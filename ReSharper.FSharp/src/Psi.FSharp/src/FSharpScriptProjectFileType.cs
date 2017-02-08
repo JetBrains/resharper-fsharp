@@ -1,4 +1,5 @@
-﻿using JetBrains.ProjectModel;
+﻿using JetBrains.Annotations;
+using JetBrains.ProjectModel;
 
 namespace JetBrains.ReSharper.Psi.FSharp
 {
@@ -6,7 +7,8 @@ namespace JetBrains.ReSharper.Psi.FSharp
   public class FSharpScriptProjectFileType : KnownProjectFileType
   {
     public new const string Name = "F# script";
-    public new static readonly FSharpScriptProjectFileType Instance;
+    [UsedImplicitly] public new static readonly FSharpScriptProjectFileType Instance;
+    public override BuildAction DefaultBuildAction => BuildAction.NONE;
 
     public const string FsxExtension = ".fsx";
     public const string FsScriptExtension = ".fsscript";

@@ -1,4 +1,5 @@
-﻿using JetBrains.ProjectModel;
+﻿using JetBrains.Annotations;
+using JetBrains.ProjectModel;
 
 namespace JetBrains.ReSharper.Psi.FSharp
 {
@@ -6,12 +7,14 @@ namespace JetBrains.ReSharper.Psi.FSharp
   public class FSharpProjectFileType : KnownProjectFileType
   {
     public new const string Name = "F#";
-    public new static readonly FSharpProjectFileType Instance;
+    [UsedImplicitly] public new static readonly FSharpProjectFileType Instance;
+    public override BuildAction DefaultBuildAction => BuildAction.COMPILE;
 
     public const string FsExtension = ".fs";
     public const string FsiExtension = ".fsi";
     public const string MlExtension = ".ml";
     public const string MliExtension = ".mli";
+
 
     private FSharpProjectFileType()
       : base(Name, "F#", new[] {FsExtension, FsiExtension, MlExtension, MliExtension})
