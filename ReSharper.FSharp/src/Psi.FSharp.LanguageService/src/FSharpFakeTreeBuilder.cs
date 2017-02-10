@@ -21,7 +21,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.LanguageService
       var fileMark = Builder.Mark();
       while (Builder.GetTokenType() != null)
         Builder.AdvanceLexer();
-      Builder.Done(fileMark, ElementType.F_SHARP_FILE, null);
+      Done(fileMark, ElementType.F_SHARP_FILE);
       return GetTree();
     }
 

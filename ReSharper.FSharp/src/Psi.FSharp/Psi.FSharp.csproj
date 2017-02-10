@@ -22,7 +22,7 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG;JET_MODE_ASSERT;WAVE08</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -31,7 +31,7 @@
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;WAVE08</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
@@ -74,6 +74,10 @@
     </Reference>
     <Reference Include="FSharp.Compiler.Service.MSBuild.v12, Version=9.0.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\packages\FSharp.Compiler.Service.9.0.1\lib\net45\FSharp.Compiler.Service.MSBuild.v12.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FSharp.Compiler.Service.ProjectCracker, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\FSharp.Compiler.Service.ProjectCracker.9.0.1\lib\net45\FSharp.Compiler.Service.ProjectCracker.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="FSharp.Core, Version=4.4.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -373,6 +377,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="src\FSharpCheckerUtil.cs" />
+    <Compile Include="src\FSharpProjectOptionsProvider.cs" />
+    <Compile Include="src\FSharpRangeUtil.cs" />
     <Compile Include="src\FSharpScriptProjectFileLanguageService.cs" />
     <Compile Include="src\Gen\Psi\FSharp\**\*.cs">
       <SubType>Code</SubType>
@@ -456,6 +463,7 @@
     <Error Condition="!Exists('..\..\packages\JetBrains.Psi.Features.UnitTesting.108.0.20170208.155144-eap02\build\JetBrains.Psi.Features.UnitTesting.Targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\JetBrains.Psi.Features.UnitTesting.108.0.20170208.155144-eap02\build\JetBrains.Psi.Features.UnitTesting.Targets'))" />
     <Error Condition="!Exists('..\..\packages\JetBrains.Psi.Features.test.Framework.108.0.20170208.155144-eap02\build\JetBrains.Psi.Features.test.Framework.Targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\JetBrains.Psi.Features.test.Framework.108.0.20170208.155144-eap02\build\JetBrains.Psi.Features.test.Framework.Targets'))" />
     <Error Condition="!Exists('..\..\packages\JetBrains.ReSharper.SDK.Internal.108.0.20170208.163221-eap02\build\JetBrains.ReSharper.SDK.Internal.Targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\JetBrains.ReSharper.SDK.Internal.108.0.20170208.163221-eap02\build\JetBrains.ReSharper.SDK.Internal.Targets'))" />
+    <Error Condition="!Exists('..\..\packages\FSharp.Compiler.Service.ProjectCracker.9.0.1\build\net45\FSharp.Compiler.Service.ProjectCracker.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\FSharp.Compiler.Service.ProjectCracker.9.0.1\build\net45\FSharp.Compiler.Service.ProjectCracker.targets'))" />
   </Target>
   <Import Project="..\..\packages\JetBrains.Platform.Interop.dotMemoryUnit.Framework.108.0.20170208.154448-eap02\build\JetBrains.Platform.Interop.dotMemoryUnit.Framework.Targets" Condition="Exists('..\..\packages\JetBrains.Platform.Interop.dotMemoryUnit.Framework.108.0.20170208.154448-eap02\build\JetBrains.Platform.Interop.dotMemoryUnit.Framework.Targets')" />
   <Import Project="..\..\packages\JetBrains.Platform.Core.Shell.108.0.20170208.104656-eap02\build\JetBrains.Platform.Core.Shell.Targets" Condition="Exists('..\..\packages\JetBrains.Platform.Core.Shell.108.0.20170208.104656-eap02\build\JetBrains.Platform.Core.Shell.Targets')" />
@@ -472,6 +480,7 @@
   <Import Project="..\..\packages\JetBrains.Psi.Features.UnitTesting.108.0.20170208.155144-eap02\build\JetBrains.Psi.Features.UnitTesting.Targets" Condition="Exists('..\..\packages\JetBrains.Psi.Features.UnitTesting.108.0.20170208.155144-eap02\build\JetBrains.Psi.Features.UnitTesting.Targets')" />
   <Import Project="..\..\packages\JetBrains.Psi.Features.test.Framework.108.0.20170208.155144-eap02\build\JetBrains.Psi.Features.test.Framework.Targets" Condition="Exists('..\..\packages\JetBrains.Psi.Features.test.Framework.108.0.20170208.155144-eap02\build\JetBrains.Psi.Features.test.Framework.Targets')" />
   <Import Project="..\..\packages\JetBrains.ReSharper.SDK.Internal.108.0.20170208.163221-eap02\build\JetBrains.ReSharper.SDK.Internal.Targets" Condition="Exists('..\..\packages\JetBrains.ReSharper.SDK.Internal.108.0.20170208.163221-eap02\build\JetBrains.ReSharper.SDK.Internal.Targets')" />
+  <Import Project="..\..\packages\FSharp.Compiler.Service.ProjectCracker.9.0.1\build\net45\FSharp.Compiler.Service.ProjectCracker.targets" Condition="Exists('..\..\packages\FSharp.Compiler.Service.ProjectCracker.9.0.1\build\net45\FSharp.Compiler.Service.ProjectCracker.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

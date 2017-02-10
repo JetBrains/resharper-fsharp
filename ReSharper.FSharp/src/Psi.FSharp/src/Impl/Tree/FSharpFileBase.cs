@@ -1,10 +1,13 @@
 ﻿using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
+using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 {
   internal abstract class FSharpFileBase : FileElementBase, IFSharpFile
   {
+    public FSharpParseFileResults ParseResults { get; set; }
+
     public override PsiLanguageType Language => FSharpLanguage.Instance;
 
     public virtual void Accept(TreeNodeVisitor visitor)
