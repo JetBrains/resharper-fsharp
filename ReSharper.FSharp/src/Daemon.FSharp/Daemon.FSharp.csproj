@@ -374,10 +374,25 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="src\FSharpDaemonBehaviour.cs" />
+    <Compile Include="src\Highlightings\ErrorHighlighting.cs" />
+    <Compile Include="src\Highlightings\ErrorOrWarningHighlightingBase.cs" />
+    <Compile Include="src\Highlightings\UnresolvedErrorHighlighting.cs" />
+    <Compile Include="src\Highlightings\WarningHighlighting.cs" />
+    <Compile Include="src\Stages\FSharpDaemonBehaviour.cs" />
+    <Compile Include="src\Stages\FSharpDaemonStageBase.cs" />
+    <Compile Include="src\Stages\ErrorsStageProcess.cs" />
+    <Compile Include="src\Stages\SyntaxErrorsStage.cs" />
     <Compile Include="ZoneMarker.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Common.FSharp\Common.FSharp.csproj">
+      <Project>{071AE9B9-B98A-4ADB-A3CF-EF5CE5656ECA}</Project>
+      <Name>Common.FSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Common.Util\Common.Util.fsproj">
+      <Project>{01F81F14-0563-4493-A4A9-AE29A8DA689F}</Project>
+      <Name>Common.Util</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Psi.FSharp\Psi.FSharp.csproj">
       <Project>{4D2A870A-2D0D-4004-A795-596F0F9CE591}</Project>
       <Name>Psi.FSharp</Name>

@@ -2,7 +2,7 @@
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.FSharp;
 
-namespace JetBrains.ReSharper.Daemon.FSharp
+namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 {
   [Language(typeof(FSharpLanguage))]
   public class FSharpDaemonBehaviour : LanguageSpecificDaemonBehavior
