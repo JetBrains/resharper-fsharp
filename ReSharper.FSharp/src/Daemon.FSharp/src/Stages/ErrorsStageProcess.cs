@@ -52,8 +52,10 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
       if (error.StartLineAlternate == 0)
         return new DocumentRange(document, new TextRange(0, document.GetLineEndOffsetNoLineBreak(Line.O)));
 
-      var startOffset = FSharpRangeUtil.GetDocumentOffset(document, (Line) (error.StartLineAlternate - 1), (Column) error.StartColumn);
-      var endOffset = FSharpRangeUtil.GetDocumentOffset(document, (Line) (error.EndLineAlternate - 1), (Column) error.EndColumn);
+      var startOffset = FSharpRangeUtil.GetDocumentOffset(document, (Line) (error.StartLineAlternate - 1),
+        (Column) error.StartColumn);
+      var endOffset = FSharpRangeUtil.GetDocumentOffset(document, (Line) (error.EndLineAlternate - 1),
+        (Column) error.EndColumn);
       return new DocumentRange(document, new TextRange(startOffset, endOffset));
     }
 

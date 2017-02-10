@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.Application.Progress;
+using JetBrains.ReSharper.Psi.FSharp.Tree;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Control;
 using Microsoft.FSharp.Core;
@@ -22,6 +23,18 @@ namespace JetBrains.ReSharper.Psi.FSharp
       var projectOptions = FSharpProjectOptionsProvider.GetProjectOptions(file);
 
       return WaitForFSharpAsync(Checker.ParseFileInProject(filePath, fileSource, projectOptions));
+    }
+
+    [CanBeNull]
+    public static FSharpCheckFileResults CheckFSharpFile([NotNull] IFSharpFile fsFile)
+    {
+      var sourceFile = fsFile.GetSourceFile();
+      var projectOptions = sourceFile != null ? FSharpProjectOptionsProvider.GetProjectOptions(sourceFile) : null;
+      if (projectOptions == null) return null;
+      var checkAsync = Checker.CheckFileInProject(fsFile.ParseResults, sourceFile.GetLocation().FullPath, 0,
+        sourceFile.Document.GetText(), projectOptions, null, null);
+      var checkResultsAnswer = WaitForFSharpAsync(checkAsync) as FSharpCheckFileAnswer.Succeeded;
+      return checkResultsAnswer?.Item;
     }
 
     public static TAsync WaitForFSharpAsync<TAsync>(FSharpAsync<TAsync> async, int interruptCheckTimeout = 30)

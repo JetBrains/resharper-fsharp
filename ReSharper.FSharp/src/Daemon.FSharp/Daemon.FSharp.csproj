@@ -382,6 +382,7 @@
     <Compile Include="src\Stages\FSharpDaemonStageBase.cs" />
     <Compile Include="src\Stages\ErrorsStageProcess.cs" />
     <Compile Include="src\Stages\SyntaxErrorsStage.cs" />
+    <Compile Include="src\Stages\TypeCheckErrorsStage.cs" />
     <Compile Include="ZoneMarker.cs" />
   </ItemGroup>
   <ItemGroup>

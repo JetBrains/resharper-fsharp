@@ -8,5 +8,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Tree
   {
     [CanBeNull]
     FSharpParseFileResults ParseResults { get; set; }
+
+    [CanBeNull]
+    FSharpCheckFileResults CheckResults { get; }
   }
 }

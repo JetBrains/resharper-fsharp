@@ -1,4 +1,5 @@
-﻿using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
+﻿using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
@@ -6,7 +7,15 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 {
   internal abstract class FSharpFileBase : FileElementBase, IFSharpFile
   {
+    private FSharpCheckFileResults myCheckFileResults;
+
     public FSharpParseFileResults ParseResults { get; set; }
+
+    public FSharpCheckFileResults CheckResults
+    {
+      get { return myCheckFileResults ?? (myCheckFileResults = FSharpCheckerUtil.CheckFSharpFile(this)); }
+      set { myCheckFileResults = value; }
+    }
 
     public override PsiLanguageType Language => FSharpLanguage.Instance;
 
