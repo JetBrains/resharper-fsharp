@@ -6,6 +6,7 @@ using JetBrains.Application.changes;
 using JetBrains.DataFlow;
 using JetBrains.Platform.ProjectModel.FSharp.Properties;
 using JetBrains.ProjectModel;
+using JetBrains.ProjectModel.Impl.Build;
 using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
 using JetBrains.ReSharper.Feature.Services;
 using JetBrains.ReSharper.Psi.Modules;
@@ -146,6 +147,31 @@ namespace JetBrains.ReSharper.Psi.FSharp
       var refAssembliesPaths = project.GetAssemblyReferences(framework)
         .Select(a => a.ResolveResultAssemblyFile().Location);
       return refProjectsOutputs.Concat(refAssembliesPaths).Select(a => "-r:" + a.FullPath).ToArray();
+    }
+
+    [NotNull]
+    public static string[] GetDefinedConstants([NotNull] IPsiSourceFile sourceFile)
+    {
+      var project = sourceFile.GetProject() as ProjectImpl;
+      var definesString = project?.ProjectProperties.ActiveConfigurations.Configurations
+        .OfType<ManagedProjectConfiguration>()
+        .FirstOrDefault()
+        ?.DefineConstants;
+      return SplitDefines(definesString);
+    }
+
+    [NotNull]
+    public static string[] SplitDefines([CanBeNull] string definesString)
+    {
+      if (string.IsNullOrEmpty(definesString)) return EmptyArray<string>.Instance;
+
+      var defines = definesString.Split(';', ',', ' ');
+      var result = new string[defines.Length];
+      for (var i = 0; i < defines.Length; i++)
+      {
+        result[i] = defines[i].Trim();
+      }
+      return result;
     }
   }
 }

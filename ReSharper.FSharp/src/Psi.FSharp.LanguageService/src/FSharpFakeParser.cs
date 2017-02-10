@@ -24,7 +24,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.LanguageService
         var parseResults = FSharpCheckerUtil.ParseFSharpFile(mySourceFile);
         InterruptableActivityCookie.CheckAndThrow();
 
-        var tokenBuffer = new TokenBuffer(new FSharpLexer(mySourceFile.Document, EmptyArray<string>.Instance));
+        var defines = FSharpProjectOptionsProvider.GetDefinedConstants(mySourceFile);
+        var tokenBuffer = new TokenBuffer(new FSharpLexer(mySourceFile.Document, defines));
         var treeBuilder = new FSharpFakeTreeBuilder(tokenBuffer.CreateLexer(), lifetimeDefinition.Lifetime);
         var fsFile = treeBuilder.CreateFakeFile() as IFSharpFile;
         Assertion.AssertNotNull(fsFile, "fsFile != null");

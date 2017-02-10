@@ -1,6 +1,5 @@
 ﻿using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.Text;
-using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Parsing
 {
@@ -15,8 +14,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
 
     public ILexer CreateLexer(IBuffer buffer)
     {
-//      return new FSharpLexer(mySourceFile.Document, FSharpCheckerUtil.GetDefines(mySourceFile));
-      return new FSharpLexer(mySourceFile.Document, EmptyArray<string>.Instance);
+      return new FSharpLexer(mySourceFile.Document, FSharpProjectOptionsProvider.GetDefinedConstants(mySourceFile));
     }
   }
 }
