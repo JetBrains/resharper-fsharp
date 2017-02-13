@@ -377,9 +377,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="src\FSharpCheckerUtil.cs" />
     <Compile Include="src\FSharpProjectOptionsProvider.cs" />
-    <Compile Include="src\FSharpRangeUtil.cs" />
     <Compile Include="src\FSharpScriptProjectFileLanguageService.cs" />
     <Compile Include="src\Gen\Psi\FSharp\**\*.cs">
       <SubType>Code</SubType>
@@ -405,8 +403,11 @@
     <Compile Include="src\FSharpProjectFileType.cs" />
     <Compile Include="src\FSharpPsiProperties.cs" />
     <Compile Include="src\FSharpScriptProjectFileType.cs" />
+    <Compile Include="src\Impl\FSharpFakeElementFromReference.cs" />
+    <Compile Include="src\Impl\FSharpReference.cs" />
     <Compile Include="src\Impl\Tree\FSharpCompositeElement.cs" />
     <Compile Include="src\Impl\Tree\FSharpFileBase.cs" />
+    <Compile Include="src\Impl\Tree\FSharpIdentifierToken.cs" />
     <Compile Include="src\Impl\Tree\FSharpToken.cs" />
     <Compile Include="src\Impl\Tree\NewLine.cs" />
     <Compile Include="src\Impl\Tree\Whitespace.cs" />
@@ -425,6 +426,10 @@
     <Compile Include="src\Tree\FSharpCompositeNodeType.cs" />
     <Compile Include="src\Tree\IFSharpFile.cs" />
     <Compile Include="src\Tree\IFSharpTreeNode.cs" />
+    <Compile Include="src\Util\FSharpCheckerUtil.cs" />
+    <Compile Include="src\Util\FSharpElementsUtil.cs" />
+    <Compile Include="src\Util\FSharpRangeUtil.cs" />
+    <Compile Include="src\Util\FSharpSymbolUtil.cs" />
     <Compile Include="ZoneMarker.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -8,12 +8,12 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Control;
 using Microsoft.FSharp.Core;
 
-namespace JetBrains.ReSharper.Psi.FSharp
+namespace JetBrains.ReSharper.Psi.FSharp.Util
 {
   public class FSharpCheckerUtil
   {
     public static readonly FSharpChecker Checker =
-      FSharpChecker.Create(null, FSharpOption<bool>.Some(true), null, null);
+      FSharpChecker.Create(null, FSharpOption<bool>.Some(true), null, new FSharpOption<bool>(false));
 
     [CanBeNull]
     public static FSharpParseFileResults ParseFSharpFile([NotNull] IPsiSourceFile file)

@@ -1,5 +1,6 @@
 ﻿using JetBrains.Annotations;
 using JetBrains.Application.Settings;
+using JetBrains.ReSharper.Daemon.UsageChecking;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
@@ -8,7 +9,7 @@ using Microsoft.FSharp.Compiler;
 
 namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 {
-  [DaemonStage(StagesBefore = new[] {typeof(SyntaxErrorsStage)})] //,
+  [DaemonStage(StagesBefore = new[] {typeof(SetResolvedSymbolsStage)}, StagesAfter = new[] {typeof(CollectUsagesStage)})]
   public class TypeCheckErrorsStage : FSharpDaemonStageBase
   {
     public class TypeCheckErrorsStageProcess : ErrorsStageProcess

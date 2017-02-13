@@ -9,6 +9,7 @@ using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.Impl.Build;
 using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
 using JetBrains.ReSharper.Feature.Services;
+using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.Util;
 using Microsoft.FSharp.Collections;
@@ -168,9 +169,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
       var defines = definesString.Split(';', ',', ' ');
       var result = new string[defines.Length];
       for (var i = 0; i < defines.Length; i++)
-      {
         result[i] = defines[i].Trim();
-      }
       return result;
     }
   }

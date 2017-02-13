@@ -28,7 +28,8 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
       return fsFile != null ? new[] {CreateProcess(fsFile, process)} : EmptyList<IDaemonStageProcess>.InstanceList;
     }
 
-    protected abstract IDaemonStageProcess CreateProcess([NotNull] IFSharpFile fsFile, IDaemonProcess process);
+    protected abstract IDaemonStageProcess CreateProcess([NotNull] IFSharpFile fsFile,
+      [NotNull] IDaemonProcess process);
 
     public virtual ErrorStripeRequest NeedsErrorStripe(IPsiSourceFile sourceFile,
       IContextBoundSettingsStore settingsStore)

@@ -376,12 +376,16 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\Highlightings\ErrorHighlighting.cs" />
     <Compile Include="src\Highlightings\ErrorOrWarningHighlightingBase.cs" />
+    <Compile Include="src\Highlightings\IdentifierHighlighting.cs" />
     <Compile Include="src\Highlightings\UnresolvedErrorHighlighting.cs" />
     <Compile Include="src\Highlightings\WarningHighlighting.cs" />
     <Compile Include="src\Stages\FSharpDaemonBehaviour.cs" />
     <Compile Include="src\Stages\FSharpDaemonStageBase.cs" />
     <Compile Include="src\Stages\ErrorsStageProcess.cs" />
+    <Compile Include="src\Stages\FSharpIdentifierTooltipProvider.cs" />
+    <Compile Include="src\Stages\SetResolvedSymbolsStage.cs" />
     <Compile Include="src\Stages\SyntaxErrorsStage.cs" />
+    <Compile Include="src\Stages\SyntaxHighlightingStage.cs" />
     <Compile Include="src\Stages\TypeCheckErrorsStage.cs" />
     <Compile Include="ZoneMarker.cs" />
   </ItemGroup>
