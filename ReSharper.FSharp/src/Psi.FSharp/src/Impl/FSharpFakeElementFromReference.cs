@@ -14,19 +14,19 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
 {
   public class FSharpFakeElementFromReference : IClrDeclaredElement
   {
-    [NotNull] private readonly FSharpSymbol mySymbol;
+    [NotNull] public readonly FSharpSymbol Symbol;
     [NotNull] private readonly FSharpIdentifierToken myReferenceOwner;
 
     public FSharpFakeElementFromReference([NotNull] FSharpSymbol symbol, [NotNull] FSharpIdentifierToken referenceOwner)
     {
-      mySymbol = symbol;
+      Symbol = symbol;
       myReferenceOwner = referenceOwner;
     }
 
     [CanBeNull]
-    private IClrDeclaredElement GetActualElement()
+    public IClrDeclaredElement GetActualElement()
     {
-      return FSharpElementsUtil.GetDeclaredElement(mySymbol, myReferenceOwner.GetPsiModule());
+      return FSharpElementsUtil.GetDeclaredElement(Symbol, myReferenceOwner.GetPsiModule());
     }
 
     public IPsiServices GetPsiServices()
@@ -48,7 +48,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
 
     public DeclaredElementType GetElementType()
     {
-      throw new System.NotImplementedException(); // todo
+      return GetActualElement()?.GetElementType() ?? CLRDeclaredElementType.LOCAL_VARIABLE;
     }
 
     public XmlNode GetXMLDoc(bool inherit)
@@ -63,12 +63,12 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
 
     public bool IsValid()
     {
-      return GetActualElement()?.IsValid() ?? myReferenceOwner.IsValid();
+      return myReferenceOwner.IsValid();
     }
 
     public bool IsSynthetic()
     {
-      return GetActualElement()?.IsSynthetic() ?? false;
+      return false;
     }
 
     public HybridCollection<IPsiSourceFile> GetSourceFiles()
@@ -82,8 +82,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
     }
 
     public string ShortName => GetActualElement()?.ShortName ?? myReferenceOwner.GetText();
-    public bool CaseSensitiveName => GetActualElement()?.CaseSensitiveName ?? true;
-    public PsiLanguageType PresentationLanguage => GetActualElement()?.PresentationLanguage ?? FSharpLanguage.Instance;
+    public bool CaseSensitiveName => true;
+    public PsiLanguageType PresentationLanguage => FSharpLanguage.Instance;
 
     public ITypeElement GetContainingType()
     {

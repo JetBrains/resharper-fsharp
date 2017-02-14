@@ -423,6 +423,9 @@
       <DependentUpon>FSharpTokens.xml</DependentUpon>
     </Compile>
     <Compile Include="src\Parsing\ParserMessages.cs" />
+    <Compile Include="src\Searching\FSharpReferenceSearcher.cs" />
+    <Compile Include="src\Searching\FSharpReferenceSearchProcessor.cs" />
+    <Compile Include="src\Searching\FSharpSearcherFactory.cs" />
     <Compile Include="src\Tree\FSharpCompositeNodeType.cs" />
     <Compile Include="src\Tree\IFSharpFile.cs" />
     <Compile Include="src\Tree\IFSharpTreeNode.cs" />
@@ -430,6 +433,7 @@
     <Compile Include="src\Util\FSharpElementsUtil.cs" />
     <Compile Include="src\Util\FSharpRangeUtil.cs" />
     <Compile Include="src\Util\FSharpSymbolUtil.cs" />
+    <Compile Include="src\Util\FSharpTypeAbbreviationsUtil.cs" />
     <Compile Include="ZoneMarker.cs" />
   </ItemGroup>
   <ItemGroup>

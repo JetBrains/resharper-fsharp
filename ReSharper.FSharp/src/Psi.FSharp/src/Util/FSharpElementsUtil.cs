@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi.FSharp.Impl;
 using JetBrains.ReSharper.Psi.Modules;
+using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util.Extension;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
@@ -8,13 +12,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
 {
   public class FSharpElementsUtil
   {
-    [CanBeNull]
-    public static IClrDeclaredElement GetDeclaredElement([NotNull] FSharpSymbol symbol, [NotNull] IPsiModule psiModule)
-    {
-      // todo: map symbols to R# elements
-      return null;
-    }
-
     [CanBeNull]
     public static IDeclaredType GetBaseType([NotNull] FSharpEntity entity, [NotNull] IPsiModule psiModule)
     {
@@ -38,13 +35,20 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     }
 
     [CanBeNull]
+    public static string GetQualifiedName([NotNull] FSharpEntity entity)
+    {
+      // sometimes name includes assembly name, public key, etc and separated with comma
+      return entity.QualifiedName.SubstringBefore(",");
+    }
+
+    [CanBeNull]
     public static IDeclaredType GetDeclaredType([NotNull] FSharpType type, [NotNull] IPsiModule psiModule)
     {
       while (type.IsAbbreviation) type = type.AbbreviatedType;
-      var typeDefinition = type.TypeDefinition;
 
       // sometimes name includes assembly name, public key, etc and separated with comma
-      var qualifiedName = typeDefinition.QualifiedName.SubstringBefore(",");
+      var qualifiedName = GetQualifiedName(type.TypeDefinition);
+      if (qualifiedName == null) return null;
       var typeElement = TypeFactory.CreateTypeByCLRName(qualifiedName, psiModule);
 
       var args = type.GenericArguments;
@@ -54,6 +58,66 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
         typeArgs[i] = GetDeclaredType(args[i], psiModule);
       var element = typeElement.GetTypeElement();
       return element != null ? TypeFactory.CreateType(element, typeArgs) : null;
+    }
+
+    [CanBeNull]
+    public static IDeclaredType GetDeclaredType([NotNull] FSharpEntity entity, [NotNull] IPsiModule psiModule)
+    {
+      if (((FSharpSymbol) entity).DeclarationLocation == null) return null;
+
+      if (entity.IsFSharpAbbreviation)
+      {
+        var type = entity.AbbreviatedType;
+        while (type.IsAbbreviation) type = type.AbbreviatedType;
+        entity = type.TypeDefinition;
+      }
+      var qualifiedName = GetQualifiedName(entity);
+      return qualifiedName != null ? TypeFactory.CreateTypeByCLRName(qualifiedName, psiModule) : null;
+    }
+
+    [CanBeNull]
+    public static IClrDeclaredElement GetDeclaredElement([NotNull] FSharpSymbol symbol, [NotNull] IPsiModule psiModule)
+    {
+      var entity = symbol as FSharpEntity;
+      if (entity != null) return GetDeclaredType(entity, psiModule)?.GetTypeElement();
+
+      var unionCase = symbol as FSharpUnionCase;
+      if (unionCase != null)
+      {
+        // here are two distinct cases:
+        // * case with fields, inherited class
+        // * case without fields, singleton property
+      }
+
+      var mfv = symbol as FSharpMemberOrFunctionOrValue;
+      if (mfv != null)
+      {
+        var type = GetContainingType(mfv, psiModule);
+        var members = type?.GetTypeElement()?.EnumerateMembers(mfv.CompiledName, true);
+        return members?.FirstOrDefault(); // todo: check overloads
+      }
+      return null;
+    }
+
+    [CanBeNull]
+    private static IDeclaredType GetContainingType([NotNull] FSharpMemberOrFunctionOrValue mfv,
+      [NotNull] IPsiModule psiModule)
+    {
+      try
+      {
+        return GetDeclaredType(mfv.EnclosingEntity, psiModule);
+      }
+      catch (InvalidOperationException)
+      {
+        // element is local to some member and is not stored in R# caches
+        return null;
+      }
+    }
+
+    [CanBeNull]
+    public static FSharpSymbol GetFSharpSymbol(IDeclaredElement element)
+    {
+      return (element as FSharpFakeElementFromReference)?.Symbol;
     }
   }
 }

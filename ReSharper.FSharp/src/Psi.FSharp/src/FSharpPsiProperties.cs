@@ -12,9 +12,8 @@ namespace JetBrains.ReSharper.Psi.FSharp
     }
 
     public override bool ProvidesCodeModel =>
-//      ProjectFile.Properties.BuildAction.IsCompile() ||
-//      ProjectFile.LanguageType.Equals(FSharpScriptProjectFileType.Instance);
-      true;
+      ProjectFile.Properties.BuildAction.IsCompile() ||
+      ProjectFile.LanguageType.Equals(FSharpScriptProjectFileType.Instance);
 
     public override bool ShouldBuildPsi => true;
   }
