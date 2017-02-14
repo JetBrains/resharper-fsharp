@@ -1,5 +1,5 @@
 ﻿using System.Threading;
-using System.Threading.Tasks;
+using FSharpUtil;
 using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.Application.Progress;
@@ -40,22 +40,21 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
 
     public static TAsync WaitForFSharpAsync<TAsync>(FSharpAsync<TAsync> async, int interruptCheckTimeout = 30)
     {
-      var interruptChecker = new SeldomInterruptCheckerWithCheckTime(interruptCheckTimeout);
+      var interruptChecker = InterruptableActivityCookie.GetCheck();
       var cancellationTokenSource = new CancellationTokenSource();
       var cancellationToken = cancellationTokenSource.Token;
       var mres = new ManualResetEventSlim();
 
       InterruptableActivityCookie.CheckAndThrow();
-      var checkTask = FSharpAsync.StartAsTask(async, null, new FSharpOption<CancellationToken>(cancellationToken));
-      checkTask.ContinueWith(completed => { mres.Set(); }, TaskContinuationOptions.ExecuteSynchronously);
-
-      while (!checkTask.IsCompleted)
+      var task = FSharpAsync.StartAsTask(AsyncUtil.RunAsyncAndSetEvent(async, mres), null,
+        new FSharpOption<CancellationToken>(cancellationToken));
+      while (!task.IsCompleted)
       {
         var finished = mres.Wait(interruptCheckTimeout, cancellationToken);
         if (finished) break;
         try
         {
-          interruptChecker.CheckForInterrupt();
+          interruptChecker?.Invoke();
         }
         catch (ProcessCancelledException)
         {
@@ -63,7 +62,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
           throw;
         }
       }
-      return checkTask.Result;
+      return task.Result;
     }
   }
 }
