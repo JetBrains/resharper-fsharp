@@ -404,7 +404,9 @@
     <Compile Include="src\FSharpPsiProperties.cs" />
     <Compile Include="src\FSharpScriptProjectFileType.cs" />
     <Compile Include="src\Impl\FSharpFakeElementFromReference.cs" />
-    <Compile Include="src\Impl\FSharpReference.cs" />
+    <Compile Include="src\Impl\FSharpResolvedReference.cs" />
+    <Compile Include="src\Impl\FSharpReferenceBase.cs" />
+    <Compile Include="src\Impl\FSharpUnresolvedReference.cs" />
     <Compile Include="src\Impl\Tree\FSharpCompositeElement.cs" />
     <Compile Include="src\Impl\Tree\FSharpFileBase.cs" />
     <Compile Include="src\Impl\Tree\FSharpIdentifierToken.cs" />

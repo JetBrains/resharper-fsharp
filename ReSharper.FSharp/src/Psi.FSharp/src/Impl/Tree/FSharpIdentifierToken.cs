@@ -19,8 +19,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
     public override ReferenceCollection GetFirstClassReferences()
     {
       return FSharpSymbol != null
-        ? new ReferenceCollection(new FSharpReference(this, FSharpSymbol))
-        : ReferenceCollection.Empty;
+        ? new ReferenceCollection(new FSharpResolvedReference(this, FSharpSymbol))
+        : new ReferenceCollection(new FSharpUnresolvedReference(this));
     }
   }
 }
