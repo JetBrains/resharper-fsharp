@@ -1,0 +1,13 @@
+<idea-plugin>
+  <name>F# Support</name>
+  <id>com.jetbrains.rider.fsharp</id>
+  <vendor url="https://jetbrains.com">JetBrains</vendor>
+  <description>F# language support in Rider</description>
+  <change-notes/>
+  <depends>com.intellij.modules.rider</depends>
+  <extensions defaultExtensionNs="com.intellij">
+    <fileTypeFactory id="F#" implementation="com.jetbrains.resharper.ideaInterop.fileTypes.fsharp.FSharpFileTypeFactory"/>
+    <lang.parserDefinition language="F#" implementationClass="com.jetbrains.resharper.ideaInterop.fileTypes.fsharp.FSharpParserDefinition"/>
+    <typedHandler implementation="com.jetbrains.resharper.editorActions.FSharpTypeHandler"/>
+  </extensions>
+</idea-plugin>

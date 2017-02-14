@@ -1,0 +1,31 @@
+buildscript {
+    ext.kotlin_version = '1.0.6'
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+plugins {
+    id "org.jetbrains.intellij" version "0.2.3"
+}
+
+apply plugin: 'kotlin'
+
+intellij {
+    version 'RS-163.12057'
+    downloadSources false
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '3.2'
+    distributionUrl = "https://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+group 'com.jetbrains'
+version '0.1'
