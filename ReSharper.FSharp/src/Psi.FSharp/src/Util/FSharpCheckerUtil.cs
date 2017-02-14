@@ -30,9 +30,10 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     {
       var sourceFile = fsFile.GetSourceFile();
       var projectOptions = sourceFile != null ? FSharpProjectOptionsProvider.GetProjectOptions(sourceFile) : null;
-      if (projectOptions == null) return null;
+      if (fsFile.ParseResults == null || projectOptions == null) return null;
+
       var checkAsync = Checker.CheckFileInProject(fsFile.ParseResults, sourceFile.GetLocation().FullPath, 0,
-        sourceFile.Document.GetText(), projectOptions, null, null);
+        sourceFile.Document.GetText(), projectOptions, null);
       var checkResultsAnswer = WaitForFSharpAsync(checkAsync) as FSharpCheckFileAnswer.Succeeded;
       return checkResultsAnswer?.Item;
     }

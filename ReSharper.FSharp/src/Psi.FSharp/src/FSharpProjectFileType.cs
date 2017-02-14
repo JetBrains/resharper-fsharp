@@ -8,7 +8,6 @@ namespace JetBrains.ReSharper.Psi.FSharp
   {
     public new const string Name = "F#";
     [UsedImplicitly] public new static readonly FSharpProjectFileType Instance;
-    public override BuildAction DefaultBuildAction => BuildAction.COMPILE;
 
     public const string FsExtension = ".fs";
     public const string FsiExtension = ".fsi";

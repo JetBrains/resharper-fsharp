@@ -91,7 +91,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
     {
       var filePath = sourceFile.GetLocation().FullPath;
       var getScriptOptionsAsync = FSharpCheckerUtil.Checker.GetProjectOptionsFromScript(
-        filePath, sourceFile.Document.GetText(), FSharpOption<DateTime>.Some(DateTime.Now), null, null);
+        filePath, sourceFile.Document.GetText(), FSharpOption<DateTime>.Some(DateTime.Now), null, null, null);
       return FSharpAsync.RunSynchronously(getScriptOptionsAsync, null, null);
     }
 
@@ -134,7 +134,9 @@ namespace JetBrains.ReSharper.Psi.FSharp
         options.IsIncompleteTypeCheckEnvironment,
         options.UseScriptResolutionRules,
         options.LoadTime,
-        options.UnresolvedReferences);
+        options.UnresolvedReferences,
+        options.OriginalLoadReferences,
+        options.ExtraProjectInfo);
 
       return Tuple.Create(outPath, fixedOptions);
     }

@@ -8,7 +8,6 @@ namespace JetBrains.ReSharper.Psi.FSharp
   {
     public new const string Name = "F# script";
     [UsedImplicitly] public new static readonly FSharpScriptProjectFileType Instance;
-    public override BuildAction DefaultBuildAction => BuildAction.NONE;
 
     public const string FsxExtension = ".fsx";
     public const string FsScriptExtension = ".fsscript";
