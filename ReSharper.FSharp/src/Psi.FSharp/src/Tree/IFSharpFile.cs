@@ -11,5 +11,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Tree
 
     [CanBeNull]
     FSharpCheckFileResults CheckResults { get; }
+
+    /// <summary>
+    /// True when SetResolvedSymbolsStageProcess is finished.
+    /// </summary>
+    bool ReferencesResolved { get; set; }
+
   }
 }

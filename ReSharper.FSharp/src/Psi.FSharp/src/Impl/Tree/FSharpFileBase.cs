@@ -17,6 +17,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       set { myCheckFileResults = value; }
     }
 
+    public bool ReferencesResolved { get; set; }
+
     public override PsiLanguageType Language => FSharpLanguage.Instance;
 
     public virtual void Accept(TreeNodeVisitor visitor)

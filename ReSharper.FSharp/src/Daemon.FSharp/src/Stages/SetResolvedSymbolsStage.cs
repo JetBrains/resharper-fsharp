@@ -56,6 +56,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
         }
         if (i % 100 == 0 && DaemonProcess.InterruptFlag) throw new ProcessCancelledException();
       }
+      myFsFile.ReferencesResolved = true;
     }
 
     [CanBeNull]
