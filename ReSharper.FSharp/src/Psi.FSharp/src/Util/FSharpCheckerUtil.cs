@@ -34,8 +34,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
 
       var checkAsync = Checker.CheckFileInProject(fsFile.ParseResults, sourceFile.GetLocation().FullPath, 0,
         sourceFile.Document.GetText(), projectOptions, null);
-      var checkResultsAnswer = WaitForFSharpAsync(checkAsync) as FSharpCheckFileAnswer.Succeeded;
-      return checkResultsAnswer?.Item;
+      return (WaitForFSharpAsync(checkAsync) as FSharpCheckFileAnswer.Succeeded)?.Item;
     }
 
     public static TAsync WaitForFSharpAsync<TAsync>(FSharpAsync<TAsync> async, int interruptCheckTimeout = 30)

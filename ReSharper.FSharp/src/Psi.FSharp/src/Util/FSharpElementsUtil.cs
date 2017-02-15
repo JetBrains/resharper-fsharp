@@ -45,8 +45,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     public static IDeclaredType GetDeclaredType([NotNull] FSharpType type, [NotNull] IPsiModule psiModule)
     {
       while (type.IsAbbreviation) type = type.AbbreviatedType;
-
-      // sometimes name includes assembly name, public key, etc and separated with comma
       var qualifiedName = GetQualifiedName(type.TypeDefinition);
       if (qualifiedName == null) return null;
       var typeElement = TypeFactory.CreateTypeByCLRName(qualifiedName, psiModule);
