@@ -20,7 +20,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
     }
   }
 
-  public class SetResolvedSymbolsStageProcess : IDaemonStageProcess
+  public class SetResolvedSymbolsStageProcess : FSharpDaemonStageProcessBase
   {
     private const string AttributeSuffix = "Attribute";
 
@@ -28,13 +28,13 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
     private readonly IDocument myDocument;
 
     public SetResolvedSymbolsStageProcess([NotNull] IFSharpFile fsFile, [NotNull] IDaemonProcess process)
+      : base(process)
     {
       myFsFile = fsFile;
       myDocument = process.Document;
-      DaemonProcess = process;
     }
 
-    public void Execute(Action<DaemonStageResult> committer)
+    public override void Execute(Action<DaemonStageResult> committer)
     {
       var checkResult = myFsFile.CheckResults;
       if (checkResult == null) return;
@@ -44,16 +44,10 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 
       for (var i = 0; i < symbolUses.Length; i++)
       {
-        var symbolUse = symbolUses[i];
-        if (symbolUse.IsFromDefinition)
-        {
-          // todo: cover declarations
-        }
-        else
-        {
-          var token = FindUsageToken(symbolUse);
-          if (token != null) token.FSharpSymbol = symbolUse.Symbol;
-        }
+        var symbolUse = symbolUses[i]; // todo: remove for declarations
+        var token = FindUsageToken(symbolUse);
+        if (token != null) token.FSharpSymbol = symbolUse.Symbol;
+
         if (i % 100 == 0 && DaemonProcess.InterruptFlag) throw new ProcessCancelledException();
       }
       myFsFile.ReferencesResolved = true;
@@ -84,7 +78,5 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 
       return null;
     }
-
-    public IDaemonProcess DaemonProcess { get; }
   }
 }

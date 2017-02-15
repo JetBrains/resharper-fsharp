@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using JetBrains.ReSharper.Daemon.FSharp.Highlightings;
+using JetBrains.Application.Progress;
 using JetBrains.ReSharper.Daemon.Stages;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi.FSharp.Parsing;
@@ -18,41 +18,30 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
       return new SyntaxHighlightStageProcess(psiFile, process);
     }
 
-    public class SyntaxHighlightStageProcess : IDaemonStageProcess
+    public class SyntaxHighlightStageProcess : FSharpHighlightStageProcessBase
     {
-      private readonly IFSharpFile myFsFile;
-
-      public SyntaxHighlightStageProcess(IFSharpFile fsFile, IDaemonProcess process)
+      public SyntaxHighlightStageProcess(IFSharpFile fsFile, IDaemonProcess process) : base(fsFile, process)
       {
-        myFsFile = fsFile;
-        DaemonProcess = process;
       }
 
-      public void Execute(Action<DaemonStageResult> committer)
+      public override void Execute(Action<DaemonStageResult> committer)
       {
         var highlightings = new List<HighlightingInfo>();
-        foreach (var token in myFsFile.Tokens())
+
+        using (var tokensEnumerator = FsFile.Tokens().GetEnumerator())
         {
-          var tokenType = token.GetTokenType();
-          if (tokenType == FSharpTokenType.DEAD_CODE)
-            highlightings.Add(CreateTokenHighlighting(token, HighlightingAttributeIds.DEADCODE_ATTRIBUTE));
-          else if (tokenType == FSharpTokenType.IDENTIFIER || tokenType == FSharpTokenType.OPERATOR)
+          var token = tokensEnumerator.Current;
+          for (var i = 0; tokensEnumerator.MoveNext(); i++)
           {
-            var attrId = HighlightingAttributeIds.LOCAL_VARIABLE_IDENTIFIER_ATTRIBUTE; // todo: get from resolved symbol
-            highlightings.Add(CreateTokenHighlighting(token, attrId));
+            if (token?.GetTokenType() == FSharpTokenType.DEAD_CODE)
+              highlightings.Add(CreateHighlighting(token, HighlightingAttributeIds.DEADCODE_ATTRIBUTE));
+            token = tokensEnumerator.Current;
+
+            if (i % 100 == 0 && DaemonProcess.InterruptFlag) throw new ProcessCancelledException();
           }
         }
         committer(new DaemonStageResult(highlightings));
       }
-
-      private static HighlightingInfo CreateTokenHighlighting(ITreeNode token, string highlightingAttributeId)
-      {
-        var range = token.GetNavigationRange();
-        var highlighting = new FSharpIdentifierHighlighting(highlightingAttributeId, range);
-        return new HighlightingInfo(range, highlighting);
-      }
-
-      public IDaemonProcess DaemonProcess { get; }
     }
   }
 }

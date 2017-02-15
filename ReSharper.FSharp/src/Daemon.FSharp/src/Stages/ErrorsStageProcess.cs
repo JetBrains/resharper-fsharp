@@ -12,7 +12,7 @@ using Line = JetBrains.Util.dataStructures.TypedIntrinsics.Int32<JetBrains.Docum
 
 namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 {
-  public class ErrorsStageProcess : IDaemonStageProcess
+  public class ErrorsStageProcess : FSharpDaemonStageProcessBase
   {
     [NotNull] private readonly FSharpErrorInfo[] myErrors;
     [NotNull] private readonly IDocument myDocument;
@@ -20,14 +20,13 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
     // github.com/fsharp/FSharp.Compiler.Service/blob/9.0.0/src/fsharp/CompileOps.fs#L246
     private const int ErrorNumberUndefined = 39;
 
-    public ErrorsStageProcess([NotNull] IDaemonProcess process, [NotNull] FSharpErrorInfo[] errors)
+    public ErrorsStageProcess([NotNull] IDaemonProcess process, [NotNull] FSharpErrorInfo[] errors) : base(process)
     {
       myErrors = errors;
-      DaemonProcess = process;
       myDocument = DaemonProcess.Document;
     }
 
-    public void Execute(Action<DaemonStageResult> committer)
+    public override void Execute(Action<DaemonStageResult> committer)
     {
       var highlightings = new List<HighlightingInfo>(myErrors.Length);
       foreach (var error in myErrors)
@@ -58,7 +57,5 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
         (Column) error.EndColumn);
       return new DocumentRange(document, new TextRange(startOffset, endOffset));
     }
-
-    public IDaemonProcess DaemonProcess { get; }
   }
 }

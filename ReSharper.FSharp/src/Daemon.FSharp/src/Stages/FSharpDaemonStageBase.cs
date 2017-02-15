@@ -10,7 +10,6 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 {
-  [Language(typeof(FSharpLanguage))]
   public abstract class FSharpDaemonStageBase : IDaemonStage
   {
     protected virtual bool IsSupported(IPsiSourceFile sourceFile)
