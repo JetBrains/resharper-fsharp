@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using JetBrains.Application.Progress;
+using JetBrains.ReSharper.Daemon.FSharp.Highlightings;
 using JetBrains.ReSharper.Daemon.Stages;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi.FSharp.Parsing;
@@ -27,16 +28,17 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
       public override void Execute(Action<DaemonStageResult> committer)
       {
         var highlightings = new List<HighlightingInfo>();
-
         using (var tokensEnumerator = FsFile.Tokens().GetEnumerator())
         {
           var token = tokensEnumerator.Current;
           for (var i = 0; tokensEnumerator.MoveNext(); i++)
           {
-            if (token?.GetTokenType() == FSharpTokenType.DEAD_CODE)
-              highlightings.Add(CreateHighlighting(token, HighlightingAttributeIds.DEADCODE_ATTRIBUTE));
+            if (token != null && token.GetTokenType() == FSharpTokenType.DEAD_CODE)
+            {
+              var range = token.GetNavigationRange();
+              highlightings.Add(new HighlightingInfo(range, new DeadCodeHighlighting(range)));
+            }
             token = tokensEnumerator.Current;
-
             if (i % 100 == 0 && DaemonProcess.InterruptFlag) throw new ProcessCancelledException();
           }
         }

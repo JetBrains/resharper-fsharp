@@ -375,6 +375,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\DaemonUtil.cs" />
+    <Compile Include="src\Highlightings\DeadCodeHighlighting.cs" />
     <Compile Include="src\Highlightings\ErrorHighlighting.cs" />
     <Compile Include="src\Highlightings\ErrorOrWarningHighlightingBase.cs" />
     <Compile Include="src\Highlightings\IdentifierHighlighting.cs" />
