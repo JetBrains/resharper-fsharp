@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.DataFlow;
@@ -44,7 +43,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 
       var documentRange = new DocumentRange(document, highlighter.Range);
       var psiFile = GetPsiFile(sourceFile, documentRange) as IFSharpFile;
-      var checkResults = psiFile?.CheckResults;
+      var checkResults = psiFile?.GetCheckResults();
       var token = psiFile?.FindTokenAt(documentRange.StartOffset) as FSharpToken;
       if (checkResults == null || token == null) return string.Empty;
 
@@ -64,11 +63,11 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
       var tooltipsTexts = new List<string>();
       foreach (var tooltip in tooltips)
       {
-        var singleTooltip = tooltip as FSharpToolTipElement<string>.Single;
+        var singleTooltip = tooltip as FSharpToolTipElement.Single;
         if (singleTooltip != null)
           tooltipsTexts.Add(GetTooltipText(singleTooltip.Item1, singleTooltip.Item2));
 
-        var overloads = tooltip as FSharpToolTipElement<string>.Group;
+        var overloads = tooltip as FSharpToolTipElement.Group;
         if (overloads != null)
           tooltipsTexts.AddRange(overloads.Item.Select(overload => GetTooltipText(overload.Item1, overload.Item2)));
       }

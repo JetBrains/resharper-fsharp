@@ -36,15 +36,21 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 
     public override void Execute(Action<DaemonStageResult> committer)
     {
-      var checkResult = myFsFile.CheckResults;
+      var interruptChecker = DaemonProcess.CreateInterruptChecker();
+      var checkResult = myFsFile.GetCheckResults(interruptChecker);
       if (checkResult == null) return;
 
-      var symbolUses = FSharpCheckerUtil.WaitForFSharpAsync(checkResult.GetAllUsesOfAllSymbolsInFile());
-      if (DaemonProcess.InterruptFlag) throw new ProcessCancelledException();
+      var symbolUses = FSharpCheckerUtil.RunFSharpAsync(checkResult.GetAllUsesOfAllSymbolsInFile(), interruptChecker);
+      if (symbolUses == null) return;
 
       for (var i = 0; i < symbolUses.Length; i++)
       {
         var symbolUse = symbolUses[i]; // todo: remove for declarations
+        if (symbolUse.IsFromDefinition)
+        {
+          var mfv = symbolUse.Symbol as FSharpMemberOrFunctionOrValue;
+          if (mfv != null && mfv.IsImplicitConstructor) continue;
+        }
         var token = FindUsageToken(symbolUse);
         if (token != null) token.FSharpSymbol = symbolUse.Symbol;
 

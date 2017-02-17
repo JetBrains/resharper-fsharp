@@ -81,7 +81,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
       return GetActualElement()?.HasDeclarationsIn(sourceFile) ?? myReferenceOwner.GetSourceFile() == sourceFile;
     }
 
-    public string ShortName => GetActualElement()?.ShortName ?? myReferenceOwner.GetText();
+    public string ShortName => myReferenceOwner.GetText();
     public bool CaseSensitiveName => true;
     public PsiLanguageType PresentationLanguage => FSharpLanguage.Instance;
 

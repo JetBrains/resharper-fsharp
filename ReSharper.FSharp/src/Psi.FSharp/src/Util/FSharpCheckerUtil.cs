@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using FSharpUtil;
 using JetBrains.Annotations;
 using JetBrains.Application;
@@ -22,38 +23,41 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       var fileSource = file.Document.GetText();
       var projectOptions = FSharpProjectOptionsProvider.GetProjectOptions(file);
 
-      return WaitForFSharpAsync(Checker.ParseFileInProject(filePath, fileSource, projectOptions));
+      return RunFSharpAsync(Checker.ParseFileInProject(filePath, fileSource, projectOptions));
     }
 
     [CanBeNull]
-    public static FSharpCheckFileResults CheckFSharpFile([NotNull] IFSharpFile fsFile)
+    public static FSharpCheckFileResults CheckFSharpFile([NotNull] IFSharpFile fsFile,
+      [CanBeNull] Action interruptChecker = null)
     {
       var sourceFile = fsFile.GetSourceFile();
       var projectOptions = sourceFile != null ? FSharpProjectOptionsProvider.GetProjectOptions(sourceFile) : null;
       if (fsFile.ParseResults == null || projectOptions == null) return null;
 
       var checkAsync = Checker.CheckFileInProject(fsFile.ParseResults, sourceFile.GetLocation().FullPath, 0,
-        sourceFile.Document.GetText(), projectOptions, null);
-      return (WaitForFSharpAsync(checkAsync) as FSharpCheckFileAnswer.Succeeded)?.Item;
+        sourceFile.Document.GetText(), projectOptions, null, null);
+      return (RunFSharpAsync(checkAsync, interruptChecker) as FSharpCheckFileAnswer.Succeeded)?.Item;
     }
 
-    public static TAsync WaitForFSharpAsync<TAsync>(FSharpAsync<TAsync> async, int interruptCheckTimeout = 30)
+    [CanBeNull]
+    public static TResult RunFSharpAsync<TResult>(FSharpAsync<TResult> async,
+      [CanBeNull] Action interruptChecker = null)
     {
-      var interruptChecker = InterruptableActivityCookie.GetCheck();
+      const int interruptCheckTimeout = 30;
+      interruptChecker = interruptChecker ?? (() => InterruptableActivityCookie.CheckAndThrow());
       var cancellationTokenSource = new CancellationTokenSource();
       var cancellationToken = cancellationTokenSource.Token;
+      var cancellationTokenOption = new FSharpOption<CancellationToken>(cancellationToken);
       var mres = new ManualResetEventSlim();
 
-      InterruptableActivityCookie.CheckAndThrow();
-      var task = FSharpAsync.StartAsTask(AsyncUtil.RunAsyncAndSetEvent(async, mres), null,
-        new FSharpOption<CancellationToken>(cancellationToken));
+      var task = FSharpAsync.StartAsTask(AsyncUtil.RunAsyncAndSetEvent(async, mres), null, cancellationTokenOption);
       while (!task.IsCompleted)
       {
         var finished = mres.Wait(interruptCheckTimeout, cancellationToken);
         if (finished) break;
         try
         {
-          interruptChecker?.Invoke();
+          interruptChecker();
         }
         catch (ProcessCancelledException)
         {

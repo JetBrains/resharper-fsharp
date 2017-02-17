@@ -32,7 +32,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
     {
       var sourceFile = myOwner.GetSourceFile();
       Assertion.AssertNotNull(sourceFile, "sourceFile != null");
-      var checkResults = (myOwner.GetContainingFile() as IFSharpFile)?.CheckResults;
+      var checkResults = (myOwner.GetContainingFile() as IFSharpFile)?.GetCheckResults();
       if (checkResults == null) return null;
 
       var coords = sourceFile.Document.GetCoordsByOffset(myOwner.GetTreeEndOffset().Offset);

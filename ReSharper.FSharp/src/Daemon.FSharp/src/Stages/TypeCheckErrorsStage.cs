@@ -22,8 +22,8 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 
     protected override IDaemonStageProcess CreateProcess(IFSharpFile fsFile, IDaemonProcess process)
     {
-      var errors = fsFile.CheckResults?.Errors ?? EmptyArray<FSharpErrorInfo>.Instance;
-      return new TypeCheckErrorsStageProcess(process, errors);
+      var errors = fsFile.GetCheckResults(process.CreateInterruptChecker())?.Errors;
+      return new TypeCheckErrorsStageProcess(process, errors ?? EmptyArray<FSharpErrorInfo>.Instance);
     }
 
     public override ErrorStripeRequest NeedsErrorStripe(IPsiSourceFile sourceFile,
