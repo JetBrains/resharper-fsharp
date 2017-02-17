@@ -73,11 +73,24 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       return qualifiedName != null ? TypeFactory.CreateTypeByCLRName(qualifiedName, psiModule) : null;
     }
 
+    public static INamespace GetDeclaredNamespace([NotNull] FSharpEntity entity, IPsiModule psiModule)
+    {
+      var nsName = entity.CompiledName;
+      var containingName = entity.Namespace?.Value;
+      var fullName = containingName != null ? containingName + "." + nsName : nsName;
+      var symbolScope = psiModule.GetPsiServices().Symbols.GetSymbolScope(psiModule, true, true);
+      return symbolScope.GetElementsByQualifiedName(fullName).FirstOrDefault() as INamespace;
+    }
+
     [CanBeNull]
     public static IClrDeclaredElement GetDeclaredElement([NotNull] FSharpSymbol symbol, [NotNull] IPsiModule psiModule)
     {
       var entity = symbol as FSharpEntity;
-      if (entity != null) return GetDeclaredType(entity, psiModule)?.GetTypeElement();
+      if (entity != null)
+      {
+        if (entity.IsNamespace) return GetDeclaredNamespace(entity, psiModule);
+        return GetDeclaredType(entity, psiModule)?.GetTypeElement();
+      }
 
       var unionCase = symbol as FSharpUnionCase;
       if (unionCase != null)

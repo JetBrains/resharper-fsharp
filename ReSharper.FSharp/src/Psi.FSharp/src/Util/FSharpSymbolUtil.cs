@@ -1,11 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
 using JetBrains.ReSharper.Feature.Services.Daemon;
+using JetBrains.ReSharper.Psi.FSharp.Impl;
 using JetBrains.Util;
 using JetBrains.Util.Extension;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
+using Microsoft.FSharp.Core;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Util
 {
@@ -15,8 +18,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     private const string ClrConstructorName = ".ctor";
     private const string AttributeSuffix = "Attribute";
 
-    private static readonly ClrTypeName SourceNameAttribute =
+    private static readonly ClrTypeName SourceNameAttributeAttr =
       new ClrTypeName("Microsoft.FSharp.Core.CompilationSourceNameAttribute");
+
+    private static readonly ClrTypeName CompilationRepresentationAttr =
+      new ClrTypeName("Microsoft.FSharp.Core.CompilationRepresentationAttribute");
 
     [CanBeNull]
     public static string GetDisplayName(FSharpSymbol symbol)
@@ -45,7 +51,14 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     [NotNull]
     public static IEnumerable<string> GetPossibleSourceNames([NotNull] IDeclaredElement element)
     {
-      var names = new List<string> {element.ShortName};
+      var names = new List<string>();
+
+      var constructor = element as IConstructor;
+      var typeElement = constructor?.GetContainingType();
+      if (typeElement != null) names.Add(typeElement.ShortName);
+
+      names.Add(element.ShortName);
+
       var type = element as ITypeElement;
       if (type != null)
       {
@@ -57,11 +70,39 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
         names.AddRange(abbreviatedTypes.TryGetValue(type.GetClrName(), EmptyArray<string>.Instance));
       }
       var attrOwner = element as IAttributesOwner;
-      var sourceNameAttr = attrOwner?.GetAttributeInstances(SourceNameAttribute, true).FirstOrDefault();
-      var sourceName = sourceNameAttr?.PositionParameters().FirstOrDefault()?.ConstantValue.Value as string;
-      if (sourceName != null) names.Add(sourceName);
+      if (attrOwner != null)
+      {
+        var sourceName = GetAttributeValue(attrOwner, SourceNameAttributeAttr) as string;
+        if (sourceName != null) names.Add(sourceName);
 
+        var compilationRepr = GetAttributeValue(attrOwner, CompilationRepresentationAttr) as int?;
+        if (CompilationRepresentationFlags.ModuleSuffix.Equals(compilationRepr))
+          names.Add(element.ShortName.SubstringBeforeLast("Module"));
+      }
+
+      var fsSymbol = (element as FSharpFakeElementFromReference)?.Symbol;
+      if (fsSymbol == null) return names;
+
+      var entity = fsSymbol as FSharpEntity;
+      if (entity != null)
+      {
+        while (entity.IsFSharpAbbreviation)
+        {
+          var abbreviatedType = entity.AbbreviatedType;
+          if (!abbreviatedType.HasTypeDefinition) break;
+
+          entity = abbreviatedType.TypeDefinition;
+          names.Add(entity.DisplayName);
+        }
+      }
       return names;
+    }
+
+    [CanBeNull]
+    private static object GetAttributeValue([NotNull] IAttributesOwner attrOwner, [NotNull] IClrTypeName attrName)
+    {
+      var attrInstance = attrOwner.GetAttributeInstances(attrName, true).FirstOrDefault();
+      return attrInstance?.PositionParameters().FirstOrDefault()?.ConstantValue.Value;
     }
 
     [NotNull]
