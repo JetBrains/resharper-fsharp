@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Psi.FSharp.LanguageService"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services.FSharp", "src\Services.FSharp\Services.FSharp.csproj", "{E76D1B94-7AA1-4DA2-8978-AC2CBC912AA0}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Psi.FSharp.Parsing", "src\Psi.FSharp.Parsing\Psi.FSharp.Parsing.fsproj", "{35B0D9D5-CAD5-4FC8-860B-41BF66D9A5D5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{E76D1B94-7AA1-4DA2-8978-AC2CBC912AA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E76D1B94-7AA1-4DA2-8978-AC2CBC912AA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E76D1B94-7AA1-4DA2-8978-AC2CBC912AA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35B0D9D5-CAD5-4FC8-860B-41BF66D9A5D5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35B0D9D5-CAD5-4FC8-860B-41BF66D9A5D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35B0D9D5-CAD5-4FC8-860B-41BF66D9A5D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35B0D9D5-CAD5-4FC8-860B-41BF66D9A5D5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

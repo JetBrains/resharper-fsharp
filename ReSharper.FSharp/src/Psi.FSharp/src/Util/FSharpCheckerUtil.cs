@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading;
-using FSharpUtil;
 using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.Application.Progress;
@@ -27,7 +26,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     }
 
     [CanBeNull]
-    public static FSharpCheckFileResults CheckFSharpFile([NotNull] IFSharpFile fsFile,
+    public static FSharpCheckFileResults CheckFSharpFile([NotNull] IFSharpFileCheckInfoOwner fsFile,
       [CanBeNull] Action interruptChecker = null)
     {
       var sourceFile = fsFile.GetSourceFile();

@@ -7,20 +7,19 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 {
-  internal abstract class FSharpFileBase : FileElementBase, IFSharpFile
+  internal abstract class FSharpFileBase : FileElementBase, IFSharpFileCheckInfoOwner
   {
-    public FSharpParseFileResults ParseResults { get; set; }
     private FSharpCheckFileResults CheckResults { get; set; }
 
+    public FSharpParseFileResults ParseResults { get; set; }
+    public bool ReferencesResolved { get; set; }
+    public bool IsChecked => CheckResults != null;
+    public override PsiLanguageType Language => FSharpLanguage.Instance;
 
     public FSharpCheckFileResults GetCheckResults([CanBeNull] Action interruptChecker = null)
     {
       return CheckResults ?? (CheckResults = FSharpCheckerUtil.CheckFSharpFile(this, interruptChecker));
     }
-
-    public bool ReferencesResolved { get; set; }
-
-    public override PsiLanguageType Language => FSharpLanguage.Instance;
 
     public virtual void Accept(TreeNodeVisitor visitor)
     {

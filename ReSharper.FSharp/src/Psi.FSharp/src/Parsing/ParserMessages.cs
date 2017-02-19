@@ -2,6 +2,14 @@
 {
   public class ParserMessages
   {
+    public const string IDS_F_SHARP_FILE = "";
+    public const string IDS_F_SHARP_DECLARATION = "";
+
+    public static string GetString(string id)
+    {
+      return id;
+    }
+
     public static string GetExpectedMessage(string expectedSymbol)
     {
       return string.Empty;

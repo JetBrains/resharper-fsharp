@@ -13,7 +13,6 @@ options {
   elementTypePrefix="";
   visitorClassName="TreeNodeVisitor";
   visitorMethodSuffix="";
-  testTargetSubdir="Psi/Test/FSharp";
   disableReflection;
   separateHierarchies;
   acceptModifier="";
@@ -43,9 +42,42 @@ options {
   generateWorkingPsi;
 }
 
-fSharpFile options {
+
+
+// Files
+
+interface fSharpFile
+:
+  fSharpImplFile |
+  fSharpSigFile
+;
+
+fSharpImplFile options {
+  customParseFunction;
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpFileBase";
 }
 :
-  FAKE
+  (moduleOrNamespaceDeclaration<FS_MODULE_OR_NAMESPACE_DECLARATION, Declarations>)* FAKE
 ;
+
+fSharpSigFile options {
+  customParseFunction;
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpFileBase";
+}
+:
+  (moduleOrNamespaceSignature<FS_MODULE_OR_NAMESPACE_SIGNATURE, Declarations>)* FAKE
+;
+
+
+
+// Modules and namespaces
+
+interface fSharpDeclaration
+:
+  moduleOrNamespaceDeclaration |
+  moduleMemberDeclaration
+;
+
+moduleOrNamespaceSignature : FAKE;
+moduleOrNamespaceDeclaration: FAKE;
+moduleMemberDeclaration : FAKE;

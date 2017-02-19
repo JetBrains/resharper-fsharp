@@ -88,7 +88,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
       return null;
     }
 
-    [CanBeNull]
+    [NotNull]
     public static FSharpProjectOptions GetProjectOptions([NotNull] IPsiSourceFile sourceFile)
     {
       if (sourceFile.LanguageType.Equals(FSharpScriptProjectFileType.Instance)) return GetScriptOptions(sourceFile);

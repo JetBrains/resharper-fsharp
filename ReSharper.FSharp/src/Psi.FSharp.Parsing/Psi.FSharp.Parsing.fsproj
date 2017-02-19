@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>35b0d9d5-cad5-4fc8-860b-41bf66d9a5d5</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Psi.FSharp.Parsing</RootNamespace>
+    <AssemblyName>Psi.FSharp.Parsing</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFSharpCoreVersion>4.4.0.0</TargetFSharpCoreVersion>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Name>Psi.FSharp.Parsing</Name>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <Tailcalls>false</Tailcalls>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;JET_MODE_ASSERT;WAVE08</DefineConstants>
+    <WarningLevel>3</WarningLevel>
+    <DocumentationFile>bin\Debug\Psi.FSharp.Parsing.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <Tailcalls>true</Tailcalls>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE;WAVE08</DefineConstants>
+    <WarningLevel>3</WarningLevel>
+    <DocumentationFile>bin\Release\Psi.FSharp.Parsing.XML</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <MinimumVisualStudioVersion Condition="'$(MinimumVisualStudioVersion)' == ''">11</MinimumVisualStudioVersion>
+  </PropertyGroup>
+  <Choose>
+    <When Condition="'$(VisualStudioVersion)' == '11.0'">
+      <PropertyGroup Condition="Exists('$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets')">
+        <FSharpTargetsPath>$(MSBuildExtensionsPath32)\..\Microsoft SDKs\F#\3.0\Framework\v4.0\Microsoft.FSharp.Targets</FSharpTargetsPath>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup Condition="Exists('$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets')">
+        <FSharpTargetsPath>$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\FSharp\Microsoft.FSharp.Targets</FSharpTargetsPath>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
+  <Import Project="$(FSharpTargetsPath)" />
+  <ItemGroup>
+    <Content Include="packages.config" />
+    <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="FSharpPsiBuilderTokenFactory.fs" />
+    <Compile Include="FSharpTreeBuilder.fs" />
+    <Compile Include="FSharpParser.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Psi.FSharp\Psi.FSharp.csproj">
+      <Project>{4D2A870A-2D0D-4004-A795-596F0F9CE591}</Project>
+      <Name>Psi.FSharp</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Psi.FSharp\Psi.FSharp.csproj">
+      <Project>{4D2A870A-2D0D-4004-A795-596F0F9CE591}</Project>
+      <Name>Psi.FSharp</Name>
+    </ProjectReference>
+    <Reference Include="FSharp.Compiler.Service">
+      <HintPath>..\..\packages\FSharp.Compiler.Service.9.0.1\lib\net45\FSharp.Compiler.Service.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="FSharp.Compiler.Service.MSBuild.v12">
+      <HintPath>..\..\packages\FSharp.Compiler.Service.9.0.1\lib\net45\FSharp.Compiler.Service.MSBuild.v12.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="JetBrains.Platform.DocumentModel">
+      <HintPath>..\..\packages\JetBrains.Platform.Core.Text.108.0.20170209.145827-eap01\DotFiles\JetBrains.Platform.DocumentModel.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.Platform.ProjectModel">
+      <HintPath>..\..\packages\JetBrains.Platform.Core.Ide.108.0.20170209.145827-eap01\DotFiles\JetBrains.Platform.ProjectModel.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.Platform.Shell">
+      <HintPath>..\..\packages\JetBrains.Platform.Core.Shell.108.0.20170209.80907-eap01\DotFiles\JetBrains.Platform.Shell.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.Platform.TextControl">
+      <HintPath>..\..\packages\JetBrains.Platform.Core.Text.108.0.20170209.145827-eap01\DotFiles\JetBrains.Platform.TextControl.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.Platform.Util">
+      <HintPath>..\..\packages\JetBrains.Platform.Core.Shell.108.0.20170209.80907-eap01\DotFiles\JetBrains.Platform.Util.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.ReSharper.Psi">
+      <HintPath>..\..\packages\JetBrains.Psi.Features.Core.108.0.20170209.150352-eap01\DotFiles\JetBrains.ReSharper.Psi.dll</HintPath>
+    </Reference>
+    <Reference Include="mscorlib" />
+    <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Collections.Immutable">
+      <HintPath>..\..\packages\System.Collections.Immutable.1.3.0\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Core" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Reflection.Metadata">
+      <HintPath>..\..\packages\System.Reflection.Metadata.1.4.1\lib\portable-net45+win8\System.Reflection.Metadata.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

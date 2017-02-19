@@ -374,13 +374,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="src\FSharpFakeParser.cs" />
-    <Compile Include="src\FSharpFakeTreeBuilder.cs" />
     <Compile Include="src\FSharpLanguageService.cs" />
-    <Compile Include="src\FSharpPsiBuilderTokenFactory.cs" />
     <Compile Include="ZoneMarker.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Psi.FSharp.Parsing\Psi.FSharp.Parsing.fsproj">
+      <Project>{35B0D9D5-CAD5-4FC8-860B-41BF66D9A5D5}</Project>
+      <Name>Psi.FSharp.Parsing</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Psi.FSharp\Psi.FSharp.csproj">
       <Project>{4D2A870A-2D0D-4004-A795-596F0F9CE591}</Project>
       <Name>Psi.FSharp</Name>

@@ -29,7 +29,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.LanguageService
 
     public override IParser CreateParser(ILexer lexer, IPsiModule module, IPsiSourceFile sourceFile)
     {
-      return new FSharpFakeParser(sourceFile);
+      return new FSharpParser(sourceFile);
     }
 
     public override IEnumerable<ITypeDeclaration> FindTypeDeclarations(IFile file)
