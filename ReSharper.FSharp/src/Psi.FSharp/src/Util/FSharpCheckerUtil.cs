@@ -48,12 +48,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       var cancellationTokenSource = new CancellationTokenSource();
       var cancellationToken = cancellationTokenSource.Token;
       var cancellationTokenOption = new FSharpOption<CancellationToken>(cancellationToken);
-      var mres = new ManualResetEventSlim();
 
-      var task = FSharpAsync.StartAsTask(AsyncUtil.RunAsyncAndSetEvent(async, mres), null, cancellationTokenOption);
+      var task = FSharpAsync.StartAsTask(async, null, cancellationTokenOption);
       while (!task.IsCompleted)
       {
-        var finished = mres.Wait(interruptCheckTimeout, cancellationToken);
+        var finished = task.Wait(interruptCheckTimeout, cancellationToken);
         if (finished) break;
         try
         {
