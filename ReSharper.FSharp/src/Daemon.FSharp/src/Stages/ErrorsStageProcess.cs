@@ -17,7 +17,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
     [NotNull] private readonly FSharpErrorInfo[] myErrors;
     [NotNull] private readonly IDocument myDocument;
 
-    // github.com/fsharp/FSharp.Compiler.Service/blob/9.0.0/src/fsharp/CompileOps.fs#L246
+    /// https://github.com/fsharp/FSharp.Compiler.Service/blob/9.0.0/src/fsharp/CompileOps.fs#L246
     private const int ErrorNumberUndefined = 39;
 
     public ErrorsStageProcess([NotNull] IDaemonProcess process, [NotNull] FSharpErrorInfo[] errors) : base(process)
@@ -33,6 +33,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
       {
         var range = GetDocumentRange(myDocument, error);
         highlightings.Add(new HighlightingInfo(range, CreateHighlighting(error, range)));
+        SeldomInterruptChecker.CheckForInterrupt();
       }
       committer(new DaemonStageResult(highlightings));
     }

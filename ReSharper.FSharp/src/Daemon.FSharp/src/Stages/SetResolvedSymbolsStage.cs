@@ -1,6 +1,5 @@
 ﻿using System;
 using JetBrains.Annotations;
-using JetBrains.Application.Progress;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
@@ -23,6 +22,8 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
   public class SetResolvedSymbolsStageProcess : FSharpDaemonStageProcessBase
   {
     private const string AttributeSuffix = "Attribute";
+    private const int EscapedNameAffixLength = 4;
+    private const int EscapedNameStartIndex = 2;
 
     private readonly IFSharpFile myFsFile;
     private readonly IDocument myDocument;
@@ -43,9 +44,8 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
       var symbolUses = FSharpCheckerUtil.RunFSharpAsync(checkResult.GetAllUsesOfAllSymbolsInFile(), interruptChecker);
       if (symbolUses == null) return;
 
-      for (var i = 0; i < symbolUses.Length; i++)
+      foreach (var symbolUse in symbolUses)
       {
-        var symbolUse = symbolUses[i]; // todo: remove for declarations
         if (symbolUse.IsFromDefinition)
         {
           var mfv = symbolUse.Symbol as FSharpMemberOrFunctionOrValue;
@@ -53,8 +53,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
         }
         var token = FindUsageToken(symbolUse);
         if (token != null) token.FSharpSymbol = symbolUse.Symbol;
-
-        if (i % 100 == 0 && DaemonProcess.InterruptFlag) throw new ProcessCancelledException();
+        SeldomInterruptChecker.CheckForInterrupt();
       }
       myFsFile.ReferencesResolved = true;
     }
@@ -65,7 +64,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
       var name = FSharpSymbolUtil.GetDisplayName(symbolUse.Symbol);
       if (name == null) return null;
 
-      // range includes qualifiers so we need the last identifier only
+      // range includes qualifiers, we need the last identifier only
       var endOffset = FSharpRangeUtil.GetEndOffset(myDocument, symbolUse.RangeAlternate) - 1;
       var token = myFsFile.FindTokenAt(endOffset) as FSharpIdentifierToken;
       if (token == null) return null;
@@ -77,10 +76,11 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
       if (attrName != null && attrName.Length == token.Length) return token;
 
       // e.g. name: "( |> )", token: "|>"
-      if (FSharpSymbolUtil.IsEscapedName(name) && name.Length - 4 == token.Length) return token;
+      if (FSharpSymbolUtil.IsEscapedName(name) && name.Length - EscapedNameAffixLength == token.Length) return token;
 
       // e.g. name: "foo bar", token: "``foo bar``"
-      if (name.Length + 4 == token.Length && name == token.GetText().Substring(2, token.Length - 4)) return token;
+      if (name.Length + EscapedNameAffixLength == token.Length &&
+          name == token.GetText().Substring(EscapedNameStartIndex, token.Length - EscapedNameAffixLength)) return token;
 
       return null;
     }

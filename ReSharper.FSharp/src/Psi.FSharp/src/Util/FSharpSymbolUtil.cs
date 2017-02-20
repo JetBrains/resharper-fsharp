@@ -3,7 +3,6 @@ using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
-using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi.FSharp.Impl;
 using JetBrains.Util;
 using JetBrains.Util.Extension;
@@ -17,6 +16,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     private const string FSharpConstructorName = "( .ctor )";
     private const string ClrConstructorName = ".ctor";
     private const string AttributeSuffix = "Attribute";
+    private const int EscapedNameAffixLength = 4;
 
     private static readonly ClrTypeName SourceNameAttributeAttr =
       new ClrTypeName("Microsoft.FSharp.Core.CompilationSourceNameAttribute");
@@ -45,7 +45,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     public static bool IsEscapedName([NotNull] string name)
     {
       var length = name.Length;
-      return length > 4 && name[0] == '(' && name[1] == ' ' && name[length - 2] == ' ' && name[length - 1] == ')';
+      return length > EscapedNameAffixLength &&
+             name[0] == '(' && name[1] == ' ' && name[length - 2] == ' ' && name[length - 1] == ')';
     }
 
     [NotNull]
@@ -84,16 +85,15 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       if (fsSymbol == null) return names;
 
       var entity = fsSymbol as FSharpEntity;
-      if (entity != null)
-      {
-        while (entity.IsFSharpAbbreviation)
-        {
-          var abbreviatedType = entity.AbbreviatedType;
-          if (!abbreviatedType.HasTypeDefinition) break;
+      if (entity == null) return names;
 
-          entity = abbreviatedType.TypeDefinition;
-          names.Add(entity.DisplayName);
-        }
+      while (entity.IsFSharpAbbreviation)
+      {
+        var abbreviatedType = entity.AbbreviatedType;
+        if (!abbreviatedType.HasTypeDefinition) break;
+
+        entity = abbreviatedType.TypeDefinition;
+        names.Add(entity.DisplayName);
       }
       return names;
     }
@@ -103,45 +103,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     {
       var attrInstance = attrOwner.GetAttributeInstances(attrName, true).FirstOrDefault();
       return attrInstance?.PositionParameters().FirstOrDefault()?.ConstantValue.Value;
-    }
-
-    [NotNull]
-    public static string GetEntityHighlightingAttributeId([NotNull] FSharpEntity entity)
-    {
-      if (entity.IsNamespace) return HighlightingAttributeIds.NAMESPACE_IDENTIFIER_ATTRIBUTE;
-      if (entity.IsInterface) return HighlightingAttributeIds.TYPE_INTERFACE_ATTRIBUTE;
-
-      return HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE;
-    }
-
-    [NotNull]
-    public static string GetMfvHighlightingAttributeId([NotNull] FSharpMemberOrFunctionOrValue mfv)
-    {
-      if (mfv.IsEvent || mfv.IsEventAddMethod || mfv.IsEventRemoveMethod)
-        return HighlightingAttributeIds.EVENT_IDENTIFIER_ATTRIBUTE;
-      if (mfv.IsProperty || mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod)
-        return HighlightingAttributeIds.FIELD_IDENTIFIER_ATTRIBUTE;
-
-      var name = mfv.DisplayName;
-      if (mfv.IsImplicitConstructor || name == ClrConstructorName || name == FSharpConstructorName)
-        return HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE;
-
-      return HighlightingAttributeIds.LOCAL_VARIABLE_IDENTIFIER_ATTRIBUTE;
-    }
-
-    [NotNull]
-    public static string GetHighlightingAttributeId([NotNull] FSharpSymbol symbol)
-    {
-      var entity = symbol as FSharpEntity;
-      if (entity != null) return GetEntityHighlightingAttributeId(entity);
-
-      var mfv = symbol as FSharpMemberOrFunctionOrValue;
-      if (mfv != null) return GetMfvHighlightingAttributeId(mfv);
-
-      if (symbol is FSharpField) return HighlightingAttributeIds.FIELD_IDENTIFIER_ATTRIBUTE;
-      if (symbol is FSharpUnionCase) return HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE;
-
-      return HighlightingAttributeIds.LOCAL_VARIABLE_IDENTIFIER_ATTRIBUTE;
     }
   }
 }

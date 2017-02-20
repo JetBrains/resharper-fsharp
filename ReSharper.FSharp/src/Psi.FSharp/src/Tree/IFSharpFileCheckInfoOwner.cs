@@ -1,11 +1,10 @@
 ﻿using System;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Tree
 {
-  public interface IFSharpFileCheckInfoOwner : IFileImpl, ICompositeElement
+  public interface IFSharpFileCheckInfoOwner
   {
     [CanBeNull]
     FSharpParseFileResults ParseResults { get; set; }

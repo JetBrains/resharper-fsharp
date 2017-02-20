@@ -3,7 +3,6 @@ using System.Threading;
 using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.Application.Progress;
-using JetBrains.ReSharper.Psi.FSharp.Tree;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Control;
 using Microsoft.FSharp.Core;
@@ -13,7 +12,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
   public class FSharpCheckerUtil
   {
     public static readonly FSharpChecker Checker =
-      FSharpChecker.Create(null, FSharpOption<bool>.Some(true), null, new FSharpOption<bool>(false));
+      FSharpChecker.Create(projectCacheSize: null, keepAssemblyContents: FSharpOption<bool>.Some(true),
+        keepAllBackgroundResolutions: null, msbuildEnabled: new FSharpOption<bool>(false));
 
     [CanBeNull]
     public static FSharpParseFileResults ParseFSharpFile([NotNull] IPsiSourceFile file)
@@ -26,15 +26,12 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     }
 
     [CanBeNull]
-    public static FSharpCheckFileResults CheckFSharpFile([NotNull] IFSharpFileCheckInfoOwner fsFile,
-      [CanBeNull] Action interruptChecker = null)
+    public static FSharpCheckFileResults CheckFSharpFile([NotNull] IPsiSourceFile sourceFile,
+      [NotNull] FSharpParseFileResults parseResults, [CanBeNull] Action interruptChecker = null)
     {
-      var sourceFile = fsFile.GetSourceFile();
-      var projectOptions = sourceFile != null ? FSharpProjectOptionsProvider.GetProjectOptions(sourceFile) : null;
-      if (fsFile.ParseResults == null || projectOptions == null) return null;
-
-      var checkAsync = Checker.CheckFileInProject(fsFile.ParseResults, sourceFile.GetLocation().FullPath, 0,
-        sourceFile.Document.GetText(), projectOptions, null, null);
+      var projectOptions = FSharpProjectOptionsProvider.GetProjectOptions(sourceFile);
+      var checkAsync = Checker.CheckFileInProject(parseResults, sourceFile.GetLocation().FullPath, 0,
+        sourceFile.Document.GetText(), projectOptions, isResultObsolete: null, textSnapshotInfo: null);
       return (RunFSharpAsync(checkAsync, interruptChecker) as FSharpCheckFileAnswer.Succeeded)?.Item;
     }
 
