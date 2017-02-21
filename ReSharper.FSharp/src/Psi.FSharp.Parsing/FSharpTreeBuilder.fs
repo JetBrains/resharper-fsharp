@@ -43,6 +43,14 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         let lidMark = builder.Mark()
         tail.idRange |> getEndOffset |> advanceToOffset
         builder.Done(lidMark, ElementType.LONG_IDENTIFIER, null)
+    
+    let processException (SynExceptionDefn(SynExceptionDefnRepr(_,(UnionCase(_,id,_,_,_,_)),_,_,_,_),_,range)) =
+            range |> getStartOffset |> advanceToOffset
+            let exnMark = builder.Mark()
+            processIdentifier id
+
+            range |> getEndOffset |> advanceToOffset
+            builder.Done(exnMark, ElementType.F_SHARP_EXCEPTION_DECLARATION, null)
 
     let rec processModuleMember = function
         | SynModuleDecl.NestedModule(ComponentInfo(_,_,_,lid,_,_,_,_),_,decls,_,range) as decl ->
@@ -55,6 +63,7 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
 
             decl.Range |> getEndOffset |> advanceToOffset
             builder.Done(moduleMark, ElementType.NESTED_MODULE_DECLARATION, null)
+        | SynModuleDecl.Exception(exceptionDefn,_) -> processException exceptionDefn
         | decl ->
             decl.Range |> getStartOffset |> advanceToOffset
             let declMark = builder.Mark()

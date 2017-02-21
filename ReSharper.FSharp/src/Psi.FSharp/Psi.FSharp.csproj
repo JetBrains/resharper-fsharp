@@ -402,9 +402,11 @@
     <Compile Include="src\FSharpPsiProperties.cs" />
     <Compile Include="src\FSharpScriptProjectFileType.cs" />
     <Compile Include="src\Impl\Cache2\DeclaredNamespacePart.cs" />
+    <Compile Include="src\Impl\Cache2\ExceptionPart.cs" />
     <Compile Include="src\Impl\Cache2\FSharpCacheProvider.cs" />
     <Compile Include="src\Impl\Cache2\FSharpClassLikePart.cs" />
     <Compile Include="src\Impl\Cache2\FSharpDeclarationProcessor.cs" />
+    <Compile Include="src\Impl\Cache2\FSharpException.cs" />
     <Compile Include="src\Impl\Cache2\FSharpModule.cs" />
     <Compile Include="src\Impl\Cache2\FSharpNestedModule.cs" />
     <Compile Include="src\Impl\Cache2\FSharpProjectFilePart.cs" />
@@ -420,6 +422,7 @@
     <Compile Include="src\Impl\FSharpUnresolvedReference.cs" />
     <Compile Include="src\Impl\Tree\FSharpCachedDeclarationBase.cs" />
     <Compile Include="src\Impl\Tree\FSharpCompositeElement.cs" />
+    <Compile Include="src\Impl\Tree\FSharpExceptionDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpFileBase.cs" />
     <Compile Include="src\Impl\Tree\FSharpIdentifierToken.cs" />
     <Compile Include="src\Impl\Tree\FSharpNamespaceDeclaration.cs" />
@@ -454,6 +457,7 @@
     <Compile Include="src\Tree\IFSharpNamespaceDeclaration.cs" />
     <Compile Include="src\Tree\IFSharpTreeNode.cs" />
     <Compile Include="src\Util\FSharpAsyncUtil.cs" />
+    <Compile Include="src\Tree\IFSharpTypeDeclaration.cs" />
     <Compile Include="src\Tree\IFSharpTypeElementDeclaration.cs" />
     <Compile Include="src\Tree\ILongIdentifier.cs" />
     <Compile Include="src\Tree\IModuleDeclaration.cs" />

@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.ReSharper.Psi.FSharp.Tree;
+using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
+using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
@@ -25,10 +28,14 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public IEnumerable<IDeclaredType> GetSuperTypes()
     {
-      return EmptyList<IDeclaredType>.Instance;
+      return (GetDeclaration() as IFSharpTypeDeclaration)?.SuperTypes ??
+             EmptyList<IDeclaredType>.Instance;
+    }
 
-//      var decl = GetDeclaration() as IFSharpTypeDeclaration;
-//      return decl != null ? decl.SuperTypes : EmptyList<IDeclaredType>.Instance;
+    public virtual IDeclaredType GetBaseClassType()
+    {
+      var entity = (GetDeclaration() as IFSharpTypeDeclaration)?.Symbol as FSharpEntity;
+      return entity != null ? FSharpElementsUtil.GetBaseType(entity, GetPsiModule()) : null;
     }
   }
 }

@@ -115,6 +115,7 @@ moduleOrNamespaceSignature : FAKE;
 interface moduleMemberDeclaration
 :
   nestedModuleDeclaration |
+  fSharpTypeDeclaration |
   otherMemberDeclaration
 ;
 
@@ -125,6 +126,20 @@ nestedModuleDeclaration options {
   accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
   fSharpIdentifier<FS_IDENTIFIER, Identifier>
   (moduleMemberDeclaration<MODULE_MEMBER, Declarations>)* FAKE
+;
+
+interface fSharpTypeDeclaration
+:
+  fSharpExceptionDeclaration //|
+//  fSharpSimpleTypeDeclaration |
+//  fSharpObjectModelTypeDeclaration
+;
+
+fSharpExceptionDeclaration options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
+}
+:
+  fSharpIdentifier<FS_IDENTIFIER, Identifier>
 ;
 
 otherMemberDeclaration: fSharpIdentifier<FS_IDENTIFIER, Identifier>;

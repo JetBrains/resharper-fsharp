@@ -24,6 +24,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
           return new ModulePart(reader);
         case FSharpSerializationTag.NestedModulePart:
           return new NestedModulePart(reader);
+        case FSharpSerializationTag.ExceptionPart:
+          return new ExceptionPart(reader);
         default:
           throw new SerializationError("Unknown tag:" + tag);
       }
@@ -64,11 +66,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       return FSharpNodeTypeIndexer.Instance.GetNodeType(index);
     }
 
-    public bool IsInternableToken(TokenNodeType tokenNodeType)
-    {
-      throw new System.NotImplementedException();
-    }
-
     public string PersistentTreeNodeCacheUniqueId => "FSharpPersistentTreeNodeCache";
     public string TokenCacheUniqueId => "FSharpTokenCache";
     public string BufferCacheUniqueId => "FSharpBufferCache";
@@ -80,6 +77,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public void RestoreMetadata(IFile file, UnsafeReader bufferReader)
     {
+    }
+
+    public bool IsInternableToken(TokenNodeType tokenNodeType)
+    {
+      throw new System.NotImplementedException();
     }
 
     public void BuildCache(ISandBox sandBox, ICacheBuilder builder)

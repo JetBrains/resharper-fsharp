@@ -54,5 +54,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       }
       myBuilder.EndPart();
     }
+
+    public override void VisitFSharpExceptionDeclaration(IFSharpExceptionDeclaration decl)
+    {
+      myBuilder.StartPart(new ExceptionPart(decl));
+      myBuilder.EndPart();
+    }
   }
 }
