@@ -43,13 +43,17 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 
       foreach (var symbolUse in symbolUses)
       {
+        var token = FindUsageToken(symbolUse);
+        if (token == null) continue;
+
         if (symbolUse.IsFromDefinition)
         {
-          var mfv = symbolUse.Symbol as FSharpMemberOrFunctionOrValue;
-          if (mfv != null && mfv.IsImplicitConstructor) continue;
+          // todo: enable when other declarations are added
+//          var declaration = token.GetContainingNode<IFSharpDeclaration>();
+//          if (declaration != null) declaration.Symbol = symbolUse.Symbol;
+          continue;
         }
-        var token = FindUsageToken(symbolUse);
-        if (token != null) token.FSharpSymbol = symbolUse.Symbol;
+        token.FSharpSymbol = symbolUse.Symbol;
         SeldomInterruptChecker.CheckForInterrupt();
       }
       myFsFile.ReferencesResolved = true;
