@@ -375,7 +375,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\FSharpProjectPresenter.cs" />
     <Compile Include="src\Properties\FSharpProjectFileProperiesProvider.cs" />
-    <Compile Include="src\Properties\FSharpProjectLanguage.cs" />
     <Compile Include="src\Properties\FSharpProjectProperties.cs" />
     <Compile Include="src\Properties\FSharpProjectPropertiesFactory.cs" />
     <Compile Include="ZoneMark.cs" />
