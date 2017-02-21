@@ -29,6 +29,11 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         while not (builder.GetTokenType().IsKeyword) || builder.GetTokenText() <> keyword do
             builder.AdvanceLexer() |> ignore
 
+    let isTypedCase (UnionCase(_,_,fieldType,_,_,_)) =
+        match fieldType with
+        | UnionCaseFields([]) -> false
+        | _ -> true
+
     let processIdentifier (id : Ident) =
         id.idRange |> getStartOffset |> advanceToOffset
         let idMark = builder.Mark()
@@ -52,6 +57,58 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
             range |> getEndOffset |> advanceToOffset
             builder.Done(exnMark, ElementType.F_SHARP_EXCEPTION_DECLARATION, null)
 
+    let processUnionCase (UnionCase(_,id,caseType,_,_,range) as case) =
+        if isTypedCase case then
+            range |> getStartOffset |> advanceToOffset
+            let exnMark = builder.Mark()
+            processIdentifier id
+
+    //        processUnionCaseTypes caseType
+
+            range |> getEndOffset |> advanceToOffset
+    //        let elementType = if isTypedCase case
+    //                          then ElementType.F_SHARP_TYPED_UNION_CASE_DECLARATION
+    //                          else ElementType.F_SHARP_SINGLETON_UNION_CASE_DECLARATION
+            builder.Done(exnMark, ElementType.F_SHARP_TYPED_UNION_CASE_DECLARATION, null)
+
+    let processType (TypeDefn(ComponentInfo(attributes,_,_,lid,_,_,_,_), repr, members, range)) =
+        (if List.isEmpty attributes then range else (List.head attributes).TypeName.Range) |> getStartOffset |> advanceToOffset
+        let typeMark = builder.Mark()
+//        List.iter processAttribute attributes
+
+        processIdentifier (List.head lid)
+
+        let elementType =
+            match repr with
+            | SynTypeDefnRepr.Simple(simpleRepr, _) ->
+                match simpleRepr with
+                | SynTypeDefnSimpleRepr.Record(_,fields,_) ->
+//                    List.iter processField fields
+                    ElementType.F_SHARP_RECORD_DECLARATION
+                | SynTypeDefnSimpleRepr.Enum(enumCases,_) ->
+//                    List.iter processEnumCase enumCases
+                    ElementType.F_SHARP_ENUM_DECLARATION
+                | SynTypeDefnSimpleRepr.Union(_,cases,_) ->
+                    List.iter processUnionCase cases
+                    ElementType.F_SHARP_UNION_DECLARATION
+                | SynTypeDefnSimpleRepr.TypeAbbrev(_) ->
+                    ElementType.F_SHARP_TYPE_ABBREVIATION_DECLARATION
+                | _ -> ElementType.F_SHARP_OTHER_SIMPLE_TYPE_DECLARATION
+            | SynTypeDefnRepr.Exception(_) ->
+                ElementType.F_SHARP_EXCEPTION_DECLARATION
+//            | SynTypeDefnRepr.ObjectModel(kind, members, range) ->
+//                List.iter processTypeMember members
+//                match kind with
+//                | TyconClass -> ElementType.F_SHARP_CLASS_DECLARATION
+//                | TyconInterface -> ElementType.F_SHARP_INTERFACE_DECLARATION
+//                | TyconStruct -> ElementType.F_SHARP_STRUCT_DECLARATION
+//                | _ -> ElementType.F_SHARP_UNSPECIFIED_OBJECT_TYPE_DECLARATION
+            | _ -> ElementType.OTHER_MEMBER_DECLARATION
+//        List.iter processTypeMember members
+
+        range |> getEndOffset |> advanceToOffset
+        builder.Done(typeMark, elementType , null)
+
     let rec processModuleMember = function
         | SynModuleDecl.NestedModule(ComponentInfo(_,_,_,lid,_,_,_,_),_,decls,_,range) as decl ->
             let id = List.head lid
@@ -63,6 +120,7 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
 
             decl.Range |> getEndOffset |> advanceToOffset
             builder.Done(moduleMark, ElementType.NESTED_MODULE_DECLARATION, null)
+        | SynModuleDecl.Types(types,_) -> List.iter processType types
         | SynModuleDecl.Exception(exceptionDefn,_) -> processException exceptionDefn
         | decl ->
             decl.Range |> getStartOffset |> advanceToOffset

@@ -7,6 +7,8 @@
     public const string IDS_MODULE_LIKE_DECLARATION = "";
     public const string IDS_MODULE_OR_NAMESPACE_DECLARATION = "";
     public const string IDS_MODULE_MEMBER_DECLARATION = "";
+    public const string IDS_F_SHARP_TYPE_DECLARATION = "";
+    public const string IDS_F_SHARP_SIMPLE_TYPE_DECLARATION = "";
 
     public static string GetString(string id)
     {

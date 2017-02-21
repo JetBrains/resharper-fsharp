@@ -1,12 +1,11 @@
 ﻿using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
-using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
   internal class ModulePart : FSharpClassLikePart<IModuleDeclaration>, Class.IClassPart
   {
-    public ModulePart(IModuleDeclaration declaration) : base(declaration, declaration.ShortName, typeParameters: 0)
+    public ModulePart(IModuleDeclaration declaration) : base(declaration, declaration.ShortName)
     {
     }
 
@@ -24,7 +23,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       return MemberPresenceFlag.NONE;
     }
 
-    public IDeclaredType GetBaseClassType()
+    public override IDeclaredType GetBaseClassType()
     {
       return GetDeclaration()?.GetPsiModule().GetPredefinedType().Object;
     }

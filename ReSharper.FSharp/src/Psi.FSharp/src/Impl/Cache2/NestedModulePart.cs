@@ -5,8 +5,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
   public class NestedModulePart : FSharpClassLikePart<INestedModuleDeclaration>, Class.IClassPart
   {
-    public NestedModulePart(INestedModuleDeclaration declaration)
-      : base(declaration, declaration.DeclaredName, typeParameters: 0)
+    public NestedModulePart(INestedModuleDeclaration declaration) : base(declaration, declaration.DeclaredName)
     {
     }
 
@@ -19,7 +18,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       return new FSharpNestedModule(this);
     }
 
-    public IDeclaredType GetBaseClassType()
+    public override IDeclaredType GetBaseClassType()
     {
       return GetDeclaration()?.GetPsiModule().GetPredefinedType().Object;
     }

@@ -48,16 +48,45 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     {
       myBuilder.StartPart(part);
       foreach (var memberDecl in decl.DeclarationsEnumerable)
-      {
         memberDecl.Accept(this);
-        if (decl.IsModule) myBuilder.AddDeclaredMemberName(memberDecl.DeclaredName);
-      }
       myBuilder.EndPart();
     }
 
     public override void VisitFSharpExceptionDeclaration(IFSharpExceptionDeclaration decl)
     {
       myBuilder.StartPart(new ExceptionPart(decl));
+      myBuilder.EndPart();
+    }
+
+    public override void VisitFSharpEnumDeclaration(IFSharpEnumDeclaration decl)
+    {
+      myBuilder.StartPart(new EnumPart(decl));
+      myBuilder.EndPart();
+    }
+
+    public override void VisitFSharpRecordDeclaration(IFSharpRecordDeclaration decl)
+    {
+      myBuilder.StartPart(new RecordPart(decl));
+      myBuilder.EndPart();
+    }
+
+    public override void VisitFSharpUnionDeclaration(IFSharpUnionDeclaration decl)
+    {
+      myBuilder.StartPart(new UnionPart(decl));
+      foreach (var unionCase in decl.CasesEnumerable)
+        unionCase.Accept(this);
+      myBuilder.EndPart();
+    }
+
+    public override void VisitFSharpTypedUnionCaseDeclaration(IFSharpTypedUnionCaseDeclaration decl)
+    {
+      myBuilder.StartPart(new TypedUnionCasePart(decl));
+      myBuilder.EndPart();
+    }
+
+    public override void VisitFSharpTypeAbbreviationDeclaration(IFSharpTypeAbbreviationDeclaration decl)
+    {
+      myBuilder.StartPart(new TypeAbbreviationPart(decl));
       myBuilder.EndPart();
     }
   }

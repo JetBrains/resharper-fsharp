@@ -15,18 +15,18 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     {
     }
 
-    protected FSharpClassLikePart(TDeclaration declaration, string shortName, int typeParameters)
+    protected FSharpClassLikePart(TDeclaration declaration, string shortName, int typeParameters = 0)
       : base(declaration, shortName, typeParameters)
     {
     }
 
-    public IEnumerable<ITypeMember> GetTypeMembers()
+    public virtual IEnumerable<ITypeMember> GetTypeMembers()
     {
       return GetDeclaration()?.MemberDeclarations.Select(d => d.DeclaredElement).WhereNotNull() ??
              EmptyList<ITypeMember>.InstanceList;
     }
 
-    public IEnumerable<IDeclaredType> GetSuperTypes()
+    public virtual IEnumerable<IDeclaredType> GetSuperTypes()
     {
       return (GetDeclaration() as IFSharpTypeDeclaration)?.SuperTypes ??
              EmptyList<IDeclaredType>.Instance;

@@ -130,10 +130,89 @@ nestedModuleDeclaration options {
 
 interface fSharpTypeDeclaration
 :
-  fSharpExceptionDeclaration //|
-//  fSharpSimpleTypeDeclaration |
+  fSharpExceptionDeclaration |
+  fSharpSimpleTypeDeclaration //|
 //  fSharpObjectModelTypeDeclaration
 ;
+
+interface fSharpSimpleTypeDeclaration
+:
+  fSharpEnumDeclaration |
+  fSharpRecordDeclaration |
+  fSharpUnionDeclaration |
+  fSharpTypeAbbreviationDeclaration |
+  fSharpOtherSimpleTypeDeclaration
+;
+
+
+
+// Enums
+
+fSharpEnumDeclaration options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
+}
+:
+  fSharpIdentifier<FS_IDENTIFIER, Identifier>
+//  (fSharpEnumMemberDeclaration<FS_ENUM_MEMBER, EnumMemberDeclarations>)* FAKE
+;
+
+//fSharpEnumMemberDeclaration options {
+//  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpProperTypeMemberDeclarationBase";
+//}
+//:
+//  fSharpIdentifier<FS_IDENTIFIER, Identifier>
+//;
+
+
+
+// Records
+
+fSharpRecordDeclaration options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
+}
+:
+  fSharpIdentifier<FS_IDENTIFIER, Identifier>
+//  (fSharpFieldDeclaration<FS_FIELD, Fields>)* FAKE
+//  (fSharpTypeMemberDeclaration<FS_TYPE_MEMBER, Members>)* FAKE
+;
+
+
+
+// Discriminated unions
+
+fSharpUnionDeclaration options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
+}
+:
+  fSharpIdentifier<FS_IDENTIFIER, Identifier>
+  (fSharpUnionCaseDeclaration<FS_UNION_CASE, Cases>)* FAKE
+//  (fSharpTypeMemberDeclaration<FS_TYPE_MEMBER, Members>)* FAKE
+;
+
+interface fSharpUnionCaseDeclaration
+:
+//  fSharpSingletonUnionCaseDeclaration |
+  fSharpTypedUnionCaseDeclaration
+;
+
+//fSharpSingletonUnionCaseDeclaration options {
+//  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpProperTypeMemberDeclarationBase";
+//}
+//:
+//  fSharpIdentifier<FS_IDENTIFIER, Identifier>
+//;
+
+fSharpTypedUnionCaseDeclaration options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
+}
+:
+  fSharpIdentifier<FS_IDENTIFIER, Identifier>
+//  (fSharpReadOnlyFieldDeclaration<FS_FIELD, Fields>)* FAKE
+;
+
+
+
+// Other members
 
 fSharpExceptionDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
@@ -142,7 +221,23 @@ fSharpExceptionDeclaration options {
   fSharpIdentifier<FS_IDENTIFIER, Identifier>
 ;
 
+fSharpTypeAbbreviationDeclaration options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
+}
+:
+  fSharpIdentifier<FS_IDENTIFIER, Identifier>
+;
+
 otherMemberDeclaration: fSharpIdentifier<FS_IDENTIFIER, Identifier>;
+
+fSharpOtherSimpleTypeDeclaration options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
+}
+:
+  fSharpIdentifier<FS_IDENTIFIER, Identifier>
+;
+
+
 
 // Other
 

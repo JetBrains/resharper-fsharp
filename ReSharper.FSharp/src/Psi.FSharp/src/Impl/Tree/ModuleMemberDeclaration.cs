@@ -1,4 +1,5 @@
 ﻿using System.Xml;
+using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
@@ -8,26 +9,25 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
   {
     public XmlNode GetXMLDoc(bool inherit)
     {
-      throw new System.NotImplementedException();
+      return null;
     }
 
     public void SetName(string name)
     {
-      throw new System.NotImplementedException();
     }
 
     public TreeTextRange GetNameRange()
     {
-      throw new System.NotImplementedException();
+      return TreeTextRange.InvalidRange;
     }
 
     public bool IsSynthetic()
     {
-      throw new System.NotImplementedException();
+      return false;
     }
 
-    public IDeclaredElement DeclaredElement { get; }
-    public string DeclaredName { get; }
+    public IDeclaredElement DeclaredElement => null;
+    public string DeclaredName => SharedImplUtil.MISSING_DECLARATION_NAME;
     public FSharpSymbol Symbol { get; set; }
   }
 }

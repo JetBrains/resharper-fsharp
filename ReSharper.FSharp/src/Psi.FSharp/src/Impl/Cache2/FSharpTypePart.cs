@@ -9,7 +9,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
   public abstract class FSharpTypePart<TDeclaration> : TypePartImplBase<TDeclaration>
     where TDeclaration : class, ITypeDeclaration
   {
-    protected FSharpTypePart(TDeclaration declaration, string shortName, int typeParameters)
+    protected FSharpTypePart(TDeclaration declaration, string shortName, int typeParameters = 0)
       : base(declaration, shortName, typeParameters)
     {
       ExtendsListShortNames = EmptyArray<string>.Instance; // todo
