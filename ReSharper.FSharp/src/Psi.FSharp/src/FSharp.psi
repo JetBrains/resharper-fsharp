@@ -53,19 +53,17 @@ interface fSharpFile
 ;
 
 fSharpImplFile options {
-  customParseFunction;
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpFileBase";
 }
 :
-  (moduleOrNamespaceDeclaration<FS_MODULE_OR_NAMESPACE_DECLARATION, Declarations>)* FAKE
+  (moduleOrNamespaceDeclaration<MODULE_OR_NAMESPACE_DECLARATION, Declarations>)* FAKE
 ;
 
 fSharpSigFile options {
-  customParseFunction;
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpFileBase";
 }
 :
-  (moduleOrNamespaceSignature<FS_MODULE_OR_NAMESPACE_SIGNATURE, Declarations>)* FAKE
+  (moduleOrNamespaceSignature<MODULE_OR_NAMESPACE_SIGNATURE, Signatures>)* FAKE
 ;
 
 
@@ -78,6 +76,34 @@ interface fSharpDeclaration
   moduleMemberDeclaration
 ;
 
+interface moduleOrNamespaceDeclaration
+:
+  moduleDeclaration |
+  fSharpNamespaceDeclaration
+;
+
+fSharpNamespaceDeclaration options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpCachedDeclarationBase";
+}
+:
+  longIdentifier<LONG_IDENTIFIER, LongIdentifier>
+;
+
+moduleDeclaration options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
+}
+:
+  accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
+  longIdentifier<LONG_IDENTIFIER, LongIdentifier>
+;
+
+
 moduleOrNamespaceSignature : FAKE;
-moduleOrNamespaceDeclaration: FAKE;
 moduleMemberDeclaration : FAKE;
+
+
+
+// Other
+
+longIdentifier: (IDENTIFIER<FS_IDENTIFIER, Identifiers>)* FAKE;
+accessModifiers: (KEYWORD<FS_KEYWORD, Modifiers>)* FAKE;

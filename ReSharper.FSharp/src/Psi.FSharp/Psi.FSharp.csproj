@@ -401,14 +401,31 @@
     <Compile Include="src\FSharpProjectFileType.cs" />
     <Compile Include="src\FSharpPsiProperties.cs" />
     <Compile Include="src\FSharpScriptProjectFileType.cs" />
+    <Compile Include="src\Impl\Cache2\DeclaredNamespacePart.cs" />
+    <Compile Include="src\Impl\Cache2\FSharpCacheProvider.cs" />
+    <Compile Include="src\Impl\Cache2\FSharpClassLikePart.cs" />
+    <Compile Include="src\Impl\Cache2\FSharpDeclarationProcessor.cs" />
+    <Compile Include="src\Impl\Cache2\FSharpProjectFilePart.cs" />
+    <Compile Include="src\Impl\Cache2\FSharpSerializationTag.cs" />
+    <Compile Include="src\Impl\Cache2\FSharpTypePart.cs" />
+    <Compile Include="src\Impl\Cache2\ModulePart.cs" />
+    <Compile Include="src\Impl\Cache2\QualifiedNamespacePart.cs" />
     <Compile Include="src\Impl\FSharpFakeElementFromReference.cs" />
+    <Compile Include="src\Impl\FSharpImplUtil.cs" />
     <Compile Include="src\Impl\FSharpResolvedReference.cs" />
     <Compile Include="src\Impl\FSharpReferenceBase.cs" />
     <Compile Include="src\Impl\FSharpUnresolvedReference.cs" />
+    <Compile Include="src\Impl\Tree\FSharpCachedDeclarationBase.cs" />
     <Compile Include="src\Impl\Tree\FSharpCompositeElement.cs" />
     <Compile Include="src\Impl\Tree\FSharpFileBase.cs" />
     <Compile Include="src\Impl\Tree\FSharpIdentifierToken.cs" />
+    <Compile Include="src\Impl\Tree\FSharpModule.cs" />
+    <Compile Include="src\Impl\Tree\FSharpNamespaceDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpToken.cs" />
+    <Compile Include="src\Impl\Tree\FSharpTypeElementDeclarationBase.cs" />
+    <Compile Include="src\Impl\Tree\LongIdentifier.cs" />
+    <Compile Include="src\Impl\Tree\ModuleDeclaration.cs" />
+    <Compile Include="src\Impl\Tree\ModuleMemberDeclaration.cs" />
     <Compile Include="src\Impl\Tree\NewLine.cs" />
     <Compile Include="src\Impl\Tree\Whitespace.cs" />
     <Compile Include="src\Impl\Tree\WhitespaceBase.cs" />
@@ -428,10 +445,17 @@
     <Compile Include="src\Searching\FSharpSearcherFactory.cs" />
     <Compile Include="src\Tree\ChildRole.cs" />
     <Compile Include="src\Tree\FSharpCompositeNodeType.cs" />
+    <Compile Include="src\Tree\IFSharpDeclaration.cs" />
     <Compile Include="src\Tree\IFSharpFile.cs" />
     <Compile Include="src\Tree\IFSharpFileCheckInfoOwner.cs" />
+    <Compile Include="src\Tree\IFSharpNamespaceDeclaration.cs" />
     <Compile Include="src\Tree\IFSharpTreeNode.cs" />
     <Compile Include="src\Util\FSharpAsyncUtil.cs" />
+    <Compile Include="src\Tree\IFSharpTypeElementDeclaration.cs" />
+    <Compile Include="src\Tree\ILongIdentifier.cs" />
+    <Compile Include="src\Tree\IModuleDeclaration.cs" />
+    <Compile Include="src\Tree\IModuleOrNamespaceDeclaration.cs" />
+    <Compile Include="src\Util\FSharpCheckerUtil.cs" />
     <Compile Include="src\Util\FSharpElementsUtil.cs" />
     <Compile Include="src\Util\FSharpRangeUtil.cs" />
     <Compile Include="src\Util\FSharpSymbolUtil.cs" />
@@ -439,10 +463,6 @@
     <Compile Include="ZoneMarker.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FSharpUtil\FSharpUtil.fsproj">
-      <Project>{7FFF987C-FC4E-425C-B8FE-2D6E3143E8BC}</Project>
-      <Name>FSharpUtil</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Projects.FSharp\Projects.FSharp.csproj">
       <Project>{7339FF3B-9DD2-4E7C-A982-FEFC119540F9}</Project>
       <Name>Projects.FSharp</Name>

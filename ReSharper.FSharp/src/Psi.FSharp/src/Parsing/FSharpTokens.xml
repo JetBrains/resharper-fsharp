@@ -3,22 +3,22 @@
     <TokenTypeNamespace>JetBrains.ReSharper.Psi.FSharp.Parsing</TokenTypeNamespace>
 
     <Tokens NodeType="FSharpTokenNodeType">
-        <Token Name="KEYWORD"/>
-        <Token Name="IDENTIFIER"/>
-        <Token Name="LITERAL"/>
-        <Token Name="STRING"/>
-        <Token Name="OPERATOR"/>
-        <Token Name="COMMENT"/>
-        <Token Name="TEXT" />
-        <Token Name="DEAD_CODE" />
-        <Token Name="FAKE"/> <!-- Used in FsharpFakeLexer -->
+        <Token name="KEYWORD"/>
+        <Token name="IDENTIFIER"/>
+        <Token name="LITERAL"/>
+        <Token name="STRING"/>
+        <Token name="OPERATOR"/>
+        <Token name="COMMENT"/>
+        <Token name="TEXT"/>
+        <Token name="DEAD_CODE"/>
+        <Token name="FAKE"/> <!-- Used in FsharpFakeLexer -->
 
-        <Token name="LBRACK" title="LBRACK" />
+        <Token name="LBRACK" title="LBRACK"/>
         <Token name="RBRACK" title="RBRACK"/>
-        <Token name="LBRACE" />
-        <Token name="RBRACE" />
-        <Token name="LPAREN" />
-        <Token name="RPAREN" />
+        <Token name="LBRACE"/>
+        <Token name="RBRACE"/>
+        <Token name="LPAREN"/>
+        <Token name="RPAREN"/>
         <Token name="DOT" title="DOT"/>
     </Tokens>
 </FSharpTokens>

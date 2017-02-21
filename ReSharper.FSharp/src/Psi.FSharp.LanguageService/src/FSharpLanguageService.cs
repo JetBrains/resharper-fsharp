@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2;
 using JetBrains.ReSharper.Psi.FSharp.Parsing;
 using JetBrains.ReSharper.Psi.Impl;
 using JetBrains.ReSharper.Psi.Modules;
@@ -18,6 +19,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.LanguageService
       FSharpCheckerService fSharpCheckerService) : base(psiLanguageType, constantValueService)
     {
       myFSharpCheckerService = fSharpCheckerService;
+      CacheProvider = new FSharpCacheProvider();
     }
 
     public override ILexerFactory GetPrimaryLexerFactory()
@@ -40,7 +42,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.LanguageService
       return EmptyList<ITypeDeclaration>.Instance;
     }
 
-    public override ILanguageCacheProvider CacheProvider => null;
+    public override ILanguageCacheProvider CacheProvider { get; }
     public override bool IsCaseSensitive => true;
     public override bool SupportTypeMemberCache => true;
     public override ITypePresenter TypePresenter => CLRTypePresenter.Instance;

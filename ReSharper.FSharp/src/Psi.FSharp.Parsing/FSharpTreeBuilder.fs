@@ -24,6 +24,34 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
     let advanceToOffset offset =
         while builder.GetTokenOffset() < offset && not(isNull(builder.GetTokenType())) do
             builder.AdvanceLexer() |> ignore
+    
+    let advanceToKeyword (keyword : string) =
+        while not (builder.GetTokenType().IsKeyword) || builder.GetTokenText() <> keyword do
+            builder.AdvanceLexer() |> ignore
+
+    let processLongIdentifier (lid : Ident list) =
+        let head = List.head lid
+        let tail = List.last lid
+
+        head.idRange |> getStartOffset |> advanceToOffset
+        let lidMark = builder.Mark()
+        tail.idRange |> getEndOffset |> advanceToOffset
+        builder.Done(lidMark, ElementType.LONG_IDENTIFIER, null)
+
+    let processModuleOrNamespace (SynModuleOrNamespace(lid,_,isModule,decls,_,_,_,range) as ns) =
+        //advanceToKeyword (if isModule then "module" else "namespace")
+        let nsMark = builder.Mark() // whole module or namespace
+
+        builder.AdvanceLexer() |> ignore
+        let accessMark = builder.Mark()
+        lid.Head.idRange |> getStartOffset |> advanceToOffset
+        builder.Done(accessMark, ElementType.ACCESS_MODIFIERS, null)
+        
+        processLongIdentifier lid
+
+        ns.Range |> getEndOffset |> advanceToOffset
+        let declType = if isModule then ElementType.MODULE_DECLARATION else ElementType.F_SHARP_NAMESPACE_DECLARATION
+        builder.Done(nsMark, declType, null)
 
     override x.Builder = builder
     override x.NewLine = FSharpTokenType.NEW_LINE
@@ -35,7 +63,9 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
 
         let elementType =
             match ast with
-            | ParsedInput.ImplFile (ParsedImplFileInput(_)) -> ElementType.F_SHARP_IMPL_FILE
+            | ParsedInput.ImplFile (ParsedImplFileInput(_,isScript,_,_,_,modulesAndNamespaces,_)) ->
+                List.iter processModuleOrNamespace modulesAndNamespaces
+                ElementType.F_SHARP_IMPL_FILE
             | ParsedInput.SigFile (ParsedSigFileInput(_)) -> ElementType.F_SHARP_SIG_FILE
 
         ast.Range |> getEndOffset |> advanceToOffset
