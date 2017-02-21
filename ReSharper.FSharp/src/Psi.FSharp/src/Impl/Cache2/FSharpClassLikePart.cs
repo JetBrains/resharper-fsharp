@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Tree;
-using yWorks.Support;
+using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
@@ -19,7 +19,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public IEnumerable<ITypeMember> GetTypeMembers()
     {
-      return EmptyList<ITypeMember>.Instance;
+      return GetDeclaration()?.MemberDeclarations.Select(d => d.DeclaredElement).WhereNotNull() ??
+             EmptyList<ITypeMember>.InstanceList;
     }
 
     public IEnumerable<IDeclaredType> GetSuperTypes()

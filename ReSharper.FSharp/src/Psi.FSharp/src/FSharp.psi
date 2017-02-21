@@ -70,6 +70,12 @@ fSharpSigFile options {
 
 // Modules and namespaces
 
+interface moduleLikeDeclaration
+:
+  moduleOrNamespaceDeclaration |
+  nestedModuleDeclaration
+;
+
 interface fSharpDeclaration
 :
   moduleOrNamespaceDeclaration |
@@ -87,6 +93,7 @@ fSharpNamespaceDeclaration options {
 }
 :
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>
+  (moduleMemberDeclaration<MODULE_MEMBER, Declarations>)* FAKE
 ;
 
 moduleDeclaration options {
@@ -95,15 +102,35 @@ moduleDeclaration options {
 :
   accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>
+  (moduleMemberDeclaration<MODULE_MEMBER, Declarations>)* FAKE
 ;
 
-
 moduleOrNamespaceSignature : FAKE;
-moduleMemberDeclaration : FAKE;
 
 
+
+// Module members
+
+
+interface moduleMemberDeclaration
+:
+  nestedModuleDeclaration |
+  otherMemberDeclaration
+;
+
+nestedModuleDeclaration options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
+}
+:
+  accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
+  fSharpIdentifier<FS_IDENTIFIER, Identifier>
+  (moduleMemberDeclaration<MODULE_MEMBER, Declarations>)* FAKE
+;
+
+otherMemberDeclaration: fSharpIdentifier<FS_IDENTIFIER, Identifier>;
 
 // Other
 
+fSharpIdentifier : IDENTIFIER;
 longIdentifier: (IDENTIFIER<FS_IDENTIFIER, Identifiers>)* FAKE;
 accessModifiers: (KEYWORD<FS_KEYWORD, Modifiers>)* FAKE;

@@ -11,6 +11,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
     public override string DeclaredName => QualifiedName;
     public string QualifiedName => LongIdentifier.QualifiedName;
     public string ShortName => LongIdentifier.ShortName;
+    public bool IsModule => false;
 
     public override TreeTextRange GetNameRange()
     {

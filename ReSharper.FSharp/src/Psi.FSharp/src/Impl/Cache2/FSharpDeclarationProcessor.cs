@@ -29,19 +29,29 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       }
     }
 
-    public override void VisitModuleDeclaration(IModuleDeclaration decl)
-    {
-      ProcessModuleLikeDeclaraion(decl, new ModulePart(decl));
-    }
-
     public override void VisitFSharpNamespaceDeclaration(IFSharpNamespaceDeclaration decl)
     {
       ProcessModuleLikeDeclaraion(decl, new DeclaredNamespacePart(decl));
     }
 
-    private void ProcessModuleLikeDeclaraion(IModuleOrNamespaceDeclaration decl, Part part)
+    public override void VisitModuleDeclaration(IModuleDeclaration decl)
+    {
+      ProcessModuleLikeDeclaraion(decl, new ModulePart(decl));
+    }
+
+    public override void VisitNestedModuleDeclaration(INestedModuleDeclaration decl)
+    {
+      ProcessModuleLikeDeclaraion(decl, new NestedModulePart(decl));
+    }
+
+    private void ProcessModuleLikeDeclaraion(IModuleLikeDeclaration decl, Part part)
     {
       myBuilder.StartPart(part);
+      foreach (var memberDecl in decl.DeclarationsEnumerable)
+      {
+        memberDecl.Accept(this);
+        if (decl.IsModule) myBuilder.AddDeclaredMemberName(memberDecl.DeclaredName);
+      }
       myBuilder.EndPart();
     }
   }

@@ -4,7 +4,9 @@
   {
     public const string IDS_F_SHARP_FILE = "";
     public const string IDS_F_SHARP_DECLARATION = "";
+    public const string IDS_MODULE_LIKE_DECLARATION = "";
     public const string IDS_MODULE_OR_NAMESPACE_DECLARATION = "";
+    public const string IDS_MODULE_MEMBER_DECLARATION = "";
 
     public static string GetString(string id)
     {

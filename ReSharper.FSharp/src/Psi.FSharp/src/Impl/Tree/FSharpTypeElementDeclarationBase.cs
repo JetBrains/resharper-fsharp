@@ -31,9 +31,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       }
     }
 
+    public TreeNodeCollection<ITypeMemberDeclaration> MemberDeclarations =>
+      this.Children<ITypeMemberDeclaration>().ToTreeNodeCollection();
+
     // todo
     public TreeNodeCollection<ITypeDeclaration> NestedTypeDeclarations => TreeNodeCollection<ITypeDeclaration>.Empty;
-    public TreeNodeCollection<ITypeMemberDeclaration> MemberDeclarations => TreeNodeCollection<ITypeMemberDeclaration>.Empty;
     public IList<ITypeDeclaration> TypeDeclarations => EmptyList<ITypeDeclaration>.Instance;
     public string CLRName { get; }
   }

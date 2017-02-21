@@ -29,6 +29,12 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         while not (builder.GetTokenType().IsKeyword) || builder.GetTokenText() <> keyword do
             builder.AdvanceLexer() |> ignore
 
+    let processIdentifier (id : Ident) =
+        id.idRange |> getStartOffset |> advanceToOffset
+        let idMark = builder.Mark()
+        id.idRange |> getEndOffset |> advanceToOffset
+        builder.Done(idMark, ElementType.F_SHARP_IDENTIFIER, null)
+
     let processLongIdentifier (lid : Ident list) =
         let head = List.head lid
         let tail = List.last lid
@@ -37,6 +43,23 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         let lidMark = builder.Mark()
         tail.idRange |> getEndOffset |> advanceToOffset
         builder.Done(lidMark, ElementType.LONG_IDENTIFIER, null)
+
+    let rec processModuleMember = function
+        | SynModuleDecl.NestedModule(ComponentInfo(_,_,_,lid,_,_,_,_),_,decls,_,range) as decl ->
+            let id = List.head lid
+            id.idRange |> getStartOffset |> advanceToOffset
+            let moduleMark = builder.Mark()
+            processIdentifier id
+
+            List.iter processModuleMember decls
+
+            decl.Range |> getEndOffset |> advanceToOffset
+            builder.Done(moduleMark, ElementType.NESTED_MODULE_DECLARATION, null)
+        | decl ->
+            decl.Range |> getStartOffset |> advanceToOffset
+            let declMark = builder.Mark()
+            decl.Range |> getEndOffset |> advanceToOffset
+            builder.Done(declMark, ElementType.OTHER_MEMBER_DECLARATION, null)
 
     let processModuleOrNamespace (SynModuleOrNamespace(lid,_,isModule,decls,_,_,_,range) as ns) =
         //advanceToKeyword (if isModule then "module" else "namespace")
@@ -48,6 +71,8 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         builder.Done(accessMark, ElementType.ACCESS_MODIFIERS, null)
         
         processLongIdentifier lid
+
+        List.iter processModuleMember decls
 
         ns.Range |> getEndOffset |> advanceToOffset
         let declType = if isModule then ElementType.MODULE_DECLARATION else ElementType.F_SHARP_NAMESPACE_DECLARATION

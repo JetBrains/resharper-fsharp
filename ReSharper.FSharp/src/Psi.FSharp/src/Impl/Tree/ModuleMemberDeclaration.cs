@@ -4,7 +4,7 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 {
   // temp class for complementing generated PSI
-  internal partial class ModuleMemberDeclaration
+  internal partial class OtherMemberDeclaration
   {
     public XmlNode GetXMLDoc(bool inherit)
     {

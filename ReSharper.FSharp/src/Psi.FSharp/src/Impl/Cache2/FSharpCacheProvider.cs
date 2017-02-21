@@ -22,6 +22,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
           return new QualifiedNamespacePart(reader);
         case FSharpSerializationTag.ModulePart:
           return new ModulePart(reader);
+        case FSharpSerializationTag.NestedModulePart:
+          return new NestedModulePart(reader);
         default:
           throw new SerializationError("Unknown tag:" + tag);
       }
