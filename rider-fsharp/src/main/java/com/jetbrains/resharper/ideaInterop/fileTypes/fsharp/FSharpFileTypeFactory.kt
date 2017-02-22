@@ -6,12 +6,11 @@ import com.intellij.openapi.fileTypes.FileTypeConsumer
 import com.intellij.openapi.fileTypes.FileTypeFactory
 
 class FSharpFileTypeFactory : FileTypeFactory() {
-    private val FSharpFileExtensions: List<String> = arrayListOf("fs", "fsi", "fsx", "fsscript", "ml", "mli")
-    private val FSharpFileNameMatchers: List<FileNameMatcher> = FSharpFileExtensions.map(::ExtensionFileNameMatcher)
+    private val fSharpFileExtensions: List<String> = arrayListOf("fs", "fsi", "fsx", "fsscript", "ml", "mli")
+    private val fSharpFileNameMatchers: List<FileNameMatcher> = fSharpFileExtensions.map(::ExtensionFileNameMatcher)
 
     override fun createFileTypes(consumer: FileTypeConsumer) {
-        for (matcher in FSharpFileNameMatchers)
+        for (matcher in fSharpFileNameMatchers)
             consumer.consume(FSharpFileType, matcher)
-        consumer.consume(FSharpFileType)
     }
 }
