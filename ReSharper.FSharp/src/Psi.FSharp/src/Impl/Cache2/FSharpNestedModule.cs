@@ -1,17 +1,30 @@
-﻿using JetBrains.Annotations;
-using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
-  public class FSharpNestedModule : FSharpModule
+  internal class FSharpNestedModule : FSharpClassLikeElement<NestedModulePart>
   {
     public FSharpNestedModule([NotNull] IClassPart part) : base(part)
     {
     }
 
-    protected override bool AcceptsPart(TypePart part)
+    protected override IList<IDeclaredType> CalcSuperTypes()
     {
-      return part is NestedModulePart;
+      return new[] {Module.GetPredefinedType().Object};
+    }
+
+    // todo: calc access modifiers in part constructor
+    protected override MemberDecoration Modifiers
+    {
+      get
+      {
+        var modifiers = base.Modifiers;
+        modifiers.IsAbstract = true;
+        modifiers.IsStatic = true;
+        modifiers.IsSealed = true;
+        return modifiers;
+      }
     }
   }
 }

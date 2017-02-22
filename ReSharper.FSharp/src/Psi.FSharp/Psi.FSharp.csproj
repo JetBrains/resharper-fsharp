@@ -405,6 +405,7 @@
     <Compile Include="src\Impl\Cache2\EnumPart.cs" />
     <Compile Include="src\Impl\Cache2\ExceptionPart.cs" />
     <Compile Include="src\Impl\Cache2\FSharpCacheProvider.cs" />
+    <Compile Include="src\Impl\Cache2\FSharpClassLikeElement.cs" />
     <Compile Include="src\Impl\Cache2\FSharpClassLikePart.cs" />
     <Compile Include="src\Impl\Cache2\FSharpDeclarationProcessor.cs" />
     <Compile Include="src\Impl\Cache2\FSharpException.cs" />
