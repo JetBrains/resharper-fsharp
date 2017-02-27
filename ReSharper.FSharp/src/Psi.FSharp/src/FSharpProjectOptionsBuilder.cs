@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 using JetBrains.Application.Components;
 using JetBrains.DataFlow;
 using JetBrains.Platform.MsBuildModel;
+using JetBrains.Platform.ProjectModel.FSharp.Properties;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.Impl.Build;
 using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
@@ -31,7 +32,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
     /// <summary>
     /// Build project options for FSharp.Compiler.Service. Options for referenced projects are not created.
     /// </summary>
-    public FSharpProjectOptions Build(IProject project)
+    public FSharpProjectOptions BuildWithoutReferencedProjects(IProject project)
     {
       using (ReadLockCookie.Create())
       {
@@ -100,12 +101,60 @@ namespace JetBrains.ReSharper.Psi.FSharp
     [NotNull]
     private IEnumerable<string> GetReferencedPathsOptions(IProject project)
     {
+      // todo: provide path to dll for unloaded projects?
       var framework = project.GetCurrentTargetFrameworkId();
       var refProjectsOutputs = project.GetReferencedProjects(framework)
         .Select(p => p.GetOutputFilePath(p.GetCurrentTargetFrameworkId()));
       var refAssembliesPaths = project.GetAssemblyReferences(framework)
         .Select(a => a.ResolveResultAssemblyFile().Location);
       return refProjectsOutputs.Concat(refAssembliesPaths).Select(a => "-r:" + a.FullPath);
+    }
+
+    [NotNull]
+    public Dictionary<IProject, FSharpProjectOptions> AddReferencedProjects(
+      [NotNull] Dictionary<IProject, FSharpProjectOptions> optionsWithoutRerefencedProjects)
+    {
+      using (ReadLockCookie.Create())
+      {
+        var newOptions = new Dictionary<IProject, FSharpProjectOptions>();
+        foreach (var projectOptions in optionsWithoutRerefencedProjects)
+        {
+          var project = projectOptions.Key;
+          newOptions[project] = AddReferencedProjects(project, optionsWithoutRerefencedProjects, newOptions);
+        }
+        return newOptions;
+      }
+    }
+
+    [NotNull]
+    private FSharpProjectOptions AddReferencedProjects([NotNull] IProject project,
+      [NotNull] Dictionary<IProject, FSharpProjectOptions> optionsWithoutReferences,
+      [NotNull] Dictionary<IProject, FSharpProjectOptions> newOptions)
+    {
+      if (newOptions.ContainsKey(project)) return newOptions[project];
+
+      // do not transitively add referenced projects like other FSharp tools (maybe change it later)
+      var referencedProjects = project.GetReferencedProjects(project.GetCurrentTargetFrameworkId(), transitive: false);
+      var referencedProjectOptions = new List<Tuple<string, FSharpProjectOptions>>();
+      foreach (var referencedProject in referencedProjects)
+      {
+        if (!(referencedProject.ProjectProperties is FSharpProjectProperties)) continue;
+
+        var fixedOptions = AddReferencedProjects(referencedProject, optionsWithoutReferences, newOptions);
+        newOptions[referencedProject] = fixedOptions;
+        var outPath = referencedProject.GetOutputFilePath(referencedProject.GetCurrentTargetFrameworkId()).FullPath;
+        referencedProjectOptions.Add(Tuple.Create(outPath, fixedOptions));
+      }
+      var oldOptions = optionsWithoutReferences[project];
+      return new FSharpProjectOptions(
+        oldOptions.ProjectFileName,
+        oldOptions.ProjectFileNames,
+        oldOptions.OtherOptions,
+        referencedProjectOptions.ToArray(),
+        oldOptions.IsIncompleteTypeCheckEnvironment,
+        oldOptions.UseScriptResolutionRules,
+        oldOptions.LoadTime,
+        oldOptions.UnresolvedReferences);
     }
   }
 }

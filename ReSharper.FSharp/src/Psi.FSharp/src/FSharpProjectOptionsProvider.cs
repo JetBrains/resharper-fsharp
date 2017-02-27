@@ -6,6 +6,7 @@ using JetBrains.Platform.ProjectModel.FSharp.Properties;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.PsiGen.Util;
 using JetBrains.Threading;
+using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp
 {
@@ -24,8 +25,8 @@ namespace JetBrains.ReSharper.Psi.FSharp
       mySolution = solution;
       myProjectOptionsBuilder = projectOptionsBuilder;
       myFSharpCheckerService = fSharpCheckerService;
-      myUpdateEvent = solution.Locks.GroupingEvents.CreateEvent(lifetime, "updateFSharpProject",
-        TimeSpan.FromMilliseconds(500), Rgc.Guarded, DoUpdateProject);
+      myUpdateEvent = solution.Locks.GroupingEvents.CreateEvent(lifetime, "updateFSharpProjects",
+        TimeSpan.FromMilliseconds(500), Rgc.Guarded, DoUpdateProjects);
 
       changeManager.Changed2.Advise(lifetime, ProcessChange);
     }
@@ -39,8 +40,10 @@ namespace JetBrains.ReSharper.Psi.FSharp
           AddReferencingProjects(referencingProject, projects);
     }
 
-    private void DoUpdateProject()
+    private void DoUpdateProjects()
     {
+      // todo: reparse files, reprocess caches
+
       mySolution.Locks.AssertMainThread();
 
       var referencingProjects = new HashSet<IProject>();
@@ -48,12 +51,15 @@ namespace JetBrains.ReSharper.Psi.FSharp
         AddReferencingProjects(project, referencingProjects);
       myProjectsToUpdate.addAll(referencingProjects);
 
+      var projectsOptions = new Dictionary<IProject, FSharpProjectOptions>();
       foreach (var project in myProjectsToUpdate)
+        projectsOptions.Add(project, myProjectOptionsBuilder.BuildWithoutReferencedProjects(project));
+
+      foreach (var projectOptions in myProjectOptionsBuilder.AddReferencedProjects(projectsOptions))
       {
-        var newProjectOptions = myProjectOptionsBuilder.Build(project);
-        var defines = myProjectOptionsBuilder.GetDefines(project);
-        myFSharpCheckerService.AddProject(project, newProjectOptions, defines);
-        // todo: reparse files, reprocess caches
+        var project = projectOptions.Key;
+        var options = projectOptions.Value;
+        myFSharpCheckerService.AddProject(project, options, myProjectOptionsBuilder.GetDefines(project));
       }
       myProjectsToUpdate.Clear();
     }
