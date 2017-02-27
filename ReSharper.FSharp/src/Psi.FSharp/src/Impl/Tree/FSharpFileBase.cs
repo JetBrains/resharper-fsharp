@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
+using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
@@ -18,7 +19,10 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 
     public FSharpCheckFileResults GetCheckResults([CanBeNull] Action interruptChecker = null)
     {
-      return CheckResults ?? (CheckResults = FSharpCheckerUtil.CheckFSharpFile(this, interruptChecker));
+      var psiSourceFile = GetSourceFile();
+      Assertion.Assert(psiSourceFile != null && ParseResults != null, "psiSourceFile != null && ParseResults != null");
+      return CheckResults ?? (CheckResults =
+               FSharpCheckerUtil.CheckFSharpFile(psiSourceFile, ParseResults, interruptChecker));
     }
 
     public virtual void Accept(TreeNodeVisitor visitor)
