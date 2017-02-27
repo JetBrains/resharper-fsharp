@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>JetBrains.ReSharper.FSharp</id>
+    <title>ReSharper.FSharp</title>
+    <version>0.1</version>
+    <authors>JetBrains auduchinok</authors>
+    <owners>JetBrains auduchinok</owners>
+    <summary>F# support</summary>
+    <description>F# language support in ReSharper</description>
+    <releaseNotes/>
+    <projectUrl>https://github.com/JetBrains/resharper-fsharp</projectUrl>
+    <iconUrl>http://resharper-plugins.jetbrains.com/Content/Images/packageReSharper.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <dependencies>
+      <dependency id="Wave" version="[8.0]" />
+    </dependencies>
+    <tags>resharper fsharp</tags>
+  </metadata>
+  <files>
+    <file src="src\Psi.FSharp\bin\Debug\JetBrains.ReSharper.Psi.FSharp.dll" target="DotFiles" />
+    <file src="src\Psi.FSharp.LanguageService\bin\Debug\JetBrains.ReSharper.Psi.FSharp.LanguageService.dll" target="DotFiles" />
+    <file src="src\Daemon.FSharp\bin\Debug\JetBrains.ReSharper.Daemon.FSharp.dll" target="DotFiles" />
+    <file src="src\Projects.FSharp\bin\Debug\JetBrains.Platform.ProjectModel.FSharp.dll" target="DotFiles" />
+    <file src="src\Services.FSharp\bin\Debug\JetBrains.ReSharper.Feature.Services.FSharp.dll" target="DotFiles" />
+    <file src="src\Psi.FSharp.Parsing\bin\Debug\Psi.FSharp.Parsing.dll" target="DotFiles" />
+    <file src="packages\FSharp.Core.4.0.0.1\lib\net40\FSharp.Core.dll" target="DotFiles" />
+    <file src="packages\FSharp.Compiler.Service.9.0.1\lib\net45\FSharp.Compiler.Service.dll" target="DotFiles"/>
+    <file src="packages\FSharp.Compiler.Service.9.0.1\lib\net45\FSharp.Compiler.Service.MSBuild.v12.dll" target="DotFiles"/>
+    <file src="packages\FSharp.Compiler.Service.ProjectCracker.9.0.1\lib\net45\FSharp.Compiler.Service.ProjectCracker.dll" target="DotFiles"/>
+    <file src="packages\FSharp.Compiler.Service.ProjectCracker.9.0.1\utilities\net45\FSharp.Compiler.Service.ProjectCrackerTool.exe" target="DotFiles"/>
+    <file src="packages\FSharp.Compiler.Service.ProjectCracker.9.0.1\utilities\net45\FSharp.Compiler.Service.ProjectCrackerTool.exe.config" target="DotFiles"/>
+  </files>
+</package>
