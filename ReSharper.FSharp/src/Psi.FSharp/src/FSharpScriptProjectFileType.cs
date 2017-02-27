@@ -24,5 +24,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
     protected FSharpScriptProjectFileType(string name, string presentableName) : base(name, presentableName)
     {
     }
+
+    public override BuildAction DefaultBuildAction => BuildAction.NONE;
   }
 }
