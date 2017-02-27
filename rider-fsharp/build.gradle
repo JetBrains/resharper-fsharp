@@ -9,13 +9,13 @@ buildscript {
 }
 
 plugins {
-    id "org.jetbrains.intellij" version "0.2.3"
+    id "org.jetbrains.intellij" version "0.2.5"
 }
 
 apply plugin: 'kotlin'
 
 intellij {
-    version 'RS-163.12057'
+    version 'RS-171.3085.362'
     downloadSources false
 }
 

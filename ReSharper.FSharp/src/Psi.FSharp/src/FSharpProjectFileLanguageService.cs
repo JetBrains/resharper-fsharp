@@ -10,8 +10,12 @@ namespace JetBrains.ReSharper.Psi.FSharp
   [ProjectFileType(typeof(FSharpProjectFileType))]
   public class FSharpProjectFileLanguageService : ProjectFileLanguageService
   {
-    public FSharpProjectFileLanguageService(ProjectFileType projectFileType) : base(projectFileType)
+    private readonly FSharpCheckerService myCheckerService;
+
+    public FSharpProjectFileLanguageService(ProjectFileType projectFileType, FSharpCheckerService checkerService)
+      : base(projectFileType)
     {
+      myCheckerService = checkerService;
     }
 
     protected override PsiLanguageType PsiLanguageType => FSharpLanguage.Instance;
@@ -21,7 +25,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
       IPsiSourceFile sourceFile = null)
     {
       return sourceFile != null
-        ? new FSharpLexerFactory(sourceFile)
+        ? new FSharpLexerFactory(sourceFile, myCheckerService)
         : FSharpLanguage.Instance.LanguageService().GetPrimaryLexerFactory();
     }
 

@@ -1,195 +1,89 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using JetBrains.Annotations;
 using JetBrains.Application.changes;
 using JetBrains.DataFlow;
 using JetBrains.Platform.ProjectModel.FSharp.Properties;
 using JetBrains.ProjectModel;
-using JetBrains.ProjectModel.Impl.Build;
-using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
-using JetBrains.ReSharper.Feature.Services;
-using JetBrains.ReSharper.Psi.FSharp.Util;
-using JetBrains.ReSharper.Psi.Modules;
-using JetBrains.Util;
-using Microsoft.FSharp.Collections;
-using Microsoft.FSharp.Compiler.SourceCodeServices;
-using Microsoft.FSharp.Control;
-using Microsoft.FSharp.Core;
+using JetBrains.ReSharper.PsiGen.Util;
+using JetBrains.Threading;
 
 namespace JetBrains.ReSharper.Psi.FSharp
 {
   [SolutionComponent]
-  public class FSharpProjectOptionsProvider : IChangeProvider
+  public class FSharpProjectOptionsProvider
   {
     private readonly ISolution mySolution;
-    private readonly PsiModules myPsiModules;
-    private readonly OnSolutionCloseNotifier myNotifier;
+    private readonly FSharpProjectOptionsBuilder myProjectOptionsBuilder;
+    private readonly FSharpCheckerService myFSharpCheckerService;
+    private readonly GroupingEvent myUpdateEvent;
+    private readonly HashSet<IProject> myProjectsToUpdate = new HashSet<IProject>();
 
-    private static readonly Dictionary<IProject, FSharpProjectOptions> ourProjectsOptions =
-      new Dictionary<IProject, FSharpProjectOptions>();
-
-    private static readonly Dictionary<IProject, string[]> ourConfigurationDefines =
-      new Dictionary<IProject, string[]>();
-
-    private static readonly FSharpFunc<string, bool> ourOptionsFilter =
-      FSharpFunc<string, bool>.FromConverter(s => !s.StartsWith("--out:", StringComparison.Ordinal) &&
-                                                  !s.StartsWith("-r:", StringComparison.Ordinal));
-
-    private const string Configuration = "Configuration";
-
-    public FSharpProjectOptionsProvider(Lifetime lifetime, ISolution solution, PsiModules psiModules,
-      OnSolutionCloseNotifier notifier, ChangeManager changeManager)
+    public FSharpProjectOptionsProvider(Lifetime lifetime, ISolution solution, ChangeManager changeManager,
+      FSharpCheckerService fSharpCheckerService, FSharpProjectOptionsBuilder projectOptionsBuilder)
     {
       mySolution = solution;
-      myPsiModules = psiModules;
-      myNotifier = notifier;
-      changeManager.RegisterChangeProvider(lifetime, this);
-      changeManager.AddDependency(lifetime, this, myPsiModules);
-      changeManager.AddDependency(lifetime, this, mySolution);
+      myProjectOptionsBuilder = projectOptionsBuilder;
+      myFSharpCheckerService = fSharpCheckerService;
+      myUpdateEvent = solution.Locks.GroupingEvents.CreateEvent(lifetime, "updateFSharpProject",
+        TimeSpan.FromMilliseconds(500), Rgc.Guarded, DoUpdateProject);
 
-      myNotifier.SolutionIsAboutToClose.Advise(lifetime, () =>
-      {
-        ourProjectsOptions.Clear();
-        FSharpCheckerUtil.Checker.InvalidateAll();
-      });
+      changeManager.Changed2.Advise(lifetime, ProcessChange);
     }
 
-    public object Execute(IChangeMap changeMap)
+    private void AddReferencingProjects(IProject project, HashSet<IProject> projects)
     {
-      var moduleChanges = changeMap.GetChange<PsiModuleChange>(myPsiModules)?.ModuleChanges;
-      if (moduleChanges == null) return null;
+      if (projects.Contains(project)) return;
+      projects.Add(project);
+      foreach (var referencingProject in project.GetReferencingProjects(project.GetCurrentTargetFrameworkId()))
+        if (referencingProject.ProjectProperties is FSharpProjectProperties)
+          AddReferencingProjects(referencingProject, projects);
+    }
 
-      foreach (var moduleChange in moduleChanges)
+    private void DoUpdateProject()
+    {
+      mySolution.Locks.AssertMainThread();
+
+      var referencingProjects = new HashSet<IProject>();
+      foreach (var project in myProjectsToUpdate)
+        AddReferencingProjects(project, referencingProjects);
+      myProjectsToUpdate.addAll(referencingProjects);
+
+      foreach (var project in myProjectsToUpdate)
       {
-        var changeType = moduleChange.Type;
-        if (changeType != PsiModuleChange.ChangeType.Added && changeType != PsiModuleChange.ChangeType.Removed)
-          continue;
-
-        var project = moduleChange.Item.ContainingProjectModule as IProject;
-        if (project == null || !project.IsValid() || !(project.ProjectProperties is FSharpProjectProperties))
-          continue;
-
-        if (changeType == PsiModuleChange.ChangeType.Added)
-        {
-          var newProjectOptions = GetProjectOptions(project);
-          if (newProjectOptions == null) continue;
-          ourProjectsOptions[project] = newProjectOptions;
-          ourConfigurationDefines[project] = GetDefines(project);
-          FSharpCheckerUtil.Checker.CheckProjectInBackground(newProjectOptions);
-        }
-        if (changeType == PsiModuleChange.ChangeType.Removed)
-        {
-          FSharpCheckerUtil.Checker.InvalidateConfiguration(ourProjectsOptions[project]);
-          ourProjectsOptions.Remove(project);
-          ourConfigurationDefines.Remove(project);
-        }
+        var newProjectOptions = myProjectOptionsBuilder.Build(project);
+        var defines = myProjectOptionsBuilder.GetDefines(project);
+        myFSharpCheckerService.AddProject(project, newProjectOptions, defines);
+        // todo: reparse files, reprocess caches
       }
-      return null;
+      myProjectsToUpdate.Clear();
     }
 
-    [NotNull]
-    public static FSharpProjectOptions GetProjectOptions([NotNull] IPsiSourceFile sourceFile)
+    private void ProcessChange(ChangeEventArgs obj)
     {
-      if (sourceFile.LanguageType.Equals(FSharpScriptProjectFileType.Instance)) return GetScriptOptions(sourceFile);
-      var project = sourceFile.GetProject();
-      var options = project != null ? ourProjectsOptions.GetValueSafe(project) : null;
-      return options ?? GetScriptOptions(sourceFile);
+      var change = obj.ChangeMap.GetChange<ProjectModelChange>(mySolution);
+      if (change == null) return;
+      ProcessChange(change);
     }
 
-    [NotNull]
-    public static FSharpProjectOptions GetScriptOptions([NotNull] IPsiSourceFile sourceFile)
+    private void ProcessChange(ProjectModelChange change)
     {
-      var filePath = sourceFile.GetLocation().FullPath;
-      var getScriptOptionsAsync = FSharpCheckerUtil.Checker.GetProjectOptionsFromScript(
-        filePath, sourceFile.Document.GetText(), FSharpOption<DateTime>.Some(DateTime.Now), null, null);
-      return FSharpAsync.RunSynchronously(getScriptOptionsAsync, null, null);
-    }
-
-    [CanBeNull]
-    public static FSharpProjectOptions GetProjectOptions([NotNull] IProject project)
-    {
-      var path = project.ProjectFile?.Location.FullPath;
-      var configuration = project.ProjectProperties.ActiveConfigurations.Configurations.FirstOrDefault();
-      if (path == null || configuration == null) return null;
-      var configurationName = ListModule.OfArray(new[] {Tuple.Create(Configuration, configuration.Name)});
-
-      var optionsFromCracker = ProjectCracker.GetProjectOptionsFromProjectFile(path,
-        OptionModule.OfObj(configurationName), FSharpOption<DateTime>.Some(DateTime.Now));
-      var fixedOptions = FixReferences(optionsFromCracker, project).Item2;
-      ourProjectsOptions[project] = fixedOptions;
-      return fixedOptions;
-    }
-
-    [NotNull]
-    private static IProject GetProject([NotNull] FSharpProjectOptions options, [NotNull] ISolution solution)
-    {
-      var project = solution.FindProjectByProjectFilePath(FileSystemPath.Parse(options.ProjectFileName));
-      Assertion.AssertNotNull(project, "project != null");
-      return project;
-    }
-
-    [NotNull]
-    private static Tuple<string, FSharpProjectOptions> FixReferences([NotNull] FSharpProjectOptions options,
-      [NotNull] IProject project)
-    {
-      var solution = project.GetSolution();
-      var outPath = project.GetOutputFilePath(project.GetCurrentTargetFrameworkId()).FullPath;
-      var filteredOptions = ArrayModule.Filter(ourOptionsFilter, options.OtherOptions);
-      var referencedPathsOptions = GetReferencedPathsOptions(project);
-      var definesOptions = GetDefines(project).Convert(s => "--define:" + s);
-
-      var fixedOptions = new FSharpProjectOptions(
-        options.ProjectFileName,
-        options.ProjectFileNames,
-        ArrayModule.Concat(new[] {new[] {"--out:" + outPath}, filteredOptions, referencedPathsOptions, definesOptions}),
-        options.ReferencedProjects.Convert(p => FixReferences(p.Item2, GetProject(p.Item2, solution))),
-        options.IsIncompleteTypeCheckEnvironment,
-        options.UseScriptResolutionRules,
-        options.LoadTime,
-        options.UnresolvedReferences);
-
-      return Tuple.Create(outPath, fixedOptions);
-    }
-
-    [NotNull]
-    private static string[] GetReferencedPathsOptions(IProject project)
-    {
-      var framework = project.GetCurrentTargetFrameworkId();
-      var refProjectsOutputs = project.GetReferencedProjects(framework)
-        .Select(p => p.GetOutputFilePath(p.GetCurrentTargetFrameworkId()));
-      var refAssembliesPaths = project.GetAssemblyReferences(framework)
-        .Select(a => a.ResolveResultAssemblyFile().Location);
-      return refProjectsOutputs.Concat(refAssembliesPaths).Select(a => "-r:" + a.FullPath).ToArray();
-    }
-
-    [NotNull]
-    public static string[] GetDefinedConstants([NotNull] IPsiSourceFile sourceFile)
-    {
-      var project = sourceFile.GetProject();
-      return project != null && ourConfigurationDefines.ContainsKey(project)
-        ? ourConfigurationDefines[project]
-        : EmptyArray<string>.Instance;
-    }
-
-    [NotNull]
-    public static string[] SplitDefines([CanBeNull] string definesString)
-    {
-      if (string.IsNullOrEmpty(definesString)) return EmptyArray<string>.Instance;
-
-      var defines = definesString.Split(';', ',', ' ');
-      var result = new string[defines.Length];
-      for (var i = 0; i < defines.Length; i++)
-        result[i] = defines[i].Trim();
-      return result;
-    }
-
-    [NotNull]
-    public static string[] GetDefines([NotNull] IProject project)
-    {
-      var configurations = (project as ProjectImpl)?.ProjectProperties.ActiveConfigurations.Configurations;
-      var definesString = configurations?.OfType<ManagedProjectConfiguration>().FirstOrDefault()?.DefineConstants;
-      return SplitDefines(definesString);
+      var project = change.ProjectModelElement as IProject;
+      if (project != null)
+      {
+        if (project.ProjectProperties is FSharpProjectProperties)
+        {
+          if (change.IsRemoved)
+          {
+            myFSharpCheckerService.RemoveProject(project);
+            return;
+          }
+          myProjectsToUpdate.Add(project);
+          myUpdateEvent.FireIncoming();
+        }
+        return;
+      }
+      foreach (var projectModelChange in change.GetChildren())
+        ProcessChange(projectModelChange);
     }
   }
 }

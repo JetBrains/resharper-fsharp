@@ -74,22 +74,22 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="JetBrains.Platform.DocumentModel">
-      <HintPath>..\..\packages\JetBrains.Platform.Core.Text.108.0.20170209.145827-eap01\DotFiles\JetBrains.Platform.DocumentModel.dll</HintPath>
+      <HintPath>..\..\packages\JetBrains.Platform.Core.Text.108.0.20170216.80713-eap02\DotFiles\JetBrains.Platform.DocumentModel.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.Platform.ProjectModel">
-      <HintPath>..\..\packages\JetBrains.Platform.Core.Ide.108.0.20170209.145827-eap01\DotFiles\JetBrains.Platform.ProjectModel.dll</HintPath>
+      <HintPath>..\..\packages\JetBrains.Platform.Core.Ide.108.0.20170216.80713-eap02\DotFiles\JetBrains.Platform.ProjectModel.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.Platform.Shell">
-      <HintPath>..\..\packages\JetBrains.Platform.Core.Shell.108.0.20170209.80907-eap01\DotFiles\JetBrains.Platform.Shell.dll</HintPath>
+      <HintPath>..\..\packages\JetBrains.Platform.Core.Shell.108.0.20170216.80317-eap02\DotFiles\JetBrains.Platform.Shell.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.Platform.TextControl">
-      <HintPath>..\..\packages\JetBrains.Platform.Core.Text.108.0.20170209.145827-eap01\DotFiles\JetBrains.Platform.TextControl.dll</HintPath>
+      <HintPath>..\..\packages\JetBrains.Platform.Core.Text.108.0.20170216.80713-eap02\DotFiles\JetBrains.Platform.TextControl.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.Platform.Util">
-      <HintPath>..\..\packages\JetBrains.Platform.Core.Shell.108.0.20170209.80907-eap01\DotFiles\JetBrains.Platform.Util.dll</HintPath>
+      <HintPath>..\..\packages\JetBrains.Platform.Core.Shell.108.0.20170216.80317-eap02\DotFiles\JetBrains.Platform.Util.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.ReSharper.Psi">
-      <HintPath>..\..\packages\JetBrains.Psi.Features.Core.108.0.20170209.150352-eap01\DotFiles\JetBrains.ReSharper.Psi.dll</HintPath>
+      <HintPath>..\..\packages\JetBrains.Psi.Features.Core.108.0.20170216.112753-eap02\DotFiles\JetBrains.ReSharper.Psi.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="FSharp.Core, Version=$(TargetFSharpCoreVersion), Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
@@ -97,13 +97,13 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Collections.Immutable">
-      <HintPath>..\..\packages\System.Collections.Immutable.1.3.0\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
+      <HintPath>..\..\packages\System.Collections.Immutable.1.3.1\lib\portable-net45+win8+wp8+wpa81\System.Collections.Immutable.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Reflection.Metadata">
-      <HintPath>..\..\packages\System.Reflection.Metadata.1.4.1\lib\portable-net45+win8\System.Reflection.Metadata.dll</HintPath>
+      <HintPath>..\..\packages\System.Reflection.Metadata.1.4.2\lib\portable-net45+win8\System.Reflection.Metadata.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Windows.Forms" />

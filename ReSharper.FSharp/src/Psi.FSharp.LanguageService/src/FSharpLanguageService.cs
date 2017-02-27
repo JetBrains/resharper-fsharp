@@ -12,9 +12,12 @@ namespace JetBrains.ReSharper.Psi.FSharp.LanguageService
   [Language(typeof(FSharpLanguage))]
   public class FSharpLanguageService : Psi.LanguageService
   {
-    public FSharpLanguageService(PsiLanguageType psiLanguageType, IConstantValueService constantValueService)
-      : base(psiLanguageType, constantValueService)
+    private readonly FSharpCheckerService myFSharpCheckerService;
+
+    public FSharpLanguageService(PsiLanguageType psiLanguageType, IConstantValueService constantValueService,
+      FSharpCheckerService fSharpCheckerService) : base(psiLanguageType, constantValueService)
     {
+      myFSharpCheckerService = fSharpCheckerService;
     }
 
     public override ILexerFactory GetPrimaryLexerFactory()
@@ -29,7 +32,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.LanguageService
 
     public override IParser CreateParser(ILexer lexer, IPsiModule module, IPsiSourceFile sourceFile)
     {
-      return new FSharpParser(sourceFile);
+      return new FSharpParser(sourceFile, myFSharpCheckerService);
     }
 
     public override IEnumerable<ITypeDeclaration> FindTypeDeclarations(IFile file)

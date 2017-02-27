@@ -38,10 +38,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
     public override void Execute(Action<DaemonStageResult> committer)
     {
       var interruptChecker = DaemonProcess.CreateInterruptChecker();
-      var checkResult = myFsFile.GetCheckResults(interruptChecker);
-      if (checkResult == null) return;
-
-      var symbolUses = FSharpCheckerUtil.RunFSharpAsync(checkResult.GetAllUsesOfAllSymbolsInFile(), interruptChecker);
+      var symbolUses = myFsFile.GetCheckResults(interruptChecker)?.GetAllUsesOfAllSymbolsInFile()?.RunAsTask(interruptChecker);
       if (symbolUses == null) return;
 
       foreach (var symbolUse in symbolUses)
@@ -64,11 +61,14 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
       var name = FSharpSymbolUtil.GetDisplayName(symbolUse.Symbol);
       if (name == null) return null;
 
-      // range includes qualifiers, we need the last identifier only
+      // range includes qualifiers, we're looking for the last identifier
       var endOffset = FSharpRangeUtil.GetEndOffset(myDocument, symbolUse.RangeAlternate) - 1;
       var token = myFsFile.FindTokenAt(endOffset) as FSharpIdentifierToken;
       if (token == null) return null;
 
+      // if token length matches the name length then found the right token
+      // otherwise name in code differs from symbol display name, trying to find it
+      // todo: check if the last identifier is always the one needed
       if (name.Length == token.Length) return token;
 
       // "Some" or "SomeAttribute" in element attribute, "SomeAttribute" elsewhere

@@ -2,7 +2,6 @@
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
-using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
@@ -13,16 +12,20 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
     private FSharpCheckFileResults CheckResults { get; set; }
 
     public FSharpParseFileResults ParseResults { get; set; }
+    public FSharpCheckerService CheckerService { get; set; }
+    public FSharpProjectOptions ProjectOptions { get; set; }
+    public override PsiLanguageType Language => FSharpLanguage.Instance;
     public bool ReferencesResolved { get; set; }
     public bool IsChecked => CheckResults != null;
-    public override PsiLanguageType Language => FSharpLanguage.Instance;
 
     public FSharpCheckFileResults GetCheckResults([CanBeNull] Action interruptChecker = null)
     {
+      if (CheckResults != null) return CheckResults;
       var psiSourceFile = GetSourceFile();
-      Assertion.Assert(psiSourceFile != null && ParseResults != null, "psiSourceFile != null && ParseResults != null");
-      return CheckResults ?? (CheckResults =
-               FSharpCheckerUtil.CheckFSharpFile(psiSourceFile, ParseResults, interruptChecker));
+      if (psiSourceFile == null || ParseResults == null) return null;
+      Assertion.AssertNotNull(CheckerService, "CheckerService != null");
+
+      return CheckResults = CheckerService.CheckFSharpFile(this, interruptChecker);
     }
 
     public virtual void Accept(TreeNodeVisitor visitor)
