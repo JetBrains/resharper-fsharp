@@ -4,7 +4,6 @@ using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.DataFlow;
 using JetBrains.ProjectModel;
-using JetBrains.ProjectModel.ProjectsHost.MsBuild.Internal;
 using JetBrains.ReSharper.Feature.Services;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
@@ -48,9 +47,10 @@ namespace JetBrains.ReSharper.Psi.FSharp
     [CanBeNull]
     public FSharpParseFileResults ParseFSharpFile([NotNull] IPsiSourceFile sourceFile)
     {
-      var origin = sourceFile?.ToProjectFile()?.Origin as MsBuildProjectItemOrigin;
       var projectOptions = GetProjectOptions(sourceFile);
-      return myChecker.ParseFileInProject(sourceFile.Name, sourceFile.Document.GetText(), projectOptions).RunAsTask();
+      var filename = sourceFile.GetLocation().FullPath;
+      var source = sourceFile.Document.GetText();
+      return myChecker.ParseFileInProject(filename, source, projectOptions).RunAsTask();
     }
 
     /// <param name="fsFile"></param>
@@ -63,8 +63,10 @@ namespace JetBrains.ReSharper.Psi.FSharp
       var sourceFile = fsFile.GetSourceFile();
       if (sourceFile == null) return null;
       var projectOptions = GetProjectOptions(sourceFile);
-      var checkAsync = myChecker.CheckFileInProject(fsFile.ParseResults, sourceFile.Name, 0,
-        sourceFile.Document.GetText(), projectOptions, textSnapshotInfo: null, isResultObsolete: null);
+      var filename = sourceFile.GetLocation().FullPath;
+      var source = sourceFile.Document.GetText();
+      var checkAsync = myChecker.CheckFileInProject(fsFile.ParseResults, filename, 0, source, projectOptions,
+        textSnapshotInfo: null, isResultObsolete: null);
       return (checkAsync.RunAsTask(interruptChecker) as FSharpCheckFileAnswer.Succeeded)?.Item;
     }
 

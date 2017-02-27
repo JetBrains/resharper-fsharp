@@ -27,8 +27,5 @@
     <file src="packages\FSharp.Core.4.0.0.1\lib\net40\FSharp.Core.dll" target="DotFiles" />
     <file src="packages\FSharp.Compiler.Service.9.0.1\lib\net45\FSharp.Compiler.Service.dll" target="DotFiles"/>
     <file src="packages\FSharp.Compiler.Service.9.0.1\lib\net45\FSharp.Compiler.Service.MSBuild.v12.dll" target="DotFiles"/>
-    <file src="packages\FSharp.Compiler.Service.ProjectCracker.9.0.1\lib\net45\FSharp.Compiler.Service.ProjectCracker.dll" target="DotFiles"/>
-    <file src="packages\FSharp.Compiler.Service.ProjectCracker.9.0.1\utilities\net45\FSharp.Compiler.Service.ProjectCrackerTool.exe" target="DotFiles"/>
-    <file src="packages\FSharp.Compiler.Service.ProjectCracker.9.0.1\utilities\net45\FSharp.Compiler.Service.ProjectCrackerTool.exe.config" target="DotFiles"/>
   </files>
 </package>

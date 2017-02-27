@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Application.Components;
-using JetBrains.DataFlow;
 using JetBrains.Platform.MsBuildModel;
 using JetBrains.Platform.ProjectModel.FSharp.Properties;
 using JetBrains.ProjectModel;
-using JetBrains.ProjectModel.Impl.Build;
 using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
 using JetBrains.ProjectModel.ProjectsHost;
 using JetBrains.ProjectModel.ProjectsHost.MsBuild;
 using JetBrains.ProjectModel.ProjectsHost.SolutionHost;
+using JetBrains.ProjectModel.Properties.Managed;
 using JetBrains.ReSharper.PsiGen.Util;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
@@ -24,22 +23,23 @@ namespace JetBrains.ReSharper.Psi.FSharp
   {
     private readonly MsBuildProjectHost myMsBuildHost;
 
-    public FSharpProjectOptionsBuilder(Lifetime lifetime, ISolution solution)
+    public FSharpProjectOptionsBuilder(ISolution solution)
     {
       myMsBuildHost = solution.ProjectsHostContainer().GetComponent<MsBuildProjectHost>();
     }
 
     /// <summary>
     /// Build project options for FSharp.Compiler.Service. Options for referenced projects are not created.
+    /// Use AddReferencedProjects to add referenced projects options.
     /// </summary>
     public FSharpProjectOptions BuildWithoutReferencedProjects(IProject project)
     {
       using (ReadLockCookie.Create())
       {
-        var targetFrameworkId = project.GetCurrentTargetFrameworkId();
+        var buildSettings = project.ProjectProperties.BuildSettings as IManagedProjectBuildSettings;
         var projectOptions = new List<string>
         {
-          "--out:" + project.GetOutputFilePath(targetFrameworkId),
+          "--out:" + project.GetOutputFilePath(project.GetCurrentTargetFrameworkId()),
           "--simpleresolution",
           "--noframework",
           "--debug:full",
@@ -49,13 +49,12 @@ namespace JetBrains.ReSharper.Psi.FSharp
           "--fullpaths",
           "--flaterrors",
           "--highentropyva+",
-          "--target:library", // todo
-//            "--subsystemversion:6.00",
-//            "--warnon:",
-          "--platform:anycpu"
+          "--target:" + GetOutputTarget(buildSettings),
+          "--platform:anycpu" // todo
+//          "--warnon:", // todo
+//          xml doc // todo
         };
 
-        // todo: Get all properties for compiler from proper IProject.Configurations
         projectOptions.addAll(GetDefines(project).Convert(s => "--define:" + s));
         projectOptions.addAll(GetReferencedPathsOptions(project));
 
@@ -65,10 +64,17 @@ namespace JetBrains.ReSharper.Psi.FSharp
         {
           session.EditProject(projectMark, editor =>
           {
-            // Obtains all items in a right order directly from msbuild
+            // obtains all items in a right order directly from msbuild
             foreach (var item in editor.Items)
-              if (BuildAction.GetOrCreate(item.ItemType()).IsCompile())
-                projectFileNames.Add(item.EvaluatedInclude); // todo: need full paths here
+            {
+              if (!BuildAction.GetOrCreate(item.ItemType()).IsCompile()) continue;
+
+              var path = FileSystemPath.TryParse(item.EvaluatedInclude);
+              if (path.IsEmpty) continue;
+
+              var actualPath = EnsureAbsolute(path, projectMark.Location.Directory);
+              projectFileNames.Add(actualPath.FullPath);
+            }
           });
         });
 
@@ -85,14 +91,40 @@ namespace JetBrains.ReSharper.Psi.FSharp
       }
     }
 
+    private string GetOutputTarget([CanBeNull] IManagedProjectBuildSettings buildSettings)
+    {
+      if (buildSettings == null) return "library";
+
+      switch (buildSettings.OutputType)
+      {
+        case ProjectOutputType.CONSOLE_EXE:
+          return "exe";
+        case ProjectOutputType.LIBRARY:
+          return "library";
+        default:
+          return "library"; // todo: any additional cases for F#?
+      }
+    }
+
+    [NotNull]
+    private FileSystemPath EnsureAbsolute([NotNull] FileSystemPath path, [NotNull] FileSystemPath projectDirectory)
+    {
+      var relativePath = path.AsRelative();
+      if (relativePath == null) return path;
+      return projectDirectory.Combine(relativePath);
+    }
+
     /// <summary>
     /// Current configuration defines, e.g. TRACE or DEBUG. Used in FSharpLexer.
     /// </summary>
     [NotNull]
     public string[] GetDefines([NotNull] IProject project)
     {
-      var configurations = (project as ProjectImpl)?.ProjectProperties.ActiveConfigurations.Configurations;
-      var definesString = configurations?.OfType<ManagedProjectConfiguration>().FirstOrDefault()?.DefineConstants;
+      // todo: multiple frameworks?
+      var activeConfigurations = project.ProjectProperties.ActiveConfigurations;
+      var configuration = activeConfigurations.Configurations.SingleItem() as IManagedProjectConfiguration;
+      var definesString = configuration?.DefineConstants;
+
       return string.IsNullOrEmpty(definesString)
         ? EmptyArray<string>.Instance
         : definesString.Split(';', ',', ' ').Select(x => x.Trim()).ToArray();
@@ -112,45 +144,42 @@ namespace JetBrains.ReSharper.Psi.FSharp
 
     [NotNull]
     public Dictionary<IProject, FSharpProjectOptions> AddReferencedProjects(
-      [NotNull] Dictionary<IProject, FSharpProjectOptions> optionsWithoutRerefencedProjects)
+      [NotNull] IDictionary<IProject, FSharpProjectOptions> options)
     {
       using (ReadLockCookie.Create())
       {
         var newOptions = new Dictionary<IProject, FSharpProjectOptions>();
-        foreach (var projectOptions in optionsWithoutRerefencedProjects)
-        {
-          var project = projectOptions.Key;
-          newOptions[project] = AddReferencedProjects(project, optionsWithoutRerefencedProjects, newOptions);
-        }
+        foreach (var project in options.Keys)
+          if (!newOptions.ContainsKey(project))
+            newOptions[project] = AddReferencedProjects(project, options, newOptions);
         return newOptions;
       }
     }
 
     [NotNull]
-    private FSharpProjectOptions AddReferencedProjects([NotNull] IProject project,
-      [NotNull] Dictionary<IProject, FSharpProjectOptions> optionsWithoutReferences,
-      [NotNull] Dictionary<IProject, FSharpProjectOptions> newOptions)
+    private static FSharpProjectOptions AddReferencedProjects([NotNull] IProject project,
+      [NotNull] IDictionary<IProject, FSharpProjectOptions> options,
+      [NotNull] IDictionary<IProject, FSharpProjectOptions> newOptions)
     {
-      if (newOptions.ContainsKey(project)) return newOptions[project];
-
-      // do not transitively add referenced projects like other FSharp tools (maybe change it later)
+      // do not transitively add referenced projects (same as in other FSharp tools)
       var referencedProjects = project.GetReferencedProjects(project.GetCurrentTargetFrameworkId(), transitive: false);
-      var referencedProjectOptions = new List<Tuple<string, FSharpProjectOptions>>();
+      var referencedProjectsOptions = new List<Tuple<string, FSharpProjectOptions>>();
       foreach (var referencedProject in referencedProjects)
       {
-        if (!(referencedProject.ProjectProperties is FSharpProjectProperties)) continue;
+        if (!(referencedProject.ProjectProperties is FSharpProjectProperties) ||
+            newOptions.ContainsKey(project)) continue;
 
-        var fixedOptions = AddReferencedProjects(referencedProject, optionsWithoutReferences, newOptions);
+        var fixedOptions = AddReferencedProjects(referencedProject, options, newOptions);
         newOptions[referencedProject] = fixedOptions;
         var outPath = referencedProject.GetOutputFilePath(referencedProject.GetCurrentTargetFrameworkId()).FullPath;
-        referencedProjectOptions.Add(Tuple.Create(outPath, fixedOptions));
+        referencedProjectsOptions.Add(Tuple.Create(outPath, fixedOptions));
       }
-      var oldOptions = optionsWithoutReferences[project];
+      var oldOptions = options[project];
       return new FSharpProjectOptions(
         oldOptions.ProjectFileName,
         oldOptions.ProjectFileNames,
         oldOptions.OtherOptions,
-        referencedProjectOptions.ToArray(),
+        referencedProjectsOptions.ToArray(),
         oldOptions.IsIncompleteTypeCheckEnvironment,
         oldOptions.UseScriptResolutionRules,
         oldOptions.LoadTime,
