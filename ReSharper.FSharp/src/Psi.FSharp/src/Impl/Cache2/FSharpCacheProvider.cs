@@ -68,7 +68,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public bool IsCachableTreeNode(ITreeNode treeNode)
     {
-      throw new System.NotImplementedException();
+      return treeNode is IFSharpDeclaration;
     }
 
     public NodeType GetNodeType(int index)

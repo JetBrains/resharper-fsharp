@@ -376,6 +376,7 @@
     <Compile Include="src\FSharpCheckerService.cs" />
     <Compile Include="src\FSharpProjectOptionsBuilder.cs" />
     <Compile Include="src\FSharpProjectOptionsProvider.cs" />
+    <Compile Include="src\FSharpPsiModules.cs" />
     <Compile Include="src\FSharpScriptProjectFileLanguageService.cs" />
     <Compile Include="src\Gen\Psi\FSharp\**\*.cs">
       <SubType>Code</SubType>
@@ -480,7 +481,6 @@
     <Compile Include="src\Tree\IModuleLikeDeclaration.cs" />
     <Compile Include="src\Tree\IModuleOrNamespaceDeclaration.cs" />
     <Compile Include="src\Tree\INestedModuleDeclaration.cs" />
-    <Compile Include="src\Util\FSharpCheckerUtil.cs" />
     <Compile Include="src\Util\FSharpElementsUtil.cs" />
     <Compile Include="src\Util\FSharpRangeUtil.cs" />
     <Compile Include="src\Util\FSharpSymbolUtil.cs" />
