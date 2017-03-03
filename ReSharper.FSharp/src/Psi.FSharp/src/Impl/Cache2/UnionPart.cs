@@ -5,6 +5,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
   public class UnionPart : FSharpClassLikePart<IFSharpUnionDeclaration>, Class.IClassPart
   {
+    private static readonly string[] ourExtendsListShortNames =
+      {"IStructuralEquatable", "IStructuralComparable", "IComparable"};
+
     public UnionPart(IFSharpUnionDeclaration declaration) : base(declaration, declaration.DeclaredName,
       ModifiersUtil.GetDecoration(declaration.AccessModifiers))
     {
@@ -25,5 +28,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     }
 
     protected override byte SerializationTag => (byte) FSharpSerializationTag.UnionPart;
+
+    public override string[] ExtendsListShortNames => ourExtendsListShortNames;
   }
 }

@@ -5,6 +5,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
   internal class RecordPart : FSharpClassLikePart<IFSharpRecordDeclaration>, Class.IClassPart
   {
+    private static readonly string[] ourExtendsListShortNames =
+      {"IStructuralEquatable", "IStructuralComparable", "IComparable"};
+
     public RecordPart(IFSharpRecordDeclaration declaration) :
       base(declaration, declaration.DeclaredName, ModifiersUtil.GetDecoration(declaration.AccessModifiers))
     {
@@ -25,5 +28,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     }
 
     protected override byte SerializationTag => (byte) FSharpSerializationTag.RecordPart;
+
+    public override string[] ExtendsListShortNames => ourExtendsListShortNames;
   }
 }

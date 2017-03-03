@@ -5,6 +5,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
   internal class ExceptionPart : FSharpClassLikePart<IFSharpExceptionDeclaration>, Class.IClassPart
   {
+    private static readonly string[] ourExtendsListShortNames = {"Exception", "IStructuralEquatable"};
+
     public ExceptionPart(IFSharpExceptionDeclaration declaration)
       : base(declaration, declaration.DeclaredName, ModifiersUtil.GetDecoration(declaration.AccessModifiers))
     {
@@ -25,5 +27,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     }
 
     protected override byte SerializationTag => (byte) FSharpSerializationTag.ExceptionPart;
+
+    public override string[] ExtendsListShortNames => ourExtendsListShortNames;
   }
 }
