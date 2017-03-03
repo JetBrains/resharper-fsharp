@@ -7,9 +7,33 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
 {
   public partial class FSharpTokenType
   {
+    public class FSharpTokenNodeType : TokenNodeType
+    {
+      public FSharpTokenNodeType(string name, int index) : base(name, index)
+      {
+        FSharpNodeTypeIndexer.Instance.Add(this, index);
+        TokenRepresentation = name;
+      }
+
+      public override LeafElementBase Create(IBuffer buffer, TreeOffset startOffset, TreeOffset endOffset)
+      {
+        return new FSharpToken(this, buffer, startOffset, endOffset);
+      }
+
+      public override bool IsWhitespace => this == WHITESPACE || this == NEW_LINE;
+      public override bool IsComment => this == COMMENT;
+      public override bool IsStringLiteral => this == STRING;
+      public override bool IsConstantLiteral => this == LITERAL;
+      public override bool IsIdentifier => this == IDENTIFIER;
+      public override bool IsKeyword => Keywords[this];
+
+      public override string TokenRepresentation { get; }
+    }
+
     public static readonly NodeTypeSet RightBraces;
     public static readonly NodeTypeSet LeftBraces;
     public static readonly NodeTypeSet CommentsOrWhitespaces;
+    public static readonly NodeTypeSet AccessModifiersKeywords;
     public static readonly NodeTypeSet Keywords;
 
     static FSharpTokenType()
@@ -17,8 +41,10 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
       CommentsOrWhitespaces = new NodeTypeSet(COMMENT, WHITESPACE, NEW_LINE);
       RightBraces = new NodeTypeSet(RPAREN, RBRACK, RBRACE);
       LeftBraces = new NodeTypeSet(LPAREN, LBRACK, LBRACE);
+      AccessModifiersKeywords = new NodeTypeSet(PUBLIC, PRIVATE, INTERNAL);
 
       Keywords = new NodeTypeSet(
+        // todo: add other keywords
         PUBLIC,
         PRIVATE,
         INTERNAL,
@@ -27,7 +53,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
         KEYWORD);
     }
 
-    private sealed class WhitespaceNodeType : FSharpTokenType
+    private sealed class WhitespaceNodeType : FSharpTokenNodeType
     {
       public WhitespaceNodeType(int nodeTypeIndex) : base("WHITE_SPACE", nodeTypeIndex)
       {
@@ -39,7 +65,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
       }
     }
 
-    private sealed class NewLineNodeType : FSharpTokenType
+    private sealed class NewLineNodeType : FSharpTokenNodeType
     {
       public NewLineNodeType(int nodeTypeIndex) : base("NEW_LINE", nodeTypeIndex)
       {

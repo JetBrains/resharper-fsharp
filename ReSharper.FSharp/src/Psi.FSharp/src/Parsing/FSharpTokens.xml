@@ -2,7 +2,7 @@
     <TokenTypeClass>FSharpTokenType</TokenTypeClass>
     <TokenTypeNamespace>JetBrains.ReSharper.Psi.FSharp.Parsing</TokenTypeNamespace>
 
-    <Tokens NodeType="FSharpTokenType">
+    <Tokens NodeType="FSharpTokenNodeType">
         <Token name="PUBLIC"/>
         <Token name="PRIVATE"/>
         <Token name="INTERNAL"/>
@@ -17,7 +17,6 @@
         <Token name="COMMENT"/>
         <Token name="TEXT"/>
         <Token name="DEAD_CODE"/>
-        <Token name="FAKE"/> <!-- Used in FsharpFakeLexer -->
 
         <Token name="LBRACK" title="LBRACK"/>
         <Token name="RBRACK" title="RBRACK"/>
@@ -26,5 +25,8 @@
         <Token name="LPAREN"/>
         <Token name="RPAREN"/>
         <Token name="DOT" title="DOT"/>
+
+        <!-- Used in FsharpFakeLexer and as a separator in psi grammar -->
+        <Token name="FAKE"/>
     </Tokens>
 </FSharpTokens>

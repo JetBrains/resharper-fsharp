@@ -457,7 +457,6 @@
     <Compile Include="src\Parsing\FSharpLexer.cs" />
     <Compile Include="src\Parsing\FSharpLexerFactory.cs" />
     <Compile Include="src\Parsing\FSharpTokenInfoEx.cs" />
-    <Compile Include="src\Parsing\FSharpTokenNodeType.cs" />
     <Compile Include="src\Parsing\FSharpTokenType.cs" />
     <Compile Include="Src\Parsing\FSharpTokenType.Generated.cs">
       <DependentUpon>FSharpTokens.xml</DependentUpon>
