@@ -17,7 +17,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
         ? SharedImplUtil.MISSING_DECLARATION_NAME
         : Identifiers.Select(id => id.GetText()).Join(StringUtil.SDOT);
 
-    public string ShortName =>
+    public string Name =>
       Identifiers.IsEmpty
         ? SharedImplUtil.MISSING_DECLARATION_NAME
         : Identifiers.Last().GetText();

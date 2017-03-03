@@ -261,8 +261,9 @@ fSharpClassDeclaration options {
 }
 :
   (fSharpAttribute<FS_ATTRIBUTE, Attributes>)* FAKE
+  accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
   fSharpIdentifier<FS_IDENTIFIER, Identifier>
-//  (fSharpTypeMemberDeclaration<FS_TYPE_MEMBER, Members>)* FAKE
+  (fSharpTypeMemberDeclaration<FS_TYPE_MEMBER, Members>)* FAKE
 ;
 
 fSharpInterfaceDeclaration options {
@@ -270,8 +271,9 @@ fSharpInterfaceDeclaration options {
 }
 :
   (fSharpAttribute<FS_ATTRIBUTE, Attributes>)* FAKE
+  accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
   fSharpIdentifier<FS_IDENTIFIER, Identifier>
-//  (fSharpTypeMemberDeclaration<FS_TYPE_MEMBER, Members>)* FAKE
+  (fSharpTypeMemberDeclaration<FS_TYPE_MEMBER, Members>)* FAKE
 ;
 
 fSharpStructDeclaration options {
@@ -279,8 +281,9 @@ fSharpStructDeclaration options {
 }
 :
   (fSharpAttribute<FS_ATTRIBUTE, Attributes>)* FAKE
+  accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
   fSharpIdentifier<FS_IDENTIFIER, Identifier>
-//  (fSharpTypeMemberDeclaration<FS_TYPE_MEMBER, Members>)* FAKE
+  (fSharpTypeMemberDeclaration<FS_TYPE_MEMBER, Members>)* FAKE
 ;
 
 fSharpUnspecifiedObjectTypeDeclaration options {
@@ -288,10 +291,32 @@ fSharpUnspecifiedObjectTypeDeclaration options {
 }
 :
   (fSharpAttribute<FS_ATTRIBUTE, Attributes>)* FAKE
+  accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
   fSharpIdentifier<FS_IDENTIFIER, Identifier>
-//  (fSharpTypeMemberDeclaration<FS_TYPE_MEMBER, Members>)* FAKE
+  (fSharpTypeMemberDeclaration<FS_TYPE_MEMBER, Members>)* FAKE
 ;
 
+interface fSharpTypeMemberDeclaration
+:
+//  open |
+//  memberDeclaration |
+//  implicitCtor |
+  typeInherit |
+//  letBindings |
+  abstractSlot |
+  interfaceImplementation |
+  interfaceInherit |
+//  valField |
+//  autoProperty |
+  otherTypeMember
+;
+
+interfaceInherit : longIdentifier<LONG_IDENTIFIER, LongIdentifier> FAKE;
+typeInherit : longIdentifier<LONG_IDENTIFIER, LongIdentifier> FAKE;
+interfaceImplementation : longIdentifier<LONG_IDENTIFIER, LongIdentifier> FAKE;
+
+abstractSlot : FAKE;
+otherTypeMember : FAKE;
 
 
 // Identifiers

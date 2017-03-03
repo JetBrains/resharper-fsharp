@@ -19,7 +19,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
     [NotNull]
     public static string GetName([CanBeNull] this IFSharpIdentifier identifier)
     {
-      return identifier?.GetText() ?? SharedImplUtil.MISSING_DECLARATION_NAME;
+      return identifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
     }
 
     public static TreeTextRange GetNameRange([CanBeNull] this IFSharpIdentifier identifier)

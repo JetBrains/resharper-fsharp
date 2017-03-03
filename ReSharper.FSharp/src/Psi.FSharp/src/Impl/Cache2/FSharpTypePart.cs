@@ -18,21 +18,17 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
       if (myDecoration.AccessRights == AccessRights.NONE)
         myDecoration.AccessRights = AccessRights.PUBLIC;
-
-      ExtendsListShortNames = EmptyArray<string>.Instance; // todo
     }
 
     protected FSharpTypePart(IReader reader) : base(reader)
     {
       myDecoration = MemberDecoration.FromInt(reader.ReadInt());
-      ExtendsListShortNames = reader.ReadStringArray();
     }
 
     protected override void Write(IWriter writer)
     {
       base.Write(writer);
       writer.WriteInt(myDecoration.ToInt());
-      writer.WriteStringArray(ExtendsListShortNames);
     }
 
     protected override ICachedDeclaration2 FindDeclaration(IFile file, ICachedDeclaration2 candidateDeclaration)
@@ -42,7 +38,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       return null;
     }
 
-    public override string[] ExtendsListShortNames { get; }
+    public override string[] ExtendsListShortNames => EmptyArray<string>.Instance;
     public override bool CanBePartial => true; // workaround for F# signatures
     public override MemberDecoration Modifiers => myDecoration;
 

@@ -26,10 +26,11 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
             builder.AdvanceLexer() |> ignore
 
     member private x.ProcessIdentifier (id : Ident) =
-        id.idRange |> x.GetStartOffset |> x.AdvanceToOffset
-        let idMark = builder.Mark()
-        id.idRange |> x.GetEndOffset |> x.AdvanceToOffset
-        x.Done(idMark, ElementType.F_SHARP_IDENTIFIER)
+        let range = id.idRange
+        x.AdvanceToOffset (x.GetStartOffset range)
+        let mark = builder.Mark()
+        x.AdvanceToOffset (x.GetEndOffset range)
+        x.Done(mark, ElementType.F_SHARP_IDENTIFIER)
     
     /// Should be called on access modifiers start offset.
     /// Always goes right before identifier.
@@ -89,6 +90,39 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         x.AdvanceToOffset (x.GetEndOffset attr.Range)
         x.Done(mark, ElementType.F_SHARP_ATTRIBUTE)
 
+    member private x.ProcessTypeMember (typeMember : SynMemberDefn) =
+        x.AdvanceToOffset (x.GetStartOffset typeMember.Range)
+        let mark = builder.Mark()
+
+        let memberType =
+            match typeMember with
+            | SynMemberDefn.ImplicitInherit(SynType.LongIdent(lidWithDots),_,_,_) ->
+                x.ProcessLongIdentifier lidWithDots.Lid
+                ElementType.TYPE_INHERIT
+            | SynMemberDefn.Interface(SynType.LongIdent(lidWithDots),_,_) ->
+                x.ProcessLongIdentifier lidWithDots.Lid
+                ElementType.INTERFACE_IMPLEMENTATION
+            | SynMemberDefn.Inherit(SynType.LongIdent(lidWithDots),_,_) ->
+                x.ProcessLongIdentifier lidWithDots.Lid
+                ElementType.INTERFACE_INHERIT
+//            | SynMemberDefn.Member(Binding(access,kind,_,_,attrs,_,_,headPat,returnInfo,_,_,_),_) ->
+//                match headPat with
+//                | SynPat.LongIdent(LongIdentWithDots(lid,_),_,_,_,_,_) ->
+//                    if List.length lid = 2 then List.last lid |> processIdentifier
+//                    if List.length lid = 1 then List.head lid |> processIdentifier
+//                | _ -> ()
+//                ElementType.MEMBER_DECLARATION
+//            | SynMemberDefn.ImplicitCtor(_) -> ElementType.IMPLICIT_CTOR
+//            | SynMemberDefn.LetBindings(_) -> ElementType.LET_BINDINGS
+//            | SynMemberDefn.AbstractSlot(_) -> ElementType.ABSTRACT_SLOT
+//            | SynMemberDefn.ValField(_) -> ElementType.VAL_FIELD
+//            | SynMemberDefn.AutoProperty(_) -> ElementType.AUTO_PROPERTY
+//            | SynMemberDefn.Open(_) -> ElementType.OPEN
+            | _ -> ElementType.OTHER_TYPE_MEMBER
+
+        x.AdvanceToOffset (x.GetEndOffset typeMember.Range)
+        builder.Done(mark, memberType, null)
+
     member private x.ProcessType (TypeDefn(ComponentInfo(attributes,_,_,lid,_,_,_,_), repr, members, range)) =
         let startOffset = x.GetStartOffset (if List.isEmpty attributes then range else (List.head attributes).TypeName.Range)
         x.AdvanceToOffset startOffset
@@ -118,14 +152,14 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
                 | _ -> ElementType.F_SHARP_OTHER_SIMPLE_TYPE_DECLARATION
             | SynTypeDefnRepr.Exception(_) ->
                 ElementType.F_SHARP_EXCEPTION_DECLARATION
-            | SynTypeDefnRepr.ObjectModel(kind, members, range) ->
-//                List.iter processTypeMember members
+            | SynTypeDefnRepr.ObjectModel(kind, members, _) ->
+                List.iter x.ProcessTypeMember members
                 match kind with
                 | TyconClass -> ElementType.F_SHARP_CLASS_DECLARATION
                 | TyconInterface -> ElementType.F_SHARP_INTERFACE_DECLARATION
                 | TyconStruct -> ElementType.F_SHARP_STRUCT_DECLARATION
                 | _ -> ElementType.F_SHARP_UNSPECIFIED_OBJECT_TYPE_DECLARATION
-//        List.iter processTypeMember members
+        List.iter x.ProcessTypeMember members
 
         range |> x.GetEndOffset |> x.AdvanceToOffset
         builder.Done(mark, elementType , null)

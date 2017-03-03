@@ -12,6 +12,7 @@
     public const short FS_UNION_CASE = 8;
     public const short FS_ACCESS_MODIFIER = 9;
     public const short FS_ATTRIBUTE = 10;
+    public const short FS_TYPE_MEMBER = 11;
 
     public const short LAST = 100;
   }

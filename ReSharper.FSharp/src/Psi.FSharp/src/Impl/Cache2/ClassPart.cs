@@ -3,10 +3,9 @@ using JetBrains.ReSharper.Psi.FSharp.Tree;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
-  internal class ClassPart : FSharpClassLikePart<IFSharpObjectModelTypeDeclaration>, Class.IClassPart
+  internal class ClassPart : FSharpObjectModelTypePart, Class.IClassPart
   {
-    public ClassPart(IFSharpObjectModelTypeDeclaration declaration)
-      : base(declaration, declaration.DeclaredName, MemberDecoration.DefaultValue)
+    public ClassPart(IFSharpObjectModelTypeDeclaration declaration) : base(declaration)
     {
     }
 

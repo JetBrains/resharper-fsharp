@@ -31,9 +31,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
           if (attrText == AbstractClass || attrText == Class) return FSharpObjectModelTypeKind.Class;
           if (attrText == Struct) return FSharpObjectModelTypeKind.Struct;
         }
-//        foreach (var member in MembersEnumerable)
-//          if (!(member is IAbstractSlot) && !(member is IInterfaceInherit))
-//            return FSharpObjectModelTypeKind.Class;
+
+        foreach (var member in MembersEnumerable)
+          if (!(member is IInterfaceInherit) && !(member is IAbstractSlot))
+            return FSharpObjectModelTypeKind.Class;
+
         return FSharpObjectModelTypeKind.Interface;
       }
     }

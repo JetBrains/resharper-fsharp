@@ -413,6 +413,7 @@
     <Compile Include="src\Impl\Cache2\FSharpException.cs" />
     <Compile Include="src\Impl\Cache2\FSharpModule.cs" />
     <Compile Include="src\Impl\Cache2\FSharpNestedModule.cs" />
+    <Compile Include="src\Impl\Cache2\FSharpObjectModelTypePart.cs" />
     <Compile Include="src\Impl\Cache2\FSharpProjectFilePart.cs" />
     <Compile Include="src\Impl\Cache2\FSharpRecord.cs" />
     <Compile Include="src\Impl\Cache2\FSharpSerializationTag.cs" />
@@ -440,6 +441,7 @@
     <Compile Include="src\Impl\Tree\FSharpEnumDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpExceptionDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpFileBase.cs" />
+    <Compile Include="src\Impl\Tree\FSharpIdentifier.cs" />
     <Compile Include="src\Impl\Tree\FSharpIdentifierToken.cs" />
     <Compile Include="src\Impl\Tree\FSharpInterfaceDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpNamespaceDeclaration.cs" />
@@ -478,6 +480,7 @@
     <Compile Include="src\Tree\IFSharpDeclaration.cs" />
     <Compile Include="src\Tree\IFSharpFile.cs" />
     <Compile Include="src\Tree\IFSharpFileCheckInfoOwner.cs" />
+    <Compile Include="src\Tree\IFSharpIdentifier.cs" />
     <Compile Include="src\Tree\IFSharpNamespaceDeclaration.cs" />
     <Compile Include="src\Tree\IFSharpObjectModelTypeDeclaration.cs" />
     <Compile Include="src\Tree\IFSharpTreeNode.cs" />
