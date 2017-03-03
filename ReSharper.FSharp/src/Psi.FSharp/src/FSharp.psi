@@ -130,8 +130,8 @@ nestedModuleDeclaration options {
 interface fSharpTypeDeclaration
 :
   fSharpExceptionDeclaration |
-  fSharpSimpleTypeDeclaration //|
-//  fSharpObjectModelTypeDeclaration
+  fSharpSimpleTypeDeclaration |
+  fSharpObjectModelTypeDeclaration
 ;
 
 interface fSharpSimpleTypeDeclaration
@@ -141,6 +141,14 @@ interface fSharpSimpleTypeDeclaration
   fSharpUnionDeclaration |
   fSharpTypeAbbreviationDeclaration |
   fSharpOtherSimpleTypeDeclaration
+;
+
+interface fSharpObjectModelTypeDeclaration
+:
+  fSharpClassDeclaration |
+  fSharpInterfaceDeclaration |
+  fSharpStructDeclaration |
+  fSharpUnspecifiedObjectTypeDeclaration
 ;
 
 
@@ -246,16 +254,51 @@ fSharpOtherSimpleTypeDeclaration options {
 
 
 
+// Object model type declarations
+
+fSharpClassDeclaration options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
+}
+:
+  (fSharpAttribute<FS_ATTRIBUTE, Attributes>)* FAKE
+  fSharpIdentifier<FS_IDENTIFIER, Identifier>
+//  (fSharpTypeMemberDeclaration<FS_TYPE_MEMBER, Members>)* FAKE
+;
+
+fSharpInterfaceDeclaration options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
+}
+:
+  (fSharpAttribute<FS_ATTRIBUTE, Attributes>)* FAKE
+  fSharpIdentifier<FS_IDENTIFIER, Identifier>
+//  (fSharpTypeMemberDeclaration<FS_TYPE_MEMBER, Members>)* FAKE
+;
+
+fSharpStructDeclaration options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
+}
+:
+  (fSharpAttribute<FS_ATTRIBUTE, Attributes>)* FAKE
+  fSharpIdentifier<FS_IDENTIFIER, Identifier>
+//  (fSharpTypeMemberDeclaration<FS_TYPE_MEMBER, Members>)* FAKE
+;
+
+fSharpUnspecifiedObjectTypeDeclaration options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
+}
+:
+  (fSharpAttribute<FS_ATTRIBUTE, Attributes>)* FAKE
+  fSharpIdentifier<FS_IDENTIFIER, Identifier>
+//  (fSharpTypeMemberDeclaration<FS_TYPE_MEMBER, Members>)* FAKE
+;
+
+
+
 // Identifiers
-
 fSharpIdentifier : IDENTIFIER;
-
 longIdentifier: IDENTIFIER<FS_IDENTIFIER, Identifiers>*;
 
-
-
 // Access modifiers
-
 accessModifiers: modifier{FS_ACCESS_MODIFIER, Modifiers}*;
 
 private modifier{ROLE,Getter}
@@ -264,3 +307,6 @@ private modifier{ROLE,Getter}
   PRIVATE<@ROLE,@Getter> |
   INTERNAL<@ROLE,@Getter>
 ;
+
+// Attributes
+fSharpAttribute : longIdentifier<FS_IDENTIFIER, LongIdentifier>; // todo: add constructor expressions

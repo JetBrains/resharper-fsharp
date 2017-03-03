@@ -12,7 +12,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
 
       switch (token.CharClass)
       {
-        // todo: dictionary from string to type?
+        // todo: dictionary from string to token type?
         case FSharpTokenCharKind.Keyword:
           if (token.TokenName == FSharpTokenType.PUBLIC.TokenRepresentation)
             return FSharpTokenType.PUBLIC;

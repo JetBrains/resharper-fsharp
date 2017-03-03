@@ -36,6 +36,12 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
           return new TypedUnionCasePart(reader);
         case FSharpSerializationTag.TypeAbbreviationPart:
           return new TypeAbbreviationPart(reader);
+        case FSharpSerializationTag.ClassPart:
+          return new ClassPart(reader);
+        case FSharpSerializationTag.InterfacePart:
+          return new InterfacePart(reader);
+        case FSharpSerializationTag.StructPart:
+          return new StructPart(reader);
         default:
           throw new SerializationError("Unknown tag:" + tag);
       }

@@ -22,7 +22,7 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
     let getEndOffset (range : Range.range) = getLineOffset range.EndLine + range.EndColumn
 
     let advanceToOffset offset =
-        while builder.GetTokenOffset() < offset && not(isNull(builder.GetTokenType())) do
+        while builder.GetTokenOffset() < offset && not (isNull (builder.GetTokenType())) do
             builder.AdvanceLexer() |> ignore
 
     let isTypedCase (UnionCase(_,_,fieldType,_,_,_)) =
@@ -82,12 +82,20 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         advanceToOffset endOffset
         x.Done(mark, ElementType.LONG_IDENTIFIER)
 
+    member private x.ProcessAttribute (attr : SynAttribute) =
+        advanceToOffset (getStartOffset attr.Range)
+        let mark = builder.Mark()
+        x.ProcessLongIdentifier attr.TypeName.Lid
+        advanceToOffset (getEndOffset attr.Range)
+        x.Done(mark, ElementType.F_SHARP_ATTRIBUTE)
+
     member private x.ProcessType (TypeDefn(ComponentInfo(attributes,_,_,lid,_,_,_,_), repr, members, range)) =
-//        advanceToOffset (getStartOffset (if List.isEmpty attributes then range else (List.head attributes).TypeName.Range))
-//        List.iter processAttribute attributes
-        advanceToOffset (getStartOffset range)
+        let startOffset = getStartOffset (if List.isEmpty attributes then range else (List.head attributes).TypeName.Range)
+        advanceToOffset startOffset
         let mark = builder.Mark()
 
+        List.iter x.ProcessAttribute attributes
+        
         let id = lid.Head
         processAccessModifiers (getStartOffset id.idRange)
         processIdentifier id
@@ -110,14 +118,13 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
                 | _ -> ElementType.F_SHARP_OTHER_SIMPLE_TYPE_DECLARATION
             | SynTypeDefnRepr.Exception(_) ->
                 ElementType.F_SHARP_EXCEPTION_DECLARATION
-//            | SynTypeDefnRepr.ObjectModel(kind, members, range) ->
+            | SynTypeDefnRepr.ObjectModel(kind, members, range) ->
 //                List.iter processTypeMember members
-//                match kind with
-//                | TyconClass -> ElementType.F_SHARP_CLASS_DECLARATION
-//                | TyconInterface -> ElementType.F_SHARP_INTERFACE_DECLARATION
-//                | TyconStruct -> ElementType.F_SHARP_STRUCT_DECLARATION
-//                | _ -> ElementType.F_SHARP_UNSPECIFIED_OBJECT_TYPE_DECLARATION
-            | _ -> ElementType.OTHER_MEMBER_DECLARATION
+                match kind with
+                | TyconClass -> ElementType.F_SHARP_CLASS_DECLARATION
+                | TyconInterface -> ElementType.F_SHARP_INTERFACE_DECLARATION
+                | TyconStruct -> ElementType.F_SHARP_STRUCT_DECLARATION
+                | _ -> ElementType.F_SHARP_UNSPECIFIED_OBJECT_TYPE_DECLARATION
 //        List.iter processTypeMember members
 
         range |> getEndOffset |> advanceToOffset

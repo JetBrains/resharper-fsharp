@@ -89,5 +89,26 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       myBuilder.StartPart(new TypeAbbreviationPart(decl));
       myBuilder.EndPart();
     }
+
+    public override void VisitFSharpObjectModelTypeDeclaration(IFSharpObjectModelTypeDeclaration decl)
+    {
+      myBuilder.StartPart(CreateObjectTypePart(decl));
+      myBuilder.EndPart();
+    }
+
+    private static Part CreateObjectTypePart(IFSharpObjectModelTypeDeclaration decl)
+    {
+      switch (decl.TypeKind)
+      {
+        case FSharpObjectModelTypeKind.Class:
+          return new ClassPart(decl);
+        case FSharpObjectModelTypeKind.Interface:
+          return new InterfacePart(decl);
+        case FSharpObjectModelTypeKind.Struct:
+          return new StructPart(decl);
+        default:
+          throw new System.ArgumentOutOfRangeException();
+      }
+    }
   }
 }
