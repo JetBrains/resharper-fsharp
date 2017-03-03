@@ -2,8 +2,14 @@
     <TokenTypeClass>FSharpTokenType</TokenTypeClass>
     <TokenTypeNamespace>JetBrains.ReSharper.Psi.FSharp.Parsing</TokenTypeNamespace>
 
-    <Tokens NodeType="FSharpTokenNodeType">
+    <Tokens NodeType="FSharpTokenType">
+        <Token name="PUBLIC"/>
+        <Token name="PRIVATE"/>
+        <Token name="INTERNAL"/>
+        <Token name="NAMESPACE"/>
+        <Token name="MODULE"/>
         <Token name="KEYWORD"/>
+
         <Token name="IDENTIFIER"/>
         <Token name="LITERAL"/>
         <Token name="STRING"/>

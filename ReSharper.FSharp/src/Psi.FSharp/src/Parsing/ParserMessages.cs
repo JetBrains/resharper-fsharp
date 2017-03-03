@@ -9,6 +9,7 @@
     public const string IDS_MODULE_MEMBER_DECLARATION = "";
     public const string IDS_F_SHARP_TYPE_DECLARATION = "";
     public const string IDS_F_SHARP_SIMPLE_TYPE_DECLARATION = "";
+    public const string IDS_MODIFIER = "";
 
     public static string GetString(string id)
     {

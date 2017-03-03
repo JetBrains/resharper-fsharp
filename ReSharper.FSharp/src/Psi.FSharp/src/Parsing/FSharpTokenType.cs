@@ -10,15 +10,24 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
     public static readonly NodeTypeSet RightBraces;
     public static readonly NodeTypeSet LeftBraces;
     public static readonly NodeTypeSet CommentsOrWhitespaces;
+    public static readonly NodeTypeSet Keywords;
 
     static FSharpTokenType()
     {
       CommentsOrWhitespaces = new NodeTypeSet(COMMENT, WHITESPACE, NEW_LINE);
       RightBraces = new NodeTypeSet(RPAREN, RBRACK, RBRACE);
       LeftBraces = new NodeTypeSet(LPAREN, LBRACK, LBRACE);
+
+      Keywords = new NodeTypeSet(
+        PUBLIC,
+        PRIVATE,
+        INTERNAL,
+        NAMESPACE,
+        MODULE,
+        KEYWORD);
     }
 
-    private sealed class WhitespaceNodeType : FSharpTokenNodeType
+    private sealed class WhitespaceNodeType : FSharpTokenType
     {
       public WhitespaceNodeType(int nodeTypeIndex) : base("WHITE_SPACE", nodeTypeIndex)
       {
@@ -30,7 +39,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
       }
     }
 
-    private sealed class NewLineNodeType : FSharpTokenNodeType
+    private sealed class NewLineNodeType : FSharpTokenType
     {
       public NewLineNodeType(int nodeTypeIndex) : base("NEW_LINE", nodeTypeIndex)
       {

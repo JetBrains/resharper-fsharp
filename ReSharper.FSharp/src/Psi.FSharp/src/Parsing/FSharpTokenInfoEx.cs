@@ -13,6 +13,12 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
       switch (token.CharClass)
       {
         case FSharpTokenCharKind.Keyword:
+          if (token.TokenName == FSharpTokenType.PUBLIC.TokenRepresentation)
+            return FSharpTokenType.PUBLIC;
+          if (token.TokenName == FSharpTokenType.PRIVATE.TokenRepresentation)
+            return FSharpTokenType.PRIVATE;
+          if (token.TokenName == FSharpTokenType.INTERNAL.TokenRepresentation)
+            return FSharpTokenType.INTERNAL;
           return FSharpTokenType.KEYWORD;
 
         case FSharpTokenCharKind.Identifier:

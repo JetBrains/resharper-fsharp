@@ -250,4 +250,13 @@ fSharpOtherSimpleTypeDeclaration options {
 
 fSharpIdentifier : IDENTIFIER;
 longIdentifier: (IDENTIFIER<FS_IDENTIFIER, Identifiers>)* FAKE;
-accessModifiers: (KEYWORD<FS_KEYWORD, Modifiers>)* FAKE;
+accessModifiers: modifier{FS_ACCESS_MODIFIER, Modifiers}*;
+
+private modifier{ROLE,Getter}
+:
+  PUBLIC<@ROLE,@Getter> |
+  PRIVATE<@ROLE,@Getter> |
+  INTERNAL<@ROLE,@Getter> |
+  NAMESPACE<@ROLE,@Getter> |
+  MODULE<@ROLE,@Getter>
+;
