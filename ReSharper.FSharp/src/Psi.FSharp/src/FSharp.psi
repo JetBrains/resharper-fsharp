@@ -56,30 +56,30 @@ fSharpImplFile options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpFileBase";
 }
 :
-  (moduleOrNamespaceDeclaration<MODULE_OR_NAMESPACE_DECLARATION, Declarations>)* FAKE
+  moduleOrNamespaceDeclaration<MODULE_OR_NAMESPACE_DECLARATION, Declarations>* FAKE
 ;
 
 fSharpSigFile options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpFileBase";
 }
 :
-  (moduleOrNamespaceSignature<MODULE_OR_NAMESPACE_SIGNATURE, Signatures>)* FAKE
+  moduleOrNamespaceSignature<MODULE_OR_NAMESPACE_SIGNATURE, Signatures>* FAKE
 ;
 
 
 
 // Modules and namespaces
 
+interface fSharpDeclaration
+:
+  moduleLikeDeclaration |
+  moduleMemberDeclaration
+;
+
 interface moduleLikeDeclaration
 :
   moduleOrNamespaceDeclaration |
   nestedModuleDeclaration
-;
-
-interface fSharpDeclaration
-:
-  moduleOrNamespaceDeclaration |
-  moduleMemberDeclaration
 ;
 
 interface moduleOrNamespaceDeclaration
@@ -93,7 +93,7 @@ fSharpNamespaceDeclaration options {
 }
 :
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>
-  (moduleMemberDeclaration<MODULE_MEMBER, Declarations>)* FAKE
+  moduleMemberDeclaration<MODULE_MEMBER, Declarations>* FAKE
 ;
 
 moduleDeclaration options {
@@ -102,7 +102,7 @@ moduleDeclaration options {
 :
   accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>
-  (moduleMemberDeclaration<MODULE_MEMBER, Declarations>)* FAKE
+  moduleMemberDeclaration<MODULE_MEMBER, Declarations>* FAKE
 ;
 
 moduleOrNamespaceSignature : FAKE;
@@ -124,7 +124,7 @@ nestedModuleDeclaration options {
 :
   accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
   fSharpIdentifier<FS_IDENTIFIER, Identifier>
-  (moduleMemberDeclaration<MODULE_MEMBER, Declarations>)* FAKE
+  moduleMemberDeclaration<MODULE_MEMBER, Declarations>* FAKE
 ;
 
 interface fSharpTypeDeclaration
@@ -187,7 +187,7 @@ fSharpUnionDeclaration options {
 :
   accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
   fSharpIdentifier<FS_IDENTIFIER, Identifier>
-  (fSharpUnionCaseDeclaration<FS_UNION_CASE, Cases>)* FAKE
+  fSharpUnionCaseDeclaration<FS_UNION_CASE, Cases>* FAKE
 //  (fSharpTypeMemberDeclaration<FS_TYPE_MEMBER, Members>)* FAKE
 ;
 
@@ -246,17 +246,21 @@ fSharpOtherSimpleTypeDeclaration options {
 
 
 
-// Other
+// Identifiers
 
 fSharpIdentifier : IDENTIFIER;
-longIdentifier: (IDENTIFIER<FS_IDENTIFIER, Identifiers>)* FAKE;
+
+longIdentifier: IDENTIFIER<FS_IDENTIFIER, Identifiers>*;
+
+
+
+// Access modifiers
+
 accessModifiers: modifier{FS_ACCESS_MODIFIER, Modifiers}*;
 
 private modifier{ROLE,Getter}
 :
   PUBLIC<@ROLE,@Getter> |
   PRIVATE<@ROLE,@Getter> |
-  INTERNAL<@ROLE,@Getter> |
-  NAMESPACE<@ROLE,@Getter> |
-  MODULE<@ROLE,@Getter>
+  INTERNAL<@ROLE,@Getter>
 ;
