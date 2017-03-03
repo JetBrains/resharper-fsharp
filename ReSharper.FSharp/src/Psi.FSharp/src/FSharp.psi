@@ -111,7 +111,6 @@ moduleOrNamespaceSignature : FAKE;
 
 // Module members
 
-
 interface moduleMemberDeclaration
 :
   nestedModuleDeclaration |
@@ -152,6 +151,7 @@ fSharpEnumDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
+  accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
   fSharpIdentifier<FS_IDENTIFIER, Identifier>
 //  (fSharpEnumMemberDeclaration<FS_ENUM_MEMBER, EnumMemberDeclarations>)* FAKE
 ;
@@ -171,6 +171,7 @@ fSharpRecordDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
+  accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
   fSharpIdentifier<FS_IDENTIFIER, Identifier>
 //  (fSharpFieldDeclaration<FS_FIELD, Fields>)* FAKE
 //  (fSharpTypeMemberDeclaration<FS_TYPE_MEMBER, Members>)* FAKE
@@ -184,6 +185,7 @@ fSharpUnionDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
+  accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
   fSharpIdentifier<FS_IDENTIFIER, Identifier>
   (fSharpUnionCaseDeclaration<FS_UNION_CASE, Cases>)* FAKE
 //  (fSharpTypeMemberDeclaration<FS_TYPE_MEMBER, Members>)* FAKE
@@ -218,6 +220,7 @@ fSharpExceptionDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
+  accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
   fSharpIdentifier<FS_IDENTIFIER, Identifier>
 ;
 
@@ -225,15 +228,19 @@ fSharpTypeAbbreviationDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
+  accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
   fSharpIdentifier<FS_IDENTIFIER, Identifier>
 ;
 
-otherMemberDeclaration: fSharpIdentifier<FS_IDENTIFIER, Identifier>;
+otherMemberDeclaration:
+  accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
+  fSharpIdentifier<FS_IDENTIFIER, Identifier>;
 
 fSharpOtherSimpleTypeDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
+  accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
   fSharpIdentifier<FS_IDENTIFIER, Identifier>
 ;
 

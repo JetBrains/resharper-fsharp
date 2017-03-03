@@ -13,7 +13,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     }
 
     public TypedUnionCasePart(IFSharpTypedUnionCaseDeclaration declaration)
-      : base(declaration, declaration.DeclaredName)
+      : base(declaration, declaration.DeclaredName, MemberDecoration.DefaultValue)
     {
     }
 

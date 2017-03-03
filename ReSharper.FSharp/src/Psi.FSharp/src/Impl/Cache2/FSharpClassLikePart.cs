@@ -15,8 +15,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     {
     }
 
-    protected FSharpClassLikePart(TDeclaration declaration, string shortName, int typeParameters = 0)
-      : base(declaration, shortName, typeParameters)
+    protected FSharpClassLikePart(TDeclaration declaration, string shortName, MemberDecoration memberDecoration,
+      int typeParameters = 0) : base(declaration, shortName, memberDecoration, typeParameters)
     {
     }
 

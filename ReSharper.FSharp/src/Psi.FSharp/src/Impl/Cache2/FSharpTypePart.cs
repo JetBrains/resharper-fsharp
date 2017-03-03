@@ -9,20 +9,29 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
   public abstract class FSharpTypePart<TDeclaration> : TypePartImplBase<TDeclaration>
     where TDeclaration : class, ITypeDeclaration
   {
-    protected FSharpTypePart(TDeclaration declaration, string shortName, int typeParameters = 0)
-      : base(declaration, shortName, typeParameters)
+    private readonly MemberDecoration myDecoration;
+
+    protected FSharpTypePart(TDeclaration declaration, string shortName, MemberDecoration memberDecoration,
+      int typeParameters = 0) : base(declaration, shortName, typeParameters)
     {
+      myDecoration = memberDecoration;
+
+      if (myDecoration.AccessRights == AccessRights.NONE)
+        myDecoration.AccessRights = AccessRights.PUBLIC;
+
       ExtendsListShortNames = EmptyArray<string>.Instance; // todo
     }
 
     protected FSharpTypePart(IReader reader) : base(reader)
     {
+      myDecoration = MemberDecoration.FromInt(reader.ReadInt());
       ExtendsListShortNames = reader.ReadStringArray();
     }
 
     protected override void Write(IWriter writer)
     {
       base.Write(writer);
+      writer.WriteInt(myDecoration.ToInt());
       writer.WriteStringArray(ExtendsListShortNames);
     }
 
@@ -35,6 +44,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public override string[] ExtendsListShortNames { get; }
     public override bool CanBePartial => true; // workaround for F# signatures
+    public override MemberDecoration Modifiers => myDecoration;
 
     public override IDeclaration GetTypeParameterDeclaration(int index)
     {
@@ -81,7 +91,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       return false;
     }
 
-    public override MemberDecoration Modifiers => MemberDecoration.FromModifiers(Psi.Modifiers.PUBLIC);
     public override string[] AttributeClassNames => EmptyArray<string>.Instance;
   }
 }

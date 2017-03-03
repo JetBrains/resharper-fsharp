@@ -5,7 +5,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
   internal class ModulePart : FSharpClassLikePart<IModuleDeclaration>, Class.IClassPart
   {
-    public ModulePart(IModuleDeclaration declaration) : base(declaration, declaration.ShortName)
+    public ModulePart(IModuleDeclaration declaration)
+      : base(declaration, declaration.ShortName, ModifiersUtil.GetDecoration(declaration.AccessModifiers))
     {
     }
 
@@ -26,6 +27,19 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     public override IDeclaredType GetBaseClassType()
     {
       return GetDeclaration()?.GetPsiModule().GetPredefinedType().Object;
+    }
+
+    public override MemberDecoration Modifiers
+    {
+      get
+      {
+        var modifiers = base.Modifiers;
+        modifiers.IsAbstract = true;
+        modifiers.IsSealed = true;
+        modifiers.IsStatic = true;
+
+        return modifiers;
+      }
     }
 
     protected override byte SerializationTag => (byte) FSharpSerializationTag.ModulePart;

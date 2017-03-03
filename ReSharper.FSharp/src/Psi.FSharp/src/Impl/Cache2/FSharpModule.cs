@@ -13,18 +13,5 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     {
       return new[] {Module.GetPredefinedType().Object};
     }
-
-    // todo: calc access modifiers in part constructor
-    protected override MemberDecoration Modifiers
-    {
-      get
-      {
-        var modifiers = base.Modifiers;
-        modifiers.IsAbstract = true;
-        modifiers.IsStatic = true;
-        modifiers.IsSealed = true;
-        return modifiers;
-      }
-    }
   }
 }

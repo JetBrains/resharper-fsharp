@@ -5,7 +5,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
   internal class RecordPart : FSharpClassLikePart<IFSharpRecordDeclaration>, Class.IClassPart
   {
-    public RecordPart(IFSharpRecordDeclaration declaration) : base(declaration, declaration.DeclaredName)
+    public RecordPart(IFSharpRecordDeclaration declaration) :
+      base(declaration, declaration.DeclaredName, ModifiersUtil.GetDecoration(declaration.AccessModifiers))
     {
     }
 

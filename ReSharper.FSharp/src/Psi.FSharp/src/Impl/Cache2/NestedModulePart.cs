@@ -5,7 +5,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
   public class NestedModulePart : FSharpClassLikePart<INestedModuleDeclaration>, Class.IClassPart
   {
-    public NestedModulePart(INestedModuleDeclaration declaration) : base(declaration, declaration.DeclaredName)
+    public NestedModulePart(INestedModuleDeclaration declaration)
+      : base(declaration, declaration.DeclaredName, ModifiersUtil.GetDecoration(declaration.AccessModifiers))
     {
     }
 
@@ -26,6 +27,19 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     public MemberPresenceFlag GetMemberPresenceFlag()
     {
       return MemberPresenceFlag.NONE;
+    }
+
+    public override MemberDecoration Modifiers
+    {
+      get
+      {
+        var modifiers = base.Modifiers;
+        modifiers.IsAbstract = true;
+        modifiers.IsSealed = true;
+        modifiers.IsStatic = true;
+
+        return modifiers;
+      }
     }
 
     protected override byte SerializationTag => (byte) FSharpSerializationTag.NestedModulePart;

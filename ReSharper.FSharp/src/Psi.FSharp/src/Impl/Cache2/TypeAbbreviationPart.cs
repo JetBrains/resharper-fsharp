@@ -6,7 +6,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
   public class TypeAbbreviationPart : FSharpClassLikePart<IFSharpTypeAbbreviationDeclaration>, Class.IClassPart
   {
     public TypeAbbreviationPart(IFSharpTypeAbbreviationDeclaration declaration)
-      : base(declaration, declaration.DeclaredName)
+      : base(declaration, declaration.DeclaredName, MemberDecoration.DefaultValue)
     {
     }
 
@@ -24,7 +24,10 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       return MemberPresenceFlag.NONE;
     }
 
-    public override MemberDecoration Modifiers => MemberDecoration.FromModifiers(Psi.Modifiers.INTERNAL);
+    public override MemberDecoration Modifiers =>
+      // workaround for types not presented in compiled code
+      MemberDecoration.FromModifiers(Psi.Modifiers.INTERNAL);
+
     protected override byte SerializationTag => (byte) FSharpSerializationTag.TypeAbbreviationPart;
   }
 }

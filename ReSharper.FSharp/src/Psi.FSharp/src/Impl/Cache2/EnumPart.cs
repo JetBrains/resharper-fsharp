@@ -7,7 +7,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
   public class EnumPart : FSharpTypePart<IFSharpEnumDeclaration>, Enum.IEnumPart
   {
-    public EnumPart(IFSharpEnumDeclaration declaration) : base(declaration, declaration.DeclaredName)
+    public EnumPart(IFSharpEnumDeclaration declaration)
+      : base(declaration, declaration.DeclaredName, ModifiersUtil.GetDecoration(declaration.AccessModifiers))
     {
     }
 
@@ -22,8 +23,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public IType GetUnderlyingType()
     {
-      // todo: replace with actual type
-      // F# compiler takes type from first valid case
+      // todo: replace with actual type, F# compiler takes type from first valid case
       return GetPsiModule().GetPredefinedType().Int;
     }
 

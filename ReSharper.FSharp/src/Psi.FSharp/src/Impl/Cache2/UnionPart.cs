@@ -5,7 +5,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
   public class UnionPart : FSharpClassLikePart<IFSharpUnionDeclaration>, Class.IClassPart
   {
-    public UnionPart(IFSharpUnionDeclaration declaration) : base(declaration, declaration.DeclaredName)
+    public UnionPart(IFSharpUnionDeclaration declaration) : base(declaration, declaration.DeclaredName,
+      ModifiersUtil.GetDecoration(declaration.AccessModifiers))
     {
     }
 

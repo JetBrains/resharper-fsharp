@@ -1,6 +1,7 @@
 ﻿using System;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
+using Microsoft.FSharp.Compiler;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Tree
@@ -12,6 +13,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Tree
 
     [CanBeNull]
     FSharpCheckFileResults GetCheckResults(Action interruptChecker = null);
+
+    [CanBeNull]
+    Ast.ParsedInput ParseTree { get; }
 
     /// <summary>
     /// True when SetResolvedSymbolsStageProcess is finished.

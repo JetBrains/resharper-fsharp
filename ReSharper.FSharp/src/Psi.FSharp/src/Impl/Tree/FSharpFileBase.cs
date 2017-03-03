@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.Util;
+using Microsoft.FSharp.Compiler;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
@@ -17,6 +18,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
     public override PsiLanguageType Language => FSharpLanguage.Instance;
     public bool ReferencesResolved { get; set; }
     public bool IsChecked => CheckResults != null;
+    public Ast.ParsedInput ParseTree => ParseResults?.ParseTree?.Value;
 
     public FSharpCheckFileResults GetCheckResults([CanBeNull] Action interruptChecker = null)
     {
