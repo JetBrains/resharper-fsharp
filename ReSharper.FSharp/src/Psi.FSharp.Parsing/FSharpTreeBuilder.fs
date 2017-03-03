@@ -17,52 +17,52 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
     let tokenFactory = FSharpPsiBuilderTokenFactory()
     let builder = PsiBuilder(lexer, ElementType.F_SHARP_IMPL_FILE, tokenFactory, lifetime)
 
-    let getLineOffset line = document.GetLineStartOffset(line - 1 |> Int32.op_Explicit)
-    let getStartOffset (range : Range.range) = getLineOffset range.StartLine + range.StartColumn
-    let getEndOffset (range : Range.range) = getLineOffset range.EndLine + range.EndColumn
+    member private x.GetLineOffset line = document.GetLineStartOffset(line - 1 |> Int32.op_Explicit)
+    member private x.GetStartOffset (range : Range.range) = x.GetLineOffset range.StartLine + range.StartColumn
+    member private x.GetEndOffset (range : Range.range) = x.GetLineOffset range.EndLine + range.EndColumn
 
-    let advanceToOffset offset =
+    member private x.AdvanceToOffset offset =
         while builder.GetTokenOffset() < offset && not (isNull (builder.GetTokenType())) do
             builder.AdvanceLexer() |> ignore
 
-    let isTypedCase (UnionCase(_,_,fieldType,_,_,_)) =
+    member private x.ProcessIdentifier (id : Ident) =
+        id.idRange |> x.GetStartOffset |> x.AdvanceToOffset
+        let idMark = builder.Mark()
+        id.idRange |> x.GetEndOffset |> x.AdvanceToOffset
+        x.Done(idMark, ElementType.F_SHARP_IDENTIFIER)
+    
+    /// Should be called on access modifiers start offset.
+    /// Always goes right before identifier.
+    member private x.ProcessAccessModifiers (endOffset : int) =
+        let accessModifiersMark = builder.Mark()
+        x.AdvanceToOffset endOffset
+        builder.Done(accessModifiersMark, ElementType.ACCESS_MODIFIERS, null)
+
+    member private x.ProcessException (SynExceptionDefn(SynExceptionDefnRepr(_,(UnionCase(_,id,_,_,_,_)),_,_,_,_),_,range)) =
+            range |> x.GetStartOffset |> x.AdvanceToOffset
+            let mark = builder.Mark()
+            builder.AdvanceLexer() |> ignore // ignore keyword token
+
+            x.ProcessAccessModifiers (x.GetStartOffset id.idRange)
+            x.ProcessIdentifier id
+
+            range |> x.GetEndOffset |> x.AdvanceToOffset
+            builder.Done(mark, ElementType.F_SHARP_EXCEPTION_DECLARATION, null)
+
+    member private x.IsTypedCase (UnionCase(_,_,fieldType,_,_,_)) =
         match fieldType with
         | UnionCaseFields([]) -> false
         | _ -> true
 
-    let processIdentifier (id : Ident) =
-        id.idRange |> getStartOffset |> advanceToOffset
-        let idMark = builder.Mark()
-        id.idRange |> getEndOffset |> advanceToOffset
-        builder.Done(idMark, ElementType.F_SHARP_IDENTIFIER, null)
-    
-    /// Should be called on access modifiers start offset.
-    /// Always goes right before identifier.
-    let processAccessModifiers (endOffset : int) =
-        let accessModifiersMark = builder.Mark()
-        advanceToOffset endOffset
-        builder.Done(accessModifiersMark, ElementType.ACCESS_MODIFIERS, null)
-
-    let processException (SynExceptionDefn(SynExceptionDefnRepr(_,(UnionCase(_,id,_,_,_,_)),_,_,_,_),_,range)) =
-            range |> getStartOffset |> advanceToOffset
-            let mark = builder.Mark()
-            builder.AdvanceLexer() |> ignore // ignore keyword token
-
-            processAccessModifiers (getStartOffset id.idRange)
-            processIdentifier id
-
-            range |> getEndOffset |> advanceToOffset
-            builder.Done(mark, ElementType.F_SHARP_EXCEPTION_DECLARATION, null)
-
-    let processUnionCase (UnionCase(_,id,caseType,_,_,range) as case) =
-        if isTypedCase case then
-            range |> getStartOffset |> advanceToOffset
+    member private x.ProcessUnionCase (UnionCase(_,id,caseType,_,_,range) as case) =
+        if x.IsTypedCase case then
+            range |> x.GetStartOffset |> x.AdvanceToOffset
             let exnMark = builder.Mark()
-            processIdentifier id
+            x.ProcessIdentifier id
 
     //        processUnionCaseTypes caseType
 
-            range |> getEndOffset |> advanceToOffset
+            range |> x.GetEndOffset |> x.AdvanceToOffset
     //        let elementType = if isTypedCase case
     //                          then ElementType.F_SHARP_TYPED_UNION_CASE_DECLARATION
     //                          else ElementType.F_SHARP_SINGLETON_UNION_CASE_DECLARATION
@@ -74,31 +74,31 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
             builder.AdvanceLexer() |> ignore
 
     member private x.ProcessLongIdentifier (lid : Ident list) =
-        let startOffset = getStartOffset (List.head lid).idRange
-        let endOffset = getEndOffset (List.last lid).idRange
+        let startOffset = x.GetStartOffset (List.head lid).idRange
+        let endOffset = x.GetEndOffset (List.last lid).idRange
 
-        advanceToOffset startOffset
+        x.AdvanceToOffset startOffset
         let mark = builder.Mark()
-        advanceToOffset endOffset
+        x.AdvanceToOffset endOffset
         x.Done(mark, ElementType.LONG_IDENTIFIER)
 
     member private x.ProcessAttribute (attr : SynAttribute) =
-        advanceToOffset (getStartOffset attr.Range)
+        x.AdvanceToOffset (x.GetStartOffset attr.Range)
         let mark = builder.Mark()
         x.ProcessLongIdentifier attr.TypeName.Lid
-        advanceToOffset (getEndOffset attr.Range)
+        x.AdvanceToOffset (x.GetEndOffset attr.Range)
         x.Done(mark, ElementType.F_SHARP_ATTRIBUTE)
 
     member private x.ProcessType (TypeDefn(ComponentInfo(attributes,_,_,lid,_,_,_,_), repr, members, range)) =
-        let startOffset = getStartOffset (if List.isEmpty attributes then range else (List.head attributes).TypeName.Range)
-        advanceToOffset startOffset
+        let startOffset = x.GetStartOffset (if List.isEmpty attributes then range else (List.head attributes).TypeName.Range)
+        x.AdvanceToOffset startOffset
         let mark = builder.Mark()
 
         List.iter x.ProcessAttribute attributes
         
         let id = lid.Head
-        processAccessModifiers (getStartOffset id.idRange)
-        processIdentifier id
+        x.ProcessAccessModifiers (x.GetStartOffset id.idRange)
+        x.ProcessIdentifier id
 
         let elementType =
             match repr with
@@ -111,7 +111,7 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
 //                    List.iter processEnumCase enumCases
                     ElementType.F_SHARP_ENUM_DECLARATION
                 | SynTypeDefnSimpleRepr.Union(_,cases,_) ->
-                    List.iter processUnionCase cases
+                    List.iter x.ProcessUnionCase cases
                     ElementType.F_SHARP_UNION_DECLARATION
                 | SynTypeDefnSimpleRepr.TypeAbbrev(_) ->
                     ElementType.F_SHARP_TYPE_ABBREVIATION_DECLARATION
@@ -127,45 +127,45 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
                 | _ -> ElementType.F_SHARP_UNSPECIFIED_OBJECT_TYPE_DECLARATION
 //        List.iter processTypeMember members
 
-        range |> getEndOffset |> advanceToOffset
+        range |> x.GetEndOffset |> x.AdvanceToOffset
         builder.Done(mark, elementType , null)
 
     member private x.ProcessModuleMember = function
         | SynModuleDecl.NestedModule(ComponentInfo(_,_,_,lid,_,_,_,_),_,decls,_,range) as decl ->
-            range |> getStartOffset |> advanceToOffset
+            range |> x.GetStartOffset |> x.AdvanceToOffset
             let mark = builder.Mark()
             builder.AdvanceLexer() |> ignore // ignore keyword token
 
             let id = List.head lid 
-            processAccessModifiers (getStartOffset id.idRange)
-            processIdentifier id // always single identifier or not parsed at all instead
+            x.ProcessAccessModifiers (x.GetStartOffset id.idRange)
+            x.ProcessIdentifier id // always single identifier or not parsed at all instead
 
             List.iter x.ProcessModuleMember decls
 
-            decl.Range |> getEndOffset |> advanceToOffset
+            decl.Range |> x.GetEndOffset |> x.AdvanceToOffset
             builder.Done(mark, ElementType.NESTED_MODULE_DECLARATION, null)
         | SynModuleDecl.Types(types,_) -> List.iter x.ProcessType types
-        | SynModuleDecl.Exception(exceptionDefn,_) -> processException exceptionDefn
+        | SynModuleDecl.Exception(exceptionDefn,_) -> x.ProcessException exceptionDefn
         | decl ->
-            decl.Range |> getStartOffset |> advanceToOffset
+            decl.Range |> x.GetStartOffset |> x.AdvanceToOffset
             let declMark = builder.Mark()
-            decl.Range |> getEndOffset |> advanceToOffset
+            decl.Range |> x.GetEndOffset |> x.AdvanceToOffset
             builder.Done(declMark, ElementType.OTHER_MEMBER_DECLARATION, null)
 
     member private x.ProcessModuleOrNamespace (SynModuleOrNamespace(lid,_,isModule,decls,_,_,_,range)) =
         // When top level namespace or module identifier is missing
         // its ident name is replaced with file name and the range is 1,0-1,0.
         
-        let lidStartOffset = getStartOffset lid.Head.idRange
+        let lidStartOffset = x.GetStartOffset lid.Head.idRange
         x.AdvanceToKeywordOrOffset (if isModule then "module" else "namespace") lidStartOffset
         let mark = builder.Mark()
         builder.AdvanceLexer() |> ignore // ignore keyword token
 
-        if isModule then processAccessModifiers lidStartOffset
+        if isModule then x.ProcessAccessModifiers lidStartOffset
         x.ProcessLongIdentifier lid
         List.iter x.ProcessModuleMember decls
 
-        range |> getEndOffset |> advanceToOffset
+        range |> x.GetEndOffset |> x.AdvanceToOffset
         x.Done(mark, if isModule then ElementType.MODULE_DECLARATION else ElementType.F_SHARP_NAMESPACE_DECLARATION)
 
     override x.Builder = builder
@@ -183,7 +183,7 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
                 ElementType.F_SHARP_IMPL_FILE
             | ParsedInput.SigFile (ParsedSigFileInput(_)) -> ElementType.F_SHARP_SIG_FILE
 
-        ast.Range |> getEndOffset |> advanceToOffset
+        ast.Range |> x.GetEndOffset |> x.AdvanceToOffset
 
         x.Done(fileMark, elementType)
         x.GetTree() :> ICompositeElement
