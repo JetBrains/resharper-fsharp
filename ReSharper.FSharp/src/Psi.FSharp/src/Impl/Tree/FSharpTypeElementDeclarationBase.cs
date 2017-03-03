@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
@@ -32,7 +33,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
     }
 
     public TreeNodeCollection<ITypeMemberDeclaration> MemberDeclarations =>
-      this.Children<ITypeMemberDeclaration>().ToTreeNodeCollection();
+      this.Children<ITypeMemberDeclaration>()
+        .Where(c => !(c is IFSharpTypeAbbreviationDeclaration))
+        .ToTreeNodeCollection();
 
     // todo
     public TreeNodeCollection<ITypeDeclaration> NestedTypeDeclarations => TreeNodeCollection<ITypeDeclaration>.Empty;
