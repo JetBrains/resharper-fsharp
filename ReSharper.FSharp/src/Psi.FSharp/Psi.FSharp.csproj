@@ -495,7 +495,8 @@
     <Compile Include="src\Tree\INestedModuleDeclaration.cs" />
     <Compile Include="src\Util\FSharpElementsUtil.cs" />
     <Compile Include="src\Util\FSharpRangeUtil.cs" />
-    <Compile Include="src\Util\FSharpSymbolUtil.cs" />
+    <Compile Include="src\Util\FSharpNamesUtil.cs" />
+    <Compile Include="src\Util\FSharpSymbolsUtil.cs" />
     <Compile Include="src\Util\FSharpTypeAbbreviationsUtil.cs" />
     <Compile Include="ZoneMarker.cs" />
   </ItemGroup>

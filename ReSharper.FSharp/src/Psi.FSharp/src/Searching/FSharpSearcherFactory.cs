@@ -30,7 +30,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Searching
 
     public IEnumerable<string> GetAllPossibleWordsInFile(IDeclaredElement element)
     {
-      return FSharpSymbolUtil.GetPossibleSourceNames(element);
+      return FSharpNamesUtil.GetPossibleSourceNames(element);
     }
 
     public Tuple<ICollection<IDeclaredElement>, bool> GetNavigateToTargets(IDeclaredElement element)

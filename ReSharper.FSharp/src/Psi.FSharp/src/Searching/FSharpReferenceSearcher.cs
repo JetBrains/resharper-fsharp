@@ -22,7 +22,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Searching
       myElementNames = new List<string>();
 
       foreach (var element in elements)
-        myElementNames.AddRange(FSharpSymbolUtil.GetPossibleSourceNames(element));
+        myElementNames.AddRange(FSharpNamesUtil.GetPossibleSourceNames(element));
     }
 
     public bool ProcessProjectItem<TResult>(IPsiSourceFile sourceFile, IFindResultConsumer<TResult> consumer)

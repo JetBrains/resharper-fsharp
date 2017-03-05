@@ -2,13 +2,10 @@
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Resolve;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
+using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Util;
-using Microsoft.FSharp.Collections;
-using Microsoft.FSharp.Compiler;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
-using Microsoft.FSharp.Control;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl
 {
@@ -30,24 +27,10 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
     [CanBeNull]
     private FSharpSymbol FindFSharpSymbol()
     {
-      var sourceFile = myOwner.GetSourceFile();
-      Assertion.AssertNotNull(sourceFile, "sourceFile != null");
-      var checkResults = (myOwner.GetContainingFile() as IFSharpFile)?.GetCheckResults();
-      if (checkResults == null) return null;
-
-      var coords = sourceFile.Document.GetCoordsByOffset(myOwner.GetTreeEndOffset().Offset);
-      var lineText = sourceFile.Document.GetLineText(coords.Line);
-      var names = ListModule.OfArray(new[] {myOwner.GetText()});
-      try
-      {
-        var findSymbolAsync =
-          checkResults.GetSymbolUseAtLocation((int) coords.Line + 1, (int) coords.Column, lineText, names);
-        return FSharpAsync.RunSynchronously(findSymbolAsync, null, null)?.Value.Symbol;
-      }
-      catch (ErrorLogger.UnresolvedPathReferenceNoRange)
-      {
-        return null; // internal FCS error
-      }
+      var fsFile = myOwner.GetContainingFile() as IFSharpFile;
+      return fsFile != null
+        ? FSharpSymbolsUtil.TryFindFSharpSymbol(fsFile, myOwner.GetText(), myOwner.GetTreeEndOffset().Offset)
+        : null;
     }
   }
 }

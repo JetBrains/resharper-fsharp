@@ -11,7 +11,7 @@ using Microsoft.FSharp.Core;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Util
 {
-  public class FSharpSymbolUtil
+  public class FSharpNamesUtil
   {
     private const string FSharpConstructorName = "( .ctor )";
     private const string ClrConstructorName = ".ctor";

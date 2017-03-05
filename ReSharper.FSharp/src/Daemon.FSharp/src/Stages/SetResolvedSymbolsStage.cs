@@ -38,7 +38,9 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
     public override void Execute(Action<DaemonStageResult> committer)
     {
       var interruptChecker = DaemonProcess.CreateInterruptChecker();
-      var symbolUses = myFsFile.GetCheckResults(interruptChecker)?.GetAllUsesOfAllSymbolsInFile()?.RunAsTask(interruptChecker);
+      var symbolUses = myFsFile.GetCheckResults(interruptChecker)
+        ?.GetAllUsesOfAllSymbolsInFile()
+        ?.RunAsTask(interruptChecker);
       if (symbolUses == null) return;
 
       foreach (var symbolUse in symbolUses)
@@ -48,9 +50,12 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 
         if (symbolUse.IsFromDefinition)
         {
-          // todo: enable when other declarations are added
-//          var declaration = token.GetContainingNode<IFSharpDeclaration>();
-//          if (declaration != null) declaration.Symbol = symbolUse.Symbol;
+          // todo: add other symbols (let bindings, local values, type members)
+          if (symbolUse.Symbol is FSharpEntity)
+          {
+            var declaration = token.GetContainingNode<IFSharpDeclaration>();
+            if (declaration != null) declaration.Symbol = symbolUse.Symbol;
+          }
           continue;
         }
         token.FSharpSymbol = symbolUse.Symbol;
@@ -62,7 +67,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
     [CanBeNull]
     private FSharpIdentifierToken FindUsageToken(FSharpSymbolUse symbolUse)
     {
-      var name = FSharpSymbolUtil.GetDisplayName(symbolUse.Symbol);
+      var name = FSharpNamesUtil.GetDisplayName(symbolUse.Symbol);
       if (name == null) return null;
 
       // range includes qualifiers, we're looking for the last identifier
@@ -80,7 +85,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
       if (attrName != null && attrName.Length == token.Length) return token;
 
       // e.g. name: "( |> )", token: "|>"
-      if (FSharpSymbolUtil.IsEscapedName(name) && name.Length - EscapedNameAffixLength == token.Length) return token;
+      if (FSharpNamesUtil.IsEscapedName(name) && name.Length - EscapedNameAffixLength == token.Length) return token;
 
       // e.g. name: "foo bar", token: "``foo bar``"
       if (name.Length + EscapedNameAffixLength == token.Length &&
