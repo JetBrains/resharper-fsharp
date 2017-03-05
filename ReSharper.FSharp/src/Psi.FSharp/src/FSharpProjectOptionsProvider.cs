@@ -74,7 +74,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
     private void ProcessChange(ProjectModelChange change)
     {
       var project = change.ProjectModelElement as IProject;
-      if (project != null)
+      if (project != null && project.ProjectProperties.ProjectKind != ProjectKind.SOLUTION_FOLDER)
       {
         if (project.ProjectProperties is FSharpProjectProperties)
         {
