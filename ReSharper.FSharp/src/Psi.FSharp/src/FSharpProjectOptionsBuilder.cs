@@ -93,17 +93,9 @@ namespace JetBrains.ReSharper.Psi.FSharp
 
     private string GetOutputTarget([CanBeNull] IManagedProjectBuildSettings buildSettings)
     {
-      if (buildSettings == null) return "library";
-
-      switch (buildSettings.OutputType)
-      {
-        case ProjectOutputType.CONSOLE_EXE:
-          return "exe";
-        case ProjectOutputType.LIBRARY:
-          return "library";
-        default:
-          return "library"; // todo: any additional cases for F#?
-      }
+      if (buildSettings != null && buildSettings.OutputType == ProjectOutputType.CONSOLE_EXE)
+        return "exe";
+      return "library"; // todo: any other targets for F#?
     }
 
     [NotNull]
@@ -120,9 +112,8 @@ namespace JetBrains.ReSharper.Psi.FSharp
     [NotNull]
     public string[] GetDefines([NotNull] IProject project)
     {
-      // todo: multiple frameworks?
-      var activeConfigurations = project.ProjectProperties.ActiveConfigurations;
-      var configuration = activeConfigurations.Configurations.SingleItem() as IManagedProjectConfiguration;
+      var configuration =
+        project.ProjectProperties.ActiveConfigurations.Configurations.SingleItem() as IManagedProjectConfiguration;
       var definesString = configuration?.DefineConstants;
 
       return string.IsNullOrEmpty(definesString)
