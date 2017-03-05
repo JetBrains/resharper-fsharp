@@ -32,14 +32,15 @@ namespace JetBrains.ReSharper.Psi.FSharp
     public FSharpCheckerService(Lifetime lifetime, OnSolutionCloseNotifier onSolutionCloseNotifier)
     {
       myChecker = FSharpChecker.Create(
-        projectCacheSize: null,
+        projectCacheSize: null, // use default value
         keepAssemblyContents: FSharpOption<bool>.Some(true),
-        keepAllBackgroundResolutions: null,
+        keepAllBackgroundResolutions: null, // use default value, true
         msbuildEnabled: new FSharpOption<bool>(false));
 
       onSolutionCloseNotifier.SolutionIsAboutToClose.Advise(lifetime, () =>
       {
         myProjectsOptions.Clear();
+        myProjectDefines.Clear();
         myChecker.ClearLanguageServiceRootCachesAndCollectAndFinalizeAllTransients();
       });
     }
@@ -61,10 +62,13 @@ namespace JetBrains.ReSharper.Psi.FSharp
       [CanBeNull] Action interruptChecker = null)
     {
       var sourceFile = fsFile.GetSourceFile();
-      if (sourceFile == null) return null;
+      if (sourceFile == null)
+        return null;
+
       var projectOptions = GetProjectOptions(sourceFile);
       var filename = sourceFile.GetLocation().FullPath;
       var source = sourceFile.Document.GetText();
+
       var checkAsync = myChecker.CheckFileInProject(fsFile.ParseResults, filename, 0, source, projectOptions,
         textSnapshotInfo: null, isResultObsolete: null);
       return (checkAsync.RunAsTask(interruptChecker) as FSharpCheckFileAnswer.Succeeded)?.Item;
@@ -85,6 +89,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
       var filePath = sourceFile.GetLocation().FullPath;
       var documentText = sourceFile.Document.GetText();
       var loadTime = FSharpOption<DateTime>.Some(DateTime.Now);
+
       var getScriptOptionsAsync =
         myChecker.GetProjectOptionsFromScript(filePath, documentText, loadTime, otherFlags: null, useFsiAuxLib: null);
       return FSharpAsync.RunSynchronously(getScriptOptionsAsync, null, null);
