@@ -23,7 +23,6 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
   {
     private const string AttributeSuffix = "Attribute";
     private const int EscapedNameAffixLength = 4;
-    private const int EscapedNameStartIndex = 2;
 
     private readonly IFSharpFile myFsFile;
     private readonly IDocument myDocument;
@@ -85,11 +84,11 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
       if (attrName != null && attrName.Length == token.Length) return token;
 
       // e.g. name: "( |> )", token: "|>"
-      if (FSharpNamesUtil.IsEscapedName(name) && name.Length - EscapedNameAffixLength == token.Length) return token;
+      if (FSharpNamesUtil.IsEscapedWithParens(name) && name.Length - EscapedNameAffixLength == token.Length) return token;
 
       // e.g. name: "foo bar", token: "``foo bar``"
       if (name.Length + EscapedNameAffixLength == token.Length &&
-          name == token.GetText().Substring(EscapedNameStartIndex, token.Length - EscapedNameAffixLength)) return token;
+          name == FSharpNamesUtil.RemoveBackticks(token.GetText())) return token;
 
       return null;
     }

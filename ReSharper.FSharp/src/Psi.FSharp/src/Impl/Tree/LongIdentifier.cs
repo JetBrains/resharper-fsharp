@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
+using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
@@ -15,11 +16,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
     public string QualifiedName =>
       Identifiers.IsEmpty
         ? SharedImplUtil.MISSING_DECLARATION_NAME
-        : Identifiers.Select(id => id.GetText()).Join(StringUtil.SDOT);
+        : Identifiers.Select(id => FSharpNamesUtil.RemoveBackticks(id.GetText())).Join(StringUtil.SDOT);
 
     public string Name =>
       Identifiers.IsEmpty
         ? SharedImplUtil.MISSING_DECLARATION_NAME
-        : Identifiers.Last().GetText();
+        : FSharpNamesUtil.RemoveBackticks(Identifiers.Last().GetText());
   }
 }

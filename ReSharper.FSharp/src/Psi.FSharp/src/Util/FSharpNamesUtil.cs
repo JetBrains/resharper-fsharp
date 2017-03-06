@@ -42,11 +42,27 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       return symbol.DeclarationLocation != null ? symbol.DisplayName : null;
     }
 
-    public static bool IsEscapedName([NotNull] string name)
+    public static bool IsEscapedWithParens([NotNull] string name)
     {
       var length = name.Length;
       return length > EscapedNameAffixLength &&
              name[0] == '(' && name[1] == ' ' && name[length - 2] == ' ' && name[length - 1] == ')';
+    }
+
+    public static bool IsEscapedWithBackticks([NotNull] string name)
+    {
+      var length = name.Length;
+      return length > EscapedNameAffixLength &&
+             name[0] == '`' && name[1] == '`' && name[length - 2] == '`' && name[length - 1] == '`';
+    }
+
+    [NotNull]
+    public static string RemoveBackticks([NotNull] string name)
+    {
+      const int escapedNameStartIndex = 2;
+      return IsEscapedWithBackticks(name)
+        ? name.Substring(escapedNameStartIndex, name.Length - EscapedNameAffixLength)
+        : name;
     }
 
     [NotNull]

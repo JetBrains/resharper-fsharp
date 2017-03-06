@@ -1,5 +1,6 @@
 ﻿using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
+using JetBrains.ReSharper.Psi.FSharp.Util;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
@@ -20,7 +21,10 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       {
         var qualifiers = declaration.LongIdentifier.Qualifiers;
         foreach (var qualifier in qualifiers)
-          myBuilder.StartPart(new QualifiedNamespacePart(qualifier.GetTreeStartOffset(), qualifier.GetText()));
+        {
+          var qualifierName = FSharpNamesUtil.RemoveBackticks(qualifier.GetText());
+          myBuilder.StartPart(new QualifiedNamespacePart(qualifier.GetTreeStartOffset(), qualifierName));
+        }
 
         declaration.Accept(this);
 
