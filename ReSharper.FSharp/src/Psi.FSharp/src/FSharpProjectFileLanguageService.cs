@@ -1,4 +1,5 @@
-﻿using JetBrains.ProjectModel;
+﻿using JetBrains.Platform.ProjectModel.FSharp;
+using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.Resources;
 using JetBrains.ReSharper.Psi.FSharp.Parsing;
 using JetBrains.ReSharper.Psi.Parsing;

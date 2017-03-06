@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.DataFlow;
+using JetBrains.Platform.ProjectModel.FSharp;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services;
 using JetBrains.ReSharper.Psi.FSharp.Tree;

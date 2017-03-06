@@ -1,4 +1,5 @@
-﻿using JetBrains.ProjectModel;
+﻿using JetBrains.Platform.ProjectModel.FSharp;
+using JetBrains.ProjectModel;
 
 namespace JetBrains.ReSharper.Psi.FSharp
 {

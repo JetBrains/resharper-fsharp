@@ -1,7 +1,7 @@
 ﻿using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 
-namespace JetBrains.ReSharper.Psi.FSharp
+namespace JetBrains.Platform.ProjectModel.FSharp
 {
   [ProjectFileTypeDefinition(Name)]
   public class FSharpProjectFileType : KnownProjectFileType

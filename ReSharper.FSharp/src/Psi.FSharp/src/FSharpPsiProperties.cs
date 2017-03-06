@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using JetBrains.Platform.ProjectModel.FSharp;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Psi.Impl;
 

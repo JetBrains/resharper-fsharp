@@ -33,7 +33,7 @@ namespace JetBrains.Platform.ProjectModel.FSharp.Properties
     }
 
     public override IBuildSettings BuildSettings => myBuildSettings;
-    public ProjectLanguage DefaultLanguage => ProjectLanguage.UNKNOWN;
+    public ProjectLanguage DefaultLanguage => FSharpProjectLanguage.Instance;
     public ProjectKind ProjectKind => ProjectKind.REGULAR_PROJECT;
     public TargetPlatformData TargetPlatformData => myTargetPlatformData;
 
