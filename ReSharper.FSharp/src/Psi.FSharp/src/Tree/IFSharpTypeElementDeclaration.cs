@@ -3,7 +3,7 @@
 namespace JetBrains.ReSharper.Psi.FSharp.Tree
 {
   // ReSharper disable once PossibleInterfaceMemberAmbiguity
-  public interface IFSharpTypeElementDeclaration : ITypeDeclaration, ITypeMemberDeclaration
+  public interface IFSharpTypeElementDeclaration : IFSharpDeclaration, ITypeDeclaration, ITypeMemberDeclaration
   {
   }
 }

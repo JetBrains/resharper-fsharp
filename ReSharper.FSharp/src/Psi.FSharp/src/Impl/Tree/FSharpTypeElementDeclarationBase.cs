@@ -8,8 +8,7 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 {
-  internal abstract class FSharpTypeElementDeclarationBase : FSharpCachedDeclarationBase, ITypeDeclaration,
-    ITypeMemberDeclaration, IFSharpDeclaration
+  internal abstract class FSharpTypeElementDeclarationBase : FSharpCachedDeclarationBase, IFSharpTypeElementDeclaration
   {
     public FSharpSymbol Symbol { get; set; }
 
@@ -45,9 +44,10 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
         .Where(c => !(c is IFSharpTypeAbbreviationDeclaration))
         .ToTreeNodeCollection();
 
+    public string CLRName => FSharpImplUtil.MakeClrName(this);
+
     // todo
     public TreeNodeCollection<ITypeDeclaration> NestedTypeDeclarations => TreeNodeCollection<ITypeDeclaration>.Empty;
     public IList<ITypeDeclaration> TypeDeclarations => EmptyList<ITypeDeclaration>.Instance;
-    public string CLRName { get; }
   }
 }

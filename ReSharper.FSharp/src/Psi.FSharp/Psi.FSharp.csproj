@@ -477,6 +477,7 @@
     <Compile Include="src\Tree\ChildRole.cs" />
     <Compile Include="src\Tree\FSharpCompositeNodeType.cs" />
     <Compile Include="src\Tree\FSharpObjectModelTypeKind.cs" />
+    <Compile Include="src\Tree\FSharpTreeNodeExtensions.cs" />
     <Compile Include="src\Tree\IFSharpDeclaration.cs" />
     <Compile Include="src\Tree\IFSharpFile.cs" />
     <Compile Include="src\Tree\IFSharpFileCheckInfoOwner.cs" />
