@@ -118,7 +118,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
 
       return string.IsNullOrEmpty(definesString)
         ? EmptyArray<string>.Instance
-        : definesString.Split(';', ',', ' ').Select(x => x.Trim()).ToArray();
+        : definesString.Split(';', ',', ' ').Select(x => x.Trim()).Where(s => !s.IsEmpty()).ToArray();
     }
 
     [NotNull]
