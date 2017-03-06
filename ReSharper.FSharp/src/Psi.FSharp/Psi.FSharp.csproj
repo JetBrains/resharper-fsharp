@@ -420,7 +420,7 @@
     <Compile Include="src\Impl\Cache2\FSharpClassLikePart.cs" />
     <Compile Include="src\Impl\Cache2\FSharpDeclarationProcessor.cs" />
     <Compile Include="src\Impl\Cache2\FSharpException.cs" />
-    <Compile Include="src\Impl\Cache2\FSharpModule.cs" />
+    <Compile Include="src\Impl\Cache2\FSharpTopLevelModule.cs" />
     <Compile Include="src\Impl\Cache2\FSharpNestedModule.cs" />
     <Compile Include="src\Impl\Cache2\FSharpObjectModelTypePart.cs" />
     <Compile Include="src\Impl\Cache2\FSharpProjectFilePart.cs" />
@@ -430,7 +430,7 @@
     <Compile Include="src\Impl\Cache2\FSharpTypePart.cs" />
     <Compile Include="src\Impl\Cache2\FSharpUnion.cs" />
     <Compile Include="src\Impl\Cache2\InterfacePart.cs" />
-    <Compile Include="src\Impl\Cache2\ModulePart.cs" />
+    <Compile Include="src\Impl\Cache2\TopLevelModulePart.cs" />
     <Compile Include="src\Impl\Cache2\NestedModulePart.cs" />
     <Compile Include="src\Impl\Cache2\QualifiedNamespacePart.cs" />
     <Compile Include="src\Impl\Cache2\RecordPart.cs" />
@@ -464,7 +464,7 @@
     <Compile Include="src\Impl\Tree\FSharpUnionDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpUnspecifiedObjectTypeDeclaration.cs" />
     <Compile Include="src\Impl\Tree\LongIdentifier.cs" />
-    <Compile Include="src\Impl\Tree\ModuleDeclaration.cs" />
+    <Compile Include="src\Impl\Tree\TopLevelModuleDeclaration.cs" />
     <Compile Include="src\Impl\Tree\ModuleMemberDeclaration.cs" />
     <Compile Include="src\Impl\Tree\NestedModuleDeclaration.cs" />
     <Compile Include="src\Impl\Tree\NewLine.cs" />
@@ -499,9 +499,9 @@
     <Compile Include="src\Tree\IFSharpTypeElementDeclaration.cs" />
     <Compile Include="src\Tree\IFSharpUnionCaseDeclaration.cs" />
     <Compile Include="src\Tree\ILongIdentifier.cs" />
-    <Compile Include="src\Tree\IModuleDeclaration.cs" />
+    <Compile Include="src\Tree\ITopLevelModuleDeclaration.cs" />
     <Compile Include="src\Tree\IModuleLikeDeclaration.cs" />
-    <Compile Include="src\Tree\IModuleOrNamespaceDeclaration.cs" />
+    <Compile Include="src\Tree\ITopLevelModuleOrNamespaceDeclaration.cs" />
     <Compile Include="src\Tree\INestedModuleDeclaration.cs" />
     <Compile Include="src\Util\FSharpElementsUtil.cs" />
     <Compile Include="src\Util\FSharpRangeUtil.cs" />

@@ -56,7 +56,7 @@ fSharpImplFile options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpFileBase";
 }
 :
-  moduleOrNamespaceDeclaration<MODULE_OR_NAMESPACE_DECLARATION, Declarations>* FAKE
+  topLevelModuleOrNamespaceDeclaration<MODULE_OR_NAMESPACE_DECLARATION, Declarations>* FAKE
 ;
 
 fSharpSigFile options {
@@ -73,18 +73,19 @@ fSharpSigFile options {
 interface fSharpDeclaration
 :
   moduleLikeDeclaration |
-  moduleMemberDeclaration
+  moduleMemberDeclaration |
+  fSharpTypeDeclaration
 ;
 
 interface moduleLikeDeclaration
 :
-  moduleOrNamespaceDeclaration |
+  topLevelModuleOrNamespaceDeclaration |
   nestedModuleDeclaration
 ;
 
-interface moduleOrNamespaceDeclaration
+interface topLevelModuleOrNamespaceDeclaration
 :
-  moduleDeclaration |
+  topLevelModuleDeclaration |
   fSharpNamespaceDeclaration
 ;
 
@@ -93,16 +94,16 @@ fSharpNamespaceDeclaration options {
 }
 :
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>
-  moduleMemberDeclaration<MODULE_MEMBER, Declarations>* FAKE
+  moduleMember<MODULE_MEMBER, Members>* FAKE
 ;
 
-moduleDeclaration options {
+topLevelModuleDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
-  accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
+  accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>
-  moduleMemberDeclaration<MODULE_MEMBER, Declarations>* FAKE
+  moduleMember<MODULE_MEMBER, Members>* FAKE
 ;
 
 moduleOrNamespaceSignature : FAKE;
@@ -111,6 +112,13 @@ moduleOrNamespaceSignature : FAKE;
 
 // Module members
 
+interface moduleMember
+:
+  moduleMemberDeclaration |
+  moduleMemberStatement |
+  otherModuleMember
+;
+
 interface moduleMemberDeclaration
 :
   nestedModuleDeclaration |
@@ -118,13 +126,19 @@ interface moduleMemberDeclaration
   otherMemberDeclaration
 ;
 
+interface moduleMemberStatement
+:
+  open |
+  do
+;
+
 nestedModuleDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
-  accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
-  fSharpIdentifier<FS_IDENTIFIER, Identifier>
-  moduleMemberDeclaration<MODULE_MEMBER, Declarations>* FAKE
+  accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
+  fSharpIdentifier<IDENTIFIER, Identifier>
+  moduleMember<MODULE_MEMBER, Members>* FAKE
 ;
 
 interface fSharpTypeDeclaration
@@ -159,8 +173,8 @@ fSharpEnumDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
-  accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
-  fSharpIdentifier<FS_IDENTIFIER, Identifier>
+  accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
+  fSharpIdentifier<IDENTIFIER, Identifier>
 //  (fSharpEnumMemberDeclaration<FS_ENUM_MEMBER, EnumMemberDeclarations>)* FAKE
 ;
 
@@ -168,7 +182,7 @@ fSharpEnumDeclaration options {
 //  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpProperTypeMemberDeclarationBase";
 //}
 //:
-//  fSharpIdentifier<FS_IDENTIFIER, Identifier>
+//  fSharpIdentifier<IDENTIFIER, Identifier>
 //;
 
 
@@ -179,10 +193,10 @@ fSharpRecordDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
-  accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
-  fSharpIdentifier<FS_IDENTIFIER, Identifier>
+  accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
+  fSharpIdentifier<IDENTIFIER, Identifier>
 //  (fSharpFieldDeclaration<FS_FIELD, Fields>)* FAKE
-//  (fSharpTypeMemberDeclaration<FS_TYPE_MEMBER, Members>)* FAKE
+//  (fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>)* FAKE
 ;
 
 
@@ -193,10 +207,10 @@ fSharpUnionDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
-  accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
-  fSharpIdentifier<FS_IDENTIFIER, Identifier>
-  fSharpUnionCaseDeclaration<FS_UNION_CASE, Cases>* FAKE
-//  (fSharpTypeMemberDeclaration<FS_TYPE_MEMBER, Members>)* FAKE
+  accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
+  fSharpIdentifier<IDENTIFIER, Identifier>
+  fSharpUnionCaseDeclaration<UNION_CASE, Cases>* FAKE
+//  (fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>)* FAKE
 ;
 
 interface fSharpUnionCaseDeclaration
@@ -209,14 +223,14 @@ interface fSharpUnionCaseDeclaration
 //  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpProperTypeMemberDeclarationBase";
 //}
 //:
-//  fSharpIdentifier<FS_IDENTIFIER, Identifier>
+//  fSharpIdentifier<IDENTIFIER, Identifier>
 //;
 
 fSharpTypedUnionCaseDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
-  fSharpIdentifier<FS_IDENTIFIER, Identifier>
+  fSharpIdentifier<IDENTIFIER, Identifier>
 //  (fSharpReadOnlyFieldDeclaration<FS_FIELD, Fields>)* FAKE
 ;
 
@@ -228,28 +242,28 @@ fSharpExceptionDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
-  accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
-  fSharpIdentifier<FS_IDENTIFIER, Identifier>
+  accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
+  fSharpIdentifier<IDENTIFIER, Identifier>
 ;
 
 fSharpTypeAbbreviationDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
-  accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
-  fSharpIdentifier<FS_IDENTIFIER, Identifier>
+  accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
+  fSharpIdentifier<IDENTIFIER, Identifier>
 ;
 
 otherMemberDeclaration:
-  accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
-  fSharpIdentifier<FS_IDENTIFIER, Identifier>;
+  accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
+  fSharpIdentifier<IDENTIFIER, Identifier>;
 
 fSharpOtherSimpleTypeDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
-  accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
-  fSharpIdentifier<FS_IDENTIFIER, Identifier>
+  accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
+  fSharpIdentifier<IDENTIFIER, Identifier>
 ;
 
 
@@ -260,40 +274,40 @@ fSharpClassDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
-  (fSharpAttribute<FS_ATTRIBUTE, Attributes>)* FAKE
-  accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
-  fSharpIdentifier<FS_IDENTIFIER, Identifier>
-  (fSharpTypeMemberDeclaration<FS_TYPE_MEMBER, Members>)* FAKE
+  (fSharpAttribute<ATTRIBUTE, Attributes>)* FAKE
+  accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
+  fSharpIdentifier<IDENTIFIER, Identifier>
+  (fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>)* FAKE
 ;
 
 fSharpInterfaceDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
-  (fSharpAttribute<FS_ATTRIBUTE, Attributes>)* FAKE
-  accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
-  fSharpIdentifier<FS_IDENTIFIER, Identifier>
-  (fSharpTypeMemberDeclaration<FS_TYPE_MEMBER, Members>)* FAKE
+  (fSharpAttribute<ATTRIBUTE, Attributes>)* FAKE
+  accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
+  fSharpIdentifier<IDENTIFIER, Identifier>
+  (fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>)* FAKE
 ;
 
 fSharpStructDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
-  (fSharpAttribute<FS_ATTRIBUTE, Attributes>)* FAKE
-  accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
-  fSharpIdentifier<FS_IDENTIFIER, Identifier>
-  (fSharpTypeMemberDeclaration<FS_TYPE_MEMBER, Members>)* FAKE
+  (fSharpAttribute<ATTRIBUTE, Attributes>)* FAKE
+  accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
+  fSharpIdentifier<IDENTIFIER, Identifier>
+  (fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>)* FAKE
 ;
 
 fSharpUnspecifiedObjectTypeDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
-  (fSharpAttribute<FS_ATTRIBUTE, Attributes>)* FAKE
-  accessModifiers<FS_ACCESS_MODIFIERS, AccessModifiers>?
-  fSharpIdentifier<FS_IDENTIFIER, Identifier>
-  (fSharpTypeMemberDeclaration<FS_TYPE_MEMBER, Members>)* FAKE
+  (fSharpAttribute<ATTRIBUTE, Attributes>)* FAKE
+  accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
+  fSharpIdentifier<IDENTIFIER, Identifier>
+  (fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>)* FAKE
 ;
 
 interface fSharpTypeMemberDeclaration
@@ -314,17 +328,26 @@ interface fSharpTypeMemberDeclaration
 interfaceInherit : longIdentifier<LONG_IDENTIFIER, LongIdentifier> FAKE;
 typeInherit : longIdentifier<LONG_IDENTIFIER, LongIdentifier> FAKE;
 interfaceImplementation : longIdentifier<LONG_IDENTIFIER, LongIdentifier> FAKE;
+open : longIdentifier<LONG_IDENTIFIER, LongIdentifier> FAKE;
+do : FAKE;
 
 abstractSlot : FAKE;
 otherTypeMember : FAKE;
+otherModuleMember : FAKE;
+
 
 
 // Identifiers
+
 fSharpIdentifier : IDENTIFIER;
-longIdentifier: IDENTIFIER<FS_IDENTIFIER, Identifiers>*;
+
+longIdentifier: IDENTIFIER<IDENTIFIER, Identifiers>*;
+
+
 
 // Access modifiers
-accessModifiers: modifier{FS_ACCESS_MODIFIER, Modifiers}*;
+
+accessModifiers: modifier{ACCESS_MODIFIER, Modifiers}*;
 
 private modifier{ROLE,Getter}
 :
@@ -333,5 +356,8 @@ private modifier{ROLE,Getter}
   INTERNAL<@ROLE,@Getter>
 ;
 
+
+
 // Attributes
-fSharpAttribute : longIdentifier<FS_IDENTIFIER, LongIdentifier>; // todo: add constructor expressions
+
+fSharpAttribute : longIdentifier<IDENTIFIER, LongIdentifier>; // todo: add constructor expressions

@@ -1,6 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 {
-  internal partial class ModuleDeclaration
+  internal partial class TopLevelModuleDeclaration
   {
     public override string DeclaredName => LongIdentifier.QualifiedName;
     public string ShortName => LongIdentifier.Name;

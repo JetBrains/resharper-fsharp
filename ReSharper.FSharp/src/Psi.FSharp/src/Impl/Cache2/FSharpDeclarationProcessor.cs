@@ -38,9 +38,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       ProcessModuleLikeDeclaraion(decl, new DeclaredNamespacePart(decl));
     }
 
-    public override void VisitModuleDeclaration(IModuleDeclaration decl)
+    public override void VisitTopLevelModuleDeclaration(ITopLevelModuleDeclaration decl)
     {
-      ProcessModuleLikeDeclaraion(decl, new ModulePart(decl));
+      ProcessModuleLikeDeclaraion(decl, new TopLevelModulePart(decl));
     }
 
     public override void VisitNestedModuleDeclaration(INestedModuleDeclaration decl)
@@ -51,7 +51,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     private void ProcessModuleLikeDeclaraion(IModuleLikeDeclaration decl, Part part)
     {
       myBuilder.StartPart(part);
-      foreach (var memberDecl in decl.DeclarationsEnumerable)
+      foreach (var memberDecl in decl.MembersEnumerable)
         memberDecl.Accept(this);
       myBuilder.EndPart();
     }

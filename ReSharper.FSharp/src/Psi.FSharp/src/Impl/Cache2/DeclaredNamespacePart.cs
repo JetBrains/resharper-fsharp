@@ -6,7 +6,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
   public class DeclaredNamespacePart : NamespacePart
   {
-    public DeclaredNamespacePart(IModuleOrNamespaceDeclaration declaration)
+    public DeclaredNamespacePart(IFSharpNamespaceDeclaration declaration)
       : base(declaration, declaration.GetTreeStartOffset(), declaration.ShortName)
     {
     }

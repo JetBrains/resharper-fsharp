@@ -180,6 +180,12 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
             builder.Done(mark, ElementType.NESTED_MODULE_DECLARATION, null)
         | SynModuleDecl.Types(types,_) -> List.iter x.ProcessType types
         | SynModuleDecl.Exception(exceptionDefn,_) -> x.ProcessException exceptionDefn
+        | SynModuleDecl.Open(lidWithDots,range) ->
+            range |> x.GetStartOffset |> x.AdvanceToOffset
+            let openMark = builder.Mark()
+            x.ProcessLongIdentifier lidWithDots.Lid
+            range |> x.GetEndOffset |> x.AdvanceToOffset
+            builder.Done(openMark, ElementType.OPEN, null)
         | decl ->
             decl.Range |> x.GetStartOffset |> x.AdvanceToOffset
             let declMark = builder.Mark()
@@ -200,7 +206,7 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         List.iter x.ProcessModuleMember decls
 
         range |> x.GetEndOffset |> x.AdvanceToOffset
-        x.Done(mark, if isModule then ElementType.MODULE_DECLARATION else ElementType.F_SHARP_NAMESPACE_DECLARATION)
+        x.Done(mark, if isModule then ElementType.TOP_LEVEL_MODULE_DECLARATION else ElementType.F_SHARP_NAMESPACE_DECLARATION)
 
     override x.Builder = builder
     override x.NewLine = FSharpTokenType.NEW_LINE

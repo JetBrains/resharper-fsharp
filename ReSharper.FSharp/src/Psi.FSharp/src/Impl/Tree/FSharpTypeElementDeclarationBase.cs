@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
@@ -20,6 +21,10 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       return GetContainingNode<ITypeDeclaration>();
     }
 
+    /// <summary>
+    /// May take long time due to waiting for FCS
+    /// </summary>
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     public IEnumerable<IDeclaredType> SuperTypes
     {
       get
@@ -34,6 +39,10 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       }
     }
 
+    /// <summary>
+    /// May take long time due to waiting for FCS
+    /// </summary>
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     public IDeclaredType BaseClassType
     {
       get

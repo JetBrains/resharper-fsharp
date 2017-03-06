@@ -3,9 +3,9 @@ using JetBrains.Annotations;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
-  internal class FSharpModule : FSharpClassLikeElement<ModulePart>
+  internal class FSharpTopLevelModule : FSharpClassLikeElement<TopLevelModulePart>
   {
-    public FSharpModule([NotNull] IClassPart part) : base(part)
+    public FSharpTopLevelModule([NotNull] IClassPart part) : base(part)
     {
     }
 

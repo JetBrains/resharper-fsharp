@@ -21,7 +21,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
         case FSharpSerializationTag.QualifiedNamespacePart:
           return new QualifiedNamespacePart(reader);
         case FSharpSerializationTag.ModulePart:
-          return new ModulePart(reader);
+          return new TopLevelModulePart(reader);
         case FSharpSerializationTag.NestedModulePart:
           return new NestedModulePart(reader);
         case FSharpSerializationTag.ExceptionPart:
