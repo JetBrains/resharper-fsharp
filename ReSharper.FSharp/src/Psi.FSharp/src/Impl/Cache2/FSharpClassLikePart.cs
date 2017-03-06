@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
-using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
-using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
@@ -34,8 +32,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public virtual IDeclaredType GetBaseClassType()
     {
-      var entity = (GetDeclaration() as IFSharpTypeDeclaration)?.Symbol as FSharpEntity;
-      return entity != null ? FSharpElementsUtil.GetBaseType(entity, GetPsiModule()) : null;
+      return (GetDeclaration() as IFSharpTypeDeclaration)?.BaseClassType ??
+             GetPsiModule().GetPredefinedType().Object;
     }
   }
 }

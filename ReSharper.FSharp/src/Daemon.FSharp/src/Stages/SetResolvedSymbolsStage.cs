@@ -50,7 +50,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 
         if (symbolUse.IsFromDefinition)
         {
-          // todo: add other symbols (let bindings, local values, type members)
+          // todo: add other symbols (e.g let bindings, local values, type members), be careful with implicit constructors
           if (symbolUse.Symbol is FSharpEntity)
           {
             var declaration = token.GetContainingNode<IFSharpDeclaration>();

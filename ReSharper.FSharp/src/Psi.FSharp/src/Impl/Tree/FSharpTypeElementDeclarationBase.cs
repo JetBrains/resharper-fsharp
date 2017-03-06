@@ -25,18 +25,39 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       get
       {
         if (Symbol == null)
-        {
-          var fsFile = this.GetContainingFile() as IFSharpFile;
-          if (fsFile == null)
-            return EmptyList<IDeclaredType>.Instance;
-          Symbol = FSharpSymbolsUtil.TryFindFSharpSymbol(fsFile, GetText(), GetNameRange().EndOffset.Offset);
-        }
+          TryFindAndSetFSharpSymbol();
 
         var entity = Symbol as FSharpEntity;
         return entity != null
           ? FSharpElementsUtil.GetSuperTypes(entity, GetPsiModule())
           : EmptyList<IDeclaredType>.Instance;
       }
+    }
+
+    public IDeclaredType BaseClassType
+    {
+      get
+      {
+        if (Symbol == null)
+          TryFindAndSetFSharpSymbol();
+
+        var entity = Symbol as FSharpEntity;
+        return entity != null
+          ? FSharpElementsUtil.GetBaseType(entity, GetPsiModule())
+          : null;
+      }
+    }
+
+    private void TryFindAndSetFSharpSymbol()
+    {
+      var fsFile = this.GetContainingFile() as IFSharpFile;
+      Assertion.AssertNotNull(fsFile, "fsFile != null");
+
+      var symbol = FSharpSymbolsUtil.TryFindFSharpSymbol(fsFile, GetText(), GetNameRange().EndOffset.Offset);
+      var mfv = symbol as FSharpMemberOrFunctionOrValue;
+      Symbol = mfv != null && mfv.IsImplicitConstructor
+        ? mfv.EnclosingEntity
+        : symbol;
     }
 
     public TreeNodeCollection<ITypeMemberDeclaration> MemberDeclarations =>
