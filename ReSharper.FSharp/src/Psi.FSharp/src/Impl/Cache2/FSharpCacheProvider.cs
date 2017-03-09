@@ -74,7 +74,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public bool IsCachableTreeNode(ITreeNode treeNode)
     {
-      return treeNode is IFSharpDeclaration;
+      return false;
     }
 
     public NodeType GetNodeType(int index)
@@ -82,10 +82,10 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       return FSharpNodeTypeIndexer.Instance.GetNodeType(index);
     }
 
-    public string PersistentTreeNodeCacheUniqueId => "FSharpPersistentTreeNodeCache";
-    public string TokenCacheUniqueId => "FSharpTokenCache";
-    public string BufferCacheUniqueId => "FSharpBufferCache";
-    public string StubTreeNodeCacheUniqueId => "FSharpStubTreeNodeCache";
+    public string PersistentTreeNodeCacheUniqueId => null;
+    public string TokenCacheUniqueId => null;
+    public string BufferCacheUniqueId => null;
+    public string StubTreeNodeCacheUniqueId => null;
 
     public void SerializeMetadata(IFile file, UnsafeWriter bufferWriter)
     {
