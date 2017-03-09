@@ -216,6 +216,10 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         member x.CreateToken(tokenType, buffer, startOffset, endOffset) =
             tokenType.Create(buffer, TreeOffset(startOffset), TreeOffset(endOffset))
 
+    member private x.AdvanceToFileEnd () =
+        while not (isNull (builder.GetTokenType())) do
+                builder.AdvanceLexer() |> ignore
+
     member x.CreateFSharpFile() =
         let fileMark = builder.Mark()
 
@@ -226,7 +230,6 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
                 ElementType.F_SHARP_IMPL_FILE
             | ParsedInput.SigFile (ParsedSigFileInput(_)) -> ElementType.F_SHARP_SIG_FILE
 
-        ast.Range |> x.GetEndOffset |> x.AdvanceToOffset
-
+        x.AdvanceToFileEnd()
         x.Done(fileMark, elementType)
         x.GetTree() :> ICompositeElement
