@@ -17,8 +17,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
 
       public override LeafElementBase Create(IBuffer buffer, TreeOffset startOffset, TreeOffset endOffset)
       {
-        return this == IDENTIFIER || this == OPERATOR
-          ? new FSharpIdentifierToken(this, buffer, startOffset, endOffset)
+        if (this == IDENTIFIER || this == OPERATOR)
+          return new FSharpIdentifierToken(this, buffer, startOffset, endOffset);
+
+        return this == DEAD_CODE
+          ? new FSharpDeadCodeToken(this, buffer, startOffset, endOffset)
           : new FSharpToken(this, buffer, startOffset, endOffset);
       }
 

@@ -75,17 +75,76 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
           myCommitter(new DaemonStageResult(myHighlightings));
         }
 
-
-#pragma warning disable 672
-
-        public override void VisitModuleLikeDeclaration(IModuleLikeDeclaration module)
-#pragma warning restore 672
+        public override void VisitTopLevelModuleOrNamespaceDeclaration(ITopLevelModuleOrNamespaceDeclaration module)
         {
           foreach (var member in module.MembersEnumerable)
           {
             member.Accept(this);
             myInterruptChecker.CheckForInterrupt();
           }
+
+          var ids = module.LongIdentifier.Identifiers;
+          if (ids.IsEmpty) return;
+
+          foreach (var ns in module.LongIdentifier.Qualifiers)
+            myHighlightings.Add(CreateHighlighting(ns, HighlightingAttributeIds.NAMESPACE_IDENTIFIER_ATTRIBUTE));
+
+          var highlightingAttrId = module.IsModule
+            ? HighlightingAttributeIds.TYPE_STATIC_CLASS_ATTRIBUTE
+            : HighlightingAttributeIds.NAMESPACE_IDENTIFIER_ATTRIBUTE;
+
+          var nameToken = ids.Last();
+          myHighlightings.Add(CreateHighlighting(nameToken, highlightingAttrId));
+        }
+
+        public override void VisitNestedModuleDeclaration(INestedModuleDeclaration module)
+        {
+          var range = module.Identifier.GetDocumentRange();
+          myHighlightings.Add(new HighlightingInfo(range,
+            new FSharpIdentifierHighlighting(HighlightingAttributeIds.TYPE_STATIC_CLASS_ATTRIBUTE, range)));
+
+          foreach (var member in module.MembersEnumerable)
+          {
+            member.Accept(this);
+            myInterruptChecker.CheckForInterrupt();
+          }
+        }
+
+        public override void VisitFSharpExceptionDeclaration(IFSharpExceptionDeclaration exn)
+        {
+          var range = exn.Identifier.GetDocumentRange();
+          myHighlightings.Add(new HighlightingInfo(range,
+            new FSharpIdentifierHighlighting(HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE, range)));
+        }
+
+        public override void VisitFSharpObjectModelTypeDeclaration(IFSharpObjectModelTypeDeclaration type)
+        {
+          var range = type.Identifier.GetDocumentRange();
+          myHighlightings.Add(new HighlightingInfo(range,
+            new FSharpIdentifierHighlighting(GetHighlightingAttributeId(type.TypeKind), range)));
+        }
+
+        [NotNull]
+        private string GetHighlightingAttributeId(FSharpObjectModelTypeKind kind)
+        {
+          switch (kind)
+          {
+            case FSharpObjectModelTypeKind.Class:
+              return HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE;
+            case FSharpObjectModelTypeKind.Interface:
+              return HighlightingAttributeIds.TYPE_INTERFACE_ATTRIBUTE;
+            case FSharpObjectModelTypeKind.Struct:
+              return HighlightingAttributeIds.TYPE_STRUCT_ATTRIBUTE;
+            default:
+              throw new ArgumentOutOfRangeException(nameof(kind), kind, null);
+          }
+        }
+
+        public override void VisitFSharpSimpleTypeDeclaration(IFSharpSimpleTypeDeclaration type)
+        {
+          var range = type.Identifier.GetDocumentRange();
+          myHighlightings.Add(new HighlightingInfo(range,
+            new FSharpIdentifierHighlighting(HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE, range)));
         }
 
         public override void VisitOpen(IOpen open)
@@ -125,6 +184,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
           myHighlightings.Add(CreateHighlighting(ids[idsCount - 1], highlightingAttrId));
         }
 
+        [NotNull]
         private static HighlightingInfo CreateHighlighting(ITreeNode token, string highlightingAttributeId)
         {
           var range = token.GetNavigationRange();

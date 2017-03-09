@@ -447,6 +447,7 @@
     <Compile Include="src\Impl\Tree\FSharpCachedDeclarationBase.cs" />
     <Compile Include="src\Impl\Tree\FSharpClassDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpCompositeElement.cs" />
+    <Compile Include="src\Impl\Tree\FSharpDeadCodeToken.cs" />
     <Compile Include="src\Impl\Tree\FSharpEnumDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpExceptionDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpFileBase.cs" />

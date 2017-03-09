@@ -20,6 +20,15 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
       return ids.IsEmpty ? TreeTextRange.InvalidRange : ids.Last().GetTreeTextRange();
     }
 
+    [CanBeNull]
+    public static ITokenNode GetNameToken([CanBeNull] this ILongIdentifier longIdentifier)
+    {
+      if (longIdentifier == null) return null;
+
+      var ids = longIdentifier.Identifiers;
+      return ids.IsEmpty ? null : ids.Last();
+    }
+
     [NotNull]
     public static string GetName([CanBeNull] this IFSharpIdentifier identifier)
     {
