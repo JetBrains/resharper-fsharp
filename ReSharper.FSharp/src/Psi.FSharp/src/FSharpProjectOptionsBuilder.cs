@@ -37,6 +37,8 @@ namespace JetBrains.ReSharper.Psi.FSharp
       using (ReadLockCookie.Create())
       {
         var buildSettings = project.ProjectProperties.BuildSettings as IManagedProjectBuildSettings;
+        var configuration =
+          project.ProjectProperties.ActiveConfigurations.Configurations.SingleItem() as IManagedProjectConfiguration;
         var projectOptions = new List<string>
         {
           "--out:" + project.GetOutputFilePath(project.GetCurrentTargetFrameworkId()),
@@ -50,12 +52,24 @@ namespace JetBrains.ReSharper.Psi.FSharp
           "--flaterrors",
           "--highentropyva+",
           "--target:" + GetOutputTarget(buildSettings),
-          "--platform:anycpu" // todo
-//          "--warnon:", // todo
-//          xml doc // todo
+          "--platform:anycpu", // todo
         };
 
-        projectOptions.addAll(GetDefines(project).Convert(s => "--define:" + s));
+        if (configuration != null)
+        {
+          projectOptions.addAll(SplitDefines(configuration.DefineConstants).Convert(s => "--define:" + s));
+
+          var doc = configuration.DocumentationFile;
+          if (!doc.IsNullOrWhitespace()) projectOptions.Add("--doc:" + doc);
+
+          var nowarn = configuration.NoWarn;
+          if (!nowarn.IsNullOrWhitespace()) projectOptions.Add("--nowarn:" + nowarn);
+
+          projectOptions.Add("--warn:" + configuration.WarningLevel);
+
+          // todo: add F# specific options like 'warnon'
+        }
+
         projectOptions.addAll(GetReferencedPathsOptions(project));
 
         var projectFileNames = new List<string>();
@@ -91,7 +105,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
       }
     }
 
-    private string GetOutputTarget([CanBeNull] IManagedProjectBuildSettings buildSettings)
+    private static string GetOutputTarget([CanBeNull] IManagedProjectBuildSettings buildSettings)
     {
       if (buildSettings != null && buildSettings.OutputType == ProjectOutputType.CONSOLE_EXE)
         return "exe";
@@ -102,8 +116,16 @@ namespace JetBrains.ReSharper.Psi.FSharp
     private FileSystemPath EnsureAbsolute([NotNull] FileSystemPath path, [NotNull] FileSystemPath projectDirectory)
     {
       var relativePath = path.AsRelative();
-      if (relativePath == null) return path;
-      return projectDirectory.Combine(relativePath);
+      return relativePath != null
+        ? projectDirectory.Combine(relativePath)
+        : path;
+    }
+
+    private static string[] SplitDefines([CanBeNull] string definesString)
+    {
+      return string.IsNullOrEmpty(definesString)
+        ? EmptyArray<string>.Instance
+        : definesString.Split(';', ',', ' ').Select(x => x.Trim()).Where(s => !s.IsEmpty()).ToArray();
     }
 
     /// <summary>
@@ -114,11 +136,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
     {
       var configuration =
         project.ProjectProperties.ActiveConfigurations.Configurations.SingleItem() as IManagedProjectConfiguration;
-      var definesString = configuration?.DefineConstants;
-
-      return string.IsNullOrEmpty(definesString)
-        ? EmptyArray<string>.Instance
-        : definesString.Split(';', ',', ' ').Select(x => x.Trim()).Where(s => !s.IsEmpty()).ToArray();
+      return SplitDefines(configuration?.DefineConstants);
     }
 
     [NotNull]
