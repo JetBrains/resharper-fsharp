@@ -99,9 +99,8 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 
         public override void VisitNestedModuleDeclaration(INestedModuleDeclaration module)
         {
-          var range = module.Identifier.GetDocumentRange();
-          myHighlightings.Add(new HighlightingInfo(range,
-            new FSharpIdentifierHighlighting(HighlightingAttributeIds.TYPE_STATIC_CLASS_ATTRIBUTE, range)));
+          myHighlightings.Add(CreateHighlighting(module.Identifier.IdentifierToken,
+            HighlightingAttributeIds.TYPE_STATIC_CLASS_ATTRIBUTE));
 
           foreach (var member in module.MembersEnumerable)
           {
@@ -112,16 +111,14 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 
         public override void VisitFSharpExceptionDeclaration(IFSharpExceptionDeclaration exn)
         {
-          var range = exn.Identifier.GetDocumentRange();
-          myHighlightings.Add(new HighlightingInfo(range,
-            new FSharpIdentifierHighlighting(HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE, range)));
+          myHighlightings.Add(CreateHighlighting(exn.Identifier.IdentifierToken,
+            HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE));
         }
 
         public override void VisitFSharpObjectModelTypeDeclaration(IFSharpObjectModelTypeDeclaration type)
         {
-          var range = type.Identifier.GetDocumentRange();
-          myHighlightings.Add(new HighlightingInfo(range,
-            new FSharpIdentifierHighlighting(GetHighlightingAttributeId(type.TypeKind), range)));
+          myHighlightings.Add(CreateHighlighting(type.Identifier.IdentifierToken,
+            GetHighlightingAttributeId(type.TypeKind)));
         }
 
         [NotNull]
@@ -142,9 +139,8 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 
         public override void VisitFSharpSimpleTypeDeclaration(IFSharpSimpleTypeDeclaration type)
         {
-          var range = type.Identifier.GetDocumentRange();
-          myHighlightings.Add(new HighlightingInfo(range,
-            new FSharpIdentifierHighlighting(HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE, range)));
+          myHighlightings.Add(CreateHighlighting(type.Identifier.IdentifierToken,
+            HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE));
         }
 
         public override void VisitOpen(IOpen open)

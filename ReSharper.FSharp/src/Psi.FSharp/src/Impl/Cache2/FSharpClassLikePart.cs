@@ -9,12 +9,12 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
   public abstract class FSharpClassLikePart<TDeclaration> : FSharpTypePart<TDeclaration>,
     ClassLikeTypeElement.IClassLikePart where TDeclaration : class, ITypeDeclaration
   {
-    protected FSharpClassLikePart(IReader reader) : base(reader)
+    protected FSharpClassLikePart(TDeclaration declaration, string shortName, MemberDecoration memberDecoration,
+      int typeParameters = 0) : base(declaration, shortName, memberDecoration, typeParameters)
     {
     }
 
-    protected FSharpClassLikePart(TDeclaration declaration, string shortName, MemberDecoration memberDecoration,
-      int typeParameters = 0) : base(declaration, shortName, memberDecoration, typeParameters)
+    protected FSharpClassLikePart(IReader reader) : base(reader)
     {
     }
 

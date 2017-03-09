@@ -32,10 +32,10 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         x.Done(mark, ElementType.F_SHARP_IDENTIFIER)
     
     /// Should be called on access modifiers start offset.
-    /// Always goes right before identifier.
-    member private x.ProcessAccessModifiers (endOffset : int) =
+    /// Modifiers always go right before an identifier.
+    member private x.ProcessAccessModifiers (id: Ident) =
         let accessModifiersMark = builder.Mark()
-        x.AdvanceToOffset endOffset
+        x.AdvanceToOffset (x.GetStartOffset id.idRange)
         builder.Done(accessModifiersMark, ElementType.ACCESS_MODIFIERS, null)
 
     member private x.ProcessException (SynExceptionDefn(SynExceptionDefnRepr(_,(UnionCase(_,id,_,_,_,_)),_,_,_,_),_,range)) =
@@ -43,7 +43,7 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
             let mark = builder.Mark()
             builder.AdvanceLexer() |> ignore // ignore keyword token
 
-            x.ProcessAccessModifiers (x.GetStartOffset id.idRange)
+            x.ProcessAccessModifiers id
             x.ProcessIdentifier id
 
             range |> x.GetEndOffset |> x.AdvanceToOffset
@@ -130,7 +130,7 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         List.iter x.ProcessAttribute attributes
         
         let id = lid.Head
-        x.ProcessAccessModifiers (x.GetStartOffset id.idRange)
+        x.ProcessAccessModifiers id
         x.ProcessIdentifier id
 
         let elementType =
@@ -170,7 +170,7 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
             builder.AdvanceLexer() |> ignore // ignore keyword token
 
             let id = List.head lid 
-            x.ProcessAccessModifiers (x.GetStartOffset id.idRange)
+            x.ProcessAccessModifiers id
             x.ProcessIdentifier id // always single identifier or not parsed at all instead
 
             List.iter x.ProcessModuleMember decls
@@ -195,12 +195,11 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         // When top level namespace or module identifier is missing
         // its ident name is replaced with file name and the range is 1,0-1,0.
         
-        let lidStartOffset = x.GetStartOffset lid.Head.idRange
-        x.AdvanceToKeywordOrOffset (if isModule then "module" else "namespace") lidStartOffset
+        x.AdvanceToKeywordOrOffset (if isModule then "module" else "namespace") (x.GetStartOffset lid.Head.idRange)
         let mark = builder.Mark()
         builder.AdvanceLexer() |> ignore // ignore keyword token
 
-        if isModule then x.ProcessAccessModifiers lidStartOffset
+        if isModule then x.ProcessAccessModifiers lid.Head
         x.ProcessLongIdentifier lid
         List.iter x.ProcessModuleMember decls
 
