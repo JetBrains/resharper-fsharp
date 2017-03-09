@@ -7,6 +7,7 @@ using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.Descriptions;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.FSharp;
+using JetBrains.ReSharper.Psi.FSharp.Impl;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Tree;
@@ -44,20 +45,22 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
       var documentRange = new DocumentRange(document, highlighter.Range);
       var psiFile = GetPsiFile(sourceFile, documentRange) as IFSharpFile;
       var checkResults = psiFile?.GetCheckResults();
-      var token = psiFile?.FindTokenAt(documentRange.StartOffset) as FSharpToken;
+      var token = psiFile?.FindTokenAt(documentRange.StartOffset) as FSharpIdentifierToken;
       if (checkResults == null || token == null) return string.Empty;
 
-      var coords = document.GetCoordsByOffset(highlighter.Range.EndOffset);
-      var names = new[] {token.GetText()}; // todo: provide qualifiers
-      return GetTooltip(checkResults, names, coords);
+      var coords = document.GetCoordsByOffset(token.GetTreeEndOffset().Offset);
+      var names = FSharpImplUtil.GetQualifiersAndName(token);
+      var lineText = sourceFile.Document.GetLineText(coords.Line);
+      return GetTooltip(checkResults, names, coords, lineText);
     }
 
-
-    private static string GetTooltip(FSharpCheckFileResults checkResults, string[] names, DocumentCoords coords)
+    [NotNull]
+    private static string GetTooltip([NotNull] FSharpCheckFileResults checkResults, [NotNull] string[] names,
+      DocumentCoords coords, [NotNull] string lineText)
     {
       // todo: provide tooltip for #r strings in fsx, should pass String tag
       var getTooltipAsync = checkResults.GetToolTipTextAlternate((int) coords.Line + 1,
-        (int) coords.Column, string.Empty, ListModule.OfArray(names), FSharpTokenTag.Identifier);
+        (int) coords.Column, lineText, ListModule.OfArray(names), FSharpTokenTag.Identifier);
 
       var tooltips = FSharpAsync.RunSynchronously(getTooltipAsync, null, null).Item;
       var tooltipsTexts = new List<string>();
@@ -71,7 +74,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
         if (overloads != null)
           tooltipsTexts.AddRange(overloads.Item.Select(overload => GetTooltipText(overload.Item1, overload.Item2)));
       }
-      return tooltipsTexts.Join("\n----\n");
+      return tooltipsTexts.Join("_RIDER_HORIZONTAL_LINE_TOOLTIP_SEPARATOR_");
     }
 
     [CanBeNull]

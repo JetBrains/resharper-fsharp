@@ -13,8 +13,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
     public FSharpSymbol FSharpSymbol { get; set; }
 
     public FSharpIdentifierToken(NodeType nodeType, [NotNull] IBuffer buffer, TreeOffset startOffset,
-      TreeOffset endOffset)
-      : base(nodeType, buffer, startOffset, endOffset)
+      TreeOffset endOffset) : base(nodeType, buffer, startOffset, endOffset)
     {
     }
 

@@ -399,7 +399,7 @@
     <Compile Include="src\Stages\ErrorsStageProcess.cs" />
     <Compile Include="src\Stages\FSharpDaemonStageProcessBase.cs" />
     <Compile Include="src\Stages\FSharpIdentifierTooltipProvider.cs" />
-    <Compile Include="src\Stages\IdentifiersHighlightStage.cs" />
+    <Compile Include="src\Stages\ResolvedIdentifiersHighlightStage.cs" />
     <Compile Include="src\Stages\SetResolvedSymbolsStage.cs" />
     <Compile Include="src\Stages\SyntaxErrorsStage.cs" />
     <Compile Include="src\Stages\SyntaxHighlightingStage.cs" />

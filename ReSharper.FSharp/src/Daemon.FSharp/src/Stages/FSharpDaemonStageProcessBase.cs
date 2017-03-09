@@ -6,7 +6,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 {
   public abstract class FSharpDaemonStageProcessBase : IDaemonStageProcess
   {
-    protected readonly int InterruptCheckTime = 100;
+    private const int InterruptCheckTime = 100;
     protected readonly SeldomInterruptCheckerWithCheckTime SeldomInterruptChecker;
 
     protected FSharpDaemonStageProcessBase(IDaemonProcess daemonProcess)

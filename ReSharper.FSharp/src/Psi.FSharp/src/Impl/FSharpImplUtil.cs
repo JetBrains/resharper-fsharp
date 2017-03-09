@@ -1,8 +1,11 @@
 ﻿using System.Text;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
+using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
+using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl
 {
@@ -26,6 +29,24 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
     public static TreeTextRange GetNameRange([CanBeNull] this IFSharpIdentifier identifier)
     {
       return identifier?.GetTreeTextRange() ?? TreeTextRange.InvalidRange;
+    }
+
+    /// <summary>
+    /// Get name and qualifiers without backticks. Qualifiers added if the token is in ILongIdentifier.
+    /// </summary>
+    [NotNull]
+    public static string[] GetQualifiersAndName(FSharpIdentifierToken token)
+    {
+      var longIdentifier = token.Parent as ILongIdentifier;
+      if (longIdentifier == null) return new[] {FSharpNamesUtil.RemoveBackticks(token.GetText())};
+
+      var names = new FrugalLocalHashSet<string>();
+      foreach (var id in longIdentifier.IdentifiersEnumerable)
+      {
+        names.Add(FSharpNamesUtil.RemoveBackticks(id.GetText()));
+        if (id == token) break;
+      }
+      return names.ToArray();
     }
 
     [NotNull]

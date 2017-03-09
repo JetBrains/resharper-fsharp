@@ -10,12 +10,11 @@ open JetBrains.Util.dataStructures.TypedIntrinsics
 open Microsoft.FSharp.Compiler.Ast
 open Microsoft.FSharp.Compiler
 
-type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput, lifetime) =
+type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput, lifetime) as this =
     inherit TreeStructureBuilderBase(lifetime)
 
     let document = file.Document
-    let tokenFactory = FSharpPsiBuilderTokenFactory()
-    let builder = PsiBuilder(lexer, ElementType.F_SHARP_IMPL_FILE, tokenFactory, lifetime)
+    let builder = PsiBuilder(lexer, ElementType.F_SHARP_IMPL_FILE, this, lifetime)
 
     member private x.GetLineOffset line = document.GetLineStartOffset(line - 1 |> Int32.op_Explicit)
     member private x.GetStartOffset (range : Range.range) = x.GetLineOffset range.StartLine + range.StartColumn
@@ -212,6 +211,10 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
     override x.NewLine = FSharpTokenType.NEW_LINE
     override x.CommentsOrWhiteSpacesTokens = FSharpTokenType.CommentsOrWhitespaces
     override x.GetExpectedMessage(name) = NotImplementedException() |> raise
+    
+    interface IPsiBuilderTokenFactory with
+        member x.CreateToken(tokenType, buffer, startOffset, endOffset) =
+            tokenType.Create(buffer, TreeOffset(startOffset), TreeOffset(endOffset))
 
     member x.CreateFSharpFile() =
         let fileMark = builder.Mark()
@@ -227,5 +230,3 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
 
         x.Done(fileMark, elementType)
         x.GetTree() :> ICompositeElement
-
-

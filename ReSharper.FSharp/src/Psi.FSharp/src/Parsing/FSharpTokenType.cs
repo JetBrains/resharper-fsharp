@@ -17,7 +17,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
 
       public override LeafElementBase Create(IBuffer buffer, TreeOffset startOffset, TreeOffset endOffset)
       {
-        return new FSharpToken(this, buffer, startOffset, endOffset);
+        return this == IDENTIFIER || this == OPERATOR
+          ? new FSharpIdentifierToken(this, buffer, startOffset, endOffset)
+          : new FSharpToken(this, buffer, startOffset, endOffset);
       }
 
       public override bool IsWhitespace => this == WHITESPACE || this == NEW_LINE;

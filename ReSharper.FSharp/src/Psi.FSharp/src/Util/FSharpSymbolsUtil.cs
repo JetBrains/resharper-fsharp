@@ -11,7 +11,13 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
   public class FSharpSymbolsUtil
   {
     [CanBeNull]
-    public static FSharpSymbol TryFindFSharpSymbol([NotNull] IFSharpFile fsFile, [NotNull] string name,
+    public static FSharpSymbol TryFindFSharpSymbol([NotNull] IFSharpFile fsFile, [NotNull] string name, int offset)
+    {
+      return TryFindFSharpSymbol(fsFile, ListModule.OfArray(new[] {name}), offset);
+    }
+
+    [CanBeNull]
+    public static FSharpSymbol TryFindFSharpSymbol([NotNull] IFSharpFile fsFile, [NotNull] FSharpList<string> names,
       int offset)
     {
       var sourceFile = fsFile.GetSourceFile();
@@ -21,8 +27,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
         return null;
 
       var coords = sourceFile.Document.GetCoordsByOffset(offset);
-      var names = ListModule.OfArray(new[] {name});
-      var lineText = sourceFile?.Document.GetLineText(coords.Line);
+      var lineText = sourceFile.Document.GetLineText(coords.Line);
       var findSymbolAsync =
         checkResults.GetSymbolUseAtLocation((int) coords.Line + 1, (int) coords.Column, lineText, names);
       try
