@@ -149,7 +149,7 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
                 | SynTypeDefnSimpleRepr.TypeAbbrev(_) ->
                     ElementType.F_SHARP_TYPE_ABBREVIATION_DECLARATION
                 | SynTypeDefnSimpleRepr.None(_) ->
-                    ElementType.F_SHARP_ABSTRACT_TYPE_DEFINITION
+                    ElementType.F_SHARP_ABSTRACT_TYPE_DECLARATION
                 | _ -> ElementType.F_SHARP_OTHER_SIMPLE_TYPE_DECLARATION
             | SynTypeDefnRepr.Exception(_) ->
                 ElementType.F_SHARP_EXCEPTION_DECLARATION
@@ -165,7 +165,8 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         range |> x.GetEndOffset |> x.AdvanceToOffset
         builder.Done(mark, elementType , null)
 
-    member private x.ProcessModuleMember = function
+    member private x.ProcessModuleMember moduleMember =
+        match moduleMember with
         | SynModuleDecl.NestedModule(ComponentInfo(_,_,_,lid,_,_,_,_),_,decls,_,range) as decl ->
             range |> x.GetStartOffset |> x.AdvanceToOffset
             let mark = builder.Mark()
@@ -178,7 +179,7 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
             List.iter x.ProcessModuleMember decls
 
             decl.Range |> x.GetEndOffset |> x.AdvanceToOffset
-            builder.Done(mark, ElementType.NESTED_MODULE_DECLARATION, null)
+            x.Done(mark, ElementType.NESTED_MODULE_DECLARATION)
         | SynModuleDecl.Types(types,_) -> List.iter x.ProcessType types
         | SynModuleDecl.Exception(exceptionDefn,_) -> x.ProcessException exceptionDefn
         | SynModuleDecl.Open(lidWithDots,range) ->
@@ -186,12 +187,12 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
             let openMark = builder.Mark()
             x.ProcessLongIdentifier lidWithDots.Lid
             range |> x.GetEndOffset |> x.AdvanceToOffset
-            builder.Done(openMark, ElementType.OPEN, null)
+            x.Done(openMark, ElementType.OPEN)
         | decl ->
             decl.Range |> x.GetStartOffset |> x.AdvanceToOffset
             let declMark = builder.Mark()
             decl.Range |> x.GetEndOffset |> x.AdvanceToOffset
-            builder.Done(declMark, ElementType.OTHER_MEMBER_DECLARATION, null)
+            x.Done(declMark, ElementType.OTHER_MEMBER_DECLARATION)
 
     member private x.ProcessModuleOrNamespace (SynModuleOrNamespace(lid,_,isModule,decls,_,_,_,range)) =
         // When top level namespace or module identifier is missing
