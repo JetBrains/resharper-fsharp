@@ -158,7 +158,13 @@ interface fSharpSimpleTypeDeclaration
   fSharpEnumDeclaration |
   fSharpRecordDeclaration |
   fSharpUnionDeclaration |
+  fSharpNotCompiledTypeDeclaration
+;
+
+interface fSharpNotCompiledTypeDeclaration
+:
   fSharpTypeAbbreviationDeclaration |
+  fSharpAbstractTypeDeclaration |
   fSharpOtherSimpleTypeDeclaration
 ;
 
@@ -259,9 +265,11 @@ fSharpTypeAbbreviationDeclaration options {
   fSharpIdentifier<IDENTIFIER, Identifier>
 ;
 
-otherMemberDeclaration:
+otherMemberDeclaration
+:
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
-  fSharpIdentifier<IDENTIFIER, Identifier>;
+  fSharpIdentifier<IDENTIFIER, Identifier>
+;
 
 fSharpOtherSimpleTypeDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
@@ -271,6 +279,13 @@ fSharpOtherSimpleTypeDeclaration options {
   fSharpIdentifier<IDENTIFIER, Identifier>
 ;
 
+fSharpAbstractTypeDeclaration options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
+}
+:
+  accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
+  fSharpIdentifier<IDENTIFIER, Identifier>
+;
 
 
 // Object model type declarations

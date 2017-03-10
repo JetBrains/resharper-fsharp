@@ -70,14 +70,21 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
     }
 
     public TreeNodeCollection<ITypeMemberDeclaration> MemberDeclarations =>
-      this.Children<ITypeMemberDeclaration>()
-        .Where(c => !(c is IFSharpTypeAbbreviationDeclaration))
-        .ToTreeNodeCollection();
+      this.Children<ITypeMemberDeclaration>().Where(IsCompiledElementDeclaration).ToTreeNodeCollection();
+
+    private static bool IsCompiledElementDeclaration(ITypeMemberDeclaration decl)
+    {
+      if (decl is ITypeDeclaration)
+        return !(decl is IFSharpNotCompiledTypeDeclaration);
+
+      return true; // todo: update when type members added
+    }
 
     public string CLRName => FSharpImplUtil.MakeClrName(this);
 
     // todo
     public TreeNodeCollection<ITypeDeclaration> NestedTypeDeclarations => TreeNodeCollection<ITypeDeclaration>.Empty;
+
     public IList<ITypeDeclaration> TypeDeclarations => EmptyList<ITypeDeclaration>.Instance;
   }
 }

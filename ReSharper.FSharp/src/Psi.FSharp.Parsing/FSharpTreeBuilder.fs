@@ -148,6 +148,8 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
                     ElementType.F_SHARP_UNION_DECLARATION
                 | SynTypeDefnSimpleRepr.TypeAbbrev(_) ->
                     ElementType.F_SHARP_TYPE_ABBREVIATION_DECLARATION
+                | SynTypeDefnSimpleRepr.None(_) ->
+                    ElementType.F_SHARP_ABSTRACT_TYPE_DEFINITION
                 | _ -> ElementType.F_SHARP_OTHER_SIMPLE_TYPE_DECLARATION
             | SynTypeDefnRepr.Exception(_) ->
                 ElementType.F_SHARP_EXCEPTION_DECLARATION

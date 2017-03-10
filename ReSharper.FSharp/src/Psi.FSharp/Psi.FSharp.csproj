@@ -444,6 +444,7 @@
     <Compile Include="src\Impl\FSharpReferenceBase.cs" />
     <Compile Include="src\Impl\FSharpUnresolvedReference.cs" />
     <Compile Include="src\Impl\ModifiersUtil.cs" />
+    <Compile Include="src\Impl\Tree\FSharpAbstractTypeDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpCachedDeclarationBase.cs" />
     <Compile Include="src\Impl\Tree\FSharpClassDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpCompositeElement.cs" />
