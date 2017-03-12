@@ -7,8 +7,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
   public abstract class FSharpObjectModelTypePart : FSharpClassLikePart<IFSharpObjectModelTypeDeclaration>
   {
     protected FSharpObjectModelTypePart(IFSharpObjectModelTypeDeclaration declaration)
-      : base(declaration, declaration.DeclaredName,
-        ModifiersUtil.GetDecoration(declaration.AccessModifiers), declaration.TypeParameters.Count)
+      : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifiers), declaration.TypeParameters.Count)
     {
       var extendListShortNames = new FrugalLocalHashSet<string>();
       foreach (var member in declaration.MembersEnumerable)

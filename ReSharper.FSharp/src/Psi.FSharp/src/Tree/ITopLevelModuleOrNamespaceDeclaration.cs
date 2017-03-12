@@ -2,6 +2,5 @@
 {
   public partial interface ITopLevelModuleOrNamespaceDeclaration
   {
-    string ShortName { get; }
   }
 }

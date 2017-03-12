@@ -3,7 +3,7 @@
   internal partial class TopLevelModuleDeclaration
   {
     public override string DeclaredName => LongIdentifier.QualifiedName;
-    public string ShortName => LongIdentifier.Name;
+    public override string ShortName => LongIdentifier.Name;
     public bool IsModule => true;
 
     public override TreeTextRange GetNameRange()

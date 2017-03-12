@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
@@ -8,12 +9,12 @@ using JetBrains.Util;
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
   public abstract class FSharpTypePart<TDeclaration> : TypePartImplBase<TDeclaration>
-    where TDeclaration : class, ITypeDeclaration
+    where TDeclaration : class, IFSharpDeclaration, ITypeDeclaration
   {
     private readonly MemberDecoration myDecoration;
 
-    protected FSharpTypePart(TDeclaration declaration, string shortName, MemberDecoration memberDecoration,
-      int typeParameters = 0) : base(declaration, shortName, typeParameters)
+    protected FSharpTypePart(TDeclaration declaration, MemberDecoration memberDecoration,
+      int typeParameters = 0) : base(declaration, declaration.ShortName, typeParameters)
     {
       myDecoration = memberDecoration;
 

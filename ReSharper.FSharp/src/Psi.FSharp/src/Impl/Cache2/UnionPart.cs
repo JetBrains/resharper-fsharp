@@ -8,8 +8,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     private static readonly string[] ourExtendsListShortNames =
       {"IStructuralEquatable", "IStructuralComparable", "IComparable"};
 
-    public UnionPart(IFSharpUnionDeclaration declaration) : base(declaration, declaration.DeclaredName,
-      ModifiersUtil.GetDecoration(declaration.AccessModifiers), declaration.TypeParameters.Count)
+    public UnionPart(IFSharpUnionDeclaration declaration) :
+      base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifiers), declaration.TypeParameters.Count)
     {
     }
 

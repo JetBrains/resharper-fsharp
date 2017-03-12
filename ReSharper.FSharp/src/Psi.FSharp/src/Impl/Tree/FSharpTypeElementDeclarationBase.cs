@@ -12,6 +12,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
   internal abstract class FSharpTypeElementDeclarationBase : FSharpCachedDeclarationBase, IFSharpTypeElementDeclaration
   {
     public FSharpSymbol Symbol { get; set; }
+    public virtual string ShortName => DeclaredName;
 
     ITypeMember ITypeMemberDeclaration.DeclaredElement => (ITypeMember) DeclaredElement;
     ITypeElement ITypeDeclaration.DeclaredElement => (ITypeElement) DeclaredElement;

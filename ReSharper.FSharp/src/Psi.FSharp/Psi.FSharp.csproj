@@ -467,7 +467,7 @@
     <Compile Include="src\Impl\Tree\FSharpUnspecifiedObjectTypeDeclaration.cs" />
     <Compile Include="src\Impl\Tree\LongIdentifier.cs" />
     <Compile Include="src\Impl\Tree\TopLevelModuleDeclaration.cs" />
-    <Compile Include="src\Impl\Tree\ModuleMemberDeclaration.cs" />
+    <Compile Include="src\Impl\Tree\OtherMemberDeclaration.cs" />
     <Compile Include="src\Impl\Tree\NestedModuleDeclaration.cs" />
     <Compile Include="src\Impl\Tree\NewLine.cs" />
     <Compile Include="src\Impl\Tree\Whitespace.cs" />
