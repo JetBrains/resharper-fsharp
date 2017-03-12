@@ -38,16 +38,23 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         x.AdvanceToOffset (x.GetStartOffset id.idRange)
         builder.Done(accessModifiersMark, ElementType.ACCESS_MODIFIERS, null)
 
+    member private x.ProcessTypeParameter (TyparDecl(_,(Typar(id,_,_)))) =
+        x.AdvanceToOffset (x.GetStartOffset id.idRange)
+        let mark = builder.Mark()
+        x.ProcessIdentifier id
+        x.Done(mark, ElementType.TYPE_PARAMETER_DECLARATION)
+        
+
     member private x.ProcessException (SynExceptionDefn(SynExceptionDefnRepr(_,(UnionCase(_,id,_,_,_,_)),_,_,_,_),_,range)) =
-            range |> x.GetStartOffset |> x.AdvanceToOffset
-            let mark = builder.Mark()
-            builder.AdvanceLexer() |> ignore // ignore keyword token
+        range |> x.GetStartOffset |> x.AdvanceToOffset
+        let mark = builder.Mark()
+        builder.AdvanceLexer() |> ignore // ignore keyword token
 
-            x.ProcessAccessModifiers id
-            x.ProcessIdentifier id
+        x.ProcessAccessModifiers id
+        x.ProcessIdentifier id
 
-            range |> x.GetEndOffset |> x.AdvanceToOffset
-            builder.Done(mark, ElementType.F_SHARP_EXCEPTION_DECLARATION, null)
+        range |> x.GetEndOffset |> x.AdvanceToOffset
+        builder.Done(mark, ElementType.F_SHARP_EXCEPTION_DECLARATION, null)
 
     member private x.IsTypedCase (UnionCase(_,_,fieldType,_,_,_)) =
         match fieldType with
@@ -122,16 +129,16 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         x.AdvanceToOffset (x.GetEndOffset typeMember.Range)
         builder.Done(mark, memberType, null)
 
-    member private x.ProcessType (TypeDefn(ComponentInfo(attributes,_,_,lid,_,_,_,_), repr, members, range)) =
+    member private x.ProcessType (TypeDefn(ComponentInfo(attributes, typeParams,_,lid,_,_,_,_), repr, members, range)) =
         let startOffset = x.GetStartOffset (if List.isEmpty attributes then range else (List.head attributes).TypeName.Range)
         x.AdvanceToOffset startOffset
         let mark = builder.Mark()
 
-        List.iter x.ProcessAttribute attributes
-        
         let id = lid.Head
+        List.iter x.ProcessAttribute attributes
         x.ProcessAccessModifiers id
         x.ProcessIdentifier id
+        List.iter x.ProcessTypeParameter typeParams
 
         let elementType =
             match repr with

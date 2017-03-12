@@ -6,7 +6,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
   public class TypeAbbreviationPart : FSharpClassLikePart<IFSharpTypeAbbreviationDeclaration>, Class.IClassPart
   {
     public TypeAbbreviationPart(IFSharpTypeAbbreviationDeclaration declaration)
-      : base(declaration, declaration.DeclaredName, ModifiersUtil.GetDecoration(declaration.AccessModifiers))
+      : base(declaration, declaration.DeclaredName,
+        ModifiersUtil.GetDecoration(declaration.AccessModifiers), declaration.TypeParameters.Count)
     {
     }
 

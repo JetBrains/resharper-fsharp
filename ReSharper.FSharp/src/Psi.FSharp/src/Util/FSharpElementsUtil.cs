@@ -44,6 +44,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     [CanBeNull]
     public static IDeclaredType GetDeclaredType([NotNull] FSharpType type, [NotNull] IPsiModule psiModule)
     {
+      if (type.IsGenericParameter) return null; // todo
+
       while (type.IsAbbreviation) type = type.AbbreviatedType;
       var qualifiedName = GetQualifiedName(type.TypeDefinition);
       if (qualifiedName == null) return null;
@@ -53,7 +55,13 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       if (args.Count == 0) return typeElement;
       var typeArgs = new IType[args.Count];
       for (var i = 0; i < args.Count; i++)
-        typeArgs[i] = GetDeclaredType(args[i], psiModule);
+      {
+        var argType = GetDeclaredType(args[i], psiModule);
+        if (argType == null) return null;
+
+        typeArgs[i] = argType;
+      }
+
       var element = typeElement.GetTypeElement();
       return element != null ? TypeFactory.CreateType(element, typeArgs) : null;
     }

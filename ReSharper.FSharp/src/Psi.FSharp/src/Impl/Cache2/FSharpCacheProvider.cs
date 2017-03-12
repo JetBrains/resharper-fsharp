@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using JetBrains.Platform.ProjectModel.FSharp;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
+using JetBrains.ReSharper.Psi.Impl.CodeStyle;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
@@ -54,7 +56,10 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public void BuildCache(IFile file, ICacheBuilder builder)
     {
-      (file as IFSharpFile)?.Accept(new FSharpDeclarationProcessor(builder));
+      if (file.GetProjectFileType().Equals(FSharpScriptProjectFileType.Instance))
+        return;
+
+      ((IFSharpFile) file).Accept(new FSharpDeclarationProcessor(builder));
     }
 
     public bool NeedCacheUpdate(ITreeNode elementContainingChanges, PsiChangedElementType type)

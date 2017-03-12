@@ -9,7 +9,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       {"IStructuralEquatable", "IStructuralComparable", "IComparable"};
 
     public UnionPart(IFSharpUnionDeclaration declaration) : base(declaration, declaration.DeclaredName,
-      ModifiersUtil.GetDecoration(declaration.AccessModifiers))
+      ModifiersUtil.GetDecoration(declaration.AccessModifiers), declaration.TypeParameters.Count)
     {
     }
 

@@ -46,7 +46,9 @@ options {
 
 // Files
 
-interface fSharpFile
+interface fSharpFile options {
+  customParseFunction; noInternalParseFunction;
+}
 :
   fSharpImplFile |
   fSharpSigFile
@@ -57,7 +59,6 @@ fSharpImplFile options {
 }
 :
   topLevelModuleOrNamespaceDeclaration<MODULE_OR_NAMESPACE_DECLARATION, Declarations>*
-  fakeSeparator
 ;
 
 fSharpSigFile options {
@@ -65,7 +66,6 @@ fSharpSigFile options {
 }
 :
   moduleOrNamespaceSignature<MODULE_OR_NAMESPACE_SIGNATURE, Signatures>*
-  fakeSeparator
 ;
 
 
@@ -97,7 +97,6 @@ fSharpNamespaceDeclaration options {
 :
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>
   moduleMember<MODULE_MEMBER, Members>*
-  fakeSeparator
 ;
 
 topLevelModuleDeclaration options {
@@ -136,19 +135,14 @@ interface moduleMemberStatement
   do
 ;
 
-nestedModuleDeclaration options {
-  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
-}
-:
-  accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
-  fSharpIdentifier<IDENTIFIER, Identifier>
-  moduleMember<MODULE_MEMBER, Members>*
-  fakeSeparator
-;
-
 interface fSharpTypeDeclaration
 :
   fSharpExceptionDeclaration |
+  fSharpTypeParametersOwnerDeclaration
+;
+
+interface fSharpTypeParametersOwnerDeclaration
+:
   fSharpSimpleTypeDeclaration |
   fSharpObjectModelTypeDeclaration
 ;
@@ -176,6 +170,15 @@ interface fSharpObjectModelTypeDeclaration
   fSharpUnspecifiedObjectTypeDeclaration
 ;
 
+nestedModuleDeclaration options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
+}
+:
+  accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
+  fSharpIdentifier<IDENTIFIER, Identifier>
+  moduleMember<MODULE_MEMBER, Members>*
+;
+
 
 
 // Enums
@@ -186,6 +189,7 @@ fSharpEnumDeclaration options {
 :
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
+  typeParameterDeclaration<TYPE_PARAMETERS, TypeParameters>*
 //  (fSharpEnumMemberDeclaration<FS_ENUM_MEMBER, EnumMemberDeclarations>)* fakeSeparator
 ;
 
@@ -206,6 +210,7 @@ fSharpRecordDeclaration options {
 :
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
+  typeParameterDeclaration<TYPE_PARAMETERS, TypeParameters>*
 //  (fSharpFieldDeclaration<FS_FIELD, Fields>)* fakeSeparator
 //  (fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>)* fakeSeparator
 ;
@@ -220,6 +225,7 @@ fSharpUnionDeclaration options {
 :
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
+  typeParameterDeclaration<TYPE_PARAMETERS, TypeParameters>*
   fSharpUnionCaseDeclaration<UNION_CASE, Cases>* fakeSeparator
 //  (fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>)* fakeSeparator
 ;
@@ -263,6 +269,7 @@ fSharpTypeAbbreviationDeclaration options {
 :
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
+  typeParameterDeclaration<TYPE_PARAMETERS, TypeParameters>*
 ;
 
 otherMemberDeclaration
@@ -277,6 +284,7 @@ fSharpOtherSimpleTypeDeclaration options {
 :
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
+  typeParameterDeclaration<TYPE_PARAMETERS, TypeParameters>*
 ;
 
 fSharpAbstractTypeDeclaration options {
@@ -285,6 +293,7 @@ fSharpAbstractTypeDeclaration options {
 :
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
+  typeParameterDeclaration<TYPE_PARAMETERS, TypeParameters>*
 ;
 
 
@@ -294,40 +303,44 @@ fSharpClassDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
-  (fSharpAttribute<ATTRIBUTE, Attributes>)* fakeSeparator
+  fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
-  (fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>)* fakeSeparator
+  typeParameterDeclaration<TYPE_PARAMETERS, TypeParameters>*
+  fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>*
 ;
 
 fSharpInterfaceDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
-  (fSharpAttribute<ATTRIBUTE, Attributes>)* fakeSeparator
+  fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
-  (fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>)* fakeSeparator
+  typeParameterDeclaration<TYPE_PARAMETERS, TypeParameters>*
+  fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>*
 ;
 
 fSharpStructDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
-  (fSharpAttribute<ATTRIBUTE, Attributes>)* fakeSeparator
+  fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
-  (fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>)* fakeSeparator
+  typeParameterDeclaration<TYPE_PARAMETERS, TypeParameters>*
+  fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>*
 ;
 
 fSharpUnspecifiedObjectTypeDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
-  (fSharpAttribute<ATTRIBUTE, Attributes>)* fakeSeparator
+  fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
-  (fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>)* fakeSeparator
+  typeParameterDeclaration<TYPE_PARAMETERS, TypeParameters>*
+  fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>*
 ;
 
 interface fSharpTypeMemberDeclaration
@@ -346,7 +359,7 @@ interface fSharpTypeMemberDeclaration
   otherTypeMember
 ;
 
-interfaceInherit : longIdentifier<LONG_IDENTIFIER, LongIdentifier> fakeSeparator;
+interfaceInherit : longIdentifier<LONG_IDENTIFIER, LongIdentifier>;
 typeInherit : longIdentifier<LONG_IDENTIFIER, LongIdentifier> fakeSeparator;
 interfaceImplementation : longIdentifier<LONG_IDENTIFIER, LongIdentifier> fakeSeparator;
 abstractSlot : fakeSeparator;
@@ -356,7 +369,7 @@ otherTypeMember : fakeSeparator;
 
 // module statements
 
-open : longIdentifier<LONG_IDENTIFIER, LongIdentifier> fakeSeparator;
+open : longIdentifier<LONG_IDENTIFIER, LongIdentifier>;
 do : fakeSeparator;
 
 otherModuleMember : fakeSeparator;
@@ -368,6 +381,12 @@ otherModuleMember : fakeSeparator;
 fSharpIdentifier : IDENTIFIER<IDENTIFIER, IdentifierToken>;
 
 longIdentifier: IDENTIFIER<IDENTIFIER, Identifiers>*;
+
+
+
+// Type parameters declarations
+
+typeParameterDeclaration : fSharpIdentifier<IDENTIFIER, Identifer>;
 
 
 

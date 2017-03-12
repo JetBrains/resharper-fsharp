@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
@@ -44,17 +45,21 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public override IDeclaration GetTypeParameterDeclaration(int index)
     {
-      throw new System.NotImplementedException();
+      return null;
     }
 
     public override string GetTypeParameterName(int index)
     {
-      throw new System.NotImplementedException();
+      var typeParamsOwnerDeclaration = GetDeclaration() as IFSharpTypeParametersOwnerDeclaration;
+      Assertion.AssertNotNull(typeParamsOwnerDeclaration, "typeParamsOwnerDeclaration != null");
+
+      var name = typeParamsOwnerDeclaration.TypeParameters[index].GetText();
+      return name[0] == '\'' ? name.Substring(1) : name;
     }
 
     public override TypeParameterVariance GetTypeParameterVariance(int index)
     {
-      throw new System.NotImplementedException();
+      return TypeParameterVariance.INVARIANT;
     }
 
     public override IEnumerable<IType> GetTypeParameterSuperTypes(int index)
@@ -64,7 +69,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public override TypeParameterConstraintFlags GetTypeParameterConstraintFlags(int index)
     {
-      throw new System.NotImplementedException();
+      return 0;
     }
 
     public override IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName)
