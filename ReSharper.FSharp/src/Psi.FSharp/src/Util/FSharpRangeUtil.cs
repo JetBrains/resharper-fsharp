@@ -9,7 +9,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
   {
     public static int GetDocumentOffset(IDocument document, Line line, Column column)
     {
-      return document.GetLineLength(line) < column ? -1 : document.GetOffsetByCoords(new DocumentCoords(line, column));
+      return document.GetLineLength(line) >= column
+        ? document.GetOffsetByCoords(new DocumentCoords(line, column))
+        : document.GetLineEndOffsetNoLineBreak(line);
     }
 
     public static TreeOffset GetTreeOffset(IDocument document, Line line, Column column)
