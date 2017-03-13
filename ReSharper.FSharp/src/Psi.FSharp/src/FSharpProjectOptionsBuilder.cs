@@ -62,7 +62,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
           var doc = configuration.DocumentationFile;
           if (!doc.IsNullOrWhitespace()) projectOptions.Add("--doc:" + doc);
 
-          var nowarn = configuration.NoWarn;
+          var nowarn = FixNoWarn(configuration.NoWarn);
           if (!nowarn.IsNullOrWhitespace()) projectOptions.Add("--nowarn:" + nowarn);
 
           projectOptions.Add("--warn:" + configuration.WarningLevel);
@@ -113,7 +113,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
     }
 
     [NotNull]
-    private FileSystemPath EnsureAbsolute([NotNull] FileSystemPath path, [NotNull] FileSystemPath projectDirectory)
+    private static FileSystemPath EnsureAbsolute([NotNull] FileSystemPath path, [NotNull] FileSystemPath projectDirectory)
     {
       var relativePath = path.AsRelative();
       return relativePath != null
@@ -121,11 +121,25 @@ namespace JetBrains.ReSharper.Psi.FSharp
         : path;
     }
 
+    [NotNull]
+    private static string FixNoWarn([CanBeNull] string noWarn)
+    {
+      return SplitAndTrim(noWarn).Join(",");
+    }
+
+    [NotNull]
     private static string[] SplitDefines([CanBeNull] string definesString)
     {
       return string.IsNullOrEmpty(definesString)
         ? EmptyArray<string>.Instance
-        : definesString.Split(';', ',', ' ').Select(x => x.Trim()).Where(s => !s.IsEmpty()).ToArray();
+        : SplitAndTrim(definesString).ToArray();
+    }
+
+    [NotNull]
+    private static IEnumerable<string> SplitAndTrim([CanBeNull] string strings)
+    {
+      return strings?.Split(';', ',', ' ').Select(x => x.Trim()).Where(s => !s.IsEmpty()) ??
+             EmptyList<string>.Instance;
     }
 
     /// <summary>
