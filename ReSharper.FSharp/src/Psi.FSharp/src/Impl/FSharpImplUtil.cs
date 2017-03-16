@@ -77,9 +77,10 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
       clrName.Append(declaration.DeclaredName);
 
       var typeParamsOwner = declaration as IFSharpTypeParametersOwnerDeclaration;
-      if (typeParamsOwner != null) clrName.Append("`" + typeParamsOwner.TypeParameters.Count);
+      if (typeParamsOwner?.TypeParameters.Count > 0)
+        clrName.Append("`" + typeParamsOwner.TypeParameters.Count);
 
-      return clrName.ToString(); // todo: type parameters
+      return clrName.ToString();
     }
   }
 }

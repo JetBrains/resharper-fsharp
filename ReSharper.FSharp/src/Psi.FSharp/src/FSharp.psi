@@ -92,7 +92,7 @@ interface topLevelModuleOrNamespaceDeclaration
 ;
 
 fSharpNamespaceDeclaration options {
-  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpCachedDeclarationBase";
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpDeclarationBase";
 }
 :
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>
@@ -190,15 +190,15 @@ fSharpEnumDeclaration options {
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterDeclaration<TYPE_PARAMETERS, TypeParameters>*
-//  (fSharpEnumMemberDeclaration<FS_ENUM_MEMBER, EnumMemberDeclarations>)* fakeSeparator
+  fSharpEnumMemberDeclaration<ENUM_MEMBER, EnumMembers>*
 ;
 
-//fSharpEnumMemberDeclaration options {
-//  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpProperTypeMemberDeclarationBase";
-//}
-//:
-//  fSharpIdentifier<IDENTIFIER, Identifier>
-//;
+fSharpEnumMemberDeclaration options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpProperTypeMemberDeclarationBase";
+}
+:
+  fSharpIdentifier<IDENTIFIER, Identifier>
+;
 
 
 

@@ -11,16 +11,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 {
   internal abstract class FSharpTypeElementDeclarationBase : FSharpCachedDeclarationBase, IFSharpTypeElementDeclaration
   {
-    public FSharpSymbol Symbol { get; set; }
-    public virtual string ShortName => DeclaredName;
-
     ITypeMember ITypeMemberDeclaration.DeclaredElement => (ITypeMember) DeclaredElement;
     ITypeElement ITypeDeclaration.DeclaredElement => (ITypeElement) DeclaredElement;
-
-    public ITypeDeclaration GetContainingTypeDeclaration()
-    {
-      return GetContainingNode<ITypeDeclaration>();
-    }
 
     /// <summary>
     /// May take long time due to waiting for FCS
@@ -70,7 +62,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
         : symbol;
     }
 
-    public TreeNodeCollection<ITypeMemberDeclaration> MemberDeclarations =>
+    public virtual TreeNodeCollection<ITypeMemberDeclaration> MemberDeclarations =>
       this.Children<ITypeMemberDeclaration>().Where(IsCompiledElementDeclaration).ToTreeNodeCollection();
 
     private static bool IsCompiledElementDeclaration(ITypeMemberDeclaration decl)
@@ -84,7 +76,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
     public string CLRName => FSharpImplUtil.MakeClrName(this);
 
     // todo
-    public TreeNodeCollection<ITypeDeclaration> NestedTypeDeclarations => TreeNodeCollection<ITypeDeclaration>.Empty;
+    public TreeNodeCollection<ITypeDeclaration> NestedTypeDeclarations =>
+      MemberDeclarations.OfType<ITypeDeclaration>().ToTreeNodeCollection();
 
     public IList<ITypeDeclaration> TypeDeclarations => EmptyList<ITypeDeclaration>.Instance;
   }

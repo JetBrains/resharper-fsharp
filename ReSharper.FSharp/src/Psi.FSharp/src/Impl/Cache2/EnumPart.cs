@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using ICSharpCode.NRefactory;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 
@@ -28,8 +27,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     }
 
     public IList<IField> Fields =>
-//      ProcessSubDeclaration<IField, IFSharpEnumMemberDeclaration>(input => input.EnumMemberDeclarations);
-      EmptyList<IField>.Instance;
+      ProcessSubDeclaration<IField, IFSharpEnumMemberDeclaration>(input => input.EnumMembers);
 
     protected override byte SerializationTag => (byte) FSharpSerializationTag.EnumPart;
   }

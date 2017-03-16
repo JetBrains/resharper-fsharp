@@ -65,6 +65,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     public override void VisitFSharpEnumDeclaration(IFSharpEnumDeclaration decl)
     {
       myBuilder.StartPart(new EnumPart(decl));
+      foreach (var memberDecl in decl.EnumMembersEnumerable)
+        myBuilder.AddDeclaredMemberName(memberDecl.DeclaredName);
       myBuilder.EndPart();
     }
 

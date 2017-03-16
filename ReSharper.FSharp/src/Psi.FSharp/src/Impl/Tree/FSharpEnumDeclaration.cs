@@ -1,4 +1,7 @@
-﻿namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
+﻿using JetBrains.ReSharper.Psi.FSharp.Tree;
+using JetBrains.ReSharper.Psi.Tree;
+
+namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 {
   internal partial class FSharpEnumDeclaration
   {
@@ -12,5 +15,8 @@
     public override void SetName(string name)
     {
     }
+
+    public override TreeNodeCollection<ITypeMemberDeclaration> MemberDeclarations =>
+      EnumMembers.Cast<ITypeMemberDeclaration, IFSharpEnumMemberDeclaration>();
   }
 }

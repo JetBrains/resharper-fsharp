@@ -1,13 +1,11 @@
 ﻿using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Psi.Tree;
-using Microsoft.FSharp.Compiler.SourceCodeServices;
+using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 {
   internal partial class FSharpNamespaceDeclaration
   {
-    public FSharpSymbol Symbol { get; set; }
-
     public override string DeclaredName => QualifiedName;
     public string QualifiedName => LongIdentifier.QualifiedName;
     public string ShortName => LongIdentifier.Name;
@@ -23,7 +21,26 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       return LongIdentifier.GetDocumentRange();
     }
 
-    public new INamespace DeclaredElement { get; set; }
+    protected override void PreInit()
+    {
+      base.PreInit();
+      CacheDeclaredElement = null;
+    }
+
+    public override IDeclaredElement DeclaredElement
+    {
+      get
+      {
+        Assertion.Assert(IsValid(), "Getting declared element from invalid declaration");
+        Assertion.Assert(CacheDeclaredElement == null || CacheDeclaredElement.IsValid(),
+          "myCacheDeclaredElement == null || myCacheDeclaredElement.IsValid()");
+        return CacheDeclaredElement;
+      }
+    }
+
+    public IDeclaredElement CacheDeclaredElement { get; set; }
+
+    INamespace INamespaceDeclaration.DeclaredElement => DeclaredElement as INamespace;
 
     public override void SetName(string name)
     {

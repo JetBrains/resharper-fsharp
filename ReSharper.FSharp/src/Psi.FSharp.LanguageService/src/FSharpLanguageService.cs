@@ -32,6 +32,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.LanguageService
       return lexer;
     }
 
+    public override bool IsTypeMemberVisible(ITypeMember member)
+    {
+      return true;
+    }
+
     public override IParser CreateParser(ILexer lexer, IPsiModule module, IPsiSourceFile sourceFile)
     {
       return new FSharpParser(sourceFile, myFSharpCheckerService);
