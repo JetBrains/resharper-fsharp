@@ -198,6 +198,22 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         range |> x.GetEndOffset |> x.AdvanceToOffset
         x.Done(mark, ElementType.F_SHARP_ENUM_MEMBER_DECLARATION)
 
+    member private x.ProcessField (Field(_,_,id,_,_,_,_,range)) =
+        let mark =
+            match id with
+            | Some id ->
+                let startOffset = min (id.idRange |> x.GetStartOffset) (range |> x.GetStartOffset)
+                x.AdvanceToOffset startOffset
+                let mark = builder.Mark()
+                x.ProcessIdentifier id
+                mark
+            | None ->
+                range |> x.GetStartOffset |> x.AdvanceToOffset
+                builder.Mark()
+
+        range |> x.GetEndOffset |> x.AdvanceToOffset
+        x.Done(mark, ElementType.F_SHARP_FIELD_DECLARATION)
+
     member private x.ProcessTypeMember (typeMember : SynMemberDefn) =
         x.AdvanceToOffset (x.GetStartOffset typeMember.Range)
         let mark = builder.Mark()
@@ -247,7 +263,7 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
             | SynTypeDefnRepr.Simple(simpleRepr, _) ->
                 match simpleRepr with
                 | SynTypeDefnSimpleRepr.Record(_,fields,_) ->
-//                    List.iter processField fields
+                    List.iter x.ProcessField fields
                     ElementType.F_SHARP_RECORD_DECLARATION
                 | SynTypeDefnSimpleRepr.Enum(enumCases,_) ->
                     List.iter x.ProcessEnumCase enumCases

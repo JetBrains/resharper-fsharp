@@ -211,9 +211,17 @@ fSharpRecordDeclaration options {
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterDeclaration<TYPE_PARAMETERS, TypeParameters>*
-//  (fSharpFieldDeclaration<FS_FIELD, Fields>)* fakeSeparator
+  fSharpFieldDeclaration<RECORD_FIELD, Fields>*
 //  (fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>)* fakeSeparator
 ;
+
+fSharpFieldDeclaration options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpProperTypeMemberDeclarationBase";
+}
+:
+  fSharpIdentifier<IDENTIFIER, Identifier>
+;
+
 
 
 
@@ -248,7 +256,7 @@ fSharpTypedUnionCaseDeclaration options {
 }
 :
   fSharpIdentifier<IDENTIFIER, Identifier>
-//  (fSharpReadOnlyFieldDeclaration<FS_FIELD, Fields>)* fakeSeparator
+  fSharpFieldDeclaration<UNION_FIELD, Fields>*
 ;
 
 
