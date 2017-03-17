@@ -51,6 +51,10 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
             var declaration = token.GetContainingNode<IFSharpDeclaration>();
             if (declaration != null) declaration.Symbol = symbolUse.Symbol;
           }
+          if (symbolUse.Symbol is FSharpMemberOrFunctionOrValue)
+          {
+
+          }
           continue;
         }
         token.FSharpSymbol = symbolUse.Symbol;

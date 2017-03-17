@@ -111,9 +111,16 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       var mfv = symbol as FSharpMemberOrFunctionOrValue;
       if (mfv != null)
       {
-        var type = GetContainingType(mfv, psiModule);
-        var members = type?.GetTypeElement()?.EnumerateMembers(mfv.CompiledName, true);
-        return members?.FirstOrDefault(); // todo: check overloads
+        try
+        {
+          var type = GetContainingType(mfv, psiModule);
+          var members = type?.GetTypeElement()?.EnumerateMembers(mfv.CompiledName, true);
+          return members?.FirstOrDefault(); // todo: check overloads
+        }
+        catch (Exception) // todo: remove this check and find element properly
+        {
+          return null;
+        }
       }
       return null;
     }

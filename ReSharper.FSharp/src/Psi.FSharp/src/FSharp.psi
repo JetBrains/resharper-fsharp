@@ -65,7 +65,7 @@ fSharpSigFile options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpFileBase";
 }
 :
-  moduleOrNamespaceSignature<MODULE_OR_NAMESPACE_SIGNATURE, Signatures>*
+  topLevelModuleOrNamespaceDeclaration<MODULE_OR_NAMESPACE_DECLARATION, Declarations>*
 ;
 
 
@@ -408,3 +408,14 @@ private modifier{ROLE,Getter}
 fSharpAttribute : longIdentifier<IDENTIFIER, LongIdentifier>; // todo: add constructor expressions
 
 fakeSeparator : FAKE;
+
+
+
+// Local declarations
+
+localDeclaration options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpDeclarationBase";
+}
+:
+  fSharpIdentifier<IDENTIFIER, Identifier>
+;

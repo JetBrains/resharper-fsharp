@@ -6,6 +6,12 @@ namespace JetBrains.ReSharper.Psi.FSharp.Tree
 {
   public partial interface IFSharpDeclaration : IDeclaration
   {
+    /// <summary>
+    /// May take long time due to waiting for FCS. Symbol is cached in declaration.
+    /// </summary>
+    [CanBeNull]
+    FSharpSymbol GetFSharpSymbol();
+
     [CanBeNull]
     FSharpSymbol Symbol { get; set; }
 

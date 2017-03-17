@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
@@ -22,14 +21,22 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
     {
       get
       {
-        if (Symbol == null)
-          TryFindAndSetFSharpSymbol();
-
-        var entity = Symbol as FSharpEntity;
+        var entity = GetFSharpSymbol() as FSharpEntity;
         return entity != null
           ? FSharpElementsUtil.GetSuperTypes(entity, GetPsiModule())
           : EmptyList<IDeclaredType>.Instance;
       }
+    }
+
+    public override FSharpSymbol GetFSharpSymbol()
+    {
+      var symbol = base.GetFSharpSymbol();
+      var mfv = symbol as FSharpMemberOrFunctionOrValue;
+      Symbol = mfv != null && mfv.IsImplicitConstructor
+        ? mfv.EnclosingEntity
+        : symbol;
+
+      return Symbol;
     }
 
     /// <summary>
@@ -40,45 +47,20 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
     {
       get
       {
-        if (Symbol == null)
-          TryFindAndSetFSharpSymbol();
-
-        var entity = Symbol as FSharpEntity;
+        var entity = GetFSharpSymbol() as FSharpEntity;
         return entity != null
           ? FSharpElementsUtil.GetBaseType(entity, GetPsiModule())
           : null;
       }
     }
 
-    private void TryFindAndSetFSharpSymbol()
-    {
-      var fsFile = this.GetContainingFile() as IFSharpFile;
-      Assertion.AssertNotNull(fsFile, "fsFile != null");
-
-      var symbol = FSharpSymbolsUtil.TryFindFSharpSymbol(fsFile, GetText(), GetNameRange().EndOffset.Offset);
-      var mfv = symbol as FSharpMemberOrFunctionOrValue;
-      Symbol = mfv != null && mfv.IsImplicitConstructor
-        ? mfv.EnclosingEntity
-        : symbol;
-    }
-
     public virtual TreeNodeCollection<ITypeMemberDeclaration> MemberDeclarations =>
-      this.Children<ITypeMemberDeclaration>().Where(IsCompiledElementDeclaration).ToTreeNodeCollection();
-
-    private static bool IsCompiledElementDeclaration(ITypeMemberDeclaration decl)
-    {
-      if (decl is ITypeDeclaration)
-        return !(decl is IFSharpNotCompiledTypeDeclaration);
-
-      return true; // todo: update when type members added
-    }
+      this.Children<ITypeMemberDeclaration>().ToTreeNodeCollection(); // todo: hide non compiled types
 
     public string CLRName => FSharpImplUtil.MakeClrName(this);
+    public IList<ITypeDeclaration> TypeDeclarations => EmptyList<ITypeDeclaration>.Instance;
 
-    // todo
     public TreeNodeCollection<ITypeDeclaration> NestedTypeDeclarations =>
       MemberDeclarations.OfType<ITypeDeclaration>().ToTreeNodeCollection();
-
-    public IList<ITypeDeclaration> TypeDeclarations => EmptyList<ITypeDeclaration>.Instance;
   }
 }

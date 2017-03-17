@@ -13,11 +13,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       myBuilder = builder;
     }
 
-    public override void VisitFSharpImplFile(IFSharpImplFile implFile)
+    public override void VisitFSharpFile(IFSharpFile fsFile)
     {
-      myBuilder.CreateProjectFilePart(new FSharpProjectFilePart(implFile.GetSourceFile()));
+      myBuilder.CreateProjectFilePart(new FSharpProjectFilePart(fsFile.GetSourceFile()));
 
-      foreach (var declaration in implFile.DeclarationsEnumerable)
+      foreach (var declaration in fsFile.DeclarationsEnumerable)
       {
         var qualifiers = declaration.LongIdentifier.Qualifiers;
         foreach (var qualifier in qualifiers)
