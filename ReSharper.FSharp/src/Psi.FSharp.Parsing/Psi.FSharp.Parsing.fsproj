@@ -65,11 +65,11 @@
       <Name>Psi.FSharp</Name>
     </ProjectReference>
     <Reference Include="FSharp.Compiler.Service">
-      <HintPath>..\..\packages\FSharp.Compiler.Service.11.0.6\lib\net45\FSharp.Compiler.Service.dll</HintPath>
+      <HintPath>..\..\packages\FSharp.Compiler.Service.11.0.8\lib\net45\FSharp.Compiler.Service.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="FSharp.Compiler.Service.MSBuild.v12">
-      <HintPath>..\..\packages\FSharp.Compiler.Service.11.0.6\lib\net45\FSharp.Compiler.Service.MSBuild.v12.dll</HintPath>
+      <HintPath>..\..\packages\FSharp.Compiler.Service.11.0.8\lib\net45\FSharp.Compiler.Service.MSBuild.v12.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="FSharp.Core">
