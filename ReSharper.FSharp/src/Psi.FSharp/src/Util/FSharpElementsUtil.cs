@@ -41,6 +41,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       return entity.QualifiedName.SubstringBefore(",");
     }
 
+    // todo: tuple types
     [CanBeNull]
     public static IDeclaredType GetDeclaredType([NotNull] FSharpType type, [NotNull] IPsiModule psiModule)
     {

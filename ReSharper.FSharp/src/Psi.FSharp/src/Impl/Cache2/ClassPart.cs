@@ -20,7 +20,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public MemberPresenceFlag GetMemberPresenceFlag()
     {
-      return MemberPresenceFlag.NONE; // todo: check members for this
+      return MemberPresenceFlag.INSTANCE_CTOR; // todo: check members for this
     }
 
     protected override byte SerializationTag => (byte) FSharpSerializationTag.ClassPart;

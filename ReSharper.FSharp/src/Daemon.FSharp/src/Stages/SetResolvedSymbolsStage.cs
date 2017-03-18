@@ -5,6 +5,7 @@ using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
+using JetBrains.ReSharper.Psi.Tree;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Daemon.FSharp.Stages
@@ -43,29 +44,38 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
         var token = FindUsageToken(symbolUse);
         if (token == null) continue;
 
+        var symbol = symbolUse.Symbol;
         if (symbolUse.IsFromDefinition)
         {
-          // todo: add other symbols (e.g let bindings, local values, type members), be careful with implicit constructors
-          if (symbolUse.Symbol is FSharpEntity)
-          {
-            var declaration = token.GetContainingNode<IFSharpDeclaration>();
-            if (declaration != null) declaration.Symbol = symbolUse.Symbol;
-          }
-          if (symbolUse.Symbol is FSharpMemberOrFunctionOrValue)
-          {
-
-          }
+          var declaration = FindDeclaration(symbol, token);
+          if (declaration != null) declaration.Symbol = symbol;
           continue;
         }
-        token.FSharpSymbol = symbolUse.Symbol;
+        token.FSharpSymbol = symbol;
         SeldomInterruptChecker.CheckForInterrupt();
       }
       myFsFile.ReferencesResolved = true;
     }
 
     [CanBeNull]
+    private IFSharpDeclaration FindDeclaration(FSharpSymbol symbol, ITreeNode token)
+    {
+      // todo: add other symbols (e.g let bindings, local values, type members), be careful with implicit constructors
+      if (symbol is FSharpEntity)
+      {
+        return token.GetContainingNode<IFSharpDeclaration>();
+      }
+      if (symbol is FSharpField)
+      {
+        return token.GetContainingNode<IFSharpFieldDeclaration>();
+      }
+      return null;
+    }
+
+    [CanBeNull]
     private FSharpIdentifierToken FindUsageToken(FSharpSymbolUse symbolUse)
     {
+      // todo: `new` for .ctor
       var name = FSharpNamesUtil.GetDisplayName(symbolUse.Symbol);
       if (name == null) return null;
 

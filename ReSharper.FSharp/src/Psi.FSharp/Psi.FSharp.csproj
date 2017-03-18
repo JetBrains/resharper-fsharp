@@ -442,6 +442,7 @@
     <Compile Include="src\Impl\Cache2\TypeAbbreviationPart.cs" />
     <Compile Include="src\Impl\Cache2\TypedUnionCasePart.cs" />
     <Compile Include="src\Impl\Cache2\UnionPart.cs" />
+    <Compile Include="src\Impl\DeclaredElement\FSharpImplicitConstructor.cs" />
     <Compile Include="src\Impl\DeclaredElement\FSharpDeclaredElement.cs" />
     <Compile Include="src\Impl\DeclaredElement\FSharpEnumMember.cs" />
     <Compile Include="src\Impl\DeclaredElement\FSharpFieldProperty.cs" />
@@ -465,7 +466,9 @@
     <Compile Include="src\Impl\Tree\FSharpFileBase.cs" />
     <Compile Include="src\Impl\Tree\FSharpIdentifier.cs" />
     <Compile Include="src\Impl\Tree\FSharpIdentifierToken.cs" />
+    <Compile Include="src\Impl\Tree\ImplicitConstructorDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpInterfaceDeclaration.cs" />
+    <Compile Include="src\Impl\Tree\LocalDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpNamespaceDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpOtherSimpleTypeDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpProperTypeMemberDeclarationBase.cs" />

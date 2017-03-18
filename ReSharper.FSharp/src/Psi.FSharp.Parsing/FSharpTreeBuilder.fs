@@ -214,12 +214,40 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         range |> x.GetEndOffset |> x.AdvanceToOffset
         x.Done(mark, ElementType.F_SHARP_FIELD_DECLARATION)
 
+    member private x.ProcessLocalDeclaration id range =
+        range |> x.GetStartOffset |> x.AdvanceToOffset
+        let mark = x.Mark()
+        x.ProcessIdentifier id
+        range |> x.GetEndOffset |> x.AdvanceToOffset
+        x.Done(mark, ElementType.LOCAL_DECLARATION)
+
+    member private x.ProcessSimplePattern (pat : SynSimplePat) =
+        match pat with
+        | SynSimplePat.Id(id,_,_,_,_,range) ->
+            x.ProcessLocalDeclaration id range
+        | SynSimplePat.Typed(SynSimplePat.Id(id,_,_,_,_,range),_,_) ->
+            x.ProcessLocalDeclaration id range
+        | _ -> ()
+
+    member private x.ProcessImplicitCtor (args : SynSimplePat list) (selfId : Ident option) =
+        List.iter x.ProcessSimplePattern args
+        match selfId with
+        | Some id ->
+            id.idRange |> x.GetStartOffset |> x.AdvanceToOffset
+            let selfIdMark = x.Mark()
+            id.idRange |> x.GetEndOffset |> x.AdvanceToOffset
+            x.Done(selfIdMark, ElementType.SELF_IDENTIFIER_DECLARATION)
+        | _ -> ()
+
     member private x.ProcessTypeMember (typeMember : SynMemberDefn) =
         x.AdvanceToOffset (x.GetStartOffset typeMember.Range)
         let mark = builder.Mark()
 
         let memberType =
             match typeMember with
+            | SynMemberDefn.ImplicitCtor(_,_,args,selfId,_) ->
+                x.ProcessImplicitCtor args selfId
+                ElementType.IMPLICIT_CONSTRUCTOR_DECLARATION
             | SynMemberDefn.ImplicitInherit(SynType.LongIdent(lidWithDots),_,_,_) ->
                 x.ProcessLongIdentifier lidWithDots.Lid
                 ElementType.TYPE_INHERIT
@@ -236,7 +264,6 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
 //                    if List.length lid = 1 then List.head lid |> processIdentifier
 //                | _ -> ()
 //                ElementType.MEMBER_DECLARATION
-//            | SynMemberDefn.ImplicitCtor(_) -> ElementType.IMPLICIT_CTOR
 //            | SynMemberDefn.LetBindings(_) -> ElementType.LET_BINDINGS
 //            | SynMemberDefn.AbstractSlot(_) -> ElementType.ABSTRACT_SLOT
 //            | SynMemberDefn.ValField(_) -> ElementType.VAL_FIELD

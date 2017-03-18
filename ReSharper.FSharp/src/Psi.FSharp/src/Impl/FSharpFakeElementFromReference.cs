@@ -87,15 +87,15 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
 
     public ITypeElement GetContainingType()
     {
-      return GetActualElement()?.GetContainingType();
+      return null;
     }
 
     public ITypeMember GetContainingTypeMember()
     {
-      return GetActualElement()?.GetContainingTypeMember();
+      return null;
     }
 
-    public IPsiModule Module => GetActualElement()?.Module ?? myReferenceOwner.GetPsiModule();
+    public IPsiModule Module => myReferenceOwner.GetPsiModule();
     public ISubstitution IdSubstitution => GetActualElement()?.IdSubstitution ?? EmptySubstitution.INSTANCE;
   }
 }

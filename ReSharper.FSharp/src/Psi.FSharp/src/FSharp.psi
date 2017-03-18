@@ -212,7 +212,7 @@ fSharpRecordDeclaration options {
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterDeclaration<TYPE_PARAMETERS, TypeParameters>*
   fSharpFieldDeclaration<RECORD_FIELD, Fields>*
-//  (fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>)* fakeSeparator
+  fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>*
 ;
 
 fSharpFieldDeclaration options {
@@ -235,7 +235,7 @@ fSharpUnionDeclaration options {
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterDeclaration<TYPE_PARAMETERS, TypeParameters>*
   fSharpUnionCaseDeclaration<UNION_CASE, Cases>* fakeSeparator
-//  (fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>)* fakeSeparator
+  fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>*
 ;
 
 interface fSharpUnionCaseDeclaration
@@ -353,13 +353,13 @@ fSharpUnspecifiedObjectTypeDeclaration options {
 
 interface fSharpTypeMemberDeclaration
 :
+  implicitConstructorDeclaration |
   typeInherit |
   interfaceImplementation |
   interfaceInherit |
   abstractSlot |
-  
+
 //  memberDeclaration |
-//  implicitCtor |
 //  letBindings |
 //  valField |
 //  autoProperty |
@@ -373,6 +373,21 @@ interfaceImplementation : longIdentifier<LONG_IDENTIFIER, LongIdentifier> fakeSe
 abstractSlot : fakeSeparator;
 otherTypeMember : fakeSeparator;
 
+implicitConstructorDeclaration options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpProperTypeMemberDeclarationBase";
+}
+:
+  localDeclaration<PARAMETER, Parameters>*
+  selfIdentifierDeclaration<SELF_IDENTIFIER, SelfIdentifier>
+;
+
+
+selfIdentifierDeclaration options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.LocalDeclaration";
+}
+:
+  fakeSeparator
+;
 
 
 // module statements
@@ -421,9 +436,15 @@ fakeSeparator : FAKE;
 
 // Local declarations
 
-//localDeclaration options {
-//  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpDeclarationBase";
-//}
-//:
-//  fSharpIdentifier<IDENTIFIER, Identifier>
-//;
+localDeclaration options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpDeclarationBase";
+}
+:
+  fSharpIdentifier<IDENTIFIER, Identifier>
+;
+
+
+
+// Other declarations
+
+//fSharpParamDeclaration : localDeclaration;
