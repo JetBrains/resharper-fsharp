@@ -71,7 +71,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
       var source = sourceFile.Document.GetText();
 
       var checkAsync = myChecker.CheckFileInProject(fsFile.ParseResults, filename, 0, source, projectOptions,
-        textSnapshotInfo: null, isResultObsolete: null);
+        textSnapshotInfo: null);
       return (checkAsync.RunAsTask(interruptChecker) as FSharpCheckFileAnswer.Succeeded)?.Item;
     }
 
@@ -88,11 +88,12 @@ namespace JetBrains.ReSharper.Psi.FSharp
     private FSharpProjectOptions GetScriptOptions([NotNull] IPsiSourceFile sourceFile)
     {
       var filePath = sourceFile.GetLocation().FullPath;
-      var documentText = sourceFile.Document.GetText();
+      var source = sourceFile.Document.GetText();
       var loadTime = FSharpOption<DateTime>.Some(DateTime.Now);
 
       var getScriptOptionsAsync =
-        myChecker.GetProjectOptionsFromScript(filePath, documentText, loadTime, otherFlags: null, useFsiAuxLib: null);
+        myChecker.GetProjectOptionsFromScript(filePath, source, loadTime, otherFlags: null, useFsiAuxLib: null,
+          assumeDotNetFramework: null, extraProjectInfo: null);
       return FSharpAsync.RunSynchronously(getScriptOptionsAsync, null, null);
     }
 

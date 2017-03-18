@@ -421,9 +421,9 @@ fakeSeparator : FAKE;
 
 // Local declarations
 
-localDeclaration options {
-  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpDeclarationBase";
-}
-:
-  fSharpIdentifier<IDENTIFIER, Identifier>
-;
+//localDeclaration options {
+//  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpDeclarationBase";
+//}
+//:
+//  fSharpIdentifier<IDENTIFIER, Identifier>
+//;

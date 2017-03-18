@@ -66,11 +66,11 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
       var tooltipsTexts = new List<string>();
       foreach (var tooltip in tooltips)
       {
-        var singleTooltip = tooltip as FSharpToolTipElement.Single;
+        var singleTooltip = tooltip as FSharpToolTipElement<string>.Single;
         if (singleTooltip != null)
           tooltipsTexts.Add(GetTooltipText(singleTooltip.Item1, singleTooltip.Item2));
 
-        var overloads = tooltip as FSharpToolTipElement.Group;
+        var overloads = tooltip as FSharpToolTipElement<string>.Group;
         if (overloads != null)
           tooltipsTexts.AddRange(overloads.Item.Select(overload => GetTooltipText(overload.Item1, overload.Item2)));
       }

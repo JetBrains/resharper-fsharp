@@ -14,6 +14,8 @@ using JetBrains.ProjectModel.Properties.Managed;
 using JetBrains.ReSharper.PsiGen.Util;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
+using Microsoft.FSharp.Collections;
+using Microsoft.FSharp.Compiler;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp
@@ -100,7 +102,9 @@ namespace JetBrains.ReSharper.Psi.FSharp
           isIncompleteTypeCheckEnvironment: false,
           useScriptResolutionRules: false,
           loadTime: DateTime.Now,
-          unresolvedReferences: null
+          unresolvedReferences: null,
+          originalLoadReferences: FSharpList<Tuple<Range.range, string>>.Empty, // todo: check this
+          extraProjectInfo: null
         );
       }
     }
@@ -113,7 +117,8 @@ namespace JetBrains.ReSharper.Psi.FSharp
     }
 
     [NotNull]
-    private static FileSystemPath EnsureAbsolute([NotNull] FileSystemPath path, [NotNull] FileSystemPath projectDirectory)
+    private static FileSystemPath EnsureAbsolute([NotNull] FileSystemPath path,
+      [NotNull] FileSystemPath projectDirectory)
     {
       var relativePath = path.AsRelative();
       return relativePath != null
@@ -206,7 +211,9 @@ namespace JetBrains.ReSharper.Psi.FSharp
         oldOptions.IsIncompleteTypeCheckEnvironment,
         oldOptions.UseScriptResolutionRules,
         oldOptions.LoadTime,
-        oldOptions.UnresolvedReferences);
+        oldOptions.UnresolvedReferences,
+        oldOptions.OriginalLoadReferences,
+        oldOptions.ExtraProjectInfo);
     }
   }
 }
