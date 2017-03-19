@@ -136,7 +136,7 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         x.AdvanceToOffset (x.GetStartOffset id.idRange)
         let mark = builder.Mark()
         x.ProcessIdentifier id
-        x.Done(mark, ElementType.TYPE_PARAMETER_DECLARATION)
+        x.Done(mark, ElementType.TYPE_PARAMETER_OF_TYPE_DECLARATION)
         
 
     member private x.ProcessException (SynExceptionDefn(SynExceptionDefnRepr(_,(UnionCase(_,id,_,_,_,_)),_,_,_,_),_,range)) =

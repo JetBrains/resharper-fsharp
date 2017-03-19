@@ -21,13 +21,13 @@ namespace JetBrains.ReSharper.Psi.FSharp.Searching
       ICollection<string> referenceNames)
       : base(treeNode, findCandidates, resultConsumer, elements, wordsInText, referenceNames)
     {
-      myFSharpSymbols = new List<FSharpSymbol>(elements.Select(FSharpElementsUtil.GetFSharpSymbol).WhereNotNull());
+      myFSharpSymbols = new List<FSharpSymbol>(elements.Select(FSharpElementsUtil.GetFSharpSymbolFromFakeElement).WhereNotNull());
       myPsiModule = treeNode.GetPsiModule();
     }
 
     protected override bool AcceptElement(IDeclaredElement resolvedElement)
     {
-      var symbol = FSharpElementsUtil.GetFSharpSymbol(resolvedElement);
+      var symbol = FSharpElementsUtil.GetFSharpSymbolFromFakeElement(resolvedElement);
       Assertion.AssertNotNull(symbol, "resolvedSymbol != null");
 
       if (myFSharpSymbols.Any(s => s.IsEffectivelySameAs(symbol))) return true;

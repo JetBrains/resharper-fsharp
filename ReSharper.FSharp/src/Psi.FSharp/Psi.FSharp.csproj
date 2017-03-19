@@ -486,6 +486,7 @@
     <Compile Include="src\Impl\Tree\NestedModuleDeclaration.cs" />
     <Compile Include="src\Impl\Tree\NewLine.cs" />
     <Compile Include="src\Impl\Tree\FSharpTypeMemberDeclarationBase.cs" />
+    <Compile Include="src\Impl\Tree\TypeParameterOfTypeDeclaration.cs" />
     <Compile Include="src\Impl\Tree\Whitespace.cs" />
     <Compile Include="src\Impl\Tree\WhitespaceBase.cs" />
     <Compile Include="src\Parsing\FSharpFakeLexer.cs" />
@@ -514,6 +515,7 @@
     <Compile Include="src\Tree\IFSharpNamespaceDeclaration.cs" />
     <Compile Include="src\Tree\IFSharpObjectModelTypeDeclaration.cs" />
     <Compile Include="src\Tree\IFSharpTreeNode.cs" />
+    <Compile Include="src\Tree\ITypeParameterOfTypeDeclaration.cs" />
     <Compile Include="src\Util\FSharpAsyncUtil.cs" />
     <Compile Include="src\Tree\IFSharpTypeDeclaration.cs" />
     <Compile Include="src\Tree\IFSharpTypeElementDeclaration.cs" />

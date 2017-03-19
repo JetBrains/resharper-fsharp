@@ -45,15 +45,20 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public override IDeclaration GetTypeParameterDeclaration(int index)
     {
-      return null;
+      var declaration = GetDeclaration() as IFSharpTypeParametersOwnerDeclaration;
+      if (declaration == null) return null;
+
+      var parameters = declaration.TypeParameters;
+      Assertion.Assert(parameters.Count >= index, "typeParametersDeclarations.Count >= index");
+      return parameters[index];
     }
 
     public override string GetTypeParameterName(int index)
     {
-      var typeParamsOwnerDeclaration = GetDeclaration() as IFSharpTypeParametersOwnerDeclaration;
-      Assertion.AssertNotNull(typeParamsOwnerDeclaration, "typeParamsOwnerDeclaration != null");
+      var declaration = GetDeclaration() as IFSharpTypeParametersOwnerDeclaration;
+      Assertion.AssertNotNull(declaration, "typeParamsOwnerDeclaration != null");
 
-      var name = typeParamsOwnerDeclaration.TypeParameters[index].GetText();
+      var name = declaration.TypeParameters[index].GetText();
       return name[0] == '\'' ? name.Substring(1) : name;
     }
 

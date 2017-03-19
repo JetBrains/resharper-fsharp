@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
@@ -23,8 +24,23 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       {
         var entity = GetFSharpSymbol() as FSharpEntity;
         return entity != null
-          ? FSharpElementsUtil.GetSuperTypes(entity, GetPsiModule())
+          ? FSharpElementsUtil.GetSuperTypes(entity, TypeParameters, GetPsiModule())
           : EmptyList<IDeclaredType>.Instance;
+      }
+    }
+
+    /// <summary>
+    /// May take long time due to waiting for FCS
+    /// </summary>
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
+    public IDeclaredType BaseClassType
+    {
+      get
+      {
+        var entity = GetFSharpSymbol() as FSharpEntity;
+        return entity != null
+          ? FSharpElementsUtil.GetBaseType(entity, TypeParameters, GetPsiModule())
+          : null;
       }
     }
 
@@ -39,20 +55,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       return Symbol;
     }
 
-    /// <summary>
-    /// May take long time due to waiting for FCS
-    /// </summary>
-    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    public IDeclaredType BaseClassType
-    {
-      get
-      {
-        var entity = GetFSharpSymbol() as FSharpEntity;
-        return entity != null
-          ? FSharpElementsUtil.GetBaseType(entity, GetPsiModule())
-          : null;
-      }
-    }
+    [NotNull]
+    private IList<ITypeParameter> TypeParameters => ((ITypeDeclaration) this).DeclaredElement?.TypeParameters ??
+                                                    EmptyList<ITypeParameter>.Instance;
 
     public virtual TreeNodeCollection<ITypeMemberDeclaration> MemberDeclarations =>
       this.Children<ITypeMemberDeclaration>().ToTreeNodeCollection(); // todo: hide non compiled types

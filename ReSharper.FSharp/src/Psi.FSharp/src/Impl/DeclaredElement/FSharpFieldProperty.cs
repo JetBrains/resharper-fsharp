@@ -16,7 +16,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
   /// </summary>
   internal class FSharpFieldProperty : FSharpTypeMember<FSharpFieldDeclaration>, IProperty
   {
-    public FSharpFieldProperty([NotNull] IFSharpDeclaration declaration) : base(declaration)
+    public FSharpFieldProperty([NotNull] IFSharpFieldDeclaration declaration) : base(declaration)
     {
       // todo: check if this is called after set resolved symbols stage
       var fieldSymbol = declaration.GetFSharpSymbol() as FSharpField;
@@ -29,7 +29,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 
       var psiModule = declaration.GetPsiModule();
       IsWritable = fieldSymbol.IsMutable;
-      ReturnType = FSharpElementsUtil.GetDeclaredType(fieldSymbol.FieldType, psiModule) ??
+      ReturnType = FSharpElementsUtil.GetDeclaredType(fieldSymbol.FieldType, declaration, psiModule) ??
                    TypeFactory.CreateUnknownType(psiModule);
     }
 

@@ -189,7 +189,7 @@ fSharpEnumDeclaration options {
 :
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
-  typeParameterDeclaration<TYPE_PARAMETERS, TypeParameters>*
+  typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
   fSharpEnumMemberDeclaration<ENUM_MEMBER, EnumMembers>*
 ;
 
@@ -210,7 +210,7 @@ fSharpRecordDeclaration options {
 :
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
-  typeParameterDeclaration<TYPE_PARAMETERS, TypeParameters>*
+  typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
   fSharpFieldDeclaration<RECORD_FIELD, Fields>*
   fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>*
 ;
@@ -233,7 +233,7 @@ fSharpUnionDeclaration options {
 :
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
-  typeParameterDeclaration<TYPE_PARAMETERS, TypeParameters>*
+  typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
   fSharpUnionCaseDeclaration<UNION_CASE, Cases>* fakeSeparator
   fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>*
 ;
@@ -277,7 +277,7 @@ fSharpTypeAbbreviationDeclaration options {
 :
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
-  typeParameterDeclaration<TYPE_PARAMETERS, TypeParameters>*
+  typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
 ;
 
 otherMemberDeclaration
@@ -292,7 +292,7 @@ fSharpOtherSimpleTypeDeclaration options {
 :
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
-  typeParameterDeclaration<TYPE_PARAMETERS, TypeParameters>*
+  typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
 ;
 
 fSharpAbstractTypeDeclaration options {
@@ -301,7 +301,7 @@ fSharpAbstractTypeDeclaration options {
 :
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
-  typeParameterDeclaration<TYPE_PARAMETERS, TypeParameters>*
+  typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
 ;
 
 
@@ -314,7 +314,7 @@ fSharpClassDeclaration options {
   fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
-  typeParameterDeclaration<TYPE_PARAMETERS, TypeParameters>*
+  typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
   fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>*
 ;
 
@@ -325,7 +325,7 @@ fSharpInterfaceDeclaration options {
   fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
-  typeParameterDeclaration<TYPE_PARAMETERS, TypeParameters>*
+  typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
   fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>*
 ;
 
@@ -336,7 +336,7 @@ fSharpStructDeclaration options {
   fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
-  typeParameterDeclaration<TYPE_PARAMETERS, TypeParameters>*
+  typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
   fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>*
 ;
 
@@ -347,7 +347,7 @@ fSharpUnspecifiedObjectTypeDeclaration options {
   fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
-  typeParameterDeclaration<TYPE_PARAMETERS, TypeParameters>*
+  typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
   fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>*
 ;
 
@@ -409,7 +409,12 @@ longIdentifier: IDENTIFIER<IDENTIFIER, Identifiers>*;
 
 // Type parameters declarations
 
-typeParameterDeclaration : fSharpIdentifier<IDENTIFIER, Identifer>;
+typeParameterOfTypeDeclaration options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpDeclarationBase";
+}
+:
+  fSharpIdentifier<IDENTIFIER, Identifier>
+;
 
 
 

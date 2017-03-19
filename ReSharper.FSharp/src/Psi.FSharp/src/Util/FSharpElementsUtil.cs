@@ -4,32 +4,40 @@ using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.FSharp.Impl;
 using JetBrains.ReSharper.Psi.Modules;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
+using JetBrains.Util;
 using JetBrains.Util.Extension;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Util
 {
+  /// <summary>
+  /// Map FSharpSymbol elements (as seen by FSharp.Compiler.Service) to declared elements or types.
+  /// </summary>
   public class FSharpElementsUtil
   {
     [CanBeNull]
-    public static IDeclaredType GetBaseType([NotNull] FSharpEntity entity, [NotNull] IPsiModule psiModule)
+    public static IDeclaredType GetBaseType([NotNull] FSharpEntity entity,
+      IList<ITypeParameter> typeParametersFromContext, [NotNull] IPsiModule psiModule)
     {
-      return entity.BaseType != null ? GetDeclaredType(entity.BaseType.Value, psiModule) : null;
+      return entity.BaseType != null
+        ? GetDeclaredType(entity.BaseType.Value, typeParametersFromContext, psiModule)
+        : null;
     }
 
     [NotNull]
     public static IEnumerable<IDeclaredType> GetSuperTypes([NotNull] FSharpEntity entity,
-      [NotNull] IPsiModule psiModule)
+      IList<ITypeParameter> typeParametersFromContext, [NotNull] IPsiModule psiModule)
     {
       var interfaces = entity.DeclaredInterfaces;
       var types = new List<IDeclaredType>(interfaces.Count + 1);
       foreach (var entityInterface in interfaces)
       {
-        var declaredType = GetDeclaredType(entityInterface, psiModule);
+        var declaredType = GetDeclaredType(entityInterface, typeParametersFromContext, psiModule);
         if (declaredType != null) types.Add(declaredType);
       }
-      var baseType = GetBaseType(entity, psiModule);
+      var baseType = GetBaseType(entity, typeParametersFromContext, psiModule);
       if (baseType != null) types.Add(baseType);
       return types;
     }
@@ -41,30 +49,67 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       return entity.QualifiedName.SubstringBefore(",");
     }
 
+    /// <summary>
+    /// Get declared type from a context of some declaration, possibly containing type parameters declarations.
+    /// </summary>
+    public static IDeclaredType GetDeclaredType([NotNull] FSharpType fsType,
+      [NotNull] ITypeMemberDeclaration typeMemberDeclaration, [NotNull] IPsiModule psiModule)
+    {
+      var typeDeclaration = typeMemberDeclaration.GetContainingTypeDeclaration();
+      var typeParameters = typeDeclaration?.DeclaredElement?.TypeParameters; // todo obj type member type params
+      return GetDeclaredType(fsType, typeParameters, psiModule);
+    }
+
     // todo: tuple types
     [CanBeNull]
-    public static IDeclaredType GetDeclaredType([NotNull] FSharpType type, [NotNull] IPsiModule psiModule)
+    public static IDeclaredType GetDeclaredType([NotNull] FSharpType fsType,
+      [CanBeNull] IList<ITypeParameter> typeParametersFromContext, [NotNull] IPsiModule psiModule)
     {
-      if (type.IsGenericParameter) return null; // todo
+      while (fsType.IsAbbreviation)
+        fsType = fsType.AbbreviatedType;
 
-      while (type.IsAbbreviation) type = type.AbbreviatedType;
-      var qualifiedName = GetQualifiedName(type.TypeDefinition);
-      if (qualifiedName == null) return null;
-      var typeElement = TypeFactory.CreateTypeByCLRName(qualifiedName, psiModule);
+      var qualifiedName = GetQualifiedName(fsType.TypeDefinition);
+      if (qualifiedName == null)
+        return null;
 
-      var args = type.GenericArguments;
-      if (args.Count == 0) return typeElement;
-      var typeArgs = new IType[args.Count];
-      for (var i = 0; i < args.Count; i++)
+      var declaredType = TypeFactory.CreateTypeByCLRName(qualifiedName, psiModule);
+      var typeElement = declaredType.GetTypeElement();
+      if (typeElement == null)
+        return null;
+
+      var args = fsType.GenericArguments;
+      return args.Count != 0
+        ? GetTypeWithSubstitution(typeElement, args, typeParametersFromContext, psiModule) ?? declaredType
+        : declaredType;
+    }
+
+    [CanBeNull]
+    private static IDeclaredType GetTypeWithSubstitution([NotNull] ITypeElement typeElement, IList<FSharpType> fsTypes,
+      [CanBeNull] IList<ITypeParameter> typeParametersFromContext, [NotNull] IPsiModule psiModule)
+    {
+      var typeParams = typeElement.TypeParameters;
+      Assertion.Assert(typeParams.Count == fsTypes.Count, "typeParameters.Count == fsTypes.Count");
+      var typeArgs = new IType[fsTypes.Count];
+      for (var i = 0; i < fsTypes.Count; i++)
       {
-        var argType = GetDeclaredType(args[i], psiModule);
-        if (argType == null) return null;
-
-        typeArgs[i] = argType;
+        var arg = fsTypes[i];
+        typeArgs[i] = arg.IsGenericParameter
+          ? FindTypeParameterByName(arg, typeParametersFromContext) ?? typeParams[i].Type()
+          : GetDeclaredType(arg, typeParametersFromContext, psiModule);
       }
 
-      var element = typeElement.GetTypeElement();
-      return element != null ? TypeFactory.CreateType(element, typeArgs) : null;
+      return TypeFactory.CreateType(typeElement, typeArgs);
+    }
+
+    [CanBeNull]
+    public static IType FindTypeParameterByName([NotNull] FSharpType type,
+      [CanBeNull] IEnumerable<ITypeParameter> typeParameters)
+    {
+      Assertion.Assert(type.IsGenericParameter, "type.IsGenericParameter");
+      var typeParam = typeParameters?.FirstOrDefault(
+        typeParameter => typeParameter.ShortName == type.GenericParameter.DisplayName);
+
+      return typeParam != null ? TypeFactory.CreateType(typeParam) : null;
     }
 
     [CanBeNull]
@@ -142,7 +187,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     }
 
     [CanBeNull]
-    public static FSharpSymbol GetFSharpSymbol(IDeclaredElement element)
+    public static FSharpSymbol GetFSharpSymbolFromFakeElement(IDeclaredElement element)
     {
       return (element as FSharpFakeElementFromReference)?.Symbol;
     }
