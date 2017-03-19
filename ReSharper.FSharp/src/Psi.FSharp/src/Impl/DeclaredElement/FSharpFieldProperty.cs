@@ -29,7 +29,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 
       var psiModule = declaration.GetPsiModule();
       IsWritable = fieldSymbol.IsMutable;
-      ReturnType = FSharpElementsUtil.GetDeclaredType(fieldSymbol.FieldType, declaration, psiModule) ??
+      ReturnType = FSharpElementsUtil.GetType(fieldSymbol.FieldType, declaration, psiModule) ??
                    TypeFactory.CreateUnknownType(psiModule);
     }
 
