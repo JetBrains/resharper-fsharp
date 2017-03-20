@@ -119,10 +119,15 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       [CanBeNull] IList<ITypeParameter> typeParametersFromContext, [NotNull] IPsiModule psiModule)
     {
       var typeParams = typeElement.TypeParameters;
-      Assertion.Assert(typeParams.Count == fsTypes.Count, "typeParameters.Count == fsTypes.Count");
       var typeArgs = new IType[fsTypes.Count];
       for (var i = 0; i < fsTypes.Count; i++)
-        typeArgs[i] = GetTypeArgumentType(fsTypes[i], typeParams[i].Type(), typeParametersFromContext, psiModule);
+      {
+        var typeParam = typeParams.Count >= i + 1 ? typeParams[i] : null;
+        var typeArg = GetTypeArgumentType(fsTypes[i], typeParam?.Type(), typeParametersFromContext, psiModule);
+        if (typeArg == null)
+          return TypeFactory.CreateUnknownType(psiModule);
+        typeArgs[i] = typeArg;
+      }
 
       return TypeFactory.CreateType(typeElement, typeArgs);
     }
@@ -171,9 +176,10 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     [CanBeNull]
     private static INamespace GetDeclaredNamespace([NotNull] FSharpEntity entity, IPsiModule psiModule)
     {
-      var nsName = entity.CompiledName;
+      Assertion.Assert(entity.IsNamespace, "entity.IsNamespace");
+      var name = entity.CompiledName;
       var containingName = entity.Namespace?.Value;
-      var fullName = containingName != null ? containingName + "." + nsName : nsName;
+      var fullName = containingName != null ? containingName + "." + name : name;
       var symbolScope = psiModule.GetPsiServices().Symbols.GetSymbolScope(psiModule, true, true);
       return symbolScope.GetElementsByQualifiedName(fullName).FirstOrDefault() as INamespace;
     }
@@ -196,36 +202,96 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
         // * case without fields, singleton property
       }
 
+      var field = symbol as FSharpField;
+      if (field != null)
+      {
+        var typeElement = GetDeclaredType(field.DeclaringEntity, psiModule)?.GetTypeElement();
+        return typeElement?.EnumerateMembers(field.Name, true).FirstOrDefault();
+      }
+
       var mfv = symbol as FSharpMemberOrFunctionOrValue;
       if (mfv != null)
       {
-        try
-        {
-          var type = GetContainingType(mfv, psiModule);
-          var members = type?.GetTypeElement()?.EnumerateMembers(mfv.CompiledName, true);
-          return members?.FirstOrDefault(); // todo: check overloads
-        }
-        catch (Exception) // todo: remove this check and find element properly
-        {
-          return null;
-        }
+        var memberEntity = GetContainingEntity(mfv);
+        if (memberEntity == null) return null;
+
+        var typeElement = GetDeclaredType(memberEntity, psiModule)?.GetTypeElement();
+        if (typeElement == null) return null;
+
+        var fsMember = GetMemberWithoutSubstitution(mfv, memberEntity);
+        var typeParameters = typeElement.GetAllTypeParameters().ToIList();
+        var members = typeElement.EnumerateMembers(mfv.CompiledName, true);
+        return members.FirstOrDefault(m => SameParameters(m, fsMember, typeParameters, psiModule));
       }
       return null;
     }
 
+    private static bool SameParameters([NotNull] ITypeMember member, [NotNull] FSharpMemberOrFunctionOrValue mfv,
+      IList<ITypeParameter> typeParameters, IPsiModule psiModule)
+    {
+      var paramsOwner = member as IParametersOwner;
+      if (paramsOwner == null)
+        return true;
+
+      var memberParams = paramsOwner.Parameters.ToArray();
+      var fsParamsTypes = GetParametersTypes(mfv);
+      if (memberParams.Length != fsParamsTypes.Length)
+        return false;
+
+      for (var i = 0; i < fsParamsTypes.Length; i++)
+      {
+        var memberParamType = memberParams[i].Type;
+        var fsParamType = fsParamsTypes[i];
+
+        var typeParameter = memberParamType.GetTypeElement() as ITypeParameter;
+        if (typeParameter != null)
+        {
+          if (!fsParamType.IsGenericParameter)
+            return false;
+
+          if (typeParameter.ShortName != fsParamType.GenericParameter.Name)
+            return false;
+        }
+        else
+        {
+          if (fsParamType.IsGenericParameter)
+            return false;
+
+          if (!memberParamType.Equals(GetType(fsParamType, typeParameters, psiModule)))
+            return false;
+        }
+      }
+
+      return true;
+    }
+
+    private static FSharpType[] GetParametersTypes([NotNull] FSharpMemberOrFunctionOrValue mfv)
+    {
+      var result = new List<FSharpType>();
+      foreach (var paramGroup in mfv.CurriedParameterGroups)
+        result.AddRange(paramGroup.Select(param => param.Type));
+      return result.ToArray();
+    }
+
     [CanBeNull]
-    private static IDeclaredType GetContainingType([NotNull] FSharpMemberOrFunctionOrValue mfv,
-      [NotNull] IPsiModule psiModule)
+    private static FSharpEntity GetContainingEntity([NotNull] FSharpMemberOrFunctionOrValue mfv)
     {
       try
       {
-        return GetDeclaredType(mfv.EnclosingEntity, psiModule);
+        return mfv.EnclosingEntity;
       }
       catch (InvalidOperationException)
       {
         // element is local to some member and is not stored in R# caches
         return null;
       }
+    }
+
+    [NotNull]
+    private static FSharpMemberOrFunctionOrValue GetMemberWithoutSubstitution([NotNull] FSharpSymbol mfv,
+      [NotNull] FSharpEntity entity)
+    {
+      return entity.MembersFunctionsAndValues.Single(m => m.IsEffectivelySameAs(mfv));
     }
 
     [CanBeNull]
