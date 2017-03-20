@@ -19,6 +19,7 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
     member private x.GetLineOffset line = document.GetLineStartOffset(line - 1 |> Int32.op_Explicit)
     member private x.GetStartOffset (range : Range.range) = x.GetLineOffset range.StartLine + range.StartColumn
     member private x.GetEndOffset (range : Range.range) = x.GetLineOffset range.EndLine + range.EndColumn
+    member private x.GetStartOffset (id : Ident) = x.GetStartOffset id.idRange
     member private x.IsPastEndOfFile = builder.GetTokenType() |> isNull 
 
     member private x.AdvanceToFileEnd () =
@@ -57,7 +58,7 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         // When top level namespace or module identifier is missing
         // its ident name is replaced with file name and the range is 1,0-1,0.
         
-        x.GetStartOffset lid.Head.idRange |> x.AdvanceToKeywordOrOffset (if isModule then "module" else "namespace")
+        x.GetStartOffset lid.Head |> x.AdvanceToKeywordOrOffset (if isModule then "module" else "namespace")
         let mark = builder.Mark()
         builder.AdvanceLexer() |> ignore // ignore keyword token
 
@@ -126,14 +127,19 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         x.Done(mark, ElementType.F_SHARP_IDENTIFIER)
     
     /// Should be called on access modifiers start offset.
-    /// Modifiers always go right before an identifier.
-    member private x.ProcessAccessModifiers (id: Ident) =
+    /// Modifiers always go right before an identifier or type parameters.
+    member private x.ProcessAccessModifiers (id : Ident) =
+        x.ProcessAccessModifiers (x.GetStartOffset id)
+    
+    /// Should be called on access modifiers start offset.
+    /// Modifiers always go right before an identifier or type parameters.
+    member private x.ProcessAccessModifiers (endOffset : int) =
         let accessModifiersMark = builder.Mark()
-        x.AdvanceToOffset (x.GetStartOffset id.idRange)
+        x.AdvanceToOffset endOffset
         builder.Done(accessModifiersMark, ElementType.ACCESS_MODIFIERS, null)
 
     member private x.ProcessTypeParameter (TyparDecl(_,(Typar(id,_,_)))) =
-        x.AdvanceToOffset (x.GetStartOffset id.idRange)
+        id |> x.GetStartOffset |> x.AdvanceToOffset
         let mark = builder.Mark()
         x.ProcessIdentifier id
         x.Done(mark, ElementType.TYPE_PARAMETER_OF_TYPE_DECLARATION)
@@ -202,7 +208,7 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         let mark =
             match id with
             | Some id ->
-                let startOffset = min (id.idRange |> x.GetStartOffset) (range |> x.GetStartOffset)
+                let startOffset = min (x.GetStartOffset id) (x.GetStartOffset range)
                 x.AdvanceToOffset startOffset
                 let mark = builder.Mark()
                 x.ProcessIdentifier id
@@ -214,7 +220,7 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         range |> x.GetEndOffset |> x.AdvanceToOffset
         x.Done(mark, ElementType.F_SHARP_FIELD_DECLARATION)
 
-    member private x.ProcessLocalDeclaration id range =
+    member private x.ProcessLocalDeclaration id (range : Range.range)=
         range |> x.GetStartOffset |> x.AdvanceToOffset
         let mark = x.Mark()
         x.ProcessIdentifier id
@@ -233,9 +239,10 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         List.iter x.ProcessSimplePattern args
         match selfId with
         | Some id ->
-            id.idRange |> x.GetStartOffset |> x.AdvanceToOffset
+            let idRange = id.idRange
+            idRange |> x.GetStartOffset |> x.AdvanceToOffset
             let selfIdMark = x.Mark()
-            id.idRange |> x.GetEndOffset |> x.AdvanceToOffset
+            idRange |> x.GetEndOffset |> x.AdvanceToOffset
             x.Done(selfIdMark, ElementType.SELF_IDENTIFIER_DECLARATION)
         | _ -> ()
 
@@ -278,12 +285,24 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         let startOffset = x.GetStartOffset (if List.isEmpty attributes then range else (List.head attributes).TypeName.Range)
         x.AdvanceToOffset startOffset
         let mark = builder.Mark()
-
-        let id = lid.Head
         List.iter x.ProcessAttribute attributes
-        x.ProcessAccessModifiers id
-        x.ProcessIdentifier id
-        List.iter x.ProcessTypeParameter typeParams
+        
+        let id = lid.Head
+        let idOffset = x.GetStartOffset id
+
+        let typeParamsOffset =
+            match List.tryHead typeParams with
+            | Some (TyparDecl(_,(Typar(id,_,_)))) -> x.GetStartOffset id
+            | None -> idOffset
+
+        x.ProcessAccessModifiers (min idOffset typeParamsOffset)
+
+        if idOffset < typeParamsOffset then
+            x.ProcessIdentifier id
+            List.iter x.ProcessTypeParameter typeParams
+        else
+            List.iter x.ProcessTypeParameter typeParams 
+            x.ProcessIdentifier id
 
         let elementType =
             match repr with
