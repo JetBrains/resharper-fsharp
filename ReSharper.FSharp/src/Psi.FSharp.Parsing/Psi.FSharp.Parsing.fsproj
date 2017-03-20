@@ -77,22 +77,22 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="JetBrains.Platform.DocumentModel">
-      <HintPath>..\..\packages\JetBrains.Platform.Core.Text.108.0.20170315.152359-eap05\DotFiles\JetBrains.Platform.DocumentModel.dll</HintPath>
+      <HintPath>..\..\packages\JetBrains.Platform.Core.Text.108.0.20170319.94803-eap06\DotFiles\JetBrains.Platform.DocumentModel.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.Platform.ProjectModel">
-      <HintPath>..\..\packages\JetBrains.Platform.Core.Ide.108.0.20170315.152359-eap05\DotFiles\JetBrains.Platform.ProjectModel.dll</HintPath>
+      <HintPath>..\..\packages\JetBrains.Platform.Core.Ide.108.0.20170319.94803-eap06\DotFiles\JetBrains.Platform.ProjectModel.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.Platform.Shell">
-      <HintPath>..\..\packages\JetBrains.Platform.Core.Shell.108.0.20170315.85806-eap05\DotFiles\JetBrains.Platform.Shell.dll</HintPath>
+      <HintPath>..\..\packages\JetBrains.Platform.Core.Shell.108.0.20170319.94250-eap06\DotFiles\JetBrains.Platform.Shell.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.Platform.TextControl">
-      <HintPath>..\..\packages\JetBrains.Platform.Core.Text.108.0.20170315.152359-eap05\DotFiles\JetBrains.Platform.TextControl.dll</HintPath>
+      <HintPath>..\..\packages\JetBrains.Platform.Core.Text.108.0.20170319.94803-eap06\DotFiles\JetBrains.Platform.TextControl.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.Platform.Util">
-      <HintPath>..\..\packages\JetBrains.Platform.Core.Shell.108.0.20170315.85806-eap05\DotFiles\JetBrains.Platform.Util.dll</HintPath>
+      <HintPath>..\..\packages\JetBrains.Platform.Core.Shell.108.0.20170319.94250-eap06\DotFiles\JetBrains.Platform.Util.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.ReSharper.Psi">
-      <HintPath>..\..\packages\JetBrains.Psi.Features.Core.108.0.20170315.153125-eap05\DotFiles\JetBrains.ReSharper.Psi.dll</HintPath>
+      <HintPath>..\..\packages\JetBrains.Psi.Features.Core.108.0.20170319.95107-eap06\DotFiles\JetBrains.ReSharper.Psi.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="System" />

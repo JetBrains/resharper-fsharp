@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using JetBrains.Application.changes;
+using JetBrains.Application.Threading;
 using JetBrains.DataFlow;
 using JetBrains.Platform.ProjectModel.FSharp.Properties;
 using JetBrains.ProjectModel;

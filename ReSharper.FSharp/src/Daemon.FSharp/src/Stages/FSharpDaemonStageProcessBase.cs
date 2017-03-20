@@ -1,5 +1,5 @@
 ﻿using System;
-using JetBrains.Application;
+using JetBrains.Application.Threading;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 
 namespace JetBrains.ReSharper.Daemon.FSharp.Stages
