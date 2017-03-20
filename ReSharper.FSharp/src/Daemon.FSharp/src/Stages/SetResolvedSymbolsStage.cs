@@ -42,9 +42,13 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
       foreach (var symbolUse in symbolUses)
       {
         var token = FindUsageToken(symbolUse);
-        if (token == null) continue;
+        if (token == null)
+          continue;
 
         var symbol = symbolUse.Symbol;
+        if (!IsOpGreaterThan(symbol) && token.GetText() == ">")
+          continue; // found usage of generic symbol with specified type parameter
+
         if (symbolUse.IsFromDefinition)
         {
           var declaration = FindDeclaration(symbol, token);
@@ -57,8 +61,14 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
       myFsFile.ReferencesResolved = true;
     }
 
+    private static bool IsOpGreaterThan(FSharpSymbol symbol)
+    {
+      var mfv = symbol as FSharpMemberOrFunctionOrValue;
+      return mfv?.CompiledName == "op_GreaterThan";
+    }
+
     [CanBeNull]
-    private IFSharpDeclaration FindDeclaration(FSharpSymbol symbol, ITreeNode token)
+    private static IFSharpDeclaration FindDeclaration(FSharpSymbol symbol, ITreeNode token)
     {
       // todo: add other symbols (e.g let bindings, local values, type members), be careful with implicit constructors
       if (symbol is FSharpEntity)
