@@ -23,7 +23,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     {
       return entity.BaseType != null
         ? GetType(entity.BaseType.Value, typeParametersFromContext, psiModule) as IDeclaredType
-        : null;
+        : TypeFactory.CreateUnknownType(psiModule);
+      ;
     }
 
     [NotNull]
@@ -43,14 +44,14 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     }
 
     [NotNull]
-    private static string GetQualifiedName([NotNull] FSharpEntity entity)
+    private static string GetClrName([NotNull] FSharpEntity entity)
     {
       // sometimes name includes assembly name, public key, etc and separated with comma
       return entity.QualifiedName.SubstringBefore(",");
     }
 
     [CanBeNull]
-    private static string GetQualifiedName([NotNull] FSharpType fsType)
+    private static string GetClrName([NotNull] FSharpType fsType)
     {
       var typeArgumentsCount = fsType.GenericArguments.Count;
 
@@ -82,19 +83,19 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       var type = GetAbbreviatedType(fsType);
 
       if (type.IsGenericParameter)
-        return FindTypeParameterByName(type, typeParametersFromContext);
+        return FindTypeParameterByName(type, typeParametersFromContext, psiModule);
 
       if (type.HasTypeDefinition && type.TypeDefinition.IsArrayType)
         return GetArrayType(type, typeParametersFromContext, psiModule);
 
-      var qualifiedName = GetQualifiedName(type);
+      var qualifiedName = GetClrName(type);
       if (qualifiedName == null)
-        return null;
+        return TypeFactory.CreateUnknownType(psiModule);
 
       var declaredType = TypeFactory.CreateTypeByCLRName(qualifiedName, psiModule);
       var typeElement = declaredType.GetTypeElement();
       if (typeElement == null)
-        return null;
+        return TypeFactory.CreateUnknownType(psiModule);
 
       var args = type.GenericArguments;
       return args.Count != 0
@@ -137,19 +138,22 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       [CanBeNull] IList<ITypeParameter> typeParametersFromContext, [NotNull] IPsiModule psiModule)
     {
       return arg.IsGenericParameter
-        ? FindTypeParameterByName(arg, typeParametersFromContext) ?? typeParam
+        ? FindTypeParameterByName(arg, typeParametersFromContext, psiModule) ?? typeParam
         : GetType(arg, typeParametersFromContext, psiModule);
     }
 
     [CanBeNull]
     private static IType FindTypeParameterByName([NotNull] FSharpType type,
-      [CanBeNull] IEnumerable<ITypeParameter> typeParameters)
+      [CanBeNull] IEnumerable<ITypeParameter> typeParameters, [NotNull] IPsiModule psiModule)
     {
       Assertion.Assert(type.IsGenericParameter, "type.IsGenericParameter");
       var typeParam = typeParameters?.FirstOrDefault(
         typeParameter => typeParameter.ShortName == type.GenericParameter.DisplayName);
 
-      return typeParam != null ? TypeFactory.CreateType(typeParam) : null;
+      return typeParam != null
+        ? TypeFactory.CreateType(typeParam)
+        : TypeFactory.CreateUnknownType(psiModule);
+      ;
     }
 
     [NotNull]
@@ -162,15 +166,29 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     }
 
     [CanBeNull]
-    private static IDeclaredType GetDeclaredType([NotNull] FSharpEntity entity, [NotNull] IPsiModule psiModule)
+    private static ITypeElement GetTypeElement([NotNull] FSharpEntity entity, [NotNull] IPsiModule psiModule)
     {
       if (((FSharpSymbol) entity).DeclarationLocation == null)
         return null;
 
-      if (entity.IsFSharpAbbreviation)
-        entity = GetAbbreviatedType(entity.AbbreviatedType).TypeDefinition;
+      if (!entity.IsFSharpAbbreviation)
+        return TypeFactory.CreateTypeByCLRName(GetClrName(entity), psiModule).GetTypeElement();
 
-      return TypeFactory.CreateTypeByCLRName(GetQualifiedName(entity), psiModule);
+      var symbolScope = psiModule.GetPsiServices().Symbols.GetSymbolScope(psiModule, true, true);
+      while (entity.IsFSharpAbbreviation)
+      {
+        // it's easier to use qualified name with abbreviations
+        // FCS can return CLR names for non-abbreviated types only
+
+        var qualifiedName = ((FSharpSymbol) entity).FullName;
+        var typeElement = symbolScope.GetElementsByQualifiedName(qualifiedName).FirstOrDefault() as ITypeElement;
+        if (typeElement != null)
+          return typeElement;
+
+        entity = entity.AbbreviatedType.TypeDefinition;
+      }
+
+      return TypeFactory.CreateTypeByCLRName(GetClrName(entity), psiModule).GetTypeElement();
     }
 
     [CanBeNull]
@@ -191,7 +209,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       if (entity != null)
       {
         if (entity.IsNamespace) return GetDeclaredNamespace(entity, psiModule);
-        return GetDeclaredType(entity, psiModule)?.GetTypeElement();
+        return GetTypeElement(entity, psiModule);
       }
 
       var unionCase = symbol as FSharpUnionCase;
@@ -205,7 +223,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       var field = symbol as FSharpField;
       if (field != null)
       {
-        var typeElement = GetDeclaredType(field.DeclaringEntity, psiModule)?.GetTypeElement();
+        var typeElement = GetTypeElement(field.DeclaringEntity, psiModule);
         return typeElement?.EnumerateMembers(field.Name, true).FirstOrDefault();
       }
 
@@ -213,12 +231,17 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       if (mfv != null)
       {
         var memberEntity = GetContainingEntity(mfv);
-        if (memberEntity == null) return null;
+        if (memberEntity == null)
+          return null;
 
-        var typeElement = GetDeclaredType(memberEntity, psiModule)?.GetTypeElement();
-        if (typeElement == null) return null;
+        var typeElement = GetTypeElement(memberEntity, psiModule);
+        if (typeElement == null)
+          return null;
 
         var fsMember = GetMemberWithoutSubstitution(mfv, memberEntity);
+        if (fsMember == null)
+          return null;
+
         var typeParameters = typeElement.GetAllTypeParameters().ToIList();
         var members = typeElement.EnumerateMembers(mfv.CompiledName, true);
         return members.FirstOrDefault(m => SameParameters(m, fsMember, typeParameters, psiModule));
@@ -287,11 +310,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       }
     }
 
-    [NotNull]
+    [CanBeNull]
     private static FSharpMemberOrFunctionOrValue GetMemberWithoutSubstitution([NotNull] FSharpSymbol mfv,
       [NotNull] FSharpEntity entity)
     {
-      return entity.MembersFunctionsAndValues.Single(m => m.IsEffectivelySameAs(mfv));
+      return entity.MembersFunctionsAndValues.FirstOrDefault(m => m.IsEffectivelySameAs(mfv));
     }
 
     [CanBeNull]
