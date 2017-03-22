@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using JetBrains.ReSharper.Psi.CSharp.Impl;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2;
 using JetBrains.ReSharper.Psi.FSharp.Parsing;
@@ -41,6 +42,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.LanguageService
     {
       return new FSharpParser(sourceFile, myFSharpCheckerService);
     }
+
+    public override IDeclaredElementPresenter DeclaredElementPresenter =>
+      CSharpDeclaredElementPresenter.Instance; // todo: replace with F#-specific presenter
 
     public override IEnumerable<ITypeDeclaration> FindTypeDeclarations(IFile file)
     {
