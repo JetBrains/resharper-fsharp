@@ -58,7 +58,10 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         // When top level namespace or module identifier is missing
         // its ident name is replaced with file name and the range is 1,0-1,0.
         
-        x.GetStartOffset lid.Head |> x.AdvanceToKeywordOrOffset (if isModule then "module" else "namespace")
+        // Namespace range starts after its identifier for some reason,
+        // try to locate a keyword after which there may be access modifiers
+        let keywordTokenType = if isModule then FSharpTokenType.MODULE else FSharpTokenType.NAMESPACE
+        x.GetStartOffset lid.Head |> x.AdvanceToKeywordOrOffset keywordTokenType
         let mark = builder.Mark()
         builder.AdvanceLexer() |> ignore // ignore keyword token
 
@@ -138,11 +141,17 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         x.AdvanceToOffset endOffset
         builder.Done(accessModifiersMark, ElementType.ACCESS_MODIFIERS, null)
 
-    member private x.ProcessTypeParameter (TyparDecl(_,(Typar(id,_,_)))) =
+    member private x.ProcessTypeParameterOfType p =
+        x.ProcessTypeParameter ElementType.TYPE_PARAMETER_OF_TYPE_DECLARATION p
+
+    member private x.ProcessTypeParameterOfMethod p =
+        x.ProcessTypeParameter ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION p
+
+    member private x.ProcessTypeParameter elementType (TyparDecl(_,(Typar(id,_,_)))) =
         id |> x.GetStartOffset |> x.AdvanceToOffset
         let mark = builder.Mark()
         x.ProcessIdentifier id
-        x.Done(mark, ElementType.TYPE_PARAMETER_OF_TYPE_DECLARATION)
+        x.Done(mark, elementType)
         
 
     member private x.ProcessException (SynExceptionDefn(SynExceptionDefnRepr(_,(UnionCase(_,id,_,_,_,_)),_,_,_,_),_,range)) =
@@ -175,9 +184,9 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
     //                          else ElementType.F_SHARP_SINGLETON_UNION_CASE_DECLARATION
             builder.Done(exnMark, ElementType.F_SHARP_TYPED_UNION_CASE_DECLARATION, null)
 
-    member private x.AdvanceToKeywordOrOffset (keyword : string) (maxOffset : int) =
+    member private x.AdvanceToKeywordOrOffset (keyword : TokenNodeType) (maxOffset : int) =
         while builder.GetTokenOffset() < maxOffset &&
-              (not (builder.GetTokenType().IsKeyword) || builder.GetTokenText() <> keyword) do
+              (not (builder.GetTokenType().IsKeyword) || builder.GetTokenType() <> keyword) do
             builder.AdvanceLexer() |> ignore
 
     member private x.ProcessLongIdentifier (lid : Ident list) =
@@ -227,6 +236,12 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         range |> x.GetEndOffset |> x.AdvanceToOffset
         x.Done(mark, ElementType.LOCAL_DECLARATION)
 
+    member private x.ProcessLocalDeclarationWithoutId (range : Range.range)=
+        range |> x.GetStartOffset |> x.AdvanceToOffset
+        let mark = x.Mark()
+        range |> x.GetEndOffset |> x.AdvanceToOffset
+        x.Done(mark, ElementType.LOCAL_DECLARATION)
+
     member private x.ProcessSimplePattern (pat : SynSimplePat) =
         match pat with
         | SynSimplePat.Id(id,_,_,_,_,range) ->
@@ -246,6 +261,13 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
             x.Done(selfIdMark, ElementType.SELF_IDENTIFIER_DECLARATION)
         | _ -> ()
 
+    member private x.ProcessMemberParams memberParams =
+        let paramsRanges = 
+            match memberParams with
+            | Pats(pats) -> List.map (fun (x : SynPat) -> x.Range) pats
+            | NamePatPairs(idsAndPats,_) -> List.map (fun (_,pat : SynPat) -> pat.Range) idsAndPats
+        List.iter x.ProcessLocalDeclarationWithoutId paramsRanges
+
     member private x.ProcessTypeMember (typeMember : SynMemberDefn) =
         x.AdvanceToOffset (x.GetStartOffset typeMember.Range)
         let mark = builder.Mark()
@@ -264,13 +286,25 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
             | SynMemberDefn.Inherit(SynType.LongIdent(lidWithDots),_,_) ->
                 x.ProcessLongIdentifier lidWithDots.Lid
                 ElementType.INTERFACE_INHERIT
-//            | SynMemberDefn.Member(Binding(access,kind,_,_,attrs,_,_,headPat,returnInfo,_,_,_),_) ->
-//                match headPat with
-//                | SynPat.LongIdent(LongIdentWithDots(lid,_),_,_,_,_,_) ->
-//                    if List.length lid = 2 then List.last lid |> processIdentifier
-//                    if List.length lid = 1 then List.head lid |> processIdentifier
-//                | _ -> ()
-//                ElementType.MEMBER_DECLARATION
+            | SynMemberDefn.Member(Binding(_,_,_,_,_,_,_,headPat,_,_,_,_),_) ->
+                match headPat with
+                | SynPat.LongIdent(LongIdentWithDots(lid,_),_,typeParamsOption,memberParams,_,_) ->
+                    match lid with
+                    | [id] when id.idText = "new" ->
+                        x.ProcessMemberParams memberParams
+                        ElementType.CONSTRUCTOR_DECLARATION
+                    | [id] | _ :: id :: _ ->
+                        x.ProcessIdentifier id
+                        match typeParamsOption with
+                        | Some (SynValTyparDecls(typeParams,_,_)) ->
+                            List.iter x.ProcessTypeParameterOfMethod typeParams
+                            ()
+                        | _ -> ()
+                        x.ProcessMemberParams memberParams
+                        ElementType.MEMBER_DECLARATION
+                    | _ -> ElementType.OTHER_TYPE_MEMBER
+                | _ -> ElementType.OTHER_TYPE_MEMBER
+
 //            | SynMemberDefn.LetBindings(_) -> ElementType.LET_BINDINGS
 //            | SynMemberDefn.AbstractSlot(_) -> ElementType.ABSTRACT_SLOT
 //            | SynMemberDefn.ValField(_) -> ElementType.VAL_FIELD
@@ -279,7 +313,7 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
             | _ -> ElementType.OTHER_TYPE_MEMBER
 
         x.AdvanceToOffset (x.GetEndOffset typeMember.Range)
-        builder.Done(mark, memberType, null)
+        x.Done(mark, memberType)
 
     member private x.ProcessType (TypeDefn(ComponentInfo(attributes, typeParams,_,lid,_,_,_,_), repr, members, range)) =
         let startOffset = x.GetStartOffset (if List.isEmpty attributes then range else (List.head attributes).TypeName.Range)
@@ -299,9 +333,9 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
 
         if idOffset < typeParamsOffset then
             x.ProcessIdentifier id
-            List.iter x.ProcessTypeParameter typeParams
+            List.iter x.ProcessTypeParameterOfType typeParams
         else
-            List.iter x.ProcessTypeParameter typeParams 
+            List.iter x.ProcessTypeParameterOfType typeParams 
             x.ProcessIdentifier id
 
         let elementType =

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Tree;
@@ -14,6 +15,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
     private static readonly Func<FSharpProperTypeMemberDeclarationBase, IDeclaredElement>
       DeclaredElementFactory = declaration => declaration.CreateDeclaredElement();
 
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     public override IDeclaredElement DeclaredElement
     {
       get

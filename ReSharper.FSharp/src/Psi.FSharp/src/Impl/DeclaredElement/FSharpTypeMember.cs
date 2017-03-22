@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
-using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Tree;
@@ -61,7 +60,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
       return EmptyList<TypeMemberInstance>.Instance;
     }
 
-    public AccessibilityDomain AccessibilityDomain => SharedImplUtil.CalcAccessibilityDomain(this);
+    public AccessibilityDomain AccessibilityDomain =>
+      new AccessibilityDomain(AccessibilityDomain.AccessibilityDomainType.PUBLIC, null);
 
     public MemberHidePolicy HidePolicy => this is IParametersOwner
       ? MemberHidePolicy.HIDE_BY_SIGNATURE

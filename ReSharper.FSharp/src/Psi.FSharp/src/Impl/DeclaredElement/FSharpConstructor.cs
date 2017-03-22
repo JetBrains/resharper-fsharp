@@ -5,13 +5,13 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 {
-  internal class FSharpImplicitConstructor : FSharpConstructorBase<ImplicitConstructorDeclaration>
+  internal class FSharpConstructor : FSharpConstructorBase<ConstructorDeclaration>
   {
-    public FSharpImplicitConstructor([NotNull] ITypeMemberDeclaration declaration,
+    public FSharpConstructor([NotNull] ITypeMemberDeclaration declaration,
       [CanBeNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)
     {
     }
 
-    public override bool IsImplicit => true;
+    public override bool IsImplicit => false;
   }
 }

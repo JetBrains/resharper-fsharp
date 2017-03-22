@@ -10,7 +10,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifiers), declaration.TypeParameters.Count)
     {
       var extendListShortNames = new FrugalLocalHashSet<string>();
-      foreach (var member in declaration.MembersEnumerable)
+      foreach (var member in declaration.TypeMembersEnumerable)
       {
         var inherit = member as ITypeInherit;
         if (inherit != null)

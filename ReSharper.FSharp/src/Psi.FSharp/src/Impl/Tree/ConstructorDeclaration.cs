@@ -1,18 +1,18 @@
-﻿using System.Linq;
-using JetBrains.ReSharper.Psi.ExtensionsAPI;
+﻿using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement;
+using JetBrains.ReSharper.Psi.Tree;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 {
-  internal partial class ImplicitConstructorDeclaration
+  internal partial class ConstructorDeclaration
   {
     public override string DeclaredName =>
       GetContainingTypeDeclaration()?.DeclaredName ?? SharedImplUtil.MISSING_DECLARATION_NAME;
 
     public override TreeTextRange GetNameRange()
     {
-      return GetContainingTypeDeclaration()?.GetNameRange() ?? TreeTextRange.InvalidRange;
+      return NewKeyword.GetTreeTextRange();
     }
 
     public override void SetName(string name)
@@ -21,9 +21,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 
     protected override IDeclaredElement CreateDeclaredElement()
     {
-      var entity = GetFSharpSymbol() as FSharpEntity;
-      var ctor = entity?.MembersFunctionsAndValues.Single(m => m.IsImplicitConstructor);
-      return new FSharpImplicitConstructor(this, ctor);
+      return new FSharpConstructor(this, GetFSharpSymbol() as FSharpMemberOrFunctionOrValue);
     }
   }
 }

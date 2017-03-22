@@ -12,25 +12,24 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 {
   /// <summary>
-  /// Field in record or in discriminated union. Compiled as property.
+  /// Field in a record or in a discriminated union. Compiled as property.
   /// </summary>
   internal class FSharpFieldProperty : FSharpTypeMember<FSharpFieldDeclaration>, IProperty
   {
-    public FSharpFieldProperty([NotNull] IFSharpFieldDeclaration declaration) : base(declaration)
+    public FSharpFieldProperty([NotNull] IFSharpFieldDeclaration declaration, FSharpField field)
+      : base(declaration)
     {
       // todo: check if this is called after set resolved symbols stage
-      var fieldSymbol = declaration.GetFSharpSymbol() as FSharpField;
-      if (fieldSymbol == null)
+      if (field == null)
       {
         IsWritable = false;
         ReturnType = TypeFactory.CreateUnknownType(Module);
         return;
       }
 
-      var psiModule = declaration.GetPsiModule();
-      IsWritable = fieldSymbol.IsMutable;
-      ReturnType = FSharpElementsUtil.GetType(fieldSymbol.FieldType, declaration, psiModule) ??
-                   TypeFactory.CreateUnknownType(psiModule);
+      IsWritable = field.IsMutable;
+      ReturnType = FSharpElementsUtil.GetType(field.FieldType, declaration, Module) ??
+                   TypeFactory.CreateUnknownType(Module);
     }
 
     public override DeclaredElementType GetElementType()

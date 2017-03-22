@@ -32,10 +32,15 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
       return false;
     }
 
-    public virtual string ShortName => GetDeclaration()?.DeclaredName ?? SharedImplUtil.MISSING_DECLARATION_NAME;
     public bool CaseSensitiveName => true;
-    public virtual ISubstitution IdSubstitution => GetContainingType()?.IdSubstitution ?? EmptySubstitution.INSTANCE;
 
+    public virtual string ShortName =>
+      GetDeclaration()?.DeclaredName ??
+      SharedImplUtil.MISSING_DECLARATION_NAME;
+
+    public virtual ISubstitution IdSubstitution =>
+      GetContainingType()?.IdSubstitution ??
+      EmptySubstitution.INSTANCE;
 
     // ReSharper disable once InconsistentNaming
     public XmlNode GetXMLDoc(bool inherit)

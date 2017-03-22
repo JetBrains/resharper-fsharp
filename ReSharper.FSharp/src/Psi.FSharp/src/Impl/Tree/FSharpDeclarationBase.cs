@@ -14,11 +14,20 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 
     public virtual FSharpSymbol GetFSharpSymbol()
     {
-      if (Symbol != null) return Symbol;
+      if (Symbol != null)
+        return Symbol;
+
+      var nameRange = GetNameRange();
+      if (!nameRange.IsValid())
+        return null;
 
       var fsFile = this.GetContainingFile() as IFSharpFile;
       Assertion.AssertNotNull(fsFile, "fsFile != null");
-      return Symbol = FSharpSymbolsUtil.TryFindFSharpSymbol(fsFile, GetText(), GetNameRange().EndOffset.Offset);
+      var token = fsFile.FindTokenAt(nameRange.StartOffset);
+      if (token == null)
+        return null;
+
+      return Symbol = FSharpSymbolsUtil.TryFindFSharpSymbol(fsFile, token.GetText(), nameRange.EndOffset.Offset);
     }
 
     public abstract IDeclaredElement DeclaredElement { get; }

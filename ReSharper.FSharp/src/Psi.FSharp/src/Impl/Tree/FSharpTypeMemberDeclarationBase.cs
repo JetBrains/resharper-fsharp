@@ -1,4 +1,5 @@
-﻿using JetBrains.ReSharper.Psi.Tree;
+﻿using System.Diagnostics;
+using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 {
@@ -26,50 +27,44 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 
     public void SetAbstract(bool value)
     {
-      throw new System.NotImplementedException();
     }
 
     public void SetSealed(bool value)
     {
-      throw new System.NotImplementedException();
     }
 
     public void SetVirtual(bool value)
     {
-      throw new System.NotImplementedException();
     }
 
     public void SetOverride(bool value)
     {
-      throw new System.NotImplementedException();
     }
 
     public void SetStatic(bool value)
     {
-      throw new System.NotImplementedException();
     }
 
     public void SetReadonly(bool value)
     {
-      throw new System.NotImplementedException();
     }
 
     public void SetExtern(bool value)
     {
-      throw new System.NotImplementedException();
     }
 
     public void SetUnsafe(bool value)
     {
-      throw new System.NotImplementedException();
     }
 
     public void SetVolatile(bool value)
     {
-      throw new System.NotImplementedException();
     }
 
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     IModifiersOwner IModifiersOwnerDeclaration.DeclaredElement => (IModifiersOwner) DeclaredElement;
+
+    [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     ITypeMember ITypeMemberDeclaration.DeclaredElement => (ITypeMember) DeclaredElement;
 
     public AccessRights GetAccessRights()
@@ -83,7 +78,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
     public bool IsOverride => false;
     public bool IsStatic => false;
     public bool IsReadonly => false;
-
     public bool IsExtern => false;
     public bool IsUnsafe => false;
     public bool IsVolatile => false;

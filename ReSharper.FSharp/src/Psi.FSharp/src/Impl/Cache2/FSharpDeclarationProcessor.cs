@@ -73,6 +73,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     public override void VisitFSharpRecordDeclaration(IFSharpRecordDeclaration decl)
     {
       myBuilder.StartPart(new RecordPart(decl));
+      foreach (var fieldDeclaration in decl.FieldsEnumerable)
+        myBuilder.AddDeclaredMemberName(fieldDeclaration.DeclaredName);
       myBuilder.EndPart();
     }
 

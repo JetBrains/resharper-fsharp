@@ -1,4 +1,5 @@
 ﻿using JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement;
+using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 {
@@ -17,7 +18,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 
     protected override IDeclaredElement CreateDeclaredElement()
     {
-      return new FSharpFieldProperty(this);
+      return new FSharpFieldProperty(this, GetFSharpSymbol() as FSharpField);
     }
   }
 }

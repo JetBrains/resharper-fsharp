@@ -212,7 +212,7 @@ fSharpRecordDeclaration options {
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
   fSharpFieldDeclaration<RECORD_FIELD, Fields>*
-  fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>*
+  fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*
 ;
 
 fSharpFieldDeclaration options {
@@ -235,7 +235,7 @@ fSharpUnionDeclaration options {
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
   fSharpUnionCaseDeclaration<UNION_CASE, Cases>* fakeSeparator
-  fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>*
+  fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*
 ;
 
 interface fSharpUnionCaseDeclaration
@@ -315,7 +315,7 @@ fSharpClassDeclaration options {
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
-  fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>*
+  fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*
 ;
 
 fSharpInterfaceDeclaration options {
@@ -326,7 +326,7 @@ fSharpInterfaceDeclaration options {
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
-  fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>*
+  fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*
 ;
 
 fSharpStructDeclaration options {
@@ -337,7 +337,7 @@ fSharpStructDeclaration options {
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
-  fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>*
+  fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*
 ;
 
 fSharpUnspecifiedObjectTypeDeclaration options {
@@ -348,18 +348,19 @@ fSharpUnspecifiedObjectTypeDeclaration options {
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
-  fSharpTypeMemberDeclaration<TYPE_MEMBER, Members>*
+  fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*
 ;
 
 interface fSharpTypeMemberDeclaration
 :
   implicitConstructorDeclaration |
+  constructorDeclaration |
   typeInherit |
   interfaceImplementation |
   interfaceInherit |
   abstractSlot |
+  memberDeclaration |
 
-//  memberDeclaration |
 //  letBindings |
 //  valField |
 //  autoProperty |
@@ -381,6 +382,26 @@ implicitConstructorDeclaration options {
   selfIdentifierDeclaration<SELF_IDENTIFIER, SelfIdentifier>
 ;
 
+constructorDeclaration options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpProperTypeMemberDeclarationBase";
+}
+:
+  localDeclaration<PARAMETER, Parameters>* fakeSeparator
+  NEW<NEW, NewKeyword>
+;
+
+
+
+// todo: fix properties with explicit setters
+
+memberDeclaration options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpProperTypeMemberDeclarationBase";
+}
+:
+  fSharpIdentifier<IDENTIFIER, Identifier>
+  typeParameterOfMethodDeclaration<TYPE_PARAMETER, TypeParameters>*
+  localDeclaration<PARAMETER, Parameters>*
+;
 
 selfIdentifierDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.LocalDeclaration";
@@ -416,6 +437,12 @@ typeParameterOfTypeDeclaration options {
   fSharpIdentifier<IDENTIFIER, Identifier>
 ;
 
+typeParameterOfMethodDeclaration options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpDeclarationBase";
+}
+:
+  fSharpIdentifier<IDENTIFIER, Identifier>
+;
 
 
 // Access modifiers

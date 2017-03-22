@@ -32,7 +32,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
           if (attrText == Struct) return FSharpObjectModelTypeKind.Struct;
         }
 
-        foreach (var member in MembersEnumerable)
+        // ReSharper disable once LoopCanBeConvertedToQuery
+        foreach (var member in TypeMembersEnumerable)
           if (!(member is IInterfaceInherit) && !(member is IAbstractSlot))
             return FSharpObjectModelTypeKind.Class;
 

@@ -71,9 +71,24 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     public static IType GetType([NotNull] FSharpType fsType,
       [NotNull] ITypeMemberDeclaration typeMemberDeclaration, [NotNull] IPsiModule psiModule)
     {
+      return GetType(fsType, GetTypeParametersFromOuterType(typeMemberDeclaration), psiModule);
+    }
+
+    [CanBeNull]
+    public static IType GetType([NotNull] FSharpType fsType,
+      [NotNull] ITypeMemberDeclaration methodDeclaration, [NotNull] IList<ITypeParameter> methodTypeParams,
+      [NotNull] IPsiModule psiModule)
+    {
+      var typeParametersFromType = GetTypeParametersFromOuterType(methodDeclaration);
+      var typeParametersFromContext = typeParametersFromType?.Prepend(methodTypeParams).ToIList() ?? methodTypeParams;
+      return GetType(fsType, typeParametersFromContext, psiModule);
+    }
+
+    [CanBeNull]
+    private static IList<ITypeParameter> GetTypeParametersFromOuterType(ITypeMemberDeclaration typeMemberDeclaration)
+    {
       var typeDeclaration = typeMemberDeclaration.GetContainingTypeDeclaration();
-      var typeParameters = typeDeclaration?.DeclaredElement?.TypeParameters; // todo obj type member type params
-      return GetType(fsType, typeParameters, psiModule);
+      return typeDeclaration?.DeclaredElement?.TypeParameters;
     }
 
     [CanBeNull]
