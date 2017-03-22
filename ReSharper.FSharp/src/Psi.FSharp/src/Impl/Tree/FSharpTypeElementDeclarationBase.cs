@@ -24,7 +24,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       {
         var entity = GetFSharpSymbol() as FSharpEntity;
         return entity != null
-          ? FSharpElementsUtil.GetSuperTypes(entity, TypeParameters, GetPsiModule())
+          ? FSharpTypesUtil.GetSuperTypes(entity, TypeParameters, GetPsiModule())
           : EmptyList<IDeclaredType>.Instance;
       }
     }
@@ -39,7 +39,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       {
         var entity = GetFSharpSymbol() as FSharpEntity;
         return entity != null
-          ? FSharpElementsUtil.GetBaseType(entity, TypeParameters, GetPsiModule())
+          ? FSharpTypesUtil.GetBaseType(entity, TypeParameters, GetPsiModule())
           : null;
       }
     }

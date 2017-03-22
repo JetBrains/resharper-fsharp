@@ -28,7 +28,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
       }
 
       IsWritable = field.IsMutable;
-      ReturnType = FSharpElementsUtil.GetType(field.FieldType, declaration, Module) ??
+      ReturnType = FSharpTypesUtil.GetType(field.FieldType, declaration, Module) ??
                    TypeFactory.CreateUnknownType(Module);
     }
 

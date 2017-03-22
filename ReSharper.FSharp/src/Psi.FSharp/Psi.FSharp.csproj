@@ -546,6 +546,7 @@
     <Compile Include="src\Util\FSharpNamesUtil.cs" />
     <Compile Include="src\Util\FSharpSymbolsUtil.cs" />
     <Compile Include="src\Util\FSharpTypeAbbreviationsUtil.cs" />
+    <Compile Include="src\Util\FSharpTypesUtil.cs" />
     <Compile Include="ZoneMarker.cs" />
   </ItemGroup>
   <ItemGroup>

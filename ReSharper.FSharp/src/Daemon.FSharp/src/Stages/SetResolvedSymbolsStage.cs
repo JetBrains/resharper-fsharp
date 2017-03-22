@@ -88,7 +88,6 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
     [CanBeNull]
     private FSharpIdentifierToken FindUsageToken(FSharpSymbolUse symbolUse)
     {
-      // todo: `new` for .ctor
       var name = FSharpNamesUtil.GetDisplayName(symbolUse.Symbol);
       if (name == null) return null;
 

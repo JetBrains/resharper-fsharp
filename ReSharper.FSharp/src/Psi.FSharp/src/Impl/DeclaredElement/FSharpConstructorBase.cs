@@ -32,7 +32,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
       foreach (var param in paramsGroup)
       {
         ctorParams.Add(new Parameter(this, ctorParams.Count, ParameterKind.VALUE,
-          FSharpElementsUtil.GetType(param.Type, declaration, Module), param.DisplayName));
+          FSharpTypesUtil.GetType(param.Type, declaration, Module), param.DisplayName));
       }
       Parameters = ctorParams.ToList();
     }
