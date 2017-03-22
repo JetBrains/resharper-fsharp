@@ -8,7 +8,8 @@
         <Token name="INTERNAL"/>
         <Token name="NAMESPACE"/>
         <Token name="MODULE"/>
-        <Token name="KEYWORD"/>
+        <Token name="NEW"/>
+        <Token name="OTHER_KEYWORD"/>
 
         <Token name="IDENTIFIER"/>
         <Token name="LITERAL"/>
@@ -18,13 +19,19 @@
         <Token name="TEXT"/>
         <Token name="DEAD_CODE"/>
 
-        <Token name="LBRACK" title="LBRACK"/>
-        <Token name="RBRACK" title="RBRACK"/>
+        <Token name="LBRACK"/>
+        <Token name="RBRACK"/>
         <Token name="LBRACE"/>
         <Token name="RBRACE"/>
         <Token name="LPAREN"/>
         <Token name="RPAREN"/>
-        <Token name="DOT" title="DOT"/>
+
+        <Token name="DOT"/>
+
+        <Token name="GREATER"/>
+        <Token name="LESS"/>
+        <Token name="GREATER_RBRACK"/>
+        <Token name="LBRACK_LESS"/>
 
         <!-- Used in FsharpFakeLexer and as a separator in psi grammar -->
         <Token name="FAKE"/>

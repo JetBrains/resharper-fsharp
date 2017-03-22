@@ -17,19 +17,19 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
 
       public override LeafElementBase Create(IBuffer buffer, TreeOffset startOffset, TreeOffset endOffset)
       {
-        if (this == IDENTIFIER || this == OPERATOR)
+        if (Identifiers[this])
           return new FSharpIdentifierToken(this, buffer, startOffset, endOffset);
 
-        return this == DEAD_CODE
-          ? new FSharpDeadCodeToken(this, buffer, startOffset, endOffset)
-          : new FSharpToken(this, buffer, startOffset, endOffset);
+        return this != DEAD_CODE
+          ? new FSharpToken(this, buffer, startOffset, endOffset)
+          : new FSharpDeadCodeToken(this, buffer, startOffset, endOffset);
       }
 
       public override bool IsWhitespace => this == WHITESPACE || this == NEW_LINE;
       public override bool IsComment => this == COMMENT;
       public override bool IsStringLiteral => this == STRING;
       public override bool IsConstantLiteral => this == LITERAL;
-      public override bool IsIdentifier => this == IDENTIFIER;
+      public override bool IsIdentifier => Identifiers[this];
       public override bool IsKeyword => Keywords[this];
 
       public override string TokenRepresentation { get; }
@@ -40,6 +40,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
     public static readonly NodeTypeSet CommentsOrWhitespaces;
     public static readonly NodeTypeSet AccessModifiersKeywords;
     public static readonly NodeTypeSet Keywords;
+    public static readonly NodeTypeSet Identifiers;
 
     static FSharpTokenType()
     {
@@ -55,8 +56,18 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
         INTERNAL,
         NAMESPACE,
         MODULE,
-        KEYWORD);
+        NEW,
+        OTHER_KEYWORD);
+
+      Identifiers = new NodeTypeSet(
+        IDENTIFIER,
+        OPERATOR,
+        GREATER,
+        LESS,
+        GREATER_RBRACK,
+        LBRACK_LESS);
     }
+
 
     private sealed class WhitespaceNodeType : FSharpTokenNodeType
     {

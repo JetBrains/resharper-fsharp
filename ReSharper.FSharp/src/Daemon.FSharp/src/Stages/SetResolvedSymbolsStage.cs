@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
+using JetBrains.ReSharper.Psi.FSharp.Parsing;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
@@ -46,7 +47,9 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
           continue;
 
         var symbol = symbolUse.Symbol;
-        if (!IsOpGreaterThan(symbol) && token.GetText() == ">")
+        var tokenType = token.GetTokenType();
+        if ((tokenType == FSharpTokenType.GREATER || tokenType == FSharpTokenType.GREATER_RBRACK)
+            && !IsOpGreaterThan(symbol))
           continue; // found usage of generic symbol with specified type parameter
 
         if (symbolUse.IsFromDefinition)

@@ -12,6 +12,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
 {
   public class FSharpLexer : ILexer
   {
+    // todo: add this tag to FCS
     private const int InactiveCodeTag = 7;
 
     private readonly IDocument myDocument;
@@ -75,6 +76,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
       myNextTokenAndState = myLineTokenizer.ScanToken(myNextTokenAndState.Item2);
       while (myNextTokenAndState.Item1 != null)
       {
+        // some tokens like multi-word strings come as separate tokens, concatenate them
         var nextTokenClass = myNextTokenAndState.Item1.Value.CharClass;
         if (token.CharClass != nextTokenClass || !ShouldConcatenate(token))
           break;
@@ -83,7 +85,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
       }
 
       var nextToken = myNextTokenAndState.Item1;
-      // sometimes tokenizer may skip letters after #, look for next token column
+      // sometimes tokenizer may skip idents after #, look for next token start column
       TokenEnd = myLineStartOffset + (nextToken?.Value.LeftColumn ?? token.RightColumn + 1);
       TokenType = FSharpTokenInfoEx.GetTokenType(token);
     }
