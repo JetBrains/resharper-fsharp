@@ -55,15 +55,18 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         x.ProcessModuleOrNamespace(lid, isModule, range, (fun () -> List.iter x.ProcessModuleMemberSignature sigs))
 
     member private x.ProcessModuleOrNamespace(lid, isModule, range, processModuleDeclsFun) =
-        // When top level namespace or module identifier is missing
-        // its ident name is replaced with file name and the range is 1,0-1,0.
+        let idRange = lid.Head.idRange
+        if idRange.Start <> idRange.End then
+            // When top level namespace or module identifier is missing
+            // its ident name is replaced with file name and the range is 1,0-1,0.
         
-        // Namespace range starts after its identifier for some reason,
-        // try to locate a keyword after which there may be access modifiers
-        let keywordTokenType = if isModule then FSharpTokenType.MODULE else FSharpTokenType.NAMESPACE
-        x.GetStartOffset lid.Head |> x.AdvanceToKeywordOrOffset keywordTokenType
+            // Namespace range starts after its identifier for some reason,
+            // try to locate a keyword after which there may be access modifiers
+            let keywordTokenType = if isModule then FSharpTokenType.MODULE else FSharpTokenType.NAMESPACE
+            x.GetStartOffset lid.Head |> x.AdvanceToKeywordOrOffset keywordTokenType
+        
         let mark = builder.Mark()
-        builder.AdvanceLexer() |> ignore // ignore keyword token
+        if idRange.Start <> idRange.End then builder.AdvanceLexer() |> ignore // ignore keyword token
 
         if isModule then x.ProcessAccessModifiers lid.Head
         x.ProcessLongIdentifier lid
@@ -72,8 +75,38 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         range |> x.GetEndOffset |> x.AdvanceToOffset
         x.Done(mark, if isModule then ElementType.TOP_LEVEL_MODULE_DECLARATION else ElementType.F_SHARP_NAMESPACE_DECLARATION)
 
-
     // Module members
+
+    member private x.ProcessLetPat (pat : SynPat) =
+        match pat with
+        | SynPat.LongIdent(LongIdentWithDots(lid,_),_,typeParamsOption,memberParams,_,range) ->
+            match lid with
+            | [id] ->
+                range |> x.GetStartOffset |> x.AdvanceToOffset
+                let mark = builder.Mark()
+                x.ProcessIdentifier id
+                match typeParamsOption with
+                | Some (SynValTyparDecls(typeParams,_,_)) ->
+                    List.iter x.ProcessTypeParameterOfMethod typeParams
+                | _ -> ()
+                x.ProcessMemberParams memberParams
+                range |> x.GetEndOffset |> x.AdvanceToOffset
+                x.Done(mark, ElementType.LET)
+            | _ -> ()
+        | SynPat.Named(_,id,_,_,range) ->
+            range |> x.GetStartOffset |> x.AdvanceToOffset
+            let mark = builder.Mark()
+            x.ProcessIdentifier id
+            range |> x.GetEndOffset |> x.AdvanceToOffset
+            x.Done(mark, ElementType.LET)
+        | SynPat.Tuple(patterns,_) ->
+            List.iter x.ProcessLetPat patterns
+        | SynPat.Paren(pat,_) -> x.ProcessLetPat pat
+        | _ -> ()
+
+    member private x.ProcessModuleLet (Binding(_,_,_,_,_,_,_,headPat,_,_,_,_)) =
+        x.ProcessLetPat headPat
+        
 
     member private x.ProcessModuleMemberDeclaration moduleMember =
         match moduleMember with
@@ -98,6 +131,8 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
             x.ProcessLongIdentifier lidWithDots.Lid
             range |> x.GetEndOffset |> x.AdvanceToOffset
             x.Done(openMark, ElementType.OPEN)
+        | SynModuleDecl.Let(_,bindings,range) ->
+            List.iter x.ProcessModuleLet bindings
         | decl ->
             decl.Range |> x.GetStartOffset |> x.AdvanceToOffset
             let declMark = builder.Mark()

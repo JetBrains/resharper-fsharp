@@ -14,9 +14,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 {
   internal class FSharpTypeParameterOfMethod : ITypeParameter
   {
-    [NotNull] private readonly FSharpMethod myMethod;
+    [NotNull] private readonly IMethod myMethod;
 
-    public FSharpTypeParameterOfMethod([NotNull] FSharpMethod method, [NotNull] string name, int index)
+    public FSharpTypeParameterOfMethod([NotNull] IMethod method, [NotNull] string name, int index)
     {
       myMethod = method;
       Index = index;

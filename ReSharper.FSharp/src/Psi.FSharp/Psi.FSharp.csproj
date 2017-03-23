@@ -453,10 +453,14 @@
     <Compile Include="src\Impl\DeclaredElement\FSharpFieldProperty.cs" />
     <Compile Include="src\Impl\DeclaredElement\FSharpImplicitConstructor.cs" />
     <Compile Include="src\Impl\DeclaredElement\FSharpMemberBase.cs" />
-    <Compile Include="src\Impl\DeclaredElement\FSharpMethod.cs" />
-    <Compile Include="src\Impl\DeclaredElement\FSharpProperty.cs" />
+    <Compile Include="src\Impl\DeclaredElement\FSharpMethodBase.cs" />
+    <Compile Include="src\Impl\DeclaredElement\FSharpPropertyBase.cs" />
     <Compile Include="src\Impl\DeclaredElement\FSharpTypeMember.cs" />
     <Compile Include="src\Impl\DeclaredElement\FSharpTypeParameterOfMethod.cs" />
+    <Compile Include="src\Impl\DeclaredElement\ModuleFunction.cs" />
+    <Compile Include="src\Impl\DeclaredElement\ModuleValue.cs" />
+    <Compile Include="src\Impl\DeclaredElement\FSharpMethod.cs" />
+    <Compile Include="src\Impl\DeclaredElement\FSharpProperty.cs" />
     <Compile Include="src\Impl\FSharpFakeElementFromReference.cs" />
     <Compile Include="src\Impl\FSharpImplUtil.cs" />
     <Compile Include="src\Impl\FSharpResolvedReference.cs" />
@@ -479,6 +483,7 @@
     <Compile Include="src\Impl\Tree\FSharpIdentifierToken.cs" />
     <Compile Include="src\Impl\Tree\ImplicitConstructorDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpInterfaceDeclaration.cs" />
+    <Compile Include="src\Impl\Tree\Let.cs" />
     <Compile Include="src\Impl\Tree\LocalDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpNamespaceDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpOtherSimpleTypeDeclaration.cs" />

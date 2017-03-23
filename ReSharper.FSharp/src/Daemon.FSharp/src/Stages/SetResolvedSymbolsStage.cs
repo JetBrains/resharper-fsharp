@@ -82,6 +82,12 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
       {
         return token.GetContainingNode<IFSharpFieldDeclaration>();
       }
+      var mfv = symbol as FSharpMemberOrFunctionOrValue;
+      if (mfv != null)
+      {
+        if (mfv.IsMember || mfv.IsModuleValueOrMember)
+          return (IFSharpDeclaration) token.GetContainingNode<ITypeMemberDeclaration>();
+      }
       return null;
     }
 

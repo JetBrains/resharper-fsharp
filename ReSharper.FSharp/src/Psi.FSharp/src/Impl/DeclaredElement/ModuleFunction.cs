@@ -6,9 +6,9 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 {
-  internal class FSharpMethod : FSharpMethodBase<MemberDeclaration>
+  internal class ModuleFunction : FSharpMethodBase<Let>
   {
-    public FSharpMethod([NotNull] ITypeMemberDeclaration declaration, [CanBeNull] FSharpMemberOrFunctionOrValue mfv,
+    public ModuleFunction([NotNull] ITypeMemberDeclaration declaration, [CanBeNull] FSharpMemberOrFunctionOrValue mfv,
       [CanBeNull] IFSharpTypeParametersOwnerDeclaration typeDeclaration) : base(declaration, mfv, typeDeclaration)
     {
     }
