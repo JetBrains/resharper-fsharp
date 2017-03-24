@@ -24,6 +24,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       return MemberPresenceFlag.NONE;
     }
 
+    public override MemberDecoration Modifiers =>
+      MemberDecoration.FromModifiers(Psi.Modifiers.INTERNAL); // should not be accessible from other languages
+
     protected override byte SerializationTag => (byte) FSharpSerializationTag.TypeAbbreviationPart;
   }
 }
