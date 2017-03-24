@@ -168,7 +168,7 @@ interface fSharpObjectModelTypeDeclaration
   fSharpClassDeclaration |
   fSharpInterfaceDeclaration |
   fSharpStructDeclaration |
-  fSharpUnspecifiedObjectTypeDeclaration
+  fSharpObjectTypeDeclaration
 ;
 
 nestedModuleDeclaration options {
@@ -286,6 +286,7 @@ let options {
 }
 :
   fSharpIdentifier<IDENTIFIER, Identifier>
+  body<BODY,Body>
 ;
 
 otherMemberDeclaration
@@ -348,7 +349,7 @@ fSharpStructDeclaration options {
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*
 ;
 
-fSharpUnspecifiedObjectTypeDeclaration options {
+fSharpObjectTypeDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
@@ -368,8 +369,8 @@ interface fSharpTypeMemberDeclaration
   interfaceInherit |
   abstractSlot |
   memberDeclaration |
+  typeLetBindings |
 
-//  letBindings |
 //  valField |
 //  autoProperty |
 
@@ -381,13 +382,13 @@ typeInherit : longIdentifier<LONG_IDENTIFIER, LongIdentifier> fakeSeparator;
 interfaceImplementation : longIdentifier<LONG_IDENTIFIER, LongIdentifier> fakeSeparator;
 abstractSlot : fakeSeparator;
 otherTypeMember : fakeSeparator;
+typeLetBindings : fakeSeparator;
 
 implicitConstructorDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpProperTypeMemberDeclarationBase";
 }
 :
-  localDeclaration<PARAMETER, Parameters>*
-  selfIdentifierDeclaration<SELF_IDENTIFIER, SelfIdentifier>
+  memberParam<PARAMETER, Parameters>* fakeSeparator
 ;
 
 constructorDeclaration options {
@@ -408,15 +409,10 @@ memberDeclaration options {
 :
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfMethodDeclaration<TYPE_PARAMETER, TypeParameters>*
-  localDeclaration<PARAMETER, Parameters>*
+  memberParam<PARAMETER, Parameters>* fakeSeparator
 ;
 
-selfIdentifierDeclaration options {
-  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.LocalDeclaration";
-}
-:
-  fakeSeparator
-;
+memberParam: fakeSeparator;
 
 
 // module statements
@@ -476,15 +472,11 @@ fakeSeparator : FAKE;
 
 // Local declarations
 
+body: fakeSeparator;
+
 localDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpDeclarationBase";
 }
 :
   fSharpIdentifier<IDENTIFIER, Identifier>
 ;
-
-
-
-// Other declarations
-
-//fSharpParamDeclaration : localDeclaration;

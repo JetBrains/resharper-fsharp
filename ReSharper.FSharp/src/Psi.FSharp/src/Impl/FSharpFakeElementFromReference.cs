@@ -2,6 +2,7 @@
 using System.Xml;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
+using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Resolve;
@@ -24,9 +25,35 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
     }
 
     [CanBeNull]
+    public IPsiSourceFile GetSourceFile()
+    {
+      return myReferenceOwner.GetSourceFile();
+    }
+
+    [CanBeNull]
     public IClrDeclaredElement GetActualElement()
     {
+      var mfv = Symbol as FSharpMemberOrFunctionOrValue;
+      if (mfv != null && !mfv.IsMember && !mfv.IsModuleValueOrMember)
+        return FindLocalDeclaration(mfv);
+
       return FSharpElementsUtil.GetDeclaredElement(Symbol, myReferenceOwner.GetPsiModule());
+    }
+
+    private IClrDeclaredElement FindLocalDeclaration([NotNull] FSharpMemberOrFunctionOrValue mfv)
+    {
+      var declRange = Symbol.DeclarationLocation;
+      if (declRange == null)
+        return null;
+
+      var document = myReferenceOwner.GetSourceFile()?.Document;
+      if (document == null)
+        return null;
+
+      var fsFile = myReferenceOwner.GetContainingFile();
+      Assertion.AssertNotNull(fsFile, "fsFile != null");
+      var idToken = fsFile.FindTokenAt(FSharpRangeUtil.GetEndOffset(document, declRange.Value) - 1);
+      return idToken?.GetContainingNode<LocalDeclaration>();
     }
 
     public IPsiServices GetPsiServices()

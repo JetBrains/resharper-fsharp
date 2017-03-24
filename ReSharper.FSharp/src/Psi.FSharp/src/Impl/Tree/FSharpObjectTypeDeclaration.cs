@@ -2,7 +2,7 @@
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 {
-  internal partial class FSharpUnspecifiedObjectTypeDeclaration
+  internal partial class FSharpObjectTypeDeclaration
   {
     private const string Interface = "Interface";
     private const string AbstractClass = "AbstractClass";

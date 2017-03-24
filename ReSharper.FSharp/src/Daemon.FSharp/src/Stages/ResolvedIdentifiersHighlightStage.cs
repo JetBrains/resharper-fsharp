@@ -75,6 +75,15 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
           myCommitter(new DaemonStageResult(myHighlightings));
         }
 
+        public override void VisitLet(ILet letBinding)
+        {
+          var idToken = letBinding.Identifier.IdentifierToken;
+          if (idToken != null)
+            myHighlightings.Add(CreateHighlighting(idToken,
+              HighlightingAttributeIds.LOCAL_VARIABLE_IDENTIFIER_ATTRIBUTE));
+          base.VisitLet(letBinding);
+        }
+
         public override void VisitTopLevelModuleOrNamespaceDeclaration(ITopLevelModuleOrNamespaceDeclaration module)
         {
           foreach (var member in module.MembersEnumerable)
@@ -97,10 +106,23 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
           myHighlightings.Add(CreateHighlighting(nameToken, highlightingAttrId));
         }
 
+        public override void VisitMemberDeclaration(IMemberDeclaration member)
+        {
+          var idToken = member.Identifier.IdentifierToken;
+          if (idToken == null)
+            return;
+
+          var highlightingAttrId = member.ParametersEnumerable.IsEmpty()
+            ? HighlightingAttributeIds.FIELD_IDENTIFIER_ATTRIBUTE
+            : HighlightingAttributeIds.METHOD_IDENTIFIER_ATTRIBUTE;
+          myHighlightings.Add(CreateHighlighting(idToken, highlightingAttrId));
+        }
+
         public override void VisitNestedModuleDeclaration(INestedModuleDeclaration module)
         {
-          myHighlightings.Add(CreateHighlighting(module.Identifier.IdentifierToken,
-            HighlightingAttributeIds.TYPE_STATIC_CLASS_ATTRIBUTE));
+          var idToken = module.Identifier.IdentifierToken;
+          if (idToken != null)
+            myHighlightings.Add(CreateHighlighting(idToken, HighlightingAttributeIds.TYPE_STATIC_CLASS_ATTRIBUTE));
 
           foreach (var member in module.MembersEnumerable)
           {
@@ -111,14 +133,19 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 
         public override void VisitFSharpExceptionDeclaration(IFSharpExceptionDeclaration exn)
         {
-          myHighlightings.Add(CreateHighlighting(exn.Identifier.IdentifierToken,
-            HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE));
+          var idToken = exn.Identifier.IdentifierToken;
+          if (idToken != null)
+            myHighlightings.Add(CreateHighlighting(idToken, HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE));
         }
 
         public override void VisitFSharpObjectModelTypeDeclaration(IFSharpObjectModelTypeDeclaration type)
         {
-          myHighlightings.Add(CreateHighlighting(type.Identifier.IdentifierToken,
-            GetHighlightingAttributeId(type.TypeKind)));
+          var idToken = type.Identifier.IdentifierToken;
+          if (idToken != null)
+            myHighlightings.Add(CreateHighlighting(idToken, GetHighlightingAttributeId(type.TypeKind)));
+
+          foreach (var member in type.TypeMembersEnumerable)
+            member.Accept(this);
         }
 
         [NotNull]
@@ -139,8 +166,9 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 
         public override void VisitFSharpSimpleTypeDeclaration(IFSharpSimpleTypeDeclaration type)
         {
-          myHighlightings.Add(CreateHighlighting(type.Identifier.IdentifierToken,
-            HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE));
+          var idToken = type.Identifier.IdentifierToken;
+          if (idToken != null)
+            myHighlightings.Add(CreateHighlighting(idToken, HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE));
         }
 
         public override void VisitOpen(IOpen open)
@@ -180,8 +208,19 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
           myHighlightings.Add(CreateHighlighting(ids[idsCount - 1], highlightingAttrId));
         }
 
+        public override void VisitFSharpRecordDeclaration(IFSharpRecordDeclaration record)
+        {
+          foreach (var field in record.FieldsEnumerable)
+          {
+            var idToken = field.Identifier.IdentifierToken;
+            if (idToken != null)
+              myHighlightings.Add(CreateHighlighting(idToken, HighlightingAttributeIds.FIELD_IDENTIFIER_ATTRIBUTE));
+          }
+          base.VisitFSharpRecordDeclaration(record);
+        }
+
         [NotNull]
-        private static HighlightingInfo CreateHighlighting(ITreeNode token, string highlightingAttributeId)
+        private static HighlightingInfo CreateHighlighting([NotNull] ITreeNode token, string highlightingAttributeId)
         {
           var range = token.GetNavigationRange();
           var highlighting = new FSharpIdentifierHighlighting(highlightingAttributeId, range);
