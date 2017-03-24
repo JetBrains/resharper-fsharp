@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.FSharp.Impl;
 using JetBrains.ReSharper.Psi.FSharp.Util;
+using JetBrains.ReSharper.Psi.Impl.Search;
 using JetBrains.ReSharper.Psi.Search;
 using JetBrains.Util;
+using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Searching
 {
@@ -12,10 +14,13 @@ namespace JetBrains.ReSharper.Psi.FSharp.Searching
   public class FSharpSearcherFactory : IDomainSpecificSearcherFactory
   {
     private readonly SearchDomainFactory mySearchDomainFactory;
+    private readonly CLRDeclaredElementSearcherFactory myClrSearchFactory;
 
-    public FSharpSearcherFactory(SearchDomainFactory searchDomainFactory)
+    public FSharpSearcherFactory(SearchDomainFactory searchDomainFactory,
+      CLRDeclaredElementSearcherFactory clrSearchFactory)
     {
       mySearchDomainFactory = searchDomainFactory;
+      myClrSearchFactory = clrSearchFactory;
     }
 
     public bool IsCompatibleWithLanguage(PsiLanguageType languageType)
@@ -57,7 +62,12 @@ namespace JetBrains.ReSharper.Psi.FSharp.Searching
     {
       var fakeElement = declaredElement as FSharpFakeElementFromReference;
       var actualElement = fakeElement?.GetActualElement();
-      if (actualElement != null) return mySearchDomainFactory.CreateSearchDomain(actualElement.GetSolution(), false);
+      if (actualElement != null)
+        myClrSearchFactory.GetDeclaredElementSearchDomain(actualElement);
+
+      var mfv = fakeElement?.Symbol as FSharpMemberOrFunctionOrValue;
+      if (mfv != null && !mfv.IsMember && !mfv.IsModuleValueOrMember)
+        return mySearchDomainFactory.CreateSearchDomain(fakeElement.GetSourceFile());
 
       return mySearchDomainFactory.CreateSearchDomain(declaredElement.GetSolution(), false);
     }
