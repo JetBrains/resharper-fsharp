@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.FSharp.Impl;
+using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Modules;
-using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
@@ -177,9 +177,14 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     }
 
     [CanBeNull]
-    public static FSharpSymbol GetFSharpSymbolFromFakeElement(IDeclaredElement element)
+    public static FSharpSymbol GetFSharpSymbolFromElement(IDeclaredElement element)
     {
-      return (element as FSharpFakeElementFromReference)?.Symbol;
+      var fakeLemement = element as FSharpFakeElementFromReference;
+      if (fakeLemement != null)
+        return fakeLemement.Symbol;
+
+      var localDeclaration = element as ILocalDeclaration;
+      return localDeclaration?.Symbol;
     }
   }
 }

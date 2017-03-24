@@ -4,6 +4,7 @@ using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
 using JetBrains.ReSharper.Psi.FSharp.Impl;
+using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.Util;
 using JetBrains.Util.Extension;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
@@ -97,7 +98,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
           names.Add(element.ShortName.SubstringBeforeLast("Module"));
       }
 
-      var fsSymbol = (element as FSharpFakeElementFromReference)?.Symbol;
+      var fsSymbol = FSharpElementsUtil.GetFSharpSymbolFromElement(element);
       if (fsSymbol == null) return names;
 
       var entity = fsSymbol as FSharpEntity;
