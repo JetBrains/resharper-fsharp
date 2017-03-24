@@ -4,6 +4,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.FSharp.Impl;
 using JetBrains.ReSharper.Psi.Modules;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
@@ -106,6 +107,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       if (paramsOwner == null)
         return true;
 
+      var typeParametersOwner = member as ITypeParametersOwner;
+      var methodTypeParameters = typeParametersOwner != null
+        ? typeParameters.Prepend(typeParametersOwner.TypeParameters).ToIList()
+        : typeParameters;
+
       var memberParams = paramsOwner.Parameters.ToArray();
       var fsParamsTypes = GetParametersTypes(mfv);
       if (memberParams.Length != fsParamsTypes.Length)
@@ -122,15 +128,18 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
           if (!fsParamType.IsGenericParameter)
             return false;
 
-          if (typeParameter.ShortName != fsParamType.GenericParameter.Name)
-            return false;
+          var typeParameterName = typeParameter.ShortName;
+          var fsTypeParameterName = fsParamType.GenericParameter.Name;
+          if (typeParameterName != fsTypeParameterName &&
+              (typeParameterName[0] != 'T' || typeParameterName.Substring(1) != fsTypeParameterName))
+            return false; // sometimes TKey replaced with Key, todo: why and where?
         }
         else
         {
           if (fsParamType.IsGenericParameter)
             return false;
 
-          if (!memberParamType.Equals(FSharpTypesUtil.GetType(fsParamType, typeParameters, psiModule)))
+          if (!memberParamType.Equals(FSharpTypesUtil.GetType(fsParamType, methodTypeParameters, psiModule)))
             return false;
         }
       }
