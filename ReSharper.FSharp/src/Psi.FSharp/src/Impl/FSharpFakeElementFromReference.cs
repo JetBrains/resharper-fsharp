@@ -23,10 +23,16 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
       myReferenceOwner = referenceOwner;
     }
 
+    /// <summary>
+    /// Should be used on local declarations only
+    /// </summary>
     [CanBeNull]
-    public IPsiSourceFile GetSourceFile()
+    public ITreeNode GetContainingTypeMemberDeclaration()
     {
-      return myReferenceOwner.GetSourceFile();
+      var mfv = Symbol as FSharpMemberOrFunctionOrValue;
+      Assertion.Assert(mfv != null && !mfv.IsMember && !mfv.IsModuleValueOrMember,
+        $"Getting local declaratiion for top value: {Symbol}");
+      return myReferenceOwner.GetContainingNode<ITypeMemberDeclaration>();
     }
 
     [CanBeNull]

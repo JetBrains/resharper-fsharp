@@ -67,7 +67,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Searching
 
       var mfv = fakeElement?.Symbol as FSharpMemberOrFunctionOrValue;
       if (mfv != null && !mfv.IsMember && !mfv.IsModuleValueOrMember)
-        return mySearchDomainFactory.CreateSearchDomain(fakeElement.GetSourceFile());
+        return mySearchDomainFactory.CreateSearchDomain(fakeElement.GetContainingTypeMemberDeclaration());
 
       return mySearchDomainFactory.CreateSearchDomain(declaredElement.GetSolution(), false);
     }
