@@ -392,6 +392,7 @@
     <Compile Include="src\CodeCompletion\FSharpCodeCompletionContextProvider.cs" />
     <Compile Include="src\CodeCompletion\FSharpItemsProvider.cs" />
     <Compile Include="src\Comment\FSharpLineCommentActionProvider.cs" />
+    <Compile Include="src\Debugger\FSharpBreakpointVariantsProvider.cs" />
     <Compile Include="ZoneMarker.cs" />
   </ItemGroup>
   <ItemGroup>
