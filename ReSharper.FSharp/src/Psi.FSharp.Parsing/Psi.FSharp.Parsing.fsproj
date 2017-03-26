@@ -54,6 +54,7 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="FSharpTreeBuilder.fs" />
     <Compile Include="FSharpParser.fs" />
+    <Compile Include="QuickParse.fs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Psi.FSharp\Psi.FSharp.csproj">
@@ -77,22 +78,25 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="JetBrains.Platform.DocumentModel">
-      <HintPath>..\..\packages\JetBrains.Platform.Core.Text.108.0.20170319.94803-eap06\DotFiles\JetBrains.Platform.DocumentModel.dll</HintPath>
+      <HintPath>..\..\packages\JetBrains.Platform.Core.Text.108.0.20170325.143358-eap06\DotFiles\JetBrains.Platform.DocumentModel.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.Platform.Interop.WinApi">
+      <HintPath>..\..\packages\JetBrains.Platform.Core.Shell.108.0.20170324.231632-eap06\DotFiles\JetBrains.Platform.Interop.WinApi.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.Platform.ProjectModel">
       <HintPath>..\..\packages\JetBrains.Platform.Core.Ide.108.0.20170319.94803-eap06\DotFiles\JetBrains.Platform.ProjectModel.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.Platform.Shell">
-      <HintPath>..\..\packages\JetBrains.Platform.Core.Shell.108.0.20170319.94250-eap06\DotFiles\JetBrains.Platform.Shell.dll</HintPath>
+      <HintPath>..\..\packages\JetBrains.Platform.Core.Shell.108.0.20170324.231632-eap06\DotFiles\JetBrains.Platform.Shell.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.Platform.TextControl">
-      <HintPath>..\..\packages\JetBrains.Platform.Core.Text.108.0.20170319.94803-eap06\DotFiles\JetBrains.Platform.TextControl.dll</HintPath>
+      <HintPath>..\..\packages\JetBrains.Platform.Core.Text.108.0.20170325.143358-eap06\DotFiles\JetBrains.Platform.TextControl.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.Platform.Util">
-      <HintPath>..\..\packages\JetBrains.Platform.Core.Shell.108.0.20170319.94250-eap06\DotFiles\JetBrains.Platform.Util.dll</HintPath>
+      <HintPath>..\..\packages\JetBrains.Platform.Core.Shell.108.0.20170324.231632-eap06\DotFiles\JetBrains.Platform.Util.dll</HintPath>
     </Reference>
     <Reference Include="JetBrains.ReSharper.Psi">
-      <HintPath>..\..\packages\JetBrains.Psi.Features.Core.108.0.20170319.95107-eap06\DotFiles\JetBrains.ReSharper.Psi.dll</HintPath>
+      <HintPath>..\..\packages\JetBrains.Psi.Features.Core.108.0.20170325.143733-eap06\DotFiles\JetBrains.ReSharper.Psi.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
     <Reference Include="System" />
@@ -101,6 +105,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Reflection.Metadata">
       <HintPath>..\..\packages\System.Reflection.Metadata.1.4.2\lib\portable-net45+win8\System.Reflection.Metadata.dll</HintPath>
@@ -111,6 +116,8 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
