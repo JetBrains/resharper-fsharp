@@ -8,6 +8,10 @@
   <extensions defaultExtensionNs="com.intellij">
     <fileTypeFactory id="F#" implementation="com.jetbrains.resharper.ideaInterop.fileTypes.fsharp.FSharpFileTypeFactory"/>
     <lang.parserDefinition language="F#" implementationClass="com.jetbrains.resharper.ideaInterop.fileTypes.fsharp.FSharpParserDefinition"/>
-    <typedHandler implementation="com.jetbrains.resharper.editorActions.FSharpTypeHandler"/>
+    <lang.ast.factory language="F#" implementationClass="com.jetbrains.resharper.ideaInterop.fileTypes.fsharp.FSharpAstFactory"/>
+    <backend.typedHandler language="F#" implementationClass="com.jetbrains.resharper.editorActions.RiderTypedHandler"/>
+    <completion.contributor language="F#" implementationClass="com.jetbrains.resharper.completion.ReSharperCompletionContributor" />
+    <backend.markup.adapterFactory language="F#" implementationClass="com.jetbrains.resharper.daemon.RiderMarkupAdapterFactory" />
+    <backend.actions.support language="F#" implementationClass="com.jetbrains.resharper.actions.RiderActionSupportPolicy" />
   </extensions>
 </idea-plugin>
