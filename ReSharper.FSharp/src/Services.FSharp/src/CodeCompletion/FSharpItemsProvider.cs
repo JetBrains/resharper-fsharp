@@ -6,7 +6,6 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.FSharp;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.Util;
-using JetBrains.Util.Extension;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Control;
@@ -40,7 +39,7 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
         if (symbol.DisplayName.Contains(' '))
           continue;
 
-        var lookupItem = new TextLookupItem(GetCompletionText(symbol));
+        var lookupItem = new TextLookupItem(symbol.DisplayName);
         lookupItem.InitializeRanges(GetDefaultRanges(context), context.BasicContext);
         collector.Add(lookupItem);
       }
@@ -77,19 +76,6 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
         hasTextChangedSinceLastTypecheck: null);
 
       return FSharpAsync.RunSynchronously(getCompletionsAsync, null, null);
-    }
-
-    [NotNull]
-    private static string GetCompletionText([NotNull] FSharpSymbol symbol)
-    {
-      const string attributeSuffix = "Attribute";
-
-      var entity = symbol as FSharpEntity;
-      var name = entity != null && entity.IsAttributeType
-        ? entity.DisplayName.SubstringBeforeLast(attributeSuffix)
-        : symbol.DisplayName;
-
-      return name;
     }
   }
 }

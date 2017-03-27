@@ -1,6 +1,7 @@
 ﻿using JetBrains.Annotations;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Impl;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure;
+using JetBrains.ReSharper.Feature.Services.Lookup;
 using JetBrains.ReSharper.Psi.FSharp.Parsing;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Tree;
@@ -41,6 +42,7 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
         ? defaultRanges.WithReplaceRange(new TextRange(caretOffset, tokenAtCaret.GetTreeEndOffset().Offset))
         : defaultRanges;
 
+      context.Parameters.InitialLookupFocusBehaviour = LookupFocusBehaviour.Soft;
       return new FSharpCodeCompletionContext(context, ranges);
     }
 
