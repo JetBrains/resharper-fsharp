@@ -11,14 +11,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       return Identifier.GetNameRange();
     }
 
-    public override void SetName(string name)
-    {
-    }
-
     public IAccessModifiers AccessModifiers => null;
+
     public IAccessModifiers SetAccessModifiers(IAccessModifiers param)
     {
-      throw new System.NotImplementedException();
+      return null;
     }
   }
 }

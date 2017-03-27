@@ -12,10 +12,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       return Identifier.GetNameRange();
     }
 
-    public override void SetName(string name)
-    {
-    }
-
     protected override void PreInit()
     {
       base.PreInit();

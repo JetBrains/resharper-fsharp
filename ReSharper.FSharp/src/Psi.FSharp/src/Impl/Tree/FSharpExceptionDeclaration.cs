@@ -8,9 +8,5 @@
     {
       return Identifier.GetNameRange();
     }
-
-    public override void SetName(string name)
-    {
-    }
   }
 }

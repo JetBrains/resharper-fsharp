@@ -32,12 +32,16 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 
     public abstract IDeclaredElement DeclaredElement { get; }
     public abstract string DeclaredName { get; }
-    public abstract void SetName(string name);
     public abstract TreeTextRange GetNameRange();
 
     public XmlNode GetXMLDoc(bool inherit)
     {
       return null; // todo
+    }
+
+    public void SetName(string name)
+    {
+      // todo
     }
 
     public bool IsSynthetic()

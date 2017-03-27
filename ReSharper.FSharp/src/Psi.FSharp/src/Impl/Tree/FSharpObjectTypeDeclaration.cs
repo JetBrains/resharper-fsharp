@@ -11,10 +11,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 
     public override string DeclaredName => Identifier.GetName();
 
-    public override void SetName(string name)
-    {
-    }
-
     public override TreeTextRange GetNameRange()
     {
       return Identifier.GetNameRange();

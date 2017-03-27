@@ -42,11 +42,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 
     INamespace INamespaceDeclaration.DeclaredElement => DeclaredElement as INamespace;
 
-    public override void SetName(string name)
-    {
-      // todo
-    }
-
     public void SetQualifiedName(string qualifiedName)
     {
       // todo

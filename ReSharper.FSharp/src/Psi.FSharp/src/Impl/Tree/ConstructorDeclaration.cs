@@ -15,10 +15,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       return NewKeyword.GetTreeTextRange();
     }
 
-    public override void SetName(string name)
-    {
-    }
-
     protected override IDeclaredElement CreateDeclaredElement()
     {
       return new FSharpConstructor(this, GetFSharpSymbol() as FSharpMemberOrFunctionOrValue);

@@ -16,9 +16,5 @@
         ? LongIdentifier.GetNameRange()
         : new TreeTextRange(TreeOffset.Zero);
     }
-
-    public override void SetName(string name)
-    {
-    }
   }
 }

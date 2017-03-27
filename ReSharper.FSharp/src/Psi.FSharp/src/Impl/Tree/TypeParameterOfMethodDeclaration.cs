@@ -9,10 +9,6 @@
       return Identifier.GetNameRange();
     }
 
-    public override void SetName(string name)
-    {
-    }
-
     public override IDeclaredElement DeclaredElement => null;
   }
 }

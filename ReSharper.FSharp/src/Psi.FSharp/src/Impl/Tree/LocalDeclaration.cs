@@ -17,10 +17,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       return Identifier.GetNameRange();
     }
 
-    public override void SetName(string name)
-    {
-    }
-
     public IList<IDeclaration> GetDeclarations()
     {
       return new IDeclaration[] {this};
