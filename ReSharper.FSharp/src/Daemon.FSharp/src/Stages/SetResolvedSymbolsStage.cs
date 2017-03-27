@@ -75,13 +75,14 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
     {
       // todo: add other symbols (e.g let bindings, local values, type members), be careful with implicit constructors
       if (symbol is FSharpEntity)
-      {
         return token.GetContainingNode<IFSharpDeclaration>();
-      }
+
       if (symbol is FSharpField)
-      {
         return token.GetContainingNode<IFSharpFieldDeclaration>();
-      }
+
+      if (symbol is FSharpUnionCase)
+        return token.GetContainingNode<IFSharpUnionCaseDeclaration>();
+
       var mfv = symbol as FSharpMemberOrFunctionOrValue;
       if (mfv == null)
         return null;

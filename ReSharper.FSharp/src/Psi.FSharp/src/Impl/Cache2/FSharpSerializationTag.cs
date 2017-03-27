@@ -10,7 +10,7 @@
     EnumPart = 5,
     RecordPart = 6,
     UnionPart = 7,
-    TypedUnionCasePart = 8,
+    UnionCasePart = 8,
     TypeAbbreviationPart = 9,
     InterfacePart = 10,
     ClassPart = 11,

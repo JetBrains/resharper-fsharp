@@ -33,8 +33,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
         return;
       }
 
-      IsReadable = property.HasGetterMethod;
-      IsWritable = property.HasSetterMethod;
+      IsReadable = property.IsModuleValueOrMember || property.HasGetterMethod;
+      IsWritable = property.IsModuleValueOrMember ? property.IsMutable : property.HasSetterMethod;
       ShortName = property.CompiledName; // todo: returns LogicalName, fix it in FCS
 
       ReturnType = FSharpTypesUtil.GetType(property.ReturnParameter.Type, declaration, Module) ??

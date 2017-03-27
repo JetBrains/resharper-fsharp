@@ -192,7 +192,6 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         let mark = builder.Mark()
         x.ProcessIdentifier id
         x.Done(mark, elementType)
-        
 
     member private x.ProcessException (SynExceptionDefn(SynExceptionDefnRepr(_,(UnionCase(_,id,_,_,_,_)),_,_,_,_),_,range)) =
         range |> x.GetStartOffset |> x.AdvanceToOffset
@@ -205,24 +204,22 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         range |> x.GetEndOffset |> x.AdvanceToOffset
         builder.Done(mark, ElementType.F_SHARP_EXCEPTION_DECLARATION, null)
 
-    member private x.IsTypedCase (UnionCase(_,_,fieldType,_,_,_)) =
-        match fieldType with
-        | UnionCaseFields([]) -> false
-        | _ -> true
+    member private x.ProcessUnionCaseType caseType =
+        match caseType with
+        | UnionCaseFields(fields) ->
+            List.iter x.ProcessField fields
 
-    member private x.ProcessUnionCase (UnionCase(_,id,caseType,_,_,range) as case) =
-        if x.IsTypedCase case then
-            range |> x.GetStartOffset |> x.AdvanceToOffset
-            let exnMark = builder.Mark()
-            x.ProcessIdentifier id
+        | UnionCaseFullType(_) -> () // todo: used in FSharp.Core only, otherwise warning
 
-    //        processUnionCaseTypes caseType
+    member private x.ProcessUnionCase (UnionCase(_,id,caseType,_,_,range)) =
+        range |> x.GetStartOffset |> x.AdvanceToOffset
+        let mark = builder.Mark()
 
-            range |> x.GetEndOffset |> x.AdvanceToOffset
-    //        let elementType = if isTypedCase case
-    //                          then ElementType.F_SHARP_TYPED_UNION_CASE_DECLARATION
-    //                          else ElementType.F_SHARP_SINGLETON_UNION_CASE_DECLARATION
-            builder.Done(exnMark, ElementType.F_SHARP_TYPED_UNION_CASE_DECLARATION, null)
+        x.ProcessIdentifier id
+        x.ProcessUnionCaseType caseType
+
+        range |> x.GetEndOffset |> x.AdvanceToOffset
+        builder.Done(mark, ElementType.F_SHARP_UNION_CASE_DECLARATION, null)
 
     member private x.AdvanceToKeywordOrOffset (keyword : TokenNodeType) (maxOffset : int) =
         while builder.GetTokenOffset() < maxOffset &&

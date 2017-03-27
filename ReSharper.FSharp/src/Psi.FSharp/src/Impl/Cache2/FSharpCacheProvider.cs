@@ -34,8 +34,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
           return new RecordPart(reader);
         case FSharpSerializationTag.UnionPart:
           return new UnionPart(reader);
-        case FSharpSerializationTag.TypedUnionCasePart:
-          return new TypedUnionCasePart(reader);
+        case FSharpSerializationTag.UnionCasePart:
+          return new UnionCasePart(reader);
         case FSharpSerializationTag.TypeAbbreviationPart:
           return new TypeAbbreviationPart(reader);
         case FSharpSerializationTag.ClassPart:

@@ -3,8 +3,6 @@ using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
-using JetBrains.ReSharper.Psi.FSharp.Impl;
-using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.Util;
 using JetBrains.Util.Extension;
 using Microsoft.FSharp.Compiler.SourceCodeServices;

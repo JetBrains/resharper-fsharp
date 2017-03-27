@@ -81,14 +81,14 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     public override void VisitFSharpUnionDeclaration(IFSharpUnionDeclaration decl)
     {
       myBuilder.StartPart(new UnionPart(decl));
-      foreach (var unionCase in decl.CasesEnumerable)
+      foreach (var unionCase in decl.UnionCasesEnumerable)
         unionCase.Accept(this);
       myBuilder.EndPart();
     }
 
-    public override void VisitFSharpTypedUnionCaseDeclaration(IFSharpTypedUnionCaseDeclaration decl)
+    public override void VisitFSharpUnionCaseDeclaration(IFSharpUnionCaseDeclaration decl)
     {
-      myBuilder.StartPart(new TypedUnionCasePart(decl));
+      myBuilder.StartPart(new UnionCasePart(decl));
       myBuilder.EndPart();
     }
 

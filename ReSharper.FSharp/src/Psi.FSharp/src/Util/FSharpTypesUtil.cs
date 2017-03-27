@@ -5,6 +5,7 @@ using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
+using JetBrains.Util.dataStructures;
 using JetBrains.Util.Extension;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
@@ -15,6 +16,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
   /// </summary>
   public class FSharpTypesUtil
   {
+    private const string TupleClrName = "System.Tuple`";
+    private const string FSharpFuncClrName = "Microsoft.FSharp.Core.FSharpFunc`";
+
     [CanBeNull]
     public static IDeclaredType GetBaseType([NotNull] FSharpEntity entity,
       IList<ITypeParameter> typeParametersFromContext, [NotNull] IPsiModule psiModule)
@@ -53,10 +57,10 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       var typeArgumentsCount = fsType.GenericArguments.Count;
 
       if (fsType.IsTupleType)
-        return "System.Tuple`" + typeArgumentsCount;
+        return TupleClrName + typeArgumentsCount;
 
       if (fsType.IsFunctionType)
-        return "Microsoft.FSharp.Core.FSharpFunc`" + typeArgumentsCount;
+        return FSharpFuncClrName + typeArgumentsCount;
 
       return fsType.TypeDefinition.QualifiedName.SubstringBefore(",");
     }
@@ -68,7 +72,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     public static IType GetType([NotNull] FSharpType fsType,
       [NotNull] ITypeMemberDeclaration typeMemberDeclaration, [NotNull] IPsiModule psiModule)
     {
-      return GetType(fsType, GetTypeParametersFromOuterType(typeMemberDeclaration), psiModule);
+      return GetType(fsType, GetOuterTypeParameters(typeMemberDeclaration), psiModule);
     }
 
     [CanBeNull]
@@ -76,16 +80,24 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       [NotNull] ITypeMemberDeclaration methodDeclaration, [NotNull] IList<ITypeParameter> methodTypeParams,
       [NotNull] IPsiModule psiModule)
     {
-      var typeParametersFromType = GetTypeParametersFromOuterType(methodDeclaration);
+      var typeParametersFromType = GetOuterTypeParameters(methodDeclaration);
       var typeParametersFromContext = typeParametersFromType?.Prepend(methodTypeParams).ToIList() ?? methodTypeParams;
       return GetType(fsType, typeParametersFromContext, psiModule);
     }
 
     [CanBeNull]
-    private static IList<ITypeParameter> GetTypeParametersFromOuterType(ITypeMemberDeclaration typeMemberDeclaration)
+    private static IList<ITypeParameter> GetOuterTypeParameters(ITypeMemberDeclaration typeMemberDeclaration)
     {
+      var allTypeParameters = new FrugalLocalList<ITypeParameter>();
       var typeDeclaration = typeMemberDeclaration.GetContainingTypeDeclaration();
-      return typeDeclaration?.DeclaredElement?.TypeParameters;
+      while (typeDeclaration != null)
+      {
+        var typeParameters = typeDeclaration.DeclaredElement?.TypeParameters;
+        if (typeParameters != null)
+          allTypeParameters.AddRange(typeParameters);
+        typeDeclaration = typeDeclaration.GetContainingNode<ITypeDeclaration>();
+      }
+      return allTypeParameters.ToList();
     }
 
     [CanBeNull]

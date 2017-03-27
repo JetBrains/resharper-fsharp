@@ -235,24 +235,11 @@ fSharpUnionDeclaration options {
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
-  fSharpUnionCaseDeclaration<UNION_CASE, Cases>* fakeSeparator
+  fSharpUnionCaseDeclaration<UNION_CASE, UnionCases>* fakeSeparator
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*
 ;
 
-interface fSharpUnionCaseDeclaration
-:
-//  fSharpSingletonUnionCaseDeclaration |
-  fSharpTypedUnionCaseDeclaration
-;
-
-//fSharpSingletonUnionCaseDeclaration options {
-//  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpProperTypeMemberDeclarationBase";
-//}
-//:
-//  fSharpIdentifier<IDENTIFIER, Identifier>
-//;
-
-fSharpTypedUnionCaseDeclaration options {
+fSharpUnionCaseDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :

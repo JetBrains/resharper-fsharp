@@ -24,13 +24,17 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
       {
         IsWritable = false;
         ReturnType = TypeFactory.CreateUnknownType(Module);
+        ShortName = declaration.ShortName;
         return;
       }
 
       IsWritable = field.IsMutable;
       ReturnType = FSharpTypesUtil.GetType(field.FieldType, declaration, Module) ??
                    TypeFactory.CreateUnknownType(Module);
+      ShortName = field.Name;
     }
+
+    public override string ShortName { get; }
 
     public override DeclaredElementType GetElementType()
     {

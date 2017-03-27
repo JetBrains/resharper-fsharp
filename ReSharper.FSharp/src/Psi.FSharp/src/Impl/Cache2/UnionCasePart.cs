@@ -6,14 +6,14 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
-  internal class TypedUnionCasePart : FSharpClassLikePart<IFSharpTypedUnionCaseDeclaration>, Class.IClassPart
+  internal class UnionCasePart : FSharpClassLikePart<IFSharpUnionCaseDeclaration>, Class.IClassPart
   {
-    public TypedUnionCasePart(IReader reader) : base(reader)
+    public UnionCasePart(IFSharpUnionCaseDeclaration declaration)
+      : base(declaration, ModifiersUtil.GetDecoration(declaration))
     {
     }
 
-    public TypedUnionCasePart(IFSharpTypedUnionCaseDeclaration declaration)
-      : base(declaration, MemberDecoration.DefaultValue)
+    public UnionCasePart(IReader reader) : base(reader)
     {
     }
 
@@ -25,7 +25,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public override TypeElement CreateTypeElement()
     {
-      return new FSharpTypedUnionCase(this);
+      return new FSharpUnionCase(this);
     }
 
     public MemberPresenceFlag GetMemberPresenceFlag()
@@ -33,6 +33,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       return MemberPresenceFlag.INSTANCE_CTOR;
     }
 
-    protected override byte SerializationTag => (byte) FSharpSerializationTag.TypedUnionCasePart;
+    protected override byte SerializationTag => (byte) FSharpSerializationTag.UnionCasePart;
   }
 }
