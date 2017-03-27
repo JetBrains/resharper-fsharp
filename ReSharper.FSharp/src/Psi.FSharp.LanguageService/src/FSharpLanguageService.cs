@@ -15,11 +15,13 @@ namespace JetBrains.ReSharper.Psi.FSharp.LanguageService
   public class FSharpLanguageService : Psi.LanguageService
   {
     private readonly FSharpCheckerService myFSharpCheckerService;
+    private readonly ILogger myLogger;
 
     public FSharpLanguageService(PsiLanguageType psiLanguageType, IConstantValueService constantValueService,
-      FSharpCheckerService fSharpCheckerService) : base(psiLanguageType, constantValueService)
+      FSharpCheckerService fSharpCheckerService, ILogger logger) : base(psiLanguageType, constantValueService)
     {
       myFSharpCheckerService = fSharpCheckerService;
+      myLogger = logger;
       CacheProvider = new FSharpCacheProvider();
     }
 
@@ -40,7 +42,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.LanguageService
 
     public override IParser CreateParser(ILexer lexer, IPsiModule module, IPsiSourceFile sourceFile)
     {
-      return new FSharpParser(sourceFile, myFSharpCheckerService);
+      return new FSharpParser(sourceFile, myFSharpCheckerService, myLogger);
     }
 
     public override IDeclaredElementPresenter DeclaredElementPresenter =>
