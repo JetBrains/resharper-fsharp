@@ -23,12 +23,15 @@ namespace JetBrains.ReSharper.Daemon.FSharp
     {
       if (mfv.IsEvent || mfv.IsEventAddMethod || mfv.IsEventRemoveMethod)
         return HighlightingAttributeIds.EVENT_IDENTIFIER_ATTRIBUTE;
-      if (mfv.IsProperty || mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod)
-        return HighlightingAttributeIds.FIELD_IDENTIFIER_ATTRIBUTE;
 
       var name = mfv.DisplayName;
       if (mfv.IsImplicitConstructor || name == ClrConstructorName || name == FSharpConstructorName)
         return HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE;
+
+      if (mfv.IsMember && !mfv.EnclosingEntity.IsFSharpModule)
+        return mfv.IsProperty || mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod
+          ? HighlightingAttributeIds.FIELD_IDENTIFIER_ATTRIBUTE
+          : HighlightingAttributeIds.METHOD_IDENTIFIER_ATTRIBUTE;
 
       return HighlightingAttributeIds.LOCAL_VARIABLE_IDENTIFIER_ATTRIBUTE;
     }

@@ -24,7 +24,7 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
       var textControl = context.TextControl;
 
       var tokenAtCaret = TextControlToPsi.GetSourceTokenAtCaret(solution, textControl);
-      var tokenBeforeCaret = TextControlToPsi.GetSourceTokenBeforeCaret(solution, textControl) as ITokenNode;
+      var tokenBeforeCaret = TextControlToPsi.GetSourceTokenBeforeCaret(solution, textControl);
       var tokenType = tokenBeforeCaret?.GetTokenType();
 
       if (tokenAtCaret == tokenBeforeCaret && tokenType != null &&

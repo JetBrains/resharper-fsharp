@@ -30,7 +30,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
     public ITreeNode GetContainingTypeMemberDeclaration()
     {
       var mfv = Symbol as FSharpMemberOrFunctionOrValue;
-      Assertion.Assert(mfv != null && !mfv.IsMember && !mfv.IsModuleValueOrMember,
+      Assertion.Assert(mfv != null && !mfv.IsModuleValueOrMember,
         $"Getting local declaratiion for top value: {Symbol}");
       return myReferenceOwner.GetContainingNode<ITypeMemberDeclaration>();
     }
@@ -39,7 +39,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
     public IClrDeclaredElement GetActualElement()
     {
       var mfv = Symbol as FSharpMemberOrFunctionOrValue;
-      if (mfv != null && !mfv.IsMember && !mfv.IsModuleValueOrMember)
+      if (mfv != null && !mfv.IsModuleValueOrMember)
         return FindLocalDeclaration(mfv);
 
       return FSharpElementsUtil.GetDeclaredElement(Symbol, myReferenceOwner.GetPsiModule());

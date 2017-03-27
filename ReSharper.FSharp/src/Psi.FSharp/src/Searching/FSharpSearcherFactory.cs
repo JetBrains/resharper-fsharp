@@ -63,12 +63,16 @@ namespace JetBrains.ReSharper.Psi.FSharp.Searching
       var fakeElement = declaredElement as FSharpFakeElementFromReference;
       var actualElement = fakeElement?.GetActualElement();
       if (actualElement != null)
-        myClrSearchFactory.GetDeclaredElementSearchDomain(actualElement);
+        return myClrSearchFactory.GetDeclaredElementSearchDomain(actualElement);
+
+      // todo: abbreviations
+      // mySearchDomainFactory.CreateSearchDomainOfModuleAndItsReferences(actualElement.Module);
 
       var mfv = fakeElement?.Symbol as FSharpMemberOrFunctionOrValue;
-      if (mfv != null && !mfv.IsMember && !mfv.IsModuleValueOrMember)
+      if (mfv != null && !mfv.IsModuleValueOrMember)
         return mySearchDomainFactory.CreateSearchDomain(fakeElement.GetContainingTypeMemberDeclaration());
 
+      // couldn't find element in caches and the element is not local
       return mySearchDomainFactory.CreateSearchDomain(declaredElement.GetSolution(), false);
     }
 

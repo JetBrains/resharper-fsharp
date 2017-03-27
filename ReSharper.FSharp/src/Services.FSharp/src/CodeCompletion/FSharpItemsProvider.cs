@@ -5,7 +5,6 @@ using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupI
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.FSharp;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
-using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.Util;
 using JetBrains.Util.Extension;
 using Microsoft.FSharp.Collections;
