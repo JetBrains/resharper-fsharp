@@ -3,15 +3,12 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.DataFlow;
-using JetBrains.DocumentModel;
 using JetBrains.Platform.ProjectModel.FSharp;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services;
-using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.Util;
-using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Control;
 using Microsoft.FSharp.Core;
@@ -33,6 +30,9 @@ namespace JetBrains.ReSharper.Psi.FSharp
     private readonly Dictionary<IProject, string[]> myProjectDefines =
       new Dictionary<IProject, string[]>();
 
+    private readonly Dictionary<string, int> myFilesVersions =
+      new Dictionary<string, int>(); // todo: clean it up when removing project containing file
+
     public FSharpCheckerService(Lifetime lifetime, OnSolutionCloseNotifier onSolutionCloseNotifier)
     {
       myChecker = FSharpChecker.Create(
@@ -47,6 +47,14 @@ namespace JetBrains.ReSharper.Psi.FSharp
         myProjectDefines.Clear();
         myChecker.ClearLanguageServiceRootCachesAndCollectAndFinalizeAllTransients();
       });
+    }
+
+    [CanBeNull]
+    public FSharpCheckFileResults GetPreviousCheckResults([NotNull] IPsiSourceFile sourceFile)
+    {
+      var projectOptions = GetProjectOptions(sourceFile);
+      var filename = sourceFile.GetLocation().FullPath;
+      return myChecker.TryGetRecentCheckResultsForFile(filename, projectOptions, null)?.Value.Item2;
     }
 
     [CanBeNull]
@@ -72,8 +80,9 @@ namespace JetBrains.ReSharper.Psi.FSharp
       var projectOptions = GetProjectOptions(sourceFile);
       var filename = sourceFile.GetLocation().FullPath;
       var source = sourceFile.Document.GetText();
+      var version = myFilesVersions[filename] = myFilesVersions.GetOrCreateValue(filename, -1) + 1;
 
-      var checkAsync = myChecker.CheckFileInProject(fsFile.ParseResults, filename, 0, source, projectOptions,
+      var checkAsync = myChecker.CheckFileInProject(fsFile.ParseResults, filename, version, source, projectOptions,
         textSnapshotInfo: null);
       return (checkAsync.RunAsTask(interruptChecker) as FSharpCheckFileAnswer.Succeeded)?.Item;
     }

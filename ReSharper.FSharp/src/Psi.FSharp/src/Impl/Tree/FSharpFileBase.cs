@@ -11,6 +11,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
   internal abstract class FSharpFileBase : FileElementBase, IFSharpFileCheckInfoOwner
   {
     private FSharpCheckFileResults CheckResults { get; set; }
+    public FSharpCheckFileResults PreviousCheckResults { get; set; }
 
     public FSharpParseFileResults ParseResults { get; set; }
     public FSharpCheckerService CheckerService { get; set; }
@@ -29,6 +30,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 
       return CheckResults = CheckerService.CheckFSharpFile(this, interruptChecker);
     }
+
 
     public virtual void Accept(TreeNodeVisitor visitor)
     {

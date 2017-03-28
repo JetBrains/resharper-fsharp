@@ -531,6 +531,7 @@
     <Compile Include="src\Tree\IFSharpObjectModelTypeDeclaration.cs" />
     <Compile Include="src\Tree\IFSharpTreeNode.cs" />
     <Compile Include="src\Tree\IImplicitConstructor.cs" />
+    <Compile Include="src\Tree\ILet.cs" />
     <Compile Include="src\Tree\ILocalDeclaration.cs" />
     <Compile Include="src\Tree\IMemberDeclaration.cs" />
     <Compile Include="src\Tree\ITypeParameterOfTypeDeclaration.cs" />

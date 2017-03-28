@@ -19,6 +19,7 @@ type FSharpParser(file : IPsiSourceFile, checkerService : FSharpCheckerService, 
         member this.ParseFile() =
             use lifetimeDefinition = Lifetimes.Define()
             let parseResults = checkerService.ParseFSharpFile file
+            let previousCheckResults = checkerService.GetPreviousCheckResults file
             match parseResults.ParseTree with
             | Some ast ->
                 let defines = checkerService.GetDefinedConstants file
@@ -28,6 +29,7 @@ type FSharpParser(file : IPsiSourceFile, checkerService : FSharpCheckerService, 
                 | :? IFSharpFile as fsFile ->
                     fsFile.TokenBuffer <- tokenBuffer
                     fsFile.ParseResults <- parseResults
+                    fsFile.PreviousCheckResults <- previousCheckResults
                     fsFile.CheckerService <- checkerService
                     fsFile :> IFile
                 | _ -> null

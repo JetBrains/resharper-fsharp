@@ -15,6 +15,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Tree
     FSharpCheckFileResults GetCheckResults(Action interruptChecker = null);
 
     [CanBeNull]
+    FSharpCheckFileResults PreviousCheckResults { get; set; }
+
+    [CanBeNull]
     Ast.ParsedInput ParseTree { get; }
 
     /// <summary>

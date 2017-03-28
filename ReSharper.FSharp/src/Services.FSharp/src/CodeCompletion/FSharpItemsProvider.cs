@@ -27,7 +27,7 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
         return false;
 
       var completions = GetFSharpCompletions(completionContext, fsFile);
-      if (completions == null)
+      if (completions == null || completions.IsEmpty)
         return false;
 
       foreach (var overloadsGroup in completions)
@@ -61,18 +61,26 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
       var caretOffset = completionContext.CaretTreeOffset.Offset;
       var coords = document.GetCoordsByOffset(caretOffset);
       var parseResults = new FSharpOption<FSharpParseFileResults>(fsFile.ParseResults);
-      var checkResults = fsFile.GetCheckResults();
+      var names = QuickParse.GetPartialLongNameEx(document.GetLineText(coords.Line), (int) coords.Column - 1);
+      var qualifiers = names.Item1;
+      var partialName = names.Item2;
+
+      var checkResults = !qualifiers.IsEmpty
+        ? fsFile.GetCheckResults()
+        : (fsFile.IsChecked
+          ? fsFile.GetCheckResults()
+          : fsFile.PreviousCheckResults ?? fsFile.GetCheckResults());
+
       if (checkResults == null)
         return null;
 
-      var names = QuickParse.GetPartialLongNameEx(document.GetLineText(coords.Line), (int) coords.Column - 1);
       var getCompletionsAsync = checkResults.GetDeclarationListSymbols(
         parseResults,
         (int) coords.Line + 1,
         (int) coords.Column,
         document.GetLineText(coords.Line),
-        qualifyingNames: names.Item1,
-        partialName: names.Item2,
+        qualifiers,
+        partialName,
         hasTextChangedSinceLastTypecheck: null);
 
       return FSharpAsync.RunSynchronously(getCompletionsAsync, null, null);
