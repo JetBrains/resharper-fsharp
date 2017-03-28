@@ -5,6 +5,7 @@ using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupI
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.FSharp;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
+using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.Util;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
@@ -39,7 +40,7 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
         if (symbol.DisplayName.Contains(' '))
           continue;
 
-        var lookupItem = new TextLookupItem(symbol.DisplayName);
+        var lookupItem = new TextLookupItem(symbol.DisplayName, symbol.GetIconId());
         lookupItem.InitializeRanges(GetDefaultRanges(context), context.BasicContext);
         collector.Add(lookupItem);
       }

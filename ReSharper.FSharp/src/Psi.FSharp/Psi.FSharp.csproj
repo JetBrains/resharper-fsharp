@@ -545,6 +545,7 @@
     <Compile Include="src\Tree\ITopLevelModuleOrNamespaceDeclaration.cs" />
     <Compile Include="src\Tree\INestedModuleDeclaration.cs" />
     <Compile Include="src\Util\FSharpElementsUtil.cs" />
+    <Compile Include="src\Util\FSharpIconsUtil.cs" />
     <Compile Include="src\Util\FSharpRangeUtil.cs" />
     <Compile Include="src\Util\FSharpNamesUtil.cs" />
     <Compile Include="src\Util\FSharpSymbolsUtil.cs" />
