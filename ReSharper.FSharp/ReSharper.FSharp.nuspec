@@ -25,8 +25,9 @@
     <file src="src\Services.FSharp\bin\Debug\JetBrains.ReSharper.Feature.Services.FSharp.dll" target="DotFiles" />
     <file src="src\Psi.FSharp.Parsing\bin\Debug\Psi.FSharp.Parsing.dll" target="DotFiles" />
     <file src="packages\FSharp.Core.4.1.0.2\lib\net40\FSharp.Core.dll" target="DotFiles" />
-    <file src="packages\FSharp.Compiler.Service.11.0.8\lib\net45\FSharp.Compiler.Service.dll" target="DotFiles"/>
-    <file src="packages\FSharp.Compiler.Service.11.0.8\lib\net45\FSharp.Compiler.Service.pdb" target="DotFiles"/>
-    <file src="packages\FSharp.Compiler.Service.11.0.8\lib\net45\FSharp.Compiler.Service.MSBuild.v12.dll" target="DotFiles"/>
+    <file src="packages\FSharp.Compiler.Service.12.0.1\lib\net45\FSharp.Compiler.Service.dll" target="DotFiles"/>
+    <file src="packages\FSharp.Compiler.Service.12.0.1\lib\net45\FSharp.Compiler.Service.pdb" target="DotFiles"/>
+    <file src="packages\FSharp.Compiler.Service.12.0.1\lib\net45\FSharp.Compiler.Service.MSBuild.v12.dll" target="DotFiles"/>
+    <file src="packages\System.ValueTuple.4.3.0\lib\netstandard1.0\System.ValueTuple.dll" target="DotFiles"/>
   </files>
 </package>

@@ -106,7 +106,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
       var getScriptOptionsAsync =
         myChecker.GetProjectOptionsFromScript(filePath, source, loadTime, otherFlags: null, useFsiAuxLib: null,
           assumeDotNetFramework: null, extraProjectInfo: null);
-      return FSharpAsync.RunSynchronously(getScriptOptionsAsync, null, null);
+      return FSharpAsync.RunSynchronously(getScriptOptionsAsync, null, null).Item1;
     }
 
     [NotNull]
