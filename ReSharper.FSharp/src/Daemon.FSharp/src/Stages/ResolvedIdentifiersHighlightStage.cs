@@ -77,10 +77,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 
         public override void VisitLet(ILet letBinding)
         {
-          var idToken = letBinding.Identifier.IdentifierToken;
-          if (idToken != null)
-            myHighlightings.Add(CreateHighlighting(idToken,
-              HighlightingAttributeIds.LOCAL_VARIABLE_IDENTIFIER_ATTRIBUTE));
+          HighlightIdentifier(letBinding.Identifier, HighlightingAttributeIds.LOCAL_VARIABLE_IDENTIFIER_ATTRIBUTE);
           base.VisitLet(letBinding);
         }
 
@@ -108,21 +105,24 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 
         public override void VisitMemberDeclaration(IMemberDeclaration member)
         {
-          var idToken = member.Identifier.IdentifierToken;
-          if (idToken == null)
-            return;
-
           var highlightingAttrId = member.ParametersEnumerable.IsEmpty()
             ? HighlightingAttributeIds.FIELD_IDENTIFIER_ATTRIBUTE
             : HighlightingAttributeIds.METHOD_IDENTIFIER_ATTRIBUTE;
-          myHighlightings.Add(CreateHighlighting(idToken, highlightingAttrId));
+
+          HighlightIdentifier(member.Identifier, highlightingAttrId);
+        }
+
+        public override void VisitFSharpUnionCaseDeclaration(IFSharpUnionCaseDeclaration caseDeclaration)
+        {
+          HighlightIdentifier(caseDeclaration.Identifier, HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE);
+
+          foreach (var fieldDeclaration in caseDeclaration.FieldsEnumerable)
+            HighlightIdentifier(fieldDeclaration.Identifier, HighlightingAttributeIds.FIELD_IDENTIFIER_ATTRIBUTE);
         }
 
         public override void VisitNestedModuleDeclaration(INestedModuleDeclaration module)
         {
-          var idToken = module.Identifier.IdentifierToken;
-          if (idToken != null)
-            myHighlightings.Add(CreateHighlighting(idToken, HighlightingAttributeIds.TYPE_STATIC_CLASS_ATTRIBUTE));
+          HighlightIdentifier(module.Identifier, HighlightingAttributeIds.TYPE_STATIC_CLASS_ATTRIBUTE);
 
           foreach (var member in module.MembersEnumerable)
           {
@@ -133,16 +133,12 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 
         public override void VisitFSharpExceptionDeclaration(IFSharpExceptionDeclaration exn)
         {
-          var idToken = exn.Identifier.IdentifierToken;
-          if (idToken != null)
-            myHighlightings.Add(CreateHighlighting(idToken, HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE));
+          HighlightIdentifier(exn.Identifier, HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE);
         }
 
         public override void VisitFSharpObjectModelTypeDeclaration(IFSharpObjectModelTypeDeclaration type)
         {
-          var idToken = type.Identifier.IdentifierToken;
-          if (idToken != null)
-            myHighlightings.Add(CreateHighlighting(idToken, GetHighlightingAttributeId(type.TypeKind)));
+          HighlightIdentifier(type.Identifier, GetHighlightingAttributeId(type.TypeKind));
 
           foreach (var member in type.TypeMembersEnumerable)
             member.Accept(this);
@@ -166,9 +162,18 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 
         public override void VisitFSharpSimpleTypeDeclaration(IFSharpSimpleTypeDeclaration type)
         {
-          var idToken = type.Identifier.IdentifierToken;
-          if (idToken != null)
-            myHighlightings.Add(CreateHighlighting(idToken, HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE));
+          HighlightIdentifier(type.Identifier, HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE);
+
+          foreach (var member in type.MemberDeclarations)
+            (member as IFSharpDeclaration)?.Accept(this);
+        }
+
+        public override void VisitFSharpEnumDeclaration(IFSharpEnumDeclaration enumDeclaration)
+        {
+          foreach (var member in enumDeclaration.EnumMembersEnumerable)
+            HighlightIdentifier(member.Identifier, HighlightingAttributeIds.FIELD_IDENTIFIER_ATTRIBUTE);
+
+          base.VisitFSharpEnumDeclaration(enumDeclaration);
         }
 
         public override void VisitOpen(IOpen open)
@@ -211,12 +216,16 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
         public override void VisitFSharpRecordDeclaration(IFSharpRecordDeclaration record)
         {
           foreach (var field in record.FieldsEnumerable)
-          {
-            var idToken = field.Identifier.IdentifierToken;
-            if (idToken != null)
-              myHighlightings.Add(CreateHighlighting(idToken, HighlightingAttributeIds.FIELD_IDENTIFIER_ATTRIBUTE));
-          }
+            HighlightIdentifier(field.Identifier, HighlightingAttributeIds.FIELD_IDENTIFIER_ATTRIBUTE);
+
           base.VisitFSharpRecordDeclaration(record);
+        }
+
+        private void HighlightIdentifier([NotNull] IFSharpIdentifier ident, string highlightingAttributeId)
+        {
+          var idToken = ident.IdentifierToken;
+          if (idToken != null)
+            myHighlightings.Add(CreateHighlighting(idToken, highlightingAttributeId));
         }
 
         [NotNull]
