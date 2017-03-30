@@ -19,6 +19,12 @@ intellij {
     downloadSources false
 }
 
+prepareSandbox {
+    from('../JetBrains.ReSharper.FSharp.0.1.0.nupkg', {
+        into "$intellij.pluginName"
+    })
+}
+
 task wrapper(type: Wrapper) {
     gradleVersion = '3.2'
     distributionUrl = "https://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
