@@ -13,7 +13,7 @@ type FSharpParser(file : IPsiSourceFile, checkerService : FSharpCheckerService, 
     
     member this.LogErrors errors =
         let messages = Array.map (fun (e : FSharpErrorInfo) -> e.Message) errors
-        logger.LogMessage(LoggingLevel.ERROR, StringUtil.Join(messages, "\n"))
+        logger.LogMessage(LoggingLevel.ERROR, sprintf "%s: %s" (file.GetLocation().FullPath) (StringUtil.Join(messages, "\n")))
 
     interface IParser with
         member this.ParseFile() =
