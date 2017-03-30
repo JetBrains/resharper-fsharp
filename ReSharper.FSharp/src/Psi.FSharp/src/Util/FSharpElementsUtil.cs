@@ -66,9 +66,19 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       var unionCase = symbol as FSharpUnionCase;
       if (unionCase != null)
       {
-        // here are two distinct cases:
-        // * case with fields, inherited class
-        // * case without fields, singleton property
+        var unionType = unionCase.ReturnType;
+        Assertion.AssertNotNull(unionType, "unionType != null");
+        var unionTypeElement = GetTypeElement(unionType.TypeDefinition, psiModule);
+        if (unionTypeElement == null)
+          return null;
+
+        var caseMember = unionTypeElement.EnumerateMembers(unionCase.CompiledName, true).FirstOrDefault();
+        if (caseMember != null)
+          return caseMember;
+
+        var unionClrName = unionTypeElement.GetClrName();
+        var caseDeclaredType = TypeFactory.CreateTypeByCLRName(unionClrName + "+" + unionCase.CompiledName, psiModule);
+        return caseDeclaredType.GetTypeElement();
       }
 
       var field = symbol as FSharpField;
@@ -99,6 +109,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       }
       return null;
     }
+
 
     private static bool SameParameters([NotNull] ITypeMember member, [NotNull] FSharpMemberOrFunctionOrValue mfv,
       IList<ITypeParameter> typeParameters, IPsiModule psiModule)
@@ -158,15 +169,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     [CanBeNull]
     private static FSharpEntity GetContainingEntity([NotNull] FSharpMemberOrFunctionOrValue mfv)
     {
-      try
-      {
-        return mfv.EnclosingEntity;
-      }
-      catch (InvalidOperationException)
-      {
-        // element is local to some member and is not stored in R# caches
-        return null;
-      }
+      return mfv.IsModuleValueOrMember ? mfv.EnclosingEntity : null;
     }
 
     [CanBeNull]
