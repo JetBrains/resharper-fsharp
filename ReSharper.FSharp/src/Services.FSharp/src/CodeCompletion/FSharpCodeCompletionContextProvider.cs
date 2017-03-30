@@ -1,11 +1,11 @@
 ﻿using JetBrains.Annotations;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Impl;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure;
-using JetBrains.ReSharper.Feature.Services.Lookup;
 using JetBrains.ReSharper.Psi.FSharp.Parsing;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
+using Microsoft.VisualStudio.FSharp.LanguageService;
 
 namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
 {
@@ -42,8 +42,11 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
         ? defaultRanges.WithReplaceRange(new TextRange(caretOffset, tokenAtCaret.GetTreeEndOffset().Offset))
         : defaultRanges;
 
-      context.Parameters.InitialLookupFocusBehaviour = LookupFocusBehaviour.Soft;
-      return new FSharpCodeCompletionContext(context, ranges);
+      var document = context.Document;
+      var coords = document.GetCoordsByOffset(caretOffset);
+      var names = QuickParse.GetPartialLongNameEx(document.GetLineText(coords.Line), (int) coords.Column - 1);
+
+      return new FSharpCodeCompletionContext(context, ranges, caretTreeOffset, coords, names);
     }
 
     private static bool ShouldReplace([CanBeNull] ITreeNode token)

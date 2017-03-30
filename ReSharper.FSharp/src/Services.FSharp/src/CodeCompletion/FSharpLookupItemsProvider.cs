@@ -1,5 +1,4 @@
 ﻿using JetBrains.Annotations;
-using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems.Impl;
 using JetBrains.ReSharper.Psi;
@@ -11,12 +10,11 @@ using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Control;
 using Microsoft.FSharp.Core;
-using Microsoft.VisualStudio.FSharp.LanguageService;
 
 namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
 {
   [Language(typeof(FSharpLanguage))]
-  public class FSharpItemsProvider : ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>
+  public class FSharpLookupItemsProvider : FSharpItemsProviderBase
   {
     protected override bool AddLookupItems(FSharpCodeCompletionContext context, GroupedItemsCollector collector)
     {
@@ -27,7 +25,7 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
       if (fsFile.ParseResults == null)
         return false;
 
-      var completions = GetFSharpCompletions(completionContext, fsFile);
+      var completions = GetFSharpCompletions(context, fsFile);
       if (completions == null || completions.IsEmpty)
         return false;
 
@@ -48,33 +46,23 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
       return true;
     }
 
-    protected override TextLookupRanges GetDefaultRanges(FSharpCodeCompletionContext context)
-    {
-      return context.Ranges;
-    }
-
     [CanBeNull]
-    private FSharpList<FSharpList<FSharpSymbolUse>> GetFSharpCompletions(
-      [NotNull] CodeCompletionContext completionContext,
+    private FSharpList<FSharpList<FSharpSymbolUse>> GetFSharpCompletions([NotNull] FSharpCodeCompletionContext context,
       [NotNull] IFSharpFile fsFile)
     {
+      var completionContext = context.BasicContext;
       var document = completionContext.Document;
-      var caretOffset = completionContext.CaretTreeOffset.Offset;
-      var coords = document.GetCoordsByOffset(caretOffset);
       var parseResults = new FSharpOption<FSharpParseFileResults>(fsFile.ParseResults);
-      var names = QuickParse.GetPartialLongNameEx(document.GetLineText(coords.Line), (int) coords.Column - 1);
-      var qualifiers = names.Item1;
-      var partialName = names.Item2;
 
-      var checkResults = !qualifiers.IsEmpty
-        ? fsFile.GetCheckResults()
-        : (fsFile.IsChecked
-          ? fsFile.GetCheckResults()
-          : fsFile.PreviousCheckResults ?? fsFile.GetCheckResults());
+      var qualifiers = context.Names.Item1;
+      var partialName = context.Names.Item2;
+
+      var checkResults = fsFile.GetCheckResults();
 
       if (checkResults == null)
         return null;
 
+      var coords = context.Coords;
       var getCompletionsAsync = checkResults.GetDeclarationListSymbols(
         parseResults,
         (int) coords.Line + 1,
