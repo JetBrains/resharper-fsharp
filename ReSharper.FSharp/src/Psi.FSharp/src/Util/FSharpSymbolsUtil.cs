@@ -39,5 +39,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
         return null; // internal FCS error
       }
     }
+
+    public static bool IsOpGreaterThan(FSharpSymbol symbol)
+    {
+      var mfv = symbol as FSharpMemberOrFunctionOrValue;
+      return mfv?.CompiledName == "op_GreaterThan";
+    }
   }
 }
