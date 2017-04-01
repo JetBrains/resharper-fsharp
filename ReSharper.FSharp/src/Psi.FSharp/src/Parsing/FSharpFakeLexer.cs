@@ -5,7 +5,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
 {
   /// <summary>
   /// Creates a single token for the whole file.
-  /// FSharpParser uses FSharpLexer which gets info about project configuration needed for #if condition compilation
+  /// FSharpParser uses FSharpLexer which is aware of current project configuration needed for conditional compilation.
   /// </summary>
   public class FSharpFakeLexer : ILexer
   {

@@ -357,17 +357,22 @@ interface fSharpTypeMemberDeclaration
   abstractSlot |
   memberDeclaration |
   typeLetBindings |
-
-//  valField |
-//  autoProperty |
+  valField |
+  autoProperty |
 
   otherTypeMember
 ;
 
 interfaceInherit : longIdentifier<LONG_IDENTIFIER, LongIdentifier>;
 typeInherit : longIdentifier<LONG_IDENTIFIER, LongIdentifier> fakeSeparator;
-interfaceImplementation : longIdentifier<LONG_IDENTIFIER, LongIdentifier> fakeSeparator;
-abstractSlot : fakeSeparator;
+
+interfaceImplementation
+:
+  longIdentifier<LONG_IDENTIFIER, LongIdentifier>
+  fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>* fakeSeparator
+;
+
+
 otherTypeMember : fakeSeparator;
 typeLetBindings : fakeSeparator;
 
@@ -397,6 +402,29 @@ memberDeclaration options {
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfMethodDeclaration<TYPE_PARAMETER, TypeParameters>*
   memberParam<PARAMETER, Parameters>* fakeSeparator
+;
+
+abstractSlot options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpProperTypeMemberDeclarationBase";
+}
+:
+  fSharpIdentifier<IDENTIFIER, Identifier>
+  typeParameterOfMethodDeclaration<TYPE_PARAMETER, TypeParameters>*
+  memberParam<PARAMETER, Parameters>* fakeSeparator
+;
+
+valField options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpProperTypeMemberDeclarationBase";
+}
+:
+  fSharpIdentifier<IDENTIFIER, Identifier>
+;
+
+autoProperty options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpProperTypeMemberDeclarationBase";
+}
+:
+  fSharpIdentifier<IDENTIFIER, Identifier>
 ;
 
 memberParam: fakeSeparator;

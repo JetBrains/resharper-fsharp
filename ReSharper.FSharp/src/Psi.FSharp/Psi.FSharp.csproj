@@ -467,6 +467,8 @@
     <Compile Include="src\Impl\FSharpReferenceBase.cs" />
     <Compile Include="src\Impl\FSharpUnresolvedReference.cs" />
     <Compile Include="src\Impl\ModifiersUtil.cs" />
+    <Compile Include="src\Impl\Tree\AbstractSlot.cs" />
+    <Compile Include="src\Impl\Tree\AutoProperty.cs" />
     <Compile Include="src\Impl\Tree\ConstructorDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpAbstractTypeDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpCachedDeclarationBase.cs" />
@@ -505,6 +507,7 @@
     <Compile Include="src\Impl\Tree\FSharpTypeMemberDeclarationBase.cs" />
     <Compile Include="src\Impl\Tree\TypeParameterOfMethodDeclaration.cs" />
     <Compile Include="src\Impl\Tree\TypeParameterOfTypeDeclaration.cs" />
+    <Compile Include="src\Impl\Tree\ValField.cs" />
     <Compile Include="src\Impl\Tree\Whitespace.cs" />
     <Compile Include="src\Impl\Tree\WhitespaceBase.cs" />
     <Compile Include="src\Parsing\FSharpFakeLexer.cs" />
@@ -521,7 +524,7 @@
     <Compile Include="src\Searching\FSharpReferenceSearchProcessor.cs" />
     <Compile Include="src\Searching\FSharpSearcherFactory.cs" />
     <Compile Include="src\Tree\ChildRole.cs" />
-    <Compile Include="src\Tree\ConstructorDeclaration.cs" />
+    <Compile Include="src\Tree\IConstructorDeclaration.cs" />
     <Compile Include="src\Tree\FSharpCompositeNodeType.cs" />
     <Compile Include="src\Tree\FSharpObjectModelTypeKind.cs" />
     <Compile Include="src\Tree\FSharpTreeNodeExtensions.cs" />

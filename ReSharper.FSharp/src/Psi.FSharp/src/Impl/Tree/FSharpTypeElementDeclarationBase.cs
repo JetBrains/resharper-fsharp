@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
@@ -59,8 +60,16 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
     private IList<ITypeParameter> TypeParameters => ((ITypeDeclaration) this).DeclaredElement?.TypeParameters ??
                                                     EmptyList<ITypeParameter>.Instance;
 
-    public virtual TreeNodeCollection<ITypeMemberDeclaration> MemberDeclarations =>
-      this.Children<ITypeMemberDeclaration>().ToTreeNodeCollection(); // todo: hide non compiled types
+    public virtual TreeNodeCollection<ITypeMemberDeclaration> MemberDeclarations
+    {
+      get
+      {
+        var members = this.Children<ITypeMemberDeclaration>();
+        var implementedMembers = this.Children<IInterfaceImplementation>()
+          .SelectMany(m => m.Children<ITypeMemberDeclaration>());
+        return members.Prepend(implementedMembers).ToTreeNodeCollection();
+      }
+    }
 
     public string CLRName => FSharpImplUtil.MakeClrName(this);
     public IList<ITypeDeclaration> TypeDeclarations => EmptyList<ITypeDeclaration>.Instance;

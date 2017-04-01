@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.FSharp.Impl;
+using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Impl.Search;
 using JetBrains.ReSharper.Psi.Search;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
-using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Searching
 {
@@ -63,14 +64,16 @@ namespace JetBrains.ReSharper.Psi.FSharp.Searching
       var fakeElement = declaredElement as FSharpFakeElementFromReference;
       var actualElement = fakeElement?.GetActualElement();
       if (actualElement != null)
+      {
+        var localDeclaration = actualElement as ILocalDeclaration;
+        if (localDeclaration != null)
+          mySearchDomainFactory.CreateSearchDomain(localDeclaration.GetSourceFile());
+
         return myClrSearchFactory.GetDeclaredElementSearchDomain(actualElement);
+      }
 
       // todo: abbreviations
       // mySearchDomainFactory.CreateSearchDomainOfModuleAndItsReferences(actualElement.Module);
-
-      var mfv = fakeElement?.Symbol as FSharpMemberOrFunctionOrValue;
-      if (mfv != null && !mfv.IsModuleValueOrMember)
-        return mySearchDomainFactory.CreateSearchDomain(fakeElement.GetContainingTypeMemberDeclaration());
 
       // couldn't find element in caches and the element is not local
       return mySearchDomainFactory.CreateSearchDomain(declaredElement.GetSolution(), false);

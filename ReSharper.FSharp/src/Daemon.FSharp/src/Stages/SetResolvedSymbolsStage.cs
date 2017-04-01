@@ -49,7 +49,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
         var symbol = symbolUse.Symbol;
         var tokenType = token.GetTokenType();
         if ((tokenType == FSharpTokenType.GREATER || tokenType == FSharpTokenType.GREATER_RBRACK)
-            && !IsOpGreaterThan(symbol))
+            && !FSharpSymbolsUtil.IsOpGreaterThan(symbol))
           continue; // found usage of generic symbol with specified type parameter
 
         if (symbolUse.IsFromDefinition)
@@ -58,16 +58,17 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
           if (declaration != null) declaration.Symbol = symbol;
           continue;
         }
+
+        // usage of symbol may override declaration (e.g. interface member)
+        // todo: better check?
+        var parentDeclaration = token.GetContainingNode<ITypeMemberDeclaration>();
+        if (parentDeclaration != null && parentDeclaration.GetNameRange() == token.GetTreeTextRange())
+          continue;
+
         token.FSharpSymbol = symbol;
         SeldomInterruptChecker.CheckForInterrupt();
       }
       myFsFile.ReferencesResolved = true;
-    }
-
-    private static bool IsOpGreaterThan(FSharpSymbol symbol)
-    {
-      var mfv = symbol as FSharpMemberOrFunctionOrValue;
-      return mfv?.CompiledName == "op_GreaterThan";
     }
 
     [CanBeNull]
@@ -84,11 +85,17 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
         return token.GetContainingNode<IFSharpUnionCaseDeclaration>();
 
       var mfv = symbol as FSharpMemberOrFunctionOrValue;
-      if (mfv == null)
-        return null;
+      if (mfv != null)
+      {
+        if (mfv.IsImplicitConstructor)
+          return null;
 
-      if (mfv.IsMember || mfv.IsModuleValueOrMember)
-        return (IFSharpDeclaration) token.GetContainingNode<ITypeMemberDeclaration>();
+        if (mfv.IsModuleValueOrMember)
+        {
+          var memberDeclaration = token.GetContainingNode<ITypeMemberDeclaration>();
+          return (IFSharpDeclaration) (memberDeclaration is ITypeDeclaration ? null : memberDeclaration);
+        }
+      }
 
       return token.GetContainingNode<ILocalDeclaration>();
     }

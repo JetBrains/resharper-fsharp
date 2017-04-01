@@ -9,7 +9,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
   public abstract class FSharpProperTypeMemberDeclarationBase : FSharpTypeMemberDeclarationBase,
     ICachedTypeMemberDeclaration
   {
-    [NotNull]
+    [CanBeNull]
     protected abstract IDeclaredElement CreateDeclaredElement();
 
     private static readonly Func<FSharpProperTypeMemberDeclarationBase, IDeclaredElement>

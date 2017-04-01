@@ -221,9 +221,9 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
           base.VisitFSharpRecordDeclaration(record);
         }
 
-        private void HighlightIdentifier([NotNull] IFSharpIdentifier ident, string highlightingAttributeId)
+        private void HighlightIdentifier([CanBeNull] IFSharpIdentifier ident, string highlightingAttributeId)
         {
-          var idToken = ident.IdentifierToken;
+          var idToken = ident?.IdentifierToken;
           if (idToken != null)
             myHighlightings.Add(CreateHighlighting(idToken, highlightingAttributeId));
         }
