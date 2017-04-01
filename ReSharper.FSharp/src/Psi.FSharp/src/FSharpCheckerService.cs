@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.DataFlow;
@@ -8,6 +9,7 @@ using JetBrains.ReSharper.Feature.Services;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.Util;
+using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Control;
 using Microsoft.FSharp.Core;
@@ -23,6 +25,9 @@ namespace JetBrains.ReSharper.Psi.FSharp
   {
     private readonly FSharpChecker myChecker;
 
+    private readonly bool myIsRunningOnMono; // this should be removed when Rider's bundled mono is able to call msbuild
+    private readonly string myFSharpCorePath;
+
     private readonly Dictionary<Guid, FSharpProjectOptions> myProjectsOptions =
       new Dictionary<Guid, FSharpProjectOptions>();
 
@@ -34,11 +39,13 @@ namespace JetBrains.ReSharper.Psi.FSharp
 
     public FSharpCheckerService(Lifetime lifetime, OnSolutionCloseNotifier onSolutionCloseNotifier)
     {
+      myIsRunningOnMono = PlatformUtil.IsRunningOnMono;
+
       myChecker = FSharpChecker.Create(
         projectCacheSize: null, // use default value
         keepAssemblyContents: FSharpOption<bool>.Some(true),
         keepAllBackgroundResolutions: null, // use default value, true
-        msbuildEnabled: new FSharpOption<bool>(false));
+        msbuildEnabled: new FSharpOption<bool>(!myIsRunningOnMono));
 
       onSolutionCloseNotifier.SolutionIsAboutToClose.Advise(lifetime, () =>
       {
@@ -46,6 +53,13 @@ namespace JetBrains.ReSharper.Psi.FSharp
         myProjectDefines.Clear();
         myChecker.ClearLanguageServiceRootCachesAndCollectAndFinalizeAllTransients();
       });
+
+      if (!myIsRunningOnMono)
+        return;
+
+      var fsharpCorePath = Assembly.GetAssembly(typeof(Unit))?.Location;
+      if (fsharpCorePath != null)
+        myFSharpCorePath = "-r:" + FileSystemPath.Parse(fsharpCorePath);
     }
 
     [CanBeNull]
@@ -105,7 +119,22 @@ namespace JetBrains.ReSharper.Psi.FSharp
       var getScriptOptionsAsync =
         myChecker.GetProjectOptionsFromScript(filePath, source, loadTime, otherFlags: null, useFsiAuxLib: null,
           assumeDotNetFramework: null, extraProjectInfo: null);
-      return FSharpAsync.RunSynchronously(getScriptOptionsAsync, null, null).Item1;
+      var scriptOptions = FSharpAsync.RunSynchronously(getScriptOptionsAsync, null, null);
+
+      if (!myIsRunningOnMono || myFSharpCorePath == null)
+        return scriptOptions;
+
+      return new FSharpProjectOptions(
+        scriptOptions.ProjectFileName,
+        scriptOptions.ProjectFileNames,
+        ArrayModule.Append(scriptOptions.OtherOptions, new[] {myFSharpCorePath}),
+        scriptOptions.ReferencedProjects,
+        scriptOptions.IsIncompleteTypeCheckEnvironment,
+        scriptOptions.UseScriptResolutionRules,
+        scriptOptions.LoadTime,
+        scriptOptions.UnresolvedReferences,
+        scriptOptions.OriginalLoadReferences,
+        scriptOptions.ExtraProjectInfo);
     }
 
     [NotNull]
