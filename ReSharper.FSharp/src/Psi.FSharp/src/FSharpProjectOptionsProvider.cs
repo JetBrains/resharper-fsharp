@@ -6,7 +6,9 @@ using JetBrains.DataFlow;
 using JetBrains.Platform.ProjectModel.FSharp.Properties;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.PsiGen.Util;
+using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Threading;
+using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp
@@ -18,7 +20,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
     private readonly FSharpProjectOptionsBuilder myProjectOptionsBuilder;
     private readonly FSharpCheckerService myFSharpCheckerService;
     private readonly GroupingEvent myUpdateEvent;
-    private readonly HashSet<IProject> myProjectsToUpdate = new HashSet<IProject>();
+    private readonly HashSet<Guid> myProjectsToUpdateGuids = new HashSet<Guid>();
 
     public FSharpProjectOptionsProvider(Lifetime lifetime, ISolution solution, ChangeManager changeManager,
       FSharpCheckerService fSharpCheckerService, FSharpProjectOptionsBuilder projectOptionsBuilder)
@@ -27,18 +29,21 @@ namespace JetBrains.ReSharper.Psi.FSharp
       myProjectOptionsBuilder = projectOptionsBuilder;
       myFSharpCheckerService = fSharpCheckerService;
       myUpdateEvent = solution.Locks.GroupingEvents.CreateEvent(lifetime, "updateFSharpProjects",
-        TimeSpan.FromMilliseconds(100), Rgc.Guarded, DoUpdateProjects); // todo: wait in FSharpCheckerService if new file added and options are not ready
+        TimeSpan.FromMilliseconds(100), Rgc.Guarded,
+        DoUpdateProjects); // todo: wait in FSharpCheckerService if new file added and options are not ready
 
       changeManager.Changed2.Advise(lifetime, ProcessChange);
     }
 
-    private void AddReferencingProjects(IProject project, HashSet<IProject> projects)
+    private void AddReferencingProjects(Guid projectGuid, HashSet<Guid> projectGuids)
     {
-      if (projects.Contains(project)) return;
-      projects.Add(project);
+      if (projectGuids.Contains(projectGuid)) return;
+      projectGuids.Add(projectGuid);
+      var project = mySolution.GetProjectByGuid(projectGuid);
+      Assertion.AssertNotNull(project, "project != null");
       foreach (var referencingProject in project.GetReferencingProjects(project.GetCurrentTargetFrameworkId()))
         if (referencingProject.ProjectProperties is FSharpProjectProperties)
-          AddReferencingProjects(referencingProject, projects);
+          AddReferencingProjects(referencingProject.Guid, projectGuids);
     }
 
     private void DoUpdateProjects()
@@ -47,22 +52,25 @@ namespace JetBrains.ReSharper.Psi.FSharp
 
       mySolution.Locks.AssertMainThread();
 
-      var referencingProjects = new HashSet<IProject>();
-      foreach (var project in myProjectsToUpdate)
-        AddReferencingProjects(project, referencingProjects);
-      myProjectsToUpdate.addAll(referencingProjects);
-
-      var projectsOptions = new Dictionary<IProject, FSharpProjectOptions>();
-      foreach (var project in myProjectsToUpdate)
-        projectsOptions.Add(project, myProjectOptionsBuilder.BuildWithoutReferencedProjects(project));
-
-      foreach (var projectOptions in myProjectOptionsBuilder.AddReferencedProjects(projectsOptions))
+      using (ReadLockCookie.Create())
       {
-        var project = projectOptions.Key;
-        var options = projectOptions.Value;
-        myFSharpCheckerService.AddProject(project, options, myProjectOptionsBuilder.GetDefines(project));
+        var referencingProjects = new HashSet<Guid>();
+        foreach (var projectGuid in myProjectsToUpdateGuids)
+          AddReferencingProjects(projectGuid, referencingProjects);
+        myProjectsToUpdateGuids.addAll(referencingProjects);
+
+        var projectsOptions = new Dictionary<Guid, FSharpProjectOptions>();
+        foreach (var projectGuid in myProjectsToUpdateGuids)
+          projectsOptions.Add(projectGuid, myProjectOptionsBuilder.BuildWithoutReferencedProjects(projectGuid));
+
+        foreach (var projectOptions in myProjectOptionsBuilder.AddReferencedProjects(projectsOptions))
+        {
+          var projectGuid = projectOptions.Key;
+          var options = projectOptions.Value;
+          myFSharpCheckerService.AddProject(projectGuid, options, myProjectOptionsBuilder.GetDefines(projectGuid));
+        }
+        myProjectsToUpdateGuids.Clear();
       }
-      myProjectsToUpdate.Clear();
     }
 
     private void ProcessChange(ChangeEventArgs obj)
@@ -81,10 +89,10 @@ namespace JetBrains.ReSharper.Psi.FSharp
         {
           if (change.IsRemoved)
           {
-            myFSharpCheckerService.RemoveProject(project);
+            myFSharpCheckerService.RemoveProject(project.Guid);
             return;
           }
-          myProjectsToUpdate.Add(project);
+          myProjectsToUpdateGuids.Add(project.Guid);
           myUpdateEvent.FireIncoming();
         }
         return;

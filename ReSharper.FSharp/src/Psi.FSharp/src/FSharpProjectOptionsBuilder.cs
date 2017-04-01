@@ -23,10 +23,12 @@ namespace JetBrains.ReSharper.Psi.FSharp
   [SolutionComponent]
   public class FSharpProjectOptionsBuilder
   {
+    private readonly ISolution mySolution;
     private readonly MsBuildProjectHost myMsBuildHost;
 
     public FSharpProjectOptionsBuilder(ISolution solution)
     {
+      mySolution = solution;
       myMsBuildHost = solution.ProjectsHostContainer().GetComponent<MsBuildProjectHost>();
     }
 
@@ -34,79 +36,78 @@ namespace JetBrains.ReSharper.Psi.FSharp
     /// Build project options for FSharp.Compiler.Service. Options for referenced projects are not created.
     /// Use AddReferencedProjects to add referenced projects options.
     /// </summary>
-    public FSharpProjectOptions BuildWithoutReferencedProjects(IProject project)
+    public FSharpProjectOptions BuildWithoutReferencedProjects(Guid projectGuid)
     {
-      using (ReadLockCookie.Create())
+      var project = mySolution.GetProjectByGuid(projectGuid);
+      Assertion.AssertNotNull(project, "project != null");
+      var buildSettings = project.ProjectProperties.BuildSettings as IManagedProjectBuildSettings;
+      var configuration =
+        project.ProjectProperties.ActiveConfigurations.Configurations.SingleItem() as IManagedProjectConfiguration;
+      var projectOptions = new List<string>
       {
-        var buildSettings = project.ProjectProperties.BuildSettings as IManagedProjectBuildSettings;
-        var configuration =
-          project.ProjectProperties.ActiveConfigurations.Configurations.SingleItem() as IManagedProjectConfiguration;
-        var projectOptions = new List<string>
-        {
-          "--out:" + project.GetOutputFilePath(project.GetCurrentTargetFrameworkId()),
-          "--simpleresolution",
-          "--noframework",
-          "--debug:full",
-          "--debug+",
-          "--optimize-",
-          "--tailcalls-",
-          "--fullpaths",
-          "--flaterrors",
-          "--highentropyva+",
-          "--target:" + GetOutputTarget(buildSettings),
-          "--platform:anycpu", // todo
-        };
+        "--out:" + project.GetOutputFilePath(project.GetCurrentTargetFrameworkId()),
+        "--simpleresolution",
+        "--noframework",
+        "--debug:full",
+        "--debug+",
+        "--optimize-",
+        "--tailcalls-",
+        "--fullpaths",
+        "--flaterrors",
+        "--highentropyva+",
+        "--target:" + GetOutputTarget(buildSettings),
+        "--platform:anycpu", // todo
+      };
 
-        if (configuration != null)
-        {
-          projectOptions.addAll(SplitDefines(configuration.DefineConstants).Convert(s => "--define:" + s));
+      if (configuration != null)
+      {
+        projectOptions.addAll(SplitDefines(configuration.DefineConstants).Convert(s => "--define:" + s));
 
-          var doc = configuration.DocumentationFile;
-          if (!doc.IsNullOrWhitespace()) projectOptions.Add("--doc:" + doc);
+        var doc = configuration.DocumentationFile;
+        if (!doc.IsNullOrWhitespace()) projectOptions.Add("--doc:" + doc);
 
-          var nowarn = FixNoWarn(configuration.NoWarn);
-          if (!nowarn.IsNullOrWhitespace()) projectOptions.Add("--nowarn:" + nowarn);
+        var nowarn = FixNoWarn(configuration.NoWarn);
+        if (!nowarn.IsNullOrWhitespace()) projectOptions.Add("--nowarn:" + nowarn);
 
-          projectOptions.Add("--warn:" + configuration.WarningLevel);
+        projectOptions.Add("--warn:" + configuration.WarningLevel);
 
-          // todo: add F# specific options like 'warnon'
-        }
-
-        projectOptions.addAll(GetReferencedPathsOptions(project));
-
-        var projectFileNames = new List<string>();
-        var projectMark = project.GetProjectMark().NotNull();
-        myMsBuildHost.mySessionHolder.Execute(session =>
-        {
-          session.EditProject(projectMark, editor =>
-          {
-            // obtains all items in a right order directly from msbuild
-            foreach (var item in editor.Items)
-            {
-              if (!BuildAction.GetOrCreate(item.ItemType()).IsCompile()) continue;
-
-              var path = FileSystemPath.TryParse(item.EvaluatedInclude);
-              if (path.IsEmpty) continue;
-
-              var actualPath = EnsureAbsolute(path, projectMark.Location.Directory);
-              projectFileNames.Add(actualPath.FullPath);
-            }
-          });
-        });
-
-        return new FSharpProjectOptions(
-          project.ProjectFileLocation.FullPath,
-          projectFileNames.ToArray(),
-          projectOptions.ToArray(),
-          referencedProjects: EmptyArray<Tuple<string, FSharpProjectOptions>>.Instance,
-          isIncompleteTypeCheckEnvironment: false,
-          useScriptResolutionRules: false,
-          loadTime: DateTime.Now,
-          unresolvedReferences: null,
-          originalLoadReferences: FSharpList<Tuple<Range.range, string>>.Empty, // todo: check this
-          extraProjectInfo: null
-        );
+        // todo: add F# specific options like 'warnon'
       }
+
+      projectOptions.addAll(GetReferencedPathsOptions(project));
+
+      var projectFileNames = new List<string>();
+      var projectMark = project.GetProjectMark().NotNull();
+      myMsBuildHost.mySessionHolder.Execute(session =>
+      {
+        session.EditProject(projectMark, editor =>
+        {
+          // obtains all items in a right order directly from msbuild
+          foreach (var item in editor.Items)
+          {
+            if (!BuildAction.GetOrCreate(item.ItemType()).IsCompile()) continue;
+
+            var path = FileSystemPath.TryParse(item.EvaluatedInclude);
+            if (path.IsEmpty) continue;
+
+            var actualPath = EnsureAbsolute(path, projectMark.Location.Directory);
+            projectFileNames.Add(actualPath.FullPath);
+          }
+        });
+      });
+
+      return new FSharpProjectOptions(
+        project.ProjectFileLocation.FullPath,
+        projectFileNames.ToArray(),
+        projectOptions.ToArray(),
+        referencedProjects: EmptyArray<Tuple<string, FSharpProjectOptions>>.Instance,
+        isIncompleteTypeCheckEnvironment: false,
+        useScriptResolutionRules: false,
+        loadTime: DateTime.Now,
+        unresolvedReferences: null,
+        originalLoadReferences: FSharpList<Tuple<Range.range, string>>.Empty, // todo: check this
+        extraProjectInfo: null
+      );
     }
 
     private static string GetOutputTarget([CanBeNull] IManagedProjectBuildSettings buildSettings)
@@ -151,11 +152,16 @@ namespace JetBrains.ReSharper.Psi.FSharp
     /// Current configuration defines, e.g. TRACE or DEBUG. Used in FSharpLexer.
     /// </summary>
     [NotNull]
-    public string[] GetDefines([NotNull] IProject project)
+    public string[] GetDefines(Guid projectGuid)
     {
-      var configuration =
-        project.ProjectProperties.ActiveConfigurations.Configurations.SingleItem() as IManagedProjectConfiguration;
-      return SplitDefines(configuration?.DefineConstants);
+      using (ReadLockCookie.Create())
+      {
+        var project = mySolution.GetProjectByGuid(projectGuid);
+        Assertion.AssertNotNull(project, "project != null");
+        var configuration =
+          project.ProjectProperties.ActiveConfigurations.Configurations.SingleItem() as IManagedProjectConfiguration;
+        return SplitDefines(configuration?.DefineConstants);
+      }
     }
 
     [NotNull]
@@ -171,28 +177,26 @@ namespace JetBrains.ReSharper.Psi.FSharp
     }
 
     [NotNull]
-    public Dictionary<IProject, FSharpProjectOptions> AddReferencedProjects(
-      [NotNull] IDictionary<IProject, FSharpProjectOptions> optionsDict)
+    public Dictionary<Guid, FSharpProjectOptions> AddReferencedProjects(
+      [NotNull] IDictionary<Guid, FSharpProjectOptions> optionsDict)
     {
-      using (ReadLockCookie.Create())
+      var newOptions = new Dictionary<Guid, FSharpProjectOptions>();
+      foreach (var projectGuidAndOptions in optionsDict)
       {
-        var newOptions = new Dictionary<IProject, FSharpProjectOptions>();
-        foreach (var projectAndOptions in optionsDict)
-        {
-          var project = projectAndOptions.Key;
-          var projectOptions = projectAndOptions.Value;
-          if (!newOptions.ContainsKey(project))
-            newOptions[project] = AddReferencedProjects(project, projectOptions, optionsDict, newOptions);
-        }
-
-        return newOptions;
+        var project = mySolution.GetProjectByGuid(projectGuidAndOptions.Key);
+        Assertion.AssertNotNull(project, "project != null");
+        var projectOptions = projectGuidAndOptions.Value;
+        if (!newOptions.ContainsKey(project.Guid))
+          newOptions[project.Guid] = AddReferencedProjects(project, projectOptions, optionsDict, newOptions);
       }
+
+      return newOptions;
     }
 
     [NotNull]
     private FSharpProjectOptions AddReferencedProjects([NotNull] IProject project, FSharpProjectOptions projectOptions,
-      [NotNull] IDictionary<IProject, FSharpProjectOptions> optionsDict,
-      [NotNull] IDictionary<IProject, FSharpProjectOptions> newOptions)
+      [NotNull] IDictionary<Guid, FSharpProjectOptions> optionsDict,
+      [NotNull] IDictionary<Guid, FSharpProjectOptions> newOptions)
     {
       // do not transitively add referenced projects (same as in other FSharp tools)
       var referencedProjects = project.GetReferencedProjects(project.GetCurrentTargetFrameworkId(), transitive: false);
@@ -200,14 +204,15 @@ namespace JetBrains.ReSharper.Psi.FSharp
       foreach (var referencedProject in referencedProjects)
       {
         if (!(referencedProject.ProjectProperties is FSharpProjectProperties) ||
-            newOptions.ContainsKey(project)) continue;
+            newOptions.ContainsKey(project.Guid)) continue;
 
-        var referencedProjectOptions = optionsDict.ContainsKey(referencedProject)
-          ? optionsDict[referencedProject]
-          : BuildWithoutReferencedProjects(referencedProject);
+        var referencedProjectGuid = referencedProject.Guid;
+        var referencedProjectOptions = optionsDict.ContainsKey(referencedProjectGuid)
+          ? optionsDict[referencedProjectGuid]
+          : BuildWithoutReferencedProjects(referencedProjectGuid);
 
         var fixedOptions = AddReferencedProjects(referencedProject, referencedProjectOptions, optionsDict, newOptions);
-        newOptions[referencedProject] = fixedOptions;
+        newOptions[referencedProjectGuid] = fixedOptions;
         var outPath = referencedProject.GetOutputFilePath(referencedProject.GetCurrentTargetFrameworkId()).FullPath;
         referencedProjectsOptions.Add(Tuple.Create(outPath, fixedOptions));
       }

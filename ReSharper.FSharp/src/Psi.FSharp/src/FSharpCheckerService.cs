@@ -4,7 +4,6 @@ using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.DataFlow;
 using JetBrains.Platform.ProjectModel.FSharp;
-using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
@@ -24,11 +23,11 @@ namespace JetBrains.ReSharper.Psi.FSharp
   {
     private readonly FSharpChecker myChecker;
 
-    private readonly Dictionary<IProject, FSharpProjectOptions> myProjectsOptions =
-      new Dictionary<IProject, FSharpProjectOptions>();
+    private readonly Dictionary<Guid, FSharpProjectOptions> myProjectsOptions =
+      new Dictionary<Guid, FSharpProjectOptions>();
 
-    private readonly Dictionary<IProject, string[]> myProjectDefines =
-      new Dictionary<IProject, string[]>();
+    private readonly Dictionary<Guid, string[]> myProjectDefines =
+      new Dictionary<Guid, string[]>();
 
     private readonly Dictionary<string, int> myFilesVersions =
       new Dictionary<string, int>(); // todo: clean it up when removing project containing file
@@ -93,7 +92,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
       if (sourceFile.LanguageType.Equals(FSharpScriptProjectFileType.Instance))
         return GetScriptOptions(sourceFile);
       var project = sourceFile.GetProject();
-      return (project != null ? myProjectsOptions.GetValueSafe(project) : null) ?? GetScriptOptions(sourceFile);
+      return (project != null ? myProjectsOptions.GetValueSafe(project.Guid) : null) ?? GetScriptOptions(sourceFile);
     }
 
     [NotNull]
@@ -114,36 +113,36 @@ namespace JetBrains.ReSharper.Psi.FSharp
     {
       var project = sourceFile.GetProject();
       Assertion.AssertNotNull(project, "project != null");
-      return myProjectDefines.GetValueSafe(project) ?? EmptyArray<string>.Instance;
+      return myProjectDefines.GetValueSafe(project.Guid) ?? EmptyArray<string>.Instance;
     }
 
     /// <summary>
     /// Remember project options and start analyzing the project in background.
     /// If the project is already known and options have changed, invalidate and start over.
     /// </summary>
-    public void AddProject([NotNull] IProject project, [NotNull] FSharpProjectOptions projectOptions,
+    public void AddProject(Guid projectGuid, [NotNull] FSharpProjectOptions projectOptions,
       [NotNull] string[] defines)
     {
-      if (myProjectsOptions.ContainsKey(project))
+      if (myProjectsOptions.ContainsKey(projectGuid))
       {
-        if (myProjectsOptions[project].Equals(projectOptions)) return;
+        if (myProjectsOptions[projectGuid].Equals(projectOptions)) return;
         myChecker.InvalidateConfiguration(projectOptions);
       }
 
-      myProjectsOptions[project] = projectOptions;
-      myProjectDefines[project] = defines;
+      myProjectsOptions[projectGuid] = projectOptions;
+      myProjectDefines[projectGuid] = defines;
       myChecker.CheckProjectInBackground(projectOptions);
     }
 
     /// <summary>
     /// Invalidate project and stop background analysis.
     /// </summary>
-    public void RemoveProject([NotNull] IProject project)
+    public void RemoveProject(Guid projectGuid)
     {
-      Assertion.Assert(myProjectsOptions.ContainsKey(project), "myProjectsOptions.ContainsKey(project)");
-      myChecker.InvalidateConfiguration(myProjectsOptions[project]);
-      myProjectsOptions.Remove(project);
-      myProjectDefines.Remove(project);
+      Assertion.Assert(myProjectsOptions.ContainsKey(projectGuid), "myProjectsOptions.ContainsKey(project)");
+      myChecker.InvalidateConfiguration(myProjectsOptions[projectGuid]);
+      myProjectsOptions.Remove(projectGuid);
+      myProjectDefines.Remove(projectGuid);
     }
   }
 }
