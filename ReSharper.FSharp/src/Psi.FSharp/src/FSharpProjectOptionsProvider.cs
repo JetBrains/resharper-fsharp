@@ -27,7 +27,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
       myProjectOptionsBuilder = projectOptionsBuilder;
       myFSharpCheckerService = fSharpCheckerService;
       myUpdateEvent = solution.Locks.GroupingEvents.CreateEvent(lifetime, "updateFSharpProjects",
-        TimeSpan.FromMilliseconds(500), Rgc.Guarded, DoUpdateProjects);
+        TimeSpan.FromMilliseconds(100), Rgc.Guarded, DoUpdateProjects); // todo: wait in FSharpCheckerService if new file added and options are not ready
 
       changeManager.Changed2.Advise(lifetime, ProcessChange);
     }

@@ -172,21 +172,26 @@ namespace JetBrains.ReSharper.Psi.FSharp
 
     [NotNull]
     public Dictionary<IProject, FSharpProjectOptions> AddReferencedProjects(
-      [NotNull] IDictionary<IProject, FSharpProjectOptions> options)
+      [NotNull] IDictionary<IProject, FSharpProjectOptions> optionsDict)
     {
       using (ReadLockCookie.Create())
       {
         var newOptions = new Dictionary<IProject, FSharpProjectOptions>();
-        foreach (var project in options.Keys)
+        foreach (var projectAndOptions in optionsDict)
+        {
+          var project = projectAndOptions.Key;
+          var projectOptions = projectAndOptions.Value;
           if (!newOptions.ContainsKey(project))
-            newOptions[project] = AddReferencedProjects(project, options, newOptions);
+            newOptions[project] = AddReferencedProjects(project, projectOptions, optionsDict, newOptions);
+        }
+
         return newOptions;
       }
     }
 
     [NotNull]
-    private static FSharpProjectOptions AddReferencedProjects([NotNull] IProject project,
-      [NotNull] IDictionary<IProject, FSharpProjectOptions> options,
+    private FSharpProjectOptions AddReferencedProjects([NotNull] IProject project, FSharpProjectOptions projectOptions,
+      [NotNull] IDictionary<IProject, FSharpProjectOptions> optionsDict,
       [NotNull] IDictionary<IProject, FSharpProjectOptions> newOptions)
     {
       // do not transitively add referenced projects (same as in other FSharp tools)
@@ -197,23 +202,27 @@ namespace JetBrains.ReSharper.Psi.FSharp
         if (!(referencedProject.ProjectProperties is FSharpProjectProperties) ||
             newOptions.ContainsKey(project)) continue;
 
-        var fixedOptions = AddReferencedProjects(referencedProject, options, newOptions);
+        var referencedProjectOptions = optionsDict.ContainsKey(referencedProject)
+          ? optionsDict[referencedProject]
+          : BuildWithoutReferencedProjects(referencedProject);
+
+        var fixedOptions = AddReferencedProjects(referencedProject, referencedProjectOptions, optionsDict, newOptions);
         newOptions[referencedProject] = fixedOptions;
         var outPath = referencedProject.GetOutputFilePath(referencedProject.GetCurrentTargetFrameworkId()).FullPath;
         referencedProjectsOptions.Add(Tuple.Create(outPath, fixedOptions));
       }
-      var oldOptions = options[project];
+
       return new FSharpProjectOptions(
-        oldOptions.ProjectFileName,
-        oldOptions.ProjectFileNames,
-        oldOptions.OtherOptions,
+        projectOptions.ProjectFileName,
+        projectOptions.ProjectFileNames,
+        projectOptions.OtherOptions,
         referencedProjectsOptions.ToArray(),
-        oldOptions.IsIncompleteTypeCheckEnvironment,
-        oldOptions.UseScriptResolutionRules,
-        oldOptions.LoadTime,
-        oldOptions.UnresolvedReferences,
-        oldOptions.OriginalLoadReferences,
-        oldOptions.ExtraProjectInfo);
+        projectOptions.IsIncompleteTypeCheckEnvironment,
+        projectOptions.UseScriptResolutionRules,
+        projectOptions.LoadTime,
+        projectOptions.UnresolvedReferences,
+        projectOptions.OriginalLoadReferences,
+        projectOptions.ExtraProjectInfo);
     }
   }
 }
