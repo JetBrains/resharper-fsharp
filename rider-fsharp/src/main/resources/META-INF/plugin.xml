@@ -16,5 +16,7 @@
 
     <directoryProjectGenerator implementation="com.jetbrains.resharper.projectView.projectGenerators.FSharpLibrary"/>
     <directoryProjectGenerator implementation="com.jetbrains.resharper.projectView.projectGenerators.FSharpConsoleApplication"/>
+
+    <rider.ProjectTypesProvider implementation="com.jetbrains.resharper.projectView.projectTypes.FSharpProjectTypeProvider" />
   </extensions>
 </idea-plugin>
