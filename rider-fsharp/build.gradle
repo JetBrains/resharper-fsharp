@@ -9,13 +9,16 @@ buildscript {
 }
 
 plugins {
-    id "org.jetbrains.intellij" version "0.2.5"
+    id "org.jetbrains.intellij" version "0.2.7"
 }
 
 apply plugin: 'kotlin'
 
 intellij {
-    version 'RS-171.3655.1246'
+    def riderToolboxPath = "C:\\Users\\Eugene\\AppData\\Local\\JetBrains\\Toolbox\\apps\\Rider\\ch-0\\"
+    def riderVersion = "171.4089.32"
+    localPath "${riderToolboxPath}${riderVersion}" // todo: use some variable?
+    type 'RS'
     downloadSources false
 }
 
