@@ -15,21 +15,20 @@ plugins {
 apply plugin: 'kotlin'
 
 intellij {
-    def riderToolboxPath = "C:\\Users\\Eugene\\AppData\\Local\\JetBrains\\Toolbox\\apps\\Rider\\ch-0\\"
-    def riderVersion = "171.4089.32"
-    localPath "${riderToolboxPath}${riderVersion}" // todo: use some variable?
+    localPath "$projectDir/build/rider"
     type 'RS'
     downloadSources false
+    updateSinceUntilBuild false
 }
 
 prepareSandbox {
-    from('../JetBrains.ReSharper.FSharp.0.1.0.nupkg', {
+    from('$projectDir/../ReSharper.FSharp/JetBrains.ReSharper.FSharp.0.1.0.nupkg', {
         into "$intellij.pluginName"
     })
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '3.2'
+    gradleVersion = '3.4'
     distributionUrl = "https://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
 }
 
@@ -37,4 +36,3 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 group 'com.jetbrains'
-version '0.1'
