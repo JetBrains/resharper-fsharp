@@ -12,7 +12,7 @@ using Line = JetBrains.Util.dataStructures.TypedIntrinsics.Int32<JetBrains.Docum
 
 namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 {
-  public class ErrorsStageProcess : FSharpDaemonStageProcessBase
+  public abstract class ErrorsStageProcessBase : FSharpDaemonStageProcessBase
   {
     [NotNull] private readonly FSharpErrorInfo[] myErrors;
     [NotNull] private readonly IDocument myDocument;
@@ -20,7 +20,8 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
     /// https://github.com/fsharp/FSharp.Compiler.Service/blob/9.0.0/src/fsharp/CompileOps.fs#L246
     private const int ErrorNumberUndefined = 39;
 
-    public ErrorsStageProcess([NotNull] IDaemonProcess process, [NotNull] FSharpErrorInfo[] errors) : base(process)
+    protected ErrorsStageProcessBase([NotNull] IDaemonProcess process, [NotNull] FSharpErrorInfo[] errors)
+      : base(process)
     {
       myErrors = errors;
       myDocument = DaemonProcess.Document;
@@ -50,7 +51,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
     {
       // Error in project options or environment
       if (error.StartLineAlternate == 0)
-        return new DocumentRange(document, new TextRange(0, document.GetLineEndOffsetNoLineBreak(Line.O)));
+        return new DocumentRange(document, new TextRange(0, document.GetLineEndOffsetWithLineBreak(Line.O)));
 
       var startOffset = FSharpRangeUtil.GetDocumentOffset(document, (Line) (error.StartLineAlternate - 1),
         (Column) error.StartColumn);

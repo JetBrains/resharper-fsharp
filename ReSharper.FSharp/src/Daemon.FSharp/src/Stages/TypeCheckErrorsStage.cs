@@ -12,7 +12,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
     StagesAfter = new[] {typeof(ResolvedIdentifiersHighlightStage)})]
   public class TypeCheckErrorsStage : FSharpDaemonStageBase
   {
-    public class TypeCheckErrorsStageProcess : ErrorsStageProcess
+    public class TypeCheckErrorsStageProcess : ErrorsStageProcessBase
     {
       public TypeCheckErrorsStageProcess([NotNull] IDaemonProcess process, [NotNull] FSharpErrorInfo[] errors)
         : base(process, errors)

@@ -12,7 +12,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
     StagesAfter = new[] {typeof(SetResolvedSymbolsStage)})]
   public class SyntaxErrorsStage : FSharpDaemonStageBase
   {
-    public class SyntaxErrorsStageProcess : ErrorsStageProcess
+    public class SyntaxErrorsStageProcess : ErrorsStageProcessBase
     {
       public SyntaxErrorsStageProcess([NotNull] IDaemonProcess process, [NotNull] FSharpErrorInfo[] errors)
         : base(process, errors)

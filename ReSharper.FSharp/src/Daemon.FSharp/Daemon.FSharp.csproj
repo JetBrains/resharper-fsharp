@@ -405,7 +405,7 @@
     <Compile Include="src\Highlightings\WarningHighlighting.cs" />
     <Compile Include="src\Stages\FSharpDaemonBehaviour.cs" />
     <Compile Include="src\Stages\FSharpDaemonStageBase.cs" />
-    <Compile Include="src\Stages\ErrorsStageProcess.cs" />
+    <Compile Include="src\Stages\ErrorsStageProcessBase.cs" />
     <Compile Include="src\Stages\FSharpDaemonStageProcessBase.cs" />
     <Compile Include="src\Stages\FSharpIdentifierTooltipProvider.cs" />
     <Compile Include="src\Stages\ResolvedIdentifiersHighlightStage.cs" />
