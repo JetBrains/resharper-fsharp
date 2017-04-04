@@ -21,16 +21,17 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
     public bool IsChecked => CheckResults != null;
     public Ast.ParsedInput ParseTree => ParseResults?.ParseTree?.Value;
 
-    public FSharpCheckFileResults GetCheckResults([CanBeNull] Action interruptChecker = null)
+    public FSharpCheckFileResults GetCheckResults(bool forceRecheck = false, [CanBeNull] Action interruptChecker = null)
     {
-      if (CheckResults != null) return CheckResults;
+      if (CheckResults != null && !forceRecheck)
+        return CheckResults;
+
       var psiSourceFile = GetSourceFile();
       if (psiSourceFile == null || ParseResults == null) return null;
       Assertion.AssertNotNull(CheckerService, "CheckerService != null");
 
       return CheckResults = CheckerService.CheckFSharpFile(this, interruptChecker);
     }
-
 
     public virtual void Accept(TreeNodeVisitor visitor)
     {

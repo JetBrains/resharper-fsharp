@@ -22,7 +22,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 
     protected override IDaemonStageProcess CreateProcess(IFSharpFile fsFile, IDaemonProcess process)
     {
-      var errors = fsFile.GetCheckResults(process.CreateInterruptChecker())?.Errors;
+      var errors = fsFile.GetCheckResults(false, process.CreateInterruptChecker())?.Errors;
       return new TypeCheckErrorsStageProcess(process, errors ?? EmptyArray<FSharpErrorInfo>.Instance);
     }
 

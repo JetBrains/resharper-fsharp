@@ -12,7 +12,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Tree
     FSharpParseFileResults ParseResults { get; set; }
 
     [CanBeNull]
-    FSharpCheckFileResults GetCheckResults(Action interruptChecker = null);
+    FSharpCheckFileResults GetCheckResults(bool forceRecheck = false, Action interruptChecker = null);
 
     [CanBeNull]
     FSharpCheckFileResults PreviousCheckResults { get; set; }
