@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Application.Threading;
-using JetBrains.ReSharper.Daemon.FSharp.Highlightings;
 using JetBrains.ReSharper.Daemon.UsageChecking;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
@@ -226,14 +225,6 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
           var idToken = ident?.IdentifierToken;
           if (idToken != null)
             myHighlightings.Add(CreateHighlighting(idToken, highlightingAttributeId));
-        }
-
-        [NotNull]
-        private static HighlightingInfo CreateHighlighting([NotNull] ITreeNode token, string highlightingAttributeId)
-        {
-          var range = token.GetNavigationRange();
-          var highlighting = new FSharpIdentifierHighlighting(highlightingAttributeId, range);
-          return new HighlightingInfo(range, highlighting);
         }
       }
     }

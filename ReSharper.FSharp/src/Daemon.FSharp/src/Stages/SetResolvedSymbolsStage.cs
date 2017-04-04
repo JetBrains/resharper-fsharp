@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Feature.Services.Daemon;
@@ -24,6 +25,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
   {
     private readonly IFSharpFile myFsFile;
     private readonly IDocument myDocument;
+    private const string LocalhighlightingAttributeId = HighlightingAttributeIds.LOCAL_VARIABLE_IDENTIFIER_ATTRIBUTE;
 
     public SetResolvedSymbolsStageProcess([NotNull] IFSharpFile fsFile, [NotNull] IDaemonProcess process)
       : base(process)
@@ -39,6 +41,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
         ?.GetAllUsesOfAllSymbolsInFile()
         ?.RunAsTask(interruptChecker);
       if (symbolUses == null) return;
+      var localDeclarationsHighlightings = new List<HighlightingInfo>(symbolUses.Length);
 
       foreach (var symbolUse in symbolUses)
       {
@@ -55,7 +58,16 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
         if (symbolUse.IsFromDefinition)
         {
           var declaration = FindDeclaration(symbol, token);
-          if (declaration != null) declaration.Symbol = symbol;
+          if (declaration != null)
+          {
+            declaration.Symbol = symbol;
+            var identifier = (declaration as ILocalDeclaration)?.Identifier;
+            if (identifier != null)
+            {
+              localDeclarationsHighlightings.Add(
+                CreateHighlighting(identifier.IdentifierToken, LocalhighlightingAttributeId));
+            }
+          }
           continue;
         }
 
@@ -69,6 +81,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
         SeldomInterruptChecker.CheckForInterrupt();
       }
       myFsFile.ReferencesResolved = true;
+      committer(new DaemonStageResult(localDeclarationsHighlightings));
     }
 
     [CanBeNull]
