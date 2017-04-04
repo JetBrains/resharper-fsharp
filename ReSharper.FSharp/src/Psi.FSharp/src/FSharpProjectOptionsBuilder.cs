@@ -173,7 +173,9 @@ namespace JetBrains.ReSharper.Psi.FSharp
         .Select(p => p.GetOutputFilePath(p.GetCurrentTargetFrameworkId()));
       var refAssembliesPaths = project.GetAssemblyReferences(framework)
         .Select(a => a.ResolveResultAssemblyFile().Location);
-      return refProjectsOutputs.Concat(refAssembliesPaths).Select(a => "-r:" + a.FullPath);
+      return refProjectsOutputs.Concat(refAssembliesPaths)
+        .Where(a => !a.IsNullOrEmpty())
+        .Select(a => "-r:" + a.FullPath);
     }
 
     [NotNull]
