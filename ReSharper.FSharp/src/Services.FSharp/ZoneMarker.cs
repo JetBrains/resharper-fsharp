@@ -4,7 +4,7 @@ using JetBrains.ReSharper.Psi.FSharp;
 namespace JetBrains.ReSharper.Feature.Services.FSharp
 {
   [ZoneMarker]
-  public class ZoneMarker : IRequire<ILanguageFSharpZone>
+  public class ZoneMarker : IRequire<ILanguageFSharpZone>, IRequire<ICodeEditingZone>
   {
   }
 }

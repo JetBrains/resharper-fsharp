@@ -406,6 +406,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Projects.FSharp\Projects.FSharp.csproj">
+      <Project>{7339FF3B-9DD2-4E7C-A982-FEFC119540F9}</Project>
+      <Name>Projects.FSharp</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Psi.FSharp.Parsing\Psi.FSharp.Parsing.fsproj">
       <Project>{35b0d9d5-cad5-4fc8-860b-41bf66d9a5d5}</Project>
       <Name>Psi.FSharp.Parsing</Name>
