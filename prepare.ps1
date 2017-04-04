@@ -172,11 +172,11 @@ SetPluginVersion -file "rider-fsharp/src/main/resources/META-INF/plugin.xml" -ve
 
 if ($Source) {
   $packages = GetPackagesFromFolder -folder $Source
-  foreach ($config in Get-ChildItem -Path src -Filter packages.config -Recurse) {
+  foreach ($config in Get-ChildItem -Path ReSharper.FSharp/src -Filter packages.config -Recurse) {
     UpdatePackagesInPackagesConfig $config.FullName $packages
   }
 
-  foreach ($proj in Get-ChildItem -Path src -Filter *.*proj -Recurse) {
+  foreach ($proj in Get-ChildItem -Path ReSharper.FSharp/src -Filter *.*proj -Recurse) {
     UpdatePackagesInProj $proj.FullName $packages
   }
 }
