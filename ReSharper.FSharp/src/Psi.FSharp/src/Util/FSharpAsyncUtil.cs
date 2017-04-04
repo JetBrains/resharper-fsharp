@@ -3,6 +3,7 @@ using System.Threading;
 using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.Application.Progress;
+using JetBrains.Util;
 using Microsoft.FSharp.Control;
 using Microsoft.FSharp.Core;
 
@@ -36,6 +37,21 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
         }
       }
       return task.Result;
+    }
+
+    [CanBeNull]
+    public static TResult RunSynchronouslySafe<TResult>(FSharpAsync<TResult> async, ILogger logger, string actionTitle)
+      where TResult : class
+    {
+      try
+      {
+        return FSharpAsync.RunSynchronously(async, null, null);
+      }
+      catch (Exception e)
+      {
+        logger.LogMessage(LoggingLevel.WARN, actionTitle + "\n" + e.Message);
+        return null;
+      }
     }
   }
 }

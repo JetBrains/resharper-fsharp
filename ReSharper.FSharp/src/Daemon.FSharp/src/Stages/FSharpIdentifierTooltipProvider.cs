@@ -10,13 +10,13 @@ using JetBrains.ReSharper.Psi.FSharp;
 using JetBrains.ReSharper.Psi.FSharp.Impl;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
+using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.TextControl.DocumentMarkup;
 using JetBrains.UI.RichText;
 using JetBrains.Util;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
-using Microsoft.FSharp.Control;
 
 namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 {
@@ -24,11 +24,13 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
   public class FSharpIdentifierTooltipProvider : IdentifierTooltipProvider<FSharpLanguage>
   {
     private readonly ISolution mySolution;
+    private readonly ILogger myLogger;
 
     public FSharpIdentifierTooltipProvider(Lifetime lifetime, ISolution solution,
-      IDeclaredElementDescriptionPresenter presenter) : base(lifetime, solution, presenter)
+      IDeclaredElementDescriptionPresenter presenter, ILogger logger) : base(lifetime, solution, presenter)
     {
       mySolution = solution;
+      myLogger = logger;
     }
 
     [NotNull]
@@ -55,14 +57,16 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
     }
 
     [NotNull]
-    private static string GetTooltip([NotNull] FSharpCheckFileResults checkResults, [NotNull] string[] names,
+    private string GetTooltip([NotNull] FSharpCheckFileResults checkResults, [NotNull] string[] names,
       DocumentCoords coords, [NotNull] string lineText)
     {
       // todo: provide tooltip for #r strings in fsx, should pass String tag
       var getTooltipAsync = checkResults.GetToolTipTextAlternate((int) coords.Line + 1,
         (int) coords.Column, lineText, ListModule.OfArray(names), FSharpTokenTag.Identifier);
+      var tooltips = FSharpAsyncUtil.RunSynchronouslySafe(getTooltipAsync, myLogger, "Getting FSharp tooltips")?.Item;
+      if (tooltips == null)
+        return string.Empty;
 
-      var tooltips = FSharpAsync.RunSynchronously(getTooltipAsync, null, null).Item;
       var tooltipsTexts = new List<string>();
       foreach (var tooltip in tooltips)
       {
