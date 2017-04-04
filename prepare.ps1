@@ -2,7 +2,7 @@ param (
   [string]$Source, # Rider SDK Packages folder, optional
   [string]$BuildCounter, # Set Rider plugin version to version from Packaging.Props + $BuildCounter, optional
   [string]$SinceBuild, # Set since-build in Rider plugin descriptor
-  [string]$UntilBuild, # Set until-build in Rider plugin descriptor
+  [string]$UntilBuild # Set until-build in Rider plugin descriptor
 )
 
 Set-StrictMode -Version Latest; $ErrorActionPreference = [System.Management.Automation.ActionPreference]::Stop
