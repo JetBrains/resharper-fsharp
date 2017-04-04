@@ -105,7 +105,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
 
         var typeParameters = typeElement.GetAllTypeParameters().ToIList();
         var members = typeElement.EnumerateMembers(mfv.CompiledName, true);
-        return members.FirstOrDefault(m => SameParameters(m, fsMember, typeParameters, psiModule));
+        var member = members.FirstOrDefault(m => SameParameters(m, fsMember, typeParameters, psiModule));
+        return member ??
+               typeElement.EnumerateMembers(mfv.CompiledName, true).FirstOrDefault(); // todo: rarely happens, needs fix
       }
       return null;
     }
