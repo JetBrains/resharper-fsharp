@@ -42,9 +42,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
       foreach (var paramsGroup in mfv.CurriedParameterGroups)
       foreach (var param in paramsGroup)
       {
-        methodParams.Add(new Parameter(this, methodParams.Count, ParameterKind.VALUE,
-          FSharpTypesUtil.GetType(param.Type, declaration, TypeParameters, Module),
-          param.DisplayName));
+        var paramType = param.Type;
+        methodParams.Add(new Parameter(this, methodParams.Count, FSharpTypesUtil.GetParameterKind(param),
+          FSharpTypesUtil.GetType(paramType, declaration, TypeParameters, Module), param.DisplayName));
       }
       Parameters = methodParams.ToList();
       ShortName = mfv.CompiledName;

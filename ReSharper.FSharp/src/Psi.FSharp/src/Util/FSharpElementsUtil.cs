@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.FSharp.Impl;
@@ -19,7 +18,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     [CanBeNull]
     private static ITypeElement GetTypeElement([NotNull] FSharpEntity entity, [NotNull] IPsiModule psiModule)
     {
-      if (((FSharpSymbol) entity).DeclarationLocation == null)
+      if (((FSharpSymbol) entity).DeclarationLocation == null || entity.IsByRef)
         return null;
 
       if (!entity.IsFSharpAbbreviation)

@@ -107,6 +107,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       if (type.HasTypeDefinition && type.TypeDefinition.IsArrayType)
         return GetArrayType(type, typeParametersFromContext, psiModule);
 
+      if (type.HasTypeDefinition && type.TypeDefinition.IsByRef)
+        return GetType(type.GenericArguments[0], typeParametersFromContext, psiModule);
+
       var clrName = GetClrName(type);
       if (clrName == null)
         return TypeFactory.CreateUnknownType(psiModule);
@@ -182,6 +185,19 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
         fsType = fsType.AbbreviatedType;
 
       return fsType;
+    }
+
+    public static ParameterKind GetParameterKind([NotNull] FSharpParameter param)
+    {
+      var fsType = param.Type;
+      if (fsType.HasTypeDefinition && fsType.TypeDefinition.IsByRef)
+      {
+        return param.Attributes.Any(a => a.AttributeType.FullName == "System.Runtime.InteropServices.OutAttribute")
+          ? ParameterKind.OUTPUT
+          : ParameterKind.REFERENCE;
+      }
+
+      return ParameterKind.VALUE;
     }
   }
 }
