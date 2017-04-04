@@ -2,7 +2,7 @@
   <name>F# Support</name>
   <id>com.jetbrains.rider.fsharp</id>
   <vendor url="https://jetbrains.com">JetBrains</vendor>
-  <description>F# language support in Rider</description>
+  <description>F#/FSharp language support in Rider</description>
   <change-notes />
 
   <version>SNAPSHOT</version>
