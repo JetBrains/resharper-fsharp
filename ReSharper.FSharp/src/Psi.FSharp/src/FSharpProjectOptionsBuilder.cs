@@ -112,9 +112,16 @@ namespace JetBrains.ReSharper.Psi.FSharp
 
     private static string GetOutputTarget([CanBeNull] IManagedProjectBuildSettings buildSettings)
     {
-      if (buildSettings != null && buildSettings.OutputType == ProjectOutputType.CONSOLE_EXE)
-        return "exe";
-      return "library"; // todo: any other targets for F#?
+      switch (buildSettings?.OutputType)
+      {
+        case ProjectOutputType.CONSOLE_EXE:
+          return "exe";
+        case ProjectOutputType.WIN_EXE:
+          return "winexe";
+        case ProjectOutputType.MODULE:
+          return "module";
+        default: return "library";
+      }
     }
 
     [NotNull]
