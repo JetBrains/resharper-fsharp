@@ -6,6 +6,7 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.TreeBuilder
+open JetBrains.Util
 open JetBrains.Util.dataStructures.TypedIntrinsics
 open Microsoft.FSharp.Compiler
 open Microsoft.FSharp.Compiler.Ast
@@ -36,10 +37,12 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, parseResults : FSh
         let elementType =
             match parseResults.ParseTree with
             | Some (ParsedInput.ImplFile (ParsedImplFileInput(_,_,_,_,_,modulesAndNamespaces,_))) ->
-                List.iter x.ProcessModuleOrNamespaceDeclaration modulesAndNamespaces
+                for ns in modulesAndNamespaces do
+                    x.ProcessModuleOrNamespaceDeclaration ns
                 ElementType.F_SHARP_IMPL_FILE
             | Some (ParsedInput.SigFile (ParsedSigFileInput(_,_,_,_,modulesAndNamespacesSignatures))) ->
-                List.iter x.ProcessModuleOrNamespaceSignature modulesAndNamespacesSignatures
+                for ns in modulesAndNamespacesSignatures do
+                    x.ProcessModuleOrNamespaceSignature ns
                 ElementType.F_SHARP_SIG_FILE
 
             | None ->
@@ -93,7 +96,8 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, parseResults : FSh
                 x.ProcessIdentifier id
                 match typeParamsOption with
                 | Some (SynValTyparDecls(typeParams,_,_)) ->
-                    List.iter x.ProcessTypeParameterOfMethod typeParams
+                    for param in typeParams do
+                        x.ProcessTypeParameterOfMethod param
                 | _ -> ()
                 x.ProcessLocalConstructorArgs memberParams
                 range |> x.GetEndOffset |> x.AdvanceToOffset
@@ -106,7 +110,8 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, parseResults : FSh
             range |> x.GetEndOffset |> x.AdvanceToOffset
             x.Done(mark, ElementType.LET)
         | SynPat.Tuple(patterns,_) ->
-            List.iter x.ProcessLetPat patterns
+            for pattern in patterns do
+                x.ProcessLetPat pattern
         | SynPat.Paren(pat,_) -> x.ProcessLetPat pat
         | _ -> ()
 
@@ -124,13 +129,15 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, parseResults : FSh
             let id = lid.Head  // single id or not parsed
             x.ProcessAccessModifiers id
             x.ProcessIdentifier id
-            List.iter x.ProcessModuleMemberDeclaration decls
+            for moduleDecl in decls do
+                x.ProcessModuleMemberDeclaration moduleDecl
 
             decl.Range |> x.GetEndOffset |> x.AdvanceToOffset
             x.Done(mark, ElementType.NESTED_MODULE_DECLARATION)
 
         | SynModuleDecl.Types(types,_) ->
-            List.iter x.ProcessType types
+            for t in types do
+                x.ProcessType t
 
         | SynModuleDecl.Exception(exceptionDefn,_) ->
             x.ProcessException exceptionDefn
@@ -143,7 +150,8 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, parseResults : FSh
             x.Done(openMark, ElementType.OPEN)
 
         | SynModuleDecl.Let(_,bindings,range) ->
-            List.iter x.ProcessModuleLet bindings
+            for binding in bindings do
+                x.ProcessModuleLet binding
 
         | decl ->
             decl.Range |> x.GetStartOffset |> x.AdvanceToOffset
@@ -161,7 +169,8 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, parseResults : FSh
             let id = lid.Head // single id or not parsed
             x.ProcessAccessModifiers id
             x.ProcessIdentifier id
-            List.iter x.ProcessModuleMemberSignature sigs
+            for moduleMemberSig in sigs do
+                x.ProcessModuleMemberSignature moduleMemberSig
 
             decl.Range |> x.GetEndOffset |> x.AdvanceToOffset
             x.Done(mark, ElementType.NESTED_MODULE_DECLARATION)
@@ -213,7 +222,8 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, parseResults : FSh
     member private x.ProcessUnionCaseType caseType =
         match caseType with
         | UnionCaseFields(fields) ->
-            List.iter x.ProcessField fields
+            for field in fields do
+                x.ProcessField field
 
         | UnionCaseFullType(_) -> () // todo: used in FSharp.Core only, otherwise warning
 
@@ -297,7 +307,8 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, parseResults : FSh
         | _ -> ()
 
     member private x.ProcessTypeMemberTypeParams (SynValTyparDecls(typeParams,_,_)) =
-        List.iter x.ProcessTypeParameterOfMethod typeParams
+        for param in typeParams do
+            x.ProcessTypeParameterOfMethod param
 
     member private x.ProcessMemberDeclaration id (typeParamsOpt : SynValTyparDecls option) memberParams expr =
         x.ProcessIdentifier id
@@ -312,7 +323,8 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, parseResults : FSh
         let memberType =
             match typeMember with
             | SynMemberDefn.ImplicitCtor(_,_,args,selfId,_) ->
-                List.iter x.ProcessImplicitCtorParam args
+                for arg in args do
+                    x.ProcessImplicitCtorParam arg
                 if selfId.IsSome then x.ProcessLocalId selfId.Value
                 ElementType.IMPLICIT_CONSTRUCTOR_DECLARATION
 
@@ -322,7 +334,8 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, parseResults : FSh
 
             | SynMemberDefn.Interface(SynType.LongIdent(lidWithDots),interfaceMembersOpt,_) ->
                 if interfaceMembersOpt.IsSome then
-                    List.iter x.ProcessTypeMember interfaceMembersOpt.Value
+                    for m in interfaceMembersOpt.Value do
+                        x.ProcessTypeMember m
                 x.ProcessLongIdentifier lidWithDots.Lid
                 ElementType.INTERFACE_IMPLEMENTATION
 
@@ -352,7 +365,8 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, parseResults : FSh
                 | _ -> ElementType.OTHER_TYPE_MEMBER
 
             | SynMemberDefn.LetBindings(bindings,_,_,_) ->
-                List.iter x.ProcessLocalBinding bindings
+                for binding in bindings do
+                    x.ProcessLocalBinding binding
                 ElementType.TYPE_LET_BINDINGS
 
             | SynMemberDefn.AbstractSlot(ValSpfn(_,id,typeParams,_,_,_,_,_,_,_,_),_,_) as slot ->
@@ -377,7 +391,8 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, parseResults : FSh
         let startOffset = x.GetStartOffset (if List.isEmpty attributes then range else (List.head attributes).TypeName.Range)
         x.AdvanceToOffset startOffset
         let mark = builder.Mark()
-        List.iter x.ProcessAttribute attributes
+        for attr in attributes do
+            x.ProcessAttribute attr
 
         let id = lid.Head
         let idOffset = x.GetStartOffset id
@@ -391,9 +406,11 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, parseResults : FSh
 
         if idOffset < typeParamsOffset then
             x.ProcessIdentifier id
-            List.iter x.ProcessTypeParameterOfType typeParams
+            for param in typeParams do
+                x.ProcessTypeParameterOfType param
         else
-            List.iter x.ProcessTypeParameterOfType typeParams
+            for param in typeParams do
+                x.ProcessTypeParameterOfType param
             x.ProcessIdentifier id
 
         let elementType =
@@ -401,13 +418,16 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, parseResults : FSh
             | SynTypeDefnRepr.Simple(simpleRepr, _) ->
                 match simpleRepr with
                 | SynTypeDefnSimpleRepr.Record(_,fields,_) ->
-                    List.iter x.ProcessField fields
+                    for field in fields do
+                        x.ProcessField field
                     ElementType.F_SHARP_RECORD_DECLARATION
                 | SynTypeDefnSimpleRepr.Enum(enumCases,_) ->
-                    List.iter x.ProcessEnumCase enumCases
+                    for case in enumCases do
+                        x.ProcessEnumCase case
                     ElementType.F_SHARP_ENUM_DECLARATION
                 | SynTypeDefnSimpleRepr.Union(_,cases,_) ->
-                    List.iter x.ProcessUnionCase cases
+                    for case in cases do
+                        x.ProcessUnionCase case
                     ElementType.F_SHARP_UNION_DECLARATION
                 | SynTypeDefnSimpleRepr.TypeAbbrev(_) ->
                     ElementType.F_SHARP_TYPE_ABBREVIATION_DECLARATION
@@ -417,21 +437,27 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, parseResults : FSh
             | SynTypeDefnRepr.Exception(_) ->
                 ElementType.F_SHARP_EXCEPTION_DECLARATION
             | SynTypeDefnRepr.ObjectModel(kind, members, _) ->
-                List.iter x.ProcessTypeMember members
+                for m in members do
+                    x.ProcessTypeMember m
                 match kind with
                 | TyconClass -> ElementType.F_SHARP_CLASS_DECLARATION
                 | TyconInterface -> ElementType.F_SHARP_INTERFACE_DECLARATION
                 | TyconStruct -> ElementType.F_SHARP_STRUCT_DECLARATION
                 | _ -> ElementType.F_SHARP_OBJECT_TYPE_DECLARATION
-        List.iter x.ProcessTypeMember members
+        for m in members do
+            x.ProcessTypeMember m
 
         range |> x.GetEndOffset |> x.AdvanceToOffset
         builder.Done(mark, elementType , null)
 
     member private x.ProcessMemberParams (memberParams : SynConstructorArgs) =
         match memberParams with
-        | Pats(pats) -> List.iter x.ProcessMemberParamPat pats
-        | NamePatPairs(idsAndPats,_) -> List.iter (snd >> x.ProcessMemberParamPat) idsAndPats
+        | Pats(pats) ->
+            for pat in pats do
+                x.ProcessMemberParamPat pat
+        | NamePatPairs(idsAndPats,_) ->
+            for (id, pat) in idsAndPats do
+                x.ProcessMemberParamPat pat
 
     member private x.ProcessMemberParamPat (pat : SynPat) =
         pat.Range |> x.GetStartOffset |> x.AdvanceToOffset
@@ -442,8 +468,12 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, parseResults : FSh
 
     member private x.ProcessLocalConstructorArgs (args : SynConstructorArgs) =
         match args with
-        | Pats(pats) -> List.iter x.ProcessLocalPat pats
-        | NamePatPairs(idsAndPats,_) -> List.iter (snd >> x.ProcessLocalPat) idsAndPats
+        | Pats(pats) ->
+            for pat in pats do
+                x.ProcessLocalPat pat
+        | NamePatPairs(idsAndPats,_) ->
+            for (id, pat) in idsAndPats do
+                x.ProcessLocalPat pat
 
     member private x.ProcessLocalPat (pat : SynPat) =
         match pat with
@@ -457,13 +487,15 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, parseResults : FSh
             x.Done(mark, ElementType.LOCAL_DECLARATION)
         | SynPat.Tuple(patterns,_)
         | SynPat.StructTuple(patterns,_) ->
-            List.iter x.ProcessLocalPat patterns
+            for pat in patterns do
+                x.ProcessLocalPat pat
         | SynPat.Paren(pat,_)
         | SynPat.Typed(pat,_,_) ->
             x.ProcessLocalPat pat
         | SynPat.Ands(pats,_)
         | SynPat.ArrayOrList(_,pats,_) ->
-            List.iter x.ProcessLocalPat pats
+            for pat in pats do
+                x.ProcessLocalPat pat
         | SynPat.Or(pat1,pat2,_) ->
             x.ProcessLocalPat pat1
             x.ProcessLocalPat pat2
@@ -482,7 +514,8 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, parseResults : FSh
     member private x.ProcessSimplePatterns (pats : SynSimplePats) =
         match pats with
         | SynSimplePats.SimplePats(pats,_) ->
-            List.iter x.ProcessSimplePattern pats
+            for pat in pats do
+                x.ProcessSimplePattern pat
         | SynSimplePats.Typed(pats,_,_) ->
             x.ProcessSimplePatterns pats
 
@@ -500,7 +533,8 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, parseResults : FSh
         | SynExpr.Tuple(exprs,_,_)
         | SynExpr.StructTuple(exprs,_,_)
         | SynExpr.ArrayOrList(_,exprs,_) ->
-            List.iter x.ProcessLocalExpression exprs
+            for e in exprs do
+                x.ProcessLocalExpression e
 
         | SynExpr.Record(_) -> () // todo
 
@@ -533,11 +567,13 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, parseResults : FSh
             x.ProcessLocalExpression expr
 
         | SynExpr.MatchLambda(_,_,cases,_,_) ->
-            List.iter x.ProcessMatchClause cases
+            for case in cases do
+                x.ProcessMatchClause case
 
         | SynExpr.Match(_,expr,cases,_,_) ->
             x.ProcessLocalExpression expr
-            List.iter x.ProcessMatchClause cases
+            for case in cases do
+                x.ProcessMatchClause case
 
         | SynExpr.Do(expr,_)
         | SynExpr.Assert(expr,_) ->
@@ -550,12 +586,14 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, parseResults : FSh
         | SynExpr.TypeApp(_) -> ()
 
         | SynExpr.LetOrUse(_,_,bindings,bodyExpr,_) ->
-            List.iter x.ProcessLocalBinding bindings
+            for binding in bindings do
+                    x.ProcessLocalBinding binding
             x.ProcessLocalExpression bodyExpr
 
         | SynExpr.TryWith(tryExpr,_,withCases,_,_,_,_) ->
             x.ProcessLocalExpression tryExpr
-            List.iter x.ProcessMatchClause withCases
+            for case in withCases do
+                x.ProcessMatchClause case
 
         | SynExpr.TryFinally(tryExpr,finallyExpr,_,_,_) ->
             x.ProcessLocalExpression tryExpr

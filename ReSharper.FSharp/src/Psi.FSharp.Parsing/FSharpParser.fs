@@ -19,7 +19,9 @@ type FSharpParser(file : IPsiSourceFile, checkerService : FSharpCheckerService, 
             use lifetimeDefinition = Lifetimes.Define()
             let lifetime = lifetimeDefinition.Lifetime
             let parseResults = checkerService.ParseFSharpFile file
-            this.LogErrors parseResults.Errors
+            if not <| parseResults.Errors.IsEmpty()
+                then this.LogErrors parseResults.Errors
+
             let tokenBuffer = TokenBuffer(FSharpLexer(file.Document, checkerService.GetDefinedConstants file))
             let treeBuilder = FSharpTreeBuilder(file, tokenBuffer.CreateLexer(), parseResults, lifetime)
             match treeBuilder.CreateFSharpFile() with
