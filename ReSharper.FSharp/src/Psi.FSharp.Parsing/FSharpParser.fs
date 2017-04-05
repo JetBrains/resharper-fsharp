@@ -10,29 +10,25 @@ open JetBrains.Util
 open Microsoft.FSharp.Compiler
 
 type FSharpParser(file : IPsiSourceFile, checkerService : FSharpCheckerService, logger : ILogger) =
-    
     member this.LogErrors errors =
         let messages = Array.map (fun (e : FSharpErrorInfo) -> e.Message) errors
-        logger.LogMessage(LoggingLevel.ERROR, sprintf "%s: %s" (file.GetLocation().FullPath) (StringUtil.Join(messages, "\n")))
+        logger.LogMessage(LoggingLevel.WARN, sprintf "%s: %s" (file.GetLocation().FullPath) (StringUtil.Join(messages, "\n")))
 
     interface IParser with
         member this.ParseFile() =
             use lifetimeDefinition = Lifetimes.Define()
+            let lifetime = lifetimeDefinition.Lifetime
             let parseResults = checkerService.ParseFSharpFile file
-            let previousCheckResults = checkerService.GetPreviousCheckResults file
-            match parseResults.ParseTree with
-            | Some ast ->
-                let defines = checkerService.GetDefinedConstants file
-                let tokenBuffer = TokenBuffer(FSharpLexer(file.Document, defines))
-                let treeBuilder = FSharpTreeBuilder(file, tokenBuffer.CreateLexer(), ast, lifetimeDefinition.Lifetime)
-                match treeBuilder.CreateFSharpFile() with
-                | :? IFSharpFile as fsFile ->
-                    fsFile.TokenBuffer <- tokenBuffer
-                    fsFile.ParseResults <- parseResults
-                    fsFile.PreviousCheckResults <- previousCheckResults
-                    fsFile.CheckerService <- checkerService
-                    fsFile :> IFile
-                | _ -> null
-            | None ->
-                this.LogErrors parseResults.Errors
+            this.LogErrors parseResults.Errors
+            let tokenBuffer = TokenBuffer(FSharpLexer(file.Document, checkerService.GetDefinedConstants file))
+            let treeBuilder = FSharpTreeBuilder(file, tokenBuffer.CreateLexer(), parseResults, lifetime)
+            match treeBuilder.CreateFSharpFile() with
+            | :? IFSharpFile as fsFile ->
+                fsFile.TokenBuffer <- tokenBuffer
+                fsFile.ParseResults <- parseResults
+                fsFile.PreviousCheckResults <- checkerService.GetPreviousCheckResults file
+                fsFile.CheckerService <- checkerService
+                fsFile :> IFile
+            | _ ->
+                logger.LogMessage(LoggingLevel.ERROR, "FSharpTreeBuilder returned null")
                 null

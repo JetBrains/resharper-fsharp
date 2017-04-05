@@ -7,10 +7,11 @@ open JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.TreeBuilder
 open JetBrains.Util.dataStructures.TypedIntrinsics
-open Microsoft.FSharp.Compiler.Ast
 open Microsoft.FSharp.Compiler
+open Microsoft.FSharp.Compiler.Ast
+open Microsoft.FSharp.Compiler.SourceCodeServices
 
-type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput, lifetime) as this =
+type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, parseResults : FSharpParseFileResults, lifetime) as this =
     inherit TreeStructureBuilderBase(lifetime)
 
     let document = file.Document
@@ -33,13 +34,18 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, ast : ParsedInput,
         let fileMark = builder.Mark()
 
         let elementType =
-            match ast with
-            | ParsedInput.ImplFile (ParsedImplFileInput(_,_,_,_,_,modulesAndNamespaces,_)) ->
+            match parseResults.ParseTree with
+            | Some (ParsedInput.ImplFile (ParsedImplFileInput(_,_,_,_,_,modulesAndNamespaces,_))) ->
                 List.iter x.ProcessModuleOrNamespaceDeclaration modulesAndNamespaces
                 ElementType.F_SHARP_IMPL_FILE
-            | ParsedInput.SigFile (ParsedSigFileInput(_,_,_,_,modulesAndNamespacesSignatures)) ->
+            | Some (ParsedInput.SigFile (ParsedSigFileInput(_,_,_,_,modulesAndNamespacesSignatures))) ->
                 List.iter x.ProcessModuleOrNamespaceSignature modulesAndNamespacesSignatures
                 ElementType.F_SHARP_SIG_FILE
+
+            | None ->
+                ElementType.F_SHARP_IMPL_FILE
+                // FCS couldn't parse file but we need to return correct IFile
+                // and want at least basic syntax highlighting
 
         x.AdvanceToFileEnd()
         x.Done(fileMark, elementType)
