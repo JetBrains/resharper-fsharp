@@ -121,13 +121,23 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, parseResults : FSh
 
     member private x.ProcessModuleMemberDeclaration moduleMember =
         match moduleMember with
-        | SynModuleDecl.NestedModule(ComponentInfo(_,_,_,lid,_,_,_,_),_,decls,_,range) as decl ->
-            range |> x.GetStartOffset |> x.AdvanceToOffset
-            let mark = builder.Mark()
+        | SynModuleDecl.NestedModule(ComponentInfo(attrs,_,_,lid,_,_,_,_),_,decls,_,range) as decl ->
+            let mark =
+                if attrs.IsEmpty then
+                    range |> x.GetStartOffset |> x.AdvanceToOffset
+                    builder.Mark()
+                else
+                    attrs.Head.Range |> x.GetStartOffset |> x.AdvanceToOffset
+                    let mark = builder.Mark()
+                    for attr in attrs do
+                        x.ProcessAttribute attr
+                    mark
+
             builder.AdvanceLexer() |> ignore // ignore keyword token
 
             let id = lid.Head  // single id or not parsed
             x.ProcessAccessModifiers id
+
             x.ProcessIdentifier id
             for moduleDecl in decls do
                 x.ProcessModuleMemberDeclaration moduleDecl
@@ -251,10 +261,24 @@ type FSharpTreeBuilder(file : IPsiSourceFile, lexer : ILexer, parseResults : FSh
         x.AdvanceToOffset endOffset
         x.Done(mark, ElementType.LONG_IDENTIFIER)
 
+    member private x.ProcessAttributeArg (expr : SynExpr) =
+        match expr with
+        | SynExpr.LongIdent(_,lid,_,_) -> x.ProcessLongIdentifier lid.Lid
+        | SynExpr.Paren(expr,_,_,_) -> x.ProcessAttributeArg expr
+        | _ -> () // we need to cover only these cases for now
+
     member private x.ProcessAttribute (attr : SynAttribute) =
         x.AdvanceToOffset (x.GetStartOffset attr.Range)
         let mark = builder.Mark()
         x.ProcessLongIdentifier attr.TypeName.Lid
+
+        let argExpr = attr.ArgExpr
+        argExpr.Range.StartRange |> x.GetStartOffset |> x.AdvanceToOffset
+        let argMark = builder.Mark()
+        x.ProcessAttributeArg attr.ArgExpr
+        argExpr.Range.EndRange |> x.GetEndOffset |> x.AdvanceToOffset
+        x.Done(argMark, ElementType.ARG_EXPRESSION)
+
         x.AdvanceToOffset (x.GetEndOffset attr.Range)
         x.Done(mark, ElementType.F_SHARP_ATTRIBUTE)
 

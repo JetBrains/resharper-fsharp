@@ -10,7 +10,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
   internal partial class LocalDeclaration : IClrDeclaredElement
   {
     public override IDeclaredElement DeclaredElement => this;
-    public override string DeclaredName => Identifier.GetName();
+    public override string DeclaredName => FSharpImplUtil.GetName(Identifier, Attributes);
 
     public override TreeTextRange GetNameRange()
     {

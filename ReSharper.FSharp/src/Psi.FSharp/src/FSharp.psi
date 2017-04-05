@@ -103,6 +103,7 @@ topLevelModuleDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
+  fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>
   moduleMember<MODULE_MEMBER, Members>*
@@ -175,6 +176,7 @@ nestedModuleDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
+  fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
   moduleMember<MODULE_MEMBER, Members>*
@@ -188,6 +190,7 @@ fSharpEnumDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
+  fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
@@ -198,6 +201,7 @@ fSharpEnumMemberDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpProperTypeMemberDeclarationBase";
 }
 :
+  fSharpAttribute<ATTRIBUTE, Attributes>*
   fSharpIdentifier<IDENTIFIER, Identifier>
 ;
 
@@ -209,6 +213,7 @@ fSharpRecordDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
+  fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
@@ -220,6 +225,7 @@ fSharpFieldDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpProperTypeMemberDeclarationBase";
 }
 :
+  fSharpAttribute<ATTRIBUTE, Attributes>*
   fSharpIdentifier<IDENTIFIER, Identifier>
 ;
 
@@ -232,6 +238,7 @@ fSharpUnionDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
+  fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
@@ -243,6 +250,7 @@ fSharpUnionCaseDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
+  fSharpAttribute<ATTRIBUTE, Attributes>*
   fSharpIdentifier<IDENTIFIER, Identifier>
   fSharpFieldDeclaration<UNION_FIELD, Fields>*
 ;
@@ -255,6 +263,7 @@ fSharpExceptionDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
+  fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
 ;
@@ -263,6 +272,7 @@ fSharpTypeAbbreviationDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
+  fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
@@ -272,12 +282,14 @@ let options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpProperTypeMemberDeclarationBase";
 }
 :
+  fSharpAttribute<ATTRIBUTE, Attributes>*
   fSharpIdentifier<IDENTIFIER, Identifier>
   body<BODY,Body>
 ;
 
 otherMemberDeclaration
 :
+
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
 ;
@@ -286,6 +298,7 @@ fSharpOtherSimpleTypeDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
+  fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
@@ -295,6 +308,7 @@ fSharpAbstractTypeDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :
+  fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
@@ -399,6 +413,7 @@ memberDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpProperTypeMemberDeclarationBase";
 }
 :
+  fSharpAttribute<ATTRIBUTE, Attributes>*
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfMethodDeclaration<TYPE_PARAMETER, TypeParameters>*
   memberParam<PARAMETER, Parameters>* fakeSeparator
@@ -408,6 +423,7 @@ abstractSlot options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpProperTypeMemberDeclarationBase";
 }
 :
+  fSharpAttribute<ATTRIBUTE, Attributes>*
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfMethodDeclaration<TYPE_PARAMETER, TypeParameters>*
   memberParam<PARAMETER, Parameters>* fakeSeparator
@@ -417,6 +433,7 @@ valField options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpProperTypeMemberDeclarationBase";
 }
 :
+  fSharpAttribute<ATTRIBUTE, Attributes>*
   fSharpIdentifier<IDENTIFIER, Identifier>
 ;
 
@@ -424,6 +441,7 @@ autoProperty options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpProperTypeMemberDeclarationBase";
 }
 :
+  fSharpAttribute<ATTRIBUTE, Attributes>*
   fSharpIdentifier<IDENTIFIER, Identifier>
 ;
 
@@ -453,6 +471,7 @@ typeParameterOfTypeDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpDeclarationBase";
 }
 :
+  fSharpAttribute<ATTRIBUTE, Attributes>*
   fSharpIdentifier<IDENTIFIER, Identifier>
 ;
 
@@ -460,6 +479,7 @@ typeParameterOfMethodDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpDeclarationBase";
 }
 :
+  fSharpAttribute<ATTRIBUTE, Attributes>*
   fSharpIdentifier<IDENTIFIER, Identifier>
 ;
 
@@ -479,7 +499,19 @@ private modifier{ROLE,Getter}
 
 // Attributes
 
-fSharpAttribute : longIdentifier<IDENTIFIER, LongIdentifier>; // todo: add constructor expressions
+fSharpAttribute
+:
+  longIdentifier<IDENTIFIER, LongIdentifier>
+  argExpression<ARG_EXPRESSION, ArgExpression>
+;
+
+argExpression
+:
+  longIdentifier<LONG_IDENTIFIER, LongIdentifier>
+  STRING<STRING, String>
+;
+// todo: cover more cases (this is a temp mock for the only case we actually look at it now)
+
 
 fakeSeparator : FAKE;
 
@@ -493,5 +525,6 @@ localDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpDeclarationBase";
 }
 :
+  fSharpAttribute<ATTRIBUTE, Attributes>*
   fSharpIdentifier<IDENTIFIER, Identifier>
 ;

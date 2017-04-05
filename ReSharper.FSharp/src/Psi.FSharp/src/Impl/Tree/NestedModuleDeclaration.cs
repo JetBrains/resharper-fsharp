@@ -2,7 +2,7 @@
 {
   internal partial class NestedModuleDeclaration
   {
-    public override string DeclaredName => Identifier.GetName();
+    public override string DeclaredName => FSharpImplUtil.GetName(Identifier, Attributes);
     public bool IsModule => true;
 
     public override TreeTextRange GetNameRange()

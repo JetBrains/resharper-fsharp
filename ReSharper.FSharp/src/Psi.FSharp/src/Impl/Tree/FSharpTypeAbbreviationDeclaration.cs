@@ -2,7 +2,7 @@
 {
   internal partial class FSharpTypeAbbreviationDeclaration
   {
-    public override string DeclaredName => Identifier.GetName();
+    public override string DeclaredName => FSharpImplUtil.GetName(Identifier, Attributes);
 
     public override TreeTextRange GetNameRange()
     {

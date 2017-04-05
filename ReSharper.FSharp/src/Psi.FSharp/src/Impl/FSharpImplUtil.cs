@@ -6,6 +6,7 @@ using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
+using JetBrains.Util.Extension;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl
 {
@@ -30,9 +31,28 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
     }
 
     [NotNull]
-    public static string GetName([CanBeNull] this IFSharpIdentifier identifier)
+    public static string GetName([CanBeNull] IFSharpIdentifier identifier,
+      TreeNodeCollection<IFSharpAttribute> attributes)
     {
-      return identifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
+      var hasModuleSuffix = false;
+
+      foreach (var attr in attributes)
+      {
+        if (attr.LongIdentifier?.Name.SubstringBeforeLast("Attribute") == "CompiledName" &&
+            attr.ArgExpression.String != null)
+        {
+          var compiledNameString = attr.ArgExpression.String.GetText();
+          return compiledNameString.Substring(1, compiledNameString.Length - 2);
+        }
+
+        if (!hasModuleSuffix &&
+            attr.LongIdentifier?.Name.SubstringBeforeLast("Attribute") == "CompilationRepresentation" &&
+            attr.ArgExpression.LongIdentifier?.QualifiedName == "CompilationRepresentationFlags.ModuleSuffix")
+          hasModuleSuffix = true;
+      }
+      var sourceName = identifier?.Name;
+      var compiledName = hasModuleSuffix && sourceName != null ? sourceName + "Module" : sourceName;
+      return compiledName ?? SharedImplUtil.MISSING_DECLARATION_NAME;
     }
 
     public static TreeTextRange GetNameRange([CanBeNull] this IFSharpIdentifier identifier)
