@@ -11,7 +11,6 @@ using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.Util;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
-using Microsoft.FSharp.Control;
 using Microsoft.FSharp.Core;
 
 namespace JetBrains.ReSharper.Psi.FSharp
@@ -45,7 +44,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
         projectCacheSize: null, // use default value
         keepAssemblyContents: FSharpOption<bool>.Some(true),
         keepAllBackgroundResolutions: null, // use default value, true
-        msbuildEnabled: new FSharpOption<bool>(!myIsRunningOnMono));
+        msbuildEnabled: null); // use default value, true
 
       onSolutionCloseNotifier.SolutionIsAboutToClose.Advise(lifetime, () =>
       {
@@ -119,23 +118,24 @@ namespace JetBrains.ReSharper.Psi.FSharp
       var getScriptOptionsAsync =
         myChecker.GetProjectOptionsFromScript(filePath, source, loadTime, otherFlags: null, useFsiAuxLib: null,
           assumeDotNetFramework: null, extraProjectInfo: null);
-      var scriptOptions = getScriptOptionsAsync.RunAsTask();
-      Assertion.AssertNotNull(scriptOptions, "scriptOptions != null");
+      var scriptOptionsAndErrors = getScriptOptionsAsync.RunAsTask();
+      Assertion.AssertNotNull(scriptOptionsAndErrors, "scriptOptions != null");
 
+      var options = scriptOptionsAndErrors.Item1;
       if (!myIsRunningOnMono || myFSharpCorePath == null)
-        return scriptOptions;
+        return options;
 
       return new FSharpProjectOptions(
-        scriptOptions.ProjectFileName,
-        scriptOptions.ProjectFileNames,
-        ArrayModule.Append(scriptOptions.OtherOptions, new[] {myFSharpCorePath}),
-        scriptOptions.ReferencedProjects,
-        scriptOptions.IsIncompleteTypeCheckEnvironment,
-        scriptOptions.UseScriptResolutionRules,
-        scriptOptions.LoadTime,
-        scriptOptions.UnresolvedReferences,
-        scriptOptions.OriginalLoadReferences,
-        scriptOptions.ExtraProjectInfo);
+        options.ProjectFileName,
+        options.ProjectFileNames,
+        ArrayModule.Append(options.OtherOptions, new[] {myFSharpCorePath}),
+        options.ReferencedProjects,
+        options.IsIncompleteTypeCheckEnvironment,
+        options.UseScriptResolutionRules,
+        options.LoadTime,
+        options.UnresolvedReferences,
+        options.OriginalLoadReferences,
+        options.ExtraProjectInfo);
     }
 
     [NotNull]
