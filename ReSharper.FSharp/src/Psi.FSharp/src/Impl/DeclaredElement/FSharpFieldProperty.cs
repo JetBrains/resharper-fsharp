@@ -19,6 +19,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
     public FSharpFieldProperty([NotNull] IFSharpFieldDeclaration declaration, FSharpField field)
       : base(declaration)
     {
+      IsVisibleFromFSharp = declaration.Identifier?.IdentifierToken != null;
+
       // todo: check if this is called after set resolved symbols stage
       if (field == null)
       {
@@ -72,5 +74,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 
     public bool IsAuto => false;
     public bool IsDefault => false;
+    public override bool IsVisibleFromFSharp { get; }
   }
 }

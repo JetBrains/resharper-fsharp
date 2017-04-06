@@ -37,7 +37,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.LanguageService
 
     public override bool IsTypeMemberVisible(ITypeMember member)
     {
-      return true;
+      return (member as IFSharpTypeMember)?.IsVisibleFromFSharp ?? true;
     }
 
     public override IParser CreateParser(ILexer lexer, IPsiModule module, IPsiSourceFile sourceFile)

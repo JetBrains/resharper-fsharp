@@ -8,7 +8,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 {
-  internal abstract class FSharpTypeMember<TDeclaration> : FSharpDeclaredElement<TDeclaration>, ITypeMember
+  internal abstract class FSharpTypeMember<TDeclaration> : FSharpDeclaredElement<TDeclaration>, IFSharpTypeMember
     where TDeclaration : FSharpDeclarationBase, IFSharpDeclaration, IAccessRightsOwnerDeclaration,
     IModifiersOwnerDeclaration
   {
@@ -66,5 +66,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
     public MemberHidePolicy HidePolicy => this is IParametersOwner
       ? MemberHidePolicy.HIDE_BY_SIGNATURE
       : MemberHidePolicy.HIDE_BY_NAME;
+
+    public virtual bool IsVisibleFromFSharp => true;
   }
 }

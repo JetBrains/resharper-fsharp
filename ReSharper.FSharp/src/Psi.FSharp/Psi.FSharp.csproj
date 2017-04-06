@@ -419,6 +419,7 @@
     <Compile Include="src\FSharpNodeTypeIndexer.cs" />
     <Compile Include="src\FSharpProjectFileLanguageService.cs" />
     <Compile Include="src\FSharpPsiProperties.cs" />
+    <Compile Include="src\IFSharpTypeMember.cs" />
     <Compile Include="src\Impl\Cache2\ClassPart.cs" />
     <Compile Include="src\Impl\Cache2\DeclaredNamespacePart.cs" />
     <Compile Include="src\Impl\Cache2\EnumPart.cs" />
