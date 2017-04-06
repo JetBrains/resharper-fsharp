@@ -53,8 +53,10 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="AssemblyInfo.fs" />
-    <Compile Include="FSharpTreeBuilder.fs" />
+    <Compile Include="FSharpTreeBuilderBase.fs" />
+    <Compile Include="FSharpImplTreeBuilder.fs" />
+    <Compile Include="FSharpSigTreeBuilder.fs" />
+    <Compile Include="FSharpFakeTreeBuilder.fs" />
     <Compile Include="FSharpParser.fs" />
     <Compile Include="QuickParse.fs" />
     <Content Include="packages.config" />

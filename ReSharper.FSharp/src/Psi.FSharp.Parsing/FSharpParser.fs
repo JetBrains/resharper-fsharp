@@ -8,11 +8,23 @@ open JetBrains.ReSharper.Psi.FSharp.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 open Microsoft.FSharp.Compiler
+open Microsoft.FSharp.Compiler.Ast
 
 type FSharpParser(file : IPsiSourceFile, checkerService : FSharpCheckerService, logger : ILogger) =
     member this.LogErrors errors =
         let messages = Array.map (fun (e : FSharpErrorInfo) -> e.Message) errors
-        logger.LogMessage(LoggingLevel.WARN, sprintf "%s: %s" (file.GetLocation().FullPath) (StringUtil.Join(messages, "\n")))
+        let filePath = file.GetLocation().FullPath
+        logger.LogMessage(LoggingLevel.WARN, sprintf "%s: %s" filePath (StringUtil.Join(messages, "\n")))
+
+    member private x.CreateTreeBuilder lexer parseTree lifetime =
+        match parseTree with
+        | Some (ParsedInput.ImplFile (_)) ->
+            FSharpImplTreeBuilder(file, lexer, parseTree, lifetime, logger) :> FSharpTreeBuilderBase
+        | Some (ParsedInput.SigFile (_)) ->
+            FSharpSigTreeBuilder(file, lexer, parseTree, lifetime, logger) :> FSharpTreeBuilderBase
+        | None ->
+            // FCS could't parse the file, but we still want a correct IFile
+            FSharpFakeTreeBuilder(file, lexer, lifetime, logger) :> FSharpTreeBuilderBase
 
     interface IParser with
         member this.ParseFile() =
@@ -23,7 +35,9 @@ type FSharpParser(file : IPsiSourceFile, checkerService : FSharpCheckerService, 
                 then this.LogErrors parseResults.Errors
 
             let tokenBuffer = TokenBuffer(FSharpLexer(file.Document, checkerService.GetDefinedConstants file))
-            let treeBuilder = FSharpTreeBuilder(file, tokenBuffer.CreateLexer(), parseResults, lifetime)
+            let lexer = tokenBuffer.CreateLexer()
+            let treeBuilder = this.CreateTreeBuilder lexer parseResults.ParseTree lifetime
+
             match treeBuilder.CreateFSharpFile() with
             | :? IFSharpFile as fsFile ->
                 fsFile.TokenBuffer <- tokenBuffer

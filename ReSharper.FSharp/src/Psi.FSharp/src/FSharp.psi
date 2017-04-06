@@ -128,6 +128,7 @@ interface moduleMemberDeclaration
   nestedModuleDeclaration |
   fSharpTypeDeclaration |
   let |
+  fSharpModuleAbbreviation |
   otherMemberDeclaration
 ;
 
@@ -160,6 +161,7 @@ interface fSharpSimpleTypeDeclaration
 interface fSharpNotCompiledTypeDeclaration
 :
   fSharpTypeAbbreviationDeclaration |
+  fSharpModuleAbbreviation |
   fSharpAbstractTypeDeclaration |
   fSharpOtherSimpleTypeDeclaration
 ;
@@ -269,6 +271,16 @@ fSharpExceptionDeclaration options {
 ;
 
 fSharpTypeAbbreviationDeclaration options {
+  stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
+}
+:
+  fSharpAttribute<ATTRIBUTE, Attributes>*
+  accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
+  fSharpIdentifier<IDENTIFIER, Identifier>
+  typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
+;
+
+fSharpModuleAbbreviation options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
 }
 :

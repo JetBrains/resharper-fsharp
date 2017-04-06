@@ -483,6 +483,7 @@
     <Compile Include="src\Impl\Tree\FSharpFileBase.cs" />
     <Compile Include="src\Impl\Tree\FSharpIdentifier.cs" />
     <Compile Include="src\Impl\Tree\FSharpIdentifierToken.cs" />
+    <Compile Include="src\Impl\Tree\FSharpModuleAbbreviation.cs" />
     <Compile Include="src\Impl\Tree\ImplicitConstructorDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpInterfaceDeclaration.cs" />
     <Compile Include="src\Impl\Tree\Let.cs" />
