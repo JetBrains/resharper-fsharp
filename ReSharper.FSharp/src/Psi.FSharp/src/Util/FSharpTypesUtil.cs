@@ -47,7 +47,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     [NotNull]
     public static string GetClrName([NotNull] FSharpEntity entity)
     {
-      // sometimes name includes assembly name, public key, etc and separated with comma
+      // name may include assembly name, public key, etc and separated with comma, e.g. for unit it returns
+      // "Microsoft.FSharp.Core.Unit, FSharp.Core, Version=4.4.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
+
       return entity.QualifiedName.SubstringBefore(",");
     }
 
@@ -62,7 +64,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       if (fsType.IsFunctionType)
         return FSharpFuncClrName + typeArgumentsCount;
 
-      return fsType.TypeDefinition.QualifiedName.SubstringBefore(",");
+      return GetClrName(fsType.TypeDefinition);
     }
 
     /// <summary>
@@ -107,7 +109,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       if (type.HasTypeDefinition && type.TypeDefinition.IsArrayType)
         return GetArrayType(type, typeParametersFromContext, psiModule);
 
-      if (type.HasTypeDefinition && type.TypeDefinition.IsByRef)
+      if (type.HasTypeDefinition && type.TypeDefinition.IsByRef)  // e.g. byref<int>, we need int
         return GetType(type.GenericArguments[0], typeParametersFromContext, psiModule);
 
       var clrName = GetClrName(type);

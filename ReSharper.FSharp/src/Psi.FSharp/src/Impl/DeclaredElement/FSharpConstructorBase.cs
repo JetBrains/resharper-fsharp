@@ -30,10 +30,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
       var ctorParams = new FrugalLocalList<IParameter>();
       foreach (var paramsGroup in mfv.CurriedParameterGroups)
       foreach (var param in paramsGroup)
-      {
-        ctorParams.Add(new Parameter(this, ctorParams.Count, ParameterKind.VALUE,
+        ctorParams.Add(new Parameter(this, ctorParams.Count, FSharpTypesUtil.GetParameterKind(param),
           FSharpTypesUtil.GetType(param.Type, declaration, Module), param.DisplayName));
-      }
+
       Parameters = ctorParams.ToList();
     }
 

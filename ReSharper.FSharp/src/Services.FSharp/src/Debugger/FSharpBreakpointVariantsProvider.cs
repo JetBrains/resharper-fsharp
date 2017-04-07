@@ -62,10 +62,5 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.Debugger
       var coords = document.GetCoordsByOffset(offset);
       return Range.mkPos((int) coords.Line + 1, (int) coords.Column);
     }
-
-    public bool CheckFileExtensionForDummyBreakpoint(FileSystemPath path)
-    {
-      return path.ExtensionNoDot == "fs";
-    }
   }
 }

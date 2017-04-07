@@ -61,11 +61,11 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
           if (declaration != null)
           {
             declaration.Symbol = symbol;
-            var identifier = (declaration as ILocalDeclaration)?.Identifier;
-            if (identifier != null)
+            var identifierToken = (declaration as ILocalDeclaration)?.Identifier?.IdentifierToken;
+            if (identifierToken != null)
             {
               localDeclarationsHighlightings.Add(
-                CreateHighlighting(identifier.IdentifierToken, LocalhighlightingAttributeId));
+                CreateHighlighting(identifierToken, LocalhighlightingAttributeId));
             }
           }
           continue;

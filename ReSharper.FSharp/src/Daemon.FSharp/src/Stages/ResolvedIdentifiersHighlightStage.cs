@@ -68,7 +68,8 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
           foreach (var token in file.Tokens().OfType<FSharpIdentifierToken>())
           {
             var symbol = token.FSharpSymbol;
-            if (symbol != null) myHighlightings.Add(CreateHighlighting(token, symbol.GetHighlightingAttributeId()));
+            if (symbol != null)
+              myHighlightings.Add(CreateHighlighting(token, symbol.GetHighlightingAttributeId()));
             myInterruptChecker.CheckForInterrupt();
           }
           myCommitter(new DaemonStageResult(myHighlightings));
@@ -91,15 +92,19 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
           var ids = module.LongIdentifier.Identifiers;
           if (ids.IsEmpty) return;
 
-          foreach (var ns in module.LongIdentifier.Qualifiers)
-            myHighlightings.Add(CreateHighlighting(ns, HighlightingAttributeIds.NAMESPACE_IDENTIFIER_ATTRIBUTE));
+          foreach (var nsToken in module.LongIdentifier.Qualifiers)
+          {
+            if (nsToken != null)
+              myHighlightings.Add(CreateHighlighting(nsToken, HighlightingAttributeIds.NAMESPACE_IDENTIFIER_ATTRIBUTE));
+          }
 
           var highlightingAttrId = module.IsModule
             ? HighlightingAttributeIds.TYPE_STATIC_CLASS_ATTRIBUTE
             : HighlightingAttributeIds.NAMESPACE_IDENTIFIER_ATTRIBUTE;
 
           var nameToken = ids.Last();
-          myHighlightings.Add(CreateHighlighting(nameToken, highlightingAttrId));
+          if (nameToken != null)
+            myHighlightings.Add(CreateHighlighting(nameToken, highlightingAttrId));
         }
 
         public override void VisitMemberDeclaration(IMemberDeclaration member)

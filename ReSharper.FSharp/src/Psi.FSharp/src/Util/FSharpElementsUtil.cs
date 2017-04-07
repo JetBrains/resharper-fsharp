@@ -27,9 +27,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       var symbolScope = psiModule.GetPsiServices().Symbols.GetSymbolScope(psiModule, true, true);
       while (entity.IsFSharpAbbreviation)
       {
-        // it's easier to use qualified name with abbreviations
-        // FCS can return CLR names for non-abbreviated types only
-
+        // FCS returns Clr names for non-abbreviated types only, using fullname
         var qualifiedName = ((FSharpSymbol) entity).FullName;
         var typeElement = symbolScope.GetElementsByQualifiedName(qualifiedName).FirstOrDefault() as ITypeElement;
         if (typeElement != null)
@@ -57,10 +55,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     {
       var entity = symbol as FSharpEntity;
       if (entity != null)
-      {
-        if (entity.IsNamespace) return GetDeclaredNamespace(entity, psiModule);
-        return GetTypeElement(entity, psiModule);
-      }
+        return entity.IsNamespace
+          ? (IClrDeclaredElement) GetDeclaredNamespace(entity, psiModule)
+          : GetTypeElement(entity, psiModule);
 
       var unionCase = symbol as FSharpUnionCase;
       if (unionCase != null)
