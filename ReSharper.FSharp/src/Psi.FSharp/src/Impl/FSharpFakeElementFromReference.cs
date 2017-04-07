@@ -57,7 +57,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
 
       var fsFile = myReferenceOwner.GetContainingFile();
       Assertion.AssertNotNull(fsFile, "fsFile != null");
-      var idToken = fsFile.FindTokenAt(FSharpRangeUtil.GetEndOffset(document, declRange.Value) - 1);
+      var idToken = fsFile.FindTokenAt(document.GetTreeEndOffset(declRange.Value) - 1);
       return idToken?.GetContainingNode<LocalDeclaration>();
     }
 

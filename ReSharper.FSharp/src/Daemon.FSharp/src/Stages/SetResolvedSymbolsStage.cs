@@ -120,7 +120,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
       if (name == null) return null;
 
       // range includes qualifiers, we're looking for the last identifier
-      var endOffset = FSharpRangeUtil.GetEndOffset(myDocument, symbolUse.RangeAlternate) - 1;
+      var endOffset = myDocument.GetTreeEndOffset(symbolUse.RangeAlternate) - 1;
       return myFsFile.FindTokenAt(endOffset) as FSharpIdentifierToken;
     }
   }

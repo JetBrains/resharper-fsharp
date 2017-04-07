@@ -64,7 +64,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.ContextHighlighters
       var symbolUsages = FSharpAsync.RunSynchronously(checkResults.GetUsesOfSymbolInFile(symbol), null, null);
       foreach (var symbolUse in symbolUsages)
       {
-        var treeOffset = FSharpRangeUtil.GetEndOffset(document, symbolUse.RangeAlternate);
+        var treeOffset = document.GetTreeEndOffset(symbolUse.RangeAlternate);
         var usageToken = file.FindTokenAt(treeOffset - 1) as FSharpIdentifierToken;
         if (usageToken == null)
           continue;

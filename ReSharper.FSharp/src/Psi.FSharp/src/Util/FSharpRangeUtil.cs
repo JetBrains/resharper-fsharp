@@ -5,7 +5,7 @@ using Line = JetBrains.Util.dataStructures.TypedIntrinsics.Int32<JetBrains.Docum
 
 namespace JetBrains.ReSharper.Psi.FSharp.Util
 {
-  public class FSharpRangeUtil
+  public static class FSharpRangeUtil
   {
     public static int GetDocumentOffset(IDocument document, Line line, Column column)
     {
@@ -16,19 +16,39 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
 
     public static TreeOffset GetTreeOffset(IDocument document, Line line, Column column)
     {
-      return document.GetLineLength(line) < column
-        ? TreeOffset.InvalidOffset
-        : new TreeOffset(document.GetOffsetByCoords(new DocumentCoords(line, column)));
+      return document.GetLineLength(line) >= column
+        ? new TreeOffset(document.GetOffsetByCoords(new DocumentCoords(line, column)))
+        : TreeOffset.InvalidOffset;
     }
 
-    public static TreeOffset GetStartOffset(IDocument document, Range.range range)
+    public static TreeOffset GetTreeStartOffset(this IDocument document, Range.range range)
     {
-      return GetTreeOffset(document, (Line) (range.StartLine - 1), (Column) range.StartColumn);
+      return GetTreeOffset(document, range.GetStartLine(), range.GetStartColumn());
     }
 
-    public static TreeOffset GetEndOffset(IDocument document, Range.range range)
+    public static TreeOffset GetTreeEndOffset(this IDocument document, Range.range range)
     {
-      return GetTreeOffset(document, (Line) (range.EndLine - 1), (Column) range.EndColumn);
+      return GetTreeOffset(document, range.GetEndLine(), range.GetEndColumn());
+    }
+
+    public static Line GetStartLine(this Range.range range)
+    {
+      return (Line) (range.StartLine - 1);
+    }
+
+    public static Line GetEndLine(this Range.range range)
+    {
+      return (Line) (range.EndLine - 1);
+    }
+
+    public static Column GetStartColumn(this Range.range range)
+    {
+      return (Column) range.StartColumn;
+    }
+
+    public static Column GetEndColumn(this Range.range range)
+    {
+      return (Column) range.EndColumn;
     }
   }
 }

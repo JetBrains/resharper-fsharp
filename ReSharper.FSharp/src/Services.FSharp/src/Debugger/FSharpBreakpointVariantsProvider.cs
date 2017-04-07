@@ -44,8 +44,8 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.Debugger
         }
 
         var range = rangeOption.Value;
-        var startOffset = FSharpRangeUtil.GetStartOffset(document, range).Offset;
-        var endOffset = FSharpRangeUtil.GetEndOffset(document, range).Offset;
+        var startOffset = document.GetTreeStartOffset(range).Offset;
+        var endOffset = document.GetTreeEndOffset(range).Offset;
         var breakpointLineText = document.GetText(new TextRange(startOffset, Math.Min(lineEndOffset, endOffset)));
         var breakpointText = endOffset > lineEndOffset
           ? breakpointLineText + MultilineBreakpointTextSuffix
