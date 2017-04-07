@@ -2,16 +2,13 @@
 
 open System
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.TreeBuilder
-open JetBrains.Util
 open JetBrains.Util.dataStructures.TypedIntrinsics
 open Microsoft.FSharp.Compiler
 open Microsoft.FSharp.Compiler.Ast
-open Microsoft.FSharp.Compiler.SourceCodeServices
 
 [<AbstractClass>]
 type FSharpTreeBuilderBase(file : IPsiSourceFile, lexer : ILexer, lifetime) as this =

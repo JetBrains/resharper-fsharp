@@ -15,6 +15,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     private const string FSharpConstructorName = "( .ctor )";
     private const string ClrConstructorName = ".ctor";
     private const string AttributeSuffix = "Attribute";
+    private const string ModuleSuffix = "Module";
     private const int EscapedNameAffixLength = 4;
 
     private static readonly ClrTypeName SourceNameAttributeAttr =
@@ -93,7 +94,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
 
         var compilationRepr = GetAttributeValue(attrOwner, CompilationRepresentationAttr) as int?;
         if (CompilationRepresentationFlags.ModuleSuffix.Equals(compilationRepr))
-          names.Add(element.ShortName.SubstringBeforeLast("Module"));
+          names.Add(element.ShortName.SubstringBeforeLast(ModuleSuffix));
       }
 
       var fsSymbol = FSharpElementsUtil.GetFSharpSymbolFromElement(element);
@@ -114,9 +115,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     }
 
     [CanBeNull]
-    private static object GetAttributeValue([NotNull] IAttributesOwner attrOwner, [NotNull] IClrTypeName attrName)
+    private static object GetAttributeValue([NotNull] IAttributesSet attrs, [NotNull] IClrTypeName attrName)
     {
-      var attrInstance = attrOwner.GetAttributeInstances(attrName, true).FirstOrDefault();
+      var attrInstance = attrs.GetAttributeInstances(attrName, true).FirstOrDefault();
       return attrInstance?.PositionParameters().FirstOrDefault()?.ConstantValue.Value;
     }
   }

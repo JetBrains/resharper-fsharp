@@ -47,7 +47,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     [NotNull]
     public static string GetClrName([NotNull] FSharpEntity entity)
     {
-      // name may include assembly name, public key, etc and separated with comma, e.g. for unit it returns
+      // qualified name may include assembly name, public key, etc and separated with comma, e.g. for unit it returns
       // "Microsoft.FSharp.Core.Unit, FSharp.Core, Version=4.4.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
 
       return entity.QualifiedName.SubstringBefore(",");
@@ -77,6 +77,10 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       return GetType(fsType, GetOuterTypeParameters(typeMemberDeclaration), psiModule);
     }
 
+    /// <summary>
+    /// Get type from a context of some declaration, possibly containing type parameters declarations.
+    /// Overload for method context.
+    /// </summary>
     [CanBeNull]
     public static IType GetType([NotNull] FSharpType fsType,
       [NotNull] ITypeMemberDeclaration methodDeclaration, [NotNull] IList<ITypeParameter> methodTypeParams,

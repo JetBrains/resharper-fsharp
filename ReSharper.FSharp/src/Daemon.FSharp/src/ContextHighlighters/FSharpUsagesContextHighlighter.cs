@@ -50,7 +50,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.ContextHighlighters
       if (token == null)
         return;
 
-      // todo: type parameters t<$caret$type> or t<'$caret$ttype>
+      // todo: type parameters: t<$caret$type> or t<'$caret$ttype>
       // todo: namespaces, use R# search?
 
       var checkResults = file.GetCheckResults();
