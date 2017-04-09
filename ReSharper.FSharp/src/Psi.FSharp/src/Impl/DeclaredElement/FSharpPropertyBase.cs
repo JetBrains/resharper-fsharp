@@ -35,7 +35,13 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 
       IsReadable = property.IsModuleValueOrMember || property.HasGetterMethod;
       IsWritable = property.IsModuleValueOrMember ? property.IsMutable : property.HasSetterMethod;
-      ShortName = property.CompiledName; // todo: returns LogicalName, fix it in FCS
+
+      const string compiledNameAttrName = "Microsoft.FSharp.Core.CompiledNameAttribute";
+      var compiledNameAttr = property.Attributes.FirstOrDefault(a => a.AttributeType.FullName == compiledNameAttrName);
+      var compiledName = compiledNameAttr != null && !compiledNameAttr.ConstructorArguments.IsEmpty()
+        ? compiledNameAttr.ConstructorArguments[0].Item2 as string
+        : null;
+      ShortName = compiledName ?? property.LogicalName;
 
       ReturnType = FSharpTypesUtil.GetType(property.ReturnParameter.Type, declaration, Module) ??
                    TypeFactory.CreateUnknownType(Module);
