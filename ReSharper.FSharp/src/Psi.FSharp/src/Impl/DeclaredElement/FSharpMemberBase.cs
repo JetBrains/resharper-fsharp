@@ -37,5 +37,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 
     public override bool IsStatic { get; }
     public override bool IsOverride { get; }
+    public bool CanBeImplicitImplementation => true;
   }
 }

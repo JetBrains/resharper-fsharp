@@ -35,14 +35,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 
       IsReadable = property.IsModuleValueOrMember || property.HasGetterMethod;
       IsWritable = property.IsModuleValueOrMember ? property.IsMutable : property.HasSetterMethod;
-
-      const string compiledNameAttrName = "Microsoft.FSharp.Core.CompiledNameAttribute";
-      var compiledNameAttr = property.Attributes.FirstOrDefault(a => a.AttributeType.FullName == compiledNameAttrName);
-      var compiledName = compiledNameAttr != null && !compiledNameAttr.ConstructorArguments.IsEmpty()
-        ? compiledNameAttr.ConstructorArguments[0].Item2 as string
-        : null;
-      ShortName = compiledName ?? property.LogicalName;
-
+      ShortName = FSharpImplUtil.GetMemberCompiledName(property);
       ReturnType = FSharpTypesUtil.GetType(property.ReturnParameter.Type, declaration, Module) ??
                    TypeFactory.CreateUnknownType(Module);
     }
@@ -57,7 +50,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 
     public bool IsExplicitImplementation => false;
     public IList<IExplicitImplementation> ExplicitImplementations => EmptyList<IExplicitImplementation>.Instance;
-    public bool CanBeImplicitImplementation => false;
     public IType Type => ReturnType;
 
     public string GetDefaultPropertyMetadataName()

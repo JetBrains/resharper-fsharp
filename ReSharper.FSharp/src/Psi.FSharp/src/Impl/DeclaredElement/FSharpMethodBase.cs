@@ -46,8 +46,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
         methodParams.Add(new Parameter(this, methodParams.Count, FSharpTypesUtil.GetParameterKind(param),
           FSharpTypesUtil.GetType(paramType, declaration, TypeParameters, Module), param.DisplayName));
       }
-      Parameters = methodParams.ToList();
-      ShortName = mfv.CompiledName;
+      Parameters = methodParams.Count == 1 && methodParams[0].Type.IsUnit(Module)
+        ? EmptyList<IParameter>.InstanceList
+        : methodParams.ToList();
+
+      ShortName = FSharpImplUtil.GetMemberCompiledName(mfv);
     }
 
     public override string ShortName { get; }
@@ -64,7 +67,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
     public IAttributesSet ReturnTypeAttributes => EmptyAttributesSet.Instance;
     public bool IsExplicitImplementation => false;
     public IList<IExplicitImplementation> ExplicitImplementations => EmptyList<IExplicitImplementation>.Instance;
-    public bool CanBeImplicitImplementation => false;
     public IList<ITypeParameter> TypeParameters { get; }
     public bool IsExtensionMethod => false;
     public bool IsAsync => false;

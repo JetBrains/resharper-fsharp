@@ -13,10 +13,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
   /// <summary>
   /// Map FSharpType elements (as seen by FSharp.Compiler.Service) to IType types.
   /// </summary>
-  public class FSharpTypesUtil
+  public static class FSharpTypesUtil
   {
     private const string TupleClrName = "System.Tuple`";
     private const string FSharpFuncClrName = "Microsoft.FSharp.Core.FSharpFunc`";
+    private const string UnitTypeName = "Microsoft.FSharp.Core.Unit";
 
     [CanBeNull]
     public static IDeclaredType GetBaseType([NotNull] FSharpEntity entity,
@@ -113,7 +114,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       if (type.HasTypeDefinition && type.TypeDefinition.IsArrayType)
         return GetArrayType(type, typeParametersFromContext, psiModule);
 
-      if (type.HasTypeDefinition && type.TypeDefinition.IsByRef)  // e.g. byref<int>, we need int
+      if (type.HasTypeDefinition && type.TypeDefinition.IsByRef) // e.g. byref<int>, we need int
         return GetType(type.GenericArguments[0], typeParametersFromContext, psiModule);
 
       var clrName = GetClrName(type);
@@ -191,6 +192,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
         fsType = fsType.AbbreviatedType;
 
       return fsType;
+    }
+
+    public static bool IsUnit([NotNull] this IType type, [NotNull] IPsiModule psiModule)
+    {
+      return type.Equals(TypeFactory.CreateTypeByCLRName(UnitTypeName, psiModule));
     }
 
     public static ParameterKind GetParameterKind([NotNull] FSharpParameter param)

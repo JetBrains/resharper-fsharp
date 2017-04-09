@@ -21,7 +21,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       var mfv = GetFSharpSymbol() as FSharpMemberOrFunctionOrValue;
       if (memberParams.IsEmpty)
       {
-        var entityMembers = mfv?.EnclosingEntity.MembersFunctionsAndValues;
+        var entityMembers = mfv?.EnclosingEntity.MembersFunctionsAndValues; //todo inheritance with same name
         var property = entityMembers?.SingleItem(m => m.IsProperty && !m.IsPropertyGetterMethod &&
                                                       !m.IsPropertySetterMethod && m.DisplayName == mfv.DisplayName);
         return new FSharpProperty(this, property);

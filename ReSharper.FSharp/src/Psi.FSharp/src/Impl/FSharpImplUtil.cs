@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Linq;
+using System.Text;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
@@ -7,11 +8,14 @@ using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 using JetBrains.Util.Extension;
+using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl
 {
   public static class FSharpImplUtil
   {
+    private const string CompiledNameAttrName = "Microsoft.FSharp.Core.CompiledNameAttribute";
+
     public static TreeTextRange GetNameRange([CanBeNull] this ILongIdentifier longIdentifier)
     {
       if (longIdentifier == null) return TreeTextRange.InvalidRange;
@@ -39,7 +43,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
       foreach (var attr in attributes)
       {
         if (attr.LongIdentifier?.Name.SubstringBeforeLast("Attribute") == "CompiledName" &&
-            attr.ArgExpression.String != null)
+            attr.ArgExpression.String != null) // todo: proper expressions evaluation, e.g. "S1" + "S2"
         {
           var compiledNameString = attr.ArgExpression.String.GetText();
           return compiledNameString.Substring(1, compiledNameString.Length - 2);
@@ -101,6 +105,16 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
         clrName.Append("`" + typeParamsOwner.TypeParameters.Count);
 
       return clrName.ToString();
+    }
+
+    [NotNull]
+    public static string GetMemberCompiledName([NotNull] FSharpMemberOrFunctionOrValue mfv)
+    {
+      var compiledNameAttr = mfv.Attributes.FirstOrDefault(a => a.AttributeType.FullName == CompiledNameAttrName);
+      var compiledName = compiledNameAttr != null && !compiledNameAttr.ConstructorArguments.IsEmpty()
+        ? compiledNameAttr.ConstructorArguments[0].Item2 as string
+        : null;
+      return compiledName ?? mfv.LogicalName;
     }
   }
 }
