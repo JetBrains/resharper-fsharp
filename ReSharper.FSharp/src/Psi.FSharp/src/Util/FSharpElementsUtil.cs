@@ -13,7 +13,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
   /// <summary>
   /// Map FSharpSymbol elements (as seen by FSharp.Compiler.Service) to declared elements.
   /// </summary>
-  public class FSharpElementsUtil
+  public static class FSharpElementsUtil
   {
     [CanBeNull]
     private static ITypeElement GetTypeElement([NotNull] FSharpEntity entity, [NotNull] IPsiModule psiModule)
@@ -171,10 +171,26 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     }
 
     [CanBeNull]
-    private static FSharpMemberOrFunctionOrValue GetMemberWithoutSubstitution([NotNull] FSharpSymbol mfv,
-      [NotNull] FSharpEntity entity)
+    private static FSharpMemberOrFunctionOrValue GetMemberWithoutSubstitution(
+      [NotNull] FSharpMemberOrFunctionOrValue mfv, [NotNull] FSharpEntity entity)
     {
-      return entity.MembersFunctionsAndValues.FirstOrDefault(m => m.IsEffectivelySameAs(mfv));
+      var sameMfv = entity.MembersFunctionsAndValues.FirstOrDefault(m => m.IsEffectivelySameAs(mfv));
+      if (sameMfv != null)
+        return sameMfv;
+
+      if (mfv.IsConstructor)
+      {
+        // bug in FCS, https://github.com/fsharp/FSharp.Compiler.Service/issues/752
+        var mfvParamsCount = mfv.ParametersCount();
+        return entity.MembersFunctionsAndValues.FirstOrDefault(
+          m => m.CompiledName == ".ctor" && m.ParametersCount() == mfvParamsCount);
+      }
+      return null;
+    }
+
+    private static int ParametersCount([NotNull] this FSharpMemberOrFunctionOrValue mfv)
+    {
+      return mfv.CurriedParameterGroups.SelectMany(p => p).ToList().Count;
     }
 
     [CanBeNull]
