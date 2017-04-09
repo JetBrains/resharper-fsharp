@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Psi.FSharp.Impl;
+using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Util;
@@ -51,13 +51,46 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     }
 
     [CanBeNull]
-    public static IClrDeclaredElement GetDeclaredElement([NotNull] FSharpSymbol symbol, [NotNull] IPsiModule psiModule)
+    public static IClrDeclaredElement GetDeclaredElement([CanBeNull] FSharpSymbol symbol,
+      [NotNull] IPsiModule psiModule, [CanBeNull] IFSharpFile fsFile = null)
     {
+      if (symbol == null)
+        return null;
+
       var entity = symbol as FSharpEntity;
       if (entity != null)
         return entity.IsNamespace
           ? (IClrDeclaredElement) GetDeclaredNamespace(entity, psiModule)
           : GetTypeElement(entity, psiModule);
+
+      var mfv = symbol as FSharpMemberOrFunctionOrValue;
+      if (mfv != null)
+      {
+        if (!mfv.IsModuleValueOrMember)
+          return FindLocalDeclaration(mfv, fsFile);
+
+        var memberEntity = GetContainingEntity(mfv);
+        if (memberEntity == null)
+          return null;
+
+        var typeElement = GetTypeElement(memberEntity, psiModule);
+        if (typeElement == null)
+          return null;
+
+        var fsMember = GetMemberWithoutSubstitution(mfv, memberEntity);
+        if (fsMember == null)
+          return null;
+
+        var typeParameters = typeElement.GetAllTypeParameters().ToIList();
+        var members = mfv.IsConstructor
+          ? typeElement.Constructors
+          : typeElement.EnumerateMembers(mfv.CompiledName, true);
+
+        var member = members.FirstOrDefault(m => SameParameters(m, fsMember, typeParameters, psiModule));
+        return member ??
+               // todo: rarely happens, couldn't map types (with substitutions), needs a proper fix
+               typeElement.EnumerateMembers(mfv.CompiledName, true).FirstOrDefault();
+      }
 
       var unionCase = symbol as FSharpUnionCase;
       if (unionCase != null)
@@ -84,30 +117,20 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
         return typeElement?.EnumerateMembers(field.Name, true).FirstOrDefault();
       }
 
-      var mfv = symbol as FSharpMemberOrFunctionOrValue;
-      if (mfv != null)
-      {
-        var memberEntity = GetContainingEntity(mfv);
-        if (memberEntity == null)
-          return null;
-
-        var typeElement = GetTypeElement(memberEntity, psiModule);
-        if (typeElement == null)
-          return null;
-
-        var fsMember = GetMemberWithoutSubstitution(mfv, memberEntity);
-        if (fsMember == null)
-          return null;
-
-        var typeParameters = typeElement.GetAllTypeParameters().ToIList();
-        var members = typeElement.EnumerateMembers(mfv.CompiledName, true);
-        var member = members.FirstOrDefault(m => SameParameters(m, fsMember, typeParameters, psiModule));
-        return member ??
-               typeElement.EnumerateMembers(mfv.CompiledName, true).FirstOrDefault(); // todo: rarely happens, needs fix
-      }
       return null;
     }
 
+    private static IClrDeclaredElement FindLocalDeclaration([NotNull] FSharpMemberOrFunctionOrValue mfv,
+      [NotNull] IFSharpFile fsFile)
+    {
+      var declRange = mfv.DeclarationLocation;
+      var document = fsFile.GetSourceFile()?.Document;
+      if (document == null)
+        return null;
+
+      var idToken = fsFile.FindTokenAt(document.GetTreeEndOffset(declRange) - 1);
+      return idToken?.GetContainingNode<LocalDeclaration>();
+    }
 
     private static bool SameParameters([NotNull] ITypeMember member, [NotNull] FSharpMemberOrFunctionOrValue mfv,
       IList<ITypeParameter> typeParameters, IPsiModule psiModule)
@@ -191,17 +214,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     private static int ParametersCount([NotNull] this FSharpMemberOrFunctionOrValue mfv)
     {
       return mfv.CurriedParameterGroups.SelectMany(p => p).ToList().Count;
-    }
-
-    [CanBeNull]
-    public static FSharpSymbol GetFSharpSymbolFromElement(IDeclaredElement element)
-    {
-      var fakeLemement = element as FSharpFakeElementFromReference;
-      if (fakeLemement != null)
-        return fakeLemement.Symbol;
-
-      var localDeclaration = element as ILocalDeclaration;
-      return localDeclaration?.Symbol;
     }
   }
 }

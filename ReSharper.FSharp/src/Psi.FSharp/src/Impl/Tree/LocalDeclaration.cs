@@ -1,13 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Xml;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
+using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.Util;
+using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 {
-  internal partial class LocalDeclaration : IClrDeclaredElement
+  internal partial class LocalDeclaration : ITypeOwner
   {
     public override IDeclaredElement DeclaredElement => this;
     public override string DeclaredName => FSharpImplUtil.GetName(Identifier, Attributes);
@@ -52,5 +55,20 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 
     public IPsiModule Module => GetPsiModule();
     public ISubstitution IdSubstitution => EmptySubstitution.INSTANCE;
+
+    public IType Type
+    {
+      get
+      {
+        var mfv = Symbol as FSharpMemberOrFunctionOrValue;
+        if (mfv == null)
+          return TypeFactory.CreateUnknownType(Module);
+
+        var typeMemberDeclaration = GetContainingNode<ITypeMemberDeclaration>();
+        Assertion.AssertNotNull(typeMemberDeclaration, "typeMemberDeclaration != null");
+        return FSharpTypesUtil.GetType(mfv.ReturnParameter.Type, typeMemberDeclaration, Module) ??
+               TypeFactory.CreateUnknownType(Module);
+      }
+    }
   }
 }

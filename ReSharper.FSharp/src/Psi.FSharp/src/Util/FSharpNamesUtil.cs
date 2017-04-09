@@ -97,20 +97,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
           names.Add(element.ShortName.SubstringBeforeLast(ModuleSuffix));
       }
 
-      var fsSymbol = FSharpElementsUtil.GetFSharpSymbolFromElement(element);
-      if (fsSymbol == null) return names;
-
-      var entity = fsSymbol as FSharpEntity;
-      if (entity == null) return names;
-
-      while (entity.IsFSharpAbbreviation)
-      {
-        var abbreviatedType = entity.AbbreviatedType;
-        if (!abbreviatedType.HasTypeDefinition) break;
-
-        entity = abbreviatedType.TypeDefinition;
-        names.Add(entity.DisplayName);
-      }
+      // todo: type abbreviations
       return names;
     }
 

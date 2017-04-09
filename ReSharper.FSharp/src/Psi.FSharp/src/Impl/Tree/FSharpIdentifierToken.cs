@@ -20,13 +20,13 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
     public override ReferenceCollection GetFirstClassReferences()
     {
       if (FSharpSymbol != null)
-        return new ReferenceCollection(new FSharpResolvedReference(this, FSharpSymbol));
+        return new ReferenceCollection(new FSharpSymbolReference(this, lazyResolve: false));
 
       var fsFile = this.GetContainingFile() as IFSharpFile;
       Assertion.AssertNotNull(fsFile, "fsFile != null");
       return fsFile.ReferencesResolved
         ? ReferenceCollection.Empty
-        : new ReferenceCollection(new FSharpUnresolvedReference(this));
+        : new ReferenceCollection(new FSharpSymbolReference(this, lazyResolve: true));
     }
   }
 }

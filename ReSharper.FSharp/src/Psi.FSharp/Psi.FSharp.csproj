@@ -462,11 +462,9 @@
     <Compile Include="src\Impl\DeclaredElement\ModuleValue.cs" />
     <Compile Include="src\Impl\DeclaredElement\FSharpMethod.cs" />
     <Compile Include="src\Impl\DeclaredElement\FSharpProperty.cs" />
-    <Compile Include="src\Impl\FSharpFakeElementFromReference.cs" />
     <Compile Include="src\Impl\FSharpImplUtil.cs" />
-    <Compile Include="src\Impl\FSharpResolvedReference.cs" />
     <Compile Include="src\Impl\FSharpReferenceBase.cs" />
-    <Compile Include="src\Impl\FSharpUnresolvedReference.cs" />
+    <Compile Include="src\Impl\FSharpSymbolReference.cs" />
     <Compile Include="src\Impl\ModifiersUtil.cs" />
     <Compile Include="src\Impl\Tree\AbstractSlot.cs" />
     <Compile Include="src\Impl\Tree\AutoProperty.cs" />

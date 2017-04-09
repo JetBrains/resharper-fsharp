@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
-using JetBrains.ReSharper.Psi.FSharp.Impl;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Impl.Search;
 using JetBrains.ReSharper.Psi.Search;
-using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Searching
@@ -39,11 +37,18 @@ namespace JetBrains.ReSharper.Psi.FSharp.Searching
       return FSharpNamesUtil.GetPossibleSourceNames(element);
     }
 
+    public ISearchDomain GetDeclaredElementSearchDomain(IDeclaredElement declaredElement)
+    {
+      // todo: type abbreviations
+      var localDeclaration = declaredElement as ILocalDeclaration;
+      return localDeclaration != null
+        ? mySearchDomainFactory.CreateSearchDomain(localDeclaration.GetSourceFile())
+        : myClrSearchFactory.GetDeclaredElementSearchDomain(declaredElement);
+    }
+
     public Tuple<ICollection<IDeclaredElement>, bool> GetNavigateToTargets(IDeclaredElement element)
     {
-      var fakeElement = element as FSharpFakeElementFromReference;
-      var actualElement = fakeElement?.GetActualElement() as IDeclaredElement;
-      return actualElement != null ? Tuple.Create(new[] {actualElement}.AsCollection(), false) : null;
+      return null;
     }
 
     public ICollection<FindResult> TransformNavigationTargets(ICollection<FindResult> targets)
@@ -53,30 +58,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Searching
 
     public IEnumerable<RelatedDeclaredElement> GetRelatedDeclaredElements(IDeclaredElement element)
     {
-      var actualElement = (element as FSharpFakeElementFromReference)?.GetActualElement();
-      return actualElement != null
-        ? (IEnumerable<RelatedDeclaredElement>) new[] {new RelatedDeclaredElement(actualElement)}
-        : EmptyList<RelatedDeclaredElement>.Instance;
-    }
-
-    public ISearchDomain GetDeclaredElementSearchDomain(IDeclaredElement declaredElement)
-    {
-      var fakeElement = declaredElement as FSharpFakeElementFromReference;
-      var actualElement = fakeElement?.GetActualElement();
-      if (actualElement != null)
-      {
-        var localDeclaration = actualElement as ILocalDeclaration;
-        if (localDeclaration != null)
-          mySearchDomainFactory.CreateSearchDomain(localDeclaration.GetSourceFile());
-
-        return myClrSearchFactory.GetDeclaredElementSearchDomain(actualElement);
-      }
-
-      // todo: abbreviations
-      // mySearchDomainFactory.CreateSearchDomainOfModuleAndItsReferences(actualElement.Module);
-
-      // couldn't find element in caches and the element is not local
-      return mySearchDomainFactory.CreateSearchDomain(declaredElement.GetSolution(), false);
+      return EmptyList<RelatedDeclaredElement>.Instance;
     }
 
     public Tuple<ICollection<IDeclaredElement>, Predicate<IFindResultReference>, bool> GetDerivedFindRequest(
