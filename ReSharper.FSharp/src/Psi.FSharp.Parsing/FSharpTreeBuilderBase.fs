@@ -4,6 +4,7 @@ open System
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.FSharp.Impl.Tree
+open JetBrains.ReSharper.Psi.FSharp.Util
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.TreeBuilder
 open JetBrains.Util.dataStructures.TypedIntrinsics
@@ -77,9 +78,11 @@ type FSharpTreeBuilderBase(file : IPsiSourceFile, lexer : ILexer, lifetime) as t
             else ElementType.F_SHARP_NAMESPACE_DECLARATION
         x.Done(mark, elementType)
 
-    member internal x.ProcessAttributesAndStartRange (attrs : SynAttributes) (range : Range.range) =
+    member internal x.ProcessAttributesAndStartRange (attrs : SynAttributes) (id : Ident option) (range : Range.range) =
         if attrs.IsEmpty then
-            range |> x.GetStartOffset |> x.AdvanceToOffset
+            let rangeStartOffset = x.GetStartOffset range
+            let startOffset = if id.IsSome then Math.Min(x.GetStartOffset id.Value.idRange, rangeStartOffset) else rangeStartOffset
+            startOffset |> x.AdvanceToOffset
             x.Builder.Mark()
         else
             attrs.Head.Range |> x.GetStartOffset |> x.AdvanceToOffset
@@ -88,7 +91,7 @@ type FSharpTreeBuilderBase(file : IPsiSourceFile, lexer : ILexer, lifetime) as t
             mark
 
     member internal x.StartNestedModule (attrs : SynAttributes) (lid : LongIdent) (range : Range.range) =
-        let mark = x.ProcessAttributesAndStartRange attrs range
+        let mark = x.ProcessAttributesAndStartRange attrs (List.tryHead lid) range
         x.Builder.AdvanceLexer() |> ignore // skip keyword
         if not lid.IsEmpty then
             let id = lid.Head
@@ -112,7 +115,7 @@ type FSharpTreeBuilderBase(file : IPsiSourceFile, lexer : ILexer, lifetime) as t
         x.Builder.Done(mark, ElementType.ACCESS_MODIFIERS, null)
 
     member internal x.StartType attrs typeParams (lid : LongIdent) range =
-        let mark = x.ProcessAttributesAndStartRange attrs range
+        let mark = x.ProcessAttributesAndStartRange attrs (List.tryHead lid) range
         if not lid.IsEmpty then
             let id = lid.Head
             let idOffset = x.GetStartOffset id

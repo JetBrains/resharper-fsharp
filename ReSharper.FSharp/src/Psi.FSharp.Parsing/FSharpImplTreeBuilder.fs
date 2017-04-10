@@ -108,7 +108,7 @@ type FSharpImplTreeBuilder(file, lexer, parseTree, lifetime, logger : ILogger) =
         | SynPat.LongIdent(LongIdentWithDots(lid,_),_,typeParamsOption,memberParams,_,range) ->
             match lid with
             | [id] ->
-                let mark = x.ProcessAttributesAndStartRange attrs range
+                let mark = x.ProcessAttributesAndStartRange attrs (Some id) range
                 x.ProcessIdentifier id
                 match typeParamsOption with
                 | Some (SynValTyparDecls(typeParams,_,_)) ->
@@ -120,7 +120,7 @@ type FSharpImplTreeBuilder(file, lexer, parseTree, lifetime, logger : ILogger) =
             | _ -> ()
 
         | SynPat.Named(_,id,_,_,range) ->
-            let mark = x.ProcessAttributesAndStartRange attrs range
+            let mark = x.ProcessAttributesAndStartRange attrs (Some id) range
             x.ProcessIdentifier id
             range |> x.GetEndOffset |> x.AdvanceToOffset
             x.Done(mark, ElementType.LET)

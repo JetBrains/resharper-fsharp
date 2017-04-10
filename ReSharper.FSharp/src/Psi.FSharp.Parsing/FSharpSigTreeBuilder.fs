@@ -46,7 +46,7 @@ type FSharpSigTreeBuilder(file, lexer, parseTree, lifetime, logger : ILogger) =
             x.Done(mark, ElementType.F_SHARP_MODULE_ABBREVIATION)
 
         | SynModuleSigDecl.Val(ValSpfn(attrs,id,SynValTyparDecls(typeParams,_,_),_,_,_,_,_,_,_,_),range) ->
-            let mark = x.ProcessAttributesAndStartRange attrs range
+            let mark = x.ProcessAttributesAndStartRange attrs (Some id) range
             x.ProcessIdentifier id
             for p in typeParams do x.ProcessTypeParameter p ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION
             range |> x.GetEndOffset |> x.AdvanceToOffset
