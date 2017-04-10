@@ -25,14 +25,21 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
 
       var tokenBeforeCaret = file.FindTokenAt(caretTreeOffset - 1);
       var tokenAtCaret = file.FindTokenAt(caretTreeOffset);
-      var tokenType = tokenBeforeCaret?.GetTokenType();
+      var tokenBeforeCaretType = tokenBeforeCaret?.GetTokenType();
+      var tokenAtCaretType = tokenAtCaret?.GetTokenType();
 
-      if (tokenAtCaret == tokenBeforeCaret && tokenType != null &&
-          (tokenType.IsComment || tokenType.IsStringLiteral || tokenType.IsConstantLiteral))
+      if (tokenBeforeCaretType == FSharpTokenType.LINE_COMMENT ||
+          tokenBeforeCaretType == FSharpTokenType.DEAD_CODE || tokenAtCaretType == FSharpTokenType.DEAD_CODE)
+        return null;
+
+      if (tokenAtCaret == tokenBeforeCaret && tokenBeforeCaretType != null &&
+          (tokenBeforeCaretType.IsComment || tokenBeforeCaretType.IsStringLiteral ||
+           tokenBeforeCaretType.IsConstantLiteral))
         return null;
 
       var completedRangeStartOffset =
-        tokenType != null && (tokenType == FSharpTokenType.IDENTIFIER || tokenType.IsKeyword)
+        tokenBeforeCaretType != null && (tokenBeforeCaretType == FSharpTokenType.IDENTIFIER ||
+                                         tokenBeforeCaretType.IsKeyword)
           ? tokenBeforeCaret.GetTreeStartOffset().Offset
           : caretOffset;
       var completedRange = new TextRange(completedRangeStartOffset, caretOffset);

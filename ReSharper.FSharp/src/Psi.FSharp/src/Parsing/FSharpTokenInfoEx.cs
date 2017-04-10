@@ -60,6 +60,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
           return FSharpTokenType.OPERATOR;
 
         case FSharpTokenCharKind.LineComment:
+          return FSharpTokenType.LINE_COMMENT;
         case FSharpTokenCharKind.Comment:
           return FSharpTokenType.COMMENT;
 

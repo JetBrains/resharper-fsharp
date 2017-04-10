@@ -18,7 +18,7 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.Comment
 
     protected override bool IsEndOfLineComment(TokenNodeType tokenType, string tokenText)
     {
-      if (tokenType != FSharpTokenType.COMMENT)
+      if (tokenType != FSharpTokenType.LINE_COMMENT)
         return false;
 
       // exactly 2 slashes

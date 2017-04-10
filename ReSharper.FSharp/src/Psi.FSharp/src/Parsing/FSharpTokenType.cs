@@ -26,7 +26,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
       }
 
       public override bool IsWhitespace => this == WHITESPACE || this == NEW_LINE;
-      public override bool IsComment => this == COMMENT;
+      public override bool IsComment => this == COMMENT || this == LINE_COMMENT;
       public override bool IsStringLiteral => this == STRING;
       public override bool IsConstantLiteral => this == LITERAL;
       public override bool IsIdentifier => Identifiers[this];

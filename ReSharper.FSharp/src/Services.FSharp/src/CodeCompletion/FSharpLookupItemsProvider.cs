@@ -53,12 +53,10 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
       var completionContext = context.BasicContext;
       var document = completionContext.Document;
       var parseResults = new FSharpOption<FSharpParseFileResults>(fsFile.ParseResults);
-
       var qualifiers = context.Names.Item1;
       var partialName = context.Names.Item2;
 
       var checkResults = fsFile.GetCheckResults();
-
       if (checkResults == null)
         return null;
 
