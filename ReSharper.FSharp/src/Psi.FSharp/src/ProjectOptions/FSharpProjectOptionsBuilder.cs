@@ -11,24 +11,22 @@ using JetBrains.ProjectModel.ProjectsHost;
 using JetBrains.ProjectModel.ProjectsHost.MsBuild;
 using JetBrains.ProjectModel.ProjectsHost.SolutionHost;
 using JetBrains.ProjectModel.Properties.Managed;
-using JetBrains.ReSharper.PsiGen.Util;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
+using JetBrains.Util.dataStructures;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Compiler;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
-namespace JetBrains.ReSharper.Psi.FSharp
+namespace JetBrains.ReSharper.Psi.FSharp.ProjectOptions
 {
   [SolutionComponent]
   public class FSharpProjectOptionsBuilder
   {
-    private readonly ISolution mySolution;
     private readonly MsBuildProjectHost myMsBuildHost;
 
     public FSharpProjectOptionsBuilder(ISolution solution)
     {
-      mySolution = solution;
       myMsBuildHost = solution.ProjectsHostContainer().GetComponent<MsBuildProjectHost>();
     }
 
@@ -36,9 +34,8 @@ namespace JetBrains.ReSharper.Psi.FSharp
     /// Build project options for FSharp.Compiler.Service. Options for referenced projects are not created.
     /// Use AddReferencedProjects to add referenced projects options.
     /// </summary>
-    public FSharpProjectOptions BuildWithoutReferencedProjects(Guid projectGuid)
+    public FSharpProjectOptions BuildWithoutReferencedProjects(IProject project)
     {
-      var project = mySolution.GetProjectByGuid(projectGuid);
       Assertion.AssertNotNull(project, "project != null");
       var buildSettings = project.ProjectProperties.BuildSettings as IManagedProjectBuildSettings;
       var configuration =
@@ -61,7 +58,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
 
       if (configuration != null)
       {
-        projectOptions.addAll(SplitDefines(configuration.DefineConstants).Convert(s => "--define:" + s));
+        projectOptions.AddRange(SplitDefines(configuration.DefineConstants).Convert(s => "--define:" + s));
 
         var doc = configuration.DocumentationFile;
         if (!doc.IsNullOrWhitespace()) projectOptions.Add("--doc:" + doc);
@@ -74,7 +71,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
         // todo: add F# specific options like 'warnon'
       }
 
-      projectOptions.addAll(GetReferencedPathsOptions(project));
+      projectOptions.AddRange(GetReferencedPathsOptions(project));
 
       var projectFileNames = new List<string>();
       var projectMark = project.GetProjectMark().NotNull();
@@ -84,15 +81,12 @@ namespace JetBrains.ReSharper.Psi.FSharp
         {
           // obtains all items in a right order directly from msbuild
           foreach (var item in editor.Items)
-          {
-            if (!BuildAction.GetOrCreate(item.ItemType()).IsCompile()) continue;
-
-            var path = FileSystemPath.TryParse(item.EvaluatedInclude);
-            if (path.IsEmpty) continue;
-
-            var actualPath = EnsureAbsolute(path, projectMark.Location.Directory);
-            projectFileNames.Add(actualPath.FullPath);
-          }
+            if (BuildAction.GetOrCreate(item.ItemType()).IsCompile())
+            {
+              var path = FileSystemPath.TryParse(item.EvaluatedInclude);
+              if (!path.IsEmpty)
+                projectFileNames.Add(EnsureAbsolute(path, projectMark.Location.Directory).FullPath);
+            }
         });
       });
 
@@ -105,7 +99,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
         useScriptResolutionRules: false,
         loadTime: DateTime.Now,
         unresolvedReferences: null,
-        originalLoadReferences: FSharpList<Tuple<Range.range, string>>.Empty, // todo: check this
+        originalLoadReferences: FSharpList<Tuple<Range.range, string>>.Empty,
         extraProjectInfo: null
       );
     }
@@ -120,7 +114,8 @@ namespace JetBrains.ReSharper.Psi.FSharp
           return "winexe";
         case ProjectOutputType.MODULE:
           return "module";
-        default: return "library";
+        default:
+          return "library";
       }
     }
 
@@ -143,9 +138,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
     [NotNull]
     private static string[] SplitDefines([CanBeNull] string definesString)
     {
-      return string.IsNullOrEmpty(definesString)
-        ? EmptyArray<string>.Instance
-        : SplitAndTrim(definesString).ToArray();
+      return SplitAndTrim(definesString).ToArray();
     }
 
     [NotNull]
@@ -159,11 +152,10 @@ namespace JetBrains.ReSharper.Psi.FSharp
     /// Current configuration defines, e.g. TRACE or DEBUG. Used in FSharpLexer.
     /// </summary>
     [NotNull]
-    public string[] GetDefines(Guid projectGuid)
+    public string[] GetDefines(IProject project)
     {
       using (ReadLockCookie.Create())
       {
-        var project = mySolution.GetProjectByGuid(projectGuid);
         Assertion.AssertNotNull(project, "project != null");
         var configuration =
           project.ProjectProperties.ActiveConfigurations.Configurations.SingleItem() as IManagedProjectConfiguration;
@@ -172,31 +164,30 @@ namespace JetBrains.ReSharper.Psi.FSharp
     }
 
     [NotNull]
-    private IEnumerable<string> GetReferencedPathsOptions(IProject project)
+    private static IEnumerable<string> GetReferencedPathsOptions(IProject project)
     {
-      // todo: provide path to dll for unloaded projects?
       var framework = project.GetCurrentTargetFrameworkId();
-      var refProjectsOutputs = project.GetReferencedProjects(framework)
-        .Select(p => p.GetOutputFilePath(p.GetCurrentTargetFrameworkId()));
-      var refAssembliesPaths = project.GetAssemblyReferences(framework)
-        .Select(a => a.ResolveResultAssemblyFile().Location);
-      return refProjectsOutputs.Concat(refAssembliesPaths)
-        .Where(a => !a.IsNullOrEmpty())
-        .Select(a => "-r:" + a.FullPath);
+      var paths = new FrugalLocalList<string>();
+      foreach (var referencedProject in project.GetReferencedProjects(framework))
+        paths.Add("-r:" + referencedProject.GetOutputFilePath(referencedProject.GetCurrentTargetFrameworkId()));
+
+      foreach (var assemblyReference in project.GetAssemblyReferences(framework))
+        paths.Add("-r:" + assemblyReference.ResolveResultAssemblyFile().Location.FullPath);
+
+      return paths.ToList();
     }
 
     [NotNull]
-    public Dictionary<Guid, FSharpProjectOptions> AddReferencedProjects(
-      [NotNull] IDictionary<Guid, FSharpProjectOptions> optionsDict)
+    public Dictionary<IProject, FSharpProjectOptions> AddReferencedProjects(
+      [NotNull] IDictionary<IProject, FSharpProjectOptions> optionsDict)
     {
-      var newOptions = new Dictionary<Guid, FSharpProjectOptions>();
-      foreach (var projectGuidAndOptions in optionsDict)
+      var newOptions = new Dictionary<IProject, FSharpProjectOptions>();
+      foreach (var projectAndOptions in optionsDict)
       {
-        var project = mySolution.GetProjectByGuid(projectGuidAndOptions.Key);
-        Assertion.AssertNotNull(project, "project != null");
-        var projectOptions = projectGuidAndOptions.Value;
-        if (!newOptions.ContainsKey(project.Guid))
-          newOptions[project.Guid] = AddReferencedProjects(project, projectOptions, optionsDict, newOptions);
+        var project = projectAndOptions.Key;
+        var projectOptions = projectAndOptions.Value;
+        if (!newOptions.ContainsKey(project))
+          newOptions[project] = AddReferencedProjects(project, projectOptions, optionsDict, newOptions);
       }
 
       return newOptions;
@@ -204,8 +195,8 @@ namespace JetBrains.ReSharper.Psi.FSharp
 
     [NotNull]
     private FSharpProjectOptions AddReferencedProjects([NotNull] IProject project, FSharpProjectOptions projectOptions,
-      [NotNull] IDictionary<Guid, FSharpProjectOptions> optionsDict,
-      [NotNull] IDictionary<Guid, FSharpProjectOptions> newOptions)
+      [NotNull] IDictionary<IProject, FSharpProjectOptions> optionsDict,
+      [NotNull] IDictionary<IProject, FSharpProjectOptions> newOptions)
     {
       // do not transitively add referenced projects (same as in other FSharp tools)
       var referencedProjects = project.GetReferencedProjects(project.GetCurrentTargetFrameworkId(), transitive: false);
@@ -213,15 +204,14 @@ namespace JetBrains.ReSharper.Psi.FSharp
       foreach (var referencedProject in referencedProjects)
       {
         if (!(referencedProject.ProjectProperties is FSharpProjectProperties) ||
-            newOptions.ContainsKey(project.Guid)) continue;
+            newOptions.ContainsKey(project)) continue;
 
-        var referencedProjectGuid = referencedProject.Guid;
-        var referencedProjectOptions = optionsDict.ContainsKey(referencedProjectGuid)
-          ? optionsDict[referencedProjectGuid]
-          : BuildWithoutReferencedProjects(referencedProjectGuid);
+        var referencedProjectOptions = optionsDict.ContainsKey(referencedProject)
+          ? optionsDict[referencedProject]
+          : BuildWithoutReferencedProjects(referencedProject);
 
         var fixedOptions = AddReferencedProjects(referencedProject, referencedProjectOptions, optionsDict, newOptions);
-        newOptions[referencedProjectGuid] = fixedOptions;
+        newOptions[referencedProject] = fixedOptions;
         var outPath = referencedProject.GetOutputFilePath(referencedProject.GetCurrentTargetFrameworkId()).FullPath;
         referencedProjectsOptions.Add(Tuple.Create(outPath, fixedOptions));
       }
