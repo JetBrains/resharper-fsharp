@@ -399,6 +399,7 @@
     <Compile Include="src\CodeCompletion\FSharpLookupItemsProvider.cs" />
     <Compile Include="src\Comment\FSharpLineCommentActionProvider.cs" />
     <Compile Include="src\Debugger\FSharpBreakpointVariantsProvider.cs" />
+    <Compile Include="src\FSharpClrLanguage.cs" />
     <Compile Include="src\TypingAssist\FSharpTypingAssist.cs" />
     <Compile Include="ZoneMarker.cs" />
   </ItemGroup>
