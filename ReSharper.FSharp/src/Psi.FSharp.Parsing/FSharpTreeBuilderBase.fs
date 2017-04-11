@@ -253,11 +253,11 @@ type FSharpTreeBuilderBase(file : IPsiSourceFile, lexer : ILexer, lifetime) as t
                 x.ProcessLongIdentifier lidWithDots.Lid
                 ElementType.TYPE_INHERIT
 
-            | SynMemberDefn.Interface(SynType.LongIdent(lidWithDots),interfaceMembersOpt,_) ->
+            | SynMemberDefn.Interface(SynType.LongIdent(lidWithDots),interfaceMembersOpt,range) ->
+                x.ProcessLongIdentifier lidWithDots.Lid
                 if interfaceMembersOpt.IsSome then
                     for m in interfaceMembersOpt.Value do
                         x.ProcessTypeMember m
-                x.ProcessLongIdentifier lidWithDots.Lid
                 ElementType.INTERFACE_IMPLEMENTATION
 
             | SynMemberDefn.Inherit(SynType.LongIdent(lidWithDots),_,_) ->

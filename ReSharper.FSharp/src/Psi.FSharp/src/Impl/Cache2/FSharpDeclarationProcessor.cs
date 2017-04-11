@@ -101,6 +101,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     public override void VisitFSharpObjectModelTypeDeclaration(IFSharpObjectModelTypeDeclaration decl)
     {
       myBuilder.StartPart(CreateObjectTypePart(decl));
+      foreach (var typeMemberDeclaration in decl.MemberDeclarations)
+        myBuilder.AddDeclaredMemberName(typeMemberDeclaration.DeclaredName);
       myBuilder.EndPart();
     }
 
