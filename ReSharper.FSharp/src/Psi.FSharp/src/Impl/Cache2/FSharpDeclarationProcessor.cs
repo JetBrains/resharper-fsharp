@@ -1,6 +1,7 @@
 ﻿using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
+using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
@@ -56,6 +57,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       myBuilder.EndPart();
     }
 
+    public override void VisitLet(ILet letParam)
+    {
+      myBuilder.AddDeclaredMemberName(letParam.DeclaredName);
+    }
+
     public override void VisitFSharpExceptionDeclaration(IFSharpExceptionDeclaration decl)
     {
       myBuilder.StartPart(new ExceptionPart(decl));
@@ -75,6 +81,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       myBuilder.StartPart(new RecordPart(decl));
       foreach (var fieldDeclaration in decl.FieldsEnumerable)
         myBuilder.AddDeclaredMemberName(fieldDeclaration.DeclaredName);
+      ProcessTypeMembers(decl.MemberDeclarations);
       myBuilder.EndPart();
     }
 
@@ -83,6 +90,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       myBuilder.StartPart(new UnionPart(decl));
       foreach (var unionCase in decl.UnionCasesEnumerable)
         unionCase.Accept(this);
+      ProcessTypeMembers(decl.MemberDeclarations);
       myBuilder.EndPart();
     }
 
@@ -101,9 +109,14 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     public override void VisitFSharpObjectModelTypeDeclaration(IFSharpObjectModelTypeDeclaration decl)
     {
       myBuilder.StartPart(CreateObjectTypePart(decl));
-      foreach (var typeMemberDeclaration in decl.MemberDeclarations)
-        myBuilder.AddDeclaredMemberName(typeMemberDeclaration.DeclaredName);
+      ProcessTypeMembers(decl.MemberDeclarations);
       myBuilder.EndPart();
+    }
+
+    private void ProcessTypeMembers(TreeNodeCollection<ITypeMemberDeclaration> memberDeclarations)
+    {
+      foreach (var typeMemberDeclaration in memberDeclarations)
+        myBuilder.AddDeclaredMemberName(typeMemberDeclaration.DeclaredName);
     }
 
     private static Part CreateObjectTypePart(IFSharpObjectModelTypeDeclaration decl)
