@@ -35,8 +35,10 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
         typeParams.Add(new FSharpTypeParameterOfMethod(this, mfvTypeParams[i].DisplayName, i - outerTypeParamsCount));
       TypeParameters = typeParams.ToList();
 
-      ReturnType = FSharpTypesUtil.GetType(mfv.ReturnParameter.Type, declaration, TypeParameters, Module) ??
-                   TypeFactory.CreateUnknownType(Module);
+      var returnType = FSharpTypesUtil.GetType(mfv.ReturnParameter.Type, declaration, TypeParameters, Module) ??
+                       TypeFactory.CreateUnknownType(Module);
+      ReturnType = returnType.IsUnit(Module) ? Module.GetPredefinedType().Void : returnType;
+
 
       var methodParams = new FrugalLocalList<IParameter>();
       foreach (var paramsGroup in mfv.CurriedParameterGroups)
