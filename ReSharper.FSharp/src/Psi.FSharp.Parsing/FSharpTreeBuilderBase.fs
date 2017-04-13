@@ -335,7 +335,7 @@ type FSharpTreeBuilderBase(file : IPsiSourceFile, lexer : ILexer, lifetime) as t
         match pat with
         | SynPat.LongIdent(lidWithDots,_,_,patParams,_,range) ->
             if not lidWithDots.Lid.IsEmpty then
-                x.ProcessLocalId (List.last lidWithDots.Lid)
+                for id in lidWithDots.Lid do x.ProcessLocalId id
             x.ProcessLocalParams patParams
         | SynPat.Named(pat,id,_,_,_) ->
             x.ProcessLocalPat pat
@@ -392,12 +392,27 @@ type FSharpTreeBuilderBase(file : IPsiSourceFile, lexer : ILexer, lifetime) as t
             for e in exprs do
                 x.ProcessLocalExpression e
 
-        | SynExpr.Record(_) -> () // todo
+        | SynExpr.Record(_,copyInfoOpt,fields,_) ->
+            match copyInfoOpt with
+            | Some (expr,_) -> x.ProcessLocalExpression expr
+            | _ -> ()
+
+            // todo: mark name for getting reference access type
+            for name, expr, _ in fields do
+                if expr.IsSome then x.ProcessLocalExpression expr.Value
 
         | SynExpr.New(_,_,expr,_) ->
             x.ProcessLocalExpression expr
 
-        | SynExpr.ObjExpr(_) -> () // todo
+        | SynExpr.ObjExpr(_,args,bindings,interfaceImpls,_,_) ->
+            match args with
+            | Some (expr,_) -> x.ProcessLocalExpression expr
+            | _ -> ()
+
+            for b in bindings do x.ProcessLocalBinding b
+
+            for InterfaceImpl(_,bindings,_) in interfaceImpls do
+                for b in bindings do x.ProcessLocalBinding b
 
         | SynExpr.While(_,whileExpr,doExpr,_) ->
             x.ProcessLocalExpression whileExpr
