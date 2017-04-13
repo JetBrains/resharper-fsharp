@@ -105,6 +105,10 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
         if (caseMember != null)
           return caseMember;
 
+        var newCaseMember = unionTypeElement.EnumerateMembers("New" + unionCase.CompiledName, true).FirstOrDefault();
+        if (newCaseMember != null)
+          return newCaseMember;
+
         var unionClrName = unionTypeElement.GetClrName();
         var caseDeclaredType = TypeFactory.CreateTypeByCLRName(unionClrName + "+" + unionCase.CompiledName, psiModule);
         return caseDeclaredType.GetTypeElement();
