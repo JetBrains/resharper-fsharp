@@ -15,9 +15,13 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
   /// </summary>
   public static class FSharpTypesUtil
   {
+    private const string ArrayClrName = "System.Array";
+    private const string IntPtrClrName = "System.IntPtr";
     private const string TupleClrName = "System.Tuple`";
+    private const string FSharpCoreNamespace = "Microsoft.FSharp.Core";
     private const string FSharpFuncClrName = "Microsoft.FSharp.Core.FSharpFunc`";
-    private const string UnitTypeName = "Microsoft.FSharp.Core.Unit";
+    private const string UnitClrName = "Microsoft.FSharp.Core.Unit";
+    private const string NativeptrLogicalName = "nativeptr`1";
 
     [CanBeNull]
     public static IDeclaredType GetBaseType([NotNull] FSharpEntity entity,
@@ -48,9 +52,16 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     [NotNull]
     public static string GetClrName([NotNull] FSharpEntity entity)
     {
+      // F# 4.0 specs 5.1.4
+      if (entity.IsArrayType)
+        return ArrayClrName;
+
+      // F# 4.0 specs 18.1.3
+      if (entity.IsFSharp && entity.LogicalName.Equals(NativeptrLogicalName) && entity.AccessPath.Equals(FSharpCoreNamespace))
+        return IntPtrClrName;
+
       // qualified name may include assembly name, public key, etc and separated with comma, e.g. for unit it returns
       // "Microsoft.FSharp.Core.Unit, FSharp.Core, Version=4.4.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
-
       return entity.QualifiedName.SubstringBefore(",");
     }
 
@@ -59,6 +70,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     {
       var typeArgumentsCount = fsType.GenericArguments.Count;
 
+      // F# 4.0 specs 5.1.3
       if (fsType.IsTupleType)
         return TupleClrName + typeArgumentsCount;
 
@@ -111,11 +123,21 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       if (type.IsGenericParameter)
         return FindTypeParameterByName(type, typeParametersFromContext, psiModule);
 
-      if (type.HasTypeDefinition && type.TypeDefinition.IsArrayType)
-        return GetArrayType(type, typeParametersFromContext, psiModule);
+      if (type.HasTypeDefinition)
+      {
+        var entity = type.TypeDefinition;
 
-      if (type.HasTypeDefinition && type.TypeDefinition.IsByRef) // e.g. byref<int>, we need int
-        return GetType(type.GenericArguments[0], typeParametersFromContext, psiModule);
+        // F# 4.0 specs 5.1.4
+        if (entity.IsArrayType)
+          return GetArrayType(type, typeParametersFromContext, psiModule);
+
+        // F# 4.0 specs 18.1.3
+        if (entity.IsFSharp && entity.LogicalName.Equals(NativeptrLogicalName) && entity.AccessPath.Equals(FSharpCoreNamespace))
+          return GetPointerType(type, typeParametersFromContext, psiModule);
+
+        if (entity.IsByRef) // e.g. byref<int>, we need int
+          return GetType(type.GenericArguments[0], typeParametersFromContext, psiModule);
+      }
 
       var clrName = GetClrName(type);
       if (clrName == null)
@@ -138,12 +160,25 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     {
       var entity = fsType.TypeDefinition;
       Assertion.Assert(entity.IsArrayType, "fsType.TypeDefinition.IsArrayType");
+      var argType = GetSingleTypeArgument(fsType, typeParametersFromContext, psiModule);
+      return TypeFactory.CreateArrayType(argType, entity.ArrayRank);
+    }
+
+    [CanBeNull]
+    private static IType GetPointerType(FSharpType fsType, IList<ITypeParameter> typeParametersFromContext,
+      IPsiModule psiModule)
+    {
+      var argType = GetSingleTypeArgument(fsType, typeParametersFromContext, psiModule);
+      return TypeFactory.CreatePointerType(argType);
+    }
+
+    [NotNull]
+    private static IType GetSingleTypeArgument([NotNull] FSharpType fsType,
+      IList<ITypeParameter> typeParametersFromContext, IPsiModule psiModule)
+    {
       Assertion.Assert(fsType.GenericArguments.Count == 1, "fsType.GenericArguments.Count == 1");
-
-      var arrayType = GetTypeArgumentType(fsType.GenericArguments[0], null, typeParametersFromContext, psiModule) ??
-                      TypeFactory.CreateUnknownType(psiModule);
-
-      return TypeFactory.CreateArrayType(arrayType, entity.ArrayRank);
+      return GetTypeArgumentType(fsType.GenericArguments[0], null, typeParametersFromContext, psiModule) ??
+             TypeFactory.CreateUnknownType(psiModule);
     }
 
     [CanBeNull]
@@ -196,7 +231,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
 
     public static bool IsUnit([NotNull] this IType type, [NotNull] IPsiModule psiModule)
     {
-      return type.Equals(TypeFactory.CreateTypeByCLRName(UnitTypeName, psiModule));
+      return type.Equals(TypeFactory.CreateTypeByCLRName(UnitClrName, psiModule));
     }
 
     public static ParameterKind GetParameterKind([NotNull] FSharpParameter param)
