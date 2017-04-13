@@ -327,22 +327,21 @@ type FSharpTreeBuilderBase(file : IPsiSourceFile, lexer : ILexer, lifetime) as t
     member internal x.ProcessLocalParams (args : SynConstructorArgs) =
         match args with
         | Pats(pats) ->
-            for pat in pats do
-                x.ProcessLocalPat pat
+            for p in pats do x.ProcessLocalPat p
         | NamePatPairs(idsAndPats,_) ->
-            for (id, pat) in idsAndPats do
-                x.ProcessLocalPat pat
+            for (id, pat) in idsAndPats do x.ProcessLocalPat pat
 
     member internal x.ProcessLocalPat (pat : SynPat) =
         match pat with
-        | SynPat.LongIdent(_,_,_,patParams,_,range) ->
+        | SynPat.LongIdent(lidWithDots,_,_,patParams,_,range) ->
+            if not lidWithDots.Lid.IsEmpty then
+                x.ProcessLocalId (List.last lidWithDots.Lid)
             x.ProcessLocalParams patParams
-        | SynPat.Named(_,id,_,_,_)
+        | SynPat.Named(pat,id,_,_,_) ->
+            x.ProcessLocalPat pat
+            x.ProcessLocalId id
         | SynPat.OptionalVal(id,_) ->
-            id.idRange |> x.GetStartOffset |> x.AdvanceToOffset
-            let mark = x.Builder.Mark()
-            x.ProcessIdentifier id
-            x.Done(mark, ElementType.LOCAL_DECLARATION)
+            x.ProcessLocalId id
         | SynPat.Tuple(patterns,_)
         | SynPat.StructTuple(patterns,_) ->
             for pat in patterns do
