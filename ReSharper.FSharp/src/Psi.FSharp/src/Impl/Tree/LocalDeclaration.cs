@@ -66,7 +66,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 
         var typeMemberDeclaration = GetContainingNode<ITypeMemberDeclaration>();
         Assertion.AssertNotNull(typeMemberDeclaration, "typeMemberDeclaration != null");
-        return FSharpTypesUtil.GetType(mfv.ReturnParameter.Type, typeMemberDeclaration, Module) ??
+        return FSharpTypesUtil.GetType(mfv.FullType, typeMemberDeclaration, Module) ??
                TypeFactory.CreateUnknownType(Module);
       }
     }
