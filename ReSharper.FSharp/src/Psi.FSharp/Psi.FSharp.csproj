@@ -394,6 +394,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="src\FSharpCheckerService.cs" />
+    <Compile Include="src\Impl\DeclaredElement\FSharpParameter.cs" />
     <Compile Include="src\ProjectOptions\FSharpProjectOptionsBuilder.cs" />
     <Compile Include="src\ProjectOptions\FSharpProjectOptionsProvider.cs" />
     <Compile Include="src\FSharpScriptProjectFileLanguageService.cs" />

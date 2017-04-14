@@ -45,8 +45,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
       foreach (var param in paramsGroup)
       {
         var paramType = param.Type;
-        methodParams.Add(new Parameter(this, methodParams.Count, FSharpTypesUtil.GetParameterKind(param),
-          FSharpTypesUtil.GetType(paramType, declaration, TypeParameters, Module), param.DisplayName));
+        var isParamArray = FSharpTypesUtil.IsParamArray(param);
+        methodParams.Add(new FSharpParameter(this, methodParams.Count, FSharpTypesUtil.GetParameterKind(param),
+          FSharpTypesUtil.GetType(paramType, declaration, TypeParameters, Module), param.DisplayName, isParamArray));
       }
       Parameters = methodParams.Count == 1 && methodParams[0].Type.IsUnit(Module)
         ? EmptyList<IParameter>.InstanceList
