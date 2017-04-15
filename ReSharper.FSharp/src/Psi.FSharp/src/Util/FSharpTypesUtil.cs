@@ -57,7 +57,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
         return ArrayClrName;
 
       // F# 4.0 specs 18.1.3
-      if (entity.IsFSharp && entity.LogicalName.Equals(NativeptrLogicalName) && entity.AccessPath.Equals(FSharpCoreNamespace))
+      if (entity.IsNativePtr())
         return IntPtrClrName;
 
       // qualified name may include assembly name, public key, etc and separated with comma, e.g. for unit it returns
@@ -77,7 +77,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       if (fsType.IsFunctionType)
         return FSharpFuncClrName + typeArgumentsCount;
 
-      return GetClrName(fsType.TypeDefinition);
+      var entity = fsType.TypeDefinition;
+      if (entity.IsProvided)
+        return null;
+
+      return GetClrName(entity);
     }
 
     /// <summary>
@@ -132,7 +136,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
           return GetArrayType(type, typeParametersFromContext, psiModule);
 
         // F# 4.0 specs 18.1.3
-        if (entity.IsFSharp && entity.LogicalName.Equals(NativeptrLogicalName) && entity.AccessPath.Equals(FSharpCoreNamespace))
+        if (entity.IsNativePtr())
           return GetPointerType(type, typeParametersFromContext, psiModule);
 
         if (entity.IsByRef) // e.g. byref<int>, we need int
@@ -245,6 +249,18 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       }
 
       return ParameterKind.VALUE;
+    }
+
+    public static bool IsParamArray([NotNull] FSharpParameter param)
+    {
+      return param.Attributes.Any(a => a.AttributeType.FullName == "System.ParamArrayAttribute");
+    }
+
+    private static bool IsNativePtr([NotNull] this FSharpEntity entity)
+    {
+      return entity.IsFSharp &&
+             entity.LogicalName == NativeptrLogicalName &&
+             entity.AccessPath == FSharpCoreNamespace;
     }
   }
 }

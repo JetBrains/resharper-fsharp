@@ -18,7 +18,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     [CanBeNull]
     private static ITypeElement GetTypeElement([NotNull] FSharpEntity entity, [NotNull] IPsiModule psiModule)
     {
-      if (((FSharpSymbol) entity).DeclarationLocation == null || entity.IsByRef)
+      if (((FSharpSymbol) entity).DeclarationLocation == null || entity.IsByRef || entity.IsProvided)
         return null;
 
       if (!entity.IsFSharpAbbreviation)
@@ -66,12 +66,15 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       var mfv = symbol as FSharpMemberOrFunctionOrValue;
       if (mfv != null)
       {
-        if (!mfv.IsModuleValueOrMember)
+        if (!mfv.IsModuleValueOrMember && fsFile != null)
           return FindLocalDeclaration(mfv, fsFile);
 
         var memberEntity = GetContainingEntity(mfv);
         if (memberEntity == null)
           return null;
+
+        if (mfv.IsImplicitConstructor)
+          return GetDeclaredElement(memberEntity, psiModule);
 
         var typeElement = GetTypeElement(memberEntity, psiModule);
         if (typeElement == null)
