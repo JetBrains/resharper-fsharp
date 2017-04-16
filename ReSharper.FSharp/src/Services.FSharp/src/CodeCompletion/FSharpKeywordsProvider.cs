@@ -22,6 +22,17 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
       "type", "upcast", "use", "val", "void", "when", "while", "with", "yield"
     };
 
+
+    protected override bool IsAvailable(FSharpCodeCompletionContext context)
+    {
+      var tokenType = context.TokenBeforeCaret?.GetTokenType();
+      var tokenBeforeType = context.TokenAtCaret?.GetTokenType();
+      if (tokenType != null && !tokenType.IsWhitespace && tokenBeforeType != null && !tokenBeforeType.IsWhitespace)
+        return false;
+
+      return base.IsAvailable(context);
+    }
+
     protected override bool AddLookupItems(FSharpCodeCompletionContext context, GroupedItemsCollector collector)
     {
       if (!context.Names.Item1.IsEmpty)
