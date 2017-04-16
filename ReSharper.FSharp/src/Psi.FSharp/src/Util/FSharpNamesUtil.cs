@@ -17,6 +17,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     private const string AttributeSuffix = "Attribute";
     private const string ModuleSuffix = "Module";
     private const int EscapedNameAffixLength = 4;
+    private const int EscapedNameStartIndex = 2;
 
     private static readonly ClrTypeName SourceNameAttributeAttr =
       new ClrTypeName("Microsoft.FSharp.Core.CompilationSourceNameAttribute");
@@ -59,9 +60,17 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     [NotNull]
     public static string RemoveBackticks([NotNull] string name)
     {
-      const int escapedNameStartIndex = 2;
       return IsEscapedWithBackticks(name)
-        ? name.Substring(escapedNameStartIndex, name.Length - EscapedNameAffixLength)
+        ? name.Substring(EscapedNameStartIndex, name.Length - EscapedNameAffixLength)
+        : name;
+    }
+
+    [NotNull]
+    public static string RemoveParens([NotNull] string name, out bool isEscaped)
+    {
+      isEscaped = IsEscapedWithParens(name);
+      return isEscaped
+        ? name.Substring(EscapedNameStartIndex, name.Length - EscapedNameAffixLength)
         : name;
     }
 

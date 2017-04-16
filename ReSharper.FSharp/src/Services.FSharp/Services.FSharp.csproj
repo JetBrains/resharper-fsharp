@@ -340,6 +340,7 @@
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.IdentityModel" />
     <Reference Include="System.IO.Compression" />
     <Reference Include="System.Net.Http" />
@@ -396,6 +397,7 @@
     <Compile Include="src\CodeCompletion\FSharpCodeCompletionContextProvider.cs" />
     <Compile Include="src\CodeCompletion\FSharpItemsProviderBase.cs" />
     <Compile Include="src\CodeCompletion\FSharpKeywordsProvider.cs" />
+    <Compile Include="src\CodeCompletion\FSharpLookupItem.cs" />
     <Compile Include="src\CodeCompletion\FSharpLookupItemsProvider.cs" />
     <Compile Include="src\Comment\FSharpLineCommentActionProvider.cs" />
     <Compile Include="src\Debugger\FSharpBreakpointVariantsProvider.cs" />

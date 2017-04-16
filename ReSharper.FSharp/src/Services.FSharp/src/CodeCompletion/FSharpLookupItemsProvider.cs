@@ -1,6 +1,5 @@
 ﻿using JetBrains.Annotations;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems;
-using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems.Impl;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.FSharp;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
@@ -23,11 +22,11 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
       Assertion.AssertNotNull(fsFile, "fsFile != null");
 
       if (fsFile.ParseResults == null)
-        return false;
+        return true;
 
       var completions = GetFSharpCompletions(context, fsFile);
       if (completions == null || completions.IsEmpty)
-        return false;
+        return true;
 
       foreach (var overloadsGroup in completions)
       {
@@ -35,10 +34,10 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
           continue;
 
         var symbol = overloadsGroup.Head.Symbol;
-        if (symbol.DisplayName.Contains(' '))
-          continue;
+        bool isEscaped;
+        var name = FSharpNamesUtil.RemoveParens(symbol.DisplayName, out isEscaped);
 
-        var lookupItem = new TextLookupItem(symbol.DisplayName, symbol.GetIconId());
+        var lookupItem = new FSharpLookupItem(name, symbol.GetIconId(), isEscaped);
         lookupItem.InitializeRanges(GetDefaultRanges(context), context.BasicContext);
         collector.Add(lookupItem);
       }
