@@ -78,7 +78,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
         return FSharpFuncClrName + typeArgumentsCount;
 
       var entity = fsType.TypeDefinition;
-      if (entity.IsProvided)
+      if (entity.IsProvidedAndErased)
         return null;
 
       return GetClrName(entity);
@@ -141,6 +141,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
 
         if (entity.IsByRef) // e.g. byref<int>, we need int
           return GetType(type.GenericArguments[0], typeParametersFromContext, psiModule);
+
+        if (entity.IsProvidedAndErased && entity.BaseType != null)
+          return GetType(entity.BaseType.Value, typeParametersFromContext, psiModule);
       }
 
       var clrName = GetClrName(type);

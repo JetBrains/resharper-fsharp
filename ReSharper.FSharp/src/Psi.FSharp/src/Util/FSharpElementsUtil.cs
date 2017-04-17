@@ -18,7 +18,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     [CanBeNull]
     private static ITypeElement GetTypeElement([NotNull] FSharpEntity entity, [NotNull] IPsiModule psiModule)
     {
-      if (((FSharpSymbol) entity).DeclarationLocation == null || entity.IsByRef || entity.IsProvided)
+      if (((FSharpSymbol) entity).DeclarationLocation == null || entity.IsByRef || entity.IsProvidedAndErased)
         return null;
 
       if (!entity.IsFSharpAbbreviation)
