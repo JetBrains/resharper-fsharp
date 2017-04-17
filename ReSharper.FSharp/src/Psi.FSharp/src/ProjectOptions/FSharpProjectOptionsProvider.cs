@@ -29,7 +29,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.ProjectOptions
       myProjectOptionsBuilder = projectOptionsBuilder;
       myFSharpCheckerService = fSharpCheckerService;
       myUpdateEvent = solution.Locks.GroupingEvents.CreateEvent(lifetime, "updateFSharpProjects",
-        TimeSpan.FromMilliseconds(100), Rgc.Guarded,
+        TimeSpan.FromMilliseconds(500), Rgc.Guarded,
         DoUpdateProjects); // todo: stop daemons while updating options
 
       changeManager.Changed2.Advise(lifetime, ProcessChange);
