@@ -25,12 +25,7 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
 
     protected override bool IsAvailable(FSharpCodeCompletionContext context)
     {
-      var tokenType = context.TokenBeforeCaret?.GetTokenType();
-      var tokenBeforeType = context.TokenAtCaret?.GetTokenType();
-      if (tokenType != null && !tokenType.IsWhitespace && tokenBeforeType != null && !tokenBeforeType.IsWhitespace)
-        return false;
-
-      return base.IsAvailable(context);
+      return context.TokenBeforeCaret?.GetTokenType() != FSharpTokenType.DOT && base.IsAvailable(context);
     }
 
     protected override bool AddLookupItems(FSharpCodeCompletionContext context, GroupedItemsCollector collector)
