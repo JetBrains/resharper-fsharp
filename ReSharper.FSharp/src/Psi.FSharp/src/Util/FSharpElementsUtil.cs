@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi.FSharp.Impl;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Modules;
@@ -83,6 +84,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
         var typeElement = GetTypeElement(memberEntity, psiModule);
         if (typeElement == null)
           return null;
+
+        if (mfv.IsProperty)
+          return typeElement.EnumerateMembers(mfv.GetMemberCompiledName(), true).FirstOrDefault();
 
         var fsMember = GetMemberWithoutSubstitution(mfv, memberEntity);
         if (fsMember == null)

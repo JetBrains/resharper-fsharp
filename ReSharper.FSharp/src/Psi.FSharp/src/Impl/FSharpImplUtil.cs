@@ -108,7 +108,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
     }
 
     [NotNull]
-    public static string GetMemberCompiledName([NotNull] FSharpMemberOrFunctionOrValue mfv)
+    public static string GetMemberCompiledName([NotNull] this FSharpMemberOrFunctionOrValue mfv)
     {
       var compiledNameAttr = mfv.Attributes.FirstOrDefault(a => a.AttributeType.FullName == CompiledNameAttrName);
       var compiledName = compiledNameAttr != null && !compiledNameAttr.ConstructorArguments.IsEmpty()
