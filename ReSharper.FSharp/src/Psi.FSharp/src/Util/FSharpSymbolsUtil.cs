@@ -1,8 +1,8 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.Util;
 using Microsoft.FSharp.Collections;
-using Microsoft.FSharp.Compiler;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Control;
 
@@ -34,9 +34,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       {
         return FSharpAsync.RunSynchronously(findSymbolAsync, null, null)?.Value.Symbol;
       }
-      catch (ErrorLogger.UnresolvedPathReferenceNoRange)
+      catch (Exception) // Cannot access FCS internal exception types here
       {
-        return null; // internal FCS error
+        return null; // internal FCS or type provider error
       }
     }
 
