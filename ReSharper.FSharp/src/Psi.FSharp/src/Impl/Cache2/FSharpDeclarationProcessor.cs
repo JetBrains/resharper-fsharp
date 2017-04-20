@@ -8,15 +8,17 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
   public class FSharpDeclarationProcessor : TreeNodeVisitor
   {
     private readonly ICacheBuilder myBuilder;
+    private readonly int myCacheVersion;
 
-    public FSharpDeclarationProcessor(ICacheBuilder builder)
+    public FSharpDeclarationProcessor(ICacheBuilder builder, int cacheVersion)
     {
       myBuilder = builder;
+      myCacheVersion = cacheVersion;
     }
 
     public override void VisitFSharpFile(IFSharpFile fsFile)
     {
-      myBuilder.CreateProjectFilePart(new FSharpProjectFilePart(fsFile.GetSourceFile()));
+      myBuilder.CreateProjectFilePart(new FSharpProjectFilePart(fsFile.GetSourceFile(), myCacheVersion));
 
       foreach (var declaration in fsFile.DeclarationsEnumerable)
       {

@@ -14,6 +14,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
   public class FSharpCacheProvider : ILanguageCacheProvider
   {
+    private const int CacheVersion = 1;
+
     public Part ReadPart(byte tag, IReader reader)
     {
       switch ((FSharpSerializationTag) tag)
@@ -51,7 +53,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public ProjectFilePart LoadProjectFilePart(IPsiSourceFile sourceFile, ProjectFilePartsTree tree, IReader reader)
     {
-      return new FSharpProjectFilePart(sourceFile, reader);
+      var part = new FSharpProjectFilePart(sourceFile, reader);
+      if (part.CacheVersion != CacheVersion)
+        tree.ForceDirty();
+
+      return part;
     }
 
     public void BuildCache(IFile file, ICacheBuilder builder)
@@ -59,7 +65,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       if (file.GetProjectFileType().Equals(FSharpScriptProjectFileType.Instance))
         return;
 
-      ((IFSharpFile) file).Accept(new FSharpDeclarationProcessor(builder));
+      ((IFSharpFile) file).Accept(new FSharpDeclarationProcessor(builder, CacheVersion));
     }
 
     public bool NeedCacheUpdate(ITreeNode elementContainingChanges, PsiChangedElementType type)
