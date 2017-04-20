@@ -5,6 +5,7 @@ open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.DataFlow
 open JetBrains.ReSharper.Psi.FSharp
 open JetBrains.ReSharper.Psi.FSharp.Tree
+open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 open Microsoft.FSharp.Compiler
@@ -17,12 +18,12 @@ type FSharpParser(file : IPsiSourceFile, checkerService : FSharpCheckerService, 
         logger.LogMessage(LoggingLevel.WARN, sprintf "%s: %s" filePath (StringUtil.Join(messages, "\n")))
 
     member private x.CreateTreeBuilder lexer parseTree lifetime =
-        match parseTree with
-        | Some (ParsedInput.ImplFile (_)) ->
+        match file.PsiModule.IsMiscFilesProjectModule(), parseTree with
+        | false, Some (ParsedInput.ImplFile (_)) ->
             FSharpImplTreeBuilder(file, lexer, parseTree, lifetime, logger) :> FSharpTreeBuilderBase
-        | Some (ParsedInput.SigFile (_)) ->
+        | false, Some (ParsedInput.SigFile (_)) ->
             FSharpSigTreeBuilder(file, lexer, parseTree, lifetime, logger) :> FSharpTreeBuilderBase
-        | None ->
+        | _ ->
             // FCS could't parse the file, but we still want a correct IFile
             FSharpFakeTreeBuilder(file, lexer, lifetime, logger) :> FSharpTreeBuilderBase
 
