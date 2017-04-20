@@ -33,6 +33,10 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
         if (typeElement != null)
           return typeElement;
 
+        var abbreviatedType = entity.AbbreviatedType;
+        if (!abbreviatedType.HasTypeDefinition)
+          return null;
+
         entity = entity.AbbreviatedType.TypeDefinition;
       }
 
