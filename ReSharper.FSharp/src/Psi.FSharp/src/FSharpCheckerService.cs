@@ -65,17 +65,23 @@ namespace JetBrains.ReSharper.Psi.FSharp
     public FSharpCheckFileResults GetPreviousCheckResults([NotNull] IPsiSourceFile sourceFile)
     {
       var projectOptions = GetProjectOptions(sourceFile);
+      if (projectOptions == null)
+        return null;
+
       var filename = sourceFile.GetLocation().FullPath;
       return myChecker.TryGetRecentCheckResultsForFile(filename, projectOptions, null)?.Value.Item2;
     }
 
     [CanBeNull]
-    public FSharpParseFileResults ParseFSharpFile([NotNull] IPsiSourceFile sourceFile)
+    public FSharpOption<FSharpParseFileResults> ParseFSharpFile([NotNull] IPsiSourceFile sourceFile)
     {
       var projectOptions = GetProjectOptions(sourceFile);
+      if (projectOptions == null)
+        return null;
+
       var filename = sourceFile.GetLocation().FullPath;
       var source = sourceFile.Document.GetText();
-      return myChecker.ParseFileInProject(filename, source, projectOptions).RunAsTask();
+      return OptionModule.OfObj(myChecker.ParseFileInProject(filename, source, projectOptions).RunAsTask());
     }
 
     /// <param name="fsFile"></param>
@@ -90,6 +96,9 @@ namespace JetBrains.ReSharper.Psi.FSharp
         return null;
 
       var projectOptions = GetProjectOptions(sourceFile);
+      if (projectOptions == null)
+        return null;
+
       var filename = sourceFile.GetLocation().FullPath;
       var source = sourceFile.Document.GetText();
       var version = myFilesVersions[filename] = myFilesVersions.GetOrCreateValue(filename, -1) + 1;
@@ -99,7 +108,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
       return (checkAsync.RunAsTask(interruptChecker) as FSharpCheckFileAnswer.Succeeded)?.Item;
     }
 
-    [NotNull]
+    [CanBeNull]
     private FSharpProjectOptions GetProjectOptions([NotNull] IPsiSourceFile sourceFile)
     {
       if (sourceFile.LanguageType.Equals(FSharpScriptProjectFileType.Instance))
@@ -108,7 +117,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
       return (project != null ? myProjectsOptions.GetValueSafe(project.Guid) : null) ?? GetScriptOptions(sourceFile);
     }
 
-    [NotNull]
+    [CanBeNull]
     private FSharpProjectOptions GetScriptOptions([NotNull] IPsiSourceFile sourceFile)
     {
       var filePath = sourceFile.GetLocation().FullPath;
@@ -118,24 +127,33 @@ namespace JetBrains.ReSharper.Psi.FSharp
       var getScriptOptionsAsync =
         myChecker.GetProjectOptionsFromScript(filePath, source, loadTime, otherFlags: null, useFsiAuxLib: null,
           assumeDotNetFramework: null, extraProjectInfo: null);
-      var scriptOptionsAndErrors = getScriptOptionsAsync.RunAsTask();
-      Assertion.AssertNotNull(scriptOptionsAndErrors, "scriptOptions != null");
+      try
+      {
+        var scriptOptionsAndErrors = getScriptOptionsAsync.RunAsTask();
+        Assertion.AssertNotNull(scriptOptionsAndErrors, "scriptOptions != null");
 
-      var options = scriptOptionsAndErrors.Item1;
-      if (!myIsRunningOnMono || myFSharpCorePath == null)
-        return options;
+        var options = scriptOptionsAndErrors.Item1;
+        if (!myIsRunningOnMono || myFSharpCorePath == null)
+          return options;
 
-      return new FSharpProjectOptions(
-        options.ProjectFileName,
-        options.ProjectFileNames,
-        ArrayModule.Append(options.OtherOptions, new[] {myFSharpCorePath}),
-        options.ReferencedProjects,
-        options.IsIncompleteTypeCheckEnvironment,
-        options.UseScriptResolutionRules,
-        options.LoadTime,
-        options.UnresolvedReferences,
-        options.OriginalLoadReferences,
-        options.ExtraProjectInfo);
+        return new FSharpProjectOptions(
+          options.ProjectFileName,
+          options.ProjectFileNames,
+          ArrayModule.Append(options.OtherOptions, new[] {myFSharpCorePath}),
+          options.ReferencedProjects,
+          options.IsIncompleteTypeCheckEnvironment,
+          options.UseScriptResolutionRules,
+          options.LoadTime,
+          options.UnresolvedReferences,
+          options.OriginalLoadReferences,
+          options.ExtraProjectInfo);
+      }
+      catch (Exception)
+      {
+        // Error while resolving assemblies
+        // todo: replace FCS reference resolver
+        return null;
+      }
     }
 
     [NotNull]
