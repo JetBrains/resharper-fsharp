@@ -1,4 +1,6 @@
-﻿namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
+﻿using Microsoft.FSharp.Compiler.SourceCodeServices;
+
+namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 {
   internal partial class ValField
   {
@@ -11,6 +13,7 @@
 
     protected override IDeclaredElement CreateDeclaredElement()
     {
+      var mfv = GetFSharpSymbol() as FSharpMemberOrFunctionOrValue;
       return null;
     }
   }

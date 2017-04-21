@@ -37,7 +37,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
       return false;
     }
 
-    public AccessRights GetAccessRights()
+    public virtual AccessRights GetAccessRights()
     {
       return GetDeclaration()?.GetAccessRights() ?? AccessRights.PUBLIC;
     }

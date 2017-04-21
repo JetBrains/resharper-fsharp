@@ -56,8 +56,20 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
 
     public static Range.pos GetPos([NotNull] this IDocument document, int offset)
     {
+      // FCS lines are 1-based
       var coords = document.GetCoordsByOffset(offset);
       return Range.mkPos((int) coords.Line + 1, (int) coords.Column);
+    }
+
+    public static Range.pos GetPos(this DocumentCoords coords)
+    {
+      // FCS lines are 1-based
+      return Range.mkPos((int) coords.Line + 1, (int) coords.Column);
+    }
+
+    public static int GetOffset([NotNull] this IDocument document, Range.pos pos)
+    {
+      return GetDocumentOffset(document, (Line) (pos.Line - 1), (Column) pos.Column);
     }
   }
 }

@@ -238,75 +238,84 @@ type FSharpTreeBuilderBase(file : IPsiSourceFile, lexer : ILexer, lifetime) as t
         x.ProcessLocalExpression expr
 
     member internal x.ProcessTypeMember (typeMember : SynMemberDefn) =
-        typeMember.Range |> x.GetStartOffset |> x.AdvanceToOffset
-        let mark = x.Builder.Mark()
-
-        let memberType =
+        let rangeStart = x.GetStartOffset typeMember.Range
+        let isMember =
             match typeMember with
-            | SynMemberDefn.ImplicitCtor(_,_,args,selfId,_) ->
-                for arg in args do
-                    x.ProcessImplicitCtorParam arg
-                if selfId.IsSome then x.ProcessLocalId selfId.Value
-                ElementType.IMPLICIT_CONSTRUCTOR_DECLARATION
+            | SynMemberDefn.Member(_) -> true
+            | _ -> false
 
-            | SynMemberDefn.ImplicitInherit(SynType.LongIdent(lidWithDots),_,_,_) ->
-                x.ProcessLongIdentifier lidWithDots.Lid
-                ElementType.TYPE_INHERIT
+        if x.Builder.GetTokenOffset() <= rangeStart || (not isMember) then
+            x.AdvanceToOffset rangeStart
+            let mark = x.Builder.Mark()
 
-            | SynMemberDefn.Interface(SynType.LongIdent(lidWithDots),interfaceMembersOpt,range) ->
-                x.ProcessLongIdentifier lidWithDots.Lid
-                if interfaceMembersOpt.IsSome then
-                    for m in interfaceMembersOpt.Value do
-                        x.ProcessTypeMember m
-                ElementType.INTERFACE_IMPLEMENTATION
+            let memberType =
+                match typeMember with
+                | SynMemberDefn.ImplicitCtor(_,_,args,selfId,_) ->
+                    for arg in args do
+                        x.ProcessImplicitCtorParam arg
+                    if selfId.IsSome then x.ProcessLocalId selfId.Value
+                    ElementType.IMPLICIT_CONSTRUCTOR_DECLARATION
 
-            | SynMemberDefn.Inherit(SynType.LongIdent(lidWithDots),_,_) ->
-                x.ProcessLongIdentifier lidWithDots.Lid
-                ElementType.INTERFACE_INHERIT
+                | SynMemberDefn.ImplicitInherit(SynType.LongIdent(lidWithDots),_,_,_) ->
+                    x.ProcessLongIdentifier lidWithDots.Lid
+                    ElementType.TYPE_INHERIT
 
-            | SynMemberDefn.Member(Binding(_,_,_,_,_,_,_,headPat,_,expr,_,_),_) ->
-                match headPat with
-                | SynPat.LongIdent(LongIdentWithDots(lid,_),_,typeParamsOpt,memberParams,_,_) ->
-                    match lid with
-                    | [id] when id.idText = "new" ->
-                        x.ProcessLocalParams memberParams
-                        x.ProcessLocalExpression expr
-                        ElementType.CONSTRUCTOR_DECLARATION
+                | SynMemberDefn.Interface(SynType.LongIdent(lidWithDots),interfaceMembersOpt,range) ->
+                    x.ProcessLongIdentifier lidWithDots.Lid
+                    if interfaceMembersOpt.IsSome then
+                        for m in interfaceMembersOpt.Value do
+                            x.ProcessTypeMember m
+                    ElementType.INTERFACE_IMPLEMENTATION
 
-                    | [id] ->
-                        x.ProcessMemberDeclaration id typeParamsOpt memberParams expr
-                        ElementType.MEMBER_DECLARATION
+                | SynMemberDefn.Inherit(SynType.LongIdent(lidWithDots),_,_) ->
+                    x.ProcessLongIdentifier lidWithDots.Lid
+                    ElementType.INTERFACE_INHERIT
 
-                    | selfId :: id :: _ ->
-                        x.ProcessLocalId selfId
-                        x.ProcessMemberDeclaration id typeParamsOpt memberParams expr
-                        ElementType.MEMBER_DECLARATION
+                | SynMemberDefn.Member(Binding(_,_,_,_,_,_,_,headPat,_,expr,_,_),range) ->
+                    match headPat with
+                    | SynPat.LongIdent(LongIdentWithDots(lid,_),_,typeParamsOpt,memberParams,_,_) ->
+                        match lid with
+                        | [id] when id.idText = "new" ->
+                            x.ProcessLocalParams memberParams
+                            x.ProcessLocalExpression expr
+                            ElementType.CONSTRUCTOR_DECLARATION
 
+                        | [id] ->
+                            x.ProcessMemberDeclaration id typeParamsOpt memberParams expr
+                            ElementType.MEMBER_DECLARATION
+
+                        | selfId :: id :: _ ->
+                            x.ProcessLocalId selfId
+                            x.ProcessMemberDeclaration id typeParamsOpt memberParams expr
+                            ElementType.MEMBER_DECLARATION
+
+                        | _ -> ElementType.OTHER_TYPE_MEMBER
                     | _ -> ElementType.OTHER_TYPE_MEMBER
+
+                | SynMemberDefn.LetBindings(bindings,_,_,_) ->
+                    for (Binding(_,_,_,_,_,_,_,headPat,_,expr,_,_)) in bindings do
+                        x.ProcessLocalPat headPat
+                        x.ProcessLocalExpression expr
+                    ElementType.OTHER_TYPE_MEMBER // we don't want to mark the whole bindings block
+
+                | SynMemberDefn.AbstractSlot(ValSpfn(_,id,typeParams,_,_,_,_,_,_,_,_),_,_) as slot ->
+                    x.ProcessIdentifier id
+                    x.ProcessTypeMemberTypeParams typeParams
+                    ElementType.ABSTRACT_SLOT
+
+                | SynMemberDefn.ValField(Field(_,_,id,_,_,_,_,_),_) ->
+                    if id.IsSome then x.ProcessIdentifier id.Value
+                    ElementType.VAL_FIELD
+
+                | SynMemberDefn.AutoProperty(_,_,id,_,_,_,_,_,expr,_,_) ->
+                    x.ProcessIdentifier id
+                    x.ProcessLocalExpression expr
+                    ElementType.AUTO_PROPERTY
+
                 | _ -> ElementType.OTHER_TYPE_MEMBER
 
-            | SynMemberDefn.LetBindings(bindings,_,_,_) ->
-                for binding in bindings do
-                    x.ProcessLocalBinding binding
-                ElementType.TYPE_LET_BINDINGS
-
-            | SynMemberDefn.AbstractSlot(ValSpfn(_,id,typeParams,_,_,_,_,_,_,_,_),_,_) as slot ->
-                x.ProcessIdentifier id
-                x.ProcessTypeMemberTypeParams typeParams
-                ElementType.ABSTRACT_SLOT
-
-            | SynMemberDefn.ValField(Field(_,_,id,_,_,_,_,_),_) ->
-                if id.IsSome then x.ProcessIdentifier id.Value
-                ElementType.VAL_FIELD
-
-            | SynMemberDefn.AutoProperty(_,_,id,_,_,_,_,_,_,_,_) ->
-                x.ProcessIdentifier id
-                ElementType.AUTO_PROPERTY
-
-            | _ -> ElementType.OTHER_TYPE_MEMBER
-
-        x.AdvanceToOffset (x.GetEndOffset typeMember.Range)
-        x.Done(mark, memberType)
+            x.AdvanceToOffset (x.GetEndOffset typeMember.Range)
+            x.Done(mark, memberType)
 
     member internal x.ProcessMemberParams (memberParams : SynConstructorArgs) =
         match memberParams with
