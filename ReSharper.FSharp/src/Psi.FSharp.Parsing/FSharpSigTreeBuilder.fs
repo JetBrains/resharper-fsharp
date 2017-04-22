@@ -83,12 +83,55 @@ type FSharpSigTreeBuilder(file, lexer, parseTree, lifetime, logger : ILogger) =
                 ElementType.F_SHARP_EXCEPTION_DECLARATION
 
             | SynTypeDefnSigRepr.ObjectModel(kind, members,_) ->
-//                for m in members do x.ProcessTypeMember m
+                for m in members do x.ProcessTypeMemberSignature m
                 match kind with
                 | TyconClass -> ElementType.F_SHARP_CLASS_DECLARATION
                 | TyconInterface -> ElementType.F_SHARP_INTERFACE_DECLARATION
                 | TyconStruct -> ElementType.F_SHARP_STRUCT_DECLARATION
                 | _ -> ElementType.F_SHARP_OBJECT_TYPE_DECLARATION
 
+        for m in members do x.ProcessTypeMemberSignature m
         range |> x.GetEndOffset |> x.AdvanceToOffset
         x.Done(mark, elementType)
+
+    member private x.ProcessTypeMemberSignature memberSig =
+        match memberSig with
+        | SynMemberSig.Member(ValSpfn(_,id,_,_,_,_,_,_,_,_,_),flags,_) ->
+            id.idRange |> x.GetStartOffset |> x.AdvanceToOffset
+            let mark = x.Mark()
+            x.ProcessIdentifier id
+            let elementType =
+                if flags.IsDispatchSlot then
+                    ElementType.ABSTRACT_SLOT
+                else
+                    match flags.MemberKind with
+                    | MemberKind.Constructor -> ElementType.CONSTRUCTOR_DECLARATION
+                    | _ -> ElementType.MEMBER_DECLARATION
+            x.Done(mark,elementType)
+
+        | SynMemberSig.ValField(Field(_,_,id,_,_,_,_,_),_) ->
+            if id.IsSome then
+                let id = id.Value
+                id.idRange |> x.GetStartOffset |> x.AdvanceToOffset
+                let mark = x.Mark()
+                x.ProcessIdentifier id
+                x.Done(mark,ElementType.VAL_FIELD)
+
+        | SynMemberSig.Inherit(SynType.LongIdent(lidWithDots),_) ->
+            let lid = lidWithDots.Lid
+            if not lid.IsEmpty then
+                let id = lid.Head
+                id.idRange |> x.GetStartOffset |> x.AdvanceToOffset
+                let mark = x.Mark()
+                x.ProcessLongIdentifier lidWithDots.Lid
+                x.Done(mark, ElementType.INTERFACE_INHERIT)
+
+        | SynMemberSig.Interface(SynType.LongIdent(lidWithDots),_) ->
+            let lid = lidWithDots.Lid
+            if not lid.IsEmpty then
+                let id = lid.Head
+                id.idRange |> x.GetStartOffset |> x.AdvanceToOffset
+                let mark = x.Mark()
+                x.ProcessLongIdentifier lidWithDots.Lid
+                x.Done(mark, ElementType.INTERFACE_INHERIT)
+        | _ -> ()

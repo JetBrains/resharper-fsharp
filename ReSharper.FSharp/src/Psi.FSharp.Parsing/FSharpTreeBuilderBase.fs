@@ -271,18 +271,19 @@ type FSharpTreeBuilderBase(file : IPsiSourceFile, lexer : ILexer, lifetime) as t
                     x.ProcessLongIdentifier lidWithDots.Lid
                     ElementType.INTERFACE_INHERIT
 
-                | SynMemberDefn.Member(Binding(_,_,_,_,_,_,_,headPat,_,expr,_,_),range) ->
+                | SynMemberDefn.Member(Binding(_,_,_,_,_,_,valData,headPat,_,expr,_,_),range) ->
                     match headPat with
                     | SynPat.LongIdent(LongIdentWithDots(lid,_),_,typeParamsOpt,memberParams,_,_) ->
                         match lid with
-                        | [id] when id.idText = "new" ->
-                            x.ProcessLocalParams memberParams
-                            x.ProcessLocalExpression expr
-                            ElementType.CONSTRUCTOR_DECLARATION
-
                         | [id] ->
-                            x.ProcessMemberDeclaration id typeParamsOpt memberParams expr
-                            ElementType.MEMBER_DECLARATION
+                            match valData with
+                            | SynValData(Some (flags),_,_) when flags.MemberKind = MemberKind.Constructor ->
+                                x.ProcessLocalParams memberParams
+                                x.ProcessLocalExpression expr
+                                ElementType.CONSTRUCTOR_DECLARATION
+                            | _ ->
+                                x.ProcessMemberDeclaration id typeParamsOpt memberParams expr
+                                ElementType.MEMBER_DECLARATION
 
                         | selfId :: id :: _ ->
                             x.ProcessLocalId selfId
@@ -296,7 +297,7 @@ type FSharpTreeBuilderBase(file : IPsiSourceFile, lexer : ILexer, lifetime) as t
                     for (Binding(_,_,_,_,_,_,_,headPat,_,expr,_,_)) in bindings do
                         x.ProcessLocalPat headPat
                         x.ProcessLocalExpression expr
-                    ElementType.OTHER_TYPE_MEMBER // we don't want to mark the whole bindings block
+                    ElementType.OTHER_TYPE_MEMBER
 
                 | SynMemberDefn.AbstractSlot(ValSpfn(_,id,typeParams,_,_,_,_,_,_,_,_),_,_) as slot ->
                     x.ProcessIdentifier id
