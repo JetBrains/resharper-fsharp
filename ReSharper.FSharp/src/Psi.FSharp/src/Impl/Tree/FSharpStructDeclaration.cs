@@ -1,4 +1,4 @@
-﻿using JetBrains.ReSharper.Psi.FSharp.Tree;
+﻿using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 {
@@ -11,6 +11,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       return Identifier.GetNameRange();
     }
 
-    public FSharpObjectModelTypeKind TypeKind => FSharpObjectModelTypeKind.Struct;
+    public FSharpPartKind TypePartKind => FSharpPartKind.Struct;
   }
 }

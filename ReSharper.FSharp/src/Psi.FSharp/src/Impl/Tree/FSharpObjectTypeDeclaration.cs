@@ -1,4 +1,5 @@
-﻿using JetBrains.ReSharper.Psi.FSharp.Tree;
+﻿using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations;
+using JetBrains.ReSharper.Psi.FSharp.Tree;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 {
@@ -7,6 +8,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
     private const string Interface = "Interface";
     private const string AbstractClass = "AbstractClass";
     private const string Class = "Class";
+    private const string Sealed = "Sealed";
     private const string Struct = "Struct";
 
     public override string DeclaredName => FSharpImplUtil.GetName(Identifier, Attributes);
@@ -16,24 +18,32 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       return Identifier.GetNameRange();
     }
 
-    public FSharpObjectModelTypeKind TypeKind
+    public FSharpPartKind TypePartKind
     {
       get
       {
         foreach (var attr in AttributesEnumerable)
         {
           var attrText = attr.GetText();
-          if (attrText == Interface) return FSharpObjectModelTypeKind.Interface;
-          if (attrText == AbstractClass || attrText == Class) return FSharpObjectModelTypeKind.Class;
-          if (attrText == Struct) return FSharpObjectModelTypeKind.Struct;
+          switch (attrText)
+          {
+            case Interface:
+              return FSharpPartKind.Interface;
+            case AbstractClass:
+            case Sealed:
+            case Class:
+              return FSharpPartKind.Class;
+            case Struct:
+              return FSharpPartKind.Struct;
+          }
         }
 
         // ReSharper disable once LoopCanBeConvertedToQuery
         foreach (var member in TypeMembersEnumerable)
           if (!(member is IInterfaceInherit) && !(member is IAbstractSlot))
-            return FSharpObjectModelTypeKind.Class;
+            return FSharpPartKind.Class;
 
-        return FSharpObjectModelTypeKind.Interface;
+        return FSharpPartKind.Interface;
       }
     }
   }

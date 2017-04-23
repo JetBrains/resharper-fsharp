@@ -4,10 +4,11 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
-  public abstract class FSharpObjectModelTypePart : FSharpClassLikePart<IFSharpObjectModelTypeDeclaration>
+  public abstract class FSharpObjectModelTypePart : FSharpClassLikePart<IFSharpTypeParametersOwnerDeclaration>
   {
-    protected FSharpObjectModelTypePart(IFSharpObjectModelTypeDeclaration declaration)
-      : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifiers), declaration.TypeParameters.Count)
+    protected FSharpObjectModelTypePart(IFSharpTypeParametersOwnerDeclaration declaration, bool isHidden)
+      : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifiers), isHidden,
+        declaration.TypeParameters.Count)
     {
       var extendListShortNames = new FrugalLocalHashSet<string>();
       foreach (var member in declaration.TypeMembersEnumerable)

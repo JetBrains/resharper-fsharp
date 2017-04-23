@@ -1,15 +1,17 @@
 ﻿using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
-  internal class RecordPart : FSharpClassLikePart<IFSharpRecordDeclaration>, Class.IClassPart
+  internal class RecordPart : FSharpClassLikePart<IFSharpTypeParametersOwnerDeclaration>, Class.IClassPart
   {
     private static readonly string[] ourExtendsListShortNames =
       {"IStructuralEquatable", "IStructuralComparable", "IComparable"};
 
-    public RecordPart(IFSharpRecordDeclaration declaration)
-      : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifiers), declaration.TypeParameters.Count)
+    public RecordPart(IFSharpTypeParametersOwnerDeclaration declaration, bool isHidden)
+      : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifiers), isHidden,
+        declaration.TypeParameters.Count)
     {
     }
 
@@ -27,7 +29,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       return MemberPresenceFlag.INSTANCE_CTOR;
     }
 
-    protected override byte SerializationTag => (byte) FSharpSerializationTag.RecordPart;
+    protected override byte SerializationTag => (byte) FSharpPartKind.Record;
 
     public override string[] ExtendsListShortNames => ourExtendsListShortNames;
   }

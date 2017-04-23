@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
   public class EnumPart : FSharpTypePart<IFSharpEnumDeclaration>, Enum.IEnumPart
   {
-    public EnumPart(IFSharpEnumDeclaration declaration) : base(declaration,
-      ModifiersUtil.GetDecoration(declaration.AccessModifiers), declaration.TypeParameters.Count)
+    public EnumPart(IFSharpEnumDeclaration declaration, bool isHidden) : base(declaration,
+      ModifiersUtil.GetDecoration(declaration.AccessModifiers), isHidden, declaration.TypeParameters.Count)
     {
     }
 
@@ -23,12 +24,12 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     public IType GetUnderlyingType()
     {
       // todo: replace with actual type, F# compiler takes type from first valid case
-      return GetPsiModule().GetPredefinedType().Int;
+      return TypeFactory.CreateUnknownType(GetPsiModule());
     }
 
     public IList<IField> Fields =>
       ProcessSubDeclaration<IField, IFSharpEnumMemberDeclaration>(input => input.EnumMembers);
 
-    protected override byte SerializationTag => (byte) FSharpSerializationTag.EnumPart;
+    protected override byte SerializationTag => (byte) FSharpPartKind.Enum;
   }
 }

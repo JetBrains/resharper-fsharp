@@ -12,13 +12,13 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
   {
     private readonly MemberDecoration myDecoration;
 
-    protected FSharpTypePart(TDeclaration declaration, MemberDecoration memberDecoration,
+    protected FSharpTypePart(TDeclaration declaration, MemberDecoration memberDecoration, bool isHidden,
       int typeParameters = 0) : base(declaration, declaration.ShortName, typeParameters)
     {
       myDecoration = memberDecoration;
 
       if (myDecoration.AccessRights == AccessRights.NONE)
-        myDecoration.AccessRights = AccessRights.PUBLIC;
+        myDecoration.AccessRights = isHidden ? AccessRights.INTERNAL : AccessRights.PUBLIC;
     }
 
     protected FSharpTypePart(IReader reader) : base(reader)

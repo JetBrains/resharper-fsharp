@@ -1,11 +1,12 @@
 ﻿using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
   internal class ClassPart : FSharpObjectModelTypePart, Class.IClassPart
   {
-    public ClassPart(IFSharpObjectModelTypeDeclaration declaration) : base(declaration)
+    public ClassPart(IFSharpTypeParametersOwnerDeclaration declaration, bool isHidden) : base(declaration, isHidden)
     {
     }
 
@@ -23,6 +24,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       return MemberPresenceFlag.INSTANCE_CTOR; // todo: check members for this
     }
 
-    protected override byte SerializationTag => (byte) FSharpSerializationTag.ClassPart;
+    protected override byte SerializationTag => (byte) FSharpPartKind.Class;
   }
 }

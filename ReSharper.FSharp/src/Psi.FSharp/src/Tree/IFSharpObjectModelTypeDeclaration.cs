@@ -1,7 +1,9 @@
-﻿namespace JetBrains.ReSharper.Psi.FSharp.Tree
+﻿using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations;
+
+namespace JetBrains.ReSharper.Psi.FSharp.Tree
 {
   public partial interface IFSharpObjectModelTypeDeclaration
   {
-    FSharpObjectModelTypeKind TypeKind { get; }
+    FSharpPartKind TypePartKind { get; }
   }
 }

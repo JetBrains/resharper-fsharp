@@ -1,4 +1,5 @@
 ﻿using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
@@ -23,6 +24,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       return null;
     }
 
-    protected override byte SerializationTag => (byte) FSharpSerializationTag.QualifiedNamespacePart;
+    protected override byte SerializationTag => (byte) FSharpPartKind.QualifiedNamespace;
   }
 }

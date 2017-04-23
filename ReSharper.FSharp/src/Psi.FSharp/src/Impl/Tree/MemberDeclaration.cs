@@ -1,6 +1,6 @@
-﻿using JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement;
+﻿using System.Linq;
+using JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
-using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
@@ -20,8 +20,12 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       if (mfv != null && (mfv.IsProperty || mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod))
       {
         var entityMembers = mfv.EnclosingEntity.MembersFunctionsAndValues; //todo inheritance with same name
-        var property = entityMembers?.SingleItem(m => m.IsProperty && !m.IsPropertyGetterMethod &&
-                                                      !m.IsPropertySetterMethod && m.DisplayName == mfv.DisplayName);
+        // same trouble as with constructors: member from entity (and its type) differs from initial
+        var mfvReturnTypeString = mfv.ReturnParameter.Type.ToString();
+        var property = entityMembers?
+          .FirstOrDefault(m => m.IsProperty && !m.IsPropertyGetterMethod && !m.IsPropertySetterMethod &&
+                               m.DisplayName == mfv.DisplayName &&
+                               m.ReturnParameter.Type.ToString() == mfvReturnTypeString);
         return new FSharpProperty<MemberDeclaration>(this, property);
       }
 

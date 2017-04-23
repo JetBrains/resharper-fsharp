@@ -1,4 +1,5 @@
 ﻿using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
@@ -7,8 +8,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
   {
     private static readonly string[] ourExtendsListShortNames = {"Exception", "IStructuralEquatable"};
 
-    public ExceptionPart(IFSharpExceptionDeclaration declaration)
-      : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifiers))
+    public ExceptionPart(IFSharpExceptionDeclaration declaration, bool isHidden)
+      : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifiers), isHidden)
     {
     }
 
@@ -26,7 +27,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       return MemberPresenceFlag.NONE;
     }
 
-    protected override byte SerializationTag => (byte) FSharpSerializationTag.ExceptionPart;
+    protected override byte SerializationTag => (byte) FSharpPartKind.Exception;
 
     public override string[] ExtendsListShortNames => ourExtendsListShortNames;
   }

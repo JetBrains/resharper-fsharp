@@ -1,11 +1,12 @@
 ﻿using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
   internal class StructPart : FSharpObjectModelTypePart, Struct.IStructPart
   {
-    public StructPart(IFSharpObjectModelTypeDeclaration declaration) : base(declaration)
+    public StructPart(IFSharpTypeParametersOwnerDeclaration declaration, bool isHidden) : base(declaration, isHidden)
     {
     }
 
@@ -24,6 +25,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     }
 
     public bool HasHiddenInstanceFields => false; // todo: check this
-    protected override byte SerializationTag => (byte) FSharpSerializationTag.StructPart;
+    protected override byte SerializationTag => (byte) FSharpPartKind.Struct;
   }
 }

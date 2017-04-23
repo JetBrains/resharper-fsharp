@@ -9,8 +9,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
   public abstract class FSharpClassLikePart<TDeclaration> : FSharpTypePart<TDeclaration>,
     ClassLikeTypeElement.IClassLikePart where TDeclaration : class, IFSharpDeclaration, ITypeDeclaration
   {
-    protected FSharpClassLikePart(TDeclaration declaration, MemberDecoration memberDecoration, int typeParameters = 0)
-      : base(declaration, memberDecoration, typeParameters)
+    protected FSharpClassLikePart(TDeclaration declaration, MemberDecoration memberDecoration, bool isHidden,
+      int typeParameters = 0) : base(declaration, memberDecoration, isHidden, typeParameters)
     {
     }
 

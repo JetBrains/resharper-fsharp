@@ -1,12 +1,13 @@
 ﻿using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
   public class NestedModulePart : FSharpClassLikePart<INestedModuleDeclaration>, Class.IClassPart
   {
-    public NestedModulePart(INestedModuleDeclaration declaration)
-      : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifiers))
+    public NestedModulePart(INestedModuleDeclaration declaration, bool isHidden)
+      : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifiers), isHidden)
     {
     }
 
@@ -42,6 +43,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       }
     }
 
-    protected override byte SerializationTag => (byte) FSharpSerializationTag.NestedModulePart;
+    protected override byte SerializationTag => (byte) FSharpPartKind.NestedModule;
   }
 }

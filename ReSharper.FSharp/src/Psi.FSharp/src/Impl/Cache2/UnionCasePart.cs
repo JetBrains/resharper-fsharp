@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
@@ -8,8 +9,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
   internal class UnionCasePart : FSharpClassLikePart<IFSharpUnionCaseDeclaration>, Class.IClassPart
   {
-    public UnionCasePart(IFSharpUnionCaseDeclaration declaration)
-      : base(declaration, ModifiersUtil.GetDecoration(declaration))
+    public UnionCasePart(IFSharpUnionCaseDeclaration declaration, bool isHidden)
+      : base(declaration, ModifiersUtil.GetDecoration(declaration), isHidden)
     {
     }
 
@@ -33,6 +34,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       return MemberPresenceFlag.INSTANCE_CTOR;
     }
 
-    protected override byte SerializationTag => (byte) FSharpSerializationTag.UnionCasePart;
+    protected override byte SerializationTag => (byte) FSharpPartKind.UnionCase;
   }
 }

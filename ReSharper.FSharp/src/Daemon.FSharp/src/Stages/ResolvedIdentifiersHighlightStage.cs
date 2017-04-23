@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 using JetBrains.Application.Threading;
 using JetBrains.ReSharper.Daemon.UsageChecking;
 using JetBrains.ReSharper.Feature.Services.Daemon;
+using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
@@ -142,22 +143,22 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 
         public override void VisitFSharpObjectModelTypeDeclaration(IFSharpObjectModelTypeDeclaration type)
         {
-          HighlightIdentifier(type.Identifier, GetHighlightingAttributeId(type.TypeKind));
+          HighlightIdentifier(type.Identifier, GetHighlightingAttributeId(type.TypePartKind));
 
           foreach (var member in type.TypeMembersEnumerable)
             member.Accept(this);
         }
 
         [NotNull]
-        private string GetHighlightingAttributeId(FSharpObjectModelTypeKind kind)
+        private string GetHighlightingAttributeId(FSharpPartKind kind)
         {
           switch (kind)
           {
-            case FSharpObjectModelTypeKind.Class:
+            case FSharpPartKind.Class:
               return HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE;
-            case FSharpObjectModelTypeKind.Interface:
+            case FSharpPartKind.Interface:
               return HighlightingAttributeIds.TYPE_INTERFACE_ATTRIBUTE;
-            case FSharpObjectModelTypeKind.Struct:
+            case FSharpPartKind.Struct:
               return HighlightingAttributeIds.TYPE_STRUCT_ATTRIBUTE;
             default:
               throw new ArgumentOutOfRangeException(nameof(kind), kind, null);
