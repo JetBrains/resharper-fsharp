@@ -16,18 +16,18 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 {
   [DaemonStage(StagesBefore = new[] {typeof(TypeCheckErrorsStage)}, StagesAfter = new[] {typeof(CollectUsagesStage)})]
-  public class ResolvedIdentifiersHighlightStage : FSharpDaemonStageBase
+  public class HighlightOpenExpressionsStage : FSharpDaemonStageBase
   {
     protected override IDaemonStageProcess CreateProcess(IFSharpFile fsFile, IDaemonProcess process)
     {
-      return new ResolvedIdentifiersHighlightProcess(fsFile, process);
+      return new HighlightOpenExpressionsStageProcess(fsFile, process);
     }
 
-    public class ResolvedIdentifiersHighlightProcess : FSharpDaemonStageProcessBase
+    public class HighlightOpenExpressionsStageProcess : FSharpDaemonStageProcessBase
     {
       private readonly IFSharpFile myFsFile;
 
-      public ResolvedIdentifiersHighlightProcess([NotNull] IFSharpFile fsFile, [NotNull] IDaemonProcess process)
+      public HighlightOpenExpressionsStageProcess([NotNull] IFSharpFile fsFile, [NotNull] IDaemonProcess process)
         : base(process)
       {
         myFsFile = fsFile;
@@ -51,36 +51,21 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
           myFsFile = fsFile;
           myCommitter = committer;
           myInterruptChecker = interruptChecker;
-          myHighlightings = new List<HighlightingInfo>(fsFile.TokenBuffer.Buffer.Length);
+          myHighlightings =
+            new List<HighlightingInfo>(fsFile.TokenBuffer.Buffer.Length / 10); // todo: to set resolved process?
         }
 
-        public override void VisitFSharpImplFile(IFSharpImplFile implFile)
-        {
-          foreach (var module in implFile.Declarations) // todo: implement for signature files
-          {
-            module.Accept(this);
-            myInterruptChecker.CheckForInterrupt();
-          }
-          VisitFSharpFile(implFile);
-        }
 
         public override void VisitFSharpFile(IFSharpFile file)
         {
-          foreach (var token in file.Tokens().OfType<FSharpIdentifierToken>())
+          foreach (var module in file.Declarations)
           {
-            var symbol = token.FSharpSymbol;
-            if (symbol != null)
-              myHighlightings.Add(CreateHighlighting(token, symbol.GetHighlightingAttributeId()));
+            module.Accept(this);
             myInterruptChecker.CheckForInterrupt();
           }
           myCommitter(new DaemonStageResult(myHighlightings));
         }
 
-        public override void VisitLet(ILet letBinding)
-        {
-          HighlightIdentifier(letBinding.Identifier, HighlightingAttributeIds.LOCAL_VARIABLE_IDENTIFIER_ATTRIBUTE);
-          base.VisitLet(letBinding);
-        }
 
         public override void VisitTopLevelModuleOrNamespaceDeclaration(ITopLevelModuleOrNamespaceDeclaration module)
         {
@@ -108,23 +93,6 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
             myHighlightings.Add(CreateHighlighting(nameToken, highlightingAttrId));
         }
 
-        public override void VisitMemberDeclaration(IMemberDeclaration member)
-        {
-          var highlightingAttrId = member.ParametersEnumerable.IsEmpty()
-            ? HighlightingAttributeIds.FIELD_IDENTIFIER_ATTRIBUTE
-            : HighlightingAttributeIds.METHOD_IDENTIFIER_ATTRIBUTE;
-
-          HighlightIdentifier(member.Identifier, highlightingAttrId);
-        }
-
-        public override void VisitFSharpUnionCaseDeclaration(IFSharpUnionCaseDeclaration caseDeclaration)
-        {
-          HighlightIdentifier(caseDeclaration.Identifier, HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE);
-
-          foreach (var fieldDeclaration in caseDeclaration.FieldsEnumerable)
-            HighlightIdentifier(fieldDeclaration.Identifier, HighlightingAttributeIds.FIELD_IDENTIFIER_ATTRIBUTE);
-        }
-
         public override void VisitNestedModuleDeclaration(INestedModuleDeclaration module)
         {
           HighlightIdentifier(module.Identifier, HighlightingAttributeIds.TYPE_STATIC_CLASS_ATTRIBUTE);
@@ -134,51 +102,6 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
             member.Accept(this);
             myInterruptChecker.CheckForInterrupt();
           }
-        }
-
-        public override void VisitFSharpExceptionDeclaration(IFSharpExceptionDeclaration exn)
-        {
-          HighlightIdentifier(exn.Identifier, HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE);
-        }
-
-        public override void VisitFSharpObjectModelTypeDeclaration(IFSharpObjectModelTypeDeclaration type)
-        {
-          HighlightIdentifier(type.Identifier, GetHighlightingAttributeId(type.TypePartKind));
-
-          foreach (var member in type.TypeMembersEnumerable)
-            member.Accept(this);
-        }
-
-        [NotNull]
-        private string GetHighlightingAttributeId(FSharpPartKind kind)
-        {
-          switch (kind)
-          {
-            case FSharpPartKind.Class:
-              return HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE;
-            case FSharpPartKind.Interface:
-              return HighlightingAttributeIds.TYPE_INTERFACE_ATTRIBUTE;
-            case FSharpPartKind.Struct:
-              return HighlightingAttributeIds.TYPE_STRUCT_ATTRIBUTE;
-            default:
-              throw new ArgumentOutOfRangeException(nameof(kind), kind, null);
-          }
-        }
-
-        public override void VisitFSharpSimpleTypeDeclaration(IFSharpSimpleTypeDeclaration type)
-        {
-          HighlightIdentifier(type.Identifier, HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE);
-
-          foreach (var member in type.MemberDeclarations)
-            (member as IFSharpDeclaration)?.Accept(this);
-        }
-
-        public override void VisitFSharpEnumDeclaration(IFSharpEnumDeclaration enumDeclaration)
-        {
-          foreach (var member in enumDeclaration.EnumMembersEnumerable)
-            HighlightIdentifier(member.Identifier, HighlightingAttributeIds.FIELD_IDENTIFIER_ATTRIBUTE);
-
-          base.VisitFSharpEnumDeclaration(enumDeclaration);
         }
 
         public override void VisitOpen(IOpen open)
@@ -216,14 +139,6 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
             ? HighlightingAttributeIds.NAMESPACE_IDENTIFIER_ATTRIBUTE
             : HighlightingAttributeIds.TYPE_STATIC_CLASS_ATTRIBUTE;
           myHighlightings.Add(CreateHighlighting(ids[idsCount - 1], highlightingAttrId));
-        }
-
-        public override void VisitFSharpRecordDeclaration(IFSharpRecordDeclaration record)
-        {
-          foreach (var field in record.FieldsEnumerable)
-            HighlightIdentifier(field.Identifier, HighlightingAttributeIds.FIELD_IDENTIFIER_ATTRIBUTE);
-
-          base.VisitFSharpRecordDeclaration(record);
         }
 
         private void HighlightIdentifier([CanBeNull] IFSharpIdentifier ident, string highlightingAttributeId)

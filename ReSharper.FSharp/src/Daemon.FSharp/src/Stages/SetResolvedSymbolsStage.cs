@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Feature.Services.Daemon;
@@ -25,7 +26,6 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
   {
     private readonly IFSharpFile myFsFile;
     private readonly IDocument myDocument;
-    private const string LocalhighlightingAttributeId = HighlightingAttributeIds.LOCAL_VARIABLE_IDENTIFIER_ATTRIBUTE;
 
     public SetResolvedSymbolsStageProcess([NotNull] IFSharpFile fsFile, [NotNull] IDaemonProcess process)
       : base(process)
@@ -40,8 +40,14 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
       var symbolUses = myFsFile.GetCheckResults(true, interruptChecker)
         ?.GetAllUsesOfAllSymbolsInFile()
         ?.RunAsTask(interruptChecker);
-      if (symbolUses == null) return;
-      var localDeclarationsHighlightings = new List<HighlightingInfo>(symbolUses.Length);
+      if (symbolUses == null)
+        return;
+
+      myFsFile.ReferencesResolved = false;
+      foreach (var token in myFsFile.Tokens().OfType<FSharpIdentifierToken>())
+        token.FSharpSymbol = null;
+
+      var highlightings = new List<HighlightingInfo>(symbolUses.Length);
 
       foreach (var symbolUse in symbolUses)
       {
@@ -49,7 +55,9 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
         if (token == null)
           continue;
 
+        var shouldHighlight = token.FSharpSymbol == null;
         var symbol = symbolUse.Symbol;
+        var highlightingId = symbol.GetHighlightingAttributeId();
         var tokenType = token.GetTokenType();
         if ((tokenType == FSharpTokenType.GREATER || tokenType == FSharpTokenType.GREATER_RBRACK)
             && !FSharpSymbolsUtil.IsOpGreaterThan(symbol))
@@ -61,12 +69,8 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
           if (declaration != null)
           {
             declaration.Symbol = symbol;
-            var identifierToken = (declaration as ILocalDeclaration)?.Identifier?.IdentifierToken;
-            if (identifierToken != null)
-            {
-              localDeclarationsHighlightings.Add(
-                CreateHighlighting(identifierToken, LocalhighlightingAttributeId));
-            }
+            if (shouldHighlight)
+              highlightings.Add(CreateHighlighting(token, highlightingId));
           }
           continue;
         }
@@ -78,10 +82,13 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
           continue;
 
         token.FSharpSymbol = symbol;
+        if (shouldHighlight)
+          highlightings.Add(CreateHighlighting(token, highlightingId));
+
         SeldomInterruptChecker.CheckForInterrupt();
       }
       myFsFile.ReferencesResolved = true;
-      committer(new DaemonStageResult(localDeclarationsHighlightings));
+      committer(new DaemonStageResult(highlightings));
     }
 
     [CanBeNull]

@@ -9,7 +9,7 @@ using Microsoft.FSharp.Compiler;
 namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 {
   [DaemonStage(StagesBefore = new[] {typeof(SetResolvedSymbolsStage)},
-    StagesAfter = new[] {typeof(ResolvedIdentifiersHighlightStage)})]
+    StagesAfter = new[] {typeof(HighlightOpenExpressionsStage)})]
   public class TypeCheckErrorsStage : FSharpDaemonStageBase
   {
     public class TypeCheckErrorsStageProcess : ErrorsStageProcessBase

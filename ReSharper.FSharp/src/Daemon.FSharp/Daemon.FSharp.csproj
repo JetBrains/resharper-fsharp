@@ -408,7 +408,7 @@
     <Compile Include="src\Stages\ErrorsStageProcessBase.cs" />
     <Compile Include="src\Stages\FSharpDaemonStageProcessBase.cs" />
     <Compile Include="src\Stages\FSharpIdentifierTooltipProvider.cs" />
-    <Compile Include="src\Stages\ResolvedIdentifiersHighlightStage.cs" />
+    <Compile Include="src\Stages\HighlightOpenExpressionsStage.cs" />
     <Compile Include="src\Stages\SetResolvedSymbolsStage.cs" />
     <Compile Include="src\Stages\SyntaxErrorsStage.cs" />
     <Compile Include="src\Stages\SyntaxHighlightingStage.cs" />
