@@ -12,7 +12,7 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
   {
     public FSharpCodeCompletionContext([NotNull] CodeCompletionContext context, TextLookupRanges ranges,
       TreeOffset caretOffset, DocumentCoords coords, Tuple<FSharpList<string>, string> names,
-      ITreeNode tokenBeforeCaret, ITreeNode tokenAtCaret) : base(context)
+      ITreeNode tokenBeforeCaret, ITreeNode tokenAtCaret, string lineText) : base(context)
     {
       Ranges = ranges;
       CaretOffset = caretOffset;
@@ -20,6 +20,7 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
       Names = names;
       TokenBeforeCaret = tokenBeforeCaret;
       TokenAtCaret = tokenAtCaret;
+      LineText = lineText;
     }
 
     public override string ContextId => "FSharpCodeCompletionContext";
@@ -27,6 +28,7 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
     public Tuple<FSharpList<string>, string> Names { get; }
     public ITreeNode TokenBeforeCaret { get; }
     public ITreeNode TokenAtCaret { get; }
+    public string LineText { get; }
     public TreeOffset CaretOffset { get; }
     public DocumentCoords Coords { get; }
   }

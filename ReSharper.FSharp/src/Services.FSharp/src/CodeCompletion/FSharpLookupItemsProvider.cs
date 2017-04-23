@@ -2,9 +2,12 @@
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.FSharp;
+using JetBrains.ReSharper.Psi.FSharp.Parsing;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
+using JetBrains.Util.Extension;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Control;
@@ -35,14 +38,42 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
 
         var symbol = overloadsGroup.Head.Symbol;
         bool isEscaped;
-        var name = FSharpNamesUtil.RemoveParens(symbol.DisplayName, out isEscaped);
-
-        var lookupItem = new FSharpLookupItem(name, symbol.GetIconId(), isEscaped);
+        var lookupText = GetLookupText(symbol, IsInAttributeList(fsFile, context), out isEscaped);
+        var lookupItem = new FSharpLookupItem(lookupText, symbol.GetIconId(), isEscaped);
         lookupItem.InitializeRanges(GetDefaultRanges(context), context.BasicContext);
         collector.Add(lookupItem);
       }
 
       return true;
+    }
+
+    private static bool IsInAttributeList([NotNull] IFSharpFile fsFile, FSharpCodeCompletionContext context)
+    {
+      if (context.TokenAtCaret.GetNextMeaningfulToken(true)?.GetTokenType() == FSharpTokenType.GREATER_RBRACK)
+        return true;
+
+      var fsCompletionContext = UntypedParseImpl.TryGetCompletionContext(context.Coords.GetPos(),
+        OptionModule.OfObj(fsFile.ParseResults), context.LineText);
+      return fsCompletionContext != null && fsCompletionContext.Value.IsAttributeApplication;
+    }
+
+    [NotNull]
+    private static string GetLookupText([NotNull] FSharpSymbol symbol, bool isAttrApplication, out bool isEscaped)
+    {
+      var entity = symbol as FSharpEntity;
+      if (entity != null && !entity.IsUnresolved && entity.IsAttributeType && isAttrApplication)
+      {
+        isEscaped = false;
+        return entity.CompiledName.SubstringBeforeLast("Attribute");
+      }
+      var mfv = symbol as FSharpMemberOrFunctionOrValue;
+      if (mfv != null && PrettyNaming.IsOperatorName(symbol.DisplayName))
+      {
+        isEscaped = false;
+        return mfv.CompiledName;
+      }
+
+      return FSharpNamesUtil.RemoveParens(symbol.DisplayName, out isEscaped);
     }
 
     [CanBeNull]

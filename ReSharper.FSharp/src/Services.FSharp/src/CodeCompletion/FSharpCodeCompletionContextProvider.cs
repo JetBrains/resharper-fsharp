@@ -5,6 +5,8 @@ using JetBrains.ReSharper.Psi.FSharp.Parsing;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
+using Microsoft.FSharp.Compiler.SourceCodeServices;
+using Microsoft.FSharp.Core;
 using Microsoft.VisualStudio.FSharp.LanguageService;
 
 namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
@@ -40,9 +42,11 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
 
       var document = context.Document;
       var coords = document.GetCoordsByOffset(caretOffset);
-      var names = QuickParse.GetPartialLongNameEx(document.GetLineText(coords.Line), (int) coords.Column - 1);
+      var lineText = document.GetLineText(coords.Line);
+      var names = QuickParse.GetPartialLongNameEx(lineText, (int) coords.Column - 1);
 
-      return new FSharpCodeCompletionContext(context, ranges, caretTreeOffset, coords, names, tokenBefore, token);
+      return new FSharpCodeCompletionContext(context, ranges, caretTreeOffset, coords, names, tokenBefore, token,
+        lineText);
     }
 
     private static bool ShouldReplace([CanBeNull] ITreeNode token)

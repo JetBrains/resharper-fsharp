@@ -53,10 +53,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
             return FSharpTokenType.GREATER;
           if (token.Tag == FSharpTokenTag.LESS)
             return FSharpTokenType.LESS;
-          if (token.Tag == FSharpTokenTag.GREATER_RBRACK)
-            return FSharpTokenType.GREATER_RBRACK;
-          if (token.Tag == FSharpTokenTag.LBRACK_LESS)
-            return FSharpTokenType.LBRACK_LESS;
           return FSharpTokenType.OPERATOR;
 
         case FSharpTokenCharKind.LineComment:
@@ -74,6 +70,10 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
             return FSharpTokenType.LPAREN;
           if (token.Tag == FSharpTokenTag.DOT)
             return FSharpTokenType.DOT;
+          if (token.Tag == FSharpTokenTag.GREATER_RBRACK)
+            return FSharpTokenType.GREATER_RBRACK;
+          if (token.Tag == FSharpTokenTag.LBRACK_LESS)
+            return FSharpTokenType.LBRACK_LESS;
           return FSharpTokenType.TEXT;
 
         default:
