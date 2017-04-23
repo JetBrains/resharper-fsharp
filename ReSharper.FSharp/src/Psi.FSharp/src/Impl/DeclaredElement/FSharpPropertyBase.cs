@@ -35,7 +35,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 
       IsReadable = property.IsModuleValueOrMember || property.HasGetterMethod;
       IsWritable = property.IsMutable || property.HasSetterMethod;
-      ShortName = FSharpImplUtil.GetMemberCompiledName(property);
+      ShortName = property.GetMemberCompiledName();
       ReturnType = FSharpTypesUtil.GetType(property.ReturnParameter.Type, declaration, Module) ??
                    TypeFactory.CreateUnknownType(Module);
     }

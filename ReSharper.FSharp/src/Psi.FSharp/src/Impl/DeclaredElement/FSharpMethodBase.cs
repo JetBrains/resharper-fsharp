@@ -53,7 +53,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
         ? EmptyList<IParameter>.InstanceList
         : methodParams.ToList();
 
-      ShortName = FSharpImplUtil.GetMemberCompiledName(mfv);
+      ShortName = mfv.GetMemberCompiledName();
     }
 
     public override string ShortName { get; }

@@ -5,6 +5,7 @@ using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
+using JetBrains.Util.DataStructures;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
@@ -38,6 +39,23 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
     public InvocableSignature GetSignature(ISubstitution substitution)
     {
       return new InvocableSignature(this, substitution);
+    }
+
+    public override bool Equals(object obj)
+    {
+      if (!base.Equals(obj))
+        return false;
+
+      var member = obj as FSharpMemberBase<TDeclaration>;
+
+      return member != null &&
+             SignatureComparers.Strict.Compare(GetSignature(IdSubstitution),
+               member.GetSignature(member.IdSubstitution));
+    }
+
+    public override int GetHashCode()
+    {
+      return ShortName.GetHashCode();
     }
 
     public IEnumerable<IParametersOwnerDeclaration> GetParametersOwnerDeclarations()

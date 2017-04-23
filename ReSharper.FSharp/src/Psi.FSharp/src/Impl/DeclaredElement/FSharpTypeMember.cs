@@ -5,6 +5,8 @@ using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
+using JetBrains.Util.dataStructures;
+using JetBrains.Util.DataStructures;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 {
@@ -19,6 +21,73 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
     public ITypeMember GetContainingTypeMember()
     {
       return (ITypeMember) GetContainingType();
+    }
+
+    public override IList<IDeclaration> GetDeclarations()
+    {
+      return GetPartialDeclarations(null);
+    }
+
+    public override IList<IDeclaration> GetDeclarationsIn(IPsiSourceFile sourceFile)
+    {
+      return GetPartialDeclarations(sourceFile);
+    }
+
+    private IList<IDeclaration> GetPartialDeclarations([CanBeNull] IPsiSourceFile sourceFile)
+    {
+      var containingType = GetContainingType();
+      if (containingType == null)
+        return EmptyList<IDeclaration>.InstanceList;
+
+      var declaration = GetDeclaration();
+      if (declaration == null)
+        return EmptyList<IDeclaration>.InstanceList;
+
+      var list = new FrugalLocalList<IDeclaration>();
+      var declarations =
+        sourceFile != null
+          ? containingType.GetDeclarationsIn(sourceFile)
+          : containingType.GetDeclarations();
+
+      foreach (var partDeclaration in declarations)
+      {
+        var typeDeclaration = partDeclaration as IFSharpTypeElementDeclaration;
+        if (typeDeclaration == null) continue;
+
+        foreach (var member in typeDeclaration.MemberDeclarations)
+          if (member.DeclaredName == declaration.DeclaredName && Equals(this, member.DeclaredElement))
+            list.Add(member);
+      }
+      return list.AsList();
+    }
+
+    public override HybridCollection<IPsiSourceFile> GetSourceFiles()
+    {
+      return GetContainingType()?.GetSourceFiles() ??
+             HybridCollection<IPsiSourceFile>.Empty;
+    }
+
+    public override bool HasDeclarationsIn(IPsiSourceFile sourceFile)
+    {
+      return GetSourceFiles().Contains(sourceFile);
+    }
+
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(this, obj))
+        return true;
+
+      var member = obj as FSharpTypeMember<TDeclaration>;
+      if (member == null)
+        return false;
+
+      return member.ShortName == ShortName &&
+             Equals(GetContainingType(), member.GetContainingType());
+    }
+
+    public override int GetHashCode()
+    {
+      return ShortName.GetHashCode();
     }
 
 
