@@ -4,9 +4,9 @@ using JetBrains.ReSharper.Psi.FSharp.Tree;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
-  internal class StructPart : FSharpObjectModelTypePart, Struct.IStructPart
+  internal class StructPart : FSharpTypeMembersOwnerTypePart, Struct.IStructPart
   {
-    public StructPart(IFSharpTypeParametersOwnerDeclaration declaration, bool isHidden) : base(declaration, isHidden)
+    public StructPart(IFSharpTypeDeclaration declaration, bool isHidden) : base(declaration, isHidden)
     {
     }
 

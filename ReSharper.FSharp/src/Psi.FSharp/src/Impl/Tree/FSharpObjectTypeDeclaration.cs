@@ -1,5 +1,6 @@
 ﻿using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
+using JetBrains.Util.Extension;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 {
@@ -24,7 +25,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       {
         foreach (var attr in AttributesEnumerable)
         {
-          var attrText = attr.GetText();
+          var attrText = attr.GetText().SubstringBeforeLast("Attribute");
           switch (attrText)
           {
             case Interface:

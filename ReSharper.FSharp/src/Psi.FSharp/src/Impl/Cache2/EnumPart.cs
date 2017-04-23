@@ -8,7 +8,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
   public class EnumPart : FSharpTypePart<IFSharpEnumDeclaration>, Enum.IEnumPart
   {
     public EnumPart(IFSharpEnumDeclaration declaration, bool isHidden) : base(declaration,
-      ModifiersUtil.GetDecoration(declaration.AccessModifiers), isHidden, declaration.TypeParameters.Count)
+      ModifiersUtil.GetDecoration(declaration.AccessModifiers, declaration.AttributesEnumerable), isHidden,
+      declaration.TypeParameters.Count)
     {
     }
 

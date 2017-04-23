@@ -141,11 +141,6 @@ interface moduleMemberStatement
 interface fSharpTypeDeclaration
 :
   fSharpExceptionDeclaration |
-  fSharpTypeParametersOwnerDeclaration
-;
-
-interface fSharpTypeParametersOwnerDeclaration
-:
   fSharpSimpleTypeDeclaration |
   fSharpObjectModelTypeDeclaration
 ;
@@ -256,6 +251,7 @@ fSharpUnionCaseDeclaration options {
   fSharpAttribute<ATTRIBUTE, Attributes>*
   fSharpIdentifier<IDENTIFIER, Identifier>
   fSharpFieldDeclaration<UNION_FIELD, Fields>*
+  typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*
 ;
 
@@ -270,6 +266,7 @@ fSharpExceptionDeclaration options {
   fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
+  typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*
 ;
 

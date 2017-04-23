@@ -6,10 +6,12 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 {
-  internal class FSharpMethod : FSharpMethodBase<MemberDeclaration>
+  internal class FSharpMethod<TDeclaration> : FSharpMethodBase<TDeclaration>
+    where TDeclaration : FSharpDeclarationBase, IFSharpDeclaration, IAccessRightsOwnerDeclaration,
+    IModifiersOwnerDeclaration
   {
     public FSharpMethod([NotNull] ITypeMemberDeclaration declaration, [CanBeNull] FSharpMemberOrFunctionOrValue mfv,
-      [CanBeNull] IFSharpTypeParametersOwnerDeclaration typeDeclaration) : base(declaration, mfv, typeDeclaration)
+      [CanBeNull] IFSharpTypeDeclaration typeDeclaration) : base(declaration, mfv, typeDeclaration)
     {
     }
   }

@@ -9,7 +9,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
   internal class ModuleFunction : FSharpMethodBase<Let>
   {
     public ModuleFunction([NotNull] ITypeMemberDeclaration declaration, [CanBeNull] FSharpMemberOrFunctionOrValue mfv,
-      [CanBeNull] IFSharpTypeParametersOwnerDeclaration typeDeclaration) : base(declaration, mfv, typeDeclaration)
+      [CanBeNull] IFSharpTypeDeclaration typeDeclaration) : base(declaration, mfv, typeDeclaration)
     {
     }
   }

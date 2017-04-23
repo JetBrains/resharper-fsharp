@@ -159,23 +159,23 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations
         case FSharpPartKind.NestedModule:
           return new NestedModulePart((INestedModuleDeclaration) decl, isHidden);
         case FSharpPartKind.Exception:
-          return new ExceptionPart((IFSharpExceptionDeclaration) decl, isHidden);
+          return new ExceptionPart((IFSharpTypeDeclaration) decl, isHidden);
         case FSharpPartKind.Enum:
           return new EnumPart((IFSharpEnumDeclaration) decl, isHidden);
         case FSharpPartKind.Record:
-          return new RecordPart((IFSharpTypeParametersOwnerDeclaration) decl, isHidden);
+          return new RecordPart((IFSharpTypeDeclaration) decl, isHidden);
         case FSharpPartKind.Union:
-          return new UnionPart((IFSharpTypeParametersOwnerDeclaration) decl, isHidden);
+          return new UnionPart((IFSharpTypeDeclaration) decl, isHidden);
         case FSharpPartKind.UnionCase:
           return new UnionCasePart((IFSharpUnionCaseDeclaration) decl, isHidden);
         case FSharpPartKind.HiddenType:
-          return new HiddenTypePart((IFSharpTypeParametersOwnerDeclaration) decl, isHidden);
+          return new HiddenTypePart((IFSharpTypeDeclaration) decl, isHidden);
         case FSharpPartKind.Interface:
-          return new InterfacePart((IFSharpTypeParametersOwnerDeclaration) decl, isHidden);
+          return new InterfacePart((IFSharpTypeDeclaration) decl, isHidden);
         case FSharpPartKind.Class:
-          return new ClassPart((IFSharpTypeParametersOwnerDeclaration) decl, isHidden);
+          return new ClassPart((IFSharpTypeDeclaration) decl, isHidden);
         case FSharpPartKind.Struct:
-          return new StructPart((IFSharpTypeParametersOwnerDeclaration) decl, isHidden);
+          return new StructPart((IFSharpTypeDeclaration) decl, isHidden);
         default:
           throw new ArgumentOutOfRangeException(nameof(partKind), partKind, null);
       }

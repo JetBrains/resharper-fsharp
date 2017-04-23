@@ -19,25 +19,29 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
       : base(declaration, mfv)
     {
       var property =
-        mfv != null && mfv.IsMember
+        mfv != null && mfv.IsModuleValueOrMember
           ? mfv.EnclosingEntity.MembersFunctionsAndValues.FirstOrDefault(
-            m => m.IsProperty && m.DisplayName == mfv.DisplayName)
+            m => m.IsProperty && m.DisplayName == mfv.DisplayName) ?? mfv
           : mfv;
 
-      if (property == null)
+      if (property != null)
+      {
+        IsReadable = property.HasGetterMethod || property.IsPropertyGetterMethod;
+        IsWritable = property.IsMutable || property.HasSetterMethod || property.IsPropertySetterMethod;
+        ShortName = property.GetMemberCompiledName();
+        var returnType = property.IsPropertySetterMethod
+          ? property.CurriedParameterGroups[0][0].Type
+          : property.ReturnParameter.Type;
+        ReturnType = FSharpTypesUtil.GetType(returnType, declaration, Module) ??
+                     TypeFactory.CreateUnknownType(Module);
+      }
+      else
       {
         IsReadable = true;
         IsWritable = false;
         ReturnType = TypeFactory.CreateUnknownType(Module);
         ShortName = declaration.DeclaredName;
-        return;
       }
-
-      IsReadable = property.IsModuleValueOrMember || property.HasGetterMethod;
-      IsWritable = property.IsMutable || property.HasSetterMethod;
-      ShortName = property.GetMemberCompiledName();
-      ReturnType = FSharpTypesUtil.GetType(property.ReturnParameter.Type, declaration, Module) ??
-                   TypeFactory.CreateUnknownType(Module);
     }
 
     public override string ShortName { get; }

@@ -7,10 +7,10 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations
 {
   internal class FSharpCacheImplementationProcessor : FSharpCacheDeclarationProcessorBase
   {
-    [NotNull] private readonly IDictionary<string, FSharpTypeInfo> myPairFileTypesInfo;
+    [CanBeNull] private readonly IDictionary<string, FSharpTypeInfo> myPairFileTypesInfo;
 
     public FSharpCacheImplementationProcessor(ICacheBuilder builder, int cacheVersion,
-      [NotNull] IDictionary<string, FSharpTypeInfo> pairFileTypesInfo) : base(builder, cacheVersion)
+      [CanBeNull] IDictionary<string, FSharpTypeInfo> pairFileTypesInfo) : base(builder, cacheVersion)
     {
       myPairFileTypesInfo = pairFileTypesInfo;
     }
@@ -18,7 +18,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations
     internal override void StartTypePart(IFSharpTypeElementDeclaration declaration,
       FSharpPartKind partKind)
     {
-      var isHidden = !myPairFileTypesInfo.ContainsKey(FSharpImplUtil.MakeClrName(declaration));
+      var isHidden = myPairFileTypesInfo != null &&
+                     !myPairFileTypesInfo.ContainsKey(FSharpImplUtil.MakeClrName(declaration));
       Builder.StartPart(CreateTypePart(declaration, partKind, isHidden));
     }
   }

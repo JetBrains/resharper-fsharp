@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
+using JetBrains.ReSharper.Psi.FSharp.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
@@ -18,19 +19,10 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
     {
       var mfv = GetFSharpSymbol() as FSharpMemberOrFunctionOrValue;
       if (mfv != null && (mfv.IsProperty || mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod))
-      {
-        var entityMembers = mfv.EnclosingEntity.MembersFunctionsAndValues; //todo inheritance with same name
-        // same trouble as with constructors: member from entity (and its type) differs from initial
-        var mfvReturnTypeString = mfv.ReturnParameter.Type.ToString();
-        var property = entityMembers?
-          .FirstOrDefault(m => m.IsProperty && !m.IsPropertyGetterMethod && !m.IsPropertySetterMethod &&
-                               m.DisplayName == mfv.DisplayName &&
-                               m.ReturnParameter.Type.ToString() == mfvReturnTypeString);
-        return new FSharpProperty<MemberDeclaration>(this, property);
-      }
+        return new FSharpProperty<MemberDeclaration>(this, mfv.TryGetPropertyFromAccessor());
 
-      var typeDeclaration = GetContainingTypeDeclaration() as IFSharpTypeParametersOwnerDeclaration;
-      return new FSharpMethod(this, mfv, typeDeclaration);
+      var typeDeclaration = GetContainingTypeDeclaration() as IFSharpTypeDeclaration;
+      return new FSharpMethod<MemberDeclaration>(this, mfv, typeDeclaration);
     }
   }
 }

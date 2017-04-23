@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
@@ -19,8 +20,32 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
     protected FSharpMemberBase([NotNull] ITypeMemberDeclaration declaration,
       [CanBeNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration)
     {
-      IsStatic = !mfv?.IsInstanceMember ?? false;
-      IsOverride = mfv?.IsOverrideOrExplicitInterfaceImplementation ?? false;
+      if (mfv == null)
+      {
+        IsStatic = false;
+        IsOverride = false;
+        IsVirtual = false;
+        IsAbstract = false;
+      }
+      else
+      {
+        if (mfv.IsProperty || mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod)
+        {
+        }
+
+        var members = mfv.EnclosingEntity.MembersFunctionsAndValues;
+        var hasAbstract = members.Any(m => m.LogicalName == mfv.LogicalName && m.IsDispatchSlot);
+        var hasDefault = members.Any(m => m.LogicalName == mfv.LogicalName &&
+                                          m.IsOverrideOrExplicitInterfaceImplementation);
+        var isOverride = mfv.IsOverrideOrExplicitInterfaceImplementation;
+        var isAbstract = mfv.IsDispatchSlot;
+
+        IsStatic = !mfv.IsInstanceMember;
+        IsOverride = isOverride;
+        IsVirtual = hasAbstract && hasDefault;
+        IsAbstract = isAbstract && !hasDefault;
+      }
+
 
       var accessibility = mfv?.Accessibility;
       if (accessibility == null)
@@ -75,6 +100,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 
     public override bool IsStatic { get; }
     public override bool IsOverride { get; }
+    public override bool IsAbstract { get; }
+    public override bool IsVirtual { get; }
     public bool CanBeImplicitImplementation => true;
   }
 }

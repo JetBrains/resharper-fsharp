@@ -32,7 +32,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       var pairFile = GetPairFile(file, out pairFilePath);
       var pairFileTypesInfo = pairFile != null
         ? GetTypesInfo(pairFile)
-        : EmptyDictionary<string, FSharpTypeInfo>.InstanceDictionary;
+        : null;
 
       var implFile = file as IFSharpImplFile;
       implFile?.Accept(new FSharpCacheImplementationProcessor(builder, CacheVersion, pairFileTypesInfo));

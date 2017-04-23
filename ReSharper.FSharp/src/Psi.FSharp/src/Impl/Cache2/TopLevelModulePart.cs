@@ -6,8 +6,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
   internal class TopLevelModulePart : FSharpClassLikePart<ITopLevelModuleDeclaration>, Class.IClassPart
   {
-    public TopLevelModulePart(ITopLevelModuleDeclaration declaration, bool isHidden)
-      : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifiers), isHidden)
+    public TopLevelModulePart(ITopLevelModuleDeclaration declaration, bool isHidden) : base(declaration,
+      ModifiersUtil.GetDecoration(declaration.AccessModifiers, declaration.AttributesEnumerable), isHidden)
     {
     }
 

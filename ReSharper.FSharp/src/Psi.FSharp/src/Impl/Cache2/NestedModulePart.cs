@@ -6,8 +6,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
   public class NestedModulePart : FSharpClassLikePart<INestedModuleDeclaration>, Class.IClassPart
   {
-    public NestedModulePart(INestedModuleDeclaration declaration, bool isHidden)
-      : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifiers), isHidden)
+    public NestedModulePart(INestedModuleDeclaration declaration, bool isHidden) : base(declaration,
+      ModifiersUtil.GetDecoration(declaration.AccessModifiers, declaration.AttributesEnumerable), isHidden)
     {
     }
 

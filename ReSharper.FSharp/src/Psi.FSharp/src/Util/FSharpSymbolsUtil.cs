@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.Util;
@@ -8,7 +9,7 @@ using Microsoft.FSharp.Control;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Util
 {
-  public class FSharpSymbolsUtil
+  public static class FSharpSymbolsUtil
   {
     [CanBeNull]
     public static FSharpSymbol TryFindFSharpSymbol([NotNull] IFSharpFile fsFile, [NotNull] string name, int offset)
@@ -44,6 +45,22 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     {
       var mfv = symbol as FSharpMemberOrFunctionOrValue;
       return mfv?.CompiledName == "op_GreaterThan";
+    }
+
+    [CanBeNull]
+    public static FSharpMemberOrFunctionOrValue TryGetPropertyFromAccessor(
+      [CanBeNull] this FSharpMemberOrFunctionOrValue mfv)
+    {
+      if (mfv == null)
+        return null;
+
+      if (mfv.IsProperty)
+        return mfv;
+
+      var members = mfv.EnclosingEntity.MembersFunctionsAndValues;
+      return mfv.IsModuleValueOrMember
+        ? members.FirstOrDefault(m => m.IsProperty && m.DisplayName == mfv.DisplayName) ?? mfv
+        : mfv;
     }
   }
 }

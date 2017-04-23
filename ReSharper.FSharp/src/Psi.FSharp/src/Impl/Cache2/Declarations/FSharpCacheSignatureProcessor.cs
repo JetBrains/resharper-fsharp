@@ -7,10 +7,10 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations
 {
   internal class FSharpCacheSignatureProcessor : FSharpCacheDeclarationProcessorBase
   {
-    private readonly IDictionary<string, FSharpTypeInfo> myPairFileTypesInfo;
+    [CanBeNull] private readonly IDictionary<string, FSharpTypeInfo> myPairFileTypesInfo;
 
     public FSharpCacheSignatureProcessor(ICacheBuilder builder, int cacheVersion,
-      [NotNull] IDictionary<string, FSharpTypeInfo> pairFileTypesInfo) : base(builder, cacheVersion)
+      [CanBeNull] IDictionary<string, FSharpTypeInfo> pairFileTypesInfo) : base(builder, cacheVersion)
     {
       myPairFileTypesInfo = pairFileTypesInfo;
     }
@@ -19,7 +19,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations
     {
       var clrName = FSharpImplUtil.MakeClrName(declaration);
       var partKindToCreate =
-        myPairFileTypesInfo.ContainsKey(clrName)
+        myPairFileTypesInfo != null && myPairFileTypesInfo.ContainsKey(clrName)
           ? myPairFileTypesInfo[clrName].TypeKind
           : partKind;
       Builder.StartPart(CreateTypePart(declaration, partKindToCreate));

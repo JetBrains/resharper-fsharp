@@ -439,7 +439,7 @@
     <Compile Include="src\Impl\Cache2\FSharpUnionCase.cs" />
     <Compile Include="src\Impl\Cache2\FSharpTopLevelModule.cs" />
     <Compile Include="src\Impl\Cache2\FSharpNestedModule.cs" />
-    <Compile Include="src\Impl\Cache2\FSharpObjectModelTypePart.cs" />
+    <Compile Include="src\Impl\Cache2\FSharpTypeMembersOwnerTypePart.cs" />
     <Compile Include="src\Impl\Cache2\FSharpProjectFilePart.cs" />
     <Compile Include="src\Impl\Cache2\FSharpRecord.cs" />
     <Compile Include="src\Impl\Cache2\FSharpTypePart.cs" />

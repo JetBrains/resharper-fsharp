@@ -100,7 +100,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
       }
       clrName.Append(declaration.DeclaredName);
 
-      var typeParamsOwner = declaration as IFSharpTypeParametersOwnerDeclaration;
+      var typeParamsOwner = declaration as IFSharpTypeDeclaration;
       if (typeParamsOwner?.TypeParameters.Count > 0)
         clrName.Append("`" + typeParamsOwner.TypeParameters.Count);
 
@@ -114,7 +114,10 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
       var compiledName = compiledNameAttr != null && !compiledNameAttr.ConstructorArguments.IsEmpty()
         ? compiledNameAttr.ConstructorArguments[0].Item2 as string
         : null;
-      return compiledName ?? mfv.LogicalName;
+      return compiledName ??
+             (mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod
+               ? mfv.DisplayName
+               : mfv.LogicalName);
     }
   }
 }

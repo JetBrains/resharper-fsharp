@@ -17,7 +17,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
   {
     protected FSharpMethodBase([NotNull] ITypeMemberDeclaration declaration,
       [CanBeNull] FSharpMemberOrFunctionOrValue mfv,
-      [CanBeNull] IFSharpTypeParametersOwnerDeclaration typeDeclaration) : base(declaration, mfv)
+      [CanBeNull] IFSharpTypeDeclaration typeDeclaration) : base(declaration, mfv)
     {
       if (mfv == null)
       {

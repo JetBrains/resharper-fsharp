@@ -45,7 +45,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public override IDeclaration GetTypeParameterDeclaration(int index)
     {
-      var declaration = GetDeclaration() as IFSharpTypeParametersOwnerDeclaration;
+      var declaration = GetDeclaration() as IFSharpTypeDeclaration;
       if (declaration == null) return null;
 
       var parameters = declaration.TypeParameters;
@@ -55,7 +55,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public override string GetTypeParameterName(int index)
     {
-      var declaration = GetDeclaration() as IFSharpTypeParametersOwnerDeclaration;
+      var declaration = GetDeclaration() as IFSharpTypeDeclaration;
       Assertion.AssertNotNull(declaration, "typeParamsOwnerDeclaration != null");
 
       var name = declaration.TypeParameters[index].GetText();
