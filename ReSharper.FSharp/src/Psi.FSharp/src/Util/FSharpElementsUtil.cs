@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi.Caches;
 using JetBrains.ReSharper.Psi.FSharp.Impl;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
@@ -29,8 +30,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       while (entity.IsFSharpAbbreviation)
       {
         // FCS returns Clr names for non-abbreviated types only, using fullname
-        var qualifiedName = ((FSharpSymbol) entity).FullName;
-        var typeElement = symbolScope.GetElementsByQualifiedName(qualifiedName).FirstOrDefault() as ITypeElement;
+        var typeElement = TryFindByNames(GetPossibleNames(entity), symbolScope);
         if (typeElement != null)
           return typeElement;
 
@@ -42,6 +42,25 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       }
 
       return TypeFactory.CreateTypeByCLRName(FSharpTypesUtil.GetClrName(entity), psiModule).GetTypeElement();
+    }
+
+    private static IEnumerable<string> GetPossibleNames([NotNull] FSharpEntity entity)
+    {
+      yield return entity.AccessPath + "." + entity.DisplayName;
+      yield return entity.AccessPath + "." + entity.LogicalName;
+      yield return ((FSharpSymbol) entity).FullName;
+    }
+
+    [CanBeNull]
+    private static ITypeElement TryFindByNames([NotNull] IEnumerable<string> names, ISymbolScope symbolScope)
+    {
+      foreach (var name in names)
+      {
+        var typeElement = symbolScope.GetElementsByQualifiedName(name).FirstOrDefault() as ITypeElement;
+        if (typeElement != null)
+          return typeElement;
+      }
+      return null;
     }
 
     [CanBeNull]
