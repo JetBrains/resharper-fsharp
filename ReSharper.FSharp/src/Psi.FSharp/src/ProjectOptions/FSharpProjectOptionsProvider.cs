@@ -5,6 +5,7 @@ using JetBrains.Application.Threading;
 using JetBrains.DataFlow;
 using JetBrains.Platform.ProjectModel.FSharp.Properties;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Feature.Services.Util;
 using JetBrains.ReSharper.PsiGen.Util;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Threading;
@@ -17,15 +18,20 @@ namespace JetBrains.ReSharper.Psi.FSharp.ProjectOptions
   public class FSharpProjectOptionsProvider
   {
     private readonly ISolution mySolution;
+    private readonly IDaemonSuspender myDaemonSuspender;
     private readonly FSharpProjectOptionsBuilder myProjectOptionsBuilder;
     private readonly FSharpCheckerService myFSharpCheckerService;
     private readonly GroupingEvent myUpdateEvent;
+    private IDisposable myDaemonSuspendedDisposable;
+
     private readonly HashSet<IProject> myProjectsToUpdate = new HashSet<IProject>();
 
-    public FSharpProjectOptionsProvider(Lifetime lifetime, ISolution solution, ChangeManager changeManager,
-      FSharpCheckerService fSharpCheckerService, FSharpProjectOptionsBuilder projectOptionsBuilder)
+    public FSharpProjectOptionsProvider(Lifetime lifetime, ISolution solution, IDaemonSuspender daemonSuspender,
+      ChangeManager changeManager, FSharpCheckerService fSharpCheckerService,
+      FSharpProjectOptionsBuilder projectOptionsBuilder)
     {
       mySolution = solution;
+      myDaemonSuspender = daemonSuspender;
       myProjectOptionsBuilder = projectOptionsBuilder;
       myFSharpCheckerService = fSharpCheckerService;
       myUpdateEvent = solution.Locks.GroupingEvents.CreateEvent(lifetime, "updateFSharpProjects",
@@ -70,6 +76,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.ProjectOptions
         }
         myProjectsToUpdate.Clear();
       }
+      if (!myUpdateEvent.IsWaiting())
+      {
+        myDaemonSuspendedDisposable.Dispose();
+        myDaemonSuspendedDisposable = null;
+      }
     }
 
     private void ProcessChange(ChangeEventArgs obj)
@@ -88,9 +99,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.ProjectOptions
         {
           if (change.IsRemoved)
           {
-            myFSharpCheckerService.RemoveProject(project.Guid);
+            myFSharpCheckerService.RemoveProject(project.Guid); // todo: referenced projects
             return;
           }
+          if (myDaemonSuspendedDisposable == null)
+            myDaemonSuspendedDisposable = myDaemonSuspender.Suspend();
           myProjectsToUpdate.Add(project);
           myUpdateEvent.FireIncoming();
         }
