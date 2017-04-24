@@ -131,6 +131,11 @@ namespace JetBrains.ReSharper.Psi.FSharp
     [CanBeNull]
     private FSharpProjectOptions GetProjectOptions([NotNull] IPsiSourceFile sourceFile, bool tryUpdate = false)
     {
+      var projectFile = sourceFile.ToProjectFile();
+      if (projectFile != null && !projectFile.Properties.BuildAction.IsCompile() &&
+          !Equals(projectFile.LanguageType, FSharpScriptProjectFileType.Instance))
+        return null;
+
       if (sourceFile.LanguageType.Equals(FSharpScriptProjectFileType.Instance))
         return GetScriptOptions(sourceFile, tryUpdate);
       var project = sourceFile.GetProject();
