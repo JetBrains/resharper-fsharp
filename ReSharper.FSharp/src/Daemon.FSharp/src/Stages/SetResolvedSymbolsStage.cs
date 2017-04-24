@@ -60,7 +60,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
         var highlightingId = symbol.GetHighlightingAttributeId();
         var tokenType = token.GetTokenType();
         if ((tokenType == FSharpTokenType.GREATER || tokenType == FSharpTokenType.GREATER_RBRACK)
-            && !FSharpSymbolsUtil.IsOpGreaterThan(symbol))
+            && !symbol.IsOpGreaterThan())
           continue; // found usage of generic symbol with specified type parameter
 
         if (symbolUse.IsFromDefinition)
@@ -68,6 +68,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
           var declaration = FindDeclaration(symbol, token);
           if (declaration != null)
           {
+            shouldHighlight |= declaration.Symbol == null;
             declaration.Symbol = symbol;
             if (shouldHighlight)
               highlightings.Add(CreateHighlighting(token, highlightingId));

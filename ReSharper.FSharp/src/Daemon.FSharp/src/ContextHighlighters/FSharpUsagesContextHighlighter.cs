@@ -71,7 +71,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.ContextHighlighters
 
         var tokenType = usageToken.GetTokenType();
         if ((tokenType == FSharpTokenType.GREATER || tokenType == FSharpTokenType.GREATER_RBRACK)
-            && !FSharpSymbolsUtil.IsOpGreaterThan(symbol))
+            && !symbol.IsOpGreaterThan())
           continue; // found usage of generic symbol with specified type parameter
 
         consumer.ConsumeHighlighting(HighlightingId, usageToken.GetDocumentRange());
