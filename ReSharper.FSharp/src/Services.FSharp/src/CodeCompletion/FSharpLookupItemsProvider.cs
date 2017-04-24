@@ -39,7 +39,7 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
         var symbol = overloadsGroup.Head.Symbol;
         bool isEscaped;
         var lookupText = GetLookupText(symbol, IsInAttributeList(fsFile, context), out isEscaped);
-        var lookupItem = new FSharpLookupItem(lookupText, symbol.GetIconId(), isEscaped);
+        var lookupItem = new FSharpLookupItem(lookupText, symbol.GetIconId(), isEscaped, symbol.IsParam());
         lookupItem.InitializeRanges(GetDefaultRanges(context), context.BasicContext);
         collector.Add(lookupItem);
       }

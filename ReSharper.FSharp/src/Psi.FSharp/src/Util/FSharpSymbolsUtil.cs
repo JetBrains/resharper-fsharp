@@ -41,10 +41,15 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       }
     }
 
-    public static bool IsOpGreaterThan(FSharpSymbol symbol)
+    public static bool IsOpGreaterThan([NotNull] this FSharpSymbol symbol)
     {
       var mfv = symbol as FSharpMemberOrFunctionOrValue;
       return mfv?.CompiledName == "op_GreaterThan";
+    }
+
+    public static bool IsParam([NotNull] this FSharpSymbol symbol)
+    {
+      return symbol is FSharpParameter;
     }
 
     [CanBeNull]
