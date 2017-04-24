@@ -82,13 +82,13 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
         return null;
 
       var entity = symbol as FSharpEntity;
-      if (entity != null)
+      if (entity != null && !entity.IsUnresolved)
         return entity.IsNamespace
           ? (IClrDeclaredElement) GetDeclaredNamespace(entity, psiModule)
           : GetTypeElement(entity, psiModule);
 
       var mfv = symbol as FSharpMemberOrFunctionOrValue;
-      if (mfv != null)
+      if (mfv != null && !mfv.IsUnresolved)
       {
         if (!mfv.IsModuleValueOrMember && fsFile != null)
           return FindLocalDeclaration(mfv, fsFile);
@@ -123,7 +123,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       }
 
       var unionCase = symbol as FSharpUnionCase;
-      if (unionCase != null)
+      if (unionCase != null && unionCase.IsUnresolved)
       {
         var unionType = unionCase.ReturnType;
         Assertion.AssertNotNull(unionType, "unionType != null");
@@ -145,7 +145,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       }
 
       var field = symbol as FSharpField;
-      if (field != null)
+      if (field != null && field.IsUnresolved)
       {
         var typeElement = GetTypeElement(field.DeclaringEntity, psiModule);
         return typeElement?.EnumerateMembers(field.Name, true).FirstOrDefault();
