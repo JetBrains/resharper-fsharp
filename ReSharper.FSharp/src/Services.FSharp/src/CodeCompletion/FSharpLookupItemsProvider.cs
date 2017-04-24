@@ -61,10 +61,20 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
     private static string GetLookupText([NotNull] FSharpSymbol symbol, bool isAttrApplication, out bool isEscaped)
     {
       var entity = symbol as FSharpEntity;
-      if (entity != null && !entity.IsUnresolved && entity.IsAttributeType && isAttrApplication)
+      if (entity != null && !entity.IsUnresolved && isAttrApplication)
       {
-        isEscaped = false;
-        return entity.CompiledName.SubstringBeforeLast("Attribute");
+        try
+        {
+          if (entity.IsAttributeType)
+          {
+            isEscaped = false;
+            return entity.CompiledName.SubstringBeforeLast("Attribute");
+          }
+        }
+        catch
+        {
+          // ignored
+        }
       }
       var mfv = symbol as FSharpMemberOrFunctionOrValue;
       if (mfv != null && PrettyNaming.IsOperatorName(symbol.DisplayName))
