@@ -2,7 +2,7 @@
   <name>F# Support</name>
   <id>com.jetbrains.rider.fsharp</id>
   <vendor url="https://jetbrains.com">JetBrains</vendor>
-  <description>F#/FSharp language support in Rider</description>
+  <description>F# language support in Rider</description>
   <change-notes />
 
   <version>SNAPSHOT</version>
@@ -11,16 +11,18 @@
   <depends>com.intellij.modules.rider</depends>
   <extensions defaultExtensionNs="com.intellij">
     <fileTypeFactory id="F#" implementation="com.jetbrains.resharper.ideaInterop.fileTypes.fsharp.FSharpFileTypeFactory" />
+    <rider.ProjectTypesProvider implementation="com.jetbrains.resharper.projectView.projectTypes.FSharpProjectTypeProvider" />
     <lang.parserDefinition language="F#" implementationClass="com.jetbrains.resharper.ideaInterop.fileTypes.fsharp.FSharpParserDefinition" />
     <lang.ast.factory language="F#" implementationClass="com.jetbrains.resharper.ideaInterop.fileTypes.fsharp.FSharpAstFactory" />
+
+    <backend.actions.support language="F#" implementationClass="com.jetbrains.resharper.actions.RiderActionSupportPolicy" />
+    <backend.markup.adapterFactory language="F#" implementationClass="com.jetbrains.resharper.daemon.RiderMarkupAdapterFactory" />
     <backend.typedHandler language="F#" implementationClass="com.jetbrains.resharper.editorActions.FSharpTypedHandler" />
     <completion.contributor language="F#" implementationClass="com.jetbrains.resharper.completion.ReSharperCompletionContributor" />
-    <backend.markup.adapterFactory language="F#" implementationClass="com.jetbrains.resharper.daemon.RiderMarkupAdapterFactory" />
-    <backend.actions.support language="F#" implementationClass="com.jetbrains.resharper.actions.RiderActionSupportPolicy" />
+    <codeInsight.parameterInfo language="F#" implementationClass="com.jetbrains.resharper.parameterInfo.RiderParameterInfoHandler" />
 
     <directoryProjectGenerator implementation="com.jetbrains.resharper.projectView.projectGenerators.FSharpLibrary" />
     <directoryProjectGenerator implementation="com.jetbrains.resharper.projectView.projectGenerators.FSharpConsoleApplication" />
 
-    <rider.ProjectTypesProvider implementation="com.jetbrains.resharper.projectView.projectTypes.FSharpProjectTypeProvider" />
   </extensions>
 </idea-plugin>

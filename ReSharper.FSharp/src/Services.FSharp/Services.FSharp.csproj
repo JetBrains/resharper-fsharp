@@ -402,6 +402,11 @@
     <Compile Include="src\Comment\FSharpLineCommentActionProvider.cs" />
     <Compile Include="src\Debugger\FSharpBreakpointVariantsProvider.cs" />
     <Compile Include="src\FSharpClrLanguage.cs" />
+    <Compile Include="src\ParameterInfo\FSharpParameterInfoCandidate.cs" />
+    <Compile Include="src\ParameterInfo\FSharpParameterInfoCandidateBase.cs" />
+    <Compile Include="src\ParameterInfo\FSharpParameterInfoContext.cs" />
+    <Compile Include="src\ParameterInfo\FSharpParameterInfoContextFactory.cs" />
+    <Compile Include="src\ParameterInfo\FSharpTypeArgumentCandidate.cs" />
     <Compile Include="src\TypingAssist\FSharpTypingAssist.cs" />
     <Compile Include="ZoneMarker.cs" />
   </ItemGroup>
