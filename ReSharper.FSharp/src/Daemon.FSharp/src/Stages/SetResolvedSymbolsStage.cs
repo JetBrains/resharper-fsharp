@@ -69,7 +69,8 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
           if (declaration != null)
           {
             shouldHighlight |= declaration.Symbol == null;
-            declaration.Symbol = symbol;
+            if (declaration.Symbol == null || ShouldReplaceSymbol(declaration.Symbol, symbol))
+              declaration.Symbol = symbol;
             if (shouldHighlight)
               highlightings.Add(CreateHighlighting(token, highlightingId));
           }
@@ -82,7 +83,8 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
         if (parentDeclaration != null && parentDeclaration.GetNameRange() == token.GetTreeTextRange())
           continue;
 
-        token.FSharpSymbol = symbol;
+        if (token.FSharpSymbol == null || ShouldReplaceSymbol(token.FSharpSymbol, symbol))
+          token.FSharpSymbol = symbol;
         if (shouldHighlight)
           highlightings.Add(CreateHighlighting(token, highlightingId));
 
@@ -90,6 +92,16 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
       }
       myFsFile.ReferencesResolved = true;
       committer(new DaemonStageResult(highlightings));
+    }
+
+    private static bool ShouldReplaceSymbol(FSharpSymbol setSymbol, FSharpSymbol newSymbol)
+    {
+      var setEntity = setSymbol as FSharpEntity;
+      var newMfv = newSymbol as FSharpMemberOrFunctionOrValue;
+      if (setEntity != null && newMfv != null && (newMfv.IsConstructor || newMfv.IsImplicitConstructor))
+        return false;
+
+      return true;
     }
 
     [CanBeNull]
