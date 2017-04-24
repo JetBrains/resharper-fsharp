@@ -47,9 +47,9 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
       return true;
     }
 
-    private static bool IsInAttributeList([NotNull] IFSharpFile fsFile, FSharpCodeCompletionContext context)
+    private static bool IsInAttributeList([NotNull] IFSharpFile fsFile, [NotNull] FSharpCodeCompletionContext context)
     {
-      if (context.TokenAtCaret.GetNextMeaningfulToken(true)?.GetTokenType() == FSharpTokenType.GREATER_RBRACK)
+      if (context.TokenAtCaret?.GetNextMeaningfulToken(true)?.GetTokenType() == FSharpTokenType.GREATER_RBRACK)
         return true;
 
       var fsCompletionContext = UntypedParseImpl.TryGetCompletionContext(context.Coords.GetPos(),
