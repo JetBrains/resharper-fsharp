@@ -6,6 +6,7 @@ using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
+using JetBrains.Util.Extension;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
@@ -29,13 +30,22 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
       {
         // todo: overloads
         var entity = mfv.EnclosingEntity;
-        var members = entity.MembersFunctionsAndValues.Where(m => m.LogicalName == mfv.LogicalName).AsList();
-        var hasAbstract = members.Any(m => m.IsDispatchSlot);
-        var hasDefault = members.Any(m => m.IsOverrideOrExplicitInterfaceImplementation);
+        if (entity.QualifiedName.SubstringBefore(",") != declaration.GetContainingTypeDeclaration()?.CLRName)
+        {
+          IsOverride = true;
+          IsAbstract = false;
+          IsVirtual = false;
+        }
+        else
+        {
+          var members = entity.MembersFunctionsAndValues.Where(m => m.LogicalName == mfv.LogicalName).AsList();
+          var hasAbstract = members.Any(m => m.IsDispatchSlot);
+          var hasDefault = members.Any(m => m.IsOverrideOrExplicitInterfaceImplementation);
 
-        IsOverride = mfv.IsOverrideOrExplicitInterfaceImplementation;
-        IsVirtual = hasAbstract && hasDefault;
-        IsAbstract = mfv.IsDispatchSlot && !hasDefault;
+          IsOverride = mfv.IsOverrideOrExplicitInterfaceImplementation;
+          IsVirtual = hasAbstract && hasDefault;
+          IsAbstract = mfv.IsDispatchSlot && !hasDefault;
+        }
       }
 
       IsStatic = !mfv?.IsInstanceMember ?? false;
