@@ -6,7 +6,6 @@ using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
-using JetBrains.Util.DataStructures;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
@@ -20,32 +19,26 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
     protected FSharpMemberBase([NotNull] ITypeMemberDeclaration declaration,
       [CanBeNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration)
     {
-      if (mfv == null)
+      if (mfv == null || !mfv.IsMember)
       {
-        IsStatic = false;
         IsOverride = false;
         IsVirtual = false;
         IsAbstract = false;
       }
       else
       {
-        if (mfv.IsProperty || mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod)
-        {
-        }
+        // todo: overloads
+        var entity = mfv.EnclosingEntity;
+        var members = entity.MembersFunctionsAndValues.Where(m => m.LogicalName == mfv.LogicalName).AsList();
+        var hasAbstract = members.Any(m => m.IsDispatchSlot);
+        var hasDefault = members.Any(m => m.IsOverrideOrExplicitInterfaceImplementation);
 
-        var members = mfv.EnclosingEntity.MembersFunctionsAndValues;
-        var hasAbstract = members.Any(m => m.LogicalName == mfv.LogicalName && m.IsDispatchSlot);
-        var hasDefault = members.Any(m => m.LogicalName == mfv.LogicalName &&
-                                          m.IsOverrideOrExplicitInterfaceImplementation);
-        var isOverride = mfv.IsOverrideOrExplicitInterfaceImplementation;
-        var isAbstract = mfv.IsDispatchSlot;
-
-        IsStatic = !mfv.IsInstanceMember;
-        IsOverride = isOverride;
+        IsOverride = mfv.IsOverrideOrExplicitInterfaceImplementation;
         IsVirtual = hasAbstract && hasDefault;
-        IsAbstract = isAbstract && !hasDefault;
+        IsAbstract = mfv.IsDispatchSlot && !hasDefault;
       }
 
+      IsStatic = !mfv?.IsInstanceMember ?? false;
 
       var accessibility = mfv?.Accessibility;
       if (accessibility == null)
