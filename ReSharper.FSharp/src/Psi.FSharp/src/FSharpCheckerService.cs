@@ -1,16 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Threading;
 using JetBrains.Annotations;
 using JetBrains.Application;
+using JetBrains.Application.Threading;
+using JetBrains.Application.Threading.Tasks;
 using JetBrains.DataFlow;
 using JetBrains.Platform.ProjectModel.FSharp;
+using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Daemon.Impl;
 using JetBrains.ReSharper.Feature.Services;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.Util;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
+using Microsoft.FSharp.Control;
 using Microsoft.FSharp.Core;
 
 namespace JetBrains.ReSharper.Psi.FSharp
@@ -22,6 +28,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
   [ShellComponent]
   public class FSharpCheckerService
   {
+    private readonly Lifetime myLifetime;
     private readonly FSharpChecker myChecker;
 
     private readonly bool myIsRunningOnMono; // this should be removed when Rider's bundled mono is able to call msbuild
@@ -36,8 +43,18 @@ namespace JetBrains.ReSharper.Psi.FSharp
     private readonly Dictionary<string, int> myFilesVersions =
       new Dictionary<string, int>(); // todo: clean it up when removing project containing file
 
-    public FSharpCheckerService(Lifetime lifetime, OnSolutionCloseNotifier onSolutionCloseNotifier)
+    private readonly Dictionary<string, FSharpProjectOptions> myScriptOptions =
+      new Dictionary<string, FSharpProjectOptions>();
+
+    private CancellationTokenSource myCancellationTokenSource;
+    private readonly ITaskHost myTaskHost;
+
+    public FSharpCheckerService(Lifetime lifetime, OnSolutionCloseNotifier onSolutionCloseNotifier,
+      ShellLocks shellLocks)
     {
+      myLifetime = lifetime;
+      myTaskHost = shellLocks.Tasks;
+
       myIsRunningOnMono = PlatformUtil.IsRunningOnMono;
 
       myChecker = FSharpChecker.Create(
@@ -64,18 +81,21 @@ namespace JetBrains.ReSharper.Psi.FSharp
     [CanBeNull]
     public FSharpCheckFileResults GetPreviousCheckResults([NotNull] IPsiSourceFile sourceFile)
     {
-      var projectOptions = GetProjectOptions(sourceFile);
-      if (projectOptions == null)
-        return null;
+      var filePath = sourceFile.GetLocation().FullPath;
+      var projectOptions =
+        Equals(sourceFile.LanguageType, FSharpScriptProjectFileType.Instance)
+          ? myScriptOptions.GetValueSafe(filePath)
+          : GetProjectOptions(sourceFile);
 
-      var filename = sourceFile.GetLocation().FullPath;
-      return myChecker.TryGetRecentCheckResultsForFile(filename, projectOptions, null)?.Value.Item2;
+      return projectOptions != null
+        ? myChecker.TryGetRecentCheckResultsForFile(filePath, projectOptions, null)?.Value.Item2
+        : null;
     }
 
     [CanBeNull]
     public FSharpOption<FSharpParseFileResults> ParseFSharpFile([NotNull] IPsiSourceFile sourceFile)
     {
-      var projectOptions = GetProjectOptions(sourceFile);
+      var projectOptions = GetProjectOptions(sourceFile, true);
       if (projectOptions == null)
         return null;
 
@@ -109,51 +129,90 @@ namespace JetBrains.ReSharper.Psi.FSharp
     }
 
     [CanBeNull]
-    private FSharpProjectOptions GetProjectOptions([NotNull] IPsiSourceFile sourceFile)
+    private FSharpProjectOptions GetProjectOptions([NotNull] IPsiSourceFile sourceFile, bool tryUpdate = false)
     {
       if (sourceFile.LanguageType.Equals(FSharpScriptProjectFileType.Instance))
-        return GetScriptOptions(sourceFile);
+        return GetScriptOptions(sourceFile, tryUpdate);
       var project = sourceFile.GetProject();
-      return (project != null ? myProjectsOptions.GetValueSafe(project.Guid) : null) ?? GetScriptOptions(sourceFile);
+      return (project != null ? myProjectsOptions.GetValueSafe(project.Guid) : null) ??
+             GetScriptOptions(sourceFile, tryUpdate);
     }
 
     [CanBeNull]
-    private FSharpProjectOptions GetScriptOptions([NotNull] IPsiSourceFile sourceFile)
+    private FSharpProjectOptions GetScriptOptions([NotNull] IPsiSourceFile sourceFile, bool shouldTryUpdate = false)
     {
       var filePath = sourceFile.GetLocation().FullPath;
       var source = sourceFile.Document.GetText();
       var loadTime = FSharpOption<DateTime>.Some(DateTime.Now);
-
       var getScriptOptionsAsync =
         myChecker.GetProjectOptionsFromScript(filePath, source, loadTime, otherFlags: null, useFsiAuxLib: null,
           assumeDotNetFramework: null, extraProjectInfo: null);
-      try
-      {
-        var scriptOptionsAndErrors = getScriptOptionsAsync.RunAsTask();
-        Assertion.AssertNotNull(scriptOptionsAndErrors, "scriptOptions != null");
 
-        var options = scriptOptionsAndErrors.Item1;
-        if (!myIsRunningOnMono || myFSharpCorePath == null)
+      if (!myScriptOptions.ContainsKey(filePath))
+      {
+        try
+        {
+          var scriptOptionsAndErrors = getScriptOptionsAsync.RunAsTask();
+          var options = FixOptions(scriptOptionsAndErrors?.Item1);
+          if (options == null) return null;
+
+          myScriptOptions[filePath] = options;
           return options;
+        }
+        catch (Exception)
+        {
+          // Error while resolving assemblies
+          // todo: replace FCS reference resolver
+          return null;
+        }
+      }
 
-        return new FSharpProjectOptions(
-          options.ProjectFileName,
-          options.ProjectFileNames,
-          ArrayModule.Append(options.OtherOptions, new[] {myFSharpCorePath}),
-          options.ReferencedProjects,
-          options.IsIncompleteTypeCheckEnvironment,
-          options.UseScriptResolutionRules,
-          options.LoadTime,
-          options.UnresolvedReferences,
-          options.OriginalLoadReferences,
-          options.ExtraProjectInfo);
-      }
-      catch (Exception)
+      var existingOptions = myScriptOptions[filePath];
+      if (!shouldTryUpdate)
+        return existingOptions;
+
+      myCancellationTokenSource?.Cancel();
+      myCancellationTokenSource = new CancellationTokenSource();
+      myTaskHost.StartNew(myLifetime, Scheduling.FreeThreaded, () =>
       {
-        // Error while resolving assemblies
-        // todo: replace FCS reference resolver
-        return null;
-      }
+        try
+        {
+          var cancellationToken = FSharpOption<CancellationToken>.Some(myCancellationTokenSource.Token);
+          var optionsAndErrors = FSharpAsync.RunSynchronously(getScriptOptionsAsync, null, cancellationToken);
+          var options = FixOptions(optionsAndErrors?.Item1);
+          if (options != null && !ArrayUtil.Equals(options.OtherOptions, existingOptions.OtherOptions))
+          {
+            myScriptOptions[filePath] = options;
+            sourceFile.GetSolution().GetComponent<DaemonImpl>().Invalidate();
+          }
+          myCancellationTokenSource = null;
+        }
+        catch (Exception)
+        {
+          // Error while resolving assemblies
+          // todo: replace FCS reference resolver
+        }
+      });
+      return existingOptions;
+    }
+
+    [CanBeNull]
+    private FSharpProjectOptions FixOptions([CanBeNull] FSharpProjectOptions options)
+    {
+      if (options == null || !myIsRunningOnMono || myFSharpCorePath == null)
+        return options;
+
+      return new FSharpProjectOptions(
+        options.ProjectFileName,
+        options.ProjectFileNames,
+        ArrayModule.Append(options.OtherOptions, new[] {myFSharpCorePath}),
+        options.ReferencedProjects,
+        options.IsIncompleteTypeCheckEnvironment,
+        options.UseScriptResolutionRules,
+        options.LoadTime,
+        options.UnresolvedReferences,
+        options.OriginalLoadReferences,
+        options.ExtraProjectInfo);
     }
 
     [NotNull]

@@ -1,8 +1,9 @@
 ﻿namespace JetBrains.ReSharper.Psi.FSharp.Parsing
 
+open JetBrains.DataFlow
+open JetBrains.Platform.ProjectModel.FSharp
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Parsing
-open JetBrains.DataFlow
 open JetBrains.ReSharper.Psi.FSharp
 open JetBrains.ReSharper.Psi.FSharp.Tree
 open JetBrains.ReSharper.Psi.Modules
@@ -22,7 +23,8 @@ type FSharpParser(file : IPsiSourceFile, checkerService : FSharpCheckerService, 
         match parseResults with
         | Some results ->
             let parseTree = results.ParseTree
-            match file.PsiModule.IsMiscFilesProjectModule(), parseTree with
+            let isScript = file.LanguageType.Equals(FSharpScriptProjectFileType.Instance)
+            match not isScript && file.PsiModule.IsMiscFilesProjectModule(), parseTree with
             | false, Some (ParsedInput.ImplFile (_)) ->
                 FSharpImplTreeBuilder(file, lexer, parseTree, lifetime, logger) :> FSharpTreeBuilderBase
             | false, Some (ParsedInput.SigFile (_)) ->
