@@ -59,49 +59,57 @@ type FSharpImplTreeBuilder(file, lexer, parseTree, lifetime, logger : ILogger) =
             x.Done(mark, ElementType.OTHER_MEMBER_DECLARATION)
 
     member internal x.ProcessType (TypeDefn(ComponentInfo(attrs, typeParams,_,lid,_,_,_,_), repr, members, range)) =
-        let mark = x.StartType attrs typeParams lid range
-
-        let elementType =
+        let shouldProcess =
             match repr with
-            | SynTypeDefnRepr.Simple(simpleRepr, _) ->
-                match simpleRepr with
-                | SynTypeDefnSimpleRepr.Record(_,fields,_) ->
-                    for field in fields do
-                        x.ProcessField field
-                    ElementType.F_SHARP_RECORD_DECLARATION
+            | SynTypeDefnRepr.ObjectModel(SynTypeDefnKind.TyconAugmentation,_,_) -> false
+            | _ -> true
 
-                | SynTypeDefnSimpleRepr.Enum(enumCases,_) ->
-                    for case in enumCases do
-                        x.ProcessEnumCase case
-                    ElementType.F_SHARP_ENUM_DECLARATION
+        if not shouldProcess then
+            for m in members do x.ProcessTypeMember m
+        else
+            let mark = x.StartType attrs typeParams lid range
 
-                | SynTypeDefnSimpleRepr.Union(_,cases,_) ->
-                    for case in cases do
-                        x.ProcessUnionCase case
-                    ElementType.F_SHARP_UNION_DECLARATION
+            let elementType =
+                match repr with
+                | SynTypeDefnRepr.Simple(simpleRepr, _) ->
+                    match simpleRepr with
+                    | SynTypeDefnSimpleRepr.Record(_,fields,_) ->
+                        for field in fields do
+                            x.ProcessField field
+                        ElementType.F_SHARP_RECORD_DECLARATION
 
-                | SynTypeDefnSimpleRepr.TypeAbbrev(_) ->
-                    ElementType.F_SHARP_TYPE_ABBREVIATION_DECLARATION
+                    | SynTypeDefnSimpleRepr.Enum(enumCases,_) ->
+                        for case in enumCases do
+                            x.ProcessEnumCase case
+                        ElementType.F_SHARP_ENUM_DECLARATION
 
-                | SynTypeDefnSimpleRepr.None(_) ->
-                    ElementType.F_SHARP_ABSTRACT_TYPE_DECLARATION
+                    | SynTypeDefnSimpleRepr.Union(_,cases,_) ->
+                        for case in cases do
+                            x.ProcessUnionCase case
+                        ElementType.F_SHARP_UNION_DECLARATION
 
-                | _ -> ElementType.F_SHARP_OTHER_SIMPLE_TYPE_DECLARATION
+                    | SynTypeDefnSimpleRepr.TypeAbbrev(_) ->
+                        ElementType.F_SHARP_TYPE_ABBREVIATION_DECLARATION
 
-            | SynTypeDefnRepr.Exception(_) ->
-                ElementType.F_SHARP_EXCEPTION_DECLARATION
+                    | SynTypeDefnSimpleRepr.None(_) ->
+                        ElementType.F_SHARP_ABSTRACT_TYPE_DECLARATION
 
-            | SynTypeDefnRepr.ObjectModel(kind, members, _) ->
-                for m in members do x.ProcessTypeMember m
-                match kind with
-                | TyconClass -> ElementType.F_SHARP_CLASS_DECLARATION
-                | TyconInterface -> ElementType.F_SHARP_INTERFACE_DECLARATION
-                | TyconStruct -> ElementType.F_SHARP_STRUCT_DECLARATION
-                | _ -> ElementType.F_SHARP_OBJECT_TYPE_DECLARATION
+                    | _ -> ElementType.F_SHARP_OTHER_SIMPLE_TYPE_DECLARATION
 
-        for m in members do x.ProcessTypeMember m
-        range |> x.GetEndOffset |> x.AdvanceToOffset
-        x.Done(mark, elementType)
+                | SynTypeDefnRepr.Exception(_) ->
+                    ElementType.F_SHARP_EXCEPTION_DECLARATION
+
+                | SynTypeDefnRepr.ObjectModel(kind, members, _) ->
+                    for m in members do x.ProcessTypeMember m
+                    match kind with
+                    | TyconClass -> ElementType.F_SHARP_CLASS_DECLARATION
+                    | TyconInterface -> ElementType.F_SHARP_INTERFACE_DECLARATION
+                    | TyconStruct -> ElementType.F_SHARP_STRUCT_DECLARATION
+                    | _ -> ElementType.F_SHARP_OBJECT_TYPE_DECLARATION
+
+            for m in members do x.ProcessTypeMember m
+            range |> x.GetEndOffset |> x.AdvanceToOffset
+            x.Done(mark, elementType)
 
     member internal x.ProcessModuleLetPat (pat : SynPat) (attrs : SynAttributes) =
         match pat with

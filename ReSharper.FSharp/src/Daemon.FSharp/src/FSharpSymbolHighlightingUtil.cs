@@ -28,7 +28,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp
       if (mfv.IsImplicitConstructor || name == ClrConstructorName || name == FSharpConstructorName)
         return HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE;
 
-      if (mfv.IsMember && !mfv.EnclosingEntity.IsFSharpModule)
+      if (mfv.IsMember && (!mfv.EnclosingEntity.IsFSharpModule || mfv.IsExtensionMember))
         return mfv.IsProperty || mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod
           ? HighlightingAttributeIds.FIELD_IDENTIFIER_ATTRIBUTE
           : HighlightingAttributeIds.METHOD_IDENTIFIER_ATTRIBUTE;

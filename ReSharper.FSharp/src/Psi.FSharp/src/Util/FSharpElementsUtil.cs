@@ -114,7 +114,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
         var typeParameters = typeElement.GetAllTypeParameters().ToIList();
         var members = mfv.IsConstructor
           ? typeElement.Constructors
-          : typeElement.EnumerateMembers(mfv.CompiledName, true);
+          : typeElement.EnumerateMembers(mfv.GetMemberCompiledName(), true);
 
         var member = members.FirstOrDefault(m => SameParameters(m, fsMember, typeParameters, psiModule));
         return member ??
