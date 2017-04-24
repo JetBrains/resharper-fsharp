@@ -3,6 +3,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
+using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.Util;
 using JetBrains.Util.Extension;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
@@ -104,6 +105,13 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
         var compilationRepr = GetAttributeValue(attrOwner, CompilationRepresentationAttr) as int?;
         if (CompilationRepresentationFlags.ModuleSuffix.Equals(compilationRepr))
           names.Add(element.ShortName.SubstringBeforeLast(ModuleSuffix));
+      }
+
+      foreach (var declaration in element.GetDeclarations())
+      {
+        var fsDeclaration = declaration as IFSharpDeclaration;
+        if (fsDeclaration != null)
+          names.Add(fsDeclaration.SourceName);
       }
 
       // todo: type abbreviations

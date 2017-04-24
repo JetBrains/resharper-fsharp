@@ -11,6 +11,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
   {
     public FSharpSymbol Symbol { get; set; }
     public virtual string ShortName => DeclaredName;
+    public virtual string SourceName => DeclaredName;
 
     public virtual FSharpSymbol GetFSharpSymbol()
     {

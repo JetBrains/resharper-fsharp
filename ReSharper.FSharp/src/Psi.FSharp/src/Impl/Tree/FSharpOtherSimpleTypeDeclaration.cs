@@ -2,7 +2,8 @@
 {
   internal partial class FSharpOtherSimpleTypeDeclaration
   {
-    public override string DeclaredName => FSharpImplUtil.GetName(Identifier, Attributes);
+    public override string DeclaredName => FSharpImplUtil.GetCompiledName(Identifier, Attributes);
+    public override string SourceName => FSharpImplUtil.GetSourceName(Identifier);
 
     public override TreeTextRange GetNameRange()
     {

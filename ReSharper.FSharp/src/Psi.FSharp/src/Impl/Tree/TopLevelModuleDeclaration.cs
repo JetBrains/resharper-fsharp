@@ -5,7 +5,11 @@
     public override string DeclaredName => LongIdentifier.QualifiedName;
 
     public override string ShortName => !LongIdentifier.IdentifiersEnumerable.IsEmpty()
-      ? LongIdentifier.Name
+      ? FSharpImplUtil.GetCompiledName(LongIdentifier, Attributes)
+      : GetSourceFile().GetLocation().NameWithoutExtension;
+
+    public override string SourceName => !LongIdentifier.IdentifiersEnumerable.IsEmpty()
+      ? FSharpImplUtil.GetSourceName(LongIdentifier)
       : GetSourceFile().GetLocation().NameWithoutExtension;
 
     public bool IsModule => true;

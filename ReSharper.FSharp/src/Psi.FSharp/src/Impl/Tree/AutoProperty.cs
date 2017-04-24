@@ -6,7 +6,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 {
   internal partial class AutoProperty
   {
-    public override string DeclaredName => FSharpImplUtil.GetName(Identifier, Attributes);
+    public override string DeclaredName => FSharpImplUtil.GetCompiledName(Identifier, Attributes);
 
     public override TreeTextRange GetNameRange()
     {

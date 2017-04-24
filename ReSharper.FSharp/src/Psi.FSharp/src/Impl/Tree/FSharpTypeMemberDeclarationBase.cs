@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
@@ -20,9 +21,14 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       set { myCachedDeclaredElement = value; }
     }
 
-    public ITypeDeclaration GetContainingTypeDeclaration()
+    public IFSharpTypeElementDeclaration GetContainingTypeDeclaration()
     {
-      return GetContainingNode<ITypeDeclaration>();
+      return GetContainingNode<IFSharpTypeElementDeclaration>();
+    }
+
+    ITypeDeclaration ITypeMemberDeclaration.GetContainingTypeDeclaration()
+    {
+      return GetContainingTypeDeclaration();
     }
 
     public void SetAbstract(bool value)
@@ -74,7 +80,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 
     public bool IsAbstract => false;
     public bool IsSealed => false;
-    public bool IsVirtual=> false;
+    public bool IsVirtual => false;
     public bool IsOverride => false;
     public bool IsStatic => false;
     public bool IsReadonly => false;

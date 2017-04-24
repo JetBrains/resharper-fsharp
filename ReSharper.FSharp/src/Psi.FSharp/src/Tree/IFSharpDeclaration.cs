@@ -17,5 +17,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Tree
 
     [NotNull]
     string ShortName { get; }
+
+    [NotNull]
+    string SourceName { get; }
   }
 }

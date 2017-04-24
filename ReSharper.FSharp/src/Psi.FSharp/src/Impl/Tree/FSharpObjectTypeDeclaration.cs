@@ -12,7 +12,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
     private const string Sealed = "Sealed";
     private const string Struct = "Struct";
 
-    public override string DeclaredName => FSharpImplUtil.GetName(Identifier, Attributes);
+    public override string DeclaredName => FSharpImplUtil.GetCompiledName(Identifier, Attributes);
+    public override string SourceName => FSharpImplUtil.GetSourceName(Identifier);
 
     public override TreeTextRange GetNameRange()
     {

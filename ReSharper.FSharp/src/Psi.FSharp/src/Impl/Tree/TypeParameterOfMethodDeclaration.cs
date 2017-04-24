@@ -2,7 +2,7 @@
 {
   internal partial class TypeParameterOfMethodDeclaration
   {
-    public override string DeclaredName => FSharpImplUtil.GetName(Identifier, Attributes);
+    public override string DeclaredName => FSharpImplUtil.GetCompiledName(Identifier, Attributes);
 
     public override TreeTextRange GetNameRange()
     {

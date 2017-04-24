@@ -35,7 +35,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
     }
 
     [NotNull]
-    public static string GetName([CanBeNull] IFSharpIdentifier identifier,
+    public static string GetCompiledName([CanBeNull] IIdentifier identifier,
       TreeNodeCollection<IFSharpAttribute> attributes)
     {
       var hasModuleSuffix = false;
@@ -57,6 +57,12 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
       var sourceName = identifier?.Name;
       var compiledName = hasModuleSuffix && sourceName != null ? sourceName + "Module" : sourceName;
       return compiledName ?? SharedImplUtil.MISSING_DECLARATION_NAME;
+    }
+
+    [NotNull]
+    public static string GetSourceName([CanBeNull] IIdentifier identifier)
+    {
+      return identifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
     }
 
     public static TreeTextRange GetNameRange([CanBeNull] this IFSharpIdentifier identifier)

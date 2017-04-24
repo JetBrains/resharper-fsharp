@@ -10,6 +10,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
     public override string DeclaredName =>
       GetContainingTypeDeclaration()?.DeclaredName ?? SharedImplUtil.MISSING_DECLARATION_NAME;
 
+    public override string SourceName =>
+      GetContainingTypeDeclaration()?.SourceName ?? SharedImplUtil.MISSING_DECLARATION_NAME;
+
     public override TreeTextRange GetNameRange()
     {
       return NewKeyword.GetTreeTextRange();
