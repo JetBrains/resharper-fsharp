@@ -20,6 +20,9 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
   {
     protected override bool AddLookupItems(FSharpCodeCompletionContext context, GroupedItemsCollector collector)
     {
+      if (!context.ShouldComplete)
+        return false;
+
       var completionContext = context.BasicContext;
       var fsFile = completionContext.File as IFSharpFile;
       Assertion.AssertNotNull(fsFile, "fsFile != null");

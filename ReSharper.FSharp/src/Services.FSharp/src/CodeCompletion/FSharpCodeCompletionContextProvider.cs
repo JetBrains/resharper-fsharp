@@ -1,12 +1,13 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using JetBrains.Annotations;
+using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Impl;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.FSharp.Parsing;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
-using Microsoft.FSharp.Compiler.SourceCodeServices;
-using Microsoft.FSharp.Core;
 using Microsoft.VisualStudio.FSharp.LanguageService;
 
 namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
@@ -29,6 +30,19 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
       var tokenBefore = file.FindTokenAt(caretTreeOffset - 1);
       var tokenBeforeType = tokenBefore?.GetTokenType();
 
+      if (tokenBeforeType == FSharpTokenType.LINE_COMMENT ||
+          tokenBeforeType == FSharpTokenType.DEAD_CODE || token?.GetTokenType() == FSharpTokenType.DEAD_CODE ||
+          token == tokenBefore && tokenBeforeType != null &&
+          (tokenBeforeType.IsComment || tokenBeforeType.IsStringLiteral ||
+           tokenBeforeType.IsConstantLiteral) ||
+          context.SelectedRange.TextRange.Length > 0 ||
+          tokenBefore.GetTreeEndOffset() < caretTreeOffset || token.GetTreeEndOffset() < caretTreeOffset)
+      {
+        var selectedRange = context.SelectedRange.TextRange;
+        return new FSharpCodeCompletionContext(context, new TextLookupRanges(selectedRange, selectedRange),
+          TreeOffset.InvalidOffset, DocumentCoords.Empty, null, null, null, null, false);
+      }
+
       var completedRangeStartOffset =
         tokenBeforeType != null && (tokenBeforeType == FSharpTokenType.IDENTIFIER || tokenBeforeType.IsKeyword)
           ? tokenBefore.GetTreeStartOffset().Offset
@@ -37,7 +51,8 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
       var defaultRanges = GetTextLookupRanges(context, completedRange);
 
       var ranges = ShouldReplace(token)
-        ? defaultRanges.WithReplaceRange(new TextRange(caretOffset, token.GetTreeEndOffset().Offset))
+        ? defaultRanges.WithReplaceRange(new TextRange(caretOffset,
+          Math.Max(token.GetTreeEndOffset().Offset, caretOffset)))
         : defaultRanges;
 
       var document = context.Document;

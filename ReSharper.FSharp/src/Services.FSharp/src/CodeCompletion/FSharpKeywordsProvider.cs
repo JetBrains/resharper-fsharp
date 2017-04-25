@@ -25,11 +25,27 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
 
     protected override bool IsAvailable(FSharpCodeCompletionContext context)
     {
-      return context.TokenBeforeCaret?.GetTokenType() != FSharpTokenType.DOT && base.IsAvailable(context);
+      return true;
     }
 
     protected override bool AddLookupItems(FSharpCodeCompletionContext context, GroupedItemsCollector collector)
     {
+      if (!context.ShouldComplete)
+        return false;
+
+      var tokenType = context.TokenAtCaret?.GetTokenType();
+      var tokenBeforeType = context.TokenBeforeCaret?.GetTokenType();
+      if (tokenBeforeType == FSharpTokenType.LINE_COMMENT ||
+          tokenBeforeType == FSharpTokenType.DEAD_CODE || tokenType == FSharpTokenType.DEAD_CODE)
+        return false;
+
+      if (context.TokenBeforeCaret?.GetTokenType() == FSharpTokenType.DOT)
+        return false;
+
+      if (context.TokenBeforeCaret == context.TokenAtCaret && tokenBeforeType != null &&
+          (tokenBeforeType.IsComment || tokenBeforeType.IsStringLiteral || tokenBeforeType.IsConstantLiteral))
+        return false;
+
       if (!context.Names.Item1.IsEmpty)
         return false;
 
