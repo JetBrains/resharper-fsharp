@@ -93,9 +93,9 @@ namespace JetBrains.ReSharper.Psi.FSharp
     }
 
     [CanBeNull]
-    public FSharpOption<FSharpParseFileResults> ParseFSharpFile([NotNull] IPsiSourceFile sourceFile)
+    public FSharpOption<FSharpParseFileResults> ParseFSharpFile([NotNull] IPsiSourceFile sourceFile,
+      [CanBeNull] FSharpProjectOptions projectOptions)
     {
-      var projectOptions = GetProjectOptions(sourceFile, true);
       if (projectOptions == null)
         return null;
 
@@ -129,7 +129,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
     }
 
     [CanBeNull]
-    private FSharpProjectOptions GetProjectOptions([NotNull] IPsiSourceFile sourceFile, bool tryUpdate = false)
+    public FSharpProjectOptions GetProjectOptions([NotNull] IPsiSourceFile sourceFile, bool tryUpdate = false)
     {
       var projectFile = sourceFile.ToProjectFile();
       if (projectFile != null && !projectFile.Properties.BuildAction.IsCompile() &&

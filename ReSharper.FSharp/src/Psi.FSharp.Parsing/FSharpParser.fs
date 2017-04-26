@@ -19,7 +19,7 @@ type FSharpParser(file : IPsiSourceFile, checkerService : FSharpCheckerService, 
         let filePath = file.GetLocation().FullPath
         logger.LogMessage(LoggingLevel.WARN, sprintf "%s: %s" filePath (StringUtil.Join(messages, "\n")))
 
-    member private x.CreateTreeBuilder lexer (parseResults : FSharpParseFileResults option) lifetime =
+    member private x.CreateTreeBuilder lexer (parseResults : FSharpParseFileResults option) lifetime options =
         match parseResults with
         | Some results ->
             let parseTree = results.ParseTree
@@ -31,22 +31,23 @@ type FSharpParser(file : IPsiSourceFile, checkerService : FSharpCheckerService, 
                 FSharpSigTreeBuilder(file, lexer, parseTree, lifetime, logger) :> FSharpTreeBuilderBase
             | _ ->
                 // FCS could't parse the file, but we still want a correct IFile
-                FSharpFakeTreeBuilder(file, lexer, lifetime, logger) :> FSharpTreeBuilderBase
+                FSharpFakeTreeBuilder(file, lexer, lifetime, logger, options) :> FSharpTreeBuilderBase
         | _ ->
             // We didn't have valid project options
-            FSharpFakeTreeBuilder(file, lexer, lifetime, logger) :> FSharpTreeBuilderBase
+            FSharpFakeTreeBuilder(file, lexer, lifetime, logger, options) :> FSharpTreeBuilderBase
 
     interface IParser with
         member this.ParseFile() =
             use lifetimeDefinition = Lifetimes.Define()
             let lifetime = lifetimeDefinition.Lifetime
-            let parseResults = checkerService.ParseFSharpFile file
+            let projectOptions = checkerService.GetProjectOptions file
+            let parseResults = checkerService.ParseFSharpFile(file, projectOptions)
             if parseResults.IsSome &&  not <| parseResults.Value.Errors.IsEmpty()
                 then this.LogErrors parseResults.Value.Errors
 
             let tokenBuffer = TokenBuffer(FSharpLexer(file.Document, checkerService.GetDefinedConstants file))
             let lexer = tokenBuffer.CreateLexer()
-            let treeBuilder = this.CreateTreeBuilder lexer parseResults lifetime
+            let treeBuilder = this.CreateTreeBuilder lexer parseResults lifetime projectOptions
 
             match treeBuilder.CreateFSharpFile() with
             | :? IFSharpFile as fsFile ->
