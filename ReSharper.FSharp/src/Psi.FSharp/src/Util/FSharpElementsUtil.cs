@@ -123,7 +123,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       }
 
       var unionCase = symbol as FSharpUnionCase;
-      if (unionCase != null && unionCase.IsUnresolved)
+      if (unionCase != null && !unionCase.IsUnresolved)
       {
         var unionType = unionCase.ReturnType;
         Assertion.AssertNotNull(unionType, "unionType != null");
@@ -145,7 +145,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       }
 
       var field = symbol as FSharpField;
-      if (field != null && field.IsUnresolved)
+      if (field != null && !field.IsUnresolved)
       {
         var typeElement = GetTypeElement(field.DeclaringEntity, psiModule);
         return typeElement?.EnumerateMembers(field.Name, true).FirstOrDefault();
