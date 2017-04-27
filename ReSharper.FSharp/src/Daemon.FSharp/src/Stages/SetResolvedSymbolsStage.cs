@@ -115,7 +115,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
         return token.GetContainingNode<IFSharpDeclaration>();
 
       if (symbol is FSharpUnionCase)
-        return token.GetContainingNode<IFSharpUnionCaseDeclaration>();
+        return token.GetContainingNode<IFSharpDeclaration>();
 
       var mfv = symbol as FSharpMemberOrFunctionOrValue;
       if (mfv != null)

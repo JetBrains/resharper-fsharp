@@ -16,12 +16,12 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement.CompilerGenerated
       private readonly ITypeElement myTagsClass;
       private readonly int myIndex;
 
-      public TagField([NotNull] FSharpClassLikeElement<UnionCasePart> containingType, ITypeElement tagsClass, int index)
+      public TagField(string name, [NotNull] IClass containingType, ITypeElement tagsClass, int index)
         : base(containingType)
       {
         myTagsClass = tagsClass;
         myIndex = index;
-        ShortName = containingType.ShortName;
+        ShortName = name;
       }
 
       public override DeclaredElementType GetElementType()
@@ -125,7 +125,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement.CompilerGenerated
         var tags = new LocalList<IField>();
         foreach (var unionCase in myContainingType.Cases)
         {
-          tags.Add(new TagField(unionCase, this, count));
+          tags.Add(new TagField(unionCase.ShortName, this, this, count));
           count++;
         }
         return tags.ResultingList();

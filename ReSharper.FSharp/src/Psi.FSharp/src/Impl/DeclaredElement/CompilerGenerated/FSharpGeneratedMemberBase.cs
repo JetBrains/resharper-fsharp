@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
-using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement.CompilerGenerated
 {
   public abstract class FSharpGeneratedMemberBase : FSharpGeneratedElementBase, ITypeMember
   {
-    protected FSharpGeneratedMemberBase([NotNull] Class containingType) : base(containingType)
+    protected FSharpGeneratedMemberBase([NotNull] IClass containingType) : base(containingType)
     {
     }
 

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Xml;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
@@ -12,9 +11,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement.CompilerGenerated
 {
   public abstract class FSharpGeneratedElementBase : IClrDeclaredElement
   {
-    [NotNull] private readonly Class myContainingType;
+    [NotNull] private readonly IClass myContainingType;
 
-    protected FSharpGeneratedElementBase([NotNull] Class containingType)
+    protected FSharpGeneratedElementBase([NotNull] IClass containingType)
     {
       myContainingType = containingType;
     }

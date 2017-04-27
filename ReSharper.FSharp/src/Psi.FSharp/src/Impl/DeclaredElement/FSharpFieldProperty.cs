@@ -16,24 +16,39 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
   /// </summary>
   internal class FSharpFieldProperty : FSharpTypeMember<FSharpFieldDeclaration>, IProperty
   {
-    internal FSharpFieldProperty([NotNull] IFSharpFieldDeclaration declaration, FSharpField field)
+    internal FSharpFieldProperty([NotNull] IFSharpFieldDeclaration declaration, FSharpSymbol symbol)
       : base(declaration)
     {
       IsVisibleFromFSharp = declaration.Identifier?.IdentifierToken != null;
 
-      // todo: check if this is called after set resolved symbols stage
-      if (field == null)
+      var field = symbol as FSharpField;
+      if (field != null)
       {
-        IsWritable = false;
-        ReturnType = TypeFactory.CreateUnknownType(Module);
-        ShortName = declaration.ShortName;
+        IsWritable = field.IsMutable;
+        ReturnType = FSharpTypesUtil.GetType(field.FieldType, declaration, Module) ??
+                     TypeFactory.CreateUnknownType(Module);
+        ShortName = field.Name;
+        IsStatic = false;
         return;
       }
 
-      IsWritable = field.IsMutable;
-      ReturnType = FSharpTypesUtil.GetType(field.FieldType, declaration, Module) ??
-                   TypeFactory.CreateUnknownType(Module);
-      ShortName = field.Name;
+      var unionCase = symbol as FSharpUnionCase;
+      if (unionCase != null)
+      {
+        IsWritable = false;
+        var containingType = declaration.GetContainingTypeDeclaration()?.DeclaredElement;
+        ReturnType = containingType != null
+          ? TypeFactory.CreateType(containingType)
+          : TypeFactory.CreateUnknownType(Module);
+        ShortName = unionCase.Name;
+        IsStatic = true;
+        return;
+      }
+
+      IsWritable = false;
+      ReturnType = TypeFactory.CreateUnknownType(Module);
+      ShortName = declaration.ShortName;
+
     }
 
     public override string ShortName { get; }
@@ -74,6 +89,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 
     public bool IsAuto => false;
     public bool IsDefault => false;
+    public override bool IsStatic { get; }
     public override bool IsVisibleFromFSharp { get; }
   }
 }

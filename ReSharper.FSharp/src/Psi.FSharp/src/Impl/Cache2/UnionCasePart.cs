@@ -27,7 +27,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     public override TypeElement CreateTypeElement()
     {
       var isSingleton = GetDeclaration()?.Fields.IsEmpty ?? true;
-      return new FSharpUnionCase(this, isSingleton);
+      return new FSharpUnionCase(this);
     }
 
     public override MemberDecoration Modifiers =>

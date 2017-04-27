@@ -144,19 +144,22 @@ type FSharpTreeBuilderBase(file : IPsiSourceFile, lexer : ILexer, lifetime) as t
         match caseType with
         | UnionCaseFields(fields) ->
             for f in fields do x.ProcessField f
+            fields.IsEmpty
 
         | UnionCaseFullType(_) ->
-            () // todo: used in FSharp.Core only, otherwise warning
+            false // todo: used in FSharp.Core only, otherwise warning
 
     member internal x.ProcessUnionCase (UnionCase(_,id,caseType,_,_,range)) =
         range |> x.GetStartOffset |> x.AdvanceToOffset
         let mark = x.Builder.Mark()
 
         x.ProcessIdentifier id
-        x.ProcessUnionCaseType caseType
+        let isSingleton = x.ProcessUnionCaseType caseType
+        let elementType = if isSingleton then ElementType.F_SHARP_FIELD_DECLARATION
+                                         else ElementType.F_SHARP_UNION_CASE_DECLARATION
 
         range |> x.GetEndOffset |> x.AdvanceToOffset
-        x.Done(mark, ElementType.F_SHARP_UNION_CASE_DECLARATION)
+        x.Done(mark, elementType)
 
     member internal x.ProcessAttributeArg (expr : SynExpr) =
         match expr with

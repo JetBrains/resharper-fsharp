@@ -17,7 +17,14 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 
     protected override IDeclaredElement CreateDeclaredElement()
     {
-      var field = GetFSharpSymbol() as FSharpField;
+      var symbol = GetFSharpSymbol();
+      var unionCase = symbol as FSharpUnionCase;
+      if (unionCase != null)
+      {
+        return new FSharpFieldProperty(this, unionCase);
+      }
+
+      var field = symbol as FSharpField;
       if (field != null)
       {
         // the field is in a property
@@ -26,15 +33,15 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 
       // the field is in a union case
       var unionCaseDecl = GetContainingNode<IFSharpUnionCaseDeclaration>();
-      var unionCase = unionCaseDecl?.GetFSharpSymbol() as FSharpUnionCase;
-      if (unionCase == null)
+      var containingUnionCase = unionCaseDecl?.GetFSharpSymbol() as FSharpUnionCase;
+      if (containingUnionCase == null)
         return new FSharpFieldProperty(this, null);
 
       var caseFields = unionCaseDecl.Fields;
       var index = caseFields.IndexOf(this);
       Assertion.Assert(index != -1, "index != -1");
 
-      var unionCaseFields = unionCase.UnionCaseFields;
+      var unionCaseFields = containingUnionCase.UnionCaseFields;
       var caseField = index <= unionCaseFields.Count
         ? unionCaseFields[index]
         : null;
