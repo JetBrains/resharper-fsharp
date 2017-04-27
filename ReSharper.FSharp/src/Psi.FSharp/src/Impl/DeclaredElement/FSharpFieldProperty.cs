@@ -16,7 +16,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
   /// </summary>
   internal class FSharpFieldProperty : FSharpTypeMember<FSharpFieldDeclaration>, IProperty
   {
-    public FSharpFieldProperty([NotNull] IFSharpFieldDeclaration declaration, FSharpField field)
+    internal FSharpFieldProperty([NotNull] IFSharpFieldDeclaration declaration, FSharpField field)
       : base(declaration)
     {
       IsVisibleFromFSharp = declaration.Identifier?.IdentifierToken != null;

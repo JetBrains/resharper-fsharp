@@ -79,7 +79,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 
     public ITypeElement GetContainingType()
     {
-      throw new System.NotImplementedException();
+      return null;
     }
 
     public ITypeMember GetContainingTypeMember()
@@ -114,7 +114,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 
     public IList<IDeclaredType> GetSuperTypes()
     {
-      throw new System.NotImplementedException();
+      return EmptyList<IDeclaredType>.Instance;
     }
 
     public IEnumerable<ITypeMember> GetMembers()
@@ -130,7 +130,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 
     public IPsiSourceFile GetSingleOrDefaultSourceFile()
     {
-      throw new System.NotImplementedException();
+      return null;
     }
 
     public IList<ITypeElement> NestedTypes => EmptyList<ITypeElement>.InstanceList;

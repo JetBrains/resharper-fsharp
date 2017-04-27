@@ -401,6 +401,13 @@
     <Compile Include="src\Impl\Cache2\Declarations\FSharpPartKind.cs" />
     <Compile Include="src\Impl\Cache2\Declarations\FSharpTypeInfo.cs" />
     <Compile Include="src\Impl\Cache2\Declarations\FSharpNamesCacheBuilder.cs" />
+    <Compile Include="src\Impl\Cache2\FSharpSimpleType.cs" />
+    <Compile Include="src\Impl\DeclaredElement\CompilerGenerated\FSharpGeneratedElementBase.cs" />
+    <Compile Include="src\Impl\DeclaredElement\CompilerGenerated\FSharpGeneratedConstructor.cs" />
+    <Compile Include="src\Impl\DeclaredElement\CompilerGenerated\FSharpGeneratedMemberBase.cs" />
+    <Compile Include="src\Impl\DeclaredElement\CompilerGenerated\FSharpGeneratedMethod.cs" />
+    <Compile Include="src\Impl\DeclaredElement\CompilerGenerated\FSharpGeneratedProperty.cs" />
+    <Compile Include="src\Impl\DeclaredElement\CompilerGenerated\FSharpTagsClass.cs" />
     <Compile Include="src\Impl\DeclaredElement\FSharpParameter.cs" />
     <Compile Include="src\ProjectOptions\FSharpProjectOptionsBuilder.cs" />
     <Compile Include="src\ProjectOptions\FSharpProjectOptionsProvider.cs" />
