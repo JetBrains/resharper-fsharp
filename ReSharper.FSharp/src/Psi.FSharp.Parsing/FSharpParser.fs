@@ -54,7 +54,6 @@ type FSharpParser(file : IPsiSourceFile, checkerService : FSharpCheckerService, 
                 if parseResults.IsSome then
                     fsFile.ParseResults <- parseResults.Value
                 fsFile.TokenBuffer <- tokenBuffer
-                fsFile.PreviousCheckResults <- checkerService.GetPreviousCheckResults file
                 fsFile.CheckerService <- checkerService
                 fsFile :> IFile
             | _ ->

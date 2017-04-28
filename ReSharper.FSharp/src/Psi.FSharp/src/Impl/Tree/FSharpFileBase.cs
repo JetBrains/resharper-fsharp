@@ -11,7 +11,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
   internal abstract class FSharpFileBase : FileElementBase, IFSharpFileCheckInfoOwner
   {
     private FSharpCheckFileResults CheckResults { get; set; }
-    public FSharpCheckFileResults PreviousCheckResults { get; set; }
 
     public FSharpParseFileResults ParseResults { get; set; }
     public FSharpCheckerService CheckerService { get; set; }
@@ -19,7 +18,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
     public override PsiLanguageType Language => FSharpLanguage.Instance;
     public bool ReferencesResolved { get; set; }
     public bool IsChecked => CheckResults != null;
-    public Ast.ParsedInput ParseTree => ParseResults?.ParseTree?.Value;
+
+    // debug helper
+    internal Ast.ParsedInput ParseTree => ParseResults?.ParseTree?.Value;
 
     public FSharpCheckFileResults GetCheckResults(bool forceRecheck = false, [CanBeNull] Action interruptChecker = null)
     {

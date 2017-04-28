@@ -14,12 +14,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Tree
     [CanBeNull]
     FSharpCheckFileResults GetCheckResults(bool forceRecheck = false, Action interruptChecker = null);
 
-    [CanBeNull]
-    FSharpCheckFileResults PreviousCheckResults { get; set; }
-
-    [CanBeNull]
-    Ast.ParsedInput ParseTree { get; }
-
     /// <summary>
     /// True when SetResolvedSymbolsStageProcess is finished.
     /// </summary>
