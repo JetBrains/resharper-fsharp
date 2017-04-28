@@ -57,8 +57,9 @@ namespace JetBrains.ReSharper.Psi.FSharp
 
       myIsRunningOnMono = PlatformUtil.IsRunningOnMono;
 
+      Environment.SetEnvironmentVariable("FCS_IncrementalTypeCheckCacheSize", "1000");
       myChecker = FSharpChecker.Create(
-        projectCacheSize: null, // use default value
+        projectCacheSize: FSharpOption<int>.Some(200), // use default value
         keepAssemblyContents: FSharpOption<bool>.Some(true),
         keepAllBackgroundResolutions: null, // use default value, true
         msbuildEnabled: null); // use default value, true
