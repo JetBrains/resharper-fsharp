@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
@@ -55,7 +56,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
     }
 
     public IList<IParameter> Parameters { get; }
-    public override string ShortName => GetContainingType().ShortName;
+    public override string ShortName => GetContainingType()?.ShortName ?? SharedImplUtil.MISSING_DECLARATION_NAME;
 
     public bool IsPredefined => false;
     public bool IsIterator => false;
