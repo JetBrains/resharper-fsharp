@@ -19,6 +19,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     private const string ModuleSuffix = "Module";
     private const int EscapedNameAffixLength = 4;
     private const int EscapedNameStartIndex = 2;
+    private static readonly int ModuleSuffixFlag = (int) CompilationRepresentationFlags.ModuleSuffix;
 
     private static readonly ClrTypeName SourceNameAttributeAttr =
       new ClrTypeName("Microsoft.FSharp.Core.CompilationSourceNameAttribute");
@@ -102,9 +103,10 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
         var sourceName = GetAttributeValue(attrOwner, SourceNameAttributeAttr) as string;
         if (sourceName != null) names.Add(sourceName);
 
-        var compilationRepr = GetAttributeValue(attrOwner, CompilationRepresentationAttr) as int?;
-        if (CompilationRepresentationFlags.ModuleSuffix.Equals(compilationRepr))
+        var reprFlag = GetAttributeValue(attrOwner, CompilationRepresentationAttr) as int?;
+        if (reprFlag != null && reprFlag.Value == ModuleSuffixFlag)
           names.Add(element.ShortName.SubstringBeforeLast(ModuleSuffix));
+        // todo: implicit module suffix in F# 4.1
       }
 
       foreach (var declaration in element.GetDeclarations())
