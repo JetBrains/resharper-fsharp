@@ -398,6 +398,10 @@
     <Compile Include="ZoneMarker.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FSharp.Common\FSharp.Common.fsproj">
+      <Project>{12f662db-cfb9-436c-85a9-e0ca6da9f0bb}</Project>
+      <Name>FSharp.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Psi.FSharp.Parsing\Psi.FSharp.Parsing.fsproj">
       <Project>{35B0D9D5-CAD5-4FC8-860B-41BF66D9A5D5}</Project>
       <Name>Psi.FSharp.Parsing</Name>

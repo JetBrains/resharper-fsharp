@@ -393,7 +393,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="src\FSharpCheckerService.cs" />
+    <Compile Include="src\FSharpCheckerServiceOld.cs" />
     <Compile Include="src\Impl\Cache2\Declarations\FSharpCacheImplementationProcessor.cs" />
     <Compile Include="src\Impl\Cache2\Declarations\FSharpCacheNamesProcessor.cs" />
     <Compile Include="src\Impl\Cache2\Declarations\FSharpCacheSignatureProcessor.cs" />
@@ -409,8 +409,8 @@
     <Compile Include="src\Impl\DeclaredElement\CompilerGenerated\FSharpGeneratedProperty.cs" />
     <Compile Include="src\Impl\DeclaredElement\CompilerGenerated\FSharpTagsClass.cs" />
     <Compile Include="src\Impl\DeclaredElement\FSharpParameter.cs" />
-    <Compile Include="src\ProjectOptions\FSharpProjectOptionsBuilder.cs" />
-    <Compile Include="src\ProjectOptions\FSharpProjectOptionsProvider.cs" />
+    <Compile Include="src\ProjectOptions\FSharpProjectOptionsBuilderOld.cs" />
+    <Compile Include="src\ProjectOptions\FSharpProjectOptionsProviderOld.cs" />
     <Compile Include="src\FSharpScriptProjectFileLanguageService.cs" />
     <Compile Include="src\Gen\Psi\FSharp\**\*.cs">
       <SubType>Code</SubType>
@@ -573,6 +573,10 @@
     <Compile Include="ZoneMarker.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FSharp.Common\FSharp.Common.fsproj">
+      <Project>{12f662db-cfb9-436c-85a9-e0ca6da9f0bb}</Project>
+      <Name>FSharp.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Projects.FSharp\Projects.FSharp.csproj">
       <Project>{7339FF3B-9DD2-4E7C-A982-FEFC119540F9}</Project>
       <Name>Projects.FSharp</Name>

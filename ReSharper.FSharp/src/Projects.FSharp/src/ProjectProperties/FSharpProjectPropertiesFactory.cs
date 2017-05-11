@@ -4,7 +4,7 @@ using JetBrains.ProjectModel.Impl;
 using JetBrains.ProjectModel.Properties;
 using JetBrains.ProjectModel.Properties.Common;
 
-namespace JetBrains.Platform.ProjectModel.FSharp.Properties
+namespace JetBrains.Platform.ProjectModel.FSharp.ProjectProperties
 {
   [ProjectModelExtension]
   public class FSharpProjectPropertiesFactory : UnknownProjectPropertiesFactory

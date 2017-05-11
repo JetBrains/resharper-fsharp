@@ -1,5 +1,6 @@
 ﻿using JetBrains.Platform.ProjectModel.FSharp;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Plugins.FSharp.Common.CheckerService;
 
 namespace JetBrains.ReSharper.Psi.FSharp
 {
@@ -7,7 +8,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
   public class FSharpScriptProjectFileLanguageService : FSharpProjectFileLanguageService
   {
     public FSharpScriptProjectFileLanguageService(ProjectFileType projectFileType,
-      FSharpCheckerService fSharpCheckerService) : base(projectFileType, fSharpCheckerService)
+      FSharpCheckerService checkerService) : base(projectFileType, checkerService)
     {
     }
   }

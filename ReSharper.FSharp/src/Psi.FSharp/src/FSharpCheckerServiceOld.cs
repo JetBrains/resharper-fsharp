@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using JetBrains.Annotations;
-using JetBrains.Application;
 using JetBrains.Application.Threading;
 using JetBrains.Application.Threading.Tasks;
 using JetBrains.DataFlow;
@@ -25,8 +24,8 @@ namespace JetBrains.ReSharper.Psi.FSharp
   /// Wrapper for FSharp.Compiler.Service FSharpChecker.
   /// When F# project is added to solution, FSharpChecker starts analyzing it in background.
   /// </summary>
-  [ShellComponent]
-  public class FSharpCheckerService
+  [Obsolete]
+  public class FSharpCheckerServiceOld
   {
     private readonly Lifetime myLifetime;
     private readonly FSharpChecker myChecker;
@@ -49,7 +48,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
     private CancellationTokenSource myCancellationTokenSource;
     private readonly ITaskHost myTaskHost;
 
-    public FSharpCheckerService(Lifetime lifetime, OnSolutionCloseNotifier onSolutionCloseNotifier,
+    public FSharpCheckerServiceOld(Lifetime lifetime, OnSolutionCloseNotifier onSolutionCloseNotifier,
       ShellLocks shellLocks)
     {
       myLifetime = lifetime;

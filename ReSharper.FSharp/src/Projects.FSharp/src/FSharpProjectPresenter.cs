@@ -1,4 +1,4 @@
-﻿using JetBrains.Platform.ProjectModel.FSharp.Properties;
+﻿using JetBrains.Platform.ProjectModel.FSharp.ProjectProperties;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.Resources;
 using JetBrains.UI.Icons;

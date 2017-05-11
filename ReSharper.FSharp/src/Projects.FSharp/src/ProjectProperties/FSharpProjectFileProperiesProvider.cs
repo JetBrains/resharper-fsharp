@@ -1,6 +1,6 @@
 ﻿using JetBrains.ProjectModel.Properties;
 
-namespace JetBrains.Platform.ProjectModel.FSharp.Properties
+namespace JetBrains.Platform.ProjectModel.FSharp.ProjectProperties
 {
   [ProjectModelExtension]
   public class FSharpProjectFilePropertiesProvider : ProjectFilePropertiesProviderBase

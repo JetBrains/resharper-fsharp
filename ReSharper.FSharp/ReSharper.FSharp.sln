@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26228.10
+VisualStudioVersion = 15.0.26403.7
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Daemon.FSharp", "src\Daemon.FSharp\Daemon.FSharp.csproj", "{D24849E3-6E1E-4878-9FB7-00CEF5280CA4}"
 EndProject
@@ -14,6 +14,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Services.FSharp", "src\Services.FSharp\Services.FSharp.csproj", "{E76D1B94-7AA1-4DA2-8978-AC2CBC912AA0}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Psi.FSharp.Parsing", "src\Psi.FSharp.Parsing\Psi.FSharp.Parsing.fsproj", "{35B0D9D5-CAD5-4FC8-860B-41BF66D9A5D5}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Common", "src\FSharp.Common\FSharp.Common.fsproj", "{12F662DB-CFB9-436C-85A9-E0CA6DA9F0BB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{35B0D9D5-CAD5-4FC8-860B-41BF66D9A5D5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{35B0D9D5-CAD5-4FC8-860B-41BF66D9A5D5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{35B0D9D5-CAD5-4FC8-860B-41BF66D9A5D5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12F662DB-CFB9-436C-85A9-E0CA6DA9F0BB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12F662DB-CFB9-436C-85A9-E0CA6DA9F0BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12F662DB-CFB9-436C-85A9-E0CA6DA9F0BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12F662DB-CFB9-436C-85A9-E0CA6DA9F0BB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -4,7 +4,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Application.Components;
 using JetBrains.Platform.MsBuildModel;
-using JetBrains.Platform.ProjectModel.FSharp.Properties;
+using JetBrains.Platform.ProjectModel.FSharp.ProjectProperties;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.Model2.Assemblies.Interfaces;
 using JetBrains.ProjectModel.ProjectsHost;
@@ -20,12 +20,12 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.ProjectOptions
 {
-  [SolutionComponent]
-  public class FSharpProjectOptionsBuilder
+  [Obsolete]
+  public class FSharpProjectOptionsBuilderOld
   {
     private readonly MsBuildProjectHost myMsBuildHost;
 
-    public FSharpProjectOptionsBuilder(ISolution solution)
+    public FSharpProjectOptionsBuilderOld(ISolution solution)
     {
       myMsBuildHost = solution.ProjectsHostContainer().GetComponent<MsBuildProjectHost>();
     }

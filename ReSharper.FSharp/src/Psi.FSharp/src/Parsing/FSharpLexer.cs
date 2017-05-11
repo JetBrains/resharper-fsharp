@@ -24,11 +24,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
     private int myLineStartOffset;
     private Tuple<FSharpOption<FSharpTokenInfo>, long> myNextTokenAndState;
 
-    public FSharpLexer([NotNull] IDocument document, string[] defines)
+    public FSharpLexer([NotNull] IDocument document, FSharpList<string> defines)
     {
       myDocument = document;
       myDocumentLineCount = document.GetLineCount();
-      mySourceTokenizer = new FSharpSourceTokenizer(ArrayModule.ToList(defines), null);
+      mySourceTokenizer = new FSharpSourceTokenizer(defines, null);
       Buffer = document.Buffer;
     }
 

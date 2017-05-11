@@ -1,6 +1,7 @@
 ﻿using JetBrains.Platform.ProjectModel.FSharp;
 using JetBrains.ProjectModel;
 using JetBrains.ProjectModel.Resources;
+using JetBrains.ReSharper.Plugins.FSharp.Common.CheckerService;
 using JetBrains.ReSharper.Psi.FSharp.Parsing;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.Text;
@@ -26,7 +27,7 @@ namespace JetBrains.ReSharper.Psi.FSharp
       IPsiSourceFile sourceFile = null)
     {
       return sourceFile != null
-        ? new FSharpLexerFactory(sourceFile, myCheckerService)
+        ? new FSharpLexerFactory(sourceFile, myCheckerService.GetDefines(sourceFile))
         : FSharpLanguage.Instance.LanguageService().GetPrimaryLexerFactory();
     }
 

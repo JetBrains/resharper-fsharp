@@ -1,10 +1,12 @@
 ﻿using System;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Common.CheckerService;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.Util;
 using Microsoft.FSharp.Compiler;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
+using Microsoft.FSharp.Core;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 {
@@ -31,7 +33,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       if (psiSourceFile == null || ParseResults == null) return null;
       Assertion.AssertNotNull(CheckerService, "CheckerService != null");
 
-      return CheckResults = CheckerService.CheckFSharpFile(this, interruptChecker);
+      return CheckResults = CheckerService.CheckFile(this, ParseResults, OptionModule.OfObj(interruptChecker))?.Value;
     }
 
     public virtual void Accept(TreeNodeVisitor visitor)

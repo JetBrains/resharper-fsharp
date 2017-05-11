@@ -11,7 +11,7 @@ using JetBrains.ProjectModel.Properties.Common;
 using JetBrains.ProjectModel.Properties.Managed;
 using PlatformID = JetBrains.Application.platforms.PlatformID;
 
-namespace JetBrains.Platform.ProjectModel.FSharp.Properties
+namespace JetBrains.Platform.ProjectModel.FSharp.ProjectProperties
 {
   public class FSharpProjectProperties : ProjectPropertiesBase<ManagedProjectConfiguration>, ISdkConsumerProperties
   {
