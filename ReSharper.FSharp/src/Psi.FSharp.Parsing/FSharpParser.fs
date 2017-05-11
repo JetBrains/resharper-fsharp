@@ -1,7 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Psi.FSharp.Parsing
 
 open JetBrains.DataFlow
-open JetBrains.Platform.ProjectModel.FSharp
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Common.CheckerService

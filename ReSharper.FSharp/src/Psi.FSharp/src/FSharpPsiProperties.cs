@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
-using JetBrains.Platform.ProjectModel.FSharp;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase;
 using JetBrains.ReSharper.Psi.Impl;
 
 namespace JetBrains.ReSharper.Psi.FSharp

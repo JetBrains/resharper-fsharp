@@ -8,8 +8,8 @@
     <ProjectTypeGuids>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>JetBrains.Platform.ProjectModel.FSharp</RootNamespace>
-    <AssemblyName>JetBrains.Platform.ProjectModel.FSharp</AssemblyName>
+    <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase</RootNamespace>
+    <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
@@ -394,12 +394,7 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="src\FSharpProjectFileType.cs" />
-    <Compile Include="src\FSharpProjectLanguage.cs" />
-    <Compile Include="src\FSharpProjectPresenter.cs" />
     <Compile Include="src\FSharpScriptProjectFileType.cs" />
-    <Compile Include="src\ProjectProperties\FSharpProjectFileProperiesProvider.cs" />
-    <Compile Include="src\ProjectProperties\FSharpProjectProperties.cs" />
-    <Compile Include="src\ProjectProperties\FSharpProjectPropertiesFactory.cs" />
     <Compile Include="ZoneMark.cs" />
   </ItemGroup>
   <ItemGroup>

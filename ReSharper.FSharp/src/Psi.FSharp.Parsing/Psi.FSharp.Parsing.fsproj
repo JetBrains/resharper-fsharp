@@ -290,10 +290,6 @@
       <Project>{12f662db-cfb9-436c-85a9-e0ca6da9f0bb}</Project>
       <Name>FSharp.Common</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Projects.FSharp\Projects.FSharp.csproj">
-      <Project>{7339ff3b-9dd2-4e7c-a982-fefc119540f9}</Project>
-      <Name>Projects.FSharp</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Psi.FSharp\Psi.FSharp.csproj">
       <Name>Psi.FSharp</Name>
       <Project>{4d2a870a-2d0d-4004-a795-596f0f9ce591}</Project>

@@ -14,7 +14,6 @@ open JetBrains.Application.Threading
 open JetBrains.Application.Threading.Tasks
 open JetBrains.DataFlow
 open JetBrains.Platform.MsBuildModel
-open JetBrains.Platform.ProjectModel.FSharp.ProjectProperties
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost.MsBuild
@@ -28,7 +27,9 @@ open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Plugins.FSharp.Common
 open JetBrains.ReSharper.Plugins.FSharp.Common.CheckerService
-open JetBrains.Platform.ProjectModel.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
@@ -41,7 +42,7 @@ type FSharpProjectOptionsProvider(lifetime, logger : ILogger, solution : ISoluti
     let projects = Dictionary<IProject, IDisposable>() // keeps FCS project alive until disposed
     let projectsOptions = Dictionary<IProject, FSharpProjectOptions>()
     let projectsToInvalidate = JetHashSet<IProject>()
-    
+
     let scriptsOptions = Dictionary<string, FSharpProjectOptions>()
     let configurationDefines = Dictionary<IProject, string list>()
     let taskHost = shellLocks.Tasks
@@ -70,15 +71,6 @@ type FSharpProjectOptionsProvider(lifetime, logger : ILogger, solution : ISoluti
                     use cookie = ReadLockCookie.Create()
                     projectsToInvalidate.add project
                     x.InvalidateReferencingProjects(project)
-                base.VisitDelta change
-            | :? IProjectFile as file ->
-                match file.ToSourceFile() with
-                | sourceFile when 
-                    isNotNull sourceFile && sourceFile.LanguageType.Equals(FSharpScriptProjectFileType.Instance) &&
-                    (change.IsMovedIn || change.IsMovedOut || change.IsRemoved) ->
-                        let change = change :?> ProjectItemChange
-                        scriptsOptions.remove change.OldLocation.FullPath
-                | _ -> ()
             | _ -> base.VisitDelta change
 
     member private x.IsApplicable([<NotNull>] properties : IProjectProperties) =
@@ -104,7 +96,7 @@ type FSharpProjectOptionsProvider(lifetime, logger : ILogger, solution : ISoluti
                 match file.GetProject() with
                 | project when isNotNull project && project.IsOpened ->
                     x.ProcessInvalidateOptions(checker)
-                    use cookie = ReadLockCookie.Create() 
+                    use cookie = ReadLockCookie.Create()
                     Some (x.GetOrCreateProjectOptions(project, checker))
                 | _ -> None
         | _ -> None
@@ -114,27 +106,28 @@ type FSharpProjectOptionsProvider(lifetime, logger : ILogger, solution : ISoluti
         else
             let options, defines = optionsBuilder.BuildSingleProjectOptions(project)
             configurationDefines.[project] <- defines
-            
+
             let framework = project.GetCurrentTargetFrameworkId()
-            let referencedProjectsOptions = 
+            let referencedProjectsOptions =
                 seq { for p in project.GetReferencedProjects(framework, transitive = false) do
                           if p.IsOpened && x.IsApplicable(p.ProjectProperties) then
                               let outPath = p.GetOutputFilePath(p.GetCurrentTargetFrameworkId()).FullPath
                               yield outPath, x.GetOrCreateProjectOptions(p, checker) }
-            
+
             let options' = { options with ReferencedProjects = referencedProjectsOptions.ToArray() }
             projects.[project] <- checker.KeepProjectAlive(options').RunAsTask()
             projectsOptions.[project] <- options'
             options'
 
     member private x.ProcessInvalidateOptions(checker) =
-        for p in projectsToInvalidate do
-            if projectsOptions.contains p then checker.InvalidateConfiguration(projectsOptions.[p])
-            if projects.contains p then projects.[p].Dispose()
-            configurationDefines.remove p
-            projectsOptions.remove p
-            projects.remove p
-        projectsToInvalidate.Clear()
+        lock projectsToInvalidate (fun _ ->
+            for p in projectsToInvalidate do
+                if projectsOptions.contains p then checker.InvalidateConfiguration(projectsOptions.[p])
+                if projects.contains p then projects.[p].Dispose()
+                configurationDefines.remove p
+                projectsOptions.remove p
+                projects.remove p
+            projectsToInvalidate.Clear())
 
     member private x.GetScriptOptionsAux(file : IPsiSourceFile, checker : FSharpChecker, shouldTryUpdate : bool) =
         let filePath = file.GetLocation().FullPath
@@ -180,7 +173,7 @@ type FSharpProjectOptionsProvider(lifetime, logger : ILogger, solution : ISoluti
                         let msg = sprintf "Getting options for %s: %s" filePath exn.Message
                         logger.LogMessage(LoggingLevel.WARN, msg)) |> ignore
             Some existingOptions
-    
+
     member private x.InvalidateAll() =
         for p in projects.Values do p.Dispose()
         projects.Clear()
@@ -188,7 +181,7 @@ type FSharpProjectOptionsProvider(lifetime, logger : ILogger, solution : ISoluti
         scriptsOptions.Clear()
         configurationDefines.Clear()
         projectsToInvalidate.Clear()
-            
+
     member private x.GetDefinesAux(sourceFile : IPsiSourceFile) =
         match sourceFile.GetProject() with
         | project when isNotNull project && configurationDefines.ContainsKey(project) ->
@@ -198,7 +191,7 @@ type FSharpProjectOptionsProvider(lifetime, logger : ILogger, solution : ISoluti
     interface IFSharpProjectOptionsProvider with
         member x.GetProjectOptions(file, checker, updateScriptOptions) =
             if file.PsiModule.IsMiscFilesProjectModule() then None
-            else 
+            else
                 if file.LanguageType.Equals(FSharpScriptProjectFileType.Instance)
                 then x.GetScriptOptionsAux(file, checker, updateScriptOptions)
                 else x.GetProjectOptionsAux(file, checker)

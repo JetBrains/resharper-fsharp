@@ -415,9 +415,13 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Projects.FSharp\Projects.FSharp.csproj">
+    <ProjectReference Include="..\FSharp.Common\FSharp.Common.fsproj">
+      <Project>{12F662DB-CFB9-436C-85A9-E0CA6DA9F0BB}</Project>
+      <Name>FSharp.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj">
       <Project>{7339FF3B-9DD2-4E7C-A982-FEFC119540F9}</Project>
-      <Name>Projects.FSharp</Name>
+      <Name>FSharp.ProjectModelBase</Name>
     </ProjectReference>
     <ProjectReference Include="..\Psi.FSharp.Parsing\Psi.FSharp.Parsing.fsproj">
       <Project>{35b0d9d5-cad5-4fc8-860b-41bf66d9a5d5}</Project>
@@ -466,7 +470,7 @@
   <Import Project="..\..\packages\JetBrains.Psi.Features.UnitTesting.108.0.20170510.73103-eap08\build\JetBrains.Psi.Features.UnitTesting.targets" Condition="Exists('..\..\packages\JetBrains.Psi.Features.UnitTesting.108.0.20170510.73103-eap08\build\JetBrains.Psi.Features.UnitTesting.targets')" />
   <Import Project="..\..\packages\JetBrains.Psi.Features.test.Framework.108.0.20170510.73103-eap08\build\JetBrains.Psi.Features.test.Framework.targets" Condition="Exists('..\..\packages\JetBrains.Psi.Features.test.Framework.108.0.20170510.73103-eap08\build\JetBrains.Psi.Features.test.Framework.targets')" />
   <Import Project="..\..\packages\JetBrains.ReSharper.SDK.Internal.108.0.20170510.80226-eap08\build\JetBrains.ReSharper.SDK.Internal.targets" Condition="Exists('..\..\packages\JetBrains.ReSharper.SDK.Internal.108.0.20170510.80226-eap08\build\JetBrains.ReSharper.SDK.Internal.targets')" />
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>

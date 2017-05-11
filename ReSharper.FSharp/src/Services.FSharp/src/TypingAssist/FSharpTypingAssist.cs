@@ -2,10 +2,10 @@
 using JetBrains.Application.Settings;
 using JetBrains.Application.UI.ActionSystem.Text;
 using JetBrains.DataFlow;
-using JetBrains.Platform.ProjectModel.FSharp;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion;
 using JetBrains.ReSharper.Feature.Services.TypingAssist;
+using JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CachingLexers;
 using JetBrains.ReSharper.Psi.FSharp;
