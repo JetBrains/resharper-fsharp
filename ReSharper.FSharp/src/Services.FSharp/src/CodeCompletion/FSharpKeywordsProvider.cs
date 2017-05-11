@@ -33,6 +33,10 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
       if (!context.ShouldComplete)
         return false;
 
+      var fsContext = context.FsCompletionContext;
+      if (fsContext != null && !fsContext.IsInvalid)
+        return false;
+
       var tokenType = context.TokenAtCaret?.GetTokenType();
       var tokenBeforeType = context.TokenBeforeCaret?.GetTokenType();
       if (tokenBeforeType == FSharpTokenType.LINE_COMMENT ||

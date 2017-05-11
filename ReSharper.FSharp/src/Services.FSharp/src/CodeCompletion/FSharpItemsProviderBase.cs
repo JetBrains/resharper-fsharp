@@ -1,7 +1,5 @@
 ﻿using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure;
 using JetBrains.ReSharper.Feature.Services.Lookup;
-using JetBrains.ReSharper.Psi.FSharp.Parsing;
-using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
 {
