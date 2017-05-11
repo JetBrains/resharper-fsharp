@@ -28,7 +28,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp
       if (mfv.IsImplicitConstructor || name == ClrConstructorName || name == FSharpConstructorName)
         return HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE;
 
-      if (mfv.IsMember && (!mfv.EnclosingEntity.IsFSharpModule || mfv.IsExtensionMember))
+      if (mfv.IsModuleValueOrMember && (!mfv.EnclosingEntity.IsFSharpModule || mfv.IsExtensionMember))
         return mfv.IsProperty || mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod
           ? HighlightingAttributeIds.FIELD_IDENTIFIER_ATTRIBUTE
           : HighlightingAttributeIds.METHOD_IDENTIFIER_ATTRIBUTE;
@@ -40,10 +40,10 @@ namespace JetBrains.ReSharper.Daemon.FSharp
     public static string GetHighlightingAttributeId([NotNull] this FSharpSymbol symbol)
     {
       var entity = symbol as FSharpEntity;
-      if (entity != null) return GetEntityHighlightingAttributeId(entity);
+      if (entity != null && !entity.IsUnresolved) return GetEntityHighlightingAttributeId(entity);
 
       var mfv = symbol as FSharpMemberOrFunctionOrValue;
-      if (mfv != null) return GetMfvHighlightingAttributeId(mfv);
+      if (mfv != null && !mfv.IsUnresolved) return GetMfvHighlightingAttributeId(mfv);
 
       if (symbol is FSharpField) return HighlightingAttributeIds.FIELD_IDENTIFIER_ATTRIBUTE;
       if (symbol is FSharpUnionCase) return HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE;
