@@ -11,6 +11,6 @@ type FSharpFakeTreeBuilder(file, lexer, lifetime, logger : ILogger, options : FS
 
     override x.CreateFSharpFile() =
         let filePath = file.GetLocation().FullPath
-        logger.LogMessage(LoggingLevel.WARN, sprintf "creating fake IFile for %s, project options: %A" filePath options)
+        logger.Warn ("creating fake IFile for %s, project options: %A", filePath, options)
         let mark = x.Builder.Mark()
         x.FinishFile mark ElementType.F_SHARP_IMPL_FILE
