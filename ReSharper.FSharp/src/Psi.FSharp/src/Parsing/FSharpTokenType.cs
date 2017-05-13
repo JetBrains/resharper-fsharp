@@ -45,9 +45,21 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
     static FSharpTokenType()
     {
       CommentsOrWhitespaces = new NodeTypeSet(COMMENT, WHITESPACE, NEW_LINE);
-      RightBraces = new NodeTypeSet(RPAREN, RBRACK, RBRACE);
-      LeftBraces = new NodeTypeSet(LPAREN, LBRACK, LBRACE);
       AccessModifiersKeywords = new NodeTypeSet(PUBLIC, PRIVATE, INTERNAL);
+
+      LeftBraces = new NodeTypeSet(
+        LPAREN,
+        LBRACE,
+        LBRACK,
+        LBRACK_LESS,
+        LBRACK_BAR);
+
+      RightBraces = new NodeTypeSet(
+        RPAREN,
+        RBRACE,
+        RBRACK,
+        GREATER_RBRACK,
+        BAR_RBRACK);
 
       Keywords = new NodeTypeSet(
         // todo: add other keywords

@@ -20,19 +20,22 @@
         <Token name="TEXT"/>
         <Token name="DEAD_CODE"/>
 
-        <Token name="LBRACK"/>
-        <Token name="RBRACK"/>
-        <Token name="LBRACE"/>
-        <Token name="RBRACE"/>
         <Token name="LPAREN"/>
         <Token name="RPAREN"/>
+        <Token name="LBRACE"/>
+        <Token name="RBRACE"/>
+        <Token name="LBRACK"/>
+        <Token name="RBRACK"/>
 
-        <Token name="DOT"/>
+        <Token name="LBRACK_LESS"/>
+        <Token name="GREATER_RBRACK"/>
+        <Token name="LBRACK_BAR"/>
+        <Token name="BAR_RBRACK"/>
 
         <Token name="GREATER"/>
         <Token name="LESS"/>
-        <Token name="GREATER_RBRACK"/>
-        <Token name="LBRACK_LESS"/>
+
+        <Token name="DOT"/>
 
         <!-- Used in FsharpFakeLexer and as a separator in psi grammar -->
         <Token name="FAKE"/>
