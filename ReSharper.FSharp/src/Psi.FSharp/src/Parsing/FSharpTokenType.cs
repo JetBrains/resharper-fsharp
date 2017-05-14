@@ -51,15 +51,19 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
         LPAREN,
         LBRACE,
         LBRACK,
+        LQUOTE,
+        LBRACK_BAR,
         LBRACK_LESS,
-        LBRACK_BAR);
+        LQUOTE_TYPED);
 
       RightBraces = new NodeTypeSet(
         RPAREN,
         RBRACE,
         RBRACK,
-        GREATER_RBRACK,
-        BAR_RBRACK);
+        RQUOTE,
+        BAR_RBRACK,
+        RQUOTE_TYPED,
+        GREATER_RBRACK);
 
       Keywords = new NodeTypeSet(
         // todo: add other keywords
@@ -75,9 +79,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
         IDENTIFIER,
         OPERATOR,
         GREATER,
-        LESS,
-        GREATER_RBRACK,
-        LBRACK_LESS);
+        LESS);
     }
 
 

@@ -73,14 +73,18 @@ namespace JetBrains.ReSharper.Daemon.FSharp.ContextHighlighters
       if (token1 == FSharpTokenType.LPAREN) return token2 == FSharpTokenType.RPAREN;
       if (token1 == FSharpTokenType.LBRACE) return token2 == FSharpTokenType.RBRACE;
       if (token1 == FSharpTokenType.LBRACK) return token2 == FSharpTokenType.RBRACK;
+      if (token1 == FSharpTokenType.LQUOTE) return token2 == FSharpTokenType.RQUOTE;
       if (token1 == FSharpTokenType.LBRACK_BAR) return token2 == FSharpTokenType.BAR_RBRACK;
       if (token1 == FSharpTokenType.LBRACK_LESS) return token2 == FSharpTokenType.GREATER_RBRACK;
+      if (token1 == FSharpTokenType.LQUOTE_TYPED) return token2 == FSharpTokenType.RQUOTE_TYPED;
 
       if (token1 == FSharpTokenType.RPAREN) return token2 == FSharpTokenType.LPAREN;
       if (token1 == FSharpTokenType.RBRACE) return token2 == FSharpTokenType.LBRACE;
       if (token1 == FSharpTokenType.RBRACK) return token2 == FSharpTokenType.LBRACK;
+      if (token1 == FSharpTokenType.RQUOTE) return token2 == FSharpTokenType.LQUOTE;
       if (token1 == FSharpTokenType.BAR_RBRACK) return token2 == FSharpTokenType.LBRACK_BAR;
       if (token1 == FSharpTokenType.GREATER_RBRACK) return token2 == FSharpTokenType.LBRACK_LESS;
+      if (token1 == FSharpTokenType.RQUOTE_TYPED) return token2 == FSharpTokenType.LQUOTE_TYPED;
 
       return false;
     }

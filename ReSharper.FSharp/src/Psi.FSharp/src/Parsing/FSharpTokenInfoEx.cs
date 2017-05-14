@@ -14,14 +14,16 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
       const int NewTag = 118;
       const int ModuleTag = 148;
       const int NamespaceTag = 149;
+      const int LQuoteTag = 153;
+      const int RQuoteTag = 154;
 
       if (token.ColorClass == FSharpTokenColorKind.InactiveCode) return FSharpTokenType.DEAD_CODE;
       if (token.ColorClass == FSharpTokenColorKind.PreprocessorKeyword) return FSharpTokenType.OTHER_KEYWORD;
-
+      var tokenTag = token.Tag;
       switch (token.CharClass)
       {
         case FSharpTokenCharKind.Keyword:
-          switch (token.Tag)
+          switch (tokenTag)
           {
             case PublicTag:
               return FSharpTokenType.PUBLIC;
@@ -49,9 +51,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
           return FSharpTokenType.LITERAL;
 
         case FSharpTokenCharKind.Operator:
-          if (token.Tag == FSharpTokenTag.GREATER)
+          if (tokenTag == FSharpTokenTag.GREATER)
             return FSharpTokenType.GREATER;
-          if (token.Tag == FSharpTokenTag.LESS)
+          if (tokenTag == FSharpTokenTag.LESS)
             return FSharpTokenType.LESS;
           return FSharpTokenType.OPERATOR;
 
@@ -64,28 +66,39 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
           return FSharpTokenType.WHITESPACE;
 
         case FSharpTokenCharKind.Delimiter:
-          if (token.Tag == FSharpTokenTag.LPAREN)
+          if (tokenTag == FSharpTokenTag.LPAREN)
             return FSharpTokenType.LPAREN;
-          if (token.Tag == FSharpTokenTag.RPAREN)
+          if (tokenTag == FSharpTokenTag.RPAREN)
             return FSharpTokenType.RPAREN;
-          if (token.Tag == FSharpTokenTag.LBRACE)
+          if (tokenTag == FSharpTokenTag.LBRACE)
             return FSharpTokenType.LBRACE;
-          if (token.Tag == FSharpTokenTag.RBRACE)
+          if (tokenTag == FSharpTokenTag.RBRACE)
             return FSharpTokenType.RBRACE;
-          if (token.Tag == FSharpTokenTag.LBRACK)
+          if (tokenTag == FSharpTokenTag.LBRACK)
             return FSharpTokenType.LBRACK;
-          if (token.Tag == FSharpTokenTag.RBRACK)
+          if (tokenTag == FSharpTokenTag.RBRACK)
             return FSharpTokenType.RBRACK;
-          if (token.Tag == FSharpTokenTag.DOT)
+          if (tokenTag == FSharpTokenTag.DOT)
             return FSharpTokenType.DOT;
-          if (token.Tag == FSharpTokenTag.GREATER_RBRACK)
+          if (tokenTag == FSharpTokenTag.GREATER_RBRACK)
             return FSharpTokenType.GREATER_RBRACK;
-          if (token.Tag == FSharpTokenTag.LBRACK_LESS)
+          if (tokenTag == FSharpTokenTag.LBRACK_LESS)
             return FSharpTokenType.LBRACK_LESS;
-          if (token.Tag == FSharpTokenTag.LBRACK_BAR)
+          if (tokenTag == FSharpTokenTag.LBRACK_BAR)
             return FSharpTokenType.LBRACK_BAR;
-          if (token.Tag == FSharpTokenTag.BAR_RBRACK)
+          if (tokenTag == FSharpTokenTag.BAR_RBRACK)
             return FSharpTokenType.BAR_RBRACK;
+
+          if (tokenTag == LQuoteTag)
+            return token.FullMatchedLength == 2
+              ? FSharpTokenType.LQUOTE_TYPED
+              : FSharpTokenType.LQUOTE;
+
+          if (tokenTag == RQuoteTag)
+            return token.FullMatchedLength == 2
+              ? FSharpTokenType.RQUOTE_TYPED
+              : FSharpTokenType.RQUOTE;
+
           return FSharpTokenType.TEXT;
 
         default:
