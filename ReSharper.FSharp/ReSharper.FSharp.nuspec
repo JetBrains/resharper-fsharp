@@ -18,17 +18,17 @@
     <tags>resharper fsharp</tags>
   </metadata>
   <files>
+    <file src="src\FSharp.Common\bin\Debug\JetBrains.ReSharper.Plugins.FSharp.Common.dll" target="DotFiles" />
+    <file src="src\FSharp.ProjectModelBase\bin\Debug\JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase.dll" target="DotFiles" />
     <file src="src\Psi.FSharp\bin\Debug\JetBrains.ReSharper.Psi.FSharp.dll" target="DotFiles" />
     <file src="src\Psi.FSharp.LanguageService\bin\Debug\JetBrains.ReSharper.Psi.FSharp.LanguageService.dll" target="DotFiles" />
     <file src="src\Daemon.FSharp\bin\Debug\JetBrains.ReSharper.Daemon.FSharp.dll" target="DotFiles" />
-    <file src="src\Projects.FSharp\bin\Debug\JetBrains.Platform.ProjectModel.FSharp.dll" target="DotFiles" />
     <file src="src\Services.FSharp\bin\Debug\JetBrains.ReSharper.Feature.Services.FSharp.dll" target="DotFiles" />
     <file src="src\Psi.FSharp.Parsing\bin\Debug\Psi.FSharp.Parsing.dll" target="DotFiles" />
     <file src="packages\FSharp.Core.4.1.12\lib\net40\FSharp.Core.dll" target="DotFiles" />
     <file src="packages\FSharp.Core.4.1.12\lib\net40\FSharp.Core.optdata" target="DotFiles" />
     <file src="packages\FSharp.Core.4.1.12\lib\net40\FSharp.Core.sigdata" target="DotFiles" />
     <file src="packages\FSharp.Compiler.Service.12.0.2\lib\net45\FSharp.Compiler.Service.dll" target="DotFiles"/>
-    <file src="packages\FSharp.Compiler.Service.12.0.2\lib\net45\FSharp.Compiler.Service.pdb" target="DotFiles"/>
     <file src="packages\FSharp.Compiler.Service.12.0.2\lib\net45\FSharp.Compiler.Service.MSBuild.v12.dll" target="DotFiles"/>
     <file src="packages\System.ValueTuple.4.3.0\lib\netstandard1.0\System.ValueTuple.dll" target="DotFiles"/>
   </files>
