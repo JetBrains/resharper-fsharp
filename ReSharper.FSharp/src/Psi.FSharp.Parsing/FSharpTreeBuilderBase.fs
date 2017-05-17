@@ -106,7 +106,7 @@ type FSharpTreeBuilderBase(file : IPsiSourceFile, lexer : ILexer, lifetime) as t
         x.ProcessIdentifier id
 
         range |> x.GetEndOffset |> x.AdvanceToOffset
-        x.Builder.Done(mark, ElementType.F_SHARP_EXCEPTION_DECLARATION, null)
+        x.Builder.Done(mark, ElementType.EXCEPTION_DECLARATION, null)
 
     member internal x.ProcessModifiersBeforeOffset (endOffset : int) =
         let mark = x.Builder.Mark()
@@ -171,8 +171,8 @@ type FSharpTreeBuilderBase(file : IPsiSourceFile, lexer : ILexer, lifetime) as t
 
         x.ProcessIdentifier id
         let isSingleton = x.ProcessUnionCaseType caseType
-        let elementType = if isSingleton then ElementType.F_SHARP_FIELD_DECLARATION
-                                         else ElementType.F_SHARP_UNION_CASE_DECLARATION
+        let elementType = if isSingleton then ElementType.EXCEPTION_DECLARATION
+                                         else ElementType.UNION_CASE_DECLARATION
 
         range |> x.GetEndOffset |> x.AdvanceToOffset
         x.Done(mark, elementType)
@@ -204,7 +204,7 @@ type FSharpTreeBuilderBase(file : IPsiSourceFile, lexer : ILexer, lifetime) as t
         x.ProcessIdentifier id
 
         range |> x.GetEndOffset |> x.AdvanceToOffset
-        x.Done(mark, ElementType.F_SHARP_ENUM_MEMBER_DECLARATION)
+        x.Done(mark, ElementType.ENUM_MEMBER_DECLARATION)
 
     member internal x.ProcessField (Field(_,_,id,t,_,_,_,range)) =
         let mark =
@@ -221,7 +221,7 @@ type FSharpTreeBuilderBase(file : IPsiSourceFile, lexer : ILexer, lifetime) as t
 
         x.ProcessSynType t
         range |> x.GetEndOffset |> x.AdvanceToOffset
-        x.Done(mark, ElementType.F_SHARP_FIELD_DECLARATION)
+        x.Done(mark, ElementType.EXCEPTION_DECLARATION)
 
     member internal x.ProcessLocalId (id : Ident) =
         id.idRange |> x.GetStartOffset |> x.AdvanceToOffset

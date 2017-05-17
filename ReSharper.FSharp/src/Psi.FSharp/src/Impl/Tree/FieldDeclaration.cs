@@ -5,7 +5,7 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 {
-  internal partial class FSharpFieldDeclaration
+  internal partial class FieldDeclaration
   {
     public override string DeclaredName => FSharpImplUtil.GetCompiledName(Identifier, Attributes);
     public override string SourceName => FSharpImplUtil.GetSourceName(Identifier);
@@ -32,7 +32,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       }
 
       // the field is in a union case
-      var unionCaseDecl = GetContainingNode<IFSharpUnionCaseDeclaration>();
+      var unionCaseDecl = GetContainingNode<IUnionCaseDeclaration>();
       var containingUnionCase = unionCaseDecl?.GetFSharpSymbol() as FSharpUnionCase;
       if (containingUnionCase == null)
         return new FSharpFieldProperty(this, null);

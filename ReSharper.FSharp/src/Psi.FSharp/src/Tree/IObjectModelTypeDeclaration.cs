@@ -2,7 +2,7 @@
 
 namespace JetBrains.ReSharper.Psi.FSharp.Tree
 {
-  public partial interface IFSharpObjectModelTypeDeclaration
+  public partial interface IObjectModelTypeDeclaration
   {
     FSharpPartKind TypePartKind { get; }
   }

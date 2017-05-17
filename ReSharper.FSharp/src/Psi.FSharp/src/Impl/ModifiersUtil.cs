@@ -11,12 +11,12 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
   {
     private const string AbstractClass = "AbstractClass";
 
-    public static MemberDecoration GetDecoration(IFSharpUnionCaseDeclaration caseDeclaration)
+    public static MemberDecoration GetDecoration(IUnionCaseDeclaration caseDeclaration)
     {
       if (caseDeclaration.FieldsEnumerable.IsEmpty())
         return MemberDecoration.FromModifiers(Modifiers.INTERNAL);
 
-      var unionDeclaration = caseDeclaration.GetContainingTypeDeclaration() as IFSharpUnionDeclaration;
+      var unionDeclaration = caseDeclaration.GetContainingTypeDeclaration() as IUnionDeclaration;
       return unionDeclaration != null
         ? GetDecoration(unionDeclaration.AccessModifiers, TreeNodeEnumerable<IFSharpAttribute>.Empty)
         : MemberDecoration.DefaultValue;

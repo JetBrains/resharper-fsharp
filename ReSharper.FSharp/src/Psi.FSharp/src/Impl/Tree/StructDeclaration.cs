@@ -1,6 +1,8 @@
-﻿namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
+﻿using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations;
+
+namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 {
-  internal partial class FSharpUnionDeclaration
+  internal partial class StructDeclaration
   {
     public override string DeclaredName => FSharpImplUtil.GetCompiledName(Identifier, Attributes);
     public override string SourceName => FSharpImplUtil.GetSourceName(Identifier);
@@ -9,5 +11,7 @@
     {
       return Identifier.GetNameRange();
     }
+
+    public FSharpPartKind TypePartKind => FSharpPartKind.Struct;
   }
 }

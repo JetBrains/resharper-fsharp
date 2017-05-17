@@ -1,8 +1,8 @@
-﻿using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations;
+﻿using JetBrains.ReSharper.Psi.FSharp.Tree;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 {
-  internal partial class FSharpStructDeclaration
+  internal partial class UnionCaseDeclaration
   {
     public override string DeclaredName => FSharpImplUtil.GetCompiledName(Identifier, Attributes);
     public override string SourceName => FSharpImplUtil.GetSourceName(Identifier);
@@ -12,6 +12,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       return Identifier.GetNameRange();
     }
 
-    public FSharpPartKind TypePartKind => FSharpPartKind.Struct;
+    public IAccessModifiers AccessModifiers => null;
+
+    public IAccessModifiers SetAccessModifiers(IAccessModifiers param)
+    {
+      return null;
+    }
   }
 }

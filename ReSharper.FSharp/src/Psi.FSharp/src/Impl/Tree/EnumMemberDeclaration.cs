@@ -2,7 +2,7 @@
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 {
-  internal partial class FSharpEnumMemberDeclaration
+  internal partial class EnumMemberDeclaration
   {
     public override string DeclaredName => FSharpImplUtil.GetCompiledName(Identifier, Attributes);
 

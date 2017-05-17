@@ -14,9 +14,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
   /// <summary>
   /// Field in a record or in a discriminated union. Compiled as property.
   /// </summary>
-  internal class FSharpFieldProperty : FSharpTypeMember<FSharpFieldDeclaration>, IProperty
+  internal class FSharpFieldProperty : FSharpTypeMember<FieldDeclaration>, IProperty
   {
-    internal FSharpFieldProperty([NotNull] IFSharpFieldDeclaration declaration, FSharpSymbol symbol)
+    internal FSharpFieldProperty([NotNull] IFieldDeclaration declaration, FSharpSymbol symbol)
       : base(declaration)
     {
       IsVisibleFromFSharp = declaration.Identifier?.IdentifierToken != null;

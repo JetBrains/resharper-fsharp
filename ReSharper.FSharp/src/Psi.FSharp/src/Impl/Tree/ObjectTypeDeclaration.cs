@@ -4,7 +4,7 @@ using JetBrains.Util.Extension;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 {
-  internal partial class FSharpObjectTypeDeclaration
+  internal partial class ObjectTypeDeclaration
   {
     private const string Interface = "Interface";
     private const string AbstractClass = "AbstractClass";

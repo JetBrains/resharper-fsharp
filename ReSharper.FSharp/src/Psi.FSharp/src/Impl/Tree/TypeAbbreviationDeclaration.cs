@@ -1,6 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 {
-  internal partial class FSharpModuleAbbreviation
+  internal partial class TypeAbbreviationDeclaration
   {
     public override string DeclaredName => FSharpImplUtil.GetCompiledName(Identifier, Attributes);
     public override string SourceName => FSharpImplUtil.GetSourceName(Identifier);

@@ -76,37 +76,37 @@ type FSharpImplTreeBuilder(file, lexer, parseTree, lifetime, logger : ILogger) =
                     | SynTypeDefnSimpleRepr.Record(_,fields,_) ->
                         for field in fields do
                             x.ProcessField field
-                        ElementType.F_SHARP_RECORD_DECLARATION
+                        ElementType.RECORD_DECLARATION
 
                     | SynTypeDefnSimpleRepr.Enum(enumCases,_) ->
                         for case in enumCases do
                             x.ProcessEnumCase case
-                        ElementType.F_SHARP_ENUM_DECLARATION
+                        ElementType.ENUM_DECLARATION
 
                     | SynTypeDefnSimpleRepr.Union(_,cases,_) ->
                         for case in cases do
                             x.ProcessUnionCase case
-                        ElementType.F_SHARP_UNION_DECLARATION
+                        ElementType.UNION_DECLARATION
 
                     | SynTypeDefnSimpleRepr.TypeAbbrev(_,t,_) ->
                         x.ProcessSynType t
-                        ElementType.F_SHARP_TYPE_ABBREVIATION_DECLARATION
+                        ElementType.TYPE_ABBREVIATION_DECLARATION
 
                     | SynTypeDefnSimpleRepr.None(_) ->
-                        ElementType.F_SHARP_ABSTRACT_TYPE_DECLARATION
+                        ElementType.ABSTRACT_TYPE_DECLARATION
 
-                    | _ -> ElementType.F_SHARP_OTHER_SIMPLE_TYPE_DECLARATION
+                    | _ -> ElementType.OTHER_SIMPLE_TYPE_DECLARATION
 
                 | SynTypeDefnRepr.Exception(_) ->
-                    ElementType.F_SHARP_EXCEPTION_DECLARATION
+                    ElementType.EXCEPTION_DECLARATION
 
                 | SynTypeDefnRepr.ObjectModel(kind, members, _) ->
                     for m in members do x.ProcessTypeMember m
                     match kind with
-                    | TyconClass -> ElementType.F_SHARP_CLASS_DECLARATION
-                    | TyconInterface -> ElementType.F_SHARP_INTERFACE_DECLARATION
-                    | TyconStruct -> ElementType.F_SHARP_STRUCT_DECLARATION
-                    | _ -> ElementType.F_SHARP_OBJECT_TYPE_DECLARATION
+                    | TyconClass -> ElementType.CLASS_DECLARATION
+                    | TyconInterface -> ElementType.INTERFACE_DECLARATION
+                    | TyconStruct -> ElementType.STRUCT_DECLARATION
+                    | _ -> ElementType.OBJECT_TYPE_DECLARATION
 
             for m in members do x.ProcessTypeMember m
             range |> x.GetEndOffset |> x.AdvanceToOffset

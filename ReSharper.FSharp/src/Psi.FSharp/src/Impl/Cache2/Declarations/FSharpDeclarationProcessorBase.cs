@@ -85,13 +85,13 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations
       Builder.AddDeclaredMemberName(letParam.DeclaredName);
     }
 
-    public override void VisitFSharpExceptionDeclaration(IFSharpExceptionDeclaration decl)
+    public override void VisitExceptionDeclaration(IExceptionDeclaration decl)
     {
       StartTypePart(decl, FSharpPartKind.Exception);
       Builder.EndPart();
     }
 
-    public override void VisitFSharpEnumDeclaration(IFSharpEnumDeclaration decl)
+    public override void VisitEnumDeclaration(IEnumDeclaration decl)
     {
       StartTypePart(decl, FSharpPartKind.Enum);
       foreach (var memberDecl in decl.EnumMembersEnumerable)
@@ -99,7 +99,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations
       Builder.EndPart();
     }
 
-    public override void VisitFSharpRecordDeclaration(IFSharpRecordDeclaration decl)
+    public override void VisitRecordDeclaration(IRecordDeclaration decl)
     {
       StartTypePart(decl, FSharpPartKind.Record);
       foreach (var fieldDeclaration in decl.FieldsEnumerable)
@@ -108,7 +108,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations
       Builder.EndPart();
     }
 
-    public override void VisitFSharpUnionDeclaration(IFSharpUnionDeclaration decl)
+    public override void VisitUnionDeclaration(IUnionDeclaration decl)
     {
       StartTypePart(decl, FSharpPartKind.Union);
       foreach (var unionCase in decl.UnionCasesEnumerable)
@@ -117,26 +117,26 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations
       Builder.EndPart();
     }
 
-    public override void VisitFSharpUnionCaseDeclaration(IFSharpUnionCaseDeclaration decl)
+    public override void VisitUnionCaseDeclaration(IUnionCaseDeclaration decl)
     {
       StartTypePart(decl, FSharpPartKind.UnionCase);
       Builder.EndPart();
     }
 
-    public override void VisitFSharpTypeAbbreviationDeclaration(IFSharpTypeAbbreviationDeclaration decl)
+    public override void VisitTypeAbbreviationDeclaration(ITypeAbbreviationDeclaration decl)
     {
       StartTypePart(decl, FSharpPartKind.HiddenType);
       Builder.EndPart();
     }
 
-    public override void VisitFSharpObjectModelTypeDeclaration(IFSharpObjectModelTypeDeclaration decl)
+    public override void VisitObjectModelTypeDeclaration(IObjectModelTypeDeclaration decl)
     {
       StartTypePart(decl, decl.TypePartKind);
       ProcessTypeMembers(decl.MemberDeclarations);
       Builder.EndPart();
     }
 
-    public override void VisitFSharpAbstractTypeDeclaration(IFSharpAbstractTypeDeclaration decl)
+    public override void VisitAbstractTypeDeclaration(IAbstractTypeDeclaration decl)
     {
       StartTypePart(decl, FSharpPartKind.HiddenType);
       Builder.EndPart();
@@ -161,13 +161,13 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations
         case FSharpPartKind.Exception:
           return new ExceptionPart((IFSharpTypeDeclaration) decl, isHidden);
         case FSharpPartKind.Enum:
-          return new EnumPart((IFSharpEnumDeclaration) decl, isHidden);
+          return new EnumPart((IEnumDeclaration) decl, isHidden);
         case FSharpPartKind.Record:
           return new RecordPart((IFSharpTypeDeclaration) decl, isHidden);
         case FSharpPartKind.Union:
           return new UnionPart((IFSharpTypeDeclaration) decl, isHidden);
         case FSharpPartKind.UnionCase:
-          return new UnionCasePart((IFSharpUnionCaseDeclaration) decl, isHidden);
+          return new UnionCasePart((IUnionCaseDeclaration) decl, isHidden);
         case FSharpPartKind.HiddenType:
           return new HiddenTypePart((IFSharpTypeDeclaration) decl, isHidden);
         case FSharpPartKind.Interface:

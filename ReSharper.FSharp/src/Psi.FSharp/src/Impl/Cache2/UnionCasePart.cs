@@ -7,9 +7,9 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
-  internal class UnionCasePart : FSharpClassLikePart<IFSharpUnionCaseDeclaration>, Class.IClassPart
+  internal class UnionCasePart : FSharpClassLikePart<IUnionCaseDeclaration>, Class.IClassPart
   {
-    public UnionCasePart(IFSharpUnionCaseDeclaration declaration, bool isHidden)
+    public UnionCasePart(IUnionCaseDeclaration declaration, bool isHidden)
       : base(declaration, ModifiersUtil.GetDecoration(declaration), isHidden)
     {
     }
@@ -20,7 +20,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public override IEnumerable<IDeclaredType> GetSuperTypes()
     {
-      var type = (GetDeclaration()?.GetContainingNode<IFSharpUnionDeclaration>() as ITypeDeclaration)?.DeclaredElement;
+      var type = (GetDeclaration()?.GetContainingNode<IUnionDeclaration>() as ITypeDeclaration)?.DeclaredElement;
       return type != null ? new[] {TypeFactory.CreateType(type)} : EmptyList<IDeclaredType>.InstanceList;
     }
 

@@ -43,7 +43,7 @@ type FSharpSigTreeBuilder(file, lexer, parseTree, lifetime, logger : ILogger) =
             id |> x.GetStartOffset |> x.AdvanceToOffset
             let mark = x.Builder.Mark()
             x.ProcessIdentifier id
-            x.Done(mark, ElementType.F_SHARP_MODULE_ABBREVIATION)
+            x.Done(mark, ElementType.MODULE_ABBREVIATION)
 
         | SynModuleSigDecl.Val(ValSpfn(attrs,id,SynValTyparDecls(typeParams,_,_),_,_,_,_,_,_,_,_),range) ->
             let mark = x.ProcessAttributesAndStartRange attrs (Some id) range
@@ -61,34 +61,34 @@ type FSharpSigTreeBuilder(file, lexer, parseTree, lifetime, logger : ILogger) =
                 match simpleRepr with
                 | SynTypeDefnSimpleRepr.Record(_,fields,_) ->
                     for f in fields do x.ProcessField f
-                    ElementType.F_SHARP_RECORD_DECLARATION
+                    ElementType.RECORD_DECLARATION
 
                 | SynTypeDefnSimpleRepr.Enum(enumCases,_) ->
                     for c in enumCases do x.ProcessEnumCase c
-                    ElementType.F_SHARP_ENUM_DECLARATION
+                    ElementType.ENUM_DECLARATION
 
                 | SynTypeDefnSimpleRepr.Union(_,cases,_) ->
                     for c in cases do x.ProcessUnionCase c
-                    ElementType.F_SHARP_UNION_DECLARATION
+                    ElementType.UNION_DECLARATION
 
                 | SynTypeDefnSimpleRepr.TypeAbbrev(_) ->
-                    ElementType.F_SHARP_TYPE_ABBREVIATION_DECLARATION
+                    ElementType.TYPE_ABBREVIATION_DECLARATION
 
                 | SynTypeDefnSimpleRepr.None(_) ->
-                    ElementType.F_SHARP_ABSTRACT_TYPE_DECLARATION
+                    ElementType.ABSTRACT_TYPE_DECLARATION
 
-                | _ -> ElementType.F_SHARP_OTHER_SIMPLE_TYPE_DECLARATION
+                | _ -> ElementType.OTHER_SIMPLE_TYPE_DECLARATION
 
             | SynTypeDefnSigRepr.Exception(_) ->
-                ElementType.F_SHARP_EXCEPTION_DECLARATION
+                ElementType.EXCEPTION_DECLARATION
 
             | SynTypeDefnSigRepr.ObjectModel(kind, members,_) ->
                 for m in members do x.ProcessTypeMemberSignature m
                 match kind with
-                | TyconClass -> ElementType.F_SHARP_CLASS_DECLARATION
-                | TyconInterface -> ElementType.F_SHARP_INTERFACE_DECLARATION
-                | TyconStruct -> ElementType.F_SHARP_STRUCT_DECLARATION
-                | _ -> ElementType.F_SHARP_OBJECT_TYPE_DECLARATION
+                | TyconClass -> ElementType.CLASS_DECLARATION
+                | TyconInterface -> ElementType.INTERFACE_DECLARATION
+                | TyconStruct -> ElementType.STRUCT_DECLARATION
+                | _ -> ElementType.OBJECT_TYPE_DECLARATION
 
         for m in members do x.ProcessTypeMemberSignature m
         range |> x.GetEndOffset |> x.AdvanceToOffset

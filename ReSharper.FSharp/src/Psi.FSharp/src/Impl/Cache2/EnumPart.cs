@@ -5,9 +5,9 @@ using JetBrains.ReSharper.Psi.FSharp.Tree;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
-  public class EnumPart : FSharpTypePart<IFSharpEnumDeclaration>, Enum.IEnumPart
+  public class EnumPart : FSharpTypePart<IEnumDeclaration>, Enum.IEnumPart
   {
-    public EnumPart(IFSharpEnumDeclaration declaration, bool isHidden) : base(declaration,
+    public EnumPart(IEnumDeclaration declaration, bool isHidden) : base(declaration,
       ModifiersUtil.GetDecoration(declaration.AccessModifiers, declaration.AttributesEnumerable), isHidden,
       declaration.TypeParameters.Count)
     {
@@ -29,7 +29,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     }
 
     public IList<IField> Fields =>
-      ProcessSubDeclaration<IField, IFSharpEnumMemberDeclaration>(input => input.EnumMembers);
+      ProcessSubDeclaration<IField, IEnumMemberDeclaration>(input => input.EnumMembers);
 
     protected override byte SerializationTag => (byte) FSharpPartKind.Enum;
   }

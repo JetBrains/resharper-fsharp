@@ -4,7 +4,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 {
-  internal class FSharpEnumMember : FSharpTypeMember<FSharpEnumMemberDeclaration>, IField
+  internal class FSharpEnumMember : FSharpTypeMember<EnumMemberDeclaration>, IField
   {
     public FSharpEnumMember([NotNull] IDeclaration declaration) : base(declaration)
     {

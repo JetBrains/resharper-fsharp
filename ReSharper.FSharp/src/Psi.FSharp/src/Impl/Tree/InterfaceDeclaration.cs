@@ -1,9 +1,8 @@
-﻿using JetBrains.ReSharper.Psi.FSharp.Tree;
-using JetBrains.ReSharper.Psi.Tree;
+﻿using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 {
-  internal partial class FSharpEnumDeclaration
+  internal partial class InterfaceDeclaration
   {
     public override string DeclaredName => FSharpImplUtil.GetCompiledName(Identifier, Attributes);
     public override string SourceName => FSharpImplUtil.GetSourceName(Identifier);
@@ -13,7 +12,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       return Identifier.GetNameRange();
     }
 
-    public override TreeNodeCollection<ITypeMemberDeclaration> MemberDeclarations =>
-      EnumMembers.Cast<ITypeMemberDeclaration, IFSharpEnumMemberDeclaration>();
+    public FSharpPartKind TypePartKind => FSharpPartKind.Interface;
   }
 }
