@@ -88,7 +88,8 @@ type FSharpImplTreeBuilder(file, lexer, parseTree, lifetime, logger : ILogger) =
                             x.ProcessUnionCase case
                         ElementType.F_SHARP_UNION_DECLARATION
 
-                    | SynTypeDefnSimpleRepr.TypeAbbrev(_) ->
+                    | SynTypeDefnSimpleRepr.TypeAbbrev(_,t,_) ->
+                        x.ProcessSynType t
                         ElementType.F_SHARP_TYPE_ABBREVIATION_DECLARATION
 
                     | SynTypeDefnSimpleRepr.None(_) ->

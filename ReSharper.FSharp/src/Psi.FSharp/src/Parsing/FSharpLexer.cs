@@ -92,7 +92,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
 
     private static bool ShouldConcatenate(FSharpTokenInfo token)
     {
-      if (token.Tag == InactiveCodeTag) return true;
+      var tokenTag = token.Tag;
+      if (tokenTag == InactiveCodeTag) return true;
+      if (tokenTag == FSharpTokenTag.LESS || tokenTag == FSharpTokenTag.GREATER) return false;
 
       var tokenClass = token.CharClass;
       return tokenClass == FSharpTokenCharKind.String || tokenClass == FSharpTokenCharKind.Operator ||

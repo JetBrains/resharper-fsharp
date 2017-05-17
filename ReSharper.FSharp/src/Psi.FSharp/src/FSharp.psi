@@ -185,12 +185,14 @@ nestedModuleDeclaration options {
 
 fSharpEnumDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
+} extras {
+  get { methodName="TypeParameters" path=<fSharpEnumDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
 }
 :
   fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
-  typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
+  typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   fSharpEnumMemberDeclaration<ENUM_MEMBER, EnumMembers>*
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*
 ;
@@ -209,12 +211,14 @@ fSharpEnumMemberDeclaration options {
 
 fSharpRecordDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
+} extras {
+  get { methodName="TypeParameters" path=<fSharpRecordDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
 }
 :
   fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
-  typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
+  typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   fSharpFieldDeclaration<RECORD_FIELD, Fields>*
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*
 ;
@@ -234,24 +238,28 @@ fSharpFieldDeclaration options {
 
 fSharpUnionDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
+} extras {
+  get { methodName="TypeParameters" path=<fSharpUnionDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
 }
 :
   fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
-  typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
+  typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   fSharpUnionCaseDeclaration<UNION_CASE, UnionCases>* fakeSeparator
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*
 ;
 
 fSharpUnionCaseDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
+} extras {
+  get { methodName="TypeParameters" path=<fSharpUnionCaseDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
 }
 :
   fSharpAttribute<ATTRIBUTE, Attributes>*
   fSharpIdentifier<IDENTIFIER, Identifier>
   fSharpFieldDeclaration<UNION_FIELD, Fields>*
-  typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
+  typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*
 ;
 
@@ -261,34 +269,40 @@ fSharpUnionCaseDeclaration options {
 
 fSharpExceptionDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
+} extras {
+  get { methodName="TypeParameters" path=<fSharpExceptionDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
 }
 :
   fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
-  typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
+  typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*
 ;
 
 fSharpTypeAbbreviationDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
+} extras {
+  get { methodName="TypeParameters" path=<fSharpTypeAbbreviationDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
 }
 :
   fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
-  typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
+  typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*
 ;
 
 fSharpModuleAbbreviation options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
+} extras {
+  get { methodName="TypeParameters" path=<fSharpModuleAbbreviation:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
 }
 :
   fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
-  typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
+  typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*
 ;
 
@@ -298,7 +312,6 @@ let options {
 :
   fSharpAttribute<ATTRIBUTE, Attributes>*
   fSharpIdentifier<IDENTIFIER, Identifier>
-  body<BODY,Body>
 ;
 
 otherMemberDeclaration
@@ -310,23 +323,27 @@ otherMemberDeclaration
 
 fSharpOtherSimpleTypeDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
+} extras {
+  get { methodName="TypeParameters" path=<fSharpOtherSimpleTypeDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
 }
 :
   fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
-  typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
+  typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*
 ;
 
 fSharpAbstractTypeDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
+} extras {
+  get { methodName="TypeParameters" path=<fSharpAbstractTypeDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
 }
 :
   fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
-  typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
+  typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*
 ;
 
@@ -335,45 +352,53 @@ fSharpAbstractTypeDeclaration options {
 
 fSharpClassDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
+} extras {
+  get { methodName="TypeParameters" path=<fSharpClassDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
 }
 :
   fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
-  typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
+  typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*
 ;
 
 fSharpInterfaceDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
+} extras {
+  get { methodName="TypeParameters" path=<fSharpInterfaceDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
 }
 :
   fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
-  typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
+  typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*
 ;
 
 fSharpStructDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
+} extras {
+  get { methodName="TypeParameters" path=<fSharpStructDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
 }
 :
   fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
-  typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
+  typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*
 ;
 
 fSharpObjectTypeDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpTypeElementDeclarationBase";
+} extras {
+  get { methodName="TypeParameters" path=<fSharpObjectTypeDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
 }
 :
   fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
-  typeParameterOfTypeDeclaration<TYPE_PARAMETERS, TypeParameters>*
+  typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*
 ;
 
@@ -427,21 +452,25 @@ constructorDeclaration options {
 
 memberDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpProperTypeMemberDeclarationBase";
+} extras {
+  get { methodName="TypeParameters" path=<memberDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfMethodList:TYPE_PARAMETER> };
 }
 :
   fSharpAttribute<ATTRIBUTE, Attributes>*
   fSharpIdentifier<IDENTIFIER, Identifier>
-  typeParameterOfMethodDeclaration<TYPE_PARAMETER, TypeParameters>*
+  typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   memberParam<PARAMETER, Parameters>* fakeSeparator
 ;
 
 abstractSlot options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpProperTypeMemberDeclarationBase";
+} extras {
+  get { methodName="TypeParameters" path=<abstractSlot:TYPE_PARAMETERS_LIST/typeParameterOfMethodList:TYPE_PARAMETER> };
 }
 :
   fSharpAttribute<ATTRIBUTE, Attributes>*
   fSharpIdentifier<IDENTIFIER, Identifier>
-  typeParameterOfMethodDeclaration<TYPE_PARAMETER, TypeParameters>*
+  typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   memberParam<PARAMETER, Parameters>* fakeSeparator
 ;
 
@@ -481,7 +510,27 @@ longIdentifier: IDENTIFIER<IDENTIFIER, Identifiers>*;
 
 
 
-// Type parameters declarations
+// Type parameters
+
+typeParameterOfTypeList
+:
+  LESS<LESS,LAngle>
+  typeParameterOfTypeDeclaration<TYPE_PARAMETER, TypeParameters>*
+  GREATER<GREATER,RAngle>
+;
+
+typeParameterOfMethodList
+:
+  LESS<LESS,LAngle>
+  typeParameterOfMethodDeclaration<TYPE_PARAMETER, TypeParameters>*
+  GREATER<GREATER,RAngle>
+;
+
+typeArgumentList
+:
+  LESS<LESS,LAngle>
+  GREATER<GREATER,RAngle>
+;
 
 typeParameterOfTypeDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpDeclarationBase";
@@ -534,8 +583,6 @@ fakeSeparator : FAKE;
 
 
 // Local declarations
-
-body: fakeSeparator;
 
 localDeclaration options {
   stubBase="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpDeclarationBase";
