@@ -17,9 +17,8 @@ open Microsoft.FSharp.Compiler.SourceCodeServices
 
 [<ShellComponent>]
 type FSharpCheckerService(lifetime, onSolutionCloseNotifier : OnSolutionCloseNotifier) as this =
-    let checker = FSharpChecker.Create(projectCacheSize = 200, keepAssemblyContents = true)
+    let checker = FSharpChecker.Create(projectCacheSize = 200, keepAllBackgroundResolutions = false)
     do
-        Environment.SetEnvironmentVariable("FCS_IncrementalTypeCheckCacheSize", "1000");
         onSolutionCloseNotifier.SolutionIsAboutToClose.Advise(lifetime, fun () ->
             checker.ClearLanguageServiceRootCachesAndCollectAndFinalizeAllTransients()
             this.OptionsProvider <- null)
