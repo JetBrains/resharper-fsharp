@@ -392,6 +392,7 @@
       <Private>True</Private>
     </Reference>
   </ItemGroup>
+  <Import Project="..\..\packages\JetBrains.Build.Platform.Tasks.ProxyToSolutionCompiledTask.2.0.20170511.1\build\ProxyToSolutionCompiledTask.Tasks" Condition="" />
   <ItemGroup>
     <Compile Include="src\Impl\Cache2\Declarations\FSharpCacheImplementationProcessor.cs" />
     <Compile Include="src\Impl\Cache2\Declarations\FSharpCacheNamesProcessor.cs" />
