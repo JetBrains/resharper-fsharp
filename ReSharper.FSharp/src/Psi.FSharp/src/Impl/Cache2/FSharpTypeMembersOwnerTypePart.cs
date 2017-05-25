@@ -4,31 +4,31 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
-  public abstract class FSharpTypeMembersOwnerTypePart : FSharpClassLikePart<IFSharpTypeDeclaration>
+  internal abstract class FSharpTypeMembersOwnerTypePart : FSharpClassLikePart<IFSharpTypeDeclaration>
   {
-    protected FSharpTypeMembersOwnerTypePart(IFSharpTypeDeclaration declaration, bool isHidden) : base(declaration,
-      ModifiersUtil.GetDecoration(declaration.AccessModifiers, declaration.AttributesEnumerable), isHidden,
-      declaration.TypeParameters.Count)
+    protected FSharpTypeMembersOwnerTypePart(IFSharpTypeDeclaration declaration, ICacheBuilder cacheBuilder)
+      : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifiers, declaration.AttributesEnumerable),
+        declaration.TypeParameters, cacheBuilder)
     {
       var extendListShortNames = new FrugalLocalHashSet<string>();
       foreach (var member in declaration.TypeMembersEnumerable)
       {
         var inherit = member as ITypeInherit;
-        if (inherit != null)
+        if (inherit?.LongIdentifier != null)
         {
           extendListShortNames.Add(inherit.LongIdentifier.Name);
           continue;
         }
 
         var interfaceImpl = member as IInterfaceImplementation;
-        if (interfaceImpl != null)
+        if (interfaceImpl?.LongIdentifier != null)
         {
           extendListShortNames.Add(interfaceImpl.LongIdentifier.Name);
           continue;
         }
 
         var interfaceInherit = member as IInterfaceInherit;
-        if (interfaceInherit != null)
+        if (interfaceInherit?.LongIdentifier != null)
           extendListShortNames.Add(interfaceInherit.LongIdentifier.Name);
       }
 

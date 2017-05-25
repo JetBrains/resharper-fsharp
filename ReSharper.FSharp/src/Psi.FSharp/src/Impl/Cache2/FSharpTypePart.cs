@@ -7,18 +7,15 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
-  public abstract class FSharpTypePart<TDeclaration> : TypePartImplBase<TDeclaration>
-    where TDeclaration : class, IFSharpDeclaration, ITypeDeclaration
+  public abstract class FSharpTypePart<T> : TypePartImplBase<T> where T : class, IFSharpDeclaration, ITypeDeclaration
   {
     private readonly MemberDecoration myDecoration;
 
-    protected FSharpTypePart(TDeclaration declaration, MemberDecoration memberDecoration, bool isHidden,
-      int typeParameters = 0) : base(declaration, declaration.ShortName, typeParameters)
+    protected FSharpTypePart(T declaration, MemberDecoration memberDecoration, int typeParameters,
+      ICacheBuilder cacheBuilder) : base(declaration, cacheBuilder.Intern(declaration.ShortName), typeParameters)
     {
+      // todo: calc access rights in class (impl & sig files)
       myDecoration = memberDecoration;
-
-      if (myDecoration.AccessRights == AccessRights.NONE)
-        myDecoration.AccessRights = isHidden ? AccessRights.INTERNAL : AccessRights.PUBLIC;
     }
 
     protected FSharpTypePart(IReader reader) : base(reader)
@@ -35,47 +32,13 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     protected override ICachedDeclaration2 FindDeclaration(IFile file, ICachedDeclaration2 candidateDeclaration)
     {
       if (Offset < TreeOffset.Zero) return null;
-      if (candidateDeclaration is TDeclaration) return candidateDeclaration;
+      if (candidateDeclaration is T) return candidateDeclaration;
       return null;
     }
 
     public override string[] ExtendsListShortNames => EmptyArray<string>.Instance;
     public override bool CanBePartial => true; // workaround for F# signatures
     public override MemberDecoration Modifiers => myDecoration;
-
-    public override IDeclaration GetTypeParameterDeclaration(int index)
-    {
-      var declaration = GetDeclaration() as IFSharpTypeDeclaration;
-      if (declaration == null) return null;
-
-      var parameters = declaration.TypeParameters;
-      Assertion.Assert(parameters.Count >= index, "typeParametersDeclarations.Count >= index");
-      return parameters[index];
-    }
-
-    public override string GetTypeParameterName(int index)
-    {
-      var declaration = GetDeclaration() as IFSharpTypeDeclaration;
-      Assertion.AssertNotNull(declaration, "typeParamsOwnerDeclaration != null");
-
-      var name = declaration.TypeParameters[index].GetText();
-      return name[0] == '\'' ? name.Substring(1) : name;
-    }
-
-    public override TypeParameterVariance GetTypeParameterVariance(int index)
-    {
-      return TypeParameterVariance.INVARIANT;
-    }
-
-    public override IEnumerable<IType> GetTypeParameterSuperTypes(int index)
-    {
-      return EmptyList<IType>.Instance;
-    }
-
-    public override TypeParameterConstraintFlags GetTypeParameterConstraintFlags(int index)
-    {
-      return 0;
-    }
 
     public override IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName)
     {

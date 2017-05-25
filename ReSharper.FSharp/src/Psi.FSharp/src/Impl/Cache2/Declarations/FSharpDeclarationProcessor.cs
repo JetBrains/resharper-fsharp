@@ -1,5 +1,4 @@
-﻿using System;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
@@ -7,33 +6,21 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations
 {
-  public abstract class FSharpCacheDeclarationProcessorBase : TreeNodeVisitor
+  public class FSharpCacheDeclarationProcessor : TreeNodeVisitor
   {
     protected readonly ICacheBuilder Builder;
     protected readonly int CacheVersion;
 
-    protected FSharpCacheDeclarationProcessorBase(ICacheBuilder builder, int cacheVersion = -1)
+    public FSharpCacheDeclarationProcessor(ICacheBuilder builder, int cacheVersion, FSharpFileKind fileKind)
     {
       Builder = builder;
       CacheVersion = cacheVersion;
     }
 
-    internal abstract void StartTypePart(IFSharpTypeElementDeclaration fSharpTypeElementDeclaration,
-      FSharpPartKind partKind);
-
     internal virtual void StartNamespacePart([NotNull] Part part)
     {
       Builder.StartPart(part);
     }
-
-
-    [CanBeNull]
-    protected static string MakeClrName([NotNull] IFSharpTypeElementDeclaration declaration)
-    {
-      var typeDeclaration = declaration as IFSharpTypeDeclaration;
-      return typeDeclaration != null ? FSharpImplUtil.MakeClrName(typeDeclaration) : null;
-    }
-
 
     public override void VisitFSharpFile(IFSharpFile fsFile)
     {
@@ -45,7 +32,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations
         foreach (var qualifier in qualifiers)
         {
           var qualifierName = FSharpNamesUtil.RemoveBackticks(qualifier.GetText());
-          StartNamespacePart(new QualifiedNamespacePart(qualifier.GetTreeStartOffset(), qualifierName));
+          StartNamespacePart(new QualifiedNamespacePart(qualifier.GetTreeStartOffset(), Builder.Intern(qualifierName)));
         }
 
         declaration.Accept(this);
@@ -57,19 +44,19 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations
 
     public override void VisitFSharpNamespaceDeclaration(IFSharpNamespaceDeclaration decl)
     {
-      StartNamespacePart(new DeclaredNamespacePart(decl));
+      Builder.StartPart(new DeclaredNamespacePart(decl));
       FinishModuleLikeDeclaraion(decl);
     }
 
     public override void VisitTopLevelModuleDeclaration(ITopLevelModuleDeclaration decl)
     {
-      StartTypePart(decl, FSharpPartKind.TopLevelModule);
+      Builder.StartPart(new TopLevelModulePart(decl, Builder));
       FinishModuleLikeDeclaraion(decl);
     }
 
     public override void VisitNestedModuleDeclaration(INestedModuleDeclaration decl)
     {
-      StartTypePart(decl, FSharpPartKind.NestedModule);
+      Builder.StartPart(new NestedModulePart(decl, Builder));
       FinishModuleLikeDeclaraion(decl);
     }
 
@@ -87,13 +74,13 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations
 
     public override void VisitExceptionDeclaration(IExceptionDeclaration decl)
     {
-      StartTypePart(decl, FSharpPartKind.Exception);
+      Builder.StartPart(new ExceptionPart(decl, Builder));
       Builder.EndPart();
     }
 
     public override void VisitEnumDeclaration(IEnumDeclaration decl)
     {
-      StartTypePart(decl, FSharpPartKind.Enum);
+      Builder.StartPart(new EnumPart(decl, Builder));
       foreach (var memberDecl in decl.EnumMembersEnumerable)
         Builder.AddDeclaredMemberName(memberDecl.DeclaredName);
       Builder.EndPart();
@@ -101,7 +88,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations
 
     public override void VisitRecordDeclaration(IRecordDeclaration decl)
     {
-      StartTypePart(decl, FSharpPartKind.Record);
+      Builder.StartPart(new RecordPart(decl, Builder));
       foreach (var fieldDeclaration in decl.FieldsEnumerable)
         Builder.AddDeclaredMemberName(fieldDeclaration.DeclaredName);
       ProcessTypeMembers(decl.MemberDeclarations);
@@ -110,7 +97,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations
 
     public override void VisitUnionDeclaration(IUnionDeclaration decl)
     {
-      StartTypePart(decl, FSharpPartKind.Union);
+      Builder.StartPart(new UnionPart(decl, Builder));
       foreach (var unionCase in decl.UnionCasesEnumerable)
         unionCase.Accept(this);
       ProcessTypeMembers(decl.MemberDeclarations);
@@ -119,66 +106,48 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations
 
     public override void VisitUnionCaseDeclaration(IUnionCaseDeclaration decl)
     {
-      StartTypePart(decl, FSharpPartKind.UnionCase);
+      Builder.StartPart(new UnionCasePart(decl, Builder));
       Builder.EndPart();
     }
 
     public override void VisitTypeAbbreviationDeclaration(ITypeAbbreviationDeclaration decl)
     {
-      StartTypePart(decl, FSharpPartKind.HiddenType);
-      Builder.EndPart();
-    }
-
-    public override void VisitObjectModelTypeDeclaration(IObjectModelTypeDeclaration decl)
-    {
-      StartTypePart(decl, decl.TypePartKind);
-      ProcessTypeMembers(decl.MemberDeclarations);
+      Builder.StartPart(new HiddenTypePart(decl, Builder));
       Builder.EndPart();
     }
 
     public override void VisitAbstractTypeDeclaration(IAbstractTypeDeclaration decl)
     {
-      StartTypePart(decl, FSharpPartKind.HiddenType);
+      Builder.StartPart(new HiddenTypePart(decl, Builder));
       Builder.EndPart();
+    }
+
+    public override void VisitObjectModelTypeDeclaration(IObjectModelTypeDeclaration decl)
+    {
+      Builder.StartPart(CreateObjectTypePart(decl));
+      ProcessTypeMembers(decl.MemberDeclarations);
+      Builder.EndPart();
+    }
+
+    private Part CreateObjectTypePart(IObjectModelTypeDeclaration decl)
+    {
+      switch (decl.TypePartKind)
+      {
+        case FSharpPartKind.Class:
+          return new ClassPart(decl, Builder);
+        case FSharpPartKind.Interface:
+          return new InterfacePart(decl, Builder);
+        case FSharpPartKind.Struct:
+          return new StructPart(decl, Builder);
+        default:
+          throw new System.ArgumentOutOfRangeException();
+      }
     }
 
     private void ProcessTypeMembers(TreeNodeCollection<ITypeMemberDeclaration> memberDeclarations)
     {
       foreach (var typeMemberDeclaration in memberDeclarations)
         Builder.AddDeclaredMemberName(typeMemberDeclaration.DeclaredName);
-    }
-
-    [NotNull]
-    internal static TypePart CreateTypePart([NotNull] IFSharpTypeElementDeclaration decl, FSharpPartKind partKind,
-      bool isHidden = false)
-    {
-      switch (partKind)
-      {
-        case FSharpPartKind.TopLevelModule:
-          return new TopLevelModulePart((ITopLevelModuleDeclaration) decl, isHidden);
-        case FSharpPartKind.NestedModule:
-          return new NestedModulePart((INestedModuleDeclaration) decl, isHidden);
-        case FSharpPartKind.Exception:
-          return new ExceptionPart((IFSharpTypeDeclaration) decl, isHidden);
-        case FSharpPartKind.Enum:
-          return new EnumPart((IEnumDeclaration) decl, isHidden);
-        case FSharpPartKind.Record:
-          return new RecordPart((IFSharpTypeDeclaration) decl, isHidden);
-        case FSharpPartKind.Union:
-          return new UnionPart((IFSharpTypeDeclaration) decl, isHidden);
-        case FSharpPartKind.UnionCase:
-          return new UnionCasePart((IUnionCaseDeclaration) decl, isHidden);
-        case FSharpPartKind.HiddenType:
-          return new HiddenTypePart((IFSharpTypeDeclaration) decl, isHidden);
-        case FSharpPartKind.Interface:
-          return new InterfacePart((IFSharpTypeDeclaration) decl, isHidden);
-        case FSharpPartKind.Class:
-          return new ClassPart((IFSharpTypeDeclaration) decl, isHidden);
-        case FSharpPartKind.Struct:
-          return new StructPart((IFSharpTypeDeclaration) decl, isHidden);
-        default:
-          throw new ArgumentOutOfRangeException(nameof(partKind), partKind, null);
-      }
     }
   }
 }

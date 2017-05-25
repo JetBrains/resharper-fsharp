@@ -5,14 +5,14 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
-  public class UnionPart : FSharpClassLikePart<IFSharpTypeDeclaration>, Class.IClassPart
+  internal class UnionPart : FSharpClassLikePart<IFSharpTypeDeclaration>, Class.IClassPart
   {
     private static readonly string[] ourExtendsListShortNames =
       {"IStructuralEquatable", "IStructuralComparable", "IComparable"};
 
-    public UnionPart(IFSharpTypeDeclaration declaration, bool isHidden) : base(declaration,
-      ModifiersUtil.GetDecoration(declaration.AccessModifiers, declaration.AttributesEnumerable), isHidden,
-      declaration.TypeParameters.Count)
+    public UnionPart(IFSharpTypeDeclaration declaration, ICacheBuilder cacheBuilder)
+      : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifiers, declaration.AttributesEnumerable),
+        declaration.TypeParameters, cacheBuilder)
     {
     }
 

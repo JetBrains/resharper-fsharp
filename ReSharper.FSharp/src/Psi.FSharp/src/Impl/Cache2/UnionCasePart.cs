@@ -9,8 +9,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
   internal class UnionCasePart : FSharpClassLikePart<IUnionCaseDeclaration>, Class.IClassPart
   {
-    public UnionCasePart(IUnionCaseDeclaration declaration, bool isHidden)
-      : base(declaration, ModifiersUtil.GetDecoration(declaration), isHidden)
+    public UnionCasePart(IUnionCaseDeclaration declaration, ICacheBuilder cacheBuilder)
+      : base(declaration, ModifiersUtil.GetDecoration(declaration),
+        TreeNodeCollection<ITypeParameterOfTypeDeclaration>.Empty, cacheBuilder)
     {
     }
 

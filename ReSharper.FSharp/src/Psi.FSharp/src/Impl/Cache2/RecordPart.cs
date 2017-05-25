@@ -10,8 +10,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     private static readonly string[] ourExtendsListShortNames =
       {"IStructuralEquatable", "IStructuralComparable", "IComparable"};
 
-    public RecordPart(IFSharpTypeDeclaration declaration, bool isHidden)
-      : base(declaration, isHidden)
+    public RecordPart(IFSharpTypeDeclaration declaration, ICacheBuilder cacheBuilder)
+      : base(declaration, cacheBuilder)
     {
     }
 

@@ -7,11 +7,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
   /// <summary>
   /// Used for type abbreviations and abstract types
   /// </summary>
-  public class HiddenTypePart : FSharpClassLikePart<IFSharpTypeDeclaration>, Class.IClassPart
+  internal class HiddenTypePart : FSharpClassLikePart<IFSharpTypeDeclaration>, Class.IClassPart
   {
-    public HiddenTypePart(IFSharpTypeDeclaration declaration, bool isHidden) : base(declaration,
-      ModifiersUtil.GetDecoration(declaration.AccessModifiers, declaration.AttributesEnumerable), isHidden,
-      declaration.TypeParameters.Count)
+    public HiddenTypePart(IFSharpTypeDeclaration declaration, ICacheBuilder cacheBuilder)
+      : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifiers, declaration.AttributesEnumerable),
+        declaration.TypeParameters, cacheBuilder)
     {
     }
 

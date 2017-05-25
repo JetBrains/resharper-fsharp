@@ -5,11 +5,11 @@ using JetBrains.ReSharper.Psi.FSharp.Tree;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
-  public class EnumPart : FSharpTypePart<IEnumDeclaration>, Enum.IEnumPart
+  internal class EnumPart : FSharpTypeParametersOwnerPart<IEnumDeclaration>, Enum.IEnumPart
   {
-    public EnumPart(IEnumDeclaration declaration, bool isHidden) : base(declaration,
-      ModifiersUtil.GetDecoration(declaration.AccessModifiers, declaration.AttributesEnumerable), isHidden,
-      declaration.TypeParameters.Count)
+    public EnumPart(IEnumDeclaration declaration, ICacheBuilder builder)
+      : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifiers, declaration.AttributesEnumerable),
+        declaration.TypeParameters, builder)
     {
     }
 

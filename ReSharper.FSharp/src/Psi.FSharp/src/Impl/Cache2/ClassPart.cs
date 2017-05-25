@@ -6,7 +6,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
   internal class ClassPart : FSharpTypeMembersOwnerTypePart, Class.IClassPart
   {
-    public ClassPart(IFSharpTypeDeclaration declaration, bool isHidden) : base(declaration, isHidden)
+    public ClassPart(IFSharpTypeDeclaration declaration, ICacheBuilder cacheBuilder) : base(declaration, cacheBuilder)
     {
     }
 
@@ -21,7 +21,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public MemberPresenceFlag GetMemberPresenceFlag()
     {
-      return MemberPresenceFlag.INSTANCE_CTOR; // todo: check members for this
+      // todo: check actual members 
+      return MemberPresenceFlag.INSTANCE_CTOR; 
     }
 
     protected override byte SerializationTag => (byte) FSharpPartKind.Class;

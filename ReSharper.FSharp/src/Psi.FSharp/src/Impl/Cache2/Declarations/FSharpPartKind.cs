@@ -15,6 +15,5 @@
     Interface = 10,
     Class = 11,
     Struct = 12,
-    OtherSimpleTypePart = 20
   }
 }

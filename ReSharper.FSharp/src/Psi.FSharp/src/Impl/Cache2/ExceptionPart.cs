@@ -9,8 +9,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
   {
     private static readonly string[] ourExtendsListShortNames = {"Exception", "IStructuralEquatable"};
 
-    public ExceptionPart(IFSharpTypeDeclaration declaration, bool isHidden)
-      : base(declaration, isHidden)
+    public ExceptionPart(IFSharpTypeDeclaration declaration, ICacheBuilder cacheBuilder)
+      : base(declaration, cacheBuilder)
     {
     }
 

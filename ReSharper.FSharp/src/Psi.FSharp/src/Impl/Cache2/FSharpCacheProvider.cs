@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using JetBrains.Annotations;
-using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase;
-using JetBrains.ReSharper.Psi.Caches.SymbolCache;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations;
@@ -20,69 +16,24 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
   public class FSharpCacheProvider : ILanguageCacheProvider
   {
-    private const int CacheVersion = 1;
-    private readonly HashSet<FileSystemPath> myFilesWaitingForPairUpdate = new HashSet<FileSystemPath>();
+    private const int CacheVersion = 2;
 
     public void BuildCache(IFile file, ICacheBuilder builder)
     {
       if (file.GetProjectFileType().Equals(FSharpScriptProjectFileType.Instance))
         return;
 
-      FileSystemPath pairFilePath;
-      var pairFile = GetPairFile(file, out pairFilePath);
-      var pairFileTypesInfo = pairFile != null
-        ? GetTypesInfo(pairFile)
-        : null;
-
-      var implFile = file as IFSharpImplFile;
-      implFile?.Accept(new FSharpCacheImplementationProcessor(builder, CacheVersion, pairFileTypesInfo));
-
-      var sigFile = file as IFSharpSigFile;
-      sigFile?.Accept(new FSharpCacheSignatureProcessor(builder, CacheVersion, pairFileTypesInfo));
-
-      if (pairFile != null && !myFilesWaitingForPairUpdate.Contains(pairFilePath))
-      {
-        var symbolCache = file.GetSolution().GetComponent<SymbolCache>(); // todo: store it somewhere?
-        myFilesWaitingForPairUpdate.Remove(pairFilePath);
-        symbolCache.MarkAsDirty(pairFile.GetSourceFile());
-        myFilesWaitingForPairUpdate.Add(file.GetSourceFile().GetLocation());
-        return;
-      }
-      myFilesWaitingForPairUpdate.Remove(pairFilePath);
+      var declarationProcessor = new FSharpCacheDeclarationProcessor(builder, CacheVersion, GetFSharpFileKind(file));
+      (file as IFSharpFile)?.Accept(declarationProcessor);
     }
 
-    [CanBeNull]
-    private static IFSharpFile GetPairFile([NotNull] IFile file, out FileSystemPath pairPath)
+    private static FSharpFileKind GetFSharpFileKind(IFile file)
     {
-      var sourceFile = file.GetSourceFile();
-      Assertion.AssertNotNull(sourceFile, "sourceFile != null");
-      pairPath = GetPairFilePath(sourceFile.GetLocation());
-      var pairFile = file.GetSolution().FindProjectItemsByLocation(pairPath).FirstOrDefault() as IProjectFile;
-      return pairFile?.GetPrimaryPsiFile() as IFSharpFile;
-    }
+      if (file is IFSharpImplFile)
+        return FSharpFileKind.ImplFile;
+      if (file is IFSharpSigFile)
+        return FSharpFileKind.SigFile;
 
-    [NotNull]
-    private static Dictionary<string, FSharpTypeInfo> GetTypesInfo([NotNull] IFSharpFile fsFile)
-    {
-      var namesCacheBuilder = new FSharpNamesCacheBuilder();
-      fsFile.Accept(new FSharpCacheNamesProcessor(namesCacheBuilder));
-      return namesCacheBuilder.Types;
-    }
-
-    [NotNull]
-    private static FileSystemPath GetPairFilePath([NotNull] FileSystemPath filePath)
-    {
-      switch (filePath.ExtensionNoDot)
-      {
-        case "fs":
-          return filePath.ChangeExtension("fsi");
-        case "fsi":
-          return filePath.ChangeExtension("fs");
-        case "ml":
-          return filePath.ChangeExtension("mli");
-        case "mli":
-          return filePath.ChangeExtension("ml");
-      }
       throw new ArgumentOutOfRangeException();
     }
 
@@ -142,6 +93,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public IEnumerable<IPsiSourceFile> GetAffectedOnPsiModulePropertiesChange(IPsiModule module)
     {
+      // todo: check this
       return EmptyList<IPsiSourceFile>.InstanceList;
     }
 
@@ -170,22 +122,22 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public bool IsInternableToken(TokenNodeType tokenNodeType)
     {
-      throw new System.NotImplementedException();
+      throw new NotImplementedException();
     }
 
     public void BuildCache(ISandBox sandBox, ICacheBuilder builder)
     {
-      throw new System.NotImplementedException();
+      throw new NotImplementedException();
     }
 
     public bool IsCacheableInClosedForm(IChameleonNode node)
     {
-      throw new System.NotImplementedException();
+      throw new NotImplementedException();
     }
 
     public TreeElement CreateChameleonNode(NodeType nodeType, TreeOffset startOffset, TreeOffset endOffset)
     {
-      throw new System.NotImplementedException();
+      throw new NotImplementedException();
     }
   }
 }

@@ -6,11 +6,12 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
-  public abstract class FSharpClassLikePart<TDeclaration> : FSharpTypePart<TDeclaration>,
-    ClassLikeTypeElement.IClassLikePart where TDeclaration : class, IFSharpDeclaration, ITypeDeclaration
+  internal abstract class FSharpClassLikePart<T> : FSharpTypeParametersOwnerPart<T>,
+    ClassLikeTypeElement.IClassLikePart where T : class, IFSharpTypeDeclaration, ITypeDeclaration
   {
-    protected FSharpClassLikePart(TDeclaration declaration, MemberDecoration memberDecoration, bool isHidden,
-      int typeParameters = 0) : base(declaration, memberDecoration, isHidden, typeParameters)
+    protected FSharpClassLikePart(T declaration, MemberDecoration memberDecoration,
+      TreeNodeCollection<ITypeParameterOfTypeDeclaration> typeParameters, ICacheBuilder cacheBuilder)
+      : base(declaration, memberDecoration, typeParameters, cacheBuilder)
     {
     }
 
@@ -20,20 +21,21 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public virtual IEnumerable<ITypeMember> GetTypeMembers()
     {
+      // todo: ask members from FCS and check `IsCompilerGenerated`
       return GetDeclaration()?.MemberDeclarations.Select(d => d.DeclaredElement).WhereNotNull() ??
              EmptyList<ITypeMember>.InstanceList;
     }
 
     public virtual IEnumerable<IDeclaredType> GetSuperTypes()
     {
-      return (GetDeclaration() as IFSharpTypeDeclaration)?.SuperTypes ??
-             EmptyList<IDeclaredType>.Instance;
+      // todo: override in class and ask FCS without getting declaration
+      return GetDeclaration()?.SuperTypes ?? EmptyList<IDeclaredType>.Instance;
     }
 
     public virtual IDeclaredType GetBaseClassType()
     {
-      return (GetDeclaration() as IFSharpTypeDeclaration)?.BaseClassType ??
-             GetPsiModule().GetPredefinedType().Object;
+      // todo: override in class and ask FCS without getting declaration
+      return GetDeclaration()?.BaseClassType ?? GetPsiModule().GetPredefinedType().Object;
     }
   }
 }
