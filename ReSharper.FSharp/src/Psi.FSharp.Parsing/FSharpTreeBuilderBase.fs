@@ -210,8 +210,7 @@ type FSharpTreeBuilderBase(file : IPsiSourceFile, lexer : ILexer, lifetime) as t
         let mark =
             match id with
             | Some id ->
-                let startOffset = min (x.GetStartOffset id) (x.GetStartOffset range)
-                x.AdvanceToOffset startOffset
+                x.AdvanceToOffset (min (x.GetStartOffset id) (x.GetStartOffset range))
                 let mark = x.Builder.Mark()
                 x.ProcessIdentifier id
                 mark
@@ -221,7 +220,7 @@ type FSharpTreeBuilderBase(file : IPsiSourceFile, lexer : ILexer, lifetime) as t
 
         x.ProcessSynType t
         range |> x.GetEndOffset |> x.AdvanceToOffset
-        x.Done(mark, ElementType.EXCEPTION_DECLARATION)
+        x.Done(mark, ElementType.FIELD_DECLARATION)
 
     member internal x.ProcessLocalId (id : Ident) =
         id.idRange |> x.GetStartOffset |> x.AdvanceToOffset
