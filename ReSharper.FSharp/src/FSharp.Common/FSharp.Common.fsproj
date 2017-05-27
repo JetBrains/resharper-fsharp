@@ -51,7 +51,9 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
+    <!--<Compile Include="src\FileSystemShim.fs" />-->
     <Compile Include="src\ProjectModel\FSharpProjectLanguage.fs" />
+    <Compile Include="src\ProjectOptions\FSharpProject.fs" />
     <Compile Include="src\ProjectModel\ProjectProperties\FSharpProjectProperties.fs" />
     <Compile Include="src\ProjectModel\ProjectProperties\FSharpProjectPropertiesFactory.fs" />
     <Compile Include="src\ProjectModel\ProjectProperties\FSharpProjectFilePropertiesProvider.fs" />

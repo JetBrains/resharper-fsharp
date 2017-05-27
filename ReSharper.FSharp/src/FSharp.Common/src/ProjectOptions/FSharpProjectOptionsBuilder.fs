@@ -13,13 +13,14 @@ open JetBrains.ProjectModel.ProjectsHost.MsBuild
 open JetBrains.ProjectModel.ProjectsHost.SolutionHost
 open JetBrains.ProjectModel.Properties
 open JetBrains.ProjectModel.Properties.Managed
+open JetBrains.ReSharper.Plugins.FSharp.Common
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
 [<ShellComponent>]
 type FSharpProjectPropertiesRequest() =
-    let properties = [ "OtherFlags"; "WarnOn" ]
+    let properties = [ "WarnOn" ]
     interface IProjectPropertiesRequest with
         member x.RequestedProperties = properties :> seq<_>
 
@@ -27,6 +28,7 @@ type FSharpProjectPropertiesRequest() =
 type FSharpProjectOptionsBuilder(solution : ISolution) =
     let msBuildHost = solution.ProjectsHostContainer().GetComponent<MsBuildProjectHost>()
     let defaultDelimiters = [| ';'; ','; ' ' |]
+    let compileTypes = Set.ofSeq (seq { yield "Compile"; yield "CompileBefore"; yield "CompileAfter"})
 
     member x.BuildSingleProjectOptions (project : IProject) =
         let properties = project.ProjectProperties
@@ -35,7 +37,6 @@ type FSharpProjectOptionsBuilder(solution : ISolution) =
         let options = List()
         options.AddRange(seq {
             yield "--out:" + project.GetOutputFilePath(project.GetCurrentTargetFrameworkId()).FullPath
-            yield "--simpleresolution"
             yield "--noframework"
             yield "--debug:full"
             yield "--debug+"
@@ -61,37 +62,46 @@ type FSharpProjectOptionsBuilder(solution : ISolution) =
 
             let nowarn = x.SplitAndTrim(cfg.NoWarn, defaultDelimiters).Join(",")
             if not (nowarn.IsNullOrWhitespace()) then options.Add("--nowarn:" + nowarn)
-
-            let properties = cfg.PropertiesCollection
-            options.AddRange(x.SplitAndTrim(properties.TryGetValue("OtherFlags"), ' '))
         | _ -> ()
 
-        let options' =
-            { ProjectFileName = project.ProjectFileLocation.FullPath;
-              ProjectFileNames = x.GetProjectFileNames(project)
+        let filePaths, pairFiles = x.GetProjectFiles(project)
+        let fileIndices = Dictionary<FileSystemPath, int>()
+        Array.iteri (fun i p -> fileIndices.[p] <- i) filePaths
+        
+        let projectOptions =
+            { ProjectFileName = project.ProjectFileLocation.FullPath
+              ProjectFileNames = Array.map (fun (p : FileSystemPath ) -> p.FullPath) filePaths
               OtherOptions = options.ToArray()
-              ReferencedProjects = [||]
+              ReferencedProjects = Array.empty
               IsIncompleteTypeCheckEnvironment = false
               UseScriptResolutionRules = false
               LoadTime = DateTime.Now
-              OriginalLoadReferences = []
+              OriginalLoadReferences = List.empty
               UnresolvedReferences = None
               ExtraProjectInfo = None }
-        
-        options', definedConstants
-        
-    member private x.GetProjectFileNames(project : IProject) =
+
+        { Options = Some projectOptions
+          ConfigurationDefines = definedConstants
+          FileIndices = fileIndices
+          FilesWithPairs = pairFiles }
+
+    member private x.GetProjectFiles(project : IProject) =
         let projectMark = project.GetProjectMark().NotNull()
         let projectDir = projectMark.Location.Directory
         let files = List()
+        let sigFiles = HashSet<string>()
+        let pairFiles = HashSet<FileSystemPath>()
         ignore (msBuildHost.mySessionHolder.Execute(fun session ->
             session.EditProject(projectMark, fun editor ->
                 for item in editor.Items do
-                    if BuildAction.GetOrCreate(item.ItemType()).IsCompile() then
+                    if compileTypes.Contains(item.ItemType()) then
                         let path = FileSystemPath.TryParse(item.EvaluatedInclude)
                         if not path.IsEmpty then
-                            files.Add(x.EnsureAbsolute(path, projectDir).FullPath))))
-        files.ToArray()
+                            files.Add(x.EnsureAbsolute(path, projectDir))
+                            if path.IsSigFile() then sigFiles.add path.NameWithoutExtension
+                            else if path.IsImplFile() && sigFiles.Contains(path.NameWithoutExtension)
+                                 then pairFiles.add(path))))
+        files.ToArray(), pairFiles
 
     member private x.GetReferencedPathsOptions(project : IProject) =
         let framework = project.GetCurrentTargetFrameworkId()

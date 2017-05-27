@@ -4,6 +4,7 @@ open System
 open System.Collections.Generic
 open System.Linq
 open System.Threading
+open System.Reflection
 open JetBrains
 open JetBrains.Annotations
 open JetBrains.Application
@@ -18,9 +19,6 @@ open JetBrains.ProjectModel
 open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost.MsBuild
 open JetBrains.ProjectModel.ProjectsHost.SolutionHost
-open JetBrains.ProjectModel.Properties
-open JetBrains.ProjectModel.Properties.CSharp
-open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Daemon.Impl
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
@@ -28,30 +26,44 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Plugins.FSharp.Common
 open JetBrains.ReSharper.Plugins.FSharp.Common.CheckerService
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
-open JetBrains.Util
+open JetBrains
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
+type Logger = Util.ILoggerEx
+type LoggingLevel = Util.LoggingLevel
+
 [<SolutionComponent>]
-type FSharpProjectOptionsProvider(lifetime, logger : ILogger, solution : ISolution, shellLocks : ShellLocks,
+type FSharpProjectOptionsProvider(lifetime, logger : Util.ILogger, solution : ISolution,
                                   checkerService : FSharpCheckerService, optionsBuilder : FSharpProjectOptionsBuilder,
                                   changeManager : ChangeManager) as this =
     inherit RecursiveProjectModelChangeDeltaVisitor()
 
-    let projects = Dictionary<IProject, IDisposable>() // keeps FCS project alive until disposed
-    let projectsOptions = Dictionary<IProject, FSharpProjectOptions>()
+    let projects = Dictionary<IProject, FSharpProject>()
     let projectsToInvalidate = JetHashSet<IProject>()
 
-    let scriptsOptions = Dictionary<string, FSharpProjectOptions>()
-    let configurationDefines = Dictionary<IProject, string list>()
-    let taskHost = shellLocks.Tasks
     let mutable cts : CancellationTokenSource = null
-    let isRunningOnMono = PlatformUtil.IsRunningOnMono
+    let mutable fsCorePath : string = null
+    
+    let invalidProject (p : IProject) =
+        invalidOp (sprintf "Project %s is not opened" p.ProjectFileLocation.FullPath)
+    
+    let getProject (file : IPsiSourceFile) =
+        let project = file.GetProject()
+        match projects.TryGetValue(project) with
+        | true, fsProject -> fsProject
+        | _ -> invalidProject project
 
     do
         changeManager.Changed2.Advise(lifetime, this.ProcessChange);
         checkerService.OptionsProvider <- this
+        lifetime.AddAction(fun _ -> checkerService.OptionsProvider <- null) |> ignore
+
+        if Util.PlatformUtil.IsRunningOnMono then
+            let fsCoreAssembly = Assembly.GetAssembly(typeof<Unit>)
+            if isNotNull fsCoreAssembly then
+                let path = Util.FileSystemPath.TryParse(fsCoreAssembly.Location)
+                if isNotNull path then fsCorePath <- "-r:" + path.FullPath
 
     member private x.ProcessChange(obj : ChangeEventArgs) =
         let change = obj.ChangeMap.GetChange<ProjectModelChange>(solution)
@@ -61,140 +73,107 @@ type FSharpProjectOptionsProvider(lifetime, logger : ILogger, solution : ISoluti
         if change.IsClosingSolution then x.InvalidateAll()
         else
             match change.ProjectModelElement with
-            | :? IProject as project when x.IsApplicable(project.ProjectProperties) ->
+            | :? IProject as project when isApplicable project ->
                 if change.IsRemoved then
-                    if projects.contains project then projects.[project].Dispose()
-                    projects.remove project
-                    configurationDefines.remove project
-                    projectsToInvalidate.remove project
-                else
-                    use cookie = ReadLockCookie.Create()
-                    projectsToInvalidate.add project
-                    x.InvalidateReferencingProjects(project)
+                    match projects.TryGetValue project with
+                    | true, fsProject ->
+                        checkerService.Checker.InvalidateConfiguration(fsProject.Options.Value)
+                        projects.Remove(project) |> ignore
+                    | _ -> ()
+                else projectsToInvalidate.add project
+                checkerService.InvalidateAssemblySignature(project, false)
+                x.InvalidateReferencingProjects(project)
             | _ -> base.VisitDelta change
 
-    member private x.IsApplicable([<NotNull>] properties : IProjectProperties) =
-        match properties with
-        | :? FSharpProjectProperties -> true
-        | :? ProjectKCSharpProjectProperties as coreProperties ->
-            // todo: remove when ProjectK properties replaced with DotNetCoreProjectFlavour
-            coreProperties.ProjectTypeGuids.Contains(FSharpProjectPropertiesFactory.FSharpProjectTypeGuid)
-        | _ -> false
-
     member private x.InvalidateReferencingProjects(project) =
+        // todo: how to get framework when project was removed?
         for p in project.GetReferencingProjects(project.GetCurrentTargetFrameworkId()) do
-            if x.IsApplicable(project.ProjectProperties) then
+            if isApplicable project then
                 projectsToInvalidate.Add(p) |> ignore
                 x.InvalidateReferencingProjects(p)
 
-    member private x.GetProjectOptionsAux(file : IPsiSourceFile, checker : FSharpChecker) =
-        match file.ToProjectFile() with
-        | projectFile when
-            isNotNull projectFile &&
-            projectFile.LanguageType.Equals(FSharpProjectFileType.Instance) &&
-            projectFile.Properties.BuildAction.IsCompile() ->
-                match file.GetProject() with
-                | project when isNotNull project && project.IsOpened ->
-                    x.ProcessInvalidateOptions(checker)
-                    use cookie = ReadLockCookie.Create()
-                    Some (x.GetOrCreateProjectOptions(project, checker))
-                | _ -> None
-        | _ -> None
+    member private x.GetProjectOptionsImpl(file : IPsiSourceFile, checker : FSharpChecker) =
+        lock projects (fun _ ->
+            x.ProcessInvalidateOptions(checker)
+            let project = file.GetProject()
+            match projects.TryGetValue(project) with
+            | true, fsProject when fsProject.ContainsFile file -> fsProject.Options
+            | _ when project.IsOpened -> x.CreateProjectOptions(project, checker)
+            | _ -> None)
 
-    member private x.GetOrCreateProjectOptions(project, checker) =
-        if projectsOptions.contains project then projectsOptions.[project]
-        else
-            let options, defines = optionsBuilder.BuildSingleProjectOptions(project)
-            configurationDefines.[project] <- defines
-
+    member private x.CreateProjectOptions(project, checker) =
+        match projects.TryGetValue(project) with
+        | true, project -> project.Options
+        | _ ->
+            let fsProject = optionsBuilder.BuildSingleProjectOptions(project)
             let framework = project.GetCurrentTargetFrameworkId()
             let referencedProjectsOptions =
                 seq { for p in project.GetReferencedProjects(framework, transitive = false) do
-                          if p.IsOpened && x.IsApplicable(p.ProjectProperties) then
+                          if p.IsOpened && isApplicable p then
                               let outPath = p.GetOutputFilePath(p.GetCurrentTargetFrameworkId()).FullPath
-                              yield outPath, x.GetOrCreateProjectOptions(p, checker) }
+                              yield outPath, x.CreateProjectOptions(p, checker).Value }
 
-            let options' = { options with ReferencedProjects = referencedProjectsOptions.ToArray() }
-            projects.[project] <- checker.KeepProjectAlive(options').RunAsTask()
-            projectsOptions.[project] <- options'
-            options'
+            let options' = { fsProject.Options.Value with ReferencedProjects = referencedProjectsOptions.ToArray() }
+            let fsProject = { fsProject with Options = Some options' }
+            projects.[project] <- fsProject
+            fsProject.Options
 
     member private x.ProcessInvalidateOptions(checker) =
-        lock projectsToInvalidate (fun _ ->
-            for p in projectsToInvalidate do
-                if projectsOptions.contains p then checker.InvalidateConfiguration(projectsOptions.[p])
-                if projects.contains p then projects.[p].Dispose()
-                configurationDefines.remove p
-                projectsOptions.remove p
+        for p in projectsToInvalidate do
+            if projects.contains p then
+                checker.InvalidateConfiguration(projects.[p].Options.Value)
                 projects.remove p
-            projectsToInvalidate.Clear())
+        projectsToInvalidate.Clear()
 
-    member private x.GetScriptOptionsAux(file : IPsiSourceFile, checker : FSharpChecker, shouldTryUpdate : bool) =
+    member private x.GetScriptOptionsImpl(file : IPsiSourceFile, checker : FSharpChecker) =
         let filePath = file.GetLocation().FullPath
         let source = file.Document.GetText()
         let loadTime = DateTime.Now
         let getScriptOptionsAsync = checker.GetProjectOptionsFromScript(filePath, source, loadTime)
-        if not (scriptsOptions.ContainsKey(filePath)) then
-            try
-                let options, errors = getScriptOptionsAsync.RunAsTask()
-                if not errors.IsEmpty then logger.LogFSharpErrors("Script options for " + filePath) errors
+        try
+            let options, errors = getScriptOptionsAsync.RunAsTask()
+            if not errors.IsEmpty then logger.LogFSharpErrors("Script options for " + filePath) errors
+            Some (x.FixScriptOptions(options))
+        with
+        | :? ProcessCancelledException -> reraise()
+        | exn ->
+            // todo: replace FCS reference resolver
+            Logger.Warn(logger, "Error while getting options for {0}: {1}", filePath, exn.Message)
+            None
 
-                scriptsOptions.[filePath] <- options
-                Some options // todo: fix options on mono
-            with
-            | :? ProcessCancelledException -> reraise()
-            | exn ->
-                // todo: replace FCS reference resolver
-                let message = sprintf "Getting options for %s: %s" filePath exn.Message
-                logger.LogMessage(LoggingLevel.WARN, message)
-                None
-        else
-            // todo: check working
-            let existingOptions = scriptsOptions.[filePath]
-            if shouldTryUpdate then
-                if isNotNull cts then cts.Cancel()
-                cts <- new CancellationTokenSource()
-                taskHost.StartNew(lifetime, Scheduling.FreeThreaded, fun () ->
-                    try
-                        let cancellationToken = cts.Token
-                        let options, errors = getScriptOptionsAsync |> Async.RunSynchronously
-                        if not errors.IsEmpty then
-                            logger.LogFSharpErrors("Script options for " + filePath) errors
-
-                        if not (ArrayUtil.Equals(options.OtherOptions, existingOptions.OtherOptions)) then
-                            scriptsOptions.[filePath] <- options
-                            use cookie = ReadLockCookie.Create()
-                            file.GetSolution().GetComponent<DaemonImpl>().ForceReHighlight(file.Document) |> ignore
-                        cts <- null
-                    with
-                    | :? ProcessCancelledException -> reraise()
-                    | exn ->
-                        // todo: replace FCS reference resolver
-                        let msg = sprintf "Getting options for %s: %s" filePath exn.Message
-                        logger.LogMessage(LoggingLevel.WARN, msg)) |> ignore
-            Some existingOptions
+    member private x.FixScriptOptions(options) =
+        if isNull fsCorePath then options
+        else { options with OtherOptions = Array.append options.OtherOptions [| fsCorePath |] }
 
     member private x.InvalidateAll() =
-        for p in projects.Values do p.Dispose()
         projects.Clear()
-        projectsOptions.Clear()
-        scriptsOptions.Clear()
-        configurationDefines.Clear()
-        projectsToInvalidate.Clear()
-
-    member private x.GetDefinesAux(sourceFile : IPsiSourceFile) =
-        match sourceFile.GetProject() with
-        | project when isNotNull project && configurationDefines.ContainsKey(project) ->
-            configurationDefines.[project]
-        | _ -> List.empty
+        projectsToInvalidate.Clear() // todo: check?
 
     interface IFSharpProjectOptionsProvider with
-        member x.GetProjectOptions(file, checker, updateScriptOptions) =
+        member x.GetProjectOptions(file, checker) =
             if file.PsiModule.IsMiscFilesProjectModule() then None
             else
                 if file.LanguageType.Equals(FSharpScriptProjectFileType.Instance)
-                then x.GetScriptOptionsAux(file, checker, updateScriptOptions)
-                else x.GetProjectOptionsAux(file, checker)
+                then x.GetScriptOptionsImpl(file, checker)
+                else x.GetProjectOptionsImpl(file, checker)
 
-        member x.GetDefines(sourceFile : IPsiSourceFile) =
-            x.GetDefinesAux(sourceFile)
+        member x.GetProjectOptions(project) =
+            match projects.TryGetValue(project) with
+            | true, fsProject -> fsProject.Options
+            | _ -> invalidProject project
+
+        member x.TryGetFSharpProject(project : IProject) =
+            match projects.TryGetValue project with
+            | true, fsProject -> Some fsProject
+            | _ -> None
+
+        member x.GetFileIndex(file) =
+            let fsProject = getProject file
+            let filePath = file.GetLocation()
+            match fsProject.FileIndices.TryGetValue(filePath) with
+            | true, index -> index
+            | _ -> invalidOp (sprintf "%s doesn't belong to %A" filePath.FullPath fsProject)
+            
+        member x.HasPairFile(file) =
+            let fsProject = getProject file 
+            fsProject.FilesWithPairs.Contains(file.GetLocation())
