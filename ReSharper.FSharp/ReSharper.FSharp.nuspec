@@ -19,6 +19,8 @@
   </metadata>
   <files>
     <file src="src\FSharp.Common\bin\Debug\JetBrains.ReSharper.Plugins.FSharp.Common.dll" target="DotFiles" />
+    <file src="src\FSharp.Daemon\bin\Debug\JetBrains.ReSharper.Plugins.FSharp.Daemon.dll" target="DotFiles" />
+    <file src="src\FSharp.Services\bin\Debug\JetBrains.ReSharper.Plugins.FSharp.Services.dll" target="DotFiles" />
     <file src="src\FSharp.ProjectModelBase\bin\Debug\JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase.dll" target="DotFiles" />
     <file src="src\Psi.FSharp\bin\Debug\JetBrains.ReSharper.Psi.FSharp.dll" target="DotFiles" />
     <file src="src\Psi.FSharp.LanguageService\bin\Debug\JetBrains.ReSharper.Psi.FSharp.LanguageService.dll" target="DotFiles" />
