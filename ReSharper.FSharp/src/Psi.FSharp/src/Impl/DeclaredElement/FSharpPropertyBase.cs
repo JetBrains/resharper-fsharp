@@ -26,7 +26,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 
       if (property != null)
       {
-        IsReadable = property.HasGetterMethod || property.IsPropertyGetterMethod;
+        IsReadable = property.HasGetterMethod || property.IsPropertyGetterMethod ||
+                     property.IsModuleValueOrMember && !property.IsMember;
         IsWritable = property.IsMutable || property.HasSetterMethod || property.IsPropertySetterMethod;
         ShortName = property.GetMemberCompiledName();
         var returnType = property.IsPropertySetterMethod
