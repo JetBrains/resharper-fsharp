@@ -72,12 +72,10 @@ type FSharpSelectEmbracingConstructProvider(settingsStore : ISettingsStore) =
                         // todo: cover more cases (open expressions, inner expressions in bindings, match guards)
                         member x.VisitExpr(path,_,defaultTraverse,expr) =
                             match expr with
-                            | SynExpr.LongIdent(_,_,_,range) -> Some path
-                            | SynExpr.Ident ident -> Some path
-                            | SynExpr.Const(synconst, constRange) -> Some path
+                            | SynExpr.Ident _ | SynExpr.Const _ | SynExpr.LongIdent _ -> Some path
                             | _ -> defaultTraverse expr }
                     
-                    let parentRanges = 
+                    let parentRanges =
                         match Traverse(pos, parseTree, visitor) with
                         | Some traversePath ->
                             List.map getRanges traversePath
