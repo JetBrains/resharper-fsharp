@@ -1,9 +1,17 @@
-﻿using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+﻿using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
+  internal class FSharpClass : FSharpTypeBase
+  {
+    public FSharpClass([NotNull] IClassPart part) : base(part)
+    {
+    }
+  }
+  
   internal class ClassPart : FSharpTypeMembersOwnerTypePart, Class.IClassPart
   {
     public ClassPart(IFSharpTypeDeclaration declaration, ICacheBuilder cacheBuilder) : base(declaration, cacheBuilder)
@@ -16,7 +24,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public override TypeElement CreateTypeElement()
     {
-      return new Class(this);
+      return new FSharpClass(this);
     }
 
     public MemberPresenceFlag GetMemberPresenceFlag()

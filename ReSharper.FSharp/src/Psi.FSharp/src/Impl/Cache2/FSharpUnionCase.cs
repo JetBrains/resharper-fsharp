@@ -5,7 +5,7 @@ using JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
-  internal class FSharpUnionCase : FSharpClassLikeElement<UnionCasePart>
+  internal class FSharpUnionCase : FSharpTypeBase
   {
 
     public FSharpUnionCase([NotNull] IClassPart part) : base(part)

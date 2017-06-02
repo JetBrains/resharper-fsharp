@@ -1,4 +1,6 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Common.CheckerService;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
@@ -8,13 +10,22 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations
 {
   public class FSharpCacheDeclarationProcessor : TreeNodeVisitor
   {
-    protected readonly ICacheBuilder Builder;
     protected readonly int CacheVersion;
+    protected readonly ICacheBuilder Builder;
+    private readonly FSharpCheckerService myCheckerService;
 
-    public FSharpCacheDeclarationProcessor(ICacheBuilder builder, int cacheVersion, FSharpFileKind fileKind)
+    public FSharpCacheDeclarationProcessor(ICacheBuilder builder, FSharpCheckerService checkerService, int cacheVersion)
     {
       Builder = builder;
+      myCheckerService = checkerService;
       CacheVersion = cacheVersion;
+    }
+
+    private static FSharpFileKind GetFSharpFileKind(IFSharpFile file)
+    {
+      if (file is IFSharpImplFile) return FSharpFileKind.ImplFile;
+      if (file is IFSharpSigFile) return FSharpFileKind.SigFile;
+      throw new ArgumentOutOfRangeException();
     }
 
     internal virtual void StartNamespacePart([NotNull] Part part)
@@ -24,7 +35,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations
 
     public override void VisitFSharpFile(IFSharpFile fsFile)
     {
-      Builder.CreateProjectFilePart(new FSharpProjectFilePart(fsFile.GetSourceFile(), CacheVersion));
+      var sourceFile = fsFile.GetSourceFile();
+      var fileKind = GetFSharpFileKind(fsFile);
+      var hasPairFile = myCheckerService.HasPairFile(sourceFile);
+
+      Builder.CreateProjectFilePart(new FSharpProjectFilePart(sourceFile, CacheVersion, fileKind, hasPairFile));
 
       foreach (var declaration in fsFile.DeclarationsEnumerable)
       {
@@ -140,7 +155,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations
         case FSharpPartKind.Struct:
           return new StructPart(decl, Builder);
         default:
-          throw new System.ArgumentOutOfRangeException();
+          throw new ArgumentOutOfRangeException();
       }
     }
 

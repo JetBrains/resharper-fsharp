@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using JetBrains.ReSharper.Plugins.FSharp.Common.CheckerService;
 using JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
-using JetBrains.ReSharper.Psi.Impl.CodeStyle;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
@@ -16,30 +16,30 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
   public class FSharpCacheProvider : ILanguageCacheProvider
   {
+    private readonly FSharpCheckerService myCheckerService;
+
+    public FSharpCacheProvider(FSharpCheckerService checkerService)
+    {
+      myCheckerService = checkerService;
+    }
+
     private const int CacheVersion = 2;
 
     public void BuildCache(IFile file, ICacheBuilder builder)
     {
-      if (file.GetProjectFileType().Equals(FSharpScriptProjectFileType.Instance))
+      var sourceFile = file.GetSourceFile();
+      Assertion.AssertNotNull(sourceFile, "sourceFile != null");
+      if (sourceFile.LanguageType.Equals(FSharpScriptProjectFileType.Instance))
         return;
 
-      var declarationProcessor = new FSharpCacheDeclarationProcessor(builder, CacheVersion, GetFSharpFileKind(file));
+      var declarationProcessor = new FSharpCacheDeclarationProcessor(builder, myCheckerService, CacheVersion);
       (file as IFSharpFile)?.Accept(declarationProcessor);
-    }
-
-    private static FSharpFileKind GetFSharpFileKind(IFile file)
-    {
-      if (file is IFSharpImplFile)
-        return FSharpFileKind.ImplFile;
-      if (file is IFSharpSigFile)
-        return FSharpFileKind.SigFile;
-
-      throw new ArgumentOutOfRangeException();
     }
 
     public ProjectFilePart LoadProjectFilePart(IPsiSourceFile sourceFile, ProjectFilePartsTree tree, IReader reader)
     {
-      var part = new FSharpProjectFilePart(sourceFile, reader);
+      var part = new FSharpProjectFilePart(sourceFile, reader, sourceFile.GetFSharpFileKind(),
+        myCheckerService.HasPairFile(sourceFile));
       if (part.CacheVersion != CacheVersion)
         tree.ForceDirty();
 
@@ -83,6 +83,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public bool NeedCacheUpdate(ITreeNode elementContainingChanges, PsiChangedElementType type)
     {
+      var project = elementContainingChanges?.GetProject();
+      if (project != null)
+        myCheckerService.InvalidateAssemblySignature(project, true);
       return true;
     }
 

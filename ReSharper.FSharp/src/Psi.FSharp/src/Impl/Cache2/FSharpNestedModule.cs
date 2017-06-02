@@ -3,7 +3,7 @@ using JetBrains.Annotations;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
-  internal class FSharpNestedModule : FSharpClassLikeElement<NestedModulePart>
+  internal class FSharpNestedModule : FSharpTypeBase
   {
     public FSharpNestedModule([NotNull] IClassPart part) : base(part)
     {

@@ -6,7 +6,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
-  internal class FSharpSimpleType<TPart> : FSharpClassLikeElement<TPart> where TPart : Part
+  internal class FSharpSimpleType: FSharpTypeBase
   {
     private const string CompareToName = "CompareTo";
     private const string EqualsName = "Equals";
