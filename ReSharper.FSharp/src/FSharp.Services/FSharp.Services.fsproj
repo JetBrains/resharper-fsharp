@@ -51,6 +51,7 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
+    <Compile Include="FSharpClrLanguage.fs" />
     <Compile Include="SelectEmbracingConsruct\FSharpSelectEmbracingConstructProvider.fs" />
     <Content Include="packages.config" />
   </ItemGroup>
@@ -79,19 +80,22 @@
     <Reference Include="DevExpress.XtraTreeList.v7.1">
       <HintPath>..\..\packages\JetBrains.Platform.Lib.DevExpress.2.0.20150224.0\lib\Net\DevExpress.XtraTreeList.v7.1.dll</HintPath>
     </Reference>
-    <Reference Include="FSharp.Compiler.Service, Version=12.0.6.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="FantomasLib">
+      <HintPath>..\..\packages\Fantomas.2.6.1\lib\FantomasLib.dll</HintPath>
+    </Reference>
+    <Reference Include="FSharp.Compiler.Service">
       <HintPath>..\..\..\..\FSharp.Compiler.Service\bin\v4.5\FSharp.Compiler.Service.dll</HintPath>
     </Reference>
-    <Reference Include="FSharp.Compiler.Service.MSBuild.v12, Version=12.0.6.0, Culture=neutral, PublicKeyToken=null">
+    <Reference Include="FSharp.Compiler.Service.MSBuild.v12">
       <HintPath>..\..\..\..\FSharp.Compiler.Service\bin\v4.5\FSharp.Compiler.Service.MSBuild.v12.dll</HintPath>
     </Reference>
     <!--<Reference Include="FSharp.Compiler.Service">-->
-      <!--<HintPath>..\..\packages\FSharp.Compiler.Service.12.0.2\lib\net45\FSharp.Compiler.Service.dll</HintPath>-->
-      <!--<Private>True</Private>-->
+    <!--<HintPath>..\..\packages\FSharp.Compiler.Service.12.0.2\lib\net45\FSharp.Compiler.Service.dll</HintPath>-->
+    <!--<Private>True</Private>-->
     <!--</Reference>-->
     <!--<Reference Include="FSharp.Compiler.Service.MSBuild.v12">-->
-      <!--<HintPath>..\..\packages\FSharp.Compiler.Service.12.0.2\lib\net45\FSharp.Compiler.Service.MSBuild.v12.dll</HintPath>-->
-      <!--<Private>True</Private>-->
+    <!--<HintPath>..\..\packages\FSharp.Compiler.Service.12.0.2\lib\net45\FSharp.Compiler.Service.MSBuild.v12.dll</HintPath>-->
+    <!--<Private>True</Private>-->
     <!--</Reference>-->
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\..\packages\SharpZipLib.JetBrains.Stripped.0.87.20161027.6\lib\net40\ICSharpCode.SharpZipLib.dll</HintPath>
