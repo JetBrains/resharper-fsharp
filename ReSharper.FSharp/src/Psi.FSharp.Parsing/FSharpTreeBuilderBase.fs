@@ -286,19 +286,19 @@ type FSharpTreeBuilderBase(file : IPsiSourceFile, lexer : ILexer, lifetime) as t
                     if selfId.IsSome then x.ProcessLocalId selfId.Value
                     ElementType.IMPLICIT_CONSTRUCTOR_DECLARATION
 
-                | SynMemberDefn.ImplicitInherit(SynType.LongIdent(lidWithDots),_,_,_) -> // todo: other syntypes (e.g. app/lidapp)
-                    x.ProcessLongIdentifier lidWithDots.Lid
+                | SynMemberDefn.ImplicitInherit(baseType,_,_,_) ->
+                    x.ProcessSynType baseType
                     ElementType.TYPE_INHERIT
 
-                | SynMemberDefn.Interface(SynType.LongIdent(lidWithDots),interfaceMembersOpt,range) ->
-                    x.ProcessLongIdentifier lidWithDots.Lid
-                    if interfaceMembersOpt.IsSome then
-                        for m in interfaceMembersOpt.Value do
-                            x.ProcessTypeMember m
+                | SynMemberDefn.Interface(interfaceType,interfaceMembersOpt,range) ->
+                    x.ProcessSynType interfaceType
+                    match interfaceMembersOpt with
+                    | Some members -> for m in members do x.ProcessTypeMember m
+                    | _ -> () 
                     ElementType.INTERFACE_IMPLEMENTATION
 
-                | SynMemberDefn.Inherit(SynType.LongIdent(lidWithDots),_,_) ->
-                    x.ProcessLongIdentifier lidWithDots.Lid
+                | SynMemberDefn.Inherit(baseInterface,_,_) ->
+                    x.ProcessSynType baseInterface
                     ElementType.INTERFACE_INHERIT
 
                 | SynMemberDefn.Member(Binding(_,_,_,_,_,_,valData,headPat,ret,expr,_,_),range) ->
@@ -427,27 +427,40 @@ type FSharpTreeBuilderBase(file : IPsiSourceFile, lexer : ILexer, lifetime) as t
             x.ProcessSimplePatterns pats
             x.ProcessSynType t
 
+    member internal x.ProcessTypeArgs(ltRange : Range.range, typeArgs, gtRange) =
+        ltRange |> x.GetStartOffset |> x.AdvanceToOffset
+        let mark = x.Mark()
+        for t in typeArgs do x.ProcessSynType t
+        gtRange |> x.GetEndOffset |> x.AdvanceToOffset
+        x.Done(mark, ElementType.TYPE_ARGUMENT_LIST)
+
     member internal x.ProcessSynType(synType : SynType) =
+        let range = synType.Range
         match synType with
-        | SynType.App(_,lt,typeArgs,_,gt,isPostfix,_) ->
+        | SynType.LongIdent(lid) ->
+            range |> x.GetStartOffset |> x.AdvanceToOffset
+            let mark = x.Mark()
+            x.ProcessLongIdentifier lid.Lid
+            range |> x.GetEndOffset |> x.AdvanceToOffset
+            x.Done(mark, ElementType.NAMED_TYPE_EXPRESSION)
+        
+        | SynType.App(typeName,lt,typeArgs,_,gt,isPostfix,_) ->
+            range |> x.GetStartOffset |> x.AdvanceToOffset
+            let mark = x.Mark()
+            match typeName with
+            | SynType.LongIdent(lid) -> x.ProcessLongIdentifier lid.Lid | _ -> ()
             match isPostfix, lt, gt with
-            | false, Some ltRange, Some rtRange ->
-                ltRange |> x.GetStartOffset |> x.AdvanceToOffset
-                let mark = x.Mark()
-                for t in typeArgs do x.ProcessSynType t
-                rtRange |> x.GetEndOffset |> x.AdvanceToOffset
-                x.Done(mark, ElementType.TYPE_ARGUMENT_LIST)
-            | _ -> ()
+            | false, Some ltRange, Some gtRange -> x.ProcessTypeArgs(ltRange, typeArgs, gtRange) | _ -> ()
+            range |> x.GetEndOffset |> x.AdvanceToOffset
+            x.Done(mark, ElementType.NAMED_TYPE_EXPRESSION)
 
         | SynType.LongIdentApp(_,_,lt,typeArgs,_,gt,_) ->
+            range |> x.GetStartOffset |> x.AdvanceToOffset
+            let mark = x.Mark()
             match lt, gt with
-            | Some ltRange, Some rtRange ->
-                ltRange |> x.GetStartOffset |> x.AdvanceToOffset
-                let mark = x.Mark()
-                for t in typeArgs do x.ProcessSynType t
-                rtRange |> x.GetEndOffset |> x.AdvanceToOffset
-                x.Done(mark, ElementType.TYPE_ARGUMENT_LIST)
-            | _ -> ()
+            | Some ltRange, Some gtRange -> x.ProcessTypeArgs(ltRange, typeArgs, gtRange) | _ -> ()
+            range |> x.GetEndOffset |> x.AdvanceToOffset
+            x.Done(mark, ElementType.NAMED_TYPE_EXPRESSION)
 
         | SynType.Tuple (types,_)
         | SynType.StructTuple (types,_) ->
@@ -467,7 +480,6 @@ type FSharpTreeBuilderBase(file : IPsiSourceFile, lexer : ILexer, lifetime) as t
 
         | SynType.StaticConstantExpr(_)
         | SynType.StaticConstant(_)
-        | SynType.LongIdent(_)
         | SynType.Anon(_)
         | SynType.Var(_) -> ()
 

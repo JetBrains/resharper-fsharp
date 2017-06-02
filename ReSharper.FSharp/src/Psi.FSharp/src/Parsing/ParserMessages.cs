@@ -16,6 +16,7 @@
     public const string IDS_MODIFIER = "";
     public const string IDS_NOT_COMPILED_TYPE_DECLARATION = "";
     public const string IDS_SIMPLE_TYPE_DECLARATION = "";
+    public const string IDS_TYPE_EXPRESSION = "";
 
     public static string GetString(string id)
     {

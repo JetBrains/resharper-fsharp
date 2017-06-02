@@ -13,23 +13,23 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       var extendListShortNames = new FrugalLocalHashSet<string>();
       foreach (var member in declaration.TypeMembersEnumerable)
       {
-        var inherit = member as ITypeInherit;
-        if (inherit?.LongIdentifier != null)
+        var baseTypeIdentifier = (member as ITypeInherit)?.BaseType?.LongIdentifier;
+        if (baseTypeIdentifier != null)
         {
-          extendListShortNames.Add(inherit.LongIdentifier.Name);
+          extendListShortNames.Add(baseTypeIdentifier.Name);
           continue;
         }
 
-        var interfaceImpl = member as IInterfaceImplementation;
-        if (interfaceImpl?.LongIdentifier != null)
+        var interfaceImplTypeIdentifier = (member as IInterfaceImplementation)?.InterfaceType?.LongIdentifier;
+        if (interfaceImplTypeIdentifier != null)
         {
-          extendListShortNames.Add(interfaceImpl.LongIdentifier.Name);
+          extendListShortNames.Add(interfaceImplTypeIdentifier.Name);
           continue;
         }
 
-        var interfaceInherit = member as IInterfaceInherit;
-        if (interfaceInherit?.LongIdentifier != null)
-          extendListShortNames.Add(interfaceInherit.LongIdentifier.Name);
+        var interfaceInheritTypeIdentifier = (member as IInterfaceInherit)?.InterfaceType?.LongIdentifier; 
+        if (interfaceInheritTypeIdentifier != null)
+          extendListShortNames.Add(interfaceInheritTypeIdentifier.Name);
       }
 
       ExtendsListShortNames = extendListShortNames.ToArray();

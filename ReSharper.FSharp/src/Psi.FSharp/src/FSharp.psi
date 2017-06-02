@@ -304,11 +304,11 @@ interface fSharpTypeMemberDeclaration:
 
   otherTypeMember;
 
-interfaceInherit: longIdentifier<LONG_IDENTIFIER, LongIdentifier>;
-typeInherit: longIdentifier<LONG_IDENTIFIER, LongIdentifier> fakeSeparator;
+interfaceInherit: namedTypeExpression<INTERFACE_TYPE, InterfaceType>;
+typeInherit: namedTypeExpression<BASE_TYPE, BaseType>;
 
 interfaceImplementation:
-  longIdentifier<LONG_IDENTIFIER, LongIdentifier>
+  namedTypeExpression<INTERFACE_TYPE, InterfaceType>
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>* fakeSeparator;
 
 
@@ -426,3 +426,15 @@ fakeSeparator: FAKE;
 localDeclaration options { stubBase="FSharpDeclarationBase"; }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
   fSharpIdentifier<IDENTIFIER, Identifier>;
+
+
+typeExpression:
+  namedTypeExpression |
+  otherTypeExpression;
+
+
+namedTypeExpression:
+  longIdentifier<LONG_IDENTIFIER, LongIdentifier> fakeSeparator
+  typeArgumentList?;
+
+otherTypeExpression: FAKE;
