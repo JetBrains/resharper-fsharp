@@ -54,17 +54,18 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       return (Column) range.EndColumn;
     }
 
-    public static Range.pos GetPos([NotNull] this IDocument document, int offset)
+    public static Range.pos GetPos([NotNull] this IDocument document, int offset, int lineShift = 0,
+      int columnShift = 0)
     {
       // FCS lines are 1-based
       var coords = document.GetCoordsByOffset(offset);
       return Range.mkPos((int) coords.Line + 1, (int) coords.Column);
     }
 
-    public static Range.pos GetPos(this DocumentCoords coords)
+    public static Range.pos GetPos(this DocumentCoords coords, int columnShift = 0)
     {
       // FCS lines are 1-based
-      return Range.mkPos((int) coords.Line + 1, (int) coords.Column);
+      return Range.mkPos((int) coords.Line + 1, (int) coords.Column + columnShift);
     }
 
     public static int GetOffset([NotNull] this IDocument document, Range.pos pos)
