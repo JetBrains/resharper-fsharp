@@ -1,8 +1,8 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 
 open JetBrains.Application.BuildScript.Application.Zones
-open JetBrains.ProjectModel
+open JetBrains.ProjectModel.ProjectsHost.SolutionHost
 
 [<ZoneMarker>]
-type ZoneMarker =
-    inherit IRequire<IProjectModelZone> // todo: cannot find inherited ZoneMarker here
+type ZoneMarker() =
+    interface IRequire<ISolutionHostZone>
