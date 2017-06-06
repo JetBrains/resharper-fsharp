@@ -1,9 +1,8 @@
 ﻿using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
-using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.Util;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
+namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
 {
   internal class ExceptionPart : FSharpTypeMembersOwnerTypePart, Class.IClassPart
   {

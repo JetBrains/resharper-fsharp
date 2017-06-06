@@ -4,7 +4,7 @@ using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
+namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
 {
   internal abstract class FSharpClassLikePart<T> : FSharpTypeParametersOwnerPart<T>,
     ClassLikeTypeElement.IClassLikePart where T : class, IFSharpTypeDeclaration, ITypeDeclaration

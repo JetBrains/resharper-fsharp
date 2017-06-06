@@ -1,8 +1,8 @@
-﻿using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
-using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations;
+﻿using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
+namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
 {
   internal class StructPart : FSharpTypeMembersOwnerTypePart, Struct.IStructPart
   {
@@ -16,7 +16,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public override TypeElement CreateTypeElement()
     {
-      return new Struct(this);
+      return new FSharpStruct(this);
     }
 
     public MemberPresenceFlag GetMembersPresenceFlag()
@@ -26,5 +26,14 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public bool HasHiddenInstanceFields => false; // todo: check this
     protected override byte SerializationTag => (byte) FSharpPartKind.Struct;
+  }
+
+  public class FSharpStruct : Struct
+  {
+    public FSharpStruct([NotNull] IStructPart part) : base(part)
+    {
+    }
+    
+    protected override MemberDecoration Modifiers => myParts.GetModifiers();
   }
 }

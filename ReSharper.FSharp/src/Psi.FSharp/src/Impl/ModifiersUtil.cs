@@ -1,4 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2;
 using JetBrains.ReSharper.Psi.FSharp.Parsing;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Parsing;
@@ -7,7 +11,7 @@ using JetBrains.Util.Extension;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl
 {
-  public class ModifiersUtil
+  public static class ModifiersUtil
   {
     private const string AbstractClass = "AbstractClass";
 
@@ -38,16 +42,60 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
       foreach (var attr in attributes)
       {
         var ids = attr.LongIdentifier.Identifiers;
-        if (ids.IsEmpty)
-          continue;
+        if (ids.IsEmpty) continue;
 
-        if (ids.Last().GetText().SubstringBeforeLast("Attribute") == AbstractClass)
+        var attributeShortName = ids.Last().GetText().SubstringBeforeLast("Attribute");
+        if (attributeShortName.Equals(AbstractClass, StringComparison.InvariantCulture))
         {
           decoration.Modifiers |= Modifiers.ABSTRACT;
           break;
         }
       }
       return decoration;
+    }
+
+    public static MemberDecoration GetModifiers(this TypePart typePart)
+    {
+        var sigPart = GetPartFromSignature(typePart);
+        if (sigPart != null)
+          return Normalize(sigPart.Modifiers);
+
+        if (typePart == null)
+          return MemberDecoration.DefaultValue;
+
+        var decoration = typePart.Modifiers;
+        var isHiddenBySignature = (typePart?.GetRoot() as FSharpProjectFilePart)?.HasPairFile ?? false;
+        if (isHiddenBySignature)
+          decoration.AccessRights = AccessRights.INTERNAL;
+
+        return Normalize(decoration);
+    }
+
+    private static MemberDecoration Normalize(MemberDecoration decoration)
+    {
+      if (decoration.AccessRights == AccessRights.NONE)
+        decoration.AccessRights = AccessRights.PUBLIC;
+
+      if (decoration.IsStatic)
+      {
+        decoration.IsAbstract = true;
+        decoration.IsSealed = true;
+      }
+
+      decoration.IsStatic = true;
+      return decoration;
+    }
+
+    [CanBeNull]
+    private static TypePart GetPartFromSignature(TypePart typePart)
+    {
+      for (var part = typePart; part != null; part = part.NextPart)
+      {
+        var filePart = part.GetRoot() as FSharpProjectFilePart;
+        if (filePart?.IsSignaturePart ?? false)
+          return part;
+      }
+      return null;
     }
   }
 }

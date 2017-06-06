@@ -1,12 +1,11 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement.CompilerGenerated;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
-  internal class FSharpSimpleType: FSharpTypeBase
+  internal class FSharpSimpleTypeBase : FSharpClass
   {
     private const string CompareToName = "CompareTo";
     private const string EqualsName = "Equals";
@@ -16,12 +15,13 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     private const string ComparerTypeName = "System.Collections.IComparer";
     private const string EqComparerTypeName = "System.Collections.IEqualityComparer";
 
-    public FSharpSimpleType([NotNull] IClassPart part) : base(part)
+    public FSharpSimpleTypeBase([NotNull] IClassPart part) : base(part)
     {
     }
 
     public override IEnumerable<ITypeMember> GetMembers()
     {
+      // todo: convert these members from FCS and cache them
       var boolType = Module.GetPredefinedType().Bool;
       var intType = Module.GetPredefinedType().Int;
       var objType = Module.GetPredefinedType().Object;

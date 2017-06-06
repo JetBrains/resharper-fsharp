@@ -1,12 +1,12 @@
 ﻿using System;
-using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Common.CheckerService;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations
+namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
   public class FSharpCacheDeclarationProcessor : TreeNodeVisitor
   {
@@ -28,11 +28,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations
       throw new ArgumentOutOfRangeException();
     }
 
-    internal virtual void StartNamespacePart([NotNull] Part part)
-    {
-      Builder.StartPart(part);
-    }
-
     public override void VisitFSharpFile(IFSharpFile fsFile)
     {
       var sourceFile = fsFile.GetSourceFile();
@@ -47,7 +42,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations
         foreach (var qualifier in qualifiers)
         {
           var qualifierName = FSharpNamesUtil.RemoveBackticks(qualifier.GetText());
-          StartNamespacePart(new QualifiedNamespacePart(qualifier.GetTreeStartOffset(), Builder.Intern(qualifierName)));
+          Builder.StartPart(new QualifiedNamespacePart(qualifier.GetTreeStartOffset(), Builder.Intern(qualifierName)));
         }
 
         declaration.Accept(this);
@@ -56,7 +51,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations
           Builder.EndPart();
       }
     }
-
+    
     public override void VisitFSharpNamespaceDeclaration(IFSharpNamespaceDeclaration decl)
     {
       Builder.StartPart(new DeclaredNamespacePart(decl));

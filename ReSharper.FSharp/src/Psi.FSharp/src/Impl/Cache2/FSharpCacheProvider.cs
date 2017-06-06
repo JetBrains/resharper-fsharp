@@ -4,7 +4,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Common.CheckerService;
 using JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
-using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations;
+using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Parsing;
@@ -40,6 +40,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     {
       var part = new FSharpProjectFilePart(sourceFile, reader, sourceFile.GetFSharpFileKind(),
         myCheckerService.HasPairFile(sourceFile));
+
       if (part.CacheVersion != CacheVersion)
         tree.ForceDirty();
 

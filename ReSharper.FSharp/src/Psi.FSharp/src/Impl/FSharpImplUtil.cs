@@ -1,7 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
+using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
@@ -89,6 +92,27 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
     }
 
     [NotNull]
+    public static IEnumerable<string> MakeNamePath([NotNull] IFSharpTypeElementDeclaration declaration)
+    {
+      var containingTypeDeclaration = declaration.GetContainingTypeDeclaration() as IFSharpTypeElementDeclaration;
+      if (containingTypeDeclaration != null)
+        foreach (var name in MakeNamePath(containingTypeDeclaration))
+          yield return name;
+      else
+      {
+        var namespaceDeclaration = declaration.GetContainingNamespaceDeclaration();
+        if (namespaceDeclaration != null)
+          foreach (var name in namespaceDeclaration.QualifiedName.Split("."))
+            yield return name;
+      }
+      var typeParamsOwner = declaration as IFSharpTypeDeclaration;
+      var declName = typeParamsOwner?.TypeParameters.Count > 0
+        ? declaration.DeclaredName + "`" + typeParamsOwner.TypeParameters.Count
+        : declaration.DeclaredName;
+      yield return declName;
+    }
+
+    [NotNull]
     public static string MakeClrName([NotNull] IFSharpTypeElementDeclaration declaration)
     {
       var clrName = new StringBuilder();
@@ -124,6 +148,21 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
              (mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod
                ? mfv.DisplayName
                : mfv.LogicalName);
+    }
+
+    public static FSharpFileKind GetFSharpFileKind([NotNull] this IFile file)
+    {
+      if (file is IFSharpImplFile) return FSharpFileKind.ImplFile;
+      if (file is IFSharpSigFile) return FSharpFileKind.SigFile;
+      throw new ArgumentOutOfRangeException();
+    }
+
+    public static FSharpFileKind GetFSharpFileKind([NotNull] this IPsiSourceFile sourceFile)
+    {
+      var fileExtension = sourceFile.GetLocation().ExtensionNoDot;
+      if (fileExtension == "fs" || fileExtension == "ml") return FSharpFileKind.ImplFile;
+      if (fileExtension == "fsi" || fileExtension == "mli") return FSharpFileKind.SigFile;
+      throw new ArgumentOutOfRangeException();
     }
   }
 }

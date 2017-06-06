@@ -7,7 +7,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {
-  internal class FSharpRecord : FSharpSimpleType
+  internal class FSharpRecord : FSharpSimpleTypeBase
   {
     public FSharpRecord([NotNull] IClassPart part) : base(part)
     {

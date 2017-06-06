@@ -1,8 +1,7 @@
 ﻿using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
-using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
+namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
 {
   internal class InterfacePart : FSharpTypeMembersOwnerTypePart, Interface.IInterfacePart
   {
@@ -17,9 +16,18 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public override TypeElement CreateTypeElement()
     {
-      return new Interface(this);
+      return new FSharpInterface(this);
     }
 
     protected override byte SerializationTag => (byte) FSharpPartKind.Interface;
+  }
+
+  public class FSharpInterface : Interface
+  {
+    public FSharpInterface(IInterfacePart part) : base(part)
+    {
+    }
+
+    protected override MemberDecoration Modifiers => myParts.GetModifiers();
   }
 }

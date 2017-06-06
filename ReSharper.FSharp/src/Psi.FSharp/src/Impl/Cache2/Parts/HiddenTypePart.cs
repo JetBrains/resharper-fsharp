@@ -1,11 +1,14 @@
 ﻿using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
-using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
+namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
 {
   /// <summary>
   /// Used for type abbreviations and abstract types
+  /// todo: check cases:
+  ///   * single union case without bar (parsed as abbreviation)
+  ///   * units of measure
+  ///   * provided types (cache them in assembly signature?)
   /// </summary>
   internal class HiddenTypePart : FSharpClassLikePart<IFSharpTypeDeclaration>, Class.IClassPart
   {

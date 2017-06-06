@@ -392,22 +392,38 @@
       <Private>True</Private>
     </Reference>
   </ItemGroup>
-  <Import Project="..\..\packages\JetBrains.Build.Platform.Tasks.ProxyToSolutionCompiledTask.2.0.20170511.1\build\ProxyToSolutionCompiledTask.Tasks" Condition="" />
+  <Import Project="..\..\packages\JetBrains.Build.Platform.Tasks.ProxyToSolutionCompiledTask.2.0.20170530.0\build\ProxyToSolutionCompiledTask.Tasks" Condition="" />
   <ItemGroup>
-    <Compile Include="src\Impl\Cache2\Declarations\FSharpCacheImplementationProcessor.cs" />
-    <Compile Include="src\Impl\Cache2\Declarations\FSharpCacheNamesProcessor.cs" />
-    <Compile Include="src\Impl\Cache2\Declarations\FSharpCacheSignatureProcessor.cs" />
-    <Compile Include="src\Impl\Cache2\Declarations\FSharpDeclarationProcessorBase.cs" />
-    <Compile Include="src\Impl\Cache2\Declarations\FSharpPartKind.cs" />
-    <Compile Include="src\Impl\Cache2\Declarations\FSharpTypeInfo.cs" />
-    <Compile Include="src\Impl\Cache2\Declarations\FSharpNamesCacheBuilder.cs" />
-    <Compile Include="src\Impl\Cache2\FSharpSimpleType.cs" />
+    <Compile Include="src\Impl\Cache2\FSharpDeclarationProcessor.cs" />
+    <Compile Include="src\Impl\Cache2\FSharpFileKind.cs" />
+    <Compile Include="src\Impl\Cache2\FSharpPartKind.cs" />
+    <Compile Include="src\Impl\Cache2\FSharpSimpleTypeBase.cs" />
+    <Compile Include="src\Impl\Cache2\Parts\ClassPart.cs" />
+    <Compile Include="src\Impl\Cache2\Parts\DeclaredNamespacePart.cs" />
+    <Compile Include="src\Impl\Cache2\Parts\EnumPart.cs" />
+    <Compile Include="src\Impl\Cache2\Parts\ExceptionPart.cs" />
+    <Compile Include="src\Impl\Cache2\Parts\FSharpClassLikePart.cs" />
+    <Compile Include="src\Impl\Cache2\Parts\FSharpTypeMembersOwnerTypePart.cs" />
+    <Compile Include="src\Impl\Cache2\Parts\FSharpTypeParametersOwnerPart.cs" />
+    <Compile Include="src\Impl\Cache2\Parts\FSharpTypePart.cs" />
+    <Compile Include="src\Impl\Cache2\Parts\HiddenTypePart.cs" />
+    <Compile Include="src\Impl\Cache2\Parts\InterfacePart.cs" />
+    <Compile Include="src\Impl\Cache2\Parts\ModulePartBase.cs" />
+    <Compile Include="src\Impl\Cache2\Parts\NestedModulePart.cs" />
+    <Compile Include="src\Impl\Cache2\Parts\QualifiedNamespacePart.cs" />
+    <Compile Include="src\Impl\Cache2\Parts\RecordPart.cs" />
+    <Compile Include="src\Impl\Cache2\Parts\SimpleTypePartBase.cs" />
+    <Compile Include="src\Impl\Cache2\Parts\StructPart.cs" />
+    <Compile Include="src\Impl\Cache2\Parts\TopLevelModulePart.cs" />
+    <Compile Include="src\Impl\Cache2\Parts\UnionCasePart.cs" />
+    <Compile Include="src\Impl\Cache2\Parts\UnionPart.cs" />
     <Compile Include="src\Impl\DeclaredElement\CompilerGenerated\FSharpGeneratedElementBase.cs" />
     <Compile Include="src\Impl\DeclaredElement\CompilerGenerated\FSharpGeneratedConstructor.cs" />
     <Compile Include="src\Impl\DeclaredElement\CompilerGenerated\FSharpGeneratedMemberBase.cs" />
     <Compile Include="src\Impl\DeclaredElement\CompilerGenerated\FSharpGeneratedMethod.cs" />
     <Compile Include="src\Impl\DeclaredElement\CompilerGenerated\FSharpGeneratedProperty.cs" />
     <Compile Include="src\Impl\DeclaredElement\CompilerGenerated\FSharpTagsClass.cs" />
+    <Compile Include="src\Impl\DeclaredElement\FSharpAttributeInstance.cs" />
     <Compile Include="src\Impl\DeclaredElement\FSharpParameter.cs" />
     <Compile Include="src\FSharpScriptProjectFileLanguageService.cs" />
     <Compile Include="src\Gen\Psi\FSharp\**\*.cs">
@@ -433,31 +449,14 @@
     <Compile Include="src\FSharpProjectFileLanguageService.cs" />
     <Compile Include="src\FSharpPsiProperties.cs" />
     <Compile Include="src\IFSharpTypeMember.cs" />
-    <Compile Include="src\Impl\Cache2\ClassPart.cs" />
-    <Compile Include="src\Impl\Cache2\DeclaredNamespacePart.cs" />
-    <Compile Include="src\Impl\Cache2\EnumPart.cs" />
-    <Compile Include="src\Impl\Cache2\ExceptionPart.cs" />
     <Compile Include="src\Impl\Cache2\FSharpCacheProvider.cs" />
-    <Compile Include="src\Impl\Cache2\FSharpClassLikeElement.cs" />
-    <Compile Include="src\Impl\Cache2\FSharpClassLikePart.cs" />
+    <Compile Include="src\Impl\Cache2\FSharpTypeBase.cs" />
     <Compile Include="src\Impl\Cache2\FSharpException.cs" />
     <Compile Include="src\Impl\Cache2\FSharpUnionCase.cs" />
-    <Compile Include="src\Impl\Cache2\FSharpTopLevelModule.cs" />
-    <Compile Include="src\Impl\Cache2\FSharpNestedModule.cs" />
-    <Compile Include="src\Impl\Cache2\FSharpTypeMembersOwnerTypePart.cs" />
+    <Compile Include="src\Impl\Cache2\FSharpModule.cs" />
     <Compile Include="src\Impl\Cache2\FSharpProjectFilePart.cs" />
     <Compile Include="src\Impl\Cache2\FSharpRecord.cs" />
-    <Compile Include="src\Impl\Cache2\FSharpTypePart.cs" />
     <Compile Include="src\Impl\Cache2\FSharpUnion.cs" />
-    <Compile Include="src\Impl\Cache2\InterfacePart.cs" />
-    <Compile Include="src\Impl\Cache2\TopLevelModulePart.cs" />
-    <Compile Include="src\Impl\Cache2\NestedModulePart.cs" />
-    <Compile Include="src\Impl\Cache2\QualifiedNamespacePart.cs" />
-    <Compile Include="src\Impl\Cache2\RecordPart.cs" />
-    <Compile Include="src\Impl\Cache2\StructPart.cs" />
-    <Compile Include="src\Impl\Cache2\HiddenTypePart.cs" />
-    <Compile Include="src\Impl\Cache2\UnionCasePart.cs" />
-    <Compile Include="src\Impl\Cache2\UnionPart.cs" />
     <Compile Include="src\Impl\DeclaredElement\FSharpConstructor.cs" />
     <Compile Include="src\Impl\DeclaredElement\FSharpConstructorBase.cs" />
     <Compile Include="src\Impl\DeclaredElement\FSharpDeclaredElement.cs" />
@@ -534,6 +533,7 @@
     <Compile Include="src\Searching\FSharpReferenceSearcher.cs" />
     <Compile Include="src\Searching\FSharpReferenceSearchProcessor.cs" />
     <Compile Include="src\Searching\FSharpSearcherFactory.cs" />
+    <Compile Include="src\Settings\FSharpHighlighterColorSettingsPage.cs" />
     <Compile Include="src\Tree\ChildRole.cs" />
     <Compile Include="src\Tree\IConstructorDeclaration.cs" />
     <Compile Include="src\Tree\FSharpCompositeNodeType.cs" />
@@ -545,6 +545,7 @@
     <Compile Include="src\Tree\IFSharpFileCheckInfoOwner.cs" />
     <Compile Include="src\Tree\IFSharpIdentifier.cs" />
     <Compile Include="src\Tree\IFSharpNamespaceDeclaration.cs" />
+    <Compile Include="src\Tree\INestedModuleDeclaration.cs" />
     <Compile Include="src\Tree\IObjectModelTypeDeclaration.cs" />
     <Compile Include="src\Tree\IFSharpTreeNode.cs" />
     <Compile Include="src\Tree\IImplicitConstructor.cs" />
@@ -560,7 +561,6 @@
     <Compile Include="src\Tree\ITopLevelModuleDeclaration.cs" />
     <Compile Include="src\Tree\IModuleLikeDeclaration.cs" />
     <Compile Include="src\Tree\ITopLevelModuleOrNamespaceDeclaration.cs" />
-    <Compile Include="src\Tree\INestedModuleDeclaration.cs" />
     <Compile Include="src\Util\FSharpElementsUtil.cs" />
     <Compile Include="src\Util\FSharpIconsUtil.cs" />
     <Compile Include="src\Util\FSharpRangeUtil.cs" />
