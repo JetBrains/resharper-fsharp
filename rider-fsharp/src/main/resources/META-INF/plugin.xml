@@ -20,6 +20,7 @@
     <backend.typedHandler language="F#" implementationClass="com.jetbrains.resharper.editorActions.FSharpTypedHandler" />
     <completion.contributor language="F#" implementationClass="com.jetbrains.resharper.completion.ReSharperCompletionContributor" />
     <codeInsight.parameterInfo language="F#" implementationClass="com.jetbrains.resharper.parameterInfo.RiderParameterInfoHandler" />
+    <codeStyleSettingsProvider implementation="com.jetbrains.resharper.settings.FSharpCodeStyleSettingsProvider" />
 
     <directoryProjectGenerator implementation="com.jetbrains.resharper.projectView.projectGenerators.FSharpLibrary" />
     <directoryProjectGenerator implementation="com.jetbrains.resharper.projectView.projectGenerators.FSharpConsoleApplication" />

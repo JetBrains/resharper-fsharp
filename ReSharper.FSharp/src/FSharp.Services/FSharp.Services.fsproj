@@ -53,6 +53,8 @@
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="FSharpClrLanguage.fs" />
     <Compile Include="SelectEmbracingConsruct\FSharpSelectEmbracingConstructProvider.fs" />
+    <Compile Include="Formatter\FSharpCodeStylePage.fs" />
+    <Compile Include="Formatter\ReformatCode.fs" />
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -234,6 +236,7 @@
     <Reference Include="Owin">
       <HintPath>..\..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
+    <Reference Include="PresentationFramework" />
     <Reference Include="SharpCompress">
       <HintPath>..\..\packages\sharpcompress.0.11.6\lib\net40\SharpCompress.dll</HintPath>
     </Reference>
