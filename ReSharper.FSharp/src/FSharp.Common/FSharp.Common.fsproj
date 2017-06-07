@@ -51,7 +51,6 @@
   <Import Project="$(FSharpTargetsPath)" />
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
-    <!--<Compile Include="src\FileSystemShim.fs" />-->
     <Compile Include="src\ProjectModel\FSharpProjectLanguage.fs" />
     <Compile Include="src\ProjectOptions\FSharpProject.fs" />
     <Compile Include="src\ProjectModel\ProjectProperties\FSharpProjectProperties.fs" />
@@ -59,9 +58,10 @@
     <Compile Include="src\ProjectModel\ProjectProperties\FSharpProjectFilePropertiesProvider.fs" />
     <Compile Include="src\ProjectModel\FSharpProjectPresenter.fs" />
     <Compile Include="src\ProjectModel\ZoneMarker.fs" />
-    <Compile Include="src\Util.fs" />
+    <Compile Include="src\Util\Util.fs" />
     <Compile Include="src\ProjectOptions\IFSharpProjectOptionsProvider.fs" />
     <Compile Include="src\FSharpCheckerService.fs" />
+    <Compile Include="src\ProjectOptions\FSharpMsBuildProjectListener.fs" />
     <Compile Include="src\ProjectOptions\FSharpProjectOptionsBuilder.fs" />
     <Compile Include="src\ProjectOptions\FSharpProjectOptionsProvider.fs" />
     <Content Include="packages.config" />

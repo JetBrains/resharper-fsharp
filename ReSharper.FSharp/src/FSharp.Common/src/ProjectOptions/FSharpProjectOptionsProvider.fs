@@ -23,7 +23,7 @@ open JetBrains.ReSharper.Daemon.Impl
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.ReSharper.Plugins.FSharp.Common
+open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Common.CheckerService
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
@@ -41,8 +41,6 @@ type FSharpProjectOptionsProvider(lifetime, logger : Util.ILogger, solution : IS
 
     let projects = Dictionary<IProject, FSharpProject>()
     let projectsToInvalidate = JetHashSet<IProject>()
-
-    let mutable cts : CancellationTokenSource = null
     let mutable fsCorePath : string = null
     
     let invalidProject (p : IProject) =
@@ -67,7 +65,8 @@ type FSharpProjectOptionsProvider(lifetime, logger : Util.ILogger, solution : IS
 
     member private x.ProcessChange(obj : ChangeEventArgs) =
         let change = obj.ChangeMap.GetChange<ProjectModelChange>(solution)
-        if isNotNull change then x.VisitDelta change
+        if isNotNull change then
+            lock projects (fun _ -> x.VisitDelta change)
 
     override x.VisitDelta(change : ProjectModelChange) =
         if change.IsClosingSolution then x.InvalidateAll()
@@ -79,14 +78,18 @@ type FSharpProjectOptionsProvider(lifetime, logger : Util.ILogger, solution : IS
                     | true, fsProject ->
                         checkerService.Checker.InvalidateConfiguration(fsProject.Options.Value)
                         projects.Remove(project) |> ignore
+                        projectsToInvalidate.Remove(project) |> ignore
+                        for p in fsProject.ReferencingProjects do
+                            projectsToInvalidate.Add(p) |> ignore
+                            x.InvalidateReferencingProjects(p)
                     | _ -> ()
-                else projectsToInvalidate.add project
+                else
+                    projectsToInvalidate.add project
+                    x.InvalidateReferencingProjects(project)
                 checkerService.InvalidateAssemblySignature(project, false)
-                x.InvalidateReferencingProjects(project)
             | _ -> base.VisitDelta change
 
     member private x.InvalidateReferencingProjects(project) =
-        // todo: how to get framework when project was removed?
         for p in project.GetReferencingProjects(project.GetCurrentTargetFrameworkId()) do
             if isApplicable project then
                 projectsToInvalidate.Add(p) |> ignore

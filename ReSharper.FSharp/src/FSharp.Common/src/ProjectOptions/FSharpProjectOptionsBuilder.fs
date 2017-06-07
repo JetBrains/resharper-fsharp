@@ -13,7 +13,7 @@ open JetBrains.ProjectModel.ProjectsHost.MsBuild
 open JetBrains.ProjectModel.ProjectsHost.SolutionHost
 open JetBrains.ProjectModel.Properties
 open JetBrains.ProjectModel.Properties.Managed
-open JetBrains.ReSharper.Plugins.FSharp.Common
+open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
@@ -25,7 +25,7 @@ type FSharpProjectPropertiesRequest() =
         member x.RequestedProperties = properties :> seq<_>
 
 [<SolutionComponent>]
-type FSharpProjectOptionsBuilder(solution : ISolution) =
+type FSharpProjectOptionsBuilder(solution : ISolution, filesProvider : FSharpProjectFilesFromTargetsProvider) =
     let msBuildHost = solution.ProjectsHostContainer().GetComponent<MsBuildProjectHost>()
     let defaultDelimiters = [| ';'; ','; ' ' |]
     let compileTypes = Set.ofSeq (seq { yield "Compile"; yield "CompileBefore"; yield "CompileAfter"})
@@ -48,7 +48,8 @@ type FSharpProjectOptionsBuilder(solution : ISolution) =
             yield "--target:" + x.GetOutputType(buildSettings)
           })
 
-        options.AddRange(x.GetReferencedPathsOptions(project))
+        let paths, referencingProjects = x.GetReferencedPathsOptions(project)
+        options.AddRange(paths)
 
         let definedConstants = x.GetDefinedConstants(properties)
         options.AddRange(List.map (fun c -> "--define:" + c) definedConstants)
@@ -83,7 +84,8 @@ type FSharpProjectOptionsBuilder(solution : ISolution) =
         { Options = Some projectOptions
           ConfigurationDefines = definedConstants
           FileIndices = fileIndices
-          FilesWithPairs = pairFiles }
+          FilesWithPairs = pairFiles
+          ReferencingProjects = referencingProjects }
 
     member private x.GetProjectFiles(project : IProject) =
         let projectMark = project.GetProjectMark().NotNull()
@@ -97,7 +99,8 @@ type FSharpProjectOptionsBuilder(solution : ISolution) =
                     if compileTypes.Contains(item.ItemType()) then
                         let path = FileSystemPath.TryParse(item.EvaluatedInclude)
                         if not path.IsEmpty then
-                            files.Add(x.EnsureAbsolute(path, projectDir))
+                            let path = ensureAbsolute path projectDir
+                            files.Add(path)
                             if path.IsSigFile() then sigFiles.add path.NameWithoutExtension
                             else if path.IsImplFile() && sigFiles.Contains(path.NameWithoutExtension)
                                  then pairFiles.add(path))))
@@ -105,15 +108,11 @@ type FSharpProjectOptionsBuilder(solution : ISolution) =
 
     member private x.GetReferencedPathsOptions(project : IProject) =
         let framework = project.GetCurrentTargetFrameworkId()
-        seq { for p in project.GetReferencedProjects(framework) ->
+        let referencingProjects = project.GetReferencedProjects(framework) |> List.ofSeq 
+        seq { for p in referencingProjects ->
                   "-r:" + p.GetOutputFilePath(p.GetCurrentTargetFrameworkId()).FullPath
               for a in project.GetAssemblyReferences(framework) ->
-                  "-r:" + a.ResolveResultAssemblyFile().Location.FullPath }
-
-    member private x.EnsureAbsolute(path : FileSystemPath, projectDirectory : FileSystemPath) : FileSystemPath =
-        let relativePath = path.AsRelative()
-        if isNull relativePath then path
-        else projectDirectory.Combine(relativePath)
+                  "-r:" + a.ResolveResultAssemblyFile().Location.FullPath }, referencingProjects
 
     member private x.GetOutputType([<CanBeNull>] buildSettings : IManagedProjectBuildSettings) =
         if isNull buildSettings then "library"

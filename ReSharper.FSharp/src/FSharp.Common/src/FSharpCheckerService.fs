@@ -15,7 +15,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ProjectModel.Properties
 open JetBrains.ProjectModel.Properties.CSharp
 open JetBrains.ProjectModel.Properties.Managed
-open JetBrains.ReSharper.Plugins.FSharp.Common
+open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Common.ProjectOptions
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open Microsoft.FSharp.Compiler.SourceCodeServices
@@ -84,6 +84,6 @@ type FSharpCheckerService(lifetime, onSolutionCloseNotifier : OnSolutionCloseNot
         | _ -> x.GetProjectSignature(project)
 
     member x.GetDefines(sourceFile : IPsiSourceFile) =
-            match x.OptionsProvider.TryGetFSharpProject(sourceFile.GetProject()) with
-            | Some project -> project.ConfigurationDefines
-            | _ -> List.empty
+        match x.OptionsProvider.TryGetFSharpProject(sourceFile.GetProject()) with
+        | Some project -> project.ConfigurationDefines
+        | _ -> List.empty
