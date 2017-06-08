@@ -6,9 +6,6 @@ namespace JetBrains.ReSharper.Daemon.FSharp
 {
   public static class FSharpSymbolHighlightingUtil
   {
-    private const string FSharpConstructorName = "( .ctor )";
-    private const string ClrConstructorName = ".ctor";
-
     [NotNull]
     public static string GetEntityHighlightingAttributeId([NotNull] this FSharpEntity entity)
     {
@@ -24,8 +21,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp
       if (mfv.IsEvent || mfv.IsEventAddMethod || mfv.IsEventRemoveMethod)
         return HighlightingAttributeIds.EVENT_IDENTIFIER_ATTRIBUTE;
 
-      var name = mfv.DisplayName;
-      if (mfv.IsImplicitConstructor || name == ClrConstructorName || name == FSharpConstructorName)
+      if (mfv.IsImplicitConstructor || mfv.IsConstructor)
         return HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE;
 
       if (mfv.IsModuleValueOrMember && (!mfv.EnclosingEntity.IsFSharpModule || mfv.IsExtensionMember))
@@ -33,7 +29,12 @@ namespace JetBrains.ReSharper.Daemon.FSharp
           ? HighlightingAttributeIds.FIELD_IDENTIFIER_ATTRIBUTE
           : HighlightingAttributeIds.METHOD_IDENTIFIER_ATTRIBUTE;
 
-      return HighlightingAttributeIds.LOCAL_VARIABLE_IDENTIFIER_ATTRIBUTE;
+      if (mfv.LiteralValue != null)
+        return HighlightingAttributeIds.CONSTANT_IDENTIFIER_ATTRIBUTE;
+
+      return mfv.IsMutable || mfv.IsRefCell
+        ? HighlightingAttributeIds.MUTABLE_LOCAL_VARIABLE_IDENTIFIER_ATTRIBUTE
+        : HighlightingAttributeIds.LOCAL_VARIABLE_IDENTIFIER_ATTRIBUTE;
     }
 
     [NotNull]
