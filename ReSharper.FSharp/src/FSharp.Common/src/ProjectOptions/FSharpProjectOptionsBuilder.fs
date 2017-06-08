@@ -25,7 +25,8 @@ type FSharpProjectPropertiesRequest() =
         member x.RequestedProperties = properties :> seq<_>
 
 [<SolutionComponent>]
-type FSharpProjectOptionsBuilder(solution : ISolution, filesProvider : FSharpProjectFilesFromTargetsProvider) =
+type FSharpProjectOptionsBuilder(solution : ISolution,
+                                 filesFromTargetsProvider : FSharpProjectFilesFromTargetsProvider) =
     let msBuildHost = solution.ProjectsHostContainer().GetComponent<MsBuildProjectHost>()
     let defaultDelimiters = [| ';'; ','; ' ' |]
     let compileTypes = Set.ofSeq (seq { yield "Compile"; yield "CompileBefore"; yield "CompileAfter"})
@@ -104,7 +105,13 @@ type FSharpProjectOptionsBuilder(solution : ISolution, filesProvider : FSharpPro
                             if path.IsSigFile() then sigFiles.add path.NameWithoutExtension
                             else if path.IsImplFile() && sigFiles.Contains(path.NameWithoutExtension)
                                  then pairFiles.add(path))))
-        files.ToArray(), pairFiles
+        let filesFromTargets = filesFromTargetsProvider.GetFilesForProject(projectMark)
+        let files =
+            seq { yield! filesFromTargets.CompileBefore
+                  yield! filesFromTargets.Compile
+                  yield! files
+                  yield! filesFromTargets.CompileAfter }
+        files |> Array.ofSeq, pairFiles
 
     member private x.GetReferencedPathsOptions(project : IProject) =
         let framework = project.GetCurrentTargetFrameworkId()
