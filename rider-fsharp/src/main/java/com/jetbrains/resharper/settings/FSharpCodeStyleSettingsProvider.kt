@@ -11,7 +11,7 @@ class FSharpCodeStyleSettingsProvider : RiderCodeStyleSettingsProvider() {
     }
 
     override fun getPagesId(): Map<String, String> {
-        return mapOf("FSharpIndentStylePage" to "Formatting Style")
+        return mapOf("FSharpCodeStylePage" to "Formatting Style")
     }
 }
 

@@ -11,7 +11,6 @@ using JetBrains.Util.Extension;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Control;
-using Microsoft.FSharp.Core;
 
 namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
 {
@@ -27,7 +26,8 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
       var fsFile = completionContext.File as IFSharpFile;
       Assertion.AssertNotNull(fsFile, "fsFile != null");
 
-      if (fsFile.ParseResults == null)
+      var parseResults = fsFile.GetParseResults()?.Value;
+      if (parseResults == null)
         return true;
 
       var completions = GetFSharpCompletions(context, fsFile);
@@ -39,11 +39,20 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
         if (overloadsGroup.IsEmpty)
           continue;
 
-        var symbol = overloadsGroup.Head.Symbol;
+        var symbolUse = overloadsGroup.Head;
+        var symbol = symbolUse.Symbol;
+
         bool isEscaped;
         var lookupText = GetLookupText(symbol, IsInAttributeList(fsFile, context), out isEscaped);
         var lookupItem = new FSharpLookupItem(lookupText, symbol.GetIconId(), isEscaped, symbol.IsParam());
         lookupItem.InitializeRanges(GetDefaultRanges(context), context.BasicContext);
+
+        var mfv = symbol as FSharpMemberOrFunctionOrValue;
+        if (mfv != null)
+        {
+          lookupItem.DisplayTypeName = mfv.ReturnParameter.Type.Format(symbolUse.DisplayContext);
+        }
+
         collector.Add(lookupItem);
       }
 
@@ -56,7 +65,7 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
         return true;
 
       var fsCompletionContext = UntypedParseImpl.TryGetCompletionContext(context.Coords.GetPos(),
-        OptionModule.OfObj(fsFile.ParseResults), context.LineText);
+        context.ParseResults, context.LineText);
       return fsCompletionContext != null && fsCompletionContext.Value.IsAttributeApplication;
     }
 
@@ -95,7 +104,6 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
     {
       var completionContext = context.BasicContext;
       var document = completionContext.Document;
-      var parseResults = FSharpOption<FSharpParseFileResults>.Some(fsFile.ParseResults);
       var qualifiers = context.Names.Item1;
       var partialName = context.Names.Item2;
 
@@ -105,7 +113,7 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
 
       var coords = context.Coords;
       var getCompletionsAsync = checkResults.GetDeclarationListSymbols(
-        parseResults,
+        context.ParseResults,
         (int) coords.Line + 1,
         (int) coords.Column,
         document.GetLineText(coords.Line),

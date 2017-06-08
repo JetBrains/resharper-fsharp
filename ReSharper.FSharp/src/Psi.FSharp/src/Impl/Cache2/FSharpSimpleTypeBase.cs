@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement.CompilerGenerated;
 using JetBrains.Util;
 

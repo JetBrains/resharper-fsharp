@@ -1,5 +1,5 @@
 ﻿using JetBrains.ProjectModel;
-using JetBrains.ReSharper.Plugins.FSharp.Common.CheckerService;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Checker;
 using JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase;
 
 namespace JetBrains.ReSharper.Psi.FSharp

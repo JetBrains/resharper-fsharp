@@ -93,8 +93,8 @@ type FSharpCodeStylePageSchema(lifetime, smartContext, itemViewModelFactory, con
                    x.ItemFor(fun (key : FSharpFormatSettingsKey) -> key.ReorderOpenDeclarations) ]
 
 
-[<OptionsPage("FSharpIndentStylePage", "Tabs and Indents", typeof<PsiFeaturesUnsortedOptionsThemedIcons.Indent>)>]
-type FSharpIndentStylePage(lifetime, smartContext : OptionsSettingsSmartContext, env,
+[<OptionsPage("FSharpCodeStylePage", "Formatting Style", typeof<PsiFeaturesUnsortedOptionsThemedIcons.Indent>)>]
+type FSharpCodeStylePage(lifetime, smartContext : OptionsSettingsSmartContext, env,
                            schema : FSharpCodeStylePageSchema, preview) =
     inherit CodeStylePage(lifetime, smartContext, env, schema, preview)
 

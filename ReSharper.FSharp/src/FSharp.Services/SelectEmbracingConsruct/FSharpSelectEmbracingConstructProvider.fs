@@ -62,28 +62,25 @@ type FSharpSelectEmbracingConstructProvider(settingsStore : ISettingsStore) =
 
         member x.GetSelectedRange(sourceFile, documentRange) =
             let fsFile = sourceFile.GetTheOnlyPsiFile() :?> IFSharpFile
-            if isNull fsFile || fsFile.ParseResults.IsNone then null
-            else
-                match fsFile.ParseResults.Value.ParseTree with
-                | Some parseTree ->
-                    let document = documentRange.Document 
-                    let pos = document.GetPos(documentRange.StartOffset.Offset)
-                    let visitor = { new AstVisitorBase<_>() with
-                        // todo: cover more cases (open expressions, inner expressions in bindings, match guards)
-                        member x.VisitExpr(path,_,defaultTraverse,expr) =
-                            match expr with
-                            | SynExpr.Ident _ | SynExpr.Const _ | SynExpr.LongIdent _ -> Some path
-                            | _ -> defaultTraverse expr }
-                    
-                    let parentRanges =
-                        match Traverse(pos, parseTree, visitor) with
-                        | Some traversePath ->
-                            List.map getRanges traversePath
-                            |> List.concat
-                            |> List.map (fun r -> r.ToDocumentRange(document))
-                            |> List.filter (fun r -> r.Contains(documentRange))
-                        | _ -> []
-    
-                    let range = fsFile.Translate(documentRange)
-                    FSharpDotSelection(fsFile, document, range, parentRanges) :> ISelectedRange
-                | _ -> null
+            match isNotNull fsFile, fsFile.GetParseResults() with
+            | true, Some parseResults when parseResults.ParseTree.IsSome ->
+                let document = documentRange.Document 
+                let pos = document.GetPos(documentRange.StartOffset.Offset)
+                let visitor = { new AstVisitorBase<_>() with
+                    // todo: cover more cases (open expressions, inner expressions in bindings, match guards)
+                    member x.VisitExpr(path,_,defaultTraverse,expr) =
+                        match expr with
+                        | SynExpr.Ident _ | SynExpr.Const _ | SynExpr.LongIdent _ -> Some path
+                        | _ -> defaultTraverse expr }
+                
+                let parentRanges =
+                    match Traverse(pos, parseResults.ParseTree.Value, visitor) with
+                    | Some traversePath ->
+                        List.map getRanges traversePath
+                        |> List.concat
+                        |> List.map (fun r -> r.ToDocumentRange(document))
+                        |> List.filter (fun r -> r.Contains(documentRange))
+                    | _ -> []
+
+                FSharpDotSelection(fsFile, document, fsFile.Translate(documentRange), parentRanges) :> ISelectedRange
+            | _ -> null

@@ -7,6 +7,7 @@ using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 using JetBrains.Util.Extension;
+using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
 {
@@ -55,7 +56,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
 
     public override IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName)
     {
-      var entity = (GetDeclaration() as IFSharpTypeDeclaration)?.GetFSharpEntity();
+      var entity = (GetDeclaration() as IFSharpTypeDeclaration)?.GetFSharpSymbol() as FSharpEntity;
       if (entity == null)
         return EmptyList<IAttributeInstance>.Instance;
 
@@ -68,7 +69,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
     public override bool HasAttributeInstance(IClrTypeName clrTypeName)
     {
       // todo: get entity without getting declaration 
-      var entity = (GetDeclaration() as IFSharpTypeDeclaration)?.GetFSharpEntity();
+      var entity = (GetDeclaration() as IFSharpTypeDeclaration)?.GetFSharpSymbol() as FSharpEntity;
       return entity?.Attributes.Any(a => a.AttributeType.FullName == clrTypeName.FullName) ?? false;
     }
 

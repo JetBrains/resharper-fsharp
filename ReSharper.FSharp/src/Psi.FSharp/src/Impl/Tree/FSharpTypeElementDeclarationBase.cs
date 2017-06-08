@@ -46,11 +46,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       }
     }
 
-    public FSharpEntity GetFSharpEntity()
-    {
-      return (FSharpEntity) GetFSharpSymbol();
-    }
-
     public override FSharpSymbol GetFSharpSymbol()
     {
       var fsFile = this.GetContainingFile() as IFSharpFile;

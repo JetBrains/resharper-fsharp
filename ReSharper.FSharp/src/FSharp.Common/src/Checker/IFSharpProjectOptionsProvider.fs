@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Common.ProjectOptions
+namespace JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Psi

@@ -22,7 +22,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 
     protected override IDaemonStageProcess CreateProcess(IFSharpFile fsFile, IDaemonProcess process)
     {
-      var errors = fsFile.ParseResults?.Errors ?? EmptyArray<FSharpErrorInfo>.Instance;
+      var errors = fsFile.GetParseResults()?.Value?.Errors ?? EmptyArray<FSharpErrorInfo>.Instance;
       return new SyntaxErrorsStageProcess(process, errors);
     }
 

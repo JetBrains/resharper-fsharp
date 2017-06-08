@@ -1,16 +1,18 @@
 ﻿using System;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Plugins.FSharp.Common.CheckerService;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Checker;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
+using JetBrains.ReSharper.Psi.Parsing;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
+using Microsoft.FSharp.Core;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Tree
 {
   public interface IFSharpFileCheckInfoOwner : ICompositeElement
   {
     [CanBeNull]
-    FSharpParseFileResults ParseResults { get; set; }
-
+    FSharpOption<FSharpParseFileResults> GetParseResults(bool keepResults = false, Action interruptChecker = null);
+    
     [CanBeNull]
     FSharpCheckFileResults GetCheckResults(bool forceRecheck = false, Action interruptChecker = null);
 
@@ -23,5 +25,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Tree
 
     FSharpCheckerService CheckerService { get; set; }
     FSharpProjectOptions ProjectOptions { get; set; }
+
+    TokenBuffer ActualTokenBuffer { get; set; }
   }
 }

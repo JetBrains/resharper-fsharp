@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 {

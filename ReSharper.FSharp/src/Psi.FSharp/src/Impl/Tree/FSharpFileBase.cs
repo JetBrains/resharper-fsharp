@@ -1,10 +1,10 @@
 ﻿using System;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Plugins.FSharp.Common.CheckerService;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Checker;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
+using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.Util;
-using Microsoft.FSharp.Compiler;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Core;
 
@@ -12,28 +12,28 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 {
   internal abstract class FSharpFileBase : FileElementBase, IFSharpFileCheckInfoOwner
   {
-    private FSharpCheckFileResults CheckResults { get; set; }
-
-    public FSharpParseFileResults ParseResults { get; set; }
     public FSharpCheckerService CheckerService { get; set; }
     public FSharpProjectOptions ProjectOptions { get; set; }
+    public TokenBuffer ActualTokenBuffer { get; set; }
     public override PsiLanguageType Language => FSharpLanguage.Instance;
     public bool ReferencesResolved { get; set; }
-    public bool IsChecked => CheckResults != null;
+    public bool IsChecked { get; private set; }
 
-    // debug helper
-    internal Ast.ParsedInput ParseTree => ParseResults?.ParseTree?.Value;
+    public FSharpOption<FSharpParseFileResults> GetParseResults(bool keepResults = false,
+      Action interruptChecker = null)
+    {
+      return CheckerService.GetOrCreateParseResults(GetSourceFile()); // todo: interrupt
+    }
 
     public FSharpCheckFileResults GetCheckResults(bool forceRecheck = false, [CanBeNull] Action interruptChecker = null)
     {
-      if (CheckResults != null && !forceRecheck)
-        return CheckResults;
+      var parseResults = CheckerService.GetOrCreateParseResults(GetSourceFile())?.Value;
+      if (parseResults == null)
+        return null;
 
-      var psiSourceFile = GetSourceFile();
-      if (psiSourceFile == null || ParseResults == null) return null;
-      Assertion.AssertNotNull(CheckerService, "CheckerService != null");
-
-      return CheckResults = CheckerService.CheckFile(this, ParseResults, OptionModule.OfObj(interruptChecker))?.Value;
+      var checkResults = CheckerService.CheckFile(this, parseResults, OptionModule.OfObj(interruptChecker))?.Value;
+      IsChecked = true;
+      return checkResults;
     }
 
     public virtual void Accept(TreeNodeVisitor visitor)

@@ -52,18 +52,18 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="src\ProjectModel\FSharpProjectLanguage.fs" />
-    <Compile Include="src\ProjectOptions\FSharpProject.fs" />
+    <Compile Include="src\Checker\FSharpProject.fs" />
     <Compile Include="src\ProjectModel\ProjectProperties\FSharpProjectProperties.fs" />
     <Compile Include="src\ProjectModel\ProjectProperties\FSharpProjectPropertiesFactory.fs" />
     <Compile Include="src\ProjectModel\ProjectProperties\FSharpProjectFilePropertiesProvider.fs" />
     <Compile Include="src\ProjectModel\FSharpProjectPresenter.fs" />
     <Compile Include="src\ProjectModel\ZoneMarker.fs" />
     <Compile Include="src\Util\Util.fs" />
-    <Compile Include="src\ProjectOptions\IFSharpProjectOptionsProvider.fs" />
-    <Compile Include="src\FSharpCheckerService.fs" />
-    <Compile Include="src\ProjectOptions\FSharpMsBuildProjectListener.fs" />
-    <Compile Include="src\ProjectOptions\FSharpProjectOptionsBuilder.fs" />
-    <Compile Include="src\ProjectOptions\FSharpProjectOptionsProvider.fs" />
+    <Compile Include="src\Checker\IFSharpProjectOptionsProvider.fs" />
+    <Compile Include="src\Checker\FSharpCheckerService.fs" />
+    <Compile Include="src\Checker\FSharpMsBuildProjectListener.fs" />
+    <Compile Include="src\Checker\FSharpProjectOptionsBuilder.fs" />
+    <Compile Include="src\Checker\FSharpProjectOptionsProvider.fs" />
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

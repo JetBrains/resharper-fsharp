@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Common.ProjectOptions
+namespace JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 
 open System.Linq
 open System.Collections.Generic
@@ -12,7 +12,6 @@ open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost.MsBuild
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
-open JetBrains.ReSharper.Plugins.FSharp.Common.ProjectOptions
 
 type FileSystemPath = Util.FileSystemPath
 

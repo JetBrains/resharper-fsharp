@@ -1,4 +1,4 @@
-﻿namespace JetBrains.ReSharper.Plugins.FSharp.Common.CheckerService
+﻿namespace JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 
 open System
 open System.Collections.Generic
@@ -16,7 +16,6 @@ open JetBrains.ProjectModel.Properties
 open JetBrains.ProjectModel.Properties.CSharp
 open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
-open JetBrains.ReSharper.Plugins.FSharp.Common.ProjectOptions
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
@@ -87,3 +86,6 @@ type FSharpCheckerService(lifetime, onSolutionCloseNotifier : OnSolutionCloseNot
         match x.OptionsProvider.TryGetFSharpProject(sourceFile.GetProject()) with
         | Some project -> project.ConfigurationDefines
         | _ -> List.empty
+
+    member x.GetOrCreateParseResults([<NotNull>] file : IPsiSourceFile) =
+        snd (x.ParseFile file)

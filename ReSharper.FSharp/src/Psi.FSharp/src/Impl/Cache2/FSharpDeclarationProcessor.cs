@@ -1,5 +1,5 @@
 ﻿using System;
-using JetBrains.ReSharper.Plugins.FSharp.Common.CheckerService;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Checker;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
@@ -30,6 +30,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public override void VisitFSharpFile(IFSharpFile fsFile)
     {
+      fsFile.TokenBuffer = fsFile.ActualTokenBuffer; // todo: remove this when a proper lexer implemented
       var sourceFile = fsFile.GetSourceFile();
       var fileKind = GetFSharpFileKind(fsFile);
       var hasPairFile = myCheckerService.HasPairFile(sourceFile);
