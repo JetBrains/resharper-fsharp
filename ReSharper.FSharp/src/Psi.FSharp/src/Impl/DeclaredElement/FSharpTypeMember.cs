@@ -91,17 +91,17 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
     }
 
 
-    public IList<IAttributeInstance> GetAttributeInstances(bool inherit)
+    public virtual IList<IAttributeInstance> GetAttributeInstances(bool inherit)
     {
       return EmptyList<IAttributeInstance>.Instance;
     }
 
-    public IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName, bool inherit)
+    public virtual IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName, bool inherit)
     {
       return EmptyList<IAttributeInstance>.Instance;
     }
 
-    public bool HasAttributeInstance(IClrTypeName clrName, bool inherit)
+    public virtual bool HasAttributeInstance(IClrTypeName clrName, bool inherit)
     {
       return false;
     }

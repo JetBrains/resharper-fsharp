@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Resolve;
@@ -15,11 +16,15 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
     where TDeclaration : FSharpDeclarationBase, IFSharpDeclaration, IAccessRightsOwnerDeclaration,
     IModifiersOwnerDeclaration
   {
+    [CanBeNull]
+    public FSharpMemberOrFunctionOrValue Mfv { get; }
+
     private readonly AccessRights myAccessRights;
 
     protected FSharpMemberBase([NotNull] ITypeMemberDeclaration declaration,
       [CanBeNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration)
     {
+      Mfv = mfv;
       if (mfv == null || !mfv.IsMember)
       {
         IsOverride = false;
@@ -62,6 +67,38 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
         else
           myAccessRights = AccessRights.PUBLIC;
       }
+    }
+
+
+    public override IList<IAttributeInstance> GetAttributeInstances(bool inherit)
+    {
+      if (Mfv == null)
+        return EmptyList<IAttributeInstance>.Instance;
+
+      var attrs = new List<IAttributeInstance>();
+      foreach (var attr in Mfv.Attributes)
+        attrs.Add(new FSharpAttributeInstance(attr, Module));
+      return attrs;
+    }
+
+    public override IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName, bool inherit)
+    {
+      if (Mfv == null)
+        return EmptyList<IAttributeInstance>.Instance;
+
+      var attrs = new List<IAttributeInstance>();
+      foreach (var attr in Mfv.Attributes)
+        if (attr.AttributeType.FullName == clrName.FullName)
+          attrs.Add(new FSharpAttributeInstance(attr, Module));
+      return attrs;
+    }
+
+    public override bool HasAttributeInstance(IClrTypeName clrName, bool inherit)
+    {
+      if (Mfv == null)
+        return false;
+
+      return Mfv.Attributes.Any(a => a.AttributeType.FullName == clrName.FullName);
     }
 
     public InvocableSignature GetSignature(ISubstitution substitution)
