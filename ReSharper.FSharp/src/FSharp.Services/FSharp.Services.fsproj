@@ -55,6 +55,7 @@
     <Compile Include="SelectEmbracingConsruct\FSharpSelectEmbracingConstructProvider.fs" />
     <Compile Include="Formatter\FSharpCodeStylePage.fs" />
     <Compile Include="Formatter\ReformatCode.fs" />
+    <Compile Include="TodoItems\FSharpTodoContentsProvider.fs" />
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
