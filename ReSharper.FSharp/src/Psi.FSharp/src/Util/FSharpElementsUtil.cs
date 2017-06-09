@@ -93,7 +93,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
         if (!mfv.IsModuleValueOrMember && fsFile != null)
           return FindLocalDeclaration(mfv, fsFile);
 
-        var memberEntity = GetContainingEntity(mfv);
+        var memberEntity = mfv.IsModuleValueOrMember ? mfv.EnclosingEntity : null;
         if (memberEntity == null)
           return null;
 
@@ -104,22 +104,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
         if (typeElement == null)
           return null;
 
-        if (mfv.IsProperty)
-          return typeElement.EnumerateMembers(mfv.GetMemberCompiledName(), true).FirstOrDefault();
-
-        var fsMember = GetMemberWithoutSubstitution(mfv, memberEntity);
-        if (fsMember == null)
-          return null;
-
-        var typeParameters = typeElement.GetAllTypeParameters().ToIList();
         var members = mfv.IsConstructor
-          ? typeElement.Constructors
-          : typeElement.EnumerateMembers(mfv.GetMemberCompiledName(), true);
+          ? typeElement.Constructors.AsList<ITypeMember>()
+          : typeElement.EnumerateMembers(mfv.GetMemberCompiledName(), true).AsList();
 
-        var member = members.FirstOrDefault(m => SameParameters(m, fsMember, typeParameters, psiModule));
-        return member ??
-               // todo: rarely happens, couldn't map types (with substitutions), needs a proper fix
-               typeElement.EnumerateMembers(mfv.CompiledName, true).FirstOrDefault();
+        return members.Count == 1 ? members[0] : members.FirstOrDefault(m => m.XMLDocId == mfv.XmlDocSig);
       }
 
       var unionCase = symbol as FSharpUnionCase;
@@ -164,90 +153,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
 
       var idToken = fsFile.FindTokenAt(document.GetTreeEndOffset(declRange) - 1);
       return idToken?.GetContainingNode<LocalDeclaration>();
-    }
-
-    private static bool SameParameters([NotNull] ITypeMember member, [NotNull] FSharpMemberOrFunctionOrValue mfv,
-      IList<ITypeParameter> typeParameters, IPsiModule psiModule)
-    {
-      var paramsOwner = member as IParametersOwner;
-      if (paramsOwner == null)
-        return true;
-
-      var typeParametersOwner = member as ITypeParametersOwner;
-      var methodTypeParameters = typeParametersOwner != null
-        ? typeParameters.Prepend(typeParametersOwner.TypeParameters).ToIList()
-        : typeParameters;
-
-      var memberParams = paramsOwner.Parameters.ToArray();
-      var fsParamsTypes = GetParametersTypes(mfv);
-      if (memberParams.Length != fsParamsTypes.Length)
-        return false;
-
-      for (var i = 0; i < fsParamsTypes.Length; i++)
-      {
-        var memberParamType = memberParams[i].Type;
-        var fsParamType = fsParamsTypes[i];
-
-        var typeParameter = memberParamType.GetTypeElement() as ITypeParameter;
-        if (typeParameter != null)
-        {
-          if (!fsParamType.IsGenericParameter)
-            return false;
-
-          var typeParameterName = typeParameter.ShortName;
-          var fsTypeParameterName = fsParamType.GenericParameter.Name;
-          if (typeParameterName != fsTypeParameterName &&
-              (typeParameterName[0] != 'T' || typeParameterName.Substring(1) != fsTypeParameterName))
-            return false; // sometimes TKey replaced with Key, todo: why and where?
-        }
-        else
-        {
-          if (fsParamType.IsGenericParameter)
-            return false;
-
-          if (!memberParamType.Equals(FSharpTypesUtil.GetType(fsParamType, methodTypeParameters, psiModule)))
-            return false;
-        }
-      }
-
-      return true;
-    }
-
-    private static FSharpType[] GetParametersTypes([NotNull] FSharpMemberOrFunctionOrValue mfv)
-    {
-      var result = new List<FSharpType>();
-      foreach (var paramGroup in mfv.CurriedParameterGroups)
-        result.AddRange(paramGroup.Select(param => param.Type));
-      return result.ToArray();
-    }
-
-    [CanBeNull]
-    private static FSharpEntity GetContainingEntity([NotNull] FSharpMemberOrFunctionOrValue mfv)
-    {
-      return mfv.IsModuleValueOrMember ? mfv.EnclosingEntity : null;
-    }
-
-    [CanBeNull]
-    private static FSharpMemberOrFunctionOrValue GetMemberWithoutSubstitution(
-      [NotNull] FSharpMemberOrFunctionOrValue mfv, [NotNull] FSharpEntity entity)
-    {
-      var sameMfv = entity.MembersFunctionsAndValues.FirstOrDefault(m => m.IsEffectivelySameAs(mfv));
-      if (sameMfv != null)
-        return sameMfv;
-
-      if (mfv.IsConstructor)
-      {
-        // bug in FCS, https://github.com/fsharp/FSharp.Compiler.Service/issues/752
-        var mfvParamsCount = mfv.ParametersCount();
-        return entity.MembersFunctionsAndValues.FirstOrDefault(
-          m => m.CompiledName == ".ctor" && m.ParametersCount() == mfvParamsCount);
-      }
-      return null;
-    }
-
-    private static int ParametersCount([NotNull] this FSharpMemberOrFunctionOrValue mfv)
-    {
-      return mfv.CurriedParameterGroups.SelectMany(p => p).ToList().Count;
     }
   }
 }
