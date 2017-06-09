@@ -23,15 +23,17 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.Debugger
     public List<BreakpointVariantModelBase> GetBreakpointVariants(IProjectFile file, int line, ISolution solution)
     {
       var fsFile = file.GetPrimaryPsiFile() as IFSharpFile;
-      var parseResults = fsFile?.ParseResults;
-      var document = file.ToSourceFile()?.Document;
-      if (parseResults == null || document == null)
+      var parseResults = fsFile?.GetParseResults()?.Value;
+      if (parseResults == null)
         return null;
 
-      var breakpointVariants = new JetHashSet<BreakpointVariantModelBase>();
+      var sourceFile = file.ToSourceFile();
+      Assertion.AssertNotNull(sourceFile, "sourceFile != null");
+      var document = sourceFile.Document;
       var documentLine = (Int32<DocLine>) line;
       var lineEndOffset = document.GetLineEndOffsetWithLineBreak(documentLine);
 
+      var breakpointVariants = new JetHashSet<BreakpointVariantModelBase>();
       var token = fsFile.FindTokenAt(new TreeOffset(document.GetLineStartOffset(documentLine)));
       while (token != null && token.GetTreeEndOffset().Offset < lineEndOffset)
       {

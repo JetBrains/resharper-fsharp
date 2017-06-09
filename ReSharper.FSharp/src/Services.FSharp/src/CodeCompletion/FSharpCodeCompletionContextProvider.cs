@@ -26,7 +26,7 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
     public override ISpecificCodeCompletionContext GetCompletionContext(CodeCompletionContext context)
     {
       var file = (IFSharpFile) context.File;
-      var parseResults = file.ParseResults;
+      var parseResults = file.GetParseResults();
 
       var caretTreeOffset = context.CaretTreeOffset;
       var caretOffset = caretTreeOffset.Offset;
@@ -46,7 +46,7 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
       {
         var selectedRange = context.SelectedRange.TextRange;
         return new FSharpCodeCompletionContext(context, new TextLookupRanges(selectedRange, selectedRange),
-          TreeOffset.InvalidOffset, DocumentCoords.Empty, null, null, null, null, null, false);
+          TreeOffset.InvalidOffset, DocumentCoords.Empty, null, null, null, null, null, null, false);
       }
 
       var completedRangeStartOffset =
@@ -66,11 +66,10 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
       var lineText = document.GetLineText(coords.Line);
       var names = QuickParse.GetPartialLongNameEx(lineText, (int) coords.Column - 1);
 
-      var fsCompletionContext = UntypedParseImpl.TryGetCompletionContext(coords.GetPos(),
-        OptionModule.OfObj(parseResults), lineText);
+      var fsCompletionContext = UntypedParseImpl.TryGetCompletionContext(coords.GetPos(), parseResults, lineText); // todo: create issue about implicit FSOpt
 
       return new FSharpCodeCompletionContext(context, ranges, caretTreeOffset, coords, names, tokenBefore, token,
-        lineText, fsCompletionContext?.Value);
+        lineText, fsCompletionContext?.Value, parseResults);
     }
 
     private static bool ShouldReplace([CanBeNull] ITreeNode token)

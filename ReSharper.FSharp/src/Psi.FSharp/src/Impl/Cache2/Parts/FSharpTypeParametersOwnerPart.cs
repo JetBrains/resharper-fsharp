@@ -26,7 +26,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
       for (var i = 0; i < typeParameters.Count; i++)
       {
         var name = typeParameters[i].GetText();
-        var trimmed = name[0] == '\'' ? name.Substring(1) : name;
+        var trimmed = !name.IsEmpty() && name[0] == '\'' ? name.Substring(1) : name;
         myTypeParameterNames[i] = cacheBuilder.Intern(trimmed);
       }
     }

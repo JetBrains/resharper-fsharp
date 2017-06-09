@@ -27,24 +27,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     private static readonly ClrTypeName CompilationRepresentationAttr =
       new ClrTypeName("Microsoft.FSharp.Core.CompilationRepresentationAttribute");
 
-    [CanBeNull]
-    public static string GetDisplayName(FSharpSymbol symbol)
-    {
-      var mfv = symbol as FSharpMemberOrFunctionOrValue;
-      if (mfv != null)
-      {
-        var name = mfv.DisplayName;
-        if (name == FSharpConstructorName || name == ClrConstructorName)
-          return mfv.EnclosingEntity.DisplayName;
-        if (mfv.IsMember) return name;
-      }
-
-      var fsField = symbol as FSharpField;
-      if (fsField != null) return fsField.DisplayName;
-
-      return symbol.DeclarationLocation != null ? symbol.DisplayName : null;
-    }
-
     public static bool IsEscapedWithParens([NotNull] string name)
     {
       var length = name.Length;

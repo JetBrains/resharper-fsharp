@@ -4,6 +4,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Feature.Services.Daemon;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Parsing;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
@@ -37,31 +38,34 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
     public override void Execute(Action<DaemonStageResult> committer)
     {
       var interruptChecker = DaemonProcess.CreateInterruptChecker();
-      var symbolUses = myFsFile.GetCheckResults(true, interruptChecker)
-        ?.GetAllUsesOfAllSymbolsInFile()
-        ?.RunAsTask(interruptChecker);
+      var checkResults = myFsFile.GetCheckResults(true, interruptChecker);
+      var symbolUses = checkResults?.GetAllUsesOfAllSymbolsInFile()?.RunAsTask(interruptChecker);
       if (symbolUses == null)
         return;
 
-      myFsFile.ReferencesResolved = false;
-      foreach (var token in myFsFile.Tokens().OfType<FSharpIdentifierToken>())
-        token.FSharpSymbol = null;
+      if (myFsFile.ReferencesResolved)
+      {
+        myFsFile.ReferencesResolved = false;
+        foreach (var token in myFsFile.Tokens().OfType<FSharpIdentifierToken>())
+          token.FSharpSymbol = null;
+      }
 
       var highlightings = new List<HighlightingInfo>(symbolUses.Length);
 
       foreach (var symbolUse in symbolUses)
       {
-        var token = FindUsageToken(symbolUse);
+        // range includes qualifiers, we're looking for the last identifier
+        var useRangeEnd = myDocument.GetTreeEndOffset(symbolUse.RangeAlternate) - 1;
+        var token = myFsFile.FindTokenAt(useRangeEnd) as FSharpIdentifierToken;
         if (token == null)
           continue;
 
         var shouldHighlight = token.FSharpSymbol == null;
         var symbol = symbolUse.Symbol;
         var highlightingId = symbol.GetHighlightingAttributeId();
-        var tokenType = token.GetTokenType();
-        if ((tokenType == FSharpTokenType.GREATER || tokenType == FSharpTokenType.GREATER_RBRACK)
-            && !symbol.IsOpGreaterThan())
-          continue; // found usage of generic symbol with specified type parameter
+
+        if (token.GetTokenType() == FSharpTokenType.GREATER && !symbol.IsOpGreaterThan())
+          continue; // found usage of generic type with specified type parameter
 
         if (symbolUse.IsFromDefinition)
         {
@@ -131,17 +135,6 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
       }
 
       return token.GetContainingNode<ILocalDeclaration>();
-    }
-
-    [CanBeNull]
-    private FSharpIdentifierToken FindUsageToken(FSharpSymbolUse symbolUse)
-    {
-      var name = FSharpNamesUtil.GetDisplayName(symbolUse.Symbol);
-      if (name == null) return null;
-
-      // range includes qualifiers, we're looking for the last identifier
-      var endOffset = myDocument.GetTreeEndOffset(symbolUse.RangeAlternate) - 1;
-      return myFsFile.FindTokenAt(endOffset) as FSharpIdentifierToken;
     }
   }
 }

@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
-using JetBrains.ReSharper.Plugins.FSharp.Common.CheckerService;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Checker;
+using JetBrains.ReSharper.Plugins.FSharp.Services.Formatter;
+using JetBrains.ReSharper.Psi.CodeStyle;
 using JetBrains.ReSharper.Psi.CSharp.Impl;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2;
@@ -19,12 +21,16 @@ namespace JetBrains.ReSharper.Psi.FSharp.LanguageService
     private readonly ILogger myLogger;
 
     public FSharpLanguageService(PsiLanguageType psiLanguageType, IConstantValueService constantValueService,
-      FSharpCheckerService fSharpCheckerService, ILogger logger) : base(psiLanguageType, constantValueService)
+      FSharpDummyCodeFormatter codeFormatter, FSharpCheckerService fSharpCheckerService, ILogger logger)
+      : base(psiLanguageType, constantValueService)
     {
+      CodeFormatter = codeFormatter;
       myFSharpCheckerService = fSharpCheckerService;
       myLogger = logger;
-      CacheProvider = new FSharpCacheProvider();
+      CacheProvider = new FSharpCacheProvider(fSharpCheckerService);
     }
+
+    public override ICodeFormatter CodeFormatter { get; }
 
     public override ILexerFactory GetPrimaryLexerFactory()
     {
