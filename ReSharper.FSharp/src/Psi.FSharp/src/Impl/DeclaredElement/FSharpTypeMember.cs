@@ -4,9 +4,11 @@ using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 using JetBrains.Util.dataStructures;
 using JetBrains.Util.DataStructures;
+using Microsoft.FSharp.Compiler;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 {
@@ -122,7 +124,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
     public virtual bool IsExtern => false;
     public virtual bool IsUnsafe => false;
     public virtual bool IsVolatile => false;
-    public string XMLDocId => ShortName;
+    public string XMLDocId => XMLDocUtil.GetTypeMemberXmlDocId(this, ShortName);
 
     public IList<TypeMemberInstance> GetHiddenMembers()
     {

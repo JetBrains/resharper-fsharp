@@ -183,7 +183,7 @@ if ($Source) {
 
 Write-Host "##teamcity[progressMessage 'Restoring packages']"
 if ($Source) {
-  & tools\nuget restore -Source $Source -Source https://www.nuget.org/api/v2/ ReSharper.FSharp/ReSharper.FSharp.sln
+  & tools\nuget restore -Source $Source -Source https://www.nuget.org/api/v2/ -Source http://repo.labs.intellij.net/api/nuget/dotnet-build ReSharper.FSharp/ReSharper.FSharp.sln
 } else {
   & tools\nuget restore ReSharper.FSharp/ReSharper.FSharp.sln
 }
