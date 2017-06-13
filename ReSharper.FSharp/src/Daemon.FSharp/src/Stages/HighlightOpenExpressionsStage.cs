@@ -5,7 +5,6 @@ using JetBrains.Annotations;
 using JetBrains.Application.Threading;
 using JetBrains.ReSharper.Daemon.UsageChecking;
 using JetBrains.ReSharper.Feature.Services.Daemon;
-using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Declarations;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
@@ -18,6 +17,9 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
   [DaemonStage(StagesBefore = new[] {typeof(TypeCheckErrorsStage)}, StagesAfter = new[] {typeof(CollectUsagesStage)})]
   public class HighlightOpenExpressionsStage : FSharpDaemonStageBase
   {
+    private const string NsHighlightingAttr = HighlightingAttributeIds.NAMESPACE_IDENTIFIER_ATTRIBUTE;
+    private const string ModuleHighlightingAttr = HighlightingAttributeIds.TYPE_STATIC_CLASS_ATTRIBUTE;
+
     protected override IDaemonStageProcess CreateProcess(IFSharpFile fsFile, IDaemonProcess process)
     {
       return new HighlightOpenExpressionsStageProcess(fsFile, process);
@@ -67,35 +69,39 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
         }
 
 
-        public override void VisitTopLevelModuleOrNamespaceDeclaration(ITopLevelModuleOrNamespaceDeclaration module)
+        public override void VisitTopLevelModuleOrNamespaceDeclaration(ITopLevelModuleOrNamespaceDeclaration topDecl)
         {
-          foreach (var member in module.MembersEnumerable)
+          foreach (var member in topDecl.MembersEnumerable)
           {
             member.Accept(this);
             myInterruptChecker.CheckForInterrupt();
           }
 
-          var ids = module.LongIdentifier.Identifiers;
+          var ids = topDecl.LongIdentifier.Identifiers;
           if (ids.IsEmpty) return;
 
-          foreach (var nsToken in module.LongIdentifier.Qualifiers)
+
+          foreach (var token in topDecl.LongIdentifier.Qualifiers)
           {
-            if (nsToken != null)
-              myHighlightings.Add(CreateHighlighting(nsToken, HighlightingAttributeIds.NAMESPACE_IDENTIFIER_ATTRIBUTE));
+            var nsToken = token as FSharpIdentifierToken;
+            var symbol = nsToken?.FSharpSymbol;
+            if (symbol == null)
+              continue;
+
+            myHighlightings.Add(CreateHighlighting(nsToken, symbol.GetHighlightingAttributeId()));
           }
 
-          var highlightingAttrId = module.IsModule
-            ? HighlightingAttributeIds.TYPE_STATIC_CLASS_ATTRIBUTE
-            : HighlightingAttributeIds.NAMESPACE_IDENTIFIER_ATTRIBUTE;
+          if (topDecl.IsModule)
+            return;
 
           var nameToken = ids.Last();
           if (nameToken != null)
-            myHighlightings.Add(CreateHighlighting(nameToken, highlightingAttrId));
+            myHighlightings.Add(CreateHighlighting(nameToken, NsHighlightingAttr));
         }
 
         public override void VisitNestedModuleDeclaration(INestedModuleDeclaration module)
         {
-          HighlightIdentifier(module.Identifier, HighlightingAttributeIds.TYPE_STATIC_CLASS_ATTRIBUTE);
+          HighlightIdentifier(module.Identifier, ModuleHighlightingAttr);
 
           foreach (var member in module.MembersEnumerable)
           {
@@ -133,11 +139,9 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
         {
           // todo: highlight modules as static classes
           for (var i = 0; i < idsCount - 1; i++)
-            myHighlightings.Add(CreateHighlighting(ids[i], HighlightingAttributeIds.NAMESPACE_IDENTIFIER_ATTRIBUTE));
+            myHighlightings.Add(CreateHighlighting(ids[i], NsHighlightingAttr));
 
-          var highlightingAttrId = entity.IsNamespace
-            ? HighlightingAttributeIds.NAMESPACE_IDENTIFIER_ATTRIBUTE
-            : HighlightingAttributeIds.TYPE_STATIC_CLASS_ATTRIBUTE;
+          var highlightingAttrId = entity.IsNamespace ? NsHighlightingAttr : ModuleHighlightingAttr;
           myHighlightings.Add(CreateHighlighting(ids[idsCount - 1], highlightingAttrId));
         }
 
