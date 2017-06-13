@@ -44,7 +44,7 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
 
         bool isEscaped;
         var lookupText = GetLookupText(symbol, IsInAttributeList(fsFile, context), out isEscaped);
-        var lookupItem = new FSharpLookupItem(lookupText, symbol.GetIconId(), isEscaped, symbol.IsParam());
+        var lookupItem = new FSharpLookupItem(lookupText, symbol.GetIconId(), isEscaped);
         lookupItem.InitializeRanges(GetDefaultRanges(context), context.BasicContext);
 
         var mfv = symbol as FSharpMemberOrFunctionOrValue;
