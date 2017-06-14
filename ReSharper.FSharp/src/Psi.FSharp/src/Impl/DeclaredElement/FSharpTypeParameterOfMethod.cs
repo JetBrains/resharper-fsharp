@@ -143,8 +143,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 
     public int Index { get; }
     public TypeParameterVariance Variance => TypeParameterVariance.INVARIANT;
-    public bool IsValueType => true; // todo
-    public bool IsClassType => true; // todo
+    public bool IsValueType => false; // todo
+    public bool IsClassType => false; // todo
     public bool HasDefaultConstructor => false;
     public IList<IType> TypeConstraints => EmptyList<IType>.Instance;
     public ITypeParametersOwner Owner => myMethod;

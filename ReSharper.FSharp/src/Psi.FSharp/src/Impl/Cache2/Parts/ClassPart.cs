@@ -1,5 +1,4 @@
-﻿using JetBrains.Annotations;
-using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+﻿using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
@@ -26,14 +25,5 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
     }
 
     protected override byte SerializationTag => (byte) FSharpPartKind.Class;
-  }
-
-  public class FSharpClass : Class
-  {
-    public FSharpClass([NotNull] IClassPart part) : base(part)
-    {
-    }
-
-    protected override MemberDecoration Modifiers => myParts.GetModifiers();
   }
 }

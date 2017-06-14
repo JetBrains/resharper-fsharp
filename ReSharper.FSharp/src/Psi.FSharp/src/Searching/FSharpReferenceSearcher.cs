@@ -6,20 +6,23 @@ using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Search;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
+using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Searching
 {
   public class FSharpReferenceSearcher : IDomainSpecificSearcher
   {
     private readonly IDeclaredElementsSet myElements;
+    private readonly IList<FSharpSymbol> myFSharpSymbols;
     private readonly bool myFindCandidates;
     private readonly ICollection<string> myElementNames;
 
     public FSharpReferenceSearcher(IDeclaredElementsSet elements, bool findCandidates)
     {
-      myElements = elements;
+      myElements = new DeclaredElementsSet(elements.Where(e => !(e is IFSharpSymbolElement)));
+      myFSharpSymbols = elements.OfType<IFSharpSymbolElement>().Select(e => e.Symbol).ToIList();
       myFindCandidates = findCandidates;
-      myElementNames = new List<string>();
+      myElementNames = new HashSet<string>();
 
       foreach (var element in elements)
         myElementNames.AddRange(FSharpNamesUtil.GetPossibleSourceNames(element));
@@ -33,7 +36,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Searching
     public bool ProcessElement<TResult>(ITreeNode element, IFindResultConsumer<TResult> consumer)
     {
       var result = new FSharpReferenceSearchProcessor<TResult>(element, myFindCandidates, consumer, myElements,
-        myElementNames, myElementNames).Run();
+        myFSharpSymbols, myElementNames).Run();
       return result == FindExecution.Stop;
     }
   }

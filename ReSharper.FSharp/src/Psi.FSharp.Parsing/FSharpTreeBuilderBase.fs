@@ -355,6 +355,23 @@ type FSharpTreeBuilderBase(file : IPsiSourceFile, lexer : ILexer, lifetime) as t
             x.AdvanceToOffset (x.GetEndOffset typeMember.Range)
             x.Done(mark, memberType)
 
+    member internal x.ProcessActivePatternId (s : Ident) =
+        let range = s.idRange
+        let endOffset = x.GetEndOffset range
+        x.AdvanceToOffset (x.GetStartOffset range)
+        let idMark = x.Builder.Mark()
+        
+        while x.Builder.GetTokenOffset() < endOffset do
+            if x.Builder.GetTokenType() = FSharpTokenType.IDENTIFIER then
+                let caseMark = x.Builder.Mark()
+                let idMark = x.Builder.Mark()
+                x.Builder.AdvanceLexer() |> ignore
+                x.Done(idMark, ElementType.F_SHARP_IDENTIFIER)
+                x.Done(caseMark, ElementType.ACTIVE_PATTERN_CASE_DECLARATION) 
+            else x.Builder.AdvanceLexer() |> ignore
+
+        x.Done(idMark, ElementType.F_SHARP_IDENTIFIER)
+
     member internal x.ProcessMemberParams (memberParams : SynConstructorArgs) =
         match memberParams with
         | Pats(pats) ->

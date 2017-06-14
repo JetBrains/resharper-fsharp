@@ -5,6 +5,7 @@ using System.Text;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2;
+using JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
@@ -163,6 +164,14 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
       if (fileExtension == "fs" || fileExtension == "ml") return FSharpFileKind.ImplFile;
       if (fileExtension == "fsi" || fileExtension == "mli") return FSharpFileKind.SigFile;
       throw new ArgumentOutOfRangeException();
+    }
+
+    [CanBeNull]
+    internal static IDeclaredElement GetActivePatternByIndex(IDeclaration declaration, int index)
+    {
+      var letDecl = declaration as Let;
+      var cases = letDecl?.Identifier.Children<ActivePatternCaseDeclaration>().AsIList();
+      return cases?.Count > index ? cases[index].DeclaredElement : null;
     }
   }
 }

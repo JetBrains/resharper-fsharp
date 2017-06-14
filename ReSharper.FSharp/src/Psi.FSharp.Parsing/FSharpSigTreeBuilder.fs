@@ -5,6 +5,7 @@ open JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 open JetBrains.ReSharper.Psi.TreeBuilder
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.Ast
+open Microsoft.FSharp.Compiler.PrettyNaming
 
 type FSharpSigTreeBuilder(file, lexer, parseTree, lifetime, logger : ILogger) =
     inherit FSharpTreeBuilderBase(file, lexer, lifetime)
@@ -47,7 +48,8 @@ type FSharpSigTreeBuilder(file, lexer, parseTree, lifetime, logger : ILogger) =
 
         | SynModuleSigDecl.Val(ValSpfn(attrs,id,SynValTyparDecls(typeParams,_,_),_,_,_,_,_,_,_,_),range) ->
             let mark = x.ProcessAttributesAndStartRange attrs (Some id) range
-            x.ProcessIdentifier id
+            let isActivePattern = IsActivePatternName id.idText 
+            if isActivePattern then x.ProcessActivePatternId id else x.ProcessIdentifier id
             for p in typeParams do x.ProcessTypeParameter p ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION
             range |> x.GetEndOffset |> x.AdvanceToOffset
             x.Done(mark, ElementType.LET)

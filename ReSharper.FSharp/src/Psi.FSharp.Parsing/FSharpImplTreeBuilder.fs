@@ -5,6 +5,7 @@ open JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 open JetBrains.ReSharper.Psi.TreeBuilder
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.Ast
+open Microsoft.FSharp.Compiler.PrettyNaming
 
 type FSharpImplTreeBuilder(file, lexer, parseTree, lifetime, logger : ILogger) =
     inherit FSharpTreeBuilderBase(file, lexer, lifetime)
@@ -118,7 +119,10 @@ type FSharpImplTreeBuilder(file, lexer, parseTree, lifetime, logger : ILogger) =
             match lid with
             | [id] ->
                 let mark = x.ProcessAttributesAndStartRange attrs (Some id) range
-                x.ProcessIdentifier id
+                let idText = id.idText
+                let isActivePattern = IsActivePatternName id.idText 
+                if isActivePattern then x.ProcessActivePatternId id else x.ProcessIdentifier id
+
                 match typeParamsOption with
                 | Some (SynValTyparDecls(typeParams,_,_)) ->
                     for p in typeParams do x.ProcessTypeParameter p ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION
@@ -130,7 +134,9 @@ type FSharpImplTreeBuilder(file, lexer, parseTree, lifetime, logger : ILogger) =
 
         | SynPat.Named(_,id,_,_,range) ->
             let mark = x.ProcessAttributesAndStartRange attrs (Some id) range
-            x.ProcessIdentifier id
+            let isActivePattern = IsActivePatternName id.idText 
+            if isActivePattern then x.ProcessActivePatternId id else x.ProcessIdentifier id
+
             range |> x.GetEndOffset |> x.AdvanceToOffset
             x.Done(mark, ElementType.LET)
 

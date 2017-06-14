@@ -4,10 +4,13 @@ using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.Caches;
 using JetBrains.ReSharper.Psi.FSharp.Impl;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
+using JetBrains.ReSharper.Psi.FSharp.Searching;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Modules;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
+using Microsoft.FSharp.Compiler;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Util
@@ -18,7 +21,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
   public static class FSharpElementsUtil
   {
     [CanBeNull]
-    private static ITypeElement GetTypeElement([NotNull] FSharpEntity entity, [NotNull] IPsiModule psiModule)
+    internal static ITypeElement GetTypeElement([NotNull] FSharpEntity entity, [NotNull] IPsiModule psiModule)
     {
       if (((FSharpSymbol) entity).DeclarationLocation == null || entity.IsByRef || entity.IsProvidedAndErased)
         return null;
@@ -64,7 +67,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     }
 
     [CanBeNull]
-    private static INamespace GetDeclaredNamespace([NotNull] FSharpEntity entity, IPsiModule psiModule)
+    private static IClrDeclaredElement GetDeclaredNamespace([NotNull] FSharpEntity entity, IPsiModule psiModule)
     {
       Assertion.Assert(entity.IsNamespace, "entity.IsNamespace");
       var name = entity.CompiledName;
@@ -75,34 +78,36 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     }
 
     [CanBeNull]
-    public static IClrDeclaredElement GetDeclaredElement([CanBeNull] FSharpSymbol symbol,
-      [NotNull] IPsiModule psiModule, [CanBeNull] IFSharpFile fsFile = null)
+    public static IDeclaredElement GetDeclaredElement([CanBeNull] FSharpSymbol symbol,
+      [NotNull] IPsiModule psiModule, [CanBeNull] FSharpIdentifierToken referenceOwnerToken = null)
     {
-      if (symbol == null)
-        return null;
+      if (symbol == null) return null;
 
       var entity = symbol as FSharpEntity;
-      if (entity != null && !entity.IsUnresolved)
+      if (entity != null)
+      {
+        if (entity.IsUnresolved) return null;
         return entity.IsNamespace
-          ? (IClrDeclaredElement) GetDeclaredNamespace(entity, psiModule)
+          ? GetDeclaredNamespace(entity, psiModule)
           : GetTypeElement(entity, psiModule);
+      }
 
       var mfv = symbol as FSharpMemberOrFunctionOrValue;
-      if (mfv != null && !mfv.IsUnresolved)
+      if (mfv != null)
       {
-        if (!mfv.IsModuleValueOrMember && fsFile != null)
-          return FindLocalDeclaration(mfv, fsFile);
+        if (mfv.IsUnresolved) return null;
+
+        if (!mfv.IsModuleValueOrMember)
+          return FindLocalDeclaration(mfv, referenceOwnerToken);
 
         var memberEntity = mfv.IsModuleValueOrMember ? mfv.EnclosingEntity : null;
-        if (memberEntity == null)
-          return null;
+        if (memberEntity == null) return null;
 
         if (mfv.IsImplicitConstructor)
-          return GetDeclaredElement(memberEntity, psiModule);
+          return GetDeclaredElement(memberEntity, psiModule, referenceOwnerToken);
 
         var typeElement = GetTypeElement(memberEntity, psiModule);
-        if (typeElement == null)
-          return null;
+        if (typeElement == null) return null;
 
         var members = mfv.IsConstructor
           ? typeElement.Constructors.AsList<ITypeMember>()
@@ -112,13 +117,14 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       }
 
       var unionCase = symbol as FSharpUnionCase;
-      if (unionCase != null && !unionCase.IsUnresolved)
+      if (unionCase != null)
       {
+        if (unionCase.IsUnresolved) return null;
+
         var unionType = unionCase.ReturnType;
         Assertion.AssertNotNull(unionType, "unionType != null");
         var unionTypeElement = GetTypeElement(unionType.TypeDefinition, psiModule);
-        if (unionTypeElement == null)
-          return null;
+        if (unionTypeElement == null) return null;
 
         var caseMember = unionTypeElement.EnumerateMembers(unionCase.CompiledName, true).FirstOrDefault();
         if (caseMember != null)
@@ -140,18 +146,21 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
         return typeElement?.EnumerateMembers(field.Name, true).FirstOrDefault();
       }
 
+      var activePatternCase = symbol as FSharpActivePatternCase;
+      if (activePatternCase != null)
+        return new ResolvedFSharpSymbolElement(activePatternCase, referenceOwnerToken);
+
       return null;
     }
 
     private static IClrDeclaredElement FindLocalDeclaration([NotNull] FSharpMemberOrFunctionOrValue mfv,
-      [NotNull] IFSharpFile fsFile)
+      [CanBeNull] FSharpIdentifierToken referenceOwnerToken)
     {
-      var declRange = mfv.DeclarationLocation;
-      var document = fsFile.GetSourceFile()?.Document;
-      if (document == null)
-        return null;
+      var fsFile = referenceOwnerToken?.GetContainingFile() as IFSharpFile;
+      var document = fsFile?.GetSourceFile()?.Document;
+      if (document == null) return null;
 
-      var idToken = fsFile.FindTokenAt(document.GetTreeEndOffset(declRange) - 1);
+      var idToken = fsFile.FindTokenAt(document.GetTreeEndOffset(mfv.DeclarationLocation) - 1);
       return idToken?.GetContainingNode<LocalDeclaration>();
     }
   }

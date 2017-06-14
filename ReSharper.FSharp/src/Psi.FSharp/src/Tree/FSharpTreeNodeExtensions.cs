@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Tree
 {
@@ -11,9 +12,12 @@ namespace JetBrains.ReSharper.Psi.FSharp.Tree
     }
 
     [CanBeNull, Pure]
-    public static IFSharpTypeDeclaration GetContainingTypeDeclaration([NotNull] this IFSharpTreeNode treeNode)
+    public static IFSharpTypeElementDeclaration GetContainingTypeDeclaration([NotNull] this ITreeNode treeNode)
     {
-      return treeNode.GetContainingNode<IFSharpTypeDeclaration>();
+      while (treeNode != null && !(treeNode is ITypeDeclaration))
+        treeNode = treeNode.Parent;
+
+      return (IFSharpTypeElementDeclaration) treeNode;
     }
   }
 }
