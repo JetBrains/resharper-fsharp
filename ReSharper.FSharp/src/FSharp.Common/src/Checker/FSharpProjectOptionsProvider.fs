@@ -83,7 +83,7 @@ type FSharpProjectOptionsProvider(lifetime, logger : Util.ILogger, solution : IS
                             projectsToInvalidate.Add(p) |> ignore
                             x.InvalidateReferencingProjects(p)
                     | _ -> ()
-                else
+                else if project.IsOpened then
                     projectsToInvalidate.add project
                     x.InvalidateReferencingProjects(project)
                 checkerService.InvalidateAssemblySignature(project, false)
