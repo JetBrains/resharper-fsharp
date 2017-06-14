@@ -48,7 +48,14 @@ namespace JetBrains.ReSharper.Psi.FSharp.Searching
 
     public Tuple<ICollection<IDeclaredElement>, bool> GetNavigateToTargets(IDeclaredElement element)
     {
-      return null;
+      var fsTypeMember = element as IFSharpTypeMember;
+      if (fsTypeMember == null || fsTypeMember.IsVisibleFromFSharp)
+        return null;
+
+      var containingType = fsTypeMember.GetContainingType() as IDeclaredElement;
+      return containingType != null
+        ? Tuple.Create(new[] {containingType}.AsCollection(), false)
+        : null;
     }
 
     public ICollection<FindResult> TransformNavigationTargets(ICollection<FindResult> targets)
