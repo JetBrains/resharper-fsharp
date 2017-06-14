@@ -15,6 +15,7 @@ using JetBrains.Util;
 namespace JetBrains.ReSharper.Feature.Services.FSharp.TypingAssist
 {
   [SolutionComponent]
+  // todo: remove or add more typing assists (e.g. braces)
   public class FSharpTypingAssist : TypingAssistLanguageBase<FSharpLanguage>, ITypingHandler
   {
     private const string NewLineString = "\n";

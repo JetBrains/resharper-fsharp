@@ -1,7 +1,15 @@
 package com.jetbrains.resharper.editorActions
 
-import com.intellij.openapi.editor.Editor
-
 class FSharpTypedHandler : RiderTypedHandler() {
-    override fun isWritableTypingAssist(editor: Editor, typedChar: Char): Boolean = false
+    override val syncBackspace: Boolean
+        get() = false
+
+    override val syncEnter: Boolean
+        get() = false
+
+    override val syncTab: Boolean
+        get() = false
+
+    override val syncDelete: Boolean
+        get() = false
 }
