@@ -171,7 +171,7 @@ type FSharpTreeBuilderBase(file : IPsiSourceFile, lexer : ILexer, lifetime) as t
 
         x.ProcessIdentifier id
         let isSingleton = x.ProcessUnionCaseType caseType
-        let elementType = if isSingleton then ElementType.EXCEPTION_DECLARATION
+        let elementType = if isSingleton then ElementType.FIELD_DECLARATION
                                          else ElementType.UNION_CASE_DECLARATION
 
         range |> x.GetEndOffset |> x.AdvanceToOffset
