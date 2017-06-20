@@ -5,7 +5,7 @@
   <description>F# language support in Rider</description>
   <change-notes />
 
-  <version>SNAPSHOT</version>
+  <version>0.1</version>
   <idea-version since-build="171.3655" />
 
   <depends>com.intellij.modules.rider</depends>
@@ -25,5 +25,12 @@
     <directoryProjectGenerator implementation="com.jetbrains.resharper.projectView.projectGenerators.FSharpLibrary" />
     <directoryProjectGenerator implementation="com.jetbrains.resharper.projectView.projectGenerators.FSharpConsoleApplication" />
 
+    <applicationConfigurable groupId="language" instance="com.jetbrains.resharper.settings.FsiOptionsPage" id="Fsi"/>
   </extensions>
+
+  <project-components>
+    <component>
+      <implementation-class>com.jetbrains.resharper.plugins.fsharp.services.fsi.FSharpInteractiveHost</implementation-class>
+    </component>
+  </project-components>
 </idea-plugin>
