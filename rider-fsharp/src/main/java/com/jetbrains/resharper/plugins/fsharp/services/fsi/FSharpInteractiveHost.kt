@@ -10,38 +10,34 @@ import com.intellij.execution.runners.AbstractConsoleRunnerWithHistory
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.fileTypes.PlainTextLanguage
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.SystemInfo
 import com.intellij.openapi.wm.impl.ToolWindowManagerImpl
 import com.jetbrains.resharper.projectView.solution
-import com.jetbrains.resharper.runtime.DotNetRuntime
 import com.jetbrains.resharper.runtime.RiderDotNetActiveRuntimeHost
 import com.jetbrains.resharper.util.idea.ILifetimedComponent
 import com.jetbrains.resharper.util.idea.LifetimedComponent
+import com.jetbrains.rider.framework.RdVoid
 import com.jetbrains.rider.model.RdFSharpInteractiveHost
+import com.jetbrains.rider.model.RdFsiSendTextRequest
+import com.jetbrains.rider.model.RdFsiSessionInfo
 
-class FSharpInteractiveHost(val project: Project, runtimeHost: RiderDotNetActiveRuntimeHost)
+class FSharpInteractiveHost(val project: Project, val runtimeHost: RiderDotNetActiveRuntimeHost)
     : ILifetimedComponent by LifetimedComponent(project) {
-    val fsiTitle = "F# Interactive"
-    val runtime: DotNetRuntime? = runtimeHost.getCurrentDotNetRuntime(false)
 
-    val fsharpInteractiveHost: RdFSharpInteractiveHost
-        get() = project.solution.fSharpInteractiveHost
-
+    val rdFsiHost: RdFSharpInteractiveHost get() = project.solution.fSharpInteractiveHost
     private var runner: FsiConsoleRunner? = null
 
     init {
-        fsharpInteractiveHost.printOutput.advise(componentLifetime) { text ->
-            sendText(text)
-        }
+        rdFsiHost.sendText.advise(componentLifetime) { request -> getConsoleRunner().sendText(request) }
     }
 
     private fun getConsoleRunner(): FsiConsoleRunner {
         synchronized(this) {
             if (runner == null) {
-                runner = FsiConsoleRunner(this, fsiTitle)
+                val sessionInfo = rdFsiHost.requestNewFsiSessionInfo.sync(RdVoid)
+                runner = FsiConsoleRunner(sessionInfo, this)
                 runner!!.initAndRun()
             }
-            return runner as FsiConsoleRunner
+            return runner!!
         }
     }
 
@@ -50,31 +46,26 @@ class FSharpInteractiveHost(val project: Project, runtimeHost: RiderDotNetActive
             runner = null
         }
     }
+}
 
-    fun sendText(text: String) {
-        val consoleRunner = getConsoleRunner()
-        val processHandler = consoleRunner.processHandler
+class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val host: FSharpInteractiveHost)
+    : AbstractConsoleRunnerWithHistory<LanguageConsoleView>(host.project, fsiTitle, null) {
+
+    companion object {
+        val fsiTitle = "F# Interactive"
+    }
+
+    val cmdLine = GeneralCommandLine().withExePath(sessionInfo.fsiPath).withParameters(sessionInfo.args)
+
+    fun sendText(request: RdFsiSendTextRequest) {
         val stream = processHandler.processInput ?: error("Broken Fsi stream")
         val charset = Charsets.UTF_8
 
-        consoleRunner.consoleView.setInputText("$text;;\n")
-        consoleRunner.show()
-
+        consoleView.setInputText("${request.visibleText};;\n")
+        ToolWindowManagerImpl.getInstance(host.project).getToolWindow(executor.id).show(null)
 //        val bytes = ().toByteArray(charset)
 //        stream.write(bytes)
 //        stream.flush()
-    }
-}
-
-class FsiConsoleRunner(val host: FSharpInteractiveHost, title: String) : AbstractConsoleRunnerWithHistory<LanguageConsoleView>(host.project, title, null) {
-    val fsiPath = if (SystemInfo.isWindows) "C:\\Program Files (x86)\\Microsoft SDKs\\F#\\4.1\\Framework\\v4.0\\fsi.exe" else "/usr/local/bin/fsharpi"
-    val cmdLine = GeneralCommandLine()
-            .withExePath(fsiPath)
-            .withParameters("--fsi-server-input-codepage:65001", "--fsi-server-output-codepage:65001")
-//    val cmdLine = host.runtime?.createRunProcessCmd(fsiPath, StringUtil.notNullize(project.basePath), emptyList(), emptyMap())
-
-    fun show() {
-        ToolWindowManagerImpl.getInstance(host.project).getToolWindow(executor.id).show(null)
     }
 
     override fun finishConsole() {
@@ -95,7 +86,7 @@ class FsiConsoleRunner(val host: FSharpInteractiveHost, title: String) : Abstrac
         val gutterProvider = object : BasicGutterContentProvider() {
             override fun beforeEvaluate(e: Editor) = Unit
         }
-        val consoleView = builder.gutterContentProvider(gutterProvider).build(project, PlainTextLanguage.INSTANCE)
+        val consoleView = builder.gutterContentProvider(gutterProvider).build(project, PlainTextLanguage.INSTANCE) // todo: Use F# language
         consoleView.prompt = null
 
         return consoleView

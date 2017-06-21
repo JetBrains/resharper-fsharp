@@ -1,24 +1,35 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Settings
 
 open JetBrains.Application.Settings
-open JetBrains.Application.UI.Icons.CommonThemedIcons
+open JetBrains.ProjectModel.Resources
 open JetBrains.Application.UI.Options
 open JetBrains.Application.UI.Options.OptionsDialog
 open JetBrains.DataFlow
 open JetBrains.ProjectModel.Settings.Schema
 open JetBrains.UI.RichText
 
-[<SettingsKey(typeof<HierarchySettings>, "Fsi")>]
-type FsiOptions() =
-    [<SettingsEntry(true, "Use 64-bit F# Interactive"); DefaultValue>]
-    val mutable UseAnyCpuVersion : bool
+[<AutoOpen>]
+module FsiOptions =
+    let [<Literal>] useAnyCpuVersionText = "Use 64-bit F# Interactive"
+    let [<Literal>] shadowCopyReferencesText = "Shadow copy assemblies"
+    let [<Literal>] fsiArgsText = "F# Interactive arguments"
 
-    [<SettingsEntry("--optimize", "F# Interactive arguments"); DefaultValue>]
-    val mutable FsiArgs : string
+    [<SettingsKey(typeof<HierarchySettings>, "Fsi")>]
+    type FsiOptions() =
+        [<SettingsEntry(false, useAnyCpuVersionText); DefaultValue>]
+        val mutable UseAnyCpuVersion : bool
 
-[<OptionsPage("FsiOptionsPage", "Fsi", typeof<CommonThemedIcons.Abort>)>]
-type FsiOptionsPage(lifetime, optionsContext) as this =
-    inherit SimpleOptionsPage(lifetime, optionsContext)
-    do
-        this.AddBoolOption((fun (key : FsiOptions) -> key.UseAnyCpuVersion), RichText("Use 64-bit F# Interactive")) |> ignore
-        this.AddStringOption((fun (key : FsiOptions) -> key.FsiArgs), "F# Interactive arguments") |> ignore
+        [<SettingsEntry(true, shadowCopyReferencesText); DefaultValue>]
+        val mutable ShadowCopyReferences : bool
+
+        [<SettingsEntry("--optimize", fsiArgsText); DefaultValue>]
+        val mutable FsiArgs : string
+
+    [<OptionsPage("FsiOptionsPage", "Fsi", typeof<ProjectModelThemedIcons.Fsharp>)>]
+    type FsiOptionsPage(lifetime, optionsContext) as this =
+        inherit SimpleOptionsPage(lifetime, optionsContext)
+        do
+            this.AddBoolOption((fun (key : FsiOptions) -> key.UseAnyCpuVersion), RichText(useAnyCpuVersionText)) |> ignore
+            this.AddBoolOption((fun (key : FsiOptions) -> key.ShadowCopyReferences), RichText(shadowCopyReferencesText)) |> ignore
+            this.AddStringOption((fun (key : FsiOptions) -> key.FsiArgs), fsiArgsText) |> ignore
+            this.FinishPage()
