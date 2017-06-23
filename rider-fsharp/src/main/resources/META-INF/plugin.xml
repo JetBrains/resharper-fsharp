@@ -25,12 +25,32 @@
     <directoryProjectGenerator implementation="com.jetbrains.resharper.projectView.projectGenerators.FSharpLibrary" />
     <directoryProjectGenerator implementation="com.jetbrains.resharper.projectView.projectGenerators.FSharpConsoleApplication" />
 
-    <applicationConfigurable groupId="language" instance="com.jetbrains.resharper.settings.FsiOptionsPage" id="Fsi"/>
+    <applicationConfigurable groupId="language" instance="com.jetbrains.resharper.plugins.fsharp.services.settings.FsiOptionsPage" id="Fsi" />
+
+    <intentionAction>
+      <className>com.jetbrains.resharper.plugins.fsharp.services.fsi.SendLineToFsiAction</className>
+      <category>F#</category>
+      <descriptionDirectoryName>SendToFsi</descriptionDirectoryName>
+    </intentionAction>
+
+    <intentionAction>
+      <className>com.jetbrains.resharper.plugins.fsharp.services.fsi.SendSelectionToFsiAction</className>
+      <category>F#</category>
+      <descriptionDirectoryName>SendToFsi</descriptionDirectoryName>
+    </intentionAction>
   </extensions>
+
+  <actions>
+    <group id="Rider.Plugins.FSharp.FsiGroup" text="F# Interactive" popup="true" icon="/icons/fsharp.png">
+      <action class="com.jetbrains.resharper.plugins.fsharp.services.fsi.StartFsiAction" id="Rider.Plugins.FSharp.StartFsi" text="Start F# Interactive Session..."/>
+      <action class="com.jetbrains.resharper.plugins.fsharp.services.fsi.SendToFsiAction" id="Rider.Plugins.FSharp.SendToFsi" text="Send to F# Interactive"/>
+      <add-to-group group-id="ToolsMenu" anchor="last"/>
+    </group>
+  </actions>
 
   <project-components>
     <component>
-      <implementation-class>com.jetbrains.resharper.plugins.fsharp.services.fsi.FSharpInteractiveHost</implementation-class>
+      <implementation-class>com.jetbrains.resharper.plugins.fsharp.services.fsi.FsiHost</implementation-class>
     </component>
   </project-components>
 </idea-plugin>
