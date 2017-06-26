@@ -59,6 +59,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement.CompilerGenerated
       AccessibilityDomain.AccessibilityDomainType.PUBLIC, null);
 
     public abstract MemberHidePolicy HidePolicy { get; }
-    public bool IsVisibleFromFSharp => false;
+    public virtual bool IsVisibleFromFSharp => false;
   }
 }

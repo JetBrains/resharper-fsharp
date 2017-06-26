@@ -49,7 +49,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement.CompilerGenerated
     public bool IsIterator => false;
     public IAttributesSet ReturnTypeAttributes => EmptyAttributesSet.Instance;
 
-    public bool IsVisibleFromFSharp => false;
+    public override bool IsVisibleFromFSharp => false;
     public bool IsDefault => false;
     public bool IsParameterless => false;
     public bool IsImplicit => true;

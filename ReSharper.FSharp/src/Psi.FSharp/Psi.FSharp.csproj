@@ -505,8 +505,8 @@
     <Compile Include="src\Impl\Tree\StructDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpToken.cs" />
     <Compile Include="src\Impl\Tree\TypeAbbreviationDeclaration.cs" />
-    <Compile Include="src\Impl\Tree\TypedUnionCaseDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpTypeElementDeclarationBase.cs" />
+    <Compile Include="src\Impl\Tree\UnionCaseDeclaration.cs" />
     <Compile Include="src\Impl\Tree\UnionDeclaration.cs" />
     <Compile Include="src\Impl\Tree\ObjectTypeDeclaration.cs" />
     <Compile Include="src\Impl\Tree\LongIdentifier.cs" />
@@ -554,11 +554,10 @@
     <Compile Include="src\Tree\ILocalDeclaration.cs" />
     <Compile Include="src\Tree\IMemberDeclaration.cs" />
     <Compile Include="src\Tree\ITypeParameterOfTypeDeclaration.cs" />
-    <Compile Include="src\Tree\IUnionDeclaration.cs" />
     <Compile Include="src\Util\FSharpAsyncUtil.cs" />
     <Compile Include="src\Tree\IFSharpTypeDeclaration.cs" />
     <Compile Include="src\Tree\IFSharpTypeElementDeclaration.cs" />
-    <Compile Include="src\Tree\ITypedUnionCaseDeclaration.cs" />
+    <Compile Include="src\Tree\IUnionCaseDeclaration.cs" />
     <Compile Include="src\Tree\ILongIdentifier.cs" />
     <Compile Include="src\Tree\ITopLevelModuleDeclaration.cs" />
     <Compile Include="src\Tree\IModuleLikeDeclaration.cs" />

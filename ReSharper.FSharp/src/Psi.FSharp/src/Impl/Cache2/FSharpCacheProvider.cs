@@ -84,9 +84,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public bool NeedCacheUpdate(ITreeNode elementContainingChanges, PsiChangedElementType type)
     {
-      var project = elementContainingChanges?.GetProject();
-      if (project != null)
-        myCheckerService.InvalidateAssemblySignature(project, true);
       return true;
     }
 
