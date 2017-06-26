@@ -7,7 +7,7 @@ open Microsoft.FSharp.Compiler.SourceCodeServices
 
 [<AllowNullLiteral>]
 type IFSharpProjectOptionsProvider =
-    abstract member GetProjectOptions : IPsiSourceFile * FSharpChecker -> FSharpProjectOptions option
+    abstract member GetProjectOptions : IPsiSourceFile * FSharpChecker * updateScriptOptions: bool -> FSharpProjectOptions option
     abstract member GetProjectOptions : IProject -> FSharpProjectOptions option
     abstract member TryGetFSharpProject : IProject -> FSharpProject option
     abstract member GetFileIndex : IPsiSourceFile -> int

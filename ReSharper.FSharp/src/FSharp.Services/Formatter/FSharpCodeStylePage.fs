@@ -72,7 +72,6 @@ type FSharpCodePreviewPreparator() =
     override x.ProjectFileType = FSharpProjectFileType.Instance :> _
     override x.Parse(parser,_) = parser.ParseFile() :> _
 
-
 [<FormattingSettingsPresentationComponent>]
 type FSharpCodeStylePageSchema(lifetime, smartContext, itemViewModelFactory, container, settingsToHide) =
     inherit CodeStylePageSchema<FSharpFormatSettingsKey, FSharpCodePreviewPreparator>(lifetime, smartContext,itemViewModelFactory,
