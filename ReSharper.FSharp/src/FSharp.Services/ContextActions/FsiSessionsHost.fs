@@ -4,6 +4,8 @@ open JetBrains.Application.Settings
 open JetBrains.DataFlow
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
+open JetBrains.Platform.RdFramework.Base
+open JetBrains.Platform.RdFramework.Util
 open JetBrains.ReSharper.Feature.Services.Bulbs
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Feature.Services.Intentions
@@ -32,7 +34,7 @@ type SendToFsiActionType =
     | SendSelection
 
 [<SolutionComponent>]
-type FsiSessionsHost(solution : ISolution, solutionModel : SolutionModel, toolset : RiderSolutionToolset) as this =
+type FsiSessionsHost(lifetime: Lifetime, solution : ISolution, solutionModel : SolutionModel, toolset : RiderSolutionToolset) as this =
     let rdFsiHost =
         match solutionModel.TryGetCurrentSolution() with
         | null -> failwith "Could not get fsi host"
@@ -41,7 +43,12 @@ type FsiSessionsHost(solution : ISolution, solutionModel : SolutionModel, toolse
     let stringOption option arg = sprintf "--%s:%O" option arg
     let boolOption option arg = sprintf "--%s%s" option (if arg then "+" else "-")
 
-    do rdFsiHost.RequestNewFsiSessionInfo.Set(this.GetNewFsiSessionInfo)
+    do
+        rdFsiHost.RequestNewFsiSessionInfo.Set(this.GetNewFsiSessionInfo)
+        let settings = solution.GetSettingsStore().SettingsStore.BindToContextLive(lifetime, ContextRange.ApplicationWide)
+        let moveCaretOnSendLine = settings.GetValueProperty(lifetime, (fun (s : FsiOptions) -> s.MoveCaretOnSendLine))
+        rdFsiHost.MoveCaretOnSendLine.Value <- moveCaretOnSendLine.Value
+        moveCaretOnSendLine.FlowInto(lifetime, rdFsiHost.MoveCaretOnSendLine :> IRdProperty<_>)
 
     member x.GetNewFsiSessionInfo(_) =
         let settings = solution.GetSettingsStore()
@@ -79,52 +86,3 @@ type FsiSessionsHost(solution : ISolution, solutionModel : SolutionModel, toolse
                 yield! userArgs
             }
         RdFsiSessionInfo(fsiPath, List(args))
-
-    member x.SendText(request) = rdFsiHost.SendText.Fire(request)
-
-and FSharpContextActionDataProvider(solution : ISolution, textControl, file) =
-    inherit CachedContextActionDataProviderBase<IFSharpFile>(solution, textControl, file)
-
-[<ContextActionDataBuilder(typeof<FSharpContextActionDataProvider>)>]
-type FSharpContextActionDataBuilder() =
-    inherit ContextActionDataBuilderBase<FSharpLanguage, IFSharpFile>()
-    override x.BuildFromPsi(solution, textControl, file) =
-        FSharpContextActionDataProvider(solution, textControl, file) :> _
-
-type SendToFsiAction(dataProvider : FSharpContextActionDataProvider) =
-    inherit BulbActionBase()
-
-    let actionType = if dataProvider.DocumentSelection.Length > 0 then SendSelection else SendLine
-
-    override x.Text =
-        match actionType with
-        | SendLine -> "line"
-        | SendSelection -> "selection"
-        |> sprintf "Send %s to F# Interactive"
-
-    override x.ExecutePsiTransaction(solution, _) =
-        let filePath = dataProvider.SourceFile.GetLocation()
-        let document = dataProvider.Document
-        let startLine = document.GetCoordsByOffset(dataProvider.DocumentSelection.StartOffset.Offset).Line |> int
-
-        let visibleText =
-            match actionType with
-            | SendLine -> document.GetLineText(document.GetCoordsByOffset(dataProvider.DocumentCaret.Offset).Line)
-            | SendSelection -> dataProvider.DocumentSelection.GetText()
-
-        // copied from visualfsharp
-        let fsiText =
-            sprintf "\n# silentCd @\"%s\" ;; \n" filePath.Directory.FullPath
-          + sprintf "# %d @\"%s\" \n" startLine filePath.FullPath
-          + visibleText + "\n# 1 \"stdin\"\n;;\n"
-
-        Action<_>(fun _ -> solution.GetComponent<FsiSessionsHost>().SendText(RdFsiSendTextRequest(visibleText, fsiText)))
-
-[<ContextAction(Group = "F#", Name = "Send to F# Interactive", Description = "Sends F# code to F# Interactive session.")>]
-type SendToFsiContextAction(dataProvider : FSharpContextActionDataProvider) =
-    let icon = BulbThemedIcons.GhostBulb.Id
-    let anchor = IntentionsAnchors.ContextActionsAnchor
-
-    interface IContextAction with
-        member x.IsAvailable(_) = true
-        member x.CreateBulbItems() = seq { yield IntentionAction(SendToFsiAction(dataProvider), icon, anchor) }

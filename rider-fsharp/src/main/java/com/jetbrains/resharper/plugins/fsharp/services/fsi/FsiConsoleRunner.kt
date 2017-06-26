@@ -9,6 +9,7 @@ import com.intellij.execution.console.LanguageConsoleView
 import com.intellij.execution.console.ProcessBackedConsoleExecuteActionHandler
 import com.intellij.execution.process.OSProcessHandler
 import com.intellij.execution.runners.AbstractConsoleRunnerWithHistory
+import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.execution.ui.RunContentDescriptor
 import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnAction
@@ -17,36 +18,39 @@ import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.fileTypes.PlainTextLanguage
+import com.intellij.openapi.util.IconLoader
 import com.intellij.openapi.wm.impl.ToolWindowManagerImpl
 import com.intellij.util.containers.ContainerUtil
-import com.jetbrains.rider.model.RdFsiSendTextRequest
 import com.jetbrains.rider.model.RdFsiSessionInfo
 import java.io.File
-import javax.swing.Icon
 import kotlin.properties.Delegates
 
-class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val host: FsiHost)
-    : AbstractConsoleRunnerWithHistory<LanguageConsoleView>(host.project, fsiTitle, null) {
+class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost)
+    : AbstractConsoleRunnerWithHistory<LanguageConsoleView>(fsiHost.project, fsiTitle, null) {
 
     companion object {
         val fsiTitle = "F# Interactive"
     }
 
     val cmdLine = GeneralCommandLine().withExePath(sessionInfo.fsiPath).withParameters(sessionInfo.args)
+    val sendActionExecutor = SendToFsiActionExecutor(this)
     private var contentDescriptor by Delegates.notNull<RunContentDescriptor>()
 
     fun isValid(): Boolean = !(processHandler?.isProcessTerminated ?: true)
 
-    fun sendText(request: RdFsiSendTextRequest) {
-        val stream = processHandler.processInput ?: error("Broken Fsi stream")
-        val bytes = request.fsiText.toByteArray(Charsets.UTF_8)
-        stream.write(bytes)
-        stream.flush()
+
+    fun sendText(visibleText: String, fsiText: String) {
+        consoleView.print(visibleText, ConsoleViewContentType.USER_INPUT)
+        consoleView.print("\n", ConsoleViewContentType.NORMAL_OUTPUT)
         EditorUtil.scrollToTheEnd(consoleView.historyViewer)
 
         // show the window without getting focus
-        ToolWindowManagerImpl.getInstance(project).getToolWindow(executor.id).show(null)
         ExecutionManager.getInstance(project).contentManager.selectRunContent(contentDescriptor)
+        ToolWindowManagerImpl.getInstance(project).getToolWindow(executor.id).show(null)
+
+        val stream = processHandler.processInput ?: error("Broken Fsi stream")
+        stream.write(fsiText.toByteArray(Charsets.UTF_8))
+        stream.flush()
     }
 
     override fun createProcess(): Process? {
@@ -54,11 +58,13 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val host: FsiHost)
         return cmdLine.createProcess()
     }
 
+    override fun isAutoFocusContent() = false
+
     override fun createExecuteActionHandler(): ProcessBackedConsoleExecuteActionHandler {
         return ProcessBackedConsoleExecuteActionHandler(processHandler, false)
     }
 
-    override fun getConsoleIcon() = com.jetbrains.resharper.icons.ReSharperProjectModelIcons.Fsharp
+    override fun getConsoleIcon() = IconLoader.getIcon("/icons/fsharpConsole.png")
 
     override fun fillToolBarActions(toolbarActions: DefaultActionGroup, defaultExecutor: Executor,
                                     contentDescriptor: RunContentDescriptor): MutableList<AnAction> {
@@ -66,7 +72,7 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val host: FsiHost)
         contentDescriptor.icon
         val actionList = ContainerUtil.newArrayList<AnAction>(
                 createCloseAction(defaultExecutor, contentDescriptor),
-                ResetFsiAction(this.host))
+                ResetFsiAction(this.fsiHost))
         toolbarActions.addAll(actionList)
         actionList.add(createConsoleExecAction(consoleExecuteActionHandler))
         return actionList
@@ -84,8 +90,9 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val host: FsiHost)
             override fun isSilentlyDestroyOnClose(): Boolean = true
         }
     }
+
+    private class ResetFsiAction(private val host: FsiHost) : AnAction("Reset F# Interactive", null, AllIcons.Actions.Restart) {
+        override fun actionPerformed(e: AnActionEvent) = host.resetFsiConsole()
+    }
 }
 
-class ResetFsiAction(private val host: FsiHost) : AnAction("Reset F# Interactive", null, AllIcons.Actions.Restart) {
-    override fun actionPerformed(e: AnActionEvent) = host.resetRunner()
-}
