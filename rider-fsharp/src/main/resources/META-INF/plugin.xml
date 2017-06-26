@@ -19,6 +19,7 @@
     <backend.markup.adapterFactory language="F#" implementationClass="com.jetbrains.resharper.daemon.RiderMarkupAdapterFactory" />
     <backend.typedHandler language="F#" implementationClass="com.jetbrains.resharper.editorActions.FSharpTypedHandler" />
     <completion.contributor language="F#" implementationClass="com.jetbrains.resharper.completion.ReSharperCompletionContributor" />
+    <completion.completionSessionStrategy language="F#" implementationClass="com.jetbrains.resharper.plugins.fsharp.services.completion.FSharpCompletionStrategy" />
     <codeInsight.parameterInfo language="F#" implementationClass="com.jetbrains.resharper.parameterInfo.RiderParameterInfoHandler" />
     <codeStyleSettingsProvider implementation="com.jetbrains.resharper.settings.FSharpCodeStyleSettingsProvider" />
 
