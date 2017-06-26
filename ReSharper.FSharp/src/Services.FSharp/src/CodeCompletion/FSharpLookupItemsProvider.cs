@@ -1,5 +1,6 @@
 ﻿using JetBrains.Annotations;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.FSharp;
 using JetBrains.ReSharper.Psi.FSharp.Parsing;
@@ -44,14 +45,20 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
 
         bool isEscaped;
         var lookupText = GetLookupText(symbol, IsInAttributeList(fsFile, context), out isEscaped);
-        var lookupItem = new FSharpLookupItem(lookupText, symbol.GetIconId(), isEscaped, symbol.IsParam());
+        var lookupItem = new FSharpLookupItem(lookupText, symbol.GetIconId(), isEscaped);
         lookupItem.InitializeRanges(GetDefaultRanges(context), context.BasicContext);
 
-        var mfv = symbol as FSharpMemberOrFunctionOrValue;
-        if (mfv != null)
+        try
         {
-          lookupItem.DisplayTypeName = mfv.ReturnParameter.Type.Format(symbolUse.DisplayContext);
+          var returnType = FSharpSymbolUtil.GetReturnType(symbol);
+          if (returnType != null)
+            lookupItem.DisplayTypeName = returnType.Value.Format(symbolUse.DisplayContext);
         }
+        catch
+        {
+          // ignored
+        }
+
 
         collector.Add(lookupItem);
       }

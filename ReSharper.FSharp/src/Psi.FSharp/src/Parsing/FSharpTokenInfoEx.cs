@@ -99,6 +99,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Parsing
               ? FSharpTokenType.RQUOTE_TYPED
               : FSharpTokenType.RQUOTE;
 
+          if (tokenTag == FSharpTokenTag.BAR)
+            return FSharpTokenType.BAR;
+
           return FSharpTokenType.TEXT;
 
         default:

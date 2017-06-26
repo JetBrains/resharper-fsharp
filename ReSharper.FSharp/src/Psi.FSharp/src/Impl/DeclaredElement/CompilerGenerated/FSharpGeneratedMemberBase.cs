@@ -5,7 +5,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement.CompilerGenerated
 {
-  public abstract class FSharpGeneratedMemberBase : FSharpGeneratedElementBase, ITypeMember
+  public abstract class FSharpGeneratedMemberBase : FSharpGeneratedElementBase, IFSharpTypeMember
   {
     protected FSharpGeneratedMemberBase([NotNull] IClass containingType) : base(containingType)
     {
@@ -59,5 +59,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement.CompilerGenerated
       AccessibilityDomain.AccessibilityDomainType.PUBLIC, null);
 
     public abstract MemberHidePolicy HidePolicy { get; }
+    public bool IsVisibleFromFSharp => false;
   }
 }

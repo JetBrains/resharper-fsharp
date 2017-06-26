@@ -42,6 +42,7 @@
 
 
         <Token name="DOT"/>
+        <Token name="BAR"/>
 
         <!-- Used in FsharpFakeLexer and as a separator in psi grammar -->
         <Token name="FAKE"/>

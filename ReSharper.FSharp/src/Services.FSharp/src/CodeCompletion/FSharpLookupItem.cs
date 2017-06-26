@@ -10,27 +10,17 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
   {
     [NotNull] private readonly string myText;
     private readonly bool myIsEscaped;
-    private readonly bool myIsParam;
 
-    public FSharpLookupItem([NotNull] string text, [NotNull] IconId image, bool isEscaped, bool isParam) : base(false)
+    public FSharpLookupItem([NotNull] string text, [NotNull] IconId image, bool isEscaped) : base(false)
     {
       myText = text;
       myIsEscaped = isEscaped;
-      myIsParam = isParam;
       Image = image;
     }
 
     public override IconId Image { get; }
 
-    public override string Text
-    {
-      get
-      {
-        var nameText = myIsEscaped ? "``" + myText + "``" : myText;
-        var insertText = myIsParam ? nameText + " = " : nameText;
-        return insertText;
-      }
-    }
+    public override string Text => myIsEscaped ? "``" + myText + "``" : myText;
 
     protected override RichText GetDisplayName()
     {

@@ -27,7 +27,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
       var fsFile = myOwner.GetContainingFile() as IFSharpFile;
       var symbol = myLazyResolve ? FindFSharpSymbol(fsFile) : myOwner.FSharpSymbol;
 
-      var element = symbol != null ? FSharpElementsUtil.GetDeclaredElement(symbol, psiModule, fsFile) : null;
+      var element = symbol != null ? FSharpElementsUtil.GetDeclaredElement(symbol, psiModule, myOwner) : null;
       return element != null
         ? new ResolveResultWithInfo(new SimpleResolveResult(element), ResolveErrorType.OK)
         : ResolveResultWithInfo.Ignore;

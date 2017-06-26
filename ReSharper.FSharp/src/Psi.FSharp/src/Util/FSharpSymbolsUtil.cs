@@ -46,11 +46,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       return (symbol as FSharpMemberOrFunctionOrValue)?.CompiledName == "op_GreaterThan";
     }
 
-    public static bool IsParam([NotNull] this FSharpSymbol symbol)
-    {
-      return symbol is FSharpParameter;
-    }
-
     [CanBeNull]
     public static FSharpMemberOrFunctionOrValue TryGetPropertyFromAccessor(
       [CanBeNull] this FSharpMemberOrFunctionOrValue mfv)

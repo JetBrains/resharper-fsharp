@@ -227,7 +227,11 @@ moduleAbbreviation options { stubBase="FSharpTypeElementDeclarationBase"; } extr
 
 let options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
-  fSharpIdentifier<IDENTIFIER, Identifier>;
+  fSharpIdentifier<IDENTIFIER, Identifier>
+  activePatternCaseDeclaration<ACTIVE_PATTERN_CASE, Cases>*;
+
+activePatternCaseDeclaration options { stubBase="FSharpDeclarationBase"; }:
+   fSharpIdentifier<IDENTIFIER, Identifier>;
 
 otherMemberDeclaration:
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
