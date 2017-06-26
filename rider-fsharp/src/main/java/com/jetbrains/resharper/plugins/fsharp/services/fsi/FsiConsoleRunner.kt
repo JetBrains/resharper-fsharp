@@ -61,7 +61,14 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost)
     override fun isAutoFocusContent() = false
 
     override fun createExecuteActionHandler(): ProcessBackedConsoleExecuteActionHandler {
-        return ProcessBackedConsoleExecuteActionHandler(processHandler, false)
+        return object : ProcessBackedConsoleExecuteActionHandler(processHandler, false) {
+            override fun runExecuteAction(consoleView: LanguageConsoleView) {
+                val visibleText = consoleView.consoleEditor.document.text
+                val fsiText = "\n$visibleText\n# 1 \"stdin\"\n;;\n"
+                sendText(visibleText, fsiText)
+                consoleView.setInputText("")
+            }
+        }
     }
 
     override fun getConsoleIcon() = IconLoader.getIcon("/icons/fsharpConsole.png")
@@ -69,7 +76,6 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost)
     override fun fillToolBarActions(toolbarActions: DefaultActionGroup, defaultExecutor: Executor,
                                     contentDescriptor: RunContentDescriptor): MutableList<AnAction> {
         this.contentDescriptor = contentDescriptor
-        contentDescriptor.icon
         val actionList = ContainerUtil.newArrayList<AnAction>(
                 createCloseAction(defaultExecutor, contentDescriptor),
                 ResetFsiAction(this.fsiHost))
