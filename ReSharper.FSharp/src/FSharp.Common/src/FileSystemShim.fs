@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Common
 open JetBrains.DataFlow
 open JetBrains.DocumentManagers
 open JetBrains.ProjectModel
+open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.AbstractIL.Internal.Library
 open System.Collections.Generic
@@ -22,7 +23,8 @@ type FileSystemShim(lifetime : Lifetime, documentManager : DocumentManager) as t
             match FileSystemPath.TryParse(fileName) with
             | path when not path.IsEmpty && fsExtensions.Contains(path.ExtensionNoDot) ->
                 let document = documentManager.GetOrCreateDocument(path)
-                new MemoryStream(Encoding.UTF8.GetBytes(document.GetText())) :> _
+                let text = ReadLockCookie.Execute(fun () -> document.GetText())
+                new MemoryStream(Encoding.UTF8.GetBytes(text)) :> _
             | _ -> defaultFileSystem.FileStreamReadShim(fileName)
         
         member x.GetLastWriteTimeShim(fileName) = defaultFileSystem.GetLastWriteTimeShim(fileName) // todo
