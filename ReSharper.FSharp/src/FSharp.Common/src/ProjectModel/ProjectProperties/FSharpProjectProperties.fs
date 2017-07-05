@@ -15,6 +15,7 @@ type FSharpProjectProperties =
     val mutable targetPlatformData : TargetPlatformData
     val buildSettings : ManagedProjectBuildSettings
 
+    // todo: these constructors are seen as partial member
     new(projectTypeGuids, platformId, factoryGuid, targetFrameworkIds, targetPlatformData) =
         { inherit ProjectPropertiesBase<_>(projectTypeGuids, platformId, factoryGuid, targetFrameworkIds)
           buildSettings = ManagedProjectBuildSettings()

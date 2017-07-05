@@ -17,10 +17,12 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
   public class FSharpCacheProvider : ILanguageCacheProvider
   {
     private readonly FSharpCheckerService myCheckerService;
+    private readonly ILogger myLogger;
 
-    public FSharpCacheProvider(FSharpCheckerService checkerService)
+    public FSharpCacheProvider(FSharpCheckerService checkerService, ILogger logger)
     {
       myCheckerService = checkerService;
+      myLogger = logger;
     }
 
     private const int CacheVersion = 2;
@@ -84,6 +86,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
     public bool NeedCacheUpdate(ITreeNode elementContainingChanges, PsiChangedElementType type)
     {
+      var filePath = elementContainingChanges?.GetSourceFile()?.GetLocation().FullPath;
+      if (filePath != null)
+        myLogger.Warn("Modifying " + filePath);
       return true;
     }
 

@@ -7,8 +7,8 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
   {
     protected override bool IsAvailable(FSharpCodeCompletionContext context)
     {
-//      return context.BasicContext.CodeCompletionType == CodeCompletionType.BasicCompletion;
-      // for some reason completion type becomes smart on subsequent invokations
+      // todo: change when it's possible to disable smart completion on the second invokation
+      // return context.BasicContext.CodeCompletionType == CodeCompletionType.BasicCompletion;
       return true;
     }
 

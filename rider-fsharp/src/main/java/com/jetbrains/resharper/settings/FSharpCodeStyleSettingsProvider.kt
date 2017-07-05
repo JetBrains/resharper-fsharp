@@ -4,6 +4,8 @@ import com.intellij.lang.Language
 import com.jetbrains.resharper.ideaInterop.fileTypes.fsharp.FSharpLanguage
 
 class FSharpCodeStyleSettingsProvider : RiderCodeStyleSettingsProvider() {
+    override fun getHelpTopic() = ""
+
     override fun getLanguage(): Language = FSharpLanguage
 
     override fun getConfigurableDisplayName(): String {
