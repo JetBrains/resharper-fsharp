@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="AssemblyInfo.fs" />
     <Compile Include="FSharpClrLanguage.fs" />
+    <Compile Include="FSharpRefactoringLanguageService.fs" />
     <Compile Include="SelectEmbracingConsruct\FSharpSelectEmbracingConstructProvider.fs" />
     <Compile Include="Formatter\FSharpCodeStylePage.fs" />
     <Compile Include="Formatter\ReformatCode.fs" />
