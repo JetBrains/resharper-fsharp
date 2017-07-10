@@ -23,10 +23,19 @@ intellij {
 }
 
 assert file(nupkg_path).exists()
+
 prepareSandbox {
     from(nupkg_path, {
         into "$intellij.pluginName"
     })
+}
+
+runIde {
+    systemProperties = [
+            'rider.debug.mono.debug': true,
+            'rider.debug.mono.allowConnect': true,
+            'idea.platform.prefix' : "Rider"
+    ]
 }
 
 task wrapper(type: Wrapper) {
