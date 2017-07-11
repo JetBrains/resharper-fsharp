@@ -87,10 +87,10 @@
       <HintPath>..\..\packages\JetBrains.Platform.Lib.DevExpress.2.0.20150224.0\lib\Net\DevExpress.XtraTreeList.v7.1.dll</HintPath>
     </Reference>
     <Reference Include="FSharp.Compiler.Service">
-      <HintPath>..\..\packages\JetBrains.FSharp.Compiler.Service.12.0.8-2\lib\net45\FSharp.Compiler.Service.dll</HintPath>
+      <HintPath>..\..\packages\JetBrains.FSharp.Compiler.Service.12.0.8-3\lib\net45\FSharp.Compiler.Service.dll</HintPath>
     </Reference>
     <Reference Include="FSharp.Compiler.Service.MSBuild.v12">
-      <HintPath>..\..\packages\JetBrains.FSharp.Compiler.Service.12.0.8-2\lib\net45\FSharp.Compiler.Service.MSBuild.v12.dll</HintPath>
+      <HintPath>..\..\packages\JetBrains.FSharp.Compiler.Service.12.0.8-3\lib\net45\FSharp.Compiler.Service.MSBuild.v12.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\..\packages\SharpZipLib.JetBrains.Stripped.0.87.20161027.6\lib\net40\ICSharpCode.SharpZipLib.dll</HintPath>
