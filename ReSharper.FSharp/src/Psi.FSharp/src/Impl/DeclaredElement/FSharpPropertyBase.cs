@@ -1,12 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Impl.Special;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
@@ -15,34 +13,25 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
     where TDeclaration : FSharpDeclarationBase, IFSharpDeclaration, IAccessRightsOwnerDeclaration,
     IModifiersOwnerDeclaration
   {
-    protected FSharpPropertyBase([NotNull] ITypeMemberDeclaration declaration, FSharpMemberOrFunctionOrValue mfv)
+    protected FSharpPropertyBase([NotNull] ITypeMemberDeclaration declaration,
+      [NotNull] FSharpMemberOrFunctionOrValue mfv)
       : base(declaration, mfv)
     {
       var property =
-        mfv != null && mfv.IsModuleValueOrMember
+        mfv.IsModuleValueOrMember
           ? mfv.EnclosingEntity.MembersFunctionsAndValues.FirstOrDefault(
-            m => m.IsProperty && m.DisplayName == mfv.DisplayName) ?? mfv
+              m => m.IsProperty && m.DisplayName == mfv.DisplayName) ?? mfv
           : mfv;
-
-      if (property != null)
-      {
-        IsReadable = property.HasGetterMethod || property.IsPropertyGetterMethod ||
-                     property.IsModuleValueOrMember && !property.IsMember;
-        IsWritable = property.IsMutable || property.HasSetterMethod || property.IsPropertySetterMethod;
-        ShortName = property.GetMemberCompiledName();
-        var returnType = property.IsPropertySetterMethod
-          ? property.CurriedParameterGroups[0][0].Type
-          : property.ReturnParameter.Type;
-        ReturnType = FSharpTypesUtil.GetType(returnType, declaration, Module) ??
-                     TypeFactory.CreateUnknownType(Module);
-      }
-      else
-      {
-        IsReadable = true;
-        IsWritable = false;
-        ReturnType = TypeFactory.CreateUnknownType(Module);
-        ShortName = declaration.DeclaredName;
-      }
+      
+      IsReadable = property.HasGetterMethod || property.IsPropertyGetterMethod ||
+                   property.IsModuleValueOrMember && !property.IsMember;
+      IsWritable = property.IsMutable || property.HasSetterMethod || property.IsPropertySetterMethod;
+      ShortName = property.GetMemberCompiledName();
+      var returnType = property.IsPropertySetterMethod
+        ? property.CurriedParameterGroups[0][0].Type
+        : property.ReturnParameter.Type;
+      ReturnType = FSharpTypesUtil.GetType(returnType, declaration, Module) ??
+                   TypeFactory.CreateUnknownType(Module);
     }
 
     public override string ShortName { get; }
@@ -53,8 +42,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
       return CLRDeclaredElementType.PROPERTY;
     }
 
-    public bool IsExplicitImplementation => false;
-    public IList<IExplicitImplementation> ExplicitImplementations => EmptyList<IExplicitImplementation>.Instance;
     public IType Type => ReturnType;
 
     public string GetDefaultPropertyMetadataName()

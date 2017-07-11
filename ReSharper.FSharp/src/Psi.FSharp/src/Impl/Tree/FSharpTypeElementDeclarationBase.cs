@@ -49,7 +49,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
     public override FSharpSymbol GetFSharpSymbol()
     {
       var fsFile = this.GetContainingFile() as IFSharpFile;
-      var assemblySignature = fsFile?.GetCheckResults()?.PartialAssemblySignature;
+      var assemblySignature = fsFile?.GetParseAndCheckResults()?.Value.CheckResults.PartialAssemblySignature;
       var namesPath = ListModule.OfSeq(FSharpImplUtil.MakeNamePath(this));
       var entityFromAssemblySignature = assemblySignature?.FindEntityByPath(namesPath)?.Value;
       if (entityFromAssemblySignature != null)
