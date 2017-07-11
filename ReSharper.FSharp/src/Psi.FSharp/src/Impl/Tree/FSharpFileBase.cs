@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Checker;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
+using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
@@ -12,28 +14,39 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 {
   internal abstract class FSharpFileBase : FileElementBase, IFSharpFileCheckInfoOwner
   {
+    private readonly object myCheckLock = new object();
+    private readonly object myGetSymbolsLock = new object();
+    private Dictionary<int, FSharpSymbol> myDeclarationSymbols = null;
     public FSharpCheckerService CheckerService { get; set; }
     public FSharpProjectOptions ProjectOptions { get; set; }
     public TokenBuffer ActualTokenBuffer { get; set; }
+    public FSharpOption<FSharpParseFileResults> ParseResults { get; set; }
     public override PsiLanguageType Language => FSharpLanguage.Instance;
     public bool ReferencesResolved { get; set; }
-    public bool IsChecked { get; private set; }
 
-    public FSharpOption<FSharpParseFileResults> GetParseResults(bool keepResults = false,
-      Action interruptChecker = null)
+    public FSharpOption<FSharpParseAndCheckResults> GetParseAndCheckResults([CanBeNull] Action interruptChecker = null,
+      bool allowStaleResults = false)
     {
-      return CheckerService.GetOrCreateParseResults(GetSourceFile()); // todo: interrupt
+      lock (myCheckLock)
+        return CheckerService.ParseAndCheckFile(GetSourceFile(), allowStaleResults);
     }
 
-    public FSharpCheckFileResults GetCheckResults(bool forceRecheck = false, [CanBeNull] Action interruptChecker = null)
+    public FSharpSymbol GetSymbolDeclaration(int offset)
     {
-      var parseResults = CheckerService.GetOrCreateParseResults(GetSourceFile())?.Value;
-      if (parseResults == null)
-        return null;
+      lock (myGetSymbolsLock)
+        if (myDeclarationSymbols == null)
+        {
+          var checkResults = GetParseAndCheckResults();
+          var document = GetSourceFile()?.Document;
+          var declaredSymbolUses = checkResults?.Value.CheckResults.GetAllDeclaredSymbols().RunAsTask();
+          if (declaredSymbolUses == null || document == null)
+            return null;
 
-      var checkResults = CheckerService.CheckFile(this, parseResults, OptionModule.OfObj(interruptChecker))?.Value;
-      IsChecked = true;
-      return checkResults;
+          myDeclarationSymbols = new Dictionary<int, FSharpSymbol>(declaredSymbolUses.Length);
+          foreach (var symbolUse in declaredSymbolUses)
+            myDeclarationSymbols[document.GetOffset(symbolUse.range.Start)] = symbolUse.symbol;
+        }
+      return myDeclarationSymbols?.TryGetValue(offset);
     }
 
     public virtual void Accept(TreeNodeVisitor visitor)

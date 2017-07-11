@@ -27,8 +27,8 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
       var fsFile = completionContext.File as IFSharpFile;
       Assertion.AssertNotNull(fsFile, "fsFile != null");
 
-      var parseResults = fsFile.GetParseResults()?.Value;
-      if (parseResults == null)
+      
+      if (fsFile.ParseResults == null)
         return true;
 
       var completions = GetFSharpCompletions(context, fsFile);
@@ -114,7 +114,7 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
       var qualifiers = context.Names.Item1;
       var partialName = context.Names.Item2;
 
-      var checkResults = fsFile.GetCheckResults();
+      var checkResults = fsFile.GetParseAndCheckResults()?.Value.CheckResults;
       if (checkResults == null)
         return null;
 

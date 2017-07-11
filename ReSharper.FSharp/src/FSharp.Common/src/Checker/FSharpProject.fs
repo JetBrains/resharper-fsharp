@@ -13,6 +13,7 @@ type FSharpProject =
         FileIndices : Dictionary<FileSystemPath, int>
         FilesWithPairs : HashSet<FileSystemPath>
         ReferencingProjects : IProject list
+        mutable ParsingOptions: FSharpParsingOptions option
     }
     member x.ContainsFile (file : IPsiSourceFile) =
         x.FileIndices.ContainsKey(file.GetLocation())

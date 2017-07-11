@@ -26,7 +26,7 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
     public override ISpecificCodeCompletionContext GetCompletionContext(CodeCompletionContext context)
     {
       var file = (IFSharpFile) context.File;
-      var parseResults = file.GetParseResults();
+      var parseResults = file.ParseResults;
 
       var caretTreeOffset = context.CaretTreeOffset;
       var caretOffset = caretTreeOffset.Offset;

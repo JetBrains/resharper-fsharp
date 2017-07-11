@@ -11,21 +11,24 @@ namespace JetBrains.ReSharper.Psi.FSharp.Tree
   public interface IFSharpFileCheckInfoOwner : ICompositeElement
   {
     [CanBeNull]
-    FSharpOption<FSharpParseFileResults> GetParseResults(bool keepResults = false, Action interruptChecker = null);
-    
-    [CanBeNull]
-    FSharpCheckFileResults GetCheckResults(bool forceRecheck = false, Action interruptChecker = null);
+    FSharpOption<FSharpParseAndCheckResults> GetParseAndCheckResults(Action interruptChecker = null,
+      bool allowStaleResults = false);
 
     /// <summary>
     /// True when SetResolvedSymbolsStageProcess is finished.
     /// </summary>
     bool ReferencesResolved { get; set; }
 
-    bool IsChecked { get; }
-
     FSharpCheckerService CheckerService { get; set; }
     FSharpProjectOptions ProjectOptions { get; set; }
 
     TokenBuffer ActualTokenBuffer { get; set; }
+    
+    [CanBeNull]
+    FSharpOption<FSharpParseFileResults> ParseResults { get; set; }
+
+    [CanBeNull]
+    FSharpSymbol GetSymbolDeclaration(int offset);
+    
   }
 }

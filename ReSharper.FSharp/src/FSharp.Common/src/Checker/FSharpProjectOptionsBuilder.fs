@@ -86,7 +86,9 @@ type FSharpProjectOptionsBuilder(solution : ISolution,
           ConfigurationDefines = definedConstants
           FileIndices = fileIndices
           FilesWithPairs = pairFiles
-          ReferencingProjects = referencingProjects }
+          ReferencingProjects = referencingProjects
+          ParsingOptions = None
+        }
 
     member private x.GetProjectFiles(project : IProject) =
         let projectMark = project.GetProjectMark().NotNull()
