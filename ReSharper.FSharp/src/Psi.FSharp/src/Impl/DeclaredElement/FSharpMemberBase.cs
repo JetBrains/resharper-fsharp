@@ -12,82 +12,33 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 {
-  internal abstract class FSharpMemberBase<TDeclaration> : FSharpTypeMember<TDeclaration>, IParametersOwner
+  internal abstract class FSharpMemberBase<TDeclaration> : FSharpTypeMember<TDeclaration>, IParametersOwner,
+    IOverridableMember
     where TDeclaration : FSharpDeclarationBase, IFSharpDeclaration, IAccessRightsOwnerDeclaration,
     IModifiersOwnerDeclaration
   {
-    [CanBeNull]
-    public FSharpMemberOrFunctionOrValue Mfv { get; }
-
-    private readonly AccessRights myAccessRights;
+    [NotNull]
+    public FSharpMemberOrFunctionOrValue FSharpSymbol { get; }
 
     protected FSharpMemberBase([NotNull] ITypeMemberDeclaration declaration,
-      [CanBeNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration)
+      [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration)
     {
-      Mfv = mfv;
-      if (mfv == null || !mfv.IsMember)
-      {
-        IsOverride = false;
-        IsVirtual = false;
-        IsAbstract = false;
-      }
-      else
-      {
-        // todo: overloads
-        var entity = mfv.EnclosingEntity;
-        if (entity.QualifiedName.SubstringBefore(",") != declaration.GetContainingTypeDeclaration()?.CLRName)
-        {
-          IsOverride = true;
-          IsAbstract = false;
-          IsVirtual = false;
-        }
-        else
-        {
-          var members = entity.MembersFunctionsAndValues.Where(m => m.LogicalName == mfv.LogicalName).AsList();
-          var hasAbstract = members.Any(m => m.IsDispatchSlot);
-          var hasDefault = members.Any(m => m.IsOverrideOrExplicitInterfaceImplementation);
-
-          IsOverride = mfv.IsOverrideOrExplicitInterfaceImplementation;
-          IsVirtual = hasAbstract && hasDefault;
-          IsAbstract = mfv.IsDispatchSlot && !hasDefault;
-        }
-      }
-
-      IsStatic = !mfv?.IsInstanceMember ?? false;
-
-      var accessibility = mfv?.Accessibility;
-      if (accessibility == null)
-        myAccessRights = AccessRights.PUBLIC;
-      else
-      {
-        if (accessibility.IsPrivate)
-          myAccessRights = AccessRights.PRIVATE;
-        else if (accessibility.IsInternal)
-          myAccessRights = AccessRights.INTERNAL;
-        else
-          myAccessRights = AccessRights.PUBLIC;
-      }
+      FSharpSymbol = mfv;
     }
 
 
     public override IList<IAttributeInstance> GetAttributeInstances(bool inherit)
     {
-      if (Mfv == null)
-        return EmptyList<IAttributeInstance>.Instance;
-
       var attrs = new List<IAttributeInstance>();
-      foreach (var attr in Mfv.Attributes)
+      foreach (var attr in FSharpSymbol.Attributes)
         attrs.Add(new FSharpAttributeInstance(attr, Module));
       return attrs;
     }
 
     public override IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName, bool inherit)
     {
-      if (Mfv == null)
-        return EmptyList<IAttributeInstance>.Instance;
-
       var attrs = new List<IAttributeInstance>();
-      foreach (var attr in Mfv.Attributes)
+      foreach (var attr in FSharpSymbol.Attributes)
         if (attr.AttributeType.FullName == clrName.FullName)
           attrs.Add(new FSharpAttributeInstance(attr, Module));
       return attrs;
@@ -95,10 +46,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 
     public override bool HasAttributeInstance(IClrTypeName clrName, bool inherit)
     {
-      if (Mfv == null)
-        return false;
-
-      return Mfv.Attributes.Any(a => a.AttributeType.FullName == clrName.FullName);
+      return FSharpSymbol.Attributes.Any(a => a.AttributeType.FullName == clrName.FullName);
     }
 
     public InvocableSignature GetSignature(ISubstitution substitution)
@@ -108,14 +56,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 
     public override bool Equals(object obj)
     {
-      if (!base.Equals(obj))
-        return false;
-
-      var member = obj as FSharpMemberBase<TDeclaration>;
-
-      return member != null &&
-             SignatureComparers.Strict.Compare(GetSignature(IdSubstitution),
-               member.GetSignature(member.IdSubstitution));
+      return (obj as FSharpMemberBase<TDeclaration>)?.FSharpSymbol.IsEffectivelySameAs(FSharpSymbol) ?? false;
     }
 
     public override int GetHashCode()
@@ -135,13 +76,23 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 
     public override AccessRights GetAccessRights()
     {
-      return myAccessRights;
+      var accessibility = FSharpSymbol.Accessibility;
+      if (accessibility.IsInternal)
+        return AccessRights.INTERNAL;
+      if (accessibility.IsPrivate)
+        return AccessRights.PRIVATE;
+      return AccessRights.PUBLIC;
     }
 
-    public override bool IsStatic { get; }
-    public override bool IsOverride { get; }
-    public override bool IsAbstract { get; }
-    public override bool IsVirtual { get; }
-    public bool CanBeImplicitImplementation => true;
+    public override bool IsStatic => !FSharpSymbol.IsInstanceMember;
+
+    // todo: check interface impl
+    public override bool IsOverride => FSharpSymbol.IsOverrideOrExplicitInterfaceImplementation;
+
+    public override bool IsAbstract => FSharpSymbol.IsDispatchSlot;
+    public override bool IsVirtual => false; // todo
+    public bool IsExplicitImplementation => false;
+    public IList<IExplicitImplementation> ExplicitImplementations => EmptyList<IExplicitImplementation>.Instance;
+    public bool CanBeImplicitImplementation => true; // todo: set false and calc proper base element
   }
 }

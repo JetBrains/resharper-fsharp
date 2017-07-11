@@ -20,8 +20,15 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
     protected override IDeclaredElement CreateDeclaredElement()
     {
       var mfv = GetFSharpSymbol() as FSharpMemberOrFunctionOrValue;
-      if (mfv != null && (mfv.IsProperty || mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod))
-        return new FSharpProperty<MemberDeclaration>(this, mfv.TryGetPropertyFromAccessor());
+      if (mfv == null) return null;
+      
+      if (mfv.IsProperty || mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod)
+      {
+        var property = mfv.TryGetPropertyFromAccessor();
+        return property != null
+          ? new FSharpProperty<MemberDeclaration>(this, property)
+          : null;
+      }
 
       var typeDeclaration = GetContainingTypeDeclaration() as IFSharpTypeDeclaration;
       return new FSharpMethod<MemberDeclaration>(this, mfv, typeDeclaration);

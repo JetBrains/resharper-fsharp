@@ -11,7 +11,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
     IModifiersOwnerDeclaration
   {
     public FSharpProperty([NotNull] ITypeMemberDeclaration declaration,
-      FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)
+      [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)
     {
     }
   }

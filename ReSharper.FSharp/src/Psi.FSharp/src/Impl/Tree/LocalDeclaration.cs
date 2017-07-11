@@ -60,7 +60,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
     {
       get
       {
-        var mfv = Symbol as FSharpMemberOrFunctionOrValue;
+        var mfv = GetFSharpSymbol() as FSharpMemberOrFunctionOrValue;
         if (mfv == null)
           return TypeFactory.CreateUnknownType(Module);
 

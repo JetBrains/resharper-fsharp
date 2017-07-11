@@ -18,10 +18,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
     protected override IDeclaredElement CreateDeclaredElement()
     {
       var mfv = GetFSharpSymbol() as FSharpMemberOrFunctionOrValue;
-      if (mfv != null && mfv.IsValCompiledAsMethod)
-        return new ModuleFunction(this, mfv, null);
+      if (mfv == null) return null;
 
-      return new ModuleValue(this, mfv);
+      return mfv.IsValCompiledAsMethod
+        ? (IDeclaredElement) new ModuleFunction(this, mfv, null)
+        : new ModuleValue(this, mfv);
     }
   }
 }
