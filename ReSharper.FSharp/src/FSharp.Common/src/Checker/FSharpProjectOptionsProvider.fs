@@ -28,6 +28,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 open JetBrains
+open Microsoft.FSharp.Compiler
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
 type Logger = Util.ILoggerEx
@@ -195,13 +196,24 @@ type FSharpProjectOptionsProvider(lifetime, logger : Util.ILogger, solution : IS
             fsProject.FilesWithPairs.Contains(file.GetLocation())
         
         member x.GetParsingOptions(file, checker, updateScriptOptions) =
-            let _ = x.GetProjectOptionsImpl(file, checker)
-            match (x :> IFSharpProjectOptionsProvider).TryGetFSharpProject(file, checker) with
-            | Some project when project.Options.IsSome ->
-                match project.ParsingOptions with
-                | None ->
-                    let parsingOptions = checker.GetParsingOptions(project.Options.Value).RunAsTask()
-                    project.ParsingOptions <- parsingOptions
-                    parsingOptions
-                | options -> options
-            | _ -> None
+            if file.LanguageType.Equals(FSharpScriptProjectFileType.Instance) then
+                let scriptParsingOptions =
+                    {
+                      ProjectSourceFiles = Array.ofList [file.GetLocation().FullPath]
+                      ConditionalCompilationDefines = []
+                      Light = None
+                      CompilingFsLib = false
+                      ErrorSeverityOptions = FSharpErrorSeverityOptions.Default
+                      IsExe = false
+                    }
+                Some scriptParsingOptions
+            else
+                match (x :> IFSharpProjectOptionsProvider).TryGetFSharpProject(file, checker) with
+                | Some project when project.Options.IsSome ->
+                    match project.ParsingOptions with
+                    | None ->
+                        let parsingOptions = checker.GetParsingOptions(project.Options.Value).RunAsTask()
+                        project.ParsingOptions <- parsingOptions
+                        parsingOptions
+                    | options -> options
+                | _ -> None
