@@ -13,6 +13,7 @@ using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
 using Microsoft.FSharp.Control;
+using Microsoft.FSharp.Core;
 
 namespace JetBrains.ReSharper.Daemon.FSharp.ContextHighlighters
 {
@@ -60,7 +61,8 @@ namespace JetBrains.ReSharper.Daemon.FSharp.ContextHighlighters
       if (symbol == null)
         return;
 
-      var symbolUsages = FSharpAsync.RunSynchronously(checkResults.GetUsesOfSymbolInFile(symbol), null, null);
+      var symbolUsages = FSharpAsync.RunSynchronously(checkResults.GetUsesOfSymbolInFile(symbol),
+        FSharpOption<int>.Some(10000), null);
       foreach (var symbolUse in symbolUsages)
       {
         var treeOffset = document.GetTreeEndOffset(symbolUse.RangeAlternate);

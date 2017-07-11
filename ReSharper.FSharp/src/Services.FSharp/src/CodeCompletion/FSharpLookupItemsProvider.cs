@@ -12,6 +12,7 @@ using JetBrains.Util.Extension;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Control;
+using Microsoft.FSharp.Core;
 
 namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
 {
@@ -128,7 +129,7 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
         partialName,
         hasTextChangedSinceLastTypecheck: null);
 
-      return FSharpAsync.RunSynchronously(getCompletionsAsync, null, null);
+      return FSharpAsync.RunSynchronously(getCompletionsAsync, FSharpOption<int>.Some(2000), null);
     }
   }
 }

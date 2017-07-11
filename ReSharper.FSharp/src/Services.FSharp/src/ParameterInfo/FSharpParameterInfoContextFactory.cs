@@ -54,7 +54,7 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.ParameterInfo
 
       // do not show when no overloads are found or got an operator info
       // github.com/Microsoft/visualfsharp/blob/Visual-Studio-2017/vsintegration/src/FSharp.LanguageService/Intellisense.fs#L274
-      var overloads = FSharpAsync.RunSynchronously(getMethodsAsync, null, null);
+      var overloads = FSharpAsync.RunSynchronously(getMethodsAsync, FSharpOption<int>.Some(2000), null);
       if (overloads.Methods.IsEmpty() || overloads.MethodName.EndsWith("> )"))
         return null;
 
