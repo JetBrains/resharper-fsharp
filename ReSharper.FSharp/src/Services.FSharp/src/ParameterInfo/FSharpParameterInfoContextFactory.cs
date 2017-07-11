@@ -32,7 +32,7 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.ParameterInfo
       DocumentOffset expectedLParenthOffset, char invocationChar, IContextBoundSettingsStore settingsStore)
     {
       var fsFile = solution.GetPsiServices().GetPsiFile<FSharpLanguage>(caretOffset) as IFSharpFile;
-      var parseResults = fsFile?.GetParseResults()?.Value;
+      var parseResults = fsFile?.ParseResults?.Value;
       if (parseResults == null)
         return null;
 
@@ -42,7 +42,7 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.ParameterInfo
       if (paramInfoLocationsOption == null)
         return null;
 
-      var checkResults = fsFile.GetCheckResults();
+      var checkResults = fsFile.GetParseAndCheckResults()?.Value.CheckResults;
       if (checkResults == null)
         return null;
 

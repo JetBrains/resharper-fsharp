@@ -41,9 +41,8 @@ namespace JetBrains.ReSharper.Daemon.FSharp.ContextHighlighters
     {
       var psiView = psiDocumentRangeView.View<FSharpLanguage>();
       var file = psiView.GetSelectedTreeNode<IFSharpFile>();
-      if (file == null || !file.IsChecked)
+      if (file == null)
         return;
-
 
       var document = psiDocumentRangeView.DocumentRangeFromMainDocument.Document;
       var token = psiView.GetSelectedTreeNode<FSharpIdentifierToken>();
@@ -53,7 +52,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.ContextHighlighters
       // todo: type parameters: t<$caret$type> or t<'$caret$ttype>
       // todo: namespaces, use R# search?
 
-      var checkResults = file.GetCheckResults();
+      var checkResults = file.GetParseAndCheckResults()?.Value.CheckResults;
       if (checkResults == null)
         return;
 

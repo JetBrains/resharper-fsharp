@@ -46,7 +46,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 
       var documentRange = new DocumentRange(document, highlighter.Range);
       var psiFile = GetPsiFile(sourceFile, documentRange) as IFSharpFile;
-      var checkResults = psiFile?.GetCheckResults();
+      var checkResults = psiFile?.GetParseAndCheckResults()?.Value.CheckResults;
       var token = psiFile?.FindTokenAt(documentRange.StartOffset) as FSharpIdentifierToken;
       if (checkResults == null || token == null) return string.Empty;
 

@@ -170,23 +170,38 @@ type FSharpProjectOptionsProvider(lifetime, logger : Util.ILogger, solution : IS
                 x.GetScriptOptionsImpl(file, checker, updateScriptOptions)
             else x.GetProjectOptionsImpl(file, checker)
 
-        member x.GetProjectOptions(project) =
+        member x.GetProjectOptions(project, checker) =
             match projects.TryGetValue(project) with
             | true, fsProject -> fsProject.Options
             | _ -> invalidProject project
 
-        member x.TryGetFSharpProject(project : IProject) =
-            match projects.TryGetValue project with
+        member x.TryGetFSharpProject(file, checker) =
+            let _ = x.GetProjectOptionsImpl(file, checker)
+            match projects.TryGetValue(file.GetProject()) with
             | true, fsProject -> Some fsProject
             | _ -> None
 
-        member x.GetFileIndex(file) =
+        member x.GetFileIndex(file, checker) =
+            let _ = x.GetProjectOptionsImpl(file, checker)
             let fsProject = getProject file
             let filePath = file.GetLocation()
             match fsProject.FileIndices.TryGetValue(filePath) with
             | true, index -> index
             | _ -> invalidOp (sprintf "%s doesn't belong to %A" filePath.FullPath fsProject)
             
-        member x.HasPairFile(file) =
+        member x.HasPairFile(file, checker) =
+            let _ = x.GetProjectOptionsImpl(file, checker)
             let fsProject = getProject file 
             fsProject.FilesWithPairs.Contains(file.GetLocation())
+        
+        member x.GetParsingOptions(file, checker, updateScriptOptions) =
+            let _ = x.GetProjectOptionsImpl(file, checker)
+            match (x :> IFSharpProjectOptionsProvider).TryGetFSharpProject(file, checker) with
+            | Some project when project.Options.IsSome ->
+                match project.ParsingOptions with
+                | None ->
+                    let parsingOptions = checker.GetParsingOptions(project.Options.Value).RunAsTask()
+                    project.ParsingOptions <- parsingOptions
+                    parsingOptions
+                | options -> options
+            | _ -> None

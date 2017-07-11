@@ -62,7 +62,7 @@ type FSharpSelectEmbracingConstructProvider(settingsStore : ISettingsStore) =
 
         member x.GetSelectedRange(sourceFile, documentRange) =
             let fsFile = sourceFile.GetTheOnlyPsiFile() :?> IFSharpFile
-            match isNotNull fsFile, fsFile.GetParseResults() with
+            match isNotNull fsFile, fsFile.ParseResults with
             | true, Some parseResults when parseResults.ParseTree.IsSome ->
                 let document = documentRange.Document 
                 let pos = document.GetPos(documentRange.StartOffset.Offset)
