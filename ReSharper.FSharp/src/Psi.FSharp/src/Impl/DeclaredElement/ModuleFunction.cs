@@ -8,7 +8,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 {
   internal class ModuleFunction : FSharpMethodBase<Let>
   {
-    public ModuleFunction([NotNull] ITypeMemberDeclaration declaration, [CanBeNull] FSharpMemberOrFunctionOrValue mfv,
+    public ModuleFunction([NotNull] ITypeMemberDeclaration declaration, [NotNull] FSharpMemberOrFunctionOrValue mfv,
       [CanBeNull] IFSharpTypeDeclaration typeDeclaration) : base(declaration, mfv, typeDeclaration)
     {
     }

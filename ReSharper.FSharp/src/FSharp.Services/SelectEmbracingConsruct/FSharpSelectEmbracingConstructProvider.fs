@@ -45,9 +45,8 @@ type FSharpDotSelection(file, document, range : TreeTextRange, parentRanges : Do
     override x.GetParentInternal(tokenNode) = null
     override x.CreateTokenPartSelection(tokenNode, treeTextRange) = null
 
-
-[<ProjectFileType(typeof<FSharpProjectFileType>)>]
-type FSharpSelectEmbracingConstructProvider(settingsStore : ISettingsStore) =
+[<AbstractClass>]
+type FSharpSelectEmbracingConstructProviderBase(settingsStore : ISettingsStore) =
     let getRanges = function
         | TraverseStep.Expr(expr) -> [expr.Range]
         | TraverseStep.Module(moduleDecl) -> [moduleDecl.Range]
@@ -56,13 +55,15 @@ type FSharpSelectEmbracingConstructProvider(settingsStore : ISettingsStore) =
         | TraverseStep.MemberDefn(memberDefn) -> [memberDefn.Range]
         | TraverseStep.MatchClause(matchClause) -> [matchClause.Range; matchClause.RangeOfGuardAndRhs]
         | TraverseStep.Binding(binding) -> [binding.RangeOfHeadPat; binding.RangeOfBindingAndRhs; binding.RangeOfBindingSansRhs]
+        
+    abstract IsAvailableImpl: IPsiSourceFile -> bool
 
     interface ISelectEmbracingConstructProvider with
-        member x.IsAvailable(sourceFile) = sourceFile.Properties.ShouldBuildPsi
+        member x.IsAvailable(sourceFile) = x.IsAvailableImpl(sourceFile)
 
         member x.GetSelectedRange(sourceFile, documentRange) =
             let fsFile = sourceFile.GetTheOnlyPsiFile() :?> IFSharpFile
-            match isNotNull fsFile, fsFile.GetParseResults() with
+            match isNotNull fsFile, fsFile.ParseResults with
             | true, Some parseResults when parseResults.ParseTree.IsSome ->
                 let document = documentRange.Document 
                 let pos = document.GetPos(documentRange.StartOffset.Offset)
@@ -84,3 +85,15 @@ type FSharpSelectEmbracingConstructProvider(settingsStore : ISettingsStore) =
 
                 FSharpDotSelection(fsFile, document, fsFile.Translate(documentRange), parentRanges) :> ISelectedRange
             | _ -> null
+
+[<ProjectFileType(typeof<FSharpProjectFileType>)>]
+type FSharpFileSelectEmbracingConstructProvider(settingsStore: ISettingsStore) =
+    inherit FSharpSelectEmbracingConstructProviderBase(settingsStore)
+    
+    override x.IsAvailableImpl(sourceFile) = sourceFile.Properties.ShouldBuildPsi
+
+[<ProjectFileType(typeof<FSharpScriptProjectFileType>)>]
+type FSharpScriptSelectEmbracingConstructProvider(settingsStore: ISettingsStore) =
+    inherit FSharpSelectEmbracingConstructProviderBase(settingsStore)
+    
+    override x.IsAvailableImpl(sourceFile) = true

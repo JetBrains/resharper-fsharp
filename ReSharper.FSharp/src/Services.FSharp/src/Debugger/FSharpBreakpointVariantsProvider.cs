@@ -23,7 +23,7 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.Debugger
     public List<BreakpointVariantModelBase> GetBreakpointVariants(IProjectFile file, int line, ISolution solution)
     {
       var fsFile = file.GetPrimaryPsiFile() as IFSharpFile;
-      var parseResults = fsFile?.GetParseResults()?.Value;
+      var parseResults = fsFile?.ParseResults?.Value;
       if (parseResults == null)
         return null;
 

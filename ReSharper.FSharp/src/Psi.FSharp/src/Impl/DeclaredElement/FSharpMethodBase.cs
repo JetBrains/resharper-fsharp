@@ -16,18 +16,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
     IModifiersOwnerDeclaration
   {
     protected FSharpMethodBase([NotNull] ITypeMemberDeclaration declaration,
-      [CanBeNull] FSharpMemberOrFunctionOrValue mfv,
+      [NotNull] FSharpMemberOrFunctionOrValue mfv,
       [CanBeNull] IFSharpTypeDeclaration typeDeclaration) : base(declaration, mfv)
     {
-      if (mfv == null)
-      {
-        TypeParameters = EmptyList<ITypeParameter>.Instance;
-        ReturnType = TypeFactory.CreateUnknownType(Module);
-        Parameters = EmptyList<IParameter>.Instance;
-        ShortName = declaration.DeclaredName;
-        return;
-      }
-
       var mfvTypeParams = mfv.GenericParameters;
       var typeParams = new FrugalLocalList<ITypeParameter>();
       var outerTypeParamsCount = typeDeclaration?.TypeParameters.Count ?? 0;
@@ -68,8 +59,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
     public bool IsPredefined => false;
     public bool IsIterator => false;
     public IAttributesSet ReturnTypeAttributes => EmptyAttributesSet.Instance;
-    public bool IsExplicitImplementation => false;
-    public IList<IExplicitImplementation> ExplicitImplementations => EmptyList<IExplicitImplementation>.Instance;
     public IList<ITypeParameter> TypeParameters { get; }
     public bool IsExtensionMethod => false;
     public bool IsAsync => false;

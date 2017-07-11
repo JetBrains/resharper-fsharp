@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Tree;
@@ -19,6 +20,10 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 
     public override ReferenceCollection GetFirstClassReferences()
     {
+      var sourceFile = GetSourceFile();
+      if (sourceFile == null || Equals(sourceFile.LanguageType, FSharpScriptProjectFileType.Instance))
+        return ReferenceCollection.Empty;
+
       if (FSharpSymbol != null)
         return new ReferenceCollection(new FSharpSymbolReference(this, lazyResolve: false));
 

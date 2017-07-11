@@ -1,5 +1,6 @@
 ﻿using System;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Checker;
+using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
@@ -52,7 +53,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
           Builder.EndPart();
       }
     }
-    
+
     public override void VisitFSharpNamespaceDeclaration(IFSharpNamespaceDeclaration decl)
     {
       Builder.StartPart(new DeclaredNamespacePart(decl));
@@ -100,8 +101,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     public override void VisitRecordDeclaration(IRecordDeclaration decl)
     {
       Builder.StartPart(new RecordPart(decl, Builder));
-      foreach (var fieldDeclaration in decl.FieldsEnumerable)
-        Builder.AddDeclaredMemberName(fieldDeclaration.DeclaredName);
       ProcessTypeMembers(decl.MemberDeclarations);
       Builder.EndPart();
     }
@@ -118,6 +117,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     public override void VisitUnionCaseDeclaration(IUnionCaseDeclaration decl)
     {
       Builder.StartPart(new UnionCasePart(decl, Builder));
+      ProcessTypeMembers(decl.MemberDeclarations);
       Builder.EndPart();
     }
 
@@ -158,7 +158,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     private void ProcessTypeMembers(TreeNodeCollection<ITypeMemberDeclaration> memberDeclarations)
     {
       foreach (var typeMemberDeclaration in memberDeclarations)
-        Builder.AddDeclaredMemberName(typeMemberDeclaration.DeclaredName);
+      {
+        var declaredName = typeMemberDeclaration.DeclaredName;
+        if (declaredName != SharedImplUtil.MISSING_DECLARATION_NAME)
+          Builder.AddDeclaredMemberName(declaredName);
+      }
     }
   }
 }

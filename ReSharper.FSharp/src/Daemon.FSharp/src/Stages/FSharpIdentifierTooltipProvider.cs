@@ -46,7 +46,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 
       var documentRange = new DocumentRange(document, highlighter.Range);
       var psiFile = GetPsiFile(sourceFile, documentRange) as IFSharpFile;
-      var checkResults = psiFile?.GetCheckResults();
+      var checkResults = psiFile?.GetParseAndCheckResults()?.Value.CheckResults;
       var token = psiFile?.FindTokenAt(documentRange.StartOffset) as FSharpIdentifierToken;
       if (checkResults == null || token == null) return string.Empty;
 
@@ -63,7 +63,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
       // todo: provide tooltip for #r strings in fsx, should pass String tag
       var getTooltipAsync = checkResults.GetToolTipTextAlternate((int) coords.Line + 1,
         (int) coords.Column, lineText, ListModule.OfArray(names), FSharpTokenTag.Identifier);
-      var tooltips = FSharpAsyncUtil.RunSynchronouslySafe(getTooltipAsync, myLogger, "Getting FSharp tooltips")?.Item;
+      var tooltips = FSharpAsyncUtil.RunSynchronouslySafe(getTooltipAsync, myLogger, "Getting F# tooltip", 2000)?.Item;
       if (tooltips == null)
         return string.Empty;
 

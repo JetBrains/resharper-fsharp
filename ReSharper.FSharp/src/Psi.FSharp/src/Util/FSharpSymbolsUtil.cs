@@ -23,7 +23,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     {
       var sourceFile = fsFile.GetSourceFile();
       Assertion.AssertNotNull(sourceFile, "sourceFile != null");
-      var checkResults = fsFile.GetCheckResults();
+      var checkResults = fsFile.GetParseAndCheckResults()?.Value.CheckResults;
       if (checkResults == null)
         return null;
 
@@ -48,11 +48,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
 
     [CanBeNull]
     public static FSharpMemberOrFunctionOrValue TryGetPropertyFromAccessor(
-      [CanBeNull] this FSharpMemberOrFunctionOrValue mfv)
+      [NotNull] this FSharpMemberOrFunctionOrValue mfv)
     {
-      if (mfv == null)
-        return null;
-
       if (mfv.IsProperty)
         return mfv;
 

@@ -27,7 +27,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.LanguageService
       CodeFormatter = codeFormatter;
       myFSharpCheckerService = fSharpCheckerService;
       myLogger = logger;
-      CacheProvider = new FSharpCacheProvider(fSharpCheckerService);
+      CacheProvider = new FSharpCacheProvider(fSharpCheckerService, myLogger);
     }
 
     public override ICodeFormatter CodeFormatter { get; }

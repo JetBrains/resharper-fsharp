@@ -17,12 +17,12 @@ type FSharpParser(file : IPsiSourceFile, checkerService : FSharpCheckerService, 
         match options, parseResults with
         | Some options, Some results when results.ParseTree.IsSome ->
             match results.ParseTree with
-            | Some(ParsedInput.ImplFile(_)) as tree ->
-                FSharpImplTreeBuilder(file, lexer, tree, lifetime, logger) :> FSharpTreeBuilderBase
-            | Some(ParsedInput.SigFile(_)) as tree ->
-                FSharpSigTreeBuilder(file, lexer, tree, lifetime, logger) :> FSharpTreeBuilderBase
+            | Some(ParsedInput.ImplFile(_)) as treeOpt ->
+                FSharpImplTreeBuilder(file, lexer, treeOpt, lifetime, logger) :> FSharpTreeBuilderBase, treeOpt
+            | Some(ParsedInput.SigFile(_)) as treeOpt ->
+                FSharpSigTreeBuilder(file, lexer, treeOpt, lifetime, logger) :> FSharpTreeBuilderBase, treeOpt
         | _ ->
-            FSharpFakeTreeBuilder(file, lexer, lifetime, logger, options) :> FSharpTreeBuilderBase
+            FSharpFakeTreeBuilder(file, lexer, lifetime, logger, options) :> FSharpTreeBuilderBase, None
 
     interface IParser with
         member this.ParseFile() =
@@ -30,10 +30,11 @@ type FSharpParser(file : IPsiSourceFile, checkerService : FSharpCheckerService, 
             let options, parseResults = checkerService.ParseFile(file)
             let tokenBuffer = TokenBuffer(FSharpLexer(file.Document, checkerService.GetDefines(file)))
             let lexer = tokenBuffer.CreateLexer()
-            let treeBuilder = this.CreateTreeBuilder lexer parseResults lifetime options
+            let treeBuilder, tree = this.CreateTreeBuilder lexer parseResults lifetime options
 
             match treeBuilder.CreateFSharpFile() with
             | :? IFSharpFile as fsFile ->
+                fsFile.ParseResults <- parseResults
                 fsFile.CheckerService <- checkerService
                 fsFile.ActualTokenBuffer <- tokenBuffer
                 fsFile :> IFile

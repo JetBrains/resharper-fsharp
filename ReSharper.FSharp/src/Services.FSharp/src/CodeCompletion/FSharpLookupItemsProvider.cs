@@ -12,6 +12,7 @@ using JetBrains.Util.Extension;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Control;
+using Microsoft.FSharp.Core;
 
 namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
 {
@@ -27,8 +28,8 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
       var fsFile = completionContext.File as IFSharpFile;
       Assertion.AssertNotNull(fsFile, "fsFile != null");
 
-      var parseResults = fsFile.GetParseResults()?.Value;
-      if (parseResults == null)
+      
+      if (fsFile.ParseResults == null)
         return true;
 
       var completions = GetFSharpCompletions(context, fsFile);
@@ -114,7 +115,7 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
       var qualifiers = context.Names.Item1;
       var partialName = context.Names.Item2;
 
-      var checkResults = fsFile.GetCheckResults();
+      var checkResults = fsFile.GetParseAndCheckResults()?.Value.CheckResults;
       if (checkResults == null)
         return null;
 
@@ -128,7 +129,7 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
         partialName,
         hasTextChangedSinceLastTypecheck: null);
 
-      return FSharpAsync.RunSynchronously(getCompletionsAsync, null, null);
+      return FSharpAsync.RunSynchronously(getCompletionsAsync, FSharpOption<int>.Some(2000), null);
     }
   }
 }

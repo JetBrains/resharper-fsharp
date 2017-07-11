@@ -29,7 +29,7 @@ type ReformatCode() =
         member x.Process(sourceFile,rangeMarker,_,_) =
             match sourceFile.GetTheOnlyPsiFile() with
             | :? IFSharpFile as fsFile ->
-                match fsFile.GetParseResults() with // todo: completion on enter after with
+                match fsFile.ParseResults with // todo: completion on enter after with
                 | Some parseResults when parseResults.ParseTree.IsSome ->
                     let parsedInput = parseResults.ParseTree.Value
                     let filePath = sourceFile.GetLocation().FullPath

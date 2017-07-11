@@ -13,6 +13,7 @@ using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
 using Microsoft.FSharp.Control;
+using Microsoft.FSharp.Core;
 
 namespace JetBrains.ReSharper.Daemon.FSharp.ContextHighlighters
 {
@@ -41,9 +42,8 @@ namespace JetBrains.ReSharper.Daemon.FSharp.ContextHighlighters
     {
       var psiView = psiDocumentRangeView.View<FSharpLanguage>();
       var file = psiView.GetSelectedTreeNode<IFSharpFile>();
-      if (file == null || !file.IsChecked)
+      if (file == null)
         return;
-
 
       var document = psiDocumentRangeView.DocumentRangeFromMainDocument.Document;
       var token = psiView.GetSelectedTreeNode<FSharpIdentifierToken>();
@@ -53,7 +53,7 @@ namespace JetBrains.ReSharper.Daemon.FSharp.ContextHighlighters
       // todo: type parameters: t<$caret$type> or t<'$caret$ttype>
       // todo: namespaces, use R# search?
 
-      var checkResults = file.GetCheckResults();
+      var checkResults = file.GetParseAndCheckResults()?.Value.CheckResults;
       if (checkResults == null)
         return;
 
@@ -61,7 +61,8 @@ namespace JetBrains.ReSharper.Daemon.FSharp.ContextHighlighters
       if (symbol == null)
         return;
 
-      var symbolUsages = FSharpAsync.RunSynchronously(checkResults.GetUsesOfSymbolInFile(symbol), null, null);
+      var symbolUsages = FSharpAsync.RunSynchronously(checkResults.GetUsesOfSymbolInFile(symbol),
+        FSharpOption<int>.Some(10000), null);
       foreach (var symbolUse in symbolUsages)
       {
         var treeOffset = document.GetTreeEndOffset(symbolUse.RangeAlternate);

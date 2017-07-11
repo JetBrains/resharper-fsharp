@@ -8,7 +8,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
   internal class ModuleValue : FSharpPropertyBase<Let>
   {
     public ModuleValue([NotNull] ITypeMemberDeclaration declaration,
-      FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)
+      [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)
     {
     }
   }

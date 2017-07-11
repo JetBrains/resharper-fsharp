@@ -10,47 +10,51 @@
 
   <depends>com.intellij.modules.rider</depends>
   <extensions defaultExtensionNs="com.intellij">
-    <fileTypeFactory id="F#" implementation="com.jetbrains.resharper.ideaInterop.fileTypes.fsharp.FSharpFileTypeFactory" />
-    <rider.ProjectTypesProvider implementation="com.jetbrains.resharper.projectView.projectTypes.FSharpProjectTypeProvider" />
-    <lang.parserDefinition language="F#" implementationClass="com.jetbrains.resharper.ideaInterop.fileTypes.fsharp.FSharpParserDefinition" />
-    <lang.ast.factory language="F#" implementationClass="com.jetbrains.resharper.ideaInterop.fileTypes.fsharp.FSharpAstFactory" />
+    <fileTypeFactory id="F#" implementation="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpFileTypeFactory" />
+    <rider.ProjectTypesProvider implementation="com.jetbrains.rider.projectView.projectTypes.FSharpProjectTypeProvider" />
+    <lang.parserDefinition language="F#" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpParserDefinition" />
+    <lang.ast.factory language="F#" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpAstFactory" />
 
-    <backend.actions.support language="F#" implementationClass="com.jetbrains.resharper.actions.RiderActionSupportPolicy" />
-    <backend.markup.adapterFactory language="F#" implementationClass="com.jetbrains.resharper.daemon.RiderMarkupAdapterFactory" />
-    <backend.typedHandler language="F#" implementationClass="com.jetbrains.resharper.editorActions.FSharpTypedHandler" />
-    <completion.contributor language="F#" implementationClass="com.jetbrains.resharper.completion.ReSharperCompletionContributor" />
-    <codeInsight.parameterInfo language="F#" implementationClass="com.jetbrains.resharper.parameterInfo.RiderParameterInfoHandler" />
-    <codeStyleSettingsProvider implementation="com.jetbrains.resharper.settings.FSharpCodeStyleSettingsProvider" />
+    <backend.actions.support language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.actions.FSharpActionSupportPolicy" />
+    <backend.markup.adapterFactory language="F#" implementationClass="com.jetbrains.rider.daemon.RiderMarkupAdapterFactory" />
+    <backend.typedHandler language="F#" implementationClass="com.jetbrains.rider.editorActions.FSharpTypedHandler" />
+    <completion.contributor language="F#" implementationClass="com.jetbrains.rider.completion.ReSharperCompletionContributor" />
+    <completion.completionSessionStrategy language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.services.completion.FSharpCompletionStrategy" />
+    <codeInsight.parameterInfo language="F#" implementationClass="com.jetbrains.rider.parameterInfo.RiderParameterInfoHandler" />
+    <codeStyleSettingsProvider implementation="com.jetbrains.rider.settings.FSharpCodeStyleSettingsProvider" />
 
-    <directoryProjectGenerator implementation="com.jetbrains.resharper.projectView.projectGenerators.FSharpLibrary" />
-    <directoryProjectGenerator implementation="com.jetbrains.resharper.projectView.projectGenerators.FSharpConsoleApplication" />
+    <directoryProjectGenerator implementation="com.jetbrains.rider.projectView.projectGenerators.FSharpLibrary" />
+    <directoryProjectGenerator implementation="com.jetbrains.rider.projectView.projectGenerators.FSharpConsoleApplication" />
 
-    <applicationConfigurable groupId="language" instance="com.jetbrains.resharper.plugins.fsharp.services.settings.FsiOptionsPage" id="Fsi" />
+    <applicationConfigurable groupId="language" instance="com.jetbrains.rider.plugins.fsharp.services.settings.FsiOptionsPage" id="Fsi" />
 
     <intentionAction>
-      <className>com.jetbrains.resharper.plugins.fsharp.services.fsi.SendLineToFsiAction</className>
+      <className>com.jetbrains.rider.plugins.fsharp.services.fsi.SendLineToFsiIntentionAction</className>
       <category>F#</category>
       <descriptionDirectoryName>SendToFsi</descriptionDirectoryName>
     </intentionAction>
 
     <intentionAction>
-      <className>com.jetbrains.resharper.plugins.fsharp.services.fsi.SendSelectionToFsiAction</className>
+      <className>com.jetbrains.rider.plugins.fsharp.services.fsi.SendSelectionToFsiIntentionAction</className>
       <category>F#</category>
       <descriptionDirectoryName>SendToFsi</descriptionDirectoryName>
     </intentionAction>
   </extensions>
 
   <actions>
-    <group id="Rider.Plugins.FSharp.FsiGroup" text="F# Interactive" popup="true" icon="/icons/fsharp.png">
-      <action class="com.jetbrains.resharper.plugins.fsharp.services.fsi.StartFsiAction" id="Rider.Plugins.FSharp.StartFsi" text="Start F# Interactive Session..."/>
-      <action class="com.jetbrains.resharper.plugins.fsharp.services.fsi.SendToFsiAction" id="Rider.Plugins.FSharp.SendToFsi" text="Send to F# Interactive"/>
-      <add-to-group group-id="ToolsMenu" anchor="last"/>
+    <group id="Rider.Plugins.FSharp.FsiGroup" text="F# Interactive" popup="true" icon="/icons/fsharpConsole.png">
+      <action class="com.jetbrains.rider.plugins.fsharp.services.fsi.StartFsiAction" id="Rider.Plugins.FSharp.StartFsi" text="Start New F# Interactive Session..." />
+      <action class="com.jetbrains.rider.plugins.fsharp.services.fsi.SendToFsiAction" id="Rider.Plugins.FSharp.SendToFsi" text="Send to F# Interactive">
+        <keyboard-shortcut first-keystroke="control BACK_SLASH" keymap="$default" />
+        <keyboard-shortcut first-keystroke="meta BACK_SLASH" keymap="Mac OS X 10.5+" />
+      </action>
+      <add-to-group group-id="ToolsMenu" anchor="last" />
     </group>
   </actions>
 
   <project-components>
     <component>
-      <implementation-class>com.jetbrains.resharper.plugins.fsharp.services.fsi.FsiHost</implementation-class>
+      <implementation-class>com.jetbrains.rider.plugins.fsharp.services.fsi.FsiHost</implementation-class>
     </component>
   </project-components>
 </idea-plugin>

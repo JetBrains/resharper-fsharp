@@ -19,11 +19,10 @@ module CommonUtil =
     open Microsoft.FSharp.Compiler
 
     let private interruptCheckTimeout = 30
-    let private defaultInterruptChecker = Action(fun _ -> InterruptableActivityCookie.CheckAndThrow())
 
     let inline isNotNull x = not (isNull x)
     
-    let inline isApplicable (project : IProject) =
+    let inline isApplicable (project: IProject) =
         match project.ProjectProperties with
         | :? FSharpProjectProperties -> true
         | :? ProjectKCSharpProjectProperties as coreProperties ->
@@ -31,14 +30,14 @@ module CommonUtil =
             coreProperties.ProjectTypeGuids.Contains(FSharpProjectPropertiesFactory.FSharpProjectTypeGuid)
         | _ -> false
         
-    let ensureAbsolute (path : FileSystemPath) (projectDirectory : FileSystemPath) =
+    let ensureAbsolute (path: FileSystemPath) (projectDirectory: FileSystemPath) =
         let relativePath = path.AsRelative()
         if isNull relativePath then path
         else projectDirectory.Combine(relativePath)
 
     type Async<'T> with
         member x.RunAsTask(?interruptChecker) = // todo: cache these exntension methods in fs cache provider
-            let interruptChecker = defaultArg interruptChecker defaultInterruptChecker
+            let interruptChecker = defaultArg interruptChecker (Action(fun _ -> InterruptableActivityCookie.CheckAndThrow()))
             let cancellationTokenSource = new CancellationTokenSource()
             let cancellationToken = cancellationTokenSource.Token
             let task = Async.StartAsTask(x, cancellationToken = cancellationToken)
@@ -54,13 +53,13 @@ module CommonUtil =
 
     type ILogger with // todo: ILogger not mapped to R# here (ILogger is a decl here?)
         member x.LogFSharpErrors context errors =
-            let messages = Seq.fold (fun s (e : FSharpErrorInfo) -> s + "\n" + e.Message) "" errors
+            let messages = Seq.fold (fun s (e: FSharpErrorInfo) -> s + "\n" + e.Message) "" errors
             x.LogMessage(LoggingLevel.WARN, sprintf "%s: %s" context messages)
 
     type IDictionary<'TKey, 'TValue> with
-        member x.remove (key : 'TKey) = x.Remove key |> ignore
-        member x.add (key : 'TKey, value : 'TValue) = x.Add(key, value) |> ignore
-        member x.contains (key : 'TKey) = x.ContainsKey key
+        member x.remove (key: 'TKey) = x.Remove key |> ignore
+        member x.add (key: 'TKey, value: 'TValue) = x.Add(key, value) |> ignore
+        member x.contains (key: 'TKey) = x.ContainsKey key
 
     type ISet<'T> with
         member x.remove el = x.Remove el |> ignore
@@ -84,7 +83,7 @@ module CommonUtil =
         member x.GetStartColumn() = x.StartColumn   |> Column.op_Explicit
         member x.GetEndColumn()   = x.EndColumn     |> Column.op_Explicit
         
-        member x.ToDocumentRange(document : IDocument) =
+        member x.ToDocumentRange(document: IDocument) =
             let startOffset = document.GetLineStartOffset(x.GetStartLine()) + x.StartColumn
             let endOffset = document.GetLineStartOffset(x.GetEndLine()) + x.EndColumn
             DocumentRange(document, TextRange(startOffset, endOffset))
