@@ -97,7 +97,7 @@ type FSharpProjectOptionsBuilder(solution : ISolution,
         let sigFiles = HashSet<string>()
         let pairFiles = HashSet<FileSystemPath>()
         ignore (msBuildHost.mySessionHolder.Execute(fun session ->
-            session.EditProject(projectMark, fun editor ->
+            session.TryEditProject(projectMark, fun editor ->
                 for item in editor.Items do
                     if compileTypes.Contains(item.ItemType()) then
                         let path = FileSystemPath.TryParse(item.EvaluatedInclude)
