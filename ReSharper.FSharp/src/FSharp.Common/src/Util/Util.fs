@@ -34,6 +34,10 @@ module CommonUtil =
         let relativePath = path.AsRelative()
         if isNull relativePath then path
         else projectDirectory.Combine(relativePath)
+        
+    [<CompiledName("RunSynchronouslyWithTimeout")>]
+    let runSynchronouslyWithTimeout (action: Func<_>) timeout =
+        Async.RunSynchronously(async { return action.Invoke() }, timeout)
 
     type Async<'T> with
         member x.RunAsTask(?interruptChecker) = // todo: cache these exntension methods in fs cache provider

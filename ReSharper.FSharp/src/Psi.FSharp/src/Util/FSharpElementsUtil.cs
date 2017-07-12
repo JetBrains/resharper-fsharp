@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Psi.Caches;
 using JetBrains.ReSharper.Psi.FSharp.Impl;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
@@ -113,7 +114,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
           ? typeElement.Constructors.AsList<ITypeMember>()
           : typeElement.EnumerateMembers(mfv.GetMemberCompiledName(), true).AsList();
 
-        return members.Count == 1 ? members[0] : members.FirstOrDefault(m => m.XMLDocId == mfv.XmlDocSig);
+        // todo: remove action, fix freezing in FCS
+        var mfvXmlDocId = CommonUtil.RunSynchronouslyWithTimeout(() => mfv.XmlDocSig, 100);
+        return members.Count == 1 ? members[0] : members.FirstOrDefault(m => m.XMLDocId == mfvXmlDocId);
       }
 
       var unionCase = symbol as FSharpUnionCase;
