@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.DataFlow;
@@ -15,6 +16,7 @@ using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.TextControl.DocumentMarkup;
 using JetBrains.UI.RichText;
 using JetBrains.Util;
+using JetBrains.Util.Logging;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
@@ -53,7 +55,16 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
       var coords = document.GetCoordsByOffset(token.GetTreeEndOffset().Offset);
       var names = FSharpImplUtil.GetQualifiersAndName(token);
       var lineText = sourceFile.Document.GetLineText(coords.Line);
-      return GetTooltip(checkResults, names, coords, lineText);
+
+      try
+      {
+        return GetTooltip(checkResults, names, coords, lineText);
+      }
+      catch (TimeoutException)
+      {
+        Logger.LogError("Getting tooltip: {0}: {1}", sourceFile.GetLocation().FullPath, coords);
+        return string.Empty;
+      }
     }
 
     [NotNull]
@@ -63,23 +74,24 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
       // todo: provide tooltip for #r strings in fsx, should pass String tag
       var getTooltipAsync = checkResults.GetToolTipTextAlternate((int) coords.Line + 1,
         (int) coords.Column, lineText, ListModule.OfArray(names), FSharpTokenTag.Identifier);
-      var tooltips = FSharpAsyncUtil.RunSynchronouslySafe(getTooltipAsync, myLogger, "Getting F# tooltip", 2000)?.Item;
-      if (tooltips == null)
-        return string.Empty;
+        var tooltips = FSharpAsyncUtil.RunSynchronouslySafe(getTooltipAsync, myLogger, "Getting F# tooltip", 2000)?.Item;
+      
+        if (tooltips == null)
+          return string.Empty;
 
-      var tooltipsTexts = new List<string>();
-      foreach (var tooltip in tooltips)
-      {
-        var singleTooltip = tooltip as FSharpToolTipElement<string>.Single;
-        if (singleTooltip != null)
-          tooltipsTexts.Add(GetTooltipText(singleTooltip.Item1, singleTooltip.Item2));
+        var tooltipsTexts = new List<string>();
+        foreach (var tooltip in tooltips)
+        {
+          var singleTooltip = tooltip as FSharpToolTipElement<string>.Single;
+          if (singleTooltip != null)
+            tooltipsTexts.Add(GetTooltipText(singleTooltip.Item1, singleTooltip.Item2));
 
-        var overloads = tooltip as FSharpToolTipElement<string>.Group;
-        if (overloads != null)
-          tooltipsTexts.AddRange(overloads.Item.Select(overload => GetTooltipText(overload.Item1, overload.Item2)));
+          var overloads = tooltip as FSharpToolTipElement<string>.Group;
+          if (overloads != null)
+            tooltipsTexts.AddRange(overloads.Item.Select(overload => GetTooltipText(overload.Item1, overload.Item2)));
+        }
+        return tooltipsTexts.Join("_RIDER_HORIZONTAL_LINE_TOOLTIP_SEPARATOR_");
       }
-      return tooltipsTexts.Join("_RIDER_HORIZONTAL_LINE_TOOLTIP_SEPARATOR_");
-    }
 
     [CanBeNull]
     public static string GetXmlDocText(FSharpXmlDoc xmlDoc)

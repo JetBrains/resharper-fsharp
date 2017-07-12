@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Psi;
@@ -9,6 +10,7 @@ using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 using JetBrains.Util.Extension;
+using JetBrains.Util.Logging;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Control;
@@ -129,7 +131,15 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
         partialName,
         hasTextChangedSinceLastTypecheck: null);
 
-      return FSharpAsync.RunSynchronously(getCompletionsAsync, FSharpOption<int>.Some(2000), null);
+      try
+      {
+        return FSharpAsync.RunSynchronously(getCompletionsAsync, FSharpOption<int>.Some(2000), null);
+      }
+      catch (TimeoutException)
+      {
+        Logger.LogError("Getting symbol at location: {0}: {1}", context.BasicContext.SourceFile.GetLocation().FullPath, coords);
+        return null;
+      }
     }
   }
 }
