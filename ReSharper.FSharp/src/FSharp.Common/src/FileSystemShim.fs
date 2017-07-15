@@ -23,8 +23,10 @@ type FileSystemShim(lifetime : Lifetime, documentManager : DocumentManager) as t
             match FileSystemPath.TryParse(fileName) with
             | path when not path.IsEmpty && fsExtensions.Contains(path.ExtensionNoDot) ->
                 let document = documentManager.GetOrCreateDocument(path)
-                let text = ReadLockCookie.Execute(fun () -> document.GetText())
-                new MemoryStream(Encoding.UTF8.GetBytes(text)) :> _
+                let mutable text = null;
+                if ReadLockCookie.TryExecute(fun () -> text <- document.GetText()) then
+                    new MemoryStream(Encoding.UTF8.GetBytes(text)) :> _
+                else defaultFileSystem.FileStreamReadShim(fileName)
             | _ -> defaultFileSystem.FileStreamReadShim(fileName)
         
         member x.GetLastWriteTimeShim(fileName) = defaultFileSystem.GetLastWriteTimeShim(fileName) // todo
