@@ -10,6 +10,7 @@ module CommonUtil =
     open JetBrains.Application.Progress
     open JetBrains.DocumentModel
     open JetBrains.ProjectModel
+    open JetBrains.ProjectModel.ProjectsHost
     open JetBrains.ProjectModel.Properties
     open JetBrains.ProjectModel.Properties.CSharp
     open JetBrains.ProjectModel.Properties.Managed
@@ -22,7 +23,19 @@ module CommonUtil =
 
     let inline isNotNull x = not (isNull x)
     
-    let inline isApplicable (project: IProject) =
+    let inline (|NotNull|_|) x =
+        if isNull x then None else Some()
+    
+    let isFSharpProject (guid: Guid) (projectFile: FileSystemPath) =
+        match guid, projectFile with
+        | guid, _ when guid.Equals(FSharpProjectPropertiesFactory.FSharpProjectTypeGuid) -> true
+        | _, projectFile when projectFile.ExtensionNoDot.Equals("fsproj") -> true
+        | _ -> false
+        
+    let (|FSharProjectMark|_|) (mark: IProjectMark) =
+        if isFSharpProject mark.Guid mark.Location then Some() else None
+    
+    let isApplicable (project: IProject) =
         match project.ProjectProperties with
         | :? FSharpProjectProperties -> true
         | :? ProjectKCSharpProjectProperties as coreProperties ->

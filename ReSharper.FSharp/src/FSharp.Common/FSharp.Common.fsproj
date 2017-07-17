@@ -66,6 +66,7 @@
     <Compile Include="src\Checker\FSharpMsBuildProjectListener.fs" />
     <Compile Include="src\Checker\FSharpProjectOptionsBuilder.fs" />
     <Compile Include="src\Checker\FSharpProjectOptionsProvider.fs" />
+    <Compile Include="src\FSharpTargetsAnalyzer.fs" />
     <Content Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
