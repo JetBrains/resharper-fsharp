@@ -12,8 +12,8 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 type FSharpProjectProperties =
     inherit ProjectPropertiesBase<ManagedProjectConfiguration>
 
-    val mutable targetPlatformData : TargetPlatformData
-    val buildSettings : ManagedProjectBuildSettings
+    val mutable targetPlatformData: TargetPlatformData
+    val buildSettings: ManagedProjectBuildSettings
 
     // todo: these constructors are seen as partial member
     new(projectTypeGuids, platformId, factoryGuid, targetFrameworkIds, targetPlatformData) =
@@ -21,7 +21,7 @@ type FSharpProjectProperties =
           buildSettings = ManagedProjectBuildSettings()
           targetPlatformData = null }
 
-    new(factoryGuid, [<Optional; DefaultParameterValue(null : TargetPlatformData)>] tpd) =
+    new(factoryGuid, [<Optional; DefaultParameterValue(null: TargetPlatformData)>] tpd) =
         { inherit ProjectPropertiesBase<_>(factoryGuid)
           buildSettings = ManagedProjectBuildSettings()
           targetPlatformData = tpd }

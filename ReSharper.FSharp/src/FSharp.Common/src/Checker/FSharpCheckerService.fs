@@ -20,10 +20,6 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open Microsoft.FSharp.Compiler
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
-type AssemblySignature =
-    | ProjectSignature of Assembly: FSharpAssemblySignature
-    | PartialSignature of Assembly: FSharpAssemblySignature * LastKnownFileIndex : int
-    
 type FSharpParseAndCheckResults = 
     {
       ParseResults: FSharpParseFileResults
@@ -32,15 +28,14 @@ type FSharpParseAndCheckResults =
     }
 
 [<ShellComponent>]
-type FSharpCheckerService(lifetime, onSolutionCloseNotifier : OnSolutionCloseNotifier) =
-    let checker = FSharpChecker.Create(projectCacheSize = 200, keepAllBackgroundResolutions = false)
-    let assemblySignatures = Dictionary<IProject, AssemblySignature>()
+type FSharpCheckerService(lifetime, onSolutionCloseNotifier: OnSolutionCloseNotifier) =
+    let checker = FSharpChecker.Create(projectCacheSize = 200, keepAllBackgroundResolutions = false,
+                                       legacyReferenceResolver = MSBuildReferenceResolver.Resolver)
     do
         onSolutionCloseNotifier.SolutionIsAboutToClose.Advise(lifetime, fun () ->
-            checker.ClearLanguageServiceRootCachesAndCollectAndFinalizeAllTransients()
-            assemblySignatures.Clear())
+            checker.ClearLanguageServiceRootCachesAndCollectAndFinalizeAllTransients())
 
-    member val OptionsProvider : IFSharpProjectOptionsProvider = null with get, set
+    member val OptionsProvider: IFSharpProjectOptionsProvider = null with get, set
     member x.Checker = checker
 
     member x.ParseFile([<NotNull>] file: IPsiSourceFile) =
@@ -53,22 +48,6 @@ type FSharpCheckerService(lifetime, onSolutionCloseNotifier : OnSolutionCloseNot
 
     member x.HasPairFile([<NotNull>] file: IPsiSourceFile) =
         x.OptionsProvider.HasPairFile(file, checker)
-
-    member x.CheckProject(project: IProject) =
-        checker.ParseAndCheckProject(x.OptionsProvider.GetProjectOptions(project, checker).Value)
-
-    member private x.GetProjectSignature(project: IProject) =
-        let signature = x.CheckProject(project).RunAsTask().AssemblySignature
-        assemblySignatures.add(project, ProjectSignature(signature))
-        signature
-
-    member x.GetAssemblySignature([<NotNull>] file: IPsiSourceFile) =
-        let project = file.GetProject()
-        match assemblySignatures.TryGetValue(project) with
-        | true, ProjectSignature(signature) -> signature
-        | true, PartialSignature(signature, lastFileIndex)
-            when x.OptionsProvider.GetFileIndex(file, checker) <= lastFileIndex -> signature
-        | _ -> x.GetProjectSignature(project)
 
     member x.GetDefines(sourceFile: IPsiSourceFile) =
         match x.OptionsProvider.TryGetFSharpProject(sourceFile, checker) with

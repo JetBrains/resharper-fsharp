@@ -20,28 +20,28 @@ type FSharpFormatSettingsKey() =
     inherit FormatSettingsKeyBase()
 
     [<SettingsEntry(true, "Reorder open declarations"); DefaultValue>]
-    val mutable ReorderOpenDeclarations : bool
+    val mutable ReorderOpenDeclarations: bool
     
     [<SettingsEntry(false, "Semicolon at end of line"); DefaultValue>]
-    val mutable SemicolonAtEndOfLine : bool
+    val mutable SemicolonAtEndOfLine: bool
     
     [<SettingsEntry(true, "Space before argument"); DefaultValue>]
-    val mutable SpaceBeforeArgument : bool
+    val mutable SpaceBeforeArgument: bool
     
     [<SettingsEntry(true, "Space before colon"); DefaultValue>]
-    val mutable SpaceBeforeColon : bool
+    val mutable SpaceBeforeColon: bool
     
     [<SettingsEntry(true, "Space after comma"); DefaultValue>]
-    val mutable SpaceAfterComma : bool
+    val mutable SpaceAfterComma: bool
     
     [<SettingsEntry(true, "Space after semicolon"); DefaultValue>]
-    val mutable SpaceAfterSemicolon : bool
+    val mutable SpaceAfterSemicolon: bool
     
     [<SettingsEntry(false, "Indent on try with"); DefaultValue>]
-    val mutable IndentOnTryWith : bool
+    val mutable IndentOnTryWith: bool
     
     [<SettingsEntry(true, "Space around delimiter"); DefaultValue>]
-    val mutable SpaceAroundDelimiter : bool
+    val mutable SpaceAroundDelimiter: bool
     
 
 [<Language(typeof<FSharpLanguage>)>]
@@ -80,21 +80,21 @@ type FSharpCodeStylePageSchema(lifetime, smartContext, itemViewModelFactory, con
     override x.Language = FSharpLanguage.Instance :> _
     override x.PageName = "Formatting Style"
     override x.Describe() =
-      Seq.ofList [ x.ItemFor(fun (key : FSharpFormatSettingsKey) -> key.WRAP_LIMIT)
-                   x.ItemFor(fun (key : FSharpFormatSettingsKey) -> key.INDENT_SIZE)
-                   x.ItemFor(fun (key : FSharpFormatSettingsKey) -> key.SemicolonAtEndOfLine)
-                   x.ItemFor(fun (key : FSharpFormatSettingsKey) -> key.SpaceBeforeArgument)
-                   x.ItemFor(fun (key : FSharpFormatSettingsKey) -> key.SpaceBeforeColon)
-                   x.ItemFor(fun (key : FSharpFormatSettingsKey) -> key.SpaceAfterComma)
-                   x.ItemFor(fun (key : FSharpFormatSettingsKey) -> key.SpaceAfterSemicolon)
-                   x.ItemFor(fun (key : FSharpFormatSettingsKey) -> key.IndentOnTryWith)
-                   x.ItemFor(fun (key : FSharpFormatSettingsKey) -> key.SpaceAroundDelimiter)
-                   x.ItemFor(fun (key : FSharpFormatSettingsKey) -> key.ReorderOpenDeclarations) ]
+      Seq.ofList [ x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.WRAP_LIMIT)
+                   x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.INDENT_SIZE)
+                   x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.SemicolonAtEndOfLine)
+                   x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.SpaceBeforeArgument)
+                   x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.SpaceBeforeColon)
+                   x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.SpaceAfterComma)
+                   x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.SpaceAfterSemicolon)
+                   x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.IndentOnTryWith)
+                   x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.SpaceAroundDelimiter)
+                   x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.ReorderOpenDeclarations) ]
 
 
 [<OptionsPage("FSharpCodeStylePage", "Formatting Style", typeof<PsiFeaturesUnsortedOptionsThemedIcons.Indent>)>]
-type FSharpCodeStylePage(lifetime, smartContext : OptionsSettingsSmartContext, env,
-                           schema : FSharpCodeStylePageSchema, preview) =
+type FSharpCodeStylePage(lifetime, smartContext: OptionsSettingsSmartContext, env,
+                         schema: FSharpCodeStylePageSchema, preview) =
     inherit CodeStylePage(lifetime, smartContext, env, schema, preview)
 
     override x.Id = "FSharpIndentStylePage"

@@ -25,13 +25,13 @@ type FSharpProjectPropertiesRequest() =
         member x.RequestedProperties = properties :> seq<_>
 
 [<SolutionComponent>]
-type FSharpProjectOptionsBuilder(solution : ISolution,
-                                 filesFromTargetsProvider : FSharpProjectFilesFromTargetsProvider) =
+type FSharpProjectOptionsBuilder(solution: ISolution,
+                                 filesFromTargetsProvider: FSharpProjectFilesFromTargetsProvider) =
     let msBuildHost = solution.ProjectsHostContainer().GetComponent<MsBuildProjectHost>()
     let defaultDelimiters = [| ';'; ','; ' ' |]
     let compileTypes = Set.ofSeq (seq { yield "Compile"; yield "CompileBefore"; yield "CompileAfter"})
 
-    member x.BuildSingleProjectOptions (project : IProject) =
+    member x.BuildSingleProjectOptions (project: IProject) =
         let properties = project.ProjectProperties
         let buildSettings = properties.BuildSettings :?> IManagedProjectBuildSettings
 
@@ -72,7 +72,7 @@ type FSharpProjectOptionsBuilder(solution : ISolution,
         
         let projectOptions =
             { ProjectFileName = project.ProjectFileLocation.FullPath
-              ProjectFileNames = Array.map (fun (p : FileSystemPath ) -> p.FullPath) filePaths
+              SourceFiles = Array.map (fun (p: FileSystemPath ) -> p.FullPath) filePaths
               OtherOptions = options.ToArray()
               ReferencedProjects = Array.empty
               IsIncompleteTypeCheckEnvironment = false
@@ -80,7 +80,8 @@ type FSharpProjectOptionsBuilder(solution : ISolution,
               LoadTime = DateTime.Now
               OriginalLoadReferences = List.empty
               UnresolvedReferences = None
-              ExtraProjectInfo = None }
+              ExtraProjectInfo = None
+              Stamp = None }
 
         { Options = Some projectOptions
           ConfigurationDefines = definedConstants
@@ -90,7 +91,7 @@ type FSharpProjectOptionsBuilder(solution : ISolution,
           ParsingOptions = None
         }
 
-    member private x.GetProjectFiles(project : IProject) =
+    member private x.GetProjectFiles(project: IProject) =
         let projectMark = project.GetProjectMark().NotNull()
         let projectDir = projectMark.Location.Directory
         let files = List()
@@ -115,7 +116,7 @@ type FSharpProjectOptionsBuilder(solution : ISolution,
                   yield! filesFromTargets.CompileAfter }
         files |> Array.ofSeq, pairFiles
 
-    member private x.GetReferencedPathsOptions(project : IProject) =
+    member private x.GetReferencedPathsOptions(project: IProject) =
         let framework = project.GetCurrentTargetFrameworkId()
         let referencingProjects = project.GetReferencedProjects(framework) |> List.ofSeq 
         seq { for p in referencingProjects ->
@@ -123,7 +124,7 @@ type FSharpProjectOptionsBuilder(solution : ISolution,
               for a in project.GetAssemblyReferences(framework) ->
                   "-r:" + a.ResolveResultAssemblyFile().Location.FullPath }, referencingProjects
 
-    member private x.GetOutputType([<CanBeNull>] buildSettings : IManagedProjectBuildSettings) =
+    member private x.GetOutputType([<CanBeNull>] buildSettings: IManagedProjectBuildSettings) =
         if isNull buildSettings then "library"
         else
             match buildSettings.OutputType with
@@ -132,11 +133,11 @@ type FSharpProjectOptionsBuilder(solution : ISolution,
             | ProjectOutputType.MODULE -> "module"
             | _ -> "library"
 
-    member private x.GetDefinedConstants(properties : IProjectProperties) =
+    member private x.GetDefinedConstants(properties: IProjectProperties) =
         match properties.ActiveConfigurations.Configurations.SingleItem() with
         | :? IManagedProjectConfiguration as cfg -> x.SplitAndTrim(cfg.DefineConstants, defaultDelimiters)
         | _ -> List.empty
 
-    member private x.SplitAndTrim([<CanBeNull>] strings, [<ParamArray>] delimiters : char[]) : string list =
+    member private x.SplitAndTrim([<CanBeNull>] strings, [<ParamArray>] delimiters: char[]): string list =
         if isNull strings then List.empty
         else [ for s in strings.Split(delimiters) do if not (s.IsNullOrWhitespace()) then yield s.Trim() ]

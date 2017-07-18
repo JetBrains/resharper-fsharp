@@ -30,7 +30,6 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
       var fsFile = completionContext.File as IFSharpFile;
       Assertion.AssertNotNull(fsFile, "fsFile != null");
 
-      
       if (fsFile.ParseResults == null)
         return true;
 
@@ -129,7 +128,8 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
         document.GetLineText(coords.Line),
         qualifiers,
         partialName,
-        hasTextChangedSinceLastTypecheck: null);
+        hasTextChangedSinceLastTypecheck: null,
+        userOpName: FSharpOption<string>.None);
 
       try
       {

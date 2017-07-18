@@ -7,7 +7,7 @@ open JetBrains.Util
 open Microsoft.FSharp.Compiler.Ast
 open Microsoft.FSharp.Compiler.PrettyNaming
 
-type FSharpImplTreeBuilder(file, lexer, parseTree, lifetime, logger : ILogger) =
+type FSharpImplTreeBuilder(file, lexer, parseTree, lifetime, logger: ILogger) =
     inherit FSharpTreeBuilderBase(file, lexer, lifetime)
 
     override x.CreateFSharpFile() =
@@ -15,8 +15,7 @@ type FSharpImplTreeBuilder(file, lexer, parseTree, lifetime, logger : ILogger) =
         match parseTree with
         | Some (ParsedInput.ImplFile (ParsedImplFileInput(_,_,_,_,_,decls,_))) ->
             for decl in decls do x.ProcessTopLevelDeclaration decl
-        | _ ->
-            logger.LogMessage(LoggingLevel.ERROR, sprintf "FSharpImplTreeBuilder: got %A" parseTree)
+        | _ -> logger.LogMessage(LoggingLevel.ERROR, sprintf "FSharpImplTreeBuilder: got %A" parseTree)
 
         x.FinishFile mark ElementType.F_SHARP_IMPL_FILE
 
@@ -113,7 +112,7 @@ type FSharpImplTreeBuilder(file, lexer, parseTree, lifetime, logger : ILogger) =
             range |> x.GetEndOffset |> x.AdvanceToOffset
             x.Done(mark, elementType)
 
-    member internal x.ProcessModuleLetPat (pat : SynPat) (attrs : SynAttributes) =
+    member internal x.ProcessModuleLetPat (pat: SynPat) (attrs: SynAttributes) =
         match pat with
         | SynPat.LongIdent(LongIdentWithDots(lid,_),_,typeParamsOption,memberParams,_,range) ->
             match lid with

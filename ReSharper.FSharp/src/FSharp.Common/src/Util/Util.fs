@@ -18,6 +18,7 @@ module CommonUtil =
     open JetBrains.Util
     open JetBrains.Util.dataStructures.TypedIntrinsics
     open Microsoft.FSharp.Compiler
+    open Microsoft.FSharp.Compiler.SourceCodeServices
 
     let private interruptCheckTimeout = 30
 

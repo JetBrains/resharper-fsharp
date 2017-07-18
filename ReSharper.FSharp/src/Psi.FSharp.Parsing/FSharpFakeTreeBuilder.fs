@@ -6,7 +6,7 @@ open JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
-type FSharpFakeTreeBuilder(file, lexer, lifetime, logger : ILogger, options : FSharpParsingOptions option) =
+type FSharpFakeTreeBuilder(file, lexer, lifetime, logger: ILogger, options: FSharpParsingOptions) =
     inherit FSharpTreeBuilderBase(file, lexer, lifetime)
 
     override x.CreateFSharpFile() =

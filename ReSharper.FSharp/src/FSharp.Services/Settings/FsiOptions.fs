@@ -18,23 +18,23 @@ module FsiOptions =
     [<SettingsKey(typeof<HierarchySettings>, "Fsi")>]
     type FsiOptions() =
         [<SettingsEntry(false, useAnyCpuVersionText); DefaultValue>]
-        val mutable UseAnyCpuVersion : bool
+        val mutable UseAnyCpuVersion: bool
 
         [<SettingsEntry(true, shadowCopyReferencesText); DefaultValue>]
-        val mutable ShadowCopyReferences : bool
+        val mutable ShadowCopyReferences: bool
 
         [<SettingsEntry("--optimize", fsiArgsText); DefaultValue>]
-        val mutable FsiArgs : string
+        val mutable FsiArgs: string
 
         [<SettingsEntry(true, fsiArgsText); DefaultValue>]
-        val mutable MoveCaretOnSendLine : bool
+        val mutable MoveCaretOnSendLine: bool
 
     [<OptionsPage("FsiOptionsPage", "Fsi", typeof<ProjectModelThemedIcons.Fsharp>)>]
     type FsiOptionsPage(lifetime, optionsContext) as this =
         inherit SimpleOptionsPage(lifetime, optionsContext)
         do
-            this.AddBoolOption((fun (key : FsiOptions) -> key.UseAnyCpuVersion), RichText(useAnyCpuVersionText)) |> ignore
-            this.AddBoolOption((fun (key : FsiOptions) -> key.ShadowCopyReferences), RichText(shadowCopyReferencesText)) |> ignore
-            this.AddBoolOption((fun (key : FsiOptions) -> key.MoveCaretOnSendLine), RichText(moveCaretOnSendLineText)) |> ignore
-            this.AddStringOption((fun (key : FsiOptions) -> key.FsiArgs), fsiArgsText) |> ignore
+            this.AddBoolOption((fun (key: FsiOptions) -> key.UseAnyCpuVersion), RichText(useAnyCpuVersionText)) |> ignore
+            this.AddBoolOption((fun (key: FsiOptions) -> key.ShadowCopyReferences), RichText(shadowCopyReferencesText)) |> ignore
+            this.AddBoolOption((fun (key: FsiOptions) -> key.MoveCaretOnSendLine), RichText(moveCaretOnSendLineText)) |> ignore
+            this.AddStringOption((fun (key: FsiOptions) -> key.FsiArgs), fsiArgsText) |> ignore
             this.FinishPage()

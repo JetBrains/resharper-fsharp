@@ -102,7 +102,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Searching
         var fsDeclaredTypeMember = pattern as IFSharpTypeMember;
         if (fsDeclaredTypeMember != null)
         {
-          var patternDecl = pattern?.GetDeclarations().FirstOrDefault();
+          var patternDecl = pattern.GetDeclarations().FirstOrDefault();
           if (patternDecl == null)
             return null;
 

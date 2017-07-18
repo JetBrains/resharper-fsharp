@@ -19,6 +19,7 @@ using JetBrains.Util;
 using JetBrains.Util.Logging;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
+using Microsoft.FSharp.Core;
 
 namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 {
@@ -72,8 +73,8 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
       DocumentCoords coords, [NotNull] string lineText)
     {
       // todo: provide tooltip for #r strings in fsx, should pass String tag
-      var getTooltipAsync = checkResults.GetToolTipTextAlternate((int) coords.Line + 1,
-        (int) coords.Column, lineText, ListModule.OfArray(names), FSharpTokenTag.Identifier);
+      var getTooltipAsync = checkResults.GetToolTipText((int) coords.Line + 1,
+        (int) coords.Column, lineText, ListModule.OfArray(names), FSharpTokenTag.Identifier, FSharpOption<string>.None);
         var tooltips = FSharpAsyncUtil.RunSynchronouslySafe(getTooltipAsync, myLogger, "Getting F# tooltip", 2000)?.Item;
       
         if (tooltips == null)
@@ -82,13 +83,9 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
         var tooltipsTexts = new List<string>();
         foreach (var tooltip in tooltips)
         {
-          var singleTooltip = tooltip as FSharpToolTipElement<string>.Single;
-          if (singleTooltip != null)
-            tooltipsTexts.Add(GetTooltipText(singleTooltip.Item1, singleTooltip.Item2));
-
           var overloads = tooltip as FSharpToolTipElement<string>.Group;
           if (overloads != null)
-            tooltipsTexts.AddRange(overloads.Item.Select(overload => GetTooltipText(overload.Item1, overload.Item2)));
+            tooltipsTexts.AddRange(overloads.Item.Select(overload => GetTooltipText(overload.MainDescription, overload.XmlDoc)));//, overload.Item2)));
         }
         return tooltipsTexts.Join("_RIDER_HORIZONTAL_LINE_TOOLTIP_SEPARATOR_");
       }

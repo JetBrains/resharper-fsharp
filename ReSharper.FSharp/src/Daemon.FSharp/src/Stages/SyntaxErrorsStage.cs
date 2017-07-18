@@ -4,7 +4,7 @@ using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.Util;
-using Microsoft.FSharp.Compiler;
+using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Daemon.FSharp.Stages
 {

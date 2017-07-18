@@ -32,7 +32,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       var coords = sourceFile.Document.GetCoordsByOffset(offset);
       var lineText = sourceFile.Document.GetLineText(coords.Line);
       var findSymbolAsync =
-        checkResults.GetSymbolUseAtLocation((int) coords.Line + 1, (int) coords.Column, lineText, names);
+        checkResults.GetSymbolUseAtLocation((int) coords.Line + 1, (int) coords.Column, lineText, names, FSharpOption<string>.None);
       try
       {
         return FSharpAsync.RunSynchronously(findSymbolAsync, FSharpOption<int>.Some(1000), null)?.Value.Symbol;
