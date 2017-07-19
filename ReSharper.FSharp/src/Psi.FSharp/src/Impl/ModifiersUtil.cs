@@ -51,7 +51,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
           break;
         }
       }
-      return decoration;
+      return Normalize(decoration);
     }
 
     public static MemberDecoration GetModifiers(this TypePart typePart)
@@ -64,7 +64,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
           return MemberDecoration.DefaultValue;
 
         var decoration = typePart.Modifiers;
-        var isHiddenBySignature = (typePart?.GetRoot() as FSharpProjectFilePart)?.HasPairFile ?? false;
+        var isHiddenBySignature = (typePart.GetRoot() as FSharpProjectFilePart)?.HasPairFile ?? false;
         if (isHiddenBySignature)
           decoration.AccessRights = AccessRights.INTERNAL;
 
@@ -82,7 +82,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
         decoration.IsSealed = true;
       }
 
-      decoration.IsStatic = true;
       return decoration;
     }
 
