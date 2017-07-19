@@ -18,6 +18,7 @@ open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
+open JetBrains.ReSharper.Psi.Modules
 open Microsoft.FSharp.Compiler
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
@@ -40,7 +41,7 @@ type FSharpCheckerService(lifetime, onSolutionCloseNotifier: OnSolutionCloseNoti
     member x.Checker = checker
 
     member x.ParseFile([<NotNull>] file: IPsiSourceFile) =
-        match x.OptionsProvider.GetParsingOptions(file, checker, false) with
+        match x.OptionsProvider.GetParsingOptions(file, checker) with
         | Some parsingOptions as options ->
             let filePath = file.GetLocation().FullPath
             let source = file.Document.GetText()
@@ -51,11 +52,15 @@ type FSharpCheckerService(lifetime, onSolutionCloseNotifier: OnSolutionCloseNoti
         x.OptionsProvider.HasPairFile(file, checker)
 
     member x.GetDefines(sourceFile: IPsiSourceFile) =
-        if sourceFile.LanguageType.Equals(FSharpScriptProjectFileType.Instance) then []
+        if sourceFile.LanguageType.Equals(FSharpScriptProjectFileType.Instance) ||
+            sourceFile.PsiModule.IsMiscFilesProjectModule() then []
         else
             match x.OptionsProvider.TryGetFSharpProject(sourceFile, checker) with
             | Some project -> project.ConfigurationDefines
             | _ -> List.empty
+
+    member x.GetParsingOptions(sourceFile: IPsiSourceFile) =
+        x.OptionsProvider.GetParsingOptions(sourceFile, checker)
 
     member x.ParseAndCheckFile([<NotNull>] file: IPsiSourceFile, allowStaleResults: bool) =
         match x.OptionsProvider.GetProjectOptions(file, checker, true) with
