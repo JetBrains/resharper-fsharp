@@ -43,7 +43,6 @@ type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISol
     let projects = Dictionary<IProject, FSharpProject>()
     let scriptOptions = Dictionary<FileSystemPath, FSharpProjectOptions>()
     let projectsToInvalidate = JetHashSet<IProject>()
-    let mutable fsCorePath: string = null
     
     let invalidProject (p: IProject) =
         invalidOp (sprintf "Project %s is not opened" p.ProjectFileLocation.FullPath)
@@ -58,12 +57,6 @@ type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISol
         changeManager.Changed2.Advise(lifetime, this.ProcessChange);
         checkerService.OptionsProvider <- this
         lifetime.AddAction(fun _ -> checkerService.OptionsProvider <- null) |> ignore
-
-        if Util.PlatformUtil.IsRunningOnMono then
-            let fsCoreAssembly = Assembly.GetAssembly(typeof<Unit>)
-            if isNotNull fsCoreAssembly then
-                let path = Util.FileSystemPath.TryParse(fsCoreAssembly.Location)
-                if isNotNull path then fsCorePath <- "-r:" + path.FullPath
 
     member private x.ProcessChange(obj: ChangeEventArgs) =
         let change = obj.ChangeMap.GetChange<ProjectModelChange>(solution)
@@ -117,8 +110,12 @@ type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISol
                               let outPath = p.GetOutputFilePath(p.GetCurrentTargetFrameworkId()).FullPath
                               yield outPath, x.CreateProjectOptions(p, checker).Value }
 
-            let options' = { fsProject.Options.Value with ReferencedProjects = referencedProjectsOptions.ToArray() }
-            let fsProject = { fsProject with Options = Some options' }
+            let options = { fsProject.Options.Value with ReferencedProjects = referencedProjectsOptions.ToArray() }
+            let options =
+                if not (Seq.exists (fun (s: string) -> s.StartsWith "-r:" && s.Contains "FSharp.Core.dll") options.OtherOptions) then
+                    { options with OtherOptions = FSharpCoreFix.ensureCorrectFSharpCore options.OtherOptions }
+                else options
+            let fsProject = { fsProject with Options = Some options }
             projects.[project] <- fsProject
             fsProject.Options
 
@@ -157,8 +154,7 @@ type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISol
             None
 
     member private x.FixScriptOptions(options) =
-        if isNull fsCorePath then options
-        else { options with OtherOptions = Array.append options.OtherOptions [| fsCorePath |] }
+        { options with OtherOptions = FSharpCoreFix.ensureCorrectFSharpCore options.OtherOptions }
 
     member private x.InvalidateAll() =
         projects.Clear()
@@ -170,13 +166,6 @@ type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISol
                     file.PsiModule.IsMiscFilesProjectModule() then
                 x.GetScriptOptionsImpl(file, checker, updateScriptOptions)
             else x.GetProjectOptionsImpl(file, checker)
-
-        member x.GetProjectOptions(file, checker) =
-            let _ = x.GetProjectOptionsImpl(file, checker)
-            let project = file.GetProject()
-            match projects.TryGetValue(project) with
-            | true, fsProject -> fsProject.Options
-            | _ -> invalidProject project
 
         member x.TryGetFSharpProject(file, checker) =
             let _ = x.GetProjectOptionsImpl(file, checker)

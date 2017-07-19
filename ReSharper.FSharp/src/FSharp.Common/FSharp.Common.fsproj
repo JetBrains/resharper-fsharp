@@ -62,6 +62,7 @@
     <Compile Include="src\Util\FSharpSymbolUtil.fs" />
     <Compile Include="src\Util\Util.fs" />
     <Compile Include="src\Checker\IFSharpProjectOptionsProvider.fs" />
+    <Compile Include="src\Checker\FSharpCoreFix.fs" />
     <Compile Include="src\Checker\FSharpCheckerService.fs" />
     <Compile Include="src\Checker\FSharpMsBuildProjectListener.fs" />
     <Compile Include="src\Checker\FSharpProjectOptionsBuilder.fs" />
