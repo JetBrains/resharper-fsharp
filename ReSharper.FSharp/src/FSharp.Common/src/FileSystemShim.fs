@@ -11,7 +11,7 @@ open System.IO
 open System.Text
 
 [<SolutionComponent>]
-type FileSystemShim(lifetime : Lifetime, documentManager : DocumentManager) as this =
+type FileSystemShim(lifetime: Lifetime, documentManager: DocumentManager) as this =
     static let fsExtensions = HashSet(Seq.ofList ["fs"; "fsi"; "fsx"; "ml"; "mli"; "fsscript"])
     let defaultFileSystem = Shim.FileSystem
     do
@@ -23,7 +23,7 @@ type FileSystemShim(lifetime : Lifetime, documentManager : DocumentManager) as t
             match FileSystemPath.TryParse(fileName) with
             | path when not path.IsEmpty && fsExtensions.Contains(path.ExtensionNoDot) ->
                 let document = documentManager.GetOrCreateDocument(path)
-                let mutable text = null;
+                let mutable text = null
                 if ReadLockCookie.TryExecute(fun () -> text <- document.GetText()) then
                     new MemoryStream(Encoding.UTF8.GetBytes(text)) :> _
                 else defaultFileSystem.FileStreamReadShim(fileName)

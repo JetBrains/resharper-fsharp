@@ -38,13 +38,14 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
         {
           var checkResults = GetParseAndCheckResults();
           var document = GetSourceFile()?.Document;
-          var declaredSymbolUses = checkResults?.Value.CheckResults.GetAllDeclaredSymbols().RunAsTask();
+          var declaredSymbolUses = checkResults?.Value.CheckResults.GetAllUsesOfAllSymbolsInFile().RunAsTask();
           if (declaredSymbolUses == null || document == null)
             return null;
 
           myDeclarationSymbols = new Dictionary<int, FSharpSymbol>(declaredSymbolUses.Length);
           foreach (var symbolUse in declaredSymbolUses)
-            myDeclarationSymbols[document.GetOffset(symbolUse.range.Start)] = symbolUse.symbol;
+            if (symbolUse.IsFromDefinition)
+              myDeclarationSymbols[document.GetOffset(symbolUse.RangeAlternate.Start)] = symbolUse.Symbol;
         }
       return myDeclarationSymbols?.TryGetValue(offset);
     }
