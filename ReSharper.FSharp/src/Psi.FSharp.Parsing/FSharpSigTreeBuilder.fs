@@ -7,7 +7,7 @@ open JetBrains.Util
 open Microsoft.FSharp.Compiler.Ast
 open Microsoft.FSharp.Compiler.PrettyNaming
 
-type FSharpSigTreeBuilder(file, lexer, parseTree, lifetime, logger : ILogger) =
+type FSharpSigTreeBuilder(file, lexer, parseTree, lifetime, logger: ILogger) =
     inherit FSharpTreeBuilderBase(file, lexer, lifetime)
 
     override x.CreateFSharpFile() =

@@ -34,7 +34,7 @@ type SendToFsiActionType =
     | SendSelection
 
 [<SolutionComponent>]
-type FsiSessionsHost(lifetime: Lifetime, solution : ISolution, solutionModel : SolutionModel, toolset : RiderSolutionToolset) as this =
+type FsiSessionsHost(lifetime: Lifetime, solution: ISolution, solutionModel: SolutionModel, toolset: RiderSolutionToolset) as this =
     let rdFsiHost =
         match solutionModel.TryGetCurrentSolution() with
         | null -> failwith "Could not get fsi host"
@@ -46,13 +46,13 @@ type FsiSessionsHost(lifetime: Lifetime, solution : ISolution, solutionModel : S
     do
         rdFsiHost.RequestNewFsiSessionInfo.Set(this.GetNewFsiSessionInfo)
         let settings = solution.GetSettingsStore().SettingsStore.BindToContextLive(lifetime, ContextRange.ApplicationWide)
-        let moveCaretOnSendLine = settings.GetValueProperty(lifetime, (fun (s : FsiOptions) -> s.MoveCaretOnSendLine))
+        let moveCaretOnSendLine = settings.GetValueProperty(lifetime, (fun (s: FsiOptions) -> s.MoveCaretOnSendLine))
         rdFsiHost.MoveCaretOnSendLine.Value <- moveCaretOnSendLine.Value
         moveCaretOnSendLine.FlowInto(lifetime, rdFsiHost.MoveCaretOnSendLine :> IRdProperty<_>)
 
     member x.GetNewFsiSessionInfo(_) =
         let settings = solution.GetSettingsStore()
-        let useFsiAnyCpu = settings.GetValue(fun (s : FsiOptions) -> s.UseAnyCpuVersion)
+        let useFsiAnyCpu = settings.GetValue(fun (s: FsiOptions) -> s.UseAnyCpuVersion)
 
         // todo: move discover process to another place (and discover other F#-specific things like targets files)
         let fsiPath =
@@ -70,9 +70,9 @@ type FsiSessionsHost(lifetime: Lifetime, solution : ISolution, solutionModel : S
                 let fsiName = if useFsiAnyCpu then "fsharpiAnyCpu" else "fsharpi"
                 toolset.CurrentMonoRuntime.RootPath.Combine("bin").Combine(fsiName).FullPath
 
-        let shadowCopyReferences = settings.GetValue(fun (s : FsiOptions) -> s.ShadowCopyReferences)
+        let shadowCopyReferences = settings.GetValue(fun (s: FsiOptions) -> s.ShadowCopyReferences)
         let userArgs =
-            settings.GetValue(fun (s : FsiOptions) -> s.FsiArgs).Split(' ')
+            settings.GetValue(fun (s: FsiOptions) -> s.FsiArgs).Split(' ')
             |> Seq.ofArray
             |> Seq.map (fun s -> s.Trim())
             |> Seq.filter (fun s -> not (s.IsEmpty()))

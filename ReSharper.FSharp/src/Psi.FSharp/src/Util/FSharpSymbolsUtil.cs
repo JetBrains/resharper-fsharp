@@ -3,9 +3,11 @@ using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.Util;
+using JetBrains.Util.Logging;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Control;
+using Microsoft.FSharp.Core;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Util
 {
@@ -30,10 +32,15 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       var coords = sourceFile.Document.GetCoordsByOffset(offset);
       var lineText = sourceFile.Document.GetLineText(coords.Line);
       var findSymbolAsync =
-        checkResults.GetSymbolUseAtLocation((int) coords.Line + 1, (int) coords.Column, lineText, names);
+        checkResults.GetSymbolUseAtLocation((int) coords.Line + 1, (int) coords.Column, lineText, names, FSharpOption<string>.None);
       try
       {
-        return FSharpAsync.RunSynchronously(findSymbolAsync, null, null)?.Value.Symbol;
+        return FSharpAsync.RunSynchronously(findSymbolAsync, FSharpOption<int>.Some(1000), null)?.Value.Symbol;
+      }
+      catch (TimeoutException)
+      {
+        Logger.LogError("Getting symbol at location: {0}: {1}", sourceFile.GetLocation().FullPath, coords);
+        return null;
       }
       catch (Exception) // Cannot access FCS internal exception types here
       {

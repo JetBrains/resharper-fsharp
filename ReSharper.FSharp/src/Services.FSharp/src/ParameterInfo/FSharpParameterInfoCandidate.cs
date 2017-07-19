@@ -45,7 +45,7 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.ParameterInfo
             text.Append(", ");
         }
 
-      text.Append(")" + myCandidate.TypeText);
+      text.Append(")" + myCandidate.ReturnTypeText);
 
       extensionMethodInfo = ExtensionMethodInfo.NoExtension;
       parameterRanges = newParameterRanges;

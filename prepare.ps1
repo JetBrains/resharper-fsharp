@@ -64,6 +64,24 @@ function SetPluginVersion($file, $version)
   $xml.Save($file)
 }
 
+function SetNuspecVersion($file, $version)
+{
+  Write-Host "- ${file}: version -> $version"
+
+  $xml = New-Object xml
+  $xml.PreserveWhitespace = $true
+  $xml.Load($file)
+
+  $ns = New-Object System.Xml.XmlNamespaceManager($xml.NameTable)
+  $ns.AddNamespace("ns", $xml.DocumentElement.NamespaceURI)
+  
+  $node = $xml.SelectSingleNode("//ns:version", $ns)
+  if($node -eq $null) { Write-Error "//version was not found in $file" }
+
+  $node.InnerText = $version
+  $xml.Save($file)
+}
+
 function GetPackagesFromFolder($folder)
 {
   $packages = @{}
@@ -169,6 +187,7 @@ Write-Host "##teamcity[buildNumber '$version']"
 
 SetIdeaVersion -file "rider-fsharp/src/main/resources/META-INF/plugin.xml" -since $SinceBuild -until $UntilBuild
 SetPluginVersion -file "rider-fsharp/src/main/resources/META-INF/plugin.xml" -version $version
+SetNuspecVersion -file "ReSharper.FSharp/ReSharper.FSharp.nuspec" -version $version
 
 if ($Source) {
   $packages = GetPackagesFromFolder -folder $Source

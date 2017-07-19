@@ -12,8 +12,8 @@ open Microsoft.FSharp.Compiler
 open Microsoft.FSharp.Compiler.Ast
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
-type FSharpParser(file : IPsiSourceFile, checkerService : FSharpCheckerService, logger) =
-    member private x.CreateTreeBuilder lexer (parseResults : FSharpParseFileResults option) lifetime options =
+type FSharpParser(file: IPsiSourceFile, checkerService: FSharpCheckerService, logger) =
+    member private x.CreateTreeBuilder lexer (parseResults: FSharpParseFileResults option) lifetime (options: FSharpParsingOptions option) =
         match options, parseResults with
         | Some options, Some results when results.ParseTree.IsSome ->
             match results.ParseTree with

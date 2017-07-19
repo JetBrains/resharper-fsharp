@@ -5,7 +5,7 @@ open Microsoft.FSharp.Compiler.SourceCodeServices
 open Microsoft.FSharp.Compiler.SourceCodeServices.Extensions
 
 [<CompiledName("GetReturnType")>]
-let getReturnType (symbol : FSharpSymbol) =
+let getReturnType (symbol: FSharpSymbol) =
     match symbol with
     | :? FSharpMemberOrFunctionOrValue as mfv -> Some mfv.ReturnParameter.Type
     | :? FSharpField as field -> Some field.FieldType
@@ -13,5 +13,5 @@ let getReturnType (symbol : FSharpSymbol) =
     | _ -> None
 
 [<CompiledName("TryGetFullCompiledName")>]    
-let tryGetFullCompiledName (entity : FSharpEntity) =
+let tryGetFullCompiledName (entity: FSharpEntity) =
     entity.TryGetFullCompiledName()

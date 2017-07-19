@@ -79,15 +79,11 @@
     <Reference Include="DotNetZip">
       <HintPath>..\..\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
     </Reference>
-    <Reference Include="FSharp.Compiler.Service">
-      <HintPath>..\..\packages\JetBrains.FSharp.Compiler.Service.12.0.8-3\lib\net45\FSharp.Compiler.Service.dll</HintPath>
+    <Reference Include="FSharp.Compiler.Service, Version=4.4.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <HintPath>..\..\packages\JetBrains.FSharp.Compiler.Service.12.0.8-4\lib\net40\FSharp.Compiler.Service.dll</HintPath>
     </Reference>
-    <Reference Include="FSharp.Compiler.Service.MSBuild.v12">
-      <HintPath>..\..\packages\JetBrains.FSharp.Compiler.Service.12.0.8-3\lib\net45\FSharp.Compiler.Service.MSBuild.v12.dll</HintPath>
-    </Reference>
-    <Reference Include="FSharp.Core">
-      <HintPath>..\..\packages\FSharp.Core.4.1.12\lib\net45\FSharp.Core.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="FSharp.Core, Version=4.4.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <HintPath>..\..\packages\FSharp.Core.4.1.17\lib\net45\FSharp.Core.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.NRefactory">
       <HintPath>..\..\packages\ICSharpCode.NRefactory.5.5.1\lib\Net40\ICSharpCode.NRefactory.dll</HintPath>

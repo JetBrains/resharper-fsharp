@@ -79,12 +79,6 @@
     <Reference Include="DevExpress.XtraTreeList.v7.1">
       <HintPath>..\..\packages\JetBrains.Platform.Lib.DevExpress.2.0.20150224.0\lib\Net\DevExpress.XtraTreeList.v7.1.dll</HintPath>
     </Reference>
-    <Reference Include="FSharp.Compiler.Service">
-      <HintPath>..\..\packages\JetBrains.FSharp.Compiler.Service.12.0.8-3\lib\net45\FSharp.Compiler.Service.dll</HintPath>
-    </Reference>
-    <Reference Include="FSharp.Compiler.Service.MSBuild.v12">
-      <HintPath>..\..\packages\JetBrains.FSharp.Compiler.Service.12.0.8-3\lib\net45\FSharp.Compiler.Service.MSBuild.v12.dll</HintPath>
-    </Reference>
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\..\packages\SharpZipLib.JetBrains.Stripped.0.87.20161027.6\lib\net40\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>
@@ -136,11 +130,6 @@
       <HintPath>..\..\packages\Windows7APICodePack.JetBrains.Stripped.1.1.20150225.0\lib\Net\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
     </Reference>
     <Reference Include="mscorlib" />
-    <Reference Include="FSharp.Core">
-      <Name>FSharp.Core</Name>
-      <AssemblyName>FSharp.Core.dll</AssemblyName>
-      <HintPath>$(MSBuildProgramFiles32)\Reference Assemblies\Microsoft\FSharp\.NETFramework\v4.0\$(TargetFSharpCoreVersion)\FSharp.Core.dll</HintPath>
-    </Reference>
     <Reference Include="Newtonsoft.Json">
       <HintPath>..\..\packages\Newtonsoft.Json.6.0.4\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -230,6 +219,9 @@
     </Reference>
     <Reference Include="Sprache">
       <HintPath>..\..\packages\Sprache.JetBrains.2.1.0\lib\net40\Sprache.dll</HintPath>
+    </Reference>
+    <Reference Include="FSharp.Core, Version=4.4.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+      <HintPath>..\..\packages\FSharp.Core.4.1.17\lib\net45\FSharp.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Collections.Immutable">

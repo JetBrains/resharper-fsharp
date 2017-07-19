@@ -27,7 +27,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     public static IDeclaredType GetBaseType([NotNull] FSharpEntity entity,
       IList<ITypeParameter> typeParametersFromContext, [NotNull] IPsiModule psiModule)
     {
-      return entity.BaseType != null
+      return entity.BaseType != null // bug: may freze here
         ? GetType(entity.BaseType.Value, typeParametersFromContext, psiModule) as IDeclaredType
         : TypeFactory.CreateUnknownType(psiModule);
     }

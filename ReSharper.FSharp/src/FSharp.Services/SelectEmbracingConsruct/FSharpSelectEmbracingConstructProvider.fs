@@ -17,7 +17,7 @@ open Microsoft.FSharp.Compiler.Ast
 open Microsoft.FSharp.Compiler.SourceCodeServices
 open Microsoft.FSharp.Compiler.SourceCodeServices.AstTraversal
 
-type FSharpSelection(file, range, parentRanges : DocumentRange list) =
+type FSharpSelection(file, range, parentRanges: DocumentRange list) =
     inherit SelectedRangeBase<IFSharpFile>(file, range)
     
     override x.Parent =
@@ -26,7 +26,7 @@ type FSharpSelection(file, range, parentRanges : DocumentRange list) =
         | _ -> null
 
 
-type FSharpDotSelection(file, document, range : TreeTextRange, parentRanges : DocumentRange list) =
+type FSharpDotSelection(file, document, range: TreeTextRange, parentRanges: DocumentRange list) =
     inherit DotSelection<IFSharpFile>(file, range.StartOffset, range.Length = 0, false)
 
     override x.CreateTreeNodeSelection(tokenNode) =
@@ -46,7 +46,7 @@ type FSharpDotSelection(file, document, range : TreeTextRange, parentRanges : Do
     override x.CreateTokenPartSelection(tokenNode, treeTextRange) = null
 
 [<AbstractClass>]
-type FSharpSelectEmbracingConstructProviderBase(settingsStore : ISettingsStore) =
+type FSharpSelectEmbracingConstructProviderBase(settingsStore: ISettingsStore) =
     let getRanges = function
         | TraverseStep.Expr(expr) -> [expr.Range]
         | TraverseStep.Module(moduleDecl) -> [moduleDecl.Range]

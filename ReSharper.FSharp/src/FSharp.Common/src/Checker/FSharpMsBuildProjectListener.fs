@@ -17,14 +17,14 @@ type FileSystemPath = Util.FileSystemPath
 
 type ProjectFiles =
     {
-        Compile       : FileSystemPath list
-        CompileBefore : FileSystemPath list
-        CompileAfter  : FileSystemPath list
+        Compile:       FileSystemPath list
+        CompileBefore: FileSystemPath list
+        CompileAfter:  FileSystemPath list
     }
     static member Empty = {Compile = []; CompileBefore = []; CompileAfter = []}
 
 [<SolutionInstanceComponent>]
-type FSharpProjectFilesFromTargetsProvider(lifetime : Lifetime) =
+type FSharpProjectFilesFromTargetsProvider(lifetime: Lifetime) =
     inherit RecursiveProjectModelChangeDeltaVisitor()
 
     let projects = Dictionary<IProjectMark, ProjectFiles>() // todo: multiple frameworks

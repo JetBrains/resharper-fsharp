@@ -8,4 +8,4 @@ open JetBrains.ReSharper.Feature.Services.ClrLanguages
 [<ShellComponent>]
 type FSharpClrLanguage() =
     interface IClrLanguagesKnown with
-        member x.Language = FSharpLanguage.Instance :> PsiLanguageType
+        member x.Language = FSharpLanguage.Instance :> _
