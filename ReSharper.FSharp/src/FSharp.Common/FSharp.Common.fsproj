@@ -10,8 +10,8 @@
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Common</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Common</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <TargetFSharpCoreVersion>4.4.1.0</TargetFSharpCoreVersion>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFSharpCoreVersion>4.4.0.0</TargetFSharpCoreVersion>
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
     <Name>FSharp.Common</Name>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -95,14 +95,14 @@
     <Reference Include="DevExpress.XtraTreeList.v7.1">
       <HintPath>..\..\packages\JetBrains.Platform.Lib.DevExpress.2.0.20150224.0\lib\Net\DevExpress.XtraTreeList.v7.1.dll</HintPath>
     </Reference>
-    <Reference Include="FSharp.Compiler.Service, Version=4.4.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\..\packages\JetBrains.FSharp.Compiler.Service.12.0.8-4\lib\net40\FSharp.Compiler.Service.dll</HintPath>
+    <Reference Include="FSharp.Compiler.Service">
+      <HintPath>..\..\packages\JetBrains.FSharp.Compiler.Service.12.0.8-5\lib\net40\FSharp.Compiler.Service.dll</HintPath>
     </Reference>
-    <Reference Include="FSharp.Compiler.Service.MSBuild.v12, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\packages\JetBrains.FSharp.Compiler.Service.12.0.8-4\lib\net40\FSharp.Compiler.Service.MSBuild.v12.dll</HintPath>
+    <Reference Include="FSharp.Compiler.Service.MSBuild.v12">
+      <HintPath>..\..\packages\JetBrains.FSharp.Compiler.Service.12.0.8-5\lib\net40\FSharp.Compiler.Service.MSBuild.v12.dll</HintPath>
     </Reference>
-    <Reference Include="FSharp.Core, Version=4.4.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\..\packages\FSharp.Core.4.1.17\lib\net45\FSharp.Core.dll</HintPath>
+    <Reference Include="FSharp.Core">
+      <HintPath>..\..\packages\FSharp.Core.4.1.17\lib\net40\FSharp.Core.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\..\packages\SharpZipLib.JetBrains.Stripped.0.87.20161027.6\lib\net40\ICSharpCode.SharpZipLib.dll</HintPath>
