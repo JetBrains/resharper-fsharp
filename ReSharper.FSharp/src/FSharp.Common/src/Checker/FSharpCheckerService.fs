@@ -16,6 +16,7 @@ open JetBrains.ProjectModel.Properties
 open JetBrains.ProjectModel.Properties.CSharp
 open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open Microsoft.FSharp.Compiler
 open Microsoft.FSharp.Compiler.SourceCodeServices
@@ -40,19 +41,21 @@ type FSharpCheckerService(lifetime, onSolutionCloseNotifier: OnSolutionCloseNoti
 
     member x.ParseFile([<NotNull>] file: IPsiSourceFile) =
         match x.OptionsProvider.GetParsingOptions(file, checker, false) with
-        | Some projectOptions as options ->
+        | Some parsingOptions as options ->
             let filePath = file.GetLocation().FullPath
             let source = file.Document.GetText()
-            options, Some (checker.ParseFile(filePath, source, projectOptions).RunAsTask())
+            options, Some (checker.ParseFile(filePath, source, parsingOptions).RunAsTask())
         | _ -> None, None
 
     member x.HasPairFile([<NotNull>] file: IPsiSourceFile) =
         x.OptionsProvider.HasPairFile(file, checker)
 
     member x.GetDefines(sourceFile: IPsiSourceFile) =
-        match x.OptionsProvider.TryGetFSharpProject(sourceFile, checker) with
-        | Some project -> project.ConfigurationDefines
-        | _ -> List.empty
+        if sourceFile.LanguageType.Equals(FSharpScriptProjectFileType.Instance) then []
+        else
+            match x.OptionsProvider.TryGetFSharpProject(sourceFile, checker) with
+            | Some project -> project.ConfigurationDefines
+            | _ -> List.empty
 
     member x.ParseAndCheckFile([<NotNull>] file: IPsiSourceFile, allowStaleResults: bool) =
         match x.OptionsProvider.GetProjectOptions(file, checker, true) with
