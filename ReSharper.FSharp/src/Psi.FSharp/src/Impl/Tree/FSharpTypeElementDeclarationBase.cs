@@ -6,7 +6,6 @@ using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
-using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
@@ -48,16 +47,14 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 
     public override FSharpSymbol GetFSharpSymbol()
     {
-      var fsFile = this.GetContainingFile() as IFSharpFile;
-      var assemblySignature = fsFile?.GetParseAndCheckResults()?.Value.CheckResults.PartialAssemblySignature;
-      var namesPath = ListModule.OfSeq(FSharpImplUtil.MakeNamePath(this));
-      var entityFromAssemblySignature = assemblySignature?.FindEntityByPath(namesPath)?.Value;
-      if (entityFromAssemblySignature != null)
-        return entityFromAssemblySignature;
+      var symbol = base.GetFSharpSymbol();
+      if (symbol is FSharpEntity) return symbol;
 
-      // workaround for entities hidden by signature files
-      // todo: remove when fixed in FCS
-      return base.GetFSharpSymbol();
+      var mfv = symbol as FSharpMemberOrFunctionOrValue;
+      if (mfv == null)
+        return null;
+
+      return mfv.IsConstructor || mfv.IsImplicitConstructor ? mfv.EnclosingEntity : null;
     }
 
     [NotNull]
