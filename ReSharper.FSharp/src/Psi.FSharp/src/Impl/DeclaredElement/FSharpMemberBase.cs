@@ -46,7 +46,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 
     public override bool HasAttributeInstance(IClrTypeName clrName, bool inherit)
     {
-      return FSharpSymbol.Attributes.Any(a => a.AttributeType.FullName == clrName.FullName);
+      return FSharpSymbol.Attributes.Any(a => a.AttributeType.QualifiedName.SubstringBefore(",") == clrName.FullName);
     }
 
     public InvocableSignature GetSignature(ISubstitution substitution)
