@@ -6,7 +6,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
 {
   internal class StructPart : FSharpTypeMembersOwnerTypePart, Struct.IStructPart
   {
-    public StructPart(IFSharpTypeDeclaration declaration, ICacheBuilder cacheBuilder) : base(declaration, cacheBuilder)
+    public StructPart([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
+      : base(declaration, cacheBuilder)
     {
     }
 
@@ -33,7 +34,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
     public FSharpStruct([NotNull] IStructPart part) : base(part)
     {
     }
-    
+
     protected override MemberDecoration Modifiers => myParts.GetModifiers();
   }
 }

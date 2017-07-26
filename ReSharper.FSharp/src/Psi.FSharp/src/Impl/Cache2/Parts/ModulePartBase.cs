@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Tree;
@@ -10,8 +11,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
   internal abstract class ModulePartBase<T> : FSharpTypePart<T>, Class.IClassPart
     where T : class, IFSharpDeclaration, ITypeDeclaration
   {
-    protected ModulePartBase(T declaration, MemberDecoration memberDecoration, ICacheBuilder cacheBuilder)
-      : base(declaration, memberDecoration, 0, cacheBuilder)
+    protected ModulePartBase([NotNull] T declaration, [NotNull] string shortName, MemberDecoration memberDecoration,
+      [NotNull] ICacheBuilder cacheBuilder)
+      : base(declaration, shortName, memberDecoration, 0, cacheBuilder)
     {
     }
 

@@ -1,4 +1,5 @@
-﻿using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+﻿using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.Util;
 
@@ -6,7 +7,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
 {
   internal abstract class FSharpTypeMembersOwnerTypePart : FSharpClassLikePart<IFSharpTypeDeclaration>
   {
-    protected FSharpTypeMembersOwnerTypePart(IFSharpTypeDeclaration declaration, ICacheBuilder cacheBuilder)
+    protected FSharpTypeMembersOwnerTypePart([NotNull] IFSharpTypeDeclaration declaration,
+      [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifiers, declaration.AttributesEnumerable),
         declaration.TypeParameters, cacheBuilder)
     {
@@ -27,7 +29,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
           continue;
         }
 
-        var interfaceInheritTypeIdentifier = (member as IInterfaceInherit)?.InterfaceType?.LongIdentifier; 
+        var interfaceInheritTypeIdentifier = (member as IInterfaceInherit)?.InterfaceType?.LongIdentifier;
         if (interfaceInheritTypeIdentifier != null)
           extendListShortNames.Add(interfaceInheritTypeIdentifier.Name);
       }

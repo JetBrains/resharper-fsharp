@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 
@@ -6,7 +7,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
 {
   internal class EnumPart : FSharpTypeParametersOwnerPart<IEnumDeclaration>, Enum.IEnumPart
   {
-    public EnumPart(IEnumDeclaration declaration, ICacheBuilder builder)
+    public EnumPart([NotNull] IEnumDeclaration declaration, [NotNull] ICacheBuilder builder)
       : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifiers, declaration.AttributesEnumerable),
         declaration.TypeParameters, builder)
     {

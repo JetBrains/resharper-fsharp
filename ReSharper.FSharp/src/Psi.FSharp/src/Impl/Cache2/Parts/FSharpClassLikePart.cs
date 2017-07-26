@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Tree;
@@ -9,8 +10,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
   internal abstract class FSharpClassLikePart<T> : FSharpTypeParametersOwnerPart<T>,
     ClassLikeTypeElement.IClassLikePart where T : class, IFSharpTypeDeclaration, ITypeDeclaration
   {
-    protected FSharpClassLikePart(T declaration, MemberDecoration memberDecoration,
-      TreeNodeCollection<ITypeParameterOfTypeDeclaration> typeParameters, ICacheBuilder cacheBuilder)
+    protected FSharpClassLikePart([NotNull] T declaration, MemberDecoration memberDecoration,
+      TreeNodeCollection<ITypeParameterOfTypeDeclaration> typeParameters, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, memberDecoration, typeParameters, cacheBuilder)
     {
     }
