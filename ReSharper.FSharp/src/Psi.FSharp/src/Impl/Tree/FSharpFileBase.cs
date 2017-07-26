@@ -45,7 +45,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
           myDeclarationSymbols = new Dictionary<int, FSharpSymbol>(declaredSymbolUses.Length);
           foreach (var symbolUse in declaredSymbolUses)
             if (symbolUse.IsFromDefinition)
-              myDeclarationSymbols[document.GetOffset(symbolUse.RangeAlternate.Start)] = symbolUse.Symbol;
+            {
+              // todo: check multiple symbols by same offset (e.g. entity & implicit ctor)
+              var useOffset = document.GetOffset(symbolUse.RangeAlternate.Start);
+              myDeclarationSymbols[useOffset] = symbolUse.Symbol;
+            }
         }
       return myDeclarationSymbols?.TryGetValue(offset);
     }
