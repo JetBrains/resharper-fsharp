@@ -487,6 +487,7 @@
     <Compile Include="src\Impl\Tree\ExceptionDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FieldDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpFileBase.cs" />
+    <Compile Include="src\Impl\Tree\FSharpGlobalNamespaceDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpIdentifier.cs" />
     <Compile Include="src\Impl\Tree\FSharpIdentifierToken.cs" />
     <Compile Include="src\Impl\Tree\ModuleAbbreviation.cs" />

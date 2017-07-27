@@ -51,31 +51,41 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
         x.Done(mark, fileType)
         x.GetTree() :> ICompositeElement
 
-    member internal x.StartTopLevelDeclaration (lid: LongIdent) isModule =
-        let firstId = lid.Head
-        let idRange = firstId.idRange
-        if idRange.Start <> idRange.End then
-            // Missing ident may be replaced with file name with range 1,0-1,0.
+    member internal x.StartTopLevelDeclaration (lid: LongIdent) isModule (range: Range.range) =
+        match lid.IsEmpty, isModule with
+        | false, _ ->
+            let firstId = lid.Head
+            let idRange = firstId.idRange
+            if idRange.Start <> idRange.End then
+                // Missing ident may be replaced with file name with range 1,0-1,0.
+    
+                // Ast namespace range starts after its identifier,
+                // try to locate a keyword followed by access modifiers
+                let keywordTokenType = if isModule then FSharpTokenType.MODULE else FSharpTokenType.NAMESPACE
+                x.GetStartOffset firstId |> x.AdvanceToTokenOrOffset keywordTokenType
 
-            // Ast namespace range starts after its identifier,
-            // try to locate a keyword followed by access modifiers
-            let keywordTokenType = if isModule then FSharpTokenType.MODULE else FSharpTokenType.NAMESPACE
-            x.GetStartOffset firstId |> x.AdvanceToTokenOrOffset keywordTokenType
+            let mark = x.Builder.Mark()
+            if idRange.Start <> idRange.End then x.Builder.AdvanceLexer() |> ignore // skip keyword
+            
+            if isModule then x.ProcessModifiersBeforeOffset (x.GetStartOffset firstId)
+            x.ProcessLongIdentifier lid
+            let elementType =
+                if isModule
+                then ElementType.TOP_LEVEL_MODULE_DECLARATION
+                else ElementType.F_SHARP_NAMESPACE_DECLARATION
+            Some mark, elementType
+        | _, false ->
+            // global namespace or parse error
+            x.GetStartOffset range |> x.AdvanceToOffset
+            let mark = x.Builder.Mark()
+            x.Done(x.Builder.Mark(), ElementType.LONG_IDENTIFIER)
+            Some mark, ElementType.F_SHARP_GLOBAL_NAMESPACE_DECLARATION
+        | _ -> None, null
 
-        let mark = x.Builder.Mark()
-        if idRange.Start <> idRange.End then x.Builder.AdvanceLexer() |> ignore // skip keyword
-
-        if isModule then x.ProcessModifiersBeforeOffset (x.GetStartOffset firstId)
-        x.ProcessLongIdentifier lid
-        mark
-
-    member internal x.FinishTopLevelDeclaration mark range isModule =
+    member internal x.FinishTopLevelDeclaration (mark: int option) range elementType =
         range |> x.GetEndOffset |> x.AdvanceToOffset
-        let elementType =
-            if isModule
-            then ElementType.TOP_LEVEL_MODULE_DECLARATION
-            else ElementType.F_SHARP_NAMESPACE_DECLARATION
-        x.Done(mark, elementType)
+        if mark.IsSome then
+            x.Done(mark.Value, elementType)
 
     member internal x.ProcessAttributesAndStartRange (attrs: SynAttributes) (id: Ident option) (range: Range.range) =
         if attrs.IsEmpty then
