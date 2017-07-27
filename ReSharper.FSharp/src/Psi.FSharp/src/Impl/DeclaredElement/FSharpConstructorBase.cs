@@ -34,7 +34,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
         ctorParams.Add(new Parameter(this, ctorParams.Count, FSharpTypesUtil.GetParameterKind(param),
           FSharpTypesUtil.GetType(param.Type, declaration, Module), param.DisplayName));
 
-      Parameters = ctorParams.ToList();
+      Parameters = ctorParams.Count == 1 && ctorParams[0].Type.IsUnit(Module)
+        ? EmptyList<IParameter>.InstanceList
+        : ctorParams.ToList();
     }
 
     public override DeclaredElementType GetElementType()
