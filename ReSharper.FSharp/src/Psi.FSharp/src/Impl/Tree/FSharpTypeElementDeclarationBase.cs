@@ -48,7 +48,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
     public override FSharpSymbol GetFSharpSymbol()
     {
       var symbol = base.GetFSharpSymbol();
-      if (symbol is FSharpEntity) return symbol;
+      if (symbol is FSharpEntity || symbol is FSharpUnionCase) return symbol;
 
       var mfv = symbol as FSharpMemberOrFunctionOrValue;
       if (mfv == null)
