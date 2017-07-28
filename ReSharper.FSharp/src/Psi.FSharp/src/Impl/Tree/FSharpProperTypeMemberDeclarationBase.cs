@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
@@ -22,7 +23,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       {
         this.AssertIsValid("Asking declared element from invalid declaration");
         var cache = GetPsiServices().Caches.SourceDeclaredElementsCache;
-        return cache.GetOrCreateDeclaredElement(this, DeclaredElementFactory);
+        // todo: calc types on demand in members (move cookie to FSharpTypesUtil)
+        using (CompilationContextCookie.GetOrCreate(GetPsiModule().GetContextFromModule()))
+          return cache.GetOrCreateDeclaredElement(this, DeclaredElementFactory);
       }
     }
   }
