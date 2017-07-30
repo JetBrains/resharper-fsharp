@@ -37,7 +37,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       members.Add(new FSharpGeneratedMethod(this, CompareToName, objType, ObjName, compType, CompName, boolType));
 
       members.Add(new FSharpGeneratedMethod(this, EqualsName, thisType, ObjName, boolType));
-      members.Add(new FSharpGeneratedMethod(this, EqualsName, objType, ObjName, boolType));
+      members.Add(new FSharpGeneratedMethod(this, EqualsName, objType, ObjName, boolType, true));
       members.Add(new FSharpGeneratedMethod(this, EqualsName, objType, ObjName, eqCompType, CompName, boolType));
 
       members.Add(new FSharpGeneratedMethod(this, GetHashCodeName, intType, true));
