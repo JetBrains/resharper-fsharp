@@ -13,6 +13,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     {
     }
 
+    protected override bool EmitsFieldsConstructor() => false;
+
     public IEnumerable<ITypeMember> Cases =>
       base.GetMembers().Where(member => member is FSharpUnionCase || member is FSharpFieldProperty);
 
