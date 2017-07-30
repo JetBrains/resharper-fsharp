@@ -15,14 +15,14 @@ buildscript {
 }
 
 plugins {
-    id "org.jetbrains.intellij" version "0.2.7"
+    id "org.jetbrains.intellij" version "0.2.15"
 }
 
 apply plugin: 'kotlin'
 
 intellij {
     localPath "$projectDir/build/rider"
-    type 'RS'
+    type 'RD'
     downloadSources false
     updateSinceUntilBuild false
 }
@@ -39,7 +39,7 @@ runIde {
     systemProperties = [
             'rider.debug.mono.debug': true,
             'rider.debug.mono.allowConnect': true,
-            'idea.platform.prefix' : "Rider"
+            'idea.platform.prefix': "Rider"
     ]
 }
 

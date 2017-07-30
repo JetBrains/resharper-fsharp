@@ -20,7 +20,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 
     protected override IDeclaredElement CreateDeclaredElement()
     {
-      return new FSharpConstructor(this, GetFSharpSymbol() as FSharpMemberOrFunctionOrValue);
+      var ctor = GetFSharpSymbol() as FSharpMemberOrFunctionOrValue;
+      return ctor != null ? new FSharpConstructor(this, ctor) : null;
     }
   }
 }

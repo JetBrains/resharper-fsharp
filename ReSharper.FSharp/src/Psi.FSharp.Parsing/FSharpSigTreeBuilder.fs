@@ -21,10 +21,9 @@ type FSharpSigTreeBuilder(file, lexer, parseTree, lifetime, logger: ILogger) =
         x.FinishFile mark ElementType.F_SHARP_SIG_FILE
 
     member private x.ProcessTopLevelSignature (SynModuleOrNamespaceSig(lid,_,isModule,sigs,_,_,_,range)) =
-        if not lid.IsEmpty then
-            let mark = x.StartTopLevelDeclaration lid isModule
-            for s in sigs do x.ProcessModuleMemberSignature s
-            x.FinishTopLevelDeclaration mark range isModule
+        let mark, elementType = x.StartTopLevelDeclaration lid isModule range
+        for s in sigs do x.ProcessModuleMemberSignature s
+        x.FinishTopLevelDeclaration mark range elementType
 
     member private x.ProcessModuleMemberSignature moduleMember =
         match moduleMember with
@@ -70,8 +69,7 @@ type FSharpSigTreeBuilder(file, lexer, parseTree, lifetime, logger: ILogger) =
                     ElementType.ENUM_DECLARATION
 
                 | SynTypeDefnSimpleRepr.Union(_,cases,_) ->
-                    for c in cases do x.ProcessUnionCase c
-                    ElementType.UNION_DECLARATION
+                    x.ProcessUnionCases(cases)
 
                 | SynTypeDefnSimpleRepr.TypeAbbrev(_) ->
                     ElementType.TYPE_ABBREVIATION_DECLARATION

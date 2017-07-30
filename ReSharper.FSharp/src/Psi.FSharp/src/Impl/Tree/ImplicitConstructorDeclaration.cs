@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using JetBrains.ReSharper.Psi.ExtensionsAPI;
+﻿using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
@@ -20,8 +19,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 
     protected override IDeclaredElement CreateDeclaredElement()
     {
-      var entity = GetFSharpSymbol() as FSharpEntity;
-      var ctor = entity?.MembersFunctionsAndValues.FirstOrDefault(m => m.IsImplicitConstructor);
+      var ctor = GetFSharpSymbol() as FSharpMemberOrFunctionOrValue;
       return ctor != null ? new FSharpImplicitConstructor(this, ctor) : null;
     }
   }

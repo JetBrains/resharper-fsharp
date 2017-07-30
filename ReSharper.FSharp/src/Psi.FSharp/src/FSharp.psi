@@ -71,11 +71,17 @@ interface moduleLikeDeclaration:
 
 interface topLevelModuleOrNamespaceDeclaration:
   topLevelModuleDeclaration |
-  fSharpNamespaceDeclaration;
+  fSharpNamespaceDeclaration |
+  fSharpGlobalNamespaceDeclaration;
 
 fSharpNamespaceDeclaration options { stubBase="FSharpDeclarationBase"; }:
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>
   moduleMember<MODULE_MEMBER, Members>*;
+
+fSharpGlobalNamespaceDeclaration options { stubBase="FSharpDeclarationBase"; }:
+  longIdentifier<LONG_IDENTIFIER, LongIdentifier> // should be empty, needed here for common interface
+  moduleMember<MODULE_MEMBER, Members>*
+  fakeSeparator;
 
 topLevelModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
@@ -116,6 +122,10 @@ interface simpleTypeDeclaration:
   recordDeclaration |
   unionDeclaration |
   notCompiledTypeDeclaration;
+
+interface unionDeclaration:
+  singleCaseUnionDeclaration |
+  multipleCasesUnionDeclaration;
 
 interface notCompiledTypeDeclaration:
   typeAbbreviationDeclaration |
@@ -175,8 +185,18 @@ fieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
 
 // Discriminated unions
 
-unionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
-  get { methodName="TypeParameters" path=<unionDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
+multipleCasesUnionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
+  get { methodName="TypeParameters" path=<multipleCasesUnionDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
+}:
+  fSharpAttribute<ATTRIBUTE, Attributes>*
+  accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
+  fSharpIdentifier<IDENTIFIER, Identifier>
+  typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
+  unionCaseDeclaration<UNION_CASE, UnionCases>* fakeSeparator
+  fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
+
+singleCaseUnionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
+  get { methodName="TypeParameters" path=<singleCaseUnionDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
 }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>

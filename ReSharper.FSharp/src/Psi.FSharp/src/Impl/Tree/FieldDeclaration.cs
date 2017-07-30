@@ -1,5 +1,8 @@
-﻿using JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement;
+﻿using System.Collections.Generic;
+using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
@@ -20,33 +23,39 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       var symbol = GetFSharpSymbol();
       var unionCase = symbol as FSharpUnionCase;
       if (unionCase != null)
-      {
         return new FSharpFieldProperty(this, unionCase);
-      }
 
-      var field = symbol as FSharpField;
-      if (field != null)
-      {
-        // the field is in a property
-        return new FSharpFieldProperty(this, field);
-      }
+      var namedField = symbol as FSharpField;
+      if (namedField != null)
+        return new FSharpFieldProperty(this, namedField);
 
-      // the field is in a union case
-      var unionCaseDecl = GetContainingNode<IUnionCaseDeclaration>();
-      var containingUnionCase = unionCaseDecl?.GetFSharpSymbol() as FSharpUnionCase;
-      if (containingUnionCase == null)
-        return new FSharpFieldProperty(this, null);
+      // the field doesn't have a name and is in a union case or in an exception
+      var typeDeclaration = Parent as IFSharpTypeDeclaration;
+      var typeSymbol = typeDeclaration?.GetFSharpSymbol();
+      if (typeDeclaration == null || typeSymbol == null)
+        return null;
 
-      var caseFields = unionCaseDecl.Fields;
-      var index = caseFields.IndexOf(this);
-      Assertion.Assert(index != -1, "index != -1");
+      var fieldDeclarations = typeDeclaration.Children<FieldDeclaration>().ToTreeNodeCollection();
+      var index = fieldDeclarations.IndexOf(this);
+      var fields = GetFields(typeSymbol);
+      var caseField = index <= fields.Count ? fields[index] : null;
 
-      var unionCaseFields = containingUnionCase.UnionCaseFields;
-      var caseField = index <= unionCaseFields.Count
-        ? unionCaseFields[index]
+      return caseField != null
+        ? new FSharpFieldProperty(this, caseField)
         : null;
+    }
 
-      return new FSharpFieldProperty(this, caseField);
+    private static IList<FSharpField> GetFields([NotNull] FSharpSymbol typeSymbol)
+    {
+      var unionCase = typeSymbol as FSharpUnionCase;
+      if (unionCase != null)
+        return unionCase.UnionCaseFields;
+
+      var entity = typeSymbol as FSharpEntity;
+      if (entity != null && entity.IsFSharpExceptionDeclaration)
+        return entity.FSharpFields;
+
+      return null;
     }
   }
 }

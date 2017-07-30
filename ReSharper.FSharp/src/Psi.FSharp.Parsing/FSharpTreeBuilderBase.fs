@@ -51,31 +51,41 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
         x.Done(mark, fileType)
         x.GetTree() :> ICompositeElement
 
-    member internal x.StartTopLevelDeclaration (lid: LongIdent) isModule =
-        let firstId = lid.Head
-        let idRange = firstId.idRange
-        if idRange.Start <> idRange.End then
-            // Missing ident may be replaced with file name with range 1,0-1,0.
+    member internal x.StartTopLevelDeclaration (lid: LongIdent) isModule (range: Range.range) =
+        match lid.IsEmpty, isModule with
+        | false, _ ->
+            let firstId = lid.Head
+            let idRange = firstId.idRange
+            if idRange.Start <> idRange.End then
+                // Missing ident may be replaced with file name with range 1,0-1,0.
+    
+                // Ast namespace range starts after its identifier,
+                // try to locate a keyword followed by access modifiers
+                let keywordTokenType = if isModule then FSharpTokenType.MODULE else FSharpTokenType.NAMESPACE
+                x.GetStartOffset firstId |> x.AdvanceToTokenOrOffset keywordTokenType
 
-            // Ast namespace range starts after its identifier,
-            // try to locate a keyword followed by access modifiers
-            let keywordTokenType = if isModule then FSharpTokenType.MODULE else FSharpTokenType.NAMESPACE
-            x.GetStartOffset firstId |> x.AdvanceToTokenOrOffset keywordTokenType
+            let mark = x.Builder.Mark()
+            if idRange.Start <> idRange.End then x.Builder.AdvanceLexer() |> ignore // skip keyword
+            
+            if isModule then x.ProcessModifiersBeforeOffset (x.GetStartOffset firstId)
+            x.ProcessLongIdentifier lid
+            let elementType =
+                if isModule
+                then ElementType.TOP_LEVEL_MODULE_DECLARATION
+                else ElementType.F_SHARP_NAMESPACE_DECLARATION
+            Some mark, elementType
+        | _, false ->
+            // global namespace or parse error
+            x.GetStartOffset range |> x.AdvanceToOffset
+            let mark = x.Builder.Mark()
+            x.Done(x.Builder.Mark(), ElementType.LONG_IDENTIFIER)
+            Some mark, ElementType.F_SHARP_GLOBAL_NAMESPACE_DECLARATION
+        | _ -> None, null
 
-        let mark = x.Builder.Mark()
-        if idRange.Start <> idRange.End then x.Builder.AdvanceLexer() |> ignore // skip keyword
-
-        if isModule then x.ProcessModifiersBeforeOffset (x.GetStartOffset firstId)
-        x.ProcessLongIdentifier lid
-        mark
-
-    member internal x.FinishTopLevelDeclaration mark range isModule =
+    member internal x.FinishTopLevelDeclaration (mark: int option) range elementType =
         range |> x.GetEndOffset |> x.AdvanceToOffset
-        let elementType =
-            if isModule
-            then ElementType.TOP_LEVEL_MODULE_DECLARATION
-            else ElementType.F_SHARP_NAMESPACE_DECLARATION
-        x.Done(mark, elementType)
+        if mark.IsSome then
+            x.Done(mark.Value, elementType)
 
     member internal x.ProcessAttributesAndStartRange (attrs: SynAttributes) (id: Ident option) (range: Range.range) =
         if attrs.IsEmpty then
@@ -98,12 +108,13 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
             x.ProcessIdentifier id
         mark
 
-    member internal x.ProcessException (SynExceptionDefnRepr(_,UnionCase(_,id,_,_,_,_),_,_,_,range)) =
+    member internal x.ProcessException (SynExceptionDefnRepr(_,UnionCase(_,id,unionCaseType,_,_,_),_,_,_,range)) =
         range |> x.GetStartOffset |> x.AdvanceToOffset
         let mark = x.Builder.Mark()
         x.Builder.AdvanceLexer() |> ignore // skip keyword
-        x.ProcessModifiersBeforeOffset  (x.GetStartOffset id)
-        x.ProcessIdentifier id
+        x.ProcessModifiersBeforeOffset(x.GetStartOffset id)
+        x.ProcessIdentifier(id)
+        x.ProcessUnionCaseType(unionCaseType) |> ignore
 
         range |> x.GetEndOffset |> x.AdvanceToOffset
         x.Builder.Done(mark, ElementType.EXCEPTION_DECLARATION, null)
@@ -160,20 +171,28 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
         match caseType with
         | UnionCaseFields(fields) ->
             for f in fields do x.ProcessField f
-            fields.IsEmpty
+            not fields.IsEmpty
 
         | UnionCaseFullType(_) ->
-            false // todo: used in FSharp.Core only, otherwise warning
+            true // todo: used in FSharp.Core only, otherwise warning
+
+    member internal x.ProcessUnionCases(cases) =
+        match cases with
+        | [singleCase] ->
+            x.ProcessUnionCase(singleCase)
+            ElementType.SINGLE_CASE_UNION_DECLARATION
+        | cases ->
+            for case in cases do x.ProcessUnionCase(case)
+            ElementType.MULTIPLE_CASES_UNION_DECLARATION
 
     member internal x.ProcessUnionCase (UnionCase(_,id,caseType,_,_,range)) =
         range |> x.GetStartOffset |> x.AdvanceToOffset
         let mark = x.Builder.Mark()
 
-        x.ProcessIdentifier id
-        let isSingleton = x.ProcessUnionCaseType caseType
-        let elementType = if isSingleton then ElementType.FIELD_DECLARATION
-                                         else ElementType.UNION_CASE_DECLARATION
-
+        x.ProcessIdentifier(id)
+        let hasFields = x.ProcessUnionCaseType(caseType)
+        let elementType = if hasFields then ElementType.UNION_CASE_DECLARATION
+                                       else ElementType.FIELD_DECLARATION
         range |> x.GetEndOffset |> x.AdvanceToOffset
         x.Done(mark, elementType)
 

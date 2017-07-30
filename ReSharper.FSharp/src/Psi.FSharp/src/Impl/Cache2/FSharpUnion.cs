@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement;
 using JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement.CompilerGenerated;
@@ -12,43 +13,43 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     {
     }
 
-    public IEnumerable<ITypeMember> Cases
-    {
-      get
-      {
-        foreach (var member in base.GetMembers())
-          if (member is FSharpUnionCase || member is FSharpFieldProperty)
-            yield return member;
-      }
-    }
+    protected override bool EmitsFieldsConstructor() => false;
+
+    public IEnumerable<ITypeMember> Cases =>
+      base.GetMembers().Where(member => member is FSharpUnionCase || member is FSharpFieldProperty);
 
     public override IEnumerable<ITypeMember> GetMembers()
     {
-      var intType = Module.GetPredefinedType().Int;
-      var boolType = Module.GetPredefinedType().Bool;
-      var thisType = TypeFactory.CreateType(this);
+      var predefinedType = Module.GetPredefinedType();
+      var unionType = TypeFactory.CreateType(this);
+      var cases = Cases.AsCollection();
+      var isSingleCaseUnion = cases.Count == 1;
 
-      var generatedMembers = new LocalList<ITypeMember>();
-      foreach (var unionCase in Cases)
+      var members = new LocalList<ITypeMember>();
+      foreach (var unionCase in cases)
       {
-        generatedMembers.Add(new FSharpGeneratedProperty(this, "Is" + unionCase.ShortName, boolType));
+        var caseName = unionCase.ShortName;
+        if (!isSingleCaseUnion)
+          members.Add(new FSharpGeneratedProperty(this, "Is" + caseName, predefinedType.Bool));
 
-        var typedUnionCase = unionCase as FSharpUnionCase;
-        if (typedUnionCase == null)
-          continue;
+        var typedCase = unionCase as FSharpUnionCase;
+        if (typedCase == null) continue;
 
-        var typedCase = typedUnionCase;
         var fields = typedCase.CaseFields.AsArray();
         var types = fields.Convert(f => f.Type);
         var names = fields.Convert(f => f.ShortName);
-        generatedMembers.Add(new FSharpGeneratedMethod(this, "New" + unionCase.ShortName, types, names, thisType,
-          false, true));
+        members.Add(new FSharpGeneratedMethod(this, "New" + caseName, types, names, unionType, isStatic: true));
       }
 
-      generatedMembers.Add(new FSharpGeneratedProperty(this, "Tag", intType));
-      generatedMembers.Add(new FSharpTagsClass(this));
+      var theOnlyCase = isSingleCaseUnion ? cases.FirstOrDefault() as FSharpUnionCase : null;
+      if (theOnlyCase != null)
+        members.AddRange(theOnlyCase?.CaseFields);
 
-      return base.GetMembers().Prepend(generatedMembers.ResultingList());
+      members.Add(new FSharpGeneratedProperty(this, "Tag", predefinedType.Int));
+      if (!isSingleCaseUnion)
+        members.Add(new FSharpUnionTagsClass(this));
+
+      return base.GetMembers().Prepend(members.ResultingList());
     }
   }
 }

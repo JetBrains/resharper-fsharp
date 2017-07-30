@@ -186,8 +186,9 @@ type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISol
             let fsProject = getProject file 
             fsProject.FilesWithPairs.Contains(file.GetLocation())
         
-        member x.GetParsingOptions(file, checker, updateScriptOptions) =
-            if file.LanguageType.Equals(FSharpScriptProjectFileType.Instance) then
+        member x.GetParsingOptions(file, checker) =
+            if file.LanguageType.Equals(FSharpScriptProjectFileType.Instance) ||
+               file.PsiModule.IsMiscFilesProjectModule() then
                 let scriptParsingOptions =
                     {
                       SourceFiles = Array.ofList [file.GetLocation().FullPath]

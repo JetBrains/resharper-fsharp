@@ -20,10 +20,9 @@ type FSharpImplTreeBuilder(file, lexer, parseTree, lifetime, logger: ILogger) =
         x.FinishFile mark ElementType.F_SHARP_IMPL_FILE
 
     member private x.ProcessTopLevelDeclaration (SynModuleOrNamespace(lid,_,isModule,decls,_,_,_,range)) =
-        if not lid.IsEmpty then
-            let mark = x.StartTopLevelDeclaration lid isModule
-            for decl in decls do x.ProcessModuleMemberDeclaration decl
-            x.FinishTopLevelDeclaration mark range isModule
+        let mark, elementType = x.StartTopLevelDeclaration lid isModule range
+        for decl in decls do x.ProcessModuleMemberDeclaration decl
+        x.FinishTopLevelDeclaration mark range elementType  
 
     member internal x.ProcessModuleMemberDeclaration moduleMember =
         match moduleMember with
@@ -38,7 +37,6 @@ type FSharpImplTreeBuilder(file, lexer, parseTree, lifetime, logger: ILogger) =
 
         | SynModuleDecl.Exception(SynExceptionDefn(exn,_,_),_) ->
             x.ProcessException exn
-            // todo: members
 
         | SynModuleDecl.Open(lidWithDots,range) ->
             range |> x.GetStartOffset |> x.AdvanceToOffset
@@ -84,9 +82,7 @@ type FSharpImplTreeBuilder(file, lexer, parseTree, lifetime, logger: ILogger) =
                         ElementType.ENUM_DECLARATION
 
                     | SynTypeDefnSimpleRepr.Union(_,cases,_) ->
-                        for case in cases do
-                            x.ProcessUnionCase case
-                        ElementType.UNION_DECLARATION
+                        x.ProcessUnionCases(cases)
 
                     | SynTypeDefnSimpleRepr.TypeAbbrev(_,t,_) ->
                         x.ProcessSynType t

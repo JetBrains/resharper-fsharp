@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿﻿using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.Modules;
@@ -7,6 +7,7 @@ using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 using JetBrains.Util.Extension;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
+using Microsoft.FSharp.Core;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Util
 {
@@ -23,13 +24,22 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     private const string UnitClrName = "Microsoft.FSharp.Core.Unit";
     private const string NativeptrLogicalName = "nativeptr`1";
 
+    private static readonly object ourFcsLock = new object();
+
     [CanBeNull]
     public static IDeclaredType GetBaseType([NotNull] FSharpEntity entity,
       IList<ITypeParameter> typeParametersFromContext, [NotNull] IPsiModule psiModule)
     {
-      return entity.BaseType != null // bug: may freze here
-        ? GetType(entity.BaseType.Value, typeParametersFromContext, psiModule) as IDeclaredType
+      var fsBaseType = GetFSharpBaseType(entity);
+      return fsBaseType != null
+        ? GetType(fsBaseType.Value, typeParametersFromContext, psiModule) as IDeclaredType
         : TypeFactory.CreateUnknownType(psiModule);
+    }
+
+    private static FSharpOption<FSharpType> GetFSharpBaseType([NotNull] FSharpEntity entity)
+    {
+      lock (ourFcsLock)
+        return entity.BaseType;
     }
 
     [NotNull]
@@ -142,8 +152,12 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
         if (entity.IsByRef) // e.g. byref<int>, we need int
           return GetType(type.GenericArguments[0], typeParametersFromContext, psiModule);
 
-        if (entity.IsProvidedAndErased && entity.BaseType != null)
-          return GetType(entity.BaseType.Value, typeParametersFromContext, psiModule);
+        if (entity.IsProvidedAndErased)
+        {
+          var fsBaseType = GetFSharpBaseType(entity);
+          if (fsBaseType != null)
+            return GetType(fsBaseType.Value, typeParametersFromContext, psiModule);
+        }
       }
 
       var clrName = GetClrName(type);

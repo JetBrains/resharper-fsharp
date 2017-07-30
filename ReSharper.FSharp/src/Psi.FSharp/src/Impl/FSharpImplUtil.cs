@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2;
 using JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
@@ -93,27 +93,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
     }
 
     [NotNull]
-    public static IEnumerable<string> MakeNamePath([NotNull] IFSharpTypeElementDeclaration declaration)
-    {
-      var containingTypeDeclaration = declaration.GetContainingTypeDeclaration() as IFSharpTypeElementDeclaration;
-      if (containingTypeDeclaration != null)
-        foreach (var name in MakeNamePath(containingTypeDeclaration))
-          yield return name;
-      else
-      {
-        var namespaceDeclaration = declaration.GetContainingNamespaceDeclaration();
-        if (namespaceDeclaration != null)
-          foreach (var name in namespaceDeclaration.QualifiedName.Split("."))
-            yield return name;
-      }
-      var typeParamsOwner = declaration as IFSharpTypeDeclaration;
-      var declName = typeParamsOwner?.TypeParameters.Count > 0
-        ? declaration.DeclaredName + "`" + typeParamsOwner.TypeParameters.Count
-        : declaration.DeclaredName;
-      yield return declName;
-    }
-
-    [NotNull]
     public static string MakeClrName([NotNull] IFSharpTypeElementDeclaration declaration)
     {
       var clrName = new StringBuilder();
@@ -172,6 +151,18 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
       var letDecl = declaration as Let;
       var cases = letDecl?.Identifier.Children<ActivePatternCaseDeclaration>().AsIList();
       return cases?.Count > index ? cases[index].DeclaredElement : null;
+    }
+
+    [NotNull]
+    public static string GetNestedModuleShortName(INestedModuleDeclaration declaration, ICacheBuilder cacheBuilder)
+    {
+      var parent = declaration.Parent as IModuleLikeDeclaration;
+      var shortName = declaration.ShortName;
+      var moduleName =
+        parent?.Children<IFSharpTypeDeclaration>().Any(t => t.ShortName == shortName) ?? false
+          ? shortName + "Module"
+          : shortName;
+      return cacheBuilder.Intern(moduleName);
     }
   }
 }

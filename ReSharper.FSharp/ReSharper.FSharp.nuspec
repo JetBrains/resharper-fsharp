@@ -3,7 +3,7 @@
   <metadata>
     <id>JetBrains.ReSharper.FSharp</id>
     <title>ReSharper.FSharp</title>
-    <version>0.1</version>
+    <version>0.1.63</version>
     <authors>JetBrains auduchinok</authors>
     <owners>JetBrains auduchinok</owners>
     <summary>F# support</summary>
@@ -27,12 +27,12 @@
     <file src="src\Daemon.FSharp\bin\Debug\JetBrains.ReSharper.Daemon.FSharp.dll" target="DotFiles" />
     <file src="src\Services.FSharp\bin\Debug\JetBrains.ReSharper.Feature.Services.FSharp.dll" target="DotFiles" />
     <file src="src\Psi.FSharp.Parsing\bin\Debug\Psi.FSharp.Parsing.dll" target="DotFiles" />
-    <file src="packages\FSharp.Core.4.1.12\lib\net40\FSharp.Core.dll" target="DotFiles" />
-    <file src="packages\FSharp.Core.4.1.12\lib\net40\FSharp.Core.optdata" target="DotFiles" />
-    <file src="packages\FSharp.Core.4.1.12\lib\net40\FSharp.Core.sigdata" target="DotFiles" />
-    <file src="packages\JetBrains.FSharp.Compiler.Service.12.0.8-3\lib\net45\FSharp.Compiler.Service.dll" target="DotFiles"/>
-    <file src="packages\JetBrains.FSharp.Compiler.Service.12.0.8-3\lib\net45\FSharp.Compiler.Service.MSBuild.v12.dll" target="DotFiles"/>
-    <file src="packages\JetBrains.Fantomas.2.6.1-1\lib\FantomasLib.dll" target="DotFiles" />
+    <file src="packages\FSharp.Core.4.1.17\lib\net40\FSharp.Core.dll" target="DotFiles" />
+    <file src="packages\FSharp.Core.4.1.17\lib\net40\FSharp.Core.optdata" target="DotFiles" />
+    <file src="packages\FSharp.Core.4.1.17\lib\net40\FSharp.Core.sigdata" target="DotFiles" />
+    <file src="packages\JetBrains.FSharp.Compiler.Service.12.0.8-5\lib\net40\FSharp.Compiler.Service.dll" target="DotFiles"/>
+    <file src="packages\JetBrains.FSharp.Compiler.Service.12.0.8-5\lib\net40\FSharp.Compiler.Service.MSBuild.v12.dll" target="DotFiles"/>
+    <file src="packages\JetBrains.Fantomas.2.6.1-3\lib\FantomasLib.dll" target="DotFiles" />
     <file src="packages\System.ValueTuple.4.3.0\lib\netstandard1.0\System.ValueTuple.dll" target="DotFiles"/>
   </files>
 </package>

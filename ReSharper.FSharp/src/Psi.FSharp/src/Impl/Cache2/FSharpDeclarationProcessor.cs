@@ -60,6 +60,12 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       FinishModuleLikeDeclaraion(decl);
     }
 
+    public override void VisitFSharpGlobalNamespaceDeclaration(IFSharpGlobalNamespaceDeclaration decl)
+    {
+      foreach (var memberDecl in decl.MembersEnumerable)
+        memberDecl.Accept(this);
+    }
+
     public override void VisitTopLevelModuleDeclaration(ITopLevelModuleDeclaration decl)
     {
       Builder.StartPart(new TopLevelModulePart(decl, Builder));
@@ -105,18 +111,32 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       Builder.EndPart();
     }
 
-    public override void VisitUnionDeclaration(IUnionDeclaration decl)
+    public void FinishUnionDeclaration(IUnionDeclaration decl)
     {
-      Builder.StartPart(new UnionPart(decl, Builder));
       foreach (var unionCase in decl.UnionCasesEnumerable)
         unionCase.Accept(this);
       ProcessTypeMembers(decl.MemberDeclarations);
       Builder.EndPart();
     }
 
+    public override void VisitMultipleCasesUnionDeclaration(IMultipleCasesUnionDeclaration decl)
+    {
+      Builder.StartPart(new UnionPart(decl, Builder));
+      FinishUnionDeclaration(decl);
+    }
+
+    public override void VisitSingleCaseUnionDeclaration(ISingleCaseUnionDeclaration decl)
+    {
+      Builder.StartPart(new UnionPart(decl, Builder));
+      var theOnlyCase = decl.UnionCases.SingleOrDefault();
+      if (theOnlyCase != null)
+        ProcessTypeMembers(theOnlyCase.MemberDeclarations);
+      FinishUnionDeclaration(decl);
+    }
+
     public override void VisitUnionCaseDeclaration(IUnionCaseDeclaration decl)
     {
-      Builder.StartPart(new UnionCasePart(decl, Builder));
+      Builder.StartPart(new UnionCasePart(decl, Builder, decl.Parent is ISingleCaseUnionDeclaration));
       ProcessTypeMembers(decl.MemberDeclarations);
       Builder.EndPart();
     }

@@ -16,9 +16,12 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
   /// </summary>
   internal class FSharpFieldProperty : FSharpTypeMember<FieldDeclaration>, IProperty
   {
-    internal FSharpFieldProperty([NotNull] IFieldDeclaration declaration, FSharpSymbol symbol)
+    internal FSharpFieldProperty([NotNull] IFieldDeclaration declaration, [NotNull] FSharpSymbol symbol)
       : base(declaration)
     {
+      Assertion.Assert(symbol is FSharpField || symbol is FSharpUnionCase,
+        "symbol is FSharpField || symbol is FSharpUnionCase");
+
       var field = symbol as FSharpField;
       if (field != null)
       {
@@ -30,23 +33,14 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
         return;
       }
 
-      var unionCase = symbol as FSharpUnionCase;
-      if (unionCase != null)
-      {
-        IsWritable = false;
-        var containingType = declaration.GetContainingTypeDeclaration()?.DeclaredElement;
-        ReturnType = containingType != null
-          ? TypeFactory.CreateType(containingType)
-          : TypeFactory.CreateUnknownType(Module);
-        ShortName = unionCase.Name;
-        IsStatic = true;
-        return;
-      }
-
+      var unionCase = (FSharpUnionCase) symbol;
       IsWritable = false;
-      ReturnType = TypeFactory.CreateUnknownType(Module);
-      ShortName = declaration.ShortName;
-
+      var containingType = declaration.GetContainingTypeDeclaration()?.DeclaredElement;
+      ReturnType = containingType != null
+        ? TypeFactory.CreateType(containingType)
+        : TypeFactory.CreateUnknownType(Module);
+      ShortName = unionCase.Name;
+      IsStatic = true;
     }
 
     public override string ShortName { get; }

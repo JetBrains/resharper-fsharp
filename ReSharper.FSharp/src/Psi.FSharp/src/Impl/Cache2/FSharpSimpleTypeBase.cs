@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts;
+using JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement;
 using JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement.CompilerGenerated;
 using JetBrains.Util;
 
@@ -15,6 +17,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     private const string CompName = "comp";
     private const string ComparerTypeName = "System.Collections.IComparer";
     private const string EqComparerTypeName = "System.Collections.IEqualityComparer";
+
+    protected virtual bool ImplementsCompareTo() => true;
+    protected virtual bool EmitsFieldsConstructor() => true;
 
     public FSharpSimpleTypeBase([NotNull] IClassPart part) : base(part)
     {
@@ -32,16 +37,27 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
 
       var members = new LocalList<ITypeMember>();
 
-      members.Add(new FSharpGeneratedMethod(this, CompareToName, thisType, ObjName, boolType));
-      members.Add(new FSharpGeneratedMethod(this, CompareToName, objType, ObjName, boolType));
-      members.Add(new FSharpGeneratedMethod(this, CompareToName, objType, ObjName, compType, CompName, boolType));
+      if (ImplementsCompareTo())
+      {
+        members.Add(new FSharpGeneratedMethod(this, CompareToName, thisType, ObjName, boolType));
+        members.Add(new FSharpGeneratedMethod(this, CompareToName, objType, ObjName, boolType));
+        members.Add(new FSharpGeneratedMethod(this, CompareToName, objType, ObjName, compType, CompName, boolType));
+      }
 
       members.Add(new FSharpGeneratedMethod(this, EqualsName, thisType, ObjName, boolType));
-      members.Add(new FSharpGeneratedMethod(this, EqualsName, objType, ObjName, boolType));
+      members.Add(new FSharpGeneratedMethod(this, EqualsName, objType, ObjName, boolType, true));
       members.Add(new FSharpGeneratedMethod(this, EqualsName, objType, ObjName, eqCompType, CompName, boolType));
 
       members.Add(new FSharpGeneratedMethod(this, GetHashCodeName, intType, true));
       members.Add(new FSharpGeneratedMethod(this, GetHashCodeName, eqCompType, CompName, intType, true));
+
+      if (EmitsFieldsConstructor())
+      {
+        var fields = base.GetMembers().OfType<FSharpFieldProperty>().AsArray();
+        if (!fields.IsEmpty())
+          members.Add(new FSharpGeneratedConstructor(this, fields));
+      }
+
 
       return base.GetMembers().Prepend(members.ResultingList());
     }

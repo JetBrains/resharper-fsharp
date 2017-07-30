@@ -76,11 +76,11 @@
       <HintPath>..\..\packages\JetBrains.Platform.Lib.DevExpress.2.0.20150224.0\lib\Net\DevExpress.XtraTreeList.v7.1.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="FSharp.Compiler.Service, Version=4.4.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\..\packages\JetBrains.FSharp.Compiler.Service.12.0.8-4\lib\net40\FSharp.Compiler.Service.dll</HintPath>
+    <Reference Include="FSharp.Compiler.Service">
+      <HintPath>..\..\packages\JetBrains.FSharp.Compiler.Service.12.0.8-5\lib\net40\FSharp.Compiler.Service.dll</HintPath>
     </Reference>
-    <Reference Include="FSharp.Core, Version=4.4.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
-      <HintPath>..\..\packages\FSharp.Core.4.1.17\lib\net45\FSharp.Core.dll</HintPath>
+    <Reference Include="FSharp.Core">
+      <HintPath>..\..\packages\FSharp.Core.4.1.17\lib\net40\FSharp.Core.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.NRefactory">
       <HintPath>..\..\packages\ICSharpCode.NRefactory.5.5.1\lib\Net40\ICSharpCode.NRefactory.dll</HintPath>
@@ -417,9 +417,9 @@
     <Compile Include="src\Impl\DeclaredElement\CompilerGenerated\FSharpGeneratedMemberBase.cs" />
     <Compile Include="src\Impl\DeclaredElement\CompilerGenerated\FSharpGeneratedMethod.cs" />
     <Compile Include="src\Impl\DeclaredElement\CompilerGenerated\FSharpGeneratedProperty.cs" />
-    <Compile Include="src\Impl\DeclaredElement\CompilerGenerated\FSharpTagsClass.cs" />
+    <Compile Include="src\Impl\DeclaredElement\CompilerGenerated\FSharpUnionTagsClass.cs" />
     <Compile Include="src\Impl\DeclaredElement\FSharpAttributeInstance.cs" />
-    <Compile Include="src\Impl\DeclaredElement\FSharpParameter.cs" />
+    <Compile Include="src\Impl\DeclaredElement\FSharpMethodParameter.cs" />
     <Compile Include="src\FSharpScriptProjectFileLanguageService.cs" />
     <Compile Include="src\Gen\Psi\FSharp\**\*.cs">
       <SubType>Code</SubType>
@@ -487,6 +487,7 @@
     <Compile Include="src\Impl\Tree\ExceptionDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FieldDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpFileBase.cs" />
+    <Compile Include="src\Impl\Tree\FSharpGlobalNamespaceDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpIdentifier.cs" />
     <Compile Include="src\Impl\Tree\FSharpIdentifierToken.cs" />
     <Compile Include="src\Impl\Tree\ModuleAbbreviation.cs" />
@@ -495,6 +496,7 @@
     <Compile Include="src\Impl\Tree\Let.cs" />
     <Compile Include="src\Impl\Tree\LocalDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpNamespaceDeclaration.cs" />
+    <Compile Include="src\Impl\Tree\MultipleCasesUnionDeclaration.cs" />
     <Compile Include="src\Impl\Tree\OtherSimpleTypeDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpProperTypeMemberDeclarationBase.cs" />
     <Compile Include="src\Impl\Tree\RecordDeclaration.cs" />
@@ -503,7 +505,7 @@
     <Compile Include="src\Impl\Tree\TypeAbbreviationDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpTypeElementDeclarationBase.cs" />
     <Compile Include="src\Impl\Tree\UnionCaseDeclaration.cs" />
-    <Compile Include="src\Impl\Tree\UnionDeclaration.cs" />
+    <Compile Include="src\Impl\Tree\SingleCaseUnionDeclaration.cs" />
     <Compile Include="src\Impl\Tree\ObjectTypeDeclaration.cs" />
     <Compile Include="src\Impl\Tree\LongIdentifier.cs" />
     <Compile Include="src\Impl\Tree\MemberDeclaration.cs" />

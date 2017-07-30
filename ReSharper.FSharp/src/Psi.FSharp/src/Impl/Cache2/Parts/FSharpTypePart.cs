@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement;
@@ -13,8 +14,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
 {
   public abstract class FSharpTypePart<T> : TypePartImplBase<T> where T : class, IFSharpDeclaration, ITypeDeclaration
   {
-    protected FSharpTypePart(T declaration, MemberDecoration memberDecoration, int typeParameters,
-      ICacheBuilder cacheBuilder) : base(declaration, cacheBuilder.Intern(declaration.ShortName), typeParameters)
+    protected FSharpTypePart([NotNull] T declaration, [NotNull] string shortName, MemberDecoration memberDecoration,
+      int typeParameters, [NotNull] ICacheBuilder cacheBuilder) : base(declaration, shortName, typeParameters)
     {
       Modifiers = memberDecoration;
 

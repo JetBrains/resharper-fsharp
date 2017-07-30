@@ -9,7 +9,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement.CompilerGenerated
 {
-  internal class FSharpTagsClass : FSharpGeneratedMemberBase, IClass
+  internal class FSharpUnionTagsClass : FSharpGeneratedMemberBase, IClass
   {
     private class TagField : FSharpGeneratedMemberBase, IField
     {
@@ -58,7 +58,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement.CompilerGenerated
 
     [NotNull] private readonly FSharpUnion myContainingType;
 
-    internal FSharpTagsClass([NotNull] FSharpUnion containingType) : base(containingType)
+    internal FSharpUnionTagsClass([NotNull] FSharpUnion containingType) : base(containingType)
     {
       myContainingType = containingType;
     }
@@ -124,10 +124,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement.CompilerGenerated
         var count = 0;
         var tags = new LocalList<IField>();
         foreach (var unionCase in myContainingType.Cases)
-        {
-          tags.Add(new TagField(unionCase.ShortName, this, this, count));
-          count++;
-        }
+          tags.Add(new TagField(unionCase.ShortName, this, this, count++));
         return tags.ResultingList();
       }
     }

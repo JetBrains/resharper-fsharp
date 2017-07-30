@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Tree;
@@ -11,9 +12,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
   {
     private readonly string[] myTypeParameterNames;
 
-    protected FSharpTypeParametersOwnerPart(T declaration, MemberDecoration memberDecoration,
-      TreeNodeCollection<ITypeParameterOfTypeDeclaration> typeParameters, ICacheBuilder cacheBuilder)
-      : base(declaration, memberDecoration, typeParameters.Count, cacheBuilder)
+    protected FSharpTypeParametersOwnerPart([NotNull] T declaration, MemberDecoration memberDecoration,
+      TreeNodeCollection<ITypeParameterOfTypeDeclaration> typeParameters, [NotNull] ICacheBuilder cacheBuilder)
+      : base(declaration, cacheBuilder.Intern(declaration.ShortName), memberDecoration, typeParameters.Count, cacheBuilder)
     {
       var parameters = declaration.TypeParameters;
       if (parameters.Count == 0)

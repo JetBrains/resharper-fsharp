@@ -1,4 +1,5 @@
-﻿using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+﻿using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
@@ -12,7 +13,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
   /// </summary>
   internal class HiddenTypePart : FSharpClassLikePart<IFSharpTypeDeclaration>, Class.IClassPart
   {
-    public HiddenTypePart(IFSharpTypeDeclaration declaration, ICacheBuilder cacheBuilder)
+    public HiddenTypePart([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifiers, declaration.AttributesEnumerable),
         declaration.TypeParameters, cacheBuilder)
     {

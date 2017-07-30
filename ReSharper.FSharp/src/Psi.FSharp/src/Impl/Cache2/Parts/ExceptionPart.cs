@@ -1,4 +1,5 @@
-﻿using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+﻿using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.Util;
 
@@ -8,7 +9,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
   {
     private static readonly string[] ourExtendsListShortNames = {"Exception", "IStructuralEquatable"};
 
-    public ExceptionPart(IFSharpTypeDeclaration declaration, ICacheBuilder cacheBuilder)
+    public ExceptionPart([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, cacheBuilder)
     {
     }

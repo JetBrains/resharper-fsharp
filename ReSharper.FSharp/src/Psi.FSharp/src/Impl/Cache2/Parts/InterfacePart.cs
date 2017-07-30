@@ -1,11 +1,12 @@
-﻿using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+﻿using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
 {
   internal class InterfacePart : FSharpTypeMembersOwnerTypePart, Interface.IInterfacePart
   {
-    public InterfacePart(IFSharpTypeDeclaration declaration, ICacheBuilder cacheBuilder)
+    public InterfacePart([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, cacheBuilder)
     {
     }

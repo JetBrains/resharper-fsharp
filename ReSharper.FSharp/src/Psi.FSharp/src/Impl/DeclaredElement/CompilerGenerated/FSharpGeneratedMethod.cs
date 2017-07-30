@@ -27,7 +27,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement.CompilerGenerated
       };
     }
 
-    public FSharpGeneratedMethod([NotNull] Class containingType,
+    public FSharpGeneratedMethod([NotNull] IClass containingType,
       string shortName, IType parameterType, string parameterName, IType returnType, bool isOverride = false,
       bool isStatic = false)
       : base(containingType)
@@ -50,9 +50,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement.CompilerGenerated
       Parameters = EmptyList<IParameter>.Instance;
     }
 
-    public FSharpGeneratedMethod([NotNull] Class containingType,
-      string shortName, IType[] paramTypes, string[] paramNames, IType returnType, bool isOverride = false,
-      bool isStatic = false) : base(containingType)
+    public FSharpGeneratedMethod([NotNull] IClass containingType, string shortName, IReadOnlyList<IType> paramTypes,
+      IReadOnlyList<string> paramNames, IType returnType, bool isOverride = false, bool isStatic = false) : base(
+      containingType)
     {
       ShortName = shortName;
       ReturnType = returnType;
@@ -60,7 +60,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement.CompilerGenerated
       IsStatic = isStatic;
 
       var parameters = new LocalList<IParameter>();
-      for (var i = 0; i < paramTypes.Length; i++)
+      for (var i = 0; i < paramTypes.Count; i++)
         parameters.Add(new Parameter(this, i, ParameterKind.VALUE, paramTypes[i], paramNames[i]));
 
       Parameters = parameters.ResultingList();
