@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Xml;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
@@ -7,17 +9,23 @@ using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 using JetBrains.Util.DataStructures;
+using JetBrains.Util.Extension;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 {
   public class FSharpMethodParameter : IParameter
   {
+    private const string OptionalTypeName = "System.Runtime.InteropServices.OptionalAttribute";
+
+    private const string DefaultParameterValueTypeName =
+      "System.Runtime.InteropServices.DefaultParameterValueAttribute";
+
     private readonly IParametersOwner myParametersOwner;
     private readonly int myParameterIndex;
 
-    public FSharpMethodParameter(FSharpParameter fsParam, [NotNull] IParametersOwner parametersOwner, int parameterIndex,
-      ParameterKind kind, IType type, string name)
+    public FSharpMethodParameter(FSharpParameter fsParam, [NotNull] IParametersOwner parametersOwner,
+      int parameterIndex, ParameterKind kind, IType type, string name)
     {
       FSharpSymbol = fsParam;
       Type = type;
@@ -113,13 +121,32 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 
     public DefaultValue GetDefaultValue()
     {
-      return DefaultValue.BAD_VALUE;
+      try
+      {
+        // todo: implement DefaultValue in FCS
+        var defaultValueAttr = FSharpSymbol.Attributes
+          .FirstOrDefault(a => a.AttributeType.QualifiedName.SubstringBefore(",")
+            .Equals(DefaultParameterValueTypeName, StringComparison.Ordinal))?.ConstructorArguments.FirstOrDefault();
+        return defaultValueAttr == null
+          ? new DefaultValue(Type)
+          : new DefaultValue(new ConstantValue(defaultValueAttr.Item2, type: null));
+      }
+      // todo: change exception in FCS
+      catch (Exception)
+      {
+        return DefaultValue.BAD_VALUE;
+      }
     }
 
     public ParameterKind Kind { get; }
     public bool IsParameterArray => FSharpSymbol.IsParamArrayArg;
     public bool IsValueVariable => false;
-    public bool IsOptional => false;
+
+    // todo: implement IsCliOptional in FCS
+    public bool IsOptional =>
+      FSharpSymbol.Attributes.Any(a =>
+        a.AttributeType.QualifiedName.SubstringBefore(",").Equals(OptionalTypeName, StringComparison.Ordinal));
+
     public bool IsVarArg => false;
     public IParametersOwner ContainingParametersOwner => myParametersOwner;
 
