@@ -55,8 +55,10 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 
     public AttributeValue NamedParameter(string name)
     {
-      var attr = myAttr.NamedArguments.First(a => a.Item2 == name);
-      return GetAttributeValue(new Tuple<FSharpType, object>(attr.Item1, attr.Item4));
+      var param = myAttr.NamedArguments.FirstOrDefault(p => p.Item2.Equals(name, StringComparison.Ordinal));
+      return param != null
+        ? new AttributeValue(new ConstantValue(param.Item4, type: null))
+        : AttributeValue.BAD_VALUE;
     }
 
     public IEnumerable<Pair<string, AttributeValue>> NamedParameters()
