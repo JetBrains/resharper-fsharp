@@ -417,9 +417,9 @@
     <Compile Include="src\Impl\DeclaredElement\CompilerGenerated\FSharpGeneratedMemberBase.cs" />
     <Compile Include="src\Impl\DeclaredElement\CompilerGenerated\FSharpGeneratedMethod.cs" />
     <Compile Include="src\Impl\DeclaredElement\CompilerGenerated\FSharpGeneratedProperty.cs" />
-    <Compile Include="src\Impl\DeclaredElement\CompilerGenerated\FSharpTagsClass.cs" />
+    <Compile Include="src\Impl\DeclaredElement\CompilerGenerated\FSharpUnionTagsClass.cs" />
     <Compile Include="src\Impl\DeclaredElement\FSharpAttributeInstance.cs" />
-    <Compile Include="src\Impl\DeclaredElement\FSharpParameter.cs" />
+    <Compile Include="src\Impl\DeclaredElement\FSharpMethodParameter.cs" />
     <Compile Include="src\FSharpScriptProjectFileLanguageService.cs" />
     <Compile Include="src\Gen\Psi\FSharp\**\*.cs">
       <SubType>Code</SubType>
@@ -496,6 +496,7 @@
     <Compile Include="src\Impl\Tree\Let.cs" />
     <Compile Include="src\Impl\Tree\LocalDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpNamespaceDeclaration.cs" />
+    <Compile Include="src\Impl\Tree\MultipleCasesUnionDeclaration.cs" />
     <Compile Include="src\Impl\Tree\OtherSimpleTypeDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpProperTypeMemberDeclarationBase.cs" />
     <Compile Include="src\Impl\Tree\RecordDeclaration.cs" />
@@ -504,7 +505,7 @@
     <Compile Include="src\Impl\Tree\TypeAbbreviationDeclaration.cs" />
     <Compile Include="src\Impl\Tree\FSharpTypeElementDeclarationBase.cs" />
     <Compile Include="src\Impl\Tree\UnionCaseDeclaration.cs" />
-    <Compile Include="src\Impl\Tree\UnionDeclaration.cs" />
+    <Compile Include="src\Impl\Tree\SingleCaseUnionDeclaration.cs" />
     <Compile Include="src\Impl\Tree\ObjectTypeDeclaration.cs" />
     <Compile Include="src\Impl\Tree\LongIdentifier.cs" />
     <Compile Include="src\Impl\Tree\MemberDeclaration.cs" />

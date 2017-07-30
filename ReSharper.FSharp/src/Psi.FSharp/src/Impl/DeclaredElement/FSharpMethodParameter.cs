@@ -7,21 +7,22 @@ using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 using JetBrains.Util.DataStructures;
+using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 {
-  public class FSharpParameter : IParameter
+  public class FSharpMethodParameter : IParameter
   {
     private readonly IParametersOwner myParametersOwner;
     private readonly int myParameterIndex;
 
-    public FSharpParameter([NotNull] IParametersOwner parametersOwner, int parameterIndex, ParameterKind kind,
-      IType type, string name, bool isParameterArray)
+    public FSharpMethodParameter(FSharpParameter fsParam, [NotNull] IParametersOwner parametersOwner, int parameterIndex,
+      ParameterKind kind, IType type, string name)
     {
+      FSharpSymbol = fsParam;
       Type = type;
       Kind = kind;
       ShortName = name;
-      IsParameterArray = isParameterArray;
       myParametersOwner = parametersOwner;
       myParameterIndex = parameterIndex;
     }
@@ -92,6 +93,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 
     public IPsiModule Module => myParametersOwner.Module;
     public ISubstitution IdSubstitution => EmptySubstitution.INSTANCE;
+    public FSharpParameter FSharpSymbol { get; }
     public IType Type { get; }
 
     public IList<IAttributeInstance> GetAttributeInstances(bool inherit)
@@ -115,7 +117,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
     }
 
     public ParameterKind Kind { get; }
-    public bool IsParameterArray { get; }
+    public bool IsParameterArray => FSharpSymbol.IsParamArrayArg;
     public bool IsValueVariable => false;
     public bool IsOptional => false;
     public bool IsVarArg => false;
@@ -123,7 +125,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 
     public override bool Equals(object obj)
     {
-      var parameter = obj as FSharpParameter;
+      var parameter = obj as FSharpMethodParameter;
       if (parameter == null) return false;
 
       return myParametersOwner.Equals(parameter.myParametersOwner) &&

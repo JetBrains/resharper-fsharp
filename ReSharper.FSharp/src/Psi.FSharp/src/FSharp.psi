@@ -123,6 +123,10 @@ interface simpleTypeDeclaration:
   unionDeclaration |
   notCompiledTypeDeclaration;
 
+interface unionDeclaration:
+  singleCaseUnionDeclaration |
+  multipleCasesUnionDeclaration;
+
 interface notCompiledTypeDeclaration:
   typeAbbreviationDeclaration |
   moduleAbbreviation |
@@ -181,8 +185,18 @@ fieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
 
 // Discriminated unions
 
-unionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
-  get { methodName="TypeParameters" path=<unionDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
+multipleCasesUnionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
+  get { methodName="TypeParameters" path=<multipleCasesUnionDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
+}:
+  fSharpAttribute<ATTRIBUTE, Attributes>*
+  accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
+  fSharpIdentifier<IDENTIFIER, Identifier>
+  typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
+  unionCaseDeclaration<UNION_CASE, UnionCases>* fakeSeparator
+  fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
+
+singleCaseUnionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
+  get { methodName="TypeParameters" path=<singleCaseUnionDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
 }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>

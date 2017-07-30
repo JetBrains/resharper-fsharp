@@ -8,7 +8,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
   internal class FSharpImplicitConstructor : FSharpConstructorBase<ImplicitConstructorDeclaration>
   {
     public FSharpImplicitConstructor([NotNull] ITypeMemberDeclaration declaration,
-      [CanBeNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)
+      [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)
     {
     }
 

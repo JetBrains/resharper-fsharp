@@ -18,15 +18,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
     IModifiersOwnerDeclaration
   {
     protected FSharpConstructorBase([NotNull] ITypeMemberDeclaration declaration,
-      [CanBeNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration)
+      [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration)
     {
       ReturnType = Module.GetPredefinedType().Void;
-
-      if (mfv == null)
-      {
-        Parameters = EmptyList<IParameter>.Instance;
-        return;
-      }
 
       var ctorParams = new FrugalLocalList<IParameter>();
       foreach (var paramsGroup in mfv.CurriedParameterGroups)

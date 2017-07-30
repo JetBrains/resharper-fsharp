@@ -37,7 +37,6 @@ type FSharpImplTreeBuilder(file, lexer, parseTree, lifetime, logger: ILogger) =
 
         | SynModuleDecl.Exception(SynExceptionDefn(exn,_,_),_) ->
             x.ProcessException exn
-            // todo: members
 
         | SynModuleDecl.Open(lidWithDots,range) ->
             range |> x.GetStartOffset |> x.AdvanceToOffset
@@ -83,9 +82,7 @@ type FSharpImplTreeBuilder(file, lexer, parseTree, lifetime, logger: ILogger) =
                         ElementType.ENUM_DECLARATION
 
                     | SynTypeDefnSimpleRepr.Union(_,cases,_) ->
-                        for case in cases do
-                            x.ProcessUnionCase case
-                        ElementType.UNION_DECLARATION
+                        x.ProcessUnionCases(cases)
 
                     | SynTypeDefnSimpleRepr.TypeAbbrev(_,t,_) ->
                         x.ProcessSynType t

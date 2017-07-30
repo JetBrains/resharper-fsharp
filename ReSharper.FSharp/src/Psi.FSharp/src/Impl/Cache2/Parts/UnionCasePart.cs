@@ -9,14 +9,24 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
 {
   internal class UnionCasePart : FSharpClassLikePart<IUnionCaseDeclaration>, Class.IClassPart
   {
-    public UnionCasePart([NotNull] IUnionCaseDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
-      : base(declaration, ModifiersUtil.GetDecoration(declaration),
-        TreeNodeCollection<ITypeParameterOfTypeDeclaration>.Empty, cacheBuilder)
+    private readonly bool myIsHiddenCase;
+
+    public UnionCasePart([NotNull] IUnionCaseDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder,
+      bool isHiddenCase) : base(declaration, ModifiersUtil.GetDecoration(declaration),
+      TreeNodeCollection<ITypeParameterOfTypeDeclaration>.Empty, cacheBuilder)
     {
+      myIsHiddenCase = isHiddenCase;
+    }
+
+    protected override void Write(IWriter writer)
+    {
+      base.Write(writer);
+      writer.WriteBool(myIsHiddenCase);
     }
 
     public UnionCasePart(IReader reader) : base(reader)
     {
+      myIsHiddenCase = reader.ReadBool();
     }
 
     public override IEnumerable<IDeclaredType> GetSuperTypes()
@@ -31,7 +41,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
     }
 
     public override MemberDecoration Modifiers =>
-      GetDeclaration()?.Fields.IsEmpty ?? false
+      myIsHiddenCase || (GetDeclaration()?.Fields.IsEmpty ?? false)
         ? MemberDecoration.FromModifiers(Psi.Modifiers.INTERNAL)
         : base.Modifiers;
 

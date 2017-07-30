@@ -69,8 +69,7 @@ type FSharpSigTreeBuilder(file, lexer, parseTree, lifetime, logger: ILogger) =
                     ElementType.ENUM_DECLARATION
 
                 | SynTypeDefnSimpleRepr.Union(_,cases,_) ->
-                    for c in cases do x.ProcessUnionCase c
-                    ElementType.UNION_DECLARATION
+                    x.ProcessUnionCases(cases)
 
                 | SynTypeDefnSimpleRepr.TypeAbbrev(_) ->
                     ElementType.TYPE_ABBREVIATION_DECLARATION

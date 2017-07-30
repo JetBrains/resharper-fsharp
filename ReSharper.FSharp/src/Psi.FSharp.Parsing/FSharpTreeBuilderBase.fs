@@ -108,12 +108,13 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
             x.ProcessIdentifier id
         mark
 
-    member internal x.ProcessException (SynExceptionDefnRepr(_,UnionCase(_,id,_,_,_,_),_,_,_,range)) =
+    member internal x.ProcessException (SynExceptionDefnRepr(_,UnionCase(_,id,unionCaseType,_,_,_),_,_,_,range)) =
         range |> x.GetStartOffset |> x.AdvanceToOffset
         let mark = x.Builder.Mark()
         x.Builder.AdvanceLexer() |> ignore // skip keyword
-        x.ProcessModifiersBeforeOffset  (x.GetStartOffset id)
-        x.ProcessIdentifier id
+        x.ProcessModifiersBeforeOffset(x.GetStartOffset id)
+        x.ProcessIdentifier(id)
+        x.ProcessUnionCaseType(unionCaseType) |> ignore
 
         range |> x.GetEndOffset |> x.AdvanceToOffset
         x.Builder.Done(mark, ElementType.EXCEPTION_DECLARATION, null)
@@ -170,20 +171,28 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
         match caseType with
         | UnionCaseFields(fields) ->
             for f in fields do x.ProcessField f
-            fields.IsEmpty
+            not fields.IsEmpty
 
         | UnionCaseFullType(_) ->
-            false // todo: used in FSharp.Core only, otherwise warning
+            true // todo: used in FSharp.Core only, otherwise warning
+
+    member internal x.ProcessUnionCases(cases) =
+        match cases with
+        | [singleCase] ->
+            x.ProcessUnionCase(singleCase)
+            ElementType.SINGLE_CASE_UNION_DECLARATION
+        | cases ->
+            for case in cases do x.ProcessUnionCase(case)
+            ElementType.MULTIPLE_CASES_UNION_DECLARATION
 
     member internal x.ProcessUnionCase (UnionCase(_,id,caseType,_,_,range)) =
         range |> x.GetStartOffset |> x.AdvanceToOffset
         let mark = x.Builder.Mark()
 
-        x.ProcessIdentifier id
-        let isSingleton = x.ProcessUnionCaseType caseType
-        let elementType = if isSingleton then ElementType.FIELD_DECLARATION
-                                         else ElementType.UNION_CASE_DECLARATION
-
+        x.ProcessIdentifier(id)
+        let hasFields = x.ProcessUnionCaseType(caseType)
+        let elementType = if hasFields then ElementType.UNION_CASE_DECLARATION
+                                       else ElementType.FIELD_DECLARATION
         range |> x.GetEndOffset |> x.AdvanceToOffset
         x.Done(mark, elementType)
 

@@ -25,7 +25,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       myLogger = logger;
     }
 
-    private const int CacheVersion = 4;
+    private const int CacheVersion = 5;
 
     public void BuildCache(IFile file, ICacheBuilder builder)
     {
