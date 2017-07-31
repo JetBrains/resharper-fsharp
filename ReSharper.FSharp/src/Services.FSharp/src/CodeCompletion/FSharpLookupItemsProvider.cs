@@ -89,7 +89,7 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
           if (entity.IsAttributeType)
           {
             isEscaped = false;
-            return entity.CompiledName.SubstringBeforeLast("Attribute");
+            return entity.CompiledName.SubstringBeforeLast("Attribute", StringComparison.Ordinal);
           }
         }
         catch
@@ -135,9 +135,11 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
       {
         return FSharpAsync.RunSynchronously(getCompletionsAsync, FSharpOption<int>.Some(2000), null);
       }
-      catch (TimeoutException)
+      catch (Exception e)
       {
-        Logger.LogError("Getting symbol at location: {0}: {1}", context.BasicContext.SourceFile.GetLocation().FullPath, coords);
+        Logger.LogMessage(LoggingLevel.WARN, "Error while getting symbol at location: {0}: {1}",
+          context.BasicContext.SourceFile.GetLocation().FullPath, coords);
+        Logger.LogExceptionSilently(e);
         return null;
       }
     }

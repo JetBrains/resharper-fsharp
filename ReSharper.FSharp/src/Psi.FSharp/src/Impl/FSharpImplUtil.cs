@@ -38,6 +38,12 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
       return ids.IsEmpty ? null : ids.Last();
     }
 
+    private static bool AttributeHasShortName([NotNull] this IFSharpAttribute attr, [NotNull] string shortName)
+    {
+      var attrName = attr.LongIdentifier?.Name.SubstringBeforeLast("Attribute", StringComparison.Ordinal);
+      return attrName != null && attrName.Equals(shortName, StringComparison.Ordinal);
+    }
+
     [NotNull]
     public static string GetCompiledName([CanBeNull] IIdentifier identifier,
       TreeNodeCollection<IFSharpAttribute> attributes)
@@ -46,16 +52,16 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl
 
       foreach (var attr in attributes)
       {
-        if (attr.LongIdentifier?.Name.SubstringBeforeLast("Attribute") == "CompiledName" &&
-            attr.ArgExpression.String != null) // todo: proper expressions evaluation, e.g. "S1" + "S2"
+        // todo: proper expressions evaluation, e.g. "S1" + "S2"
+        if (attr.AttributeHasShortName("CompiledName") && attr.ArgExpression.String != null)
         {
           var compiledNameString = attr.ArgExpression.String.GetText();
           return compiledNameString.Substring(1, compiledNameString.Length - 2);
         }
 
-        if (!hasModuleSuffix &&
-            attr.LongIdentifier?.Name.SubstringBeforeLast("Attribute") == "CompilationRepresentation" &&
-            attr.ArgExpression.LongIdentifier?.QualifiedName == "CompilationRepresentationFlags.ModuleSuffix")
+        if (hasModuleSuffix || !attr.AttributeHasShortName("CompilationRepresentation")) continue;
+        var arg = attr.ArgExpression.LongIdentifier?.QualifiedName;
+        if (arg != null && arg.Equals("CompilationRepresentationFlags.ModuleSuffix", StringComparison.Ordinal))
           hasModuleSuffix = true;
       }
       var sourceName = identifier?.Name;

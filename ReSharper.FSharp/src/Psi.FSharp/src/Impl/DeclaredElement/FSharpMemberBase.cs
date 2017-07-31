@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
@@ -46,7 +47,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 
     public override bool HasAttributeInstance(IClrTypeName clrName, bool inherit)
     {
-      return FSharpSymbol.Attributes.Any(a => a.AttributeType.QualifiedName.SubstringBefore(",") == clrName.FullName);
+      return FSharpSymbol.Attributes.Any(a =>
+        a.AttributeType.QualifiedName.SubstringBefore(",", StringComparison.Ordinal).Equals(clrName.FullName, StringComparison.Ordinal));
     }
 
     public InvocableSignature GetSignature(ISubstitution substitution)

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.Modules;
@@ -72,7 +73,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
 
       // qualified name may include assembly name, public key, etc and separated with comma, e.g. for unit it returns
       // "Microsoft.FSharp.Core.Unit, FSharp.Core, Version=4.4.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
-      return entity.QualifiedName.SubstringBefore(",");
+      return entity.QualifiedName.SubstringBefore(",", StringComparison.Ordinal);
     }
 
     [CanBeNull]
@@ -260,7 +261,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       var fsType = param.Type;
       if (fsType.HasTypeDefinition && fsType.TypeDefinition.IsByRef)
       {
-        return param.Attributes.Any(a => a.AttributeType.FullName == "System.Runtime.InteropServices.OutAttribute")
+        return param.Attributes.Any(a =>
+          a.AttributeType.QualifiedName.SubstringBefore(",", StringComparison.Ordinal)
+            .Equals("System.Runtime.InteropServices.OutAttribute", StringComparison.Ordinal))
           ? ParameterKind.OUTPUT
           : ParameterKind.REFERENCE;
       }
@@ -270,7 +273,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
 
     public static bool IsParamArray([NotNull] FSharpParameter param)
     {
-      return param.Attributes.Any(a => a.AttributeType.FullName == "System.ParamArrayAttribute");
+      return param.Attributes.Any(a =>
+        a.AttributeType.QualifiedName.SubstringBefore(",", StringComparison.Ordinal)
+          .Equals("System.ParamArrayAttribute", StringComparison.Ordinal));
     }
 
     private static bool IsNativePtr([NotNull] this FSharpEntity entity)

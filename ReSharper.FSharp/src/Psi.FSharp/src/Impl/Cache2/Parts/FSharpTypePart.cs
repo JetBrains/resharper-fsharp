@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
@@ -27,7 +28,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
       }
       var attrNames = new FrugalLocalHashSet<string>();
       foreach (var attr in attrOwner.AttributesEnumerable)
-        attrNames.Add(cacheBuilder.Intern(attr.GetText().SubstringBeforeLast("Attribute")));
+        attrNames.Add(cacheBuilder.Intern(attr.GetText().SubstringBeforeLast("Attribute", StringComparison.Ordinal)));
       AttributeClassNames = attrNames.ToArray();
     }
 

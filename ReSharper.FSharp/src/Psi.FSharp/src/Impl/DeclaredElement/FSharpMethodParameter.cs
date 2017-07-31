@@ -125,7 +125,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
       {
         // todo: implement DefaultValue in FCS
         var defaultValueAttr = FSharpSymbol.Attributes
-          .FirstOrDefault(a => a.AttributeType.QualifiedName.SubstringBefore(",")
+          .FirstOrDefault(a => a.AttributeType.QualifiedName.SubstringBefore(",", StringComparison.Ordinal)
             .Equals(DefaultParameterValueTypeName, StringComparison.Ordinal))?.ConstructorArguments.FirstOrDefault();
         return defaultValueAttr == null
           ? new DefaultValue(Type)
@@ -145,7 +145,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
     // todo: implement IsCliOptional in FCS
     public bool IsOptional =>
       FSharpSymbol.Attributes.Any(a =>
-        a.AttributeType.QualifiedName.SubstringBefore(",").Equals(OptionalTypeName, StringComparison.Ordinal));
+        a.AttributeType.QualifiedName.SubstringBefore(",", StringComparison.Ordinal).Equals(OptionalTypeName, StringComparison.Ordinal));
 
     public bool IsVarArg => false;
     public IParametersOwner ContainingParametersOwner => myParametersOwner;

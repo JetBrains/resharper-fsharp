@@ -57,38 +57,24 @@ namespace JetBrains.ReSharper.Daemon.FSharp.Stages
       var names = FSharpImplUtil.GetQualifiersAndName(token);
       var lineText = sourceFile.Document.GetLineText(coords.Line);
 
-      try
-      {
-        return GetTooltip(checkResults, names, coords, lineText);
-      }
-      catch (TimeoutException)
-      {
-        Logger.LogError("Getting tooltip: {0}: {1}", sourceFile.GetLocation().FullPath, coords);
-        return string.Empty;
-      }
-    }
-
-    [NotNull]
-    private string GetTooltip([NotNull] FSharpCheckFileResults checkResults, [NotNull] string[] names,
-      DocumentCoords coords, [NotNull] string lineText)
-    {
       // todo: provide tooltip for #r strings in fsx, should pass String tag
       var getTooltipAsync = checkResults.GetToolTipText((int) coords.Line + 1,
         (int) coords.Column, lineText, ListModule.OfArray(names), FSharpTokenTag.Identifier, FSharpOption<string>.None);
-        var tooltips = FSharpAsyncUtil.RunSynchronouslySafe(getTooltipAsync, myLogger, "Getting F# tooltip", 2000)?.Item;
-      
-        if (tooltips == null)
-          return string.Empty;
+      var tooltips = FSharpAsyncUtil.RunSynchronouslySafe(getTooltipAsync, myLogger, "Getting F# tooltip", 2000)?.Item;
 
-        var tooltipsTexts = new List<string>();
-        foreach (var tooltip in tooltips)
-        {
-          var overloads = tooltip as FSharpToolTipElement<string>.Group;
-          if (overloads != null)
-            tooltipsTexts.AddRange(overloads.Item.Select(overload => GetTooltipText(overload.MainDescription, overload.XmlDoc)));//, overload.Item2)));
-        }
-        return tooltipsTexts.Join("_RIDER_HORIZONTAL_LINE_TOOLTIP_SEPARATOR_");
+      if (tooltips == null)
+        return string.Empty;
+
+      var tooltipsTexts = new List<string>();
+      foreach (var tooltip in tooltips)
+      {
+        var overloads = tooltip as FSharpToolTipElement<string>.Group;
+        if (overloads != null)
+          tooltipsTexts.AddRange(overloads.Item.Select(overload =>
+            GetTooltipText(overload.MainDescription, overload.XmlDoc))); //, overload.Item2)));
       }
+      return tooltipsTexts.Join("_RIDER_HORIZONTAL_LINE_TOOLTIP_SEPARATOR_");
+    }
 
     [CanBeNull]
     public static string GetXmlDocText(FSharpXmlDoc xmlDoc)
