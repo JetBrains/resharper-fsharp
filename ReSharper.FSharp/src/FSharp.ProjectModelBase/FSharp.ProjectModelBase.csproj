@@ -78,7 +78,7 @@
     <Reference Include="FSharp.Compiler.Service">
       <HintPath>..\..\packages\JetBrains.FSharp.Compiler.Service.12.0.8-5\lib\net40\FSharp.Compiler.Service.dll</HintPath>
     </Reference>
-    <Reference Include="FSharp.Core, Version=4.4.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <Reference Include="FSharp.Core">
       <HintPath>..\..\packages\FSharp.Core.4.1.17\lib\net40\FSharp.Core.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.NRefactory">
@@ -392,7 +392,6 @@
     <Compile Include="ZoneMark.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
