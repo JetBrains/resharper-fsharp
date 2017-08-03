@@ -220,8 +220,11 @@
     <Reference Include="Sprache">
       <HintPath>..\..\packages\Sprache.JetBrains.2.1.0\lib\net40\Sprache.dll</HintPath>
     </Reference>
+    <!--<Reference Include="FSharp.Core">-->
+      <!--<HintPath>..\..\packages\FSharp.Core.4.1.17\lib\net40\FSharp.Core.dll</HintPath>-->
+    <!--</Reference>-->
     <Reference Include="FSharp.Core">
-      <HintPath>..\..\packages\FSharp.Core.4.1.17\lib\net40\FSharp.Core.dll</HintPath>
+      <HintPath>..\..\..\..\visualfsharp\release\net40\bin\FSharp.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Collections.Immutable">

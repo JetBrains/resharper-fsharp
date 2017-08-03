@@ -14,9 +14,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 {
   internal class FSharpTypeParameterOfMethod : ITypeParameter
   {
-    [NotNull] private readonly IMethod myMethod;
+    [NotNull] private readonly ITypeMember myMethod;
 
-    public FSharpTypeParameterOfMethod([NotNull] IMethod method, [NotNull] string name, int index)
+    public FSharpTypeParameterOfMethod([NotNull] ITypeMember method, [NotNull] string name, int index)
     {
       myMethod = method;
       Index = index;
@@ -147,8 +147,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
     public bool IsClassType => false; // todo
     public bool HasDefaultConstructor => false;
     public IList<IType> TypeConstraints => EmptyList<IType>.Instance;
-    public ITypeParametersOwner Owner => myMethod;
+    public ITypeParametersOwner Owner => myMethod as ITypeParametersOwner;
     public ITypeElement OwnerType => myMethod.GetContainingType();
-    public IMethod OwnerMethod => myMethod;
+    public IMethod OwnerMethod => myMethod as IMethod;
   }
 }

@@ -79,8 +79,9 @@ type FsiSessionsHost(lifetime: Lifetime, solution: ISolution, solutionModel: Sol
             
         let args =
             seq { 
-                yield stringOption "fsi-server-output-codepage" Encoding.UTF8.CodePage
-                yield stringOption "fsi-server-input-codepage"  Encoding.UTF8.CodePage
+                if PlatformUtil.IsRunningUnderWindows then
+                    yield stringOption "fsi-server-output-codepage" Encoding.UTF8.CodePage
+                    yield stringOption "fsi-server-input-codepage"  Encoding.UTF8.CodePage
                 yield stringOption "fsi-server-lcid" Thread.CurrentThread.CurrentUICulture.LCID
                 yield boolOption "shadowcopyreferences" shadowCopyReferences
                 yield! userArgs

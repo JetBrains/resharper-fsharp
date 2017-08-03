@@ -90,11 +90,17 @@
       <HintPath>..\..\packages\JetBrains.Fantomas.2.6.1-3\lib\FantomasLib.dll</HintPath>
     </Reference>
     <Reference Include="FSharp.Compiler.Service">
-      <HintPath>..\..\packages\JetBrains.FSharp.Compiler.Service.12.0.8-5\lib\net40\FSharp.Compiler.Service.dll</HintPath>
+      <HintPath>..\..\..\..\visualfsharp\release\net40\bin\FSharp.Compiler.Service.dll</HintPath>
     </Reference>
     <Reference Include="FSharp.Core">
-      <HintPath>..\..\packages\FSharp.Core.4.1.17\lib\net40\FSharp.Core.dll</HintPath>
+      <HintPath>..\..\..\..\visualfsharp\release\net40\bin\FSharp.Core.dll</HintPath>
     </Reference>
+    <!--<Reference Include="FSharp.Compiler.Service">-->
+      <!--<HintPath>..\..\packages\JetBrains.FSharp.Compiler.Service.12.0.8-5\lib\net40\FSharp.Compiler.Service.dll</HintPath>-->
+    <!--</Reference>-->
+    <!--<Reference Include="FSharp.Core">-->
+      <!--<HintPath>..\..\packages\FSharp.Core.4.1.17\lib\net40\FSharp.Core.dll</HintPath>-->
+    <!--</Reference>-->
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\..\packages\SharpZipLib.JetBrains.Stripped.0.87.20161027.6\lib\net40\ICSharpCode.SharpZipLib.dll</HintPath>
     </Reference>

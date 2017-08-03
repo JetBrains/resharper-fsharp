@@ -24,14 +24,14 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       if (sourceFile == null || Equals(sourceFile.LanguageType, FSharpScriptProjectFileType.Instance))
         return ReferenceCollection.Empty;
 
-      if (FSharpSymbol != null)
-        return new ReferenceCollection(new FSharpSymbolReference(this, lazyResolve: false));
+//      if (FSharpSymbol != null)
+//        return new ReferenceCollection(new FSharpSymbolReference(this, lazyResolve: false));
 
-      var fsFile = this.GetContainingFile() as IFSharpFile;
-      Assertion.AssertNotNull(fsFile, "fsFile != null");
-      return fsFile.ReferencesResolved
-        ? ReferenceCollection.Empty
-        : new ReferenceCollection(new FSharpSymbolReference(this, lazyResolve: true));
+//      var fsFile = this.GetContainingFile() as IFSharpFile;
+//      Assertion.AssertNotNull(fsFile, "fsFile != null");
+//      return fsFile.ReferencesResolved
+//        ? ReferenceCollection.Empty
+        return new ReferenceCollection(new FSharpSymbolReference(this, lazyResolve: true));
     }
   }
 }

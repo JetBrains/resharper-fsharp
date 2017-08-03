@@ -1,4 +1,5 @@
-﻿using JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement;
+﻿using System;
+using JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement;
 using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
@@ -21,7 +22,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
     {
       var mfv = GetFSharpSymbol() as FSharpMemberOrFunctionOrValue;
       if (mfv == null) return null;
-      
+
       if (mfv.IsProperty || mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod)
       {
         var property = mfv.TryGetPropertyFromAccessor();
@@ -32,6 +33,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 
       var typeDeclaration = GetContainingTypeDeclaration() as IFSharpTypeDeclaration;
       return new FSharpMethod<MemberDeclaration>(this, mfv, typeDeclaration);
+//      return !mfv.IsInstanceMember && mfv.CompiledName.StartsWith("op_", StringComparison.Ordinal)
+//        ? (IDeclaredElement) new FSharpOperator<MemberDeclaration>(this, mfv, null)
+//        : new FSharpMethod<MemberDeclaration>(this, mfv, typeDeclaration);
     }
   }
 }
