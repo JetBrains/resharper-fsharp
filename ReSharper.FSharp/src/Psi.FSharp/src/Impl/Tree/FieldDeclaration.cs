@@ -23,11 +23,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       var symbol = GetFSharpSymbol();
       var unionCase = symbol as FSharpUnionCase;
       if (unionCase != null)
-        return new FSharpFieldProperty(this, unionCase);
+        return new FSharpUnionCaseProperty(this, unionCase);
 
-      var namedField = symbol as FSharpField;
-      if (namedField != null)
-        return new FSharpFieldProperty(this, namedField);
+      var field = symbol as FSharpField;
+      if (field != null)
+        return new FSharpFieldProperty(this, field);
 
       // the field doesn't have a name and is in a union case or in an exception
       var typeDeclaration = Parent as IFSharpTypeDeclaration;

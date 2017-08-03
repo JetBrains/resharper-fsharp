@@ -419,6 +419,7 @@
     <Compile Include="src\Impl\DeclaredElement\CompilerGenerated\FSharpGeneratedProperty.cs" />
     <Compile Include="src\Impl\DeclaredElement\CompilerGenerated\FSharpUnionTagsClass.cs" />
     <Compile Include="src\Impl\DeclaredElement\FSharpAttributeInstance.cs" />
+    <Compile Include="src\Impl\DeclaredElement\FSharpFieldPropertyBase.cs" />
     <Compile Include="src\Impl\DeclaredElement\FSharpMethodParameter.cs" />
     <Compile Include="src\FSharpScriptProjectFileLanguageService.cs" />
     <Compile Include="src\Gen\Psi\FSharp\**\*.cs">
@@ -463,6 +464,7 @@
     <Compile Include="src\Impl\DeclaredElement\ActivePatternCase.cs" />
     <Compile Include="src\Impl\DeclaredElement\FSharpTypeMember.cs" />
     <Compile Include="src\Impl\DeclaredElement\FSharpTypeParameterOfMethod.cs" />
+    <Compile Include="src\Impl\DeclaredElement\FSharpUnionCaseProperty.cs" />
     <Compile Include="src\Impl\DeclaredElement\ModuleFunction.cs" />
     <Compile Include="src\Impl\DeclaredElement\ModuleValue.cs" />
     <Compile Include="src\Impl\DeclaredElement\FSharpMethod.cs" />
