@@ -8,6 +8,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
     {
     }
 
-    protected override bool ImplementsCompareTo() => false;
+    protected override bool OverridesCompareTo() => false;
+    protected override bool OverridesToString() => false;
   }
 }

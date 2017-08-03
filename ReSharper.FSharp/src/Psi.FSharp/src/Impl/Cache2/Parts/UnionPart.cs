@@ -20,11 +20,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
       return new FSharpUnion(this);
     }
 
-    public MemberPresenceFlag GetMemberPresenceFlag()
-    {
-      return MemberPresenceFlag.NONE;
-    }
-
     protected override byte SerializationTag => (byte) FSharpPartKind.Union;
   }
 }

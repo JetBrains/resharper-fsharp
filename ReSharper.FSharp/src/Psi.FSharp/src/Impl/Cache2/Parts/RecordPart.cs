@@ -20,11 +20,6 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
       return new FSharpRecord(this);
     }
 
-    public MemberPresenceFlag GetMemberPresenceFlag()
-    {
-      return MemberPresenceFlag.INSTANCE_CTOR;
-    }
-
     protected override byte SerializationTag => (byte) FSharpPartKind.Record;
   }
 }
