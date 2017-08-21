@@ -20,6 +20,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     private const string ArrayClrName = "System.Array";
     private const string IntPtrClrName = "System.IntPtr";
     private const string TupleClrName = "System.Tuple`";
+    private const string ValueTupleClrName = "System.ValueTuple`";
     private const string FSharpCoreNamespace = "Microsoft.FSharp.Core";
     private const string FSharpFuncClrName = "Microsoft.FSharp.Core.FSharpFunc`";
     private const string UnitClrName = "Microsoft.FSharp.Core.Unit";
@@ -81,9 +82,15 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     {
       var typeArgumentsCount = fsType.GenericArguments.Count;
 
-      // F# 4.0 specs 5.1.3
       if (fsType.IsTupleType)
+      {
+        // F# 4.1 struct tuples
+        if (fsType.IsStructTupleType)
+          return ValueTupleClrName + typeArgumentsCount;
+        
+        // F# 4.0 specs 5.1.3
         return TupleClrName + typeArgumentsCount;
+      }
 
       if (fsType.IsFunctionType)
         return FSharpFuncClrName + typeArgumentsCount;
