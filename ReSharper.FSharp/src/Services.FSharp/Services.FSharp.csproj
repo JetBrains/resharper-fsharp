@@ -75,17 +75,11 @@
       <HintPath>..\..\packages\JetBrains.Platform.Lib.DevExpress.2.0.20150224.0\lib\Net\DevExpress.XtraTreeList.v7.1.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <!--<Reference Include="FSharp.Compiler.Service">-->
-      <!--<HintPath>..\..\packages\JetBrains.FSharp.Compiler.Service.12.0.8-5\lib\net40\FSharp.Compiler.Service.dll</HintPath>-->
-    <!--</Reference>-->
-    <!--<Reference Include="FSharp.Core">-->
-      <!--<HintPath>..\..\packages\FSharp.Core.4.1.17\lib\net40\FSharp.Core.dll</HintPath>-->
-    <!--</Reference>-->
     <Reference Include="FSharp.Compiler.Service">
-      <HintPath>..\..\..\..\visualfsharp\release\net40\bin\FSharp.Compiler.Service.dll</HintPath>
+      <HintPath>..\..\packages\JetBrains.FSharp.Compiler.Service.12.0.8-5\lib\net40\FSharp.Compiler.Service.dll</HintPath>
     </Reference>
     <Reference Include="FSharp.Core">
-      <HintPath>..\..\..\..\visualfsharp\release\net40\bin\FSharp.Core.dll</HintPath>
+      <HintPath>..\..\packages\FSharp.Core.4.1.17\lib\net40\FSharp.Core.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.NRefactory">
       <HintPath>..\..\packages\ICSharpCode.NRefactory.5.5.1\lib\Net40\ICSharpCode.NRefactory.dll</HintPath>
