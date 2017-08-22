@@ -3,6 +3,7 @@ using System.Xml;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Resolve;
@@ -10,13 +11,13 @@ using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 using JetBrains.Util.DataStructures;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
   internal class FSharpTypeParameterOfMethod : ITypeParameter
   {
-    [NotNull] private readonly IMethod myMethod;
+    [NotNull] private readonly ITypeMember myMethod;
 
-    public FSharpTypeParameterOfMethod([NotNull] IMethod method, [NotNull] string name, int index)
+    public FSharpTypeParameterOfMethod([NotNull] ITypeMember method, [NotNull] string name, int index)
     {
       myMethod = method;
       Index = index;
@@ -147,8 +148,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
     public bool IsClassType => false; // todo
     public bool HasDefaultConstructor => false;
     public IList<IType> TypeConstraints => EmptyList<IType>.Instance;
-    public ITypeParametersOwner Owner => myMethod;
+    public ITypeParametersOwner Owner => myMethod as ITypeParametersOwner;
     public ITypeElement OwnerType => myMethod.GetContainingType();
-    public IMethod OwnerMethod => myMethod;
+    public IMethod OwnerMethod => myMethod as IMethod;
   }
 }

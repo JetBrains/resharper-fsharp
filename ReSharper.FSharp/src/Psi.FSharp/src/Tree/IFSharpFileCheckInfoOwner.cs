@@ -6,7 +6,7 @@ using JetBrains.ReSharper.Psi.Parsing;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Core;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Tree
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
   public interface IFSharpFileCheckInfoOwner : ICompositeElement
   {

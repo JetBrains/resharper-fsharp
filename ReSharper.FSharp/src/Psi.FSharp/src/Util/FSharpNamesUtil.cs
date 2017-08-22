@@ -1,15 +1,16 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
-using JetBrains.ReSharper.Psi.FSharp.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
 using JetBrains.Util.Extension;
-using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Core;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Util
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {
   public class FSharpNamesUtil
   {
@@ -74,7 +75,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       {
         var typeShortName = type.ShortName;
         if (typeShortName.EndsWith(AttributeSuffix))
-          names.Add(typeShortName.SubstringBeforeLast(AttributeSuffix));
+          names.Add(typeShortName.SubstringBeforeLast(AttributeSuffix, StringComparison.Ordinal));
 
         var abbreviatedTypes = FSharpTypeAbbreviationsUtil.AbbreviatedTypes;
         names.AddRange(abbreviatedTypes.TryGetValue(type.GetClrName(), EmptyArray<string>.Instance));
@@ -87,7 +88,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
 
         var reprFlag = GetAttributeValue(attrOwner, CompilationRepresentationAttr) as int?;
         if (reprFlag != null && reprFlag.Value == ModuleSuffixFlag)
-          names.Add(element.ShortName.SubstringBeforeLast(ModuleSuffix));
+          names.Add(element.ShortName.SubstringBeforeLast(ModuleSuffix, StringComparison.Ordinal));
         // todo: implicit module suffix in F# 4.1
       }
 

@@ -5,17 +5,17 @@ using JetBrains.ReSharper.Daemon.CaretDependentFeatures;
 using JetBrains.ReSharper.Daemon.CSharp.ContextHighlighters;
 using JetBrains.ReSharper.Feature.Services.Contexts;
 using JetBrains.ReSharper.Feature.Services.Daemon;
+using JetBrains.ReSharper.Plugins.FSharp.Psi;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi.DataContext;
-using JetBrains.ReSharper.Psi.FSharp;
-using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
-using JetBrains.ReSharper.Psi.FSharp.Parsing;
-using JetBrains.ReSharper.Psi.FSharp.Tree;
-using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
 using Microsoft.FSharp.Control;
 using Microsoft.FSharp.Core;
 
-namespace JetBrains.ReSharper.Daemon.FSharp.ContextHighlighters
+namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
 {
   [ContainsContextConsumer]
   public class FSharpUsagesContextHighlighter : ContextHighlighterBase

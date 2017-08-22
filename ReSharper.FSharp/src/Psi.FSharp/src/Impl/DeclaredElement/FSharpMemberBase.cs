@@ -1,16 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
-using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
-using JetBrains.ReSharper.Psi.FSharp.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 using JetBrains.Util.Extension;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
   internal abstract class FSharpMemberBase<TDeclaration> : FSharpTypeMember<TDeclaration>, IParametersOwner,
     IOverridableMember
@@ -46,7 +48,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
 
     public override bool HasAttributeInstance(IClrTypeName clrName, bool inherit)
     {
-      return FSharpSymbol.Attributes.Any(a => a.AttributeType.QualifiedName.SubstringBefore(",") == clrName.FullName);
+      return FSharpSymbol.Attributes.Any(a =>
+        a.AttributeType.QualifiedName.SubstringBefore(",", StringComparison.Ordinal).Equals(clrName.FullName, StringComparison.Ordinal));
     }
 
     public InvocableSignature GetSignature(ISubstitution substitution)

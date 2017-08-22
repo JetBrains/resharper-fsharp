@@ -4,14 +4,14 @@ using JetBrains.DataFlow;
 using JetBrains.ReSharper.Daemon.CaretDependentFeatures;
 using JetBrains.ReSharper.Feature.Services.Contexts;
 using JetBrains.ReSharper.Feature.Services.Daemon;
+using JetBrains.ReSharper.Plugins.FSharp.Psi;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.DataContext;
-using JetBrains.ReSharper.Psi.FSharp;
-using JetBrains.ReSharper.Psi.FSharp.Parsing;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
 
-namespace JetBrains.ReSharper.Daemon.FSharp.ContextHighlighters
+namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
 {
   [ContainsContextConsumer]
   public class FSharpMatchingBraceContextHighlighter : MatchingBraceContextHighlighterBase<FSharpLanguage>

@@ -6,13 +6,13 @@ using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion;
 using JetBrains.ReSharper.Feature.Services.TypingAssist;
 using JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase;
+using JetBrains.ReSharper.Plugins.FSharp.Psi;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CachingLexers;
-using JetBrains.ReSharper.Psi.FSharp;
 using JetBrains.TextControl;
 using JetBrains.Util;
 
-namespace JetBrains.ReSharper.Feature.Services.FSharp.TypingAssist
+namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.TypingAssist
 {
   [SolutionComponent]
   // todo: remove or add more typing assists (e.g. braces)

@@ -1,10 +1,11 @@
 ﻿using JetBrains.Annotations;
 using JetBrains.DocumentModel;
+using JetBrains.ReSharper.Psi;
 using Microsoft.FSharp.Compiler;
 using Column = JetBrains.Util.dataStructures.TypedIntrinsics.Int32<JetBrains.DocumentModel.DocColumn>;
 using Line = JetBrains.Util.dataStructures.TypedIntrinsics.Int32<JetBrains.DocumentModel.DocLine>;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Util
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {
   public static class FSharpRangeUtil
   {

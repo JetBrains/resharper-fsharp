@@ -1,7 +1,7 @@
 ﻿using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.Text;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Parsing
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 {
   /// <summary>
   /// Creates a single token for the whole file.

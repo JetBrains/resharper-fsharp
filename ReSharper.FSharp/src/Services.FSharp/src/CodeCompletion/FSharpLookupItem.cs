@@ -4,7 +4,7 @@ using JetBrains.ReSharper.Feature.Services.Lookup;
 using JetBrains.UI.Icons;
 using JetBrains.UI.RichText;
 
-namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
+namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
 {
   public class FSharpLookupItem : TextLookupItemBase
   {

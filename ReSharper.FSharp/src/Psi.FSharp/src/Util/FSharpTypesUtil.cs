@@ -1,6 +1,8 @@
-﻿﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
@@ -9,7 +11,7 @@ using JetBrains.Util.Extension;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Core;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Util
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {
   /// <summary>
   /// Map FSharpType elements (as seen by FSharp.Compiler.Service) to IType types.
@@ -19,6 +21,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     private const string ArrayClrName = "System.Array";
     private const string IntPtrClrName = "System.IntPtr";
     private const string TupleClrName = "System.Tuple`";
+    private const string ValueTupleClrName = "System.ValueTuple`";
     private const string FSharpCoreNamespace = "Microsoft.FSharp.Core";
     private const string FSharpFuncClrName = "Microsoft.FSharp.Core.FSharpFunc`";
     private const string UnitClrName = "Microsoft.FSharp.Core.Unit";
@@ -72,7 +75,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
 
       // qualified name may include assembly name, public key, etc and separated with comma, e.g. for unit it returns
       // "Microsoft.FSharp.Core.Unit, FSharp.Core, Version=4.4.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
-      return entity.QualifiedName.SubstringBefore(",");
+      return entity.QualifiedName.SubstringBefore(",", StringComparison.Ordinal);
     }
 
     [CanBeNull]
@@ -80,9 +83,15 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
     {
       var typeArgumentsCount = fsType.GenericArguments.Count;
 
-      // F# 4.0 specs 5.1.3
       if (fsType.IsTupleType)
+      {
+        // F# 4.1 struct tuples
+        if (fsType.IsStructTupleType)
+          return ValueTupleClrName + typeArgumentsCount;
+        
+        // F# 4.0 specs 5.1.3
         return TupleClrName + typeArgumentsCount;
+      }
 
       if (fsType.IsFunctionType)
         return FSharpFuncClrName + typeArgumentsCount;
@@ -260,7 +269,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       var fsType = param.Type;
       if (fsType.HasTypeDefinition && fsType.TypeDefinition.IsByRef)
       {
-        return param.Attributes.Any(a => a.AttributeType.FullName == "System.Runtime.InteropServices.OutAttribute")
+        return param.Attributes.Any(a =>
+          a.AttributeType.QualifiedName.SubstringBefore(",", StringComparison.Ordinal)
+            .Equals("System.Runtime.InteropServices.OutAttribute", StringComparison.Ordinal))
           ? ParameterKind.OUTPUT
           : ParameterKind.REFERENCE;
       }
@@ -270,7 +281,9 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
 
     public static bool IsParamArray([NotNull] FSharpParameter param)
     {
-      return param.Attributes.Any(a => a.AttributeType.FullName == "System.ParamArrayAttribute");
+      return param.Attributes.Any(a =>
+        a.AttributeType.QualifiedName.SubstringBefore(",", StringComparison.Ordinal)
+          .Equals("System.ParamArrayAttribute", StringComparison.Ordinal));
     }
 
     private static bool IsNativePtr([NotNull] this FSharpEntity entity)

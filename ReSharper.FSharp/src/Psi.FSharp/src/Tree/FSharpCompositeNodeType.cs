@@ -1,6 +1,6 @@
 ﻿using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Tree
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
   public abstract class FSharpCompositeNodeType : CompositeNodeType
   {

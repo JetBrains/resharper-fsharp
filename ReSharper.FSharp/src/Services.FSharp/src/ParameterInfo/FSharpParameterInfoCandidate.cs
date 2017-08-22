@@ -1,13 +1,11 @@
-﻿using System.Collections.Generic;
-using System.Text;
-using JetBrains.Annotations;
+﻿using System.Text;
 using JetBrains.ReSharper.Feature.Services.Lookup;
 using JetBrains.ReSharper.Feature.Services.ParameterInfo;
 using JetBrains.UI.RichText;
 using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
-namespace JetBrains.ReSharper.Feature.Services.FSharp.ParameterInfo
+namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.ParameterInfo
 {
   public class FSharpParameterInfoCandidate : FSharpParameterInfoCandidateBase
   {

@@ -1,6 +1,6 @@
-﻿using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2;
+﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Tree
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
   public partial interface IObjectModelTypeDeclaration
   {

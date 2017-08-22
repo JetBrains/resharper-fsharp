@@ -1,7 +1,8 @@
 ﻿using JetBrains.Application.BuildScript.Application.Zones;
-using JetBrains.ReSharper.Psi.FSharp;
+using JetBrains.ReSharper.Feature.Services;
+using JetBrains.ReSharper.Plugins.FSharp.Psi;
 
-namespace JetBrains.ReSharper.Feature.Services.FSharp
+namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs
 {
   [ZoneMarker]
   public class ZoneMarker : IRequire<ILanguageFSharpZone>, IRequire<ICodeEditingZone>

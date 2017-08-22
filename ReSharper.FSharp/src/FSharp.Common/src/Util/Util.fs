@@ -48,6 +48,10 @@ module CommonUtil =
         let relativePath = path.AsRelative()
         if isNull relativePath then path
         else projectDirectory.Combine(relativePath)
+
+    [<CompiledName("DecompileOpName")>]
+    let decompileOpName name =
+        PrettyNaming.DecompileOpName name
         
     [<CompiledName("RunSynchronouslyWithTimeout")>]
     let runSynchronouslyWithTimeout (action: Func<_>) timeout =

@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Diagnostics;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   public abstract class FSharpProperTypeMemberDeclarationBase : FSharpTypeMemberDeclarationBase,
     ICachedTypeMemberDeclaration

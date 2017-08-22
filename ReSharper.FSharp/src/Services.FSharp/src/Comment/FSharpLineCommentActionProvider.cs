@@ -1,10 +1,10 @@
 ﻿using JetBrains.ReSharper.Feature.Services.Comment;
+using JetBrains.ReSharper.Plugins.FSharp.Psi;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.FSharp;
-using JetBrains.ReSharper.Psi.FSharp.Parsing;
 using JetBrains.ReSharper.Psi.Parsing;
 
-namespace JetBrains.ReSharper.Feature.Services.FSharp.Comment
+namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.Comment
 {
   [Language(typeof(FSharpLanguage))]
   public class FSharpLineCommentActionProvider : SimpleLineCommentActionProvider

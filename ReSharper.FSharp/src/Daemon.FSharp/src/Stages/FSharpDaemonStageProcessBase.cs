@@ -1,11 +1,11 @@
 ﻿using System;
 using JetBrains.Annotations;
 using JetBrains.Application.Threading;
-using JetBrains.ReSharper.Daemon.FSharp.Highlightings;
 using JetBrains.ReSharper.Feature.Services.Daemon;
+using JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Highlightings;
 using JetBrains.ReSharper.Psi.Tree;
 
-namespace JetBrains.ReSharper.Daemon.FSharp.Stages
+namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 {
   public abstract class FSharpDaemonStageProcessBase : IDaemonStageProcess
   {

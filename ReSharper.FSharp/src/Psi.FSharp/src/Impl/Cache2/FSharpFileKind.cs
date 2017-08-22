@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
   public enum FSharpFileKind : byte
   {

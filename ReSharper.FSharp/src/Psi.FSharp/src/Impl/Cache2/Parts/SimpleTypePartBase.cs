@@ -1,9 +1,10 @@
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
-using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.Util;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
   internal abstract class SimpleTypePartBase : FSharpTypeMembersOwnerTypePart
   {
@@ -21,5 +22,12 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts
 
     public override string[] ExtendsListShortNames =>
       ArrayUtil.Add(ourExtendsListShortNames, base.ExtendsListShortNames);
+
+    public MemberPresenceFlag GetMemberPresenceFlag()
+    {
+      return MemberPresenceFlag.INSTANCE_CTOR |
+             MemberPresenceFlag.MAY_EQUALS_OVERRIDE |
+             MemberPresenceFlag.MAY_TOSTRING_OVERRIDE;
+    }
   }
 }

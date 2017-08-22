@@ -2,7 +2,7 @@
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 
-namespace JetBrains.ReSharper.Daemon.FSharp.Highlightings
+namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Highlightings
 {
   [StaticSeverityHighlighting(Severity.WARNING, HighlightingGroupIds.IdentifierHighlightingsGroup,
     AttributeId = HighlightingAttributeIds.WARNING_ATTRIBUTE, OverlapResolve = OverlapResolveKind.WARNING)]

@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Linq;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Psi.FSharp.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.Util;
-using JetBrains.Util.Logging;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Control;
 using Microsoft.FSharp.Core;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Util
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {
   public static class FSharpSymbolsUtil
   {
@@ -32,15 +31,11 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
       var coords = sourceFile.Document.GetCoordsByOffset(offset);
       var lineText = sourceFile.Document.GetLineText(coords.Line);
       var findSymbolAsync =
-        checkResults.GetSymbolUseAtLocation((int) coords.Line + 1, (int) coords.Column, lineText, names, FSharpOption<string>.None);
+        checkResults.GetSymbolUseAtLocation((int) coords.Line + 1, (int) coords.Column, lineText, names,
+          FSharpOption<string>.None);
       try
       {
         return FSharpAsync.RunSynchronously(findSymbolAsync, FSharpOption<int>.Some(1000), null)?.Value.Symbol;
-      }
-      catch (TimeoutException)
-      {
-        Logger.LogError("Getting symbol at location: {0}: {1}", sourceFile.GetLocation().FullPath, coords);
-        return null;
       }
       catch (Exception) // Cannot access FCS internal exception types here
       {
@@ -50,7 +45,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Util
 
     public static bool IsOpGreaterThan([NotNull] this FSharpSymbol symbol)
     {
-      return (symbol as FSharpMemberOrFunctionOrValue)?.CompiledName == "op_GreaterThan";
+      var mfv = symbol as FSharpMemberOrFunctionOrValue;
+      return mfv != null && mfv.CompiledName.Equals("op_GreaterThan", StringComparison.Ordinal);
     }
 
     [CanBeNull]

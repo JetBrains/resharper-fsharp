@@ -4,16 +4,16 @@ using System.Linq;
 using JetBrains.DocumentModel;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.Debugger;
+using JetBrains.ReSharper.Plugins.FSharp.Psi;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.FSharp;
-using JetBrains.ReSharper.Psi.FSharp.Tree;
-using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Rider.Model;
 using JetBrains.Util;
 using JetBrains.Util.dataStructures.TypedIntrinsics;
 
-namespace JetBrains.ReSharper.Feature.Services.FSharp.Debugger
+namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.Debugger
 {
   [Language(typeof(FSharpLanguage))]
   public class FSharpBreakpointVariantsProvider : IBreakpointVariantsProvider
@@ -57,5 +57,7 @@ namespace JetBrains.ReSharper.Feature.Services.FSharp.Debugger
       }
       return breakpointVariants.ToList();
     }
+
+    public List<string> GetSupportedFileExtensions() => new List<string>(new[] {"fs"});
   }
 }

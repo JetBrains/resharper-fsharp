@@ -1,6 +1,6 @@
 <FSharpTokens>
     <TokenTypeClass>FSharpTokenType</TokenTypeClass>
-    <TokenTypeNamespace>JetBrains.ReSharper.Psi.FSharp.Parsing</TokenTypeNamespace>
+    <TokenTypeNamespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing</TokenTypeNamespace>
 
     <Tokens NodeType="FSharpTokenNodeType">
         <Token name="PUBLIC"/>

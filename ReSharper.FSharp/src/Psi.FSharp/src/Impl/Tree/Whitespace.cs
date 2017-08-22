@@ -1,8 +1,9 @@
 ﻿using JetBrains.Annotations;
-using JetBrains.ReSharper.Psi.FSharp.Parsing;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
+using JetBrains.ReSharper.Psi;
 using JetBrains.Text;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   class Whitespace : WhitespaceBase
   {

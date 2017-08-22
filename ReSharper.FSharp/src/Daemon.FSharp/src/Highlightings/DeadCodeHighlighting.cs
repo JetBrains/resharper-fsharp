@@ -1,7 +1,7 @@
 ﻿using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 
-namespace JetBrains.ReSharper.Daemon.FSharp.Highlightings
+namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Highlightings
 {
   [StaticSeverityHighlighting(Severity.INFO, HighlightingGroupIds.IdentifierHighlightingsGroup,
     AttributeId = HighlightingAttributeIds.DEADCODE_ATTRIBUTE, OverlapResolve = OverlapResolveKind.DEADCODE)]

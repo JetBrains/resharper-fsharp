@@ -4,7 +4,7 @@ using JetBrains.ReSharper.Psi.Resources;
 using JetBrains.UI.Icons;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Util
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {
   public static class FSharpIconsUtil
   {

@@ -1,8 +1,10 @@
-﻿﻿using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2;
-using JetBrains.ReSharper.Psi.FSharp.Tree;
- using JetBrains.Util.Extension;
+﻿using System;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi;
+using JetBrains.Util.Extension;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class ObjectTypeDeclaration
   {
@@ -30,7 +32,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
           if (attrIds.IsEmpty)
             continue;
 
-          switch (attrIds.Last()?.GetText().SubstringBeforeLast("Attribute"))
+          switch (attrIds.Last()?.GetText().SubstringBeforeLast("Attribute", StringComparison.Ordinal))
           {
             case Interface:
               return FSharpPartKind.Interface;

@@ -2,21 +2,22 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Checker;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
-using JetBrains.ReSharper.Psi.FSharp.Tree;
-using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Core;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal abstract class FSharpFileBase : FileElementBase, IFSharpFileCheckInfoOwner
   {
     private readonly object myCheckLock = new object();
     private readonly object myGetSymbolsLock = new object();
-    private Dictionary<int, FSharpSymbol> myDeclarationSymbols = null;
+    private Dictionary<int, FSharpSymbol> myDeclarationSymbols;
     public FSharpCheckerService CheckerService { get; set; }
     public FSharpProjectOptions ProjectOptions { get; set; }
     public TokenBuffer ActualTokenBuffer { get; set; }

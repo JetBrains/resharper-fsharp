@@ -1,6 +1,6 @@
 ﻿using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 
-namespace JetBrains.ReSharper.Psi.FSharp
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 {
   class FSharpNodeTypeIndexer : AbstractNodeTypeIndexer
   {

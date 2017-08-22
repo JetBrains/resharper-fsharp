@@ -1,10 +1,9 @@
 ﻿using JetBrains.Annotations;
-using JetBrains.Application.UI.Icons.ComposedIcons;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CSharp.Impl;
-using JetBrains.ReSharper.Psi.Resources;
 using JetBrains.UI.Icons;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 {
   public class FSharpDeclaredElementType : DeclaredElementTypeBase
   {

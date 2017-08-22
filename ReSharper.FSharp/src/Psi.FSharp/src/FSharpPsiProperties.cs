@@ -1,9 +1,10 @@
 ﻿using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Impl;
 
-namespace JetBrains.ReSharper.Psi.FSharp
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 {
   public class FSharpPsiProperties : DefaultPsiProjectFileProperties
   {

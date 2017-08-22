@@ -6,7 +6,7 @@ using JetBrains.UI.RichText;
 using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
-namespace JetBrains.ReSharper.Feature.Services.FSharp.ParameterInfo
+namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.ParameterInfo
 {
   public class FSharpTypeArgumentCandidate : FSharpParameterInfoCandidateBase
   {

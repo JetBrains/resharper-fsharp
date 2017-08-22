@@ -1,13 +1,12 @@
 ﻿using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
-using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Text;
-using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   public class FSharpIdentifierToken : FSharpToken
   {
@@ -24,14 +23,14 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
       if (sourceFile == null || Equals(sourceFile.LanguageType, FSharpScriptProjectFileType.Instance))
         return ReferenceCollection.Empty;
 
-      if (FSharpSymbol != null)
-        return new ReferenceCollection(new FSharpSymbolReference(this, lazyResolve: false));
+//      if (FSharpSymbol != null)
+//        return new ReferenceCollection(new FSharpSymbolReference(this, lazyResolve: false));
 
-      var fsFile = this.GetContainingFile() as IFSharpFile;
-      Assertion.AssertNotNull(fsFile, "fsFile != null");
-      return fsFile.ReferencesResolved
-        ? ReferenceCollection.Empty
-        : new ReferenceCollection(new FSharpSymbolReference(this, lazyResolve: true));
+//      var fsFile = this.GetContainingFile() as IFSharpFile;
+//      Assertion.AssertNotNull(fsFile, "fsFile != null");
+//      return fsFile.ReferencesResolved
+//        ? ReferenceCollection.Empty
+        return new ReferenceCollection(new FSharpSymbolReference(this, lazyResolve: true));
     }
   }
 }
