@@ -1,4 +1,5 @@
-﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+﻿using System.Collections.Generic;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 
@@ -14,7 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       return Identifier.GetNameRange();
     }
 
-    public override TreeNodeCollection<ITypeMemberDeclaration> MemberDeclarations =>
+    public override IReadOnlyList<ITypeMemberDeclaration> MemberDeclarations =>
       EnumMembers.Cast<ITypeMemberDeclaration, IEnumMemberDeclaration>();
   }
 }

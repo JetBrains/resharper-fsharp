@@ -28,7 +28,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
       return true;
     }
 
-    protected override bool AddLookupItems(FSharpCodeCompletionContext context, GroupedItemsCollector collector)
+    protected override bool AddLookupItems(FSharpCodeCompletionContext context, IItemsCollector collector)
     {
       if (!context.ShouldComplete)
         return false;

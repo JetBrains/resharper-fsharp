@@ -62,7 +62,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     private IList<ITypeParameter> TypeParameters => ((ITypeDeclaration) this).DeclaredElement?.TypeParameters ??
                                                     EmptyList<ITypeParameter>.Instance;
 
-    public virtual TreeNodeCollection<ITypeMemberDeclaration> MemberDeclarations
+    public virtual IReadOnlyList<ITypeMemberDeclaration> MemberDeclarations
     {
       get
       {
@@ -74,9 +74,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     public string CLRName => FSharpImplUtil.MakeClrName(this);
-    public IList<ITypeDeclaration> TypeDeclarations => EmptyList<ITypeDeclaration>.Instance;
+    public IReadOnlyList<ITypeDeclaration> TypeDeclarations => EmptyList<ITypeDeclaration>.Instance;
 
-    public TreeNodeCollection<ITypeDeclaration> NestedTypeDeclarations =>
+    public IReadOnlyList<ITypeDeclaration> NestedTypeDeclarations =>
       MemberDeclarations.OfType<ITypeDeclaration>().ToTreeNodeCollection();
   }
 }

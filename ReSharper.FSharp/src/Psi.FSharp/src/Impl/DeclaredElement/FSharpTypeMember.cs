@@ -60,7 +60,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
           if (member.DeclaredName == declaration.DeclaredName && Equals(this, member.DeclaredElement))
             list.Add(member);
       }
-      return list.AsList();
+      return list.AsIList();
     }
 
     public override HybridCollection<IPsiSourceFile> GetSourceFiles()

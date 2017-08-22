@@ -12,6 +12,6 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <RiderSDKVersion>[2017.1.20170814.91201-eap08]</RiderSDKVersion>
+    <RiderSDKVersion>[2017.2.20170821.130939-eap01internal]</RiderSDKVersion>
   </PropertyGroup>
 </Project>

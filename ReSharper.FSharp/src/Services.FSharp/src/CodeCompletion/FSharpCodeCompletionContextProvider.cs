@@ -43,24 +43,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
           context.SelectedRange.TextRange.Length > 0 ||
           tokenBefore.GetTreeEndOffset() < caretTreeOffset || token.GetTreeEndOffset() < caretTreeOffset)
       {
-        var selectedRange = context.SelectedRange.TextRange;
+        var selectedRange = context.SelectedRange;
         return new FSharpCodeCompletionContext(context, new TextLookupRanges(selectedRange, selectedRange),
           TreeOffset.InvalidOffset, DocumentCoords.Empty, null, null, null, null, null, null, false);
       }
 
+      var document = context.Document;
       var completedRangeStartOffset =
         tokenBeforeType != null && (tokenBeforeType == FSharpTokenType.IDENTIFIER || tokenBeforeType.IsKeyword)
           ? tokenBefore.GetTreeStartOffset().Offset
           : caretOffset;
-      var completedRange = new TextRange(completedRangeStartOffset, caretOffset);
+      var completedRange = new DocumentRange(document, new TextRange(completedRangeStartOffset, caretOffset));
       var defaultRanges = GetTextLookupRanges(context, completedRange);
 
       var ranges = ShouldReplace(token)
-        ? defaultRanges.WithReplaceRange(new TextRange(caretOffset,
-          Math.Max(token.GetTreeEndOffset().Offset, caretOffset)))
+        ? defaultRanges.WithReplaceRange(new DocumentRange(document,new TextRange(caretOffset,
+          Math.Max(token.GetTreeEndOffset().Offset, caretOffset))))
         : defaultRanges;
 
-      var document = context.Document;
       var coords = document.GetCoordsByOffset(caretOffset);
       var lineText = document.GetLineText(coords.Line);
       var names = QuickParse.GetPartialLongNameEx(lineText, (int) coords.Column - 1);

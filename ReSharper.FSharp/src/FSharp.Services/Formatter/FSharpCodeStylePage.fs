@@ -62,6 +62,9 @@ type FSharpDummyCodeFormatter(loggerProvider, settingsOptimization) =
     override x.FormatReplacedRange(_,_,_) = InvalidOperationException() |> raise
     override x.FormatDeletedNodes(_,_,_) = InvalidOperationException() |> raise
     override x.FormatReplacedNode(_,_) = InvalidOperationException() |> raise
+    
+    // todo: Fix this (temp while moving to wave10)
+    override x.CreateFormatterContext(_,_,_,_,_,_) = null
 
 
 [<CodePreviewPreparatorComponent>]
