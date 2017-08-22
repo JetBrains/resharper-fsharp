@@ -4,20 +4,12 @@
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs</AssemblyName>
   </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>TRACE;DEBUG;JET_MODE_ASSERT</DefineConstants>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DefineConstants>TRACE</DefineConstants>
-  </PropertyGroup>
-
+  
   <ItemGroup>
     <ProjectReference Include="..\Psi.FSharp\Psi.FSharp.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="JetBrains.Rider.SDK" Version="2017.1.20170814.91201-eap08" />
+    <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
   </ItemGroup>
 </Project>

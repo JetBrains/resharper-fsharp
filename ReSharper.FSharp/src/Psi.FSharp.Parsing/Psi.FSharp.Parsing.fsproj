@@ -1,16 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net45</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing</AssemblyName>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <DefineConstants>TRACE;DEBUG;JET_MODE_ASSERT</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <DefineConstants>TRACE</DefineConstants>
-  </PropertyGroup>
+
   <ItemGroup>
     <Compile Include="FSharpTreeBuilderBase.fs" />
     <Compile Include="FSharpImplTreeBuilder.fs" />
@@ -19,12 +13,14 @@
     <Compile Include="FSharpParser.fs" />
     <Compile Include="QuickParse.fs" />
   </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="4.1.*" />
     <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="12.0.8-5" />
     <PackageReference Include="JetBrains.Fantomas" Version="2.6.1-3" />
-    <PackageReference Include="JetBrains.Rider.SDK" Version="2017.1.20170814.91201-eap08" />
+    <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Psi.FSharp\Psi.FSharp.csproj" />
   </ItemGroup>
