@@ -1,27 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.DataFlow;
 using JetBrains.DocumentModel;
 using JetBrains.ProjectModel;
+using JetBrains.ReSharper.Daemon;
 using JetBrains.ReSharper.Feature.Services.Descriptions;
+using JetBrains.ReSharper.Plugins.FSharp.Psi;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.FSharp;
-using JetBrains.ReSharper.Psi.FSharp.Impl;
-using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
-using JetBrains.ReSharper.Psi.FSharp.Tree;
-using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.TextControl.DocumentMarkup;
 using JetBrains.UI.RichText;
 using JetBrains.Util;
-using JetBrains.Util.Logging;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Core;
 
-namespace JetBrains.ReSharper.Daemon.FSharp.Stages
+namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 {
   [SolutionComponent]
   public class FSharpIdentifierTooltipProvider : IdentifierTooltipProvider<FSharpLanguage>

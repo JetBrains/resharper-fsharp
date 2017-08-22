@@ -14,8 +14,8 @@ open JetBrains.ReSharper.Host.Features
 open JetBrains.ReSharper.Host.Features.Toolset
 open JetBrains.ReSharper.Plugins.FSharp.Services.Settings
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.FSharp
-open JetBrains.ReSharper.Psi.FSharp.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.Rider.Model
 open JetBrains.TextControl
 open JetBrains.UI.RichText

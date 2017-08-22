@@ -1,13 +1,12 @@
 ﻿using JetBrains.Annotations;
 using JetBrains.Application.Settings;
 using JetBrains.ReSharper.Feature.Services.Daemon;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.Util;
-using Microsoft.FSharp.Compiler;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
-namespace JetBrains.ReSharper.Daemon.FSharp.Stages
+namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 {
   [DaemonStage(StagesBefore = new[] {typeof(SetResolvedSymbolsStage)},
     StagesAfter = new[] {typeof(HighlightOpenExpressionsStage)})]

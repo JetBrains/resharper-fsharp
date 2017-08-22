@@ -1,6 +1,7 @@
 ﻿using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi;
 
-namespace JetBrains.ReSharper.Psi.FSharp
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 {
   [LanguageDefinition(Name)]
   public class FSharpLanguage : KnownLanguage

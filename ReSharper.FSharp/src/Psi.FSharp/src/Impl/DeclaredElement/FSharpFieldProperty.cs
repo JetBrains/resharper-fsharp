@@ -1,9 +1,10 @@
 ﻿using JetBrains.Annotations;
-using JetBrains.ReSharper.Psi.FSharp.Tree;
-using JetBrains.ReSharper.Psi.FSharp.Util;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
+using JetBrains.ReSharper.Psi;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
   /// <summary>
   /// Field in a record or in a union case or in an exception

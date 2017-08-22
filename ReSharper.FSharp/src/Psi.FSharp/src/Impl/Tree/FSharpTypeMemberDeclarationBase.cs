@@ -1,8 +1,9 @@
 ﻿using System.Diagnostics;
-using JetBrains.ReSharper.Psi.FSharp.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   public abstract class FSharpTypeMemberDeclarationBase : FSharpDeclarationBase, ITypeMemberDeclaration,
     IModifiersOwnerDeclaration
@@ -17,8 +18,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 
     public IDeclaredElement CachedDeclaredElement
     {
-      get { return myCachedDeclaredElement; }
-      set { myCachedDeclaredElement = value; }
+      get => myCachedDeclaredElement;
+      set => myCachedDeclaredElement = value;
     }
 
     public IFSharpTypeElementDeclaration GetContainingTypeDeclaration()

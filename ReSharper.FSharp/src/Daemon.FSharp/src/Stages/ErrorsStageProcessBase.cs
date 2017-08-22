@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
-using JetBrains.ReSharper.Daemon.FSharp.Highlightings;
 using JetBrains.ReSharper.Feature.Services.Daemon;
-using JetBrains.ReSharper.Psi.FSharp.Util;
+using JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Highlightings;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Column = JetBrains.Util.dataStructures.TypedIntrinsics.Int32<JetBrains.DocumentModel.DocColumn>;
 using Line = JetBrains.Util.dataStructures.TypedIntrinsics.Int32<JetBrains.DocumentModel.DocLine>;
 
-namespace JetBrains.ReSharper.Daemon.FSharp.Stages
+namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 {
   public abstract class ErrorsStageProcessBase : FSharpDaemonStageProcessBase
   {

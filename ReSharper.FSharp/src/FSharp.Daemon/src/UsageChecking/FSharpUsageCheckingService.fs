@@ -2,7 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.UsageChecking
 
 open JetBrains.ReSharper.Daemon.UsageChecking
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 
 type FSharpDummyUsageAnalyzer(lifetime, suppressors) =
     inherit UsageAnalyzer(lifetime, suppressors)

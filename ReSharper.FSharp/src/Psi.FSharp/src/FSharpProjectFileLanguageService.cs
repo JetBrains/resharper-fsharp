@@ -2,12 +2,13 @@
 using JetBrains.ProjectModel.Resources;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Checker;
 using JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase;
-using JetBrains.ReSharper.Psi.FSharp.Parsing;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.Text;
 using JetBrains.UI.Icons;
 
-namespace JetBrains.ReSharper.Psi.FSharp
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 {
   [ProjectFileType(typeof(FSharpProjectFileType))]
   public class FSharpProjectFileLanguageService : ProjectFileLanguageService

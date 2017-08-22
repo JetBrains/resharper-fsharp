@@ -1,6 +1,7 @@
-﻿using JetBrains.ReSharper.Psi.ExtensionsAPI;
+﻿using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.ExtensionsAPI;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class FSharpGlobalNamespaceDeclaration
   {

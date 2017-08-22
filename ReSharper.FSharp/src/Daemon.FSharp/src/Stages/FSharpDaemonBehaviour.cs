@@ -1,8 +1,8 @@
 ﻿using JetBrains.ReSharper.Feature.Services.Daemon;
+using JetBrains.ReSharper.Plugins.FSharp.Psi;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.FSharp;
 
-namespace JetBrains.ReSharper.Daemon.FSharp.Stages
+namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 {
   [Language(typeof(FSharpLanguage))]
   public class FSharpDaemonBehaviour : LanguageSpecificDaemonBehavior

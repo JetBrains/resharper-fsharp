@@ -1,12 +1,12 @@
 ﻿using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems.Impl;
+using JetBrains.ReSharper.Plugins.FSharp.Psi;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.FSharp;
-using JetBrains.ReSharper.Psi.FSharp.Parsing;
 using JetBrains.ReSharper.Psi.Resources;
 using JetBrains.ReSharper.Psi.Tree;
 
-namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
+namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
 {
   [Language(typeof(FSharpLanguage))]
   public class FSharpKeywordsProvider : FSharpItemsProviderBase

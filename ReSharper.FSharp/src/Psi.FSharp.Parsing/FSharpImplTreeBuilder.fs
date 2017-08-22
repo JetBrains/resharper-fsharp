@@ -1,7 +1,7 @@
 namespace JetBrains.ReSharper.Psi.FSharp.Parsing
 
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
-open JetBrains.ReSharper.Psi.FSharp.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Psi.TreeBuilder
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.Ast

@@ -3,8 +3,9 @@
 open System
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
-open JetBrains.ReSharper.Psi.FSharp.Impl.Tree
-open JetBrains.ReSharper.Psi.FSharp.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.TreeBuilder
 open JetBrains.Util.dataStructures.TypedIntrinsics

@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Checker;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
-using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts;
-using JetBrains.ReSharper.Psi.FSharp.Tree;
-using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
   public class FSharpCacheDeclarationProcessor : TreeNodeVisitor
   {

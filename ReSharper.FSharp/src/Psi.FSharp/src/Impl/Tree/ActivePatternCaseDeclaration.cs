@@ -1,10 +1,11 @@
 ﻿using System.Diagnostics;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
-using JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement;
 using JetBrains.ReSharper.Psi.Tree;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class ActivePatternCaseDeclaration : ICachedTypeMemberDeclaration
   {
@@ -18,8 +19,8 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
 
     IDeclaredElement ICachedTypeMemberDeclaration.CachedDeclaredElement
     {
-      get { return myCachedDeclaredElement; }
-      set { myCachedDeclaredElement = value; }
+      get => myCachedDeclaredElement;
+      set => myCachedDeclaredElement = value;
     }
 
     public override string DeclaredName => Identifier.Name;

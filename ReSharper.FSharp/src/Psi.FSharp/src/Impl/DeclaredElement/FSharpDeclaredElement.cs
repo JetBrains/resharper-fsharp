@@ -1,13 +1,14 @@
 ﻿using System.Xml;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
-using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
-using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
   internal abstract class FSharpDeclaredElement<TDeclaration> : CachedTypeMemberBase
     where TDeclaration : FSharpDeclarationBase, IFSharpDeclaration

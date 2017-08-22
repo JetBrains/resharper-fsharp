@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
   internal class FSharpException : FSharpSimpleTypeBase
   {

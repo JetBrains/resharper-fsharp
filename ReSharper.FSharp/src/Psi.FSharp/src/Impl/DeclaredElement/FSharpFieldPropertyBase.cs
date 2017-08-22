@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
-using JetBrains.ReSharper.Psi.FSharp.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Impl.Special;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
   internal abstract class FSharpFieldPropertyBase : FSharpTypeMember<FieldDeclaration>, IProperty
   {

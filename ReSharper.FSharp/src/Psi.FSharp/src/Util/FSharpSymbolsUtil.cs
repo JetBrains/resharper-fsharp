@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Linq;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Psi.FSharp.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.Util;
-using JetBrains.Util.Logging;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Control;
 using Microsoft.FSharp.Core;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Util
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {
   public static class FSharpSymbolsUtil
   {

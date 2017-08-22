@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
-using JetBrains.ReSharper.Psi.FSharp.Impl;
-using JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement;
-using JetBrains.ReSharper.Psi.FSharp.Tree;
-using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Impl.Search;
 using JetBrains.ReSharper.Psi.Impl.Search.SearchDomain;
 using JetBrains.ReSharper.Psi.Search;
@@ -14,7 +15,7 @@ using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Searching
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 {
   [PsiSharedComponent]
   public class FSharpSearcherFactory : IDomainSpecificSearcherFactory

@@ -1,6 +1,6 @@
-﻿using JetBrains.ReSharper.Psi.FSharp.Util;
+﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class FSharpIdentifier
   {

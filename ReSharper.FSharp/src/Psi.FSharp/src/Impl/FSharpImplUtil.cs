@@ -2,19 +2,19 @@
 using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
-using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2;
-using JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement;
-using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
-using JetBrains.ReSharper.Psi.FSharp.Tree;
-using JetBrains.ReSharper.Psi.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 using JetBrains.Util.Extension;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 {
   public static class FSharpImplUtil
   {

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
@@ -10,7 +11,7 @@ using JetBrains.Util.Extension;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Core;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Util
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {
   /// <summary>
   /// Map FSharpType elements (as seen by FSharp.Compiler.Service) to IType types.

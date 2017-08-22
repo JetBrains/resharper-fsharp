@@ -1,8 +1,9 @@
-﻿using JetBrains.ReSharper.Psi.Parsing;
+﻿using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.Text;
 using Microsoft.FSharp.Collections;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Parsing
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 {
   internal class FSharpLexerFactory : ILexerFactory
   {

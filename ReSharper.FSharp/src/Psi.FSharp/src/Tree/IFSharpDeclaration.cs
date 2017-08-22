@@ -2,7 +2,7 @@
 using JetBrains.ReSharper.Psi.Tree;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Tree
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
   public partial interface IFSharpDeclaration : IDeclaration
   {

@@ -18,13 +18,4 @@
     <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="12.0.8-5" />
     <PackageReference Include="JetBrains.Rider.SDK" Version="2017.1.20170814.91201-eap08" />
   </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="src\LiveTemplates\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Remove="src\LiveTemplates\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="src\LiveTemplates\**" />
-  </ItemGroup>
 </Project>

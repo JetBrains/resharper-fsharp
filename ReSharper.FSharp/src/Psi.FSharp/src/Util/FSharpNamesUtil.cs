@@ -4,13 +4,13 @@ using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
-using JetBrains.ReSharper.Psi.FSharp.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
 using JetBrains.Util.Extension;
-using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Core;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Util
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {
   public class FSharpNamesUtil
   {

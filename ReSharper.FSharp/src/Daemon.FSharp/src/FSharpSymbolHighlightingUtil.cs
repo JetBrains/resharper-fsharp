@@ -2,7 +2,7 @@
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
-namespace JetBrains.ReSharper.Daemon.FSharp
+namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
 {
   public static class FSharpSymbolHighlightingUtil
   {

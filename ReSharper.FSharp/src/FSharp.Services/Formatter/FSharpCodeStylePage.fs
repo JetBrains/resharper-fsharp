@@ -11,7 +11,7 @@ open JetBrains.ReSharper.Psi.CodeStyle
 open JetBrains.ReSharper.Psi.EditorConfig
 open JetBrains.ReSharper.Psi.Impl.CodeStyle
 open JetBrains.ReSharper.Psi.Format
-open JetBrains.ReSharper.Psi.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Resources.Icons
 

@@ -1,8 +1,9 @@
 ﻿using JetBrains.DocumentModel;
-using JetBrains.ReSharper.Daemon.FSharp.Stages;
+using JetBrains.ReSharper.Daemon;
 using JetBrains.ReSharper.Feature.Services.Daemon;
+using JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages;
 
-namespace JetBrains.ReSharper.Daemon.FSharp.Highlightings
+namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Highlightings
 {
   [DaemonTooltipProvider(typeof(FSharpIdentifierTooltipProvider))]
   [StaticSeverityHighlighting(Severity.INFO, HighlightingGroupIds.IdentifierHighlightingsGroup,

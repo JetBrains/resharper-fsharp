@@ -5,14 +5,14 @@ using JetBrains.Annotations;
 using JetBrains.Application.Threading;
 using JetBrains.ReSharper.Daemon.UsageChecking;
 using JetBrains.ReSharper.Feature.Services.Daemon;
-using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
-using JetBrains.ReSharper.Psi.FSharp.Tree;
-using JetBrains.ReSharper.Psi.FSharp.Util;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi.Tree;
 using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
-namespace JetBrains.ReSharper.Daemon.FSharp.Stages
+namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 {
   [DaemonStage(StagesBefore = new[] {typeof(TypeCheckErrorsStage)}, StagesAfter = new[] {typeof(CollectUsagesStage)})]
   public class HighlightOpenExpressionsStage : FSharpDaemonStageBase

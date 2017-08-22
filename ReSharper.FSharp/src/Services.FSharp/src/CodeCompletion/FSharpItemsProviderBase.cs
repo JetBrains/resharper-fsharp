@@ -1,7 +1,7 @@
 ﻿using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure;
 using JetBrains.ReSharper.Feature.Services.Lookup;
 
-namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
+namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
 {
   public abstract class FSharpItemsProviderBase : ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>
   {

@@ -8,7 +8,7 @@ using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Core;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Parsing
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 {
   public class FSharpLexer : ILexer
   {

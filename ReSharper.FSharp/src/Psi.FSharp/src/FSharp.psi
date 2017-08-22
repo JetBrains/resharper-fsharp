@@ -1,11 +1,11 @@
 options {
-  parserPackage="JetBrains.ReSharper.Psi.FSharp.Gen";
+  parserPackage="JetBrains.ReSharper.Plugins.FSharp.Psi.Gen";
   parserClassName="FSharpParserGenerated";
-  psiInterfacePackageName="JetBrains.ReSharper.Psi.FSharp.Tree";
-  psiStubsPackageName="JetBrains.ReSharper.Psi.FSharp.Impl.Tree";
-  psiStubsBaseClass="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpCompositeElement";
-  tokenClassName="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpToken";
-  tokenTypePackageName="JetBrains.ReSharper.Psi.FSharp.Parsing";
+  psiInterfacePackageName="JetBrains.ReSharper.Plugins.FSharp.Psi.Tree";
+  psiStubsPackageName="JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree";
+  psiStubsBaseClass="JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.FSharpCompositeElement";
+  tokenClassName="JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.FSharpToken";
+  tokenTypePackageName="JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing";
   tokenTypeClassName="FSharpTokenType";
   parserTargetSubdir="Parsing/FSharp";
   psiInterfacesTargetSubdir="Psi/FSharp";
@@ -16,29 +16,29 @@ options {
   disableReflection;
   separateHierarchies;
   acceptModifier="";
-  visitorSuperClassName="JetBrains.ReSharper.Psi.FSharp.TreeNodeVisitorBase";
+  visitorSuperClassName="JetBrains.ReSharper.Plugins.FSharp.Psi.TreeNodeVisitorBase";
   "treeElementClassFQName"="JetBrains.ReSharper.Psi.ExtensionsAPI.Tree.TreeElement";
-  "leafElementClassFQName"="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpLeafElement";
-  "compositeElementClassFQName"="JetBrains.ReSharper.Psi.FSharp.Impl.Tree.FSharpCompositeElement";
-  "psiElementVisitorClassFQName"="JetBrains.ReSharper.Psi.FSharp.Tree.TreeNodeVisitor";
+  "leafElementClassFQName"="JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.FSharpLeafElement";
+  "compositeElementClassFQName"="JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.FSharpCompositeElement";
+  "psiElementVisitorClassFQName"="JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.TreeNodeVisitor";
   "unexpectedTokenClassFQName"="Parsing.UnexpectedToken";
   "syntaxErrorClassFQName"="Parsing.SyntaxError";
   "parserGenRuntimePackageName"="Parsing";
-  "createTokenElementMethodFQName"="JetBrains.ReSharper.Psi.FSharp.Impl.Factory.createTokenElement";
+  "createTokenElementMethodFQName"="JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Factory.createTokenElement";
   "visitMethodPrefix"="Visit";
-  "lexerClassName"="JetBrains.ReSharper.Psi.FSharp.Parsing.FSharpLexer";
+  "lexerClassName"="JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.FSharpLexer";
   "psiClassesPrefix"="";
-  "psiElementClassFQName"="JetBrains.ReSharper.Psi.FSharp.Tree.IFSharpTreeNode";
-  customImplPackage="JetBrains.ReSharper.Psi.FSharp.Impl.Tree";
-  customInterfacePackage="JetBrains.ReSharper.Psi.FSharp.Tree";
+  "psiElementClassFQName"="JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IFSharpTreeNode";
+  customImplPackage="JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree";
+  customInterfacePackage="JetBrains.ReSharper.Plugins.FSharp.Psi.Tree";
   "interfaceNamePrefix"="I";
   "tokenElementClassFQName"="JetBrains.ReSharper.Psi.Tree.ITokenNode";
   "customImplSuffix"="";
   "objectClassFQName"="System.Object";
   publicChildRolePrefix="FS_";
   tokenBitsetThreshold=4;
-  elementTypeBaseClass="JetBrains.ReSharper.Psi.FSharp.Tree.FSharpCompositeNodeType";
-  parserMessagesClass="JetBrains.ReSharper.Psi.FSharp.Parsing.ParserMessages";
+  elementTypeBaseClass="JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.FSharpCompositeNodeType";
+  parserMessagesClass="JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.ParserMessages";
   generateWorkingPsi;
 }
 

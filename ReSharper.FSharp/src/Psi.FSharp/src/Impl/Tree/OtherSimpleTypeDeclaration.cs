@@ -1,4 +1,6 @@
-﻿namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
+﻿using JetBrains.ReSharper.Psi;
+
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class OtherSimpleTypeDeclaration
   {

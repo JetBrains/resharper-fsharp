@@ -8,7 +8,7 @@ using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Core;
 
-namespace JetBrains.ReSharper.Feature.Services.FSharp.CodeCompletion
+namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
 {
   public class FSharpCodeCompletionContext : SpecificCodeCompletionContext
   {

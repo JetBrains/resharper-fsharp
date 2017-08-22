@@ -1,7 +1,7 @@
 using JetBrains.ReSharper.Psi.Parsing;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Parsing
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 {
   public class FSharpTokenInfoEx
   {

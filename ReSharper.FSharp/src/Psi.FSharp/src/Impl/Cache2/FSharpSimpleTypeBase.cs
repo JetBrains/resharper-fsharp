@@ -1,12 +1,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts;
-using JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement;
-using JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement.CompilerGenerated;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
+using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
   internal class FSharpSimpleTypeBase : FSharpClass
   {

@@ -1,13 +1,12 @@
 ﻿using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
-using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Text;
-using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   public class FSharpIdentifierToken : FSharpToken
   {

@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Psi.FSharp.Impl.Cache2.Parts;
-using JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
   internal class FSharpUnionCase : FSharpClass
   {

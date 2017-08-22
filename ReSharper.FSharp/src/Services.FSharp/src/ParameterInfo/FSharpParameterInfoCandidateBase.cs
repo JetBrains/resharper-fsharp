@@ -4,7 +4,7 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.UI.RichText;
 using JetBrains.Util;
 
-namespace JetBrains.ReSharper.Feature.Services.FSharp.ParameterInfo
+namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.ParameterInfo
 {
   public abstract class FSharpParameterInfoCandidateBase : ICandidate
   {

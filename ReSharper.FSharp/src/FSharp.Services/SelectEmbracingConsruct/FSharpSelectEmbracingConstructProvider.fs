@@ -8,9 +8,9 @@ open JetBrains.ReSharper.Feature.Services.SelectEmbracingConstruct
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.FSharp.Parsing
-open JetBrains.ReSharper.Psi.FSharp.Tree
-open JetBrains.ReSharper.Psi.FSharp.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.Tree
 open Microsoft.FSharp.Compiler
 open Microsoft.FSharp.Compiler.Ast

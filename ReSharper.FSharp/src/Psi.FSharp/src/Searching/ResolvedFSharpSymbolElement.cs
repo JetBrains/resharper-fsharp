@@ -1,14 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Xml;
-using JetBrains.ReSharper.Psi.FSharp.Impl;
-using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 using JetBrains.Util.DataStructures;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Searching
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 {
   /// <summary>
   /// Produced during reference resolve and is used to find usages when symbol generally cannot be resolved to R# element.

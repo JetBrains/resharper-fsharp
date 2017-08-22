@@ -1,4 +1,4 @@
-﻿namespace JetBrains.ReSharper.Psi.FSharp.Parsing
+﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 {
   public class ParserMessages
   {

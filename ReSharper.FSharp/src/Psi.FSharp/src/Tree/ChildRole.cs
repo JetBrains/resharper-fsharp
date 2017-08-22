@@ -1,4 +1,4 @@
-﻿namespace JetBrains.ReSharper.Psi.FSharp.Tree
+﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
   public sealed class ChildRole
   {

@@ -2,7 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services
 
 open JetBrains.Application
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Feature.Services.ClrLanguages
 
 [<ShellComponent>]

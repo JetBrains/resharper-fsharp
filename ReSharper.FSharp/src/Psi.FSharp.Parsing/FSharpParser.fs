@@ -4,7 +4,8 @@ open JetBrains.DataFlow
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
-open JetBrains.ReSharper.Psi.FSharp.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util

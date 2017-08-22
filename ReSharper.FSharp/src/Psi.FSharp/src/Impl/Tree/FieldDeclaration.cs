@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement;
-using JetBrains.ReSharper.Psi.FSharp.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class FieldDeclaration
   {

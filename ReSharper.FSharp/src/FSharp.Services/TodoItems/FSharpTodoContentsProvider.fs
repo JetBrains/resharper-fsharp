@@ -3,7 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.TodoItems
 open System
 open JetBrains.ReSharper.Feature.Services.TodoItems
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.Util
 
 [<Language(typeof<FSharpLanguage>)>]

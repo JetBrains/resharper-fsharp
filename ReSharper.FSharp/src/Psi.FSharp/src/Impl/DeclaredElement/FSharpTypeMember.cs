@@ -1,16 +1,16 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
-using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
-using JetBrains.ReSharper.Psi.FSharp.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 using JetBrains.Util.dataStructures;
 using JetBrains.Util.DataStructures;
-using Microsoft.FSharp.Compiler;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Impl.DeclaredElement
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
   internal abstract class FSharpTypeMember<TDeclaration> : FSharpDeclaredElement<TDeclaration>, IFSharpTypeMember
     where TDeclaration : FSharpDeclarationBase, IFSharpDeclaration, IAccessRightsOwnerDeclaration,

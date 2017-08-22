@@ -2,27 +2,26 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Searching;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
-using JetBrains.ReSharper.Psi.FSharp.Impl;
-using JetBrains.ReSharper.Psi.FSharp.Impl.Tree;
-using JetBrains.ReSharper.Psi.FSharp.Searching;
-using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
-using JetBrains.Util.Logging;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
-namespace JetBrains.ReSharper.Psi.FSharp.Util
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {
   /// <summary>
   /// Map FSharpSymbol elements (as seen by FSharp.Compiler.Service) to declared elements.
   /// </summary>
   public static class FSharpElementsUtil
   {
-    private static object ourFcSLock = new object();
+    private static readonly object ourFcSLock = new object();
 
     [CanBeNull]
     internal static ITypeElement GetTypeElement([NotNull] FSharpEntity entity, [NotNull] IPsiModule psiModule)
