@@ -1,4 +1,5 @@
-﻿using JetBrains.ReSharper.Psi.FSharp.Tree;
+﻿using System.Collections.Generic;
+using JetBrains.ReSharper.Psi.FSharp.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Psi.FSharp.Impl.Tree

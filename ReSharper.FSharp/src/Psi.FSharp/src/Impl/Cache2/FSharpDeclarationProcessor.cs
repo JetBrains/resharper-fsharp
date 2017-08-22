@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Checker;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
@@ -175,7 +176,7 @@ namespace JetBrains.ReSharper.Psi.FSharp.Impl.Cache2
       }
     }
 
-    private void ProcessTypeMembers(TreeNodeCollection<ITypeMemberDeclaration> memberDeclarations)
+    private void ProcessTypeMembers(IReadOnlyList<ITypeMemberDeclaration> memberDeclarations)
     {
       foreach (var typeMemberDeclaration in memberDeclarations)
       {
