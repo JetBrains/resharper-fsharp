@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net45</TargetFramework>
+    <TargetFramework>net451</TargetFramework>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs</AssemblyName>
   </PropertyGroup>

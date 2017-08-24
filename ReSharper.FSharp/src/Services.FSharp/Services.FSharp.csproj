@@ -1,5 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <TargetFramework>net451</TargetFramework>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Services.Cs</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Services.Cs</AssemblyName>
   </PropertyGroup>
