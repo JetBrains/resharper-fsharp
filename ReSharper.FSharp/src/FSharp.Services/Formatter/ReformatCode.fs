@@ -24,7 +24,7 @@ type ReformatCode() =
         member x.Descriptors = EmptyList<_>.Instance :> _
         member x.IsAvailableOnSelection = false
         member x.SetDefaultSetting(_,_) = ()
-        member x.IsAvailable(file) = file.LanguageType :? FSharpProjectFileType
+        member x.IsAvailable(file) = file.PrimaryPsiLanguage :? FSharpLanguage
 
         member x.Process(sourceFile,rangeMarker,_,_) =
             match sourceFile.GetTheOnlyPsiFile() with
