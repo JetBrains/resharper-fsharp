@@ -63,9 +63,8 @@ type FSharpDummyCodeFormatter(loggerProvider, settingsOptimization) =
     override x.FormatDeletedNodes(_,_,_) = InvalidOperationException() |> raise
     override x.FormatReplacedNode(_,_) = InvalidOperationException() |> raise
     
-    // todo: Fix this (temp while moving to wave10)
-    override x.CreateFormatterContext(_,_,_,_,_,_) = null
-
+    override x.CreateFormatterContext(profile, firstNode, lastNode, parameters, _, _) =
+        CodeFormattingContext(x, firstNode, lastNode, profile, loggerProvider.FormatterLogger, parameters);
 
 [<CodePreviewPreparatorComponent>]
 type FSharpCodePreviewPreparator() = 
@@ -77,8 +76,8 @@ type FSharpCodePreviewPreparator() =
 
 [<FormattingSettingsPresentationComponent>]
 type FSharpCodeStylePageSchema(lifetime, smartContext, itemViewModelFactory, container, settingsToHide) =
-    inherit CodeStylePageSchema<FSharpFormatSettingsKey, FSharpCodePreviewPreparator>(lifetime, smartContext,itemViewModelFactory,
-                                                                 container, settingsToHide)
+    inherit CodeStylePageSchema<FSharpFormatSettingsKey, FSharpCodePreviewPreparator>(lifetime, smartContext,
+        itemViewModelFactory, container, settingsToHide)
 
     override x.Language = FSharpLanguage.Instance :> _
     override x.PageName = "Formatting Style"
