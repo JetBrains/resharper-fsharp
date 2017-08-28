@@ -13,7 +13,7 @@
     <iconUrl>http://resharper-plugins.jetbrains.com/Content/Images/packageReSharper.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <dependencies>
-      <dependency id="Wave" version="[8.0]" />
+      <dependency id="Wave" version="[10.0]" />
     </dependencies>
     <tags>resharper fsharp</tags>
   </metadata>
