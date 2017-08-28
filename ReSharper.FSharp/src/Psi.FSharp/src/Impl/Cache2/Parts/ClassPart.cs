@@ -21,10 +21,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       return new FSharpClass(this);
     }
 
-    public MemberPresenceFlag GetMemberPresenceFlag()
+    public override MemberPresenceFlag GetMemberPresenceFlag()
     {
-      // todo: check actual members 
-      return MemberPresenceFlag.INSTANCE_CTOR;
+      // todo: check actual members
+      return base.GetMemberPresenceFlag() |
+             MemberPresenceFlag.INSTANCE_CTOR;
     }
 
     protected override byte SerializationTag => (byte) FSharpPartKind.Class;

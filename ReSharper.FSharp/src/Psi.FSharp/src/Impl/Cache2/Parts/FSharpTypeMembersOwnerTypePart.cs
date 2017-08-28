@@ -1,5 +1,6 @@
 ﻿using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.Util;
 
@@ -49,5 +50,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     }
 
     public override string[] ExtendsListShortNames { get; }
+
+    // Workaround for F# operators discovery.
+    public virtual MemberPresenceFlag GetMemberPresenceFlag() => MemberPresenceFlag.SIGN_OP;
   }
 }

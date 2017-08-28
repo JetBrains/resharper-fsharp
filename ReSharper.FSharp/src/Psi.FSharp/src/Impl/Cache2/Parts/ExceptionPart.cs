@@ -24,9 +24,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       return new FSharpException(this);
     }
 
-    public MemberPresenceFlag GetMemberPresenceFlag()
+    public override MemberPresenceFlag GetMemberPresenceFlag()
     {
-      return MemberPresenceFlag.MAY_EQUALS_OVERRIDE;
+      return base.GetMemberPresenceFlag() |
+             MemberPresenceFlag.MAY_EQUALS_OVERRIDE;
     }
 
     protected override byte SerializationTag => (byte) FSharpPartKind.Exception;

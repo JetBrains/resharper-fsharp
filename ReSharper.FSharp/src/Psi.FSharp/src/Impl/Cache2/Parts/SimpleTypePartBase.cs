@@ -23,9 +23,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public override string[] ExtendsListShortNames =>
       ArrayUtil.Add(ourExtendsListShortNames, base.ExtendsListShortNames);
 
-    public MemberPresenceFlag GetMemberPresenceFlag()
+    public override MemberPresenceFlag GetMemberPresenceFlag()
     {
-      return MemberPresenceFlag.INSTANCE_CTOR |
+      return base.GetMemberPresenceFlag() |
+             MemberPresenceFlag.INSTANCE_CTOR |
              MemberPresenceFlag.MAY_EQUALS_OVERRIDE |
              MemberPresenceFlag.MAY_TOSTRING_OVERRIDE;
     }

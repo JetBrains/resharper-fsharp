@@ -1,4 +1,5 @@
-﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
+﻿using System;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
@@ -32,10 +33,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       }
 
       var typeDeclaration = GetContainingTypeDeclaration() as IFSharpTypeDeclaration;
-      return new FSharpMethod<MemberDeclaration>(this, mfv, typeDeclaration);
-//      return !mfv.IsInstanceMember && mfv.CompiledName.StartsWith("op_", StringComparison.Ordinal)
-//        ? (IDeclaredElement) new FSharpOperator<MemberDeclaration>(this, mfv, null)
-//        : new FSharpMethod<MemberDeclaration>(this, mfv, typeDeclaration);
+      return !mfv.IsInstanceMember && mfv.CompiledName.StartsWith("op_", StringComparison.Ordinal)
+        ? (IDeclaredElement) new FSharpOperator<MemberDeclaration>(this, mfv, null)
+        : new FSharpMethod<MemberDeclaration>(this, mfv, typeDeclaration);
     }
   }
 }

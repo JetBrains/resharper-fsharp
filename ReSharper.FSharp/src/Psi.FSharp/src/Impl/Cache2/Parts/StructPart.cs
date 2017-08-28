@@ -23,7 +23,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public MemberPresenceFlag GetMembersPresenceFlag()
     {
-      return MemberPresenceFlag.NONE;
+      return MemberPresenceFlag.SIGN_OP;
     }
 
     public bool HasHiddenInstanceFields => false; // todo: check this
