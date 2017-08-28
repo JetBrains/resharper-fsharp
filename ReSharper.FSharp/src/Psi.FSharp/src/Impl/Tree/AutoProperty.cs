@@ -37,7 +37,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       var mfv = GetFSharpSymbol() as FSharpMemberOrFunctionOrValue;
       if (mfv == null) return null;
 
-      var entityMembers = mfv.EnclosingEntity.MembersFunctionsAndValues; //todo inheritance with same name
+      var entityMembers = mfv.EnclosingEntity?.Value.MembersFunctionsAndValues; //todo inheritance with same name
       var property = entityMembers?.SingleItem(m => m.IsProperty && !m.IsPropertyGetterMethod &&
                                                     !m.IsPropertySetterMethod && m.DisplayName == mfv.DisplayName);
       if (property == null)

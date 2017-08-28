@@ -107,9 +107,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         if (memberEntity == null) return null;
 
         if (mfv.IsImplicitConstructor)
-          return GetDeclaredElement(memberEntity, psiModule, referenceOwnerToken);
+          return GetDeclaredElement(memberEntity.Value, psiModule, referenceOwnerToken);
 
-        var typeElement = GetTypeElement(memberEntity, psiModule);
+        var typeElement = GetTypeElement(memberEntity.Value, psiModule);
         if (typeElement == null) return null;
 
         var members = mfv.IsConstructor

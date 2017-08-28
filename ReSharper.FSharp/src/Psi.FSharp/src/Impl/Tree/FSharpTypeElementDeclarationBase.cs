@@ -55,7 +55,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (mfv == null)
         return null;
 
-      return mfv.IsConstructor || mfv.IsImplicitConstructor ? mfv.EnclosingEntity : null;
+      return mfv.IsConstructor || mfv.IsImplicitConstructor ? mfv.EnclosingEntity?.Value : null;
     }
 
     [NotNull]

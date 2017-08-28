@@ -56,9 +56,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (mfv.IsProperty)
         return mfv;
 
-      var members = mfv.EnclosingEntity.MembersFunctionsAndValues;
+      var members = mfv.EnclosingEntity?.Value.MembersFunctionsAndValues;
       return mfv.IsModuleValueOrMember
-        ? members.FirstOrDefault(m => m.IsProperty && m.DisplayName == mfv.DisplayName) ?? mfv
+        ? members?.FirstOrDefault(m => m.IsProperty && m.DisplayName == mfv.DisplayName) ?? mfv
         : mfv;
     }
   }

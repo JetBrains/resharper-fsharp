@@ -22,9 +22,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (mfv == null) return null;
 
       // todo: fix getting members in FCS and remove this hack
-      var hasDefault = mfv.EnclosingEntity.MembersFunctionsAndValues.Any(m =>
+      var hasDefault = mfv.EnclosingEntity?.Value.MembersFunctionsAndValues.Any(m =>
         m.IsOverrideOrExplicitInterfaceImplementation &&
-        mfv.LogicalName == m.LogicalName);
+        mfv.LogicalName == m.LogicalName) ?? false;
       if (hasDefault)
         return null;
 
