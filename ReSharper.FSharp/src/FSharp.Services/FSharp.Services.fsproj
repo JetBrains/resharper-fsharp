@@ -1,11 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net451</TargetFramework>
+    <DebugType>full</DebugType>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Services</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Services</AssemblyName>
   </PropertyGroup>
-
+  
   <ItemGroup>
     <Compile Include="FSharpClrLanguage.fs" />
     <Compile Include="FSharpRefactoringLanguageService.fs" />
