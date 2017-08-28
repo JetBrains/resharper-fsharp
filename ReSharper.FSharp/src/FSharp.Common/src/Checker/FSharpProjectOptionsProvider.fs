@@ -29,6 +29,7 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 open JetBrains
 open Microsoft.FSharp.Compiler
+open Microsoft.FSharp.Compiler.ErrorLogger
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
 type Logger = Util.ILoggerEx
@@ -204,9 +205,11 @@ type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISol
                 | Some project when project.Options.IsSome ->
                     match project.ParsingOptions with
                     | None ->
-                        let parsingOptions, errors = checker.GetParsingOptions(project.Options.Value).RunAsTask()
+                        let projectOptions = project.Options.Value
+                        let parsingOptions, errors = checker.CreateParsingOptions(List.ofArray projectOptions.OtherOptions)
+                        let parsingOptions = { parsingOptions with SourceFiles = projectOptions.SourceFiles }
                         logger.LogFSharpErrors "Getting parsing options" errors
-                        project.ParsingOptions <- parsingOptions
-                        parsingOptions
+                        project.ParsingOptions <- Some parsingOptions
+                        Some parsingOptions
                     | options -> options
                 | _ -> None
