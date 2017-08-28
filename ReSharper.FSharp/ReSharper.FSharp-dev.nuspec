@@ -3,12 +3,12 @@
   <metadata>
     <id>JetBrains.ReSharper.FSharp</id>
     <title>ReSharper.FSharp</title>
-    <version>0.1.100</version>
+    <version>0.1.174</version>
     <authors>JetBrains auduchinok</authors>
-    <owners>JetBrains</owners>
+    <owners>JetBrains auduchinok</owners>
     <summary>F# support</summary>
     <description>F# language support in ReSharper</description>
-    <releaseNotes />
+    <releaseNotes/>
     <projectUrl>https://github.com/JetBrains/resharper-fsharp</projectUrl>
     <iconUrl>http://resharper-plugins.jetbrains.com/Content/Images/packageReSharper.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
@@ -22,15 +22,24 @@
     <file src="src\FSharp.Common\bin\Debug\net451\FSharp.Compiler.Service.dll" target="DotFiles" />
     <file src="src\FSharp.Common\bin\Debug\net451\FSharp.Compiler.Service.MSBuild.v12.dll" target="DotFiles" />
     <file src="src\FSharp.Services\bin\Debug\net451\FantomasLib.dll" target="DotFiles" />
-
+    
     <file src="src\FSharp.Common\bin\Debug\net451\JetBrains.ReSharper.Plugins.FSharp.Common.dll" target="DotFiles" />
+    <file src="src\FSharp.Common\bin\Debug\net451\JetBrains.ReSharper.Plugins.FSharp.Common.pdb" target="DotFiles" />
     <file src="src\FSharp.Daemon\bin\Debug\net451\JetBrains.ReSharper.Plugins.FSharp.Daemon.dll" target="DotFiles" />
+    <file src="src\FSharp.Daemon\bin\Debug\net451\JetBrains.ReSharper.Plugins.FSharp.Daemon.pdb" target="DotFiles" />
     <file src="src\FSharp.Services\bin\Debug\net451\JetBrains.ReSharper.Plugins.FSharp.Services.dll" target="DotFiles" />
+    <file src="src\FSharp.Services\bin\Debug\net451\JetBrains.ReSharper.Plugins.FSharp.Services.pdb" target="DotFiles" />
     <file src="src\FSharp.ProjectModelBase\bin\Debug\net451\JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase.dll" target="DotFiles" />
+    <file src="src\FSharp.ProjectModelBase\bin\Debug\net451\JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase.pdb" target="DotFiles" />
     <file src="src\Psi.FSharp\bin\Debug\net451\JetBrains.ReSharper.Plugins.FSharp.Psi.dll" target="DotFiles" />
+    <file src="src\Psi.FSharp\bin\Debug\net451\JetBrains.ReSharper.Plugins.FSharp.Psi.pdb" target="DotFiles" />
     <file src="src\Psi.FSharp.LanguageService\bin\Debug\net451\JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.dll" target="DotFiles" />
+    <file src="src\Psi.FSharp.LanguageService\bin\Debug\net451\JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.pdb" target="DotFiles" />
     <file src="src\Daemon.FSharp\bin\Debug\net451\JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.dll" target="DotFiles" />
+    <file src="src\Daemon.FSharp\bin\Debug\net451\JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.pdb" target="DotFiles" />
     <file src="src\Services.FSharp\bin\Debug\net451\JetBrains.ReSharper.Plugins.FSharp.Services.Cs.dll" target="DotFiles" />
+    <file src="src\Services.FSharp\bin\Debug\net451\JetBrains.ReSharper.Plugins.FSharp.Services.Cs.pdb" target="DotFiles" />
     <file src="src\Psi.FSharp.Parsing\bin\Debug\net451\JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.dll" target="DotFiles" />
+    <file src="src\Psi.FSharp.Parsing\bin\Debug\net451\JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.pdb" target="DotFiles" />
   </files>
 </package>
