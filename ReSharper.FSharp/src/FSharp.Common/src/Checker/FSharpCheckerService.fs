@@ -31,43 +31,43 @@ type FSharpParseAndCheckResults =
 
 [<ShellComponent>]
 type FSharpCheckerService(lifetime, onSolutionCloseNotifier: OnSolutionCloseNotifier) =
-    let checker = FSharpChecker.Create(projectCacheSize = 200, keepAllBackgroundResolutions = false,
+    let checker = lazy FSharpChecker.Create(projectCacheSize = 200, keepAllBackgroundResolutions = false,
                                        legacyReferenceResolver = MSBuildReferenceResolver.Resolver)
     do
         onSolutionCloseNotifier.SolutionIsAboutToClose.Advise(lifetime, fun () ->
-            checker.ClearLanguageServiceRootCachesAndCollectAndFinalizeAllTransients())
+            checker.Value.ClearLanguageServiceRootCachesAndCollectAndFinalizeAllTransients())
 
     member val OptionsProvider: IFSharpProjectOptionsProvider = null with get, set
-    member x.Checker = checker
+    member x.Checker = checker.Value
 
     member x.ParseFile([<NotNull>] file: IPsiSourceFile) =
-        match x.OptionsProvider.GetParsingOptions(file, checker) with
+        match x.OptionsProvider.GetParsingOptions(file, x.Checker) with
         | Some parsingOptions as options ->
             let filePath = file.GetLocation().FullPath
             let source = file.Document.GetText()
-            options, Some (checker.ParseFile(filePath, source, parsingOptions).RunAsTask())
+            options, Some (x.Checker.ParseFile(filePath, source, parsingOptions).RunAsTask())
         | _ -> None, None
 
     member x.HasPairFile([<NotNull>] file: IPsiSourceFile) =
-        x.OptionsProvider.HasPairFile(file, checker)
+        x.OptionsProvider.HasPairFile(file, x.Checker)
 
     member x.GetDefines(sourceFile: IPsiSourceFile) =
         if sourceFile.LanguageType.Equals(FSharpScriptProjectFileType.Instance) ||
             sourceFile.PsiModule.IsMiscFilesProjectModule() then []
         else
-            match x.OptionsProvider.TryGetFSharpProject(sourceFile, checker) with
+            match x.OptionsProvider.TryGetFSharpProject(sourceFile, x.Checker) with
             | Some project -> project.ConfigurationDefines
             | _ -> List.empty
 
     member x.GetParsingOptions(sourceFile: IPsiSourceFile) =
-        x.OptionsProvider.GetParsingOptions(sourceFile, checker)
+        x.OptionsProvider.GetParsingOptions(sourceFile, x.Checker)
 
     member x.ParseAndCheckFile([<NotNull>] file: IPsiSourceFile, allowStaleResults: bool) =
-        match x.OptionsProvider.GetProjectOptions(file, checker, true) with
+        match x.OptionsProvider.GetProjectOptions(file, x.Checker, true) with
         | Some options ->
             let filePath = file.GetLocation().FullPath
             let source = file.Document.GetText()
-            let parsingResults, checkResults = checker.ParseAndCheckFileInProject(filePath, 0, source, options).RunAsTask()
+            let parsingResults, checkResults = x.Checker.ParseAndCheckFileInProject(filePath, 0, source, options).RunAsTask()
             match parsingResults.ParseTree, checkResults with
             | Some parseTree, FSharpCheckFileAnswer.Succeeded checkResults ->
                 Some { ParseResults = parsingResults; ParseTree = parseTree; CheckResults = checkResults }
