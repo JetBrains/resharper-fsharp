@@ -38,7 +38,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       var fieldDeclarations = typeDeclaration.Children<FieldDeclaration>().ToTreeNodeCollection();
       var index = fieldDeclarations.IndexOf(this);
       var fields = GetFields(typeSymbol);
-      var caseField = index <= fields.Count ? fields[index] : null;
+      var caseField =
+        fields != null && index <= fields.Count
+          ? fields[index]
+          : null;
 
       return caseField != null
         ? new FSharpFieldProperty(this, caseField)
