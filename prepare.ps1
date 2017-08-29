@@ -82,99 +82,24 @@ function SetNuspecVersion($file, $version)
   $xml.Save($file)
 }
 
-function GetPackagesFromFolder($folder)
-{
-  $packages = @{}
+function GetPackageVersionFromFolder($folder, $name) {
   foreach ($file in Get-ChildItem $folder) {
-    $match = [regex]::Match($file.Name, "^(.+?)\.((\d+\.)+\d+(\-eap\d+)?)\.nupkg$")
+    $match = [regex]::Match($file.Name, "^" + [Regex]::Escape($name) + "\.((\d+\.)+\d+(\-eap\d+(internal)?)?)\.nupkg$")
     if ($match.Success) {
-      $name = $match.Groups[1].Value
-      $version = $match.Groups[2].Value
-      
-      $packages.add($name, $version)
-      Write-Host "- package $name $version"
+      return $match.Groups[1].Value
     }
   }
-  return $packages
+
+  Write-Error "Package $name was not found in folder $folder"
 }
 
-function UpdatePackagesInPackagesConfig($file, $packages)
+function SetRiderSDKVersions($sdkPackageVersion)
 {
-  Write-Host "* Updating ${file}"
+  Write-Host "Setting versions:"
+  Write-Host "  JetBrains.Rider.SDK -> $sdkPackageVersion"
+  Write-Host "  JetBrains.Rider.SDK.Tests -> $sdkPackageVersion"  
 
-  $xml = New-Object xml
-  $xml.PreserveWhitespace = $true
-  $xml.Load($file)
-  
-  foreach ($node in $xml.SelectNodes("//package")) {
-    $version = $packages[$node.GetAttribute("id")]
-    if ($version -ne $null) {
-      $node.SetAttribute("version", $version)
-    }
-  }
-  
-  $xml.Save($file)
-}
-
-function ReplacePackageInString($str, $packages)
-{
-  foreach ($name in $packages.Keys) {
-    $version = $packages[$name]
-    $str = $str -ireplace ("packages\\" + [Regex]::Escape($name) + "\.((\d+\.)+\d+(\-eap\d+)?)\\"),"packages\${name}.${version}\"
-  }
-  return $str
-}
-
-function UpdatePackagesInProj($file, $packages)
-{
-  Write-Host "* Updating ${file}"
-
-  $xml = New-Object xml
-  $xml.PreserveWhitespace = $true
-  $xml.Load($file)
-  
-  $ns = new-object Xml.XmlNamespaceManager $xml.NameTable
-  $ns.AddNamespace("msb", "http://schemas.microsoft.com/developer/msbuild/2003")
-  
-  foreach ($node in $xml.SelectNodes("//msb:HintPath", $ns)) {
-    $node.InnerText = ReplacePackageInString $node.InnerText $packages
-  }
-  
-  foreach ($node in $xml.SelectNodes("//msb:Reference", $ns)) {
-    $inc = $node.GetAttribute("Include")
-    if ($inc) {
-      $inc = $inc -ireplace ", Version=[\d\.]+",""
-      $inc = $inc -ireplace ", Culture=\w+",""
-      $inc = $inc -ireplace ", PublicKeyToken=\w+",""
-      $inc = $inc -ireplace ", processorArchitecture=\w+",""
-      
-      $node.SetAttribute("Include", $inc)
-    }
-  }
-    
-  foreach ($node in $xml.SelectNodes("//msb:Error", $ns)) {
-    if ($node.GetAttribute("Condition")) { 
-      $condition = ReplacePackageInString -str $node.GetAttribute("Condition") -packages $packages
-      $node.SetAttribute("Condition", $condition)
-    }
-    if ($node.GetAttribute("Text")) { 
-      $text = ReplacePackageInString $node.GetAttribute("Text") $packages
-      $node.SetAttribute("Text", $text) 
-    }
-  }
-  
-  foreach ($node in $xml.SelectNodes("//msb:Import", $ns)) {
-    if ($node.GetAttribute("Condition")) { 
-      $condition = ReplacePackageInString -str $node.GetAttribute("Condition") -packages $packages
-      $node.SetAttribute("Condition", $condition)
-    }
-    if ($node.GetAttribute("Project")) { 
-      $project = ReplacePackageInString $node.GetAttribute("Project") $packages
-      $node.SetAttribute("Project", $project)
-    }
-  }
-  
-  $xml.Save($file)
+  SetPropertyValue  "ReSharper.FSharp/Directory.Build.props" "RiderSDKVersion" "[$sdkPackageVersion]"  
 }
 
 $baseVersion = [IO.File]::ReadAllText("VERSION.txt").Trim()
@@ -190,20 +115,11 @@ SetPluginVersion -file "rider-fsharp/src/main/resources/META-INF/plugin.xml" -ve
 SetNuspecVersion -file "ReSharper.FSharp/ReSharper.FSharp.nuspec" -version $version
 
 if ($Source) {
-  $packages = GetPackagesFromFolder -folder $Source
-  foreach ($config in Get-ChildItem -Path ReSharper.FSharp/src -Filter packages.config -Recurse) {
-    UpdatePackagesInPackagesConfig $config.FullName $packages
-  }
-
-  foreach ($proj in Get-ChildItem -Path ReSharper.FSharp/src -Filter *.*proj -Recurse) {
-    UpdatePackagesInProj $proj.FullName $packages
-  }
+  $sdkPackageVersion = GetPackageVersionFromFolder $Source "JetBrains.Rider.SDK"
+  SetRiderSDKVersions -sdkPackageVersion $sdkPackageVersion
 }
 
-Write-Host "##teamcity[progressMessage 'Restoring packages']"
-if ($Source) {
-  & tools\nuget restore -Source $Source -Source https://www.nuget.org/api/v2/ -Source http://repo.labs.intellij.net/api/nuget/dotnet-build ReSharper.FSharp/ReSharper.FSharp.sln
-} else {
-  & tools\nuget restore ReSharper.FSharp/ReSharper.FSharp.sln
-}
-if ($LastExitCode -ne 0) { throw "Exec: Unable to nuget restore: exit code $LastExitCode" }
+tools\nuget restore -Source $Source -Source https://www.nuget.org/api/v2/ -Source http://repo.labs.intellij.net/api/nuget/dotnet-build "ReSharper.FSharp/ReSharper.FSharp.sln"
+
+Write-Host "Finishing..."
+Exit 0
