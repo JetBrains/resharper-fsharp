@@ -2,7 +2,6 @@
   <PropertyGroup>
     <TargetFramework>net451</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
-    <DebugType>full</DebugType>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Common</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Common</AssemblyName>
   </PropertyGroup>
