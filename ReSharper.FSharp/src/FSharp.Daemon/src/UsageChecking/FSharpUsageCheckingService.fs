@@ -13,5 +13,6 @@ type FSharpDummyUsageAnalyzer(lifetime, suppressors) =
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpUsageCheckingServices(lifetime, suppressors) =
     inherit UsageCheckingServices(FSharpDummyUsageAnalyzer(lifetime, suppressors), null, null)
+    let _ = FSharpLanguage.Instance // workaround to create assembly reference (Microsoft/visualfsharp#3522)
     
     override x.CreateUnusedLocalDeclarationAnalyzer(_,_) = null

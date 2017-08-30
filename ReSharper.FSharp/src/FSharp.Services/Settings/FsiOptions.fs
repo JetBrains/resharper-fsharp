@@ -32,6 +32,8 @@ module FsiOptions =
     [<OptionsPage("FsiOptionsPage", "Fsi", typeof<ProjectModelThemedIcons.Fsharp>)>]
     type FsiOptionsPage(lifetime, optionsContext) as this =
         inherit SimpleOptionsPage(lifetime, optionsContext)
+        let _ = ProjectModelThemedIcons.Fsharp // workaround to create assembly reference (Microsoft/visualfsharp#3522)
+        
         do
             this.AddBoolOption((fun (key: FsiOptions) -> key.UseAnyCpuVersion), RichText(useAnyCpuVersionText)) |> ignore
             this.AddBoolOption((fun (key: FsiOptions) -> key.ShadowCopyReferences), RichText(shadowCopyReferencesText)) |> ignore
