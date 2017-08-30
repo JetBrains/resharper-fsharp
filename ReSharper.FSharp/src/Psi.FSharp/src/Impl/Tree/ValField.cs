@@ -1,4 +1,5 @@
-﻿using JetBrains.ReSharper.Psi;
+﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
+using JetBrains.ReSharper.Psi;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -14,8 +15,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     protected override IDeclaredElement CreateDeclaredElement()
     {
-      var mfv = GetFSharpSymbol() as FSharpMemberOrFunctionOrValue;
-      return null;
+      var field = GetFSharpSymbol() as FSharpField;
+      return field != null ? new FSharpValField(this, field) : null;
     }
   }
 }
