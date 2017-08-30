@@ -99,6 +99,7 @@ moduleOrNamespaceSignature: fakeSeparator;
 interface moduleMember:
   moduleMemberDeclaration |
   moduleMemberStatement |
+  memberDeclaration |
   otherModuleMember;
 
 interface moduleMemberDeclaration:
