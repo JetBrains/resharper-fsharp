@@ -27,7 +27,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
-open JetBrains
 open Microsoft.FSharp.Compiler
 open Microsoft.FSharp.Compiler.ErrorLogger
 open Microsoft.FSharp.Compiler.SourceCodeServices
@@ -72,7 +71,7 @@ type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISol
                 if change.IsRemoved then
                     match projects.TryGetValue project with
                     | true, fsProject ->
-                        checkerService.Checker.InvalidateConfiguration(fsProject.Options.Value)
+                        checkerService.InvalidateProject(fsProject)
                         projects.Remove(project) |> ignore
                         projectsToInvalidate.Remove(project) |> ignore
                         for p in fsProject.ReferencingProjects do
@@ -90,16 +89,16 @@ type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISol
                 projectsToInvalidate.Add(p) |> ignore
                 x.InvalidateReferencingProjects(p)
 
-    member private x.GetProjectOptionsImpl(file: IPsiSourceFile, checker: FSharpChecker) =
+    member private x.GetProjectOptionsImpl(file: IPsiSourceFile) =
         lock projects (fun _ ->
-            x.ProcessInvalidateOptions(checker)
+            x.ProcessInvalidateOptions()
             let project = file.GetProject()
             match projects.TryGetValue(project) with
             | true, fsProject when fsProject.ContainsFile file -> fsProject.Options
-            | _ when project.IsOpened -> x.CreateProjectOptions(project, checker)
+            | _ when project.IsOpened -> x.CreateProjectOptions(project)
             | _ -> None)
 
-    member private x.CreateProjectOptions(project, checker) =
+    member private x.CreateProjectOptions(project) =
         match projects.TryGetValue(project) with
         | true, project -> project.Options
         | _ ->
@@ -109,7 +108,7 @@ type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISol
                 seq { for p in project.GetReferencedProjects(framework, transitive = false) do
                           if p.IsOpened && isApplicable p then
                               let outPath = p.GetOutputFilePath(p.GetCurrentTargetFrameworkId()).FullPath
-                              yield outPath, x.CreateProjectOptions(p, checker).Value }
+                              yield outPath, x.CreateProjectOptions(p).Value }
 
             let options = { fsProject.Options.Value with ReferencedProjects = referencedProjectsOptions.ToArray() }
             let options =
@@ -120,27 +119,27 @@ type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISol
             projects.[project] <- fsProject
             fsProject.Options
 
-    member private x.ProcessInvalidateOptions(checker) =
+    member private x.ProcessInvalidateOptions() =
         for p in projectsToInvalidate do
             if projects.contains p then
-                checker.InvalidateConfiguration(projects.[p].Options.Value)
+                checkerService.InvalidateProject(projects.[p])
                 projects.remove p
         projectsToInvalidate.Clear()
 
-    member private x.GetScriptOptionsImpl(file: IPsiSourceFile, checker: FSharpChecker, updateScriptOptions: bool) =
+    member private x.GetScriptOptionsImpl(file: IPsiSourceFile, updateScriptOptions: bool) =
         let path = file.GetLocation()
-        if updateScriptOptions then x.GetNewScriptOptions(file, checker)
+        if updateScriptOptions then x.GetNewScriptOptions(file)
         else
             match scriptOptions.TryGetValue(path) with
             | true, options -> Some options
-            | _ -> x.GetNewScriptOptions(file, checker)
+            | _ -> x.GetNewScriptOptions(file)
     
-    member private x.GetNewScriptOptions(file: IPsiSourceFile, checker: FSharpChecker) =
+    member private x.GetNewScriptOptions(file: IPsiSourceFile) =
         let path = file.GetLocation()
         let filePath = path.FullPath
         let source = file.Document.GetText()
         let loadTime = DateTime.Now
-        let getScriptOptionsAsync = checker.GetProjectOptionsFromScript(filePath, source, loadTime)
+        let getScriptOptionsAsync = checkerService.Checker.GetProjectOptionsFromScript(filePath, source, loadTime)
         try
             let options, errors = getScriptOptionsAsync.RunAsTask()
             if not errors.IsEmpty then logger.LogFSharpErrors("Script options for " + filePath) errors
@@ -162,20 +161,20 @@ type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISol
         projectsToInvalidate.Clear() // todo: check?
 
     interface IFSharpProjectOptionsProvider with
-        member x.GetProjectOptions(file, checker, updateScriptOptions) =
+        member x.GetProjectOptions(file, updateScriptOptions) =
             if file.LanguageType.Equals(FSharpScriptProjectFileType.Instance) ||
                     file.PsiModule.IsMiscFilesProjectModule() then
-                x.GetScriptOptionsImpl(file, checker, updateScriptOptions)
-            else x.GetProjectOptionsImpl(file, checker)
+                x.GetScriptOptionsImpl(file, updateScriptOptions)
+            else x.GetProjectOptionsImpl(file)
 
-        member x.TryGetFSharpProject(file, checker) =
-            let _ = x.GetProjectOptionsImpl(file, checker)
+        member x.TryGetFSharpProject(file) =
+            let _ = x.GetProjectOptionsImpl(file)
             match projects.TryGetValue(file.GetProject()) with
             | true, fsProject -> Some fsProject
             | _ -> None
 
         member x.GetFileIndex(file, checker) =
-            let _ = x.GetProjectOptionsImpl(file, checker)
+            let _ = x.GetProjectOptionsImpl(file)
             let fsProject = getProject file
             let filePath = file.GetLocation()
             match fsProject.FileIndices.TryGetValue(filePath) with
@@ -183,11 +182,11 @@ type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISol
             | _ -> invalidOp (sprintf "%s doesn't belong to %A" filePath.FullPath fsProject)
             
         member x.HasPairFile(file, checker) =
-            let _ = x.GetProjectOptionsImpl(file, checker)
+            let _ = x.GetProjectOptionsImpl(file)
             let fsProject = getProject file 
             fsProject.FilesWithPairs.Contains(file.GetLocation())
         
-        member x.GetParsingOptions(file, checker) =
+        member x.GetParsingOptions(file) =
             if file.LanguageType.Equals(FSharpScriptProjectFileType.Instance) ||
                file.PsiModule.IsMiscFilesProjectModule() then
                 let scriptParsingOptions =
@@ -201,12 +200,12 @@ type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISol
                     }
                 Some scriptParsingOptions
             else
-                match (x :> IFSharpProjectOptionsProvider).TryGetFSharpProject(file, checker) with
+                match (x :> IFSharpProjectOptionsProvider).TryGetFSharpProject(file) with
                 | Some project when project.Options.IsSome ->
                     match project.ParsingOptions with
                     | None ->
                         let projectOptions = project.Options.Value
-                        let parsingOptions, errors = checker.CreateParsingOptions(List.ofArray projectOptions.OtherOptions)
+                        let parsingOptions, errors = checkerService.Checker.CreateParsingOptions(List.ofArray projectOptions.OtherOptions)
                         let parsingOptions = { parsingOptions with SourceFiles = projectOptions.SourceFiles }
                         logger.LogFSharpErrors "Getting parsing options" errors
                         project.ParsingOptions <- Some parsingOptions

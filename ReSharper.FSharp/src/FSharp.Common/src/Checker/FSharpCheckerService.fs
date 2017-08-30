@@ -41,7 +41,7 @@ type FSharpCheckerService(lifetime, onSolutionCloseNotifier: OnSolutionCloseNoti
     member x.Checker = checker.Value
 
     member x.ParseFile([<NotNull>] file: IPsiSourceFile) =
-        match x.OptionsProvider.GetParsingOptions(file, x.Checker) with
+        match x.OptionsProvider.GetParsingOptions(file) with
         | Some parsingOptions as options ->
             let filePath = file.GetLocation().FullPath
             let source = file.Document.GetText()
@@ -55,15 +55,15 @@ type FSharpCheckerService(lifetime, onSolutionCloseNotifier: OnSolutionCloseNoti
         if sourceFile.LanguageType.Equals(FSharpScriptProjectFileType.Instance) ||
             sourceFile.PsiModule.IsMiscFilesProjectModule() then []
         else
-            match x.OptionsProvider.TryGetFSharpProject(sourceFile, x.Checker) with
+            match x.OptionsProvider.TryGetFSharpProject(sourceFile) with
             | Some project -> project.ConfigurationDefines
             | _ -> List.empty
 
     member x.GetParsingOptions(sourceFile: IPsiSourceFile) =
-        x.OptionsProvider.GetParsingOptions(sourceFile, x.Checker)
+        x.OptionsProvider.GetParsingOptions(sourceFile)
 
     member x.ParseAndCheckFile([<NotNull>] file: IPsiSourceFile, allowStaleResults: bool) =
-        match x.OptionsProvider.GetProjectOptions(file, x.Checker, true) with
+        match x.OptionsProvider.GetProjectOptions(file, true) with
         | Some options ->
             let filePath = file.GetLocation().FullPath
             let source = file.Document.GetText()
@@ -73,3 +73,6 @@ type FSharpCheckerService(lifetime, onSolutionCloseNotifier: OnSolutionCloseNoti
                 Some { ParseResults = parsingResults; ParseTree = parseTree; CheckResults = checkResults }
             | _ -> None
         | _ -> None
+
+    member x.InvalidateProject(project: FSharpProject) =
+        x.Checker.InvalidateConfiguration(project.Options.Value)
