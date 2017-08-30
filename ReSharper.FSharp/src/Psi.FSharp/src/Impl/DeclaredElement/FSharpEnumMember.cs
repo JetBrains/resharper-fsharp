@@ -1,14 +1,21 @@
 ﻿using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
+using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
   internal class FSharpEnumMember : FSharpTypeMember<EnumMemberDeclaration>, IField
   {
-    public FSharpEnumMember([NotNull] IDeclaration declaration) : base(declaration)
+    [NotNull]
+    public FSharpField Field { get; }
+
+    public FSharpEnumMember([NotNull] ITypeMemberDeclaration declaration, [NotNull] FSharpField field) :
+      base(declaration)
     {
+      Field = field;
     }
 
     public override DeclaredElementType GetElementType()
@@ -31,7 +38,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public bool IsConstant => false;
     public bool IsEnumMember => true;
     public int? FixedBufferSize => null;
-    public ConstantValue ConstantValue => ConstantValue.NOT_COMPILE_TIME_CONSTANT; // todo: calculate
+
+    public ConstantValue ConstantValue =>
+      Field.LiteralValue != null
+        ? new ConstantValue(Field.LiteralValue.Value, Type)
+        : ConstantValue.BAD_VALUE;
 
     public override bool IsAbstract => false;
     public override bool IsSealed => false;

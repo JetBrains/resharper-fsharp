@@ -1,5 +1,6 @@
 ﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Psi;
+using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
@@ -14,7 +15,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     protected override IDeclaredElement CreateDeclaredElement()
     {
-      return new FSharpEnumMember(this);
+      var field = GetFSharpSymbol() as FSharpField;
+      return field != null ? new FSharpEnumMember(this, field) : null;
     }
   }
 }
