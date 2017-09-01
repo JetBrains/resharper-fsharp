@@ -1,4 +1,4 @@
-﻿﻿using System;
+﻿using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Checker;
@@ -45,12 +45,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
           myDeclarationSymbols = new Dictionary<int, FSharpSymbol>(declaredSymbolUses.Length);
           foreach (var symbolUse in declaredSymbolUses)
-            if (symbolUse.IsFromDefinition)
-            {
-              // todo: check multiple symbols by same offset (e.g. entity & implicit ctor)
-              var useOffset = document.GetOffset(symbolUse.RangeAlternate.Start);
-              myDeclarationSymbols[useOffset] = symbolUse.Symbol;
-            }
+          {
+            if (!symbolUse.IsFromDefinition)
+              continue;
+
+            var symbol = symbolUse.Symbol;
+            var mfv = symbol as FSharpMemberOrFunctionOrValue;
+            if (mfv != null && mfv.IsConstructor && !mfv.IsInstanceMember)
+              continue;
+
+            // todo: check multiple symbols by same offset (e.g. entity & implicit ctor)
+            var useOffset = document.GetOffset(symbolUse.RangeAlternate.Start);
+            myDeclarationSymbols[useOffset] = symbol;
+          }
         }
       return myDeclarationSymbols?.TryGetValue(offset);
     }
