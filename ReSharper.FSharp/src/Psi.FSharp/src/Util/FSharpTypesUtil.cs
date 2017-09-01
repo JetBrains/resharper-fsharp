@@ -8,6 +8,7 @@ using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 using JetBrains.Util.Extension;
+using JetBrains.Util.Logging;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Core;
 
@@ -62,7 +63,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       return types;
     }
 
-    [NotNull]
+    [CanBeNull]
     public static string GetClrName([NotNull] FSharpEntity entity)
     {
       // F# 4.0 specs 5.1.4
@@ -75,7 +76,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       // qualified name may include assembly name, public key, etc and separated with comma, e.g. for unit it returns
       // "Microsoft.FSharp.Core.Unit, FSharp.Core, Version=4.4.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
-      return entity.QualifiedName.SubstringBefore(",", StringComparison.Ordinal);
+      try
+      {
+        return entity.QualifiedName.SubstringBefore(",", StringComparison.Ordinal);
+      }
+      catch (Exception e)
+      {
+        Logger.LogMessage(LoggingLevel.WARN, "Could not map FSharpEntity: {0}", entity);
+        Logger.LogException(e);
+        return null;
+      }
     }
 
     [CanBeNull]
@@ -88,7 +98,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         // F# 4.1 struct tuples
         if (fsType.IsStructTupleType)
           return ValueTupleClrName + typeArgumentsCount;
-        
+
         // F# 4.0 specs 5.1.3
         return TupleClrName + typeArgumentsCount;
       }
@@ -158,7 +168,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         if (entity.IsNativePtr())
           return GetPointerType(type, typeParametersFromContext, psiModule);
 
-        if (entity.IsByRef) // e.g. byref<int>, we need int
+
+        // e.g. byref<int>, we need int
+        // bug Microsoft/visualfsharp#3532; keep only the first check when fixed
+        if (entity.IsByRef || entity.CompiledName.Equals("byref`1", StringComparison.Ordinal) &&
+            entity.AccessPath.Equals("Microsoft.FSharp.Core", StringComparison.Ordinal))
           return GetType(type.GenericArguments[0], typeParametersFromContext, psiModule);
 
         if (entity.IsProvidedAndErased)

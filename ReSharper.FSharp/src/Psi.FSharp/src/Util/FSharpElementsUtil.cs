@@ -30,7 +30,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         return null;
 
       if (!entity.IsFSharpAbbreviation)
-        return TypeFactory.CreateTypeByCLRName(FSharpTypesUtil.GetClrName(entity), psiModule).GetTypeElement();
+      {
+        var clrName = FSharpTypesUtil.GetClrName(entity);
+        return clrName != null
+          ? TypeFactory.CreateTypeByCLRName(clrName, psiModule).GetTypeElement()
+          : null;
+      }
 
       var symbolScope = psiModule.GetPsiServices().Symbols.GetSymbolScope(psiModule, true, true);
       while (entity.IsFSharpAbbreviation)
@@ -47,7 +52,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         entity = entity.AbbreviatedType.TypeDefinition;
       }
 
-      return TypeFactory.CreateTypeByCLRName(FSharpTypesUtil.GetClrName(entity), psiModule).GetTypeElement();
+      var name = FSharpTypesUtil.GetClrName(entity);
+      return name != null ? TypeFactory.CreateTypeByCLRName(name, psiModule).GetTypeElement() : null;
     }
 
     private static IEnumerable<string> GetPossibleNames([NotNull] FSharpEntity entity)
