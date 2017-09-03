@@ -4,8 +4,10 @@ open System
 open System.Collections.Generic
 open System.Linq
 open System.Threading
+open JetBrains
 open JetBrains.Annotations
 open JetBrains.Application
+open JetBrains.Application.Progress
 open JetBrains.Application.Threading
 open JetBrains.DataFlow
 open JetBrains.ProjectModel
@@ -22,6 +24,9 @@ open JetBrains.ReSharper.Psi.Modules
 open Microsoft.FSharp.Compiler
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
+type Logger = Util.ILoggerEx
+type LoggingLevel = Util.LoggingLevel
+
 type FSharpParseAndCheckResults = 
     {
       ParseResults: FSharpParseFileResults
@@ -30,7 +35,7 @@ type FSharpParseAndCheckResults =
     }
 
 [<ShellComponent>]
-type FSharpCheckerService(lifetime, onSolutionCloseNotifier: OnSolutionCloseNotifier) =
+type FSharpCheckerService(lifetime, logger: Util.ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier) =
     let checker = lazy FSharpChecker.Create(projectCacheSize = 200, keepAllBackgroundResolutions = false,
                                        legacyReferenceResolver = MSBuildReferenceResolver.Resolver)
     do
@@ -45,7 +50,15 @@ type FSharpCheckerService(lifetime, onSolutionCloseNotifier: OnSolutionCloseNoti
         | Some parsingOptions as options ->
             let filePath = file.GetLocation().FullPath
             let source = file.Document.GetText()
-            options, Some (x.Checker.ParseFile(filePath, source, parsingOptions).RunAsTask())
+            try
+                let parseResults = x.Checker.ParseFile(filePath, source, parsingOptions).RunAsTask() 
+                options, Some parseResults
+            with
+            | :? ProcessCancelledException -> reraise()
+            | exn ->
+                Logger.LogExceptionSilently(logger, exn)
+                Logger.LogMessage(logger, LoggingLevel.WARN, sprintf "Parse file error, parsing options: %A" parsingOptions)
+                options, None
         | _ -> None, None
 
     member x.HasPairFile([<NotNull>] file: IPsiSourceFile) =

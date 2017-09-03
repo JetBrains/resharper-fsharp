@@ -49,6 +49,9 @@ module CommonUtil =
         if isNull relativePath then path
         else projectDirectory.Combine(relativePath)
 
+    let concatErrors errors =
+        Seq.fold (fun s (e: FSharpErrorInfo) -> s + "\n" + e.Message) "" errors
+
     [<CompiledName("DecompileOpName")>]
     let decompileOpName name =
         PrettyNaming.DecompileOpName name
@@ -72,11 +75,6 @@ module CommonUtil =
                         cancellationTokenSource.Cancel()
                         reraise()
             task.Result
-
-    type ILogger with // todo: ILogger not mapped to R# here (ILogger is a decl here?)
-        member x.LogFSharpErrors context errors =
-            let messages = Seq.fold (fun s (e: FSharpErrorInfo) -> s + "\n" + e.Message) "" errors
-            x.LogMessage(LoggingLevel.WARN, sprintf "%s: %s" context messages)
 
     type IDictionary<'TKey, 'TValue> with
         member x.remove (key: 'TKey) = x.Remove key |> ignore

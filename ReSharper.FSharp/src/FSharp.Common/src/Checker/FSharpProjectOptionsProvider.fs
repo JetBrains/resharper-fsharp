@@ -31,9 +31,6 @@ open Microsoft.FSharp.Compiler
 open Microsoft.FSharp.Compiler.ErrorLogger
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
-type Logger = Util.ILoggerEx
-type LoggingLevel = Util.LoggingLevel
-
 [<SolutionComponent>]
 type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISolution,
                                   checkerService: FSharpCheckerService, optionsBuilder: FSharpProjectOptionsBuilder,
@@ -142,7 +139,8 @@ type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISol
         let getScriptOptionsAsync = checkerService.Checker.GetProjectOptionsFromScript(filePath, source, loadTime)
         try
             let options, errors = getScriptOptionsAsync.RunAsTask()
-            if not errors.IsEmpty then logger.LogFSharpErrors("Script options for " + filePath) errors
+            if not errors.IsEmpty then
+                Logger.Warn(logger, "Script options for {0}: {1}", filePath, concatErrors errors)
             let options = x.FixScriptOptions(options)
             scriptOptions.[path] <- options
             Some options
@@ -207,7 +205,8 @@ type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISol
                         let projectOptions = project.Options.Value
                         let parsingOptions, errors = checkerService.Checker.CreateParsingOptions(List.ofArray projectOptions.OtherOptions)
                         let parsingOptions = { parsingOptions with SourceFiles = projectOptions.SourceFiles }
-                        logger.LogFSharpErrors "Getting parsing options" errors
+                        if not errors.IsEmpty then
+                            Logger.Warn(logger, "Getting parsing options: {0}", concatErrors errors)
                         project.ParsingOptions <- Some parsingOptions
                         Some parsingOptions
                     | options -> options
