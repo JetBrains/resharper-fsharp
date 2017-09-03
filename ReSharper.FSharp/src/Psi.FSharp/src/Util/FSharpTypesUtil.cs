@@ -28,6 +28,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     private const string UnitClrName = "Microsoft.FSharp.Core.Unit";
     private const string NativeptrLogicalName = "nativeptr`1";
 
+    private const string MeasureFloat = "Microsoft.FSharp.Core.float`1";
+    private const string MeasureInt = "Microsoft.FSharp.Core.int`1";
+    private const string MeasureFloat32 = "Microsoft.FSharp.Core.float32`1";
+    private const string MeasureDecimal = "Microsoft.FSharp.Core.decimal`1";
+    private const string MeasureSByte = "Microsoft.FSharp.Core.sbyte`1";
+    private const string MeasureInt16 = "Microsoft.FSharp.Core.int16`1";
+    private const string MeasureInt64 = "Microsoft.FSharp.Core.int64`1";
+
     private static readonly object ourFcsLock = new object();
 
     [CanBeNull]
@@ -190,7 +198,33 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       var declaredType = TypeFactory.CreateTypeByCLRName(clrName, psiModule);
       var typeElement = declaredType.GetTypeElement();
       if (typeElement == null)
+      {
+        if (fsType.GenericArguments.Count != 0)
+        {
+          // todo: use ILxGen code to get compiled type
+          var genArg = fsType.GenericArguments[0];
+          if (genArg.HasTypeDefinition && genArg.TypeDefinition.IsMeasure ||
+              genArg.IsGenericParameter && genArg.GenericParameter.IsMeasure)
+          {
+            if (clrName.Equals(MeasureFloat, StringComparison.Ordinal))
+              return psiModule.GetPredefinedType().Double;
+            if (clrName.Equals(MeasureInt, StringComparison.Ordinal))
+              return psiModule.GetPredefinedType().Int;
+            
+            if (clrName.Equals(MeasureFloat32, StringComparison.Ordinal))
+              return psiModule.GetPredefinedType().Float;
+            if (clrName.Equals(MeasureDecimal, StringComparison.Ordinal))
+              return psiModule.GetPredefinedType().Decimal;
+            if (clrName.Equals(MeasureSByte, StringComparison.Ordinal))
+              return psiModule.GetPredefinedType().Sbyte;
+            if (clrName.Equals(MeasureInt16, StringComparison.Ordinal))
+              return psiModule.GetPredefinedType().Short;
+            if (clrName.Equals(MeasureInt64, StringComparison.Ordinal))
+              return psiModule.GetPredefinedType().Long;
+          }
+        }
         return TypeFactory.CreateUnknownType(psiModule);
+      }
 
       var args = type.GenericArguments;
       return args.Count != 0
