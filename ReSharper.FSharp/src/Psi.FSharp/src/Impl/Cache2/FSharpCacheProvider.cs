@@ -87,9 +87,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public bool NeedCacheUpdate(ITreeNode elementContainingChanges, PsiChangedElementType type)
     {
-      var filePath = elementContainingChanges?.GetSourceFile()?.GetLocation().FullPath;
-      if (filePath != null)
-        myLogger.Warn("Modifying " + filePath);
       return true;
     }
 
