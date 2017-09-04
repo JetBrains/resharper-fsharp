@@ -57,7 +57,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
       var defaultRanges = GetTextLookupRanges(context, completedRange);
 
       var ranges = ShouldReplace(token)
-        ? defaultRanges.WithReplaceRange(new DocumentRange(document,new TextRange(caretOffset,
+        ? defaultRanges.WithReplaceRange(new DocumentRange(document,new TextRange(completedRangeStartOffset,
           Math.Max(token.GetTreeEndOffset().Offset, caretOffset))))
         : defaultRanges;
 
@@ -65,7 +65,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
       var lineText = document.GetLineText(coords.Line);
       var names = QuickParse.GetPartialLongNameEx(lineText, (int) coords.Column - 1);
 
-      var fsCompletionContext = UntypedParseImpl.TryGetCompletionContext(coords.GetPos(), parseResults, lineText); // todo: create issue about implicit FSOpt
+      var fsCompletionContext = UntypedParseImpl.TryGetCompletionContext(coords.GetPos(), parseResults, lineText);
 
       return new FSharpCodeCompletionContext(context, ranges, caretTreeOffset, coords, names, tokenBefore, token,
         lineText, fsCompletionContext?.Value, parseResults);
