@@ -7,6 +7,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.Util;
+using JetBrains.Util.Extension;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
@@ -24,7 +25,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public IClrTypeName GetClrName()
     {
-      return new ClrTypeName(myAttr.AttributeType.FullName);
+      return new ClrTypeName(myAttr.AttributeType.QualifiedName.SubstringBefore(",", StringComparison.Ordinal));
     }
 
     public string GetAttributeShortName()
@@ -34,7 +35,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public IDeclaredType GetAttributeType()
     {
-      return TypeFactory.CreateTypeByCLRName(myAttr.AttributeType.FullName, myModule);
+      var clrName = myAttr.AttributeType.QualifiedName.SubstringBefore(",", StringComparison.Ordinal);
+      return TypeFactory.CreateTypeByCLRName(clrName, myModule);
     }
 
     private AttributeValue GetAttributeValue(Tuple<FSharpType, object> param)
