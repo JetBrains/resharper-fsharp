@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
@@ -22,9 +23,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
                    TypeFactory.CreateUnknownType(Module);
     }
 
+    public override IType ReturnType { get; }
     public override string ShortName => Field.Name;
     public override bool IsStatic => false;
-    public override bool IsWritable => Field.IsMutable;
-    public override IType ReturnType { get; }
+
+    public override bool IsWritable =>
+      Field.IsMutable || ((GetContainingType() as FSharpRecord)?.IsCliMutable ?? false);
   }
 }
