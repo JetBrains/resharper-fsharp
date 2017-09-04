@@ -18,15 +18,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
   public class FSharpCacheProvider : ILanguageCacheProvider
   {
     private readonly FSharpCheckerService myCheckerService;
-    private readonly ILogger myLogger;
 
-    public FSharpCacheProvider(FSharpCheckerService checkerService, ILogger logger)
+    public FSharpCacheProvider(FSharpCheckerService checkerService)
     {
       myCheckerService = checkerService;
-      myLogger = logger;
     }
-
-    private const int CacheVersion = 5;
 
     public void BuildCache(IFile file, ICacheBuilder builder)
     {
@@ -35,20 +31,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       if (sourceFile.LanguageType.Equals(FSharpScriptProjectFileType.Instance))
         return;
 
-      var declarationProcessor = new FSharpCacheDeclarationProcessor(builder, myCheckerService, CacheVersion);
+      var declarationProcessor = new FSharpCacheDeclarationProcessor(builder, myCheckerService);
       (file as IFSharpFile)?.Accept(declarationProcessor);
     }
 
-    public ProjectFilePart LoadProjectFilePart(IPsiSourceFile sourceFile, ProjectFilePartsTree tree, IReader reader)
-    {
-      var part = new FSharpProjectFilePart(sourceFile, reader, sourceFile.GetFSharpFileKind(),
+    public ProjectFilePart LoadProjectFilePart(IPsiSourceFile sourceFile, ProjectFilePartsTree tree, IReader reader) =>
+      new FSharpProjectFilePart(sourceFile, reader, sourceFile.GetFSharpFileKind(),
         myCheckerService.HasPairFile(sourceFile));
-
-      if (part.CacheVersion != CacheVersion)
-        tree.ForceDirty();
-
-      return part;
-    }
 
     public Part ReadPart(byte tag, IReader reader)
     {

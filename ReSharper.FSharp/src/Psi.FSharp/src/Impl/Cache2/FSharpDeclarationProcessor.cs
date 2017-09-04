@@ -12,15 +12,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
   public class FSharpCacheDeclarationProcessor : TreeNodeVisitor
   {
-    protected readonly int CacheVersion;
     protected readonly ICacheBuilder Builder;
     private readonly FSharpCheckerService myCheckerService;
 
-    public FSharpCacheDeclarationProcessor(ICacheBuilder builder, FSharpCheckerService checkerService, int cacheVersion)
+    public FSharpCacheDeclarationProcessor(ICacheBuilder builder, FSharpCheckerService checkerService)
     {
       Builder = builder;
       myCheckerService = checkerService;
-      CacheVersion = cacheVersion;
     }
 
     private static FSharpFileKind GetFSharpFileKind(IFSharpFile file)
@@ -37,7 +35,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       var fileKind = GetFSharpFileKind(fsFile);
       var hasPairFile = myCheckerService.HasPairFile(sourceFile);
 
-      Builder.CreateProjectFilePart(new FSharpProjectFilePart(sourceFile, CacheVersion, fileKind, hasPairFile));
+      Builder.CreateProjectFilePart(new FSharpProjectFilePart(sourceFile, fileKind, hasPairFile));
 
       foreach (var declaration in fsFile.DeclarationsEnumerable)
       {
