@@ -33,34 +33,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService
     }
 
     public override ICodeFormatter CodeFormatter { get; }
+    public override ILexerFactory GetPrimaryLexerFactory() => new FSharpFakeLexerFactory();
+    public override ILexer CreateFilteringLexer(ILexer lexer) => lexer;
 
-    public override ILexerFactory GetPrimaryLexerFactory()
-    {
-      return new FSharpFakeLexerFactory();
-    }
+    public override bool IsTypeMemberVisible(ITypeMember member) =>
+      (member as IFSharpTypeMember)?.IsVisibleFromFSharp ?? true;
 
-    public override ILexer CreateFilteringLexer(ILexer lexer)
-    {
-      return lexer;
-    }
-
-    public override bool IsTypeMemberVisible(ITypeMember member)
-    {
-      return (member as IFSharpTypeMember)?.IsVisibleFromFSharp ?? true;
-    }
-
-    public override IParser CreateParser(ILexer lexer, IPsiModule module, IPsiSourceFile sourceFile)
-    {
-      return new FSharpParser(sourceFile, myFSharpCheckerService, myLogger);
-    }
+    public override IParser CreateParser(ILexer lexer, IPsiModule module, IPsiSourceFile sourceFile) =>
+      new FSharpParser(sourceFile, myFSharpCheckerService, myLogger);
 
     public override IDeclaredElementPresenter DeclaredElementPresenter =>
       CSharpDeclaredElementPresenter.Instance; // todo: replace with F#-specific presenter
 
-    public override IEnumerable<ITypeDeclaration> FindTypeDeclarations(IFile file)
-    {
-      return EmptyList<ITypeDeclaration>.Instance;
-    }
+    public override IEnumerable<ITypeDeclaration> FindTypeDeclarations(IFile file) =>
+      EmptyList<ITypeDeclaration>.Instance;
 
     public override ILanguageCacheProvider CacheProvider { get; }
     public override bool IsCaseSensitive => true;

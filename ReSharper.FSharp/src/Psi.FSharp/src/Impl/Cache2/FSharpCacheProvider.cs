@@ -74,36 +74,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       }
     }
 
-    public bool NeedCacheUpdate(ITreeNode elementContainingChanges, PsiChangedElementType type)
-    {
-      return true;
-    }
+    public bool NeedCacheUpdate(ITreeNode elementContainingChanges, PsiChangedElementType type) => true;
+    public bool IsCaseSensitive(IPsiModule module) => true;
 
-    public bool IsCaseSensitive(IPsiModule module)
-    {
-      return true;
-    }
+    public IEnumerable<IPsiSourceFile> GetAffectedOnPsiModulePropertiesChange(IPsiModule module) =>
+      EmptyList<IPsiSourceFile>.InstanceList; // todo: check this
 
-    public IEnumerable<IPsiSourceFile> GetAffectedOnPsiModulePropertiesChange(IPsiModule module)
-    {
-      // todo: check this
-      return EmptyList<IPsiSourceFile>.InstanceList;
-    }
+    public bool IsCachableTreeNode(ITreeNode treeNode) => false;
+    public NodeType GetNodeType(int index) => FSharpNodeTypeIndexer.Instance.GetNodeType(index);
 
-    public bool IsCachableTreeNode(ITreeNode treeNode)
-    {
-      return false;
-    }
-
-    public NodeType GetNodeType(int index)
-    {
-      return FSharpNodeTypeIndexer.Instance.GetNodeType(index);
-    }
-
-    public string PersistentTreeNodeCacheUniqueId => null;
     public string TokenCacheUniqueId => null;
     public string BufferCacheUniqueId => null;
     public string StubTreeNodeCacheUniqueId => null;
+    public string PersistentTreeNodeCacheUniqueId => null;
 
     public void SerializeMetadata(IFile file, UnsafeWriter bufferWriter)
     {
@@ -113,24 +96,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     {
     }
 
-    public bool IsInternableToken(TokenNodeType tokenNodeType)
-    {
-      throw new NotImplementedException();
-    }
+    public bool IsInternableToken(TokenNodeType tokenNodeType) => throw new NotImplementedException();
+    public void BuildCache(ISandBox sandBox, ICacheBuilder builder) => throw new NotImplementedException();
+    public bool IsCacheableInClosedForm(IChameleonNode node) => throw new NotImplementedException();
 
-    public void BuildCache(ISandBox sandBox, ICacheBuilder builder)
-    {
+    public TreeElement CreateChameleonNode(NodeType nodeType, TreeOffset startOffset, TreeOffset endOffset) =>
       throw new NotImplementedException();
-    }
-
-    public bool IsCacheableInClosedForm(IChameleonNode node)
-    {
-      throw new NotImplementedException();
-    }
-
-    public TreeElement CreateChameleonNode(NodeType nodeType, TreeOffset startOffset, TreeOffset endOffset)
-    {
-      throw new NotImplementedException();
-    }
   }
 }
