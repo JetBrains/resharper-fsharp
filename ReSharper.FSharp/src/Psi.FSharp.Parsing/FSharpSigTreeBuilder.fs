@@ -20,8 +20,8 @@ type FSharpSigTreeBuilder(file, lexer, parseTree, lifetime, logger: ILogger) =
 
         x.FinishFile mark ElementType.F_SHARP_SIG_FILE
 
-    member private x.ProcessTopLevelSignature (SynModuleOrNamespaceSig(lid,_,isModule,sigs,_,_,_,range)) =
-        let mark, elementType = x.StartTopLevelDeclaration lid isModule range
+    member private x.ProcessTopLevelSignature (SynModuleOrNamespaceSig(lid,_,isModule,sigs,_,attrs,_,range)) =
+        let mark, elementType = x.StartTopLevelDeclaration lid attrs isModule range
         for s in sigs do x.ProcessModuleMemberSignature s
         x.FinishTopLevelDeclaration mark range elementType
 
@@ -96,9 +96,8 @@ type FSharpSigTreeBuilder(file, lexer, parseTree, lifetime, logger: ILogger) =
 
     member private x.ProcessTypeMemberSignature memberSig =
         match memberSig with
-        | SynMemberSig.Member(ValSpfn(_,id,_,_,_,_,_,_,_,_,_),flags,_) ->
-            id.idRange |> x.GetStartOffset |> x.AdvanceToOffset
-            let mark = x.Mark()
+        | SynMemberSig.Member(ValSpfn(attrs,id,_,_,_,_,_,_,_,_,_),flags,range) ->
+            let mark = x.ProcessAttributesAndStartRange attrs (Some id) range
             x.ProcessIdentifier id
             let elementType =
                 if flags.IsDispatchSlot then
@@ -109,12 +108,9 @@ type FSharpSigTreeBuilder(file, lexer, parseTree, lifetime, logger: ILogger) =
                     | _ -> ElementType.MEMBER_DECLARATION
             x.Done(mark,elementType)
 
-        | SynMemberSig.ValField(Field(_,_,id,_,_,_,_,_),_) ->
+        | SynMemberSig.ValField(Field(attrs,_,id,_,_,_,_,_),range) ->
             if id.IsSome then
-                let id = id.Value
-                id.idRange |> x.GetStartOffset |> x.AdvanceToOffset
-                let mark = x.Mark()
-                x.ProcessIdentifier id
+                let mark = x.ProcessAttributesAndStartRange attrs id range
                 x.Done(mark,ElementType.VAL_FIELD)
 
         | SynMemberSig.Inherit(SynType.LongIdent(lidWithDots),_) ->

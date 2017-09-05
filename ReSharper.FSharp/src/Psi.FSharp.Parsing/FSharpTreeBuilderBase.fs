@@ -52,20 +52,23 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
         x.Done(mark, fileType)
         x.GetTree() :> ICompositeElement
 
-    member internal x.StartTopLevelDeclaration (lid: LongIdent) isModule (range: Range.range) =
+    member internal x.StartTopLevelDeclaration (lid: LongIdent) (attrs: SynAttributes) isModule (range: Range.range) =
         match lid.IsEmpty, isModule with
         | false, _ ->
             let firstId = lid.Head
             let idRange = firstId.idRange
-            if idRange.Start <> idRange.End then
-                // Missing ident may be replaced with file name with range 1,0-1,0.
-    
-                // Ast namespace range starts after its identifier,
-                // try to locate a keyword followed by access modifiers
-                let keywordTokenType = if isModule then FSharpTokenType.MODULE else FSharpTokenType.NAMESPACE
-                x.GetStartOffset firstId |> x.AdvanceToTokenOrOffset keywordTokenType
+            let mark = 
+                if attrs.IsEmpty then
+                    if idRange.Start <> idRange.End then 
+                        // Missing ident may be replaced with file name with range 1,0-1,0.
 
-            let mark = x.Builder.Mark()
+                        // Ast namespace range starts after its identifier,
+                        // try to locate the keyword followed by access modifiers
+                        let keywordTokenType = if isModule then FSharpTokenType.MODULE else FSharpTokenType.NAMESPACE
+                        x.GetStartOffset firstId |> x.AdvanceToTokenOrOffset keywordTokenType
+                    x.Builder.Mark()
+                else
+                    x.ProcessAttributesAndStartRange attrs (Some firstId) range
             if idRange.Start <> idRange.End then x.Builder.AdvanceLexer() |> ignore // skip keyword
             
             if isModule then x.ProcessModifiersBeforeOffset (x.GetStartOffset firstId)
@@ -287,7 +290,16 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
         x.ProcessMemberParams memberParams
         x.ProcessLocalExpression expr
 
+    member internal x.GetMemberAttributes(typeMember: SynMemberDefn) =
+        match typeMember with
+        | SynMemberDefn.Member(Binding(_,_,_,_,attrs,_,_,_,_,_,_,_),_)
+        | SynMemberDefn.AbstractSlot(ValSpfn(attrs,_,_,_,_,_,_,_,_,_,_),_,_)
+        | SynMemberDefn.AutoProperty(attrs,_,_,_,_,_,_,_,_,_,_)
+        | SynMemberDefn.ValField(Field(attrs,_,_,_,_,_,_,_),_) -> attrs
+        | _ -> []
+
     member internal x.ProcessTypeMember (typeMember: SynMemberDefn) =
+        let attrs = x.GetMemberAttributes typeMember
         let rangeStart = x.GetStartOffset typeMember.Range
         let isMember =
             match typeMember with
@@ -295,8 +307,7 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
             | _ -> false
 
         if x.Builder.GetTokenOffset() <= rangeStart || (not isMember) then
-            x.AdvanceToOffset rangeStart
-            let mark = x.Builder.Mark()
+            let mark = x.ProcessAttributesAndStartRange attrs None typeMember.Range
 
             let memberType =
                 match typeMember with
@@ -321,7 +332,7 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
                     x.ProcessSynType baseInterface
                     ElementType.INTERFACE_INHERIT
 
-                | SynMemberDefn.Member(Binding(_,_,_,_,_,_,valData,headPat,ret,expr,_,_),range) ->
+                | SynMemberDefn.Member(Binding(_,_,_,_,attrs,_,valData,headPat,ret,expr,_,_),range) ->
                     let elType =
                         match headPat with
                         | SynPat.LongIdent(LongIdentWithDots(lid,_),_,typeParamsOpt,memberParams,_,_) ->

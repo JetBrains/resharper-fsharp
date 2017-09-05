@@ -75,10 +75,12 @@ interface topLevelModuleOrNamespaceDeclaration:
   fSharpGlobalNamespaceDeclaration;
 
 fSharpNamespaceDeclaration options { stubBase="FSharpDeclarationBase"; }:
+  fSharpAttribute<ATTRIBUTE, Attributes>*
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>
   moduleMember<MODULE_MEMBER, Members>*;
 
 fSharpGlobalNamespaceDeclaration options { stubBase="FSharpDeclarationBase"; }:
+  fSharpAttribute<ATTRIBUTE, Attributes>*
   longIdentifier<LONG_IDENTIFIER, LongIdentifier> // should be empty, needed here for common interface
   moduleMember<MODULE_MEMBER, Members>*
   fakeSeparator;

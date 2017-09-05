@@ -19,8 +19,8 @@ type FSharpImplTreeBuilder(file, lexer, parseTree, lifetime, logger: ILogger) =
 
         x.FinishFile mark ElementType.F_SHARP_IMPL_FILE
 
-    member private x.ProcessTopLevelDeclaration (SynModuleOrNamespace(lid,_,isModule,decls,_,_,_,range)) =
-        let mark, elementType = x.StartTopLevelDeclaration lid isModule range
+    member private x.ProcessTopLevelDeclaration (SynModuleOrNamespace(lid,_,isModule,decls,_,attrs,_,range)) =
+        let mark, elementType = x.StartTopLevelDeclaration lid attrs isModule range
         for decl in decls do x.ProcessModuleMemberDeclaration decl
         x.FinishTopLevelDeclaration mark range elementType  
 
