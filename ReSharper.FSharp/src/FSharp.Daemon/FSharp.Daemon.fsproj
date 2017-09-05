@@ -1,6 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net451</TargetFramework>
+    <DebugType>full</DebugType>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Daemon</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Daemon</AssemblyName>
@@ -12,7 +13,7 @@
 
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="4.0.*" />
-    <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="14.0.2" />
+    <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="14.0.3" />
     <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)"/>
   </ItemGroup>
 

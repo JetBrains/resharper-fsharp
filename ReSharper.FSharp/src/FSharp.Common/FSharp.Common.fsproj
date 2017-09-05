@@ -4,6 +4,7 @@
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Common</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Common</AssemblyName>
+    <DebugType>full</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
@@ -28,7 +29,7 @@
 
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="4.0.*" />
-    <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="14.0.2" />
+    <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="14.0.3" />
     <PackageReference Include="JetBrains.FSharp.Compiler.Service.MSBuild.v12" Version="14.0.2" />
     <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
   </ItemGroup>
