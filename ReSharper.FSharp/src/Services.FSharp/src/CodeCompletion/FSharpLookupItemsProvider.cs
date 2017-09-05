@@ -46,8 +46,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
         var symbolUse = overloadsGroup.Head;
         var symbol = symbolUse.Symbol;
 
-        bool isEscaped;
-        var lookupText = GetLookupText(symbol, IsInAttributeList(fsFile, context), out isEscaped);
+        var lookupText = GetLookupText(symbol, IsInAttributeList(context), out var isEscaped);
         var lookupItem = new FSharpLookupItem(lookupText, symbol.GetIconId(), isEscaped);
         lookupItem.InitializeRanges(GetDefaultRanges(context), context.BasicContext);
 
@@ -69,7 +68,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
       return true;
     }
 
-    private static bool IsInAttributeList([NotNull] IFSharpFile fsFile, [NotNull] FSharpCodeCompletionContext context)
+    private static bool IsInAttributeList([NotNull] FSharpCodeCompletionContext context)
     {
       if (context.TokenAtCaret?.GetNextMeaningfulToken(true)?.GetTokenType() == FSharpTokenType.GREATER_RBRACK)
         return true;
@@ -82,8 +81,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
     [NotNull]
     private static string GetLookupText([NotNull] FSharpSymbol symbol, bool isAttrApplication, out bool isEscaped)
     {
-      var entity = symbol as FSharpEntity;
-      if (entity != null && !entity.IsUnresolved && isAttrApplication)
+      if (symbol is FSharpEntity entity && !entity.IsUnresolved && isAttrApplication)
       {
         try
         {
@@ -98,8 +96,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
           // ignored
         }
       }
-      var mfv = symbol as FSharpMemberOrFunctionOrValue;
-      if (mfv != null && PrettyNaming.IsOperatorName(symbol.DisplayName))
+      if (symbol is FSharpMemberOrFunctionOrValue mfv && PrettyNaming.IsOperatorName(symbol.DisplayName))
       {
         isEscaped = false;
         return mfv.CompiledName;

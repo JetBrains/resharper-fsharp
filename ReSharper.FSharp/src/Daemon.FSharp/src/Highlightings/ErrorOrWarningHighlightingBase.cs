@@ -17,15 +17,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Highlightings
 
     public string ToolTip => myMessage;
     public string ErrorStripeToolTip => myMessage;
-
-    public bool IsValid()
-    {
-      return myRange.IsValid();
-    }
-
-    public DocumentRange CalculateRange()
-    {
-      return myRange;
-    }
+    public bool IsValid() => myRange.IsValid();
+    public DocumentRange CalculateRange() => myRange;
   }
 }

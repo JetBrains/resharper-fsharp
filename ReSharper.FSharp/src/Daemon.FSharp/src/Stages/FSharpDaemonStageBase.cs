@@ -23,8 +23,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
     {
       if (!IsSupported(process.SourceFile)) return EmptyList<IDaemonStageProcess>.InstanceList;
 
-      var fsFile = process.SourceFile.GetPrimaryPsiFile() as IFSharpFile;
-      return fsFile != null ? new[] {CreateProcess(fsFile, process)} : EmptyList<IDaemonStageProcess>.InstanceList;
+      return process.SourceFile.GetPrimaryPsiFile() is IFSharpFile fsFile
+        ? new[] {CreateProcess(fsFile, process)}
+        : EmptyList<IDaemonStageProcess>.InstanceList;
     }
 
     protected abstract IDaemonStageProcess CreateProcess([NotNull] IFSharpFile fsFile,

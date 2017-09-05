@@ -120,8 +120,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
       if (symbol is FSharpUnionCase)
         return token.GetContainingNode<IFSharpDeclaration>();
 
-      var mfv = symbol as FSharpMemberOrFunctionOrValue;
-      if (mfv != null)
+      if (symbol is FSharpMemberOrFunctionOrValue mfv)
       {
         if (mfv.IsImplicitConstructor)
           return null;

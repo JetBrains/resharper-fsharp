@@ -10,9 +10,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
     public static string GetEntityHighlightingAttributeId([NotNull] this FSharpEntity entity)
     {
       if (entity.IsNamespace) return HighlightingAttributeIds.NAMESPACE_IDENTIFIER_ATTRIBUTE;
-      if (entity.IsInterface) return HighlightingAttributeIds.TYPE_INTERFACE_ATTRIBUTE;
-
-      return HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE;
+      return entity.IsInterface
+        ? HighlightingAttributeIds.TYPE_INTERFACE_ATTRIBUTE
+        : HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE;
     }
 
     [NotNull]
@@ -41,14 +41,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
     [NotNull]
     public static string GetHighlightingAttributeId([NotNull] this FSharpSymbol symbol)
     {
-      var entity = symbol as FSharpEntity;
-      if (entity != null && !entity.IsUnresolved) return GetEntityHighlightingAttributeId(entity);
-
-      var mfv = symbol as FSharpMemberOrFunctionOrValue;
-      if (mfv != null && !mfv.IsUnresolved) return GetMfvHighlightingAttributeId(mfv);
-
-      if (symbol is FSharpField) return HighlightingAttributeIds.FIELD_IDENTIFIER_ATTRIBUTE;
-      if (symbol is FSharpUnionCase) return HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE;
+      switch (symbol)
+      {
+        case FSharpEntity entity when !entity.IsUnresolved:
+          return GetEntityHighlightingAttributeId(entity);
+        case FSharpMemberOrFunctionOrValue mfv when !mfv.IsUnresolved:
+          return GetMfvHighlightingAttributeId(mfv);
+        case FSharpField _:
+          return HighlightingAttributeIds.FIELD_IDENTIFIER_ATTRIBUTE;
+        case FSharpUnionCase _:
+          return HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE;
+      }
 
       // some highlighting is needed for tooltip provider
       return HighlightingAttributeIds.LOCAL_VARIABLE_IDENTIFIER_ATTRIBUTE;

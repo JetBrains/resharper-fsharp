@@ -8,22 +8,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Highlightings
   public class DeadCodeHighlighting : IHighlighting
   {
     private readonly DocumentRange myRange;
-
-    public DeadCodeHighlighting(DocumentRange range)
-    {
-      myRange = range;
-    }
-
-    public bool IsValid()
-    {
-      return true;
-    }
-
-    public DocumentRange CalculateRange()
-    {
-      return myRange;
-    }
-
+    public DeadCodeHighlighting(DocumentRange range) => myRange = range;
+    public bool IsValid() => true;
+    public DocumentRange CalculateRange() => myRange;
     public string ToolTip => string.Empty;
     public string ErrorStripeToolTip => string.Empty;
   }

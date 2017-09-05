@@ -21,15 +21,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Highlightings
     public string AttributeId { get; }
     public virtual string ToolTip => string.Empty;
     public string ErrorStripeToolTip => string.Empty;
-
-    public bool IsValid()
-    {
-      return true;
-    }
-
-    public DocumentRange CalculateRange()
-    {
-      return myRange;
-    }
+    public bool IsValid() => true;
+    public DocumentRange CalculateRange() => myRange;
   }
 }

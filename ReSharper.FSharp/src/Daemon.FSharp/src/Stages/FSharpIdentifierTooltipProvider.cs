@@ -67,8 +67,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
       var tooltipsTexts = new List<string>();
       foreach (var tooltip in tooltips)
       {
-        var overloads = tooltip as FSharpToolTipElement<string>.Group;
-        if (overloads != null)
+        if (tooltip is FSharpToolTipElement<string>.Group overloads)
           tooltipsTexts.AddRange(overloads.Item.Select(overload =>
             GetTooltipText(overload.MainDescription, overload.XmlDoc))); //, overload.Item2)));
       }
@@ -82,8 +81,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
       if (xmlDoc.IsText) return ((FSharpXmlDoc.Text) xmlDoc).Item;
       if (xmlDoc.IsXmlDocFileSignature)
       {
-        var sig = xmlDoc as FSharpXmlDoc.XmlDocFileSignature;
-        if (sig == null) return null;
+        if (!(xmlDoc is FSharpXmlDoc.XmlDocFileSignature sig)) return null;
         var s1 = sig.Item1;
         var s2 = sig.Item2;
         // todo: get doc from xml

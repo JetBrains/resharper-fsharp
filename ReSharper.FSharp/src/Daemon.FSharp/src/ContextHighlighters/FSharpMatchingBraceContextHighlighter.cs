@@ -34,8 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
       var selectedTokenType = selectedToken.GetTokenType();
       if (IsRightBracket(selectedTokenType))
       {
-        ITokenNode matchedNode;
-        if (FindMatchingLeftBracket(selectedToken, out matchedNode))
+        if (FindMatchingLeftBracket(selectedToken, out var matchedNode))
           consumer.ConsumeMatchingBracesHighlighting(selectedToken.GetDocumentRange(), matchedNode.GetDocumentRange(),
             false);
         else
@@ -49,8 +48,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
       var selectedTokenType = selectedToken.GetTokenType();
       if (IsLeftBracket(selectedTokenType))
       {
-        ITokenNode matched;
-        if (FindMatchingRightBracket(selectedToken, out matched))
+        if (FindMatchingRightBracket(selectedToken, out var matched))
           consumer.ConsumeMatchingBracesHighlighting(selectedToken.GetDocumentRange(), matched.GetDocumentRange(),
             false);
         else
