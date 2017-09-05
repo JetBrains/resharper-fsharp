@@ -56,7 +56,7 @@ type FSharpCheckerService(lifetime, logger: Util.ILogger, onSolutionCloseNotifie
             with
             | :? ProcessCancelledException -> reraise()
             | exn ->
-                Logger.LogExceptionSilently(logger, exn)
+                Util.Logging.Logger.LogException(exn)
                 Logger.LogMessage(logger, LoggingLevel.WARN, sprintf "Parse file error, parsing options: %A" parsingOptions)
                 options, None
         | _ -> None, None
@@ -75,7 +75,7 @@ type FSharpCheckerService(lifetime, logger: Util.ILogger, onSolutionCloseNotifie
     member x.GetParsingOptions(sourceFile: IPsiSourceFile) =
         x.OptionsProvider.GetParsingOptions(sourceFile)
 
-    member x.ParseAndCheckFile([<NotNull>] file: IPsiSourceFile, allowStaleResults: bool) =
+    member x.ParseAndCheckFile([<NotNull>] file: IPsiSourceFile) =
         match x.OptionsProvider.GetProjectOptions(file, true) with
         | Some options ->
             let filePath = file.GetLocation().FullPath

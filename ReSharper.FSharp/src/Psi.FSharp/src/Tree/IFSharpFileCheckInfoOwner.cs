@@ -11,8 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
   public interface IFSharpFileCheckInfoOwner : ICompositeElement
   {
     [CanBeNull]
-    FSharpOption<FSharpParseAndCheckResults> GetParseAndCheckResults(Action interruptChecker = null,
-      bool allowStaleResults = false);
+    FSharpOption<FSharpParseAndCheckResults> GetParseAndCheckResults(Action interruptChecker = null);
 
     /// <summary>
     /// True when SetResolvedSymbolsStageProcess is finished.

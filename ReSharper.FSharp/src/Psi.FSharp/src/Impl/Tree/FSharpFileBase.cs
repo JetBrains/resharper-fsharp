@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using JetBrains.Application;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Checker;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
@@ -15,8 +16,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal abstract class FSharpFileBase : FileElementBase, IFSharpFileCheckInfoOwner
   {
-    private readonly object myCheckLock = new object();
-    private readonly object myGetSymbolsLock = new object();
+    private static readonly object ourCheckLock = new object();
+    private static readonly object ourGetSymbolsLock = new object();
     private Dictionary<int, FSharpSymbol> myDeclarationSymbols;
     public FSharpCheckerService CheckerService { get; set; }
     public FSharpProjectOptions ProjectOptions { get; set; }
@@ -25,16 +26,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override PsiLanguageType Language => FSharpLanguage.Instance;
     public bool ReferencesResolved { get; set; }
 
-    public FSharpOption<FSharpParseAndCheckResults> GetParseAndCheckResults([CanBeNull] Action interruptChecker = null,
-      bool allowStaleResults = false)
+    public FSharpOption<FSharpParseAndCheckResults> GetParseAndCheckResults([CanBeNull] Action interruptChecker = null)
     {
-      lock (myCheckLock)
-        return CheckerService.ParseAndCheckFile(GetSourceFile(), allowStaleResults);
+      lock (ourCheckLock)
+      {
+        InterruptableActivityCookie.CheckAndThrow();
+        return CheckerService.ParseAndCheckFile(GetSourceFile());
+      }
     }
 
     public FSharpSymbol GetSymbolDeclaration(int offset)
     {
-      lock (myGetSymbolsLock)
+      lock (ourGetSymbolsLock)
         if (myDeclarationSymbols == null)
         {
           var checkResults = GetParseAndCheckResults();
