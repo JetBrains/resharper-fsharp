@@ -8,8 +8,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  internal abstract class FSharpTypeParametersOwnerPart<T> : FSharpTypePart<T>
-    where T : class, IFSharpTypeDeclaration, ITypeDeclaration
+  internal abstract class FSharpTypeParametersOwnerPart<T> : FSharpTypePart<T> where T : class, IFSharpTypeDeclaration
   {
     private readonly string[] myTypeParameterNames;
 

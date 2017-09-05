@@ -11,6 +11,7 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
+using JetBrains.Util.Logging;
 using JetBrains.Util.Extension;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
@@ -38,11 +39,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return ids.IsEmpty ? null : ids.Last();
     }
 
-    private static bool AttributeHasShortName([NotNull] this IFSharpAttribute attr, [NotNull] string shortName)
-    {
-      var attrName = attr.LongIdentifier?.Name.SubstringBeforeLast("Attribute", StringComparison.Ordinal);
-      return attrName != null && attrName.Equals(shortName, StringComparison.Ordinal);
-    }
+    public static bool ShortNameEquals([NotNull] this IFSharpAttribute attr, [NotNull] string shortName) =>
+      attr.LongIdentifier?.Name.GetAttributeShortName()?.Equals(shortName, StringComparison.Ordinal) ?? false;
 
     [NotNull]
     public static string GetCompiledName([CanBeNull] IIdentifier identifier,
@@ -53,13 +51,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       foreach (var attr in attributes)
       {
         // todo: proper expressions evaluation, e.g. "S1" + "S2"
-        if (attr.AttributeHasShortName("CompiledName") && attr.ArgExpression.String != null)
+        if (attr.ShortNameEquals("CompiledName") && attr.ArgExpression.String != null)
         {
           var compiledNameString = attr.ArgExpression.String.GetText();
           return compiledNameString.Substring(1, compiledNameString.Length - 2);
         }
 
-        if (hasModuleSuffix || !attr.AttributeHasShortName("CompilationRepresentation")) continue;
+        if (hasModuleSuffix || !attr.ShortNameEquals("CompilationRepresentation")) continue;
         var arg = attr.ArgExpression.LongIdentifier?.QualifiedName;
         if (arg != null && arg.Equals("CompilationRepresentationFlags.ModuleSuffix", StringComparison.Ordinal))
           hasModuleSuffix = true;
@@ -126,14 +124,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     [NotNull]
     public static string GetMemberCompiledName([NotNull] this FSharpMemberOrFunctionOrValue mfv)
     {
-      var compiledNameAttr = mfv.Attributes.FirstOrDefault(a => a.AttributeType.FullName == CompiledNameAttrName);
-      var compiledName = compiledNameAttr != null && !compiledNameAttr.ConstructorArguments.IsEmpty()
-        ? compiledNameAttr.ConstructorArguments[0].Item2 as string
-        : null;
-      return compiledName ??
-             (mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod
-               ? mfv.DisplayName
-               : mfv.LogicalName);
+      try
+      {
+        var compiledNameAttr = mfv.Attributes.FirstOrDefault(a =>
+          a.AttributeType.QualifiedName.SubstringBefore(",", StringComparison.Ordinal)
+            .Equals(CompiledNameAttrName, StringComparison.Ordinal));
+        var compiledName = compiledNameAttr != null && !compiledNameAttr.ConstructorArguments.IsEmpty()
+          ? compiledNameAttr.ConstructorArguments[0].Item2 as string
+          : null;
+        return compiledName ??
+               (mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod
+                 ? mfv.DisplayName
+                 : mfv.LogicalName);
+      }
+      catch (Exception e)
+      {
+        Logger.LogMessage(LoggingLevel.WARN, "Couldn't get CompiledName attribute value:");
+        Logger.LogExceptionSilently(e);
+      }
+      return SharedImplUtil.MISSING_DECLARATION_NAME;
     }
 
     public static FSharpFileKind GetFSharpFileKind([NotNull] this IFile file)
@@ -170,5 +179,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
           : shortName;
       return cacheBuilder.Intern(moduleName);
     }
+
+    public static TreeNodeCollection<IFSharpAttribute> GetAttributes([NotNull] this IDeclaration declaration)
+    {
+      switch (declaration)
+      {
+        case IFSharpTypeDeclaration typeDeclaration:
+          return typeDeclaration.Attributes;
+        case IMemberDeclaration memberDeclarationm:
+          return memberDeclarationm.Attributes;
+        case ILet letBinding:
+          return letBinding.Attributes;
+        case IModuleLikeDeclaration moduleLikeDeclaration:
+          return moduleLikeDeclaration.Attributes;
+        default: return TreeNodeCollection<IFSharpAttribute>.Empty;
+      }
+    }
+
+    public static string GetAttributeShortName([NotNull] this string attrName) =>
+      attrName.SubstringBeforeLast("Attribute", StringComparison.Ordinal);
   }
 }

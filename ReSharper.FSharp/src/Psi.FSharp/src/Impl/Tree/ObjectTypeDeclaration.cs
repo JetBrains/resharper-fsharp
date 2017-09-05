@@ -32,7 +32,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
           if (attrIds.IsEmpty)
             continue;
 
-          switch (attrIds.Last()?.GetText().SubstringBeforeLast("Attribute", StringComparison.Ordinal))
+          switch (attrIds.Last()?.GetText().GetAttributeShortName())
           {
             case Interface:
               return FSharpPartKind.Interface;

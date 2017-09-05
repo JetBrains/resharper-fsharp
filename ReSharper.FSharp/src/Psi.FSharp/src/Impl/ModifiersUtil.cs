@@ -45,7 +45,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         var ids = attr.LongIdentifier.Identifiers;
         if (ids.IsEmpty) continue;
 
-        var attributeShortName = ids.Last().GetText().SubstringBeforeLast("Attribute", StringComparison.Ordinal);
+        var attributeShortName = ids.Last().GetText().GetAttributeShortName();
         if (attributeShortName.Equals(AbstractClass, StringComparison.Ordinal))
         {
           decoration.Modifiers |= Modifiers.ABSTRACT;

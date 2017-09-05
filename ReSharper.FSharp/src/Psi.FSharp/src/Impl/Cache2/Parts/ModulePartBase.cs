@@ -11,7 +11,7 @@ using JetBrains.Util;
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
   internal abstract class ModulePartBase<T> : FSharpTypePart<T>, Class.IClassPart
-    where T : class, IFSharpDeclaration, ITypeDeclaration
+    where T : class, IFSharpTypeElementDeclaration
   {
     protected ModulePartBase([NotNull] T declaration, [NotNull] string shortName, MemberDecoration memberDecoration,
       [NotNull] ICacheBuilder cacheBuilder)

@@ -7,36 +7,78 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2.ExtensionMethods;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
+using JetBrains.Util.DataStructures;
 using JetBrains.Util.Extension;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  public abstract class FSharpTypePart<T> : TypePartImplBase<T> where T : class, IFSharpDeclaration, ITypeDeclaration
+  public abstract class FSharpTypePart<T> : TypePartImplBase<T> where T : class, IFSharpTypeElementDeclaration
   {
+    public override ExtensionMethodInfo[] ExtensionMethodInfos { get; }
+
     protected FSharpTypePart([NotNull] T declaration, [NotNull] string shortName, MemberDecoration memberDecoration,
       int typeParameters, [NotNull] ICacheBuilder cacheBuilder) : base(declaration, shortName, typeParameters)
     {
       Modifiers = memberDecoration;
 
-      var attrOwner = declaration as IFSharpTypeDeclaration;
-      if (attrOwner == null)
+      var attributes = declaration.GetAttributes();
+      var attrNames = new FrugalLocalHashSet<string>();
+
+      foreach (var attr in attributes)
+        attrNames.Add(cacheBuilder.Intern(attr.LongIdentifier?.Name.GetAttributeShortName()));
+      AttributeClassNames = attrNames.ToArray();
+
+      if (!attributes.Any(a => a.ShortNameEquals("Extension")))
       {
-        AttributeClassNames = EmptyArray<string>.Instance;
+        ExtensionMethodInfos = EmptyArray<ExtensionMethodInfo>.Instance;
         return;
       }
-      var attrNames = new FrugalLocalHashSet<string>();
-      foreach (var attr in attrOwner.AttributesEnumerable)
-        attrNames.Add(cacheBuilder.Intern(attr.GetText().SubstringBeforeLast("Attribute", StringComparison.Ordinal)));
-      AttributeClassNames = attrNames.ToArray();
+
+      var methods = new LocalList<ExtensionMethodInfo>();
+      foreach (var member in declaration.MemberDeclarations)
+      {
+        if (!member.GetAttributes().Any(a => a.ShortNameEquals("Extension")))
+          continue;
+
+        var offset = member.GetTreeStartOffset().Offset;
+        methods.Add(new ExtensionMethodInfo(AnyCandidateType.INSTANCE, offset, member.DeclaredName) {Owner = this});
+      }
+      ExtensionMethodInfos = methods.ToArray();
+    }
+
+    public override HybridCollection<IMethod> FindExtensionMethod(ExtensionMethodInfo info)
+    {
+      var declaration = GetDeclaration();
+      if (declaration == null)
+        return HybridCollection<IMethod>.Empty;
+
+      var result = HybridCollection<IMethod>.Empty;
+      foreach (var memberDeclaration in declaration.MemberDeclarations)
+        if (info.ShortName.Equals(memberDeclaration.DeclaredName, StringComparison.Ordinal) &&
+            info.Hash == memberDeclaration.GetTreeStartOffset().Offset)
+        {
+          if (memberDeclaration.DeclaredElement is IMethod method)
+            result = result.Add(method);
+        }
+      return result;
     }
 
     protected FSharpTypePart(IReader reader) : base(reader)
     {
       Modifiers = MemberDecoration.FromInt(reader.ReadInt());
       AttributeClassNames = reader.ReadStringArray();
+      var extensionMethodCount = reader.ReadInt();
+      if (extensionMethodCount <= 0)
+        return;
+
+      var methods = new ExtensionMethodInfo[extensionMethodCount];
+      for (var i = 0; i < extensionMethodCount; i++)
+        methods[i] = new ExtensionMethodInfo(reader) {Owner = this};
+      ExtensionMethodInfos = methods;
     }
 
     protected override void Write(IWriter writer)
@@ -44,6 +86,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       base.Write(writer);
       writer.WriteInt(Modifiers.ToInt());
       writer.WriteStringArray(AttributeClassNames);
+
+      writer.WriteInt(ExtensionMethodInfos.Length);
+      foreach (var info in ExtensionMethodInfos)
+        info.Write(writer);
     }
 
     protected override ICachedDeclaration2 FindDeclaration(IFile file, ICachedDeclaration2 candidateDeclaration)
@@ -73,7 +119,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
       // todo: get entity without getting declaration 
       var entity = (GetDeclaration() as IFSharpTypeDeclaration)?.GetFSharpSymbol() as FSharpEntity;
-      return entity?.Attributes.Any(a => a.AttributeType.FullName == clrTypeName.FullName) ?? false;
+      return entity?.Attributes.Any(a => a.AttributeType.QualifiedName.SubstringBefore(",", StringComparison.Ordinal)
+               .Equals(clrTypeName.FullName, StringComparison.Ordinal)) ?? false;
     }
 
     public override IList<IAttributeInstance> GetTypeParameterAttributeInstances(int index, IClrTypeName typeName)

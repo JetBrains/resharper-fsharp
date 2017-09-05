@@ -10,7 +10,7 @@ using JetBrains.Util;
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
   internal abstract class FSharpClassLikePart<T> : FSharpTypeParametersOwnerPart<T>,
-    ClassLikeTypeElement.IClassLikePart where T : class, IFSharpTypeDeclaration, ITypeDeclaration
+    ClassLikeTypeElement.IClassLikePart where T : class, IFSharpTypeDeclaration
   {
     protected FSharpClassLikePart([NotNull] T declaration, MemberDecoration memberDecoration,
       TreeNodeCollection<ITypeParameterOfTypeDeclaration> typeParameters, [NotNull] ICacheBuilder cacheBuilder)

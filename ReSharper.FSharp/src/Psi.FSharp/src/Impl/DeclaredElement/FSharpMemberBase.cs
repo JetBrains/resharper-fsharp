@@ -41,7 +41,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     {
       var attrs = new List<IAttributeInstance>();
       foreach (var attr in FSharpSymbol.Attributes)
-        if (attr.AttributeType.FullName == clrName.FullName)
+        if (attr.AttributeType.QualifiedName.SubstringBefore(",", StringComparison.Ordinal)
+          .Equals(clrName.FullName, StringComparison.Ordinal))
           attrs.Add(new FSharpAttributeInstance(attr, Module));
       return attrs;
     }
@@ -49,7 +50,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override bool HasAttributeInstance(IClrTypeName clrName, bool inherit)
     {
       return FSharpSymbol.Attributes.Any(a =>
-        a.AttributeType.QualifiedName.SubstringBefore(",", StringComparison.Ordinal).Equals(clrName.FullName, StringComparison.Ordinal));
+        a.AttributeType.QualifiedName.SubstringBefore(",", StringComparison.Ordinal)
+          .Equals(clrName.FullName, StringComparison.Ordinal));
     }
 
     public InvocableSignature GetSignature(ISubstitution substitution)
