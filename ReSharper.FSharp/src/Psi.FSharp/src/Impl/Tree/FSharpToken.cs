@@ -16,30 +16,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     public override PsiLanguageType Language => FSharpLanguage.Instance;
+    public TokenNodeType GetTokenType() => (TokenNodeType) NodeType;
+    public override string ToString() => base.ToString() + "(type:" + NodeType + ", text:" + GetText() + ")";
+    public virtual void Accept(TreeNodeVisitor visitor) => visitor.VisitNode(this);
 
-    public TokenNodeType GetTokenType()
-    {
-      return (TokenNodeType) NodeType;
-    }
-
-    public override string ToString()
-    {
-      return base.ToString() + "(type:" + NodeType + ", text:" + GetText() + ")";
-    }
-
-    public virtual void Accept(TreeNodeVisitor visitor)
-    {
-      visitor.VisitNode(this);
-    }
-
-    public virtual void Accept<TContext>(TreeNodeVisitor<TContext> visitor, TContext context)
-    {
+    public virtual void Accept<TContext>(TreeNodeVisitor<TContext> visitor, TContext context) =>
       visitor.VisitNode(this, context);
-    }
 
-    public virtual TResult Accept<TContext, TResult>(TreeNodeVisitor<TContext, TResult> visitor, TContext context)
-    {
-      return visitor.VisitNode(this, context);
-    }
+    public virtual TResult Accept<TContext, TResult>(TreeNodeVisitor<TContext, TResult> visitor, TContext context) =>
+      visitor.VisitNode(this, context);
   }
 }

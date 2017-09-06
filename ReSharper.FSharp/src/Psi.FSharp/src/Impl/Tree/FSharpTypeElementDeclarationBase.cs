@@ -20,39 +20,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     /// May take long time due to waiting for FCS
     /// </summary>
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    public IEnumerable<IDeclaredType> SuperTypes
-    {
-      get
-      {
-        var entity = GetFSharpSymbol() as FSharpEntity;
-        return entity != null
-          ? FSharpTypesUtil.GetSuperTypes(entity, TypeParameters, GetPsiModule())
-          : EmptyList<IDeclaredType>.Instance;
-      }
-    }
+    public IEnumerable<IDeclaredType> SuperTypes => GetFSharpSymbol() is FSharpEntity entity
+      ? FSharpTypesUtil.GetSuperTypes(entity, TypeParameters, GetPsiModule())
+      : EmptyList<IDeclaredType>.Instance;
 
     /// <summary>
     /// May take long time due to waiting for FCS
     /// </summary>
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    public IDeclaredType BaseClassType
-    {
-      get
-      {
-        var entity = GetFSharpSymbol() as FSharpEntity;
-        return entity != null
-          ? FSharpTypesUtil.GetBaseType(entity, TypeParameters, GetPsiModule())
-          : null;
-      }
-    }
+    public IDeclaredType BaseClassType => GetFSharpSymbol() is FSharpEntity entity
+      ? FSharpTypesUtil.GetBaseType(entity, TypeParameters, GetPsiModule())
+      : null;
 
     public override FSharpSymbol GetFSharpSymbol()
     {
       var symbol = base.GetFSharpSymbol();
       if (symbol is FSharpEntity || symbol is FSharpUnionCase) return symbol;
 
-      var mfv = symbol as FSharpMemberOrFunctionOrValue;
-      if (mfv == null)
+      if (!(symbol is FSharpMemberOrFunctionOrValue mfv))
         return null;
 
       return mfv.IsConstructor || mfv.IsImplicitConstructor ? mfv.EnclosingEntity?.Value : null;

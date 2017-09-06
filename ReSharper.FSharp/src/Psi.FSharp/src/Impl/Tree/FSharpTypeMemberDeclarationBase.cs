@@ -22,15 +22,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       set => myCachedDeclaredElement = value;
     }
 
-    public IFSharpTypeElementDeclaration GetContainingTypeDeclaration()
-    {
-      return GetContainingNode<IFSharpTypeElementDeclaration>();
-    }
+    public IFSharpTypeElementDeclaration GetContainingTypeDeclaration() =>
+      GetContainingNode<IFSharpTypeElementDeclaration>();
 
-    ITypeDeclaration ITypeMemberDeclaration.GetContainingTypeDeclaration()
-    {
-      return GetContainingTypeDeclaration();
-    }
+    ITypeDeclaration ITypeMemberDeclaration.GetContainingTypeDeclaration() => GetContainingTypeDeclaration();
 
     public void SetAbstract(bool value)
     {
@@ -74,11 +69,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     ITypeMember ITypeMemberDeclaration.DeclaredElement => (ITypeMember) DeclaredElement;
 
-    public AccessRights GetAccessRights()
-    {
-      return AccessRights.PUBLIC;
-    }
-
+    public AccessRights GetAccessRights() => AccessRights.PUBLIC;
     public bool IsAbstract => false;
     public bool IsSealed => false;
     public bool IsVirtual => false;
@@ -88,12 +79,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public bool IsExtern => false;
     public bool IsUnsafe => false;
     public bool IsVolatile => false;
-
+    public bool HasAccessRights => false;
 
     public void SetAccessRights(AccessRights rights)
     {
     }
-
-    public bool HasAccessRights => false;
   }
 }

@@ -44,7 +44,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
       var theOnlyCase = isSingleCaseUnion ? cases.FirstOrDefault() as FSharpUnionCase : null;
       if (theOnlyCase != null)
-        members.AddRange(theOnlyCase?.CaseFields);
+        members.AddRange(theOnlyCase.CaseFields);
 
       members.Add(new FSharpGeneratedProperty(this, "Tag", predefinedType.Int));
       if (!isSingleCaseUnion)

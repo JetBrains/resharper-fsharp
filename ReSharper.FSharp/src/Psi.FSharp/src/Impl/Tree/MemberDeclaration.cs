@@ -21,8 +21,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     protected override IDeclaredElement CreateDeclaredElement()
     {
-      var mfv = GetFSharpSymbol() as FSharpMemberOrFunctionOrValue;
-      if (mfv == null) return null;
+      if (!(GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv)) return null;
 
       if (mfv.IsProperty || mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod)
       {

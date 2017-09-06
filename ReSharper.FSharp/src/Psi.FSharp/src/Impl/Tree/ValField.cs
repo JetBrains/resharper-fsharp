@@ -7,16 +7,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class ValField
   {
     public override string DeclaredName => FSharpImplUtil.GetCompiledName(Identifier, Attributes);
+    public override TreeTextRange GetNameRange() => Identifier.GetNameRange();
 
-    public override TreeTextRange GetNameRange()
-    {
-      return Identifier.GetNameRange();
-    }
-
-    protected override IDeclaredElement CreateDeclaredElement()
-    {
-      var field = GetFSharpSymbol() as FSharpField;
-      return field != null ? new FSharpValField(this, field) : null;
-    }
+    protected override IDeclaredElement CreateDeclaredElement() =>
+      GetFSharpSymbol() is FSharpField field ? new FSharpValField(this, field) : null;
   }
 }

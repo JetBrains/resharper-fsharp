@@ -13,16 +13,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
     }
 
-    public override bool IsFiltered()
-    {
-      return true;
-    }
-
-    public override string ToString()
-    {
-      return base.ToString() + " spaces:" + "\"" + GetText() + "\"";
-    }
-
+    public override bool IsFiltered() => true;
+    public override string ToString() => base.ToString() + " spaces:" + "\"" + GetText() + "\"";
     public abstract bool IsNewLine { get; }
   }
 }

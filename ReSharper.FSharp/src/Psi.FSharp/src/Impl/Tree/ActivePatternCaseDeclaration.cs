@@ -25,11 +25,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public override string DeclaredName => Identifier.Name;
     public override string SourceName => FSharpImplUtil.GetSourceName(Identifier);
-
-    public override TreeTextRange GetNameRange()
-    {
-      return Identifier.GetNameRange();
-    }
+    public override TreeTextRange GetNameRange() => Identifier.GetNameRange();
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     public override IDeclaredElement DeclaredElement
@@ -42,11 +38,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       }
     }
 
-    private IDeclaredElement DeclaredElementFactory(ActivePatternCaseDeclaration arg)
-    {
-      var patternCase = GetFSharpSymbol() as FSharpActivePatternCase;
-      return patternCase != null ? new ActivePatternCase(this, patternCase) : null;
-    }
+    private IDeclaredElement DeclaredElementFactory(ActivePatternCaseDeclaration arg) =>
+      GetFSharpSymbol() is FSharpActivePatternCase patternCase ? new ActivePatternCase(this, patternCase) : null;
 
     public IDeclaredElement CachedDeclaredElement { get; set; }
   }

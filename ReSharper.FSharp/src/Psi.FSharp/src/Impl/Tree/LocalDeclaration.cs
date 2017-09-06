@@ -15,45 +15,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     public override IDeclaredElement DeclaredElement => this;
     public override string DeclaredName => FSharpImplUtil.GetCompiledName(Identifier, Attributes);
+    public override TreeTextRange GetNameRange() => Identifier.GetNameRange();
+    public IList<IDeclaration> GetDeclarations() => new IDeclaration[] {this};
 
-    public override TreeTextRange GetNameRange()
-    {
-      return Identifier.GetNameRange();
-    }
+    public IList<IDeclaration> GetDeclarationsIn(IPsiSourceFile sourceFile) =>
+      SharedImplUtil.GetDeclarationsIn(this, sourceFile);
 
-    public IList<IDeclaration> GetDeclarations()
-    {
-      return new IDeclaration[] {this};
-    }
-
-    public IList<IDeclaration> GetDeclarationsIn(IPsiSourceFile sourceFile)
-    {
-      return SharedImplUtil.GetDeclarationsIn(this, sourceFile);
-    }
-
-    public DeclaredElementType GetElementType()
-    {
-      return CLRDeclaredElementType.LOCAL_VARIABLE;
-    }
-
-    public XmlNode GetXMLDescriptionSummary(bool inherit)
-    {
-      return null;
-    }
+    public DeclaredElementType GetElementType() => CLRDeclaredElementType.LOCAL_VARIABLE;
+    public XmlNode GetXMLDescriptionSummary(bool inherit) => null;
 
     public bool CaseSensitiveName => true;
     public PsiLanguageType PresentationLanguage => FSharpLanguage.Instance;
-
-    public ITypeElement GetContainingType()
-    {
-      return GetContainingNode<ITypeDeclaration>()?.DeclaredElement;
-    }
-
-    public ITypeMember GetContainingTypeMember()
-    {
-      return GetContainingNode<ITypeMemberDeclaration>()?.DeclaredElement;
-    }
-
+    public ITypeElement GetContainingType() => GetContainingNode<ITypeDeclaration>()?.DeclaredElement;
+    public ITypeMember GetContainingTypeMember() => GetContainingNode<ITypeMemberDeclaration>()?.DeclaredElement;
     public IPsiModule Module => GetPsiModule();
     public ISubstitution IdSubstitution => EmptySubstitution.INSTANCE;
 
@@ -61,8 +35,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       get
       {
-        var mfv = GetFSharpSymbol() as FSharpMemberOrFunctionOrValue;
-        if (mfv == null)
+        if (!(GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv))
           return TypeFactory.CreateUnknownType(Module);
 
         var typeMemberDeclaration = GetContainingNode<ITypeMemberDeclaration>();

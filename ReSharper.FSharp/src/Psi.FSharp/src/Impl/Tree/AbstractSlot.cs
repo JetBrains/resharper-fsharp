@@ -18,13 +18,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     protected override IDeclaredElement CreateDeclaredElement()
     {
-      var mfv = GetFSharpSymbol() as FSharpMemberOrFunctionOrValue;
-      if (mfv == null) return null;
+      if (!(GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv)) return null;
 
       // todo: fix getting members in FCS and remove this hack
       var hasDefault = mfv.EnclosingEntity?.Value.MembersFunctionsAndValues.Any(m =>
-        m.IsOverrideOrExplicitInterfaceImplementation &&
-        mfv.LogicalName == m.LogicalName) ?? false;
+                         m.IsOverrideOrExplicitInterfaceImplementation &&
+                         mfv.LogicalName == m.LogicalName) ?? false;
       if (hasDefault)
         return null;
 

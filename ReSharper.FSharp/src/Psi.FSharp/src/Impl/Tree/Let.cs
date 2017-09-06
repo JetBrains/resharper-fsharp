@@ -11,16 +11,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     IFunction IFunctionDeclaration.DeclaredElement => base.DeclaredElement as IFunction;
     public override string DeclaredName => FSharpImplUtil.GetCompiledName(Identifier, Attributes);
     public override string SourceName => FSharpImplUtil.GetSourceName(Identifier);
-
-    public override TreeTextRange GetNameRange()
-    {
-      return Identifier.GetNameRange();
-    }
+    public override TreeTextRange GetNameRange() => Identifier.GetNameRange();
 
     protected override IDeclaredElement CreateDeclaredElement()
     {
-      var mfv = GetFSharpSymbol() as FSharpMemberOrFunctionOrValue;
-      if (mfv == null) return null;
+      if (!(GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv)) return null;
 
       if (!mfv.IsValCompiledAsMethod)
         return new ModuleValue(this, mfv);

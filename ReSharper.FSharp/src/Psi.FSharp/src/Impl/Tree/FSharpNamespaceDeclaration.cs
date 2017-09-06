@@ -12,15 +12,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override string ShortName => LongIdentifier.Name;
     public bool IsModule => false;
 
-    public override TreeTextRange GetNameRange()
-    {
-      return LongIdentifier.GetNameRange();
-    }
-
-    public DocumentRange GetDeclaredNameDocumentRange()
-    {
-      return LongIdentifier.GetDocumentRange();
-    }
+    public override TreeTextRange GetNameRange() => LongIdentifier.GetNameRange();
+    public DocumentRange GetDeclaredNameDocumentRange() => LongIdentifier.GetDocumentRange();
 
     protected override void PreInit()
     {

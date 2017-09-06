@@ -20,20 +20,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public abstract IDeclaredElement DeclaredElement { get; }
     public abstract string DeclaredName { get; }
     public abstract TreeTextRange GetNameRange();
-
-    public XmlNode GetXMLDoc(bool inherit)
-    {
-      return null; // todo
-    }
+    public XmlNode GetXMLDoc(bool inherit) => null;
+    public bool IsSynthetic() => false;
 
     public void SetName(string name)
     {
-      // todo
-    }
-
-    public bool IsSynthetic()
-    {
-      return false;
     }
   }
 }

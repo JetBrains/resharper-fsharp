@@ -11,11 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class AutoProperty
   {
     public override string DeclaredName => FSharpImplUtil.GetCompiledName(Identifier, Attributes);
-
-    public override TreeTextRange GetNameRange()
-    {
-      return Identifier.GetNameRange();
-    }
+    public override TreeTextRange GetNameRange() => Identifier.GetNameRange();
 
     public override FSharpSymbol GetFSharpSymbol()
     {
@@ -34,15 +30,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     protected override IDeclaredElement CreateDeclaredElement()
     {
-      var mfv = GetFSharpSymbol() as FSharpMemberOrFunctionOrValue;
-      if (mfv == null) return null;
+      if (!(GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv)) return null;
 
       var entityMembers = mfv.EnclosingEntity?.Value.MembersFunctionsAndValues; //todo inheritance with same name
       var property = entityMembers?.SingleItem(m => m.IsProperty && !m.IsPropertyGetterMethod &&
                                                     !m.IsPropertySetterMethod && m.DisplayName == mfv.DisplayName);
-      if (property == null)
-        return null;
-      return new FSharpProperty<AutoProperty>(this, property);
+      return property == null
+        ? null
+        : new FSharpProperty<AutoProperty>(this, property);
     }
   }
 }

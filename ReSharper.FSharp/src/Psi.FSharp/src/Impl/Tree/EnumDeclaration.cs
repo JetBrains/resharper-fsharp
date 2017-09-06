@@ -9,11 +9,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     public override string DeclaredName => FSharpImplUtil.GetCompiledName(Identifier, Attributes);
     public override string SourceName => FSharpImplUtil.GetSourceName(Identifier);
-
-    public override TreeTextRange GetNameRange()
-    {
-      return Identifier.GetNameRange();
-    }
+    public override TreeTextRange GetNameRange() => Identifier.GetNameRange();
 
     public override IReadOnlyList<ITypeMemberDeclaration> MemberDeclarations =>
       EnumMembers.Cast<ITypeMemberDeclaration, IEnumMemberDeclaration>();

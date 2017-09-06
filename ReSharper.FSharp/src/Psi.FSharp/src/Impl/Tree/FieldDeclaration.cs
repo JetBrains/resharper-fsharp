@@ -12,21 +12,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     public override string DeclaredName => FSharpImplUtil.GetCompiledName(Identifier, Attributes);
     public override string SourceName => FSharpImplUtil.GetSourceName(Identifier);
-
-    public override TreeTextRange GetNameRange()
-    {
-      return Identifier.GetNameRange();
-    }
+    public override TreeTextRange GetNameRange() => Identifier.GetNameRange();
 
     protected override IDeclaredElement CreateDeclaredElement()
     {
       var symbol = GetFSharpSymbol();
-      var unionCase = symbol as FSharpUnionCase;
-      if (unionCase != null)
+      if (symbol is FSharpUnionCase unionCase)
         return new FSharpUnionCaseProperty(this, unionCase);
 
-      var field = symbol as FSharpField;
-      if (field != null)
+      if (symbol is FSharpField field)
         return new FSharpFieldProperty(this, field);
 
       // the field doesn't have a name and is in a union case or in an exception
@@ -50,15 +44,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     private static IList<FSharpField> GetFields([NotNull] FSharpSymbol typeSymbol)
     {
-      var unionCase = typeSymbol as FSharpUnionCase;
-      if (unionCase != null)
-        return unionCase.UnionCaseFields;
-
-      var entity = typeSymbol as FSharpEntity;
-      if (entity != null && entity.IsFSharpExceptionDeclaration)
-        return entity.FSharpFields;
-
-      return null;
+      switch (typeSymbol)
+      {
+        case FSharpUnionCase unionCase:
+          return unionCase.UnionCaseFields;
+        case FSharpEntity entity when entity.IsFSharpExceptionDeclaration:
+          return entity.FSharpFields;
+        default:
+          return null;
+      }
     }
   }
 }

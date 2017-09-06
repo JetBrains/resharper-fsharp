@@ -21,11 +21,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public bool IsModule => true;
 
-    public override TreeTextRange GetNameRange()
-    {
-      return !LongIdentifier.IdentifiersEnumerable.IsEmpty()
+    public override TreeTextRange GetNameRange() =>
+      !LongIdentifier.IdentifiersEnumerable.IsEmpty()
         ? LongIdentifier.GetNameRange()
         : new TreeTextRange(TreeOffset.Zero);
-    }
   }
 }
