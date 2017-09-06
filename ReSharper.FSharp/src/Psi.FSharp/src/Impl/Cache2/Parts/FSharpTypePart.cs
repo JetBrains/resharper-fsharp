@@ -18,7 +18,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
   public abstract class FSharpTypePart<T> : TypePartImplBase<T> where T : class, IFSharpTypeElementDeclaration
   {
-    public override ExtensionMethodInfo[] ExtensionMethodInfos { get; }
+    public override ExtensionMethodInfo[] ExtensionMethodInfos { get; } = EmptyArray<ExtensionMethodInfo>.Instance;
 
     protected FSharpTypePart([NotNull] T declaration, [NotNull] string shortName, MemberDecoration memberDecoration,
       int typeParameters, [NotNull] ICacheBuilder cacheBuilder) : base(declaration, shortName, typeParameters)
@@ -33,10 +33,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       AttributeClassNames = attrNames.ToArray();
 
       if (!attributes.Any(a => a.ShortNameEquals("Extension")))
-      {
-        ExtensionMethodInfos = EmptyArray<ExtensionMethodInfo>.Instance;
         return;
-      }
 
       var methods = new LocalList<ExtensionMethodInfo>();
       foreach (var member in declaration.MemberDeclarations)
