@@ -7,6 +7,7 @@
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Services</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Comment\FSharpBlockCommentActionProvider.fs" />
     <Compile Include="Comment\FSharpLineCommentActionProvider.fs" />
     <Compile Include="Debugger\FSharpBreakpointVariantsProvider.fs" />
     <Compile Include="Debugger\FSharpExpressionEvaluationInfoProvider.fs" />
