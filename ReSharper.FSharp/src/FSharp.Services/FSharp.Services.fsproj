@@ -6,8 +6,8 @@
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Services</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Services</AssemblyName>
   </PropertyGroup>
-  
   <ItemGroup>
+    <Compile Include="Debugger\FSharpBreakpointVariantsProvider.fs" />
     <Compile Include="Debugger\FSharpExpressionEvaluationInfoProvider.fs" />
     <Compile Include="FSharpClrLanguage.fs" />
     <Compile Include="FSharpRefactoringLanguageService.fs" />
@@ -18,7 +18,6 @@
     <Compile Include="FsiSessionsHost.fs" />
     <Compile Include="TodoItems\FSharpTodoContentsProvider.fs" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="4.1.*" />
     <PackageReference Include="JetBrains.Fantomas" Version="2.6.5" />
@@ -29,7 +28,6 @@
     <ProjectReference Include="..\Psi.FSharp.Parsing\Psi.FSharp.Parsing.fsproj" />
     <ProjectReference Include="..\Psi.FSharp\Psi.FSharp.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Reference Include="PresentationFramework" />
     <Reference Include="WindowsBase" />
