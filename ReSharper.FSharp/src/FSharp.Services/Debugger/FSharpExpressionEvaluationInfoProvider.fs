@@ -21,6 +21,6 @@ type FSharpExpressionEvaluationInfoProvider() =
                 let coords = document.GetCoordsByOffset(token.GetTreeStartOffset().Offset)
                 let lineText = document.GetLineText(coords.Line)
                 match QuickParse.GetCompleteIdentifierIsland false lineText (int (coords.Column)) with
-                | Some (island, _, _) -> EvaluationExpressionInfo(token, island, token.GetText())
+                | Some (island, _, _) -> EvaluationExpressionInfo(token, island, token.GetText()) // todo: compiled names?
                 | _ -> null
             | _ -> null
