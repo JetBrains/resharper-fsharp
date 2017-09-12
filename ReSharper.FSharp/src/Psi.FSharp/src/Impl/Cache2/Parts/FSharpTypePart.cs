@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
@@ -11,7 +11,6 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2.ExtensionMethods;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 using JetBrains.Util.DataStructures;
-using JetBrains.Util.Extension;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
@@ -102,8 +101,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public override IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName)
     {
-      var entity = (GetDeclaration() as IFSharpTypeDeclaration)?.GetFSharpSymbol() as FSharpEntity;
-      if (entity == null)
+      if (!((GetDeclaration() as IFSharpTypeDeclaration)?.GetFSharpSymbol() is FSharpEntity entity))
         return EmptyList<IAttributeInstance>.Instance;
 
       var attrs = new List<IAttributeInstance>();
@@ -116,8 +114,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
       // todo: get entity without getting declaration 
       var entity = (GetDeclaration() as IFSharpTypeDeclaration)?.GetFSharpSymbol() as FSharpEntity;
-      return entity?.Attributes.Any(a => a.AttributeType.QualifiedName.SubstringBefore(",", StringComparison.Ordinal)
-               .Equals(clrTypeName.FullName, StringComparison.Ordinal)) ?? false;
+      return entity?.Attributes.HasAttributeInstance(clrTypeName.FullName) ?? false;
     }
 
     public override IList<IAttributeInstance> GetTypeParameterAttributeInstances(int index, IClrTypeName typeName)

@@ -67,11 +67,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     private static ITypeElement TryFindByNames([NotNull] IEnumerable<string> names, ISymbolScope symbolScope)
     {
       foreach (var name in names)
-      {
-        var typeElement = symbolScope.GetElementsByQualifiedName(name).FirstOrDefault() as ITypeElement;
-        if (typeElement != null)
+        if (symbolScope.GetElementsByQualifiedName(name).FirstOrDefault() is ITypeElement typeElement)
           return typeElement;
-      }
       return null;
     }
 
@@ -92,8 +89,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     {
       if (symbol == null) return null;
 
-      var entity = symbol as FSharpEntity;
-      if (entity != null)
+      if (symbol is FSharpEntity entity)
       {
         if (entity.IsUnresolved) return null;
         return entity.IsNamespace
@@ -101,8 +97,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
           : GetTypeElement(entity, psiModule);
       }
 
-      var mfv = symbol as FSharpMemberOrFunctionOrValue;
-      if (mfv != null)
+      if (symbol is FSharpMemberOrFunctionOrValue mfv)
       {
         if (mfv.IsUnresolved) return null;
 
@@ -128,8 +123,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
           : members.FirstOrDefault(m => mfvXmlDocId.Equals(m.XMLDocId, StringComparison.Ordinal));
       }
 
-      var unionCase = symbol as FSharpUnionCase;
-      if (unionCase != null)
+      if (symbol is FSharpUnionCase unionCase)
       {
         if (unionCase.IsUnresolved) return null;
 
@@ -151,15 +145,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         return caseDeclaredType.GetTypeElement();
       }
 
-      var field = symbol as FSharpField;
-      if (field != null && !field.IsUnresolved)
-      {
-        var typeElement = GetTypeElement(field.DeclaringEntity, psiModule);
-        return typeElement?.EnumerateMembers(field.Name, true).FirstOrDefault();
-      }
+      if (symbol is FSharpField field && !field.IsUnresolved)
+        return GetTypeElement(field.DeclaringEntity, psiModule)?.EnumerateMembers(field.Name, true).FirstOrDefault();
 
-      var activePatternCase = symbol as FSharpActivePatternCase;
-      if (activePatternCase != null)
+      if (symbol is FSharpActivePatternCase activePatternCase)
         return new ResolvedFSharpSymbolElement(activePatternCase, referenceOwnerToken);
 
       return null;

@@ -14,13 +14,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {
   public class FSharpNamesUtil
   {
-    private const string FSharpConstructorName = "( .ctor )";
-    private const string ClrConstructorName = ".ctor";
     private const string AttributeSuffix = "Attribute";
     private const string ModuleSuffix = "Module";
     private const int EscapedNameAffixLength = 4;
     private const int EscapedNameStartIndex = 2;
-    private static readonly int ModuleSuffixFlag = (int) CompilationRepresentationFlags.ModuleSuffix;
+    private const int ModuleSuffixFlag = (int) CompilationRepresentationFlags.ModuleSuffix;
 
     private static readonly ClrTypeName SourceNameAttributeAttr =
       new ClrTypeName("Microsoft.FSharp.Core.CompilationSourceNameAttribute");
@@ -43,12 +41,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     }
 
     [NotNull]
-    public static string RemoveBackticks([NotNull] string name)
-    {
-      return IsEscapedWithBackticks(name)
+    public static string RemoveBackticks([NotNull] string name) =>
+      IsEscapedWithBackticks(name)
         ? name.Substring(EscapedNameStartIndex, name.Length - EscapedNameAffixLength)
         : name;
-    }
 
     [NotNull]
     public static string RemoveParens([NotNull] string name, out bool isEscaped)
@@ -62,52 +58,41 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     [NotNull]
     public static IEnumerable<string> GetPossibleSourceNames([NotNull] IDeclaredElement element)
     {
-      var names = new List<string>();
+      var names = new List<string> {element.ShortName};
 
       var constructor = element as IConstructor;
       var typeElement = constructor?.GetContainingType();
-      if (typeElement != null) names.Add(typeElement.ShortName);
+      if (typeElement != null)
+        names.Add(typeElement.ShortName);
 
-      names.Add(element.ShortName);
-
-      var type = element as ITypeElement;
-      if (type != null)
+      if (element is ITypeElement type)
       {
         var typeShortName = type.ShortName;
         if (typeShortName.EndsWith(AttributeSuffix))
           names.Add(typeShortName.SubstringBeforeLast(AttributeSuffix, StringComparison.Ordinal));
 
-        var abbreviatedTypes = FSharpTypeAbbreviationsUtil.AbbreviatedTypes;
-        names.AddRange(abbreviatedTypes.TryGetValue(type.GetClrName(), EmptyArray<string>.Instance));
+        names.AddRange(
+          FSharpTypeAbbreviationsUtil.AbbreviatedTypes.TryGetValue(type.GetClrName(), EmptyArray<string>.Instance));
       }
-      var attrOwner = element as IAttributesOwner;
-      if (attrOwner != null)
+      if (element is IAttributesOwner attrOwner)
       {
-        var sourceName = GetAttributeValue(attrOwner, SourceNameAttributeAttr) as string;
-        if (sourceName != null) names.Add(sourceName);
-
-        var reprFlag = GetAttributeValue(attrOwner, CompilationRepresentationAttr) as int?;
-        if (reprFlag != null && reprFlag.Value == ModuleSuffixFlag)
+        if (GetAttributeValue(attrOwner, SourceNameAttributeAttr) is string sourceName)
+          names.Add(sourceName);
+        if (GetAttributeValue(attrOwner, CompilationRepresentationAttr) is int reprFlag && reprFlag == ModuleSuffixFlag)
           names.Add(element.ShortName.SubstringBeforeLast(ModuleSuffix, StringComparison.Ordinal));
-        // todo: implicit module suffix in F# 4.1
       }
 
       foreach (var declaration in element.GetDeclarations())
-      {
-        var fsDeclaration = declaration as IFSharpDeclaration;
-        if (fsDeclaration != null)
+        if (declaration is IFSharpDeclaration fsDeclaration)
           names.Add(fsDeclaration.SourceName);
-      }
 
       // todo: type abbreviations
       return names;
     }
 
     [CanBeNull]
-    private static object GetAttributeValue([NotNull] IAttributesSet attrs, [NotNull] IClrTypeName attrName)
-    {
-      var attrInstance = attrs.GetAttributeInstances(attrName, true).FirstOrDefault();
-      return attrInstance?.PositionParameters().FirstOrDefault()?.ConstantValue.Value;
-    }
+    private static object GetAttributeValue([NotNull] IAttributesSet attrs, [NotNull] IClrTypeName attrName) =>
+      attrs.GetAttributeInstances(attrName, true).FirstOrDefault()?.PositionParameters()
+        .FirstOrDefault()?.ConstantValue.Value;
   }
 }

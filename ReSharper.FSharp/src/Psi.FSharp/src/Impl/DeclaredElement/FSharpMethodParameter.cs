@@ -4,13 +4,13 @@ using System.Linq;
 using System.Xml;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 using JetBrains.Util.DataStructures;
-using JetBrains.Util.Extension;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
@@ -36,89 +36,36 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       myParameterIndex = parameterIndex;
     }
 
-    public IPsiServices GetPsiServices()
-    {
-      return myParametersOwner.GetPsiServices();
-    }
-
-    public IList<IDeclaration> GetDeclarations()
-    {
-      return EmptyList<IDeclaration>.InstanceList;
-    }
-
-    public IList<IDeclaration> GetDeclarationsIn(IPsiSourceFile sourceFile)
-    {
-      return EmptyList<IDeclaration>.InstanceList;
-    }
-
-    public DeclaredElementType GetElementType()
-    {
-      return CLRDeclaredElementType.PARAMETER;
-    }
-
-    public XmlNode GetXMLDoc(bool inherit)
-    {
-      return null;
-    }
-
-    public XmlNode GetXMLDescriptionSummary(bool inherit)
-    {
-      return null;
-    }
-
-    public bool IsValid()
-    {
-      return myParametersOwner.IsValid();
-    }
-
-    public bool IsSynthetic()
-    {
-      return false;
-    }
-
-    public HybridCollection<IPsiSourceFile> GetSourceFiles()
-    {
-      return HybridCollection<IPsiSourceFile>.Empty;
-    }
-
-    public bool HasDeclarationsIn(IPsiSourceFile sourceFile)
-    {
-      return false;
-    }
+    public IPsiServices GetPsiServices() => myParametersOwner.GetPsiServices();
+    public IList<IDeclaration> GetDeclarations() => EmptyList<IDeclaration>.InstanceList;
+    public IList<IDeclaration> GetDeclarationsIn(IPsiSourceFile sourceFile) => EmptyList<IDeclaration>.InstanceList;
+    public DeclaredElementType GetElementType() => CLRDeclaredElementType.PARAMETER;
+    public XmlNode GetXMLDoc(bool inherit) => null;
+    public XmlNode GetXMLDescriptionSummary(bool inherit) => null;
+    public bool IsValid() => myParametersOwner.IsValid();
+    public bool IsSynthetic() => false;
+    public HybridCollection<IPsiSourceFile> GetSourceFiles() => HybridCollection<IPsiSourceFile>.Empty;
+    public bool HasDeclarationsIn(IPsiSourceFile sourceFile) => false;
 
     public string ShortName { get; }
     public bool CaseSensitiveName => true;
     public PsiLanguageType PresentationLanguage => FSharpLanguage.Instance;
-
-    public ITypeElement GetContainingType()
-    {
-      return myParametersOwner.GetContainingType();
-    }
-
-    public ITypeMember GetContainingTypeMember()
-    {
-      return (ITypeMember) myParametersOwner;
-    }
+    public ITypeElement GetContainingType() => myParametersOwner.GetContainingType();
+    public ITypeMember GetContainingTypeMember() => (ITypeMember) myParametersOwner;
 
     public IPsiModule Module => myParametersOwner.Module;
     public ISubstitution IdSubstitution => EmptySubstitution.INSTANCE;
     public FSharpParameter FSharpSymbol { get; }
     public IType Type { get; }
 
-    public IList<IAttributeInstance> GetAttributeInstances(bool inherit)
-    {
-      return EmptyList<IAttributeInstance>.InstanceList;
-    }
+    public bool HasAttributeInstance(IClrTypeName clrName, bool inherit) =>
+      FSharpSymbol.Attributes.HasAttributeInstance(clrName.FullName);
 
-    public IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName, bool inherit)
-    {
-      return EmptyList<IAttributeInstance>.InstanceList;
-    }
+    public IList<IAttributeInstance> GetAttributeInstances(bool inherit) =>
+      FSharpAttributeInstance.GetAttributeInstances(FSharpSymbol.Attributes, Module);
 
-    public bool HasAttributeInstance(IClrTypeName clrName, bool inherit)
-    {
-      return false;
-    }
+    public IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName, bool inherit) =>
+      FSharpAttributeInstance.GetAttributeInstances(FSharpSymbol.Attributes.GetAttributes(clrName.FullName), Module);
 
     public DefaultValue GetDefaultValue()
     {
@@ -126,8 +73,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       {
         // todo: implement DefaultValue in FCS
         var defaultValueAttr = FSharpSymbol.Attributes
-          .FirstOrDefault(a => a.AttributeType.QualifiedName.SubstringBefore(",", StringComparison.Ordinal)
-            .Equals(DefaultParameterValueTypeName, StringComparison.Ordinal))?.ConstructorArguments.FirstOrDefault();
+          .FirstOrDefault(a => a.GetClrName().Equals(DefaultParameterValueTypeName, StringComparison.Ordinal))
+          ?.ConstructorArguments.FirstOrDefault();
         return defaultValueAttr == null
           ? new DefaultValue(Type)
           : new DefaultValue(new ConstantValue(defaultValueAttr.Item2, type: null));
@@ -145,16 +92,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     // todo: implement IsCliOptional in FCS
     public bool IsOptional =>
-      FSharpSymbol.Attributes.Any(a =>
-        a.AttributeType.QualifiedName.SubstringBefore(",", StringComparison.Ordinal).Equals(OptionalTypeName, StringComparison.Ordinal));
+      FSharpSymbol.Attributes.HasAttributeInstance(OptionalTypeName);
 
     public bool IsVarArg => false;
     public IParametersOwner ContainingParametersOwner => myParametersOwner;
 
     public override bool Equals(object obj)
     {
-      var parameter = obj as FSharpMethodParameter;
-      if (parameter == null) return false;
+      if (!(obj is FSharpMethodParameter parameter)) return false;
 
       return myParametersOwner.Equals(parameter.myParametersOwner) &&
              myParameterIndex == parameter.myParameterIndex;

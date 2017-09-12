@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
@@ -35,6 +36,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     private const string MeasureSByte = "Microsoft.FSharp.Core.sbyte`1";
     private const string MeasureInt16 = "Microsoft.FSharp.Core.int16`1";
     private const string MeasureInt64 = "Microsoft.FSharp.Core.int64`1";
+
+    public const string OutAttributeType = "System.Runtime.InteropServices.OutAttribute";
+    public const string ParamArrayAttributeType = "System.ParamArrayAttribute";
+    public const string ExtensionAttributeTypeName = "System.Runtime.CompilerServices.ExtensionAttribute";
 
     private static readonly object ourFcsLock = new object();
 
@@ -285,9 +290,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     private static IType FindTypeParameterByName([NotNull] FSharpType type,
       [CanBeNull] IEnumerable<ITypeParameter> typeParameters, [NotNull] IPsiModule psiModule)
     {
-      Assertion.Assert(type.IsGenericParameter, "type.IsGenericParameter");
       var typeParam = typeParameters?.FirstOrDefault(p => p.ShortName == type.GenericParameter.DisplayName);
-
       return typeParam != null
         ? TypeFactory.CreateType(typeParam)
         : TypeFactory.CreateUnknownType(psiModule);
@@ -298,42 +301,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     {
       while (fsType.IsAbbreviation)
         fsType = fsType.AbbreviatedType;
-
       return fsType;
     }
 
-    public static bool IsUnit([NotNull] this IType type, [NotNull] IPsiModule psiModule)
-    {
-      return type.Equals(TypeFactory.CreateTypeByCLRName(UnitClrName, psiModule));
-    }
+    public static bool IsUnit([NotNull] this IType type, [NotNull] IPsiModule psiModule) =>
+      type.Equals(TypeFactory.CreateTypeByCLRName(UnitClrName, psiModule));
 
     public static ParameterKind GetParameterKind([NotNull] FSharpParameter param)
     {
       var fsType = param.Type;
       if (fsType.HasTypeDefinition && fsType.TypeDefinition.IsByRef)
-      {
-        return param.Attributes.Any(a =>
-          a.AttributeType.QualifiedName.SubstringBefore(",", StringComparison.Ordinal)
-            .Equals("System.Runtime.InteropServices.OutAttribute", StringComparison.Ordinal))
-          ? ParameterKind.OUTPUT
-          : ParameterKind.REFERENCE;
-      }
-
+        return param.Attributes.HasAttributeInstance(OutAttributeType) ? ParameterKind.OUTPUT : ParameterKind.REFERENCE;
       return ParameterKind.VALUE;
     }
 
-    public static bool IsParamArray([NotNull] FSharpParameter param)
-    {
-      return param.Attributes.Any(a =>
-        a.AttributeType.QualifiedName.SubstringBefore(",", StringComparison.Ordinal)
-          .Equals("System.ParamArrayAttribute", StringComparison.Ordinal));
-    }
+    public static bool IsParamArray([NotNull] FSharpParameter param) =>
+      param.Attributes.HasAttributeInstance(ParamArrayAttributeType);
 
-    private static bool IsNativePtr([NotNull] this FSharpEntity entity)
-    {
-      return entity.IsFSharp &&
-             entity.LogicalName == NativeptrLogicalName &&
-             entity.AccessPath == FSharpCoreNamespace;
-    }
+    private static bool IsNativePtr([NotNull] this FSharpEntity entity) =>
+      entity.IsFSharp &&
+      entity.LogicalName == NativeptrLogicalName &&
+      entity.AccessPath == FSharpCoreNamespace;
   }
 }

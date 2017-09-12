@@ -16,11 +16,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       myActivePatternCase = activePatternCase;
     }
 
-    public override DeclaredElementType GetElementType()
-    {
-      return FSharpDeclaredElementType.ActivePatternCase;
-    }
-
+    public override DeclaredElementType GetElementType() => FSharpDeclaredElementType.ActivePatternCase;
     public override string ShortName => myActivePatternCase.Name;
     public FSharpSymbol Symbol => myActivePatternCase;
   }

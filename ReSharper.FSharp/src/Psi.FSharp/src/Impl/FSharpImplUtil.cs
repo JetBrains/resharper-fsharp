@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -127,8 +128,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       try
       {
         var compiledNameAttr = mfv.Attributes.FirstOrDefault(a =>
-          a.AttributeType.QualifiedName.SubstringBefore(",", StringComparison.Ordinal)
-            .Equals(CompiledNameAttrName, StringComparison.Ordinal));
+          a.GetClrName().Equals(CompiledNameAttrName, StringComparison.Ordinal));
         var compiledName = compiledNameAttr != null && !compiledNameAttr.ConstructorArguments.IsEmpty()
           ? compiledNameAttr.ConstructorArguments[0].Item2 as string
           : null;

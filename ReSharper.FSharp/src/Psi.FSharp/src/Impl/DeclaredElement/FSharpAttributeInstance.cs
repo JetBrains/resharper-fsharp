@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.Util;
-using JetBrains.Util.Extension;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
@@ -23,38 +23,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       myModule = module;
     }
 
-    public IClrTypeName GetClrName()
-    {
-      return new ClrTypeName(myAttr.AttributeType.QualifiedName.SubstringBefore(",", StringComparison.Ordinal));
-    }
+    public IClrTypeName GetClrName() => new ClrTypeName(myAttr.GetClrName());
 
-    public string GetAttributeShortName()
-    {
-      return myAttr.AttributeType.DisplayName;
-    }
+    public string GetAttributeShortName() => myAttr.AttributeType.DisplayName;
 
-    public IDeclaredType GetAttributeType()
-    {
-      var clrName = myAttr.AttributeType.QualifiedName.SubstringBefore(",", StringComparison.Ordinal);
-      return TypeFactory.CreateTypeByCLRName(clrName, myModule);
-    }
+    public IDeclaredType GetAttributeType() => TypeFactory.CreateTypeByCLRName(myAttr.GetClrName(), myModule);
 
-    private AttributeValue GetAttributeValue(Tuple<FSharpType, object> param)
-    {
-      var type = FSharpTypesUtil.GetType(param.Item1, EmptyList<ITypeParameter>.Instance, myModule);
-      return new AttributeValue(new ConstantValue(param.Item2, type));
-    }
+    private AttributeValue GetAttributeValue(Tuple<FSharpType, object> param) =>
+      new AttributeValue(new ConstantValue(param.Item2,
+        FSharpTypesUtil.GetType(param.Item1, EmptyList<ITypeParameter>.Instance, myModule)));
 
-    public AttributeValue PositionParameter(int paramIndex)
-    {
-      return GetAttributeValue(myAttr.ConstructorArguments[paramIndex]);
-    }
+    public AttributeValue PositionParameter(int paramIndex) =>
+      GetAttributeValue(myAttr.ConstructorArguments[paramIndex]);
 
-    public IEnumerable<AttributeValue> PositionParameters()
-    {
-      foreach (var attr in myAttr.ConstructorArguments)
-        yield return GetAttributeValue(attr);
-    }
+    public IEnumerable<AttributeValue> PositionParameters() => myAttr.ConstructorArguments.Select(GetAttributeValue);
 
     public AttributeValue NamedParameter(string name)
     {
@@ -70,17 +52,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
         GetAttributeValue(new Tuple<FSharpType, object>(a.Item1, a.Item4))));
     }
 
-    public IConstructor Constructor
-    {
-      get
-      {
-        // todo: add property to FCS to get constructor symbol
-        var ctor = myAttr.AttributeType.MembersFunctionsAndValues.FirstOrDefault(m => m.IsConstructor);
-        return FSharpElementsUtil.GetDeclaredElement(ctor, myModule) as IConstructor;
-      }
-    }
+    // todo: add property to FCS to get constructor symbol
+    public IConstructor Constructor =>
+      FSharpElementsUtil.GetDeclaredElement(
+        myAttr.AttributeType.MembersFunctionsAndValues.FirstOrDefault(m => m.IsConstructor), myModule) as IConstructor;
 
     public int PositionParameterCount => myAttr.ConstructorArguments.Count;
     public int NamedParameterCount => myAttr.NamedArguments.Count;
+
+    public static IList<IAttributeInstance> GetAttributeInstances(IList<FSharpAttribute> attrs, IPsiModule psiModule) =>
+      attrs.Select(a => (IAttributeInstance) new FSharpAttributeInstance(a, psiModule)).AsIList();
   }
 }

@@ -1,11 +1,9 @@
-﻿using System;
-using System.Linq;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Util.Extension;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
@@ -14,6 +12,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     where TDeclaration : FSharpDeclarationBase, IFSharpDeclaration, IAccessRightsOwnerDeclaration,
     IModifiersOwnerDeclaration
   {
+    public const string ExtensionAttributeTypeName = "System.Runtime.CompilerServices.ExtensionAttribute";
+
     protected FSharpMethodBase([NotNull] ITypeMemberDeclaration declaration,
       [NotNull] FSharpMemberOrFunctionOrValue mfv, [CanBeNull] IFSharpTypeDeclaration typeDeclaration)
       : base(declaration, mfv, typeDeclaration)
@@ -21,16 +21,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       ShortName = mfv.GetMemberCompiledName();
     }
 
-    public override DeclaredElementType GetElementType()
-    {
-      return CLRDeclaredElementType.METHOD;
-    }
+    public override DeclaredElementType GetElementType() => CLRDeclaredElementType.METHOD;
 
     public override string ShortName { get; }
 
-    public bool IsExtensionMethod => FSharpSymbol.Attributes.Any(a =>
-      a.AttributeType.QualifiedName.SubstringBefore(",", StringComparison.Ordinal)
-        .Equals("System.Runtime.CompilerServices.ExtensionAttribute", StringComparison.Ordinal));
+    public bool IsExtensionMethod => FSharpSymbol.Attributes.HasAttributeInstance(ExtensionAttributeTypeName);
 
     public bool IsAsync => false;
     public bool IsVarArg => false;
