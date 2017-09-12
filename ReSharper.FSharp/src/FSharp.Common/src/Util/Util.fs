@@ -29,7 +29,7 @@ module CommonUtil =
     
     let isFSharpProject (guid: Guid) (projectFile: FileSystemPath) =
         match guid, projectFile with
-        | guid, _ when guid.Equals(FSharpProjectPropertiesFactory.FSharpProjectTypeGuid) -> true
+        | guid, _ when guid.Equals(FSharpProjectPropertiesFactory.fsProjectTypeGuid) -> true
         | _, projectFile when projectFile.ExtensionNoDot.Equals("fsproj") -> true
         | _ -> false
         
@@ -41,7 +41,7 @@ module CommonUtil =
         | :? FSharpProjectProperties -> true
         | :? ProjectKCSharpProjectProperties as coreProperties ->
             // todo: remove when ProjectK properties replaced with DotNetCoreProjectFlavour
-            coreProperties.ProjectTypeGuids.Contains(FSharpProjectPropertiesFactory.FSharpProjectTypeGuid)
+            coreProperties.ProjectTypeGuids.Contains(FSharpProjectPropertiesFactory.fsProjectTypeGuid)
         | _ -> false
         
     let ensureAbsolute (path: FileSystemPath) (projectDirectory: FileSystemPath) =

@@ -15,18 +15,17 @@ type FSharpProjectProperties =
     val mutable targetPlatformData: TargetPlatformData
     val buildSettings: ManagedProjectBuildSettings
 
-    // todo: these constructors are seen as partial member
     new(projectTypeGuids, platformId, factoryGuid, targetFrameworkIds, targetPlatformData) =
         { inherit ProjectPropertiesBase<_>(projectTypeGuids, platformId, factoryGuid, targetFrameworkIds)
           buildSettings = ManagedProjectBuildSettings()
-          targetPlatformData = null }
+          targetPlatformData = targetPlatformData }
 
-    new(factoryGuid, [<Optional; DefaultParameterValue(null: TargetPlatformData)>] tpd) =
+    new(factoryGuid, [<Optional; DefaultParameterValue(null: TargetPlatformData)>] targetPlatformData) =
         { inherit ProjectPropertiesBase<_>(factoryGuid)
           buildSettings = ManagedProjectBuildSettings()
-          targetPlatformData = tpd }
+          targetPlatformData = targetPlatformData }
 
-    override x.BuildSettings = x.buildSettings :> IBuildSettings
+    override x.BuildSettings = x.buildSettings :> _
 
     override x.ReadProjectProperties(reader, index) =
         base.ReadProjectProperties(reader, index)
@@ -38,9 +37,9 @@ type FSharpProjectProperties =
     override x.WriteProjectProperties(writer) =
         base.WriteProjectProperties(writer)
         x.buildSettings.WriteBuildSettings(writer)
-        if isNull x.targetPlatformData
-        then TargetPlatformData.WriteEmpty(writer)
-        else x.targetPlatformData.Write(writer)
+        match x.targetPlatformData with
+        | null -> TargetPlatformData.WriteEmpty(writer)
+        | _ -> x.targetPlatformData.Write(writer)
 
     override x.Dump(writer, indent) =
         writer.Write(new string(' ', indent * 2))
@@ -51,16 +50,16 @@ type FSharpProjectProperties =
         base.Dump(writer, indent + 1)
 
     interface ISdkConsumerProperties with
-        member x.TargetPlatformData = x.targetPlatformData
         member x.ProjectKind = ProjectKind.REGULAR_PROJECT
-        member x.DefaultLanguage = FSharpProjectLanguage.Instance :> ProjectLanguage
-
         member x.BuildSettings = x.BuildSettings
+        member x.DefaultLanguage = FSharpProjectLanguage.Instance :> _
+        member x.TargetPlatformData = x.targetPlatformData
+
         member x.Dump(writer, indent) = x.Dump(writer, indent)
+        member x.UpdateFrom(properties) = base.UpdateFrom(properties)
         member x.WriteProjectProperties(writer) = x.WriteProjectProperties(writer)
 
         member x.PlatformId = base.PlatformId
         member x.ProjectTypeGuids = base.ProjectTypeGuids
         member x.OwnerFactoryGuid = base.OwnerFactoryGuid
         member x.ActiveConfigurations = base.ActiveConfigurations
-        member x.UpdateFrom(properties) = base.UpdateFrom(properties)

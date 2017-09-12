@@ -16,8 +16,9 @@
     <Compile Include="src\ProjectModel\ProjectProperties\FSharpProjectFilePropertiesProvider.fs" />
     <Compile Include="src\ProjectModel\FSharpProjectPresenter.fs" />
     <Compile Include="src\ProjectModel\ZoneMarker.fs" />
-    <Compile Include="src\Util\FSharpSymbolUtil.fs" />
     <Compile Include="src\Util\Util.fs" />
+    <Compile Include="src\Util\FSharpAttributesUtil.fs" />
+    <Compile Include="src\Util\FSharpSymbolUtil.fs" />
     <Compile Include="src\Checker\IFSharpProjectOptionsProvider.fs" />
     <Compile Include="src\Checker\FSharpCoreFix.fs" />
     <Compile Include="src\Checker\FSharpCheckerService.fs" />
