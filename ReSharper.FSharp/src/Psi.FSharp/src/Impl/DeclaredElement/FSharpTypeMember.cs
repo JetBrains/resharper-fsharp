@@ -79,19 +79,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       if (ReferenceEquals(this, obj))
         return true;
 
-      var member = obj as FSharpTypeMember<TDeclaration>;
-      if (member == null)
+      if (!(obj is FSharpTypeMember<TDeclaration> member)) return false;
+
+      if (!ShortName.Equals(member.ShortName))
         return false;
 
-      return member.ShortName == ShortName &&
-             Equals(GetContainingType(), member.GetContainingType());
+      return Equals(GetContainingType(), member.GetContainingType());
     }
 
-    public override int GetHashCode()
-    {
-      return ShortName.GetHashCode();
-    }
-
+    public override int GetHashCode() => ShortName.GetHashCode();
 
     public virtual IList<IAttributeInstance> GetAttributeInstances(bool inherit)
     {

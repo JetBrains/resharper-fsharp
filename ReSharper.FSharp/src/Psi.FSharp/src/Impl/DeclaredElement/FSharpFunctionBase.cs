@@ -29,7 +29,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
       var returnType = FSharpTypesUtil.GetType(mfv.ReturnParameter.Type, declaration, TypeParameters, Module) ??
                        TypeFactory.CreateUnknownType(Module);
-      ReturnType = returnType.IsUnit(Module) ? Module.GetPredefinedType().Void : returnType;
+      ReturnType = mfv.IsConstructor || returnType.IsUnit(Module)
+        ? Module.GetPredefinedType().Void
+        : returnType;
 
 
       var methodParams = new FrugalLocalList<IParameter>();

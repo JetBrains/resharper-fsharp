@@ -38,8 +38,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public InvocableSignature GetSignature(ISubstitution substitution) => new InvocableSignature(this, substitution);
 
-    public override bool Equals(object obj) =>
-      (obj as FSharpMemberBase<TDeclaration>)?.FSharpSymbol.IsEffectivelySameAs(FSharpSymbol) ?? false;
+    public override bool Equals(object obj)
+    {
+      if (!base.Equals(obj))
+        return false;
+
+      if (!(obj is FSharpMemberBase<TDeclaration> member))
+        return false;
+
+      return SignatureComparers.Strict.Compare(GetSignature(IdSubstitution),
+        member.GetSignature(member.IdSubstitution));
+    }
 
     public override int GetHashCode() => ShortName.GetHashCode();
 

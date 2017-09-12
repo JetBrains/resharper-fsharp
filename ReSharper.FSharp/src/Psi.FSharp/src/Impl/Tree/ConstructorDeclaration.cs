@@ -1,4 +1,5 @@
 ﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Tree;
@@ -16,7 +17,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public override TreeTextRange GetNameRange() => NewKeyword.GetTreeTextRange();
 
-    protected override IDeclaredElement CreateDeclaredElement() =>
-      GetFSharpSymbol() is FSharpMemberOrFunctionOrValue ctor ? new FSharpConstructor(this, ctor) : null;
+    protected override IDeclaredElement CreateDeclaredElement()
+    {
+      var typeDeclaration = GetContainingTypeDeclaration() as IFSharpTypeDeclaration;
+      return GetFSharpSymbol() is FSharpMemberOrFunctionOrValue ctor
+        ? new FSharpConstructor(this, ctor, typeDeclaration)
+        : null;
+    }
   }
 }
