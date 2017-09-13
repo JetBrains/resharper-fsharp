@@ -34,7 +34,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
         FSharpTypesUtil.GetType(param.Item1, EmptyList<ITypeParameter>.Instance, myModule)));
 
     public AttributeValue PositionParameter(int paramIndex) =>
-      GetAttributeValue(myAttr.ConstructorArguments[paramIndex]);
+      paramIndex >= 0 && paramIndex < myAttr.ConstructorArguments.Count
+        ? GetAttributeValue(myAttr.ConstructorArguments[paramIndex])
+        : AttributeValue.BAD_VALUE;
 
     public IEnumerable<AttributeValue> PositionParameters() => myAttr.ConstructorArguments.Select(GetAttributeValue);
 
