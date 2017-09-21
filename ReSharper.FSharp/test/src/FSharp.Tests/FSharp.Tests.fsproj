@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net451</TargetFramework>
+    <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
+    <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Tests</RootNamespace>
+    <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Tests</AssemblyName>
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="Stubs.fs" />
+    <Compile Include="ZoneMarker.fs" />
+    <Compile Include="Common.fs" />
+    <Compile Include="SymbolCacheTests.fs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FSharp.Core" Version="4.0.*" />
+    <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="14.0.3" />
+    <PackageReference Include="JetBrains.FSharp.Compiler.Service.MSBuild.v12" Version="14.0.3" />
+    <PackageReference Include="JetBrains.Rider.SDK.Tests" Version="$(RiderSDKVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\FSharp.Common\FSharp.Common.fsproj" />
+    <ProjectReference Include="..\..\..\src\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj" />
+    <ProjectReference Include="..\..\..\src\FSharp.Services\FSharp.Services.fsproj" />
+    <ProjectReference Include="..\..\..\src\Psi.FSharp.LanguageService\Psi.FSharp.LanguageService.csproj" />
+    <ProjectReference Include="..\..\..\src\Psi.FSharp\Psi.FSharp.csproj" />
+  </ItemGroup>
+</Project>
