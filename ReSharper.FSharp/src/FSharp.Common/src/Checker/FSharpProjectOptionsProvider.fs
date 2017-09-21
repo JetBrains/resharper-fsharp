@@ -162,25 +162,19 @@ type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISol
             | true, fsProject -> Some fsProject
             | _ -> None
 
-        member x.GetFileIndex(file) =
-            let _ = x.GetProjectOptionsImpl(file)
-            let fsProject = getProject file
-            let filePath = file.GetLocation()
-            match fsProject.FileIndices.TryGetValue(filePath) with
-            | true, index -> index
-            | _ -> invalidOp (sprintf "%s doesn't belong to %A" filePath.FullPath fsProject)
-            
         member x.HasPairFile(file) =
+            if file.LanguageType.Equals(FSharpScriptProjectFileType.Instance) ||
+               file.PsiModule.IsMiscFilesProjectModule() then false else
             let _ = x.GetProjectOptionsImpl(file)
             let fsProject = getProject file 
             fsProject.FilesWithPairs.Contains(file.GetLocation())
         
         member x.GetParsingOptions(file) =
-            let _ = x.GetProjectOptionsImpl(file)
             if file.LanguageType.Equals(FSharpScriptProjectFileType.Instance) ||
                file.PsiModule.IsMiscFilesProjectModule() then
                 Some { FSharpParsingOptions.Default with SourceFiles = Array.ofList [file.GetLocation().FullPath] }
             else
+                let _ = x.GetProjectOptionsImpl(file)
                 match (x :> IFSharpProjectOptionsProvider).TryGetFSharpProject(file) with
                 | Some project when project.Options.IsSome ->
                     match project.ParsingOptions with

@@ -48,5 +48,4 @@ type FSharpTestProjectOptionsProvider(lifetime: Lifetime, checkerService: FSharp
         member x.GetProjectOptions(file) = getProjectOptions (getPath file) [||] |> Some
         member x.GetParsingOptions(file) = { FSharpParsingOptions.Default with SourceFiles = [| getPath file |] } |> Some
         member x.TryGetFSharpProject(file) = None
-        member x.GetFileIndex(file) = 0
         member x.HasPairFile(file) = false

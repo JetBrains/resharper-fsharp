@@ -10,5 +10,4 @@ type IFSharpProjectOptionsProvider =
     abstract member GetProjectOptions: IPsiSourceFile -> FSharpProjectOptions option
     abstract member GetParsingOptions: IPsiSourceFile -> FSharpParsingOptions option
     abstract member TryGetFSharpProject: IPsiSourceFile -> FSharpProject option
-    abstract member GetFileIndex: IPsiSourceFile -> int
     abstract member HasPairFile: IPsiSourceFile -> bool
