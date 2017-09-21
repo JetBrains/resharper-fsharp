@@ -101,8 +101,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 
         public override void VisitNestedModuleDeclaration(INestedModuleDeclaration module)
         {
-          HighlightIdentifier(module.Identifier, ModuleHighlightingAttr);
-
           foreach (var member in module.MembersEnumerable)
           {
             member.Accept(this);
@@ -143,13 +141,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 
           var highlightingAttrId = entity.IsNamespace ? NsHighlightingAttr : ModuleHighlightingAttr;
           myHighlightings.Add(CreateHighlighting(ids[idsCount - 1], highlightingAttrId));
-        }
-
-        private void HighlightIdentifier([CanBeNull] IFSharpIdentifier ident, string highlightingAttributeId)
-        {
-          var idToken = ident?.IdentifierToken;
-          if (idToken != null)
-            myHighlightings.Add(CreateHighlighting(idToken, highlightingAttributeId));
         }
       }
     }
