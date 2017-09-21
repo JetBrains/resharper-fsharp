@@ -6,5 +6,5 @@ abstract class FSharpLanguageBase(name: String) : RiderLanguageBase(name, name) 
     override fun isCaseSensitive() = true
 }
 
-object FSharpLanguage : FSharpLanguageBase(FSharpFileType.name)
-object FSharpScriptLanguage : FSharpLanguageBase(FSharpScriptFileType.name)
+object FSharpLanguage : FSharpLanguageBase("F#")
+object FSharpScriptLanguage : FSharpLanguageBase("F# Script")
