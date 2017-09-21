@@ -16,3 +16,13 @@ class FSharpParserDefinition : RiderParserDefinitionBase(FSharpFileElementType, 
     override fun createLexer(project: Project?): Lexer = DummyLexer(FSharpElementType)
 
 }
+
+class FSharpScriptParserDefinition : RiderParserDefinitionBase(FSharpScriptFileElementType, FSharpScriptFileType) {
+    companion object {
+        val FSharpScriptElementType = IElementType("RIDER_FSHARP_SCRIPT", FSharpScriptLanguage)
+        val FSharpScriptFileElementType = RiderFileElementType("RIDER_FSHARP_SCRIPT_FILE", FSharpScriptLanguage, FSharpScriptElementType)
+    }
+
+    override fun createLexer(project: Project?): Lexer = DummyLexer(FSharpScriptElementType)
+
+}

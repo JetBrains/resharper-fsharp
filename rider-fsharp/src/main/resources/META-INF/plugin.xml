@@ -11,19 +11,35 @@
   <depends>com.intellij.modules.rider</depends>
   <extensions defaultExtensionNs="com.intellij">
     <fileTypeFactory id="F#" implementation="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpFileTypeFactory" />
-    <rider.ProjectTypesProvider implementation="com.jetbrains.rider.projectView.projectTypes.FSharpProjectTypeProvider" />
-    <lang.parserDefinition language="F#" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpParserDefinition" />
     <lang.ast.factory language="F#" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpAstFactory" />
+    <lang.parserDefinition language="F#" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpParserDefinition" />
+    <lang.altEnter language="F#" implementationClass="com.jetbrains.rider.intentions.altEnter.ReSharperAltEnterActionHandler" />
 
     <backend.actions.support language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.actions.FSharpActionSupportPolicy" />
     <backend.markup.adapterFactory language="F#" implementationClass="com.jetbrains.rider.daemon.RiderMarkupAdapterFactory" />
     <backend.typedHandler language="F#" implementationClass="com.jetbrains.rider.editorActions.FSharpTypedHandler" />
     <completion.contributor language="F#" implementationClass="com.jetbrains.rider.completion.ReSharperCompletionContributor" />
     <completion.completionSessionStrategy language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.services.completion.FSharpCompletionStrategy" />
-    <backend.autoPopup.support language="F#" implementationClass="com.jetbrains.rider.completion.IgnoreBackendAndGenericRider" />
+    <!--<backend.autoPopup.support language="F#" implementationClass="com.jetbrains.rider.completion.IgnoreBackendAndGenericRider" />-->
     <codeInsight.parameterInfo language="F#" implementationClass="com.jetbrains.rider.parameterInfo.RiderParameterInfoHandler" />
     <codeStyleSettingsProvider implementation="com.jetbrains.rider.settings.FSharpCodeStyleSettingsProvider" />
 
+
+    <fileTypeFactory id="F# Script" implementation="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptFileTypeFactory" />
+    <lang.ast.factory language="F# Script" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptAstFactory" />
+    <lang.parserDefinition language="F# Script" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptParserDefinition" />
+    <lang.altEnter language="F# Script" implementationClass="com.jetbrains.rider.intentions.altEnter.ReSharperAltEnterActionHandler" />
+
+    <backend.actions.support language="F# Script" implementationClass="com.jetbrains.rider.plugins.fsharp.actions.FSharpActionSupportPolicy" />
+    <backend.markup.adapterFactory language="F# Script" implementationClass="com.jetbrains.rider.daemon.RiderMarkupAdapterFactory" />
+    <backend.typedHandler language="F# Script" implementationClass="com.jetbrains.rider.editorActions.FSharpTypedHandler" />
+    <completion.contributor language="F# Script" implementationClass="com.jetbrains.rider.completion.ReSharperCompletionContributor" />
+    <completion.completionSessionStrategy language="F# Script" implementationClass="com.jetbrains.rider.plugins.fsharp.services.completion.FSharpCompletionStrategy" />
+    <!--<backend.autoPopup.support language="F# Script" implementationClass="com.jetbrains.rider.completion.IgnoreBackendAndGenericRider" />-->
+    <codeInsight.parameterInfo language="F# Script" implementationClass="com.jetbrains.rider.parameterInfo.RiderParameterInfoHandler" />
+    <codeStyleSettingsProvider implementation="com.jetbrains.rider.settings.FSharpScriptCodeStyleSettingsProvider" />
+
+    <rider.ProjectTypesProvider implementation="com.jetbrains.rider.projectView.projectTypes.FSharpProjectTypeProvider" />
     <directoryProjectGenerator implementation="com.jetbrains.rider.projectView.projectGenerators.FSharpLibrary" />
     <directoryProjectGenerator implementation="com.jetbrains.rider.projectView.projectGenerators.FSharpConsoleApplication" />
 

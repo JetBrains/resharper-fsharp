@@ -5,7 +5,5 @@ class FSharpProjectTypeProvider : RiderProjectTypesProvider {
         val FSharpProjectType = RiderProjectType("fsproj", "{F2A71F9B-5D33-465A-A702-920D77279786}")
     }
 
-    override fun getProjectType(): List<RiderProjectType> {
-        return listOf(FSharpProjectType)
-    }
+    override fun getProjectType() = listOf(FSharpProjectType)
 }

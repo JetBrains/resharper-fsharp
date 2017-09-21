@@ -2,6 +2,9 @@ package com.jetbrains.rider.ideaInterop.fileTypes.fsharp
 
 import com.jetbrains.rider.ideaInterop.fileTypes.RiderLanguageBase
 
-object FSharpLanguage : RiderLanguageBase("F#", "FSHARP") {
+abstract class FSharpLanguageBase(name: String) : RiderLanguageBase(name, name) {
     override fun isCaseSensitive() = true
 }
+
+object FSharpLanguage : FSharpLanguageBase(FSharpFileType.name)
+object FSharpScriptLanguage : FSharpLanguageBase(FSharpScriptFileType.name)

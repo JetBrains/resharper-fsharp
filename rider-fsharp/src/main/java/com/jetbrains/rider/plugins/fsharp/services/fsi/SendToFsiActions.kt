@@ -8,7 +8,7 @@ import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguage
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguageBase
 
 class StartFsiAction : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
@@ -33,7 +33,7 @@ class SendToFsiAction : AnAction() {
     override fun update(e: AnActionEvent) {
         val file = CommonDataKeys.PSI_FILE.getData(e.dataContext)
         val editor = CommonDataKeys.EDITOR.getData(e.dataContext)
-        if (file?.language !is FSharpLanguage || editor?.caretModel?.caretCount != 1) {
+        if (file?.language !is FSharpLanguageBase || editor?.caretModel?.caretCount != 1) {
             e.presentation.isEnabled = false
             return
         }
@@ -47,7 +47,7 @@ abstract class BaseSendToFsiIntentionAction : BaseElementAtCaretIntentionAction(
     override fun startInWriteAction() = false
 
     override fun isAvailable(project: Project, editor: Editor?, file: PsiElement) =
-            file.language is FSharpLanguage && editor?.caretModel?.caretCount == 1
+            file.language is FSharpLanguageBase && editor?.caretModel?.caretCount == 1
 
     override fun invoke(project: Project, editor: Editor, element: PsiElement) {
         ServiceManager.getService(project, FsiHost::class.java).sendToFsi(editor, element.containingFile)
