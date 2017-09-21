@@ -62,21 +62,15 @@ type FSharpCheckerService(lifetime, logger: Util.ILogger, onSolutionCloseNotifie
         | _ -> None, None
 
     member x.HasPairFile([<NotNull>] file: IPsiSourceFile) =
-        x.OptionsProvider.HasPairFile(file, x.Checker)
+        x.OptionsProvider.HasPairFile(file)
 
     member x.GetDefines(sourceFile: IPsiSourceFile) =
-        if sourceFile.LanguageType.Equals(FSharpScriptProjectFileType.Instance) ||
-            sourceFile.PsiModule.IsMiscFilesProjectModule() then []
-        else
-            match x.OptionsProvider.TryGetFSharpProject(sourceFile) with
-            | Some project -> project.ConfigurationDefines
-            | _ -> List.empty
-
-    member x.GetParsingOptions(sourceFile: IPsiSourceFile) =
-        x.OptionsProvider.GetParsingOptions(sourceFile)
+        match x.OptionsProvider.GetParsingOptions(sourceFile) with
+        | Some options -> options.ConditionalCompilationDefines
+        | _ -> []
 
     member x.ParseAndCheckFile([<NotNull>] file: IPsiSourceFile) =
-        match x.OptionsProvider.GetProjectOptions(file, true) with
+        match x.OptionsProvider.GetProjectOptions(file) with
         | Some options ->
             let filePath = file.GetLocation().FullPath
             let source = file.Document.GetText()

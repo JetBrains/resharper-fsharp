@@ -22,7 +22,7 @@ open Microsoft.FSharp.Compiler.SourceCodeServices
 type FSharpProjectPropertiesRequest() =
     let properties = [ "WarnOn" ]
     interface IProjectPropertiesRequest with
-        member x.RequestedProperties = properties :> seq<_>
+        member x.RequestedProperties = properties :> _
 
 [<SolutionComponent>]
 type FSharpProjectOptionsBuilder(solution: ISolution,
@@ -33,7 +33,7 @@ type FSharpProjectOptionsBuilder(solution: ISolution,
 
     member x.BuildSingleProjectOptions (project: IProject) =
         let properties = project.ProjectProperties
-        let buildSettings = properties.BuildSettings :?> IManagedProjectBuildSettings
+        let buildSettings = properties.BuildSettings :?> _
 
         let options = List()
         options.AddRange(seq {

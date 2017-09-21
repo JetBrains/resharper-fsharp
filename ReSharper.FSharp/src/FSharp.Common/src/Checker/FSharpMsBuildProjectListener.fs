@@ -23,6 +23,9 @@ type ProjectFiles =
     }
     static member Empty = {Compile = []; CompileBefore = []; CompileAfter = []}
 
+// todo: this component should be removed when R# is refactored
+
+/// this is a temp class until items from CompileBefore/After are preserved somehow in R#
 [<SolutionInstanceComponent>]
 type FSharpProjectFilesFromTargetsProvider(lifetime: Lifetime) =
     inherit RecursiveProjectModelChangeDeltaVisitor()
@@ -50,6 +53,7 @@ type FSharpProjectFilesFromTargetsProvider(lifetime: Lifetime) =
                 let projectDir = FileSystemPath.TryParse(msBuildProject.RdProjectDescription.Directory)
                 for item in rdProject.Items do
                     match item.Id with
+                    // todo: report/investigate sometimes FCS shows error about RdEvaluatedProjectItemId type
                     | :? RdEvaluatedProjectItemId as itemId ->
                         let filesList = 
                             match itemId.ItemType with
