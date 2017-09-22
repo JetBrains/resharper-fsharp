@@ -1,14 +1,15 @@
 package com.jetbrains.rider.ideaInterop.fileTypes.fsharp
 
+import com.intellij.openapi.fileTypes.FileType
 import com.intellij.openapi.fileTypes.FileTypeConsumer
 import com.intellij.openapi.fileTypes.FileTypeFactory
 
-abstract class FSharpFileTypeFactoryBase(vararg val extensions: String) : FileTypeFactory() {
+abstract class FSharpFileTypeFactoryBase(val fileType: FileType, vararg val extensions: String) : FileTypeFactory() {
     override fun createFileTypes(consumer: FileTypeConsumer) {
         for (matcher in extensions)
-            consumer.consume(FSharpScriptFileType, matcher)
+            consumer.consume(fileType, matcher)
     }
 }
 
-class FSharpFileTypeFactory : FSharpFileTypeFactoryBase("fs", "fsi", "ml", "mli")
-class FSharpScriptFileTypeFactory : FSharpFileTypeFactoryBase("fsx", "fsscript")
+class FSharpFileTypeFactory : FSharpFileTypeFactoryBase(FSharpFileType, "fs", "fsi", "ml", "mli")
+class FSharpScriptFileTypeFactory : FSharpFileTypeFactoryBase(FSharpScriptFileType, "fsx", "fsscript")
