@@ -6,7 +6,6 @@ import com.intellij.psi.PsiFile
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.util.idea.ILifetimedComponent
 import com.jetbrains.rider.util.idea.LifetimedComponent
-import com.jetbrains.rider.framework.RdVoid
 import com.jetbrains.rider.model.RdFSharpInteractiveHost
 import kotlin.properties.Delegates
 
@@ -22,21 +21,21 @@ class FsiHost(val project: Project) : ILifetimedComponent by LifetimedComponent(
     internal fun sendToFsi(editor: Editor, file: PsiFile) = getFsiConsole().sendActionExecutor.execute(editor, file)
 
     internal fun getFsiConsole(): FsiConsoleRunner = synchronized(this) {
-        if (fsiConsole?.isValid() ?: false) return fsiConsole!!
+        if (fsiConsole?.isValid() == true) return fsiConsole!!
 
         createConsoleRunner()
         return fsiConsole!!
     }
 
     internal fun resetFsiConsole() = synchronized(this) {
-        if (fsiConsole?.isValid() ?: false) {
+        if (fsiConsole?.isValid() == true) {
             fsiConsole!!.processHandler.destroyProcess()
         }
         createConsoleRunner()
     }
 
     private fun createConsoleRunner() {
-        val runner = FsiConsoleRunner(rdFsiHost.requestNewFsiSessionInfo.sync(RdVoid), this)
+        val runner = FsiConsoleRunner(rdFsiHost.requestNewFsiSessionInfo.sync(Unit), this)
         runner.initAndRun()
 
         this.fsiConsole = runner
