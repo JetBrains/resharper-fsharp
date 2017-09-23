@@ -20,7 +20,7 @@
     <backend.typedHandler language="F#" implementationClass="com.jetbrains.rider.editorActions.FSharpTypedHandler" />
     <completion.contributor language="F#" implementationClass="com.jetbrains.rider.completion.ReSharperCompletionContributor" />
     <completion.completionSessionStrategy language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.services.completion.FSharpCompletionStrategy" />
-    <!--<backend.autoPopup.support language="F#" implementationClass="com.jetbrains.rider.completion.IgnoreBackendAndGenericRider" />-->
+    <backend.autoPopup.support language="F#" implementationClass="com.jetbrains.rider.completion.IgnoreBackendAndGenericRider" />
     <codeInsight.parameterInfo language="F#" implementationClass="com.jetbrains.rider.parameterInfo.RiderParameterInfoHandler" />
     <codeStyleSettingsProvider implementation="com.jetbrains.rider.settings.FSharpCodeStyleSettingsProvider" />
 
@@ -35,7 +35,7 @@
     <backend.typedHandler language="F# Script" implementationClass="com.jetbrains.rider.editorActions.FSharpTypedHandler" />
     <completion.contributor language="F# Script" implementationClass="com.jetbrains.rider.completion.ReSharperCompletionContributor" />
     <completion.completionSessionStrategy language="F# Script" implementationClass="com.jetbrains.rider.plugins.fsharp.services.completion.FSharpCompletionStrategy" />
-    <!--<backend.autoPopup.support language="F# Script" implementationClass="com.jetbrains.rider.completion.IgnoreBackendAndGenericRider" />-->
+    <backend.autoPopup.support language="F# Script" implementationClass="com.jetbrains.rider.completion.IgnoreBackendAndGenericRider" />
     <codeInsight.parameterInfo language="F# Script" implementationClass="com.jetbrains.rider.parameterInfo.RiderParameterInfoHandler" />
     <codeStyleSettingsProvider implementation="com.jetbrains.rider.settings.FSharpScriptCodeStyleSettingsProvider" />
 
