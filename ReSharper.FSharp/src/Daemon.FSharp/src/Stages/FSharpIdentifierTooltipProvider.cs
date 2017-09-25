@@ -40,7 +40,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
     [NotNull]
     public override string GetTooltip(IHighlighter highlighter)
     {
-      if (!ShouldShowTooltip(highlighter)) return string.Empty;
+      if (!highlighter.IsValid) return string.Empty;
       var psiServices = mySolution.GetPsiServices();
       if (!psiServices.Files.AllDocumentsAreCommitted || psiServices.Caches.HasDirtyFiles) return string.Empty;
 
