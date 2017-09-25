@@ -13,7 +13,6 @@
     <Compile Include="FSharpSigTreeBuilder.fs" />
     <Compile Include="FSharpFakeTreeBuilder.fs" />
     <Compile Include="FSharpParser.fs" />
-    <Compile Include="QuickParse.fs" />
   </ItemGroup>
 
   <ItemGroup>
