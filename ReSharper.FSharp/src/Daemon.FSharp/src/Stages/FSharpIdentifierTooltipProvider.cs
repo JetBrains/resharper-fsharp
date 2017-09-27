@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Web;
 using JetBrains.Annotations;
 using JetBrains.DataFlow;
 using JetBrains.DocumentModel;
@@ -25,6 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
   [SolutionComponent]
   public class FSharpIdentifierTooltipProvider : IdentifierTooltipProvider<FSharpLanguage>
   {
+    public const string RiderTooltipSeparator = "_RIDER_HORIZONTAL_LINE_TOOLTIP_SEPARATOR_";
     private readonly ISolution mySolution;
     private readonly ILogger myLogger;
 
@@ -38,7 +40,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
     [NotNull]
     public override string GetTooltip(IHighlighter highlighter)
     {
-      if (!ShouldShowTooltip(highlighter)) return string.Empty;
+      if (!highlighter.IsValid) return string.Empty;
       var psiServices = mySolution.GetPsiServices();
       if (!psiServices.Files.AllDocumentsAreCommitted || psiServices.Caches.HasDirtyFiles) return string.Empty;
 
@@ -69,31 +71,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
       {
         if (tooltip is FSharpToolTipElement<string>.Group overloads)
           tooltipsTexts.AddRange(overloads.Item.Select(overload =>
-            GetTooltipText(overload.MainDescription, overload.XmlDoc))); //, overload.Item2)));
+            GetTooltipText(overload.MainDescription, overload.XmlDoc)));
       }
-      return tooltipsTexts.Join("_RIDER_HORIZONTAL_LINE_TOOLTIP_SEPARATOR_");
-    }
-
-    [CanBeNull]
-    public static string GetXmlDocText(FSharpXmlDoc xmlDoc)
-    {
-      if (xmlDoc.IsNone) return null;
-      if (xmlDoc.IsText) return ((FSharpXmlDoc.Text) xmlDoc).Item;
-      if (xmlDoc.IsXmlDocFileSignature)
-      {
-        if (!(xmlDoc is FSharpXmlDoc.XmlDocFileSignature sig)) return null;
-        var s1 = sig.Item1;
-        var s2 = sig.Item2;
-        // todo: get doc from xml
-      }
-      return null;
+      return tooltipsTexts.Join(RiderTooltipSeparator);
     }
 
     [NotNull]
     public static string GetTooltipText(string text, FSharpXmlDoc xmlDoc)
     {
-      var xmlDocText = GetXmlDocText(xmlDoc);
-      return xmlDocText != null ? text + xmlDocText : text;
+      // todo: use R# xmlDoc cache instead
+      var xmlDocText = HttpUtility.HtmlDecode(FsAutoComplete.TipFormatter.buildFormatComment(xmlDoc));
+      return xmlDocText != null
+        ? text + "\n\n" + xmlDocText
+        : text;
     }
 
     public override RichTextBlock GetRichTooltip(IHighlighter highlighter)
