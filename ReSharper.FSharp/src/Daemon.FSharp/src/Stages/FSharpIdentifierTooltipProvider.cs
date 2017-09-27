@@ -81,9 +81,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
     {
       // todo: use R# xmlDoc cache instead
       var xmlDocText = HttpUtility.HtmlDecode(FsAutoComplete.TipFormatter.buildFormatComment(xmlDoc));
-      return xmlDocText != null
-        ? text + "\n\n" + xmlDocText
-        : text;
+      if (xmlDocText == null)
+        return text;
+
+      return text + "\n\n" + xmlDocText.TrimEnd('\r', '\n');
     }
 
     public override RichTextBlock GetRichTooltip(IHighlighter highlighter)
