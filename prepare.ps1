@@ -110,7 +110,8 @@ if ($BuildCounter) {
 }
 Write-Host "##teamcity[buildNumber '$version']"
 
-SetIdeaVersion -file "rider-fsharp/src/main/resources/META-INF/plugin.xml" -since $SinceBuild -until $UntilBuild
+# not currently used
+# SetIdeaVersion -file "rider-fsharp/src/main/resources/META-INF/plugin.xml" -since $SinceBuild -until $UntilBuild
 SetPluginVersion -file "rider-fsharp/src/main/resources/META-INF/plugin.xml" -version $version
 SetNuspecVersion -file "ReSharper.FSharp/ReSharper.FSharp.nuspec" -version $version
 
