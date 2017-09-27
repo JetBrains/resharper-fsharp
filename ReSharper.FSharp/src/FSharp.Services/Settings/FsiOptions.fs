@@ -30,14 +30,14 @@ module FsiOptions =
         [<SettingsEntry("--optimize", fsiArgsText); DefaultValue>]
         val mutable FsiArgs: string
 
-        [<SettingsEntry(true, fsiArgsText); DefaultValue>]
+        [<SettingsEntry(true, moveCaretOnSendLineText); DefaultValue>]
         val mutable MoveCaretOnSendLine: bool
 
     [<OptionsPage("FsiOptionsPage", "Fsi", typeof<ProjectModelThemedIcons.Fsharp>)>]
     type FsiOptionsPage(lifetime, optionsContext) as this =
         inherit SimpleOptionsPage(lifetime, optionsContext)
         let _ = ProjectModelThemedIcons.Fsharp // workaround to create assembly reference (Microsoft/visualfsharp#3522)
-        
+
         do
             this.AddBoolOption((fun (key: FsiOptions) -> key.UseAnyCpuVersion), RichText(useAnyCpuVersionText)) |> ignore
             this.AddBoolOption((fun (key: FsiOptions) -> key.ShadowCopyReferences), RichText(shadowCopyReferencesText)) |> ignore
@@ -50,7 +50,7 @@ module FsiOptions =
         let categoryToKeys = Map.ofList ["F# Interactive settings", [ typeof<FsiOptions> ]]
 
         interface IExportableSettingsCategoryProvider with
-            member x.TryGetRelatedIdeaConfigsBy(category, [<Out>] configs) = 
+            member x.TryGetRelatedIdeaConfigsBy(category, [<Out>] configs) =
                 configs <- Array.empty
                 false
 
