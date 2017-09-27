@@ -53,7 +53,7 @@ type FSharpProjectOptionsBuilder(solution: ISolution,
             yield "--target:" + x.GetOutputType(buildSettings)
           })
 
-        let paths, referencingProjects = x.GetReferencedPathsOptions(project)
+        let paths = x.GetReferencedPathsOptions(project)
         options.AddRange(paths)
 
         let definedConstants = x.GetDefinedConstants(properties)
@@ -80,7 +80,7 @@ type FSharpProjectOptionsBuilder(solution: ISolution,
         let filePaths, pairFiles = x.GetProjectFiles(project)
         let fileIndices = Dictionary<FileSystemPath, int>()
         Array.iteri (fun i p -> fileIndices.[p] <- i) filePaths
-        
+
         let projectOptions =
             { ProjectFileName = project.ProjectFileLocation.FullPath
               SourceFiles = Array.map (fun (p: FileSystemPath ) -> p.FullPath) filePaths
@@ -98,7 +98,6 @@ type FSharpProjectOptionsBuilder(solution: ISolution,
           ConfigurationDefines = definedConstants
           FileIndices = fileIndices
           FilesWithPairs = pairFiles
-          ReferencingProjects = referencingProjects
           ParsingOptions = None
         }
 
@@ -129,11 +128,10 @@ type FSharpProjectOptionsBuilder(solution: ISolution,
 
     member private x.GetReferencedPathsOptions(project: IProject) =
         let framework = project.GetCurrentTargetFrameworkId()
-        let referencingProjects = project.GetReferencedProjects(framework) |> List.ofSeq 
-        seq { for p in referencingProjects ->
+        seq { for p in project.GetReferencedProjects(framework) ->
                   "-r:" + p.GetOutputFilePath(p.GetCurrentTargetFrameworkId()).FullPath
               for a in project.GetAssemblyReferences(framework) ->
-                  "-r:" + a.ResolveResultAssemblyFile().Location.FullPath }, referencingProjects
+                  "-r:" + a.ResolveResultAssemblyFile().Location.FullPath }
 
     member private x.GetOutputType([<CanBeNull>] buildSettings: IManagedProjectBuildSettings) =
         if isNull buildSettings then "library"

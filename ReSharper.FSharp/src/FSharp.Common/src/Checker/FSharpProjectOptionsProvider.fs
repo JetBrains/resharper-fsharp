@@ -16,6 +16,7 @@ open JetBrains.Application.Threading.Tasks
 open JetBrains.DataFlow
 open JetBrains.Platform.MsBuildModel
 open JetBrains.ProjectModel
+open JetBrains.ProjectModel.Assemblies.Impl
 open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost.MsBuild
 open JetBrains.ProjectModel.ProjectsHost.SolutionHost
@@ -64,27 +65,27 @@ type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISol
         if change.IsClosingSolution then x.InvalidateAll()
         else
             match change.ProjectModelElement with
-            | :? IProject as project when isApplicable project ->
+            | :? IProject as project when project.IsFSharp ->
                 if change.IsRemoved then
                     match projects.TryGetValue project with
                     | true, fsProject ->
                         checkerService.InvalidateProject(fsProject)
                         projects.Remove(project) |> ignore
                         projectsToInvalidate.Remove(project) |> ignore
-                        for p in fsProject.ReferencingProjects do
-                            projectsToInvalidate.Add(p) |> ignore
-                            x.InvalidateReferencingProjects(p)
+                        x.InvalidateReferencingProjects(project)
                     | _ -> ()
-                else if project.IsOpened then
+                else
                     projectsToInvalidate.add project
-                    x.InvalidateReferencingProjects(project)
+                x.InvalidateReferencingProjects(project)
             | _ -> base.VisitDelta change
 
     member private x.InvalidateReferencingProjects(project) =
-        for p in project.GetReferencingProjects(project.GetCurrentTargetFrameworkId()) do
-            if isApplicable project then
-                projectsToInvalidate.Add(p) |> ignore
-                x.InvalidateReferencingProjects(p)
+        if project.IsOpened then
+            for projRef in project.GetComponent<ModuleReferencesResolveStore>().GetReferencesToProject(project) do
+                let p = projRef.GetProject()
+                if isNotNull p && p.IsFSharp then
+                    projectsToInvalidate.Add(p) |> ignore
+                    x.InvalidateReferencingProjects(p)
 
     member private x.GetProjectOptionsImpl(file: IPsiSourceFile) =
         lock projects (fun _ ->
@@ -103,7 +104,7 @@ type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISol
             let framework = project.GetCurrentTargetFrameworkId()
             let referencedProjectsOptions =
                 seq { for p in project.GetReferencedProjects(framework, transitive = false) do
-                          if p.IsOpened && isApplicable p then
+                          if p.IsOpened && p.IsFSharp then
                               let outPath = p.GetOutputFilePath(p.GetCurrentTargetFrameworkId()).FullPath
                               yield outPath, x.CreateProjectOptions(p).Value }
 
@@ -117,11 +118,12 @@ type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISol
             fsProject.Options
 
     member private x.ProcessInvalidateOptions() =
-        for p in projectsToInvalidate do
-            if projects.contains p then
-                checkerService.InvalidateProject(projects.[p])
-                projects.remove p
-        projectsToInvalidate.Clear()
+        lock projectsToInvalidate (fun _ ->
+            for p in projectsToInvalidate do
+                if projects.ContainsKey(p) then
+                    checkerService.InvalidateProject(projects.[p])
+                    projects.Remove(p) |> ignore
+            projectsToInvalidate.Clear())
 
     member private x.GetScriptOptions(file: IPsiSourceFile) =
         let path = file.GetLocation()

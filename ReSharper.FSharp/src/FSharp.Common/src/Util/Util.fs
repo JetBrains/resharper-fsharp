@@ -15,6 +15,7 @@ module CommonUtil =
     open JetBrains.ProjectModel.Properties.CSharp
     open JetBrains.ProjectModel.Properties.Managed
     open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
+    open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties.FSharpProjectPropertiesFactory
     open JetBrains.Util
     open JetBrains.Util.dataStructures.TypedIntrinsics
     open Microsoft.FSharp.Compiler
@@ -26,24 +27,17 @@ module CommonUtil =
     
     let inline (|NotNull|_|) x =
         if isNull x then None else Some()
-    
-    let isFSharpProject (guid: Guid) (projectFile: FileSystemPath) =
-        match guid, projectFile with
-        | guid, _ when guid.Equals(FSharpProjectPropertiesFactory.fsProjectTypeGuid) -> true
-        | _, projectFile when projectFile.ExtensionNoDot.Equals("fsproj") -> true
-        | _ -> false
-        
+
+    [<Literal>]
+    let FsprojExtension = "fsproj"
+
+    let isFSharpProject (guids: Guid seq) (projectFile: FileSystemPath) =
+        projectFile.ExtensionNoDot.Equals(FsprojExtension, StringComparison.OrdinalIgnoreCase) ||
+        Seq.exists Factory.IsKnownProjectTypeGuid guids
+
     let (|FSharProjectMark|_|) (mark: IProjectMark) =
-        if isFSharpProject mark.Guid mark.Location then Some() else None
-    
-    let isApplicable (project: IProject) =
-        match project.ProjectProperties with
-        | :? FSharpProjectProperties -> true
-        | :? ProjectKCSharpProjectProperties as coreProperties ->
-            // todo: remove when ProjectK properties replaced with DotNetCoreProjectFlavour
-            coreProperties.ProjectTypeGuids.Contains(FSharpProjectPropertiesFactory.fsProjectTypeGuid)
-        | _ -> false
-        
+        if isFSharpProject [mark.Guid] mark.Location then Some() else None
+
     let ensureAbsolute (path: FileSystemPath) (projectDirectory: FileSystemPath) =
         let relativePath = path.AsRelative()
         if isNull relativePath then path
@@ -107,3 +101,7 @@ module CommonUtil =
             let startOffset = document.GetLineStartOffset(x.GetStartLine()) + x.StartColumn
             let endOffset = document.GetLineStartOffset(x.GetEndLine()) + x.EndColumn
             DocumentRange(document, TextRange(startOffset, endOffset))
+
+    type IProject with
+        member x.IsFSharp =
+            isFSharpProject x.ProjectProperties.ProjectTypeGuids x.ProjectFileLocation
