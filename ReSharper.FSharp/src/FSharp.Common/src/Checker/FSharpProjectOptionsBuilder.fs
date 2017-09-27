@@ -18,9 +18,13 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
+module FSharpProperties =
+    [<Literal>]
+    let TargetProfile = "TargetProfile"
+
 [<ShellComponent>]
 type FSharpProjectPropertiesRequest() =
-    let properties = [ "WarnOn" ]
+    let properties = [ FSharpProperties.TargetProfile ]
     interface IProjectPropertiesRequest with
         member x.RequestedProperties = properties :> _
 
@@ -64,6 +68,13 @@ type FSharpProjectOptionsBuilder(solution: ISolution,
 
             let nowarn = x.SplitAndTrim(cfg.NoWarn, defaultDelimiters).Join(",")
             if not (nowarn.IsNullOrWhitespace()) then options.Add("--nowarn:" + nowarn)
+            
+            let props = cfg.PropertiesCollection
+            let targetProfile = ref ""
+            match props.TryGetValue(FSharpProperties.TargetProfile, targetProfile), !targetProfile with
+            | true, targetProfile when not (targetProfile.IsNullOrWhitespace()) ->
+                options.Add("--targetprofile:" + targetProfile.Trim())
+            | _ -> ()
         | _ -> ()
 
         let filePaths, pairFiles = x.GetProjectFiles(project)
