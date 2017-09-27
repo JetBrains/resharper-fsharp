@@ -1,11 +1,15 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Settings
 
+open System.Runtime.InteropServices
+open JetBrains.Application
 open JetBrains.Application.Settings
-open JetBrains.ProjectModel.Resources
 open JetBrains.Application.UI.Options
 open JetBrains.Application.UI.Options.OptionsDialog
 open JetBrains.DataFlow
+open JetBrains.ProjectModel.Resources
 open JetBrains.ProjectModel.Settings.Schema
+open JetBrains.ReSharper.Host.Features.Settings.Layers.ExportImportWorkaround
+open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.UI.RichText
 
 [<AutoOpen>]
@@ -40,3 +44,19 @@ module FsiOptions =
             this.AddBoolOption((fun (key: FsiOptions) -> key.MoveCaretOnSendLine), RichText(moveCaretOnSendLineText)) |> ignore
             this.AddStringOption((fun (key: FsiOptions) -> key.FsiArgs), fsiArgsText) |> ignore
             this.FinishPage()
+
+    [<ShellComponent>]
+    type FSharpSettingsCategoryProvider() =
+        let categoryToKeys = Map.ofList ["F# Interactive settings", [ typeof<FsiOptions> ]]
+
+        interface IExportableSettingsCategoryProvider with
+            member x.TryGetRelatedIdeaConfigsBy(category, [<Out>] configs) = 
+                configs <- Array.empty
+                false
+
+            member x.TryGetCategoryBy(settingsKey, [<Out>] category) =
+                category <-
+                    categoryToKeys
+                    |> Map.tryFindKey (fun _ types -> types |> List.exists settingsKey.SettingsKeyClassClrType.Equals)
+                    |> Option.toObj
+                isNotNull category
