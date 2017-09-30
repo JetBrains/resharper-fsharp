@@ -13,6 +13,7 @@ open JetBrains.ProjectModel.ProjectsHost.MsBuild
 open JetBrains.ProjectModel.ProjectsHost.MsBuild.Diagnostic
 open JetBrains.ProjectModel.Properties
 open JetBrains.ReSharper.Host.Features.BackgroundTasks
+open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.Util
 
 type NuGetRestoreDisabledMessage(title, message) =
@@ -40,6 +41,7 @@ type PaketRestoreTargetsAnalyzer(lifetime, solution: ISolution, settingsStore: S
 
     interface IMsBuildProjectListener with
         member x.OnProjectLoaded(_, msBuildProject) =
+            if isNull msBuildProject then () else
             let solutionContext = solution.ToDataContext()
             let solutionSettingsStore = settingsStore.BindToContextLive(lifetime, ContextRange.Smart(solutionContext))
             match solutionSettingsStore.GetValue(fun (s: NuGetOptions) -> s.ConfigRestoreEnabled) with
