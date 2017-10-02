@@ -96,11 +96,14 @@ module CommonUtil =
         member x.GetEndLine()     = x.EndLine - 1   |> Line.op_Explicit
         member x.GetStartColumn() = x.StartColumn   |> Column.op_Explicit
         member x.GetEndColumn()   = x.EndColumn     |> Column.op_Explicit
-        
-        member x.ToDocumentRange(document: IDocument) =
+
+        member x.ToTextRange(document: IDocument) =
             let startOffset = document.GetLineStartOffset(x.GetStartLine()) + x.StartColumn
             let endOffset = document.GetLineStartOffset(x.GetEndLine()) + x.EndColumn
-            DocumentRange(document, TextRange(startOffset, endOffset))
+            TextRange(startOffset, endOffset)
+        
+        member x.ToDocumentRange(document: IDocument) =
+            DocumentRange(document, x.ToTextRange(document))
 
     type IProject with
         member x.IsFSharp =
