@@ -182,7 +182,7 @@ type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISol
                     match project.ParsingOptions with
                     | None ->
                         let projectOptions = project.Options.Value
-                        let parsingOptions, errors = checkerService.Checker.CreateParsingOptions(List.ofArray projectOptions.OtherOptions)
+                        let parsingOptions, errors = checkerService.Checker.GetParsingOptionsFromCommandLineArgs(List.ofArray projectOptions.OtherOptions)
                         let parsingOptions = { parsingOptions with SourceFiles = projectOptions.SourceFiles }
                         if not errors.IsEmpty then
                             Logger.Warn(logger, "Getting parsing options: {0}", concatErrors errors)
