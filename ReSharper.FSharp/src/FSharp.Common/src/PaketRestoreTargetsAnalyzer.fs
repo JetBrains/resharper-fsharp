@@ -29,7 +29,7 @@ type NuGetRestoreDisabledMessage(title, message) =
     override x.Kind = LoadDiagnosticKind.Warning
 
 [<SolutionInstanceComponent>]
-type PaketRestoreTargetsAnalyzer(lifetime, solution: ISolution, settingsStore: SettingsStore) =
+type PaketRestoreTargetsAnalyzer(lifetime, solution: ISolution, settingsStore: SettingsStore, logger: JetBrains.Util.ILogger) =
     let paketPropName = "IsPaketRestoreTargetsFileLoaded"
     let diagnosticMessage = NuGetRestoreDisabledMessage()
     member val RestoreWasDisabled = false with get, set
@@ -52,4 +52,5 @@ type PaketRestoreTargetsAnalyzer(lifetime, solution: ISolution, settingsStore: S
                     settingsStore
                         .BindToContextLive(lifetime, ContextRange.Custom(solutionContext, solutionContext))
                         .SetValue((fun (s: NuGetOptions) -> s.ConfigRestoreEnabled), NuGetOptionConfigPolicy.Disable)
+                    logger.LogMessage(LoggingLevel.WARN, "Found core project using Paket. Disabling NuGet restore")
                     x.RestoreWasDisabled <- true
