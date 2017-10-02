@@ -37,7 +37,7 @@ type FSharpParseAndCheckResults =
 [<ShellComponent>]
 type FSharpCheckerService(lifetime, logger: Util.ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier) =
     let checker = lazy FSharpChecker.Create(projectCacheSize = 200, keepAllBackgroundResolutions = false,
-                                       legacyReferenceResolver = MSBuildReferenceResolver.Resolver)
+                                            legacyReferenceResolver = MSBuildReferenceResolver.Resolver)
     do
         onSolutionCloseNotifier.SolutionIsAboutToClose.Advise(lifetime, fun () ->
             checker.Value.ClearLanguageServiceRootCachesAndCollectAndFinalizeAllTransients())

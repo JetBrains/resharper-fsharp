@@ -3,7 +3,7 @@
   <metadata>
     <id>JetBrains.ReSharper.FSharp</id>
     <title>ReSharper.FSharp</title>
-    <version>0.1.174</version>
+    <version>0.1.574</version>
     <authors>JetBrains auduchinok</authors>
     <owners>JetBrains auduchinok</owners>
     <summary>F# support</summary>
@@ -20,6 +20,7 @@
   <files>
     <file src="src\FSharp.Common\bin\Debug\net451\FSharp.Core.dll" target="DotFiles" />
     <file src="src\FSharp.Common\bin\Debug\net451\FSharp.Compiler.Service.dll" target="DotFiles" />
+    <file src="src\FSharp.Common\bin\Debug\net451\FSharp.Compiler.Service.pdb" target="DotFiles" />
     <file src="src\FSharp.Common\bin\Debug\net451\FSharp.Compiler.Service.MSBuild.v12.dll" target="DotFiles" />
     <file src="src\FSharp.Services\bin\Debug\net451\FantomasLib.dll" target="DotFiles" />
     
