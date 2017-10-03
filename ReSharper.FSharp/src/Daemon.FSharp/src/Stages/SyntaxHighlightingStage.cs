@@ -10,8 +10,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 {
-  [DaemonStage(StagesBefore = new[] {typeof(GlobalFileStructureCollectorStage)},
-    StagesAfter = new[] {typeof(SyntaxErrorsStage)})]
+  [DaemonStage(StagesBefore = new[] {typeof(GlobalFileStructureCollectorStage)})]
   public class SyntaxHighlightingStage : FSharpDaemonStageBase
   {
     protected override IDaemonStageProcess CreateProcess(IFSharpFile psiFile, IDaemonProcess process)

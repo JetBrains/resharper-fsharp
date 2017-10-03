@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
+using JetBrains.ReSharper.Daemon.UsageChecking;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
@@ -13,7 +14,7 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 {
-  [DaemonStage(StagesBefore = new[] {typeof(SyntaxErrorsStage)}, StagesAfter = new[] {typeof(TypeCheckErrorsStage)})]
+  [DaemonStage(StagesBefore = new[] {typeof(SyntaxHighlightingStage)}, StagesAfter = new[] {typeof(CollectUsagesStage)})]
   public class SetResolvedSymbolsStage : FSharpDaemonStageBase
   {
     protected override IDaemonStageProcess CreateProcess(IFSharpFile psiFile, IDaemonProcess process)

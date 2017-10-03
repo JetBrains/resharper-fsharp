@@ -8,6 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="src\Highlightings\ErrorHighlightings.fs" />
+    <Compile Include="src\Stages\ErrorsStageProcessBase.fs" />
+    <Compile Include="src\Stages\FSharpDaemonBehaviour.fs" />
+    <Compile Include="src\Stages\SyntaxErrorsStage.fs" />
+    <Compile Include="src\Stages\TypeCheckErrorsStage.fs" />
     <Compile Include="src\UsageChecking\FSharpUsageCheckingService.fs" />
   </ItemGroup>
 
@@ -18,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Daemon.FSharp\Daemon.FSharp.csproj" />
     <ProjectReference Include="..\Psi.Fsharp\Psi.FSharp.csproj" />
   </ItemGroup>
 </Project>
