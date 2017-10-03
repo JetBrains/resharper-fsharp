@@ -23,6 +23,14 @@ and FSharpCodeFoldingProcess() =
     inherit TreeNodeVisitor<IHighlightingConsumer>()
     let mutable processingFinished = false
 
+    let getFoldingAttrId = function
+        | Scope.Open -> CodeFoldingAttributes.IMPORTS_FOLDING_ATTRIBUTE
+        | Scope.Attribute -> CodeFoldingAttributes.ATTRIBUTES_FOLDING_ATTRIBUTE
+        | Scope.Comment -> CodeFoldingAttributes.COMMENTS_FOLDING_ATTRIBUTE
+        | Scope.XmlDocComment -> CodeFoldingAttributes.DOCUMENTATION_COMMENTS_FOLDING_ATTRIBUTE
+        | Scope.Member -> CodeFoldingAttributes.METHOD_FOLDING_ATTRIBUTE
+        | _ -> CodeFoldingAttributes.DEFAULT_FOLDING_ATTRIBUTE
+
     override x.VisitNode(element, context) =
         match element.GetContainingFile() with
         | :? IFSharpFile as fsFile ->
@@ -37,19 +45,18 @@ and FSharpCodeFoldingProcess() =
                 |> Seq.distinctBy (fun x -> x.Range.StartLine)
                 |> Seq.iter (fun x ->
                     let textRange = x.CollapseRange.ToTextRange(document)
-                    let attrId, placeholder =
+                    let docRange = DocumentRange(document, textRange)
+                    let placeholder =
                         match x.Scope with
-                        | Scope.Open -> CodeFoldingAttributes.IMPORTS_FOLDING_ATTRIBUTE, "..."
+                        | Scope.Open -> "..."
                         | _ ->
                             let line = Int32<DocLine>.op_Explicit(x.CollapseRange.StartLine).Minus1()
                             let lineStart = document.GetLineStartOffset(line)
                             let lineEnd = document.GetLineEndOffsetNoLineBreak(line)
-                            let placeholder =
-                                match TextRange(lineStart, lineEnd).Intersect(textRange) with
-                                | range when not range.IsEmpty -> document.GetText(range) + " ..."
-                                | _ -> " ..."
-                            CodeFoldingAttributes.DEFAULT_FOLDING_ATTRIBUTE, placeholder
-                    context.AddDefaultPriorityFolding(attrId, DocumentRange(document, textRange), placeholder))
+                            match TextRange(lineStart, lineEnd).Intersect(textRange) with
+                            | range when not range.IsEmpty -> document.GetText(range) + " ..."
+                            | _ -> " ..."
+                    context.AddDefaultPriorityFolding(getFoldingAttrId x.Scope, docRange, placeholder))
             | _ -> ()
         | _ -> ()
         processingFinished <- true
