@@ -9,11 +9,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {
   public static class FSharpRangeUtil
   {
-    public static int GetDocumentOffset([NotNull] IDocument document, Line line, Column column)
+    public static int GetDocumentOffset([NotNull] this IDocument document, Line line, Column column)
     {
       return document.GetLineLength(line) >= column
         ? document.GetOffsetByCoords(new DocumentCoords(line, column))
         : document.GetLineEndOffsetNoLineBreak(line);
+    }
+
+    public static int GetDocumentOffset([NotNull] this IDocument document, int line, int column)
+    {
+      return document.GetDocumentOffset((Line) line, (Column) column);
     }
 
     public static TreeOffset GetTreeOffset([NotNull] IDocument document, Line line, Column column)
