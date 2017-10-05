@@ -16,6 +16,7 @@ module CommonUtil =
     open JetBrains.ProjectModel.Properties.Managed
     open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
     open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties.FSharpProjectPropertiesFactory
+    open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
     open JetBrains.Util
     open JetBrains.Util.dataStructures.TypedIntrinsics
     open Microsoft.FSharp.Compiler
@@ -91,11 +92,14 @@ module CommonUtil =
     type Line = Int32<DocLine>
     type Column = Int32<DocColumn>
 
+    let docLine (x: int)   = Line.op_Explicit(x)
+    let docColumn (x: int) = Column.op_Explicit(x)
+
     type Range.range with
-        member x.GetStartLine()   = x.StartLine - 1 |> Line.op_Explicit
-        member x.GetEndLine()     = x.EndLine - 1   |> Line.op_Explicit
-        member x.GetStartColumn() = x.StartColumn   |> Column.op_Explicit
-        member x.GetEndColumn()   = x.EndColumn     |> Column.op_Explicit
+        member x.GetStartLine()   = x.StartLine - 1 |> docLine
+        member x.GetEndLine()     = x.EndLine - 1   |> docLine
+        member x.GetStartColumn() = x.StartColumn   |> docColumn
+        member x.GetEndColumn()   = x.EndColumn     |> docColumn
 
         member x.ToTextRange(document: IDocument) =
             let startOffset = document.GetLineStartOffset(x.GetStartLine()) + x.StartColumn

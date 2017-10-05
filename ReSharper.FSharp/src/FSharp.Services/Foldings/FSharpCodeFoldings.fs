@@ -39,7 +39,7 @@ and FSharpCodeFoldingProcess() =
                 let sourcefile = element.GetSourceFile()
                 let document = sourcefile.Document
                 let lines = [| for line in 0 .. (int (document.GetLineCount().Minus1())) do
-                                yield document.GetLineText(Int32<DocLine>.op_Explicit(line)) |]
+                                yield document.GetLineText(docLine line) |]
 
                 Structure.getOutliningRanges lines parseResults.ParseTree.Value
                 |> Seq.distinctBy (fun x -> x.Range.StartLine)
@@ -50,7 +50,7 @@ and FSharpCodeFoldingProcess() =
                         match x.Scope with
                         | Scope.Open -> "..."
                         | _ ->
-                            let line = Int32<DocLine>.op_Explicit(x.CollapseRange.StartLine).Minus1()
+                            let line = (docLine x.CollapseRange.StartLine).Minus1()
                             let lineStart = document.GetLineStartOffset(line)
                             let lineEnd = document.GetLineEndOffsetNoLineBreak(line)
                             match TextRange(lineStart, lineEnd).Intersect(textRange) with

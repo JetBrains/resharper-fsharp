@@ -3,6 +3,7 @@
 open System
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -20,7 +21,7 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
 
     abstract member CreateFSharpFile: unit -> ICompositeElement
 
-    member internal x.GetLineOffset line = document.GetLineStartOffset(line - 1 |> Int32.op_Explicit)
+    member internal x.GetLineOffset line = document.GetLineStartOffset(line - 1 |> docLine)
     member internal x.GetStartOffset (range: Range.range) = x.GetLineOffset range.StartLine + range.StartColumn
     member internal x.GetEndOffset (range: Range.range) = x.GetLineOffset range.EndLine + range.EndColumn
     member internal x.GetStartOffset (id: Ident) = x.GetStartOffset id.idRange

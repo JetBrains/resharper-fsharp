@@ -4,6 +4,7 @@ open System
 open System.Collections.Generic
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Debugger
+open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -26,8 +27,9 @@ type FSharpBreakpointVariantsProvider() =
                 match fsFile.ParseResults with
                 | Some parseResults ->
                     let document = file.ToSourceFile().Document
-                    let lineStart = document.GetLineStartOffset(Int32<DocLine>.op_Explicit(line))
-                    let lineEnd = document.GetLineEndOffsetWithLineBreak(Int32<DocLine>.op_Explicit(line))
+                    let docLine = docLine line
+                    let lineStart = document.GetLineStartOffset(docLine)
+                    let lineEnd = document.GetLineEndOffsetWithLineBreak(docLine)
                     let variants: BreakpointVariantModelBase seq = 
                         fsFile.FindTokensAt(TreeTextRange(TreeOffset(lineStart), TreeOffset(lineEnd)))
                         |> Seq.choose (fun token ->
