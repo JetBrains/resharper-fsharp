@@ -11,8 +11,7 @@ open Microsoft.FSharp.Compiler.SourceCodeServices
 [<Extension; Sealed; AbstractClass>]
 type FSharpAttributeUtil =
     [<Extension>]
-    static member GetClrName (attr: FSharpAttribute) =
-        attr.AttributeType.QualifiedName.SubstringBefore(",", StringComparison.Ordinal)
+    static member GetClrName (attr: FSharpAttribute) = attr.AttributeType.QualifiedBaseName
     
     [<Extension>]
     static member HasAttributeInstance (attrs: IList<FSharpAttribute>, clrName: string) =

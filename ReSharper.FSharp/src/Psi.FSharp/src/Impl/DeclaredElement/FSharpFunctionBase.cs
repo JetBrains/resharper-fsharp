@@ -27,14 +27,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
         typeParams.Add(new FSharpTypeParameterOfMethod(this, mfvTypeParams[i].DisplayName, i - outerTypeParamsCount));
       TypeParameters = typeParams.ToList();
 
-      var returnType = FSharpTypesUtil.GetType(mfv.ReturnParameter.Type, declaration, TypeParameters, Module) ??
-                       TypeFactory.CreateUnknownType(Module);
-      ReturnType = mfv.IsConstructor || returnType.IsUnit(Module)
+      ReturnType = mfv.IsConstructor || mfv.ReturnParameter.Type.IsUnit
         ? Module.GetPredefinedType().Void
-        : returnType;
-
+        : FSharpTypesUtil.GetType(mfv.ReturnParameter.Type, declaration, TypeParameters, Module, true) ??
+          TypeFactory.CreateUnknownType(Module);
 
       var methodParams = new FrugalLocalList<IParameter>();
+      var mfvParamGroups = mfv.CurriedParameterGroups;
+      if (mfvParamGroups.Count == 1 && mfvParamGroups[0].Count == 1 && mfvParamGroups[0][0].Type.IsUnit)
+      {
+        Parameters = EmptyList<IParameter>.InstanceList;
+        return;
+      }
+
       foreach (var paramsGroup in mfv.CurriedParameterGroups)
       foreach (var param in paramsGroup)
       {
@@ -42,12 +47,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
         var paramName = param.DisplayName;
         methodParams.Add(new FSharpMethodParameter(param, this, methodParams.Count,
           FSharpTypesUtil.GetParameterKind(param),
-          FSharpTypesUtil.GetType(paramType, declaration, TypeParameters, Module),
+          FSharpTypesUtil.GetType(paramType, declaration, TypeParameters, Module, false),
           paramName.IsEmpty() ? SharedImplUtil.MISSING_DECLARATION_NAME : paramName));
       }
-      Parameters = methodParams.Count == 1 && methodParams[0].Type.IsUnit(Module)
-        ? EmptyList<IParameter>.InstanceList
-        : methodParams.ToList();
+      Parameters = methodParams.ToList();
     }
 
     public override IList<IParameter> Parameters { get; }
