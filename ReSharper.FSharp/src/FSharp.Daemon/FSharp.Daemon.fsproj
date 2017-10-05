@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <Compile Include="src\Highlightings\ErrorHighlightings.fs" />
+    <Compile Include="src\Stages\FSharpIdentifierTooltipProvider.fs" />
     <Compile Include="src\Stages\ErrorsStageProcessBase.fs" />
     <Compile Include="src\Stages\FSharpDaemonBehaviour.fs" />
     <Compile Include="src\Stages\SyntaxErrorsStage.fs" />
@@ -25,5 +26,9 @@
   <ItemGroup>
     <ProjectReference Include="..\Daemon.FSharp\Daemon.FSharp.csproj" />
     <ProjectReference Include="..\Psi.Fsharp\Psi.FSharp.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Reference Include="System.Web" />
   </ItemGroup>
 </Project>

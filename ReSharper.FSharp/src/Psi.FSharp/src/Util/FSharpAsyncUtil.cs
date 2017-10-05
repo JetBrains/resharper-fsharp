@@ -40,7 +40,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     }
 
     [CanBeNull]
-    public static TResult RunSynchronouslySafe<TResult>(FSharpAsync<TResult> async, ILogger logger, string actionTitle, int timeout = -1)
+    public static TResult RunSynchronouslySafe<TResult>([NotNull] this FSharpAsync<TResult> async, ILogger logger,
+      string actionTitle, int timeout = -1)
       where TResult : class
     {
       try

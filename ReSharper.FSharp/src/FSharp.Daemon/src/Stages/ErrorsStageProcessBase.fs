@@ -9,6 +9,7 @@ open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
+open JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages.Tooltips
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
@@ -40,7 +41,7 @@ type ErrorsStageProcessBase(daemonProcess, errors: FSharpErrorInfo[]) =
             |> Seq.distinctBy (fun e -> e.Message)
             |> Seq.tail
             |> Seq.iter (fun x ->
-                msgBuilder.Append(FSharpIdentifierTooltipProvider.RiderTooltipSeparator).Append(x.Message) |> ignore)
+                msgBuilder.Append(RiderTooltipSeparator).Append(x.Message) |> ignore)
             msgBuilder.ToString()
 
         match firstError.Severity, firstError.ErrorNumber with

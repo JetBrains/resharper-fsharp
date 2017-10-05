@@ -83,10 +83,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     /// Get name and qualifiers without backticks. Qualifiers added if the token is in ILongIdentifier.
     /// </summary>
     [NotNull]
-    public static string[] GetQualifiersAndName(FSharpIdentifierToken token)
+    public static string[] GetQualifiersAndName(this FSharpIdentifierToken token)
     {
-      var longIdentifier = token.Parent as ILongIdentifier;
-      if (longIdentifier == null) return new[] {FSharpNamesUtil.RemoveBackticks(token.GetText())};
+      if (!(token.Parent is ILongIdentifier longIdentifier))
+        return new[] {FSharpNamesUtil.RemoveBackticks(token.GetText())};
 
       var names = new FrugalLocalHashSet<string>();
       foreach (var id in longIdentifier.IdentifiersEnumerable)
