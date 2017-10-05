@@ -41,6 +41,7 @@ type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISol
     let projects = Dictionary<IProject, FSharpProject>()
     let scriptOptions = Dictionary<FileSystemPath, FSharpProjectOptions>()
     let projectsToInvalidate = JetHashSet<IProject>()
+    let getScriptOptionsLock = obj()
 
     let invalidProject (p: IProject) =
         invalidOp (sprintf "Project %s is not opened" p.ProjectFileLocation.FullPath)
@@ -130,6 +131,7 @@ type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISol
         let filePath = path.FullPath
         let source = file.Document.GetText()
         let loadTime = DateTime.Now
+        lock getScriptOptionsLock (fun _ ->
         let getScriptOptionsAsync = checkerService.Checker.GetProjectOptionsFromScript(filePath, source, loadTime)
         try
             let options, errors = getScriptOptionsAsync.RunAsTask()
@@ -143,7 +145,7 @@ type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISol
         | exn ->
             // todo: replace FCS reference resolver
             Logger.Warn(logger, "Error while getting options for {0}: {1}", filePath, exn.Message)
-            None
+            None)
 
     member private x.FixScriptOptions(options) =
         { options with OtherOptions = FSharpCoreFix.ensureCorrectFSharpCore options.OtherOptions }
