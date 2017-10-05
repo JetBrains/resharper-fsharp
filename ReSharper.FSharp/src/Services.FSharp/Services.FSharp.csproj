@@ -6,8 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Psi.FSharp\Psi.FSharp.csproj" />
-    <ProjectReference Include="..\Psi.FSharp.Parsing\Psi.FSharp.Parsing.fsproj" />
+    <ProjectReference Include="..\FSharp.Psi\FSharp.Psi.csproj" />
+    <ProjectReference Include="..\FSharp.Psi.Features\FSharp.Psi.Features.fsproj" />
   </ItemGroup>
 
   <ItemGroup>

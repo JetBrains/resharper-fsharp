@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Psi.FSharp.Parsing
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree

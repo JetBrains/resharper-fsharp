@@ -25,7 +25,6 @@
     <ProjectReference Include="..\..\..\src\FSharp.Common\FSharp.Common.fsproj" />
     <ProjectReference Include="..\..\..\src\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj" />
     <ProjectReference Include="..\..\..\src\FSharp.Services\FSharp.Services.fsproj" />
-    <ProjectReference Include="..\..\..\src\Psi.FSharp.LanguageService\Psi.FSharp.LanguageService.csproj" />
     <ProjectReference Include="..\..\..\src\Psi.FSharp\Psi.FSharp.csproj" />
   </ItemGroup>
 </Project>

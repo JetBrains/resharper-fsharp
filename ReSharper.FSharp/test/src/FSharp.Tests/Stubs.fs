@@ -5,7 +5,6 @@ open JetBrains.Application.Components
 open JetBrains.ProjectModel
 open JetBrains.Platform
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
-open JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService
 open JetBrains.ReSharper.Plugins.FSharp.Services.ContextActions
 open Microsoft.FSharp.Compiler.SourceCodeServices
 open NUnit.Framework
@@ -20,13 +19,4 @@ type FSharpProjectOptionsBuilderStub() =
 
 /// Used to add assemblies to R# subplatfrom at runtime
 type AddAssembliesToSubplatform() =
-    let _ =
-        FsiSessionsHostStub,
-        FSharpLanguageService
-//        ComponentContainer,
-//        SolutionComponentAttribute(),
-//        ZoneDefinitionAttribute(),
-//        ZoneMarkerAttribute(),
-//        FSharpChecker.GlobalForegroundParseCountStatistic
-     
-
+    let _ = FsiSessionsHostStub

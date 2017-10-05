@@ -1,0 +1,53 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net451</TargetFramework>
+    <DebugType>full</DebugType>
+    <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
+    <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features</RootNamespace>
+    <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi.Features</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="src\Daemon\Highlightings\ErrorHighlightings.fs" />
+    <Compile Include="src\Daemon\Stages\FSharpIdentifierTooltipProvider.fs" />
+    <Compile Include="src\Daemon\Stages\ErrorsStageProcessBase.fs" />
+    <Compile Include="src\Daemon\Stages\FSharpDaemonBehaviour.fs" />
+    <Compile Include="src\Daemon\Stages\SyntaxErrorsStage.fs" />
+    <Compile Include="src\Daemon\Stages\TypeCheckErrorsStage.fs" />
+    <Compile Include="src\Daemon\UsageChecking\FSharpUsageCheckingService.fs" />
+    <Compile Include="src\Comment\FSharpBlockCommentActionProvider.fs" />
+    <Compile Include="src\Comment\FSharpLineCommentActionProvider.fs" />
+    <Compile Include="src\Debugger\FSharpBreakpointVariantsProvider.fs" />
+    <Compile Include="src\Debugger\FSharpExpressionEvaluationInfoProvider.fs" />
+    <Compile Include="src\Foldings\FSharpCodeFoldings.fs" />
+    <Compile Include="src\FSharpClrLanguage.fs" />
+    <Compile Include="src\FSharpRefactoringLanguageService.fs" />
+    <Compile Include="src\SelectEmbracingConsruct\FSharpSelectEmbracingConstructProvider.fs" />
+    <Compile Include="src\Formatter\FSharpCodeStylePage.fs" />
+    <Compile Include="src\Formatter\ReformatCode.fs" />
+    <Compile Include="src\Settings\FsiOptions.fs" />
+    <Compile Include="src\FsiSessionsHost.fs" />
+    <Compile Include="src\TodoItems\FSharpTodoContentsProvider.fs" />
+    <Compile Include="src\Parsing\FSharpTreeBuilderBase.fs" />
+    <Compile Include="src\Parsing\FSharpImplTreeBuilder.fs" />
+    <Compile Include="src\Parsing\FSharpSigTreeBuilder.fs" />
+    <Compile Include="src\Parsing\FSharpFakeTreeBuilder.fs" />
+    <Compile Include="src\Parsing\FSharpParser.fs" />
+    <Compile Include="src\FSharpLanguageService.fs" />
+    <Compile Include="src\ZoneMarker.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="FSharp.Core" Version="4.0.*" />
+    <PackageReference Include="JetBrains.Fantomas" Version="2.6.8" />
+    <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="14.0.7" />
+    <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Daemon.FSharp\Daemon.FSharp.csproj" />
+    <ProjectReference Include="..\FSharp.Psi\FSharp.Psi.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System.Web" />
+    <Reference Include="WindowsBase" />
+  </ItemGroup>
+</Project>

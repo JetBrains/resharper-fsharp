@@ -15,8 +15,8 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
-open JetBrains.Util
 open JetBrains.UI.RichText
+open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
 let [<Literal>] RiderTooltipSeparator = "_RIDER_HORIZONTAL_LINE_TOOLTIP_SEPARATOR_"
