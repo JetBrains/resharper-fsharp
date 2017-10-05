@@ -22,9 +22,9 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
     abstract member CreateFSharpFile: unit -> ICompositeElement
 
     member internal x.GetLineOffset line = document.GetLineStartOffset(line - 1 |> docLine)
-    member internal x.GetStartOffset (range: Range.range) = x.GetLineOffset range.StartLine + range.StartColumn
-    member internal x.GetEndOffset (range: Range.range) = x.GetLineOffset range.EndLine + range.EndColumn
-    member internal x.GetStartOffset (id: Ident) = x.GetStartOffset id.idRange
+    member internal x.GetStartOffset (range: Range.range) = x.GetLineOffset(range.StartLine + range.StartColumn)
+    member internal x.GetEndOffset (range: Range.range) = x.GetLineOffset(range.EndLine + range.EndColumn)
+    member internal x.GetStartOffset (id: Ident) = x.GetStartOffset(id.idRange)
     member internal x.Eof = x.Builder.Eof()
 
     member internal x.AdvanceToOffset offset =

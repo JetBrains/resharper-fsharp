@@ -5,7 +5,7 @@ using Microsoft.FSharp.Collections;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 {
-  internal class FSharpLexerFactory : ILexerFactory
+  public class FSharpLexerFactory : ILexerFactory
   {
     private readonly IPsiSourceFile mySourceFile;
     private readonly FSharpList<string> myDefinedConstants;
