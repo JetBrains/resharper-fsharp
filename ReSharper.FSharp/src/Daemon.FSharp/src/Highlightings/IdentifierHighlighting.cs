@@ -1,11 +1,14 @@
 ﻿using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Daemon;
 using JetBrains.ReSharper.Feature.Services.Daemon;
-using JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Highlightings
 {
-  [DaemonTooltipProvider(typeof(FSharpIdentifierTooltipProvider))]
+  public interface IFSharpIdentifierTooltipProvider
+  {
+  }
+
+  [DaemonTooltipProvider(typeof(IFSharpIdentifierTooltipProvider))]
   [StaticSeverityHighlighting(Severity.INFO, HighlightingGroupIds.IdentifierHighlightingsGroup,
     OverlapResolve = OverlapResolveKind.NONE, ShowToolTipInStatusBar = false)]
   public class FSharpIdentifierHighlighting : ICustomAttributeIdHighlighting

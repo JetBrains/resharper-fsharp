@@ -7,6 +7,7 @@ open FsAutoComplete.TipFormatter
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Daemon
+open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -72,3 +73,5 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, logger) =
 
     override x.GetRichTooltip(highlighter) =
         RichTextBlock(x.GetTooltip(highlighter))
+
+    interface IFSharpIdentifierTooltipProvider
