@@ -68,20 +68,32 @@ type FSharpSelectEmbracingConstructProviderBase(settingsStore: ISettingsStore) =
                 let document = documentRange.Document 
                 let pos = document.GetPos(documentRange.StartOffset.Offset)
                 let visitor = { new AstVisitorBase<_>() with
-                    // todo: cover more cases (open expressions, inner expressions in bindings, match guards)
+                    // todo: cover more cases (inner expressions in bindings, match guards)
                     member x.VisitExpr(path,_,defaultTraverse,expr) =
                         match expr with
-                        | SynExpr.Ident _ | SynExpr.Const _ | SynExpr.LongIdent _ -> Some path
+                        | SynExpr.Ident _ | SynExpr.Const _ -> Some path
+                        | SynExpr.LongIdent _ -> Some (TraverseStep.Expr expr :: path) 
                         | _ -> defaultTraverse expr }
-                
+
+                let containingDeclarations =
+                    match fsFile.FindTokenAt(documentRange.EndOffset) with
+                    | null -> []
+                    | token -> 
+                        let rec getParents = function
+                        | null -> []
+                        | (t: ITreeNode) -> t.GetDocumentRange() :: getParents t.Parent
+                        getParents token
+
                 let parentRanges =
                     match Traverse(pos, parseResults.ParseTree.Value, visitor) with
                     | Some traversePath ->
                         List.map getRanges traversePath
                         |> List.concat
                         |> List.map (fun r -> r.ToDocumentRange(document))
-                        |> List.filter (fun r -> r.Contains(documentRange))
-                    | _ -> []
+                    | None -> []
+                    |> List.append containingDeclarations
+                    |> List.filter (fun r -> r.Contains(documentRange.EndOffset))
+                    |> List.sortBy (fun r -> r.Length)
 
                 FSharpDotSelection(fsFile, document, fsFile.Translate(documentRange), parentRanges) :> ISelectedRange
             | _ -> null
@@ -89,11 +101,11 @@ type FSharpSelectEmbracingConstructProviderBase(settingsStore: ISettingsStore) =
 [<ProjectFileType(typeof<FSharpProjectFileType>)>]
 type FSharpFileSelectEmbracingConstructProvider(settingsStore: ISettingsStore) =
     inherit FSharpSelectEmbracingConstructProviderBase(settingsStore)
-    
-    override x.IsAvailableImpl(sourceFile) = sourceFile.Properties.ShouldBuildPsi
+
+    override x.IsAvailableImpl(sourceFile) = true
 
 [<ProjectFileType(typeof<FSharpScriptProjectFileType>)>]
 type FSharpScriptSelectEmbracingConstructProvider(settingsStore: ISettingsStore) =
     inherit FSharpSelectEmbracingConstructProviderBase(settingsStore)
-    
+
     override x.IsAvailableImpl(sourceFile) = true
