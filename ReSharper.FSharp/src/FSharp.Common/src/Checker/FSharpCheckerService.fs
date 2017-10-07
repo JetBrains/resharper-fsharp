@@ -69,15 +69,15 @@ type FSharpCheckerService(lifetime, logger: Util.ILogger, onSolutionCloseNotifie
         | Some options -> options.ConditionalCompilationDefines
         | _ -> []
 
-    member x.ParseAndCheckFile([<NotNull>] file: IPsiSourceFile) =
+    member x.ParseAndCheckFile([<NotNull>] file: IPsiSourceFile, allowStaleResults) =
         match x.OptionsProvider.GetProjectOptions(file) with
         | Some options ->
             let filePath = file.GetLocation().FullPath
             let source = file.Document.GetText()
-            let parsingResults, checkResults = x.Checker.ParseAndCheckFileInProject(filePath, 0, source, options).RunAsTask()
-            match parsingResults.ParseTree, checkResults with
-            | Some parseTree, FSharpCheckFileAnswer.Succeeded checkResults ->
-                Some { ParseResults = parsingResults; ParseTree = parseTree; CheckResults = checkResults }
+            // todo: don't cancel the computation when file didn't change
+            match x.Checker.ParseAndCheckDocument(filePath, source, options, allowStaleResults).RunAsTask() with
+            | Some (parseResults, checkResults) when parseResults.ParseTree.IsSome ->
+                Some { ParseResults = parseResults; ParseTree = parseResults.ParseTree.Value; CheckResults = checkResults }
             | _ -> None
         | _ -> None
 

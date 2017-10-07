@@ -24,7 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     {
       var sourceFile = fsFile.GetSourceFile();
       Assertion.AssertNotNull(sourceFile, "sourceFile != null");
-      var checkResults = fsFile.GetParseAndCheckResults()?.Value.CheckResults;
+      var checkResults = fsFile.GetParseAndCheckResults(false)?.Value.CheckResults;
       if (checkResults == null)
         return null;
 

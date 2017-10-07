@@ -42,7 +42,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.ParameterInfo
       if (paramInfoLocationsOption == null)
         return null;
 
-      var checkResults = fsFile.GetParseAndCheckResults()?.Value.CheckResults;
+      var checkResults = fsFile.GetParseAndCheckResults(true)?.Value.CheckResults;
       if (checkResults == null)
         return null;
 

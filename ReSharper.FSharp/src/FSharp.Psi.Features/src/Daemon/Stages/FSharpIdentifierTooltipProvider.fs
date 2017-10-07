@@ -2,11 +2,14 @@ module JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages.Tooltips
 
 open System
 open System.Collections.Generic
+open System.Threading
 open System.Web
 open FsAutoComplete.TipFormatter
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Daemon
+open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
+open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -15,6 +18,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Resources.Shell
 open JetBrains.UI.RichText
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
@@ -22,7 +26,7 @@ open Microsoft.FSharp.Compiler.SourceCodeServices
 let [<Literal>] RiderTooltipSeparator = "_RIDER_HORIZONTAL_LINE_TOOLTIP_SEPARATOR_"
 
 [<SolutionComponent>]
-type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, logger) =
+type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, logger, fsCheckerService: FSharpCheckerService) =
     inherit IdentifierTooltipProvider<FSharpLanguage>(lifetime, solution, presenter)
 
     override x.GetTooltip(highlighter) =
@@ -42,7 +46,7 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, logger) =
         | :? IFSharpFile as fsFile ->
             match fsFile.FindTokenAt(documentRange.StartOffset) with
             | :? FSharpIdentifierToken as token ->
-                match fsFile.GetParseAndCheckResults() with
+                match fsFile.GetParseAndCheckResults(true) with
                 | Some results ->
                     let checkResults = results.CheckResults
                     let coords = document.GetCoordsByOffset(token.GetTreeEndOffset().Offset)
@@ -50,12 +54,9 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, logger) =
                     let lineText = sourceFile.Document.GetLineText(coords.Line)
 
                     // todo: provide tooltip for #r strings in fsx, should pass String tag
-                    let getTooltip =
-                        checkResults.GetToolTipText(int coords.Line + 1, int coords.Column, lineText, names, FSharpTokenTag.Identifier)
-
-                    // todo: don't cancel computation and use previous results instead 
+                    let getTooltip = checkResults.GetToolTipText(int coords.Line + 1, int coords.Column, lineText, names, FSharpTokenTag.Identifier)
                     let result = List()
-                    match getTooltip.RunSynchronouslySafe(logger, "Getting F# tooltip", 2000) with
+                    match getTooltip.RunAsTask() with
                     | FSharpToolTipText(tooltips) ->
                         tooltips |> List.iter (function
                             | FSharpToolTipElement.Group(overloads) ->

@@ -13,7 +13,7 @@ type TypeCheckErrorsStage(daemonProcess, errors) =
 
     override x.CreateProcess(fsFile, daemonProcess) =
         let errors =
-            match fsFile.GetParseAndCheckResults() with
+            match fsFile.GetParseAndCheckResults(false) with
             | Some results -> results.CheckResults.Errors
             | _ -> [| |]
         TypeCheckErrorsStageProcess(daemonProcess, errors) :> _

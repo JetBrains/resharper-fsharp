@@ -38,7 +38,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
     public override void Execute(Action<DaemonStageResult> committer)
     {
       var interruptChecker = DaemonProcess.CreateInterruptChecker();
-      var checkResults = myFsFile.GetParseAndCheckResults(interruptChecker)?.Value.CheckResults;
+      var checkResults = myFsFile.GetParseAndCheckResults(false, interruptChecker)?.Value.CheckResults;
       var symbolUses = checkResults?.GetAllUsesOfAllSymbolsInFile()?.RunAsTask(interruptChecker);
       if (symbolUses == null)
         return;

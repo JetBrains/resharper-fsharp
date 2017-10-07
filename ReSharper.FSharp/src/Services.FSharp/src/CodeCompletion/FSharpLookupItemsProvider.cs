@@ -114,7 +114,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
       var qualifiers = context.Names.Item1;
       var partialName = context.Names.Item2;
 
-      var checkResults = fsFile.GetParseAndCheckResults()?.Value.CheckResults;
+      var checkResults = fsFile.GetParseAndCheckResults(true)?.Value.CheckResults;
       if (checkResults == null)
         return null;
 
@@ -131,7 +131,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
 
       try
       {
-        return FSharpAsync.RunSynchronously(getCompletionsAsync, FSharpOption<int>.Some(2000), null);
+        return getCompletionsAsync.RunAsTask();
       }
       catch (Exception e)
       {
