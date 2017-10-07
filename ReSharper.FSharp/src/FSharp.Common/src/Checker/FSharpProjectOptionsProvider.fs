@@ -33,24 +33,14 @@ open Microsoft.FSharp.Compiler.ErrorLogger
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
 [<SolutionComponent>]
-type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISolution,
-                                  checkerService: FSharpCheckerService, optionsBuilder: FSharpProjectOptionsBuilder,
-                                  changeManager: ChangeManager) as this =
+type FSharpProjectOptionsProvider(lifetime, logger, solution: ISolution, checkerService: FSharpCheckerService,
+                                  optionsBuilder: FSharpProjectOptionsBuilder, changeManager: ChangeManager) as this =
     inherit RecursiveProjectModelChangeDeltaVisitor()
 
     let projects = Dictionary<IProject, FSharpProject>()
     let scriptOptions = Dictionary<FileSystemPath, FSharpProjectOptions>()
     let projectsToInvalidate = JetHashSet<IProject>()
     let getScriptOptionsLock = obj()
-
-    let invalidProject (p: IProject) =
-        invalidOp (sprintf "Project %s is not opened" p.ProjectFileLocation.FullPath)
-
-    let getProject (file: IPsiSourceFile) =
-        let project = file.GetProject()
-        match projects.TryGetValue(project) with
-        | true, fsProject -> fsProject
-        | _ -> invalidProject project
 
     do
         changeManager.Changed2.Advise(lifetime, this.ProcessChange)
@@ -88,18 +78,17 @@ type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISol
                     projectsToInvalidate.Add(p) |> ignore
                     x.InvalidateReferencingProjects(p)
 
-    member private x.GetProjectOptionsImpl(file: IPsiSourceFile) =
-        lock projects (fun _ ->
-            x.ProcessInvalidateOptions()
-            let project = file.GetProject()
-            match projects.TryGetValue(project) with
-            | true, fsProject when fsProject.ContainsFile file -> fsProject.Options
-            | _ when project.IsOpened -> x.CreateProjectOptions(project)
-            | _ -> None)
-
-    member private x.CreateProjectOptions(project) =
+    member private x.GetFSharpProject(file: IPsiSourceFile) =
+        x.ProcessInvalidateOptions()
+        let project = file.GetProject()
         match projects.TryGetValue(project) with
-        | true, project -> project.Options
+        | true, fsProject when fsProject.ContainsFile file -> Some fsProject
+        | _ when project.IsOpened -> Some (x.CreateProject(project))
+        | _ -> None
+
+    member private x.CreateProject(project): FSharpProject =
+        match projects.TryGetValue(project) with
+        | true, project -> project
         | _ ->
             let fsProject = optionsBuilder.BuildSingleProjectOptions(project)
             let framework = project.GetCurrentTargetFrameworkId()
@@ -107,7 +96,7 @@ type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISol
                 seq { for p in project.GetReferencedProjects(framework, transitive = false) do
                           if p.IsOpened && p.IsFSharp then
                               let outPath = p.GetOutputFilePath(p.GetCurrentTargetFrameworkId()).FullPath
-                              yield outPath, x.CreateProjectOptions(p).Value }
+                              yield outPath, x.CreateProject(p).Options.Value }
 
             let options = { fsProject.Options.Value with ReferencedProjects = referencedProjectsOptions.ToArray() }
             let options =
@@ -116,7 +105,7 @@ type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISol
                 else options
             let fsProject = { fsProject with Options = Some options }
             projects.[project] <- fsProject
-            fsProject.Options
+            fsProject
 
     member private x.ProcessInvalidateOptions() =
         lock projectsToInvalidate (fun _ ->
@@ -158,37 +147,37 @@ type FSharpProjectOptionsProvider(lifetime, logger: Util.ILogger, solution: ISol
         member x.GetProjectOptions(file) =
             if file.LanguageType.Equals(FSharpScriptProjectFileType.Instance) then x.GetScriptOptions(file) else
             if file.PsiModule.IsMiscFilesProjectModule() then None
-            else x.GetProjectOptionsImpl(file)
-
-        member x.TryGetFSharpProject(file) =
-            let _ = x.GetProjectOptionsImpl(file)
-            match projects.TryGetValue(file.GetProject()) with
-            | true, fsProject -> Some fsProject
-            | _ -> None
+            else
+                lock projects (fun _ ->
+                    match x.GetFSharpProject(file) with
+                    | Some fsProject when fsProject.ContainsFile file -> fsProject.Options
+                    | _ -> None)
 
         member x.HasPairFile(file) =
             if file.LanguageType.Equals(FSharpScriptProjectFileType.Instance) ||
                file.PsiModule.IsMiscFilesProjectModule() then false else
-            let _ = x.GetProjectOptionsImpl(file)
-            let fsProject = getProject file 
-            fsProject.FilesWithPairs.Contains(file.GetLocation())
+
+            lock projects (fun _ ->
+                match x.GetFSharpProject(file) with
+                | Some fsProject -> fsProject.FilesWithPairs.Contains(file.GetLocation())
+                | _ -> false)
         
         member x.GetParsingOptions(file) =
             if file.LanguageType.Equals(FSharpScriptProjectFileType.Instance) ||
                file.PsiModule.IsMiscFilesProjectModule() then
                 Some { FSharpParsingOptions.Default with SourceFiles = Array.ofList [file.GetLocation().FullPath] }
             else
-                let _ = x.GetProjectOptionsImpl(file)
-                match (x :> IFSharpProjectOptionsProvider).TryGetFSharpProject(file) with
-                | Some project when project.Options.IsSome ->
-                    match project.ParsingOptions with
-                    | None ->
-                        let projectOptions = project.Options.Value
-                        let parsingOptions, errors = checkerService.Checker.GetParsingOptionsFromCommandLineArgs(List.ofArray projectOptions.OtherOptions)
-                        let parsingOptions = { parsingOptions with SourceFiles = projectOptions.SourceFiles }
-                        if not errors.IsEmpty then
-                            Logger.Warn(logger, "Getting parsing options: {0}", concatErrors errors)
-                        project.ParsingOptions <- Some parsingOptions
-                        Some parsingOptions
-                    | options -> options
-                | _ -> None
+                lock projects (fun _ ->
+                    match x.GetFSharpProject(file) with
+                    | Some project when project.Options.IsSome ->
+                        match project.ParsingOptions with
+                        | None ->
+                            let projectOptions = project.Options.Value
+                            let parsingOptions, errors = checkerService.Checker.GetParsingOptionsFromCommandLineArgs(List.ofArray projectOptions.OtherOptions)
+                            let parsingOptions = { parsingOptions with SourceFiles = projectOptions.SourceFiles }
+                            if not errors.IsEmpty then
+                                Logger.Warn(logger, "Getting parsing options: {0}", concatErrors errors)
+                            project.ParsingOptions <- Some parsingOptions
+                            Some parsingOptions
+                        | options -> options
+                    | _ -> None)
