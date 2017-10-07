@@ -1,6 +1,7 @@
 ﻿using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
 
+// ReSharper disable once CheckNamespace
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 {
   [LanguageDefinition(Name)]

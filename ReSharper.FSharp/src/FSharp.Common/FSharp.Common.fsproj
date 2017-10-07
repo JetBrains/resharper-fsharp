@@ -11,7 +11,6 @@
     <Compile Include="src\ThirdParty\QuickParse.fs" />
     <Compile Include="src\ThirdParty\TipFormatter.fs" />
     <Compile Include="src\ProjectModel\FSharpProjectLanguage.fs" />
-    <Compile Include="src\FileSystemShim.fs" />
     <Compile Include="src\ProjectModel\ProjectProperties\FSharpProjectProperties.fs" />
     <Compile Include="src\ProjectModel\ProjectProperties\FSharpProjectPropertiesFactory.fs" />
     <Compile Include="src\ProjectModel\ProjectProperties\FSharpProjectFilePropertiesProvider.fs" />
@@ -20,6 +19,8 @@
     <Compile Include="src\Util\Util.fs" />
     <Compile Include="src\Util\FSharpAttributesUtil.fs" />
     <Compile Include="src\Util\FSharpSymbolUtil.fs" />
+    <Compile Include="src\Checker\FSharpSourceCache.fs" />
+    <Compile Include="src\Checker\FileSystemShim.fs" />
     <Compile Include="src\Checker\FSharpCheckerExtensions.fs" />
     <Compile Include="src\Checker\FSharpProject.fs" />
     <Compile Include="src\Checker\IFSharpProjectOptionsProvider.fs" />

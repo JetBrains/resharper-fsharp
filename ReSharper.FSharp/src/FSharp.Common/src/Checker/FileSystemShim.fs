@@ -1,36 +1,38 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Common
 
+open System.IO
 open JetBrains.DataFlow
-open JetBrains.DocumentManagers
 open JetBrains.ProjectModel
-open JetBrains.ReSharper.Resources.Shell
+open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.AbstractIL.Internal.Library
-open System.Collections.Generic
-open System.IO
-open System.Text
 
 [<SolutionComponent>]
-type FileSystemShim(lifetime: Lifetime, documentManager: DocumentManager) as this =
-    static let fsExtensions = HashSet(Seq.ofList ["fs"; "fsi"; "fsx"; "ml"; "mli"; "fsscript"])
+type FileSystemShim(lifetime: Lifetime, sourceCache: FSharpSourceCache) as this =
     let defaultFileSystem = Shim.FileSystem
     do
         Shim.FileSystem <- this
         lifetime.AddAction(fun _ -> Shim.FileSystem <- defaultFileSystem) |> ignore
-    
+
+    let getSource (path: string) =
+        match FileSystemPath.TryParse(path) with
+        | path when not path.IsEmpty ->
+            match sourceCache.GetSource(path) with
+            | Some source -> Some source
+            | _ -> None
+        | _ -> None
+
     interface IFileSystem with
-        member x.FileStreamReadShim(fileName) =
-            match FileSystemPath.TryParse(fileName) with
-            | path when not path.IsEmpty && fsExtensions.Contains(path.ExtensionNoDot) ->
-                let document = documentManager.GetOrCreateDocument(path)
-                let mutable text = null
-                if ReadLockCookie.TryExecute(fun () -> text <- document.GetText()) then
-                    new MemoryStream(Encoding.UTF8.GetBytes(text)) :> _
-                else defaultFileSystem.FileStreamReadShim(fileName)
-            | _ -> defaultFileSystem.FileStreamReadShim(fileName)
-        
-        member x.GetLastWriteTimeShim(fileName) = defaultFileSystem.GetLastWriteTimeShim(fileName) // todo
-        
+        member x.FileStreamReadShim(path) =
+            match getSource path with
+            | Some source -> new MemoryStream(source.Source) :> _
+            | _ -> defaultFileSystem.FileStreamReadShim(path)
+
+        member x.GetLastWriteTimeShim(path) =
+            match getSource path with
+            | Some source -> source.Timestamp
+            | _ -> defaultFileSystem.GetLastWriteTimeShim(path)
+
         member x.FileStreamWriteExistingShim(fileName) = defaultFileSystem.FileStreamWriteExistingShim(fileName)
         member x.FileStreamCreateShim(fileName) = defaultFileSystem.FileStreamCreateShim(fileName)
         member x.IsInvalidPathShim(fileName) = defaultFileSystem.IsInvalidPathShim(fileName)
