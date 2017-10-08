@@ -70,8 +70,7 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
                     x.Builder.Mark()
                 else
                     x.ProcessAttributesAndStartRange attrs (Some firstId) range
-            if idRange.Start <> idRange.End then x.Builder.AdvanceLexer() |> ignore // skip keyword
-            
+
             if isModule then x.ProcessModifiersBeforeOffset (x.GetStartOffset firstId)
             x.ProcessLongIdentifier lid
             let elementType =
