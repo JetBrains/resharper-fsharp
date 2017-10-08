@@ -43,6 +43,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static bool ShortNameEquals([NotNull] this IFSharpAttribute attr, [NotNull] string shortName) =>
       attr.LongIdentifier?.Name.GetAttributeShortName()?.Equals(shortName, StringComparison.Ordinal) ?? false;
 
+    public static bool HasCompiledNameAttr(TreeNodeCollection<IFSharpAttribute> attributes)
+    {
+      foreach (var attr in attributes)
+        if (attr.ShortNameEquals("CompiledName") && attr.ArgExpression.String != null)
+          return true;
+      return false;
+    }
+
     [NotNull]
     public static string GetCompiledName([CanBeNull] IIdentifier identifier,
       TreeNodeCollection<IFSharpAttribute> attributes)
@@ -115,9 +123,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       }
       clrName.Append(declaration.DeclaredName);
 
-      var typeParamsOwner = declaration as IFSharpTypeDeclaration;
-      if (typeParamsOwner?.TypeParameters.Count > 0)
-        clrName.Append("`" + typeParamsOwner.TypeParameters.Count);
+      var typeDeclaration = declaration as IFSharpTypeDeclaration;
+      if (typeDeclaration?.TypeParameters.Count > 0 && !HasCompiledNameAttr(typeDeclaration.Attributes))
+        clrName.Append("`" + typeDeclaration.TypeParameters.Count);
 
       return clrName.ToString();
     }
