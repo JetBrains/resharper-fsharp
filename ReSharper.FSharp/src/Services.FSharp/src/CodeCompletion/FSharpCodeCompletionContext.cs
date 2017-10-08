@@ -24,7 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
       TokenBeforeCaret = tokenBeforeCaret;
       TokenAtCaret = tokenAtCaret;
       LineText = lineText;
-      FsCompletionContext = fsCompletionContext;
+      FsCompletionContext = OptionModule.OfObj(fsCompletionContext);
       ParseResults = parseResults;
       ShouldComplete = shouldComplete;
     }
@@ -35,7 +35,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
     public ITreeNode TokenBeforeCaret { get; }
     public ITreeNode TokenAtCaret { get; }
     public string LineText { get; }
-    public CompletionContext FsCompletionContext { get; }
+    public FSharpOption<CompletionContext> FsCompletionContext { get; }
     public FSharpOption<FSharpParseFileResults> ParseResults { get; }
     public TreeOffset CaretOffset { get; }
     public DocumentCoords Coords { get; }
