@@ -80,6 +80,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
           }
           continue;
         }
+        if (symbolUse.IsFromComputationExpression)
+        {
+          var range = token.GetNavigationRange();
+          highlightings.Add(new HighlightingInfo(range, new KeyWordHighlighting(range)));
+          shouldHighlight = false;
+        }
 
         // usage of symbol may override declaration (e.g. interface member)
         // todo: better check?
@@ -134,6 +140,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
       }
 
       return token.GetContainingNode<ILocalDeclaration>();
+    }
+
+    [StaticSeverityHighlighting(Severity.INFO, HighlightingGroupIds.IdentifierHighlightingsGroup,
+      OverlapResolve = OverlapResolveKind.NONE, ShowToolTipInStatusBar = false,
+      AttributeId = HighlightingAttributeIds.KEYWORD)]
+    private class KeyWordHighlighting : IHighlighting
+    {
+      private readonly DocumentRange myRange;
+
+      public KeyWordHighlighting(DocumentRange range)
+      {
+        myRange = range;
+      }
+
+      public bool IsValid() => true;
+      public DocumentRange CalculateRange() => myRange;
+      public string ToolTip => null;
+      public string ErrorStripeToolTip => null;
     }
   }
 }
