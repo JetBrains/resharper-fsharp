@@ -34,7 +34,8 @@ open Microsoft.FSharp.Compiler.SourceCodeServices
 
 [<SolutionComponent>]
 type FSharpProjectOptionsProvider(lifetime, logger, solution: ISolution, checkerService: FSharpCheckerService,
-                                  optionsBuilder: FSharpProjectOptionsBuilder, changeManager: ChangeManager) as this =
+                                  optionsBuilder: FSharpProjectOptionsBuilder, changeManager: ChangeManager,
+                                  fsFileService: FSharpFileService) as this =
     inherit RecursiveProjectModelChangeDeltaVisitor()
 
     let projects = Dictionary<IProject, FSharpProject>()
@@ -145,26 +146,24 @@ type FSharpProjectOptionsProvider(lifetime, logger, solution: ISolution, checker
 
     interface IFSharpProjectOptionsProvider with
         member x.GetProjectOptions(file) =
-            if file.LanguageType.Equals(FSharpScriptProjectFileType.Instance) then x.GetScriptOptions(file) else
-            if file.PsiModule.IsMiscFilesProjectModule() then None
-            else
-                lock projects (fun _ ->
-                    match x.GetFSharpProject(file) with
-                    | Some fsProject when fsProject.ContainsFile file -> fsProject.Options
-                    | _ -> None)
+            if fsFileService.IsScript(file) then x.GetScriptOptions(file) else
+            if file.PsiModule.IsMiscFilesProjectModule() then None else
+
+            lock projects (fun _ ->
+                match x.GetFSharpProject(file) with
+                | Some fsProject when fsProject.ContainsFile file -> fsProject.Options
+                | _ -> None)
 
         member x.HasPairFile(file) =
-            if file.LanguageType.Equals(FSharpScriptProjectFileType.Instance) ||
-               file.PsiModule.IsMiscFilesProjectModule() then false else
+            if fsFileService.IsScript(file) || file.PsiModule.IsMiscFilesProjectModule() then false else
 
             lock projects (fun _ ->
                 match x.GetFSharpProject(file) with
                 | Some fsProject -> fsProject.FilesWithPairs.Contains(file.GetLocation())
                 | _ -> false)
-        
+
         member x.GetParsingOptions(file) =
-            if file.LanguageType.Equals(FSharpScriptProjectFileType.Instance) ||
-               file.PsiModule.IsMiscFilesProjectModule() then
+            if fsFileService.IsScript(file) || file.PsiModule.IsMiscFilesProjectModule() then
                 Some { FSharpParsingOptions.Default with SourceFiles = Array.ofList [file.GetLocation().FullPath] }
             else
                 lock projects (fun _ ->

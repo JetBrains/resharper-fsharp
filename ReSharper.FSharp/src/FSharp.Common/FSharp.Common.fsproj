@@ -10,6 +10,7 @@
   <ItemGroup>
     <Compile Include="src\ThirdParty\QuickParse.fs" />
     <Compile Include="src\ThirdParty\TipFormatter.fs" />
+    <Compile Include="src\ProjectModel\FSharpFileService.fs" />
     <Compile Include="src\ProjectModel\FSharpProjectLanguage.fs" />
     <Compile Include="src\ProjectModel\ProjectProperties\FSharpProjectProperties.fs" />
     <Compile Include="src\ProjectModel\ProjectProperties\FSharpProjectPropertiesFactory.fs" />

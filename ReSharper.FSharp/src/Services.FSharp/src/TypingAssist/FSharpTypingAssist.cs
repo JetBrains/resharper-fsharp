@@ -5,7 +5,6 @@ using JetBrains.DataFlow;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion;
 using JetBrains.ReSharper.Feature.Services.TypingAssist;
-using JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase;
 using JetBrains.ReSharper.Plugins.FSharp.Psi;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CachingLexers;
@@ -35,11 +34,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.TypingAssist
       if (projectFile == null || !projectFile.IsValid())
         return false;
 
-      var languageType = projectFile.LanguageType;
-      if (!languageType.Is<FSharpProjectFileType>() && !languageType.Is<FSharpScriptProjectFileType>())
-        return false;
-
-      return projectFile.Properties.ShouldBuildPsi;
+      return projectFile.PrimaryPsiLanguage.Is<FSharpLanguage>() &&
+             projectFile.Properties.ProvidesCodeModel;
     }
 
     private bool HandleEnterPressed(IActionContext context)
@@ -73,11 +69,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.TypingAssist
       return true;
     }
 
-    public bool QuickCheckAvailability(ITextControl textControl, IPsiSourceFile projectFile)
-    {
-      var projectFileLanguageType = projectFile.LanguageType;
-      return projectFileLanguageType.Is<FSharpProjectFileType>() ||
-             projectFileLanguageType.Is<FSharpScriptProjectFileType>();
-    }
+    public bool QuickCheckAvailability(ITextControl textControl, IPsiSourceFile projectFile) =>
+      projectFile.PrimaryPsiLanguage.Is<FSharpLanguage>();
   }
 }

@@ -40,5 +40,5 @@ type FSharpParser(file: IPsiSourceFile, checkerService: FSharpCheckerService, lo
                 fsFile.ActualTokenBuffer <- tokenBuffer
                 fsFile :> IFile
             | _ ->
-                logger.LogMessage(LoggingLevel.WARN, "FSharpTreeBuilder returned null")
+                logger.LogMessage(LoggingLevel.ERROR, "FSharpTreeBuilder returned null")
                 null
