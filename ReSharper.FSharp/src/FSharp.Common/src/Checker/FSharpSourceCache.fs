@@ -15,7 +15,6 @@ type FSharpSource =
     {
         Source: byte[]
         Timestamp: DateTime
-        VersionHash: int
     }
 
 [<SolutionComponent>]
@@ -30,8 +29,7 @@ type FSharpSourceCache(lifetime: Lifetime, logger: ILogger) =
 
     let update (sourceFile: IPsiSourceFile) path timestamp =
         let source = Encoding.UTF8.GetBytes(sourceFile.Document.GetText())
-        let hash = source.GetHashCode()
-        files.[path] <- { Source = source; Timestamp = timestamp; VersionHash = hash }
+        files.[path] <- { Source = source; Timestamp = timestamp }
 
     member x.GetSource(path: FileSystemPath) =
         lock files (fun _ ->
