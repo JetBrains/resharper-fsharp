@@ -1,5 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 
+open System
 open JetBrains
 open JetBrains.Annotations
 open JetBrains.Application
@@ -23,7 +24,9 @@ type FSharpParseAndCheckResults =
 
 [<ShellComponent>]
 type FSharpCheckerService(lifetime, logger: Util.ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier) =
-    do System.Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "100")
+    do
+        Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "30")
+
     let checker = lazy FSharpChecker.Create(projectCacheSize = 200, keepAllBackgroundResolutions = false,
                                             legacyReferenceResolver = MSBuildReferenceResolver.Resolver)
     do
