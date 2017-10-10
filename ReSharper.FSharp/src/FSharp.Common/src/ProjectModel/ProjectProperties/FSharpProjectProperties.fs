@@ -15,8 +15,8 @@ type FSharpProjectProperties =
     val mutable targetPlatformData: TargetPlatformData
     val buildSettings: ManagedProjectBuildSettings
 
-    new(projectTypeGuids, platformId, factoryGuid, targetFrameworkIds, targetPlatformData) =
-        { inherit ProjectPropertiesBase<_>(projectTypeGuids, platformId, factoryGuid, targetFrameworkIds)
+    new(projectTypeGuids, platformId, factoryGuid, targetFrameworkIds, targetPlatformData, dotNetCoreSDK) =
+        { inherit ProjectPropertiesBase<_>(projectTypeGuids, platformId, factoryGuid, targetFrameworkIds, dotNetCoreSDK)
           buildSettings = ManagedProjectBuildSettings()
           targetPlatformData = targetPlatformData }
 
@@ -26,6 +26,7 @@ type FSharpProjectProperties =
           targetPlatformData = targetPlatformData }
 
     override x.BuildSettings = x.buildSettings :> _
+    override x.DefaultLanguage = FSharpProjectLanguage.Instance :> _
 
     override x.ReadProjectProperties(reader, index) =
         base.ReadProjectProperties(reader, index)
@@ -50,10 +51,11 @@ type FSharpProjectProperties =
         base.Dump(writer, indent + 1)
 
     interface ISdkConsumerProperties with
-        member x.ProjectKind = ProjectKind.REGULAR_PROJECT
+        member x.ProjectKind = x.ProjectKind
         member x.BuildSettings = x.BuildSettings
-        member x.DefaultLanguage = FSharpProjectLanguage.Instance :> _
+        member x.DefaultLanguage = x.DefaultLanguage
         member x.TargetPlatformData = x.targetPlatformData
+        member x.DotNetCoreSDK = x.DotNetCoreSDK
 
         member x.Dump(writer, indent) = x.Dump(writer, indent)
         member x.UpdateFrom(properties) = base.UpdateFrom(properties)
