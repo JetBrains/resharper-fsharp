@@ -49,19 +49,3 @@ type FSharpProjectProperties =
         writer.Write(new string(' ', 2 + indent * 2))
         x.buildSettings.Dump(writer, indent + 2)
         base.Dump(writer, indent + 1)
-
-    interface ISdkConsumerProperties with
-        member x.ProjectKind = x.ProjectKind
-        member x.BuildSettings = x.BuildSettings
-        member x.DefaultLanguage = x.DefaultLanguage
-        member x.TargetPlatformData = x.targetPlatformData
-        member x.DotNetCoreSDK = x.DotNetCoreSDK
-
-        member x.Dump(writer, indent) = x.Dump(writer, indent)
-        member x.UpdateFrom(properties) = base.UpdateFrom(properties)
-        member x.WriteProjectProperties(writer) = x.WriteProjectProperties(writer)
-
-        member x.PlatformId = base.PlatformId
-        member x.ProjectTypeGuids = base.ProjectTypeGuids
-        member x.OwnerFactoryGuid = base.OwnerFactoryGuid
-        member x.ActiveConfigurations = base.ActiveConfigurations
