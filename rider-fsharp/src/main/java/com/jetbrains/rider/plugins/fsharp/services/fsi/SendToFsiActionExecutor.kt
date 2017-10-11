@@ -1,8 +1,8 @@
 package com.jetbrains.rider.plugins.fsharp.services.fsi
 
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiFile
-import com.intellij.util.DocumentUtil
 
 class SendToFsiActionExecutor(val consoleRunner: FsiConsoleRunner) {
     fun execute(editor: Editor, file: PsiFile) {
@@ -22,7 +22,10 @@ class SendToFsiActionExecutor(val consoleRunner: FsiConsoleRunner) {
 
     fun getTextToSend(editor: Editor, hasSelection: Boolean) =
             if (hasSelection) editor.selectionModel.selectedText!!
-            else editor.document.getText(DocumentUtil.getLineTextRange(editor.document, editor.caretModel.logicalPosition.line))
+            else {
+                val caretModel = editor.caretModel
+                editor.document.getText(TextRange(caretModel.visualLineStart, caretModel.visualLineEnd))
+            }
 
     fun getTextStartLine(editor: Editor, hasSelection: Boolean) =
             if (hasSelection) editor.document.getLineNumber(editor.selectionModel.selectionStart)
