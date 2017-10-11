@@ -12,17 +12,5 @@ type FSharpKeywordLookupItem(keyword, description: string) =
     override x.Image = PsiSymbolsThemedIcons.Keyword.Id
     override x.Text = keyword
 
-    interface IParameterInfoCandidatesProvider with
-        member x.HasCandidates = true
-        member x.CreateCandidates() = [x :> ICandidate] :> _
-
-    interface ICandidate with
-        member x.GetSignature(_, _, _, _, _) = RichText(keyword)
+    interface IDescriptionProvidingLookupItem with
         member x.GetDescription() = RichTextBlock(description)
-        member x.Matches(_) = true
-
-        member x.GetParametersInfo(_, _) = ()
-        member val IsFilteredOut = false with get, set
-        member x.PositionalParameterCount = 0
-        member x.IsObsolete = false
-        member x.ObsoleteDescription = null

@@ -12,7 +12,11 @@ open Microsoft.FSharp.Compiler.SourceCodeServices
 type FSharpKeywordsProvider() =
     inherit FSharpItemsProviderBase()
 
-    let keywords = Keywords.KeywordsWithDescription |> List.map (fun (kw, descr) -> FSharpKeywordLookupItem(kw, descr))
+    let keywords =
+        Keywords.KeywordsWithDescription
+        // todo: implement auto-completion popup strategy that will cover operators
+        |> List.filter (fun (keyword, _) -> not (PrettyNaming.IsOperatorName keyword))
+        |> List.map (fun (keyword, description) -> FSharpKeywordLookupItem(keyword, description))
 
     override x.IsAvailable(_) = true
 
