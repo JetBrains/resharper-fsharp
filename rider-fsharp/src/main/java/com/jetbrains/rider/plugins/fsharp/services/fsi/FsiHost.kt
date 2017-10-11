@@ -3,10 +3,10 @@ package com.jetbrains.rider.plugins.fsharp.services.fsi
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
+import com.jetbrains.rider.model.RdFSharpInteractiveHost
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.util.idea.ILifetimedComponent
 import com.jetbrains.rider.util.idea.LifetimedComponent
-import com.jetbrains.rider.model.RdFSharpInteractiveHost
 import kotlin.properties.Delegates
 
 class FsiHost(val project: Project) : ILifetimedComponent by LifetimedComponent(project) {
@@ -18,13 +18,11 @@ class FsiHost(val project: Project) : ILifetimedComponent by LifetimedComponent(
         rdFsiHost.moveCaretOnSendLine.advise(componentLifetime) { moveCaretOnSendLine = it }
     }
 
-    internal fun sendToFsi(editor: Editor, file: PsiFile) = getFsiConsole().sendActionExecutor.execute(editor, file)
-
-    internal fun getFsiConsole(): FsiConsoleRunner = synchronized(this) {
-        if (fsiConsole?.isValid() == true) return fsiConsole!!
-
-        createConsoleRunner()
-        return fsiConsole!!
+    internal fun sendToFsi(editor: Editor, file: PsiFile) = synchronized(this) {
+        if (fsiConsole?.isValid() == true)
+            fsiConsole!!.sendActionExecutor.execute(editor, file)
+        else
+            createConsoleRunner({ it.sendActionExecutor.execute(editor, file) })
     }
 
     internal fun resetFsiConsole() = synchronized(this) {
@@ -34,10 +32,14 @@ class FsiHost(val project: Project) : ILifetimedComponent by LifetimedComponent(
         createConsoleRunner()
     }
 
-    private fun createConsoleRunner() {
-        val runner = FsiConsoleRunner(rdFsiHost.requestNewFsiSessionInfo.sync(Unit), this)
-        runner.initAndRun()
+    private fun createConsoleRunner(initialAction: ((FsiConsoleRunner) -> Unit)? = null) {
+        rdFsiHost.requestNewFsiSessionInfo.start(Unit).result.advise(componentLifetime, {
+            val runner = FsiConsoleRunner(it.unwrap(), this)
+            runner.initAndRun()
+            this.fsiConsole = runner
 
-        this.fsiConsole = runner
+            if (initialAction != null)
+                initialAction(runner)
+        })
     }
 }
