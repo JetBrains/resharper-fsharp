@@ -34,7 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       var boolType = Module.GetPredefinedType().Bool;
       var intType = Module.GetPredefinedType().Int;
       var objType = Module.GetPredefinedType().Object;
-      var voidType = Module.GetPredefinedType().Void;
+      var stringType = Module.GetPredefinedType().String;
       var thisType = TypeFactory.CreateType(this);
       var compType = TypeFactory.CreateTypeByCLRName(ComparerTypeName, Module);
       var eqCompType = TypeFactory.CreateTypeByCLRName(EqComparerTypeName, Module);
@@ -56,7 +56,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       }
 
       if (OverridesToString())
-        members.Add(new FSharpGeneratedMethod(this, ToStringName, voidType, isOverride: true));
+        members.Add(new FSharpGeneratedMethod(this, ToStringName, stringType, isOverride: true));
 
       if (EmitsFieldsConstructor())
       {
