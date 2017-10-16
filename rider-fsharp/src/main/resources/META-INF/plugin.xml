@@ -23,6 +23,7 @@
     <backend.autoPopup.support language="F#" implementationClass="com.jetbrains.rider.completion.IgnoreBackendAndGenericRider" />
     <codeInsight.parameterInfo language="F#" implementationClass="com.jetbrains.rider.parameterInfo.RiderParameterInfoHandler" />
     <codeStyleSettingsProvider implementation="com.jetbrains.rider.settings.FSharpCodeStyleSettingsProvider" />
+    <lang.documentationProvider language="F#" implementationClass="com.jetbrains.rider.quickDoc.RiderDocumentationProvider"/>
 
 
     <fileTypeFactory id="F# Script" implementation="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptFileTypeFactory" />
@@ -38,6 +39,7 @@
     <backend.autoPopup.support language="F# Script" implementationClass="com.jetbrains.rider.completion.IgnoreBackendAndGenericRider" />
     <codeInsight.parameterInfo language="F# Script" implementationClass="com.jetbrains.rider.parameterInfo.RiderParameterInfoHandler" />
     <codeStyleSettingsProvider implementation="com.jetbrains.rider.settings.FSharpScriptCodeStyleSettingsProvider" />
+    <lang.documentationProvider language="F# Script" implementationClass="com.jetbrains.rider.quickDoc.RiderDocumentationProvider"/>
 
     <rider.ProjectTypesProvider implementation="com.jetbrains.rider.projectView.projectTypes.FSharpProjectTypeProvider" />
     <directoryProjectGenerator implementation="com.jetbrains.rider.projectView.projectGenerators.FSharpLibrary" />
