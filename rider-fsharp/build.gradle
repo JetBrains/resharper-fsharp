@@ -1,55 +1,89 @@
-buildscript {
-    ext.kotlin_version = '1.1.4'
-
-    FileTree tree = fileTree(dir: '../ReSharper.FSharp')
-    tree.include 'JetBrains.ReSharper.FSharp.*.nupkg'
-    ext.nupkg_path = tree.singleFile
-    logger.warn("Using .nupkg from $nupkg_path")
-
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
-
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version '1.1.4'
-    id "org.jetbrains.intellij" version "0.2.16"
+    id 'org.jetbrains.kotlin.jvm' version '1.1.4-3'
+    id "org.jetbrains.intellij" version "0.2.17"
 }
 
-apply plugin: 'kotlin'
-
-intellij {
-    localPath "$projectDir/build/rider"
-    type 'RD'
-    downloadSources false
-    updateSinceUntilBuild false
-}
-
-assert file(nupkg_path).exists()
-
-prepareSandbox {
-    from(nupkg_path, {
-        into "$intellij.pluginName"
-    })
-}
-
-runIde {
-    systemProperties = [
-            'rider.debug.mono.debug': true,
-            'rider.debug.mono.allowConnect': true,
-            'idea.platform.prefix': "Rider"
-    ]
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '3.4'
-    distributionUrl = "https://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
-}
+group 'com.jetbrains'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-group 'com.jetbrains'
+intellij {
+    type 'RD'
+
+    // Download a version of Rider to compile and run with. Either set `version` to
+    // 'LATEST-TRUNK-SNAPSHOT' or 'LATEST-EAP-SNAPSHOT' or a known version.
+    // This will download from www.jetbrains.com/intellij-repository/snapshots or
+    // www.jetbrains.com/intellij-repository/releases, respectively.
+    // Note that there's no guarantee that these are kept up to date
+    // version = 'LATEST-TRUNK-SNAPSHOT'
+    // If the build isn't available in intellij-repository, use an installed version via `localPath`
+    // localPath = '/Users/matt/Library/Application Support/JetBrains/Toolbox/apps/Rider/ch-1/171.4089.265/Rider EAP.app/Contents'
+    // localPath = "C:\\Users\\Ivan.Shakhov\\AppData\\Local\\JetBrains\\Toolbox\\apps\\Rider\\ch-0\\171.4456.459"
+    // localPath = "C:\\Users\\ivan.pashchenko\\AppData\\Local\\JetBrains\\Toolbox\\apps\\Rider\\ch-0\\dev"
+    // localPath 'build/riderRD-LATEST-TRUNK-SNAPSHOT'
+
+    version 'LATEST-TRUNK-SNAPSHOT'
+    downloadSources false
+    updateSinceUntilBuild false
+}
+
+sourceSets {
+    'rider-fsharp' {
+        java.srcDirs 'src'
+    }
+    test {
+        java.srcDir 'testSrc'
+        resources.srcDir 'testData'
+    }
+}
+
+def tree = fileTree(dir: '../ReSharper.FSharp/src')
+def files = tree.include(
+        'FSharp.Common/bin/Debug/net451/FSharp.Core.dll',
+        'FSharp.Common/bin/Debug/net451/FSharp.Compiler.Service.dll',
+        'FSharp.Common/bin/Debug/net451/FSharp.Compiler.Service.dll.pdb',
+        'FSharp.Common/bin/Debug/net451/FSharp.Compiler.Service.MSBuild.v12.dll',
+        'FSharp.Services/bin/Debug/net451/FantomasLib.dll',
+
+        'FSharp.ProjectModelBase/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase.dll',
+        'FSharp.ProjectModelBase/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase.pdb',
+
+        'FSharp.Common/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Common.dll',
+        'FSharp.Common/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Common.pdb',
+        'FSharp.Psi/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Psi.dll',
+        'FSharp.Psi/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Psi.pdb',
+        'FSharp.Psi.Features/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Psi.Features.dll',
+        'FSharp.Psi.Features/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Psi.Features.pdb',
+
+        'Daemon.FSharp/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.dll',
+        'Daemon.FSharp/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.pdb',
+        'Services.FSharp/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Services.Cs.dll',
+        'Services.FSharp/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Services.Cs.pdb')
+
+files.forEach({ f ->
+
+})
+
+prepareSandbox {
+    files.forEach({ f ->
+        def file = file(f)
+        assert file.isFile() && file.exists()
+        logger.warn(file.toString())
+        from(f, { into "$intellij.pluginName/dotnet" })
+    })
+}
+
+wrapper {
+    gradleVersion '4.1'
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext.kotlin_version = '1.1.4-3'
+dependencies {
+    testCompile 'junit:junit:4.12'
+    testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+}
