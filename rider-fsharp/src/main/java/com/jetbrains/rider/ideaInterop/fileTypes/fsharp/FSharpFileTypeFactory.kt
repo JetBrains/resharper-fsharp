@@ -5,10 +5,7 @@ import com.intellij.openapi.fileTypes.FileTypeConsumer
 import com.intellij.openapi.fileTypes.FileTypeFactory
 
 abstract class FSharpFileTypeFactoryBase(val fileType: FileType, vararg val extensions: String) : FileTypeFactory() {
-    override fun createFileTypes(consumer: FileTypeConsumer) {
-        for (matcher in extensions)
-            consumer.consume(fileType, matcher)
-    }
+    override fun createFileTypes(consumer: FileTypeConsumer) = extensions.forEach { consumer.consume(fileType, it) }
 }
 
 class FSharpFileTypeFactory : FSharpFileTypeFactoryBase(FSharpFileType, "fs", "fsi", "ml", "mli")
