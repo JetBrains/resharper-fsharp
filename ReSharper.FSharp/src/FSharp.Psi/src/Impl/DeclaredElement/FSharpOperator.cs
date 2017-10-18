@@ -7,7 +7,7 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal class FSharpOperator<TDeclaration> : FSharpFunctionBase<TDeclaration>
+  internal class FSharpOperator<TDeclaration> : FSharpFunctionBase<TDeclaration>, ISignOperator
     where TDeclaration : FSharpDeclarationBase, IFSharpDeclaration, IAccessRightsOwnerDeclaration,
     IModifiersOwnerDeclaration
   {
