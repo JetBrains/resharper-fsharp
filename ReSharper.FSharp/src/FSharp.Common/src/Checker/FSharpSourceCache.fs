@@ -36,10 +36,9 @@ type FSharpSourceCache(lifetime: Lifetime, logger: ILogger) =
             let source = ref Unchecked.defaultof<FSharpSource>
             match files.TryGetValue(path, source), !source with
             | true, source -> Some source
-            | _ -> None
-        )
+            | _ -> None)
 
-    interface IPsiSourceFileInvalidatingCache with
+    interface ICache with
         member x.Build(sourceFile, _) =
             if canHandle sourceFile then
                 lock files (fun _ ->
@@ -52,7 +51,6 @@ type FSharpSourceCache(lifetime: Lifetime, logger: ILogger) =
                 lock files (fun _ -> update sourceFile (sourceFile.GetLocation()) DateTime.Now)
 
         member x.OnPsiChange(_, _) = ()
-        member x.Invalidate(_) = ()
         member x.HasDirtyFiles = false
         member x.MarkAsDirty(_) = ()
         member x.MergeLoaded(_) = ()
