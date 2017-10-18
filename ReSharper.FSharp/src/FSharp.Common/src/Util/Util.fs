@@ -56,7 +56,7 @@ module CommonUtil =
         Async.RunSynchronously(async { return action.Invoke() }, timeout)
 
     type Async<'T> with
-        member x.RunAsTask(?interruptChecker) = // todo: cache these exntension methods in fs cache provider
+        member x.RunAsTask(?interruptChecker) =
             let interruptChecker = defaultArg interruptChecker (Action(fun _ -> InterruptableActivityCookie.CheckAndThrow()))
             let cancellationTokenSource = new CancellationTokenSource()
             let cancellationToken = cancellationTokenSource.Token
