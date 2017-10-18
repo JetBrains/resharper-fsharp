@@ -3,7 +3,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
-open JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open Microsoft.FSharp.Compiler.SourceCodeServices
@@ -40,10 +39,10 @@ type FSharpKeywordsProvider() =
                (tokenBeforeType.IsComment || tokenBeforeType.IsStringLiteral || tokenBeforeType.IsConstantLiteral)
         then false else
 
-        if (not (List.isEmpty (fst context.Names))) then false else
+        if not (List.isEmpty (fst context.Names)) then false else
 
         for keyword in keywords do
-            keyword.InitializeRanges(x.GetDefaultRanges(context), context.BasicContext)
+            keyword.InitializeRanges(context.Ranges, context.BasicContext)
             collector.Add(keyword)
 
         true
