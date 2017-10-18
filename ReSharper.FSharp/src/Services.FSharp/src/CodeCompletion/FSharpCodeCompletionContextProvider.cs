@@ -45,7 +45,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
       {
         var selectedRange = context.SelectedRange;
         return new FSharpCodeCompletionContext(context, new TextLookupRanges(selectedRange, selectedRange),
-          TreeOffset.InvalidOffset, DocumentCoords.Empty, null, null, null, null, null, null, false);
+          TreeOffset.InvalidOffset, DocumentCoords.Empty, null, null, null, null, null, false);
       }
 
       var document = context.Document;
@@ -68,7 +68,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
       var fsCompletionContext = UntypedParseImpl.TryGetCompletionContext(coords.GetPos(), parseResults, lineText);
 
       return new FSharpCodeCompletionContext(context, ranges, caretTreeOffset, coords, names, tokenBefore, token,
-        lineText, fsCompletionContext?.Value, parseResults);
+        lineText, fsCompletionContext?.Value);
     }
 
     private static bool ShouldReplace([CanBeNull] ITreeNode token)
