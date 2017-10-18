@@ -63,13 +63,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.ParameterInfo
       var textRange = new TextRange(rangeStartOffset, document.GetLineEndOffsetNoLineBreak(coords.Line));
 
       var rangeStartText = document.GetText(new TextRange(rangeStartOffset, rangeStartOffset + 1));
-      var candidates = CreateCandidates(rangeStartText, overloads);
       var namedArgs = paramInfoLocations.NamedParamNames.TakeWhile(n => n != null).Select(n => n.Value).AsArray();
+      var candidates = CreateCandidates(rangeStartText, overloads, paramInfoLocations.TupleEndLocations.Length);
 
       return new FSharpParameterInfoContext(currentParamNumber, candidates, textRange, namedArgs);
     }
 
-    private static ICandidate[] CreateCandidates([NotNull] string rangeStartText, FSharpMethodGroup overloads)
+    private static ICandidate[] CreateCandidates([NotNull] string rangeStartText, FSharpMethodGroup overloads,
+      int argsCount)
     {
       var methods = overloads.Methods;
       switch (rangeStartText)
@@ -77,7 +78,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.ParameterInfo
         case "<":
           return methods.Select(m => new FSharpTypeArgumentCandidate(overloads.MethodName, m)).ToArray<ICandidate>();
         default:
-          return methods.Select(m => new FSharpParameterInfoCandidate(m)).ToArray<ICandidate>();
+          return methods.Select(m => new FSharpParameterInfoCandidate(m, m.Parameters.Length < argsCount)).ToArray<ICandidate>();
       }
     }
 

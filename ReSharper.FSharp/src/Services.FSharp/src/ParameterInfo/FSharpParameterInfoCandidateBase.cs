@@ -8,6 +8,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.ParameterInfo
 {
   public abstract class FSharpParameterInfoCandidateBase : ICandidate
   {
+    protected FSharpParameterInfoCandidateBase(bool isFilteredOut = false)
+    {
+      IsFilteredOut = isFilteredOut;
+    }
+
     public abstract RichText GetSignature(string[] namedArguments, AnnotationsDisplayKind showAnnotations,
       out TextRange[] parameterRanges, out int[] mapToOriginalOrder, out ExtensionMethodInfo extensionMethodInfo);
 
@@ -21,10 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.ParameterInfo
       throw new System.NotImplementedException();
     }
 
-    public bool Matches(IDeclaredElement signature)
-    {
-      return true;
-    }
+    public virtual bool Matches(IDeclaredElement signature) => true;
 
     public bool IsFilteredOut { get; set; }
     public abstract int PositionalParameterCount { get; }
