@@ -11,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.ParameterInfo
   {
     private readonly FSharpMethodGroupItem myCandidate;
 
-    public FSharpParameterInfoCandidate(FSharpMethodGroupItem candidate)
+    public FSharpParameterInfoCandidate(FSharpMethodGroupItem candidate, bool isFiltered) : base(isFiltered)
     {
       myCandidate = candidate;
     }
@@ -22,8 +22,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.ParameterInfo
       var parameters = myCandidate.Parameters;
       var text = new StringBuilder("(");
       var newParameterRanges = new TextRange[parameters.Length];
-      bool orderChanged;
-      var parametersOrder = SortParameters(parameters, namedArguments, out orderChanged);
+      var parametersOrder = SortParameters(parameters, namedArguments, out var orderChanged);
 
       if (parameters.IsEmpty())
         text.Append("<no parameters>");
