@@ -81,8 +81,12 @@ let getIconId = fun (symbol: FSharpSymbol) ->
 
         addAccessibility iconId mfv.Accessibility
 
+    | :? FSharpField as field ->
+        let iconId = PsiSymbolsThemedIcons.Field.Id
+        let iconId = if field.IsStatic then CompositeIconId.Compose(iconId, PsiSymbolsThemedIcons.ModifiersStatic.Id) else iconId
+        addAccessibility iconId field.Accessibility
+
     | :? FSharpUnionCase as unionCase -> addAccessibility PsiSymbolsThemedIcons.Enum.Id unionCase.Accessibility
-    | :? FSharpField -> PsiSymbolsThemedIcons.Field.Id
     | :? FSharpParameter -> PsiSymbolsThemedIcons.Parameter.Id
     | :? FSharpGenericParameter
     | :? FSharpStaticParameter -> PsiSymbolsThemedIcons.Typeparameter.Id
