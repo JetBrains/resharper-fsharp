@@ -4,7 +4,6 @@ open System
 open System.Collections.Generic
 open System.Threading
 open System.Web
-open FsAutoComplete.TipFormatter
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Daemon
@@ -12,6 +11,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -22,11 +22,12 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.UI.RichText
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
+open JetBrains.ReSharper.Psi.Caches
 
 let [<Literal>] RiderTooltipSeparator = "_RIDER_HORIZONTAL_LINE_TOOLTIP_SEPARATOR_"
 
 [<SolutionComponent>]
-type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, logger, fsCheckerService: FSharpCheckerService) =
+type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, logger, xmlDocService: FSharpXmlDocService) =
     inherit IdentifierTooltipProvider<FSharpLanguage>(lifetime, solution, presenter)
 
     override x.GetTooltip(highlighter) =
@@ -62,10 +63,9 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, logger, fsCh
                             | FSharpToolTipElement.Group(overloads) ->
                                 overloads |> List.iter (fun overload ->
                                     let text = overload.MainDescription
-                                    let xmlDoc = overload.XmlDoc
-                                    match HttpUtility.HtmlDecode(buildFormatComment xmlDoc) with
+                                    match xmlDocService.GetXmlDoc(overload.XmlDoc) with
                                     | null -> result.Add(text)
-                                    | xmlDocText -> result.Add(text + "\n\n" + xmlDocText.TrimEnd('\r', '\n')))
+                                    | xmlDocText -> result.Add(text + "\n\n" + xmlDocText.Text))
                             | _ -> ())
                     result.Join(RiderTooltipSeparator)
                 | _ -> String.Empty
