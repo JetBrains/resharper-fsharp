@@ -32,4 +32,8 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup>
+    <Reference Include="WindowsBase" />
+    <Reference Include="System.Windows.Forms" /> <!--needed for completion to work -->
+  </ItemGroup>
 </Project>

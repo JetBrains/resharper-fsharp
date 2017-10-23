@@ -1,6 +1,7 @@
 ﻿using System;
 using JetBrains.Annotations;
 using JetBrains.DataFlow;
+using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Daemon.CaretDependentFeatures;
 using JetBrains.ReSharper.Daemon.CSharp.ContextHighlighters;
 using JetBrains.ReSharper.Feature.Services.Contexts;
@@ -12,8 +13,8 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi.DataContext;
 using JetBrains.ReSharper.Psi.Tree;
-using Microsoft.FSharp.Control;
-using Microsoft.FSharp.Core;
+using JetBrains.Util;
+using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
 {
@@ -37,15 +38,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
       return new FSharpUsagesContextHighlighter().GetDataProcessAction(prolongedLifetime, psiDocumentRangeView);
     }
 
-    protected override void CollectHighlightings(IPsiDocumentRangeView psiDocumentRangeView,
-      HighlightingsConsumer consumer)
+    protected override void CollectHighlightings(IPsiDocumentRangeView documentView, HighlightingsConsumer consumer)
     {
-      var psiView = psiDocumentRangeView.View<FSharpLanguage>();
-      var file = psiView.GetSelectedTreeNode<IFSharpFile>();
-      if (file == null)
-        return;
-
-      var document = psiDocumentRangeView.DocumentRangeFromMainDocument.Document;
+      var psiView = documentView.View<FSharpLanguage>();
       var token = psiView.GetSelectedTreeNode<FSharpIdentifierToken>();
       if (token == null)
         return;
@@ -53,7 +48,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
       // todo: type parameters: t<$caret$type> or t<'$caret$ttype>
       // todo: namespaces, use R# search?
 
-      var checkResults = file.GetParseAndCheckResults(true)?.Value.CheckResults;
+      var file = psiView.GetSelectedTreeNode<IFSharpFile>();
+      var checkResults = file?.GetParseAndCheckResults(true)?.Value.CheckResults;
       if (checkResults == null)
         return;
 
@@ -61,11 +57,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
       if (symbol == null)
         return;
 
-      var symbolUsages = FSharpAsync.RunSynchronously(checkResults.GetUsesOfSymbolInFile(symbol),
-        FSharpOption<int>.Some(2000), null);
-      foreach (var symbolUse in symbolUsages)
+      var symbolUsages = checkResults.GetUsesOfSymbolInFile(symbol).RunAsTask();
+      foreach (var symbolUse in symbolUsages ?? EmptyArray<FSharpSymbolUse>.Instance)
       {
-        var treeOffset = document.GetTreeEndOffset(symbolUse.RangeAlternate);
+        var treeOffset = documentView.DocumentRangeFromMainDocument.Document.GetTreeEndOffset(symbolUse.RangeAlternate);
         var usageToken = file.FindTokenAt(treeOffset - 1) as FSharpIdentifierToken;
         if (usageToken == null)
           continue;
