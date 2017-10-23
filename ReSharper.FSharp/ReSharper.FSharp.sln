@@ -19,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{2E19336B-313
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{7B41BA27-ACA5-43D2-9EBA-2E604D63A4E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FSharp.Tests", "test\src\FSharp.Tests\FSharp.Tests.fsproj", "{AF85AA16-C863-42F2-AE7E-44C3E36F8883}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Tests", "test\src\FSharp.Tests\FSharp.Tests.fsproj", "{AF85AA16-C863-42F2-AE7E-44C3E36F8883}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

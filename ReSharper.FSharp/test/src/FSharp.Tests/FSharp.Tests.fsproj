@@ -28,4 +28,9 @@
     <ProjectReference Include="..\..\..\src\FSharp.Psi\FSharp.Psi.csproj" />
     <ProjectReference Include="..\..\..\src\FSharp.Psi.Features\FSharp.Psi.Features.fsproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="JetBrains.ReSharper.Plugins.FSharp.Tests.dll.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 </Project>
