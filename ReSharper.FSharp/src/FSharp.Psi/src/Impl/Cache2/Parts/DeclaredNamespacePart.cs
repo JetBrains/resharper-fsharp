@@ -23,6 +23,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       return null;
     }
 
+    public override string ToString() => $"FSharp.DeclaredNamespacePart:{ShortName}@{Offset}";
+
     protected override byte SerializationTag => (byte) FSharpPartKind.DeclaredNamespace;
   }
 }
