@@ -7,7 +7,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FSharp.Psi\FSharp.Psi.csproj" />
-    <ProjectReference Include="..\FSharp.Psi.Features\FSharp.Psi.Features.fsproj" />
   </ItemGroup>
 
   <ItemGroup>

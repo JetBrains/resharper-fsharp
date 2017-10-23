@@ -12,7 +12,7 @@
     <Compile Include="src\CodeCompletion\FSharpKeywordLookupItem.fs" />
     <Compile Include="src\CodeCompletion\FSharpKeywordsProvider.fs" />
     <Compile Include="src\CodeCompletion\FSharpLookupItem.fs" />
-    <Compile Include="src\CodeCompletion\FSharpLookupItemsProvider.fs" />
+    <Compile Include="src\CodeCompletion\FSharpCompletionProviders.fs" />
     <Compile Include="src\CodeStructure\FSharpCodeStructure.fs" />
     <Compile Include="src\Daemon\Highlightings\ErrorHighlightings.fs" />
     <Compile Include="src\Daemon\Stages\FSharpIdentifierTooltipProvider.fs" />
