@@ -22,7 +22,7 @@ type FSharpParseAndCheckResults =
       CheckResults: FSharpCheckFileResults
     }
 
-[<ShellComponent>]
+[<ShellComponent; AllowNullLiteral>]
 type FSharpCheckerService(lifetime, logger: Util.ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier) =
     do
         Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "30")
