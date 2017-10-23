@@ -4,6 +4,7 @@ open System.Collections.Generic
 open JetBrains.DataFlow
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties.FSharpProjectPropertiesFactory
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.TestFramework
@@ -34,7 +35,7 @@ type FSharpSymbolCacheTest() =
         currentTestName <- null
 
     override x.GetProjectProperties(platformId, targetFrameworkIds, _) =
-        FSharpProjectPropertiesFactory.Factory.CreateProjectProperties(platformId, targetFrameworkIds) :> _
+        Factory.CreateProjectProperties(platformId, targetFrameworkIds) :> _
 
     override x.DoTest(testProject) =
         x.Solution.GetPsiServices().Files.CommitAllDocuments()

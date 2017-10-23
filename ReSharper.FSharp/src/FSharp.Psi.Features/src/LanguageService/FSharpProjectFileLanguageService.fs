@@ -11,7 +11,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Psi
 
 [<ProjectFileType(typeof<FSharpProjectFileType>)>]
-type FSharpProjectFileLanguageService(projectFileType, fsCheckerService: FSharpCheckerService, fsFileService: FSharpFileService) =
+type FSharpProjectFileLanguageService(projectFileType, fsCheckerService: FSharpCheckerService, fsFileService: IFSharpFileService) =
     inherit ProjectFileLanguageService(projectFileType)
 
     override x.PsiLanguageType = FSharpLanguage.Instance :> _
@@ -27,5 +27,5 @@ type FSharpProjectFileLanguageService(projectFileType, fsCheckerService: FSharpC
         FSharpPsiProperties(projectFile, sourceFile, providesCodeModel) :> _
 
 [<ProjectFileType(typeof<FSharpScriptProjectFileType>)>]
-type FSharpScriptProjectFileLanguageService(projectFileType, fsCheckerService, fsFileService: FSharpFileService) =
+type FSharpScriptProjectFileLanguageService(projectFileType, fsCheckerService, fsFileService: IFSharpFileService) =
     inherit FSharpProjectFileLanguageService(projectFileType, fsCheckerService, fsFileService)

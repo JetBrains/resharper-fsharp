@@ -6,6 +6,9 @@ open JetBrains.ReSharper.Host.Features.Settings
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 open JetBrains.ReSharper.Psi
 
+type IFSharpFileService =
+    abstract member IsScript: IPsiSourceFile -> bool
+
 [<ShellComponent>]
 type FSharpFileService(settingsLocation: RiderAnyProductSettingsLocation) =
     let scratchesDir =
@@ -13,6 +16,7 @@ type FSharpFileService(settingsLocation: RiderAnyProductSettingsLocation) =
         settingsLocation.GetSettingsPath(HostFolderLifetime.TempFolder, ApplicationHostDetails.PerHost)
             .Parent / "scratches"
 
-    member x.IsScript(file: IPsiSourceFile) =
-        file.LanguageType.Equals(FSharpScriptProjectFileType.Instance) ||
-        file.GetLocation().Parent.Equals(scratchesDir)
+    interface IFSharpFileService with
+        member x.IsScript(file: IPsiSourceFile) =
+            file.LanguageType.Equals(FSharpScriptProjectFileType.Instance) ||
+            file.GetLocation().Parent.Equals(scratchesDir)

@@ -35,7 +35,7 @@ open Microsoft.FSharp.Compiler.SourceCodeServices
 [<SolutionComponent>]
 type FSharpProjectOptionsProvider(lifetime, logger, solution: ISolution, checkerService: FSharpCheckerService,
                                   optionsBuilder: FSharpProjectOptionsBuilder, changeManager: ChangeManager,
-                                  fsFileService: FSharpFileService) as this =
+                                  fsFileService: IFSharpFileService) as this =
     inherit RecursiveProjectModelChangeDeltaVisitor()
 
     let projects = Dictionary<IProject, FSharpProject>()
