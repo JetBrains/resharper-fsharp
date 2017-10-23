@@ -1,5 +1,6 @@
 ﻿using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Files;
 
 // ReSharper disable once CheckNamespace
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -23,5 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     protected FSharpLanguage([NotNull] string name, [NotNull] string presentableName) : base(name, presentableName)
     {
     }
+
+    public override PsiLanguageCategories SupportedCategories => PsiLanguageCategories.Dominant;
   }
 }

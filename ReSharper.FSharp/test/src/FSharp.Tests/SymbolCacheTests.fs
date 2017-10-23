@@ -5,8 +5,10 @@ open JetBrains.DataFlow
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties.FSharpProjectPropertiesFactory
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Caches.SymbolCache
 open JetBrains.ReSharper.TestFramework
 open JetBrains.ReSharper.TestFramework.Components.Psi
 open JetBrains.Util
@@ -15,10 +17,12 @@ open NUnit.Framework
 type FileCollector() =
     inherit RecursiveProjectVisitor(false)
 
-    member val ProjectFiles = List<IProjectFile>()
-    override x.VisitProjectFile(file) = x.ProjectFiles.Add(file)
+    let projectFiles = List<IProjectFile>()
+    member x.ProjectFiles = projectFiles |> Seq.choose (fun f -> f.ToSourceFile() |> Option.ofObj) |> Array.ofSeq
 
-[<FSharpTest; TestFixture>]
+    override x.VisitProjectFile(file) = projectFiles.Add(file)
+
+[<FSharpTest; TestFixture; TestFileExtension(FSharpProjectFileType.FsExtension)>]
 type FSharpSymbolCacheTest() =
     inherit BaseTestWithSingleProject()
 
@@ -31,7 +35,8 @@ type FSharpSymbolCacheTest() =
         let files =
             x.TestDataPath2.Combine(testName).GetChildFiles("*", PathSearchFlags.RecurseIntoSubdirectories)
             |> Seq.map (fun f -> f.FullPath)
-        x.DoTestSolution(Array.ofSeq files)
+            |> Array.ofSeq
+        x.DoTestSolution(files)
         currentTestName <- null
 
     override x.GetProjectProperties(platformId, targetFrameworkIds, _) =
@@ -46,7 +51,7 @@ type FSharpSymbolCacheTest() =
             x.ExecuteWithGold(currentTestName, fun builder ->
                 let visitor = FileCollector()
                 testProject.Accept(visitor)
-                helper.BuildCache(cache, visitor.ProjectFiles.SelectNotNull(fun f -> f.ToSourceFile()) |> Array.ofSeq)
+                helper.BuildCache(cache, visitor.ProjectFiles)
                 builder.WriteLine("-- ORIGINAL --")
                 cache.TestDump(builder, false)
 
@@ -56,9 +61,9 @@ type FSharpSymbolCacheTest() =
                     builder.WriteLine("-- RESTORED --")
                     cache2.TestDump(builder, false))
       
-                let visitor2 = FileCollector()
-                testProject.Accept(visitor2)
-                helper.BuildCache(cache, visitor2.ProjectFiles.SelectNotNull(fun f -> f.ToSourceFile()) |> Array.ofSeq)
+                let visitor = FileCollector()
+                testProject.Accept(visitor)
+                helper.BuildCache(cache, visitor.ProjectFiles)
                 builder.WriteLine("-- UPDATED --")
                 cache.TestDump(builder, false))) |> ignore
 

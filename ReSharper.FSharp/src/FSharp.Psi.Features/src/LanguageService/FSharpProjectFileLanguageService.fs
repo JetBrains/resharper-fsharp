@@ -9,6 +9,7 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Resources.Shell
 
 [<ProjectFileType(typeof<FSharpProjectFileType>)>]
 type FSharpProjectFileLanguageService(projectFileType, fsCheckerService: FSharpCheckerService, fsFileService: IFSharpFileService) =
@@ -23,7 +24,7 @@ type FSharpProjectFileLanguageService(projectFileType, fsCheckerService: FSharpC
         | _ -> FSharpLexerFactory(sourceFile, fsCheckerService.GetDefines(sourceFile)) :> _
 
     override x.GetPsiProperties(projectFile, sourceFile, _) =
-        let providesCodeModel = projectFile.Properties.BuildAction.IsCompile() || fsFileService.IsScript(sourceFile)
+        let providesCodeModel = projectFile.Properties.BuildAction.IsCompile() || fsFileService.IsScript(sourceFile) || Shell.Instance.IsTestShell
         FSharpPsiProperties(projectFile, sourceFile, providesCodeModel) :> _
 
 [<ProjectFileType(typeof<FSharpScriptProjectFileType>)>]
