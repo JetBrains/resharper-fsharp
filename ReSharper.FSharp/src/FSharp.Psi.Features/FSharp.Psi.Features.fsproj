@@ -40,7 +40,7 @@
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="4.1.18" />
     <PackageReference Include="JetBrains.Fantomas" Version="2.6.8" />
-    <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="14.0.7" />
+    <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FCSVersion)" />
     <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
   </ItemGroup>
   <ItemGroup>
