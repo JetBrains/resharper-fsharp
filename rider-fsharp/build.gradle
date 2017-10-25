@@ -61,14 +61,17 @@ def files = tree.include(
         'Services.FSharp/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Services.Cs.dll',
         'Services.FSharp/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Services.Cs.pdb')
 
-files.forEach({ f ->
-
-})
-
 prepareSandbox {
     files.forEach({ f ->
         def file = file(f)
-        assert file.isFile() && file.exists()
+        logger.warn(file.toString())
+        from(f, { into "$intellij.pluginName/dotnet" })
+    })
+}
+
+prepareTestingSandbox {
+    files.forEach({ f ->
+        def file = file(f)
         logger.warn(file.toString())
         from(f, { into "$intellij.pluginName/dotnet" })
     })
@@ -82,8 +85,6 @@ repositories {
     mavenCentral()
 }
 
-ext.kotlin_version = '1.1.4-3'
-dependencies {
-    testCompile 'junit:junit:4.12'
-    testCompile "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+test {
+    useTestNG() {}
 }
