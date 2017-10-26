@@ -65,17 +65,24 @@ def files = [
 prepareSandbox {
     files.forEach({ f ->
         def file = file("$src/$f")
-        if (!file.exists()) throw new RuntimeException("File $file does not exists")
-        logger.warn(file.toString())
-        from(f, { into "$intellij.pluginName/dotnet" })
+        if (!file.exists()) throw new RuntimeException("File $file does not exist")
+
+        logger.warn("prepareSandbox: " +
+                file.toString() + " -> " +
+                "$destinationDir/$intellij.pluginName/dotnet")
+        from(file, { into "$intellij.pluginName/dotnet" })
     })
 }
 
 prepareTestingSandbox {
     files.forEach({ f ->
-        def file = file(f)
-        logger.warn(file.toString())
-        from(f, { into "$intellij.pluginName/dotnet" })
+        def file = file("$src/$f")
+        if (!file.exists()) throw new RuntimeException("File $file does not exist")
+
+        logger.warn("prepareTestingSandbox: " +
+                file.toString() + " -> " +
+                "$destinationDir/$intellij.pluginName/dotnet")
+        from(file, { into "$intellij.pluginName/dotnet" })
     })
 }
 
