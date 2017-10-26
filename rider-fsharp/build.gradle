@@ -42,24 +42,16 @@ def src = '../ReSharper.FSharp/src'
 def files = [
         'FSharp.Common/bin/Debug/net451/FSharp.Core.dll',
         'FSharp.Common/bin/Debug/net451/FSharp.Compiler.Service.dll',
-        //'FSharp.Common/bin/Debug/net451/FSharp.Compiler.Service.dll.pdb',
         'FSharp.Common/bin/Debug/net451/FSharp.Compiler.Service.MSBuild.v12.dll',
-        //'FSharp.Services/bin/Debug/net451/FantomasLib.dll',
+        'FSharp.Psi.Features/bin/Debug/net451/FantomasLib.dll',
 
         'FSharp.ProjectModelBase/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase.dll',
-        'FSharp.ProjectModelBase/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase.pdb',
-
         'FSharp.Common/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Common.dll',
-        //'FSharp.Common/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Common.pdb',
         'FSharp.Psi/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Psi.dll',
-        'FSharp.Psi/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Psi.pdb',
         'FSharp.Psi.Features/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Psi.Features.dll',
-        //'FSharp.Psi.Features/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Psi.Features.pdb',
 
         'Daemon.FSharp/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.dll',
-        'Daemon.FSharp/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.pdb',
-        'Services.FSharp/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Services.Cs.dll',
-        'Services.FSharp/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Services.Cs.pdb'
+        'Services.FSharp/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Services.Cs.dll'
 ]
 
 prepareSandbox {
@@ -87,7 +79,7 @@ prepareTestingSandbox {
 }
 
 wrapper {
-    gradleVersion '4.1'
+    gradleVersion '4.2'
 }
 
 repositories {
