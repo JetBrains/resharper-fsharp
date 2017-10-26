@@ -89,4 +89,8 @@ repositories {
 
 test {
     useTestNG() {}
+    testLogging {
+        showStandardStreams = true
+        exceptionFormat "full"
+    }
 }
