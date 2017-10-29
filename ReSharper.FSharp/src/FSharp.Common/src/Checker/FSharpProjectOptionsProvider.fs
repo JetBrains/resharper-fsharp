@@ -39,7 +39,6 @@ type FSharpProjectOptionsProvider(lifetime, logger, solution: ISolution, checker
     inherit RecursiveProjectModelChangeDeltaVisitor()
 
     let projects = Dictionary<IProject, FSharpProject>()
-    let scriptOptions = Dictionary<FileSystemPath, FSharpProjectOptions>()
     let projectsToInvalidate = JetHashSet<IProject>()
     let getScriptOptionsLock = obj()
 
@@ -120,15 +119,13 @@ type FSharpProjectOptionsProvider(lifetime, logger, solution: ISolution, checker
         let path = file.GetLocation()
         let filePath = path.FullPath
         let source = file.Document.GetText()
-        let loadTime = DateTime.Now
         lock getScriptOptionsLock (fun _ ->
-        let getScriptOptionsAsync = checkerService.Checker.GetProjectOptionsFromScript(filePath, source, loadTime)
+        let getScriptOptionsAsync = checkerService.Checker.GetProjectOptionsFromScript(filePath, source)
         try
             let options, errors = getScriptOptionsAsync.RunAsTask()
             if not errors.IsEmpty then
                 Logger.Warn(logger, "Script options for {0}: {1}", filePath, concatErrors errors)
             let options = x.FixScriptOptions(options)
-            scriptOptions.[path] <- options
             Some options
         with
         | :? ProcessCancelledException -> reraise()
