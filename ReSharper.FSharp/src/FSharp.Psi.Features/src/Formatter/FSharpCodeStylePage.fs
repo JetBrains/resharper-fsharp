@@ -45,8 +45,8 @@ type FSharpFormatSettingsKey() =
     
 
 [<Language(typeof<FSharpLanguage>)>]
-type FSharpDummyCodeFormatter(loggerProvider, settingsOptimization) =
-    inherit CodeFormatterBase<FSharpFormatSettingsKey>(loggerProvider, settingsOptimization)
+type FSharpDummyCodeFormatter(formatterRequirements) =
+    inherit CodeFormatterBase<FSharpFormatSettingsKey>(formatterRequirements)
 
     override x.LanguageType = FSharpLanguage.Instance :> _
     override x.Format(first,last,_,_) = TreeRange(first, last) :> _
@@ -63,8 +63,8 @@ type FSharpDummyCodeFormatter(loggerProvider, settingsOptimization) =
     override x.FormatDeletedNodes(_,_,_) = InvalidOperationException() |> raise
     override x.FormatReplacedNode(_,_) = InvalidOperationException() |> raise
     
-    override x.CreateFormatterContext(profile, firstNode, lastNode, parameters, _, _) =
-        CodeFormattingContext(x, firstNode, lastNode, profile, loggerProvider.FormatterLogger, parameters);
+    override x.CreateFormatterContext(profile, firstNode, lastNode, parameters, _) =
+        CodeFormattingContext(x, firstNode, lastNode, profile, formatterRequirements.FormatterLoggerProvider.FormatterLogger, parameters);
 
 [<CodePreviewPreparatorComponent>]
 type FSharpCodePreviewPreparator() = 
