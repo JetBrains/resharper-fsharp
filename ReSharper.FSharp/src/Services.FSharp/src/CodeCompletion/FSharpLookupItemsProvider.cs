@@ -40,6 +40,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
 
       foreach (var overloadsGroup in completions)
       {
+        collector.CheckForInterrupt();
         if (overloadsGroup.IsEmpty)
           continue;
 
