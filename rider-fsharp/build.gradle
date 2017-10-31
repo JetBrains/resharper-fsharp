@@ -23,7 +23,7 @@ intellij {
     // localPath = "C:\\Users\\ivan.pashchenko\\AppData\\Local\\JetBrains\\Toolbox\\apps\\Rider\\ch-0\\dev"
     // localPath 'build/riderRD-LATEST-TRUNK-SNAPSHOT'
 
-    version 'LATEST-TRUNK-SNAPSHOT'
+    version '173-SNAPSHOT'
     downloadSources false
     updateSinceUntilBuild false
 }
