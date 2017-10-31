@@ -64,6 +64,9 @@ prepareSandbox {
                 "$destinationDir/$intellij.pluginName/dotnet")
         from(file, { into "$intellij.pluginName/dotnet" })
     })
+    into("$intellij.pluginName/projectTemplates") {
+        from 'projectTemplates'
+    }
 }
 
 prepareTestingSandbox {
@@ -76,6 +79,9 @@ prepareTestingSandbox {
                 "$destinationDir/$intellij.pluginName/dotnet")
         from(file, { into "$intellij.pluginName/dotnet" })
     })
+    into("$intellij.pluginName/projectTemplates") {
+        from 'projectTemplates'
+    }
 }
 
 wrapper {
