@@ -10,25 +10,31 @@ import com.jetbrains.rider.util.idea.LifetimedComponent
 import kotlin.properties.Delegates
 
 class FsiHost(val project: Project) : ILifetimedComponent by LifetimedComponent(project) {
-    val rdFsiHost: RdFSharpInteractiveHost get() = project.solution.fSharpInteractiveHost
+    private val rdFsiHost: RdFSharpInteractiveHost get() = project.solution.fSharpInteractiveHost
     var moveCaretOnSendLine by Delegates.notNull<Boolean>()
+    var copyRecentToEditor by Delegates.notNull<Boolean>()
     private var fsiConsole: FsiConsoleRunner? = null
 
     init {
         rdFsiHost.moveCaretOnSendLine.advise(componentLifetime) { moveCaretOnSendLine = it }
+        rdFsiHost.copyRecentToEditor.advise(componentLifetime) { copyRecentToEditor = it }
     }
 
     internal fun sendToFsi(editor: Editor, file: PsiFile) = synchronized(this) {
-        if (fsiConsole?.isValid() == true)
-            fsiConsole!!.sendActionExecutor.execute(editor, file)
-        else
-            createConsoleRunner({ it.sendActionExecutor.execute(editor, file) })
+        execute { it.sendActionExecutor.execute(editor, file) }
+    }
+
+    internal fun sendToFsi(visibleText: String, fsiText: String) = synchronized(this) {
+        execute { it.sendText(visibleText, fsiText) }
+    }
+
+    private fun execute(action: (FsiConsoleRunner) -> Unit) {
+        if (fsiConsole?.isValid() == true) action(fsiConsole!!)
+        else createConsoleRunner { action(it) }
     }
 
     internal fun resetFsiConsole() = synchronized(this) {
-        if (fsiConsole?.isValid() == true) {
-            fsiConsole!!.processHandler.destroyProcess()
-        }
+        if (fsiConsole?.isValid() == true) fsiConsole!!.processHandler.destroyProcess()
         createConsoleRunner()
     }
 

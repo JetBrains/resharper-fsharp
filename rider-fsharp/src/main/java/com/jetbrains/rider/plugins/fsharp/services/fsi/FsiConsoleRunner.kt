@@ -34,22 +34,25 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost)
         val fsiTitle = "F# Interactive"
     }
 
-    val projectDir = if (fsiHost.project.isDirectoryBased) fsiHost.project.baseDir else null
-    val workingDir = if (projectDir?.exists() ?: false) projectDir else VfsUtil.getUserHomeDir()
+    private val projectDir = if (fsiHost.project.isDirectoryBased) fsiHost.project.baseDir else null
+    private val workingDir = if (projectDir?.exists() == true) projectDir else VfsUtil.getUserHomeDir()
     val cmdLine = GeneralCommandLine()
             .withExePath(sessionInfo.fsiPath)
-            .withParameters(listOf("--readline-") + sessionInfo.args)
+            .withParameters(sessionInfo.args + listOf("--readline-"))
             .withWorkDirectory(workingDir?.path)
     val sendActionExecutor = SendToFsiActionExecutor(this)
+
     private var contentDescriptor by Delegates.notNull<RunContentDescriptor>()
+    val commandHistory = CommandHistory()
 
     fun isValid(): Boolean = !(processHandler?.isProcessTerminated ?: true)
-
 
     fun sendText(visibleText: String, fsiText: String) {
         consoleView.print(visibleText, ConsoleViewContentType.USER_INPUT)
         consoleView.print("\n", ConsoleViewContentType.NORMAL_OUTPUT)
         EditorUtil.scrollToTheEnd(consoleView.historyViewer)
+
+        commandHistory.addEntry(CommandHistory.Entry(visibleText, fsiText))
 
         // show the window without getting focus
         ExecutionManager.getInstance(project).contentManager.selectRunContent(contentDescriptor)
@@ -85,7 +88,8 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost)
         this.contentDescriptor = contentDescriptor
         val actionList = ContainerUtil.newArrayList<AnAction>(
                 createCloseAction(defaultExecutor, contentDescriptor),
-                ResetFsiAction(this.fsiHost))
+                ResetFsiAction(this.fsiHost),
+                CommandHistoryAction(this))
         toolbarActions.addAll(actionList)
         actionList.add(createConsoleExecAction(consoleExecuteActionHandler))
         return actionList
@@ -95,7 +99,13 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost)
         val gutterProvider = object : BasicGutterContentProvider() {
             override fun beforeEvaluate(e: Editor) = Unit
         }
-        return LanguageConsoleBuilder().gutterContentProvider(gutterProvider).build(project, PlainTextLanguage.INSTANCE)
+        val consoleView = LanguageConsoleBuilder().gutterContentProvider(gutterProvider).build(project, PlainTextLanguage.INSTANCE)
+
+        val historyKeyListener = HistoryKeyListener(fsiHost.project, consoleView.consoleEditor, commandHistory)
+        consoleView.consoleEditor.contentComponent.addKeyListener(historyKeyListener)
+        commandHistory.listeners.add(historyKeyListener)
+
+        return consoleView
     }
 
     override fun createProcessHandler(process: Process): OSProcessHandler {

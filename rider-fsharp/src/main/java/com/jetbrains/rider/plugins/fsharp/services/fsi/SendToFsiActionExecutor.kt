@@ -4,10 +4,10 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.TextRange
 import com.intellij.psi.PsiFile
 
-class SendToFsiActionExecutor(val consoleRunner: FsiConsoleRunner) {
+class SendToFsiActionExecutor(private val consoleRunner: FsiConsoleRunner) {
     fun execute(editor: Editor, file: PsiFile) {
         val hasSelection = editor.selectionModel.hasSelection()
-        val visibleText = getTextToSend(editor, hasSelection)
+        val visibleText = getVisibleText(editor, hasSelection)
         if (!visibleText.isEmpty()) {
             val fsiText = "\n" +
                     "# silentCd @\"${file.containingDirectory.virtualFile.path}\" ;; \n" +
@@ -20,14 +20,14 @@ class SendToFsiActionExecutor(val consoleRunner: FsiConsoleRunner) {
             editor.caretModel.moveCaretRelatively(0, 1, false, false, true)
     }
 
-    fun getTextToSend(editor: Editor, hasSelection: Boolean) =
+    private fun getVisibleText(editor: Editor, hasSelection: Boolean) =
             if (hasSelection) editor.selectionModel.selectedText!!
             else {
                 val caretModel = editor.caretModel
-                editor.document.getText(TextRange(caretModel.visualLineStart, caretModel.visualLineEnd))
+                editor.document.getText(TextRange(caretModel.visualLineStart, caretModel.visualLineEnd)).substringBeforeLast("\n")
             }
 
-    fun getTextStartLine(editor: Editor, hasSelection: Boolean) =
+    private fun getTextStartLine(editor: Editor, hasSelection: Boolean) =
             if (hasSelection) editor.document.getLineNumber(editor.selectionModel.selectionStart)
             else editor.caretModel.logicalPosition.line
 }
