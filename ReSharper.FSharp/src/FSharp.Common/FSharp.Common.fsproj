@@ -19,6 +19,7 @@
     <Compile Include="src\Util\Util.fs" />
     <Compile Include="src\Util\FSharpAttributesUtil.fs" />
     <Compile Include="src\Util\FSharpSymbolUtil.fs" />
+    <Compile Include="src\Checker\FSharpAssemblyContentProvider.fs" />
     <Compile Include="src\Checker\FSharpSourceCache.fs" />
     <Compile Include="src\Checker\FileSystemShim.fs" />
     <Compile Include="src\Checker\FSharpCheckerExtensions.fs" />
