@@ -14,6 +14,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
 open JetBrains.ReSharper.Psi
+open JetBrains.UI.RichText
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
@@ -39,7 +40,14 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
                 let line, column = int context.Coords.Line + 1, int context.Coords.Column
                 let lineText = context.LineText
                 let qualifiers, partialName = context.Names
-                let getIconId = getIconId >> Option.ofObj
+                let getIconId =
+                    Some (fun (symbol, context) ->
+                        let icon = getIconId symbol
+                        let retType =
+                            getReturnType symbol
+                            |> Option.map (fun t -> t.Format(context))
+                            |> Option.toObj
+                        Some { Icon = icon; ReturnType = retType })
 
                 let getAllSymbols () = getAllSymbols checkResults
                 try
@@ -56,6 +64,11 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
                             let isError = item.Glyph = FSharpGlyph.Error
                             let lookupItem = FSharpLookupItem(item, context, isError, xmlDocService)
                             lookupItem.InitializeRanges(context.Ranges, basicContext)
+                            lookupItem.DisplayTypeName <-
+                                item.AdditionalInfo
+                                |> Option.map (fun i -> i.ReturnType)
+                                |> Option.toObj
+                                |> RichText
                             collector.Add(lookupItem)
 
                         collector.CheckForInterrupt()

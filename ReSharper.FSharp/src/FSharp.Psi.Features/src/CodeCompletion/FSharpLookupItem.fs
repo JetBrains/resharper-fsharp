@@ -23,6 +23,12 @@ type FSharpLookupCandidateInfo =
         XmlDoc: FSharpXmlDoc
     }
 
+type FSharpLookupAdditionalInfo =
+    {
+        Icon: IconId
+        ReturnType: string
+    }
+
 type FSharpLookupCandidate(info: FSharpLookupCandidateInfo, xmlDocService: FSharpXmlDocService) =
     interface ICandidate with
         member x.GetSignature(_, _, _, _, _) = RichText(info.Description)
@@ -35,7 +41,7 @@ type FSharpLookupCandidate(info: FSharpLookupCandidateInfo, xmlDocService: FShar
         member x.ObsoleteDescription = null
         member val IsFilteredOut = false with get, set
 
-type FSharpLookupItem(item: FSharpDeclarationListItem<IconId>, context: FSharpCodeCompletionContext, isError: bool,
+type FSharpLookupItem(item: FSharpDeclarationListItem<FSharpLookupAdditionalInfo>, context: FSharpCodeCompletionContext, isError: bool,
                       xmlDocService: FSharpXmlDocService) =
     inherit TextLookupItemBase()
 
@@ -49,7 +55,7 @@ type FSharpLookupItem(item: FSharpDeclarationListItem<IconId>, context: FSharpCo
             | _ -> [])
         |> List.concat)
 
-    override x.Image = Option.toObj item.AdditionalInfo
+    override x.Image = item.AdditionalInfo |> Option.map (fun i -> i.Icon) |> Option.toObj
     override x.Text = item.NameInCode
 
     override x.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret) =
