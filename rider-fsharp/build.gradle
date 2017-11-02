@@ -21,7 +21,7 @@ intellij {
     // localPath = '/Users/matt/Library/Application Support/JetBrains/Toolbox/apps/Rider/ch-1/171.4089.265/Rider EAP.app/Contents'
     // localPath = "C:\\Users\\Ivan.Shakhov\\AppData\\Local\\JetBrains\\Toolbox\\apps\\Rider\\ch-0\\171.4456.459"
     // localPath = "C:\\Users\\ivan.pashchenko\\AppData\\Local\\JetBrains\\Toolbox\\apps\\Rider\\ch-0\\dev"
-    // localPath 'build/riderRD-LATEST-TRUNK-SNAPSHOT'
+//    localPath 'build/riderRD-173-SNAPSHOT'
 
     version '173-SNAPSHOT'
     downloadSources false
@@ -39,7 +39,7 @@ sourceSets {
 }
 
 def src = '../ReSharper.FSharp/src'
-def files = [
+def dllFiles = [
         'FSharp.Common/bin/Debug/net451/FSharp.Core.dll',
         'FSharp.Common/bin/Debug/net451/FSharp.Compiler.Service.dll',
         'FSharp.Common/bin/Debug/net451/FSharp.Compiler.Service.MSBuild.v12.dll',
@@ -53,6 +53,21 @@ def files = [
         'Daemon.FSharp/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.dll',
         'Services.FSharp/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Services.Cs.dll'
 ]
+
+def pdbFiles = [
+        'FSharp.Common/bin/Debug/net451/FSharp.Compiler.Service.pdb',
+
+        'FSharp.ProjectModelBase/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase.pdb',
+        'FSharp.Common/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Common.pdb',
+        'FSharp.Psi/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Psi.pdb',
+        'FSharp.Psi.Features/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Psi.Features.pdb',
+
+        'Daemon.FSharp/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.pdb',
+        'Services.FSharp/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Services.Cs.pdb'
+]
+
+def debug = false
+def files = debug ? dllFiles + pdbFiles : dllFiles
 
 prepareSandbox {
     files.forEach({ f ->
