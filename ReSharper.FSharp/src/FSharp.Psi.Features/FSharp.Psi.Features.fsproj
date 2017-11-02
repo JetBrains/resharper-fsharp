@@ -52,5 +52,6 @@
     <Reference Include="PresentationFramework" />
     <Reference Include="System.Web" />
     <Reference Include="WindowsBase" />
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
 </Project>

@@ -43,4 +43,9 @@
   <ItemGroup>
     <ProjectReference Include="..\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="WindowsBase" />
+    <Reference Include="System.Windows.Forms" /> <!--needed for completion to work -->
+  </ItemGroup>
 </Project>
