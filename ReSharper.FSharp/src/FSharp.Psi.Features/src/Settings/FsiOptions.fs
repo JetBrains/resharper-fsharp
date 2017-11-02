@@ -1,5 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Settings
 
+open System
+open System.Linq.Expressions
 open System.Runtime.InteropServices
 open JetBrains.Application
 open JetBrains.Application.Settings
@@ -18,6 +20,7 @@ module FsiOptions =
     let [<Literal>] shadowCopyReferencesText = "Shadow copy assemblies"
     let [<Literal>] fsiArgsText = "F# Interactive arguments"
     let [<Literal>] moveCaretOnSendLineText = "Move caret down on Send Line"
+    let [<Literal>] copyRecentToEditorText = "Copy recent commands to Interactive editor"
 
     [<SettingsKey(typeof<HierarchySettings>, "Fsi")>]
     type FsiOptions() =
@@ -33,17 +36,24 @@ module FsiOptions =
         [<SettingsEntry(true, moveCaretOnSendLineText); DefaultValue>]
         val mutable MoveCaretOnSendLine: bool
 
+        [<SettingsEntry(true, copyRecentToEditorText); DefaultValue>]
+        val mutable CopyRecentToEditor: bool
+
     [<OptionsPage("FsiOptionsPage", "Fsi", typeof<ProjectModelThemedIcons.Fsharp>)>]
     type FsiOptionsPage(lifetime, optionsContext) as this =
         inherit SimpleOptionsPage(lifetime, optionsContext)
         let _ = ProjectModelThemedIcons.Fsharp // workaround to create assembly reference (Microsoft/visualfsharp#3522)
 
         do
-            this.AddBoolOption((fun (key: FsiOptions) -> key.UseAnyCpuVersion), RichText(useAnyCpuVersionText)) |> ignore
-            this.AddBoolOption((fun (key: FsiOptions) -> key.ShadowCopyReferences), RichText(shadowCopyReferencesText)) |> ignore
-            this.AddBoolOption((fun (key: FsiOptions) -> key.MoveCaretOnSendLine), RichText(moveCaretOnSendLineText)) |> ignore
+            this.AddBool((fun key -> key.UseAnyCpuVersion), useAnyCpuVersionText)
+            this.AddBool((fun key -> key.ShadowCopyReferences), shadowCopyReferencesText)
+            this.AddBool((fun key -> key.MoveCaretOnSendLine), moveCaretOnSendLineText)
+            this.AddBool((fun key -> key.CopyRecentToEditor), copyRecentToEditorText)
             this.AddStringOption((fun (key: FsiOptions) -> key.FsiArgs), fsiArgsText) |> ignore
             this.FinishPage()
+
+        member x.AddBool(getter: Expression<Func<FsiOptions,_>>, text) =
+            this.AddBoolOption(getter, RichText(text)) |> ignore
 
     [<ShellComponent>]
     type FSharpSettingsCategoryProvider() =
