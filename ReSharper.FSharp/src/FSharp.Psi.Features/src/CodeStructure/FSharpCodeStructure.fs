@@ -86,7 +86,7 @@ type InterfaceImplementation(treeNode: IInterfaceImplementation, parent) =
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpCodeStructureProvider() =
     let isApplicable (node: ITreeNode) =
-        node :? ITypeMemberDeclaration || node :? IModuleMemberDeclaration ||
+        node :? ITypeMemberDeclaration || (node :? IModuleMemberDeclaration && not (node :? IOtherMemberDeclaration)) ||
         node :? IFSharpTypeMemberDeclaration  || node :? ITopLevelModuleOrNamespaceDeclaration
 
     let rec processNode (node: ITreeNode) (nodeElement: CodeStructureElement) =
