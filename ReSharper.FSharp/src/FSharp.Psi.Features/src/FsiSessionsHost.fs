@@ -1,5 +1,12 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.ContextActions
 
+open System
+open System.Diagnostics
+open System.Collections.Generic
+open System.IO
+open System.Linq
+open System.Text
+open System.Threading
 open JetBrains.Application.Settings
 open JetBrains.DataFlow
 open JetBrains.DocumentModel
@@ -21,13 +28,6 @@ open JetBrains.TextControl
 open JetBrains.UI.RichText
 open JetBrains.Util
 open JetBrains.Util.dataStructures.TypedIntrinsics
-open System
-open System.Diagnostics
-open System.Collections.Generic
-open System.IO
-open System.Linq
-open System.Text
-open System.Threading
 
 type SendToFsiActionType =
     | SendLine
@@ -46,9 +46,14 @@ type FsiSessionsHost(lifetime: Lifetime, solution: ISolution, solutionModel: Sol
     do
         rdFsiHost.RequestNewFsiSessionInfo.Set(this.GetNewFsiSessionInfo)
         let settings = solution.GetSettingsStore().SettingsStore.BindToContextLive(lifetime, ContextRange.ApplicationWide)
+
         let moveCaretOnSendLine = settings.GetValueProperty(lifetime, (fun (s: FsiOptions) -> s.MoveCaretOnSendLine))
         rdFsiHost.MoveCaretOnSendLine.Value <- moveCaretOnSendLine.Value
         moveCaretOnSendLine.FlowInto(lifetime, rdFsiHost.MoveCaretOnSendLine :> IRdProperty<_>)
+
+        let copyRecentToEditor = settings.GetValueProperty(lifetime, (fun (s: FsiOptions) -> s.CopyRecentToEditor))
+        rdFsiHost.MoveCaretOnSendLine.Value <- copyRecentToEditor.Value
+        copyRecentToEditor.FlowInto(lifetime, rdFsiHost.CopyRecentToEditor :> IRdProperty<_>)
 
     member x.GetNewFsiSessionInfo(_) =
         let settings = solution.GetSettingsStore()

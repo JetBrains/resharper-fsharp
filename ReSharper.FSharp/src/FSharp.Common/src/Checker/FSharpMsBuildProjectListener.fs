@@ -6,7 +6,7 @@ open JetBrains
 open JetBrains.Application
 open JetBrains.Application.changes
 open JetBrains.DataFlow
-open JetBrains.Platform.MsBuildModel
+open JetBrains.Platform.MsBuildHost.Models
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost.MsBuild

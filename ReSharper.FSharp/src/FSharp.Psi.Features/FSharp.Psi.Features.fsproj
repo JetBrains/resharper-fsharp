@@ -7,6 +7,13 @@
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi.Features</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="src\FSharpXmlDocService.fs" />
+    <Compile Include="src\CodeCompletion\FSharpCodeCompletionContext.fs" />
+    <Compile Include="src\CodeCompletion\FSharpKeywordLookupItem.fs" />
+    <Compile Include="src\CodeCompletion\FSharpKeywordsProvider.fs" />
+    <Compile Include="src\CodeCompletion\FSharpLookupItem.fs" />
+    <Compile Include="src\CodeCompletion\FSharpCompletionProviders.fs" />
+    <Compile Include="src\CodeStructure\FSharpCodeStructure.fs" />
     <Compile Include="src\Daemon\Highlightings\ErrorHighlightings.fs" />
     <Compile Include="src\Daemon\Stages\FSharpIdentifierTooltipProvider.fs" />
     <Compile Include="src\Daemon\Stages\ErrorsStageProcessBase.fs" />
@@ -46,10 +53,12 @@
   <ItemGroup>
     <ProjectReference Include="..\Daemon.FSharp\Daemon.FSharp.csproj" />
     <ProjectReference Include="..\FSharp.Psi\FSharp.Psi.csproj" />
+    <ProjectReference Include="..\Services.FSharp\Services.FSharp.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PresentationFramework" />
     <Reference Include="System.Web" />
     <Reference Include="WindowsBase" />
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
 </Project>

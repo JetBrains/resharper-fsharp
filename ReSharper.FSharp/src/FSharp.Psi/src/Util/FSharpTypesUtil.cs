@@ -118,11 +118,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     }
 
     [CanBeNull]
+    private static FSharpType GetStrippedType([NotNull] FSharpType fsType)
+    {
+      try
+      {
+        return fsType.StrippedType;
+      }
+      catch (Exception e)
+      {
+        Logger.LogMessage(LoggingLevel.WARN, "Error mapping type {0}", fsType);
+        Logger.LogExceptionSilently(e);
+        return null;
+      }
+    }
+
+    [CanBeNull]
     public static IType GetType([NotNull] FSharpType fsType, [CanBeNull] IList<ITypeParameter> typeParamsFromContext,
       [NotNull] IPsiModule psiModule, bool isFromMethodSig = false, bool isFromReturn = false)
     {
-      var type = fsType.StrippedType;
-      if (type.IsUnresolved)
+      var type = GetStrippedType(fsType);
+      if (type?.IsUnresolved ?? true)
         return TypeFactory.CreateUnknownType(psiModule);
 
       // F# 4.0 specs 18.1.3

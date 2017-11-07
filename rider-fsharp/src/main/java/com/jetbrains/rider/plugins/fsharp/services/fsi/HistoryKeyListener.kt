@@ -13,13 +13,11 @@ class HistoryKeyListener(
     : KeyAdapter(), HistoryUpdateListener {
 
     private var historyPos = 0
-    private var prevCaretOffset = -1
     private var unfinishedCommand = ""
 
     override fun onNewEntry(entry: CommandHistory.Entry) {
         // reset history positions
         historyPos = history.size
-        prevCaretOffset = -1
         unfinishedCommand = ""
     }
 
@@ -31,7 +29,6 @@ class HistoryKeyListener(
         when (e.keyCode) {
             KeyEvent.VK_UP -> moveHistoryCursor(HistoryMove.UP)
             KeyEvent.VK_DOWN -> moveHistoryCursor(HistoryMove.DOWN)
-            KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT -> prevCaretOffset = consoleEditor.caretModel.offset
         }
     }
 
@@ -45,14 +42,10 @@ class HistoryKeyListener(
         val curOffset = caret.offset
         val curLine = document.getLineNumber(curOffset)
         val totalLines = document.lineCount
-        val isMultiline = totalLines > 1
 
         when (move) {
             HistoryMove.UP -> {
-                if (curLine != 0 || (isMultiline && prevCaretOffset != 0)) {
-                    prevCaretOffset = curOffset
-                    return
-                }
+                if (curLine != 0) return
 
                 if (historyPos == history.size) {
                     unfinishedCommand = document.text
@@ -62,22 +55,16 @@ class HistoryKeyListener(
                 WriteCommandAction.runWriteCommandAction(project) {
                     document.setText(history[historyPos].visibleText)
                     EditorUtil.scrollToTheEnd(consoleEditor)
-                    prevCaretOffset = 0
-                    caret.moveToOffset(0)
+                    caret.moveToOffset(document.textLength)
                 }
             }
             HistoryMove.DOWN -> {
-                if (historyPos == history.size) return
-
-                if (curLine != totalLines - 1 || (isMultiline && prevCaretOffset != document.textLength)) {
-                    prevCaretOffset = curOffset
-                    return
-                }
+                if (historyPos == history.size || curLine != totalLines - 1) return
 
                 historyPos = Math.min(historyPos + 1, history.size)
                 WriteCommandAction.runWriteCommandAction(project) {
                     document.setText(if (historyPos == history.size) unfinishedCommand else history[historyPos].visibleText)
-                    prevCaretOffset = document.textLength
+                    caret.moveToOffset(document.textLength)
                     EditorUtil.scrollToTheEnd(consoleEditor)
                 }
             }

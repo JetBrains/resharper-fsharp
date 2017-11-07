@@ -5,7 +5,7 @@ open System.Collections.Generic
 open JetBrains.Annotations
 open JetBrains.Application
 open JetBrains.Application.Components
-open JetBrains.Platform.MsBuildModel
+open JetBrains.Platform.MsBuildHost.Models
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Model2.Assemblies.Interfaces
 open JetBrains.ProjectModel.ProjectsHost

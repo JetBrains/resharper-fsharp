@@ -1,5 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Settings
 
+open System
+open System.Linq.Expressions
 open System.Runtime.InteropServices
 open JetBrains.Application
 open JetBrains.Application.Settings
@@ -18,7 +20,7 @@ module FsiOptions =
     let [<Literal>] shadowCopyReferencesText = "Shadow copy assemblies"
     let [<Literal>] fsiArgsText = "F# Interactive arguments"
     let [<Literal>] moveCaretOnSendLineText = "Move caret down on Send Line"
-    let [<Literal>] copyRecentToEditor = "Copy recent commands to editor"
+    let [<Literal>] copyRecentToEditorText = "Copy recent commands to Interactive editor"
 
     [<SettingsKey(typeof<HierarchySettings>, "Fsi")>]
     type FsiOptions() =
@@ -34,7 +36,7 @@ module FsiOptions =
         [<SettingsEntry(true, moveCaretOnSendLineText); DefaultValue>]
         val mutable MoveCaretOnSendLine: bool
 
-        [<SettingsEntry(true, copyRecentToEditor); DefaultValue>]
+        [<SettingsEntry(true, copyRecentToEditorText); DefaultValue>]
         val mutable CopyRecentToEditor: bool
 
     [<OptionsPage("FsiOptionsPage", "Fsi", typeof<ProjectModelThemedIcons.Fsharp>)>]
@@ -46,11 +48,11 @@ module FsiOptions =
             this.AddBool((fun key -> key.UseAnyCpuVersion), useAnyCpuVersionText)
             this.AddBool((fun key -> key.ShadowCopyReferences), shadowCopyReferencesText)
             this.AddBool((fun key -> key.MoveCaretOnSendLine), moveCaretOnSendLineText)
-            this.AddBool((fun key -> key.CopyRecentToEditor), copyRecentToEditor)
+            this.AddBool((fun key -> key.CopyRecentToEditor), copyRecentToEditorText)
             this.AddStringOption((fun (key: FsiOptions) -> key.FsiArgs), fsiArgsText) |> ignore
             this.FinishPage()
 
-        member x.AddBool(getter: FsiOptions -> bool, text) =
+        member x.AddBool(getter: Expression<Func<FsiOptions,_>>, text) =
             this.AddBoolOption(getter, RichText(text)) |> ignore
 
     [<ShellComponent>]

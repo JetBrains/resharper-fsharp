@@ -14,7 +14,7 @@ open JetBrains.Application.Progress
 open JetBrains.Application.Threading
 open JetBrains.Application.Threading.Tasks
 open JetBrains.DataFlow
-open JetBrains.Platform.MsBuildModel
+open JetBrains.Platform.MsBuildHost.Models
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Assemblies.Impl
 open JetBrains.ProjectModel.ProjectsHost

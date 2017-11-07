@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <Compile Include="src\ThirdParty\QuickParse.fs" />
-    <Compile Include="src\ThirdParty\TipFormatter.fs" />
     <Compile Include="src\ProjectModel\FSharpFileService.fs" />
     <Compile Include="src\ProjectModel\FSharpProjectLanguage.fs" />
     <Compile Include="src\ProjectModel\ProjectProperties\FSharpProjectProperties.fs" />
@@ -20,6 +19,7 @@
     <Compile Include="src\Util\Util.fs" />
     <Compile Include="src\Util\FSharpAttributesUtil.fs" />
     <Compile Include="src\Util\FSharpSymbolUtil.fs" />
+    <Compile Include="src\Checker\FSharpAssemblyContentProvider.fs" />
     <Compile Include="src\Checker\FSharpSourceCache.fs" />
     <Compile Include="src\Checker\FileSystemShim.fs" />
     <Compile Include="src\Checker\FSharpCheckerExtensions.fs" />
@@ -43,5 +43,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="WindowsBase" />
+    <Reference Include="System.Windows.Forms" /> <!--needed for completion to work -->
   </ItemGroup>
 </Project>

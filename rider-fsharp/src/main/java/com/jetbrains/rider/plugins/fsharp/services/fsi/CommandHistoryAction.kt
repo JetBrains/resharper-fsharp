@@ -9,9 +9,10 @@ import com.intellij.openapi.ui.popup.PopupStep
 import com.intellij.openapi.ui.popup.util.BaseListPopupStep
 
 class CommandHistoryAction(private val consoleRunner: FsiConsoleRunner)
-    : DumbAwareAction(title, null, AllIcons.Vcs.History) {
+    : DumbAwareAction("Recent commands", null, AllIcons.Vcs.History) {
     companion object {
-        val title = "Set recent command"
+        val copyTitle = "Set recent command"
+        val executeTitle = "Execute recent command"
     }
 
     private val consoleView = consoleRunner.consoleView
@@ -19,9 +20,11 @@ class CommandHistoryAction(private val consoleRunner: FsiConsoleRunner)
 
     override fun actionPerformed(e: AnActionEvent) {
         val entries = consoleRunner.commandHistory.entries.reversed()
+        val copyToEditor = consoleRunner.fsiHost.copyRecentToEditor
+        val title = if (copyToEditor) copyTitle else executeTitle
         val popupList = object : BaseListPopupStep<CommandHistory.Entry>(title, entries) {
             override fun onChosen(selectedValue: CommandHistory.Entry, finalChoice: Boolean): PopupStep<*>? {
-                if (consoleRunner.fsiHost.copyRecentToEditor)
+                if (copyToEditor)
                     WriteCommandAction.runWriteCommandAction(consoleView.project) {
                         consoleView.editorDocument.setText(selectedValue.visibleText)
                     }

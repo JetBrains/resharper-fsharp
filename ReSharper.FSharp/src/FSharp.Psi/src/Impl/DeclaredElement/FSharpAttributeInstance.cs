@@ -59,7 +59,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       FSharpElementsUtil.GetDeclaredElement(
         myAttr.AttributeType.MembersFunctionsAndValues.FirstOrDefault(m => m.IsConstructor), myModule) as IConstructor;
 
-    public int PositionParameterCount => myAttr.ConstructorArguments.Count;
+    public int PositionParameterCount
+    {
+      get
+      {
+        try
+        {
+          return myAttr.ConstructorArguments.Count;
+        }
+        catch (Exception)
+        {
+          //This custom attribute has an argument that can not yet be converted using this API
+          return 0;
+        }
+      }
+    }
+
     public int NamedParameterCount => myAttr.NamedArguments.Count;
 
     public static IList<IAttributeInstance> GetAttributeInstances(IList<FSharpAttribute> attrs, IPsiModule psiModule) =>
