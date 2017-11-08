@@ -42,8 +42,6 @@
     <lang.documentationProvider language="F# Script" implementationClass="com.jetbrains.rider.quickDoc.RiderDocumentationProvider"/>
 
     <rider.ProjectTypesProvider implementation="com.jetbrains.rider.projectView.projectTypes.FSharpProjectTypeProvider" />
-    <directoryProjectGenerator implementation="com.jetbrains.rider.projectView.projectGenerators.FSharpLibrary" />
-    <directoryProjectGenerator implementation="com.jetbrains.rider.projectView.projectGenerators.FSharpConsoleApplication" />
 
     <applicationConfigurable groupId="language" instance="com.jetbrains.rider.plugins.fsharp.services.settings.FsiOptionsPage" id="Fsi" />
 
