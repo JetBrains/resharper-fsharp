@@ -4,12 +4,24 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
 {
+  // todo: provide F# specific highlightings and use semantic classification from FCS
   public static class FSharpSymbolHighlightingUtil
   {
     [NotNull]
     public static string GetEntityHighlightingAttributeId([NotNull] this FSharpEntity entity)
     {
-      if (entity.IsNamespace) return HighlightingAttributeIds.NAMESPACE_IDENTIFIER_ATTRIBUTE;
+      if (entity.IsNamespace)
+        return HighlightingAttributeIds.NAMESPACE_IDENTIFIER_ATTRIBUTE;
+
+      if (entity.IsEnum)
+        return HighlightingAttributeIds.TYPE_ENUM_ATTRIBUTE;
+
+      if (entity.IsValueType)
+        return HighlightingAttributeIds.TYPE_STRUCT_ATTRIBUTE;
+
+      if (entity.IsDelegate)
+        return HighlightingAttributeIds.TYPE_DELEGATE_ATTRIBUTE;
+
       return entity.IsInterface
         ? HighlightingAttributeIds.TYPE_INTERFACE_ATTRIBUTE
         : HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE;
@@ -50,7 +62,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
         case FSharpField _:
           return HighlightingAttributeIds.FIELD_IDENTIFIER_ATTRIBUTE;
         case FSharpUnionCase _:
-          return HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE;
+          return HighlightingAttributeIds.TYPE_ENUM_ATTRIBUTE;
+        case FSharpGenericParameter _:
+          return HighlightingAttributeIds.TYPE_PARAMETER_ATTRIBUTE;
       }
 
       // some highlighting is needed for tooltip provider
