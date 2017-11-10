@@ -14,7 +14,7 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 {
-  [DaemonStage(StagesAfter = new[] {typeof(CollectUsagesStage)})]
+  [DaemonStage(StagesBefore = new[] {typeof(SyntaxHighlightingStage)},StagesAfter = new[] {typeof(CollectUsagesStage)})]
   public class HighlightOpenExpressionsStage : FSharpDaemonStageBase
   {
     private const string NsHighlightingAttr = HighlightingAttributeIds.NAMESPACE_IDENTIFIER_ATTRIBUTE;
