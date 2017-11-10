@@ -13,6 +13,7 @@ let getReturnType (symbol: FSharpSymbol) =
     | :? FSharpMemberOrFunctionOrValue as mfv -> Some mfv.ReturnParameter.Type
     | :? FSharpField as field -> Some field.FieldType
     | :? FSharpParameter as param -> Some param.Type
+    | :? FSharpUnionCase as case -> Some case.ReturnType
     | _ -> None
 
 [<CompiledName("TryGetFullCompiledName")>]    
