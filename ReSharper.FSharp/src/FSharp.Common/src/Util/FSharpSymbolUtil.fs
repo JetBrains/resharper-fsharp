@@ -28,11 +28,11 @@ let addAccessibility (iconId: IconId) (accessibility: FSharpAccessibility) =
     if isNull accessibilityIcon then iconId else CompositeIconId.Compose(iconId, accessibilityIcon)
 
 // todo: provide an option to use F# style icons (e.g. functions, values (with no static modifiers), modules)
-let getIconId = fun (symbol: FSharpSymbol) ->
+let rec getIconId = fun (symbol: FSharpSymbol) ->
     match symbol with
     | :? FSharpEntity as entity ->
         let baseIcon =
-            if entity.IsClass || entity.IsFSharpAbbreviation || entity.IsFSharpRecord || entity.IsFSharpUnion
+            if entity.IsClass || entity.IsFSharpRecord
             then PsiSymbolsThemedIcons.Class.Id else
 
             if entity.IsFSharpModule
@@ -42,9 +42,20 @@ let getIconId = fun (symbol: FSharpSymbol) ->
             if entity.IsValueType then PsiSymbolsThemedIcons.Struct.Id else
             if entity.IsNamespace then PsiSymbolsThemedIcons.Namespace.Id else
             if entity.IsDelegate then PsiSymbolsThemedIcons.Delegate.Id else
-            if entity.IsEnum then PsiSymbolsThemedIcons.Enum.Id else
+            if entity.IsEnum || entity.IsFSharpUnion then PsiSymbolsThemedIcons.Enum.Id else
 
-            PsiSymbolsThemedIcons.Class.Id
+            let mutable abbrEntity = if entity.IsFSharpAbbreviation then Some entity else None
+            let hasAbbrType (entity: FSharpEntity option) =
+                entity.IsSome &&
+                entity.Value.IsFSharpAbbreviation &&
+                entity.Value.AbbreviatedType.HasTypeDefinition
+
+            seq { while hasAbbrType abbrEntity do
+                    abbrEntity <- Some abbrEntity.Value.AbbreviatedType.TypeDefinition
+                    yield abbrEntity.Value }
+            |> Seq.tryLast
+            |> Option.map getIconId
+            |> Option.defaultValue PsiSymbolsThemedIcons.Class.Id
 
         addAccessibility baseIcon entity.Accessibility
 
@@ -87,7 +98,9 @@ let getIconId = fun (symbol: FSharpSymbol) ->
         let iconId = if field.IsStatic then CompositeIconId.Compose(iconId, PsiSymbolsThemedIcons.ModifiersStatic.Id) else iconId
         addAccessibility iconId field.Accessibility
 
-    | :? FSharpUnionCase as unionCase -> addAccessibility PsiSymbolsThemedIcons.Enum.Id unionCase.Accessibility
+    | :? FSharpUnionCase as unionCase ->
+        let iconId =  addAccessibility PsiSymbolsThemedIcons.EnumMember.Id unionCase.Accessibility
+        CompositeIconId.Compose(iconId, PsiSymbolsThemedIcons.ModifiersStatic.Id)
     | :? FSharpParameter -> PsiSymbolsThemedIcons.Parameter.Id
     | :? FSharpGenericParameter
     | :? FSharpStaticParameter -> PsiSymbolsThemedIcons.Typeparameter.Id
