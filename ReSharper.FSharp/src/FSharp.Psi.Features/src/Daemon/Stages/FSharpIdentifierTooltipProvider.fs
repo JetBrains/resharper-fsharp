@@ -30,6 +30,8 @@ let [<Literal>] RiderTooltipSeparator = "_RIDER_HORIZONTAL_LINE_TOOLTIP_SEPARATO
 type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, logger, xmlDocService: FSharpXmlDocService) =
     inherit IdentifierTooltipProvider<FSharpLanguage>(lifetime, solution, presenter)
 
+    let isNullOrWhiteSpace = RichTextBlock.IsNullOrWhiteSpace
+
     override x.GetTooltip(highlighter) =
         if not highlighter.IsValid then String.Empty else
 
@@ -64,8 +66,14 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, logger, xmlD
                                 overloads |> List.iter (fun overload ->
                                     let text = overload.MainDescription
                                     match xmlDocService.GetXmlDoc(overload.XmlDoc) with
-                                    | null -> result.Add(text)
-                                    | xmlDocText -> result.Add(text + "\n\n" + xmlDocText.Text))
+                                    | null when not (text.IsNullOrWhitespace()) -> result.Add(text)
+                                    | xmlDocText ->
+                                        let xmlDocText = xmlDocText.Text
+                                        match text.IsNullOrWhitespace(), xmlDocText.IsNullOrWhitespace() with
+                                        | false, false -> result.Add(text + "\n\n" + xmlDocText)
+                                        | false, _ -> result.Add(text)
+                                        | _, false -> result.Add(xmlDocText)
+                                        | _ ->  ())
                             | _ -> ())
                     result.Join(RiderTooltipSeparator)
                 | _ -> String.Empty
