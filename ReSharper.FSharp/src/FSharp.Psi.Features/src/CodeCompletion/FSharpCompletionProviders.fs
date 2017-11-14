@@ -5,6 +5,7 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
+open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems.Impl
 open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
@@ -28,7 +29,9 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
     member x.GetAutocompletionBehaviour() = AutocompletionBehaviour.NoRecommendation
 
     member x.AddLookupItems(context: FSharpCodeCompletionContext, collector: IItemsCollector) =
-        if not context.ShouldComplete then false else
+        match context.FsCompletionContext with
+        | Some (CompletionContext.Invalid) -> false
+        | _ ->
 
         let basicContext = context.BasicContext
         match basicContext.File with
@@ -39,41 +42,40 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
                 let parseResults = fsFile.ParseResults
                 let line, column = int context.Coords.Line + 1, int context.Coords.Column
                 let lineText = context.LineText
-                let qualifiers, partialName = context.Names
-                let getIconId =
-                    Some (fun (symbol, context) ->
+                let getIconId (symbol, context) =
+                        // todo: provide symbol and display context in FCS items, calc this only when needed
                         let icon = getIconId symbol
                         let retType =
                             getReturnType symbol
                             |> Option.map (fun t -> t.Format(context))
                             |> Option.toObj
-                        Some { Icon = icon; ReturnType = retType })
+                        Some { Icon = icon; ReturnType = retType }
 
                 let getAllSymbols () = getAllSymbols checkResults
                 try
                     let completions =
                         checkResults
-                            .GetDeclarationListInfo(parseResults, line, column, lineText, qualifiers, partialName,
-                                                    getAllSymbols, getIconId, filterResolved).RunAsTask().Items
+                            .GetDeclarationListInfo(parseResults, line, lineText, context.PartialLongName,
+                                                    getAllSymbols, getIconId, true, filterResolved).RunAsTask().Items
 
                     if Array.isEmpty completions then false else
 
                     let xmlDocService = basicContext.Solution.GetComponent<FSharpXmlDocService>()
                     for item in completions do
-                        if item.NamespaceToOpen.IsNone then
-                            let isError = item.Glyph = FSharpGlyph.Error
-                            let lookupItem = FSharpLookupItem(item, context, isError, xmlDocService)
-                            lookupItem.InitializeRanges(context.Ranges, basicContext)
-                            lookupItem.DisplayTypeName <-
-                                item.AdditionalInfo
-                                |> Option.map (fun i -> i.ReturnType)
-                                |> Option.toObj
-                                |> RichText
-                            collector.Add(lookupItem)
+                        let (lookupItem: TextLookupItemBase) =
+                            if item.Glyph = FSharpGlyph.Error
+                            then FSharpErrorLookupItem(item) :> _
+                            else FSharpLookupItem(item, context, xmlDocService) :> _
+
+                        lookupItem.InitializeRanges(context.Ranges, basicContext)
+                        lookupItem.DisplayTypeName <-
+                            item.AdditionalInfo
+                            |> Option.map (fun i -> i.ReturnType)
+                            |> Option.toObj
+                            |> RichText
+                        collector.Add(lookupItem)
 
                         collector.CheckForInterrupt()
-
-                    collector.AddRanges(context.Ranges)
                     true
                 with
                 | :? ProcessCancelledException -> reraise()

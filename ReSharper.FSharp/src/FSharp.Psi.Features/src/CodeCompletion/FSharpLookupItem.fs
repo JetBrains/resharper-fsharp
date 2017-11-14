@@ -41,7 +41,22 @@ type FSharpLookupCandidate(info: FSharpLookupCandidateInfo, xmlDocService: FShar
         member x.ObsoleteDescription = null
         member val IsFilteredOut = false with get, set
 
-type FSharpLookupItem(item: FSharpDeclarationListItem<FSharpLookupAdditionalInfo>, context: FSharpCodeCompletionContext, isError: bool,
+type FSharpErrorLookupItem(item: FSharpDeclarationListItem<FSharpLookupAdditionalInfo>) =
+    inherit TextLookupItemBase()
+
+    override x.Image = null
+    override x.Text = item.NameInCode
+    override x.Accept(_, _, _, _, _, _) = ()
+
+    interface IDescriptionProvidingLookupItem with
+        member x.GetDescription() =
+            let (FSharpToolTipText(tooltips)) = item.DescriptionTextAsync.RunAsTask()
+            tooltips
+            |> List.tryHead
+            |> Option.bind (function | FSharpToolTipElement.CompositionError e -> Some (RichTextBlock(e)) | _ -> None)
+            |> Option.toObj
+
+type FSharpLookupItem(item: FSharpDeclarationListItem<FSharpLookupAdditionalInfo>, context: FSharpCodeCompletionContext,
                       xmlDocService: FSharpXmlDocService) =
     inherit TextLookupItemBase()
 
@@ -51,7 +66,6 @@ type FSharpLookupItem(item: FSharpDeclarationListItem<FSharpLookupAdditionalInfo
         tooltips |> List.map (function
             | FSharpToolTipElement.Group(overloads) ->
                 overloads |> List.map (fun o -> { Description = o.MainDescription; XmlDoc = o.XmlDoc })
-            | FSharpToolTipElement.CompositionError e -> [{ Description = e; XmlDoc = FSharpXmlDoc.None }]
             | _ -> [])
         |> List.concat)
 
@@ -59,7 +73,6 @@ type FSharpLookupItem(item: FSharpDeclarationListItem<FSharpLookupAdditionalInfo
     override x.Text = item.NameInCode
 
     override x.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret) =
-        if isError then () else
         base.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret)
 
         if item.NamespaceToOpen.IsSome then
