@@ -5,7 +5,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
-open Microsoft.VisualStudio.FSharp.LanguageService
+open Microsoft.FSharp.Compiler
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpExpressionEvaluationInfoProvider() =

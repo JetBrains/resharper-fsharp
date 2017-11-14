@@ -6,32 +6,28 @@ using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
-using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
+using Microsoft.FSharp.Compiler;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
-using Microsoft.VisualStudio.FSharp.LanguageService;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
 {
   [IntellisensePart]
   public class FSharpCodeCompletionContextProvider : CodeCompletionContextProviderBase
   {
-    public override bool IsApplicable(CodeCompletionContext context)
-    {
-      return context.File is IFSharpFile;
-    }
+    public override bool IsApplicable(CodeCompletionContext context) => context.File is IFSharpFile;
 
     public override ISpecificCodeCompletionContext GetCompletionContext(CodeCompletionContext context)
     {
-      var file = (IFSharpFile) context.File;
-      var parseResults = file.ParseResults;
+      var fsFile = (IFSharpFile) context.File;
+      var parseResults = fsFile.ParseResults;
 
       var caretTreeOffset = context.CaretTreeOffset;
       var caretOffset = caretTreeOffset.Offset;
 
-      var token = file.FindTokenAt(caretTreeOffset);
-      var tokenBefore = file.FindTokenAt(caretTreeOffset - 1);
+      var token = fsFile.FindTokenAt(caretTreeOffset);
+      var tokenBefore = fsFile.FindTokenAt(caretTreeOffset - 1);
       var tokenBeforeType = tokenBefore?.GetTokenType();
 
       if (parseResults == null ||
@@ -44,8 +40,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
           tokenBefore.GetTreeEndOffset() < caretTreeOffset || token.GetTreeEndOffset() < caretTreeOffset)
       {
         var selectedRange = context.SelectedRange;
-        return new FSharpCodeCompletionContext(context, new TextLookupRanges(selectedRange, selectedRange),
-          TreeOffset.InvalidOffset, DocumentCoords.Empty, null, null, null, null, null, false);
+        return new FSharpCodeCompletionContext(context, CompletionContext.Invalid,
+          new TextLookupRanges(selectedRange, selectedRange), DocumentCoords.Empty, null);
       }
 
       var document = context.Document;
@@ -57,18 +53,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
       var defaultRanges = GetTextLookupRanges(context, completedRange);
 
       var ranges = ShouldReplace(token)
-        ? defaultRanges.WithReplaceRange(new DocumentRange(document,new TextRange(completedRangeStartOffset,
+        ? defaultRanges.WithReplaceRange(new DocumentRange(document, new TextRange(completedRangeStartOffset,
           Math.Max(token.GetTreeEndOffset().Offset, caretOffset))))
         : defaultRanges;
 
       var coords = document.GetCoordsByOffset(caretOffset);
       var lineText = document.GetLineText(coords.Line);
-      var names = QuickParse.GetPartialLongNameEx(lineText, (int) coords.Column - 1);
-
+      var partialName = QuickParse.GetPartialLongNameEx(lineText, (int) coords.Column - 1);
       var fsCompletionContext = UntypedParseImpl.TryGetCompletionContext(coords.GetPos(), parseResults, lineText);
 
-      return new FSharpCodeCompletionContext(context, ranges, caretTreeOffset, coords, names, tokenBefore, token,
-        lineText, fsCompletionContext?.Value);
+      return new FSharpCodeCompletionContext(context, fsCompletionContext, ranges, coords, partialName, tokenBefore,
+        token, lineText);
     }
 
     private static bool ShouldReplace([CanBeNull] ITreeNode token)

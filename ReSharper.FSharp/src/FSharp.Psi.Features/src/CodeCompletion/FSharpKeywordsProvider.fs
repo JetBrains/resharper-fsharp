@@ -13,15 +13,13 @@ type FSharpKeywordsProvider() =
 
     let keywords =
         Keywords.KeywordsWithDescription
-        // todo: implement auto-completion popup strategy that will cover operators
+        // todo: implement auto-popup completion strategy that will cover operators
         |> List.filter (fun (keyword, _) -> not (PrettyNaming.IsOperatorName keyword))
         |> List.map (fun (keyword, description) -> FSharpKeywordLookupItem(keyword, description))
 
     override x.IsAvailable(_) = true
 
     override x.AddLookupItems(context, collector) =
-        if not context.ShouldComplete then false else
-
         match context.FsCompletionContext with
         | Some (CompletionContext.Invalid) -> false
         | _ ->
@@ -39,7 +37,7 @@ type FSharpKeywordsProvider() =
                (tokenBeforeType.IsComment || tokenBeforeType.IsStringLiteral || tokenBeforeType.IsConstantLiteral)
         then false else
 
-        if not (List.isEmpty (fst context.Names)) then false else
+        if not context.PartialLongName.QualifyingIdents.IsEmpty then false else
 
         for keyword in keywords do
             keyword.InitializeRanges(context.Ranges, context.BasicContext)
