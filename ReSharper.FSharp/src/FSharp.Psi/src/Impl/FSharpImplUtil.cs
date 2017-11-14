@@ -135,10 +135,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     {
       try
       {
-        var compiledNameAttr = mfv.Attributes.FirstOrDefault(a =>
-          a.GetClrName().Equals(CompiledNameAttrName, StringComparison.Ordinal));
-        var compiledName = compiledNameAttr != null && !compiledNameAttr.ConstructorArguments.IsEmpty()
-          ? compiledNameAttr.ConstructorArguments[0].Item2 as string
+        var compiledNameAttr = mfv.Attributes.FirstOrDefault(CompiledNameAttrName);
+        var compiledName = compiledNameAttr != null && !compiledNameAttr.Value.ConstructorArguments.IsEmpty()
+          ? compiledNameAttr.Value.ConstructorArguments[0].Item2 as string
           : null;
         return compiledName ??
                (mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod
@@ -151,13 +150,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         Logger.LogExceptionSilently(e);
       }
       return SharedImplUtil.MISSING_DECLARATION_NAME;
-    }
-
-    public static FSharpFileKind GetFSharpFileKind([NotNull] this IFile file)
-    {
-      if (file is IFSharpImplFile) return FSharpFileKind.ImplFile;
-      if (file is IFSharpSigFile) return FSharpFileKind.SigFile;
-      throw new ArgumentOutOfRangeException();
     }
 
     public static FSharpFileKind GetFSharpFileKind([NotNull] this IPsiSourceFile sourceFile)

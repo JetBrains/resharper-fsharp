@@ -48,20 +48,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
     public ISearchDomain GetDeclaredElementSearchDomain(IDeclaredElement declaredElement)
     {
       // todo: type abbreviations
-      var localDeclaration = declaredElement as ILocalDeclaration;
-      if (localDeclaration != null)
+      if (declaredElement is ILocalDeclaration localDeclaration)
         return mySearchDomainFactory.CreateSearchDomain(localDeclaration.GetSourceFile());
 
-      var fsSymbolElement = declaredElement as IFSharpSymbolElement;
-      if (fsSymbolElement != null)
+      if (declaredElement is IFSharpSymbolElement fsSymbolElement)
       {
         var fsSymbol = fsSymbolElement.Symbol;
-        var activePatternCase = fsSymbol as FSharpActivePatternCase;
-        if (activePatternCase == null)
+        if (!(fsSymbol is FSharpActivePatternCase activePatternCase))
           return EmptySearchDomain.Instance;
 
-        var resolvedSymbolElement = fsSymbolElement as ResolvedFSharpSymbolElement;
-        if (resolvedSymbolElement != null)
+        if (fsSymbolElement is ResolvedFSharpSymbolElement)
         {
           var patternEntity = activePatternCase.Group.EnclosingEntity?.Value;
           if (patternEntity != null)
@@ -89,8 +85,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
       // todo: for union cases navigate to case declarations
 
       var resolvedSymbolElement = element as ResolvedFSharpSymbolElement;
-      var activePatternCase = resolvedSymbolElement?.Symbol as FSharpActivePatternCase;
-      if (activePatternCase != null)
+      if (resolvedSymbolElement?.Symbol is FSharpActivePatternCase activePatternCase)
       {
         var activePattern = activePatternCase.Group;
 
@@ -100,14 +95,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 
         var typeElement = FSharpElementsUtil.GetTypeElement(entityOption.Value, resolvedSymbolElement.Module);
         var pattern = typeElement.EnumerateMembers(patternNameOption.Value, true).FirstOrDefault() as IDeclaredElement;
-        var fsDeclaredTypeMember = pattern as IFSharpTypeMember;
-        if (fsDeclaredTypeMember != null)
+        if (pattern is IFSharpTypeMember)
         {
           var patternDecl = pattern.GetDeclarations().FirstOrDefault();
           if (patternDecl == null)
             return null;
 
-          var caseElement = FSharpImplUtil.GetActivePatternByIndex(patternDecl, activePatternCase.CaseIndex);
+          var caseElement = FSharpImplUtil.GetActivePatternByIndex(patternDecl, activePatternCase.Index);
           if (caseElement != null)
             return Tuple.Create(new[] {caseElement}.AsCollection(), false);
         }
@@ -117,12 +111,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
         }
       }
 
-      var fsTypeMember = element as IFSharpTypeMember;
-      if (fsTypeMember == null || fsTypeMember.IsVisibleFromFSharp)
+      if (!(element is IFSharpTypeMember fsTypeMember) || fsTypeMember.IsVisibleFromFSharp)
         return null;
 
-      var containingType = fsTypeMember.GetContainingType() as IDeclaredElement;
-      return containingType != null
+      return fsTypeMember.GetContainingType() is IDeclaredElement containingType
         ? Tuple.Create(new[] {containingType}.AsCollection(), false)
         : null;
     }

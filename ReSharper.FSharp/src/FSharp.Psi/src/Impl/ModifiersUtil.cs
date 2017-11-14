@@ -8,7 +8,6 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Util.Extension;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 {
@@ -21,8 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       if (caseDeclaration.FieldsEnumerable.IsEmpty())
         return MemberDecoration.FromModifiers(Modifiers.INTERNAL);
 
-      var unionDeclaration = caseDeclaration.GetContainingTypeDeclaration() as IUnionDeclaration;
-      return unionDeclaration != null
+      return caseDeclaration.GetContainingTypeDeclaration() is IUnionDeclaration unionDeclaration
         ? GetDecoration(unionDeclaration.AccessModifiers, TreeNodeEnumerable<IFSharpAttribute>.Empty)
         : MemberDecoration.DefaultValue;
     }
@@ -57,19 +55,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     public static MemberDecoration GetModifiers(this TypePart typePart)
     {
-        var sigPart = GetPartFromSignature(typePart);
-        if (sigPart != null)
-          return Normalize(sigPart.Modifiers);
+      var sigPart = GetPartFromSignature(typePart);
+      if (sigPart != null)
+        return Normalize(sigPart.Modifiers);
 
-        if (typePart == null)
-          return MemberDecoration.DefaultValue;
+      if (typePart == null)
+        return MemberDecoration.DefaultValue;
 
-        var decoration = typePart.Modifiers;
-        var isHiddenBySignature = (typePart.GetRoot() as FSharpProjectFilePart)?.HasPairFile ?? false;
-        if (isHiddenBySignature)
-          decoration.AccessRights = AccessRights.INTERNAL;
+      var decoration = typePart.Modifiers;
+      var isHiddenBySignature = (typePart.GetRoot() as FSharpProjectFilePart)?.HasPairFile ?? false;
+      if (isHiddenBySignature)
+        decoration.AccessRights = AccessRights.INTERNAL;
 
-        return Normalize(decoration);
+      return Normalize(decoration);
     }
 
     private static MemberDecoration Normalize(MemberDecoration decoration)

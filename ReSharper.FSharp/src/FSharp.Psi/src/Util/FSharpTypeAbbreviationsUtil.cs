@@ -6,6 +6,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {
   public class FSharpTypeAbbreviationsUtil
   {
+    /// <summary>
+    /// Used during Find Usages to get display name when searching element without having FSharpSymbol element.
+    /// This class should be removed when a better approach is introduced. 
+    /// </summary>
     public static readonly Dictionary<IClrTypeName, string[]> AbbreviatedTypes =
       new Dictionary<IClrTypeName, string[]>
       {
@@ -30,7 +34,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         {new ClrTypeName("System.Decimal"), new[] {"decimal"}},
 
         // Collections and other types
-        {new ClrTypeName("Microsoft.FSharp.Collections.FSharpList"), new[] {"list"}}
+        {new ClrTypeName("Microsoft.FSharp.Collections.FSharpList"), new[] {"list"}},
+        {new ClrTypeName("Microsoft.FSharp.Collections.FSharpOption"), new[] {"option"}}
       };
   }
 }

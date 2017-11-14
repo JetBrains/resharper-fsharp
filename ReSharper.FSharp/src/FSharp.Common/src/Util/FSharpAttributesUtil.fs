@@ -23,6 +23,10 @@ type FSharpAttributeUtil =
             .AsIList()
 
     [<Extension>]
+    static member FirstOrDefault (attrs: IList<FSharpAttribute>, clrName: string) =
+        attrs |> Seq.tryFind (fun a -> FSharpAttributeUtil.GetClrName(a).Equals(clrName))
+
+    [<Extension>]
     static member HasAttributeInstance (attrs: IList<FSharpAttribute>, clrTypeName: IClrTypeName) =
         FSharpAttributeUtil.HasAttributeInstance(attrs, clrTypeName.FullName)
 
