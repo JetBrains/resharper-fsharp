@@ -7,7 +7,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 type TypeCheckErrorsStageProcess(daemonProcess, errors) =
     inherit ErrorsStageProcessBase(daemonProcess, errors)
 
-[<DaemonStage(StagesBefore = [| typeof<SyntaxErrorsStage> |], StagesAfter = [| typeof<HighlightOpenExpressionsStage> |])>]
+[<DaemonStage(StagesBefore = [| typeof<SyntaxErrorsStage> |], StagesAfter = [| typeof<HighlightIdentifiersStage> |])>]
 type TypeCheckErrorsStage(daemonProcess, errors) =
     inherit FSharpDaemonStageBase()
 

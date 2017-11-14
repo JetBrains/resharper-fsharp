@@ -12,9 +12,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     [CanBeNull]
     FSharpSymbol GetFSharpSymbol();
 
-    [CanBeNull]
-    FSharpSymbol Symbol { get; set; }
-
     [NotNull]
     string ShortName { get; }
 
