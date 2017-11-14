@@ -5,7 +5,7 @@
   <description>F# language support in Rider</description>
   <change-notes />
 
-  <version>0.2</version>
+  <version>0.9999</version>
   <idea-version since-build="171.3655" />
 
   <depends>com.intellij.modules.rider</depends>
