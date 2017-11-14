@@ -15,10 +15,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
       FSharpFieldProperty[] fields) : base(containingType)
     {
       var parameters = new List<IParameter>(fields.Length);
+      var fieldNames = new HashSet<string>();
+      foreach (var field in fields)
+        fieldNames.Add(field.ShortName);
+
       for (var i = 0; i < fields.Length; i++)
       {
         var field = fields[i];
-        parameters.Add(new Parameter(this, i, ParameterKind.VALUE, field.Type, field.ShortName));
+        var fieldName = field.ShortName;
+        var lowerName = !fieldName.IsEmpty() ? fieldName[0].ToLowerFast() + fieldName.Substring(1) : fieldName;
+        var paramName = fieldNames.Contains(lowerName) ? fieldName : lowerName;
+        parameters.Add(new Parameter(this, i, ParameterKind.VALUE, field.Type, paramName));
       }
       Parameters = parameters;
     }
