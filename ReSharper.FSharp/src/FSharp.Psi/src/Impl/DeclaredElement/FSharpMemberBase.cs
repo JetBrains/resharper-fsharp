@@ -43,7 +43,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       if (!base.Equals(obj))
         return false;
 
-      if (!(obj is FSharpMemberBase<TDeclaration> member))
+      if (!(obj is FSharpMemberBase<TDeclaration> member) || IsStatic != member.IsStatic) // RIDER-11321, RSRP-467025
         return false;
 
       return SignatureComparers.Strict.Compare(GetSignature(IdSubstitution),
