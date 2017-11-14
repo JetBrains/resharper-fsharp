@@ -81,5 +81,11 @@ type FSharpCheckerService(lifetime, logger: Util.ILogger, onSolutionCloseNotifie
             | _ -> None
         | _ -> None
 
+    member x.TryGetStaleCheckResults([<NotNull>] file: IPsiSourceFile) =
+        x.OptionsProvider.GetProjectOptions(file)
+        |> Option.bind (fun options ->
+            x.Checker.TryGetRecentCheckResultsForFile(file.GetLocation().FullPath, options)
+            |> Option.map (fun (_, checkResults, _) -> checkResults))
+
     member x.InvalidateProject(project: FSharpProject) =
         x.Checker.InvalidateConfiguration(project.Options.Value)

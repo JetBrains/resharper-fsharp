@@ -10,10 +10,11 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.DataContext;
 using JetBrains.ReSharper.Psi.Tree;
-using Microsoft.FSharp.Control;
-using Microsoft.FSharp.Core;
+using JetBrains.Util;
+using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
 {
@@ -32,7 +33,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
       var psiView = psiDocumentRangeView.View<FSharpLanguage>();
 
       foreach (var psiSourceFile in psiView.SortedSourceFiles)
-        if (!contextHighlighterAvailability.IsAvailable(psiSourceFile)) return null;
+        if (!contextHighlighterAvailability.IsAvailable(psiSourceFile))
+          return null;
 
       return new FSharpUsagesContextHighlighter().GetDataProcessAction(prolongedLifetime, psiDocumentRangeView);
     }
@@ -41,8 +43,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
       HighlightingsConsumer consumer)
     {
       var psiView = psiDocumentRangeView.View<FSharpLanguage>();
-      var file = psiView.GetSelectedTreeNode<IFSharpFile>();
-      if (file == null)
+      var fsFile = psiView.GetSelectedTreeNode<IFSharpFile>();
+      if (fsFile == null)
         return;
 
       var document = psiDocumentRangeView.DocumentRangeFromMainDocument.Document;
@@ -53,26 +55,32 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
       // todo: type parameters: t<$caret$type> or t<'$caret$ttype>
       // todo: namespaces, use R# search?
 
-      var checkResults = file.GetParseAndCheckResults(true)?.Value.CheckResults;
-      if (checkResults == null)
-        return;
-
-      var symbol = FSharpSymbolsUtil.TryFindFSharpSymbol(file, token.GetText(), token.GetTreeEndOffset().Offset);
+      var offset = token.GetTreeStartOffset().Offset;
+      var symbol = fsFile.GetSymbolDeclaration(offset) ?? fsFile.GetSymbolUse(offset);
       if (symbol == null)
         return;
 
-      var symbolUsages = FSharpAsync.RunSynchronously(checkResults.GetUsesOfSymbolInFile(symbol),
-        FSharpOption<int>.Some(2000), null);
-      foreach (var symbolUse in symbolUsages)
+      var sourceFile = fsFile.GetSourceFile();
+      if (sourceFile == null)
+        return;
+
+      var checkResults =
+        fsFile.CheckerService.TryGetStaleCheckResults(sourceFile)?.Value ??
+        fsFile.GetParseAndCheckResults(true)?.Value.CheckResults;
+
+      var symbolUsages = checkResults?.GetUsesOfSymbolInFile(symbol).RunAsTask();
+
+      foreach (var symbolUse in symbolUsages ?? EmptyArray<FSharpSymbolUse>.Instance)
       {
         var treeOffset = document.GetTreeEndOffset(symbolUse.RangeAlternate);
-        var usageToken = file.FindTokenAt(treeOffset - 1) as FSharpIdentifierToken;
+        var usageToken = fsFile.FindTokenAt(treeOffset - 1) as FSharpIdentifierToken;
         if (usageToken == null)
           continue;
 
         var tokenType = usageToken.GetTokenType();
-        if ((tokenType == FSharpTokenType.GREATER || tokenType == FSharpTokenType.GREATER_RBRACK)
-            && !symbol.IsOpGreaterThan())
+        if ((tokenType == FSharpTokenType.GREATER || tokenType == FSharpTokenType.GREATER_RBRACK) &&
+            !(symbol is FSharpMemberOrFunctionOrValue mfv &&
+              mfv.CompiledName.Equals("op_GreaterThan", StringComparison.Ordinal)))
           continue; // found usage of generic symbol with specified type parameter
 
         consumer.ConsumeHighlighting(HighlightingId, usageToken.GetDocumentRange());
