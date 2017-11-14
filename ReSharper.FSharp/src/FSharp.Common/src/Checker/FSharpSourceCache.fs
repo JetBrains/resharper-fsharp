@@ -2,14 +2,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 
 open System
 open System.Collections.Generic
+open System.IO
 open System.Text
+open JetBrains
 open JetBrains.DataFlow
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Caches
 open JetBrains.ReSharper.Psi.Modules
-open JetBrains.Util
 
 type FSharpSource =
     {
@@ -18,8 +19,8 @@ type FSharpSource =
     }
 
 [<SolutionComponent>]
-type FSharpSourceCache(lifetime: Lifetime, logger: ILogger) =
-    let files = Dictionary<FileSystemPath, FSharpSource>()
+type FSharpSourceCache(lifetime: Lifetime, logger: Util.ILogger) =
+    let files = Dictionary<Util.FileSystemPath, FSharpSource>()
     do lifetime.AddAction(fun _ -> files.Clear()) |> ignore
 
     let canHandle (sourceFile: IPsiSourceFile) =
@@ -31,28 +32,26 @@ type FSharpSourceCache(lifetime: Lifetime, logger: ILogger) =
         let source = Encoding.UTF8.GetBytes(sourceFile.Document.GetText())
         files.[path] <- { Source = source; Timestamp = timestamp }
 
-    member x.GetSource(path: FileSystemPath) =
+    member x.GetSource(path: Util.FileSystemPath) =
         lock files (fun _ ->
-            let source = ref Unchecked.defaultof<FSharpSource>
-            match files.TryGetValue(path, source), !source with
+            match files.TryGetValue(path) with
             | true, source -> Some source
-            | _ -> None
-        )
+            | _ -> None)
 
-    interface IPsiSourceFileInvalidatingCache with
+    // todo: rewrite to to use IChangeProvider instead
+    interface ICache with
         member x.Build(sourceFile, _) =
             if canHandle sourceFile then
                 lock files (fun _ ->
                     let path = sourceFile.GetLocation()
-                    update sourceFile path (System.IO.File.GetLastWriteTime(path.FullPath)))
+                    update sourceFile path (File.GetLastWriteTimeUtc(path.FullPath)))
             null
 
         member x.OnDocumentChange(sourceFile, _) =
             if canHandle sourceFile then
-                lock files (fun _ -> update sourceFile (sourceFile.GetLocation()) DateTime.Now)
+                lock files (fun _ -> update sourceFile (sourceFile.GetLocation()) DateTime.UtcNow)
 
         member x.OnPsiChange(_, _) = ()
-        member x.Invalidate(_) = ()
         member x.HasDirtyFiles = false
         member x.MarkAsDirty(_) = ()
         member x.MergeLoaded(_) = ()
