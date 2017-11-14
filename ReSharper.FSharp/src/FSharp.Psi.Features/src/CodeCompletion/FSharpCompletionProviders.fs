@@ -108,7 +108,15 @@ type FSharpLookupItemsProvider(logger: ILogger) =
         member x.SupportedCompletionMode = CompletionMode.Single
         member x.SupportedEvaluationMode = EvaluationMode.Light
 
-//[<Language(typeof<FSharpLanguage>)>]
+[<Language(typeof<FSharpLanguage>)>]
+type FSharpRangesProvider() =
+    inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
+
+    override x.GetDefaultRanges(context) = context.Ranges
+    override x.SupportedCompletionMode = CompletionMode.All
+    override x.SupportedEvaluationMode = EvaluationMode.Full
+
+[<Language(typeof<FSharpLanguage>)>]
 type FSharpLibraryScopeLookupItemsProvider(logger: ILogger, assemblyContentProvider: FSharpAssemblyContentProvider) =
     inherit FSharpLookupItemsProviderBase(logger, (fun checkResults -> assemblyContentProvider.GetLibrariesEntities(checkResults)), true)
 
