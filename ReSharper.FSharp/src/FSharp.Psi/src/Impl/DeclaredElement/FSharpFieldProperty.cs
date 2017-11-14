@@ -23,6 +23,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
                    TypeFactory.CreateUnknownType(Module);
     }
 
+    public override bool IsVisibleFromFSharp => !Field.IsNameGenerated;
+
     public override IType ReturnType { get; }
     public override string ShortName => Field.Name;
     public override bool IsStatic => false;
