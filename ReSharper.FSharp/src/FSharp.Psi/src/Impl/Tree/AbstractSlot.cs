@@ -1,7 +1,6 @@
 ﻿using System.Linq;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
@@ -20,20 +19,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       if (!(GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv)) return null;
 
-      // todo: fix getting members in FCS and remove this hack
+      // todo: remove this and provide API in FCS and cache it somehow
       var hasDefault = mfv.EnclosingEntity?.Value.MembersFunctionsAndValues.Any(m =>
                          m.IsOverrideOrExplicitInterfaceImplementation &&
                          mfv.LogicalName == m.LogicalName) ?? false;
       if (hasDefault)
         return null;
 
-      if (mfv.IsProperty || mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod)
-      {
-        var property = mfv.TryGetPropertyFromAccessor();
-        return property != null
-          ? new FSharpProperty<AbstractSlot>(this, property)
-          : null;
-      }
+      if (mfv.IsProperty)
+        return new FSharpProperty<AbstractSlot>(this, mfv);
+
+      var property = mfv.AccessorProperty;
+      if (property != null)
+        return new FSharpProperty<AbstractSlot>(this, property.Value);
 
       var typeDeclaration = GetContainingTypeDeclaration() as IFSharpTypeDeclaration;
       return new FSharpMethod<AbstractSlot>(this, mfv, typeDeclaration);

@@ -1,7 +1,6 @@
 ﻿using System;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
@@ -23,13 +22,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       if (!(GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv)) return null;
 
-      if (mfv.IsProperty || mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod)
-      {
-        var property = mfv.TryGetPropertyFromAccessor();
-        return property != null
-          ? new FSharpProperty<MemberDeclaration>(this, property)
-          : null;
-      }
+      if (mfv.IsProperty)
+        return new FSharpProperty<MemberDeclaration>(this, mfv);
+
+      var property = mfv.AccessorProperty;
+      if (property != null)
+        return new FSharpProperty<MemberDeclaration>(this, property.Value);
 
       var typeDeclaration = GetContainingTypeDeclaration() as IFSharpTypeDeclaration;
       return !mfv.IsInstanceMember && mfv.CompiledName.StartsWith("op_", StringComparison.Ordinal)
