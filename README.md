@@ -1,48 +1,50 @@
 # F# language support in JetBrains Rider
 [![JetBrains incubator project](http://jb.gg/badges/official.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
 
-F# support plugin is implemented as two parts: a plugin for ReSharper.Host and a plugin for IntelliJ targeting Rider. ReSharper.Host is a ReSharper version modified to work as a backend for IntelliJ.
+F# support in Rider is implemented as a plugin made of two major components: 
+* ReSharper.Host plugin (referred to as the *backend*) that adds F# support to ReSharper and is implemented in ReSharper.FSharp solution. ReSharper.Host is a modification of ReSharper used as a language service that the IntelliJ Platform interacts with. The backend is written in C# and F#.
+* IntelliJ Platform plugin for Rider (referred to as the *frontend*) that defines F# as a new IntelliJ Platform language but delegates most of the work to the backend. This part also adds F# Interactive support. The frontend is written in Kotlin.
 
-The backend part plugin adds F# support to ReSharper and is implemented in ReSharper.FSharp solution.
-The frontend part defines a new IntelliJ language and is used to delegate the most of the work to the backend. This part also adds F# Interactive support.
+F# support in Rider makes use of open source software, most notably [FSharp.Compiler.Service](https://github.com/Microsoft/visualfsharp) and [Fantomas](https://github.com/dungpa/fantomas).
 
-The plugin uses [FSharp.Compiler.Service](https://github.com/Microsoft/visualfsharp) and [Fantomas](https://github.com/dungpa/fantomas) projects made available by contributors.
-
-## Build
+## Building the plugin
 
 ### Requirements
 
-* .NET Framework 4.5.1 SDK (Windows only for now, please check the details below)
-* .NET Core SDK 2.0+ (MSBuild 15 and F# build targets are needed)
-* JDK 1.8
+* Windows. Rider SDK used by the backend references assemblies that are part of .NET Framework but are not shipped with Mono (e.g. PresentationFramework). Building on Mono is possible using .NET Framework facades obtained as a NuGet package (as suggested at [dotnet/sdk#335](https://github.com/dotnet/sdk/issues/335#issuecomment-330772137)), and we're planning to support this later on, enabling you to contribute from Mac or Linux. 
+* [.NET Framework 4.5.1 Developer Pack](https://www.microsoft.com/en-us/download/details.aspx?id=40772)
+* [.NET Core SDK 2.0+](https://www.microsoft.com/net/download/windows) for MSBuild 15 and F# build targets
+* [JDK 1.8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 
-The backend Rider.SDK references assemblies that are part of .NET Framework and aren't shipped with Mono (e.g. PresentationFramework). Building on Mono however is possible using .NET Framework facades obtained as a NuGet package (take a look at [dotnet/sdk#335](https://github.com/dotnet/sdk/issues/335#issuecomment-330772137)) and is going to be added later.
+### Building the plugin and launching Rider in a sandbox 
 
-The plugin uses [gradle-intellij-plugin](https://github.com/JetBrains/gradle-intellij-plugin) Gradle plugin that downloads needed IntelliJ-based SDK, packs the plugin and installs it to a sandboxed IDE or its test shell allowing testing the plugin in a separate environment.
+1. Open `ReSharper.FSharp.sln` in Rider or a different .NET IDE, and build using the `Debug` configuration. The output assemblies are later copied to the frontend plugin directories by Gradle. (If you're seeing build errors in Rider, choose *File | Settings | Build, Execution, Deployment | Toolset and Build*, and in the *Use MSBuild version* drop-down, make sure that Rider uses MSBuild shipped with .NET Core SDK.)
+2. Open the `rider-fsharp` project in IntelliJ IDEA. When suggested to import Gradle projects, accept the suggestion: Gradle will download Rider SDK and set up all necessary dependencies. `rider-fsharp` uses the [gradle-intellij-plugin](https://github.com/JetBrains/gradle-intellij-plugin) Gradle plugin that downloads the IntelliJ Platform SDK, packs the F# plugin and installs it into a sandboxed IDE or its test shell, which allows testing the plugin in a separate environment.
+3. To launch Rider with the plugin installed, open the *Gradle* tool window in IntelliJ IDEA (*View | Tool Windows | Gradle*), and execute the `intellij/runIde` task. This will build the frontend, install the plugin to a sandbox, and launch Rider with the plugin.
 
-### Building the plugin and launching sandboxed Rider 
+Alternatively, you can use the Gradle command line to build the frontend and launch Rider: `$ rider-fsharp/gradlew runIde`.
 
-*  build `Debug` configuration in ReSharper.FSharp solution. The output assemblies are later copied to the frontend plugin directories by Gradle.
+### Installing to an existing Rider instance
 
-* open `rider-fsharp` project in IntelliJ IDEA. Gradle will download Rider SDK and set up all dependencies. To launch Rider with the plugin installed execute `runIde` Gradle task. This task will also build the frontend plugin part and install the plugin to the sandbox before launch.
-
-Alternatively Gradle command line may be used for frontend part building and launching Rider. Use `$ rider-fsharp/gradlew runIde` command.
-
-### Installing to existing Rider
-
-* build `Debug` configuration in ReSharper.FSharp solution
-* execute `buildPlugin` Gradle task
-* install to Rider using `Install plugin from disk` action.
+1. Build the `Debug` configuration in `ReSharper.FSharp.sln`.
+2. Execute the `buildPlugin` Gradle task.
+3. Install the plugin to your Rider installation [from disk](https://www.jetbrains.com/help/idea/installing-a-plugin-from-the-disk.html).
 
 ## Contributing
 
-There're plenty of open issues on Rider [issue tracker](https://youtrack.jetbrains.com/issues?q=in:%20rider%20%23Unresolved%20Technology:%20FSharp). Although there're no Up for Grabs tags yet, contributions are welcome. Some issues are marked as [third-party problem](https://youtrack.jetbrains.com/issues/RIDER?q=Technology:%20FSharp%20%20state:%20%7BThird%20party%20problem%7D) and a fix is needed in FCS or other tools we depend on. If you're willing to work on an issue please leave a note on the issue page so the team wouldn't work on it at the same time and could assist you if needed. To propose a change please fork this repo and open a Pull Request. Public build on CI server is going to be available shortly.
+There are plenty of issues open in Rider's [issue tracker](https://youtrack.jetbrains.com/issues?q=in:%20rider%20%23Unresolved%20Technology:%20FSharp). Nothing is currently marked as *Up for Grabs*, and contributions that address any of these open issues are welcome. Note that some issues are marked as [third-party problems](https://youtrack.jetbrains.com/issues/RIDER?q=Technology:%20FSharp%20%20state:%20%7BThird%20party%20problem%7D), and addressing them requires fixes from FCS or other projects that this plugin depends on.
 
-The new code is usually being written in F# (except for `FSharp.Psi` project) and initial implementations in `Daemon.FSharp` and `Services.FSharp` projects are moved to `FSharp.Psi.Servises` during refactorings and fixes.
+If you are willing to work on an issue, please *leave a comment* under the issue. Doing this will make sure that the team doesn't start working on the same issue, and help you get any necessary assistance.
 
-The project lacks a good suite of tests and only few are implemented right now. There's currently no requirement on adding new ones yet, but as soon as more things are covered adding new tests for changed code should become necessary for a Pull Request to be accepted.
+New code is usually written in F#, except for the `FSharp.Psi` project that is written in C#.
 
-Documentation for SDK used is available here:
+As soon as you are done with changes in your fork, please open a pull request for review.
+
+Note that the public CI server is not set up at this point but it's going to be available shortly.
+
+The project currently lacks a solid test suite. There's currently no requirement to add new tests, but as soon as more functionality is covered, adding new tests along with code changes will become necessary for a PR to be accepted.
+
+We suggest that you read docs on the two SDKs that this plugin uses:
 
 * [ReSharper SDK](https://www.jetbrains.com/help/resharper/sdk/README.html)
 * [IntelliJ IDEA SDK](https://www.jetbrains.org/intellij/sdk/docs/welcome.html)
@@ -50,17 +52,21 @@ Documentation for SDK used is available here:
 
 ## Development notes
 
-The main development is currently being done in `master` branch and builds from this branch are bundled with Rider nightly updates available in [Toolbox App](https://www.jetbrains.com/toolbox/app/). When preparing a release or EAP build, changes are cherry-picked to the corresponding release branch like `wave10-rider-release`.
+`master` is currently the main development branch, and builds from this branch are bundled with nightly Rider builds available via [JetBrains Toolbox App](https://www.jetbrains.com/toolbox/app/). When preparing a release or EAP build, changes are cherry-picked to the corresponding release branch like `wave10-rider-release`.
 
-The project depends on nightly SDK builds and if some particular or previous build is needed it may be changed in [rider-fsharp/build.gradle](rider-fsharp/build.gradle) and [ReSharper.FSharp/Directory.Build.props](ReSharper.FSharp/Directory.Build.props).
+The project usually depends on nightly SDK builds, but a specific SDK version can be referenced in [rider-fsharp/build.gradle](rider-fsharp/build.gradle) and [ReSharper.FSharp/Directory.Build.props](ReSharper.FSharp/Directory.Build.props) if necessary.
 
-Debugging the backeng plugin is possible by attaching to ReSharper.Host process launched in `runIde` Gradle task. To debug the frontend plugin part, start `runIde` task in Debug mode.
+To debug the backend, attach to the ReSharper.Host process launched via the `runIde` Gradle task. To debug the frontend, start the `runIde` task in Debug mode.
 
-JVM and .NET Rider parts communicate using RdProtocol with APIs available on both sides. For plugin backend-frontend communication the RdProtocol should be used as well. However, it's not currently possible to extend the protocol from a plugin and should be done in Rider code. Some extensions needed for the plugin are already defined there. Please check [RIDER-4217](https://youtrack.jetbrains.com/issue/RIDER-4217) for updates. Meanwhile if a protocol extension is needed please raise an issue.
+## Known issues
 
-Gradle downloads a newer frontend SDK when it is available and keeps it in its caches. However, using Gradle cache directory leads to exceeding allowed path length for .NET assembly loader making some ReSharper.Host assemblies fail to load. When IntelliJ SDK is set to Rider the following workaround is used: the SDK is copied to the project `build` directory so assemblies can be loaded (assuming the path length is shorter than in the Gradle cache). This workaround, however, prevents Rider SDK from being updated automatically by Gradle. For details and a workaround please take a look at [gradle-intellij-plugin#234](https://github.com/JetBrains/gradle-intellij-plugin/issues/234).
+Rider's JVM-based frontend and .NET-based backend communicate using RdProtocol with APIs available on both sides. For backend-frontend communication in plugins, RdProtocol should be used as well. However, it's not currently possible to extend the protocol from a plugin (watch [RIDER-4217](https://youtrack.jetbrains.com/issue/RIDER-4217) for updates): this should be done directly in Rider code. Some extensions needed for the F# plugin are already available, and if you need further protocol extensions before [RIDER-4217](https://youtrack.jetbrains.com/issue/RIDER-4217) is implemented, please [raise an issue](https://youtrack.jetbrains.com/issues/RIDER#newissue=25-1770938).
 
-## Some nearest goals
+Gradle downloads the latest frontend SDK as soon as it becomes available and keeps it in cache. However, using the Gradle cache directory results in exceeding the .NET assembly loader's path length limit, which prevents loading some ReSharper.Host assemblies. As a workaround, when IntelliJ SDK is set to Rider, you can copy the SDK to the project's `build` directory. Assuming that the resulting path is shorter than the path to the Gradle cache, doing so will fix assembly loading. This workaround, however, prevents Rider SDK from being updated automatically by Gradle. For details, see [gradle-intellij-plugin#234](https://github.com/JetBrains/gradle-intellij-plugin/issues/234).
 
-* Provide PSI modules for scripts (i.e. a ReSharper project context with referenced assemblies and a target framework) to enable ReSharper navigation and other features in such files.
-* Cover more things with tests, e.g. add tests for mapping FCS representations to R# for declared elements and types.
+## Roadmap
+
+* Provide PSI modules for scripts (i.e. a ReSharper project context with referenced assemblies and a target framework) to enable ReSharper navigation and other features in script files.
+* Cover more functionality with tests, e.g. add tests for mapping FCS representations to ReSharper for declared elements and types.
+* Set up a public Continuous Integration server for test runs.
+* Enable development on macOS and Linux.
