@@ -429,8 +429,10 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
     member internal x.ProcessLocalPat (pat: SynPat) =
         match pat with
         | SynPat.LongIdent(lidWithDots,_,_,patParams,_,range) ->
-            if not lidWithDots.Lid.IsEmpty then
-                for id in lidWithDots.Lid do x.ProcessLocalId id
+            match lidWithDots.Lid with
+            | [] -> ()
+            | [id] when id.idText.Equals("op_ColonColon", StringComparison.Ordinal) -> ()
+            | lid -> for id in lid do x.ProcessLocalId id
             x.ProcessLocalParams patParams
         | SynPat.Named(pat,id,_,_,_) ->
             x.ProcessLocalPat pat
