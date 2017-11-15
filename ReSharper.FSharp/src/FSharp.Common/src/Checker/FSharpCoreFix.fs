@@ -45,7 +45,7 @@ let fsharpCoreOpt =
     else
       let referenceAssembliesPath =
         programFilesX86 </> @"Reference Assemblies\Microsoft\FSharp\.NETFramework\v4.0\"
-      let fsharpCoreVersions = ["4.4.0.0"; "4.3.1.0"; "4.3.0.0"]
+      let fsharpCoreVersions = ["4.4.1.0"; "4.4.0.0"; "4.3.1.0"; "4.3.0.0"]
       tryFindFile (List.map (combinePaths referenceAssembliesPath) fsharpCoreVersions) "FSharp.Core.dll"
 
 let isFSharpCore (s : string) = s.StartsWith "-r:" && s.EndsWith "FSharp.Core.dll"
