@@ -139,7 +139,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       {
         if (myDeclarationSymbols == null)
           UpdateSymbols();
-        return myResolvedSymbols.Values.AsArray();
+        return myResolvedSymbols?.Values.AsArray() ?? EmptyArray<FSharpResolvedSymbolUse>.Instance;
       }
     }
 
@@ -149,7 +149,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       {
         if (myDeclarationSymbols == null)
           UpdateSymbols();
-        return myDeclarationSymbols.Values.AsArray();
+        return myDeclarationSymbols?.Values.AsArray() ?? EmptyArray<FSharpResolvedSymbolUse>.Instance;
       }
     }
 
