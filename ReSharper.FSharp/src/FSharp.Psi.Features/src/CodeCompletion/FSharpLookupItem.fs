@@ -75,6 +75,7 @@ type FSharpLookupItem(item: FSharpDeclarationListItem<FSharpLookupAdditionalInfo
     override x.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret) =
         base.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret)
 
+        // todo: move it to a separate type (and reuse in open namespace Quick Fix)
         if item.NamespaceToOpen.IsSome then
             let line = int context.Coords.Line + 1
             let fullName = item.FullName.Split('.')
@@ -83,14 +84,15 @@ type FSharpLookupItem(item: FSharpDeclarationListItem<FSharpLookupAdditionalInfo
 
             match ParsedInput.tryFindNearestPointToInsertOpenDeclaration line parseTree fullName insertionPoint with
             | Some context ->
-                let pos = context.Pos
                 let document = textControl.Document
+                let getLineText = fun lineNumber -> document.GetLineText(docLine lineNumber)
+                let pos = context |> ParsedInput.adjustInsertionPoint getLineText
 
                 let isSystem = item.NamespaceToOpen.Value.StartsWith("System.")
                 let openPrefix = String(' ', pos.Column) + "open "
                 let textToInsert = openPrefix + item.NamespaceToOpen.Value
 
-                let line = pos.Line - 1|> max 0
+                let line = pos.Line - 1 |> max 0
                 let lineToInsert =
                     seq { line - 1 .. -1 .. 0 }
                     |> Seq.takeWhile (fun i ->
@@ -101,11 +103,13 @@ type FSharpLookupItem(item: FSharpDeclarationListItem<FSharpLookupAdditionalInfo
                     |> Option.defaultValue line
 
                 // add empty line after all open expressions if needed
-                if not (document.GetLineText(docLine line).IsNullOrWhitespace()) then
-                    document.InsertText(document.GetLineEndOffsetWithLineBreak(docLine (line - 1)), "\n")
+                let insertEmptyLine = not (document.GetLineText(docLine line).IsNullOrWhitespace())
 
-                let prevLineEndOffset = document.GetLineEndOffsetWithLineBreak(docLine (max 0 (lineToInsert - 1)))
-                document.InsertText(prevLineEndOffset, textToInsert + "\n")
+                let prevLineEndOffset =
+                    if lineToInsert > 0 then document.GetLineEndOffsetWithLineBreak(docLine (max 0 (lineToInsert - 1)))
+                    else 0
+
+                document.InsertText(prevLineEndOffset, textToInsert + "\n" + (if insertEmptyLine then "\n" else ""))
             | _ -> ()
 
     override x.GetDisplayName() =
