@@ -11,6 +11,7 @@ The frontend part defines a new IntelliJ language and is used to delegate the wo
 Requirements:
 
 * .NET Framework 4.5.1 SDK (Windows only for now, please check details below)
+* .NET Core SDK 2.0+ (for MSBuild 15 and F# build targets)
 * JDK 1.8
 
 The backend Rider.SDK references assemblies that are part of .NET Framework and aren't shipped with Mono (e.g. PresentationFramework). Build on Mono is possible using .NET Framework facades obtained as a NuGet package (take a look at [dotnet/sdk#335](https://github.com/dotnet/sdk/issues/335#issuecomment-330772137)) and is going to be added later.
