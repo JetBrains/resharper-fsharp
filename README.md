@@ -32,7 +32,7 @@ Alternatively, you can use the Gradle command line to build the frontend and lau
 
 ## Contributing
 
-There are plenty of issues open in Rider's [issue tracker](https://youtrack.jetbrains.com/issues?q=in:%20rider%20%23Unresolved%20Technology:%20FSharp). Nothing is currently marked as *Up for Grabs*, and contributions that address any of these open issues are welcome. Note that some issues are marked as [third-party problems](https://youtrack.jetbrains.com/issues/RIDER?q=Technology:%20FSharp%20%20state:%20%7BThird%20party%20problem%7D), and addressing them requires fixes from FCS or other projects that this plugin depends on.
+We welcome contributions that address any F# plugin issues that are open in Rider's [issue tracker](https://youtrack.jetbrains.com/issues?q=in:%20rider%20%23Unresolved%20Technology:%20FSharp). Some of these issues are marked as [Up for grabs](https://youtrack.jetbrains.com/issues/RIDER?q=Technology:%20FSharp%20%23Unresolved%20tag:%20%7BUp%20For%20Grabs%7D): we expect issues tagged this way to be easier addressed by external contributors as they are unlikely to require any changes outside the F# plugin. Note that some issues are marked as [third-party problems](https://youtrack.jetbrains.com/issues/RIDER?q=Technology:%20FSharp%20%20state:%20%7BThird%20party%20problem%7D), and addressing them requires fixes from FCS or other projects that this plugin depends on.
 
 If you are willing to work on an issue, please *leave a comment* under the issue. Doing this will make sure that the team doesn't start working on the same issue, and help you get any necessary assistance.
 
@@ -54,15 +54,19 @@ We suggest that you read docs on the two SDKs that this plugin uses:
 
 `master` is currently the main development branch, and builds from this branch are bundled with nightly Rider builds available via [JetBrains Toolbox App](https://www.jetbrains.com/toolbox/app/). When preparing a release or EAP build, changes are cherry-picked to the corresponding release branch like `wave10-rider-release`.
 
-The project usually depends on nightly SDK builds, but a specific SDK version can be referenced in [rider-fsharp/build.gradle](rider-fsharp/build.gradle) and [ReSharper.FSharp/Directory.Build.props](ReSharper.FSharp/Directory.Build.props) if necessary.
+By default, the project depends on nightly SDK builds, but a specific SDK version can be referenced in [rider-fsharp/build.gradle](rider-fsharp/build.gradle) and [ReSharper.FSharp/Directory.Build.props](ReSharper.FSharp/Directory.Build.props) if necessary.
+
+To update to the latest backend SDK, run *Tools | NuGet | NuGet Restore* in Rider.
+
+To update to the latest frontend SDK, run the `intellij/updateFrontendSdk` Gradle task in IntelliJ IDEA, or run `$ rider-fsharp/gradlew updateFrontendSdk` from the Gradle command line. 
 
 To debug the backend, attach to the ReSharper.Host process launched via the `runIde` Gradle task. To debug the frontend, start the `runIde` task in Debug mode.
 
 ## Known issues
 
-Rider's JVM-based frontend and .NET-based backend communicate using RdProtocol with APIs available on both sides. For backend-frontend communication in plugins, RdProtocol should be used as well. However, it's not currently possible to extend the protocol from a plugin (watch [RIDER-4217](https://youtrack.jetbrains.com/issue/RIDER-4217) for updates): this should be done directly in Rider code. Some extensions needed for the F# plugin are already available, and if you need further protocol extensions before [RIDER-4217](https://youtrack.jetbrains.com/issue/RIDER-4217) is implemented, please [raise an issue](https://youtrack.jetbrains.com/issues/RIDER#newissue=25-1770938).
+As soon as you build the backend for the first time, Rider will show false red code warnings across the backend's F# projects. This is due to a bug in Rider waiting to be fixed ([RIDER-11392](https://youtrack.jetbrains.com/issue/RIDER-11392)). As a workaround, you can unload all projects in `ReSharper.FSharp.sln`, and then reload them.
 
-Gradle downloads the latest frontend SDK as soon as it becomes available and keeps it in cache. However, using the Gradle cache directory results in exceeding the .NET assembly loader's path length limit, which prevents loading some ReSharper.Host assemblies. As a workaround, when IntelliJ SDK is set to Rider, you can copy the SDK to the project's `build` directory. Assuming that the resulting path is shorter than the path to the Gradle cache, doing so will fix assembly loading. This workaround, however, prevents Rider SDK from being updated automatically by Gradle. For details, see [gradle-intellij-plugin#234](https://github.com/JetBrains/gradle-intellij-plugin/issues/234).
+Rider's JVM-based frontend and .NET-based backend communicate using RdProtocol with APIs available on both sides. For backend-frontend communication in plugins, RdProtocol should be used as well. However, it's not currently possible to extend the protocol from a plugin (watch [RIDER-4217](https://youtrack.jetbrains.com/issue/RIDER-4217) for updates): this should be done directly in Rider code. Some extensions needed for the F# plugin are already available, and if you need further protocol extensions before [RIDER-4217](https://youtrack.jetbrains.com/issue/RIDER-4217) is implemented, please [raise an issue](https://youtrack.jetbrains.com/issues/RIDER#newissue=25-1770938).
 
 ## Roadmap
 
