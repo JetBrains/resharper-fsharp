@@ -55,7 +55,7 @@ type FSharpDummyCodeFormatter(formatterRequirements) =
     override x.CanModifyNode(_,_) = false
 
     override x.GetMinimalSeparator(_,_) = InvalidOperationException() |> raise
-    override x.CreateNewLine(_,_) = InvalidOperationException() |> raise
+    override x.CreateNewLine(_) = InvalidOperationException() |> raise
     override x.CreateSpace(_,_) = InvalidOperationException() |> raise
     override x.FormatInsertedNodes(_,_,_) = InvalidOperationException() |> raise
     override x.FormatInsertedRange(_,_,_) = InvalidOperationException() |> raise 
