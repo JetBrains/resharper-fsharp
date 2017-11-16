@@ -104,3 +104,12 @@ test {
         exceptionFormat "full"
     }
 }
+
+// workaround for https://github.com/JetBrains/gradle-intellij-plugin/issues/234
+task updateFrontendSdk() {
+    group = "intellij"
+    doLast {
+        delete intellij.ideaDependency.classes
+    }
+}
+
