@@ -66,6 +66,7 @@ type FSharpLookupItem(item: FSharpDeclarationListItem<FSharpLookupAdditionalInfo
         tooltips |> List.map (function
             | FSharpToolTipElement.Group(overloads) ->
                 overloads |> List.map (fun o -> { Description = o.MainDescription; XmlDoc = o.XmlDoc })
+            | FSharpToolTipElement.CompositionError e -> [{ Description = e; XmlDoc = FSharpXmlDoc.None }]
             | _ -> [])
         |> List.concat)
 
