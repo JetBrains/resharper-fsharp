@@ -15,6 +15,12 @@ using JetBrains.Util.PersistentMap;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
+  /// <summary>
+  /// Provides symbol cache constisting of namespaces and types trie and members names.
+  /// It should work fast and currently uses parse results only.
+  /// Some heuristics are applied for type kind inferrence, look at ObjectTypeDeclaration.
+  /// Info about cases like single-case union and provided generated types should probably be cached separately.  
+  /// </summary>
   public class FSharpCacheProvider : ILanguageCacheProvider
   {
     private readonly FSharpCheckerService myCheckerService;
@@ -28,6 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     {
       var sourceFile = file.GetSourceFile();
       Assertion.AssertNotNull(sourceFile, "sourceFile != null");
+      // not supported until we have psi modules for scripts
       if (sourceFile.LanguageType.Equals(FSharpScriptProjectFileType.Instance))
         return;
 

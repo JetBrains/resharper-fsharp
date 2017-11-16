@@ -19,8 +19,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     private static readonly object ourGetSymbolsLock = new object();
 
+    // These symbols should be invalidated when dependent files change.
+    // These symbols should also be used in FSharpMemberBase instances without attaching symbols to R# members.
+    // A goal is to move these symbols to a separated cache and use it from IFSharpFile, FSharpMemberBase, FSharpTypePart elements.    
     private Dictionary<int, FSharpResolvedSymbolUse> myDeclarationSymbols;
     private Dictionary<int, FSharpResolvedSymbolUse> myResolvedSymbols;
+
     public FSharpCheckerService CheckerService { get; set; }
     public TokenBuffer ActualTokenBuffer { get; set; }
     public FSharpOption<FSharpParseFileResults> ParseResults { get; set; }
