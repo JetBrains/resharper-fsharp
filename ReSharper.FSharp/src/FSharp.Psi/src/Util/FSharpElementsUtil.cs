@@ -12,6 +12,7 @@ using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
+using JetBrains.Util.Logging;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -120,7 +121,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         var mfvXmlDocId = GetXmlDocId(mfv);
         return members.Count == 1
           ? members[0]
-          : members.FirstOrDefault(m => mfvXmlDocId.Equals(m.XMLDocId, StringComparison.Ordinal));
+          : members.FirstOrDefault(m => m.XMLDocId.Equals(mfvXmlDocId, StringComparison.Ordinal));
       }
 
       if (symbol is FSharpUnionCase unionCase)
@@ -154,10 +155,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       return null;
     }
 
+    [CanBeNull]
     private static string GetXmlDocId([NotNull] FSharpMemberOrFunctionOrValue mfv)
     {
       lock (ourFcSLock)
-        return mfv.XmlDocSig;
+      {
+        try
+        {
+          return mfv.XmlDocSig;
+        }
+        catch (Exception e)
+        {
+          Logger.LogMessage(LoggingLevel.WARN, "Could not get XmlDocId for {0}", mfv);
+          Logger.LogExceptionSilently(e);
+          return null;
+        }
+      }
     }
 
     private static IClrDeclaredElement FindLocalDeclaration([NotNull] FSharpMemberOrFunctionOrValue mfv,
