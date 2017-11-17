@@ -39,7 +39,7 @@ module FsiOptions =
         [<SettingsEntry(true, copyRecentToEditorText); DefaultValue>]
         val mutable CopyRecentToEditor: bool
 
-    [<OptionsPage("FsiOptionsPage", "Fsi", typeof<ProjectModelThemedIcons.Fsharp>)>]
+    [<OptionsPage("FsiOptionsPage", "Fsi", typeof<ProjectModelThemedIcons.Fsharp>, HelpKeyword = "Settings_Languages_FSHARP_Interactive")>]
     type FsiOptionsPage(lifetime, optionsContext) as this =
         inherit SimpleOptionsPage(lifetime, optionsContext)
         let _ = ProjectModelThemedIcons.Fsharp // workaround to create assembly reference (Microsoft/visualfsharp#3522)
