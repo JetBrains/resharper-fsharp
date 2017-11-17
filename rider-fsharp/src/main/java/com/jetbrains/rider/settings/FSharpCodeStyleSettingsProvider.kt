@@ -9,7 +9,7 @@ class FSharpScriptCodeStyleSettingsProvider : FSharpCodeStyleSettingsProviderBas
 
 abstract class FSharpCodeStyleSettingsProviderBase(val lang: Language) : RiderCodeStyleSettingsProvider() {
     override fun getLanguage() = lang
-    override fun getHelpTopic() = ""
+    override fun getHelpTopic() = "Settings_Code_Style_FSHARP"
     override fun getConfigurableDisplayName() = lang.displayName
     override fun getPagesId() = mapOf("FSharpCodeStylePage" to "Formatting Style")
 }
