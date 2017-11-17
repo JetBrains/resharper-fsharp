@@ -13,7 +13,7 @@ type FSharpImplTreeBuilder(file, lexer, parseTree, lifetime, logger: ILogger) =
     override x.CreateFSharpFile() =
         let mark = x.Builder.Mark()
         match parseTree with
-        | Some (ParsedInput.ImplFile (ParsedImplFileInput(_,_,_,_,_,decls,_))) ->
+        | ParsedInput.ImplFile (ParsedImplFileInput(_,_,_,_,_,decls,_)) ->
             for decl in decls do x.ProcessTopLevelDeclaration decl
         | _ -> logger.LogMessage(LoggingLevel.ERROR, sprintf "FSharpImplTreeBuilder: got %A" parseTree)
 

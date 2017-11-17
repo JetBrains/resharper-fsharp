@@ -13,7 +13,7 @@ type FSharpSigTreeBuilder(file, lexer, parseTree, lifetime, logger: ILogger) =
     override x.CreateFSharpFile() =
         let mark = x.Builder.Mark()
         match parseTree with
-        | Some (ParsedInput.SigFile (ParsedSigFileInput(_,_,_,_,sigs))) ->
+        | ParsedInput.SigFile (ParsedSigFileInput(_,_,_,_,sigs)) ->
             for s in sigs do x.ProcessTopLevelSignature s
         | _ ->
             logger.LogMessage(LoggingLevel.ERROR, sprintf "FSharpSigTreeBuilder: got %A" parseTree)
