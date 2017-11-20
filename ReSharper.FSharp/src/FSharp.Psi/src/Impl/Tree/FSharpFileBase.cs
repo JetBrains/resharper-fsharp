@@ -163,11 +163,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       {
         if (myDeclarationSymbols == null)
           UpdateSymbols();
-        var resolvedSymbol = myResolvedSymbols.TryGetValue(offset);
+        var resolvedSymbol = myResolvedSymbols?.TryGetValue(offset);
         if (resolvedSymbol == null)
           return null;
 
-        return myDeclarationSymbols.TryGetValue(offset) == null
+        return myDeclarationSymbols?.TryGetValue(offset) == null
           ? resolvedSymbol.SymbolUse.Symbol
           : null;
       }
