@@ -132,6 +132,7 @@ type FSharpProjectOptionsProvider(lifetime, logger, solution: ISolution, checker
         | exn ->
             // todo: replace FCS reference resolver
             Logger.Warn(logger, "Error while getting options for {0}: {1}", filePath, exn.Message)
+            Logger.LogExceptionSilently(logger, exn)
             None)
 
     member private x.FixScriptOptions(options) =
