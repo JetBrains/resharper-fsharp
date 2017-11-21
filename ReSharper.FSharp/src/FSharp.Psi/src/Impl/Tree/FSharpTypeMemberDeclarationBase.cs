@@ -64,7 +64,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    IModifiersOwner IModifiersOwnerDeclaration.DeclaredElement => (IModifiersOwner) DeclaredElement;
+    IModifiersOwner IModifiersOwnerDeclaration.ModifiersOwner => (IModifiersOwner) DeclaredElement;
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     ITypeMember ITypeMemberDeclaration.DeclaredElement => (ITypeMember) DeclaredElement;
