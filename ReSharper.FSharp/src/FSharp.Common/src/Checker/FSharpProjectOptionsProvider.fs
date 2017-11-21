@@ -45,7 +45,10 @@ type FSharpProjectOptionsProvider(lifetime, logger, solution: ISolution, checker
     do
         changeManager.Changed2.Advise(lifetime, this.ProcessChange)
         checkerService.OptionsProvider <- this
-        lifetime.AddAction(fun _ -> checkerService.OptionsProvider <- null) |> ignore
+        lifetime.AddAction(fun _ ->
+            checkerService.OptionsProvider <- null
+            projects.Clear()
+            projectsToInvalidate.Clear()) |> ignore
 
     member private x.ProcessChange(obj: ChangeEventArgs) =
         let change = obj.ChangeMap.GetChange<ProjectModelChange>(solution)

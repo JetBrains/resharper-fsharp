@@ -30,8 +30,7 @@ type FSharpCheckerService(lifetime, logger: Util.ILogger, onSolutionCloseNotifie
     let checker = lazy FSharpChecker.Create(projectCacheSize = 200, keepAllBackgroundResolutions = false,
                                             legacyReferenceResolver = MSBuildReferenceResolver.Resolver)
     do
-        onSolutionCloseNotifier.SolutionIsAboutToClose.Advise(lifetime, fun _ ->
-            checker.Value.ClearLanguageServiceRootCachesAndCollectAndFinalizeAllTransients())
+        onSolutionCloseNotifier.SolutionIsAboutToClose.Advise(lifetime, fun _ -> checker.Value.InvalidateAll())
 
     member val OptionsProvider: IFSharpProjectOptionsProvider = null with get, set
     member x.Checker = checker.Value
