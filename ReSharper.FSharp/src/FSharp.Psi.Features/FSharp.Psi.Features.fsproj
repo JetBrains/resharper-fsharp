@@ -15,6 +15,7 @@
     <Compile Include="src\CodeCompletion\FSharpCompletionProviders.fs" />
     <Compile Include="src\CodeStructure\FSharpCodeStructure.fs" />
     <Compile Include="src\Daemon\Highlightings\ErrorHighlightings.fs" />
+    <Compile Include="src\Daemon\ContextHighlighters\FSharpMatchingBraceContextHighlighter.fs" />
     <Compile Include="src\Daemon\Stages\FSharpIdentifierTooltipProvider.fs" />
     <Compile Include="src\Daemon\Stages\ErrorsStageProcessBase.fs" />
     <Compile Include="src\Daemon\Stages\FSharpDaemonBehaviour.fs" />
