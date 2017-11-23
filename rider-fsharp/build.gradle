@@ -26,6 +26,9 @@ intellij {
     version '173-SNAPSHOT'
     downloadSources false
     updateSinceUntilBuild false
+
+    // Workaround for https://youtrack.jetbrains.com/issue/IDEA-179607
+    plugins 'rider-editorconfig', 'RiderJavaScriptLanguage'
 }
 
 def src = '../ReSharper.FSharp/src'
@@ -103,6 +106,8 @@ test {
         showStandardStreams = true
         exceptionFormat "full"
     }
+    def rerunSuccessfulTests = false
+    outputs.upToDateWhen { !rerunSuccessfulTests }
 }
 
 // workaround for https://github.com/JetBrains/gradle-intellij-plugin/issues/234
