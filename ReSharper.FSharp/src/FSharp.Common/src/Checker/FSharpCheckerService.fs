@@ -5,10 +5,15 @@ open JetBrains
 open JetBrains.Annotations
 open JetBrains.Application
 open JetBrains.Application.Progress
+open JetBrains.DataFlow
+open JetBrains.Platform.RdFramework.Impl
+open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services
+open JetBrains.ReSharper.Host.Features
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Psi.Modules
+open JetBrains.Rider.Model
 open Microsoft.FSharp.Compiler
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
@@ -88,3 +93,18 @@ type FSharpCheckerService(lifetime, logger: Util.ILogger, onSolutionCloseNotifie
 
     member x.InvalidateProject(project: FSharpProject) =
         x.Checker.InvalidateConfiguration(project.Options.Value)
+
+
+[<SolutionComponent>]
+type FcsHost(lifetime: Lifetime, checkerService: FSharpCheckerService, solutionModel: SolutionModel) =
+    do
+        solutionModel.TryGetCurrentSolution()
+        |> Option.ofObj
+        |> Option.iter (fun solution ->
+            match solution.FsharpCompilerServiceHost.ProjectChecked with
+            | :? RdSignal<_> as signal ->
+                signal.Async <- true
+                let handler = fun (project, _) -> signal.Fire(project)
+                let subscription = checkerService.Checker.ProjectChecked.Subscribe(handler)
+                lifetime.AddAction(fun _ -> subscription.Dispose()) |> ignore
+            | _ -> ())
