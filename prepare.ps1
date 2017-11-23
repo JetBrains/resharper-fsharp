@@ -86,7 +86,7 @@ function GetPackageVersionFromFolder($folder, $name) {
   Write-Host "Looking for package $name among items:"
   foreach ($file in Get-ChildItem $folder) {
     Write-Host $file
-    $match = [regex]::Match($file.Name, "^" + [Regex]::Escape($name) + "\.((\d+\.)+\d+((\-eap|\-snapshot)\d+(internal)?)?)\.nupkg$",
+    $match = [regex]::Match($file.Name, "^" + [Regex]::Escape($name) + "\.((\d+\.)+\d+((\-eap|\-snapshot)\d+(d?)(internal)?)?)\.nupkg$",
         [Text.RegularExpressions.RegexOptions]::IgnoreCase)
     if ($match.Success) {
       return $match.Groups[1].Value
