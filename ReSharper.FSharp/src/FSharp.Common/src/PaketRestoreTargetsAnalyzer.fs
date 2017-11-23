@@ -29,9 +29,10 @@ type NuGetRestoreDisabledMessage(title, message) =
     override x.Kind = LoadDiagnosticKind.Warning
 
 [<SolutionInstanceComponent>]
-type PaketRestoreTargetsAnalyzer(lifetime, solution: ISolution, settingsStore: SettingsStore, logger: JetBrains.Util.ILogger) =
+type PaketRestoreTargetsAnalyzer(lifetime, solution: ISolution, settingsStore: SettingsStore, logger: ILogger) =
     let paketPropName = "IsPaketRestoreTargetsFileLoaded"
     let diagnosticMessage = NuGetRestoreDisabledMessage()
+
     member val RestoreWasDisabled = false with get, set
 
     interface IMsBuildProjectLoadDiagnosticProvider with
@@ -41,16 +42,16 @@ type PaketRestoreTargetsAnalyzer(lifetime, solution: ISolution, settingsStore: S
 
     interface IMsBuildProjectListener with
         member x.OnProjectLoaded(_, msBuildProject) =
-            if isNull msBuildProject then () else
-            let solutionContext = solution.ToDataContext()
-            let solutionSettingsStore = settingsStore.BindToContextLive(lifetime, ContextRange.Smart(solutionContext))
-            match solutionSettingsStore.GetValue(fun (s: NuGetOptions) -> s.ConfigRestoreEnabled) with
-            | NuGetOptionConfigPolicy.Disable -> ()
-            | _ ->
+            if isNull msBuildProject || x.RestoreWasDisabled then () else
                 let props = msBuildProject.RdProjectDescription.Properties
                 if props |> Seq.exists (fun p -> p.Name.Equals(paketPropName, StringComparison.OrdinalIgnoreCase)) then
-                    settingsStore
-                        .BindToContextLive(lifetime, ContextRange.Custom(solutionContext, solutionContext))
-                        .SetValue((fun (s: NuGetOptions) -> s.ConfigRestoreEnabled), NuGetOptionConfigPolicy.Disable)
-                    logger.LogMessage(LoggingLevel.WARN, "Found core project using Paket. Disabling NuGet restore")
-                    x.RestoreWasDisabled <- true
+                    let context = solution.ToDataContext()
+                    let solutionSettingsStore = settingsStore.BindToContextLive(lifetime, ContextRange.Smart(context))
+                    match solutionSettingsStore.GetValue(fun (s: NuGetOptions) -> s.ConfigRestoreEnabled) with
+                    | NuGetOptionConfigPolicy.Disable -> ()
+                    | _ ->
+                        settingsStore
+                            .BindToContextLive(lifetime, ContextRange.Custom(context, context))
+                            .SetValue((fun (s: NuGetOptions) -> s.ConfigRestoreEnabled), NuGetOptionConfigPolicy.Disable)
+                        logger.LogMessage(LoggingLevel.WARN, "Found core project using Paket. Disabling NuGet restore")
+                        x.RestoreWasDisabled <- true
