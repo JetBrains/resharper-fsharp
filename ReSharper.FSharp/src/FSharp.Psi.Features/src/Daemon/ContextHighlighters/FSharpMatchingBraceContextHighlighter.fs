@@ -13,32 +13,28 @@ open JetBrains.ReSharper.Psi.Tree
 type FSharpMatchingBraceContextHighlighter() =
     inherit MatchingBraceContextHighlighterBase<FSharpLanguage>()
 
-    let highlight (isMatching, matched: ITokenNode) (consumer: MatchingHighlightingsConsumer) (selected: ITokenNode) =
+    let highlight (isMatching, matched: ITokenNode) (consumer: MatchingHighlightingsConsumer) selectedRange =
         match isMatching, matched with
-        | true, matched ->
-            consumer.ConsumeMatchingBracesHighlighting(selected.GetDocumentRange(), matched.GetDocumentRange())
-        | _ ->
-            consumer.ConsumeHighlighting(HighlightingAttributeIds.UNMATCHED_BRACE, selected.GetDocumentRange())
+        | true, matched -> consumer.ConsumeMatchingBracesHighlighting(selectedRange, matched.GetDocumentRange(), false)
+        | _ -> consumer.ConsumeHighlighting(HighlightingAttributeIds.UNMATCHED_BRACE, selectedRange)
 
     [<AsyncContextConsumer>]
-    static member ProcessDataContext(lifetime,
-                                     [<ContextKey(typeof<ContextHighlighterPsiFileView.ContextKey>)>] documentRangeView,
-                                     invisibleBraceHintManager, matchingBraceSuggester, prolongedLifetime) =
-
-          let highlighter = FSharpMatchingBraceContextHighlighter()
-          highlighter.ProcessDataContextImpl(lifetime, prolongedLifetime, documentRangeView, invisibleBraceHintManager,
-                                             matchingBraceSuggester)
+    static member ProcessDataContext([<ContextKey(typeof<ContextHighlighterPsiFileView.ContextKey>)>] documentRangeView,
+                                     lifetime, invisibleBraceHintManager, matchingBraceSuggester, prolongedLifetime) =
+        let highlighter = FSharpMatchingBraceContextHighlighter()
+        highlighter.ProcessDataContextImpl(lifetime, prolongedLifetime, documentRangeView, invisibleBraceHintManager,
+                                           matchingBraceSuggester)
 
     override x.IsLeftBracket(tokenType: TokenNodeType) = FSharpTokenType.LeftBraces.[tokenType]
     override x.IsRightBracket(tokenType: TokenNodeType) = FSharpTokenType.RightBraces.[tokenType]
 
     override x.TryHighlightToLeft(consumer, selectedToken, _) =
         if x.IsRightBracket(selectedToken.GetTokenType()) then
-            highlight (x.FindMatchingLeftBracket(selectedToken)) consumer selectedToken
+            highlight (x.FindMatchingLeftBracket(selectedToken)) consumer (selectedToken.GetDocumentRange())
 
     override x.TryHighlightToRight(consumer, selectedToken, _) =
         if x.IsLeftBracket(selectedToken.GetTokenType()) then
-            highlight (x.FindMatchingRightBracket(selectedToken)) consumer selectedToken
+            highlight (x.FindMatchingRightBracket(selectedToken)) consumer (selectedToken.GetDocumentRange())
 
     override x.Match(token1, token2) =
         if token1 = FSharpTokenType.LPAREN then token2 = FSharpTokenType.RPAREN else
