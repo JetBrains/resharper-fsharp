@@ -6,6 +6,7 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
+using JetBrains.Util.Concurrency;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
@@ -40,5 +41,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       // todo: override in class and ask FCS without getting declaration
       return GetDeclaration()?.BaseClassType ?? GetPsiModule().GetPredefinedType().Object;
     }
+
+    public InterruptibleLazy<bool> HasPublicDefaultCtor =>
+      new InterruptibleLazy<bool>(() =>
+        GetTypeMembers().OfType<IConstructor>()
+          .Any(c => c.IsParameterless && c.GetAccessRights() == AccessRights.PUBLIC));
   }
 }

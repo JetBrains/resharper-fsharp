@@ -51,7 +51,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public override string[] ExtendsListShortNames { get; }
 
-    // Workaround for F# operators discovery.
-    public virtual MemberPresenceFlag GetMemberPresenceFlag() => MemberPresenceFlag.SIGN_OP;
+    public virtual MemberPresenceFlag GetMemberPresenceFlag() =>
+      // Workaround for F# operators discovery.
+      MemberPresenceFlag.SIGN_OP |
+
+      // RIDER-10263
+      (HasPublicDefaultCtor.Value ? MemberPresenceFlag.PUBLIC_DEFAULT_CTOR : MemberPresenceFlag.NONE);
   }
 }
