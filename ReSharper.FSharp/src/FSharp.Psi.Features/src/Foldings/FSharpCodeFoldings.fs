@@ -14,12 +14,12 @@ open Microsoft.FSharp.Compiler.SourceCodeServices
 open Microsoft.FSharp.Compiler.SourceCodeServices.Structure
 
 [<Language(typeof<FSharpLanguage>)>]
-type FSharpCodeFoldingProcessFactory() =
+type FSharpCodeFoldingProcessFactory(logger: ILogger) =
     interface ICodeFoldingProcessorFactory with
         member x.CreateProcessor() =
-            FSharpCodeFoldingProcess() :> _
+            FSharpCodeFoldingProcess(logger) :> _
 
-and FSharpCodeFoldingProcess() =
+and FSharpCodeFoldingProcess(logger) =
     inherit TreeNodeVisitor<IHighlightingConsumer>()
     let mutable processingFinished = false
 
@@ -56,7 +56,10 @@ and FSharpCodeFoldingProcess() =
                             match TextRange(lineStart, lineEnd).Intersect(textRange) with
                             | range when not range.IsEmpty -> document.GetText(range) + " ..."
                             | _ -> " ..."
-                    context.AddDefaultPriorityFolding(getFoldingAttrId x.Scope, docRange, placeholder))
+                    if not textRange.IsEmpty then
+                        context.AddDefaultPriorityFolding(getFoldingAttrId x.Scope, docRange, placeholder)
+                    else
+                        logger.LogMessage(LoggingLevel.WARN, sprintf "Empty folding: %O %A" textRange x))
             | _ -> ()
         | _ -> ()
         processingFinished <- true
