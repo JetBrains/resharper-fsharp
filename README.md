@@ -56,9 +56,9 @@ We suggest that you read docs on the two SDKs that this plugin uses:
 
 By default, the project depends on nightly SDK builds, but a specific SDK version can be referenced in [rider-fsharp/build.gradle](rider-fsharp/build.gradle) and [ReSharper.FSharp/Directory.Build.props](ReSharper.FSharp/Directory.Build.props) if necessary.
 
-To update to the latest backend SDK, run *Tools | NuGet | NuGet Restore* in Rider.
+To update to the latest backend SDK, run *Tools | NuGet | NuGet Force Restore* in Rider. The force restore is currently needed for floating package versions like `2017.3-SNAPSHOT*` ([RIDER-11395](https://youtrack.jetbrains.com/issue/RIDER-11395)).
 
-To update to the latest frontend SDK, run the `intellij/updateFrontendSdk` Gradle task in IntelliJ IDEA, or run `$ rider-fsharp/gradlew updateFrontendSdk` from the Gradle command line. 
+To update to the latest frontend SDK, run the `intellij/updateFrontendSdk` Gradle task in IntelliJ IDEA, or run `$ rider-fsharp/gradlew updateFrontendSdk` from the Gradle command line. Gradle normally downloads updates automatically but in the case of Rider SDK it doesn't currently replace it in the plugin folder ([gradle-intellij-plugin#234](https://github.com/JetBrains/gradle-intellij-plugin/issues/234)).
 
 To debug the backend, attach to the ReSharper.Host process launched via the `runIde` Gradle task. To debug the frontend, start the `runIde` task in Debug mode.
 
