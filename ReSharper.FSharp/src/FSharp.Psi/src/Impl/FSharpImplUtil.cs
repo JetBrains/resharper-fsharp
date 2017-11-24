@@ -174,7 +174,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       var parent = declaration.Parent as IModuleLikeDeclaration;
       var shortName = declaration.ShortName;
       var moduleName =
-        parent?.Children<IFSharpTypeDeclaration>().Any(t => t.ShortName == shortName) ?? false
+        parent?.Children<IFSharpTypeDeclaration>().Any(t => t.TypeParameters.IsEmpty && t.ShortName.Equals(shortName, StringComparison.Ordinal)) ?? false
           ? shortName + "Module"
           : shortName;
       return cacheBuilder.Intern(moduleName);
