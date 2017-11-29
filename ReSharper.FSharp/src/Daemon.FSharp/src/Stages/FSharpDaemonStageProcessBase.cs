@@ -4,12 +4,14 @@ using JetBrains.Application.Threading;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Highlightings;
 using JetBrains.ReSharper.Psi.Tree;
+using Microsoft.FSharp.Core;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 {
+  [AllowNullLiteral]
   public abstract class FSharpDaemonStageProcessBase : IDaemonStageProcess
   {
-    private const int InterruptCheckTime = 100;
+    private const int InterruptCheckTime = 20;
     protected readonly SeldomInterruptCheckerWithCheckTime SeldomInterruptChecker;
 
     protected FSharpDaemonStageProcessBase(IDaemonProcess daemonProcess)

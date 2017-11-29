@@ -7,27 +7,37 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Files;
 using JetBrains.Util;
+using Microsoft.FSharp.Compiler.SourceCodeServices;
+using Microsoft.FSharp.Core;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 {
   public abstract class FSharpDaemonStageBase : IDaemonStage
   {
+    public static readonly Key<FSharpOption<FSharpCheckFileResults>> TypeCheckResults =
+      new Key<FSharpOption<FSharpCheckFileResults>>("FSharpTypeCheckResults");
+
     protected virtual bool IsSupported(IPsiSourceFile sourceFile)
     {
       if (sourceFile == null || !sourceFile.IsValid()) return false;
       return sourceFile.IsLanguageSupported<FSharpLanguage>() && !sourceFile.Properties.IsNonUserFile;
     }
 
-    public IEnumerable<IDaemonStageProcess> CreateProcess(IDaemonProcess process,
+    public IEnumerable<IDaemonStageProcess> CreateProcess(IDaemonProcess daemonProcess,
       IContextBoundSettingsStore settings, DaemonProcessKind processKind)
     {
-      if (!IsSupported(process.SourceFile)) return EmptyList<IDaemonStageProcess>.InstanceList;
+      if (!IsSupported(daemonProcess.SourceFile)) return EmptyList<IDaemonStageProcess>.InstanceList;
 
-      return process.SourceFile.GetPrimaryPsiFile() is IFSharpFile fsFile
-        ? new[] {CreateProcess(fsFile, process)}
+      if (!(daemonProcess.SourceFile.GetPrimaryPsiFile() is IFSharpFile fsFile))
+        return EmptyList<IDaemonStageProcess>.Instance;
+
+      var process = CreateProcess(fsFile, daemonProcess);
+      return process != null
+        ? new[] {process}
         : EmptyList<IDaemonStageProcess>.InstanceList;
     }
 
+    [CanBeNull]
     protected abstract IDaemonStageProcess CreateProcess([NotNull] IFSharpFile fsFile,
       [NotNull] IDaemonProcess process);
 

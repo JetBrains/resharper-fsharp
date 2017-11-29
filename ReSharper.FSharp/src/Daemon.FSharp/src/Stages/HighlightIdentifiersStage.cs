@@ -62,8 +62,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
     public override void Execute(Action<DaemonStageResult> committer)
     {
       // todo: add more cases to GetSemanticClassification (e.g. methods, values, namespaces) and use it instead?
+      var checkResults = DaemonProcess.CustomData.GetData(FSharpDaemonStageBase.TypeCheckResults);
+      HighlightUses(committer, myFsFile.GetAllDeclaredSymbols(checkResults?.Value));
       HighlightUses(committer, myFsFile.GetAllResolvedSymbols());
-      HighlightUses(committer, myFsFile.GetAllDeclaredSymbols());
     }
   }
 }

@@ -2,7 +2,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages
 
 open System
 open System.Text
-open System.Collections.Generic
 open JetBrains.Annotations
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Daemon
@@ -14,7 +13,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
-[<AbstractClass>]
+[<AbstractClass; AllowNullLiteral>]
 type ErrorsStageProcessBase(daemonProcess, errors: FSharpErrorInfo[]) =
     inherit FSharpDaemonStageProcessBase(daemonProcess)
 
@@ -50,7 +49,7 @@ type ErrorsStageProcessBase(daemonProcess, errors: FSharpErrorInfo[]) =
         | _ -> ErrorHighlighting(message, range) :> _
 
     override x.Execute(committer) =
-        let highlightings = List<_>(errors.Length)
+        let highlightings = ResizeArray<_>(errors.Length)
         for range, errorsAtRange in errors |> Array.groupBy (fun error -> getDocumentRange error) do
             highlightings.Add(HighlightingInfo(range, createHighlighting(errorsAtRange, range)))
             x.SeldomInterruptChecker.CheckForInterrupt()

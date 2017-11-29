@@ -1,7 +1,6 @@
 module JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages.Tooltips
 
 open System
-open System.Collections.Generic
 open System.Threading
 open System.Web
 open JetBrains.DocumentModel
@@ -58,7 +57,7 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, logger, xmlD
 
                     // todo: provide tooltip for #r strings in fsx, should pass String tag
                     let getTooltip = checkResults.GetToolTipText(int coords.Line + 1, int coords.Column, lineText, names, FSharpTokenTag.Identifier)
-                    let result = List()
+                    let result = ResizeArray()
                     match getTooltip.RunAsTask() with
                     | FSharpToolTipText(tooltips) ->
                         tooltips |> List.iter (function
