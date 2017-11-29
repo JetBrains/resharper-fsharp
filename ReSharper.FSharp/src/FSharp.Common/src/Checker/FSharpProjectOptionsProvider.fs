@@ -101,11 +101,25 @@ type FSharpProjectOptionsProvider(lifetime, logger, solution: ISolution, checker
                               let outPath = p.GetOutputFilePath(p.GetCurrentTargetFrameworkId()).FullPath
                               yield outPath, x.CreateProject(p).Options.Value }
 
+            let isCompilingFsLib options =
+                options.OtherOptions
+                |> Seq.exists (fun s -> s.Equals("--compiling-fslib", StringComparison.Ordinal))
+
+            let hasFSharpCoreReference options =
+                options.OtherOptions
+                |> Seq.exists (fun s ->
+                    s.StartsWith("-r:", StringComparison.Ordinal) &&
+                    s.EndsWith("FSharp.Core.dll", StringComparison.Ordinal))
+
+            let shoudAddFSharpCore options =
+                not (hasFSharpCoreReference options || isCompilingFsLib options)
+
             let options = { fsProject.Options.Value with ReferencedProjects = referencedProjectsOptions.ToArray() }
             let options =
-                if not (Seq.exists (fun (s: string) -> s.StartsWith "-r:" && s.Contains "FSharp.Core.dll") options.OtherOptions) then
+                if shoudAddFSharpCore options then 
                     { options with OtherOptions = FSharpCoreFix.ensureCorrectFSharpCore options.OtherOptions }
                 else options
+
             let fsProject = { fsProject with Options = Some options }
             projects.[project] <- fsProject
             fsProject

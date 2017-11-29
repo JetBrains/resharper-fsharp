@@ -10,8 +10,8 @@ type FSharpProject =
     {
         Options: FSharpProjectOptions option
         ConfigurationDefines: string list
-        FileIndices: Dictionary<FileSystemPath, int>
-        FilesWithPairs: HashSet<FileSystemPath>
+        FileIndices: IDictionary<FileSystemPath, int>
+        FilesWithPairs: ISet<FileSystemPath>
         mutable ParsingOptions: FSharpParsingOptions option
     }
     member x.ContainsFile (file: IPsiSourceFile) =

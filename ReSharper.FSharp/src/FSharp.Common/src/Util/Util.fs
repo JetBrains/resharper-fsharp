@@ -40,9 +40,9 @@ module CommonUtil =
         if isFSharpProject [mark.Guid] mark.Location then Some() else None
 
     let ensureAbsolute (path: FileSystemPath) (projectDirectory: FileSystemPath) =
-        let relativePath = path.AsRelative()
-        if isNull relativePath then path
-        else projectDirectory.Combine(relativePath)
+        match path.AsRelative() with
+        | null -> path
+        | relativePath -> projectDirectory.Combine(relativePath)
 
     let concatErrors errors =
         Seq.fold (fun s (e: FSharpErrorInfo) -> s + "\n" + e.Message) "" errors
@@ -80,14 +80,15 @@ module CommonUtil =
         member x.remove el = x.Remove el |> ignore
         member x.add el = x.Add el |> ignore
 
-    type FileSystemPath with
-        member x.IsImplFile() =
-            let ext = x.ExtensionNoDot
-            ext = "fs" || ext = "ml"
+    let (|ImplFile|_|) (path: FileSystemPath) =
+        match path.ExtensionNoDot with
+        | "fs" | "ml" -> Some()
+        | _ -> None
 
-        member x.IsSigFile() =
-            let ext = x.ExtensionNoDot
-            ext = "fsi" || ext = "mli"
+    let (|SigFile|_|) (path: FileSystemPath) =
+        match path.ExtensionNoDot with
+        | "fsi" | "mli" -> Some()
+        | _ -> None
 
     type Line = Int32<DocLine>
     type Column = Int32<DocColumn>

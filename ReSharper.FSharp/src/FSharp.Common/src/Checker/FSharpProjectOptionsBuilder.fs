@@ -19,27 +19,41 @@ open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
 module FSharpProperties =
-    [<Literal>]
-    let TargetProfile = "TargetProfile"
+    let [<Literal>] TargetProfile = "TargetProfile"
+    let [<Literal>] BaseAddress = "BaseAddress"
+    let [<Literal>] OtherFlags = "OtherFlags"
+    let [<Literal>] NoWarn = "NoWarn"
+    let [<Literal>] WarnAsError = "WarnAsError"
 
 [<ShellComponent>]
 type FSharpProjectPropertiesRequest() =
-    let properties = [ FSharpProperties.TargetProfile ]
+    let properties =
+        [ FSharpProperties.TargetProfile
+          FSharpProperties.BaseAddress
+          FSharpProperties.OtherFlags
+          FSharpProperties.NoWarn
+          FSharpProperties.WarnAsError ]
+
     interface IProjectPropertiesRequest with
         member x.RequestedProperties = properties :> _
 
 [<SolutionComponent>]
-type FSharpProjectOptionsBuilder(solution: ISolution,
-                                 filesFromTargetsProvider: FSharpProjectFilesFromTargetsProvider) =
+type FSharpProjectOptionsBuilder(solution: ISolution, filesFromTargetsProvider: FSharpProjectFilesFromTargetsProvider) =
     let msBuildHost = solution.ProjectsHostContainer().GetComponent<MsBuildProjectHost>()
+
     let defaultDelimiters = [| ';'; ','; ' ' |]
-    let compileTypes = Set.ofSeq (seq { yield "Compile"; yield "CompileBefore"; yield "CompileAfter"})
+
+    let splitAndTrim (delimiters: char[]) = function
+        | null -> Seq.empty
+        | (s: string) -> seq {
+            for s in s.Split(delimiters) do
+                if not (s.IsNullOrWhitespace()) then yield s.Trim() }
 
     member x.BuildSingleProjectOptions (project: IProject) =
         let properties = project.ProjectProperties
         let buildSettings = properties.BuildSettings :?> _
 
-        let options = List()
+        let options = ResizeArray()
         options.AddRange(seq {
             yield "--out:" + project.GetOutputFilePath(project.GetCurrentTargetFrameworkId()).FullPath
             yield "--noframework"
@@ -56,8 +70,8 @@ type FSharpProjectOptionsBuilder(solution: ISolution,
         let paths = x.GetReferencedPathsOptions(project)
         options.AddRange(paths)
 
-        let definedConstants = x.GetDefinedConstants(properties)
-        options.AddRange(List.map (fun c -> "--define:" + c) definedConstants)
+        let definedConstants = x.GetDefinedConstants(properties) |> List.ofSeq
+        options.AddRange(definedConstants |> Seq.map (fun c -> "--define:" + c))
 
         match properties.ActiveConfigurations.Configurations.SingleItem() with
         | :? IManagedProjectConfiguration as cfg ->
@@ -66,18 +80,29 @@ type FSharpProjectOptionsBuilder(solution: ISolution,
             let doc = cfg.DocumentationFile
             if not (doc.IsNullOrWhitespace()) then options.Add("--doc:" + doc)
 
-            let nowarn = x.SplitAndTrim(cfg.NoWarn, defaultDelimiters).Join(",")
-            if not (nowarn.IsNullOrWhitespace()) then options.Add("--nowarn:" + nowarn)
-            
             let props = cfg.PropertiesCollection
-            let targetProfile = ref ""
-            match props.TryGetValue(FSharpProperties.TargetProfile, targetProfile), !targetProfile with
-            | true, targetProfile when not (targetProfile.IsNullOrWhitespace()) ->
-                options.Add("--targetprofile:" + targetProfile.Trim())
-            | _ -> ()
+
+            let getOption f p =
+                match props.TryGetValue(p) with
+                | v when not (v.IsNullOrWhitespace()) -> Some ("--" + p.ToLower() + ":" + f v)
+                | _ -> None
+
+            [FSharpProperties.TargetProfile; FSharpProperties.BaseAddress]
+            |> List.choose (getOption id)
+            |> options.AddRange
+
+            [FSharpProperties.NoWarn; FSharpProperties.WarnAsError]
+            |> List.choose (getOption (fun v -> (splitAndTrim defaultDelimiters v).Join(",")))
+            |> options.AddRange
+
+            match props.TryGetValue(FSharpProperties.OtherFlags) with
+            | otherFlags when not (otherFlags.IsNullOrWhitespace()) -> splitAndTrim [| ' ' |] otherFlags
+            | _ -> Seq.empty
+            |> options.AddRange
         | _ -> ()
 
-        let filePaths, pairFiles = x.GetProjectFiles(project)
+        let filePaths, pairFiles, resources = x.GetProjectFilesAndResources(project)
+        options.AddRange(resources |> Seq.map (fun (r: FileSystemPath) -> "--resource:" + r.FullPath))
         let fileIndices = Dictionary<FileSystemPath, int>()
         Array.iteri (fun i p -> fileIndices.[p] <- i) filePaths
 
@@ -101,30 +126,43 @@ type FSharpProjectOptionsBuilder(solution: ISolution,
           ParsingOptions = None
         }
 
-    member private x.GetProjectFiles(project: IProject) =
+    member private x.GetProjectFilesAndResources(project: IProject) =
         let projectMark = project.GetProjectMark().NotNull()
         let projectDir = projectMark.Location.Directory
-        let files = List()
+
+        let files = Dictionary<_, List<FileSystemPath>>()
+        itemTypes |> Array.iter (fun t -> files.[t] <- ResizeArray())
+
         let sigFiles = HashSet<string>()
         let pairFiles = HashSet<FileSystemPath>()
+
         ignore (msBuildHost.mySessionHolder.Execute(fun session ->
             session.TryEditProject(projectMark, fun editor ->
                 for item in editor.Items do
-                    if compileTypes.Contains(item.ItemType()) then
+                    let itemType = item.ItemType()
+                    if Array.contains itemType itemTypes then
                         let path = FileSystemPath.TryParse(item.EvaluatedInclude)
                         if not path.IsEmpty then
                             let path = ensureAbsolute path projectDir
-                            files.Add(path)
-                            if path.IsSigFile() then sigFiles.add path.NameWithoutExtension
-                            else if path.IsImplFile() && sigFiles.Contains(path.NameWithoutExtension)
-                                 then pairFiles.add(path))))
+                            files.[itemType].Add(path)
+
+                            match path with
+                            | SigFile -> sigFiles.Add(path.NameWithoutExtension) |> ignore
+                            | ImplFile when sigFiles.Contains(path.NameWithoutExtension) -> pairFiles.add(path)
+                            | _ -> ())))
+
         let filesFromTargets = filesFromTargetsProvider.GetFilesForProject(projectMark)
-        let files =
-            seq { yield! filesFromTargets.CompileBefore
-                  yield! filesFromTargets.Compile
-                  yield! files
-                  yield! filesFromTargets.CompileAfter }
-        files |> Array.ofSeq, pairFiles
+        let compileFiles =
+            [| yield! filesFromTargets.CompileBefore
+               yield! files.[CompileBefore]
+
+               yield! filesFromTargets.Compile
+               yield! files.[Compile]
+               
+               yield! filesFromTargets.CompileAfter
+               yield! files.[CompileAfter] |]
+
+        compileFiles, pairFiles, files.[Resource]
 
     member private x.GetReferencedPathsOptions(project: IProject) =
         let framework = project.GetCurrentTargetFrameworkId()
@@ -144,9 +182,5 @@ type FSharpProjectOptionsBuilder(solution: ISolution,
 
     member private x.GetDefinedConstants(properties: IProjectProperties) =
         match properties.ActiveConfigurations.Configurations.SingleItem() with
-        | :? IManagedProjectConfiguration as cfg -> x.SplitAndTrim(cfg.DefineConstants, defaultDelimiters)
-        | _ -> List.empty
-
-    member private x.SplitAndTrim([<CanBeNull>] strings, [<ParamArray>] delimiters: char[]): string list =
-        if isNull strings then List.empty
-        else [ for s in strings.Split(delimiters) do if not (s.IsNullOrWhitespace()) then yield s.Trim() ]
+        | :? IManagedProjectConfiguration as cfg -> splitAndTrim defaultDelimiters cfg.DefineConstants
+        | _ -> Seq.empty
