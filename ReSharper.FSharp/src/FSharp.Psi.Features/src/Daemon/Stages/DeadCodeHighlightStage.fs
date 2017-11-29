@@ -3,8 +3,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages
 open System.Linq
 open JetBrains.ReSharper.Daemon.Stages
 open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
+open JetBrains.ReSharper.Plugins.FSharp.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Tree

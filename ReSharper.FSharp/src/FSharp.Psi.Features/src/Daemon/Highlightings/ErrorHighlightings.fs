@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Highlightings
 
+open System
 open JetBrains.Annotations
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Daemon
@@ -32,3 +33,14 @@ type WarningHighlighting(message, range) =
                              OverlapResolve = OverlapResolveKind.UNRESOLVED_ERROR)>]
 type UnresolvedHighlighting(message, range) = 
     inherit ErrorOrWarningHighlightingBase(message, range)
+
+
+[<StaticSeverityHighlighting(Severity.INFO, HighlightingGroupIds.IdentifierHighlightingsGroup,
+                             AttributeId = HighlightingAttributeIds.DEADCODE_ATTRIBUTE,
+                             OverlapResolve = OverlapResolveKind.DEADCODE)>]
+type DeadCodeHighlighting(range) =
+    interface IHighlighting with
+        member x.IsValid() = true
+        member x.CalculateRange() = range
+        member x.ToolTip = String.Empty
+        member x.ErrorStripeToolTip = String.Empty
