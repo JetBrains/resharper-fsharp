@@ -15,6 +15,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     FSharpOption<FSharpParseAndCheckResults> GetParseAndCheckResults(bool allowStaleResults,
       Action interruptChecker = null);
 
+    FSharpOption<FSharpParsingOptions> ParsingOptions { get; set; }
+
     FSharpCheckerService CheckerService { get; set; }
 
     TokenBuffer ActualTokenBuffer { get; set; }
@@ -29,9 +31,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     FSharpSymbol GetSymbolDeclaration(int offset);
 
     [NotNull]
-    FSharpResolvedSymbolUse[] GetAllResolvedSymbols();
+    FSharpResolvedSymbolUse[] GetAllResolvedSymbols(FSharpCheckFileResults checkResults = null, Action interruptChecker = null);
 
     [NotNull]
-    FSharpResolvedSymbolUse[] GetAllDeclaredSymbols();
+    FSharpResolvedSymbolUse[] GetAllDeclaredSymbols(FSharpCheckFileResults checkResults = null, Action interruptChecker = null);
   }
 }

@@ -26,6 +26,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     private Dictionary<int, FSharpResolvedSymbolUse> myResolvedSymbols;
 
     public FSharpCheckerService CheckerService { get; set; }
+    public FSharpOption<FSharpParsingOptions> ParsingOptions { get; set; }
+
     public TokenBuffer ActualTokenBuffer { get; set; }
     public FSharpOption<FSharpParseFileResults> ParseResults { get; set; }
     public override PsiLanguageType Language => FSharpLanguage.Instance;
@@ -38,17 +40,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       return CheckerService.ParseAndCheckFile(sourceFile, allowStaleResults);
     }
 
-    private void UpdateSymbols()
+
+    private void UpdateSymbols(FSharpCheckFileResults checkResults = null, Action daemonInterruptChecker = null)
     {
       lock (ourGetSymbolsLock)
         if (myDeclarationSymbols == null)
         {
           var interruptChecker = new SeldomInterruptCheckerWithCheckTime(100);
-          var checkResults = GetParseAndCheckResults(false);
+          checkResults = checkResults ?? GetParseAndCheckResults(false)?.Value.CheckResults;
+          if (checkResults == null)
+            return;
+
           var document = GetSourceFile()?.Document;
           var buffer = document?.Buffer;
 
-          var symbolUses = checkResults?.Value.CheckResults.GetAllUsesOfAllSymbolsInFile().RunAsTask();
+          var symbolUses = checkResults.GetAllUsesOfAllSymbolsInFile().RunAsTask(daemonInterruptChecker);
           if (symbolUses == null || document == null)
             return;
 
@@ -112,6 +118,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
               if (!myDeclarationSymbols.ContainsKey(startOffset))
                 myResolvedSymbols[nameRange.StartOffset] = new FSharpResolvedSymbolUse(symbolUse, nameRange);
             }
+
             interruptChecker.CheckForInterrupt();
           }
         }
@@ -137,22 +144,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       return range;
     }
 
-    public FSharpResolvedSymbolUse[] GetAllResolvedSymbols()
+    public FSharpResolvedSymbolUse[] GetAllResolvedSymbols(FSharpCheckFileResults checkResults = null,
+      Action interruptChecker = null)
     {
       lock (ourGetSymbolsLock)
       {
         if (myDeclarationSymbols == null)
-          UpdateSymbols();
+          UpdateSymbols(checkResults, interruptChecker);
         return myResolvedSymbols?.Values.AsArray() ?? EmptyArray<FSharpResolvedSymbolUse>.Instance;
       }
     }
 
-    public FSharpResolvedSymbolUse[] GetAllDeclaredSymbols()
+    public FSharpResolvedSymbolUse[] GetAllDeclaredSymbols(FSharpCheckFileResults checkResults = null,
+      Action interruptChecker = null)
     {
       lock (ourGetSymbolsLock)
       {
         if (myDeclarationSymbols == null)
-          UpdateSymbols();
+          UpdateSymbols(checkResults);
         return myDeclarationSymbols?.Values.AsArray() ?? EmptyArray<FSharpResolvedSymbolUse>.Instance;
       }
     }
