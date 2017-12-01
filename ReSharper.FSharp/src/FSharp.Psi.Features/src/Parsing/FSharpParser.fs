@@ -11,14 +11,13 @@ open Microsoft.FSharp.Compiler.Ast
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
 type FSharpParser(file: IPsiSourceFile, checkerService: FSharpCheckerService, logger) =
-    let createTreeBuilder lexer lifetime options  =
+    let tryCreateTreeBuilder lexer lifetime =
         Option.bind (fun (parseResults: FSharpParseFileResults) ->
             parseResults.ParseTree |> Option.map (function
             | ParsedInput.ImplFile(_) as tree ->
                 FSharpImplTreeBuilder(file, lexer, tree, lifetime, logger) :> FSharpTreeBuilderBase
             | ParsedInput.SigFile(_) as tree ->
                 FSharpSigTreeBuilder(file, lexer, tree, lifetime, logger) :> FSharpTreeBuilderBase))
-        >> Option.defaultWith (fun _ -> FSharpFakeTreeBuilder(file, lexer, lifetime, logger, options) :> _)
 
     interface IParser with
         member this.ParseFile() =
@@ -26,7 +25,9 @@ type FSharpParser(file: IPsiSourceFile, checkerService: FSharpCheckerService, lo
             let options, parseResults = checkerService.ParseFile(file)
             let tokenBuffer = TokenBuffer(FSharpLexer(file.Document, checkerService.GetDefines(file)))
             let lexer = tokenBuffer.CreateLexer()
-            let treeBuilder = createTreeBuilder lexer lifetime options parseResults
+            let treeBuilder =
+                tryCreateTreeBuilder lexer lifetime parseResults
+                |> Option.defaultWith (fun _ -> FSharpFakeTreeBuilder(file, lexer, lifetime, logger, options) :> _)
 
             match treeBuilder.CreateFSharpFile() with
             | :? IFSharpFile as fsFile ->
