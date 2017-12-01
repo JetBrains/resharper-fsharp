@@ -1,15 +1,18 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 
 open System
-open System.Collections.Generic
-open System.IO
+open System.Collections.Concurrent
 open System.Text
 open JetBrains
-open JetBrains.DataFlow
-open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.Application.changes
+open JetBrains.DocumentManagers
+open JetBrains.DocumentManagers.impl
+open JetBrains.DocumentModel
 open JetBrains.ProjectModel
+open JetBrains.ReSharper.Plugins.FSharp.Common.Util.CommonUtil
+open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.Caches
 open JetBrains.ReSharper.Psi.Modules
 
 type FSharpSource =
@@ -19,46 +22,29 @@ type FSharpSource =
     }
 
 [<SolutionComponent>]
-type FSharpSourceCache(lifetime: Lifetime, logger: Util.ILogger) =
-    let files = Dictionary<Util.FileSystemPath, FSharpSource>()
-    do lifetime.AddAction(fun _ -> files.Clear()) |> ignore
+type FSharpSourceCache(lifetime, changeManager: ChangeManager, documentManager: DocumentManager) as this =
+    let files = ConcurrentDictionary()
+    do
+        changeManager.RegisterChangeProvider(lifetime, this)
+        changeManager.AddDependency(lifetime, this, documentManager.ChangeProvider)
 
-    let canHandle (sourceFile: IPsiSourceFile) =
-        sourceFile.PrimaryPsiLanguage.Is<FSharpLanguage>() &&
-        sourceFile.PsiModule :? IProjectPsiModule &&
-        sourceFile.Properties.ProvidesCodeModel
-
-    let update (sourceFile: IPsiSourceFile) path timestamp =
-        let source = Encoding.UTF8.GetBytes(sourceFile.Document.GetText())
-        files.[path] <- { Source = source; Timestamp = timestamp }
+    let update (document: IDocument) path =
+        let source = Encoding.UTF8.GetBytes(document.GetText())
+        files.[path] <- { Source = source; Timestamp = DateTime.UtcNow }
 
     member x.GetSource(path: Util.FileSystemPath) =
-        lock files (fun _ ->
-            match files.TryGetValue(path) with
-            | true, source -> Some source
-            | _ -> None)
+        match files.TryGetValue(path) with
+        | true, source -> Some source
+        | _ -> None
 
-    // todo: rewrite to to use IChangeProvider instead
-    interface ICache with
-        member x.Build(sourceFile, _) =
-            if canHandle sourceFile then
-                lock files (fun _ ->
-                    let path = sourceFile.GetLocation()
-                    update sourceFile path (File.GetLastWriteTimeUtc(path.FullPath)))
+    interface IChangeProvider with
+        member x.Execute(changeMap) =
+            let change = changeMap.GetChange<ProjectFileDocumentCopyChange>(documentManager.ChangeProvider)
+            if isNotNull change then
+                let file = change.ProjectFile
+                match file.LanguageType with
+                | :? FSharpProjectFileType
+                | :? FSharpScriptProjectFileType ->
+                     update change.Document file.Location
+                | _ -> ()
             null
-
-        member x.OnDocumentChange(sourceFile, _) =
-            if canHandle sourceFile then
-                lock files (fun _ -> update sourceFile (sourceFile.GetLocation()) DateTime.UtcNow)
-
-        member x.OnPsiChange(_, _) = ()
-        member x.HasDirtyFiles = false
-        member x.MarkAsDirty(_) = ()
-        member x.MergeLoaded(_) = ()
-        member x.SyncUpdate(_) =()
-        member x.Drop(_) = ()
-        member x.UpToDate(_) = true
-        member x.Load(_, _) = null
-        member x.Save(_, _) = ()
-        member x.Dump(_, _) = ()
-        member x.Merge(_, _) = ()
