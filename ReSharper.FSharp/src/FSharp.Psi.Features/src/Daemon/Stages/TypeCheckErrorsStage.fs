@@ -18,10 +18,10 @@ type TypeCheckErrorsStage(daemonProcess, logger: ILogger) =
         fsFile.GetParseAndCheckResults(false)
         |> Option.map (fun results ->
             daemonProcess.CustomData.PutData(FSharpDaemonStageBase.TypeCheckResults, Some results.CheckResults)
-            let fileErrors, projectWarnings =
+            let projectWarnings, fileErrors  =
                 results.CheckResults.Errors
                 |> Array.partition (fun e ->
-                    e.StartLineAlternate <> 0 && e.EndLineAlternate <> 0 && e.Severity <> FSharpErrorSeverity.Warning)
+                    e.StartLineAlternate = 0 && e.EndLineAlternate = 0 && e.Severity = FSharpErrorSeverity.Warning)
 
             if not (Array.isEmpty projectWarnings) then
                 // https://github.com/Microsoft/visualfsharp/issues/4030
