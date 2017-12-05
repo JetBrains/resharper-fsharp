@@ -37,6 +37,21 @@ type FSharpProjectPropertiesRequest() =
     interface IProjectPropertiesRequest with
         member x.RequestedProperties = properties :> _
 
+[<ShellComponent>]
+type VisualFSharpTargetsProjectLoadModificator() =
+    let targets =
+        [| "GenerateFSharpInternalsVisibleToFile"
+           "GenerateAssemblyFileVersionTask" |]
+
+    interface IMsBuildProjectLoadModificator with
+        member x.IsApplicable(mark) =
+            match mark with
+            | FSharProjectMark -> true
+            | _ -> false
+
+        member x.Modify(context) =
+            context.Targets.AddRange(targets)
+
 [<SolutionComponent>]
 type FSharpProjectOptionsBuilder(solution: ISolution, filesFromTargetsProvider: FSharpProjectFilesFromTargetsProvider) =
     let msBuildHost = solution.ProjectsHostContainer().GetComponent<MsBuildProjectHost>()
