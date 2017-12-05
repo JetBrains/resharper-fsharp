@@ -145,7 +145,7 @@ type FSharpProjectOptionsBuilder(solution: ISolution, filesFromTargetsProvider: 
         let projectMark = project.GetProjectMark().NotNull()
         let projectDir = projectMark.Location.Directory
 
-        let files = Dictionary<_, List<FileSystemPath>>()
+        let files = Dictionary()
         itemTypes |> Array.iter (fun t -> files.[t] <- ResizeArray())
 
         let sigFiles = HashSet<string>()
@@ -168,15 +168,19 @@ type FSharpProjectOptionsBuilder(solution: ISolution, filesFromTargetsProvider: 
 
         let filesFromTargets = filesFromTargetsProvider.GetFilesForProject(projectMark)
         let compileFiles =
-            [| yield! filesFromTargets.CompileBefore
-               yield! files.[CompileBefore]
+            // the order between files lists and filesFromTargets may be wrong
+            // and will be fixed when R# keeps a common evaluation order
+            // https://youtrack.jetbrains.com/issue/RIDER-9682
+            [| yield! files.[CompileBefore]
+               yield! filesFromTargets.CompileBefore
 
-               yield! filesFromTargets.Compile
                yield! files.[Compile]
-               
-               yield! filesFromTargets.CompileAfter
-               yield! files.[CompileAfter] |]
+               yield! filesFromTargets.Compile
 
+               yield! files.[CompileAfter]
+               yield! filesFromTargets.CompileAfter |]
+
+        files.[Resource].AddRange(filesFromTargets.Resource.ToIList())
         compileFiles, pairFiles, files.[Resource]
 
     member private x.GetReferencedPathsOptions(project: IProject) =
