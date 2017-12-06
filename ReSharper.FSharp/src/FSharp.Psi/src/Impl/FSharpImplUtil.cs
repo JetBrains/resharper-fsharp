@@ -63,7 +63,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         if (attr.ShortNameEquals("CompiledName") && attr.ArgExpression.String != null)
         {
           var compiledNameString = attr.ArgExpression.String.GetText();
-          return compiledNameString.Substring(1, compiledNameString.Length - 2);
+          return compiledNameString
+            .Substring(1, compiledNameString.Length - 2)
+            .SubstringBeforeLast("`", StringComparison.Ordinal);
         }
 
         if (hasModuleSuffix || !attr.ShortNameEquals("CompilationRepresentation")) continue;
@@ -124,7 +126,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       clrName.Append(declaration.DeclaredName);
 
       var typeDeclaration = declaration as IFSharpTypeDeclaration;
-      if (typeDeclaration?.TypeParameters.Count > 0 && !HasCompiledNameAttr(typeDeclaration.Attributes))
+      if (typeDeclaration?.TypeParameters.Count > 0)
         clrName.Append("`" + typeDeclaration.TypeParameters.Count);
 
       return clrName.ToString();
