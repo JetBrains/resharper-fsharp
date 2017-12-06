@@ -17,7 +17,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal abstract class FSharpFileBase : FileElementBase, IFSharpFileCheckInfoOwner
   {
-    private static readonly object ourGetSymbolsLock = new object();
+    private readonly object myGetSymbolsLock = new object();
 
     // These symbols should be invalidated when dependent files change.
     // These symbols should also be used in FSharpMemberBase instances without attaching symbols to R# members.
@@ -43,85 +43,84 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     private void UpdateSymbols(FSharpCheckFileResults checkResults = null, Action daemonInterruptChecker = null)
     {
-      lock (ourGetSymbolsLock)
-        if (myDeclarationSymbols == null)
+      if (myDeclarationSymbols == null)
+      {
+        var interruptChecker = new SeldomInterruptCheckerWithCheckTime(100);
+        checkResults = checkResults ?? GetParseAndCheckResults(false)?.Value.CheckResults;
+        if (checkResults == null)
+          return;
+
+        var document = GetSourceFile()?.Document;
+        var buffer = document?.Buffer;
+
+        var symbolUses = checkResults.GetAllUsesOfAllSymbolsInFile().RunAsTask(daemonInterruptChecker);
+        if (symbolUses == null || document == null)
+          return;
+
+        // add separate APIs to FCS to get resoved symbols and bindings?
+        myResolvedSymbols = new Dictionary<int, FSharpResolvedSymbolUse>(symbolUses.Length);
+        myDeclarationSymbols = new Dictionary<int, FSharpResolvedSymbolUse>(symbolUses.Length / 4);
+
+        foreach (var symbolUse in symbolUses)
         {
-          var interruptChecker = new SeldomInterruptCheckerWithCheckTime(100);
-          checkResults = checkResults ?? GetParseAndCheckResults(false)?.Value.CheckResults;
-          if (checkResults == null)
-            return;
+          var symbol = symbolUse.Symbol;
+          var range = symbolUse.RangeAlternate;
 
-          var document = GetSourceFile()?.Document;
-          var buffer = document?.Buffer;
+          var startOffset = document.GetOffset(range.Start);
+          var endOffset = document.GetOffset(range.End);
+          var mfv = symbol as FSharpMemberOrFunctionOrValue;
 
-          var symbolUses = checkResults.GetAllUsesOfAllSymbolsInFile().RunAsTask(daemonInterruptChecker);
-          if (symbolUses == null || document == null)
-            return;
-
-          // add separate APIs to FCS to get resoved symbols and bindings?
-          myResolvedSymbols = new Dictionary<int, FSharpResolvedSymbolUse>(symbolUses.Length);
-          myDeclarationSymbols = new Dictionary<int, FSharpResolvedSymbolUse>(symbolUses.Length / 4);
-
-          foreach (var symbolUse in symbolUses)
+          if (symbolUse.IsFromDefinition)
           {
-            var symbol = symbolUse.Symbol;
-            var range = symbolUse.RangeAlternate;
-
-            var startOffset = document.GetOffset(range.Start);
-            var endOffset = document.GetOffset(range.End);
-            var mfv = symbol as FSharpMemberOrFunctionOrValue;
-
-            if (symbolUse.IsFromDefinition)
+            if (mfv != null)
             {
-              if (mfv != null)
-              {
-                // workaround for auto-properties, see visualfsharp#3939
-                var mfvLogicalName = mfv.LogicalName;
-                if (mfvLogicalName.EndsWith("@", StringComparison.Ordinal))
-                  continue;
+              // workaround for auto-properties, see visualfsharp#3939
+              var mfvLogicalName = mfv.LogicalName;
+              if (mfvLogicalName.EndsWith("@", StringComparison.Ordinal))
+                continue;
 
-                // visualfsharp#3939
-                if (mfvLogicalName.Equals("v", StringComparison.Ordinal) &&
-                    myDeclarationSymbols.ContainsKey(startOffset))
-                  continue;
+              // visualfsharp#3939
+              if (mfvLogicalName.Equals("v", StringComparison.Ordinal) &&
+                  myDeclarationSymbols.ContainsKey(startOffset))
+                continue;
 
-                // visualfsharp#3943, visualfsharp#3933
-                if (!mfvLogicalName.Equals(".ctor", StringComparison.Ordinal) &&
-                    !(FindTokenAt(new TreeOffset(endOffset - 1)) is FSharpIdentifierToken))
-                  continue;
-              }
-              else
-              {
-                // workaround for compiler generated symbols (e.g. fields auto-properties)
-                if (!(FindTokenAt(new TreeOffset(endOffset - 1)) is FSharpIdentifierToken))
-                  continue;
-              }
-
-              var textRange = new TextRange(startOffset, endOffset);
-              myDeclarationSymbols[startOffset] = new FSharpResolvedSymbolUse(symbolUse, textRange);
-              myResolvedSymbols.Remove(startOffset);
+              // visualfsharp#3943, visualfsharp#3933
+              if (!mfvLogicalName.Equals(".ctor", StringComparison.Ordinal) &&
+                  !(FindTokenAt(new TreeOffset(endOffset - 1)) is FSharpIdentifierToken))
+                continue;
             }
             else
             {
-              // workaround for indexer properties, visualfsharp#3933
-              if (startOffset == endOffset ||
-                  mfv != null && mfv.IsProperty && buffer[endOffset - 1] == ']')
+              // workaround for compiler generated symbols (e.g. fields auto-properties)
+              if (!(FindTokenAt(new TreeOffset(endOffset - 1)) is FSharpIdentifierToken))
                 continue;
-
-              var nameRange = FixRange(new TextRange(startOffset, endOffset), buffer);
-
-              // workaround for implicit type usages (e.g. in members with optional params), visualfsharp#3933
-              if (symbol is FSharpEntity &&
-                  !(FindTokenAt(new TreeOffset(nameRange.EndOffset - 1)) is FSharpIdentifierToken))
-                continue;
-
-              if (!myDeclarationSymbols.ContainsKey(startOffset))
-                myResolvedSymbols[nameRange.StartOffset] = new FSharpResolvedSymbolUse(symbolUse, nameRange);
             }
 
-            interruptChecker.CheckForInterrupt();
+            var textRange = new TextRange(startOffset, endOffset);
+            myDeclarationSymbols[startOffset] = new FSharpResolvedSymbolUse(symbolUse, textRange);
+            myResolvedSymbols.Remove(startOffset);
           }
+          else
+          {
+            // workaround for indexer properties, visualfsharp#3933
+            if (startOffset == endOffset ||
+                mfv != null && mfv.IsProperty && buffer[endOffset - 1] == ']')
+              continue;
+
+            var nameRange = FixRange(new TextRange(startOffset, endOffset), buffer);
+
+            // workaround for implicit type usages (e.g. in members with optional params), visualfsharp#3933
+            if (symbol is FSharpEntity &&
+                !(FindTokenAt(new TreeOffset(nameRange.EndOffset - 1)) is FSharpIdentifierToken))
+              continue;
+
+            if (!myDeclarationSymbols.ContainsKey(startOffset))
+              myResolvedSymbols[nameRange.StartOffset] = new FSharpResolvedSymbolUse(symbolUse, nameRange);
+          }
+
+          interruptChecker.CheckForInterrupt();
         }
+      }
     }
 
     private TextRange FixRange(TextRange range, IBuffer buffer)
@@ -147,7 +146,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public FSharpResolvedSymbolUse[] GetAllResolvedSymbols(FSharpCheckFileResults checkResults = null,
       Action interruptChecker = null)
     {
-      lock (ourGetSymbolsLock)
+      lock (myGetSymbolsLock)
       {
         if (myDeclarationSymbols == null)
           UpdateSymbols(checkResults, interruptChecker);
@@ -158,7 +157,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public FSharpResolvedSymbolUse[] GetAllDeclaredSymbols(FSharpCheckFileResults checkResults = null,
       Action interruptChecker = null)
     {
-      lock (ourGetSymbolsLock)
+      lock (myGetSymbolsLock)
       {
         if (myDeclarationSymbols == null)
           UpdateSymbols(checkResults);
@@ -168,7 +167,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public FSharpSymbol GetSymbolUse(int offset)
     {
-      lock (ourGetSymbolsLock)
+      lock (myGetSymbolsLock)
       {
         if (myDeclarationSymbols == null)
           UpdateSymbols();
@@ -184,7 +183,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public FSharpSymbol GetSymbolDeclaration(int offset)
     {
-      lock (ourGetSymbolsLock)
+      lock (myGetSymbolsLock)
       {
         if (myDeclarationSymbols == null)
           UpdateSymbols();
