@@ -10,7 +10,7 @@ open Microsoft.FSharp.Compiler
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpExpressionEvaluationInfoProvider() =
     interface IExpressionEvaluationInfoProvider with
-        member x.FindExpression(file, range, _) =
+        member x.FindExpression(file, range, _, _) =
             let offset = range.StartOffset.Offset
             let tokenOpt =
                 file.FindTokensAt(TreeTextRange(TreeOffset(offset - 1), TreeOffset(offset + 1)))
