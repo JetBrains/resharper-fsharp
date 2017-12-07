@@ -63,7 +63,7 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, logger, xmlD
                         tooltips |> List.iter (function
                             | FSharpToolTipElement.Group(overloads) ->
                                 overloads |> List.iter (fun overload ->
-                                    let text = overload.MainDescription
+                                    let text = overload.MainDescription.TrimStart()
                                     match xmlDocService.GetXmlDoc(overload.XmlDoc) with
                                     | null when not (text.IsNullOrWhitespace()) -> result.Add(text)
                                     | xmlDocText ->

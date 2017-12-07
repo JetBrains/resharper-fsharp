@@ -42,7 +42,7 @@ type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread
     [<CanBeNull>]
     member x.GetXmlDoc(fsXmlDoc: FSharpXmlDoc) =
         match fsXmlDoc with
-        | FSharpXmlDoc.Text s -> RichTextBlock(s)
+        | FSharpXmlDoc.Text s -> RichTextBlock(s.TrimStart())
         | FSharpXmlDoc.XmlDocFileSignature (dllFile, memberName) ->
             getIndex dllFile
             |> Option.map (fun index ->
