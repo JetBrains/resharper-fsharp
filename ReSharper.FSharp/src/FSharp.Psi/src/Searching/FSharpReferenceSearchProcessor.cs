@@ -27,6 +27,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
       if (Elements.Contains(resolvedElement))
         return true;
 
+      if (resolvedElement is IConstructor constructor)
+      {
+        var containingType = constructor.GetContainingType();
+        if (containingType != null)
+          return AcceptElement(containingType);
+      }
+      
       // found a symbol that cannot be resolved to the R# cache,
       // e.g. an active pattern case declared in a compiled assembly
       var resolvedSymbol = (resolvedElement as ResolvedFSharpSymbolElement)?.Symbol;
