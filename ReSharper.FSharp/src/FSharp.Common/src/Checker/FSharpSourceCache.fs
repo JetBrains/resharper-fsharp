@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 
 open System
+open System.IO
 open System.Collections.Concurrent
 open System.Text
 open JetBrains
@@ -14,6 +15,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
+open JetBrains.ReSharper.Resources.Shell
 
 type FSharpSource =
     {
@@ -28,14 +30,24 @@ type FSharpSourceCache(lifetime, changeManager: ChangeManager, documentManager: 
         changeManager.RegisterChangeProvider(lifetime, this)
         changeManager.AddDependency(lifetime, this, documentManager.ChangeProvider)
 
-    let update (document: IDocument) path =
-        let source = Encoding.UTF8.GetBytes(document.GetText())
-        files.[path] <- { Source = source; Timestamp = DateTime.UtcNow }
+    let getText (document: IDocument) = Encoding.UTF8.GetBytes(document.GetText()) 
 
     member x.GetSource(path: Util.FileSystemPath) =
         match files.TryGetValue(path) with
-        | true, source -> Some source
-        | _ -> None
+        | true, value -> Some value
+        | _ ->
+            let mutable source = None
+            ReadLockCookie.TryExecute(fun _ ->
+                match files.TryGetValue(path) with
+                | true, value -> source <- Some value
+                | _ ->
+                    documentManager.GetOrCreateDocument(path)
+                    |> Option.ofObj
+                    |> Option.iter (fun document ->
+                        let timestamp = File.GetLastWriteTimeUtc(path.FullPath)
+                        source <- Some { Source = getText document; Timestamp = timestamp }
+                        files.[path] <- source.Value)) |> ignore
+            source
 
     interface IChangeProvider with
         member x.Execute(changeMap) =
@@ -45,6 +57,6 @@ type FSharpSourceCache(lifetime, changeManager: ChangeManager, documentManager: 
                 match file.LanguageType with
                 | :? FSharpProjectFileType
                 | :? FSharpScriptProjectFileType ->
-                     update change.Document file.Location
+                     files.[file.Location] <- { Source = getText change.Document; Timestamp = DateTime.UtcNow }
                 | _ -> ()
             null

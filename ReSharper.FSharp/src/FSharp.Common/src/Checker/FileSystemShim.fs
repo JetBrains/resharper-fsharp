@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Common
 open System.IO
 open JetBrains.DataFlow
 open JetBrains.ProjectModel
+open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.AbstractIL.Internal.Library
@@ -15,11 +16,9 @@ type FileSystemShim(lifetime: Lifetime, sourceCache: FSharpSourceCache) as this 
         lifetime.AddAction(fun _ -> Shim.FileSystem <- defaultFileSystem) |> ignore
 
     let getSource (path: string) =
-        match FileSystemPath.TryParse(path) with
-        | path when not path.IsEmpty ->
-            match sourceCache.GetSource(path) with
-            | Some source -> Some source
-            | _ -> None
+        let path = FileSystemPath.TryParse(path)
+        match path.ExtensionNoDot.ToLowerInvariant() with
+        | FSharpSourceExtension -> sourceCache.GetSource(path)
         | _ -> None
 
     interface IFileSystem with
