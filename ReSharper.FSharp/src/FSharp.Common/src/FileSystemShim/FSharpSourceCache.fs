@@ -18,10 +18,8 @@ open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Resources.Shell
 
 type FSharpSource =
-    {
-        Source: byte[]
-        Timestamp: DateTime
-    }
+    { Source: byte[]
+      Timestamp: DateTime }
 
 [<SolutionComponent>]
 type FSharpSourceCache(lifetime, changeManager: ChangeManager, documentManager: DocumentManager) as this =
@@ -32,22 +30,35 @@ type FSharpSourceCache(lifetime, changeManager: ChangeManager, documentManager: 
 
     let getText (document: IDocument) = Encoding.UTF8.GetBytes(document.GetText()) 
 
-    member x.GetSource(path: Util.FileSystemPath) =
+    let tryAddSource (path: Util.FileSystemPath) =
+        let mutable source = None
+        ReadLockCookie.TryExecute(fun _ ->
+            match files.TryGetValue(path) with
+            | true, value -> source <- Some value
+            | _ ->
+                documentManager.GetOrCreateDocument(path)
+                |> Option.ofObj
+                |> Option.iter (fun document ->
+                    let timestamp = File.GetLastWriteTimeUtc(path.FullPath)
+                    source <- Some { Source = getText document; Timestamp = timestamp }
+                    files.[path] <- source.Value)) |> ignore
+        source
+
+    member x.GetTimestamp(path) =
         match files.TryGetValue(path) with
-        | true, value -> Some value
-        | _ ->
-            let mutable source = None
-            ReadLockCookie.TryExecute(fun _ ->
-                match files.TryGetValue(path) with
-                | true, value -> source <- Some value
-                | _ ->
-                    documentManager.GetOrCreateDocument(path)
-                    |> Option.ofObj
-                    |> Option.iter (fun document ->
-                        let timestamp = File.GetLastWriteTimeUtc(path.FullPath)
-                        source <- Some { Source = getText document; Timestamp = timestamp }
-                        files.[path] <- source.Value)) |> ignore
-            source
+        | true, value -> Some value.Timestamp
+        | _ -> tryAddSource path |> Option.map (fun s -> s.Timestamp)
+
+    member x.GetSourceStream(path) =
+        let getStream source = new MemoryStream(source.Source) :> Stream
+        match files.TryGetValue(path) with
+        | true, value -> Some (getStream value)
+        | _ -> tryAddSource path |> Option.map getStream
+
+    member x.Exists(path) =
+        match files.TryGetValue(path) with
+        | true, _ -> Some true
+        | _ -> None
 
     interface IChangeProvider with
         member x.Execute(changeMap) =

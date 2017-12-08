@@ -80,12 +80,6 @@ module CommonUtil =
         member x.remove el = x.Remove el |> ignore
         member x.add el = x.Add el |> ignore
 
-    let (|FSharpSourceExtension|DllExtension|OtherExtension|) extension =
-        match extension with
-        | "fs" | "fsi" | "ml" | "mli" | "fsx" | "fsscript" -> FSharpSourceExtension
-        | "dll" -> DllExtension
-        | _ -> OtherExtension
-
     let (|ImplFile|_|) (path: FileSystemPath) =
         match path.ExtensionNoDot with
         | "fs" | "ml" -> Some()
