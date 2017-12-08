@@ -187,8 +187,10 @@ type FSharpProjectOptionsBuilder(solution: ISolution, filesFromTargetsProvider: 
         let framework = project.GetCurrentTargetFrameworkId()
         seq { for p in project.GetReferencedProjects(framework) ->
                   "-r:" + p.GetOutputFilePath(p.GetCurrentTargetFrameworkId()).FullPath
-              for a in project.GetAssemblyReferences(framework) ->
-                  "-r:" + a.ResolveResultAssemblyFile().Location.FullPath }
+              for a in project.GetAssemblyReferences(framework) do
+                  let assemblyFile = a.ResolveResultAssemblyFile()
+                  if isNotNull assemblyFile then
+                    yield "-r:" + assemblyFile.Location.FullPath }
 
     member private x.GetOutputType([<CanBeNull>] buildSettings: IManagedProjectBuildSettings) =
         if isNull buildSettings then "library"
