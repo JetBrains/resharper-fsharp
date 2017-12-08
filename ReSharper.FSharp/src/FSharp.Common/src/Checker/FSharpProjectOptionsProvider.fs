@@ -53,25 +53,24 @@ type FSharpProjectOptionsProvider(lifetime, logger, solution: ISolution, checker
     member private x.ProcessChange(obj: ChangeEventArgs) =
         let change = obj.ChangeMap.GetChange<ProjectModelChange>(solution)
         if isNotNull change then
+            if change.IsClosingSolution then x.InvalidateAll() else
             lock projects (fun _ -> x.VisitDelta change)
 
     override x.VisitDelta(change: ProjectModelChange) =
-        if change.IsClosingSolution then x.InvalidateAll()
-        else
-            match change.ProjectModelElement with
-            | :? IProject as project when project.IsFSharp ->
-                if change.IsRemoved then
-                    match projects.TryGetValue project with
-                    | true, fsProject ->
-                        checkerService.InvalidateProject(fsProject)
-                        projects.Remove(project) |> ignore
-                        projectsToInvalidate.Remove(project) |> ignore
-                        x.InvalidateReferencingProjects(project)
-                    | _ -> ()
-                else
-                    projectsToInvalidate.add project
-                x.InvalidateReferencingProjects(project)
-            | _ -> base.VisitDelta change
+        match change.ProjectModelElement with
+        | :? IProject as project when project.IsFSharp ->
+            if change.IsRemoved then
+                match projects.TryGetValue project with
+                | true, fsProject ->
+                    checkerService.InvalidateProject(fsProject)
+                    projects.Remove(project) |> ignore
+                    projectsToInvalidate.Remove(project) |> ignore
+                    x.InvalidateReferencingProjects(project)
+                | _ -> ()
+            else
+                projectsToInvalidate.add project
+            x.InvalidateReferencingProjects(project)
+        | _ -> base.VisitDelta change
 
     member private x.InvalidateReferencingProjects(project) =
         if project.IsOpened then
@@ -83,11 +82,13 @@ type FSharpProjectOptionsProvider(lifetime, logger, solution: ISolution, checker
 
     member private x.GetFSharpProject(file: IPsiSourceFile) =
         x.ProcessInvalidateOptions()
-        let project = file.GetProject()
-        match projects.TryGetValue(project) with
-        | true, fsProject when fsProject.ContainsFile file -> Some fsProject
-        | _ when project.IsOpened -> Some (x.CreateProject(project))
-        | _ -> None
+        file.GetProject()
+        |> Option.ofObj
+        |> Option.bind (fun project ->
+            match projects.TryGetValue(project) with
+            | true, fsProject when fsProject.ContainsFile file -> Some fsProject
+            | _ when project.IsOpened -> Some (x.CreateProject(project))
+            | _ -> None)
 
     member private x.CreateProject(project): FSharpProject =
         match projects.TryGetValue(project) with
@@ -178,8 +179,8 @@ type FSharpProjectOptionsProvider(lifetime, logger, solution: ISolution, checker
                 | _ -> false)
 
         member x.GetParsingOptions(file) =
-            if fsFileService.IsScript(file) || file.PsiModule.IsMiscFilesProjectModule() then
-                Some { FSharpParsingOptions.Default with SourceFiles = Array.ofList [file.GetLocation().FullPath] }
+            if fsFileService.IsScript(file) || file.PsiModule.IsMiscFilesProjectModule() || isNull (file.GetProject()) then
+                Some { FSharpParsingOptions.Default with SourceFiles = Array.ofList [file.GetLocation().FullPath]; IsExe = true }
             else
                 lock projects (fun _ ->
                     match x.GetFSharpProject(file) with
