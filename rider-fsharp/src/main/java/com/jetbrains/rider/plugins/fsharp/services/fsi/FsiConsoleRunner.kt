@@ -19,6 +19,7 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.fileTypes.PlainTextLanguage
 import com.intellij.openapi.util.IconLoader
+import com.intellij.openapi.util.Key
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.wm.impl.ToolWindowManagerImpl
 import com.intellij.project.isDirectoryBased
@@ -38,7 +39,7 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost)
     private val workingDir = if (projectDir?.exists() == true) projectDir else VfsUtil.getUserHomeDir()
     val cmdLine = GeneralCommandLine()
             .withExePath(sessionInfo.fsiPath)
-            .withParameters(sessionInfo.args + listOf("--readline-"))
+            .withParameters(sessionInfo.args + listOf("--fsi-server:rider", "--readline-"))
             .withWorkDirectory(workingDir?.path)
     val sendActionExecutor = SendToFsiActionExecutor(this)
 
@@ -111,6 +112,11 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost)
     override fun createProcessHandler(process: Process): OSProcessHandler {
         return object : OSProcessHandler(process, cmdLine.commandLineString, Charsets.UTF_8) {
             override fun isSilentlyDestroyOnClose(): Boolean = true
+
+            override fun notifyTextAvailable(text: String, outputType: Key<*>) {
+                if (text != "SERVER-PROMPT>\n")
+                    super.notifyTextAvailable(text, outputType)
+            }
         }
     }
 
