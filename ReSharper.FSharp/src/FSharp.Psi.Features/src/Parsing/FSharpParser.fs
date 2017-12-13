@@ -5,36 +5,33 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.Ast
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
-type FSharpParser(file: IPsiSourceFile, checkerService: FSharpCheckerService, logger) =
+type internal FSharpParser(file: IPsiSourceFile, checkerService: FSharpCheckerService, logger: ILogger) =
     let tryCreateTreeBuilder lexer lifetime =
         Option.bind (fun (parseResults: FSharpParseFileResults) ->
             parseResults.ParseTree |> Option.map (function
-            | ParsedInput.ImplFile(_) as tree ->
-                FSharpImplTreeBuilder(file, lexer, tree, lifetime, logger) :> FSharpTreeBuilderBase
-            | ParsedInput.SigFile(_) as tree ->
-                FSharpSigTreeBuilder(file, lexer, tree, lifetime, logger) :> FSharpTreeBuilderBase))
+            | ParsedInput.ImplFile(ParsedImplFileInput(_,_,_,_,_,decls,_)) ->
+                FSharpImplTreeBuilder(file, lexer, decls, lifetime) :> FSharpTreeBuilderBase
+            | ParsedInput.SigFile(ParsedSigFileInput(_,_,_,_,sigs)) ->
+                FSharpSigTreeBuilder(file, lexer, sigs, lifetime) :> FSharpTreeBuilderBase))
 
     interface IParser with
         member this.ParseFile() =
             let lifetime = Lifetimes.Define().Lifetime
-            let options, parseResults = checkerService.ParseFile(file)
             let tokenBuffer = TokenBuffer(FSharpLexer(file.Document, checkerService.GetDefines(file)))
             let lexer = tokenBuffer.CreateLexer()
+            let parseResults = checkerService.ParseFile(file)
             let treeBuilder =
                 tryCreateTreeBuilder lexer lifetime parseResults
-                |> Option.defaultWith (fun _ -> FSharpFakeTreeBuilder(file, lexer, lifetime, logger, options) :> _)
+                |> Option.defaultWith (fun _ ->
+                    { new FSharpTreeBuilderBase(file, lexer, lifetime) with
+                        override x.CreateFSharpFile() =
+                            x.FinishFile(x.Builder.Mark(), ElementType.F_SHARP_IMPL_FILE) })
 
-            match treeBuilder.CreateFSharpFile() with
-            | :? IFSharpFile as fsFile ->
-                fsFile.ParseResults <- parseResults
-                fsFile.CheckerService <- checkerService
-                fsFile.ActualTokenBuffer <- tokenBuffer
-                fsFile :> _
-            | _ ->
-                logger.LogMessage(LoggingLevel.WARN, "FSharpTreeBuilder returned null")
-                null
+            treeBuilder.CreateFSharpFile(ActualTokenBuffer = tokenBuffer,
+                                         CheckerService = checkerService,
+                                         ParseResults = parseResults) :> _

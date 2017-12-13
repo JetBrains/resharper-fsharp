@@ -7,17 +7,14 @@ open JetBrains.Util
 open Microsoft.FSharp.Compiler.Ast
 open Microsoft.FSharp.Compiler.PrettyNaming
 
-type FSharpImplTreeBuilder(file, lexer, parseTree, lifetime, logger: ILogger) =
+type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
     inherit FSharpTreeBuilderBase(file, lexer, lifetime)
 
     override x.CreateFSharpFile() =
         let mark = x.Builder.Mark()
-        match parseTree with
-        | ParsedInput.ImplFile (ParsedImplFileInput(_,_,_,_,_,decls,_)) ->
-            for decl in decls do x.ProcessTopLevelDeclaration decl
-        | _ -> logger.LogMessage(LoggingLevel.ERROR, sprintf "FSharpImplTreeBuilder: got %A" parseTree)
-
-        x.FinishFile mark ElementType.F_SHARP_IMPL_FILE
+        for decl in decls do
+            x.ProcessTopLevelDeclaration(decl)
+        x.FinishFile(mark, ElementType.F_SHARP_IMPL_FILE)
 
     member private x.ProcessTopLevelDeclaration (SynModuleOrNamespace(lid,_,isModule,decls,_,attrs,_,range)) =
         let mark, elementType = x.StartTopLevelDeclaration lid attrs isModule range

@@ -39,7 +39,6 @@
     <Compile Include="src\Parsing\FSharpTreeBuilderBase.fs" />
     <Compile Include="src\Parsing\FSharpImplTreeBuilder.fs" />
     <Compile Include="src\Parsing\FSharpSigTreeBuilder.fs" />
-    <Compile Include="src\Parsing\FSharpFakeTreeBuilder.fs" />
     <Compile Include="src\Parsing\FSharpParser.fs" />
     <Compile Include="src\LanguageService\FSharpPsiProperties.fs" />
     <Compile Include="src\LanguageService\FSharpProjectFileLanguageService.fs" />

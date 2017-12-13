@@ -53,14 +53,14 @@ type FSharpCheckerService(lifetime, logger: Util.ILogger, onSolutionCloseNotifie
             let source = file.Document.GetText()
             try
                 let parseResults = x.Checker.ParseFile(filePath, source, parsingOptions).RunAsTask() 
-                Some parsingOptions, Some parseResults
+                Some parseResults
             with
             | :? ProcessCancelledException -> reraise()
             | exn ->
                 Util.Logging.Logger.LogException(exn)
                 Logger.LogMessage(logger, LoggingLevel.WARN, sprintf "Parse file error, parsing options: %A" parsingOptions)
-                Some parsingOptions, None
-        | _ -> None, None
+                None
+        | _ -> None
 
     member x.HasPairFile([<NotNull>] file: IPsiSourceFile) =
         x.OptionsProvider.HasPairFile(file)

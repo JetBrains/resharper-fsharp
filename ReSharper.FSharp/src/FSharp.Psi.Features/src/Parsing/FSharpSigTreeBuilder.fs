@@ -7,18 +7,14 @@ open JetBrains.Util
 open Microsoft.FSharp.Compiler.Ast
 open Microsoft.FSharp.Compiler.PrettyNaming
 
-type FSharpSigTreeBuilder(file, lexer, parseTree, lifetime, logger: ILogger) =
+type internal FSharpSigTreeBuilder(file, lexer, sigs, lifetime) =
     inherit FSharpTreeBuilderBase(file, lexer, lifetime)
 
     override x.CreateFSharpFile() =
         let mark = x.Builder.Mark()
-        match parseTree with
-        | ParsedInput.SigFile (ParsedSigFileInput(_,_,_,_,sigs)) ->
-            for s in sigs do x.ProcessTopLevelSignature s
-        | _ ->
-            logger.LogMessage(LoggingLevel.ERROR, sprintf "FSharpSigTreeBuilder: got %A" parseTree)
-
-        x.FinishFile mark ElementType.F_SHARP_SIG_FILE
+        for s in sigs do
+            x.ProcessTopLevelSignature(s)
+        x.FinishFile(mark, ElementType.F_SHARP_SIG_FILE)
 
     member private x.ProcessTopLevelSignature (SynModuleOrNamespaceSig(lid,_,isModule,sigs,_,attrs,_,range)) =
         let mark, elementType = x.StartTopLevelDeclaration lid attrs isModule range
