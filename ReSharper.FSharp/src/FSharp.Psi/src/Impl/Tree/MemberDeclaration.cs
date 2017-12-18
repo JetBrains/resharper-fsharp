@@ -25,9 +25,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (mfv.IsProperty)
         return new FSharpProperty<MemberDeclaration>(this, mfv);
 
-      var property = mfv.AccessorProperty;
+      var property = mfv.AccessorProperty?.Value;
       if (property != null)
-        return new FSharpProperty<MemberDeclaration>(this, property.Value);
+      {
+        var cliEvent = property.EventForFSharpProperty?.Value;
+        return cliEvent != null
+          ? (ITypeMember) new FSharpCliEvent<MemberDeclaration>(this, cliEvent)
+          : new FSharpProperty<MemberDeclaration>(this, property);
+      }
 
       var typeDeclaration = GetContainingTypeDeclaration() as IFSharpTypeDeclaration;
       return !mfv.IsInstanceMember && mfv.CompiledName.StartsWith("op_", StringComparison.Ordinal)
