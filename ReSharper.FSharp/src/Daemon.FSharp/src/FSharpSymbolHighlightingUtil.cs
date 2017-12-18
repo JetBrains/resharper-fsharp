@@ -30,7 +30,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
     [NotNull]
     public static string GetMfvHighlightingAttributeId([NotNull] this FSharpMemberOrFunctionOrValue mfv)
     {
-      if (mfv.IsEvent || mfv.IsEventAddMethod || mfv.IsEventRemoveMethod)
+      if (mfv.IsEvent || mfv.IsEventAddMethod || mfv.IsEventRemoveMethod || mfv.EventForFSharpProperty != null)
         return HighlightingAttributeIds.EVENT_IDENTIFIER_ATTRIBUTE;
 
       if (mfv.IsImplicitConstructor || mfv.IsConstructor)
@@ -59,7 +59,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
           return GetEntityHighlightingAttributeId(entity);
 
         case FSharpMemberOrFunctionOrValue mfv when !mfv.IsUnresolved:
-          return GetMfvHighlightingAttributeId(mfv);
+          return GetMfvHighlightingAttributeId(mfv.AccessorProperty?.Value ?? mfv);
 
         case FSharpField field:
           return field.IsLiteral
