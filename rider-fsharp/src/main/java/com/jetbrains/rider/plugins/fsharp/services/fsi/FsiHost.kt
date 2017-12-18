@@ -19,12 +19,12 @@ class FsiHost(project: Project) : LifetimedProjectComponent(project) {
         rdFsiHost.copyRecentToEditor.advise(componentLifetime) { copyRecentToEditor = it }
     }
 
-    internal fun sendToFsi(editor: Editor, file: PsiFile) = synchronized(this) {
-        execute { it.sendActionExecutor.execute(editor, file) }
+    internal fun sendToFsi(editor: Editor, file: PsiFile, debug: Boolean) = synchronized(this) {
+        execute { it.sendActionExecutor.execute(editor, file, debug) }
     }
 
-    internal fun sendToFsi(visibleText: String, fsiText: String) = synchronized(this) {
-        execute { it.sendText(visibleText, fsiText) }
+    internal fun sendToFsi(visibleText: String, fsiText: String, debug: Boolean) = synchronized(this) {
+        execute { it.sendText(visibleText, fsiText, debug) }
     }
 
     private fun execute(action: (FsiConsoleRunner) -> Unit) {
