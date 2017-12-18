@@ -57,12 +57,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
       {
         case FSharpEntity entity when !entity.IsUnresolved:
           return GetEntityHighlightingAttributeId(entity);
+
         case FSharpMemberOrFunctionOrValue mfv when !mfv.IsUnresolved:
           return GetMfvHighlightingAttributeId(mfv);
-        case FSharpField _:
-          return HighlightingAttributeIds.FIELD_IDENTIFIER_ATTRIBUTE;
+
+        case FSharpField field:
+          return field.IsLiteral
+            ? HighlightingAttributeIds.CONSTANT_IDENTIFIER_ATTRIBUTE
+            : HighlightingAttributeIds.FIELD_IDENTIFIER_ATTRIBUTE;
+
         case FSharpUnionCase _:
           return HighlightingAttributeIds.TYPE_ENUM_ATTRIBUTE;
+
         case FSharpGenericParameter _:
           return HighlightingAttributeIds.TYPE_PARAMETER_ATTRIBUTE;
       }
