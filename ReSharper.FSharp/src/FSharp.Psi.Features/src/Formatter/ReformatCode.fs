@@ -69,7 +69,10 @@ type ReformatCode() =
 //                                Some(DocumentChange(document, startOffset, oldLength, formatted, stamp, modificationSide))
 //                            with _ -> None
                         else
-                            let formatted = CodeFormatter.FormatAST(parsedInput, filePath, Some source, formatConfig)
+                            let formatted =
+                                CodeFormatter
+                                    .FormatAST(parsedInput, filePath, Some source, formatConfig)
+                                    .Replace("\r\n", "\n")
                             Some(DocumentChange(document, 0, source.Length, formatted, stamp, modificationSide))
     
                     match change with
