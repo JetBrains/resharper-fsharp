@@ -17,6 +17,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       if (!(GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv)) return null;
 
+      if (mfv.LiteralValue != null)
+        return new FSharpLiteral(this, mfv);
+
       if (!mfv.IsValCompiledAsMethod)
         return new ModuleValue(this, mfv);
 
