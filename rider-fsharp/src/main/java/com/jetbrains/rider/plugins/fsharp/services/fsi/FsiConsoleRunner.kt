@@ -8,6 +8,7 @@ import com.intellij.execution.console.LanguageConsoleBuilder
 import com.intellij.execution.console.LanguageConsoleView
 import com.intellij.execution.console.ProcessBackedConsoleExecuteActionHandler
 import com.intellij.execution.process.OSProcessHandler
+import com.intellij.execution.process.OSProcessUtil
 import com.intellij.execution.runners.AbstractConsoleRunnerWithHistory
 import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.execution.ui.RunContentDescriptor
@@ -17,15 +18,19 @@ import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.util.EditorUtil
+import com.intellij.openapi.extensions.Extensions
 import com.intellij.openapi.fileTypes.PlainTextLanguage
 import com.intellij.openapi.util.IconLoader
 import com.intellij.openapi.util.Key
+import com.intellij.openapi.util.UserDataHolderBase
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.wm.impl.ToolWindowManagerImpl
 import com.intellij.project.isDirectoryBased
 import com.intellij.util.containers.ContainerUtil
+import com.intellij.xdebugger.attach.XLocalAttachDebuggerProvider
 import com.jetbrains.rider.model.RdFsiSessionInfo
 import java.io.File
+import java.lang.Thread.sleep
 import kotlin.properties.Delegates
 
 class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost)
@@ -44,11 +49,25 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost)
     val sendActionExecutor = SendToFsiActionExecutor(this)
 
     private var contentDescriptor by Delegates.notNull<RunContentDescriptor>()
+    private var pid by Delegates.notNull<Int>()
+    private var isAttached = false
     val commandHistory = CommandHistory()
 
     fun isValid(): Boolean = !(processHandler?.isProcessTerminated ?: true)
 
-    fun sendText(visibleText: String, fsiText: String) {
+    private fun attachToProcess() {
+        val processInfo = OSProcessUtil.getProcessList().firstOrNull { it.pid == pid } ?: return
+        val dataHolder = UserDataHolderBase()
+        val debugger = Extensions.getExtensions(XLocalAttachDebuggerProvider.EP).flatMap { provider ->
+            provider.getAvailableDebuggers(project, processInfo, dataHolder)
+        }.firstOrNull() ?: return
+        debugger.attachDebugSession(project, processInfo)
+        isAttached = true
+    }
+
+    fun sendText(visibleText: String, fsiText: String, debug: Boolean) {
+        if (debug && !isAttached) attachToProcess()
+
         consoleView.print(visibleText, ConsoleViewContentType.USER_INPUT)
         consoleView.print("\n", ConsoleViewContentType.NORMAL_OUTPUT)
         EditorUtil.scrollToTheEnd(consoleView.historyViewer)
@@ -66,7 +85,9 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost)
 
     override fun createProcess(): Process? {
         if (!File(cmdLine.exePath).exists()) return null // todo: dialog with a link to settings
-        return cmdLine.createProcess()
+        val process = cmdLine.createProcess()
+        pid = OSProcessUtil.getProcessID(process)
+        return process
     }
 
     override fun isAutoFocusContent() = false
@@ -76,7 +97,7 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost)
             override fun runExecuteAction(consoleView: LanguageConsoleView) {
                 val visibleText = consoleView.consoleEditor.document.text
                 val fsiText = "\n$visibleText\n# 1 \"stdin\"\n;;\n"
-                sendText(visibleText, fsiText)
+                sendText(visibleText, fsiText, false)
                 consoleView.setInputText("")
             }
         }

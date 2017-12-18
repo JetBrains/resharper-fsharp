@@ -17,17 +17,28 @@ class StartFsiAction : AnAction() {
     }
 }
 
-class SendToFsiAction : AnAction() {
+class SendToFsiAction : SendToFsiActionBase(false, sendLineText, sendSelectionText) {
     companion object {
         val sendLineText = "Send Line to F# Interactive"
         val sendSelectionText = "Send Selection to F# Interactive"
     }
+}
+
+class DebugInFsiAction : SendToFsiActionBase(true, sendLineText, sendSelectionText) {
+    companion object {
+        val sendLineText = "Debug Line in F# Interactive"
+        val sendSelectionText = "Debug Line in F# Interactive"
+    }
+}
+
+open class SendToFsiActionBase(private val debug: Boolean, private val sendLineText: String,
+                               private val sendSelectionText: String) : AnAction() {
 
     override fun actionPerformed(e: AnActionEvent) {
         val editor = CommonDataKeys.EDITOR.getData(e.dataContext)!!
         val file = CommonDataKeys.PSI_FILE.getData(e.dataContext)!!
         val project = CommonDataKeys.PROJECT.getData(e.dataContext) ?: return
-        ServiceManager.getService(project, FsiHost::class.java).sendToFsi(editor, file)
+        ServiceManager.getService(project, FsiHost::class.java).sendToFsi(editor, file, debug)
     }
 
     override fun update(e: AnActionEvent) {
@@ -42,7 +53,25 @@ class SendToFsiAction : AnAction() {
     }
 }
 
-abstract class BaseSendToFsiIntentionAction : BaseElementAtCaretIntentionAction() {
+class SendLineToFsiIntentionAction : SendLineToFsiIntentionActionBase(false)
+class DebugLineInFsiIntentionAction : SendLineToFsiIntentionActionBase(true)
+
+class SendSelectionToFsiIntentionAction : SendSelectionToFsiIntentionActionBase(false)
+class DebugSelectionInFsiIntentionAction : SendSelectionToFsiIntentionActionBase(true)
+
+open class SendLineToFsiIntentionActionBase(debug: Boolean) : BaseSendToFsiIntentionAction(debug) {
+    override fun getText() = "Send Line to F# Interactive"
+    override fun isAvailable(project: Project, editor: Editor?, file: PsiElement)
+            = super.isAvailable(project, editor, file) && !editor!!.selectionModel.hasSelection()
+}
+
+open class SendSelectionToFsiIntentionActionBase(debug: Boolean) : BaseSendToFsiIntentionAction(debug) {
+    override fun getText() = "Send Selection to F# Interactive"
+    override fun isAvailable(project: Project, editor: Editor?, file: PsiElement)
+            = super.isAvailable(project, editor, file) && editor!!.selectionModel.hasSelection()
+}
+
+abstract class BaseSendToFsiIntentionAction(private val debug: Boolean) : BaseElementAtCaretIntentionAction() {
     override fun getFamilyName(): String = "Send to F# Interactive"
     override fun startInWriteAction() = false
 
@@ -50,18 +79,6 @@ abstract class BaseSendToFsiIntentionAction : BaseElementAtCaretIntentionAction(
             file.language is FSharpLanguageBase && editor?.caretModel?.caretCount == 1
 
     override fun invoke(project: Project, editor: Editor, element: PsiElement) {
-        ServiceManager.getService(project, FsiHost::class.java).sendToFsi(editor, element.containingFile)
+        ServiceManager.getService(project, FsiHost::class.java).sendToFsi(editor, element.containingFile, debug)
     }
-}
-
-class SendLineToFsiIntentionAction : BaseSendToFsiIntentionAction() {
-    override fun getText() = "Send Line to F# Interactive"
-    override fun isAvailable(project: Project, editor: Editor?, file: PsiElement)
-            = super.isAvailable(project, editor, file) && !editor!!.selectionModel.hasSelection()
-}
-
-class SendSelectionToFsiIntentionAction : BaseSendToFsiIntentionAction() {
-    override fun getText() = "Send Selection to F# Interactive"
-    override fun isAvailable(project: Project, editor: Editor?, file: PsiElement)
-            = super.isAvailable(project, editor, file) && editor!!.selectionModel.hasSelection()
 }

@@ -29,7 +29,7 @@ class CommandHistoryAction(private val consoleRunner: FsiConsoleRunner)
                         consoleView.editorDocument.setText(selectedValue.visibleText)
                     }
                 else
-                    consoleRunner.fsiHost.sendToFsi(selectedValue.visibleText, selectedValue.executableText)
+                    consoleRunner.fsiHost.sendToFsi(selectedValue.visibleText, selectedValue.executableText, false)
                 return PopupStep.FINAL_CHOICE
             }
         }
