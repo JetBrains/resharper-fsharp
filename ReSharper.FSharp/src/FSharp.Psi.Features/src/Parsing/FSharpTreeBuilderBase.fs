@@ -462,6 +462,9 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
             x.ProcessSynType t
         | SynPat.Attrib(pat,_,_) ->
             x.ProcessLocalPat pat
+        | SynPat.Record(pats,_) ->
+            for (_, pat) in pats do
+                x.ProcessLocalPat(pat)
         | _ -> ()
 
     member internal x.ProcessLocalBinding (Binding(_,_,_,_,_,_,_,headPat,_,expr,_,_)) =
