@@ -30,6 +30,7 @@
     <Compile Include="src\Checker\FSharpProjectOptionsBuilder.fs" />
     <Compile Include="src\Checker\FSharpProjectOptionsProvider.fs" />
     <Compile Include="src\FSharpTargetsAnalyzer.fs" />
+    <Compile Include="src\ProjectModel\FSharpScriptPsiModuleFactory.fs" />
     <Compile Include="src\PaketRestoreTargetsAnalyzer.fs" />
   </ItemGroup>
 
