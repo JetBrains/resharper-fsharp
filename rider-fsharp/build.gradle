@@ -29,7 +29,7 @@ intellij {
         localPath = dir.absolutePath
     } else {
         logger.lifecycle("*** Using Rider SDK from intellij-snapshots repository")
-        version = '173-SNAPSHOT' // Trunk until we have release
+        version = '2017.3-SNAPSHOT' // Trunk until we have release
     }
 
     downloadSources false
