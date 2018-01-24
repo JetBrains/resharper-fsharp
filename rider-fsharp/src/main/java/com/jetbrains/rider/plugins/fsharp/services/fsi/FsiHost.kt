@@ -5,11 +5,10 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import com.jetbrains.rider.model.RdFSharpInteractiveHost
 import com.jetbrains.rider.projectView.solution
-import com.jetbrains.rider.util.idea.ILifetimedComponent
-import com.jetbrains.rider.util.idea.LifetimedComponent
+import com.jetbrains.rider.util.idea.LifetimedProjectComponent
 import kotlin.properties.Delegates
 
-class FsiHost(val project: Project) : ILifetimedComponent by LifetimedComponent(project) {
+class FsiHost(project: Project) : LifetimedProjectComponent(project) {
     private val rdFsiHost: RdFSharpInteractiveHost get() = project.solution.fSharpInteractiveHost
     var moveCaretOnSendLine by Delegates.notNull<Boolean>()
     var copyRecentToEditor by Delegates.notNull<Boolean>()
