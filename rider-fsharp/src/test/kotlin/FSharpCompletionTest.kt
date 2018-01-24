@@ -19,17 +19,19 @@ class FSharpCompletionTest : CompletionTestBase() {
     private var isFcsReady = false
 
     @Test
-    fun basicCompletion() = doTest("Program.fs", "filt")
+    fun namespaceKeyword() = doTest("na")
+
+    @Test(enabled = false) // todo: remove static items in FCS basic completion
+    fun listModule() = doTest("Lis")
 
     @Test
-    fun namespaceKeyword() = doTest("Empty.fs", "na")
-
+    fun listModuleValue() = doTest("filt")
 
     private fun waitForFcs() {
         waitAndPump(Lifetime.Eternal, { isFcsReady }, 60000)
     }
 
-    private fun doTest(fileName: String, typed: String) {
+    private fun doTest(typed: String) {
         rdFcsHost.projectChecked.advise(Lifetime.Eternal, { project ->
             isFcsReady = true
             frameworkLogger.info("FCS: $project checked")
@@ -37,7 +39,7 @@ class FSharpCompletionTest : CompletionTestBase() {
 
         isFcsReady = false
         doTestWithDocuments {
-            withCaret(fileName, fileName) {
+            withCaret("Program.fs", "Program.fs") {
                 isFcsReady = false
                 typeWithLatency(typed)
                 waitForFcs()
