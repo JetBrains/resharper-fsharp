@@ -19,34 +19,31 @@ class FSharpCompletionTest : CompletionTestBase() {
     private var isFcsReady = false
 
     @Test
-    fun basicCompletion() {
-        doTest {
-            isFcsReady = false
-            typeWithLatency("filt")
-            waitForFcs()
-            callBasicCompletion()
-            waitForCompletion()
-            completeWithTab()
-        }
-    }
+    fun basicCompletion() = doTest("Program.fs", "filt")
+
+    @Test
+    fun namespaceKeyword() = doTest("Empty.fs", "na")
+
 
     private fun waitForFcs() {
         waitAndPump(Lifetime.Eternal, { isFcsReady }, 60000)
     }
 
-    private fun doTest(test: EditorImpl.() -> Unit) {
-        val fileName = "Program.fs"
-
+    private fun doTest(fileName: String, typed: String) {
         rdFcsHost.projectChecked.advise(Lifetime.Eternal, { project ->
             isFcsReady = true
             frameworkLogger.info("FCS: $project checked")
         })
 
         isFcsReady = false
-
         doTestWithDocuments {
             withCaret(fileName, fileName) {
-                test()
+                isFcsReady = false
+                typeWithLatency(typed)
+                waitForFcs()
+                callBasicCompletion()
+                waitForCompletion()
+                completeWithTab()
             }
         }
     }
