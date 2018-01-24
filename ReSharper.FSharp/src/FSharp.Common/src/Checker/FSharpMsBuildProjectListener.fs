@@ -65,13 +65,13 @@ type FSharpProjectFilesFromTargetsProvider(lifetime: Lifetime) =
                     let rdProject = msBuildProject.RdProjects.First().Value // take project with first framework
                     let projectDir = FileSystemPath.TryParse(msBuildProject.RdProjectDescription.Directory)
                     for item in rdProject.Items do
-                        match item.Id with
-                        | :? RdEvaluatedProjectItemId as itemId ->
-                            if Array.contains itemId.ItemType itemTypes then
+                        match item.Origin with
+                        | :? RdEvaluatedProjectItemOrigin as itemId ->
+                            if Array.contains item.ItemType itemTypes then
                                 let path = FileSystemPath.TryParse(item.EvaluatedInclude)
                                 if not path.IsEmpty then
                                     let path = ensureAbsolute path projectDir
-                                    files.[itemId.ItemType].Add(path)
+                                    files.[item.ItemType].Add(path)
                         | _ -> ()
                     projects.[projectMark] <-
                         { Compile       = List.ofSeq files.[Compile]

@@ -30,7 +30,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         {
           interruptChecker();
         }
-        catch (ProcessCancelledException)
+        catch (OperationCanceledException)
         {
           cancellationTokenSource.Cancel();
           throw;

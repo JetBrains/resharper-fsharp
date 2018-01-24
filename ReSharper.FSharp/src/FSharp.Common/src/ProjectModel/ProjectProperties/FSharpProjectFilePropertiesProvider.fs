@@ -4,7 +4,7 @@ open JetBrains.ProjectModel.Properties
 
 [<ProjectModelExtension>]
 type FSharpProjectFilePropertiesProvider() =
-    inherit ProjectFilePropertiesProviderBase()
+    inherit ProjectFilePropertiesProvider()
 
     override x.IsApplicable(properties) = properties :? FSharpProjectProperties
     override x.CreateProjectFileProperties() = ProjectFileProperties() :> IProjectFileProperties

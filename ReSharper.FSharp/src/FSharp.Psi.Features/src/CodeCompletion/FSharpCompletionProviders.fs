@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
+open System
 open JetBrains.Application.Progress
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
@@ -78,7 +79,7 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
                         collector.CheckForInterrupt()
                     true
                 with
-                | :? ProcessCancelledException -> reraise()
+                | :? OperationCanceledException -> reraise()
                 | e ->
                     let path = basicContext.SourceFile.GetLocation().FullPath
                     let coords = context.Coords

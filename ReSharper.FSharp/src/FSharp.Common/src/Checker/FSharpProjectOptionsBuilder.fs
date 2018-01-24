@@ -6,6 +6,7 @@ open JetBrains.Annotations
 open JetBrains.Application
 open JetBrains.Application.Components
 open JetBrains.Platform.MsBuildHost.Models
+open JetBrains.Platform.MsBuildHost.ProjectModel
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Model2.Assemblies.Interfaces
 open JetBrains.ProjectModel.ProjectsHost
@@ -151,20 +152,18 @@ type FSharpProjectOptionsBuilder(solution: ISolution, filesFromTargetsProvider: 
         let sigFiles = HashSet<string>()
         let pairFiles = HashSet<FileSystemPath>()
 
-        ignore (msBuildHost.mySessionHolder.Execute(fun session ->
-            session.TryEditProject(projectMark, fun editor ->
-                for item in editor.Items do
-                    let itemType = item.ItemType()
-                    if Array.contains itemType itemTypes then
-                        let path = FileSystemPath.TryParse(item.EvaluatedInclude)
-                        if not path.IsEmpty then
-                            let path = ensureAbsolute path projectDir
-                            files.[itemType].Add(path)
+        for item in msBuildHost.Session.GetProjectItems(projectMark) do
+            let itemType = item.ItemType
+            if Array.contains itemType itemTypes then
+                let path = FileSystemPath.TryParse(item.EvaluatedInclude)
+                if not path.IsEmpty then
+                    let path = ensureAbsolute path projectDir
+                    files.[itemType].Add(path)
 
-                            match path with
-                            | SigFile -> sigFiles.Add(path.NameWithoutExtension) |> ignore
-                            | ImplFile when sigFiles.Contains(path.NameWithoutExtension) -> pairFiles.add(path)
-                            | _ -> ())))
+                    match path with
+                    | SigFile -> sigFiles.Add(path.NameWithoutExtension) |> ignore
+                    | ImplFile when sigFiles.Contains(path.NameWithoutExtension) -> pairFiles.add(path)
+                    | _ -> ()
 
         let filesFromTargets = filesFromTargetsProvider.GetFilesForProject(projectMark)
         let compileFiles =

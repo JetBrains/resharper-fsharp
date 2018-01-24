@@ -8,7 +8,7 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <RiderSDKVersion>2017.3-SNAPSHOT*</RiderSDKVersion>
+    <RiderSDKVersion>2018.1-SNAPSHOT*</RiderSDKVersion>
     <FCSVersion>[16.0.5]</FCSVersion>
   </PropertyGroup>
 </Project>

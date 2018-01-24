@@ -146,7 +146,7 @@ type FSharpProjectOptionsProvider(lifetime, logger, solution: ISolution, checker
             let options = x.FixScriptOptions(options)
             Some options
         with
-        | :? ProcessCancelledException -> reraise()
+        | :? OperationCanceledException -> reraise()
         | exn ->
             // todo: replace FCS reference resolver
             Logger.Warn(logger, "Error while getting options for {0}: {1}", filePath, exn.Message)

@@ -66,7 +66,7 @@ module CommonUtil =
                 let finished = task.Wait(interruptCheckTimeout, cancellationToken)
                 if not finished then
                     try interruptChecker.Invoke()
-                    with :? ProcessCancelledException ->
+                    with :? OperationCanceledException ->
                         cancellationTokenSource.Cancel()
                         reraise()
             task.Result
