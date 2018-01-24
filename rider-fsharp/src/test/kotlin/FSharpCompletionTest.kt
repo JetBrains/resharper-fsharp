@@ -10,7 +10,7 @@ import com.jetbrains.rider.util.idea.waitAndPump
 import com.jetbrains.rider.util.lifetime.Lifetime
 import org.testng.annotations.Test
 
-@Test(enabled = false)
+@Test
 class FSharpCompletionTest : CompletionTestBase() {
     override fun getSolutionDirectoryName() = "CoreConsoleApp"
     override val restoreNuGetPackages = true
@@ -18,7 +18,7 @@ class FSharpCompletionTest : CompletionTestBase() {
     private val rdFcsHost get() = project.solution.fsharpCompilerServiceHost
     private var isFcsReady = false
 
-    @Test(enabled = false)
+    @Test
     fun basicCompletion() {
         doTest {
             isFcsReady = false
