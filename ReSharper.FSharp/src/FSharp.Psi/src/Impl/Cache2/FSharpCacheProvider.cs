@@ -34,9 +34,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     {
       var sourceFile = file.GetSourceFile();
       Assertion.AssertNotNull(sourceFile, "sourceFile != null");
-      // not supported until we have psi modules for scripts
-      if (sourceFile.LanguageType.Equals(FSharpScriptProjectFileType.Instance))
-        return;
 
       var declarationProcessor = new FSharpCacheDeclarationProcessor(builder, myCheckerService);
       (file as IFSharpFile)?.Accept(declarationProcessor);
