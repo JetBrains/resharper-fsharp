@@ -93,9 +93,9 @@ type FSharpScriptPsiModule(projectFile, projectFileExtensions, projectFileTypeCo
 
     let sourceFile =
         lazy
-            NavigateablePsiSourceFileWithLocation(projectFileExtensions, projectFileTypeCoordinator, this,
-                projectFile.Location, (fun _ -> projectFile.IsValid()),
-                (fun _ -> FSharpScriptFileProperties(projectFile, this) :> _),
+            PsiProjectFile(this, projectFile,
+                (fun _ _ -> FSharpScriptFileProperties(projectFile, this) :> _),
+                (fun _ _ -> projectFile.IsValid()),
                 documentManager, UniversalModuleReferenceContext.Instance) :> IPsiSourceFile
 
     member x.ScriptProjectFile = projectFile
