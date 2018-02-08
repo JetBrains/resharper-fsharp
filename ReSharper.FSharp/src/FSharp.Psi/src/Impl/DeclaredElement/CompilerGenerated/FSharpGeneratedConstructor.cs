@@ -50,7 +50,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     public IList<IParameter> Parameters { get; }
 
     public IType ReturnType => Module.GetPredefinedType().Void;
-    public bool IsRefReturn => false;
 
     public override MemberHidePolicy HidePolicy => MemberHidePolicy.HIDE_BY_SIGNATURE;
     public bool IsPredefined => false;

@@ -34,7 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public IType Type => ReturnType;
     public abstract IType ReturnType { get; }
     public IList<IParameter> Parameters => EmptyList<IParameter>.Instance;
-    public bool IsRefReturn => false;
+    public ReferenceKind ReturnKind => ReferenceKind.VALUE;
 
     public bool IsAuto => false;
     public bool IsDefault => false;

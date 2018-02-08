@@ -35,6 +35,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
       return AccessRights.PUBLIC;
     }
 
+    public ReferenceKind ReturnKind => ReferenceKind.VALUE;
+
     public virtual bool IsAbstract => false;
     public virtual bool IsSealed => false;
     public virtual bool IsVirtual => false;

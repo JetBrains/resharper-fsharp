@@ -87,7 +87,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
     public IList<IParameter> Parameters { get; }
     public IType ReturnType { get; }
-    public bool IsRefReturn => false;
     public bool IsPredefined => false;
     public bool IsIterator => false;
     public IAttributesSet ReturnTypeAttributes => EmptyAttributesSet.Instance;

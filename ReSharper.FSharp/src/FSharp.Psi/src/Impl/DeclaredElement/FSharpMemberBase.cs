@@ -56,7 +56,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       EmptyList<IParametersOwnerDeclaration>.Instance;
 
     public virtual IList<IParameter> Parameters => EmptyList<IParameter>.Instance;
-    public bool IsRefReturn => false;
+    public ReferenceKind ReturnKind => ReferenceKind.VALUE;
     public abstract override string ShortName { get; }
     public abstract IType ReturnType { get; }
 
