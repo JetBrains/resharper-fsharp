@@ -4,6 +4,8 @@ open System
 open System.Collections.Generic
 open System.Linq
 open JetBrains.Application.changes
+open JetBrains.DocumentManagers
+open JetBrains.DocumentManagers.impl
 open JetBrains.Metadata.Reader.API
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
@@ -21,20 +23,25 @@ open JetBrains.Util
 // and source files determined by "#r" and "#load" directives.
 
 [<SolutionComponent>]
-type FSharpScriptsModuleProviderFilter(projectFileExtensions, projectFileTypeCoordinator, documentManager) =
+type FSharpScriptsModuleProviderFilter(changeManager, documentManager, projectFileExtensions,
+                                       projectFileTypeCoordinator) =
     interface IProjectPsiModuleProviderFilter with
         member x.OverrideHandler(lifetime, project, handler) =
-            let handler = FSharpScriptPsiModuleHandler(handler, projectFileExtensions, projectFileTypeCoordinator,
-                                                       documentManager)
+            let handler = FSharpScriptPsiModuleHandler(lifetime, handler, changeManager, documentManager,
+                                                       projectFileExtensions, projectFileTypeCoordinator)
             handler :> _, null
 
 
-type FSharpScriptPsiModuleHandler(handler, projectFileExtensions: ProjectFileExtensions, projectFileTypeCoordinator,
-                                  documentManager) =
+type FSharpScriptPsiModuleHandler(lifetime, handler, changeManager: ChangeManager, documentManager: DocumentManager,
+                                  projectFileExtensions: ProjectFileExtensions, projectFileTypeCoordinator) as this =
     inherit DelegatingProjectPsiModuleHandler(handler)
 
     let scriptModules = Dictionary<IProjectFile, IPsiModule>()
     let locker = JetFastSemiReenterableRWLock() // for review: ever needed?
+
+    do
+        changeManager.RegisterChangeProvider(lifetime, this)
+        changeManager.AddDependency(lifetime, this, documentManager.ChangeProvider)
 
     override x.OnProjectFileChanged(projectFile, oldLocation, changeType, changeBuilder) =
         match changeType with
@@ -73,9 +80,20 @@ type FSharpScriptPsiModuleHandler(handler, projectFileExtensions: ProjectFileExt
             | scriptModule -> scriptModule.SourceFiles
         | _ -> handler.GetPsiSourceFilesFor(projectFile)
 
+    interface IChangeProvider with
+        member x.Execute(changeMap) =
+            let change = changeMap.GetChange<ProjectFileDocumentCopyChange>(documentManager.ChangeProvider)
+            if isNull change then null else
 
-type FSharpScriptFileProperties(file: IProjectFile, psiModule: IPsiModule) =
-    inherit DefaultPropertiesForFileInProject(file.GetProject(), psiModule)
+            let projectFile = change.ProjectFile
+            if projectFile.LanguageType.Is<FSharpScriptProjectFileType>() |> not then null else // todo: impl/sig files loaded to script
+
+            null
+            
+
+
+type FSharpScriptFileProperties(psiModule: IPsiModule) =
+    inherit DefaultPropertiesForFileInProject(psiModule.ContainingProjectModule :?> IProject, psiModule)
 
     override x.ShouldBuildPsi = true
     override x.IsGeneratedFile = false
@@ -94,7 +112,7 @@ type FSharpScriptPsiModule(projectFile, projectFileExtensions, projectFileTypeCo
     let sourceFile =
         lazy
             PsiProjectFile(this, projectFile,
-                (fun _ _ -> FSharpScriptFileProperties(projectFile, this) :> _),
+                (fun _ _ -> FSharpScriptFileProperties(this) :> _),
                 (fun _ _ -> projectFile.IsValid()),
                 documentManager, UniversalModuleReferenceContext.Instance) :> IPsiSourceFile
 
