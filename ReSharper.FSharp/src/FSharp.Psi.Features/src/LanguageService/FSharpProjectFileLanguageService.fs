@@ -22,8 +22,10 @@ type FSharpProjectFileLanguageService(projectFileType, fsCheckerService: FSharpC
         | null -> FSharpLanguage.Instance.LanguageService().GetPrimaryLexerFactory()
         | _ -> FSharpLexerFactory(sourceFile, fsCheckerService.GetDefines(sourceFile)) :> _
 
-    override x.GetPsiProperties(projectFile, sourceFile, _) =
-        let providesCodeModel = projectFile.Properties.BuildAction.IsCompile() || fsFileService.IsScript(sourceFile)
+    override x.GetPsiProperties(projectFile, sourceFile, isCompileService) =
+        let providesCodeModel =
+            isCompileService.IsCompile(projectFile, sourceFile) ||
+            fsFileService.IsScript(sourceFile)
         FSharpPsiProperties(projectFile, sourceFile, providesCodeModel) :> _
 
 [<ProjectFileType(typeof<FSharpScriptProjectFileType>)>]
