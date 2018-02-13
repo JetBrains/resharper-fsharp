@@ -27,6 +27,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     }
 
     public bool HasHiddenInstanceFields => false; // todo: check this
+    public bool IsReadonly => false;
+    public bool IsByRefLike => false;
     protected override byte SerializationTag => (byte) FSharpPartKind.Struct;
   }
 
