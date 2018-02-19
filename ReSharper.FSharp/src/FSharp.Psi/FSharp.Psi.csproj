@@ -8,14 +8,7 @@
   <ItemGroup>
     <PsiLanguageNames Include="FSharp" />
     <ParserGen Include="src\FSharp.psi" />
-    <TokenGenerator Include="src\Parsing\FSharpTokens.xml">
-      <OutputFile>src\Parsing\FSharpTokenType.Generated.cs</OutputFile>
-      <SubType>Designer</SubType>
-    </TokenGenerator>
-
-    <Compile Include="Src\Parsing\FSharpTokenType.Generated.cs">
-      <DependentUpon>FSharpTokens.xml</DependentUpon>
-    </Compile>
+    <TokenGenerator Include="src\Parsing\FSharpTokens.xml" />
   </ItemGroup>
 
   <ItemGroup>
