@@ -30,7 +30,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
       var tokenBefore = fsFile.FindTokenAt(caretTreeOffset - 1);
       var tokenBeforeType = tokenBefore?.GetTokenType();
 
-      if (parseResults == null ||
+      var parseTree = parseResults?.Value.ParseTree?.Value;
+      if (parseTree == null ||
           tokenBeforeType == FSharpTokenType.LINE_COMMENT ||
           tokenBeforeType == FSharpTokenType.DEAD_CODE || token?.GetTokenType() == FSharpTokenType.DEAD_CODE ||
           token == tokenBefore && tokenBeforeType != null &&
@@ -60,7 +61,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
       var coords = document.GetCoordsByOffset(caretOffset);
       var lineText = document.GetLineText(coords.Line);
       var partialName = QuickParse.GetPartialLongNameEx(lineText, (int) coords.Column - 1);
-      var fsCompletionContext = UntypedParseImpl.TryGetCompletionContext(coords.GetPos(), parseResults, lineText);
+      var fsCompletionContext = UntypedParseImpl.TryGetCompletionContext(coords.GetPos(), parseTree, lineText);
 
       return new FSharpCodeCompletionContext(context, fsCompletionContext, ranges, coords, partialName, tokenBefore,
         token, lineText);

@@ -59,7 +59,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 
         if (fsSymbolElement is ResolvedFSharpSymbolElement)
         {
-          var patternEntity = activePatternCase.Group.EnclosingEntity?.Value;
+          var patternEntity = activePatternCase.Group.DeclaringEntity?.Value;
           if (patternEntity != null)
           {
             var patternTypeElement = FSharpElementsUtil.GetDeclaredElement(patternEntity, fsSymbolElement.Module);
@@ -89,7 +89,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
       {
         var activePattern = activePatternCase.Group;
 
-        var entityOption = activePattern.EnclosingEntity;
+        var entityOption = activePattern.DeclaringEntity;
         var patternNameOption = activePattern.Name;
         if (entityOption == null || patternNameOption == null) return null;
 

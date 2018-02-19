@@ -105,7 +105,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         if (!mfv.IsModuleValueOrMember)
           return FindLocalDeclaration(mfv, referenceOwnerToken);
 
-        var memberEntity = mfv.IsModuleValueOrMember ? mfv.EnclosingEntity : null;
+        var memberEntity = mfv.IsModuleValueOrMember ? mfv.DeclaringEntity : null;
         if (memberEntity == null) return null;
 
         if (mfv.IsImplicitConstructor)

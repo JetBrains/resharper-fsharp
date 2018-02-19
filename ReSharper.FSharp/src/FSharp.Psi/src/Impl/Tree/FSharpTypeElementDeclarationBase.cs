@@ -40,7 +40,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (!(symbol is FSharpMemberOrFunctionOrValue mfv))
         return null;
 
-      return mfv.IsConstructor || mfv.IsImplicitConstructor ? mfv.EnclosingEntity?.Value : null;
+      return mfv.IsConstructor || mfv.IsImplicitConstructor ? mfv.DeclaringEntity?.Value : null;
     }
 
     [NotNull]
