@@ -4,7 +4,6 @@
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Common</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Common</AssemblyName>
-    <DebugType>full</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
