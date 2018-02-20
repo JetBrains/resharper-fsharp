@@ -43,7 +43,6 @@ def src = '../ReSharper.FSharp/src'
 def dllFiles = [
         'FSharp.Common/bin/Debug/net451/FSharp.Core.dll',
         'FSharp.Common/bin/Debug/net451/FSharp.Compiler.Service.dll',
-        'FSharp.Common/bin/Debug/net451/FSharp.Compiler.Service.MSBuild.v12.dll',
         'FSharp.Psi.Features/bin/Debug/net451/FantomasLib.dll',
 
         'FSharp.ProjectModelBase/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase.dll',

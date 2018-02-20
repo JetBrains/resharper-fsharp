@@ -32,8 +32,7 @@ type FSharpCheckerService(lifetime, logger: Util.ILogger, onSolutionCloseNotifie
     do
         Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "30")
 
-    let checker = lazy FSharpChecker.Create(projectCacheSize = 200, keepAllBackgroundResolutions = false,
-                                            legacyReferenceResolver = MSBuildReferenceResolver.Resolver)
+    let checker = lazy FSharpChecker.Create(projectCacheSize = 200, keepAllBackgroundResolutions = false)
     do
         onSolutionCloseNotifier.SolutionIsAboutToClose.Advise(lifetime, fun _ -> checker.Value.InvalidateAll())
 
