@@ -14,6 +14,7 @@ open JetBrains.Metadata.Reader.API
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Assemblies.Impl
 open JetBrains.ProjectModel.Model2.Assemblies.Interfaces
+open JetBrains.ReSharper.Host.Features.ProjectModel.MiscFiles
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
@@ -22,6 +23,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Impl
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.Rider.Model
 open JetBrains.Threading
 open JetBrains.Util
 
@@ -41,12 +43,12 @@ type FSharpScriptsModuleProviderFilter(lifetime: Lifetime, solution: ISolution, 
         member x.OverrideHandler(lifetime, project, handler) =
             let handler =
                 FSharpScriptPsiModuleHandler(lifetime, solution, handler, changeManager, documentManager, assemblies,
-                                             projectFileExtensions, checkerService, assemblyFactory)
+                                             projectFileExtensions, checkerService.Checker, assemblyFactory)
             handler :> _, null
 
 
 type FSharpScriptPsiModuleHandler(lifetime, solution, handler, changeManager, documentManager, assemblies,
-                                  projectFileExtensions, checkerService, assemblyFactory) as this =
+                                  projectFileExtensions, checker, assemblyFactory) as this =
     inherit DelegatingProjectPsiModuleHandler(handler)
 
     let [<Literal>] holderId = "FSharpScriptPsiModuleHandler"
@@ -54,6 +56,7 @@ type FSharpScriptPsiModuleHandler(lifetime, solution, handler, changeManager, do
     let scriptModules = Dictionary<IProjectFile, IPsiModule>()
     let locker = JetFastSemiReenterableRWLock()
     let psiModules = solution.PsiModules()
+    let miscFiles = solution.SolutionMiscFiles()
 
     do
         changeManager.RegisterChangeProvider(lifetime, this)
@@ -67,16 +70,32 @@ type FSharpScriptPsiModuleHandler(lifetime, solution, handler, changeManager, do
 
             use lock = locker.UsingWriteLock()
 
-            let fileName = projectFile.Location.FullPath
+            let scriptPath = projectFile.Location
             let source = projectFile.GetDocument().GetText()
-            let scriptOptions, _ = checkerService.Checker.GetProjectOptionsFromScript(fileName, source).RunAsTask()
+            let scriptOptions, _ = checker.GetProjectOptionsFromScript(scriptPath.FullPath, source).RunAsTask()
 
-            let scriptModule =
-                FSharpScriptPsiModule(projectFile, projectFileExtensions, documentManager, assemblies)
-
+            let scriptModule = FSharpScriptPsiModule(projectFile, projectFileExtensions, documentManager)
             let project = projectFile.GetProject()
             let resolveContext = PsiModuleResolveContext(scriptModule, TargetFrameworkId.Default, project)
             scriptModule.ResolveContext <- resolveContext
+
+            // todo: add files to caches? add psi changes?
+            let sourceFiles =
+                scriptOptions.SourceFiles
+                |> Array.choose (fun pathString ->
+                    let path = FileSystemPath.TryParse(pathString)
+                    if path.IsEmpty || path = scriptPath then None else
+
+                    solution.FindProjectItemsByLocation(path).OfType<IProjectFile>()
+                    |> Seq.tryHead
+                    |> Option.orElseWith (fun _ -> Some (miscFiles.CreateMiscFile(path)))) // todo: make writable by default
+                |> Array.append [| projectFile |]
+                |> Array.map (fun projectFile ->
+                    PsiProjectFile(scriptModule, projectFile,
+                        (fun _ _ -> FSharpScriptFileProperties(scriptModule) :> _),
+                        (fun _ _ -> projectFile.IsValid()),
+                        documentManager, scriptModule.ResolveContext) :> IPsiSourceFile)
+            scriptModule.SourceFiles <- sourceFiles
 
             let assemblyPaths =
                 scriptOptions.OtherOptions
@@ -136,7 +155,7 @@ type FSharpScriptPsiModuleHandler(lifetime, solution, handler, changeManager, do
             null
             
 
-type FSharpScriptPsiModule(projectFile, projectFileExtensions, documentManager, assemblies) as this =
+type FSharpScriptPsiModule(projectFile, projectFileExtensions, documentManager) as this =
     inherit ConcurrentUserDataHolder()
 
     let project = projectFile.GetProject()
@@ -151,6 +170,7 @@ type FSharpScriptPsiModule(projectFile, projectFileExtensions, documentManager, 
                 documentManager, this.ResolveContext) :> IPsiSourceFile
 
     member val ResolveContext: PsiModuleResolveContext = null with get, set
+    member val SourceFiles: IPsiSourceFile[] = null with get, set
     member val References: IPsiModuleReference[] = null with get, set
 
     interface IPsiModule with
@@ -165,10 +185,8 @@ type FSharpScriptPsiModule(projectFile, projectFileExtensions, documentManager, 
         member x.PsiLanguage = FSharpLanguage.Instance :> _
         member x.ProjectFileType = FSharpScriptProjectFileType.Instance :> _
 
-        // todo: add included source files
         // todo: add file sorter to prefer own source file for fsx over loaded into another script
-        member x.SourceFiles = seq { yield sourceFile.Value } 
-
+        member x.SourceFiles = x.SourceFiles :> _ 
         member x.GetReferences(resolveContext) = x.References :> _
 
         member x.ContainingProjectModule = project :> _
