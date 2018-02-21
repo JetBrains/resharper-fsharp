@@ -113,3 +113,9 @@ module CommonUtil =
     type IProject with
         member x.IsFSharp =
             isFSharpProject x.ProjectProperties.ProjectTypeGuids x.ProjectFileLocation
+
+    let tryGetValue (dictionary: IDictionary<'TKey,'TValue>) (key: 'TKey) =
+        let res = ref Unchecked.defaultof<'TValue>
+        match dictionary.TryGetValue(key, res), res with
+        | true, value -> Some !value
+        | _ -> None
