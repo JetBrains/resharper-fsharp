@@ -12,7 +12,6 @@
     <Compile Include="src\ProjectModel\ProjectProperties\FSharpProjectProperties.fs" />
     <Compile Include="src\ProjectModel\ProjectProperties\FSharpProjectPropertiesFactory.fs" />
     <Compile Include="src\ProjectModel\ProjectProperties\FSharpProjectFilePropertiesProvider.fs" />
-    <Compile Include="src\ProjectModel\FSharpProjectPresenter.fs" />
     <Compile Include="src\ProjectModel\ZoneMarker.fs" />
     <Compile Include="src\Util\Util.fs" />
     <Compile Include="src\FileSystemShim\FSharpSourceCache.fs" />
@@ -31,6 +30,7 @@
     <Compile Include="src\Checker\FSharpProjectOptionsProvider.fs" />
     <Compile Include="src\FSharpTargetsAnalyzer.fs" />
     <Compile Include="src\ProjectModel\FSharpScriptPsiModuleFactory.fs" />
+    <Compile Include="src\ProjectModel\FSharpProjectPresenter.fs" />
     <Compile Include="src\PaketRestoreTargetsAnalyzer.fs" />
   </ItemGroup>
 

@@ -123,6 +123,7 @@ type FSharpScriptPsiModuleHandler(lifetime, solution, handler, changeManager, do
             for path in getReferencedPaths scriptOptions do
                 psiModule.AddReference(path)
 
+            // todo: add project model change for add/remove script module
             changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Added)
             for file in sourceFiles do
                 changeBuilder.AddFileChange(file, PsiModuleChange.ChangeType.Added)
@@ -191,6 +192,7 @@ type FSharpScriptPsiModule(lifetime, projectFile, documentManager, assemblyFacto
 
     member x.ResolveContext = resolveContext.Value
     member x.ReferencedPaths = references.Keys
+    member x.Module = scriptModule
 
     member x.AddReference(path: FileSystemPath) =
         use lock = locker.UsingWriteLock()
@@ -209,8 +211,8 @@ type FSharpScriptPsiModule(lifetime, projectFile, documentManager, assemblyFacto
         references.Remove(path) |> ignore
 
     interface IPsiModule with
-        member x.Name = "F# script module: " + projectFile.Name
-        member x.DisplayName = "F# script module: " + projectFile.Name
+        member x.Name = "F# script: " + projectFile.Name
+        member x.DisplayName = "F# script: " + projectFile.Name
         member x.GetPersistentID() = "FSharpScriptModule:" + projectFile.Location.FullPath
 
         member x.GetSolution() = solution
@@ -237,12 +239,15 @@ type FSharpScriptPsiModule(lifetime, projectFile, documentManager, assemblyFacto
 type FSharpScriptModule(projectFile: IProjectFile) =
     inherit UserDataHolder()
 
+    let solution = projectFile.GetSolution()
+    let path = projectFile.Location.MakeRelativeTo(solution.SolutionFilePath.Directory)
+
     interface IModule with
         member x.Presentation = projectFile.Name
-        member x.Name = projectFile.Location.FullPath
+        member x.Name = path.FullPath
 
         member x.IsValid() = projectFile.IsValid()
-        member x.GetSolution() = projectFile.GetSolution()
+        member x.GetSolution() = solution
         member x.Accept(visitor) = visitor.VisitProjectModelElement(x)
         member x.MarshallerType = null
 

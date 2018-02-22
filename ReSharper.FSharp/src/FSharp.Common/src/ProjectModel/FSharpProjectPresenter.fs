@@ -13,6 +13,8 @@ type FSharpProjectPresenter() =
             match projectModelElement with
             | :? IProject as project when (project.ProjectProperties :? FSharpProjectProperties) ->
                 ProjectModelThemedIcons.FsharpProject.Id
+            | :? FSharpScriptModule as scriptModule ->
+                ProjectModelThemedIcons.Fsharp.Id
             | _ -> null
 
         member x.GetPresentableLocation _ = null
