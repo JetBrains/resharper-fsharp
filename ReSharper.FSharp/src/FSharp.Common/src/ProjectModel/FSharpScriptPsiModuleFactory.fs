@@ -34,21 +34,26 @@ open Microsoft.FSharp.Compiler.SourceCodeServices
 type FSharpScriptPsiModuleProviderFilter(lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager,
                                          documentManager: DocumentManager, projectFileExtensions: ProjectFileExtensions,
                                          (*projectFileTypeCoordinator: PsiProjectFileTypeCoordinator,*)
-                                         checkerService: FSharpCheckerService, assemblyFactory: AssemblyFactory) =
+                                         checkerService: FSharpCheckerService, assemblyFactory: AssemblyFactory,
+                                         platformManager: PlatformManager) =
+    let targetFrameworkId =
+        let plaformInfo = platformManager.GetAllPlatformInfos() |> Seq.maxBy (fun info -> info.Version)
+        plaformInfo.PlatformID.ToTargetFrameworkId()
+
     interface IProjectPsiModuleProviderFilter with
         member x.OverrideHandler(lifetime, _, handler) =
             let handler =
                 FSharpScriptPsiModuleHandler(lifetime, solution, handler, changeManager, documentManager,
                                              projectFileExtensions,
                                              (*projectFileTypeCoordinator,*)
-                                             checkerService.Checker, assemblyFactory)
+                                             checkerService.Checker, assemblyFactory, targetFrameworkId)
             handler :> _, null
 
 
 type FSharpScriptPsiModuleHandler(lifetime, solution, handler, changeManager, documentManager,
                                   projectFileExtensions,
                                   (*projectFileTypeCoordinator,*)
-                                  checker, assemblyFactory) as this =
+                                  checker, assemblyFactory, targetFrameworkId) as this =
     inherit DelegatingProjectPsiModuleHandler(handler)
 
     let [<Literal>] id = "FSharpScriptPsiModuleHandler"
@@ -90,7 +95,9 @@ type FSharpScriptPsiModuleHandler(lifetime, solution, handler, changeManager, do
             use lock = locker.UsingWriteLock()
 
             let moduleLifetime = Lifetimes.Define(lifetime)
-            let psiModule = FSharpScriptPsiModule(moduleLifetime.Lifetime, projectFile, documentManager, assemblyFactory)
+            let psiModule =
+                FSharpScriptPsiModule(moduleLifetime.Lifetime, projectFile, documentManager, assemblyFactory,
+                                      targetFrameworkId)
             let scriptOptions = getScriptOptions projectFile
 
             // todo: add files to caches? add psi changes?
@@ -160,7 +167,7 @@ type FSharpScriptPsiModuleHandler(lifetime, solution, handler, changeManager, do
             null
 
 
-type FSharpScriptPsiModule(lifetime, projectFile, documentManager, assemblyFactory) as this =
+type FSharpScriptPsiModule(lifetime, projectFile, documentManager, assemblyFactory, targetFrameworkId) as this =
     inherit ConcurrentUserDataHolder()
 
     let locker = JetFastSemiReenterableRWLock()
@@ -170,7 +177,7 @@ type FSharpScriptPsiModule(lifetime, projectFile, documentManager, assemblyFacto
     let psiModules = solution.PsiModules()
 
     let scriptModule = FSharpScriptModule(projectFile)
-    let resolveContext = lazy (PsiModuleResolveContext(this, TargetFrameworkId.Default, null))
+    let resolveContext = lazy (PsiModuleResolveContext(this, targetFrameworkId, null))
     let references = DictionaryEvents<FileSystemPath, AssemblyReference>(lifetime, projectFile.Location.FullPath)
 
     do
@@ -193,6 +200,7 @@ type FSharpScriptPsiModule(lifetime, projectFile, documentManager, assemblyFacto
         match psiModules.GetPrimaryPsiModule(assemblyCookie.Assembly, TargetFrameworkId.Default) with
         | null -> assemblyCookie.Dispose()
         | assemblyModule ->
+            // todo: create project reference when an assembly is a project output
             let reference = { Assembly = assemblyCookie; Reference = PsiModuleReference(assemblyModule) }
             references.Add(path, reference) |> ignore
 
@@ -208,8 +216,8 @@ type FSharpScriptPsiModule(lifetime, projectFile, documentManager, assemblyFacto
         member x.GetSolution() = solution
         member x.GetPsiServices() = psiServices
 
-        // todo: references to project psi modules with incompatible id, e.g. script -> coreapp
-        member x.TargetFrameworkId = TargetFrameworkId.Default
+        member x.TargetFrameworkId = targetFrameworkId
+        member x.ContainingProjectModule = scriptModule :> _
 
         member x.PsiLanguage = FSharpLanguage.Instance :> _
         member x.ProjectFileType = UnknownProjectFileType.Instance :> _
@@ -222,7 +230,6 @@ type FSharpScriptPsiModule(lifetime, projectFile, documentManager, assemblyFacto
             references.Values
             |> Seq.map (fun ref -> ref.Reference)
 
-        member x.ContainingProjectModule = scriptModule :> _
         member x.GetAllDefines() = EmptyList.InstanceList :> _
         member x.IsValid() = projectFile.IsValid() && psiServices.Modules.HasModule(this)
 
