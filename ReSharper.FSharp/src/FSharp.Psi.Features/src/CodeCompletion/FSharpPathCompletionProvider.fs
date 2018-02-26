@@ -18,12 +18,13 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.UI.Icons
 open JetBrains.Util
 
-type FSharpPathCompletionContext(context, token, ranges) =
+type FSharpPathCompletionContext(context, token, completedPath, ranges) =
     inherit SpecificCodeCompletionContext(context)
 
     override x.ContextId = "FSharpPathCompletionContext"
     member x.Token = token
     member x.Ranges = ranges
+    member x.CompletedPath = completedPath
 
 
 [<IntellisensePart>]
@@ -41,14 +42,41 @@ type FSharpPathCompletionContextProvider() =
 
     override x.GetCompletionContext(context) =
         let fsFile = context.File :?> IFSharpFile
-        let token = fsFile.FindTokenAt(context.CaretTreeOffset)
-        
-        let document = context.Document
+        let token = fsFile.FindTokenAt(context.CaretTreeOffset - 1)
+
+        let arg = token.GetText()
+        let startQuoteLength = arg.IndexOf('"') + 1
+        let argValue = arg.Substring(startQuoteLength).TrimFromEnd("\"")
+
+        let argOffset = token.GetTreeStartOffset().Offset
+        let valueOffset = argOffset + startQuoteLength
         let caretOffset = context.CaretTreeOffset.Offset
-        let docRange = DocumentRange(document, TextRange(caretOffset, caretOffset))
-        let ranges = TextLookupRanges(docRange, docRange)
-        
-        FSharpPathCompletionContext(context, token, ranges) :> _
+
+        let caretValueOffset = caretOffset - argOffset - startQuoteLength
+        let prevSeparatorValueOffset =
+            argValue.Substring(0, caretValueOffset).LastIndexOfAny(FileSystemDefinition.SeparatorChars)
+
+        let rangesStart =
+            let separatorLength = if prevSeparatorValueOffset < 0 then 0 else 1 
+            valueOffset + (max prevSeparatorValueOffset 0) + separatorLength
+
+        let replaceRangeEnd =
+            let valueReplaceEndOffset =
+                match context.CodeCompletionType with
+                | BasicCompletion ->
+                    let nextSeparatorOffset = argValue.IndexOfAny(FileSystemDefinition.SeparatorChars, caretValueOffset)
+                    if nextSeparatorOffset < 0 then argValue.Length else nextSeparatorOffset
+                | SmartCompletion -> argValue.Length
+                | completionType -> sprintf "Got completion type: %O" completionType |> failwith
+            valueOffset + valueReplaceEndOffset
+
+        let document = context.Document
+        let insertRange = DocumentRange(document, TextRange(rangesStart, caretOffset))
+        let replaceRange = DocumentRange(document, TextRange(rangesStart, replaceRangeEnd))
+        let ranges = TextLookupRanges(insertRange, replaceRange)
+
+        let completedPath = FileSystemPath.TryParse(argValue.Substring(0, prevSeparatorValueOffset + 1))
+        FSharpPathCompletionContext(context, token, completedPath, ranges) :> _
 
 
 [<Language(typeof<FSharpLanguage>)>]
@@ -72,23 +100,10 @@ type FSharpPathCompletionProvider() =
     override x.GetDefaultRanges(context) = context.Ranges
 
     override x.AddLookupItems(context, collector) =
-        let basicContext = context.BasicContext
-        let caretOffset = basicContext.CaretTreeOffset.Offset
+        let filePath = context.BasicContext.SourceFile.GetLocation()
+        let completedPath = context.CompletedPath.MakeAbsoluteBasedOn(filePath.Directory)
 
         let token = context.Token
-        let arg = token.GetText()
-        let stringValueOffset = arg.IndexOf('"') + 1
-        let insideTokenCaretOffset = caretOffset - token.GetTreeStartOffset().Offset - stringValueOffset
-
-        let completedPart = arg.Substring(stringValueOffset, insideTokenCaretOffset)
-        let completedPartLenght =
-            let separatorIndex = completedPart.LastIndexOf('/')
-            if separatorIndex < 0 then 0 else separatorIndex
-
-        let filePath = basicContext.SourceFile.GetLocation()
-        let completedRelativePath = FileSystemPath.TryParse(completedPart.Substring(0, completedPartLenght))
-        let completedPath = completedRelativePath.MakeAbsoluteBasedOn(filePath.Directory)
-
         let hashDirective = token.Parent :?> _
         match getCompletionTarget hashDirective with
         | Some (allowedExtensions, iconId) ->
@@ -98,11 +113,11 @@ type FSharpPathCompletionProvider() =
 
             let addLookupItem iconId path =
                 if isAllowed path then
-                    let lookupItem = FSharpPathLookupItem(path, completedPath, filePath, iconId)
+                    let lookupItem = FSharpPathLookupItem(path, completedPath, iconId)
                     lookupItem.InitializeRanges(context.Ranges, context.BasicContext)
                     collector.Add(lookupItem)
 
-            match basicContext.CodeCompletionType with
+            match context.BasicContext.CodeCompletionType with
             | BasicCompletion ->
                 if not allowedExtensions.IsEmpty then
                     completedPath.GetChildFiles()
@@ -112,7 +127,6 @@ type FSharpPathCompletionProvider() =
                 |> Seq.iter (addLookupItem ProjectModelThemedIcons.Directory.Id)
 
             | SmartCompletion ->
-                // todo: change insert range
                 if not allowedExtensions.IsEmpty then
                     let getFilesAsync = async {
                         return completedPath.GetChildFiles(flags = PathSearchFlags.RecurseIntoSubdirectories) }
@@ -124,7 +138,7 @@ type FSharpPathCompletionProvider() =
         true
 
 
-type FSharpPathLookupItem(path: FileSystemPath, basePath: FileSystemPath, filePath: FileSystemPath, iconId: IconId) =
+type FSharpPathLookupItem(path: FileSystemPath, basePath, iconId) =
     inherit TextLookupItemBase()
 
     override x.Image = iconId
