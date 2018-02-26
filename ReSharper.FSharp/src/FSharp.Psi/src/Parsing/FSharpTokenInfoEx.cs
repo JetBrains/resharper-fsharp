@@ -11,6 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       const int PublicTag = 42;
       const int PriateTag = 43;
       const int InternalTag = 44;
+      const int HashTag = 88;
       const int NewTag = 118;
       const int ModuleTag = 148;
       const int NamespaceTag = 149;
@@ -101,6 +102,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 
           if (tokenTag == FSharpTokenTag.BAR)
             return FSharpTokenType.BAR;
+
+          if (tokenTag == HashTag)
+            return FSharpTokenType.HASH;
 
           return FSharpTokenType.TEXT;
 

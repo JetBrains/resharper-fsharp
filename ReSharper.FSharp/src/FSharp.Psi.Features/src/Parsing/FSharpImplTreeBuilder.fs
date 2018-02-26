@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Psi.TreeBuilder
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.Ast
@@ -47,11 +48,21 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                 x.ProcessModuleLetPat headPat attrs
                 x.ProcessLocalExpression expr
 
+        | SynModuleDecl.HashDirective(hashDirective, _) ->
+            x.ProcessHashDirective(hashDirective)
+
         | decl ->
             decl.Range |> x.GetStartOffset |> x.AdvanceToOffset
             let mark = x.Builder.Mark()
             decl.Range |> x.GetEndOffset |> x.AdvanceToOffset
             x.Done(mark, ElementType.OTHER_MEMBER_DECLARATION)
+
+    member internal x.ProcessHashDirective (ParsedHashDirective(id, args, range)) =
+        range |> x.GetStartOffset |> x.AdvanceToOffset
+        let mark = x.Builder.Mark()
+
+        range |> x.GetEndOffset |> x.AdvanceToOffset
+        x.Done(mark, ElementType.HASH_DIRECTIVE)
 
     member internal x.ProcessType (TypeDefn(ComponentInfo(attrs, typeParams,_,lid,_,_,_,_), repr, members, range)) =
         let shouldProcess =

@@ -17,6 +17,7 @@
         <Token name="OPERATOR"/>
         <Token name="COMMENT"/>
         <Token name="LINE_COMMENT"/>
+        <Token name="HASH" />
         <Token name="TEXT"/>
         <Token name="DEAD_CODE"/>
 

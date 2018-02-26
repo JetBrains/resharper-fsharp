@@ -102,6 +102,7 @@ interface moduleMember:
   moduleMemberDeclaration |
   moduleMemberStatement |
   memberDeclaration |
+  hashDirective |
   otherModuleMember;
 
 interface moduleMemberDeclaration:
@@ -381,6 +382,10 @@ memberParam: fakeSeparator;
 
 
 // module statements
+
+hashDirective:
+  HASH<HASH, HashToken>
+  STRING<STRING, Args>*; 
 
 open: longIdentifier<LONG_IDENTIFIER, LongIdentifier>;
 do: fakeSeparator;
