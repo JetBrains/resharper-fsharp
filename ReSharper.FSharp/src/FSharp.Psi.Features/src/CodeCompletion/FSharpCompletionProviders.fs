@@ -7,6 +7,7 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems.Impl
+open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
@@ -89,6 +90,7 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
             | _ -> false
         | _ -> false
 
+
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpLookupItemsProvider(logger: ILogger) =
     inherit FSharpLookupItemsProviderBase(logger, (fun checkResults ->
@@ -111,6 +113,7 @@ type FSharpLookupItemsProvider(logger: ILogger) =
         member x.SupportedCompletionMode = CompletionMode.Single
         member x.SupportedEvaluationMode = EvaluationMode.Light
 
+
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpRangesProvider() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
@@ -118,6 +121,7 @@ type FSharpRangesProvider() =
     override x.GetDefaultRanges(context) = context.Ranges
     override x.SupportedCompletionMode = CompletionMode.All
     override x.SupportedEvaluationMode = EvaluationMode.Full
+
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpLibraryScopeLookupItemsProvider(logger: ILogger, assemblyContentProvider: FSharpAssemblyContentProvider) =
@@ -129,3 +133,22 @@ type FSharpLibraryScopeLookupItemsProvider(logger: ILogger, assemblyContentProvi
             base.AddLookupItems(context :?> FSharpCodeCompletionContext, collector)
 
         member x.SupportedEvaluationMode = EvaluationMode.Full
+
+
+[<SolutionComponent>]
+type FSharpAutocompletionStrategy() =
+    static let additionalPopupChars = ['#'; '-'; ':'; '<'; '>'; '@'] |> Set.ofList
+
+    interface IAutomaticCodeCompletionStrategy with
+
+        member x.Language = FSharpLanguage.Instance :> _
+        member x.AcceptsFile(file, textControl) = file :? IFSharpFile
+
+        member x.AcceptTyping(char, textControl, _) =
+            char.IsIdentifierPart() ||
+            Set.contains char additionalPopupChars
+
+        member x.ProcessSubsequentTyping(_, _) = true
+
+        member x.IsEnabledInSettings(_, _) = AutopopupType.SoftAutopopup
+        member x.ForceHideCompletion = false
