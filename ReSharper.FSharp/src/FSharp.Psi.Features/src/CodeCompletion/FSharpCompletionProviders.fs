@@ -136,7 +136,7 @@ type FSharpLibraryScopeLookupItemsProvider(logger: ILogger, assemblyContentProvi
 
 
 [<SolutionComponent>]
-type FSharpAutocompletionStrategy() =
+type FSharpIdentifierAutocompletionStrategy() =
     static let additionalPopupChars = ['#'; '-'; ':'; '<'; '>'; '@'] |> Set.ofList
 
     interface IAutomaticCodeCompletionStrategy with

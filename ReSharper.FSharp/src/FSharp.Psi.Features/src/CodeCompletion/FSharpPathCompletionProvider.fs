@@ -37,10 +37,18 @@ type FSharpPathCompletionContextProvider() =
     override x.IsApplicable(context) =
         match context.File with
         | :? IFSharpFile as fsFile ->
-            let token = fsFile.FindTokenAt(context.CaretTreeOffset - 1)
+            let caretOffset = context.CaretTreeOffset
+            let token = fsFile.FindTokenAt(caretOffset - 1)
             match token.GetTokenType() with
-            | null -> false
-            | tokenType -> tokenType.IsStringLiteral && token.Parent :? IHashDirective
+            | tokenType when tokenType.IsStringLiteral && (token.Parent :? IHashDirective) ->
+                let caretOffset = caretOffset.Offset
+                let tokenOffset = token.GetTreeStartOffset().Offset
+                let tokenText = token.GetText()
+                let valueStartOffset = tokenOffset + tokenText.IndexOf("\"") + 1
+                let tokenEndOffset = tokenOffset + tokenText.Length
+
+                caretOffset >= valueStartOffset && caretOffset < tokenEndOffset
+            | _ -> false
         | _ -> false
 
     override x.GetCompletionContext(context) =
@@ -90,6 +98,11 @@ type FSharpPathCompletionProvider() =
     static let dllExtensions = ["dll"; "exe"] |> Set.ofList
 
     let getCompletionTarget (hashDirective: IHashDirective) =
+        if isNull hashDirective then None else
+
+        let hastToken = hashDirective.HashToken
+        if isNull hastToken then None else 
+
         let hashTokenText = hashDirective.HashToken.GetText()
         if hashTokenText.Length < 2 then None else
 
@@ -114,27 +127,31 @@ type FSharpPathCompletionProvider() =
                 Set.contains (path.ExtensionNoDot.ToLower()) allowedExtensions && not (path.Equals(filePath)) ||
                 path.ExistsDirectory
 
-            let addLookupItem iconId path =
+            let addItem (lookupItem: TextLookupItemBase) =
+                lookupItem.InitializeRanges(context.Ranges, context.BasicContext)
+                collector.Add(lookupItem)
+
+            let addFileItem path =
                 if isAllowed path then
-                    let lookupItem = FSharpPathLookupItem(path, completedPath, iconId)
-                    lookupItem.InitializeRanges(context.Ranges, context.BasicContext)
-                    collector.Add(lookupItem)
+                    FSharpPathLookupItem(path, completedPath, iconId)
+                    |> addItem
 
             match context.BasicContext.CodeCompletionType with
             | BasicCompletion ->
                 if not allowedExtensions.IsEmpty then
                     completedPath.GetChildFiles()
-                    |> Seq.iter (addLookupItem iconId)
+                    |> Seq.iter addFileItem
 
+                let solution = context.BasicContext.Solution
                 completedPath.GetChildDirectories()
-                |> Seq.iter (addLookupItem ProjectModelThemedIcons.Directory.Id)
+                |> Seq.iter (FSharpFolderCompletionItem >> addItem)
 
             | SmartCompletion ->
                 if not allowedExtensions.IsEmpty then
                     let getFilesAsync = async {
                         return completedPath.GetChildFiles(flags = PathSearchFlags.RecurseIntoSubdirectories) }
                     getFilesAsync.RunAsTask()
-                    |> Seq.iter (addLookupItem iconId)
+                    |> Seq.iter addFileItem
             | _ -> ()
         | _ -> ()
 
@@ -154,6 +171,19 @@ type FSharpPathLookupItem(path: FileSystemPath, basePath, iconId) =
             let directoryString = directoryPath.NormalizeSeparators(FileSystemPathEx.SeparatorStyle.Unix)
             LookupUtil.AddInformationText(name, "(in " + directoryString + ")", itemInfoTextStyle)
         name
+
+
+type FSharpFolderCompletionItem(path: FileSystemPath) =
+    inherit TextLookupItemBase()
+
+    override x.Image = ProjectModelThemedIcons.Directory.Id
+    override x.Text = path.Name + "/"
+    override x.GetDisplayName() = LookupUtil.FormatLookupString(path.Name, x.TextColor)
+
+    override x.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret) =
+        base.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret)
+        textControl.RescheduleCompletion(solution)
+        
 
 [<SolutionComponent>]
 type FSharpPathAutocompletionStrategy() =

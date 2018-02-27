@@ -1,8 +1,12 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
 open System
+open JetBrains.Application.Threading
+open JetBrains.ProjectModel
+open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems.Impl
+open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -25,8 +29,8 @@ type FSharpKeywordsProvider() =
     inherit FSharpItemsProviderBase()
 
     let hashDirectives =
-        [ KeywordSuffix.Quotes, ["#load"; "#r"; "#I"; "#nowarn"]
-          KeywordSuffix.Space, ["#if"; "#else"; "#times"]
+        [ KeywordSuffix.Quotes, ["#load"; "#r"; "#I"; "#nowarn"; "#time"]
+          KeywordSuffix.Space, ["#if"; "#else"]
           KeywordSuffix.None, ["#endif"] ]
         |> List.map (fun (suffix, directives) ->
             directives |> List.map (fun d -> FSharpHashDirectiveLookupItem(d, suffix) :> TextLookupItemBase))
@@ -39,18 +43,18 @@ type FSharpKeywordsProvider() =
         |> List.map (fun (keyword, description) ->
             FSharpKeywordLookupItem(keyword, description, KeywordSuffix.Space) :> TextLookupItemBase)
 
-    let lookupItems = hashDirectives @ keywords        
+    let lookupItems = hashDirectives @ keywords
 
     override x.IsAvailable(_) = true
 
     override x.AddLookupItems(context, collector) =
-        match context.FsCompletionContext with
-        | Some (CompletionContext.Invalid) -> false
-        | _ ->
-
         match context.TokenBeforeCaret with
         | null -> false
         | tokenBefore ->
+
+        match context.FsCompletionContext with
+        | Some (CompletionContext.Invalid) when tokenBefore.GetTokenType() <> FSharpTokenType.HASH -> false
+        | _ ->
 
         let tokenBeforeType = tokenBefore.GetTokenType()
 
@@ -90,7 +94,9 @@ type FSharpKeywordLookupItemBase(keyword, keywordSuffix) =
         match keywordSuffix with
         | KeywordSuffix.Quotes ->
             textControl.Caret.MoveTo(textControl.Caret.Offset() - 1, CaretVisualPlacement.DontScrollIfVisible)
+            textControl.RescheduleCompletion(solution)
         | _ -> ()
+
 
 type FSharpKeywordLookupItem(keyword, description, suffix) =
     inherit FSharpKeywordLookupItemBase(keyword, suffix)
