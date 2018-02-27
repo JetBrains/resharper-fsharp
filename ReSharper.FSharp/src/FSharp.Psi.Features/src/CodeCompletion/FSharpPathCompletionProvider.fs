@@ -3,11 +3,13 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open System
 open System.Collections.Generic
 open JetBrains.DocumentModel
+open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Resources
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Impl
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems.Impl
+open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -15,6 +17,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Resources
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.TextControl
 open JetBrains.UI.Icons
 open JetBrains.Util
 
@@ -37,7 +40,7 @@ type FSharpPathCompletionContextProvider() =
             let token = fsFile.FindTokenAt(context.CaretTreeOffset - 1)
             match token.GetTokenType() with
             | null -> false
-            | tokenType -> isNotNull tokenType && tokenType.IsStringLiteral && token.Parent :? IHashDirective
+            | tokenType -> tokenType.IsStringLiteral && token.Parent :? IHashDirective
         | _ -> false
 
     override x.GetCompletionContext(context) =
@@ -152,4 +155,23 @@ type FSharpPathLookupItem(path: FileSystemPath, basePath, iconId) =
             LookupUtil.AddInformationText(name, "(in " + directoryString + ")", itemInfoTextStyle)
         name
 
+[<SolutionComponent>]
+type FSharpPathAutocompletionStrategy() =
+    interface IAutomaticCodeCompletionStrategy with
 
+        member x.Language = FSharpLanguage.Instance :> _
+        member x.AcceptsFile(file, textControl) =
+            match file with
+            | :? IFSharpFile as fsFile ->
+                let offset = TreeOffset(textControl.Caret.Offset() - 1)
+                let token = fsFile.FindTokenAt(offset)
+                match token.GetTokenType() with
+                | null -> false
+                | tokenType -> tokenType.IsStringLiteral && token.Parent :? IHashDirective
+            | _ -> false
+
+        member x.AcceptTyping(char, textControl, _) = Array.contains char FileSystemDefinition.InvalidPathChars |> not
+        member x.ProcessSubsequentTyping(_, _) = true
+
+        member x.IsEnabledInSettings(_, _) = AutopopupType.HardAutopopup
+        member x.ForceHideCompletion = false
