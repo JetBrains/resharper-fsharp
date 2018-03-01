@@ -178,19 +178,12 @@ type FSharpScriptPsiModule(lifetime, projectFile, targetFrameworkId, assemblyFac
 
     let sourceFile =
         lazy (PsiProjectFile(this, projectFile,
-                             (fun _ _ -> FSharpScriptFileProperties(this) :> _),
+                             (fun _ _ -> FSharpScriptFileProperties() :> _),
                              (fun _ _ -> projectFile.IsValid()),
                              documentManager, resolveContext.Value) :> IPsiSourceFile)
 
     do
-        assemblyCookies.SuppressItemErrors <- true
-//        assemblyCookies.AddRemove.Advise_Remove(lifetime, fun args ->
-//            use lock = locker.UsingWriteLock()
-//            let reference = args.Value.Value
-//            reference.Assembly.Dispose()) |> ignore
-        lifetime.AddAction(fun _ ->
-            use cookie = WriteLockCookie.Create()
-            assemblyCookies.Clear()) |> ignore
+        lifetime.AddAction(fun _ -> assemblyCookies.Clear()) |> ignore
 
     member x.SourceFile = sourceFile.Value
     member x.ResolveContext = resolveContext.Value
@@ -202,7 +195,13 @@ type FSharpScriptPsiModule(lifetime, projectFile, targetFrameworkId, assemblyFac
     member x.AddReference(path: FileSystemPath) =
         use lock = locker.UsingWriteLock()
         if assemblyCookies.ContainsKey(path) then () else
-        assemblyCookies.Add(path, assemblyFactory.AddRef(path, projectFile.Location.FullPath, this.ResolveContext))
+
+        let assemblyCookie = assemblyFactory.AddRef(path, projectFile.Location.FullPath, this.ResolveContext)
+        lifetime.AddAction(fun _ ->
+            use lock = WriteLockCookie.Create()
+            assemblyCookie.Dispose()) |> ignore
+
+        assemblyCookies.Add(path, assemblyCookie)
 
     member x.RemoveReference(path: FileSystemPath) =
         use lock = locker.UsingWriteLock()
@@ -260,13 +259,13 @@ type FSharpScriptPsiProjectFile(projectFile: IProjectFile, scriptModule: FSharpS
     inherit NavigateablePsiSourceFileWithLocation(projectFileExtensions, projectFileTypeCoordinator, scriptModule,
                                                   projectFile.Location,
                                                   (fun _ -> projectFile.IsValid()),
-                                                  (fun _ -> FSharpScriptFileProperties(scriptModule) :> _),
+                                                  (fun _ -> FSharpScriptFileProperties() :> _),
                                                   documentManager, scriptModule.ResolveContext)
     interface IPsiProjectFile with
         member x.ProjectFile = projectFile
 
 
-type FSharpScriptFileProperties(psiModule: IPsiModule) =
+type FSharpScriptFileProperties() =
     interface IPsiSourceFileProperties with
         member x.ShouldBuildPsi = true
         member x.IsGeneratedFile = false
