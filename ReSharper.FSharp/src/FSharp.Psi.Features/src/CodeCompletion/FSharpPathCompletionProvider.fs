@@ -39,6 +39,8 @@ type FSharpPathCompletionContextProvider() =
         | :? IFSharpFile as fsFile ->
             let caretOffset = context.CaretTreeOffset
             let token = fsFile.FindTokenAt(caretOffset - 1)
+            if isNull token then false else
+
             match token.GetTokenType() with
             | tokenType when tokenType.IsStringLiteral && (token.Parent :? IHashDirective) ->
                 let caretOffset = caretOffset.Offset
@@ -195,6 +197,8 @@ type FSharpPathAutocompletionStrategy() =
             | :? IFSharpFile as fsFile ->
                 let offset = TreeOffset(textControl.Caret.Offset() - 1)
                 let token = fsFile.FindTokenAt(offset)
+                if isNull token then false else
+
                 match token.GetTokenType() with
                 | null -> false
                 | tokenType -> tokenType.IsStringLiteral && token.Parent :? IHashDirective

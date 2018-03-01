@@ -27,8 +27,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
     public override string ContextId => "FSharpCodeCompletionContext";
     public TextLookupRanges Ranges { get; }
     public PartialLongName PartialLongName { get; }
-    public ITreeNode TokenBeforeCaret { get; }
-    public ITreeNode TokenAtCaret { get; }
+    [CanBeNull] public ITreeNode TokenBeforeCaret { get; }
+    [CanBeNull] public ITreeNode TokenAtCaret { get; }
     public string LineText { get; }
     public FSharpOption<CompletionContext> FsCompletionContext { get; }
     public DocumentCoords Coords { get; }

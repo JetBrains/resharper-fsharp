@@ -52,11 +52,9 @@ type FSharpKeywordsProvider() =
         | null -> false
         | tokenBefore ->
 
-        match context.FsCompletionContext with
-        | Some (CompletionContext.Invalid) when tokenBefore.GetTokenType() <> FSharpTokenType.HASH -> false
-        | _ ->
-
-        let tokenBeforeType = tokenBefore.GetTokenType()
+        match context.FsCompletionContext, tokenBefore.GetTokenType() with
+        | Some (CompletionContext.Invalid), tokenBeforeType when tokenBeforeType <> FSharpTokenType.HASH -> false
+        | _, tokenBeforeType ->
 
         if tokenBeforeType = FSharpTokenType.LINE_COMMENT ||
            tokenBeforeType = FSharpTokenType.DEAD_CODE ||
