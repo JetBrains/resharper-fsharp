@@ -154,12 +154,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return SharedImplUtil.MISSING_DECLARATION_NAME;
     }
 
-    public static FSharpFileKind GetFSharpFileKind([NotNull] this IPsiSourceFile sourceFile)
+    public static FSharpFileKind GetFSharpFileKind([CanBeNull] this IPsiSourceFile sourceFile)
     {
-      var fileExtension = sourceFile.GetLocation().ExtensionNoDot;
-      if (fileExtension == "fs" || fileExtension == "ml") return FSharpFileKind.ImplFile;
-      if (fileExtension == "fsi" || fileExtension == "mli") return FSharpFileKind.SigFile;
-      throw new ArgumentOutOfRangeException();
+      var fileExtension = sourceFile?.GetLocation().ExtensionNoDot;
+      if (fileExtension == "fsi" || fileExtension == "mli")
+          return FSharpFileKind.SigFile;
+
+      return FSharpFileKind.ImplFile;
     }
 
     [CanBeNull]
