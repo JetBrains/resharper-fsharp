@@ -101,7 +101,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
           if (patternDecl == null)
             return null;
 
-          var caseElement = FSharpImplUtil.GetActivePatternByIndex(patternDecl, activePatternCase.Index);
+          var caseElement = patternDecl.GetActivePatternByIndex(activePatternCase.Index);
           if (caseElement != null)
             return Tuple.Create(new[] {caseElement}.AsCollection(), false);
         }

@@ -10,8 +10,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class MemberDeclaration : IFunctionDeclaration
   {
     IFunction IFunctionDeclaration.DeclaredElement => base.DeclaredElement as IFunction;
-    public override string DeclaredName => FSharpImplUtil.GetCompiledName(Identifier, Attributes);
-    public override string SourceName => FSharpImplUtil.GetSourceName(Identifier);
+    public override string DeclaredName => Identifier.GetCompiledName(Attributes);
+    public override string SourceName => Identifier.GetSourceName();
 
     public override TreeTextRange GetNameRange()
     {

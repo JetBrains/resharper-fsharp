@@ -24,7 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     public override string DeclaredName => Identifier.Name;
-    public override string SourceName => FSharpImplUtil.GetSourceName(Identifier);
+    public override string SourceName => Identifier.GetSourceName();
     public override TreeTextRange GetNameRange() => Identifier.GetNameRange();
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]

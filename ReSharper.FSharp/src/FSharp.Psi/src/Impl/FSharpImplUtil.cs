@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
@@ -42,14 +42,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     public static bool ShortNameEquals([NotNull] this IFSharpAttribute attr, [NotNull] string shortName) =>
       attr.LongIdentifier?.Name.GetAttributeShortName()?.Equals(shortName, StringComparison.Ordinal) ?? false;
-
-    public static bool HasCompiledNameAttr(TreeNodeCollection<IFSharpAttribute> attributes)
-    {
-      foreach (var attr in attributes)
-        if (attr.ShortNameEquals("CompiledName") && attr.ArgExpression.String != null)
-          return true;
-      return false;
-    }
 
     [NotNull]
     public static string GetCompiledName([CanBeNull] this IIdentifier identifier,
@@ -108,7 +100,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     [NotNull]
-    public static string MakeClrName([NotNull] IFSharpTypeElementDeclaration declaration)
+    public static string MakeClrName([NotNull] this IFSharpTypeElementDeclaration declaration)
     {
       var clrName = new StringBuilder();
 
@@ -164,7 +156,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     [CanBeNull]
-    internal static IDeclaredElement GetActivePatternByIndex(IDeclaration declaration, int index)
+    internal static IDeclaredElement GetActivePatternByIndex(this IDeclaration declaration, int index)
     {
       var letDecl = declaration as Let;
       var cases = letDecl?.Identifier.Children<ActivePatternCaseDeclaration>().AsIList();
@@ -172,7 +164,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     [NotNull]
-    public static string GetNestedModuleShortName(INestedModuleDeclaration declaration, ICacheBuilder cacheBuilder)
+    public static string GetNestedModuleShortName(this INestedModuleDeclaration declaration, ICacheBuilder cacheBuilder)
     {
       var parent = declaration.Parent as IModuleLikeDeclaration;
       var shortName = declaration.ShortName;

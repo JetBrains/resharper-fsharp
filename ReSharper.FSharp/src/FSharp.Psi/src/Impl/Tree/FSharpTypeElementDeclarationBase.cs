@@ -58,7 +58,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       }
     }
 
-    public string CLRName => FSharpImplUtil.MakeClrName(this);
+    public string CLRName => this.MakeClrName();
     public IReadOnlyList<ITypeDeclaration> TypeDeclarations => EmptyList<ITypeDeclaration>.Instance;
 
     public IReadOnlyList<ITypeDeclaration> NestedTypeDeclarations =>
