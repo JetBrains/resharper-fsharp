@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
@@ -52,7 +52,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     [NotNull]
-    public static string GetCompiledName([CanBeNull] IIdentifier identifier,
+    public static string GetCompiledName([CanBeNull] this IIdentifier identifier,
       TreeNodeCollection<IFSharpAttribute> attributes)
     {
       var hasModuleSuffix = false;
@@ -79,7 +79,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     [NotNull]
-    public static string GetSourceName([CanBeNull] IIdentifier identifier)
+    public static string GetSourceName([CanBeNull] this IIdentifier identifier)
     {
       return identifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
     }
