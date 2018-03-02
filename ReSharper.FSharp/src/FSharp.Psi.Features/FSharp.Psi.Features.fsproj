@@ -31,6 +31,7 @@
     <Compile Include="src\Foldings\FSharpCodeFoldings.fs" />
     <Compile Include="src\FSharpClrLanguage.fs" />
     <Compile Include="src\FSharpRefactoringLanguageService.fs" />
+    <Compile Include="src\Searching\FSharpPathReference.fs" />
     <Compile Include="src\SelectEmbracingConsruct\FSharpSelectEmbracingConstructProvider.fs" />
     <Compile Include="src\Formatter\FSharpCodeStylePage.fs" />
     <Compile Include="src\Formatter\ReformatCode.fs" />

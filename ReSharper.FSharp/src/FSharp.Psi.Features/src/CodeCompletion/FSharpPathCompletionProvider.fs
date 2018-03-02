@@ -96,9 +96,6 @@ type FSharpPathCompletionContextProvider() =
 type FSharpPathCompletionProvider() =
     inherit ItemsProviderOfSpecificContext<FSharpPathCompletionContext>()
 
-    static let fsExtensions = ["fs"; "fsi"; "fsx"; "fsscript"] |> Set.ofList
-    static let dllExtensions = ["dll"; "exe"] |> Set.ofList
-
     let getCompletionTarget (hashDirective: IHashDirective) =
         if isNull hashDirective then None else
 
