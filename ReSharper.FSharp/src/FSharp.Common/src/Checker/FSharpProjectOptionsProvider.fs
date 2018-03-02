@@ -143,7 +143,6 @@ type FSharpProjectOptionsProvider(lifetime, logger, solution: ISolution, checker
             let options, errors = getScriptOptionsAsync.RunAsTask()
             if not errors.IsEmpty then
                 Logger.Warn(logger, "Script options for {0}: {1}", filePath, concatErrors errors)
-            let options = x.FixScriptOptions(options)
             Some options
         with
         | :? OperationCanceledException -> reraise()
