@@ -86,7 +86,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
               // visualfsharp#3943, visualfsharp#3933
               if (!mfvLogicalName.Equals(".ctor", StringComparison.Ordinal) &&
-                  !(FindTokenAt(new TreeOffset(endOffset - 1)) is FSharpIdentifierToken))
+                  !(FindTokenAt(new TreeOffset(endOffset - 1)) is FSharpIdentifierToken || mfv.IsActivePattern))
                 continue;
             }
             else
