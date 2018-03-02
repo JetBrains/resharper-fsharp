@@ -15,5 +15,3 @@ type SyntaxErrorsStage(daemonProcess, errors) =
         fsFile.ParseResults
         |> Option.map (fun parseResults -> SyntaxErrorsStageProcess(daemonProcess, parseResults.Errors))
         |> Option.defaultValue null :> _
-
-    override x.NeedsErrorStripe(_, _) = ErrorStripeRequest.STRIPE_AND_ERRORS

@@ -30,5 +30,3 @@ type TypeCheckErrorsStage(daemonProcess, logger: ILogger) =
 
             TypeCheckErrorsStageProcess(daemonProcess, fileErrors))
         |> Option.defaultValue null :> _
-
-    override x.NeedsErrorStripe(_, _) = ErrorStripeRequest.STRIPE_AND_ERRORS
