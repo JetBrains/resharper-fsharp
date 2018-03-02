@@ -62,7 +62,7 @@ type FSharpProjectFilesFromTargetsProvider(lifetime: Lifetime) =
                     let files = Dictionary()
                     itemTypes |> Array.iter (fun t -> files.[t] <- ResizeArray())
     
-                    let rdProject = msBuildProject.RdProjects.First().Value // take project with first framework
+                    let rdProject = msBuildProject.RdProjects.First() // take project with first framework
                     let projectDir = FileSystemPath.TryParse(msBuildProject.RdProjectDescription.Directory)
                     for item in rdProject.Items do
                         match item.Origin with
