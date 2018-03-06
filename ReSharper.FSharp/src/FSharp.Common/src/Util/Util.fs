@@ -8,6 +8,7 @@ module CommonUtil =
     open System.Threading
     open JetBrains.Application
     open JetBrains.Application.Progress
+    open JetBrains.DataFlow
     open JetBrains.DocumentModel
     open JetBrains.ProjectModel
     open JetBrains.ProjectModel.ProjectsHost
@@ -122,3 +123,12 @@ module CommonUtil =
         match dictionary.TryGetValue(key, res), res with
         | true, value -> Some !value
         | _ -> None
+
+    let (|AddRemoveArgs|) (args: AddRemoveEventArgs<_>) =
+        args.Value
+
+    let (|KeyValuePair|) (pair: KeyValuePair<_,_>) =
+        pair.Key, pair.Value
+
+    let (|Pair|) (pair: Pair<_,_>) =
+            pair.First, pair.Second

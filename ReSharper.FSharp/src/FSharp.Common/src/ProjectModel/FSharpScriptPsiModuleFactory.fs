@@ -12,6 +12,7 @@ open JetBrains.DataFlow
 open JetBrains.DocumentManagers
 open JetBrains.DocumentManagers.impl
 open JetBrains.DocumentManagers.Transactions
+open JetBrains.DocumentModel
 open JetBrains.Metadata.Reader.API
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Assemblies.Impl
@@ -27,6 +28,7 @@ open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Rider.Model
 open JetBrains.Threading
+open JetBrains.Util
 open JetBrains.Util
 open JetBrains.Util.DataStructures
 open Microsoft.FSharp.Compiler.SourceCodeServices
@@ -45,8 +47,8 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
     /// Psi modules for files that came from #load directives and do not present in the project model.
     let scriptsFromPaths = Dictionary<FileSystemPath, LifetimeDefinition * FSharpScriptPsiModule>()
 
-    let referencedPaths = OneToSetMap<FileSystemPath, FileSystemPath>()
-    let loadPaths = OneToSetMap<FileSystemPath, FileSystemPath>()
+    /// References to assemblies and other source files.
+    let referencedPaths = Dictionary<FileSystemPath, ScriptReferences>()
 
     do
         changeManager.RegisterChangeProvider(lifetime, this)
@@ -59,41 +61,34 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
                 lifetimeDefinition.Terminate()) |> ignore
 
     let locks = solution.Locks
-    let checker = checkerService.Checker
-
     let targetFrameworkId =
         let plaformInfo = platformManager.GetAllPlatformInfos() |> Seq.maxBy (fun info -> info.Version)
         plaformInfo.PlatformID.ToTargetFrameworkId()
 
-    let getScriptOptions (projectFile: IProjectFile) =
-        let path = projectFile.Location.FullPath
-        let source = projectFile.GetDocument().GetText()
-        checker.GetProjectOptionsFromScript(path, source).RunAsTask() |> fst
+    let getScriptOptions (path: FileSystemPath) (document: IDocument) =
+        checkerService.Checker.GetProjectOptionsFromScript(path.FullPath, document.GetText()).RunAsTask() |> fst
 
-    let getReferencedPaths (options: FSharpProjectOptions) =
-        options.OtherOptions
-        |> Seq.choose (fun o ->
-            if o.StartsWith("-r:", StringComparison.Ordinal) then
-                let path = FileSystemPath.TryParse(o.Substring(3))
-                if path.IsEmpty then None else Some path
-            else None)
-        |> HashSet :> seq<_>
+    let getScriptReferences scriptPath scriptOptions =
+        let assembliesPaths =
+            scriptOptions.OtherOptions
+            |> Seq.choose (fun o ->
+                if o.StartsWith("-r:", StringComparison.Ordinal) then
+                    let path = FileSystemPath.TryParse(o.Substring(3))
+                    if path.IsEmpty then None else Some path
+                else None)
+
+        let filesPaths =
+            scriptOptions.SourceFiles
+            |> Seq.map FileSystemPath.TryParse
+            |> Seq.filter (fun path -> not path.IsEmpty && path <> scriptPath)
+
+        { Assemblies = HashSet(assembliesPaths)
+          Files = HashSet(filesPaths) }
 
     let getPsiModulesForPath path =
         scriptsFromProjectFiles.GetValuesSafe(path)
         |> Seq.append (tryGetValue scriptsFromPaths path |> Option.toList)
         |> Seq.map snd
-
-    let tryGetReferencedPaths path =
-        let getReferences (_, psiModule: IPsiModule) =
-            (psiModule :?> FSharpScriptPsiModule).ReferencedAssemblyPaths 
-
-        tryGetValue scriptsFromPaths path
-        |> Option.map getReferences
-        |> Option.orElseWith (fun _ ->
-            scriptsFromProjectFiles.GetValuesSafe(path)
-            |> Seq.tryHead
-            |> Option.map getReferences)
 
     let createSourceFileForProjectFile projectFile (psiModule: FSharpScriptPsiModule) =
         PsiProjectFile
@@ -105,22 +100,42 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
             (projectFileExtensions, projectFileTypeCoordinator, psiModule, path, (fun _ -> psiModule.IsValid),
              (fun _ -> ScriptFileProperties.Instance), documentManager, psiModule.ResolveContext) :> IPsiSourceFile
 
-    let createPsiModule path sourceFileCtor filePaths (changeBuilder: PsiModuleChangeBuilder) =
+    let rec createPsiModule path document moduleId sourceFileCtor (changeBuilder: PsiModuleChangeBuilder) =
         let lifetimeDefinition = Lifetimes.Define(lifetime)
         let lifetime = lifetimeDefinition.Lifetime
-        let psiModule =
-            FSharpScriptPsiModule(lifetime, sourceFileCtor, path, solution, targetFrameworkId, assemblyFactory, filePaths, this)
+        let psiModule = FSharpScriptPsiModule(lifetime, path, solution, sourceFileCtor, moduleId, assemblyFactory, this)
 
         changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Added)
         changeBuilder.AddFileChange(psiModule.SourceFile, PsiModuleChange.ChangeType.Added)
+
+        let scriptOptions = getScriptOptions path document
+        let references = getScriptReferences path scriptOptions
+        referencedPaths.[path] <- references
+
+        for filePath in references.Files do
+            createPsiModuleForPath filePath changeBuilder
+
+        for assemblyPath in references.Assemblies do
+            psiModule.AddReference(assemblyPath)
+
         lifetimeDefinition, psiModule
 
-    member x.GetPsiModulesForPath(path) = getPsiModulesForPath path
+    and createPsiModuleForPath (path: FileSystemPath) changeBuilder =
+        match getPsiModulesForPath path |> Seq.tryHead with
+        | None ->
+            let fileDocument = documentManager.GetOrCreateDocument(path)
+            let sourceFileCtor = createSourceFileForPath path
+            let moduleId = path.FullPath
+            let lifetimeDefinition, psiModule = createPsiModule path fileDocument moduleId sourceFileCtor changeBuilder
+            scriptsFromPaths.[path] <- (lifetimeDefinition, psiModule)
+        | _ -> ()
 
-    member x.CreatePsiModuleForFile(projectFile: IProjectFile, changeBuilder: PsiModuleChangeBuilder) =
+    member x.CreatePsiModuleForProjectFile(projectFile: IProjectFile, changeBuilder: PsiModuleChangeBuilder) =
         locks.AssertWriteAccessAllowed()
 
         let path = projectFile.Location
+
+        // if previously created a psi module for the path then replace it with a psi module for the project file
         tryGetValue scriptsFromPaths path
         |> Option.iter (fun (lifetimeDefinition, psiModule) ->
             scriptsFromPaths.Remove(path) |> ignore
@@ -128,29 +143,36 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
             changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Removed)
             changeBuilder.AddFileChange(psiModule.SourceFile, PsiModuleChange.ChangeType.Removed))
 
-        let scriptOptions = getScriptOptions projectFile
-        let filePaths =
-            scriptOptions.SourceFiles
-            |> Seq.map FileSystemPath.TryParse
-            |> Seq.filter (fun path -> not path.IsEmpty) 
-
+        let document = projectFile.GetDocument()
         let sourceFileCtor = createSourceFileForProjectFile projectFile
-        let lifetimeDefinition, psiModule = createPsiModule path sourceFileCtor filePaths changeBuilder
+        let moduleId = projectFile.GetPersistentID()
+
+        let lifetimeDefinition, psiModule = createPsiModule path document moduleId sourceFileCtor changeBuilder
         scriptsFromProjectFiles.Add(path, (lifetimeDefinition, psiModule))
 
-        for filePath in filePaths do
-            if filePath <> path then
-                match getPsiModulesForPath filePath |> Seq.tryHead with
-                | None ->
-                    let sourceFileCtor = createSourceFileForPath filePath
-                    let lifetimeDefinition, psiModule = createPsiModule filePath sourceFileCtor [] changeBuilder
-                    scriptsFromPaths.[filePath] <- (lifetimeDefinition, psiModule)
-                | _ -> ()
-
-        for path in scriptOptions |> getReferencedPaths do
-            psiModule.AddReference(path)
-
         psiModule
+
+    member x.CreatePsiModuleForPath(path: FileSystemPath, changeBuilder: PsiModuleChangeBuilder) =
+        locks.AssertWriteAccessAllowed()
+        createPsiModuleForPath path changeBuilder
+
+    member x.TargetFrameworkId = targetFrameworkId
+
+    member x.GetReferencedScriptPsiModules(psiModule: FSharpScriptPsiModule) =
+        let sameProjectSorter =
+            match psiModule.SourceFile with
+            | :? IPsiProjectFile as psiProjectFile ->
+                let project = psiProjectFile.GetProject()
+                fun (psiModule: FSharpScriptPsiModule) ->
+                    match psiModule.SourceFile with
+                    | :? IPsiProjectFile as psiProjectFile when psiProjectFile.GetProject() = project -> 0
+                    | _ -> 1
+            | _ -> fun _ -> 1
+
+        tryGetValue referencedPaths psiModule.Path
+        |> Option.map (fun references -> references.Files)
+        |> Option.get
+        |> Seq.map (fun path -> getPsiModulesForPath path |> Seq.sortBy sameProjectSorter |> Seq.head)
 
     interface IProjectPsiModuleProviderFilter with
         member x.OverrideHandler(lifetime, _, handler) =
@@ -173,27 +195,41 @@ type FSharpScriptPsiModulesProvider(lifetime: Lifetime, solution: ISolution, cha
             let projectFile = change.ProjectFile
             let path = projectFile.Location
 
-            match tryGetReferencedPaths path with
-            | Some oldPaths ->
-                let newPaths = getScriptOptions projectFile |> getReferencedPaths
-                let added, removed =
-                    let notChanged = Enumerable.Intersect(newPaths, oldPaths) |> HashSet
-                    let filterChanges = Seq.filter (notChanged.Contains >> not) >> List.ofSeq
-                    filterChanges newPaths, filterChanges oldPaths
-                if List.isEmpty added && List.isEmpty removed then null else
-    
-                let changeBuilder = PsiModuleChangeBuilder()
-                for psiModule in getPsiModulesForPath path |> Seq.cast<FSharpScriptPsiModule> do
-                    for path in added do psiModule.AddReference(path)
-                    for path in removed do psiModule.RemoveReference(path)
-                    changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Invalidated)
-                changeBuilder.Result :> _
+            let getDiff oldPaths newPaths =
+                let notChanged = Enumerable.Intersect(newPaths, oldPaths) |> HashSet
+                let filterChanges = Seq.filter (notChanged.Contains >> not) >> List.ofSeq
+                filterChanges newPaths, filterChanges oldPaths
+
+            match tryGetValue referencedPaths path with
+            | Some oldReferences ->
+                let document = projectFile.GetDocument()
+                let newOptions = getScriptOptions path document
+                let newReferences = getScriptReferences path newOptions
+
+                match getDiff oldReferences.Assemblies newReferences.Assemblies with
+                | [], [] when newReferences.Files.SetEquals(oldReferences.Files) -> null
+                | added, removed ->
+                    let changeBuilder = PsiModuleChangeBuilder()
+
+                    referencedPaths.[path] <- newReferences
+                    for filePath in newReferences.Files do
+                        createPsiModuleForPath filePath changeBuilder
+
+                    for psiModule in getPsiModulesForPath path do
+                        for path in added do psiModule.AddReference(path)
+                        for path in removed do psiModule.RemoveReference(path)
+                        changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Invalidated)
+                    changeBuilder.Result :> _
             | _ -> null
 
 
+type ScriptReferences =
+    { Assemblies: ISet<FileSystemPath>
+      Files: ISet<FileSystemPath> }
+
+
 /// Overriding psi module handler for each project (a real project, misc files project, solution folder, etc). 
-type FSharpScriptPsiModuleHandler(lifetime, locks, handler, modulesProvider: FSharpScriptPsiModulesProvider,
-                                  projectFileExtensions: ProjectFileExtensions) =
+type FSharpScriptPsiModuleHandler(lifetime, locks, handler, modulesProvider, projectFileExtensions) =
     inherit DelegatingProjectPsiModuleHandler(handler)
 
     let sourceFiles = Dictionary<FileSystemPath, IPsiSourceFile>()
@@ -205,13 +241,15 @@ type FSharpScriptPsiModuleHandler(lifetime, locks, handler, modulesProvider: FSh
         | PsiModuleChange.ChangeType.Added when
                 projectFile.LanguageType.Is<FSharpScriptProjectFileType>() ->
 
-            let psiModule = modulesProvider.CreatePsiModuleForFile(projectFile, changeBuilder)
+            let psiModule = modulesProvider.CreatePsiModuleForProjectFile(projectFile, changeBuilder)
             sourceFiles.[projectFile.Location] <- psiModule.SourceFile
 
         | PsiModuleChange.ChangeType.Removed when
                 projectFileExtensions.GetFileType(oldLocation).Is<FSharpScriptProjectFileType>() ->
 
-            () // todo: remove project file from list for path
+            ()
+            // todo: on project file psi module remove check references to it, add path module if needed (i.e. no other project file modules remain)
+            // todo: on psi module remove look at it references: remove unneeded
 
         | _ -> handler.OnProjectFileChanged(projectFile, oldLocation, changeType, changeBuilder)
 
@@ -220,70 +258,69 @@ type FSharpScriptPsiModuleHandler(lifetime, locks, handler, modulesProvider: FSh
         |> Seq.append (tryGetValue sourceFiles projectFile.Location |> Option.toList)
 
 
-type FSharpScriptPsiModule(lifetime, sourceFileCtor, path, solution: ISolution, targetFrameworkId, assemblyFactory, filePaths, moduleProvider) as this =
+type FSharpScriptPsiModule(lifetime, path, solution, sourceFileCtor, moduleId, assemblyFactory, modulesProvider) as this =
     inherit ConcurrentUserDataHolder()
 
-    let locker = JetFastSemiReenterableRWLock()
+    let locks = solution.Locks
     let psiServices = solution.GetPsiServices()
     let psiModules = solution.PsiModules()
 
+    let targetFrameworkId = modulesProvider.TargetFrameworkId
     let scriptModule = FSharpScriptModule(path, solution)
-    let assemblyCookies = Dictionary<FileSystemPath, IAssemblyCookie>()
 
-    let resolveContext = lazy (PsiModuleResolveContext(this, targetFrameworkId, null))
+    let assemblyCookies = DictionaryEvents<FileSystemPath, IAssemblyCookie>(lifetime, moduleId)
+    let containsAssemblyCookieMgs = sprintf "%s contains cookie for %O" moduleId
+
+    do
+        assemblyCookies.AddRemove.Advise_Remove(lifetime, fun (AddRemoveArgs (KeyValuePair (_, assemblyCookie))) ->
+            assemblyCookie.Dispose())
+        lifetime.AddAction(fun _ ->
+            use lock = WriteLockCookie.Create()
+            assemblyCookies.Clear()) |> ignore
+
     let sourceFile = lazy (sourceFileCtor this)
+    let resolveContext = lazy (PsiModuleResolveContext(this, targetFrameworkId, null))
 
-    member x.SourceFile = sourceFile.Value
+    member x.Path = path
+    member x.SourceFile: IPsiSourceFile = sourceFile.Value
     member x.ResolveContext = resolveContext.Value
 
     member x.IsValid = psiServices.Modules.HasModule(this)
 
-    member x.ReferencedFilePaths = filePaths
-    member x.ReferencedAssemblyPaths =
-        use lock = locker.UsingReadLock()
-        assemblyCookies.Keys
-
     member x.AddReference(path: FileSystemPath) =
-        use lock = locker.UsingWriteLock()
-        if assemblyCookies.ContainsKey(path) then () else
-
-        let assemblyCookie = assemblyFactory.AddRef(path, path.FullPath, this.ResolveContext)
-        assemblyCookies.Add(path, assemblyCookie)
-        lifetime.AddAction(fun _ ->
-            use lock = WriteLockCookie.Create()
-            assemblyCookie.Dispose()) |> ignore
+        locks.AssertWriteAccessAllowed()
+        Assertion.Assert(assemblyCookies.ContainsKey(path) |> not, containsAssemblyCookieMgs path)
+        assemblyCookies.Add(path, assemblyFactory.AddRef(path, path.FullPath, this.ResolveContext))
 
     member x.RemoveReference(path: FileSystemPath) =
-        use lock = locker.UsingWriteLock()
+        locks.AssertWriteAccessAllowed()
+        Assertion.Assert(assemblyCookies.ContainsKey(path), containsAssemblyCookieMgs path)
         assemblyCookies.Remove(path) |> ignore
 
     interface IPsiModule with
         member x.Name = "F# script: " + path.Name
         member x.DisplayName = "F# script: " + path.Name
-        member x.GetPersistentID() = "FSharpScriptModule:" + path.FullPath
+        member x.GetPersistentID() = moduleId
 
         member x.GetSolution() = solution
         member x.GetPsiServices() = psiServices
 
+        member x.SourceFiles = [x.SourceFile] :> _ 
         member x.TargetFrameworkId = targetFrameworkId
         member x.ContainingProjectModule = scriptModule :> _
 
-        member x.PsiLanguage = FSharpLanguage.Instance :> _
-        member x.ProjectFileType = UnknownProjectFileType.Instance :> _
-
-        member x.SourceFiles = [x.SourceFile] :> _ 
-
         member x.GetReferences(resolveContext) =
-            use lock = locker.UsingReadLock()
+            locks.AssertReadAccessAllowed()
             assemblyCookies.Values
             |> Seq.choose (fun assemblyCookie ->
                 psiModules.GetPrimaryPsiModule(assemblyCookie.Assembly, targetFrameworkId)
                 |> Option.ofObj
                 |> Option.map (fun psiModule -> PsiModuleReference(psiModule) :> IPsiModuleReference))
-            |> Seq.append (filePaths |> Seq.choose (fun path ->
-                moduleProvider.GetPsiModulesForPath(path)
-                |> Seq.tryHead
-                |> Option.map (fun psiModule -> PsiModuleReference(psiModule) :> _)))
+            |> Seq.append (modulesProvider.GetReferencedScriptPsiModules(this)
+                |> Seq.map (fun psiModule -> PsiModuleReference(psiModule) :> _))
+
+        member x.PsiLanguage = FSharpLanguage.Instance :> _
+        member x.ProjectFileType = UnknownProjectFileType.Instance :> _
 
         member x.GetAllDefines() = EmptyList.InstanceList :> _
         member x.IsValid() = x.IsValid
