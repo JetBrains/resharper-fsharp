@@ -65,7 +65,8 @@ type FSharpPathReference(owner, sourceFile) =
 
      override x.GetTreeTextRange() =
         let startIndex = if owner.GetText().StartsWith("@", StringComparison.Ordinal) then 2 else 1
-        owner.GetTreeTextRange().TrimLeft(startIndex).TrimRight(1)
+        let noStartQuote = owner.GetTreeTextRange().TrimLeft(startIndex)
+        if noStartQuote.IsEmpty then noStartQuote else noStartQuote.TrimRight(1)
 
      override x.GetAccessContext() = DefaultAccessContext(owner) :> _
      override x.GetName() = SharedImplUtil.MISSING_DECLARATION_NAME
