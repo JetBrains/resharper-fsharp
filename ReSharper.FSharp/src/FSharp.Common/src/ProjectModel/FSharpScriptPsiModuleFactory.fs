@@ -273,6 +273,10 @@ type FSharpScriptPsiModuleHandler(lifetime, solution, handler, modulesProvider, 
         handler.GetPsiSourceFilesFor(projectFile)
         |> Seq.append (tryGetValue sourceFiles projectFile.Location |> Option.toList)
 
+    override x.InternalsVisibleTo(moduleTo, moduleFrom) =
+        moduleTo :? FSharpScriptPsiModule && moduleFrom :? FSharpScriptPsiModule ||
+        handler.InternalsVisibleTo(moduleTo, moduleFrom)
+
 
 type FSharpScriptPsiModule
         (lifetime, path, solution, sourceFileCtor, moduleId, assemblyFactory, modulesProvider) as this =
