@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="src\ProjectModel\FSharpFileService.fs" />
     <Compile Include="src\ProjectModel\FSharpProjectLanguage.fs" />
     <Compile Include="src\ProjectModel\ProjectProperties\FSharpProjectProperties.fs" />
     <Compile Include="src\ProjectModel\ProjectProperties\FSharpProjectPropertiesFactory.fs" />
@@ -25,12 +24,13 @@
     <Compile Include="src\Checker\IFSharpProjectOptionsProvider.fs" />
     <Compile Include="src\Checker\FSharpCoreFix.fs" />
     <Compile Include="src\Checker\FSharpCheckerService.fs" />
+    <Compile Include="src\FSharpTargetsAnalyzer.fs" />
+    <Compile Include="src\ProjectModel\FSharpScriptPsiModuleFactory.fs" />
+    <Compile Include="src\ProjectModel\FSharpFileService.fs" />
+    <Compile Include="src\ProjectModel\FSharpProjectPresenter.fs" />
     <Compile Include="src\Checker\FSharpMsBuildProjectListener.fs" />
     <Compile Include="src\Checker\FSharpProjectOptionsBuilder.fs" />
     <Compile Include="src\Checker\FSharpProjectOptionsProvider.fs" />
-    <Compile Include="src\FSharpTargetsAnalyzer.fs" />
-    <Compile Include="src\ProjectModel\FSharpScriptPsiModuleFactory.fs" />
-    <Compile Include="src\ProjectModel\FSharpProjectPresenter.fs" />
     <Compile Include="src\PaketRestoreTargetsAnalyzer.fs" />
   </ItemGroup>
 

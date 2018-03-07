@@ -4,6 +4,7 @@ open JetBrains.Application
 open JetBrains.Application.BuildScript
 open JetBrains.ReSharper.Host.Features.Settings
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 open JetBrains.ReSharper.Psi
 
 type IFSharpFileService =
@@ -18,5 +19,5 @@ type FSharpFileService(settingsLocation: RiderAnyProductSettingsLocation) =
 
     interface IFSharpFileService with
         member x.IsScript(file: IPsiSourceFile) =
-            file.LanguageType.Equals(FSharpScriptProjectFileType.Instance) ||
+            file.PsiModule :? FSharpScriptPsiModule ||
             file.GetLocation().Parent.Equals(scratchesDir)

@@ -41,6 +41,7 @@ type FSharpProjectOptionsProvider(lifetime, logger, solution: ISolution, checker
     let projects = Dictionary<IProject, FSharpProject>()
     let projectsToInvalidate = JetHashSet<IProject>()
     let getScriptOptionsLock = obj()
+    let scriptDefines = ["INTERACTIVE"]
 
     do
         changeManager.Changed2.Advise(lifetime, this.ProcessChange)
@@ -179,7 +180,10 @@ type FSharpProjectOptionsProvider(lifetime, logger, solution: ISolution, checker
 
         member x.GetParsingOptions(file) =
             if fsFileService.IsScript(file) || file.PsiModule.IsMiscFilesProjectModule() || isNull (file.GetProject()) then
-                Some { FSharpParsingOptions.Default with SourceFiles = Array.ofList [file.GetLocation().FullPath]; IsExe = true }
+                Some { FSharpParsingOptions.Default with
+                        SourceFiles = Array.ofList [file.GetLocation().FullPath]
+                        ConditionalCompilationDefines = scriptDefines
+                        IsExe = true }
             else
                 lock projects (fun _ ->
                     match x.GetFSharpProject(file) with
@@ -187,7 +191,8 @@ type FSharpProjectOptionsProvider(lifetime, logger, solution: ISolution, checker
                         match project.ParsingOptions with
                         | None ->
                             let projectOptions = project.Options.Value
-                            let parsingOptions, errors = checkerService.Checker.GetParsingOptionsFromCommandLineArgs(List.ofArray projectOptions.OtherOptions)
+                            let parsingOptions, errors =
+                                checkerService.Checker.GetParsingOptionsFromCommandLineArgs(List.ofArray projectOptions.OtherOptions)
                             let parsingOptions = { parsingOptions with SourceFiles = projectOptions.SourceFiles }
                             if not errors.IsEmpty then
                                 Logger.Warn(logger, "Getting parsing options: {0}", concatErrors errors)
