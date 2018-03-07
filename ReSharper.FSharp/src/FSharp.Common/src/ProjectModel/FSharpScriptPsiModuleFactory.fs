@@ -1,23 +1,20 @@
 module rec JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 
+open JetBrains.Application.Progress
 open System
-open System.Collections.Concurrent
 open System.Collections.Generic
 open System.Linq
-open JetBrains.Application.Progress
 open JetBrains.Application.Threading
 open JetBrains.Application.changes
 open JetBrains.Application.platforms
 open JetBrains.DataFlow
 open JetBrains.DocumentManagers
 open JetBrains.DocumentManagers.impl
-open JetBrains.DocumentManagers.Transactions
 open JetBrains.DocumentModel
 open JetBrains.Metadata.Reader.API
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Assemblies.Impl
 open JetBrains.ProjectModel.Model2.Assemblies.Interfaces
-open JetBrains.ReSharper.Host.Features.ProjectModel.MiscFiles
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
@@ -26,9 +23,6 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Impl
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.Rider.Model
-open JetBrains.Threading
-open JetBrains.Util
 open JetBrains.Util
 open JetBrains.Util.DataStructures
 open Microsoft.FSharp.Compiler.SourceCodeServices
@@ -95,7 +89,7 @@ type FSharpScriptPsiModulesProvider
     let createSourceFileForProjectFile projectFile (psiModule: FSharpScriptPsiModule) =
         PsiProjectFile
             (psiModule, projectFile, (fun _ _ -> ScriptFileProperties.Instance),
-             (fun _ _ -> projectFile.IsValid()), documentManager, psiModule.ResolveContext) :> IPsiSourceFile
+             (fun pf _ -> pf.IsValid()), documentManager, psiModule.ResolveContext) :> IPsiSourceFile
 
     let createSourceFileForPath path (psiModule: FSharpScriptPsiModule) =
         NavigateablePsiSourceFileWithLocation
@@ -174,14 +168,16 @@ type FSharpScriptPsiModulesProvider
         |> Option.map (fun paths -> paths.Files |> Seq.map (getPsiModulesForPath >> Seq.maxBy sameProjectSorter))
         |> Option.get
 
-    member x.RemoveProjectFilePsiModule(moduleToRemove: FSharpScriptPsiModule) =
+    member x.RemoveProjectFilePsiModule(moduleToRemove: FSharpScriptPsiModule, changeBuilder: PsiModuleChangeBuilder) =
         let path = moduleToRemove.Path
         scriptsFromProjectFiles.GetValuesSafe(path)
         |> Seq.tryFind (fun (_, psiModule) -> psiModule = moduleToRemove)
         |> Option.orElseWith (fun _ -> sprintf "psiModule not found: %O" path |> failwith)
         |> Option.iter (fun ((lifetimeDefinition, psiModule) as value) ->
             scriptsFromProjectFiles.RemoveValue(path, value) |> ignore
-            lifetimeDefinition.Terminate())
+            lifetimeDefinition.Terminate()
+            changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Removed)
+            changeBuilder.AddFileChange(psiModule.SourceFile, PsiModuleChange.ChangeType.Removed))
 
     member x.GetPsiModulesForPath(path) =
         getPsiModulesForPath path 
@@ -190,8 +186,9 @@ type FSharpScriptPsiModulesProvider
         targetFrameworkId
 
     interface IProjectPsiModuleProviderFilter with
-        member x.OverrideHandler(lifetime, _, handler) =
-            let handler = FSharpScriptPsiModuleHandler(lifetime, solution, handler, this, projectFileExtensions)
+        member x.OverrideHandler(lifetime, project, handler) =
+            let handler =
+                FSharpScriptPsiModuleHandler(lifetime, solution, handler, this, projectFileExtensions, changeManager)
             handler :> _, null
 
     interface IPsiModuleFactory with
@@ -235,12 +232,27 @@ type FSharpScriptPsiModulesProvider
 
 
 /// Overriding psi module handler for each project (a real project, misc files project, solution folder, etc). 
-type FSharpScriptPsiModuleHandler(lifetime, solution, handler, modulesProvider, projectFileExtensions) =
+type FSharpScriptPsiModuleHandler
+        (lifetime, solution, handler, modulesProvider, projectFileExtensions, changeManager) as this =
     inherit DelegatingProjectPsiModuleHandler(handler)
 
     let locks = solution.Locks
     let psiModules = solution.PsiModules()
     let sourceFiles = Dictionary<FileSystemPath, IPsiSourceFile>()
+
+    let removeSourceFile changeBuilder (sourceFile: IPsiSourceFile) =
+        let psiModule = sourceFile.PsiModule :?> FSharpScriptPsiModule
+        sourceFiles.Remove(sourceFile.GetLocation()) |> ignore
+        modulesProvider.RemoveProjectFilePsiModule(psiModule, changeBuilder)
+
+    do
+        changeManager.RegisterChangeProvider(lifetime, this)
+        changeManager.AddDependency(lifetime, psiModules, this)
+        lifetime.AddAction(fun _ ->
+            changeManager.ExecuteAfterChange(fun _ ->
+                let changeBuilder = new PsiModuleChangeBuilder()
+                sourceFiles.Values |> List.ofSeq |> List.iter (removeSourceFile changeBuilder)
+                changeManager.OnProviderChanged(this, changeBuilder.Result, SimpleTaskExecutor.Instance))) |> ignore
 
     /// Prevents creating default psi source files for scripts and adds new psi modules with source files instead.
     override x.OnProjectFileChanged(projectFile, oldLocation, changeType, changeBuilder) =
@@ -252,20 +264,10 @@ type FSharpScriptPsiModuleHandler(lifetime, solution, handler, modulesProvider, 
             let psiModule = modulesProvider.CreatePsiModuleForProjectFile(projectFile, changeBuilder)
             sourceFiles.[projectFile.Location] <- psiModule.SourceFile
 
-        | PsiModuleChange.ChangeType.Removed when
-                let fileType = projectFileExtensions.GetFileType(oldLocation)
-                fileType.Is<FSharpScriptProjectFileType>() || fileType.Is<FSharpProjectFileType>() ->
+        | PsiModuleChange.ChangeType.Removed when sourceFiles.ContainsKey(oldLocation) ->
 
-            tryGetValue sourceFiles oldLocation
-            |> Option.iter (fun sourceFile ->
-                let context = CompilationContextCookie.GetContext()
-                let referencingModules = psiModules.GetReverseModuleReferences(sourceFile.PsiModule, context)
-                if not (Seq.isEmpty referencingModules) then
-                    for PsiModuleReference psiModule in referencingModules do
-                        // todo: check if it is really needed
-                        changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Invalidated)
-                    modulesProvider.CreatePsiModuleForPath(oldLocation, changeBuilder)
-                sourceFiles.Remove(oldLocation) |> ignore)
+            modulesProvider.CreatePsiModuleForPath(oldLocation, changeBuilder)
+            removeSourceFile changeBuilder sourceFiles.[oldLocation]
 
         | _ -> handler.OnProjectFileChanged(projectFile, oldLocation, changeType, changeBuilder)
 
@@ -277,6 +279,8 @@ type FSharpScriptPsiModuleHandler(lifetime, solution, handler, modulesProvider, 
         moduleTo :? FSharpScriptPsiModule && moduleFrom :? FSharpScriptPsiModule ||
         handler.InternalsVisibleTo(moduleTo, moduleFrom)
 
+    interface IChangeProvider with
+        member x.Execute(_) = null
 
 type FSharpScriptPsiModule
         (lifetime, path, solution, sourceFileCtor, moduleId, assemblyFactory, modulesProvider) as this =
