@@ -169,6 +169,15 @@ type FSharpScriptPsiModulesProvider
         |> Option.map (fun paths -> paths.Files |> Seq.map (getPsiModulesForPath >> Seq.maxBy sameProjectSorter))
         |> Option.get
 
+    member x.RemoveProjectFilePsiModule(moduleToRemove: FSharpScriptPsiModule) =
+        let path = moduleToRemove.Path
+        scriptsFromProjectFiles.GetValuesSafe(path)
+        |> Seq.tryFind (fun (_, psiModule) -> psiModule = moduleToRemove)
+        |> Option.orElseWith (fun _ -> sprintf "psiModule not found: %O" path |> failwith)
+        |> Option.iter (fun ((lifetimeDefinition, psiModule) as value) ->
+            scriptsFromProjectFiles.RemoveValue(path, value) |> ignore
+            lifetimeDefinition.Terminate())
+
     member x.GetPsiModulesForPath(path) =
         getPsiModulesForPath path 
 
@@ -239,11 +248,19 @@ type FSharpScriptPsiModuleHandler(lifetime, solution, handler, modulesProvider, 
             sourceFiles.[projectFile.Location] <- psiModule.SourceFile
 
         | PsiModuleChange.ChangeType.Removed when
-                projectFileExtensions.GetFileType(oldLocation).Is<FSharpScriptProjectFileType>() ->
+                let fileType = projectFileExtensions.GetFileType(oldLocation)
+                fileType.Is<FSharpScriptProjectFileType>() || fileType.Is<FSharpProjectFileType>() ->
 
-            ()
-            // todo: on project file psi module remove check references to it, add path module if needed (i.e. no other project file modules remain)
-            // todo: on psi module remove look at it references: remove unneeded
+            tryGetValue sourceFiles oldLocation
+            |> Option.iter (fun sourceFile ->
+                let context = CompilationContextCookie.GetContext()
+                let referencingModules = psiModules.GetReverseModuleReferences(sourceFile.PsiModule, context)
+                if not (Seq.isEmpty referencingModules) then
+                    for PsiModuleReference psiModule in referencingModules do
+                        // todo: check if it is really needed
+                        changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Invalidated)
+                    modulesProvider.CreatePsiModuleForPath(oldLocation, changeBuilder)
+                sourceFiles.Remove(oldLocation) |> ignore)
 
         | _ -> handler.OnProjectFileChanged(projectFile, oldLocation, changeType, changeBuilder)
 
@@ -262,6 +279,8 @@ type FSharpScriptPsiModule
 
     let containingModule = FSharpScriptModule(path, solution)
     let targetFrameworkId = modulesProvider.TargetFrameworkId
+    let sourceFile = lazy (sourceFileCtor this)
+    let resolveContext = lazy (PsiModuleResolveContext(this, targetFrameworkId, null))
 
     let assemblyCookies = DictionaryEvents<FileSystemPath, IAssemblyCookie>(lifetime, moduleId)
     let containsAssemblyCookieMsg = sprintf "%s contains cookie for %O" moduleId
@@ -272,9 +291,6 @@ type FSharpScriptPsiModule
         lifetime.AddAction(fun _ ->
             use lock = WriteLockCookie.Create()
             assemblyCookies.Clear()) |> ignore
-
-    let sourceFile = lazy (sourceFileCtor this)
-    let resolveContext = lazy (PsiModuleResolveContext(this, targetFrameworkId, null))
 
     member x.Path = path
     member x.SourceFile: IPsiSourceFile = sourceFile.Value

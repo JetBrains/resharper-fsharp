@@ -18,6 +18,7 @@ module CommonUtil =
     open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
     open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties.FSharpProjectPropertiesFactory
     open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+    open JetBrains.ReSharper.Psi.Modules
     open JetBrains.Util
     open JetBrains.Util.dataStructures.TypedIntrinsics
     open Microsoft.FSharp.Compiler
@@ -131,4 +132,7 @@ module CommonUtil =
         pair.Key, pair.Value
 
     let (|Pair|) (pair: Pair<_,_>) =
-            pair.First, pair.Second
+        pair.First, pair.Second
+
+    let (|PsiModuleReference|) (ref: IPsiModuleReference) =
+        ref.Module
