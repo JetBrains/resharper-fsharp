@@ -50,8 +50,10 @@ type ScriptLoadPathsStageProcess(fsFile, daemonProcess) =
                             | _ -> () }
             fsFile.Accept(visitor)
 
+            let linesCount = document.GetLineCount() |> int
             let loadedDirectives =
                 options.OriginalLoadReferences
+                |> Seq.filter (fun (range, _) -> range.EndLine < linesCount)
                 |> Seq.map (fun (range, _) -> document.GetTreeStartOffset(range))
                 |> HashSet
 
