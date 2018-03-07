@@ -9,5 +9,5 @@ import com.jetbrains.rider.completion.ICompletionSessionStrategy
 class FSharpCompletionStrategy : ICompletionSessionStrategy {
     override fun shouldForbidCompletion(editor: Editor, type: CompletionType) = editor.selectionModel.hasSelection()
     override fun shouldRescheduleCompletion(prefix: String, psiFile: PsiFile, char: Char, offset: Int) =
-            CompletionSessionHeuristics.shouldRescheduleDefaultStrategy(char)
+            prefix.isEmpty()
 }
