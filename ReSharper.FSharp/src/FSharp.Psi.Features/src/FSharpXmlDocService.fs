@@ -31,8 +31,7 @@ type FSharpXmlDocService(psiServices: IPsiServices, xmlDocThread: XmlIndexThread
                     |> Option.bind (fun assemblyName ->
                         psiModules.GetAssemblyPsiModuleByName(assemblyName)
                         |> Seq.tryFind (fun psiModule -> psiModule.Assembly.Location.Equals(dllPath)))
-                    |> Option.map (fun psiModule -> psiServices.Symbols.GetLibraryFile(psiModule.Assembly))
-                    |> Option.map (fun psiFile -> psiFile.XmlDocIndex)
+                    |> Option.map (fun psiModule -> psiServices.Symbols.GetLibraryFile(psiModule.Assembly).XmlDocIndex)
                     |> Option.defaultWith (fun _ ->
                         XmlDocIndex(dllPath.ChangeExtension(ExtensionConstants.Xml), true, psiConfig, xmlDocThread))
                 indexCache.[dllFile] <- index

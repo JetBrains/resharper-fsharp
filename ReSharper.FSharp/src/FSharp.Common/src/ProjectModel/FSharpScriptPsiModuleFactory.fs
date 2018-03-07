@@ -1,9 +1,9 @@
 module rec JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 
-open JetBrains.Application.Progress
 open System
 open System.Collections.Generic
 open System.Linq
+open JetBrains.Application.Progress
 open JetBrains.Application.Threading
 open JetBrains.Application.changes
 open JetBrains.Application.platforms
