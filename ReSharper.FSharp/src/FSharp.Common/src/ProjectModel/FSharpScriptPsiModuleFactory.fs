@@ -38,7 +38,7 @@ open Microsoft.FSharp.Compiler.SourceCodeServices
 type FSharpScriptPsiModulesProvider
         (lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager, documentManager: DocumentManager,
          checkerService: FSharpCheckerService, platformManager: PlatformManager, assemblyFactory: AssemblyFactory,
-         projectFileExtensions, projectFileTypeCoordinator) as this =
+         projectFileExtensions, projectFileTypeCoordinator, logger: ILogger) as this =
 
     /// There may be multiple project files for a path (i.e. linked in multiple projects) and we must distinguish them.   
     let scriptsFromProjectFiles = OneToListMap<FileSystemPath, LifetimeDefinition * FSharpScriptPsiModule>()
@@ -58,12 +58,17 @@ type FSharpScriptPsiModulesProvider
                 lifetimeDefinition.Terminate()) |> ignore
 
     let locks = solution.Locks
+    let checker = checkerService.Checker
     let targetFrameworkId =
         let plaformInfo = platformManager.GetAllPlatformInfos() |> Seq.maxBy (fun info -> info.Version)
         plaformInfo.PlatformID.ToTargetFrameworkId()
 
     let getScriptOptions (path: FileSystemPath) (document: IDocument) =
-        checkerService.Checker.GetProjectOptionsFromScript(path.FullPath, document.GetText()).RunAsTask() |> fst
+        let source = document.GetText()
+        let options, diagnostics = checker.GetProjectOptionsFromScript(path.FullPath, source).RunAsTask()
+        if not diagnostics.IsEmpty then
+            Logger.Warn(logger, "Getting script options for {0}: {1}", path, concatErrors diagnostics)
+        options
 
     let getScriptReferences scriptPath scriptOptions =
         let assembliesPaths =
@@ -316,7 +321,7 @@ type FSharpScriptPsiModule
         member x.GetSolution() = solution
         member x.GetPsiServices() = psiServices
 
-        member x.SourceFiles = [x.SourceFile] :> _ 
+        member x.SourceFiles = [x.SourceFile] :> _
         member x.TargetFrameworkId = targetFrameworkId
         member x.ContainingProjectModule = containingModule :> _
 
