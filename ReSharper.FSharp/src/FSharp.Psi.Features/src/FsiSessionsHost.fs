@@ -63,14 +63,22 @@ type FsiSessionsHost(lifetime: Lifetime, solution: ISolution, solutionModel: Sol
         let fsiPath =
             if PlatformUtil.IsRunningUnderWindows then
                 let fsiName = if useFsiAnyCpu then "fsiAnyCpu.exe" else "fsi.exe"
-                let programFilesPath = FileSystemPath.TryParse(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86))
-                let prefixPath = programFilesPath.Combine("Microsoft SDKs\\F#")
-                let fsharpDir =
-                    ["4.1"; "4.0"; "3.1"]
-                    |> List.map (fun v -> prefixPath.Combine(v).Combine("Framework\\v4.0"))
-                    |> List.tryFind (fun p -> p.ExistsDirectory)
-                    |> function | Some p -> p | _ -> FileSystemPath.Empty
-                fsharpDir.Combine(fsiName).FullPath
+                let programFilesPath =
+                    FileSystemPath.TryParse(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86))
+                let fsharpSdkDir =
+                    let fsharpSdkBasePath = programFilesPath.Combine("Microsoft SDKs\\F#")
+                    fsharpSdkBasePath.GetChildDirectories()
+                    |> List.ofSeq
+                    |> List.choose (fun f ->
+                        match Double.TryParse(f.Name) with
+                        | true, version when
+                                f.GetChildFiles(flags = PathSearchFlags.RecurseIntoSubdirectories)
+                                |> Seq.exists (fun p -> p.Name.Equals("fsi.exe", StringComparison.Ordinal)) ->
+                            Some (version, f)
+                        | _ -> None)
+                    |> List.maxBy (fun (version, _) -> version)
+                    |> snd
+                fsharpSdkDir.Combine("Framework\\v4.0").Combine(fsiName).FullPath
             else
                 let fsiName = if useFsiAnyCpu then "fsharpiAnyCpu" else "fsharpi"
                 toolset.CurrentMonoRuntime.RootPath.Combine("bin").Combine(fsiName).FullPath
