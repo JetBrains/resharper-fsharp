@@ -57,7 +57,8 @@ and FSharpCodeFoldingProcess(logger) =
                             | range when not range.IsEmpty -> document.GetText(range) + " ..."
                             | _ -> " ..."
                     if not textRange.IsEmpty then
-                        context.AddDefaultPriorityFolding(getFoldingAttrId x.Scope, docRange, placeholder)
+                        let highlighting = CodeFoldingHighlighting(getFoldingAttrId x.Scope, placeholder, docRange, 0)
+                        context.AddHighlighting(highlighting)
                     else
                         logger.LogMessage(LoggingLevel.WARN, sprintf "Empty folding: %O %A" textRange x))
             | _ -> ()
