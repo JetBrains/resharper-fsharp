@@ -38,15 +38,13 @@ class FSharpCompletionTest : CompletionTestBase() {
         })
 
         isFcsReady = false
-        doTestWithDocuments {
-            withCaret("Program.fs", "Program.fs") {
-                isFcsReady = false
-                typeWithLatency(typed)
-                waitForFcs()
-                callBasicCompletion()
-                waitForCompletion()
-                completeWithTab()
-            }
+        withCaret("Program.fs", "Program.fs") {
+            isFcsReady = false
+            typeWithLatency(typed)
+            waitForFcs()
+            callBasicCompletion()
+            waitForCompletion()
+            completeWithTab()
         }
     }
 }
