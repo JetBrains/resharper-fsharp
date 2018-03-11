@@ -97,6 +97,7 @@ prepareTestingSandbox {
     into("$intellij.pluginName/projectTemplates") {
         from 'projectTemplates'
     }
+    from('../ReSharper.FSharp/test/src/FSharp.Tests.Host/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Tests.Host.dll', {into "$intellij.pluginName/dotnet"})
 }
 
 wrapper {
