@@ -55,8 +55,6 @@ def dllFiles = [
 ]
 
 def pdbFiles = [
-        'FSharp.Common/bin/Debug/net451/FSharp.Compiler.Service.pdb',
-
         'FSharp.ProjectModelBase/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase.pdb',
         'FSharp.Common/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Common.pdb',
         'FSharp.Psi/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Psi.pdb',
@@ -101,7 +99,8 @@ prepareTestingSandbox {
 }
 
 wrapper {
-    gradleVersion '4.2'
+    gradleVersion '4.6'
+    distributionType 'ALL'
 }
 
 repositories {
