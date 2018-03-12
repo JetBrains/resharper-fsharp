@@ -136,19 +136,13 @@ type FSharpLibraryScopeLookupItemsProvider(logger: ILogger, assemblyContentProvi
 
 
 [<SolutionComponent>]
-type FSharpIdentifierAutocompletionStrategy() =
-    static let additionalPopupChars = ['#'; '-'; ':'; '<'; '>'; '@'] |> Set.ofList
-
+type FSharpAutocompletionStrategy() =
     interface IAutomaticCodeCompletionStrategy with
-
         member x.Language = FSharpLanguage.Instance :> _
         member x.AcceptsFile(file, textControl) = file :? IFSharpFile
 
-        member x.AcceptTyping(char, textControl, _) =
-            char.IsIdentifierPart() ||
-            Set.contains char additionalPopupChars
-
-        member x.ProcessSubsequentTyping(_, _) = true
+        member x.AcceptTyping(char, _, _) = char.IsLetterFast() || char = '.'
+        member x.ProcessSubsequentTyping(char, _) = char.IsIdentifierPart()
 
         member x.IsEnabledInSettings(_, _) = AutopopupType.SoftAutopopup
         member x.ForceHideCompletion = false

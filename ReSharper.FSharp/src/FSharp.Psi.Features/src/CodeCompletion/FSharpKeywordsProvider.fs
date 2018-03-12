@@ -9,6 +9,7 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupIt
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Psi
@@ -16,6 +17,7 @@ open JetBrains.ReSharper.Psi.Resources
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.TextControl
 open JetBrains.UI.RichText
+open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
 [<RequireQualifiedAccess>]
@@ -105,3 +107,18 @@ type FSharpKeywordLookupItem(keyword, description, suffix) =
 
 type FSharpHashDirectiveLookupItem(directive, suffix) =
     inherit FSharpKeywordLookupItemBase(directive, suffix)
+
+[<SolutionComponent>]
+type FSharpHashDirectiveAutocompletionStrategy() =
+    interface IAutomaticCodeCompletionStrategy with
+        member x.Language = FSharpLanguage.Instance :> _
+        member x.AcceptsFile(file, textControl) =
+            match file.GetSourceFile() with
+            | null -> false
+            | sourceFile -> sourceFile.LanguageType.Is<FSharpScriptProjectFileType>()
+
+        member x.AcceptTyping(char, _, _) = char = '#'
+        member x.ProcessSubsequentTyping(char, _) = char.IsLetterFast()
+
+        member x.IsEnabledInSettings(_, _) = AutopopupType.SoftAutopopup
+        member x.ForceHideCompletion = false
