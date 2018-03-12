@@ -39,63 +39,62 @@ intellij {
     plugins 'rider-editorconfig', 'RiderJavaScriptLanguage'
 }
 
-def src = '../ReSharper.FSharp/src'
-def dllFiles = [
-        'FSharp.Common/bin/Debug/net451/FSharp.Core.dll',
-        'FSharp.Common/bin/Debug/net451/FSharp.Compiler.Service.dll',
-        'FSharp.Psi.Features/bin/Debug/net451/FantomasLib.dll',
+if (!ext.has("BuildConfiguration"))
+    ext.BuildConfiguration = "Debug"
 
-        'FSharp.ProjectModelBase/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase.dll',
-        'FSharp.Common/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Common.dll',
-        'FSharp.Psi/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Psi.dll',
-        'FSharp.Psi.Features/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Psi.Features.dll',
-
-        'Daemon.FSharp/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.dll',
-        'Services.FSharp/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Services.Cs.dll'
+def backendDir = '../ReSharper.FSharp'
+def libDllFiles = [
+        "FSharp.Common/bin/$BuildConfiguration/net451/FSharp.Core.dll",
+        "FSharp.Common/bin/$BuildConfiguration/net451/FSharp.Compiler.Service.dll", // todo: add pdb after next repack
+        "FSharp.Psi.Features/bin/$BuildConfiguration/net451/FantomasLib.dll"
 ]
 
-def pdbFiles = [
-        'FSharp.ProjectModelBase/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase.pdb',
-        'FSharp.Common/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Common.pdb',
-        'FSharp.Psi/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Psi.pdb',
-        'FSharp.Psi.Features/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Psi.Features.pdb',
-
-        'Daemon.FSharp/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.pdb',
-        'Services.FSharp/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Services.Cs.pdb'
+def pluginDllFiles = [
+        "FSharp.ProjectModelBase/bin/$BuildConfiguration/net451/JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase",
+        "FSharp.Common/bin/$BuildConfiguration/net451/JetBrains.ReSharper.Plugins.FSharp.Common",
+        "FSharp.Psi/bin/$BuildConfiguration/net451/JetBrains.ReSharper.Plugins.FSharp.Psi",
+        "FSharp.Psi.Features/bin/$BuildConfiguration/net451/JetBrains.ReSharper.Plugins.FSharp.Psi.Features",
+        "Daemon.FSharp/bin/$BuildConfiguration/net451/JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs",
+        "Services.FSharp/bin/$BuildConfiguration/net451/JetBrains.ReSharper.Plugins.FSharp.Services.Cs"
 ]
 
-def debug = false
-def files = debug ? dllFiles + pdbFiles : dllFiles
+def files =
+        libDllFiles +
+        pluginDllFiles.collect { it + '.dll' } +
+        pluginDllFiles.collect { it + '.pdb' }
 
 prepareSandbox {
-    files.forEach({ f ->
-        def file = file("$src/$f")
+    files.forEach {
+        def file = file("$backendDir/src/$it")
         if (!file.exists()) throw new RuntimeException("File $file does not exist")
 
         logger.warn("prepareSandbox: " +
                 file.toString() + " -> " +
                 "$destinationDir/$intellij.pluginName/dotnet")
         from(file, { into "$intellij.pluginName/dotnet" })
-    })
+    }
     into("$intellij.pluginName/projectTemplates") {
         from 'projectTemplates'
     }
 }
 
 prepareTestingSandbox {
-    files.forEach({ f ->
-        def file = file("$src/$f")
+    def hostDllName = "JetBrains.ReSharper.Plugins.FSharp.Tests.Host"
+    def hostDllPath = "$backendDir/test/src/FSharp.Tests.Host/bin/$BuildConfiguration/net451/$hostDllName"
+    files = files.collect { "$backendDir/src/$it" } + [hostDllPath + ".dll", hostDllPath + ".pdb"]
+
+    files.forEach {
+        def file = file(it)
         if (!file.exists()) throw new RuntimeException("File $file does not exist")
 
         logger.warn("prepareTestingSandbox: " +
                 file.toString() + " -> " +
                 "$destinationDir/$intellij.pluginName/dotnet")
         from(file, { into "$intellij.pluginName/dotnet" })
-    })
+    }
     into("$intellij.pluginName/projectTemplates") {
         from 'projectTemplates'
     }
-    from('../ReSharper.FSharp/test/src/FSharp.Tests.Host/bin/Debug/net451/JetBrains.ReSharper.Plugins.FSharp.Tests.Host.dll', {into "$intellij.pluginName/dotnet"})
 }
 
 wrapper {
