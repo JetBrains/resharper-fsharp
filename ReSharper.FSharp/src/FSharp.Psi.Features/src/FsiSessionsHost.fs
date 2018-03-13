@@ -69,7 +69,7 @@ type FsiSessionsHost(lifetime: Lifetime, solution: ISolution, solutionModel: Sol
                 |> Seq.choose (fun path ->
                     match Double.TryParse(path.Name) with
                     | true, version ->
-                        let fsiPath = path.Combine("Framework/v4.0/fsi.exe")
+                        let fsiPath = path.Combine("Framework/v4.0").Combine(fsiName)
                         if not fsiPath.ExistsFile then None else
                         Some (version, fsiPath.FullPath)
                     | _ -> None)
