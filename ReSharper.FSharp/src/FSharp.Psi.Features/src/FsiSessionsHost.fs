@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.ContextActions
 open System
 open System.Diagnostics
 open System.Collections.Generic
+open System.Globalization
 open System.IO
 open System.Linq
 open System.Text
@@ -67,7 +68,7 @@ type FsiSessionsHost(lifetime: Lifetime, solution: ISolution, solutionModel: Sol
                     FileSystemPath.TryParse(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86))
                 programFilesPath.Combine("Microsoft SDKs/F#").GetChildDirectories()
                 |> Seq.choose (fun path ->
-                    match Double.TryParse(path.Name) with
+                    match Double.TryParse(path.Name, NumberStyles.Any, CultureInfo.InvariantCulture) with
                     | true, version ->
                         let fsiPath = path.Combine("Framework/v4.0").Combine(fsiName)
                         if not fsiPath.ExistsFile then None else
