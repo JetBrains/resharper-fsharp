@@ -49,7 +49,9 @@ type FSharpPathCompletionContextProvider() =
                 let valueStartOffset = tokenOffset + tokenText.IndexOf("\"") + 1
                 let tokenEndOffset = tokenOffset + tokenText.Length
 
-                caretOffset >= valueStartOffset && caretOffset < tokenEndOffset
+                let unfinishedLiteral = tokenText.IndexOf('"') = tokenText.LastIndexOf('"')
+                caretOffset >= valueStartOffset &&
+                (caretOffset < tokenEndOffset || caretOffset = tokenEndOffset && unfinishedLiteral)
             | _ -> false
         | _ -> false
 
