@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Services.Foldings
+namespace rec JetBrains.ReSharper.Plugins.FSharp.Services.Foldings
 
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Daemon.CodeFolding
@@ -8,6 +8,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.TextControl.DocumentMarkup
 open JetBrains.Util
 open JetBrains.Util.dataStructures.TypedIntrinsics
 open Microsoft.FSharp.Compiler.SourceCodeServices
@@ -29,6 +30,7 @@ and FSharpCodeFoldingProcess(logger) =
         | Scope.Comment -> CodeFoldingAttributes.COMMENTS_FOLDING_ATTRIBUTE
         | Scope.XmlDocComment -> CodeFoldingAttributes.DOCUMENTATION_COMMENTS_FOLDING_ATTRIBUTE
         | Scope.Member -> CodeFoldingAttributes.METHOD_FOLDING_ATTRIBUTE
+        | Scope.HashDirective -> FSharpCodeFoldingAttributes.hashDirectivesAttribute
         | _ -> CodeFoldingAttributes.DEFAULT_FOLDING_ATTRIBUTE
 
     override x.VisitNode(element, context) =
@@ -73,3 +75,10 @@ and FSharpCodeFoldingProcess(logger) =
             match element with
             | :? IFSharpTreeNode as treeNode -> treeNode.Accept(x, context)
             | _ -> ()
+
+module FSharpCodeFoldingAttributes =
+    let [<Literal>] hashDirectivesAttribute = "ReSharper F# Hash Directives Block Folding"
+
+[<assembly: RegisterHighlighter(FSharpCodeFoldingAttributes.hashDirectivesAttribute, EffectType = EffectType.FOLDING)>]
+do
+    ()
