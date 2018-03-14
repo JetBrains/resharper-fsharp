@@ -10,6 +10,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.TreeBuilder
+open JetBrains.Util
 open JetBrains.Util.dataStructures.TypedIntrinsics
 open Microsoft.FSharp.Compiler
 open Microsoft.FSharp.Compiler.Ast
@@ -27,6 +28,8 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
     member internal x.GetEndOffset (range: Range.range) = x.GetLineOffset(range.EndLine) + range.EndColumn
     member internal x.GetStartOffset (id: Ident) = x.GetStartOffset(id.idRange)
     member internal x.Eof = x.Builder.Eof()
+
+    member val TypeExtensionsOffsets = OneToListMap<string, int>()
 
     member internal x.AdvanceToOffset offset =
         while x.Builder.GetTokenOffset() < offset && not x.Eof do x.Builder.AdvanceLexer() |> ignore
@@ -52,7 +55,9 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
     member internal x.FinishFile(mark, fileType) =
         while not x.Eof do x.Builder.AdvanceLexer() |> ignore
         x.Done(mark, fileType)
-        x.GetTree() :> ICompositeElement :?> IFSharpFile
+        let fsFile = x.GetTree() :> ICompositeElement :?> IFSharpFile
+        fsFile.TypeExtensionsOffsets <- x.TypeExtensionsOffsets
+        fsFile
 
     member internal x.StartTopLevelDeclaration (lid: LongIdent) (attrs: SynAttributes) isModule (range: Range.range) =
         match lid.IsEmpty, isModule with

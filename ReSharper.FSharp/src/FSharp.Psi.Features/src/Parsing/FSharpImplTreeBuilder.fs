@@ -68,7 +68,16 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
     
         match repr with
         | SynTypeDefnRepr.ObjectModel(SynTypeDefnKind.TyconAugmentation,_,_) ->
-            range |> x.GetStartOffset |> x.AdvanceToOffset
+            let tryGetShortName (lid: LongIdent) =
+                List.tryLast lid
+                |> Option.map (fun id -> id.idText)
+
+            let extensionOffset = x.GetStartOffset(range)
+            match tryGetShortName lid with
+            | Some name -> x.TypeExtensionsOffsets.Add(name, extensionOffset)
+            | _ -> ()
+
+            x.AdvanceToOffset(extensionOffset)
             let extensionMark = x.Mark()
             let typeExpressionMark = x.Mark()
             x.ProcessLongIdentifier lid

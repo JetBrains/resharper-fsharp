@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Application.Threading;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Checker;
@@ -25,8 +27,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     private Dictionary<int, FSharpResolvedSymbolUse> myDeclarationSymbols;
     private Dictionary<int, FSharpResolvedSymbolUse> myResolvedSymbols;
 
+    public OneToListMap<string, int> TypeExtensionsOffsets { get; set; }
+    private readonly ConcurrentDictionary<int, ITypeExtension> TypeExtensionsByOffset =
+      new ConcurrentDictionary<int, ITypeExtension>();
+
     public FSharpCheckerService CheckerService { get; set; }
-    public FSharpOption<FSharpParsingOptions> ParsingOptions { get; set; }
 
     public TokenBuffer ActualTokenBuffer { get; set; }
     public FSharpOption<FSharpParseFileResults> ParseResults { get; set; }
@@ -190,6 +195,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         return myDeclarationSymbols?.TryGetValue(offset)?.SymbolUse.Symbol;
       }
     }
+
+    public IEnumerable<ITypeExtension> GetTypeExtensions(string shortName) =>
+      TypeExtensionsOffsets?.GetValuesSafe(shortName).Select(offset => TypeExtensionsByOffset.GetOrCreateValue(offset,
+        () => FindTokenAt(new TreeOffset(offset))?.GetContainingNode<ITypeExtension>())).WhereNotNull();
 
     public virtual void Accept(TreeNodeVisitor visitor) => visitor.VisitNode(this);
 

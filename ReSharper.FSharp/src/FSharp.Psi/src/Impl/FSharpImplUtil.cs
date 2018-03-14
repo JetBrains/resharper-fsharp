@@ -31,15 +31,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return ids.IsEmpty ? TreeTextRange.InvalidRange : ids.Last().GetTreeTextRange();
     }
 
-    [CanBeNull]
-    public static ITokenNode GetNameToken([CanBeNull] this ILongIdentifier longIdentifier)
-    {
-      if (longIdentifier == null) return null;
-
-      var ids = longIdentifier.Identifiers;
-      return ids.IsEmpty ? null : ids.Last();
-    }
-
     public static bool ShortNameEquals([NotNull] this IFSharpAttribute attr, [NotNull] string shortName) =>
       attr.LongIdentifier?.Name.GetAttributeShortName()?.Equals(shortName, StringComparison.Ordinal) ?? false;
 

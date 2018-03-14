@@ -16,17 +16,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     ITypeMember ITypeMemberDeclaration.DeclaredElement => (ITypeMember) DeclaredElement;
     ITypeElement ITypeDeclaration.DeclaredElement => (ITypeElement) DeclaredElement;
 
-    /// <summary>
-    /// May take long time due to waiting for FCS
-    /// </summary>
+    /// May take long time due to waiting for FCS.
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     public IEnumerable<IDeclaredType> SuperTypes => GetFSharpSymbol() is FSharpEntity entity
       ? FSharpTypesUtil.GetSuperTypes(entity, TypeParameters, GetPsiModule())
       : EmptyList<IDeclaredType>.Instance;
 
-    /// <summary>
-    /// May take long time due to waiting for FCS
-    /// </summary>
+    /// May take long time due to waiting for FCS.
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     public IDeclaredType BaseClassType => GetFSharpSymbol() is FSharpEntity entity
       ? FSharpTypesUtil.GetBaseType(entity, TypeParameters, GetPsiModule())
@@ -54,7 +50,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         var members = this.Children<ITypeMemberDeclaration>();
         var implementedMembers = this.Children<IInterfaceImplementation>()
           .SelectMany(m => m.Children<ITypeMemberDeclaration>());
-        var extensionMembers = this.Children<ITypeExtension>().SelectMany(m => m.Children<ITypeMemberDeclaration>());
+        var extensionMembers = this.Children<ITypeExtension>()
+          .SelectMany(m => m.Children<ITypeMemberDeclaration>());
         return members.Concat(implementedMembers).Concat(extensionMembers).ToTreeNodeCollection();
       }
     }
