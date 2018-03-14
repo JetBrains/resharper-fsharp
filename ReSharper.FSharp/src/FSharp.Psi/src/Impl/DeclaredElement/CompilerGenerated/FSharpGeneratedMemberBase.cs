@@ -63,5 +63,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
     public abstract MemberHidePolicy HidePolicy { get; }
     public virtual bool IsVisibleFromFSharp => false;
+    public bool IsExtensionMember => false;
+    public bool IsMember => true;
   }
 }

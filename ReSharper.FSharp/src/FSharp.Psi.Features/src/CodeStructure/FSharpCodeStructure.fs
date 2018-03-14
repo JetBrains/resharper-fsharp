@@ -1,23 +1,54 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeStructure
+namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeStructure
 
 open System
 open System.Collections.Generic
 open JetBrains.Annotations
+open JetBrains.Application.UI.Icons.ComposedIcons
 open JetBrains.ReSharper.Feature.Services.CodeStructure
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Resources
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.UI.Icons
 open JetBrains.Util
 open JetBrains.UI.RichText
+
+[<Language(typeof<FSharpLanguage>)>]
+type FSharpCodeStructureProvider() =
+    let isApplicable (node: ITreeNode) =
+        node :? ITypeMemberDeclaration || (node :? IModuleMemberDeclaration && not (node :? IOtherMemberDeclaration)) ||
+        node :? IFSharpTypeMemberDeclaration  || node :? ITopLevelModuleOrNamespaceDeclaration
+
+    let rec processNode (node: ITreeNode) (nodeElement: CodeStructureElement) =
+        for child in node.Children() do
+            match child with
+            | :? IDeclaration when isApplicable child ->
+                processNode child (CodeStructureDeclarationElement(nodeElement, child :?> _))
+            | :? IInterfaceImplementation as node ->
+                processNode node (NamedTypeExpressionOwner(node, nodeElement, PsiSymbolsThemedIcons.Interface.Id))
+            | :? ITypeExtension as node ->
+                // todo: other type kind icons, add extension icon modificator
+                processNode node (NamedTypeExpressionOwner(node, nodeElement, PsiSymbolsThemedIcons.Class.Id))
+            | _ -> ()
+
+    interface IPsiFileCodeStructureProvider with
+        member x.Build(file, _) =
+            match file with
+            | :? IFSharpFile ->
+                let root = FSharpCodeStructureRootElement(file)
+                processNode file (root :> CodeStructureElement)
+                root :> _
+            | _ -> null
+
 
 type FSharpCodeStructureRootElement(file) =
     inherit CodeStructureRootElement(file)
 
-type InterfaceImplementationAspect([<NotNull>] treeNode: IInterfaceImplementation) =
+
+type NamedTypeExpressionNodeAspect([<NotNull>] treeNode: INamedTypeExpressionOwner, iconId: IconId) =
     let interfaceName =
-        match treeNode.InterfaceType with
+        match treeNode.TypeExpression with
         | null -> null
         | typeName -> typeName.LongIdentifier.GetText()
 
@@ -27,7 +58,7 @@ type InterfaceImplementationAspect([<NotNull>] treeNode: IInterfaceImplementatio
         | name -> [name].AsIList()
 
     let navigationRange =
-        match treeNode.InterfaceType with
+        match treeNode.TypeExpression with
         | null -> treeNode.GetNavigationRange()
         | typeName -> typeName.LongIdentifier.GetNavigationRange()
 
@@ -35,7 +66,7 @@ type InterfaceImplementationAspect([<NotNull>] treeNode: IInterfaceImplementatio
         member x.Present(descriptor, state) =
             descriptor.Icon <- PsiSymbolsThemedIcons.Interface.Id
             descriptor.Text <-
-                match treeNode.InterfaceType with
+                match treeNode.TypeExpression with
                 | null -> RichText("<Invalid>")
                 | typeName -> RichText(typeName.LongIdentifier.GetText())
         member x.NavigationRange = treeNode.GetNavigationRange()
@@ -44,9 +75,9 @@ type InterfaceImplementationAspect([<NotNull>] treeNode: IInterfaceImplementatio
 
     interface IFileStructureAspect with
         member x.Present(presenter, item, modelNode, state) =
-            item.Images.Add(PsiSymbolsThemedIcons.Interface.Id);
+            item.Images.Add(iconId) // 
             item.RichText <-
-                match treeNode.InterfaceType with
+                match treeNode.TypeExpression with
                 | null -> RichText("<Invalid>")
                 | typeName -> RichText(typeName.LongIdentifier.GetText())
 
@@ -64,14 +95,14 @@ type InterfaceImplementationAspect([<NotNull>] treeNode: IInterfaceImplementatio
     interface IMemberNavigationAspect with
         member x.GetNavigationRanges() = [| navigationRange |]
 
-type InterfaceImplementation(treeNode: IInterfaceImplementation, parent) =
+type NamedTypeExpressionOwner(treeNode: INamedTypeExpressionOwner, parent, iconId) =
     inherit CodeStructureElement(parent)
 
-    let aspect = InterfaceImplementationAspect(treeNode)
+    let aspect = NamedTypeExpressionNodeAspect(treeNode, iconId)
     let treeNodePointer = treeNode.GetPsiServices().Pointers.CreateTreeElementPointer(treeNode)
 
     let textRange =
-        match treeNode.InterfaceType with
+        match treeNode.TypeExpression with
         | null -> treeNode.GetNavigationRange().TextRange
         | typeName -> typeName.LongIdentifier.GetDocumentRange().TextRange
 
@@ -82,27 +113,3 @@ type InterfaceImplementation(treeNode: IInterfaceImplementation, parent) =
     override x.GetMemberNavigationAspect() = aspect :> _
     override x.GetTextRange() = textRange
     override x.DumpSelf(_) = ()
-
-[<Language(typeof<FSharpLanguage>)>]
-type FSharpCodeStructureProvider() =
-    let isApplicable (node: ITreeNode) =
-        node :? ITypeMemberDeclaration || (node :? IModuleMemberDeclaration && not (node :? IOtherMemberDeclaration)) ||
-        node :? IFSharpTypeMemberDeclaration  || node :? ITopLevelModuleOrNamespaceDeclaration
-
-    let rec processNode (node: ITreeNode) (nodeElement: CodeStructureElement) =
-        for child in node.Children() do
-            match child with
-            | :? IDeclaration when isApplicable child ->
-                processNode child (CodeStructureDeclarationElement(nodeElement, child :?> _))
-            | :? IInterfaceImplementation as node ->
-                processNode node (InterfaceImplementation(node, nodeElement))
-            | _ -> ()
-
-    interface IPsiFileCodeStructureProvider with
-        member x.Build(file, _) =
-            match file with
-            | :? IFSharpFile ->
-                let root = FSharpCodeStructureRootElement(file)
-                processNode file (root :> CodeStructureElement)
-                root :> _
-            | _ -> null

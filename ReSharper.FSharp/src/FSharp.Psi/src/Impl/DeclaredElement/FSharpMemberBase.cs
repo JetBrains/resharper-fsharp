@@ -26,6 +26,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       FSharpSymbol = mfv;
     }
 
+    public override bool IsExtensionMember => FSharpSymbol.IsExtensionMember;
+    public override bool IsMember => FSharpSymbol.IsMember;
 
     public override IList<IAttributeInstance> GetAttributeInstances(bool inherit) =>
       FSharpAttributeInstance.GetAttributeInstances(FSharpSymbol.Attributes, Module);

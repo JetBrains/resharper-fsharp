@@ -25,9 +25,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public IEnumerable<ITypeMember> GetTypeMembers()
     {
-      // todo: ask members from FCS
-      return GetDeclaration()?.MemberDeclarations.Select(d => d.DeclaredElement).WhereNotNull() ??
-             EmptyList<ITypeMember>.InstanceList;
+      var declaration = GetDeclaration();
+      if (declaration == null)
+        return EmptyList<ITypeMember>.Instance;
+
+      return declaration.MemberDeclarations.Select(d => d.DeclaredElement as IFSharpTypeMember)
+        .Where(el => el != null && (!el.IsMember || el.IsExtensionMember));
     }
 
     public IEnumerable<IDeclaredType> GetSuperTypes()

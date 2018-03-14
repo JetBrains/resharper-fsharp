@@ -65,16 +65,20 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
         x.Done(mark, ElementType.HASH_DIRECTIVE)
 
     member internal x.ProcessType (TypeDefn(ComponentInfo(attrs, typeParams,_,lid,_,_,_,_), repr, members, range)) =
-        let shouldProcess =
-            match repr with
-            | SynTypeDefnRepr.ObjectModel(SynTypeDefnKind.TyconAugmentation,_,_) -> false
-            | _ -> true
-
-        if not shouldProcess then
-            for m in members do x.ProcessTypeMember m
-        else
+    
+        match repr with
+        | SynTypeDefnRepr.ObjectModel(SynTypeDefnKind.TyconAugmentation,_,_) ->
+            range |> x.GetStartOffset |> x.AdvanceToOffset
+            let extensionMark = x.Mark()
+            let typeExpressionMark = x.Mark()
+            x.ProcessLongIdentifier lid
+            x.Done(typeExpressionMark, ElementType.NAMED_TYPE_EXPRESSION)
+            for m in members do
+                x.ProcessTypeMember m
+            range |> x.GetEndOffset |> x.AdvanceToOffset
+            x.Done(extensionMark, ElementType.TYPE_EXTENSION)
+        | _ ->
             let mark = x.StartType attrs typeParams lid range
-
             let elementType =
                 match repr with
                 | SynTypeDefnRepr.Simple(simpleRepr, _) ->

@@ -103,6 +103,7 @@ interface moduleMember:
   moduleMemberStatement |
   memberDeclaration |
   hashDirective |
+  typeExtension |
   otherModuleMember;
 
 interface moduleMemberDeclaration:
@@ -115,6 +116,10 @@ interface moduleMemberDeclaration:
 interface moduleMemberStatement:
   open |
   do;
+
+typeExtension:
+  namedTypeExpression<EXTENDED_TYPE, ExtendedType>
+  memberDeclaration<TYPE_MEMBER, TypeMembers>* fakeSeparator;
 
 interface fSharpTypeDeclaration:
   exceptionDeclaration |

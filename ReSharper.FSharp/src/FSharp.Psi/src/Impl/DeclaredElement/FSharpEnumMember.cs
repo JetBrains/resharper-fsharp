@@ -49,5 +49,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override bool IsOverride => false;
     public override bool IsStatic => true;
     public override bool IsReadonly => true;
+
+    public override bool IsMember => false;
   }
 }
