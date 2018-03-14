@@ -64,7 +64,7 @@ type NamedTypeExpressionNodeAspect([<NotNull>] treeNode: INamedTypeExpressionOwn
 
     interface IGotoFileMemberAspect with
         member x.Present(descriptor, state) =
-            descriptor.Icon <- PsiSymbolsThemedIcons.Interface.Id
+            descriptor.Icon <- iconId
             descriptor.Text <-
                 match treeNode.TypeExpression with
                 | null -> RichText("<Invalid>")
@@ -75,7 +75,7 @@ type NamedTypeExpressionNodeAspect([<NotNull>] treeNode: INamedTypeExpressionOwn
 
     interface IFileStructureAspect with
         member x.Present(presenter, item, modelNode, state) =
-            item.Images.Add(iconId) // 
+            item.Images.Add(iconId)
             item.RichText <-
                 match treeNode.TypeExpression with
                 | null -> RichText("<Invalid>")
