@@ -45,6 +45,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
       if (mfv.LiteralValue != null)
         return HighlightingAttributeIds.CONSTANT_IDENTIFIER_ATTRIBUTE;
 
+      if (mfv.IsActivePattern)
+        return HighlightingAttributeIds.METHOD_IDENTIFIER_ATTRIBUTE;
+      
       return mfv.IsMutable || mfv.IsRefCell
         ? HighlightingAttributeIds.MUTABLE_LOCAL_VARIABLE_IDENTIFIER_ATTRIBUTE
         : HighlightingAttributeIds.LOCAL_VARIABLE_IDENTIFIER_ATTRIBUTE;
@@ -71,6 +74,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
 
         case FSharpGenericParameter _:
           return HighlightingAttributeIds.TYPE_PARAMETER_ATTRIBUTE;
+        
+        case FSharpActivePatternCase _:
+          return HighlightingAttributeIds.METHOD_IDENTIFIER_ATTRIBUTE;
       }
 
       // some highlighting is needed for tooltip provider
