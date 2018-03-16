@@ -52,7 +52,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
           .SelectMany(m => m.Children<ITypeMemberDeclaration>());
         var extensionMembers = this.Children<ITypeExtension>()
           .SelectMany(m => m.Children<ITypeMemberDeclaration>());
-        return members.Concat(implementedMembers).Concat(extensionMembers).ToTreeNodeCollection();
+        return members.Concat(implementedMembers).Concat(extensionMembers).WhereNotNull().ToTreeNodeCollection();
       }
     }
 
