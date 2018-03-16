@@ -14,6 +14,7 @@ open JetBrains.Util
 open JetBrains.Util.dataStructures.TypedIntrinsics
 open Microsoft.FSharp.Compiler
 open Microsoft.FSharp.Compiler.Ast
+open Microsoft.FSharp.Compiler.PrettyNaming
 
 [<AbstractClass>]
 type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as this =
@@ -440,7 +441,10 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
             match lidWithDots.Lid with
             | [] -> ()
             | [id] when id.idText.Equals("op_ColonColon", StringComparison.Ordinal) -> ()
-            | lid -> for id in lid do x.ProcessLocalId id
+            | lid ->
+                for id in lid do
+                    let isActivePattern = IsActivePatternName id.idText 
+                    if isActivePattern then x.ProcessActivePatternId id else x.ProcessIdentifier id
             x.ProcessLocalParams patParams
         | SynPat.Named(pat,id,_,_,_) ->
             x.ProcessLocalPat pat

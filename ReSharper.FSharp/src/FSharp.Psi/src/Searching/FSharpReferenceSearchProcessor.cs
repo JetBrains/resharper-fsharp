@@ -36,7 +36,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
       
       // found a symbol that cannot be resolved to the R# cache,
       // e.g. an active pattern case declared in a compiled assembly
-      var resolvedSymbol = (resolvedElement as ResolvedFSharpSymbolElement)?.Symbol;
+      var resolvedSymbol = (resolvedElement as IFSharpSymbolElement)?.Symbol;
       return resolvedSymbol != null && myFSharpSymbols.Any(s => s.IsEffectivelySameAs(resolvedSymbol));
     }
   }

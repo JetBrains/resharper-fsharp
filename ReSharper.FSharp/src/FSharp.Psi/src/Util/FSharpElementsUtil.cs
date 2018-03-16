@@ -13,6 +13,7 @@ using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 using JetBrains.Util.Logging;
+using Microsoft.FSharp.Compiler;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -103,7 +104,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         if (mfv.IsUnresolved) return null;
 
         if (!mfv.IsModuleValueOrMember)
-          return FindLocalDeclaration(mfv, referenceOwnerToken);
+          return FindDeclaration<LocalDeclaration>(mfv.DeclarationLocation, referenceOwnerToken);
 
         var memberEntity = mfv.IsModuleValueOrMember ? mfv.DeclaringEntity : null;
         if (memberEntity == null) return null;
@@ -150,7 +151,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         return GetTypeElement(field.DeclaringEntity, psiModule)?.EnumerateMembers(field.Name, true).FirstOrDefault();
 
       if (symbol is FSharpActivePatternCase activePatternCase)
-        return new ResolvedFSharpSymbolElement(activePatternCase, referenceOwnerToken);
+        return
+          activePatternCase.Group.DeclaringEntity != null
+          ? new ResolvedFSharpSymbolElement(activePatternCase, referenceOwnerToken)
+          : FindDeclaration<ActivePatternCaseDeclaration>(activePatternCase.DeclarationLocation, referenceOwnerToken)?.DeclaredElement;
 
       return null;
     }
@@ -173,15 +177,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       }
     }
 
-    private static IClrDeclaredElement FindLocalDeclaration([NotNull] FSharpMemberOrFunctionOrValue mfv,
-      [CanBeNull] FSharpIdentifierToken referenceOwnerToken)
+    private static T FindDeclaration<T>(Range.range range, [CanBeNull] ITreeNode token) where T : class, IDeclaration
     {
-      var fsFile = referenceOwnerToken?.GetContainingFile() as IFSharpFile;
+      var fsFile = token?.GetContainingFile() as IFSharpFile;
       var document = fsFile?.GetSourceFile()?.Document;
       if (document == null) return null;
 
-      var idToken = fsFile.FindTokenAt(document.GetTreeEndOffset(mfv.DeclarationLocation) - 1);
-      return idToken?.GetContainingNode<LocalDeclaration>();
+      var idToken = fsFile.FindTokenAt(document.GetTreeEndOffset(range) - 1);
+      return idToken?.GetContainingNode<T>();
     }
   }
 }
