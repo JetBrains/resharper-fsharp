@@ -51,6 +51,13 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
         | SynModuleDecl.HashDirective(hashDirective, _) ->
             x.ProcessHashDirective(hashDirective)
 
+        | SynModuleDecl.DoExpr (_, expr, range) ->
+            range |> x.GetStartOffset |> x.AdvanceToOffset
+            let mark = x.Builder.Mark()
+            x.ProcessLocalExpression(expr)
+            range |> x.GetEndOffset |> x.AdvanceToOffset
+            x.Done(mark, ElementType.DO)
+
         | decl ->
             decl.Range |> x.GetStartOffset |> x.AdvanceToOffset
             let mark = x.Builder.Mark()
@@ -161,4 +168,4 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                 x.ProcessModuleLetPat pattern attrs
 
         | SynPat.Paren(pat,_) -> x.ProcessModuleLetPat pat attrs
-        | _ -> ()
+        | _ -> x.ProcessLocalPat(pat)

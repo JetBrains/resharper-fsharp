@@ -259,10 +259,12 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
 
     member internal x.ProcessSimplePattern (pat: SynSimplePat) =
         match pat with
-        | SynSimplePat.Id(id,_,_,_,_,_) ->
-            x.ProcessLocalId id
-        | SynSimplePat.Typed(SynSimplePat.Id(id,_,_,_,_,_),t,_) ->
-            x.ProcessLocalId id
+        | SynSimplePat.Id(id,_,isCompilerGenerated,_,_,_) ->
+            if not isCompilerGenerated then
+                x.ProcessLocalId id
+        | SynSimplePat.Typed(SynSimplePat.Id(id,_,isCompilerGenerated,_,_,_),t,_) ->
+            if not isCompilerGenerated then
+                x.ProcessLocalId id
             x.ProcessSynType t
         | _ -> ()
 
@@ -622,9 +624,13 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
         | SynExpr.Assert(expr,_) ->
             x.ProcessLocalExpression expr
 
-        | SynExpr.App(_,_,funExpr,argExpr,_) ->
-            x.ProcessLocalExpression funExpr
-            x.ProcessLocalExpression argExpr
+        | SynExpr.App(_,isInfix,funExpr,argExpr,_) ->
+            if isInfix then
+                x.ProcessLocalExpression argExpr
+                x.ProcessLocalExpression funExpr
+            else
+                x.ProcessLocalExpression funExpr
+                x.ProcessLocalExpression argExpr
 
         | SynExpr.TypeApp(expr,lt,typeArgs,_,rt,_,r) ->
             x.ProcessLocalExpression expr
@@ -661,22 +667,32 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
                 x.ProcessLocalExpression elseExprOpt.Value
 
         | SynExpr.Ident(_)
-        | SynExpr.LongIdent(_)
-
-
-        | SynExpr.NamedIndexedPropertySet(_)
-        | SynExpr.DotNamedIndexedPropertySet(_) -> ()
-
+        | SynExpr.LongIdent(_) -> ()
 
         | SynExpr.LongIdentSet(_,expr,_)
-        | SynExpr.DotGet(expr,_,_,_)
-        | SynExpr.DotSet(_,_,expr,_) ->
+        | SynExpr.DotGet(expr,_,_,_) ->
             x.ProcessLocalExpression expr
 
-        | SynExpr.DotIndexedGet(expr,_,_,_) -> () // todo
+        | SynExpr.NamedIndexedPropertySet(_,expr1,expr2,_)
+        | SynExpr.DotSet(expr1,_,expr2,_) ->
+            x.ProcessLocalExpression expr1
+            x.ProcessLocalExpression expr2
 
-        | SynExpr.DotIndexedSet(_) -> ()
+        | SynExpr.DotNamedIndexedPropertySet(expr1,_,expr2,expr3,_) ->
+            x.ProcessLocalExpression expr1
+            x.ProcessLocalExpression expr2
+            x.ProcessLocalExpression expr3
 
+        | SynExpr.DotIndexedGet(expr,indexerArgs,_,_) ->
+            x.ProcessLocalExpression expr
+            for arg in indexerArgs do
+                x.ProcessIndexerArg(arg)
+
+        | SynExpr.DotIndexedSet(expr1,indexerArgs,expr2,_,_,_) ->
+            x.ProcessLocalExpression expr1
+            for arg in indexerArgs do
+                x.ProcessIndexerArg(arg)
+            x.ProcessLocalExpression expr2
 
         | SynExpr.TypeTest(expr,t,_)
         | SynExpr.Upcast(expr,t,_)
@@ -723,6 +739,10 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
 
         | SynExpr.Fixed(expr,_) ->
             x.ProcessLocalExpression expr
+
+    member x.ProcessIndexerArg arg =
+        for expr in arg.Exprs do
+            x.ProcessLocalExpression(expr)
 
     override val Builder = PsiBuilder(lexer, ElementType.F_SHARP_IMPL_FILE, this, lifetime)
     override val NewLine = FSharpTokenType.NEW_LINE
