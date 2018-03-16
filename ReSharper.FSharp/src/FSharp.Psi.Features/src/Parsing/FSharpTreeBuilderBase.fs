@@ -444,7 +444,7 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
             | lid ->
                 for id in lid do
                     let isActivePattern = IsActivePatternName id.idText 
-                    if isActivePattern then x.ProcessActivePatternId id else x.ProcessIdentifier id
+                    if isActivePattern then x.ProcessActivePatternId id else x.ProcessLocalId id
             x.ProcessLocalParams patParams
         | SynPat.Named(pat,id,_,_,_) ->
             x.ProcessLocalPat pat
