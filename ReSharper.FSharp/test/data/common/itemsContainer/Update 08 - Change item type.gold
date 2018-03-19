@@ -1,0 +1,27 @@
+﻿Project
+1:File5 (CompileBefore)
+2:File1
+3:File2
+4:File3 (CompileAfter)
+5:File4 (CompileAfter)
+6:File6 (CompileAfter)
+
+=======
+Update file: 'File1' (Compile) -> 'File1' (Resource)
+Update view File1
+
+Update file: 'File2' (Compile) -> 'File2' (CompileBefore)
+Reload project Project
+
+Update file: 'File3' (CompileAfter) -> 'File3' (Resource)
+Reload project Project
+
+Update file: 'File4' (Compile) -> 'File4' (Compile)
+Update view File4
+
+Update file: 'File5' (CompileBefore) -> 'File5' (CompileAfter)
+Reload project Project
+
+Update file: 'File6' (CompileAfter) -> 'File6' (CompileBefore)
+Reload project Project
+

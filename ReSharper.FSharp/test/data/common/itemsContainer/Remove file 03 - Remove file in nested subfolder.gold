@@ -1,0 +1,18 @@
+﻿Project
+1:File1
+2:Folder[1]
+  1:SubFolder[1]
+    1:Subfolder[1]
+      1:File1
+  2:File4
+
+=======
+Remove 'Folder/Subfolder/Subfolder/File1'
+
+Project
+1:File1
+2:Folder[1]
+  1:SubFolder[1]
+    1:Subfolder[1]
+  2:File4
+

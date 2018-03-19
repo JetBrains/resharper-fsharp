@@ -1,0 +1,24 @@
+﻿Project
+1:File1
+2:Folder[1]
+  1:File2
+  2:File3
+  3:File4
+3:File5
+
+=======
+Update file: 'Folder/File2' (Compile) -> 'NewName1' (Compile)
+Update view NewName1
+Update file: 'Folder/File3' (Compile) -> 'NewName2' (Compile)
+Update view NewName2
+Update file: 'Folder/File4' (Compile) -> 'NewName3' (Compile)
+Update view NewName3
+
+Project
+1:File1
+2:Folder[1]
+  1:NewName1
+  2:NewName2
+  3:NewName3
+3:File5
+

@@ -1,0 +1,11 @@
+﻿
+=== Container Dump ===
+Project
+1:File1 (CompileBefore)
+2:File2
+
+=== Structure API ===
+File2 SortKey=2 ParentFolderIdentity=<null>
+File1 SortKey=1 ParentFolderIdentity=<null>
+
+=== Parent Folders API ===

@@ -1,0 +1,75 @@
+﻿Project
+1:File1
+2:Folder[1]
+  1:SubFolder[1]
+    1:File2
+    2:File3
+    3:File4
+  2:File5
+  3:SubFolder[2]
+    1:File6
+3:File7
+
+File1 Before File1 -> Before Folder/SubFolder/File2
+File1 After File1 -> Before Folder/SubFolder/File2
+File1 Before Folder (Folder [1]) -> Before Folder/SubFolder/File2
+File1 After Folder (Folder [1]) -> After Folder/SubFolder/File6
+File1 Before Folder/SubFolder (SubFolder [1]) -> Before Folder/SubFolder/File2
+File1 After Folder/SubFolder (SubFolder [1]) -> After Folder/SubFolder/File4
+File1 Before Folder/SubFolder (SubFolder [2]) -> Before Folder/SubFolder/File6
+File1 After Folder/SubFolder (SubFolder [2]) -> After Folder/SubFolder/File6
+
+Folder/SubFolder/File2 Before Folder (Folder [1]) -> After File1
+Folder/SubFolder/File2 After Folder (Folder [1]) -> After Folder/SubFolder/File6
+Folder/SubFolder/File2 Before Folder/SubFolder (SubFolder [1]) -> After File1
+Folder/SubFolder/File2 After Folder/SubFolder (SubFolder [1]) -> After Folder/SubFolder/File4
+Folder/SubFolder/File2 Before Folder/SubFolder/File2 -> After File1
+Folder/SubFolder/File2 After Folder/SubFolder/File2 -> Before Folder/SubFolder/File3
+Folder/SubFolder/File2 Before Folder/SubFolder (SubFolder [2]) -> Before Folder/SubFolder/File6
+Folder/SubFolder/File2 After Folder/SubFolder (SubFolder [2]) -> After Folder/SubFolder/File6
+
+Folder/SubFolder/File3 Before Folder (Folder [1]) -> Before Folder/SubFolder/File2
+Folder/SubFolder/File3 After Folder (Folder [1]) -> After Folder/SubFolder/File6
+Folder/SubFolder/File3 Before Folder/SubFolder (SubFolder [1]) -> Before Folder/SubFolder/File2
+Folder/SubFolder/File3 After Folder/SubFolder (SubFolder [1]) -> After Folder/SubFolder/File4
+Folder/SubFolder/File3 Before Folder/SubFolder/File3 -> After Folder/SubFolder/File2
+Folder/SubFolder/File3 After Folder/SubFolder/File3 -> Before Folder/SubFolder/File4
+Folder/SubFolder/File3 Before Folder/SubFolder (SubFolder [2]) -> Before Folder/SubFolder/File6
+Folder/SubFolder/File3 After Folder/SubFolder (SubFolder [2]) -> After Folder/SubFolder/File6
+
+Folder/SubFolder/File4 Before Folder (Folder [1]) -> Before Folder/SubFolder/File2
+Folder/SubFolder/File4 After Folder (Folder [1]) -> After Folder/SubFolder/File6
+Folder/SubFolder/File4 Before Folder/SubFolder (SubFolder [1]) -> Before Folder/SubFolder/File2
+Folder/SubFolder/File4 After Folder/SubFolder (SubFolder [1]) -> Before Folder/File5
+Folder/SubFolder/File4 Before Folder/SubFolder/File4 -> After Folder/SubFolder/File3
+Folder/SubFolder/File4 After Folder/SubFolder/File4 -> Before Folder/File5
+Folder/SubFolder/File4 Before Folder/SubFolder (SubFolder [2]) -> Before Folder/SubFolder/File6
+Folder/SubFolder/File4 After Folder/SubFolder (SubFolder [2]) -> After Folder/SubFolder/File6
+
+Folder/File5 Before Folder (Folder [1]) -> Before Folder/SubFolder/File2
+Folder/File5 After Folder (Folder [1]) -> After Folder/SubFolder/File6
+Folder/File5 Before Folder/SubFolder (SubFolder [1]) -> Before Folder/SubFolder/File2
+Folder/File5 After Folder/SubFolder (SubFolder [1]) -> After Folder/SubFolder/File4
+Folder/File5 Before Folder/File5 -> After Folder/SubFolder/File4
+Folder/File5 After Folder/File5 -> Before Folder/SubFolder/File6
+Folder/File5 Before Folder/SubFolder (SubFolder [2]) -> Before Folder/SubFolder/File6
+Folder/File5 After Folder/SubFolder (SubFolder [2]) -> After Folder/SubFolder/File6
+
+Folder/SubFolder/File6 Before Folder (Folder [1]) -> Before Folder/SubFolder/File2
+Folder/SubFolder/File6 After Folder (Folder [1]) -> Before File7
+Folder/SubFolder/File6 Before Folder/SubFolder (SubFolder [1]) -> Before Folder/SubFolder/File2
+Folder/SubFolder/File6 After Folder/SubFolder (SubFolder [1]) -> After Folder/SubFolder/File4
+Folder/SubFolder/File6 Before Folder/SubFolder (SubFolder [2]) -> After Folder/File5
+Folder/SubFolder/File6 After Folder/SubFolder (SubFolder [2]) -> Before File7
+Folder/SubFolder/File6 Before Folder/SubFolder/File6 -> After Folder/File5
+Folder/SubFolder/File6 After Folder/SubFolder/File6 -> Before File7
+
+File7 Before Folder (Folder [1]) -> Before Folder/SubFolder/File2
+File7 After Folder (Folder [1]) -> After Folder/SubFolder/File6
+File7 Before Folder/SubFolder (SubFolder [1]) -> Before Folder/SubFolder/File2
+File7 After Folder/SubFolder (SubFolder [1]) -> After Folder/SubFolder/File4
+File7 Before Folder/SubFolder (SubFolder [2]) -> Before Folder/SubFolder/File6
+File7 After Folder/SubFolder (SubFolder [2]) -> After Folder/SubFolder/File6
+File7 Before File7 -> After Folder/SubFolder/File6
+File7 After File7 -> After Folder/SubFolder/File6
+

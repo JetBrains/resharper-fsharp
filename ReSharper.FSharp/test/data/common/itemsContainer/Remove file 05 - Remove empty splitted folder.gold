@@ -1,0 +1,18 @@
+﻿Project
+1:File1
+2:Folder[1]
+  1:File2
+3:File3
+4:Folder[2]
+  1:File4
+
+=======
+Remove 'Folder/File4'
+Refresh whole project
+
+Project
+1:File1
+2:Folder[1]
+  1:File2
+3:File3
+

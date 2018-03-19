@@ -1,0 +1,20 @@
+﻿Project
+1:File1
+2:Folder[1]
+  1:SubFolder[1]
+    1:File1
+  2:File4
+
+=======
+Move 'Folder/File4' after 'File1':
+Remove 'Folder/File4'
+Add 'File4' After 'File1'
+Update view Folder[1]
+
+Project
+1:File1
+2:File4
+3:Folder[1]
+  1:SubFolder[1]
+    1:File1
+

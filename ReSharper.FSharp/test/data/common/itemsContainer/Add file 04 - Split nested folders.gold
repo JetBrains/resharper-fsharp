@@ -1,0 +1,33 @@
+﻿Project
+1:Folder[1]
+  1:SubFolder[1]
+    1:File1
+    2:File2
+
+=======
+Add 'Folder/File3' Before 'Folder/SubFolder/File2'
+Refresh Folder[1]
+Update view Folder/SubFolder[2]
+
+Project
+1:Folder[1]
+  1:SubFolder[1]
+    1:File1
+  2:File3
+  3:SubFolder[2]
+    1:File2
+
+=======
+Add 'Folder/File3' After 'Folder/SubFolder/File1'
+Refresh Folder[1]
+Update view Folder/SubFolder[2]
+
+Project
+1:Folder[1]
+  1:SubFolder[1]
+    1:File1
+  2:File3
+  3:SubFolder[2]
+    1:File2
+
+Dumps are equal: True

@@ -136,3 +136,47 @@ module CommonUtil =
 
     let (|PsiModuleReference|) (ref: IPsiModuleReference) =
         ref.Module
+
+    let (|ProjectFile|ProjectFolder|UnknownProjectItem|) (projectItem: IProjectItem) =
+        match projectItem with
+        | :? IProjectFile as file -> ProjectFile file
+        | :? IProjectFolder as folder -> ProjectFolder folder
+        | _ -> UnknownProjectItem
+
+[<AutoOpen>]
+module rec FSharpMsBuildUtils =
+    open System
+    open ItemTypes
+    open JetBrains.ProjectModel
+
+    module ItemTypes =
+        let [<Literal>] compileBeforeBuildAction = "CompileBefore"
+        let [<Literal>] compileAfterBuildAction = "CompileAfter"
+        let [<Literal>] folder = "Folder"
+
+    let isCompileBefore (itemType: string) =
+      itemType.Equals(compileBeforeBuildAction, StringComparison.OrdinalIgnoreCase)
+
+    let isCompileAfter (itemType: string) =
+      itemType.Equals(compileAfterBuildAction, StringComparison.OrdinalIgnoreCase)
+
+    let (|CompileBefore|_|) itemType =
+        if isCompileBefore itemType then Some () else None
+
+    let (|CompileAfter|_|) itemType =
+            if isCompileAfter itemType then Some () else None
+
+    let (|Folder|_|) itemType =
+        if isFolder itemType then Some () else None
+
+    let isFolder (itemType: string) =
+      itemType.Equals(folder, StringComparison.OrdinalIgnoreCase)
+
+    let changesOrder (itemType: string) =
+        isCompileBefore itemType || isCompileAfter itemType
+
+    type BuildAction with
+        member x.ChangesOrder() = changesOrder x.Value
+
+    let (|BuildAction|) itemType =
+        BuildAction.GetOrCreate(itemType)

@@ -1,0 +1,20 @@
+﻿
+=== Container Dump ===
+Project
+1:Folder[1]
+  1:File1 (CompileBefore)
+  2:File2
+2:File3
+3:File4
+
+=== Structure API ===
+Folder SortKey=1
+  File2 SortKey=2 ParentFolderIdentity=Some(1)
+File3 SortKey=2 ParentFolderIdentity=<null>
+Folder SortKey=1
+  File1 SortKey=1 ParentFolderIdentity=Some(1)
+File4 SortKey=3 ParentFolderIdentity=<null>
+
+=== Parent Folders API ===
+Folder
+  Folder[1] -> <null>

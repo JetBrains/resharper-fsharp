@@ -1,0 +1,34 @@
+﻿Project
+1:File1
+2:File2
+3:File3
+4:File4
+5:File5
+
+=======
+Add 'File6' Before 'File4'
+Update view File4
+Update view File5
+
+Project
+1:File1
+2:File2
+3:File3
+4:File6
+5:File4
+6:File5
+
+=======
+Add 'File6' After 'File3'
+Update view File4
+Update view File5
+
+Project
+1:File1
+2:File2
+3:File3
+4:File6
+5:File4
+6:File5
+
+Dumps are equal: True

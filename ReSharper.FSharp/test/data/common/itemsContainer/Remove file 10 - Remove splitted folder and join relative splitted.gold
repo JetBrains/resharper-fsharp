@@ -1,0 +1,27 @@
+﻿Project
+1:File1
+2:Folder[1]
+  1:SubFolder[1]
+    1:File2
+3:Another[1]
+  1:File3
+4:Folder[2]
+  1:SubFolder[2]
+    1:File4
+5:Another[2]
+  1:File5
+
+=======
+Remove 'Another/File3'
+Refresh whole project
+Update view Another[1]
+
+Project
+1:File1
+2:Folder[1]
+  1:SubFolder[1]
+    1:File2
+    2:File4
+3:Another[1]
+  1:File5
+

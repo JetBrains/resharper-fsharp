@@ -1,0 +1,41 @@
+﻿Project
+1:Folder[1]
+  1:SubFolder[1]
+    1:File1
+  2:File2
+2:File3
+3:Folder[2]
+  1:SubFolder[2]
+    1:File4
+
+=======
+Rename 'Folder/SubFolder' to 'Folder/SubFolderNewName'
+Update folder: 'Folder/SubFolder' -> 'Folder/SubFolderNewName'
+Update view Folder/SubFolderNewName[1]
+Update view Folder/SubFolderNewName[2]
+
+Project
+1:Folder[1]
+  1:SubFolderNewName[1]
+    1:File1
+  2:File2
+2:File3
+3:Folder[2]
+  1:SubFolderNewName[2]
+    1:File4
+
+Rename 'Folder' to 'NewName'
+Update folder: 'Folder' -> 'NewName'
+Update view NewName[1]
+Update view NewName[2]
+
+Project
+1:NewName[1]
+  1:SubFolderNewName[1]
+    1:File1
+  2:File2
+2:File3
+3:NewName[2]
+  1:SubFolderNewName[2]
+    1:File4
+

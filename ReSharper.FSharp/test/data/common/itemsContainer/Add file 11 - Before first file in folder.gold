@@ -1,0 +1,20 @@
+﻿Project
+1:File1
+2:File2
+3:Folder[1]
+  1:File3
+4:File4
+
+=======
+Add 'File5' Before 'Folder/File3'
+Update view Folder[1]
+Update view File4
+
+Project
+1:File1
+2:File2
+3:File5
+4:Folder[1]
+  1:File3
+5:File4
+

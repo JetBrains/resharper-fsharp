@@ -1,0 +1,24 @@
+﻿Project
+1:File1
+2:Folder[1]
+  1:SubFolder[1]
+    1:File2
+  2:File3
+  3:SubFolder[2]
+    1:File4
+3:File5
+
+=======
+Update folder: 'Folder' -> 'NewName'
+Update view NewName[1]
+
+Project
+1:File1
+2:NewName[1]
+  1:SubFolder[1]
+    1:File2
+  2:File3
+  3:SubFolder[2]
+    1:File4
+3:File5
+

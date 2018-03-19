@@ -1,0 +1,23 @@
+﻿Project
+1:File1
+2:Folder[1]
+  1:Subfolder[1]
+    1:File1
+  2:File2
+  3:Subfolder[2]
+    1:File3
+  4:File4
+
+=======
+Remove 'Folder/File2'
+Refresh Folder[1]
+Update view Folder/File4
+
+Project
+1:File1
+2:Folder[1]
+  1:Subfolder[1]
+    1:File1
+    2:File3
+  2:File4
+

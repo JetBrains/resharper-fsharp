@@ -1,0 +1,11 @@
+﻿Project
+
+=======
+Add 'Folder/Subfolder/File1'
+Refresh whole project
+
+Project
+1:Folder[1]
+  1:Subfolder[1]
+    1:File1
+
