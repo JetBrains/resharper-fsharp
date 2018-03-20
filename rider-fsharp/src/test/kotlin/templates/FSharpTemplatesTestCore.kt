@@ -73,6 +73,7 @@ abstract class FSharpTemplatesTestCore : BaseTestWithSolutionBase() {
         }
     }
 
+    @Test(enabled = false) //RIDER-14467
     @TestToolset(ToolsetVersion.toolset15CoreSDK)
     fun classlibNetCoreAppTemplate() {
         val projectName = "ClassLibrary"
@@ -121,6 +122,7 @@ abstract class FSharpTemplatesTestCore : BaseTestWithSolutionBase() {
     }
 
 
+    @Test(enabled = false) //RIDER-14467
     @TestToolset(ToolsetVersion.toolset15CoreSDK)
     fun xUnitCoreTemplate() {
         val projectName = "UnitTestProject"
