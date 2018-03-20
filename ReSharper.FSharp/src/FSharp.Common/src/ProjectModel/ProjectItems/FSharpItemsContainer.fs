@@ -4,6 +4,7 @@ open System
 open System.Collections.Generic
 open System.IO
 open System.Linq
+open JetBrains.Application
 open JetBrains.Application.Components
 open JetBrains.Application.DataContext
 open JetBrains.Application.Threading
@@ -198,7 +199,6 @@ type ProjectMapping(projectMark, items, targetFrameworks, refresher: IFSharpItem
                 updateItem item)
 
     let addFolder parent sortKey path updateItem =
-         // todo: logical path
         let folderItem = FolderItem(ItemInfo.Create(path, path, parent, sortKey), getNewFolderIdentity path)
         moveFollowingItems parent sortKey MoveDirection.Down updateItem
         itemsByPath.Add(path, folderItem)
@@ -216,8 +216,6 @@ type ProjectMapping(projectMark, items, targetFrameworks, refresher: IFSharpItem
             itemsByPath.Add(path, folderItem) 
             folderItem)
         |> ProjectItem
-            // todo: logical path
-            // todo: move items
 
     do
         let projectDirectory = projectMark.Location.Directory
@@ -823,3 +821,8 @@ type FSharpItemModificationContextProvider(container: IFSharpItemsContainer) =
         |> Option.map (fun (path, relativeToType) ->
             let relativeProjectItem = project.FindProjectItemsByLocation(path).First()
             RiderItemModificationContext(RelativeTo(relativeProjectItem, relativeToType)))
+
+[<ShellComponent>]
+type FSharpModificationSettingsProvider() =
+    interface IMsBuildModificationSettingsProvider with
+        member x.SmartModificationsFilter = ["fsproj"] :> _
