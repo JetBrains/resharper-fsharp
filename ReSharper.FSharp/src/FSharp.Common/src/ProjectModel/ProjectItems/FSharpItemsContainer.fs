@@ -35,7 +35,10 @@ type FSharpItemsContainer(refresher: IFSharpItemsContainerRefresher) =
     let tryGetProjectMapping (projectItem: IProjectItem) =
         match projectItem.GetProject() with
         | null -> None
-        | project -> project.GetProjectMark() |> tryGetValue projectMappings
+        | project ->
+            match project.GetProjectMark() with
+            | null -> None
+            | projectMark -> tryGetValue projectMappings projectMark
 
     let tryGetProjectItem (viewItem: FSharpViewItem) =
         tryGetProjectMapping viewItem.ProjectItem
@@ -770,7 +773,8 @@ type FSharpItemsContainerRefresher(lifetime: Lifetime, solution: ISolution, view
                     navigationManager.Navigate(points, options)))))
 
 
-[<AbstractClass>]
+// todo: extract IProjectElementHolder interface back in ReSharperHost
+[<AbstractClass; AllowNullLiteral>]
 type FSharpViewItem(item: IProjectItem) =
     inherit ProjectElementHolder(item)
 
@@ -784,13 +788,24 @@ type FSharpViewFile(file: IProjectFile) =
 
     member x.ProjectFile = file
 
-
+[<AllowNullLiteral>]
 type FSharpViewFolder(folder: IProjectFolder, identity: FSharpViewFolderIdentity) =
     inherit FSharpViewItem(folder)
 
     member x.ProjectFolder = folder
     member x.Identitiy = identity
     override x.ToString() = sprintf "%s[%O]" folder.Name identity
+
+    override x.Equals(other: obj) =
+        match other with
+        | null -> false
+        | :? FSharpViewFolder as folder ->
+            obj.ReferenceEquals(x, other) ||
+            x.ProjectFolder.Equals(folder.ProjectFolder) && x.Identitiy = folder.Identitiy
+        | _ -> false
+
+    override x.GetHashCode() =
+        x.ProjectFolder.GetHashCode() * 397 ^^^ x.Identitiy.GetHashCode()
 
 
 type FSharpViewFolderIdentity =

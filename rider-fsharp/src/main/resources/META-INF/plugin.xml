@@ -42,6 +42,8 @@
     <lang.documentationProvider language="F# Script" implementationClass="com.jetbrains.rider.quickDoc.RiderDocumentationProvider"/>
 
     <rider.ProjectTypesProvider implementation="com.jetbrains.rider.projectView.projectTypes.FSharpProjectTypeProvider" />
+    <moveProviderExtension implementation="com.jetbrains.rider.plugins.fsharp.projectView.FSharpMoveProviderExtension"/>
+    <solutionExplorerCustomization implementation="com.jetbrains.rider.plugins.fsharp.projectView.FSharpSolutionExplorerCustomization" />
     <codeFoldingOptionsProvider instance="com.jetbrains.rider.plugins.fsharp.settings.FSharpCodeFoldingProvider" />
     <applicationService serviceImplementation="com.jetbrains.rider.plugins.fsharp.settings.FSharpCodeFoldingSettings"/>
 

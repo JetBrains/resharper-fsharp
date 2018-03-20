@@ -11,10 +11,10 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
 open JetBrains.Rider.Model
 open JetBrains.Util
 
-[<SolutionFeaturePart>]
+[<SolutionComponent>]
 type FSharpProjectStructureProvider(container: IFSharpItemsContainer) =
-    interface  IProjectStructureProvider with
-        member x.Priority = 100
+    interface IProjectStructureProvider with
+        member x.Priority = 10
 
         member x.Process(projectItem) =
             if not (container.IsApplicable(projectItem)) then null else
