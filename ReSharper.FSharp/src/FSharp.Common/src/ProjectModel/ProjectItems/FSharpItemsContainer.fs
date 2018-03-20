@@ -14,6 +14,7 @@ open JetBrains.Platform.MsBuildHost.Models
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost.MsBuild
+open JetBrains.ProjectModel.ProjectsHost.MsBuild.Structure
 open JetBrains.ProjectModel.ProjectsHost.SolutionHost
 open JetBrains.ReSharper.Feature.Services.Navigation
 open JetBrains.ReSharper.Feature.Services.Navigation.NavigationProviders
@@ -62,15 +63,17 @@ type FSharpItemsContainer(refresher: IFSharpItemsContainerRefresher) =
             match projectMark with
             | FSharProjectMark ->
                 let rdProject = msBuildProject.RdProjects |> Seq.head // todo: items by framework
+                let filter = MsBuildItemTypeFilter(rdProject)
+                let items =
+                    rdProject.Items
+                    |> Seq.filter (fun item -> not (filter.FilterByItemType(item.ItemType, item.IsImported())))
+                    |> List.ofSeq
                 let compileBeforeItems =
-                    rdProject.Items
-                    |> Seq.filter (fun item -> match item.ItemType with | CompileBefore -> true | _ -> false)
+                    items |> List.filter (fun item -> match item.ItemType with | CompileBefore -> true | _ -> false)
                 let compileAfterItems =
-                    rdProject.Items
-                    |> Seq.filter (fun item -> match item.ItemType with | CompileAfter -> true | _ -> false)
+                    items |> List.filter (fun item -> match item.ItemType with | CompileAfter -> true | _ -> false)
                 let restItems =
-                    rdProject.Items
-                    |> Seq.filter (fun item -> item.ItemType |> changesOrder |> not)
+                    items |> List.filter (fun item -> item.ItemType |> changesOrder |> not)
                 let items = compileBeforeItems.Concat(restItems).Concat(compileAfterItems) |> List.ofSeq
                 let targetFrameworkIds = msBuildProject.TargetFrameworkIds |> List.ofSeq
 
