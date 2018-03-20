@@ -20,6 +20,7 @@ type ErrorsStageProcessBase(daemonProcess, errors: FSharpErrorInfo[]) =
     // https://github.com/fsharp/FSharp.Compiler.Service/blob/9.0.0/src/fsharp/CompileOps.fs#L246
     // https://github.com/fsharp/FSharp.Compiler.Service/blob/9.0.0/src/fsharp/FSComp.txt
     let [<Literal>] ErrorNumberUndefined = 39
+    let [<Literal>] ErrorNumberUnused = 1182
     let [<Literal>] ErronNumberModuleOrNamespaceRequired = 222
 
     let document = daemonProcess.Document
@@ -35,8 +36,9 @@ type ErrorsStageProcessBase(daemonProcess, errors: FSharpErrorInfo[]) =
     let createHighlighting(error: FSharpErrorInfo, range: DocumentRange): IHighlighting =
         let message = error.Message
         match error.Severity, error.ErrorNumber with
-        | FSharpErrorSeverity.Warning, _ -> WarningHighlighting(message, range) :> _
         | _, ErrorNumberUndefined -> UnresolvedHighlighting(message, range) :> _
+        | _, ErrorNumberUnused -> UnusedHighlighting(message, range) :> _
+        | FSharpErrorSeverity.Warning, _ -> WarningHighlighting(message, range) :> _
         | _ -> ErrorHighlighting(message, range) :> _
 
     override x.Execute(committer) =

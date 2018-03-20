@@ -34,10 +34,15 @@ type WarningHighlighting(message, range) =
 type UnresolvedHighlighting(message, range) = 
     inherit ErrorOrWarningHighlightingBase(message, range)
 
+[<StaticSeverityHighlighting(Severity.WARNING, HighlightingGroupIds.IdentifierHighlightingsGroup, 
+                             AttributeId = HighlightingAttributeIds.DEADCODE_ATTRIBUTE, 
+                             OverlapResolve = OverlapResolveKind.NONE)>]
+type UnusedHighlighting(message, range) = 
+    inherit ErrorOrWarningHighlightingBase(message, range)
 
 [<StaticSeverityHighlighting(Severity.INFO, HighlightingGroupIds.IdentifierHighlightingsGroup,
                              AttributeId = HighlightingAttributeIds.DEADCODE_ATTRIBUTE,
-                             OverlapResolve = OverlapResolveKind.DEADCODE)>]
+                             OverlapResolve = OverlapResolveKind.NONE)>]
 type DeadCodeHighlighting(range) =
     interface IHighlighting with
         member x.IsValid() = true
