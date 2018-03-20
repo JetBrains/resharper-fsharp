@@ -184,7 +184,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (document == null) return null;
 
       var idToken = fsFile.FindTokenAt(document.GetTreeEndOffset(range) - 1);
-      return idToken?.GetContainingNode<T>();
+      return idToken?.GetContainingNode<T>(true);
     }
   }
 }
