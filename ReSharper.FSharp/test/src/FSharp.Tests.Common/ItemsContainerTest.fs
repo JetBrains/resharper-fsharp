@@ -122,7 +122,8 @@ let getOrCreateFolder (AbsolutePath path) solutionItems: IProjectFolder =
 
 
 let createViewItems solutionItems item : seq<FSharpViewItem> = seq {
-    let components = item.EvaluatedInclude.Split('/')
+    let logicalPath = if isNotNull item.Link then item.Link else item.EvaluatedInclude
+    let components = logicalPath.Split('/')
 
     let mutable path = projectDirectory
     for itemComponent in Seq.take (components.Length - 1) components do
@@ -214,10 +215,10 @@ type FSharpItemsContainerTest() =
     [<Test>]
     member x.``Initialization 07 - Linked files``() =
         x.DoContainerInitializationTest(
-            [ createItem "Compile" "File1"
-              createItem "Compile" "..\\ExternalFolder\\File2"
-              createItem "Compile" "..\\ExternalFolder\\File3" |> link "File3"
-              createItem "Compile" "..\\ExternalFolder\\File4" |> link "LinkFolder\\File4" ])
+            [ createItem "Compile"      "File1"
+              createItem "Compile"      "..\\ExternalFolder\\File3" |> link "File3"
+              createItem "CompileAfter" "..\\ExternalFolder\\File4" |> link "LinkFolder\\File4"
+              createItem "Compile"      "..\\ExternalFolder\\File5" |> link "LinkFolder\\File5" ])
 
     [<Test>]
     member x.``Initialization 08 - Empty folders``() =
@@ -740,6 +741,14 @@ type FSharpItemsContainerTest() =
                  container.OnUpdateFile("Compile", "File1", "Resource", "File1")
                  writer.WriteLine()
                  container.OnUpdateFile("Resource", "File2", "Compile", "File2"))
+
+    [<Test>]
+    member x.``Update 10 - Change linked item type``() =
+        x.DoContainerModificationTest(
+            [ createItem "Compile" "..\\ExternalFolder\\File1" |> link "File1" ],
+            fun container writer ->
+                 container.OnUpdateFile("Compile", "File1", "Resource", "File1"))
+
 
     member x.DoCreateModificationContextTest(items: AnItem list) =
         let relativeToTypes = [ RelativeToType.Before; RelativeToType.After ]

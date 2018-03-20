@@ -264,7 +264,7 @@ type ProjectMapping(projectMark, items, targetFrameworks, refresher: IFSharpItem
                 | Folder -> addFolder parent currentState.NextSortKey logicalPath ignore |> ignore
                 | BuildAction buildAction ->
                     let itemInfo = ItemInfo.Create(physicalPath, logicalPath, parent, currentState.NextSortKey)
-                    itemsByPath.Add(physicalPath, FileItem (itemInfo, buildAction, [])) // todo: framework ids
+                    itemsByPath.Add(logicalPath, FileItem (itemInfo, buildAction, [])) // todo: framework ids
             | _ -> ()
 
     let (|EmptyFolder|_|) projectItem =
@@ -535,7 +535,7 @@ type ProjectMapping(projectMark, items, targetFrameworks, refresher: IFSharpItem
         Assertion.Assert(oldLocation.Parent = newLocation.Parent, "oldLocation.Parent = newLocation.Parent")
         let _, itemUpdater, refresh = createRefreshers ()
         renameFolder oldLocation newLocation itemUpdater
-        refresh () 
+        refresh ()
 
     member x.TryGetProjectItem(viewItem: FSharpViewItem): FSharpProjectItem option =
         let itemsForPath = getItemsForPath viewItem.ProjectItem.Location
@@ -614,11 +614,7 @@ type ProjectMapping(projectMark, items, targetFrameworks, refresher: IFSharpItem
     member x.Dump(writer: TextWriter) =
         let rec dump (parent: FSharpProjectModelElement) ident =
             for item in getChildren parent do
-                let itemType =
-                    match item with
-                    | FileItem (_, buildAction, _) when not (buildAction.IsCompile()) -> sprintf " (%O)" buildAction
-                    | _ -> String.Empty
-                writer.WriteLine(sprintf "%s%d:%O%s" (String(' ', ident * 2)) item.SortKey item itemType)
+                writer.WriteLine(sprintf "%s%d:%O" (String(' ', ident * 2)) item.SortKey item)
                 dump (ProjectItem item) (ident + 1)
         dump Project 0
 
@@ -652,6 +648,8 @@ type FSharpProjectItem =
         let name =
             match x with
             | FolderItem (_, id) as folderItem -> sprintf "%s[%d]" x.LogicalPath.Name id.Identity
+            | FileItem (_, buildAction, _) when
+                    not (buildAction.IsCompile()) -> sprintf "%s (%O)" x.LogicalPath.Name buildAction
             | _ -> x.LogicalPath.Name
         if x.PhysicalPath = x.LogicalPath then name else
         name + (sprintf " (from %O)" x.PhysicalPath)

@@ -2,16 +2,16 @@
 === Container Dump ===
 Project
 1:File1
-2:File2 (from C:\Solution\ExternalFolder\File2)
-3:File3 (from C:\Solution\ExternalFolder\File3)
-4:LinkFolder[1]
-  1:File4 (from C:\Solution\ExternalFolder\File4)
+2:File3 (from C:\Solution\ExternalFolder\File3)
+3:LinkFolder[1]
+  1:File5 (from C:\Solution\ExternalFolder\File5)
+  2:File4 (CompileAfter) (from C:\Solution\ExternalFolder\File4)
 
 === Structure API ===
 File1 SortKey=1 ParentFolderIdentity=<null>
-File2 SortKey=2 ParentFolderIdentity=<null>
-File3 SortKey=3 ParentFolderIdentity=<null>
-File4 SortKey=1 ParentFolderIdentity=Some(1)
+File3 SortKey=2 ParentFolderIdentity=<null>
+File4 SortKey=2 ParentFolderIdentity=Some(1)
+File5 SortKey=1 ParentFolderIdentity=Some(1)
 
 === Parent Folders API ===
 ..
