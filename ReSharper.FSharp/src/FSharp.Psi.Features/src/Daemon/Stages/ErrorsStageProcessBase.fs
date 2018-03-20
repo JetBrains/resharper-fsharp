@@ -32,26 +32,18 @@ type ErrorsStageProcessBase(daemonProcess, errors: FSharpErrorInfo[]) =
             let endOffset = document.GetDocumentOffset(error.EndLineAlternate - 1, error.EndColumn)
             DocumentRange(document, TextRange(startOffset, endOffset))
 
-    let createHighlighting(errors: FSharpErrorInfo[], range: DocumentRange): IHighlighting =
-        let firstError = errors.[0]
-        let message =
-            let msgBuilder = StringBuilder(firstError.Message)
-            errors
-            |> Seq.distinctBy (fun e -> e.Message)
-            |> Seq.tail
-            |> Seq.iter (fun x ->
-                msgBuilder.Append(RiderTooltipSeparator).Append(x.Message) |> ignore)
-            msgBuilder.ToString()
-
-        match firstError.Severity, firstError.ErrorNumber with
+    let createHighlighting(error: FSharpErrorInfo, range: DocumentRange): IHighlighting =
+        let message = error.Message
+        match error.Severity, error.ErrorNumber with
         | FSharpErrorSeverity.Warning, _ -> WarningHighlighting(message, range) :> _
         | _, ErrorNumberUndefined -> UnresolvedHighlighting(message, range) :> _
         | _ -> ErrorHighlighting(message, range) :> _
 
     override x.Execute(committer) =
         let highlightings = ResizeArray<_>(errors.Length)
-        for range, errorsAtRange in errors |> Array.groupBy (fun error -> getDocumentRange error) do
-            highlightings.Add(HighlightingInfo(range, createHighlighting(errorsAtRange, range)))
+        for error in errors do
+            let range = getDocumentRange error
+            highlightings.Add(HighlightingInfo(range, createHighlighting(error, range)))
             x.SeldomInterruptChecker.CheckForInterrupt()
 
         committer.Invoke(DaemonStageResult(highlightings))
