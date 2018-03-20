@@ -768,8 +768,8 @@ type FSharpItemsContainerTest() =
                         let relativeFileItemType = itemTypes.TryGetValue(relativeItem.Location)
                         let sameItemType =
                             isNotNull modifiedFileItemType &&
-                            modifiedFileItemType.Equals(relativeFileItemType, StringComparison.OrdinalIgnoreCase)
-      
+                            equalsIgnoreCase modifiedFileItemType relativeFileItemType
+
                         let context =
                             contextProvider.CreateModificationContext(modifiedViewFile, relativeViewItem, relativeToType)
                         match relativeViewItem, context with
@@ -898,15 +898,14 @@ type FSharpItemsContainerTest() =
                 writer.WriteLine("=== Parent Folders API ===")
 
                 let emptyFolders =
-                    items
-                    |> List.filter (fun item -> isFolder item.ItemType)
-                    |> List.map (fun item -> FileSystemPath.Parse(removeIdentities item.EvaluatedInclude))
+                    items |> List.choose (fun item ->
+                        match item.ItemType with
+                        | Folder -> Some (FileSystemPath.Parse(removeIdentities item.EvaluatedInclude))
+                        | _ -> None)
 
                 let folders =
-                    items
-                    |> Seq.collect (fun item ->
-                        let evaluatedInclude = removeIdentities item.EvaluatedInclude
-                        FileSystemPath.Parse(evaluatedInclude).GetParentDirectories())
+                    items |> Seq.collect (fun item ->
+                        FileSystemPath.Parse(removeIdentities item.EvaluatedInclude).GetParentDirectories())
                     |> Seq.append emptyFolders
                     |> HashSet
 

@@ -44,7 +44,7 @@ type PaketRestoreTargetsAnalyzer(lifetime, solution: ISolution, settingsStore: S
         member x.OnProjectLoaded(_, msBuildProject) =
             if isNull msBuildProject || x.RestoreWasDisabled then () else
                 let props = msBuildProject.RdProjectDescription.Properties
-                if props |> Seq.exists (fun p -> p.Name.Equals(paketPropName, StringComparison.OrdinalIgnoreCase)) then
+                if props |> Seq.exists (fun p -> equalsIgnoreCase paketPropName p.Name) then
                     let context = solution.ToDataContext()
                     let solutionSettingsStore = settingsStore.BindToContextLive(lifetime, ContextRange.Smart(context))
                     match solutionSettingsStore.GetValue(fun (s: NuGetOptions) -> s.ConfigRestoreEnabled) with

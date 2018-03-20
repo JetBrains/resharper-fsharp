@@ -1,7 +1,7 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Common.Util
 
 [<AutoOpen>]
-module CommonUtil =
+module rec CommonUtil =
     open System
     open System.Collections.Generic
     open System.Linq
@@ -35,7 +35,7 @@ module CommonUtil =
     let FsprojExtension = "fsproj"
 
     let isFSharpProject (guids: Guid seq) (projectFile: FileSystemPath) =
-        projectFile.ExtensionNoDot.Equals(FsprojExtension, StringComparison.OrdinalIgnoreCase) ||
+        equalsIgnoreCase FsprojExtension projectFile.ExtensionNoDot ||
         Seq.exists Factory.IsKnownProjectTypeGuid guids
 
     let (|FSharProjectMark|_|) (mark: IProjectMark) =
@@ -143,6 +143,9 @@ module CommonUtil =
         | :? IProjectFolder as folder -> ProjectFolder folder
         | _ -> UnknownProjectItem
 
+    let inline equalsIgnoreCase other (string: string) =
+        string.Equals(other, StringComparison.OrdinalIgnoreCase)
+
 [<AutoOpen>]
 module rec FSharpMsBuildUtils =
     open System
@@ -150,33 +153,25 @@ module rec FSharpMsBuildUtils =
     open JetBrains.ProjectModel
 
     module ItemTypes =
-        let [<Literal>] compileBeforeBuildAction = "CompileBefore"
-        let [<Literal>] compileAfterBuildAction = "CompileAfter"
-        let [<Literal>] folder = "Folder"
+        let [<Literal>] compileBeforeItemType = "CompileBefore"
+        let [<Literal>] compileAfterItemType = "CompileAfter"
+        let [<Literal>] folderItemType = "Folder"
 
-    let isCompileBefore (itemType: string) =
-      itemType.Equals(compileBeforeBuildAction, StringComparison.OrdinalIgnoreCase)
+    let (|CompileBefore|_|) (itemType: string) =
+        if equalsIgnoreCase compileBeforeItemType itemType then Some () else None
 
-    let isCompileAfter (itemType: string) =
-      itemType.Equals(compileAfterBuildAction, StringComparison.OrdinalIgnoreCase)
+    let (|CompileAfter|_|) (itemType: string) =
+        if equalsIgnoreCase compileAfterItemType itemType then Some () else None
 
-    let (|CompileBefore|_|) itemType =
-        if isCompileBefore itemType then Some () else None
-
-    let (|CompileAfter|_|) itemType =
-            if isCompileAfter itemType then Some () else None
-
-    let (|Folder|_|) itemType =
-        if isFolder itemType then Some () else None
-
-    let isFolder (itemType: string) =
-      itemType.Equals(folder, StringComparison.OrdinalIgnoreCase)
-
-    let changesOrder (itemType: string) =
-        isCompileBefore itemType || isCompileAfter itemType
-
-    type BuildAction with
-        member x.ChangesOrder() = changesOrder x.Value
+    let (|Folder|_|) (itemType: string) =
+        if equalsIgnoreCase folderItemType itemType then Some () else None
 
     let (|BuildAction|) itemType =
         BuildAction.GetOrCreate(itemType)
+
+    let changesOrder = function
+        | CompileBefore | CompileAfter -> true
+        | _ -> false
+
+    type BuildAction with
+        member x.ChangesOrder() = changesOrder x.Value
