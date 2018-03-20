@@ -317,8 +317,8 @@ type ProjectMapping(projectMark, items, targetFrameworks, refresher: IFSharpItem
                 | _ -> ()
             for item in itemsToUpdate do
                 match item with
-                | FileItem _ -> refresher.Update(projectMark, item.ItemInfo.PhysicalPath)
-                | FolderItem (_, id) -> refresher.Update(projectMark, item.ItemInfo.PhysicalPath, id)
+                | FileItem _ -> refresher.Update(projectMark, item.ItemInfo.LogicalPath)
+                | FolderItem (_, id) -> refresher.Update(projectMark, item.ItemInfo.LogicalPath, id)
 
         refreshFolder, updateItem, refresh
 
@@ -433,6 +433,7 @@ type ProjectMapping(projectMark, items, targetFrameworks, refresher: IFSharpItem
                 match childItem with
                 | FileItem _ as childFileItem ->
                     childFileItem.ItemInfo.LogicalPath <- newChildLocation
+                    childFileItem.ItemInfo.PhysicalPath <- newLocation / childItem.PhysicalPath.Name
                     itemsByPath.RemoveKey(oldChildLocation) |> ignore
                     itemsByPath.Add(newChildLocation, childFileItem)
                 | FolderItem _ ->
@@ -563,7 +564,7 @@ type ProjectMapping(projectMark, items, targetFrameworks, refresher: IFSharpItem
             | Some relativeItem, Some relativeToType ->
                 let relativeItemParent =
                     match relativeItem with
-                    | FolderItem _ when relativeItem.PhysicalPath = relativeToPath -> ProjectItem relativeItem
+                    | FolderItem _ when relativeItem.LogicalPath = relativeToPath -> ProjectItem relativeItem
                     | _ -> relativeItem.Parent
 
                 let parent, sortKey =
@@ -600,14 +601,14 @@ type ProjectMapping(projectMark, items, targetFrameworks, refresher: IFSharpItem
             // We need to find another item to be relative to.
             match tryGetAdjacentRelativeItem (ProjectItem relativeChildItem) modifiedNodeItem relativeToType with
             | Some (adjacentItem, relativeToType) ->
-                  Some (adjacentItem.PhysicalPath, changeDirection relativeToType)
+                  Some (adjacentItem.LogicalPath, changeDirection relativeToType)
             | _ -> 
                 // There were no adjacent items in this direction, try the other one.
                 let relativeToType = changeDirection relativeToType
                 tryGetAdjacentRelativeItem (ProjectItem relativeChildItem) modifiedNodeItem relativeToType
-                |> Option.map (fun (item, relativeToType) -> item.PhysicalPath, relativeToType)
+                |> Option.map (fun (item, relativeToType) -> item.LogicalPath, relativeToType)
 
-        | Some (item, reltativeToType) -> Some (item.PhysicalPath, relativeToType)
+        | Some (item, reltativeToType) -> Some (item.LogicalPath, relativeToType)
         | _ -> None
 
     member x.Dump(writer: TextWriter) =
@@ -644,13 +645,17 @@ type FSharpProjectItem =
 
     member x.SortKey = x.ItemInfo.SortKey
     member x.Parent  = x.ItemInfo.Parent
-    member x.PhysicalPath = x.ItemInfo.PhysicalPath
+    member x.PhysicalPath: FileSystemPath = x.ItemInfo.PhysicalPath
     member x.LogicalPath: FileSystemPath = x.ItemInfo.LogicalPath
 
     override x.ToString() =
-        match x with
-        | FolderItem (_, id) as folderItem -> sprintf "%s[%d]" x.LogicalPath.Name id.Identity
-        | _ -> x.LogicalPath.Name
+        let name =
+            match x with
+            | FolderItem (_, id) as folderItem -> sprintf "%s[%d]" x.LogicalPath.Name id.Identity
+            | _ -> x.LogicalPath.Name
+        if x.PhysicalPath = x.LogicalPath then name else
+        name + (sprintf " (from %O)" x.PhysicalPath)
+        
 
 
 type ItemInfo =
