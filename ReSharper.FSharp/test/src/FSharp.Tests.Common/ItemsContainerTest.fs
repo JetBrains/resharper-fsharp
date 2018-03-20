@@ -715,32 +715,31 @@ type FSharpItemsContainerTest() =
                   container.OnUpdateFolder("Folder", "NewName") ])
 
     [<Test>]
-    member x.``Update 08 - Change item type``() =
+    member x.``Update 08 - Change item types, reload project``() =
         x.DoContainerModificationTest(
-            [ createItem "Compile"       "File1"
+            [ createItem "CompileAfter"  "File1"
               createItem "Compile"       "File2"
-              createItem "CompileAfter"  "File3"
-              createItem "CompileAfter"  "File4"
-              createItem "CompileBefore" "File5"
-              createItem "CompileAfter"  "File6" ],
+              createItem "CompileBefore" "File3"
+              createItem "CompileAfter"  "File4" ],
             (fun container writer ->
-                 container.OnUpdateFile("Compile", "File1", "Resource", "File1")
-                 writer.WriteLine()
-
                  container.OnUpdateFile("Compile", "File2", "CompileBefore", "File2")
                  writer.WriteLine()
-
-                 container.OnUpdateFile("CompileAfter", "File3", "Resource", "File3")
+                 container.OnUpdateFile("CompileAfter", "File1", "Resource", "File1")
                  writer.WriteLine()
-
-                 container.OnUpdateFile("Compile", "File4", "Compile", "File4")
+                 container.OnUpdateFile("CompileBefore", "File3", "CompileAfter", "File3")
                  writer.WriteLine()
-
-                 container.OnUpdateFile("CompileBefore", "File5", "CompileAfter", "File5")
-                 writer.WriteLine()
-
-                 container.OnUpdateFile("CompileAfter", "File6", "CompileBefore", "File6")),
+                 container.OnUpdateFile("CompileAfter", "File4", "CompileBefore", "File4")),
             false)
+
+    [<Test>]
+    member x.``Update 09 - Change item types, no project reload``() =
+        x.DoContainerModificationTest(
+            [ createItem "Compile" "File1"
+              createItem "Resource" "File2" ],
+            fun container writer ->
+                 container.OnUpdateFile("Compile", "File1", "Resource", "File1")
+                 writer.WriteLine()
+                 container.OnUpdateFile("Resource", "File2", "Compile", "File2"))
 
     member x.DoCreateModificationContextTest(items: AnItem list) =
         let relativeToTypes = [ RelativeToType.Before; RelativeToType.After ]

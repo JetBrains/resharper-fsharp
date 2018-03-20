@@ -1,0 +1,15 @@
+﻿Project
+1:File1
+2:File2 (Resource)
+
+=======
+Update file: 'File1' (Compile) -> 'File1' (Resource)
+Update view File1
+
+Update file: 'File2' (Resource) -> 'File2' (Compile)
+Update view File2
+
+Project
+1:File1 (Resource)
+2:File2
+

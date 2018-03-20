@@ -1,0 +1,19 @@
+﻿Project
+1:File3 (CompileBefore)
+2:File2
+3:File1 (CompileAfter)
+4:File4 (CompileAfter)
+
+=======
+Update file: 'File2' (Compile) -> 'File2' (CompileBefore)
+Reload project Project
+
+Update file: 'File1' (CompileAfter) -> 'File1' (Resource)
+Reload project Project
+
+Update file: 'File3' (CompileBefore) -> 'File3' (CompileAfter)
+Reload project Project
+
+Update file: 'File4' (CompileAfter) -> 'File4' (CompileBefore)
+Reload project Project
+

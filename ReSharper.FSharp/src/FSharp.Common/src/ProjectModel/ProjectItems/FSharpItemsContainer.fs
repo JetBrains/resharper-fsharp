@@ -89,7 +89,7 @@ type FSharpItemsContainer(refresher: IFSharpItemsContainerRefresher) =
 
         member x.OnUpdateFile(projectMark, oldItemType, oldLocation, newItemType, newLocation) =
             if not (equalsIgnoreCase oldItemType newItemType) &&
-                    changesOrder oldItemType || changesOrder newItemType then
+                    (changesOrder oldItemType || changesOrder newItemType) then
                 refresher.ReloadProject(projectMark) else
 
             use lock = locker.UsingWriteLock()
@@ -114,12 +114,14 @@ type FSharpItemsContainer(refresher: IFSharpItemsContainerRefresher) =
             tryGetProjectMapping folder
             |> Option.map (fun mapping ->
                 mapping.TryGetProjectItems(folder.Location)
-                |> Seq.map (fun ((FolderItem (_, id)) as folderItem) ->
-                    let parent =
-                        match folderItem.Parent with
-                        | ProjectItem (FolderItem (_, id)) -> Some (FSharpViewFolder (folder.ParentFolder, id))
-                        | _ -> None
-                    FSharpViewFolder (folder, id), parent)
+                |> Seq.map (function
+                    | FolderItem (_, id) as folderItem ->
+                        let parent =
+                            match folderItem.Parent with
+                            | ProjectItem (FolderItem (_, id)) -> Some (FSharpViewFolder (folder.ParentFolder, id))
+                            | _ -> None
+                        FSharpViewFolder (folder, id), parent
+                    | item -> sprintf "got item %O" item |> failwith)
                 |> List.ofSeq)
             |> Option.defaultValue []
 
@@ -398,6 +400,7 @@ type ProjectMapping(projectMark, items, targetFrameworks, refresher: IFSharpItem
                 match relativeToType with
                 | RelativeToType.Before -> Seq.tryHead children
                 | RelativeToType.After -> Seq.tryLast children
+                | _ -> relativeToType |> sprintf "Got relativeToType %O" |> failwith
         
             match relativeChildItem with
             | Some item when canBeRelative item modifiedItem -> Some (item, relativeToType)
@@ -446,8 +449,7 @@ type ProjectMapping(projectMark, items, targetFrameworks, refresher: IFSharpItem
             |> List.iter (fun folderItem ->
                 match folderItem with
                 | (FolderItem (_, id)) ->
-                    if id.Identity > folderId.Identity then
-                        id.Identity <- id.Identity - 1
+                    if id.Identity > folderId.Identity then id.Identity <- id.Identity - 1
                 | _ -> ())
 
             removeItem folderItem folderPath folderRefresher itemUpdater
@@ -506,14 +508,19 @@ type ProjectMapping(projectMark, items, targetFrameworks, refresher: IFSharpItem
                 // todo: check item type
                 tryGetAdjacentRelativeItem nodeItem.Parent modifiedNodeItem relativeToType)
 
-    member x.UpdateFile(oldItemType, oldLocation, newItemType, newLocation) =
+    member x.UpdateFile(oldItemType, oldLocation, BuildAction buildAction, newLocation) =
         getItemsForPath oldLocation
         |> Seq.tryHead
-        |> Option.iter (fun fileItem ->
-            fileItem.ItemInfo.PhysicalPath <- newLocation
-            fileItem.ItemInfo.LogicalPath <- newLocation
-            itemsByPath.Add(newLocation, fileItem)
-            itemsByPath.RemoveKey(oldLocation) |> ignore)
+        |> Option.iter (function
+            | FileItem (info, oldBuildAction, targetFrameworkIds) ->
+                Assertion.Assert(equalsIgnoreCase oldItemType oldBuildAction.Value, "old build action mismatch")
+
+                itemsByPath.RemoveKey(oldLocation) |> ignore
+                itemsByPath.Add(newLocation, FileItem (info, buildAction, targetFrameworkIds))
+                if oldLocation <> newLocation then
+                    info.LogicalPath <- newLocation
+                    info.PhysicalPath <- newLocation
+            | item -> sprintf "got item %O" item |> failwith)
 
     member x.RemoveFile(itemType, location) =
         let folderRefresher, itemUpdater, refresh = createRefreshers ()
@@ -523,7 +530,6 @@ type ProjectMapping(projectMark, items, targetFrameworks, refresher: IFSharpItem
             removeItem item location folderRefresher itemUpdater
             refresh ())
 
-    // todo: add test: renamed linked
     member x.UpdateFolder(oldLocation, newLocation) =
         Assertion.Assert(oldLocation.Parent = newLocation.Parent, "oldLocation.Parent = newLocation.Parent")
         let _, itemUpdater, refresh = createRefreshers ()
