@@ -146,6 +146,8 @@ module rec CommonUtil =
     let equalsIgnoreCase other (string: string) =
         string.Equals(other, StringComparison.OrdinalIgnoreCase)
 
+    let eq a b = a = b
+
 [<AutoOpen>]
 module rec FSharpMsBuildUtils =
     open System

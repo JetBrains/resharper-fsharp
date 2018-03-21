@@ -591,7 +591,8 @@ type ProjectMapping(projectMark, items, targetFrameworks, refresher: IFSharpItem
                 parent, getNewSortKey parent
 
         let itemInfo = ItemInfo.Create(physicalPath, logicalPath, parent, sortKey)
-        itemsByPath.Add(physicalPath, FileItem(itemInfo, buildAction, targetFrameworks))
+        itemsByPath.Add(logicalPath, FileItem(itemInfo, buildAction, targetFrameworks))
+        refresher.SelectItem(projectMark, logicalPath)
         refresh ()
 
     member x.TryGetRelativeChildPath(modifiedItem, relativeItem, relativeToType) =
@@ -610,7 +611,7 @@ type ProjectMapping(projectMark, items, targetFrameworks, refresher: IFSharpItem
                 // There were no adjacent items in this direction, try the other one.
                 let relativeToType = changeDirection relativeToType
                 tryGetAdjacentRelativeItem (ProjectItem relativeChildItem) modifiedNodeItem relativeToType
-                |> Option.map (fun (item, relativeToType) -> item.LogicalPath, relativeToType)
+                |> Option.map (fun (item, relativeToType) -> item.LogicalPath, changeDirection relativeToType)
 
         | Some (item, reltativeToType) -> Some (item.LogicalPath, relativeToType)
         | _ -> None
@@ -735,7 +736,7 @@ type FSharpItemsContainerRefresher(lifetime: Lifetime, solution: ISolution, view
             for viewItem in project.FindProjectItemsByLocation(path) |> Seq.choose viewItemCtor do
                 solution.Locks.QueueReadLock(lifetime, "Refresh View", fun _ ->
                     if solution.GetComponent<FSharpItemsContainer>().IsValid(viewItem) then
-                        viewHost.UpdateItemIfExists(viewItem.ProjectItem)))
+                        viewHost.UpdateItemIfExists(viewItem)))
 
     interface IFSharpItemsContainerRefresher with
         member x.Refresh(projectMark, isOnProjectLoad) =
@@ -756,6 +757,7 @@ type FSharpItemsContainerRefresher(lifetime: Lifetime, solution: ISolution, view
             solution.Locks.QueueReadLock(lifetime, opName, fun _ ->
                 solution.ProjectsHostContainer().GetComponent<ISolutionHost>().ReloadProject(projectMark))
 
+        // todo: select item when moving to empty folder 
         member x.SelectItem(projectMark, filePath) =
             let opName = sprintf "Select %O after FSharpItemsContainer change" filePath
             solution.Locks.QueueReadLock(lifetime, opName, fun _ ->
@@ -790,6 +792,17 @@ type FSharpViewFile(file: IProjectFile) =
     inherit FSharpViewItem(file)
 
     member x.ProjectFile = file
+
+    override x.Equals(other: obj) =
+        match other with
+        | null -> false
+        | :? FSharpViewFile as file ->
+            obj.ReferenceEquals(x, other) ||
+            x.ProjectFile.Equals(file.ProjectFile)
+        | _ -> false
+
+    override x.GetHashCode() =
+        x.ProjectFile.GetHashCode()
 
 [<AllowNullLiteral>]
 type FSharpViewFolder(folder: IProjectFolder, identity: FSharpViewFolderIdentity) =

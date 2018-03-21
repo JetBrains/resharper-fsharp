@@ -754,54 +754,49 @@ type FSharpItemsContainerTest() =
         let relativeToTypes = [ RelativeToType.Before; RelativeToType.After ]
         x.ExecuteWithGold(fun writer ->
             let container = createContainer items writer
+            let provider = FSharpItemModificationContextProvider(container)
             container.Dump(writer)
             writer.WriteLine()
-    
-            let solutionItems = Dictionary<FileSystemPath, IProjectItem>()
-            let contextProvider = FSharpItemModificationContextProvider(container)
-            let itemTypes = Dictionary<FileSystemPath, string>()
-            for item in items do
-                let path =
-                    FileSystemPath.Parse(removeIdentities item.EvaluatedInclude).MakeAbsoluteBasedOn(projectDirectory)
-                itemTypes.[path] <- item.ItemType
-    
-            let viewItems = HashSet(items |> Seq.collect (createViewItems solutionItems))
+
+            let itemTypes =
+                items |> List.map (fun item ->
+                    // todo: linked
+                    let path = FileSystemPath.Parse(removeIdentities item.EvaluatedInclude)
+                    path.MakeAbsoluteBasedOn(projectDirectory), item.ItemType)
+                |> dict
+
+            let viewItems = HashSet(Seq.collect (Dictionary() |> createViewItems) items)
             let viewFiles = viewItems.OfType<FSharpViewFile>().ToList()
-            for modifiedViewFile in viewFiles do
+            for viewFile in viewFiles do
                 for relativeViewItem in viewItems do
                     for relativeToType in relativeToTypes do
-                        let modifiedFile = modifiedViewFile.ProjectFile :> IProjectItem
-                        let relativeItem = relativeViewItem.ProjectItem
-                        let modifiedFileItemType = itemTypes.TryGetValue(modifiedFile.Location)
-                        let relativeFileItemType = itemTypes.TryGetValue(relativeItem.Location)
-                        let sameItemType =
-                            isNotNull modifiedFileItemType &&
-                            equalsIgnoreCase modifiedFileItemType relativeFileItemType
+                        let projectItem = viewFile.ProjectFile :> IProjectItem
+                        let relative = relativeViewItem.ProjectItem
+                        let itemType = itemTypes.TryGetValue(projectItem.Location)
+                        let relativeItemType = itemTypes.TryGetValue(relative.Location)
 
-                        let context =
-                            contextProvider.CreateModificationContext(modifiedViewFile, relativeViewItem, relativeToType)
+                        let context = provider.CreateModificationContext(viewFile, relativeViewItem, relativeToType)
                         match relativeViewItem, context with
                         | (:? FSharpViewFile), Some context when
-                                modifiedFile <> relativeItem && sameItemType ->
+                                projectItem <> relative && isNotNull itemType &&
+                                equalsIgnoreCase itemType relativeItemType ->
 
-                            let relativeItemPath = relativeItem.Location
-                            let contextRelativeItemPath = context.RelativeTo.NotNull().ReferenceItem.Location
-                            Assertion.Assert(relativeItemPath.Equals(contextRelativeItemPath),
-                                sprintf "%O <> %O" relativeItem contextRelativeItemPath)
+                            let contextRelativeTo = context.RelativeTo.NotNull()
+                            Assertion.Assert(eq relative.Location contextRelativeTo.ReferenceItem.Location,
+                                sprintf "%O <> %O" relative contextRelativeTo.ReferenceItem.Location)
 
+                            Assertion.Assert(eq relativeToType contextRelativeTo.Type,
+                                sprintf "%O <> %O, %O, %O " relativeToType contextRelativeTo.Type
+                                        relative.Location contextRelativeTo.ReferenceItem.Location)
                         | _ ->
-                            let (NormalizedPath path) = modifiedViewFile.Location
+                            let (NormalizedPath path) = viewFile.Location
                             let (NormalizedPath relativePath) = relativeViewItem.Location
                             writer.Write(path)
-                            let folderInfo =
-                                match relativeViewItem with
-                                | :? FSharpViewFolder as folder -> sprintf " (%s [%O])" folder.Name folder.Identitiy
-                                | _ -> ""
-                            writer.Write(sprintf " %O %s%s -> " relativeToType relativePath folderInfo)
+                            writer.Write(sprintf " %O %O -> " relativeToType relativeViewItem)
                             writer.WriteLine(
                                 match context with
                                 | Some context ->
-                                    let (NormalizedPath path) = context.RelativeTo.ReferenceItem.Location
+                                    let (NormalizedPath path) = context.RelativeTo.NotNull().ReferenceItem.Location
                                     sprintf "%O %s" context.RelativeTo.Type path
                                 | _ -> "null")
                 writer.WriteLine()) |> ignore
@@ -819,7 +814,7 @@ type FSharpItemsContainerTest() =
             let mutable addAfterDump: string = null
     
             if isNotNull relativeBefore then
-              addBeforeDump <- x.DoAddFileImpl(items, filePath, relativeBefore, RelativeToType.Before, writer, true);
+              addBeforeDump <- x.DoAddFileImpl(items, filePath, relativeBefore, RelativeToType.Before, writer, true)
     
             if isNotNull relativeAfter then
               addAfterDump <- x.DoAddFileImpl(items, filePath, relativeAfter, RelativeToType.After, writer, isNull relativeBefore )

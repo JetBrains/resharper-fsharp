@@ -8,26 +8,26 @@
 
 File1 Before File1 -> Before Folder/File2
 File1 After File1 -> Before Folder/File2
-File1 Before Folder (Folder [1]) -> Before Folder/File2
-File1 After Folder (Folder [1]) -> After Folder/File4
+File1 Before Folder[1] -> Before Folder/File2
+File1 After Folder[1] -> After Folder/File4
 
-Folder/File2 Before Folder (Folder [1]) -> After File1
-Folder/File2 After Folder (Folder [1]) -> After Folder/File4
-Folder/File2 Before Folder/File2 -> After File1
-Folder/File2 After Folder/File2 -> Before Folder/File3
+Folder/File2 Before Folder[1] -> After File1
+Folder/File2 After Folder[1] -> After Folder/File4
+Folder/File2 Before File2 -> After File1
+Folder/File2 After File2 -> Before Folder/File3
 
-Folder/File3 Before Folder (Folder [1]) -> Before Folder/File2
-Folder/File3 After Folder (Folder [1]) -> After Folder/File4
-Folder/File3 Before Folder/File3 -> After Folder/File2
-Folder/File3 After Folder/File3 -> Before Folder/File4
+Folder/File3 Before Folder[1] -> Before Folder/File2
+Folder/File3 After Folder[1] -> After Folder/File4
+Folder/File3 Before File3 -> After Folder/File2
+Folder/File3 After File3 -> Before Folder/File4
 
-Folder/File4 Before Folder (Folder [1]) -> Before Folder/File2
-Folder/File4 After Folder (Folder [1]) -> Before File3
-Folder/File4 Before Folder/File4 -> After Folder/File3
-Folder/File4 After Folder/File4 -> Before File3
+Folder/File4 Before Folder[1] -> Before Folder/File2
+Folder/File4 After Folder[1] -> Before File3
+Folder/File4 Before File4 -> After Folder/File3
+Folder/File4 After File4 -> Before File3
 
-File3 Before Folder (Folder [1]) -> Before Folder/File2
-File3 After Folder (Folder [1]) -> After Folder/File4
+File3 Before Folder[1] -> Before Folder/File2
+File3 After Folder[1] -> After Folder/File4
 File3 Before File3 -> After Folder/File4
 File3 After File3 -> After Folder/File4
 
