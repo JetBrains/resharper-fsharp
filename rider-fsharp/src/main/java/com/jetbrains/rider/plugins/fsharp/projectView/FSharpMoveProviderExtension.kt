@@ -24,6 +24,9 @@ class FSharpMoveProviderExtension(project: Project) : MoveProviderExtension(proj
     }
 
     override fun allowPaste(nodes: Collection<ProjectModelNode>, relativeTo: IProjectModelNode, orderType: ActionOrderType): Boolean {
+        if (nodes.any { it.isProjectFolder() })
+            return false
+
         if (orderType == ActionOrderType.None) {
             return super.allowPaste(nodes, relativeTo, orderType)
         }
