@@ -566,6 +566,17 @@ type ProjectMapping(projectMark, items, targetFrameworks, refresher: IFSharpItem
         let parent, sortKey =
             match tryGetPossiblyRelativeNodeItem relativeToPath, relativeToType with
             | Some relativeItem, Some relativeToType ->
+
+                // Try adjacent item, if its path matches new item path better (i.e. shares a longer common path)
+                let relativeItem, relativeToType =
+                    match tryGetAdjacentRelativeItem (ProjectItem relativeItem) None relativeToType with
+                    | Some (item, relativeToType) when
+                            let relativeCommonParent = getCommonParent logicalPath relativeToPath
+                            let adjacentCommonParent = getCommonParent logicalPath item.LogicalPath
+                            relativeCommonParent.IsPrefixOf(adjacentCommonParent) ->
+                        item, changeDirection relativeToType
+                    | _ -> relativeItem, relativeToType
+
                 let relativeItemParent =
                     match relativeItem with
                     | FolderItem _ when relativeItem.LogicalPath = relativeToPath -> ProjectItem relativeItem

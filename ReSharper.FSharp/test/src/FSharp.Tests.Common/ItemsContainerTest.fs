@@ -467,6 +467,70 @@ type FSharpItemsContainerTest() =
             "Folder/Subfolder/File4")
 
     [<Test>]
+    member x.``Add file 24 - After last file before parent folder``() =
+        x.DoAddFileRelativeAfterTest(
+            [ "File1"
+              "Folder[1]/File2" ],
+            "Folder/File3",
+            "File1")
+
+    [<Test>]
+    member x.``Add file 25 - After last file before nested parent folders``() =
+        x.DoAddFileRelativeAfterTest(
+            [ "File1"
+              "Folder[1]/Sub[1]/File2" ],
+            "Folder/File3",
+            "File1")
+
+    [<Test>]
+    member x.``Add file 26 - Before first file after parent folder``() =
+        x.DoAddFileRelativeBeforeTest(
+            [ "Folder[1]/File1"
+              "File2" ],
+            "Folder/File3",
+            "File2")
+
+    [<Test>]
+    member x.``Add file 27 - Before first file after nested parent folders``() =
+        x.DoAddFileRelativeBeforeTest(
+            [ "Folder[1]/Sub[1]/File1"
+              "File2" ],
+            "Folder/File3",
+            "File2")
+
+    [<Test>]
+    member x.``Add file 28 - Before first file after nested parent folders``() =
+        x.DoAddFileRelativeBeforeTest(
+            [ "Folder[1]/Sub[1]/File1"
+              "File2" ],
+            "Folder/Sub/File3",
+            "File2")
+
+    [<Test>]
+    member x.``Add file 29 - After last file before parent folder``() =
+        x.DoAddFileRelativeAfterTest(
+            [ "File1"
+              "Folder[1]/Sub[1]/File2" ],
+            "Folder/Sub/File3",
+            "File1")
+
+    [<Test>]
+    member x.``Add file 30 - After last file before nested parent folder, different parent``() =
+        x.DoAddFileRelativeAfterTest(
+            [ "File1"
+              "Folder[1]/Sub[1]/File2" ],
+            "Folder/Another/File3",
+            "File1")
+
+    [<Test>]
+    member x.``Add file 31 - Before first file after nested parent folder, different parent``() =
+        x.DoAddFileRelativeBeforeTest(
+            [ "Folder[1]/Sub[1]/File1"
+              "File2" ],
+            "Folder/Another/File3",
+            "File2")
+
+    [<Test>]
     member x.``Remove file 01 - Top level``() =
         x.DoContainerModificationTest(
             [ "File1"

@@ -148,6 +148,9 @@ module rec CommonUtil =
 
     let eq a b = a = b
 
+    let getCommonParent path1 path2 =
+        FileSystemPath.GetDeepestCommonParent(path1, path2)
+
 [<AutoOpen>]
 module rec FSharpMsBuildUtils =
     open System

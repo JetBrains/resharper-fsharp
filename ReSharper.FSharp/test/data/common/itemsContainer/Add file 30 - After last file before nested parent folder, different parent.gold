@@ -1,0 +1,19 @@
+﻿Project
+1:File1
+2:Folder[1]
+  1:Sub[1]
+    1:File2
+
+=======
+Add 'Folder/Another/File3' After 'File1'
+Refresh Folder[1]
+Update view Folder/Sub[1]
+
+Project
+1:File1
+2:Folder[1]
+  1:Another[1]
+    1:File3
+  2:Sub[1]
+    1:File2
+
