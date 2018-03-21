@@ -29,8 +29,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       if (declaration == null)
         return EmptyList<ITypeMember>.Instance;
 
-      return declaration.MemberDeclarations.Select(d => d.DeclaredElement as IFSharpTypeMember)
-        .Where(el => el != null && (!el.IsMember || el.IsExtensionMember));
+      return declaration.MemberDeclarations.Select(d => d.DeclaredElement)
+        .Where(el => el is IFSharpTypeMember fsMember && (!fsMember.IsMember || fsMember.IsExtensionMember) ||
+                     el != null);
     }
 
     public IEnumerable<IDeclaredType> GetSuperTypes()
