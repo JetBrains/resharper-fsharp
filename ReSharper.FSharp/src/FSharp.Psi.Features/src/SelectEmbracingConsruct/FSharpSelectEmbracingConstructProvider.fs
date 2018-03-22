@@ -65,10 +65,19 @@ type FSharpSelectEmbracingConstructProviderBase() =
         | TraverseStep.MatchClause(matchClause) -> [matchClause.Range; matchClause.RangeOfGuardAndRhs]
         | TraverseStep.Binding(binding) -> [binding.RangeOfHeadPat; binding.RangeOfBindingAndRhs; binding.RangeOfBindingSansRhs]
 
-    abstract IsAvailableImpl: IPsiSourceFile -> bool
+    let mapLid (lid: LongIdent) =
+        match lid with
+        | [] -> []
+        | id :: ids ->
+            ids
+            |> List.fold (fun acc id -> (id :: (List.head acc)) :: acc) [[id]]
+            |> List.map List.rev
+            |> List.map (fun lid ->
+                let range = Range.unionRanges (List.head lid).idRange (List.last lid).idRange
+                TraverseStep.Expr (SynExpr.LongIdent (false, LongIdentWithDots(lid, []), None, range)))
 
     interface ISelectEmbracingConstructProvider with
-        member x.IsAvailable(sourceFile) = x.IsAvailableImpl(sourceFile)
+        member x.IsAvailable(sourceFile) = true
 
         member x.GetSelectedRange(sourceFile, documentRange) =
             let fsFile = sourceFile.GetTheOnlyPsiFile() :?> IFSharpFile
@@ -81,8 +90,13 @@ type FSharpSelectEmbracingConstructProviderBase() =
                     member x.VisitExpr(path, _, defaultTraverse, expr) =
                         match expr with
                         | SynExpr.Ident _ | SynExpr.Const _ -> Some path
-                        | SynExpr.LongIdent _ -> Some (TraverseStep.Expr expr :: path)
-                        | _ -> defaultTraverse expr }
+                        | SynExpr.LongIdent (_, lid, _, _) -> Some (mapLid lid.Lid @ path)
+                        | _ -> defaultTraverse expr
+                     
+                    override this.VisitModuleDecl(defaultTraverse, decl) =
+                        match decl with
+                        | SynModuleDecl.Open(lid, range) -> Some(mapLid lid.Lid)
+                        | _ -> defaultTraverse decl }
 
                 let containingDeclarations =
                     match fsFile.FindTokenAt(documentRange.EndOffset) with
@@ -112,11 +126,7 @@ type FSharpSelectEmbracingConstructProviderBase() =
 type FSharpSelectEmbracingConstructProvider() =
     inherit FSharpSelectEmbracingConstructProviderBase()
 
-    override x.IsAvailableImpl(sourceFile) = true
-
 
 [<ProjectFileType(typeof<FSharpScriptProjectFileType>)>]
 type FSharpScriptSelectEmbracingConstructProvider() =
     inherit FSharpSelectEmbracingConstructProviderBase()
-
-    override x.IsAvailableImpl(sourceFile) = true
