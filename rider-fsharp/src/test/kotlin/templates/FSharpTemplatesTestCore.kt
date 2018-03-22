@@ -6,8 +6,8 @@ import com.jetbrains.rider.debugger.DotNetDebugRunner
 import com.jetbrains.rider.diagnostics.LogTraceScenarios
 import com.jetbrains.rider.run.mono.MonoDebugProfileState
 import com.jetbrains.rider.test.BaseTestWithSolutionBase
-import com.jetbrains.rider.test.annotations.TestToolset
-import com.jetbrains.rider.test.annotations.ToolsetVersion
+import com.jetbrains.rider.test.enums.ToolsetVersion
+import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.framework.*
 import com.jetbrains.rider.test.scriptingApi.*
 import com.jetbrains.rider.util.idea.ReSharperHostException
@@ -16,7 +16,6 @@ import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
 import java.io.File
 import java.nio.file.Paths
-
 
 @Test
 abstract class FSharpTemplatesTestCore : BaseTestWithSolutionBase() {
@@ -64,7 +63,7 @@ abstract class FSharpTemplatesTestCore : BaseTestWithSolutionBase() {
         setUpCustomMonoPath("")
     }
 
-    @TestToolset(ToolsetVersion.toolset15CoreSDK)
+    @TestEnvironment(toolset = ToolsetVersion.TOOLSET_15_CORE)
     fun classlibCoreTemplate() {
         val projectName = "ClassLibrary"
         doCoreTest(ProjectTemplateIds.Core.fsharp_classLibrary, projectName) { project ->
@@ -74,7 +73,7 @@ abstract class FSharpTemplatesTestCore : BaseTestWithSolutionBase() {
     }
 
     @Test(enabled = false) //RIDER-14467
-    @TestToolset(ToolsetVersion.toolset15CoreSDK)
+    @TestEnvironment(toolset = ToolsetVersion.TOOLSET_15_CORE)
     fun classlibNetCoreAppTemplate() {
         val projectName = "ClassLibrary"
         doCoreTest(ProjectTemplateIds.Core.fsharp_classLibrary, projectName, "netcoreapp2.0") { project ->
@@ -85,7 +84,7 @@ abstract class FSharpTemplatesTestCore : BaseTestWithSolutionBase() {
 
 
 
-    @TestToolset(ToolsetVersion.toolset15CoreSDK)
+    @TestEnvironment(toolset = ToolsetVersion.TOOLSET_15_CORE)
     fun consoleAppCoreTemplate() {
         val projectName = "ConsoleApplication"
         val programFs = activeSolutionDirectory.resolve(projectName).resolve("Program.fs")
@@ -123,7 +122,7 @@ abstract class FSharpTemplatesTestCore : BaseTestWithSolutionBase() {
 
 
     @Test(enabled = false) //RIDER-14467
-    @TestToolset(ToolsetVersion.toolset15CoreSDK)
+    @TestEnvironment(toolset = ToolsetVersion.TOOLSET_15_CORE)
     fun xUnitCoreTemplate() {
         val projectName = "UnitTestProject"
         doCoreTest(ProjectTemplateIds.Core.fsharp_xUnit, projectName) { project ->
