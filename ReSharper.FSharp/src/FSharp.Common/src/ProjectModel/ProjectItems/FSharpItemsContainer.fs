@@ -45,9 +45,6 @@ type FSharpItemsContainer(refresher: IFSharpItemsContainerRefresher) =
         tryGetProjectMapping viewItem.ProjectItem
         |> Option.bind (fun mapping -> mapping.TryGetProjectItem(viewItem))
 
-    let printRelativePath (projectMark: IProjectMark) (path: FileSystemPath) =
-          path.MakeRelativeTo(projectMark.Location.Directory).NormalizeSeparators(FileSystemPathEx.SeparatorStyle.Unix)
-
     member x.IsValid(viewItem: FSharpViewItem) =
         use lock = locker.UsingReadLock()
         tryGetProjectItem viewItem |> Option.isSome
@@ -267,7 +264,7 @@ type ProjectMapping(projectMark, items, targetFrameworks, refresher: IFSharpItem
                 match item.ItemType with
                 | Folder -> addFolder parent currentState.NextSortKey logicalPath ignore |> ignore
                 | BuildAction buildAction ->
-                    let itemInfo = ItemInfo.Create(physicalPath, logicalPath, parent, currentState.NextSortKey)
+                    let itemInfo = ItemInfo.Create(logicalPath, physicalPath, parent, currentState.NextSortKey)
                     itemsByPath.Add(logicalPath, FileItem (itemInfo, buildAction, [])) // todo: framework ids
             | _ -> ()
 
@@ -359,26 +356,30 @@ type ProjectMapping(projectMark, items, targetFrameworks, refresher: IFSharpItem
         | Project -> Project, relativeItem, false
         | ProjectItem relativeItemParent ->
             let commonParentPath = FileSystemPath.GetDeepestCommonParent(relativeItemParent.LogicalPath, itemPath)
+            let initialState = relativeItem.Parent, relativeItem, false
 
             traverseParentFolders (ProjectItem relativeItemParent)
             |> Seq.takeWhile (fun item -> item.LogicalPath <> commonParentPath)
-            |> Seq.fold (fun (ProjectItem parent, relativeItem, shouldRefresh) _ ->
-                match tryGetAdjacentItemInParent relativeItem relativeToType with
-                | Some secondRelativeItem ->
-                    let sortKey = Math.Max(relativeItem.SortKey, secondRelativeItem.SortKey)
-                    let relativeItemParent, secondRelativeItemParentPath =
-                        match relativeItem.Parent, secondRelativeItem.Parent with
-                        | ProjectItem relativeParent, ProjectItem secondRelativeParent ->
-                            relativeParent, secondRelativeParent.LogicalPath
-                        | _ -> failwith "item parent"
-                    splitFolder relativeItemParent secondRelativeItemParentPath sortKey itemsUpdater
-
-                    let relativeParent, relativeItem =
-                        match relativeItem.Parent with
-                        | ProjectItem item -> item.Parent, item
-                        | _ -> failwith "getting parent item of project"
-                    relativeParent, relativeItem, true
-                | _ -> parent.Parent, parent, shouldRefresh) (relativeItem.Parent, relativeItem, false)
+            |> Seq.fold (fun state _ ->
+                match state with
+                | ProjectItem parent, relativeItem, shouldRefresh ->
+                    match tryGetAdjacentItemInParent relativeItem relativeToType with
+                    | Some secondRelativeItem ->
+                        let sortKey = Math.Max(relativeItem.SortKey, secondRelativeItem.SortKey)
+                        let relativeItemParent, secondRelativeItemParentPath =
+                            match relativeItem.Parent, secondRelativeItem.Parent with
+                            | ProjectItem relativeParent, ProjectItem secondRelativeParent ->
+                                relativeParent, secondRelativeParent.LogicalPath
+                            | _ -> failwith "item parent"
+                        splitFolder relativeItemParent secondRelativeItemParentPath sortKey itemsUpdater
+    
+                        let relativeParent, relativeItem =
+                            match relativeItem.Parent with
+                            | ProjectItem item -> item.Parent, item
+                            | _ -> failwith "getting parent item of project"
+                        relativeParent, relativeItem, true
+                    | _ -> parent.Parent, parent, shouldRefresh
+                | _ -> sprintf "got project as previous parent: %A" state |> failwith) initialState
 
     let createFoldersForItem itemPath relativeItem relativeToType folderRefresher itemUpdater =
         let parent, relativeItem, shouldRefresh =
@@ -428,11 +429,9 @@ type ProjectMapping(projectMark, items, targetFrameworks, refresher: IFSharpItem
 
             getChildren (ProjectItem folderItem)
             |> List.ofSeq
-            |> List.distinctBy (fun item -> item.LogicalPath)
-            |> List.iter (fun (childItem: FSharpProjectItem) ->
-                let childName = childItem.LogicalPath.Name
-                let oldChildLocation = oldLocation / childName
-                let newChildLocation = newLocation / childName
+            |> List.iter (fun childItem ->
+                let oldChildLocation = oldLocation / childItem.LogicalPath.Name
+                let newChildLocation = newLocation / childItem.LogicalPath.Name
 
                 match childItem with
                 | FileItem _ as childFileItem ->
@@ -453,7 +452,7 @@ type ProjectMapping(projectMark, items, targetFrameworks, refresher: IFSharpItem
             getItemsForPath folderPath
             |> List.iter (fun folderItem ->
                 match folderItem with
-                | (FolderItem (_, id)) ->
+                | FolderItem (_, id) ->
                     if id.Identity > folderId.Identity then id.Identity <- id.Identity - 1
                 | _ -> ())
 
@@ -499,7 +498,7 @@ type ProjectMapping(projectMark, items, targetFrameworks, refresher: IFSharpItem
             folderRefresher itemBefore.Parent
         | _ -> ()
 
-    let rec tryGetAdjacentRelativeItem (nodeItem: FSharpProjectModelElement) modifiedNodeItem relativeToType =
+    let rec tryGetAdjacentRelativeItem nodeItem modifiedNodeItem relativeToType =
         match nodeItem with
         | Project -> None
         | ProjectItem nodeItem ->
@@ -601,7 +600,7 @@ type ProjectMapping(projectMark, items, targetFrameworks, refresher: IFSharpItem
                     |> Seq.fold (getOrCreateFolder folderRefresher) Project
                 parent, getNewSortKey parent
 
-        let itemInfo = ItemInfo.Create(physicalPath, logicalPath, parent, sortKey)
+        let itemInfo = ItemInfo.Create(logicalPath, physicalPath, parent, sortKey)
         itemsByPath.Add(logicalPath, FileItem(itemInfo, buildAction, targetFrameworks))
         refresher.SelectItem(projectMark, logicalPath)
         refresh ()
@@ -673,13 +672,13 @@ type FSharpProjectItem =
 
 
 type ItemInfo =
-    { mutable PhysicalPath: FileSystemPath
-      mutable LogicalPath: FileSystemPath
+    { mutable LogicalPath: FileSystemPath
+      mutable PhysicalPath: FileSystemPath
       mutable Parent: FSharpProjectModelElement
       mutable SortKey: int }
 
-    static member Create(physicalPath, logicalPath, parent, sortKey) =
-        { PhysicalPath = physicalPath; LogicalPath = logicalPath; Parent = parent; SortKey = sortKey }
+    static member Create(logicalPath, physicalPath, parent, sortKey) =
+        { LogicalPath = logicalPath; PhysicalPath = physicalPath; Parent = parent; SortKey = sortKey }
 
     override x.ToString() = x.LogicalPath.Name
 
