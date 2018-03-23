@@ -17,6 +17,8 @@ open JetBrains.ProjectModel.Properties
 open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
+open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
@@ -27,6 +29,7 @@ module FSharpProperties =
     let [<Literal>] OtherFlags = "OtherFlags"
     let [<Literal>] NoWarn = "NoWarn"
     let [<Literal>] WarnAsError = "WarnAsError"
+
 
 [<ShellComponent>]
 type FSharpProjectPropertiesRequest() =
@@ -39,6 +42,7 @@ type FSharpProjectPropertiesRequest() =
 
     interface IProjectPropertiesRequest with
         member x.RequestedProperties = properties :> _
+
 
 [<ShellComponent>]
 type VisualFSharpTargetsProjectLoadModificator() =
@@ -55,8 +59,22 @@ type VisualFSharpTargetsProjectLoadModificator() =
         member x.Modify(context) =
             context.Targets.AddRange(targets)
 
+
+type FSharpProject =
+    { Options: FSharpProjectOptions
+      ParsingOptions: FSharpParsingOptions
+      ConfigurationDefines: string list
+      FileIndices: IDictionary<FileSystemPath, int>
+      FilesWithPairs: ISet<FileSystemPath> }
+
+    member x.ContainsFile (file: IPsiSourceFile) =
+        x.FileIndices.ContainsKey(file.GetLocation())
+
+
 [<SolutionComponent>]
-type FSharpProjectOptionsBuilder(solution: ISolution, itemsContainer: IFSharpItemsContainer) =
+type FSharpProjectOptionsBuilder
+        (solution: ISolution, checkerService: FSharpCheckerService, psiModules: IPsiModules, logger: ILogger,
+         psiModulesResolveContextManager: PsiModuleResolveContextManager, itemsContainer: IFSharpItemsContainer) =
     let msBuildHost = solution.ProjectsHostContainer().GetComponent<MsBuildProjectHost>()
 
     let defaultDelimiters = [| ';'; ','; ' ' |]
@@ -67,13 +85,27 @@ type FSharpProjectOptionsBuilder(solution: ISolution, itemsContainer: IFSharpIte
             for s in s.Split(delimiters) do
                 if not (s.IsNullOrWhitespace()) then yield s.Trim() }
 
-    member x.BuildSingleProjectOptions (project: IProject) =
+    let getReferences project psiModule targetFrameworkId =
+        let resolveContext =
+            psiModulesResolveContextManager.GetOrCreateModuleResolveContext(project, psiModule, targetFrameworkId)
+
+        psiModules.GetModuleReferences(psiModule, resolveContext)
+        |> Seq.choose (fun reference ->
+            let targetFrameworkId = reference.Module.TargetFrameworkId
+            match reference.Module.ContainingProjectModule with
+            | :? IProject as project -> Some (project.GetOutputFilePath(targetFrameworkId))
+            | :? IAssembly as assembly -> Some (assembly.GetLocation())
+            | _ -> None)
+        |> Seq.map (fun path -> "-r:" + path.FullPath)
+
+    member x.BuildSingleProjectOptions (project: IProject, psiModule: IPsiModule) =
+        let targetFrameworkId = psiModule.TargetFrameworkId
         let properties = project.ProjectProperties
-        let buildSettings = properties.BuildSettings :?> _
+        let buildSettings = properties.BuildSettings :?> _ // todo: can differ by framework id?
 
         let options = ResizeArray()
         options.AddRange(seq {
-            yield "--out:" + project.GetOutputFilePath(project.GetCurrentTargetFrameworkId()).FullPath
+            yield "--out:" + project.GetOutputFilePath(targetFrameworkId).FullPath
             yield "--noframework"
             yield "--debug:full"
             yield "--debug+"
@@ -85,13 +117,12 @@ type FSharpProjectOptionsBuilder(solution: ISolution, itemsContainer: IFSharpIte
             yield "--target:" + x.GetOutputType(buildSettings)
           })
 
-        let paths = x.GetReferencedPathsOptions(project)
-        options.AddRange(paths)
+        options.AddRange(getReferences project psiModule targetFrameworkId)
 
-        let definedConstants = x.GetDefinedConstants(properties) |> List.ofSeq
+        let definedConstants = x.GetDefinedConstants(properties, targetFrameworkId) |> List.ofSeq
         options.AddRange(definedConstants |> Seq.map (fun c -> "--define:" + c))
 
-        match properties.ActiveConfigurations.Configurations.SingleItem() with
+        match properties.ActiveConfigurations.GetOrCreateConfiguration(targetFrameworkId) with
         | :? IManagedProjectConfiguration as cfg ->
             options.Add(sprintf "--warn:%d" cfg.WarningLevel)
 
@@ -119,7 +150,7 @@ type FSharpProjectOptionsBuilder(solution: ISolution, itemsContainer: IFSharpIte
             |> options.AddRange
         | _ -> ()
 
-        let filePaths, pairFiles, resources = x.GetProjectFilesAndResources(project)
+        let filePaths, pairFiles, resources = x.GetProjectFilesAndResources(project, targetFrameworkId)
         options.AddRange(resources |> Seq.map (fun (r: FileSystemPath) -> "--resource:" + r.FullPath))
         let fileIndices = Dictionary<FileSystemPath, int>()
         Array.iteri (fun i p -> fileIndices.[p] <- i) filePaths
@@ -137,14 +168,37 @@ type FSharpProjectOptionsBuilder(solution: ISolution, itemsContainer: IFSharpIte
               ExtraProjectInfo = None
               Stamp = None }
 
-        { Options = Some projectOptions
+        let isCompilingFsLib options =
+            options.OtherOptions
+            |> Seq.exists (fun s -> s.Equals("--compiling-fslib", StringComparison.Ordinal))
+
+        let hasFSharpCoreReference options =
+            options.OtherOptions
+            |> Seq.exists (fun s ->
+                s.StartsWith("-r:", StringComparison.Ordinal) &&
+                s.EndsWith("FSharp.Core.dll", StringComparison.Ordinal))
+
+        let shoudAddFSharpCore options =
+            not (hasFSharpCoreReference options || isCompilingFsLib options)
+
+        let options =
+            if shoudAddFSharpCore projectOptions then 
+                { projectOptions with
+                    OtherOptions = FSharpCoreFix.ensureCorrectFSharpCore projectOptions.OtherOptions }
+            else projectOptions
+
+        let parsingOptions, errors = checkerService.Checker.GetParsingOptionsFromCommandLineArgs(List.ofArray options.OtherOptions)
+        let parsingOptions = { parsingOptions with SourceFiles = options.SourceFiles }
+        if not errors.IsEmpty then
+            logger.Warn("Getting parsing options: {0}", concatErrors errors)
+
+        { Options = projectOptions
           ConfigurationDefines = definedConstants
           FileIndices = fileIndices
           FilesWithPairs = pairFiles
-          ParsingOptions = None
-        }
+          ParsingOptions = parsingOptions }
 
-    member private x.GetProjectFilesAndResources(project: IProject) =
+    member private x.GetProjectFilesAndResources(project: IProject, targetFrameworkId: TargetFrameworkId) =
         let projectMark = project.GetProjectMark().NotNull()
 
         let sourceFiles = List()
@@ -153,7 +207,7 @@ type FSharpProjectOptionsBuilder(solution: ISolution, itemsContainer: IFSharpIte
         let sigFiles = HashSet<string>()
         let pairFiles = HashSet<FileSystemPath>()
 
-        let projectItems = itemsContainer.GetProjectItemsPaths(projectMark, TargetFrameworkId.Default)
+        let projectItems = itemsContainer.GetProjectItemsPaths(projectMark, targetFrameworkId)
         for path, buildAction in projectItems do
             match buildAction with
             | SourceFile ->
@@ -168,15 +222,6 @@ type FSharpProjectOptionsBuilder(solution: ISolution, itemsContainer: IFSharpIte
 
         sourceFiles.ToArray(), pairFiles, resources
 
-    member private x.GetReferencedPathsOptions(project: IProject) =
-        let framework = project.GetCurrentTargetFrameworkId()
-        seq { for p in project.GetReferencedProjects(framework) ->
-                  "-r:" + p.GetOutputFilePath(p.GetCurrentTargetFrameworkId()).FullPath
-              for a in project.GetAssemblyReferences(framework) do
-                  let assemblyFile = a.ResolveResultAssemblyFile()
-                  if isNotNull assemblyFile then
-                    yield "-r:" + assemblyFile.Location.FullPath }
-
     member private x.GetOutputType([<CanBeNull>] buildSettings: IManagedProjectBuildSettings) =
         if isNull buildSettings then "library"
         else
@@ -186,7 +231,7 @@ type FSharpProjectOptionsBuilder(solution: ISolution, itemsContainer: IFSharpIte
             | ProjectOutputType.MODULE -> "module"
             | _ -> "library"
 
-    member private x.GetDefinedConstants(properties: IProjectProperties) =
-        match properties.ActiveConfigurations.Configurations.SingleItem() with
+    member private x.GetDefinedConstants(properties: IProjectProperties, targetFrameworkId: TargetFrameworkId) =
+        match properties.ActiveConfigurations.GetOrCreateConfiguration(targetFrameworkId) with
         | :? IManagedProjectConfiguration as cfg -> splitAndTrim defaultDelimiters cfg.DefineConstants
         | _ -> Seq.empty

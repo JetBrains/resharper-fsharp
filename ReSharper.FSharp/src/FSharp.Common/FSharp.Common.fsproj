@@ -22,8 +22,6 @@
     <Compile Include="src\Util\FSharpSymbolUtil.fs" />
     <Compile Include="src\Checker\FSharpAssemblyContentProvider.fs" />
     <Compile Include="src\Checker\FSharpCheckerExtensions.fs" />
-    <Compile Include="src\Checker\FSharpProject.fs" />
-    <Compile Include="src\Checker\IFSharpProjectOptionsProvider.fs" />
     <Compile Include="src\Checker\FSharpCoreFix.fs" />
     <Compile Include="src\Checker\FSharpCheckerService.fs" />
     <Compile Include="src\FSharpTargetsAnalyzer.fs" />

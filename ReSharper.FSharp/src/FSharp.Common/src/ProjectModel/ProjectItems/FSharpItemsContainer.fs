@@ -47,7 +47,7 @@ type FSharpItemsContainer(refresher: IFSharpItemsContainerRefresher) =
         | project ->
             match project.GetProjectMark() with
             | null -> None
-            | projectMark -> tryGetValue projectMappings projectMark
+            | projectMark -> tryGetValue projectMark projectMappings
 
     let tryGetProjectItem (viewItem: FSharpViewItem) =
         tryGetProjectMapping viewItem.ProjectItem
@@ -111,14 +111,14 @@ type FSharpItemsContainer(refresher: IFSharpItemsContainerRefresher) =
         // todo: add on add folder
         member x.OnAddFile(projectMark, itemType, path, linkedPath, relativeTo, relativeToType) =
             use lock = locker.UsingWriteLock()
-            tryGetValue projectMappings projectMark
+            tryGetValue projectMark projectMappings
             |> Option.iter (fun mapping ->
                 let logicalPath = if isNotNull linkedPath then linkedPath else path
                 mapping.AddFile(itemType, path, logicalPath, relativeTo, Option.ofNullable relativeToType))
 
         member x.OnRemoveFile(projectMark, itemType, location) =
             use lock = locker.UsingWriteLock()
-            tryGetValue projectMappings projectMark
+            tryGetValue projectMark projectMappings
             |> Option.iter (fun mapping -> mapping.RemoveFile(itemType, location))
 
         member x.OnUpdateFile(projectMark, oldItemType, oldLocation, newItemType, newLocation) =
@@ -127,7 +127,7 @@ type FSharpItemsContainer(refresher: IFSharpItemsContainerRefresher) =
                 refresher.ReloadProject(projectMark) else
 
             use lock = locker.UsingWriteLock()
-            tryGetValue projectMappings projectMark
+            tryGetValue projectMark projectMappings
             |> Option.iter (fun mapping ->
                 mapping.UpdateFile(oldItemType, oldLocation, newItemType, newLocation)
                 refresher.Update(projectMark, newLocation))
@@ -135,7 +135,7 @@ type FSharpItemsContainer(refresher: IFSharpItemsContainerRefresher) =
         member x.OnUpdateFolder(projectMark, oldLocation, newLocation) =
             if oldLocation <> newLocation then
                 use lock = locker.UsingWriteLock()
-                tryGetValue projectMappings projectMark
+                tryGetValue projectMark projectMappings
                 |> Option.iter (fun mapping -> mapping.UpdateFolder(oldLocation, newLocation))
 
         member x.CreateFoldersWithParents(folder: IProjectFolder) =
@@ -161,7 +161,7 @@ type FSharpItemsContainer(refresher: IFSharpItemsContainerRefresher) =
 
         member x.TryGetRelativeChildPath(projectMark, modifiedItem, relativeItem, relativeToType) =
             use lock = locker.UsingReadLock()
-            tryGetValue projectMappings projectMark
+            tryGetValue projectMark projectMappings
             |> Option.bind (fun mapping ->
                 mapping.TryGetRelativeChildPath(modifiedItem, relativeItem, relativeToType))
 
@@ -190,7 +190,7 @@ type FSharpItemsContainer(refresher: IFSharpItemsContainerRefresher) =
             tryGetProjectMapping projectItem |> Option.isSome
 
         member x.GetProjectItemsPaths(projectMark, targetFrameworkId) =
-            tryGetValue projectMappings projectMark
+            tryGetValue projectMark projectMappings
             |> Option.map (fun mapping -> mapping.GetProjectItemsPaths(targetFrameworkId))
             |> Option.defaultValue [| |]
 

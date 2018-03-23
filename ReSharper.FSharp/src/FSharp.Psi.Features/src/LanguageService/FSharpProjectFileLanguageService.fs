@@ -25,7 +25,7 @@ type FSharpProjectFileLanguageService(projectFileType, fsCheckerService: FSharpC
     override x.GetPsiProperties(projectFile, sourceFile, isCompileService) =
         let providesCodeModel =
             isCompileService.IsCompile(projectFile, sourceFile) ||
-            fsFileService.IsScript(sourceFile)
+            fsFileService.IsScriptLike(sourceFile)
         FSharpPsiProperties(projectFile, sourceFile, providesCodeModel) :> _
 
 [<ProjectFileType(typeof<FSharpScriptProjectFileType>)>]

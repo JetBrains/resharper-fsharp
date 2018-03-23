@@ -57,11 +57,12 @@ type FSharpScriptPsiModulesProvider
         let plaformInfo = platformManager.GetAllPlatformInfos() |> Seq.maxBy (fun info -> info.Version)
         plaformInfo.PlatformID.ToTargetFrameworkId()
 
+    // todo: use script options provider
     let getScriptOptions (path: FileSystemPath) (document: IDocument) =
         let source = document.GetText()
         let options, diagnostics = checker.GetProjectOptionsFromScript(path.FullPath, source).RunAsTask()
         if not diagnostics.IsEmpty then
-            Logger.Warn(logger, "Getting script options for {0}: {1}", path, concatErrors diagnostics)
+            logger.Warn("Getting script options for {0}: {1}", path, concatErrors diagnostics)
         options
 
     let getScriptReferences scriptPath scriptOptions =
@@ -83,7 +84,7 @@ type FSharpScriptPsiModulesProvider
 
     let getPsiModulesForPath path =
         scriptsFromProjectFiles.GetValuesSafe(path)
-        |> Seq.append (tryGetValue scriptsFromPaths path |> Option.toList)
+        |> Seq.append (tryGetValue path scriptsFromPaths |> Option.toList)
         |> Seq.map snd
 
     let createSourceFileForProjectFile projectFile (psiModule: FSharpScriptPsiModule) =
@@ -133,7 +134,7 @@ type FSharpScriptPsiModulesProvider
         let path = projectFile.Location
 
         // if previously created a psi module for the path then replace it with a psi module for the project file
-        tryGetValue scriptsFromPaths path
+        tryGetValue path scriptsFromPaths
         |> Option.iter (fun (lifetimeDefinition, psiModule) ->
             scriptsFromPaths.Remove(path) |> ignore
             lifetimeDefinition.Terminate()
@@ -164,7 +165,7 @@ type FSharpScriptPsiModulesProvider
                     | _ -> 0
             | _ -> fun _ -> 0
 
-        tryGetValue referencedPaths psiModule.Path
+        tryGetValue psiModule.Path referencedPaths
         |> Option.map (fun paths -> paths.Files |> Seq.map (getPsiModulesForPath >> Seq.maxBy sameProjectSorter))
         |> Option.get
 
@@ -204,7 +205,7 @@ type FSharpScriptPsiModulesProvider
             if isNull change then null else
 
             let path = change.ProjectFile.Location
-            match tryGetValue referencedPaths path with
+            match tryGetValue path referencedPaths with
             | Some oldReferences ->
                 let newOptions = getScriptOptions path change.Document
                 let newReferences = getScriptReferences path newOptions
@@ -273,7 +274,7 @@ type FSharpScriptPsiModuleHandler
 
     override x.GetPsiSourceFilesFor(projectFile) =
         handler.GetPsiSourceFilesFor(projectFile)
-        |> Seq.append (tryGetValue sourceFiles projectFile.Location |> Option.toList)
+        |> Seq.append (tryGetValue projectFile.Location sourceFiles |> Option.toList)
 
     override x.InternalsVisibleTo(moduleTo, moduleFrom) =
         moduleTo :? FSharpScriptPsiModule && moduleFrom :? FSharpScriptPsiModule ||

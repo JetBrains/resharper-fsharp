@@ -26,7 +26,8 @@ type FSharpFileServiceStub() =
     interface IHideImplementation<FSharpFileService>
 
     interface IFSharpFileService with
-        member x.IsScript(_) = false
+        member x.IsScratchFile(_) = false
+        member x.IsScriptLike(_) = false
 
 /// Used to add assemblies to R# subplatfrom at runtime
 type AddAssembliesToSubplatform() =
