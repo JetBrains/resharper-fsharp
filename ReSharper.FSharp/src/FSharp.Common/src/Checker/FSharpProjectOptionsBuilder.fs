@@ -5,6 +5,7 @@ open System.Collections.Generic
 open JetBrains.Annotations
 open JetBrains.Application
 open JetBrains.Application.Components
+open JetBrains.Metadata.Reader.API
 open JetBrains.Platform.MsBuildHost.Models
 open JetBrains.Platform.MsBuildHost.ProjectModel
 open JetBrains.ProjectModel
@@ -15,6 +16,7 @@ open JetBrains.ProjectModel.ProjectsHost.SolutionHost
 open JetBrains.ProjectModel.Properties
 open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
@@ -54,7 +56,7 @@ type VisualFSharpTargetsProjectLoadModificator() =
             context.Targets.AddRange(targets)
 
 [<SolutionComponent>]
-type FSharpProjectOptionsBuilder(solution: ISolution, filesFromTargetsProvider: FSharpProjectFilesFromTargetsProvider) =
+type FSharpProjectOptionsBuilder(solution: ISolution, itemsContainer: IFSharpItemsContainer) =
     let msBuildHost = solution.ProjectsHostContainer().GetComponent<MsBuildProjectHost>()
 
     let defaultDelimiters = [| ';'; ','; ' ' |]
@@ -144,42 +146,27 @@ type FSharpProjectOptionsBuilder(solution: ISolution, filesFromTargetsProvider: 
 
     member private x.GetProjectFilesAndResources(project: IProject) =
         let projectMark = project.GetProjectMark().NotNull()
-        let projectDir = projectMark.Location.Directory
 
-        let files = Dictionary()
-        itemTypes |> Array.iter (fun t -> files.[t] <- ResizeArray())
+        let sourceFiles = List()
+        let resources = List()
 
         let sigFiles = HashSet<string>()
         let pairFiles = HashSet<FileSystemPath>()
 
-        for (RdItem (itemType, path)) in msBuildHost.Session.GetProjectItems(projectMark) do
-            if Array.contains itemType itemTypes then
-                let path = FileSystemPath.TryParse(path)
-                if not path.IsEmpty then
-                    let path = ensureAbsolute path projectDir
-                    files.[itemType].Add(path)
+        let projectItems = itemsContainer.GetProjectItemsPaths(projectMark, TargetFrameworkId.Default)
+        for path, buildAction in projectItems do
+            match buildAction with
+            | SourceFile ->
+                sourceFiles.Add(path) |> ignore
+                match path with
+                | SigFile -> sigFiles.Add(path.NameWithoutExtension) |> ignore
+                | ImplFile when sigFiles.Contains(path.NameWithoutExtension) -> pairFiles.add(path)
+                | _ -> ()
 
-                    match path with
-                    | SigFile -> sigFiles.Add(path.NameWithoutExtension) |> ignore
-                    | ImplFile when sigFiles.Contains(path.NameWithoutExtension) -> pairFiles.add(path)
-                    | _ -> ()
+            | Resource -> resources.Add(path) |> ignore
+            | _ -> ()
 
-        let filesFromTargets = filesFromTargetsProvider.GetFilesForProject(projectMark)
-        let compileFiles =
-            // the order between files lists and filesFromTargets may be wrong
-            // and will be fixed when R# keeps a common evaluation order
-            // https://youtrack.jetbrains.com/issue/RIDER-9682
-            [| yield! files.[CompileBefore]
-               yield! filesFromTargets.CompileBefore
-
-               yield! files.[Compile]
-               yield! filesFromTargets.Compile
-
-               yield! files.[CompileAfter]
-               yield! filesFromTargets.CompileAfter |]
-
-        files.[Resource].AddRange(filesFromTargets.Resource.ToIList())
-        compileFiles, pairFiles, files.[Resource]
+        sourceFiles.ToArray(), pairFiles, resources
 
     member private x.GetReferencedPathsOptions(project: IProject) =
         let framework = project.GetCurrentTargetFrameworkId()

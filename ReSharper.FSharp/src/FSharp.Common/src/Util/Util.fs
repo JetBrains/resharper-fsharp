@@ -156,7 +156,7 @@ module rec CommonUtil =
 
 [<AutoOpen>]
 module rec FSharpMsBuildUtils =
-    open System
+    open BuildActions
     open ItemTypes
     open JetBrains.Platform.MsBuildHost.Models
     open JetBrains.ProjectModel
@@ -165,6 +165,10 @@ module rec FSharpMsBuildUtils =
         let [<Literal>] compileBeforeItemType = "CompileBefore"
         let [<Literal>] compileAfterItemType = "CompileAfter"
         let [<Literal>] folderItemType = "Folder"
+
+    module BuildActions =
+        let compileBefore = BuildAction.GetOrCreate(compileBeforeItemType)  
+        let compileAfter = BuildAction.GetOrCreate(compileAfterItemType)  
 
     let isCompileBefore itemType =
         equalsIgnoreCase compileBeforeItemType itemType
@@ -186,6 +190,12 @@ module rec FSharpMsBuildUtils =
 
     let (|RdItem|) (item: RdProjectItem) =
         RdItem (item.ItemType, item.EvaluatedInclude)
+
+    let (|SourceFile|_|) (buildAction: BuildAction) =
+        if buildAction.IsCompile() || buildAction = compileBefore || buildAction = compileAfter then Some () else None
+
+    let (|Resource|_|) buildAction =
+        if buildAction = BuildAction.RESOURCE then Some () else None
 
     let changesOrder = function
         | CompileBefore | CompileAfter -> true

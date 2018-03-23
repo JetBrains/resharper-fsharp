@@ -202,7 +202,7 @@ type IFSharpItemsContainer =
     abstract member TryGetSortKey: FSharpViewItem -> int option
     abstract member TryGetParentFolderIdentity: FSharpViewItem -> FSharpViewFolderIdentity option
     abstract member CreateFoldersWithParents: IProjectFolder -> (FSharpViewFolder * FSharpViewFolder option) list
-    abstract member GetProjectItemsPaths: IProjectMark * TargetFrameworkId -> FileSystemPath[]
+    abstract member GetProjectItemsPaths: IProjectMark * TargetFrameworkId -> (FileSystemPath * BuildAction)[]
     abstract member Dump: TextWriter -> unit
 
     abstract member TryGetRelativeChildPath:
@@ -672,8 +672,8 @@ type ProjectMapping(projectMark, items, targetFrameworks, refresher: IFSharpItem
     member x.GetProjectItemsPaths(targetFrameworkId) =
         let result = List()
         iter (function
-            | FileItem (info, _, ids) when ids.Contains(targetFrameworkId) ->
-                result.Add(info.PhysicalPath)
+            | FileItem (info, buildAction, ids) when ids.Contains(targetFrameworkId) ->
+                result.Add((info.PhysicalPath, buildAction))
             | _ -> ())
         result.ToArray()
 
@@ -688,7 +688,7 @@ type ProjectMapping(projectMark, items, targetFrameworks, refresher: IFSharpItem
             writer.WriteLine()
             writer.WriteLine(targetFrameworkId)
             x.GetProjectItemsPaths(targetFrameworkId)
-            |> Array.iter (fun (UnixSeparators path) -> writer.WriteLine(path))
+            |> Array.iter (fun ((UnixSeparators path), _) -> writer.WriteLine(path))
             writer.WriteLine()
 
     member x.DumpToString() =
@@ -922,6 +922,7 @@ type FSharpItemModificationContextProvider(container: IFSharpItemsContainer) =
         |> Option.map (fun (path, relativeToType) ->
             let relativeProjectItem = project.FindProjectItemsByLocation(path).First()
             RiderItemModificationContext(RelativeTo(relativeProjectItem, relativeToType)))
+
 
 [<ShellComponent>]
 type FSharpModificationSettingsProvider() =
