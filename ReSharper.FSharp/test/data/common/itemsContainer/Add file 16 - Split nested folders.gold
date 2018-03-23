@@ -4,6 +4,11 @@
     1:File1
     2:File2
 
+.NETFramework,Version=v0.0
+C:/Solution/Project/Folder/SubFolder/File1
+C:/Solution/Project/Folder/SubFolder/File2
+
+
 =======
 Add 'File3' Before 'Folder/SubFolder/File2'
 Refresh whole project
@@ -18,6 +23,12 @@ Project
   1:SubFolder[2]
     1:File2
 
+.NETFramework,Version=v0.0
+C:/Solution/Project/Folder/SubFolder/File1
+C:/Solution/Project/File3
+C:/Solution/Project/Folder/SubFolder/File2
+
+
 =======
 Add 'File3' After 'Folder/SubFolder/File1'
 Refresh whole project
@@ -31,5 +42,11 @@ Project
 3:Folder[2]
   1:SubFolder[2]
     1:File2
+
+.NETFramework,Version=v0.0
+C:/Solution/Project/Folder/SubFolder/File1
+C:/Solution/Project/File3
+C:/Solution/Project/Folder/SubFolder/File2
+
 
 Dumps are equal: True

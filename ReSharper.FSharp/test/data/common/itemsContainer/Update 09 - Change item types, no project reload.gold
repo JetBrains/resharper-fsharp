@@ -2,6 +2,11 @@
 1:File1
 2:File2 (Resource)
 
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/File2
+
+
 =======
 Update file: 'File1' (Compile) -> 'File1' (Resource)
 Update view File1
@@ -12,4 +17,9 @@ Update view File2
 Project
 1:File1 (Resource)
 2:File2
+
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/File2
+
 

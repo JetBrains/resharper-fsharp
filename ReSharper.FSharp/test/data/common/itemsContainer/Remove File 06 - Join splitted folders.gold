@@ -8,6 +8,14 @@
     1:File3
   4:File4
 
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/Folder/Subfolder/File1
+C:/Solution/Project/Folder/File2
+C:/Solution/Project/Folder/Subfolder/File3
+C:/Solution/Project/Folder/File4
+
+
 =======
 Remove 'Folder/File2'
 Refresh Folder[1]
@@ -20,4 +28,11 @@ Project
     1:File1
     2:File3
   2:File4
+
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/Folder/Subfolder/File1
+C:/Solution/Project/Folder/Subfolder/File3
+C:/Solution/Project/Folder/File4
+
 

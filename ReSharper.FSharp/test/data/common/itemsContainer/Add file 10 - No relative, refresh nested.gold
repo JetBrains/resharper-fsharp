@@ -4,6 +4,11 @@
   1:SubFolder[1]
     1:File2
 
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/Folder/SubFolder/File2
+
+
 =======
 Add 'Folder/Subfolder/Another/File1'
 Refresh Folder/SubFolder[1]
@@ -15,4 +20,10 @@ Project
     1:File2
     2:Another[1]
       1:File1
+
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/Folder/SubFolder/File2
+C:/Solution/Project/Folder/Subfolder/Another/File1
+
 

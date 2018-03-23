@@ -5,6 +5,14 @@
 4:File4
 5:File5
 
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/File2
+C:/Solution/Project/File3
+C:/Solution/Project/File4
+C:/Solution/Project/File5
+
+
 =======
 Add 'File6' Before 'File4'
 Update view File4
@@ -18,6 +26,15 @@ Project
 5:File4
 6:File5
 
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/File2
+C:/Solution/Project/File3
+C:/Solution/Project/File6
+C:/Solution/Project/File4
+C:/Solution/Project/File5
+
+
 =======
 Add 'File6' After 'File3'
 Update view File4
@@ -30,5 +47,14 @@ Project
 4:File6
 5:File4
 6:File5
+
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/File2
+C:/Solution/Project/File3
+C:/Solution/Project/File6
+C:/Solution/Project/File4
+C:/Solution/Project/File5
+
 
 Dumps are equal: True

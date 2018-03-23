@@ -122,7 +122,13 @@ let getOrCreateFolder (AbsolutePath path) solutionItems: IProjectFolder =
 
 
 let createViewItems solutionItems item : seq<FSharpViewItem> = seq {
-    let logicalPath = if isNotNull item.Link then item.Link else item.EvaluatedInclude
+    let logicalPath =
+        let itemPath = FileSystemPath.Parse(item.EvaluatedInclude).MakeAbsoluteBasedOn(projectDirectory) 
+        match item.Link, item.EvaluatedInclude with
+        | null, path when projectDirectory.IsPrefixOf(itemPath) -> path
+        | null, _ -> projectDirectory.Combine(itemPath.Name).MakeRelativeTo(projectDirectory).FullPath
+        | link, _ -> link
+
     let components = logicalPath.Split('/')
 
     let mutable path = projectDirectory
@@ -216,6 +222,7 @@ type FSharpItemsContainerTest() =
     member x.``Initialization 07 - Linked files``() =
         x.DoContainerInitializationTest(
             [ createItem "Compile"      "File1"
+              createItem "Compile"      "..\\ExternalFolder\\File2"
               createItem "Compile"      "..\\ExternalFolder\\File3" |> link "File3"
               createItem "CompileAfter" "..\\ExternalFolder\\File4" |> link "LinkFolder\\File4"
               createItem "Compile"      "..\\ExternalFolder\\File5" |> link "LinkFolder\\File5" ])

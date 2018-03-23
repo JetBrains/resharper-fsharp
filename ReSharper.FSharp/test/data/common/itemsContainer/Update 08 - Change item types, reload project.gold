@@ -4,6 +4,13 @@
 3:File1 (CompileAfter)
 4:File4 (CompileAfter)
 
+.NETFramework,Version=v0.0
+C:/Solution/Project/File3
+C:/Solution/Project/File2
+C:/Solution/Project/File1
+C:/Solution/Project/File4
+
+
 =======
 Update file: 'File2' (Compile) -> 'File2' (CompileBefore)
 Reload project Project

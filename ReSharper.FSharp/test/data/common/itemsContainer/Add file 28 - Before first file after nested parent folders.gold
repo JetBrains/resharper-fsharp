@@ -4,6 +4,11 @@
     1:File1
 2:File2
 
+.NETFramework,Version=v0.0
+C:/Solution/Project/Folder/Sub/File1
+C:/Solution/Project/File2
+
+
 =======
 Add 'Folder/Sub/File3' Before 'File2'
 
@@ -13,4 +18,10 @@ Project
     1:File1
     2:File3
 2:File2
+
+.NETFramework,Version=v0.0
+C:/Solution/Project/Folder/Sub/File1
+C:/Solution/Project/Folder/Sub/File3
+C:/Solution/Project/File2
+
 

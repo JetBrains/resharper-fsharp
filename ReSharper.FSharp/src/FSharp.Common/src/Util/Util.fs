@@ -151,10 +151,14 @@ module rec CommonUtil =
     let getCommonParent path1 path2 =
         FileSystemPath.GetDeepestCommonParent(path1, path2)
 
+    let (|UnixSeparators|) (path: FileSystemPath) =
+        path.NormalizeSeparators(FileSystemPathEx.SeparatorStyle.Unix)
+
 [<AutoOpen>]
 module rec FSharpMsBuildUtils =
     open System
     open ItemTypes
+    open JetBrains.Platform.MsBuildHost.Models
     open JetBrains.ProjectModel
 
     module ItemTypes =
@@ -162,17 +166,26 @@ module rec FSharpMsBuildUtils =
         let [<Literal>] compileAfterItemType = "CompileAfter"
         let [<Literal>] folderItemType = "Folder"
 
-    let (|CompileBefore|_|) (itemType: string) =
-        if equalsIgnoreCase compileBeforeItemType itemType then Some () else None
+    let isCompileBefore itemType =
+        equalsIgnoreCase compileBeforeItemType itemType
 
-    let (|CompileAfter|_|) (itemType: string) =
-        if equalsIgnoreCase compileAfterItemType itemType then Some () else None
+    let isCompileAfter itemType =
+        equalsIgnoreCase compileAfterItemType itemType
+
+    let (|CompileBefore|_|) itemType =
+        if isCompileBefore itemType then Some () else None
+
+    let (|CompileAfter|_|) itemType =
+        if isCompileAfter itemType then Some () else None
 
     let (|Folder|_|) (itemType: string) =
         if equalsIgnoreCase folderItemType itemType then Some () else None
 
     let (|BuildAction|) itemType =
         BuildAction.GetOrCreate(itemType)
+
+    let (|RdItem|) (item: RdProjectItem) =
+        RdItem (item.ItemType, item.EvaluatedInclude)
 
     let changesOrder = function
         | CompileBefore | CompileAfter -> true

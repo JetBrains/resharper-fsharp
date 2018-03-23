@@ -11,6 +11,14 @@
 5:Another[2]
   1:File5
 
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/Folder/SubFolder/File2
+C:/Solution/Project/Another/File3
+C:/Solution/Project/Folder/SubFolder/File4
+C:/Solution/Project/Another/File5
+
+
 =======
 Remove 'Another/File3'
 Refresh whole project
@@ -24,4 +32,11 @@ Project
     2:File4
 3:Another[1]
   1:File5
+
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/Folder/SubFolder/File2
+C:/Solution/Project/Folder/SubFolder/File4
+C:/Solution/Project/Another/File5
+
 

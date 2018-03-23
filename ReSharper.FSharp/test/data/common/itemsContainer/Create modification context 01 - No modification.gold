@@ -3,6 +3,12 @@
 2:File2
 3:File3
 
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/File2
+C:/Solution/Project/File3
+
+
 File1 Before File1 -> Before File2
 File1 After File1 -> Before File2
 

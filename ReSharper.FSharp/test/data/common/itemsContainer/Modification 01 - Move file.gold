@@ -5,6 +5,12 @@
     1:File1
   2:File4
 
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/Folder/SubFolder/File1
+C:/Solution/Project/Folder/File4
+
+
 =======
 Move 'Folder/File4' after 'File1':
 Remove 'Folder/File4'
@@ -17,4 +23,10 @@ Project
 3:Folder[1]
   1:SubFolder[1]
     1:File1
+
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/File4
+C:/Solution/Project/Folder/SubFolder/File1
+
 

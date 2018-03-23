@@ -12,6 +12,16 @@ Project
   1:File6 (CompileAfter)
 7:File7 (CompileAfter)
 
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/Folder/File2
+C:/Solution/Project/File3
+C:/Solution/Project/Folder/File4
+C:/Solution/Project/File5
+C:/Solution/Project/Folder/File6
+C:/Solution/Project/File7
+
+
 === Structure API ===
 File3 SortKey=3 ParentFolderIdentity=<null>
 Folder SortKey=4

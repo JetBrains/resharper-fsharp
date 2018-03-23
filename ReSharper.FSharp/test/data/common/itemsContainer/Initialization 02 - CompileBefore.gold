@@ -4,6 +4,11 @@ Project
 1:File1 (CompileBefore)
 2:File2
 
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/File2
+
+
 === Structure API ===
 File2 SortKey=2 ParentFolderIdentity=<null>
 File1 SortKey=1 ParentFolderIdentity=<null>

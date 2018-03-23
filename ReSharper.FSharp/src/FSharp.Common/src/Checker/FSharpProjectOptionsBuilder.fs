@@ -152,10 +152,9 @@ type FSharpProjectOptionsBuilder(solution: ISolution, filesFromTargetsProvider: 
         let sigFiles = HashSet<string>()
         let pairFiles = HashSet<FileSystemPath>()
 
-        for item in msBuildHost.Session.GetProjectItems(projectMark) do
-            let itemType = item.ItemType
+        for (RdItem (itemType, path)) in msBuildHost.Session.GetProjectItems(projectMark) do
             if Array.contains itemType itemTypes then
-                let path = FileSystemPath.TryParse(item.EvaluatedInclude)
+                let path = FileSystemPath.TryParse(path)
                 if not path.IsEmpty then
                     let path = ensureAbsolute path projectDir
                     files.[itemType].Add(path)

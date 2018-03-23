@@ -8,6 +8,13 @@
   1:SubFolder[2]
     1:File4
 
+.NETFramework,Version=v0.0
+C:/Solution/Project/Folder/SubFolder/File1
+C:/Solution/Project/Folder/File2
+C:/Solution/Project/File3
+C:/Solution/Project/Folder/SubFolder/File4
+
+
 =======
 Rename 'Folder' to 'NewName'
 Update folder: 'Folder' -> 'NewName'
@@ -24,6 +31,13 @@ Project
   1:SubFolder[2]
     1:File4
 
+.NETFramework,Version=v0.0
+C:/Solution/Project/NewName/SubFolder/File1
+C:/Solution/Project/NewName/File2
+C:/Solution/Project/File3
+C:/Solution/Project/NewName/SubFolder/File4
+
+
 Rename 'NewName/SubFolder' to 'NewName/SubFolderNewName'
 Update folder: 'NewName/SubFolder' -> 'NewName/SubFolderNewName'
 Update view NewName/SubFolderNewName[1]
@@ -38,4 +52,11 @@ Project
 3:NewName[2]
   1:SubFolderNewName[2]
     1:File4
+
+.NETFramework,Version=v0.0
+C:/Solution/Project/NewName/SubFolderNewName/File1
+C:/Solution/Project/NewName/File2
+C:/Solution/Project/File3
+C:/Solution/Project/NewName/SubFolderNewName/File4
+
 

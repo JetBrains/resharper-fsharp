@@ -8,6 +8,15 @@
   3:File5
 4:File6
 
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/File2
+C:/Solution/Project/Folder/File3
+C:/Solution/Project/Folder/Subfolder/File4
+C:/Solution/Project/Folder/File5
+C:/Solution/Project/File6
+
+
 =======
 Add 'Another/Subfolder/File7' After 'Folder/Subfolder/File4'
 Refresh whole project
@@ -27,4 +36,14 @@ Project
 5:Folder[2]
   1:File5
 6:File6
+
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/File2
+C:/Solution/Project/Folder/File3
+C:/Solution/Project/Folder/Subfolder/File4
+C:/Solution/Project/Another/Subfolder/File7
+C:/Solution/Project/Folder/File5
+C:/Solution/Project/File6
+
 

@@ -6,6 +6,12 @@
       1:File1
   2:File4
 
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/Folder/SubFolder/Subfolder/File1
+C:/Solution/Project/Folder/File4
+
+
 =======
 Remove 'File1'
 Update view Folder[1]
@@ -16,4 +22,9 @@ Project
     1:Subfolder[1]
       1:File1
   2:File4
+
+.NETFramework,Version=v0.0
+C:/Solution/Project/Folder/SubFolder/Subfolder/File1
+C:/Solution/Project/Folder/File4
+
 

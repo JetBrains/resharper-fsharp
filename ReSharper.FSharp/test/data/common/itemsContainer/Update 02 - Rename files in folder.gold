@@ -6,6 +6,14 @@
   3:File4
 3:File5
 
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/Folder/File2
+C:/Solution/Project/Folder/File3
+C:/Solution/Project/Folder/File4
+C:/Solution/Project/File5
+
+
 =======
 Update file: 'Folder/File2' (Compile) -> 'NewName1' (Compile)
 Update view NewName1
@@ -21,4 +29,12 @@ Project
   2:NewName2
   3:NewName3
 3:File5
+
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/NewName1
+C:/Solution/Project/NewName2
+C:/Solution/Project/NewName3
+C:/Solution/Project/File5
+
 

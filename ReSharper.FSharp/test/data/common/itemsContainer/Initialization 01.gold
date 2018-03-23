@@ -17,6 +17,18 @@ Project
     2:File7
 5:File8
 
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/Folder/SubFolder/File1
+C:/Solution/Project/Folder/SubFolder/File2
+C:/Solution/Project/Folder/OtherSubFolder/Data/File3
+C:/Solution/Project/Folder/File4
+C:/Solution/Project/File5
+C:/Solution/Project/Folder/SubFolder/File6
+C:/Solution/Project/Folder/SubFolder/File7
+C:/Solution/Project/File8
+
+
 === Structure API ===
 File1 SortKey=1 ParentFolderIdentity=<null>
 Folder SortKey=2

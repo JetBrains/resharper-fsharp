@@ -27,11 +27,19 @@ open JetBrains.ReSharper.Psi
 open JetBrains.Threading
 open JetBrains.UI.RichText
 open JetBrains.Util
+open JetBrains.Util.Collections
+open JetBrains.Util.DataStructures
 
 [<SolutionInstanceComponent>]
 type FSharpItemsContainer(refresher: IFSharpItemsContainerRefresher) =
     let locker = JetFastSemiReenterableRWLock()
     let projectMappings = Dictionary<IProjectMark, ProjectMapping>()
+
+    let setComparer =
+        { new IEqualityComparer<HashSet<_>> with
+            member this.Equals(x, y) = x.SetEquals(y)
+            member this.GetHashCode(x) = x.Count }
+    let targetFrameworkIdIntern = DataIntern(setComparer)
 
     let tryGetProjectMapping (projectItem: IProjectItem) =
         match projectItem.GetProject() with
@@ -44,6 +52,32 @@ type FSharpItemsContainer(refresher: IFSharpItemsContainerRefresher) =
     let tryGetProjectItem (viewItem: FSharpViewItem) =
         tryGetProjectMapping viewItem.ProjectItem
         |> Option.bind (fun mapping -> mapping.TryGetProjectItem(viewItem))
+
+    let getItems (msBuildProject: MsBuildProject) itemTypeFilter =
+        let items = List<RdProjectItemWithTargetFrameworks>()
+        for rdProject in msBuildProject.RdProjects do
+            let targetFrameworkId = msBuildProject.GetTargetFramework(rdProject)
+            let filter = MsBuildItemTypeFilter(rdProject)
+            rdProject.Items
+            |> Seq.filter (fun item ->
+                let itemType = item.ItemType
+                not (filter.FilterByItemType(itemType, item.IsImported())) && itemTypeFilter itemType)
+            |> Seq.fold (fun index item ->
+                if index < items.Count && items.[index].Item.EvaluatedInclude = item.EvaluatedInclude then
+                    items.[index].TargetFrameworkIds.Add(targetFrameworkId) |> ignore
+                    index + 1
+                else
+                    let mutable tmpIndex = index + 1
+                    while tmpIndex < items.Count && items.[tmpIndex].Item.EvaluatedInclude <> item.EvaluatedInclude do
+                        tmpIndex <- tmpIndex + 1
+
+                    if tmpIndex >= items.Count then
+                        items.Insert(index, { Item = item; TargetFrameworkIds = HashSet([targetFrameworkId]) })
+                        index + 1
+                    else
+                        items.[tmpIndex].TargetFrameworkIds.Add(targetFrameworkId) |> ignore
+                        tmpIndex + 1) 0 |> ignore
+        items
 
     member x.IsValid(viewItem: FSharpViewItem) =
         use lock = locker.UsingReadLock()
@@ -59,26 +93,22 @@ type FSharpItemsContainer(refresher: IFSharpItemsContainerRefresher) =
 
             match projectMark with
             | FSharProjectMark ->
-                let rdProject = msBuildProject.RdProjects |> Seq.head // todo: items by framework
-                let filter = MsBuildItemTypeFilter(rdProject)
+                let compileBeforeItems = getItems msBuildProject isCompileBefore
+                let compileAfterItems = getItems msBuildProject isCompileAfter
+                let restItems = getItems msBuildProject (changesOrder >> not)
                 let items =
-                    rdProject.Items
-                    |> Seq.filter (fun item -> not (filter.FilterByItemType(item.ItemType, item.IsImported())))
+                    compileBeforeItems.Concat(restItems).Concat(compileAfterItems)
+                    |> Seq.map (fun item ->
+                        { item with TargetFrameworkIds = targetFrameworkIdIntern.Intern(item.TargetFrameworkIds) })
                     |> List.ofSeq
-                let compileBeforeItems =
-                    items |> List.filter (fun item -> match item.ItemType with | CompileBefore -> true | _ -> false)
-                let compileAfterItems =
-                    items |> List.filter (fun item -> match item.ItemType with | CompileAfter -> true | _ -> false)
-                let restItems =
-                    items |> List.filter (fun item -> item.ItemType |> changesOrder |> not)
-                let items = compileBeforeItems.Concat(restItems).Concat(compileAfterItems) |> List.ofSeq
-                let targetFrameworkIds = msBuildProject.TargetFrameworkIds |> List.ofSeq
+                let targetFrameworkIds = HashSet(msBuildProject.TargetFrameworkIds)
 
                 use lock = locker.UsingWriteLock()
                 projectMappings.[projectMark] <- ProjectMapping(projectMark, items, targetFrameworkIds, refresher)
                 refresher.Refresh(projectMark, true)
             | _ -> ()
 
+        // todo: add on add folder
         member x.OnAddFile(projectMark, itemType, path, linkedPath, relativeTo, relativeToType) =
             use lock = locker.UsingWriteLock()
             tryGetValue projectMappings projectMark
@@ -159,6 +189,11 @@ type FSharpItemsContainer(refresher: IFSharpItemsContainerRefresher) =
             use lock = locker.UsingReadLock()
             tryGetProjectMapping projectItem |> Option.isSome
 
+        member x.GetProjectItemsPaths(projectMark, targetFrameworkId) =
+            tryGetValue projectMappings projectMark
+            |> Option.map (fun mapping -> mapping.GetProjectItemsPaths(targetFrameworkId))
+            |> Option.defaultValue [| |]
+
 type IFSharpItemsContainer =
     inherit IMsBuildProjectListener
     inherit IMsBuildProjectModificationListener
@@ -167,6 +202,7 @@ type IFSharpItemsContainer =
     abstract member TryGetSortKey: FSharpViewItem -> int option
     abstract member TryGetParentFolderIdentity: FSharpViewItem -> FSharpViewFolderIdentity option
     abstract member CreateFoldersWithParents: IProjectFolder -> (FSharpViewFolder * FSharpViewFolder option) list
+    abstract member GetProjectItemsPaths: IProjectMark * TargetFrameworkId -> FileSystemPath[]
     abstract member Dump: TextWriter -> unit
 
     abstract member TryGetRelativeChildPath:
@@ -239,7 +275,7 @@ type ProjectMapping(projectMark, items, targetFrameworks, refresher: IFSharpItem
             Some (physicalPath, logicalPath)
 
         for item in items do
-            match parsePaths item with
+            match parsePaths item.Item with
             | Some (physicalPath, logicalPath) ->
                 Assertion.Assert(projectDirectory.IsPrefixOf(logicalPath), "Invalid logical path")
                 if logicalPath.Directory <> folders.Peek().Path then
@@ -261,11 +297,11 @@ type ProjectMapping(projectMark, items, targetFrameworks, refresher: IFSharpItem
                 let parent = currentState.Folder
                 currentState.NextSortKey <- currentState.NextSortKey + 1
 
-                match item.ItemType with
+                match item.Item.ItemType with
                 | Folder -> addFolder parent currentState.NextSortKey logicalPath ignore |> ignore
                 | BuildAction buildAction ->
                     let itemInfo = ItemInfo.Create(logicalPath, physicalPath, parent, currentState.NextSortKey)
-                    itemsByPath.Add(logicalPath, FileItem (itemInfo, buildAction, [])) // todo: framework ids
+                    itemsByPath.Add(logicalPath, FileItem (itemInfo, buildAction, item.TargetFrameworkIds))
             | _ -> ()
 
     let (|EmptyFolder|_|) projectItem =
@@ -512,6 +548,13 @@ type ProjectMapping(projectMark, items, targetFrameworks, refresher: IFSharpItem
                 // todo: check item type
                 tryGetAdjacentRelativeItem nodeItem.Parent modifiedNodeItem relativeToType)
 
+    let iter f =
+        let rec iter (parent: FSharpProjectModelElement) =
+            for item in getChildren parent do
+                f item
+                iter (ProjectItem item)
+        iter Project 
+
     member x.UpdateFile(oldItemType, oldLocation, BuildAction buildAction, newLocation) =
         getItemsForPath oldLocation
         |> Seq.tryHead
@@ -626,12 +669,27 @@ type ProjectMapping(projectMark, items, targetFrameworks, refresher: IFSharpItem
         | Some (item, reltativeToType) -> Some (item.LogicalPath, relativeToType)
         | _ -> None
 
+    member x.GetProjectItemsPaths(targetFrameworkId) =
+        let result = List()
+        iter (function
+            | FileItem (info, _, ids) when ids.Contains(targetFrameworkId) ->
+                result.Add(info.PhysicalPath)
+            | _ -> ())
+        result.ToArray()
+
     member x.Dump(writer: TextWriter) =
         let rec dump (parent: FSharpProjectModelElement) ident =
             for item in getChildren parent do
                 writer.WriteLine(sprintf "%s%d:%O" (String(' ', ident * 2)) item.SortKey item)
                 dump (ProjectItem item) (ident + 1)
         dump Project 0
+
+        for targetFrameworkId in targetFrameworks do
+            writer.WriteLine()
+            writer.WriteLine(targetFrameworkId)
+            x.GetProjectItemsPaths(targetFrameworkId)
+            |> Array.iter (fun (UnixSeparators path) -> writer.WriteLine(path))
+            writer.WriteLine()
 
     member x.DumpToString() =
         let writer = new StringWriter()
@@ -646,7 +704,7 @@ type FSharpProjectModelElement =
 
 [<ReferenceEquality>]
 type FSharpProjectItem =
-    | FileItem of ItemInfo * BuildAction * TargetFrameworkId list
+    | FileItem of ItemInfo * BuildAction * ISet<TargetFrameworkId>
     | FolderItem of ItemInfo * FSharpViewFolderIdentity 
 
     member x.ItemInfo: ItemInfo =
@@ -666,9 +724,11 @@ type FSharpProjectItem =
             | FileItem (_, buildAction, _) when
                     not (buildAction.IsCompile()) -> sprintf "%s (%O)" x.LogicalPath.Name buildAction
             | _ -> x.LogicalPath.Name
-        if x.PhysicalPath = x.LogicalPath then name else
-        name + (sprintf " (from %O)" x.PhysicalPath)
-        
+        if x.PhysicalPath = x.LogicalPath then name
+        else
+            let (UnixSeparators path) = x.PhysicalPath
+            sprintf "%s (from %s)" name path
+
 
 
 type ItemInfo =
@@ -700,7 +760,7 @@ type State =
 
 type RdProjectItemWithTargetFrameworks =
     { Item: RdProjectItem
-      TargetFrameworks: HashSet<TargetFrameworkId> }
+      TargetFrameworkIds: HashSet<TargetFrameworkId> }
 
 
 type IFSharpItemsContainerRefresher =
