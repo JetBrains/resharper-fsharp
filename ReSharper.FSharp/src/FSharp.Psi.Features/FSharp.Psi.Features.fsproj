@@ -6,7 +6,6 @@
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi.Features</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="src\FSharpXmlDocService.fs" />
     <Compile Include="src\CodeCompletion\CompletionUtil.fs" />
     <Compile Include="src\CodeCompletion\FSharpCodeCompletionContext.fs" />
     <Compile Include="src\CodeCompletion\FSharpPathCompletionProvider.fs" />
@@ -29,8 +28,6 @@
     <Compile Include="src\Debugger\FSharpBreakpointVariantsProvider.fs" />
     <Compile Include="src\Debugger\FSharpExpressionEvaluationInfoProvider.fs" />
     <Compile Include="src\Foldings\FSharpCodeFoldings.fs" />
-    <Compile Include="src\FSharpClrLanguage.fs" />
-    <Compile Include="src\FSharpRefactoringLanguageService.fs" />
     <Compile Include="src\Searching\FSharpPathReference.fs" />
     <Compile Include="src\SelectEmbracingConsruct\FSharpSelectEmbracingConstructProvider.fs" />
     <Compile Include="src\Formatter\FSharpCodeStylePage.fs" />
@@ -45,6 +42,8 @@
     <Compile Include="src\LanguageService\FSharpPsiProperties.fs" />
     <Compile Include="src\LanguageService\FSharpProjectFileLanguageService.fs" />
     <Compile Include="src\LanguageService\FSharpLanguageService.fs" />
+    <Compile Include="src\LanguageService\FSharpClrLanguage.fs" />
+    <Compile Include="src\LanguageService\FSharpRefactoringLanguageService.fs" />
     <Compile Include="src\ZoneMarker.fs" />
   </ItemGroup>
   <ItemGroup>
