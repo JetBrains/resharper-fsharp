@@ -47,7 +47,8 @@ type FSharpProjectPropertiesRequest() =
 [<ShellComponent>]
 type VisualFSharpTargetsProjectLoadModificator() =
     let targets =
-        [| "GenerateFSharpInternalsVisibleToFile"
+        [| "GenerateCode"
+           "GenerateFSharpInternalsVisibleToFile"
            "GenerateAssemblyFileVersionTask" |]
 
     interface IMsBuildProjectLoadModificator with
