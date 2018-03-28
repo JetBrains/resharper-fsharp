@@ -1,6 +1,6 @@
 plugins {
     id 'org.jetbrains.kotlin.jvm' version '1.2.30'
-    id "org.jetbrains.intellij" version "0.2.18"
+    id "org.jetbrains.intellij" version "0.3.1"
 }
 
 group 'com.jetbrains'
@@ -115,12 +115,3 @@ test {
     def rerunSuccessfulTests = false
     outputs.upToDateWhen { !rerunSuccessfulTests }
 }
-
-// workaround for https://github.com/JetBrains/gradle-intellij-plugin/issues/234
-task updateFrontendSdk() {
-    group = "intellij"
-    doLast {
-        delete intellij.ideaDependency.classes
-    }
-}
-
