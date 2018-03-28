@@ -159,6 +159,11 @@ module rec CommonUtil =
     let (|UnixSeparators|) (path: FileSystemPath) =
         path.NormalizeSeparators(FileSystemPathEx.SeparatorStyle.Unix)
 
+    let setComparer =
+        { new IEqualityComparer<HashSet<_>> with
+            member this.Equals(x, y) = x.SetEquals(y)
+            member this.GetHashCode(x) = x.Count }
+
 [<AutoOpen>]
 module rec FSharpMsBuildUtils =
     open BuildActions

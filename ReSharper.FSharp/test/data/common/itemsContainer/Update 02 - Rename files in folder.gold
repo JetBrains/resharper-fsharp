@@ -15,12 +15,12 @@ C:/Solution/Project/File5
 
 
 =======
-Update file: 'Folder/File2' (Compile) -> 'NewName1' (Compile)
-Update view NewName1
-Update file: 'Folder/File3' (Compile) -> 'NewName2' (Compile)
-Update view NewName2
-Update file: 'Folder/File4' (Compile) -> 'NewName3' (Compile)
-Update view NewName3
+Update file: 'Folder/File2' (Compile) -> 'Folder/NewName1' (Compile)
+Update view Folder/NewName1
+Update file: 'Folder/File3' (Compile) -> 'Folder/NewName2' (Compile)
+Update view Folder/NewName2
+Update file: 'Folder/File4' (Compile) -> 'Folder/NewName3' (Compile)
+Update view Folder/NewName3
 
 Project
 1:File1
@@ -32,9 +32,9 @@ Project
 
 .NETFramework,Version=v0.0
 C:/Solution/Project/File1
-C:/Solution/Project/NewName1
-C:/Solution/Project/NewName2
-C:/Solution/Project/NewName3
+C:/Solution/Project/Folder/NewName1
+C:/Solution/Project/Folder/NewName2
+C:/Solution/Project/Folder/NewName3
 C:/Solution/Project/File5
 
 

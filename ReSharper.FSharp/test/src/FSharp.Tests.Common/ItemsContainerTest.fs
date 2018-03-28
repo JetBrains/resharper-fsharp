@@ -19,6 +19,7 @@ open JetBrains.ReSharper.TestFramework
 open JetBrains.TestFramework
 open JetBrains.TestFramework.Application.Zones
 open JetBrains.Util
+open JetBrains.Util.Logging
 open Moq
 
 type Assert = NUnit.Framework.Assert
@@ -85,7 +86,7 @@ let createViewFile path (solutionItems: IDictionary<FileSystemPath, IProjectItem
     FSharpViewFile(getOrCreateFile path solutionItems)
 
 let createViewFolder path id solutionItems =
-    FSharpViewFolder(getOrCreateFolder path solutionItems, { Identity = id })
+    FSharpViewFolder (getOrCreateFolder path solutionItems, { Identity = id })
 
 let getOrCreateFile (AbsolutePath path) (solutionItems): IProjectFile =
     solutionItems.GetOrCreateValue(path, fun () ->
@@ -121,15 +122,8 @@ let getOrCreateFolder (AbsolutePath path) solutionItems: IProjectFolder =
     folder.Object :> IProjectItem) :?> _
 
 
-let createViewItems solutionItems item : seq<FSharpViewItem> = seq {
-    let logicalPath =
-        let itemPath = FileSystemPath.Parse(item.EvaluatedInclude).MakeAbsoluteBasedOn(projectDirectory) 
-        match item.Link, item.EvaluatedInclude with
-        | null, path when projectDirectory.IsPrefixOf(itemPath) -> path
-        | null, _ -> projectDirectory.Combine(itemPath.Name).MakeRelativeTo(projectDirectory).FullPath
-        | link, _ -> link
-
-    let components = logicalPath.Split('/')
+let createViewItems solutionItems (item: AnItem) : seq<FSharpViewItem> = seq {
+    let components = item.EvaluatedInclude.Split('/')
 
     let mutable path = projectDirectory
     for itemComponent in Seq.take (components.Length - 1) components do
@@ -140,13 +134,13 @@ let createViewItems solutionItems item : seq<FSharpViewItem> = seq {
         let id = Int32.Parse(matched.Groups.["identity"].Value)
         path <- path.Combine(name)
 
-        yield createViewFolder path id solutionItems :> _
+        yield createViewFolder path id solutionItems
 
     path <- path.Combine(Array.last components |> removeIdentities)
     yield
         match item.ItemType with
-        | Folder -> createViewFolder path 1 solutionItems :> _
-        | _ -> createViewFile path solutionItems :> _ }
+        | Folder -> createViewFolder path 1 solutionItems
+        | _ -> createViewFile path solutionItems }
 
 
 let createItem itemType evaluatedInclude =
@@ -720,9 +714,9 @@ type FSharpItemsContainerTest() =
               "Folder[1]/File4"
               "File5" ],
             fun container writer ->
-                container.OnUpdateFile("Compile", "Folder/File2", "Compile", "NewName1")
-                container.OnUpdateFile("Compile", "Folder/File3", "Compile", "NewName2")
-                container.OnUpdateFile("Compile", "Folder/File4", "Compile", "NewName3"))
+                container.OnUpdateFile("Compile", "Folder/File2", "Compile", "Folder/NewName1")
+                container.OnUpdateFile("Compile", "Folder/File3", "Compile", "Folder/NewName2")
+                container.OnUpdateFile("Compile", "Folder/File4", "Compile", "Folder/NewName3"))
 
     [<Test>]
     member x.``Update 03 - Rename folder``() =
@@ -818,7 +812,8 @@ type FSharpItemsContainerTest() =
         x.DoContainerModificationTest(
             [ createItem "Compile" "..\\ExternalFolder\\File1" |> link "File1" ],
             fun container writer ->
-                 container.OnUpdateFile("Compile", "File1", "Resource", "File1"))
+                let (UnixSeparators path) = FileSystemPath.Parse("..\\ExternalFolder\\File1")
+                container.OnUpdateFile("Compile", path, "Resource", path))
 
 
     member x.DoCreateModificationContextTest(items: AnItem list) =
@@ -837,18 +832,18 @@ type FSharpItemsContainerTest() =
                 |> dict
 
             let viewItems = HashSet(Seq.collect (Dictionary() |> createViewItems) items)
-            let viewFiles = viewItems.OfType<FSharpViewFile>().ToList()
+            let viewFiles = viewItems |> Seq.filter (function | FSharpViewFile _ -> true | _ -> false) |> List.ofSeq
             for viewFile in viewFiles do
                 for relativeViewItem in viewItems do
                     for relativeToType in relativeToTypes do
-                        let projectItem = viewFile.ProjectFile :> IProjectItem
+                        let projectItem = viewFile.ProjectItem
                         let relative = relativeViewItem.ProjectItem
                         let itemType = itemTypes.TryGetValue(projectItem.Location)
                         let relativeItemType = itemTypes.TryGetValue(relative.Location)
 
                         let context = provider.CreateModificationContext(viewFile, relativeViewItem, relativeToType)
                         match relativeViewItem, context with
-                        | (:? FSharpViewFile), Some context when
+                        | FSharpViewFile _, Some context when
                                 projectItem <> relative && isNotNull itemType &&
                                 equalsIgnoreCase itemType relativeItemType ->
 
@@ -958,14 +953,13 @@ type FSharpItemsContainerTest() =
                         let sortKey = container.TryGetSortKey(viewItem)
                         writer.Write(sprintf "%s%s SortKey=%O" identString name (Option.get sortKey))
                         match viewItem with
-                        | :? FSharpViewFolder as viewFolder->
+                        | FSharpViewFolder _ ->
                             writer.WriteLine()
                             ident ()
-                        | :? FSharpViewFile as viewFile ->
+                        | FSharpViewFile _ ->
                             container.TryGetParentFolderIdentity(viewItem)
                             |> sprintf " ParentFolderIdentity=%O" 
                             |> writer.WriteLine
-                        | _ -> ()
 
             let dumpParentFolders items solutionItems =
                 writer.WriteLine()
@@ -999,11 +993,11 @@ type AnItem =
       Link: string }
 
     static member Create(itemType, evaluatedInclude, ?link) =
-        { ItemType = itemType; EvaluatedInclude = evaluatedInclude; Link = defaultArg link null } 
+        { ItemType = itemType; EvaluatedInclude = evaluatedInclude; Link = defaultArg link null }
 
 
 type LoggingFSharpItemsContainer(writer, refresher) as this =
-    inherit FSharpItemsContainer(refresher)
+    inherit FSharpItemsContainer(DummyLogger.Instance, DummyFSharpItemsContainerLoader.Instance, refresher)
 
     let container = this :> IFSharpItemsContainer
 
@@ -1033,3 +1027,10 @@ type LoggingFSharpItemsContainer(writer, refresher) as this =
     member x.TryGetSortKey(viewItem) = container.TryGetSortKey(viewItem)
     member x.TryGetParentFolderIdentity(viewItem) = container.TryGetParentFolderIdentity(viewItem)
     member x.CreateFoldersWithParents(folder) = container.CreateFoldersWithParents(folder)
+
+
+type DummyFSharpItemsContainerLoader() =
+    inherit FSharpItemsContainerLoader(null, null, null)
+
+    override x.GetMap() = Dictionary<IProjectMark, ProjectMapping>() :> _
+    static member Instance = DummyFSharpItemsContainerLoader()

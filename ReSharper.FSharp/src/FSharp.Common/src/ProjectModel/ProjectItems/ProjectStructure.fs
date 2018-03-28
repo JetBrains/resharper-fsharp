@@ -31,12 +31,12 @@ type FSharpProjectStructureProvider(container: IFSharpItemsContainer) =
                     ProjectStructureItem(viewFolder, parentOpt |> getParent parentFolder)) :> _
     
             | :? IProjectFile as projectFile ->
-                let item = new FSharpViewFile(projectFile)
+                let item = FSharpViewFile projectFile
                 let parentFolder = projectFile.ParentFolder.NotNull()
     
                 let parentViewFolder =
                     container.TryGetParentFolderIdentity(item)
-                    |> Option.map (fun identity -> FSharpViewFolder(parentFolder, identity))
+                    |> Option.map (fun identity -> FSharpViewFolder (parentFolder, identity))
                     |> getParent parentFolder
                 [ProjectStructureItem(item, parentViewFolder)] :> _
     
@@ -46,24 +46,21 @@ type FSharpProjectStructureProvider(container: IFSharpItemsContainer) =
 [<SolutionInstanceComponent>]
 type FSharpProjectStructurePresenter(host: ProjectModelViewHost, container: IFSharpItemsContainer) =
 
-    let getSortKey viewItem =
-        container.TryGetSortKey(viewItem) |> Option.toNullable
+    let presentItem (item: FSharpViewItem): RdProjectModelItemDescriptor =
+        let key = container.TryGetSortKey(item) |> Option.toNullable
+        match item with
+        | FSharpViewFile file ->
+            let userData =
+                file.Properties.GetBuildActions()
+                |> Seq.tryHead
+                |> Option.bind (fun (Pair (_, action)) ->
+                    if action.ChangesOrder() then Some (dict ["FSharpCompileType", action.ToString()])
+                    else None)
+                |> Option.toObj
+            ProjectModelViewPresenter.PresentProjectFile(file, sortKey = key, userData = userData) :> _
 
-    let presentFile (file: FSharpViewFile): RdProjectModelItemDescriptor =
-        let key = getSortKey file
-        let userData =
-            file.ProjectFile.Properties.GetBuildActions()
-            |> Seq.tryHead
-            |> Option.bind (fun (Pair (_, action)) ->
-                if action.ChangesOrder() then Some (Dictionary(["FSharpCompileType", action.ToString()] |> dict))
-                else None)
-            |> Option.toObj
-        ProjectModelViewPresenter.PresentProjectFile(file.ProjectFile, sortKey = key, userData = userData) :> _
-
-    let presentFolder (folder: FSharpViewFolder): RdProjectModelItemDescriptor =
-        let key = getSortKey folder
-        ProjectModelViewPresenter.PresentProjectFolder(folder.ProjectFolder, sortKey = key) :> _
+        | FSharpViewFolder (folder, _) ->
+            ProjectModelViewPresenter.PresentProjectFolder(folder, sortKey = key) :> _
 
     do
-        host.Present<FSharpViewFile>(Func<_,_>(presentFile))
-        host.Present<FSharpViewFolder>(Func<_,_>(presentFolder))
+        host.Present<FSharpViewItem>(Func<_,_>(presentItem))
