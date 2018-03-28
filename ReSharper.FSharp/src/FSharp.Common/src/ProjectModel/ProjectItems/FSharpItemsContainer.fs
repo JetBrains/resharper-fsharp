@@ -167,6 +167,10 @@ type FSharpItemsContainer
         use lock = locker.UsingReadLock()
         tryGetProjectItem viewItem |> Option.isSome
 
+    member x.RemoveProject(projectMark: IProjectMark) =
+        use lock = locker.UsingWriteLock()
+        x.ProjectMappings.Remove(projectMark) |> ignore
+
     interface IFSharpItemsContainer with
         member x.OnProjectLoaded(projectMark, msBuildProject) =
             match msBuildProject with
