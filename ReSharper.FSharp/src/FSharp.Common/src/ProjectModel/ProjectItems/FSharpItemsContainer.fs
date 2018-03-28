@@ -323,6 +323,14 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         |> Option.toList
         |> List.append (getFolders path)
 
+    let tryGetProjectItem (viewItem: FSharpViewItem) =
+        let path = viewItem.ProjectItem.Location
+        match viewItem with
+        | FSharpViewFile _ -> tryGetFile path
+        | FSharpViewFolder (_, identity) as viewFolder ->
+            getFolders path
+            |> List.tryFind (function | FolderItem (_, id) -> id = identity | _ -> false)
+
     let getNewFolderIdentity path =
         { Identity = (getFolders path |> List.length) + 1 }
 
@@ -481,8 +489,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
             | _ -> tryGetRelativeChildItem relativeChildItem modifiedItem relativeToType)
 
     let getRelativeChildPathImpl (relativeViewItem: FSharpViewItem) modifiedNodeItem relativeToType =
-        getItemsForPath relativeViewItem.Location
-        |> Seq.tryHead
+        tryGetProjectItem relativeViewItem
         |> Option.bind (function
             | FileItem _ as fileItem -> Some (fileItem, relativeToType)
             | FolderItem _ as folderItem ->
@@ -797,12 +804,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         renameFolder oldLocation newLocation updater
 
     member x.TryGetProjectItem(viewItem: FSharpViewItem): FSharpProjectItem option =
-        let path = viewItem.ProjectItem.Location
-        match viewItem with
-        | FSharpViewFile _ -> tryGetFile path
-        | FSharpViewFolder (_, identity) as viewFolder ->
-            getFolders path
-            |> List.tryFind (function | FolderItem (_, id) -> id = identity | _ -> false)
+        tryGetProjectItem viewItem
 
     member x.TryGetProjectItems(path: FileSystemPath): FSharpProjectItem list =
         getItemsForPath path
@@ -816,7 +818,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         folders.Add(path, FolderItem(itemInfo, getNewFolderIdentity path))
 
     member x.TryGetRelativeChildPath(modifiedItem, relativeItem, relativeToType) =
-        let modifiedNodeItem = getItemsForPath modifiedItem.Location |> Seq.tryHead
+        let modifiedNodeItem = tryGetProjectItem modifiedItem
         match getRelativeChildPathImpl relativeItem modifiedNodeItem relativeToType with
         | Some (relativeChildItem, relativeToType) when
                 relativeChildItem.PhysicalPath = modifiedItem.ProjectItem.Location ->
