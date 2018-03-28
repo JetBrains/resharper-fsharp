@@ -5,6 +5,7 @@ import com.jetbrains.rider.projectView.moveProviders.Impl.ActionOrderType
 import com.jetbrains.rider.projectView.moveProviders.Impl.NodeOrderType
 import com.jetbrains.rider.projectView.moveProviders.extensions.MoveProviderExtension
 import com.jetbrains.rider.projectView.nodes.*
+import com.jetbrains.rider.util.idea.application
 
 class FSharpMoveProviderExtension(project: Project) : MoveProviderExtension(project) {
 
@@ -115,7 +116,8 @@ class FSharpMoveProviderExtension(project: Project) : MoveProviderExtension(proj
     }
 
     private fun isFSharpNode(node: ProjectModelNode): Boolean {
-        return node.containingProject()?.getVirtualFile()?.extension == "fsproj"
+        return node.containingProject()?.getVirtualFile()?.extension == "fsproj" ||
+                application.isUnitTestMode // todo: workaround for dummy project?
     }
 
     private fun ProjectModelNode?.isCompileBefore(orderType: ActionOrderType): Boolean {
