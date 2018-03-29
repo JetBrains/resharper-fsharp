@@ -36,7 +36,7 @@ open JetBrains.Util.DataStructures
 open JetBrains.Util.Logging
 open JetBrains.Util.PersistentMap
 
-/// Keeps project mappings in solution caches to make mappings available before MsBuild loads the projects.
+/// Keeps project mappings in solution caches to make the mappings available before MsBuild loads the projects.
 [<SolutionInstanceComponent>]
 type FSharpItemsContainerLoader(lifetime: Lifetime, solution: ISolution, solutionCaches: ISolutionCaches) =
 
@@ -124,7 +124,7 @@ type FSharpItemsContainer
                         tmpIndex + 1) 0 |> ignore
         items
 
-    let createRefreshers (projectMark: IProjectMark) =
+    let createRefreshers projectMark =
         let mutable folderToRefresh = None
         let itemsToUpdate = HashSet<FSharpProjectItem>()
 
@@ -202,17 +202,21 @@ type FSharpItemsContainer
             | _ -> ()
 
         member x.OnAddFile(projectMark, itemType, path, linkedPath, relativeTo, relativeToType) =
+            logger.Trace("On add file: {0} ({1}, link: {2}) relative to: {3} {4}",
+                path, itemType, linkedPath, relativeTo, relativeToType)
             updateProject projectMark (fun mapping refresher updater ->
                 let logicalPath = if isNotNull linkedPath then linkedPath else path
                 let relativeToType = Option.ofNullable relativeToType
                 mapping.AddFile(itemType, path, logicalPath, relativeTo, relativeToType, refresher, updater))
             refresher.SelectItem(projectMark, path)
 
-        member x.OnRemoveFile(projectMark, itemType, location) =
+        member x.OnRemoveFile(projectMark, itemType, path) =
+            logger.Trace("On remove file: {0} ({1})", path, itemType)
             updateProject projectMark (fun mapping refresher updater ->
-                mapping.RemoveFile(location, refresher, updater))
+                mapping.RemoveFile(path, refresher, updater))
 
         member x.OnUpdateFile(projectMark, oldItemType, oldLocation, newItemType, newLocation) =
+            logger.Trace("On update file: {0} ({1}) to {2} ({3})", oldLocation, oldItemType, newLocation, newItemType)
             if not (equalsIgnoreCase oldItemType newItemType) &&
                     (changesOrder oldItemType || changesOrder newItemType) then
                 refresher.ReloadProject(projectMark) else
@@ -222,15 +226,18 @@ type FSharpItemsContainer
                 refresher.Update(projectMark, newLocation))
 
         member x.OnUpdateFolder(projectMark, oldLocation, newLocation) =
+            logger.Trace("On update folder: {0} to {1}", oldLocation, newLocation)
             if oldLocation <> newLocation then
                 updateProject projectMark (fun mapping _ updater ->
                     mapping.UpdateFolder(oldLocation, newLocation, updater))
 
         member x.OnAddFolder(projectMark, path, relativeTo, relativeToType) =
+            logger.Trace("On add folder: {0} relative to {1} {2}", path, relativeTo, relativeToType)
             updateProject projectMark (fun mapping refresher updater ->
                 mapping.AddFolder(path, relativeTo, Option.ofNullable relativeToType, refresher, updater))
 
         member x.OnRemoveFolder(projectMark, path) =
+            logger.Trace("On remove file: {0}", path)
             updateProject projectMark (fun mapping refresher updater ->
                 mapping.RemoveFolder(path, refresher, updater))
 
@@ -388,7 +395,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         | FileItem _, None -> true
         | FileItem (_, buildAction, _), Some (FileItem (_, modifiedItemBuildAction, _)) ->
             not (buildAction.ChangesOrder()) && not (modifiedItemBuildAction.ChangesOrder()) ||
-            buildAction.Equals(modifiedItemBuildAction)
+            buildAction = modifiedItemBuildAction
 
         | EmptyFolder _, None -> true
         | EmptyFolder _, Some (FileItem (_, buildAction, _)) -> not (buildAction.ChangesOrder())
@@ -643,7 +650,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
             for item in getChildren parent do
                 f item
                 iter (ProjectItem item)
-        iter Project 
+        iter Project
 
     member x.Update(items) =
         let folders = Stack()
