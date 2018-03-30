@@ -11,8 +11,8 @@ import com.intellij.openapi.ui.popup.util.BaseListPopupStep
 class CommandHistoryAction(private val consoleRunner: FsiConsoleRunner)
     : DumbAwareAction("Recent commands", null, AllIcons.Vcs.History) {
     companion object {
-        val copyTitle = "Set recent command"
-        val executeTitle = "Execute recent command"
+        const val copyTitle = "Set recent command"
+        const val executeTitle = "Execute recent command"
     }
 
     private val consoleView = consoleRunner.consoleView

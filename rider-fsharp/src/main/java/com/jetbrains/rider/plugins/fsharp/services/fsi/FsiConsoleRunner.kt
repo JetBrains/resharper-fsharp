@@ -38,7 +38,7 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost)
     : AbstractConsoleRunnerWithHistory<LanguageConsoleView>(fsiHost.project, fsiTitle, null) {
 
     companion object {
-        val fsiTitle = "F# Interactive"
+        const val fsiTitle = "F# Interactive"
     }
 
     private val projectDir = if (fsiHost.project.isDirectoryBased) fsiHost.project.baseDir else null

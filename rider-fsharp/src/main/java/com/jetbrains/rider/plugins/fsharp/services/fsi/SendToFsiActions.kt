@@ -19,15 +19,15 @@ class StartFsiAction : AnAction() {
 
 class SendToFsiAction : SendToFsiActionBase(false, sendLineText, sendSelectionText) {
     companion object {
-        val sendLineText = "Send Line to F# Interactive"
-        val sendSelectionText = "Send Selection to F# Interactive"
+        const val sendLineText = "Send Line to F# Interactive"
+        const val sendSelectionText = "Send Selection to F# Interactive"
     }
 }
 
 class DebugInFsiAction : SendToFsiActionBase(true, sendLineText, sendSelectionText) {
     companion object {
-        val sendLineText = "Debug Line in F# Interactive"
-        val sendSelectionText = "Debug Line in F# Interactive"
+        const val sendLineText = "Debug Line in F# Interactive"
+        const val sendSelectionText = "Debug Line in F# Interactive"
     }
 }
 
