@@ -40,7 +40,7 @@ open Microsoft.FSharp.Compiler.SourceCodeServices
 type FSharpProjectOptionsProvider
         (lifetime, solution: ISolution, changeManager: ChangeManager, checkerService: FSharpCheckerService,
          optionsBuilder: FSharpProjectOptionsBuilder, scriptOptionsProvider: FSharpScriptOptionsProvider,
-         fsFileService: IFSharpFileService, referenceResolveStore: ModuleReferencesResolveStore,
+         fsFileService: IFSharpFileService, referenceResolveStore: ModuleReferencesResolveStore, logger: ILogger,
          psiModules: IPsiModules, psiModulesResolveContextManager: PsiModuleResolveContextManager) as this =
     inherit RecursiveProjectModelChangeDeltaVisitor()
 
@@ -60,6 +60,8 @@ type FSharpProjectOptionsProvider
         |> Option.bind (tryGetValue targetFrameworkId)
 
     let rec createFSharpProject (project: IProject) (psiModule: IPsiModule) =
+        logger.Info("Creating options for {0} {1}", project, psiModule)
+
         let targetFrameworkId = psiModule.TargetFrameworkId
         let fsProjectsForProject = CollectionUtil.GetOrCreateValue(projects, project, fun () -> Dictionary())
         let fsProject = optionsBuilder.BuildSingleProjectOptions(project, psiModule)
@@ -83,6 +85,9 @@ type FSharpProjectOptionsProvider
 
         let options = { fsProject.Options with ReferencedProjects = Array.ofSeq referencedProjectsOptions }
         let fsProject = { fsProject with Options = options }
+        logger.Info(sprintf "Source files:\n%s" (options.SourceFiles |> String.concat "\n"))
+        logger.Info(sprintf "Project options:\n%s" (options.OtherOptions |> String.concat "\n"))
+
         fsProjectsForProject.[targetFrameworkId] <- fsProject
         fsProject
 
@@ -91,12 +96,13 @@ type FSharpProjectOptionsProvider
         | FSharpProject project ->
             let psiModule = file.PsiModule
             tryGetFSharpProject project psiModule.TargetFrameworkId
-            |> Option.orElseWith (fun () ->
+            |> Option.orElseWith (fun _ ->
                 use lock = locker.UsingWriteLock()
                 Some (createFSharpProject project psiModule))
         | _ -> None
 
     let rec invalidateProject (project: IProject) =
+        logger.Info("Invalidating {0}", project)
         tryGetValue project projects
         |> Option.iter (fun fsProjectsForProject->
             for fsProject in fsProjectsForProject.Values do
@@ -104,10 +110,12 @@ type FSharpProjectOptionsProvider
             fsProjectsForProject.Clear())
 
         // todo: keep referencing project for invalidating removed projects
+        logger.Info("Invalidatnig reverencing projects")
         for reference in referenceResolveStore.GetReferencesToProject(project) do
             match reference.GetProject() with
             | FSharpProject project -> invalidateProject project
             | _ -> ()
+        logger.Info("Done invalidating {0}", project)
 
     let isScriptLike file =
         fsFileService.IsScriptLike(file) || file.PsiModule.IsMiscFilesProjectModule() || isNull (file.GetProject())        
@@ -131,6 +139,7 @@ type FSharpProjectOptionsProvider
                 let projectMark = project.GetProjectMark()
                 solution.GetComponent<FSharpItemsContainer>().RemoveProject(projectMark)
                 projects.Remove(project) |> ignore
+                logger.Info("Removing {0}", project)
         | _ -> base.VisitDelta(change)
 
     interface IFSharpProjectOptionsProvider with
