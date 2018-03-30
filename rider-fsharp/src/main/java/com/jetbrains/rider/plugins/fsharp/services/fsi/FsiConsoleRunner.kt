@@ -27,10 +27,11 @@ import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.wm.impl.ToolWindowManagerImpl
 import com.intellij.project.isDirectoryBased
 import com.intellij.util.containers.ContainerUtil
+import com.intellij.xdebugger.XDebuggerManager
 import com.intellij.xdebugger.attach.XLocalAttachDebuggerProvider
+import com.jetbrains.rider.debugger.DotNetDebugProcess
 import com.jetbrains.rider.model.RdFsiSessionInfo
 import java.io.File
-import java.lang.Thread.sleep
 import kotlin.properties.Delegates
 
 class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost)
@@ -50,7 +51,13 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost)
 
     private var contentDescriptor by Delegates.notNull<RunContentDescriptor>()
     private var pid by Delegates.notNull<Int>()
-    private var isAttached = false
+
+    private val isAttached
+        get() = XDebuggerManager.getInstance(project).debugSessions
+                .map { it.debugProcess }
+                .filterIsInstance<DotNetDebugProcess>()
+                .any { it.processId.valueOrNull == pid }
+
     val commandHistory = CommandHistory()
 
     fun isValid(): Boolean = !(processHandler?.isProcessTerminated ?: true)
@@ -62,7 +69,6 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost)
             provider.getAvailableDebuggers(project, processInfo, dataHolder)
         }.firstOrNull() ?: return
         debugger.attachDebugSession(project, processInfo)
-        isAttached = true
     }
 
     fun sendText(visibleText: String, fsiText: String, debug: Boolean) {
