@@ -709,8 +709,8 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
                     let itemInfo = ItemInfo.Create(physicalPath, logicalPath, parent, currentState.NextSortKey)
                     if files.ContainsKey(physicalPath) then
                         logger.Warn(sprintf "%O added twice" physicalPath)
-                        files.Remove(physicalPath) |> ignore
-                    files.Add(physicalPath, FileItem (itemInfo, buildAction, item.TargetFrameworkIds))
+                    else
+                        files.Add(physicalPath, FileItem (itemInfo, buildAction, item.TargetFrameworkIds))
             | _ -> ()
 
     member x.Write(writer: UnsafeWriter) =
