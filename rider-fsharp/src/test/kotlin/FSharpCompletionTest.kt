@@ -1,6 +1,7 @@
 import com.intellij.openapi.editor.impl.EditorImpl
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.test.CompletionTestBase
+import com.jetbrains.rider.test.framework.dumpOpenedDocument
 import com.jetbrains.rider.test.framework.frameworkLogger
 import com.jetbrains.rider.test.scriptingApi.callBasicCompletion
 import com.jetbrains.rider.test.scriptingApi.completeWithTab
@@ -38,7 +39,7 @@ class FSharpCompletionTest : CompletionTestBase() {
         })
 
         isFcsReady = false
-        withCaret("Program.fs", "Program.fs") {
+        dumpOpenedEditor("Program.fs", "Program.fs") {
             isFcsReady = false
             typeWithLatency(typed)
             waitForFcs()
