@@ -202,6 +202,7 @@ type FSharpItemsContainer
                     |> List.ofSeq
                 let targetFrameworkIds = HashSet(msBuildProject.TargetFrameworkIds)
 
+                begin
                 use lock = locker.UsingWriteLock()
                 x.ProjectMappings.[projectMark] <-
                     let projectDirectory = projectMark.Location.Directory
@@ -209,6 +210,8 @@ type FSharpItemsContainer
                     let mapping = ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds, logger)
                     mapping.Update(items)
                     mapping
+                end
+
                 refresher.Refresh(projectMark, true)
             | _ -> ()
 
