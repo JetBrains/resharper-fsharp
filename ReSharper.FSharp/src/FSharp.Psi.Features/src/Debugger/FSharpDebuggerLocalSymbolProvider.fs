@@ -10,6 +10,8 @@ open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
 open Microsoft.FSharp.Compiler
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open Microsoft.FSharp.Compiler.SourceCodeServices
+open Microsoft.FSharp.Compiler.Ast
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpDebuggerLocalSymbolProvider() =
@@ -18,13 +20,30 @@ type FSharpDebuggerLocalSymbolProvider() =
             match file with
             | :? IFSharpFile as fsFile ->
                 match fsFile.ParseResults with
-                | Some parseResults -> 
-                    match fsFile.FindTokenAt(range.StartOffset) with
-                    | :? FSharpIdentifierToken as token ->
-                        let pos = range.Document.GetPos(token.GetTreeEndOffset().Offset)
-                        //match parseResults.ValidateBreakpointLocation(pos) with
-                        //| Some range when range.StartLine - 1 = line -> ()
-                        null, null
+                | Some parseResults ->
+                    match parseResults.ParseTree with
+                    | Some parseTree -> 
+                        match fsFile.FindTokenAt(range.EndOffset) with
+                        | :? FSharpIdentifierToken as token ->
+                            let pos = range.Document.GetPos(token.GetTreeEndOffset().Offset)
+                            let visitor =
+                                { new AstTraversal.AstVisitorBase<_>() with
+                                    member this.VisitExpr(_, traverseSynExpr, defaultTraverse, expr) = defaultTraverse expr
+                                    member this.VisitBinding(defaultTraverse, (Binding(headPat = headPat) as synBinding)) =
+                                        match headPat with
+                                        | SynPat.LongIdent(lid,_,_,_,_,_) -> Some lid.Range
+                                        | _ -> None
+                                }
+                            
+                            match AstTraversal.Traverse(pos, parseTree, visitor) with
+                            | Some r ->
+                                let endOffset = range.Document.GetTreeEndOffset(r)
+                                let treeNode = fsFile.FindTokenAt(endOffset)
+                                treeNode, null
+                                
+                            | None -> null, null
+                        
+                        | _ -> null, null
                     | _ -> null, null
                 | _ -> null, null
             | _ -> null, null
