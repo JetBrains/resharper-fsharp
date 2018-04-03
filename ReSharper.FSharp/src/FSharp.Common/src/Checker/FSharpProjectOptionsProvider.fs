@@ -46,6 +46,14 @@ type FSharpProjectOptionsProvider
 
     let scriptDefines = ["INTERACTIVE"]
 
+    let invalidatingProjectChangeType =
+        ProjectModelChangeType.PROPERTIES ||| ProjectModelChangeType.REFERENCE_TARGET |||
+        ProjectModelChangeType.TARGET_FRAMEWORK
+
+    let invalidatingChildChangeType =
+        ProjectModelChangeType.ADDED ||| ProjectModelChangeType.REMOVED |||
+        ProjectModelChangeType.MOVED_IN ||| ProjectModelChangeType.MOVED_OUT
+
     let projects = Dictionary<IProject, Dictionary<TargetFrameworkId, FSharpProject>>()
     let checker = checkerService.Checker
     let locker = JetFastSemiReenterableRWLock()
@@ -60,36 +68,33 @@ type FSharpProjectOptionsProvider
         |> Option.bind (tryGetValue targetFrameworkId)
 
     let rec createFSharpProject (project: IProject) (psiModule: IPsiModule) =
-        logger.Info("Creating options for {0} {1}", project, psiModule)
-
         let targetFrameworkId = psiModule.TargetFrameworkId
-        let fsProjectsForProject = CollectionUtil.GetOrCreateValue(projects, project, fun () -> Dictionary())
-        let fsProject = optionsBuilder.BuildSingleProjectOptions(project, psiModule)
+        let fsProjectsForProject = projects.GetOrCreateValue(project, fun () -> Dictionary())
+        fsProjectsForProject.GetOrCreateValue(targetFrameworkId, fun () ->
+            logger.Info("Creating options for {0} {1}", project, psiModule)
+            let fsProject = optionsBuilder.BuildSingleProjectOptions(project, psiModule)
 
-        let referencedProjectsOptions = seq {
-            let resolveContext =
-                psiModulesResolveContextManager.GetOrCreateModuleResolveContext(project, psiModule, targetFrameworkId)
+            let referencedProjectsOptions = seq {
+                let resolveContext =
+                    psiModulesResolveContextManager
+                        .GetOrCreateModuleResolveContext(project, psiModule, targetFrameworkId)
 
-            let referencedProjectsPsiModules =
-                psiModules.GetModuleReferences(psiModule, resolveContext)
-                |> Seq.choose (fun reference ->
-                    match reference.Module.ContainingProjectModule with
-                    | FSharpProject project when project.IsOpened -> Some reference.Module
-                    | _ -> None)
+                let referencedProjectsPsiModules =
+                    psiModules.GetModuleReferences(psiModule, resolveContext)
+                    |> Seq.choose (fun reference ->
+                        match reference.Module.ContainingProjectModule with
+                        | FSharpProject project when project.IsOpened -> Some reference.Module
+                        | _ -> None)
 
-            for referencedPsiModule in referencedProjectsPsiModules do
-                let project = referencedPsiModule.ContainingProjectModule :?> IProject
-                let outPath = project.GetOutputFilePath(referencedPsiModule.TargetFrameworkId).FullPath
-                let fsProject = createFSharpProject project referencedPsiModule
-                yield outPath, fsProject.Options }
+                for referencedPsiModule in referencedProjectsPsiModules do
+                    let project = referencedPsiModule.ContainingProjectModule :?> IProject
+                    let outPath = project.GetOutputFilePath(referencedPsiModule.TargetFrameworkId).FullPath
+                    let fsProject = createFSharpProject project referencedPsiModule
+                    yield outPath, fsProject.Options }
 
-        let options = { fsProject.Options with ReferencedProjects = Array.ofSeq referencedProjectsOptions }
-        let fsProject = { fsProject with Options = options }
-        logger.Info(sprintf "Source files:\n%s" (options.SourceFiles |> String.concat "\n"))
-        logger.Info(sprintf "Project options:\n%s" (options.OtherOptions |> String.concat "\n"))
-
-        fsProjectsForProject.[targetFrameworkId] <- fsProject
-        fsProject
+            let options = { fsProject.Options with ReferencedProjects = Array.ofSeq referencedProjectsOptions }
+            let fsProject = { fsProject with Options = options }
+            fsProject)
 
     let getOrCreateFSharpProject (file: IPsiSourceFile) =
         match file.GetProject() with
@@ -104,18 +109,21 @@ type FSharpProjectOptionsProvider
     let rec invalidateProject (project: IProject) =
         logger.Info("Invalidating {0}", project)
         tryGetValue project projects
-        |> Option.iter (fun fsProjectsForProject->
+        |> Option.iter (fun fsProjectsForProject ->
             for fsProject in fsProjectsForProject.Values do
                 checker.InvalidateConfiguration(fsProject.Options, false)
             fsProjectsForProject.Clear())
 
         // todo: keep referencing project for invalidating removed projects
-        logger.Info("Invalidatnig reverencing projects")
-        for reference in referenceResolveStore.GetReferencesToProject(project) do
-            match reference.GetProject() with
-            | FSharpProject project -> invalidateProject project
-            | _ -> ()
-        logger.Info("Done invalidating {0}", project)
+        let referencesToProject = referenceResolveStore.GetReferencesToProject(project)
+        if not (referencesToProject.IsEmpty()) then
+            logger.Info("Invalidatnig reverencing projects")
+            for reference in referencesToProject do
+                match reference.GetProject() with
+                | FSharpProject project -> invalidateProject project
+                | _ -> ()
+            logger.Info("Done invalidating {0}", project)
+
 
     let isScriptLike file =
         fsFileService.IsScriptLike(file) || file.PsiModule.IsMiscFilesProjectModule() || isNull (file.GetProject())        
@@ -133,14 +141,37 @@ type FSharpProjectOptionsProvider
 
     override x.VisitDelta(change: ProjectModelChange) =
         match change.ProjectModelElement with
-        | FSharpProject project ->
-            invalidateProject project
-            if change.IsRemoved then
-                let projectMark = project.GetProjectMark()
-                solution.GetComponent<FSharpItemsContainer>().RemoveProject(projectMark)
-                projects.Remove(project) |> ignore
-                logger.Info("Removing {0}", project)
-        | _ -> base.VisitDelta(change)
+        | :? IProject as project ->
+            if project.IsFSharp then
+                if change.ContainsChangeType(invalidatingProjectChangeType) then
+                    invalidateProject project
+
+                else if change.IsSubtreeChanged then
+                    let mutable shouldInvalidate = false
+                    let changeVisitor =
+                        { new RecursiveProjectModelChangeDeltaVisitor() with
+                            member x.VisitItemDelta(change) =
+                                if change.ContainsChangeType(invalidatingChildChangeType) then
+                                    shouldInvalidate <- true
+
+                                if not shouldInvalidate then
+                                    base.VisitItemDelta(change) }
+
+                    change.Accept(changeVisitor)
+                    if shouldInvalidate then
+                        invalidateProject project
+    
+                if change.IsRemoved then
+                    let projectMark = project.GetProjectMark()
+                    solution.GetComponent<FSharpItemsContainer>().RemoveProject(projectMark)
+                    projects.Remove(project) |> ignore
+                    logger.Info("Removing {0}", project)
+
+            else if project.ProjectProperties.ProjectKind = ProjectKind.SOLUTION_FOLDER then
+                base.VisitDelta(change)
+
+        | :? ISolution -> base.VisitDelta(change)
+        | _ -> ()
 
     interface IFSharpProjectOptionsProvider with
         member x.GetProjectOptions(file) =
