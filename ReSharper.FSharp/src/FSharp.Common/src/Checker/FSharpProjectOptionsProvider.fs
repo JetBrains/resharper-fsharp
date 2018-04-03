@@ -47,12 +47,12 @@ type FSharpProjectOptionsProvider
     let scriptDefines = ["INTERACTIVE"]
 
     let invalidatingProjectChangeType =
-        ProjectModelChangeType.PROPERTIES ||| ProjectModelChangeType.REFERENCE_TARGET |||
-        ProjectModelChangeType.TARGET_FRAMEWORK
+        ProjectModelChangeType.PROPERTIES ||| ProjectModelChangeType.TARGET_FRAMEWORK
 
     let invalidatingChildChangeType =
         ProjectModelChangeType.ADDED ||| ProjectModelChangeType.REMOVED |||
-        ProjectModelChangeType.MOVED_IN ||| ProjectModelChangeType.MOVED_OUT
+        ProjectModelChangeType.MOVED_IN ||| ProjectModelChangeType.MOVED_OUT |||
+        ProjectModelChangeType.REFERENCE_TARGET
 
     let projects = Dictionary<IProject, Dictionary<TargetFrameworkId, FSharpProject>>()
     let checker = checkerService.Checker
@@ -150,12 +150,12 @@ type FSharpProjectOptionsProvider
                     let mutable shouldInvalidate = false
                     let changeVisitor =
                         { new RecursiveProjectModelChangeDeltaVisitor() with
-                            member x.VisitItemDelta(change) =
+                            member x.VisitDelta(change) =
                                 if change.ContainsChangeType(invalidatingChildChangeType) then
                                     shouldInvalidate <- true
 
                                 if not shouldInvalidate then
-                                    base.VisitItemDelta(change) }
+                                    base.VisitDelta(change) }
 
                     change.Accept(changeVisitor)
                     if shouldInvalidate then
