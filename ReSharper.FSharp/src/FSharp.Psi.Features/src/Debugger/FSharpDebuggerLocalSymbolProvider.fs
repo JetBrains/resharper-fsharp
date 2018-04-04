@@ -27,29 +27,26 @@ type FSharpDebuggerLocalSymbolProvider() =
                         let _x = ast
                         let pos = range.Document.GetPos(range.EndOffset.Offset)
                         let visitor =
+                            let visitPat pat defaultTraverse =
+                                match pat with
+                                | SynPat.Named(_, id, false, _, range) when id.idText = name -> 
+                                    Some range
+                                | _ -> defaultTraverse pat
+                                
                             { new AstTraversal.AstVisitorBase<_>() with
                                 member this.VisitExpr(_, traverseSynExpr, defaultTraverse, expr) = defaultTraverse expr
 
-//                                    member this.VisitBinding(defaultTraverse, (Binding(headPat = headPat) as synBinding)) =
-//                                        match headPat with
-//                                        | SynPat.LongIdent(lid,_,_,_,_,_) -> 
-//                                            let pat = headPat
-//                                            let _ = pat
-//                                            Some lid.Range
-//                                        | _ -> None
+                                member this.VisitPat(defaultTraverse, pat) = visitPat pat defaultTraverse 
                                 
                                 member this.VisitLetOrUse(bindings, range) =
-                                    bindings |> List.tryPick (fun (Binding(headPat = headPat) as binding) ->
-                                        match headPat with
-                                        | SynPat.Named(_, id, false, _, range) when id.idText = name -> 
-                                            Some range
-                                        | _ -> None 
+                                    bindings |> List.tryPick (fun (Binding(headPat = headPat)) ->
+                                        visitPat headPat (fun _ -> None)
                                     )
                             }
                         
                         match AstTraversal.Traverse(pos, parseTree, visitor) with
-                        | Some r ->
-                            let endOffset = range.Document.GetTreeEndOffset(r)
+                        | Some declRange ->
+                            let endOffset = range.Document.GetTreeEndOffset(declRange)
                             let treeNode = fsFile.FindTokenAt(endOffset)
                             treeNode, null
                             
