@@ -22,17 +22,30 @@ type FSharpDebuggerLocalSymbolProvider() =
                 match fsFile.ParseResults with
                 | Some parseResults ->
                     match parseResults.ParseTree with
-                    | Some parseTree -> 
+                    | Some parseTree ->
                         match fsFile.FindTokenAt(range.EndOffset) with
                         | :? FSharpIdentifierToken as token ->
+                            let ast = sprintf "%+A" parseTree
+                            let _x = ast
                             let pos = range.Document.GetPos(token.GetTreeEndOffset().Offset)
                             let visitor =
                                 { new AstTraversal.AstVisitorBase<_>() with
                                     member this.VisitExpr(_, traverseSynExpr, defaultTraverse, expr) = defaultTraverse expr
-                                    member this.VisitBinding(defaultTraverse, (Binding(headPat = headPat) as synBinding)) =
-                                        match headPat with
-                                        | SynPat.LongIdent(lid,_,_,_,_,_) -> Some lid.Range
-                                        | _ -> None
+//                                    member this.VisitBinding(defaultTraverse, (Binding(headPat = headPat) as synBinding)) =
+//                                        match headPat with
+//                                        | SynPat.LongIdent(lid,_,_,_,_,_) -> 
+//                                            let pat = headPat
+//                                            let _ = pat
+//                                            Some lid.Range
+//                                        | _ -> None
+                                    
+                                    member this.VisitLetOrUse(bindings, range) =
+                                        bindings |> List.tryPick (fun (Binding(headPat = headPat) as binding) ->
+                                            match headPat with
+                                            | SynPat.Named(_, id, false, _, range) when id.idText = name -> 
+                                                Some range
+                                            | _ -> None 
+                                        )
                                 }
                             
                             match AstTraversal.Traverse(pos, parseTree, visitor) with
