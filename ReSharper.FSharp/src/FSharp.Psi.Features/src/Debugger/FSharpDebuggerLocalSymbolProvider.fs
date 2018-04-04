@@ -23,14 +23,13 @@ type FSharpDebuggerLocalSymbolProvider() =
                 | Some parseResults ->
                     match parseResults.ParseTree with
                     | Some parseTree ->
-                        match fsFile.FindTokenAt(range.EndOffset) with
-                        | :? FSharpIdentifierToken as token ->
-                            let ast = sprintf "%+A" parseTree
-                            let _x = ast
-                            let pos = range.Document.GetPos(token.GetTreeEndOffset().Offset)
-                            let visitor =
-                                { new AstTraversal.AstVisitorBase<_>() with
-                                    member this.VisitExpr(_, traverseSynExpr, defaultTraverse, expr) = defaultTraverse expr
+                        let ast = sprintf "%+A" parseTree
+                        let _x = ast
+                        let pos = range.Document.GetPos(range.EndOffset.Offset)
+                        let visitor =
+                            { new AstTraversal.AstVisitorBase<_>() with
+                                member this.VisitExpr(_, traverseSynExpr, defaultTraverse, expr) = defaultTraverse expr
+
 //                                    member this.VisitBinding(defaultTraverse, (Binding(headPat = headPat) as synBinding)) =
 //                                        match headPat with
 //                                        | SynPat.LongIdent(lid,_,_,_,_,_) -> 
@@ -38,25 +37,23 @@ type FSharpDebuggerLocalSymbolProvider() =
 //                                            let _ = pat
 //                                            Some lid.Range
 //                                        | _ -> None
-                                    
-                                    member this.VisitLetOrUse(bindings, range) =
-                                        bindings |> List.tryPick (fun (Binding(headPat = headPat) as binding) ->
-                                            match headPat with
-                                            | SynPat.Named(_, id, false, _, range) when id.idText = name -> 
-                                                Some range
-                                            | _ -> None 
-                                        )
-                                }
-                            
-                            match AstTraversal.Traverse(pos, parseTree, visitor) with
-                            | Some r ->
-                                let endOffset = range.Document.GetTreeEndOffset(r)
-                                let treeNode = fsFile.FindTokenAt(endOffset)
-                                treeNode, null
                                 
-                            | None -> null, null
+                                member this.VisitLetOrUse(bindings, range) =
+                                    bindings |> List.tryPick (fun (Binding(headPat = headPat) as binding) ->
+                                        match headPat with
+                                        | SynPat.Named(_, id, false, _, range) when id.idText = name -> 
+                                            Some range
+                                        | _ -> None 
+                                    )
+                            }
                         
-                        | _ -> null, null
+                        match AstTraversal.Traverse(pos, parseTree, visitor) with
+                        | Some r ->
+                            let endOffset = range.Document.GetTreeEndOffset(r)
+                            let treeNode = fsFile.FindTokenAt(endOffset)
+                            treeNode, null
+                            
+                        | None -> null, null
                     | _ -> null, null
                 | _ -> null, null
             | _ -> null, null
