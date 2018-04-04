@@ -3,7 +3,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Debugger
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Debugger
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Parsing
@@ -23,15 +22,23 @@ type FSharpDebuggerLocalSymbolProvider() =
                 | Some parseResults ->
                     match parseResults.ParseTree with
                     | Some parseTree ->
-                        let ast = sprintf "%+A" parseTree
-                        let _x = ast
                         let pos = range.Document.GetPos(range.EndOffset.Offset)
+                        let mutable declRange = None
+                        
                         let visitor =
                             let visitPat pat defaultTraverse =
                                 match pat with
-                                | SynPat.Named(_, id, false, _, range) when id.idText = name -> 
-                                    Some range
-                                | _ -> defaultTraverse pat
+                                | SynPat.Named(_, id, false, _, range) when id.idText = name &&
+                                                                            (Range.posLt range.End pos || Range.posEq range.End pos) -> 
+                                    match declRange with
+                                    | None -> 
+                                        declRange <- Some range
+                                    | Some oldDeclRange when Range.posGt range.Start oldDeclRange.Start ->
+                                        declRange <- Some range
+                                    | _ -> ()
+                                | _ -> ()
+                                
+                                defaultTraverse pat
                                 
                             { new AstTraversal.AstVisitorBase<_>() with
                                 member this.VisitExpr(_, traverseSynExpr, defaultTraverse, expr) = defaultTraverse expr
@@ -44,11 +51,13 @@ type FSharpDebuggerLocalSymbolProvider() =
                                     )
                             }
                         
-                        match AstTraversal.Traverse(pos, parseTree, visitor) with
+                        AstTraversal.Traverse(pos, parseTree, visitor) |> ignore
+                        match declRange with
                         | Some declRange ->
                             let endOffset = range.Document.GetTreeEndOffset(declRange)
-                            let treeNode = fsFile.FindTokenAt(endOffset)
-                            treeNode, null
+                            let treeNode = fsFile.FindTokenAt(endOffset - 1)
+                            let containingTypeDeclaration = treeNode.GetContainingTypeDeclaration()
+                            treeNode, containingTypeDeclaration.DeclaredElement :> _
                             
                         | None -> null, null
                     | _ -> null, null
