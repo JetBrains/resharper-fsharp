@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages
 
 open System
+open System.Collections.Generic
 open System.Text
 open JetBrains.Annotations
 open JetBrains.DocumentModel
@@ -21,6 +22,7 @@ type ErrorsStageProcessBase(daemonProcess, errors: FSharpErrorInfo[]) =
     // https://github.com/fsharp/FSharp.Compiler.Service/blob/9.0.0/src/fsharp/FSComp.txt
     let [<Literal>] ErrorNumberUndefined = 39
     let [<Literal>] ErronNumberModuleOrNamespaceRequired = 222
+    let [<Literal>] ErrorNumberUnrecognizedOption = 243
     let [<Literal>] ErrorNumberUnused = 1182
 
     let document = daemonProcess.Document
@@ -41,11 +43,19 @@ type ErrorsStageProcessBase(daemonProcess, errors: FSharpErrorInfo[]) =
         | FSharpErrorSeverity.Warning, _ -> WarningHighlighting(message, range) :> _
         | _ -> ErrorHighlighting(message, range) :> _
 
+    let shouldAddDiagnostic (error: FSharpErrorInfo) =
+        error.ErrorNumber <> ErrorNumberUnrecognizedOption
+
     override x.Execute(committer) =
-        let highlightings = ResizeArray<_>(errors.Length)
-        let errors = errors |> Array.map (fun error -> error, getDocumentRange error)
-        for error, range in errors |> Array.distinctBy (fun (error, range) -> error.Message, range) do
-            highlightings.Add(HighlightingInfo(range, createHighlighting(error, range)))
-            x.SeldomInterruptChecker.CheckForInterrupt()
+        let highlightings = List(errors.Length)
+        let errors =
+            errors
+            |> Array.map (fun error -> error, getDocumentRange error)
+            |> Array.distinctBy (fun (error, range) -> error.Message, range)
+
+        for error, range in errors  do
+            if shouldAddDiagnostic error then
+                highlightings.Add(HighlightingInfo(range, createHighlighting(error, range)))
+                x.SeldomInterruptChecker.CheckForInterrupt()
 
         committer.Invoke(DaemonStageResult(highlightings))

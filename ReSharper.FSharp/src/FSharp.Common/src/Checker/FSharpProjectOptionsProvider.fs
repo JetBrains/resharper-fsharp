@@ -83,7 +83,9 @@ type FSharpProjectOptionsProvider
                     psiModules.GetModuleReferences(psiModule, resolveContext)
                     |> Seq.choose (fun reference ->
                         match reference.Module.ContainingProjectModule with
-                        | FSharpProject project when project.IsOpened -> Some reference.Module
+                        | FSharpProject referencedProject when
+                                referencedProject.IsOpened && referencedProject <> project ->
+                            Some reference.Module
                         | _ -> None)
 
                 for referencedPsiModule in referencedProjectsPsiModules do
@@ -114,13 +116,14 @@ type FSharpProjectOptionsProvider
                 checker.InvalidateConfiguration(fsProject.Options, false)
             fsProjectsForProject.Clear())
 
-        // todo: keep referencing project for invalidating removed projects
+        // todo: keep referencing projects for invalidating removed projects
         let referencesToProject = referenceResolveStore.GetReferencesToProject(project)
         if not (referencesToProject.IsEmpty()) then
             logger.Info("Invalidatnig reverencing projects")
             for reference in referencesToProject do
                 match reference.GetProject() with
-                | FSharpProject project -> invalidateProject project
+                | FSharpProject referencingProject when
+                        referencingProject <> project -> invalidateProject referencingProject
                 | _ -> ()
             logger.Info("Done invalidating {0}", project)
 
