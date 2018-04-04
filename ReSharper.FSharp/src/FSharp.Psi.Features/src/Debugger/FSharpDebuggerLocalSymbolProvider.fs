@@ -26,22 +26,32 @@ type FSharpDebuggerLocalSymbolProvider() =
                         let mutable declRange = None
                         
                         let visitor =
+                            let (|SutableIdent|_|) (ident: Ident) = 
+                                if ident.idText = name && (Range.posLt ident.idRange.End pos || Range.posEq ident.idRange.End pos) then
+                                    Some ident.idRange
+                                else None
+                        
+                            let updateDeclRange (range: Range.range) =
+                                match declRange with
+                                | None -> 
+                                    declRange <- Some range
+                                | Some oldDeclRange when Range.posGt range.Start oldDeclRange.Start ->
+                                    declRange <- Some range
+                                | _ -> ()
+                        
                             let visitPat pat defaultTraverse =
                                 match pat with
-                                | SynPat.Named(_, id, false, _, range) when id.idText = name &&
-                                                                            (Range.posLt range.End pos || Range.posEq range.End pos) -> 
-                                    match declRange with
-                                    | None -> 
-                                        declRange <- Some range
-                                    | Some oldDeclRange when Range.posGt range.Start oldDeclRange.Start ->
-                                        declRange <- Some range
-                                    | _ -> ()
+                                | SynPat.Named(_, SutableIdent range, false, _, _) -> updateDeclRange range 
                                 | _ -> ()
-                                
                                 defaultTraverse pat
                                 
                             { new AstTraversal.AstVisitorBase<_>() with
-                                member this.VisitExpr(_, traverseSynExpr, defaultTraverse, expr) = defaultTraverse expr
+                                member this.VisitExpr(_, traverseSynExpr, defaultTraverse, expr) = 
+                                    match expr with
+                                    | SynExpr.For(ident = SutableIdent range) -> updateDeclRange range 
+                                    | SynExpr.ForEach(pat = pat) -> visitPat pat ignore
+                                    | _ -> () 
+                                    defaultTraverse expr
 
                                 member this.VisitPat(defaultTraverse, pat) = visitPat pat defaultTraverse 
                                 
@@ -56,8 +66,8 @@ type FSharpDebuggerLocalSymbolProvider() =
                         | Some declRange ->
                             let endOffset = range.Document.GetTreeEndOffset(declRange)
                             let treeNode = fsFile.FindTokenAt(endOffset - 1)
-                            let containingTypeDeclaration = treeNode.GetContainingTypeDeclaration()
-                            treeNode, containingTypeDeclaration.DeclaredElement :> _
+                            //let containingTypeDeclaration = treeNode.GetContainingTypeDeclaration()
+                            treeNode, null //containingTypeDeclaration.DeclaredElement :> _
                             
                         | None -> null, null
                     | _ -> null, null
