@@ -36,7 +36,7 @@ intellij {
     updateSinceUntilBuild false
 
     // Workaround for https://youtrack.jetbrains.com/issue/IDEA-179607
-    plugins 'rider-editorconfig', 'RiderJavaScriptLanguage'
+    plugins 'rider-plugins-appender'
 }
 
 if (!ext.has("BuildConfiguration"))
