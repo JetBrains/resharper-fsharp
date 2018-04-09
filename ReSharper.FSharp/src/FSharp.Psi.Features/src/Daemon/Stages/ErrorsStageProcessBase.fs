@@ -15,7 +15,7 @@ open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
 [<AbstractClass; AllowNullLiteral>]
-type ErrorsStageProcessBase(daemonProcess, errors: FSharpErrorInfo[]) =
+type ErrorsStageProcessBase(daemonProcess) =
     inherit FSharpDaemonStageProcessBase(daemonProcess)
 
     // https://github.com/fsharp/FSharp.Compiler.Service/blob/9.0.0/src/fsharp/CompileOps.fs#L246
@@ -46,7 +46,7 @@ type ErrorsStageProcessBase(daemonProcess, errors: FSharpErrorInfo[]) =
     let shouldAddDiagnostic (error: FSharpErrorInfo) =
         error.ErrorNumber <> ErrorNumberUnrecognizedOption
 
-    override x.Execute(committer) =
+    member x.Execute(errors: FSharpErrorInfo[], committer: Action<DaemonStageResult>) =
         let highlightings = List(errors.Length)
         let errors =
             errors

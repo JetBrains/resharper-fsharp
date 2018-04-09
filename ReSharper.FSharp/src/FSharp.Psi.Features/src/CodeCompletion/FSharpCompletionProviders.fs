@@ -53,12 +53,17 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
                             |> Option.toObj
                         Some { Icon = icon; ReturnType = retType }
 
-                let getAllSymbols () = getAllSymbols checkResults
+                let interruptChecker = Action(fun _ -> collector.CheckForInterrupt())
+                let getAllSymbols () =
+                    let getSymbolsAsync = async { return getAllSymbols checkResults }
+                    getSymbolsAsync.RunAsTask(interruptChecker)
+
                 try
                     let completions =
                         checkResults
                             .GetDeclarationListInfo(parseResults, line, lineText, context.PartialLongName,
-                                                    getAllSymbols, getIconId, true, filterResolved).RunAsTask().Items
+                                                    getAllSymbols, getIconId, true, filterResolved)
+                            .RunAsTask(interruptChecker).Items
 
                     if Array.isEmpty completions then false else
 
@@ -125,7 +130,7 @@ type FSharpRangesProvider() =
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpLibraryScopeLookupItemsProvider(logger: ILogger, assemblyContentProvider: FSharpAssemblyContentProvider) =
-    inherit FSharpLookupItemsProviderBase(logger, (fun checkResults -> assemblyContentProvider.GetLibrariesEntities(checkResults)), true)
+    inherit FSharpLookupItemsProviderBase(logger, assemblyContentProvider.GetLibrariesEntities, true)
 
     interface ISlowCodeCompletionItemsProvider with
         member x.IsAvailable(context) = base.IsAvailable(context)
