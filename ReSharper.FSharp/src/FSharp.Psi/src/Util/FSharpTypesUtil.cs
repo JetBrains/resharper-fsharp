@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -185,8 +185,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       {
         // bug Microsoft/visualfsharp#3532
         // e.g. byref<int>, we need int
-        return entity.CompiledName.Equals("byref`1", StringComparison.Ordinal) &&
-               entity.AccessPath.Equals("Microsoft.FSharp.Core", StringComparison.Ordinal)
+        return entity.CompiledName == "byref`1" && entity.AccessPath == "Microsoft.FSharp.Core"
           ? GetType(type.GenericArguments[0], typeParamsFromContext, psiModule, isFromMethodSig, isFromReturn)
           : TypeFactory.CreateUnknownType(psiModule);
       }

@@ -122,7 +122,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         var mfvXmlDocId = GetXmlDocId(mfv);
         return members.Count == 1
           ? members[0]
-          : members.FirstOrDefault(m => m.XMLDocId.Equals(mfvXmlDocId, StringComparison.Ordinal));
+          : members.FirstOrDefault(m => m.XMLDocId == mfvXmlDocId);
       }
 
       if (symbol is FSharpUnionCase unionCase)

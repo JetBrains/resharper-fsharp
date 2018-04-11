@@ -42,7 +42,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public AttributeValue NamedParameter(string name)
     {
-      var param = myAttr.NamedArguments.FirstOrDefault(p => p.Item2.Equals(name, StringComparison.Ordinal));
+      var param = myAttr.NamedArguments.FirstOrDefault(p => p.Item2 == name);
       return param != null
         ? new AttributeValue(new ConstantValue(param.Item4, type: null))
         : AttributeValue.BAD_VALUE;

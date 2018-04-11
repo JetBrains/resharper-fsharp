@@ -440,7 +440,7 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
         | SynPat.LongIdent(lidWithDots,_,_,patParams,_,range) ->
             match lidWithDots.Lid with
             | [] -> ()
-            | [id] when id.idText.Equals("op_ColonColon", StringComparison.Ordinal) -> ()
+            | [id] when id.idText = "op_ColonColon" -> ()
             | lid ->
                 for id in lid do
                     let isActivePattern = IsActivePatternName id.idText 

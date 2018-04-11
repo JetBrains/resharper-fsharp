@@ -45,7 +45,7 @@ type ScriptLoadPathsStageProcess(fsFile, daemonProcess) =
                             match memberDecl with
                             | :? IHashDirective as directive ->
                                 // todo: implement for other directives
-                                if directive.HashToken.GetText().Equals("#load", StringComparison.Ordinal) then
+                                if directive.HashToken.GetText() = "#load" then
                                     allDirectives.Add(directive.GetTreeStartOffset(), directive)
                             | _ -> () }
             fsFile.Accept(visitor)

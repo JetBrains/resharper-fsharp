@@ -107,11 +107,11 @@ type FSharpPathCompletionProvider() =
         let hashTokenText = hashDirective.HashToken.GetText()
         if hashTokenText.Length < 2 then None else
 
-        let id = hashTokenText.Substring(1)
-        if id.Equals("load", StringComparison.Ordinal) then Some (fsExtensions, ProjectModelThemedIcons.Fsharp.Id) else
-        if id.Equals("r", StringComparison.Ordinal) then Some (dllExtensions, ProjectModelThemedIcons.Assembly.Id) else
-        if id.Equals("I", StringComparison.Ordinal) then Some (Set.empty, null) else
-        None
+        match hashTokenText.Substring(1) with
+        | "load" -> Some (fsExtensions, ProjectModelThemedIcons.Fsharp.Id)
+        | "r"    -> Some (dllExtensions, ProjectModelThemedIcons.Assembly.Id)
+        | "I"    -> Some (Set.empty, null)
+        | _ -> None
 
     override x.IsAvailable(_) = true
     override x.GetDefaultRanges(context) = context.Ranges
