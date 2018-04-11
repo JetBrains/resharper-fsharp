@@ -119,16 +119,14 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
             x.ProcessIdentifier id
         mark
 
-    member internal x.ProcessException (SynExceptionDefnRepr(_,UnionCase(_,id,unionCaseType,_,_,_),_,_,_,range)) =
+    member internal x.StartException (SynExceptionDefnRepr(_,UnionCase(_,id,unionCaseType,_,_,_),_,_,_,range)) =
         range |> x.GetStartOffset |> x.AdvanceToOffset
         let mark = x.Builder.Mark()
         x.Builder.AdvanceLexer() |> ignore // skip keyword
         x.ProcessModifiersBeforeOffset(x.GetStartOffset id)
         x.ProcessIdentifier(id)
         x.ProcessUnionCaseType(unionCaseType) |> ignore
-
-        range |> x.GetEndOffset |> x.AdvanceToOffset
-        x.Builder.Done(mark, ElementType.EXCEPTION_DECLARATION, null)
+        mark
 
     member internal x.ProcessModifiersBeforeOffset (endOffset: int) =
         let mark = x.Builder.Mark()
