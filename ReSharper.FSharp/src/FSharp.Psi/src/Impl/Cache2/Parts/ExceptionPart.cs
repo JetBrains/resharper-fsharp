@@ -34,5 +34,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public override string[] ExtendsListShortNames =>
       ArrayUtil.Add(ourExtendsListShortNames, base.ExtendsListShortNames);
+
+    public override IDeclaredType GetBaseClassType() =>
+      GetPsiModule().GetPredefinedType().Exception;
   }
 }

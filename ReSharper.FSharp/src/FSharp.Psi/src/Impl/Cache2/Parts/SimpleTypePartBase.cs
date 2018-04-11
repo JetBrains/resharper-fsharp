@@ -30,5 +30,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
              MemberPresenceFlag.EXPLICIT_OP | MemberPresenceFlag.IMPLICIT_OP |
              MemberPresenceFlag.MAY_EQUALS_OVERRIDE | MemberPresenceFlag.MAY_TOSTRING_OVERRIDE;
     }
+
+    public override IDeclaredType GetBaseClassType() =>
+      GetPsiModule().GetPredefinedType().Object;
   }
 }
