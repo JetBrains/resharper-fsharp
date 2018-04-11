@@ -90,6 +90,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
                   myDeclarationSymbols.ContainsKey(startOffset))
                 continue;
 
+              if (mfvLogicalName == StandardMemberNames.ClassConstructor)
+                continue;
+              
               // visualfsharp#3943, visualfsharp#3933
               if (mfvLogicalName != StandardMemberNames.Constructor &&
                   !(FindTokenAt(new TreeOffset(endOffset - 1)) is FSharpIdentifierToken || mfv.IsActivePattern))
