@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
+open JetBrains.Application
 open System
 open JetBrains.Application.Progress
 open JetBrains.ProjectModel
@@ -53,7 +54,7 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
                             |> Option.toObj
                         Some { Icon = icon; ReturnType = retType }
 
-                let interruptChecker = Action(fun _ -> collector.CheckForInterrupt())
+                let interruptChecker = Action(fun _ -> InterruptableActivityCookie.CheckAndThrow())
                 let getAllSymbols () =
                     let getSymbolsAsync = async { return getAllSymbols checkResults }
                     getSymbolsAsync.RunAsTask(interruptChecker)
@@ -82,7 +83,7 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
                             |> RichText
                         collector.Add(lookupItem)
 
-                        collector.CheckForInterrupt()
+                        InterruptableActivityCookie.CheckAndThrow()
                     true
                 with
                 | :? OperationCanceledException -> reraise()
