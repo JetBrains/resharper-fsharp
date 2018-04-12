@@ -27,4 +27,5 @@ type FSharpFileService(settingsLocation: RiderAnyProductSettingsLocation) =
 
         member x.IsScriptLike(file) =
             file.LanguageType.Equals(FSharpScriptProjectFileType.Instance) ||
+            file.PsiModule :? FSharpScriptPsiModule ||
             file.GetLocation().Parent.Equals(scratchesDir)
