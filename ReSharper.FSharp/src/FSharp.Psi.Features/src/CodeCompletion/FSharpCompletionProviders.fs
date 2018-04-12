@@ -49,22 +49,20 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
                         // todo: provide symbol and display context in FCS items, calc this only when needed
                         let icon = getIconId symbol
                         let retType =
-                            getReturnType symbol
-                            |> Option.map (fun t -> t.Format(context))
-                            |> Option.toObj
+                            match getReturnType symbol with
+                            | Some t -> t.Format(context)
+                            | _ -> null
                         Some { Icon = icon; ReturnType = retType }
 
-                let interruptChecker = Action(fun _ -> InterruptableActivityCookie.CheckAndThrow())
                 let getAllSymbols () =
                     let getSymbolsAsync = async { return getAllSymbols checkResults }
-                    getSymbolsAsync.RunAsTask(interruptChecker)
+                    getSymbolsAsync.RunAsTask()
 
                 try
                     let completions =
                         checkResults
                             .GetDeclarationListInfo(parseResults, line, lineText, context.PartialLongName,
-                                                    getAllSymbols, getIconId, true, filterResolved)
-                            .RunAsTask(interruptChecker).Items
+                                                    getAllSymbols, getIconId, true, filterResolved).RunAsTask().Items
 
                     if Array.isEmpty completions then false else
 
@@ -77,13 +75,11 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
 
                         lookupItem.InitializeRanges(context.Ranges, basicContext)
                         lookupItem.DisplayTypeName <-
-                            item.AdditionalInfo
-                            |> Option.map (fun i -> i.ReturnType)
-                            |> Option.toObj
-                            |> RichText
-                        collector.Add(lookupItem)
+                            match item.AdditionalInfo with
+                            | Some info -> RichText(info.ReturnType)
+                            | _ -> null
 
-                        InterruptableActivityCookie.CheckAndThrow()
+                        collector.Add(lookupItem)
                     true
                 with
                 | :? OperationCanceledException -> reraise()
