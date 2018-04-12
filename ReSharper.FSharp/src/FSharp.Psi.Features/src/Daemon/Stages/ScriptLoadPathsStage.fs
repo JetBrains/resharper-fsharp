@@ -41,14 +41,17 @@ type ScriptLoadPathsStageProcess(fsFile, daemonProcess) =
 
                 override __.VisitTopLevelModuleDeclaration(decl) =
                     for memberDecl in decl.Members do
-                        interruptChecker.CheckForInterrupt()
-
                         match memberDecl with
                         | :? IHashDirective as directive ->
-                            // todo: implement for other directives
-                            if directive.HashToken.GetText() = "#load" then
+                            match directive.HashToken with
+                            | null -> ()
+                            | token when token.GetText() = "#load" ->
+                                // todo: implement for other directives
                                 allDirectives.Add(directive.GetTreeStartOffset(), directive)
+                            | _ -> ()
                         | _ -> ()
+
+                        interruptChecker.CheckForInterrupt()
             }
         fsFile.Accept(visitor)
         if allDirectives.IsEmpty() then () else
