@@ -54,10 +54,7 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
                             | _ -> null
                         Some { Icon = icon; ReturnType = retType }
 
-                let getAllSymbols () =
-                    let getSymbolsAsync = async { return getAllSymbols checkResults }
-                    getSymbolsAsync.RunAsTask()
-
+                let getAllSymbols () = getAllSymbols checkResults 
                 try
                     let completions =
                         checkResults
