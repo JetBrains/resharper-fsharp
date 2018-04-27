@@ -23,13 +23,6 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
 
     let document = file.Document
 
-    let rec (|Sequentials|_|) = function
-        | SynExpr.Sequential (_, _, e, Sequentials es, _) ->
-            Some (e :: es)
-        | SynExpr.Sequential (_, _, e1, e2, _) ->
-            Some [e1; e2]
-        | _ -> None
-
     let rec (|Apps|_|) = function
         | SynExpr.App(_, true, expr, Apps ((cur, next: List<_>) as acc), _)
         | SynExpr.App(_, false, Apps ((cur, next) as acc), expr, _) ->
@@ -752,9 +745,9 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
         | SynExpr.Fixed(expr,_) ->
             x.ProcessLocalExpression expr
 
-        | Sequentials exprs ->
-            for expr in exprs do
-                x.ProcessLocalExpression(expr)
+        | SynExpr.Sequential(_,_,expr1,expr2,_) ->
+            x.ProcessLocalExpression expr1
+            x.ProcessLocalExpression expr2
 
         | Apps (first, next) ->
             x.ProcessLocalExpression(first)
