@@ -54,8 +54,11 @@ type FSharpScriptPsiModulesProvider
     let locks = solution.Locks
     let checker = checkerService.Checker
     let targetFrameworkId =
-        let plaformInfo = platformManager.GetAllPlatformInfos() |> Seq.maxBy (fun info -> info.Version)
-        plaformInfo.PlatformID.ToTargetFrameworkId()
+        let platformInfos = platformManager.GetAllPlatformInfos().AsList()
+        if platformInfos.IsEmpty() then TargetFrameworkId.Default else
+
+        let platformInfo = platformInfos |> Seq.maxBy (fun info -> info.Version)
+        platformInfo.PlatformID.ToTargetFrameworkId()
 
     // todo: use script options provider
     let getScriptOptions (path: FileSystemPath) (document: IDocument) =
