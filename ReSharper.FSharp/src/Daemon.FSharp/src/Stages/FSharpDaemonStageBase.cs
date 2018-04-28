@@ -40,11 +40,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
     [CanBeNull]
     protected abstract IDaemonStageProcess CreateProcess([NotNull] IFSharpFile fsFile,
       [NotNull] IDaemonProcess process);
-
-    public virtual ErrorStripeRequest NeedsErrorStripe(IPsiSourceFile sourceFile,
-      IContextBoundSettingsStore settingsStore)
-    {
-      return ErrorStripeRequest.STRIPE_AND_ERRORS;
-    }
   }
 }
