@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Application.Threading;
+using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Checker;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
@@ -85,12 +86,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
                 continue;
 
               // visualfsharp#3939
-              if (mfvLogicalName.Equals("v", StringComparison.Ordinal) &&
+              if (mfvLogicalName == "v" &&
                   myDeclarationSymbols.ContainsKey(startOffset))
                 continue;
 
+              if (mfvLogicalName == StandardMemberNames.ClassConstructor)
+                continue;
+              
               // visualfsharp#3943, visualfsharp#3933
-              if (!mfvLogicalName.Equals(".ctor", StringComparison.Ordinal) &&
+              if (mfvLogicalName != StandardMemberNames.Constructor &&
                   !(FindTokenAt(new TreeOffset(endOffset - 1)) is FSharpIdentifierToken || mfv.IsActivePattern))
                 continue;
             }

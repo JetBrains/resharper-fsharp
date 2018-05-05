@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
+using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Daemon.UsageChecking;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Highlightings;
@@ -46,8 +47,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 
         if (symbolUse.IsFromDefinition && symbol is FSharpMemberOrFunctionOrValue mfv)
         {
-          if (myDocument.Buffer.GetText(resolvedSymbolUse.Range).Equals("new", StringComparison.Ordinal) &&
-              mfv.LogicalName.Equals(".ctor", StringComparison.Ordinal))
+          if (myDocument.Buffer.GetText(resolvedSymbolUse.Range) == "new" &&
+              mfv.LogicalName == StandardMemberNames.Constructor)
             continue;
         }
 

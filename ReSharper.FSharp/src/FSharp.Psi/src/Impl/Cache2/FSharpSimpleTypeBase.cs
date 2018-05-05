@@ -20,9 +20,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     private const string ComparerTypeName = "System.Collections.IComparer";
     private const string EqComparerTypeName = "System.Collections.IEqualityComparer";
 
-    protected virtual bool OverridesCompareTo() => true;
-    protected virtual bool OverridesToString() => true;
-    protected virtual bool EmitsFieldsConstructor() => true;
+    protected virtual bool OverridesCompareTo => true;
+    protected virtual bool OverridesToString => true;
+    protected virtual bool EmitsFieldsConstructor => true;
 
     public FSharpSimpleTypeBase([NotNull] IClassPart part) : base(part)
     {
@@ -48,24 +48,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       members.Add(new FSharpGeneratedMethod(this, GetHashCodeName, intType, isOverride: true));
       members.Add(new FSharpGeneratedMethod(this, GetHashCodeName, eqCompType, CompName, intType, isOverride: true));
 
-      if (OverridesCompareTo())
+      if (OverridesCompareTo)
       {
         members.Add(new FSharpGeneratedMethod(this, CompareToName, thisType, ObjName, boolType));
         members.Add(new FSharpGeneratedMethod(this, CompareToName, objType, ObjName, boolType));
         members.Add(new FSharpGeneratedMethod(this, CompareToName, objType, ObjName, compType, CompName, boolType));
       }
 
-      if (OverridesToString())
+      if (OverridesToString)
         members.Add(new FSharpGeneratedMethod(this, ToStringName, stringType, isOverride: true));
 
-      if (EmitsFieldsConstructor())
+      var baseMembers = base.GetMembers().AsIList();
+      
+      if (EmitsFieldsConstructor)
       {
-        var fields = base.GetMembers().OfType<FSharpFieldProperty>().AsArray();
+        var fields = baseMembers.OfType<FSharpFieldProperty>().AsArray();
         if (!fields.IsEmpty())
           members.Add(new FSharpGeneratedConstructor(this, fields));
       }
 
-      return base.GetMembers().Prepend(members.ResultingList());
+      return baseMembers.Prepend(members.ResultingList());
     }
   }
 }

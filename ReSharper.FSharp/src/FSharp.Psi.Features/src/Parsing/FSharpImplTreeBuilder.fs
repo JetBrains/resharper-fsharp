@@ -33,8 +33,11 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
         | SynModuleDecl.Types(types,_) ->
             for t in types do x.ProcessType t
 
-        | SynModuleDecl.Exception(SynExceptionDefn(exn,_,_),_) ->
-            x.ProcessException exn
+        | SynModuleDecl.Exception(SynExceptionDefn(exn, members, range),_) ->
+            let mark = x.StartException(exn)
+            for m in members do x.ProcessTypeMember(m)
+            range |> x.GetEndOffset |> x.AdvanceToOffset
+            x.Done(mark, ElementType.EXCEPTION_DECLARATION)
 
         | SynModuleDecl.Open(lidWithDots,range) ->
             range |> x.GetStartOffset |> x.AdvanceToOffset

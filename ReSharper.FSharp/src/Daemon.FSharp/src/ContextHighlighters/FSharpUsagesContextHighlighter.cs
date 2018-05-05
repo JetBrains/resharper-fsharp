@@ -1,6 +1,7 @@
 ﻿using System;
 using JetBrains.Annotations;
 using JetBrains.DataFlow;
+using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Daemon.CaretDependentFeatures;
 using JetBrains.ReSharper.Daemon.CSharp.ContextHighlighters;
 using JetBrains.ReSharper.Feature.Services.Contexts;
@@ -10,7 +11,6 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
-using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.DataContext;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
@@ -79,8 +79,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
 
         var tokenType = usageToken.GetTokenType();
         if ((tokenType == FSharpTokenType.GREATER || tokenType == FSharpTokenType.GREATER_RBRACK) &&
-            !(symbol is FSharpMemberOrFunctionOrValue mfv &&
-              mfv.CompiledName.Equals("op_GreaterThan", StringComparison.Ordinal)))
+            !(symbol is FSharpMemberOrFunctionOrValue mfv && mfv.CompiledName == StandardOperatorNames.GreaterThan))
           continue; // found usage of generic symbol with specified type parameter
 
         consumer.ConsumeHighlighting(HighlightingId, usageToken.GetDocumentRange());

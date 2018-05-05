@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
+using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Impl.Special;
@@ -35,7 +36,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
       return CLRDeclaredElementType.CONSTRUCTOR;
     }
 
-    public override string ShortName => ".ctor";
+    public override string ShortName => StandardMemberNames.Constructor;
 
     public InvocableSignature GetSignature(ISubstitution substitution)
     {

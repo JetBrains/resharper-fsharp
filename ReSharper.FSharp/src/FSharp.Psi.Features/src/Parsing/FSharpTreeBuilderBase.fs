@@ -1,6 +1,7 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
 open System
+open System.Collections.Generic
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
@@ -21,6 +22,20 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
     inherit TreeStructureBuilderBase(lifetime)
 
     let document = file.Document
+
+    let rec (|Apps|_|) = function
+        | SynExpr.App(_, true, expr, Apps ((cur, next: List<_>) as acc), _)
+        | SynExpr.App(_, false, Apps ((cur, next) as acc), expr, _) ->
+            next.Add(expr)
+            Some acc
+
+        | SynExpr.App(_, true, second, first, _) 
+        | SynExpr.App(_, false, first, second, _) ->
+            let list = List()
+            list.Add(second)
+            Some (first, list)
+
+        | _ -> None
 
     abstract member CreateFSharpFile: unit -> IFSharpFile
 
@@ -119,16 +134,14 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
             x.ProcessIdentifier id
         mark
 
-    member internal x.ProcessException (SynExceptionDefnRepr(_,UnionCase(_,id,unionCaseType,_,_,_),_,_,_,range)) =
+    member internal x.StartException (SynExceptionDefnRepr(_,UnionCase(_,id,unionCaseType,_,_,_),_,_,_,range)) =
         range |> x.GetStartOffset |> x.AdvanceToOffset
         let mark = x.Builder.Mark()
         x.Builder.AdvanceLexer() |> ignore // skip keyword
         x.ProcessModifiersBeforeOffset(x.GetStartOffset id)
         x.ProcessIdentifier(id)
         x.ProcessUnionCaseType(unionCaseType) |> ignore
-
-        range |> x.GetEndOffset |> x.AdvanceToOffset
-        x.Builder.Done(mark, ElementType.EXCEPTION_DECLARATION, null)
+        mark
 
     member internal x.ProcessModifiersBeforeOffset (endOffset: int) =
         let mark = x.Builder.Mark()
@@ -440,7 +453,7 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
         | SynPat.LongIdent(lidWithDots,_,_,patParams,_,range) ->
             match lidWithDots.Lid with
             | [] -> ()
-            | [id] when id.idText.Equals("op_ColonColon", StringComparison.Ordinal) -> ()
+            | [id] when id.idText = "op_ColonColon" -> ()
             | lid ->
                 for id in lid do
                     let isActivePattern = IsActivePatternName id.idText 
@@ -628,14 +641,6 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
         | SynExpr.Assert(expr,_) ->
             x.ProcessLocalExpression expr
 
-        | SynExpr.App(_,isInfix,funExpr,argExpr,_) ->
-            if isInfix then
-                x.ProcessLocalExpression argExpr
-                x.ProcessLocalExpression funExpr
-            else
-                x.ProcessLocalExpression funExpr
-                x.ProcessLocalExpression argExpr
-
         | SynExpr.TypeApp(expr,lt,typeArgs,_,rt,_,r) ->
             x.ProcessLocalExpression expr
             lt|> x.GetStartOffset |> x.AdvanceToOffset
@@ -659,10 +664,6 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
             x.ProcessLocalExpression finallyExpr
 
         | SynExpr.Lazy(expr,_) -> x.ProcessLocalExpression expr
-
-        | SynExpr.Sequential(_,_,expr1,expr2,_) ->
-            x.ProcessLocalExpression expr1
-            x.ProcessLocalExpression expr2
 
         | SynExpr.IfThenElse(ifExpr,thenExpr,elseExprOpt,_,_,_,_) ->
             x.ProcessLocalExpression ifExpr
@@ -743,6 +744,17 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
 
         | SynExpr.Fixed(expr,_) ->
             x.ProcessLocalExpression expr
+
+        | SynExpr.Sequential(_,_,expr1,expr2,_) ->
+            x.ProcessLocalExpression expr1
+            x.ProcessLocalExpression expr2
+
+        | Apps (first, next) ->
+            x.ProcessLocalExpression(first)
+            for expr in next do
+                x.ProcessLocalExpression(expr)
+
+        | _ -> ()
 
     member x.ProcessIndexerArg arg =
         for expr in arg.Exprs do

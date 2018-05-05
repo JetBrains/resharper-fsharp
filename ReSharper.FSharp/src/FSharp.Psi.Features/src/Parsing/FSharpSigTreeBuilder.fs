@@ -32,8 +32,11 @@ type internal FSharpSigTreeBuilder(file, lexer, sigs, lifetime) =
         | SynModuleSigDecl.Types(types,_) ->
             for t in types do x.ProcessTypeSignature t
 
-        | SynModuleSigDecl.Exception(SynExceptionSig(exn,_,_),range) ->
-            x.ProcessException exn
+        | SynModuleSigDecl.Exception(SynExceptionSig(exn, members, range),_) ->
+            let mark = x.StartException(exn)
+            for m in members do x.ProcessTypeMemberSignature(m)
+            range |> x.GetEndOffset |> x.AdvanceToOffset
+            x.Done(mark, ElementType.EXCEPTION_DECLARATION)
 
         | SynModuleSigDecl.ModuleAbbrev(id,_,range) ->
             id |> x.GetStartOffset |> x.AdvanceToOffset

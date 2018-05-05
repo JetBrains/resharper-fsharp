@@ -169,10 +169,6 @@ type FSharpProjectOptionsBuilder
               ExtraProjectInfo = None
               Stamp = None }
 
-        let isCompilingFsLib options =
-            options.OtherOptions
-            |> Seq.exists (fun s -> s.Equals("--compiling-fslib", StringComparison.Ordinal))
-
         let hasFSharpCoreReference options =
             options.OtherOptions
             |> Seq.exists (fun s ->
@@ -180,7 +176,7 @@ type FSharpProjectOptionsBuilder
                 s.EndsWith("FSharp.Core.dll", StringComparison.Ordinal))
 
         let shoudAddFSharpCore options =
-            not (hasFSharpCoreReference options || isCompilingFsLib options)
+            not (hasFSharpCoreReference options || options.OtherOptions |> Array.contains "--compiling-fslib")
 
         let options =
             if shoudAddFSharpCore projectOptions then 
@@ -188,7 +184,9 @@ type FSharpProjectOptionsBuilder
                     OtherOptions = FSharpCoreFix.ensureCorrectFSharpCore projectOptions.OtherOptions }
             else projectOptions
 
-        let parsingOptions, errors = checkerService.Checker.GetParsingOptionsFromCommandLineArgs(List.ofArray options.OtherOptions)
+        let parsingOptions, errors =
+            checkerService.Checker.GetParsingOptionsFromCommandLineArgs(List.ofArray options.OtherOptions)
+
         let parsingOptions = { parsingOptions with SourceFiles = options.SourceFiles }
         if not errors.IsEmpty then
             logger.Warn("Getting parsing options: {0}", concatErrors errors)

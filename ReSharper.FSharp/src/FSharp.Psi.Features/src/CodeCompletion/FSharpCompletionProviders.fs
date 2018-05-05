@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
+open JetBrains.Application
 open System
 open JetBrains.Application.Progress
 open JetBrains.ProjectModel
@@ -48,12 +49,12 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
                         // todo: provide symbol and display context in FCS items, calc this only when needed
                         let icon = getIconId symbol
                         let retType =
-                            getReturnType symbol
-                            |> Option.map (fun t -> t.Format(context))
-                            |> Option.toObj
+                            match getReturnType symbol with
+                            | Some t -> t.Format(context)
+                            | _ -> null
                         Some { Icon = icon; ReturnType = retType }
 
-                let getAllSymbols () = getAllSymbols checkResults
+                let getAllSymbols () = getAllSymbols checkResults 
                 try
                     let completions =
                         checkResults
@@ -71,13 +72,11 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
 
                         lookupItem.InitializeRanges(context.Ranges, basicContext)
                         lookupItem.DisplayTypeName <-
-                            item.AdditionalInfo
-                            |> Option.map (fun i -> i.ReturnType)
-                            |> Option.toObj
-                            |> RichText
-                        collector.Add(lookupItem)
+                            match item.AdditionalInfo with
+                            | Some info -> RichText(info.ReturnType)
+                            | _ -> null
 
-                        collector.CheckForInterrupt()
+                        collector.Add(lookupItem)
                     true
                 with
                 | :? OperationCanceledException -> reraise()
@@ -125,7 +124,7 @@ type FSharpRangesProvider() =
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpLibraryScopeLookupItemsProvider(logger: ILogger, assemblyContentProvider: FSharpAssemblyContentProvider) =
-    inherit FSharpLookupItemsProviderBase(logger, (fun checkResults -> assemblyContentProvider.GetLibrariesEntities(checkResults)), true)
+    inherit FSharpLookupItemsProviderBase(logger, assemblyContentProvider.GetLibrariesEntities, true)
 
     interface ISlowCodeCompletionItemsProvider with
         member x.IsAvailable(context) = base.IsAvailable(context)

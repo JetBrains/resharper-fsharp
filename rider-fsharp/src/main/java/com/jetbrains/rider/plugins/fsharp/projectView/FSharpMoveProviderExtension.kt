@@ -25,7 +25,7 @@ class FSharpMoveProviderExtension(project: Project) : MoveProviderExtension(proj
     }
 
     override fun allowPaste(nodes: Collection<ProjectModelNode>, relativeTo: IProjectModelNode, orderType: ActionOrderType): Boolean {
-        if (nodes.any { it.isProjectFolder() })
+        if (nodes.any { it.isProjectFolder() && it.containingProject()?.getVirtualFile()?.extension == "fsproj" })
             return false
 
         if (orderType == ActionOrderType.None) {

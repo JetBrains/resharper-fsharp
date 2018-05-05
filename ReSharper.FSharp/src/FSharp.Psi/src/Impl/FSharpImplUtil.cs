@@ -32,7 +32,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     public static bool ShortNameEquals([NotNull] this IFSharpAttribute attr, [NotNull] string shortName) =>
-      attr.LongIdentifier?.Name.GetAttributeShortName()?.Equals(shortName, StringComparison.Ordinal) ?? false;
+      attr.LongIdentifier?.Name.GetAttributeShortName() == shortName;
 
     [NotNull]
     public static string GetCompiledName([CanBeNull] this IIdentifier identifier,
@@ -53,7 +53,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
         if (hasModuleSuffix || !attr.ShortNameEquals("CompilationRepresentation")) continue;
         var arg = attr.ArgExpression.LongIdentifier?.QualifiedName;
-        if (arg != null && arg.Equals("CompilationRepresentationFlags.ModuleSuffix", StringComparison.Ordinal))
+        if (arg != null && arg == "CompilationRepresentationFlags.ModuleSuffix")
           hasModuleSuffix = true;
       }
       var sourceName = identifier?.Name;

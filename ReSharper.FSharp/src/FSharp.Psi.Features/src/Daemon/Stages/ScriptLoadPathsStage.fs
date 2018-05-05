@@ -30,26 +30,35 @@ type ScriptLoadPathsStageProcess(fsFile, daemonProcess) =
     inherit FSharpDaemonStageProcessBase(daemonProcess)
 
     override x.Execute(committer) =
+        let interruptChecker = x.SeldomInterruptChecker
+
+        let allDirectives = Dictionary<TreeOffset, IHashDirective>()
+        let visitor =
+            { new TreeNodeVisitor() with
+                override x.VisitFSharpFile(fsFile) =
+                    for decl in fsFile.Declarations do
+                        decl.Accept(x)
+
+                override __.VisitTopLevelModuleDeclaration(decl) =
+                    for memberDecl in decl.Members do
+                        match memberDecl with
+                        | :? IHashDirective as directive ->
+                            match directive.HashToken with
+                            | null -> ()
+                            | token when token.GetText() = "#load" ->
+                                // todo: implement for other directives
+                                allDirectives.Add(directive.GetTreeStartOffset(), directive)
+                            | _ -> ()
+                        | _ -> ()
+
+                        interruptChecker.CheckForInterrupt()
+            }
+        fsFile.Accept(visitor)
+        if allDirectives.IsEmpty() then () else
+
         match fsFile.CheckerService.OptionsProvider.GetProjectOptions(daemonProcess.SourceFile) with
         | Some options when not options.OriginalLoadReferences.IsEmpty ->
             let document = daemonProcess.Document
-            let allDirectives = Dictionary<TreeOffset, IHashDirective>()
-            let visitor =
-                { new TreeNodeVisitor() with
-                    override x.VisitFSharpFile(fsFile) =
-                        for decl in fsFile.Declarations do
-                            decl.Accept(x)
-
-                    override x.VisitTopLevelModuleDeclaration(decl) =
-                        for memberDecl in decl.Members do
-                            match memberDecl with
-                            | :? IHashDirective as directive ->
-                                // todo: implement for other directives
-                                if directive.HashToken.GetText().Equals("#load", StringComparison.Ordinal) then
-                                    allDirectives.Add(directive.GetTreeStartOffset(), directive)
-                            | _ -> () }
-            fsFile.Accept(visitor)
-
             let linesCount = document.GetLineCount() |> int
             let loadedDirectives =
                 options.OriginalLoadReferences

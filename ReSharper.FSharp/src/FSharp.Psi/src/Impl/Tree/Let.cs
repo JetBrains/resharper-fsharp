@@ -24,7 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         return new ModuleValue(this, mfv);
 
       return !mfv.IsInstanceMember && mfv.CompiledName.StartsWith("op_", StringComparison.Ordinal)
-        ? (IDeclaredElement) new FSharpOperator<Let>(this, mfv, null)
+        ? (IDeclaredElement) new FSharpSignOperator<Let>(this, mfv, null)
         : new ModuleFunction(this, mfv, null);
     }
   }

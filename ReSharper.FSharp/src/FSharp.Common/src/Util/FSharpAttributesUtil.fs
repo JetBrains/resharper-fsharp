@@ -19,8 +19,7 @@ type FSharpAttributeUtil =
 
     [<Extension>]
     static member GetAttributes (attrs: IList<FSharpAttribute>, clrName) =
-        (attrs |> Seq.filter (fun a -> FSharpAttributeUtil.GetClrName(a).Equals(clrName, StringComparison.Ordinal)))
-            .AsIList()
+        (attrs |> Seq.filter (fun a -> FSharpAttributeUtil.GetClrName(a) = clrName)).AsIList()
 
     [<Extension>]
     static member FirstOrDefault (attrs: IList<FSharpAttribute>, clrName: string) =

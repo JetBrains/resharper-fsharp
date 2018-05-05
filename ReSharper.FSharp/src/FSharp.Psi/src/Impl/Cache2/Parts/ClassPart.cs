@@ -25,7 +25,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
       // todo: check actual members
       return base.GetMemberPresenceFlag() |
-             MemberPresenceFlag.INSTANCE_CTOR;
+             MemberPresenceFlag.INSTANCE_CTOR |
+             MemberPresenceFlag.IMPLICIT_OP;
     }
 
     protected override byte SerializationTag => (byte) FSharpPartKind.Class;
