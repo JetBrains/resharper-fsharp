@@ -15,8 +15,8 @@ type FSharpProjectProperties =
     val mutable targetPlatformData: TargetPlatformData
     val buildSettings: ManagedProjectBuildSettings
 
-    new(projectTypeGuids, platformId, factoryGuid, targetFrameworkIds, targetPlatformData, dotNetCoreSDK) =
-        { inherit ProjectPropertiesBase<_>(projectTypeGuids, platformId, factoryGuid, targetFrameworkIds, dotNetCoreSDK)
+    new(projectTypeGuids, factoryGuid, targetFrameworkIds, targetPlatformData, dotNetCoreSDK) =
+        { inherit ProjectPropertiesBase<_>(projectTypeGuids, factoryGuid, targetFrameworkIds, dotNetCoreSDK)
           buildSettings = ManagedProjectBuildSettings()
           targetPlatformData = targetPlatformData }
 

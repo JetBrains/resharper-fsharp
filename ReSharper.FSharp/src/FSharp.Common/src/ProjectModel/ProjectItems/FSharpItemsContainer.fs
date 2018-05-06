@@ -33,6 +33,7 @@ open JetBrains.UI.RichText
 open JetBrains.Util
 open JetBrains.Util.Collections
 open JetBrains.Util.DataStructures
+open JetBrains.Util.Dotnet.TargetFrameworkIds
 open JetBrains.Util.Logging
 open JetBrains.Util.PersistentMap
 

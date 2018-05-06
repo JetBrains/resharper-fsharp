@@ -25,6 +25,7 @@ open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 open JetBrains.Util.DataStructures
+open JetBrains.Util.Dotnet.TargetFrameworkIds
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
 /// Provides psi modules for script files with referenced assemblies determined by "#r" directives.
@@ -57,8 +58,8 @@ type FSharpScriptPsiModulesProvider
         let platformInfos = platformManager.GetAllPlatformInfos().AsList()
         if platformInfos.IsEmpty() then TargetFrameworkId.Default else
 
-        let platformInfo = platformInfos |> Seq.maxBy (fun info -> info.Version)
-        platformInfo.PlatformID.ToTargetFrameworkId()
+        let platformInfo = platformInfos |> Seq.maxBy (fun info -> info.TargetFrameworkId.Version)
+        platformInfo.TargetFrameworkId
 
     // todo: use script options provider
     let getScriptOptions (path: FileSystemPath) (document: IDocument) =

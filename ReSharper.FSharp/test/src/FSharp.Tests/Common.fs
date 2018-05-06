@@ -8,6 +8,7 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.TestFramework
+open JetBrains.Util.Dotnet.TargetFrameworkIds
 open Microsoft.FSharp.Compiler.SourceCodeServices
 open NUnit.Framework
 
@@ -18,8 +19,11 @@ module AssemblyInfo =
 type FSharpTestAttribute() =
     inherit TestPackagesAttribute()
 
+    let targetFrameworkId =
+        TargetFrameworkId.Create(FrameworkIdentifier.NetFramework, new Version(4, 5, 1), ProfileIdentifier.Default)
+
     interface ITestPlatformProvider with
-        member x.GetPlatformID() = PlatformID.CreateFromName(".NETFrameWork", new Version(4, 5));
+        member x.GetTargetFrameworkId() = targetFrameworkId
 
 [<SolutionComponent>]
 type FSharpTestProjectOptionsProvider(lifetime: Lifetime, checkerService: FSharpCheckerService) as this =

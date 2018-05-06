@@ -20,11 +20,11 @@ type Factory() =
     override x.FactoryGuid = factoryGuid
 
     override x.CreateProjectProperties(parameters) =
-        FSharpProjectProperties(parameters.ProjectTypeGuids, parameters.PlatformId, factoryGuid,
-                                parameters.TargetFrameworkIds, parameters.TargetPlatformData, parameters.DotNetCoreSDK) :> _
+        FSharpProjectProperties(parameters.ProjectTypeGuids, factoryGuid, parameters.TargetFrameworkIds,
+                                parameters.TargetPlatformData, parameters.DotNetCoreSDK) :> _
 
-    static member CreateProjectProperties(platformId, targetFrameworkIds) =
-        FSharpProjectProperties([fsProjectTypeGuid].AsCollection(), platformId, factoryGuid, targetFrameworkIds, null, null)
+    static member CreateProjectProperties(targetFrameworkIds) =
+        FSharpProjectProperties([fsProjectTypeGuid].AsCollection(), factoryGuid, targetFrameworkIds, null, null)
 
     override x.Read(reader) =
         let projectProperties = FSharpProjectProperties(factoryGuid)
