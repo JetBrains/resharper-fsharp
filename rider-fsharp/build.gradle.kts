@@ -105,4 +105,19 @@ tasks {
         outputs.upToDateWhen { !rerunSuccessfulTests }
 
     }
+
+    "prepare" {
+        group = "intellij"
+        afterEvaluate {
+            val sdkPath = intellij.ideaDependency.classes.relativeTo(project.projectDir.parentFile)
+            println("SDK path: " + intellij.ideaDependency.classes)
+            file("$projectDir/../NuGet.Config").writeText("""<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <packageSources>
+    <add key="resharper-sdk" value="$sdkPath/lib/ReSharperHostSdk" />
+  </packageSources>
+</configuration>
+""")
+        }
+    }
 }
