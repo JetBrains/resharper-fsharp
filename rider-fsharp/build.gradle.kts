@@ -19,6 +19,14 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_8
 }
 
+
+val baseVersion = "2018.2"
+val buildCounter = ext.properties["build.number"] ?: "9999"
+logger.lifecycle("Build counter: $buildCounter")
+
+version = "$baseVersion.$buildCounter"
+logger.lifecycle("Plugin version: $version")
+
 intellij {
     type = "RD"
 
@@ -40,7 +48,7 @@ intellij {
         localPath = dir.absolutePath
     } else {
         logger.lifecycle("*** Using Rider SDK from intellij-snapshots repository")
-        version = "2018.2-SNAPSHOT"
+        version = "$baseVersion-SNAPSHOT"
     }
     intellijRepo = "https://www.jetbrains.com/intellij-repository"
 
@@ -110,6 +118,8 @@ tasks {
     "prepare" {
         group = "intellij"
         doLast {
+            logger.lifecycle("##teamcity[buildNumber '$version']")
+
             val sdkPath = intellij.ideaDependency.classes
             println("SDK path: $sdkPath")
             file("$repoRoot/NuGet.Config").writeText("""<?xml version="1.0" encoding="utf-8"?>
