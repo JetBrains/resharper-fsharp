@@ -47,7 +47,7 @@
     <Compile Include="src\ZoneMarker.fs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FSharp.Core" Version="4.1.18" />
+    <PackageReference Include="FSharp.Core" Version="4.3.4" />
     <PackageReference Include="Fantomas" Version="2.7.1" />
     <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FCSVersion)" />
     <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
