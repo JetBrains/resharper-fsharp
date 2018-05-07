@@ -2,8 +2,8 @@
   <PropertyGroup>
     <TargetFramework>net451</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
-    <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Tests.Common</RootNamespace>
-    <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Tests.Common</AssemblyName>
+    <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Common.Tests</RootNamespace>
+    <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Common.Tests</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="ItemsContainerTest.fs" />

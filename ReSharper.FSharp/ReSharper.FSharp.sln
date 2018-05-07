@@ -23,7 +23,7 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Tests", "test\src\FS
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Tests.Host", "test\src\FSharp.Tests.Host\FSharp.Tests.Host.fsproj", "{3FF7EEB4-24B5-4E52-8A11-EF731BF6A9BD}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Tests.Common", "test\src\FSharp.Tests.Common\FSharp.Tests.Common.fsproj", "{83C5104C-057E-4AF8-B3FE-3437968CA621}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Common.Tests", "test\src\FSharp.Common.Tests\FSharp.Common.Tests.fsproj", "{83C5104C-057E-4AF8-B3FE-3437968CA621}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
