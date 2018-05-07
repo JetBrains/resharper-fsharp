@@ -51,6 +51,8 @@ intellij {
     setPlugins("rider-plugins-appender")
 }
 
+val repoRoot = projectDir.parentFile!!
+val resharperPluginPath = "$repoRoot/ReSharper.FSharp"
 val buildConfiguration = ext.properties["BuildConfiguration"] ?: "Debug"
 
 val libFiles = listOf(
@@ -68,7 +70,6 @@ val pluginFiles = listOf(
 
 tasks {
     withType<PrepareSandboxTask> {
-        val resharperPluginPath = "../ReSharper.FSharp"
         var files = libFiles + pluginFiles.map { "$it.dll" } + pluginFiles.map { "$it.pdb" }
         files = files.map { "$resharperPluginPath/src/$it" }
 
@@ -108,16 +109,21 @@ tasks {
 
     "prepare" {
         group = "intellij"
-        afterEvaluate {
-            val sdkPath = intellij.ideaDependency.classes.relativeTo(project.projectDir.parentFile)
-            println("SDK path: " + intellij.ideaDependency.classes)
-            file("$projectDir/../NuGet.Config").writeText("""<?xml version="1.0" encoding="utf-8"?>
+        doLast {
+            val sdkPath = intellij.ideaDependency.classes
+            println("SDK path: $sdkPath")
+            file("$repoRoot/NuGet.Config").writeText("""<?xml version="1.0" encoding="utf-8"?>
 <configuration>
   <packageSources>
-    <add key="resharper-sdk" value="$sdkPath/lib/ReSharperHostSdk" />
+    <add key="resharper-sdk" value="${sdkPath.relativeTo(repoRoot)}/lib/ReSharperHostSdk" />
   </packageSources>
 </configuration>
 """)
+
+            exec {
+                executable = "dotnet"
+                args = listOf("restore", "$resharperPluginPath/ReSharper.FSharp.sln")
+            }
         }
     }
 }
