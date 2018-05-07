@@ -53,13 +53,12 @@ intellij {
 
 val buildConfiguration = ext.properties["BuildConfiguration"] ?: "Debug"
 
-val backendDir = "../ReSharper.FSharp"
-val libDllFiles = listOf(
+val libFiles = listOf(
         "FSharp.Common/bin/$buildConfiguration/net451/FSharp.Core.dll",
         "FSharp.Common/bin/$buildConfiguration/net451/FSharp.Compiler.Service.dll", // todo: add pdb after next repack
         "FSharp.Psi.Features/bin/$buildConfiguration/net451/FantomasLib.dll")
 
-val pluginDllFiles = listOf(
+val pluginFiles = listOf(
         "FSharp.ProjectModelBase/bin/$buildConfiguration/net451/JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase",
         "FSharp.Common/bin/$buildConfiguration/net451/JetBrains.ReSharper.Plugins.FSharp.Common",
         "FSharp.Psi/bin/$buildConfiguration/net451/JetBrains.ReSharper.Plugins.FSharp.Psi",
@@ -69,23 +68,30 @@ val pluginDllFiles = listOf(
 
 tasks {
     withType<PrepareSandboxTask> {
-        var files = libDllFiles + pluginDllFiles.map { "$it.dll" } + pluginDllFiles.map { "$it.pdb" }
+        val resharperPluginPath = "../ReSharper.FSharp"
+        var files = libFiles + pluginFiles.map { "$it.dll" } + pluginFiles.map { "$it.pdb" }
+        files = files.map { "$resharperPluginPath/src/$it" }
 
         if (name == IntelliJPlugin.PREPARE_TESTING_SANDBOX_TASK_NAME) {
-            val hostDllName = "JetBrains.ReSharper.Plugins.FSharp.Tests.Host"
-            val hostDllPath = "$backendDir/test/src/FSharp.Tests.Host/bin/$buildConfiguration/net451/$hostDllName"
-            files += listOf("$hostDllPath.dll", "$hostDllPath.pdb")
+            val testHostPath = "$resharperPluginPath/test/src/FSharp.Tests.Host/bin/$buildConfiguration/net451"
+            val testHostName = "$testHostPath/JetBrains.ReSharper.Plugins.FSharp.Tests.Host"
+            files += listOf("$testHostName.dll", "$testHostName.pdb")
         }
 
         files.forEach {
-            val file = file("$backendDir/src/$it")
-            if (!file.exists()) throw RuntimeException("File $file does not exist")
-
-            logger.warn("$name: $file -> $destinationDir/${intellij.pluginName}/dotnet")
-            from(file, { into("${intellij.pluginName}/dotnet") })
+            from(it, { into("${intellij.pluginName}/dotnet") })
         }
+
         into("${intellij.pluginName}/projectTemplates") {
             from("projectTemplates")
+        }
+
+        doLast {
+            files.forEach {
+                val file = file(it)
+                if (!file.exists()) throw RuntimeException("File $file does not exist")
+                logger.warn("$name: ${file.name} -> $destinationDir/${intellij.pluginName}/dotnet")
+            }
         }
     }
 
