@@ -29,7 +29,7 @@ intellij {
         localPath = dir.absolutePath
     } else {
         logger.lifecycle("*** Using Rider SDK from intellij-snapshots repository")
-        version = 'LATEST-TRUNK-SNAPSHOT' // Trunk until we have release
+        version = '2018.1-SNAPSHOT' // Trunk until we have release
     }
 
     downloadSources false
@@ -85,7 +85,7 @@ prepareTestingSandbox {
 
     files.forEach {
         def file = file(it)
-        if (!file.exists()) throw new RuntimeException("File $file does not exist")
+//        if (!file.exists()) throw new RuntimeException("File $file does not exist")
 
         logger.warn("prepareTestingSandbox: " +
                 file.toString() + " -> " +
@@ -114,4 +114,10 @@ test {
     }
     def rerunSuccessfulTests = false
     outputs.upToDateWhen { !rerunSuccessfulTests }
+}
+
+task "hello-world" {
+    afterEvaluate {
+        println("Hello World")
+    }
 }
