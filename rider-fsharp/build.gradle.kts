@@ -56,7 +56,7 @@ val buildConfiguration = ext.properties["BuildConfiguration"] ?: "Debug"
 val libFiles = listOf(
         "FSharp.Common/bin/$buildConfiguration/net451/FSharp.Core.dll",
         "FSharp.Common/bin/$buildConfiguration/net451/FSharp.Compiler.Service.dll", // todo: add pdb after next repack
-        "FSharp.Psi.Features/bin/$buildConfiguration/net451/FantomasLib.dll")
+        "FSharp.Psi.Features/bin/$buildConfiguration/net451/Fantomas.dll")
 
 val pluginFiles = listOf(
         "FSharp.ProjectModelBase/bin/$buildConfiguration/net451/JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase",
