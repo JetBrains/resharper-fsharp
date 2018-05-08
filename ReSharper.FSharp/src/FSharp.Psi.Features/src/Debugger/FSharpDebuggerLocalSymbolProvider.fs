@@ -26,7 +26,7 @@ type FSharpDebuggerLocalSymbolProvider() =
                         let mutable declRange = None
                         
                         let visitor =
-                            let (|SutableIdent|_|) (ident: Ident) = 
+                            let inline (|SuitableIdent|_|) (ident: Ident) = 
                                 if ident.idText = name && (Range.posLt ident.idRange.End pos || Range.posEq ident.idRange.End pos) then
                                     Some ident.idRange
                                 else None
@@ -41,7 +41,7 @@ type FSharpDebuggerLocalSymbolProvider() =
                         
                             let visitPat pat defaultTraverse =
                                 match pat with
-                                | SynPat.Named(_, SutableIdent range, false, _, _) -> updateDeclRange range 
+                                | SynPat.Named(_, SuitableIdent range, false, _, _) -> updateDeclRange range 
                                 | _ -> ()
                                 defaultTraverse pat
                                 
