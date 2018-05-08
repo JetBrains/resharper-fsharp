@@ -1,7 +1,5 @@
-import com.intellij.openapi.editor.impl.EditorImpl
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.test.CompletionTestBase
-import com.jetbrains.rider.test.framework.dumpOpenedDocument
 import com.jetbrains.rider.test.framework.frameworkLogger
 import com.jetbrains.rider.test.scriptingApi.callBasicCompletion
 import com.jetbrains.rider.test.scriptingApi.completeWithTab
@@ -19,7 +17,7 @@ class FSharpCompletionTest : CompletionTestBase() {
     private val rdFcsHost get() = project.solution.fsharpCompilerServiceHost
     private var isFcsReady = false
 
-    @Test
+    @Test(enabled = false)
     fun namespaceKeyword() = doTest("na")
 
     @Test(enabled = false) // todo: remove static items in FCS basic completion
