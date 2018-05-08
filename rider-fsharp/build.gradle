@@ -85,7 +85,7 @@ prepareTestingSandbox {
 
     files.forEach {
         def file = file(it)
-//        if (!file.exists()) throw new RuntimeException("File $file does not exist")
+        if (!file.exists()) throw new RuntimeException("File $file does not exist")
 
         logger.warn("prepareTestingSandbox: " +
                 file.toString() + " -> " +
@@ -114,10 +114,4 @@ test {
     }
     def rerunSuccessfulTests = false
     outputs.upToDateWhen { !rerunSuccessfulTests }
-}
-
-task "hello-world" {
-    afterEvaluate {
-        println("Hello World")
-    }
 }
