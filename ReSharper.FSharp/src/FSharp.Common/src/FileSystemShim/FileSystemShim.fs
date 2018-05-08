@@ -59,6 +59,7 @@ type FileSystemShim(lifetime: Lifetime, sources: FSharpSourceCache, assemblies: 
                 (fun _ -> defaultFileSystem.SafeExists(path))
 
         member x.FileStreamWriteExistingShim(fileName) = defaultFileSystem.FileStreamWriteExistingShim(fileName)
+        member x.IsStableFileHeuristic(fileName) = defaultFileSystem.IsStableFileHeuristic(fileName)
         member x.FileStreamCreateShim(fileName) = defaultFileSystem.FileStreamCreateShim(fileName)
         member x.IsInvalidPathShim(fileName) = defaultFileSystem.IsInvalidPathShim(fileName)
         member x.ReadAllBytesShim(fileName) = defaultFileSystem.ReadAllBytesShim(fileName)

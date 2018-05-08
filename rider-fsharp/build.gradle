@@ -46,7 +46,7 @@ def backendDir = '../ReSharper.FSharp'
 def libDllFiles = [
         "FSharp.Common/bin/$BuildConfiguration/net451/FSharp.Core.dll",
         "FSharp.Common/bin/$BuildConfiguration/net451/FSharp.Compiler.Service.dll", // todo: add pdb after next repack
-        "FSharp.Psi.Features/bin/$BuildConfiguration/net451/FantomasLib.dll"
+        "FSharp.Psi.Features/bin/$BuildConfiguration/net451/Fantomas.dll"
 ]
 
 def pluginDllFiles = [
