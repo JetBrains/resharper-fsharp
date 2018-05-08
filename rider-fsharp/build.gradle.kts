@@ -21,11 +21,6 @@ java {
 
 
 val baseVersion = "2018.2"
-val buildCounter = ext.properties["build.number"] ?: "9999"
-logger.lifecycle("Build counter: $buildCounter")
-
-version = "$baseVersion.$buildCounter"
-logger.lifecycle("Plugin version: $version")
 
 intellij {
     type = "RD"
@@ -118,8 +113,6 @@ tasks {
     "prepare" {
         group = "intellij"
         doLast {
-            logger.lifecycle("##teamcity[buildNumber '$version']")
-
             val sdkPath = intellij.ideaDependency.classes
             println("SDK path: $sdkPath")
             file("$repoRoot/NuGet.Config").writeText("""<?xml version="1.0" encoding="utf-8"?>
