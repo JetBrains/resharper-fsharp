@@ -46,15 +46,9 @@ type FSharpDebuggerLocalSymbolProvider() =
                                 defaultTraverse pat
                                 
                             { new AstTraversal.AstVisitorBase<_>() with
-                                member this.VisitExpr(_, traverseSynExpr, defaultTraverse, expr) = 
-                                    match expr with
-                                    | SynExpr.For(ident = SutableIdent range) -> updateDeclRange range 
-                                    | SynExpr.ForEach(pat = pat) -> visitPat pat ignore
-                                    | _ -> () 
-                                    defaultTraverse expr
-
+                                member this.VisitExpr(_, traverseSynExpr, defaultTraverse, expr) = defaultTraverse expr
                                 member this.VisitPat(defaultTraverse, pat) = visitPat pat defaultTraverse 
-                                
+
                                 member this.VisitLetOrUse(bindings, range) =
                                     bindings |> List.tryPick (fun (Binding(headPat = headPat)) ->
                                         visitPat headPat (fun _ -> None)
@@ -62,12 +56,13 @@ type FSharpDebuggerLocalSymbolProvider() =
                             }
                         
                         AstTraversal.Traverse(pos, parseTree, visitor) |> ignore
+                        
                         match declRange with
                         | Some declRange ->
                             let endOffset = range.Document.GetTreeEndOffset(declRange)
                             let treeNode = fsFile.FindTokenAt(endOffset - 1)
-                            //let containingTypeDeclaration = treeNode.GetContainingTypeDeclaration()
-                            treeNode, null //containingTypeDeclaration.DeclaredElement :> _
+                            let containingTypeDeclaration = treeNode.GetContainingTypeDeclaration()
+                            treeNode, containingTypeDeclaration.DeclaredElement :> _
                             
                         | None -> null, null
                     | _ -> null, null
