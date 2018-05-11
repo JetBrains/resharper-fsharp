@@ -1,5 +1,6 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
+namespace rec JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 
+open System
 open System.Runtime.InteropServices
 open JetBrains.Metadata.Utils
 open JetBrains.ProjectModel.Impl.Build
@@ -13,16 +14,16 @@ type FSharpProjectProperties =
     inherit ProjectPropertiesBase<ManagedProjectConfiguration>
 
     val mutable targetPlatformData: TargetPlatformData
-    val buildSettings: ManagedProjectBuildSettings
+    val buildSettings: FSharpBuildSettings
 
     new(projectTypeGuids, factoryGuid, targetFrameworkIds, targetPlatformData, dotNetCoreSDK) =
         { inherit ProjectPropertiesBase<_>(projectTypeGuids, factoryGuid, targetFrameworkIds, dotNetCoreSDK)
-          buildSettings = ManagedProjectBuildSettings()
+          buildSettings = FSharpBuildSettings()
           targetPlatformData = targetPlatformData }
 
     new(factoryGuid, [<Optional; DefaultParameterValue(null: TargetPlatformData)>] targetPlatformData) =
         { inherit ProjectPropertiesBase<_>(factoryGuid)
-          buildSettings = ManagedProjectBuildSettings()
+          buildSettings = FSharpBuildSettings()
           targetPlatformData = targetPlatformData }
 
     override x.BuildSettings = x.buildSettings :> _
@@ -49,3 +50,23 @@ type FSharpProjectProperties =
         writer.Write(new string(' ', 2 + indent * 2))
         x.buildSettings.Dump(writer, indent + 2)
         base.Dump(writer, indent + 1)
+
+
+type FSharpBuildSettings() =
+    inherit ManagedProjectBuildSettings()
+
+    member val TailCalls = Unchecked.defaultof<bool> with get, set
+
+    override x.WriteBuildSettings(writer) =
+        base.WriteBuildSettings(writer)
+        writer.Write(x.TailCalls)
+
+    override x.ReadBuildSettings(reader) =
+        base.ReadBuildSettings(reader)
+        x.TailCalls <- reader.ReadBool()
+
+    override x.Dump(writer, indent) =
+        writer.Write(String(' ', 2 + indent * 2))
+        writer.WriteLine(sprintf "TailCalls:%b" x.TailCalls)
+
+        base.Dump(writer, indent)
