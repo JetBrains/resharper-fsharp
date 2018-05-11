@@ -16,6 +16,7 @@ import com.intellij.icons.AllIcons
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.extensions.Extensions
@@ -27,10 +28,16 @@ import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.wm.impl.ToolWindowManagerImpl
 import com.intellij.project.isDirectoryBased
 import com.intellij.util.containers.ContainerUtil
+import com.intellij.util.ui.UIUtil
 import com.intellij.xdebugger.XDebuggerManager
 import com.intellij.xdebugger.attach.XLocalAttachDebuggerProvider
 import com.jetbrains.rider.debugger.DotNetDebugProcess
 import com.jetbrains.rider.model.RdFsiSessionInfo
+import com.jetbrains.rider.util.idea.application
+import com.jetbrains.rider.util.idea.pumpMessages
+import org.jetbrains.concurrency.AsyncPromise
+import org.jetbrains.concurrency.Promise
+import org.jetbrains.concurrency.resolvedPromise
 import java.io.File
 import kotlin.properties.Delegates
 
@@ -39,6 +46,8 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost)
 
     companion object {
         const val fsiTitle = "F# Interactive"
+        private const val waitForDebugSessionTimeout = 15000L
+        private val logger = Logger.getInstance(FsiConsoleRunner::class.java)
     }
 
     private val projectDir = if (fsiHost.project.isDirectoryBased) fsiHost.project.baseDir else null
@@ -53,14 +62,14 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost)
     private var pid by Delegates.notNull<Int>()
 
     private val isAttached
-        get() = XDebuggerManager.getInstance(project).debugSessions
-                .map { it.debugProcess }
-                .filterIsInstance<DotNetDebugProcess>()
-                .any { it.processId.valueOrNull == pid }
+        get() = getDebugProcessForThisFsi() != null
 
     val commandHistory = CommandHistory()
 
     fun isValid(): Boolean = !(processHandler?.isProcessTerminated ?: true)
+
+    private fun getDebugProcessForThisFsi() = XDebuggerManager.getInstance(project).debugSessions
+            .map { it.debugProcess }.filterIsInstance<DotNetDebugProcess>().firstOrNull()
 
     private fun attachToProcess() {
         val processInfo = OSProcessUtil.getProcessList().firstOrNull { it.pid == pid } ?: return
@@ -72,21 +81,44 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost)
     }
 
     fun sendText(visibleText: String, fsiText: String, debug: Boolean) {
-        if (debug && !isAttached) attachToProcess()
+        attachDebuggerIfNeeded(debug).done {
+            UIUtil.invokeLaterIfNeeded {
+                consoleView.print(visibleText, ConsoleViewContentType.USER_INPUT)
+                consoleView.print("\n", ConsoleViewContentType.NORMAL_OUTPUT)
+                EditorUtil.scrollToTheEnd(consoleView.historyViewer)
 
-        consoleView.print(visibleText, ConsoleViewContentType.USER_INPUT)
-        consoleView.print("\n", ConsoleViewContentType.NORMAL_OUTPUT)
-        EditorUtil.scrollToTheEnd(consoleView.historyViewer)
+                commandHistory.addEntry(CommandHistory.Entry(visibleText, fsiText))
 
-        commandHistory.addEntry(CommandHistory.Entry(visibleText, fsiText))
+                // show the window without getting focus
+                ExecutionManager.getInstance(project).contentManager.selectRunContent(contentDescriptor)
+                ToolWindowManagerImpl.getInstance(project).getToolWindow(executor.id).show(null)
 
-        // show the window without getting focus
-        ExecutionManager.getInstance(project).contentManager.selectRunContent(contentDescriptor)
-        ToolWindowManagerImpl.getInstance(project).getToolWindow(executor.id).show(null)
+                val stream = processHandler.processInput ?: error("Broken Fsi stream")
+                stream.write(fsiText.toByteArray(Charsets.UTF_8))
+                stream.flush()
+            }
+        }.rejected {
+            logger.error(it)
+        }
+    }
 
-        val stream = processHandler.processInput ?: error("Broken Fsi stream")
-        stream.write(fsiText.toByteArray(Charsets.UTF_8))
-        stream.flush()
+    private fun attachDebuggerIfNeeded(debug: Boolean) : Promise<Unit> {
+        if (!debug || isAttached) {
+            return resolvedPromise()
+        }
+        attachToProcess()
+        val promise = AsyncPromise<Unit>()
+        //need to free dispatcher thread to pump messages over protocol for async debug runner
+        application.executeOnPooledThread {
+            if (!pumpMessages(waitForDebugSessionTimeout) {
+                        getDebugProcessForThisFsi() != null
+                    }) {
+                promise.setError(IllegalStateException("Failed to get debug process for fsi.exe with pid $pid"))
+            } else {
+                promise.setResult(Unit)
+            }
+        }
+        return promise
     }
 
     override fun createProcess(): Process? {
