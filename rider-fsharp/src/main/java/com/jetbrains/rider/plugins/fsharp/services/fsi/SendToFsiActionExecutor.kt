@@ -11,7 +11,7 @@ class SendToFsiActionExecutor(private val consoleRunner: FsiConsoleRunner) {
         if (!visibleText.isEmpty()) {
             val fsiText = "\n" +
                     "# silentCd @\"${file.containingDirectory.virtualFile.path}\" ;; \n" +
-                    if (debug) "# dbgbreak\n" else "" +
+                    (if (debug) "# dbgbreak\n" else "") +
                     "# ${getTextStartLine(editor, hasSelection) + 1} @\"${file.virtualFile.path}\" \n" +
                     visibleText + "\n" +
                     "# 1 \"stdin\"\n;;\n"
