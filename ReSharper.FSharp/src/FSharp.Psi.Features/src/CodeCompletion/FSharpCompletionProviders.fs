@@ -23,6 +23,23 @@ open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
 type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolved) =
+
+    let getKindPriority = function
+        | CompletionItemKind.Property
+        | CompletionItemKind.Field -> CLRLookupItemRelevance.FieldsAndProperties
+        | CompletionItemKind.Method (isExtension = false) -> CLRLookupItemRelevance.Methods
+        | CompletionItemKind.Method _ -> CLRLookupItemRelevance.ExtensionMethods
+        | CompletionItemKind.Event -> CLRLookupItemRelevance.Events
+        | CompletionItemKind.Argument -> CLRLookupItemRelevance.NamedArguments
+        | CompletionItemKind.Other -> Unchecked.defaultof<CLRLookupItemRelevance>
+
+    let getAdditionalPriority kind isOwnMember =
+        match kind, isOwnMember with
+        | CompletionItemKind.Other, _
+        | CompletionItemKind.Argument, _ -> Unchecked.defaultof<CLRLookupItemRelevance>
+        | _, true -> CLRLookupItemRelevance.MemberOfCurrentType
+        | _ -> CLRLookupItemRelevance.MemberOfBaseType
+
     member x.GetDefaultRanges(context: ISpecificCodeCompletionContext) =
         context |> function | :? FSharpCodeCompletionContext as context -> context.Ranges | _ -> null
 
@@ -75,6 +92,10 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
                             match item.AdditionalInfo with
                             | Some info -> RichText(info.ReturnType)
                             | _ -> null
+
+                        lookupItem.Placement.Relevance <-
+                            (getKindPriority item.Kind |> int64) +
+                            (getAdditionalPriority item.Kind item.IsOwnMember |> int64) 
 
                         collector.Add(lookupItem)
                     true
