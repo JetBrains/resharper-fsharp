@@ -144,14 +144,17 @@ type FSharpScriptPsiModulesProvider
             changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Removed)
             changeBuilder.AddFileChange(psiModule.SourceFile, PsiModuleChange.ChangeType.Removed))
 
-        let document = projectFile.GetDocument()
-        let sourceFileCtor = createSourceFileForProjectFile projectFile
         let moduleId = projectFile.GetPersistentID()
 
-        let lifetimeDefinition, psiModule = createPsiModule path document moduleId sourceFileCtor changeBuilder
-        scriptsFromProjectFiles.Add(path, (lifetimeDefinition, psiModule))
-
-        psiModule
+        scriptsFromProjectFiles.GetValuesSafe(path)
+        |> Seq.tryFind (fun (_, psiModule) -> psiModule.PersistenID = moduleId)
+        |> Option.map snd
+        |> Option.defaultWith (fun _ ->
+            let document = projectFile.GetDocument()
+            let sourceFileCtor = createSourceFileForProjectFile projectFile
+            let lifetimeDefinition, psiModule = createPsiModule path document moduleId sourceFileCtor changeBuilder
+            scriptsFromProjectFiles.Add(path, (lifetimeDefinition, psiModule))
+            psiModule)
 
     member x.CreatePsiModuleForPath(path: FileSystemPath, changeBuilder: PsiModuleChangeBuilder) =
         locks.AssertWriteAccessAllowed()
@@ -312,6 +315,7 @@ type FSharpScriptPsiModule
     member x.Path = path
     member x.SourceFile: IPsiSourceFile = sourceFile.Value
     member x.ResolveContext = resolveContext.Value
+    member x.PersistenID = moduleId
 
     member x.IsValid = psiServices.Modules.HasModule(this)
 
