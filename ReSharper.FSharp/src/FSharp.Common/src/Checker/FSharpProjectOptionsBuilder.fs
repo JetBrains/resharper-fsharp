@@ -157,7 +157,7 @@ type FSharpProjectOptionsBuilder
         Array.iteri (fun i p -> fileIndices.[p] <- i) filePaths
 
         let projectOptions =
-            { ProjectFileName = project.ProjectFileLocation.FullPath
+            { ProjectFileName = sprintf "%O.%O.fsproj" project.ProjectFileLocation targetFrameworkId
               SourceFiles = Array.map (fun (p: FileSystemPath ) -> p.FullPath) filePaths
               OtherOptions = options.ToArray()
               ReferencedProjects = Array.empty
