@@ -101,6 +101,13 @@ type FSharpKeywordLookupItemBase(keyword, keywordSuffix) =
 type FSharpKeywordLookupItem(keyword, description, suffix) =
     inherit FSharpKeywordLookupItemBase(keyword, suffix)
 
+    do
+        base.Placement.Relevance <-
+            // todo: implement reparse contexts for keyword filtering
+            if keyword.EndsWith("!", StringComparison.Ordinal) then
+                int64 CLRLookupItemRelevance.Keywords
+            else int64 CLRLookupItemRelevance.Keywords <<< 1
+
     interface IDescriptionProvidingLookupItem with
         member x.GetDescription() = RichTextBlock(description)
 
