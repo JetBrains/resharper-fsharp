@@ -7,6 +7,7 @@ import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.SystemInfo
 import com.intellij.psi.PsiElement
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguageBase
 
@@ -42,6 +43,13 @@ open class SendToFsiActionBase(private val debug: Boolean, private val sendLineT
     }
 
     override fun update(e: AnActionEvent) {
+        if (debug && !SystemInfo.isWindows)
+        {
+            // todo: enable when we can read needed metadata on Mono, RIDER-7148
+            e.presentation.isEnabled = false
+            e.presentation.isVisible = false
+            return
+        }
         val file = CommonDataKeys.PSI_FILE.getData(e.dataContext)
         val editor = CommonDataKeys.EDITOR.getData(e.dataContext)
         if (file?.language !is FSharpLanguageBase || editor?.caretModel?.caretCount != 1) {
