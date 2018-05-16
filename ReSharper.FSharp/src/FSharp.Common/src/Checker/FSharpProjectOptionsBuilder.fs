@@ -9,6 +9,7 @@ open JetBrains.Metadata.Reader.API
 open JetBrains.Platform.MsBuildHost.Models
 open JetBrains.Platform.MsBuildHost.ProjectModel
 open JetBrains.ProjectModel
+open JetBrains.ProjectModel.Assemblies.Impl
 open JetBrains.ProjectModel.Model2.Assemblies.Interfaces
 open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost.MsBuild
@@ -76,7 +77,7 @@ type FSharpProject =
 [<SolutionComponent>]
 type FSharpProjectOptionsBuilder
         (solution: ISolution, checkerService: FSharpCheckerService, psiModules: IPsiModules, logger: ILogger,
-         psiModulesResolveContextManager: PsiModuleResolveContextManager, itemsContainer: IFSharpItemsContainer) =
+         resolveContextManager: ResolveContextManager, itemsContainer: IFSharpItemsContainer) =
     let msBuildHost = solution.ProjectsHostContainer().GetComponent<MsBuildProjectHost>()
 
     let defaultDelimiters = [| ';'; ','; ' ' |]
@@ -88,17 +89,16 @@ type FSharpProjectOptionsBuilder
                 if not (s.IsNullOrWhitespace()) then yield s.Trim() }
 
     let getReferences project psiModule targetFrameworkId =
-        let resolveContext =
-            psiModulesResolveContextManager.GetOrCreateModuleResolveContext(project, psiModule, targetFrameworkId)
-
-        psiModules.GetModuleReferences(psiModule, resolveContext)
-        |> Seq.choose (fun reference ->
-            let targetFrameworkId = reference.Module.TargetFrameworkId
+        let result = List()
+        let resolveContext = resolveContextManager.GetOrCreateProjectResolveContext(project, targetFrameworkId)
+        for reference in psiModules.GetModuleReferences(psiModule, resolveContext) do
             match reference.Module.ContainingProjectModule with
-            | :? IProject as project -> Some (project.GetOutputFilePath(targetFrameworkId))
-            | :? IAssembly as assembly -> Some (assembly.GetLocation())
-            | _ -> None)
-        |> Seq.map (fun path -> "-r:" + path.FullPath)
+            | :? IProject as referencedProject when referencedProject <> project ->
+                result.Add("-r:" + project.GetOutputFilePath(reference.Module.TargetFrameworkId).FullPath)
+            | :? IAssembly as assembly -> result.Add("-r:" + assembly.GetLocation().FullPath)
+            | _ -> ()
+
+        result
 
     member x.BuildSingleProjectOptions (project: IProject, psiModule: IPsiModule) =
         let targetFrameworkId = psiModule.TargetFrameworkId
