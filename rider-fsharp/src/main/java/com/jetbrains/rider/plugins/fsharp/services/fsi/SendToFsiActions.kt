@@ -11,6 +11,14 @@ import com.intellij.openapi.util.SystemInfo
 import com.intellij.psi.PsiElement
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguageBase
 
+object Fsi {
+    const val sendLineText = "Send Line to F# Interactive"
+    const val debugLineText = "Debug Line in F# Interactive"
+
+    const val sendSelectionText = "Send Selection to F# Interactive"
+    const val debugSelectionText = "Debug Selection in F# Interactive"
+}
+
 class StartFsiAction : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         val project = CommonDataKeys.PROJECT.getData(e.dataContext) ?: return
@@ -18,19 +26,9 @@ class StartFsiAction : AnAction() {
     }
 }
 
-class SendToFsiAction : SendToFsiActionBase(false, sendLineText, sendSelectionText) {
-    companion object {
-        const val sendLineText = "Send Line to F# Interactive"
-        const val sendSelectionText = "Send Selection to F# Interactive"
-    }
-}
+class SendToFsiAction : SendToFsiActionBase(false, Fsi.sendLineText, Fsi.sendSelectionText)
 
-class DebugInFsiAction : SendToFsiActionBase(true, sendLineText, sendSelectionText) {
-    companion object {
-        const val sendLineText = "Debug Line in F# Interactive"
-        const val sendSelectionText = "Debug Line in F# Interactive"
-    }
-}
+class DebugInFsiAction : SendToFsiActionBase(true, Fsi.debugLineText, Fsi.debugSelectionText)
 
 open class SendToFsiActionBase(private val debug: Boolean, private val sendLineText: String,
                                private val sendSelectionText: String) : AnAction() {
@@ -43,8 +41,7 @@ open class SendToFsiActionBase(private val debug: Boolean, private val sendLineT
     }
 
     override fun update(e: AnActionEvent) {
-        if (debug && !SystemInfo.isWindows)
-        {
+        if (debug && !SystemInfo.isWindows) {
             // todo: enable when we can read needed metadata on Mono, RIDER-7148
             e.presentation.isEnabled = false
             e.presentation.isVisible = false
@@ -61,22 +58,22 @@ open class SendToFsiActionBase(private val debug: Boolean, private val sendLineT
     }
 }
 
-class SendLineToFsiIntentionAction : SendLineToFsiIntentionActionBase(false)
-class DebugLineInFsiIntentionAction : SendLineToFsiIntentionActionBase(true)
+class SendLineToFsiIntentionAction : SendLineToFsiIntentionActionBase(false, Fsi.sendLineText)
+class DebugLineInFsiIntentionAction : SendLineToFsiIntentionActionBase(true, Fsi.debugLineText)
 
-class SendSelectionToFsiIntentionAction : SendSelectionToFsiIntentionActionBase(false)
-class DebugSelectionInFsiIntentionAction : SendSelectionToFsiIntentionActionBase(true)
+class SendSelectionToFsiIntentionAction : SendSelectionToFsiIntentionActionBase(false, Fsi.sendSelectionText)
+class DebugSelectionInFsiIntentionAction : SendSelectionToFsiIntentionActionBase(true, Fsi.debugSelectionText)
 
-open class SendLineToFsiIntentionActionBase(debug: Boolean) : BaseSendToFsiIntentionAction(debug) {
-    override fun getText() = "Send Line to F# Interactive"
-    override fun isAvailable(project: Project, editor: Editor?, file: PsiElement)
-            = super.isAvailable(project, editor, file) && !editor!!.selectionModel.hasSelection()
+open class SendLineToFsiIntentionActionBase(debug: Boolean, private val titleText: String) : BaseSendToFsiIntentionAction(debug) {
+    override fun getText() = titleText
+    override fun isAvailable(project: Project, editor: Editor?, file: PsiElement) =
+            super.isAvailable(project, editor, file) && !editor!!.selectionModel.hasSelection()
 }
 
-open class SendSelectionToFsiIntentionActionBase(debug: Boolean) : BaseSendToFsiIntentionAction(debug) {
-    override fun getText() = "Send Selection to F# Interactive"
-    override fun isAvailable(project: Project, editor: Editor?, file: PsiElement)
-            = super.isAvailable(project, editor, file) && editor!!.selectionModel.hasSelection()
+open class SendSelectionToFsiIntentionActionBase(debug: Boolean, private val titleText: String) : BaseSendToFsiIntentionAction(debug) {
+    override fun getText() = titleText
+    override fun isAvailable(project: Project, editor: Editor?, file: PsiElement) =
+            super.isAvailable(project, editor, file) && editor!!.selectionModel.hasSelection()
 }
 
 abstract class BaseSendToFsiIntentionAction(private val debug: Boolean) : BaseElementAtCaretIntentionAction() {
