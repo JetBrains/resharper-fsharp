@@ -93,7 +93,7 @@ type FSharpProjectOptionsBuilder
         for reference in psiModules.GetModuleReferences(psiModule, resolveContext) do
             match reference.Module.ContainingProjectModule with
             | :? IProject as referencedProject when referencedProject <> project ->
-                result.Add("-r:" + project.GetOutputFilePath(reference.Module.TargetFrameworkId).FullPath)
+                result.Add("-r:" + referencedProject.GetOutputFilePath(reference.Module.TargetFrameworkId).FullPath)
             | :? IAssembly as assembly -> result.Add("-r:" + assembly.GetLocation().FullPath)
             | _ -> ()
 
