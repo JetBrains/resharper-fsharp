@@ -119,10 +119,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
           ? typeElement.Constructors.AsList<ITypeMember>()
           : typeElement.EnumerateMembers(mfv.GetMemberCompiledName(), true).AsList();
 
+        switch (members.Count)
+        {
+          case 0:
+            return null;
+          case 1:
+            return members[0];
+        }
+
         var mfvXmlDocId = GetXmlDocId(mfv);
-        return members.Count == 1
-          ? members[0]
-          : members.FirstOrDefault(m => m.XMLDocId == mfvXmlDocId);
+        return members.FirstOrDefault(m => m.XMLDocId == mfvXmlDocId);
       }
 
       if (symbol is FSharpUnionCase unionCase)
