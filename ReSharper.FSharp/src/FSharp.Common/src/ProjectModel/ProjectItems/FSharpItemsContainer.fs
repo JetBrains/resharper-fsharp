@@ -1044,6 +1044,7 @@ type FSharpItemsContainerRefresher(lifetime: Lifetime, solution: ISolution, view
                     navigationManager.Navigate(points, options)))))
 
 
+[<CustomEquality; NoComparison>]
 type FSharpViewItem =
     | FSharpViewFile of IProjectFile
     | FSharpViewFolder of IProjectFolder * FSharpViewFolderIdentity
@@ -1060,8 +1061,22 @@ type FSharpViewItem =
         | FSharpViewFile file -> file.Name
         | FSharpViewFolder (folder, identity) -> sprintf "%s[%O]" folder.Name identity
 
+    override x.GetHashCode() = x.ProjectItem.GetHashCode()
+    override x.Equals(other) =
+        match other with
+        | :? FSharpViewItem as other ->
+            match x, other with
+            | FSharpViewFile f1, FSharpViewFile f2 -> f1.Equals(f2)
+            | FSharpViewFolder (f1, id1), FSharpViewFolder (f2, id2) -> f1.Equals(f2) && id1.Equals(id2)
+            | _ -> false
+        | :? IProjectElementHolder as other -> other.Element.Equals(x.ProjectItem)
+        | _ -> false
+
     interface IProjectElementHolder with
         member x.Element = x.ProjectItem :> _
+
+    interface IEquatable<IProjectElementHolder> with
+        member x.Equals(other) = other.Element.Equals(x.ProjectItem)
 
 
 type FSharpViewFolderIdentity =
