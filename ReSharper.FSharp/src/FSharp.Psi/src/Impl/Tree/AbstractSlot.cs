@@ -8,7 +8,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class AbstractSlot
   {
-    public override string DeclaredName => Identifier.GetCompiledName(Attributes);
+    protected override string DeclaredElementName => Identifier.GetCompiledName(Attributes);
 
     public override TreeTextRange GetNameRange()
     {

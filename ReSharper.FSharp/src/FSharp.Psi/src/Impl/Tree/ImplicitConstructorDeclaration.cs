@@ -8,7 +8,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class ImplicitConstructorDeclaration
   {
-    public override string DeclaredName =>
+    protected override string DeclaredElementName =>
       GetContainingTypeDeclaration()?.DeclaredName ?? SharedImplUtil.MISSING_DECLARATION_NAME;
 
     public override string SourceName =>

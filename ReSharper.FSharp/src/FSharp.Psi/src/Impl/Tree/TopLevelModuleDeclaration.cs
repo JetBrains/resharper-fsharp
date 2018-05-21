@@ -8,7 +8,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     private bool HasExplicitName => !LongIdentifier.IdentifiersEnumerable.IsEmpty();
     private string ImplicitName => GetSourceFile().GetLocation().NameWithoutExtension.Capitalize();
 
-    public override string DeclaredName =>
+    protected override string DeclaredElementName =>
       HasExplicitName
         ? LongIdentifier.QualifiedName
         : ImplicitName;

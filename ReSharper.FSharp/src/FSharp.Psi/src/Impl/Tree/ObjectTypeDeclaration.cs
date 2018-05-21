@@ -12,7 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     private const string Sealed = "Sealed";
     private const string Struct = "Struct";
 
-    public override string DeclaredName => Identifier.GetCompiledName(Attributes);
+    protected override string DeclaredElementName => Identifier.GetCompiledName(Attributes);
     public override string SourceName => Identifier.GetSourceName();
     public override TreeTextRange GetNameRange() => Identifier.GetNameRange();
 
@@ -41,7 +41,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
         // ReSharper disable once LoopCanBeConvertedToQuery
         foreach (var member in TypeMembersEnumerable)
-          if (!(member is IInterfaceInherit) && !(member is IAbstractSlot))
+          if (!(member is IInterfaceInherit) && !(member is IAbstractSlot) || member is IInterfaceImplementation)
             return FSharpPartKind.Class;
 
         return FSharpPartKind.Interface;

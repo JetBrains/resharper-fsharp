@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -10,7 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class FieldDeclaration
   {
-    public override string DeclaredName => Identifier.GetCompiledName(Attributes);
+    protected override string DeclaredElementName => Identifier.GetCompiledName(Attributes);
     public override string SourceName => Identifier.GetSourceName();
     public override TreeTextRange GetNameRange() => Identifier.GetNameRange();
 
