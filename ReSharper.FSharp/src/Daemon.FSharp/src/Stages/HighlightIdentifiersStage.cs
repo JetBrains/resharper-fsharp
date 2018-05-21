@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using JetBrains.Application;
 using JetBrains.DocumentModel;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Daemon.UsageChecking;
@@ -66,10 +67,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
       // todo: add more cases to GetSemanticClassification (e.g. methods, values, namespaces) and use it instead?
       var checkResults = DaemonProcess.CustomData.GetData(FSharpDaemonStageBase.TypeCheckResults);
       var declarations = myFsFile.GetAllDeclaredSymbols(checkResults?.Value);
-      SeldomInterruptChecker.CheckForInterrupt();
+      InterruptableActivityCookie.CheckAndThrow();
 
       var usages = myFsFile.GetAllResolvedSymbols();
-      SeldomInterruptChecker.CheckForInterrupt();
+      InterruptableActivityCookie.CheckAndThrow();
 
       HighlightUses(committer,  declarations.Concat(usages), declarations.Length + usages.Length);
     }
