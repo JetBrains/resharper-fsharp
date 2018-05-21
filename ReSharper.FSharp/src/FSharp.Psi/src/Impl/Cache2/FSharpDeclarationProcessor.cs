@@ -168,7 +168,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     }
 
     public override void VisitTypeExtension(ITypeExtension typeExtension) =>
-      ProcessTypeMembers(typeExtension.TypeMembers.OfType<ITypeMemberDeclaration>().AsIReadOnlyList());
+      ProcessTypeMembers(typeExtension.TypeMembers);
 
     private Part CreateObjectTypePart(IObjectModelTypeDeclaration decl)
     {

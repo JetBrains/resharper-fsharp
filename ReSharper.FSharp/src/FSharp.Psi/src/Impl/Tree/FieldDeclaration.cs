@@ -1,9 +1,10 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -29,7 +30,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (typeDeclaration == null || typeSymbol == null)
         return null;
 
-      var fieldDeclarations = typeDeclaration.Children<FieldDeclaration>().ToTreeNodeCollection();
+      var result = new LocalList<IFieldDeclaration>();
+      foreach (var child in typeDeclaration.Children())
+      {
+        if (child is IFieldDeclaration fieldDeclaration)
+          result.Add(fieldDeclaration);
+      }
+
+      var fieldDeclarations = result.ReadOnlyList();
       var index = fieldDeclarations.IndexOf(this);
       var fields = GetFields(typeSymbol);
       var caseField =

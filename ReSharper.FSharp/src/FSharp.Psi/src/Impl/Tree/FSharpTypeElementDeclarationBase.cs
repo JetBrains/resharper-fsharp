@@ -47,19 +47,45 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       get
       {
-        var members = this.Children<ITypeMemberDeclaration>();
-        var implementedMembers = this.Children<IInterfaceImplementation>()
-          .SelectMany(m => m.Children<ITypeMemberDeclaration>());
-        var extensionMembers = this.Children<ITypeExtension>()
-          .SelectMany(m => m.Children<ITypeMemberDeclaration>());
-        return members.Concat(implementedMembers).Concat(extensionMembers).WhereNotNull().ToTreeNodeCollection();
+        var result = new LocalList<ITypeMemberDeclaration>();
+        foreach (var child in this.Children())
+        {
+          if (child is ITypeMemberDeclaration m)
+            result.Add(m);
+
+          if (child is IInterfaceImplementation interfaceImplementation)
+          {
+            foreach (var implementedMember in interfaceImplementation.Children<ITypeMemberDeclaration>())
+              result.Add(implementedMember);
+          }
+
+          if (child is ITypeExtension typeExtension)
+          {
+            foreach (var extensionMember in typeExtension.Children<ITypeMemberDeclaration>())
+              result.Add(extensionMember);
+          }
+        }
+
+        return result.ReadOnlyList();
       }
     }
 
     public string CLRName => this.MakeClrName();
     public IReadOnlyList<ITypeDeclaration> TypeDeclarations => EmptyList<ITypeDeclaration>.Instance;
 
-    public IReadOnlyList<ITypeDeclaration> NestedTypeDeclarations =>
-      MemberDeclarations.OfType<ITypeDeclaration>().ToTreeNodeCollection();
+    public IReadOnlyList<ITypeDeclaration> NestedTypeDeclarations
+    {
+      get
+      {
+        var result = new LocalList<ITypeDeclaration>();
+        foreach (var memberDeclaration in this.Children())
+        {
+          if (memberDeclaration is ITypeDeclaration typeDeclaration)
+            result.Add(typeDeclaration);
+        }
+
+        return result.ReadOnlyList();
+      }
+    }
   }
 }
