@@ -40,20 +40,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public InvocableSignature GetSignature(ISubstitution substitution) => new InvocableSignature(this, substitution);
 
-    public override bool Equals(object obj)
-    {
-      if (!base.Equals(obj))
-        return false;
-
-      if (!(obj is FSharpMemberBase<TDeclaration> member) || IsStatic != member.IsStatic) // RIDER-11321, RSRP-467025
-        return false;
-
-      return SignatureComparers.Strict.Compare(GetSignature(IdSubstitution),
-        member.GetSignature(member.IdSubstitution));
-    }
-
-    public override int GetHashCode() => ShortName.GetHashCode();
-
     public IEnumerable<IParametersOwnerDeclaration> GetParametersOwnerDeclarations() =>
       EmptyList<IParametersOwnerDeclaration>.Instance;
 

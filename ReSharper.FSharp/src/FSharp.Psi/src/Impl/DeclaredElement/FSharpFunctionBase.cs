@@ -53,6 +53,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       Parameters = methodParams.ToList();
     }
 
+    public override bool Equals(object obj)
+    {
+      if (!base.Equals(obj))
+        return false;
+
+      // Multiple overloads are not allowed
+      if (GetDeclaration() is ILet)
+        return true;
+
+      if (!(obj is FSharpMemberBase<TDeclaration> member) || IsStatic != member.IsStatic) // RIDER-11321, RSRP-467025
+        return false;
+
+      return SignatureComparers.Strict.CompareWithoutName(GetSignature(IdSubstitution),
+        member.GetSignature(member.IdSubstitution));
+    }
+
+    public override int GetHashCode() => ShortName.GetHashCode();
+    
     public override IList<IParameter> Parameters { get; }
     public IList<ITypeParameter> TypeParameters { get; }
     public override IType ReturnType { get; }
