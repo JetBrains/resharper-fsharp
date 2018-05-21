@@ -40,16 +40,21 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
             x.Done(mark, ElementType.EXCEPTION_DECLARATION)
 
         | SynModuleDecl.Open(lidWithDots,range) ->
-            range |> x.GetStartOffset |> x.AdvanceToOffset
+            range |> x.GetStartOffset |> x.AdvanceToTokenOrOffset FSharpTokenType.OPEN
             let mark = x.Builder.Mark()
             x.ProcessLongIdentifier lidWithDots.Lid
             range |> x.GetEndOffset |> x.AdvanceToOffset
-            x.Done(mark, ElementType.OPEN)
+            x.Done(mark, ElementType.OPEN_STATEMENT)
 
         | SynModuleDecl.Let(_,bindings,_) ->
             for (Binding(_,_,_,_,attrs,_,_,headPat,_,expr,_,_)) in bindings do
                 x.ProcessModuleLetPat headPat attrs
+                let bodyRange = expr.Range
+                bodyRange |> x.GetStartOffset |> x.AdvanceToOffset
+                let mark = x.Mark()
                 x.ProcessLocalExpression expr
+                bodyRange |> x.GetEndOffset |> x.AdvanceToOffset
+                x.Done(mark, ElementType.BODY)
 
         | SynModuleDecl.HashDirective(hashDirective, _) ->
             x.ProcessHashDirective(hashDirective)

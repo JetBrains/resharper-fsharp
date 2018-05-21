@@ -9,6 +9,8 @@
         <Token name="NAMESPACE"/>
         <Token name="MODULE"/>
         <Token name="NEW"/>
+        <Token name="TYPE"/>
+        <Token name="OPEN"/>
         <Token name="OTHER_KEYWORD"/>
 
         <Token name="IDENTIFIER"/>

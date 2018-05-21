@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using JetBrains.ReSharper.Psi.Parsing;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
@@ -5,42 +6,64 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 {
   public class FSharpTokenInfoEx
   {
+    private const int PublicTag = 42;
+    private const int PrivateTag = 43;
+    private const int InternalTag = 44;
+    private const int HashTag = 88;
+    private const int OpenTag = 101;
+    private const int TypeTag = 108;
+    private const int NewTag = 118;
+    private const int ModuleTag = 148;
+    private const int NamespaceTag = 149;
+    private const int LQuoteTag = 153;
+    private const int RQuoteTag = 154;
+
+    private static readonly Dictionary<int, TokenNodeType> TokenTypeByTokenTag =
+      new Dictionary<int, TokenNodeType>
+      {
+        {PublicTag, FSharpTokenType.PUBLIC},
+        {PrivateTag, FSharpTokenType.PRIVATE},
+        {InternalTag, FSharpTokenType.INTERNAL},
+        {HashTag, FSharpTokenType.HASH},
+        {OpenTag, FSharpTokenType.OPEN},
+        {TypeTag, FSharpTokenType.TYPE},
+        {NewTag, FSharpTokenType.NEW},
+        {ModuleTag, FSharpTokenType.MODULE},
+        {NamespaceTag, FSharpTokenType.NAMESPACE},
+        {LQuoteTag, FSharpTokenType.LQUOTE},
+        {RQuoteTag, FSharpTokenType.RQUOTE},
+
+        {FSharpTokenTag.LPAREN, FSharpTokenType.LPAREN},
+        {FSharpTokenTag.RPAREN, FSharpTokenType.RPAREN},
+        {FSharpTokenTag.LBRACE, FSharpTokenType.LBRACE},
+        {FSharpTokenTag.RBRACE, FSharpTokenType.RBRACE},
+        {FSharpTokenTag.LBRACK, FSharpTokenType.LBRACK},
+        {FSharpTokenTag.RBRACK, FSharpTokenType.RBRACK},
+        {FSharpTokenTag.DOT, FSharpTokenType.DOT},
+        {FSharpTokenTag.GREATER_RBRACK, FSharpTokenType.GREATER_RBRACK},
+        {FSharpTokenTag.LBRACK_LESS, FSharpTokenType.LBRACK_LESS},
+        {FSharpTokenTag.LBRACK_BAR, FSharpTokenType.LBRACK_BAR},
+        {FSharpTokenTag.BAR_RBRACK, FSharpTokenType.BAR_RBRACK},
+
+        {FSharpTokenTag.GREATER,FSharpTokenType.GREATER},
+        {FSharpTokenTag.LESS,FSharpTokenType.LESS},
+        {FSharpTokenTag.BAR, FSharpTokenType.BAR},
+      };
+    
+    
     public static TokenNodeType GetTokenType(FSharpTokenInfo token)
     {
       // todo: add this to FCS
-      const int PublicTag = 42;
-      const int PriateTag = 43;
-      const int InternalTag = 44;
-      const int HashTag = 88;
-      const int NewTag = 118;
-      const int ModuleTag = 148;
-      const int NamespaceTag = 149;
-      const int LQuoteTag = 153;
-      const int RQuoteTag = 154;
-
       if (token.ColorClass == FSharpTokenColorKind.InactiveCode) return FSharpTokenType.DEAD_CODE;
       if (token.ColorClass == FSharpTokenColorKind.PreprocessorKeyword) return FSharpTokenType.OTHER_KEYWORD;
       var tokenTag = token.Tag;
+      if (TokenTypeByTokenTag.TryGetValue(tokenTag, out var tokenType))
+        return tokenType;
+      
       switch (token.CharClass)
       {
         case FSharpTokenCharKind.Keyword:
-          switch (tokenTag)
-          {
-            case PublicTag:
-              return FSharpTokenType.PUBLIC;
-            case PriateTag:
-              return FSharpTokenType.PRIVATE;
-            case InternalTag:
-              return FSharpTokenType.INTERNAL;
-            case NewTag:
-              return FSharpTokenType.NEW;
-            case ModuleTag:
-              return FSharpTokenType.MODULE;
-            case NamespaceTag:
-              return FSharpTokenType.NAMESPACE;
-            default:
-              return FSharpTokenType.OTHER_KEYWORD;
-          }
+          return FSharpTokenType.OTHER_KEYWORD;
 
         case FSharpTokenCharKind.Identifier:
           return FSharpTokenType.IDENTIFIER;
@@ -52,10 +75,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
           return FSharpTokenType.LITERAL;
 
         case FSharpTokenCharKind.Operator:
-          if (tokenTag == FSharpTokenTag.GREATER)
-            return FSharpTokenType.GREATER;
-          if (tokenTag == FSharpTokenTag.LESS)
-            return FSharpTokenType.LESS;
           return FSharpTokenType.OPERATOR;
 
         case FSharpTokenCharKind.LineComment:
@@ -67,29 +86,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
           return FSharpTokenType.WHITESPACE;
 
         case FSharpTokenCharKind.Delimiter:
-          if (tokenTag == FSharpTokenTag.LPAREN)
-            return FSharpTokenType.LPAREN;
-          if (tokenTag == FSharpTokenTag.RPAREN)
-            return FSharpTokenType.RPAREN;
-          if (tokenTag == FSharpTokenTag.LBRACE)
-            return FSharpTokenType.LBRACE;
-          if (tokenTag == FSharpTokenTag.RBRACE)
-            return FSharpTokenType.RBRACE;
-          if (tokenTag == FSharpTokenTag.LBRACK)
-            return FSharpTokenType.LBRACK;
-          if (tokenTag == FSharpTokenTag.RBRACK)
-            return FSharpTokenType.RBRACK;
-          if (tokenTag == FSharpTokenTag.DOT)
-            return FSharpTokenType.DOT;
-          if (tokenTag == FSharpTokenTag.GREATER_RBRACK)
-            return FSharpTokenType.GREATER_RBRACK;
-          if (tokenTag == FSharpTokenTag.LBRACK_LESS)
-            return FSharpTokenType.LBRACK_LESS;
-          if (tokenTag == FSharpTokenTag.LBRACK_BAR)
-            return FSharpTokenType.LBRACK_BAR;
-          if (tokenTag == FSharpTokenTag.BAR_RBRACK)
-            return FSharpTokenType.BAR_RBRACK;
-
           if (tokenTag == LQuoteTag)
             return token.FullMatchedLength == 2
               ? FSharpTokenType.LQUOTE_TYPED
@@ -99,12 +95,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
             return token.FullMatchedLength == 2
               ? FSharpTokenType.RQUOTE_TYPED
               : FSharpTokenType.RQUOTE;
-
-          if (tokenTag == FSharpTokenTag.BAR)
-            return FSharpTokenType.BAR;
-
-          if (tokenTag == HashTag)
-            return FSharpTokenType.HASH;
 
           return FSharpTokenType.TEXT;
 

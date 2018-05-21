@@ -114,7 +114,7 @@ interface moduleMemberDeclaration:
   otherMemberDeclaration;
 
 interface moduleMemberStatement:
-  open |
+  openStatement |
   do;
 
 typeExtension:
@@ -257,7 +257,11 @@ moduleAbbreviation options { stubBase="FSharpTypeElementDeclarationBase"; } extr
 let options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
   fSharpIdentifier<IDENTIFIER, Identifier>
-  activePatternCaseDeclaration<ACTIVE_PATTERN_CASE, Cases>*;
+  activePatternCaseDeclaration<ACTIVE_PATTERN_CASE, Cases>*
+  body<BODY, Body>;
+
+body:
+  fakeSeparator;
 
 activePatternCaseDeclaration options { stubBase="FSharpDeclarationBase"; }:
    fSharpIdentifier<IDENTIFIER, Identifier>;
@@ -392,7 +396,10 @@ hashDirective:
   HASH<HASH, HashToken>
   STRING<STRING, Args>*; 
 
-open: longIdentifier<LONG_IDENTIFIER, LongIdentifier>;
+openStatement:
+  OPEN<OPEN, Open>
+  longIdentifier<LONG_IDENTIFIER, LongIdentifier>;
+
 do: fakeSeparator;
 
 otherModuleMember: fakeSeparator;
