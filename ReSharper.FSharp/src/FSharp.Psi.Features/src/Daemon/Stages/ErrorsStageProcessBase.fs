@@ -43,7 +43,8 @@ type ErrorsStageProcessBase(daemonProcess) =
         | FSharpErrorSeverity.Warning, _ -> WarningHighlighting(message, range) :> _
         | _ -> ErrorHighlighting(message, range) :> _
 
-    let shouldAddDiagnostic (error: FSharpErrorInfo) =
+    abstract ShouldAddDiagnostic: error: FSharpErrorInfo -> bool
+    default x.ShouldAddDiagnostic(error: FSharpErrorInfo) =
         error.ErrorNumber <> ErrorNumberUnrecognizedOption
 
     member x.Execute(errors: FSharpErrorInfo[], committer: Action<DaemonStageResult>) =
@@ -54,7 +55,7 @@ type ErrorsStageProcessBase(daemonProcess) =
             |> Array.distinctBy (fun (error, range) -> error.Message, range)
 
         for error, range in errors  do
-            if shouldAddDiagnostic error then
+            if x.ShouldAddDiagnostic(error) then
                 highlightings.Add(HighlightingInfo(range, createHighlighting(error, range)))
                 x.SeldomInterruptChecker.CheckForInterrupt()
 

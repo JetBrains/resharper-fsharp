@@ -11,6 +11,11 @@ open Microsoft.FSharp.Compiler.SourceCodeServices
 type TypeCheckErrorsStageProcess(fsFile: IFSharpFile, daemonProcess, logger: ILogger) =
     inherit ErrorsStageProcessBase(daemonProcess)
 
+    let syntaxErrorNumber = 597
+
+    override x.ShouldAddDiagnostic(error) =
+        base.ShouldAddDiagnostic(error) && error.ErrorNumber <> 597
+
     override x.Execute(committer) =
         fsFile.GetParseAndCheckResults(false)
         |> Option.iter (fun results ->
