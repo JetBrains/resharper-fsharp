@@ -17,8 +17,8 @@ type TypeCheckErrorsStageProcess(fsFile: IFSharpFile, daemonProcess, logger: ILo
         base.ShouldAddDiagnostic(error) && error.ErrorNumber <> 597
 
     override x.Execute(committer) =
-        fsFile.GetParseAndCheckResults(false)
-        |> Option.iter (fun results ->
+        match fsFile.GetParseAndCheckResults(false) with
+        | Some results ->
             daemonProcess.CustomData.PutData(FSharpDaemonStageBase.TypeCheckResults, Some results.CheckResults)
             let projectWarnings, fileErrors  =
                 results.CheckResults.Errors
@@ -29,7 +29,8 @@ type TypeCheckErrorsStageProcess(fsFile: IFSharpFile, daemonProcess, logger: ILo
                 // https://github.com/Microsoft/visualfsharp/issues/4030
                 let errors = Array.fold (fun a e -> a + "\n" + e.ToString()) "" projectWarnings
                 logger.LogMessage(LoggingLevel.WARN, "Project warnings during file typecheck:" + errors)
-            x.Execute(fileErrors, committer))
+            x.Execute(fileErrors, committer)
+        | _ -> ()
 
 
 [<DaemonStage(StagesBefore = [| typeof<SyntaxErrorsStage> |], StagesAfter = [| typeof<HighlightIdentifiersStage> |])>]

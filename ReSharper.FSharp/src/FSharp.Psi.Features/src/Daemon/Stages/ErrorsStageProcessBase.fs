@@ -57,6 +57,6 @@ type ErrorsStageProcessBase(daemonProcess) =
         for error, range in errors  do
             if x.ShouldAddDiagnostic(error) then
                 highlightings.Add(HighlightingInfo(range, createHighlighting(error, range)))
-                x.SeldomInterruptChecker.CheckForInterrupt()
+            x.SeldomInterruptChecker.CheckForInterrupt()
 
         committer.Invoke(DaemonStageResult(highlightings))

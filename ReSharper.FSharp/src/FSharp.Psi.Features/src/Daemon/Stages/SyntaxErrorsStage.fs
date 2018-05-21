@@ -9,8 +9,9 @@ type SyntaxErrorsStageProcess(fsFile: IFSharpFile, daemonProcess) =
     inherit ErrorsStageProcessBase(daemonProcess)
 
     override x.Execute(committer) =
-        fsFile.CheckerService.ParseFile(daemonProcess.SourceFile)
-        |> Option.iter (fun parseResults -> x.Execute(parseResults.Errors, committer))
+        match fsFile.CheckerService.ParseFile(daemonProcess.SourceFile) with
+        | Some parseResults -> x.Execute(parseResults.Errors, committer)
+        | _ -> ()
 
 [<DaemonStage(StagesBefore = [| typeof<DeadCodeHighlightStage> |], StagesAfter = [| typeof<HighlightIdentifiersStage> |])>]
 type SyntaxErrorsStage(daemonProcess, errors) =
