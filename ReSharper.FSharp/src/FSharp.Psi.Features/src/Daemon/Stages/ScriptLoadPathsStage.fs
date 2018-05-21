@@ -51,8 +51,8 @@ type ScriptLoadPathsStageProcess(fsFile, daemonProcess) =
                             | _ -> ()
                         | _ -> ()
 
-                        interruptChecker.CheckForInterrupt()
-            }
+                        interruptChecker.CheckForInterrupt() }
+
         fsFile.Accept(visitor)
         if allDirectives.IsEmpty() then () else
 
@@ -61,17 +61,19 @@ type ScriptLoadPathsStageProcess(fsFile, daemonProcess) =
             let document = daemonProcess.Document
             let linesCount = document.GetLineCount() |> int
             let loadedDirectives =
-                options.OriginalLoadReferences
-                |> Seq.filter (fun (range, _) -> range.EndLine < linesCount)
-                |> Seq.map (fun (range, _) -> document.GetTreeStartOffset(range))
-                |> HashSet
+                let result = HashSet()
+                for (range, _) in options.OriginalLoadReferences do
+                    if range.EndLine < linesCount then
+                        result.Add(document.GetTreeStartOffset(range)) |> ignore
+                result
 
-            let unusedDirectives =            
-                allDirectives
-                |> Seq.filter (fun d -> loadedDirectives.Contains(d.Key) |> not)
-                |> Seq.map (fun d ->
-                    let range = d.Value.GetDocumentRange()
-                    HighlightingInfo(range, DeadCodeHighlighting(range)))
+            let unusedDirectives =
+                let result = LocalList<HighlightingInfo>()
+                for directive in allDirectives do
+                    if not (loadedDirectives.Contains(directive.Key)) then
+                        let range = directive.Value.GetDocumentRange()
+                        result.Add(HighlightingInfo(range, DeadCodeHighlighting(range)))
+                result.ReadOnlyList()
 
-            committer.Invoke(DaemonStageResult(unusedDirectives.AsReadOnlyCollection()))
+            committer.Invoke(DaemonStageResult(unusedDirectives))
         | _ -> ()
