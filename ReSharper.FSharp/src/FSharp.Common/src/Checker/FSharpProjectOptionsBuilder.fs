@@ -1,4 +1,4 @@
-﻿namespace JetBrains.ReSharper.Plugins.FSharp.Common.Checker
+namespace JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 
 open System
 open System.Collections.Generic
@@ -47,11 +47,12 @@ type FSharpProjectPropertiesRequest() =
 
 
 [<ShellComponent>]
-type VisualFSharpTargetsProjectLoadModificator() =
+type FSharpTargetsProjectLoadModificator() =
     let targets =
         [| "GenerateCode"
            "GenerateFSharpInternalsVisibleToFile"
-           "GenerateAssemblyFileVersionTask" |]
+           "GenerateAssemblyFileVersionTask"
+           "ImplicitlyExpandNETStandardFacades" |]
 
     interface IMsBuildProjectLoadModificator with
         member x.IsApplicable(mark) =
