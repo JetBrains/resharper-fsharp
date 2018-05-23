@@ -30,6 +30,7 @@ import com.intellij.project.isDirectoryBased
 import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.ui.UIUtil
 import com.intellij.xdebugger.XDebuggerManager
+import com.intellij.xdebugger.attach.LocalAttachHost
 import com.intellij.xdebugger.attach.XLocalAttachDebuggerProvider
 import com.jetbrains.rider.debugger.DotNetDebugProcess
 import com.jetbrains.rider.model.RdFsiSessionInfo
@@ -75,9 +76,9 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost)
         val processInfo = OSProcessUtil.getProcessList().firstOrNull { it.pid == pid } ?: return
         val dataHolder = UserDataHolderBase()
         val debugger = Extensions.getExtensions(XLocalAttachDebuggerProvider.EP).flatMap { provider ->
-            provider.getAvailableDebuggers(project, processInfo, dataHolder)
+            provider.getAvailableDebuggers(project, LocalAttachHost.INSTANCE, processInfo, dataHolder)
         }.firstOrNull() ?: return
-        debugger.attachDebugSession(project, processInfo)
+        debugger.attachDebugSession(project, LocalAttachHost.INSTANCE, processInfo)
     }
 
     fun sendText(visibleText: String, fsiText: String, debug: Boolean) {
