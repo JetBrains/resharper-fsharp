@@ -49,11 +49,11 @@ type FSharpScriptPsiModulesProvider
     let scriptsReferences = Dictionary<FileSystemPath, ScriptReferences>()
 
     let psiModules = List<IPsiModule>()
-    let mutable psiModulesCollection = Unchecked.defaultof<HybridCollection<IPsiModule>>
+    let mutable psiModulesCollection = HybridCollection.Empty
 
     do
         changeManager.RegisterChangeProvider(lifetime, this)
-        changeManager.AddDependency(lifetime, this, documentManager.ChangeProvider)
+        changeManager.Changed2.Advise(lifetime, this.Execute)
 
     let locks = solution.Locks
     let checker = checkerService.Checker
@@ -267,6 +267,14 @@ type FSharpScriptPsiModulesProvider
     member x.TargetFrameworkId =
         targetFrameworkId
 
+    member x.Execute(change: ChangeEventArgs) =
+        match change.ChangeMap.GetChange<ProjectFileDocumentCopyChange>(documentManager.ChangeProvider) with
+        | null -> ()
+        | change ->
+            let path = change.ProjectFile.Location
+            if scriptsReferences.ContainsKey(path) then 
+                updateReferences path change.Document
+
     interface IProjectPsiModuleProviderFilter with
         member x.OverrideHandler(lifetime, project, handler) =
             let handler =
@@ -277,15 +285,7 @@ type FSharpScriptPsiModulesProvider
         member x.Modules = psiModulesCollection
 
     interface IChangeProvider with
-        member x.Execute(changeMap) =
-            match changeMap.GetChange<ProjectFileDocumentCopyChange>(documentManager.ChangeProvider) with
-            | null -> null
-            | change ->
-                let path = change.ProjectFile.Location
-                if scriptsReferences.ContainsKey(path) then 
-                    updateReferences path change.Document
-
-                null
+        member x.Execute(changeMap) = null
 
 
 /// Overriding psi module handler for each project (a real project, misc files project, solution folder, etc). 
