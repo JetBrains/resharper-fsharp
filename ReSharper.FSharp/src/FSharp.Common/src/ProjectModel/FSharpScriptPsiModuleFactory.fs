@@ -179,7 +179,6 @@ type FSharpScriptPsiModulesProvider
         let path = moduleToRemove.Path
         scriptsFromProjectFiles.GetValuesSafe(path)
         |> Seq.tryFind (fun (_, psiModule) -> psiModule = moduleToRemove)
-        |> Option.orElseWith (fun _ -> sprintf "psiModule not found: %O" path |> failwith)
         |> Option.iter (fun ((lifetimeDefinition, psiModule) as value) ->
             scriptsFromProjectFiles.RemoveValue(path, value) |> ignore
             lifetimeDefinition.Terminate()
