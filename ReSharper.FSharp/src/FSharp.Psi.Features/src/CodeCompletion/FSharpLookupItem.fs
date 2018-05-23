@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
+namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
 open System
 open JetBrains.DocumentModel
@@ -16,22 +16,13 @@ open JetBrains.UI.RichText
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
-type FSharpLookupCandidateInfo =
-    {
-        Description: string
-        XmlDoc: FSharpXmlDoc
-    }
+type FSharpLookupCandidate(description: string, xmlDoc: FSharpXmlDoc, xmlDocService: FSharpXmlDocService) =
+    member x.Description = description
+    member x.XmlDoc = xmlDoc 
 
-type FSharpLookupAdditionalInfo =
-    {
-        Icon: IconId
-        ReturnType: string
-    }
-
-type FSharpLookupCandidate(info: FSharpLookupCandidateInfo, xmlDocService: FSharpXmlDocService) =
     interface ICandidate with
-        member x.GetSignature(_, _, _, _, _) = RichText(info.Description)
-        member x.GetDescription() = xmlDocService.GetXmlDoc(info.XmlDoc)
+        member x.GetSignature(_, _, _, _, _) = RichText(description)
+        member x.GetDescription() = xmlDocService.GetXmlDoc(xmlDoc)
         member x.Matches(_) = true
 
         member x.GetParametersInfo(_, _) = ()
@@ -40,7 +31,8 @@ type FSharpLookupCandidate(info: FSharpLookupCandidateInfo, xmlDocService: FShar
         member x.ObsoleteDescription = null
         member val IsFilteredOut = false with get, set
 
-type FSharpErrorLookupItem(item: FSharpDeclarationListItem<FSharpLookupAdditionalInfo>) =
+
+type FSharpErrorLookupItem(item: FSharpDeclarationListItem<FSharpLookupCandidate>) =
     inherit TextLookupItemBase()
 
     override x.Image = null
@@ -55,19 +47,37 @@ type FSharpErrorLookupItem(item: FSharpDeclarationListItem<FSharpLookupAdditiona
             |> Option.bind (function | FSharpToolTipElement.CompositionError e -> Some (RichTextBlock(e)) | _ -> None)
             |> Option.toObj
 
-type FSharpLookupItem(item: FSharpDeclarationListItem<FSharpLookupAdditionalInfo>, context: FSharpCodeCompletionContext,
-                      xmlDocService: FSharpXmlDocService) =
+
+type FSharpLookupItem
+        (item: FSharpDeclarationListItem<FSharpLookupAdditionalInfo>, context: FSharpCodeCompletionContext,
+         xmlDocService: FSharpXmlDocService) =
     inherit TextLookupItemBase()
 
-    let candidates = lazy (let (FSharpToolTipText(tooltips)) = item.DescriptionTextAsync.RunAsTask()
-        tooltips |> List.map (function
-            | FSharpToolTipElement.Group(overloads) ->
-                overloads |> List.map (fun o -> { Description = o.MainDescription; XmlDoc = o.XmlDoc })
-            | FSharpToolTipElement.CompositionError e -> [{ Description = e; XmlDoc = FSharpXmlDoc.None }]
-            | _ -> [])
-        |> List.concat)
+    let mutable candidates = Unchecked.defaultof<_>
 
-    override x.Image = item.AdditionalInfo |> Option.map (fun i -> i.Icon) |> Option.toObj
+    member x.Candidates =
+        match box candidates with
+        | null ->
+            let result = LocalList<ICandidate>()
+            let (FSharpToolTipText(tooltips)) = item.DescriptionTextAsync.RunAsTask()
+            for tooltip in tooltips do
+                match tooltip with
+                | FSharpToolTipElement.Group(overloads) ->
+                    for overload in overloads do
+                        result.Add(FSharpLookupCandidate(overload.MainDescription, overload.XmlDoc, xmlDocService))
+                | FSharpToolTipElement.CompositionError error ->
+                    result.Add(FSharpLookupCandidate(error, FSharpXmlDoc.None, xmlDocService))
+                | _ -> ()
+            candidates <- result.ResultingList()
+            candidates
+
+        | candidates -> candidates :?> _
+
+    override x.Image =
+        match item.AdditionalInfo with
+        | Some info -> info.Icon
+        | _ -> null
+
     override x.Text = item.NameInCode
 
     override x.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret) =
@@ -118,25 +128,32 @@ type FSharpLookupItem(item: FSharpDeclarationListItem<FSharpLookupAdditionalInfo
 
     interface IParameterInfoCandidatesProvider with
         member x.HasCandidates =
-            candidates.Value.Length > 1 ||
-            item.Kind |> function CompletionItemKind.Method _ -> true  | _ -> false
+            match item.Kind with
+            | CompletionItemKind.Method _ -> true
+            | _ ->
+                x.Candidates.Count > 1
 
-        member x.CreateCandidates() =
-            candidates.Value |> List.map (fun i -> FSharpLookupCandidate(i, xmlDocService) :> ICandidate) :>_
+        member x.CreateCandidates() = x.Candidates :> _
 
     interface IDescriptionProvidingLookupItem with
-        /// called when x.HasCandidates is false
+        /// Called when x.HasCandidates is false.
         member x.GetDescription() =
-            match List.tryHead candidates.Value with
-            | Some item ->
-                let isNullOrWhiteSpace = RichTextBlock.IsNullOrWhiteSpace
+            let candidates = x.Candidates
+            if candidates.Count = 0 then null else
 
-                let mainDescription = RichTextBlock(item.Description)
-                match xmlDocService.GetXmlDoc(item.XmlDoc) with
-                | null -> ()
-                | xmlDoc ->
-                    if not (isNullOrWhiteSpace mainDescription || isNullOrWhiteSpace xmlDoc) then
-                        mainDescription.AddLines(RichTextBlock(" "))
-                    mainDescription.AddLines(xmlDoc)
-                mainDescription
-            | _ -> null
+            let candidate = candidates.[0] :?> FSharpLookupCandidate
+            let isNullOrWhiteSpace = RichTextBlock.IsNullOrWhiteSpace
+
+            let mainDescription = RichTextBlock(candidate.Description)
+            match xmlDocService.GetXmlDoc(candidate.XmlDoc) with
+            | null -> ()
+            | xmlDoc ->
+                if not (isNullOrWhiteSpace mainDescription || isNullOrWhiteSpace xmlDoc) then
+                    mainDescription.AddLines(RichTextBlock(" "))
+                mainDescription.AddLines(xmlDoc)
+            mainDescription
+
+
+type FSharpLookupAdditionalInfo =
+    { Icon: IconId
+      ReturnType: string }
