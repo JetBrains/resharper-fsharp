@@ -45,7 +45,7 @@ type FSharpScriptPsiModulesProvider
 
     do
         changeManager.RegisterChangeProvider(lifetime, this)
-        changeManager.AddDependency(lifetime, this, documentManager.ChangeProvider)
+        changeManager.Changed2.Advise(lifetime, this.Execute)
 
         lifetime.AddAction(fun _ ->
             for lifetimeDefinition, _ in Seq.append scriptsFromPaths.Values scriptsFromProjectFiles.Values do
@@ -192,6 +192,39 @@ type FSharpScriptPsiModulesProvider
     member x.TargetFrameworkId =
         targetFrameworkId
 
+    member x.Execute(change) =
+        let change = change.ChangeMap.GetChange<ProjectFileDocumentCopyChange>(documentManager.ChangeProvider)
+        if isNull change then () else
+
+        let path = change.ProjectFile.Location
+        match tryGetValue path referencedPaths with
+        | Some oldReferences ->
+            let newOptions = getScriptOptions path change.Document
+            let newReferences = getScriptReferences path newOptions
+
+            let getDiff oldPaths newPaths =
+                let notChanged = Enumerable.Intersect(newPaths, oldPaths) |> HashSet
+                let filterChanges = Seq.filter (notChanged.Contains >> not) >> List.ofSeq
+                filterChanges newPaths, filterChanges oldPaths
+
+            match getDiff oldReferences.Assemblies newReferences.Assemblies with
+            | [], [] when newReferences.Files.SetEquals(oldReferences.Files) -> ()
+            | added, removed ->
+                let changeBuilder = PsiModuleChangeBuilder()
+
+                referencedPaths.[path] <- newReferences
+                for filePath in newReferences.Files do
+                    createPsiModuleForPath filePath changeBuilder
+
+                for psiModule in getPsiModulesForPath path do
+                    for path in added do psiModule.AddReference(path)
+                    for path in removed do psiModule.RemoveReference(path)
+                    changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Invalidated)
+
+                changeManager.ExecuteAfterChange(fun _ ->
+                    changeManager.OnProviderChanged(this, changeBuilder.Result, SimpleTaskExecutor.Instance))
+        | _ -> ()
+
     interface IProjectPsiModuleProviderFilter with
         member x.OverrideHandler(lifetime, project, handler) =
             let handler =
@@ -206,36 +239,7 @@ type FSharpScriptPsiModulesProvider
             |> HybridCollection<IPsiModule>
 
     interface IChangeProvider with
-        member x.Execute(changeMap) =
-            let change = changeMap.GetChange<ProjectFileDocumentCopyChange>(documentManager.ChangeProvider)
-            if isNull change then null else
-
-            let path = change.ProjectFile.Location
-            match tryGetValue path referencedPaths with
-            | Some oldReferences ->
-                let newOptions = getScriptOptions path change.Document
-                let newReferences = getScriptReferences path newOptions
-
-                let getDiff oldPaths newPaths =
-                    let notChanged = Enumerable.Intersect(newPaths, oldPaths) |> HashSet
-                    let filterChanges = Seq.filter (notChanged.Contains >> not) >> List.ofSeq
-                    filterChanges newPaths, filterChanges oldPaths
-
-                match getDiff oldReferences.Assemblies newReferences.Assemblies with
-                | [], [] when newReferences.Files.SetEquals(oldReferences.Files) -> null
-                | added, removed ->
-                    let changeBuilder = PsiModuleChangeBuilder()
-
-                    referencedPaths.[path] <- newReferences
-                    for filePath in newReferences.Files do
-                        createPsiModuleForPath filePath changeBuilder
-
-                    for psiModule in getPsiModulesForPath path do
-                        for path in added do psiModule.AddReference(path)
-                        for path in removed do psiModule.RemoveReference(path)
-                        changeBuilder.AddModuleChange(psiModule, PsiModuleChange.ChangeType.Invalidated)
-                    changeBuilder.Result :> _
-            | _ -> null
+        member x.Execute(changeMap) = null
 
 
 /// Overriding psi module handler for each project (a real project, misc files project, solution folder, etc). 
