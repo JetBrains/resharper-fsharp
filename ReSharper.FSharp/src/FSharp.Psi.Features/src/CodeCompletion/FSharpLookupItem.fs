@@ -32,7 +32,7 @@ type FSharpLookupCandidate(description: string, xmlDoc: FSharpXmlDoc, xmlDocServ
         member val IsFilteredOut = false with get, set
 
 
-type FSharpErrorLookupItem(item: FSharpDeclarationListItem<FSharpLookupCandidate>) =
+type FSharpErrorLookupItem(item: FSharpDeclarationListItem<FSharpLookupAdditionalInfo>) =
     inherit TextLookupItemBase()
 
     override x.Image = null
