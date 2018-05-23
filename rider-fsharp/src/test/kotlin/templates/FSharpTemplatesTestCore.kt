@@ -16,9 +16,14 @@ import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
 import java.io.File
 import java.nio.file.Paths
+import java.time.Duration
 
 @Test
 abstract class FSharpTemplatesTestCore : BaseTestWithSolutionBase() {
+
+    companion object {
+        private val defaultBuildTimeout = Duration.ofMinutes(2)
+    }
 
     protected abstract fun runWithDotNetCliVersion(): String
 
@@ -163,7 +168,7 @@ abstract class FSharpTemplatesTestCore : BaseTestWithSolutionBase() {
                 }
 
                 //checkBuildAndSwea(project, "", 0) //until all tests will be ok
-                buildSolutionWithReSharperBuild(project)
+                buildSolutionWithReSharperBuild(project, defaultBuildTimeout)
                 checkThatBuildArtifactsExist(project)
                 dumpAllProjectFilesListByContainsPath(project, Paths.get("bin"), binFolderContentGoldFile)
                 dumpAllFileListAbsolute(project, fileListAbsoluteFilesGoldFile)
