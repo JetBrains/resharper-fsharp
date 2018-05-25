@@ -16,6 +16,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public override IEnumerable<ITypeMember> GetMembers() =>
       IsCliMutable ? base.GetMembers().Prepend(DefaultConstructor) : base.GetMembers();
 
-    public bool IsCliMutable => EnumerateParts().OfType<RecordPart>().Any(p => p.IsCliMutable.Value);
+    public bool IsCliMutable
+    {
+      get
+      {
+        foreach (var part in EnumerateParts())
+          if (part is RecordPart recordPart && recordPart.HasCliMutable)
+            return true;
+        return false;
+      }
+    }
   }
 }
