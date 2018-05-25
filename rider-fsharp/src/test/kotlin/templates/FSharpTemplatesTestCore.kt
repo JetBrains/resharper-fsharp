@@ -1,6 +1,5 @@
 package templates
 
-import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.project.Project
 import com.jetbrains.rider.debugger.DotNetDebugRunner
 import com.jetbrains.rider.diagnostics.LogTraceScenarios
@@ -10,7 +9,6 @@ import com.jetbrains.rider.test.enums.ToolsetVersion
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.framework.*
 import com.jetbrains.rider.test.scriptingApi.*
-import com.jetbrains.rider.util.idea.ReSharperHostException
 import org.testng.annotations.AfterClass
 import org.testng.annotations.BeforeMethod
 import org.testng.annotations.Test
@@ -31,6 +29,7 @@ abstract class FSharpTemplatesTestCore : BaseTestWithSolutionBase() {
         get() = File(testCaseGoldDirectory, testCaseName + "_opened")
     protected val configGoldFile: File
         get() = File(testCaseGoldDirectory, testCaseName + "_rcf")
+    @Suppress("unused")
     protected val debugGoldFile: File
         get() = File(testCaseGoldDirectory, testCaseName + "_debug")
     private val binFolderContentGoldFile: File
@@ -92,7 +91,7 @@ abstract class FSharpTemplatesTestCore : BaseTestWithSolutionBase() {
     @TestEnvironment(toolset = ToolsetVersion.TOOLSET_15_CORE)
     fun consoleAppCoreTemplate() {
         val projectName = "ConsoleApplication"
-        val programFs = activeSolutionDirectory.resolve(projectName).resolve("Program.fs")
+        //val programFs = activeSolutionDirectory.resolve(projectName).resolve("Program.fs")
         doCoreTest(ProjectTemplateIds.Core.fsharp_consoleApplication, projectName) { project ->
             checkSwea(project)
             checkCanExecuteSelectedRunConfiguration(project)
@@ -131,7 +130,7 @@ abstract class FSharpTemplatesTestCore : BaseTestWithSolutionBase() {
     fun xUnitCoreTemplate() {
         val projectName = "UnitTestProject"
         doCoreTest(ProjectTemplateIds.Core.fsharp_xUnit, projectName) { project ->
-            checkSwea(project, "", 1)
+            checkSwea(project, 1)
             checkSweaAnalysedFiles(backendLog, 2, 0, "Tests.fs")
 
             checkSelectedRunConfigurationExecutionNotAllowed(project)
