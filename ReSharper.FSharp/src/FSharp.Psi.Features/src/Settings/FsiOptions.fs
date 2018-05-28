@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Services.Settings
+namespace JetBrains.ReSharper.Plugins.FSharp.Services.Settings.Fsi
 
 open System
 open System.Linq.Expressions
@@ -16,57 +16,71 @@ open JetBrains.UI.RichText
 
 [<AutoOpen>]
 module FsiOptions =
-    let [<Literal>] useAnyCpuVersionText = "Use 64-bit F# Interactive"
-    let [<Literal>] shadowCopyReferencesText = "Shadow copy assemblies"
-    let [<Literal>] fsiArgsText = "F# Interactive arguments"
-    let [<Literal>] moveCaretOnSendLineText = "Move caret down on Send Line"
-    let [<Literal>] copyRecentToEditorText = "Copy recent commands to Interactive editor"
+    let [<Literal>] launchOtionsSectionHeader    = "Launch options"
+    let [<Literal>] commandsHistorySectionHeader = "Commands history"
 
-    [<SettingsKey(typeof<HierarchySettings>, "Fsi")>]
-    type FsiOptions() =
-        [<SettingsEntry(false, useAnyCpuVersionText); DefaultValue>]
-        val mutable UseAnyCpuVersion: bool
+    let [<Literal>] useAnyCpuVersionText         = "Use 64-bit F# Interactive"
+    let [<Literal>] shadowCopyReferencesText     = "Shadow copy assemblies"
+    let [<Literal>] fsiArgsText                  = "F# Interactive arguments"
+    let [<Literal>] moveCaretOnSendLineText      = "Move caret down on Send Line"
+    let [<Literal>] copyRecentToEditorText       = "Copy recent commands to Interactive editor"
 
-        [<SettingsEntry(true, shadowCopyReferencesText); DefaultValue>]
-        val mutable ShadowCopyReferences: bool
 
-        [<SettingsEntry("--optimize", fsiArgsText); DefaultValue>]
-        val mutable FsiArgs: string
+[<SettingsKey(typeof<HierarchySettings>, "Fsi")>]
+type FsiOptions() =
+    [<SettingsEntry(false, useAnyCpuVersionText); DefaultValue>]
+    val mutable UseAnyCpuVersion: bool
 
-        [<SettingsEntry(true, moveCaretOnSendLineText); DefaultValue>]
-        val mutable MoveCaretOnSendLine: bool
+    [<SettingsEntry(true, shadowCopyReferencesText); DefaultValue>]
+    val mutable ShadowCopyReferences: bool
 
-        [<SettingsEntry(true, copyRecentToEditorText); DefaultValue>]
-        val mutable CopyRecentToEditor: bool
+    [<SettingsEntry("--optimize", fsiArgsText); DefaultValue>]
+    val mutable FsiArgs: string
 
-    [<OptionsPage("FsiOptionsPage", "Fsi", typeof<ProjectModelThemedIcons.Fsharp>, HelpKeyword = "Settings_Languages_FSHARP_Interactive")>]
-    type FsiOptionsPage(lifetime, optionsContext) as this =
-        inherit SimpleOptionsPage(lifetime, optionsContext)
-        let _ = ProjectModelThemedIcons.Fsharp // workaround to create assembly reference (Microsoft/visualfsharp#3522)
+    [<SettingsEntry(true, moveCaretOnSendLineText); DefaultValue>]
+    val mutable MoveCaretOnSendLine: bool
 
-        do
-            this.AddBool((fun key -> key.UseAnyCpuVersion), useAnyCpuVersionText)
-            this.AddBool((fun key -> key.ShadowCopyReferences), shadowCopyReferencesText)
-            this.AddBool((fun key -> key.MoveCaretOnSendLine), moveCaretOnSendLineText)
-            this.AddBool((fun key -> key.CopyRecentToEditor), copyRecentToEditorText)
-            this.AddStringOption((fun (key: FsiOptions) -> key.FsiArgs), fsiArgsText) |> ignore
-            this.FinishPage()
+    [<SettingsEntry(true, copyRecentToEditorText); DefaultValue>]
+    val mutable CopyRecentToEditor: bool
 
-        member x.AddBool(getter: Expression<Func<FsiOptions,_>>, text) =
-            this.AddBoolOption(getter, RichText(text)) |> ignore
+[<OptionsPage("FsiOptionsPage", "Fsi", typeof<ProjectModelThemedIcons.Fsharp>, HelpKeyword = "Settings_Languages_FSHARP_Interactive")>]
+type FsiOptionsPage(lifetime, optionsContext) as this =
+    inherit SimpleOptionsPage(lifetime, optionsContext)
 
-    [<ShellComponent>]
-    type FSharpSettingsCategoryProvider() =
-        let categoryToKeys = Map.ofList ["F# Interactive settings", [ typeof<FsiOptions> ]]
+    do
+        this.AddHeader(launchOtionsSectionHeader)
+        this.AddBool(useAnyCpuVersionText,     fun key -> key.UseAnyCpuVersion)
+        this.AddBool(shadowCopyReferencesText, fun key -> key.ShadowCopyReferences)
+        this.AddBool(moveCaretOnSendLineText,  fun key -> key.MoveCaretOnSendLine)
+        this.AddString(fsiArgsText,            fun key -> key.FsiArgs)
 
-        interface IExportableSettingsCategoryProvider with
-            member x.TryGetRelatedIdeaConfigsBy(category, [<Out>] configs) =
-                configs <- Array.empty
-                false
+        this.AddHeader(commandsHistorySectionHeader)
+        this.AddBool(copyRecentToEditorText,   fun key -> key.CopyRecentToEditor)
 
-            member x.TryGetCategoryBy(settingsKey, [<Out>] category) =
-                category <-
-                    categoryToKeys
-                    |> Map.tryFindKey (fun _ types -> types |> List.exists settingsKey.SettingsKeyClassClrType.Equals)
-                    |> Option.toObj
-                isNotNull category
+        this.FinishPage()
+
+    member x.AddBool(text, getter: Expression<Func<FsiOptions,_>>) =
+        this.AddBoolOption(getter, RichText(text)) |> ignore
+
+    member x.AddString(text, getter: Expression<Func<FsiOptions,_>>) =
+        this.AddStringOption(getter, text) |> ignore
+
+    member x.AddHeader(text: string) =
+        this.AddHeader(text, null) |> ignore
+
+
+[<ShellComponent>]
+type FSharpSettingsCategoryProvider() =
+    let categoryToKeys = Map.ofList ["F# Interactive settings", [ typeof<FsiOptions> ]]
+
+    interface IExportableSettingsCategoryProvider with
+        member x.TryGetRelatedIdeaConfigsBy(category, [<Out>] configs) =
+            configs <- Array.empty
+            false
+
+        member x.TryGetCategoryBy(settingsKey, [<Out>] category) =
+            category <-
+                categoryToKeys
+                |> Map.tryFindKey (fun _ types -> types |> List.exists settingsKey.SettingsKeyClassClrType.Equals)
+                |> Option.toObj
+            isNotNull category

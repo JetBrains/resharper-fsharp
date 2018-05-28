@@ -24,6 +24,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Services.Settings
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Services.Settings.Fsi
 open JetBrains.Rider.Model
 open JetBrains.TextControl
 open JetBrains.UI.RichText
