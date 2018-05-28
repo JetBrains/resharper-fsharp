@@ -31,7 +31,7 @@ import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.ui.UIUtil
 import com.intellij.xdebugger.XDebuggerManager
 import com.intellij.xdebugger.attach.LocalAttachHost
-import com.intellij.xdebugger.attach.XLocalAttachDebuggerProvider
+import com.intellij.xdebugger.attach.XAttachDebuggerProvider
 import com.jetbrains.rider.debugger.DotNetDebugProcess
 import com.jetbrains.rider.model.RdFsiSessionInfo
 import com.jetbrains.rider.util.idea.application
@@ -75,7 +75,7 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost)
     private fun attachToProcess() {
         val processInfo = OSProcessUtil.getProcessList().firstOrNull { it.pid == pid } ?: return
         val dataHolder = UserDataHolderBase()
-        val debugger = Extensions.getExtensions(XLocalAttachDebuggerProvider.EP).flatMap { provider ->
+        val debugger = Extensions.getExtensions(XAttachDebuggerProvider.EP).flatMap { provider ->
             provider.getAvailableDebuggers(project, LocalAttachHost.INSTANCE, processInfo, dataHolder)
         }.firstOrNull() ?: return
         debugger.attachDebugSession(project, LocalAttachHost.INSTANCE, processInfo)
