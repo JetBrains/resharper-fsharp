@@ -34,3 +34,8 @@ type FSharpLanguageService(languageType, constantValueService, formatter: FSharp
 
     override x.CodeFormatter = formatter :> _
     override x.FindTypeDeclarations(file) = EmptyList<_>.Instance :> _
+
+
+[<Language(typeof<FSharpLanguage>)>]
+type FSharpScriptLanguageService(languageType, constantValueService, formatter, fsCheckerService, logger) =
+    inherit FSharpLanguageService(languageType, constantValueService, formatter, fsCheckerService, logger)
