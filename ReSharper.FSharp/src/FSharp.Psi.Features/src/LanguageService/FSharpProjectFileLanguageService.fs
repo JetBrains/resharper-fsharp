@@ -16,7 +16,7 @@ type FSharpProjectFileLanguageService
         (projectFileType, fsCheckerService: FSharpCheckerService, fsFileService: IFSharpFileService) =
     inherit ProjectFileLanguageService(projectFileType)
 
-    override x.PsiLanguageType = FSharpScriptLanguage.Instance :> _
+    override x.PsiLanguageType = FSharpLanguage.Instance :> _
     override x.Icon = ProjectModelThemedIcons.Fsharp.Id
 
     override x.GetMixedLexerFactory(_, _, [<Optional; DefaultParameterValue(null: IPsiSourceFile)>] sourceFile) =
@@ -37,3 +37,5 @@ type FSharpProjectFileLanguageService
 [<ProjectFileType(typeof<FSharpScriptProjectFileType>)>]
 type FSharpScriptProjectFileLanguageService(projectFileType, fsCheckerService, fsFileService: IFSharpFileService) =
     inherit FSharpProjectFileLanguageService(projectFileType, fsCheckerService, fsFileService)
+
+    override x.PsiLanguageType = FSharpScriptLanguage.Instance :> _
