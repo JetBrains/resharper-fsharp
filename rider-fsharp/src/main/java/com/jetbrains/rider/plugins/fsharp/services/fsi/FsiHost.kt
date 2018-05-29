@@ -4,12 +4,13 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import com.jetbrains.rider.model.RdFSharpInteractiveHost
+import com.jetbrains.rider.model.rdFSharpModel
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.util.idea.LifetimedProjectComponent
 import kotlin.properties.Delegates
 
 class FsiHost(project: Project) : LifetimedProjectComponent(project) {
-    private val rdFsiHost: RdFSharpInteractiveHost get() = project.solution.fSharpInteractiveHost
+    private val rdFsiHost: RdFSharpInteractiveHost get() = project.solution.rdFSharpModel.fSharpInteractiveHost
     var moveCaretOnSendLine by Delegates.notNull<Boolean>()
     var copyRecentToEditor by Delegates.notNull<Boolean>()
     private var fsiConsole: FsiConsoleRunner? = null

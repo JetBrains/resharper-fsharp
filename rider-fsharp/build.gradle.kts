@@ -1,3 +1,4 @@
+import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.internal.jvm.Jvm
 import org.jetbrains.intellij.tasks.PublishTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -99,6 +100,11 @@ tasks {
         }
     }
 
+    withType<KotlinCompile> {
+        kotlinOptions.jvmTarget = "1.8"
+        dependsOn("generateModel")
+    }
+
     withType<Test> {
         useTestNG()
         testLogging {
@@ -126,6 +132,55 @@ tasks {
             exec {
                 executable = "dotnet"
                 args = listOf("restore", "$resharperPluginPath/ReSharper.FSharp.sln")
+            }
+        }
+    }
+
+    "generateModel" {
+        group = "intellij"
+        doLast {
+            val sdkPath = intellij.ideaDependency.classes
+            val rdLibDirectory = File(sdkPath, "lib/rd").canonicalFile
+            ext.properties["rdLibDirectory"] = rdLibDirectory
+            val rdgenJar = File(rdLibDirectory.absolutePath, "rd-gen.jar")
+
+            assert(rdLibDirectory.isDirectory)
+            assert(rdgenJar.isFile)
+
+            // If we specify these as outputs of the task, gradle will create them for us, but we then
+            // need to also specify inputs. RdGen does up to date checks for us, but we could skip that
+            // altogether if we hard code them in the task. Downside is that we'd need to keep the list
+            // of inputs/outputs up to date manually, instead of leaving it to rdgen
+            mkdir("build/rdgen")
+
+            val modelDir = File(repoRoot, "rider-fsharp/protocol/src/kotlin/model")
+            val packageName = "model"
+
+            val cpSeparator = if (Os.isFamily(Os.FAMILY_WINDOWS)) ";" else ":"
+            val compilerClasspath = "$rdLibDirectory/rd-gen.jar$cpSeparator$rdLibDirectory/rider-model.jar"
+            val rdGenClasspath = files(compilerClasspath)
+
+            // Protocol between backend and frontend
+            // Direction isn't important for this model, so we don't specify it in the model. Which means
+            // we have to specify output directories here
+            // Inputs: rider/protocol/src/main/kotlin/model/rider/RdUnityModel.kt
+            // Outputs: resharper/src/resharper-unity/Rider/RdUnityProtocol/RdUnityModel.Generated.cs
+            //          rider/src/main/kotlin/com/jetbrains/rider/protocol/RdUnityProtocol/RdUnityModel.Generated.kt
+            val csOutput = File(repoRoot, "Resharper.FSharp/src/FSharp.ProjectModelBase/src/Protocol")
+            val ktOutput = File(repoRoot, "rider-fsharp/src/main/java/com/jetbrains/rider/plugins/fsharp/protocol")
+            javaexec {
+                main = "com.jetbrains.rider.generator.nova.MainKt"
+                classpath = rdGenClasspath
+                systemProperty("model.out.src.cs.dir", "$csOutput")
+                systemProperty("model.out.src.kt.dir", "$ktOutput")
+                errorOutput = System.out // kotlin throws warnings in stderr which causes appveyor build to fail
+                args = listOf(
+                        "--verbose",
+                        "--hash-folder=build/rdgen",
+                        "--compiler-classpath=$compilerClasspath",
+                        "--source=$modelDir",
+                        "--packages=$packageName"
+                )
             }
         }
     }

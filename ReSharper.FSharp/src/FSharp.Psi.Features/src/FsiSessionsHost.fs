@@ -38,8 +38,8 @@ type SendToFsiActionType =
 type FsiSessionsHost(lifetime: Lifetime, solution: ISolution, solutionModel: SolutionModel, toolset: RiderSolutionToolset) as this =
     let rdFsiHost =
         match solutionModel.TryGetCurrentSolution() with
-        | null -> failwith "Could not get fsi host"
-        | solution -> solution.FSharpInteractiveHost
+        | null -> failwith "Could not get protocol solution"
+        | solution -> solution.GetRdFSharpModel().FSharpInteractiveHost
 
     let stringOption option arg = sprintf "--%s:%O" option arg
     let boolOption option arg = sprintf "--%s%s" option (if arg then "+" else "-")
