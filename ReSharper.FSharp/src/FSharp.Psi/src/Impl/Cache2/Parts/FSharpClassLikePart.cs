@@ -6,13 +6,14 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
-using JetBrains.Util.Concurrency;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
   internal abstract class FSharpClassLikePart<T> : FSharpTypeParametersOwnerPart<T>,
     ClassLikeTypeElement.IClassLikePart where T : class, IFSharpTypeDeclaration
   {
+    private bool? myHasPublicDefaultCtor;
+    
     protected FSharpClassLikePart([NotNull] T declaration, MemberDecoration memberDecoration,
       TreeNodeCollection<ITypeParameterOfTypeDeclaration> typeParameters, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, memberDecoration, typeParameters, cacheBuilder)
@@ -51,9 +52,38 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       return GetDeclaration()?.BaseClassType ?? GetPsiModule().GetPredefinedType().Object;
     }
 
-    public InterruptibleLazy<bool> HasPublicDefaultCtor =>
-      new InterruptibleLazy<bool>(() =>
-        GetTypeMembers().OfType<IConstructor>()
-          .Any(c => c.IsParameterless && c.GetAccessRights() == AccessRights.PUBLIC));
+    public bool HasPublicDefaultCtor
+    {
+      get
+      {
+        lock (this)
+        {
+          if (myHasPublicDefaultCtor != null)
+            return myHasPublicDefaultCtor.Value;
+
+          myHasPublicDefaultCtor = false;
+          var declaration = GetDeclaration();
+          if (declaration == null)
+            return false;
+
+          foreach (var memberDeclaration in declaration.MemberDeclarations)
+          {
+            if (memberDeclaration is IConstructorDeclaration || memberDeclaration is IImplicitConstructorDeclaration)
+            {
+              // todo: analyze tree and don't get declared elements here
+              if (memberDeclaration.DeclaredElement is IConstructor ctor &&
+                  ctor.IsParameterless && ctor.GetAccessRights() == AccessRights.PUBLIC)
+              {
+                myHasPublicDefaultCtor = true;
+                return true;
+              }
+            }
+          }
+
+          myHasPublicDefaultCtor = false;
+          return false;
+        }
+      }
+    }
   }
 }
