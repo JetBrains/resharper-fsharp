@@ -148,6 +148,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public bool IsClassType => false; // todo
     public bool HasDefaultConstructor => false;
     public IList<IType> TypeConstraints => EmptyList<IType>.Instance;
+    public TypeParameterConstraintsMask ConstraintsMask => default; // todo
     public ITypeParametersOwner Owner => myMethod as ITypeParametersOwner;
     public ITypeElement OwnerType => myMethod.GetContainingType();
     public IMethod OwnerMethod => myMethod as IMethod;
