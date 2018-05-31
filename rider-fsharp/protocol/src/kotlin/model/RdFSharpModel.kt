@@ -17,11 +17,12 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
     }
 
     private val RdFSharpCompilerServiceHost = aggregatedef("RdFSharpCompilerServiceHost")  {
-        sink("fileChecked", string)
-        sink("projectChecked", string)
+        sink("fileChecked", string).async
+        sink("projectChecked", string).async
     }
 
     init {
         field("fSharpInteractiveHost", RdFSharpInteractiveHost)
+        field("fSharpCompilerServiceHost", RdFSharpCompilerServiceHost)
     }
 }

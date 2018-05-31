@@ -1,7 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Host
 
 open JetBrains.DataFlow
-open JetBrains.Platform.RdFramework.Impl
+open JetBrains.Platform.RdFramework.Util
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Host.Features
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
@@ -14,10 +14,8 @@ type FcsHost(lifetime: Lifetime, checkerService: FSharpCheckerService, solutionM
         | null -> ()
         | solution ->
 
-        match solution.FsharpCompilerServiceHost.ProjectChecked with
-        | :? RdSignal<_> as signal ->
-            signal.Async <- true
-            let handler = fun (project, _) -> signal.Fire(project)
-            let subscription = checkerService.Checker.ProjectChecked.Subscribe(handler)
+        match solution.GetRdFSharpModel().FSharpCompilerServiceHost.ProjectChecked with
+        | :? IRdSignal<_> as signal ->
+            let subscription = checkerService.Checker.ProjectChecked.Subscribe(fun (project, _) -> signal.Fire(project))
             lifetime.AddAction(fun _ -> subscription.Dispose()) |> ignore
         | _ -> ()

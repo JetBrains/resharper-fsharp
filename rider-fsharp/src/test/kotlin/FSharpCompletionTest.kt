@@ -1,3 +1,4 @@
+import com.jetbrains.rider.model.rdFSharpModel
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.test.CompletionTestBase
 import com.jetbrains.rider.test.framework.frameworkLogger
@@ -14,7 +15,7 @@ class FSharpCompletionTest : CompletionTestBase() {
     override fun getSolutionDirectoryName() = "CoreConsoleApp"
     override val restoreNuGetPackages = true
 
-    private val rdFcsHost get() = project.solution.fsharpCompilerServiceHost
+    private val rdFcsHost get() = project.solution.rdFSharpModel.fSharpCompilerServiceHost
     private var isFcsReady = false
 
     @Test(enabled = false)
