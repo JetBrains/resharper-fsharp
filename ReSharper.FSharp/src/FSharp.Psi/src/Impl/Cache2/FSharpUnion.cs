@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
 using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
@@ -16,8 +16,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     protected override bool EmitsFieldsConstructor => false;
 
-    public IEnumerable<ITypeMember> Cases =>
-      base.GetMembers().Where(member => member is FSharpUnionCase || member is FSharpUnionCaseProperty);
+    public IEnumerable<ITypeMember> Cases => EnumerateParts<UnionPart, ITypeMember>(part => part.Cases);
 
     public override IEnumerable<ITypeMember> GetMembers()
     {
