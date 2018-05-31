@@ -18,17 +18,34 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       TreeNodeCollection<ITypeParameterOfTypeDeclaration>.Empty, cacheBuilder)
     {
       myIsHiddenCase = isHiddenCase;
+      var unionShortName = declaration.GetContainingNode<IUnionDeclaration>()?.ShortName;
+      ExtendsListShortNames =
+        unionShortName != null
+          ? new[] {cacheBuilder.Intern(unionShortName)}
+          : EmptyArray<string>.Instance;
     }
 
     protected override void Write(IWriter writer)
     {
       base.Write(writer);
       writer.WriteBool(myIsHiddenCase);
+      writer.WriteStringArray(ExtendsListShortNames);
+    }
+
+    public override string[] ExtendsListShortNames { get; }
+
+    public override IDeclaredType GetBaseClassType()
+    {
+      var typeElement = (GetDeclaration()?.GetContainingNode<IUnionDeclaration>() as ITypeDeclaration)?.DeclaredElement;
+      return typeElement != null
+        ? TypeFactory.CreateType(typeElement)
+        : null;
     }
 
     public UnionCasePart(IReader reader) : base(reader)
     {
       myIsHiddenCase = reader.ReadBool();
+      ExtendsListShortNames = reader.ReadStringArray();
     }
 
     public override IEnumerable<IDeclaredType> GetSuperTypes()
