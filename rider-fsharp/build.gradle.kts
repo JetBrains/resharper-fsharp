@@ -118,6 +118,7 @@ tasks {
 
     "prepare" {
         group = "intellij"
+        dependsOn("generateModel")
         doLast {
             val sdkPath = intellij.ideaDependency.classes
             println("SDK path: $sdkPath")
