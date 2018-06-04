@@ -60,17 +60,17 @@ val resharperPluginPath = "$repoRoot/ReSharper.FSharp"
 val buildConfiguration = ext.properties["BuildConfiguration"] ?: "Debug"
 
 val libFiles = listOf(
-        "FSharp.Common/bin/$buildConfiguration/net451/FSharp.Core.dll",
-        "FSharp.Common/bin/$buildConfiguration/net451/FSharp.Compiler.Service.dll", // todo: add pdb after next repack
-        "FSharp.Psi.Features/bin/$buildConfiguration/net451/Fantomas.dll")
+        "FSharp.Common/bin/$buildConfiguration/net461/FSharp.Core.dll",
+        "FSharp.Common/bin/$buildConfiguration/net461/FSharp.Compiler.Service.dll", // todo: add pdb after next repack
+        "FSharp.Psi.Features/bin/$buildConfiguration/net461/Fantomas.dll")
 
 val pluginFiles = listOf(
-        "FSharp.ProjectModelBase/bin/$buildConfiguration/net451/JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase",
-        "FSharp.Common/bin/$buildConfiguration/net451/JetBrains.ReSharper.Plugins.FSharp.Common",
-        "FSharp.Psi/bin/$buildConfiguration/net451/JetBrains.ReSharper.Plugins.FSharp.Psi",
-        "FSharp.Psi.Features/bin/$buildConfiguration/net451/JetBrains.ReSharper.Plugins.FSharp.Psi.Features",
-        "Daemon.FSharp/bin/$buildConfiguration/net451/JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs",
-        "Services.FSharp/bin/$buildConfiguration/net451/JetBrains.ReSharper.Plugins.FSharp.Services.Cs")
+        "FSharp.ProjectModelBase/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase",
+        "FSharp.Common/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Common",
+        "FSharp.Psi/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Psi",
+        "FSharp.Psi.Features/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Psi.Features",
+        "Daemon.FSharp/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs",
+        "Services.FSharp/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Services.Cs")
 
 tasks {
     withType<PrepareSandboxTask> {
@@ -78,7 +78,7 @@ tasks {
         files = files.map { "$resharperPluginPath/src/$it" }
 
         if (name == IntelliJPlugin.PREPARE_TESTING_SANDBOX_TASK_NAME) {
-            val testHostPath = "$resharperPluginPath/test/src/FSharp.Tests.Host/bin/$buildConfiguration/net451"
+            val testHostPath = "$resharperPluginPath/test/src/FSharp.Tests.Host/bin/$buildConfiguration/net461"
             val testHostName = "$testHostPath/JetBrains.ReSharper.Plugins.FSharp.Tests.Host"
             files += listOf("$testHostName.dll", "$testHostName.pdb")
         }

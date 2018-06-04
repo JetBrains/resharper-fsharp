@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net451</TargetFramework>
+    <TargetFramework>net461</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Common</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Common</AssemblyName>
@@ -39,6 +39,7 @@
     <PackageReference Include="FSharp.Core" Version="4.3.4" />
     <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FCSVersion)" />
     <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
+    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
 
   <ItemGroup>

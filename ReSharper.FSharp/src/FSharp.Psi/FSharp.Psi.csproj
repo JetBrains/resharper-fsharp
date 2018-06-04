@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net451</TargetFramework>
+    <TargetFramework>net461</TargetFramework>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Psi</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi</AssemblyName>
     <LangVersion>latest</LangVersion>
@@ -26,6 +26,7 @@
 
   <ItemGroup>
     <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
+    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
 
   <ItemGroup>
