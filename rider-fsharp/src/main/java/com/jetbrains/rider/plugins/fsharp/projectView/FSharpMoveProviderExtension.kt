@@ -1,9 +1,9 @@
 package com.jetbrains.rider.plugins.fsharp.projectView
 
 import com.intellij.openapi.project.Project
-import com.jetbrains.rider.projectView.moveProviders.Impl.ActionOrderType
-import com.jetbrains.rider.projectView.moveProviders.Impl.NodeOrderType
 import com.jetbrains.rider.projectView.moveProviders.extensions.MoveProviderExtension
+import com.jetbrains.rider.projectView.moveProviders.impl.ActionOrderType
+import com.jetbrains.rider.projectView.moveProviders.impl.NodeOrderType
 import com.jetbrains.rider.projectView.nodes.*
 import com.jetbrains.rider.util.idea.application
 

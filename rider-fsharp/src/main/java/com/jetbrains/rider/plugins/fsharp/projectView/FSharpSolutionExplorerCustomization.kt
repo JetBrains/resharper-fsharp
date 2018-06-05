@@ -5,7 +5,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.ui.SimpleTextAttributes
 import com.jetbrains.rider.projectView.nodes.ProjectModelNode
 import com.jetbrains.rider.projectView.nodes.getUserData
-import com.jetbrains.rider.projectView.solutionExplorer.SolutionExplorerCustomization
+import com.jetbrains.rider.projectView.views.solutionExplorer.SolutionExplorerCustomization
 
 class FSharpSolutionExplorerCustomization(project: Project) : SolutionExplorerCustomization(project) {
     override fun updateNode(presentation: PresentationData, node: ProjectModelNode) {

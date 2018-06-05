@@ -3,8 +3,8 @@ import com.intellij.openapi.project.Project
 import com.jetbrains.rider.model.RdNullLocation
 import com.jetbrains.rider.model.RdProjectFileDescriptor
 import com.jetbrains.rider.model.RdProjectFolderDescriptor
-import com.jetbrains.rider.projectView.moveProviders.Impl.ActionOrderType
 import com.jetbrains.rider.plugins.fsharp.projectView.FSharpMoveProviderExtension
+import com.jetbrains.rider.projectView.moveProviders.impl.ActionOrderType
 import com.jetbrains.rider.projectView.nodes.ProjectModelNode
 import com.jetbrains.rider.projectView.nodes.ProjectModelNodeKey
 import org.testng.Assert
@@ -171,7 +171,7 @@ class FSharpMoveProviderExtensionTest {
     }
 
     private fun Project.createFolder(order: Int = 0, parent: ProjectModelNode? = null): ProjectModelNode {
-        val descriptor = RdProjectFolderDescriptor(false, false, false, order, "Folder", RdNullLocation())
+        val descriptor = RdProjectFolderDescriptor(false, false, false, false, order, "Folder", RdNullLocation())
         return ProjectModelNode(this, ProjectModelNodeKey(0), descriptor, parent)
     }
 
