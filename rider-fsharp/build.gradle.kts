@@ -57,7 +57,7 @@ intellij {
 }
 
 val repoRoot = projectDir.parentFile!!
-val resharperPluginPath = "$repoRoot/ReSharper.FSharp"
+val resharperPluginPath = File(repoRoot, "ReSharper.FSharp")
 val buildConfiguration = ext.properties["BuildConfiguration"] ?: "Debug"
 
 val libFiles = listOf(
@@ -99,7 +99,7 @@ val riderSdkPackageVersion by lazy {
 }
 
 val nugetConfigPath = File(repoRoot, "NuGet.Config")
-val directoryBuildPropsPath = File(repoRoot, "Directory.Build.props")
+val riderSdkVersionPropsPath = File(resharperPluginPath, "RiderSdkPackageVersion.props")
 
 val riderFSharpTargetsGroup = "rider-fsharp"
 
@@ -156,10 +156,10 @@ tasks {
 
     }
 
-    "writeDirectoryBuildProps" {
+    "writeRiderSdkVersionProps" {
         group = riderFSharpTargetsGroup
         doLast {
-            directoryBuildPropsPath.writeTextIfChanged("""<Project>
+            riderSdkVersionPropsPath.writeTextIfChanged("""<Project>
   <PropertyGroup>
     <RiderSDKVersion>[$riderSdkPackageVersion]</RiderSDKVersion>
   </PropertyGroup>
@@ -183,7 +183,7 @@ tasks {
 
     "prepare" {
         group = riderFSharpTargetsGroup
-        dependsOn("generateModel", "writeNuGetConfig", "writeDirectoryBuildProps")
+        dependsOn("generateModel", "writeNuGetConfig", "writeRiderSdkVersionProps")
         doLast {
             exec {
                 executable = "dotnet"
