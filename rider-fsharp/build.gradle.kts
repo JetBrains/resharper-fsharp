@@ -5,10 +5,11 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.intellij.IntelliJPlugin
 import org.jetbrains.intellij.tasks.PrepareSandboxTask
+import org.jetbrains.kotlin.daemon.common.toHexString
 
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.2.41"
-    id("org.jetbrains.intellij") version "0.3.1"
+    id("org.jetbrains.intellij") version "0.3.2"
 }
 
 repositories {
@@ -72,6 +73,45 @@ val pluginFiles = listOf(
         "Daemon.FSharp/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs",
         "Services.FSharp/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Services.Cs")
 
+val nugetPackagesPath by lazy {
+    val sdkPath = intellij.ideaDependency.classes
+
+    println("SDK path: $sdkPath")
+    val path = File(sdkPath, "lib/ReSharperHostSdk")
+
+    println("NuGet packages: $path")
+    if (!path.isDirectory) error("$path does not exist or not a directory")
+
+    return@lazy path
+}
+
+val riderSdkPackageVersion by lazy {
+    val sdkPackageName = "JetBrains.Rider.SDK"
+
+    val regex = Regex("${Regex.escape(sdkPackageName)}\\.([\\d\\.]+.*)\\.nupkg")
+    val version = nugetPackagesPath
+            .listFiles()
+            .mapNotNull { regex.matchEntire(it.name)?.groupValues?.drop(1)?.first() }
+            .singleOrNull() ?: error("$sdkPackageName package is not found in $nugetPackagesPath (or multiple matches)")
+    println("$sdkPackageName version is $version")
+
+    return@lazy version
+}
+
+val nugetConfigPath = File(repoRoot, "NuGet.Config")
+val directoryBuildPropsPath = File(repoRoot, "Directory.Build.props")
+
+val riderFSharpTargetsGroup = "rider-fsharp"
+
+fun File.writeTextIfChanged(content: String) {
+    val bytes = content.toByteArray()
+
+    if (!exists() || readBytes().toHexString() != bytes.toHexString()) {
+        println("Writing $path")
+        writeBytes(bytes)
+    }
+}
+
 tasks {
     withType<PrepareSandboxTask> {
         var files = libFiles + pluginFiles.map { "$it.dll" } + pluginFiles.map { "$it.pdb" }
@@ -116,20 +156,35 @@ tasks {
 
     }
 
-    "prepare" {
-        group = "intellij"
-        dependsOn("generateModel")
+    "writeDirectoryBuildProps" {
+        group = riderFSharpTargetsGroup
         doLast {
-            val sdkPath = intellij.ideaDependency.classes
-            println("SDK path: $sdkPath")
-            file("$repoRoot/NuGet.Config").writeText("""<?xml version="1.0" encoding="utf-8"?>
+            directoryBuildPropsPath.writeTextIfChanged("""<Project>
+  <PropertyGroup>
+    <RiderSDKVersion>[$riderSdkPackageVersion]</RiderSDKVersion>
+  </PropertyGroup>
+</Project>
+""")
+        }
+    }
+
+    "writeNuGetConfig" {
+        group = riderFSharpTargetsGroup
+        doLast {
+            nugetConfigPath.writeTextIfChanged("""<?xml version="1.0" encoding="utf-8"?>
 <configuration>
   <packageSources>
-    <add key="resharper-sdk" value="${sdkPath.relativeTo(repoRoot)}/lib/ReSharperHostSdk" />
+    <add key="resharper-sdk" value="$nugetPackagesPath" />
   </packageSources>
 </configuration>
 """)
+        }
+    }
 
+    "prepare" {
+        group = riderFSharpTargetsGroup
+        dependsOn("generateModel", "writeNuGetConfig", "writeDirectoryBuildProps")
+        doLast {
             exec {
                 executable = "dotnet"
                 args = listOf("restore", "$resharperPluginPath/ReSharper.FSharp.sln")
@@ -138,7 +193,7 @@ tasks {
     }
 
     "generateModel" {
-        group = "intellij"
+        group = riderFSharpTargetsGroup
         doLast {
             val sdkPath = intellij.ideaDependency.classes
             val rdLibDirectory = File(sdkPath, "lib/rd").canonicalFile
@@ -185,9 +240,7 @@ tasks {
             }
         }
     }
-}
 
-tasks {
     task<Wrapper>("wrapper") {
         gradleVersion = "4.7"
         distributionType = Wrapper.DistributionType.ALL
