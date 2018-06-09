@@ -46,13 +46,23 @@ type FSharpDebuggerLocalSymbolProvider() =
                                 defaultTraverse pat
                                 
                             { new AstTraversal.AstVisitorBase<_>() with
-                                member this.VisitExpr(_, traverseSynExpr, defaultTraverse, expr) = defaultTraverse expr
+                                member this.VisitExpr(_, traverseSynExpr, defaultTraverse, expr) = 
+                                    match expr with
+                                    | SynExpr.For(ident = SuitableIdent range) -> updateDeclRange range 
+                                    | SynExpr.ForEach(pat = pat) -> visitPat pat ignore
+                                    | SynExpr.App(argExpr = SynExpr.Ident (SuitableIdent range)) -> updateDeclRange range
+                                    | _ -> ()
+                                    defaultTraverse expr
+                                
                                 member this.VisitPat(defaultTraverse, pat) = visitPat pat defaultTraverse 
 
                                 member this.VisitLetOrUse(bindings, range) =
                                     bindings |> List.tryPick (fun (Binding(headPat = headPat)) ->
-                                        visitPat headPat (fun _ -> None)
+                                        visitPat headPat (fun _ -> None) 
                                     )
+                                    
+                                member this.VisitMatchClause(defaultTraverse, (Clause(pat, _, _, _, _) as clause)) = 
+                                    visitPat pat (fun _ -> None) |> Option.orElseWith (fun _ -> defaultTraverse clause) 
                             }
                         
                         AstTraversal.Traverse(pos, parseTree, visitor) |> ignore
