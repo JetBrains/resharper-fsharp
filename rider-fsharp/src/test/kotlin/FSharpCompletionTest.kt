@@ -1,6 +1,7 @@
+
 import com.jetbrains.rider.model.rdFSharpModel
 import com.jetbrains.rider.projectView.solution
-import com.jetbrains.rider.test.CompletionTestBase
+import com.jetbrains.rider.test.base.CompletionTestBase
 import com.jetbrains.rider.test.framework.frameworkLogger
 import com.jetbrains.rider.test.scriptingApi.callBasicCompletion
 import com.jetbrains.rider.test.scriptingApi.completeWithTab

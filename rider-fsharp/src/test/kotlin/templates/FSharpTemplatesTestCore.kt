@@ -4,9 +4,9 @@ import com.intellij.openapi.project.Project
 import com.jetbrains.rider.debugger.DotNetDebugRunner
 import com.jetbrains.rider.diagnostics.LogTraceScenarios
 import com.jetbrains.rider.run.mono.MonoDebugProfileState
-import com.jetbrains.rider.test.BaseTestWithSolutionBase
-import com.jetbrains.rider.test.enums.ToolsetVersion
 import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.base.BaseTestWithSolutionBase
+import com.jetbrains.rider.test.enums.ToolsetVersion
 import com.jetbrains.rider.test.framework.*
 import com.jetbrains.rider.test.scriptingApi.*
 import org.testng.annotations.AfterClass
