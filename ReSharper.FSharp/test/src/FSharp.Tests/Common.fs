@@ -1,10 +1,11 @@
-﻿namespace JetBrains.ReSharper.Plugins.FSharp.Tests
+namespace JetBrains.ReSharper.Plugins.FSharp.Tests
 
 open System
 open JetBrains.Application.Components
 open JetBrains.Application.platforms
 open JetBrains.DataFlow
 open JetBrains.ProjectModel
+open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.TestFramework
@@ -29,7 +30,7 @@ type FSharpTestAttribute() =
 type FSharpTestProjectOptionsProvider(lifetime: Lifetime, checkerService: FSharpCheckerService) as this =
     do
         checkerService.OptionsProvider <- this
-        lifetime.AddAction(fun _ -> checkerService.OptionsProvider <- null) |> ignore
+        lifetime.AddAction(fun _ -> checkerService.OptionsProvider <- Unchecked.defaultof<_>) |> ignore
 
     let getPath (sourceFile: IPsiSourceFile) = sourceFile.GetLocation().FullPath
 
@@ -49,6 +50,23 @@ type FSharpTestProjectOptionsProvider(lifetime: Lifetime, checkerService: FSharp
     interface IHideImplementation<FSharpProjectOptionsProvider>
     
     interface IFSharpProjectOptionsProvider with
-        member x.GetProjectOptions(file) = getProjectOptions (getPath file) [||] |> Some
-        member x.GetParsingOptions(file) = { FSharpParsingOptions.Default with SourceFiles = [| getPath file |] }
         member x.HasPairFile(file) = false
+        member x.GetProjectOptions(file) =
+            let path = getPath file
+            let projectOptions = getProjectOptions path [||] 
+            Some projectOptions
+
+        member x.GetParsingOptions(file) =
+            let isExe =
+                match file.GetProject() with
+                | null -> false
+                | project ->
+
+                match project.ProjectProperties.BuildSettings with
+                | :? IManagedProjectBuildSettings as buildSettings ->
+                    buildSettings.OutputType = ProjectOutputType.CONSOLE_EXE
+                | _ -> false
+
+            { FSharpParsingOptions.Default with
+                SourceFiles = [| getPath file |]
+                IsExe = isExe }

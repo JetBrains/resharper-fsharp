@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Actions
+namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Actions
 
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework

@@ -1,4 +1,4 @@
-﻿namespace rec JetBrains.ReSharper.Plugins.FSharp.Common.Checker
+namespace rec JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 
 open System
 open JetBrains
@@ -24,7 +24,7 @@ type FSharpCheckerService(lifetime, logger: ILogger, onSolutionCloseNotifier: On
     do
         onSolutionCloseNotifier.SolutionIsAboutToClose.Advise(lifetime, fun _ -> checker.Value.InvalidateAll())
 
-    member val OptionsProvider: IFSharpProjectOptionsProvider = null with get, set
+    member val OptionsProvider: IFSharpProjectOptionsProvider = Unchecked.defaultof<_> with get, set
     member x.Checker = checker.Value
 
     member x.ParseFile([<NotNull>] file: IPsiSourceFile) =
@@ -79,7 +79,6 @@ type FSharpParseAndCheckResults =
       CheckResults: FSharpCheckFileResults }
 
 
-[<AllowNullLiteral>]
 type IFSharpProjectOptionsProvider =
     abstract member GetProjectOptions: IPsiSourceFile -> FSharpProjectOptions option
     abstract member GetParsingOptions: IPsiSourceFile -> FSharpParsingOptions

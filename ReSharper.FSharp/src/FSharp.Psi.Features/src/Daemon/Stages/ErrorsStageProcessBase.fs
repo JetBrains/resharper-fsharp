@@ -14,7 +14,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
-[<AbstractClass; AllowNullLiteral>]
+[<AbstractClass>]
 type ErrorsStageProcessBase(daemonProcess) =
     inherit FSharpDaemonStageProcessBase(daemonProcess)
 
@@ -43,20 +43,20 @@ type ErrorsStageProcessBase(daemonProcess) =
         | FSharpErrorSeverity.Warning, _ -> WarningHighlighting(message, range) :> _
         | _ -> ErrorHighlighting(message, range) :> _
 
-    abstract ShouldAddDiagnostic: error: FSharpErrorInfo -> bool
-    default x.ShouldAddDiagnostic(error: FSharpErrorInfo) =
+    abstract ShouldAddDiagnostic: error: FSharpErrorInfo * range: DocumentRange -> bool
+    default x.ShouldAddDiagnostic(error: FSharpErrorInfo, range: DocumentRange) =
         error.ErrorNumber <> ErrorNumberUnrecognizedOption
 
     member x.Execute(errors: FSharpErrorInfo[], committer: Action<DaemonStageResult>) =
-        let highlightings = List(errors.Length)
+        let highlightings = LocalList(errors.Length)
         let errors =
             errors
             |> Array.map (fun error -> error, getDocumentRange error)
             |> Array.distinctBy (fun (error, range) -> error.Message, range)
 
         for error, range in errors  do
-            if x.ShouldAddDiagnostic(error) then
+            if x.ShouldAddDiagnostic(error, range) then
                 highlightings.Add(HighlightingInfo(range, createHighlighting(error, range)))
             x.SeldomInterruptChecker.CheckForInterrupt()
 
-        committer.Invoke(DaemonStageResult(highlightings))
+        committer.Invoke(DaemonStageResult(highlightings.ReadOnlyList()))

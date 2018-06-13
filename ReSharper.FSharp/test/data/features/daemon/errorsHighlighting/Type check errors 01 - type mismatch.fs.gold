@@ -1,0 +1,7 @@
+﻿module Module
+
+let x = 1 |+|(0) |1.0|(1)
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: The type 'float' does not match the type 'int'
+(1): ReSharper Underlined Error Highlighting: The type 'float' does not match the type 'int'

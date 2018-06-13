@@ -5,16 +5,14 @@ open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.Util
+open Microsoft.FSharp.Compiler.ErrorLogger
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
-[<AllowNullLiteral>]
 type TypeCheckErrorsStageProcess(fsFile: IFSharpFile, daemonProcess, logger: ILogger) =
     inherit ErrorsStageProcessBase(daemonProcess)
 
-    let syntaxErrorNumber = 597
-
-    override x.ShouldAddDiagnostic(error) =
-        base.ShouldAddDiagnostic(error) && error.ErrorNumber <> 597
+    override x.ShouldAddDiagnostic(error, range) =
+        base.ShouldAddDiagnostic(error, range) && error.Subcategory <> BuildPhaseSubcategory.Parse
 
     override x.Execute(committer) =
         match fsFile.GetParseAndCheckResults(false) with

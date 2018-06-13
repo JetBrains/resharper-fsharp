@@ -27,7 +27,7 @@ type FSharpProjectProperties =
           targetPlatformData = targetPlatformData }
 
     override x.BuildSettings = x.buildSettings :> _
-    override x.DefaultLanguage = FSharpProjectLanguage.Instance :> _
+    override x.DefaultLanguage = FSharpProjectLanguage.Instance
 
     override x.ReadProjectProperties(reader) =
         base.ReadProjectProperties(reader)

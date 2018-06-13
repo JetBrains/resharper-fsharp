@@ -16,7 +16,6 @@ module rec CommonUtil =
     open JetBrains.ProjectModel.Properties.CSharp
     open JetBrains.ProjectModel.Properties.Managed
     open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
-    open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties.FSharpProjectPropertiesFactory
     open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
     open JetBrains.ReSharper.Psi.Modules
     open JetBrains.Util
@@ -36,7 +35,7 @@ module rec CommonUtil =
 
     let isFSharpProject (guids: Guid seq) (projectFile: FileSystemPath) =
         equalsIgnoreCase FsprojExtension projectFile.ExtensionNoDot ||
-        Seq.exists Factory.IsKnownProjectTypeGuid guids
+        Seq.exists FSharpProjectPropertiesFactory.IsKnownProjectTypeGuid guids
 
     let (|FSharProjectMark|_|) (mark: IProjectMark) =
         if isFSharpProject [mark.Guid] mark.Location then Some() else None

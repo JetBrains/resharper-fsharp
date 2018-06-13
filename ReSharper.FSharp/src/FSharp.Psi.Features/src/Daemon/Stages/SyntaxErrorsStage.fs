@@ -4,7 +4,6 @@ open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
-[<AllowNullLiteral>]
 type SyntaxErrorsStageProcess(fsFile: IFSharpFile, daemonProcess) =
     inherit ErrorsStageProcessBase(daemonProcess)
 

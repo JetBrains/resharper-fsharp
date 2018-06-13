@@ -1,4 +1,4 @@
-﻿namespace rec JetBrains.ReSharper.Plugins.FSharp.Common.Checker
+namespace rec JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 
 open System
 open System.Collections.Generic
@@ -61,7 +61,7 @@ type FSharpProjectOptionsProvider
     do
         changeManager.Changed2.Advise(lifetime, this.ProcessChange)
         checkerService.OptionsProvider <- this
-        lifetime.AddAction(fun _ -> checkerService.OptionsProvider <- null) |> ignore
+        lifetime.AddAction(fun _ -> checkerService.OptionsProvider <- Unchecked.defaultof<_>) |> ignore
 
     let tryGetFSharpProject (project: IProject) (targetFrameworkId: TargetFrameworkId) =
         use lock = locker.UsingReadLock()

@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Tests
+namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open JetBrains.Application.BuildScript.Application.Zones
 open JetBrains.Application.Environment
