@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 using JetBrains.Application.Threading;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Highlightings;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 using Microsoft.FSharp.Core;
 

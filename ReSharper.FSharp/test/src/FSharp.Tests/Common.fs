@@ -36,6 +36,7 @@ type FSharpTestProjectOptionsProvider(lifetime: Lifetime, checkerService: FSharp
 
     let getProjectOptions fileName references =
         { ProjectFileName = fileName + ".fsproj"
+          ProjectId = None
           SourceFiles = [| fileName |]
           OtherOptions = Array.map ((+) "-r:") references
           ReferencedProjects = Array.empty

@@ -1,0 +1,2 @@
+﻿0000: COMMENT '(*\r\n  "foo"\r\n"bar\r\n "\r\n *)'
+0026: NEW_LINE '\r\n'

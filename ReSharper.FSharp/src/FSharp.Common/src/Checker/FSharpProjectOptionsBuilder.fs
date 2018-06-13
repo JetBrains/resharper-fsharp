@@ -160,6 +160,7 @@ type FSharpProjectOptionsBuilder
 
         let projectOptions =
             { ProjectFileName = sprintf "%O.%O.fsproj" project.ProjectFileLocation targetFrameworkId
+              ProjectId = None
               SourceFiles = Array.map (fun (p: FileSystemPath ) -> p.FullPath) filePaths
               OtherOptions = options.ToArray()
               ReferencedProjects = Array.empty

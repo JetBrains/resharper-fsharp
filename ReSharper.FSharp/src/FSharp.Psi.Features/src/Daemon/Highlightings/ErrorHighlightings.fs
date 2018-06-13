@@ -6,7 +6,7 @@ open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Daemon
 
 [<AbstractClass>]
-type ErrorOrWarningHighlightingBase(message, range: DocumentRange) = 
+type FSharpErrorHighlightingBase(message, range: DocumentRange) = 
     interface IHighlighting with
         member x.ToolTip = message
         member x.ErrorStripeToolTip = message
@@ -18,27 +18,27 @@ type ErrorOrWarningHighlightingBase(message, range: DocumentRange) =
                              AttributeId = HighlightingAttributeIds.ERROR_ATTRIBUTE, 
                              OverlapResolve = OverlapResolveKind.NONE)>]
 type ErrorHighlighting(message, range) = 
-    inherit ErrorOrWarningHighlightingBase(message, range)
+    inherit FSharpErrorHighlightingBase(message, range)
 
 
 [<StaticSeverityHighlighting(Severity.WARNING, HighlightingGroupIds.IdentifierHighlightingsGroup, 
                              AttributeId = HighlightingAttributeIds.WARNING_ATTRIBUTE, 
                              OverlapResolve = OverlapResolveKind.NONE)>]
 type WarningHighlighting(message, range) = 
-    inherit ErrorOrWarningHighlightingBase(message, range)
+    inherit FSharpErrorHighlightingBase(message, range)
 
 
 [<StaticSeverityHighlighting(Severity.ERROR, HighlightingGroupIds.IdentifierHighlightingsGroup, 
                              AttributeId = HighlightingAttributeIds.UNRESOLVED_ERROR_ATTRIBUTE, 
                              OverlapResolve = OverlapResolveKind.NONE)>]
 type UnresolvedHighlighting(message, range) = 
-    inherit ErrorOrWarningHighlightingBase(message, range)
+    inherit FSharpErrorHighlightingBase(message, range)
 
 [<StaticSeverityHighlighting(Severity.WARNING, HighlightingGroupIds.IdentifierHighlightingsGroup, 
                              AttributeId = HighlightingAttributeIds.DEADCODE_ATTRIBUTE, 
                              OverlapResolve = OverlapResolveKind.NONE)>]
 type UnusedHighlighting(message, range) = 
-    inherit ErrorOrWarningHighlightingBase(message, range)
+    inherit FSharpErrorHighlightingBase(message, range)
 
 [<StaticSeverityHighlighting(Severity.INFO, HighlightingGroupIds.IdentifierHighlightingsGroup,
                              AttributeId = HighlightingAttributeIds.DEADCODE_ATTRIBUTE,

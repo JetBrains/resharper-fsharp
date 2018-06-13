@@ -1,8 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
-open JetBrains.Application
 open System
-open JetBrains.Application.Progress
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
@@ -12,41 +10,20 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
 open JetBrains.ReSharper.Psi
-open JetBrains.UI.RichText
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
 type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolved) =
-
-    let getKindPriority = function
-        | CompletionItemKind.Property
-        | CompletionItemKind.Field -> CLRLookupItemRelevance.FieldsAndProperties
-        | CompletionItemKind.Method (isExtension = false) -> CLRLookupItemRelevance.Methods
-        | CompletionItemKind.Method _ -> CLRLookupItemRelevance.ExtensionMethods
-        | CompletionItemKind.Event -> CLRLookupItemRelevance.Events
-        | CompletionItemKind.Argument -> CLRLookupItemRelevance.NamedArguments
-        | CompletionItemKind.Other -> Unchecked.defaultof<CLRLookupItemRelevance>
-
-    let getAdditionalPriority kind isOwnMember =
-        match kind, isOwnMember with
-        | CompletionItemKind.Other, _
-        | CompletionItemKind.Argument, _ -> Unchecked.defaultof<CLRLookupItemRelevance>
-        | _, true -> CLRLookupItemRelevance.MemberOfCurrentType
-        | _ -> CLRLookupItemRelevance.MemberOfBaseType
-
     member x.GetDefaultRanges(context: ISpecificCodeCompletionContext) =
         context |> function | :? FSharpCodeCompletionContext as context -> context.Ranges | _ -> null
 
     member x.IsAvailable(context: ISpecificCodeCompletionContext) =
         context |> function | :? FSharpCodeCompletionContext -> obj() | _ -> null
-
-    member x.GetAutocompletionBehaviour() = AutocompletionBehaviour.NoRecommendation
 
     member x.AddLookupItems(context: FSharpCodeCompletionContext, collector: IItemsCollector) =
         match context.FsCompletionContext with
@@ -73,30 +50,22 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
 
                 let getAllSymbols () = getAllSymbols checkResults 
                 try
-                    let completions =
+                    let completionInfo =
                         checkResults
                             .GetDeclarationListInfo(parseResults, line, lineText, context.PartialLongName,
-                                                    getAllSymbols, getIconId, true, filterResolved).RunAsTask().Items
+                                                    getAllSymbols, filterResolved).RunAsTask()
 
-                    if Array.isEmpty completions then false else
+                    let completionItems = completionInfo.Items
+                    if completionItems.IsEmpty() then false else
 
                     let xmlDocService = basicContext.Solution.GetComponent<FSharpXmlDocService>()
-                    for item in completions do
+                    for item in completionItems do
                         let (lookupItem: TextLookupItemBase) =
                             if item.Glyph = FSharpGlyph.Error
                             then FSharpErrorLookupItem(item) :> _
-                            else FSharpLookupItem(item, context, xmlDocService) :> _
+                            else FSharpLookupItem(item, context, completionInfo.DisplayContext, xmlDocService) :> _
 
                         lookupItem.InitializeRanges(context.Ranges, basicContext)
-                        lookupItem.DisplayTypeName <-
-                            match item.AdditionalInfo with
-                            | Some info -> RichText(info.ReturnType)
-                            | _ -> null
-
-                        lookupItem.Placement.Relevance <-
-                            (getKindPriority item.Kind |> int64) +
-                            (getAdditionalPriority item.Kind item.IsOwnMember |> int64) 
-
                         collector.Add(lookupItem)
                     true
                 with
@@ -114,7 +83,10 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpLookupItemsProvider(logger: ILogger) =
     inherit FSharpLookupItemsProviderBase(logger, (fun checkResults ->
-        AssemblyContentProvider.getAssemblySignatureContent AssemblyContentType.Full checkResults.PartialAssemblySignature), false)
+        let assemblySignature = checkResults.PartialAssemblySignature
+        let getSymbolsAsync = async {
+            return AssemblyContentProvider.getAssemblySignatureContent AssemblyContentType.Full assemblySignature }
+        getSymbolsAsync.RunAsTask()), false)
 
     interface ICodeCompletionItemsProvider with
         member x.IsAvailable(context) = base.IsAvailable(context)

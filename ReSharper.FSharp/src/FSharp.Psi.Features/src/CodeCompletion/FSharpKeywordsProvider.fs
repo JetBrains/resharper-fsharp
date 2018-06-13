@@ -55,13 +55,13 @@ type FSharpKeywordsProvider() =
         | tokenBefore ->
 
         match context.FsCompletionContext, tokenBefore.GetTokenType() with
-        | Some (CompletionContext.Invalid), tokenBeforeType when tokenBeforeType <> FSharpTokenType.HASH -> false
+        | Some (CompletionContext.Invalid), tokenBeforeType when tokenBeforeType != FSharpTokenType.HASH -> false
         | _, tokenBeforeType ->
 
-        if tokenBeforeType = FSharpTokenType.LINE_COMMENT ||
-           tokenBeforeType = FSharpTokenType.DEAD_CODE ||
-           tokenBeforeType = FSharpTokenType.DOT ||
-           tokenBefore = context.TokenAtCaret && isNotNull tokenBeforeType &&
+        if tokenBeforeType == FSharpTokenType.LINE_COMMENT ||
+           tokenBeforeType == FSharpTokenType.DEAD_CODE ||
+           tokenBeforeType == FSharpTokenType.DOT ||
+           tokenBefore == context.TokenAtCaret && isNotNull tokenBeforeType &&
                (tokenBeforeType.IsComment || tokenBeforeType.IsStringLiteral || tokenBeforeType.IsConstantLiteral)
         then false else
 
@@ -100,13 +100,6 @@ type FSharpKeywordLookupItemBase(keyword, keywordSuffix) =
 
 type FSharpKeywordLookupItem(keyword, description, suffix) =
     inherit FSharpKeywordLookupItemBase(keyword, suffix)
-
-    do
-        base.Placement.Relevance <-
-            // todo: implement reparse contexts for keyword filtering
-            if keyword.EndsWith("!", StringComparison.Ordinal) then
-                int64 CLRLookupItemRelevance.Keywords
-            else int64 CLRLookupItemRelevance.Keywords <<< 1
 
     interface IDescriptionProvidingLookupItem with
         member x.GetDescription() = RichTextBlock(description)

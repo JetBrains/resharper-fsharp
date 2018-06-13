@@ -1,7 +1,6 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
 open System
-open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems.Impl
 open JetBrains.ReSharper.Feature.Services.Lookup
@@ -10,7 +9,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
-open JetBrains.Text
 open JetBrains.UI.Icons
 open JetBrains.UI.RichText
 open JetBrains.Util
@@ -32,7 +30,7 @@ type FSharpLookupCandidate(description: string, xmlDoc: FSharpXmlDoc, xmlDocServ
         member val IsFilteredOut = false with get, set
 
 
-type FSharpErrorLookupItem(item: FSharpDeclarationListItem<FSharpLookupAdditionalInfo>) =
+type FSharpErrorLookupItem(item: FSharpDeclarationListItem) =
     inherit TextLookupItemBase()
 
     override x.Image = null
@@ -49,7 +47,7 @@ type FSharpErrorLookupItem(item: FSharpDeclarationListItem<FSharpLookupAdditiona
 
 
 type FSharpLookupItem
-        (item: FSharpDeclarationListItem<FSharpLookupAdditionalInfo>, context: FSharpCodeCompletionContext,
+        (item: FSharpDeclarationListItem, context: FSharpCodeCompletionContext, displayContext: FSharpDisplayContext,
          xmlDocService: FSharpXmlDocService) =
     inherit TextLookupItemBase()
 
@@ -74,11 +72,19 @@ type FSharpLookupItem
         | candidates -> candidates :?> _
 
     override x.Image =
-        match item.AdditionalInfo with
-        | Some info -> info.Icon
-        | _ -> null
+        try getIconId item.FSharpSymbol
+        with _ -> null
 
     override x.Text = item.NameInCode
+
+    override x.DisplayTypeName =
+        try
+            match getReturnType item.FSharpSymbol with
+            | Some t -> RichText(t.Format(displayContext))
+            | _ -> null
+        with _ -> null
+
+    override x.DisableFormatter = true
 
     override x.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret) =
         base.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret)
@@ -86,39 +92,36 @@ type FSharpLookupItem
         // todo: move it to a separate type (and reuse in open namespace Quick Fix)
         if item.NamespaceToOpen.IsSome then
             let line = int context.Coords.Line + 1
-            let fullName = item.FullName.Split('.')
             let parseTree = (context.BasicContext.File :?> IFSharpFile).ParseResults.Value.ParseTree.Value
             let insertionPoint = OpenStatementInsertionPoint.Nearest
 
-            match ParsedInput.tryFindNearestPointToInsertOpenDeclaration line parseTree fullName insertionPoint with
-            | Some context ->
-                let document = textControl.Document
-                let getLineText = fun lineNumber -> document.GetLineText(docLine lineNumber)
-                let pos = context |> ParsedInput.adjustInsertionPoint getLineText
+            let context = ParsedInput.findNearestPointToInsertOpenDeclaration line parseTree [||] insertionPoint
+            let document = textControl.Document
+            let getLineText = fun lineNumber -> document.GetLineText(docLine lineNumber)
+            let pos = context |> ParsedInput.adjustInsertionPoint getLineText
 
-                let isSystem = item.NamespaceToOpen.Value.StartsWith("System.")
-                let openPrefix = String(' ', pos.Column) + "open "
-                let textToInsert = openPrefix + item.NamespaceToOpen.Value
+            let isSystem = item.NamespaceToOpen.Value.StartsWith("System.")
+            let openPrefix = String(' ', pos.Column) + "open "
+            let textToInsert = openPrefix + item.NamespaceToOpen.Value
 
-                let line = pos.Line - 1 |> max 0
-                let lineToInsert =
-                    seq { line - 1 .. -1 .. 0 }
-                    |> Seq.takeWhile (fun i ->
-                        let lineText = document.GetLineText(docLine i)
-                        lineText.StartsWith(openPrefix) &&
-                        (textToInsert < lineText || isSystem && not (lineText.StartsWith("open System")))) // todo: System<smth> namespaces
-                    |> Seq.tryLast
-                    |> Option.defaultValue line
+            let line = pos.Line - 1 |> max 0
+            let lineToInsert =
+                seq { line - 1 .. -1 .. 0 }
+                |> Seq.takeWhile (fun i ->
+                    let lineText = document.GetLineText(docLine i)
+                    lineText.StartsWith(openPrefix) &&
+                    (textToInsert < lineText || isSystem && not (lineText.StartsWith("open System")))) // todo: System<smth> namespaces
+                |> Seq.tryLast
+                |> Option.defaultValue line
 
-                // add empty line after all open expressions if needed
-                let insertEmptyLine = not (document.GetLineText(docLine line).IsNullOrWhitespace())
+            // add empty line after all open expressions if needed
+            let insertEmptyLine = not (document.GetLineText(docLine line).IsNullOrWhitespace())
 
-                let prevLineEndOffset =
-                    if lineToInsert > 0 then document.GetLineEndOffsetWithLineBreak(docLine (max 0 (lineToInsert - 1)))
-                    else 0
+            let prevLineEndOffset =
+                if lineToInsert > 0 then document.GetLineEndOffsetWithLineBreak(docLine (max 0 (lineToInsert - 1)))
+                else 0
 
-                document.InsertText(prevLineEndOffset, textToInsert + "\n" + (if insertEmptyLine then "\n" else ""))
-            | _ -> ()
+            document.InsertText(prevLineEndOffset, textToInsert + "\n" + (if insertEmptyLine then "\n" else ""))
 
     override x.GetDisplayName() =
         let name = LookupUtil.FormatLookupString(item.Name, x.TextColor)

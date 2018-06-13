@@ -1,22 +1,25 @@
-﻿using JetBrains.Annotations;
-using JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
-using JetBrains.ReSharper.Psi;
+﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Text;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   public class FSharpIdentifierToken : FSharpToken, IIdentifier
   {
-    public FSharpIdentifierToken(NodeType nodeType, [NotNull] IBuffer buffer, TreeOffset startOffset,
-      TreeOffset endOffset) : base(nodeType, buffer, startOffset, endOffset)
+    private FSharpSymbolReference mySymbolReference;
+
+    public FSharpIdentifierToken(NodeType nodeType, string text) : base(nodeType, text)
     {
     }
 
+    protected override void PreInit()
+    {
+      base.PreInit();
+      mySymbolReference = new FSharpSymbolReference(this);
+    }
+
     public override ReferenceCollection GetFirstClassReferences() =>
-      new ReferenceCollection(new FSharpSymbolReference(this));
+      new ReferenceCollection(mySymbolReference);
 
     public string Name => GetText().RemoveBackticks();
   }

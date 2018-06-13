@@ -2,52 +2,142 @@
     <TokenTypeClass>FSharpTokenType</TokenTypeClass>
     <TokenTypeNamespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing</TokenTypeNamespace>
 
+    <Tokens NodeType="FixedTokenNodeType" TokenElement="FixedTokenNodeElement">
+        <Token name="ABSTRACT" representation="abstract" />
+        <Token name="AND" representation="and" />
+        <Token name="AS" representation="as" />
+        <Token name="ASR" representation="asr" />
+        <Token name="ASSERT" representation="assert" />
+        <Token name="BASE" representation="base" />
+        <Token name="BEGIN" representation="begin" />
+        <Token name="CLASS" representation="class" />
+        <Token name="CONST" representation="const" />
+        <Token name="DEFAULT" representation="default" />
+        <Token name="DELEGATE" representation="delegate" />
+        <Token name="DO" representation="do" />
+        <Token name="DO_BANG" representation="do!" />
+        <Token name="DONE" representation="done" />
+        <Token name="DOWNCAST" representation="downcast" />
+        <Token name="DOWNTO" representation="downto" />
+        <Token name="ELIF" representation="elif" />
+        <Token name="ELSE" representation="else" />
+        <Token name="END" representation="end" />
+        <Token name="EXCEPTION" representation="exception" />
+        <Token name="EXTERN" representation="extern" />
+        <Token name="FALSE" representation="false" />
+        <Token name="FINALLY" representation="finally" />
+        <Token name="FIXED" representation="fixed" />
+        <Token name="FOR" representation="for" />
+        <Token name="FUN" representation="fun" />
+        <Token name="FUNCTION" representation="function" />
+        <Token name="GLOBAL" representation="global" />
+        <Token name="IF" representation="if" />
+        <Token name="IN" representation="in" />
+        <Token name="INHERIT" representation="inherit" />
+        <Token name="INLINE" representation="inline" />
+        <Token name="INTERFACE" representation="interface" />
+        <Token name="INTERNAL" representation="internal" />
+        <Token name="LAZY" representation="lazy" />
+        <Token name="LET" representation="let" /> <!--check-->
+        <Token name="LET_BANG" representation="let!" /> <!--check-->
+        <Token name="MATCH" representation="match" />
+        <Token name="MATCH_BANG" representation="match!" />
+        <Token name="MEMBER" representation="member" />
+        <Token name="MODULE" representation="module" />
+        <Token name="MUTABLE" representation="mutable" />
+        <Token name="NAMESPACE" representation="namespace" />
+        <Token name="NEW" representation="new" />
+        <Token name="NULL" representation="null" />
+        <Token name="OF" representation="of" />
+        <Token name="OPEN" representation="open" />
+        <Token name="OR" representation="or" />
+        <Token name="OVERRIDE" representation="override" />
+        <Token name="PRIVATE" representation="private" />
+        <Token name="PUBLIC" representation="public" />
+        <Token name="REC" representation="rec" />
+        <Token name="RETURN" representation="return" /> <!--check-->
+        <Token name="RETURN_BANG" representation="return!" /> <!--check-->
+        <Token name="SIG" representation="sig" />
+        <Token name="STATIC" representation="static" />
+        <Token name="STRUCT" representation="struct" />
+        <Token name="THEN" representation="then" />
+        <Token name="TO" representation="to" />
+        <Token name="TRUE" representation="true" />
+        <Token name="TRY" representation="try" />
+        <Token name="TYPE" representation="type" />
+        <Token name="UPCAST" representation="upcast" />
+        <Token name="USE" representation="use" /> <!--check-->
+        <Token name="USE_BANG" representation="use!" /> <!--check-->
+        <Token name="VAL" representation="val" />
+        <Token name="VOID" representation="void" />
+        <Token name="WHEN" representation="when" />
+        <Token name="WHILE" representation="while" />
+        <Token name="WITH" representation="with" />
+        <Token name="YIELD" representation="yield" /> <!--check-->
+        <Token name="UNDERSCORE" representation="_" />
+
+        <Token name="GREATER" representation=">" />
+        <Token name="LESS" representation="&lt;" />
+
+        <Token name="LPAREN" representation="(" />
+        <Token name="RPAREN" representation=")" />
+        <Token name="LBRACE" representation="{" />
+        <Token name="RBRACE" representation="}" />
+        <Token name="LBRACK" representation="[" />
+        <Token name="RBRACK" representation="]" />
+
+        <Token name="LBRACK_LESS" representation="[&lt;" />
+        <Token name="GREATER_RBRACK" representation=">]" />
+        <Token name="LBRACK_BAR" representation="[|" />
+        <Token name="BAR_RBRACK" representation="|]" />
+
+        <Token name="LQUOTE_UNTYPED" representation="&lt;@@" />
+        <Token name="RQUOTE_UNTYPED" representation="@@>" />
+        <Token name="LQUOTE_TYPED" representation="&lt;@" />
+        <Token name="RQUOTE_TYPED" representation="@>" />
+        
+        <Token name="AMP" representation="&amp;" />
+        <Token name="AMP_AMP" representation="&amp;&amp;" />
+        <Token name="BAR" representation="|" />
+        <Token name="BAR_BAR" representation="||" />
+        <Token name="STAR" representation="*" />
+        <Token name="COMMA" representation="," />
+        <Token name="RARROW" representation="->" />
+        <Token name="DOT_DOT" representation=".." />
+        <Token name="DOT" representation="." />
+        <Token name="COLON" representation=":" />
+        <Token name="COLON_COLON" representation="::" />
+        <Token name="COLON_GREATER" representation=":>" />
+        <Token name="COLON_QMARK_GREATER" representation=":?>" />
+        <Token name="COLON_QMARK" representation=":?" />
+        <Token name="COLON_EQUALS" representation=":=" />
+        <Token name="SEMICOLON" representation=";" />
+        <Token name="LARROW" representation="&lt;-" />
+        <Token name="EQUALS" representation="=" />
+        <Token name="DOLLAR" representation="$" />
+        <Token name="MINUS" representation="-" />
+
+        <Token name="PLUS" representation="+" />
+    </Tokens>
+
     <Tokens NodeType="FSharpTokenNodeType">
-        <Token name="PUBLIC"/>
-        <Token name="PRIVATE"/>
-        <Token name="INTERNAL"/>
-        <Token name="NAMESPACE"/>
-        <Token name="MODULE"/>
-        <Token name="NEW"/>
-        <Token name="TYPE"/>
-        <Token name="OPEN"/>
-        <Token name="OTHER_KEYWORD"/>
-
-        <Token name="IDENTIFIER"/>
-        <Token name="LITERAL"/>
-        <Token name="STRING"/>
-        <Token name="OPERATOR"/>
-        <Token name="COMMENT"/>
-        <Token name="LINE_COMMENT"/>
+        <Token name="IDENTIFIER" />
+        <Token name="LITERAL" />
+        <Token name="OPERATOR" />
+        <Token name="COMMENT" />
+        <Token name="LINE_COMMENT" />
         <Token name="HASH" />
-        <Token name="TEXT"/>
-        <Token name="DEAD_CODE"/>
+        <Token name="TEXT" />
+        <Token name="DEAD_CODE" />
 
-        <Token name="LPAREN"/>
-        <Token name="RPAREN"/>
-        <Token name="LBRACE"/>
-        <Token name="RBRACE"/>
-        <Token name="LBRACK"/>
-        <Token name="RBRACK"/>
-
-        <Token name="LBRACK_LESS"/>
-        <Token name="GREATER_RBRACK"/>
-        <Token name="LBRACK_BAR"/>
-        <Token name="BAR_RBRACK"/>
-
-        <Token name="GREATER"/>
-        <Token name="LESS"/>
-
-        <Token name="LQUOTE"/>
-        <Token name="RQUOTE"/>
-        <Token name="LQUOTE_TYPED"/>
-        <Token name="RQUOTE_TYPED"/>
-
-
-        <Token name="DOT"/>
-        <Token name="BAR"/>
+        <Token name="CHAR" />
+        <Token name="STRING" />
+        <Token name="VERBATIM_STRING" />
+        <Token name="TRIPLE_QUOTE_STRING" />
+        <Token name="BYTEARRAY" />
 
         <!-- Used in FsharpFakeLexer and as a separator in psi grammar -->
-        <Token name="FAKE"/>
+        <Token name="OTHER_KEYWORD" />
+        <Token name="FAKE" />
     </Tokens>
 </FSharpTokens>

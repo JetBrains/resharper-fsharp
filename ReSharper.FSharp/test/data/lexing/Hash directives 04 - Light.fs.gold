@@ -1,0 +1,7 @@
+﻿0000: OTHER_KEYWORD '#light "off"'
+0012: NEW_LINE '\r\n'
+0014: OTHER_KEYWORD '#light "on"'
+0025: NEW_LINE '\r\n'
+0027: OTHER_KEYWORD '#light '
+0034: STRING '"foo"'
+0039: NEW_LINE '\r\n'

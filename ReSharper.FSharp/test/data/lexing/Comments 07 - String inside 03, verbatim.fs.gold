@@ -1,0 +1,2 @@
+﻿0000: COMMENT '(*\r\n  @"qwerty"\r\n\r\n  @"foo\\r\nbar"\r\n *)'
+0038: NEW_LINE '\r\n'

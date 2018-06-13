@@ -35,19 +35,20 @@ type ErrorsStageProcessBase(daemonProcess) =
             let endOffset = document.GetDocumentOffset(error.EndLineAlternate - 1, error.EndColumn)
             DocumentRange(document, TextRange(startOffset, endOffset))
 
-    let createHighlighting(error: FSharpErrorInfo, range: DocumentRange): IHighlighting =
-        let message = error.Message
-        match error.Severity, error.ErrorNumber with
-        | _, ErrorNumberUndefined -> UnresolvedHighlighting(message, range) :> _
-        | _, ErrorNumberUnused -> UnusedHighlighting(message, range) :> _
-        | FSharpErrorSeverity.Warning, _ -> WarningHighlighting(message, range) :> _
-        | _ -> ErrorHighlighting(message, range) :> _
-
     abstract ShouldAddDiagnostic: error: FSharpErrorInfo * range: DocumentRange -> bool
     default x.ShouldAddDiagnostic(error: FSharpErrorInfo, range: DocumentRange) =
         error.ErrorNumber <> ErrorNumberUnrecognizedOption
 
     member x.Execute(errors: FSharpErrorInfo[], committer: Action<DaemonStageResult>) =
+        let createHighlighting (error: FSharpErrorInfo) (range: DocumentRange): IHighlighting =
+            let message = error.Message
+
+            match error.Severity, error.ErrorNumber with
+            | _, ErrorNumberUndefined -> UnresolvedHighlighting(message, range) :> _
+            | _, ErrorNumberUnused -> UnusedHighlighting(message, range) :> _
+            | FSharpErrorSeverity.Warning, _ -> WarningHighlighting(message, range) :> _
+            | _ -> ErrorHighlighting(message, range) :> _
+
         let highlightings = LocalList(errors.Length)
         let errors =
             errors
@@ -56,7 +57,7 @@ type ErrorsStageProcessBase(daemonProcess) =
 
         for error, range in errors  do
             if x.ShouldAddDiagnostic(error, range) then
-                highlightings.Add(HighlightingInfo(range, createHighlighting(error, range)))
+                highlightings.Add(HighlightingInfo(range, createHighlighting error range))
             x.SeldomInterruptChecker.CheckForInterrupt()
 
         committer.Invoke(DaemonStageResult(highlightings.ReadOnlyList()))

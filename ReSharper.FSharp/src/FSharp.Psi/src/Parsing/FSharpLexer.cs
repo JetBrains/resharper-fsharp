@@ -5,6 +5,7 @@ using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.Text;
 using JetBrains.Util.dataStructures.TypedIntrinsics;
 using Microsoft.FSharp.Collections;
+using Microsoft.FSharp.Compiler;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Core;
 
@@ -20,9 +21,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     private readonly FSharpSourceTokenizer mySourceTokenizer;
 
     private FSharpLineTokenizer myLineTokenizer;
-    private Int32<DocLine> myLineIndex = Int32<DocLine>.O;
+    private Int32<DocLine> myLineIndex = (Int32<DocLine>) (-1);
     private int myLineStartOffset;
-    private Tuple<FSharpOption<FSharpTokenInfo>, long> myNextTokenAndState;
+    private long myState;
+
+    private Tuple<FSharpOption<FSharpToken>, long> myNextTokenAndState =
+      new Tuple<FSharpOption<FSharpToken>, long>(null, (long) FSharpTokenizerColorState.InitialState);
 
     public FSharpLexer([NotNull] IDocument document, FSharpList<string> defines)
     {
@@ -34,72 +38,113 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 
     public void Start()
     {
-      StartNewLine((long) FSharpTokenizerColorState.InitialState);
-      Advance();
+      if (StartNewLine())
+        Advance();
     }
 
     public void Advance()
     {
-      if (myNextTokenAndState.Item1 == null) // end of line
+      if (myNextTokenAndState.Item1 == null) // check if no token found, end of line
       {
-        if (myLineIndex == myDocumentLineCount)
+        if (!StartNewLine())
         {
+          // did not start a new line, end of file
           TokenType = null;
           return;
         }
 
+        TokenType = FSharpTokenType.NEW_LINE;
         TokenStart = TokenEnd;
-        myLineIndex++;
-
         TokenEnd = myLineIndex < myDocumentLineCount
           ? myDocument.GetLineStartOffset(myLineIndex)
-          : myDocument.Buffer.Length;
-
-        TokenType = FSharpTokenType.NEW_LINE;
-        if (myLineIndex < myDocumentLineCount) StartNewLine(myNextTokenAndState.Item2);
+          : Buffer.Length;
         return;
       }
-      FindToken();
-    }
 
-    private void StartNewLine(long state)
-    {
-      myLineTokenizer = mySourceTokenizer.CreateLineTokenizer(myDocument.GetLineText(myLineIndex));
-      myLineStartOffset = myDocument.GetLineStartOffset(myLineIndex);
-      myNextTokenAndState = myLineTokenizer.ScanToken(state);
-    }
-
-    private void FindToken()
-    {
       var token = myNextTokenAndState.Item1.Value;
       TokenStart = token.LeftColumn + myLineStartOffset;
-      myNextTokenAndState = myLineTokenizer.ScanToken(myNextTokenAndState.Item2);
-      while (myNextTokenAndState.Item1 != null)
+      TokenType = GetTokenType(token);
+      Seek();
+
+      var initialState = FSharpColorState;
+      var isInLineComment = initialState == FSharpTokenizerColorState.SingleLineComment;
+      while (ShouldConcatNextToken(initialState))
       {
-        // some tokens like multi-word strings come as separate tokens, concatenate them
-        var nextTokenClass = myNextTokenAndState.Item1.Value.CharClass;
-        if (token.CharClass != nextTokenClass || !ShouldConcatenate(token))
-          break;
-        token = myNextTokenAndState.Item1.Value;
-        myNextTokenAndState = myLineTokenizer.ScanToken(myNextTokenAndState.Item2);
+        while (myNextTokenAndState.Item1 == null)
+        {
+          if (!ShouldConcatNextToken(initialState))
+            break;
+          
+          if (isInLineComment)
+            break;
+
+          if (!StartNewLine())
+          {
+            TokenEnd = Buffer.Length;
+            return;
+          }
+        }
+
+        if (myNextTokenAndState.Item1 != null)
+          token = myNextTokenAndState.Item1.Value;
+        Seek();
       }
 
-      var nextToken = myNextTokenAndState.Item1;
-      // sometimes tokenizer may skip idents after #, look for next token start column
-      TokenEnd = myLineStartOffset + (nextToken?.Value.LeftColumn ?? token.RightColumn + 1);
-      TokenType = FSharpTokenInfoEx.GetTokenType(token);
+      // sometimes tokenizer may skip idents after #, look for next token start column // todo
+      TokenEnd = myLineStartOffset + (myNextTokenAndState.Item1?.Value.LeftColumn ?? token.RightColumn + 1);
     }
 
-    private static bool ShouldConcatenate(FSharpTokenInfo token)
+    private TokenNodeType GetTokenType(FSharpToken token)
     {
-      var tokenTag = token.Tag;
-      if (tokenTag == InactiveCodeTag) return true;
-      if (tokenTag == FSharpTokenTag.LESS || tokenTag == FSharpTokenTag.GREATER) return false;
+      // todo: next or current state?
+      var state = FSharpLineTokenizer.ColorStateOfLexState(myNextTokenAndState.Item2);
+      if (state == FSharpTokenizerColorState.VerbatimString)
+        return FSharpTokenType.VERBATIM_STRING;
+      if (state == FSharpTokenizerColorState.TripleQuoteString)
+        return FSharpTokenType.TRIPLE_QUOTE_STRING;
 
-      var tokenClass = token.CharClass;
-      return tokenClass == FSharpTokenCharKind.String || tokenClass == FSharpTokenCharKind.Operator ||
-             tokenClass == FSharpTokenCharKind.Comment || tokenClass == FSharpTokenCharKind.LineComment;
+      return token.GetTokenType();
     }
+    
+    private bool ShouldConcatNextToken(FSharpTokenizerColorState initial)
+    {
+      var current = FSharpColorState;
+      if (current == FSharpTokenizerColorState.Token || current == FSharpTokenizerColorState.EndLineThenToken ||
+          current == FSharpTokenizerColorState.EndLineThenSkip)
+        return false;
+
+      if (initial == FSharpTokenizerColorState.String || initial == FSharpTokenizerColorState.TripleQuoteString ||
+          initial == FSharpTokenizerColorState.VerbatimString)
+        return current == initial;
+
+      if (initial == FSharpTokenizerColorState.IfDefSkip && current == FSharpTokenizerColorState.IfDefSkip)
+        return myNextTokenAndState.Item1?.Value.Token.Tag == InactiveCodeTag;
+
+      return current != FSharpTokenizerColorState.String && current != FSharpTokenizerColorState.TripleQuoteString &&
+             current != FSharpTokenizerColorState.VerbatimString && current != FSharpTokenizerColorState.IfDefSkip;
+    }
+
+    private bool StartNewLine()
+    {
+      myLineIndex++;
+      if (myLineIndex >= myDocumentLineCount)
+        return false;
+
+      myLineTokenizer = mySourceTokenizer.CreateLineTokenizer(myDocument.GetLineText(myLineIndex));
+      myLineStartOffset = myDocument.GetLineStartOffset(myLineIndex);
+      Seek();
+
+      return true;
+    }
+
+    private void Seek()
+    {
+      myState = myNextTokenAndState.Item2;
+      myNextTokenAndState = myLineTokenizer.ScanToken(myNextTokenAndState.Item2);
+    }
+
+    internal FSharpTokenizerColorState FSharpColorState =>
+      FSharpLineTokenizer.ColorStateOfLexState(myState);
 
     public object CurrentPosition { get; set; }
     public TokenNodeType TokenType { get; private set; }

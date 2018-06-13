@@ -2,24 +2,22 @@
 
 open System
 open System.Collections.Generic
+open JetBrains.DataFlow
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.Parsing
-open JetBrains.ReSharper.Psi.TreeBuilder
 open JetBrains.Util
-open JetBrains.Util.dataStructures.TypedIntrinsics
 open Microsoft.FSharp.Compiler
 open Microsoft.FSharp.Compiler.Ast
 open Microsoft.FSharp.Compiler.PrettyNaming
 
 [<AbstractClass>]
-type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as this =
-    inherit TreeStructureBuilderBase(lifetime)
+type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime: Lifetime) =
+    inherit TreeBuilderBase(lifetime, lexer)
 
     let document = file.Document
 
@@ -759,12 +757,3 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
     member x.ProcessIndexerArg arg =
         for expr in arg.Exprs do
             x.ProcessLocalExpression(expr)
-
-    override val Builder = PsiBuilder(lexer, ElementType.F_SHARP_IMPL_FILE, this, lifetime)
-    override val NewLine = FSharpTokenType.NEW_LINE
-    override val CommentsOrWhiteSpacesTokens = FSharpTokenType.CommentsOrWhitespaces
-    override x.GetExpectedMessage name  = NotImplementedException() |> raise
-
-    interface IPsiBuilderTokenFactory with
-        member x.CreateToken(tokenType, buffer, startOffset, endOffset) =
-            tokenType.Create(buffer, TreeOffset(startOffset), TreeOffset(endOffset))

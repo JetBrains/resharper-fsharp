@@ -1,15 +1,11 @@
-﻿using JetBrains.Annotations;
-using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
+﻿using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Text;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal abstract class WhitespaceBase : FSharpToken, IWhitespaceNode
   {
-    protected WhitespaceBase(NodeType nodeType, [NotNull] IBuffer buffer, TreeOffset startOffset, TreeOffset endOffset)
-      : base(nodeType, buffer, startOffset, endOffset)
+    protected WhitespaceBase(NodeType nodeType, string text) : base(nodeType, text)
     {
     }
 

@@ -1,0 +1,4 @@
+﻿0000: HASH '#r'
+0002: WHITE_SPACE ' '
+0003: STRING '"foo.dll"'
+0012: NEW_LINE '\r\n'
