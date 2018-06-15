@@ -107,7 +107,7 @@ class FSharpMoveProviderExtensionTest {
         }
     }
 
-    @Test
+    @Test(enabled = false)
     fun testAllowPaste04_DifferentFilesInFolders() {
         doTest { project, provider ->
             /* Folder1/CompileBefore [0]
