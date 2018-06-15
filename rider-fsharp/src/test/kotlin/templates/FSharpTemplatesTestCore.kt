@@ -87,7 +87,6 @@ abstract class FSharpTemplatesTestCore : BaseTestWithSolutionBase() {
     }
 
 
-    @Test(enabled = false)
     @TestEnvironment(toolset = ToolsetVersion.TOOLSET_15_CORE)
     fun consoleAppCoreTemplate() {
         val projectName = "ConsoleApplication"

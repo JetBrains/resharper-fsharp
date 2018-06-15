@@ -13,9 +13,13 @@ type FSharpProjectPropertiesFactory() =
     static let fsProjectTypeGuid = Guid("{F2A71F9B-5D33-465A-A702-920D77279786}")
     static let fsCpsProjectTypeGuid = Guid("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}")
 
-    override x.IsApplicable(parameters) = x.IsKnownProjectTypeGuid(parameters.ProjectTypeGuid)
-
     override x.FactoryGuid = factoryGuid
+
+    override x.IsApplicable(parameters) =
+        FSharpProjectPropertiesFactory.IsKnownProjectTypeGuid(parameters.ProjectTypeGuid)
+
+    override x.IsKnownProjectTypeGuid(projectTypeGuid) =
+        FSharpProjectPropertiesFactory.IsKnownProjectTypeGuid(projectTypeGuid)
 
     override x.CreateProjectProperties(parameters) =
         FSharpProjectProperties(parameters.ProjectTypeGuids, factoryGuid, parameters.TargetFrameworkIds,
@@ -29,4 +33,5 @@ type FSharpProjectPropertiesFactory() =
         projectProperties.ReadProjectProperties(reader)
         projectProperties :> _
 
-    static member IsKnownProjectTypeGuid(guid) = guid.Equals(fsProjectTypeGuid) || guid.Equals(fsCpsProjectTypeGuid)
+    static member IsKnownProjectTypeGuid(guid) =
+        guid.Equals(fsProjectTypeGuid) || guid.Equals(fsCpsProjectTypeGuid)
