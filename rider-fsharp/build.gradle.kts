@@ -249,3 +249,5 @@ tasks {
         distributionUrl = "https://cache-redirector.shared.aws.intellij.net/services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
     }
 }
+
+defaultTasks("prepare")
