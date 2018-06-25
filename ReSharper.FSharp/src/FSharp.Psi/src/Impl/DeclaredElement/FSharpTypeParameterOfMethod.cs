@@ -146,6 +146,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public TypeParameterVariance Variance => TypeParameterVariance.INVARIANT;
     public bool IsValueType => false; // todo
     public bool IsClassType => false; // todo
+    public bool IsUnmanagedType => false;
     public bool HasDefaultConstructor => false;
     public IList<IType> TypeConstraints => EmptyList<IType>.Instance;
     public TypeParameterConstraintsMask ConstraintsMask => default; // todo
