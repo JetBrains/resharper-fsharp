@@ -243,6 +243,17 @@ tasks {
         }
     }
 
+    "buildReSharperPlugin" {
+        group = riderFSharpTargetsGroup
+        dependsOn("prepare")
+        doLast {
+            exec {
+                executable = "msbuild"
+                args = listOf("$resharperPluginPath/ReSharper.FSharp.sln")
+            }
+        }
+    }
+
     task<Wrapper>("wrapper") {
         gradleVersion = "4.7"
         distributionType = Wrapper.DistributionType.ALL
