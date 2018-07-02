@@ -13,7 +13,7 @@ F# support in Rider makes use of open source software, most notably [FSharp.Comp
 
 ### Requirements
 
-* [.NET Framework 4.6.1 Developer Pack](https://www.microsoft.com/en-us/download/details.aspx?id=40772)
+* [.NET Framework 4.6.1 Developer Pack](https://www.microsoft.com/en-us/download/details.aspx?id=49978)
 * [.NET Core SDK 2.0+](https://www.microsoft.com/net/download/windows) for MSBuild 15 and F# build targets
 * [JDK 1.8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 
@@ -28,6 +28,8 @@ F# support in Rider makes use of open source software, most notably [FSharp.Comp
     * if using IntelliJ IDEA:
 
 	     Open the `rider-fsharp` project in IntelliJ IDEA. When suggested to import Gradle projects, accept the suggestion: Gradle will download Rider SDK and set up all necessary dependencies. `rider-fsharp` uses the [gradle-intellij-plugin](https://github.com/JetBrains/gradle-intellij-plugin) Gradle plugin that downloads the IntelliJ Platform SDK, packs the F# plugin and installs it into a sandboxed IDE or its test shell, which allows testing the plugin in a separate environment.
+
+	     Open the *Gradle* tool window in IntelliJ IDEA (*View | Tool Windows | Gradle*), and execute the `rider-fsharp/prepare` task.
 
     * if using Gradle command line:
 
