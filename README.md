@@ -87,11 +87,11 @@ To update to the latest frontend SDK, run the `intellij/prepare` Gradle task in 
 
 To debug the backend, attach to the ReSharper.Host process launched via the `runIde` Gradle task. To debug the frontend, start the `runIde` task in Debug mode.
 
+Rider's JVM-based frontend and .NET-based backend communicate using RdProtocol with APIs available on both sides. For backend-frontend communication in plugins, RdProtocol should be used as well. Protocol model is defined in [this file](https://github.com/JetBrains/fsharp-support/blob/master/rider-fsharp/protocol/src/kotlin/model/RdFSharpModel.kt).
+
 ## Known issues
 
 As soon as you build the backend for the first time, Rider will show false red code warnings across the backend's F# projects. This is due to a bug in Rider waiting to be fixed ([RIDER-11392](https://youtrack.jetbrains.com/issue/RIDER-11392)). As a workaround, you can unload all projects in `ReSharper.FSharp.sln`, and then reload them.
-
-Rider's JVM-based frontend and .NET-based backend communicate using RdProtocol with APIs available on both sides. For backend-frontend communication in plugins, RdProtocol should be used as well. However, it's not currently possible to extend the protocol from a plugin (watch [RIDER-4217](https://youtrack.jetbrains.com/issue/RIDER-4217) for updates): this should be done directly in Rider code. Some extensions needed for the F# plugin are already available, and if you need further protocol extensions before [RIDER-4217](https://youtrack.jetbrains.com/issue/RIDER-4217) is implemented, please [raise an issue](https://youtrack.jetbrains.com/issues/RIDER#newissue=25-1770938).
 
 ## Roadmap
 
