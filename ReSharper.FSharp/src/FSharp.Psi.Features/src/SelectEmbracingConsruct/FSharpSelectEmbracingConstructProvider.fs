@@ -25,6 +25,8 @@ type FSharpSelection(file, range, parentRanges: DocumentRange list) =
         | parent :: rest -> FSharpSelection(file, parent, rest) :> _
         | _ -> null
 
+    override x.ExtendToWholeLine = ExtendToTheWholeLinePolicy.DO_NOT_EXTEND
+
 
 type FSharpDotSelection(file, document, range: TreeTextRange, parentRanges: DocumentRange list) =
     inherit DotSelection<IFSharpFile>(file, range.StartOffset, range.Length = 0, false)
