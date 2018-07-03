@@ -69,7 +69,7 @@ let rec getIconId = fun (symbol: FSharpSymbol) ->
             if mfv.IsMember then
                 if mfv.IsProperty then PsiSymbolsThemedIcons.Property.Id else
                 if mfv.IsConstructor then PsiSymbolsThemedIcons.Constructor.Id else
-                if mfv.Attributes.HasAttributeInstance("System.Runtime.CompilerServices.ExtensionAttribute") then
+                if mfv.IsExtensionMember then
                     PsiSymbolsThemedIcons.ExtensionMethod.Id else
                 PsiSymbolsThemedIcons.Method.Id
 
