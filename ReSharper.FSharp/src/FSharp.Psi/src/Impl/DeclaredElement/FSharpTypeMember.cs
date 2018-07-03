@@ -4,6 +4,7 @@ using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Impl;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
@@ -122,10 +123,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public virtual bool IsVolatile => false;
     public string XMLDocId => XMLDocUtil.GetTypeMemberXmlDocId(this, ShortName);
 
-    public IList<TypeMemberInstance> GetHiddenMembers()
-    {
-      return EmptyList<TypeMemberInstance>.Instance;
-    }
+    public IList<TypeMemberInstance> GetHiddenMembers() => HiddenMemberImpl.GetHiddenMembers(this);
 
     public AccessibilityDomain AccessibilityDomain =>
       new AccessibilityDomain(AccessibilityDomain.AccessibilityDomainType.PUBLIC, null);
