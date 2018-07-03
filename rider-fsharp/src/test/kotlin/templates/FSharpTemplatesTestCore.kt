@@ -26,16 +26,16 @@ abstract class FSharpTemplatesTestCore : BaseTestWithSolutionBase() {
     protected abstract fun runWithDotNetCliVersion(): String
 
     private val editorGoldFile: File
-        get() = File(testCaseGoldDirectory, testCaseName + "_opened")
+        get() = File(testCaseGoldDirectory, "${testMethod.name}_opened")
     protected val configGoldFile: File
-        get() = File(testCaseGoldDirectory, testCaseName + "_rcf")
+        get() = File(testCaseGoldDirectory, "${testMethod.name}_rcf")
     @Suppress("unused")
     protected val debugGoldFile: File
-        get() = File(testCaseGoldDirectory, testCaseName + "_debug")
+        get() = File(testCaseGoldDirectory, "${testMethod.name}_debug")
     private val binFolderContentGoldFile: File
-        get() = File(testCaseGoldDirectory, testCaseName + "_bin")
+        get() = File(testCaseGoldDirectory, "${testMethod.name}_bin")
     private val fileListAbsoluteFilesGoldFile: File
-        get() = File(testCaseGoldDirectory, testCaseName + "_abs")
+        get() = File(testCaseGoldDirectory, "${testMethod.name}_abs")
 
     override val traceCategories: List<String>
         get() = arrayListOf(
