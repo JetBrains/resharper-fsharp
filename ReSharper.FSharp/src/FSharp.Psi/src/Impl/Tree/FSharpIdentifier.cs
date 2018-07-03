@@ -4,6 +4,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class FSharpIdentifier
   {
-    public string Name => FSharpNamesUtil.RemoveBackticks(GetText());
+    public string Name => GetText().RemoveBackticks();
   }
 }

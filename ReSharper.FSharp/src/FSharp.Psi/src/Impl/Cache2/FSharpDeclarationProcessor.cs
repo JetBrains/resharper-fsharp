@@ -44,7 +44,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
         var qualifiers = declaration.LongIdentifier.Qualifiers;
         foreach (var qualifier in qualifiers)
         {
-          var qualifierName = FSharpNamesUtil.RemoveBackticks(qualifier.GetText());
+          var qualifierName = qualifier.GetText().RemoveBackticks();
           Builder.StartPart(new QualifiedNamespacePart(qualifier.GetTreeStartOffset(), Builder.Intern(qualifierName)));
         }
 

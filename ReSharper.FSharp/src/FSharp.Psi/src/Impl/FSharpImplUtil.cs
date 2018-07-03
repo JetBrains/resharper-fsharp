@@ -79,12 +79,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static string[] GetQualifiersAndName(this FSharpIdentifierToken token)
     {
       if (!(token.Parent is ILongIdentifier longIdentifier))
-        return new[] {FSharpNamesUtil.RemoveBackticks(token.GetText())};
+        return new[] {token.GetText().RemoveBackticks()};
 
       var names = new FrugalLocalHashSet<string>();
       foreach (var id in longIdentifier.IdentifiersEnumerable)
       {
-        names.Add(FSharpNamesUtil.RemoveBackticks(id.GetText()));
+        names.Add(id.GetText().RemoveBackticks());
         if (id == token) break;
       }
       return names.ToArray();

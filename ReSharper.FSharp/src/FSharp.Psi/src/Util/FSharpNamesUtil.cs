@@ -12,7 +12,7 @@ using Microsoft.FSharp.Core;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {
-  public class FSharpNamesUtil
+  public static class FSharpNamesUtil
   {
     private const string AttributeSuffix = "Attribute";
     private const string ModuleSuffix = "Module";
@@ -41,7 +41,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     }
 
     [NotNull]
-    public static string RemoveBackticks([NotNull] string name) =>
+    public static string RemoveBackticks([NotNull] this  string name) =>
       IsEscapedWithBackticks(name)
         ? name.Substring(EscapedNameStartIndex, name.Length - EscapedNameAffixLength)
         : name;

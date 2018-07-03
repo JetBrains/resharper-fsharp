@@ -16,11 +16,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public string QualifiedName =>
       Identifiers.IsEmpty
         ? SharedImplUtil.MISSING_DECLARATION_NAME
-        : Identifiers.Select(id => FSharpNamesUtil.RemoveBackticks(id.GetText())).Join(StringUtil.SDOT);
+        : Identifiers.Select(id => id.GetText().RemoveBackticks()).Join(StringUtil.SDOT);
 
     public string Name =>
       Identifiers.IsEmpty
         ? SharedImplUtil.MISSING_DECLARATION_NAME
-        : FSharpNamesUtil.RemoveBackticks(Identifiers.Last().GetText());
+        : Identifiers.Last().GetText().RemoveBackticks();
   }
 }
