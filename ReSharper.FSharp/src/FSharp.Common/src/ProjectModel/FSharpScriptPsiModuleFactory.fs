@@ -315,14 +315,11 @@ type FSharpScriptPsiModuleHandler
             psiModule.AddProjectHandler(this)
             sourceFiles.[projectFile.Location] <- psiModule.SourceFile
 
-        | PsiModuleChange.ChangeType.Removed ->
-            let mutable sourceFile = Unchecked.defaultof<IPsiSourceFile>
-            match sourceFiles.TryGetValue(oldLocation, &sourceFile) with
-            | true -> 
-                let psiModule = sourceFile.PsiModule :?> FSharpScriptPsiModule
-                psiModule.RemoveProjectHandler(this)
-                sourceFiles.Remove(oldLocation) |> ignore
-            | _ -> ()
+        | PsiModuleChange.ChangeType.Removed when sourceFiles.ContainsKey(oldLocation) ->
+            let sourceFile = sourceFiles.[oldLocation]
+            let psiModule = sourceFile.PsiModule :?> FSharpScriptPsiModule
+            psiModule.RemoveProjectHandler(this)
+            sourceFiles.Remove(oldLocation) |> ignore
 
         | _ -> handler.OnProjectFileChanged(projectFile, oldLocation, changeType, changeBuilder)
 
