@@ -4,7 +4,7 @@ using JetBrains.ProjectModel;
 namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 {
   [ProjectFileTypeDefinition(Name)]
-  public class FSharpScriptProjectFileType : KnownProjectFileType
+  public class FSharpScriptProjectFileType : FSharpProjectFileType
   {
     public new const string Name = "F# Script";
     [UsedImplicitly] public new static readonly FSharpScriptProjectFileType Instance;

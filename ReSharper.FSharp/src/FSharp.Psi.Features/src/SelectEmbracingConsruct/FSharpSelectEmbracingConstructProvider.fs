@@ -56,8 +56,8 @@ type FSharpDotSelection(file, document, range: TreeTextRange, parentRanges: Docu
         | _ -> null
     override x.CreateTokenPartSelection(tokenNode, treeTextRange) = null
 
-[<AbstractClass>]
-type FSharpSelectEmbracingConstructProviderBase() =
+[<ProjectFileType(typeof<FSharpProjectFileType>)>]
+type FSharpSelectEmbracingConstructProvider() =
     let getRanges = function
         | TraverseStep.Expr(expr) -> [expr.Range]
         | TraverseStep.Module(moduleDecl) -> [moduleDecl.Range]
@@ -122,13 +122,3 @@ type FSharpSelectEmbracingConstructProviderBase() =
 
                 FSharpDotSelection(fsFile, document, fsFile.Translate(documentRange), ranges) :> _
             | _ -> null
-
-
-[<ProjectFileType(typeof<FSharpProjectFileType>)>]
-type FSharpSelectEmbracingConstructProvider() =
-    inherit FSharpSelectEmbracingConstructProviderBase()
-
-
-[<ProjectFileType(typeof<FSharpScriptProjectFileType>)>]
-type FSharpScriptSelectEmbracingConstructProvider() =
-    inherit FSharpSelectEmbracingConstructProviderBase()
