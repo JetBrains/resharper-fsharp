@@ -40,7 +40,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
         {
           if (memberDeclaration is IUnionCaseDeclaration)
           {
-            result.Add(memberDeclaration.DeclaredElement);
+            var unionCase = memberDeclaration.DeclaredElement;
+            if (unionCase != null)
+              result.Add(unionCase);
             continue;
           }
 
