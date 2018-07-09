@@ -12,7 +12,7 @@ open NUnit.Framework
 
 [<ZoneDefinition>]
 type IFSharpTestsZone =
-    inherit ITestsZone
+    inherit ITestsEnvZone
 
 [<ZoneActivator>]
 type PsiFeatureTestZoneActivator() = 
