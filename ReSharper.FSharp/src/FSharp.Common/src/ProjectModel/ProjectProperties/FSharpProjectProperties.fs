@@ -1,11 +1,11 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 
+open JetBrains.Application
 open System
 open System.Runtime.InteropServices
 open JetBrains.Metadata.Utils
 open JetBrains.ProjectModel.Impl.Build
-open JetBrains.ProjectModel
-open JetBrains.ProjectModel.Properties
+open JetBrains.ProjectModel.ProjectsHost.MsBuild.Diagnostic.Components
 open JetBrains.ProjectModel.Properties.Common
 open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
@@ -70,3 +70,9 @@ type FSharpBuildSettings() =
         writer.WriteLine(sprintf "TailCalls:%b" x.TailCalls)
 
         base.Dump(writer, indent)
+
+[<ShellComponent>]
+type FSharpProjectApplicableProvider() =
+    interface ProjectConfigurationValidator.IApplicableProvider with
+        member x.IsApplicable(projectMark) =
+            projectMark.Location.ExtensionNoDot.Equals("fsproj", StringComparison.OrdinalIgnoreCase)
