@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase</RootNamespace>
@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)"/>
+    <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
+    <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FCSVersion)" />
   </ItemGroup>
 </Project>

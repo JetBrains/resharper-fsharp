@@ -16,9 +16,8 @@
     <Compile Include="src\Util\Util.fs" />
     <Compile Include="src\ProjectModel\ProjectItems\FSharpItemsContainer.fs" />
     <Compile Include="src\ProjectModel\ProjectItems\ProjectStructure.fs" />
-    <Compile Include="src\FileSystemShim\FSharpSourceCache.fs" />
-    <Compile Include="src\FileSystemShim\AssemblyTimestampCache.fs" />
-    <Compile Include="src\FileSystemShim\FileSystemShim.fs" />
+    <Compile Include="src\Shim\FileSystem\FSharpSourceCache.fs" />
+    <Compile Include="src\Shim\FileSystem\AssemblyTimestampCache.fs" />
     <Compile Include="src\Util\FSharpAttributesUtil.fs" />
     <Compile Include="src\Util\FSharpSymbolUtil.fs" />
     <Compile Include="src\Util\FSharpXmlDocService.fs" />
