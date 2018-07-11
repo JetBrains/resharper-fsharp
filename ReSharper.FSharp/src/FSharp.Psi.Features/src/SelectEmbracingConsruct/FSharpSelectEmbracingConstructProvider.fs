@@ -82,6 +82,7 @@ type FSharpSelectEmbracingConstructProvider() =
         member x.IsAvailable(sourceFile) = true
 
         member x.GetSelectedRange(sourceFile, documentRange) =
+            let mutable documentRange = documentRange
             let fsFile = sourceFile.GetTheOnlyPsiFile() :?> IFSharpFile
             match isNotNull fsFile, fsFile.ParseResults with
             | true, Some parseResults when parseResults.ParseTree.IsSome ->
@@ -117,7 +118,7 @@ type FSharpSelectEmbracingConstructProvider() =
                         |> List.map (fun r -> r.ToDocumentRange(document))
                     | None -> []
                     |> List.append containingDeclarations
-                    |> List.filter (fun r -> r.Contains(documentRange))
+                    |> List.filter (fun r -> r.Contains(&documentRange))
                     |> List.sortBy (fun r -> r.Length)
 
                 FSharpDotSelection(fsFile, document, fsFile.Translate(documentRange), ranges) :> _

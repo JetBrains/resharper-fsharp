@@ -46,7 +46,7 @@ and FSharpCodeFoldingProcess(logger) =
                 Structure.getOutliningRanges lines parseResults.ParseTree.Value
                 |> Seq.distinctBy (fun x -> x.Range.StartLine)
                 |> Seq.iter (fun x ->
-                    let textRange = x.CollapseRange.ToTextRange(document)
+                    let mutable textRange = x.CollapseRange.ToTextRange(document)
                     let docRange = DocumentRange(document, textRange)
                     let placeholder =
                         match x.Scope with
@@ -55,7 +55,7 @@ and FSharpCodeFoldingProcess(logger) =
                             let line = (docLine x.CollapseRange.StartLine).Minus1()
                             let lineStart = document.GetLineStartOffset(line)
                             let lineEnd = document.GetLineEndOffsetNoLineBreak(line)
-                            match TextRange(lineStart, lineEnd).Intersect(textRange) with
+                            match TextRange(lineStart, lineEnd).Intersect(&textRange) with
                             | range when not range.IsEmpty -> document.GetText(range) + " ..."
                             | _ -> " ..."
                     if not textRange.IsEmpty then
