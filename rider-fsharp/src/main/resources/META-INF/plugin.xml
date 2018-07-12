@@ -48,6 +48,7 @@
     <applicationService serviceImplementation="com.jetbrains.rider.plugins.fsharp.settings.FSharpCodeFoldingSettings"/>
 
     <applicationConfigurable groupId="language" instance="com.jetbrains.rider.plugins.fsharp.services.settings.FsiOptionsPage" id="Fsi" />
+    <projectConfigurable parentId="FileTemplatesSettingsId" instance="com.jetbrains.rider.settings.RiderFSharpFileTemplatesOptionPage" groupWeight="-20"/>
 
     <intentionAction>
       <className>com.jetbrains.rider.plugins.fsharp.services.fsi.SendLineToFsiIntentionAction</className>
