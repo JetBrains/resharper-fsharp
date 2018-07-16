@@ -1,0 +1,24 @@
+===================
+Opened
+
+-Project
+ -ConsoleApplication * 1 project
+  -ConsoleApplication
+   -Dependencies
+    .NETCoreApp 2.1
+   Program.fs
+
+
+Project [Name:&, GUID:]
+  Child items:
+    ProjectFileImpl(Path : ConsoleApplication.sln)[]
+
+Project [Name:ConsoleApplication, GUID:]
+  Child items:
+    ProjectFileImpl(Path : ConsoleApplication.fsproj)[]
+    ProjectFileImpl(Path : Program.fs)[COMPILE ]
+
+Project [Name:Miscellaneous Files, GUID:]
+
+
+

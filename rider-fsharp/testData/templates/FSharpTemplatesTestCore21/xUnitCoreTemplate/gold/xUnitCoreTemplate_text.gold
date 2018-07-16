@@ -1,0 +1,18 @@
+===================
+Opened
+
+[Program.fs]
+module Program = let [<EntryPoint>] main _ = 0
+
+
+[Tests.fs]
+module Tests
+
+open System
+open Xunit
+
+[<Fact>]
+let ``My test`` () =
+    Assert.True(true)
+
+
