@@ -10,7 +10,7 @@ Start browser url: http://localhost:5000
 Start browser is start JavaScript debugger: false
 Start browser browser name: null
 Project kind: DotNetCore
-Exe path: $PROJECT_DIR$/ConsoleApplication/bin/Debug/netcoreapp2.0/ConsoleApplication.dll
+Exe path: $PROJECT_DIR$/ConsoleApplication/bin/Debug/netcoreapp2.1/ConsoleApplication.dll
 Arguments: 
 Working directory: $PROJECT_DIR$/ConsoleApplication
 Environment variables: {ASPNETCORE_ENVIRONMENT=Development, ASPNETCORE_URLS=http://localhost:5000}
