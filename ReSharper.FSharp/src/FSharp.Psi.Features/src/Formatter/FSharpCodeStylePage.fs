@@ -19,7 +19,7 @@ open JetBrains.ReSharper.Resources.Resources.Icons
 type FSharpFormatSettingsKey() =
     inherit FormatSettingsKeyBase()
 
-    [<SettingsEntry(true, "Reorder open declarations"); DefaultValue>]
+    [<SettingsEntry(false, "Reorder open declarations"); DefaultValue>]
     val mutable ReorderOpenDeclarations: bool
     
     [<SettingsEntry(false, "Semicolon at end of line"); DefaultValue>]
