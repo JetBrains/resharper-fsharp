@@ -9,6 +9,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.intellij.IntelliJPlugin
 import org.jetbrains.intellij.tasks.PrepareSandboxTask
 import org.jetbrains.kotlin.daemon.common.toHexString
+import org.jetbrains.grammarkit.tasks.*
 
 buildscript {
     repositories {
@@ -23,10 +24,12 @@ buildscript {
 plugins {
     id("org.jetbrains.kotlin.jvm") version "1.2.41"
     id("org.jetbrains.intellij") version "0.3.2"
+    id("org.jetbrains.grammarkit") version "2018.1.7"
 }
 
 apply {
     plugin("com.jetbrains.rdgen")
+    plugin("org.jetbrains.grammarkit")
 }
 
 repositories {
@@ -193,9 +196,16 @@ tasks {
         }
     }
 
+    val generateFSharpLexer = task<GenerateLexer>("generateFSharpLexer") {
+        source = "src/main/java/com/jetbrains/rider/ideaInterop/fileTypes/fsharp/lexer/_FSharpLexer.flex"
+        targetDir = "src/main/java/com/jetbrains/rider/ideaInterop/fileTypes/fsharp/lexer"
+        targetClass = "_FSharpLexer"
+        purgeOldFiles = true
+    }
+
     withType<KotlinCompile> {
         kotlinOptions.jvmTarget = "1.8"
-        dependsOn("rdgen")
+        dependsOn(generateFSharpLexer,"rdgen")
     }
 
     withType<Test> {
