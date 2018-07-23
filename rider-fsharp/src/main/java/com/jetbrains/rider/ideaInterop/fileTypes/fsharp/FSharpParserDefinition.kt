@@ -6,6 +6,9 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.tree.IElementType
 import com.jetbrains.rider.ideaInterop.fileTypes.RiderFileElementType
 import com.jetbrains.rider.ideaInterop.fileTypes.RiderParserDefinitionBase
+import com.intellij.psi.tree.TokenSet
+import com.intellij.psi.tree.IFileElementType
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpElementTypes.*
 
 class FSharpParserDefinition : RiderParserDefinitionBase(FSharpFileElementType, FSharpFileType) {
     companion object {
@@ -14,7 +17,7 @@ class FSharpParserDefinition : RiderParserDefinitionBase(FSharpFileElementType, 
     }
 
     override fun createLexer(project: Project?): Lexer = DummyLexer(FSharpElementType)
-
+    override fun getFileNodeType(): IFileElementType = FSharpFileElementType
 }
 
 class FSharpScriptParserDefinition : RiderParserDefinitionBase(FSharpScriptFileElementType, FSharpScriptFileType) {

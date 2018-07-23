@@ -13,6 +13,7 @@
     <fileTypeFactory id="F#" implementation="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpFileTypeFactory" />
     <lang.ast.factory language="F#" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpAstFactory" />
     <lang.parserDefinition language="F#" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpParserDefinition" />
+    <lang.syntaxHighlighterFactory language="F#" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.highlighting.FSharpSyntaxHighlighterFactory"/>
     <lang.altEnter language="F#" implementationClass="com.jetbrains.rider.intentions.altEnter.ReSharperAltEnterActionHandler" />
 
     <backend.actions.support language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.actions.FSharpActionSupportPolicy" />

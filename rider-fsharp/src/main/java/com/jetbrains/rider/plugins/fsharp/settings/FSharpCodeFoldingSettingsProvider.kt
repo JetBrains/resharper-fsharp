@@ -19,6 +19,6 @@ class FSharpCodeFoldingSettings : RiderCodeFoldingSettings(), PersistentStateCom
     override fun loadState(state: FSharpCodeFoldingSettings) = XmlSerializerUtil.copyBean(state, this)
 
     companion object {
-        val instance: FSharpCodeFoldingSettings by lazy { ServiceManager.getService(FSharpCodeFoldingSettings::class.java) }
+        val instance: FSharpCodeFoldingSettings by lazy<FSharpCodeFoldingSettings> { ServiceManager.getService(FSharpCodeFoldingSettings::class.java) }
     }
 }
