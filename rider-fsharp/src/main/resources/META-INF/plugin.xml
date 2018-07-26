@@ -30,6 +30,7 @@
     <fileTypeFactory id="F# Script" implementation="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptFileTypeFactory" />
     <lang.ast.factory language="F# Script" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptAstFactory" />
     <lang.parserDefinition language="F# Script" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptParserDefinition" />
+    <lang.syntaxHighlighterFactory language="F# Script" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.highlighting.FSharpSyntaxHighlighterFactory"/>
     <lang.altEnter language="F# Script" implementationClass="com.jetbrains.rider.intentions.altEnter.ReSharperAltEnterActionHandler" />
 
     <backend.actions.support language="F# Script" implementationClass="com.jetbrains.rider.plugins.fsharp.actions.FSharpActionSupportPolicy" />

@@ -15,42 +15,33 @@ import com.intellij.openapi.fileTypes.SyntaxHighlighter
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
 
 import com.intellij.openapi.project.Project
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpElementTypes.*
+import com.jetbrains.rider.ideaInterop.RiderTextAttributeKeys
+import com.jetbrains.rider.ideaInterop.fileTypes.csharp.CSharpSyntaxHighlighter
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType.*
 
 class FSharpSyntaxHighlighter : SyntaxHighlighterBase() {
+    companion object {
+        private val keywords =
+                IDENT_KEYWORDS.types.map { it to RiderTextAttributeKeys.KEYWORD }
+        private val strings =
+                STRINGS.types.map { it to RiderTextAttributeKeys.STRING }
+        private val comments =
+                COMMENTS.types.map { it to RiderTextAttributeKeys.BLOCK_COMMENT }
+        private val ourKeys = mapOf(
+                CHAR to RiderTextAttributeKeys.STRING,
+                BYTECHAR to RiderTextAttributeKeys.STRING,
+                END_OF_LINE_COMMENT to RiderTextAttributeKeys.COMMENT,
+                SYMBOLIC_OP to RiderTextAttributeKeys.OPERATOR_IDENTIFIER,
+                TokenType.BAD_CHARACTER to HighlighterColors.BAD_CHARACTER
+        ) + keywords + comments + strings
+    }
 
     override fun getHighlightingLexer(): Lexer {
         return FSharpLexer()
     }
 
     override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey> {
-        return if (tokenType == STRING || tokenType == UNFINISHED_STRING || tokenType == UNFINISHED_VERBATIM_STRING ||
-                tokenType == UNFINISHED_TRIPLE_QUOTED_STRING) {
-            STRING_KEYS
-        } else if (tokenType == END_OF_LINE_COMMENT || tokenType == BLOCK_COMMENT || tokenType == UNFINISHED_BLOCK_COMMENT ||
-                tokenType == UNFINISHED_STRING_IN_COMMENT || tokenType == UNFINISHED_VERBATIM_STRING_IN_COMMENT ||
-                tokenType == UNFINISHED_TRIPLE_QUOTED_STRING_IN_COMMENT) {
-            COMMENT_KEYS
-        } else if (tokenType == IDENT_KEYWORD) {
-            IDENT_KEYWORD_KEYS
-        } else if (tokenType == TokenType.BAD_CHARACTER) {
-            BAD_CHAR_KEYS
-        } else {
-            EMPTY_KEYS
-        }
-    }
-
-    companion object {
-        val LITERAL_STRING = createTextAttributesKey("FSHARP_STRING", DefaultLanguageHighlighterColors.STRING)
-        val COMMENT = createTextAttributesKey("FSHARP_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT)
-        val IDENT_KEYWORDS = createTextAttributesKey("FSHARP_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD)
-        val BAD_CHARACTER = createTextAttributesKey("FSHARP_BAD_CHARACTER", HighlighterColors.BAD_CHARACTER)
-
-        private val BAD_CHAR_KEYS = arrayOf(BAD_CHARACTER)
-        private val STRING_KEYS = arrayOf(LITERAL_STRING)
-        private val COMMENT_KEYS = arrayOf(COMMENT)
-        private val IDENT_KEYWORD_KEYS = arrayOf(IDENT_KEYWORDS)
-        private val EMPTY_KEYS = arrayOf<TextAttributesKey>()
+        return pack(FSharpSyntaxHighlighter.ourKeys[tokenType])
     }
 }
 

@@ -205,7 +205,7 @@ tasks {
 
     withType<KotlinCompile> {
         kotlinOptions.jvmTarget = "1.8"
-        dependsOn(generateFSharpLexer,"rdgen")
+        dependsOn(generateFSharpLexer, "rdgen")
     }
 
     withType<Test> {

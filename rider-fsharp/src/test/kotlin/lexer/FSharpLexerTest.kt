@@ -53,7 +53,7 @@ class FSharpLexerTest : LexerTestCase() {
     }
 
     fun testSymbolicOperator() {
-        doTest("&&& ||| ?<- @-><-= ?->",
+        doTest("&&& ||| ?<- @-><-= ?-> >-> >>= >>- |> .>>. .>> >>",
                 "SYMBOLIC_OP ('&&&')\n" +
                         "WHITE_SPACE (' ')\n" +
                         "SYMBOLIC_OP ('|||')\n" +
@@ -62,8 +62,21 @@ class FSharpLexerTest : LexerTestCase() {
                         "WHITE_SPACE (' ')\n" +
                         "SYMBOLIC_OP ('@-><-=')\n" +
                         "WHITE_SPACE (' ')\n" +
-                        "QMARK ('?')\n" +
-                        "RARROW ('->')")
+                        "SYMBOLIC_OP ('?->')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "SYMBOLIC_OP ('>->')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "SYMBOLIC_OP ('>>=')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "SYMBOLIC_OP ('>>-')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "SYMBOLIC_OP ('|>')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "SYMBOLIC_OP ('.>>.')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "SYMBOLIC_OP ('.>>')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "SYMBOLIC_OP ('>>')")
     }
 
     fun testSimpleBlockComment() {
@@ -162,8 +175,28 @@ class FSharpLexerTest : LexerTestCase() {
                         "QUOTE_OP_RIGHT ('@@>')")
     }
 
+    fun testStringEscapeChar() {
+        doTest("\"\\n\\t\\b\\r\\a\\f\\v\"", "STRING ('\"\\n\\t\\b\\r\\a\\f\\v\"')"
+        )
+    }
+
     fun testEscapeChar() {
-        doTest("\"\\n\\t\\b\\r\"", "STRING ('\"\\n\\t\\b\\r\"')"
+        doTest("'\\n' '\\t' '\\b' '\\r' '\"' '\\a' '\\f' '\\v'",
+                "CHAR (''\\n'')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "CHAR (''\\t'')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "CHAR (''\\b'')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "CHAR (''\\r'')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "CHAR (''\"'')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "CHAR (''\\a'')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "CHAR (''\\f'')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "CHAR (''\\v'')"
         )
     }
 
@@ -179,9 +212,9 @@ class FSharpLexerTest : LexerTestCase() {
                 "#endif\n" +
                 "\n" +
                 "let result = function1 10 20",
-                "IF_DERECTIVE ('#if VERSION1')\n" +
+                "IF_DIRECTIVE ('#if VERSION1')\n" +
                         "NEWLINE ('\\n')\n" +
-                        "IDENT_KEYWORD ('let')\n" +
+                        "LET ('let')\n" +
                         "WHITE_SPACE (' ')\n" +
                         "IDENT ('function1')\n" +
                         "WHITE_SPACE (' ')\n" +
@@ -207,13 +240,13 @@ class FSharpLexerTest : LexerTestCase() {
                         "WHITE_SPACE (' ')\n" +
                         "INT32 ('2')\n" +
                         "WHITE_SPACE (' ')\n" +
-                        "SYMBOLIC_OP ('*')\n" +
+                        "STAR ('*')\n" +
                         "WHITE_SPACE (' ')\n" +
                         "IDENT ('y')\n" +
                         "NEWLINE ('\\n')\n" +
-                        "ELSE_DERECTIVE ('#else')\n" +
+                        "ELSE_DIRECTIVE ('#else')\n" +
                         "NEWLINE ('\\n')\n" +
-                        "IDENT_KEYWORD ('let')\n" +
+                        "LET ('let')\n" +
                         "WHITE_SPACE (' ')\n" +
                         "IDENT ('function1')\n" +
                         "WHITE_SPACE (' ')\n" +
@@ -238,13 +271,13 @@ class FSharpLexerTest : LexerTestCase() {
                         "MINUS ('-')\n" +
                         "WHITE_SPACE (' ')\n" +
                         "INT32 ('2')\n" +
-                        "SYMBOLIC_OP ('*')\n" +
+                        "STAR ('*')\n" +
                         "IDENT ('y')\n" +
                         "NEWLINE ('\\n')\n" +
-                        "ENDIF_DERECTIVE ('#endif')\n" +
+                        "ENDIF_DIRECTIVE ('#endif')\n" +
                         "NEWLINE ('\\n')\n" +
                         "NEWLINE ('\\n')\n" +
-                        "IDENT_KEYWORD ('let')\n" +
+                        "LET ('let')\n" +
                         "WHITE_SPACE (' ')\n" +
                         "IDENT ('result')\n" +
                         "WHITE_SPACE (' ')\n" +
@@ -274,5 +307,139 @@ class FSharpLexerTest : LexerTestCase() {
                 "        let haha = 67\n" +
                 "        printfn \"%A\" name //hello",
                 "UNFINISHED_TRIPLE_QUOTED_STRING_IN_COMMENT ('(* \"\"\" *)\\n        let str = \"STRING\\n \\ NEWLINE\\n\"\\n        let haha = 67\\n        printfn \"%A\" name //hello')")
+    }
+
+    fun testIntDotDot() {
+        doTest("[ for x in 1..2 -> x + x ]",
+                "LBRACK ('[')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "FOR ('for')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "IDENT ('x')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "IN ('in')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "INT32 ('1')\n" +
+                        "DOT_DOT ('..')\n" +
+                        "INT32 ('2')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "RARROW ('->')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "IDENT ('x')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "PLUS ('+')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "IDENT ('x')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "RBRACK (']')")
+    }
+
+    fun testIdent() {
+        doTest("``value.with odd#name``",
+                "IDENT ('``value.with odd#name``')")
+    }
+
+    fun testEndOfLineCOmment() {
+        doTest("//hello world!", "END_OF_LINE_COMMENT ('//hello world!')")
+    }
+
+    fun testUnfinishedString() {
+        doTest("(* \"\"\"hello\"\"\" *)\n" +
+                "        let str = \"STRING\n",
+                "BLOCK_COMMENT ('(* \"\"\"hello\"\"\" *)')\n" +
+                        "NEWLINE ('\\n')\n" +
+                        "WHITE_SPACE ('        ')\n" +
+                        "LET ('let')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "IDENT ('str')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "EQUALS ('=')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "UNFINISHED_STRING ('\"STRING\\n')")
+    }
+
+    fun testCodeQuotation() {
+        doTest("let expr : string = <@ 1 + 1 @>.ToString()\n" +
+                "let expr2 : string = <@@ 1 + 1 @@>.ToString()",
+                "LET ('let')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "IDENT ('expr')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "COLON (':')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "IDENT ('string')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "EQUALS ('=')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "QUOTE_OP_LEFT ('<@')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "INT32 ('1')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "PLUS ('+')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "INT32 ('1')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "QUOTE_OP_RIGHT ('@>')\n" +
+                        "DOT ('.')\n" +
+                        "IDENT ('ToString')\n" +
+                        "LPAREN ('(')\n" +
+                        "RPAREN (')')\n" +
+                        "NEWLINE ('\\n')\n" +
+                        "LET ('let')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "IDENT ('expr2')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "COLON (':')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "IDENT ('string')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "EQUALS ('=')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "QUOTE_OP_LEFT ('<@@')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "INT32 ('1')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "PLUS ('+')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "INT32 ('1')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "QUOTE_OP_RIGHT ('@@>')\n" +
+                        "DOT ('.')\n" +
+                        "IDENT ('ToString')\n" +
+                        "LPAREN ('(')\n" +
+                        "RPAREN (')')")
+    }
+
+    fun testBadOperator() {
+        doTest(".?:%? .?$%?",
+                "BAD_SYMBOLIC_OP ('.?:%?')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "BAD_SYMBOLIC_OP ('.?\$%?')")
+    }
+
+    fun testTypeAppAndAttribute() {
+        doTest("[someFunction \"arg0\" typeof<int>] [<SomeAttribute>] [typeof<int >]",
+                "LBRACK ('[')\n" +
+                        "IDENT ('someFunction')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "STRING ('\"arg0\"')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "IDENT ('typeof')\n" +
+                        "LESS ('<')\n" +
+                        "IDENT ('int')\n" +
+                        "GREATER ('>')\n" +
+                        "RBRACK (']')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "LBRACK_LESS ('[<')\n" +
+                        "IDENT ('SomeAttribute')\n" +
+                        "GREATER_RBRACK ('>]')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "LBRACK ('[')\n" +
+                        "IDENT ('typeof')\n" +
+                        "LESS ('<')\n" +
+                        "IDENT ('int')\n" +
+                        "WHITE_SPACE (' ')\n" +
+                        "GREATER ('>')\n" +
+                        "RBRACK (']')")
     }
 }
