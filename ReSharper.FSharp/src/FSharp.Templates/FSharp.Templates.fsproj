@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net461</TargetFramework>
+    <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
+    <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Templates</RootNamespace>
+    <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Templates</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="src\Templates\FileTemplates.fs"/>
+    <EmbeddedResource Include="src\Templates\FileTemplates.xml">
+      <LogicalName>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Templates.FileTemplates.xml</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FSharp.Core" Version="4.3.4"/>
+    <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FSharp.Psi\FSharp.Psi.csproj"/>
+  </ItemGroup>
+
+</Project>

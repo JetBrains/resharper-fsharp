@@ -25,6 +25,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Tests.Host", "test\s
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Common.Tests", "test\src\FSharp.Common.Tests\FSharp.Common.Tests.fsproj", "{83C5104C-057E-4AF8-B3FE-3437968CA621}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Templates", "src\FSharp.Templates\FSharp.Templates.fsproj", "{3FE0A747-5D63-4AA6-AC54-F64DFC859FBD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -67,6 +69,10 @@ Global
 		{83C5104C-057E-4AF8-B3FE-3437968CA621}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{83C5104C-057E-4AF8-B3FE-3437968CA621}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{83C5104C-057E-4AF8-B3FE-3437968CA621}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3FE0A747-5D63-4AA6-AC54-F64DFC859FBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3FE0A747-5D63-4AA6-AC54-F64DFC859FBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3FE0A747-5D63-4AA6-AC54-F64DFC859FBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3FE0A747-5D63-4AA6-AC54-F64DFC859FBD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -81,5 +87,6 @@ Global
 		{AF85AA16-C863-42F2-AE7E-44C3E36F8883} = {7B41BA27-ACA5-43D2-9EBA-2E604D63A4E2}
 		{3FF7EEB4-24B5-4E52-8A11-EF731BF6A9BD} = {7B41BA27-ACA5-43D2-9EBA-2E604D63A4E2}
 		{83C5104C-057E-4AF8-B3FE-3437968CA621} = {7B41BA27-ACA5-43D2-9EBA-2E604D63A4E2}
+		{3FE0A747-5D63-4AA6-AC54-F64DFC859FBD} = {2E19336B-3133-4C1A-8E65-E2F7C465663B}
 	EndGlobalSection
 EndGlobal

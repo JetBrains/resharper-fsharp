@@ -45,8 +45,6 @@
     <Compile Include="src\LanguageService\FSharpLanguageService.fs" />
     <Compile Include="src\LanguageService\FSharpClrLanguage.fs" />
     <Compile Include="src\LanguageService\FSharpRefactoringLanguageService.fs" />
-    <Compile Include="src\Templates\FileTemplates.fs" />
-    <EmbeddedResource Include="src\Templates\Templates.xml" />
     <Compile Include="src\ZoneMarker.fs" />
   </ItemGroup>
   <ItemGroup>

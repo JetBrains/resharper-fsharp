@@ -119,8 +119,8 @@ type RiderFSharpFileTemplatesOptionPage
 
 
 [<ShellComponent>]
-type DefaultFileTemplates() =
-    let xmlPath = "JetBrains.ReSharper.Plugins.FSharp.Psi.Features.src.Templates.Templates.xml"
+type FSharpDefaultFileTemplates() =
+    let xmlPath = "JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Templates.FileTemplates.xml"
 
     member val FSharp = TemplateImage("FSharp", ProjectModelThemedIcons.Fsharp.Id)
 
@@ -129,5 +129,6 @@ type DefaultFileTemplates() =
 
         member x.GetDefaultSettingsStream(lifetime) =
             let stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(xmlPath)
+            Assertion.AssertNotNull(stream, "stream <> null")
             lifetime.AddDispose(stream) |> ignore
             stream
