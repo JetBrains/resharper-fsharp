@@ -56,6 +56,8 @@ type FSharpDotSelection(file, document, range: TreeTextRange, parentRanges: Docu
         | _ -> null
     override x.CreateTokenPartSelection(tokenNode, treeTextRange) = null
 
+    override x.ExtendToWholeLine = ExtendToTheWholeLinePolicy.DO_NOT_EXTEND
+
 [<ProjectFileType(typeof<FSharpProjectFileType>)>]
 type FSharpSelectEmbracingConstructProvider() =
     let getRanges = function

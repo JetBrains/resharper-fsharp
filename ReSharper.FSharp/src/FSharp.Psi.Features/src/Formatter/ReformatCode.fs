@@ -22,7 +22,7 @@ type ReformatCode() =
     interface ICodeCleanupModule with
         member x.LanguageType = FSharpLanguage.Instance :> _
         member x.Descriptors = EmptyList<_>.Instance :> _
-        member x.IsAvailableOnSelection = false
+        member x.IsAvailableOnSelection = true
         member x.SetDefaultSetting(_,_) = ()
         member x.IsAvailable(file) = file.PrimaryPsiLanguage :? FSharpLanguage
 
@@ -51,23 +51,22 @@ type ReformatCode() =
                     let modificationSide = TextModificationSide.NotSpecified
     
                     let change = 
-                        if isNotNull rangeMarker then None
-//                            let getRange (range: DocumentRange) =
-//                                let startCoords = document.GetCoordsByOffset(range.StartOffset.Offset)
-//                                let mutable endCoords = document.GetCoordsByOffset(range.EndOffset.Offset)
-//                                // todo: rewrite extend selection and remove this step
-//                                if endCoords.Column = Column.O && endCoords.Line > Line.O then
-//                                    let prevLineEndOffset = document.GetLineEndOffsetNoLineBreak(endCoords.Line - Line.I)
-//                                    endCoords <- document.GetCoordsByOffset(prevLineEndOffset)
-//                                Range.mkRange "" (startCoords.GetPos()) (endCoords.GetPos())
-//    
-//                            try
-//                                let range = getRange rangeMarker.DocumentRange
-//                                let formatted = CodeFormatter.FormatSelection(filePath, range, source, formatConfig)
-//                                let startOffset = rangeMarker.DocumentRange.StartOffset.Offset
-//                                let oldLength = rangeMarker.Range.Length
-//                                Some(DocumentChange(document, startOffset, oldLength, formatted, stamp, modificationSide))
-//                            with _ -> None
+                        if isNotNull rangeMarker then
+                            let getRange (range: DocumentRange) =
+                                let startCoords = document.GetCoordsByOffset(range.StartOffset.Offset)
+                                let endCoords = document.GetCoordsByOffset(range.EndOffset.Offset)
+                                Range.mkRange "" (startCoords.GetPos()) (endCoords.GetPos())
+
+                            try
+                                let range = getRange rangeMarker.DocumentRange
+                                let formatted =
+                                    CodeFormatter
+                                        .FormatSelection(filePath, range, source, formatConfig)
+                                        .Replace("\r\n", "\n")
+                                let offset = rangeMarker.DocumentRange.StartOffset.Offset
+                                let oldLength = rangeMarker.DocumentRange.Length
+                                Some (DocumentChange(document, offset, oldLength, formatted, stamp, modificationSide))
+                            with _ -> None
                         else
                             let formatted =
                                 CodeFormatter
