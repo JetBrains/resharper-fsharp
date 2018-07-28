@@ -50,8 +50,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public override IEnumerable<IDeclaredType> GetSuperTypes()
     {
-      var type = (GetDeclaration()?.GetContainingNode<IUnionDeclaration>() as ITypeDeclaration)?.DeclaredElement;
-      return type != null ? new[] {TypeFactory.CreateType(type)} : EmptyList<IDeclaredType>.InstanceList;
+      var parent = TypeElement.GetContainingType();
+      if (parent == null)
+        return EmptyList<IDeclaredType>.Instance;
+
+      return new[] {TypeFactory.CreateType(parent)};
     }
 
     public override TypeElement CreateTypeElement()

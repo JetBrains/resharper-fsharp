@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
@@ -57,5 +58,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
       // RIDER-10263
       (HasPublicDefaultCtor ? MemberPresenceFlag.PUBLIC_DEFAULT_CTOR : MemberPresenceFlag.NONE);
+
+    public override IEnumerable<IDeclaredType> GetSuperTypes()
+    {
+      if (ExtendsListShortNames.IsEmpty())
+        return EmptyList<IDeclaredType>.InstanceList;
+
+      var declaration = GetDeclaration();
+      if (declaration == null)
+        return EmptyList<IDeclaredType>.InstanceList;
+
+      return declaration.SuperTypes;
+    }
   }
 }
