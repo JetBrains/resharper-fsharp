@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 
@@ -9,13 +9,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public readonly bool HasCliMutable;
 
     public RecordPart([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
-      : base(declaration, cacheBuilder)
-    {
-      HasCliMutable = declaration.Attributes.Any(attr => attr.ShortNameEquals("CLIMutable")); // todo: resolve
-    }
+      : base(declaration, cacheBuilder) =>
+      HasCliMutable = declaration.Attributes.Any(attr => attr.ShortNameEquals("CLIMutable"));
 
-    public RecordPart(IReader reader) : base(reader)
+    public RecordPart(IReader reader) : base(reader) =>
+      HasCliMutable = reader.ReadBool();
+
+    protected override void Write(IWriter writer)
     {
+      base.Write(writer);
+      writer.WriteBool(HasCliMutable);
     }
 
     public override TypeElement CreateTypeElement()
