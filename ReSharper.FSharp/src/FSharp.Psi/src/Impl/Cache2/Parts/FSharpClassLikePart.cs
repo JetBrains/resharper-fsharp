@@ -30,27 +30,33 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       if (declaration == null)
         return EmptyList<ITypeMember>.Instance;
 
-      // todo: ask members from FCS and check `IsCompilerGenerated`
-      var result = new List<ITypeMember>(declaration.MemberDeclarations.Select(d => d.DeclaredElement).WhereNotNull());
+      var result = new LocalList<ITypeMember>();
+      foreach (var memberDeclaration in declaration.MemberDeclarations)
+      {
+        var declaredElement = memberDeclaration.DeclaredElement;
+        if (declaredElement != null)
+          result.Add(declaredElement);
+      }
 
-      var fsFile = declaration.GetContainingNode<IFSharpFile>().NotNull();
+      var fsFile = (IFSharpFile) declaration.GetContainingFile().NotNull();
       foreach (var typeExtension in fsFile.GetTypeExtensions(ShortName))
-        result.AddRange(typeExtension.TypeMembers.Select(d => d.DeclaredElement).WhereNotNull());
+      {
+        foreach (var memberDeclaration in typeExtension.TypeMembers)
+        {
+          var declaredElement = memberDeclaration.DeclaredElement;
+          if (declaredElement != null)
+            result.Add(declaredElement);
+        }
+      }
 
-      return result;
+      return result.ResultingList();
     }
 
-    public virtual IEnumerable<IDeclaredType> GetSuperTypes()
-    {
-      // todo: override in class and ask FCS without getting declaration
-      return GetDeclaration()?.SuperTypes ?? EmptyList<IDeclaredType>.Instance;
-    }
+    public virtual IEnumerable<IDeclaredType> GetSuperTypes() =>
+      GetDeclaration()?.SuperTypes ?? EmptyList<IDeclaredType>.Instance;
 
-    public virtual IDeclaredType GetBaseClassType()
-    {
-      // todo: override in class and ask FCS without getting declaration
-      return GetDeclaration()?.BaseClassType ?? GetPsiModule().GetPredefinedType().Object;
-    }
+    public virtual IDeclaredType GetBaseClassType() =>
+      GetDeclaration()?.BaseClassType ?? GetPsiModule().GetPredefinedType().Object;
 
     public bool HasPublicDefaultCtor
     {
