@@ -1,0 +1,51 @@
+﻿using System.Collections;
+using System.Runtime.Serialization;
+using static Module;
+
+namespace ClassLibrary1
+{
+    public class Class1 : E1
+    {
+        public Class1()
+        {
+            var e1 = new E1(data0: 123, data1: 123);
+            var e2 = new E2(named: 123, other: 123.0);
+
+            var e1error = new E1();
+            var e2error = new E2();
+
+            IDictionary data = e1.Data;
+            int d0 = e1.Data0;
+            double d1 = e1.Data1;
+
+            int n = e2.Named;
+            double o = e2.Other;
+
+            e1.|Data0|(0) = 123;
+            e1.|Data1|(1) = 123;
+            e2.|Named|(2) = 123;
+            e2.|Other|(3) = 123;
+        }
+
+        protected Class1(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
+    }
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: The property 'Module.E1.Data0' has no setter
+(1): ReSharper Underlined Error Highlighting: The property 'Module.E1.Data1' has no setter
+(2): ReSharper Underlined Error Highlighting: The property 'Module.E2.Named' has no setter
+(3): ReSharper Underlined Error Highlighting: The property 'Module.E2.Other' has no setter
+M:Module.E1.#ctor(System.Int32,System.Double)
+M:Module.E2.#ctor(System.Int32,System.Double)
+P:Module.E1.Data0
+P:Module.E1.Data1
+P:Module.E2.Named
+P:Module.E2.Other
+P:Module.E1.Data0
+P:Module.E1.Data1
+P:Module.E2.Named
+P:Module.E2.Other
+M:Module.E1.#ctor(System.Runtime.Serialization.SerializationInfo,System.Runtime.Serialization.StreamingContext)

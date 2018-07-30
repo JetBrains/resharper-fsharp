@@ -1,0 +1,64 @@
+﻿using static Module;
+
+namespace ClassLibrary1
+{
+    public class Class1
+    {
+        public Class1()
+        {
+            U a = U.NewCaseA(item: 123);
+            U b = U.NewCaseB(named: 123);
+            U c = U.NewCaseC(item1: 123, other: 123.0);
+
+            U.CaseA ca = (U.CaseA) a;
+            U.CaseB cb = (U.CaseB) b;
+            U.CaseC cc = (U.CaseC) c;
+
+            int aItem = ca.Item;
+            int bNamed = cb.Named;
+            int cItem0 = cc.Item1;
+            double cOther = cc.Other;
+
+            int aItemError = a.|Item|(0);
+            int bNamedError = b.|Named|(1);
+            int cItem1Error = c.|Item1|(2);
+            double cOtherError = c.|Other|(3);
+
+            bool isA = a.IsCaseA;
+            bool isB = a.IsCaseB;
+            bool isC = a.IsCaseC;
+
+            int tA = U.Tags.CaseA;
+            int tB = U.Tags.CaseB;
+            int tC = U.Tags.CaseC;
+
+            int t = a.Tag;
+        }
+    }
+}
+
+---------------------------------------------------------
+(0): ReSharper Error Highlighting: Cannot resolve symbol 'Item'
+(1): ReSharper Error Highlighting: Cannot resolve symbol 'Named'
+(2): ReSharper Error Highlighting: Cannot resolve symbol 'Item1'
+(3): ReSharper Error Highlighting: Cannot resolve symbol 'Other'
+M:Module.U.CaseA.NewCaseA(System.Int32)
+M:Module.U.CaseA.NewCaseA(System.Int32)
+M:Module.U.CaseB.NewCaseB(System.Int32)
+M:Module.U.CaseB.NewCaseB(System.Int32)
+M:Module.U.CaseC.NewCaseC(System.Int32,System.Double)
+M:Module.U.CaseC.NewCaseC(System.Int32,System.Double)
+P:Module.U.CaseA.Item
+P:Module.U.CaseB.Named
+P:Module.U.CaseC.Item1
+P:Module.U.CaseC.Other
+P:Module.U.IsCaseA
+P:Module.U.IsCaseB
+P:Module.U.IsCaseC
+F:Module.U.Tags.CaseA
+T:Module.U.Tags
+F:Module.U.Tags.CaseB
+T:Module.U.Tags
+F:Module.U.Tags.CaseC
+T:Module.U.Tags
+P:Module.U.Tag

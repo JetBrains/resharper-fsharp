@@ -1,0 +1,68 @@
+﻿using static Module;
+
+namespace ClassLibrary1
+{
+    public class Class1
+    {
+        public Class1()
+        {
+            R r = new R(123);
+            r.VoidMethod();
+            int r1 = r.Prop;
+            int r2 = r.Method();
+            int r3 = r.Method(123);
+            int r4 = R.StaticMethod();
+            int r5 = R.StaticProp;
+
+            U c = U.Case;
+            c.VoidMethod();
+            int c1 = c.Prop;
+            int c2 = c.Method();
+            int c3 = c.Method(123);
+            int c4 = U.StaticMethod();
+            int c5 = U.StaticProp;
+
+            E e = new E();
+            e.VoidMethod();
+            int e1 = e.Prop;
+            int e2 = e.Method();
+            int e3 = e.Method(123);
+            int e4 = E.StaticMethod();
+            int e5 = E.StaticProp;
+        }
+    }
+}
+
+---------------------------------------------------------
+M:Module.R.#ctor(System.Int32)
+M:Module.R.VoidMethod
+M:Module.R.VoidMethod
+P:Module.R.Prop
+M:Module.R.Method
+M:Module.R.Method
+M:Module.R.Method(System.Int32)
+M:Module.R.Method(System.Int32)
+M:Module.R.StaticMethod
+M:Module.R.StaticMethod
+P:Module.R.StaticProp
+P:Module.U.Case
+M:Module.U.VoidMethod
+M:Module.U.VoidMethod
+P:Module.U.Prop
+M:Module.U.Method
+M:Module.U.Method
+M:Module.U.Method(System.Int32)
+M:Module.U.Method(System.Int32)
+M:Module.U.StaticMethod
+M:Module.U.StaticMethod
+P:Module.U.StaticProp
+M:Module.E.VoidMethod
+M:Module.E.VoidMethod
+P:Module.E.Prop
+M:Module.E.Method
+M:Module.E.Method
+M:Module.E.Method(System.Int32)
+M:Module.E.Method(System.Int32)
+M:Module.E.StaticMethod
+M:Module.E.StaticMethod
+P:Module.E.StaticProp
