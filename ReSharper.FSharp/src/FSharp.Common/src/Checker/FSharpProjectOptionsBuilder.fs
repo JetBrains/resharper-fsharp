@@ -57,7 +57,7 @@ type FSharpTargetsProjectLoadModificator() =
     interface IMsBuildProjectLoadModificator with
         member x.IsApplicable(mark) =
             match mark with
-            | FSharProjectMark -> true
+            | FSharpProjectMark -> true
             | _ -> false
 
         member x.Modify(context) =

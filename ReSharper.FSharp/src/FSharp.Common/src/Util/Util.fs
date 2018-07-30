@@ -43,7 +43,7 @@ module rec CommonUtil =
         equalsIgnoreCase FsprojExtension projectFile.ExtensionNoDot ||
         Seq.exists FSharpProjectPropertiesFactory.IsKnownProjectTypeGuid guids
 
-    let (|FSharProjectMark|_|) (mark: IProjectMark) =
+    let (|FSharpProjectMark|_|) (mark: IProjectMark) =
         if isFSharpProject [mark.Guid] mark.Location then Some() else None
 
     let ensureAbsolute (path: FileSystemPath) (projectDirectory: FileSystemPath) =

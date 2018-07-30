@@ -184,7 +184,7 @@ type FSharpItemsContainer
             | _ ->
 
             match projectMark with
-            | FSharProjectMark ->
+            | FSharpProjectMark ->
                 let itemsByName = OneToListMap()
                 for rdProject in msBuildProject.RdProjects do
                     for rdItem in rdProject.Items do
@@ -217,13 +217,16 @@ type FSharpItemsContainer
             | _ -> ()
 
         member x.OnAddFile(projectMark, itemType, path, linkedPath, relativeTo, relativeToType) =
-            logger.Trace("On add file: {0} ({1}, link: {2}) relative to: {3} {4}",
-                path, itemType, linkedPath, relativeTo, relativeToType)
-            updateProject projectMark (fun mapping refresher updater ->
-                let logicalPath = if isNotNull linkedPath then linkedPath else path
-                let relativeToType = Option.ofNullable relativeToType
-                mapping.AddFile(itemType, path, logicalPath, relativeTo, relativeToType, refresher, updater))
-            refresher.SelectItem(projectMark, path)
+            match projectMark with
+            | FSharpProjectMark ->
+                logger.Trace("On add file: {0} ({1}, link: {2}) relative to: {3} {4}",
+                    path, itemType, linkedPath, relativeTo, relativeToType)
+                updateProject projectMark (fun mapping refresher updater ->
+                    let logicalPath = if isNotNull linkedPath then linkedPath else path
+                    let relativeToType = Option.ofNullable relativeToType
+                    mapping.AddFile(itemType, path, logicalPath, relativeTo, relativeToType, refresher, updater))
+                refresher.SelectItem(projectMark, path)
+            | _ -> ()
 
         member x.OnRemoveFile(projectMark, itemType, path) =
             logger.Trace("On remove file: {0} ({1})", path, itemType)
@@ -231,14 +234,17 @@ type FSharpItemsContainer
                 mapping.RemoveFile(path, refresher, updater))
 
         member x.OnUpdateFile(projectMark, oldItemType, oldLocation, newItemType, newLocation) =
-            logger.Trace("On update file: {0} ({1}) to {2} ({3})", oldLocation, oldItemType, newLocation, newItemType)
-            if not (equalsIgnoreCase oldItemType newItemType) &&
-                    (changesOrder oldItemType || changesOrder newItemType) then
-                refresher.ReloadProject(projectMark) else
+            match projectMark with
+            | FSharpProjectMark ->
+                logger.Trace("On update file: {0} ({1}) to {2} ({3})", oldLocation, oldItemType, newLocation, newItemType)
+                if not (equalsIgnoreCase oldItemType newItemType) &&
+                        (changesOrder oldItemType || changesOrder newItemType) then
+                    refresher.ReloadProject(projectMark) else
 
-            updateProject projectMark (fun mapping _ updater ->
-                mapping.UpdateFile(oldItemType, oldLocation, newItemType, newLocation)
-                refresher.Update(projectMark, newLocation))
+                updateProject projectMark (fun mapping _ updater ->
+                    mapping.UpdateFile(oldItemType, oldLocation, newItemType, newLocation)
+                    refresher.Update(projectMark, newLocation))
+            | _ -> ()
 
         member x.OnUpdateFolder(projectMark, oldLocation, newLocation) =
             logger.Trace("On update folder: {0} to {1}", oldLocation, newLocation)
