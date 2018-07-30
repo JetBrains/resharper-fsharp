@@ -1,7 +1,7 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using JetBrains.Annotations;
-using JetBrains.Metadata.Reader.API;
-using JetBrains.Metadata.Reader.Impl;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
@@ -13,9 +13,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   {
     private static readonly string[] ourExtendsListShortNames = {"Exception", "IStructuralEquatable"};
 
-    private static readonly IClrTypeName ourIStructuralEquatableTypeName =
-      new ClrTypeName("System.Collections.IStructuralEquatable");
-
     public ExceptionPart([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, cacheBuilder)
     {
@@ -25,12 +22,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
     }
 
-    public override TypeElement CreateTypeElement()
-    {
-      return new FSharpException(this);
-    }
+    public override TypeElement CreateTypeElement() =>
+      new FSharpClass(this);
 
-    protected override byte SerializationTag => (byte) FSharpPartKind.Exception;
+    protected override byte SerializationTag =>
+      (byte) FSharpPartKind.Exception;
 
     public override string[] ExtendsListShortNames =>
       ourExtendsListShortNames;
@@ -42,7 +38,38 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       new[]
       {
         GetPsiModule().GetPredefinedType().Exception,
-        TypeFactory.CreateTypeByCLRName(ourIStructuralEquatableTypeName, GetPsiModule())
+        TypeFactory.CreateTypeByCLRName(FSharpGeneratedMembers.StructuralEquatableInterfaceName, GetPsiModule())
       };
+
+    private IList<ITypeMember> GetGeneratedMembers()
+    {
+      var result = new LocalList<ITypeMember>();
+
+      result.Add(new ExceptionConstructor(this));
+
+      result.Add(new EqualsSimpleTypeMethod(TypeElement));
+      result.Add(new EqualsObjectMethod(TypeElement));
+      result.Add(new EqualsObjectWithComparerMethod(TypeElement));
+
+      result.Add(new GetHashCodeMethod(TypeElement));
+      result.Add(new GetHashCodeWithComparerMethod(TypeElement));
+
+      if (GetDeclaration() is IExceptionDeclaration)
+      {
+        // todo: add field list tree node
+        var fields = new LocalList<ITypeOwner>();
+        foreach (var typeMember in base.GetTypeMembers())
+          if (typeMember is FSharpFieldProperty fieldProperty)
+            fields.Add(fieldProperty);
+
+        if (!fields.IsEmpty())
+          result.Add(new FSharpGeneratedConstructorFromFields(this, fields.ResultingList()));
+      }
+
+      return result.ResultingList();
+    }
+
+    public override IEnumerable<ITypeMember> GetTypeMembers() =>
+      GetGeneratedMembers().Prepend(base.GetTypeMembers());
   }
 }

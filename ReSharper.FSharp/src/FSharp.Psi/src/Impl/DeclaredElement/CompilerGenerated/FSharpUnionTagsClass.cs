@@ -3,36 +3,117 @@ using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Resolve;
+using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 {
   internal class FSharpUnionTagsClass : FSharpGeneratedMemberBase, IClass
   {
-    private class TagField : FSharpGeneratedMemberBase, IField
+    private const string TagsClassName = "Tags";
+
+    public readonly UnionPart UnionPart;
+
+    internal FSharpUnionTagsClass([NotNull] UnionPart containingType) =>
+      UnionPart = containingType;
+
+    public override DeclaredElementType GetElementType() =>
+      CLRDeclaredElementType.CLASS;
+
+    protected ITypeElement ContainingType => UnionPart.TypeElement;
+
+    protected override IClrDeclaredElement ContainingElement => ContainingType;
+    public override ITypeElement GetContainingType() => ContainingType;
+    public override ITypeMember GetContainingTypeMember() => (ITypeMember) ContainingType;
+
+    public override string ShortName => TagsClassName;
+    public IList<ITypeParameter> TypeParameters => EmptyList<ITypeParameter>.Instance;
+
+    public IClrTypeName GetClrName() =>
+      new ClrTypeName($"{ContainingType.GetClrName().FullName}+{TagsClassName}");
+
+    public IEnumerable<ITypeMember> GetMembers() => Constants;
+
+    public IEnumerable<string> MemberNames =>
+      UnionPart.Cases.Select(c => c.ShortName);
+
+    public INamespace GetContainingNamespace() =>
+      ContainingType.GetContainingNamespace();
+
+    public IPsiSourceFile GetSingleOrDefaultSourceFile() =>
+      ContainingType.GetSingleOrDefaultSourceFile();
+
+
+    public override bool IsStatic => true;
+
+    public IEnumerable<IField> Constants
     {
-      private readonly ITypeElement myTagsClass;
+      get
+      {
+        var tags = new LocalList<IField>();
+        for (var i = 0; i < UnionPart.Cases.Count; i++)
+          tags.Add(new UnionCaseTag(this, i));
+
+        return tags.ResultingList();
+      }
+    }
+
+    public IDeclaredType GetBaseClassType() => PredefinedType.Object;
+    public IList<IDeclaredType> GetSuperTypes() => new[] {GetBaseClassType()};
+
+    public MemberPresenceFlag GetMemberPresenceFlag() =>
+      MemberPresenceFlag.NONE;
+
+    public IEnumerable<IField> Fields => EmptyList<IField>.Instance;
+    public IList<ITypeElement> NestedTypes => EmptyList<ITypeElement>.Instance;
+    public IEnumerable<IConstructor> Constructors => EmptyList<IConstructor>.Instance;
+    public IEnumerable<IOperator> Operators => EmptyList<IOperator>.Instance;
+    public IEnumerable<IMethod> Methods => EmptyList<IMethod>.Instance;
+    public IEnumerable<IProperty> Properties => EmptyList<IProperty>.Instance;
+    public IEnumerable<IEvent> Events => EmptyList<IEvent>.Instance;
+
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(this, obj))
+        return true;
+
+      if (!(obj is FSharpUnionTagsClass tags)) return false;
+
+      return Equals(GetContainingType(), tags.GetContainingType());
+    }
+
+    public override int GetHashCode() => ShortName.GetHashCode();
+
+    public override string XMLDocId =>
+      XMLDocUtil.GetTypeElementXmlDocId(this);
+
+    #region UnionCaseTag
+
+    public class UnionCaseTag : FSharpGeneratedMemberBase, IField
+    {
+      public FSharpUnionTagsClass TagsClass { get; }
       private readonly int myIndex;
 
-      public TagField(string name, [NotNull] IClass containingType, ITypeElement tagsClass, int index)
-        : base(containingType)
+      public UnionCaseTag(FSharpUnionTagsClass tagsClass, int index)
       {
-        myTagsClass = tagsClass;
+        TagsClass = tagsClass;
         myIndex = index;
-        ShortName = name;
       }
 
-      public override DeclaredElementType GetElementType()
-      {
-        return CLRDeclaredElementType.CONSTANT;
-      }
+      public override string ShortName =>
+        TagsClass.UnionPart.Cases[myIndex].ShortName;
 
-      public override string ShortName { get; }
-      public override MemberHidePolicy HidePolicy => MemberHidePolicy.HIDE_BY_NAME;
-      public IType Type => Module.GetPredefinedType().Int;
+      protected override IClrDeclaredElement ContainingElement => TagsClass;
+      public override ITypeElement GetContainingType() => TagsClass;
+      public override ITypeMember GetContainingTypeMember() => TagsClass;
+
+      public override DeclaredElementType GetElementType() =>
+        CLRDeclaredElementType.CONSTANT;
+
+      public IType Type => PredefinedType.Int;
       public ConstantValue ConstantValue => new ConstantValue(myIndex, Type);
       public bool IsField => false;
       public bool IsConstant => true;
@@ -42,94 +123,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
       public override bool IsStatic => true;
       public override bool IsReadonly => true;
 
-      public override ITypeElement GetContainingType()
-      {
-        return myTagsClass;
-      }
-
-      public override ITypeMember GetContainingTypeMember()
-      {
-        return (ITypeMember) myTagsClass;
-      }
-
       public override ISubstitution IdSubstitution => EmptySubstitution.INSTANCE;
-    }
 
-    private const string TagsClassName = "Tags";
-
-    [NotNull] private readonly FSharpUnion myContainingType;
-
-    internal FSharpUnionTagsClass([NotNull] FSharpUnion containingType) : base(containingType)
-    {
-      myContainingType = containingType;
-    }
-
-    public override DeclaredElementType GetElementType()
-    {
-      return CLRDeclaredElementType.CLASS;
-    }
-
-    public override string ShortName => TagsClassName;
-    public override MemberHidePolicy HidePolicy => MemberHidePolicy.HIDE_BY_NAME;
-    public IList<ITypeParameter> TypeParameters => EmptyList<ITypeParameter>.Instance;
-
-    public IClrTypeName GetClrName()
-    {
-      return new ClrTypeName($"{myContainingType.GetClrName().FullName}+{TagsClassName}");
-    }
-
-    public IList<IDeclaredType> GetSuperTypes()
-    {
-      return EmptyList<IDeclaredType>.Instance;
-    }
-
-    public IEnumerable<ITypeMember> GetMembers()
-    {
-      return Constants;
-    }
-
-    public INamespace GetContainingNamespace()
-    {
-      return myContainingType.GetContainingNamespace();
-    }
-
-    public IPsiSourceFile GetSingleOrDefaultSourceFile()
-    {
-      return myContainingType.GetSingleOrDefaultSourceFile();
-    }
-
-    public IList<ITypeElement> NestedTypes => EmptyList<ITypeElement>.Instance;
-    public IEnumerable<IConstructor> Constructors => EmptyList<IConstructor>.Instance;
-    public IEnumerable<IOperator> Operators => EmptyList<IOperator>.Instance;
-    public IEnumerable<IMethod> Methods => EmptyList<IMethod>.Instance;
-    public IEnumerable<IProperty> Properties => EmptyList<IProperty>.Instance;
-    public IEnumerable<IEvent> Events => EmptyList<IEvent>.Instance;
-    public IEnumerable<string> MemberNames => myContainingType.Cases.Select(c => c.ShortName);
-
-    public IDeclaredType GetBaseClassType()
-    {
-      return null;
-    }
-
-    public MemberPresenceFlag GetMemberPresenceFlag()
-    {
-      return MemberPresenceFlag.NONE;
-    }
-
-    public override bool IsStatic => true;
-
-    public IEnumerable<IField> Constants
-    {
-      get
+      public override bool Equals(object obj)
       {
-        var count = 0;
-        var tags = new LocalList<IField>();
-        foreach (var unionCase in myContainingType.Cases)
-          tags.Add(new TagField(unionCase.ShortName, this, this, count++));
-        return tags.ResultingList();
+        if (ReferenceEquals(this, obj))
+          return true;
+
+        if (!(obj is UnionCaseTag tag)) return false;
+
+        if (!ShortName.Equals(tag.ShortName))
+          return false;
+
+        return Equals(GetContainingType(), tag.GetContainingType());
       }
+
+      public override int GetHashCode() => ShortName.GetHashCode();
     }
 
-    public IEnumerable<IField> Fields => EmptyList<IField>.Enumerable;
+    #endregion
   }
 }

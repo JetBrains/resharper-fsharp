@@ -36,7 +36,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public override IDeclaredType GetBaseClassType()
     {
-      var typeElement = (GetDeclaration()?.GetContainingNode<IUnionDeclaration>() as ITypeDeclaration)?.DeclaredElement;
+      var typeElement = TypeElement.GetContainingType();
       return typeElement != null
         ? TypeFactory.CreateType(typeElement)
         : null;
@@ -50,11 +50,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public override IEnumerable<IDeclaredType> GetSuperTypes()
     {
-      var parent = TypeElement.GetContainingType();
-      if (parent == null)
+      var baseType = GetBaseClassType();
+      if (baseType == null)
         return EmptyList<IDeclaredType>.Instance;
 
-      return new[] {TypeFactory.CreateType(parent)};
+      return new[] {baseType};
     }
 
     public override TypeElement CreateTypeElement()

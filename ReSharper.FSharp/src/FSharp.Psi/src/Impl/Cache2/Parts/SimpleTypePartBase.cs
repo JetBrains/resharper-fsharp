@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
-using JetBrains.Metadata.Reader.API;
-using JetBrains.Metadata.Reader.Impl;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
@@ -11,15 +10,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
   internal abstract class SimpleTypePartBase : FSharpTypeMembersOwnerTypePart
   {
-    private static readonly string[] ourExtendsListShortNames =
-      {"IStructuralEquatable", "IStructuralComparable", "IComparable"};
-
-    private static readonly IClrTypeName ourIStructuralComparableTypeName =
-      new ClrTypeName("System.Collections.IStructuralComparable");
-
-    private static readonly IClrTypeName ourIStructuralEquatableTypeName =
-      new ClrTypeName("System.Collections.IStructuralEquatable");
-
     protected SimpleTypePartBase([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, cacheBuilder)
     {
@@ -30,7 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     }
 
     public override string[] ExtendsListShortNames =>
-      ArrayUtil.Add(ourExtendsListShortNames, base.ExtendsListShortNames);
+      FSharpGeneratedMembers.SimpleTypeExtendsListShortNames;
 
     public override MemberPresenceFlag GetMemberPresenceFlag()
     {
@@ -53,9 +43,29 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
         predefinedType.IComparable,
         predefinedType.GenericIComparable,
         predefinedType.GenericIEquatable,
-        TypeFactory.CreateTypeByCLRName(ourIStructuralComparableTypeName, psiModule),
-        TypeFactory.CreateTypeByCLRName(ourIStructuralEquatableTypeName, psiModule)
+        TypeFactory.CreateTypeByCLRName(FSharpGeneratedMembers.StructuralComparableInterfaceName, psiModule),
+        TypeFactory.CreateTypeByCLRName(FSharpGeneratedMembers.StructuralEquatableInterfaceName, psiModule)
       };
     }
+
+    protected virtual IList<ITypeMember> GetGeneratedMembers() =>
+      new ITypeMember[]
+      {
+        new ToStringMethod(TypeElement),
+
+        new EqualsSimpleTypeMethod(TypeElement),
+        new EqualsObjectMethod(TypeElement),
+        new EqualsObjectWithComparerMethod(TypeElement),
+
+        new GetHashCodeMethod(TypeElement),
+        new GetHashCodeWithComparerMethod(TypeElement),
+
+        new CompareToSimpleTypeMethod(TypeElement),
+        new CompareToObjectMethod(TypeElement),
+        new CompareToObjectWithComparerMethod(TypeElement)
+      };
+
+    public override IEnumerable<ITypeMember> GetTypeMembers() =>
+      GetGeneratedMembers().Prepend(base.GetTypeMembers());
   }
 }

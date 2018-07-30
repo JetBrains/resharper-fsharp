@@ -4,6 +4,7 @@ using System.Text;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
@@ -184,5 +185,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     public static string GetAttributeShortName([NotNull] this string attrName) =>
       attrName.SubstringBeforeLast("Attribute", StringComparison.Ordinal);
+
+    public static bool IsCliMutableRecord([NotNull] this TypeElement typeElement)
+    {
+      // todo: climutable attr can be on anon part (`type R`)
+      foreach (var part in typeElement.EnumerateParts())
+        if (part is RecordPart recordPart && recordPart.CliMutable)
+          return true;
+
+      return false;
+    }
   }
 }
