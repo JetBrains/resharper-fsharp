@@ -59,6 +59,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       // RIDER-10263
       (HasPublicDefaultCtor ? MemberPresenceFlag.PUBLIC_DEFAULT_CTOR : MemberPresenceFlag.NONE);
 
+    public override IDeclaredType GetBaseClassType()
+    {
+      // todo: check inherit only
+      if (ExtendsListShortNames.IsEmpty())
+        return null;
+
+      return base.GetBaseClassType();
+    }
+
     public override IEnumerable<IDeclaredType> GetSuperTypes()
     {
       if (ExtendsListShortNames.IsEmpty())
