@@ -1,0 +1,12 @@
+﻿using System.Collections.Generic;
+using static Module;
+
+namespace ClassLibrary1
+{
+    public class Class1 : |R|(0)
+    {
+    }
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Cannot inherit from sealed class 'R'

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -31,6 +31,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     protected override byte SerializationTag =>
       (byte) FSharpPartKind.Record;
+
+    public override MemberDecoration Modifiers
+    {
+      get
+      {
+        var modifiers = base.Modifiers;
+        modifiers.IsSealed = true;
+        return modifiers;
+      }
+    }
 
     protected override IList<ITypeMember> GetGeneratedMembers()
     {
