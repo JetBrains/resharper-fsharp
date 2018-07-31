@@ -33,6 +33,9 @@ type CSharpResolveTest() =
 
     [<Test>] member x.``Simple types 01 - Members``() = x.DoNamedTest()
 
+    [<Test>] member x.``Class 01 - Abstract``() = x.DoNamedTest()
+    [<Test>] member x.``Class 02 - Sealed``() = x.DoNamedTest()
+
     override x.RelativeTestDataPath = "cache/csharpResolve"
 
     override x.MainFileExtension = CSharpProjectFileType.CS_EXTENSION

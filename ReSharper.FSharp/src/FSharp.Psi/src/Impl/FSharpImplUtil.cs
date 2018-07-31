@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
@@ -22,6 +22,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
   public static class FSharpImplUtil
   {
     private const string CompiledNameAttrName = "Microsoft.FSharp.Core.CompiledNameAttribute";
+    private const string ModuleSuffix = "CompilationRepresentationFlags.ModuleSuffix";
+    public const string Interface = "Interface";
+    public const string AbstractClass = "AbstractClass";
+    public const string Class = "Class";
+    public const string Sealed = "Sealed";
+    public const string Struct = "Struct";
 
     public static TreeTextRange GetNameRange([CanBeNull] this ILongIdentifier longIdentifier)
     {
@@ -32,8 +38,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return ids.IsEmpty ? TreeTextRange.InvalidRange : ids.Last().GetTreeTextRange();
     }
 
+    public static string GetShortName([NotNull] this IFSharpAttribute attr) =>
+      attr.LongIdentifier?.Name.GetAttributeShortName();
+
     public static bool ShortNameEquals([NotNull] this IFSharpAttribute attr, [NotNull] string shortName) =>
-      attr.LongIdentifier?.Name.GetAttributeShortName() == shortName;
+      attr.GetShortName() == shortName;
 
     [NotNull]
     public static string GetCompiledName([CanBeNull] this IIdentifier identifier,
