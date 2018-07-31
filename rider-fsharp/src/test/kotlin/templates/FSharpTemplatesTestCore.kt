@@ -68,14 +68,10 @@ abstract class FSharpTemplatesTestCore : RiderTemplatesTestCoreBase() {
                         waitForPause()
                         dumpFullCurrentData(2)
                         resumeSession()
-
-                        // waiting for exit console app
-                        if (!this.session.debugProcess.processHandler.waitFor(5000)) {
-                            logger.warn("Console app hasn't terminated for 5 seconds.")
-                        }
                     },
                     outputConsumer = {},
-                    killProcessAfterTest = true)
+                    killProcessAfterTest = true
+                )
             }
 
         }
