@@ -9,7 +9,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  internal class ExceptionPart : FSharpTypeMembersOwnerTypePart, Class.IClassPart
+  internal class ExceptionPart : FSharpTypeMembersOwnerTypePart, IExceptionPart
   {
     private static readonly string[] ourExtendsListShortNames = {"Exception", "IStructuralEquatable"};
 
@@ -41,35 +41,28 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
         TypeFactory.CreateTypeByCLRName(FSharpGeneratedMembers.StructuralEquatableInterfaceName, GetPsiModule())
       };
 
-    private IList<ITypeMember> GetGeneratedMembers()
+    public override IEnumerable<ITypeMember> GetTypeMembers() =>
+      this.GetGeneratedMembers().Prepend(base.GetTypeMembers());
+
+    public IList<ITypeOwner> Fields
     {
-      var result = new LocalList<ITypeMember>();
-
-      result.Add(new ExceptionConstructor(this));
-
-      result.Add(new EqualsSimpleTypeMethod(TypeElement));
-      result.Add(new EqualsObjectMethod(TypeElement));
-      result.Add(new EqualsObjectWithComparerMethod(TypeElement));
-
-      result.Add(new GetHashCodeMethod(TypeElement));
-      result.Add(new GetHashCodeWithComparerMethod(TypeElement));
-
-      if (GetDeclaration() is IExceptionDeclaration)
+      get
       {
         // todo: add field list tree node
         var fields = new LocalList<ITypeOwner>();
         foreach (var typeMember in base.GetTypeMembers())
           if (typeMember is FSharpFieldProperty fieldProperty)
             fields.Add(fieldProperty);
-
-        if (!fields.IsEmpty())
-          result.Add(new FSharpGeneratedConstructorFromFields(this, fields.ResultingList()));
+        return fields.ResultingList();
       }
-
-      return result.ResultingList();
     }
 
-    public override IEnumerable<ITypeMember> GetTypeMembers() =>
-      GetGeneratedMembers().Prepend(base.GetTypeMembers());
+    public bool OverridesToString => false;
+    public bool HasCompareTo => false;
+  }
+
+  public interface IExceptionPart : Class.IClassPart, ISimpleTypePart
+  {
+    IList<ITypeOwner> Fields { get; }
   }
 }

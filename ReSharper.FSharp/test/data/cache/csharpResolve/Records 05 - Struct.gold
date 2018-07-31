@@ -1,0 +1,61 @@
+﻿using System.Collections.Generic;
+using static Module;
+
+namespace ClassLibrary1
+{
+  public class Class1
+  {
+    public Class1()
+    {
+      |R?|(0) rError = |new R|(1)(field: 123);
+      SR? sr = new SR(field: 123);
+
+      SR r = new SR(field: 123);
+
+      r.|Field|(2) = 123;
+
+      var o = new object();
+      var c = EqualityComparer<SR>.Default;
+
+      string s = r.ToString();
+
+      int hc1 = r.GetHashCode();
+      int hc2 = r.GetHashCode(c);
+
+      bool b1 = r.Equals(r);
+      bool b2 = r.Equals(o);
+      bool b3 = r.Equals(o, c);
+
+      int ct1 = r.CompareTo(r);
+      int ct2 = r.CompareTo(o);
+      int ct3 = r.CompareTo(o, Comparer<SR>.Default);
+    }
+  }
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Only non-nullable value type could be underlying of 'System.Nullable'
+(1): ReSharper Underlined Error Highlighting: Cannot convert source type 'Module.R' to target type 'System.Nullable<Module.R>'
+(2): ReSharper Underlined Error Highlighting: The property 'Module.SR.Field' has no setter
+M:Module.R.#ctor(System.Int32)
+M:Module.SR.#ctor(System.Int32)
+M:Module.SR.#ctor(System.Int32)
+P:Module.SR.Field
+M:Module.SR.ToString
+M:Module.SR.ToString
+M:Module.SR.GetHashCode
+M:Module.SR.GetHashCode
+M:Module.SR.GetHashCode(System.Collections.IEqualityComparer)
+M:Module.SR.GetHashCode(System.Collections.IEqualityComparer)
+M:Module.SR.Equals(Module.SR)
+M:Module.SR.Equals(Module.SR)
+M:Module.SR.Equals(System.Object)
+M:Module.SR.Equals(System.Object)
+M:Module.SR.Equals(System.Object,System.Collections.IEqualityComparer)
+M:Module.SR.Equals(System.Object,System.Collections.IEqualityComparer)
+M:Module.SR.CompareTo(Module.SR)
+M:Module.SR.CompareTo(Module.SR)
+M:Module.SR.CompareTo(System.Object)
+M:Module.SR.CompareTo(System.Object)
+M:Module.SR.CompareTo(System.Object,System.Collections.IComparer)
+M:Module.SR.CompareTo(System.Object,System.Collections.IComparer)

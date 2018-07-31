@@ -15,5 +15,7 @@
     Interface = 10,
     Class = 11,
     Struct = 12,
+    StructRecord = 13,
+    StructUnion = 14,
   }
 }

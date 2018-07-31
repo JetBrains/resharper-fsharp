@@ -20,17 +20,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
       Parameters = parameters;
     }
 
-    public FSharpGeneratedConstructorFromFields([NotNull] TypePart typePart,
-      TreeNodeCollection<IFieldDeclaration> fieldsDeclarations) : base(typePart)
-    {
-      var parameters = new IParameter[fieldsDeclarations.Count];
-      for (var i = 0; i < fieldsDeclarations.Count; i++)
-        parameters[i] =
-          new FSharpGeneratedConstructorParameter(this, (ITypeOwner) fieldsDeclarations[i].DeclaredElement);
-
-      Parameters = parameters;
-    }
-
     public override IList<IParameter> Parameters { get; }
   }
 

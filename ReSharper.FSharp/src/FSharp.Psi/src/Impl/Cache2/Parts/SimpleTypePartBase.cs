@@ -8,7 +8,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  internal abstract class SimpleTypePartBase : FSharpTypeMembersOwnerTypePart
+  internal abstract class SimpleTypePartBase : FSharpTypeMembersOwnerTypePart, ISimpleTypePart
   {
     protected SimpleTypePartBase([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, cacheBuilder)
@@ -49,23 +49,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     }
 
     protected virtual IList<ITypeMember> GetGeneratedMembers() =>
-      new ITypeMember[]
-      {
-        new ToStringMethod(TypeElement),
-
-        new EqualsSimpleTypeMethod(TypeElement),
-        new EqualsObjectMethod(TypeElement),
-        new EqualsObjectWithComparerMethod(TypeElement),
-
-        new GetHashCodeMethod(TypeElement),
-        new GetHashCodeWithComparerMethod(TypeElement),
-
-        new CompareToSimpleTypeMethod(TypeElement),
-        new CompareToObjectMethod(TypeElement),
-        new CompareToObjectWithComparerMethod(TypeElement)
-      };
+      GeneratedMembersUtil.GetGeneratedMembers(this);
 
     public override IEnumerable<ITypeMember> GetTypeMembers() =>
       GetGeneratedMembers().Prepend(base.GetTypeMembers());
+
+    public bool OverridesToString => true;
+    public bool HasCompareTo => true;
+  }
+
+  public interface ISimpleTypePart : ClassLikeTypeElement.IClassLikePart
+  {
+    bool OverridesToString { get; }
+    bool HasCompareTo { get; }
   }
 }

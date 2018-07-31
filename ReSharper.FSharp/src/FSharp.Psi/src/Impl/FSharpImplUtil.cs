@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using JetBrains.Annotations;
@@ -21,8 +22,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 {
   public static class FSharpImplUtil
   {
-    private const string CompiledNameAttrName = "Microsoft.FSharp.Core.CompiledNameAttribute";
-    private const string ModuleSuffix = "CompilationRepresentationFlags.ModuleSuffix";
+    public const string CompiledNameAttrName = "Microsoft.FSharp.Core.CompiledNameAttribute";
+    public const string ModuleSuffix = "CompilationRepresentationFlags.ModuleSuffix";
+    public const string CompiledName = "CompiledName";
+    public const string AttributeSuffix = "Attribute";
     public const string Interface = "Interface";
     public const string AbstractClass = "AbstractClass";
     public const string Class = "Class";
@@ -199,7 +202,53 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     {
       // todo: climutable attr can be on anon part (`type R`)
       foreach (var part in typeElement.EnumerateParts())
-        if (part is RecordPart recordPart && recordPart.CliMutable)
+        if (part is IRecordPart recordPart && recordPart.CliMutable)
+          return true;
+
+      return false;
+    }
+
+    public static bool GetTypeKind(IEnumerable<IFSharpAttribute> attributes, out FSharpPartKind fSharpPartKind)
+    {
+      foreach (var attr in attributes)
+      {
+        var attrIds = attr.LongIdentifier.Identifiers;
+        if (attrIds.IsEmpty)
+          continue;
+
+        switch (attrIds.Last()?.GetText().DropAttributeSuffix())
+        {
+          case Interface:
+          {
+            fSharpPartKind = FSharpPartKind.Interface;
+            return true;
+          }
+          case AbstractClass:
+          case Sealed:
+          case Class:
+          {
+            fSharpPartKind = FSharpPartKind.Class;
+            return true;
+          }
+          case Struct:
+          {
+            fSharpPartKind = FSharpPartKind.Struct;
+            return true;
+          }
+        }
+      }
+
+      fSharpPartKind = default;
+      return false;
+    }
+
+    public static string DropAttributeSuffix([NotNull] this string attrName) =>
+      attrName.SubstringBeforeLast(AttributeSuffix, StringComparison.Ordinal);
+
+    public static bool HasAttribute([NotNull] this IFSharpTypeDeclaration typeDeclaration, [NotNull] string shortName)
+    {
+      foreach (var attr in typeDeclaration.Attributes)
+        if (attr.ShortNameEquals(shortName))
           return true;
 
       return false;

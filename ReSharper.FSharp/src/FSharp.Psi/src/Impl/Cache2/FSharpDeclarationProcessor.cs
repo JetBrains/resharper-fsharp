@@ -113,7 +113,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public override void VisitRecordDeclaration(IRecordDeclaration decl)
     {
-      Builder.StartPart(new RecordPart(decl, Builder));
+      var recordPart =
+        decl.HasAttribute(FSharpImplUtil.Struct)
+          ? (Part) new StructRecordPart(decl, Builder)
+          : new RecordPart(decl, Builder);
+
+      Builder.StartPart(recordPart);
       ProcessTypeMembers(decl.MemberDeclarations);
       Builder.EndPart();
     }

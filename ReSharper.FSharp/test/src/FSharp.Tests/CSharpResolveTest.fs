@@ -20,6 +20,9 @@ type CSharpResolveTest() =
     [<Test>] member x.``Records 01 - Generated members``() = x.DoNamedTest()
     [<Test>] member x.``Records 02 - CliMutable``() = x.DoNamedTest()
     [<Test>] member x.``Records 03 - Override generated members``() = x.DoNamedTest()
+    [<Test>] member x.``Records 04 - Sealed``() = x.DoNamedTest()
+    [<Test>] member x.``Records 05 - Struct``() = x.DoNamedTest()
+    [<Test>] member x.``Records 06 - Struct CliMutable``() = x.DoNamedTest()
 
     [<Test>] member x.``Exceptions 01 - Empty``() = x.DoNamedTest()
     [<Test>] member x.``Exceptions 02 - Single field``() = x.DoNamedTest()
