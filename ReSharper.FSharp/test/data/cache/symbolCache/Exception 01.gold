@@ -1,0 +1,7 @@
+﻿Project Files:Exception 01.fs:
+FSharpProjectFilePart:ImplFile
+ TopLevelModulePart:Module->Class:Module
+  ExceptionPart:Exn->Class:Module+Exn
+[]: Namespace:
+ [Module]: Class:Module[TestProject]
+  [Exn]: Class:Module+Exn[TestProject]

@@ -130,5 +130,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     }
 
     public override string[] AttributeClassNames { get; }
+
+    public override string ToString()
+    {
+      var typeElement = TypeElement?.ToString() ?? "null";
+      var typeParameters = PrintTypeParameters();
+
+      return $"{GetType().Name}:{ShortName}{typeParameters}->{typeElement}";
+    }
+
+    protected virtual string PrintTypeParameters() => "";
   }
 }

@@ -1,0 +1,5 @@
+﻿Project Files:Namespace 02 - Qualified.fs:
+FSharpProjectFilePart:ImplFile
+ QualifiedNamespacePart:Qualifier
+  FSharp.DeclaredNamespacePart:MyNamespace
+[]: Namespace:

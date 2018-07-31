@@ -1,0 +1,7 @@
+﻿Project Files:Inferred interface 01 - Abstract member.fs:
+FSharpProjectFilePart:ImplFile
+ TopLevelModulePart:Module->Class:Module
+  InterfacePart:IInterface->Interface:Module+IInterface
+[]: Namespace:
+ [Module]: Class:Module[TestProject]
+  [IInterface]: Interface:Module+IInterface[TestProject]

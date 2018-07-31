@@ -79,5 +79,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
       return 0;
     }
+
+    protected override string PrintTypeParameters() =>
+      myTypeParameterNames.Length == 0
+        ? ""
+        : "<" + StringUtil.StringArrayText(myTypeParameterNames) + ">";
   }
 }

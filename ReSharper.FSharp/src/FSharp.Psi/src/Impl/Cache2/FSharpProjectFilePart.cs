@@ -28,5 +28,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public bool IsSignaturePart => FileKind == FSharpFileKind.SigFile;
     public bool IsImplementationPart => FileKind == FSharpFileKind.ImplFile;
+
+    public override string ToString() => $"{GetType().Name}:{FileKind}";
   }
 }

@@ -9,6 +9,7 @@
   <ItemGroup>
     <Compile Include="TestWithTwoProjects.fs" />
     <Compile Include="CSharpResolveTest.fs" />
+    <Compile Include="SymbolCacheTest.fs" />
     <Compile Include="ErrorsHighlightingTest.fs" />
     <Compile Include="FSharpLexerTest.fs" />
     <Compile Include="Stubs.fs" />

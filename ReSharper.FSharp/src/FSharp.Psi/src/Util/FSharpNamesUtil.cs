@@ -4,6 +4,7 @@ using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
@@ -14,7 +15,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {
   public static class FSharpNamesUtil
   {
-    private const string AttributeSuffix = "Attribute";
     private const string ModuleSuffix = "Module";
     private const int EscapedNameAffixLength = 4;
     private const int EscapedNameStartIndex = 2;
@@ -68,8 +68,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (element is ITypeElement type)
       {
         var typeShortName = type.ShortName;
-        if (typeShortName.EndsWith(AttributeSuffix))
-          names.Add(typeShortName.SubstringBeforeLast(AttributeSuffix, StringComparison.Ordinal));
+        if (typeShortName.EndsWith(FSharpImplUtil.AttributeSuffix))
+          names.Add(typeShortName.SubstringBeforeLast(FSharpImplUtil.AttributeSuffix, StringComparison.Ordinal));
 
         names.AddRange(
           FSharpTypeAbbreviationsUtil.AbbreviatedTypes.TryGetValue(type.GetClrName(), EmptyArray<string>.Instance));

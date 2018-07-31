@@ -10,12 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     protected override string DeclaredElementName =>
       HasExplicitName
-        ? LongIdentifier.QualifiedName
-        : ImplicitName;
-
-    public override string ShortName =>
-      HasExplicitName
-        ? LongIdentifier.GetCompiledName(Attributes)
+        ? LongIdentifier.GetModuleCompiledName(Attributes)
         : ImplicitName;
 
     public override string SourceName =>

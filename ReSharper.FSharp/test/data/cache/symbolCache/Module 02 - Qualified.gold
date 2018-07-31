@@ -1,0 +1,7 @@
+﻿Project Files:Module 02 - Qualified.fs:
+FSharpProjectFilePart:ImplFile
+ QualifiedNamespacePart:MyNamespace
+  TopLevelModulePart:MyModule->Class:MyNamespace.MyModule
+[]: Namespace:
+ [MyNamespace]: Namespace:MyNamespace
+  [MyModule]: Class:MyNamespace.MyModule[TestProject]

@@ -1,0 +1,7 @@
+﻿Project Files:Record 02 - Simple, namespace.fs:
+FSharpProjectFilePart:ImplFile
+ FSharp.DeclaredNamespacePart:Ns
+  RecordPart:R->Class:Ns.R
+[]: Namespace:
+ [Ns]: Namespace:Ns
+  [R]: Class:Ns.R[TestProject]

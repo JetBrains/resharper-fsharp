@@ -1,10 +1,28 @@
-﻿using JetBrains.ReSharper.Psi;
+﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class NestedModuleDeclaration
   {
-    protected override string DeclaredElementName => Identifier.GetCompiledName(Attributes);
+    protected override string DeclaredElementName
+    {
+      get
+      {
+        var parentModule = Parent as IModuleLikeDeclaration;
+        if (parentModule == null)
+          return Identifier.GetModuleCompiledName(Attributes);
+
+        var sourceName = SourceName;
+        foreach (var typeDeclaration in parentModule.Children<IFSharpTypeDeclaration>())
+          if (typeDeclaration.ShortName == sourceName && typeDeclaration.TypeParameters.IsEmpty)
+            return sourceName + "Module";
+
+        return Identifier.GetModuleCompiledName(Attributes);
+      }
+    }
+
     public override string SourceName => Identifier.GetSourceName();
     public bool IsModule => true;
     public override TreeTextRange GetNameRange() => Identifier.GetNameRange();

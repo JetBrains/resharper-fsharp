@@ -1,0 +1,9 @@
+﻿Project Files:Module 06 - Module suffix attribute, CompiledName 2.fs:
+FSharpProjectFilePart:ImplFile
+ QualifiedNamespacePart:MyNamespace
+  TopLevelModulePart:TopModule->Class:MyNamespace.TopModule
+   NestedModulePart:NestedModule->Class:MyNamespace.TopModule+NestedModule
+[]: Namespace:
+ [MyNamespace]: Namespace:MyNamespace
+  [TopModule]: Class:MyNamespace.TopModule[TestProject]
+   [NestedModule]: Class:MyNamespace.TopModule+NestedModule[TestProject]
