@@ -1,10 +1,13 @@
 package templates
 
+import com.intellij.execution.runners.ExecutionEnvironment
+import com.jetbrains.rider.run.configurations.project.DotNetProjectConfiguration
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.RiderTemplatesTestCoreBase
 import com.jetbrains.rider.test.enums.ToolsetVersion
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.*
+import com.jetbrains.rider.util.idea.toVirtualFile
 import org.testng.annotations.Test
 
 @Test
@@ -41,7 +44,7 @@ abstract class FSharpTemplatesTestCore : RiderTemplatesTestCoreBase() {
             templateId = ProjectTemplateIds.Core.fsharp_consoleApplication21
 
         val projectName = "ConsoleApplication"
-        //val programFs = activeSolutionDirectory.resolve(projectName).resolve("Program.fs")
+        val programFs = activeSolutionDirectory.resolve(projectName).resolve("Program.fs")
         doCoreTest(templateId, projectName) { project ->
             checkSwea(project)
             checkCanExecuteSelectedRunConfiguration(project)
@@ -51,8 +54,7 @@ abstract class FSharpTemplatesTestCore : RiderTemplatesTestCoreBase() {
             val output = runProgram(project)
             assert(output.contains("Hello World from F#!")) { "Wrong program output: $output" }
 
-            //todo enable after move ScriptingAPI.Debug.Temp to ScriptingAPI
-            /*val beforeRun: ExecutionEnvironment.() -> Unit = {
+            val beforeRun: ExecutionEnvironment.() -> Unit = {
                 this.runProfile as DotNetProjectConfiguration
                 val envVars = mutableMapOf<String, String>()
                 //envVars.putAll(configuration.environmentVariables)
@@ -60,16 +62,21 @@ abstract class FSharpTemplatesTestCore : RiderTemplatesTestCoreBase() {
                 //configuration.environmentVariables = envVars
                 toggleBreakpoint(project, programFs.toVirtualFile(true)!!, 7)
             }
-            debugProgram(project, debugGoldFile, beforeRun) {
-                waitForPause()
-                dumpFullCurrentData(2)
-                resumeSession()
+            executeWithGold(debugGoldFile, getGoldFileSystemDependentSuffix()) {
+                debugProgram(project, it, beforeRun,
+                    test = {
+                        waitForPause()
+                        dumpFullCurrentData(2)
+                        resumeSession()
 
-                // waiting for exit console app
-                if (!this.session.debugProcess.processHandler.waitFor(5000)) {
-                    logger.warn("Console app hasn't terminated for 5 seconds.")
-                }
-            }*/
+                        // waiting for exit console app
+                        if (!this.session.debugProcess.processHandler.waitFor(5000)) {
+                            logger.warn("Console app hasn't terminated for 5 seconds.")
+                        }
+                    },
+                    outputConsumer = {},
+                    killProcessAfterTest = true)
+            }
 
         }
     }
