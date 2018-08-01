@@ -12,10 +12,8 @@ import org.jetbrains.kotlin.daemon.common.toHexString
 
 buildscript {
     repositories {
-        maven {
-            setUrl("https://cache-redirector.jetbrains.com/myget.org.rd-snapshots.maven")
-            setUrl("https://cache-redirector.jetbrains.com/maven-central")
-        }
+        maven { setUrl("https://repo.labs.intellij.net/rd-snapshots-maven") }
+        mavenCentral()
     }
     dependencies {
         classpath("com.jetbrains.rd:rd-gen:0.1.19")
