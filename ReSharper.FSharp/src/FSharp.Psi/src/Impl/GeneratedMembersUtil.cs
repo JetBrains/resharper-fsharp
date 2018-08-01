@@ -45,7 +45,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       {
         case IRecordPart recordPart:
           result.Add(new FSharpGeneratedConstructorFromFields(typePart, recordPart.Fields));
-          if (recordPart.CliMutable)
+          if (recordPart.CliMutable && typePart is Class.IClassPart)
             result.Add(new DefaultConstructor(typeElement));
           break;
 
