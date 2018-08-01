@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -53,6 +54,30 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
           var fields = exceptionPart.Fields;
           if (!fields.IsEmpty())
             result.Add(new FSharpGeneratedConstructorFromFields(typePart, fields));
+          break;
+
+        case IUnionPart unionPart:
+          var cases = unionPart.Cases;
+          var isSingleCaseUnion = cases.Count == 1;
+
+          result.Add(new UnionTagProperty(typeElement));
+
+          foreach (var unionCase in cases)
+          {
+            if (!isSingleCaseUnion)
+              result.Add(new IsUnionCaseProperty(typeElement, "Is" + unionCase.ShortName));
+
+            if (unionCase is FSharpNestedTypeUnionCase typedCase)
+            {
+              result.Add(new NewUnionCaseMethod(typedCase));
+
+              if (!unionPart.HasPublicNestedTypes)
+                result.AddRange(typedCase.CaseFields);
+            }
+          }
+
+          if (!isSingleCaseUnion)
+            result.Add(new FSharpUnionTagsClass(typePart));
           break;
       }
 

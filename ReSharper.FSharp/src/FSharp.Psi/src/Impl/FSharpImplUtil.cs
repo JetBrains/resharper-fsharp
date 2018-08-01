@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using JetBrains.Annotations;
@@ -221,6 +221,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
           return true;
 
       return false;
+    }
+
+    public static bool IsUnionWithPublicNestedTypes([NotNull] this TypeElement typeElement)
+    {
+      foreach (var part in typeElement.EnumerateParts())
+        if (part is IUnionPart unionPart && unionPart.HasPublicNestedTypes)
+          return true;
+
+      return false;
+
     }
 
     public static bool GetTypeKind(IEnumerable<IFSharpAttribute> attributes, out FSharpPartKind fSharpPartKind)

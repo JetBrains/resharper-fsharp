@@ -75,7 +75,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
         case FSharpPartKind.StructRecord:
           return new StructRecordPart(reader);
         case FSharpPartKind.StructUnion:
-          throw new NotImplementedException(); // todo
+          return new StructUnionPart(reader);
         default:
           throw new SerializationError("Unknown tag:" + tag);
       }

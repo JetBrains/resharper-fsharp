@@ -198,14 +198,13 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime: Lifeti
         | UnionCaseFullType(_) ->
             true // todo: used in FSharp.Core only, otherwise warning
 
-    member internal x.ProcessUnionCases(cases) =
-        match cases with
-        | [singleCase] ->
-            x.ProcessUnionCase(singleCase)
-            ElementType.SINGLE_CASE_UNION_DECLARATION
-        | cases ->
-            for case in cases do x.ProcessUnionCase(case)
-            ElementType.MULTIPLE_CASES_UNION_DECLARATION
+    member internal x.ProcessUnionCases(cases, range: Range.range) =
+        range |> x.GetStartOffset |> x.AdvanceToOffset
+        let casesListMark = x.Mark()
+        for case in cases do
+            x.ProcessUnionCase(case)
+        range |> x.GetEndOffset |> x.AdvanceToOffset
+        x.Done(casesListMark, ElementType.UNION_CASES_LIST)
 
     member internal x.ProcessUnionCase (UnionCase(_,id,caseType,_,_,range)) =
         range |> x.GetStartOffset |> x.AdvanceToOffset
@@ -213,8 +212,8 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime: Lifeti
 
         x.ProcessIdentifier(id)
         let hasFields = x.ProcessUnionCaseType(caseType)
-        let elementType = if hasFields then ElementType.UNION_CASE_DECLARATION
-                                       else ElementType.FIELD_DECLARATION
+        let elementType = if hasFields then ElementType.NESTED_TYPE_UNION_CASE_DECLARATION
+                                       else ElementType.SINGLETON_CASE_DECLARATION
         range |> x.GetEndOffset |> x.AdvanceToOffset
         x.Done(mark, elementType)
 

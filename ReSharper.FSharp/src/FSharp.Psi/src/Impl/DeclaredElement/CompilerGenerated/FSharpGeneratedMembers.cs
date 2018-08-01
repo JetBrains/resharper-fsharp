@@ -283,7 +283,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
   {
     internal readonly UnionCasePart UnionCasePart;
 
-    public NewUnionCaseMethod([NotNull] TypeElement typeElement) : base(typeElement) =>
+    public NewUnionCaseMethod([NotNull] TypeElement typeElement) : base(typeElement.GetContainingType()) =>
       UnionCasePart = typeElement.EnumerateParts().OfType<UnionCasePart>().First();
 
     public override string ShortName => "New" + UnionCasePart.ShortName;

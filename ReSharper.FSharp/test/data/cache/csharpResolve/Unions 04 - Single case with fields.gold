@@ -23,7 +23,7 @@ namespace ClassLibrary1
 (1): ReSharper Error Highlighting: Cannot resolve symbol 'Tags'
 (2): ReSharper Underlined Error Highlighting: Cannot access internal class 'Case' here
 (3): ReSharper Underlined Error Highlighting: Cannot access internal class 'Case' here
-M:Module.U.Case.NewCase(System.Int32)
-M:Module.U.Case.NewCase(System.Int32)
+M:Module.U.NewCase(System.Int32)
+M:Module.U.NewCase(System.Int32)
 P:Module.U.Tag
 P:Module.U.Case.Item

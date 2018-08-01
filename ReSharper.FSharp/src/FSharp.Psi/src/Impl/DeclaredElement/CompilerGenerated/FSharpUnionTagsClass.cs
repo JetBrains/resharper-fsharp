@@ -5,6 +5,7 @@ using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
@@ -15,15 +16,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
   {
     private const string TagsClassName = "Tags";
 
-    public readonly UnionPart UnionPart;
+    public readonly TypePart TypePart;
 
-    internal FSharpUnionTagsClass([NotNull] UnionPart containingType) =>
-      UnionPart = containingType;
+    internal FSharpUnionTagsClass([NotNull] TypePart typePart) =>
+      TypePart = typePart;
 
     public override DeclaredElementType GetElementType() =>
       CLRDeclaredElementType.CLASS;
 
-    protected ITypeElement ContainingType => UnionPart.TypeElement;
+    protected IUnionPart UnionPart => (IUnionPart) TypePart;
+    protected ITypeElement ContainingType => TypePart.TypeElement;
 
     protected override IClrDeclaredElement ContainingElement => ContainingType;
     public override ITypeElement GetContainingType() => ContainingType;

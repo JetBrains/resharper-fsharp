@@ -1,4 +1,6 @@
 ﻿using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
@@ -8,12 +10,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
   /// <summary>
   /// Union case compiled to property
   /// </summary>
-  internal class FSharpUnionCaseProperty : FSharpFieldPropertyBase
+  internal class FSharpUnionCaseProperty : FSharpFieldPropertyBase<SingletonCaseDeclaration>, IUnionCase
   {
     [NotNull]
     public FSharpUnionCase UnionCase { get; }
 
-    internal FSharpUnionCaseProperty([NotNull] IFieldDeclaration declaration, [NotNull] FSharpUnionCase unionCase)
+    internal FSharpUnionCaseProperty([NotNull] ISingletonCaseDeclaration declaration, [NotNull] FSharpUnionCase unionCase)
       : base(declaration)
     {
       UnionCase = unionCase;

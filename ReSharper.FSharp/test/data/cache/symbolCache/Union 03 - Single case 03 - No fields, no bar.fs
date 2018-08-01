@@ -1,3 +1,3 @@
 module Module
 
-exception Exn
+type U = Case

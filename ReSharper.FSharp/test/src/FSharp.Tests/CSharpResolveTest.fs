@@ -33,6 +33,8 @@ type CSharpResolveTest() =
     [<Test>] member x.``Unions 02 - Singletons``() = x.DoNamedTest()
     [<Test>] member x.``Unions 03 - Nested types``() = x.DoNamedTest()
     [<Test>] member x.``Unions 04 - Single case with fields``() = x.DoNamedTest()
+    [<Test>] member x.``Unions 05 - Struct single case with fields``() = x.DoNamedTest()
+    [<Test>] member x.``Unions 06 - Struct nested types``() = x.DoNamedTest()
 
     [<Test>] member x.``Simple types 01 - Members``() = x.DoNamedTest()
 

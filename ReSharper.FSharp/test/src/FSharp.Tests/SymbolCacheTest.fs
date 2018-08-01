@@ -46,6 +46,16 @@ type SymbolCacheTest() =
     [<Test>] member x.``Enum 01``() = x.DoNamedTest()
     [<Test>] member x.``Exception 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Union 01 - Single case 01 - Fields``() = x.DoNamedTest()
+    [<Test>] member x.``Union 02 - Single case 02 - No fields``() = x.DoNamedTest()
+    [<Test; Ignore>] member x.``Union 03 - Single case 03 - No fields, no bar``() = x.DoNamedTest()
+    [<Test>] member x.``Union 04 - Singletons``() = x.DoNamedTest()
+    [<Test>] member x.``Union 05 - Nested types``() = x.DoNamedTest()
+    [<Test>] member x.``Union 06 - Mixed cases``() = x.DoNamedTest()
+    [<Test>] member x.``Union 07 - Struct single case``() = x.DoNamedTest()
+    [<Test>] member x.``Union 08 - Struct singletons``() = x.DoNamedTest()
+    [<Test>] member x.``Union 09 - Struct multiple cases with fields``() = x.DoNamedTest()
+
     override x.DoTest(project: IProject) =
         let psiServices = x.Solution.GetPsiServices()
         psiServices.Files.CommitAllDocuments()

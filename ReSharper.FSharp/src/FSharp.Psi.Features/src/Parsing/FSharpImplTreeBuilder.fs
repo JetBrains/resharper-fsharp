@@ -117,8 +117,9 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                             x.ProcessEnumCase case
                         ElementType.ENUM_DECLARATION
 
-                    | SynTypeDefnSimpleRepr.Union(_,cases,_) ->
-                        x.ProcessUnionCases(cases)
+                    | SynTypeDefnSimpleRepr.Union(_,cases, range) ->
+                        x.ProcessUnionCases(cases, range)
+                        ElementType.UNION_DECLARATION
 
                     | SynTypeDefnSimpleRepr.TypeAbbrev(_,t,_) ->
                         x.ProcessSynType t

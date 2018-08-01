@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
@@ -10,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
   /// <summary>
   /// Field in a record or in a union case or in an exception
   /// </summary>
-  internal class FSharpFieldProperty : FSharpFieldPropertyBase
+  internal class FSharpFieldProperty : FSharpFieldPropertyBase<FieldDeclaration>
   {
     [NotNull]
     public FSharpField Field { get; }

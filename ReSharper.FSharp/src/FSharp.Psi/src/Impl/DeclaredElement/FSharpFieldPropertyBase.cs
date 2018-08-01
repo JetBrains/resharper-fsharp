@@ -10,9 +10,10 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal abstract class FSharpFieldPropertyBase : FSharpTypeMember<FieldDeclaration>, IProperty
+  internal abstract class FSharpFieldPropertyBase<T> : FSharpTypeMember<T>, IProperty
+    where T : FSharpDeclarationBase, IModifiersOwnerDeclaration
   {
-    internal FSharpFieldPropertyBase([NotNull] IFieldDeclaration declaration)
+    internal FSharpFieldPropertyBase([NotNull] ITypeMemberDeclaration declaration)
       : base(declaration)
     {
     }

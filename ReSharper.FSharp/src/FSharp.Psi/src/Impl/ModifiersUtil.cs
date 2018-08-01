@@ -12,7 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 {
   public static class ModifiersUtil
   {
-    public static MemberDecoration GetDecoration(IUnionCaseDeclaration caseDeclaration)
+    public static MemberDecoration GetDecoration(INestedTypeUnionCaseDeclaration caseDeclaration)
     {
       if (caseDeclaration.FieldsEnumerable.IsEmpty())
         return MemberDecoration.FromModifiers(Modifiers.INTERNAL);
@@ -47,6 +47,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
             break;
         }
       }
+
       return Normalize(decoration);
     }
 
@@ -90,6 +91,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         if (filePart?.IsSignaturePart ?? false)
           return part;
       }
+
       return null;
     }
   }

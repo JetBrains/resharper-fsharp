@@ -16,20 +16,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
     }
 
-    public override TypeElement CreateTypeElement()
-    {
-      return new FSharpStruct(this);
-    }
+    public override TypeElement CreateTypeElement() =>
+      new FSharpStruct(this);
 
-    public MemberPresenceFlag GetMembersPresenceFlag()
-    {
-      return MemberPresenceFlag.SIGN_OP;
-    }
+    protected override byte SerializationTag =>
+      (byte) FSharpPartKind.Struct;
 
-    public bool HasHiddenInstanceFields => false; // todo: check this
+    public MemberPresenceFlag GetMembersPresenceFlag() =>
+      GetMemberPresenceFlag();
+
+    public bool HasHiddenInstanceFields => false;
     public bool IsReadonly => false;
     public bool IsByRefLike => false;
-    protected override byte SerializationTag => (byte) FSharpPartKind.Struct;
   }
 
   public class FSharpStruct : Struct
@@ -38,6 +36,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
     }
 
-    protected override MemberDecoration Modifiers => myParts.GetModifiers();
+    protected override MemberDecoration Modifiers => Parts.GetModifiers();
   }
 }

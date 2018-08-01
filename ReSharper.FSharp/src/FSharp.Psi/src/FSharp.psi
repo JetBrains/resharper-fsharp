@@ -124,17 +124,14 @@ typeExtension:
 interface fSharpTypeDeclaration:
   exceptionDeclaration |
   simpleTypeDeclaration |
-  objectModelTypeDeclaration;
+  objectModelTypeDeclaration |
+  nestedTypeUnionCaseDeclaration;
 
 interface simpleTypeDeclaration:
   enumDeclaration |
   recordDeclaration |
   unionDeclaration |
   notCompiledTypeDeclaration;
-
-interface unionDeclaration:
-  singleCaseUnionDeclaration |
-  multipleCasesUnionDeclaration;
 
 interface notCompiledTypeDeclaration:
   typeAbbreviationDeclaration |
@@ -194,30 +191,36 @@ fieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
 
 // Discriminated unions
 
-multipleCasesUnionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
-  get { methodName="TypeParameters" path=<multipleCasesUnionDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
+unionCasesList:
+  modifier{ACCESS_MODIFIER, Modifier}?
+  unionCaseDeclaration<UNION_CASE, UnionCases>*;
+
+unionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
+  get { methodName="TypeParameters" path=<unionDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
+  get { methodName="UnionCases" path=<unionDeclaration:UNION_CASES_LIST/unionCasesList:UNION_CASE> };
 }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
-  unionCaseDeclaration<UNION_CASE, UnionCases>* fakeSeparator
+  unionCasesList<UNION_CASES_LIST, UnionCasesList>
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
 
-singleCaseUnionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
-  get { methodName="TypeParameters" path=<singleCaseUnionDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
+
+interface unionCaseDeclaration:
+  singletonCaseDeclaration |
+  nestedTypeUnionCaseDeclaration;
+
+singletonCaseDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
+  fSharpAttribute<ATTRIBUTE, Attributes>*
+  accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
+  fSharpIdentifier<IDENTIFIER, Identifier>;
+
+nestedTypeUnionCaseDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
+  get { methodName="TypeParameters" path=<nestedTypeUnionCaseDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
 }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
-  fSharpIdentifier<IDENTIFIER, Identifier>
-  typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
-  unionCaseDeclaration<UNION_CASE, UnionCases>* fakeSeparator
-  fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
-
-unionCaseDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
-  get { methodName="TypeParameters" path=<unionCaseDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
-}:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
   fSharpIdentifier<IDENTIFIER, Identifier>
   fieldDeclaration<UNION_FIELD, Fields>*
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?

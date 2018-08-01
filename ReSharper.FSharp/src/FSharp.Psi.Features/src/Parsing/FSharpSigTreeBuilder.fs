@@ -67,8 +67,9 @@ type internal FSharpSigTreeBuilder(file, lexer, sigs, lifetime) =
                     for c in enumCases do x.ProcessEnumCase c
                     ElementType.ENUM_DECLARATION
 
-                | SynTypeDefnSimpleRepr.Union(_,cases,_) ->
-                    x.ProcessUnionCases(cases)
+                | SynTypeDefnSimpleRepr.Union(_,cases, range) ->
+                    x.ProcessUnionCases(cases, range)
+                    ElementType.UNION_DECLARATION
 
                 | SynTypeDefnSimpleRepr.TypeAbbrev(_) ->
                     ElementType.TYPE_ABBREVIATION_DECLARATION

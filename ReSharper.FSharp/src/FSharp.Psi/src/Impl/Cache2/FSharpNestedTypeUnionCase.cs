@@ -5,10 +5,10 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
-  internal class FSharpUnionCase : FSharpClass
+  internal class FSharpNestedTypeUnionCase : FSharpClass, IUnionCase
   {
 
-    public FSharpUnionCase([NotNull] IClassPart part) : base(part)
+    public FSharpNestedTypeUnionCase([NotNull] IClassPart part) : base(part)
     {
     }
 

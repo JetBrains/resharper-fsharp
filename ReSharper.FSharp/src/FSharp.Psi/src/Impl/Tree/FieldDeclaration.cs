@@ -18,9 +18,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     protected override IDeclaredElement CreateDeclaredElement()
     {
       var symbol = GetFSharpSymbol();
-      if (symbol is FSharpUnionCase unionCase)
-        return new FSharpUnionCaseProperty(this, unionCase);
-
       if (symbol is FSharpField field)
         return new FSharpFieldProperty(this, field);
 

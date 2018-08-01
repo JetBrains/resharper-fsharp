@@ -1,0 +1,9 @@
+﻿Project Files:Union 06 - Mixed cases.fs:
+FSharpProjectFilePart:ImplFile
+ TopLevelModulePart:Module->Class:Module
+  UnionPart:U->Class:Module+U
+   UnionCasePart:CaseB->Class:Module+U+CaseB
+[]: Namespace:
+ [Module]: Class:Module[TestProject]
+  [U]: Class:Module+U[TestProject]
+   [CaseB]: Class:Module+U+CaseB[TestProject]

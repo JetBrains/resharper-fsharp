@@ -83,7 +83,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
         : EmptyList<ITypeOwner>.Instance;
   }
 
-  public interface IRecordPart : ClassLikeTypeElement.IClassLikePart
+  public interface IRecordPart : ISimpleTypePart
   {
     IList<ITypeOwner> Fields { get; }
     bool CliMutable { get; }

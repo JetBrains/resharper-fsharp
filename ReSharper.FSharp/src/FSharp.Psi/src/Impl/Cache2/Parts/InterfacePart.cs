@@ -16,12 +16,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
     }
 
-    public override TypeElement CreateTypeElement()
-    {
-      return new FSharpInterface(this);
-    }
+    public override TypeElement CreateTypeElement() =>
+      new FSharpInterface(this);
 
-    protected override byte SerializationTag => (byte) FSharpPartKind.Interface;
+    protected override byte SerializationTag =>
+      (byte) FSharpPartKind.Interface;
   }
 
   public class FSharpInterface : Interface
