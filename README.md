@@ -55,7 +55,7 @@ F# support in Rider makes use of open source software, most notably [FSharp.Comp
 
 1. Build the `Debug` configuration in `ReSharper.FSharp.sln`.
 2. Execute the `buildPlugin` Gradle task.
-3. Install the plugin to your Rider installation [from disk](https://www.jetbrains.com/help/idea/installing-a-plugin-from-the-disk.html).
+3. Install the plugin (`rider-fsharp/build/distributions/*.zip`) to your Rider installation [from disk](https://www.jetbrains.com/help/idea/installing-a-plugin-from-the-disk.html).
 
 ## Contributing
 
