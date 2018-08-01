@@ -116,19 +116,3 @@ type RiderFSharpFileTemplatesOptionPage
          scopeCategoryManager, uiFactory, iconHostBase) =
     inherit RiderFileTemplatesOptionPageBase(lifetime, uiProvider, settings, storedTemplatesProvider,
         scopeCategoryManager, uiFactory, iconHostBase, FSharpProjectFileType.Name)
-
-
-[<ShellComponent>]
-type FSharpDefaultFileTemplates() =
-    let xmlPath = "JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Templates.FileTemplates.xml"
-
-    member val FSharp = TemplateImage("FSharp", ProjectModelThemedIcons.Fsharp.Id)
-
-    interface IHaveDefaultSettingsStream with
-        member x.Name = "Default F# file templates"
-
-        member x.GetDefaultSettingsStream(lifetime) =
-            let stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(xmlPath)
-            Assertion.AssertNotNull(stream, "stream <> null")
-            lifetime.AddDispose(stream) |> ignore
-            stream

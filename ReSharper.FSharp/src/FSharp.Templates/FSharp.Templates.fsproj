@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
@@ -7,10 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="src\Templates\FileTemplates.fs"/>
-    <EmbeddedResource Include="src\Templates\FileTemplates.xml">
-      <LogicalName>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Templates.FileTemplates.xml</LogicalName>
-    </EmbeddedResource>
+    <Compile Include="src\Templates\FileTemplates.fs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -32,4 +32,10 @@
   <ItemGroup>
     <ProjectReference Include="..\FSharp.Common\FSharp.Common.fsproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="src\FileTemplates.xml">
+      <LogicalName>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Templates.FileTemplates.xml</LogicalName>
+    </EmbeddedResource>
+  </ItemGroup>
 </Project>
