@@ -1,0 +1,100 @@
+﻿using static Module;
+
+namespace ClassLibrary1
+{
+    public class Class1
+    {
+        public Class1()
+        {
+            U? sa = U.|NewCaseA|(0)(item: 123);
+            U? sb = U.|NewCaseB|(1)(named: 123);
+            U? sc = U.|NewCaseC|(2)(item1: 123, other: 123.0);
+
+            U a = sa.Value;
+            U b = sb.Value;
+            U c = sc.Value;
+
+            U.|CaseA|(3) caError = (U.|CaseA|(4)) a;
+            U.|CaseB|(5) cbError = (U.|CaseB|(6)) b;
+            U.|CaseC|(7) ccError = (U.|CaseC|(8)) c;
+
+            int aItem = a.|Item|(9);
+            int bItem = b.|Item|(10);
+            int cItem = c.|Item|(11);
+            int bNamed = b.|Named|(12);
+            int cItem0 = c.|Item1|(13);
+            double cOther = c.|Other|(14);
+
+            int aItemError = a.|Item|(15);
+            int bNamedError = b.|Named|(16);
+            int cItem1Error = c.|Item1|(17);
+            double cOtherError = c.|Other|(18);
+
+            bool isA = a.|IsCaseA|(19);
+            bool isB = a.|IsCaseB|(20);
+            bool isC = a.|IsCaseC|(21);
+
+            int tA = U.|Tags|(22).CaseA;
+            int tB = U.|Tags|(23).CaseB;
+            int tC = U.|Tags|(24).CaseC;
+
+            int t = a.|Tag|(25);
+            int m = U.Prop;
+        }
+    }
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Cannot access internal method 'NewCaseA' here
+(1): ReSharper Underlined Error Highlighting: Cannot access internal method 'NewCaseB' here
+(2): ReSharper Underlined Error Highlighting: Cannot access internal method 'NewCaseC' here
+(3): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseA' here
+(4): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseA' here
+(5): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseB' here
+(6): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseB' here
+(7): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseC' here
+(8): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseC' here
+(9): ReSharper Underlined Error Highlighting: Cannot access internal property 'Item' here
+(10): ReSharper Underlined Error Highlighting: Cannot access internal property 'Item' here
+(11): ReSharper Underlined Error Highlighting: Cannot access internal property 'Item' here
+(12): ReSharper Underlined Error Highlighting: Cannot access internal property 'Named' here
+(13): ReSharper Underlined Error Highlighting: Cannot access internal property 'Item1' here
+(14): ReSharper Underlined Error Highlighting: Cannot access internal property 'Other' here
+(15): ReSharper Underlined Error Highlighting: Cannot access internal property 'Item' here
+(16): ReSharper Underlined Error Highlighting: Cannot access internal property 'Named' here
+(17): ReSharper Underlined Error Highlighting: Cannot access internal property 'Item1' here
+(18): ReSharper Underlined Error Highlighting: Cannot access internal property 'Other' here
+(19): ReSharper Underlined Error Highlighting: Cannot access internal property 'IsCaseA' here
+(20): ReSharper Underlined Error Highlighting: Cannot access internal property 'IsCaseB' here
+(21): ReSharper Underlined Error Highlighting: Cannot access internal property 'IsCaseC' here
+(22): ReSharper Underlined Error Highlighting: Cannot access internal class 'Tags' here
+(23): ReSharper Underlined Error Highlighting: Cannot access internal class 'Tags' here
+(24): ReSharper Underlined Error Highlighting: Cannot access internal class 'Tags' here
+(25): ReSharper Underlined Error Highlighting: Cannot access internal property 'Tag' here
+M:Module.U.NewCaseA(System.Int32)
+M:Module.U.NewCaseA(System.Int32)
+M:Module.U.NewCaseB(System.Int32)
+M:Module.U.NewCaseB(System.Int32)
+M:Module.U.NewCaseC(System.Int32,System.Double)
+M:Module.U.NewCaseC(System.Int32,System.Double)
+P:Module.U.CaseA.Item
+P:Module.U.CaseA.Item
+P:Module.U.CaseA.Item
+P:Module.U.CaseB.Named
+P:Module.U.CaseC.Item1
+P:Module.U.CaseC.Other
+P:Module.U.CaseA.Item
+P:Module.U.CaseB.Named
+P:Module.U.CaseC.Item1
+P:Module.U.CaseC.Other
+P:Module.U.IsCaseA
+P:Module.U.IsCaseB
+P:Module.U.IsCaseC
+F:Module.U.Tags.CaseA
+T:Module.U.Tags
+F:Module.U.Tags.CaseB
+T:Module.U.Tags
+F:Module.U.Tags.CaseC
+T:Module.U.Tags
+P:Module.U.Tag
+P:Module.U.Prop

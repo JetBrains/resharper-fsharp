@@ -58,9 +58,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     }
 
     public override MemberDecoration Modifiers =>
-      Parent is IUnionPart unionPart && !unionPart.HasPublicNestedTypes
-        ? MemberDecoration.FromModifiers(ReSharper.Psi.Modifiers.INTERNAL)
-        : base.Modifiers;
+      MemberDecoration.FromModifiers(
+        Parent is IUnionPart unionPart &&
+        (!unionPart.HasPublicNestedTypes || unionPart.RepresentationAccessRights != AccessRights.PUBLIC)
+          ? ReSharper.Psi.Modifiers.INTERNAL
+          : ReSharper.Psi.Modifiers.PUBLIC);
 
     public MemberPresenceFlag GetMemberPresenceFlag()
     {

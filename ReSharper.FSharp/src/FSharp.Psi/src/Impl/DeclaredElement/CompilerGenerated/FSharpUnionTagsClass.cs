@@ -25,11 +25,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
       CLRDeclaredElementType.CLASS;
 
     protected IUnionPart UnionPart => (IUnionPart) TypePart;
-    protected ITypeElement ContainingType => TypePart.TypeElement;
+    protected TypeElement ContainingType => TypePart.TypeElement;
 
     protected override IClrDeclaredElement ContainingElement => ContainingType;
     public override ITypeElement GetContainingType() => ContainingType;
-    public override ITypeMember GetContainingTypeMember() => (ITypeMember) ContainingType;
+    public override ITypeMember GetContainingTypeMember() => ContainingType;
 
     public override string ShortName => TagsClassName;
     public IList<ITypeParameter> TypeParameters => EmptyList<ITypeParameter>.Instance;
@@ -91,6 +91,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
     public override string XMLDocId =>
       XMLDocUtil.GetTypeElementXmlDocId(this);
+
+    public override AccessRights GetAccessRights() =>
+      ContainingType.GetRepresentationAccessRights();
 
     #region UnionCaseTag
 

@@ -32,5 +32,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public override bool IsWritable =>
       Field.IsMutable || GetContainingType() is TypeElement typeElement && typeElement.IsCliMutableRecord();
+
+    public override AccessRights GetAccessRights() =>
+      GetContainingType() is TypeElement typeElement
+        ? typeElement.GetRepresentationAccessRights()
+        : AccessRights.PUBLIC;
   }
 }

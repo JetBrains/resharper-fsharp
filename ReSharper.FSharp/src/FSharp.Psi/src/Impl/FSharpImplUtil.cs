@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using JetBrains.Annotations;
@@ -223,14 +223,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return false;
     }
 
-    public static bool IsUnionWithPublicNestedTypes([NotNull] this TypeElement typeElement)
+    public static AccessRights GetRepresentationAccessRights([NotNull] this TypeElement typeElement)
     {
       foreach (var part in typeElement.EnumerateParts())
-        if (part is IUnionPart unionPart && unionPart.HasPublicNestedTypes)
-          return true;
+        switch (part)
+        {
+          case IUnionPart unionPart:
+            if (unionPart.RepresentationAccessRights != AccessRights.PUBLIC)
+              return AccessRights.INTERNAL;
+            break;
 
-      return false;
+          case UnionCasePart casePart:
+            if (casePart.Parent is IUnionPart parent && parent.RepresentationAccessRights != AccessRights.PUBLIC)
+              return AccessRights.INTERNAL;
+            break;
+        }
 
+      return AccessRights.PUBLIC;
     }
 
     public static bool GetTypeKind(IEnumerable<IFSharpAttribute> attributes, out FSharpPartKind fSharpPartKind)

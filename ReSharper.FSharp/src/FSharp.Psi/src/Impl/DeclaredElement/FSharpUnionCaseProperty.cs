@@ -1,8 +1,9 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
@@ -15,7 +16,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     [NotNull]
     public FSharpUnionCase UnionCase { get; }
 
-    internal FSharpUnionCaseProperty([NotNull] ISingletonCaseDeclaration declaration, [NotNull] FSharpUnionCase unionCase)
+    internal FSharpUnionCaseProperty([NotNull] ISingletonCaseDeclaration declaration,
+      [NotNull] FSharpUnionCase unionCase)
       : base(declaration)
     {
       UnionCase = unionCase;
@@ -27,6 +29,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     }
 
     public override string ShortName => UnionCase.Name;
+
+    public override AccessRights GetAccessRights() =>
+      GetContainingType() is TypeElement typeElement
+        ? typeElement.GetRepresentationAccessRights()
+        : AccessRights.NONE;
+
     public override bool IsStatic => true;
     public override bool IsWritable => false;
     public override IType ReturnType { get; }
