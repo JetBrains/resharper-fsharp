@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.daemon.common.toHexString
 
 buildscript {
     repositories {
-        maven { setUrl("https://repo.labs.intellij.net/rd-snapshots-maven") }
+        maven { setUrl("https://cache-redirector.jetbrains.com/www.myget.org/F/rd-snapshots/maven") }
         mavenCentral()
     }
     dependencies {
