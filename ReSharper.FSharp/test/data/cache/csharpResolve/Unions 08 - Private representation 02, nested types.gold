@@ -1,0 +1,87 @@
+﻿using static Module;
+
+namespace ClassLibrary1
+{
+    public class Class1
+    {
+        public Class1()
+        {
+            U a = U.|NewCaseA|(0)(item: 123);
+            U b = U.|NewCaseB|(1)(named: 123);
+            U c = U.|NewCaseC|(2)(item1: 123, other: 123.0);
+
+            U.|CaseA|(3) ca = (U.|CaseA|(4)) a;
+            U.|CaseB|(5) cb = (U.|CaseB|(6)) b;
+            U.|CaseC|(7) cc = (U.|CaseC|(8)) c;
+
+            int aItem = ca.|Item|(9);
+            int bNamed = cb.|Named|(10);
+            int cItem0 = cc.|Item1|(11);
+            double cOther = cc.|Other|(12);
+
+            int aItemError = a.|Item|(13);
+            int bNamedError = b.|Named|(14);
+            int cItem1Error = c.|Item1|(15);
+            double cOtherError = c.|Other|(16);
+
+            bool isA = a.|IsCaseA|(17);
+            bool isB = a.|IsCaseB|(18);
+            bool isC = a.|IsCaseC|(19);
+
+            int tA = U.|Tags|(20).CaseA;
+            int tB = U.|Tags|(21).CaseB;
+            int tC = U.|Tags|(22).CaseC;
+
+            int t = a.|Tag|(23);
+
+            int m = U.Prop;
+        }
+    }
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Cannot access internal method 'NewCaseA' here
+(1): ReSharper Underlined Error Highlighting: Cannot access internal method 'NewCaseB' here
+(2): ReSharper Underlined Error Highlighting: Cannot access internal method 'NewCaseC' here
+(3): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseA' here
+(4): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseA' here
+(5): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseB' here
+(6): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseB' here
+(7): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseC' here
+(8): ReSharper Underlined Error Highlighting: Cannot access internal class 'CaseC' here
+(9): ReSharper Underlined Error Highlighting: Cannot access internal property 'Item' here
+(10): ReSharper Underlined Error Highlighting: Cannot access internal property 'Named' here
+(11): ReSharper Underlined Error Highlighting: Cannot access internal property 'Item1' here
+(12): ReSharper Underlined Error Highlighting: Cannot access internal property 'Other' here
+(13): ReSharper Error Highlighting: Cannot resolve symbol 'Item'
+(14): ReSharper Error Highlighting: Cannot resolve symbol 'Named'
+(15): ReSharper Error Highlighting: Cannot resolve symbol 'Item1'
+(16): ReSharper Error Highlighting: Cannot resolve symbol 'Other'
+(17): ReSharper Underlined Error Highlighting: Cannot access internal property 'IsCaseA' here
+(18): ReSharper Underlined Error Highlighting: Cannot access internal property 'IsCaseB' here
+(19): ReSharper Underlined Error Highlighting: Cannot access internal property 'IsCaseC' here
+(20): ReSharper Underlined Error Highlighting: Cannot access internal class 'Tags' here
+(21): ReSharper Underlined Error Highlighting: Cannot access internal class 'Tags' here
+(22): ReSharper Underlined Error Highlighting: Cannot access internal class 'Tags' here
+(23): ReSharper Underlined Error Highlighting: Cannot access internal property 'Tag' here
+M:Module.U.NewCaseA(System.Int32)
+M:Module.U.NewCaseA(System.Int32)
+M:Module.U.NewCaseB(System.Int32)
+M:Module.U.NewCaseB(System.Int32)
+M:Module.U.NewCaseC(System.Int32,System.Double)
+M:Module.U.NewCaseC(System.Int32,System.Double)
+P:Module.U.CaseA.Item
+P:Module.U.CaseB.Named
+P:Module.U.CaseC.Item1
+P:Module.U.CaseC.Other
+P:Module.U.IsCaseA
+P:Module.U.IsCaseB
+P:Module.U.IsCaseC
+F:Module.U.Tags.CaseA
+T:Module.U.Tags
+F:Module.U.Tags.CaseB
+T:Module.U.Tags
+F:Module.U.Tags.CaseC
+T:Module.U.Tags
+P:Module.U.Tag
+P:Module.U.Prop

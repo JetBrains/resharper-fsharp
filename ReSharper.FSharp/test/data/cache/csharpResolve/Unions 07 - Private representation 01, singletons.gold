@@ -1,0 +1,37 @@
+﻿using static Module;
+
+namespace ClassLibrary1
+{
+    public class Class1
+    {
+        public Class1()
+        {
+            U a = U.|CaseA|(0);
+            U b = U.|CaseB|(1);
+
+            bool isA = a.|IsCaseA|(2);
+            bool isB = a.|IsCaseB|(3);
+
+            int t = a.|Tag|(4);
+            int tA = U.|Tags|(5).CaseA;
+
+            int m = U.Prop;
+        }
+    }
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Cannot access internal property 'CaseA' here
+(1): ReSharper Underlined Error Highlighting: Cannot access internal property 'CaseB' here
+(2): ReSharper Underlined Error Highlighting: Cannot access internal property 'IsCaseA' here
+(3): ReSharper Underlined Error Highlighting: Cannot access internal property 'IsCaseB' here
+(4): ReSharper Underlined Error Highlighting: Cannot access internal property 'Tag' here
+(5): ReSharper Underlined Error Highlighting: Cannot access internal class 'Tags' here
+P:Module.U.CaseA
+P:Module.U.CaseB
+P:Module.U.IsCaseA
+P:Module.U.IsCaseB
+P:Module.U.Tag
+F:Module.U.Tags.CaseA
+T:Module.U.Tags
+P:Module.U.Prop
