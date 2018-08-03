@@ -21,7 +21,6 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.extensions.Extensions
 import com.intellij.openapi.fileTypes.PlainTextLanguage
-import com.intellij.openapi.util.IconLoader
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.UserDataHolderBase
 import com.intellij.openapi.vfs.VfsUtil
@@ -34,6 +33,7 @@ import com.intellij.xdebugger.attach.LocalAttachHost
 import com.intellij.xdebugger.attach.XAttachDebuggerProvider
 import com.jetbrains.rider.debugger.DotNetDebugProcess
 import com.jetbrains.rider.model.RdFsiSessionInfo
+import com.jetbrains.rider.plugins.fsharp.FSharpIcons
 import com.jetbrains.rider.util.idea.application
 import com.jetbrains.rider.util.idea.pumpMessages
 import org.jetbrains.concurrency.AsyncPromise
@@ -142,7 +142,7 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost)
         }
     }
 
-    override fun getConsoleIcon() = IconLoader.getIcon("/icons/fsharpConsole.png")
+    override fun getConsoleIcon() = FSharpIcons.FSharpConsole
 
     override fun fillToolBarActions(toolbarActions: DefaultActionGroup, defaultExecutor: Executor,
                                     contentDescriptor: RunContentDescriptor): MutableList<AnAction> {
