@@ -1,6 +1,5 @@
 package com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer;
 
-import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.NotNull;
@@ -12,19 +11,16 @@ public interface FSharpTokenType {
     IElementType BYTE = createToken("BYTE");
     IElementType BYTEARRAY = createToken("BYTEARRAY");
     IElementType BYTECHAR = createToken("BYTECHAR");
-    IElementType CHAR = createToken("CHAR");
+    IElementType CHARACTER_LITERAL = createToken("CHARACTER_LITERAL");
     IElementType DECIMAL = createToken("DECIMAL");
-    IElementType ELSE_DIRECTIVE = createToken("ELSE_DIRECTIVE");
-    IElementType ENDIF_DIRECTIVE = createToken("ENDIF_DIRECTIVE");
     IElementType END_OF_LINE_COMMENT = createToken("END_OF_LINE_COMMENT");
+    IElementType SHEBANG = createToken("SHEBANG");
     IElementType IDENT = createToken("IDENT");
     IElementType IEEE32 = createToken("IEEE32");
     IElementType IEEE64 = createToken("IEEE64");
-    IElementType IF_DIRECTIVE = createToken("IF_DIRECTIVE");
     IElementType INT16 = createToken("INT16");
     IElementType INT32 = createToken("INT32");
     IElementType INT64 = createToken("INT64");
-    IElementType LINE_DIRECTIVE = createToken("LINE_DIRECTIVE");
     IElementType NATIVEINT = createToken("NATIVEINT");
     IElementType QUOTE_OP_LEFT = createToken("QUOTE_OP_LEFT");
     IElementType QUOTE_OP_RIGHT = createToken("QUOTE_OP_RIGHT");
@@ -101,6 +97,9 @@ public interface FSharpTokenType {
     IElementType AMP = createToken("AMP");
     IElementType AMP_AMP = createToken("AMP_AMP");
     IElementType COMMA = createToken("COMMA");
+    IElementType BAD_TAB = createToken("BAD_TAB");
+    IElementType TAB = createToken("TAB");
+
     IElementType ABSTRACT = createKeywordToken("ABSTRACT", "abstract");
     IElementType AND = createKeywordToken("AND", "and");
     IElementType AS = createKeywordToken("AS", "as");
@@ -165,6 +164,27 @@ public interface FSharpTokenType {
     IElementType WITH = createKeywordToken("WITH", "with");
     IElementType YIELD = createKeywordToken("YIELD", "yield");
 
+    IElementType PP_LIGHT = createToken("PP_LIGHT");
+    IElementType PP_ELSE_SECTION = createToken("PP_ELSE_SECTION");
+    IElementType PP_ENDIF = createToken("PP_ENDIF");
+    IElementType PP_LINE = createToken("PP_LINE");
+    IElementType PP_HELP = createToken("PP_HELP");
+    IElementType PP_LOAD = createToken("PP_LOAD");
+    IElementType PP_QUIT = createToken("PP_QUIT");
+    IElementType PP_I = createToken("PP_I");
+    IElementType PP_NOWARN = createToken("PP_NOWARN");
+    IElementType PP_REFERENCE = createToken("PP_REFERENCE");
+    IElementType PP_TIME = createToken("PP_TIME");
+    IElementType PP_IF_SECTION = createToken("PP_IF_SECTION");
+    IElementType PP_BAD_CHARACTER = createToken("PP_BAD_CHARACTER");
+    IElementType PP_CONDITIONAL_SYMBOL = createToken("PP_CONDITIONAL_SYMBOL");
+    IElementType PP_OR = createToken("PP_OR");
+    IElementType PP_AND = createToken("PP_AND");
+    IElementType PP_NOT = createToken("PP_NOT");
+    IElementType PP_LPAR = createToken("PP_LPAR");
+    IElementType PP_RPAR = createToken("PP_RPAR");
+    IElementType PP_DIRECTIVE= createToken("PP_DIRECTIVE");
+
     TokenSet STRINGS = TokenSet.create(
             STRING,
             UNFINISHED_STRING,
@@ -176,6 +196,7 @@ public interface FSharpTokenType {
     );
 
     TokenSet COMMENTS = TokenSet.create(
+            SHEBANG,
             BLOCK_COMMENT,
             UNFINISHED_BLOCK_COMMENT,
             UNFINISHED_STRING_IN_COMMENT,
@@ -255,6 +276,22 @@ public interface FSharpTokenType {
             RARROW,
             LARROW,
             HASH
+    );
+
+    TokenSet PP_KEYWORDS = TokenSet.create(
+            PP_IF_SECTION,
+            PP_ELSE_SECTION,
+            PP_ENDIF,
+            PP_LIGHT,
+            PP_LINE,
+            PP_REFERENCE,
+            PP_LOAD,
+            PP_I,
+            PP_TIME,
+            PP_NOWARN,
+            PP_HELP,
+            PP_QUIT,
+            PP_DIRECTIVE
     );
 
     @NotNull

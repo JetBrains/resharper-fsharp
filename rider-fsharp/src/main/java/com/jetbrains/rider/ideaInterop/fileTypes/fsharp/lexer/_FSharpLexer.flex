@@ -33,7 +33,6 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
 %unicode
 
 %{
-  private int zzSavedState = 0;
   private int zzNestedCommentLevel = 0;
   private int zzParenLevel = 0;
 %}
@@ -49,8 +48,11 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
   }
 
   private void initBlockComment() {
-    saveState();
-    yybegin(IN_BLOCK_COMMENT);
+    if (yystate() == LINE) {
+      yybegin(IN_BLOCK_COMMENT_FROM_LINE);
+    } else {
+       yybegin(IN_BLOCK_COMMENT);
+    }
     zzNestedCommentLevel++;
   }
 
@@ -59,17 +61,25 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
     return makeToken(keyword != null ? keyword : IDENT);
   }
 
-  private IElementType initIdentInTypeApp() {
+  private IElementType identInTypeApp() {
     IElementType keyword = FindKeywordByCurrentToken();
     if (keyword != null) {
-        toSavedStateAndErase();
+        return makeToken(keyword);
+    }
+    return makeToken(IDENT);
+  }
+
+  private IElementType identInInitTypeApp() {
+    IElementType keyword = FindKeywordByCurrentToken();
+    if (keyword != null) {
+        yybegin(LINE);
         return makeToken(keyword);
     }
     return makeToken(IDENT);
   }
 
   private IElementType fillBlockComment(IElementType tokenType) {
-    toSavedStateAndErase();
+    yybegin(LINE);
     zzNestedCommentLevel = 0;
     return makeToken(tokenType);
   }
@@ -79,28 +89,8 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
       yybegin(finalState);
     }
     else {
-      saveState();
       yybegin(state);
     }
-  }
-
-  private IElementType exitSmashAdjacent(int state) {
-    if (yystate() == state) {
-      toSavedStateAndErase();
-    }
-    else {
-      yybegin(YYINITIAL);
-    }
-    return makeToken(RBRACK);
-  }
-
-  private void saveState() {
-    zzSavedState = yystate();
-  }
-  private void toSavedStateAndErase()
-  {
-    yybegin(zzSavedState);
-    zzSavedState = YYINITIAL;
   }
 
   private void deepIntoParenLevel() {
@@ -110,10 +100,13 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
 
   private void riseFromParenLevel(int n) {
     zzParenLevel -= n;
-    if (zzParenLevel <= 1)
+    if (zzParenLevel > 1) {
+      yybegin(ADJACENT_TYAPP);
+    } else if (zzParenLevel <= 0) {
+      yybegin(LINE);
+    } else {
       yybegin(INIT_ADJACENT_TYAPP);
-    if (zzParenLevel <= 0)
-      yybegin(YYINITIAL);
+    }
   }
 
   private void initAdjacentTypeApp()
@@ -131,39 +124,72 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
   {
     zzParenLevel -= yylength();
     yypushback(yylength());
-    if (zzParenLevel != 0) {
+    if (zzParenLevel > 0) {
       yybegin(SYMBOLIC_OPERATOR);
     }
     else {
-      yybegin(GREATER_OPERATOR);
+      yybegin(GREATER_OP_SYMBOLIC_OP);
+    }
+  }
+
+  private void exitSmash(int state) {
+    if (yystate() == state) {
+      yybegin(LINE);
+    } else {
+      riseFromParenLevel(0);
+    }
+  }
+
+  private void initSmash(int initState, int anotherState) {
+    if (yystate() == LINE) {
+      yybegin(initState);
+    } else {
+      yybegin(anotherState);
+    }
+  }
+
+  private void exitGreaterOp()
+  {
+    if (yystate() == GREATER_OP) {
+      riseFromParenLevel(0);
+    } else {
+      yybegin(SYMBOLIC_OPERATOR);
     }
   }
 %}
 
 %state IN_BLOCK_COMMENT
+%state IN_BLOCK_COMMENT_FROM_LINE
 %state STRING_IN_COMMENT
-%state VERBATIM_STRING_IN_COMMENT
-%state TRIPLE_QUOTED_STRING_IN_COMMENT
-%state INT_DOT_DOT
-%state RQUOTE_DOT
-%state CHAR_LITERAL
+%state SMASH_INT_DOT_DOT
+%state SMASH_INT_DOT_DOT_FROM_LINE
+%state SMASH_RQUOTE_DOT
+%state SMASH_RQUOTE_DOT_FROM_LINE
 %state SMASH_ADJACENT_LESS_OP
 %state SMASH_ADJACENT_GREATER_BAR_RBRACK
 %state SMASH_ADJACENT_GREATER_RBRACK
 %state SMASH_ADJACENT_GREATER_BAR_RBRACK_FIN
 %state SMASH_ADJACENT_GREATER_RBRACK_FIN
-%state SMASH_ADJACENT_INFIX_COMPARE_OP
 %state ADJACENT_TYPE_CLOSE_OP
 %state INIT_ADJACENT_TYAPP
 %state ADJACENT_TYAPP
 %state SYMBOLIC_OPERATOR
-%state GREATER_OPERATOR
+%state GREATER_OP
+%state GREATER_OP_SYMBOLIC_OP
+%state PRE_LESS_OP
+%state LINE
+
+%state PPSHARP
+%state PPSYMBOL
+%state PPDIRECTIVE
 
 WHITE_SPACE=" "+
+TAB="\t"+
+ANYWHITE={WHITE_SPACE}|{TAB}
 
 NEWLINE=\n|\r\n
 END_OF_LINE_COMMENT=\/\/[^\n\r]*
-IF_DIRECTIVE="#if"{WHITE_SPACE}+{IDENT_TEXT}
+SHEBANG="#!"[^\n\r]*
 LETTER_CHAR=\p{Lu}|\p{Ll}|\p{Lt}|\p{Lm}|\p{Lo}|\p{Nl}
 DIGIT=\p{Nd}
 IDENT_START_CHAR={LETTER_CHAR}|_
@@ -181,28 +207,25 @@ RESERVED_IDENT_KEYWORD=
 RESERVED_IDENT_FORMATS={IDENT_TEXT}([!#])
 ESCAPE_CHAR=[\\][\\\"\'afvntbr]
 NON_ESCAPE_CHARS=[\\][^afvntbr\\\"\']
-SIMPLE_CHAR_CHAR=[^\t\b\n\r\\]
+SIMPLE_CHARACTER=[^\t\b\n\r\\\'\"]
 SIMPLE_STRING_CHAR=[^\"]
-SIMPLE_CHAR={SIMPLE_STRING_CHAR}|\"
 UNICODEGRAPH_SHORT=\\u{HEXDIGIT}{HEXDIGIT}{HEXDIGIT}{HEXDIGIT}
-UNICODEGRAPH_LONG =\\U{HEXDIGIT}{HEXDIGIT}{HEXDIGIT}{HEXDIGIT}
-                      {HEXDIGIT}{HEXDIGIT}{HEXDIGIT}{HEXDIGIT}
+UNICODEGRAPH_LONG =\\U{HEXDIGIT}{HEXDIGIT}{HEXDIGIT}{HEXDIGIT}{HEXDIGIT}{HEXDIGIT}{HEXDIGIT}{HEXDIGIT}
 TRIGRAPH=\\{DIGIT}{DIGIT}{DIGIT}
-CHAR_CHAR ={SIMPLE_CHAR_CHAR}|{ESCAPE_CHAR}|{TRIGRAPH}|{UNICODEGRAPH_SHORT}|\"
-STRING_CHAR=
-    {SIMPLE_STRING_CHAR}|{ESCAPE_CHAR}|{NON_ESCAPE_CHARS}|
-    {TRIGRAPH}|{UNICODEGRAPH_SHORT}|{UNICODEGRAPH_LONG}|{NEWLINE}
-CHAR='{CHAR_CHAR}'
+CHARACTER ={SIMPLE_CHARACTER}|{ESCAPE_CHAR}|{TRIGRAPH}|{UNICODEGRAPH_SHORT}|\"
+STRING_CHAR={SIMPLE_CHARACTER}|{ESCAPE_CHAR}|{NON_ESCAPE_CHARS}|{TRIGRAPH}|{UNICODEGRAPH_SHORT}|{UNICODEGRAPH_LONG}|"'"|{NEWLINE}
+CHARACTER_LITERAL='{CHARACTER}'
 UNFINISHED_STRING=\"{STRING_CHAR}*
 STRING={UNFINISHED_STRING}\"
-VERBATIM_STRING_CHAR={SIMPLE_STRING_CHAR}|{NON_ESCAPE_CHARS}|\"\"
+VERBATIM_STRING_CHAR={SIMPLE_STRING_CHAR}|{NON_ESCAPE_CHARS}|\"\"|\\|{NEWLINE}
 UNFINISHED_VERBATIM_STRING=@\"{VERBATIM_STRING_CHAR}*
 VERBATIM_STRING={UNFINISHED_VERBATIM_STRING}\"
 BYTECHAR='{SIMPLE_OR_ESCAPE_CHAR}'B
 BYTEARRAY=\"{STRING_CHAR}*\"B
 VERBATIM_BYTEARRAY=@\"{VERBATIM_STRING_CHAR}*\"B
-SIMPLE_OR_ESCAPE_CHAR={ESCAPE_CHAR}|{SIMPLE_CHAR}
-UNFINISHED_TRIPLE_QUOTED_STRING=\"\"\"((\"?){STRING_CHAR}|\"\"{STRING_CHAR})*
+SIMPLE_OR_ESCAPE_CHAR={ESCAPE_CHAR}|{SIMPLE_CHARACTER}
+TRIPLE_QUOTED_STRING_CHAR={SIMPLE_STRING_CHAR}|{NON_ESCAPE_CHARS}|{NEWLINE}|\\
+UNFINISHED_TRIPLE_QUOTED_STRING=\"\"\"((\"?){TRIPLE_QUOTED_STRING_CHAR}|\"\"{TRIPLE_QUOTED_STRING_CHAR})*(\"|\"\")?
 TRIPLE_QUOTED_STRING={UNFINISHED_TRIPLE_QUOTED_STRING}\"\"\"
 
 LET_BANG="let!"
@@ -235,7 +258,6 @@ COLON_QMARK_GREATER=":?>"
 COLON_QMARK=":?"
 COLON_GREATER=":>"
 DOT_DOT=\.\.
-INTDOTDOT={INT}\.\.
 COLON_COLON="::"
 COLON_EQUALS=":="
 SEMICOLON_SEMICOLON=";;"
@@ -260,13 +282,10 @@ OP_CHAR=[!%&*+-./<=>@\^|~?]
 BAD_OP_CHAR={OP_CHAR}|[$:]
 QUOTE_OP_LEFT="<@"|"<@@"
 QUOTE_OP_RIGHT="@>"|"@@>"
-QUOTE_OP_RIGHT_DOT="@>."|"@@>."
 SYMBOLIC_OP=[?]|"?<-"|{OP_CHAR}+|{QUOTE_OP_LEFT}|{QUOTE_OP_RIGHT}
 BAD_SYMBOLIC_OP=[?]|"?<-"|{BAD_OP_CHAR}+|{QUOTE_OP_LEFT}|{QUOTE_OP_RIGHT}
 
-INFIX_OR_PREFIX_OP="+"|"-"|"+."|"-."|"%"|"&"|"&&"
 LESS_OP="</"|{LESS}
-INFIX_COMPARE_OP=([.?])*("="|"!="|"<"|">")(OP_CHAR)*
 
 HEXDIGIT={DIGIT}|[A-F]|[a-f]
 OCTALDIGIT=[0-7]
@@ -288,22 +307,25 @@ IEEE64={FLOAT}|{XINT}LF
 BIGNUM={INT}[QRZING]
 DECIMAL=({FLOAT}|{INT})[Mm]
 FLOAT={DIGIT}+\.{DIGIT}*|{DIGIT}+(\.{DIGIT}*)?[Ee][+-]?{DIGIT}+
-INTDOTDOT={INT}\.\.
 RESERVED_LITERAL_FORMATS=({XINT}|{IEEE32}|{IEEE64}){IDENT_CHAR}+
-LINE_DIRECTIVE=#{INT}|#{INT}{STRING}|#{INT}{VERBATIM_STRING}|#line{INT}|#line{INT}{STRING}|#line{INT}{VERBATIM_STRING}
 
 KEYWORD_STRING_SOURCE_DIRECTORY="__SOURCE_DIRECTORY__"
 KEYWORD_STRING_SOURCE_FILE="__SOURCE_FILE__"
 KEYWORD_STRING_LINE="__LINE__"
 
+PP_COMPILER_DIRECTIVE={HASH}("if"|"else"|"endif")
+PP_DIRECTIVE={ANYWHITE}*{HASH}({IDENT}|{ANYWHITE}*[0-9]+)
+PP_CONDITIONAL_SYMBOL={IDENT}
+
 %%
+<YYINITIAL> [^]                                          { yypushback(1); yybegin(LINE);}
 <INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {
   {LESS}                                                 { deepIntoParenLevel(); return makeToken(LESS); }
   {LPAREN}                                               { deepIntoParenLevel(); return makeToken(LPAREN); }
   {LBRACK}                                               { deepIntoParenLevel(); return makeToken(LBRACK); }
   {LBRACK_LESS}                                          { deepIntoParenLevel(); return makeToken(LBRACK_LESS); }
-  {GREATER}                                              { riseFromParenLevel(1); return makeToken(GREATER); }
-  "</"                                                   { deepIntoParenLevel(); yypushback(2); saveState(); yybegin(SMASH_ADJACENT_LESS_OP);}
+  {GREATER}+                                             { riseFromParenLevel(yylength()); yypushback(yylength()); yybegin(GREATER_OP); }
+  "</"                                                   { deepIntoParenLevel(); yypushback(2); yybegin(SMASH_ADJACENT_LESS_OP);}
   {RPAREN}                                               { riseFromParenLevel(1); return makeToken(RPAREN); }
   {RBRACK}                                               { riseFromParenLevel(1); return makeToken(RBRACK); }
   {GREATER_RBRACK}                                       { yypushback(yylength()); initSmashAdjacent(SMASH_ADJACENT_GREATER_RBRACK, SMASH_ADJACENT_GREATER_RBRACK_FIN); }
@@ -322,22 +344,24 @@ KEYWORD_STRING_LINE="__LINE__"
   "^"                                                    |
   "^-"                                                   |
   "/"                                                    { return makeToken(SYMBOLIC_OP); }
-  {IDENT}                                                { return initIdentInTypeApp(); }
 }
+
+<INIT_ADJACENT_TYAPP> {IDENT}                            { return identInInitTypeApp(); }
+<ADJACENT_TYAPP> {IDENT}                                 { return identInTypeApp(); }
 
 <ADJACENT_TYPE_CLOSE_OP> {
   {GREATER}+                                             { adjacentTypeCloseOp(); }
 }
 
-<GREATER_OPERATOR> {
+<GREATER_OP,GREATER_OP_SYMBOLIC_OP> {
   {GREATER}                                              { return makeToken(GREATER); }
-  [^]                                                    { yypushback(1); riseFromParenLevel(0);}
+  [^]                                                    { yypushback(1); exitGreaterOp(); }
 }
 
 <SYMBOLIC_OPERATOR> {
   {QUOTE_OP_LEFT}                                        { riseFromParenLevel(0); return makeToken(QUOTE_OP_LEFT); }
   {QUOTE_OP_RIGHT}                                       { riseFromParenLevel(0); return makeToken(QUOTE_OP_RIGHT); }
-  {QUOTE_OP_RIGHT_DOT}                                   { riseFromParenLevel(0); yypushback(yylength()); yybegin(RQUOTE_DOT); }
+  "@>."|"@@>."                                           { yypushback(yylength()); yybegin(SMASH_RQUOTE_DOT); }
   {BAR}                                                  { riseFromParenLevel(0); return makeToken(BAR); }
   {LARROW}                                               { riseFromParenLevel(0); return makeToken(LARROW); }
   {LPAREN}                                               { riseFromParenLevel(0); return makeToken(LPAREN); }
@@ -373,7 +397,6 @@ KEYWORD_STRING_LINE="__LINE__"
   {COLON}                                                { riseFromParenLevel(0); return makeToken(COLON); }
   {STAR}                                                 { riseFromParenLevel(0); return makeToken(STAR); }
   {QUOTE}                                                { riseFromParenLevel(0); return makeToken(QUOTE); }
-  {HASH}                                                 { riseFromParenLevel(0); return makeToken(HASH); }
   {COLON_GREATER}                                        { riseFromParenLevel(0); return makeToken(COLON_GREATER); }
   {DOT_DOT}                                              { riseFromParenLevel(0); return makeToken(DOT_DOT); }
   {EQUALS}                                               { riseFromParenLevel(0); return makeToken(EQUALS); }
@@ -384,22 +407,25 @@ KEYWORD_STRING_LINE="__LINE__"
   {BAD_SYMBOLIC_OP}                                      { riseFromParenLevel(0); return makeToken(BAD_SYMBOLIC_OP); }
 }
 
-<YYINITIAL, ADJACENT_TYAPP> {
+<LINE, ADJACENT_TYAPP> {
   <INIT_ADJACENT_TYAPP> {
+    {TAB}                                                { return makeToken(BAD_TAB); }
     {WHITE_SPACE}                                        { return makeToken(WHITE_SPACE); }
-    {NEWLINE}                                            { return makeToken(NEWLINE); }
+    {NEWLINE}                                            { yybegin(YYINITIAL); return makeToken(NEWLINE); }
   }
 
   "(*"                                                   { initBlockComment(); }
   {END_OF_LINE_COMMENT}                                  { return makeToken(END_OF_LINE_COMMENT); }
-
-  {IF_DIRECTIVE}                                         { return makeToken(IF_DIRECTIVE); }
-  "#else"                                                { return makeToken(ELSE_DIRECTIVE); }
-  "#endif"                                               { return makeToken(ENDIF_DIRECTIVE); }
+  {SHEBANG}                                              { return makeToken(SHEBANG); }
+  {HASH}"light"                                          { return makeToken(PP_LIGHT); }
+  {PP_COMPILER_DIRECTIVE}                                { yypushback(yylength()); yybegin(PPSHARP); }
+  ^{PP_DIRECTIVE}                                        { yypushback(yylength()); yybegin(PPDIRECTIVE); }
 
   {QUOTE_OP_LEFT}                                        { return makeToken(QUOTE_OP_LEFT); }
   {QUOTE_OP_RIGHT}                                       { return makeToken(QUOTE_OP_RIGHT); }
-  {QUOTE_OP_RIGHT_DOT}                                   { saveState(); yypushback(yylength()); yybegin(RQUOTE_DOT); }
+// Rule for smash RQUOTE_DOT.
+// https://github.com/Microsoft/visualfsharp/blob/master/src/fsharp/LexFilter.fs#L2151
+  "@>."|"@@>."                                           { yypushback(yylength()); initSmash(SMASH_RQUOTE_DOT_FROM_LINE, SMASH_RQUOTE_DOT); }
   {LET_BANG}                                             { return makeToken(LET_BANG); }
   {USE_BANG}                                             { return makeToken(USE_BANG); }
   {DO_BANG }                                             { return makeToken(DO_BANG); }
@@ -460,9 +486,11 @@ KEYWORD_STRING_LINE="__LINE__"
   {RESERVED_IDENT_FORMATS}                               { return makeToken(RESERVED_IDENT_FORMATS); }
 }
 
-<YYINITIAL> {
+// Rule for smahimg type apply.
+// https://github.com/Microsoft/visualfsharp/blob/173513e/src/fsharp/LexFilter.fs#L2131
+<LINE> {
   "delegate"{LESS_OP}                                    { initAdjacentTypeApp(); return makeToken(DELEGATE); }
-  {IDENT}{LESS_OP}                                       { initAdjacentTypeApp(); return initIdentInTypeApp(); }
+  {IDENT}{LESS_OP}                                       { initAdjacentTypeApp(); return identInTypeApp(); }
   {IEEE32}{LESS_OP}                                      { initAdjacentTypeApp(); return makeToken(IEEE32); }
   {IEEE64}{LESS_OP}                                      { initAdjacentTypeApp(); return makeToken(IEEE64); }
   {DECIMAL}{LESS_OP}                                     { initAdjacentTypeApp(); return makeToken(DECIMAL); }
@@ -476,16 +504,48 @@ KEYWORD_STRING_LINE="__LINE__"
   {UINT64}{LESS_OP}                                      { initAdjacentTypeApp(); return makeToken(UINT64); }
   {BIGNUM}{LESS_OP}                                      { initAdjacentTypeApp(); return makeToken(BIGNUM); }
   {NATIVEINT}{LESS_OP}                                   { initAdjacentTypeApp(); return makeToken(NATIVEINT); }
+  "delegate"{LESS_OP}{BAD_SYMBOLIC_OP}                   { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+  {IDENT}{LESS_OP}{BAD_SYMBOLIC_OP}                      { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+  {IEEE32}{LESS_OP}{BAD_SYMBOLIC_OP}                     { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+  {IEEE64}{LESS_OP}{BAD_SYMBOLIC_OP}                     { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+  {DECIMAL}{LESS_OP}{BAD_SYMBOLIC_OP}                    { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+  {BYTE}{LESS_OP}{BAD_SYMBOLIC_OP}                       { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+  {INT16}{LESS_OP}{BAD_SYMBOLIC_OP}                      { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+  {INT32}{LESS_OP}{BAD_SYMBOLIC_OP}                      { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+  {INT64}{LESS_OP}{BAD_SYMBOLIC_OP}                      { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+  {SBYTE}{LESS_OP}{BAD_SYMBOLIC_OP}                      { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+  {UINT16}{LESS_OP}{BAD_SYMBOLIC_OP}                     { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+  {UINT32}{LESS_OP}{BAD_SYMBOLIC_OP}                     { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+  {UINT64}{LESS_OP}{BAD_SYMBOLIC_OP}                     { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+  {BIGNUM}{LESS_OP}{BAD_SYMBOLIC_OP}                     { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+  {NATIVEINT}{LESS_OP}{BAD_SYMBOLIC_OP}                  { yypushback(yylength()); yybegin(PRE_LESS_OP); }
 }
 
-<YYINITIAL, ADJACENT_TYAPP> {
+<PRE_LESS_OP> {
+  "delegate"                                             { yybegin(LINE); return makeToken(DELEGATE); }
+  {IDENT}                                                { yybegin(LINE); return identInTypeApp(); }
+  {IEEE32}                                               { yybegin(LINE); return makeToken(IEEE32); }
+  {IEEE64}                                               { yybegin(LINE); return makeToken(IEEE64); }
+  {DECIMAL}                                              { yybegin(LINE); return makeToken(DECIMAL); }
+  {BYTE}                                                 { yybegin(LINE); return makeToken(BYTE); }
+  {INT16}                                                { yybegin(LINE); return makeToken(INT16); }
+  {INT32}                                                { yybegin(LINE); return makeToken(INT32); }
+  {INT64}                                                { yybegin(LINE); return makeToken(INT64); }
+  {SBYTE}                                                { yybegin(LINE); return makeToken(SBYTE); }
+  {UINT16}                                               { yybegin(LINE); return makeToken(UINT16); }
+  {UINT32}                                               { yybegin(LINE); return makeToken(UINT32); }
+  {UINT64}                                               { yybegin(LINE); return makeToken(UINT64); }
+  {BIGNUM}                                               { yybegin(LINE); return makeToken(BIGNUM); }
+  {NATIVEINT}                                            { yybegin(LINE); return makeToken(NATIVEINT); }
+}
+
+<LINE, ADJACENT_TYAPP> {
   <INIT_ADJACENT_TYAPP> {
     {IDENT}                                              { return initIdent(); }
     {SBYTE}                                              { return makeToken(SBYTE); }
     {BYTE}                                               { return makeToken(BYTE); }
     {INT16}                                              { return makeToken(INT16); }
     {UINT16}                                             { return makeToken(UINT16); }
-    {INTDOTDOT}                                          { saveState(); yypushback(yylength()); yybegin(INT_DOT_DOT); }
     {XINT}|{INT}                                         { return makeToken(INT32); }
     {INT32}                                              { return makeToken(INT32); }
     {UINT32}                                             { return makeToken(UINT32); }
@@ -493,12 +553,15 @@ KEYWORD_STRING_LINE="__LINE__"
     {UNATIVEINT}                                         { return makeToken(UNATIVEINT); }
     {INT64}                                              { return makeToken(INT64); }
     {UINT64}                                             { return makeToken(UINT64); }
+// Rule for smah INT_DOT_DOT.
+// https://github.com/Microsoft/visualfsharp/blob/173513e/src/fsharp/LexFilter.fs#L2142
+    {INT}\.\.                                            { yypushback(yylength()); initSmash(SMASH_INT_DOT_DOT_FROM_LINE, SMASH_INT_DOT_DOT); }
     {IEEE32}                                             { return makeToken(IEEE32); }
     {IEEE64}                                             { return makeToken(IEEE64); }
     {BIGNUM}                                             { return makeToken(BIGNUM); }
     {DECIMAL}                                            { return makeToken(DECIMAL); }
 
-    {CHAR}                                               { return makeToken(CHAR); }
+    {CHARACTER_LITERAL}                                  { return makeToken(CHARACTER_LITERAL); }
     {STRING}                                             { return makeToken(STRING); }
     {UNFINISHED_STRING}                                  { return makeToken(UNFINISHED_STRING); }
     {VERBATIM_STRING}                                    { return makeToken(VERBATIM_STRING); }
@@ -514,64 +577,99 @@ KEYWORD_STRING_LINE="__LINE__"
   {RESERVED_LITERAL_FORMATS}                             { return makeToken(RESERVED_LITERAL_FORMATS); }
   {SYMBOLIC_OP}                                          { return makeToken(SYMBOLIC_OP); }
   {BAD_SYMBOLIC_OP}                                      { return makeToken(BAD_SYMBOLIC_OP); }
-  {LINE_DIRECTIVE}                                       { return makeToken(LINE_DIRECTIVE); }
 }
 
-<INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {
-  [^]                                                    { zzParenLevel = 0; yypushback(1); yybegin(YYINITIAL); }
-}
-
-<INT_DOT_DOT> {
+<SMASH_INT_DOT_DOT,
+ SMASH_INT_DOT_DOT_FROM_LINE> {
   {INT}                                                  { return makeToken(INT32); }
-  \.\.                                                   { toSavedStateAndErase(); return makeToken(DOT_DOT); }
+  \.\.                                                   { exitSmash(SMASH_INT_DOT_DOT_FROM_LINE); return makeToken(DOT_DOT); }
 }
 
-<RQUOTE_DOT> {
-    "@>"                                                 |
-    "@@>"                                                { return makeToken(QUOTE_OP_RIGHT); }
-    \.                                                   { toSavedStateAndErase(); return makeToken(DOT); }
+<SMASH_RQUOTE_DOT,
+ SMASH_RQUOTE_DOT_FROM_LINE> {
+  "@>"                                                   |
+  "@@>"                                                  { return makeToken(QUOTE_OP_RIGHT); }
+  \.                                                     { exitSmash(SMASH_RQUOTE_DOT_FROM_LINE); return makeToken(DOT); }
 }
 
 <STRING_IN_COMMENT> {
-  {STRING}                                               { yybegin(IN_BLOCK_COMMENT); }
-  {UNFINISHED_STRING}                                    { return fillBlockComment(UNFINISHED_STRING_IN_COMMENT); }
-}
-
-<VERBATIM_STRING_IN_COMMENT> {
-  {VERBATIM_STRING}                                      { yybegin(IN_BLOCK_COMMENT); }
-  {UNFINISHED_VERBATIM_STRING}                           { return fillBlockComment(UNFINISHED_VERBATIM_STRING_IN_COMMENT); }
-}
-
-<TRIPLE_QUOTED_STRING_IN_COMMENT> {
+  {STRING}                                               |
+  {VERBATIM_STRING}                                      |
   {TRIPLE_QUOTED_STRING}                                 { yybegin(IN_BLOCK_COMMENT); }
+  {UNFINISHED_STRING}                                    { return fillBlockComment(UNFINISHED_STRING_IN_COMMENT); }
+  {UNFINISHED_VERBATIM_STRING}                           { return fillBlockComment(UNFINISHED_VERBATIM_STRING_IN_COMMENT); }
   {UNFINISHED_TRIPLE_QUOTED_STRING}                      { return fillBlockComment(UNFINISHED_TRIPLE_QUOTED_STRING_IN_COMMENT); }
 }
 
-<IN_BLOCK_COMMENT> {
+<IN_BLOCK_COMMENT,
+ IN_BLOCK_COMMENT_FROM_LINE> {
   "(*"                                                   { zzNestedCommentLevel++; }
   "*)"                                                   { if (--zzNestedCommentLevel == 0) return fillBlockComment(BLOCK_COMMENT); }
-  "(*)"                                                  { }
-  \"                                                     { yypushback(1); yybegin(STRING_IN_COMMENT); }
-  @\"                                                    { yypushback(2); yybegin(VERBATIM_STRING_IN_COMMENT); }
-  \"\"\"                                                 { yypushback(3); yybegin(TRIPLE_QUOTED_STRING_IN_COMMENT); }
-  {STRING_CHAR}                                          { }
+  \"                                                     |
+  @\"                                                    |
+  \"\"\"                                                 { yypushback(yylength()); yybegin(STRING_IN_COMMENT); }
+  [^(\"@*]+                                              |
+  [^]|"(*)"                                              { }
 }
 
 <SMASH_ADJACENT_LESS_OP> {
   {LESS}                                                 { return makeToken(LESS); }
-  "/"                                                    { toSavedStateAndErase(); return makeToken(SYMBOLIC_OP); }
+  "/"                                                    { riseFromParenLevel(0); return makeToken(SYMBOLIC_OP); }
 }
 
 <SMASH_ADJACENT_GREATER_BAR_RBRACK,
  SMASH_ADJACENT_GREATER_BAR_RBRACK_FIN> {
   {GREATER}                                              { return makeToken(GREATER); }
-  {BAR_RBRACK}                                           { return exitSmashAdjacent(SMASH_ADJACENT_GREATER_BAR_RBRACK); }
+  {BAR_RBRACK}                                           { exitSmash(SMASH_ADJACENT_GREATER_BAR_RBRACK_FIN); return makeToken(RBRACK); }
 }
 
 <SMASH_ADJACENT_GREATER_RBRACK,
  SMASH_ADJACENT_GREATER_RBRACK_FIN> {
   {GREATER}                                              { return makeToken(GREATER); }
-  {RBRACK}                                               { return exitSmashAdjacent(SMASH_ADJACENT_GREATER_RBRACK); }
+  {RBRACK}                                               { exitSmash(SMASH_ADJACENT_GREATER_RBRACK_FIN); return makeToken(RBRACK); }
 }
+
+// No need rule for ADJACENT_PREFIX rule.
+// https://github.com/Microsoft/visualfsharp/blob/master/src/fsharp/LexFilter.fs#L2157
+
+<PPSHARP, PPSYMBOL, PPDIRECTIVE> {WHITE_SPACE}           { return makeToken (WHITE_SPACE); }
+
+<PPDIRECTIVE> {
+  {HASH}("l"|"load")                                     { yybegin(LINE); return makeToken(PP_LOAD); }
+  {HASH}("r"|"reference")                                { yybegin(LINE); return makeToken(PP_REFERENCE); }
+  {HASH}("line"|{ANYWHITE}*[0-9]+)                       { yybegin(LINE); return makeToken(PP_LINE); }
+  {HASH}"help"                                           { yybegin(LINE); return makeToken(PP_HELP); }
+  {HASH}"quit"                                           { yybegin(LINE); return makeToken(PP_QUIT); }
+  {HASH}("light"|"indent")                               { yybegin(LINE); return makeToken(PP_LIGHT); }
+  {HASH}"time"                                           { yybegin(LINE); return makeToken(PP_TIME); }
+  {HASH}"I"                                              { yybegin(LINE); return makeToken(PP_I); }
+  {HASH}"nowarn"                                         { yybegin(LINE); return makeToken(PP_NOWARN); }
+  {HASH}"if"{IDENT}                                      { yypushback(yylength()); yybegin(PPSHARP); }
+  {HASH}"else"{IDENT}                                    { yypushback(yylength()); yybegin(PPSHARP); }
+  {HASH}"endif"{IDENT}                                   { yypushback(yylength()); yybegin(PPSHARP); }
+  {HASH}{IDENT}                                          { yybegin(LINE); return makeToken(PP_DIRECTIVE); }
+}
+
+<PPSHARP> {
+  {HASH}"if"                                             { yybegin(PPSYMBOL); return makeToken(PP_IF_SECTION); }
+  {HASH}"else"                                           { yybegin(PPSYMBOL); return makeToken(PP_ELSE_SECTION); }
+  {HASH}"endif"                                          { yybegin(PPSYMBOL); return makeToken(PP_ENDIF); }
+}
+
+<PPSYMBOL> {
+  "||"                                                   { return makeToken(PP_OR); }
+  "&&"                                                   { return makeToken(PP_AND); }
+  "!"                                                    { return makeToken(PP_NOT); }
+  "("                                                    { return makeToken(PP_LPAR); }
+  ")"                                                    { return makeToken(PP_RPAR); }
+  {PP_CONDITIONAL_SYMBOL}                                { return makeToken(PP_CONDITIONAL_SYMBOL); }
+}
+
+<PPSHARP, PPSYMBOL> {
+  {END_OF_LINE_COMMENT}                                  { return makeToken(END_OF_LINE_COMMENT); }
+}
+
+<PPSHARP, PPSYMBOL> {NEWLINE}                            { yybegin(YYINITIAL); return makeToken(NEWLINE); }
+<PPSYMBOL> .                                             { return makeToken(PP_BAD_CHARACTER); }
 
 [^]                                                      { return makeToken(BAD_CHARACTER); }
