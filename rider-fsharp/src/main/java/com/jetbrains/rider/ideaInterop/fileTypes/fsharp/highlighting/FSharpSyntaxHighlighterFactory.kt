@@ -23,17 +23,19 @@ class FSharpSyntaxHighlighter : SyntaxHighlighterBase() {
     companion object {
         private val keywords =
                 IDENT_KEYWORDS.types.map { it to RiderTextAttributeKeys.KEYWORD }
+        private val pp_keywords =
+                PP_KEYWORDS.types.map { it to RiderTextAttributeKeys.KEYWORD }
         private val strings =
                 STRINGS.types.map { it to RiderTextAttributeKeys.STRING }
         private val comments =
                 COMMENTS.types.map { it to RiderTextAttributeKeys.BLOCK_COMMENT }
         private val ourKeys = mapOf(
-                CHAR to RiderTextAttributeKeys.STRING,
+                CHARACTER_LITERAL to RiderTextAttributeKeys.STRING,
                 BYTECHAR to RiderTextAttributeKeys.STRING,
                 END_OF_LINE_COMMENT to RiderTextAttributeKeys.COMMENT,
                 SYMBOLIC_OP to RiderTextAttributeKeys.OPERATOR_IDENTIFIER,
                 TokenType.BAD_CHARACTER to HighlighterColors.BAD_CHARACTER
-        ) + keywords + comments + strings
+        ) + keywords + pp_keywords + comments + strings
     }
 
     override fun getHighlightingLexer(): Lexer {
