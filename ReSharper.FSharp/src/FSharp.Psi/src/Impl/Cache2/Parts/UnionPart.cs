@@ -110,14 +110,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     }
   }
 
-  public interface IUnionPart : ISimpleTypePart
+  public interface IRepresentationAccessRightsOwner
   {
-    bool HasPublicNestedTypes { get; }
-    IList<IUnionCase> Cases { get; }
     AccessRights RepresentationAccessRights { get; }
   }
 
-  public interface IUnionCase : ITypeMember
+  public interface IUnionPart : ISimpleTypePart, IRepresentationAccessRightsOwner
+  {
+    bool HasPublicNestedTypes { get; }
+    IList<IUnionCase> Cases { get; }
+  }
+
+  public interface IUnionCase : ITypeMember, IRepresentationAccessRightsOwner
   {
   }
 }

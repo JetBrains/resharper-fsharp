@@ -1,4 +1,4 @@
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -38,5 +38,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override bool IsStatic => true;
     public override bool IsWritable => false;
     public override IType ReturnType { get; }
+
+    public AccessRights RepresentationAccessRights =>
+      GetContainingType() is TypeElement typeElement
+        ? typeElement.GetFSharpRepresentationAccessRights()
+        : AccessRights.NONE;
   }
 }

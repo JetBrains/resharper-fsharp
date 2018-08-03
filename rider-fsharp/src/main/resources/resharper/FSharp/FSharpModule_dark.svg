@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <title>FSharpModule_dark</title>
+  <g>
+    <rect width="16" height="16" fill="#ffe3ff" opacity="0"/>
+    <g>
+      <rect x="2" y="1" width="13" height="13" fill="#252525"/>
+      <rect x="3" y="8" width="11" height="5" fill="#b280d3"/>
+      <rect x="3" y="2" width="5" height="5" fill="#b280d3"/>
+      <rect x="9" y="2" width="5" height="5" fill="#b280d3"/>
+    </g>
+  </g>
+</svg>

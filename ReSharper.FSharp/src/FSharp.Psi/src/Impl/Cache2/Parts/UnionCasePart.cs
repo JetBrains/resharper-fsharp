@@ -9,7 +9,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  internal class UnionCasePart : FSharpClassLikePart<INestedTypeUnionCaseDeclaration>, Class.IClassPart
+  internal class UnionCasePart : FSharpClassLikePart<INestedTypeUnionCaseDeclaration>, Class.IClassPart, IRepresentationAccessRightsOwner
   {
     public UnionCasePart([NotNull] INestedTypeUnionCaseDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, ModifiersUtil.GetDecoration(declaration),
@@ -89,5 +89,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
         return result.ResultingList();
       }
     }
+
+    public AccessRights RepresentationAccessRights =>
+      Parent is IUnionPart unionPart
+        ? unionPart.RepresentationAccessRights
+        : AccessRights.PUBLIC;
   }
 }

@@ -223,6 +223,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return false;
     }
 
+    public static bool IsUnion([NotNull] this TypeElement typeElement)
+    {
+      foreach (var part in typeElement.EnumerateParts())
+        if (part is IUnionPart)
+        {
+          return true;
+        }
+
+      return false;
+    }
+
+    public static AccessRights GetFSharpRepresentationAccessRights([NotNull] this TypeElement typeElement)
+    {
+      foreach (var part in typeElement.EnumerateParts())
+        if (part is IRepresentationAccessRightsOwner accessRightsOwner)
+          return accessRightsOwner.RepresentationAccessRights;
+      return AccessRights.PUBLIC;
+    }
+
     public static AccessRights GetRepresentationAccessRights([NotNull] this TypeElement typeElement)
     {
       foreach (var part in typeElement.EnumerateParts())
