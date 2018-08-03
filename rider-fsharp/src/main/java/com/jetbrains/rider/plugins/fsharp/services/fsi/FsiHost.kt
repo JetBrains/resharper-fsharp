@@ -1,10 +1,15 @@
 package com.jetbrains.rider.plugins.fsharp.services.fsi
 
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationType
+import com.intellij.notification.Notifications
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.io.FileUtil
 import com.intellij.psi.PsiFile
 import com.jetbrains.rider.model.RdFSharpInteractiveHost
 import com.jetbrains.rider.model.rdFSharpModel
+import com.jetbrains.rider.plugins.fsharp.FSharpIcons
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.util.idea.LifetimedProjectComponent
 import kotlin.properties.Delegates
@@ -38,14 +43,28 @@ class FsiHost(project: Project) : LifetimedProjectComponent(project) {
         createConsoleRunner()
     }
 
+    private fun notifyFsiNotFound(fsiPath: String) {
+        val title = "Could not start F# Interactive"
+        val content = "The file '$fsiPath' was not found."
+        val notification = Notification(FsiConsoleRunner.fsiTitle, title, content, NotificationType.WARNING)
+        notification.icon = FSharpIcons.FSharpConsole
+        Notifications.Bus.notify(notification, project)
+    }
+
     private fun createConsoleRunner(initialAction: ((FsiConsoleRunner) -> Unit)? = null) {
-        rdFsiHost.requestNewFsiSessionInfo.start(Unit).result.advise(componentLifetime, {
-            val runner = FsiConsoleRunner(it.unwrap(), this)
+        rdFsiHost.requestNewFsiSessionInfo.start(Unit).result.advise(componentLifetime) {
+            val sessionInfo = it.unwrap()
+            if (!FileUtil.exists(sessionInfo.fsiPath)) {
+                notifyFsiNotFound(sessionInfo.fsiPath)
+                return@advise
+            }
+
+            val runner = FsiConsoleRunner(sessionInfo, this)
             runner.initAndRun()
             this.fsiConsole = runner
 
             if (initialAction != null)
                 initialAction(runner)
-        })
+        }
     }
 }
