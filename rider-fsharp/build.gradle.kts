@@ -267,7 +267,7 @@ tasks {
     task<Wrapper>("wrapper") {
         gradleVersion = "4.7"
         distributionType = Wrapper.DistributionType.ALL
-        distributionUrl = "https://cache-redirector.shared.aws.intellij.net/services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
+        distributionUrl = "https://cache-redirector.jetbrains.com/services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
     }
 }
 
