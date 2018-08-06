@@ -7,7 +7,6 @@ open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Feature.Services.ParameterInfo
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
 open JetBrains.UI.Icons
 open JetBrains.UI.RichText
@@ -16,7 +15,7 @@ open Microsoft.FSharp.Compiler.SourceCodeServices
 
 type FSharpLookupCandidate(description: string, xmlDoc: FSharpXmlDoc, xmlDocService: FSharpXmlDocService) =
     member x.Description = description
-    member x.XmlDoc = xmlDoc 
+    member x.XmlDoc = xmlDoc
 
     interface ICandidate with
         member x.GetSignature(_, _, _, _, _) = RichText(description)
@@ -89,39 +88,40 @@ type FSharpLookupItem
     override x.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret) =
         base.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret)
 
-        // todo: move it to a separate type (and reuse in open namespace Quick Fix)
-        if item.NamespaceToOpen.IsSome then
-            let line = int context.Coords.Line + 1
-            let parseTree = (context.BasicContext.File :?> IFSharpFile).ParseResults.Value.ParseTree.Value
-            let insertionPoint = OpenStatementInsertionPoint.Nearest
+        match item.NamespaceToOpen with
+        | None -> ()
+        | Some namespaceToOpen ->
 
-            let context = ParsedInput.findNearestPointToInsertOpenDeclaration line parseTree [||] insertionPoint
-            let document = textControl.Document
-            let getLineText = fun lineNumber -> document.GetLineText(docLine lineNumber)
-            let pos = context |> ParsedInput.adjustInsertionPoint getLineText
+        let line = int context.Coords.Line + 1
+        let parseTree = context.FSharpFile.ParseResults.Value.ParseTree.Value
+        let insertionPoint = OpenStatementInsertionPoint.Nearest
 
-            let isSystem = item.NamespaceToOpen.Value.StartsWith("System.")
-            let openPrefix = String(' ', pos.Column) + "open "
-            let textToInsert = openPrefix + item.NamespaceToOpen.Value
+        let document = textControl.Document
+        let context = ParsedInput.findNearestPointToInsertOpenDeclaration line parseTree [||] insertionPoint
+        let pos = ParsedInput.adjustInsertionPoint (docLine >> document.GetLineText) context
 
-            let line = pos.Line - 1 |> max 0
-            let lineToInsert =
-                seq { line - 1 .. -1 .. 0 }
-                |> Seq.takeWhile (fun i ->
-                    let lineText = document.GetLineText(docLine i)
-                    lineText.StartsWith(openPrefix) &&
-                    (textToInsert < lineText || isSystem && not (lineText.StartsWith("open System")))) // todo: System<smth> namespaces
-                |> Seq.tryLast
-                |> Option.defaultValue line
+        let isSystem = namespaceToOpen.StartsWith("System.", StringComparison.Ordinal) || namespaceToOpen = "System"
+        let openPrefix = String(' ', pos.Column) + "open "
+        let textToInsert = openPrefix + namespaceToOpen
 
-            // add empty line after all open expressions if needed
-            let insertEmptyLine = not (document.GetLineText(docLine line).IsNullOrWhitespace())
+        let line = pos.Line - 1 |> max 0
+        let lineToInsert =
+            seq { line - 1 .. -1 .. 0 }
+            |> Seq.takeWhile (fun i ->
+                let lineText = document.GetLineText(docLine i)
+                lineText.StartsWith(openPrefix) &&
+                (textToInsert < lineText || isSystem && not (lineText.StartsWith("open System"))))
+            |> Seq.tryLast
+            |> Option.defaultValue line
 
-            let prevLineEndOffset =
-                if lineToInsert > 0 then document.GetLineEndOffsetWithLineBreak(docLine (max 0 (lineToInsert - 1)))
-                else 0
+        // add empty line after all open expressions if needed
+        let insertEmptyLine = not (document.GetLineText(docLine line).IsNullOrWhitespace())
 
-            document.InsertText(prevLineEndOffset, textToInsert + "\n" + (if insertEmptyLine then "\n" else ""))
+        let prevLineEndOffset =
+            if lineToInsert > 0 then document.GetLineEndOffsetWithLineBreak(docLine (max 0 (lineToInsert - 1)))
+            else 0
+
+        document.InsertText(prevLineEndOffset, textToInsert + "\n" + (if insertEmptyLine then "\n" else ""))
 
     override x.GetDisplayName() =
         let name = LookupUtil.FormatLookupString(item.Name, x.TextColor)

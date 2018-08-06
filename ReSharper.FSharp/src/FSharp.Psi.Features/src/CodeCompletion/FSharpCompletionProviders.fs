@@ -39,27 +39,18 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
                 let parseResults = fsFile.ParseResults
                 let line, column = int context.Coords.Line + 1, int context.Coords.Column
                 let lineText = context.LineText
-                let getIconId (symbol, context) =
-                        // todo: provide symbol and display context in FCS items, calc this only when needed
-                        let icon = getIconId symbol
-                        let retType =
-                            match getReturnType symbol with
-                            | Some t -> t.Format(context)
-                            | _ -> null
-                        Some { Icon = icon; ReturnType = retType }
 
-                let getAllSymbols () = getAllSymbols checkResults 
+                let getAllSymbols () = getAllSymbols checkResults
                 try
                     let completionInfo =
                         checkResults
                             .GetDeclarationListInfo(parseResults, line, lineText, context.PartialLongName,
                                                     getAllSymbols, filterResolved).RunAsTask()
 
-                    let completionItems = completionInfo.Items
-                    if completionItems.IsEmpty() then false else
+                    if completionInfo.Items.IsEmpty() then false else
 
                     let xmlDocService = basicContext.Solution.GetComponent<FSharpXmlDocService>()
-                    for item in completionItems do
+                    for item in completionInfo.Items do
                         let (lookupItem: TextLookupItemBase) =
                             if item.Glyph = FSharpGlyph.Error
                             then FSharpErrorLookupItem(item) :> _
