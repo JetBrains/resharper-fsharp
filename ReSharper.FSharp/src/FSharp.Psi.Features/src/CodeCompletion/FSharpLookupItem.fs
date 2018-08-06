@@ -125,8 +125,9 @@ type FSharpLookupItem
 
     override x.GetDisplayName() =
         let name = LookupUtil.FormatLookupString(item.Name, x.TextColor)
-        item.NamespaceToOpen
-        |> Option.iter (fun ns -> LookupUtil.AddInformationText(name, "(in " + ns + ")", itemInfoTextStyle))
+        match item.NamespaceToOpen with
+        | None -> ()
+        | Some ns -> LookupUtil.AddInformationText(name, "(in " + ns + ")", itemInfoTextStyle)
         name
 
     interface IParameterInfoCandidatesProvider with
