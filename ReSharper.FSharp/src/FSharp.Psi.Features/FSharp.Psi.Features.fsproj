@@ -34,8 +34,9 @@
     <Compile Include="src\SelectEmbracingConsruct\FSharpSelectEmbracingConstructProvider.fs" />
     <Compile Include="src\Formatter\FSharpCodeStylePage.fs" />
     <Compile Include="src\Formatter\ReformatCode.fs" />
-    <Compile Include="src\Settings\FsiOptions.fs" />
-    <Compile Include="src\FsiSessionsHost.fs" />
+    <Compile Include="src\Fsi\FsiOptions.fs" />
+    <Compile Include="src\Fsi\FsiSessionsHost.fs" />
+    <Compile Include="src\Fsi\FsiOptionsPage.fs" />
     <Compile Include="src\TodoItems\FSharpTodoContentsProvider.fs" />
     <Compile Include="src\Parsing\FSharpTreeBuilderBase.fs" />
     <Compile Include="src\Parsing\FSharpImplTreeBuilder.fs" />
