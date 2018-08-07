@@ -2,6 +2,7 @@ package com.jetbrains.rider.plugins.fsharp.services.fsi
 
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.util.TextRange
+import com.intellij.openapi.util.text.StringUtil
 import com.intellij.psi.PsiFile
 
 class SendToFsiActionExecutor(private val consoleRunner: FsiConsoleRunner) {
@@ -17,7 +18,7 @@ class SendToFsiActionExecutor(private val consoleRunner: FsiConsoleRunner) {
                     "# 1 \"stdin\"\n;;\n"
             consoleRunner.sendText(visibleText, fsiText, debug)
         }
-        if (!hasSelection && consoleRunner.fsiHost.moveCaretOnSendLine)
+        if (!hasSelection && consoleRunner.fsiHost.moveCaretOnSendLine.value)
             editor.caretModel.moveCaretRelatively(0, 1, false, false, true)
     }
 

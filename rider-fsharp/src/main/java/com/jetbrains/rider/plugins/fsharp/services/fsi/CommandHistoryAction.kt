@@ -21,10 +21,10 @@ class CommandHistoryAction(private val consoleRunner: FsiConsoleRunner)
     override fun actionPerformed(e: AnActionEvent) {
         val entries = consoleRunner.commandHistory.entries.reversed()
         val copyToEditor = consoleRunner.fsiHost.copyRecentToEditor
-        val title = if (copyToEditor) copyTitle else executeTitle
+        val title = if (copyToEditor.value) copyTitle else executeTitle
         val popupList = object : BaseListPopupStep<CommandHistory.Entry>(title, entries) {
             override fun onChosen(selectedValue: CommandHistory.Entry, finalChoice: Boolean): PopupStep<*>? {
-                if (copyToEditor)
+                if (copyToEditor.value)
                     WriteCommandAction.runWriteCommandAction(consoleView.project) {
                         consoleView.editorDocument.setText(selectedValue.visibleText)
                     }

@@ -7,40 +7,93 @@ import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.io.FileUtil
 import com.intellij.psi.PsiFile
-import com.jetbrains.rider.model.RdFSharpInteractiveHost
+import com.jetbrains.rider.model.RdFsiSessionInfo
 import com.jetbrains.rider.model.rdFSharpModel
 import com.jetbrains.rider.plugins.fsharp.FSharpIcons
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.util.idea.LifetimedProjectComponent
-import kotlin.properties.Delegates
+import com.jetbrains.rider.util.reactive.Property
+import com.jetbrains.rider.util.reactive.flowInto
+import org.jetbrains.concurrency.AsyncPromise
+import org.jetbrains.concurrency.Promise
 
 class FsiHost(project: Project) : LifetimedProjectComponent(project) {
-    private val rdFsiHost: RdFSharpInteractiveHost get() = project.solution.rdFSharpModel.fSharpInteractiveHost
-    var moveCaretOnSendLine by Delegates.notNull<Boolean>()
-    var copyRecentToEditor by Delegates.notNull<Boolean>()
-    private var fsiConsole: FsiConsoleRunner? = null
+    private val rdFsiHost = project.solution.rdFSharpModel.fSharpInteractiveHost
+
+    val moveCaretOnSendLine = Property(true)
+    val copyRecentToEditor = Property(false)
 
     init {
-        rdFsiHost.moveCaretOnSendLine.advise(componentLifetime) { moveCaretOnSendLine = it }
-        rdFsiHost.copyRecentToEditor.advise(componentLifetime) { copyRecentToEditor = it }
+        rdFsiHost.moveCaretOnSendLine.flowInto(componentLifetime, moveCaretOnSendLine)
+        rdFsiHost.copyRecentToEditor.flowInto(componentLifetime, copyRecentToEditor)
     }
 
-    internal fun sendToFsi(editor: Editor, file: PsiFile, debug: Boolean) = synchronized(this) {
-        execute { it.sendActionExecutor.execute(editor, file, debug) }
+    var consoleRunner: FsiConsoleRunner? = null
+        private set
+
+    private val lockObj = Object()
+
+    fun sendToFsi(editor: Editor, file: PsiFile, debug: Boolean) {
+        getOrCreateConsoleRunner(debug).onSuccess {
+            it.sendActionExecutor.execute(editor, file, debug)
+        }
     }
 
-    internal fun sendToFsi(visibleText: String, fsiText: String, debug: Boolean) = synchronized(this) {
-        execute { it.sendText(visibleText, fsiText, debug) }
+    fun sendToFsi(visibleText: String, fsiText: String, debug: Boolean) {
+        getOrCreateConsoleRunner(debug).onSuccess {
+            it.sendText(visibleText, fsiText, debug)
+        }
     }
 
-    private fun execute(action: (FsiConsoleRunner) -> Unit) {
-        if (fsiConsole?.isValid() == true) action(fsiConsole!!)
-        else createConsoleRunner { action(it) }
+    fun resetFsiConsole(forceOptimizeForDebug: Boolean, attach: Boolean = false) {
+        synchronized(lockObj) {
+            if (consoleRunner?.isValid() == true) {
+                consoleRunner!!.processHandler.destroyProcess()
+            }
+            tryCreateConsoleRunner(forceOptimizeForDebug, attach)
+        }
     }
 
-    internal fun resetFsiConsole() = synchronized(this) {
-        if (fsiConsole?.isValid() == true) fsiConsole!!.processHandler.destroyProcess()
-        createConsoleRunner()
+    private fun getOrCreateConsoleRunner(forceOptimizeForDebug: Boolean): Promise<FsiConsoleRunner> {
+        if (consoleRunner?.isValid() == true) {
+            val result = AsyncPromise<FsiConsoleRunner>()
+            result.setResult(consoleRunner!!)
+            return result
+        }
+
+        return tryCreateConsoleRunner(forceOptimizeForDebug)
+    }
+
+    private fun createConsoleRunner(sessionInfo: RdFsiSessionInfo, forceOptimizeForDebug: Boolean, attach: Boolean): FsiConsoleRunner? =
+            synchronized(lockObj) {
+                // Might have already been created.
+                if (consoleRunner?.isValid() == true)
+                    return consoleRunner
+
+                val fsiPath = sessionInfo.fsiPath
+                if (!FileUtil.exists(fsiPath)) {
+                    notifyFsiNotFound(fsiPath)
+                    return null
+                }
+
+                val runner = FsiConsoleRunner(sessionInfo, this, forceOptimizeForDebug)
+                runner.initAndRun()
+                this.consoleRunner = runner
+
+                if (attach)
+                    runner.attachToProcess()
+
+                return runner
+            }
+
+    private fun tryCreateConsoleRunner(forceOptimizeForDebug: Boolean, attach: Boolean = false): Promise<FsiConsoleRunner> {
+        val result = AsyncPromise<FsiConsoleRunner>()
+        rdFsiHost.requestNewFsiSessionInfo.start(Unit).result.advise(componentLifetime) {
+            val consoleRunner = createConsoleRunner(it.unwrap(), forceOptimizeForDebug, attach)
+            if (consoleRunner != null)
+                result.setResult(consoleRunner)
+        }
+        return result
     }
 
     private fun notifyFsiNotFound(fsiPath: String) {
@@ -49,22 +102,5 @@ class FsiHost(project: Project) : LifetimedProjectComponent(project) {
         val notification = Notification(FsiConsoleRunner.fsiTitle, title, content, NotificationType.WARNING)
         notification.icon = FSharpIcons.FSharpConsole
         Notifications.Bus.notify(notification, project)
-    }
-
-    private fun createConsoleRunner(initialAction: ((FsiConsoleRunner) -> Unit)? = null) {
-        rdFsiHost.requestNewFsiSessionInfo.start(Unit).result.advise(componentLifetime) {
-            val sessionInfo = it.unwrap()
-            if (!FileUtil.exists(sessionInfo.fsiPath)) {
-                notifyFsiNotFound(sessionInfo.fsiPath)
-                return@advise
-            }
-
-            val runner = FsiConsoleRunner(sessionInfo, this)
-            runner.initAndRun()
-            this.fsiConsole = runner
-
-            if (initialAction != null)
-                initialAction(runner)
-        }
     }
 }

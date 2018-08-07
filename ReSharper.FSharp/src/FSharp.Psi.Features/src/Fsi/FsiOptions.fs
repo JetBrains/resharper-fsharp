@@ -29,7 +29,7 @@ module FsiOptions =
         "Copy referenced assemblies to a temporary directory to prevent locking by the F# Interactive process."
 
     let [<Literal>] fixOptionsForDebugDescription =
-        "Fix launch options by adding additional `--optimize- --debug+` flags."
+        "Always add `--optimize- --debug+` flags to allow attaching debugger."
 
     let [<Literal>] executeRecentsDescription =
         "When disabled, copy recent command to F# Interactive editor."

@@ -9,6 +9,7 @@ open JetBrains.ProjectModel.Resources
 open JetBrains.ReSharper.Host.Features.Settings.Layers.ExportImportWorkaround
 open JetBrains.ReSharper.Plugins.FSharp.Services.Settings.Fsi
 open JetBrains.UI.RichText
+open JetBrains.Util
 open System
 
 [<OptionsPage("FsiOptionsPage", "Fsi", typeof<ProjectModelThemedIcons.Fsharp>, HelpKeyword = fsiHelpKeyword)>]
@@ -25,9 +26,10 @@ type FsiOptionsPage(lifetime, optionsContext) as this =
         this.AddString(fsiArgsText,            fun key -> key.FsiArgs)
         this.AddEmptyLine() |> ignore
 
-        this.AddHeader(debugSectionTitle)
-        this.AddBool(fixOptionsForDebugText,   fun key -> key.FixOptionsForDebug)
-        this.AddDescription(fixOptionsForDebugDescription)
+        if PlatformUtil.IsRunningUnderWindows then
+            this.AddHeader(debugSectionTitle)
+            this.AddBool(fixOptionsForDebugText,   fun key -> key.FixOptionsForDebug)
+            this.AddDescription(fixOptionsForDebugDescription)
 
         this.AddHeader(commandsSectionTitle)
         this.AddBool(moveCaretOnSendLineText,  fun key -> key.MoveCaretOnSendLine)

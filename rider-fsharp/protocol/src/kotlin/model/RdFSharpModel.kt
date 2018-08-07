@@ -11,6 +11,7 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
         call("requestNewFsiSessionInfo", void, structdef("RdFsiSessionInfo") {
             field("fsiPath", string)
             field("args", immutableList(string))
+            field("FixArgsForAttach", bool)
         })
         property("moveCaretOnSendLine", bool).readonly
         property("copyRecentToEditor", bool).readonly

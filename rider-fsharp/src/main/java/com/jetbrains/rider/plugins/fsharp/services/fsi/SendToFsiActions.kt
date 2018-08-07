@@ -22,7 +22,7 @@ object Fsi {
 class StartFsiAction : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         val project = CommonDataKeys.PROJECT.getData(e.dataContext) ?: return
-        ServiceManager.getService(project, FsiHost::class.java).resetFsiConsole()
+        ServiceManager.getService(project, FsiHost::class.java).resetFsiConsole(false)
     }
 }
 

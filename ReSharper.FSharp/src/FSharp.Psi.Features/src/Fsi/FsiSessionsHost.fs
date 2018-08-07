@@ -11,15 +11,13 @@ open JetBrains.ProjectModel
 open JetBrains.Platform.RdFramework.Util
 open JetBrains.ReSharper.Host.Features
 open JetBrains.ReSharper.Host.Features.Toolset
-open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Services.Settings.Fsi
 open JetBrains.Rider.Model
 open JetBrains.Util
 
 [<SolutionComponent>]
 type FsiSessionsHost
-        (lifetime: Lifetime, solution: ISolution, fsiDetector: IFsiDetector, fsiOptions: FsiOptionsProvider,
-         fsCheckerService: FSharpCheckerService) =
+        (lifetime: Lifetime, solution: ISolution, fsiDetector: IFsiDetector, fsiOptions: FsiOptionsProvider) =
 
     let stringArg option arg = sprintf "--%s:%O" option arg
     let boolArg option arg = sprintf "--%s%s" option (if arg then "+" else "-")
@@ -34,13 +32,8 @@ type FsiSessionsHost
                yield stringArg "fsi-server-lcid" Thread.CurrentThread.CurrentUICulture.LCID
                yield boolArg "shadowcopyreferences" fsiOptions.ShadowCopyReferences.Value
 
-               yield! fsiOptions.FsiArgs.Value.Split([|' '|], StringSplitOptions.RemoveEmptyEntries)
-
-               if fsiOptions.FixOptionsForDebug.Value then
-                   yield boolArg "optimize" false
-                   yield boolArg "debug" true |]
-
-        RdFsiSessionInfo(fsiPath, List(args))
+               yield! fsiOptions.FsiArgs.Value.Split([|' '|], StringSplitOptions.RemoveEmptyEntries) |]
+        RdFsiSessionInfo(fsiPath, List(args), fsiOptions.FixOptionsForDebug.Value)
 
     do
         let rdFsiHost = solution.GetProtocolSolution().GetRdFSharpModel().FSharpInteractiveHost
