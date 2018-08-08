@@ -34,7 +34,8 @@ F# support in Rider makes use of open source software, most notably [FSharp.Comp
     * if using Gradle command line:
 
         ```
-        $ ./rider-fsharp/gradlew prepare
+        $ cd ./rider-fsharp
+        $ ./gradlew prepare
         ```
 
 2. Open `ReSharper.FSharp.sln` solution and build using the `Debug` configuration. The output assemblies are later copied to the frontend plugin directories by Gradle. (If you're seeing build errors in Rider, choose *File | Settings | Build, Execution, Deployment | Toolset and Build*, and in the *Use MSBuild version* drop-down, make sure that Rider uses MSBuild shipped with .NET Core SDK.)
@@ -48,7 +49,7 @@ F# support in Rider makes use of open source software, most notably [FSharp.Comp
     * if using Gradle command line:
 
         ```
-        $ rider-fsharp/gradlew runIde
+        $ ./gradlew runIde
         ```
 
 ### Installing to an existing Rider instance
