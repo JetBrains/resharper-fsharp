@@ -16,7 +16,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.jetbrains.rd:rd-gen:0.1.19")
+        classpath("com.jetbrains.rd:rd-gen:0.183.29")
     }
 }
 
@@ -39,7 +39,7 @@ java {
 }
 
 
-val baseVersion = "2018.2"
+val baseVersion = "2018.3"
 val buildCounter = ext.properties["build.number"] ?: "9999"
 version = "$baseVersion.$buildCounter"
 
@@ -136,8 +136,8 @@ configure<RdgenParams> {
     val csOutput = File(repoRoot, "Resharper.FSharp/src/FSharp.ProjectModelBase/src/Protocol")
     val ktOutput = File(repoRoot, "rider-fsharp/src/main/java/com/jetbrains/rider/plugins/fsharp/protocol")
 
-    verbose.set(true)
-    hashFolder.set("build/rdgen")
+    verbose = true
+    hashFolder = "build/rdgen"
     logger.info("Configuring rdgen params")
     classpath({
         logger.info("Calculating classpath for rdgen, intellij.ideaDependency is ${intellij.ideaDependency}")
@@ -147,7 +147,7 @@ configure<RdgenParams> {
         "$rdLibDirectory/rider-model.jar"
     })
     sources(File(repoRoot, "rider-fsharp/protocol/src/kotlin/model"))
-    packages.set("model")
+    packages = "model"
 
     generator {
         language = "kotlin"
