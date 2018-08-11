@@ -1,4 +1,3 @@
-import com.intellij.openapi.command.impl.DummyProject
 import com.intellij.openapi.project.Project
 import com.jetbrains.rider.model.RdNullLocation
 import com.jetbrains.rider.model.RdProjectFileDescriptor
@@ -7,15 +6,17 @@ import com.jetbrains.rider.plugins.fsharp.projectView.FSharpMoveProviderExtensio
 import com.jetbrains.rider.projectView.moveProviders.impl.ActionOrderType
 import com.jetbrains.rider.projectView.nodes.ProjectModelNode
 import com.jetbrains.rider.projectView.nodes.ProjectModelNodeKey
+import com.jetbrains.rider.test.base.ProjectModelBaseTest
 import org.testng.Assert
 import org.testng.annotations.Test
 
 @Test
-class FSharpMoveProviderExtensionTest {
+class FSharpMoveProviderExtensionTest : ProjectModelBaseTest() {
+    override fun getSolutionDirectoryName() = "EmptySolution"
 
     @Test
     fun testAllowPaste01() {
-        doTest { project, provider ->
+        doTest { provider ->
             Assert.assertTrue(
                     provider.allowPaste(listOf(project.createFile()), project.createFile(), ActionOrderType.None)
             )
@@ -24,7 +25,7 @@ class FSharpMoveProviderExtensionTest {
 
     @Test
     fun testAllowPaste02_Mix() {
-        doTest { project, provider ->
+        doTest { provider ->
             Assert.assertTrue(
                     provider.allowPaste(listOf(project.createFile(), project.createCompileBeforeFile()),
                             project.createFile(), ActionOrderType.None)
@@ -42,7 +43,7 @@ class FSharpMoveProviderExtensionTest {
 
     @Test
     fun testAllowPaste03_DifferentFiles() {
-        doTest { project, provider ->
+        doTest { provider ->
             /* CompileBefore [0]
                CompileBefore [1]
                Compile       [2]
@@ -109,7 +110,7 @@ class FSharpMoveProviderExtensionTest {
 
     @Test(enabled = false)
     fun testAllowPaste04_DifferentFilesInFolders() {
-        doTest { project, provider ->
+        doTest { provider ->
             /* Folder1/CompileBefore [0]
                Folder1/Compile       [1]
                Compile               [2]
@@ -175,9 +176,7 @@ class FSharpMoveProviderExtensionTest {
         return ProjectModelNode(this, ProjectModelNodeKey(0), descriptor, parent)
     }
 
-    private fun doTest(action: (Project, FSharpMoveProviderExtension) -> Unit) {
-        val project = DummyProject.getInstance()
-        val provider = FSharpMoveProviderExtension(project)
-        action(project, provider)
+    private fun doTest(action: (FSharpMoveProviderExtension) -> Unit) {
+        action(FSharpMoveProviderExtension(project))
     }
 }
