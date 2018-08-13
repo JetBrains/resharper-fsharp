@@ -32,7 +32,7 @@ class FSharpSyntaxHighlighter : SyntaxHighlighterBase() {
         private val ourKeys = mapOf(
                 CHARACTER_LITERAL to RiderTextAttributeKeys.STRING,
                 BYTECHAR to RiderTextAttributeKeys.STRING,
-                END_OF_LINE_COMMENT to RiderTextAttributeKeys.COMMENT,
+                LINE_COMMENT to RiderTextAttributeKeys.COMMENT,
                 SYMBOLIC_OP to RiderTextAttributeKeys.OPERATOR_IDENTIFIER,
                 TokenType.BAD_CHARACTER to HighlighterColors.BAD_CHARACTER
         ) + keywords + pp_keywords + comments + strings
