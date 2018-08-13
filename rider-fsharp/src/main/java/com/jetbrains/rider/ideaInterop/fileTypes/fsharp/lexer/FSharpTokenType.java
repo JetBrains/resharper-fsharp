@@ -13,7 +13,7 @@ public interface FSharpTokenType {
     IElementType BYTECHAR = createToken("BYTECHAR");
     IElementType CHARACTER_LITERAL = createToken("CHARACTER_LITERAL");
     IElementType DECIMAL = createToken("DECIMAL");
-    IElementType END_OF_LINE_COMMENT = createToken("END_OF_LINE_COMMENT");
+    IElementType LINE_COMMENT = createToken("LINE_COMMENT");
     IElementType SHEBANG = createToken("SHEBANG");
     IElementType IDENT = createToken("IDENT");
     IElementType IEEE32 = createToken("IEEE32");
@@ -22,8 +22,10 @@ public interface FSharpTokenType {
     IElementType INT32 = createToken("INT32");
     IElementType INT64 = createToken("INT64");
     IElementType NATIVEINT = createToken("NATIVEINT");
-    IElementType QUOTE_OP_LEFT = createToken("QUOTE_OP_LEFT");
-    IElementType QUOTE_OP_RIGHT = createToken("QUOTE_OP_RIGHT");
+    IElementType LQUOTE_TYPED = createToken("LQUOTE_TYPED");
+    IElementType RQUOTE_TYPED = createToken("RQUOTE_TYPED");
+    IElementType LQUOTE_UNTYPED = createToken("LQUOTE_UNTYPED");
+    IElementType RQUOTE_UNTYPED = createToken("RQUOTE_UNTYPED");
     IElementType RESERVED_IDENT_FORMATS = createToken("RESERVED_IDENT_FORMATS");
     IElementType RESERVED_IDENT_KEYWORD = createToken("RESERVED_IDENT_KEYWORD");
     IElementType RESERVED_LITERAL_FORMATS = createToken("RESERVED_LITERAL_FORMATS");
@@ -80,7 +82,8 @@ public interface FSharpTokenType {
     IElementType UNATIVEINT = createToken("UNATIVEINT");
     IElementType VERBATIM_BYTEARRAY = createToken("VERBATIM_BYTEARRAY");
     IElementType VERBATIM_STRING = createToken("VERBATIM_STRING");
-    IElementType NEWLINE = createToken("NEWLINE");
+    IElementType NEW_LINE = createToken("NEW_LINE");
+    IElementType WHITESPACE = createToken("WHITESPACE");
     IElementType KEYWORD_STRING_SOURCE_DIRECTORY = createToken("KEYWORD_STRING_SOURCE_DIRECTORY");
     IElementType KEYWORD_STRING_SOURCE_FILE = createToken("KEYWORD_STRING_SOURCE_FILE");
     IElementType KEYWORD_STRING_LINE = createToken("KEYWORD_STRING_LINE");
@@ -98,7 +101,6 @@ public interface FSharpTokenType {
     IElementType AMP_AMP = createToken("AMP_AMP");
     IElementType COMMA = createToken("COMMA");
     IElementType BAD_TAB = createToken("BAD_TAB");
-    IElementType TAB = createToken("TAB");
 
     IElementType ABSTRACT = createKeywordToken("ABSTRACT", "abstract");
     IElementType AND = createKeywordToken("AND", "and");
@@ -164,6 +166,35 @@ public interface FSharpTokenType {
     IElementType WITH = createKeywordToken("WITH", "with");
     IElementType YIELD = createKeywordToken("YIELD", "yield");
 
+    IElementType ATOMIC = createKeywordToken("ATOMIC", "atomic");
+    IElementType BREAK = createKeywordToken("BREAK", "break");
+    IElementType CHECKED = createKeywordToken("CHECKED", "checked");
+    IElementType COMPONENT = createKeywordToken("COMPONENT", "component");
+    IElementType CONST = createKeywordToken("CONST", "const");
+    IElementType CONSTRAINT = createKeywordToken("CONSTRAINT", "constraint");
+    IElementType CONSTRUCTOR = createKeywordToken("CONSTRUCTOR", "constructor");
+    IElementType CONTINUE = createKeywordToken("CONTINUE", "continue");
+    IElementType EAGER = createKeywordToken("EAGER", "eager");
+    IElementType FIXED = createKeywordToken("FIXED", "fixed");
+    IElementType FORI = createKeywordToken("FORI", "fori");
+    IElementType FUNCTOR = createKeywordToken("FUNCTOR", "functor");
+    IElementType INCLUDE = createKeywordToken("INCLUDE", "include");
+    IElementType MEASURE = createKeywordToken("MEASURE", "measure");
+    IElementType METHOD = createKeywordToken("METHOD", "method");
+    IElementType MIXIN = createKeywordToken("MIXIN", "mixin");
+    IElementType OBJECT = createKeywordToken("OBJECT", "object");
+    IElementType PARALLEL = createKeywordToken("PARALLEL", "parallel");
+    IElementType PARAMS = createKeywordToken("PARAMS", "params");
+    IElementType PROCESS = createKeywordToken("PROCESS", "process");
+    IElementType PROTECTED = createKeywordToken("PROTECTED", "protected");
+    IElementType PURE = createKeywordToken("PURE", "pure");
+    IElementType RECURSIVE = createKeywordToken("RECURSIVE", "recursive");
+    IElementType SEALED = createKeywordToken("SEALED", "sealed");
+    IElementType TAILCALL = createKeywordToken("TAILCALL", "tailcall");
+    IElementType TRAIT = createKeywordToken("TRAIT", "trait");
+    IElementType VIRTUAL = createKeywordToken("VIRTUAL", "virtual");
+    IElementType VOLATILE = createKeywordToken("VOLATILE", "volatile");
+
     IElementType PP_LIGHT = createToken("PP_LIGHT");
     IElementType PP_ELSE_SECTION = createToken("PP_ELSE_SECTION");
     IElementType PP_ENDIF = createToken("PP_ENDIF");
@@ -215,6 +246,7 @@ public interface FSharpTokenType {
             DEFAULT,
             DELEGATE,
             DO,
+            DO_BANG,
             DONE,
             DOWNCAST,
             DOWNTO,
@@ -229,14 +261,17 @@ public interface FSharpTokenType {
             FUN,
             FUNCTION,
             GLOBAL,
+            HASH,
             IF,
             IN,
             INHERIT,
             INLINE,
             INTERFACE,
             INTERNAL,
+            LARROW,
             LAZY,
             LET,
+            LET_BANG,
             MATCH,
             MEMBER,
             MODULE,
@@ -250,8 +285,10 @@ public interface FSharpTokenType {
             OVERRIDE,
             PRIVATE,
             PUBLIC,
+            RARROW,
             REC,
             RETURN,
+            RETURN_BANG,
             SIG,
             STATIC,
             STRUCT,
@@ -262,20 +299,45 @@ public interface FSharpTokenType {
             TYPE,
             UPCAST,
             USE,
+            USE_BANG,
             VAL,
             VOID,
             WHEN,
             WHILE,
             WITH,
             YIELD,
-            LET_BANG,
-            USE_BANG,
-            DO_BANG,
-            YIELD_BANG,
-            RETURN_BANG,
-            RARROW,
-            LARROW,
-            HASH
+            YIELD_BANG
+    );
+
+    TokenSet RESERVED_IDENT_KEYWORDS = TokenSet.create(
+            ATOMIC,
+            BREAK,
+            CHECKED,
+            COMPONENT,
+            CONST,
+            CONSTRAINT,
+            CONSTRUCTOR,
+            CONTINUE,
+            EAGER,
+            FIXED,
+            FORI,
+            FUNCTOR,
+            INCLUDE,
+            MEASURE,
+            METHOD,
+            MIXIN,
+            OBJECT,
+            PARALLEL,
+            PARAMS,
+            PROCESS,
+            PROTECTED,
+            PURE,
+            RECURSIVE,
+            SEALED,
+            TAILCALL,
+            TRAIT,
+            VIRTUAL,
+            VOLATILE
     );
 
     TokenSet PP_KEYWORDS = TokenSet.create(
