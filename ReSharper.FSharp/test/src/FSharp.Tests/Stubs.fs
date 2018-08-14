@@ -22,29 +22,6 @@ type FSharpProjectOptionsBuilderStub() =
     interface IHideImplementation<FSharpProjectOptionsBuilder>
 
 
-[<SolutionInstanceComponent>]
-type FSharpProjectStructurePresenterStub() =
-    interface IHideImplementation<FSharpProjectStructurePresenter>
-
-
-[<SolutionInstanceComponent>]
-type FSharpItemsContainerRefresherStub() =
-    interface IHideImplementation<FSharpItemsContainerRefresher>
-
-    interface  IFSharpItemsContainerRefresher with
-        member x.Refresh(_, _) = ()
-        member x.Refresh(_, _, _) = ()
-        member x.Update(_, _) = ()
-        member x.Update(_, _, _) = ()
-        member x.ReloadProject(_) = ()
-        member x.SelectItem(_, _) = ()
-
-
-[<SolutionFeaturePart>]
-type FSharpItemModificationContextProviderStub() =
-    interface IHideImplementation<FSharpItemModificationContextProvider>
-
-
 [<ShellComponent>]
 type FSharpFileServiceStub() =
     interface IHideImplementation<FSharpFileService>

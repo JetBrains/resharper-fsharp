@@ -1,7 +1,8 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Scripts
+namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Common.Scripts
 
 open System
 open System.IO
+open JetBrains.Application
 open JetBrains.Application.Components
 open JetBrains.Application.Environment
 open JetBrains.DataFlow
@@ -9,9 +10,12 @@ open JetBrains.ProjectModel
 open JetBrains.ProjectModel.BuildTools
 open JetBrains.ProjectModel.ProjectsHost.SolutionHost
 open JetBrains.ProjectModel.ProjectsHost.SolutionHost.Impl
-open JetBrains.ReSharper.Plugins.FSharp.Common.Util
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ProjectStructure
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.TestFramework
 open JetBrains.TestFramework.Projects
@@ -44,7 +48,7 @@ type ScriptPsiModulesTest() =
     member x.OpenSolution(lifetime: Lifetime): ISolution =
         let tempSolutionPath = x.CopyTestDataDirectoryToTemp2(lifetime, x.TestMethodName)
         let solution = x.SolutionManager.OpenSolution(tempSolutionPath / x.SolutionFileName)
-        lifetime.AddAction2(fun _ -> x.SolutionManager.CloseSolution())
+        lifetime.AddAction(fun _ -> x.SolutionManager.CloseSolution()) |> ignore
         solution
 
     member x.DumpSourceFilePersistentIds(solution: ISolution, writer: TextWriter) =
@@ -87,3 +91,34 @@ type TestSolutionToolset(lifetime: Lifetime, buildToolContainer: BuildToolContai
 type SolutionHostZoneActivator() =
     interface IActivate<IHostSolutionZone> with
         member x.ActivatorEnabled() = true
+
+
+[<SolutionInstanceComponent>]
+type FSharpProjectStructurePresenterStub() =
+    interface IHideImplementation<FSharpProjectStructurePresenter>
+
+
+[<SolutionInstanceComponent>]
+type FSharpItemsContainerRefresherStub() =
+    interface IHideImplementation<FSharpItemsContainerRefresher>
+
+    interface  IFSharpItemsContainerRefresher with
+        member x.Refresh(_, _) = ()
+        member x.Refresh(_, _, _) = ()
+        member x.Update(_, _) = ()
+        member x.Update(_, _, _) = ()
+        member x.ReloadProject(_) = ()
+        member x.SelectItem(_, _) = ()
+
+
+[<SolutionFeaturePart>]
+type FSharpItemModificationContextProviderStub() =
+    interface IHideImplementation<FSharpItemModificationContextProvider>
+
+[<ShellComponent>]
+type FSharpFileServiceStub() =
+    interface IHideImplementation<FSharpFileService>
+
+    interface IFSharpFileService with
+        member x.IsScratchFile(_) = false
+        member x.IsScriptLike(_) = false

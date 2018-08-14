@@ -8,6 +8,7 @@
   <ItemGroup>
     <Compile Include="ItemsContainerTest.fs" />
     <Compile Include="ZoneMarker.fs" />
+    <Compile Include="SciptPsiModulesTest.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="4.3.4" />
