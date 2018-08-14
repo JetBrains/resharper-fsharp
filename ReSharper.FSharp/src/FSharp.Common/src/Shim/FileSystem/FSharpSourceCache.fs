@@ -77,9 +77,21 @@ type FSharpSourceCache
         | _ -> base.Exists(path)
 
     override x.Execute(changeMap) =
-        let change = changeMap.GetChange<ProjectFileDocumentCopyChange>(documentManager.ChangeProvider)
-        if isNotNull change then
-            let file = change.ProjectFile
-            if file.LanguageType.Is<FSharpProjectFileType>() then
-                 files.[file.Location] <- { Source = getText change.Document; Timestamp = DateTime.UtcNow }
+        match changeMap.GetChange<DocumentChange>(documentManager.ChangeProvider) with
+        | null -> null
+        | change ->
+
+        let projectFile =
+            match change with
+            | :? ProjectFileDocumentChange as change -> change.ProjectFile
+            | :? ProjectFileDocumentCopyChange as change -> change.ProjectFile
+            | _ -> null
+
+        match projectFile with
+        | null -> null
+        | file ->
+
+        if file.LanguageType.Is<FSharpProjectFileType>() then
+             files.[file.Location] <- { Source = getText change.Document; Timestamp = DateTime.UtcNow }
+
         null
