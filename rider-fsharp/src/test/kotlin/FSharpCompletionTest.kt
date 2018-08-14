@@ -1,7 +1,9 @@
 
 import com.jetbrains.rider.model.rdFSharpModel
 import com.jetbrains.rider.projectView.solution
+import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.CompletionTestBase
+import com.jetbrains.rider.test.enums.ToolsetVersion
 import com.jetbrains.rider.test.framework.frameworkLogger
 import com.jetbrains.rider.test.scriptingApi.callBasicCompletion
 import com.jetbrains.rider.test.scriptingApi.completeWithTab
@@ -26,6 +28,7 @@ class FSharpCompletionTest : CompletionTestBase() {
     fun listModule() = doTest("Lis")
 
     @Test
+    @TestEnvironment(toolset = ToolsetVersion.TOOLSET_15_CORE)
     fun listModuleValue() = doTest("filt")
 
     private fun waitForFcs() {
@@ -33,10 +36,10 @@ class FSharpCompletionTest : CompletionTestBase() {
     }
 
     private fun doTest(typed: String) {
-        rdFcsHost.projectChecked.advise(Lifetime.Eternal, { project ->
+        rdFcsHost.projectChecked.advise(Lifetime.Eternal) { project ->
             isFcsReady = true
             frameworkLogger.info("FCS: $project checked")
-        })
+        }
 
         isFcsReady = false
         dumpOpenedEditor("Program.fs", "Program.fs") {

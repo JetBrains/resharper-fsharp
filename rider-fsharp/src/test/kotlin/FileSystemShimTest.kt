@@ -25,7 +25,6 @@ class FileSystemShimTest : BaseTestWithSolution() {
 
         val newText = "namespace NewTextHere"
         changeFileContent(project, file) { newText }
-        fcsHost.projectChecked.adviseOnce(project.lifetime) {}
 
         waitAndPump(project.lifetime, { getTimestamp(file) > stampBefore }, 15000, { "Timestamp wasn't changed." })
         val stampAfter = getTimestamp(file)
