@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net45</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Folder\File1.fs" />
+    <Compile Include="Folder\File2.fs" />
+    <Compile Include="File3.fs" />
+    <Folder Include="EmptyFolder" />
+    <Compile Include="Folder\File3.fs" />
+    <Compile Include="Folder\File4.fs" />
+    <Compile Include="Folder\Sub\Class1.fs" />
+    <Compile Include="Folder\File5.fs" />
+    <Compile Include="Folder\Sub\Class2.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <CompileAfter Include="AfterFile.fs" />
+    <CompileBefore Include="BeforeFile.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\ExternalFolder\LinkedFile1.fs" />
+    <Compile Include="..\ExternalFolder\LinkedFile2.fs">
+      <Link>LinkedFolder\x</Link>
+    </Compile>
+  </ItemGroup>
+</Project>

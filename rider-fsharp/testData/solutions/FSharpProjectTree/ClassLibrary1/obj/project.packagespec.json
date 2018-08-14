@@ -1,0 +1,36 @@
+﻿{
+  "version": "1.0.0",
+  "restore": {
+    "projectUniqueName": "C:\\Developer\\resharper-fsharp\\rider-fsharp\\testData\\solutions\\FSharpProjectTree\\ClassLibrary1\\ClassLibrary1.fsproj",
+    "projectName": "ClassLibrary1",
+    "projectPath": "C:\\Developer\\resharper-fsharp\\rider-fsharp\\testData\\solutions\\FSharpProjectTree\\ClassLibrary1\\ClassLibrary1.fsproj",
+    "outputPath": "C:\\Developer\\resharper-fsharp\\rider-fsharp\\testData\\solutions\\FSharpProjectTree\\ClassLibrary1\\obj\\",
+    "projectStyle": "PackageReference",
+    "fallbackFolders": [
+      "C:\\Developer\\resharper-fsharp\\rider-fsharp\\testData\\{FALLBACK_PLACEHOLDER}",
+      "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+    ],
+    "originalTargetFrameworks": [
+      "net45"
+    ],
+    "frameworks": {
+      "net45": {
+        "projectReferences": {}
+      }
+    }
+  },
+  "frameworks": {
+    "net45": {
+      "dependencies": {
+        "FSharp.Core": {
+          "target": "Package",
+          "version": "[4.3.*, )"
+        },
+        "System.ValueTuple": {
+          "target": "Package",
+          "version": "[4.*, )"
+        }
+      }
+    }
+  }
+}
