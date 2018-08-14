@@ -5,17 +5,21 @@ open JetBrains.Platform.RdFramework.Util
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Host.Features
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
+open JetBrains.ReSharper.Plugins.FSharp.Common.Shim.FileSystem
 open JetBrains.Rider.Model
+open Microsoft.FSharp.Compiler.AbstractIL.Internal.Library
 
 [<SolutionComponent>]
-type FcsHost(lifetime: Lifetime, checkerService: FSharpCheckerService, solutionModel: SolutionModel) =
+type FcsHost
+        (lifetime: Lifetime, solution: ISolution, checkerService: FSharpCheckerService,
+         sourceCache: FSharpSourceCache) =
     do
-        match solutionModel.TryGetCurrentSolution() with
-        | null -> ()
-        | solution ->
+        let fcsHost = solution.GetProtocolSolution().GetRdFSharpModel().FSharpCompilerServiceHost
 
-        match solution.GetRdFSharpModel().FSharpCompilerServiceHost.ProjectChecked with
-        | :? IRdSignal<_> as signal ->
-            let subscription = checkerService.Checker.ProjectChecked.Subscribe(fun (project, _) -> signal.Fire(project))
-            lifetime.AddAction(fun _ -> subscription.Dispose()) |> ignore
-        | _ -> ()
+        let projectChecked = fcsHost.ProjectChecked :?> IRdSignal<string>
+        let subscription = checkerService.Checker.ProjectChecked.Subscribe(fun (projectFilePath, _) ->
+            projectChecked.Fire(projectFilePath))
+        lifetime.AddAction(fun _ -> subscription.Dispose()) |> ignore
+
+        fcsHost.GetLastModificationStamp.Set(Shim.FileSystem.GetLastWriteTimeShim)
+        fcsHost.GetSourceCache.Set(sourceCache.GetRdFSharpSource)

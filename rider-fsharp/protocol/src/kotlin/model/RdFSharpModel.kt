@@ -20,6 +20,11 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
     private val RdFSharpCompilerServiceHost = aggregatedef("RdFSharpCompilerServiceHost")  {
         sink("fileChecked", string).async
         sink("projectChecked", string).async
+        call("getLastModificationStamp", string, dateTime)
+        call("getSourceCache", string, structdef("RdFSharpSource") {
+            field("source", string)
+            field("timestamp", dateTime)
+        }.nullable)
     }
 
     init {

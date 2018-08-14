@@ -14,12 +14,15 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util.CommonUtil
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.Rider.Model
 open Microsoft.FSharp.Compiler.AbstractIL.Internal.Library
 
 type FSharpSource =
     { Source: byte[]
       Timestamp: DateTime }
 
+    member x.ToRdFSharpSource() =
+        RdFSharpSource(Encoding.UTF8.GetString(x.Source), x.Timestamp)
 
 [<SolutionComponent>]
 type FSharpSourceCache
@@ -95,3 +98,8 @@ type FSharpSourceCache
              files.[file.Location] <- { Source = getText change.Document; Timestamp = DateTime.UtcNow }
 
         null
+
+    member x.GetRdFSharpSource(fileName: string): RdFSharpSource =
+        let path = FileSystemPath.TryParse(fileName)
+        let mutable fsSource = Unchecked.defaultof<FSharpSource>
+        if x.TryGetSource(path, &fsSource) then fsSource.ToRdFSharpSource() else null
