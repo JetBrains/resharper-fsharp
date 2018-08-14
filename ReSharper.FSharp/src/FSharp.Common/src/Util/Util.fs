@@ -170,6 +170,10 @@ module rec CommonUtil =
             member this.Equals(x, y) = x.SetEquals(y)
             member this.GetHashCode(x) = x.Count }
 
+    type Lifetime with
+        member x.AddAction2(func: Func<_,_>) =
+            x.AddAction(fun _ -> func.Invoke() |> ignore) |> ignore
+
 [<AutoOpen>]
 module rec FSharpMsBuildUtils =
     open BuildActions

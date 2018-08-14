@@ -1,8 +1,10 @@
-module rec JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
+namespace rec JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 
 open System
 open System.Collections.Generic
+open System.IO
 open System.Linq
+open System.Runtime.InteropServices
 open JetBrains.Application
 open JetBrains.Application.Progress
 open JetBrains.Application.Threading
@@ -12,12 +14,9 @@ open JetBrains.DataFlow
 open JetBrains.DocumentManagers
 open JetBrains.DocumentManagers.impl
 open JetBrains.DocumentModel
-open JetBrains.Metadata.Reader.API
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Assemblies.Impl
-open JetBrains.ProjectModel.Model2.Assemblies.Impl
 open JetBrains.ProjectModel.Model2.Assemblies.Interfaces
-open JetBrains.ProjectModel.Transaction
 open JetBrains.ProjectModel.model2.Assemblies.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
@@ -200,7 +199,9 @@ type FSharpScriptPsiModulesProvider
 
             ira.DoStart())
 
-    member x.CreatePsiModuleForProjectFile(projectFile: IProjectFile, changeBuilder: PsiModuleChangeBuilder) =
+    member x.CreatePsiModuleForProjectFile(projectFile: IProjectFile, changeBuilder: PsiModuleChangeBuilder,
+                                           [<Out>] resultModule: byref<FSharpScriptPsiModule>) =
+
         locks.AssertWriteAccessAllowed()
         let path = projectFile.Location
 
@@ -217,15 +218,21 @@ type FSharpScriptPsiModulesProvider
         | _ -> ()
 
         let moduleId = projectFile.GetPersistentID()
-        scriptsFromProjectFiles.GetValuesSafe(path)
-        |> Seq.tryFind (fun psiModule -> psiModule.PersistenID = moduleId)
-        |> Option.defaultWith (fun _ ->
-            let document = projectFile.GetDocument()
-            let sourceFileCtor = createSourceFileForProjectFile projectFile
-            let psiModule = createPsiModule path document moduleId sourceFileCtor changeBuilder
-            scriptsFromProjectFiles.Add(path, psiModule)
-            addPsiModule psiModule
-            psiModule)
+        let existingModule =
+            scriptsFromProjectFiles.GetValuesSafe(path)
+            |> Seq.tryFind (fun psiModule -> psiModule.PersistenID = moduleId)
+
+        match existingModule with
+        | Some _ -> false
+        | _ ->
+
+        let document = projectFile.GetDocument()
+        let sourceFileCtor = createSourceFileForProjectFile projectFile
+        let psiModule = createPsiModule path document moduleId sourceFileCtor changeBuilder
+        scriptsFromProjectFiles.Add(path, psiModule)
+        addPsiModule psiModule
+        resultModule <- psiModule
+        true
 
     member x.CreatePsiModuleForPath(path: FileSystemPath, changeBuilder: PsiModuleChangeBuilder) =
         locks.AssertWriteAccessAllowed()
@@ -275,6 +282,15 @@ type FSharpScriptPsiModulesProvider
             if scriptsReferences.ContainsKey(path) then 
                 updateReferences path change.Document
 
+    member x.Dump(writer: TextWriter) =
+        writer.WriteLine(sprintf "Scripts from paths:")
+        for KeyValuePair (path, _) in scriptsFromPaths do
+            writer.WriteLine("  " + path.ToString())
+
+        writer.WriteLine(sprintf "Scripts from project files:")
+        for fsPsiModule in scriptsFromProjectFiles.Values do
+            writer.WriteLine("  " + fsPsiModule.SourceFile.ToProjectFile().GetPersistentID())
+
     interface IProjectPsiModuleProviderFilter with
         member x.OverrideHandler(lifetime, project, handler) =
             let handler =
@@ -311,9 +327,10 @@ type FSharpScriptPsiModuleHandler
         match changeType with
         | PsiModuleChange.ChangeType.Added when
                 projectFile.LanguageType.Is<FSharpScriptProjectFileType>() ->
-            let psiModule = modulesProvider.CreatePsiModuleForProjectFile(projectFile, changeBuilder)
-            psiModule.AddProjectHandler(this)
-            sourceFiles.[projectFile.Location] <- psiModule.SourceFile
+            let mutable psiModule = Unchecked.defaultof<FSharpScriptPsiModule>
+            if modulesProvider.CreatePsiModuleForProjectFile(projectFile, changeBuilder, &psiModule) then
+                psiModule.AddProjectHandler(this)
+                sourceFiles.[projectFile.Location] <- psiModule.SourceFile
 
         | PsiModuleChange.ChangeType.Removed when sourceFiles.ContainsKey(oldLocation) ->
             let sourceFile = sourceFiles.[oldLocation]

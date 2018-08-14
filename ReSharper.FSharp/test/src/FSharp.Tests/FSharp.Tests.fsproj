@@ -12,6 +12,7 @@
     <Compile Include="SymbolCacheTest.fs" />
     <Compile Include="ErrorsHighlightingTest.fs" />
     <Compile Include="FSharpLexerTest.fs" />
+    <Compile Include="SciptPsiModulesTest.fs" />
     <Compile Include="Stubs.fs" />
     <Compile Include="ZoneMarker.fs" />
     <Compile Include="Common.fs" />

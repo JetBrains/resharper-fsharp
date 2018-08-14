@@ -6,17 +6,43 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Common
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ProjectStructure
 open JetBrains.ReSharper.Plugins.FSharp.Services.ContextActions
+open JetBrains.ReSharper.Psi
 open JetBrains.Util
 
 [<SolutionComponent>]
-type FsiSessionsHostStub() = 
+type FsiSessionsHostStub() =
     interface IHideImplementation<FsiSessionsHost>
 
 
 [<SolutionComponent>]
-type FSharpProjectOptionsBuilderStub() = 
+type FSharpProjectOptionsBuilderStub() =
     interface IHideImplementation<FSharpProjectOptionsBuilder>
+
+
+[<SolutionInstanceComponent>]
+type FSharpProjectStructurePresenterStub() =
+    interface IHideImplementation<FSharpProjectStructurePresenter>
+
+
+[<SolutionInstanceComponent>]
+type FSharpItemsContainerRefresherStub() =
+    interface IHideImplementation<FSharpItemsContainerRefresher>
+
+    interface  IFSharpItemsContainerRefresher with
+        member x.Refresh(_, _) = ()
+        member x.Refresh(_, _, _) = ()
+        member x.Update(_, _) = ()
+        member x.Update(_, _, _) = ()
+        member x.ReloadProject(_) = ()
+        member x.SelectItem(_, _) = ()
+
+
+[<SolutionFeaturePart>]
+type FSharpItemModificationContextProviderStub() =
+    interface IHideImplementation<FSharpItemModificationContextProvider>
 
 
 [<ShellComponent>]
