@@ -58,22 +58,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     [NotNull]
     public static IEnumerable<string> GetPossibleSourceNames([NotNull] IDeclaredElement element)
     {
-      var names = new List<string> {element.ShortName};
+      var names = new HashSet<string> {element.ShortName};
 
-      var constructor = element as IConstructor;
-      var typeElement = constructor?.GetContainingType();
+      var typeElement = (element as IConstructor)?.GetContainingType();
       if (typeElement != null)
-        names.Add(typeElement.ShortName);
+        GetPossibleSourceNames(typeElement, names);
 
       if (element is ITypeElement type)
-      {
-        var typeShortName = type.ShortName;
-        if (typeShortName.EndsWith(FSharpImplUtil.AttributeSuffix))
-          names.Add(typeShortName.SubstringBeforeLast(FSharpImplUtil.AttributeSuffix, StringComparison.Ordinal));
+        GetPossibleSourceNames(type, names);
 
-        names.AddRange(
-          FSharpTypeAbbreviationsUtil.AbbreviatedTypes.TryGetValue(type.GetClrName(), EmptyArray<string>.Instance));
-      }
       if (element is IAttributesOwner attrOwner)
       {
         if (GetAttributeValue(attrOwner, SourceNameAttributeAttr) is string sourceName)
@@ -86,8 +79,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         if (declaration is IFSharpDeclaration fsDeclaration)
           names.Add(fsDeclaration.SourceName);
 
-      // todo: type abbreviations
-      return names;
+      var result = new List<string>(names.Count * 2);
+      result.AddRange(names);
+      result.AddRange(names.Select(n => $"``{n}``"));
+
+      return result;
+    }
+
+    private static void GetPossibleSourceNames(ITypeElement type, ISet<string> names)
+    {
+      names.Add(type.ShortName);
+
+      var typeShortName = type.ShortName;
+      if (typeShortName.EndsWith(FSharpImplUtil.AttributeSuffix))
+        names.Add(typeShortName.SubstringBeforeLast(FSharpImplUtil.AttributeSuffix, StringComparison.Ordinal));
+
+      if (type.GetClrName().TryGetAbbreviations(out var abbreviations))
+        names.AddRange(abbreviations);
     }
 
     [CanBeNull]
