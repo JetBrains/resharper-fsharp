@@ -8,17 +8,15 @@ using static Microsoft.FSharp.Compiler.AbstractIL.Internal.Library;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 {
-    public abstract class FileSystemShimChangeProvider : DelegatingFileSystemShim, IChangeProvider
+    public abstract class FileSystemShimChangeProvider : DelegatingFileSystemShim
     {
         protected FileSystemShimChangeProvider(Lifetime lifetime, Shim.IFileSystem fileSystem,
-            ChangeManager changeManager, params IChangeProvider[] changeProviders) : base(lifetime, fileSystem)
+            ChangeManager changeManager) : base(lifetime, fileSystem)
         {
-            changeManager.RegisterChangeProvider(lifetime, this);
-            foreach (var changeProvider in changeProviders)
-                changeManager.AddDependency(lifetime, this, changeProvider);
+            changeManager.Changed2.Advise(lifetime, Execute);
         }
 
-        public abstract object Execute(IChangeMap changeMap);
+        public abstract void Execute(ChangeEventArgs changeEventArgs);
     }
 
     public class DelegatingFileSystemShim : Shim.IFileSystem

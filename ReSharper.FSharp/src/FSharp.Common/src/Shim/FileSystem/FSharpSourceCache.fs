@@ -26,9 +26,9 @@ type FSharpSource =
 
 [<SolutionComponent>]
 type FSharpSourceCache
-        (lifetime: Lifetime, changeManager, documentManager: DocumentManager, extensions: IProjectFileExtensions) =
-    inherit FileSystemShimChangeProvider
-        (Lifetimes.Define(lifetime).Lifetime, Shim.FileSystem, changeManager, documentManager.ChangeProvider)
+        (lifetime: Lifetime, solution: ISolution, changeManager, documentManager: DocumentManager,
+         extensions: IProjectFileExtensions, solutionDocumentChangeProvider: SolutionDocumentChangeProvider) =
+    inherit FileSystemShimChangeProvider(Lifetimes.Define(lifetime).Lifetime, Shim.FileSystem, changeManager)
 
     let files = ConcurrentDictionary<FileSystemPath, FSharpSource>()
 
@@ -79,11 +79,7 @@ type FSharpSourceCache
         | true, value -> true
         | _ -> base.Exists(path)
 
-    override x.Execute(changeMap) =
-        match changeMap.GetChange<DocumentChange>(documentManager.ChangeProvider) with
-        | null -> null
-        | change ->
-
+    member x.ProcessDocumentChange(change: DocumentChange) =
         let projectFile =
             match change with
             | :? ProjectFileDocumentChange as change -> change.ProjectFile
@@ -91,13 +87,41 @@ type FSharpSourceCache
             | _ -> null
 
         match projectFile with
-        | null -> null
+        | null -> ()
         | file ->
 
         if file.LanguageType.Is<FSharpProjectFileType>() then
              files.[file.Location] <- { Source = getText change.Document; Timestamp = DateTime.UtcNow }
 
-        null
+    member x.ProcessProjectModelChange(change: ProjectModelChange) =
+        if isNull change then () else
+        let visitor =
+            { new RecursiveProjectModelChangeDeltaVisitor() with
+                override v.VisitItemDelta(change) =
+                    base.VisitItemDelta(change)
+                    if not (change.ContainsChangeType(ProjectModelChangeType.EXTERNAL_CHANGE)) then () else
+
+                    match change.ProjectItem with
+                    | :? IProjectFile as file when file.LanguageType.Is<FSharpProjectFileType>() ->
+                        match file.GetDocument() with
+                        | null -> ()
+                        | document ->
+
+                        let path = file.Location
+                        let text = getText document
+
+                        let mutable fsSource = Unchecked.defaultof<_>
+                        if files.TryGetValue(path, &fsSource) && text = fsSource.Source then () else
+
+                        files.[path] <- { Source = text; Timestamp = DateTime.UtcNow }
+                    | _ -> () }
+
+        visitor.VisitDelta(change)
+
+    override x.Execute(changeEventArgs: ChangeEventArgs) =
+        let changeMap = changeEventArgs.ChangeMap
+        x.ProcessDocumentChange(changeMap.GetChange<DocumentChange>(solutionDocumentChangeProvider))
+        x.ProcessProjectModelChange(changeMap.GetChange<ProjectModelChange>(solution))
 
     member x.GetRdFSharpSource(fileName: string): RdFSharpSource =
         let path = FileSystemPath.TryParse(fileName)
