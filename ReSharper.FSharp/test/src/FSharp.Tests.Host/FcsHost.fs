@@ -1,18 +1,28 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Host
 
+open System.Linq
 open JetBrains.DataFlow
+open JetBrains.Platform.RdFramework
 open JetBrains.Platform.RdFramework.Util
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Host.Features
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Common.Shim.FileSystem
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
 open JetBrains.Rider.Model
+open JetBrains.Util
 open Microsoft.FSharp.Compiler.AbstractIL.Internal.Library
 
 [<SolutionComponent>]
 type FcsHost
         (lifetime: Lifetime, solution: ISolution, checkerService: FSharpCheckerService,
-         sourceCache: FSharpSourceCache) =
+         sourceCache: FSharpSourceCache, itemsContainer: FSharpItemsContainer) =
+
+    let dumpSingleProjectMapping (rdVoid: RdVoid) =
+        let projectMapping =
+            itemsContainer.ProjectMappings.Values.SingleOrDefault().NotNull("Expected single project mapping.")
+        projectMapping.DumpToString()
+
     do
         let fcsHost = solution.GetProtocolSolution().GetRdFSharpModel().FSharpCompilerServiceHost
 
@@ -23,3 +33,4 @@ type FcsHost
 
         fcsHost.GetLastModificationStamp.Set(Shim.FileSystem.GetLastWriteTimeShim)
         fcsHost.GetSourceCache.Set(sourceCache.GetRdFSharpSource)
+        fcsHost.DumpSingleProjectMapping.Set(dumpSingleProjectMapping)

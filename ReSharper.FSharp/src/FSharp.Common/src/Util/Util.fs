@@ -162,8 +162,13 @@ module rec CommonUtil =
     let getCommonParent path1 path2 =
         FileSystemPath.GetDeepestCommonParent(path1, path2)
 
-    let (|UnixSeparators|) (path: FileSystemPath) =
-        path.NormalizeSeparators(FileSystemPathEx.SeparatorStyle.Unix)
+    /// Used in tests. Should not be invoked on BackSlashSeparatedRelativePath.
+    let (|UnixSeparators|) (path: IPath) =
+        let separatorStyle = FileSystemPathEx.SeparatorStyle.Unix
+        match path with
+        | :? FileSystemPath as path -> path.NormalizeSeparators(separatorStyle)
+        | :? RelativePath as path -> path.NormalizeSeparators(separatorStyle)
+        | _ -> failwith "Should not be invoked on BackSlashSeparatedRelativePath."
 
     let setComparer =
         { new IEqualityComparer<HashSet<_>> with

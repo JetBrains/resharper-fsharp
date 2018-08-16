@@ -147,8 +147,8 @@ type FSharpItemsContainer
                 | _ -> ()
             for item in itemsToUpdate do
                 match item with
-                | FileItem _ -> refresher.Update(projectMark, item.ItemInfo.LogicalPath)
-                | FolderItem (_, id) -> refresher.Update(projectMark, item.ItemInfo.LogicalPath, id)
+                | FileItem _ -> refresher.Update(projectMark, item.ItemInfo.PhysicalPath)
+                | FolderItem (_, id) -> refresher.Update(projectMark, item.ItemInfo.PhysicalPath, id)
 
         refreshFolder, updateItem, refresh
 
@@ -162,7 +162,7 @@ type FSharpItemsContainer
             projectMappings.[projectMark] <- mapping
             refresh ())
 
-    member private x.ProjectMappings = projectMappings.Value
+    member x.ProjectMappings = projectMappings.Value
 
     member x.IsValid(viewItem: FSharpViewItem) =
         use lock = locker.UsingReadLock()
@@ -900,8 +900,13 @@ type FSharpProjectModelElement =
     | Project of FileSystemPath
     | ProjectItem of FSharpProjectItem
 
+    member x.GetProjectDirectory(): FileSystemPath =
+        match x with
+        | Project path -> path
+        | ProjectItem item -> item.Parent.GetProjectDirectory()
 
 [<ReferenceEquality>]
+[<StructuredFormatDisplay("{RelativePhysicalPath}")>]
 type FSharpProjectItem =
     | FileItem of ItemInfo * BuildAction * ISet<TargetFrameworkId>
     | FolderItem of ItemInfo * FSharpViewFolderIdentity 
@@ -915,6 +920,9 @@ type FSharpProjectItem =
     member x.Parent  = x.ItemInfo.Parent
     member x.PhysicalPath: FileSystemPath = x.ItemInfo.PhysicalPath
     member x.LogicalPath: FileSystemPath = x.ItemInfo.LogicalPath
+
+    member x.ProjectDirectory = x.Parent.GetProjectDirectory()
+    member x.RelativePhysicalPath = x.PhysicalPath.MakeRelativeTo(x.ProjectDirectory)
 
     override x.ToString() =
         let name =
@@ -1010,7 +1018,11 @@ type FSharpItemsContainerRefresher(lifetime: Lifetime, solution: ISolution, view
         use lock = solution.Locks.UsingReadLock()
         tryGetProject projectMark
         |> Option.iter (fun project ->
-            for viewItem in project.FindProjectItemsByLocation(path) |> Seq.choose viewItemCtor do
+            for projectItem in project.FindProjectItemsByLocation(path) do
+                match viewItemCtor projectItem with
+                | None -> ()
+                | Some viewItem ->
+
                 solution.Locks.QueueReadLock(lifetime, "Refresh View", fun _ ->
                     if solution.GetComponent<FSharpItemsContainer>().IsValid(viewItem) then
                         viewHost.UpdateItemIfExists(viewItem)))

@@ -25,6 +25,7 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
             field("source", string)
             field("timestamp", dateTime)
         }.nullable)
+        call("dumpSingleProjectMapping", void, string)
     }
 
     init {
