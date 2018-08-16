@@ -80,9 +80,10 @@ type FSharpItemsContainer
         match projectItem.GetProject() with
         | null -> None
         | project ->
-            match project.GetProjectMark() with
-            | null -> None
-            | projectMark -> Some projectMark
+
+        match project.GetProjectMark() with
+        | null -> None
+        | projectMark -> Some projectMark
 
     let tryGetProjectMapping (projectMark: IProjectMark): ProjectMapping option =
         tryGetValue projectMark projectMappings.Value
@@ -407,7 +408,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         match relativeToType with
         | RelativeToType.Before -> item.SortKey
         | RelativeToType.After -> item.SortKey + 1
-        | _ -> relativeToType |> sprintf "Got relativeToType %O" |> failwith
+        | _ -> relativeToType |> failwithf "Got relativeToType %O"
 
     let canBeRelative (projectItem: FSharpProjectItem) (modifiedItem: FSharpProjectItem option) =
         match projectItem, modifiedItem with
@@ -424,14 +425,14 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
     let changeDirection = function
         | RelativeToType.Before -> RelativeToType.After
         | RelativeToType.After -> RelativeToType.Before
-        | relativeToType -> relativeToType |> sprintf "Got relativeToType %O" |> failwith
+        | relativeToType -> relativeToType |> failwithf "Got relativeToType %O"
 
     let tryGetAdjacentItemInParent (relativeItem: FSharpProjectItem) relativeToType =
         let otherRelativeSortKey =
             match relativeToType with
             | RelativeToType.After -> relativeItem.SortKey + 1
             | RelativeToType.Before -> relativeItem.SortKey - 1
-            | _ -> relativeToType |> sprintf "Got relativeToType %O" |> failwith
+            | _ -> relativeToType |> failwithf "Got relativeToType %O"
         getChildren relativeItem.Parent
         |> Seq.filter (fun item -> item.SortKey = otherRelativeSortKey)
         |> List.ofSeq
@@ -482,7 +483,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
                             | _ -> failwith "getting parent item of project"
                         relativeParent, relativeItem, true
                     | _ -> parent.Parent, parent, shouldRefresh
-                | _ -> sprintf "got project as previous parent: %A" state |> failwith) initialState
+                | _ -> failwithf "got project as previous parent: %A" state) initialState
 
     let createFoldersForItem itemPath relativeItem relativeToType folderRefresher itemUpdater =
         let parent, relativeItem, shouldRefresh =
@@ -508,7 +509,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
                 match relativeToType with
                 | RelativeToType.Before -> Seq.tryHead children
                 | RelativeToType.After -> Seq.tryLast children
-                | _ -> relativeToType |> sprintf "Got relativeToType %O" |> failwith
+                | _ -> relativeToType |> failwithf "Got relativeToType %O"
         
             match relativeChildItem with
             | Some item when canBeRelative item modifiedItem -> Some (item, relativeToType)
@@ -793,7 +794,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
                     foldersById.[id] <- ProjectItem item
                     item
 
-                | itemType -> sprintf "got item %O" itemType |> failwith
+                | itemType -> failwithf "got item %O" itemType
             mapping.AddItem(item)
 
         mapping
@@ -814,11 +815,11 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
                 // renaming linked files isn't currently supported, but 
                 info.LogicalPath <- info.LogicalPath.Directory / newLocation.Name
                 info.PhysicalPath <- info.PhysicalPath.Directory / newLocation.Name
-        | item -> sprintf "got item %O" item |> failwith
+        | item -> failwithf "got item %O" item
 
     member x.RemoveFile(path, refresher, updater) =
         tryGetFile path
-        |> Option.orElseWith (fun _ -> sprintf "No item found for %O" path |> failwith)
+        |> Option.orElseWith (fun _ -> failwithf "No item found for %O" path)
         |> Option.iter (removeItem refresher updater)
 
     member x.RemoveFolder(path, refresher, updater) =

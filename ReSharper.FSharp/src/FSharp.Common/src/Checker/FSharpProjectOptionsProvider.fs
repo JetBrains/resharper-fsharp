@@ -205,8 +205,7 @@ type FSharpScriptOptionsProvider(logger: ILogger, checkerService: FSharpCheckerS
     let getScriptOptionsLock = obj()
 
     member x.GetScriptOptions(file: IPsiSourceFile) =
-        let path = file.GetLocation()
-        let filePath = path.FullPath
+        let filePath = file.GetLocation().FullPath
         let source = file.Document.GetText()
         lock getScriptOptionsLock (fun _ ->
         let getScriptOptionsAsync = checkerService.Checker.GetProjectOptionsFromScript(filePath, source)

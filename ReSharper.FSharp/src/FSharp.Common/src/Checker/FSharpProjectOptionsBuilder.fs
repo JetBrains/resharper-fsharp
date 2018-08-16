@@ -84,10 +84,8 @@ type FSharpProjectOptionsBuilder
     let defaultDelimiters = [| ';'; ','; ' ' |]
 
     let splitAndTrim (delimiters: char[]) = function
-        | null -> Seq.empty
-        | (s: string) -> seq {
-            for s in s.Split(delimiters) do
-                if not (s.IsNullOrWhitespace()) then yield s.Trim() }
+        | null -> EmptyArray.Instance
+        | (s: string) -> s.Split(delimiters, StringSplitOptions.RemoveEmptyEntries)
 
     let getReferences project psiModule targetFrameworkId =
         let result = List()
@@ -149,7 +147,7 @@ type FSharpProjectOptionsBuilder
 
             match props.TryGetValue(FSharpProperties.OtherFlags) with
             | otherFlags when not (otherFlags.IsNullOrWhitespace()) -> splitAndTrim [| ' ' |] otherFlags
-            | _ -> Seq.empty
+            | _ -> EmptyArray.Instance
             |> options.AddRange
         | _ -> ()
 
@@ -236,4 +234,4 @@ type FSharpProjectOptionsBuilder
     member private x.GetDefinedConstants(properties: IProjectProperties, targetFrameworkId: TargetFrameworkId) =
         match properties.ActiveConfigurations.GetOrCreateConfiguration(targetFrameworkId) with
         | :? IManagedProjectConfiguration as cfg -> splitAndTrim defaultDelimiters cfg.DefineConstants
-        | _ -> Seq.empty
+        | _ -> EmptyArray.Instance

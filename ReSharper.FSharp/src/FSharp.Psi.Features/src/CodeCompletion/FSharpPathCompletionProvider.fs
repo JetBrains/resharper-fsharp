@@ -82,7 +82,7 @@ type FSharpPathCompletionContextProvider() =
                     let nextSeparatorOffset = argValue.IndexOfAny(FileSystemDefinition.SeparatorChars, caretValueOffset)
                     if nextSeparatorOffset < 0 then argValue.Length else nextSeparatorOffset
                 | SmartCompletion -> argValue.Length
-                | completionType -> sprintf "Got completion type: %O" completionType |> failwith
+                | completionType -> failwithf "Got completion type: %O" completionType
             valueOffset + valueReplaceEndOffset
 
         let document = context.Document
