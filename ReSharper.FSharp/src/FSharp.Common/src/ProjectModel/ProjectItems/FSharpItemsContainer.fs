@@ -41,8 +41,9 @@ type FSharpItemsContainerLoader(lifetime: Lifetime, solution: ISolution, solutio
     abstract GetMap: unit -> IDictionary<IProjectMark, ProjectMapping>
     default x.GetMap() =
         let projectMarks =
-            solution.ProjectsHostContainer().GetComponent<ISolutionStructureContainer>().ProjectMarks.ToArray()
-            |> Array.map (fun projectMark -> projectMark.UniqueProjectName, projectMark) |> dict
+            solution.ProjectsHostContainer().GetComponent<ISolutionStructureContainer>().ProjectMarks
+            |> Seq.map (fun projectMark -> projectMark.UniqueProjectName, projectMark)
+            |> dict
 
         let dummyProjectMark =
             DummyProjectMark(solution.GetSolutionMark(), String.Empty, Guid.Empty, FileSystemPath.Empty)
@@ -100,14 +101,14 @@ type FSharpItemsContainer
             let filter = MsBuildItemTypeFilter(rdProject)
 
             rdProject.Items
-            |> Seq.filter (fun item ->
+            |> List.ofSeq
+            |> List.filter (fun item ->
                 // todo: allow passing additional default item types to the filter ctor
                 itemTypeFilter item.ItemType && allowNonDefaultItemType ||
                 not (filter.FilterByItemType(item.ItemType, item.IsImported())))
-            |> Seq.filter (fun item ->
+            |> List.filter (fun item ->
                 let (BuildAction buildAction) = item.ItemType
                 not (buildAction.IsNone() && getItemsByName item.EvaluatedInclude |> Seq.length > 1))
-            |> List.ofSeq
             |> List.filter (fun item -> itemTypeFilter item.ItemType)
             |> List.fold (fun index item ->
                 if index < items.Count && items.[index].Item.EvaluatedInclude = item.EvaluatedInclude then
@@ -266,15 +267,14 @@ type FSharpItemsContainer
             |> Option.bind tryGetProjectMapping
             |> Option.map (fun mapping ->
                 mapping.TryGetProjectItems(folder.Location)
-                |> Seq.map (function
+                |> List.map (function
                     | FolderItem (_, id) as folderItem ->
                         let parent =
                             match folderItem.Parent with
                             | ProjectItem (FolderItem (_, id)) -> Some (FSharpViewFolder (folder.ParentFolder, id))
                             | _ -> None
                         FSharpViewFolder (folder, id), parent
-                    | item -> sprintf "got item %O" item |> failwith)
-                |> List.ofSeq)
+                    | item -> failwithf "got item %O" item))
             |> Option.defaultValue []
 
         member x.TryGetRelativeChildPath(projectMark, modifiedItem, relativeItem, relativeToType) =
@@ -371,14 +371,13 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         getChildren parent |> Seq.length |> (+) 1
 
     let moveFollowingItems parent sortKeyFrom direction updateItem =
-        getChildren parent
-        |> Seq.iter (fun item ->
+        for item in getChildren parent do
             if item.SortKey >= sortKeyFrom then
                 item.ItemInfo.SortKey <-
                     match direction with
                     | MoveDirection.Up -> item.SortKey - 1
                     | MoveDirection.Down -> item.SortKey + 1
-                updateItem item)
+                updateItem item
 
     let addFolder parent sortKey path updateItem =
         let folderItem = FolderItem(ItemInfo.Create(path, path, parent, sortKey), getNewFolderIdentity path)
