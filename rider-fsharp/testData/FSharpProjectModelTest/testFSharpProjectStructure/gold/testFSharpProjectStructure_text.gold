@@ -544,3 +544,45 @@ Init
 [LinkedFile2.fs]
 
 
+===================
+Move file 'File1.fs' and 'Class1.fs' in folder 'Folder(2)' before 'Sub(1)'
+
+[AfterFile.fs]
+
+
+[BeforeFile.fs]
+
+
+[File2.fs]
+
+
+[Class1.fs]
+
+
+[Class2.fs]
+
+
+[File1.fs]
+
+
+[File3.fs]
+
+
+[File4.fs]
+
+
+[File5.fs]
+
+
+[Foo.fs]
+
+
+[Library.fs]
+
+
+[LinkedFile1.fs]
+
+
+[LinkedFile2.fs]
+
+
