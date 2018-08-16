@@ -272,3 +272,8 @@ tasks {
 }
 
 defaultTasks("prepare")
+
+// workaround for https://youtrack.jetbrains.com/issue/RIDER-18697
+dependencies {
+    testCompile("xalan", "xalan", "2.7.2")
+}
