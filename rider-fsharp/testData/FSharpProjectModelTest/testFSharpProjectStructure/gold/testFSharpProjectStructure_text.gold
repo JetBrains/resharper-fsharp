@@ -377,7 +377,7 @@ Init
 
 
 ===================
-10. Move file 'Folder/File2.fs' before 'Folder(1)'
+9. Move file 'Folder/File2.fs' before 'Folder(1)'
 
 [AfterFile.fs]
 
@@ -419,7 +419,91 @@ Init
 
 
 ===================
-11. Rename file 'File3.fs' to 'Foo.fs'
+10. Rename file 'File3.fs' to 'Foo.fs'
+
+[AfterFile.fs]
+
+
+[BeforeFile.fs]
+
+
+[File2.fs]
+
+
+[Class2.fs]
+
+
+[File3.fs]
+
+
+[File4.fs]
+
+
+[File5.fs]
+
+
+[Class1.fs]
+
+
+[File1.fs]
+
+
+[Foo.fs]
+
+
+[Library.fs]
+
+
+[LinkedFile1.fs]
+
+
+[LinkedFile2.fs]
+
+
+===================
+11. Move file 'Foo.fs' to 'EmptyFolder(1)'
+
+[AfterFile.fs]
+
+
+[BeforeFile.fs]
+
+
+[Foo.fs]
+
+
+[File2.fs]
+
+
+[Class2.fs]
+
+
+[File3.fs]
+
+
+[File4.fs]
+
+
+[File5.fs]
+
+
+[Class1.fs]
+
+
+[File1.fs]
+
+
+[Library.fs]
+
+
+[LinkedFile1.fs]
+
+
+[LinkedFile2.fs]
+
+
+===================
+12. Move file 'EmptyFolder/Foo.fs' before 'EmptyFolder(1)'
 
 [AfterFile.fs]
 

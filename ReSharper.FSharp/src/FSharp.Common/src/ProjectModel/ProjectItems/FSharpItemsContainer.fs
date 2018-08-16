@@ -615,7 +615,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
                 // todo: check item type
                 tryGetAdjacentRelativeItem nodeItem.Parent modifiedNodeItem relativeToType)
 
-    let createNewItemInfo path logicalPath relativeToPath relativeToType refresher updater =
+    let createNewItemInfo (path: FileSystemPath) logicalPath relativeToPath relativeToType refresher updater =
         let tryGetPossiblyRelativeNodeItem path =
             if isNull path then None else
             tryGetFile path
@@ -645,6 +645,9 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
 
                 let parent, sortKey =
                     match relativeItemParent with
+                    | ProjectItem (EmptyFolder _) when path.Parent = relativeToPath ->
+                        ProjectItem relativeItem, 1
+
                     | ProjectItem item when item.LogicalPath = logicalPath.Parent ->
                         relativeItemParent, getNewRelativeSortKey relativeItem relativeToType
                     | _ ->
