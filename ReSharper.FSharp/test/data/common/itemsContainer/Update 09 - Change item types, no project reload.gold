@@ -3,8 +3,8 @@
 2:File2 (Resource)
 
 .NETFramework,Version=v0.0
-C:/Solution/Project/File1
-C:/Solution/Project/File2
+File1
+File2
 
 
 =======
@@ -19,7 +19,7 @@ Project
 2:File2
 
 .NETFramework,Version=v0.0
-C:/Solution/Project/File1
-C:/Solution/Project/File2
+File1
+File2
 
 

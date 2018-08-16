@@ -40,7 +40,7 @@ let (|AbsolutePath|) (path: FileSystemPath) =
     path.MakeAbsoluteBasedOn(projectDirectory)
 
 let removeIdentities path =
-    Regex.Replace(path, @"\[\d+\]", String.Empty);
+    Regex.Replace(path, @"\[\d+\]", String.Empty)
 
 
 let createContainer items writer =
@@ -639,7 +639,7 @@ type FSharpItemsContainerTest() =
               "Folder[1]/File4" ],
             fun container writer ->
                 writer.WriteLine("Move 'Folder/File4' after 'File1':")
-                container.OnRemoveFile("Compile", "Folder/File4");
+                container.OnRemoveFile("Compile", "Folder/File4")
                 container.OnAddFile("Compile", "File4", "File1", Some RelativeToType.After))
 
     [<Test>]

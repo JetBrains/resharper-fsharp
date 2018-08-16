@@ -9,9 +9,7 @@ open JetBrains.Application.Components
 open JetBrains.Application.DataContext
 open JetBrains.Application.PersistentMap
 open JetBrains.Application.Threading
-open JetBrains.Application.changes
 open JetBrains.DataFlow
-open JetBrains.Metadata.Reader.API
 open JetBrains.Platform.MsBuildHost.Models
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Caches
@@ -31,13 +29,12 @@ open JetBrains.ReSharper.Psi
 open JetBrains.Threading
 open JetBrains.UI.RichText
 open JetBrains.Util
-open JetBrains.Util.Collections
 open JetBrains.Util.DataStructures
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 open JetBrains.Util.Logging
 open JetBrains.Util.PersistentMap
 
-/// Keeps project mappings in solution caches to make the mappings available before MsBuild loads the projects.
+/// Keeps project mappings in solution caches so mappings available on warm start before MsBuild loads projects.
 [<SolutionInstanceComponent>]
 type FSharpItemsContainerLoader(lifetime: Lifetime, solution: ISolution, solutionCaches: ISolutionCaches) =
 
@@ -134,7 +131,7 @@ type FSharpItemsContainer
 
         let refreshFolder folder =
             match folderToRefresh, folder with
-            | None, _ | _, Project -> folderToRefresh <- Some folder
+            | None, _ | _, Project _ -> folderToRefresh <- Some folder
             | Some (ProjectItem existingFolder), (ProjectItem newFolder) when
                     newFolder.LogicalPath.IsPrefixOf(existingFolder.LogicalPath) -> folderToRefresh <- Some folder
             | _ -> ()
@@ -144,7 +141,7 @@ type FSharpItemsContainer
 
         let refresh () =
             match folderToRefresh with
-                | Some Project -> refresher.Refresh(projectMark, false)
+                | Some (Project _) -> refresher.Refresh(projectMark, false)
                 | Some (ProjectItem (FolderItem (_, id) as folder)) ->
                     refresher.Refresh(projectMark, folder.LogicalPath, id)
                 | _ -> ()
@@ -334,6 +331,7 @@ type IFSharpItemsContainer =
 
 
 type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISet<_>, logger: ILogger) =
+    let project = Project projectDirectory
 
     // Files and folders by physical path.
     // For now we assume that a file is only included to a single item type group.
@@ -451,14 +449,14 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
 
     let rec traverseParentFolders (item: FSharpProjectModelElement) = seq {
         match item with
-        | Project -> ()
+        | Project _ -> ()
         | ProjectItem item ->
             yield item
             yield! traverseParentFolders item.Parent }
 
     let getTopLevelModifiedParent itemPath (relativeItem: FSharpProjectItem) relativeToType itemsUpdater =
         match relativeItem.Parent with
-        | Project -> Project, relativeItem, false
+        | Project projectPath -> Project projectPath, relativeItem, false
         | ProjectItem relativeItemParent ->
             let commonParentPath = FileSystemPath.GetDeepestCommonParent(relativeItemParent.LogicalPath, itemPath)
             let initialState = relativeItem.Parent, relativeItem, false
@@ -605,7 +603,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
 
     let rec tryGetAdjacentRelativeItem nodeItem modifiedNodeItem relativeToType =
         match nodeItem with
-        | Project -> None
+        | Project _ -> None
         | ProjectItem nodeItem ->
             tryGetAdjacentItemInParent nodeItem relativeToType
             |> Option.bind (fun adjacentItem ->
@@ -661,7 +659,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
                     logicalPath.GetParentDirectories()
                     |> Seq.takeWhile (fun p -> p <> projectDirectory)
                     |> Seq.rev
-                    |> Seq.fold (getOrCreateFolder refresher) Project
+                    |> Seq.fold (getOrCreateFolder refresher) (project)
                 parent, getNewSortKey parent
 
         ItemInfo.Create(path, logicalPath, parent, sortKey)
@@ -671,11 +669,11 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
             for item in getChildren parent do
                 f item
                 iter (ProjectItem item)
-        iter Project
+        iter (project)
 
     member x.Update(items) =
         let folders = Stack()
-        folders.Push(State.Create(projectDirectory, Project))
+        folders.Push(State.Create(projectDirectory, project))
 
         let parsePaths (item: RdProjectItem) =
             let path = FileSystemPath.TryParse(item.EvaluatedInclude)
@@ -736,7 +734,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         let foldersIds = Dictionary<FSharpProjectModelElement, int>()
         let getFolderId el =
             foldersIds.GetOrCreateValue(el, fun () -> foldersIds.Count)
-        foldersIds.[Project] <- 0
+        foldersIds.[project] <- 0
 
         iter (fun projectItem ->
             let info = projectItem.ItemInfo
@@ -773,7 +771,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         let logger = Logger.GetLogger<FSharpItemsContainer>()
         let mapping = ProjectMapping(projectDirectory, projectUniqueName, readTargetFrameworkIds (), logger)
         let foldersById = Dictionary<int, FSharpProjectModelElement>()
-        foldersById.[0] <- Project
+        foldersById.[0] <- Project projectDirectory
 
         let itemsCount = reader.ReadInt()
         for _ in 1 .. itemsCount do
@@ -877,15 +875,16 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
     member x.Dump(writer: TextWriter) =
         let rec dump (parent: FSharpProjectModelElement) ident =
             for item in getChildren parent do
-                writer.WriteLine(sprintf "%s%d:%O" (String(' ', ident * 2)) item.SortKey item)
-                dump (ProjectItem item) (ident + 1)
-        dump Project 0
+                writer.WriteLine(sprintf "%s%d:%O" ident item.SortKey item)
+                dump (ProjectItem item) (ident + "  ")
+        dump (project) ""
 
         for targetFrameworkId in targetFrameworkIds do
             writer.WriteLine()
             writer.WriteLine(targetFrameworkId)
-            x.GetProjectItemsPaths(targetFrameworkId)
-            |> Array.iter (fun ((UnixSeparators path), _) -> writer.WriteLine(path))
+            for path, _ in x.GetProjectItemsPaths(targetFrameworkId) do
+                let (UnixSeparators path) = path.MakeRelativeTo(projectDirectory)
+                writer.WriteLine(path)
             writer.WriteLine()
 
     member x.DumpToString() =
@@ -896,8 +895,9 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
     static member DummyMapping =
         ProjectMapping(FileSystemPath.Empty, String.Empty, EmptySet.Instance, DummyLogger.Instance)
 
+
 type FSharpProjectModelElement =
-    | Project
+    | Project of FileSystemPath
     | ProjectItem of FSharpProjectItem
 
 
@@ -919,14 +919,18 @@ type FSharpProjectItem =
     override x.ToString() =
         let name =
             match x with
-            | FolderItem (_, id) as folderItem -> sprintf "%s[%d]" x.LogicalPath.Name id.Identity
-            | FileItem (_, buildAction, _) when
-                    not (buildAction.IsCompile()) -> sprintf "%s (%O)" x.LogicalPath.Name buildAction
+            | FolderItem (_, id) ->
+                sprintf "%s[%d]" x.LogicalPath.Name id.Identity
+
+            | FileItem (_, buildAction, _) when not (buildAction.IsCompile()) ->
+                sprintf "%s (%O)" x.LogicalPath.Name buildAction
+
             | _ -> x.LogicalPath.Name
-        if x.PhysicalPath = x.LogicalPath then name
-        else
-            let (UnixSeparators path) = x.PhysicalPath
-            sprintf "%s (from %s)" name path
+
+        if x.PhysicalPath = x.LogicalPath then name else
+
+        let (UnixSeparators path) = x.RelativePhysicalPath
+        sprintf "%s (from %s)" name path
 
 [<RequireQualifiedAccess>]
 type FSharpProjectItemType =
@@ -957,7 +961,7 @@ type State =
       Folder: FSharpProjectModelElement
       mutable NextSortKey: int }
 
-    static member Create(path, folder) =
+    static member Create(path, folder: FSharpProjectModelElement) =
         { Path = path; Folder = folder; NextSortKey = 0 }
 
 

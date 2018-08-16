@@ -13,13 +13,13 @@ Project
 7:File7 (CompileAfter)
 
 .NETFramework,Version=v0.0
-C:/Solution/Project/File1
-C:/Solution/Project/Folder/File2
-C:/Solution/Project/File3
-C:/Solution/Project/Folder/File4
-C:/Solution/Project/File5
-C:/Solution/Project/Folder/File6
-C:/Solution/Project/File7
+File1
+Folder/File2
+File3
+Folder/File4
+File5
+Folder/File6
+File7
 
 
 === Structure API ===

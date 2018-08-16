@@ -9,10 +9,10 @@
   3:File4
 
 .NETFramework,Version=v0.0
-C:/Solution/Project/Folder/SubFolder/File1
-C:/Solution/Project/Folder/SubFolder/File2
-C:/Solution/Project/Folder/Another/SubFolder/File3
-C:/Solution/Project/Folder/File4
+Folder/SubFolder/File1
+Folder/SubFolder/File2
+Folder/Another/SubFolder/File3
+Folder/File4
 
 
 =======
@@ -37,11 +37,11 @@ Project
   5:File4
 
 .NETFramework,Version=v0.0
-C:/Solution/Project/Folder/SubFolder/File1
-C:/Solution/Project/Folder/Another/SubFolder/File5
-C:/Solution/Project/Folder/SubFolder/File2
-C:/Solution/Project/Folder/Another/SubFolder/File3
-C:/Solution/Project/Folder/File4
+Folder/SubFolder/File1
+Folder/Another/SubFolder/File5
+Folder/SubFolder/File2
+Folder/Another/SubFolder/File3
+Folder/File4
 
 
 =======
@@ -66,11 +66,11 @@ Project
   5:File4
 
 .NETFramework,Version=v0.0
-C:/Solution/Project/Folder/SubFolder/File1
-C:/Solution/Project/Folder/Another/SubFolder/File5
-C:/Solution/Project/Folder/SubFolder/File2
-C:/Solution/Project/Folder/Another/SubFolder/File3
-C:/Solution/Project/Folder/File4
+Folder/SubFolder/File1
+Folder/Another/SubFolder/File5
+Folder/SubFolder/File2
+Folder/Another/SubFolder/File3
+Folder/File4
 
 
 Dumps are equal: True

@@ -13,14 +13,14 @@
   3:File8
 
 .NETFramework,Version=v0.0
-C:/Solution/Project/File1
-C:/Solution/Project/Folder/File2
-C:/Solution/Project/Folder/SubFolder/File3
-C:/Solution/Project/Folder/File4
-C:/Solution/Project/File5
-C:/Solution/Project/Folder/File6
-C:/Solution/Project/Folder/SubFolder/File7
-C:/Solution/Project/Folder/File8
+File1
+Folder/File2
+Folder/SubFolder/File3
+Folder/File4
+File5
+Folder/File6
+Folder/SubFolder/File7
+Folder/File8
 
 
 =======
@@ -43,13 +43,13 @@ Project
   3:File8
 
 .NETFramework,Version=v0.0
-C:/Solution/Project/File1
-C:/Solution/Project/NewName/File2
-C:/Solution/Project/NewName/SubFolder/File3
-C:/Solution/Project/NewName/File4
-C:/Solution/Project/File5
-C:/Solution/Project/NewName/File6
-C:/Solution/Project/NewName/SubFolder/File7
-C:/Solution/Project/NewName/File8
+File1
+NewName/File2
+NewName/SubFolder/File3
+NewName/File4
+File5
+NewName/File6
+NewName/SubFolder/File7
+NewName/File8
 
 
