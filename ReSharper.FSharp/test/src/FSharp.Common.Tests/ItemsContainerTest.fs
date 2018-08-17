@@ -5,19 +5,14 @@ open System.Collections.Generic
 open System.IO
 open System.Linq
 open System.Text.RegularExpressions
-open JetBrains.Application.BuildScript.Application.Zones
-open JetBrains.Application.Environment
 open JetBrains.Platform.MsBuildHost.Models
 open JetBrains.ProjectModel
-open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost.Impl
 open JetBrains.ProjectModel.ProjectsHost.MsBuild
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
-open JetBrains.ReSharper.TestFramework
 open JetBrains.TestFramework
-open JetBrains.TestFramework.Application.Zones
 open JetBrains.Util
 open JetBrains.Util.Logging
 open Moq
@@ -65,16 +60,16 @@ let createContainer items writer =
 
 let createRefresher (writer: TextWriter) =
     { new IFSharpItemsContainerRefresher with
-        member x.Refresh(_, initial) =
+        member x.RefreshProject(_, initial) =
             if not initial then writer.WriteLine("Refresh whole project")
 
-        member x.Refresh(_, NormalizedPath path, id) =
+        member x.RefreshFolder(_, NormalizedPath path, id) =
             writer.WriteLine(sprintf "Refresh %s[%O]" path id)
 
-        member x.Update(_, NormalizedPath path) =
+        member x.UpdateFile(_, NormalizedPath path) =
             writer.WriteLine(sprintf "Update view %s" path)
 
-        member x.Update(_, NormalizedPath path, id) =
+        member x.UpdateFolder(_, NormalizedPath path, id) =
             writer.WriteLine(sprintf "Update view %s[%O]" path id)
 
         member x.ReloadProject(projectMark) =

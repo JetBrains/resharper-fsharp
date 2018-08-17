@@ -143,14 +143,14 @@ type FSharpItemsContainer
 
         let refresh () =
             match folderToRefresh with
-                | Some (Project _) -> refresher.Refresh(projectMark, false)
+                | Some (Project _) -> refresher.RefreshProject(projectMark, false)
                 | Some (ProjectItem (FolderItem (_, id) as folder)) ->
-                    refresher.Refresh(projectMark, folder.LogicalPath, id)
+                    refresher.RefreshFolder(projectMark, folder.LogicalPath, id)
                 | _ -> ()
             for item in itemsToUpdate do
                 match item with
-                | FileItem _ -> refresher.Update(projectMark, item.ItemInfo.PhysicalPath)
-                | FolderItem (_, id) -> refresher.Update(projectMark, item.ItemInfo.PhysicalPath, id)
+                | FileItem _ -> refresher.UpdateFile(projectMark, item.ItemInfo.PhysicalPath)
+                | FolderItem (_, id) -> refresher.UpdateFolder(projectMark, item.ItemInfo.PhysicalPath, id)
 
         refreshFolder, updateItem, refresh
 
@@ -212,7 +212,7 @@ type FSharpItemsContainer
                     mapping
                 end
 
-                refresher.Refresh(projectMark, true)
+                refresher.RefreshProject(projectMark, true)
             | _ -> ()
 
         member x.OnAddFile(projectMark, itemType, path, linkedPath, relativeTo, relativeToType) =
@@ -242,7 +242,7 @@ type FSharpItemsContainer
 
                 updateProject projectMark (fun mapping _ updater ->
                     mapping.UpdateFile(oldItemType, oldLocation, newItemType, newLocation)
-                    refresher.Update(projectMark, newLocation))
+                    refresher.UpdateFile(projectMark, newLocation))
             | _ -> ()
 
         member x.OnUpdateFolder(projectMark, oldLocation, newLocation) =
@@ -662,7 +662,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
                     logicalPath.GetParentDirectories()
                     |> Seq.takeWhile (fun p -> p <> projectDirectory)
                     |> Seq.rev
-                    |> Seq.fold (getOrCreateFolder refresher) (project)
+                    |> Seq.fold (getOrCreateFolder refresher) project
                 parent, getNewSortKey parent
 
         ItemInfo.Create(path, logicalPath, parent, sortKey)
@@ -672,7 +672,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
             for item in getChildren parent do
                 f item
                 iter (ProjectItem item)
-        iter (project)
+        iter project
 
     member x.Update(items) =
         let folders = Stack()
@@ -880,7 +880,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
             for item in getChildren parent do
                 writer.WriteLine(sprintf "%s%d:%O" ident item.SortKey item)
                 dump (ProjectItem item) (ident + "  ")
-        dump (project) ""
+        dump project ""
 
         for targetFrameworkId in targetFrameworkIds do
             writer.WriteLine()
@@ -982,22 +982,22 @@ type RdProjectItemWithTargetFrameworks =
 
 
 type IFSharpItemsContainerRefresher =
-    /// Refreshes the project structure for a project.
-    abstract member Refresh: IProjectMark * isOnProjectLoad: bool -> unit
+    /// Refresh the project tree structure for a project.
+    abstract member RefreshProject: IProjectMark * isOnProjectLoad: bool -> unit
 
-    /// Refreshes the project structure for a folder in a project.
-    abstract member Refresh: IProjectMark * folder: FileSystemPath * identity: FSharpViewFolderIdentity -> unit
+    /// Refresh the project tree structure for a folder in a project.
+    abstract member RefreshFolder: IProjectMark * folder: FileSystemPath * identity: FSharpViewFolderIdentity -> unit
 
-    /// Updates presentation (i.e. changes sort key) for a file.
-    abstract member Update: IProjectMark * file: FileSystemPath -> unit
+    /// Update view item presentation (e.g. change sort key).
+    abstract member UpdateFile: IProjectMark * file: FileSystemPath -> unit
 
-    /// Updates presentation (i.e. changes sort key) for a folder.
-    abstract member Update: IProjectMark * folder: FileSystemPath * identity: FSharpViewFolderIdentity -> unit 
+    /// Update view item presentation (e.g. change sort key).
+    abstract member UpdateFolder: IProjectMark * folder: FileSystemPath * identity: FSharpViewFolderIdentity -> unit
 
     /// Used on changes we currenlty cannot process, e.g. Compile -> CompileBefore build action change.
     abstract member ReloadProject: IProjectMark -> unit
 
-    /// Selects an item after a project structure change that could make an item parent folder collapse.
+    /// Select view item after a project structure change that could collapse the item parent folder.
     abstract member SelectItem: IProjectMark * FileSystemPath -> unit
 
 
@@ -1031,17 +1031,17 @@ type FSharpItemsContainerRefresher(lifetime: Lifetime, solution: ISolution, view
                         viewHost.UpdateItemIfExists(viewItem)))
 
     interface IFSharpItemsContainerRefresher with
-        member x.Refresh(projectMark, isOnProjectLoad) =
+        member x.RefreshProject(projectMark, isOnProjectLoad) =
             refresh projectMark (fun project -> [project])
 
         // todo: single identity
-        member x.Refresh(projectMark, folder, folderIdentity) =
+        member x.RefreshFolder(projectMark, folder, folderIdentity) =
             refresh projectMark (fun project -> project.FindProjectItemsByLocation(folder).OfType<IProjectFolder>()) 
     
-        member x.Update(projectMark, path) =
+        member x.UpdateFile(projectMark, path) =
             update projectMark path (function | ProjectFile x -> Some (FSharpViewFile(x)) | _ -> None)
 
-        member x.Update(projectMark, path, id) =
+        member x.UpdateFolder(projectMark, path, id) =
             update projectMark path (function | ProjectFolder x -> Some (FSharpViewFolder (x, id)) | _ -> None)
 
         member x.ReloadProject(projectMark) =
