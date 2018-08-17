@@ -23,6 +23,7 @@ type CSharpResolveTest() =
     [<Test>] member x.``Records 04 - Sealed``() = x.DoNamedTest()
     [<Test>] member x.``Records 05 - Struct``() = x.DoNamedTest()
     [<Test>] member x.``Records 06 - Struct CliMutable``() = x.DoNamedTest()
+    [<Test>] member x.``Records 07 - Field compiled name ignored``() = x.DoNamedTest()
 
     [<Test>] member x.``Exceptions 01 - Empty``() = x.DoNamedTest()
     [<Test>] member x.``Exceptions 02 - Single field``() = x.DoNamedTest()

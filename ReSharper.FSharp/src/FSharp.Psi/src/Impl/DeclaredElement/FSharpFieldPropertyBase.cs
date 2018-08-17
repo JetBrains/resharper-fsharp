@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Impl.Special;
 using JetBrains.ReSharper.Psi.Resolve;
@@ -17,8 +16,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       : base(declaration)
     {
     }
-
-    public abstract override string ShortName { get; }
 
     public override DeclaredElementType GetElementType() => CLRDeclaredElementType.PROPERTY;
 
@@ -40,7 +37,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public bool IsAuto => false;
     public bool IsDefault => false;
     public bool IsReadable => true;
-    public abstract bool IsWritable { get; }
+    public virtual bool IsWritable => false;
     public IAccessor Getter => new ImplicitAccessor(this, AccessorKind.GETTER);
     public IAccessor Setter => IsWritable ? new ImplicitAccessor(this, AccessorKind.SETTER) : null;
 

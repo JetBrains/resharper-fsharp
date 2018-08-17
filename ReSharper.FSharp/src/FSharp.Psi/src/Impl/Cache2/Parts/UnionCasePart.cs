@@ -71,18 +71,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     protected override byte SerializationTag => (byte) FSharpPartKind.UnionCase;
 
-    public IList<FSharpFieldProperty> CaseFields
+    public IList<FSharpUnionCaseField> CaseFields
     {
       get
       {
         var declaration = GetDeclaration();
         if (declaration == null)
-          return EmptyList<FSharpFieldProperty>.Instance;
+          return EmptyList<FSharpUnionCaseField>.Instance;
 
-        var result = new LocalList<FSharpFieldProperty>();
+        var result = new LocalList<FSharpUnionCaseField>();
         foreach (var fieldDeclaration in declaration.Fields)
         {
-          if (fieldDeclaration.DeclaredElement is FSharpFieldProperty field)
+          if (fieldDeclaration.DeclaredElement is FSharpUnionCaseField field)
             result.Add(field);
         }
 

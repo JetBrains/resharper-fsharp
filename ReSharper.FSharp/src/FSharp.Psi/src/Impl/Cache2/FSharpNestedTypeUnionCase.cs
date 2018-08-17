@@ -13,8 +13,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     {
     }
 
-    public IEnumerable<FSharpFieldProperty> CaseFields =>
-      EnumerateParts<UnionCasePart, FSharpFieldProperty>(part => part.CaseFields);
+    public IEnumerable<FSharpUnionCaseField> CaseFields =>
+      EnumerateParts<UnionCasePart, FSharpUnionCaseField>(part => part.CaseFields);
 
     public AccessRights RepresentationAccessRights =>
       GetContainingType() is TypeElement typeElement

@@ -109,7 +109,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                     match simpleRepr with
                     | SynTypeDefnSimpleRepr.Record(_,fields,_) ->
                         for field in fields do
-                            x.ProcessField field
+                            x.ProcessField field ElementType.RECORD_FIELD_DECLARATION
                         ElementType.RECORD_DECLARATION
 
                     | SynTypeDefnSimpleRepr.Enum(enumCases,_) ->

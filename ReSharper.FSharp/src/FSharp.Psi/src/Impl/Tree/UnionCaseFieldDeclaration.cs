@@ -9,28 +9,23 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class FieldDeclaration
+  internal partial class UnionCaseFieldDeclaration
   {
-    protected override string DeclaredElementName => Identifier.GetCompiledName(Attributes);
-    public override string SourceName => Identifier.GetSourceName();
+    protected override string DeclaredElementName => Identifier.GetSourceName();
     public override TreeTextRange GetNameRange() => Identifier.GetNameRange();
 
     protected override IDeclaredElement CreateDeclaredElement()
     {
-      var symbol = GetFSharpSymbol();
-      if (symbol is FSharpField field)
-        return new FSharpFieldProperty(this, field);
-
       // the field doesn't have a name and is in a union case or in an exception
       var typeDeclaration = Parent as IFSharpTypeDeclaration;
       var typeSymbol = typeDeclaration?.GetFSharpSymbol();
-      if (typeDeclaration == null || typeSymbol == null)
+      if (typeSymbol == null)
         return null;
 
-      var result = new LocalList<IFieldDeclaration>();
+      var result = new LocalList<IUnionCaseFieldDeclaration>();
       foreach (var child in typeDeclaration.Children())
       {
-        if (child is IFieldDeclaration fieldDeclaration)
+        if (child is IUnionCaseFieldDeclaration fieldDeclaration)
           result.Add(fieldDeclaration);
       }
 
@@ -43,7 +38,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
           : null;
 
       return caseField != null
-        ? new FSharpFieldProperty(this, caseField)
+        ? new FSharpUnionCaseField(this, caseField)
         : null;
     }
 

@@ -180,10 +180,11 @@ recordDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extra
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
-  fieldDeclaration<RECORD_FIELD, Fields>*
+  recordFieldDeclaration<RECORD_FIELD, Fields>*
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
 
-fieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
+
+recordFieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
   fSharpIdentifier<IDENTIFIER, Identifier>;
 
@@ -222,11 +223,14 @@ nestedTypeUnionCaseDeclaration options { stubBase="FSharpTypeElementDeclarationB
   fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>
-  fieldDeclaration<UNION_FIELD, Fields>*
+  unionCaseFieldDeclaration<UNION_FIELD, Fields>*
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
 
-
+// Used in union cases and exceptions
+unionCaseFieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
+  fSharpAttribute<ATTRIBUTE, Attributes>*
+  fSharpIdentifier<IDENTIFIER, Identifier>;
 
 // Other members
 

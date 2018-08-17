@@ -1,4 +1,4 @@
-﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
 open System
 open System.Collections.Generic
@@ -192,7 +192,7 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime: Lifeti
     member internal x.ProcessUnionCaseType caseType =
         match caseType with
         | UnionCaseFields(fields) ->
-            for f in fields do x.ProcessField f
+            for f in fields do x.ProcessField f ElementType.UNION_CASE_FIELD_DECLARATION
             not fields.IsEmpty
 
         | UnionCaseFullType(_) ->
@@ -246,7 +246,7 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime: Lifeti
         range |> x.GetEndOffset |> x.AdvanceToOffset
         x.Done(mark, ElementType.ENUM_MEMBER_DECLARATION)
 
-    member internal x.ProcessField (Field(_,_,id,t,_,_,_,range)) =
+    member internal x.ProcessField (Field(_,_,id,t,_,_,_,range)) elementType =
         let mark =
             match id with
             | Some id ->
@@ -260,7 +260,7 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime: Lifeti
 
         x.ProcessSynType t
         range |> x.GetEndOffset |> x.AdvanceToOffset
-        x.Done(mark, ElementType.FIELD_DECLARATION)
+        x.Done(mark, elementType)
 
     member internal x.ProcessLocalId (id: Ident) =
         id.idRange |> x.GetStartOffset |> x.AdvanceToOffset

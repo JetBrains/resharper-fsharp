@@ -51,7 +51,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
         // todo: add field list tree node
         var fields = new LocalList<ITypeOwner>();
         foreach (var typeMember in base.GetTypeMembers())
-          if (typeMember is FSharpFieldProperty fieldProperty)
+          if (typeMember is FSharpUnionCaseField fieldProperty)
             fields.Add(fieldProperty);
         return fields.ResultingList();
       }

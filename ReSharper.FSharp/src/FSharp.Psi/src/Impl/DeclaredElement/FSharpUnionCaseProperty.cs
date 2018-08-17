@@ -28,7 +28,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
         : AccessRights.NONE;
 
     public override bool IsStatic => true;
-    public override bool IsWritable => false;
 
     public override IType ReturnType
     {
