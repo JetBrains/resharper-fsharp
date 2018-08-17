@@ -38,6 +38,7 @@ type CSharpResolveTest() =
     [<Test>] member x.``Unions 07 - Private representation 01, singletons``() = x.DoNamedTest()
     [<Test>] member x.``Unions 08 - Private representation 02, nested types``() = x.DoNamedTest()
     [<Test>] member x.``Unions 09 - Private representation 03, struct``() = x.DoNamedTest()
+    [<Test>] member x.``Unions 10 - Case compiled name ignored``() = x.DoNamedTest()
 
     [<Test>] member x.``Simple types 01 - Members``() = x.DoNamedTest()
 

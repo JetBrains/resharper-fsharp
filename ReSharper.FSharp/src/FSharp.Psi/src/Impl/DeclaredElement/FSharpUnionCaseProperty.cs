@@ -3,32 +3,24 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
-using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
   /// <summary>
-  /// Union case compiled to property
+  /// A union case compiled to a static property.
   /// </summary>
   internal class FSharpUnionCaseProperty : FSharpFieldPropertyBase<SingletonCaseDeclaration>, IUnionCase
   {
-    [NotNull]
-    public FSharpUnionCase UnionCase { get; }
-
-    internal FSharpUnionCaseProperty([NotNull] ISingletonCaseDeclaration declaration,
-      [NotNull] FSharpUnionCase unionCase)
-      : base(declaration)
+    internal FSharpUnionCaseProperty([NotNull] ISingletonCaseDeclaration declaration) : base(declaration)
     {
-      UnionCase = unionCase;
-
-      var containingType = declaration.GetContainingTypeDeclaration()?.DeclaredElement;
-      ReturnType = containingType != null
-        ? TypeFactory.CreateType(containingType)
-        : TypeFactory.CreateUnknownType(Module);
     }
 
-    public override string ShortName => UnionCase.Name;
+    // Compiled name attribute is ignored.
+    public override string ShortName =>
+      GetDeclaration()?.DeclaredName ??
+      SharedImplUtil.MISSING_DECLARATION_NAME;
 
     public override AccessRights GetAccessRights() =>
       GetContainingType() is TypeElement typeElement
@@ -37,7 +29,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public override bool IsStatic => true;
     public override bool IsWritable => false;
-    public override IType ReturnType { get; }
+
+    public override IType ReturnType
+    {
+      get
+      {
+        var containingType = GetContainingType();
+        return containingType != null
+          ? TypeFactory.CreateType(containingType)
+          : TypeFactory.CreateUnknownType(Module);
+      }
+    }
 
     public AccessRights RepresentationAccessRights =>
       GetContainingType() is TypeElement typeElement

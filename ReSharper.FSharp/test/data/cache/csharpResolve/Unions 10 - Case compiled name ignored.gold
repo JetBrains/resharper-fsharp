@@ -1,0 +1,23 @@
+﻿using static Module;
+
+namespace ClassLibrary1
+{
+    public class Class1
+    {
+        public Class1()
+        {
+            U a = U.CaseA;
+            U b = U.NewCaseB(123);
+
+            U aError = U.|AName|(0);
+            U bError = U.|NewBName|(1)(123);
+        }
+    }
+}
+
+---------------------------------------------------------
+(0): ReSharper Error Highlighting: Cannot resolve symbol 'AName'
+(1): ReSharper Error Highlighting: Cannot resolve symbol 'NewBName'
+P:Module.U.CaseA
+M:Module.U.NewCaseB(System.Int32)
+M:Module.U.NewCaseB(System.Int32)
