@@ -1,20 +1,19 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.SelectEmbracingConstruct
 
-open JetBrains.Application.Settings
+open System
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
-open JetBrains.ReSharper.Feature.Services.Editor
 open JetBrains.ReSharper.Feature.Services.SelectEmbracingConstruct
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
-open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open Microsoft.FSharp.Compiler
 open Microsoft.FSharp.Compiler.Ast
-open Microsoft.FSharp.Compiler.SourceCodeServices
 open Microsoft.FSharp.Compiler.SourceCodeServices.AstTraversal
 
 type FSharpSelection(file, range, parentRanges: DocumentRange list) =
@@ -31,6 +30,13 @@ type FSharpSelection(file, range, parentRanges: DocumentRange list) =
 type FSharpDotSelection(file, document, range: TreeTextRange, parentRanges: DocumentRange list) =
     inherit DotSelection<IFSharpFile>(file, range.StartOffset, range.Length = 0, false)
 
+    let getTrimmedSelection (token: ITokenNode) trimStart trimEnd =
+        let tokRange = token.GetDocumentRange()
+        if tokRange.Length <= trimStart + trimEnd then null else
+
+        let ranges = tokRange :: parentRanges
+        FSharpSelection(file, tokRange.TrimLeft(trimStart).TrimRight(trimEnd), ranges) :> ISelectedRange
+
     override x.CreateTreeNodeSelection(tokenNode) =
         FSharpSelection(file, tokenNode.GetDocumentRange(), parentRanges) :> _
 
@@ -46,13 +52,22 @@ type FSharpDotSelection(file, document, range: TreeTextRange, parentRanges: Docu
     override x.IsNewLineToken(token) = token.GetTokenType() = FSharpTokenType.NEW_LINE
     override x.GetParentInternal(token) =
         match token.GetTokenType() with
-        | :? FSharpTokenType.FSharpTokenNodeType as t when t.IsStringLiteral ->
-            let tokRange = token.GetDocumentRange()
-            let ranges = tokRange :: parentRanges
-            match token.GetText().[0] with
-            | ''' | '"' -> FSharpSelection(file, tokRange.TrimLeft(1).TrimRight(1), ranges) :> _
-            | '@' -> FSharpSelection(file, tokRange.TrimLeft(2).TrimRight(1), tokRange.TrimLeft(1) :: ranges) :> _
-            | _ -> null
+        | tokenType when tokenType.IsStringLiteral ->
+            match tokenType.GetLiteralType() with
+            | FSharpLiteralType.Character
+            | FSharpLiteralType.RegularString -> getTrimmedSelection token 1 1
+            | FSharpLiteralType.VerbatimString -> getTrimmedSelection token 2 1
+            | FSharpLiteralType.TripleQuoteString -> getTrimmedSelection token 3 3
+            | FSharpLiteralType.ByteArray -> getTrimmedSelection token 1 2
+
+        | tokenType when tokenType == FSharpTokenType.IDENTIFIER ->
+            let tokenText = token.GetText()
+            if tokenText.Length > 4 &&
+                    tokenText.StartsWith("``", StringComparison.Ordinal) &&
+                    tokenText.EndsWith("``", StringComparison.Ordinal) then
+                getTrimmedSelection token 2 2
+            else null
+
         | _ -> null
     override x.CreateTokenPartSelection(tokenNode, treeTextRange) = null
 
