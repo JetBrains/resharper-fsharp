@@ -11,19 +11,27 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     [NotNull]
     public FSharpField Field { get; }
 
-    public FSharpValField([NotNull] ValField declaration, [NotNull] FSharpField field) : base(declaration)
-    {
+    public FSharpValField([NotNull] ValField declaration, [NotNull] FSharpField field) : base(declaration) =>
       Field = field;
-      Type = FSharpTypesUtil.GetType(field.FieldType, declaration, Module) ??
-             TypeFactory.CreateUnknownType(Module);
-    }
 
     public override DeclaredElementType GetElementType()
     {
       return CLRDeclaredElementType.FIELD;
     }
 
-    public IType Type { get; }
+    public IType Type
+    {
+      get
+      {
+        var declaration = GetDeclaration();
+        if (declaration == null)
+          return TypeFactory.CreateUnknownType(Module);
+
+        return FSharpTypesUtil.GetType(Field.FieldType, declaration, Module) ??
+               TypeFactory.CreateUnknownType(Module);
+      }
+    }
+
     public ConstantValue ConstantValue => ConstantValue.NOT_COMPILE_TIME_CONSTANT;
     public bool IsField => true;
     public bool IsConstant => false;
