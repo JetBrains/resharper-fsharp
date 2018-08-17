@@ -48,7 +48,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
 
         | SynModuleDecl.Let(_,bindings,_) ->
             for (Binding(_,_,_,_,attrs,_,_,headPat,_,expr,_,_)) in bindings do
-                x.ProcessModuleLetPat headPat attrs
+                x.ProcessTopLevelLetPat headPat attrs
                 let bodyRange = expr.Range
                 bodyRange |> x.GetStartOffset |> x.AdvanceToOffset
                 let mark = x.Mark()
@@ -145,7 +145,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
             range |> x.GetEndOffset |> x.AdvanceToOffset
             x.Done(mark, elementType)
 
-    member internal x.ProcessModuleLetPat (pat: SynPat) (attrs: SynAttributes) =
+    member internal x.ProcessTopLevelLetPat (pat: SynPat) (attrs: SynAttributes) =
         match pat with
         | SynPat.LongIdent(LongIdentWithDots(lid,_),_,typeParamsOption,memberParams,_,range) ->
             match lid with
@@ -172,9 +172,19 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
             range |> x.GetEndOffset |> x.AdvanceToOffset
             x.Done(mark, ElementType.LET)
 
-        | SynPat.Tuple(patterns,_) ->
+        | SynPat.Ands (patterns, _)
+        | SynPat.ArrayOrList (_, patterns, _)
+        | SynPat.Tuple (patterns,_)
+        | SynPat.StructTuple (patterns,_) ->
             for pattern in patterns do
-                x.ProcessModuleLetPat pattern attrs
+                x.ProcessTopLevelLetPat pattern []
 
-        | SynPat.Paren(pat,_) -> x.ProcessModuleLetPat pat attrs
+        | SynPat.Record (bindedPatterns, _) ->
+            for _, pattern in bindedPatterns do
+                x.ProcessTopLevelLetPat pattern []
+
+        | SynPat.Typed (pat, _, _)
+        | SynPat.Paren (pat,_) ->
+            x.ProcessTopLevelLetPat pat attrs
+
         | _ -> x.ProcessLocalPat(pat)
