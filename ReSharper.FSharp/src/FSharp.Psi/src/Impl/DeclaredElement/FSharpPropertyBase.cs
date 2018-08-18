@@ -27,7 +27,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       IsReadable = property.HasGetterMethod || property.IsPropertyGetterMethod ||
                    property.IsModuleValueOrMember && !property.IsMember;
       IsWritable = property.IsMutable || property.HasSetterMethod || property.IsPropertySetterMethod;
-      ShortName = property.GetMemberCompiledName();
       var returnType = property.IsPropertySetterMethod
         ? property.CurriedParameterGroups[0][0].Type
         : property.ReturnParameter.Type;
@@ -35,7 +34,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
                    TypeFactory.CreateUnknownType(Module);
     }
 
-    public override string ShortName { get; }
     public override IType ReturnType { get; }
 
     public override DeclaredElementType GetElementType()

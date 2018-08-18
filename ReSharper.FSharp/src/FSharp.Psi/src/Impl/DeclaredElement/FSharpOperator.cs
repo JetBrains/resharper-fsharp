@@ -52,7 +52,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     {
     }
     
-    public override string ShortName => FSharpSymbol.CompiledName;
     public override bool IsStatic => true;
   }
 }

@@ -1,0 +1,20 @@
+﻿using System.Collections.Generic;
+using static Module;
+
+namespace ClassLibrary1
+{
+    public class Class1
+    {
+        public Class1()
+        {
+            var t = new T();
+            int p = t.CompiledProp;
+            int pError = t.|AutoProp|(0);
+        }
+    }
+}
+
+---------------------------------------------------------
+(0): ReSharper Error Highlighting: Cannot resolve symbol 'AutoProp'
+M:Module.T.#ctor
+P:Module.T.CompiledProp

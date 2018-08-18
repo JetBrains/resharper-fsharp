@@ -17,7 +17,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public FSharpCliEvent([NotNull] ITypeMemberDeclaration declaration, FSharpMemberOrFunctionOrValue mfv)
       : base(declaration, mfv)
     {
-      ShortName = mfv.GetMemberCompiledName();
       try
       {
         ReturnType = FSharpTypesUtil.GetType(mfv.FullType, declaration, Module) ??
@@ -29,7 +28,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       }
     }
 
-    public override string ShortName { get; }
     public override IType ReturnType { get; }
 
     public override DeclaredElementType GetElementType() => CLRDeclaredElementType.EVENT;

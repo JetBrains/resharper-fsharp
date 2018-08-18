@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -20,12 +20,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       [NotNull] FSharpMemberOrFunctionOrValue mfv, [CanBeNull] IFSharpTypeDeclaration typeDeclaration)
       : base(declaration, mfv, typeDeclaration)
     {
-      ShortName = mfv.GetMemberCompiledName();
     }
 
     public override DeclaredElementType GetElementType() => CLRDeclaredElementType.METHOD;
-
-    public override string ShortName { get; }
 
     public bool IsExtensionMethod => FSharpSymbol.Attributes.HasAttributeInstance(ExtensionAttributeTypeName);
 
