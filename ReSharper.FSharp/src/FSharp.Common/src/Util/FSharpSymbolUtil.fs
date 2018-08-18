@@ -2,6 +2,7 @@
 module JetBrains.ReSharper.Plugins.FSharp.Common.Util.FSharpSymbolUtil
 
 open JetBrains.Application.UI.Icons.ComposedIcons
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Psi.Resources
 open JetBrains.UI.Icons
 open Microsoft.FSharp.Compiler.SourceCodeServices
@@ -25,7 +26,6 @@ let addAccessibility (iconId: IconId) (accessibility: FSharpAccessibility) =
 
 let staticProperty = compose PsiSymbolsThemedIcons.Property.Id PsiSymbolsThemedIcons.ModifiersStatic.Id
 let staticMethod   = compose PsiSymbolsThemedIcons.Method.Id   PsiSymbolsThemedIcons.ModifiersStatic.Id
-let staticClass    = compose PsiSymbolsThemedIcons.Class.Id    PsiSymbolsThemedIcons.ModifiersStatic.Id
 
 let rec getIconId (symbol: FSharpSymbol) =
     match symbol with
@@ -36,7 +36,7 @@ let rec getIconId (symbol: FSharpSymbol) =
             if entity.IsClass || entity.IsFSharpRecord
             then PsiSymbolsThemedIcons.Class.Id else
 
-            if entity.IsFSharpModule then staticClass else
+            if entity.IsFSharpModule then FSharpIcons.FSharpModule.Id else
 
             if entity.IsInterface then PsiSymbolsThemedIcons.Interface.Id else
             if entity.IsValueType then PsiSymbolsThemedIcons.Struct.Id else

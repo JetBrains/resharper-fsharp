@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
-    <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase</RootNamespace>
+    <RootNamespace>JetBrains.ReSharper.Plugins.FSharp</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase</AssemblyName>
   </PropertyGroup>
 
