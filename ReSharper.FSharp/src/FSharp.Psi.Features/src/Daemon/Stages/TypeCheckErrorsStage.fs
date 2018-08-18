@@ -9,7 +9,7 @@ open Microsoft.FSharp.Compiler.ErrorLogger
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
 type TypeCheckErrorsStageProcess(fsFile: IFSharpFile, daemonProcess, logger: ILogger) =
-    inherit ErrorsStageProcessBase(daemonProcess)
+    inherit ErrorsStageProcessBase(fsFile, daemonProcess)
 
     override x.ShouldAddDiagnostic(error, range) =
         base.ShouldAddDiagnostic(error, range) && error.Subcategory <> BuildPhaseSubcategory.Parse
@@ -35,5 +35,5 @@ type TypeCheckErrorsStageProcess(fsFile: IFSharpFile, daemonProcess, logger: ILo
 type TypeCheckErrorsStage(daemonProcess, logger: ILogger) =
     inherit FSharpDaemonStageBase()
 
-    override x.CreateProcess(fsFile, daemonProcess) =
+    override x.CreateStageProcess(fsFile, settings, daemonProcess) =
         TypeCheckErrorsStageProcess(fsFile, daemonProcess, logger) :> _

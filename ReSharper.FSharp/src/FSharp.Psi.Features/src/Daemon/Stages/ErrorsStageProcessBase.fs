@@ -15,8 +15,8 @@ open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
 [<AbstractClass>]
-type ErrorsStageProcessBase(daemonProcess) =
-    inherit FSharpDaemonStageProcessBase(daemonProcess)
+type ErrorsStageProcessBase(fsFile, daemonProcess) =
+    inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
     // https://github.com/fsharp/FSharp.Compiler.Service/blob/9.0.0/src/fsharp/CompileOps.fs#L246
     // https://github.com/fsharp/FSharp.Compiler.Service/blob/9.0.0/src/fsharp/FSComp.txt

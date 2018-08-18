@@ -22,12 +22,12 @@ type ScritpLoadPathsStage(daemonProcess, errors) =
         override x.IsSupported(sourceFile, processKind) =
             processKind = DaemonProcessKind.VISIBLE_DOCUMENT && base.IsSupported(sourceFile, processKind)
 
-        override x.CreateProcess(fsFile, daemonProcess) =
+        override x.CreateStageProcess(fsFile, settings, daemonProcess) =
             ScriptLoadPathsStageProcess(fsFile, daemonProcess) :> _
 
 
 type ScriptLoadPathsStageProcess(fsFile, daemonProcess) =
-    inherit FSharpDaemonStageProcessBase(daemonProcess)
+    inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
     override x.Execute(committer) =
         let interruptChecker = x.SeldomInterruptChecker

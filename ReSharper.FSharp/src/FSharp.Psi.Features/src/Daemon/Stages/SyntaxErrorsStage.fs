@@ -5,7 +5,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
 type SyntaxErrorsStageProcess(fsFile: IFSharpFile, daemonProcess) =
-    inherit ErrorsStageProcessBase(daemonProcess)
+    inherit ErrorsStageProcessBase(fsFile, daemonProcess)
 
     override x.Execute(committer) =
         match fsFile.CheckerService.ParseFile(daemonProcess.SourceFile) with
@@ -16,5 +16,5 @@ type SyntaxErrorsStageProcess(fsFile: IFSharpFile, daemonProcess) =
 type SyntaxErrorsStage(daemonProcess, errors) =
     inherit FSharpDaemonStageBase()
 
-    override x.CreateProcess(fsFile, daemonProcess) =
+    override x.CreateStageProcess(fsFile, settings, daemonProcess) =
         SyntaxErrorsStageProcess(fsFile, daemonProcess) :> _

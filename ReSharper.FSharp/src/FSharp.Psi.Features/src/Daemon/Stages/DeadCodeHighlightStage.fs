@@ -11,7 +11,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
 type DeadCodeHighlightStageProcess(fsFile: IFSharpFile, daemonProcess) =
-    inherit FSharpDaemonStageProcessBase(daemonProcess)
+    inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
     override x.Execute(committer) =
         let highlightings = LocalList<HighlightingInfo>()
@@ -28,5 +28,5 @@ type DeadCodeHighlightStageProcess(fsFile: IFSharpFile, daemonProcess) =
 type DeadCodeHighlightStage(daemonProcess) =
     inherit FSharpDaemonStageBase()
 
-    override x.CreateProcess(fsFile, daemonProcess) =
+    override x.CreateStageProcess(fsFile, settings, daemonProcess) =
         DeadCodeHighlightStageProcess(fsFile, daemonProcess) :> _

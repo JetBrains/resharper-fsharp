@@ -31,14 +31,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
       if (!(daemonProcess.SourceFile.GetPrimaryPsiFile() is IFSharpFile fsFile))
         return EmptyList<IDaemonStageProcess>.Instance;
 
-      var process = CreateProcess(fsFile, daemonProcess);
+      var process = CreateStageProcess(fsFile, settings, daemonProcess);
       return process != null
         ? new[] {process}
         : EmptyList<IDaemonStageProcess>.InstanceList;
     }
 
     [CanBeNull]
-    protected abstract IDaemonStageProcess CreateProcess([NotNull] IFSharpFile fsFile,
-      [NotNull] IDaemonProcess process);
+    protected abstract IDaemonStageProcess CreateStageProcess([NotNull] IFSharpFile fsFile,
+      IContextBoundSettingsStore settings, [NotNull] IDaemonProcess process);
   }
 }

@@ -14,9 +14,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
   {
     private const int InterruptCheckTime = 20;
     protected readonly SeldomInterruptCheckerWithCheckTime SeldomInterruptChecker;
+    public IFSharpFile FSharpFile;
 
-    protected FSharpDaemonStageProcessBase(IDaemonProcess daemonProcess)
+    protected FSharpDaemonStageProcessBase(IFSharpFile fsFile, IDaemonProcess daemonProcess)
     {
+      FSharpFile = fsFile;
       DaemonProcess = daemonProcess;
       SeldomInterruptChecker = new SeldomInterruptCheckerWithCheckTime(InterruptCheckTime);
     }

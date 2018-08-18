@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.Application;
+using JetBrains.Application.Settings;
 using JetBrains.DocumentModel;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Daemon.UsageChecking;
@@ -17,21 +18,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
   [DaemonStage(StagesAfter = new[] {typeof(CollectUsagesStage)})]
   public class HighlightIdentifiersStage : FSharpDaemonStageBase
   {
-    protected override IDaemonStageProcess CreateProcess(IFSharpFile psiFile, IDaemonProcess process) =>
+    protected override IDaemonStageProcess CreateStageProcess(IFSharpFile psiFile, IContextBoundSettingsStore settings,
+      IDaemonProcess process) =>
       new HighlightIdentifiersStageProcess(psiFile, process);
   }
 
   public class HighlightIdentifiersStageProcess : FSharpDaemonStageProcessBase
   {
-    private readonly IFSharpFile myFsFile;
     private readonly IDocument myDocument;
 
     public HighlightIdentifiersStageProcess([NotNull] IFSharpFile fsFile, [NotNull] IDaemonProcess process)
-      : base(process)
-    {
-      myFsFile = fsFile;
-      myDocument = process.Document;
-    }
+      : base(fsFile, process) => myDocument = process.Document;
 
     private void HighlightUses(Action<DaemonStageResult> committer, IEnumerable<FSharpResolvedSymbolUse> symbols, int allSymbolsCount)
     {
