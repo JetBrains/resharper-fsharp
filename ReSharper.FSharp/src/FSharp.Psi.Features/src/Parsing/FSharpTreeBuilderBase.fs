@@ -492,8 +492,11 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime: Lifeti
         x.ProcessLocalPat headPat
         x.ProcessLocalExpression expr
 
-    member internal x.ProcessMatchClause (Clause(pat,exprOpt,expr,_,_)) =
+    member internal x.ProcessMatchClause (Clause(pat,whenExpr,expr,_,_)) =
         x.ProcessLocalPat pat
+        match whenExpr with
+        | Some expr -> x.ProcessLocalExpression(expr)
+        | _ -> ()
         x.ProcessLocalExpression expr
 
     member internal x.ProcessSimplePatterns (pats: SynSimplePats) =
