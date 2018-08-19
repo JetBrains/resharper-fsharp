@@ -11,6 +11,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Parsing;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Text;
 using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
@@ -22,11 +23,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     private readonly object myGetSymbolsLock = new object();
 
-    // These symbols should be invalidated when dependent files change.
-    // These symbols should also be used in FSharpMemberBase instances without attaching symbols to R# members.
-    // A goal is to move these symbols to a separated cache and use it from IFSharpFile, FSharpMemberBase, FSharpTypePart elements.    
-    private Dictionary<int, FSharpResolvedSymbolUse> myDeclarationSymbols;
-    private Dictionary<int, FSharpResolvedSymbolUse> myResolvedSymbols;
+    private class FileResolvedSymbols
+    {
+      // These symbols should be invalidated when dependent files change.
+      // These symbols should also be used in FSharpMemberBase instances without attaching symbols to R# members.
+      // A goal is to move these symbols to a separated cache and use it from IFSharpFile, FSharpMemberBase, FSharpTypePart elements.
+      public Dictionary<int, FSharpResolvedSymbolUse> Declarations;
+      public Dictionary<int, FSharpResolvedSymbolUse> Uses;
+    }
+
+    private readonly CachedPsiValue<FileResolvedSymbols> myResolvedSymbols =
+      new FileCachedPsiValue<FileResolvedSymbols>();
+
+    private FileResolvedSymbols ResolvedSymbols =>
+      myResolvedSymbols.GetValue(this, () => new FileResolvedSymbols());
 
     public OneToListMap<string, int> TypeExtensionsOffsets { get; set; }
     private readonly IDictionary<int, ITypeExtension> myTypeExtensionsByOffset =
@@ -34,8 +44,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public FSharpCheckerService CheckerService { get; set; }
 
+    private readonly CachedPsiValue<FSharpOption<FSharpParseFileResults>> myParseResults =
+      new FileCachedPsiValue<FSharpOption<FSharpParseFileResults>>();
+
+    public FSharpOption<FSharpParseFileResults> ParseResults
+    {
+      get => myParseResults.GetValue(this, fsFile => CheckerService.ParseFile(fsFile.GetSourceFile()));
+      set => myParseResults.SetValue(this, value);
+    }
+
     public TokenBuffer ActualTokenBuffer { get; set; }
-    public FSharpOption<FSharpParseFileResults> ParseResults { get; set; }
     public override PsiLanguageType Language => FSharpLanguage.Instance;
 
     public FSharpOption<FSharpParseAndCheckResults> GetParseAndCheckResults(bool allowStaleResults,
@@ -49,7 +67,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     private void UpdateSymbols(FSharpCheckFileResults checkResults = null, Action daemonInterruptChecker = null)
     {
-      if (myDeclarationSymbols == null)
+      var resolvedSymbols = ResolvedSymbols;
+      if (resolvedSymbols.Declarations == null)
       {
         var interruptChecker = new SeldomInterruptCheckerWithCheckTime(100);
         checkResults = checkResults ?? GetParseAndCheckResults(false)?.Value.CheckResults;
@@ -64,8 +83,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
           return;
 
         // add separate APIs to FCS to get resoved symbols and bindings?
-        myResolvedSymbols = new Dictionary<int, FSharpResolvedSymbolUse>(symbolUses.Length);
-        myDeclarationSymbols = new Dictionary<int, FSharpResolvedSymbolUse>(symbolUses.Length / 4);
+        resolvedSymbols.Uses = new Dictionary<int, FSharpResolvedSymbolUse>(symbolUses.Length);
+        resolvedSymbols.Declarations = new Dictionary<int, FSharpResolvedSymbolUse>(symbolUses.Length / 4);
 
         foreach (var symbolUse in symbolUses)
         {
@@ -87,12 +106,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
               // visualfsharp#3939
               if (mfvLogicalName == "v" &&
-                  myDeclarationSymbols.ContainsKey(startOffset))
+                  resolvedSymbols.Declarations.ContainsKey(startOffset))
                 continue;
 
               if (mfvLogicalName == StandardMemberNames.ClassConstructor)
                 continue;
-              
+
               // visualfsharp#3943, visualfsharp#3933
               if (mfvLogicalName != StandardMemberNames.Constructor &&
                   !(FindTokenAt(new TreeOffset(endOffset - 1)) is FSharpIdentifierToken || mfv.IsActivePattern))
@@ -106,8 +125,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
             }
 
             var textRange = new TextRange(startOffset, endOffset);
-            myDeclarationSymbols[startOffset] = new FSharpResolvedSymbolUse(symbolUse, textRange);
-            myResolvedSymbols.Remove(startOffset);
+            resolvedSymbols.Declarations[startOffset] = new FSharpResolvedSymbolUse(symbolUse, textRange);
+            resolvedSymbols.Uses.Remove(startOffset);
           }
           else
           {
@@ -123,8 +142,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
                 !(FindTokenAt(new TreeOffset(nameRange.EndOffset - 1)) is FSharpIdentifierToken))
               continue;
 
-            if (!myDeclarationSymbols.ContainsKey(startOffset))
-              myResolvedSymbols[nameRange.StartOffset] = new FSharpResolvedSymbolUse(symbolUse, nameRange);
+            if (!resolvedSymbols.Declarations.ContainsKey(startOffset))
+              resolvedSymbols.Uses[nameRange.StartOffset] = new FSharpResolvedSymbolUse(symbolUse, nameRange);
           }
 
           interruptChecker.CheckForInterrupt();
@@ -157,9 +176,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       lock (myGetSymbolsLock)
       {
-        if (myDeclarationSymbols == null)
+        var resolvedSymbols = ResolvedSymbols;
+        if (resolvedSymbols.Declarations == null)
           UpdateSymbols(checkResults, interruptChecker);
-        return myResolvedSymbols?.Values.AsArray() ?? EmptyArray<FSharpResolvedSymbolUse>.Instance;
+        return resolvedSymbols.Uses?.Values.AsArray() ?? EmptyArray<FSharpResolvedSymbolUse>.Instance;
       }
     }
 
@@ -168,9 +188,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       lock (myGetSymbolsLock)
       {
-        if (myDeclarationSymbols == null)
+        var resolvedSymbols = ResolvedSymbols;
+        if (resolvedSymbols.Declarations == null)
           UpdateSymbols(checkResults);
-        return myDeclarationSymbols?.Values.AsArray() ?? EmptyArray<FSharpResolvedSymbolUse>.Instance;
+        return resolvedSymbols.Declarations?.Values.AsArray() ?? EmptyArray<FSharpResolvedSymbolUse>.Instance;
       }
     }
 
@@ -178,13 +199,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       lock (myGetSymbolsLock)
       {
-        if (myDeclarationSymbols == null)
+        var resolvedSymbols = ResolvedSymbols;
+        if (resolvedSymbols.Declarations == null)
           UpdateSymbols();
-        var resolvedSymbol = myResolvedSymbols?.TryGetValue(offset);
+        var resolvedSymbol = resolvedSymbols.Uses?.TryGetValue(offset);
         if (resolvedSymbol == null)
           return null;
 
-        return myDeclarationSymbols?.TryGetValue(offset) == null
+        return resolvedSymbols.Declarations?.TryGetValue(offset) == null
           ? resolvedSymbol.SymbolUse.Symbol
           : null;
       }
@@ -194,9 +216,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       lock (myGetSymbolsLock)
       {
-        if (myDeclarationSymbols == null)
+        var resolvedSymbols = ResolvedSymbols;
+        if (resolvedSymbols.Declarations == null)
           UpdateSymbols();
-        return myDeclarationSymbols?.TryGetValue(offset)?.SymbolUse.Symbol;
+        return resolvedSymbols.Declarations?.TryGetValue(offset)?.SymbolUse.Symbol;
       }
     }
 
@@ -218,5 +241,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public virtual TReturn Accept<TContext, TReturn>(TreeNodeVisitor<TContext, TReturn> visitor, TContext context) =>
       visitor.VisitNode(this, context);
+  }
+
+  public class FileCachedPsiValue<T> : CachedPsiValue<T>
+  {
+    protected override int GetTimestamp(ITreeNode element) =>
+      element.GetContainingFile()?.ModificationCounter ??
+      element.GetPsiServices().Files.PsiCacheTimestamp;
   }
 }
