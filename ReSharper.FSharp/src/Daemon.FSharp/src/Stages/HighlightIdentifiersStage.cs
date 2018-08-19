@@ -63,10 +63,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
     {
       // todo: add more cases to GetSemanticClassification (e.g. methods, values, namespaces) and use it instead?
       var checkResults = DaemonProcess.CustomData.GetData(FSharpDaemonStageBase.TypeCheckResults);
-      var declarations = myFsFile.GetAllDeclaredSymbols(checkResults?.Value);
+      var declarations = FSharpFile.GetAllDeclaredSymbols(checkResults?.Value);
       InterruptableActivityCookie.CheckAndThrow();
 
-      var usages = myFsFile.GetAllResolvedSymbols();
+      var usages = FSharpFile.GetAllResolvedSymbols();
       InterruptableActivityCookie.CheckAndThrow();
 
       HighlightUses(committer,  declarations.Concat(usages), declarations.Length + usages.Length);
