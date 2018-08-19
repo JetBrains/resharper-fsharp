@@ -13,10 +13,12 @@ import com.intellij.execution.runners.AbstractConsoleRunnerWithHistory
 import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.execution.ui.RunContentDescriptor
 import com.intellij.icons.AllIcons
+import com.intellij.ide.DataManager
 import com.intellij.notification.Notification
 import com.intellij.notification.NotificationListener
 import com.intellij.notification.NotificationType
 import com.intellij.notification.Notifications
+import com.intellij.openapi.actionSystem.ActionPlaces
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.DefaultActionGroup
@@ -94,9 +96,10 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
     private val listener = object : NotificationListener.Adapter() {
         override fun hyperlinkActivated(notification: Notification, e: HyperlinkEvent) {
             if (!project.isDisposed) {
+                val actionEvent = AnActionEvent.createFromDataContext(ActionPlaces.UNKNOWN, null, DataManager.getInstance().dataContext)
                 when (e.description) {
-                    RelaunchFsiWithDebugAction.actionName -> RelaunchFsiWithDebugAction(project).actionPerformed(null)
-                    ShowFsiSettingsAction.actionName -> ShowFsiSettingsAction(project).actionPerformed(null)
+                    RelaunchFsiWithDebugAction.actionName -> RelaunchFsiWithDebugAction(project).actionPerformed(actionEvent)
+                    ShowFsiSettingsAction.actionName -> ShowFsiSettingsAction(project).actionPerformed(actionEvent)
                 }
                 notification.expire()
 
@@ -243,8 +246,8 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
 }
 
 class RelaunchFsiWithDebugAction(private val currentProject: Project? = null) : AnAction() {
-    override fun actionPerformed(e: AnActionEvent?) {
-        val project = e?.project ?: currentProject ?: return
+    override fun actionPerformed(e: AnActionEvent) {
+        val project = e.project ?: currentProject ?: return
         val fsiHost = project.getComponent<FsiHost>()
         fsiHost.resetFsiConsole(true, true)
     }
@@ -256,8 +259,8 @@ class RelaunchFsiWithDebugAction(private val currentProject: Project? = null) : 
 }
 
 class ShowFsiSettingsAction(private val currentProject: Project? = null) : AnAction() {
-    override fun actionPerformed(e: AnActionEvent?) {
-        val project = e?.project ?: currentProject ?: return
+    override fun actionPerformed(e: AnActionEvent) {
+        val project = e.project ?: currentProject ?: return
         ShowSettingsUtil.getInstance().showSettingsDialog(project, "F# Interactive")
     }
 
