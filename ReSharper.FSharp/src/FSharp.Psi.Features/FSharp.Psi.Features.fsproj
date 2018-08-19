@@ -43,11 +43,11 @@
     <Compile Include="src\Parsing\FSharpImplTreeBuilder.fs" />
     <Compile Include="src\Parsing\FSharpSigTreeBuilder.fs" />
     <Compile Include="src\Parsing\FSharpParser.fs" />
+    <Compile Include="src\Refactorings\Rename.fs" />
     <Compile Include="src\LanguageService\FSharpPsiProperties.fs" />
     <Compile Include="src\LanguageService\FSharpProjectFileLanguageService.fs" />
     <Compile Include="src\LanguageService\FSharpLanguageService.fs" />
     <Compile Include="src\LanguageService\FSharpClrLanguage.fs" />
-    <Compile Include="src\LanguageService\FSharpRefactoringLanguageService.fs" />
     <Compile Include="src\ZoneMarker.fs" />
   </ItemGroup>
   <ItemGroup>

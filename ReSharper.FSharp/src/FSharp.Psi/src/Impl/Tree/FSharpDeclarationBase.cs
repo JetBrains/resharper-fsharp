@@ -20,7 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public XmlNode GetXMLDoc(bool inherit) => null;
     public bool IsSynthetic() => false;
 
-    public void SetName(string name)
+    public virtual void SetName(string name)
     {
     }
   }

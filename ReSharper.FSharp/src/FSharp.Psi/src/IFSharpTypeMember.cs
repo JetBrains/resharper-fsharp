@@ -2,7 +2,11 @@
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 {
-  public interface IFSharpTypeMember : ITypeMember
+  public interface IFSharpDeclaredElement : IClrDeclaredElement
+  {
+  }
+
+  public interface IFSharpTypeMember : IFSharpDeclaredElement, ITypeMember
   {
     bool IsVisibleFromFSharp { get; }
     bool IsExtensionMember { get; }

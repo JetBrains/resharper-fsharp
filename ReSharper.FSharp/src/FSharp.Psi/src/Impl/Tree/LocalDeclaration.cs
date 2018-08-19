@@ -44,5 +44,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
                TypeFactory.CreateUnknownType(Module);
       }
     }
+
+    public override void SetName(string name) =>
+      Identifier.ReplaceIdentifier(name);
   }
 }
