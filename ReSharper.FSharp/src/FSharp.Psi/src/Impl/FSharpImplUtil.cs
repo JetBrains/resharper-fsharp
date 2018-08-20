@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using JetBrains.Annotations;
@@ -163,7 +163,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     {
       try
       {
-        var compiledNameAttr = mfv.Attributes.FirstOrDefault(CompiledNameAttrName);
+        var compiledNameAttr = mfv.Attributes.TryFindAttribute(CompiledNameAttrName);
         var compiledName = compiledNameAttr != null && !compiledNameAttr.Value.ConstructorArguments.IsEmpty()
           ? compiledNameAttr.Value.ConstructorArguments[0].Item2 as string
           : null;
@@ -230,10 +230,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     {
       foreach (var part in typeElement.EnumerateParts())
         if (part is IUnionPart)
-        {
           return true;
-        }
-
       return false;
     }
 
