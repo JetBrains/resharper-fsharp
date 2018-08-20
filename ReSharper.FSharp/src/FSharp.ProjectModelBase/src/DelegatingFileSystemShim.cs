@@ -6,15 +6,12 @@ using JetBrains.DataFlow;
 using JetBrains.Util;
 using static Microsoft.FSharp.Compiler.AbstractIL.Internal.Library;
 
-namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
+namespace JetBrains.ReSharper.Plugins.FSharp
 {
     public abstract class FileSystemShimChangeProvider : DelegatingFileSystemShim
     {
-        protected FileSystemShimChangeProvider(Lifetime lifetime, Shim.IFileSystem fileSystem,
-            ChangeManager changeManager) : base(lifetime, fileSystem)
-        {
+        protected FileSystemShimChangeProvider(Lifetime lifetime, ChangeManager changeManager) : base(lifetime) =>
             changeManager.Changed2.Advise(lifetime, Execute);
-        }
 
         public abstract void Execute(ChangeEventArgs changeEventArgs);
     }
@@ -23,11 +20,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
     {
         private readonly Shim.IFileSystem myFileSystem;
 
-        public DelegatingFileSystemShim(Lifetime lifetime, Shim.IFileSystem fileSystem)
+        public DelegatingFileSystemShim(Lifetime lifetime)
         {
-            myFileSystem = fileSystem;
+            myFileSystem = Shim.FileSystem;
             Shim.FileSystem = this;
-            lifetime.AddAction(() => Shim.FileSystem = fileSystem);
+            lifetime.AddAction(() => Shim.FileSystem = myFileSystem);
         }
 
         public virtual bool Exists(FileSystemPath path) =>
@@ -40,7 +37,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
                 ? shim.GetLastWriteTime(path)
                 : myFileSystem.GetLastWriteTimeShim(path.FullPath);
 
-        public DateTime GetLastWriteTimeShim(string fileName)
+        [Obsolete("Use in tests only.")]
+        public virtual DateTime GetLastWriteTimeShim(string fileName)
         {
             var path = FileSystemPath.TryParse(fileName);
             return path.IsEmpty
@@ -48,7 +46,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
                 : GetLastWriteTime(path);
         }
 
-        public bool SafeExists(string fileName)
+        [Obsolete("Use in tests only.")]
+        public virtual bool SafeExists(string fileName)
         {
             var path = FileSystemPath.TryParse(fileName);
             return path.IsEmpty

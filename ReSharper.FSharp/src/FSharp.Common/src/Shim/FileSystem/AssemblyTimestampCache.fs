@@ -3,13 +3,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Common.Shim.FileSystem
 open JetBrains.Application.Infra
 open JetBrains.DataFlow
 open JetBrains.ProjectModel
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.Util
 
 [<SolutionComponent>]
 type AssemblyTimestampCache
         (lifetime: Lifetime, fsSourceCache: FSharpSourceCache, assemblyExistsService: AssemblyExistsService) =
-    inherit DelegatingFileSystemShim(Lifetimes.Define(lifetime).Lifetime, fsSourceCache)
+    inherit DelegatingFileSystemShim(lifetime)
 
     let isSupported (path: FileSystemPath) =
         let extension = path.ExtensionNoDot

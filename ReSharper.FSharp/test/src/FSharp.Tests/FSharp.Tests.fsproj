@@ -11,6 +11,7 @@
     <Compile Include="CSharpResolveTest.fs" />
     <Compile Include="SymbolCacheTest.fs" />
     <Compile Include="ErrorsHighlightingTest.fs" />
+    <Compile Include="DelegatingFileSystemShimTest.fs" />
     <Compile Include="FSharpLexerTest.fs" />
     <Compile Include="Stubs.fs" />
     <Compile Include="ZoneMarker.fs" />

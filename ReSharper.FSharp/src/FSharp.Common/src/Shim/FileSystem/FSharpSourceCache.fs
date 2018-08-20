@@ -12,10 +12,10 @@ open JetBrains.DocumentManagers.impl
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util.CommonUtil
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Rider.Model
-open Microsoft.FSharp.Compiler.AbstractIL.Internal.Library
 
 type FSharpSource =
     { Source: byte[]
@@ -28,7 +28,7 @@ type FSharpSource =
 type FSharpSourceCache
         (lifetime: Lifetime, solution: ISolution, changeManager, documentManager: DocumentManager,
          extensions: IProjectFileExtensions, solutionDocumentChangeProvider: SolutionDocumentChangeProvider) =
-    inherit FileSystemShimChangeProvider(Lifetimes.Define(lifetime).Lifetime, Shim.FileSystem, changeManager)
+    inherit FileSystemShimChangeProvider(Lifetimes.Define(lifetime).Lifetime, changeManager)
 
     let files = ConcurrentDictionary<FileSystemPath, FSharpSource>()
 

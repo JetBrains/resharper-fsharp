@@ -1,0 +1,7 @@
+﻿Shim3: Get last write time (string): fakePath.fs
+Shim3: Get last write time (path): fakePath.fs
+Shim2: Get last write time (path): fakePath.fs
+Shim1: Get last write time (path): fakePath.fs
+Shim3: End of lifetime
+Shim2: End of lifetime
+Shim1: End of lifetime
