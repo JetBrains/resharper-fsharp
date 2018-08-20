@@ -1029,4 +1029,4 @@ type DummyFSharpItemsContainerLoader() =
     inherit FSharpItemsContainerLoader(null, null, null)
 
     override x.GetMap() = Dictionary<IProjectMark, ProjectMapping>() :> _
-    static member Instance = DummyFSharpItemsContainerLoader()
+    static member val Instance = DummyFSharpItemsContainerLoader()

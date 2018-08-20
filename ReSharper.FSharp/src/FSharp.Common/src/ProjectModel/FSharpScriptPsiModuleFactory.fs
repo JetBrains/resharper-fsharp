@@ -478,7 +478,7 @@ type ScriptFileProperties() =
         member x.GetDefaultNamespace() = String.Empty
         member x.GetDefines() = EmptyList.Instance :> _
 
-    static member Instance = ScriptFileProperties() :> _
+    static member val Instance = ScriptFileProperties() :> IPsiSourceFileProperties
 
 
 type ScriptReferences =
