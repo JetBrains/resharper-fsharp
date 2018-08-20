@@ -210,7 +210,7 @@ HEXGRAPH_SHORT=\\x{HEXDIGIT}{HEXDIGIT}
 UNICODEGRAPH_SHORT=\\u{HEXDIGIT}{HEXDIGIT}{HEXDIGIT}{HEXDIGIT}
 UNICODEGRAPH_LONG =\\U{HEXDIGIT}{HEXDIGIT}{HEXDIGIT}{HEXDIGIT}{HEXDIGIT}{HEXDIGIT}{HEXDIGIT}{HEXDIGIT}
 TRIGRAPH=\\{DIGIT}{DIGIT}{DIGIT}
-CHARACTER ={SIMPLE_CHARACTER}|{ESCAPE_CHAR}|{TRIGRAPH}|{UNICODEGRAPH_SHORT}|{HEXGRAPH_SHORT}|{UNICODEGRAPH_LONG}|\"
+CHARACTER ={SIMPLE_OR_ESCAPE_CHAR}|{TRIGRAPH}|{UNICODEGRAPH_SHORT}|{HEXGRAPH_SHORT}|{UNICODEGRAPH_LONG}|\"
 STRING_CHAR={SIMPLE_STRING_CHAR}|{ESCAPE_CHAR}|{NON_ESCAPE_CHARS}|{TRIGRAPH}|{UNICODEGRAPH_SHORT}|{UNICODEGRAPH_LONG}|"'"
 CHARACTER_LITERAL='{CHARACTER}'
 UNFINISHED_STRING=\"{STRING_CHAR}*
@@ -218,7 +218,7 @@ STRING={UNFINISHED_STRING}\"
 VERBATIM_STRING_CHAR={SIMPLE_STRING_CHAR}|{NON_ESCAPE_CHARS}|\"\"|\\
 UNFINISHED_VERBATIM_STRING=@\"{VERBATIM_STRING_CHAR}*
 VERBATIM_STRING={UNFINISHED_VERBATIM_STRING}\"
-BYTECHAR='{SIMPLE_OR_ESCAPE_CHAR}'B
+BYTECHAR='({SIMPLE_OR_ESCAPE_CHAR}|{TRIGRAPH}|{UNICODEGRAPH_SHORT})'B
 BYTEARRAY=\"{STRING_CHAR}*\"B
 VERBATIM_BYTEARRAY=@\"{VERBATIM_STRING_CHAR}*\"B
 SIMPLE_OR_ESCAPE_CHAR={ESCAPE_CHAR}|{SIMPLE_CHARACTER}
@@ -293,7 +293,7 @@ HEXDIGIT={DIGIT}|[A-F]|[a-f]
 OCTALDIGIT=[0-7]
 BITDIGIT=[0-1]
 INT={DIGIT}+
-XINT=0(x|X)({HEXDIGIT}+|{OCTALDIGIT}+|{BITDIGIT}+)
+XINT=0(((x|X){HEXDIGIT}+)|((o|O){OCTALDIGIT}+)|((b|B){BITDIGIT}+))
 SBYTE=({INT}|{XINT})y
 BYTE=({INT}|{XINT})uy
 INT16=({INT}|{XINT})s
@@ -533,53 +533,56 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 
 // Rule for smahimg type apply.
 // https://github.com/Microsoft/visualfsharp/blob/173513e/src/fsharp/LexFilter.fs#L2131
-<LINE> "delegate"{LESS_OP}  { initAdjacentTypeApp(); return makeToken(DELEGATE); }
-<LINE> {IDENT}{LESS_OP}     { initAdjacentTypeApp(); return identInTypeApp(); }
-<LINE> {IEEE32}{LESS_OP}    { initAdjacentTypeApp(); return makeToken(IEEE32); }
-<LINE> {IEEE64}{LESS_OP}    { initAdjacentTypeApp(); return makeToken(IEEE64); }
-<LINE> {DECIMAL}{LESS_OP}   { initAdjacentTypeApp(); return makeToken(DECIMAL); }
-<LINE> {BYTE}{LESS_OP}      { initAdjacentTypeApp(); return makeToken(BYTE); }
-<LINE> {INT16}{LESS_OP}     { initAdjacentTypeApp(); return makeToken(INT16); }
-<LINE> {INT32}{LESS_OP}     { initAdjacentTypeApp(); return makeToken(INT32); }
-<LINE> {INT64}{LESS_OP}     { initAdjacentTypeApp(); return makeToken(INT64); }
-<LINE> {SBYTE}{LESS_OP}     { initAdjacentTypeApp(); return makeToken(SBYTE); }
-<LINE> {UINT16}{LESS_OP}    { initAdjacentTypeApp(); return makeToken(UINT16); }
-<LINE> {UINT32}{LESS_OP}    { initAdjacentTypeApp(); return makeToken(UINT32); }
-<LINE> {UINT64}{LESS_OP}    { initAdjacentTypeApp(); return makeToken(UINT64); }
-<LINE> {BIGNUM}{LESS_OP}    { initAdjacentTypeApp(); return makeToken(BIGNUM); }
-<LINE> {NATIVEINT}{LESS_OP} { initAdjacentTypeApp(); return makeToken(NATIVEINT); }
+<LINE> "delegate"{LESS_OP}     { initAdjacentTypeApp(); return makeToken(DELEGATE); }
+<LINE> {IDENT}{LESS_OP}        { initAdjacentTypeApp(); return identInTypeApp(); }
+<LINE> {IEEE32}{LESS_OP}       { initAdjacentTypeApp(); return makeToken(IEEE32); }
+<LINE> {IEEE64}{LESS_OP}       { initAdjacentTypeApp(); return makeToken(IEEE64); }
+<LINE> {DECIMAL}{LESS_OP}      { initAdjacentTypeApp(); return makeToken(DECIMAL); }
+<LINE> {BYTE}{LESS_OP}         { initAdjacentTypeApp(); return makeToken(BYTE); }
+<LINE> {INT16}{LESS_OP}        { initAdjacentTypeApp(); return makeToken(INT16); }
+<LINE> ({XINT}|{INT}){LESS_OP} { initAdjacentTypeApp(); return makeToken(INT32); }
+<LINE> {INT32}{LESS_OP}        { initAdjacentTypeApp(); return makeToken(INT32); }
+<LINE> {INT64}{LESS_OP}        { initAdjacentTypeApp(); return makeToken(INT64); }
+<LINE> {SBYTE}{LESS_OP}        { initAdjacentTypeApp(); return makeToken(SBYTE); }
+<LINE> {UINT16}{LESS_OP}       { initAdjacentTypeApp(); return makeToken(UINT16); }
+<LINE> {UINT32}{LESS_OP}       { initAdjacentTypeApp(); return makeToken(UINT32); }
+<LINE> {UINT64}{LESS_OP}       { initAdjacentTypeApp(); return makeToken(UINT64); }
+<LINE> {BIGNUM}{LESS_OP}       { initAdjacentTypeApp(); return makeToken(BIGNUM); }
+<LINE> {NATIVEINT}{LESS_OP}    { initAdjacentTypeApp(); return makeToken(NATIVEINT); }
 
-<LINE> "delegate"{LESS_OP}{BAD_SYMBOLIC_OP}  { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> {IDENT}{LESS_OP}{BAD_SYMBOLIC_OP}     { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> {IEEE32}{LESS_OP}{BAD_SYMBOLIC_OP}    { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> {IEEE64}{LESS_OP}{BAD_SYMBOLIC_OP}    { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> {DECIMAL}{LESS_OP}{BAD_SYMBOLIC_OP}   { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> {BYTE}{LESS_OP}{BAD_SYMBOLIC_OP}      { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> {INT16}{LESS_OP}{BAD_SYMBOLIC_OP}     { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> {INT32}{LESS_OP}{BAD_SYMBOLIC_OP}     { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> {INT64}{LESS_OP}{BAD_SYMBOLIC_OP}     { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> {SBYTE}{LESS_OP}{BAD_SYMBOLIC_OP}     { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> {UINT16}{LESS_OP}{BAD_SYMBOLIC_OP}    { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> {UINT32}{LESS_OP}{BAD_SYMBOLIC_OP}    { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> {UINT64}{LESS_OP}{BAD_SYMBOLIC_OP}    { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> {BIGNUM}{LESS_OP}{BAD_SYMBOLIC_OP}    { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> {NATIVEINT}{LESS_OP}{BAD_SYMBOLIC_OP} { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+<LINE> "delegate"{LESS_OP}{BAD_SYMBOLIC_OP}     { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+<LINE> {IDENT}{LESS_OP}{BAD_SYMBOLIC_OP}        { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+<LINE> {IEEE32}{LESS_OP}{BAD_SYMBOLIC_OP}       { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+<LINE> {IEEE64}{LESS_OP}{BAD_SYMBOLIC_OP}       { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+<LINE> {DECIMAL}{LESS_OP}{BAD_SYMBOLIC_OP}      { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+<LINE> {BYTE}{LESS_OP}{BAD_SYMBOLIC_OP}         { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+<LINE> {INT16}{LESS_OP}{BAD_SYMBOLIC_OP}        { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+<LINE> ({XINT}|{INT}){LESS_OP}{BAD_SYMBOLIC_OP} { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+<LINE> {INT32}{LESS_OP}{BAD_SYMBOLIC_OP}        { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+<LINE> {INT64}{LESS_OP}{BAD_SYMBOLIC_OP}        { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+<LINE> {SBYTE}{LESS_OP}{BAD_SYMBOLIC_OP}        { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+<LINE> {UINT16}{LESS_OP}{BAD_SYMBOLIC_OP}       { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+<LINE> {UINT32}{LESS_OP}{BAD_SYMBOLIC_OP}       { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+<LINE> {UINT64}{LESS_OP}{BAD_SYMBOLIC_OP}       { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+<LINE> {BIGNUM}{LESS_OP}{BAD_SYMBOLIC_OP}       { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+<LINE> {NATIVEINT}{LESS_OP}{BAD_SYMBOLIC_OP}    { yypushback(yylength()); yybegin(PRE_LESS_OP); }
 
-<PRE_LESS_OP> "delegate"  { yybegin(LINE); return makeToken(DELEGATE); }
-<PRE_LESS_OP> {IDENT}     { yybegin(LINE); return identInTypeApp(); }
-<PRE_LESS_OP> {IEEE32}    { yybegin(LINE); return makeToken(IEEE32); }
-<PRE_LESS_OP> {IEEE64}    { yybegin(LINE); return makeToken(IEEE64); }
-<PRE_LESS_OP> {DECIMAL}   { yybegin(LINE); return makeToken(DECIMAL); }
-<PRE_LESS_OP> {BYTE}      { yybegin(LINE); return makeToken(BYTE); }
-<PRE_LESS_OP> {INT16}     { yybegin(LINE); return makeToken(INT16); }
-<PRE_LESS_OP> {INT32}     { yybegin(LINE); return makeToken(INT32); }
-<PRE_LESS_OP> {INT64}     { yybegin(LINE); return makeToken(INT64); }
-<PRE_LESS_OP> {SBYTE}     { yybegin(LINE); return makeToken(SBYTE); }
-<PRE_LESS_OP> {UINT16}    { yybegin(LINE); return makeToken(UINT16); }
-<PRE_LESS_OP> {UINT32}    { yybegin(LINE); return makeToken(UINT32); }
-<PRE_LESS_OP> {UINT64}    { yybegin(LINE); return makeToken(UINT64); }
-<PRE_LESS_OP> {BIGNUM}    { yybegin(LINE); return makeToken(BIGNUM); }
-<PRE_LESS_OP> {NATIVEINT} { yybegin(LINE); return makeToken(NATIVEINT); }
+<PRE_LESS_OP> "delegate"   { yybegin(LINE); return makeToken(DELEGATE); }
+<PRE_LESS_OP> {IDENT}      { yybegin(LINE); return identInTypeApp(); }
+<PRE_LESS_OP> {IEEE32}     { yybegin(LINE); return makeToken(IEEE32); }
+<PRE_LESS_OP> {IEEE64}     { yybegin(LINE); return makeToken(IEEE64); }
+<PRE_LESS_OP> {DECIMAL}    { yybegin(LINE); return makeToken(DECIMAL); }
+<PRE_LESS_OP> {BYTE}       { yybegin(LINE); return makeToken(BYTE); }
+<PRE_LESS_OP> {INT16}      { yybegin(LINE); return makeToken(INT16); }
+<PRE_LESS_OP> {XINT}|{INT} { yybegin(LINE); return makeToken(INT32); }
+<PRE_LESS_OP> {INT32}      { yybegin(LINE); return makeToken(INT32); }
+<PRE_LESS_OP> {INT64}      { yybegin(LINE); return makeToken(INT64); }
+<PRE_LESS_OP> {SBYTE}      { yybegin(LINE); return makeToken(SBYTE); }
+<PRE_LESS_OP> {UINT16}     { yybegin(LINE); return makeToken(UINT16); }
+<PRE_LESS_OP> {UINT32}     { yybegin(LINE); return makeToken(UINT32); }
+<PRE_LESS_OP> {UINT64}     { yybegin(LINE); return makeToken(UINT64); }
+<PRE_LESS_OP> {BIGNUM}     { yybegin(LINE); return makeToken(BIGNUM); }
+<PRE_LESS_OP> {NATIVEINT}  { yybegin(LINE); return makeToken(NATIVEINT); }
 
 <LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {IDENT}      { return initIdent(); }
 <LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {SBYTE}      { return makeToken(SBYTE); }
