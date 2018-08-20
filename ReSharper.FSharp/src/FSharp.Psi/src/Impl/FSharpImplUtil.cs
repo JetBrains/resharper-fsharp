@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Naming;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
@@ -68,7 +69,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       attr.ShortNameEquals("CompilationRepresentation") &&
       attr.ArgExpression.LongIdentifier?.QualifiedName == ModuleSuffix;
 
-    public static string GetModuleCompiledName([CanBeNull] this IIdentifier identifier,
+    public static FSharpName GetModuleCompiledName([CanBeNull] this IIdentifier identifier,
       TreeNodeCollection<IFSharpAttribute> attributes)
     {
       var hasModuleSuffix = false;
@@ -87,27 +88,39 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       }
 
       var sourceName = identifier?.Name;
-      return hasModuleSuffix && sourceName != null
-        ? sourceName + "Module"
-        : compiledName ?? sourceName ?? SharedImplUtil.MISSING_DECLARATION_NAME;
+      if (sourceName == null)
+        return FSharpNameModule.MissingName;
+
+      if (hasModuleSuffix)
+        return FSharpName.NewMultipleNames(sourceName, sourceName + "Module", CompiledNameKind.ExplicitModule);
+
+      if (compiledName != null)
+        return FSharpName.NewMultipleNames(sourceName, compiledName, CompiledNameKind.Attribute);
+      return FSharpName.Create(sourceName);
     }
 
-
     [NotNull]
-    public static string GetCompiledName([CanBeNull] this IIdentifier identifier,
+    public static FSharpName GetFSharpName([CanBeNull] this IIdentifier identifier,
       TreeNodeCollection<IFSharpAttribute> attributes)
     {
+      var sourceName = identifier.GetName();
+
       foreach (var attr in attributes)
         if (GetCompiledNameValue(attr, out var value))
-          return value;
+          return FSharpName.NewMultipleNames(sourceName, value, CompiledNameKind.Attribute);
 
-      return identifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
+      return FSharpName.NewDeclaredName(sourceName);
     }
 
     [NotNull]
-    public static string GetSourceName([CanBeNull] this IIdentifier identifier)
+    public static string GetName([CanBeNull] this IIdentifier identifier) =>
+      identifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
+
+    [NotNull]
+    public static FSharpName GetSourceName([CanBeNull] this IIdentifier identifier)
     {
-      return identifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
+      var sourceName = identifier?.Name;
+      return sourceName != null ? FSharpName.NewDeclaredName(sourceName) : FSharpNameModule.MissingName;
     }
 
     public static TreeTextRange GetNameRange([CanBeNull] this IFSharpIdentifier identifier)

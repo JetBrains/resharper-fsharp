@@ -1,12 +1,12 @@
-﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
+﻿using JetBrains.ReSharper.Plugins.FSharp.Common.Naming;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
 using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class InterfaceDeclaration
   {
-    protected override string DeclaredElementName => Identifier.GetCompiledName(Attributes);
-    public override string SourceName => Identifier.GetSourceName();
+    protected override FSharpName GetFSharpName() => Identifier.GetFSharpName(Attributes);
     public override TreeTextRange GetNameRange() => Identifier.GetNameRange();
     public FSharpPartKind TypePartKind => FSharpPartKind.Interface;
   }

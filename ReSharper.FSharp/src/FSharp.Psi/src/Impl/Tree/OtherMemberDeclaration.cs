@@ -19,7 +19,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public IDeclaredElement DeclaredElement => null;
     public string DeclaredName => SharedImplUtil.MISSING_DECLARATION_NAME;
     public string ShortName => DeclaredName;
-    public string SourceName => Identifier.GetSourceName();
+    public string SourceName => Identifier.GetName();
     public FSharpSymbol GetFSharpSymbol() => null;
     public FSharpSymbol Symbol { get; set; }
   }

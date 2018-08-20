@@ -1,11 +1,11 @@
-﻿using JetBrains.ReSharper.Psi;
+﻿using JetBrains.ReSharper.Plugins.FSharp.Common.Naming;
+using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class ModuleAbbreviation
   {
-    protected override string DeclaredElementName => Identifier.GetCompiledName(Attributes);
-    public override string SourceName => Identifier.GetSourceName();
+    protected override FSharpName GetFSharpName() => Identifier.GetFSharpName(Attributes);
     public override TreeTextRange GetNameRange() => Identifier.GetNameRange();
   }
 }

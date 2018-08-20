@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Naming;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
@@ -10,20 +11,29 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     IModifiersOwnerDeclaration
   {
     private volatile IDeclaredElement myCachedDeclaredElement;
-    [CanBeNull] private volatile string myCachedName;
 
-    protected abstract string DeclaredElementName { get; }
-    
-    public override string DeclaredName
+    [CanBeNull] private volatile FSharpName myCachedName;
+
+    protected override void ClearCachedData() =>
+      myCachedName = null;
+
+    [NotNull]
+    protected abstract FSharpName GetFSharpName();
+
+    public FSharpName FSharpName
     {
       get
       {
         lock (this)
         {
-          return myCachedName ?? (myCachedName = DeclaredElementName);
+          return myCachedName ?? (myCachedName = GetFSharpName());
         }
       }
+
     }
+
+    public override string DeclaredName => FSharpName.CompiledName;
+    public override string SourceName => FSharpName.SourceName;
 
     protected override void PreInit()
     {

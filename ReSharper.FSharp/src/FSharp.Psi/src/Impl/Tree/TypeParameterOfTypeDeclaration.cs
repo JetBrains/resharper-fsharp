@@ -6,7 +6,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class TypeParameterOfTypeDeclaration : ICachedDeclaration2
   {
-    public override string DeclaredName => Identifier.GetCompiledName(Attributes);
+    public override string DeclaredName => Identifier.GetName();
     public override TreeTextRange GetNameRange() => Identifier.GetNameRange();
 
     protected override void PreInit()

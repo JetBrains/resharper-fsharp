@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Naming;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
@@ -11,7 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class UnionCaseFieldDeclaration
   {
-    protected override string DeclaredElementName => Identifier.GetSourceName();
+    protected override FSharpName GetFSharpName() => Identifier.GetSourceName();
     public override TreeTextRange GetNameRange() => Identifier.GetNameRange();
 
     protected override IDeclaredElement CreateDeclaredElement()

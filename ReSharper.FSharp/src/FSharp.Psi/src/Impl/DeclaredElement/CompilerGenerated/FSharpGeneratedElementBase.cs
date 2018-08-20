@@ -2,6 +2,7 @@
 using System.Xml;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
@@ -19,6 +20,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     public abstract DeclaredElementType GetElementType();
     public abstract ITypeElement GetContainingType();
     public abstract ITypeMember GetContainingTypeMember();
+
+    public string SourceName => SharedImplUtil.MISSING_DECLARATION_NAME;
 
     public virtual bool IsValid() => ContainingElement.IsValid();
     public IPsiServices GetPsiServices() => ContainingElement.GetPsiServices();

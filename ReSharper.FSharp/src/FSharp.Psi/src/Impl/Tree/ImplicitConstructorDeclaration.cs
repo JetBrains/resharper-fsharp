@@ -1,18 +1,15 @@
-﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
+﻿using JetBrains.ReSharper.Plugins.FSharp.Common.Naming;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class ImplicitConstructorDeclaration
   {
-    protected override string DeclaredElementName =>
-      GetContainingTypeDeclaration()?.DeclaredName ?? SharedImplUtil.MISSING_DECLARATION_NAME;
-
-    public override string SourceName =>
-      GetContainingTypeDeclaration()?.SourceName ?? SharedImplUtil.MISSING_DECLARATION_NAME;
+    protected override FSharpName GetFSharpName() =>
+      GetContainingTypeDeclaration()?.FSharpName ?? FSharpNameModule.MissingName;
 
     public override TreeTextRange GetNameRange() =>
       GetContainingTypeDeclaration()?.GetNameRange() ?? TreeTextRange.InvalidRange;

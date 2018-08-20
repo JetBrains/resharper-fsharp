@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Naming;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
@@ -8,7 +9,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class AbstractSlot
   {
-    protected override string DeclaredElementName => Identifier.GetCompiledName(Attributes);
+    protected override FSharpName GetFSharpName() => Identifier.GetFSharpName(Attributes);
 
     public override TreeTextRange GetNameRange()
     {

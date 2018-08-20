@@ -1,4 +1,5 @@
-﻿using JetBrains.ReSharper.Psi;
+﻿using JetBrains.ReSharper.Plugins.FSharp.Common.Naming;
+using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -6,16 +7,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class TopLevelModuleDeclaration
   {
     private bool HasExplicitName => !LongIdentifier.IdentifiersEnumerable.IsEmpty();
-    private string ImplicitName => GetSourceFile().GetLocation().NameWithoutExtension.Capitalize();
+    private string ImplicitName =>
+      GetSourceFile().GetLocation().NameWithoutExtension.Capitalize();
 
-    protected override string DeclaredElementName =>
+    protected override FSharpName GetFSharpName() =>
       HasExplicitName
         ? LongIdentifier.GetModuleCompiledName(Attributes)
-        : ImplicitName;
+        : FSharpName.NewDeclaredName(ImplicitName);
 
     public override string SourceName =>
       HasExplicitName
-        ? LongIdentifier.GetSourceName()
+        ? LongIdentifier.GetName()
         : ImplicitName;
 
     public override TreeTextRange GetNameRange() =>

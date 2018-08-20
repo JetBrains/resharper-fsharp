@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Naming;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
@@ -9,8 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class Let : IFunctionDeclaration
   {
     IFunction IFunctionDeclaration.DeclaredElement => base.DeclaredElement as IFunction;
-    protected override string DeclaredElementName => Identifier.GetCompiledName(Attributes);
-    public override string SourceName => Identifier.GetSourceName();
+    protected override FSharpName GetFSharpName() => Identifier.GetFSharpName(Attributes);
     public override TreeTextRange GetNameRange() => Identifier.GetNameRange();
 
     protected override IDeclaredElement CreateDeclaredElement()
