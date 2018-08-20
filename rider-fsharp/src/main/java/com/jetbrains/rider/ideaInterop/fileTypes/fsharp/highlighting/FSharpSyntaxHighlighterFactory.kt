@@ -29,13 +29,15 @@ class FSharpSyntaxHighlighter : SyntaxHighlighterBase() {
                 STRINGS.types.map { it to RiderTextAttributeKeys.STRING }
         private val comments =
                 COMMENTS.types.map { it to RiderTextAttributeKeys.BLOCK_COMMENT }
+        private val numbers =
+                NUMBERS.types.map { it to RiderTextAttributeKeys.NUMBER }
         private val ourKeys = mapOf(
                 CHARACTER_LITERAL to RiderTextAttributeKeys.STRING,
                 BYTECHAR to RiderTextAttributeKeys.STRING,
                 LINE_COMMENT to RiderTextAttributeKeys.COMMENT,
                 SYMBOLIC_OP to RiderTextAttributeKeys.OPERATOR_IDENTIFIER,
                 TokenType.BAD_CHARACTER to HighlighterColors.BAD_CHARACTER
-        ) + keywords + pp_keywords + comments + strings
+        ) + keywords + pp_keywords + comments + strings + numbers
     }
 
     override fun getHighlightingLexer(): Lexer {

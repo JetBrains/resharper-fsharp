@@ -223,7 +223,8 @@ public interface FSharpTokenType {
             UNFINISHED_TRIPLE_QUOTED_STRING,
             VERBATIM_STRING,
             TRIPLE_QUOTED_STRING,
-            BYTEARRAY
+            BYTEARRAY,
+            VERBATIM_BYTEARRAY
     );
 
     TokenSet COMMENTS = TokenSet.create(
@@ -354,6 +355,24 @@ public interface FSharpTokenType {
             PP_HELP,
             PP_QUIT,
             PP_DIRECTIVE
+    );
+
+    TokenSet NUMBERS = TokenSet.create(
+            SBYTE,
+            BYTE,
+            INT16,
+            UINT16,
+            INT32,
+            INT32,
+            UINT32,
+            NATIVEINT,
+            UNATIVEINT,
+            INT64,
+            UINT64,
+            BIGNUM,
+            IEEE32,
+            IEEE64,
+            DECIMAL
     );
 
     @NotNull
