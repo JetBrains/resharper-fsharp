@@ -32,7 +32,7 @@ type UnusedOpensStageProcess(fsFile: IFSharpFile, checkResults, daemonProcess: I
         lines.GetOrCreateValue(line, fun () -> document.GetLineText(docLine line))
 
     override x.Execute(committer) =
-        let highlightings = LocalList()
+        let highlightings = List()
         let interruptChecker = daemonProcess.CreateInterruptChecker()
         for range in UnusedOpens.getUnusedOpens(checkResults, getLine).RunAsTask(interruptChecker) do
             x.SeldomInterruptChecker.CheckForInterrupt()
@@ -46,7 +46,7 @@ type UnusedOpensStageProcess(fsFile: IFSharpFile, checkResults, daemonProcess: I
 
             let range = openDirective.GetHighlightingRange()
             highlightings.Add(HighlightingInfo(range, UnusedOpenWarningHighlighting(openDirective)))
-        committer.Invoke(DaemonStageResult(highlightings.ReadOnlyList()))
+        committer.Invoke(DaemonStageResult(highlightings))
 
 
 [<DaemonStage(StagesBefore = [| typeof<HighlightIdentifiersStage> |], StagesAfter = [| typeof<CollectUsagesStage> |])>]
