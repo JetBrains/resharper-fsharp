@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService
 
+open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
@@ -11,10 +12,10 @@ open JetBrains.ReSharper.Psi.Impl
 open JetBrains.Util
 
 [<Language(typeof<FSharpLanguage>)>]
-type FSharpLanguageService(languageType, constantValueService, formatter: FSharpDummyCodeFormatter, fsCheckerService, logger) =
+type FSharpLanguageService
+        (languageType, constantValueService, cacheProvider: FSharpCacheProvider, formatter: FSharpDummyCodeFormatter,
+         fsCheckerService: FSharpCheckerService, logger: ILogger) =
     inherit LanguageService(languageType, constantValueService)
-
-    let cacheProvider = FSharpCacheProvider(fsCheckerService)
 
     override x.IsCaseSensitive = true
     override x.SupportTypeMemberCache = true
@@ -34,8 +35,3 @@ type FSharpLanguageService(languageType, constantValueService, formatter: FSharp
 
     override x.CodeFormatter = formatter :> _
     override x.FindTypeDeclarations(file) = EmptyList<_>.Instance :> _
-
-
-[<Language(typeof<FSharpLanguage>)>]
-type FSharpScriptLanguageService(languageType, constantValueService, formatter, fsCheckerService, logger) =
-    inherit FSharpLanguageService(languageType, constantValueService, formatter, fsCheckerService, logger)

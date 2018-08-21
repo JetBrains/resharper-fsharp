@@ -328,7 +328,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
       name = Lexhelp.Keywords.QuoteIdentifierIfNeeded(name);
       using (WriteLockCookie.Create(fsIdentifier.IsPhysical()))
-        ModificationUtil.ReplaceChild(token, new FSharpIdentifierToken(name));
+        LowLevelModificationUtil.ReplaceChildRange(token, token, new FSharpIdentifierToken(name));
     }
   }
 }
