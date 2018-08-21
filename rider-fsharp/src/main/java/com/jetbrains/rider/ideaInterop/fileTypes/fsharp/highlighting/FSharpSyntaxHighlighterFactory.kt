@@ -35,7 +35,6 @@ class FSharpSyntaxHighlighter : SyntaxHighlighterBase() {
                 CHARACTER_LITERAL to RiderTextAttributeKeys.STRING,
                 BYTECHAR to RiderTextAttributeKeys.STRING,
                 LINE_COMMENT to RiderTextAttributeKeys.COMMENT,
-                SYMBOLIC_OP to RiderTextAttributeKeys.OPERATOR_IDENTIFIER,
                 TokenType.BAD_CHARACTER to HighlighterColors.BAD_CHARACTER
         ) + keywords + pp_keywords + comments + strings + numbers
     }
