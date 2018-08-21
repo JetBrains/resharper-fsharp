@@ -11,7 +11,7 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class LocalDeclaration : ITypeOwner
+  internal partial class LocalDeclaration : ITypeOwner, IFSharpDeclaredElement
   {
     public override IDeclaredElement DeclaredElement => this;
     public override string DeclaredName => Identifier.GetName();

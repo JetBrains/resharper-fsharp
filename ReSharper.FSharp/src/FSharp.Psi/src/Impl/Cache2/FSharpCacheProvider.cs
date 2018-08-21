@@ -103,8 +103,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     {
     }
 
+    public void BuildCache(ISandBox sandBox, ICacheBuilder builder)
+    {
+    }
+
     public bool IsInternableToken(TokenNodeType tokenNodeType) => throw new NotImplementedException();
-    public void BuildCache(ISandBox sandBox, ICacheBuilder builder) => throw new NotImplementedException();
     public bool IsCacheableInClosedForm(IChameleonNode node) => throw new NotImplementedException();
 
     public TreeElement CreateChameleonNode(NodeType nodeType, TreeOffset startOffset, TreeOffset endOffset) =>

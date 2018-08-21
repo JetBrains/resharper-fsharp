@@ -4,8 +4,10 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Resolve;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.ReSharper.Resources.Shell;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 {
@@ -32,15 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         : ResolveResultWithInfo.Ignore;
     }
 
-    public override bool IsValid()
-    {
-      return myOwner.IsValid();
-    }
-
-    public override string GetName()
-    {
-      return myOwner.GetText();
-    }
+    public override string GetName() => myOwner.GetText();
 
     public override ISymbolTable GetReferenceSymbolTable(bool useReferenceName)
     {
@@ -54,8 +48,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     public override IReference BindTo(IDeclaredElement element)
     {
-      // not supported yet (called during refactorings)
-      return this;
+      // Disable for non-F# elements until such rename is possible.
+      if (!(element is IFSharpDeclaredElement fsElement))
+        return this;
+
+      using (WriteLockCookie.Create(true))
+      {
+        // We should change the reference here so it resolves to the new element.
+        // We don't, however, want to resolve it again and probably wait for FCS to type check all needed projects
+        // so bind the element beforehand.
+
+        var newToken = new FSharpIdentifierToken(fsElement.SourceName);
+        newToken = ModificationUtil.ReplaceChild(myOwner, newToken);
+
+        var newReference = new FSharpSymbolReference(newToken);
+        newToken.SymbolReference = newReference;
+        newReference.CurrentResolveResult =
+          new ResolveResultWithInfo(new SimpleResolveResult(element), ResolveErrorType.OK);
+
+        return newReference;
+      }
     }
 
     public override IReference BindTo(IDeclaredElement element, ISubstitution substitution)

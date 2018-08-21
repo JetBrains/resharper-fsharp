@@ -4,12 +4,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 {
   public interface IFSharpDeclaredElement : IClrDeclaredElement
   {
+    string SourceName { get; }
   }
 
   public interface IFSharpTypeMember : IFSharpDeclaredElement, ITypeMember
   {
-    string SourceName { get; }
-
     bool IsVisibleFromFSharp { get; }
     bool IsExtensionMember { get; }
     bool IsMember { get; }
