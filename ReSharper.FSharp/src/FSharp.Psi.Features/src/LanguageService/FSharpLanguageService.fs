@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService
 
+open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
@@ -11,12 +12,12 @@ open JetBrains.ReSharper.Psi.Impl
 open JetBrains.Util
 
 [<Language(typeof<FSharpLanguage>)>]
-type FSharpLanguageService(languageType, constantValueService, formatter: FSharpDummyCodeFormatter, fsCheckerService, logger) =
+type FSharpLanguageService
+        (languageType, constantValueService, cacheProvider: FSharpCacheProvider, formatter: FSharpDummyCodeFormatter,
+         fsCheckerService: FSharpCheckerService, logger: ILogger) =
     inherit LanguageService(languageType, constantValueService)
 
-    static let lexerFactory = FSharpLexerFactory()
-
-    let cacheProvider = FSharpCacheProvider(fsCheckerService)
+    let lexerFactory = FSharpLexerFactory()
 
     override x.IsCaseSensitive = true
     override x.SupportTypeMemberCache = true
