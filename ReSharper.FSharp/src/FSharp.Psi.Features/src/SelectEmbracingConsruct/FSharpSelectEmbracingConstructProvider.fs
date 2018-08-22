@@ -24,7 +24,7 @@ type FSharpSelection(file, range, parentRanges: DocumentRange list) =
         | parent :: rest -> FSharpSelection(file, parent, rest) :> _
         | _ -> null
 
-    override x.ExtendToWholeLine = ExtendToTheWholeLinePolicy.DO_NOT_EXTEND
+    override x.ExtendToWholeLine = ExtendToTheWholeLinePolicy.EXTEND_LEFT_SPACES
 
 
 type FSharpDotSelection(file, document, range: TreeTextRange, parentRanges: DocumentRange list) =
@@ -71,7 +71,7 @@ type FSharpDotSelection(file, document, range: TreeTextRange, parentRanges: Docu
         | _ -> null
     override x.CreateTokenPartSelection(tokenNode, treeTextRange) = null
 
-    override x.ExtendToWholeLine = ExtendToTheWholeLinePolicy.DO_NOT_EXTEND
+    override x.ExtendToWholeLine = ExtendToTheWholeLinePolicy.EXTEND_LEFT_SPACES
 
 [<ProjectFileType(typeof<FSharpProjectFileType>)>]
 type FSharpSelectEmbracingConstructProvider() =
