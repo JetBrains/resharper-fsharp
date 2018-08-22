@@ -48,24 +48,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     public override IReference BindTo(IDeclaredElement element)
     {
-      // Disable for non-F# elements until such rename is possible.
+      // Disable for non-F# elements until such refactorings are possible.
       if (!(element is IFSharpDeclaredElement fsElement))
         return this;
 
-      using (WriteLockCookie.Create(true))
+      using (WriteLockCookie.Create(myOwner.IsPhysical()))
       {
-        // We should change the reference here so it resolves to the new element.
-        // We don't, however, want to resolve it again and probably wait for FCS to type check all needed projects
-        // so bind the element beforehand.
+        // We should change the reference here so it can be resolved to the new element.
+        // We don't, however, want to resolve it and to wait for FCS to type check all needed projects
+        // so set resolve result beforehand.
 
-        var newToken = new FSharpIdentifierToken(fsElement.SourceName);
-        newToken = ModificationUtil.ReplaceChild(myOwner, newToken);
-
+        var newToken = ModificationUtil.ReplaceChild(myOwner, new FSharpIdentifierToken(fsElement.SourceName));
         var newReference = new FSharpSymbolReference(newToken);
-        newToken.SymbolReference = newReference;
-        newReference.CurrentResolveResult =
-          new ResolveResultWithInfo(new SimpleResolveResult(element), ResolveErrorType.OK);
+        ResolveUtil.SetFakedResolveTo(newReference, element, null);
 
+        newToken.SymbolReference = newReference;
         return newReference;
       }
     }
