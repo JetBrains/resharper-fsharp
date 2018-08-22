@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
@@ -28,14 +29,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public bool HasHiddenInstanceFields => false;
     public bool IsReadonly => false;
     public bool IsByRefLike => false;
-  }
-
-  public class FSharpStruct : Struct
-  {
-    public FSharpStruct([NotNull] IStructPart part) : base(part)
-    {
-    }
-
-    protected override MemberDecoration Modifiers => Parts.GetModifiers();
   }
 }

@@ -37,5 +37,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       var typeDeclaration = GetContainingTypeDeclaration() as IFSharpTypeDeclaration;
       return new FSharpMethod<AbstractSlot>(this, mfv, typeDeclaration);
     }
+
+    public override void SetName(string name) =>
+      Identifier.ReplaceIdentifier(name);
   }
 }

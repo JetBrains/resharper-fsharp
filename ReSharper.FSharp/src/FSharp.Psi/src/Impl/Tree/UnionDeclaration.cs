@@ -14,5 +14,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public override IReadOnlyList<ITypeMemberDeclaration> MemberDeclarations =>
       base.MemberDeclarations.Prepend(UnionCases).AsIReadOnlyList(); // todo: shit, rewrite it
+
+    public override void SetName(string name) =>
+      Identifier.ReplaceIdentifier(name);
   }
 }

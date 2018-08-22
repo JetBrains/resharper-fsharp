@@ -1,6 +1,6 @@
 ﻿using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
-using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
@@ -21,14 +21,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     protected override byte SerializationTag =>
       (byte) FSharpPartKind.Interface;
-  }
-
-  public class FSharpInterface : Interface
-  {
-    public FSharpInterface(IInterfacePart part) : base(part)
-    {
-    }
-
-    protected override MemberDecoration Modifiers => myParts.GetModifiers();
   }
 }

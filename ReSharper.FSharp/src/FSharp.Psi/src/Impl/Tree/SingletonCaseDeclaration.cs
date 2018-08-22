@@ -11,5 +11,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     protected override IDeclaredElement CreateDeclaredElement() =>
       new FSharpUnionCaseProperty(this);
+
+    public override void SetName(string name) =>
+      Identifier.ReplaceIdentifier(name);
   }
 }

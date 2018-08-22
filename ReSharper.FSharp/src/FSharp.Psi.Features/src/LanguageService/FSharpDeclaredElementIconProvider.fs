@@ -7,6 +7,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2
 open JetBrains.ReSharper.Psi.Resources

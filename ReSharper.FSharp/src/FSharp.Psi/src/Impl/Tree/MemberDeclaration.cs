@@ -51,5 +51,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       }
       return new FSharpMethod<MemberDeclaration>(this, mfv, typeDeclaration);
     }
+
+    public override void SetName(string name) =>
+      Identifier.ReplaceIdentifier(name);
   }
 }

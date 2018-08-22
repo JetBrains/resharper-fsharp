@@ -22,5 +22,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         ? new FSharpProperty<AutoProperty>(this, property.Value)
         : null;
     }
+
+    public override void SetName(string name) =>
+      Identifier.ReplaceIdentifier(name);
   }
 }

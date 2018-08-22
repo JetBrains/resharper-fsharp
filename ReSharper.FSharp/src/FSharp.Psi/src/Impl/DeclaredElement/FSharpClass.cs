@@ -2,14 +2,16 @@
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  public class FSharpClass : Class
+  public class FSharpClass : Class, IFSharpDeclaredElement
   {
     public FSharpClass([NotNull] IClassPart part) : base(part)
     {
     }
 
     protected override MemberDecoration Modifiers => myParts.GetModifiers();
+
+    public string SourceName => this.GetFSharpName().SourceName;
   }
 }

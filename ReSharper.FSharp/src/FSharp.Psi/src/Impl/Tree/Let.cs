@@ -27,5 +27,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         ? (IDeclaredElement) new FSharpSignOperator<Let>(this, mfv, null)
         : new ModuleFunction(this, mfv, null);
     }
+
+    public override void SetName(string name) =>
+      Identifier.ReplaceIdentifier(name);
   }
 }

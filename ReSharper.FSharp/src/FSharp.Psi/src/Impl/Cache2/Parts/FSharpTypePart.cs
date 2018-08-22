@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Naming;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -15,7 +15,8 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  public abstract class FSharpTypePart<T> : TypePartImplBase<T> where T : class, IFSharpTypeElementDeclaration
+  public abstract class FSharpTypePart<T> : TypePartImplBase<T>, IFSharpTypePart
+    where T : class, IFSharpTypeElementDeclaration
   {
     public override ExtensionMethodInfo[] ExtensionMethodInfos { get; } = EmptyArray<ExtensionMethodInfo>.Instance;
 
@@ -140,5 +141,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     }
 
     protected virtual string PrintTypeParameters() => "";
+
+    public FSharpName FSharpName =>
+      GetDeclaration()?.FSharpName ?? FSharpNameModule.MissingName;
   }
 }

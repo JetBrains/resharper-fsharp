@@ -7,5 +7,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     protected override FSharpName GetFSharpName() => Identifier.GetFSharpName(Attributes);
     public override TreeTextRange GetNameRange() => Identifier.GetNameRange();
+
+    public override void SetName(string name) =>
+      Identifier.ReplaceIdentifier(name);
   }
 }

@@ -10,5 +10,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override TreeTextRange GetNameRange() => Identifier.GetNameRange();
 
     public FSharpPartKind TypePartKind => FSharpPartKind.Class;
+
+    public override void SetName(string name) =>
+      Identifier.ReplaceIdentifier(name);
   }
 }
