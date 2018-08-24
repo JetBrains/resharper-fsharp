@@ -10,7 +10,9 @@ open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CSharp.Impl
 open JetBrains.ReSharper.Psi.Impl
+open JetBrains.ReSharper.Psi.Naming.Impl
 open JetBrains.Util
+open Microsoft.FSharp.Compiler
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpLanguageService
@@ -39,3 +41,11 @@ type FSharpLanguageService
 
     override x.IsValidName(elementType, name) =
         not (startsWith "`" name || endsWith "`" name || name.ContainsNewLine() || name.Contains("``"))
+
+
+[<Language(typeof<FSharpLanguage>)>]
+type FSharpNamingService(language: FSharpLanguage) =
+    inherit NamingLanguageServiceBase(language)
+
+    override x.MangleNameIfNecessary(name, _) =
+        Lexhelp.Keywords.QuoteIdentifierIfNeeded name

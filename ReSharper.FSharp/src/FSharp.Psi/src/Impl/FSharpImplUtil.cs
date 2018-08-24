@@ -12,13 +12,12 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
-using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
+using JetBrains.ReSharper.Psi.Naming;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 using JetBrains.Util.Logging;
 using JetBrains.Util.Extension;
-using Microsoft.FSharp.Compiler;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -334,7 +333,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       if (!(fsIdentifier?.FirstChild is FSharpIdentifierToken token))
         return;
 
-      name = Lexhelp.Keywords.QuoteIdentifierIfNeeded(name);
+      name = NamingManager.GetNamingLanguageService(fsIdentifier.Language).MangleNameIfNecessary(name);
       using (WriteLockCookie.Create(fsIdentifier.IsPhysical()))
         LowLevelModificationUtil.ReplaceChildRange(token, token, new FSharpIdentifierToken(name));
     }

@@ -5,6 +5,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Resolve;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
+using JetBrains.ReSharper.Psi.Naming;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Resources.Shell;
@@ -58,7 +59,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         // We don't, however, want to resolve it and to wait for FCS to type check all needed projects
         // so set resolve result beforehand.
 
-        var newToken = ModificationUtil.ReplaceChild(myOwner, new FSharpIdentifierToken(fsElement.SourceName));
+        var name = NamingManager.GetNamingLanguageService(myOwner.Language).MangleNameIfNecessary(fsElement.SourceName);
+
+        var newToken = ModificationUtil.ReplaceChild(myOwner, new FSharpIdentifierToken(name));
         var newReference = new FSharpSymbolReference(newToken);
         ResolveUtil.SetFakedResolveTo(newReference, element, null);
 
