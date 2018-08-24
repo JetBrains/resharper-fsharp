@@ -157,6 +157,12 @@ module rec CommonUtil =
     let equalsIgnoreCase other (string: string) =
         string.Equals(other, StringComparison.OrdinalIgnoreCase)
 
+    let inline startsWith other (string: string) =
+        string.StartsWith(other, StringComparison.Ordinal)
+
+    let inline endsWith other (string: string) =
+        string.EndsWith(other, StringComparison.Ordinal)
+
     let eq a b = a = b
 
     let getCommonParent path1 path2 =

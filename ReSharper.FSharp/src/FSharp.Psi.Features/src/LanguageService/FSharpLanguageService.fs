@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService
 
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
+open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
@@ -35,3 +36,6 @@ type FSharpLanguageService
 
     override x.CodeFormatter = formatter :> _
     override x.FindTypeDeclarations(file) = EmptyList<_>.Instance :> _
+
+    override x.IsValidName(elementType, name) =
+        not (startsWith "`" name || endsWith "`" name || name.ContainsNewLine() || name.Contains("``"))
