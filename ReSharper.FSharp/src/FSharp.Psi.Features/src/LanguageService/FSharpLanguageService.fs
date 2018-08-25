@@ -14,13 +14,15 @@ open JetBrains.Util
 type FSharpLanguageService(languageType, constantValueService, formatter: FSharpDummyCodeFormatter, fsCheckerService, logger) =
     inherit LanguageService(languageType, constantValueService)
 
+    static let fakeLexerFactory = FSharpFakeLexerFactory()
+
     let cacheProvider = FSharpCacheProvider(fsCheckerService)
 
     override x.IsCaseSensitive = true
     override x.SupportTypeMemberCache = true
     override x.CacheProvider = cacheProvider :> _
 
-    override x.GetPrimaryLexerFactory() = FSharpFakeLexerFactory() :> _
+    override x.GetPrimaryLexerFactory() = fakeLexerFactory :> _
     override x.CreateFilteringLexer(lexer) = lexer
     override x.CreateParser(lexer, psiModule, sourceFile) = FSharpParser(sourceFile, fsCheckerService, logger) :> _
 
