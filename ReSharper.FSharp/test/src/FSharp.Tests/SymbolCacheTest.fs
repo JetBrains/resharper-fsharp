@@ -2,16 +2,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open System
 open JetBrains.ProjectModel
-open JetBrains.ProjectModel.MSBuild
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
+open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Psi.Caches.SymbolCache
 open JetBrains.ReSharper.TestFramework
-open JetBrains.TestFramework.Projects
 open NUnit.Framework
 
-[<TestFileExtension(FSharpProjectFileType.FsExtension)>]
-[<TestProjectFilePropertiesProvider(FSharpProjectFileType.FsExtension, MSBuildProjectUtil.CompileElement)>]
+[<FSharpTest>]
 type SymbolCacheTest() =
     inherit BaseTestWithSingleProject()
 
