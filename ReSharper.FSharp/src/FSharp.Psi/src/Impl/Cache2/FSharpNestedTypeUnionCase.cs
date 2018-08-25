@@ -13,7 +13,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     {
     }
 
-    public override DeclaredElementType GetElementType() => FSharpDeclaredElementType.UnionCase;
+    public override DeclaredElementType GetElementType() => FSharpDeclaredElementType.UnionCaseClass;
 
     public IEnumerable<FSharpUnionCaseField> CaseFields =>
       EnumerateParts<UnionCasePart, FSharpUnionCaseField>(part => part.CaseFields);

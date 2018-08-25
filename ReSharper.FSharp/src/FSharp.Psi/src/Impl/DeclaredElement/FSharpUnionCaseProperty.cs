@@ -27,7 +27,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
         ? typeElement.GetRepresentationAccessRights()
         : AccessRights.NONE;
 
-    public override DeclaredElementType GetElementType() => FSharpDeclaredElementType.UnionCase;
+    public override DeclaredElementType GetElementType() => FSharpDeclaredElementType.UnionCaseProperty;
 
     public override bool IsStatic => true;
 

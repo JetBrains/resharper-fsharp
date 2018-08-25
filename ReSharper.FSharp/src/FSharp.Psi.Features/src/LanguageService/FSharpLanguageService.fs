@@ -60,14 +60,10 @@ type FSharpNamingService(language: FSharpLanguage) =
     member x.IsValidName(elementType: DeclaredElementType, name: string) =
         if name.IsEmpty() then false else
 
-        if elementType == FSharpDeclaredElementType.UnionCase &&
-                (Char.IsLower(name.[0]) || not (Char.IsUpper(name.[0]))) then
+        if elementType.IsUnionCase() && (Char.IsLower(name.[0]) || not (Char.IsUpper(name.[0]))) then
             false else
 
-        if (elementType == CLRDeclaredElementType.CLASS || elementType == CLRDeclaredElementType.STRUCT ||
-                elementType == CLRDeclaredElementType.INTERFACE || elementType == CLRDeclaredElementType.NAMESPACE ||
-                elementType == FSharpDeclaredElementType.UnionCase) &&
-                name.IndexOfAny(notAllowedInTypes) <> -1 then
+        if (elementType.IsEntity() || elementType.IsUnionCase()) && name.IndexOfAny(notAllowedInTypes) <> -1 then
             false else
 
         not (startsWith "`" name || endsWith "`" name || name.ContainsNewLine() || name.Contains("``"))
