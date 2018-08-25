@@ -32,6 +32,5 @@ type internal FSharpParser(file: IPsiSourceFile, checkerService: FSharpCheckerSe
                         override x.CreateFSharpFile() =
                             x.FinishFile(x.Builder.Mark(), ElementType.F_SHARP_IMPL_FILE) })
 
-            treeBuilder.CreateFSharpFile(ActualTokenBuffer = tokenBuffer,
-                                         CheckerService = checkerService,
+            treeBuilder.CreateFSharpFile(CheckerService = checkerService,
                                          ParseResults = parseResults) :> _

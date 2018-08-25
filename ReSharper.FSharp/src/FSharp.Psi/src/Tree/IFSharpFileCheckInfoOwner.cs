@@ -4,7 +4,6 @@ using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Checker;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
-using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Core;
@@ -18,8 +17,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
       Action interruptChecker = null);
 
     FSharpCheckerService CheckerService { get; set; }
-
-    TokenBuffer ActualTokenBuffer { get; set; }
 
     [CanBeNull]
     FSharpOption<FSharpParseFileResults> ParseResults { get; set; }

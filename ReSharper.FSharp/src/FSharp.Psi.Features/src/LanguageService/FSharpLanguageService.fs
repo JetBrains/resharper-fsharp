@@ -22,11 +22,13 @@ type FSharpLanguageService
          fsCheckerService: FSharpCheckerService, namingService: FSharpNamingService, logger: ILogger) =
     inherit LanguageService(languageType, constantValueService)
 
+    static let fakeLexerFactory = FSharpFakeLexerFactory()
+
     override x.IsCaseSensitive = true
     override x.SupportTypeMemberCache = true
     override x.CacheProvider = cacheProvider :> _
 
-    override x.GetPrimaryLexerFactory() = FSharpFakeLexerFactory() :> _
+    override x.GetPrimaryLexerFactory() = fakeLexerFactory :> _
     override x.CreateFilteringLexer(lexer) = lexer
     override x.CreateParser(lexer, psiModule, sourceFile) = FSharpParser(sourceFile, fsCheckerService, logger) :> _
 

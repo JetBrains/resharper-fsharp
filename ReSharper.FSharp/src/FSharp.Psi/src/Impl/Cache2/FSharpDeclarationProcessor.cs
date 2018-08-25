@@ -32,7 +32,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public override void VisitFSharpFile(IFSharpFile fsFile)
     {
-      fsFile.TokenBuffer = fsFile.ActualTokenBuffer; // todo: remove this when/if a proper lexer is implemented
       var sourceFile = fsFile.GetSourceFile();
       var fileKind = GetFSharpFileKind(fsFile);
       var hasPairFile = myCheckerService.HasPairFile(sourceFile);
