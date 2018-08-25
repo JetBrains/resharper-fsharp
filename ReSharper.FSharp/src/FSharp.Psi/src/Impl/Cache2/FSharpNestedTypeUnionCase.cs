@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
@@ -12,6 +12,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public FSharpNestedTypeUnionCase([NotNull] IClassPart part) : base(part)
     {
     }
+
+    public override DeclaredElementType GetElementType() => FSharpDeclaredElementType.UnionCase;
 
     public IEnumerable<FSharpUnionCaseField> CaseFields =>
       EnumerateParts<UnionCasePart, FSharpUnionCaseField>(part => part.CaseFields);

@@ -1,8 +1,10 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService
+namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService
 
+open System
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
@@ -17,7 +19,7 @@ open Microsoft.FSharp.Compiler
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpLanguageService
         (languageType, constantValueService, cacheProvider: FSharpCacheProvider, formatter: FSharpDummyCodeFormatter,
-         fsCheckerService: FSharpCheckerService, logger: ILogger) =
+         fsCheckerService: FSharpCheckerService, namingService: FSharpNamingService, logger: ILogger) =
     inherit LanguageService(languageType, constantValueService)
 
     override x.IsCaseSensitive = true
@@ -40,12 +42,30 @@ type FSharpLanguageService
     override x.FindTypeDeclarations(file) = EmptyList<_>.Instance :> _
 
     override x.IsValidName(elementType, name) =
-        not (startsWith "`" name || endsWith "`" name || name.ContainsNewLine() || name.Contains("``"))
+        namingService.IsValidName(elementType, name)
 
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpNamingService(language: FSharpLanguage) =
     inherit NamingLanguageServiceBase(language)
 
+    static let notAllowedInTypes =
+        [| '.'; '+'; '$'; '&'; '['; ']'; '/'; '\\'; '*'; '\"'; '`' |]
+
     override x.MangleNameIfNecessary(name, _) =
         Lexhelp.Keywords.QuoteIdentifierIfNeeded name
+
+    member x.IsValidName(elementType: DeclaredElementType, name: string) =
+        if name.IsEmpty() then false else
+
+        if elementType == FSharpDeclaredElementType.UnionCase &&
+                (Char.IsLower(name.[0]) || not (Char.IsUpper(name.[0]))) then
+            false else
+
+        if (elementType == CLRDeclaredElementType.CLASS || elementType == CLRDeclaredElementType.STRUCT ||
+                elementType == CLRDeclaredElementType.INTERFACE || elementType == CLRDeclaredElementType.NAMESPACE ||
+                elementType == FSharpDeclaredElementType.UnionCase) &&
+                name.IndexOfAny(notAllowedInTypes) <> -1 then
+            false else
+
+        not (startsWith "`" name || endsWith "`" name || name.ContainsNewLine() || name.Contains("``"))

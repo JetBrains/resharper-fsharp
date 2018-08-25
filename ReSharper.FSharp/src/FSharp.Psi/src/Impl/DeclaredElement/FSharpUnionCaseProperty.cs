@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -26,6 +26,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       GetContainingType() is TypeElement typeElement
         ? typeElement.GetRepresentationAccessRights()
         : AccessRights.NONE;
+
+    public override DeclaredElementType GetElementType() => FSharpDeclaredElementType.UnionCase;
 
     public override bool IsStatic => true;
 
