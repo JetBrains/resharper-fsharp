@@ -45,10 +45,20 @@ type FsiSessionsHost
 
 [<SolutionComponent>]
 type FsiDetector(toolset: RiderSolutionToolset, fsiOptions: FsiOptionsProvider) =
+    let programFiles86 = PlatformUtils.GetProgramFiles86()
+    let legacySdkPath = programFiles86 / "Microsoft SDKs" / "F#"
+    let vsSdks =
+        let vs2017 = programFiles86 / "Microsoft Visual Studio" / "2017"
+        let fsExtensionPath = "Common7/IDE/CommonExtensions/Microsoft/FSharp"
+        let vsEditions = ["Community"; "Professional"; "Enterprise"]
+
+        [ for edition in vsEditions do
+              yield vs2017 / edition / fsExtensionPath
+          yield vs2017 / "BuildTools" / fsExtensionPath ]
+
     interface IFsiDetector with
         member x.GetSystemFsiDirectoryPath() =
             // todo: also check:
-            //   * Common7/IDE/CommonExtensions/Microsoft/FSharp per VS installation
             //   * FSharp.Compiler.Tools package if installed in solution
             //   * FSharp.Compiler.Tools package in nuget caches
 
@@ -56,17 +66,22 @@ type FsiDetector(toolset: RiderSolutionToolset, fsiOptions: FsiOptionsProvider) 
             if PlatformUtil.IsRunningOnMono then
                 toolset.CurrentMonoRuntime.RootPath / "bin" / fsiName
             else
-                let fsSDKsDir = PlatformUtils.GetProgramFiles86() / "Microsoft SDKs" / "F#"
-                fsSDKsDir.GetChildDirectories()
-                |> Seq.choose (fun path ->
-                    match Double.TryParse(path.Name, NumberStyles.Any, CultureInfo.InvariantCulture) with
-                    | true, version ->
-                        let fsiPath = path / "Framework" / "v4.0" / fsiName
-                        if fsiPath.ExistsFile then Some (version, fsiPath) else None
-                    | _ -> None)
-                |> Seq.sortBy fst
-                |> Seq.tryHead
-                |> Option.map snd
+                let fsiPaths = vsSdks |> List.map (fun path -> path / fsiName)
+                match fsiPaths |> List.tryFind (fun path -> path.ExistsFile) with
+                | Some path -> path
+                | _ ->
+
+                if legacySdkPath.ExistsDirectory then
+                    legacySdkPath.GetChildDirectories() |> Seq.choose (fun path ->
+                        match Double.TryParse(path.Name, NumberStyles.Any, CultureInfo.InvariantCulture) with
+                        | true, version ->
+                            let fsiPath = path / "Framework" / "v4.0" / fsiName
+                            if fsiPath.ExistsFile then Some (version, fsiPath) else None
+                        | _ -> None)
+                    |> Seq.sortBy fst
+                    |> Seq.tryHead
+                    |> Option.map snd
+                else None
                 |> Option.defaultValue FileSystemPath.Empty
 
 
