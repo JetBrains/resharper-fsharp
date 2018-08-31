@@ -69,7 +69,6 @@ intellij {
         logger.lifecycle("*** Using Rider SDK from intellij-snapshots repository")
         version = "$baseVersion-SNAPSHOT"
     }
-    intellijRepo = "https://www.jetbrains.com/intellij-repository"
 
     downloadSources = false
     updateSinceUntilBuild = false
