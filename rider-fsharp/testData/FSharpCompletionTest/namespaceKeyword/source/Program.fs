@@ -1,1 +1,1 @@
-{caret}
+<caret>
