@@ -1,13 +1,13 @@
 package templates
 
 import com.intellij.execution.runners.ExecutionEnvironment
+import com.jetbrains.rdclient.util.idea.toVirtualFile
 import com.jetbrains.rider.run.configurations.project.DotNetProjectConfiguration
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.RiderTemplatesTestCoreBase
 import com.jetbrains.rider.test.enums.ToolsetVersion
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.*
-import com.jetbrains.rider.util.idea.toVirtualFile
 import org.testng.annotations.Test
 
 @Test
