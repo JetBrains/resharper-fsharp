@@ -56,7 +56,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
       // todo: namespaces, use R# search?
 
       var offset = token.GetTreeStartOffset().Offset;
-      var symbol = fsFile.GetSymbolDeclaration(offset) ?? fsFile.GetSymbolUse(offset);
+      var symbol = fsFile.GetSymbolDeclaration(offset) ?? fsFile.GetSymbolUse(offset)?.Symbol;
       if (symbol == null)
         return;
 
