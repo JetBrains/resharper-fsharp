@@ -195,7 +195,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       }
     }
 
-    public FSharpSymbol GetSymbolUse(int offset)
+    public FSharpSymbolUse GetSymbolUse(int offset)
     {
       lock (myGetSymbolsLock)
       {
@@ -207,7 +207,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
           return null;
 
         return resolvedSymbols.Declarations?.TryGetValue(offset) == null
-          ? resolvedSymbol.SymbolUse.Symbol
+          ? resolvedSymbol.SymbolUse
           : null;
       }
     }

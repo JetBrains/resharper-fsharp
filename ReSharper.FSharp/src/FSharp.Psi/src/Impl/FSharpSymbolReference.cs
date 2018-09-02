@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
@@ -6,6 +6,8 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Resolve;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.ReSharper.Resources.Shell;
+using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 {
@@ -15,17 +17,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     {
     }
 
+    public FSharpSymbolUse GetSymbolUse() =>
+      (myOwner.GetContainingFile() as IFSharpFile)?.GetSymbolUse(myOwner.GetTreeStartOffset().Offset);
+
     public override ResolveResultWithInfo ResolveWithoutCache()
     {
       if (!myOwner.IsValid())
         return ResolveResultWithInfo.Ignore;
 
-      var psiModule = myOwner.GetPsiModule();
-      var offset = myOwner.GetTreeStartOffset().Offset;
-      var symbol = (myOwner.GetContainingFile() as IFSharpFile)?.GetSymbolUse(offset);
-
+      var symbol = GetSymbolUse()?.Symbol;
       var element = symbol != null
-        ? FSharpElementsUtil.GetDeclaredElement(symbol, psiModule, myOwner)
+        ? FSharpElementsUtil.GetDeclaredElement(symbol, myOwner.GetPsiModule(), myOwner)
         : null;
       return element != null
         ? new ResolveResultWithInfo(new SimpleResolveResult(element), ResolveErrorType.OK) // todo: add substitutions

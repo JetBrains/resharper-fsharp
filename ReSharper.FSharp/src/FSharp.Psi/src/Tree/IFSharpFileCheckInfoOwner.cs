@@ -25,7 +25,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     FSharpOption<FSharpParseFileResults> ParseResults { get; set; }
 
     [CanBeNull]
-    FSharpSymbol GetSymbolUse(int offset);
+    FSharpSymbolUse GetSymbolUse(int offset);
 
     [CanBeNull]
     FSharpSymbol GetSymbolDeclaration(int offset);
