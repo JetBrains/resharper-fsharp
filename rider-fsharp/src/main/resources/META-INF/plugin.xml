@@ -17,7 +17,7 @@
     <lang.altEnter language="F#" implementationClass="com.jetbrains.rider.intentions.altEnter.ReSharperAltEnterActionHandler" />
 
     <backend.actions.support language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.actions.FSharpActionSupportPolicy" />
-    <backend.markup.adapterFactory language="F#" implementationClass="com.jetbrains.rider.daemon.RiderMarkupAdapterFactory" />
+    <backend.markup.adapterFactory language="F#" implementationClass="com.jetbrains.rdclient.daemon.FrontendMarkupAdapterFactory" />
     <backend.typedHandler language="F#" implementationClass="com.jetbrains.rider.editorActions.FSharpTypedHandler" />
     <completion.contributor language="F#" implementationClass="com.jetbrains.rider.completion.ReSharperCompletionContributor" />
     <completion.completionSessionStrategy language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.services.completion.FSharpCompletionStrategy" />
@@ -34,7 +34,7 @@
     <lang.altEnter language="F# Script" implementationClass="com.jetbrains.rider.intentions.altEnter.ReSharperAltEnterActionHandler" />
 
     <backend.actions.support language="F# Script" implementationClass="com.jetbrains.rider.plugins.fsharp.actions.FSharpActionSupportPolicy" />
-    <backend.markup.adapterFactory language="F# Script" implementationClass="com.jetbrains.rider.daemon.RiderMarkupAdapterFactory" />
+    <backend.markup.adapterFactory language="F# Script" implementationClass="com.jetbrains.rdclient.daemon.FrontendMarkupAdapterFactory" />
     <backend.typedHandler language="F# Script" implementationClass="com.jetbrains.rider.editorActions.FSharpTypedHandler" />
     <completion.contributor language="F# Script" implementationClass="com.jetbrains.rider.completion.ReSharperCompletionContributor" />
     <completion.completionSessionStrategy language="F# Script" implementationClass="com.jetbrains.rider.plugins.fsharp.services.completion.FSharpCompletionStrategy" />
