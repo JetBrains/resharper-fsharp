@@ -22,8 +22,8 @@ buildscript {
 }
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.2.41"
-    id("org.jetbrains.intellij") version "0.3.2"
+    id("org.jetbrains.kotlin.jvm") version "1.2.61"
+    id("org.jetbrains.intellij") version "0.3.9"
     id("org.jetbrains.grammarkit") version "2018.1.7"
 }
 
