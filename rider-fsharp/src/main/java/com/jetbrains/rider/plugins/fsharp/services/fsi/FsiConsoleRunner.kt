@@ -39,12 +39,12 @@ import com.intellij.util.ui.UIUtil
 import com.intellij.xdebugger.XDebuggerManager
 import com.intellij.xdebugger.attach.LocalAttachHost
 import com.intellij.xdebugger.attach.XAttachDebuggerProvider
+import com.jetbrains.rdclient.util.idea.pumpMessages
 import com.jetbrains.rider.debugger.DotNetDebugProcess
 import com.jetbrains.rider.model.RdFsiSessionInfo
 import com.jetbrains.rider.plugins.fsharp.FSharpIcons
 import com.jetbrains.rider.util.idea.application
 import com.jetbrains.rider.util.idea.getComponent
-import com.jetbrains.rider.util.idea.pumpMessages
 import org.jetbrains.concurrency.AsyncPromise
 import org.jetbrains.concurrency.Promise
 import org.jetbrains.concurrency.resolvedPromise
