@@ -3,9 +3,8 @@ package templates
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.jetbrains.rdclient.util.idea.toVirtualFile
 import com.jetbrains.rider.run.configurations.project.DotNetProjectConfiguration
-import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.RiderTemplatesTestCoreBase
-import com.jetbrains.rider.test.enums.ToolsetVersion
+import com.jetbrains.rider.test.enums.CoreVersion
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.*
 import org.testng.annotations.Test
@@ -13,10 +12,9 @@ import org.testng.annotations.Test
 @Test
 abstract class FSharpTemplatesTestCore : RiderTemplatesTestCoreBase() {
 
-    @TestEnvironment(toolset = ToolsetVersion.TOOLSET_15_CORE)
     fun classlibCoreTemplate() {
         var templateId = ProjectTemplateIds.Core.fsharp_classLibrary
-        if (runWithDotNetCliVersion().startsWith("2.1"))
+        if (testMethod.environment.coreVersion.value == CoreVersion.DOT_NET_CORE_2_1.value)
             templateId = ProjectTemplateIds.Core.fsharp_classLibrary21
 
         val projectName = "ClassLibrary"
@@ -27,7 +25,6 @@ abstract class FSharpTemplatesTestCore : RiderTemplatesTestCoreBase() {
     }
 
     @Test(enabled = false) //RIDER-14467
-    @TestEnvironment(toolset = ToolsetVersion.TOOLSET_15_CORE)
     fun classlibNetCoreAppTemplate() {
         val projectName = "ClassLibrary"
         doCoreTest(ProjectTemplateIds.Core.fsharp_classLibrary, projectName, "netcoreapp2.0") { project ->
@@ -37,10 +34,9 @@ abstract class FSharpTemplatesTestCore : RiderTemplatesTestCoreBase() {
     }
 
 
-    @TestEnvironment(toolset = ToolsetVersion.TOOLSET_15_CORE)
     fun consoleAppCoreTemplate() {
         var templateId = ProjectTemplateIds.Core.fsharp_consoleApplication
-        if (runWithDotNetCliVersion().startsWith("2.1"))
+        if (testMethod.environment.coreVersion.value == CoreVersion.DOT_NET_CORE_2_1.value)
             templateId = ProjectTemplateIds.Core.fsharp_consoleApplication21
 
         val projectName = "ConsoleApplication"
@@ -79,10 +75,13 @@ abstract class FSharpTemplatesTestCore : RiderTemplatesTestCoreBase() {
 
 
     @Test(enabled = false) //RIDER-14467
-    @TestEnvironment(toolset = ToolsetVersion.TOOLSET_15_CORE)
     fun xUnitCoreTemplate() {
+        var templateId = ProjectTemplateIds.Core.fsharp_xUnit
+        if (testMethod.environment.coreVersion.value == CoreVersion.DOT_NET_CORE_2_1.value)
+            templateId = ProjectTemplateIds.Core.fsharp_xUnit21
+        
         val projectName = "UnitTestProject"
-        doCoreTest(ProjectTemplateIds.Core.fsharp_xUnit, projectName) { project ->
+        doCoreTest(templateId, projectName) { project ->
             checkSwea(project, 1)
             checkSweaAnalysedFiles(backendLog, 2, 0, "Tests.fs")
 

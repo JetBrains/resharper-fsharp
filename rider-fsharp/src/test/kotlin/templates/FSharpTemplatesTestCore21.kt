@@ -1,7 +1,10 @@
 package templates
 
-class FSharpTemplatesTestCore21 : FSharpTemplatesTestCore() {
+import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.enums.CoreVersion
+import com.jetbrains.rider.test.enums.ToolsetVersion
+import org.testng.annotations.Test
 
-    override fun runWithDotNetCliVersion() = "2.1"
-
-}
+@Test
+@TestEnvironment(toolset = ToolsetVersion.TOOLSET_15_CORE, coreVersion = CoreVersion.DOT_NET_CORE_2_1)
+class FSharpTemplatesTestCore21 : FSharpTemplatesTestCore()
