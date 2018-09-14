@@ -17,7 +17,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.jetbrains.rd:rd-gen:0.183.29")
+        classpath("com.jetbrains.rd:rd-gen:0.183.47")
     }
 }
 
