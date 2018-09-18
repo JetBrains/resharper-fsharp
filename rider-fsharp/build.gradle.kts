@@ -14,26 +14,29 @@ import org.jetbrains.grammarkit.tasks.*
 buildscript {
     repositories {
         maven { setUrl("https://cache-redirector.jetbrains.com/www.myget.org/F/rd-snapshots/maven") }
+        maven { setUrl("https://cache-redirector.jetbrains.com/dl.bintray.com/kotlin/kotlin-eap") }
         mavenCentral()
     }
     dependencies {
         classpath("com.jetbrains.rd:rd-gen:0.183.47")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3-M2")
     }
 }
 
 plugins {
-    id("org.jetbrains.kotlin.jvm") version "1.2.70"
     id("org.jetbrains.intellij") version "0.3.9"
     id("org.jetbrains.grammarkit") version "2018.1.7"
 }
 
 apply {
+    plugin("kotlin")
     plugin("com.jetbrains.rdgen")
     plugin("org.jetbrains.grammarkit")
 }
 
 repositories {
     mavenCentral()
+    maven { setUrl("https://cache-redirector.jetbrains.com/dl.bintray.com/kotlin/kotlin-eap") }
 }
 
 java {
@@ -218,7 +221,7 @@ tasks {
         ignoreFailures = true
     }
 
-    "writeRiderSdkVersionProps" {
+    create("writeRiderSdkVersionProps") {
         group = riderFSharpTargetsGroup
         doLast {
             riderSdkVersionPropsPath.writeTextIfChanged("""<Project>
@@ -230,7 +233,7 @@ tasks {
         }
     }
 
-    "writeNuGetConfig" {
+    create("writeNuGetConfig") {
         group = riderFSharpTargetsGroup
         doLast {
             nugetConfigPath.writeTextIfChanged("""<?xml version="1.0" encoding="utf-8"?>
@@ -243,14 +246,14 @@ tasks {
         }
     }
 
-    "assemble" {
+    getByName("assemble") {
         doLast {
             logger.lifecycle("Plugin version: $version")
             logger.lifecycle("##teamcity[buildNumber '$version']")
         }
     }
 
-    "prepare" {
+    create("prepare") {
         group = riderFSharpTargetsGroup
         dependsOn("rdgen", "writeNuGetConfig", "writeRiderSdkVersionProps")
         doLast {
@@ -261,7 +264,7 @@ tasks {
         }
     }
 
-    "buildReSharperPlugin" {
+    create("buildReSharperPlugin") {
         group = riderFSharpTargetsGroup
         dependsOn("prepare")
         doLast {
@@ -273,7 +276,7 @@ tasks {
     }
 
     task<Wrapper>("wrapper") {
-        gradleVersion = "4.7"
+        gradleVersion = "4.10"
         distributionType = Wrapper.DistributionType.ALL
         distributionUrl = "https://cache-redirector.jetbrains.com/services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
     }
