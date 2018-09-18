@@ -42,6 +42,9 @@ type FSharpFormatSettingsKey() =
     
     [<SettingsEntry(true, "Space around delimiter"); DefaultValue>]
     val mutable SpaceAroundDelimiter: bool
+
+    [<SettingsEntry(false, "Preserve end of line"); DefaultValue>]
+    val mutable PreserveEndOfLine: bool
     
 
 [<Language(typeof<FSharpLanguage>)>]
@@ -91,7 +94,8 @@ type FSharpCodeStylePageSchema(lifetime, smartContext, itemViewModelFactory, con
                    x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.SpaceAfterSemicolon)
                    x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.IndentOnTryWith)
                    x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.SpaceAroundDelimiter)
-                   x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.ReorderOpenDeclarations) ]
+                   x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.ReorderOpenDeclarations)
+                   x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.PreserveEndOfLine) ]
 
 
 [<OptionsPage("FSharpCodeStylePage", "Formatting Style", typeof<PsiFeaturesUnsortedOptionsThemedIcons.Indent>)>]

@@ -45,7 +45,8 @@ type ReformatCode() =
                                              SpaceAfterComma = settings.SpaceAfterComma
                                              SpaceAfterSemicolon = settings.SpaceAfterSemicolon
                                              IndentOnTryWith = settings.IndentOnTryWith
-                                             SpaceAroundDelimiter = settings.SpaceAroundDelimiter }
+                                             SpaceAroundDelimiter = settings.SpaceAroundDelimiter
+                                             PreserveEndOfLine = settings.PreserveEndOfLine }
     
                     let stamp = document.LastModificationStamp
                     let modificationSide = TextModificationSide.NotSpecified
