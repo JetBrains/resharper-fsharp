@@ -43,7 +43,7 @@ type FSharpFormatSettingsKey() =
     [<SettingsEntry(true, "Space around delimiter"); DefaultValue>]
     val mutable SpaceAroundDelimiter: bool
 
-    [<SettingsEntry(false, "Preserve end of line"); DefaultValue>]
+    [<SettingsEntry(true, "Preserve end of line"); DefaultValue>]
     val mutable PreserveEndOfLine: bool
     
 
