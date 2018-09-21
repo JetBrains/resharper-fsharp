@@ -1,0 +1,1 @@
+typeof<int(*comment*)> typeof<int<int(*comment*)>>

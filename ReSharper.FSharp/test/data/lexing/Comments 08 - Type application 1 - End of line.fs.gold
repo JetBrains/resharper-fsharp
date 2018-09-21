@@ -1,0 +1,4 @@
+﻿0000: IDENTIFIER 'typeof'
+0006: LESS '<'
+0007: IDENTIFIER 'int'
+0010: LINE_COMMENT '//>'
