@@ -25,7 +25,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         {
             get 
             {
-                if (NodeType == FSharpTokenType.COMMENT) 
+                if (NodeType == FSharpTokenType.BLOCK_COMMENT) 
                     return CommentType.MultilineComment;
 
                 var text = GetText();

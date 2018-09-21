@@ -73,7 +73,8 @@
         <Token name="WHEN" representation="when" />
         <Token name="WHILE" representation="while" />
         <Token name="WITH" representation="with" />
-        <Token name="YIELD" representation="yield" /> <!--check-->
+        <Token name="YIELD" representation="yield" />
+        <Token name="YIELD_BANG" representation="yield!" /> <!--check-->
         <Token name="UNDERSCORE" representation="_" />
 
         <Token name="GREATER" representation=">" />
@@ -87,6 +88,7 @@
         <Token name="RBRACK" representation="]" />
 
         <Token name="LBRACK_LESS" representation="[&lt;" />
+        <Token name="GREATER_BAR_RBRACK" representation=">|]" />
         <Token name="GREATER_RBRACK" representation=">]" />
         <Token name="LBRACK_BAR" representation="[|" />
         <Token name="BAR_RBRACK" representation="|]" />
@@ -111,33 +113,104 @@
         <Token name="COLON_QMARK_GREATER" representation=":?>" />
         <Token name="COLON_QMARK" representation=":?" />
         <Token name="COLON_EQUALS" representation=":=" />
+        <Token name="LPAREN_STAR_RPAREN" representation="(*)" />
+        <Token name="PERCENT" representation="%" />
+        <Token name="PERCENT_PERCENT" representation="%%" />
         <Token name="SEMICOLON" representation=";" />
+        <Token name="SEMICOLON_SEMICOLON" representation=";;" />
         <Token name="LARROW" representation="&lt;-" />
         <Token name="EQUALS" representation="=" />
         <Token name="DOLLAR" representation="$" />
         <Token name="MINUS" representation="-" />
+        <Token name="QMARK" representation="?" />
+        <Token name="QMARK_QMARK" representation="??" />
+        <Token name="QUOTE" representation="'" />
 
         <Token name="PLUS" representation="+" />
+
+        <Token name="KEYWORD_STRING_SOURCE_DIRECTORY" representation="__SOURCE_DIRECTORY__" />
+        <Token name="KEYWORD_STRING_SOURCE_FILE" representation="__SOURCE_FILE__" />
+        <Token name="KEYWORD_STRING_LINE" representation="__LINE__" />
+
+        <Token name="PP_HELP" representation="#help" />
+        <Token name="PP_QUIT" representation="#quit" />
+        <Token name="PP_TIME" representation="#time" />
+        <Token name="PP_I" representation="#i" />
+        <Token name="PP_IF_SECTION" representation="#if" />
+        <Token name="PP_ELSE_SECTION" representation="#else" />
+        <Token name="PP_ENDIF" representation="#endif" />
+        <Token name="PP_NOWARN" representation="#nowarn" />
+
+        <Token name="PP_OR" representation="||" />
+        <Token name="PP_AND" representation="&amp;&amp;" />
+        <Token name="PP_NOT" representation="!" />
+        <Token name="PP_LPAR" representation="(" />
+        <Token name="PP_RPAR" representation=")" />
     </Tokens>
 
     <Tokens NodeType="FSharpTokenNodeType">
         <Token name="IDENTIFIER" />
-        <Token name="LITERAL" />
-        <Token name="OPERATOR" />
-        <Token name="COMMENT" />
+        <Token name="SYMBOLIC_OP" />
+        <Token name="BAD_SYMBOLIC_OP" />
+        <Token name="BLOCK_COMMENT" />
+        <Token name="SHEBANG" />
         <Token name="LINE_COMMENT" />
         <Token name="HASH" />
         <Token name="TEXT" />
         <Token name="DEAD_CODE" />
 
-        <Token name="CHAR" />
+        <Token name="IEEE32" />
+        <Token name="IEEE64" />
+        <Token name="DECIMAL" />
+        <Token name="BYTE" />
+        <Token name="INT16" />
+        <Token name="INT32" />
+        <Token name="INT64" />
+        <Token name="SBYTE" />
+        <Token name="UINT16" />
+        <Token name="UINT32" />
+        <Token name="UINT64" />
+        <Token name="BIGNUM" />
+        <Token name="NATIVEINT" />
+        <Token name="UNATIVEINT" />
+
+        <Token name="UNFINISHED_BLOCK_COMMENT" />
+        <Token name="UNFINISHED_STRING_IN_COMMENT" />
+        <Token name="UNFINISHED_VERBATIM_STRING_IN_COMMENT" />
+        <Token name="UNFINISHED_TRIPLE_QUOTED_STRING_IN_COMMENT" />
+        
+        <Token name="CHARACTER_LITERAL" />
         <Token name="STRING" />
         <Token name="VERBATIM_STRING" />
-        <Token name="TRIPLE_QUOTE_STRING" />
+        <Token name="TRIPLE_QUOTED_STRING" />
         <Token name="BYTEARRAY" />
+        <Token name="VERBATIM_BYTEARRAY" />
+        <Token name="BYTECHAR" />
+        
+        <Token name="UNFINISHED_STRING" />
+        <Token name="UNFINISHED_VERBATIM_STRING" />
+        <Token name="UNFINISHED_TRIPLE_QUOTED_STRING" />
+
+        <Token name="RESERVED_LITERAL_FORMATS" />
+        <Token name="RESERVED_SYMBOLIC_SEQUENCE" />
+        <Token name="RESERVED_IDENT_FORMATS" />
+
+        <Token name="BAD_TAB" />
+        <Token name="BAD_CHARACTER" />
 
         <!-- Used in FsharpFakeLexer and as a separator in psi grammar -->
         <Token name="OTHER_KEYWORD" />
         <Token name="FAKE" />
+    </Tokens>
+    
+    <Tokens NodeType="PPFSharpNodeType">
+        <Token name="PP_LOAD" />
+        <Token name="PP_REFERENCE" />
+        <Token name="PP_LINE" />
+        <Token name="PP_LIGHT" />
+        <Token name="PP_CONDITIONAL_SYMBOL" />
+        <Token name="PP_DIRECTIVE" />
+        <Token name="PP_BAD_CHARACTER" />
+        <Token name="PP_EOF" />
     </Tokens>
 </FSharpTokens>

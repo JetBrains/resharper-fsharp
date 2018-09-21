@@ -22,7 +22,7 @@ type FSharpProjectFileLanguageService
     override x.GetMixedLexerFactory(_, _, [<Optional; DefaultParameterValue(null: IPsiSourceFile)>] sourceFile) =
         match sourceFile with
         | null -> FSharpLanguage.Instance.LanguageService().GetPrimaryLexerFactory()
-        | _ -> FSharpLexerFactory(sourceFile, fsCheckerService.GetDefines(sourceFile)) :> _
+        | _ -> FSharpLexerFactory() :> _
 
     override x.GetPsiProperties(projectFile, sourceFile, isCompileService) =
         let providesCodeModel =

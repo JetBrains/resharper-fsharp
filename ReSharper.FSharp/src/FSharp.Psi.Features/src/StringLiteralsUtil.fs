@@ -25,10 +25,10 @@ type FSharpLiteralType =
 
     [<Extension>]
     static member GetLiteralType(literalTokenType: TokenNodeType) =
-        if literalTokenType == FSharpTokenType.CHAR then FSharpLiteralType.Character else
+        if literalTokenType == FSharpTokenType.CHARACTER_LITERAL then FSharpLiteralType.Character else
         if literalTokenType == FSharpTokenType.STRING then FSharpLiteralType.RegularString else
         if literalTokenType == FSharpTokenType.VERBATIM_STRING then FSharpLiteralType.VerbatimString else
-        if literalTokenType == FSharpTokenType.TRIPLE_QUOTE_STRING then FSharpLiteralType.TripleQuoteString else
+        if literalTokenType == FSharpTokenType.TRIPLE_QUOTED_STRING then FSharpLiteralType.TripleQuoteString else
         if literalTokenType == FSharpTokenType.BYTEARRAY then FSharpLiteralType.ByteArray else
 
         failwithf "Token %O is not a string literal" literalTokenType

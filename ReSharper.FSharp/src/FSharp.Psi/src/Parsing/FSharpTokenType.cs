@@ -34,9 +34,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       }
 
       public override bool IsWhitespace => this == WHITESPACE || this == NEW_LINE;
-      public override bool IsComment => this == LINE_COMMENT || this == COMMENT;
+      public override bool IsComment => this == LINE_COMMENT || this == BLOCK_COMMENT;
       public override bool IsStringLiteral => Strings[this];
-      public override bool IsConstantLiteral => this == LITERAL;
+      public override bool IsConstantLiteral => Literals[this];
       public override bool IsIdentifier => Identifiers[this];
       public override bool IsKeyword => Keywords[this];
 
@@ -80,6 +80,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       public override LeafElementBase Create(string text) => new NewLine(text);
     }
 
+    private sealed class PPFSharpNodeType : FSharpTokenNodeType
+    {
+      private readonly bool isFilteredToken;
+      public PPFSharpNodeType(string name, int index, bool isFilteredToken = false) : base(name, index)
+      {
+        this.isFilteredToken = isFilteredToken;
+      }
+      
+      public override bool IsFiltered => isFilteredToken;
+    }
+
     public const int WHITESPACE_NODE_TYPE_INDEX = LAST_GENERATED_TOKEN_TYPE_INDEX + 1;
     public static readonly TokenNodeType WHITESPACE = new WhitespaceNodeType(WHITESPACE_NODE_TYPE_INDEX);
 
@@ -94,10 +105,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public static readonly NodeTypeSet Keywords;
     public static readonly NodeTypeSet Identifiers;
     public static readonly NodeTypeSet Strings;
+    public static readonly NodeTypeSet Literals;
 
     static FSharpTokenType()
     {
-      CommentsOrWhitespaces = new NodeTypeSet(COMMENT, WHITESPACE, NEW_LINE);
+      CommentsOrWhitespaces = new NodeTypeSet(BLOCK_COMMENT, WHITESPACE, NEW_LINE);
       AccessModifiersKeywords = new NodeTypeSet(PUBLIC, PRIVATE, INTERNAL);
 
       LeftBraces = new NodeTypeSet(
@@ -191,16 +203,32 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 
       Identifiers = new NodeTypeSet(
         IDENTIFIER,
-        OPERATOR,
+        SYMBOLIC_OP,
         GREATER,
         LESS);
 
       Strings = new NodeTypeSet(
-        CHAR,
+        CHARACTER_LITERAL,
         STRING,
         VERBATIM_STRING,
-        TRIPLE_QUOTE_STRING,
+        TRIPLE_QUOTED_STRING,
         BYTEARRAY);
+      
+      Literals = new NodeTypeSet(
+        IEEE32,
+        IEEE64,
+        DECIMAL,
+        BYTE,
+        INT16,
+        INT32,
+        INT64,
+        SBYTE,
+        UINT16,
+        UINT32,
+        UINT64,
+        BIGNUM,
+        NATIVEINT,
+        UNATIVEINT);
     }
   }
 }

@@ -1,167 +1,41 @@
-package com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer;
+using System.Collections;
+using JetBrains.Util;
+using JetBrains.Text;
+using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Parsing;
+using JetBrains.ReSharper.Psi.CSharp;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
+using static JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.FSharpTokenType;
 
-import com.intellij.psi.tree.IElementType;
-import com.intellij.lexer.*;
-
-import static com.intellij.psi.TokenType.BAD_CHARACTER;
-import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType.*;
 %%
 
+%unicode
+
+%init{
+   currTokenType = null;
+%init}
+
 %{
-  public _FSharpLexer() {
-    this((java.io.Reader)null);
-  }
+
 %}
 
-%public
-%class _FSharpLexer
-%implements FlexLexer
-%function advance
-%type IElementType
 %eofval{
-  if(yystate() == IN_BLOCK_COMMENT || yystate() == IN_BLOCK_COMMENT_FROM_LINE) {
+  if(yy_lexical_state == IN_BLOCK_COMMENT || yy_lexical_state == IN_BLOCK_COMMENT_FROM_LINE)
+  {
     return fillBlockComment(UNFINISHED_BLOCK_COMMENT);
   }
   else
     return makeToken(null);
 %eofval}
-%unicode
 
-%{
-  private int zzNestedCommentLevel = 0;
-  private int zzParenLevel = 0;
-%}
-
-%{
-  // for sharing rules with ReSharper
-  private IElementType makeToken(IElementType type) {
-    return type;
-  }
-
-  private IElementType FindKeywordByCurrentToken() {
-    return FSharpKeywordsMap.findKeyword(zzBuffer, zzStartRead, zzMarkedPos);
-  }
-
-  private IElementType FindReservedKeywordByCurrentToken() {
-    return FSharpReservedKeywordsMap.findKeyword(zzBuffer, zzStartRead, zzMarkedPos);
-  }
-
-  private void initBlockComment() {
-    if (yystate() == LINE) {
-      yybegin(IN_BLOCK_COMMENT_FROM_LINE);
-    } else {
-       yybegin(IN_BLOCK_COMMENT);
-    }
-    zzNestedCommentLevel++;
-  }
-
-  private IElementType initIdent() {
-    IElementType keyword = FindKeywordByCurrentToken();
-    // use if you need to separate the reserved keyword
-    // IElementType reservedKeyword = FindReservedKeywordByCurrentToken();
-    return makeToken(keyword != null ? keyword : IDENT);
-  }
-
-  private IElementType identInTypeApp() {
-    IElementType keyword = FindKeywordByCurrentToken();
-    if (keyword != null) {
-        return makeToken(keyword);
-    }
-    return makeToken(IDENT);
-  }
-
-  private IElementType identInInitTypeApp() {
-    IElementType keyword = FindKeywordByCurrentToken();
-    if (keyword != null) {
-        yybegin(LINE);
-        return makeToken(keyword);
-    }
-    return makeToken(IDENT);
-  }
-
-  private IElementType fillBlockComment(IElementType tokenType) {
-    if (yystate() == IN_BLOCK_COMMENT_FROM_LINE) {
-      yybegin(LINE);
-    } else {
-      riseFromParenLevel(0);
-    }
-    zzNestedCommentLevel = 0;
-    return makeToken(tokenType);
-  }
-
-  private void initSmashAdjacent(int state, int finalState) {
-    if (--zzParenLevel <= 0) {
-      yybegin(finalState);
-    }
-    else {
-      yybegin(state);
-    }
-  }
-
-  private void deepIntoParenLevel() {
-    if (++zzParenLevel > 1 && yystate() == INIT_ADJACENT_TYAPP)
-      yybegin(ADJACENT_TYAPP);
-  }
-
-  private void riseFromParenLevel(int n) {
-    zzParenLevel -= n;
-    if (zzParenLevel > 1) {
-      yybegin(ADJACENT_TYAPP);
-    } else if (zzParenLevel <= 0) {
-      yybegin(LINE);
-    } else {
-      yybegin(INIT_ADJACENT_TYAPP);
-    }
-  }
-
-  private void initAdjacentTypeApp()
-  {
-    if (yytext().charAt(yylength() - 1) == '/')
-      yypushback(2);
-    else {
-      yypushback(1);
-    }
-    zzParenLevel = 0;
-    yybegin(INIT_ADJACENT_TYAPP);
-  }
-
-  private void adjacentTypeCloseOp()
-  {
-    zzParenLevel -= yylength();
-    yypushback(yylength());
-    if (zzParenLevel > 0) {
-      yybegin(SYMBOLIC_OPERATOR);
-    }
-    else {
-      yybegin(GREATER_OP_SYMBOLIC_OP);
-    }
-  }
-
-  private void exitSmash(int state) {
-    if (yystate() == state) {
-      yybegin(LINE);
-    } else {
-      riseFromParenLevel(0);
-    }
-  }
-
-  private void initSmash(int initState, int anotherState) {
-    if (yystate() == LINE) {
-      yybegin(initState);
-    } else {
-      yybegin(anotherState);
-    }
-  }
-
-  private void exitGreaterOp()
-  {
-    if (yystate() == GREATER_OP) {
-      riseFromParenLevel(0);
-    } else {
-      yybegin(SYMBOLIC_OPERATOR);
-    }
-  }
-%}
+%namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
+%class FSharpLexerGenerated
+%public
+%implements IIncrementalLexer
+%function _locateToken
+%virtual
+%type TokenNodeType
 
 %state IN_BLOCK_COMMENT
 %state IN_BLOCK_COMMENT_FROM_LINE
@@ -192,15 +66,17 @@ WHITESPACE=((" ")+)
 TAB=((\t)+)
 ANYWHITE=({WHITESPACE}|{TAB})
 
+%include PsiTasks/Unicode.lex
+
 NEW_LINE=(\n|\r\n)
 LINE_COMMENT=(\/\/([^\n\r])*)
 SHEBANG=("#!"([^\n\r])*)
-LETTER_CHAR=\p{Lu}|\p{Ll}|\p{Lt}|\p{Lm}|\p{Lo}|\p{Nl}
-DIGIT=\p{Nd}
+LETTER_CHAR=({UNICODE_LU}|{UNICODE_LL}|{UNICODE_LT}|{UNICODE_LM}|{UNICODE_LO}|{UNICODE_NL})
+DIGIT=({UNICODE_ND})
 IDENT_START_CHAR=({LETTER_CHAR}|"_")
-CONNECTING_CHAR=\p{Pc}
-COMBINING_CHAR=\p{Mn}|\p{Mc}
-FORMATTING_CHAR=\p{Cf}
+CONNECTING_CHAR=({UNICODE_PC})
+COMBINING_CHAR=({UNICODE_MN}|{UNICODE_MC})
+FORMATTING_CHAR=({UNICODE_CF})
 IDENT_CHAR=({LETTER_CHAR}|{CONNECTING_CHAR}|{COMBINING_CHAR}|{FORMATTING_CHAR}|{DIGIT}|['_])
 TAIL_IDENT=(({IDENT_CHAR})+)
 IDENT_TEXT=(({IDENT_START_CHAR})({TAIL_IDENT})?)
@@ -280,7 +156,7 @@ COMMA=","
 
 RESERVED_SYMBOLIC_SEQUENCE=[~`]
 
-OP_CHAR=([!%&*+\-./<=>@\^|~\?])
+OP_CHAR=([!%&*+\-./<=>@^|~\?])
 BAD_OP_CHAR=({OP_CHAR}|([$:]))
 LQUOTE_TYPED="<@"
 RQUOTE_TYPED="@>"
@@ -328,20 +204,20 @@ PP_DIRECTIVE=(({ANYWHITE})*({HASH}({IDENT}|({ANYWHITE})*([0-9])+)))
 PP_CONDITIONAL_SYMBOL={IDENT}
 
 %%
-<YYINITIAL> {PP_DIRECTIVE} { yypushback(yylength()); yybegin(PPDIRECTIVE); }
-<YYINITIAL> [^]            { yypushback(1); yybegin(LINE);}
+<YYINITIAL> {PP_DIRECTIVE} { yypushback(yylength()); yybegin(PPDIRECTIVE); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<YYINITIAL> [^]            { yypushback(1); yybegin(LINE); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
 
-<INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {LESS}                      { deepIntoParenLevel(); return makeToken(LESS); }
-<INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {LPAREN}                    { deepIntoParenLevel(); return makeToken(LPAREN); }
-<INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {LBRACK}                    { deepIntoParenLevel(); return makeToken(LBRACK); }
-<INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {LBRACK_LESS}               { deepIntoParenLevel(); return makeToken(LBRACK_LESS); }
-<INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {GREATER}+                  { riseFromParenLevel(yylength()); yypushback(yylength()); yybegin(GREATER_OP); }
-<INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> "</"                        { deepIntoParenLevel(); yypushback(2); yybegin(SMASH_ADJACENT_LESS_OP);}
-<INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {RPAREN}                    { riseFromParenLevel(1); return makeToken(RPAREN); }
-<INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {RBRACK}                    { riseFromParenLevel(1); return makeToken(RBRACK); }
-<INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {GREATER_RBRACK}            { yypushback(yylength()); initSmashAdjacent(SMASH_ADJACENT_GREATER_RBRACK, SMASH_ADJACENT_GREATER_RBRACK_FIN); }
-<INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {GREATER_BAR_RBRACK}        { yypushback(yylength()); initSmashAdjacent(SMASH_ADJACENT_GREATER_BAR_RBRACK, SMASH_ADJACENT_GREATER_BAR_RBRACK_FIN); }
-<INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {GREATER}+{BAD_SYMBOLIC_OP} { yypushback(yylength()); yybegin(ADJACENT_TYPE_CLOSE_OP); }
+<INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {LESS}                        { deepIntoParenLevel(); return makeToken(LESS); }
+<INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {LPAREN}                      { deepIntoParenLevel(); return makeToken(LPAREN); }
+<INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {LBRACK}                      { deepIntoParenLevel(); return makeToken(LBRACK); }
+<INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {LBRACK_LESS}                 { deepIntoParenLevel(); return makeToken(LBRACK_LESS); }
+<INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> ({GREATER})+                  { riseFromParenLevel(yylength()); yypushback(yylength()); yybegin(GREATER_OP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> "</"                          { deepIntoParenLevel(); yypushback(2); yybegin(SMASH_ADJACENT_LESS_OP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break;}
+<INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {RPAREN}                      { riseFromParenLevel(1); return makeToken(RPAREN); }
+<INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {RBRACK}                      { riseFromParenLevel(1); return makeToken(RBRACK); }
+<INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {GREATER_RBRACK}              { yypushback(yylength()); initSmashAdjacent(SMASH_ADJACENT_GREATER_RBRACK, SMASH_ADJACENT_GREATER_RBRACK_FIN); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {GREATER_BAR_RBRACK}          { yypushback(yylength()); initSmashAdjacent(SMASH_ADJACENT_GREATER_BAR_RBRACK, SMASH_ADJACENT_GREATER_BAR_RBRACK_FIN); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> ({GREATER})+{BAD_SYMBOLIC_OP} { yypushback(yylength()); yybegin(ADJACENT_TYPE_CLOSE_OP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
 
 <INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> "default"  { return initIdent(); }
 <INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> "struct"   { return initIdent(); }
@@ -360,16 +236,16 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <INIT_ADJACENT_TYAPP> {IDENT} { return identInInitTypeApp(); }
 <ADJACENT_TYAPP> {IDENT}      { return identInTypeApp(); }
 
-<ADJACENT_TYPE_CLOSE_OP> {GREATER}+ { adjacentTypeCloseOp(); }
+<ADJACENT_TYPE_CLOSE_OP> ({GREATER})+ { adjacentTypeCloseOp(); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
 
 <GREATER_OP, GREATER_OP_SYMBOLIC_OP> {GREATER} { return makeToken(GREATER); }
-<GREATER_OP, GREATER_OP_SYMBOLIC_OP> [^]       { yypushback(1); exitGreaterOp(); }
+<GREATER_OP, GREATER_OP_SYMBOLIC_OP> [^]       { yypushback(1); exitGreaterOp(); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
 
 <SYMBOLIC_OPERATOR> {LQUOTE_TYPED}        { riseFromParenLevel(0); return makeToken(LQUOTE_TYPED); }
 <SYMBOLIC_OPERATOR> {RQUOTE_TYPED}        { riseFromParenLevel(0); return makeToken(RQUOTE_TYPED); }
 <SYMBOLIC_OPERATOR> {LQUOTE_UNTYPED}      { riseFromParenLevel(0); return makeToken(LQUOTE_UNTYPED); }
 <SYMBOLIC_OPERATOR> {RQUOTE_UNTYPED}      { riseFromParenLevel(0); return makeToken(RQUOTE_UNTYPED); }
-<SYMBOLIC_OPERATOR> "@>."|"@@>."          { yypushback(yylength()); yybegin(SMASH_RQUOTE_DOT); }
+<SYMBOLIC_OPERATOR> "@>."|"@@>."          { yypushback(yylength()); yybegin(SMASH_RQUOTE_DOT); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
 <SYMBOLIC_OPERATOR> {BAR}                 { riseFromParenLevel(0); return makeToken(BAR); }
 <SYMBOLIC_OPERATOR> {LARROW}              { riseFromParenLevel(0); return makeToken(LARROW); }
 <SYMBOLIC_OPERATOR> {LPAREN}              { riseFromParenLevel(0); return makeToken(LPAREN); }
@@ -426,8 +302,8 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <LINE, ADJACENT_TYAPP> {SHEBANG}        { return makeToken(SHEBANG); }
 <LINE, ADJACENT_TYAPP> {HASH}"light"    { return makeToken(PP_LIGHT); }
 
-<LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> "(*"                    { initBlockComment(); }
-<LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {PP_COMPILER_DIRECTIVE} { yypushback(yylength()); yybegin(PPSHARP); }
+<LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> ("(*")                  { initBlockComment(); initTokenLength(); increaseTokenLength(yylength()); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {PP_COMPILER_DIRECTIVE} { yypushback(yylength()); yybegin(PPSHARP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
 
 <INIT_ADJACENT_TYAPP> "(*IF-FSHARP"    { yybegin(LINE); return makeToken(BLOCK_COMMENT); }
 <INIT_ADJACENT_TYAPP> "ENDIF-FSHARP*)" { yybegin(LINE); return makeToken(BLOCK_COMMENT); }
@@ -437,9 +313,7 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <INIT_ADJACENT_TYAPP> {SHEBANG}        { yybegin(LINE); return makeToken(SHEBANG); }
 <INIT_ADJACENT_TYAPP> {HASH}"light"    { yybegin(LINE); return makeToken(PP_LIGHT); }
 
-//<LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {PP_BAD_COMPILER_DIRECTIVE} { yypushback(yylength() - 1); return makeToken(HASH); }
-// TODO: uncomment previous line and delete the following line after fixing the bug: https://github.com/Microsoft/visualfsharp/pull/5498
-<LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {PP_BAD_COMPILER_DIRECTIVE} { yypushback(yylength()); yybegin(PPSHARP); }
+<LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {PP_BAD_COMPILER_DIRECTIVE} { yypushback(yylength()); yybegin(PPSHARP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
 
 <LINE, ADJACENT_TYAPP> {LQUOTE_TYPED}   { return makeToken(LQUOTE_TYPED); }
 <LINE, ADJACENT_TYAPP> {RQUOTE_TYPED}   { return makeToken(RQUOTE_TYPED); }
@@ -451,10 +325,8 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <LINE, INIT_ADJACENT_TYAPP> {LQUOTE_UNTYPED} { yybegin(LINE); return makeToken(LQUOTE_UNTYPED); }
 <LINE, INIT_ADJACENT_TYAPP> {RQUOTE_UNTYPED} { yybegin(LINE); return makeToken(RQUOTE_UNTYPED); }
 
-// Rule for smash RQUOTE_DOT.
-// https://github.com/Microsoft/visualfsharp/blob/173513e/src/fsharp/LexFilter.fs#L2148
-<LINE, ADJACENT_TYAPP> "@>."|"@@>." { yypushback(yylength()); initSmash(SMASH_RQUOTE_DOT_FROM_LINE, SMASH_RQUOTE_DOT); }
-<INIT_ADJACENT_TYAPP> "@>."|"@@>."  { yypushback(yylength()); yybegin(SMASH_RQUOTE_DOT_FROM_LINE); }
+<LINE, ADJACENT_TYAPP> "@>."|"@@>." { yypushback(yylength()); initSmash(SMASH_RQUOTE_DOT_FROM_LINE, SMASH_RQUOTE_DOT); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<INIT_ADJACENT_TYAPP> "@>."|"@@>."  { yypushback(yylength()); yybegin(SMASH_RQUOTE_DOT_FROM_LINE); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
 
 <LINE, ADJACENT_TYAPP> {LET_BANG}            { return makeToken(LET_BANG); }
 <LINE, ADJACENT_TYAPP> {USE_BANG}            { return makeToken(USE_BANG); }
@@ -538,8 +410,6 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 
 <LINE, ADJACENT_TYAPP> {RESERVED_IDENT_FORMATS} { return makeToken(RESERVED_IDENT_FORMATS); }
 
-// Rule for smahimg type apply.
-// https://github.com/Microsoft/visualfsharp/blob/173513e/src/fsharp/LexFilter.fs#L2131
 <LINE> "delegate"{LESS_OP}                 { initAdjacentTypeApp(); return makeToken(DELEGATE); }
 <LINE> {IDENT}{LESS_OP}                    { initAdjacentTypeApp(); return identInTypeApp(); }
 <LINE> {IEEE32}{LESS_OP}                   { initAdjacentTypeApp(); return makeToken(IEEE32); }
@@ -558,23 +428,23 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <LINE> {NATIVEINT}{LESS_OP}                { initAdjacentTypeApp(); return makeToken(NATIVEINT); }
 <LINE> {RESERVED_LITERAL_FORMATS}{LESS_OP} { initAdjacentTypeApp(); return makeToken(RESERVED_LITERAL_FORMATS); }
 
-<LINE> "delegate"{LESS_OP}{BAD_SYMBOLIC_OP}                 { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> {IDENT}{LESS_OP}{BAD_SYMBOLIC_OP}                    { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> {IEEE32}{LESS_OP}{BAD_SYMBOLIC_OP}                   { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> {IEEE64}{LESS_OP}{BAD_SYMBOLIC_OP}                   { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> {DECIMAL}{LESS_OP}{BAD_SYMBOLIC_OP}                  { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> {BYTE}{LESS_OP}{BAD_SYMBOLIC_OP}                     { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> {INT16}{LESS_OP}{BAD_SYMBOLIC_OP}                    { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> ({XINT}|{INT}){LESS_OP}{BAD_SYMBOLIC_OP}             { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> {INT32}{LESS_OP}{BAD_SYMBOLIC_OP}                    { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> {INT64}{LESS_OP}{BAD_SYMBOLIC_OP}                    { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> {SBYTE}{LESS_OP}{BAD_SYMBOLIC_OP}                    { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> {UINT16}{LESS_OP}{BAD_SYMBOLIC_OP}                   { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> {UINT32}{LESS_OP}{BAD_SYMBOLIC_OP}                   { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> {UINT64}{LESS_OP}{BAD_SYMBOLIC_OP}                   { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> {BIGNUM}{LESS_OP}{BAD_SYMBOLIC_OP}                   { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> {NATIVEINT}{LESS_OP}{BAD_SYMBOLIC_OP}                { yypushback(yylength()); yybegin(PRE_LESS_OP); }
-<LINE> {RESERVED_LITERAL_FORMATS}{LESS_OP}{BAD_SYMBOLIC_OP} { yypushback(yylength()); yybegin(PRE_LESS_OP); }
+<LINE> "delegate"{LESS_OP}{BAD_SYMBOLIC_OP}                 { yypushback(yylength()); yybegin(PRE_LESS_OP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<LINE> {IDENT}{LESS_OP}{BAD_SYMBOLIC_OP}                    { yypushback(yylength()); yybegin(PRE_LESS_OP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<LINE> {IEEE32}{LESS_OP}{BAD_SYMBOLIC_OP}                   { yypushback(yylength()); yybegin(PRE_LESS_OP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<LINE> {IEEE64}{LESS_OP}{BAD_SYMBOLIC_OP}                   { yypushback(yylength()); yybegin(PRE_LESS_OP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<LINE> {DECIMAL}{LESS_OP}{BAD_SYMBOLIC_OP}                  { yypushback(yylength()); yybegin(PRE_LESS_OP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<LINE> {BYTE}{LESS_OP}{BAD_SYMBOLIC_OP}                     { yypushback(yylength()); yybegin(PRE_LESS_OP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<LINE> {INT16}{LESS_OP}{BAD_SYMBOLIC_OP}                    { yypushback(yylength()); yybegin(PRE_LESS_OP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<LINE> ({XINT}|{INT}){LESS_OP}{BAD_SYMBOLIC_OP}             { yypushback(yylength()); yybegin(PRE_LESS_OP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<LINE> {INT32}{LESS_OP}{BAD_SYMBOLIC_OP}                    { yypushback(yylength()); yybegin(PRE_LESS_OP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<LINE> {INT64}{LESS_OP}{BAD_SYMBOLIC_OP}                    { yypushback(yylength()); yybegin(PRE_LESS_OP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<LINE> {SBYTE}{LESS_OP}{BAD_SYMBOLIC_OP}                    { yypushback(yylength()); yybegin(PRE_LESS_OP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<LINE> {UINT16}{LESS_OP}{BAD_SYMBOLIC_OP}                   { yypushback(yylength()); yybegin(PRE_LESS_OP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<LINE> {UINT32}{LESS_OP}{BAD_SYMBOLIC_OP}                   { yypushback(yylength()); yybegin(PRE_LESS_OP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<LINE> {UINT64}{LESS_OP}{BAD_SYMBOLIC_OP}                   { yypushback(yylength()); yybegin(PRE_LESS_OP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<LINE> {BIGNUM}{LESS_OP}{BAD_SYMBOLIC_OP}                   { yypushback(yylength()); yybegin(PRE_LESS_OP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<LINE> {NATIVEINT}{LESS_OP}{BAD_SYMBOLIC_OP}                { yypushback(yylength()); yybegin(PRE_LESS_OP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<LINE> {RESERVED_LITERAL_FORMATS}{LESS_OP}{BAD_SYMBOLIC_OP} { yypushback(yylength()); yybegin(PRE_LESS_OP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
 
 <PRE_LESS_OP> "delegate"                 { yybegin(LINE); return makeToken(DELEGATE); }
 <PRE_LESS_OP> {IDENT}                    { yybegin(LINE); return identInTypeApp(); }
@@ -607,9 +477,7 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {INT64}      { return makeToken(INT64); }
 <LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {UINT64}     { return makeToken(UINT64); }
 
-// Rule for smah INT_DOT_DOT.
-// https://github.com/Microsoft/visualfsharp/blob/173513e/src/fsharp/LexFilter.fs#L2142
-<LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {INT}\.\. { yypushback(yylength()); initSmash(SMASH_INT_DOT_DOT_FROM_LINE, SMASH_INT_DOT_DOT); }
+<LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {INT}\.\. { yypushback(yylength()); initSmash(SMASH_INT_DOT_DOT_FROM_LINE, SMASH_INT_DOT_DOT); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
 
 <LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {IEEE32}  { return makeToken(IEEE32); }
 <LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {IEEE64}  { return makeToken(IEEE64); }
@@ -644,20 +512,21 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <SMASH_RQUOTE_DOT, SMASH_RQUOTE_DOT_FROM_LINE> "@@>" { return makeToken(RQUOTE_UNTYPED); }
 <SMASH_RQUOTE_DOT, SMASH_RQUOTE_DOT_FROM_LINE> \.    { exitSmash(SMASH_RQUOTE_DOT_FROM_LINE); return makeToken(DOT); }
 
-<STRING_IN_COMMENT> {STRING}                          { yybegin(IN_BLOCK_COMMENT); }
-<STRING_IN_COMMENT> {VERBATIM_STRING}                 { yybegin(IN_BLOCK_COMMENT); }
-<STRING_IN_COMMENT> {TRIPLE_QUOTED_STRING}            { yybegin(IN_BLOCK_COMMENT); }
+<STRING_IN_COMMENT> {STRING}                          { yybegin(IN_BLOCK_COMMENT); increaseTokenLength(yylength()); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<STRING_IN_COMMENT> {VERBATIM_STRING}                 { yybegin(IN_BLOCK_COMMENT); increaseTokenLength(yylength()); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<STRING_IN_COMMENT> {TRIPLE_QUOTED_STRING}            { yybegin(IN_BLOCK_COMMENT); increaseTokenLength(yylength()); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
 <STRING_IN_COMMENT> {UNFINISHED_STRING}               { return fillBlockComment(UNFINISHED_STRING_IN_COMMENT); }
 <STRING_IN_COMMENT> {UNFINISHED_VERBATIM_STRING}      { return fillBlockComment(UNFINISHED_VERBATIM_STRING_IN_COMMENT); }
 <STRING_IN_COMMENT> {UNFINISHED_TRIPLE_QUOTED_STRING} { return fillBlockComment(UNFINISHED_TRIPLE_QUOTED_STRING_IN_COMMENT); }
 
-<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> "(*"      { zzNestedCommentLevel++; }
-<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> "*)"      { if (--zzNestedCommentLevel == 0) return fillBlockComment(BLOCK_COMMENT); }
-<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> \"        { yypushback(yylength()); yybegin(STRING_IN_COMMENT); }
-<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> @\"       { yypushback(yylength()); yybegin(STRING_IN_COMMENT); }
-<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> \"\"\"    { yypushback(yylength()); yybegin(STRING_IN_COMMENT); }
-<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> [^(\"@*]+ { }
-<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> [^]|"(*)" { }
+<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> "(*"      { zzNestedCommentLevel++; increaseTokenLength(yylength()); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> "*)"      { if (--zzNestedCommentLevel == 0) return fillBlockComment(BLOCK_COMMENT); increaseTokenLength(yylength()); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> \"        { yypushback(yylength()); yybegin(STRING_IN_COMMENT); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> @\"       { yypushback(yylength()); yybegin(STRING_IN_COMMENT); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> \"\"\"    { yypushback(yylength()); yybegin(STRING_IN_COMMENT); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> [^(\"@*]+ { increaseTokenLength(yylength()); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> [^]|"(*)" { increaseTokenLength(yylength()); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<IN_BLOCK_COMMENT, IN_BLOCK_COMMENT_FROM_LINE> <<EOF>>   { return fillBlockComment(UNFINISHED_BLOCK_COMMENT); }
 
 <SMASH_ADJACENT_LESS_OP> {LESS} { return makeToken(LESS); }
 <SMASH_ADJACENT_LESS_OP> "/"    { riseFromParenLevel(0); return makeToken(SYMBOLIC_OP); }
@@ -668,9 +537,7 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <SMASH_ADJACENT_GREATER_RBRACK, SMASH_ADJACENT_GREATER_RBRACK_FIN> {GREATER} { return makeToken(GREATER); }
 <SMASH_ADJACENT_GREATER_RBRACK, SMASH_ADJACENT_GREATER_RBRACK_FIN> {RBRACK}  { exitSmash(SMASH_ADJACENT_GREATER_RBRACK_FIN); return makeToken(RBRACK); }
 
-// No need rule for ADJACENT_PREFIX rule.
-// https://github.com/Microsoft/visualfsharp/blob/173513e/src/fsharp/LexFilter.fs#L2154
-<PPSHARP, PPSYMBOL, PPDIRECTIVE> {WHITESPACE} { return makeToken(WHITESPACE); }
+<PPSHARP, PPSYMBOL, PPDIRECTIVE> {WHITESPACE} { return makeToken (WHITESPACE); }
 
 <PPDIRECTIVE> {HASH}("l"|"load")                 { yybegin(LINE); return makeToken(PP_LOAD); }
 <PPDIRECTIVE> {HASH}("r"|"reference")            { yybegin(LINE); return makeToken(PP_REFERENCE); }
@@ -682,14 +549,13 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <PPDIRECTIVE> {HASH}"I"                          { yybegin(LINE); return makeToken(PP_I); }
 <PPDIRECTIVE> {HASH}"nowarn"                     { yybegin(LINE); return makeToken(PP_NOWARN); }
 
-<PPDIRECTIVE> {HASH}"if"                         { yypushback(yylength()); yybegin(PPSHARP); }
-<PPDIRECTIVE> {HASH}"else"                       { yypushback(yylength()); yybegin(PPSHARP); }
-<PPDIRECTIVE> {HASH}"endif"                      { yypushback(yylength()); yybegin(PPSHARP); }
+<PPDIRECTIVE> {HASH}"if"                         { yypushback(yylength()); yybegin(PPSHARP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<PPDIRECTIVE> {HASH}"else"                       { yypushback(yylength()); yybegin(PPSHARP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<PPDIRECTIVE> {HASH}"endif"                      { yypushback(yylength()); yybegin(PPSHARP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
 
-// TODO: delete the following three lines after fixing the bug: https://github.com/Microsoft/visualfsharp/pull/5498
-<PPDIRECTIVE> {HASH}"if"{TAIL_IDENT}             { yypushback(yylength()); yybegin(PPSHARP); }
-<PPDIRECTIVE> {HASH}"else"{TAIL_IDENT}           { yypushback(yylength()); yybegin(PPSHARP); }
-<PPDIRECTIVE> {HASH}"endif"{TAIL_IDENT}          { yypushback(yylength()); yybegin(PPSHARP); }
+<PPDIRECTIVE> {HASH}"if"{TAIL_IDENT}             { yypushback(yylength()); yybegin(PPSHARP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<PPDIRECTIVE> {HASH}"else"{TAIL_IDENT}           { yypushback(yylength()); yybegin(PPSHARP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<PPDIRECTIVE> {HASH}"endif"{TAIL_IDENT}          { yypushback(yylength()); yybegin(PPSHARP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
 
 <PPDIRECTIVE> {HASH}{IDENT}                      { yybegin(LINE); return makeToken(PP_DIRECTIVE); }
 
@@ -697,7 +563,6 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <PPSHARP> {HASH}"else"  { yybegin(PPSYMBOL); return makeToken(PP_ELSE_SECTION); }
 <PPSHARP> {HASH}"endif" { yybegin(PPSYMBOL); return makeToken(PP_ENDIF); }
 
-// TODO: delete the following three lines after fixing the bug: https://github.com/Microsoft/visualfsharp/pull/5498
 <PPSHARP> {HASH}"if"{TAIL_IDENT}    { yypushback(yylength() - 3); yybegin(LINE); return makeToken(PP_IF_SECTION); }
 <PPSHARP> {HASH}"else"{TAIL_IDENT}  { yypushback(yylength() - 5); yybegin(PPSYMBOL); return makeToken(PP_ELSE_SECTION); }
 <PPSHARP> {HASH}"endif"{TAIL_IDENT} { yypushback(yylength() - 6); yybegin(PPSYMBOL); return makeToken(PP_ENDIF); }
@@ -714,4 +579,23 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 
 <PPSYMBOL> . { return makeToken(PP_BAD_CHARACTER); }
 
-[^] { return makeToken(BAD_CHARACTER); }
+<IN_BLOCK_COMMENT,
+ IN_BLOCK_COMMENT_FROM_LINE,
+ STRING_IN_COMMENT,
+ SMASH_INT_DOT_DOT,
+ SMASH_INT_DOT_DOT_FROM_LINE,
+ SMASH_RQUOTE_DOT,
+ SMASH_RQUOTE_DOT_FROM_LINE,
+ SMASH_ADJACENT_LESS_OP,
+ SMASH_ADJACENT_GREATER_BAR_RBRACK,
+ SMASH_ADJACENT_GREATER_RBRACK,
+ SMASH_ADJACENT_GREATER_BAR_RBRACK_FIN,
+ SMASH_ADJACENT_GREATER_RBRACK_FIN,
+ ADJACENT_TYPE_CLOSE_OP,
+ INIT_ADJACENT_TYAPP,
+ ADJACENT_TYAPP,
+ SYMBOLIC_OPERATOR,
+ GREATER_OP,
+ GREATER_OP_SYMBOLIC_OP,
+ PRE_LESS_OP,
+ LINE> [^] { return makeToken(BAD_CHARACTER); }

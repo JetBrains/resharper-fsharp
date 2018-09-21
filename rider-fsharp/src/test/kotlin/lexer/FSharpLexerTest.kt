@@ -15,8 +15,9 @@ class FSharpLexerTest : LexerTestCase() {
         return null
     }
 
+    @Test
     fun testDigit() {
-        doTest("1234567890 1234567890u 1234567890l 0XABCDEFy 0x001100010s 3.0F 0x0000000000000000LF 34742626263193832612536171N 0o7 0b1",
+        doTest("1234567890 1234567890u 1234567890l 0XABCDEFy 0x001100010s 3.0F 0x0000000000000000LF 34742626263193832612536171N 0o7 0b1 1F",
                 """
                 |INT32 ('1234567890')
                 |WHITESPACE (' ')
@@ -37,6 +38,8 @@ class FSharpLexerTest : LexerTestCase() {
                 |INT32 ('0o7')
                 |WHITESPACE (' ')
                 |INT32 ('0b1')
+                |WHITESPACE (' ')
+                |RESERVED_LITERAL_FORMATS ('1F')
                 """.trimMargin()
         )
     }
@@ -1075,6 +1078,28 @@ class FSharpLexerTest : LexerTestCase() {
                 |LESS ('<')
                 |IDENT ('int')
                 |LINE_COMMENT ('//>')
+                """.trimMargin()
+        )
+    }
+
+    @Test
+    fun testBlockCommentInTypeApp() {
+        doTest("typeof<int(*comment*)> typeof<int<int(*comment*)>>",
+                """
+                |IDENT ('typeof')
+                |LESS ('<')
+                |IDENT ('int')
+                |BLOCK_COMMENT ('(*comment*)')
+                |GREATER ('>')
+                |WHITESPACE (' ')
+                |IDENT ('typeof')
+                |LESS ('<')
+                |IDENT ('int')
+                |LESS ('<')
+                |IDENT ('int')
+                |BLOCK_COMMENT ('(*comment*)')
+                |GREATER ('>')
+                |GREATER ('>')
                 """.trimMargin()
         )
     }
