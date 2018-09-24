@@ -62,22 +62,6 @@ module rec CommonUtil =
     let runSynchronouslyWithTimeout (action: Func<_>) timeout =
         Async.RunSynchronously(async { return action.Invoke() }, timeout)
 
-    type Async<'T> with
-        member x.RunAsTask(?interruptChecker) =
-            let interruptChecker = defaultArg interruptChecker (Action(fun _ -> InterruptableActivityCookie.CheckAndThrow()))
-            let cancellationTokenSource = new CancellationTokenSource()
-            let cancellationToken = cancellationTokenSource.Token
-            let task = Async.StartAsTask(x, cancellationToken = cancellationToken)
-
-            while not task.IsCompleted do
-                let finished = task.Wait(interruptCheckTimeout, cancellationToken)
-                if not finished then
-                    try interruptChecker.Invoke()
-                    with :? OperationCanceledException ->
-                        cancellationTokenSource.Cancel()
-                        reraise()
-            task.Result
-
     type IDictionary<'TKey, 'TValue> with
         member x.remove (key: 'TKey) = x.Remove key |> ignore
         member x.add (key: 'TKey, value: 'TValue) = x.Add(key, value) |> ignore

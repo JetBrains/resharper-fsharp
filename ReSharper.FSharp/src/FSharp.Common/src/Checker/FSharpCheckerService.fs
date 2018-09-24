@@ -8,7 +8,7 @@ open JetBrains.Application.Progress
 open JetBrains.DataFlow
 open JetBrains.ReSharper.Feature.Services
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Common.Util
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Util
 open JetBrains.Util.Logging

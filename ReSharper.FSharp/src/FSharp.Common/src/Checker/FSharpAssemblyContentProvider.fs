@@ -1,9 +1,8 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 
-open System
 open JetBrains.Application
 open JetBrains.ReSharper.Feature.Services
-open JetBrains.ReSharper.Plugins.FSharp.Common.Util
+open JetBrains.ReSharper.Plugins.FSharp
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
 [<ShellComponent>]
