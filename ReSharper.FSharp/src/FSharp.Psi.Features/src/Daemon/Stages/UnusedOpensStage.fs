@@ -69,7 +69,7 @@ type UnusedOpenWarningHighlighting(openStatement: IOpenStatement) =
     let [<Literal>] message = "Open directive is not required by the code and can be safely removed"
 
     member x.OpenStatement = openStatement
-    static member HighlightingId = "RedundantOpen"
+    static member val HighlightingId = "RedundantOpen"
 
     interface IHighlighting with
         member x.ToolTip = message

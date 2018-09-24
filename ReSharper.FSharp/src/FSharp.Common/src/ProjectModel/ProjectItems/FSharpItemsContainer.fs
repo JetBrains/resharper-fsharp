@@ -801,7 +801,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
 
         mapping
 
-    static member Marshaller =
+    static member val Marshaller =
         { new IUnsafeMarshaller<ProjectMapping> with
             member x.Marshal(writer, value) = value.Write(writer)
             member x.Unmarshal(reader) = ProjectMapping.Read(reader) }
@@ -895,7 +895,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         x.Dump(writer)
         writer.ToString()
 
-    static member DummyMapping =
+    static member val DummyMapping =
         ProjectMapping(FileSystemPath.Empty, String.Empty, EmptySet.Instance, DummyLogger.Instance)
 
 
