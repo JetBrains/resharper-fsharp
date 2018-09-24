@@ -7,7 +7,7 @@ class LogErrorTest : TestCaseRunner() {
 
     @Test(expectedExceptions = [(BackendException::class)])
     fun testThrowEx() {
-        Logger.getInstance("Projected Logger").error(BackendException("a", "b"))
+        Logger.getInstance("Projected Logger").error(BackendException("a"))
         testCaseErrorsProcessor.throwIfNotEmpty()
     }
 }
