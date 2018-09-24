@@ -11,6 +11,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp
   public static class FSharpAsyncUtil
   {
     private const int InterruptCheckTimeout = 30;
+    private const int GetTransferredWriteLockTimeout = 10;
+
+    private static readonly CancellationToken ourEternalCancellationToken =
+      new CancellationTokenSource().Token;
 
     private static readonly Action ourDefaultInterruptCheck =
       () => InterruptableActivityCookie.CheckAndThrow();
@@ -63,9 +67,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp
 
       while (!task.IsCompleted || isLockTransferred)
       {
-        var finished = task.Wait(InterruptCheckTimeout);
+        var finished = task.Wait(InterruptCheckTimeout, ourEternalCancellationToken);
         if (finished)
-          break;
+        {
+          if (!isLockTransferred)
+            break;
+
+          Thread.Sleep(GetTransferredWriteLockTimeout);
+        }
 
         if (!isLockTransferred && FSharpLocks.ThreadRequestingWriteLock != null)
         {
