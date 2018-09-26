@@ -201,9 +201,7 @@
         <!-- Used in FsharpFakeLexer and as a separator in psi grammar -->
         <Token name="OTHER_KEYWORD" />
         <Token name="FAKE" />
-    </Tokens>
-    
-    <Tokens NodeType="PPFSharpNodeType">
+
         <Token name="PP_LOAD" />
         <Token name="PP_REFERENCE" />
         <Token name="PP_LINE" />

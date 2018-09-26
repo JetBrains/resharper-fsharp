@@ -61,7 +61,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       public LeafElementBase Create() =>
         throw new NotImplementedException();
     }
-    
+
     private sealed class WhitespaceNodeType : FSharpTokenNodeType
     {
       public WhitespaceNodeType(int nodeTypeIndex) : base("WHITE_SPACE", nodeTypeIndex)
@@ -78,17 +78,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       }
 
       public override LeafElementBase Create(string text) => new NewLine(text);
-    }
-
-    private sealed class PPFSharpNodeType : FSharpTokenNodeType
-    {
-      private readonly bool isFilteredToken;
-      public PPFSharpNodeType(string name, int index, bool isFilteredToken = false) : base(name, index)
-      {
-        this.isFilteredToken = isFilteredToken;
-      }
-      
-      public override bool IsFiltered => isFilteredToken;
     }
 
     public const int WHITESPACE_NODE_TYPE_INDEX = LAST_GENERATED_TOKEN_TYPE_INDEX + 1;

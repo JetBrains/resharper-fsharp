@@ -13,6 +13,7 @@
     public const string IDS_NOT_COMPILED_TYPE_DECLARATION = "";
     public const string IDS_SIMPLE_TYPE_DECLARATION = "";
     public const string IDS_TYPE_EXPRESSION = "";
+    public const string IDS_HASH_DIRECTIVE = "";
 
     public static string GetString(string id) => id;
     public static string GetExpectedMessage(string expectedSymbol) => string.Empty;

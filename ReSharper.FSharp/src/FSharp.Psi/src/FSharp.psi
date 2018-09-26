@@ -399,9 +399,32 @@ memberParam: fakeSeparator;
 
 // module statements
 
-hashDirective:
-  HASH<HASH, HashToken>
-  STRING<STRING, Args>*; 
+interface hashDirective:
+  lineDirective |
+  loadDirective |
+  referenceDirective |
+  iDirective |
+  otherDirective;
+
+lineDirective:
+  PP_LINE<PP_LINE, HashToken>
+  STRING<STRING, Args>*;
+
+loadDirective:
+  PP_LOAD<PP_LOAD, HashToken>
+  STRING<STRING, Args>*;
+
+referenceDirective:
+  PP_REFERENCE<PP_REFERENCE, HashToken>
+  STRING<STRING, Args>*;
+
+iDirective:
+  PP_I<PP_I, HashToken>
+  STRING<STRING, Args>*;
+
+otherDirective:
+  PP_DIRECTIVE<PP_DIRECTIVE, HashToken>
+  STRING<STRING, Args>*;
 
 openStatement:
   OPEN<OPEN, Open>

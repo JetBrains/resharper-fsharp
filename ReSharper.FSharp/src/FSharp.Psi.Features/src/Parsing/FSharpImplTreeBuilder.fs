@@ -77,7 +77,13 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
         let mark = x.Builder.Mark()
 
         range |> x.GetEndOffset |> x.AdvanceToOffset
-        x.Done(mark, ElementType.HASH_DIRECTIVE)
+        match id with
+        | "l"
+        | "load" -> x.Done(mark, ElementType.LOAD_DIRECTIVE)
+        | "r"
+        | "reference" -> x.Done(mark, ElementType.REFERENCE_DIRECTIVE)
+        | "I" -> x.Done(mark, ElementType.I_DIRECTIVE)
+        | _ -> x.Done(mark, ElementType.OTHER_DIRECTIVE)
 
     member internal x.ProcessType (TypeDefn(ComponentInfo(attrs, typeParams,_,lid,_,_,_,_), repr, members, range)) =
     

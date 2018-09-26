@@ -109,8 +109,10 @@ type FSharpPathCompletionProvider() =
         if hashTokenText.Length < 2 then None else
 
         match hashTokenText.Substring(1) with
+        | "l"
         | "load" -> Some (fsExtensions, ProjectModelThemedIcons.Fsharp.Id)
-        | "r"    -> Some (dllExtensions, ProjectModelThemedIcons.Assembly.Id)
+        | "r"
+        | "reference"    -> Some (dllExtensions, ProjectModelThemedIcons.Assembly.Id)
         | "I"    -> Some (Set.empty, null)
         | _ -> None
 
