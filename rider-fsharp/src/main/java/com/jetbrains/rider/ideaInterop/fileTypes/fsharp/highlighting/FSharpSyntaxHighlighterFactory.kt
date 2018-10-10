@@ -2,21 +2,17 @@ package com.jetbrains.rider.ideaInterop.fileTypes.fsharp.highlighting
 
 
 import com.intellij.lexer.Lexer
-import com.intellij.openapi.editor.*
+import com.intellij.openapi.editor.HighlighterColors
 import com.intellij.openapi.editor.colors.TextAttributesKey
+import com.intellij.openapi.fileTypes.SyntaxHighlighter
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
+import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
+import com.intellij.openapi.project.Project
+import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.TokenType
 import com.intellij.psi.tree.IElementType
-
-import com.intellij.openapi.editor.colors.TextAttributesKey.createTextAttributesKey
-import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpLexer
-import com.intellij.openapi.vfs.VirtualFile
-import com.intellij.openapi.fileTypes.SyntaxHighlighter
-import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
-
-import com.intellij.openapi.project.Project
 import com.jetbrains.rider.ideaInterop.RiderTextAttributeKeys
-import com.jetbrains.rider.ideaInterop.fileTypes.csharp.CSharpSyntaxHighlighter
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpLexer
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType.*
 
 class FSharpSyntaxHighlighter : SyntaxHighlighterBase() {
