@@ -62,7 +62,7 @@ type FSharpProjectOptionsProvider
     do
         changeManager.Changed2.Advise(lifetime, this.ProcessChange)
         checkerService.OptionsProvider <- this
-        lifetime.AddAction(fun _ -> checkerService.OptionsProvider <- Unchecked.defaultof<_>) |> ignore
+        lifetime.OnTermination(fun _ -> checkerService.OptionsProvider <- Unchecked.defaultof<_>) |> ignore
 
     let tryGetFSharpProject (project: IProject) (targetFrameworkId: TargetFrameworkId) =
         use lock = locker.UsingReadLock()

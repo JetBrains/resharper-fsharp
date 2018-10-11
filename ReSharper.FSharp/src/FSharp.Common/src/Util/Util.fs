@@ -161,7 +161,7 @@ module rec CommonUtil =
 
     type Lifetime with
         member x.AddAction2(func: Func<_,_>) =
-            x.AddAction(fun _ -> func.Invoke() |> ignore) |> ignore
+            x.OnTermination(fun _ -> func.Invoke() |> ignore) |> ignore
 
 [<AutoOpen>]
 module rec FSharpMsBuildUtils =

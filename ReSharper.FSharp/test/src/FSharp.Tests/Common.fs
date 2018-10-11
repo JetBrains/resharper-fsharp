@@ -30,7 +30,7 @@ type FSharpTestAttribute() =
 type FSharpTestProjectOptionsProvider(lifetime: Lifetime, checkerService: FSharpCheckerService) as this =
     do
         checkerService.OptionsProvider <- this
-        lifetime.AddAction(fun _ -> checkerService.OptionsProvider <- Unchecked.defaultof<_>) |> ignore
+        lifetime.OnTermination(fun _ -> checkerService.OptionsProvider <- Unchecked.defaultof<_>) |> ignore
 
     let getPath (sourceFile: IPsiSourceFile) = sourceFile.GetLocation().FullPath
 

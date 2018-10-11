@@ -130,5 +130,5 @@ type FSharpDefaultFileTemplates() =
         member x.GetDefaultSettingsStream(lifetime) =
             let stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(xmlPath)
             Assertion.AssertNotNull(stream, "stream <> null")
-            lifetime.AddDispose(stream) |> ignore
+            lifetime.OnTermination(stream) |> ignore
             stream

@@ -24,7 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
         {
             myFileSystem = Shim.FileSystem;
             Shim.FileSystem = this;
-            lifetime.AddAction(() => Shim.FileSystem = myFileSystem);
+            lifetime.OnTermination(() => Shim.FileSystem = myFileSystem);
         }
 
         public virtual bool Exists(FileSystemPath path) =>

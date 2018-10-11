@@ -153,7 +153,7 @@ type FSharpScriptPsiModulesProvider
 
             let ira =
                 InterruptableReadActivityThe
-                    (lifetime, locks, fun _ -> lifetime.IsTerminated || locks.ContentModelLocks.IsWriteLockRequested)
+                    (lifetime, locks, fun _ -> not lifetime.IsAlive || locks.ContentModelLocks.IsWriteLockRequested)
 
             ira.FuncRun <-
                 fun _ ->
@@ -315,7 +315,7 @@ type FSharpScriptPsiModuleHandler
     let sourceFiles = Dictionary<FileSystemPath, IPsiSourceFile>()
 
     do
-        lifetime.AddAction(fun _ ->
+        lifetime.OnTermination(fun _ ->
             changeManager.ExecuteAfterChange(fun _ ->
                 let changeBuilder = new PsiModuleChangeBuilder()
                 for sourceFile in sourceFiles.Values do
@@ -386,7 +386,7 @@ type FSharpScriptPsiModule
             locks.AssertWriteAccessAllowed()
             assemblyCookie.Dispose())
 
-        lifetime.AddAction(fun _ ->
+        lifetime.OnTermination(fun _ ->
             use lock = WriteLockCookie.Create()
             assemblyCookies.Clear()) |> ignore
 
