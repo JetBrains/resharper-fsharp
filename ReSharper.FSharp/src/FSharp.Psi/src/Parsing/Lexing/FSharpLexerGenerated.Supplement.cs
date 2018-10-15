@@ -1,12 +1,7 @@
 using System;
-using System.Diagnostics;
-using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.Text;
 using JetBrains.Util;
-using JetBrains.Util.DataStructures;
-using JetBrains.Util.Logging;
-using Xunit;
 
 // ReSharper disable RedundantDisableWarningComment
 // ReSharper disable InconsistentNaming
@@ -28,9 +23,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
     private readonly ReusableBufferRange myBuffer = new ReusableBufferRange();
     protected static readonly LexerDictionary<TokenNodeType> keywords = new LexerDictionary<TokenNodeType>();
     
-    private int zzNestedCommentLevel = 0;
-    private int zzParenLevel = 0;
-    private int zzTokenLength = 0;
+    private int zzNestedCommentLevel;
+    private int zzParenLevel;
+    private int zzTokenLength;
     
     static FSharpLexerGenerated()
     {
@@ -71,11 +66,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
     private TokenNodeType makeToken(TokenNodeType type)
     {
       return currTokenType = type;
-    }
-
-    private void doSome()
-    {
-
     }
 
     private void initTokenLength()

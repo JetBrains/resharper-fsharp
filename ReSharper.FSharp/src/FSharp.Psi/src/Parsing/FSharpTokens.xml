@@ -209,6 +209,5 @@
         <Token name="PP_CONDITIONAL_SYMBOL" />
         <Token name="PP_DIRECTIVE" />
         <Token name="PP_BAD_CHARACTER" />
-        <Token name="PP_EOF" />
     </Tokens>
 </FSharpTokens>

@@ -185,6 +185,7 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
 %state LINE
 
 %state PPSHARP
+%state BAD_PPSHARP
 %state PPSYMBOL
 %state PPDIRECTIVE
 
@@ -427,7 +428,7 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <LINE, ADJACENT_TYAPP> {HASH}"light"    { return makeToken(PP_LIGHT); }
 
 <LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> "(*"                    { initBlockComment(); }
-<LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {PP_COMPILER_DIRECTIVE} { yypushback(yylength()); yybegin(PPSHARP); }
+<LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {PP_COMPILER_DIRECTIVE} { yypushback(yylength()); yybegin(BAD_PPSHARP); }
 
 <INIT_ADJACENT_TYAPP> "(*IF-FSHARP"    { yybegin(LINE); return makeToken(BLOCK_COMMENT); }
 <INIT_ADJACENT_TYAPP> "ENDIF-FSHARP*)" { yybegin(LINE); return makeToken(BLOCK_COMMENT); }
@@ -439,7 +440,7 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 
 //<LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {PP_BAD_COMPILER_DIRECTIVE} { yypushback(yylength() - 1); return makeToken(HASH); }
 // TODO: uncomment previous line and delete the following line after fixing the bug: https://github.com/Microsoft/visualfsharp/pull/5498
-<LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {PP_BAD_COMPILER_DIRECTIVE} { yypushback(yylength()); yybegin(PPSHARP); }
+<LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {PP_BAD_COMPILER_DIRECTIVE} { yypushback(yylength()); yybegin(BAD_PPSHARP); }
 
 <LINE, ADJACENT_TYAPP> {LQUOTE_TYPED}   { return makeToken(LQUOTE_TYPED); }
 <LINE, ADJACENT_TYAPP> {RQUOTE_TYPED}   { return makeToken(RQUOTE_TYPED); }
@@ -697,10 +698,14 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <PPSHARP> {HASH}"else"  { yybegin(PPSYMBOL); return makeToken(PP_ELSE_SECTION); }
 <PPSHARP> {HASH}"endif" { yybegin(PPSYMBOL); return makeToken(PP_ENDIF); }
 
+<BAD_PPSHARP> {HASH}"if"    { yybegin(PPSYMBOL); return makeToken(PP_DIRECTIVE); }
+<BAD_PPSHARP> {HASH}"else"  { yybegin(PPSYMBOL); return makeToken(PP_DIRECTIVE); }
+<BAD_PPSHARP> {HASH}"endif" { yybegin(PPSYMBOL); return makeToken(PP_DIRECTIVE); }
+
 // TODO: delete the following three lines after fixing the bug: https://github.com/Microsoft/visualfsharp/pull/5498
-<PPSHARP> {HASH}"if"{TAIL_IDENT}    { yypushback(yylength() - 3); yybegin(LINE); return makeToken(PP_IF_SECTION); }
-<PPSHARP> {HASH}"else"{TAIL_IDENT}  { yypushback(yylength() - 5); yybegin(PPSYMBOL); return makeToken(PP_ELSE_SECTION); }
-<PPSHARP> {HASH}"endif"{TAIL_IDENT} { yypushback(yylength() - 6); yybegin(PPSYMBOL); return makeToken(PP_ENDIF); }
+<PPSHARP, BAD_PPSHARP> {HASH}"if"{TAIL_IDENT}    { yypushback(yylength() - 3); yybegin(LINE); return makeToken(PP_DIRECTIVE); }
+<PPSHARP, BAD_PPSHARP> {HASH}"else"{TAIL_IDENT}  { yypushback(yylength() - 5); yybegin(PPSYMBOL); return makeToken(PP_DIRECTIVE); }
+<PPSHARP, BAD_PPSHARP> {HASH}"endif"{TAIL_IDENT} { yypushback(yylength() - 6); yybegin(PPSYMBOL); return makeToken(PP_DIRECTIVE); }
 
 <PPSYMBOL> "||"                    { return makeToken(PP_OR); }
 <PPSYMBOL> "&&"                    { return makeToken(PP_AND); }

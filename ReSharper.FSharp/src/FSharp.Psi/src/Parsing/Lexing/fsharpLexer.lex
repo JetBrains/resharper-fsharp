@@ -59,6 +59,7 @@ using static JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.FSharpTokenType;
 %state LINE
 
 %state PPSHARP
+%state BAD_PPSHARP
 %state PPSYMBOL
 %state PPDIRECTIVE
 
@@ -303,7 +304,7 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <LINE, ADJACENT_TYAPP> {HASH}"light"    { return makeToken(PP_LIGHT); }
 
 <LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> ("(*")                  { initBlockComment(); initTokenLength(); increaseTokenLength(yylength()); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
-<LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {PP_COMPILER_DIRECTIVE} { yypushback(yylength()); yybegin(PPSHARP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {PP_COMPILER_DIRECTIVE} { yypushback(yylength()); yybegin(BAD_PPSHARP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
 
 <INIT_ADJACENT_TYAPP> "(*IF-FSHARP"    { yybegin(LINE); return makeToken(BLOCK_COMMENT); }
 <INIT_ADJACENT_TYAPP> "ENDIF-FSHARP*)" { yybegin(LINE); return makeToken(BLOCK_COMMENT); }
@@ -313,7 +314,7 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <INIT_ADJACENT_TYAPP> {SHEBANG}        { yybegin(LINE); return makeToken(SHEBANG); }
 <INIT_ADJACENT_TYAPP> {HASH}"light"    { yybegin(LINE); return makeToken(PP_LIGHT); }
 
-<LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {PP_BAD_COMPILER_DIRECTIVE} { yypushback(yylength()); yybegin(PPSHARP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {PP_BAD_COMPILER_DIRECTIVE} { yypushback(yylength()); yybegin(BAD_PPSHARP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
 
 <LINE, ADJACENT_TYAPP> {LQUOTE_TYPED}   { return makeToken(LQUOTE_TYPED); }
 <LINE, ADJACENT_TYAPP> {RQUOTE_TYPED}   { return makeToken(RQUOTE_TYPED); }
@@ -537,7 +538,7 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <SMASH_ADJACENT_GREATER_RBRACK, SMASH_ADJACENT_GREATER_RBRACK_FIN> {GREATER} { return makeToken(GREATER); }
 <SMASH_ADJACENT_GREATER_RBRACK, SMASH_ADJACENT_GREATER_RBRACK_FIN> {RBRACK}  { exitSmash(SMASH_ADJACENT_GREATER_RBRACK_FIN); return makeToken(RBRACK); }
 
-<PPSHARP, PPSYMBOL, PPDIRECTIVE> {WHITESPACE} { return makeToken (WHITESPACE); }
+<PPSHARP, PPSYMBOL, PPDIRECTIVE> {ANYWHITE} { return makeToken (WHITESPACE); }
 
 <PPDIRECTIVE> {HASH}("l"|"load")                 { yybegin(LINE); return makeToken(PP_LOAD); }
 <PPDIRECTIVE> {HASH}("r"|"reference")            { yybegin(LINE); return makeToken(PP_REFERENCE); }
@@ -563,9 +564,13 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <PPSHARP> {HASH}"else"  { yybegin(PPSYMBOL); return makeToken(PP_ELSE_SECTION); }
 <PPSHARP> {HASH}"endif" { yybegin(PPSYMBOL); return makeToken(PP_ENDIF); }
 
-<PPSHARP> {HASH}"if"{TAIL_IDENT}    { yypushback(yylength() - 3); yybegin(LINE); return makeToken(PP_IF_SECTION); }
-<PPSHARP> {HASH}"else"{TAIL_IDENT}  { yypushback(yylength() - 5); yybegin(PPSYMBOL); return makeToken(PP_ELSE_SECTION); }
-<PPSHARP> {HASH}"endif"{TAIL_IDENT} { yypushback(yylength() - 6); yybegin(PPSYMBOL); return makeToken(PP_ENDIF); }
+<BAD_PPSHARP> {HASH}"if"    { yybegin(PPSYMBOL); return makeToken(PP_DIRECTIVE); }
+<BAD_PPSHARP> {HASH}"else"  { yybegin(PPSYMBOL); return makeToken(PP_DIRECTIVE); }
+<BAD_PPSHARP> {HASH}"endif" { yybegin(PPSYMBOL); return makeToken(PP_DIRECTIVE); }
+
+<PPSHARP, BAD_PPSHARP> {HASH}"if"{TAIL_IDENT}    { yypushback(yylength() - 3); yybegin(LINE); return makeToken(PP_DIRECTIVE); }
+<PPSHARP, BAD_PPSHARP> {HASH}"else"{TAIL_IDENT}  { yypushback(yylength() - 5); yybegin(PPSYMBOL); return makeToken(PP_DIRECTIVE); }
+<PPSHARP, BAD_PPSHARP> {HASH}"endif"{TAIL_IDENT} { yypushback(yylength() - 6); yybegin(PPSYMBOL); return makeToken(PP_DIRECTIVE); }
 
 <PPSYMBOL> "||"                    { return makeToken(PP_OR); }
 <PPSYMBOL> "&&"                    { return makeToken(PP_AND); }
