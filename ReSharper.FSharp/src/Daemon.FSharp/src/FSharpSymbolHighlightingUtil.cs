@@ -51,7 +51,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
       if (mfv.IsMutable || mfv.IsRefCell)
         return HighlightingAttributeIds.MUTABLE_LOCAL_VARIABLE_IDENTIFIER_ATTRIBUTE;
 
-      if (PrettyNaming.IsOperatorName(mfv.DisplayName))
+      if (Microsoft.FSharp.Compiler.PrettyNaming.IsMangledOpName(mfv.LogicalName) &&
+          PrettyNaming.IsOperatorName(mfv.DisplayName))
         return HighlightingAttributeIds.OPERATOR_IDENTIFIER_ATTRIBUTE;
 
       return HighlightingAttributeIds.LOCAL_VARIABLE_IDENTIFIER_ATTRIBUTE;
