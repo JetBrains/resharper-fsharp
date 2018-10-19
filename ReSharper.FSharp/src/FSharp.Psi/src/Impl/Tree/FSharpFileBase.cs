@@ -15,6 +15,7 @@ using JetBrains.Text;
 using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Core;
+using static Microsoft.FSharp.Compiler.PrettyNaming;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
@@ -133,7 +134,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
                 mfv != null && mfv.IsProperty && buffer[endOffset - 1] == ']')
               continue;
 
-            var nameRange = FixRange(new TextRange(startOffset, endOffset), buffer);
+            var nameRange = FixRange(startOffset, endOffset, mfv?.LogicalName, buffer);
 
             // workaround for implicit type usages (e.g. in members with optional params), visualfsharp#3933
             if (symbol is FSharpEntity &&
@@ -149,24 +150,29 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       }
     }
 
-    private TextRange FixRange(TextRange range, IBuffer buffer)
+    private TextRange FixRange(int startOffset, int endOffset, [CanBeNull] string logicalName, IBuffer buffer)
     {
-      // todo: remove when visualfsharp#3920 is fixed
-      var endOffset = range.EndOffset;
-      var startOffset = range.StartOffset;
+      // todo: remove when visualfsharp#3920 is implemented
 
       // trim foo.``bar`` to ``bar``
-      if (buffer.Length > 4 && endOffset > 4 &&
+      const int minimumEscapedNameLength = 5;
+      if (endOffset >= minimumEscapedNameLength && buffer.Length >= minimumEscapedNameLength &&
           buffer[endOffset - 1] == '`' && buffer[endOffset - 2] == '`')
         for (var i = endOffset - 4; i > startOffset; i--)
           if (buffer[i] == '`' && buffer[i + 1] == '`')
             return new TextRange(i, endOffset);
 
+      if (logicalName != null && IsMangledOpName(logicalName))
+      {
+        var opLength = DecompileOpName.Invoke(logicalName).Length;
+        return new TextRange(endOffset - opLength, endOffset);
+      }
+
       // trim foo.bar to bar
       for (var i = endOffset - 1; i > startOffset; i--)
         if (buffer[i].Equals('.'))
           return new TextRange(i + 1, endOffset);
-      return range;
+      return new TextRange(startOffset, endOffset);
     }
 
     public FSharpResolvedSymbolUse[] GetAllResolvedSymbols(FSharpCheckFileResults checkResults = null,
