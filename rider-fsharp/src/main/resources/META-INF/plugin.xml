@@ -16,6 +16,7 @@
     <lang.syntaxHighlighterFactory language="F#" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.highlighting.FSharpSyntaxHighlighterFactory"/>
     <lang.altEnter language="F#" implementationClass="com.jetbrains.rider.intentions.altEnter.ReSharperAltEnterActionHandler" />
 
+    <backend.actions.support language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.actions.FSharpActionSupportPolicy" />
     <backend.markup.adapterFactory language="F#" implementationClass="com.jetbrains.rdclient.daemon.FrontendMarkupAdapterFactory" />
     <completion.contributor language="F#" implementationClass="com.jetbrains.rdclient.completion.ProtocolCompletionContributor" />
     <completion.completionSessionStrategy language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.services.completion.FSharpCompletionStrategy" />
@@ -31,6 +32,7 @@
     <lang.syntaxHighlighterFactory language="F# Script" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.highlighting.FSharpSyntaxHighlighterFactory"/>
     <lang.altEnter language="F# Script" implementationClass="com.jetbrains.rider.intentions.altEnter.ReSharperAltEnterActionHandler" />
 
+    <backend.actions.support language="F# Script" implementationClass="com.jetbrains.rider.plugins.fsharp.actions.FSharpActionSupportPolicy" />
     <backend.markup.adapterFactory language="F# Script" implementationClass="com.jetbrains.rdclient.daemon.FrontendMarkupAdapterFactory" />
     <completion.contributor language="F# Script" implementationClass="com.jetbrains.rdclient.completion.ProtocolCompletionContributor" />
     <completion.completionSessionStrategy language="F# Script" implementationClass="com.jetbrains.rider.plugins.fsharp.services.completion.FSharpCompletionStrategy" />
