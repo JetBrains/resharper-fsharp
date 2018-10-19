@@ -14,6 +14,7 @@ using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Text;
 using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
+using static Microsoft.FSharp.Compiler.PrettyNaming;
 using Microsoft.FSharp.Core;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -133,7 +134,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
                 mfv != null && mfv.IsProperty && buffer[endOffset - 1] == ']')
               continue;
 
-            var nameRange = FixRange(new TextRange(startOffset, endOffset), buffer);
+            TextRange nameRange;
+            if (symbol.DisplayName is var displayName && IsOperatorOrBacktickedName(displayName))
+            {
+              var opLen = IsOperatorName(displayName) && displayName.StartsWith("(") ? displayName.Length - 4 : displayName.Length;
+              nameRange = new TextRange(endOffset - opLen, endOffset);
+            }
+            else
+              nameRange = FixRange(new TextRange(startOffset, endOffset), buffer);
 
             // workaround for implicit type usages (e.g. in members with optional params), visualfsharp#3933
             if (symbol is FSharpEntity &&
