@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing;
-using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.Text;
 using JetBrains.Util;
@@ -9,7 +8,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 {
   public class FSharpPreprocessedLexer : ILexer<FSharpLexerState>
   {
-    private TokenNodeType currTokenType;
+    private TokenNodeType myCurrTokenType;
     private readonly FSharpLexer myLexer;
     private readonly FSharpPreprocessor myPreprocessor;
     private readonly HashSet<string> myDefinedConstants;
@@ -22,28 +21,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       myDefinedConstants = definedConstants;
     }
 
-    public FSharpPreprocessedLexer(
-      IBuffer buffer,
-      int startOffset,
-      int endOffset,
-      FSharpPreprocessor preprocessor,
-      HashSet<string> definedConstants)
-    {
-      myLexer = new FSharpLexer(buffer, startOffset, endOffset);
-      myPreprocessor = preprocessor;
-      myDefinedConstants = definedConstants;
-    }
-
     public void Start()
     {
       myLexer.Start();
-      currTokenType = null;
+      myCurrTokenType = null;
     }
 
-    private void Restore(FSharpLexerState stackElem)
-    {
+    private void Restore(FSharpLexerState stackElem) =>
       myLexer.CurrentPosition = stackElem;
-    }
 
     private FSharpLexerState DeadCodeToken(FSharpLexerState state, int dumpStart)
     {
@@ -60,35 +45,36 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       using (LexerStateCookie.Create(myLexer))
       {
         while (myLexer.TokenType == FSharpTokenType.WHITESPACE)
-        {
           myLexer.Advance();
-        }
 
         tokenType = myLexer.TokenType;
       }
-      
-      switch (tokenType)
+
+      if (tokenType == FSharpTokenType.PP_IF_SECTION)
       {
-        case var token when token == FSharpTokenType.PP_IF_SECTION:
-          myState.InIfBlock(false, false);
-          return PreprocessInactiveLine();
-        case var token when token == FSharpTokenType.PP_ENDIF:
-          myState.FromIfBlock();
-          return myState.Condition ? PreprocessLine() : PreprocessInactiveLine();
-        case var token when token == FSharpTokenType.PP_ELSE_SECTION:
-          myState.SwitchBranch();
-          return myState.Condition ? PreprocessLine() : PreprocessInactiveLine();
-        default:
-          return PreprocessInactiveLine();
+        myState.InIfBlock(false, false);
+        return PreprocessInactiveLine();
       }
+
+      if (tokenType == FSharpTokenType.PP_ENDIF)
+      {
+        myState.FromIfBlock();
+        return myState.Condition ? PreprocessLine() : PreprocessInactiveLine();
+      }
+
+      if (tokenType == FSharpTokenType.PP_ELSE_SECTION)
+      {
+        myState.SwitchBranch();
+        return myState.Condition ? PreprocessLine() : PreprocessInactiveLine();
+      }
+
+      return PreprocessInactiveLine();
     }
 
     private TokenNodeType PreprocessIfSection()
     {
       using (LexerStateCookie.Create(myLexer))
-      {
         myState.InIfBlock(myPreprocessor.Preprocess(myLexer, myDefinedConstants), true);
-      }
       return PreprocessLine();
     }
 
@@ -100,7 +86,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         tokenType = myLexer.TokenType;
         myState.EnqueueLexerState(myLexer.CurrentPosition);
         myLexer.Advance();
-      } while (!(tokenType == FSharpTokenType.NEW_LINE || tokenType == null));
+      } while (tokenType != FSharpTokenType.NEW_LINE && tokenType != null);
       return TokenType;
     }
 
@@ -111,44 +97,46 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       do
       {
         tokenType = myLexer.TokenType;
-        switch (tokenType)
+        if (tokenType == FSharpTokenType.NEW_LINE)
         {
-          case var token when token == FSharpTokenType.NEW_LINE:
-            var state = DeadCodeToken(myLexer.CurrentPosition, dumpStartToken);
-            myState.EnqueueLexerState(state);
-            myState.EnqueueLexerState(myLexer.CurrentPosition);
-            break;
+          var state = DeadCodeToken(myLexer.CurrentPosition, dumpStartToken);
+          myState.EnqueueLexerState(state);
+          myState.EnqueueLexerState(myLexer.CurrentPosition);
         }
         myLexer.Advance();
-      } while (!(tokenType == FSharpTokenType.NEW_LINE || tokenType == null));
+      } while (tokenType != FSharpTokenType.NEW_LINE && tokenType != null);
       return TokenType;
     }
 
     private TokenNodeType PreprocessActiveBranch()
     {
-      switch (myLexer.TokenType)
+      var tokenType = myLexer.TokenType;
+      if (tokenType == FSharpTokenType.PP_IF_SECTION)
+        return PreprocessIfSection();
+
+      if (tokenType == FSharpTokenType.PP_ENDIF)
       {
-        case var token when token == FSharpTokenType.PP_IF_SECTION:
-          return PreprocessIfSection();
-        case var token when token == FSharpTokenType.PP_ENDIF:
-          myState.FromIfBlock();
-          return PreprocessLine();
-        case var token when token == FSharpTokenType.PP_ELSE_SECTION:
-          myState.SwitchBranch();
-          return PreprocessLine();
-        default:
-          return myLexer.TokenType;
+        myState.FromIfBlock();
+        return PreprocessLine();
       }
+
+      if (tokenType == FSharpTokenType.PP_ELSE_SECTION)
+      {
+        myState.SwitchBranch();
+        return PreprocessLine();
+      }
+
+      return tokenType;
     }
 
     public void Advance()
     {
       myLexer.Advance();
       LocateToken();
-      currTokenType = null;
+      myCurrTokenType = null;
     }
 
-    public TokenNodeType _locateToken()
+    private TokenNodeType LocateTokenImpl()
     {
       if (!myState.LexerStates().IsEmpty())
       {
@@ -179,7 +167,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       get
       {
         LocateToken();
-        return currTokenType;
+        return myCurrTokenType;
       }
     }
 
@@ -205,10 +193,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 
     private void LocateToken()
     {
-      if (currTokenType == null)
-      {
-        currTokenType = _locateToken();
-      }
+      if (myCurrTokenType == null)
+        myCurrTokenType = LocateTokenImpl();
     }
     
     private class PreprocessorState
@@ -268,24 +254,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       private readonly Stack<PreprocessorBlockState> myStack = new Stack<PreprocessorBlockState>();
       private readonly Queue<FSharpLexerState> myQueue = new Queue<FSharpLexerState>();
 
-      public IEnumerable<FSharpLexerState> LexerStates()
-      {
-        return myQueue;
-      }
-      public void EnqueueLexerState(FSharpLexerState state)
-      {
+      public IEnumerable<FSharpLexerState> LexerStates() => myQueue;
+
+      public void EnqueueLexerState(FSharpLexerState state) =>
         myQueue.Enqueue(state);
-      }
 
-      public FSharpLexerState DequeueLexerState()
-      {
-        return myQueue.Dequeue();
-      }
+      public FSharpLexerState DequeueLexerState() =>
+        myQueue.Dequeue();
 
-      public void InIfBlock(bool condition, bool hasActiveBranch)
-      {
+      public void InIfBlock(bool condition, bool hasActiveBranch) =>
         myStack.Push(new PreprocessorBlockState(condition, hasActiveBranch));
-      }
 
       public void FromIfBlock()
       {
@@ -298,8 +276,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         if (myStack.IsEmpty())
           return;
         var state = myStack.Pop();
-        var elseState = state.SwitchBranch();
-        if (elseState == PreprocessorElseState.Error)
+        if (state.SwitchBranch() == PreprocessorElseState.Error)
           myStack.Clear();
         else
           myStack.Push(state);

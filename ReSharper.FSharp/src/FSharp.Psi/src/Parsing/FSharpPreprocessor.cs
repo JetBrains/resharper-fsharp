@@ -26,10 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     {
       public readonly string Symbol;
     
-      public SymbolExpression(string symbol)
-      {
-        Symbol = symbol;
-      }
+      public SymbolExpression(string symbol) => Symbol = symbol;
 
       public override bool Accept(FSharpPreprocessor fSharpPreprocessor) => fSharpPreprocessor.Visit(this);
     }
@@ -38,10 +35,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     {
       public readonly Expression Expr;
 
-      public NotExpression(Expression expr)
-      {
-        Expr = expr;
-      }
+      public NotExpression(Expression expr) => Expr = expr;
 
       public override bool Accept(FSharpPreprocessor fSharpPreprocessor) => fSharpPreprocessor.Visit(this);
     }
@@ -75,12 +69,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     }
 
     private ExpressionParser myParser;
-    private HashSet<string> myDefinedConststants;
+    private HashSet<string> myDefinedConstants;
 
     public bool Preprocess(ILexer lexer, HashSet<string> definedConstants)
     {
       myParser = new ExpressionParser();
-      myDefinedConststants = definedConstants;
+      myDefinedConstants = definedConstants;
       var expr =  myParser.Parse(lexer);
       return expr.Accept(this);
     }
@@ -88,17 +82,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     private bool Visit(NotExpression notExpr) => !notExpr.Expr.Accept(this);
     private bool Visit(AndExpression andExpr) => andExpr.Left.Accept(this) && andExpr.Right.Accept(this);
     private bool Visit(OrExpression orExpr) => orExpr.Left.Accept(this) || orExpr.Right.Accept(this);
-    private bool Visit(SymbolExpression symbolExpr) => myDefinedConststants.Contains(symbolExpr.Symbol);
+    private bool Visit(SymbolExpression symbolExpr) => myDefinedConstants.Contains(symbolExpr.Symbol);
     private bool Visit(ErrorExpression errorExpr) => false;
+
     private class ExpressionParser
     {    
-      private static readonly NodeTypeSet mySkippedToken = new NodeTypeSet(
+      private static readonly NodeTypeSet ourSkippedTokens = new NodeTypeSet(
         FSharpTokenType.WHITESPACE,
         FSharpTokenType.PP_IF_SECTION);
 
       private TokenNodeType TokenType()
       {
-        while (mySkippedToken[myLexer.TokenType])
+        while (ourSkippedTokens[myLexer.TokenType])
           myLexer.Advance();
         return myLexer.TokenType;
       }
@@ -162,7 +157,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       {
         switch (TokenType())
         {
-          case var token when token == null: return new ErrorExpression(); 
+          case null: return new ErrorExpression(); 
           case var token when token == FSharpTokenType.PP_NOT:
             myLexer.Advance();
             return ParseNotExpression().Not();

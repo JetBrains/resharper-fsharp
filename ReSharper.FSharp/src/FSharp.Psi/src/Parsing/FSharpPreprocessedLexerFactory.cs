@@ -10,10 +10,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     private readonly HashSet<string> myDefinedConstant;
     private readonly FSharpPreprocessor myPreprocessor = new FSharpPreprocessor();
 
-    public FSharpPreprocessedLexerFactory(FSharpList<string> definedConstants)
-    {
+    public FSharpPreprocessedLexerFactory(FSharpList<string> definedConstants) =>
       myDefinedConstant = new HashSet<string>(definedConstants);
-    }
 
     public ILexer CreateLexer(IBuffer buffer) =>
       new FSharpPreprocessedLexer(buffer, myPreprocessor, myDefinedConstant);

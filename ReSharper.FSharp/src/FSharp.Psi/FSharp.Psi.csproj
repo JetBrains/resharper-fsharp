@@ -18,7 +18,7 @@
       <SubType>Designer</SubType>
     </TokenGenerator>
 
-    <Compile Include="Src\Parsing\FSharpTokenType.Generated.cs">
+    <Compile Update="Src\Parsing\FSharpTokenType.Generated.cs">
       <DependentUpon>FSharpTokens.xml</DependentUpon>
     </Compile>
   </ItemGroup>
