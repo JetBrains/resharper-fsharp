@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FSharp.Core" Version="4.3.4" />
+    <PackageReference Include="FSharp.Core" Version="4.5.2" />
     <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
     <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FCSVersion)" />
   </ItemGroup>
