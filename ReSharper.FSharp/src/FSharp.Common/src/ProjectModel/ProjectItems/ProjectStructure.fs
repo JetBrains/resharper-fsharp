@@ -1,11 +1,9 @@
 module JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ProjectStructure
 
 open System
-open System.Collections.Generic
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Host.Features.ProjectModel.View
 open JetBrains.ReSharper.Host.Features.ProjectModel.View.Appenders.ProjectStructure
-open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
 open JetBrains.Rider.Model
@@ -44,7 +42,8 @@ type FSharpProjectStructureProvider(container: IFSharpItemsContainer) =
 
 
 [<SolutionInstanceComponent>]
-type FSharpProjectStructurePresenter(host: ProjectModelViewHost, container: IFSharpItemsContainer) =
+type FSharpProjectStructurePresenter
+        (host: ProjectModelViewHost, container: IFSharpItemsContainer, presenter: ProjectModelViewPresenter) =
 
     let presentItem (item: FSharpViewItem): RdProjectModelItemDescriptor =
         let key = container.TryGetSortKey(item) |> Option.toNullable
@@ -57,10 +56,10 @@ type FSharpProjectStructurePresenter(host: ProjectModelViewHost, container: IFSh
                     if action.ChangesOrder() then Some (dict ["FSharpCompileType", action.ToString()])
                     else None)
                 |> Option.toObj
-            ProjectModelViewPresenter.PresentProjectFile(file, sortKey = key, userData = userData) :> _
+            presenter.PresentProjectFile(file, sortKey = key, userData = userData) :> _
 
         | FSharpViewFolder (folder, _) ->
-            ProjectModelViewPresenter.PresentProjectFolder(folder, sortKey = key) :> _
+            presenter.PresentProjectFolder(folder, sortKey = key) :> _
 
     do
         host.Present<FSharpViewItem>(Func<_,_>(presentItem))
