@@ -4,7 +4,6 @@ open System
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Host.Features.ProjectModel.View
 open JetBrains.ReSharper.Host.Features.ProjectModel.View.Appenders.ProjectStructure
-open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
 open JetBrains.Rider.Model
 open JetBrains.Util
@@ -49,14 +48,7 @@ type FSharpProjectStructurePresenter
         let key = container.TryGetSortKey(item) |> Option.toNullable
         match item with
         | FSharpViewFile file ->
-            let userData =
-                file.Properties.GetBuildActions()
-                |> Seq.tryHead
-                |> Option.bind (fun (Pair (_, action)) ->
-                    if action.ChangesOrder() then Some (dict ["FSharpCompileType", action.ToString()])
-                    else None)
-                |> Option.toObj
-            presenter.PresentProjectFile(file, sortKey = key, userData = userData) :> _
+            presenter.PresentProjectFile(file, sortKey = key) :> _
 
         | FSharpViewFolder (folder, _) ->
             presenter.PresentProjectFolder(folder, sortKey = key) :> _
