@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
@@ -43,4 +43,8 @@
     <Reference Include="WindowsBase" />
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="Build">
+    <Delete Files="$(OutputPath)\FSharp.Core.resources.dll" />
+  </Target>
 </Project>

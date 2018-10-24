@@ -5,7 +5,6 @@ open JetBrains.ReSharper.Feature.Services.Debugger
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
 open Microsoft.FSharp.Compiler
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -56,7 +55,7 @@ type FSharpDebuggerLocalSymbolProvider() =
                                 
                                 member this.VisitPat(defaultTraverse, pat) = visitPat pat defaultTraverse 
 
-                                member this.VisitLetOrUse(bindings, range) =
+                                member this.VisitLetOrUse(_, _, bindings, range) =
                                     bindings |> List.tryPick (fun (Binding(headPat = headPat)) ->
                                         visitPat headPat (fun _ -> None) 
                                     )
