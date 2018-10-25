@@ -7,14 +7,14 @@ open JetBrains.DocumentModel
 open JetBrains.DocumentModel.Impl
 open JetBrains.ReSharper.Feature.Services.CodeCleanup
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CodeStyle
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
-open JetBrains.ReSharper.Resources.Shell
+open JetBrains.ReSharper.Psi.Util
 open JetBrains.Util
+open JetBrains.Util.Text
 open Microsoft.FSharp.Compiler
 
 [<CodeCleanupModule>]
@@ -50,6 +50,7 @@ type ReformatCode() =
     
                     let stamp = document.LastModificationStamp
                     let modificationSide = TextModificationSide.NotSpecified
+                    let newLineText = sourceFile.DetectLineEnding().GetPresentation()
     
                     let change = 
                         if isNotNull rangeMarker then
@@ -63,7 +64,7 @@ type ReformatCode() =
                                 let formatted =
                                     CodeFormatter
                                         .FormatSelection(filePath, range, source, formatConfig)
-                                        .Replace("\r\n", "\n")
+                                        .Replace("\r\n", newLineText)
                                 let offset = rangeMarker.DocumentRange.StartOffset.Offset
                                 let oldLength = rangeMarker.DocumentRange.Length
                                 Some (DocumentChange(document, offset, oldLength, formatted, stamp, modificationSide))
@@ -72,7 +73,7 @@ type ReformatCode() =
                             let formatted =
                                 CodeFormatter
                                     .FormatAST(parsedInput, filePath, Some source, formatConfig)
-                                    .Replace("\r\n", "\n")
+                                    .Replace("\r\n", newLineText)
                             Some(DocumentChange(document, 0, source.Length, formatted, stamp, modificationSide))
     
                     match change with

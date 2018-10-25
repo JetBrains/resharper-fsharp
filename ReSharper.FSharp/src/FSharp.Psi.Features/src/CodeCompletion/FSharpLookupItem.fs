@@ -9,9 +9,12 @@ open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
+open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Util
 open JetBrains.UI.Icons
 open JetBrains.UI.RichText
 open JetBrains.Util
+open JetBrains.Util.Text
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
 type FSharpLookupCandidate(description: string, xmlDoc: FSharpXmlDoc, xmlDocService: FSharpXmlDocService) =
@@ -122,7 +125,9 @@ type FSharpLookupItem
             if lineToInsert > 0 then document.GetLineEndOffsetWithLineBreak(docLine (max 0 (lineToInsert - 1)))
             else 0
 
-        document.InsertText(prevLineEndOffset, textToInsert + "\n" + (if insertEmptyLine then "\n" else ""))
+        let newLineText = document.GetPsiSourceFile(solution).DetectLineEnding().GetPresentation()
+        let emptyLine = (if insertEmptyLine then newLineText else "")
+        document.InsertText(prevLineEndOffset, textToInsert + newLineText + emptyLine)
 
     override x.GetDisplayName() =
         let name = LookupUtil.FormatLookupString(item.Name, x.TextColor)
