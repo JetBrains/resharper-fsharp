@@ -6,7 +6,7 @@ Init
   -ClassLibrary1
    -Dependencies
     .NETFramework 4.5
-   BeforeFile.fs (CompileBefore)
+   BeforeFile.fs [CompileBefore]
    -Folder
     File1.fs
     File2.fs
@@ -23,7 +23,7 @@ Init
    LinkedFile1.fs
    -LinkedFolder
     LinkedFile2.fs
-   AfterFile.fs (CompileAfter)
+   AfterFile.fs [CompileAfter]
 
 
 Project [Name:&, GUID:]
@@ -52,13 +52,6 @@ Project [Name:ClassLibrary1, GUID:]
     Folder [Name:LinkedFolder, AllowsNonExistence:true]
       Child items:
         ProjectFileImpl(Path : LinkedFile2.fs (..\..\ExternalFolder\LinkedFile2.fs))[COMPILE ]
-    Folder [Name:obj, IsHidden:true]
-      Child items:
-        Folder [Name:Debug, IsHidden:true]
-          Child items:
-            Folder [Name:net45, IsHidden:true]
-              Child items:
-                ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
 Project [Name:Miscellaneous Files, GUID:]
 
@@ -67,12 +60,7 @@ Project [Name:Miscellaneous Files, GUID:]
 ===================
 File Path Index
 <SOLUTION ROOT> [Nodes: 1] Index:IncludeFlat
- .clang-format FLAT_EXTERNAL_ROOT
- .editorconfig FLAT_EXTERNAL_ROOT
- .nuget
-  NuGet.Config FLAT_EXTERNAL_ROOT
- _clang-format FLAT_EXTERNAL_ROOT
- ClassLibrary1 [Nodes: 1] RECURSIVE_EXTERNAL_ROOT Index:IncludeRecursive
+ ClassLibrary1 [Nodes: 1] Index:IncludeRecursive
   AfterFile.fs [Nodes: 1] Index:Include
   BeforeFile.fs [Nodes: 1] Index:Include
   bin Index:ExcludeRecursive
@@ -89,34 +77,21 @@ File Path Index
     Class1.fs [Nodes: 1] Index:Include
     Class2.fs [Nodes: 1] Index:Include
   LinkedFolder [Nodes: 1] Index:Include
-  obj [Nodes: 1] Index:ExcludeRecursive
-   Debug [Nodes: 1] Index:Include
-    net45 [Nodes: 1] Index:Include
-     ClassLibrary1.AssemblyInfo.fs [Nodes: 1] Index:Include
- ExternalFolder FLAT_EXTERNAL_ROOT
+  obj Index:ExcludeRecursive
+ ExternalFolder
   LinkedFile1.fs [Nodes: 1] Index:Include
   LinkedFile2.fs [Nodes: 1] Index:Include
- FSharpProjectTree.sln [Nodes: 1] FLAT_EXTERNAL_ROOT Index:IncludeFlat
- FSharpProjectTree.sln.DotSettings FLAT_EXTERNAL_ROOT
- FSharpProjectTree.sln.DotSettings.user FLAT_EXTERNAL_ROOT
- global.json FLAT_EXTERNAL_ROOT
- NuGet.Config FLAT_EXTERNAL_ROOT
- packages RECURSIVE_EXTERNAL_ROOT Index:ExcludeRecursive
- packages.config FLAT_EXTERNAL_ROOT
- Settings.StyleCop FLAT_EXTERNAL_ROOT
+ FSharpProjectTree.sln [Nodes: 1] Index:IncludeFlat
+ packages Index:ExcludeRecursive
 
 
 1:BeforeFile.fs (CompileBefore)
-2:obj[1]
-  1:Debug[1]
-    1:net45[1]
-      1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:Folder[1]
+2:Folder[1]
   1:File1.fs
   2:File2.fs
-4:File3.fs
-5:EmptyFolder[1]
-6:Folder[2]
+3:File3.fs
+4:EmptyFolder[1]
+5:Folder[2]
   1:File3.fs
   2:File4.fs
   3:Sub[1]
@@ -124,14 +99,13 @@ File Path Index
   4:File5.fs
   5:Sub[2]
     1:Class2.fs
-7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-8:LinkedFolder[1]
+6:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+7:LinkedFolder[1]
   1:x (from ../ExternalFolder/LinkedFile2.fs)
-9:AfterFile.fs (CompileAfter)
+8:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
-obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 Folder/File1.fs
 Folder/File2.fs
 File3.fs
@@ -152,7 +126,7 @@ AfterFile.fs
   -ClassLibrary1
    -Dependencies
     .NETFramework 4.5
-   BeforeFile.fs (CompileBefore)
+   BeforeFile.fs [CompileBefore]
    -Folder
     File2.fs
    File3.fs
@@ -169,7 +143,7 @@ AfterFile.fs
    LinkedFile1.fs
    -LinkedFolder
     LinkedFile2.fs
-   AfterFile.fs (CompileAfter)
+   AfterFile.fs [CompileAfter]
 
 
 Project [Name:&, GUID:]
@@ -198,13 +172,6 @@ Project [Name:ClassLibrary1, GUID:]
     Folder [Name:LinkedFolder, AllowsNonExistence:true]
       Child items:
         ProjectFileImpl(Path : LinkedFile2.fs (..\..\ExternalFolder\LinkedFile2.fs))[COMPILE ]
-    Folder [Name:obj, IsHidden:true]
-      Child items:
-        Folder [Name:Debug, IsHidden:true]
-          Child items:
-            Folder [Name:net45, IsHidden:true]
-              Child items:
-                ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
 Project [Name:Miscellaneous Files, GUID:]
 
@@ -213,12 +180,7 @@ Project [Name:Miscellaneous Files, GUID:]
 ===================
 File Path Index
 <SOLUTION ROOT> [Nodes: 1] Index:IncludeFlat
- .clang-format FLAT_EXTERNAL_ROOT
- .editorconfig FLAT_EXTERNAL_ROOT
- .nuget
-  NuGet.Config FLAT_EXTERNAL_ROOT
- _clang-format FLAT_EXTERNAL_ROOT
- ClassLibrary1 [Nodes: 1] RECURSIVE_EXTERNAL_ROOT Index:IncludeRecursive
+ ClassLibrary1 [Nodes: 1] Index:IncludeRecursive
   AfterFile.fs [Nodes: 1] Index:Include
   BeforeFile.fs [Nodes: 1] Index:Include
   bin Index:ExcludeRecursive
@@ -235,33 +197,20 @@ File Path Index
     Class1.fs [Nodes: 1] Index:Include
     Class2.fs [Nodes: 1] Index:Include
   LinkedFolder [Nodes: 1] Index:Include
-  obj [Nodes: 1] Index:ExcludeRecursive
-   Debug [Nodes: 1] Index:Include
-    net45 [Nodes: 1] Index:Include
-     ClassLibrary1.AssemblyInfo.fs [Nodes: 1] Index:Include
- ExternalFolder FLAT_EXTERNAL_ROOT
+  obj Index:ExcludeRecursive
+ ExternalFolder
   LinkedFile1.fs [Nodes: 1] Index:Include
   LinkedFile2.fs [Nodes: 1] Index:Include
- FSharpProjectTree.sln [Nodes: 1] FLAT_EXTERNAL_ROOT Index:IncludeFlat
- FSharpProjectTree.sln.DotSettings FLAT_EXTERNAL_ROOT
- FSharpProjectTree.sln.DotSettings.user FLAT_EXTERNAL_ROOT
- global.json FLAT_EXTERNAL_ROOT
- NuGet.Config FLAT_EXTERNAL_ROOT
- packages RECURSIVE_EXTERNAL_ROOT Index:ExcludeRecursive
- packages.config FLAT_EXTERNAL_ROOT
- Settings.StyleCop FLAT_EXTERNAL_ROOT
+ FSharpProjectTree.sln [Nodes: 1] Index:IncludeFlat
+ packages Index:ExcludeRecursive
 
 
 1:BeforeFile.fs (CompileBefore)
-2:obj[1]
-  1:Debug[1]
-    1:net45[1]
-      1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:Folder[1]
+2:Folder[1]
   1:File2.fs
-4:File3.fs
-5:EmptyFolder[1]
-6:Folder[2]
+3:File3.fs
+4:EmptyFolder[1]
+5:Folder[2]
   1:File3.fs
   2:File4.fs
   3:File1.fs
@@ -270,14 +219,13 @@ File Path Index
   5:File5.fs
   6:Sub[2]
     1:Class2.fs
-7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-8:LinkedFolder[1]
+6:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+7:LinkedFolder[1]
   1:x (from ../ExternalFolder/LinkedFile2.fs)
-9:AfterFile.fs (CompileAfter)
+8:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
-obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 Folder/File2.fs
 File3.fs
 Folder/File3.fs
@@ -298,7 +246,7 @@ AfterFile.fs
   -ClassLibrary1
    -Dependencies
     .NETFramework 4.5
-   BeforeFile.fs (CompileBefore)
+   BeforeFile.fs [CompileBefore]
    -Folder
     File3.fs
     File2.fs
@@ -315,7 +263,7 @@ AfterFile.fs
    LinkedFile1.fs
    -LinkedFolder
     LinkedFile2.fs
-   AfterFile.fs (CompileAfter)
+   AfterFile.fs [CompileAfter]
 
 
 Project [Name:&, GUID:]
@@ -344,13 +292,6 @@ Project [Name:ClassLibrary1, GUID:]
     Folder [Name:LinkedFolder, AllowsNonExistence:true]
       Child items:
         ProjectFileImpl(Path : LinkedFile2.fs (..\..\ExternalFolder\LinkedFile2.fs))[COMPILE ]
-    Folder [Name:obj, IsHidden:true]
-      Child items:
-        Folder [Name:Debug, IsHidden:true]
-          Child items:
-            Folder [Name:net45, IsHidden:true]
-              Child items:
-                ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
 Project [Name:Miscellaneous Files, GUID:]
 
@@ -359,12 +300,7 @@ Project [Name:Miscellaneous Files, GUID:]
 ===================
 File Path Index
 <SOLUTION ROOT> [Nodes: 1] Index:IncludeFlat
- .clang-format FLAT_EXTERNAL_ROOT
- .editorconfig FLAT_EXTERNAL_ROOT
- .nuget
-  NuGet.Config FLAT_EXTERNAL_ROOT
- _clang-format FLAT_EXTERNAL_ROOT
- ClassLibrary1 [Nodes: 1] RECURSIVE_EXTERNAL_ROOT Index:IncludeRecursive
+ ClassLibrary1 [Nodes: 1] Index:IncludeRecursive
   AfterFile.fs [Nodes: 1] Index:Include
   BeforeFile.fs [Nodes: 1] Index:Include
   bin Index:ExcludeRecursive
@@ -381,34 +317,21 @@ File Path Index
     Class1.fs [Nodes: 1] Index:Include
     Class2.fs [Nodes: 1] Index:Include
   LinkedFolder [Nodes: 1] Index:Include
-  obj [Nodes: 1] Index:ExcludeRecursive
-   Debug [Nodes: 1] Index:Include
-    net45 [Nodes: 1] Index:Include
-     ClassLibrary1.AssemblyInfo.fs [Nodes: 1] Index:Include
- ExternalFolder FLAT_EXTERNAL_ROOT
+  obj Index:ExcludeRecursive
+ ExternalFolder
   LinkedFile1.fs [Nodes: 1] Index:Include
   LinkedFile2.fs [Nodes: 1] Index:Include
- FSharpProjectTree.sln [Nodes: 1] FLAT_EXTERNAL_ROOT Index:IncludeFlat
- FSharpProjectTree.sln.DotSettings FLAT_EXTERNAL_ROOT
- FSharpProjectTree.sln.DotSettings.user FLAT_EXTERNAL_ROOT
- global.json FLAT_EXTERNAL_ROOT
- NuGet.Config FLAT_EXTERNAL_ROOT
- packages RECURSIVE_EXTERNAL_ROOT Index:ExcludeRecursive
- packages.config FLAT_EXTERNAL_ROOT
- Settings.StyleCop FLAT_EXTERNAL_ROOT
+ FSharpProjectTree.sln [Nodes: 1] Index:IncludeFlat
+ packages Index:ExcludeRecursive
 
 
 1:BeforeFile.fs (CompileBefore)
-2:obj[1]
-  1:Debug[1]
-    1:net45[1]
-      1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:Folder[1]
+2:Folder[1]
   1:File3.fs
   2:File2.fs
-4:File3.fs
-5:EmptyFolder[1]
-6:Folder[2]
+3:File3.fs
+4:EmptyFolder[1]
+5:Folder[2]
   1:File4.fs
   2:File1.fs
   3:Sub[1]
@@ -416,14 +339,13 @@ File Path Index
   4:File5.fs
   5:Sub[2]
     1:Class2.fs
-7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-8:LinkedFolder[1]
+6:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+7:LinkedFolder[1]
   1:x (from ../ExternalFolder/LinkedFile2.fs)
-9:AfterFile.fs (CompileAfter)
+8:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
-obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 Folder/File3.fs
 Folder/File2.fs
 File3.fs
@@ -444,7 +366,7 @@ AfterFile.fs
   -ClassLibrary1
    -Dependencies
     .NETFramework 4.5
-   BeforeFile.fs (CompileBefore)
+   BeforeFile.fs [CompileBefore]
    -Folder
     File3.fs
     File2.fs
@@ -461,7 +383,7 @@ AfterFile.fs
    LinkedFile1.fs
    -LinkedFolder
     LinkedFile2.fs
-   AfterFile.fs (CompileAfter)
+   AfterFile.fs [CompileAfter]
 
 
 Project [Name:&, GUID:]
@@ -490,13 +412,6 @@ Project [Name:ClassLibrary1, GUID:]
     Folder [Name:LinkedFolder, AllowsNonExistence:true]
       Child items:
         ProjectFileImpl(Path : LinkedFile2.fs (..\..\ExternalFolder\LinkedFile2.fs))[COMPILE ]
-    Folder [Name:obj, IsHidden:true]
-      Child items:
-        Folder [Name:Debug, IsHidden:true]
-          Child items:
-            Folder [Name:net45, IsHidden:true]
-              Child items:
-                ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
 Project [Name:Miscellaneous Files, GUID:]
 
@@ -505,12 +420,7 @@ Project [Name:Miscellaneous Files, GUID:]
 ===================
 File Path Index
 <SOLUTION ROOT> [Nodes: 1] Index:IncludeFlat
- .clang-format FLAT_EXTERNAL_ROOT
- .editorconfig FLAT_EXTERNAL_ROOT
- .nuget
-  NuGet.Config FLAT_EXTERNAL_ROOT
- _clang-format FLAT_EXTERNAL_ROOT
- ClassLibrary1 [Nodes: 1] RECURSIVE_EXTERNAL_ROOT Index:IncludeRecursive
+ ClassLibrary1 [Nodes: 1] Index:IncludeRecursive
   AfterFile.fs [Nodes: 1] Index:Include
   BeforeFile.fs [Nodes: 1] Index:Include
   bin Index:ExcludeRecursive
@@ -527,49 +437,35 @@ File Path Index
     Class1.fs [Nodes: 1] Index:Include
     Class2.fs [Nodes: 1] Index:Include
   LinkedFolder [Nodes: 1] Index:Include
-  obj [Nodes: 1] Index:ExcludeRecursive
-   Debug [Nodes: 1] Index:Include
-    net45 [Nodes: 1] Index:Include
-     ClassLibrary1.AssemblyInfo.fs [Nodes: 1] Index:Include
- ExternalFolder FLAT_EXTERNAL_ROOT
+  obj Index:ExcludeRecursive
+ ExternalFolder
   LinkedFile1.fs [Nodes: 1] Index:Include
   LinkedFile2.fs [Nodes: 1] Index:Include
- FSharpProjectTree.sln [Nodes: 1] FLAT_EXTERNAL_ROOT Index:IncludeFlat
- FSharpProjectTree.sln.DotSettings FLAT_EXTERNAL_ROOT
- FSharpProjectTree.sln.DotSettings.user FLAT_EXTERNAL_ROOT
- global.json FLAT_EXTERNAL_ROOT
- NuGet.Config FLAT_EXTERNAL_ROOT
- packages RECURSIVE_EXTERNAL_ROOT Index:ExcludeRecursive
- packages.config FLAT_EXTERNAL_ROOT
- Settings.StyleCop FLAT_EXTERNAL_ROOT
+ FSharpProjectTree.sln [Nodes: 1] Index:IncludeFlat
+ packages Index:ExcludeRecursive
 
 
 1:BeforeFile.fs (CompileBefore)
-2:obj[1]
-  1:Debug[1]
-    1:net45[1]
-      1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:Folder[1]
+2:Folder[1]
   1:File3.fs
   2:File2.fs
-4:File3.fs
-5:EmptyFolder[1]
-6:File1.fs
-7:Folder[2]
+3:File3.fs
+4:EmptyFolder[1]
+5:File1.fs
+6:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:Class1.fs
   3:File5.fs
   4:Sub[2]
     1:Class2.fs
-8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-9:LinkedFolder[1]
+7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+8:LinkedFolder[1]
   1:x (from ../ExternalFolder/LinkedFile2.fs)
-10:AfterFile.fs (CompileAfter)
+9:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
-obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 Folder/File3.fs
 Folder/File2.fs
 File3.fs
@@ -590,7 +486,7 @@ AfterFile.fs
   -ClassLibrary1
    -Dependencies
     .NETFramework 4.5
-   BeforeFile.fs (CompileBefore)
+   BeforeFile.fs [CompileBefore]
    -Folder
     File3.fs
     File2.fs
@@ -607,7 +503,7 @@ AfterFile.fs
    LinkedFile1.fs
    -LinkedFolder
     LinkedFile2.fs
-   AfterFile.fs (CompileAfter)
+   AfterFile.fs [CompileAfter]
 
 
 Project [Name:&, GUID:]
@@ -636,13 +532,6 @@ Project [Name:ClassLibrary1, GUID:]
     Folder [Name:LinkedFolder, AllowsNonExistence:true]
       Child items:
         ProjectFileImpl(Path : LinkedFile2.fs (..\..\ExternalFolder\LinkedFile2.fs))[COMPILE ]
-    Folder [Name:obj, IsHidden:true]
-      Child items:
-        Folder [Name:Debug, IsHidden:true]
-          Child items:
-            Folder [Name:net45, IsHidden:true]
-              Child items:
-                ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
 Project [Name:Miscellaneous Files, GUID:]
 
@@ -651,12 +540,7 @@ Project [Name:Miscellaneous Files, GUID:]
 ===================
 File Path Index
 <SOLUTION ROOT> [Nodes: 1] Index:IncludeFlat
- .clang-format FLAT_EXTERNAL_ROOT
- .editorconfig FLAT_EXTERNAL_ROOT
- .nuget
-  NuGet.Config FLAT_EXTERNAL_ROOT
- _clang-format FLAT_EXTERNAL_ROOT
- ClassLibrary1 [Nodes: 1] RECURSIVE_EXTERNAL_ROOT Index:IncludeRecursive
+ ClassLibrary1 [Nodes: 1] Index:IncludeRecursive
   AfterFile.fs [Nodes: 1] Index:Include
   BeforeFile.fs [Nodes: 1] Index:Include
   bin Index:ExcludeRecursive
@@ -673,33 +557,20 @@ File Path Index
     File1.fs [Nodes: 1] Index:Include
     File3.fs [Nodes: 1] Index:Include
   LinkedFolder [Nodes: 1] Index:Include
-  obj [Nodes: 1] Index:ExcludeRecursive
-   Debug [Nodes: 1] Index:Include
-    net45 [Nodes: 1] Index:Include
-     ClassLibrary1.AssemblyInfo.fs [Nodes: 1] Index:Include
- ExternalFolder FLAT_EXTERNAL_ROOT
+  obj Index:ExcludeRecursive
+ ExternalFolder
   LinkedFile1.fs [Nodes: 1] Index:Include
   LinkedFile2.fs [Nodes: 1] Index:Include
- FSharpProjectTree.sln [Nodes: 1] FLAT_EXTERNAL_ROOT Index:IncludeFlat
- FSharpProjectTree.sln.DotSettings FLAT_EXTERNAL_ROOT
- FSharpProjectTree.sln.DotSettings.user FLAT_EXTERNAL_ROOT
- global.json FLAT_EXTERNAL_ROOT
- NuGet.Config FLAT_EXTERNAL_ROOT
- packages RECURSIVE_EXTERNAL_ROOT Index:ExcludeRecursive
- packages.config FLAT_EXTERNAL_ROOT
- Settings.StyleCop FLAT_EXTERNAL_ROOT
+ FSharpProjectTree.sln [Nodes: 1] Index:IncludeFlat
+ packages Index:ExcludeRecursive
 
 
 1:BeforeFile.fs (CompileBefore)
-2:obj[1]
-  1:Debug[1]
-    1:net45[1]
-      1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:Folder[1]
+2:Folder[1]
   1:File3.fs
   2:File2.fs
-4:EmptyFolder[1]
-5:Folder[2]
+3:EmptyFolder[1]
+4:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:File3.fs
@@ -708,14 +579,13 @@ File Path Index
   3:File5.fs
   4:Sub[2]
     1:Class2.fs
-6:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-7:LinkedFolder[1]
+5:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+6:LinkedFolder[1]
   1:x (from ../ExternalFolder/LinkedFile2.fs)
-8:AfterFile.fs (CompileAfter)
+7:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
-obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 Folder/File3.fs
 Folder/File2.fs
 Folder/File4.fs
@@ -736,7 +606,7 @@ AfterFile.fs
   -ClassLibrary1
    -Dependencies
     .NETFramework 4.5
-   BeforeFile.fs (CompileBefore)
+   BeforeFile.fs [CompileBefore]
    -Folder
     File3.fs
     File2.fs
@@ -753,7 +623,7 @@ AfterFile.fs
    LinkedFile1.fs
    -LinkedFolder
     LinkedFile2.fs
-   AfterFile.fs (CompileAfter)
+   AfterFile.fs [CompileAfter]
 
 
 Project [Name:&, GUID:]
@@ -782,13 +652,6 @@ Project [Name:ClassLibrary1, GUID:]
     Folder [Name:LinkedFolder, AllowsNonExistence:true]
       Child items:
         ProjectFileImpl(Path : LinkedFile2.fs (..\..\ExternalFolder\LinkedFile2.fs))[COMPILE ]
-    Folder [Name:obj, IsHidden:true]
-      Child items:
-        Folder [Name:Debug, IsHidden:true]
-          Child items:
-            Folder [Name:net45, IsHidden:true]
-              Child items:
-                ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
 Project [Name:Miscellaneous Files, GUID:]
 
@@ -797,12 +660,7 @@ Project [Name:Miscellaneous Files, GUID:]
 ===================
 File Path Index
 <SOLUTION ROOT> [Nodes: 1] Index:IncludeFlat
- .clang-format FLAT_EXTERNAL_ROOT
- .editorconfig FLAT_EXTERNAL_ROOT
- .nuget
-  NuGet.Config FLAT_EXTERNAL_ROOT
- _clang-format FLAT_EXTERNAL_ROOT
- ClassLibrary1 [Nodes: 1] RECURSIVE_EXTERNAL_ROOT Index:IncludeRecursive
+ ClassLibrary1 [Nodes: 1] Index:IncludeRecursive
   AfterFile.fs [Nodes: 1] Index:Include
   BeforeFile.fs [Nodes: 1] Index:Include
   bin Index:ExcludeRecursive
@@ -819,34 +677,21 @@ File Path Index
     Class2.fs [Nodes: 1] Index:Include
     File1.fs [Nodes: 1] Index:Include
   LinkedFolder [Nodes: 1] Index:Include
-  obj [Nodes: 1] Index:ExcludeRecursive
-   Debug [Nodes: 1] Index:Include
-    net45 [Nodes: 1] Index:Include
-     ClassLibrary1.AssemblyInfo.fs [Nodes: 1] Index:Include
- ExternalFolder FLAT_EXTERNAL_ROOT
+  obj Index:ExcludeRecursive
+ ExternalFolder
   LinkedFile1.fs [Nodes: 1] Index:Include
   LinkedFile2.fs [Nodes: 1] Index:Include
- FSharpProjectTree.sln [Nodes: 1] FLAT_EXTERNAL_ROOT Index:IncludeFlat
- FSharpProjectTree.sln.DotSettings FLAT_EXTERNAL_ROOT
- FSharpProjectTree.sln.DotSettings.user FLAT_EXTERNAL_ROOT
- global.json FLAT_EXTERNAL_ROOT
- NuGet.Config FLAT_EXTERNAL_ROOT
- packages RECURSIVE_EXTERNAL_ROOT Index:ExcludeRecursive
- packages.config FLAT_EXTERNAL_ROOT
- Settings.StyleCop FLAT_EXTERNAL_ROOT
+ FSharpProjectTree.sln [Nodes: 1] Index:IncludeFlat
+ packages Index:ExcludeRecursive
 
 
 1:BeforeFile.fs (CompileBefore)
-2:obj[1]
-  1:Debug[1]
-    1:net45[1]
-      1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:Folder[1]
+2:Folder[1]
   1:File3.fs
   2:File2.fs
-4:File3.fs
-5:EmptyFolder[1]
-6:Folder[2]
+3:File3.fs
+4:EmptyFolder[1]
+5:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:File1.fs
@@ -854,14 +699,13 @@ File Path Index
   3:File5.fs
   4:Sub[2]
     1:Class2.fs
-7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-8:LinkedFolder[1]
+6:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+7:LinkedFolder[1]
   1:x (from ../ExternalFolder/LinkedFile2.fs)
-9:AfterFile.fs (CompileAfter)
+8:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
-obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 Folder/File3.fs
 Folder/File2.fs
 File3.fs
@@ -882,7 +726,7 @@ AfterFile.fs
   -ClassLibrary1
    -Dependencies
     .NETFramework 4.5
-   BeforeFile.fs (CompileBefore)
+   BeforeFile.fs [CompileBefore]
    -Folder
     File3.fs
     File2.fs
@@ -899,7 +743,7 @@ AfterFile.fs
    LinkedFile1.fs
    -LinkedFolder
     LinkedFile2.fs
-   AfterFile.fs (CompileAfter)
+   AfterFile.fs [CompileAfter]
 
 
 Project [Name:&, GUID:]
@@ -928,13 +772,6 @@ Project [Name:ClassLibrary1, GUID:]
     Folder [Name:LinkedFolder, AllowsNonExistence:true]
       Child items:
         ProjectFileImpl(Path : LinkedFile2.fs (..\..\ExternalFolder\LinkedFile2.fs))[COMPILE ]
-    Folder [Name:obj, IsHidden:true]
-      Child items:
-        Folder [Name:Debug, IsHidden:true]
-          Child items:
-            Folder [Name:net45, IsHidden:true]
-              Child items:
-                ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
 Project [Name:Miscellaneous Files, GUID:]
 
@@ -943,12 +780,7 @@ Project [Name:Miscellaneous Files, GUID:]
 ===================
 File Path Index
 <SOLUTION ROOT> [Nodes: 1] Index:IncludeFlat
- .clang-format FLAT_EXTERNAL_ROOT
- .editorconfig FLAT_EXTERNAL_ROOT
- .nuget
-  NuGet.Config FLAT_EXTERNAL_ROOT
- _clang-format FLAT_EXTERNAL_ROOT
- ClassLibrary1 [Nodes: 1] RECURSIVE_EXTERNAL_ROOT Index:IncludeRecursive
+ ClassLibrary1 [Nodes: 1] Index:IncludeRecursive
   AfterFile.fs [Nodes: 1] Index:Include
   BeforeFile.fs [Nodes: 1] Index:Include
   bin Index:ExcludeRecursive
@@ -965,34 +797,21 @@ File Path Index
     Class2.fs [Nodes: 1] Index:Include
     File1.fs [Nodes: 1] Index:Include
   LinkedFolder [Nodes: 1] Index:Include
-  obj [Nodes: 1] Index:ExcludeRecursive
-   Debug [Nodes: 1] Index:Include
-    net45 [Nodes: 1] Index:Include
-     ClassLibrary1.AssemblyInfo.fs [Nodes: 1] Index:Include
- ExternalFolder FLAT_EXTERNAL_ROOT
+  obj Index:ExcludeRecursive
+ ExternalFolder
   LinkedFile1.fs [Nodes: 1] Index:Include
   LinkedFile2.fs [Nodes: 1] Index:Include
- FSharpProjectTree.sln [Nodes: 1] FLAT_EXTERNAL_ROOT Index:IncludeFlat
- FSharpProjectTree.sln.DotSettings FLAT_EXTERNAL_ROOT
- FSharpProjectTree.sln.DotSettings.user FLAT_EXTERNAL_ROOT
- global.json FLAT_EXTERNAL_ROOT
- NuGet.Config FLAT_EXTERNAL_ROOT
- packages RECURSIVE_EXTERNAL_ROOT Index:ExcludeRecursive
- packages.config FLAT_EXTERNAL_ROOT
- Settings.StyleCop FLAT_EXTERNAL_ROOT
+ FSharpProjectTree.sln [Nodes: 1] Index:IncludeFlat
+ packages Index:ExcludeRecursive
 
 
 1:BeforeFile.fs (CompileBefore)
-2:obj[1]
-  1:Debug[1]
-    1:net45[1]
-      1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:Folder[1]
+2:Folder[1]
   1:File3.fs
   2:File2.fs
-4:EmptyFolder[1]
-5:File3.fs
-6:Folder[2]
+3:EmptyFolder[1]
+4:File3.fs
+5:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:File1.fs
@@ -1000,14 +819,13 @@ File Path Index
   3:File5.fs
   4:Sub[2]
     1:Class2.fs
-7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-8:LinkedFolder[1]
+6:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+7:LinkedFolder[1]
   1:x (from ../ExternalFolder/LinkedFile2.fs)
-9:AfterFile.fs (CompileAfter)
+8:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
-obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 Folder/File3.fs
 Folder/File2.fs
 File3.fs
@@ -1028,7 +846,7 @@ AfterFile.fs
   -ClassLibrary1
    -Dependencies
     .NETFramework 4.5
-   BeforeFile.fs (CompileBefore)
+   BeforeFile.fs [CompileBefore]
    -Folder
     File3.fs
     File2.fs
@@ -1044,7 +862,7 @@ AfterFile.fs
    LinkedFile1.fs
    -LinkedFolder
     LinkedFile2.fs
-   AfterFile.fs (CompileAfter)
+   AfterFile.fs [CompileAfter]
 
 
 Project [Name:&, GUID:]
@@ -1073,13 +891,6 @@ Project [Name:ClassLibrary1, GUID:]
     Folder [Name:LinkedFolder, AllowsNonExistence:true]
       Child items:
         ProjectFileImpl(Path : LinkedFile2.fs (..\..\ExternalFolder\LinkedFile2.fs))[COMPILE ]
-    Folder [Name:obj, IsHidden:true]
-      Child items:
-        Folder [Name:Debug, IsHidden:true]
-          Child items:
-            Folder [Name:net45, IsHidden:true]
-              Child items:
-                ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
 Project [Name:Miscellaneous Files, GUID:]
 
@@ -1088,12 +899,7 @@ Project [Name:Miscellaneous Files, GUID:]
 ===================
 File Path Index
 <SOLUTION ROOT> [Nodes: 1] Index:IncludeFlat
- .clang-format FLAT_EXTERNAL_ROOT
- .editorconfig FLAT_EXTERNAL_ROOT
- .nuget
-  NuGet.Config FLAT_EXTERNAL_ROOT
- _clang-format FLAT_EXTERNAL_ROOT
- ClassLibrary1 [Nodes: 1] RECURSIVE_EXTERNAL_ROOT Index:IncludeRecursive
+ ClassLibrary1 [Nodes: 1] Index:IncludeRecursive
   AfterFile.fs [Nodes: 1] Index:Include
   BeforeFile.fs [Nodes: 1] Index:Include
   bin Index:ExcludeRecursive
@@ -1110,48 +916,34 @@ File Path Index
     Class1.fs [Nodes: 1] Index:Include
     File1.fs [Nodes: 1] Index:Include
   LinkedFolder [Nodes: 1] Index:Include
-  obj [Nodes: 1] Index:ExcludeRecursive
-   Debug [Nodes: 1] Index:Include
-    net45 [Nodes: 1] Index:Include
-     ClassLibrary1.AssemblyInfo.fs [Nodes: 1] Index:Include
- ExternalFolder FLAT_EXTERNAL_ROOT
+  obj Index:ExcludeRecursive
+ ExternalFolder
   LinkedFile1.fs [Nodes: 1] Index:Include
   LinkedFile2.fs [Nodes: 1] Index:Include
- FSharpProjectTree.sln [Nodes: 1] FLAT_EXTERNAL_ROOT Index:IncludeFlat
- FSharpProjectTree.sln.DotSettings FLAT_EXTERNAL_ROOT
- FSharpProjectTree.sln.DotSettings.user FLAT_EXTERNAL_ROOT
- global.json FLAT_EXTERNAL_ROOT
- NuGet.Config FLAT_EXTERNAL_ROOT
- packages RECURSIVE_EXTERNAL_ROOT Index:ExcludeRecursive
- packages.config FLAT_EXTERNAL_ROOT
- Settings.StyleCop FLAT_EXTERNAL_ROOT
+ FSharpProjectTree.sln [Nodes: 1] Index:IncludeFlat
+ packages Index:ExcludeRecursive
 
 
 1:BeforeFile.fs (CompileBefore)
-2:obj[1]
-  1:Debug[1]
-    1:net45[1]
-      1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:Folder[1]
+2:Folder[1]
   1:File3.fs
   2:File2.fs
-4:EmptyFolder[1]
-5:File3.fs
-6:Folder[2]
+3:EmptyFolder[1]
+4:File3.fs
+5:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:File1.fs
     2:Class1.fs
   3:File5.fs
   4:Class2.fs
-7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-8:LinkedFolder[1]
+6:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+7:LinkedFolder[1]
   1:x (from ../ExternalFolder/LinkedFile2.fs)
-9:AfterFile.fs (CompileAfter)
+8:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
-obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 Folder/File3.fs
 Folder/File2.fs
 File3.fs
@@ -1172,7 +964,7 @@ AfterFile.fs
   -ClassLibrary1
    -Dependencies
     .NETFramework 4.5
-   BeforeFile.fs (CompileBefore)
+   BeforeFile.fs [CompileBefore]
    -Folder
     File2.fs
     File3.fs
@@ -1188,7 +980,7 @@ AfterFile.fs
    LinkedFile1.fs
    -LinkedFolder
     LinkedFile2.fs
-   AfterFile.fs (CompileAfter)
+   AfterFile.fs [CompileAfter]
 
 
 Project [Name:&, GUID:]
@@ -1217,13 +1009,6 @@ Project [Name:ClassLibrary1, GUID:]
     Folder [Name:LinkedFolder, AllowsNonExistence:true]
       Child items:
         ProjectFileImpl(Path : LinkedFile2.fs (..\..\ExternalFolder\LinkedFile2.fs))[COMPILE ]
-    Folder [Name:obj, IsHidden:true]
-      Child items:
-        Folder [Name:Debug, IsHidden:true]
-          Child items:
-            Folder [Name:net45, IsHidden:true]
-              Child items:
-                ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
 Project [Name:Miscellaneous Files, GUID:]
 
@@ -1232,12 +1017,7 @@ Project [Name:Miscellaneous Files, GUID:]
 ===================
 File Path Index
 <SOLUTION ROOT> [Nodes: 1] Index:IncludeFlat
- .clang-format FLAT_EXTERNAL_ROOT
- .editorconfig FLAT_EXTERNAL_ROOT
- .nuget
-  NuGet.Config FLAT_EXTERNAL_ROOT
- _clang-format FLAT_EXTERNAL_ROOT
- ClassLibrary1 [Nodes: 1] RECURSIVE_EXTERNAL_ROOT Index:IncludeRecursive
+ ClassLibrary1 [Nodes: 1] Index:IncludeRecursive
   AfterFile.fs [Nodes: 1] Index:Include
   BeforeFile.fs [Nodes: 1] Index:Include
   bin Index:ExcludeRecursive
@@ -1254,48 +1034,34 @@ File Path Index
     Class1.fs [Nodes: 1] Index:Include
     File1.fs [Nodes: 1] Index:Include
   LinkedFolder [Nodes: 1] Index:Include
-  obj [Nodes: 1] Index:ExcludeRecursive
-   Debug [Nodes: 1] Index:Include
-    net45 [Nodes: 1] Index:Include
-     ClassLibrary1.AssemblyInfo.fs [Nodes: 1] Index:Include
- ExternalFolder FLAT_EXTERNAL_ROOT
+  obj Index:ExcludeRecursive
+ ExternalFolder
   LinkedFile1.fs [Nodes: 1] Index:Include
   LinkedFile2.fs [Nodes: 1] Index:Include
- FSharpProjectTree.sln [Nodes: 1] FLAT_EXTERNAL_ROOT Index:IncludeFlat
- FSharpProjectTree.sln.DotSettings FLAT_EXTERNAL_ROOT
- FSharpProjectTree.sln.DotSettings.user FLAT_EXTERNAL_ROOT
- global.json FLAT_EXTERNAL_ROOT
- NuGet.Config FLAT_EXTERNAL_ROOT
- packages RECURSIVE_EXTERNAL_ROOT Index:ExcludeRecursive
- packages.config FLAT_EXTERNAL_ROOT
- Settings.StyleCop FLAT_EXTERNAL_ROOT
+ FSharpProjectTree.sln [Nodes: 1] Index:IncludeFlat
+ packages Index:ExcludeRecursive
 
 
 1:BeforeFile.fs (CompileBefore)
-2:obj[1]
-  1:Debug[1]
-    1:net45[1]
-      1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:Folder[1]
+2:Folder[1]
   1:File2.fs
   2:File3.fs
-4:EmptyFolder[1]
-5:File3.fs
-6:Folder[2]
+3:EmptyFolder[1]
+4:File3.fs
+5:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:File1.fs
     2:Class1.fs
   3:File5.fs
   4:Class2.fs
-7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-8:LinkedFolder[1]
+6:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+7:LinkedFolder[1]
   1:x (from ../ExternalFolder/LinkedFile2.fs)
-9:AfterFile.fs (CompileAfter)
+8:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
-obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 Folder/File2.fs
 Folder/File3.fs
 File3.fs
@@ -1316,7 +1082,7 @@ AfterFile.fs
   -ClassLibrary1
    -Dependencies
     .NETFramework 4.5
-   BeforeFile.fs (CompileBefore)
+   BeforeFile.fs [CompileBefore]
    File2.fs
    -Folder
     File3.fs
@@ -1332,7 +1098,7 @@ AfterFile.fs
    LinkedFile1.fs
    -LinkedFolder
     LinkedFile2.fs
-   AfterFile.fs (CompileAfter)
+   AfterFile.fs [CompileAfter]
 
 
 Project [Name:&, GUID:]
@@ -1361,13 +1127,6 @@ Project [Name:ClassLibrary1, GUID:]
     Folder [Name:LinkedFolder, AllowsNonExistence:true]
       Child items:
         ProjectFileImpl(Path : LinkedFile2.fs (..\..\ExternalFolder\LinkedFile2.fs))[COMPILE ]
-    Folder [Name:obj, IsHidden:true]
-      Child items:
-        Folder [Name:Debug, IsHidden:true]
-          Child items:
-            Folder [Name:net45, IsHidden:true]
-              Child items:
-                ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
 Project [Name:Miscellaneous Files, GUID:]
 
@@ -1376,12 +1135,7 @@ Project [Name:Miscellaneous Files, GUID:]
 ===================
 File Path Index
 <SOLUTION ROOT> [Nodes: 1] Index:IncludeFlat
- .clang-format FLAT_EXTERNAL_ROOT
- .editorconfig FLAT_EXTERNAL_ROOT
- .nuget
-  NuGet.Config FLAT_EXTERNAL_ROOT
- _clang-format FLAT_EXTERNAL_ROOT
- ClassLibrary1 [Nodes: 1] RECURSIVE_EXTERNAL_ROOT Index:IncludeRecursive
+ ClassLibrary1 [Nodes: 1] Index:IncludeRecursive
   AfterFile.fs [Nodes: 1] Index:Include
   BeforeFile.fs [Nodes: 1] Index:Include
   bin Index:ExcludeRecursive
@@ -1398,48 +1152,34 @@ File Path Index
     Class1.fs [Nodes: 1] Index:Include
     File1.fs [Nodes: 1] Index:Include
   LinkedFolder [Nodes: 1] Index:Include
-  obj [Nodes: 1] Index:ExcludeRecursive
-   Debug [Nodes: 1] Index:Include
-    net45 [Nodes: 1] Index:Include
-     ClassLibrary1.AssemblyInfo.fs [Nodes: 1] Index:Include
- ExternalFolder FLAT_EXTERNAL_ROOT
+  obj Index:ExcludeRecursive
+ ExternalFolder
   LinkedFile1.fs [Nodes: 1] Index:Include
   LinkedFile2.fs [Nodes: 1] Index:Include
- FSharpProjectTree.sln [Nodes: 1] FLAT_EXTERNAL_ROOT Index:IncludeFlat
- FSharpProjectTree.sln.DotSettings FLAT_EXTERNAL_ROOT
- FSharpProjectTree.sln.DotSettings.user FLAT_EXTERNAL_ROOT
- global.json FLAT_EXTERNAL_ROOT
- NuGet.Config FLAT_EXTERNAL_ROOT
- packages RECURSIVE_EXTERNAL_ROOT Index:ExcludeRecursive
- packages.config FLAT_EXTERNAL_ROOT
- Settings.StyleCop FLAT_EXTERNAL_ROOT
+ FSharpProjectTree.sln [Nodes: 1] Index:IncludeFlat
+ packages Index:ExcludeRecursive
 
 
 1:BeforeFile.fs (CompileBefore)
-2:obj[1]
-  1:Debug[1]
-    1:net45[1]
-      1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:File2.fs
-4:Folder[1]
+2:File2.fs
+3:Folder[1]
   1:File3.fs
-5:EmptyFolder[1]
-6:File3.fs
-7:Folder[2]
+4:EmptyFolder[1]
+5:File3.fs
+6:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:File1.fs
     2:Class1.fs
   3:File5.fs
   4:Class2.fs
-8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-9:LinkedFolder[1]
+7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+8:LinkedFolder[1]
   1:x (from ../ExternalFolder/LinkedFile2.fs)
-10:AfterFile.fs (CompileAfter)
+9:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
-obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 File2.fs
 Folder/File3.fs
 File3.fs
@@ -1460,7 +1200,7 @@ AfterFile.fs
   -ClassLibrary1
    -Dependencies
     .NETFramework 4.5
-   BeforeFile.fs (CompileBefore)
+   BeforeFile.fs [CompileBefore]
    File2.fs
    -Folder
     File3.fs
@@ -1476,7 +1216,7 @@ AfterFile.fs
    LinkedFile1.fs
    -LinkedFolder
     LinkedFile2.fs
-   AfterFile.fs (CompileAfter)
+   AfterFile.fs [CompileAfter]
 
 
 Project [Name:&, GUID:]
@@ -1505,13 +1245,6 @@ Project [Name:ClassLibrary1, GUID:]
     Folder [Name:LinkedFolder, AllowsNonExistence:true]
       Child items:
         ProjectFileImpl(Path : LinkedFile2.fs (..\..\ExternalFolder\LinkedFile2.fs))[COMPILE ]
-    Folder [Name:obj, IsHidden:true]
-      Child items:
-        Folder [Name:Debug, IsHidden:true]
-          Child items:
-            Folder [Name:net45, IsHidden:true]
-              Child items:
-                ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
 Project [Name:Miscellaneous Files, GUID:]
 
@@ -1520,12 +1253,7 @@ Project [Name:Miscellaneous Files, GUID:]
 ===================
 File Path Index
 <SOLUTION ROOT> [Nodes: 1] Index:IncludeFlat
- .clang-format FLAT_EXTERNAL_ROOT
- .editorconfig FLAT_EXTERNAL_ROOT
- .nuget
-  NuGet.Config FLAT_EXTERNAL_ROOT
- _clang-format FLAT_EXTERNAL_ROOT
- ClassLibrary1 [Nodes: 1] RECURSIVE_EXTERNAL_ROOT Index:IncludeRecursive
+ ClassLibrary1 [Nodes: 1] Index:IncludeRecursive
   AfterFile.fs [Nodes: 1] Index:Include
   BeforeFile.fs [Nodes: 1] Index:Include
   bin Index:ExcludeRecursive
@@ -1542,48 +1270,34 @@ File Path Index
     File1.fs [Nodes: 1] Index:Include
   Foo.fs [Nodes: 1] Index:Include
   LinkedFolder [Nodes: 1] Index:Include
-  obj [Nodes: 1] Index:ExcludeRecursive
-   Debug [Nodes: 1] Index:Include
-    net45 [Nodes: 1] Index:Include
-     ClassLibrary1.AssemblyInfo.fs [Nodes: 1] Index:Include
- ExternalFolder FLAT_EXTERNAL_ROOT
+  obj Index:ExcludeRecursive
+ ExternalFolder
   LinkedFile1.fs [Nodes: 1] Index:Include
   LinkedFile2.fs [Nodes: 1] Index:Include
- FSharpProjectTree.sln [Nodes: 1] FLAT_EXTERNAL_ROOT Index:IncludeFlat
- FSharpProjectTree.sln.DotSettings FLAT_EXTERNAL_ROOT
- FSharpProjectTree.sln.DotSettings.user FLAT_EXTERNAL_ROOT
- global.json FLAT_EXTERNAL_ROOT
- NuGet.Config FLAT_EXTERNAL_ROOT
- packages RECURSIVE_EXTERNAL_ROOT Index:ExcludeRecursive
- packages.config FLAT_EXTERNAL_ROOT
- Settings.StyleCop FLAT_EXTERNAL_ROOT
+ FSharpProjectTree.sln [Nodes: 1] Index:IncludeFlat
+ packages Index:ExcludeRecursive
 
 
 1:BeforeFile.fs (CompileBefore)
-2:obj[1]
-  1:Debug[1]
-    1:net45[1]
-      1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:File2.fs
-4:Folder[1]
+2:File2.fs
+3:Folder[1]
   1:File3.fs
-5:EmptyFolder[1]
-6:Foo.fs
-7:Folder[2]
+4:EmptyFolder[1]
+5:Foo.fs
+6:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:File1.fs
     2:Class1.fs
   3:File5.fs
   4:Class2.fs
-8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-9:LinkedFolder[1]
+7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+8:LinkedFolder[1]
   1:x (from ../ExternalFolder/LinkedFile2.fs)
-10:AfterFile.fs (CompileAfter)
+9:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
-obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 File2.fs
 Folder/File3.fs
 Foo.fs
@@ -1604,7 +1318,7 @@ AfterFile.fs
   -ClassLibrary1
    -Dependencies
     .NETFramework 4.5
-   BeforeFile.fs (CompileBefore)
+   BeforeFile.fs [CompileBefore]
    File2.fs
    -Folder
     File3.fs
@@ -1620,7 +1334,7 @@ AfterFile.fs
    LinkedFile1.fs
    -LinkedFolder
     LinkedFile2.fs
-   AfterFile.fs (CompileAfter)
+   AfterFile.fs [CompileAfter]
 
 
 Project [Name:&, GUID:]
@@ -1650,13 +1364,6 @@ Project [Name:ClassLibrary1, GUID:]
     Folder [Name:LinkedFolder, AllowsNonExistence:true]
       Child items:
         ProjectFileImpl(Path : LinkedFile2.fs (..\..\ExternalFolder\LinkedFile2.fs))[COMPILE ]
-    Folder [Name:obj, IsHidden:true]
-      Child items:
-        Folder [Name:Debug, IsHidden:true]
-          Child items:
-            Folder [Name:net45, IsHidden:true]
-              Child items:
-                ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
 Project [Name:Miscellaneous Files, GUID:]
 
@@ -1665,12 +1372,7 @@ Project [Name:Miscellaneous Files, GUID:]
 ===================
 File Path Index
 <SOLUTION ROOT> [Nodes: 1] Index:IncludeFlat
- .clang-format FLAT_EXTERNAL_ROOT
- .editorconfig FLAT_EXTERNAL_ROOT
- .nuget
-  NuGet.Config FLAT_EXTERNAL_ROOT
- _clang-format FLAT_EXTERNAL_ROOT
- ClassLibrary1 [Nodes: 1] RECURSIVE_EXTERNAL_ROOT Index:IncludeRecursive
+ ClassLibrary1 [Nodes: 1] Index:IncludeRecursive
   AfterFile.fs [Nodes: 1] Index:Include
   BeforeFile.fs [Nodes: 1] Index:Include
   bin Index:ExcludeRecursive
@@ -1687,48 +1389,34 @@ File Path Index
     Class1.fs [Nodes: 1] Index:Include
     File1.fs [Nodes: 1] Index:Include
   LinkedFolder [Nodes: 1] Index:Include
-  obj [Nodes: 1] Index:ExcludeRecursive
-   Debug [Nodes: 1] Index:Include
-    net45 [Nodes: 1] Index:Include
-     ClassLibrary1.AssemblyInfo.fs [Nodes: 1] Index:Include
- ExternalFolder FLAT_EXTERNAL_ROOT
+  obj Index:ExcludeRecursive
+ ExternalFolder
   LinkedFile1.fs [Nodes: 1] Index:Include
   LinkedFile2.fs [Nodes: 1] Index:Include
- FSharpProjectTree.sln [Nodes: 1] FLAT_EXTERNAL_ROOT Index:IncludeFlat
- FSharpProjectTree.sln.DotSettings FLAT_EXTERNAL_ROOT
- FSharpProjectTree.sln.DotSettings.user FLAT_EXTERNAL_ROOT
- global.json FLAT_EXTERNAL_ROOT
- NuGet.Config FLAT_EXTERNAL_ROOT
- packages RECURSIVE_EXTERNAL_ROOT Index:ExcludeRecursive
- packages.config FLAT_EXTERNAL_ROOT
- Settings.StyleCop FLAT_EXTERNAL_ROOT
+ FSharpProjectTree.sln [Nodes: 1] Index:IncludeFlat
+ packages Index:ExcludeRecursive
 
 
 1:BeforeFile.fs (CompileBefore)
-2:obj[1]
-  1:Debug[1]
-    1:net45[1]
-      1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:File2.fs
-4:Folder[1]
+2:File2.fs
+3:Folder[1]
   1:File3.fs
-5:EmptyFolder[1]
+4:EmptyFolder[1]
   1:Foo.fs
-6:Folder[2]
+5:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:File1.fs
     2:Class1.fs
   3:File5.fs
   4:Class2.fs
-7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-8:LinkedFolder[1]
+6:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+7:LinkedFolder[1]
   1:x (from ../ExternalFolder/LinkedFile2.fs)
-9:AfterFile.fs (CompileAfter)
+8:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
-obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 File2.fs
 Folder/File3.fs
 EmptyFolder/Foo.fs
@@ -1749,7 +1437,7 @@ AfterFile.fs
   -ClassLibrary1
    -Dependencies
     .NETFramework 4.5
-   BeforeFile.fs (CompileBefore)
+   BeforeFile.fs [CompileBefore]
    File2.fs
    -Folder
     File3.fs
@@ -1765,7 +1453,7 @@ AfterFile.fs
    LinkedFile1.fs
    -LinkedFolder
     LinkedFile2.fs
-   AfterFile.fs (CompileAfter)
+   AfterFile.fs [CompileAfter]
 
 
 Project [Name:&, GUID:]
@@ -1794,13 +1482,6 @@ Project [Name:ClassLibrary1, GUID:]
     Folder [Name:LinkedFolder, AllowsNonExistence:true]
       Child items:
         ProjectFileImpl(Path : LinkedFile2.fs (..\..\ExternalFolder\LinkedFile2.fs))[COMPILE ]
-    Folder [Name:obj, IsHidden:true]
-      Child items:
-        Folder [Name:Debug, IsHidden:true]
-          Child items:
-            Folder [Name:net45, IsHidden:true]
-              Child items:
-                ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
 Project [Name:Miscellaneous Files, GUID:]
 
@@ -1809,12 +1490,7 @@ Project [Name:Miscellaneous Files, GUID:]
 ===================
 File Path Index
 <SOLUTION ROOT> [Nodes: 1] Index:IncludeFlat
- .clang-format FLAT_EXTERNAL_ROOT
- .editorconfig FLAT_EXTERNAL_ROOT
- .nuget
-  NuGet.Config FLAT_EXTERNAL_ROOT
- _clang-format FLAT_EXTERNAL_ROOT
- ClassLibrary1 [Nodes: 1] RECURSIVE_EXTERNAL_ROOT Index:IncludeRecursive
+ ClassLibrary1 [Nodes: 1] Index:IncludeRecursive
   AfterFile.fs [Nodes: 1] Index:Include
   BeforeFile.fs [Nodes: 1] Index:Include
   bin Index:ExcludeRecursive
@@ -1831,48 +1507,34 @@ File Path Index
     File1.fs [Nodes: 1] Index:Include
   Foo.fs [Nodes: 1] Index:Include
   LinkedFolder [Nodes: 1] Index:Include
-  obj [Nodes: 1] Index:ExcludeRecursive
-   Debug [Nodes: 1] Index:Include
-    net45 [Nodes: 1] Index:Include
-     ClassLibrary1.AssemblyInfo.fs [Nodes: 1] Index:Include
- ExternalFolder FLAT_EXTERNAL_ROOT
+  obj Index:ExcludeRecursive
+ ExternalFolder
   LinkedFile1.fs [Nodes: 1] Index:Include
   LinkedFile2.fs [Nodes: 1] Index:Include
- FSharpProjectTree.sln [Nodes: 1] FLAT_EXTERNAL_ROOT Index:IncludeFlat
- FSharpProjectTree.sln.DotSettings FLAT_EXTERNAL_ROOT
- FSharpProjectTree.sln.DotSettings.user FLAT_EXTERNAL_ROOT
- global.json FLAT_EXTERNAL_ROOT
- NuGet.Config FLAT_EXTERNAL_ROOT
- packages RECURSIVE_EXTERNAL_ROOT Index:ExcludeRecursive
- packages.config FLAT_EXTERNAL_ROOT
- Settings.StyleCop FLAT_EXTERNAL_ROOT
+ FSharpProjectTree.sln [Nodes: 1] Index:IncludeFlat
+ packages Index:ExcludeRecursive
 
 
 1:BeforeFile.fs (CompileBefore)
-2:obj[1]
-  1:Debug[1]
-    1:net45[1]
-      1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:File2.fs
-4:Folder[1]
+2:File2.fs
+3:Folder[1]
   1:File3.fs
-5:Foo.fs
-6:EmptyFolder[1]
-7:Folder[2]
+4:Foo.fs
+5:EmptyFolder[1]
+6:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:File1.fs
     2:Class1.fs
   3:File5.fs
   4:Class2.fs
-8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-9:LinkedFolder[1]
+7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+8:LinkedFolder[1]
   1:x (from ../ExternalFolder/LinkedFile2.fs)
-10:AfterFile.fs (CompileAfter)
+9:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
-obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 File2.fs
 Folder/File3.fs
 Foo.fs
@@ -1893,7 +1555,7 @@ Move file 'File1.fs' and 'Class1.fs' in folder 'Folder(2)' before 'Sub(1)'
   -ClassLibrary1
    -Dependencies
     .NETFramework 4.5
-   BeforeFile.fs (CompileBefore)
+   BeforeFile.fs [CompileBefore]
    File2.fs
    -Folder
     File3.fs
@@ -1909,7 +1571,7 @@ Move file 'File1.fs' and 'Class1.fs' in folder 'Folder(2)' before 'Sub(1)'
    LinkedFile1.fs
    -LinkedFolder
     LinkedFile2.fs
-   AfterFile.fs (CompileAfter)
+   AfterFile.fs [CompileAfter]
 
 
 Project [Name:&, GUID:]
@@ -1937,13 +1599,6 @@ Project [Name:ClassLibrary1, GUID:]
     Folder [Name:LinkedFolder, AllowsNonExistence:true]
       Child items:
         ProjectFileImpl(Path : LinkedFile2.fs (..\..\ExternalFolder\LinkedFile2.fs))[COMPILE ]
-    Folder [Name:obj, IsHidden:true]
-      Child items:
-        Folder [Name:Debug, IsHidden:true]
-          Child items:
-            Folder [Name:net45, IsHidden:true]
-              Child items:
-                ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
 Project [Name:Miscellaneous Files, GUID:]
 
@@ -1952,12 +1607,7 @@ Project [Name:Miscellaneous Files, GUID:]
 ===================
 File Path Index
 <SOLUTION ROOT> [Nodes: 1] Index:IncludeFlat
- .clang-format FLAT_EXTERNAL_ROOT
- .editorconfig FLAT_EXTERNAL_ROOT
- .nuget
-  NuGet.Config FLAT_EXTERNAL_ROOT
- _clang-format FLAT_EXTERNAL_ROOT
- ClassLibrary1 [Nodes: 1] RECURSIVE_EXTERNAL_ROOT Index:IncludeRecursive
+ ClassLibrary1 [Nodes: 1] Index:IncludeRecursive
   AfterFile.fs [Nodes: 1] Index:Include
   BeforeFile.fs [Nodes: 1] Index:Include
   bin Index:ExcludeRecursive
@@ -1974,48 +1624,34 @@ File Path Index
    Sub [Nodes: 1] Index:Include
   Foo.fs [Nodes: 1] Index:Include
   LinkedFolder [Nodes: 1] Index:Include
-  obj [Nodes: 1] Index:ExcludeRecursive
-   Debug [Nodes: 1] Index:Include
-    net45 [Nodes: 1] Index:Include
-     ClassLibrary1.AssemblyInfo.fs [Nodes: 1] Index:Include
- ExternalFolder FLAT_EXTERNAL_ROOT
+  obj Index:ExcludeRecursive
+ ExternalFolder
   LinkedFile1.fs [Nodes: 1] Index:Include
   LinkedFile2.fs [Nodes: 1] Index:Include
- FSharpProjectTree.sln [Nodes: 1] FLAT_EXTERNAL_ROOT Index:IncludeFlat
- FSharpProjectTree.sln.DotSettings FLAT_EXTERNAL_ROOT
- FSharpProjectTree.sln.DotSettings.user FLAT_EXTERNAL_ROOT
- global.json FLAT_EXTERNAL_ROOT
- NuGet.Config FLAT_EXTERNAL_ROOT
- packages RECURSIVE_EXTERNAL_ROOT Index:ExcludeRecursive
- packages.config FLAT_EXTERNAL_ROOT
- Settings.StyleCop FLAT_EXTERNAL_ROOT
+ FSharpProjectTree.sln [Nodes: 1] Index:IncludeFlat
+ packages Index:ExcludeRecursive
 
 
 1:BeforeFile.fs (CompileBefore)
-2:obj[1]
-  1:Debug[1]
-    1:net45[1]
-      1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:File2.fs
-4:Folder[1]
+2:File2.fs
+3:Folder[1]
   1:File3.fs
-5:Foo.fs
-6:EmptyFolder[1]
-7:Folder[2]
+4:Foo.fs
+5:EmptyFolder[1]
+6:Folder[2]
   1:File4.fs
   2:File1.fs
   3:Class1.fs
   4:Sub[1]
   5:File5.fs
   6:Class2.fs
-8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-9:LinkedFolder[1]
+7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+8:LinkedFolder[1]
   1:x (from ../ExternalFolder/LinkedFile2.fs)
-10:AfterFile.fs (CompileAfter)
+9:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
-obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 File2.fs
 Folder/File3.fs
 Foo.fs
