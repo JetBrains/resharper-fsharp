@@ -88,6 +88,10 @@ module rec CommonUtil =
     type Column = Int32<DocColumn>
     type FileSystemPath = JetBrains.Util.FileSystemPath
 
+    type Int32<'T> with
+        member x.Next = x.Plus1()
+        member x.Previous = x.Minus1()
+
     let inline docLine (x: int)   = Line.op_Explicit(x)
     let inline docColumn (x: int) = Column.op_Explicit(x)
 
