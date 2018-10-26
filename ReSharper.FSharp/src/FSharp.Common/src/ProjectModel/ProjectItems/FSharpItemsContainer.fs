@@ -20,9 +20,9 @@ open JetBrains.ProjectModel.ProjectsHost.MsBuild.Structure
 open JetBrains.ProjectModel.ProjectsHost.SolutionHost
 open JetBrains.ReSharper.Feature.Services.Navigation
 open JetBrains.ReSharper.Feature.Services.Navigation.NavigationProviders
-open JetBrains.ReSharper.Host.Features.ProjectModel.Editing
 open JetBrains.ReSharper.Host.Features.ProjectModel.View
 open JetBrains.ReSharper.Host.Features.ProjectModel.View.Appenders
+open JetBrains.ReSharper.Host.Features.ProjectModel.View.Ordering
 open JetBrains.ReSharper.Host.Features.Util.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Psi
@@ -406,7 +406,8 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
     let getNewRelativeSortKey (item: FSharpProjectItem) relativeToType =
         match relativeToType with
         | RelativeToType.Before -> item.SortKey
-        | RelativeToType.After -> item.SortKey + 1
+        | RelativeToType.After
+        | RelativeToType.Inside -> item.SortKey + 1
         | _ -> relativeToType |> failwithf "Got relativeToType %O"
 
     let canBeRelative (projectItem: FSharpProjectItem) (modifiedItem: FSharpProjectItem option) =
@@ -424,12 +425,14 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
     let changeDirection = function
         | RelativeToType.Before -> RelativeToType.After
         | RelativeToType.After -> RelativeToType.Before
+        | RelativeToType.Inside -> RelativeToType.Inside
         | relativeToType -> relativeToType |> failwithf "Got relativeToType %O"
 
     let tryGetAdjacentItemInParent (relativeItem: FSharpProjectItem) relativeToType =
         let otherRelativeSortKey =
             match relativeToType with
-            | RelativeToType.After -> relativeItem.SortKey + 1
+            | RelativeToType.After
+            | RelativeToType.Inside -> relativeItem.SortKey + 1
             | RelativeToType.Before -> relativeItem.SortKey - 1
             | _ -> relativeToType |> failwithf "Got relativeToType %O"
         getChildren relativeItem.Parent
@@ -507,7 +510,8 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
             let relativeChildItem =
                 match relativeToType with
                 | RelativeToType.Before -> Seq.tryHead children
-                | RelativeToType.After -> Seq.tryLast children
+                | RelativeToType.After
+                | RelativeToType.Inside -> Seq.tryLast children
                 | _ -> relativeToType |> failwithf "Got relativeToType %O"
         
             match relativeChildItem with
@@ -1112,11 +1116,11 @@ type FSharpViewFolderIdentity =
 
 [<SolutionFeaturePart>]
 type FSharpItemModificationContextProvider(container: IFSharpItemsContainer) =
-    inherit ItemModificationContextProvider()
+    inherit OrderingContextProvider()
 
     override x.IsApplicable(project) = project.IsFSharp
 
-    override x.CreateModificationContext(modifiedItem, relativeItem, relativeToType) =
+    override x.CreateOrderingContext(modifiedItem, relativeItem, relativeToType) =
         let context =
             match modifiedItem, relativeItem with
             | (:? FSharpViewItem as modifiedViewItem), (:? FSharpViewItem as relativeViewItem) ->
@@ -1124,14 +1128,14 @@ type FSharpItemModificationContextProvider(container: IFSharpItemsContainer) =
             | _ -> None
         match context with
         | Some context -> context :> _
-        | _ -> base.CreateModificationContext(modifiedItem, relativeItem, relativeToType)
+        | _ -> base.CreateOrderingContext(modifiedItem, relativeItem, relativeToType)
 
     member x.CreateModificationContext(modifiedViewItem, (relativeViewItem: FSharpViewItem), relativeToType) =
         let project = relativeViewItem.ProjectItem.GetProject().NotNull()
         container.TryGetRelativeChildPath(project.GetProjectMark(), modifiedViewItem, relativeViewItem, relativeToType)
         |> Option.map (fun (path, relativeToType) ->
             let relativeProjectItem = project.FindProjectItemsByLocation(path).First()
-            RiderItemModificationContext(RelativeTo(relativeProjectItem, relativeToType)))
+            OrderingContext(RelativeTo(relativeProjectItem, relativeToType)))
 
 
 [<ShellComponent>]
