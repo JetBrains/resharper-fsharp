@@ -2,4 +2,5 @@
 module Module
 
 let x =
-    [| 123{caret} |]
+    [ 123
+      123{caret} ]

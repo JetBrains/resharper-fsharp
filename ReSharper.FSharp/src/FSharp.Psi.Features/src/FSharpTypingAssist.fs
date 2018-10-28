@@ -49,6 +49,15 @@ type FSharpTypingAssist
            FSharpTokenType.DO |]
         |> HashSet
 
+    let deindentingTokens =
+        [| FSharpTokenType.RPAREN
+           FSharpTokenType.RBRACK
+           FSharpTokenType.BAR_RBRACK
+           FSharpTokenType.GREATER_RBRACK
+           FSharpTokenType.RBRACE
+           FSharpTokenType.END |]
+        |> HashSet
+
     let getCachingLexer textControl (lexer: outref<_>) =
         match cachingLexerService.GetCachingLexer(textControl) with
         | null -> false
@@ -100,9 +109,34 @@ type FSharpTypingAssist
 
         pos - startOffset
 
+    let getContinuedIndentLine (textControl: ITextControl) caretOffset =
+        let document = textControl.Document
+        let line = document.GetCoordsByOffset(caretOffset).Line
+        if caretOffset = document.GetLineStartOffset(line) then line else
+
+        let mutable lexer = Unchecked.defaultof<_>
+        if not (getCachingLexer textControl &lexer && lexer.FindTokenAt(caretOffset)) then line else
+
+        let matcher = FSharpBracketMatcher()
+
+        let rec findContinuedLine line =
+            lexer.Advance(-1)
+            if lexer.TokenStart <= document.GetLineStartOffset(line) then line else
+            if isNull lexer.TokenType then line else  
+
+            let continuedLine =
+                if deindentingTokens.Contains(lexer.TokenType) then
+                    if not (matcher.FindMatchingBracket(lexer)) then line else
+                    document.GetCoordsByOffset(lexer.TokenStart).Line
+                else
+                    line
+            findContinuedLine continuedLine
+
+        findContinuedLine line
+        
     let doDumpIndent (textControl: ITextControl) =
         let caretOffset = textControl.Caret.Offset()
-        let line = textControl.Document.GetCoordsByOffset(caretOffset).Line
+        let line = getContinuedIndentLine textControl caretOffset
         let lineIndent = getLineWhitespaceIndent textControl line
 
         let insertPos = trimTrailingSpacesBeforeCaret textControl
@@ -240,12 +274,12 @@ let tryGetNestedIndentBelow cachingLexerService textControl line =
 
     let linesCount = textControl.Document.GetLineCount()
 
-    let rec getIndent firstFoundCommentIndent line =
+    let rec getIndent (firstFoundCommentIndent: LineIndent option) line =
         if line >= linesCount then firstFoundCommentIndent else
 
         let indent = getLineIndent cachingLexerService textControl line
         match indent, firstFoundCommentIndent with
-        | Some (Source n) as indent, _ ->
+        | Some (Source n), _ ->
             if n > currentIndent then indent else firstFoundCommentIndent
 
         | Some (Comments _), None -> getIndent indent line.Next

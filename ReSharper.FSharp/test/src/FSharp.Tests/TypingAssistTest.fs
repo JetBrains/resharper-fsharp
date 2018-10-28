@@ -34,7 +34,13 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter 11 - Left paren``() = x.DoNamedTest()
     [<Test>] member x.``Enter 12 - Left paren and eol space``() = x.DoNamedTest()
     [<Test>] member x.``Enter 13 - Left paren and space before``() = x.DoNamedTest()
-    [<Test>] member x.``Enter 14 - List``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 14 - List, first element``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 15 - List, last element``() = x.DoNamedTest()
+
+    [<Test>] member x.``Enter 16 - After list``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 17 - After multiple continued lines``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 18 - After single continued line``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 19 - After pair starting at line start``() = x.DoNamedTest()
 
 [<FSharpTest>]
 type LineIndentsTest() =
