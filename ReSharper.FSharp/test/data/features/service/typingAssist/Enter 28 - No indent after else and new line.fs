@@ -1,0 +1,8 @@
+// ${CHAR:Enter} 
+module Module
+
+let foo =
+   if bar then true else
+{caret}
+
+   ()

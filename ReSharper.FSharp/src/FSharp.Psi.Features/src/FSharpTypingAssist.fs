@@ -26,7 +26,6 @@ type FSharpTypingAssist
     let indentingTokens =
         [| FSharpTokenType.EQUALS
            FSharpTokenType.LARROW
-           FSharpTokenType.RARROW
            FSharpTokenType.LPAREN
            FSharpTokenType.LBRACK
            FSharpTokenType.LBRACK_BAR
@@ -35,9 +34,7 @@ type FSharpTypingAssist
            FSharpTokenType.LQUOTE_TYPED
            FSharpTokenType.LQUOTE_UNTYPED
            FSharpTokenType.BEGIN
-           FSharpTokenType.DO
            FSharpTokenType.THEN
-           FSharpTokenType.ELSE
            FSharpTokenType.STRUCT
            FSharpTokenType.CLASS
            FSharpTokenType.INTERFACE
@@ -171,7 +168,8 @@ type FSharpTypingAssist
     let handleEnter (context: IActionContext) =
         let textControl = context.TextControl
 
-        if this.HandleEnterAddIndent(textControl) then true else
+        if this.HandleEnterAddIndentAfterLeftBracket(textControl) then true else
+        if this.HandleEnterAddBiggerIndentFromBelow(textControl) then true else
         if this.HandleEnterFindLeftBracket(textControl) then true else
 
         doDumpIndent textControl
@@ -185,6 +183,23 @@ type FSharpTypingAssist
     do
         manager.AddActionHandler(lifetime, TextControlActions.ENTER_ACTION_ID, this, Func<_,_>(handleEnter), isActionHandlerAvailable)
         manager.AddTypingHandler(lifetime, ' ', this, Func<_,_>(handleSpace), isTypingHandlerAvailable)
+
+    member x.HandleEnterAddBiggerIndentFromBelow(textControl) =
+        let document = textControl.Document
+        let caretCoords = document.GetCoordsByOffset(textControl.Caret.Offset())
+        let line = caretCoords.Line
+
+        if line.Next >= document.GetLineCount() then false else
+        if not (document.GetLineText(caretCoords.Line).IsWhitespace()) then false else
+
+        let caretIndent = int caretCoords.Column
+        match tryGetNestedIndentBelow cachingLexerService textControl line caretIndent with
+        | None -> false
+        | Some (Source indent | Comments indent) -> 
+
+        let insertPos = trimTrailingSpacesBeforeCaret textControl
+        let text = this.GetNewLineText(textControl) + String(' ' , indent) 
+        insertText textControl insertPos text "Indent on Enter"
 
     member x.HandleEnterFindLeftBracket(textControl) =
         let mutable lexer = Unchecked.defaultof<_>
@@ -211,8 +226,9 @@ type FSharpTypingAssist
         let text = this.GetNewLineText(textControl) + String(' ', lexer.TokenStart - lineStartOffset)
         insertText textControl insertPos text "Indent on Enter"
 
-    member x.HandleEnterAddIndent(textControl) =
+    member x.HandleEnterAddIndentAfterLeftBracket(textControl) =
         let mutable lexer = Unchecked.defaultof<_>
+        let mutable encounteredNewLine = false
 
         let isAvailable =
             x.CheckAndDeleteSelectionIfNeeded(textControl, fun selection ->
@@ -222,8 +238,11 @@ type FSharpTypingAssist
                 if not (getCachingLexer textControl &lexer && lexer.FindTokenAt(offset - 1)) then false else
 
                 while isIgnoredOrNewLine lexer.TokenType do
+                    if lexer.TokenType == FSharpTokenType.NEW_LINE then
+                        encounteredNewLine <- true
                     lexer.Advance(-1)
 
+                not encounteredNewLine && allowingNoIndentTokens.Contains(lexer.TokenType) ||
                 indentingTokens.Contains(lexer.TokenType))
 
         if not isAvailable then false else
@@ -234,7 +253,7 @@ type FSharpTypingAssist
 
         let line = textControl.Document.GetCoordsByOffset(lexer.TokenStart).Line
         let indentSize =
-            match tryGetNestedIndentBelow cachingLexerService textControl line with
+            match tryGetNestedIndentBelowLine cachingLexerService textControl line with
             | Some (Source n | Comments n) -> n
             | _ ->
                 let line = getContinuedIndentLine textControl lexer.TokenStart true
@@ -320,11 +339,13 @@ let getLineIndent (cachingLexerService: CachingLexerService) (textControl: IText
     if isNull tokenType || isIgnoredOrNewLine tokenType then commentOffset else
     Some (Source (lexer.TokenStart - startOffset))
 
-let tryGetNestedIndentBelow cachingLexerService textControl line =
+let tryGetNestedIndentBelowLine cachingLexerService textControl line =
     match getLineIndent cachingLexerService textControl line with
     | None | Some (Comments _) -> None
     | Some (Source currentIndent) ->
+        tryGetNestedIndentBelow cachingLexerService textControl line currentIndent
 
+let tryGetNestedIndentBelow cachingLexerService textControl line currentIndent =
     let linesCount = textControl.Document.GetLineCount()
 
     let rec getIndent (firstFoundCommentIndent: LineIndent option) line =

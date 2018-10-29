@@ -50,6 +50,10 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter 24 - Add indent after continued line``() = x.DoNamedTest()
     [<Test>] member x.``Enter 25 - Add indent after continued line before block``() = x.DoNamedTest()
 
+    [<Test>] member x.``Enter 26 - Empty line, add indent from below``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 27 - Empty line, dump indent``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 28 - No indent after else and new line``() = x.DoNamedTest()
+
     [<Test>] member x.``Space 01 - Inside empty list``() = x.DoNamedTest()
     [<Test>] member x.``Space 02 - Inside empty array``() = x.DoNamedTest()
 
@@ -69,7 +73,7 @@ type NestedIndentsTest() =
     [<Test>] member x.``Nested indents``() = x.DoNamedTest()
 
     override x.DoLineTest(writer, textControl, line) =
-        writer.WriteLine(tryGetNestedIndentBelow x.CachingLexerService textControl line)
+        writer.WriteLine(tryGetNestedIndentBelowLine x.CachingLexerService textControl line)
         
 [<AbstractClass>]
 type LineIndentsTestBase() =
