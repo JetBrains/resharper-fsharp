@@ -19,7 +19,7 @@ let [<Literal>] paketTargets = "Paket.Restore.targets"
 type PaketTargetsProjectLoadModificator() =
     interface IMsBuildProjectLoadModificator with
         member x.IsApplicable(projectMark) =
-            projectMark.HasPossbleImport(paketTargets)
+            projectMark.HasPossibleImport(paketTargets)
 
         member x.Modify(context) =
             context.Targets.Add("PaketRestore")
@@ -31,7 +31,7 @@ type PaketRestoreTargetsAnalyzer(lifetime, solution: ISolution, settingsStore: S
 
     interface IMsBuildProjectLoadDiagnosticProvider with
         member x.CollectDiagnostic(projectMark, _, _) =
-            match restoreOptionsWereReset, projectMark.HasPossbleImport(paketTargets) with
+            match restoreOptionsWereReset, projectMark.HasPossibleImport(paketTargets) with
             | true, _ | _, false -> EmptyList.Instance :> _
             | _ ->
 
