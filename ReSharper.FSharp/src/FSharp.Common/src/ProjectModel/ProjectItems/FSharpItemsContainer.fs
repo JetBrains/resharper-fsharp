@@ -154,14 +154,13 @@ type FSharpItemsContainer
 
         refreshFolder, updateItem, refresh
 
-    let updateProject projectMark update =
+    let updateProject projectMark updateFunction =
         use lock = locker.UsingWriteLock()
-        let projectMappings = projectMappings.Value
-        tryGetValue projectMark projectMappings
+        tryGetProjectMapping projectMark
         |> Option.iter (fun mapping ->
             let refresher, updater, refresh = createRefreshers projectMark
-            update mapping refresher updater
-            projectMappings.[projectMark] <- mapping
+            updateFunction mapping refresher updater
+            projectMappings.Value.[projectMark] <- mapping
             refresh ())
 
     member x.ProjectMappings = projectMappings.Value
@@ -279,7 +278,7 @@ type FSharpItemsContainer
 
         member x.TryGetRelativeChildPath(projectMark, modifiedItem, relativeItem, relativeToType) =
             use lock = locker.UsingReadLock()
-            tryGetValue projectMark x.ProjectMappings
+            tryGetProjectMapping projectMark
             |> Option.bind (fun mapping ->
                 mapping.TryGetRelativeChildPath(modifiedItem, relativeItem, relativeToType))
 
@@ -311,7 +310,7 @@ type FSharpItemsContainer
             |> Option.isSome
 
         member x.GetProjectItemsPaths(projectMark, targetFrameworkId) =
-            tryGetValue projectMark x.ProjectMappings
+            tryGetProjectMapping projectMark
             |> Option.map (fun mapping -> mapping.GetProjectItemsPaths(targetFrameworkId))
             |> Option.defaultValue [| |]
 
@@ -327,7 +326,7 @@ type IFSharpItemsContainer =
     abstract member Dump: TextWriter -> unit
 
     abstract member TryGetRelativeChildPath:
-            IProjectMark * modifiedItem: FSharpViewItem * relativeItem: FSharpViewItem * RelativeToType ->
+            IProjectMark * modifiedItem: FSharpViewItem option * relativeItem: FSharpViewItem * RelativeToType ->
             (FileSystemPath * RelativeToType) option
 
 
@@ -410,15 +409,15 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         | RelativeToType.Inside -> item.SortKey + 1
         | _ -> relativeToType |> failwithf "Got relativeToType %O"
 
-    let canBeRelative (projectItem: FSharpProjectItem) (modifiedItem: FSharpProjectItem option) =
-        match projectItem, modifiedItem with
+    let canBeRelative (projectItem: FSharpProjectItem) (modifiedItemBuildAction: BuildAction option) =
+        match projectItem, modifiedItemBuildAction with
         | FileItem _, None -> true
-        | FileItem (_, buildAction, _), Some (FileItem (_, modifiedItemBuildAction, _)) ->
-            not (buildAction.ChangesOrder()) && not (modifiedItemBuildAction.ChangesOrder()) ||
+        | FileItem (_, buildAction, _), Some modifiedItemBuildAction ->
+            not buildAction.ChangesOrder && not modifiedItemBuildAction.ChangesOrder ||
             buildAction = modifiedItemBuildAction
 
         | EmptyFolder _, None -> true
-        | EmptyFolder _, Some (FileItem (_, buildAction, _)) -> not (buildAction.ChangesOrder())
+        | EmptyFolder _, Some buildAction -> not buildAction.ChangesOrder
 
         | _ -> false
 
@@ -518,13 +517,13 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
             | Some item when canBeRelative item modifiedItem -> Some (item, relativeToType)
             | _ -> tryGetRelativeChildItem relativeChildItem modifiedItem relativeToType)
 
-    let getRelativeChildPathImpl (relativeViewItem: FSharpViewItem) modifiedNodeItem relativeToType =
+    let getRelativeChildPathImpl (relativeViewItem: FSharpViewItem) modifiedItemBuildAction relativeToType =
         tryGetProjectItem relativeViewItem
         |> Option.bind (function
             | FileItem _ as fileItem -> Some (fileItem, relativeToType)
             | FolderItem _ as folderItem ->
-                if canBeRelative folderItem modifiedNodeItem then Some (folderItem, relativeToType) else
-                tryGetRelativeChildItem (Some (folderItem)) modifiedNodeItem relativeToType)
+                if canBeRelative folderItem modifiedItemBuildAction then Some (folderItem, relativeToType) else
+                tryGetRelativeChildItem (Some folderItem) modifiedItemBuildAction relativeToType)
 
     let rec renameFolder oldLocation newLocation itemUpdater =
         getFolders oldLocation
@@ -605,19 +604,19 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
             folderRefresher itemBefore.Parent
         | _ -> ()
 
-    let rec tryGetAdjacentRelativeItem nodeItem modifiedNodeItem relativeToType =
-        match nodeItem with
+    let rec tryGetAdjacentRelativeItem relativeToItem modifiedItemBuildAction relativeToType =
+        match relativeToItem with
         | Project _ -> None
-        | ProjectItem nodeItem ->
-            tryGetAdjacentItemInParent nodeItem relativeToType
+        | ProjectItem relativeToItem ->
+            tryGetAdjacentItemInParent relativeToItem relativeToType
             |> Option.bind (fun adjacentItem ->
-                if canBeRelative adjacentItem modifiedNodeItem then Some (adjacentItem, relativeToType)
-                else
-                    tryGetRelativeChildItem (Some adjacentItem) modifiedNodeItem (changeDirection relativeToType)
-                    |> Option.map (fun (item, _) -> item, relativeToType))
+                if canBeRelative adjacentItem modifiedItemBuildAction then Some (adjacentItem, relativeToType) else
+
+                tryGetRelativeChildItem (Some adjacentItem) modifiedItemBuildAction (changeDirection relativeToType)
+                |> Option.map (fun (item, _) -> item, relativeToType))
             |> Option.orElseWith (fun _ ->
                 // todo: check item type
-                tryGetAdjacentRelativeItem nodeItem.Parent modifiedNodeItem relativeToType)
+                tryGetAdjacentRelativeItem relativeToItem.Parent modifiedItemBuildAction relativeToType)
 
     let createNewItemInfo (path: FileSystemPath) logicalPath relativeToPath relativeToType refresher updater =
         let tryGetPossiblyRelativeNodeItem path =
@@ -635,11 +634,13 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
                 // Try adjacent item, if its path matches new item path better (i.e. shares a longer common path)
                 let relativeItem, relativeToType =
                     match tryGetAdjacentRelativeItem (ProjectItem relativeItem) None relativeToType with
-                    | Some (item, relativeToType) when
+                    | Some (adjacentItem, relativeToType) when
+                            relativeToPath.Parent <> path.Parent &&
+
                             let relativeCommonParent = getCommonParent logicalPath relativeItem.LogicalPath
-                            let adjacentCommonParent = getCommonParent logicalPath item.LogicalPath
+                            let adjacentCommonParent = getCommonParent logicalPath adjacentItem.LogicalPath
                             relativeCommonParent.IsPrefixOf(adjacentCommonParent) ->
-                        item, changeDirection relativeToType
+                        adjacentItem, changeDirection relativeToType
                     | _ -> relativeItem, relativeToType
 
                 let relativeItemParent =
@@ -850,22 +851,31 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         let itemInfo = createNewItemInfo path path relativeToPath relativeToType refresher updater
         folders.Add(path, FolderItem(itemInfo, getNewFolderIdentity path))
 
-    member x.TryGetRelativeChildPath(modifiedItem, relativeItem, relativeToType) =
-        let modifiedNodeItem = tryGetProjectItem modifiedItem
-        match getRelativeChildPathImpl relativeItem modifiedNodeItem relativeToType with
+    member x.TryGetRelativeChildPath(modifiedViewItem, relativeItem, relativeToType) =
+        let modifiedItemBuildAction =
+            modifiedViewItem
+            |> Option.bind tryGetProjectItem
+            |> Option.bind (function | FileItem (_, buildAction, _) -> Some buildAction | _ -> None)
+
+        let modifiedItemLocation =
+            modifiedViewItem
+            |> Option.map (fun item -> item.ProjectItem.Location)
+            |> Option.defaultValue null
+
+        match getRelativeChildPathImpl relativeItem modifiedItemBuildAction relativeToType with
         | Some (relativeChildItem, relativeToType) when
-                relativeChildItem.PhysicalPath = modifiedItem.ProjectItem.Location ->
+                 relativeChildItem.PhysicalPath = modifiedItemLocation ->
 
             // When moving files, we remove each file first and then we add it next to the relative item.
             // An item should not be relative to itself as we won't be able to find place to insert after removing.
             // We need to find another item to be relative to.
-            match tryGetAdjacentRelativeItem (ProjectItem relativeChildItem) modifiedNodeItem relativeToType with
+            match tryGetAdjacentRelativeItem (ProjectItem relativeChildItem) modifiedItemBuildAction relativeToType with
             | Some (adjacentItem, relativeToType) ->
                   Some (adjacentItem.PhysicalPath, changeDirection relativeToType)
             | _ -> 
                 // There were no adjacent items in this direction, try the other one.
                 let relativeToType = changeDirection relativeToType
-                tryGetAdjacentRelativeItem (ProjectItem relativeChildItem) modifiedNodeItem relativeToType
+                tryGetAdjacentRelativeItem (ProjectItem relativeChildItem) modifiedItemBuildAction relativeToType
                 |> Option.map (fun (item, relativeToType) -> item.PhysicalPath, changeDirection relativeToType)
 
         | Some (item, reltativeToType) -> Some (item.PhysicalPath, relativeToType)
@@ -1124,10 +1134,12 @@ type FSharpItemModificationContextProvider(container: IFSharpItemsContainer) =
         let context =
             match modifiedItem, relativeItem with
             | (:? FSharpViewItem as modifiedViewItem), (:? FSharpViewItem as relativeViewItem) ->
-                x.CreateModificationContext(modifiedViewItem, relativeViewItem, relativeToType)
+                x.CreateModificationContext(Some modifiedViewItem, relativeViewItem, relativeToType)
+            | null, (:? FSharpViewItem as relativeViewItem) ->
+                x.CreateModificationContext(None, relativeViewItem, relativeToType)
             | _ -> None
         match context with
-        | Some context -> context :> _
+        | Some context -> context
         | _ -> base.CreateOrderingContext(modifiedItem, relativeItem, relativeToType)
 
     member x.CreateModificationContext(modifiedViewItem, (relativeViewItem: FSharpViewItem), relativeToType) =

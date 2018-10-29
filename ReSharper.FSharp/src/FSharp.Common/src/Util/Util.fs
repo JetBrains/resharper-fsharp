@@ -211,4 +211,4 @@ module rec FSharpMsBuildUtils =
         | _ -> false
 
     type BuildAction with
-        member x.ChangesOrder() = changesOrder x.Value
+        member x.ChangesOrder = changesOrder x.Value

@@ -837,7 +837,7 @@ type FSharpItemsContainerTest() =
                         let itemType = itemTypes.TryGetValue(projectItem.Location)
                         let relativeItemType = itemTypes.TryGetValue(relative.Location)
 
-                        let context = provider.CreateModificationContext(viewFile, relativeViewItem, relativeToType)
+                        let context = provider.CreateModificationContext(Some viewFile, relativeViewItem, relativeToType)
                         match relativeViewItem, context with
                         | FSharpViewFile _, Some context when
                                 projectItem <> relative && isNotNull itemType &&
