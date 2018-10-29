@@ -120,7 +120,7 @@ type FSharpTypingAssist
 
         pos - startOffset
 
-    let getContinuedIndentLine (textControl: ITextControl) caretOffset =
+    let getContinuedIndentLine (textControl: ITextControl) caretOffset continueByLeadingLParen =
         let document = textControl.Document
         let line = document.GetCoordsByOffset(caretOffset).Line
         if caretOffset = document.GetLineStartOffset(line) then line else
@@ -130,24 +130,37 @@ type FSharpTypingAssist
 
         let matcher = FSharpBracketMatcher()
 
-        let rec findContinuedLine line =
+        let rec tryFindContinuedLine line lineStartOffset hasLeadingLeftBracket =
             lexer.Advance(-1)
-            if lexer.TokenStart <= document.GetLineStartOffset(line) then line else
             if isNull lexer.TokenType then line else  
+
+            if lexer.TokenStart <= lineStartOffset && not hasLeadingLeftBracket then line else
 
             let continuedLine =
                 if deindentingTokens.Contains(lexer.TokenType) then
                     if not (matcher.FindMatchingBracket(lexer)) then line else
                     document.GetCoordsByOffset(lexer.TokenStart).Line
                 else
-                    line
-            findContinuedLine continuedLine
+                    if lexer.TokenStart >= lineStartOffset then line else line.Previous
 
-        findContinuedLine line
+            let lineStartOffset =
+                if line = continuedLine then lineStartOffset else
+                document.GetLineStartOffset(continuedLine)
+
+            let hasLeadingLeftParen =
+                continueByLeadingLParen &&
+                (lexer.TokenStart > lineStartOffset && lexer.TokenType == FSharpTokenType.LPAREN ||
+                 hasLeadingLeftBracket && isIgnored lexer.TokenType)
+
+            tryFindContinuedLine continuedLine lineStartOffset hasLeadingLeftParen
+
+        let lineStartOffset = document.GetLineStartOffset(line)
+        
+        tryFindContinuedLine line lineStartOffset (lexer.TokenType == FSharpTokenType.LPAREN)
         
     let doDumpIndent (textControl: ITextControl) =
         let caretOffset = textControl.Caret.Offset()
-        let line = getContinuedIndentLine textControl caretOffset
+        let line = getContinuedIndentLine textControl caretOffset false
         let lineIndent = getLineWhitespaceIndent textControl line
 
         let insertPos = trimTrailingSpacesBeforeCaret textControl
@@ -158,8 +171,8 @@ type FSharpTypingAssist
     let handleEnter (context: IActionContext) =
         let textControl = context.TextControl
 
-        if this.HandleEnterFindLeftBracket(textControl) then true else
         if this.HandleEnterAddIndent(textControl) then true else
+        if this.HandleEnterFindLeftBracket(textControl) then true else
 
         doDumpIndent textControl
 
@@ -224,6 +237,7 @@ type FSharpTypingAssist
             match tryGetNestedIndentBelow cachingLexerService textControl line with
             | Some (Source n | Comments n) -> n
             | _ ->
+                let line = getContinuedIndentLine textControl lexer.TokenStart true
                 let prevIndentSize = getLineWhitespaceIndent textControl line
                 let defaultIndent = sourceFile.GetFormatterSettings(sourceFile.PrimaryPsiLanguage).INDENT_SIZE
                 prevIndentSize + defaultIndent

@@ -44,7 +44,11 @@ type FSharpTypingAssistTest() =
 
     [<Test>] member x.``Enter 20 - Nested indent after =``() = x.DoNamedTest()
     [<Test>] member x.``Enter 21 - Nested indent after = and comments``() = x.DoNamedTest()
+
     [<Test>] member x.``Enter 22 - Indent after = 2``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 23 - After new line ctor and =``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 24 - Add indent after continued line``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 25 - Add indent after continued line before block``() = x.DoNamedTest()
 
     [<Test>] member x.``Space 01 - Inside empty list``() = x.DoNamedTest()
     [<Test>] member x.``Space 02 - Inside empty array``() = x.DoNamedTest()
