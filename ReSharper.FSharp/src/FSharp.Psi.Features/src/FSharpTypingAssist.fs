@@ -32,6 +32,8 @@ type FSharpTypingAssist
            FSharpTokenType.LBRACK_BAR
            FSharpTokenType.LBRACK_LESS
            FSharpTokenType.LBRACE
+           FSharpTokenType.LQUOTE_TYPED
+           FSharpTokenType.LQUOTE_UNTYPED
            FSharpTokenType.BEGIN
            FSharpTokenType.DO
            FSharpTokenType.THEN
@@ -54,8 +56,17 @@ type FSharpTypingAssist
            FSharpTokenType.RBRACK
            FSharpTokenType.BAR_RBRACK
            FSharpTokenType.GREATER_RBRACK
+           FSharpTokenType.RQUOTE_TYPED
+           FSharpTokenType.RQUOTE_UNTYPED
            FSharpTokenType.RBRACE
            FSharpTokenType.END |]
+        |> HashSet
+
+    let emptyBracketsToAddSpace =
+        [| FSharpTokenType.LBRACK, FSharpTokenType.RBRACK
+           FSharpTokenType.LBRACK_BAR, FSharpTokenType.BAR_RBRACK
+           FSharpTokenType.LQUOTE_TYPED, FSharpTokenType.RQUOTE_TYPED
+           FSharpTokenType.LQUOTE_UNTYPED, FSharpTokenType.RQUOTE_UNTYPED |]
         |> HashSet
 
     let getCachingLexer textControl (lexer: outref<_>) =
@@ -152,10 +163,15 @@ type FSharpTypingAssist
 
         doDumpIndent textControl
 
-    let isAvailable = Predicate<_>(this.IsAvailable)
+    let handleSpace (context: ITypingContext) =
+        this.HandleSpaceInsideEmptyBrackets(context.TextControl)
+
+    let isActionHandlerAvailable = Predicate<_>(this.IsActionHandlerAvailabile2)
+    let isTypingHandlerAvailable = Predicate<_>(this.IsTypingHandlerAvailable2)
 
     do
-        manager.AddActionHandler(lifetime, TextControlActions.ENTER_ACTION_ID, this, Func<_,_>(handleEnter), isAvailable)
+        manager.AddActionHandler(lifetime, TextControlActions.ENTER_ACTION_ID, this, Func<_,_>(handleEnter), isActionHandlerAvailable)
+        manager.AddTypingHandler(lifetime, ' ', this, Func<_,_>(handleSpace), isTypingHandlerAvailable)
 
     member x.HandleEnterFindLeftBracket(textControl) =
         let mutable lexer = Unchecked.defaultof<_>
@@ -207,18 +223,44 @@ type FSharpTypingAssist
         let indentSize =
             match tryGetNestedIndentBelow cachingLexerService textControl line with
             | Some (Source n | Comments n) -> n
-            | _ -> sourceFile.GetFormatterSettings(sourceFile.PrimaryPsiLanguage).INDENT_SIZE
+            | _ ->
+                let prevIndentSize = getLineWhitespaceIndent textControl line
+                let defaultIndent = sourceFile.GetFormatterSettings(sourceFile.PrimaryPsiLanguage).INDENT_SIZE
+                prevIndentSize + defaultIndent
 
         let insertPos = trimTrailingSpacesBeforeCaret textControl
-        let prevIndentSize = getLineWhitespaceIndent textControl line
-        let text = this.GetNewLineText(textControl) + String(' ' , prevIndentSize + indentSize) 
+        let text = this.GetNewLineText(textControl) + String(' ' , indentSize) 
         insertText textControl insertPos text "Indent on Enter"
+
+    member x.HandleSpaceInsideEmptyBrackets(textControl: ITextControl) =
+        let mutable lexer = Unchecked.defaultof<_>
+
+        let isAvailable =
+            x.CheckAndDeleteSelectionIfNeeded(textControl, fun selection ->
+                let offset = selection.StartOffset
+                if not (offset > 0 && getCachingLexer textControl &lexer) then false else
+
+                if not (lexer.FindTokenAt(offset - 1)) then false else
+                let left = lexer.TokenType
+
+                if not (lexer.FindTokenAt(offset)) then false else
+                let right = lexer.TokenType
+
+                let pair = left, right
+                emptyBracketsToAddSpace.Contains(pair))
+
+        if not isAvailable then false else
+
+        let offset = textControl.Caret.Offset()
+        textControl.Document.InsertText(offset, "  ")
+        textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible)
+        true
 
     member x.GetNewLineText(textControl: ITextControl) =
         x.GetNewLineText(textControl.Document.GetPsiSourceFile(x.Solution))
 
-    member x.IsAvailable(context) =
-        x.IsActionHandlerAvailabile(context)
+    member x.IsActionHandlerAvailabile2(context) = base.IsActionHandlerAvailabile(context)
+    member x.IsTypingHandlerAvailable2(context) = base.IsTypingHandlerAvailable(context)
 
     override x.IsSupported(textControl: ITextControl) =
         match textControl.Document.GetPsiSourceFile(x.Solution) with
@@ -260,11 +302,8 @@ let getLineIndent (cachingLexerService: CachingLexerService) (textControl: IText
             commentOffset <- Some (Comments (lexer.TokenStart - startOffset))
         lexer.Advance()
 
-    match lexer.TokenType with
-    | null -> commentOffset
-    | tokenType ->
-
-    if isIgnoredOrNewLine tokenType then None else
+    let tokenType = lexer.TokenType
+    if isNull tokenType || isIgnoredOrNewLine tokenType then commentOffset else
     Some (Source (lexer.TokenStart - startOffset))
 
 let tryGetNestedIndentBelow cachingLexerService textControl line =
@@ -314,6 +353,8 @@ let matchingBrackets =
        Pair.Of(FSharpTokenType.LBRACE, FSharpTokenType.RBRACE) 
        Pair.Of(FSharpTokenType.LBRACK_BAR, FSharpTokenType.BAR_RBRACK) 
        Pair.Of(FSharpTokenType.LBRACK_LESS, FSharpTokenType.GREATER_RBRACK)
+       Pair.Of(FSharpTokenType.LQUOTE_TYPED, FSharpTokenType.RQUOTE_TYPED)
+       Pair.Of(FSharpTokenType.LQUOTE_UNTYPED, FSharpTokenType.RQUOTE_UNTYPED)
        Pair.Of(FSharpTokenType.BEGIN, FSharpTokenType.END)
        Pair.Of(FSharpTokenType.CLASS, FSharpTokenType.END)
        Pair.Of(FSharpTokenType.STRUCT, FSharpTokenType.END)

@@ -1,0 +1,7 @@
+// ${CHAR:Enter} 
+module Module
+
+let foo =
+    let foo ={caret}
+       // comment
+    ()

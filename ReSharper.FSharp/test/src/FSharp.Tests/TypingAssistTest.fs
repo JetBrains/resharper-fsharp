@@ -42,6 +42,13 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter 18 - After single continued line``() = x.DoNamedTest()
     [<Test>] member x.``Enter 19 - After pair starting at line start``() = x.DoNamedTest()
 
+    [<Test>] member x.``Enter 20 - Nested indent after =``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 21 - Nested indent after = and comments``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 22 - Indent after = 2``() = x.DoNamedTest()
+
+    [<Test>] member x.``Space 01 - Inside empty list``() = x.DoNamedTest()
+    [<Test>] member x.``Space 02 - Inside empty array``() = x.DoNamedTest()
+
 [<FSharpTest>]
 type LineIndentsTest() =
     inherit LineIndentsTestBase()
