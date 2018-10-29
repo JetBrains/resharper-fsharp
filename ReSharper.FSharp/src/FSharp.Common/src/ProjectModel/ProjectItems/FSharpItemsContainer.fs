@@ -1130,7 +1130,9 @@ type FSharpItemModificationContextProvider(container: IFSharpItemsContainer) =
 
     override x.IsApplicable(project) = project.IsFSharp
 
-    override x.CreateOrderingContext(modifiedItem, relativeItem, relativeToType) =
+    override x.CreateOrderingContext(modifiedItems, relativeItems, relativeToType) =
+        let modifiedItem = modifiedItems.FirstOrDefault()
+        let relativeItem = relativeItems.FirstOrDefault()
         let context =
             match modifiedItem, relativeItem with
             | (:? FSharpViewItem as modifiedViewItem), (:? FSharpViewItem as relativeViewItem) ->
@@ -1140,7 +1142,7 @@ type FSharpItemModificationContextProvider(container: IFSharpItemsContainer) =
             | _ -> None
         match context with
         | Some context -> context
-        | _ -> base.CreateOrderingContext(modifiedItem, relativeItem, relativeToType)
+        | _ -> base.CreateOrderingContext(modifiedItems, relativeItems, relativeToType)
 
     member x.CreateModificationContext(modifiedViewItem, (relativeViewItem: FSharpViewItem), relativeToType) =
         let project = relativeViewItem.ProjectItem.GetProject().NotNull()
