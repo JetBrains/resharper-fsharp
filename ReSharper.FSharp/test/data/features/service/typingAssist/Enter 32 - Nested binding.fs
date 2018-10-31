@@ -1,0 +1,5 @@
+// ${CHAR:Enter} 
+module Module
+
+let main argv =
+{caret}   let foo qwe =

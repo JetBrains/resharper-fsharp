@@ -44,6 +44,7 @@ type FSharpTypingAssist
 
     let allowingNoIndentTokens =
         [| FSharpTokenType.RARROW
+           FSharpTokenType.THEN
            FSharpTokenType.ELSE
            FSharpTokenType.DO |]
         |> HashSet
@@ -81,6 +82,9 @@ type FSharpTypingAssist
         if document.GetLineText(line).IsWhitespace() then initialLine else line
 
     let trimTrailingSpacesBeforeOffset (document: IDocument) (offset: outref<int>) =
+        let startOffset = document.GetLineStartOffset(document.GetCoordsByOffset(offset).Line)
+        if document.GetText(TextRange(startOffset, offset)).IsWhitespace() then () else
+
         let initialOffset = offset
         let buffer = document.Buffer
         while offset > 0 &&
@@ -154,23 +158,38 @@ type FSharpTypingAssist
         let lineStartOffset = document.GetLineStartOffset(line)
         
         tryFindContinuedLine line lineStartOffset (lexer.TokenType == FSharpTokenType.LPAREN)
-        
-    let doDumpIndent (textControl: ITextControl) =
-        let caretOffset = textControl.Caret.Offset()
-        let line = getContinuedIndentLine textControl caretOffset false
-        let lineIndent = getLineWhitespaceIndent textControl line
 
+    let insertIndentFromLine textControl insertPos line =
+        let indentSize = getLineWhitespaceIndent textControl line
         let insertPos = trimTrailingSpacesBeforeCaret textControl
-        let text = this.GetNewLineText(textControl) + String(' ', lineIndent)
+        let text = this.GetNewLineText(textControl) + String(' ', indentSize)
+        insertText textControl insertPos text "Indent on Enter"
 
+    let doDumpIndent (textControl: ITextControl) =
+        let document = textControl.Document
+        let buffer = document.Buffer
+
+        let caretOffset = textControl.Caret.Offset()
+        let caretLine = document.GetCoordsByOffset(caretOffset).Line
+        let line = getContinuedIndentLine textControl caretOffset false
+        if line <> caretLine then insertIndentFromLine textControl caretOffset line else
+        
+        let startOffset = document.GetLineStartOffset(caretLine)
+        let mutable pos = startOffset
+
+        while pos < caretOffset && Char.IsWhiteSpace(buffer.[pos]) do
+            pos <- pos + 1
+
+        let text = this.GetNewLineText(textControl) + buffer.GetText(TextRange(startOffset, pos))
+        let insertPos = trimTrailingSpacesBeforeCaret textControl
         insertText textControl insertPos text "Indent on Enter"
 
     let handleEnter (context: IActionContext) =
         let textControl = context.TextControl
 
         if this.HandleEnterAddIndentAfterLeftBracket(textControl) then true else
-        if this.HandleEnterAddBiggerIndentFromBelow(textControl) then true else
         if this.HandleEnterFindLeftBracket(textControl) then true else
+        if this.HandleEnterAddBiggerIndentFromBelow(textControl) then true else
 
         doDumpIndent textControl
 
@@ -247,18 +266,23 @@ type FSharpTypingAssist
 
         if not isAvailable then false else
 
-        match textControl.Document.GetPsiSourceFile(x.Solution) with
+        let document = textControl.Document
+        match document.GetPsiSourceFile(x.Solution) with
         | null -> false
         | sourceFile ->
 
-        let line = textControl.Document.GetCoordsByOffset(lexer.TokenStart).Line
+        let line = document.GetCoordsByOffset(lexer.TokenStart).Line
         let indentSize =
             match tryGetNestedIndentBelowLine cachingLexerService textControl line with
             | Some (Source n | Comments n) -> n
             | _ ->
+                let defaultIndent = sourceFile.GetFormatterSettings(sourceFile.PrimaryPsiLanguage).INDENT_SIZE
+                let tokenType = lexer.TokenType
+                if not (allowingNoIndentTokens.Contains(tokenType) || tokenType == FSharpTokenType.EQUALS) then
+                    lexer.TokenStart + defaultIndent else
+
                 let line = getContinuedIndentLine textControl lexer.TokenStart true
                 let prevIndentSize = getLineWhitespaceIndent textControl line
-                let defaultIndent = sourceFile.GetFormatterSettings(sourceFile.PrimaryPsiLanguage).INDENT_SIZE
                 prevIndentSize + defaultIndent
 
         let insertPos = trimTrailingSpacesBeforeCaret textControl
@@ -369,11 +393,15 @@ let findUnmatchedBracketToLeft (lexer: CachingLexer) offset minOffset =
     let mutable foundToken = false
 
     while not foundToken && lexer.TokenStart >= minOffset do
-        matcher.ProceedStack(lexer.TokenType) |> ignore
-        if matcher.IsStackEmpty() || not FSharpTokenType.LeftBraces.[lexer.TokenType] then
-            lexer.Advance(-1)
-        else
+        if FSharpTokenType.RightBraces.[lexer.TokenType] then
+            if matcher.FindMatchingBracket(lexer) then
+                lexer.Advance(-1)
+        
+        if FSharpTokenType.LeftBraces.[lexer.TokenType] then
             foundToken <- true
+        else
+            lexer.Advance(-1)
+    
     foundToken
 
 let isIgnored (tokenType: TokenNodeType) =

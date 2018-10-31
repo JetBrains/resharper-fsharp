@@ -2,6 +2,6 @@
 module Module
 
 let foo =
-   
-   {caret}
-   123
+    123
+    
+    {caret}

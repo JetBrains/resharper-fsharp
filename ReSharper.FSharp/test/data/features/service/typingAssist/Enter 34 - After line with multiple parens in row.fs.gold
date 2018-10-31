@@ -1,7 +1,5 @@
 ﻿// ${CHAR:Enter} 
 module Module
 
-let foo =
-   
+   let x = not (foo (bar + baz))
    {caret}
-   123

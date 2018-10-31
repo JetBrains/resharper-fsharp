@@ -22,7 +22,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter 01 - No indent``() = x.DoNamedTest()
     [<Test>] member x.``Enter 02 - Dumb indent``() = x.DoNamedTest()
     [<Test>] member x.``Enter 03 - Dumb indent, trim spaces``() = x.DoNamedTest()
-    [<Test>] member x.``Enter 04 - Dumb indent, trim empty line``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 04 - Dumb indent, empty line``() = x.DoNamedTest()
 
     [<Test>] member x.``Enter 05 - Indent after =``() = x.DoNamedTest()
     [<Test>] member x.``Enter 06 - Indent after = and spaces``() = x.DoNamedTest()
@@ -53,6 +53,13 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter 26 - Empty line, add indent from below``() = x.DoNamedTest()
     [<Test>] member x.``Enter 27 - Empty line, dump indent``() = x.DoNamedTest()
     [<Test>] member x.``Enter 28 - No indent after else and new line``() = x.DoNamedTest()
+
+    [<Test>] member x.``Enter 29 - No indent before source``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 30 - No indent before source 2``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 31 - Inside empty ctor``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 32 - Nested binding``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 33 - After then on line with multiple parens in row``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 34 - After line with multiple parens in row``() = x.DoNamedTest()
 
     [<Test>] member x.``Space 01 - Inside empty list``() = x.DoNamedTest()
     [<Test>] member x.``Space 02 - Inside empty array``() = x.DoNamedTest()
