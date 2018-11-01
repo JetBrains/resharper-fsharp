@@ -60,6 +60,13 @@ type FSharpTypingAssist
            FSharpTokenType.END |]
         |> HashSet
 
+    let rightBracketsToAddSpace =
+        [| FSharpTokenType.RBRACK
+           FSharpTokenType.BAR_RBRACK
+           FSharpTokenType.RQUOTE_TYPED
+           FSharpTokenType.RQUOTE_UNTYPED |]
+        |> HashSet
+
     let emptyBracketsToAddSpace =
         [| FSharpTokenType.LBRACK, FSharpTokenType.RBRACK
            FSharpTokenType.LBRACK_BAR, FSharpTokenType.BAR_RBRACK
@@ -81,23 +88,63 @@ type FSharpTypingAssist
 
         if document.GetLineText(line).IsWhitespace() then initialLine else line
 
-    let trimTrailingSpacesBeforeOffset (document: IDocument) (offset: outref<int>) =
-        let startOffset = document.GetLineStartOffset(document.GetCoordsByOffset(offset).Line)
-        if document.GetText(TextRange(startOffset, offset)).IsWhitespace() then () else
+    let getAdditionalSpacesBeforeToken (textControl: ITextControl) offset lineStart =
+        let mutable lexer = Unchecked.defaultof<_>
 
-        let initialOffset = offset
+        if not (getCachingLexer textControl &lexer && lexer.FindTokenAt(offset)) then 0 else
+        if not (rightBracketsToAddSpace.Contains(lexer.TokenType)) then 0 else
+
+        let rightBracketOffset = lexer.TokenStart
+        if not (findUnmatchedBracketToLeft lexer offset lineStart) then 0 else
+
+        let leftBracketEndOffset = lexer.TokenEnd
+
+        lexer.Advance()
+        while lexer.TokenType == FSharpTokenType.WHITESPACE do
+            lexer.Advance() 
+
+        // Emtpy list with spaces, add the same space as before caret.
+        if lexer.TokenStart >= offset then offset - leftBracketEndOffset - 1 else
+
+        // Empty list with no spaces, no additional spaces should be added.
+        if lexer.TokenStart = rightBracketOffset then 0 else
+
+        // Space before first list element.
+        lexer.TokenStart - leftBracketEndOffset
+
+    let trimTrailingSpacesAtOffset (textControl: ITextControl) (startOffset: outref<int>) trimAfterCaret =
+        let isWhitespace c =
+            c = ' ' || c = '\t'
+
+        let document = textControl.Document
+        let line = document.GetCoordsByOffset(startOffset).Line
+        let lineStart = document.GetLineStartOffset(line)
+        if document.GetText(TextRange(lineStart, startOffset)).IsWhitespace() then () else
+
+        let mutable endOffset = startOffset
         let buffer = document.Buffer
-        while offset > 0 &&
-                let c = buffer.[offset - 1]
-                c = ' ' || c = '\t' do
-            offset <- offset - 1
+        while startOffset > 0 && isWhitespace buffer.[startOffset - 1] do
+            startOffset <- startOffset - 1
 
-        if offset <> initialOffset then
-            document.DeleteText(TextRange(offset, initialOffset))
+        let lineEndOffset = document.GetLineEndOffsetNoLineBreak(line)
+        if trimAfterCaret then
+            while endOffset < lineEndOffset && isWhitespace buffer.[endOffset] do
+                endOffset <- endOffset + 1
 
-    let trimTrailingSpacesBeforeCaret (textControl: ITextControl) =
+        let additionalSpaces =
+            if endOffset >= lineEndOffset then 0 else
+            getAdditionalSpacesBeforeToken textControl endOffset lineStart
+        
+        if additionalSpaces > 0 then
+            let replaceRange = TextRange(startOffset, endOffset)
+            document.ReplaceText(replaceRange, String(' ', additionalSpaces))
+
+        elif startOffset <> endOffset then
+            document.DeleteText(TextRange(startOffset, endOffset))
+
+    let trimTrailingSpaces (textControl: ITextControl) trimAfterCaret =
         let mutable offset = textControl.Caret.Offset()
-        trimTrailingSpacesBeforeOffset textControl.Document &offset
+        trimTrailingSpacesAtOffset textControl &offset trimAfterCaret
         offset
 
     let insertText (textControl: ITextControl) insertOffset text commandName =
@@ -159,8 +206,8 @@ type FSharpTypingAssist
         
         tryFindContinuedLine line lineStartOffset (lexer.TokenType == FSharpTokenType.LPAREN)
 
-    let insertNewLineAt textControl insertPos indent =
-        let insertPos = trimTrailingSpacesBeforeCaret textControl
+    let insertNewLineAt textControl insertPos indent trimAfterCaret =
+        let insertPos = trimTrailingSpaces textControl trimAfterCaret
         let text = this.GetNewLineText(textControl) + String(' ', indent)
         insertText textControl insertPos text "Indent on Enter"
     
@@ -193,7 +240,7 @@ type FSharpTypingAssist
         if this.HandleEnterFindLeftBracket(textControl) then true else
         if this.HandleEnterAddBiggerIndentFromBelow(textControl) then true else
 
-        doDumpIndent textControl
+        doDumpIndent textControl false
 
     let handleSpace (context: ITypingContext) =
         this.HandleSpaceInsideEmptyBrackets(context.TextControl)
@@ -217,7 +264,7 @@ type FSharpTypingAssist
         match tryGetNestedIndentBelow cachingLexerService textControl caretLine (int caretCoords.Column) with
         | None -> false
         | Some (_, (Source indent | Comments indent)) ->
-            insertNewLineAt textControl caretOffset indent
+            insertNewLineAt textControl caretOffset indent false
 
     member x.HandleEnterFindLeftBracket(textControl) =
         let mutable lexer = Unchecked.defaultof<_>
@@ -240,7 +287,7 @@ type FSharpTypingAssist
             lexer.Advance()
 
         let indent = lexer.TokenStart - lineStartOffset
-        insertNewLineAt textControl caretOffset indent
+        insertNewLineAt textControl caretOffset indent true
 
     member x.HandleEnterAddIndentAfterLeftBracket(textControl) =
         let mutable lexer = Unchecked.defaultof<_>
@@ -286,7 +333,7 @@ type FSharpTypingAssist
             let caretLine = document.GetCoordsByOffset(caretOffset).Line
             if nestedIndentLine = caretLine then false else
 
-            insertNewLineAt textControl caretOffset indent
+            insertNewLineAt textControl caretOffset indent true
         | _ ->
 
         match document.GetPsiSourceFile(x.Solution) with
@@ -304,7 +351,7 @@ type FSharpTypingAssist
                 getLineWhitespaceIndent textControl line
             prevIndentSize + defaultIndent
 
-        insertNewLineAt textControl caretOffset indentSize
+        insertNewLineAt textControl caretOffset indentSize true
 
     member x.HandleSpaceInsideEmptyBrackets(textControl: ITextControl) =
         let mutable lexer = Unchecked.defaultof<_>

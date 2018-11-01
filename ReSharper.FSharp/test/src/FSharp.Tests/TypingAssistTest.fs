@@ -62,6 +62,11 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter 34 - After line with multiple parens in row``() = x.DoNamedTest()
     [<Test>] member x.``Enter 35 - Nested binding and indent``() = x.DoNamedTest()
 
+    [<Test>] member x.``Enter 36 - Indent after =, trim before source``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 37 - List, first element, trim before source``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 38 - Empty list``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 39 - Empty list with spaces``() = x.DoNamedTest()
+
     [<Test>] member x.``Space 01 - Inside empty list``() = x.DoNamedTest()
     [<Test>] member x.``Space 02 - Inside empty array``() = x.DoNamedTest()
 
