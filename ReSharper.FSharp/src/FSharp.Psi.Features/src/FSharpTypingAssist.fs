@@ -127,7 +127,7 @@ type FSharpTypingAssist
             startOffset <- startOffset - 1
 
         let lineEndOffset = document.GetLineEndOffsetNoLineBreak(line)
-        if trimAfterCaret then
+        if trimAfterCaret = TrimTrailingSpaces.Yes then
             while endOffset < lineEndOffset && isWhitespace buffer.[endOffset] do
                 endOffset <- endOffset + 1
 
@@ -240,7 +240,7 @@ type FSharpTypingAssist
         if this.HandleEnterFindLeftBracket(textControl) then true else
         if this.HandleEnterAddBiggerIndentFromBelow(textControl) then true else
 
-        doDumpIndent textControl false
+        doDumpIndent textControl TrimTrailingSpaces.No
 
     let handleSpace (context: ITypingContext) =
         this.HandleSpaceInsideEmptyBrackets(context.TextControl)
@@ -264,7 +264,7 @@ type FSharpTypingAssist
         match tryGetNestedIndentBelow cachingLexerService textControl caretLine (int caretCoords.Column) with
         | None -> false
         | Some (_, (Source indent | Comments indent)) ->
-            insertNewLineAt textControl caretOffset indent false
+            insertNewLineAt textControl caretOffset indent TrimTrailingSpaces.No
 
     member x.HandleEnterFindLeftBracket(textControl) =
         let mutable lexer = Unchecked.defaultof<_>
@@ -287,7 +287,7 @@ type FSharpTypingAssist
             lexer.Advance()
 
         let indent = lexer.TokenStart - lineStartOffset
-        insertNewLineAt textControl caretOffset indent true
+        insertNewLineAt textControl caretOffset indent TrimTrailingSpaces.Yes
 
     member x.HandleEnterAddIndentAfterLeftBracket(textControl) =
         let mutable lexer = Unchecked.defaultof<_>
@@ -333,7 +333,7 @@ type FSharpTypingAssist
             let caretLine = document.GetCoordsByOffset(caretOffset).Line
             if nestedIndentLine = caretLine then false else
 
-            insertNewLineAt textControl caretOffset indent true
+            insertNewLineAt textControl caretOffset indent TrimTrailingSpaces.Yes
         | _ ->
 
         match document.GetPsiSourceFile(x.Solution) with
@@ -351,7 +351,7 @@ type FSharpTypingAssist
                 getLineWhitespaceIndent textControl line
             prevIndentSize + defaultIndent
 
-        insertNewLineAt textControl caretOffset indentSize true
+        insertNewLineAt textControl caretOffset indentSize TrimTrailingSpaces.Yes
 
     member x.HandleSpaceInsideEmptyBrackets(textControl: ITextControl) =
         let mutable lexer = Unchecked.defaultof<_>
@@ -494,3 +494,8 @@ let matchingBrackets =
 
 type FSharpBracketMatcher() =
     inherit BracketMatcher(matchingBrackets)
+
+[<RequireQualifiedAccess; Struct>]
+type TrimTrailingSpaces =
+    | Yes
+    | No
