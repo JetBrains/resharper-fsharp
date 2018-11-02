@@ -1108,4 +1108,24 @@ class FSharpLexerTest : LexerTestCase() {
     fun testValidIdentifiers() {
         doTest("``s<>,.;':\"`~!@#\$%^&*()_+-=``","IDENT ('``s<>,.;':\"`~!@#\$%^&*()_+-=``')")
     }
+
+    @Test
+    fun testSmashingGreaterBarRBrack() {
+        doTest("let t = [|typeof<string>|]",
+                """
+                |LET ('let')
+                |WHITESPACE (' ')
+                |IDENT ('t')
+                |WHITESPACE (' ')
+                |EQUALS ('=')
+                |WHITESPACE (' ')
+                |LBRACK_BAR ('[|')
+                |IDENT ('typeof')
+                |LESS ('<')
+                |IDENT ('string')
+                |GREATER ('>')
+                |BAR_RBRACK ('|]')
+                """.trimMargin()
+        )
+    }
 }
