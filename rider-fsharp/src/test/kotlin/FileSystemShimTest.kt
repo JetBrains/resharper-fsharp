@@ -1,3 +1,4 @@
+import com.intellij.openapi.vfs.LocalFileSystem
 import com.jetbrains.rider.model.RdFSharpCompilerServiceHost
 import com.jetbrains.rider.model.rdFSharpModel
 import com.jetbrains.rider.projectView.solution
@@ -26,6 +27,7 @@ class FileSystemShimTest : BaseTestWithSolution() {
         val newText = "namespace NewTextHere"
         changeFileContent(project, file) { newText }
 
+        LocalFileSystem.getInstance().refresh(false)
         waitAndPump(project.lifetime, { getTimestamp(file) > stampBefore }, 15000, { "Timestamp wasn't changed." })
         val stampAfter = getTimestamp(file)
 

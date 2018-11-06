@@ -71,6 +71,11 @@ type FSharpTypingAssist
     let rightBracketsToAddSpace =
         emptyBracketsToAddSpace |> Seq.map snd |> HashSet
 
+    let emptyQuotationsStrings =
+        [| "<@@>", "<@"
+           "<@@@@>", "<@@" |]
+        |> dict
+    
     let bracketsToAddIndent =
         [| FSharpTokenType.LPAREN, FSharpTokenType.RPAREN
            FSharpTokenType.LBRACE, FSharpTokenType.RBRACE
@@ -424,12 +429,20 @@ type FSharpTypingAssist
 
                 if not (lexer.FindTokenAt(offset - 1)) then false else
                 let left = lexer.TokenType
+                let leftStart = lexer.TokenStart
 
                 if not (lexer.FindTokenAt(offset)) then false else
                 let right = lexer.TokenType
 
-                let pair = left, right
-                emptyBracketsToAddSpace.Contains(pair))
+                emptyBracketsToAddSpace.Contains((left, right)) ||
+
+                lexer.TokenType == FSharpTokenType.SYMBOLIC_OP &&
+                leftStart = lexer.TokenStart &&
+
+                let tokenText = lexer.GetCurrTokenText()
+                let mutable leftBracketText = Unchecked.defaultof<_>
+                emptyQuotationsStrings.TryGetValue(tokenText, &leftBracketText) &&
+                tokenText.Substring(0, leftBracketText.Length) = leftBracketText)
 
         if not isAvailable then false else
 

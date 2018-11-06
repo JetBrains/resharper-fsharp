@@ -72,9 +72,15 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter 42 - Before first list element and new line``() = x.DoNamedTest()
     [<Test>] member x.``Enter 43 - Before first list element``() = x.DoNamedTest()
     [<Test>] member x.``Enter 44 - Before first list element and spaces``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 45 - Before first list element in multiline brackets``() = x.DoNamedTest()
 
     [<Test>] member x.``Space 01 - Inside empty list``() = x.DoNamedTest()
     [<Test>] member x.``Space 02 - Inside empty array``() = x.DoNamedTest()
+    [<Test>] member x.``Space 03 - Inside empty quotation, typed``() = x.DoNamedTest()
+    [<Test>] member x.``Space 04 - Inside empty quotation, untyped``() = x.DoNamedTest()
+    [<Test>] member x.``Space 05 - Inside empty quotation, no assist``() = x.DoNamedTest()
+    [<Test>] member x.``Space 06 - Inside operator, no assist``() = x.DoNamedTest()
+    [<Test>] member x.``Space 07 - Inside empty array, no assist``() = x.DoNamedTest()
 
 [<FSharpTest>]
 type LineIndentsTest() =
