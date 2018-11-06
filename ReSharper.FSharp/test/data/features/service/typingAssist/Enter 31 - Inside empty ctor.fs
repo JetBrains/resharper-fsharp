@@ -1,6 +1,6 @@
 // ${CHAR:Enter} 
 module Module
 
-type T({caret}) =
+type T( {caret} ) =
    class
    end

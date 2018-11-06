@@ -1,7 +1,6 @@
 ﻿// ${CHAR:Enter}
-module Module
+module Module =
 
-let x =
-   [
+   let x = [
      {caret}
    ]

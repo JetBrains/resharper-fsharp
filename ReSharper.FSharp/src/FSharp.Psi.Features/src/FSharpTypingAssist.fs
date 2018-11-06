@@ -60,26 +60,47 @@ type FSharpTypingAssist
            FSharpTokenType.END |]
         |> HashSet
 
-    let rightBracketsToAddSpace =
-        [| FSharpTokenType.RBRACK
-           FSharpTokenType.BAR_RBRACK
-           FSharpTokenType.RQUOTE_TYPED
-           FSharpTokenType.RQUOTE_UNTYPED |]
-        |> HashSet
-
     let emptyBracketsToAddSpace =
-        [| FSharpTokenType.LBRACK, FSharpTokenType.RBRACK
+        [| FSharpTokenType.LBRACE, FSharpTokenType.RBRACE
+           FSharpTokenType.LBRACK, FSharpTokenType.RBRACK
            FSharpTokenType.LBRACK_BAR, FSharpTokenType.BAR_RBRACK
            FSharpTokenType.LQUOTE_TYPED, FSharpTokenType.RQUOTE_TYPED
            FSharpTokenType.LQUOTE_UNTYPED, FSharpTokenType.RQUOTE_UNTYPED |]
         |> HashSet
 
+    let rightBracketsToAddSpace =
+        emptyBracketsToAddSpace |> Seq.map snd |> HashSet
+
+    let bracketsToAddIndent =
+        [| FSharpTokenType.LPAREN, FSharpTokenType.RPAREN
+           FSharpTokenType.LBRACE, FSharpTokenType.RBRACE
+           FSharpTokenType.LBRACK, FSharpTokenType.RBRACK
+           FSharpTokenType.LBRACK_BAR, FSharpTokenType.BAR_RBRACK
+           FSharpTokenType.LBRACK_LESS, FSharpTokenType.GREATER_RBRACK
+           FSharpTokenType.LQUOTE_TYPED, FSharpTokenType.RQUOTE_TYPED
+           FSharpTokenType.LQUOTE_UNTYPED, FSharpTokenType.RQUOTE_UNTYPED |]
+        |> HashSet
+
+    let leftBracketsToAddIndent =
+        bracketsToAddIndent |> Seq.map fst |> HashSet
+
+    let bracketsAllowingDeindent =
+        [| FSharpTokenType.LBRACE
+           FSharpTokenType.LBRACK
+           FSharpTokenType.LBRACK_BAR |]
+        |> HashSet
+    
     let getCachingLexer textControl (lexer: outref<_>) =
         match cachingLexerService.GetCachingLexer(textControl) with
         | null -> false
         | cachingLexer ->
             lexer <- cachingLexer
             true
+
+    let getIndentSize (textControl: ITextControl) =
+        let document = textControl.Document
+        let sourceFile = document.GetPsiSourceFile(this.Solution).NotNull("psiSourceFile is null for {0}", document)
+        sourceFile.GetFormatterSettings(sourceFile.PrimaryPsiLanguage).INDENT_SIZE
 
     let getBaseIndentLine (document: IDocument) initialLine =
         let mutable line = initialLine
@@ -196,7 +217,7 @@ type FSharpTypingAssist
                 document.GetLineStartOffset(continuedLine)
 
             let hasLeadingLeftParen =
-                continueByLeadingLParen &&
+                continueByLeadingLParen = LeadingParenContinuesLine.Yes &&
                 (lexer.TokenStart > lineStartOffset && lexer.TokenType == FSharpTokenType.LPAREN ||
                  hasLeadingLeftBracket && isIgnored lexer.TokenType)
 
@@ -221,7 +242,7 @@ type FSharpTypingAssist
 
         let caretOffset = textControl.Caret.Offset()
         let caretLine = document.GetCoordsByOffset(caretOffset).Line
-        let line = getContinuedIndentLine textControl caretOffset false
+        let line = getContinuedIndentLine textControl caretOffset LeadingParenContinuesLine.No
         if line <> caretLine then insertIndentFromLine textControl caretOffset line else
         
         let startOffset = document.GetLineStartOffset(caretLine)
@@ -318,40 +339,80 @@ type FSharpTypingAssist
         let caretOffset = textControl.Caret.Offset()
         let line = document.GetCoordsByOffset(tokenStart).Line
 
-        let rightBracketCoords =
-            if not (FSharpTokenType.LeftBraces.[tokenType]) then None else
-            if not (FSharpBracketMatcher().FindMatchingBracket(lexer)) then None else
-            Some (document.GetCoordsByOffset(lexer.TokenStart))
+        if x.HandleEnterInsideSingleLineBrackets(textControl, lexer, line) then true else
 
         match tryGetNestedIndentBelowLine cachingLexerService textControl line with
-        | Some (nestedIndentLine, (Source indent | Comments indent)) when
-                rightBracketCoords.IsNone ||
-
-                nestedIndentLine <= rightBracketCoords.Value.Line &&
-                indent <= int rightBracketCoords.Value.Column ->
-
+        | Some (nestedIndentLine, (Source indent | Comments indent)) ->
             let caretLine = document.GetCoordsByOffset(caretOffset).Line
             if nestedIndentLine = caretLine then false else
 
             insertNewLineAt textControl caretOffset indent TrimTrailingSpaces.Yes
         | _ ->
 
-        match document.GetPsiSourceFile(x.Solution) with
-        | null -> false
-        | sourceFile ->
-
         let indentSize =
-            let defaultIndent = sourceFile.GetFormatterSettings(sourceFile.PrimaryPsiLanguage).INDENT_SIZE
+            let defaultIndent = getIndentSize textControl
             if not (allowingNoIndentTokens.Contains(tokenType) || tokenType == FSharpTokenType.EQUALS) then
                 let lineStart = document.GetLineStartOffset(line)
                 tokenEnd - lineStart + defaultIndent else
 
             let prevIndentSize =
-                let line = getContinuedIndentLine textControl tokenStart true
+                let line = getContinuedIndentLine textControl tokenStart LeadingParenContinuesLine.Yes
                 getLineWhitespaceIndent textControl line
             prevIndentSize + defaultIndent
 
         insertNewLineAt textControl caretOffset indentSize TrimTrailingSpaces.Yes
+
+    member x.HandleEnterInsideSingleLineBrackets(textControl: ITextControl, lexer: CachingLexer, line) =
+        let tokenType = lexer.TokenType
+        let leftBracketStartOffset = lexer.TokenStart
+        let leftBracketEndOffset = lexer.TokenEnd
+
+        if not (leftBracketsToAddIndent.Contains(tokenType)) then false else
+        if not (FSharpBracketMatcher().FindMatchingBracket(lexer)) then false else
+
+        let document = textControl.Document
+        let rightBracketStartOffset = lexer.TokenStart
+        if document.GetCoordsByOffset(rightBracketStartOffset).Line <> line then false else
+
+        lexer.Advance(-1)
+        while lexer.TokenType == FSharpTokenType.WHITESPACE do
+            lexer.Advance(-1)
+
+        let lastElementEndOffset = lexer.TokenEnd
+
+        let shouldDeindent =
+            lexer.FindTokenAt(leftBracketStartOffset - 1) |> ignore
+            while isIgnored lexer.TokenType do
+                lexer.Advance(-1)
+
+            bracketsAllowingDeindent.Contains(tokenType) && lexer.TokenType != FSharpTokenType.NEW_LINE
+
+        let baseIndentLength =
+            if not shouldDeindent then
+                let lineOffset = document.GetLineStartOffset(line)
+                leftBracketStartOffset - lineOffset
+            else
+                let line = getContinuedIndentLine textControl leftBracketStartOffset LeadingParenContinuesLine.Yes
+                getLineWhitespaceIndent textControl line
+
+        let baseIndentString = x.GetNewLineText(textControl) + String(' ', baseIndentLength)
+        let indentString = baseIndentString + String(' ',  getIndentSize textControl)
+
+        if lastElementEndOffset = leftBracketEndOffset then
+            let newText = indentString + baseIndentString
+            document.ReplaceText(TextRange(lastElementEndOffset, rightBracketStartOffset), newText)
+        else
+            let firstElementStartOffset =
+                lexer.FindTokenAt(leftBracketEndOffset) |> ignore
+                while isIgnored lexer.TokenType do
+                    lexer.Advance()
+                lexer.TokenStart
+
+            document.ReplaceText(TextRange(lastElementEndOffset, rightBracketStartOffset), baseIndentString)
+            document.ReplaceText(TextRange(leftBracketEndOffset, firstElementStartOffset), indentString)
+
+        textControl.Caret.MoveTo(leftBracketEndOffset + indentString.Length, CaretVisualPlacement.DontScrollIfVisible)
+        true
 
     member x.HandleSpaceInsideEmptyBrackets(textControl: ITextControl) =
         let mutable lexer = Unchecked.defaultof<_>
@@ -497,5 +558,10 @@ type FSharpBracketMatcher() =
 
 [<RequireQualifiedAccess; Struct>]
 type TrimTrailingSpaces =
+    | Yes
+    | No
+
+[<RequireQualifiedAccess; Struct>]
+type LeadingParenContinuesLine =
     | Yes
     | No
