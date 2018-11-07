@@ -546,7 +546,7 @@ let findUnmatchedBracketToLeft (lexer: CachingLexer) offset minOffset =
     foundToken
 
 let isIgnored (tokenType: TokenNodeType) =
-    tokenType == FSharpTokenType.WHITESPACE || tokenType.IsComment
+    isNotNull tokenType && (tokenType == FSharpTokenType.WHITESPACE || tokenType.IsComment)
 
 let isIgnoredOrNewLine tokenType =
     isIgnored tokenType || tokenType == FSharpTokenType.NEW_LINE

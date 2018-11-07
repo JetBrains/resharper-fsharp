@@ -19,6 +19,7 @@ type FSharpTypingAssistTest() =
 
     override x.RelativeTestDataPath = "features/service/typingAssist"
 
+    [<Test>] member x.``Enter 00 - File beginning``() = x.DoNamedTest()
     [<Test>] member x.``Enter 01 - No indent``() = x.DoNamedTest()
     [<Test>] member x.``Enter 02 - Dumb indent``() = x.DoNamedTest()
     [<Test>] member x.``Enter 03 - Dumb indent, trim spaces``() = x.DoNamedTest()
