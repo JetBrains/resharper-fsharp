@@ -1,0 +1,4 @@
+﻿// ${CHAR: }
+module Module
+
+let x = seq {{caret}}
