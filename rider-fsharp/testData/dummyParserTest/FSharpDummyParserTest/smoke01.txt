@@ -1,0 +1,12 @@
+FSharpFile
+  PsiElement(LINE)
+    PsiElement(LET)('let')
+    PsiElement(WHITESPACE)(' ')
+    PsiElement(IDENT)('x')
+    PsiElement(WHITESPACE)(' ')
+    PsiElement(EQUALS)('=')
+  PsiElement(NEW_LINE)('\n')
+  PsiElement(INDENTATION_BLOCK)
+    PsiElement(LINE)
+      PsiElement(WHITESPACE)('    ')
+      PsiElement(INT32)('42')

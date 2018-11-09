@@ -1,31 +1,46 @@
 package com.jetbrains.rider.ideaInterop.fileTypes.fsharp
 
-import com.intellij.lexer.DummyLexer
+import com.intellij.lang.ASTNode
+import com.intellij.lang.ParserDefinition
+import com.intellij.lang.PsiParser
 import com.intellij.lexer.Lexer
 import com.intellij.openapi.project.Project
-import com.intellij.psi.tree.IElementType
-import com.jetbrains.rider.ideaInterop.fileTypes.RiderFileElementType
-import com.jetbrains.rider.ideaInterop.fileTypes.RiderParserDefinitionBase
+import com.intellij.psi.FileViewProvider
+import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiFile
 import com.intellij.psi.tree.IFileElementType
+import com.intellij.psi.tree.TokenSet
+import com.intellij.psi.util.PsiUtilCore
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpLexer
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.FSharpElementTypes
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.FSharpFileImpl
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.psi.impl.FSharpScriptImpl
+import com.jetbrains.rider.util.idea.getLogger
 
-class FSharpParserDefinition : RiderParserDefinitionBase(FSharpFileElementType, FSharpFileType) {
-    companion object {
-        val FSharpElementType = IElementType("RIDER_FSHARP", FSharpLanguage)
-        val FSharpFileElementType = RiderFileElementType("RIDER_FSHARP_FILE", FSharpLanguage, FSharpElementType)
+open class FSharpParserDefinition : ParserDefinition {
+    override fun createLexer(project: Project?): Lexer = FSharpLexer()
+
+    override fun createParser(project: Project): PsiParser = FSharpDummyParser(project)
+
+    override fun getFileNodeType(): IFileElementType = FSharpElementTypes.FILE
+
+    override fun getCommentTokens(): TokenSet = FSharpTokenType.COMMENTS
+
+    override fun getStringLiteralElements(): TokenSet = FSharpTokenType.STRINGS
+
+    override fun createElement(p0: ASTNode?): PsiElement {
+        getLogger<FSharpParserDefinition>().error("createElement is not expected to be called!")
+        return PsiUtilCore.NULL_PSI_ELEMENT
     }
 
-    override fun createLexer(project: Project?): Lexer = FSharpLexer()
-    override fun getFileNodeType(): IFileElementType = FSharpFileElementType
+    override fun createFile(viewProvider: FileViewProvider): PsiFile {
+        return FSharpFileImpl(viewProvider)
+    }
 }
 
-class FSharpScriptParserDefinition : RiderParserDefinitionBase(FSharpScriptFileElementType, FSharpScriptFileType) {
-    companion object {
-        val FSharpScriptElementType = IElementType("RIDER_FSHARP_SCRIPT", FSharpScriptLanguage)
-        val FSharpScriptFileElementType = RiderFileElementType("RIDER_FSHARP_SCRIPT_FILE", FSharpScriptLanguage, FSharpScriptElementType)
+class FSharpScriptParserDefinition : FSharpParserDefinition() {
+    override fun createFile(viewProvider: FileViewProvider): PsiFile {
+        return FSharpScriptImpl(viewProvider)
     }
-
-    override fun createLexer(project: Project?): Lexer = FSharpLexer()
-    override fun getFileNodeType(): IFileElementType = FSharpParserDefinition.FSharpFileElementType
-
 }
