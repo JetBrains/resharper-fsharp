@@ -236,6 +236,7 @@ USE_BANG="use!"
 DO_BANG="do!"
 YIELD_BANG="yield!"
 RETURN_BANG="return!"
+MATCH_BANG="match!"
 BAR="|"
 RARROW="->"
 LARROW="<-"
@@ -462,6 +463,7 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <LINE, ADJACENT_TYAPP> {DO_BANG}             { return makeToken(DO_BANG); }
 <LINE, ADJACENT_TYAPP> {YIELD_BANG}          { return makeToken(YIELD_BANG); }
 <LINE, ADJACENT_TYAPP> {RETURN_BANG}         { return makeToken(RETURN_BANG); }
+<LINE, ADJACENT_TYAPP> {MATCH_BANG}          { return makeToken(MATCH_BANG); }
 <LINE, ADJACENT_TYAPP> {BAR}                 { return makeToken(BAR); }
 <LINE, ADJACENT_TYAPP> {LARROW}              { return makeToken(LARROW); }
 <LINE, ADJACENT_TYAPP> {LPAREN}              { return makeToken(LPAREN); }
@@ -498,6 +500,7 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <INIT_ADJACENT_TYAPP> {DO_BANG}             { yybegin(LINE); return makeToken(DO_BANG); }
 <INIT_ADJACENT_TYAPP> {YIELD_BANG}          { yybegin(LINE); return makeToken(YIELD_BANG); }
 <INIT_ADJACENT_TYAPP> {RETURN_BANG}         { yybegin(LINE); return makeToken(RETURN_BANG); }
+<INIT_ADJACENT_TYAPP> {MATCH_BANG}          { yybegin(LINE); return makeToken(MATCH_BANG); }
 <INIT_ADJACENT_TYAPP> {BAR}                 { yybegin(LINE); return makeToken(BAR); }
 <INIT_ADJACENT_TYAPP> {LARROW}              { yybegin(LINE); return makeToken(LARROW); }
 <INIT_ADJACENT_TYAPP> {LBRACK_BAR}          { yybegin(LINE); return makeToken(LBRACK_BAR); }

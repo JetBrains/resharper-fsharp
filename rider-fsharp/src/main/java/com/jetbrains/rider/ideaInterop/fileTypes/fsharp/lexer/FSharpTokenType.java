@@ -37,6 +37,7 @@ public interface FSharpTokenType {
     IElementType DO_BANG = createToken("DO_BANG");
     IElementType YIELD_BANG = createToken("YIELD_BANG");
     IElementType RETURN_BANG = createToken("RETURN_BANG");
+    IElementType MATCH_BANG = createToken("MATCH_BANG");
     IElementType BAR = createToken("BAR");
     IElementType RARROW = createToken("RARROW");
     IElementType LARROW = createToken("LARROW");

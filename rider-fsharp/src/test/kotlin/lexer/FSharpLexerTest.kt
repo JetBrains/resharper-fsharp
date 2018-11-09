@@ -124,7 +124,7 @@ class FSharpLexerTest : LexerTestCase() {
 
     @Test
     fun testSymbolicKeyword() {
-        doTest("let! use! do! yield! return! | -> <- . : ( ) [ ] [< >] " +
+        doTest("let! use! do! yield! return! match! | -> <- . : ( ) [ ] [< >] " +
                 "[| |] { } ' # :?> :? :> .. :: := ;; ; = _ ? ?? (*) <@ @> <@@ @@>",
                 """
                 |LET_BANG ('let!')
@@ -136,6 +136,8 @@ class FSharpLexerTest : LexerTestCase() {
                 |YIELD_BANG ('yield!')
                 |WHITESPACE (' ')
                 |RETURN_BANG ('return!')
+                |WHITESPACE (' ')
+                |MATCH_BANG ('match!')
                 |WHITESPACE (' ')
                 |BAR ('|')
                 |WHITESPACE (' ')
