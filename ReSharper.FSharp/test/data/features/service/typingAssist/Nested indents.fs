@@ -13,3 +13,7 @@
     let baz =
         123
     123
+
+   let bar =
+   // comment
+   123

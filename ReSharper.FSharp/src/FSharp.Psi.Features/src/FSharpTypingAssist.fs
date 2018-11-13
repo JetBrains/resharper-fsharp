@@ -521,7 +521,7 @@ let tryGetNestedIndentBelow cachingLexerService textControl line currentIndent =
         | Some (_, Source n), _ ->
             if n > currentIndent then indent else firstFoundCommentIndent
 
-        | Some (_, Comments _), None -> tryFindIndent indent line.Next
+        | Some (_, Comments n), None when n > currentIndent -> tryFindIndent indent line.Next
         | _ -> tryFindIndent firstFoundCommentIndent line.Next
 
     tryFindIndent None line.Next

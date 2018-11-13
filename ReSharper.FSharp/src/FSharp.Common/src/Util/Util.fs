@@ -2,6 +2,7 @@
 
 [<AutoOpen>]
 module rec CommonUtil =
+    open System.Diagnostics
     open System
     open System.Collections.Generic
     open System.Linq
@@ -89,7 +90,11 @@ module rec CommonUtil =
     type FileSystemPath = JetBrains.Util.FileSystemPath
 
     type Int32<'T> with
+
+        [<DebuggerStepThrough>]
         member x.Next = x.Plus1()
+
+        [<DebuggerStepThrough>]
         member x.Previous = x.Minus1()
 
     let inline docLine (x: int)   = Line.op_Explicit(x)

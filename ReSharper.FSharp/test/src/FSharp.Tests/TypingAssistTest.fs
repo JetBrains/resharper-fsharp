@@ -74,6 +74,8 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter 43 - Before first list element``() = x.DoNamedTest()
     [<Test>] member x.``Enter 44 - Before first list element and spaces``() = x.DoNamedTest()
     [<Test>] member x.``Enter 45 - Before first list element in multiline brackets``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Enter 48 - After =``() = x.DoNamedTest()
 
     [<Test>] member x.``Space 01 - Inside empty list``() = x.DoNamedTest()
     [<Test>] member x.``Space 02 - Inside empty array``() = x.DoNamedTest()
