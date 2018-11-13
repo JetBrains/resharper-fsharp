@@ -187,8 +187,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         YIELD,
 
         HASH,
-        RARROW,
-        OTHER_KEYWORD);
+        RARROW);
 
       Identifiers = new NodeTypeSet(
         IDENTIFIER,

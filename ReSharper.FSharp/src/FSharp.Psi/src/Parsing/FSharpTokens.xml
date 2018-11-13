@@ -199,7 +199,6 @@
         <Token name="BAD_CHARACTER" />
 
         <!-- Used in FsharpFakeLexer and as a separator in psi grammar -->
-        <Token name="OTHER_KEYWORD" />
         <Token name="FAKE" />
 
         <Token name="PP_LOAD" />
