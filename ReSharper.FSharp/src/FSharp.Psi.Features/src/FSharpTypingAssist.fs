@@ -271,12 +271,16 @@ type FSharpTypingAssist
     let handleSpace (context: ITypingContext) =
         this.HandleSpaceInsideEmptyBrackets(context.TextControl)
 
+    let handleQuote (context: ITypingContext) =
+        this.HandlerThirdQuote(context.TextControl)
+
     let isActionHandlerAvailable = Predicate<_>(this.IsActionHandlerAvailabile2)
     let isTypingHandlerAvailable = Predicate<_>(this.IsTypingHandlerAvailable2)
 
     do
         manager.AddActionHandler(lifetime, TextControlActions.ENTER_ACTION_ID, this, Func<_,_>(handleEnter), isActionHandlerAvailable)
         manager.AddTypingHandler(lifetime, ' ', this, Func<_,_>(handleSpace), isTypingHandlerAvailable)
+        manager.AddTypingHandler(lifetime, '"', this, Func<_,_>(handleQuote), isTypingHandlerAvailable)
 
     member x.HandleEnterAddBiggerIndentFromBelow(textControl) =
         let document = textControl.Document
@@ -417,6 +421,20 @@ type FSharpTypingAssist
             document.ReplaceText(TextRange(leftBracketEndOffset, firstElementStartOffset), indentString)
 
         textControl.Caret.MoveTo(leftBracketEndOffset + indentString.Length, CaretVisualPlacement.DontScrollIfVisible)
+        true
+
+    member x.HandlerThirdQuote(textControl: ITextControl) =
+        if textControl.Selection.HasSelection() then false else
+
+        let offset = textControl.Caret.Offset()
+        let mutable lexer = Unchecked.defaultof<_>
+
+        if not (getCachingLexer textControl &lexer && lexer.FindTokenAt(offset - 1)) then false else
+        if lexer.TokenType != FSharpTokenType.STRING || lexer.GetTokenLength() <> 2 then false else
+        if lexer.TokenEnd <> offset then false else
+
+        textControl.Document.InsertText(offset, "\"\"\"\"")
+        textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible)
         true
 
     member x.HandleSpaceInsideEmptyBrackets(textControl: ITextControl) =

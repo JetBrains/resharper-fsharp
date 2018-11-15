@@ -86,6 +86,8 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Space 07 - Inside empty array, no assist``() = x.DoNamedTest()
     [<Test>] member x.``Space 08 - Inside empty braces``() = x.DoNamedTest()
 
+    [<Test>] member x.``Quote 01 - Adding third quote``() = x.DoNamedTest()
+
 [<FSharpTest>]
 type LineIndentsTest() =
     inherit LineIndentsTestBase()
