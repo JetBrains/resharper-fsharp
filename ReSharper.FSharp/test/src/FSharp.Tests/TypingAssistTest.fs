@@ -101,6 +101,29 @@ type FSharpTypingAssistTest() =
 
     [<Test>] member x.``Quote 01 - Adding third quote``() = x.DoNamedTest()
 
+    [<Test>] member x.``Brackets - Attributes 01 - Type left angle``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Attributes 02 - Type left angle before spaces``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Attributes 03 - Type right angle``() = x.DoNamedTest()
+      
+    [<Test>] member x.``Brackets - Arrays 01 - Type left bar``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Arrays 02 - Type left bar before space``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Arrays 03 - Type left bar in multiline list``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Arrays 04 - Type right bar``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Arrays 05 - Type right bar in multiline list``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Arrays 06 - Type right bar in multiline list``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Arrays 07 - Type bar in multiline list wrong formatting``() = x.DoNamedTest()
+
+    [<Test>] member x.``At 01 - Make quotation after left angle``() = x.DoNamedTest()
+    [<Test>] member x.``At 02 - Inside empty typed quotations``() = x.DoNamedTest()
+    [<Test>] member x.``At 03 - Inside empty typed quotations and spaces 01``() = x.DoNamedTest()
+    [<Test>] member x.``At 04 - Inside empty typed quotations and spaces 02``() = x.DoNamedTest()
+    [<Test>] member x.``At 05 - Inside empty typed quotations and spaces 03``() = x.DoNamedTest()
+    [<Test>] member x.``At 06 - Inside empty typed quotations and spaces 04``() = x.DoNamedTest()
+    [<Test>] member x.``At 07 - Inside empty typed quotations and spaces 05``() = x.DoNamedTest()
+    [<Test>] member x.``At 08 - Inside empty typed quotations and spaces 06``() = x.DoNamedTest()
+    [<Test>] member x.``At 09 - Inside empty typed quotations and spaces 07``() = x.DoNamedTest()
+    [<Test>] member x.``At 10 - Inside empty typed quotations and spaces 08``() = x.DoNamedTest()
+
 [<FSharpTest>]
 type LineIndentsTest() =
     inherit LineIndentsTestBase()
