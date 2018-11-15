@@ -77,6 +77,19 @@ type FSharpTypingAssistTest() =
     
     [<Test>] member x.``Enter 48 - After =``() = x.DoNamedTest()
 
+    [<Test>] member x.``Enter in string 01 - Inside empty triple-quoted string``() = x.DoNamedTest()
+    [<Test>] member x.``Enter in string 02 - Inside triple-quoted string``() = x.DoNamedTest()
+    [<Test>] member x.``Enter in string 03 - Inside triple-quoted string``() = x.DoNamedTest()
+    [<Test>] member x.``Enter in string 04 - Inside multiline triple-quoted string``() = x.DoNamedTest()
+
+    [<Test>] member x.``Backspace 01 - Inside empty triple-quoted string``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace 02 - Inside multiline triple-quoted string``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace 03 - Inside multiline triple-quoted string 2``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace 04 - Inside triple-quoted string``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace 05 - Inside triple-quoted string 2``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace 06 - Inside multiline triple-quoted string``() = x.DoNamedTest()
+    [<Test>] member x.``Backspace 07 - Inside multiline triple-quoted string``() = x.DoNamedTest()
+    
     [<Test>] member x.``Space 01 - Inside empty list``() = x.DoNamedTest()
     [<Test>] member x.``Space 02 - Inside empty array``() = x.DoNamedTest()
     [<Test>] member x.``Space 03 - Inside empty quotation, typed``() = x.DoNamedTest()

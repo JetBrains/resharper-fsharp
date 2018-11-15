@@ -262,6 +262,7 @@ type FSharpTypingAssist
     let handleEnter (context: IActionContext) =
         let textControl = context.TextControl
 
+        if this.HandlerEnterInTripleQuotedString(textControl) then true else
         if this.HandleEnterAddIndentAfterLeftBracket(textControl) then true else
         if this.HandleEnterFindLeftBracket(textControl) then true else
         if this.HandleEnterAddBiggerIndentFromBelow(textControl) then true else
@@ -279,6 +280,7 @@ type FSharpTypingAssist
 
     do
         manager.AddActionHandler(lifetime, TextControlActions.ENTER_ACTION_ID, this, Func<_,_>(handleEnter), isActionHandlerAvailable)
+        manager.AddActionHandler(lifetime, TextControlActions.BACKSPACE_ACTION_ID, this, Func<_,_>(this.HandleBackspacePressed), isActionHandlerAvailable)
         manager.AddTypingHandler(lifetime, ' ', this, Func<_,_>(handleSpace), isTypingHandlerAvailable)
         manager.AddTypingHandler(lifetime, '"', this, Func<_,_>(handleQuote), isTypingHandlerAvailable)
 
@@ -423,6 +425,70 @@ type FSharpTypingAssist
         textControl.Caret.MoveTo(leftBracketEndOffset + indentString.Length, CaretVisualPlacement.DontScrollIfVisible)
         true
 
+    member x.HandlerEnterInTripleQuotedString(textControl: ITextControl) =
+        let offset = textControl.Caret.Offset()
+        let mutable lexer = Unchecked.defaultof<_>
+
+        if not (getCachingLexer textControl &lexer && lexer.FindTokenAt(offset)) then false else
+
+         // """{caret} foo"""
+        if lexer.TokenType != FSharpTokenType.TRIPLE_QUOTED_STRING then false else
+        if offset < lexer.TokenStart + 3 || offset > lexer.TokenEnd - 3 then false else
+
+        let document = textControl.Document
+        let strStartLine = document.GetCoordsByOffset(lexer.TokenStart).Line
+        let strEndLine = document.GetCoordsByOffset(lexer.TokenEnd).Line
+        if strStartLine <> strEndLine then false else
+
+        let newLineString = this.GetNewLineText(textControl)
+        document.InsertText(lexer.TokenEnd - 3, newLineString)
+        document.InsertText(offset, newLineString)
+        textControl.Caret.MoveTo(offset + newLineString.Length, CaretVisualPlacement.DontScrollIfVisible)
+        true
+
+    member x.HandleBackspacePressed(context: IActionContext) =
+        let textControl = context.TextControl
+        if textControl.Selection.OneDocRangeWithCaret().Length > 0 then false else
+
+        this.HandlerBackspaceInTripleQuotedString(textControl)
+
+    member x.HandlerBackspaceInTripleQuotedString(textControl: ITextControl) =
+        let offset = textControl.Caret.Offset()
+        let mutable lexer = Unchecked.defaultof<_>
+
+        if not (getCachingLexer textControl &lexer && lexer.FindTokenAt(offset)) then false else
+        if lexer.TokenType != FSharpTokenType.TRIPLE_QUOTED_STRING || lexer.TokenStart = offset then false else
+
+        let strStart = "\"\"\""
+        let newLineLength = this.GetNewLineText(textControl).Length
+
+        // """{caret}"""
+        if lexer.TokenStart = offset - strStart.Length && lexer.TokenEnd = offset + strStart.Length then 
+            textControl.Document.DeleteText(TextRange(offset - 1, offset + 3))
+            textControl.Caret.MoveTo(offset - 1, CaretVisualPlacement.DontScrollIfVisible)
+            true
+
+        // """\n{caret} text here \n"""
+        elif lexer.TokenStart + strStart.Length + newLineLength = offset then
+            let document = textControl.Document
+            let strStartCoords = document.GetCoordsByOffset(lexer.TokenStart)
+            let strEndCoords = document.GetCoordsByOffset(lexer.TokenEnd)
+
+            let caretLine = document.GetCoordsByOffset(offset).Line
+
+            if caretLine <> strStartCoords.Line.Next then false else 
+            if offset <> document.GetLineStartOffset(caretLine) then false else
+            if strStartCoords.Line + (docLine 2) <> strEndCoords.Line then false else
+            if strEndCoords.Column <> (docColumn 3) then false else
+
+            let lastNewLineOffset = lexer.TokenEnd - strStart.Length - newLineLength
+            textControl.Document.DeleteText(TextRange(lastNewLineOffset, lastNewLineOffset + newLineLength))
+            textControl.Document.DeleteText(TextRange(offset - newLineLength, offset))
+            textControl.Caret.MoveTo(offset - newLineLength, CaretVisualPlacement.DontScrollIfVisible)
+            true
+
+        else false
+    
     member x.HandlerThirdQuote(textControl: ITextControl) =
         if textControl.Selection.HasSelection() then false else
 
