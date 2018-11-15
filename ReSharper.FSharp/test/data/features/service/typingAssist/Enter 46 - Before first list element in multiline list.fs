@@ -2,5 +2,5 @@
 module Module
 
 let x =
-   [{caret} foo
-      bar ]
+  [{caret}foo
+   bar ]

@@ -79,19 +79,6 @@ type FSharpTypingAssist
            "<@@@@>", "<@@" |]
         |> dict
     
-    let bracketsToAddIndent =
-        [| FSharpTokenType.LPAREN, FSharpTokenType.RPAREN
-           FSharpTokenType.LBRACE, FSharpTokenType.RBRACE
-           FSharpTokenType.LBRACK, FSharpTokenType.RBRACK
-           FSharpTokenType.LBRACK_BAR, FSharpTokenType.BAR_RBRACK
-           FSharpTokenType.LBRACK_LESS, FSharpTokenType.GREATER_RBRACK
-           FSharpTokenType.LQUOTE_TYPED, FSharpTokenType.RQUOTE_TYPED
-           FSharpTokenType.LQUOTE_UNTYPED, FSharpTokenType.RQUOTE_UNTYPED |]
-        |> HashSet
-
-    let leftBracketsToAddIndent =
-        bracketsToAddIndent |> Seq.map fst |> HashSet
-
     let bracketsAllowingDeindent =
         [| FSharpTokenType.LBRACE
            FSharpTokenType.LBRACK
@@ -286,10 +273,12 @@ type FSharpTypingAssist
             let rBracketLine = int (document.GetCoordsByOffset(rBracketOffset).Line)
 
             let shouldAddIndent =
-                lBracketLine <> rBracketLine && not (isLastTokenOnLine lexer (lBracketOffset - 1))
+                lexer.FindTokenAt(lBracketOffset - 1) &&
+                lBracketLine <> rBracketLine && not (isLastTokenOnLine lexer)
 
             let lastLine =
-                if isFirstTokenOnLine lexer rBracketOffset then rBracketLine - 1 else rBracketLine 
+                if not (lexer.FindTokenAt(rBracketOffset)) then rBracketLine else
+                if isFirstTokenOnLine lexer then rBracketLine - 1 else rBracketLine 
 
             if shouldAddIndent then
                 for line in lBracketLine + 1 .. lastLine do
@@ -400,6 +389,9 @@ type FSharpTypingAssist
 
         if x.HandleEnterInsideSingleLineBrackets(textControl, lexer, line) then true else
 
+        if leftBracketsToAddIndent.Contains(tokenType) && not (isSingleLineBrackets lexer document) &&
+                not (isLastTokenOnLine lexer) && isFirstTokenOnLine lexer then false else
+
         match tryGetNestedIndentBelowLine cachingLexerService textControl line with
         | Some (nestedIndentLine, (Source indent | Comments indent)) ->
             let caretLine = document.GetCoordsByOffset(caretOffset).Line
@@ -422,16 +414,18 @@ type FSharpTypingAssist
         insertNewLineAt textControl caretOffset indentSize TrimTrailingSpaces.Yes
 
     member x.HandleEnterInsideSingleLineBrackets(textControl: ITextControl, lexer: CachingLexer, line) =
+        use cookie = LexerStateCookie.Create(lexer)
+
+        let document = textControl.Document
         let tokenType = lexer.TokenType
         let leftBracketStartOffset = lexer.TokenStart
         let leftBracketEndOffset = lexer.TokenEnd
+        let leftBracketLine = document.GetCoordsByOffset(leftBracketStartOffset).Line
 
-        if not (leftBracketsToAddIndent.Contains(tokenType)) then false else
-        if not (FSharpBracketMatcher().FindMatchingBracket(lexer)) then false else
+        if not (findRightBracket lexer) then false else
+        if document.GetCoordsByOffset(lexer.TokenStart).Line <> leftBracketLine then false else
 
-        let document = textControl.Document
         let rightBracketStartOffset = lexer.TokenStart
-        if document.GetCoordsByOffset(rightBracketStartOffset).Line <> line then false else
 
         lexer.Advance(-1)
         while lexer.TokenType == FSharpTokenType.WHITESPACE do
@@ -780,21 +774,46 @@ let isIgnoredOrNewLine tokenType =
     isIgnored tokenType || tokenType == FSharpTokenType.NEW_LINE
 
 
-let isLastTokenOnLine (lexer: CachingLexer) offset =
-    if not (lexer.FindTokenAt(offset)) then false else
-
+let isLastTokenOnLine (lexer: CachingLexer) =
+    use cookie = LexerStateCookie.Create(lexer)
     lexer.Advance()
     while isIgnored lexer.TokenType do
         lexer.Advance()
     lexer.TokenType == FSharpTokenType.NEW_LINE
 
-let isFirstTokenOnLine (lexer: CachingLexer) offset =
-    if not (lexer.FindTokenAt(offset)) then false else
+let isFirstTokenOnLine (lexer: CachingLexer) =
+    use cookie = LexerStateCookie.Create(lexer)
 
     lexer.Advance(-1)
     while isIgnored lexer.TokenType do
         lexer.Advance(-1)
     isNull lexer.TokenType || lexer.TokenType == FSharpTokenType.NEW_LINE
+
+
+let bracketsToAddIndent =
+    [| FSharpTokenType.LPAREN, FSharpTokenType.RPAREN
+       FSharpTokenType.LBRACE, FSharpTokenType.RBRACE
+       FSharpTokenType.LBRACK, FSharpTokenType.RBRACK
+       FSharpTokenType.LBRACK_BAR, FSharpTokenType.BAR_RBRACK
+       FSharpTokenType.LBRACK_LESS, FSharpTokenType.GREATER_RBRACK
+       FSharpTokenType.LQUOTE_TYPED, FSharpTokenType.RQUOTE_TYPED
+       FSharpTokenType.LQUOTE_UNTYPED, FSharpTokenType.RQUOTE_UNTYPED |]
+    |> HashSet
+
+let leftBracketsToAddIndent: HashSet<TokenNodeType> =
+    bracketsToAddIndent |> Seq.map fst |> HashSet
+
+let findRightBracket (lexer: CachingLexer) =
+    leftBracketsToAddIndent.Contains(lexer.TokenType) &&
+    FSharpBracketMatcher().FindMatchingBracket(lexer)
+
+let isSingleLineBrackets (lexer: CachingLexer) (document: IDocument) =
+    use cookie = LexerStateCookie.Create(lexer)
+
+    let startLine = document.GetCoordsByOffset(lexer.TokenStart).Line
+    if not (findRightBracket lexer) then false else
+
+    document.GetCoordsByOffset(lexer.TokenStart).Line = startLine
 
 
 let typedQuotationBrackes = FSharpTokenType.LQUOTE_TYPED, FSharpTokenType.RQUOTE_TYPED

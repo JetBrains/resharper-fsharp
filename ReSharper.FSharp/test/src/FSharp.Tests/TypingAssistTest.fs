@@ -73,7 +73,9 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter 42 - Before first list element and new line``() = x.DoNamedTest()
     [<Test>] member x.``Enter 43 - Before first list element``() = x.DoNamedTest()
     [<Test>] member x.``Enter 44 - Before first list element and spaces``() = x.DoNamedTest()
-    [<Test>] member x.``Enter 45 - Before first list element in multiline brackets``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 45 - Before first list element in multiline list``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 46 - Before first list element in multiline list``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 47 - Before first list element in multiline list``() = x.DoNamedTest()
     
     [<Test>] member x.``Enter 48 - After =``() = x.DoNamedTest()
     [<Test>] member x.``Enter 49 - After yield!``() = x.DoNamedTest()
