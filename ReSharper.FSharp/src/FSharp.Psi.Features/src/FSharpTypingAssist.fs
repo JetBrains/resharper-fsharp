@@ -39,7 +39,10 @@ type FSharpTypingAssist
            FSharpTokenType.CLASS
            FSharpTokenType.INTERFACE
            FSharpTokenType.TRY
-           FSharpTokenType.WHEN |]
+           FSharpTokenType.WHEN
+           FSharpTokenType.DO_BANG
+           FSharpTokenType.YIELD
+           FSharpTokenType.YIELD_BANG |]
         |> HashSet
 
     let allowingNoIndentTokens =
@@ -306,7 +309,7 @@ type FSharpTypingAssist
         let textControl = context.TextControl
 
         if this.HandlerEnterInTripleQuotedString(textControl) then true else
-        if this.HandleEnterAddIndentAfterLeftBracket(textControl) then true else
+        if this.HandleEnterAddIndent(textControl) then true else
         if this.HandleEnterFindLeftBracket(textControl) then true else
         if this.HandleEnterAddBiggerIndentFromBelow(textControl) then true else
 
@@ -367,7 +370,7 @@ type FSharpTypingAssist
         let indent = lexer.TokenStart - lineStartOffset
         insertNewLineAt textControl caretOffset indent TrimTrailingSpaces.Yes
 
-    member x.HandleEnterAddIndentAfterLeftBracket(textControl) =
+    member x.HandleEnterAddIndent(textControl) =
         let mutable lexer = Unchecked.defaultof<_>
         let mutable encounteredNewLine = false
 
@@ -389,7 +392,6 @@ type FSharpTypingAssist
         if not isAvailable then false else
 
         let tokenStart = lexer.TokenStart
-        let tokenEnd = lexer.TokenEnd
         let tokenType = lexer.TokenType
 
         let document = textControl.Document
@@ -410,7 +412,7 @@ type FSharpTypingAssist
             let defaultIndent = getIndentSize textControl
             if not (allowingNoIndentTokens.Contains(tokenType) || tokenType == FSharpTokenType.EQUALS) then
                 let lineStart = document.GetLineStartOffset(line)
-                tokenEnd - lineStart + defaultIndent else
+                tokenStart - lineStart + defaultIndent else
 
             let prevIndentSize =
                 let line = getContinuedIndentLine textControl tokenStart LeadingParenContinuesLine.Yes

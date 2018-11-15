@@ -76,6 +76,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter 45 - Before first list element in multiline brackets``() = x.DoNamedTest()
     
     [<Test>] member x.``Enter 48 - After =``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 49 - After yield!``() = x.DoNamedTest()
 
     [<Test>] member x.``Enter in string 01 - Inside empty triple-quoted string``() = x.DoNamedTest()
     [<Test>] member x.``Enter in string 02 - Inside triple-quoted string``() = x.DoNamedTest()
