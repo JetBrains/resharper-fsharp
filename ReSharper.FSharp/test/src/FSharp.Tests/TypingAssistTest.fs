@@ -99,7 +99,23 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Space 07 - Inside empty array, no assist``() = x.DoNamedTest()
     [<Test>] member x.``Space 08 - Inside empty braces``() = x.DoNamedTest()
 
-    [<Test>] member x.``Quote 01 - Adding third quote``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Adding third quote``() = x.DoNamedTest()
+
+    [<Test>] member x.``Quotes - Pair quotes 01 - Before code``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Pair quotes 02 - Insert pair``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Pair quotes 03 - Insert pair inside string``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Pair quotes 04 - Wrong quote type``() = x.DoNamedTest()
+
+    [<Test>] member x.``Quotes - Skip end 01 - Char``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Skip end 02 - String``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Skip end 03 - Verbatim``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Skip end 05 - Triple-quote``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Skip end 06 - Triple-quote``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Skip end 07 - Triple-quote``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Skip end 08 - ByteArray``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Skip end 09 - No skip``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Skip end 10 - No skip``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Skip end 11 - No skip``() = x.DoNamedTest()
 
     [<Test>] member x.``Brackets - Attributes 01 - Type left angle``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Attributes 02 - Type left angle before spaces``() = x.DoNamedTest()

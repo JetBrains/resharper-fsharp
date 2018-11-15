@@ -315,9 +315,6 @@ type FSharpTypingAssist
     let handleSpace (context: ITypingContext) =
         this.HandleSpaceInsideEmptyBrackets(context.TextControl)
 
-    let handleQuote (context: ITypingContext) =
-        this.HandlerThirdQuote(context.TextControl)
-
     let isActionHandlerAvailable = Predicate<_>(this.IsActionHandlerAvailabile2)
     let isTypingHandlerAvailable = Predicate<_>(this.IsTypingHandlerAvailable2)
 
@@ -325,7 +322,9 @@ type FSharpTypingAssist
         manager.AddActionHandler(lifetime, TextControlActions.ENTER_ACTION_ID, this, Func<_,_>(handleEnter), isActionHandlerAvailable)
         manager.AddActionHandler(lifetime, TextControlActions.BACKSPACE_ACTION_ID, this, Func<_,_>(this.HandleBackspacePressed), isActionHandlerAvailable)
         manager.AddTypingHandler(lifetime, ' ', this, Func<_,_>(handleSpace), isTypingHandlerAvailable)
-        manager.AddTypingHandler(lifetime, '"', this, Func<_,_>(handleQuote), isTypingHandlerAvailable)
+
+        manager.AddTypingHandler(lifetime, '\'', this, Func<_,_>(this.HandleQuoteTyped), isTypingHandlerAvailable)
+        manager.AddTypingHandler(lifetime, '"', this, Func<_,_>(this.HandleQuoteTyped), isTypingHandlerAvailable)
 
         manager.AddTypingHandler(lifetime, '<', this, Func<_,_>(this.HandleLeftAngleBracket), isTypingHandlerAvailable)
         manager.AddTypingHandler(lifetime, '@', this, Func<_,_>(this.HandleAtTyped), isTypingHandlerAvailable)
@@ -535,9 +534,62 @@ type FSharpTypingAssist
             true
 
         else false
-    
-    member x.HandlerThirdQuote(textControl: ITextControl) =
-        if textControl.Selection.HasSelection() then false else
+
+    member x.HandleQuoteTyped(context: ITypingContext) =
+        let textControl = context.TextControl
+        let typedChar = context.Char
+
+        if context.EnsureWritable() <> EnsureWritableResult.SUCCESS then false else
+        if textControl.Selection.OneDocRangeWithCaret().Length > 0 then false else
+
+        if x.HandleThirdQuote(textControl, typedChar) then true else
+        if x.SkipQuote(textControl, typedChar) then true else
+
+        x.InsertPairQuote(textControl, typedChar)
+
+    member x.SkipQuote(textControl: ITextControl, typedChar: char) =
+        let buffer = textControl.Document.Buffer
+        let offset = textControl.Caret.Offset()
+        if offset >= buffer.Length || typedChar <> buffer.[offset] then false else
+
+        let skipEndQuote (lexer: CachingLexer) =
+            typedChar = getStringEndingQuote lexer.TokenType &&
+            offset >= lexer.TokenEnd - getStringEndingQuotesOffset lexer.TokenType
+
+        let skipEscapedQuoteInVerbatim (lexer: CachingLexer) =
+            lexer.TokenType == FSharpTokenType.VERBATIM_STRING && typedChar = '\"'
+
+        let mutable lexer = Unchecked.defaultof<_>
+        if not (getCachingLexer textControl &lexer && lexer.FindTokenAt(offset - 1)) then false else
+        if not lexer.TokenType.IsStringLiteral || offset = lexer.TokenEnd then false else
+        if not (skipEndQuote lexer || skipEscapedQuoteInVerbatim lexer) then false else
+
+        textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible)
+        true
+
+    member x.InsertPairQuote(textControl: ITextControl, typedChar: char) =
+        let mutable lexer = Unchecked.defaultof<_>
+        let offset = textControl.Caret.Offset()
+
+        if not (getCachingLexer textControl &lexer && lexer.FindTokenAt(offset - 1)) then false else
+
+        let tokenType = lexer.TokenType
+        if tokenType == FSharpTokenType.TRIPLE_QUOTED_STRING then false else
+        if tokenType.IsStringLiteral && typedChar <> getStringEndingQuote tokenType then false else
+
+        while lexer.TokenType == FSharpTokenType.WHITESPACE do
+            lexer.Advance()
+
+        // Do not prevent quoting code
+        if not (isStringLiteralStopper lexer.TokenType) then false else
+
+        textControl.Document.InsertText(offset, getCorresponingQuotesPair typedChar)
+        textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible)
+
+        true 
+
+    member x.HandleThirdQuote(textControl: ITextControl, typedChar: char) =
+        if typedChar <> '\"' then false else
 
         let offset = textControl.Caret.Offset()
         let mutable lexer = Unchecked.defaultof<_>
@@ -765,6 +817,26 @@ let isInsideEmptyQuoation (lexer: CachingLexer) offset =
     let mutable leftBracketText = Unchecked.defaultof<_>
     emptyQuotationsStrings.TryGetValue(tokenText, &leftBracketText) &&
     tokenText.Substring(0, leftBracketText.Length) = leftBracketText
+
+let stringLiteralStopperss =
+    [| FSharpTokenType.WHITESPACE
+       FSharpTokenType.NEW_LINE
+       FSharpTokenType.LINE_COMMENT
+       FSharpTokenType.BLOCK_COMMENT
+       FSharpTokenType.SEMICOLON
+       FSharpTokenType.COMMA
+       FSharpTokenType.RPAREN
+       FSharpTokenType.RBRACK
+       FSharpTokenType.RBRACE
+       FSharpTokenType.RQUOTE_TYPED
+       FSharpTokenType.RQUOTE_UNTYPED
+       FSharpTokenType.BAR_RBRACK
+       FSharpTokenType.GREATER_RBRACK |]
+    |> HashSet
+
+let isStringLiteralStopper tokenType =
+    stringLiteralStopperss.Contains(tokenType) ||
+    isNotNull tokenType && tokenType.IsStringLiteral
 
 let matchingBrackets =
     [| Pair.Of(FSharpTokenType.LPAREN, FSharpTokenType.RPAREN)
