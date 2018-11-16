@@ -567,7 +567,7 @@ type FSharpTypingAssist
         let mutable lexer = Unchecked.defaultof<_>
         let offset = textControl.Caret.Offset()
 
-        if not (getCachingLexer textControl &lexer && lexer.FindTokenAt(offset - 1)) then false else
+        if not (getCachingLexer textControl &lexer && lexer.FindTokenAt(offset)) then false else
 
         let tokenType = lexer.TokenType
         if tokenType == FSharpTokenType.TRIPLE_QUOTED_STRING then false else
