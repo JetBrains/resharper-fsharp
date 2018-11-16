@@ -190,12 +190,11 @@ type FSharpTypingAssist
         if caretOffset = document.GetLineStartOffset(line) then line else
 
         let mutable lexer = Unchecked.defaultof<_>
-        if not (getCachingLexer textControl &lexer && lexer.FindTokenAt(caretOffset)) then line else
+        if not (getCachingLexer textControl &lexer && lexer.FindTokenAt(caretOffset - 1)) then line else
 
         let matcher = FSharpBracketMatcher()
 
         let rec tryFindContinuedLine line lineStartOffset hasLeadingLeftBracket =
-            lexer.Advance(-1)
             if isNull lexer.TokenType then line else  
 
             if lexer.TokenStart <= lineStartOffset && not hasLeadingLeftBracket then line else
@@ -216,6 +215,7 @@ type FSharpTypingAssist
                 (lexer.TokenStart > lineStartOffset && lexer.TokenType == FSharpTokenType.LPAREN ||
                  hasLeadingLeftBracket && isIgnored lexer.TokenType)
 
+            lexer.Advance(-1)
             tryFindContinuedLine continuedLine lineStartOffset hasLeadingLeftParen
 
         let lineStartOffset = document.GetLineStartOffset(line)
@@ -226,7 +226,7 @@ type FSharpTypingAssist
         let insertPos = trimTrailingSpaces textControl trimAfterCaret
         let text = this.GetNewLineText(textControl) + String(' ', indent)
         insertText textControl insertPos text "Indent on Enter"
-    
+
     let insertIndentFromLine textControl insertPos line =
         let indentSize = getLineWhitespaceIndent textControl line
         insertNewLineAt textControl insertPos indentSize
