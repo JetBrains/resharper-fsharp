@@ -21,10 +21,10 @@ type internal FSharpParser(file: IPsiSourceFile, checkerService: FSharpCheckerSe
 
     interface IParser with
         member this.ParseFile() =
-            let lifetime = Lifetimes.Define().Lifetime
+            use lifetimeDefintion = Lifetimes.Define()
+            let lifetime = lifetimeDefintion.Lifetime
             let factory = FSharpPreprocessedLexerFactory(checkerService.GetDefines(file)) :> ILexerFactory
-            let tokenBuffer = TokenBuffer(factory.CreateLexer(file.Document.Buffer))
-            let lexer = tokenBuffer.CreateLexer()
+            let lexer = TokenBuffer(factory.CreateLexer(file.Document.Buffer)).CreateLexer()
             let parseResults = checkerService.ParseFile(file)
             let treeBuilder =
                 tryCreateTreeBuilder lexer lifetime parseResults

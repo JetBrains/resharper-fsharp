@@ -89,7 +89,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 
     public static readonly NodeTypeSet RightBraces;
     public static readonly NodeTypeSet LeftBraces;
-    public static readonly NodeTypeSet CommentsOrWhitespaces;
     public static readonly NodeTypeSet AccessModifiersKeywords;
     public static readonly NodeTypeSet Keywords;
     public static readonly NodeTypeSet Identifiers;
@@ -98,7 +97,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 
     static FSharpTokenType()
     {
-      CommentsOrWhitespaces = new NodeTypeSet(BLOCK_COMMENT, WHITESPACE, NEW_LINE);
       AccessModifiersKeywords = new NodeTypeSet(PUBLIC, PRIVATE, INTERNAL);
 
       LeftBraces = new NodeTypeSet(
