@@ -122,13 +122,13 @@ type RiderFSharpFileTemplatesOptionPage
 type FSharpDefaultFileTemplates() =
     let xmlPath = "JetBrains.ReSharper.Plugins.FSharp.Templates.FileTemplates.xml"
 
-    member val FSharp = TemplateImage("FSharp", ProjectModelThemedIcons.Fsharp.Id)
+    static do
+        TemplateImage.Register("FSharp", ProjectModelThemedIcons.Fsharp.Id) |> ignore
 
     interface IHaveDefaultSettingsStream with
         member x.Name = "Default F# file templates"
 
         member x.GetDefaultSettingsStream(lifetime) =
-            let stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(xmlPath)
-            Assertion.AssertNotNull(stream, "stream <> null")
+            let stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(xmlPath).NotNull("stream == null")
             lifetime.OnTermination(stream) |> ignore
             stream
