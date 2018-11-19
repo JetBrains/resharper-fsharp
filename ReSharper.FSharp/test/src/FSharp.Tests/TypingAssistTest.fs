@@ -76,9 +76,13 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter 45 - Before first list element in multiline list``() = x.DoNamedTest()
     [<Test>] member x.``Enter 46 - Before first list element in multiline list``() = x.DoNamedTest()
     [<Test>] member x.``Enter 47 - Before first list element in multiline list``() = x.DoNamedTest()
-    
+
     [<Test>] member x.``Enter 48 - After =``() = x.DoNamedTest()
     [<Test>] member x.``Enter 49 - After yield!``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 50 - After line with attribute``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 51 - Parens``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 52 - Nested indents and parens``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 53 - After when``() = x.DoNamedTest()
 
     [<Test>] member x.``Enter in string 01 - Inside empty triple-quoted string``() = x.DoNamedTest()
     [<Test>] member x.``Enter in string 02 - Inside triple-quoted string``() = x.DoNamedTest()
@@ -176,7 +180,7 @@ type NestedIndentsTest() =
 
     override x.DoLineTest(writer, textControl, line) =
         writer.WriteLine(tryGetNestedIndentBelowLine x.CachingLexerService textControl line)
-        
+
 [<AbstractClass>]
 type LineIndentsTestBase() =
     inherit BaseTestWithTextControl()

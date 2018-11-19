@@ -37,6 +37,8 @@ type FSharpTypingAssist
            FSharpTokenType.LQUOTE_TYPED
            FSharpTokenType.LQUOTE_UNTYPED
            FSharpTokenType.BEGIN
+           FSharpTokenType.IF
+           FSharpTokenType.ELIF
            FSharpTokenType.THEN
            FSharpTokenType.STRUCT
            FSharpTokenType.CLASS
@@ -52,7 +54,10 @@ type FSharpTypingAssist
         [| FSharpTokenType.RARROW
            FSharpTokenType.THEN
            FSharpTokenType.ELSE
-           FSharpTokenType.DO |]
+           FSharpTokenType.DO
+           FSharpTokenType.WHEN
+           FSharpTokenType.IF
+           FSharpTokenType.ELIF |]
         |> HashSet
 
     let deindentingTokens =
@@ -935,7 +940,7 @@ let findUnmatchedBracketToLeft (lexer: CachingLexer) offset minOffset =
 
         if FSharpTokenType.LeftBraces.[lexer.TokenType] then
             foundToken <- true
-        else
+        elif not (FSharpTokenType.RightBraces.[lexer.TokenType]) then
             lexer.Advance(-1)
 
     foundToken
@@ -952,7 +957,7 @@ let isLastTokenOnLine (lexer: CachingLexer) =
     lexer.Advance()
     while isIgnored lexer.TokenType do
         lexer.Advance()
-    lexer.TokenType == FSharpTokenType.NEW_LINE
+    isNull lexer.TokenType || lexer.TokenType == FSharpTokenType.NEW_LINE
 
 let isFirstTokenOnLine (lexer: CachingLexer) =
     use cookie = LexerStateCookie.Create(lexer)
@@ -1040,20 +1045,15 @@ let isStringLiteralStopper tokenType =
 let matchingBrackets =
     [| Pair.Of(FSharpTokenType.LPAREN, FSharpTokenType.RPAREN)
        Pair.Of(FSharpTokenType.LBRACK, FSharpTokenType.RBRACK)
-       Pair.Of(FSharpTokenType.LBRACE, FSharpTokenType.RBRACE) 
-       Pair.Of(FSharpTokenType.LBRACK_BAR, FSharpTokenType.BAR_RBRACK) 
+       Pair.Of(FSharpTokenType.LBRACE, FSharpTokenType.RBRACE)
+       Pair.Of(FSharpTokenType.LBRACK_BAR, FSharpTokenType.BAR_RBRACK)
        Pair.Of(FSharpTokenType.LBRACK_LESS, FSharpTokenType.GREATER_RBRACK)
        Pair.Of(FSharpTokenType.LQUOTE_TYPED, FSharpTokenType.RQUOTE_TYPED)
-       Pair.Of(FSharpTokenType.LQUOTE_UNTYPED, FSharpTokenType.RQUOTE_UNTYPED)
-       Pair.Of(FSharpTokenType.BEGIN, FSharpTokenType.END)
-       Pair.Of(FSharpTokenType.CLASS, FSharpTokenType.END)
-       Pair.Of(FSharpTokenType.STRUCT, FSharpTokenType.END)
-       Pair.Of(FSharpTokenType.INTERFACE, FSharpTokenType.END)
-       Pair.Of(FSharpTokenType.WITH, FSharpTokenType.END)
-       Pair.Of(FSharpTokenType.DO, FSharpTokenType.DONE) |]
+       Pair.Of(FSharpTokenType.LQUOTE_UNTYPED, FSharpTokenType.RQUOTE_UNTYPED) |]
 
 type FSharpBracketMatcher() =
     inherit BracketMatcher(matchingBrackets)
+
 
 [<RequireQualifiedAccess; Struct>]
 type TrimTrailingSpaces =
