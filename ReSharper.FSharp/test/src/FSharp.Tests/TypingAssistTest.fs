@@ -85,6 +85,21 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter in string 03 - Inside triple-quoted string``() = x.DoNamedTest()
     [<Test>] member x.``Enter in string 04 - Inside multiline triple-quoted string``() = x.DoNamedTest()
 
+    [<Test>] member x.``Enter before dot 01``() = x.DoNamedTest()
+    [<Test>] member x.``Enter before dot 02``() = x.DoNamedTest()
+    [<Test>] member x.``Enter before dot 03 - After parens``() = x.DoNamedTest()
+    [<Test>] member x.``Enter before dot 04 - After ctor``() = x.DoNamedTest()
+    [<Test>] member x.``Enter before dot 05 - Chained methods``() = x.DoNamedTest()
+    [<Test>] member x.``Enter before dot 06 - Chained members``() = x.DoNamedTest()
+
+    [<Test>] member x.``Enter in app 01``() = x.DoNamedTest()
+    [<Test>] member x.``Enter in app 02``() = x.DoNamedTest()
+    [<Test>] member x.``Enter in app 03``() = x.DoNamedTest()
+    [<Test>] member x.``Enter in app 04 - After last arg``() = x.DoNamedTest()
+    [<Test>] member x.``Enter in app 05 - After last arg and comment``() = x.DoNamedTest()
+    [<Test>] member x.``Enter in app 06 - Inside method invoke``() = x.DoNamedTest()
+    [<Test>] member x.``Enter in app 07 - Joined args in parens``() = x.DoNamedTest()
+
     [<Test>] member x.``Backspace 01 - Inside empty triple-quoted string``() = x.DoNamedTest()
     [<Test>] member x.``Backspace 02 - Inside multiline triple-quoted string``() = x.DoNamedTest()
     [<Test>] member x.``Backspace 03 - Inside multiline triple-quoted string 2``() = x.DoNamedTest()

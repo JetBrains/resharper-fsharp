@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Psi;
 using Microsoft.FSharp.Compiler;
@@ -78,5 +78,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     {
       return GetDocumentOffset(document, (Line) (pos.Line - 1), (Column) pos.Column);
     }
+
+    public static bool Contains(this Range.range range, DocumentCoords coords) =>
+      range.StartLine - 1 >= (int) coords.Line && range.EndLine - 1 <= (int) coords.Line &&
+      range.StartColumn >= (int) coords.Column && range.EndColumn <= (int) coords.Column;
   }
 }
