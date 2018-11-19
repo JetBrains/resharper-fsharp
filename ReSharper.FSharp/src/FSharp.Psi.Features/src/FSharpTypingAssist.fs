@@ -22,9 +22,10 @@ open Microsoft.FSharp.Compiler.SourceCodeServices.AstTraversal
 [<SolutionComponent>]
 type FSharpTypingAssist
         (lifetime, solution, settingsStore, cachingLexerService, commandProcessor, psiServices,
-         externalIntellisenseHost, manager: ITypingAssistManager) as this =
+         externalIntellisenseHost, skippingTypingAssist, manager: ITypingAssistManager) as this =
     inherit TypingAssistLanguageBase<FSharpLanguage>
-        (solution, settingsStore, cachingLexerService, commandProcessor, psiServices, externalIntellisenseHost)
+        (solution, settingsStore, cachingLexerService, commandProcessor, psiServices, externalIntellisenseHost,
+         skippingTypingAssist)
 
     let indentingTokens =
         [| FSharpTokenType.EQUALS
@@ -87,6 +88,37 @@ type FSharpTypingAssist
            FSharpTokenType.LBRACK
            FSharpTokenType.LBRACK_BAR |]
         |> HashSet
+
+    let leftBrackets =
+        [| FSharpTokenType.LPAREN
+           FSharpTokenType.LBRACK
+           FSharpTokenType.LBRACE |]
+        |> HashSet
+
+    let tokensSuitableForRightBracket =
+        [| FSharpTokenType.WHITESPACE
+           FSharpTokenType.NEW_LINE
+           FSharpTokenType.LINE_COMMENT
+           FSharpTokenType.BLOCK_COMMENT
+           FSharpTokenType.SEMICOLON
+           FSharpTokenType.COMMA
+           FSharpTokenType.RPAREN
+           FSharpTokenType.RBRACK 
+           FSharpTokenType.RBRACE |]
+        |> HashSet
+
+    let rightBracketsText =
+        [| '(', ")"
+           '[', "]"
+           '{', "}" |]
+        |> dict
+
+    let bracketTypesForRightBracketChar =
+        [| ')', (FSharpTokenType.LPAREN, FSharpTokenType.RPAREN)
+           ']', (FSharpTokenType.LBRACK, FSharpTokenType.RBRACK)
+           '}', (FSharpTokenType.LBRACE, FSharpTokenType.RBRACE)
+           '>', (FSharpTokenType.LESS,   FSharpTokenType.GREATER) |]
+        |> dict
 
     let getCachingLexer textControl (lexer: outref<_>) =
         match cachingLexerService.GetCachingLexer(textControl) with
@@ -198,8 +230,6 @@ type FSharpTypingAssist
         let mutable lexer = Unchecked.defaultof<_>
         if not (getCachingLexer textControl &lexer && lexer.FindTokenAt(caretOffset - 1)) then line else
 
-        let matcher = FSharpBracketMatcher()
-
         let rec tryFindContinuedLine line lineStartOffset hasLeadingLeftBracket =
             if isNull lexer.TokenType then line else  
 
@@ -207,7 +237,7 @@ type FSharpTypingAssist
 
             let continuedLine =
                 if deindentingTokens.Contains(lexer.TokenType) then
-                    if not (matcher.FindMatchingBracket(lexer)) then line else
+                    if not (FSharpBracketMatcher().FindMatchingBracket(lexer)) then line else
                     document.GetCoordsByOffset(lexer.TokenStart).Line
                 else
                     if lexer.TokenStart >= lineStartOffset then line else line.Previous
@@ -225,7 +255,7 @@ type FSharpTypingAssist
             tryFindContinuedLine continuedLine lineStartOffset hasLeadingLeftParen
 
         let lineStartOffset = document.GetLineStartOffset(line)
-        
+
         tryFindContinuedLine line lineStartOffset (lexer.TokenType == FSharpTokenType.LPAREN)
 
     let insertNewLineAt textControl insertPos indent trimAfterCaret =
@@ -245,7 +275,7 @@ type FSharpTypingAssist
         let caretLine = document.GetCoordsByOffset(caretOffset).Line
         let line = getContinuedIndentLine textControl caretOffset LeadingParenContinuesLine.No
         if line <> caretLine then insertIndentFromLine textControl caretOffset line else
-        
+
         let startOffset = document.GetLineStartOffset(caretLine)
         let mutable pos = startOffset
 
@@ -335,6 +365,14 @@ type FSharpTypingAssist
 
         manager.AddTypingHandler(lifetime, '\'', this, Func<_,_>(this.HandleQuoteTyped), isTypingHandlerAvailable)
         manager.AddTypingHandler(lifetime, '"', this, Func<_,_>(this.HandleQuoteTyped), isTypingHandlerAvailable)
+
+        manager.AddTypingHandler(lifetime, '(', this, Func<_,_>(this.HandleLeftBracket), isTypingHandlerAvailable)
+        manager.AddTypingHandler(lifetime, '[', this, Func<_,_>(this.HandleLeftBracket), isTypingHandlerAvailable)
+        manager.AddTypingHandler(lifetime, '{', this, Func<_,_>(this.HandleLeftBracket), isTypingHandlerAvailable)
+        manager.AddTypingHandler(lifetime, ')', this, Func<_,_>(this.HandleRightBracket), isTypingHandlerAvailable)
+        manager.AddTypingHandler(lifetime, ']', this, Func<_,_>(this.HandleRightBracket), isTypingHandlerAvailable)
+        manager.AddTypingHandler(lifetime, '}', this, Func<_,_>(this.HandleRightBracket), isTypingHandlerAvailable)
+        manager.AddTypingHandler(lifetime, '>', this, Func<_,_>(this.HandleRightBracket), isTypingHandlerAvailable)
 
         manager.AddTypingHandler(lifetime, '<', this, Func<_,_>(this.HandleLeftAngleBracket), isTypingHandlerAvailable)
         manager.AddTypingHandler(lifetime, '@', this, Func<_,_>(this.HandleAtTyped), isTypingHandlerAvailable)
@@ -678,7 +716,12 @@ type FSharpTypingAssist
         let textControl = context.TextControl
         if textControl.Selection.OneDocRangeWithCaret().Length > 0 then false else
 
-        this.HandlerBackspaceInTripleQuotedString(textControl)
+        if this.HandlerBackspaceInTripleQuotedString(textControl) then true else
+
+        this.DoHandleBackspacePressed
+            (textControl,
+             (fun lexer -> lexer.TokenType == FSharpTokenType.STRING),
+             (fun _ -> FSharpBracketMatcher() :> _))
 
     member x.HandlerBackspaceInTripleQuotedString(textControl: ITextControl) =
         let offset = textControl.Caret.Offset()
@@ -716,6 +759,27 @@ type FSharpTypingAssist
             true
 
         else false
+
+    member x.HandleLeftBracket(context: ITypingContext) =
+        this.HandleLeftBracketTyped
+            (context,
+             (fun lexer -> leftBrackets.Contains(lexer.TokenType)),
+             (fun _ -> FSharpBracketMatcher() :> _),
+             (fun _ -> false),
+             (fun tokenType _ -> tokensSuitableForRightBracket.Contains(tokenType)),
+             (fun _ -> rightBracketsText.[context.Char]))
+
+    member x.HandleRightBracket(context: ITypingContext) =
+        this.HandleRightBracketTyped
+            (context,
+             (fun _ -> false),
+             (fun tokenType -> tokenType == FSharpTokenType.WHITESPACE),
+             (fun lexer -> x.NeedSkipCloseBracket(context.TextControl, lexer, context.Char)))
+
+    member x.NeedSkipCloseBracket(textControl, lexer, charTyped) =
+        x.NeedSkipCloseBracket(textControl, lexer, charTyped, bracketTypesForRightBracketChar,
+            (fun _ _ -> false),
+            (fun _ -> FSharpSkipPairBracketsMatcher() :> _))
 
     member x.HandleQuoteTyped(context: ITypingContext) =
         let textControl = context.TextControl
@@ -1042,6 +1106,7 @@ let isStringLiteralStopper tokenType =
     stringLiteralStopperss.Contains(tokenType) ||
     isNotNull tokenType && tokenType.IsStringLiteral
 
+
 let matchingBrackets =
     [| Pair.Of(FSharpTokenType.LPAREN, FSharpTokenType.RPAREN)
        Pair.Of(FSharpTokenType.LBRACK, FSharpTokenType.RBRACK)
@@ -1053,6 +1118,16 @@ let matchingBrackets =
 
 type FSharpBracketMatcher() =
     inherit BracketMatcher(matchingBrackets)
+
+
+let skipPairBrackets =
+    [| Pair.Of(FSharpTokenType.LPAREN, FSharpTokenType.RPAREN)
+       Pair.Of(FSharpTokenType.LBRACK, FSharpTokenType.RBRACK)
+       Pair.Of(FSharpTokenType.LBRACE, FSharpTokenType.RBRACE)
+       Pair.Of(FSharpTokenType.LESS, FSharpTokenType.GREATER) |]
+
+type FSharpSkipPairBracketsMatcher() =
+    inherit BracketMatcher(skipPairBrackets)
 
 
 [<RequireQualifiedAccess; Struct>]

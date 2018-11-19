@@ -140,6 +140,23 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Quotes - Skip end 10 - No skip``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Skip end 11 - No skip``() = x.DoNamedTest()
 
+    [<Test>] member x.``Brackets - Left 01 - Add right``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Left 02 - No add right before other``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Left 03 - Add right before other and space``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Left 04 - No add angle``() = x.DoNamedTest()
+
+    [<Test>] member x.``Brackets - Skip right 01``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Skip right 02 - After code``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Skip right 03 - After code and space``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Skip right 04 - Angle``() = x.DoNamedTest()
+
+    [<Test>] member x.``Brackets - Insert right 01``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Insert right 02 - After code and brace``() = x.DoNamedTest()
+
+    [<Test>] member x.``Brackets - Backspace 01 - Erase both``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Backspace 02 - Erase single, unbalanced left``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Backspace 03 - Erase single, unbalanced right``() = x.DoNamedTest()
+
     [<Test>] member x.``Brackets - Attributes 01 - Type left angle``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Attributes 02 - Type left angle before spaces``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Attributes 03 - Type right angle``() = x.DoNamedTest()
