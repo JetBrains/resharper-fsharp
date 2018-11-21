@@ -1,0 +1,19 @@
+FSharpFile
+  PsiElement(LINE)
+    PsiElement(LET)('let')
+    PsiElement(WHITESPACE)(' ')
+    PsiElement(IDENT)('poem')
+    PsiElement(WHITESPACE)(' ')
+    PsiElement(EQUALS)('=')
+    PsiElement(WHITESPACE)(' ')
+    FSharpStringLiteralExpression
+      PsiElement(STRING)('"Does my life want to end itself\n\\n            I know I'm not one to have these thoughts given a bubbly personality\n\\n            But every day it seems my life drifts farther from reality\n\\n            I cry\n\\n            I scream\n\\n            to no one\n"')
+  PsiElement(NEW_LINE)('\n')
+  PsiElement(NEW_LINE)('\n')
+  PsiElement(LINE)
+    PsiElement(IDENT)('printfn')
+    PsiElement(WHITESPACE)(' ')
+    FSharpStringLiteralExpression
+      PsiElement(STRING)('"poem:\n%s"')
+    PsiElement(WHITESPACE)(' ')
+    PsiElement(IDENT)('poem')

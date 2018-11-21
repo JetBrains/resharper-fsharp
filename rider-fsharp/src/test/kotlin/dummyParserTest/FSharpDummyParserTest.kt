@@ -7,4 +7,8 @@ class FSharpDummyParserTest : RiderFrontendParserTest("", "fs", FSharpParserDefi
     fun testSmoke01() = doTest()
     fun testBlocks01() = doTest()
     fun testLong01() = doTest()
+    fun testMultiline01() = doTest()
+    fun testMultiline02() = doTest()
+    fun testMultiline03() = doTest()
+    fun testMultiline04() = doTest()
 }

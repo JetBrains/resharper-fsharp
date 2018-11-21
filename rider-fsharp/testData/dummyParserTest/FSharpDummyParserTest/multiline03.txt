@@ -1,0 +1,19 @@
+FSharpFile
+  PsiElement(LINE)
+    PsiElement(LET)('let')
+    PsiElement(WHITESPACE)(' ')
+    PsiElement(IDENT)('song')
+    PsiElement(WHITESPACE)(' ')
+    PsiElement(EQUALS)('=')
+    PsiElement(WHITESPACE)(' ')
+    FSharpStringLiteralExpression
+      PsiElement(TRIPLE_QUOTED_STRING)('"""We all live in a yellow submarine\n    Yellow submarine, yellow submarine\nWe all live in a yellow submarine\n    Yellow submarine, yellow submarine"""')
+  PsiElement(NEW_LINE)('\n')
+  PsiElement(NEW_LINE)('\n')
+  PsiElement(LINE)
+    PsiElement(IDENT)('printfn')
+    PsiElement(WHITESPACE)(' ')
+    FSharpStringLiteralExpression
+      PsiElement(STRING)('"song:\n%s"')
+    PsiElement(WHITESPACE)(' ')
+    PsiElement(IDENT)('song')

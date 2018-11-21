@@ -1,0 +1,19 @@
+FSharpFile
+  PsiElement(LINE)
+    PsiElement(LET)('let')
+    PsiElement(WHITESPACE)(' ')
+    PsiElement(IDENT)('text')
+    PsiElement(WHITESPACE)(' ')
+    PsiElement(EQUALS)('=')
+    PsiElement(WHITESPACE)(' ')
+    FSharpStringLiteralExpression
+      PsiElement(VERBATIM_STRING)('@"Lorem ipsum dolor sit amet, consectetur adipiscing elit.\nEtiam pharetra placerat viverra. Nam auctor sem lacus. Nullam accumsan cursus tium.\nCras dignissim tellus nec vulputate tincidunt. Sed consectetur blandit metus,\npretium euismod neque aliquet sit amet. Aenean a vestibulum turpis. Proin ut ipsum pellentesque,\nbibendum libero vel, porta justo. Integer nec lorem vitae arcu porttitor molestie.\nSed sed turpis et nunc vulputate dapibus eu ut ligula. Vestibulum ante ipsum primis in faucibus\norci luctus et ultrices posuere cubilia Curae; Quisque laoreet luctus congue.\nDuis congue neque et enim finibus lacinia."')
+  PsiElement(NEW_LINE)('\n')
+  PsiElement(NEW_LINE)('\n')
+  PsiElement(LINE)
+    PsiElement(IDENT)('printfn')
+    PsiElement(WHITESPACE)(' ')
+    FSharpStringLiteralExpression
+      PsiElement(STRING)('"text:\n%s"')
+    PsiElement(WHITESPACE)(' ')
+    PsiElement(IDENT)('text')
