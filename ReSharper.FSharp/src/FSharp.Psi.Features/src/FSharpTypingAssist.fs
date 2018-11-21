@@ -579,10 +579,11 @@ type FSharpTypingAssist
             { new AstVisitorBase<_>() with
                 member x.VisitExpr(path, _, defaultTraverse, expr) =
                     match expr with
-                    | SynExpr.App (_, false, funcExpr, argExpr, m) when
-                            funcExpr.Range.GetStartLine() = caretLine &&
-                            offset >= document.GetOffset(funcExpr.Range.End) &&
-                            offset <= document.GetOffset(argExpr.Range.Start) ->
+                    | SynExpr.App (_, false, leftExpr, rightExpr, _)
+                    | SynExpr.App (_, true,  rightExpr, leftExpr, _) when
+                            leftExpr.Range.GetStartLine() = caretLine &&
+                            offset >= document.GetOffset(leftExpr.Range.End) &&
+                            offset <= document.GetOffset(rightExpr.Range.Start) ->
                         funExpr <- Some expr
                         defaultTraverse expr
 
