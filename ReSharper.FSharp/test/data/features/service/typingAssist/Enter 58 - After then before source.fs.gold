@@ -1,6 +1,7 @@
 ﻿// ${CHAR:Enter} 
 module Module
 
-let foo =
-   
-   {caret}
+do
+   if true then
+
+{caret}   ()

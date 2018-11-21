@@ -28,41 +28,35 @@ type FSharpTypingAssist
          skippingTypingAssist)
 
     let indentingTokens =
-        [| FSharpTokenType.EQUALS
-           FSharpTokenType.LARROW
-           FSharpTokenType.LPAREN
-           FSharpTokenType.LBRACK
-           FSharpTokenType.LBRACK_BAR
+        [| FSharpTokenType.LARROW
            FSharpTokenType.LBRACK_LESS
-           FSharpTokenType.LBRACE
            FSharpTokenType.LQUOTE_TYPED
            FSharpTokenType.LQUOTE_UNTYPED
            FSharpTokenType.BEGIN
-           FSharpTokenType.IF
-           FSharpTokenType.ELIF
-           FSharpTokenType.THEN
            FSharpTokenType.STRUCT
            FSharpTokenType.CLASS
            FSharpTokenType.INTERFACE
-           FSharpTokenType.TRY
-           FSharpTokenType.WHEN
-           FSharpTokenType.DO_BANG
-           FSharpTokenType.YIELD
-           FSharpTokenType.YIELD_BANG |]
+           FSharpTokenType.TRY |]
         |> HashSet
 
     let allowingNoIndentTokens =
-        [| FSharpTokenType.RARROW
-           FSharpTokenType.THEN
-           FSharpTokenType.ELSE
-           FSharpTokenType.DO
-           FSharpTokenType.WHEN
-           FSharpTokenType.IF
-           FSharpTokenType.ELIF
-           FSharpTokenType.LPAREN
+        [| FSharpTokenType.LPAREN
            FSharpTokenType.LBRACK
            FSharpTokenType.LBRACE
-           FSharpTokenType.LBRACK_BAR |]
+           FSharpTokenType.LBRACK_BAR
+           FSharpTokenType.EQUALS
+           FSharpTokenType.RARROW
+           FSharpTokenType.IF
+           FSharpTokenType.THEN
+           FSharpTokenType.ELIF
+           FSharpTokenType.ELSE
+           FSharpTokenType.MATCH
+           FSharpTokenType.WHILE
+           FSharpTokenType.WHEN
+           FSharpTokenType.DO
+           FSharpTokenType.DO_BANG
+           FSharpTokenType.YIELD
+           FSharpTokenType.YIELD_BANG |]
         |> HashSet
 
     let deindentingTokens =
@@ -462,7 +456,7 @@ type FSharpTypingAssist
 
         let indentSize =
             let defaultIndent = getIndentSize textControl
-            if not (allowingNoIndentTokens.Contains(tokenType) || tokenType == FSharpTokenType.EQUALS) then
+            if not (allowingNoIndentTokens.Contains(tokenType)) then
                 defaultIndent + getOffsetInLine document line tokenStart else
 
             let prevIndentSize =
