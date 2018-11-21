@@ -602,19 +602,27 @@ type FSharpTypingAssist
         | None, _ -> false
         | Some expr, None
         | _, Some (_, expr) ->
-            let indent =
-                let exprStartLine = expr.Range.GetStartLine()
 
-                if exprStartLine < caretLine then
-                    getLineWhitespaceIndent textControl caretLine else
+        let indent =
+            match expr with
+            | SynExpr.App (_, true, SynExpr.Ident id, argExpr, _) when id.idText = "op_PipeRight" ->
+                let argExprLine = argExpr.Range.GetStartLine()
+                getOffsetInLine document argExprLine (document.GetOffset(expr.Range.Start))
 
-                let offsetInLine = getOffsetInLine document exprStartLine (document.GetOffset(expr.Range.Start))
-                if exprStartLine > caretLine then offsetInLine else
+            | _ ->
 
-                let additionalIndent = getIndentSize textControl 
-                offsetInLine + additionalIndent
+            let exprStartLine = expr.Range.GetStartLine()
 
-            insertNewLineAt textControl offset indent TrimTrailingSpaces.Yes
+            if exprStartLine < caretLine then
+                getLineWhitespaceIndent textControl caretLine else
+
+            let offsetInLine = getOffsetInLine document exprStartLine (document.GetOffset(expr.Range.Start))
+            if exprStartLine > caretLine then offsetInLine else
+
+            let additionalIndent = getIndentSize textControl 
+            offsetInLine + additionalIndent
+
+        insertNewLineAt textControl offset indent TrimTrailingSpaces.Yes
     
     member x.HandleEnterBeforeDot(textControl: ITextControl) =
         if textControl.Selection.OneDocRangeWithCaret().Length > 0 then false else
