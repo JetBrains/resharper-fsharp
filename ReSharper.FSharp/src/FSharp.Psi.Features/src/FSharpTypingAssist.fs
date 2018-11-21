@@ -58,7 +58,11 @@ type FSharpTypingAssist
            FSharpTokenType.DO
            FSharpTokenType.WHEN
            FSharpTokenType.IF
-           FSharpTokenType.ELIF |]
+           FSharpTokenType.ELIF
+           FSharpTokenType.LPAREN
+           FSharpTokenType.LBRACK
+           FSharpTokenType.LBRACE
+           FSharpTokenType.LBRACK_BAR |]
         |> HashSet
 
     let deindentingTokens =

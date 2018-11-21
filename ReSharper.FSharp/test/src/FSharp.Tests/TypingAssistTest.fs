@@ -83,6 +83,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter 51 - Parens``() = x.DoNamedTest()
     [<Test>] member x.``Enter 52 - Nested indents and parens``() = x.DoNamedTest()
     [<Test>] member x.``Enter 53 - After when``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 54 - After mismatched {``() = x.DoNamedTest()
 
     [<Test>] member x.``Enter in string 01 - Inside empty triple-quoted string``() = x.DoNamedTest()
     [<Test>] member x.``Enter in string 02 - Inside triple-quoted string``() = x.DoNamedTest()
