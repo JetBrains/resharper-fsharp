@@ -105,6 +105,9 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter in app 06 - Inside method invoke``() = x.DoNamedTest()
     [<Test>] member x.``Enter in app 07 - Joined args in parens``() = x.DoNamedTest()
     [<Test>] member x.``Enter in app 08 - Infix app``() = x.DoNamedTest()
+    [<Test>] member x.``Enter in app 09 - Multiline``() = x.DoNamedTest()
+    [<Test>] member x.``Enter in app 10 - Multiline``() = x.DoNamedTest()
+    [<Test>] member x.``Enter in app 11 - Multiline``() = x.DoNamedTest()
 
     [<Test>] member x.``Backspace 01 - Inside empty triple-quoted string``() = x.DoNamedTest()
     [<Test>] member x.``Backspace 02 - Inside multiline triple-quoted string``() = x.DoNamedTest()

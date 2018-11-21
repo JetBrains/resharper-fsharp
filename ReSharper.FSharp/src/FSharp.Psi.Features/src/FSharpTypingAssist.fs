@@ -578,31 +578,49 @@ type FSharpTypingAssist
         let caretCoords = document.GetCoordsByOffset(offset)
         let caretLine = caretCoords.Line
 
-        let mutable funExpr = None 
+        let mutable appExpr = None
+        let mutable outerExpr = None
         let visitor =
             { new AstVisitorBase<_>() with
                 member x.VisitExpr(path, _, defaultTraverse, expr) =
                     match expr with
-                    | SynExpr.App (_, false, leftExpr, rightExpr, _)
-                    | SynExpr.App (_, true,  rightExpr, leftExpr, _) when
-                            leftExpr.Range.GetStartLine() = caretLine &&
-                            offset >= document.GetOffset(leftExpr.Range.End) &&
-                            offset <= document.GetOffset(rightExpr.Range.Start) ->
-                        funExpr <- Some expr
+                    | SynExpr.App (_, false, leftExpr, rightExpr, range)
+                    | SynExpr.App (_, true,  rightExpr, leftExpr, range) ->
+
+                        if offset >= document.GetOffset(range.Start) && rightExpr.Range.GetStartLine() > caretLine then
+                            outerExpr <- Some (expr, rightExpr)
+
+                        if offset >= document.GetOffset(leftExpr.Range.End) &&
+                                offset <= document.GetOffset(rightExpr.Range.Start) then
+                            appExpr <- Some expr
+
+                            outerExpr <-
+                                match outerExpr with
+                                | Some (expr, _) when range.Start = expr.Range.Start -> outerExpr
+                                | _ -> None
+
                         defaultTraverse expr
 
                     | _ -> defaultTraverse expr }
 
         Traverse(caretCoords.GetPos(), parseTree, visitor) |> ignore
-        match funExpr with
-        | None -> false
-        | Some funExpr ->
+        match appExpr, outerExpr with
+        | None, _ -> false
+        | Some expr, None
+        | _, Some (_, expr) ->
+            let indent =
+                let exprStartLine = expr.Range.GetStartLine()
 
-        let indent =
-            getOffsetInLine document caretLine (document.GetOffset(funExpr.Range.Start)) +
-            getIndentSize textControl
+                if exprStartLine < caretLine then
+                    getLineWhitespaceIndent textControl caretLine else
 
-        insertNewLineAt textControl offset indent TrimTrailingSpaces.Yes
+                let offsetInLine = getOffsetInLine document exprStartLine (document.GetOffset(expr.Range.Start))
+                if exprStartLine > caretLine then offsetInLine else
+
+                let additionalIndent = getIndentSize textControl 
+                offsetInLine + additionalIndent
+
+            insertNewLineAt textControl offset indent TrimTrailingSpaces.Yes
     
     member x.HandleEnterBeforeDot(textControl: ITextControl) =
         if textControl.Selection.OneDocRangeWithCaret().Length > 0 then false else
