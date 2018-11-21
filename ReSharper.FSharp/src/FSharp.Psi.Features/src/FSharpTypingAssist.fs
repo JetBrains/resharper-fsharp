@@ -826,6 +826,11 @@ type FSharpTypingAssist
 
         let tokenType = lexer.TokenType
         if tokenType == FSharpTokenType.TRIPLE_QUOTED_STRING then false else
+
+        if (tokenType == FSharpTokenType.STRING && typedChar = '\"' ||
+            tokenType == FSharpTokenType.CHARACTER_LITERAL && typedChar = '\'') &&
+               FSharpTypingAssist.EscapesNextChar(offset, textControl.Document.Buffer) then false else
+
         if tokenType.IsStringLiteral && typedChar <> getStringEndingQuote tokenType then false else
 
         while lexer.TokenType == FSharpTokenType.WHITESPACE do

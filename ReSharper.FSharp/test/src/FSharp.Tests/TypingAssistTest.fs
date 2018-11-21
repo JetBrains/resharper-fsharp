@@ -130,6 +130,8 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Quotes - Pair quotes 03 - Insert pair inside string``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Pair quotes 04 - Wrong quote type``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Pair quotes 05 - In parens``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Pair quotes 06 - Insert single escaped``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Pair quotes 07 - Insert single escaped``() = x.DoNamedTest()
 
     [<Test>] member x.``Quotes - Skip end 01 - Char``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Skip end 02 - String``() = x.DoNamedTest()
