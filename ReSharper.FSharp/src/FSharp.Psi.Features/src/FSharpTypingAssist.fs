@@ -642,9 +642,25 @@ type FSharpTypingAssist
 
         let opEndOffset = lexer.TokenEnd
 
+        let nextTokenIsKeyword =
+            use cookie = LexerStateCookie.Create(lexer)
+            lexer.Advance()
+
+            while lexer.TokenType == FSharpTokenType.WHITESPACE do
+                lexer.Advance()
+
+            isNotNull lexer.TokenType && lexer.TokenType.IsKeyword
+
         lexer.Advance(-1)
         while lexer.TokenType == FSharpTokenType.WHITESPACE do
             lexer.Advance(-1)
+
+        let tokenType = lexer.TokenType
+        if isNull tokenType then false else
+        
+        let prevEndOffset =
+            if tokenType == FSharpTokenType.NEW_LINE then None else
+            Some lexer.TokenEnd
 
         let document = textControl.Document
         let caretCoords = document.GetCoordsByOffset(offset)
@@ -667,10 +683,11 @@ type FSharpTypingAssist
                     | SynExpr.FromParseError _ -> foundError <- true
                     | _ -> ()
 
-                    let exprOffset = document.GetTreeEndOffset(expr.Range).Offset 
-                    if exprOffset = opEndOffset then Some expr else
-
-                    defaultTraverse expr }
+                    match document.GetTreeEndOffset(expr.Range).Offset with
+                    | offset when offset = opEndOffset ||
+                                  prevEndOffset.IsSome && offset = prevEndOffset.Value ->
+                        Some expr
+                    | _ -> defaultTraverse expr }
 
         let tokenCoords = document.GetCoordsByOffset(lexer.TokenStart)
         match Traverse(tokenCoords.GetPos(), parseTree, visitor) with
@@ -688,7 +705,11 @@ type FSharpTypingAssist
             let offset = document.GetOffset(expr.Range.Start)
             getOffsetInLine document startLine offset
 
-        insertNewLineAt textControl offset indent TrimTrailingSpaces.Yes
+        if not (insertNewLineAt textControl offset indent TrimTrailingSpaces.Yes) then false else
+
+        if nextTokenIsKeyword then
+            document.InsertText(textControl.Caret.Offset(), " ")
+        true
 
     member x.HandleEnterBeforeDot(textControl: ITextControl) =
         if textControl.Selection.OneDocRangeWithCaret().Length > 0 then false else

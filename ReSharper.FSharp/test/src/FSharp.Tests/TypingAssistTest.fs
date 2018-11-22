@@ -94,6 +94,8 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter after error 04 - While``() = x.DoNamedTest()
     [<Test>] member x.``Enter after error 05 - multiline if``() = x.DoNamedTest()
     [<Test>] member x.``Enter after error 06 - match``() = x.DoNamedTest()
+    [<Test>] member x.``Enter after error 07 - multiline if with parens``() = x.DoNamedTest()
+    [<Test>] member x.``Enter after error 08 - multiline if before then``() = x.DoNamedTest()
     
     [<Test>] member x.``Enter in string 01 - Inside empty triple-quoted string``() = x.DoNamedTest()
     [<Test>] member x.``Enter in string 02 - Inside triple-quoted string``() = x.DoNamedTest()
