@@ -18,7 +18,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.jetbrains.rd:rd-gen:0.183.47")
+        classpath("com.jetbrains.rd:rd-gen:0.191.1")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.10")
     }
 }
@@ -45,7 +45,7 @@ java {
 }
 
 
-val baseVersion = "2018.3"
+val baseVersion = "2019.1"
 val buildCounter = ext.properties["build.number"] ?: "9999"
 version = "$baseVersion.$buildCounter"
 
