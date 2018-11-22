@@ -84,10 +84,17 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter 52 - Nested indents and parens``() = x.DoNamedTest()
     [<Test>] member x.``Enter 53 - After when``() = x.DoNamedTest()
     [<Test>] member x.``Enter 54 - After mismatched {``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 55 - Should not continue line``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 56 - After then before source``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 57 - After + before source``() = x.DoNamedTest()
 
-    [<Test>] member x.``Enter 58 - After then before source``() = x.DoNamedTest()
-    [<Test>] member x.``Enter 59 - After + before source``() = x.DoNamedTest()
-
+    [<Test>] member x.``Enter after error 01 - If``() = x.DoNamedTest()
+    [<Test>] member x.``Enter after error 02 - If``() = x.DoNamedTest()
+    [<Test>] member x.``Enter after error 03 - If``() = x.DoNamedTest()
+    [<Test>] member x.``Enter after error 04 - While``() = x.DoNamedTest()
+    [<Test>] member x.``Enter after error 05 - multiline if``() = x.DoNamedTest()
+    [<Test>] member x.``Enter after error 06 - match``() = x.DoNamedTest()
+    
     [<Test>] member x.``Enter in string 01 - Inside empty triple-quoted string``() = x.DoNamedTest()
     [<Test>] member x.``Enter in string 02 - Inside triple-quoted string``() = x.DoNamedTest()
     [<Test>] member x.``Enter in string 03 - Inside triple-quoted string``() = x.DoNamedTest()
