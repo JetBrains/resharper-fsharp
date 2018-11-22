@@ -4,5 +4,5 @@ module Module
 do
    while (foo &&
           bar) ||
-          {caret}baz do
+         {caret}baz do
       ()

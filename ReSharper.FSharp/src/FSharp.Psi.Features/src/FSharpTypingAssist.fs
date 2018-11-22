@@ -562,6 +562,19 @@ type FSharpTypingAssist
         lexer.FindTokenAt(offset - 1) |> ignore
         if isFirstTokenOnLine lexer || isLastTokenOnLine lexer then false else 
 
+        let isAfterInfixOp =
+            use cookie = LexerStateCookie.Create(lexer)
+            while lexer.TokenType == FSharpTokenType.WHITESPACE do
+                lexer.Advance(-1)
+            isInfixOp lexer
+
+        let isBeforeInfixOp =
+            use cookie = LexerStateCookie.Create(lexer)
+            lexer.FindTokenAt(offset) |> ignore
+            while lexer.TokenType == FSharpTokenType.WHITESPACE do
+                lexer.Advance()
+            isInfixOp lexer
+
         let document = textControl.Document
         let caretCoords = document.GetCoordsByOffset(offset)
         let caretLine = caretCoords.Line
@@ -610,7 +623,9 @@ type FSharpTypingAssist
 
         let indent =
             match expr with
-            | SynExpr.App (_, true, SynExpr.Ident id, argExpr, _) when id.idText = "op_PipeRight" ->
+            | SynExpr.App (_, (true  as isInfix), _, argExpr, _)
+            | SynExpr.App (_, (false as isInfix), argExpr, _, _) when
+                isInfix && isBeforeInfixOp || not isInfix && isAfterInfixOp ->
                 let argExprLine = argExpr.Range.GetStartLine()
                 getOffsetInLine document argExprLine (document.GetOffset(expr.Range.Start))
 
@@ -1194,6 +1209,8 @@ let infixOpTokens =
     |> HashSet
 
 let isInfixOp (lexer: ILexer) =
+    if isNull lexer.TokenType then false else
+
     infixOpTokens.Contains(lexer.TokenType) ||
 
     lexer.TokenType == FSharpTokenType.SYMBOLIC_OP &&

@@ -122,6 +122,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter in app 11 - Multiline``() = x.DoNamedTest()
     [<Test>] member x.``Enter in app 12 - Before pipe``() = x.DoNamedTest()
     [<Test>] member x.``Enter in app 13 - Before pipe``() = x.DoNamedTest()
+    [<Test>] member x.``Enter in app 14 - After infix op``() = x.DoNamedTest()
 
     [<Test>] member x.``Backspace 01 - Inside empty triple-quoted string``() = x.DoNamedTest()
     [<Test>] member x.``Backspace 02 - Inside multiline triple-quoted string``() = x.DoNamedTest()
