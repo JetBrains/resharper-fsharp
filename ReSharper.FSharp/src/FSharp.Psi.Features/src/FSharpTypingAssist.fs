@@ -560,6 +560,13 @@ type FSharpTypingAssist
         lexer.FindTokenAt(offset - 1) |> ignore
         if isFirstTokenOnLine lexer || isLastTokenOnLine lexer then false else 
 
+        let document = textControl.Document
+        let caretCoords = document.GetCoordsByOffset(offset)
+        let caretLine = caretCoords.Line
+
+        let lineStart = document.GetLineStartOffset(caretLine)
+        if document.GetText(TextRange(lineStart, offset)).IsWhitespace() then false else
+
         match x.CommitPsiOnlyAndProceedWithDirtyCaches(textControl, id).AsFSharpFile() with
         | null -> false
         | fsFile ->
@@ -568,15 +575,11 @@ type FSharpTypingAssist
         | None -> false
         | Some parseTree ->
 
-        let document = textControl.Document
-        let caretCoords = document.GetCoordsByOffset(offset)
-        let caretLine = caretCoords.Line
-
         let mutable appExpr = None
         let mutable outerExpr = None
         let visitor =
             { new AstVisitorBase<_>() with
-                member x.VisitExpr(path, _, defaultTraverse, expr) =
+                member x.VisitExpr(_, _, defaultTraverse, expr) =
                     match expr with
                     | SynExpr.App (_, false, leftExpr, rightExpr, range)
                     | SynExpr.App (_, true,  rightExpr, leftExpr, range) ->
@@ -654,7 +657,7 @@ type FSharpTypingAssist
 
         let visitor =
             { new AstVisitorBase<_>() with
-                member x.VisitExpr(path, _, defaultTraverse, expr) =
+                member x.VisitExpr(_, _, defaultTraverse, expr) =
                     if expr.Range.GetStartLine() <> caretLine then defaultTraverse expr else
 
                     match expr with
