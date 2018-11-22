@@ -3,7 +3,6 @@
 open System
 
 [<EntryPoint>]
-let main argv =
+let main argv =<caret>
     printfn "Hello World from F#!"
-    printfn "<caret>"
     0 // return an integer exit code

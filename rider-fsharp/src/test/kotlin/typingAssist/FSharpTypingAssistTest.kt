@@ -1,7 +1,6 @@
-/*
 package typingAssist
 
-import com.jetbrains.rider.test.TypingAssistTestBase
+import com.jetbrains.rider.test.base.TypingAssistTestBase
 import com.jetbrains.rider.test.scriptingApi.typeOrCallAction
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
@@ -15,7 +14,9 @@ class FSharpTypingAssistTest: TypingAssistTestBase() {
             arrayOf("closingBrace1", "{"),
             arrayOf("parentheses1", "("),
             arrayOf("quotes1", "\""),
-            arrayOf("closingAngleBracket1", "<")
+            arrayOf("singleQuote1", "'"),
+            arrayOf("closingAngleBracket1", "<"),
+            arrayOf("indentAfterEnter", "EditorEnter")
     )
 
     @Test(dataProvider = "testTypingAssists")
@@ -25,4 +26,4 @@ class FSharpTypingAssistTest: TypingAssistTestBase() {
         }
     }
 
-}*/
+}

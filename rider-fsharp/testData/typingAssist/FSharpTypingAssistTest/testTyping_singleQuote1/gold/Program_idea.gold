@@ -1,0 +1,7 @@
+Idea editors:
+Editor #1
+Name: Text
+Model id: file=Program.fs projectModelId!=0
+Virtual file: Program.fs
+Current caret: (6, 13)
+Current selection:  startPosition = (6, 13) endPosition = (6, 13)
