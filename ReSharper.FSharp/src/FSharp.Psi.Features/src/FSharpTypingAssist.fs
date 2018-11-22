@@ -404,15 +404,27 @@ type FSharpTypingAssist
 
         let document = textControl.Document
         let caretOffset = textControl.Caret.Offset()
-        let lineStartOffset = document.GetLineStartOffset(document.GetCoordsByOffset(caretOffset).Line)
+        let caretLine = document.GetCoordsByOffset(caretOffset).Line
+        let lineStartOffset = document.GetLineStartOffset(caretLine)
 
         if not (findUnmatchedBracketToLeft lexer caretOffset lineStartOffset) then false else
+
+        let leftBracketOffset = lexer.TokenStart
+        let leftBracketType = lexer.TokenType
 
         lexer.Advance()
         while lexer.TokenType == FSharpTokenType.WHITESPACE do
             lexer.Advance()
 
-        let indent = lexer.TokenStart - lineStartOffset
+        let indent =
+            // { new IInterface with {caret} }
+            if leftBracketType == FSharpTokenType.LBRACE && lexer.TokenType == FSharpTokenType.NEW then
+                let braceOffset = getOffsetInLine document caretLine leftBracketOffset
+                let defaultIndent = getIndentSize textControl
+                braceOffset + defaultIndent
+
+            else lexer.TokenStart - lineStartOffset
+
         insertNewLineAt textControl caretOffset indent TrimTrailingSpaces.Yes
 
     member x.HandleEnterAddIndent(textControl) =

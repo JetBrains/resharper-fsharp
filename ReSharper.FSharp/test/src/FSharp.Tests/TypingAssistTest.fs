@@ -87,6 +87,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter 55 - Should not continue line``() = x.DoNamedTest()
     [<Test>] member x.``Enter 56 - After then before source``() = x.DoNamedTest()
     [<Test>] member x.``Enter 57 - After + before source``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 58 - Object expression``() = x.DoNamedTest()
 
     [<Test>] member x.``Enter after error 01 - If``() = x.DoNamedTest()
     [<Test>] member x.``Enter after error 02 - If``() = x.DoNamedTest()
