@@ -900,6 +900,8 @@ type FSharpTypingAssist
     member x.InsertPairQuote(textControl: ITextControl, typedChar: char) =
         let mutable lexer = Unchecked.defaultof<_>
         let offset = textControl.Caret.Offset()
+        let document = textControl.Document
+        let line = document.GetCoordsByOffset(offset).Line
 
         if not (getCachingLexer textControl &lexer && lexer.FindTokenAt(offset)) then false else
 
@@ -912,11 +914,14 @@ type FSharpTypingAssist
 
         if tokenType.IsStringLiteral && typedChar <> getStringEndingQuote tokenType then false else
 
-        while lexer.TokenType == FSharpTokenType.WHITESPACE do
-            lexer.Advance()
-
         // Do not prevent quoting code
-        if not (isStringLiteralStopper lexer.TokenType) then false else
+        if not (isStringLiteralStopper tokenType) then false else
+
+        // Workaround for cases like { name = "{caret}, title = "" }
+        let tokenStartLine = document.GetCoordsByOffset(lexer.TokenStart).Line
+        let tokenEndLine = document.GetCoordsByOffset(lexer.TokenEnd).Line
+        if tokenType == FSharpTokenType.STRING && offset > lexer.TokenStart &&
+           tokenStartLine = line && tokenEndLine > line then false else
 
         textControl.Document.InsertText(offset, getCorresponingQuotesPair typedChar)
         textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible)
