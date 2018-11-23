@@ -924,9 +924,8 @@ type FSharpTypingAssist
 
         // Workaround for cases like { name = "{caret}, title = "" }
         let tokenStartLine = document.GetCoordsByOffset(lexer.TokenStart).Line
-        let tokenEndLine = document.GetCoordsByOffset(lexer.TokenEnd).Line
         if tokenType == FSharpTokenType.STRING && offset > lexer.TokenStart &&
-           tokenStartLine = line && tokenEndLine > line then false else
+           tokenStartLine = line && lineEndsWithString lexer document line then false else
 
         textControl.Document.InsertText(offset, getCorresponingQuotesPair typedChar)
         textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible)
@@ -1129,6 +1128,15 @@ let isFirstTokenOnLine (lexer: CachingLexer) =
     while isIgnored lexer.TokenType do
         lexer.Advance(-1)
     isNull lexer.TokenType || lexer.TokenType == FSharpTokenType.NEW_LINE
+
+
+let lineEndsWithString (lexer: CachingLexer) (document: IDocument) line =
+    use cookie = LexerStateCookie.Create(lexer)
+    let lineEnd = document.GetLineEndOffsetNoLineBreak(line)
+    if not (lexer.FindTokenAt(lineEnd)) then false else
+
+    let tokenType = lexer.TokenType
+    tokenType == FSharpTokenType.STRING || tokenType == FSharpTokenType.UNFINISHED_STRING
 
 
 let bracketsToAddIndent =
