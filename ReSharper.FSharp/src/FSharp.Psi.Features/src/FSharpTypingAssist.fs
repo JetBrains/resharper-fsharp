@@ -577,7 +577,7 @@ type FSharpTypingAssist
                 (tokenType == FSharpTokenType.WHITESPACE || tokenType == FSharpTokenType.LPAREN)) then false else
 
         lexer.FindTokenAt(offset - 1) |> ignore
-        if isFirstTokenOnLine lexer || isLastTokenOnLine lexer then false else 
+        if isLastTokenOnLine lexer then false else 
 
         let isAfterInfixOp =
             use cookie = LexerStateCookie.Create(lexer)
