@@ -506,7 +506,7 @@ type FSharpTypingAssist
         let document = textControl.Document
         let visitor =
             { new AstVisitorBase<_>() with
-                member x.VisitExpr(path, _, defaultTraverse, expr) =
+                member x.VisitExpr(_, _, defaultTraverse, expr) =
                     match expr with
 
                     // if expr then {caret}
@@ -521,10 +521,10 @@ type FSharpTypingAssist
 
         match Traverse(document.GetCoordsByOffset(lexer.TokenStart).GetPos(), parseTree, visitor) with
         | None -> false
-        | Some expr ->
+        | Some (ExprRange range) ->
 
         use cookie = LexerStateCookie.Create(lexer)
-        let exprStart = document.GetStartOffset(expr.Range)
+        let exprStart = document.GetStartOffset(range)
         if exprStart <= 0 || not (lexer.FindTokenAt(exprStart - 1)) then false else
 
         while lexer.TokenType == FSharpTokenType.WHITESPACE do
@@ -558,11 +558,12 @@ type FSharpTypingAssist
             { new AstVisitorBase<_>() with
                 member x.VisitMatchClause(defaultTraverse, (SynMatchClause.Clause (pat, whenExpr, _, _, _) as mc)) =
                     match pat, whenExpr with
-                    | _, Some expr when document.GetEndOffset(expr.Range) <> prevTokenEnd -> defaultTraverse mc
-                    | path, None when document.GetEndOffset(pat.Range) <> prevTokenEnd -> defaultTraverse mc
-                    | _ -> Some mc
+                    | _, Some (ExprRange range)
+                    | (PatRange range), None when document.GetEndOffset(range) = prevTokenEnd -> Some mc
 
-                member x.VisitExpr(path, _, defaultTraverse, expr) =
+                    | _ -> defaultTraverse mc
+
+                member x.VisitExpr(_, _, defaultTraverse, expr) =
                     defaultTraverse expr }
 
         match Traverse(document.GetCoordsByOffset(lexer.TokenStart).GetPos(), parseTree, visitor) with

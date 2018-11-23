@@ -5,19 +5,11 @@ module rec CommonUtil =
     open System.Diagnostics
     open System
     open System.Collections.Generic
-    open System.Linq
-    open System.Threading
-    open JetBrains.Application
-    open JetBrains.Application.Progress
     open JetBrains.DataFlow
     open JetBrains.DocumentModel
     open JetBrains.ProjectModel
     open JetBrains.ProjectModel.ProjectsHost
-    open JetBrains.ProjectModel.Properties
-    open JetBrains.ProjectModel.Properties.CSharp
-    open JetBrains.ProjectModel.Properties.Managed
     open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
-    open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
     open JetBrains.ReSharper.Psi.Modules
     open JetBrains.Util
     open JetBrains.Util.dataStructures.TypedIntrinsics
@@ -173,6 +165,14 @@ module rec CommonUtil =
             x.OnTermination(fun _ -> func.Invoke() |> ignore) |> ignore
 
 [<AutoOpen>]
+module rec FcsUtil =
+    open Microsoft.FSharp.Compiler.Ast
+
+    let (|ExprRange|) (expr: SynExpr) = expr.Range
+    let (|PatRange|) (pat: SynPat) = pat.Range
+
+
+[<AutoOpen>]
 module rec FSharpMsBuildUtils =
     open BuildActions
     open ItemTypes
@@ -195,13 +195,13 @@ module rec FSharpMsBuildUtils =
         equalsIgnoreCase compileAfterItemType itemType
 
     let (|CompileBefore|_|) itemType =
-        if isCompileBefore itemType then Some () else None
+        if isCompileBefore itemType then someUnit else None
 
     let (|CompileAfter|_|) itemType =
-        if isCompileAfter itemType then Some () else None
+        if isCompileAfter itemType then someUnit else None
 
     let (|Folder|_|) (itemType: string) =
-        if equalsIgnoreCase folderItemType itemType then Some () else None
+        if equalsIgnoreCase folderItemType itemType then someUnit else None
 
     let (|BuildAction|) itemType =
         BuildAction.GetOrCreate(itemType)
@@ -210,10 +210,10 @@ module rec FSharpMsBuildUtils =
         RdItem (item.ItemType, item.EvaluatedInclude)
 
     let (|SourceFile|_|) (buildAction: BuildAction) =
-        if buildAction.IsCompile() || buildAction = compileBefore || buildAction = compileAfter then Some () else None
+        if buildAction.IsCompile() || buildAction = compileBefore || buildAction = compileAfter then someUnit else None
 
     let (|Resource|_|) buildAction =
-        if buildAction = BuildAction.RESOURCE then Some () else None
+        if buildAction = BuildAction.RESOURCE then someUnit else None
 
     let changesOrder = function
         | CompileBefore | CompileAfter -> true
@@ -221,3 +221,5 @@ module rec FSharpMsBuildUtils =
 
     type BuildAction with
         member x.ChangesOrder = changesOrder x.Value
+
+    let someUnit = Some ()
