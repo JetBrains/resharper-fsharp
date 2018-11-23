@@ -333,6 +333,7 @@ type FSharpTypingAssist
         let textControl = context.TextControl
 
         if this.HandlerEnterInTripleQuotedString(textControl) then true else
+        if this.HandleEnterInLineComment(textControl) then true else
         if this.HandleEnterAddIndent(textControl) then true else
         if this.HandleEnterInApp(textControl) then true else
         if this.HandleEnterBeforeDot(textControl) then true else
@@ -392,6 +393,10 @@ type FSharpTypingAssist
         | Some (_, (Source indent | Comments indent)) ->
             insertNewLineAt textControl caretOffset indent TrimTrailingSpaces.No
 
+    member x.HandleEnterInLineComment(textControl) =
+        x.DoHandleEnterInLineCommentPressed
+            (textControl, "//", "///", fun tokenType -> tokenType == FSharpTokenType.LINE_COMMENT)
+    
     member x.HandleEnterFindLeftBracket(textControl) =
         let mutable lexer = Unchecked.defaultof<_>
 
