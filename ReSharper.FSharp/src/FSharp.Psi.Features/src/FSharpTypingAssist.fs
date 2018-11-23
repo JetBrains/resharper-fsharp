@@ -474,6 +474,7 @@ type FSharpTypingAssist
         | _ ->
 
         if x.DeindentAfterUnfinishedExpr(textControl, lexer, offset) then true else
+        if x.IndentAfterRArrow(textControl, lexer, offset) then true else
 
         let indentSize =
             let defaultIndent = getIndentSize textControl
@@ -489,14 +490,12 @@ type FSharpTypingAssist
 
     member x.DeindentAfterUnfinishedExpr(textControl: ITextControl, lexer: CachingLexer, offset) =
         let mutable expectedToken = null 
-        match tryDeindentTokens.TryGetValue(lexer.TokenType, &expectedToken) with
-        | false -> false
-        | true ->
+        if not (tryDeindentTokens.TryGetValue(lexer.TokenType, &expectedToken)) then false else
 
         let prevTokenEnd =
             use cookie = LexerStateCookie.Create(lexer)
             lexer.Advance(-1)
-            while lexer.TokenType == FSharpTokenType.WHITESPACE do
+            while isIgnored lexer.TokenType do
                 lexer.Advance(-1)
             lexer.TokenEnd
 
@@ -515,7 +514,7 @@ type FSharpTypingAssist
 
                     // while expr do {caret}
                     | SynExpr.While (_, expr, SynExpr.ArbitraryAfterError _, _) when
-                            document.GetTreeEndOffset(expr.Range).Offset = prevTokenEnd ->
+                            document.GetEndOffset(expr.Range) = prevTokenEnd ->
                         Some expr
 
                     | _ -> defaultTraverse expr }
@@ -525,7 +524,7 @@ type FSharpTypingAssist
         | Some expr ->
 
         use cookie = LexerStateCookie.Create(lexer)
-        let exprStart = document.GetTreeStartOffset(expr.Range).Offset
+        let exprStart = document.GetStartOffset(expr.Range)
         if exprStart <= 0 || not (lexer.FindTokenAt(exprStart - 1)) then false else
 
         while lexer.TokenType == FSharpTokenType.WHITESPACE do
@@ -539,6 +538,53 @@ type FSharpTypingAssist
             offsetInLine + getIndentSize textControl
 
         insertNewLineAt textControl offset indent TrimTrailingSpaces.Yes        
+
+    member x.IndentAfterRArrow(textControl: ITextControl, lexer: CachingLexer, offset) =
+        if lexer.TokenType != FSharpTokenType.RARROW then false else
+
+        let prevTokenEnd =
+            use cookie = LexerStateCookie.Create(lexer)
+            lexer.Advance(-1)
+            while isIgnored lexer.TokenType do
+                lexer.Advance(-1)
+            lexer.TokenEnd
+
+        match x.GetFSharpTree(textControl) with
+        | None -> false
+        | Some parseTree ->
+
+        let document = textControl.Document
+        let visitor =
+            { new AstVisitorBase<_>() with
+                member x.VisitMatchClause(defaultTraverse, (SynMatchClause.Clause (pat, whenExpr, _, _, _) as mc)) =
+                    match pat, whenExpr with
+                    | _, Some expr when document.GetEndOffset(expr.Range) <> prevTokenEnd -> defaultTraverse mc
+                    | path, None when document.GetEndOffset(pat.Range) <> prevTokenEnd -> defaultTraverse mc
+                    | _ -> Some mc
+
+                member x.VisitExpr(path, _, defaultTraverse, expr) =
+                    defaultTraverse expr }
+
+        match Traverse(document.GetCoordsByOffset(lexer.TokenStart).GetPos(), parseTree, visitor) with
+        | None -> false
+        | Some (SynMatchClause.Clause (_, _, _, range, _)) ->
+
+        use cookie = LexerStateCookie.Create(lexer)
+
+        if not (lexer.FindTokenAt(document.GetStartOffset(range))) then false else
+
+        lexer.Advance(-1)
+        while isIgnored lexer.TokenType do
+            lexer.Advance(-1)
+
+        if lexer.TokenType != FSharpTokenType.BAR then false else
+
+        let indent =
+            let tokenLine = document.GetCoordsByOffset(lexer.TokenStart).Line
+            let offsetInLine = getOffsetInLine document tokenLine lexer.TokenStart
+            offsetInLine + getIndentSize textControl
+
+        insertNewLineAt textControl offset indent TrimTrailingSpaces.Yes
 
     member x.HandleEnterInsideSingleLineBrackets(textControl: ITextControl, lexer: CachingLexer, line) =
         use cookie = LexerStateCookie.Create(lexer)
@@ -761,10 +807,9 @@ type FSharpTypingAssist
                     | SynExpr.FromParseError _ -> foundError <- true
                     | _ -> ()
 
-                    match document.GetTreeEndOffset(expr.Range).Offset with
+                    match document.GetEndOffset(expr.Range) with
                     | offset when offset = opEndOffset ||
-                                  prevEndOffset.IsSome && offset = prevEndOffset.Value ->
-                        Some expr
+                                  prevEndOffset.IsSome && offset = prevEndOffset.Value -> Some expr
                     | _ -> defaultTraverse expr }
 
         let tokenCoords = document.GetCoordsByOffset(lexer.TokenStart)
