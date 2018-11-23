@@ -363,7 +363,7 @@ type FSharpTypingAssist
         manager.AddActionHandler(lifetime, TextControlActions.BACKSPACE_ACTION_ID, this, Func<_,_>(this.HandleBackspacePressed), isActionHandlerAvailable)
         manager.AddTypingHandler(lifetime, ' ', this, Func<_,_>(handleSpace), isTypingHandlerAvailable)
 
-        manager.AddTypingHandler(lifetime, '\'', this, Func<_,_>(this.HandleQuoteTyped), isTypingHandlerAvailable)
+        manager.AddTypingHandler(lifetime, '\'', this, Func<_,_>(this.HandleSingleQuoteTyped), isTypingHandlerAvailable)
         manager.AddTypingHandler(lifetime, '"', this, Func<_,_>(this.HandleQuoteTyped), isTypingHandlerAvailable)
 
         manager.AddTypingHandler(lifetime, '(', this, Func<_,_>(this.HandleLeftBracket), isTypingHandlerAvailable)
@@ -858,6 +858,12 @@ type FSharpTypingAssist
         x.NeedSkipCloseBracket(textControl, lexer, charTyped, bracketTypesForRightBracketChar,
             (fun _ _ -> false),
             (fun _ -> FSharpSkipPairBracketsMatcher() :> _))
+
+    member x.HandleSingleQuoteTyped(context: ITypingContext) =
+        if context.EnsureWritable() <> EnsureWritableResult.SUCCESS then false else
+        if context.TextControl.Selection.OneDocRangeWithCaret().Length > 0 then false else
+
+        x.SkipQuote(context.TextControl, context.Char)
 
     member x.HandleQuoteTyped(context: ITypingContext) =
         let textControl = context.TextControl

@@ -1,4 +1,4 @@
-﻿// ${CHAR:'}
+﻿// ${CHAR:"}
 module Module
 
-let foo = string('{caret}')
+let foo = string("{caret}")
