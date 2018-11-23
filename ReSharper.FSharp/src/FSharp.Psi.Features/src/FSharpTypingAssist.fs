@@ -335,9 +335,9 @@ type FSharpTypingAssist
         if this.HandlerEnterInTripleQuotedString(textControl) then true else
         if this.HandleEnterInLineComment(textControl) then true else
         if this.HandleEnterAddIndent(textControl) then true else
+        if this.HandleEnterAfterErrorAndInfixOp(textControl) then true else
         if this.HandleEnterInApp(textControl) then true else
         if this.HandleEnterBeforeDot(textControl) then true else
-        if this.HandleEnterAfterInfixOp(textControl) then true else
         if this.HandleEnterFindLeftBracket(textControl) then true else
         if this.HandleEnterAddBiggerIndentFromBelow(textControl) then true else
 
@@ -574,10 +574,9 @@ type FSharpTypingAssist
 
                 lexer.FindTokenAt(offset) &&
                 let tokenType = lexer.TokenType
-                (tokenType == FSharpTokenType.WHITESPACE || tokenType == FSharpTokenType.LPAREN)) then false else
+                (isNotNull tokenType && tokenType.IsWhitespace || tokenType == FSharpTokenType.LPAREN)) then false else
 
         lexer.FindTokenAt(offset - 1) |> ignore
-        if isLastTokenOnLine lexer then false else 
 
         let isAfterInfixOp =
             use cookie = LexerStateCookie.Create(lexer)
@@ -661,7 +660,7 @@ type FSharpTypingAssist
 
         insertNewLineAt textControl offset indent TrimTrailingSpaces.Yes
 
-    member x.HandleEnterAfterInfixOp(textControl: ITextControl) =
+    member x.HandleEnterAfterErrorAndInfixOp(textControl: ITextControl) =
         let mutable lexer = Unchecked.defaultof<_>
         let offset = textControl.Caret.Offset()
         if offset <= 0 then false else
