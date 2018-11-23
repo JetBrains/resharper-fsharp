@@ -1,0 +1,7 @@
+﻿// ${CHAR:Enter} 
+module Module
+
+do
+   if true &&
+       false then
+     {caret}

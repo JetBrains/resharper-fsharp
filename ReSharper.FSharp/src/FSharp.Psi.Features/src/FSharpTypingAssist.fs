@@ -457,7 +457,7 @@ type FSharpTypingAssist
         let tokenType = lexer.TokenType
 
         let document = textControl.Document
-        let caretOffset = textControl.Caret.Offset()
+        let offset = textControl.Caret.Offset()
         let line = document.GetCoordsByOffset(tokenStart).Line
 
         if x.HandleEnterInsideSingleLineBrackets(textControl, lexer, line) then true else
@@ -467,11 +467,13 @@ type FSharpTypingAssist
 
         match tryGetNestedIndentBelowLine cachingLexerService textControl line with
         | Some (nestedIndentLine, (Source indent | Comments indent)) ->
-            let caretLine = document.GetCoordsByOffset(caretOffset).Line
+            let caretLine = document.GetCoordsByOffset(offset).Line
             if nestedIndentLine = caretLine then false else
 
-            insertNewLineAt textControl caretOffset indent TrimTrailingSpaces.Yes
+            insertNewLineAt textControl offset indent TrimTrailingSpaces.Yes
         | _ ->
+
+        if x.DeindentAfterUnfinishedExpr(textControl, lexer, offset) then true else
 
         let indentSize =
             let defaultIndent = getIndentSize textControl
@@ -483,7 +485,60 @@ type FSharpTypingAssist
                 getLineWhitespaceIndent textControl line
             prevIndentSize + defaultIndent
 
-        insertNewLineAt textControl caretOffset indentSize TrimTrailingSpaces.Yes
+        insertNewLineAt textControl offset indentSize TrimTrailingSpaces.Yes
+
+    member x.DeindentAfterUnfinishedExpr(textControl: ITextControl, lexer: CachingLexer, offset) =
+        let mutable expectedToken = null 
+        match tryDeindentTokens.TryGetValue(lexer.TokenType, &expectedToken) with
+        | false -> false
+        | true ->
+
+        let prevTokenEnd =
+            use cookie = LexerStateCookie.Create(lexer)
+            lexer.Advance(-1)
+            while lexer.TokenType == FSharpTokenType.WHITESPACE do
+                lexer.Advance(-1)
+            lexer.TokenEnd
+
+        match x.GetFSharpTree(textControl) with
+        | None -> false
+        | Some parseTree ->
+
+        let document = textControl.Document
+        let visitor =
+            { new AstVisitorBase<_>() with
+                member x.VisitExpr(path, _, defaultTraverse, expr) =
+                    match expr with
+
+                    // if expr then {caret}
+                    | SynExpr.FromParseError (expr, _)
+
+                    // while expr do {caret}
+                    | SynExpr.While (_, expr, SynExpr.ArbitraryAfterError _, _) when
+                            document.GetTreeEndOffset(expr.Range).Offset = prevTokenEnd ->
+                        Some expr
+
+                    | _ -> defaultTraverse expr }
+
+        match Traverse(document.GetCoordsByOffset(lexer.TokenStart).GetPos(), parseTree, visitor) with
+        | None -> false
+        | Some expr ->
+
+        use cookie = LexerStateCookie.Create(lexer)
+        let exprStart = document.GetTreeStartOffset(expr.Range).Offset
+        if exprStart <= 0 || not (lexer.FindTokenAt(exprStart - 1)) then false else
+
+        while lexer.TokenType == FSharpTokenType.WHITESPACE do
+            lexer.Advance(-1)
+
+        if lexer.TokenType != expectedToken then false else
+
+        let indent =
+            let tokenLine = document.GetCoordsByOffset(lexer.TokenStart).Line
+            let offsetInLine = getOffsetInLine document tokenLine lexer.TokenStart
+            offsetInLine + getIndentSize textControl
+
+        insertNewLineAt textControl offset indent TrimTrailingSpaces.Yes        
 
     member x.HandleEnterInsideSingleLineBrackets(textControl: ITextControl, lexer: CachingLexer, line) =
         use cookie = LexerStateCookie.Create(lexer)
@@ -598,11 +653,7 @@ type FSharpTypingAssist
         let lineStart = document.GetLineStartOffset(caretLine)
         if document.GetText(TextRange(lineStart, offset)).IsWhitespace() then false else
 
-        match x.CommitPsiOnlyAndProceedWithDirtyCaches(textControl, id).AsFSharpFile() with
-        | null -> false
-        | fsFile ->
-
-        match fsFile.ParseTree with
+        match x.GetFSharpTree(textControl) with
         | None -> false
         | Some parseTree ->
 
@@ -697,11 +748,7 @@ type FSharpTypingAssist
         let caretCoords = document.GetCoordsByOffset(offset)
         let caretLine = caretCoords.Line
 
-        match x.CommitPsiOnlyAndProceedWithDirtyCaches(textControl, id).AsFSharpFile() with
-        | null -> false
-        | fsFile ->
-
-        match fsFile.ParseTree with
+        match x.GetFSharpTree(textControl) with
         | None -> false
         | Some parseTree ->
 
@@ -758,11 +805,7 @@ type FSharpTypingAssist
         if lexer.TokenType != FSharpTokenType.DOT then false else
         let dotOffset = lexer.TokenStart
 
-        match x.CommitPsiOnlyAndProceedWithDirtyCaches(textControl, id).AsFSharpFile() with
-        | null -> false
-        | fsFile ->
-
-        match fsFile.ParseTree with
+        match x.GetFSharpTree(textControl) with
         | None -> false
         | Some parseTree ->
 
@@ -1018,6 +1061,11 @@ type FSharpTypingAssist
     member x.IsActionHandlerAvailabile2(context) = base.IsActionHandlerAvailabile(context)
     member x.IsTypingHandlerAvailable2(context) = base.IsTypingHandlerAvailable(context)
 
+    member x.GetFSharpTree(textControl: ITextControl) =
+        match x.CommitPsiOnlyAndProceedWithDirtyCaches(textControl, id).AsFSharpFile() with
+        | null -> None
+        | fsFile -> fsFile.ParseTree
+
     override x.IsSupported(textControl: ITextControl) =
         match textControl.Document.GetPsiSourceFile(x.Solution) with
         | null -> false
@@ -1162,6 +1210,12 @@ let isSingleLineBrackets (lexer: CachingLexer) (document: IDocument) =
     if not (findRightBracket lexer) then false else
 
     document.GetCoordsByOffset(lexer.TokenStart).Line = startLine
+
+
+let tryDeindentTokens: IDictionary<_,_> =
+    [| FSharpTokenType.THEN, FSharpTokenType.IF
+       FSharpTokenType.DO,   FSharpTokenType.WHILE |]
+    |> dict
 
 
 let shouldTrimSpacesBeforeToken (tokenType: TokenNodeType) =
