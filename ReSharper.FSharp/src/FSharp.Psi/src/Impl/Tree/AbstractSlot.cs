@@ -8,7 +8,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class AbstractSlot
   {
-    public override string DeclaredName => FSharpImplUtil.GetCompiledName(Identifier, Attributes);
+    public override string DeclaredName => Identifier.GetCompiledName(Attributes);
 
     public override TreeTextRange GetNameRange()
     {
@@ -20,7 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (!(GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv)) return null;
 
       // todo: remove this and provide API in FCS and cache it somehow
-      var hasDefault = mfv.EnclosingEntity?.Value.MembersFunctionsAndValues.Any(m =>
+      var hasDefault = mfv.DeclaringEntity?.Value.MembersFunctionsAndValues.Any(m =>
                          m.IsOverrideOrExplicitInterfaceImplementation &&
                          mfv.LogicalName == m.LogicalName) ?? false;
       if (hasDefault)

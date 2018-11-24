@@ -74,6 +74,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         NAMESPACE,
         MODULE,
         NEW,
+        HASH,
         OTHER_KEYWORD);
 
       Identifiers = new NodeTypeSet(

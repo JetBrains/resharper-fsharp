@@ -1,6 +1,7 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
 open System
+open System.Collections.Generic
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
@@ -10,15 +11,31 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.TreeBuilder
+open JetBrains.Util
 open JetBrains.Util.dataStructures.TypedIntrinsics
 open Microsoft.FSharp.Compiler
 open Microsoft.FSharp.Compiler.Ast
+open Microsoft.FSharp.Compiler.PrettyNaming
 
 [<AbstractClass>]
 type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as this =
     inherit TreeStructureBuilderBase(lifetime)
 
     let document = file.Document
+
+    let rec (|Apps|_|) = function
+        | SynExpr.App(_, true, expr, Apps ((cur, next: List<_>) as acc), _)
+        | SynExpr.App(_, false, Apps ((cur, next) as acc), expr, _) ->
+            next.Add(expr)
+            Some acc
+
+        | SynExpr.App(_, true, second, first, _) 
+        | SynExpr.App(_, false, first, second, _) ->
+            let list = List()
+            list.Add(second)
+            Some (first, list)
+
+        | _ -> None
 
     abstract member CreateFSharpFile: unit -> IFSharpFile
 
@@ -27,6 +44,8 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
     member internal x.GetEndOffset (range: Range.range) = x.GetLineOffset(range.EndLine) + range.EndColumn
     member internal x.GetStartOffset (id: Ident) = x.GetStartOffset(id.idRange)
     member internal x.Eof = x.Builder.Eof()
+
+    member val TypeExtensionsOffsets = OneToListMap<string, int>()
 
     member internal x.AdvanceToOffset offset =
         while x.Builder.GetTokenOffset() < offset && not x.Eof do x.Builder.AdvanceLexer() |> ignore
@@ -52,7 +71,9 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
     member internal x.FinishFile(mark, fileType) =
         while not x.Eof do x.Builder.AdvanceLexer() |> ignore
         x.Done(mark, fileType)
-        x.GetTree() :> ICompositeElement :?> IFSharpFile
+        let fsFile = x.GetTree() :> ICompositeElement :?> IFSharpFile
+        fsFile.TypeExtensionsOffsets <- x.TypeExtensionsOffsets
+        fsFile
 
     member internal x.StartTopLevelDeclaration (lid: LongIdent) (attrs: SynAttributes) isModule (range: Range.range) =
         match lid.IsEmpty, isModule with
@@ -113,16 +134,14 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
             x.ProcessIdentifier id
         mark
 
-    member internal x.ProcessException (SynExceptionDefnRepr(_,UnionCase(_,id,unionCaseType,_,_,_),_,_,_,range)) =
+    member internal x.StartException (SynExceptionDefnRepr(_,UnionCase(_,id,unionCaseType,_,_,_),_,_,_,range)) =
         range |> x.GetStartOffset |> x.AdvanceToOffset
         let mark = x.Builder.Mark()
         x.Builder.AdvanceLexer() |> ignore // skip keyword
         x.ProcessModifiersBeforeOffset(x.GetStartOffset id)
         x.ProcessIdentifier(id)
         x.ProcessUnionCaseType(unionCaseType) |> ignore
-
-        range |> x.GetEndOffset |> x.AdvanceToOffset
-        x.Builder.Done(mark, ElementType.EXCEPTION_DECLARATION, null)
+        mark
 
     member internal x.ProcessModifiersBeforeOffset (endOffset: int) =
         let mark = x.Builder.Mark()
@@ -254,10 +273,12 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
 
     member internal x.ProcessSimplePattern (pat: SynSimplePat) =
         match pat with
-        | SynSimplePat.Id(id,_,_,_,_,_) ->
-            x.ProcessLocalId id
-        | SynSimplePat.Typed(SynSimplePat.Id(id,_,_,_,_,_),t,_) ->
-            x.ProcessLocalId id
+        | SynSimplePat.Id(id,_,isCompilerGenerated,_,_,_) ->
+            if not isCompilerGenerated then
+                x.ProcessLocalId id
+        | SynSimplePat.Typed(SynSimplePat.Id(id,_,isCompilerGenerated,_,_,_),t,_) ->
+            if not isCompilerGenerated then
+                x.ProcessLocalId id
             x.ProcessSynType t
         | _ -> ()
 
@@ -432,8 +453,11 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
         | SynPat.LongIdent(lidWithDots,_,_,patParams,_,range) ->
             match lidWithDots.Lid with
             | [] -> ()
-            | [id] when id.idText.Equals("op_ColonColon", StringComparison.Ordinal) -> ()
-            | lid -> for id in lid do x.ProcessLocalId id
+            | [id] when id.idText = "op_ColonColon" -> ()
+            | lid ->
+                for id in lid do
+                    let isActivePattern = IsActivePatternName id.idText 
+                    if isActivePattern then x.ProcessActivePatternId id else x.ProcessLocalId id
             x.ProcessLocalParams patParams
         | SynPat.Named(pat,id,_,_,_) ->
             x.ProcessLocalPat pat
@@ -462,6 +486,9 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
             x.ProcessSynType t
         | SynPat.Attrib(pat,_,_) ->
             x.ProcessLocalPat pat
+        | SynPat.Record(pats,_) ->
+            for (_, pat) in pats do
+                x.ProcessLocalPat(pat)
         | _ -> ()
 
     member internal x.ProcessLocalBinding (Binding(_,_,_,_,_,_,_,headPat,_,expr,_,_)) =
@@ -614,10 +641,6 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
         | SynExpr.Assert(expr,_) ->
             x.ProcessLocalExpression expr
 
-        | SynExpr.App(_,_,funExpr,argExpr,_) ->
-            x.ProcessLocalExpression funExpr
-            x.ProcessLocalExpression argExpr
-
         | SynExpr.TypeApp(expr,lt,typeArgs,_,rt,_,r) ->
             x.ProcessLocalExpression expr
             lt|> x.GetStartOffset |> x.AdvanceToOffset
@@ -642,10 +665,6 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
 
         | SynExpr.Lazy(expr,_) -> x.ProcessLocalExpression expr
 
-        | SynExpr.Sequential(_,_,expr1,expr2,_) ->
-            x.ProcessLocalExpression expr1
-            x.ProcessLocalExpression expr2
-
         | SynExpr.IfThenElse(ifExpr,thenExpr,elseExprOpt,_,_,_,_) ->
             x.ProcessLocalExpression ifExpr
             x.ProcessLocalExpression thenExpr
@@ -653,22 +672,32 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
                 x.ProcessLocalExpression elseExprOpt.Value
 
         | SynExpr.Ident(_)
-        | SynExpr.LongIdent(_)
-
-
-        | SynExpr.NamedIndexedPropertySet(_)
-        | SynExpr.DotNamedIndexedPropertySet(_) -> ()
-
+        | SynExpr.LongIdent(_) -> ()
 
         | SynExpr.LongIdentSet(_,expr,_)
-        | SynExpr.DotGet(expr,_,_,_)
-        | SynExpr.DotSet(_,_,expr,_) ->
+        | SynExpr.DotGet(expr,_,_,_) ->
             x.ProcessLocalExpression expr
 
-        | SynExpr.DotIndexedGet(expr,_,_,_) -> () // todo
+        | SynExpr.NamedIndexedPropertySet(_,expr1,expr2,_)
+        | SynExpr.DotSet(expr1,_,expr2,_) ->
+            x.ProcessLocalExpression expr1
+            x.ProcessLocalExpression expr2
 
-        | SynExpr.DotIndexedSet(_) -> ()
+        | SynExpr.DotNamedIndexedPropertySet(expr1,_,expr2,expr3,_) ->
+            x.ProcessLocalExpression expr1
+            x.ProcessLocalExpression expr2
+            x.ProcessLocalExpression expr3
 
+        | SynExpr.DotIndexedGet(expr,indexerArgs,_,_) ->
+            x.ProcessLocalExpression expr
+            for arg in indexerArgs do
+                x.ProcessIndexerArg(arg)
+
+        | SynExpr.DotIndexedSet(expr1,indexerArgs,expr2,_,_,_) ->
+            x.ProcessLocalExpression expr1
+            for arg in indexerArgs do
+                x.ProcessIndexerArg(arg)
+            x.ProcessLocalExpression expr2
 
         | SynExpr.TypeTest(expr,t,_)
         | SynExpr.Upcast(expr,t,_)
@@ -715,6 +744,21 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime) as thi
 
         | SynExpr.Fixed(expr,_) ->
             x.ProcessLocalExpression expr
+
+        | SynExpr.Sequential(_,_,expr1,expr2,_) ->
+            x.ProcessLocalExpression expr1
+            x.ProcessLocalExpression expr2
+
+        | Apps (first, next) ->
+            x.ProcessLocalExpression(first)
+            for expr in next do
+                x.ProcessLocalExpression(expr)
+
+        | _ -> ()
+
+    member x.ProcessIndexerArg arg =
+        for expr in arg.Exprs do
+            x.ProcessLocalExpression(expr)
 
     override val Builder = PsiBuilder(lexer, ElementType.F_SHARP_IMPL_FILE, this, lifetime)
     override val NewLine = FSharpTokenType.NEW_LINE

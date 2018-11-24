@@ -31,28 +31,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return ids.IsEmpty ? TreeTextRange.InvalidRange : ids.Last().GetTreeTextRange();
     }
 
-    [CanBeNull]
-    public static ITokenNode GetNameToken([CanBeNull] this ILongIdentifier longIdentifier)
-    {
-      if (longIdentifier == null) return null;
-
-      var ids = longIdentifier.Identifiers;
-      return ids.IsEmpty ? null : ids.Last();
-    }
-
     public static bool ShortNameEquals([NotNull] this IFSharpAttribute attr, [NotNull] string shortName) =>
-      attr.LongIdentifier?.Name.GetAttributeShortName()?.Equals(shortName, StringComparison.Ordinal) ?? false;
-
-    public static bool HasCompiledNameAttr(TreeNodeCollection<IFSharpAttribute> attributes)
-    {
-      foreach (var attr in attributes)
-        if (attr.ShortNameEquals("CompiledName") && attr.ArgExpression.String != null)
-          return true;
-      return false;
-    }
+      attr.LongIdentifier?.Name.GetAttributeShortName() == shortName;
 
     [NotNull]
-    public static string GetCompiledName([CanBeNull] IIdentifier identifier,
+    public static string GetCompiledName([CanBeNull] this IIdentifier identifier,
       TreeNodeCollection<IFSharpAttribute> attributes)
     {
       var hasModuleSuffix = false;
@@ -70,7 +53,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
         if (hasModuleSuffix || !attr.ShortNameEquals("CompilationRepresentation")) continue;
         var arg = attr.ArgExpression.LongIdentifier?.QualifiedName;
-        if (arg != null && arg.Equals("CompilationRepresentationFlags.ModuleSuffix", StringComparison.Ordinal))
+        if (arg != null && arg == "CompilationRepresentationFlags.ModuleSuffix")
           hasModuleSuffix = true;
       }
       var sourceName = identifier?.Name;
@@ -79,7 +62,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     [NotNull]
-    public static string GetSourceName([CanBeNull] IIdentifier identifier)
+    public static string GetSourceName([CanBeNull] this IIdentifier identifier)
     {
       return identifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
     }
@@ -108,7 +91,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     [NotNull]
-    public static string MakeClrName([NotNull] IFSharpTypeElementDeclaration declaration)
+    public static string MakeClrName([NotNull] this IFSharpTypeElementDeclaration declaration)
     {
       var clrName = new StringBuilder();
 
@@ -154,16 +137,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return SharedImplUtil.MISSING_DECLARATION_NAME;
     }
 
-    public static FSharpFileKind GetFSharpFileKind([NotNull] this IPsiSourceFile sourceFile)
+    public static FSharpFileKind GetFSharpFileKind([CanBeNull] this IPsiSourceFile sourceFile)
     {
-      var fileExtension = sourceFile.GetLocation().ExtensionNoDot;
-      if (fileExtension == "fs" || fileExtension == "ml") return FSharpFileKind.ImplFile;
-      if (fileExtension == "fsi" || fileExtension == "mli") return FSharpFileKind.SigFile;
-      throw new ArgumentOutOfRangeException();
+      var fileExtension = sourceFile?.GetLocation().ExtensionNoDot;
+      if (fileExtension == "fsi" || fileExtension == "mli")
+          return FSharpFileKind.SigFile;
+
+      return FSharpFileKind.ImplFile;
     }
 
     [CanBeNull]
-    internal static IDeclaredElement GetActivePatternByIndex(IDeclaration declaration, int index)
+    internal static IDeclaredElement GetActivePatternByIndex(this IDeclaration declaration, int index)
     {
       var letDecl = declaration as Let;
       var cases = letDecl?.Identifier.Children<ActivePatternCaseDeclaration>().AsIList();
@@ -171,7 +155,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     [NotNull]
-    public static string GetNestedModuleShortName(INestedModuleDeclaration declaration, ICacheBuilder cacheBuilder)
+    public static string GetNestedModuleShortName(this INestedModuleDeclaration declaration, ICacheBuilder cacheBuilder)
     {
       var parent = declaration.Parent as IModuleLikeDeclaration;
       var shortName = declaration.ShortName;

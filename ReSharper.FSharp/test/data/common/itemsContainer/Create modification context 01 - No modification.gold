@@ -1,0 +1,20 @@
+﻿Project
+1:File1
+2:File2
+3:File3
+
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/File2
+C:/Solution/Project/File3
+
+
+File1 Before File1 -> Before File2
+File1 After File1 -> Before File2
+
+File2 Before File2 -> After File1
+File2 After File2 -> Before File3
+
+File3 Before File3 -> After File2
+File3 After File3 -> After File2
+

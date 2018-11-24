@@ -25,9 +25,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public virtual IEnumerable<ITypeMember> GetTypeMembers()
     {
+      var declaration = GetDeclaration();
+      if (declaration == null)
+        return EmptyList<ITypeMember>.Instance;
+
       // todo: ask members from FCS and check `IsCompilerGenerated`
-      return GetDeclaration()?.MemberDeclarations.Select(d => d.DeclaredElement).WhereNotNull() ??
-             EmptyList<ITypeMember>.InstanceList;
+      var result = new List<ITypeMember>(declaration.MemberDeclarations.Select(d => d.DeclaredElement).WhereNotNull());
+
+      var fsFile = declaration.GetContainingNode<IFSharpFile>().NotNull();
+      foreach (var typeExtension in fsFile.GetTypeExtensions(ShortName))
+        result.AddRange(typeExtension.TypeMembers.Select(d => d.DeclaredElement).WhereNotNull());
+
+      return result;
     }
 
     public virtual IEnumerable<IDeclaredType> GetSuperTypes()

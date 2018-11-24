@@ -44,7 +44,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         if (ids.IsEmpty) continue;
 
         var attributeShortName = ids.Last().GetText().GetAttributeShortName();
-        if (attributeShortName.Equals(AbstractClass, StringComparison.Ordinal))
+        if (attributeShortName == AbstractClass)
         {
           decoration.Modifiers |= Modifiers.ABSTRACT;
           break;

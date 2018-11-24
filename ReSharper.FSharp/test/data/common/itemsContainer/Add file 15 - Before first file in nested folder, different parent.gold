@@ -1,0 +1,49 @@
+﻿Project
+1:File1
+2:File2
+3:Folder[1]
+  1:File3
+  2:Subfolder[1]
+    1:File4
+  3:File5
+4:File6
+
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/File2
+C:/Solution/Project/Folder/File3
+C:/Solution/Project/Folder/Subfolder/File4
+C:/Solution/Project/Folder/File5
+C:/Solution/Project/File6
+
+
+=======
+Add 'Another/Subfolder/File7' Before 'Folder/Subfolder/File4'
+Refresh whole project
+Update view File6
+Update view Folder[2]
+
+Project
+1:File1
+2:File2
+3:Folder[1]
+  1:File3
+4:Another[1]
+  1:Subfolder[1]
+    1:File7
+5:Folder[2]
+  1:Subfolder[1]
+    1:File4
+  2:File5
+6:File6
+
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/File2
+C:/Solution/Project/Folder/File3
+C:/Solution/Project/Another/Subfolder/File7
+C:/Solution/Project/Folder/Subfolder/File4
+C:/Solution/Project/Folder/File5
+C:/Solution/Project/File6
+
+

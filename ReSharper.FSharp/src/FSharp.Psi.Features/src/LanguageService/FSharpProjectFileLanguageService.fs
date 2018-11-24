@@ -4,6 +4,7 @@ open System.Runtime.InteropServices
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Resources
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
+open JetBrains.ReSharper.Plugins.FSharp.Common.Util.FSharpMsBuildUtils
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -11,7 +12,8 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Psi
 
 [<ProjectFileType(typeof<FSharpProjectFileType>)>]
-type FSharpProjectFileLanguageService(projectFileType, fsCheckerService: FSharpCheckerService, fsFileService: IFSharpFileService) =
+type FSharpProjectFileLanguageService
+        (projectFileType, fsCheckerService: FSharpCheckerService, fsFileService: IFSharpFileService) =
     inherit ProjectFileLanguageService(projectFileType)
 
     override x.PsiLanguageType = FSharpLanguage.Instance :> _
@@ -22,8 +24,14 @@ type FSharpProjectFileLanguageService(projectFileType, fsCheckerService: FSharpC
         | null -> FSharpLanguage.Instance.LanguageService().GetPrimaryLexerFactory()
         | _ -> FSharpLexerFactory(sourceFile, fsCheckerService.GetDefines(sourceFile)) :> _
 
-    override x.GetPsiProperties(projectFile, sourceFile, _) =
-        let providesCodeModel = projectFile.Properties.BuildAction.IsCompile() || fsFileService.IsScript(sourceFile)
+    override x.GetPsiProperties(projectFile, sourceFile, isCompileService) =
+        let providesCodeModel =
+            // todo: use items container instead
+            isCompileService.IsCompile(projectFile, sourceFile) ||
+            fsFileService.IsScriptLike(sourceFile) ||
+
+            let buildAction = projectFile.Properties.GetBuildAction(sourceFile.PsiModule.TargetFrameworkId)
+            buildAction = BuildActions.compileBefore || buildAction = BuildActions.compileAfter
         FSharpPsiProperties(projectFile, sourceFile, providesCodeModel) :> _
 
 [<ProjectFileType(typeof<FSharpScriptProjectFileType>)>]

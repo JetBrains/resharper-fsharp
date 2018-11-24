@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
@@ -10,8 +11,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class MemberDeclaration : IFunctionDeclaration
   {
     IFunction IFunctionDeclaration.DeclaredElement => base.DeclaredElement as IFunction;
-    public override string DeclaredName => FSharpImplUtil.GetCompiledName(Identifier, Attributes);
-    public override string SourceName => FSharpImplUtil.GetSourceName(Identifier);
+    public override string DeclaredName => Identifier.GetCompiledName(Attributes);
+    public override string SourceName => Identifier.GetSourceName();
 
     public override TreeTextRange GetNameRange()
     {
@@ -34,10 +35,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
           : new FSharpProperty<MemberDeclaration>(this, property);
       }
 
+      var compiledName = mfv.CompiledName;
       var typeDeclaration = GetContainingTypeDeclaration() as IFSharpTypeDeclaration;
-      return !mfv.IsInstanceMember && mfv.CompiledName.StartsWith("op_", StringComparison.Ordinal)
-        ? (IDeclaredElement) new FSharpOperator<MemberDeclaration>(this, mfv, null)
-        : new FSharpMethod<MemberDeclaration>(this, mfv, typeDeclaration);
+      if (!mfv.IsInstanceMember && compiledName.StartsWith("op_", StringComparison.Ordinal))
+      {
+        switch (compiledName)
+        {
+          case StandardOperatorNames.Explicit:
+            return new FSharpConversionOperator<MemberDeclaration>(this, mfv, typeDeclaration, true);
+          case StandardOperatorNames.Implicit:
+            return new FSharpConversionOperator<MemberDeclaration>(this, mfv, typeDeclaration, false);
+        }
+
+        return new FSharpSignOperator<MemberDeclaration>(this, mfv, null);
+      }
+      return new FSharpMethod<MemberDeclaration>(this, mfv, typeDeclaration);
     }
   }
 }

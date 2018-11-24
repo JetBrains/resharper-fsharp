@@ -1,6 +1,0 @@
-ReSharper textControls:
-TextControl #1:
-program.fs
-Model id: ProjectModelElementId != 0, FilePath - editortest/program.fs
-Current caret: (7, 15)
-Current selection:  startPosition = (7, 15) endPosition = (7, 15)

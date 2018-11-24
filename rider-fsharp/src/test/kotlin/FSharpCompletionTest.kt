@@ -1,4 +1,3 @@
-import com.intellij.openapi.editor.impl.EditorImpl
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.test.CompletionTestBase
 import com.jetbrains.rider.test.framework.frameworkLogger
@@ -18,36 +17,33 @@ class FSharpCompletionTest : CompletionTestBase() {
     private val rdFcsHost get() = project.solution.fsharpCompilerServiceHost
     private var isFcsReady = false
 
+    @Test(enabled = false)
+    fun namespaceKeyword() = doTest("na")
+
+    @Test(enabled = false) // todo: remove static items in FCS basic completion
+    fun listModule() = doTest("Lis")
+
     @Test
-    fun basicCompletion() {
-        doTest {
-            isFcsReady = false
-            typeWithLatency("filt")
-            waitForFcs()
-            callBasicCompletion()
-            waitForCompletion()
-            completeWithTab()
-        }
-    }
+    fun listModuleValue() = doTest("filt")
 
     private fun waitForFcs() {
         waitAndPump(Lifetime.Eternal, { isFcsReady }, 60000)
     }
 
-    private fun doTest(test: EditorImpl.() -> Unit) {
-        val fileName = "Program.fs"
-
+    private fun doTest(typed: String) {
         rdFcsHost.projectChecked.advise(Lifetime.Eternal, { project ->
             isFcsReady = true
             frameworkLogger.info("FCS: $project checked")
         })
 
         isFcsReady = false
-
-        doTestWithDocuments {
-            withCaret(fileName, fileName) {
-                test()
-            }
+        dumpOpenedEditor("Program.fs", "Program.fs") {
+            isFcsReady = false
+            typeWithLatency(typed)
+            waitForFcs()
+            callBasicCompletion()
+            waitForCompletion()
+            completeWithTab()
         }
     }
 }

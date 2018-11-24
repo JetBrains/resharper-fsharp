@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.ContextActions
 open System
 open System.Diagnostics
 open System.Collections.Generic
+open System.Globalization
 open System.IO
 open System.Linq
 open System.Text
@@ -63,14 +64,18 @@ type FsiSessionsHost(lifetime: Lifetime, solution: ISolution, solutionModel: Sol
         let fsiPath =
             if PlatformUtil.IsRunningUnderWindows then
                 let fsiName = if useFsiAnyCpu then "fsiAnyCpu.exe" else "fsi.exe"
-                let programFilesPath = FileSystemPath.TryParse(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86))
-                let prefixPath = programFilesPath.Combine("Microsoft SDKs\\F#")
-                let fsharpDir =
-                    ["4.1"; "4.0"; "3.1"]
-                    |> List.map (fun v -> prefixPath.Combine(v).Combine("Framework\\v4.0"))
-                    |> List.tryFind (fun p -> p.ExistsDirectory)
-                    |> function | Some p -> p | _ -> FileSystemPath.Empty
-                fsharpDir.Combine(fsiName).FullPath
+                let programFilesPath =
+                    FileSystemPath.TryParse(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86))
+                programFilesPath.Combine("Microsoft SDKs/F#").GetChildDirectories()
+                |> Seq.choose (fun path ->
+                    match Double.TryParse(path.Name, NumberStyles.Any, CultureInfo.InvariantCulture) with
+                    | true, version ->
+                        let fsiPath = path.Combine("Framework/v4.0").Combine(fsiName)
+                        if not fsiPath.ExistsFile then None else
+                        Some (version, fsiPath.FullPath)
+                    | _ -> None)
+                |> Seq.maxBy fst
+                |> snd
             else
                 let fsiName = if useFsiAnyCpu then "fsharpiAnyCpu" else "fsharpi"
                 toolset.CurrentMonoRuntime.RootPath.Combine("bin").Combine(fsiName).FullPath

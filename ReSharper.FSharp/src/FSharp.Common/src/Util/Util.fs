@@ -1,13 +1,14 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Common.Util
 
 [<AutoOpen>]
-module CommonUtil =
+module rec CommonUtil =
     open System
     open System.Collections.Generic
     open System.Linq
     open System.Threading
     open JetBrains.Application
     open JetBrains.Application.Progress
+    open JetBrains.DataFlow
     open JetBrains.DocumentModel
     open JetBrains.ProjectModel
     open JetBrains.ProjectModel.ProjectsHost
@@ -17,6 +18,7 @@ module CommonUtil =
     open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
     open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties.FSharpProjectPropertiesFactory
     open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+    open JetBrains.ReSharper.Psi.Modules
     open JetBrains.Util
     open JetBrains.Util.dataStructures.TypedIntrinsics
     open Microsoft.FSharp.Compiler
@@ -33,7 +35,7 @@ module CommonUtil =
     let FsprojExtension = "fsproj"
 
     let isFSharpProject (guids: Guid seq) (projectFile: FileSystemPath) =
-        projectFile.ExtensionNoDot.Equals(FsprojExtension, StringComparison.OrdinalIgnoreCase) ||
+        equalsIgnoreCase FsprojExtension projectFile.ExtensionNoDot ||
         Seq.exists Factory.IsKnownProjectTypeGuid guids
 
     let (|FSharProjectMark|_|) (mark: IProjectMark) =
@@ -66,7 +68,7 @@ module CommonUtil =
                 let finished = task.Wait(interruptCheckTimeout, cancellationToken)
                 if not finished then
                     try interruptChecker.Invoke()
-                    with :? ProcessCancelledException ->
+                    with :? OperationCanceledException ->
                         cancellationTokenSource.Cancel()
                         reraise()
             task.Result
@@ -79,6 +81,9 @@ module CommonUtil =
     type ISet<'T> with
         member x.remove el = x.Remove el |> ignore
         member x.add el = x.Add el |> ignore
+
+    let fsExtensions = ["fs"; "fsi"; "ml"; "mli"; "fsx"; "fsscript"] |> Set.ofList
+    let dllExtensions = ["dll"; "exe"] |> Set.ofList
 
     let (|ImplFile|_|) (path: FileSystemPath) =
         match path.ExtensionNoDot with
@@ -113,3 +118,98 @@ module CommonUtil =
     type IProject with
         member x.IsFSharp =
             isFSharpProject x.ProjectProperties.ProjectTypeGuids x.ProjectFileLocation
+
+    let (|FSharpProject|_|) (projectModelElement: IProjectModelElement) =
+        match projectModelElement with
+        | :? IProject as project when project.IsFSharp -> Some project
+        | _ -> None
+
+    let tryGetValue (key: 'TKey) (dictionary: IDictionary<'TKey,'TValue>) =
+        let res = ref Unchecked.defaultof<'TValue>
+        match dictionary.TryGetValue(key, res), res with
+        | true, value -> Some !value
+        | _ -> None
+
+    let (|AddRemoveArgs|) (args: AddRemoveEventArgs<_>) =
+        args.Value
+
+    let (|KeyValuePair|) (pair: KeyValuePair<_,_>) =
+        pair.Key, pair.Value
+
+    let (|Pair|) (pair: Pair<_,_>) =
+        pair.First, pair.Second
+
+    let (|PsiModuleReference|) (ref: IPsiModuleReference) =
+        ref.Module
+
+    let (|ProjectFile|ProjectFolder|UnknownProjectItem|) (projectItem: IProjectItem) =
+        match projectItem with
+        | :? IProjectFile as file -> ProjectFile file
+        | :? IProjectFolder as folder -> ProjectFolder folder
+        | _ -> UnknownProjectItem
+
+    let equalsIgnoreCase other (string: string) =
+        string.Equals(other, StringComparison.OrdinalIgnoreCase)
+
+    let eq a b = a = b
+
+    let getCommonParent path1 path2 =
+        FileSystemPath.GetDeepestCommonParent(path1, path2)
+
+    let (|UnixSeparators|) (path: FileSystemPath) =
+        path.NormalizeSeparators(FileSystemPathEx.SeparatorStyle.Unix)
+
+    let setComparer =
+        { new IEqualityComparer<HashSet<_>> with
+            member this.Equals(x, y) = x.SetEquals(y)
+            member this.GetHashCode(x) = x.Count }
+
+[<AutoOpen>]
+module rec FSharpMsBuildUtils =
+    open BuildActions
+    open ItemTypes
+    open JetBrains.Platform.MsBuildHost.Models
+    open JetBrains.ProjectModel
+
+    module ItemTypes =
+        let [<Literal>] compileBeforeItemType = "CompileBefore"
+        let [<Literal>] compileAfterItemType = "CompileAfter"
+        let [<Literal>] folderItemType = "Folder"
+
+    module BuildActions =
+        let compileBefore = BuildAction.GetOrCreate(compileBeforeItemType)  
+        let compileAfter = BuildAction.GetOrCreate(compileAfterItemType)  
+
+    let isCompileBefore itemType =
+        equalsIgnoreCase compileBeforeItemType itemType
+
+    let isCompileAfter itemType =
+        equalsIgnoreCase compileAfterItemType itemType
+
+    let (|CompileBefore|_|) itemType =
+        if isCompileBefore itemType then Some () else None
+
+    let (|CompileAfter|_|) itemType =
+        if isCompileAfter itemType then Some () else None
+
+    let (|Folder|_|) (itemType: string) =
+        if equalsIgnoreCase folderItemType itemType then Some () else None
+
+    let (|BuildAction|) itemType =
+        BuildAction.GetOrCreate(itemType)
+
+    let (|RdItem|) (item: RdProjectItem) =
+        RdItem (item.ItemType, item.EvaluatedInclude)
+
+    let (|SourceFile|_|) (buildAction: BuildAction) =
+        if buildAction.IsCompile() || buildAction = compileBefore || buildAction = compileAfter then Some () else None
+
+    let (|Resource|_|) buildAction =
+        if buildAction = BuildAction.RESOURCE then Some () else None
+
+    let changesOrder = function
+        | CompileBefore | CompileAfter -> true
+        | _ -> false
+
+    type BuildAction with
+        member x.ChangesOrder() = changesOrder x.Value

@@ -34,7 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public IType Type => ReturnType;
     public abstract IType ReturnType { get; }
     public IList<IParameter> Parameters => EmptyList<IParameter>.Instance;
-    public bool IsRefReturn => false;
+    public ReferenceKind ReturnKind => ReferenceKind.VALUE;
 
     public bool IsAuto => false;
     public bool IsDefault => false;
@@ -42,5 +42,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public abstract bool IsWritable { get; }
     public IAccessor Getter => new ImplicitAccessor(this, AccessorKind.GETTER);
     public IAccessor Setter => IsWritable ? new ImplicitAccessor(this, AccessorKind.SETTER) : null;
+
+    public override bool IsMember => true;
   }
 }

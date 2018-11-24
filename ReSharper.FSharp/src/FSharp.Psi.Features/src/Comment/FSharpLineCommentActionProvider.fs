@@ -12,6 +12,8 @@ type FSharpLineCommentActionProvider() =
     override x.StartLineCommentMarker = "//"
     override x.IsNewLine(tokenType) = tokenType = FSharpTokenType.NEW_LINE
     override x.IsWhitespace(tokenType) = tokenType = FSharpTokenType.WHITESPACE
+    override x.ShouldInsertAtLineStart(settingsStore) = true
+    override x.ShouldInsertSpaceAtCommentStartAndEnd(settingsStore) = true
 
     override x.IsEndOfLineComment(tokenType, tokenText) =
         tokenType = FSharpTokenType.LINE_COMMENT &&

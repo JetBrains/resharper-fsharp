@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Checker;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -7,6 +8,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
@@ -97,6 +99,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public override void VisitExceptionDeclaration(IExceptionDeclaration decl)
     {
       Builder.StartPart(new ExceptionPart(decl, Builder));
+      ProcessTypeMembers(decl.MemberDeclarations);
       Builder.EndPart();
     }
 
@@ -163,6 +166,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       ProcessTypeMembers(decl.MemberDeclarations);
       Builder.EndPart();
     }
+
+    public override void VisitTypeExtension(ITypeExtension typeExtension) =>
+      ProcessTypeMembers(typeExtension.TypeMembers.OfType<ITypeMemberDeclaration>().AsIReadOnlyList());
 
     private Part CreateObjectTypePart(IObjectModelTypeDeclaration decl)
     {

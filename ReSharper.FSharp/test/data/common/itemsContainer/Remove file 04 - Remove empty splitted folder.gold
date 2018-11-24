@@ -1,0 +1,33 @@
+﻿Project
+1:File1
+2:Folder[1]
+  1:File2
+3:File3
+4:Folder[2]
+  1:File4
+
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/Folder/File2
+C:/Solution/Project/File3
+C:/Solution/Project/Folder/File4
+
+
+=======
+Remove 'Folder/File2'
+Refresh whole project
+Update view File3
+Update view Folder[1]
+
+Project
+1:File1
+2:File3
+3:Folder[1]
+  1:File4
+
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/File3
+C:/Solution/Project/Folder/File4
+
+

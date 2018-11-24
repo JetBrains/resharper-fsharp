@@ -1,0 +1,31 @@
+﻿
+=== Container Dump ===
+Project
+1:File1 (CompileBefore)
+2:Folder[1]
+  1:File2 (CompileBefore)
+  2:File3
+  3:File4 (CompileAfter)
+3:File5 (CompileAfter)
+
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/Folder/File2
+C:/Solution/Project/Folder/File3
+C:/Solution/Project/Folder/File4
+C:/Solution/Project/File5
+
+
+=== Structure API ===
+Folder SortKey=2
+  File3 SortKey=2 ParentFolderIdentity=Some(1)
+Folder SortKey=2
+  File4 SortKey=3 ParentFolderIdentity=Some(1)
+File1 SortKey=1 ParentFolderIdentity=<null>
+File5 SortKey=3 ParentFolderIdentity=<null>
+Folder SortKey=2
+  File2 SortKey=1 ParentFolderIdentity=Some(1)
+
+=== Parent Folders API ===
+Folder
+  Folder[1] -> <null>

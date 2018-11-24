@@ -17,7 +17,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
     public static readonly Key<FSharpOption<FSharpCheckFileResults>> TypeCheckResults =
       new Key<FSharpOption<FSharpCheckFileResults>>("FSharpTypeCheckResults");
 
-    protected virtual bool IsSupported(IPsiSourceFile sourceFile)
+    protected virtual bool IsSupported(IPsiSourceFile sourceFile, DaemonProcessKind processKind)
     {
       if (sourceFile == null || !sourceFile.IsValid()) return false;
       return sourceFile.IsLanguageSupported<FSharpLanguage>() && !sourceFile.Properties.IsNonUserFile;
@@ -26,7 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
     public IEnumerable<IDaemonStageProcess> CreateProcess(IDaemonProcess daemonProcess,
       IContextBoundSettingsStore settings, DaemonProcessKind processKind)
     {
-      if (!IsSupported(daemonProcess.SourceFile)) return EmptyList<IDaemonStageProcess>.InstanceList;
+      if (!IsSupported(daemonProcess.SourceFile, processKind)) return EmptyList<IDaemonStageProcess>.InstanceList;
 
       if (!(daemonProcess.SourceFile.GetPrimaryPsiFile() is IFSharpFile fsFile))
         return EmptyList<IDaemonStageProcess>.Instance;
@@ -40,11 +40,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
     [CanBeNull]
     protected abstract IDaemonStageProcess CreateProcess([NotNull] IFSharpFile fsFile,
       [NotNull] IDaemonProcess process);
-
-    public virtual ErrorStripeRequest NeedsErrorStripe(IPsiSourceFile sourceFile,
-      IContextBoundSettingsStore settingsStore)
-    {
-      return ErrorStripeRequest.NONE;
-    }
   }
 }

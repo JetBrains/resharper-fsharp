@@ -16,28 +16,33 @@ type ErrorOrWarningHighlightingBase(message, range: DocumentRange) =
 
 [<StaticSeverityHighlighting(Severity.ERROR, HighlightingGroupIds.IdentifierHighlightingsGroup, 
                              AttributeId = HighlightingAttributeIds.ERROR_ATTRIBUTE, 
-                             OverlapResolve = OverlapResolveKind.ERROR)>]
+                             OverlapResolve = OverlapResolveKind.NONE)>]
 type ErrorHighlighting(message, range) = 
     inherit ErrorOrWarningHighlightingBase(message, range)
 
 
 [<StaticSeverityHighlighting(Severity.WARNING, HighlightingGroupIds.IdentifierHighlightingsGroup, 
                              AttributeId = HighlightingAttributeIds.WARNING_ATTRIBUTE, 
-                             OverlapResolve = OverlapResolveKind.WARNING)>]
+                             OverlapResolve = OverlapResolveKind.NONE)>]
 type WarningHighlighting(message, range) = 
     inherit ErrorOrWarningHighlightingBase(message, range)
 
 
 [<StaticSeverityHighlighting(Severity.ERROR, HighlightingGroupIds.IdentifierHighlightingsGroup, 
                              AttributeId = HighlightingAttributeIds.UNRESOLVED_ERROR_ATTRIBUTE, 
-                             OverlapResolve = OverlapResolveKind.UNRESOLVED_ERROR)>]
+                             OverlapResolve = OverlapResolveKind.NONE)>]
 type UnresolvedHighlighting(message, range) = 
     inherit ErrorOrWarningHighlightingBase(message, range)
 
+[<StaticSeverityHighlighting(Severity.WARNING, HighlightingGroupIds.IdentifierHighlightingsGroup, 
+                             AttributeId = HighlightingAttributeIds.DEADCODE_ATTRIBUTE, 
+                             OverlapResolve = OverlapResolveKind.NONE)>]
+type UnusedHighlighting(message, range) = 
+    inherit ErrorOrWarningHighlightingBase(message, range)
 
 [<StaticSeverityHighlighting(Severity.INFO, HighlightingGroupIds.IdentifierHighlightingsGroup,
                              AttributeId = HighlightingAttributeIds.DEADCODE_ATTRIBUTE,
-                             OverlapResolve = OverlapResolveKind.DEADCODE)>]
+                             OverlapResolve = OverlapResolveKind.NONE)>]
 type DeadCodeHighlighting(range) =
     interface IHighlighting with
         member x.IsValid() = true

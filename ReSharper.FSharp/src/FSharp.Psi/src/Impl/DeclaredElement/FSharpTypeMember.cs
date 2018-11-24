@@ -135,5 +135,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       : MemberHidePolicy.HIDE_BY_NAME;
 
     public virtual bool IsVisibleFromFSharp => true;
+    public virtual bool IsExtensionMember => false;
+    public abstract bool IsMember { get; }
   }
 }

@@ -26,6 +26,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       FSharpSymbol = mfv;
     }
 
+    public override bool IsExtensionMember => FSharpSymbol.IsExtensionMember;
+    public override bool IsMember => FSharpSymbol.IsMember;
 
     public override IList<IAttributeInstance> GetAttributeInstances(bool inherit) =>
       FSharpAttributeInstance.GetAttributeInstances(FSharpSymbol.Attributes, Module);
@@ -56,7 +58,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       EmptyList<IParametersOwnerDeclaration>.Instance;
 
     public virtual IList<IParameter> Parameters => EmptyList<IParameter>.Instance;
-    public bool IsRefReturn => false;
+    public ReferenceKind ReturnKind => ReferenceKind.VALUE;
     public abstract override string ShortName { get; }
     public abstract IType ReturnType { get; }
 

@@ -1,15 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net451</TargetFramework>
-    <DebugType>full</DebugType>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi.Features</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="src\FSharpXmlDocService.fs" />
+    <Compile Include="src\CodeCompletion\CompletionUtil.fs" />
     <Compile Include="src\CodeCompletion\FSharpCodeCompletionContext.fs" />
-    <Compile Include="src\CodeCompletion\FSharpKeywordLookupItem.fs" />
+    <Compile Include="src\CodeCompletion\FSharpPathCompletionProvider.fs" />
     <Compile Include="src\CodeCompletion\FSharpKeywordsProvider.fs" />
     <Compile Include="src\CodeCompletion\FSharpLookupItem.fs" />
     <Compile Include="src\CodeCompletion\FSharpCompletionProviders.fs" />
@@ -20,16 +19,17 @@
     <Compile Include="src\Daemon\Stages\ErrorsStageProcessBase.fs" />
     <Compile Include="src\Daemon\Stages\FSharpDaemonBehaviour.fs" />
     <Compile Include="src\Daemon\Stages\DeadCodeHighlightStage.fs" />
+    <Compile Include="src\Daemon\Stages\ScriptLoadPathsStage.fs" />
     <Compile Include="src\Daemon\Stages\SyntaxErrorsStage.fs" />
     <Compile Include="src\Daemon\Stages\TypeCheckErrorsStage.fs" />
     <Compile Include="src\Daemon\UsageChecking\FSharpUsageCheckingService.fs" />
     <Compile Include="src\Comment\FSharpBlockCommentActionProvider.fs" />
     <Compile Include="src\Comment\FSharpLineCommentActionProvider.fs" />
     <Compile Include="src\Debugger\FSharpBreakpointVariantsProvider.fs" />
+    <Compile Include="src\Debugger\FSharpDebuggerLocalSymbolProvider.fs" />
     <Compile Include="src\Debugger\FSharpExpressionEvaluationInfoProvider.fs" />
     <Compile Include="src\Foldings\FSharpCodeFoldings.fs" />
-    <Compile Include="src\FSharpClrLanguage.fs" />
-    <Compile Include="src\FSharpRefactoringLanguageService.fs" />
+    <Compile Include="src\Searching\FSharpPathReference.fs" />
     <Compile Include="src\SelectEmbracingConsruct\FSharpSelectEmbracingConstructProvider.fs" />
     <Compile Include="src\Formatter\FSharpCodeStylePage.fs" />
     <Compile Include="src\Formatter\ReformatCode.fs" />
@@ -43,11 +43,13 @@
     <Compile Include="src\LanguageService\FSharpPsiProperties.fs" />
     <Compile Include="src\LanguageService\FSharpProjectFileLanguageService.fs" />
     <Compile Include="src\LanguageService\FSharpLanguageService.fs" />
+    <Compile Include="src\LanguageService\FSharpClrLanguage.fs" />
+    <Compile Include="src\LanguageService\FSharpRefactoringLanguageService.fs" />
     <Compile Include="src\ZoneMarker.fs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FSharp.Core" Version="4.1.18" />
-    <PackageReference Include="JetBrains.Fantomas" Version="2.6.10" />
+    <PackageReference Include="FSharp.Core" Version="4.3.4" />
+    <PackageReference Include="Fantomas" Version="2.7.1" />
     <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FCSVersion)" />
     <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
   </ItemGroup>

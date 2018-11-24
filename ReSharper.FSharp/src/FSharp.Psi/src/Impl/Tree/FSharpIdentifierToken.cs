@@ -14,13 +14,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
     }
 
-    public override ReferenceCollection GetFirstClassReferences()
-    {
-      var sourceFile = GetSourceFile();
-      // not supported until we have psi modules for scripts
-      if (sourceFile == null || Equals(sourceFile.LanguageType, FSharpScriptProjectFileType.Instance))
-        return ReferenceCollection.Empty;
-      return new ReferenceCollection(new FSharpSymbolReference(this));
-    }
+    public override ReferenceCollection GetFirstClassReferences() =>
+      new ReferenceCollection(new FSharpSymbolReference(this));
   }
 }

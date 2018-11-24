@@ -1,0 +1,29 @@
+===================
+Opened
+
+-Project
+ -UnitTestProject (1 project)
+  -UnitTestProject
+   -Dependencies
+    .NETCoreApp 2
+   Program.fs
+   Tests.fs
+
+
+Project [Name:&, GUID:]
+  Child items:
+    ProjectFileImpl(Path : UnitTestProject.sln)[]
+
+Project [Name:Miscellaneous Files, GUID:]
+
+Project [Name:UnitTestProject, GUID:]
+  Child items:
+    ProjectFileImpl(Path : Program.fs)[COMPILE ]
+    ProjectFileImpl(Path : Tests.fs)[COMPILE ]
+    ProjectFileImpl(Path : UnitTestProject.fsproj)[]
+    ProjectFileImpl(Path : xunit.runner.reporters.netstandard15.dll (.nuget\packages\xunit.runner.visualstudio\2.2.0\build\netcoreapp1.0\xunit.runner.reporters.netstandard15.dll))[Hidden CONTENT ]
+    ProjectFileImpl(Path : xunit.runner.utility.netstandard15.dll (.nuget\packages\xunit.runner.visualstudio\2.2.0\build\netcoreapp1.0\xunit.runner.utility.netstandard15.dll))[Hidden CONTENT ]
+    ProjectFileImpl(Path : xunit.runner.visualstudio.dotnetcore.testadapter.dll (.nuget\packages\xunit.runner.visualstudio\2.2.0\build\netcoreapp1.0\xunit.runner.visualstudio.dotnetcore.testadapter.dll))[Hidden CONTENT ]
+
+
+

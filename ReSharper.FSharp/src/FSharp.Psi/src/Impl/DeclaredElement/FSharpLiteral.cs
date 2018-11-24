@@ -19,6 +19,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public override DeclaredElementType GetElementType() => CLRDeclaredElementType.CONSTANT;
     public override bool IsStatic => true;
+    public override bool IsMember => false;
 
     public IType Type { get; }
     public ConstantValue ConstantValue { get; }

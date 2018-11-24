@@ -73,7 +73,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       {
         // todo: implement DefaultValue in FCS
         var defaultValueAttr = FSharpSymbol.Attributes
-          .FirstOrDefault(a => a.GetClrName().Equals(DefaultParameterValueTypeName, StringComparison.Ordinal))
+          .FirstOrDefault(a => a.GetClrName() == DefaultParameterValueTypeName)
           ?.ConstructorArguments.FirstOrDefault();
         return defaultValueAttr == null
           ? new DefaultValue(Type)

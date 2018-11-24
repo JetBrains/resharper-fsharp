@@ -6,13 +6,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PsiLanguageNames Include="FSharp" />
+    <PsiLanguageNames Include="FSharp">
+      <Visible>False</Visible>
+    </PsiLanguageNames>
+
     <ParserGen Include="src\FSharp.psi" />
+
     <TokenGenerator Include="src\Parsing\FSharpTokens.xml">
       <OutputFile>src\Parsing\FSharpTokenType.Generated.cs</OutputFile>
       <SubType>Designer</SubType>
     </TokenGenerator>
 
+    <Compile Remove="Src\Parsing\FSharpTokenType.Generated.cs" />
     <Compile Include="Src\Parsing\FSharpTokenType.Generated.cs">
       <DependentUpon>FSharpTokens.xml</DependentUpon>
     </Compile>

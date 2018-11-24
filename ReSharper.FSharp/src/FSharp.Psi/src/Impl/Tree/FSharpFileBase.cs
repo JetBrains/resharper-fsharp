@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Application.Threading;
+using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Checker;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
@@ -25,8 +28,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     private Dictionary<int, FSharpResolvedSymbolUse> myDeclarationSymbols;
     private Dictionary<int, FSharpResolvedSymbolUse> myResolvedSymbols;
 
+    public OneToListMap<string, int> TypeExtensionsOffsets { get; set; }
+    private readonly IDictionary<int, ITypeExtension> myTypeExtensionsByOffset =
+      new ConcurrentDictionary<int, ITypeExtension>();
+
     public FSharpCheckerService CheckerService { get; set; }
-    public FSharpOption<FSharpParsingOptions> ParsingOptions { get; set; }
 
     public TokenBuffer ActualTokenBuffer { get; set; }
     public FSharpOption<FSharpParseFileResults> ParseResults { get; set; }
@@ -80,13 +86,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
                 continue;
 
               // visualfsharp#3939
-              if (mfvLogicalName.Equals("v", StringComparison.Ordinal) &&
+              if (mfvLogicalName == "v" &&
                   myDeclarationSymbols.ContainsKey(startOffset))
                 continue;
 
+              if (mfvLogicalName == StandardMemberNames.ClassConstructor)
+                continue;
+              
               // visualfsharp#3943, visualfsharp#3933
-              if (!mfvLogicalName.Equals(".ctor", StringComparison.Ordinal) &&
-                  !(FindTokenAt(new TreeOffset(endOffset - 1)) is FSharpIdentifierToken))
+              if (mfvLogicalName != StandardMemberNames.Constructor &&
+                  !(FindTokenAt(new TreeOffset(endOffset - 1)) is FSharpIdentifierToken || mfv.IsActivePattern))
                 continue;
             }
             else
@@ -190,6 +199,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         return myDeclarationSymbols?.TryGetValue(offset)?.SymbolUse.Symbol;
       }
     }
+
+    public IEnumerable<ITypeExtension> GetTypeExtensions(string shortName) =>
+      TypeExtensionsOffsets?.GetValuesSafe(shortName).Select(offset =>
+      {
+        if (myTypeExtensionsByOffset.TryGetValue(offset, out var typeExtension))
+          return typeExtension;
+
+        typeExtension = FindTokenAt(new TreeOffset(offset))?.GetContainingNode<ITypeExtension>();
+        myTypeExtensionsByOffset[offset] = typeExtension;
+        return typeExtension;
+      }).WhereNotNull();
 
     public virtual void Accept(TreeNodeVisitor visitor) => visitor.VisitNode(this);
 

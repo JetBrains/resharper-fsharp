@@ -24,15 +24,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       return new FSharpException(this);
     }
 
-    public override MemberPresenceFlag GetMemberPresenceFlag()
-    {
-      return base.GetMemberPresenceFlag() |
-             MemberPresenceFlag.MAY_EQUALS_OVERRIDE;
-    }
-
     protected override byte SerializationTag => (byte) FSharpPartKind.Exception;
 
     public override string[] ExtendsListShortNames =>
       ArrayUtil.Add(ourExtendsListShortNames, base.ExtendsListShortNames);
+
+    public override IDeclaredType GetBaseClassType() =>
+      GetPsiModule().GetPredefinedType().Exception;
   }
 }

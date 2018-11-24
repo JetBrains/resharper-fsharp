@@ -5,11 +5,10 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiFile
 import com.jetbrains.rider.model.RdFSharpInteractiveHost
 import com.jetbrains.rider.projectView.solution
-import com.jetbrains.rider.util.idea.ILifetimedComponent
-import com.jetbrains.rider.util.idea.LifetimedComponent
+import com.jetbrains.rider.util.idea.LifetimedProjectComponent
 import kotlin.properties.Delegates
 
-class FsiHost(val project: Project) : ILifetimedComponent by LifetimedComponent(project) {
+class FsiHost(project: Project) : LifetimedProjectComponent(project) {
     private val rdFsiHost: RdFSharpInteractiveHost get() = project.solution.fSharpInteractiveHost
     var moveCaretOnSendLine by Delegates.notNull<Boolean>()
     var copyRecentToEditor by Delegates.notNull<Boolean>()
@@ -20,12 +19,12 @@ class FsiHost(val project: Project) : ILifetimedComponent by LifetimedComponent(
         rdFsiHost.copyRecentToEditor.advise(componentLifetime) { copyRecentToEditor = it }
     }
 
-    internal fun sendToFsi(editor: Editor, file: PsiFile) = synchronized(this) {
-        execute { it.sendActionExecutor.execute(editor, file) }
+    internal fun sendToFsi(editor: Editor, file: PsiFile, debug: Boolean) = synchronized(this) {
+        execute { it.sendActionExecutor.execute(editor, file, debug) }
     }
 
-    internal fun sendToFsi(visibleText: String, fsiText: String) = synchronized(this) {
-        execute { it.sendText(visibleText, fsiText) }
+    internal fun sendToFsi(visibleText: String, fsiText: String, debug: Boolean) = synchronized(this) {
+        execute { it.sendText(visibleText, fsiText, debug) }
     }
 
     private fun execute(action: (FsiConsoleRunner) -> Unit) {

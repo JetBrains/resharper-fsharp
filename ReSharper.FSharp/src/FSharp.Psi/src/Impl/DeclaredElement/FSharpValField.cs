@@ -29,5 +29,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public bool IsConstant => false;
     public bool IsEnumMember => false;
     public int? FixedBufferSize => null;
+    public override bool IsMember => false;
   }
 }

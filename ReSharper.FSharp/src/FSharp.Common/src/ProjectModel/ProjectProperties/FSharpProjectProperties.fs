@@ -28,8 +28,8 @@ type FSharpProjectProperties =
     override x.BuildSettings = x.buildSettings :> _
     override x.DefaultLanguage = FSharpProjectLanguage.Instance :> _
 
-    override x.ReadProjectProperties(reader, index) =
-        base.ReadProjectProperties(reader, index)
+    override x.ReadProjectProperties(reader) =
+        base.ReadProjectProperties(reader)
         x.buildSettings.ReadBuildSettings(reader)
         let tpd = TargetPlatformData()
         tpd.Read(reader)

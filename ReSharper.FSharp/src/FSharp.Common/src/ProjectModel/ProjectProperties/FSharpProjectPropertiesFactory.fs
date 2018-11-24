@@ -26,9 +26,9 @@ type Factory() =
     static member CreateProjectProperties(platformId, targetFrameworkIds) =
         FSharpProjectProperties([fsProjectTypeGuid].AsCollection(), platformId, factoryGuid, targetFrameworkIds, null, null)
 
-    override x.Read(reader, index) =
+    override x.Read(reader) =
         let projectProperties = FSharpProjectProperties(factoryGuid)
-        projectProperties.ReadProjectProperties(reader, index)
+        projectProperties.ReadProjectProperties(reader)
         projectProperties :> _
 
     static member IsKnownProjectTypeGuid(guid) = guid.Equals(fsProjectTypeGuid) || guid.Equals(fsCpsProjectTypeGuid)

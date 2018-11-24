@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
+using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Daemon.UsageChecking;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Highlightings;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
@@ -30,9 +32,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
       myDocument = process.Document;
     }
 
-    private void HighlightUses(Action<DaemonStageResult> committer, FSharpResolvedSymbolUse[] symbols)
+    private void HighlightUses(Action<DaemonStageResult> committer, IEnumerable<FSharpResolvedSymbolUse> symbols, int allSymbolsCount)
     {
-      var highlightings = new List<HighlightingInfo>(symbols.Length);
+      var highlightings = new List<HighlightingInfo>(allSymbolsCount);
       foreach (var resolvedSymbolUse in symbols)
       {
         var symbolUse = resolvedSymbolUse.SymbolUse;
@@ -45,8 +47,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 
         if (symbolUse.IsFromDefinition && symbol is FSharpMemberOrFunctionOrValue mfv)
         {
-          if (myDocument.Buffer.GetText(resolvedSymbolUse.Range).Equals("new", StringComparison.Ordinal) &&
-              mfv.LogicalName.Equals(".ctor", StringComparison.Ordinal))
+          if (myDocument.Buffer.GetText(resolvedSymbolUse.Range) == "new" &&
+              mfv.LogicalName == StandardMemberNames.Constructor)
             continue;
         }
 
@@ -63,8 +65,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
     {
       // todo: add more cases to GetSemanticClassification (e.g. methods, values, namespaces) and use it instead?
       var checkResults = DaemonProcess.CustomData.GetData(FSharpDaemonStageBase.TypeCheckResults);
-      HighlightUses(committer, myFsFile.GetAllDeclaredSymbols(checkResults?.Value));
-      HighlightUses(committer, myFsFile.GetAllResolvedSymbols());
+      var declarations = myFsFile.GetAllDeclaredSymbols(checkResults?.Value);
+      SeldomInterruptChecker.CheckForInterrupt();
+
+      var usages = myFsFile.GetAllResolvedSymbols();
+      SeldomInterruptChecker.CheckForInterrupt();
+
+      HighlightUses(committer,  declarations.Concat(usages), declarations.Length + usages.Length);
     }
   }
 }

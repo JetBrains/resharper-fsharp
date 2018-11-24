@@ -1,7 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
 open System
-open System.Drawing
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems.Impl
@@ -60,8 +59,6 @@ type FSharpLookupItem(item: FSharpDeclarationListItem<FSharpLookupAdditionalInfo
                       xmlDocService: FSharpXmlDocService) =
     inherit TextLookupItemBase()
 
-    static let namespaceToOpenTextStyle = TextStyle.FromForeColor(SystemColors.GrayText)
-
     let candidates = lazy (let (FSharpToolTipText(tooltips)) = item.DescriptionTextAsync.RunAsTask()
         tooltips |> List.map (function
             | FSharpToolTipElement.Group(overloads) ->
@@ -116,7 +113,7 @@ type FSharpLookupItem(item: FSharpDeclarationListItem<FSharpLookupAdditionalInfo
     override x.GetDisplayName() =
         let name = LookupUtil.FormatLookupString(item.Name, x.TextColor)
         item.NamespaceToOpen
-        |> Option.iter (fun ns -> LookupUtil.AddInformationText(name, "(in " + ns + ")", namespaceToOpenTextStyle))
+        |> Option.iter (fun ns -> LookupUtil.AddInformationText(name, "(in " + ns + ")", itemInfoTextStyle))
         name
 
     interface IParameterInfoCandidatesProvider with

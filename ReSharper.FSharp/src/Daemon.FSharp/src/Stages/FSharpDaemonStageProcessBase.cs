@@ -22,13 +22,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 
     public IDaemonProcess DaemonProcess { get; }
     public abstract void Execute(Action<DaemonStageResult> committer);
-
-    [NotNull]
-    protected static HighlightingInfo CreateHighlighting([NotNull] ITreeNode token, string highlightingAttributeId)
-    {
-      var range = token.GetNavigationRange();
-      var highlighting = new FSharpIdentifierHighlighting(highlightingAttributeId, range);
-      return new HighlightingInfo(range, highlighting);
-    }
   }
 }

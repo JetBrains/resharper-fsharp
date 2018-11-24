@@ -1,11 +1,14 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
+open JetBrains.Application
+open System
 open JetBrains.Application.Progress
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems.Impl
+open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
@@ -20,6 +23,23 @@ open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
 type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolved) =
+
+    let getKindPriority = function
+        | CompletionItemKind.Property
+        | CompletionItemKind.Field -> CLRLookupItemRelevance.FieldsAndProperties
+        | CompletionItemKind.Method (isExtension = false) -> CLRLookupItemRelevance.Methods
+        | CompletionItemKind.Method _ -> CLRLookupItemRelevance.ExtensionMethods
+        | CompletionItemKind.Event -> CLRLookupItemRelevance.Events
+        | CompletionItemKind.Argument -> CLRLookupItemRelevance.NamedArguments
+        | CompletionItemKind.Other -> Unchecked.defaultof<CLRLookupItemRelevance>
+
+    let getAdditionalPriority kind isOwnMember =
+        match kind, isOwnMember with
+        | CompletionItemKind.Other, _
+        | CompletionItemKind.Argument, _ -> Unchecked.defaultof<CLRLookupItemRelevance>
+        | _, true -> CLRLookupItemRelevance.MemberOfCurrentType
+        | _ -> CLRLookupItemRelevance.MemberOfBaseType
+
     member x.GetDefaultRanges(context: ISpecificCodeCompletionContext) =
         context |> function | :? FSharpCodeCompletionContext as context -> context.Ranges | _ -> null
 
@@ -46,12 +66,12 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
                         // todo: provide symbol and display context in FCS items, calc this only when needed
                         let icon = getIconId symbol
                         let retType =
-                            getReturnType symbol
-                            |> Option.map (fun t -> t.Format(context))
-                            |> Option.toObj
+                            match getReturnType symbol with
+                            | Some t -> t.Format(context)
+                            | _ -> null
                         Some { Icon = icon; ReturnType = retType }
 
-                let getAllSymbols () = getAllSymbols checkResults
+                let getAllSymbols () = getAllSymbols checkResults 
                 try
                     let completions =
                         checkResults
@@ -69,16 +89,18 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
 
                         lookupItem.InitializeRanges(context.Ranges, basicContext)
                         lookupItem.DisplayTypeName <-
-                            item.AdditionalInfo
-                            |> Option.map (fun i -> i.ReturnType)
-                            |> Option.toObj
-                            |> RichText
-                        collector.Add(lookupItem)
+                            match item.AdditionalInfo with
+                            | Some info -> RichText(info.ReturnType)
+                            | _ -> null
 
-                        collector.CheckForInterrupt()
+                        lookupItem.Placement.Relevance <-
+                            (getKindPriority item.Kind |> int64) +
+                            (getAdditionalPriority item.Kind item.IsOwnMember |> int64) 
+
+                        collector.Add(lookupItem)
                     true
                 with
-                | :? ProcessCancelledException -> reraise()
+                | :? OperationCanceledException -> reraise()
                 | e ->
                     let path = basicContext.SourceFile.GetLocation().FullPath
                     let coords = context.Coords
@@ -87,6 +109,7 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
                     false
             | _ -> false
         | _ -> false
+
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpLookupItemsProvider(logger: ILogger) =
@@ -110,6 +133,7 @@ type FSharpLookupItemsProvider(logger: ILogger) =
         member x.SupportedCompletionMode = CompletionMode.Single
         member x.SupportedEvaluationMode = EvaluationMode.Light
 
+
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpRangesProvider() =
     inherit ItemsProviderOfSpecificContext<FSharpCodeCompletionContext>()
@@ -118,9 +142,10 @@ type FSharpRangesProvider() =
     override x.SupportedCompletionMode = CompletionMode.All
     override x.SupportedEvaluationMode = EvaluationMode.Full
 
+
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpLibraryScopeLookupItemsProvider(logger: ILogger, assemblyContentProvider: FSharpAssemblyContentProvider) =
-    inherit FSharpLookupItemsProviderBase(logger, (fun checkResults -> assemblyContentProvider.GetLibrariesEntities(checkResults)), true)
+    inherit FSharpLookupItemsProviderBase(logger, assemblyContentProvider.GetLibrariesEntities, true)
 
     interface ISlowCodeCompletionItemsProvider with
         member x.IsAvailable(context) = base.IsAvailable(context)
@@ -128,3 +153,16 @@ type FSharpLibraryScopeLookupItemsProvider(logger: ILogger, assemblyContentProvi
             base.AddLookupItems(context :?> FSharpCodeCompletionContext, collector)
 
         member x.SupportedEvaluationMode = EvaluationMode.Full
+
+
+[<SolutionComponent>]
+type FSharpAutocompletionStrategy() =
+    interface IAutomaticCodeCompletionStrategy with
+        member x.Language = FSharpLanguage.Instance :> _
+        member x.AcceptsFile(file, textControl) = file :? IFSharpFile
+
+        member x.AcceptTyping(char, _, _) = char.IsLetterFast() || char = '.'
+        member x.ProcessSubsequentTyping(char, _) = char.IsIdentifierPart()
+
+        member x.IsEnabledInSettings(_, _) = AutopopupType.SoftAutopopup
+        member x.ForceHideCompletion = false

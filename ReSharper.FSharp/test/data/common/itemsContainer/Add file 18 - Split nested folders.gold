@@ -1,0 +1,76 @@
+﻿Project
+1:File1
+2:Folder[1]
+  1:File2
+  2:File3
+  3:SubFolder[1]
+    1:File4
+  4:File5
+3:File6
+
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/Folder/File2
+C:/Solution/Project/Folder/File3
+C:/Solution/Project/Folder/SubFolder/File4
+C:/Solution/Project/Folder/File5
+C:/Solution/Project/File6
+
+
+=======
+Add 'File7' Before 'Folder/SubFolder/File4'
+Refresh whole project
+Update view File6
+Update view Folder[2]
+
+Project
+1:File1
+2:Folder[1]
+  1:File2
+  2:File3
+3:File7
+4:Folder[2]
+  1:SubFolder[1]
+    1:File4
+  2:File5
+5:File6
+
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/Folder/File2
+C:/Solution/Project/Folder/File3
+C:/Solution/Project/File7
+C:/Solution/Project/Folder/SubFolder/File4
+C:/Solution/Project/Folder/File5
+C:/Solution/Project/File6
+
+
+=======
+Add 'File7' After 'Folder/File3'
+Refresh whole project
+Update view File6
+Update view Folder[2]
+
+Project
+1:File1
+2:Folder[1]
+  1:File2
+  2:File3
+3:File7
+4:Folder[2]
+  1:SubFolder[1]
+    1:File4
+  2:File5
+5:File6
+
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/Folder/File2
+C:/Solution/Project/Folder/File3
+C:/Solution/Project/File7
+C:/Solution/Project/Folder/SubFolder/File4
+C:/Solution/Project/Folder/File5
+C:/Solution/Project/File6
+
+
+Dumps are equal: True

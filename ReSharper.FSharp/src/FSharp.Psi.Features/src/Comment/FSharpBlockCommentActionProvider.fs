@@ -24,7 +24,7 @@ type FSharpBlockCommentActionProvider() =
             disableAllProviders <- false
             true
 
-        member x.InsertBockCommentPosition(lexer, position) = 
+        member x.InsertBlockCommentPosition(lexer, position) = 
             let tokenType = lexer.TokenType
             if tokenType = FSharpTokenType.LINE_COMMENT then position
             else if tokenType = FSharpTokenType.WHITESPACE ||

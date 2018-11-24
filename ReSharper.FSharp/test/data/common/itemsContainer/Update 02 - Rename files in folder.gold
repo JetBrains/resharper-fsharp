@@ -1,0 +1,40 @@
+﻿Project
+1:File1
+2:Folder[1]
+  1:File2
+  2:File3
+  3:File4
+3:File5
+
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/Folder/File2
+C:/Solution/Project/Folder/File3
+C:/Solution/Project/Folder/File4
+C:/Solution/Project/File5
+
+
+=======
+Update file: 'Folder/File2' (Compile) -> 'Folder/NewName1' (Compile)
+Update view Folder/NewName1
+Update file: 'Folder/File3' (Compile) -> 'Folder/NewName2' (Compile)
+Update view Folder/NewName2
+Update file: 'Folder/File4' (Compile) -> 'Folder/NewName3' (Compile)
+Update view Folder/NewName3
+
+Project
+1:File1
+2:Folder[1]
+  1:NewName1
+  2:NewName2
+  3:NewName3
+3:File5
+
+.NETFramework,Version=v0.0
+C:/Solution/Project/File1
+C:/Solution/Project/Folder/NewName1
+C:/Solution/Project/Folder/NewName2
+C:/Solution/Project/Folder/NewName3
+C:/Solution/Project/File5
+
+

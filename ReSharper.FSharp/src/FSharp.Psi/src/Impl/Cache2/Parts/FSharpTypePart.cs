@@ -54,7 +54,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
       var result = HybridCollection<IMethod>.Empty;
       foreach (var memberDeclaration in declaration.MemberDeclarations)
-        if (info.ShortName.Equals(memberDeclaration.DeclaredName, StringComparison.Ordinal) &&
+        if (info.ShortName == memberDeclaration.DeclaredName &&
             info.Hash == memberDeclaration.GetTreeStartOffset().Offset)
         {
           if (memberDeclaration.DeclaredElement is IMethod method)

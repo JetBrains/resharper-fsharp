@@ -16,17 +16,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     ITypeMember ITypeMemberDeclaration.DeclaredElement => (ITypeMember) DeclaredElement;
     ITypeElement ITypeDeclaration.DeclaredElement => (ITypeElement) DeclaredElement;
 
-    /// <summary>
-    /// May take long time due to waiting for FCS
-    /// </summary>
+    /// May take long time due to waiting for FCS.
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     public IEnumerable<IDeclaredType> SuperTypes => GetFSharpSymbol() is FSharpEntity entity
       ? FSharpTypesUtil.GetSuperTypes(entity, TypeParameters, GetPsiModule())
       : EmptyList<IDeclaredType>.Instance;
 
-    /// <summary>
-    /// May take long time due to waiting for FCS
-    /// </summary>
+    /// May take long time due to waiting for FCS.
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     public IDeclaredType BaseClassType => GetFSharpSymbol() is FSharpEntity entity
       ? FSharpTypesUtil.GetBaseType(entity, TypeParameters, GetPsiModule())
@@ -40,7 +36,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (!(symbol is FSharpMemberOrFunctionOrValue mfv))
         return null;
 
-      return mfv.IsConstructor || mfv.IsImplicitConstructor ? mfv.EnclosingEntity?.Value : null;
+      return mfv.IsConstructor || mfv.IsImplicitConstructor ? mfv.DeclaringEntity?.Value : null;
     }
 
     [NotNull]
@@ -54,11 +50,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         var members = this.Children<ITypeMemberDeclaration>();
         var implementedMembers = this.Children<IInterfaceImplementation>()
           .SelectMany(m => m.Children<ITypeMemberDeclaration>());
-        return members.Prepend(implementedMembers).ToTreeNodeCollection();
+        var extensionMembers = this.Children<ITypeExtension>()
+          .SelectMany(m => m.Children<ITypeMemberDeclaration>());
+        return members.Concat(implementedMembers).Concat(extensionMembers).WhereNotNull().ToTreeNodeCollection();
       }
     }
 
-    public string CLRName => FSharpImplUtil.MakeClrName(this);
+    public string CLRName => this.MakeClrName();
     public IReadOnlyList<ITypeDeclaration> TypeDeclarations => EmptyList<ITypeDeclaration>.Instance;
 
     public IReadOnlyList<ITypeDeclaration> NestedTypeDeclarations =>

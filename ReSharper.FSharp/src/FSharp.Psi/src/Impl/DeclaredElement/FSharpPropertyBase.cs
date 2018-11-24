@@ -20,7 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     {
       var property =
         mfv.IsModuleValueOrMember
-          ? mfv.EnclosingEntity?.Value.MembersFunctionsAndValues.FirstOrDefault(
+          ? mfv.DeclaringEntity?.Value.MembersFunctionsAndValues.FirstOrDefault(
               m => m.IsProperty && m.DisplayName == mfv.DisplayName) ?? mfv
           : mfv;
       

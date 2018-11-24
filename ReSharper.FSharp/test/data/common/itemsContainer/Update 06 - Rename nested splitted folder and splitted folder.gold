@@ -1,0 +1,62 @@
+﻿Project
+1:Folder[1]
+  1:SubFolder[1]
+    1:File1
+  2:File2
+2:File3
+3:Folder[2]
+  1:SubFolder[2]
+    1:File4
+
+.NETFramework,Version=v0.0
+C:/Solution/Project/Folder/SubFolder/File1
+C:/Solution/Project/Folder/File2
+C:/Solution/Project/File3
+C:/Solution/Project/Folder/SubFolder/File4
+
+
+=======
+Rename 'Folder' to 'NewName'
+Update folder: 'Folder' -> 'NewName'
+Update view NewName[1]
+Update view NewName[2]
+
+Project
+1:NewName[1]
+  1:SubFolder[1]
+    1:File1
+  2:File2
+2:File3
+3:NewName[2]
+  1:SubFolder[2]
+    1:File4
+
+.NETFramework,Version=v0.0
+C:/Solution/Project/NewName/SubFolder/File1
+C:/Solution/Project/NewName/File2
+C:/Solution/Project/File3
+C:/Solution/Project/NewName/SubFolder/File4
+
+
+Rename 'NewName/SubFolder' to 'NewName/SubFolderNewName'
+Update folder: 'NewName/SubFolder' -> 'NewName/SubFolderNewName'
+Update view NewName/SubFolderNewName[1]
+Update view NewName/SubFolderNewName[2]
+
+Project
+1:NewName[1]
+  1:SubFolderNewName[1]
+    1:File1
+  2:File2
+2:File3
+3:NewName[2]
+  1:SubFolderNewName[2]
+    1:File4
+
+.NETFramework,Version=v0.0
+C:/Solution/Project/NewName/SubFolderNewName/File1
+C:/Solution/Project/NewName/File2
+C:/Solution/Project/File3
+C:/Solution/Project/NewName/SubFolderNewName/File4
+
+

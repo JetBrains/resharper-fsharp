@@ -7,7 +7,7 @@ import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptLanguage
 class FSharpCodeStyleSettingsProvider : FSharpCodeStyleSettingsProviderBase(FSharpLanguage)
 class FSharpScriptCodeStyleSettingsProvider : FSharpCodeStyleSettingsProviderBase(FSharpScriptLanguage)
 
-abstract class FSharpCodeStyleSettingsProviderBase(val lang: Language) : RiderCodeStyleSettingsProvider() {
+abstract class FSharpCodeStyleSettingsProviderBase(private val lang: Language) : RiderCodeStyleSettingsProvider() {
     override fun getLanguage() = lang
     override fun getHelpTopic() = "Settings_Code_Style_FSHARP"
     override fun getConfigurableDisplayName() = lang.displayName

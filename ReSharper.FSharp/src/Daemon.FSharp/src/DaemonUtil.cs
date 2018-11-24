@@ -11,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
     {
       return () =>
       {
-        if (process.InterruptFlag) throw new ProcessCancelledException();
+        if (process.InterruptFlag) throw new OperationCanceledException();
       };
     }
   }

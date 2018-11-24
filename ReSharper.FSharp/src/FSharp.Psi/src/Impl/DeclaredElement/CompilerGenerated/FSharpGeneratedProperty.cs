@@ -42,7 +42,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
     public IList<IParameter> Parameters => EmptyList<IParameter>.Instance;
     public IType ReturnType { get; }
-    public bool IsRefReturn => false;
     public IType Type => ReturnType;
 
     public string GetDefaultPropertyMetadataName()

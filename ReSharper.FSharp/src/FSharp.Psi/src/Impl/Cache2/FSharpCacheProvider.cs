@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Checker;
-using JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
@@ -34,9 +33,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     {
       var sourceFile = file.GetSourceFile();
       Assertion.AssertNotNull(sourceFile, "sourceFile != null");
-      // not supported until we have psi modules for scripts
-      if (sourceFile.LanguageType.Equals(FSharpScriptProjectFileType.Instance))
-        return;
 
       var declarationProcessor = new FSharpCacheDeclarationProcessor(builder, myCheckerService);
       (file as IFSharpFile)?.Accept(declarationProcessor);
