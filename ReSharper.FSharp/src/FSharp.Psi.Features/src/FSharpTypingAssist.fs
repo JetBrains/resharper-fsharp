@@ -865,20 +865,27 @@ type FSharpTypingAssist
                     if expr.Range.GetStartLine() <> caretLine then defaultTraverse expr else
 
                     match expr with
-                    | SynExpr.DotGet (expr, rangeOfDot, _, _) when
+                    | SynExpr.DotGet (expr, rangeOfDot, _, _)
+                    | SynExpr.DotIndexedGet (expr, _, rangeOfDot, _)
+                    | SynExpr.DotIndexedSet (expr, _, _, _, rangeOfDot, _) when
                             dotOffset = document.GetOffset(rangeOfDot.Start) ->
-                        Some expr
-                    | SynExpr.LongIdent (_, LongIdentWithDots (lid, dots), _, _) when
-                            dots |> List.exists (fun dot -> dotOffset = document.GetOffset(dot.Start)) ->
-                        Some expr
+                        Some expr.Range
+
+                    | SynExpr.DotSet (_, LongIdentWithDots (_, dots), _, _)
+                    | SynExpr.LongIdent (_, LongIdentWithDots (_, dots), _, _)
+                    | SynExpr.NamedIndexedPropertySet (LongIdentWithDots (_, dots), _, _, _)
+                    | SynExpr.DotNamedIndexedPropertySet (_, LongIdentWithDots (_, dots), _, _, _) when
+                            dots |> List.exists (fun dot -> dotOffset = document.GetStartOffset(dot)) ->
+                        Some expr.Range
+
                     | _ -> defaultTraverse expr }
 
         match Traverse(caretCoords.GetPos(), parseTree, visitor) with
         | None -> false
-        | Some path ->
+        | Some range ->
 
         let indent =
-            getOffsetInLine document caretLine (document.GetOffset(path.Range.Start)) +
+            getOffsetInLine document caretLine (document.GetStartOffset(range)) +
             getIndentSize textControl
 
         insertNewLineAt textControl dotOffset indent TrimTrailingSpaces.Yes
