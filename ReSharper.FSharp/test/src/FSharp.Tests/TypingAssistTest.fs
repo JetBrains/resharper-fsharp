@@ -165,6 +165,8 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Quotes - Pair quotes 08 - Before list``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Pair quotes 09 - Insert single in multiline``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Pair quotes 10 - Insert single in multiline``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Pair quotes 11 - At eof``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Pair quotes 12 - At eof, unfinished triple quote``() = x.DoNamedTest()
 
     [<Test>] member x.``Quotes - Skip end 01 - Char``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Skip end 02 - String``() = x.DoNamedTest()

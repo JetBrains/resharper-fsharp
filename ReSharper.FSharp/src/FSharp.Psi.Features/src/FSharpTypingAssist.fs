@@ -996,16 +996,24 @@ type FSharpTypingAssist
         let document = textControl.Document
         let line = document.GetCoordsByOffset(offset).Line
 
-        if not (getCachingLexer textControl &lexer && lexer.FindTokenAt(offset)) then false else
+        if not (getCachingLexer textControl &lexer) then false else
+
+        if offset = document.GetDocumentEndOffset().Offset then
+            if lexer.FindTokenAt(offset - 1) &&
+               lexer.TokenType == FSharpTokenType.UNFINISHED_TRIPLE_QUOTED_STRING then false else
+
+            textControl.Document.InsertText(offset, emptyString)
+            textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible)
+            true
+        else
+
+        if not (lexer.FindTokenAt(offset)) then false else
 
         let tokenType = lexer.TokenType
         if tokenType == FSharpTokenType.TRIPLE_QUOTED_STRING then false else
 
-        if (tokenType == FSharpTokenType.STRING && typedChar = '\"' ||
-            tokenType == FSharpTokenType.CHARACTER_LITERAL && typedChar = '\'') &&
+        if tokenType == FSharpTokenType.STRING && typedChar = '\"' &&
                FSharpTypingAssist.EscapesNextChar(offset, textControl.Document.Buffer) then false else
-
-        if tokenType.IsStringLiteral && typedChar <> getStringEndingQuote tokenType then false else
 
         // Do not prevent quoting code
         if not (isStringLiteralStopper tokenType) then false else
@@ -1015,7 +1023,7 @@ type FSharpTypingAssist
         if tokenType == FSharpTokenType.STRING && offset > lexer.TokenStart &&
            tokenStartLine = line && lineEndsWithString lexer document line then false else
 
-        textControl.Document.InsertText(offset, getCorresponingQuotesPair typedChar)
+        textControl.Document.InsertText(offset, emptyString)
         textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible)
 
         true 
