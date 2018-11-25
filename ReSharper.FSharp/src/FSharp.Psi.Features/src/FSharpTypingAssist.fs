@@ -489,8 +489,8 @@ type FSharpTypingAssist
         insertNewLineAt textControl offset indentSize TrimTrailingSpaces.Yes
 
     member x.DeindentAfterUnfinishedExpr(textControl: ITextControl, lexer: CachingLexer, offset) =
-        let mutable expectedToken = null 
-        if not (tryDeindentTokens.TryGetValue(lexer.TokenType, &expectedToken)) then false else
+        let mutable allowedTokens = null 
+        if not (tryDeindentTokens.TryGetValue(lexer.TokenType, &allowedTokens)) then false else
 
         let prevTokenEnd =
             use cookie = LexerStateCookie.Create(lexer)
@@ -530,7 +530,7 @@ type FSharpTypingAssist
         while lexer.TokenType == FSharpTokenType.WHITESPACE do
             lexer.Advance(-1)
 
-        if lexer.TokenType != expectedToken then false else
+        if not (Array.contains lexer.TokenType allowedTokens) then false else
 
         let indent =
             let tokenLine = document.GetCoordsByOffset(lexer.TokenStart).Line
@@ -1273,9 +1273,9 @@ let isSingleLineBrackets (lexer: CachingLexer) (document: IDocument) =
     document.GetCoordsByOffset(lexer.TokenStart).Line = startLine
 
 
-let tryDeindentTokens: IDictionary<_,_> =
-    [| FSharpTokenType.THEN, FSharpTokenType.IF
-       FSharpTokenType.DO,   FSharpTokenType.WHILE |]
+let tryDeindentTokens: IDictionary<TokenNodeType, TokenNodeType[]> =
+    [| FSharpTokenType.THEN, [| FSharpTokenType.IF; FSharpTokenType.ELIF |]
+       FSharpTokenType.DO,   [| FSharpTokenType.WHILE; FSharpTokenType.DO |] |]
     |> dict
 
 

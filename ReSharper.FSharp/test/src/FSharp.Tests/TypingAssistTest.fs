@@ -102,6 +102,8 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter after error 09 - After then``() = x.DoNamedTest()
     [<Test>] member x.``Enter after error 10 - After while``() = x.DoNamedTest()
     [<Test>] member x.``Enter after error 11 - After while and comments``() = x.DoNamedTest()
+    [<Test>] member x.``Enter after error 12 - After then and elif``() = x.DoNamedTest()
+    [<Test>] member x.``Enter after error 13 - After for do``() = x.DoNamedTest()
     
     [<Test>] member x.``Enter in comment 01``() = x.DoNamedTest()
     [<Test>] member x.``Enter in comment 02``() = x.DoNamedTest()
