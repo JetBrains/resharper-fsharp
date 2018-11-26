@@ -145,6 +145,10 @@ type FSharpTypingAssist
         let mutable lexer = Unchecked.defaultof<_>
 
         if not (getCachingLexer textControl &lexer && lexer.FindTokenAt(offset)) then 0 else
+
+        // Always add single space before -> so completion works nicely
+        if lexer.TokenType == FSharpTokenType.RARROW then 1 else
+
         if not (rightBracketsToAddSpace.Contains(lexer.TokenType)) then 0 else
 
         let rightBracketOffset = lexer.TokenStart
