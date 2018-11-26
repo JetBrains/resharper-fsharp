@@ -510,18 +510,27 @@ type FSharpTypingAssist
                     match expr with
 
                     // if expr then {caret}
-                    | SynExpr.FromParseError (expr, _)
+                    // No info is available after error recovery, we check that range is surrounded with if ... then.
+                    | SynExpr.FromParseError (ExprRange range, _)
 
                     // while expr do {caret}
-                    | SynExpr.While (_, expr, SynExpr.ArbitraryAfterError _, _) when
-                            document.GetEndOffset(expr.Range) = prevTokenEnd ->
-                        Some expr
+                    | SynExpr.While (_, ExprRange range, _, _) when
+                            document.GetEndOffset(range) = prevTokenEnd ->
+                        Some range
+
+                    // for i = ... to ... do {caret}
+                    | SynExpr.For (_, IdentRange range, _, _, ExprRange lastRange, _, _)
+
+                    // for ... in ... do {caret}
+                    | SynExpr.ForEach (_, _, _, PatRange range, ExprRange lastRange, _, _) when
+                            document.GetEndOffset(lastRange) = prevTokenEnd ->
+                        Some range
 
                     | _ -> defaultTraverse expr }
 
         match Traverse(document.GetCoordsByOffset(lexer.TokenStart).GetPos(), parseTree, visitor) with
         | None -> false
-        | Some (ExprRange range) ->
+        | Some range ->
 
         use cookie = LexerStateCookie.Create(lexer)
         let exprStart = document.GetStartOffset(range)
@@ -559,7 +568,7 @@ type FSharpTypingAssist
                 member x.VisitMatchClause(defaultTraverse, (SynMatchClause.Clause (pat, whenExpr, _, _, _) as mc)) =
                     match pat, whenExpr with
                     | _, Some (ExprRange range)
-                    | (PatRange range), None when document.GetEndOffset(range) = prevTokenEnd -> Some mc
+                    | PatRange range, None when document.GetEndOffset(range) = prevTokenEnd -> Some mc
 
                     | _ -> defaultTraverse mc
 
@@ -1275,7 +1284,7 @@ let isSingleLineBrackets (lexer: CachingLexer) (document: IDocument) =
 
 let tryDeindentTokens: IDictionary<TokenNodeType, TokenNodeType[]> =
     [| FSharpTokenType.THEN, [| FSharpTokenType.IF; FSharpTokenType.ELIF |]
-       FSharpTokenType.DO,   [| FSharpTokenType.WHILE; FSharpTokenType.DO |] |]
+       FSharpTokenType.DO,   [| FSharpTokenType.WHILE; FSharpTokenType.FOR |] |]
     |> dict
 
 

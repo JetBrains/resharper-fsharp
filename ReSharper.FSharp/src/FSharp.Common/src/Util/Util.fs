@@ -170,6 +170,7 @@ module rec FcsUtil =
 
     let (|ExprRange|) (expr: SynExpr) = expr.Range
     let (|PatRange|) (pat: SynPat) = pat.Range
+    let (|IdentRange|) (id: Ident) = id.idRange
 
 
 [<AutoOpen>]
