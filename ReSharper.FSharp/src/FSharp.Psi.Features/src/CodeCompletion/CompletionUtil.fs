@@ -19,9 +19,14 @@ let (|BasicCompletion|SmartCompletion|ImportCompletion|) completionType =
 
 let itemInfoTextStyle = TextStyle.FromForeColor(SystemColors.GrayText)
 
+
+type ISolution with
+    member x.CompletionSessionManager =
+        x.GetComponent<ICodeCompletionSessionManager>()
+
+
 type ITextControl with
     member x.RescheduleCompletion(solution: ISolution) =
         solution.Locks.QueueReadLock("Next code completion", fun _ ->
-            let language = FSharpLanguage.Instance
-            let sessionManager = solution.GetComponent<ICodeCompletionSessionManager>()
-            sessionManager.ExecuteAutomaticCompletionAsync(x, language, AutopopupType.HardAutopopup))
+            solution.CompletionSessionManager
+                .ExecuteAutomaticCompletionAsync(x, FSharpLanguage.Instance, AutopopupType.HardAutopopup))

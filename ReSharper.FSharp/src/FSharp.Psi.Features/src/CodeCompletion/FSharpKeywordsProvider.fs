@@ -1,7 +1,5 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
-open System
-open JetBrains.Application.Threading
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
@@ -32,8 +30,7 @@ type FSharpKeywordsProvider() =
 
     let hashDirectives =
         [ KeywordSuffix.Quotes, ["#load"; "#r"; "#I"; "#nowarn"; "#time"]
-          KeywordSuffix.Space, ["#if"; "#else"]
-          KeywordSuffix.None, ["#endif"] ]
+          KeywordSuffix.None, ["#if"; "#else"; "#endif"] ]
         |> List.map (fun (suffix, directives) ->
             directives |> List.map (fun d -> FSharpHashDirectiveLookupItem(d, suffix) :> TextLookupItemBase))
         |> List.concat
@@ -43,7 +40,7 @@ type FSharpKeywordsProvider() =
         // todo: implement auto-popup completion strategy that will cover operators
         |> List.filter (fun (keyword, _) -> not (PrettyNaming.IsOperatorName keyword))
         |> List.map (fun (keyword, description) ->
-            FSharpKeywordLookupItem(keyword, description, KeywordSuffix.Space) :> TextLookupItemBase)
+            FSharpKeywordLookupItem(keyword, description, KeywordSuffix.None) :> TextLookupItemBase)
 
     let lookupItems = hashDirectives @ keywords
 
@@ -78,13 +75,12 @@ type FSharpKeywordLookupItemBase(keyword, keywordSuffix) =
     inherit TextLookupItemBase()
 
     override x.Image = PsiSymbolsThemedIcons.Keyword.Id
+
     override x.Text =
-            let suffix =
-                match keywordSuffix with
-                | KeywordSuffix.Space -> " "
-                | KeywordSuffix.Quotes -> " \"\""
-                | _ -> String.Empty
-            keyword + suffix
+        match keywordSuffix with
+        | KeywordSuffix.Space -> keyword + " "
+        | KeywordSuffix.Quotes -> keyword + " \"\""
+        | _ -> keyword
 
     override x.GetDisplayName() = LookupUtil.FormatLookupString(keyword, x.TextColor)
 
@@ -93,6 +89,7 @@ type FSharpKeywordLookupItemBase(keyword, keywordSuffix) =
 
         match keywordSuffix with
         | KeywordSuffix.Quotes ->
+            // Move caret back inside inserted quotes.
             textControl.Caret.MoveTo(textControl.Caret.Offset() - 1, CaretVisualPlacement.DontScrollIfVisible)
             textControl.RescheduleCompletion(solution)
         | _ -> ()

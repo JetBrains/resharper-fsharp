@@ -1,7 +1,5 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
-open System
-open System.Collections.Generic
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Resources
@@ -16,10 +14,8 @@ open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.Resources
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.TextControl
-open JetBrains.UI.Icons
 open JetBrains.Util
 
 type FSharpPathCompletionContext(context, token, completedPath, ranges) =
@@ -82,8 +78,8 @@ type FSharpPathCompletionContextProvider() =
                 | BasicCompletion ->
                     let nextSeparatorOffset = argValue.IndexOfAny(FileSystemDefinition.SeparatorChars, caretValueOffset)
                     if nextSeparatorOffset < 0 then argValue.Length else nextSeparatorOffset
-                | SmartCompletion -> argValue.Length
-                | completionType -> failwithf "Got completion type: %O" completionType
+                | _ -> argValue.Length
+
             valueOffset + valueReplaceEndOffset
 
         let document = context.Document
