@@ -66,7 +66,7 @@ abstract class FSharpTemplatesTestCore : RiderTemplatesTestCoreBase() {
                         resumeSession()
                     },
                     outputConsumer = {},
-                    killProcessAfterTest = true
+                    exitProcessAfterTest = true
                 )
             }
 
