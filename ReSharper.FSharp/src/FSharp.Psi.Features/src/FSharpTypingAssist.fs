@@ -119,13 +119,6 @@ type FSharpTypingAssist
            '>', (FSharpTokenType.LESS,   FSharpTokenType.GREATER) |]
         |> dict
 
-    let getCachingLexer textControl (lexer: outref<_>) =
-        match cachingLexerService.GetCachingLexer(textControl) with
-        | null -> false
-        | cachingLexer ->
-            lexer <- cachingLexer
-            true
-
     let getIndentSize (textControl: ITextControl) =
         let document = textControl.Document
         let sourceFile = document.GetPsiSourceFile(this.Solution).NotNull("psiSourceFile is null for {0}", document)
@@ -144,7 +137,7 @@ type FSharpTypingAssist
     let getAdditionalSpacesBeforeToken (textControl: ITextControl) offset lineStart =
         let mutable lexer = Unchecked.defaultof<_>
 
-        if not (getCachingLexer textControl &lexer && lexer.FindTokenAt(offset)) then 0 else
+        if not (this.GetCachingLexer(textControl, &lexer) && lexer.FindTokenAt(offset)) then 0 else
 
         // Always add single space before -> so completion works nicely
         if lexer.TokenType == FSharpTokenType.RARROW then 1 else
@@ -231,7 +224,7 @@ type FSharpTypingAssist
         if caretOffset = document.GetLineStartOffset(line) then line else
 
         let mutable lexer = Unchecked.defaultof<_>
-        if not (getCachingLexer textControl &lexer && lexer.FindTokenAt(caretOffset - 1)) then line else
+        if not (this.GetCachingLexer(textControl, &lexer) && lexer.FindTokenAt(caretOffset - 1)) then line else
 
         let rec tryFindContinuedLine line lineStartOffset hasLeadingLeftBracket =
             if isNull lexer.TokenType then line else  
@@ -348,7 +341,7 @@ type FSharpTypingAssist
         let trimSpacesAfterCaret =
             let mutable lexer = Unchecked.defaultof<_>
             let offset = textControl.Caret.Offset()
-            if not (getCachingLexer textControl &lexer && lexer.FindTokenAt(offset)) then TrimTrailingSpaces.No else
+            if not (this.GetCachingLexer(textControl, &lexer) && lexer.FindTokenAt(offset)) then TrimTrailingSpaces.No else
 
             while lexer.TokenType == FSharpTokenType.WHITESPACE do
                 lexer.Advance()
@@ -407,7 +400,7 @@ type FSharpTypingAssist
         let isAvailable =
             x.CheckAndDeleteSelectionIfNeeded(textControl, fun selection ->
                 let offset = selection.StartOffset
-                offset > 0 && getCachingLexer textControl &lexer && lexer.FindTokenAt(offset - 1))
+                offset > 0 && x.GetCachingLexer(textControl, &lexer) && lexer.FindTokenAt(offset - 1))
 
         if not isAvailable then false else
 
@@ -445,7 +438,7 @@ type FSharpTypingAssist
                 let offset = selection.StartOffset
                 if offset <= 0 then false else
 
-                if not (getCachingLexer textControl &lexer && lexer.FindTokenAt(offset - 1)) then false else
+                if not (x.GetCachingLexer(textControl, &lexer) && lexer.FindTokenAt(offset - 1)) then false else
 
                 while isIgnoredOrNewLine lexer.TokenType do
                     if lexer.TokenType == FSharpTokenType.NEW_LINE then
@@ -657,7 +650,7 @@ type FSharpTypingAssist
         let offset = textControl.Caret.Offset()
         let mutable lexer = Unchecked.defaultof<_>
 
-        if not (getCachingLexer textControl &lexer && lexer.FindTokenAt(offset)) then false else
+        if not (x.GetCachingLexer(textControl, &lexer) && lexer.FindTokenAt(offset)) then false else
 
          // """{caret} foo"""
         if lexer.TokenType != FSharpTokenType.TRIPLE_QUOTED_STRING then false else
@@ -668,7 +661,7 @@ type FSharpTypingAssist
         let strEndLine = document.GetCoordsByOffset(lexer.TokenEnd).Line
         if strStartLine <> strEndLine then false else
 
-        let newLineString = this.GetNewLineText(textControl)
+        let newLineString = x.GetNewLineText(textControl)
         document.InsertText(lexer.TokenEnd - 3, newLineString)
         document.InsertText(offset, newLineString)
         textControl.Caret.MoveTo(offset + newLineString.Length, CaretVisualPlacement.DontScrollIfVisible)
@@ -681,7 +674,7 @@ type FSharpTypingAssist
         if offset <= 0 then false else
 
         let mutable lexer = Unchecked.defaultof<_>
-        if not (getCachingLexer textControl &lexer) then false else
+        if not (x.GetCachingLexer(textControl, &lexer)) then false else
 
         if not (lexer.FindTokenAt(offset - 1) &&
                 let tokenType = lexer.TokenType
@@ -775,7 +768,7 @@ type FSharpTypingAssist
         let mutable lexer = Unchecked.defaultof<_>
         let offset = textControl.Caret.Offset()
         if offset <= 0 then false else
-        if not (getCachingLexer textControl &lexer && lexer.FindTokenAt(offset - 1)) then false else
+        if not (x.GetCachingLexer(textControl, &lexer) && lexer.FindTokenAt(offset - 1)) then false else
 
         while lexer.TokenType == FSharpTokenType.WHITESPACE do
             lexer.Advance(-1)
@@ -855,7 +848,7 @@ type FSharpTypingAssist
         if offset <= 0 then false else
 
         let mutable lexer = Unchecked.defaultof<_>
-        if not (getCachingLexer textControl &lexer) then false else
+        if not (x.GetCachingLexer(textControl, &lexer)) then false else
 
         if not (lexer.FindTokenAt(offset)) then false else
         while lexer.TokenType == FSharpTokenType.WHITESPACE do
@@ -918,7 +911,7 @@ type FSharpTypingAssist
         let offset = textControl.Caret.Offset()
         let mutable lexer = Unchecked.defaultof<_>
 
-        if not (getCachingLexer textControl &lexer && lexer.FindTokenAt(offset)) then false else
+        if not (x.GetCachingLexer(textControl, &lexer) && lexer.FindTokenAt(offset)) then false else
         if lexer.TokenType != FSharpTokenType.TRIPLE_QUOTED_STRING || lexer.TokenStart = offset then false else
 
         let strStart = "\"\"\""
@@ -1003,7 +996,7 @@ type FSharpTypingAssist
             lexer.TokenType == FSharpTokenType.VERBATIM_STRING && typedChar = '\"'
 
         let mutable lexer = Unchecked.defaultof<_>
-        if not (getCachingLexer textControl &lexer && lexer.FindTokenAt(offset - 1)) then false else
+        if not (x.GetCachingLexer(textControl, &lexer) && lexer.FindTokenAt(offset - 1)) then false else
         if not lexer.TokenType.IsStringLiteral || offset = lexer.TokenEnd then false else
         if not (skipEndQuote lexer || skipEscapedQuoteInVerbatim lexer) then false else
 
@@ -1016,7 +1009,7 @@ type FSharpTypingAssist
         let document = textControl.Document
         let line = document.GetCoordsByOffset(offset).Line
 
-        if not (getCachingLexer textControl &lexer) then false else
+        if not (x.GetCachingLexer(textControl, &lexer)) then false else
 
         if offset = document.GetDocumentEndOffset().Offset then
             if lexer.FindTokenAt(offset - 1) &&
@@ -1054,7 +1047,7 @@ type FSharpTypingAssist
         let offset = textControl.Caret.Offset()
         let mutable lexer = Unchecked.defaultof<_>
 
-        if not (getCachingLexer textControl &lexer && lexer.FindTokenAt(offset - 1)) then false else
+        if not (x.GetCachingLexer(textControl, &lexer) && lexer.FindTokenAt(offset - 1)) then false else
         if lexer.TokenType != FSharpTokenType.STRING || lexer.GetTokenLength() <> 2 then false else
         if lexer.TokenEnd <> offset then false else
 
@@ -1068,7 +1061,7 @@ type FSharpTypingAssist
         let isAvailable =
             x.CheckAndDeleteSelectionIfNeeded(textControl, fun selection ->
                 let offset = selection.StartOffset
-                if not (offset > 0 && getCachingLexer textControl &lexer) then false else
+                if not (offset > 0 && x.GetCachingLexer(textControl, &lexer)) then false else
 
                 if not (lexer.FindTokenAt(offset - 1)) then false else
                 let left = lexer.TokenType
@@ -1089,14 +1082,14 @@ type FSharpTypingAssist
     member x.HandleLeftAngleBracket(context: ITypingContext) =
         let textControl = context.TextControl
         let mutable lexer = Unchecked.defaultof<_>
-        if not (getCachingLexer textControl &lexer) then false else
+        if not (x.GetCachingLexer(textControl, &lexer)) then false else
 
         insertCharInBrackets textControl lexer ("<", ">") listBrackets LeftBracketOnly.Yes
 
     member x.HandleBarTyped(context: ITypingContext) =
         let textControl = context.TextControl
         let mutable lexer = Unchecked.defaultof<_>
-        if not (getCachingLexer textControl &lexer) then false else
+        if not (x.GetCachingLexer(textControl, &lexer)) then false else
         insertCharInBrackets textControl lexer ("|", "|") listBrackets LeftBracketOnly.No
     
     member x.HandleAtTyped(context: ITypingContext) =
@@ -1107,7 +1100,7 @@ type FSharpTypingAssist
         if offset <= 0 then false else
 
         let mutable lexer = Unchecked.defaultof<_>
-        if not (getCachingLexer textControl &lexer && lexer.FindTokenAt(offset - 1)) then false else
+        if not (x.GetCachingLexer(textControl, &lexer) && lexer.FindTokenAt(offset - 1)) then false else
 
         if x.MakeQuotation(textControl, lexer, offset) then true else
         if x.MakeEmptyQuotationUntyped(textControl, lexer, offset) then true else
@@ -1139,6 +1132,13 @@ type FSharpTypingAssist
         match x.CommitPsiOnlyAndProceedWithDirtyCaches(textControl, id).AsFSharpFile() with
         | null -> None
         | fsFile -> fsFile.ParseTree
+
+    member x.GetCachingLexer(textControl: ITextControl, lexer: byref<CachingLexer>) =
+        match x.GetCachingLexer(textControl) with
+        | null -> false
+        | cachingLexer ->
+            lexer <- cachingLexer
+            true
 
     override x.IsSupported(textControl: ITextControl) =
         match textControl.Document.GetPsiSourceFile(x.Solution) with
