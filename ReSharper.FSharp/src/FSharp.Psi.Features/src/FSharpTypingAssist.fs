@@ -163,39 +163,9 @@ type FSharpTypingAssist
         // Space before first list element.
         lexer.TokenStart - leftBracketEndOffset
 
-    let trimTrailingSpacesAtOffset (textControl: ITextControl) (startOffset: outref<int>) trimAfterCaret =
-        let isWhitespace c =
-            c = ' ' || c = '\t'
-
-        let document = textControl.Document
-        let line = document.GetCoordsByOffset(startOffset).Line
-        let lineStart = document.GetLineStartOffset(line)
-        if document.GetText(TextRange(lineStart, startOffset)).IsWhitespace() then () else
-
-        let mutable endOffset = startOffset
-        let buffer = document.Buffer
-        while startOffset > 0 && isWhitespace buffer.[startOffset - 1] do
-            startOffset <- startOffset - 1
-
-        let lineEndOffset = document.GetLineEndOffsetNoLineBreak(line)
-        if trimAfterCaret = TrimTrailingSpaces.Yes then
-            while endOffset < lineEndOffset && isWhitespace buffer.[endOffset] do
-                endOffset <- endOffset + 1
-
-        let additionalSpaces =
-            if endOffset >= lineEndOffset then 0 else
-            getAdditionalSpacesBeforeToken textControl endOffset lineStart
-        
-        if additionalSpaces > 0 then
-            let replaceRange = TextRange(startOffset, endOffset)
-            document.ReplaceText(replaceRange, String(' ', additionalSpaces))
-
-        elif startOffset <> endOffset then
-            document.DeleteText(TextRange(startOffset, endOffset))
-
     let trimTrailingSpaces (textControl: ITextControl) trimAfterCaret =
         let mutable offset = textControl.Caret.Offset()
-        trimTrailingSpacesAtOffset textControl &offset trimAfterCaret
+        this.TrimTrailingSpacesAtOffset(textControl, &offset, trimAfterCaret)
         offset
 
     let insertText (textControl: ITextControl) insertOffset text commandName =
@@ -1122,6 +1092,36 @@ type FSharpTypingAssist
             true else
 
         insertCharInBrackets textControl lexer ("@", "@") typedQuotationBrackes LeftBracketOnly.No
+
+    member x.TrimTrailingSpacesAtOffset(textControl: ITextControl, startOffset: byref<int>, trimAfterCaret) =
+        let isWhitespace c =
+            c = ' ' || c = '\t'
+
+        let document = textControl.Document
+        let line = document.GetCoordsByOffset(startOffset).Line
+        let lineStart = document.GetLineStartOffset(line)
+        if document.GetText(TextRange(lineStart, startOffset)).IsWhitespace() then () else
+
+        let mutable endOffset = startOffset
+        let buffer = document.Buffer
+        while startOffset > 0 && isWhitespace buffer.[startOffset - 1] do
+            startOffset <- startOffset - 1
+
+        let lineEndOffset = document.GetLineEndOffsetNoLineBreak(line)
+        if trimAfterCaret = TrimTrailingSpaces.Yes then
+            while endOffset < lineEndOffset && isWhitespace buffer.[endOffset] do
+                endOffset <- endOffset + 1
+
+        let additionalSpaces =
+            if endOffset >= lineEndOffset then 0 else
+            getAdditionalSpacesBeforeToken textControl endOffset lineStart
+        
+        if additionalSpaces > 0 then
+            let replaceRange = TextRange(startOffset, endOffset)
+            document.ReplaceText(replaceRange, String(' ', additionalSpaces))
+
+        elif startOffset <> endOffset then
+            document.DeleteText(TextRange(startOffset, endOffset))
     
     member x.GetNewLineText(textControl: ITextControl) =
         x.GetNewLineText(textControl.Document.GetPsiSourceFile(x.Solution))
