@@ -43,6 +43,7 @@
     <Compile Include="src\Formatter\FSharpCodeStylePage.fs" />
     <Compile Include="src\Formatter\ReformatCode.fs" />
     <Compile Include="src\Fsi\FsiOptions.fs" />
+    <Compile Include="src\Fsi\FsiDetector.fs" />
     <Compile Include="src\Fsi\FsiSessionsHost.fs" />
     <Compile Include="src\Fsi\FsiOptionsPage.fs" />
     <Compile Include="src\TodoItems\FSharpTodoContentsProvider.fs" />

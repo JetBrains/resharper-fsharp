@@ -18,10 +18,7 @@ import com.intellij.notification.Notification
 import com.intellij.notification.NotificationListener
 import com.intellij.notification.NotificationType
 import com.intellij.notification.Notifications
-import com.intellij.openapi.actionSystem.ActionPlaces
-import com.intellij.openapi.actionSystem.AnAction
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.DefaultActionGroup
+import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.util.EditorUtil
@@ -61,14 +58,13 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
         private const val debugNotConfiguredDescription = "F# Interactive should be relaunched."
         private const val notificationLinks = "<br/>${RelaunchFsiWithDebugAction.link}&nbsp;&nbsp;&nbsp;&nbsp;${ShowFsiSettingsAction.link}"
 
-        private val riderFsiArgs = listOf("--fsi-server:rider", "--readline-")
         private val debugFsiArgs = listOf("--optimize-", "--debug+")
 
         private const val waitForDebugSessionTimeout = 15000L
     }
 
     val optimizeForDebug = debug || sessionInfo.fixArgsForAttach
-    private val fsiArgs = sessionInfo.args + (if (optimizeForDebug) debugFsiArgs else emptyList()) + riderFsiArgs
+    private val fsiArgs = sessionInfo.args + (if (optimizeForDebug) debugFsiArgs else emptyList())
     private var cmdLine = GeneralCommandLine()
             .withExePath(sessionInfo.fsiPath)
             .withParameters(fsiArgs)
@@ -208,7 +204,10 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
         val actionList = ContainerUtil.newArrayList<AnAction>(
                 createCloseAction(defaultExecutor, contentDescriptor),
                 ResetFsiAction(this.fsiHost),
-                CommandHistoryAction(this))
+                Separator(),
+                CommandHistoryAction(this),
+                Separator(),
+                OpenSettings(project))
         toolbarActions.addAll(actionList)
         actionList.add(createConsoleExecAction(consoleExecuteActionHandler))
         return actionList
@@ -241,6 +240,12 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
     private class ResetFsiAction(private val host: FsiHost) : AnAction("Reset F# Interactive", null, AllIcons.Actions.Restart) {
         override fun actionPerformed(e: AnActionEvent) {
             host.resetFsiConsole(host.consoleRunner?.optimizeForDebug ?: false)
+        }
+    }
+
+    private class OpenSettings(val project: Project) : AnAction("F# Interactive settings", null, AllIcons.General.Settings) {
+        override fun actionPerformed(e: AnActionEvent) {
+            ShowSettingsUtil.getInstance().showSettingsDialog(project, "Fsi")
         }
     }
 }

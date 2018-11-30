@@ -6,11 +6,7 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Common
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ProjectStructure
-open JetBrains.ReSharper.Plugins.FSharp.Services.ContextActions
-open JetBrains.ReSharper.Psi
-open JetBrains.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi
 
 [<SolutionComponent>]
 type FsiSessionsHostStub() =
@@ -29,14 +25,6 @@ type FSharpFileServiceStub() =
     interface IFSharpFileService with
         member x.IsScratchFile(_) = false
         member x.IsScriptLike(_) = false
-
-
-[<SolutionComponent>]
-type FsiDetectorStub() =
-    interface IHideImplementation<FsiDetector>
-
-    interface IFsiDetector with
-        member x.GetSystemFsiDirectoryPath() = FileSystemPath.Empty
 
 
 /// Used to add assemblies to R# subplatfrom at runtime
