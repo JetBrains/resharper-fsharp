@@ -40,6 +40,8 @@ import com.jetbrains.rdclient.util.idea.pumpMessages
 import com.jetbrains.rider.debugger.DotNetDebugProcess
 import com.jetbrains.rider.model.RdFsiSessionInfo
 import com.jetbrains.rider.plugins.fsharp.FSharpIcons
+import com.jetbrains.rider.runtime.RiderDotNetActiveRuntimeHost
+import com.jetbrains.rider.runtime.mono.MonoRuntime
 import com.jetbrains.rider.util.idea.application
 import com.jetbrains.rider.util.idea.getComponent
 import org.jetbrains.concurrency.AsyncPromise
@@ -70,6 +72,11 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
             .withParameters(fsiArgs)
 
     init {
+        val currentRuntime = project.getComponent<RiderDotNetActiveRuntimeHost>().getCurrentDotNetRuntime(false)
+        if (currentRuntime != null && currentRuntime is MonoRuntime && sessionInfo.fsiPath.endsWith(".exe", true)) {
+            currentRuntime.patchRunCommandLine(cmdLine, listOf())
+        }
+
         if (project.isDirectoryBased) {
             val projectDir = project.baseDir
             val workingDir = if (projectDir.exists()) projectDir else VfsUtil.getUserHomeDir()

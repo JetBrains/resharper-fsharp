@@ -1,11 +1,14 @@
 module rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi.FsiDetector
 
 open System
+open System.Collections.Generic
 open System.Globalization
 open JetBrains.Application
 open JetBrains.Application.platforms
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.NuGet.Packaging
+open JetBrains.ReSharper.Host.Features.Runtime
+open JetBrains.ReSharper.Host.Features.Toolset
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi.Settings
 open JetBrains.Util
@@ -137,9 +140,31 @@ type LegacyVsFsiProvider() =
 
 
 type MonoFsiProvider() =
+    let fsiRelativePath = RelativePath.Parse("lib/mono/fsharp") / defaultFsiName
+    let fsiToolPathComparer =
+        { new IEqualityComparer<FsiTool> with
+            member __.Equals(x, y) = x.Path = y.Path
+            member __.GetHashCode(obj) = obj.Path.GetHashCode() }
+
     interface IFsiDirectoryProvider with
-        member x.GetFsiTools(_) =
-            [] :> _
+        member x.GetFsiTools(solution) =
+            let tools = HashSet(fsiToolPathComparer)
+            seq {
+                if isNotNull solution && PlatformUtil.IsRunningOnMono then
+                    let currentToolset = solution.GetComponent<RiderSolutionToolset>()
+                    let fsiPath = currentToolset.CurrentMonoRuntime.RootPath / fsiRelativePath
+                    if fsiPath.ExistsFile then
+                        let fsiTool = FsiTool.Create("Current Mono toolset", fsiPath.Directory)
+                        tools.Add(fsiTool) |> ignore
+                        yield fsiTool
+    
+                for runtime in MonoRuntimeDetector.DetectMonoRuntimes() do
+                    let fsiPath = runtime.RootPath / fsiRelativePath
+                    if fsiPath.ExistsFile then
+                        let fsiTool = FsiTool.Create(sprintf "Mono %s" runtime.RootPath.Name, fsiPath.Directory)
+                        if not (tools.Contains(fsiTool)) then
+                            tools.Add(fsiTool) |> ignore
+                            yield fsiTool }
 
 
 type SolutionInstalledFsiProvider() =
