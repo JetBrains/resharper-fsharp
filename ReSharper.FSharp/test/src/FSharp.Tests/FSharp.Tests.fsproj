@@ -7,15 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Common.fs" />
     <Compile Include="TestWithTwoProjects.fs" />
     <Compile Include="CSharpResolveTest.fs" />
     <Compile Include="SymbolCacheTest.fs" />
     <Compile Include="ErrorsHighlightingTest.fs" />
+    <Compile Include="IdentifierHighlightingTest.fs" />
     <Compile Include="DelegatingFileSystemShimTest.fs" />
     <Compile Include="FSharpLexerTest.fs" />
     <Compile Include="Stubs.fs" />
     <Compile Include="ZoneMarker.fs" />
-    <Compile Include="Common.fs" />
     <Compile Include="CommentActionTests.fs" />
     <Compile Include="TypingAssistTest.fs" />
   </ItemGroup>

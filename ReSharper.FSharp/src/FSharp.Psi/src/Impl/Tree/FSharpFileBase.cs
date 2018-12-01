@@ -158,7 +158,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       const int minimumEscapedNameLength = 5;
       if (endOffset >= minimumEscapedNameLength && buffer.Length >= minimumEscapedNameLength &&
           buffer[endOffset - 1] == '`' && buffer[endOffset - 2] == '`')
-        for (var i = endOffset - 4; i > startOffset; i--)
+        for (var i = endOffset - 4; i >= startOffset; i--)
           if (buffer[i] == '`' && buffer[i + 1] == '`')
             return new TextRange(i, endOffset);
 
