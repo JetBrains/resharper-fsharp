@@ -18,7 +18,7 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 {
   [PsiSharedComponent]
-  public class FSharpSearcherFactory : IDomainSpecificSearcherFactory
+  public class FSharpSearcherFactory : DomainSpecificSearcherFactoryBase
   {
     private readonly SearchDomainFactory mySearchDomainFactory;
     private readonly CLRDeclaredElementSearcherFactory myClrSearchFactory;
@@ -30,22 +30,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
       myClrSearchFactory = clrSearchFactory;
     }
 
-    public bool IsCompatibleWithLanguage(PsiLanguageType languageType)
-    {
-      return languageType.Is<FSharpLanguage>();
-    }
+    public override bool IsCompatibleWithLanguage(PsiLanguageType languageType) => languageType.Is<FSharpLanguage>();
 
-    public IDomainSpecificSearcher CreateReferenceSearcher(IDeclaredElementsSet elements, bool findCandidates)
-    {
-      return new FSharpReferenceSearcher(elements, findCandidates);
-    }
+    public override IDomainSpecificSearcher CreateReferenceSearcher(IDeclaredElementsSet elements, bool findCandidates) => 
+      new FSharpReferenceSearcher(elements, findCandidates);
 
-    public IEnumerable<string> GetAllPossibleWordsInFile(IDeclaredElement element)
-    {
-      return FSharpNamesUtil.GetPossibleSourceNames(element);
-    }
+    public override IEnumerable<string> GetAllPossibleWordsInFile(IDeclaredElement element) => 
+      FSharpNamesUtil.GetPossibleSourceNames(element);
 
-    public ISearchDomain GetDeclaredElementSearchDomain(IDeclaredElement declaredElement)
+    public override ISearchDomain GetDeclaredElementSearchDomain(IDeclaredElement declaredElement)
     {
       // todo: type abbreviations
       if (declaredElement is ILocalDeclaration localDeclaration)
@@ -66,21 +59,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
             if (patternTypeElement == null)
               return EmptySearchDomain.Instance;
 
-            declaredElement = patternTypeElement;
+            return myClrSearchFactory.GetDeclaredElementSearchDomain(patternTypeElement);
           }
         }
 
-        var activePatternCaseElement = fsSymbolElement as ActivePatternCase;
-        var declaration = activePatternCaseElement?.GetDeclaration();
-        var containingType = ((ITypeDeclaration) declaration?.GetContainingTypeDeclaration())?.DeclaredElement;
-        if (containingType != null)
-          declaredElement = containingType;
+        if (fsSymbolElement is ActivePatternCase activePatternCaseElement)
+        {
+          var declaration = activePatternCaseElement.GetDeclaration();
+          var containingType = ((ITypeDeclaration) declaration?.GetContainingTypeDeclaration())?.DeclaredElement;
+          if (containingType != null)
+            return myClrSearchFactory.GetDeclaredElementSearchDomain(containingType);
+        }
       }
 
-      return myClrSearchFactory.GetDeclaredElementSearchDomain(declaredElement);
+      return EmptySearchDomain.Instance;
     }
 
-    public Tuple<ICollection<IDeclaredElement>, bool> GetNavigateToTargets(IDeclaredElement element)
+    public override Tuple<ICollection<IDeclaredElement>, bool> GetNavigateToTargets(IDeclaredElement element)
     {
       // todo: for union cases navigate to case declarations
 
@@ -117,59 +112,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
       return fsTypeMember.GetContainingType() is IDeclaredElement containingType
         ? Tuple.Create(new[] {containingType}.AsCollection(), false)
         : null;
-    }
-
-    public ICollection<FindResult> TransformNavigationTargets(ICollection<FindResult> targets)
-    {
-      return null;
-    }
-
-    public IEnumerable<RelatedDeclaredElement> GetRelatedDeclaredElements(IDeclaredElement element)
-    {
-      return EmptyList<RelatedDeclaredElement>.Instance;
-    }
-
-    public Tuple<ICollection<IDeclaredElement>, Predicate<IFindResultReference>, bool> GetDerivedFindRequest(
-      IFindResultReference result)
-    {
-      return null;
-    }
-
-    public IDomainSpecificSearcher CreateLateBoundReferenceSearcher(IDeclaredElementsSet elements)
-    {
-      return null;
-    }
-
-    public IDomainSpecificSearcher CreateConstructorSpecialReferenceSearcher(ICollection<IConstructor> constructors)
-    {
-      return null;
-    }
-
-    public IDomainSpecificSearcher CreateMethodsReferencedByDelegateSearcher(IDelegate @delegate)
-    {
-      return null;
-    }
-
-    public IDomainSpecificSearcher CreateTextOccurrenceSearcher(IDeclaredElementsSet elements)
-    {
-      return null;
-    }
-
-    public IDomainSpecificSearcher CreateTextOccurrenceSearcher(string subject)
-    {
-      return null;
-    }
-
-    public IDomainSpecificSearcher CreateAnonymousTypeSearcher(IList<AnonymousTypeDescriptor> typeDescription,
-      bool caseSensitive)
-    {
-      return null;
-    }
-
-    public IDomainSpecificSearcher CreateConstantExpressionSearcher(ConstantValue constantValue,
-      bool onlyLiteralExpression)
-    {
-      return null;
     }
   }
 }
