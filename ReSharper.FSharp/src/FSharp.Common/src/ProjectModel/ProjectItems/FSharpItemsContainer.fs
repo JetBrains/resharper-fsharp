@@ -16,7 +16,6 @@ open JetBrains.ProjectModel.Caches
 open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost.Impl
 open JetBrains.ProjectModel.ProjectsHost.MsBuild
-open JetBrains.ProjectModel.ProjectsHost.MsBuild.Structure
 open JetBrains.ProjectModel.ProjectsHost.SolutionHost
 open JetBrains.ReSharper.Feature.Services.Navigation
 open JetBrains.ReSharper.Feature.Services.Navigation.NavigationProviders
@@ -25,6 +24,7 @@ open JetBrains.ReSharper.Host.Features.ProjectModel.View.Appenders
 open JetBrains.ReSharper.Host.Features.ProjectModel.View.Ordering
 open JetBrains.ReSharper.Host.Features.Util.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Psi
 open JetBrains.Threading
 open JetBrains.UI.RichText
@@ -71,7 +71,8 @@ type FSharpItemsContainerLoader(lifetime: Lifetime, solution: ISolution, solutio
 /// Keeps project items in proper order and is used in creating FCS project options and F# project tree.
 [<SolutionInstanceComponent>]
 type FSharpItemsContainer
-        (logger: ILogger, containerLoader: FSharpItemsContainerLoader, refresher: IFSharpItemsContainerRefresher) =
+        (logger: ILogger, containerLoader: FSharpItemsContainerLoader, refresher: IFSharpItemsContainerRefresher,
+         buildActions: MsBuildDefaultBuildActions) =
 
     let locker = JetFastSemiReenterableRWLock()
     let projectMappings = lazy (containerLoader.GetMap())
@@ -94,11 +95,11 @@ type FSharpItemsContainer
         |> Option.bind tryGetProjectMapping
         |> Option.bind (fun mapping -> mapping.TryGetProjectItem(viewItem))
 
-    let getItems (msBuildProject: MsBuildProject) itemTypeFilter getItemsByName allowNonDefaultItemType =
+    let getItems (msBuildProject: MsBuildProject) projectDescriptor itemTypeFilter getItemsByName allowNonDefaultItemType =
         let items = List<RdProjectItemWithTargetFrameworks>()
         for rdProject in msBuildProject.RdProjects do
             let targetFrameworkId = msBuildProject.GetTargetFramework(rdProject)
-            let filter = MsBuildItemTypeFilter(rdProject)
+            let filter = buildActions.CreateItemFilter(rdProject, projectDescriptor)
 
             rdProject.Items
             |> List.ofSeq
@@ -174,7 +175,7 @@ type FSharpItemsContainer
         x.ProjectMappings.Remove(projectMark) |> ignore
 
     interface IFSharpItemsContainer with
-        member x.OnProjectLoaded(projectMark, msBuildProject) =
+        member x.OnProjectLoaded(projectMark, msBuildProject, projectDescriptor) =
             match msBuildProject with
             | null ->
                 use lock = locker.UsingWriteLock()
@@ -185,15 +186,16 @@ type FSharpItemsContainer
             | FSharpProjectMark ->
                 let itemsByName = OneToListMap()
                 for rdProject in msBuildProject.RdProjects do
+                    let itemFilter = buildActions.CreateItemFilter(rdProject, projectDescriptor)
                     for rdItem in rdProject.Items do
                         itemsByName.Add(rdItem.EvaluatedInclude, rdItem.ItemType)
 
                 let getItemsByName name =
                     itemsByName.GetValuesSafe(name)
 
-                let compileBeforeItems = getItems msBuildProject isCompileBefore getItemsByName true
-                let compileAfterItems = getItems msBuildProject isCompileAfter getItemsByName true 
-                let restItems = getItems msBuildProject (changesOrder >> not) getItemsByName false
+                let compileBeforeItems = getItems msBuildProject projectDescriptor isCompileBefore getItemsByName true
+                let compileAfterItems = getItems msBuildProject projectDescriptor isCompileAfter getItemsByName true 
+                let restItems = getItems msBuildProject projectDescriptor (changesOrder >> not) getItemsByName false
                 let items =
                     compileBeforeItems.Concat(restItems).Concat(compileAfterItems)
                     |> Seq.map (fun item ->
@@ -1156,3 +1158,15 @@ type FSharpItemModificationContextProvider(container: IFSharpItemsContainer) =
 type FSharpModificationSettingsProvider() =
     interface IMsBuildModificationSettingsProvider with
         member x.SmartModificationsFilter = ["fsproj"] :> _
+
+
+//[<SolutionInstanceComponent>]
+type FSharpBuildActionsProvider() =
+    let buildActions =
+        [| BuildActions.compileBefore
+           BuildActions.compileAfter |]
+    
+    interface IMsBuildDefaultBuildActionsProvider with
+        member x.IsApplicable(projectProperties) = projectProperties :? FSharpProjectProperties
+        member x.DefaultBuildActions = buildActions :> _
+        member x.IsAllowed(_) = false

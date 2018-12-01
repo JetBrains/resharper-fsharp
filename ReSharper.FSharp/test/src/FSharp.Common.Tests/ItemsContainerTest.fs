@@ -10,8 +10,12 @@ open JetBrains.ProjectModel
 open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost.Impl
 open JetBrains.ProjectModel.ProjectsHost.MsBuild
+open JetBrains.ProjectModel.ProjectsHost.MsBuild.Internal
+open JetBrains.ProjectModel.ProjectsHost.MsBuild.Structure
+open JetBrains.ProjectModel.Update
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.TestFramework
 open JetBrains.Util
 open JetBrains.Util.Logging
@@ -27,6 +31,21 @@ let solutionMark = SolutionMarkFactory.Create(projectDirectory.Combine("Solution
 let projectMark = DummyProjectMark(solutionMark, "Project", Guid.Empty, projectDirectory.Combine("Project.fsproj"))
 
 let projectPath (relativePath: string) = projectDirectory / relativePath 
+
+let buildActions =
+    let provider = Mock<IMsBuildDefaultBuildActionsProvider>()
+    let buildActions =
+        [| yield! MsBuildDefaultBuildActionsProvider().DefaultBuildActions
+           yield BuildActions.compileBefore
+           yield BuildActions.compileAfter |]
+        |> HashSet
+
+    let itemFilter = MsBuildItemTypeFilter(buildActions)
+    provider.Setup(fun x -> x.IsApplicable(It.IsAny())).Returns(true) |> ignore
+    provider.Setup(fun x -> x.DefaultBuildActions).Returns(buildActions) |> ignore
+    provider.Setup(fun x -> x.IsAllowed(It.IsAny())).Returns(false) |> ignore
+    MsBuildDefaultBuildActions([|provider.Object|])
+
 
 let (|NormalizedPath|) (path: FileSystemPath) =
     path.MakeRelativeTo(projectDirectory).NormalizeSeparators(FileSystemPathEx.SeparatorStyle.Unix)
@@ -53,8 +72,10 @@ let createContainer items writer =
     let rdProjectDescription =
         RdProjectDescription(projectDirectory.FullPath, projectMark.Location.FullPath, null, List(), List(), List())
     let msBuildProject = MsBuildProject(projectMark, Dictionary(), [rdProject].ToList(id), rdProjectDescription)
+    let projectProperties = FSharpProjectPropertiesFactory.CreateProjectProperties(List())
+    let projectDescriptor = ProjectDescriptor.CreateByProjectName(Guid(), projectProperties, null, projectMark.Name)
 
-    (container :> IFSharpItemsContainer).OnProjectLoaded(projectMark, msBuildProject)
+    (container :> IFSharpItemsContainer).OnProjectLoaded(projectMark, msBuildProject, projectDescriptor)
     container
 
 
@@ -993,7 +1014,7 @@ type AnItem =
 
 
 type LoggingFSharpItemsContainer(writer, refresher) as this =
-    inherit FSharpItemsContainer(DummyLogger.Instance, DummyFSharpItemsContainerLoader.Instance, refresher)
+    inherit FSharpItemsContainer(DummyLogger.Instance, DummyFSharpItemsContainerLoader.Instance, refresher, buildActions)
 
     let container = this :> IFSharpItemsContainer
 
