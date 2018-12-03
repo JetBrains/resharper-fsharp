@@ -112,9 +112,9 @@ type FSharpProjectScopeCategoryUIProvider() as this =
 
 [<OptionsPage("RiderFSharpFileTemplatesSettings", "F#", typeof<ProjectModelThemedIcons.Fsharp>)>]
 type RiderFSharpFileTemplatesOptionPage
-        (lifetime, settings, storedTemplatesProvider, uiProvider: FSharpProjectScopeCategoryUIProvider,
+        (lifetime, optionsPageContext, settings, storedTemplatesProvider, uiProvider: FSharpProjectScopeCategoryUIProvider,
          scopeCategoryManager, uiFactory, iconHostBase) =
-    inherit RiderFileTemplatesOptionPageBase(lifetime, uiProvider, settings, storedTemplatesProvider,
+    inherit RiderFileTemplatesOptionPageBase(lifetime, uiProvider, optionsPageContext, settings, storedTemplatesProvider,
         scopeCategoryManager, uiFactory, iconHostBase, FSharpProjectFileType.Name)
 
 

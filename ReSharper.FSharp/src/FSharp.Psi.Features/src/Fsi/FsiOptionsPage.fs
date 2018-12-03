@@ -20,9 +20,9 @@ open JetBrains.Util
 
 [<OptionsPage("FsiOptionsPage", "Fsi", typeof<ProjectModelThemedIcons.Fsharp>, HelpKeyword = fsiHelpKeyword)>]
 type FsiOptionsPage
-        (lifetime: Lifetime, settings, fsiDetector: FsiDetector,
+        (lifetime: Lifetime, optionsPageContext, settings, fsiDetector: FsiDetector,
          [<Optional; DefaultParameterValue(null: ISolution)>] solution: ISolution) as this =
-    inherit BeSimpleOptionsPage(lifetime, settings)
+    inherit BeSimpleOptionsPage(lifetime, optionsPageContext, settings)
 
     let (|ArgValue|) (arg: PropertyChangedEventArgs<_>) = arg.New
     let (|FsiTool|) (obj: obj) = obj :?> FsiTool 
