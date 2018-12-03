@@ -29,11 +29,9 @@ type FSharpTypingAssist
          skippingTypingAssist)
 
     let indentingTokens =
-        [| FSharpTokenType.LARROW
-           FSharpTokenType.LBRACK_LESS
+        [| FSharpTokenType.LBRACK_LESS
            FSharpTokenType.LQUOTE_TYPED
            FSharpTokenType.LQUOTE_UNTYPED
-           FSharpTokenType.BEGIN
            FSharpTokenType.STRUCT
            FSharpTokenType.CLASS
            FSharpTokenType.INTERFACE
@@ -47,6 +45,7 @@ type FSharpTypingAssist
            FSharpTokenType.LBRACE
            FSharpTokenType.LBRACK_BAR
            FSharpTokenType.EQUALS
+           FSharpTokenType.LARROW
            FSharpTokenType.RARROW
            FSharpTokenType.IF
            FSharpTokenType.THEN
@@ -58,7 +57,8 @@ type FSharpTypingAssist
            FSharpTokenType.DO
            FSharpTokenType.DO_BANG
            FSharpTokenType.YIELD
-           FSharpTokenType.YIELD_BANG |]
+           FSharpTokenType.YIELD_BANG
+           FSharpTokenType.BEGIN |]
         |> HashSet
 
     let deindentingTokens =
