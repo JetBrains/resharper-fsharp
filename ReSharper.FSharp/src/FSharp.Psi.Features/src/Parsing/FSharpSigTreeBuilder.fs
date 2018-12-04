@@ -1,9 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
-open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
-open JetBrains.ReSharper.Psi.TreeBuilder
-open JetBrains.Util
 open Microsoft.FSharp.Compiler.Ast
 open Microsoft.FSharp.Compiler.PrettyNaming
 
@@ -60,7 +57,7 @@ type internal FSharpSigTreeBuilder(file, lexer, sigs, lifetime) =
             | SynTypeDefnSigRepr.Simple(simpleRepr,_) ->
                 match simpleRepr with
                 | SynTypeDefnSimpleRepr.Record(_,fields,_) ->
-                    for f in fields do x.ProcessField f
+                    for f in fields do x.ProcessField f ElementType.RECORD_FIELD_DECLARATION
                     ElementType.RECORD_DECLARATION
 
                 | SynTypeDefnSimpleRepr.Enum(enumCases,_) ->
