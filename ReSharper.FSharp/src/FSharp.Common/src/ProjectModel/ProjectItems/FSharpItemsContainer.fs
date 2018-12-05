@@ -1115,6 +1115,7 @@ type FSharpViewItem =
 
     interface IProjectElementHolder with
         member x.Element = x.ProjectItem :> _
+        member x.Value = x.ProjectItem :> _
 
     interface IEquatable<IProjectElementHolder> with
         member x.Equals(other) = other.Element.Equals(x.ProjectItem)
