@@ -11,6 +11,7 @@ open JetBrains.ReSharper.Host.Features.Runtime
 open JetBrains.ReSharper.Host.Features.Toolset
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi.Settings
+open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
 let [<Literal>] defaultFsiName        = "fsi.exe"
@@ -158,7 +159,8 @@ type MonoFsiProvider() =
                         tools.Add(fsiTool) |> ignore
                         yield fsiTool
     
-                for runtime in MonoRuntimeDetector.DetectMonoRuntimes() do
+                let monoRuntimeDetector = Shell.Instance.GetComponent<MonoRuntimeDetector>()
+                for runtime in monoRuntimeDetector.DetectMonoRuntimes() do
                     let fsiPath = runtime.RootPath / fsiRelativePath
                     if fsiPath.ExistsFile then
                         let fsiTool = FsiTool.Create(sprintf "Mono %s" runtime.RootPath.Name, fsiPath.Directory)
