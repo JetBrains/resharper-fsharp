@@ -141,18 +141,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         return TypeFactory.CreateUnknownType(psiModule);
 
       // F# 4.0 specs 18.1.3
-      if (isFromMethodSig && type.IsNativePtr && !HasGenericTypeParams(fsType))
+      try
       {
-        try
+        if (isFromMethodSig && type.IsNativePtr && !HasGenericTypeParams(fsType))
         {
           var argType = GetSingleTypeArgument(fsType, typeParamsFromContext, psiModule, true);
           return TypeFactory.CreatePointerType(argType);
         }
-        catch (Exception e)
-        {
-          Logger.LogMessage(LoggingLevel.WARN, "Could not map pointer type: {0}", fsType);
-          Logger.LogExceptionSilently(e);
-        }
+      }
+      catch (Exception e)
+      {
+        Logger.LogMessage(LoggingLevel.WARN, "Could not map pointer type: {0}", fsType);
+        Logger.LogExceptionSilently(e);
       }
 
       if (type.IsGenericParameter)
