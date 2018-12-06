@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
@@ -9,8 +9,6 @@
   <ItemGroup>
     <Compile Include="src\ProjectModel\FSharpProjectLanguage.fs" />
     <Compile Include="src\ProjectModel\ProjectProperties\FSharpProjectProperties.fs" />
-    <Compile Include="src\ProjectModel\ProjectProperties\FSharpProjectPropertiesFactory.fs" />
-    <Compile Include="src\ProjectModel\ProjectProperties\FSharpProjectFilePropertiesProvider.fs" />
     <Compile Include="src\ProjectModel\FSharpLanguageSpecificItemsProvider.fs" />
     <Compile Include="src\ProjectModel\ZoneMarker.fs" />
     <Compile Include="src\Util\Util.fs" />
