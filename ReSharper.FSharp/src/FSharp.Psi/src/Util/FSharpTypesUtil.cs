@@ -8,6 +8,7 @@ using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 using JetBrains.Util.Logging;
+using Microsoft.FSharp.Compiler;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Core;
 
@@ -81,7 +82,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     public static IType GetType([NotNull] FSharpType fsType, [NotNull] ITypeMemberDeclaration typeMemberDeclaration,
       [NotNull] IPsiModule psiModule)
     {
-      return GetType(fsType, GetOuterTypeParameters(typeMemberDeclaration), psiModule);
+      try
+      {
+        return GetType(fsType, GetOuterTypeParameters(typeMemberDeclaration), psiModule);
+      }
+      catch (ErrorLogger.UnresolvedPathReferenceNoRange)
+      {
+        return TypeFactory.CreateUnknownType(psiModule);
+      }
     }
 
     /// <summary>
@@ -95,7 +103,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     {
       var typeParametersFromType = GetOuterTypeParameters(methodDeclaration);
       var typeParamsFromContext = typeParametersFromType.Prepend(methodTypeParams).ToIList();
-      return GetType(fsType, typeParamsFromContext, psiModule, true, isFromReturn);
+      try
+      {
+        return GetType(fsType, typeParamsFromContext, psiModule, true, isFromReturn);
+      }
+      catch (ErrorLogger.UnresolvedPathReferenceNoRange)
+      {
+        return TypeFactory.CreateUnknownType(psiModule);
+      }
     }
 
     [NotNull]

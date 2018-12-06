@@ -1,7 +1,6 @@
 [<AutoOpen>]
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.StringLiteralsUtil
 
-open System.Runtime.CompilerServices
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Psi.Parsing

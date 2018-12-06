@@ -1,11 +1,30 @@
-[<AutoOpen>]
+[<AutoOpen; Extension>]
 module JetBrains.ReSharper.Plugins.FSharp.Common.Util.FSharpSymbolUtil
 
 open JetBrains.Application.UI.Icons.ComposedIcons
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Psi.Resources
 open JetBrains.UI.Icons
+open JetBrains.Util
+open JetBrains.Util.Logging
 open Microsoft.FSharp.Compiler.SourceCodeServices
+
+[<Extension; CompiledName("IsRefCell")>]
+let isRefCell (mfv: FSharpMemberOrFunctionOrValue) =
+    try mfv.IsRefCell
+    with e ->
+        Logger.LogMessage(LoggingLevel.WARN, "FSharpSymbolUtil.isRefCell fail: {0}", mfv)
+        Logger.LogExceptionSilently(e)
+        false
+
+[<Extension; CompiledName("IsValCompiledAsMethod")>]
+let isValCompiledAsMethod (mfv: FSharpMemberOrFunctionOrValue) =
+    try mfv.IsValCompiledAsMethod
+    with e ->
+        Logger.LogMessage(LoggingLevel.WARN, "FSharpSymbolUtil.isValCompiledAsMethod fail: {0}", mfv)
+        Logger.LogExceptionSilently(e)
+        false
+
 
 [<CompiledName("GetReturnType")>]
 let getReturnType (symbol: FSharpSymbol) =
@@ -64,7 +83,7 @@ let rec getIconId (symbol: FSharpSymbol) =
         let isCtor = mfv.IsConstructor
 
         if isModuleValueOrMember && not isMember && accessibility.IsPublic then
-            if mfv.IsValCompiledAsMethod then staticMethod else staticProperty
+            if isValCompiledAsMethod mfv then staticMethod else staticProperty
         else
 
         let baseIcon =
@@ -89,7 +108,7 @@ let rec getIconId (symbol: FSharpSymbol) =
                     else
                         if mfv.HasGetterMethod then PsiSymbolsThemedIcons.ModifiersRead.Id else null
 
-                else if mfv.IsMutable || mfv.IsRefCell then PsiSymbolsThemedIcons.ModifiersWrite.Id
+                else if mfv.IsMutable || isRefCell mfv then PsiSymbolsThemedIcons.ModifiersWrite.Id
                 else null
 
             if isNull readWriteModifier then baseIcon

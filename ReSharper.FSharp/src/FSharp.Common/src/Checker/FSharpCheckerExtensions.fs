@@ -1,7 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 
 open System
-open System.Runtime.CompilerServices
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
 module FSharpCheckerExtensions =

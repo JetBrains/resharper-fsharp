@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Common.Util
+﻿namespace JetBrains.ReSharper.Plugins.FSharp.Common.Util
 
 [<AutoOpen>]
 module rec CommonUtil =
@@ -216,3 +216,10 @@ module rec FSharpMsBuildUtils =
         member x.ChangesOrder = changesOrder x.Value
 
     let someUnit = Some ()
+
+
+namespace global
+
+[<AutoOpen>]
+module Extension =
+    type Extension = System.Runtime.CompilerServices.ExtensionAttribute

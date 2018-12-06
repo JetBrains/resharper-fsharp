@@ -1,4 +1,5 @@
 ﻿using System;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
@@ -20,7 +21,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (mfv.LiteralValue != null)
         return new FSharpLiteral(this, mfv);
 
-      if (!mfv.IsValCompiledAsMethod)
+      if (!mfv.IsValCompiledAsMethod())
         return new ModuleValue(this, mfv);
 
       return !mfv.IsInstanceMember && mfv.CompiledName.StartsWith("op_", StringComparison.Ordinal)
