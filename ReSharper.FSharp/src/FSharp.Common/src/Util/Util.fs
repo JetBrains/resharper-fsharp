@@ -1,4 +1,4 @@
-﻿namespace JetBrains.ReSharper.Plugins.FSharp.Common.Util
+namespace JetBrains.ReSharper.Plugins.FSharp.Common.Util
 
 [<AutoOpen>]
 module rec CommonUtil =
@@ -29,15 +29,16 @@ module rec CommonUtil =
     let inline (|NotNull|_|) x =
         if isNull x then None else Some()
 
-    [<Literal>]
-    let FsprojExtension = "fsproj"
+    let [<Literal>] FsprojExtension = "fsproj"
 
-    let isFSharpProject (guids: Guid seq) (projectFile: FileSystemPath) =
-        equalsIgnoreCase FsprojExtension projectFile.ExtensionNoDot ||
-        Seq.exists FSharpProjectPropertiesFactory.IsKnownProjectTypeGuid guids
+    let isFSharpProjectFile (path: FileSystemPath) =
+        equalsIgnoreCase FsprojExtension path.ExtensionNoDot
+    
+    let isFSharpProject (guid: Guid) (path: FileSystemPath) =
+        isFSharpProjectFile path || FSharpProjectPropertiesFactory.IsKnownProjectTypeGuid guid
 
     let (|FSharpProjectMark|_|) (mark: IProjectMark) =
-        if isFSharpProject [mark.Guid] mark.Location then Some() else None
+        if isFSharpProject mark.Guid mark.Location then Some() else None
 
     let ensureAbsolute (path: FileSystemPath) (projectDirectory: FileSystemPath) =
         match path.AsRelative() with
@@ -105,15 +106,6 @@ module rec CommonUtil =
         
         member x.ToDocumentRange(document: IDocument) =
             DocumentRange(document, x.ToTextRange(document))
-
-    type IProject with
-        member x.IsFSharp =
-            isFSharpProject x.ProjectProperties.ProjectTypeGuids x.ProjectFileLocation
-
-    let (|FSharpProject|_|) (projectModelElement: IProjectModelElement) =
-        match projectModelElement with
-        | :? IProject as project when project.IsFSharp -> Some project
-        | _ -> None
 
     let tryGetValue (key: 'TKey) (dictionary: IDictionary<'TKey,'TValue>) =
         let res = ref Unchecked.defaultof<'TValue>

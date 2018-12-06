@@ -5,6 +5,7 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Host.Features.ProjectModel.View
 open JetBrains.ReSharper.Host.Features.ProjectModel.View.Appenders.ProjectStructure
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.Rider.Model
 open JetBrains.Util
 
@@ -14,7 +15,10 @@ type FSharpProjectStructureProvider(container: IFSharpItemsContainer) =
         member x.Priority = 10
 
         member x.Process(projectItem) =
-            if not (container.IsApplicable(projectItem)) then null else
+            match projectItem.GetProject() with
+            | null -> null
+            | project when not project.IsFSharp -> null
+            | _ ->
 
             let getParent defaultParent =
                 Option.map box >> Option.defaultValue defaultParent

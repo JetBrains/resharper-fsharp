@@ -120,3 +120,15 @@ type FSharpProjectFilePropertiesProvider() =
 
     override x.IsApplicable(properties) = properties :? FSharpProjectProperties
     override x.CreateProjectFileProperties() = ProjectFileProperties() :> IProjectFileProperties
+
+
+[<AutoOpen>]
+module Util =
+    type IProject with
+        member x.IsFSharp =
+            x.ProjectProperties :? FSharpProjectProperties
+
+    let (|FSharpProject|_|) (projectModelElement: IProjectModelElement) =
+        match projectModelElement with
+        | :? IProject as project when project.IsFSharp -> Some project
+        | _ -> None
