@@ -1,11 +1,12 @@
-UnitTestProject/obj/Debug/netcoreapp2.0/UnitTestProject.fsproj.FileListAbsolute.txt:
-	UnitTestProject/bin/Debug/netcoreapp2.0/UnitTestProject.deps.json
-	UnitTestProject/bin/Debug/netcoreapp2.0/UnitTestProject.dll
-	UnitTestProject/bin/Debug/netcoreapp2.0/UnitTestProject.pdb
-	UnitTestProject/bin/Debug/netcoreapp2.0/UnitTestProject.runtimeconfig.dev.json
-	UnitTestProject/bin/Debug/netcoreapp2.0/UnitTestProject.runtimeconfig.json
-	UnitTestProject/bin/Debug/netcoreapp2.0/xunit.runner.reporters.netstandard15.dll
-	UnitTestProject/bin/Debug/netcoreapp2.0/xunit.runner.utility.netstandard15.dll
-	UnitTestProject/bin/Debug/netcoreapp2.0/xunit.runner.visualstudio.dotnetcore.testadapter.dll
-	UnitTestProject/obj/Debug/netcoreapp2.0/UnitTestProject.dll
-	UnitTestProject/obj/Debug/netcoreapp2.0/UnitTestProject.pdb
+UnitTestProject/obj/Debug/netcoreapp2.1/UnitTestProject.fsproj.FileListAbsolute.txt:
+	UnitTestProject/bin/Debug/netcoreapp2.1/UnitTestProject.deps.json
+	UnitTestProject/bin/Debug/netcoreapp2.1/UnitTestProject.dll
+	UnitTestProject/bin/Debug/netcoreapp2.1/UnitTestProject.pdb
+	UnitTestProject/bin/Debug/netcoreapp2.1/UnitTestProject.runtimeconfig.dev.json
+	UnitTestProject/bin/Debug/netcoreapp2.1/UnitTestProject.runtimeconfig.json
+	UnitTestProject/bin/Debug/netcoreapp2.1/xunit.runner.reporters.netcoreapp10.dll
+	UnitTestProject/bin/Debug/netcoreapp2.1/xunit.runner.utility.netcoreapp10.dll
+	UnitTestProject/bin/Debug/netcoreapp2.1/xunit.runner.visualstudio.dotnetcore.testadapter.dll
+	UnitTestProject/obj/Debug/netcoreapp2.1/UnitTestProject.AssemblyInfo.fs
+	UnitTestProject/obj/Debug/netcoreapp2.1/UnitTestProject.dll
+	UnitTestProject/obj/Debug/netcoreapp2.1/UnitTestProject.pdb

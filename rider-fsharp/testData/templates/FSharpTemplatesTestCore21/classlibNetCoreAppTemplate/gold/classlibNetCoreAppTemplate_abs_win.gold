@@ -1,6 +1,7 @@
-ClassLibrary/obj/Debug/netcoreapp2.0/ClassLibrary.fsproj.FileListAbsolute.txt:
-	ClassLibrary/bin/Debug/netcoreapp2.0/ClassLibrary.deps.json
-	ClassLibrary/bin/Debug/netcoreapp2.0/ClassLibrary.dll
-	ClassLibrary/bin/Debug/netcoreapp2.0/ClassLibrary.pdb
-	ClassLibrary/obj/Debug/netcoreapp2.0/ClassLibrary.dll
-	ClassLibrary/obj/Debug/netcoreapp2.0/ClassLibrary.pdb
+ClassLibrary/obj/Debug/netcoreapp2.1/ClassLibrary.fsproj.FileListAbsolute.txt:
+	ClassLibrary/bin/Debug/netcoreapp2.1/ClassLibrary.deps.json
+	ClassLibrary/bin/Debug/netcoreapp2.1/ClassLibrary.dll
+	ClassLibrary/bin/Debug/netcoreapp2.1/ClassLibrary.pdb
+	ClassLibrary/obj/Debug/netcoreapp2.1/ClassLibrary.AssemblyInfo.fs
+	ClassLibrary/obj/Debug/netcoreapp2.1/ClassLibrary.dll
+	ClassLibrary/obj/Debug/netcoreapp2.1/ClassLibrary.pdb

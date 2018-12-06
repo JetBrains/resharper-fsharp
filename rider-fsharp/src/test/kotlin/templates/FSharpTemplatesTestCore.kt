@@ -24,10 +24,15 @@ abstract class FSharpTemplatesTestCore : RiderTemplatesTestCoreBase() {
         }
     }
 
-    @Test(enabled = false) //RIDER-14467
+
+    @Test
     fun classlibNetCoreAppTemplate() {
+        var templateId = ProjectTemplateIds.Core.fsharp_classLibrary
+        if (testMethod.environment.coreVersion.value == CoreVersion.DOT_NET_CORE_2_1.value)
+            templateId = ProjectTemplateIds.Core.fsharp_classLibrary21
+
         val projectName = "ClassLibrary"
-        doCoreTest(ProjectTemplateIds.Core.fsharp_classLibrary, projectName, "netcoreapp2.0") { project ->
+        doCoreTest(templateId, projectName, "netcoreapp2.1") { project ->
             checkSwea(project)
             checkSelectedRunConfigurationExecutionNotAllowed(project)
         }
@@ -74,7 +79,7 @@ abstract class FSharpTemplatesTestCore : RiderTemplatesTestCoreBase() {
     }
 
 
-    @Test(enabled = false) //RIDER-14467
+    @Test
     fun xUnitCoreTemplate() {
         var templateId = ProjectTemplateIds.Core.fsharp_xUnit
         if (testMethod.environment.coreVersion.value == CoreVersion.DOT_NET_CORE_2_1.value)
@@ -82,10 +87,11 @@ abstract class FSharpTemplatesTestCore : RiderTemplatesTestCoreBase() {
         
         val projectName = "UnitTestProject"
         doCoreTest(templateId, projectName) { project ->
-            checkSwea(project, 1)
-            checkSweaAnalysedFiles(backendLog, 2, 0, "Tests.fs")
+            checkSwea(project, 0)
+            checkSweaAnalysedFiles(backendLog, 1, 0, "Tests.fs")
 
-            checkSelectedRunConfigurationExecutionNotAllowed(project)
+            // No run configuration in 2.1.402
+//            checkSelectedRunConfigurationExecutionNotAllowed(project)
 
             runAllUnitTestsFromProject(project, projectName, 2, 2, expectedSuccessful = 2)
 

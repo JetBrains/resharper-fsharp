@@ -2,10 +2,10 @@
 Opened
 
 -Project
- -ClassLibrary (1 project)
+ -ClassLibrary * 1 project
   -ClassLibrary
    -Dependencies
-    .NETCoreApp 2
+    .NETCoreApp 2.1
    Library.fs
 
 
