@@ -36,7 +36,8 @@ type FSharpTypingAssist
            FSharpTokenType.CLASS
            FSharpTokenType.INTERFACE
            FSharpTokenType.TRY
-           FSharpTokenType.NEW |]
+           FSharpTokenType.NEW
+           FSharpTokenType.LAZY |]
         |> HashSet
 
     let allowingNoIndentTokens =
