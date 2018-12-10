@@ -113,6 +113,8 @@ module rec CommonUtil =
         | true, value -> Some !value
         | _ -> None
 
+    let (|ArgValue|) (arg: PropertyChangedEventArgs<_>) = arg.New
+
     let (|AddRemoveArgs|) (args: AddRemoveEventArgs<_>) =
         args.Value
 

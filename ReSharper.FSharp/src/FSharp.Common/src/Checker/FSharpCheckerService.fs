@@ -4,22 +4,35 @@ open System
 open JetBrains
 open JetBrains.Annotations
 open JetBrains.Application
-open JetBrains.Application.Progress
+open JetBrains.Application.Settings
 open JetBrains.DataFlow
 open JetBrains.ReSharper.Feature.Services
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Plugins.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.Common.Settings
+open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Util
-open JetBrains.Util.Logging
 open Microsoft.FSharp.Compiler
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
 [<ShellComponent; AllowNullLiteral>]
-type FSharpCheckerService(lifetime, logger: ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier) =
+type FSharpCheckerService
+        (lifetime, logger: ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier, settingsStore: ISettingsStore) =
+
     let checker =
         Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "20")
-        lazy FSharpChecker.Create(projectCacheSize = 200, keepAllBackgroundResolutions = false)
+        lazy
+            let checker = FSharpChecker.Create(projectCacheSize = 200, keepAllBackgroundResolutions = false)
+            let enableBgCheck =
+                settingsStore.BindToContextLive(lifetime, ContextRange.ApplicationWide)
+                    .GetValueProperty(lifetime, fun (key: FSharpOptions) -> key.BackgroundTypeCheck)
+
+            checker.ImplicitlyStartBackgroundWork <- enableBgCheck.Value
+            enableBgCheck.Change.Advise_NoAcknowledgement(lifetime, fun (ArgValue enabled) ->
+                checker.ImplicitlyStartBackgroundWork <- enabled)
+
+            checker
 
     do
         onSolutionCloseNotifier.SolutionIsAboutToClose.Advise(lifetime, fun _ ->

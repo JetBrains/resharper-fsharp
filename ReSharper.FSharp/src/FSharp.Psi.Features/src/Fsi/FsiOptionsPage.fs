@@ -24,7 +24,6 @@ type FsiOptionsPage
          [<Optional; DefaultParameterValue(null: ISolution)>] solution: ISolution) as this =
     inherit BeSimpleOptionsPage(lifetime, optionsPageContext, settings)
 
-    let (|ArgValue|) (arg: PropertyChangedEventArgs<_>) = arg.New
     let (|FsiTool|) (obj: obj) = obj :?> FsiTool 
 
     let Not = Func<_,_>(not)

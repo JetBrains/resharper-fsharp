@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="src\FSharpOptions.fs" />
     <Compile Include="src\ProjectModel\FSharpProjectLanguage.fs" />
     <Compile Include="src\ProjectModel\ProjectProperties\FSharpProjectProperties.fs" />
     <Compile Include="src\ProjectModel\FSharpLanguageSpecificItemsProvider.fs" />
