@@ -58,7 +58,7 @@ type FsiOptions() =
     [<SettingsEntry("--optimize+", fsiArgsText); DefaultValue>]
     val mutable FsiArgs: string
 
-    [<SettingsEntry("--fsi-server:rider --readline-", fsiInternalArgsText); DefaultValue>]
+    [<SettingsEntry("--fsi-server:0 --readline-", fsiInternalArgsText); DefaultValue>]
     val mutable FsiInternalArgs: string
 
     [<SettingsEntry(true, moveCaretOnSendLineText); DefaultValue>]
