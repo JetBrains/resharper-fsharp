@@ -22,7 +22,9 @@ type FSharpCheckerService(lifetime, logger: ILogger, onSolutionCloseNotifier: On
         lazy FSharpChecker.Create(projectCacheSize = 200, keepAllBackgroundResolutions = false)
 
     do
-        onSolutionCloseNotifier.SolutionIsAboutToClose.Advise(lifetime, fun _ -> checker.Value.InvalidateAll())
+        onSolutionCloseNotifier.SolutionIsAboutToClose.Advise(lifetime, fun _ ->
+            if checker.IsValueCreated then
+                checker.Value.InvalidateAll())
 
     member val OptionsProvider: IFSharpProjectOptionsProvider = Unchecked.defaultof<_> with get, set
     member x.Checker = checker.Value
