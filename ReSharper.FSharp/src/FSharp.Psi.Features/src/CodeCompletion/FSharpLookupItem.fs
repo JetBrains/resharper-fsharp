@@ -5,6 +5,7 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupIt
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems.Impl
 open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Feature.Services.ParameterInfo
+open JetBrains.ReSharper.Host.Features.Completion
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
@@ -163,6 +164,7 @@ type FSharpLookupItem
                 mainDescription.AddLines(xmlDoc)
             mainDescription
 
+    interface IRiderAsyncCompletionLookupItem
 
 type FSharpLookupAdditionalInfo =
     { Icon: IconId

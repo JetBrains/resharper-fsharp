@@ -6,6 +6,7 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupIt
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems.Impl
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.Feature.Services.Lookup
+open JetBrains.ReSharper.Host.Features.Completion
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -94,6 +95,8 @@ type FSharpKeywordLookupItemBase(keyword, keywordSuffix) =
             textControl.RescheduleCompletion(solution)
         | _ -> ()
 
+    interface IRiderAsyncCompletionLookupItem
+
 
 type FSharpKeywordLookupItem(keyword, description, suffix) =
     inherit FSharpKeywordLookupItemBase(keyword, suffix)
@@ -105,10 +108,12 @@ type FSharpKeywordLookupItem(keyword, description, suffix) =
 type FSharpHashDirectiveLookupItem(directive, suffix) =
     inherit FSharpKeywordLookupItemBase(directive, suffix)
 
+
 [<SolutionComponent>]
 type FSharpHashDirectiveAutocompletionStrategy() =
     interface IAutomaticCodeCompletionStrategy with
         member x.Language = FSharpLanguage.Instance :> _
+
         member x.AcceptsFile(file, textControl) =
             match file.GetSourceFile() with
             | null -> false
