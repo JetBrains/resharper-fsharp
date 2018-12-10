@@ -16,6 +16,7 @@ open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Rider.Model
+open JetBrains.Util.Logging
 
 type FSharpSource =
     { Source: byte[]
@@ -27,7 +28,8 @@ type FSharpSource =
 [<SolutionComponent>]
 type FSharpSourceCache
         (lifetime: Lifetime, solution: ISolution, changeManager, documentManager: DocumentManager,
-         extensions: IProjectFileExtensions, solutionDocumentChangeProvider: SolutionDocumentChangeProvider) =
+         extensions: IProjectFileExtensions, solutionDocumentChangeProvider: SolutionDocumentChangeProvider,
+         fileExtensions: IProjectFileExtensions, logger: JetBrains.Util.ILogger) =
     inherit FileSystemShimChangeProvider(Lifetimes.Define(lifetime).Lifetime, changeManager)
 
     let files = ConcurrentDictionary<FileSystemPath, FSharpSource>()
@@ -47,12 +49,14 @@ type FSharpSourceCache
             | document ->
                 let timestamp = File.GetLastWriteTimeUtc(path.FullPath)
                 source <- Some { Source = getText document; Timestamp = timestamp }
+                logger.Verbose("tryAddSource, add: {0}", path)
                 files.[path] <- source.Value) |> ignore
         source
 
-    member x.TryGetSource(path: FileSystemPath, [<Out>] source: byref<FSharpSource>) =
-        if not (extensions.GetFileType(path).Is<FSharpProjectFileType>()) then false else
+    member x.IsApplicable(path: FileSystemPath) =
+        fileExtensions.GetFileType(path).Is<FSharpProjectFileType>()
 
+    member x.TryGetSource(path: FileSystemPath, [<Out>] source: byref<FSharpSource>) =
         match files.TryGetValue(path) with
         | true, value -> source <- value; true
         | _ ->
@@ -63,16 +67,22 @@ type FSharpSourceCache
 
     override x.FileStreamReadShim(fileName) =
         let path = FileSystemPath.TryParse(fileName)
-        if path.IsEmpty then base.FileStreamReadShim(fileName) else
+        if path.IsEmpty || not (x.IsApplicable(path)) then base.FileStreamReadShim(fileName) else
 
         match x.TryGetSource(path) with
         | true, source -> new MemoryStream(source.Source) :> Stream
-        | _ -> base.FileStreamReadShim(fileName)
+        | _ ->
+            logger.Warn("FileStreamReadShim miss: {0}", path)
+            base.FileStreamReadShim(fileName)
 
     override x.GetLastWriteTime(path) =
+        if not (x.IsApplicable(path)) then base.GetLastWriteTime(path) else
+
         match x.TryGetSource(path) with
         | true, source -> source.Timestamp
-        | _ -> base.GetLastWriteTime(path)
+        | _ ->
+            logger.Warn("GetLastWriteTime miss: {0}", path)
+            base.GetLastWriteTime(path)
 
     override x.Exists(path) =
         match files.TryGetValue(path) with
@@ -113,6 +123,7 @@ type FSharpSourceCache
                         let mutable fsSource = Unchecked.defaultof<_>
                         if files.TryGetValue(path, &fsSource) && text = fsSource.Source then () else
 
+                        logger.Verbose("ProcessProjectModelChange, add: {0}", path)
                         files.[path] <- { Source = text; Timestamp = DateTime.UtcNow }
                     | _ -> () }
 
