@@ -1,11 +1,13 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
+namespace rec JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 
 open JetBrains.Application
 open System
+open System.Collections.Generic
 open System.Runtime.InteropServices
 open JetBrains.Metadata.Utils
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Impl.Build
+open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost.MsBuild.Diagnostic.Components
 open JetBrains.ProjectModel.Properties
 open JetBrains.ProjectModel.Properties.Common
@@ -13,14 +15,13 @@ open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.Util
 
-
 type FSharpProjectProperties =
     inherit ProjectPropertiesBase<ManagedProjectConfiguration>
 
     val mutable targetPlatformData: TargetPlatformData
     val buildSettings: FSharpBuildSettings
 
-    new(projectTypeGuids, factoryGuid, targetFrameworkIds, targetPlatformData, dotNetCoreSDK) =
+    new(projectTypeGuids: ICollection<_>, factoryGuid, targetFrameworkIds, targetPlatformData, dotNetCoreSDK) =
         { inherit ProjectPropertiesBase<_>(projectTypeGuids, factoryGuid, targetFrameworkIds, dotNetCoreSDK)
           buildSettings = FSharpBuildSettings()
           targetPlatformData = targetPlatformData }
@@ -75,11 +76,12 @@ and FSharpBuildSettings() =
 
         base.Dump(writer, indent)
 
+
 [<ShellComponent>]
 type FSharpProjectApplicableProvider() =
     interface ProjectConfigurationValidator.IApplicableProvider with
         member x.IsApplicable(projectMark) =
-            projectMark.Location.ExtensionNoDot.Equals("fsproj", StringComparison.OrdinalIgnoreCase)
+            isFSharpProject projectMark.Location projectMark.TypeGuid
 
 
 [<ProjectModelExtension>]
@@ -93,7 +95,7 @@ type FSharpProjectPropertiesFactory() =
     override x.FactoryGuid = factoryGuid
 
     override x.IsApplicable(parameters) =
-        FSharpProjectPropertiesFactory.IsKnownProjectTypeGuid(parameters.ProjectTypeGuid)
+        isFSharpProject parameters.ProjectFilePath parameters.ProjectTypeGuid
 
     override x.IsKnownProjectTypeGuid(projectTypeGuid) =
         FSharpProjectPropertiesFactory.IsKnownProjectTypeGuid(projectTypeGuid)
@@ -103,7 +105,7 @@ type FSharpProjectPropertiesFactory() =
                                 parameters.TargetPlatformData, parameters.DotNetCoreSDK) :> _
 
     static member CreateProjectProperties(targetFrameworkIds): IProjectProperties =
-        FSharpProjectProperties([fsProjectTypeGuid].AsCollection(), factoryGuid, targetFrameworkIds, null, null) :> _
+        FSharpProjectProperties([|fsProjectTypeGuid|], factoryGuid, targetFrameworkIds, null, null) :> _
 
     override x.Read(reader) =
         let projectProperties = FSharpProjectProperties(factoryGuid)
@@ -118,17 +120,30 @@ type FSharpProjectPropertiesFactory() =
 type FSharpProjectFilePropertiesProvider() =
     inherit ProjectFilePropertiesProvider()
 
+    static let factoryGuid = Guid("{A04D5A34-28EE-4649-A76C-E5965CC0B766}")
+    
     override x.IsApplicable(properties) = properties :? FSharpProjectProperties
-    override x.CreateProjectFileProperties() = ProjectFileProperties() :> IProjectFileProperties
+    override x.CreateProjectFileProperties() = ProjectFileProperties(factoryGuid) :> IProjectFileProperties
 
 
 [<AutoOpen>]
 module Util =
+    let [<Literal>] FsprojExtension = "fsproj"
+
     type IProject with
         member x.IsFSharp =
             x.ProjectProperties :? FSharpProjectProperties
+
+    let isFSharpProjectFile (path: FileSystemPath) =
+        path.ExtensionNoDot.Equals(FsprojExtension, StringComparison.OrdinalIgnoreCase)
+
+    let isFSharpProject (path: FileSystemPath) (guid: Guid) =
+        isFSharpProjectFile path || FSharpProjectPropertiesFactory.IsKnownProjectTypeGuid guid
 
     let (|FSharpProject|_|) (projectModelElement: IProjectModelElement) =
         match projectModelElement with
         | :? IProject as project when project.IsFSharp -> Some project
         | _ -> None
+
+    let (|FSharpProjectMark|_|) (mark: IProjectMark) =
+        if isFSharpProject mark.Location mark.Guid then Some() else None
