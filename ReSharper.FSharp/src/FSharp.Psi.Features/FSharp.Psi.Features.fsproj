@@ -8,6 +8,7 @@
   <ItemGroup>
     <Compile Include="src\Util\StringLiteralsUtil.fs" />
     <Compile Include="src\Util\PsiUtil.fs" />
+    <Compile Include="src\CodeCompletion\FSharpAssemblyContentProvider.fs" />
     <Compile Include="src\CodeCompletion\CompletionUtil.fs" />
     <Compile Include="src\CodeCompletion\FSharpCodeCompletionContext.fs" />
     <Compile Include="src\CodeCompletion\FSharpPathCompletionProvider.fs" />

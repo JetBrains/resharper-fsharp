@@ -20,7 +20,6 @@
     <Compile Include="src\Util\FSharpAttributesUtil.fs" />
     <Compile Include="src\Util\FSharpSymbolUtil.fs" />
     <Compile Include="src\Util\FSharpXmlDocService.fs" />
-    <Compile Include="src\Checker\FSharpAssemblyContentProvider.fs" />
     <Compile Include="src\Checker\FSharpCheckerExtensions.fs" />
     <Compile Include="src\Checker\FSharpCoreFix.fs" />
     <Compile Include="src\Checker\FSharpCheckerService.fs" />

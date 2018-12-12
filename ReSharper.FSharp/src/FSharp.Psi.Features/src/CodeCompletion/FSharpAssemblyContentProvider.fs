@@ -1,0 +1,34 @@
+namespace JetBrains.ReSharper.Plugins.FSharp.Common.Checker
+
+open JetBrains.Application
+open JetBrains.ReSharper.Feature.Services
+open JetBrains.ReSharper.Plugins.FSharp
+open Microsoft.FSharp.Compiler.SourceCodeServices
+
+[<ShellComponent>]
+type FSharpAssemblyContentProvider(lifetime, onSolutionCloseNotifier: OnSolutionCloseNotifier) =
+    let entityCache = EntityCache()
+    do
+        onSolutionCloseNotifier.SolutionIsAboutToClose.Advise(lifetime, fun _ -> entityCache.Clear())
+
+    let getContent (assembliesByFileName: (string option * FSharpAssembly list) list) =
+        assembliesByFileName
+        |> List.map (fun (fileName, signatures) -> async {
+            return AssemblyContentProvider.getAssemblyContent entityCache.Locking Public fileName signatures } )
+        |> Async.Parallel
+    
+    member x.GetLibrariesEntities(checkResults: FSharpCheckFileResults) =
+        [ // FCS sometimes returns several FSharpAssembly for single referenced assembly.
+          // For example, it returns two different ones for Swensen.Unquote; the first one
+          // contains no useful entities, the second one does. Our cache prevents to process
+          // the second FSharpAssembly which results with the entities containing in it to be
+          // not discovered.
+          let assembliesByFileName =
+              checkResults.ProjectContext.GetReferencedAssemblies()
+              |> Seq.groupBy (fun asm -> asm.FileName)
+              |> Seq.map (fun (fileName, asms) -> fileName, List.ofSeq asms)
+              |> Seq.toList
+              |> List.rev // if mscorlib.dll is the first then FSC raises exception when we try to
+                          // get Content.Entities from it.
+    
+          yield! (getContent assembliesByFileName).RunAsTask() |> List.concat ]
