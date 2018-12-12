@@ -8,8 +8,6 @@ module rec CommonUtil =
     open JetBrains.DataFlow
     open JetBrains.DocumentModel
     open JetBrains.ProjectModel
-    open JetBrains.ProjectModel.ProjectsHost
-    open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
     open JetBrains.ReSharper.Psi.Modules
     open JetBrains.Util
     open JetBrains.Util.dataStructures.TypedIntrinsics
@@ -29,17 +27,6 @@ module rec CommonUtil =
     let inline (|NotNull|_|) x =
         if isNull x then None else Some()
 
-    let [<Literal>] FsprojExtension = "fsproj"
-
-    let isFSharpProjectFile (path: FileSystemPath) =
-        equalsIgnoreCase FsprojExtension path.ExtensionNoDot
-    
-    let isFSharpProject (guid: Guid) (path: FileSystemPath) =
-        isFSharpProjectFile path || FSharpProjectPropertiesFactory.IsKnownProjectTypeGuid guid
-
-    let (|FSharpProjectMark|_|) (mark: IProjectMark) =
-        if isFSharpProject mark.Guid mark.Location then Some() else None
-
     let ensureAbsolute (path: FileSystemPath) (projectDirectory: FileSystemPath) =
         match path.AsRelative() with
         | null -> path
@@ -52,10 +39,6 @@ module rec CommonUtil =
     let decompileOpName name =
         PrettyNaming.DecompileOpName name
         
-    [<CompiledName("RunSynchronouslyWithTimeout")>]
-    let runSynchronouslyWithTimeout (action: Func<_>) timeout =
-        Async.RunSynchronously(async { return action.Invoke() }, timeout)
-
     type IDictionary<'TKey, 'TValue> with
         member x.remove (key: 'TKey) = x.Remove key |> ignore
         member x.add (key: 'TKey, value: 'TValue) = x.Add(key, value) |> ignore
