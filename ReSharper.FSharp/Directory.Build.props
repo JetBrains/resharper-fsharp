@@ -8,7 +8,7 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <FCSVersion>[25.0.2]</FCSVersion>
+    <FCSVersion>[25.0.5]</FCSVersion>
   </PropertyGroup>
 
   <Import Project="RiderSdkPackageVersion.props" />
