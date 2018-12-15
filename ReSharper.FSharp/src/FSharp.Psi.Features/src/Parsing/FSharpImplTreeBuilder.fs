@@ -1,7 +1,10 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Psi.TreeBuilder
+open JetBrains.Util
 open Microsoft.FSharp.Compiler.Ast
 open Microsoft.FSharp.Compiler.PrettyNaming
 
@@ -177,7 +180,8 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
 
         | SynPat.Ands (patterns, _)
         | SynPat.ArrayOrList (_, patterns, _)
-        | SynPat.Tuple (_, patterns,_) ->
+        | SynPat.Tuple (patterns,_)
+        | SynPat.StructTuple (patterns,_) ->
             for pattern in patterns do
                 x.ProcessTopLevelLetPat pattern []
 

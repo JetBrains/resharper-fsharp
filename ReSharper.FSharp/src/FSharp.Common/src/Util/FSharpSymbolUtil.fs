@@ -121,9 +121,7 @@ let rec getIconId (symbol: FSharpSymbol) =
         addAccessibility iconId accessibility
 
     | :? FSharpField as field ->
-        match field.DeclaringEntity with
-        | Some entity when entity.IsEnum -> PsiSymbolsThemedIcons.EnumMember.Id
-        | _ ->
+        if field.DeclaringEntity.IsEnum then PsiSymbolsThemedIcons.EnumMember.Id else
 
         let iconId =
             let iconId = PsiSymbolsThemedIcons.Field.Id

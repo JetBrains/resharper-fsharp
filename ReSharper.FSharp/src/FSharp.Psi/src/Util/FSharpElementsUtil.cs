@@ -154,11 +154,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       }
 
       if (symbol is FSharpField field && !field.IsUnresolved)
-      {
-        var fieldEntity = field.DeclaringEntity;
-        if (fieldEntity != null)
-        return GetTypeElement(fieldEntity.Value, psiModule)?.EnumerateMembers(field.Name, true).FirstOrDefault();
-      }
+        return GetTypeElement(field.DeclaringEntity, psiModule)?.EnumerateMembers(field.Name, true).FirstOrDefault();
 
       if (symbol is FSharpActivePatternCase activePatternCase)
         return

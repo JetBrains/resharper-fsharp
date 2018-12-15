@@ -461,7 +461,8 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime: Lifeti
             x.ProcessLocalId id
         | SynPat.OptionalVal(id,_) ->
             x.ProcessLocalId id
-        | SynPat.Tuple(_, patterns,_) ->
+        | SynPat.Tuple(patterns,_)
+        | SynPat.StructTuple(patterns,_) ->
             for pat in patterns do
                 x.ProcessLocalPat pat
         | SynPat.Paren(pat,_) ->
@@ -541,11 +542,9 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime: Lifeti
             range |> x.GetEndOffset |> x.AdvanceToOffset
             x.Done(mark, ElementType.NAMED_TYPE_EXPRESSION)
 
-        | SynType.Tuple (_, types,_) ->
-            for _, t in types do x.ProcessSynType t
-        
-        | SynType.AnonRecd (_, types, _) ->
-            for _, t in types do x.ProcessSynType(t)
+        | SynType.Tuple (types,_)
+        | SynType.StructTuple (types,_) ->
+            for _,t in types do x.ProcessSynType t
 
         | SynType.StaticConstantNamed(t1, t2,_)
         | SynType.MeasureDivide(t1,t2,_)
@@ -576,19 +575,12 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime: Lifeti
             x.ProcessLocalExpression expr
             x.ProcessSynType synType
 
-        | SynExpr.Tuple(_, exprs,_,_)
+        | SynExpr.Tuple(exprs,_,_)
+        | SynExpr.StructTuple(exprs,_,_)
         | SynExpr.ArrayOrList(_,exprs,_) ->
             for e in exprs do
                 x.ProcessLocalExpression e
 
-        | SynExpr.AnonRecd(_,copyInfoOpt,fields,_) ->
-            match copyInfoOpt with
-            | Some (expr,_) -> x.ProcessLocalExpression expr
-            | _ -> ()
-
-            for id, expr in fields do
-                x.ProcessLocalExpression(expr)
-        
         | SynExpr.Record(_,copyInfoOpt,fields,_) ->
             match copyInfoOpt with
             | Some (expr,_) -> x.ProcessLocalExpression expr
@@ -640,7 +632,7 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime: Lifeti
             for case in cases do
                 x.ProcessMatchClause case
 
-        | SynExpr.Match(_,expr,cases,_) ->
+        | SynExpr.Match(_,expr,cases,_,_) ->
             x.ProcessLocalExpression expr
             for case in cases do
                 x.ProcessMatchClause case
