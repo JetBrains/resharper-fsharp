@@ -313,7 +313,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       if (!(fsIdentifier?.FirstChild is FSharpIdentifierToken token))
         return;
 
-      name = Lexhelp.Keywords.QuoteIdentifierIfNeeded(name);
+      name = Keywords.QuoteIdentifierIfNeeded(name);
       using (WriteLockCookie.Create(fsIdentifier.IsPhysical()))
         LowLevelModificationUtil.ReplaceChildRange(token, token, new FSharpIdentifierToken(name));
     }
