@@ -1,6 +1,7 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Tests.Features.TypingAssist
 
 open System.IO
+open JetBrains.DataFlow
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.FeaturesTestFramework.TypingAssist
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
@@ -257,7 +258,8 @@ type LineIndentsTestBase() =
     abstract DoLineTest: TextWriter * ITextControl * Line -> unit 
 
     override x.DoTest(project: IProject) =
-        use textControl = x.OpenTextControl(project)
+        use lifetimeDefintion = Lifetimes.Define()
+        let textControl = x.OpenTextControl(lifetimeDefintion.Lifetime)
         let linesCount = int (textControl.Document.GetLineCount())
         x.ExecuteWithGold(fun writer ->
             for i in 1 .. linesCount do
