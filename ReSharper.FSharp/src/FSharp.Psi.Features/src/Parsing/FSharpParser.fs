@@ -31,7 +31,7 @@ type internal FSharpParser(file: IPsiSourceFile, checkerService: FSharpCheckerSe
                 |> Option.defaultWith (fun _ ->
                     { new FSharpTreeBuilderBase(file, lexer, lifetime) with
                         override x.CreateFSharpFile() =
-                            x.FinishFile(x.Builder.Mark(), ElementType.F_SHARP_IMPL_FILE) })
+                            x.FinishFile(x.Mark(), ElementType.F_SHARP_IMPL_FILE) })
 
             treeBuilder.CreateFSharpFile(CheckerService = checkerService,
                                          ParseResults = parseResults) :> _

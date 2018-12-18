@@ -1,10 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
-open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
-open JetBrains.ReSharper.Psi.TreeBuilder
-open JetBrains.Util
 open Microsoft.FSharp.Compiler.Ast
 open Microsoft.FSharp.Compiler.PrettyNaming
 
@@ -12,7 +9,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
     inherit FSharpTreeBuilderBase(file, lexer, lifetime)
 
     override x.CreateFSharpFile() =
-        let mark = x.Builder.Mark()
+        let mark = x.Mark()
         for decl in decls do
             x.ProcessTopLevelDeclaration(decl)
         x.FinishFile(mark, ElementType.F_SHARP_IMPL_FILE)
@@ -27,8 +24,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
         | SynModuleDecl.NestedModule(ComponentInfo(attrs,_,_,lid,_,_,_,_),_,decls,_,range) ->
             let mark = x.StartNestedModule attrs lid range
             for d in decls do x.ProcessModuleMemberDeclaration d
-            range |> x.GetEndOffset |> x.AdvanceToOffset
-            x.Done(mark, ElementType.NESTED_MODULE_DECLARATION)
+            x.Done(range, mark, ElementType.NESTED_MODULE_DECLARATION)
 
         | SynModuleDecl.Types(types,_) ->
             for t in types do x.ProcessType t
@@ -36,57 +32,46 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
         | SynModuleDecl.Exception(SynExceptionDefn(exn, members, range),_) ->
             let mark = x.StartException(exn)
             for m in members do x.ProcessTypeMember(m)
-            range |> x.GetEndOffset |> x.AdvanceToOffset
-            x.Done(mark, ElementType.EXCEPTION_DECLARATION)
+            x.Done(range, mark, ElementType.EXCEPTION_DECLARATION)
 
         | SynModuleDecl.Open(lidWithDots,range) ->
             range |> x.GetStartOffset |> x.AdvanceToTokenOrOffset FSharpTokenType.OPEN
-            let mark = x.Builder.Mark()
+            let mark = x.Mark()
             x.ProcessLongIdentifier lidWithDots.Lid
-            range |> x.GetEndOffset |> x.AdvanceToOffset
-            x.Done(mark, ElementType.OPEN_STATEMENT)
+            x.Done(range, mark, ElementType.OPEN_STATEMENT)
 
         | SynModuleDecl.Let(_,bindings,_) ->
             for (Binding(_,_,_,_,attrs,_,_,headPat,_,expr,_,_)) in bindings do
                 x.ProcessTopLevelLetPat headPat attrs
                 let bodyRange = expr.Range
-                bodyRange |> x.GetStartOffset |> x.AdvanceToOffset
-                let mark = x.Mark()
+                let mark = x.Mark(bodyRange)
                 x.ProcessLocalExpression expr
-                bodyRange |> x.GetEndOffset |> x.AdvanceToOffset
-                x.Done(mark, ElementType.BODY)
+                x.Done(bodyRange, mark, ElementType.BODY)
 
         | SynModuleDecl.HashDirective(hashDirective, _) ->
             x.ProcessHashDirective(hashDirective)
 
         | SynModuleDecl.DoExpr (_, expr, range) ->
-            range |> x.GetStartOffset |> x.AdvanceToOffset
-            let mark = x.Builder.Mark()
+            let mark = x.Mark(range)
             x.ProcessLocalExpression(expr)
-            range |> x.GetEndOffset |> x.AdvanceToOffset
-            x.Done(mark, ElementType.DO)
+            x.Done(range, mark, ElementType.DO)
 
         | decl ->
-            decl.Range |> x.GetStartOffset |> x.AdvanceToOffset
-            let mark = x.Builder.Mark()
-            decl.Range |> x.GetEndOffset |> x.AdvanceToOffset
-            x.Done(mark, ElementType.OTHER_MEMBER_DECLARATION)
+            let range = decl.Range
+            let mark = x.Mark(range)
+            x.Done(range, mark, ElementType.OTHER_MEMBER_DECLARATION)
 
-    member internal x.ProcessHashDirective (ParsedHashDirective(id, args, range)) =
-        range |> x.GetStartOffset |> x.AdvanceToOffset
-        let mark = x.Builder.Mark()
-
-        range |> x.GetEndOffset |> x.AdvanceToOffset
-        match id with
-        | "l"
-        | "load" -> x.Done(mark, ElementType.LOAD_DIRECTIVE)
-        | "r"
-        | "reference" -> x.Done(mark, ElementType.REFERENCE_DIRECTIVE)
-        | "I" -> x.Done(mark, ElementType.I_DIRECTIVE)
-        | _ -> x.Done(mark, ElementType.OTHER_DIRECTIVE)
+    member x.ProcessHashDirective(ParsedHashDirective (id, _, range)) =
+        let mark = x.Mark(range)
+        let elementType =
+            match id with
+            | "l" | "load" -> ElementType.LOAD_DIRECTIVE
+            | "r" | "reference" -> ElementType.REFERENCE_DIRECTIVE
+            | "I" -> ElementType.I_DIRECTIVE
+            | _ -> ElementType.OTHER_DIRECTIVE
+        x.Done(range, mark, elementType)
 
     member internal x.ProcessType (TypeDefn(ComponentInfo(attrs, typeParams,_,lid,_,_,_,_), repr, members, range)) =
-    
         match repr with
         | SynTypeDefnRepr.ObjectModel(SynTypeDefnKind.TyconAugmentation,_,_) ->
             let tryGetShortName (lid: LongIdent) =
@@ -105,8 +90,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
             x.Done(typeExpressionMark, ElementType.NAMED_TYPE_EXPRESSION)
             for m in members do
                 x.ProcessTypeMember m
-            range |> x.GetEndOffset |> x.AdvanceToOffset
-            x.Done(extensionMark, ElementType.TYPE_EXTENSION)
+            x.Done(range, extensionMark, ElementType.TYPE_EXTENSION)
         | _ ->
             let mark = x.StartType attrs typeParams lid range
             let elementType =
@@ -148,8 +132,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                     | _ -> ElementType.OBJECT_TYPE_DECLARATION
 
             for m in members do x.ProcessTypeMember m
-            range |> x.GetEndOffset |> x.AdvanceToOffset
-            x.Done(mark, elementType)
+            x.Done(range, mark, elementType)
 
     member internal x.ProcessTopLevelLetPat (pat: SynPat) (attrs: SynAttributes) =
         match pat with
@@ -166,8 +149,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                     for p in typeParams do x.ProcessTypeParameter p ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION
                 | _ -> ()
                 x.ProcessLocalParams memberParams
-                range |> x.GetEndOffset |> x.AdvanceToOffset
-                x.Done(mark, ElementType.LET)
+                x.Done(range, mark, ElementType.LET)
             | _ -> ()
 
         | SynPat.Named(_,id,_,_,range) ->
@@ -175,8 +157,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
             let isActivePattern = IsActivePatternName id.idText 
             if isActivePattern then x.ProcessActivePatternId id else x.ProcessIdentifier id
 
-            range |> x.GetEndOffset |> x.AdvanceToOffset
-            x.Done(mark, ElementType.LET)
+            x.Done(range, mark, ElementType.LET)
 
         | SynPat.Ands (patterns, _)
         | SynPat.ArrayOrList (_, patterns, _)
