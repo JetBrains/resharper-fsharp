@@ -19,7 +19,14 @@ open Microsoft.FSharp.Compiler.PrettyNaming
 type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime: Lifetime) =
     inherit TreeBuilderBase(lifetime, lexer)
 
-    let document = file.Document
+    let document = sourceFile.Document
+
+    let lineOffsets =
+        let lineCount = document.GetLineCount()
+        Array.init (int lineCount) (fun line -> document.GetLineStartOffset(docLine line))
+
+    let getLineOffset line =
+        lineOffsets.[line - 1]
 
     let rec (|Apps|_|) = function
         | SynExpr.App(_, true, expr, Apps ((cur, next: List<_>) as acc), _)
@@ -37,11 +44,14 @@ type FSharpTreeBuilderBase(file: IPsiSourceFile, lexer: ILexer, lifetime: Lifeti
 
     abstract member CreateFSharpFile: unit -> IFSharpFile
 
-    member internal x.GetLineOffset line = document.GetLineStartOffset(line - 1 |> docLine)
-    member internal x.GetStartOffset (range: Range.range) = x.GetLineOffset(range.StartLine) + range.StartColumn
-    member internal x.GetEndOffset (range: Range.range) = x.GetLineOffset(range.EndLine) + range.EndColumn
-    member internal x.GetStartOffset (id: Ident) = x.GetStartOffset(id.idRange)
-    member internal x.Eof = x.Builder.Eof()
+    member x.GetOffset(pos: Range.pos) = getLineOffset pos.Line + pos.Column
+    member x.GetStartOffset(range: Range.range) = getLineOffset range.StartLine + range.StartColumn
+    member x.GetEndOffset(range: Range.range) = getLineOffset range.EndLine + range.EndColumn
+    member x.GetStartOffset(IdentRange range) = x.GetStartOffset(range)
+
+    member x.Eof = x.Builder.Eof()
+
+    override x.SkipWhitespaces() = ()
 
     member val TypeExtensionsOffsets = OneToListMap<string, int>()
 
