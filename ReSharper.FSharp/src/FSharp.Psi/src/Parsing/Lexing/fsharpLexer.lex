@@ -130,7 +130,9 @@ LBRACK_LESS="[<"
 GREATER_RBRACK=">]"
 GREATER_BAR_RBRACK=">|]"
 LBRACK_BAR="[|"
+LBRACE_BAR="{|"
 BAR_RBRACK="|]"
+BAR_RBRACE="|}"
 LBRACE="{"
 RBRACE="}"
 QUOTE="'"
@@ -228,6 +230,7 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> "delegate" { return initIdent(); }
 <INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> "and"      { return initIdent(); }
 <INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> "when"     { return initIdent(); }
+<INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> "new"      { return initIdent(); }
 <INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> "global"   { return initIdent(); }
 <INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> "const"    { return initIdent(); }
 <INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> "true"     { return initIdent(); }
@@ -258,9 +261,11 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <SYMBOLIC_OPERATOR> {LBRACK_LESS}         { riseFromParenLevel(0); return makeToken(LBRACK_LESS); }
 <SYMBOLIC_OPERATOR> {GREATER_RBRACK}      { riseFromParenLevel(0); return makeToken(GREATER_RBRACK); }
 <SYMBOLIC_OPERATOR> {LBRACK_BAR}          { riseFromParenLevel(0); return makeToken(LBRACK_BAR); }
+<SYMBOLIC_OPERATOR> {LBRACE_BAR}          { riseFromParenLevel(0); return makeToken(LBRACE_BAR); }
 <SYMBOLIC_OPERATOR> {LESS}                { riseFromParenLevel(0); return makeToken(LESS); }
 <SYMBOLIC_OPERATOR> {GREATER}             { riseFromParenLevel(0); return makeToken(GREATER); }
 <SYMBOLIC_OPERATOR> {BAR_RBRACK}          { riseFromParenLevel(0); return makeToken(BAR_RBRACK); }
+<SYMBOLIC_OPERATOR> {BAR_RBRACE}          { riseFromParenLevel(0); return makeToken(BAR_RBRACE); }
 <SYMBOLIC_OPERATOR> {LBRACE}              { riseFromParenLevel(0); return makeToken(LBRACE); }
 <SYMBOLIC_OPERATOR> {RBRACE}              { riseFromParenLevel(0); return makeToken(RBRACE); }
 <SYMBOLIC_OPERATOR> {GREATER_BAR_RBRACK}  { riseFromParenLevel(0); return makeToken(GREATER_BAR_RBRACK); }
@@ -373,7 +378,7 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <INIT_ADJACENT_TYAPP> {DO_BANG}             { yybegin(LINE); return makeToken(DO_BANG); }
 <INIT_ADJACENT_TYAPP> {YIELD_BANG}          { yybegin(LINE); return makeToken(YIELD_BANG); }
 <INIT_ADJACENT_TYAPP> {RETURN_BANG}         { yybegin(LINE); return makeToken(RETURN_BANG); }
-<INIT_ADJACENT_TYAPP> {MATCH_BANG}         { yybegin(LINE); return makeToken(MATCH_BANG); }
+<INIT_ADJACENT_TYAPP> {MATCH_BANG}          { yybegin(LINE); return makeToken(MATCH_BANG); }
 <INIT_ADJACENT_TYAPP> {BAR}                 { yybegin(LINE); return makeToken(BAR); }
 <INIT_ADJACENT_TYAPP> {LARROW}              { yybegin(LINE); return makeToken(LARROW); }
 <INIT_ADJACENT_TYAPP> {LBRACK_BAR}          { yybegin(LINE); return makeToken(LBRACK_BAR); }
@@ -385,7 +390,6 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <INIT_ADJACENT_TYAPP> {COLON_COLON}         { yybegin(LINE); return makeToken(COLON_COLON); }
 <INIT_ADJACENT_TYAPP> {COLON_EQUALS}        { yybegin(LINE); return makeToken(COLON_EQUALS); }
 <INIT_ADJACENT_TYAPP> {SEMICOLON_SEMICOLON} { yybegin(LINE); return makeToken(SEMICOLON_SEMICOLON); }
-<INIT_ADJACENT_TYAPP> {SEMICOLON}           { yybegin(LINE); return makeToken(SEMICOLON); }
 <INIT_ADJACENT_TYAPP> {QMARK}               { yybegin(LINE); return makeToken(QMARK); }
 <INIT_ADJACENT_TYAPP> {QMARK_QMARK}         { yybegin(LINE); return makeToken(QMARK_QMARK); }
 <INIT_ADJACENT_TYAPP> {LPAREN_STAR_RPAREN}  { yybegin(LINE); return makeToken(LPAREN_STAR_RPAREN); }
@@ -396,6 +400,9 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <INIT_ADJACENT_TYAPP> {AMP}                 { yybegin(LINE); return makeToken(AMP); }
 <INIT_ADJACENT_TYAPP> {AMP_AMP}             { yybegin(LINE); return makeToken(AMP_AMP); }
 
+<LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {LBRACE_BAR}    { return makeToken(LBRACE_BAR); }
+<LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {BAR_RBRACE}    { return makeToken(BAR_RBRACE); }
+<LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {SEMICOLON}     { return makeToken(SEMICOLON); }
 <LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {RARROW}        { return makeToken(RARROW); }
 <LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {DOT}           { return makeToken(DOT); }
 <LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {COLON}         { return makeToken(COLON); }

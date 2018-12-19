@@ -51,10 +51,12 @@ public interface FSharpTokenType {
     IElementType LBRACK_LESS = createToken("LBRACK_LESS");
     IElementType GREATER_RBRACK = createToken("GREATER_RBRACK");
     IElementType LBRACK_BAR = createToken("LBRACK_BAR");
+    IElementType LBRACE_BAR = createToken("LBRACE_BAR");
     IElementType LESS = createToken("LESS");
     IElementType GREATER = createToken("GREATER");
     IElementType GREATER_BAR_RBRACK = createToken("GREATER_BAR_RBRACK");
     IElementType BAR_RBRACK = createToken("BAR_RBRACK");
+    IElementType BAR_RBRACE = createToken("BAR_RBRACE");
     IElementType LBRACE = createToken("LBRACE");
     IElementType RBRACE = createToken("RBRACE");
     IElementType QUOTE = createToken("QUOTE");

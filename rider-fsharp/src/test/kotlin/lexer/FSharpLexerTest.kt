@@ -1130,4 +1130,25 @@ class FSharpLexerTest : LexerTestCase() {
                 """.trimMargin()
         )
     }
+
+    @Test
+    fun testAnonymousRecords() {
+        doTest("f<{| C : int |}>x",
+                """
+                |IDENT ('f')
+                |LESS ('<')
+                |LBRACE_BAR ('{|')
+                |WHITESPACE (' ')
+                |IDENT ('C')
+                |WHITESPACE (' ')
+                |COLON (':')
+                |WHITESPACE (' ')
+                |IDENT ('int')
+                |WHITESPACE (' ')
+                |BAR_RBRACE ('|}')
+                |GREATER ('>')
+                |IDENT ('x')
+                """.trimMargin()
+        )
+    }
 }

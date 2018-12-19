@@ -92,6 +92,8 @@
         <Token name="GREATER_RBRACK" representation=">]" />
         <Token name="LBRACK_BAR" representation="[|" />
         <Token name="BAR_RBRACK" representation="|]" />
+        <Token name="LBRACE_BAR" representation="{|" />
+        <Token name="BAR_RBRACE" representation="|}" />
 
         <Token name="LQUOTE_UNTYPED" representation="&lt;@@" />
         <Token name="RQUOTE_UNTYPED" representation="@@>" />

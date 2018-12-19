@@ -253,7 +253,9 @@ LBRACK_LESS="[<"
 GREATER_RBRACK=">]"
 GREATER_BAR_RBRACK=">|]"
 LBRACK_BAR="[|"
+LBRACE_BAR="{|"
 BAR_RBRACK="|]"
+BAR_RBRACE="|}"
 LBRACE="{"
 RBRACE="}"
 QUOTE="'"
@@ -381,9 +383,11 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <SYMBOLIC_OPERATOR> {LBRACK_LESS}         { riseFromParenLevel(0); return makeToken(LBRACK_LESS); }
 <SYMBOLIC_OPERATOR> {GREATER_RBRACK}      { riseFromParenLevel(0); return makeToken(GREATER_RBRACK); }
 <SYMBOLIC_OPERATOR> {LBRACK_BAR}          { riseFromParenLevel(0); return makeToken(LBRACK_BAR); }
+<SYMBOLIC_OPERATOR> {LBRACE_BAR}          { riseFromParenLevel(0); return makeToken(LBRACE_BAR); }
 <SYMBOLIC_OPERATOR> {LESS}                { riseFromParenLevel(0); return makeToken(LESS); }
 <SYMBOLIC_OPERATOR> {GREATER}             { riseFromParenLevel(0); return makeToken(GREATER); }
 <SYMBOLIC_OPERATOR> {BAR_RBRACK}          { riseFromParenLevel(0); return makeToken(BAR_RBRACK); }
+<SYMBOLIC_OPERATOR> {BAR_RBRACE}          { riseFromParenLevel(0); return makeToken(BAR_RBRACE); }
 <SYMBOLIC_OPERATOR> {LBRACE}              { riseFromParenLevel(0); return makeToken(LBRACE); }
 <SYMBOLIC_OPERATOR> {RBRACE}              { riseFromParenLevel(0); return makeToken(RBRACE); }
 <SYMBOLIC_OPERATOR> {GREATER_BAR_RBRACK}  { riseFromParenLevel(0); return makeToken(GREATER_BAR_RBRACK); }
@@ -473,9 +477,11 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <LINE, ADJACENT_TYAPP> {LBRACK_LESS}         { return makeToken(LBRACK_LESS); }
 <LINE, ADJACENT_TYAPP> {GREATER_RBRACK}      { return makeToken(GREATER_RBRACK); }
 <LINE, ADJACENT_TYAPP> {LBRACK_BAR}          { return makeToken(LBRACK_BAR); }
+<LINE, ADJACENT_TYAPP> {LBRACE_BAR}          { return makeToken(LBRACE_BAR); }
 <LINE, ADJACENT_TYAPP> {LESS}                { return makeToken(LESS); }
 <LINE, ADJACENT_TYAPP> {GREATER}             { return makeToken(GREATER); }
 <LINE, ADJACENT_TYAPP> {BAR_RBRACK}          { return makeToken(BAR_RBRACK); }
+<LINE, ADJACENT_TYAPP> {BAR_RBRACE}          { return makeToken(BAR_RBRACE); }
 <LINE, ADJACENT_TYAPP> {LBRACE}              { return makeToken(LBRACE); }
 <LINE, ADJACENT_TYAPP> {RBRACE}              { return makeToken(RBRACE); }
 <LINE, ADJACENT_TYAPP> {GREATER_BAR_RBRACK}  { return makeToken(GREATER_BAR_RBRACK); }
@@ -504,7 +510,8 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <INIT_ADJACENT_TYAPP> {BAR}                 { yybegin(LINE); return makeToken(BAR); }
 <INIT_ADJACENT_TYAPP> {LARROW}              { yybegin(LINE); return makeToken(LARROW); }
 <INIT_ADJACENT_TYAPP> {LBRACK_BAR}          { yybegin(LINE); return makeToken(LBRACK_BAR); }
-<INIT_ADJACENT_TYAPP> {BAR_RBRACK}          { yybegin(LINE); return makeToken(BAR_RBRACK); }
+<INIT_ADJACENT_TYAPP> {LBRACE_BAR}          { yybegin(LINE); return makeToken(LBRACE_BAR); }
+<INIT_ADJACENT_TYAPP> {BAR_RBRACE}          { yybegin(LINE); return makeToken(BAR_RBRACE); }
 <INIT_ADJACENT_TYAPP> {LBRACE}              { yybegin(LINE); return makeToken(LBRACE); }
 <INIT_ADJACENT_TYAPP> {RBRACE}              { yybegin(LINE); return makeToken(RBRACE); }
 <INIT_ADJACENT_TYAPP> {COLON_QMARK_GREATER} { yybegin(LINE); return makeToken(COLON_QMARK_GREATER); }

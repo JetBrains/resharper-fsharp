@@ -84,3 +84,4 @@ type FSharpLexerTest() =
     [<Test>] member x.``Operators 09 - Left arrow``() = x.DoNamedTest()
 
     [<Test>] member x.``Identifiers 01 - Double grave accent``() = x.DoNamedTest()
+    [<Test>] member x.``Anonymous Records``() = x.DoNamedTest()
