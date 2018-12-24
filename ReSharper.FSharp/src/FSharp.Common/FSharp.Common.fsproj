@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
@@ -24,10 +24,10 @@
     <Compile Include="src\Checker\FSharpCheckerExtensions.fs" />
     <Compile Include="src\Checker\FSharpCoreFix.fs" />
     <Compile Include="src\Checker\FSharpCheckerService.fs" />
-    <Compile Include="src\FSharpTargetsAnalyzer.fs" />
     <Compile Include="src\ProjectModel\FSharpScriptPsiModuleFactory.fs" />
     <Compile Include="src\ProjectModel\FSharpFileService.fs" />
     <Compile Include="src\ProjectModel\FSharpProjectPresenter.fs" />
+    <Compile Include="src\ProjectModel\ProjectLoadDiagnostics.fs" />
     <Compile Include="src\Checker\FSharpProjectOptionsBuilder.fs" />
     <Compile Include="src\Checker\FSharpProjectOptionsProvider.fs" />
     <Compile Include="src\PaketRestoreTargetsAnalyzer.fs" />

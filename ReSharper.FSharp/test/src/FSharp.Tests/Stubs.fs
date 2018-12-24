@@ -3,8 +3,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Common
 open JetBrains.Application
 open JetBrains.Application.Components
 open JetBrains.ProjectModel
-open JetBrains.ReSharper.Plugins.FSharp.Common
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
+open JetBrains.ReSharper.Plugins.FSharp.Common.ProjectModel.Diagnostic
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi
 
@@ -30,4 +30,4 @@ type FSharpFileServiceStub() =
 /// Used to add assemblies to R# subplatfrom at runtime
 type AddAssembliesToSubplatform() =
     let _ = FsiSessionsHostStub
-    let _ = FSharpProjectLoadTargetsAnalyzer()
+    let _ = FSharpTargetsDiagnosticMessage.InstanceCollection
