@@ -89,8 +89,6 @@ type FSharpProjectPropertiesFactory() =
     inherit UnknownProjectPropertiesFactory()
 
     static let factoryGuid = Guid("{7B32A26D-3EC5-4A2A-B40C-EC79FF38A223}")
-    static let fsProjectTypeGuid = Guid("{F2A71F9B-5D33-465A-A702-920D77279786}")
-    static let fsCpsProjectTypeGuid = Guid("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}")
 
     override x.FactoryGuid = factoryGuid
 
@@ -112,33 +110,24 @@ type FSharpProjectPropertiesFactory() =
         projectProperties.ReadProjectProperties(reader)
         projectProperties :> _
 
-    static member IsKnownProjectTypeGuid(guid) =
-        guid.Equals(fsProjectTypeGuid) || guid.Equals(fsCpsProjectTypeGuid)
-
-
-[<ProjectModelExtension>]
-type FSharpProjectFilePropertiesProvider() =
-    inherit ProjectFilePropertiesProvider()
-
-    static let factoryGuid = Guid("{A04D5A34-28EE-4649-A76C-E5965CC0B766}")
-    
-    override x.IsApplicable(properties) = properties :? FSharpProjectProperties
-    override x.CreateProjectFileProperties() = ProjectFileProperties(factoryGuid) :> IProjectFileProperties
+    static member IsKnownProjectTypeGuid(guid) = isFSharpGuid guid
 
 
 [<AutoOpen>]
 module Util =
     let [<Literal>] FsprojExtension = "fsproj"
 
-    type IProject with
-        member x.IsFSharp =
-            x.ProjectProperties :? FSharpProjectProperties
+    let fsProjectTypeGuid = Guid("{F2A71F9B-5D33-465A-A702-920D77279786}")
+    let fsCpsProjectTypeGuid = Guid("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}")
 
     let isFSharpProjectFile (path: FileSystemPath) =
         path.ExtensionNoDot.Equals(FsprojExtension, StringComparison.OrdinalIgnoreCase)
 
+    let isFSharpGuid (guid: Guid) =
+        guid = fsProjectTypeGuid || guid = fsCpsProjectTypeGuid
+
     let isFSharpProject (path: FileSystemPath) (guid: Guid) =
-        isFSharpProjectFile path || FSharpProjectPropertiesFactory.IsKnownProjectTypeGuid guid
+        isFSharpProjectFile path || isFSharpGuid guid
 
     let (|FSharpProject|_|) (projectModelElement: IProjectModelElement) =
         match projectModelElement with
@@ -147,3 +136,8 @@ module Util =
 
     let (|FSharpProjectMark|_|) (mark: IProjectMark) =
         if isFSharpProject mark.Location mark.Guid then Some() else None
+
+    type IProject with
+        member x.IsFSharp =
+            x.ProjectProperties :? FSharpProjectProperties ||
+            isFSharpProjectFile x.ProjectFileLocation
