@@ -116,23 +116,14 @@ type FSharpProjectPropertiesFactory() =
         guid.Equals(fsProjectTypeGuid) || guid.Equals(fsCpsProjectTypeGuid)
 
 
-[<ProjectModelExtension>]
-type FSharpProjectFilePropertiesProvider() =
-    inherit ProjectFilePropertiesProvider()
-
-    static let factoryGuid = Guid("{A04D5A34-28EE-4649-A76C-E5965CC0B766}")
-    
-    override x.IsApplicable(properties) = properties :? FSharpProjectProperties
-    override x.CreateProjectFileProperties() = ProjectFileProperties(factoryGuid) :> IProjectFileProperties
-
-
 [<AutoOpen>]
 module Util =
     let [<Literal>] FsprojExtension = "fsproj"
 
     type IProject with
         member x.IsFSharp =
-            x.ProjectProperties :? FSharpProjectProperties
+            x.ProjectProperties :? FSharpProjectProperties ||
+            isFSharpProjectFile x.ProjectFileLocation
 
     let isFSharpProjectFile (path: FileSystemPath) =
         path.ExtensionNoDot.Equals(FsprojExtension, StringComparison.OrdinalIgnoreCase)
