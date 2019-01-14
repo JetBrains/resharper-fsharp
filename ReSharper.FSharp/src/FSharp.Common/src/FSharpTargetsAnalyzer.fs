@@ -6,6 +6,7 @@ open JetBrains.ProjectModel.ProjectsHost.Diagnostic
 open JetBrains.ProjectModel.ProjectsHost.MsBuild.Diagnostic
 open JetBrains.ReSharper.Host.Features.BackgroundTasks
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.Util
 open JetBrains.Util.Logging
 
