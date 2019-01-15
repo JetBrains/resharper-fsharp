@@ -26,6 +26,9 @@ type FcsHost
     do
         let fcsHost = solution.GetProtocolSolution().GetRdFSharpModel().FSharpCompilerServiceHost
 
+        // We want to get events published by background checker.
+        checkerService.Checker.ImplicitlyStartBackgroundWork <- true
+        
         let projectChecked = fcsHost.ProjectChecked :?> IRdSignal<string>
         let subscription = checkerService.Checker.ProjectChecked.Subscribe(fun (projectFilePath, _) ->
             projectChecked.Fire(projectFilePath))
