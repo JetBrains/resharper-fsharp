@@ -16,7 +16,9 @@ open JetBrains.ProjectModel.Caches
 open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost.Impl
 open JetBrains.ProjectModel.ProjectsHost.MsBuild
+open JetBrains.ProjectModel.ProjectsHost.MsBuild.Structure
 open JetBrains.ProjectModel.ProjectsHost.SolutionHost
+open JetBrains.ProjectModel.Update
 open JetBrains.ReSharper.Feature.Services.Navigation
 open JetBrains.ReSharper.Feature.Services.Navigation.NavigationProviders
 open JetBrains.ReSharper.Host.Features.ProjectModel.View
@@ -68,11 +70,18 @@ type FSharpItemsContainerLoader(lifetime: Lifetime, solution: ISolution, solutio
         map :> _
 
 
+type IItemTypeFilterProvider =
+    abstract CreateItemFilter: RdProject * IProjectDescriptor -> MsBuildItemTypeFilter
+
+type ItemTypeFilterProvider() =
+    interface IItemTypeFilterProvider with
+        member x.CreateItemFilter(rdProject, projectDescriptor) = null
+
 /// Keeps project items in proper order and is used in creating FCS project options and F# project tree.
 [<SolutionInstanceComponent>]
 type FSharpItemsContainer
         (logger: ILogger, containerLoader: FSharpItemsContainerLoader, refresher: IFSharpItemsContainerRefresher,
-         buildActions: MsBuildDefaultBuildActions) =
+         filterProvider: IItemTypeFilterProvider) =
 
     let locker = JetFastSemiReenterableRWLock()
     let projectMappings = lazy (containerLoader.GetMap())
@@ -99,7 +108,7 @@ type FSharpItemsContainer
         let items = List<RdProjectItemWithTargetFrameworks>()
         for rdProject in msBuildProject.RdProjects do
             let targetFrameworkId = msBuildProject.GetTargetFramework(rdProject)
-            let filter = buildActions.CreateItemFilter(rdProject, projectDescriptor)
+            let filter = filterProvider.CreateItemFilter(rdProject, projectDescriptor)
 
             rdProject.Items
             |> List.ofSeq
@@ -186,7 +195,7 @@ type FSharpItemsContainer
             | FSharpProjectMark ->
                 let itemsByName = OneToListMap()
                 for rdProject in msBuildProject.RdProjects do
-                    let itemFilter = buildActions.CreateItemFilter(rdProject, projectDescriptor)
+                    let itemFilter = filterProvider.CreateItemFilter(rdProject, projectDescriptor)
                     for rdItem in rdProject.Items do
                         itemsByName.Add(rdItem.EvaluatedInclude, rdItem.ItemType)
 
