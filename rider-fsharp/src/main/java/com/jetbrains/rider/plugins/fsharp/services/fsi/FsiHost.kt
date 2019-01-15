@@ -12,8 +12,8 @@ import com.jetbrains.rider.model.RdFsiSessionInfo
 import com.jetbrains.rider.model.rdFSharpModel
 import com.jetbrains.rider.plugins.fsharp.FSharpIcons
 import com.jetbrains.rider.projectView.solution
-import com.jetbrains.rider.util.reactive.Property
-import com.jetbrains.rider.util.reactive.flowInto
+import com.jetbrains.rd.util.reactive.Property
+import com.jetbrains.rd.util.reactive.flowInto
 import org.jetbrains.concurrency.AsyncPromise
 import org.jetbrains.concurrency.Promise
 
