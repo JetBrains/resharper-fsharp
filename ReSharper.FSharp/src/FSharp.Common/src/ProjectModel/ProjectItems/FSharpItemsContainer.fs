@@ -73,9 +73,13 @@ type FSharpItemsContainerLoader(lifetime: Lifetime, solution: ISolution, solutio
 type IItemTypeFilterProvider =
     abstract CreateItemFilter: RdProject * IProjectDescriptor -> MsBuildItemTypeFilter
 
-type ItemTypeFilterProvider() =
+
+[<SolutionInstanceComponent>]
+type ItemTypeFilterProvider(buildActions: MsBuildDefaultBuildActions) =
     interface IItemTypeFilterProvider with
-        member x.CreateItemFilter(rdProject, projectDescriptor) = null
+        member x.CreateItemFilter(rdProject, projectDescriptor) =
+            buildActions.CreateItemFilter(rdProject, projectDescriptor)
+
 
 /// Keeps project items in proper order and is used in creating FCS project options and F# project tree.
 [<SolutionInstanceComponent>]
