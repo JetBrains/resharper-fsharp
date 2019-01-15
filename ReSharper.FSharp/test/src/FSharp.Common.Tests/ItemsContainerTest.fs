@@ -32,20 +32,6 @@ let projectMark = DummyProjectMark(solutionMark, "Project", Guid.Empty, projectD
 
 let projectPath (relativePath: string) = projectDirectory / relativePath 
 
-let buildActions =
-    let provider = Mock<IMsBuildDefaultBuildActionsProvider>()
-    let buildActions =
-        [| yield! MsBuildDefaultBuildActionsProvider().DefaultBuildActions
-           yield BuildActions.compileBefore
-           yield BuildActions.compileAfter |]
-        |> HashSet
-
-    let itemFilter = MsBuildItemTypeFilter(buildActions)
-    provider.Setup(fun x -> x.IsApplicable(It.IsAny())).Returns(true) |> ignore
-    provider.Setup(fun x -> x.DefaultBuildActions).Returns(buildActions) |> ignore
-    provider.Setup(fun x -> x.IsAllowed(It.IsAny())).Returns(false) |> ignore
-    MsBuildDefaultBuildActions([|provider.Object|])
-
 
 let (|NormalizedPath|) (path: FileSystemPath) =
     path.MakeRelativeTo(projectDirectory).NormalizeSeparators(FileSystemPathEx.SeparatorStyle.Unix)
@@ -1013,8 +999,20 @@ type AnItem =
         { ItemType = itemType; EvaluatedInclude = evaluatedInclude; Link = defaultArg link null }
 
 
+let itemFilterProvider =
+    let defaultBuildActions =
+        [| yield! MsBuildCommonBuildActionsProvider().DefaultBuildActions
+           yield BuildActions.compileBefore
+           yield BuildActions.compileAfter |]
+        |> HashSet
+
+    { new IItemTypeFilterProvider with
+        member x.CreateItemFilter(_, _) = MsBuildItemTypeFilter(defaultBuildActions) }
+
+
 type LoggingFSharpItemsContainer(writer, refresher) as this =
-    inherit FSharpItemsContainer(DummyLogger.Instance, DummyFSharpItemsContainerLoader.Instance, refresher, buildActions)
+    inherit FSharpItemsContainer(DummyLogger.Instance, DummyFSharpItemsContainerLoader.Instance, refresher,
+                                 itemFilterProvider)
 
     let container = this :> IFSharpItemsContainer
 
