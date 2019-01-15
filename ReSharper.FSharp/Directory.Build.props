@@ -9,7 +9,7 @@
   
   <PropertyGroup>
     <FcsVersion>[25.0.5]</FcsVersion>
-    <FsCoreVersion>[4.5.2]</FsCoreVersion>
+    <FsCoreVersion>[4.5.4]</FsCoreVersion>
   </PropertyGroup>
 
   <Import Project="RiderSdkPackageVersion.props" />

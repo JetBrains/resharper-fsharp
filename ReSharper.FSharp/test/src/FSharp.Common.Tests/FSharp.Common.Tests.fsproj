@@ -24,13 +24,4 @@
     <Reference Include="System.Windows.Forms" />
     <!--needed for completion to work -->
   </ItemGroup>
-  <!--<ItemGroup>-->
-    <!--<Content Include="JetBrains.ReSharper.Plugins.FSharp.Tests.Common.dll.config">-->
-      <!--<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>-->
-    <!--</Content>-->
-  <!--</ItemGroup>-->
-
-  <Target Name="PostBuild" AfterTargets="Build">
-    <Delete Files="$(OutputPath)\FSharp.Core.resources.dll" />
-  </Target>
 </Project>
