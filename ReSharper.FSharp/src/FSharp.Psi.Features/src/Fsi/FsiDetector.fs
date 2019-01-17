@@ -7,9 +7,12 @@ open JetBrains.Application
 open JetBrains.Application.platforms
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.NuGet.Packaging
+open JetBrains.ProjectModel.Properties
 open JetBrains.ReSharper.Host.Features.Runtime
 open JetBrains.ReSharper.Host.Features.Toolset
+open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi.Settings
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
@@ -69,7 +72,8 @@ let customTool: FsiTool =
 [<ShellComponent>]
 type FsiDetector(providers: IFsiDirectoryProvider seq) =
     let providers: IFsiDirectoryProvider[] =
-        [| SolutionInstalledFsiProvider()
+        [| MsBuildPropertiesFsiProvider()
+           SolutionInstalledFsiProvider()
            VsFsiProvider()
            MonoFsiProvider()
            LegacyVsFsiProvider()
@@ -179,12 +183,43 @@ type SolutionInstalledFsiProvider() =
             let packageReferenceTracker = solution.GetComponent<NuGetPackageReferenceTracker>()
             let nugetStorage = solution.GetComponent<NuGetNupkgStorage>()
 
-            packageReferenceTracker.GetAllInstalledPackages()
-            |> Seq.filter (fun pkg -> pkg.PackageIdentity.Id = fctPackageName)
-            |> Seq.sortByDescending (fun pkg -> pkg.PackageIdentity.Version)
-            |> Seq.map (fun pkg -> nugetStorage.GetNupkg(pkg.PackageIdentity))
-            |> Seq.filter isNotNull
-            |> Seq.choose (fun nupkg -> FsiTool.FromFctNupkg(nupkg, source))
+            let installedPackages = packageReferenceTracker.GetAllInstalledPackages()
+            let fctPackages =
+                installedPackages
+                |> Seq.filter (fun pkg -> pkg.PackageIdentity.Id = fctPackageName)
+                |> Array.ofSeq
+
+            fctPackages
+            |> Array.sortByDescending (fun pkg -> pkg.PackageIdentity.Version)
+            |> Array.choose (fun pkg ->
+                match nugetStorage.GetNupkg(pkg.PackageIdentity) with
+                | null -> None
+                | nupkg -> FsiTool.FromFctNupkg(nupkg, source)) :> _
+
+
+type MsBuildPropertiesFsiProvider() =
+    let [<Literal>] source = "MSBuild project property"
+
+    interface IFsiDirectoryProvider with
+        member x.GetFsiTools(solution) =
+            solution.GetAllProjects()
+            |> Seq.tryPick (fun project ->
+                if not project.IsFSharp then None else
+
+                project.ProjectProperties.GetActiveConfigurations()
+                |> Seq.tryPick (fun cfg ->
+                    match cfg.PropertiesCollection.TryGetValue(FSharpProperties.FscToolPath) with
+                    | null -> None
+                    | path ->
+
+                    let toolDirPath = FileSystemPath.TryParse(path)
+                    if toolDirPath.IsEmpty then None else
+
+                    let fsiPath = toolDirPath / defaultFsiName
+                    if not fsiPath.ExistsFile then None else
+
+                    Some [| FsiTool.Create(source, toolDirPath) |]))
+            |> Option.defaultValue [||] :> _
 
 
 type NugetCacheFsiProvider() =

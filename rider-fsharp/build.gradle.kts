@@ -1,5 +1,4 @@
-import com.jetbrains.rider.generator.gradle.RdgenParams
-import com.jetbrains.rider.generator.nova.GenerationSpec
+import com.jetbrains.rd.generator.gradle.RdgenParams
 import groovy.lang.Closure
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.gradle.internal.jvm.Jvm
@@ -18,7 +17,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.jetbrains.rd:rd-gen:0.191.1")
+        classpath("com.jetbrains.rd:rd-gen:0.191.16")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.10")
     }
 }
