@@ -105,7 +105,10 @@ type FSharpTypingAssist
            FSharpTokenType.COMMA
            FSharpTokenType.RPAREN
            FSharpTokenType.RBRACK 
-           FSharpTokenType.RBRACE |]
+           FSharpTokenType.RBRACE
+           FSharpTokenType.GREATER_RBRACK
+           FSharpTokenType.RQUOTE_TYPED
+           FSharpTokenType.RQUOTE_UNTYPED |]
         |> HashSet
 
     let rightBracketsText =
