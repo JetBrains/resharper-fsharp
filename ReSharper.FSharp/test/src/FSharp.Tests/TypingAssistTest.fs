@@ -192,6 +192,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Brackets - Left 02 - No add right before other``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Left 03 - Add right before other and space``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Left 04 - No add angle``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Left 05 - Add right before attr list end``() = x.DoNamedTest()
 
     [<Test>] member x.``Brackets - Skip right 01``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Skip right 02 - After code``() = x.DoNamedTest()
