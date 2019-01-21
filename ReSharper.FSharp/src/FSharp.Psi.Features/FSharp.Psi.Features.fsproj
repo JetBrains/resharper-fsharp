@@ -47,6 +47,7 @@
     <Compile Include="src\Fsi\FsiSessionsHost.fs" />
     <Compile Include="src\Fsi\FsiOptionsPage.fs" />
     <Compile Include="src\TodoItems\FSharpTodoContentsProvider.fs" />
+    <Compile Include="src\Parsing\ParseTreeUtil.fs" />
     <Compile Include="src\Parsing\FSharpTreeBuilderBase.fs" />
     <Compile Include="src\Parsing\FSharpImplTreeBuilder.fs" />
     <Compile Include="src\Parsing\FSharpSigTreeBuilder.fs" />

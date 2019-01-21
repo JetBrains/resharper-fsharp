@@ -90,9 +90,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       Builder.AddDeclaredMemberName(decl.DeclaredName);
     }
 
-    public override void VisitLet(ILet letParam)
+    public override void VisitLet(ILet let)
     {
-      Builder.AddDeclaredMemberName(letParam.DeclaredName);
+      foreach (var binding in let.Bindings) 
+        ProcessTypeMembers(binding.HeadPattern.Declarations);
     }
 
     public override void VisitExceptionDeclaration(IExceptionDeclaration decl)
@@ -188,7 +189,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       }
     }
 
-    private void ProcessTypeMembers(IReadOnlyList<ITypeMemberDeclaration> memberDeclarations)
+    private void ProcessTypeMembers(IEnumerable<ITypeMemberDeclaration> memberDeclarations)
     {
       foreach (var typeMemberDeclaration in memberDeclarations)
       {

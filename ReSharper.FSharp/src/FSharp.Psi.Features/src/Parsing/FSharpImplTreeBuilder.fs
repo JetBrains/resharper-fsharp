@@ -1,5 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
+open JetBrains.ReSharper.Plugins.FSharp.Common.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open Microsoft.FSharp.Compiler.Ast
@@ -40,13 +42,12 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
             x.ProcessLongIdentifier lidWithDots.Lid
             x.Done(range, mark, ElementType.OPEN_STATEMENT)
 
-        | SynModuleDecl.Let(_,bindings,_) ->
-            for (Binding(_,_,_,_,attrs,_,_,headPat,_,expr,_,_)) in bindings do
-                x.ProcessTopLevelLetPat headPat attrs
-                let bodyRange = expr.Range
-                let mark = x.Mark(bodyRange)
-                x.ProcessLocalExpression expr
-                x.Done(bodyRange, mark, ElementType.BODY)
+        | SynModuleDecl.Let(_, bindings, range) ->
+            let letStart = letStartPos bindings range
+            let letMark = x.Mark(letStart)
+            for binding in bindings do
+                x.ProcessBinding(binding)
+            x.Done(range, letMark, ElementType.LET)
 
         | SynModuleDecl.HashDirective(hashDirective, _) ->
             x.ProcessHashDirective(hashDirective)
@@ -134,44 +135,96 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
             for m in members do x.ProcessTypeMember m
             x.Done(range, mark, elementType)
 
-    member internal x.ProcessTopLevelLetPat (pat: SynPat) (attrs: SynAttributes) =
+    member x.ProcessPat(PatRange range as pat) =
         match pat with
-        | SynPat.LongIdent(LongIdentWithDots(lid,_),_,typeParamsOption,memberParams,_,range) ->
-            match lid with
-            | [id] ->
-                let mark = x.ProcessAttributesAndStartRange attrs (Some id) range
-                let idText = id.idText
-                let isActivePattern = IsActivePatternName id.idText 
-                if isActivePattern then x.ProcessActivePatternId id else x.ProcessIdentifier id
+        | SynPat.Wild _ -> ()
+        | _ ->
 
-                match typeParamsOption with
-                | Some (SynValTyparDecls(typeParams,_,_)) ->
-                    for p in typeParams do x.ProcessTypeParameter p ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION
-                | _ -> ()
-                x.ProcessLocalParams memberParams
-                x.Done(range, mark, ElementType.LET)
-            | _ -> ()
+        let mark = x.Mark(range)
+        let elementType =
+            match pat with
+            | SynPat.Named (pat, id, _, _, _) ->
+                x.ProcessPat(pat)
+                if IsActivePatternName id.idText then x.ProcessActivePatternId(id) else x.ProcessIdentifier(id)
+                ElementType.NAMED_PAT
 
-        | SynPat.Named(_,id,_,_,range) ->
-            let mark = x.ProcessAttributesAndStartRange attrs (Some id) range
-            let isActivePattern = IsActivePatternName id.idText 
-            if isActivePattern then x.ProcessActivePatternId id else x.ProcessIdentifier id
+            | SynPat.LongIdent (lid, _, typars, args, _, _) ->
+                match lid.Lid with
+                | [id] when id.idText = "op_ColonColon" ->
+                    match args with
+                    | Pats pats -> for p in pats do x.ProcessPat(p)
+                    | NamePatPairs (pats, _) -> for _, p in pats do x.ProcessPat(p)
+                    ElementType.CONS_PAT
 
-            x.Done(range, mark, ElementType.LET)
+                | [id] ->
+                    if IsActivePatternName id.idText then x.ProcessActivePatternId id else x.ProcessIdentifier id
 
-        | SynPat.Ands (patterns, _)
-        | SynPat.ArrayOrList (_, patterns, _)
-        | SynPat.Tuple (patterns,_)
-        | SynPat.StructTuple (patterns,_) ->
-            for pattern in patterns do
-                x.ProcessTopLevelLetPat pattern []
+                    match typars with
+                    | Some (SynValTyparDecls (typars, _, _)) ->
+                        for p in typars do
+                            x.ProcessTypeParameter p ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION
+                    | None -> ()
 
-        | SynPat.Record (bindedPatterns, _) ->
-            for _, pattern in bindedPatterns do
-                x.ProcessTopLevelLetPat pattern []
+                    x.ProcessLocalParams(args)
+                    ElementType.LONG_IDENT_PAT
 
-        | SynPat.Typed (pat, _, _)
-        | SynPat.Paren (pat,_) ->
-            x.ProcessTopLevelLetPat pat attrs
+                | _ ->
+                    ElementType.LONG_IDENT_PAT
 
-        | _ -> x.ProcessLocalPat(pat)
+            | SynPat.Typed (pat, _, _) ->
+                x.ProcessPat(pat)
+                ElementType.TYPED_PAT
+
+            | SynPat.Or (pat1, pat2, _) ->
+                x.ProcessPat(pat1)
+                x.ProcessPat(pat2)
+                ElementType.OR_PAT
+
+            | SynPat.Ands (pats, _) ->
+                for pat in pats do
+                    x.ProcessPat(pat)
+                ElementType.ANDS_PAT
+
+            | SynPat.Tuple (pats, _)
+            | SynPat.StructTuple (pats, _)
+            | SynPat.ArrayOrList (_, pats, _) ->
+                for pat in pats do
+                    x.ProcessPat(pat)
+                ElementType.LIST_PAT
+
+            | SynPat.Paren (pat,_) ->
+                x.ProcessPat(pat)
+                ElementType.PAREN_PAT
+
+            | SynPat.Record (pats, _) ->
+                for _, pat in pats do
+                    x.ProcessPat(pat)
+                ElementType.RECORD_PAT
+
+            | SynPat.IsInst _ ->
+                ElementType.IS_INST_PAT
+
+            | _ ->
+                ElementType.OTHER_PAT
+
+        x.Done(range, mark, elementType)
+    
+    member x.ProcessExpr(ExprRange range as expr) =
+        let mark = x.Mark(range)
+        x.ProcessLocalExpression expr
+        x.Done(range, mark, ElementType.EXPR)
+
+    member x.ProcessAttributes(attrs) =
+        for attr in attrs do
+            x.ProcessAttribute(attr)
+
+    member x.ProcessBinding(Binding (_,_,_,_,attrs,_,_,headPat,_, expr,_,_) as binding) =
+        // todo: add [< to range?
+        x.AdvanceToPos(binding.StartPos)
+        let bindingMark = x.Mark()
+
+        x.ProcessAttributes(attrs)
+        x.ProcessPat(headPat)
+        x.ProcessExpr(expr)
+
+        x.Done(binding.RangeOfBindingAndRhs, bindingMark, ElementType.BINDING)

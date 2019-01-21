@@ -6,6 +6,7 @@ open JetBrains.DataFlow
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Parsing
@@ -65,15 +66,19 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
     member x.AdvanceToPos(pos: Range.pos) =
         x.AdvanceToOffset(x.GetOffset(pos))
 
-    member x.Mark(range) =
+    member x.Mark(range: Range.range) =
         x.AdvanceToStart(range)
         x.Mark()
 
+    member x.Mark(pos: Range.pos) =
+        x.AdvanceToPos(pos)
+        x.Mark()
+    
     member x.Done(range, mark, elementType) =
         x.AdvanceToEnd(range)
         x.Done(mark, elementType)
 
-    member x.MarkAndDone(range, elementType) =
+    member x.MarkAndDone(range: Range.range, elementType) =
         let mark = x.Mark(range)
         x.Done(range, mark, elementType)
 
@@ -324,16 +329,8 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         x.ProcessMemberParams memberParams
         x.ProcessLocalExpression expr
 
-    member x.GetMemberAttributes(typeMember: SynMemberDefn) =
-        match typeMember with
-        | SynMemberDefn.Member(Binding(_,_,_,_,attrs,_,_,_,_,_,_,_),_)
-        | SynMemberDefn.AbstractSlot(ValSpfn(attrs,_,_,_,_,_,_,_,_,_,_),_,_)
-        | SynMemberDefn.AutoProperty(attrs,_,_,_,_,_,_,_,_,_,_)
-        | SynMemberDefn.ValField(Field(attrs,_,_,_,_,_,_,_),_) -> attrs
-        | _ -> []
-
     member x.ProcessTypeMember (typeMember: SynMemberDefn) =
-        let attrs = x.GetMemberAttributes typeMember
+        let attrs = typeMember.Attributes
         let rangeStart = x.GetStartOffset typeMember.Range
         let isMember =
             match typeMember with
@@ -343,6 +340,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         if x.Builder.GetTokenOffset() <= rangeStart || (not isMember) then
             let mark = x.ProcessAttributesAndStartRange attrs None typeMember.Range
 
+            // todo: mark body exprs as synExpr
             let memberType =
                 match typeMember with
                 | SynMemberDefn.ImplicitCtor(_,_,args,selfId,_) ->

@@ -63,6 +63,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
             foreach (var extensionMember in typeExtension.Children<ITypeMemberDeclaration>())
               result.Add(extensionMember);
           }
+
+          if (child is ILet let)
+            foreach (var binding in let.Bindings)
+              result.AddRange(binding.HeadPattern.Declarations);
         }
 
         return result.ReadOnlyList();

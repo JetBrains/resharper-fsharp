@@ -117,6 +117,95 @@ interface moduleMemberStatement:
   openStatement |
   do;
 
+let options { stubBase="DummyDeclaration"; }:
+  // todo: add `let` `rec` keyword
+  binding<BINDING, Bindings>*
+  fakeSeparator;
+
+binding:
+  fSharpAttribute<ATTRIBUTE, Attributes>*
+  synPat<HEAD_PATTERN, HeadPattern>
+  EQUALS
+  synExpr<EXPR, Expression>
+  fakeSeparator;
+
+
+interface synPat:
+  namedPat |
+  typedPat |
+  orPat |
+  andsPat |
+  longIdentPat | // Used for functions, union cases, active patterns and `::` with wrong ranges order.
+  listPat |      // We currently use it for tuples, lists and arrays.
+  parenPat |
+  recordPat |
+  optionalValPat |
+  isInstPat |
+  consPat |
+  otherPat;
+
+
+namedPat options { stubBase="PatternDeclarationBase"; }:
+  synPat<PATTERN, Pattern>?
+  fSharpIdentifier<IDENTIFIER, Identifier>;
+
+typedPat options { stubBase="SynPatternBase"; }:
+  synPat<PATTERN, Pattern>
+  COLON
+  typeExpression;
+
+orPat options { stubBase="SynPatternBase"; }:
+  synPat<PATTERN, Pattern1>
+  BAR
+  synPat<PATTERN, Pattern2>;
+
+andsPat options { stubBase="SynPatternBase"; }:
+  synPat<PATTERN, Pattern1>
+  AMP
+  synPat<PATTERN, Pattern2>;
+
+longIdentPat options { stubBase="PatternDeclarationBase"; }:
+  fSharpIdentifier<IDENTIFIER, Identifier>
+  // todo: use longIdentifier<LONG_IDENTIFIER, LongIdentifier>
+  synPat<PARAMETER, Parameters>*
+  fakeSeparator;
+
+listPat options { stubBase="SynPatternBase"; }:
+  synPat<ATTRIBUTE, Patterns>*;
+
+parenPat options { stubBase="SynPatternBase"; }:
+  LPAREN
+  synPat<PATTERN, Pattern>
+  RPAREN;
+
+recordPat options { stubBase="SynPatternBase"; }:
+  synPat<ATTRIBUTE, Patterns>*
+  fakeSeparator;
+
+optionalValPat options { stubBase="SynPatternBase"; }:
+  QMARK
+  synPat<PATTERN, Pattern>;
+
+isInstPat options { stubBase="SynPatternBase"; }:
+  COLON_QMARK
+  synPat<PATTERN, Pattern>;
+
+consPat options { stubBase="SynPatternBase"; }:
+  synPat<PATTERN1, Pattern1>
+  COLON_COLON
+  synPat<PATTERN2, Pattern2>;
+
+otherPat options { stubBase="SynPatternBase"; }:
+  fakeSeparator;
+
+
+interface synExpr:
+  expr;
+
+expr options { stubBase="DummyExpression"; }:
+  fakeSeparator;
+
+
 typeExtension:
   namedTypeExpression<EXTENDED_TYPE, ExtendedType>
   memberDeclaration<TYPE_MEMBER, TypeMembers>* fakeSeparator;
@@ -261,19 +350,10 @@ moduleAbbreviation options { stubBase="FSharpTypeElementDeclarationBase"; } extr
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
 
-let options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
-  fSharpIdentifier<IDENTIFIER, Identifier>
-  activePatternCaseDeclaration<ACTIVE_PATTERN_CASE, Cases>*
-  body<BODY, Body>;
-
-body:
-  fakeSeparator;
-
 activePatternCaseDeclaration options { stubBase="FSharpDeclarationBase"; }:
    fSharpIdentifier<IDENTIFIER, Identifier>;
 
-otherMemberDeclaration:
+otherMemberDeclaration options { stubBase="DummyDeclaration"; }:
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   fSharpIdentifier<IDENTIFIER, Identifier>;
 

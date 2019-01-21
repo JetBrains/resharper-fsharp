@@ -191,9 +191,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     [CanBeNull]
     internal static IDeclaredElement GetActivePatternByIndex(this IDeclaration declaration, int index)
     {
-      var letDecl = declaration as Let;
-      var cases = letDecl?.Identifier.Children<ActivePatternCaseDeclaration>().AsIList();
-      return cases?.Count > index ? cases[index].DeclaredElement : null;
+      return null;
+//      var letDecl = declaration as PatternDeclarationBase;
+//      var cases = letDecl?.Identifier.Children<ActivePatternCaseDeclaration>().AsIList();
+//      return cases?.Count > index ? cases[index].DeclaredElement : null;
     }
 
     public static TreeNodeCollection<IFSharpAttribute> GetAttributes([NotNull] this IDeclaration declaration)
@@ -204,8 +205,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
           return typeDeclaration.Attributes;
         case IMemberDeclaration memberDeclarationm:
           return memberDeclarationm.Attributes;
-        case ILet letBinding:
-          return letBinding.Attributes;
+//        case IPatternDeclaration letBinding:
+//          return letBinding.Attributes;
         case IModuleLikeDeclaration moduleLikeDeclaration:
           return moduleLikeDeclaration.Attributes;
         default: return TreeNodeCollection<IFSharpAttribute>.Empty;

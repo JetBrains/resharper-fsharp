@@ -58,10 +58,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       if (!base.Equals(obj))
         return false;
 
-      // Multiple overloads are not allowed
-      if (GetDeclaration() is ILet)
-        return true;
-
       if (!(obj is FSharpMemberBase<TDeclaration> member) || IsStatic != member.IsStatic) // RIDER-11321, RSRP-467025
         return false;
 

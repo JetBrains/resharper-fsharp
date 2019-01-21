@@ -7,7 +7,7 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal class FSharpLiteral : FSharpTypeMember<Let>, IField
+  internal class FSharpLiteral : FSharpTypeMember<PatternDeclarationBase>, IField
   {
     public FSharpLiteral([NotNull] ITypeMemberDeclaration declaration, FSharpMemberOrFunctionOrValue mfv) :
       base(declaration)
