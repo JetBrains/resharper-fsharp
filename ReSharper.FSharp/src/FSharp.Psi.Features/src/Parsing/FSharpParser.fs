@@ -10,7 +10,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open Microsoft.FSharp.Compiler.Ast
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
-type internal FSharpParser(file: IPsiSourceFile, checkerService: FSharpCheckerService,
+type internal FSharpParser(lexer: ILexer, file: IPsiSourceFile, checkerService: FSharpCheckerService,
                            resolvedSymbolsCache: IFSharpResolvedSymbolsCache) =
     let tryCreateTreeBuilder lexer lifetime =
         Option.bind (fun (parseResults: FSharpParseFileResults) ->
@@ -24,8 +24,8 @@ type internal FSharpParser(file: IPsiSourceFile, checkerService: FSharpCheckerSe
         member this.ParseFile() =
             use lifetimeDefintion = Lifetime.Define()
             let lifetime = lifetimeDefintion.Lifetime
-            let factory = FSharpPreprocessedLexerFactory(checkerService.GetDefines(file)) :> ILexerFactory
-            let lexer = TokenBuffer(factory.CreateLexer(file.Document.Buffer)).CreateLexer()
+            let factory = FSharpPreprocessedLexerFactory(checkerService.GetDefines(file))
+            let lexer = factory.CreateLexer(lexer).ToCachingLexer()
             let parseResults = checkerService.ParseFile(file)
             let treeBuilder =
                 tryCreateTreeBuilder lexer lifetime parseResults

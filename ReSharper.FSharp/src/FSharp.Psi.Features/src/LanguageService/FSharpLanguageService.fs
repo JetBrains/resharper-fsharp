@@ -31,7 +31,7 @@ type FSharpLanguageService
     override x.CreateFilteringLexer(lexer) = lexer
     override x.CreateParser(lexer, _, sourceFile) =
         let resolvedSymbolsCache = sourceFile.GetSolution().GetComponent<IFSharpResolvedSymbolsCache>()
-        FSharpParser(sourceFile, fsCheckerService, resolvedSymbolsCache) :> _
+        FSharpParser(lexer, sourceFile, fsCheckerService, resolvedSymbolsCache) :> _
 
     override x.IsTypeMemberVisible(typeMember) =
         match typeMember with

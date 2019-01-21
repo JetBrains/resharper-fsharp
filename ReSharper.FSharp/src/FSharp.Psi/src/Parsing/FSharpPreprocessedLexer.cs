@@ -6,17 +6,42 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 {
-  public class FSharpPreprocessedLexer : ILexer<FSharpLexerState>
+  public class FSharpPreprocessedLexer : ILexer<int>
   {
+    private struct LexerState
+    {
+      public readonly TokenNodeType TokenType;
+      public readonly int TokenStart;
+      public readonly int TokenEnd;
+      public readonly int CachingLexerState;
+
+      public LexerState(TokenNodeType tokenType, int tokenStart, int tokenEnd, int cachingLexerState)
+      {
+        TokenType = tokenType;
+        TokenStart = tokenStart;
+        TokenEnd = tokenEnd;
+        CachingLexerState = cachingLexerState;
+      }
+    }
+
     private TokenNodeType myCurrTokenType;
-    private readonly FSharpLexer myLexer;
+    private int myTokenStart;
+    private int myTokenEnd;
+    private readonly ILexer<int> myLexer;
     private readonly FSharpPreprocessor myPreprocessor;
     private readonly HashSet<string> myDefinedConstants;
     private readonly PreprocessorState myState = new PreprocessorState();
 
+    public FSharpPreprocessedLexer(ILexer lexer, FSharpPreprocessor preprocessor, HashSet<string> definedConstants)
+    {
+      myLexer = lexer is CachingLexer cachingLexer ? cachingLexer : new FSharpLexer(lexer.Buffer).ToCachingLexer();
+      myPreprocessor = preprocessor;
+      myDefinedConstants = definedConstants;
+    }
+
     public FSharpPreprocessedLexer(IBuffer buffer, FSharpPreprocessor preprocessor, HashSet<string> definedConstants)
     {
-      myLexer = new FSharpLexer(buffer);
+      myLexer = new FSharpLexer(buffer).ToCachingLexer();
       myPreprocessor = preprocessor;
       myDefinedConstants = definedConstants;
     }
@@ -27,17 +52,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       myCurrTokenType = null;
     }
 
-    private void Restore(FSharpLexerState stackElem) =>
-      myLexer.CurrentPosition = stackElem;
-
-    private FSharpLexerState DeadCodeToken(FSharpLexerState state, int dumpStart)
+    private TokenNodeType Restore(TokenNodeType token)
     {
-      state.currTokenType = FSharpTokenType.DEAD_CODE;
-      state.yy_buffer_start = dumpStart;
-      state.yy_buffer_end = myLexer.TokenStart;
-      state.yy_buffer_index = myLexer.TokenStart;
-      return state;
+      if (token != FSharpTokenType.DEAD_CODE)
+      {
+        myTokenStart = myLexer.TokenStart;
+        myTokenEnd = myLexer.TokenEnd;
+      }
+      return token;
     }
+    
+    private TokenNodeType Restore(LexerState stackElem)
+    {
+      myLexer.CurrentPosition = stackElem.CachingLexerState;
+      myTokenStart = stackElem.TokenStart;
+      myTokenEnd = stackElem.TokenEnd;
+      return stackElem.TokenType;
+    }
+
+    private LexerState DeadCodeToken(int dumpStart) =>
+      new LexerState(FSharpTokenType.DEAD_CODE, dumpStart, myLexer.TokenStart, myLexer.CurrentPosition);
 
     private TokenNodeType PreprocessInactiveBranch()
     {
@@ -84,7 +118,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       do
       {
         tokenType = myLexer.TokenType;
-        myState.EnqueueLexerState(myLexer.CurrentPosition);
+        myState.EnqueueLexerState(new LexerState(tokenType, myLexer.TokenStart, myLexer.TokenEnd, myLexer.CurrentPosition));
         myLexer.Advance();
       } while (tokenType != FSharpTokenType.NEW_LINE && tokenType != null);
       return TokenType;
@@ -99,9 +133,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         tokenType = myLexer.TokenType;
         if (tokenType == FSharpTokenType.NEW_LINE)
         {
-          var state = DeadCodeToken(myLexer.CurrentPosition, dumpStartToken);
+          var state = DeadCodeToken(dumpStartToken);
           myState.EnqueueLexerState(state);
-          myState.EnqueueLexerState(myLexer.CurrentPosition);
+          myState.EnqueueLexerState(new LexerState(tokenType, myLexer.TokenStart, myLexer.TokenEnd, myLexer.CurrentPosition));
         }
         myLexer.Advance();
       } while (tokenType != FSharpTokenType.NEW_LINE && tokenType != null);
@@ -140,22 +174,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     {
       if (!myState.LexerStates().IsEmpty())
       {
-        Restore(myState.DequeueLexerState());
-        return myLexer.TokenType;
+        return Restore(myState.DequeueLexerState());
       }
 
-      return myLexer.TokenType != null
+      return Restore(myLexer.TokenType != null
         ? myState.Condition ? PreprocessActiveBranch() : PreprocessInactiveBranch()
-        : null;
+        : null);
     }
   
     object ILexer.CurrentPosition
     {
       get => CurrentPosition;
-      set => CurrentPosition = (FSharpLexerState) value;
+      set => CurrentPosition = (int) value;
     }
   
-    public FSharpLexerState CurrentPosition
+    public int CurrentPosition
     {
       get => myLexer.CurrentPosition;
       set => myLexer.CurrentPosition = value;
@@ -176,7 +209,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       get
       {
         LocateToken();
-        return myLexer.TokenStart;
+        return myTokenStart;
       }
     }
 
@@ -185,7 +218,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       get
       {
         LocateToken();
-        return myLexer.TokenEnd;
+        return myTokenEnd;
       }
     }
 
@@ -252,14 +285,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       }
 
       private readonly Stack<PreprocessorBlockState> myStack = new Stack<PreprocessorBlockState>();
-      private readonly Queue<FSharpLexerState> myQueue = new Queue<FSharpLexerState>();
+      private readonly Queue<LexerState> myQueue = new Queue<LexerState>();
 
-      public IEnumerable<FSharpLexerState> LexerStates() => myQueue;
+      public IEnumerable<LexerState> LexerStates() => myQueue;
 
-      public void EnqueueLexerState(FSharpLexerState state) =>
+      public void EnqueueLexerState(LexerState state) =>
         myQueue.Enqueue(state);
 
-      public FSharpLexerState DequeueLexerState() =>
+      public LexerState DequeueLexerState() =>
         myQueue.Dequeue();
 
       public void InIfBlock(bool condition, bool hasActiveBranch) =>

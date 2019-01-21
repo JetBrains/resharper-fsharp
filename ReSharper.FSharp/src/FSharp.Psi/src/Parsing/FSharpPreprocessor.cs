@@ -25,7 +25,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     private sealed class SymbolExpression : Expression
     {
       public readonly string Symbol;
-    
+
       public SymbolExpression(string symbol) => Symbol = symbol;
 
       public override bool Accept(FSharpPreprocessor fSharpPreprocessor) => fSharpPreprocessor.Visit(this);
@@ -170,7 +170,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         switch (TokenType())
         {
           case var token when token == FSharpTokenType.PP_CONDITIONAL_SYMBOL:
-            var sym = new SymbolExpression(myLexer.GetCurrTokenText());
+            var sym = new SymbolExpression(myLexer.GetTokenText());
             myLexer.Advance();
             return sym;
           case var token when token == FSharpTokenType.PP_LPAR:

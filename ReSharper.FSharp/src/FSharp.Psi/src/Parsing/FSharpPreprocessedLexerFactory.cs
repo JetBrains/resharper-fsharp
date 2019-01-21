@@ -15,5 +15,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 
     public ILexer CreateLexer(IBuffer buffer) =>
       new FSharpPreprocessedLexer(buffer, myPreprocessor, myDefinedConstant);
+
+    public ILexer CreateLexer(ILexer lexer) =>
+      new FSharpPreprocessedLexer(lexer, myPreprocessor, myDefinedConstant);
   }
 }
