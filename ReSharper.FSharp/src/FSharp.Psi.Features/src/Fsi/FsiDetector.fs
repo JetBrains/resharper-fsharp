@@ -202,6 +202,9 @@ type MsBuildPropertiesFsiProvider() =
 
     interface IFsiDirectoryProvider with
         member x.GetFsiTools(solution) =
+            if isNull solution then [] :> _ else
+
+            use lock = ReadLockCookie.Create()
             solution.GetAllProjects()
             |> Seq.tryPick (fun project ->
                 if not project.IsFSharp then None else
