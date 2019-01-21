@@ -9,6 +9,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CSharp.Impl
 open JetBrains.ReSharper.Psi.Impl
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
 [<Language(typeof<FSharpLanguage>)>]
@@ -37,3 +38,6 @@ type FSharpLanguageService
 
     override x.CodeFormatter = formatter :> _
     override x.FindTypeDeclarations(file) = EmptyList<_>.Instance :> _
+
+    override x.CanContainCachableDeclarations(node) =
+        not (node :? IExpression)
