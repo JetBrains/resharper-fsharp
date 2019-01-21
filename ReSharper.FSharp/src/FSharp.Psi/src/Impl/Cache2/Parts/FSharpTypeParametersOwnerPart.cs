@@ -25,11 +25,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
       myTypeParameterNames = new string[typeParameters.Count];
       for (var i = 0; i < typeParameters.Count; i++)
-      {
-        var name = typeParameters[i].GetText();
-        var trimmed = !name.IsEmpty() && name[0] == '\'' ? name.Substring(1) : name;
-        myTypeParameterNames[i] = cacheBuilder.Intern(trimmed);
-      }
+        myTypeParameterNames[i] = cacheBuilder.Intern(typeParameters[i].DeclaredName);
     }
 
     protected FSharpTypeParametersOwnerPart(IReader reader) : base(reader)

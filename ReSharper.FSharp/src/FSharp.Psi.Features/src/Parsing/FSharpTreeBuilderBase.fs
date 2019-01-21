@@ -206,24 +206,21 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         mark
 
     member x.ProcessTypeParametersOfType typeParams range paramsInBraces =
-        if not typeParams.IsEmpty then
-            match typeParams.Head with
-            | TyparDecl(_,(Typar(id,_,_))) ->
-                id.idRange |> x.GetStartOffset |> x.AdvanceToTokenOrOffset FSharpTokenType.LESS
-                let mark = x.Mark()
-                for p in typeParams do
-                    x.ProcessTypeParameter p ElementType.TYPE_PARAMETER_OF_TYPE_DECLARATION
-                if paramsInBraces then
-                    let greaterTokenType = FSharpTokenType.GREATER
-                    range |> x.GetEndOffset |> x.AdvanceToTokenOrOffset greaterTokenType
-                    if LanguagePrimitives.PhysicalEquality (x.Builder.GetTokenType()) greaterTokenType then
-                        x.Advance()
-                x.Done(mark, ElementType.TYPE_PARAMETER_OF_TYPE_LIST)
+        match typeParams with
+        | TyparDecl(_,(Typar(id,_,_))) :: _ ->
+            id.idRange |> x.GetStartOffset |> x.AdvanceToTokenOrOffset FSharpTokenType.LESS
+            let mark = x.Mark()
+            for p in typeParams do
+                x.ProcessTypeParameter(p, ElementType.TYPE_PARAMETER_OF_TYPE_DECLARATION)
+            if paramsInBraces then
+                range |> x.GetEndOffset |> x.AdvanceToTokenOrOffset FSharpTokenType.GREATER
+                if x.Builder.GetTokenType() == FSharpTokenType.GREATER then
+                    x.Advance()
+            x.Done(mark, ElementType.TYPE_PARAMETER_OF_TYPE_LIST)
+        | [] -> ()
 
-    member x.ProcessTypeParameter (TyparDecl(_,(Typar(IdentRange range as id,_,_)))) elementType =
-        let mark = x.Mark(range)
-        x.ProcessIdentifier id
-        x.Done(range, mark, elementType)
+    member x.ProcessTypeParameter(TyparDecl(_,(Typar(IdentRange range,_,_))), elementType) =
+        x.MarkAndDone(range, elementType)
 
     member x.ProcessUnionCaseType caseType =
         match caseType with
@@ -318,7 +315,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
 
     member x.ProcessTypeMemberTypeParams (SynValTyparDecls(typeParams,_,_)) =
         for param in typeParams do
-            x.ProcessTypeParameter param ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION
+            x.ProcessTypeParameter(param, ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION)
 
     member x.ProcessMemberDeclaration id (typeParamsOpt: SynValTyparDecls option) memberParams expr range =
         x.ProcessIdentifier id

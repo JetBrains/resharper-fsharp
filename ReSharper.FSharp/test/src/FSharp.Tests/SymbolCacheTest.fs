@@ -43,6 +43,8 @@ type SymbolCacheTest() =
     [<Test>] member x.``Record 01 - Simple, module``() = x.DoNamedTest()
     [<Test>] member x.``Record 02 - Simple, namespace``() = x.DoNamedTest()
     [<Test>] member x.``Record 03 - Struct``() = x.DoNamedTest()
+    [<Test>] member x.``Record 04 - Prefix type parameters``() = x.DoNamedTest()
+    [<Test>] member x.``Record 05 - Prefix type parameters 2``() = x.DoNamedTest()
 
     [<Test>] member x.``Enum 01``() = x.DoNamedTest()
     [<Test>] member x.``Exception 01``() = x.DoNamedTest()

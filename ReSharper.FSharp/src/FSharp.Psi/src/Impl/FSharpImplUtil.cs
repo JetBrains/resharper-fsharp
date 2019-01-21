@@ -309,8 +309,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     public static void ReplaceIdentifier([CanBeNull] this IFSharpIdentifier fsIdentifier, string name)
     {
-      // todo: replace the composite identifier node with a single token where possible
-      if (!(fsIdentifier?.FirstChild is FSharpIdentifierToken token))
+      var token = fsIdentifier?.IdentifierToken;
+      if (token == null)
         return;
 
       name = Keywords.QuoteIdentifierIfNeeded(name);

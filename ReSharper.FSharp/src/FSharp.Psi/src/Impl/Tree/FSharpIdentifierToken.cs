@@ -1,11 +1,12 @@
 ﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  public class FSharpIdentifierToken : FSharpToken, IIdentifier
+  public class FSharpIdentifierToken : FSharpToken, IFSharpIdentifier
   {
     public FSharpSymbolReference SymbolReference;
 
@@ -27,5 +28,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       new ReferenceCollection(SymbolReference);
 
     public string Name => GetText().RemoveBackticks();
+    public ITokenNode IdentifierToken => this;
   }
 }

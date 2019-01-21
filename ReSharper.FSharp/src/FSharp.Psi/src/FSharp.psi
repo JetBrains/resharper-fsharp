@@ -520,6 +520,9 @@ otherModuleMember: fakeSeparator;
 
 fSharpIdentifier: IDENTIFIER<IDENTIFIER, IdentifierToken>;
 
+abstract identifier options { interfaceName="JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IFSharpIdentifier"; }:
+  IDENTIFIER;
+
 longIdentifier: IDENTIFIER<IDENTIFIER, Identifiers>*;
 
 
@@ -542,11 +545,11 @@ typeArgumentList:
 
 typeParameterOfTypeDeclaration options { stubBase="FSharpDeclarationBase"; }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
-  fSharpIdentifier<IDENTIFIER, Identifier>;
+  identifier<IDENTIFIER, Identifier>;
 
 typeParameterOfMethodDeclaration options { stubBase="FSharpDeclarationBase"; }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
-  fSharpIdentifier<IDENTIFIER, Identifier>;
+  identifier<IDENTIFIER, Identifier>;
 
 
 // Access modifiers

@@ -162,7 +162,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                     match typars with
                     | Some (SynValTyparDecls (typars, _, _)) ->
                         for p in typars do
-                            x.ProcessTypeParameter p ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION
+                            x.ProcessTypeParameter(p, ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION)
                     | None -> ()
 
                     x.ProcessLocalParams(args)
