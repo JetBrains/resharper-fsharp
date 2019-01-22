@@ -9,15 +9,11 @@ open JetBrains.Application.Threading
 open JetBrains.DocumentManagers.Transactions
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Impl.Sdk
-open JetBrains.ProjectModel.MSBuild
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
+open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
-open JetBrains.TestFramework.Projects
 open JetBrains.Util
 
-[<AbstractClass>]
-[<TestFileExtension(FSharpProjectFileType.FsExtension)>]
-[<TestProjectFilePropertiesProvider(FSharpProjectFileType.FsExtension, MSBuildProjectUtil.CompileElement)>]
+[<AbstractClass; FSharpTest>]
 type TestWithTwoProjects() =
     inherit BaseTestWithSingleProject()
 
