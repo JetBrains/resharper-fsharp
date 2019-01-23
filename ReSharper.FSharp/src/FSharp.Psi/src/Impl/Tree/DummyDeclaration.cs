@@ -14,6 +14,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
     }
 
+    public void SetName(string name, ChangeNameKind changeNameKind)
+    {
+    }
+
     public TreeTextRange GetNameRange() => TreeTextRange.InvalidRange;
     public bool IsSynthetic() => false;
     public IDeclaredElement DeclaredElement => null;

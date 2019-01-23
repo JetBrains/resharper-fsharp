@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using System;
+using System.Xml;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
@@ -20,7 +21,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public XmlNode GetXMLDoc(bool inherit) => null;
     public bool IsSynthetic() => false;
 
-    public virtual void SetName(string name)
+    public virtual void SetName(string name) =>
+      throw new InvalidOperationException("Use IFSharpDeclaration.SetName(string, ChangeNameKind)");
+
+    public void SetName(string name, ChangeNameKind changeNameKind)
     {
     }
   }
