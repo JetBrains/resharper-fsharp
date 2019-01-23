@@ -5,8 +5,10 @@ open JetBrains.ReSharper.Feature.Services.Refactorings.Specific.Rename
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Naming.Impl
 open JetBrains.ReSharper.Psi.Resolve
 open JetBrains.ReSharper.Refactorings.Rename
+open Microsoft.FSharp.Compiler.SourceCodeServices
 
 type FSharpCustomRenameModel(declaredElement, reference, lifetime, changeNameKind: ChangeNameKind) =
     inherit ClrCustomRenameModel(declaredElement, reference, lifetime)
@@ -62,3 +64,10 @@ type FSharpAtomicRenamesFactory() =
     override x.CreateAtomicRenames(declaredElement, newName, doNotAddBindingConflicts) =
         [| FSharpAtomicRename(declaredElement, newName, doNotAddBindingConflicts) :> AtomicRenameBase |] :> _
 
+
+[<Language(typeof<FSharpLanguage>)>]
+type FSharpNamingService(language: FSharpLanguage) =
+    inherit NamingLanguageServiceBase(language)
+
+    override x.MangleNameIfNecessary(name, _) =
+        Keywords.QuoteIdentifierIfNeeded name
