@@ -5,6 +5,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CSharp.Impl
@@ -41,3 +42,8 @@ type FSharpLanguageService
 
     override x.CanContainCachableDeclarations(node) =
         not (node :? IExpression)
+
+    override x.CalcOffset(declaration) =
+        match declaration with
+        | :? INamedPat as namedPat -> namedPat.GetOffset()
+        | _ -> base.CalcOffset(declaration)

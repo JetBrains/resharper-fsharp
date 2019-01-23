@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
@@ -12,6 +13,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public IEnumerable<ITypeMemberDeclaration> Declarations =>
       Pattern?.Declarations.Prepend(this) ?? new []{this};
+
+    /// Workaround for type members cache:
+    /// in `let a, b as c = 1, 2` we want `a` and `a, b as c` to have different offsets
+    /// so use `c` offset when identifier exists.
+    public TreeOffset GetOffset() =>
+      Identifier?.GetTreeStartOffset() ?? GetTreeStartOffset();
   }
 
   internal partial class OrPat
