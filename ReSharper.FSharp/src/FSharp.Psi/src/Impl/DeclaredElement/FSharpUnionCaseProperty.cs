@@ -17,11 +17,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     {
     }
 
-    // Compiled name attribute is ignored.
-    public override string ShortName =>
-      GetDeclaration()?.DeclaredName ??
-      SharedImplUtil.MISSING_DECLARATION_NAME;
-
     public override AccessRights GetAccessRights() =>
       GetContainingType() is TypeElement typeElement
         ? typeElement.GetRepresentationAccessRights()

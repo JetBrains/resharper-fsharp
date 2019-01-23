@@ -40,7 +40,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     private IDeclaredElement DeclaredElementFactory(ActivePatternCaseDeclaration arg) =>
       GetFSharpSymbol() is FSharpActivePatternCase patternCase ? new ActivePatternCase(this, patternCase) : null;
-
-    public IDeclaredElement CachedDeclaredElement { get; set; }
   }
 }

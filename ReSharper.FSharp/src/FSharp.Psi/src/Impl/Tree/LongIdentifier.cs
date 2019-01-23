@@ -30,15 +30,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       }
     }
 
-    public string Name
-    {
-      get
-      {
-        var identifiers = Identifiers;
-        return identifiers.IsEmpty
-          ? SharedImplUtil.MISSING_DECLARATION_NAME
-          : identifiers.Last().GetText().RemoveBackticks();
-      }
-    }
+    public string Name =>
+      Identifiers.LastOrDefault()?.GetText().RemoveBackticks() ?? 
+      SharedImplUtil.MISSING_DECLARATION_NAME;
   }
 }

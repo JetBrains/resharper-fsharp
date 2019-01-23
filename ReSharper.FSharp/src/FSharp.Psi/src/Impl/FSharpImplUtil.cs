@@ -17,7 +17,6 @@ using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 using JetBrains.Util.Logging;
 using JetBrains.Util.Extension;
-using Microsoft.FSharp.Compiler;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -269,7 +268,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         if (attrIds.IsEmpty)
           continue;
 
-        switch (attrIds.Last()?.GetText().DropAttributeSuffix())
+        switch (attrIds.LastOrDefault()?.GetText().DropAttributeSuffix())
         {
           case Interface:
           {
