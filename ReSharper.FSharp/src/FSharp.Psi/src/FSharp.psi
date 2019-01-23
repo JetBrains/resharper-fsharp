@@ -565,7 +565,7 @@ private modifier{ROLE,Getter}:
 
 // Attributes
 
-fSharpAttribute:
+fSharpAttribute options { stubBase="DummyExpression"; }:
   longIdentifier<IDENTIFIER, LongIdentifier>
   argExpression<ARG_EXPRESSION, ArgExpression>
 ;
