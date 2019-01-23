@@ -6,8 +6,7 @@ import com.jetbrains.rider.test.asserts.shouldNotBeNull
 import com.jetbrains.rider.test.base.BaseTestWithSolution
 import com.jetbrains.rider.test.scriptingApi.changeFileContent
 import com.jetbrains.rider.util.idea.lifetime
-import com.jetbrains.rider.util.idea.waitAndPump
-import com.jetbrains.rd.util.reactive.adviseOnce
+import com.jetbrains.rdclient.util.idea.waitAndPump
 import org.testng.annotations.Test
 import java.io.File
 

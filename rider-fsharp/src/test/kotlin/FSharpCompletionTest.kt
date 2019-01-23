@@ -9,7 +9,7 @@ import com.jetbrains.rider.test.scriptingApi.callBasicCompletion
 import com.jetbrains.rider.test.scriptingApi.completeWithTab
 import com.jetbrains.rider.test.scriptingApi.typeWithLatency
 import com.jetbrains.rider.test.scriptingApi.waitForCompletion
-import com.jetbrains.rider.util.idea.waitAndPump
+import com.jetbrains.rdclient.util.idea.waitAndPump
 import com.jetbrains.rd.util.lifetime.Lifetime
 import org.testng.annotations.Test
 
