@@ -7,6 +7,7 @@ Opened
    -Dependencies
     .NETCoreApp 2.1
    Tests.fs
+   Program.fs
 
 
 Project [Name:&, GUID:]
@@ -17,11 +18,12 @@ Project [Name:Miscellaneous Files, GUID:]
 
 Project [Name:UnitTestProject, GUID:]
   Child items:
+    ProjectFileImpl(Path : Program.fs)[COMPILE ]
     ProjectFileImpl(Path : Tests.fs)[COMPILE ]
     ProjectFileImpl(Path : UnitTestProject.fsproj)[]
-    ProjectFileImpl(Path : xunit.runner.reporters.netcoreapp10.dll (.nuget\packages\xunit.runner.visualstudio\2.3.1\build\netcoreapp1.0\xunit.runner.reporters.netcoreapp10.dll))[Hidden NONE ]
-    ProjectFileImpl(Path : xunit.runner.utility.netcoreapp10.dll (.nuget\packages\xunit.runner.visualstudio\2.3.1\build\netcoreapp1.0\xunit.runner.utility.netcoreapp10.dll))[Hidden NONE ]
-    ProjectFileImpl(Path : xunit.runner.visualstudio.dotnetcore.testadapter.dll (.nuget\packages\xunit.runner.visualstudio\2.3.1\build\netcoreapp1.0\xunit.runner.visualstudio.dotnetcore.testadapter.dll))[Hidden NONE ]
+    ProjectFileImpl(Path : xunit.runner.reporters.netcoreapp10.dll (.nuget\packages\xunit.runner.visualstudio\2.4.0\build\netcoreapp1.0\xunit.runner.reporters.netcoreapp10.dll))[Hidden NONE ]
+    ProjectFileImpl(Path : xunit.runner.utility.netcoreapp10.dll (.nuget\packages\xunit.runner.visualstudio\2.4.0\build\netcoreapp1.0\xunit.runner.utility.netcoreapp10.dll))[Hidden NONE ]
+    ProjectFileImpl(Path : xunit.runner.visualstudio.dotnetcore.testadapter.dll (.nuget\packages\xunit.runner.visualstudio\2.4.0\build\netcoreapp1.0\xunit.runner.visualstudio.dotnetcore.testadapter.dll))[Hidden NONE ]
 
 
 

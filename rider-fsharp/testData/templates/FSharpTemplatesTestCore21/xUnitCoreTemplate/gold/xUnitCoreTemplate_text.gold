@@ -1,8 +1,12 @@
 ===================
 Opened
 
+[Program.fs]
+module Program = let [<EntryPoint>] main _ = 0
+
+
 [Tests.fs]
-﻿module Tests
+module Tests
 
 open System
 open Xunit

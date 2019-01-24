@@ -88,7 +88,7 @@ abstract class FSharpTemplatesTestCore : RiderTemplatesTestCoreBase() {
         val projectName = "UnitTestProject"
         doCoreTest(templateId, projectName) { project ->
             checkSwea(project, 0)
-            checkSweaAnalysedFiles(backendLog, 1, 0, "Tests.fs")
+            checkSweaAnalysedFiles(backendLog, 2, 0, "Tests.fs")
 
             // No run configuration in 2.1.402
 //            checkSelectedRunConfigurationExecutionNotAllowed(project)
