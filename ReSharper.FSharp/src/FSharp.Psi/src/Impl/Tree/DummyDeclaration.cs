@@ -18,7 +18,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
     }
 
+    public IFSharpIdentifier NameIdentifier => null;
     public TreeTextRange GetNameRange() => TreeTextRange.InvalidRange;
+    public TreeTextRange GetNameIdentifierRange() => TreeTextRange.InvalidRange;
+
     public bool IsSynthetic() => false;
     public IDeclaredElement DeclaredElement => null;
     public string DeclaredName => SharedImplUtil.MISSING_DECLARATION_NAME;

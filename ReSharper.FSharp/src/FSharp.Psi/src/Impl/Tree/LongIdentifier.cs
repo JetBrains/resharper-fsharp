@@ -33,5 +33,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public string Name =>
       Identifiers.LastOrDefault()?.GetText().RemoveBackticks() ?? 
       SharedImplUtil.MISSING_DECLARATION_NAME;
+
+    public ITokenNode IdentifierToken =>
+      Identifiers.LastOrDefault();
   }
 }

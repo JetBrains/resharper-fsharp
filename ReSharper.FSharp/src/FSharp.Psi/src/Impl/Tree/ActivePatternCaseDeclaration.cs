@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Tree;
@@ -24,8 +25,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     public override string DeclaredName => Identifier.Name;
-    public override string SourceName => Identifier.GetSourceName();
-    public override TreeTextRange GetNameRange() => Identifier.GetNameRange();
+    public override IFSharpIdentifier NameIdentifier => Identifier;
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     public override IDeclaredElement DeclaredElement

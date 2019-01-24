@@ -1,4 +1,5 @@
 ﻿using JetBrains.DocumentModel;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
@@ -12,7 +13,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override string ShortName => LongIdentifier.Name;
     public bool IsModule => false;
 
-    public override TreeTextRange GetNameRange() => LongIdentifier.GetNameRange();
+    public override IFSharpIdentifier NameIdentifier => LongIdentifier;
     public DocumentRange GetDeclaredNameDocumentRange() => LongIdentifier.GetDocumentRange();
 
     protected override void PreInit()

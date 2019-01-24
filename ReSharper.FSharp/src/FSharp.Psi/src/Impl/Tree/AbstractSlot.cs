@@ -10,10 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     protected override string DeclaredElementName => Identifier.GetCompiledName(Attributes);
 
-    public override TreeTextRange GetNameRange()
-    {
-      return Identifier.GetNameRange();
-    }
+    public override IFSharpIdentifier NameIdentifier => Identifier;
 
     protected override IDeclaredElement CreateDeclaredElement()
     {

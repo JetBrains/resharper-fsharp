@@ -112,8 +112,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     public static TreeTextRange GetNameRange([CanBeNull] this IFSharpIdentifier identifier)
     {
-      return identifier?.GetTreeTextRange() ?? TreeTextRange.InvalidRange;
+      if (identifier == null)
+        return TreeTextRange.InvalidRange;
+
+      var nameRange = identifier.GetTreeTextRange();
+      return FSharpNamesUtil.IsEscapedWithBackticks(identifier.IdentifierToken.GetText())
+        ? nameRange.TrimLeft(2).TrimRight(2)
+        : nameRange;
     }
+
+    public static TreeTextRange GetNameIdentifierRange([CanBeNull] this IFSharpIdentifier identifier) =>
+      identifier?.GetTreeTextRange() ?? TreeTextRange.InvalidRange;
 
     /// <summary>
     /// Get name and qualifiers without backticks. Qualifiers added if the token is in ILongIdentifier.

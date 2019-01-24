@@ -1,4 +1,5 @@
-﻿using JetBrains.ReSharper.Psi;
+﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -22,6 +23,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       HasExplicitName
         ? LongIdentifier.GetNameRange()
         : new TreeTextRange(TreeOffset.Zero);
+
+    public override IFSharpIdentifier NameIdentifier => LongIdentifier;
 
     public bool IsModule => true;
   }

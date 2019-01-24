@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
@@ -31,5 +32,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     string SourceName { get; }
 
     void SetName(string name, ChangeNameKind changeNameKind);
+
+    [CanBeNull] IFSharpIdentifier NameIdentifier { get; }
+
+    TreeTextRange GetNameIdentifierRange();
   }
 }

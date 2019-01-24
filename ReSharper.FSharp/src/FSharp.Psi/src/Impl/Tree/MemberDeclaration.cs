@@ -12,12 +12,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     IFunction IFunctionDeclaration.DeclaredElement => base.DeclaredElement as IFunction;
     protected override string DeclaredElementName => Identifier.GetCompiledName(Attributes);
-    public override string SourceName => Identifier.GetSourceName();
 
-    public override TreeTextRange GetNameRange()
-    {
-      return Identifier.GetNameRange();
-    }
+    public override IFSharpIdentifier NameIdentifier => Identifier;
 
     protected override IDeclaredElement CreateDeclaredElement()
     {

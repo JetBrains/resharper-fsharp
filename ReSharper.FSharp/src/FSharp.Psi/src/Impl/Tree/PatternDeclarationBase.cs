@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
@@ -15,15 +15,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class NamedPat
   {
     protected override string DeclaredElementName => Identifier.GetCompiledName(Attributes);
-    public override string SourceName => Identifier.GetSourceName();
     public override TreeTextRange GetNameRange() => Identifier.GetNameRange();
+
+    public override IFSharpIdentifier NameIdentifier => Identifier;
   }
 
   internal partial class LongIdentPat
   {
     protected override string DeclaredElementName => Identifier.GetCompiledName(Attributes);
-    public override string SourceName => IsDeclaration ? Identifier.GetSourceName() : SharedImplUtil.MISSING_DECLARATION_NAME;
-    public override TreeTextRange GetNameRange() => IsDeclaration ? Identifier.GetNameRange() : TreeTextRange.InvalidRange;
+    public override string SourceName => IsDeclaration ? base.SourceName : SharedImplUtil.MISSING_DECLARATION_NAME;
+    public override TreeTextRange GetNameRange() => IsDeclaration ? base.GetNameRange() : TreeTextRange.InvalidRange;
+
+    public override IFSharpIdentifier NameIdentifier => Identifier;
 
     protected override IDeclaredElement CreateDeclaredElement() =>
       IsDeclaration ? base.CreateDeclaredElement() : null;

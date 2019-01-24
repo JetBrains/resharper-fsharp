@@ -12,7 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class UnionCaseFieldDeclaration
   {
     protected override string DeclaredElementName => Identifier.GetSourceName();
-    public override TreeTextRange GetNameRange() => Identifier.GetNameRange();
+    public override IFSharpIdentifier NameIdentifier => Identifier;
 
     protected override IDeclaredElement CreateDeclaredElement()
     {

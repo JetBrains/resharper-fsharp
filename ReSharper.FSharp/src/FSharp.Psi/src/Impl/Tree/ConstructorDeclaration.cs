@@ -16,6 +16,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       GetContainingTypeDeclaration()?.SourceName ?? SharedImplUtil.MISSING_DECLARATION_NAME;
 
     public override TreeTextRange GetNameRange() => NewKeyword.GetTreeTextRange();
+    public override IFSharpIdentifier NameIdentifier => null;
 
     protected override IDeclaredElement CreateDeclaredElement()
     {
