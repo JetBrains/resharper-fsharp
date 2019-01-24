@@ -4,6 +4,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 {
   public interface IFSharpDeclaredElement : IClrDeclaredElement
   {
+    string SourceName { get; }
   }
 
   public interface IFSharpTypeMember : IFSharpDeclaredElement, ITypeMember
