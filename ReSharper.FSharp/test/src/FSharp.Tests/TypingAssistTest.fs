@@ -161,6 +161,9 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Space 07 - Inside empty array, no assist``() = x.DoNamedTest()
     [<Test>] member x.``Space 08 - Inside empty braces``() = x.DoNamedTest()
 
+    [<Test>] member x.``Tab 01 - Line start``() = x.DoNamedTest()
+    [<Test>] member x.``Tab 02 - To next tab position``() = x.DoNamedTest()
+
     [<Test>] member x.``Quotes - Adding third quote``() = x.DoNamedTest()
 
     [<Test>] member x.``Quotes - Pair quotes 01 - Before code``() = x.DoNamedTest()

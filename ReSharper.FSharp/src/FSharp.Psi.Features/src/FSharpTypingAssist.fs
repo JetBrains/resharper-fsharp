@@ -334,6 +334,7 @@ type FSharpTypingAssist
     do
         manager.AddActionHandler(lifetime, TextControlActions.ENTER_ACTION_ID, this, Func<_,_>(handleEnter), isActionHandlerAvailable)
         manager.AddActionHandler(lifetime, TextControlActions.BACKSPACE_ACTION_ID, this, Func<_,_>(this.HandleBackspacePressed), isActionHandlerAvailable)
+        manager.AddActionHandler(lifetime, TextControlActions.TAB_ACTION_ID, this, Func<_,_>(this.HandleTabPressed), isActionHandlerAvailable)
         manager.AddTypingHandler(lifetime, ' ', this, Func<_,_>(handleSpace), isTypingHandlerAvailable)
 
         manager.AddTypingHandler(lifetime, '\'', this, Func<_,_>(this.HandleSingleQuoteTyped), isTypingHandlerAvailable)
