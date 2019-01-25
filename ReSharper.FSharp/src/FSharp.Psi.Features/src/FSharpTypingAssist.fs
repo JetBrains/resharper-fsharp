@@ -1321,7 +1321,7 @@ let isInsideEmptyQuoation (lexer: CachingLexer) offset =
     lexer.TokenType == FSharpTokenType.SYMBOLIC_OP &&
     leftStart = lexer.TokenStart &&
 
-    let tokenText = lexer.GetCurrTokenText()
+    let tokenText = lexer.GetTokenText()
     let mutable leftBracketText = Unchecked.defaultof<_>
     emptyQuotationsStrings.TryGetValue(tokenText, &leftBracketText) &&
     tokenText.Substring(0, leftBracketText.Length) = leftBracketText
@@ -1383,7 +1383,7 @@ let isInfixOp (lexer: ILexer) =
     infixOpTokens.Contains(lexer.TokenType) ||
 
     lexer.TokenType == FSharpTokenType.SYMBOLIC_OP &&
-    IsInfixOperator (lexer.GetCurrTokenText())
+    IsInfixOperator (lexer.GetTokenText())
 
 
 [<RequireQualifiedAccess; Struct>]
