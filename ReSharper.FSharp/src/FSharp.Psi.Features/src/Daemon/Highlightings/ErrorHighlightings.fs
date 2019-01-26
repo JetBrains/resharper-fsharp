@@ -1,7 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Highlightings
 
 open System
-open JetBrains.Annotations
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Daemon
 
@@ -34,11 +33,27 @@ type WarningHighlighting(message, range) =
 type UnresolvedHighlighting(message, range) = 
     inherit FSharpErrorHighlightingBase(message, range)
 
+
 [<StaticSeverityHighlighting(Severity.WARNING, HighlightingGroupIds.IdentifierHighlightingsGroup, 
                              AttributeId = HighlightingAttributeIds.DEADCODE_ATTRIBUTE, 
                              OverlapResolve = OverlapResolveKind.NONE)>]
 type UnusedHighlighting(message, range) = 
     inherit FSharpErrorHighlightingBase(message, range)
+
+
+[<StaticSeverityHighlighting(Severity.WARNING, HighlightingGroupIds.IdentifierHighlightingsGroup, 
+                             AttributeId = HighlightingAttributeIds.WARNING_ATTRIBUTE, 
+                             OverlapResolve = OverlapResolveKind.NONE)>]
+type UseKeywordIllegalInModule(message, range) = 
+    inherit FSharpErrorHighlightingBase(message, range)
+
+
+[<StaticSeverityHighlighting(Severity.ERROR, HighlightingGroupIds.IdentifierHighlightingsGroup, 
+                             AttributeId = HighlightingAttributeIds.ERROR_ATTRIBUTE, 
+                             OverlapResolve = OverlapResolveKind.NONE)>]
+type UseKeywordIllegalInPrimaryCtor(message, range) = 
+    inherit FSharpErrorHighlightingBase(message, range)
+
 
 [<StaticSeverityHighlighting(Severity.INFO, HighlightingGroupIds.IdentifierHighlightingsGroup,
                              AttributeId = HighlightingAttributeIds.DEADCODE_ATTRIBUTE,

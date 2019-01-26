@@ -25,3 +25,6 @@ type ErrorsHighlightingTest() =
 
     [<Test>] member x.``Type check errors 01 - type mismatch``() = x.DoNamedTest()
     [<Test>] member x.``Type check errors 02 - nested error``() = x.DoNamedTest()
+
+    [<Test>] member x.``Use not allowed 01 - module``() = x.DoNamedTest()
+    [<Test>] member x.``Use not allowed 02 - primary ctor``() = x.DoNamedTest()
