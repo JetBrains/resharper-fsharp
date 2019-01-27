@@ -2,7 +2,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Search
 
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Occurrences
+open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
@@ -18,6 +20,12 @@ type FSharpItemOccurenceKindProvider() =
             | :? ReferenceOccurrence as referenceOccurrence ->
                 match referenceOccurrence.PrimaryReference with
                 | :? FSharpSymbolReference as symbolReference ->
+
+                    // todo: mark synType nodes
+                    let referenceNode = symbolReference.GetTreeNode()
+                    if isNotNull referenceNode && isNotNull (referenceNode.GetContainingNode<IIsInstPat>()) then
+                        [| CSharpSpecificOccurrenceKinds.TypeChecking |] :> _ else
+
                     let symbolUse = symbolReference.GetSymbolUse()
                     if isNull (box symbolUse) then EmptyList.Instance :> _ else
 
@@ -37,4 +45,5 @@ type FSharpItemOccurenceKindProvider() =
         member x.GetAllPossibleOccurrenceKinds() =
             [| OccurrenceKind.NewInstanceCreation
                FSharpItemOccurrenceKind.Pattern
-               FSharpItemOccurrenceKind.TypeSpecification |] :> _
+               FSharpItemOccurrenceKind.TypeSpecification
+               CSharpSpecificOccurrenceKinds.TypeChecking |] :> _
