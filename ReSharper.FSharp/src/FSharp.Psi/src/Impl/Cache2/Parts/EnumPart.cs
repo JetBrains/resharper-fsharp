@@ -18,10 +18,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
     }
 
-    public override TypeElement CreateTypeElement()
-    {
-      return new Enum(this);
-    }
+    public override TypeElement CreateTypeElement() =>
+      new FSharpEnum(this);
 
     public IType GetUnderlyingType()
     {

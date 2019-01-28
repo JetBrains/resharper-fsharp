@@ -35,6 +35,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public bool CaseSensitiveName => true;
 
+    public virtual string SourceName =>
+      GetDeclaration()?.SourceName ??
+      SharedImplUtil.MISSING_DECLARATION_NAME;
+    
     public virtual string ShortName =>
       GetDeclaration()?.DeclaredName ??
       SharedImplUtil.MISSING_DECLARATION_NAME;

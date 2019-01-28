@@ -244,6 +244,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return false;
     }
 
+    public static string GetSourceName([NotNull] this TypeElement typeElement)
+    {
+      foreach (var part in typeElement.EnumerateParts())
+        if (part is IFSharpTypePart fsTypePart)
+          return fsTypePart.SourceName;
+
+      return typeElement.ShortName;
+    }
+    
     public static AccessRights GetFSharpRepresentationAccessRights([NotNull] this TypeElement typeElement)
     {
       foreach (var part in typeElement.EnumerateParts())

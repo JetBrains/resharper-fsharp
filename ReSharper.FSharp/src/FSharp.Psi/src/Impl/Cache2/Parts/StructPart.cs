@@ -29,13 +29,4 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public bool IsReadonly => false;
     public bool IsByRefLike => false;
   }
-
-  public class FSharpStruct : Struct
-  {
-    public FSharpStruct([NotNull] IStructPart part) : base(part)
-    {
-    }
-
-    protected override MemberDecoration Modifiers => Parts.GetModifiers();
-  }
 }
