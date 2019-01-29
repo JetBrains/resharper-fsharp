@@ -10,8 +10,10 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Files
 open JetBrains.ReSharper.Psi.Resolve
+open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
+[<TestPackages("FSharp.Core")>]
 type CSharpResolveTest() =
     inherit TestWithTwoProjects()
 
@@ -55,9 +57,19 @@ type CSharpResolveTest() =
 
     [<Test>] member x.``Methods 01``() = x.DoNamedTest()
     [<Test>] member x.``Methods 02, compiled name``() = x.DoNamedTest()
+    [<Test>] member x.``Methods 03, optional param``() = x.DoNamedTest()
+    [<Test>] member x.``Methods 04, extension methods``() = x.DoNamedTest()
+
+    [<Test>] member x.``Properties 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Module bindings 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Module bindings 02 - Records``() = x.DoNamedTest()
+    [<Test>] member x.``Module bindings 03 - extension methods 01``() = x.DoNamedTest()
+    [<Test>] member x.``Module bindings 04 - extension methods 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Enum 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Events 01``() = x.DoNamedTest()
 
     override x.RelativeTestDataPath = "cache/csharpResolve"
 

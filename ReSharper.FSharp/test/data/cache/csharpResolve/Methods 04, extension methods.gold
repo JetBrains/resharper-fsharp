@@ -1,0 +1,16 @@
+﻿using Ns;
+
+namespace ClassLibrary1
+{
+    public class Class1
+    {
+        public Class1()
+        {
+            string s1 = 1.Ext();
+        }
+    }
+}
+
+---------------------------------------------------------
+M:Ns.T.Ext(System.Int32)
+M:Ns.T.Ext(System.Int32)
