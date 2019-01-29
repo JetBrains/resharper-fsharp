@@ -1,4 +1,4 @@
-﻿namespace JetBrains.ReSharper.Plugins.FSharp.Common.Util
+namespace JetBrains.ReSharper.Plugins.FSharp.Common.Util
 
 [<AutoOpen>]
 module rec CommonUtil =
@@ -206,5 +206,11 @@ module rec FSharpMsBuildUtils =
 namespace global
 
 [<AutoOpen>]
-module Extension =
+module FSharpGlobalUtil =
     type Extension = System.Runtime.CompilerServices.ExtensionAttribute
+
+    type System.Object with
+        member x.As<'T when 'T : null>() =
+            match x with
+            | :? 'T as t -> t
+            | _ -> null

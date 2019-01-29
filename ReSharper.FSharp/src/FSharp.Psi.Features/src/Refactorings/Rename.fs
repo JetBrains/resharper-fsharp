@@ -1,14 +1,38 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings.Rename
+namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings.Rename
 
+open System
 open JetBrains.Application
 open JetBrains.ReSharper.Feature.Services.Refactorings.Specific.Rename
+open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Naming.Impl
 open JetBrains.ReSharper.Psi.Resolve
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Refactorings.Rename
+open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
+
+[<AutoOpen>]
+module Util =
+    type IRenameWorkflow with
+        member x.RenameWorkflow =
+            match x with
+            | :? RenameWorkflow as workflow -> workflow
+            | _ -> failwithf "Got workflow: %O" x
+
+        member x.RenameDataModel =
+            x.RenameWorkflow.DataModel
+
+        member x.FSharpRenameModel =
+            x.RenameDataModel.FSharpRenameModel
+
+    type RenameDataModel with
+        member x.FSharpRenameModel =
+            x.Model :?> FSharpCustomRenameModel
+
 
 type FSharpCustomRenameModel(declaredElement, reference, lifetime, changeNameKind: ChangeNameKind) =
     inherit ClrCustomRenameModel(declaredElement, reference, lifetime)
@@ -19,21 +43,15 @@ type FSharpCustomRenameModel(declaredElement, reference, lifetime, changeNameKin
 type FSharpAtomicRename(declaredElement, newName, doNotShowBindingConflicts) =
     inherit AtomicRename(declaredElement, newName, doNotShowBindingConflicts)
 
-    let getModel (executor: IRenameRefactoring) =
-        match executor.Workflow with
-        | :? RenameWorkflowBase as workflow -> workflow.DataModel.Model :?> FSharpCustomRenameModel
-        | workflow -> failwithf "Got workflow: %O" workflow
-
-    override x.SetName(declaration, executor) =
+    override x.SetName(declaration, renameRefactoring) =
         match declaration with
         | :? IFSharpDeclaration as fsDeclaration ->
-            let model = getModel executor
-            fsDeclaration.SetName(x.NewName, model.ChangeNameKind)
+            fsDeclaration.SetName(x.NewName, renameRefactoring.Workflow.FSharpRenameModel.ChangeNameKind)
         | declaration -> failwithf "Got declaration: %O" declaration
 
 
 [<Language(typeof<FSharpLanguage>)>]
-type RenameHelper() =
+type FSharpRenameHelper() =
     inherit RenameHelperBase()
 
     override x.IsLanguageSupported = true
@@ -47,6 +65,22 @@ type RenameHelper() =
 
     override x.GetOptionsModel(declaredElement, reference, lifetime) =
         FSharpCustomRenameModel(declaredElement, reference, lifetime, (* todo *) ChangeNameKind.SourceName) :> _
+
+    override x.GetInitialPage(workflow) =
+        let dataModel = workflow.RenameDataModel
+        let declaredElement = dataModel.InitialDeclaredElement
+
+        match declaredElement.As<IFSharpDeclaredElement>() with
+        | null -> failwithf "Got declared element: %O" declaredElement
+        | fsDeclaredElement ->
+
+        dataModel.InitialName <-
+            match dataModel.FSharpRenameModel.ChangeNameKind with
+            | ChangeNameKind.SourceName
+            | ChangeNameKind.UseSingleName -> fsDeclaredElement.SourceName
+            | _ -> fsDeclaredElement.ShortName
+
+        null            
 
 
 [<ShellFeaturePart>]
