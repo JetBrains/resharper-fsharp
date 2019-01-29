@@ -35,7 +35,7 @@ type ScriptPsiModulesTest() =
     [<Test>] member x.FileDoNotExist() = x.DoTestSolution()
 
     member x.DoTestSolution() =
-        x.RunGuarded(fun _ -> Lifetimes.Using(x.DoTestSolutionImpl))
+        x.RunGuarded(fun _ -> Lifetime.Using(x.DoTestSolutionImpl))
 
     member x.DoTestSolutionImpl(lifetime: Lifetime) =
         use persistCacheCookie = x.ShellInstance.GetComponent<TestCachesConfigurationSettings>().PersistCachesCookie()

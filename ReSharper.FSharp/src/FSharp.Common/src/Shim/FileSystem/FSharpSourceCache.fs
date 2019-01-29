@@ -30,7 +30,7 @@ type FSharpSourceCache
         (lifetime: Lifetime, solution: ISolution, changeManager, documentManager: DocumentManager,
          extensions: IProjectFileExtensions, solutionDocumentChangeProvider: SolutionDocumentChangeProvider,
          fileExtensions: IProjectFileExtensions, logger: JetBrains.Util.ILogger) =
-    inherit FileSystemShimChangeProvider(Lifetimes.Define(lifetime).Lifetime, changeManager)
+    inherit FileSystemShimChangeProvider(Lifetime.Define(lifetime).Lifetime, changeManager)
 
     let files = ConcurrentDictionary<FileSystemPath, FSharpSource>()
 

@@ -1088,7 +1088,7 @@ type FSharpItemsContainerRefresher(lifetime: Lifetime, solution: ISolution, view
                 |> Option.iter (fun projectFile ->
 
                 let navigationManager = NavigationManager.GetInstance(solution)
-                ignore (Lifetimes.Using(fun lifetime ->
+                ignore (Lifetime.Using(fun lifetime ->
                     let points =
                         navigationManager
                             .GetNavigationPoints<ISolutionExplorerNavigationProvider, IProjectItem>(projectFile)

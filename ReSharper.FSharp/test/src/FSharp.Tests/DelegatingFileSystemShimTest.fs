@@ -30,10 +30,10 @@ type DelegatingFileSystemShimTest() =
         x.DoTest(fun lifetime writer ->
             let shim1 = LoggingShim(shim1name, lifetime, writer)
 
-            let lifetime2 = Lifetimes.Define(lifetime).Lifetime
+            let lifetime2 = Lifetime.Define(lifetime).Lifetime
             let shim2 = LoggingShim(shim2name, lifetime2, writer)
 
-            let lifetime3 = Lifetimes.Define(lifetime2).Lifetime
+            let lifetime3 = Lifetime.Define(lifetime2).Lifetime
             let shim3 = LoggingShim(shim3name, lifetime3, writer)
 
             Shim.FileSystem.GetLastWriteTimeShim(fakePath) |> ignore)
@@ -41,7 +41,7 @@ type DelegatingFileSystemShimTest() =
     member x.DoTest(action: Lifetime -> TextWriter -> unit) =
         x.ExecuteWithGold(fun writer ->
             x.RunGuarded(fun _ ->
-                Lifetimes.Using(fun lifetime -> action lifetime writer)
+                Lifetime.Using(fun lifetime -> action lifetime writer)
 
                 match Shim.FileSystem with
                 | :? LoggingShim as loggingShim ->

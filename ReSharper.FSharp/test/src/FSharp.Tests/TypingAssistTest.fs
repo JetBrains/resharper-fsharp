@@ -262,7 +262,7 @@ type LineIndentsTestBase() =
     abstract DoLineTest: TextWriter * ITextControl * Line -> unit 
 
     override x.DoTest(project: IProject) =
-        use lifetimeDefintion = Lifetimes.Define()
+        use lifetimeDefintion = Lifetime.Define()
         let textControl = x.OpenTextControl(lifetimeDefintion.Lifetime)
         let linesCount = int (textControl.Document.GetLineCount())
         x.ExecuteWithGold(fun writer ->

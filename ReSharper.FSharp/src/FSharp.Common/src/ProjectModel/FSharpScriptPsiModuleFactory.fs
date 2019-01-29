@@ -362,7 +362,7 @@ type FSharpScriptPsiModule
         (lifetime, path, solution, sourceFileCtor, moduleId, assemblyFactory, modulesProvider) as this =
     inherit ConcurrentUserDataHolder()
 
-    let lifetimeDefinition = Lifetimes.Define(lifetime)
+    let lifetimeDefinition = Lifetime.Define(lifetime)
     let lifetime = lifetimeDefinition.Lifetime 
 
     let locks = solution.Locks
