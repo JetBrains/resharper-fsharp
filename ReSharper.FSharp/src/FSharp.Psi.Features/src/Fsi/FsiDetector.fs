@@ -207,7 +207,7 @@ type MsBuildPropertiesFsiProvider() =
             use lock = ReadLockCookie.Create()
             solution.GetAllProjects()
             |> Seq.tryPick (fun project ->
-                if not project.IsFSharp then None else
+                if project.IsDotNetCoreProject() || not project.IsFSharp then None else
 
                 project.ProjectProperties.GetActiveConfigurations()
                 |> Seq.tryPick (fun cfg ->
