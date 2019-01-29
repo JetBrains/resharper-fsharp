@@ -19,6 +19,7 @@ type ErrorsHighlightingTest() =
 
     [<Test>] member x.``Empty file``() = x.DoNamedTest()
     [<Test>] member x.``No errors 01``() = x.DoNamedTest()
+    [<Test>] member x.``Multiline range``() = x.DoNamedTest()
 
     [<Test>] member x.``Syntax errors 01``() = x.DoNamedTest()
     [<Test>] member x.``Syntax errors 02``() = x.DoNamedTest()
