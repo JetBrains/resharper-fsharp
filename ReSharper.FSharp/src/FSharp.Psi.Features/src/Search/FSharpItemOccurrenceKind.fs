@@ -12,34 +12,35 @@ type FSharpItemOccurrenceKind() =
     static member val Pattern = OccurrenceKind("Pattern", OccurrenceKind.SemanticAxis)
     static member val TypeSpecification = OccurrenceKind("Type specification", OccurrenceKind.SemanticAxis)
 
+
 [<SolutionComponent>]
 type FSharpItemOccurenceKindProvider() =
     interface IOccurrenceKindProvider with
         member x.GetOccurrenceKinds(occurrence: IOccurrence) =
-            match occurrence with
-            | :? ReferenceOccurrence as referenceOccurrence ->
-                match referenceOccurrence.PrimaryReference with
-                | :? FSharpSymbolReference as symbolReference ->
+            match occurrence.As<ReferenceOccurrence>() with
+            | null -> EmptyList.Instance :> _
+            | referenceOccurrence ->
 
-                    // todo: mark synType nodes
-                    let referenceNode = symbolReference.GetTreeNode()
-                    if isNotNull referenceNode && isNotNull (referenceNode.GetContainingNode<IIsInstPat>()) then
-                        [| CSharpSpecificOccurrenceKinds.TypeChecking |] :> _ else
+            match referenceOccurrence.PrimaryReference.As<FSharpSymbolReference>() with
+            | null -> EmptyList.Instance :> _
+            | symbolReference ->
 
-                    let symbolUse = symbolReference.GetSymbolUse()
-                    if isNull (box symbolUse) then EmptyList.Instance :> _ else
+            let referenceNode = symbolReference.GetTreeNode()
+            if isNotNull referenceNode && isNotNull (referenceNode.GetContainingNode<IIsInstPat>()) then
+                [| CSharpSpecificOccurrenceKinds.TypeChecking |] :> _ else
 
-                    if symbolUse.IsFromType then [| FSharpItemOccurrenceKind.TypeSpecification |] :> _ else
-                    if symbolUse.IsFromPattern then [| FSharpItemOccurrenceKind.Pattern |] :> _ else
+            let symbolUse = symbolReference.GetSymbolUse()
+            if isNull (box symbolUse) then EmptyList.Instance :> _ else
 
-                    match symbolUse.Symbol with
-                    | :? FSharpUnionCase -> [| OccurrenceKind.NewInstanceCreation |] :> _
+            if symbolUse.IsFromType then [| FSharpItemOccurrenceKind.TypeSpecification |] :> _ else
+            if symbolUse.IsFromPattern then [| FSharpItemOccurrenceKind.Pattern |] :> _ else
 
-                    | :? FSharpMemberOrFunctionOrValue as mfv when mfv.IsConstructor ->
-                        [| OccurrenceKind.NewInstanceCreation |] :> _
+            match symbolUse.Symbol with
+            | :? FSharpUnionCase -> [| OccurrenceKind.NewInstanceCreation |] :> _
 
-                    | _ -> EmptyList.Instance :> _
-                | _ -> EmptyList.Instance :> _
+            | :? FSharpMemberOrFunctionOrValue as mfv when mfv.IsConstructor ->
+                [| OccurrenceKind.NewInstanceCreation |] :> _
+
             | _ -> EmptyList.Instance :> _
 
         member x.GetAllPossibleOccurrenceKinds() =
