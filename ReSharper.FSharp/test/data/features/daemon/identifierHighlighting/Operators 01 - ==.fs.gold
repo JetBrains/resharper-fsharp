@@ -1,0 +1,58 @@
+﻿module |Module|(0)
+
+module |Op|(1) =
+    let (|==|(2)) = ()
+    (|==|(3))
+
+module |Id|(4) =
+    let |op_EqualsEquals|(5) = ()
+    |op_EqualsEquals|(6)
+    |``op_EqualsEquals``|(7)
+
+module |ParamsOp|(8) =
+    let (|==|(9)) |_|(10) |_|(11) = ()
+    1 |==|(12) 2
+    |op_EqualsEquals|(13) 1 2
+    |``op_EqualsEquals``|(14) 1 2
+
+module |ParamsIdent|(15) =
+    let |op_EqualsEquals|(16) |_|(17) |_|(18) = ()
+    1 |==|(19) 2
+    |op_EqualsEquals|(20) 1 2
+    |``op_EqualsEquals``|(21) 1 2
+
+module |ModuleQualifier|(22) =
+    let _ = |Op|(23).(|==|(24))
+    let _ = |Op|(25).|op_EqualsEquals|(26)
+    let _ = |Op|(27).|``op_EqualsEquals``|(28)
+
+---------------------------------------------------------
+(0): ReSharper Class Identifier: 
+(1): ReSharper Class Identifier: 
+(2): ReSharper Operator Identifier: 
+(3): ReSharper Operator Identifier: 
+(4): ReSharper Class Identifier: 
+(5): ReSharper Operator Identifier: 
+(6): ReSharper Operator Identifier: 
+(7): ReSharper Operator Identifier: 
+(8): ReSharper Class Identifier: 
+(9): ReSharper Operator Identifier: 
+(10): ReSharper Local Variable Identifier: 
+(11): ReSharper Local Variable Identifier: 
+(12): ReSharper Operator Identifier: 
+(13): ReSharper Operator Identifier: 
+(14): ReSharper Operator Identifier: 
+(15): ReSharper Class Identifier: 
+(16): ReSharper Operator Identifier: 
+(17): ReSharper Local Variable Identifier: 
+(18): ReSharper Local Variable Identifier: 
+(19): ReSharper Operator Identifier: 
+(20): ReSharper Operator Identifier: 
+(21): ReSharper Operator Identifier: 
+(22): ReSharper Class Identifier: 
+(23): ReSharper Class Identifier: 
+(24): ReSharper Operator Identifier: 
+(25): ReSharper Class Identifier: 
+(26): ReSharper Operator Identifier: 
+(27): ReSharper Class Identifier: 
+(28): ReSharper Operator Identifier: 

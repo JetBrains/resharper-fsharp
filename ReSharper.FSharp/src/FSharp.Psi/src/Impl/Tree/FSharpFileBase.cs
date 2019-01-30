@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +6,7 @@ using JetBrains.Annotations;
 using JetBrains.Application.Threading;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Checker;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
@@ -164,8 +165,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
       if (logicalName != null && IsMangledOpName(logicalName))
       {
-        var opLength = DecompileOpName.Invoke(logicalName).Length;
-        return new TextRange(endOffset - opLength, endOffset);
+        var token = FindTokenAt(new TreeOffset(endOffset - 1));
+        if (token != null)
+        {
+          var sourceName = DecompileOpName.Invoke(logicalName);
+          var sourceLength = sourceName.Length;
+          if (sourceLength == endOffset - startOffset)
+            return new TextRange(startOffset, endOffset);
+
+          var opText = token.GetTokenType() == FSharpTokenType.SYMBOLIC_OP ? sourceName : logicalName;
+          return new TextRange(endOffset - opText.Length, endOffset);
+        }
       }
 
       // trim foo.bar to bar

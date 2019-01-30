@@ -20,3 +20,4 @@ type IdentifierHighlightingTest() =
     override x.HighlightingPredicate(highlighting, _, _) = true
 
     [<Test>] member x.``Backticks 01``() = x.DoNamedTest()
+    [<Test>] member x.``Operators 01 - ==``() = x.DoNamedTest()
