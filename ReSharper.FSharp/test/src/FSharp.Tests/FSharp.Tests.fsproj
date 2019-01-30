@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
@@ -20,6 +20,7 @@
     <Compile Include="CommentActionTests.fs" />
     <Compile Include="TypingAssistTest.fs" />
     <Compile Include="FSharpTodoTest.fs" />
+    <Compile Include="FSharpOccurenceKindTest.fs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,12 +34,6 @@
     <ProjectReference Include="..\..\..\src\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj" />
     <ProjectReference Include="..\..\..\src\FSharp.Psi\FSharp.Psi.csproj" />
     <ProjectReference Include="..\..\..\src\FSharp.Psi.Features\FSharp.Psi.Features.fsproj" />
-  </ItemGroup>
-  
-  <ItemGroup>
-    <Content Include="JetBrains.ReSharper.Plugins.FSharp.Tests.dll.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
 
   <ItemGroup>

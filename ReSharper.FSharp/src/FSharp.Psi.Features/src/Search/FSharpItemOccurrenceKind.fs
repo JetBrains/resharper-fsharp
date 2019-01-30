@@ -26,8 +26,16 @@ type FSharpItemOccurenceKindProvider() =
             | symbolReference ->
 
             let referenceNode = symbolReference.GetTreeNode()
+            if isNotNull referenceNode && isNotNull (referenceNode.GetContainingNode<ITypeArgumentList>()) then
+                [| CSharpSpecificOccurrenceKinds.TypeArgument |] :> _ else
+
             if isNotNull referenceNode && isNotNull (referenceNode.GetContainingNode<IIsInstPat>()) then
                 [| CSharpSpecificOccurrenceKinds.TypeChecking |] :> _ else
+
+            if isNotNull referenceNode &&
+               (isNotNull (referenceNode.GetContainingNode<ITypeInherit>()) ||
+                isNotNull (referenceNode.GetContainingNode<IInterfaceInherit>())) then
+                [| OccurrenceKind.ExtendedType |] :> _ else
 
             let symbolUse = symbolReference.GetSymbolUse()
             if isNull (box symbolUse) then EmptyList.Instance :> _ else
@@ -44,7 +52,9 @@ type FSharpItemOccurenceKindProvider() =
             | _ -> EmptyList.Instance :> _
 
         member x.GetAllPossibleOccurrenceKinds() =
-            [| OccurrenceKind.NewInstanceCreation
+            [| OccurrenceKind.ExtendedType
+               OccurrenceKind.NewInstanceCreation
                FSharpItemOccurrenceKind.Pattern
                FSharpItemOccurrenceKind.TypeSpecification
+               CSharpSpecificOccurrenceKinds.TypeArgument
                CSharpSpecificOccurrenceKinds.TypeChecking |] :> _

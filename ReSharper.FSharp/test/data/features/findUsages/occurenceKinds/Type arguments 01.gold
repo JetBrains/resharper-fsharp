@@ -1,0 +1,37 @@
+﻿Other
+---
+TO: [O] module |Module| RANGE: (7,13) @ Type arguments 01.fs
+TO: [O] open |System|.Collections.Generic RANGE: (22,28) @ Type arguments 01.fs
+TO: [O] open System.|Collections|.Generic RANGE: (29,40) @ Type arguments 01.fs
+TO: [O] open System.Collections.|Generic| RANGE: (41,48) @ Type arguments 01.fs
+TO: [O] let |l|: List<string> = List<string>() RANGE: (56,57) @ Type arguments 01.fs
+
+
+Type specification
+---
+TO: [O] let l: |List|<string> = List<string>() RANGE: (59,63) @ Type arguments 01.fs
+TO: [O] let l: List<|string|> = List<string>() RANGE: (64,70) @ Type arguments 01.fs
+
+
+New instance creation
+---
+TO: [O] let l: List<string> = |List|<string>() RANGE: (74,78) @ Type arguments 01.fs
+TO: [O] match |obj|() with RANGE: (98,101) @ Type arguments 01.fs
+
+
+Type argument
+---
+TO: [O] let l: List<string> = List<|string|>() RANGE: (79,85) @ Type arguments 01.fs
+TO: [O] | :? IList<|string|> -> () RANGE: (121,127) @ Type arguments 01.fs
+TO: [O] | :? IList<|string|[]> -> () RANGE: (147,153) @ Type arguments 01.fs
+TO: [O] | :? IList<|string| * int> -> () RANGE: (175,181) @ Type arguments 01.fs
+TO: [O] | :? IList<string * |int|> -> () RANGE: (184,187) @ Type arguments 01.fs
+
+
+Type checking
+---
+TO: [O] | :? |IList|<string> -> () RANGE: (115,120) @ Type arguments 01.fs
+TO: [O] | :? |IList|<string[]> -> () RANGE: (141,146) @ Type arguments 01.fs
+TO: [O] | :? |IList|<string * int> -> () RANGE: (169,174) @ Type arguments 01.fs
+
+
