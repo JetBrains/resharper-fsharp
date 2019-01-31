@@ -1,0 +1,32 @@
+﻿module |Module|(0)
+
+let (|>>>|(1)) = () in (|>>>|(2))
+let (|>>=|(3)) = () in (|>>=|(4))
+let (|>==|(5)) = () in (|>==|(6))
+let (|>->|(7)) = () in (|>->|(8))
+let (|>>.|(9)) = () in (|>>.|(10))
+let (|>>.|(11)) = () in (|>>.|(12))
+let (|.>>|(13)) = () in (|.>>|(14))
+let (|>->|(15)) = () in (|>->|(16))
+let (|>>.~|(17)) = () in (|>>.~|(18))
+
+---------------------------------------------------------
+(0): ReSharper Class Identifier: 
+(1): ReSharper Operator Identifier: 
+(2): ReSharper Operator Identifier: 
+(3): ReSharper Operator Identifier: 
+(4): ReSharper Operator Identifier: 
+(5): ReSharper Operator Identifier: 
+(6): ReSharper Operator Identifier: 
+(7): ReSharper Operator Identifier: 
+(8): ReSharper Operator Identifier: 
+(9): ReSharper Operator Identifier: 
+(10): ReSharper Operator Identifier: 
+(11): ReSharper Operator Identifier: 
+(12): ReSharper Operator Identifier: 
+(13): ReSharper Operator Identifier: 
+(14): ReSharper Operator Identifier: 
+(15): ReSharper Operator Identifier: 
+(16): ReSharper Operator Identifier: 
+(17): ReSharper Operator Identifier: 
+(18): ReSharper Operator Identifier: 

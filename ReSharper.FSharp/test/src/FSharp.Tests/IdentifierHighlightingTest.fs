@@ -1,4 +1,4 @@
-module JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon.IdentifierHighlightingTest
+namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 
 open JetBrains.ReSharper.FeaturesTestFramework.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
@@ -21,3 +21,4 @@ type IdentifierHighlightingTest() =
 
     [<Test>] member x.``Backticks 01``() = x.DoNamedTest()
     [<Test>] member x.``Operators 01 - ==``() = x.DoNamedTest()
+    [<Test>] member x.``Operators 02 - Custom``() = x.DoNamedTest()

@@ -71,6 +71,12 @@ type CSharpResolveTest() =
     [<Test>] member x.``Module bindings 03 - extension methods 01``() = x.DoNamedTest()
     [<Test>] member x.``Module bindings 04 - extension methods 02``() = x.DoNamedTest()
 
+    [<Test>] member x.``Operators 01 - Module``() = x.DoNamedTest()
+    [<Test>] member x.``Operators 02 - Type``() = x.DoNamedTest()
+    [<Test>] member x.``Operators 03 - Greater, Less``() = x.DoNamedTest()
+    [<Test>] member x.``Operators 04 - Implicit, Explicit``() = x.DoNamedTest()
+    [<Test>] member x.``Operators 05 - Equals``() = x.DoNamedTest()
+
     [<Test>] member x.``Enum 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Events 01``() = x.DoNamedTest()

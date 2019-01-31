@@ -1,0 +1,15 @@
+﻿namespace ClassLibrary1
+{
+    public class Class1
+    {
+        public Class1()
+        {
+            var x1 = Module.T.op_EqualsEquals(1, 2);
+            var x2 = Module.T.op_LessBarBarGreater(1, 2);
+        }
+    }
+}
+
+---------------------------------------------------------
+M:Module.T.op_EqualsEquals(System.Int32,System.Int32)
+M:Module.T.op_LessBarBarGreater(System.Int32,System.Int32)
