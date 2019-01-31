@@ -14,6 +14,9 @@ type FSharpTodoTest() =
     
     override x.CompilerIdsLanguage = FSharpLanguage.Instance :> _
     
+    override x.GetProjectProperties(targetFrameworkIds, flavours) =
+        FSharpProjectPropertiesFactory.CreateProjectProperties(targetFrameworkIds)
+
     [<Test>] member x.``Line comment``() = x.DoNamedTest()
     [<Test>] member x.``Block comment``() = x.DoNamedTest() // todo: second line range isn't reported in tests
 
