@@ -166,7 +166,7 @@ class FSharpMoveProviderExtensionTest : ProjectModelBaseTest() {
     }
 
     private fun Project.createFile(order: Int = 0, parent: ProjectModelNode? = null, itemType: String? = null): ProjectModelNode {
-        val descriptor = RdProjectFileDescriptor(false, false, itemType ?: "Compile", listOf(), order, null, "File.fs", RdNullLocation())
+        val descriptor = RdProjectFileDescriptor(false, false, itemType ?: "Compile", order, null, "File.fs", RdNullLocation())
         return ProjectModelNode(this, ProjectModelNodeKey(0), descriptor, parent)
     }
 
