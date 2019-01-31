@@ -815,6 +815,7 @@ type FSharpTypingAssist
 
         if nextTokenIsKeyword then
             document.InsertText(textControl.Caret.Offset(), " ")
+            textControl.Caret.MoveTo(textControl.Caret.Offset() - 1, CaretVisualPlacement.DontScrollIfVisible)
         true
 
     member x.HandleEnterBeforeDot(textControl: ITextControl) =
