@@ -135,21 +135,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       {
         if (unionCase.IsUnresolved) return null;
 
-        var unionType = unionCase.ReturnType;
-        Assertion.AssertNotNull(unionType, "unionType != null");
-        var unionTypeElement = GetTypeElement(unionType.TypeDefinition, psiModule);
+        var unionTypeElement = GetTypeElement(unionCase.ReturnType.TypeDefinition, psiModule);
         if (unionTypeElement == null) return null;
 
-        var caseMember = unionTypeElement.EnumerateMembers(unionCase.CompiledName, true).FirstOrDefault();
+        var caseCompiledName = unionCase.CompiledName;
+        var caseMember = unionTypeElement.GetMembers().FirstOrDefault(m =>
+        {
+          var shortName = m.ShortName;
+          return shortName == caseCompiledName || shortName == "New" + caseCompiledName;
+        });
+
         if (caseMember != null)
           return caseMember;
 
-        var newCaseMember = unionTypeElement.EnumerateMembers("New" + unionCase.CompiledName, true).FirstOrDefault();
-        if (newCaseMember != null)
-          return newCaseMember;
-
         var unionClrName = unionTypeElement.GetClrName();
-        var caseDeclaredType = TypeFactory.CreateTypeByCLRName(unionClrName + "+" + unionCase.CompiledName, psiModule);
+        var caseDeclaredType = TypeFactory.CreateTypeByCLRName(unionClrName + "+" + caseCompiledName, psiModule);
         return caseDeclaredType.GetTypeElement();
       }
 
