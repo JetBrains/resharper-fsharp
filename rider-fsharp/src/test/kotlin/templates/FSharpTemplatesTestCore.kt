@@ -93,7 +93,7 @@ abstract class FSharpTemplatesTestCore : RiderTemplatesTestCoreBase() {
             // No run configuration in 2.1.402
 //            checkSelectedRunConfigurationExecutionNotAllowed(project)
 
-            runAllUnitTestsFromProject(project, projectName, 2, 2, expectedSuccessful = 2)
+            runAllUnitTestsFromProject(project, projectName, 4, 4, expectedSuccessful = 4)
 
             //todo enable after move ScriptingAPI.Debug.Temp to ScriptingAPI
             /*val testsCs = activeSolutionDirectory.resolve(projectName).resolve("UnitTest1.cs").toVirtualFile(true)!!
