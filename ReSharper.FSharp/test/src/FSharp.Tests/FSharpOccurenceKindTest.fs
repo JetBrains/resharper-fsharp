@@ -6,7 +6,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
 [<FSharpTest>]
-type FSharpOccuerenceKindTest() =
+type FSharpOccurenceKindTest() =
     inherit OccurrenceKindTestBase()
 
     override x.RelativeTestDataPath = "features/findUsages/occurenceKinds"

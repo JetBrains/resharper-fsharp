@@ -17,7 +17,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     }
   }
 
-  public interface IModule
+  public interface IModule : ITypeElement
   {
   }
 }

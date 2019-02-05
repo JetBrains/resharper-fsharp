@@ -135,6 +135,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public virtual bool IsVisibleFromFSharp => true;
     public virtual bool IsExtensionMember => false;
     public abstract bool IsMember { get; }
-    public string SourceName => ShortName; // todo
   }
 }

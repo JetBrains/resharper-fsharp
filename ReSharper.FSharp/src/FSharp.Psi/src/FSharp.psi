@@ -122,7 +122,19 @@ let options { stubBase="DummyDeclaration"; }:
   binding<BINDING, Bindings>*
   fakeSeparator;
 
-binding:
+
+interface binding:
+  topBinding |
+  localBinding;
+
+topBinding:
+  fSharpAttribute<ATTRIBUTE, Attributes>*
+  synPat<HEAD_PATTERN, HeadPattern>
+  EQUALS
+  synExpr<EXPR, Expression>
+  fakeSeparator;
+
+localBinding:
   fSharpAttribute<ATTRIBUTE, Attributes>*
   synPat<HEAD_PATTERN, HeadPattern>
   EQUALS
@@ -142,12 +154,37 @@ interface synPat:
   optionalValPat |
   isInstPat |
   consPat |
+  wildPat |
   otherPat;
 
+interface namedPat:
+  topNamedPat |
+  localNamedPat;
 
-namedPat options { stubBase="PatternDeclarationBase"; }:
+interface longIdentPat:
+  topLongIdentPat |
+  localLongIdentPat;
+
+topNamedPat options { stubBase="TopPatternDeclarationBase"; }:
   synPat<PATTERN, Pattern>?
-  fSharpIdentifier<IDENTIFIER, Identifier>;
+  identOrOpName{IDENTIFIER, Identifier};
+
+topLongIdentPat options { stubBase="TopPatternDeclarationBase"; }:
+  identOrOpName{IDENTIFIER, Identifier}
+  fakeSeparator
+  // todo: use longIdentifier<LONG_IDENTIFIER, LongIdentifier>
+  synPat<PARAMETER, Parameters>*
+  fakeSeparator;
+
+localNamedPat options { stubBase="LocalPatternDeclarationBase"; }:
+  synPat<PATTERN, Pattern>?
+  identOrOpName{IDENTIFIER, Identifier};
+
+localLongIdentPat options { stubBase="LocalPatternDeclarationBase"; }:
+  identOrOpName{IDENTIFIER, Identifier}
+  // todo: use longIdentifier<LONG_IDENTIFIER, LongIdentifier>
+  synPat<PARAMETER, Parameters>*
+  fakeSeparator;
 
 typedPat options { stubBase="SynPatternBase"; }:
   synPat<PATTERN, Pattern>
@@ -155,20 +192,14 @@ typedPat options { stubBase="SynPatternBase"; }:
   typeExpression;
 
 orPat options { stubBase="SynPatternBase"; }:
-  synPat<PATTERN, Pattern1>
+  synPat<PATTERN1, Pattern1>
   BAR
-  synPat<PATTERN, Pattern2>;
+  synPat<PATTERN2, Pattern2>;
 
 andsPat options { stubBase="SynPatternBase"; }:
-  synPat<PATTERN, Pattern1>
+  synPat<PATTERN1, Pattern1>
   AMP
-  synPat<PATTERN, Pattern2>;
-
-longIdentPat options { stubBase="PatternDeclarationBase"; }:
-  fSharpIdentifier<IDENTIFIER, Identifier>
-  // todo: use longIdentifier<LONG_IDENTIFIER, LongIdentifier>
-  synPat<PARAMETER, Parameters>*
-  fakeSeparator;
+  synPat<PATTERN2, Pattern2>;
 
 listPat options { stubBase="SynPatternBase"; }:
   synPat<ATTRIBUTE, Patterns>*;
@@ -188,12 +219,15 @@ optionalValPat options { stubBase="SynPatternBase"; }:
 
 isInstPat options { stubBase="SynPatternBase"; }:
   COLON_QMARK
-  synPat<PATTERN, Pattern>;
+  fakeSeparator;
 
 consPat options { stubBase="SynPatternBase"; }:
   synPat<PATTERN1, Pattern1>
   COLON_COLON
   synPat<PATTERN2, Pattern2>;
+
+wildPat options { stubBase="SynPatternBase"; }:
+  UNDERSCORE;
 
 otherPat options { stubBase="SynPatternBase"; }:
   fakeSeparator;
@@ -350,8 +384,23 @@ moduleAbbreviation options { stubBase="FSharpTypeElementDeclarationBase"; } extr
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
 
-activePatternCaseDeclaration options { stubBase="FSharpDeclarationBase"; }:
-   fSharpIdentifier<IDENTIFIER, Identifier>;
+interface activePatternCase:
+  activePatternCaseDeclaration |
+  activePatternWildCase;
+
+interface activePatternCaseDeclaration:
+  topActivePatternCaseDeclaration |
+  localActivePatternCaseDeclaration;
+
+topActivePatternCaseDeclaration options { stubBase="FSharpDeclarationBase"; }:
+   IDENTIFIER<IDENTIFIER, Identifier>;
+
+localActivePatternCaseDeclaration options { stubBase="LocalDeclarationBase"; }:
+  IDENTIFIER<IDENTIFIER, Identifier>;
+
+activePatternWildCase:
+  wildPat;
+
 
 otherMemberDeclaration options { stubBase="DummyDeclaration"; }:
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
@@ -474,7 +523,8 @@ autoProperty options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
   fSharpIdentifier<IDENTIFIER, Identifier>;
 
-memberParam: fakeSeparator;
+memberParam:
+  synPat<PATTERN, Pattern>;
 
 
 // module statements
@@ -510,7 +560,8 @@ openStatement:
   OPEN<OPEN, Open>
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>;
 
-do: fakeSeparator;
+do options { stubBase="DummyDeclaration"; }:
+  fakeSeparator;
 
 otherModuleMember: fakeSeparator;
 
@@ -520,8 +571,24 @@ otherModuleMember: fakeSeparator;
 
 fSharpIdentifier: IDENTIFIER<IDENTIFIER, IdentifierToken>;
 
-abstract identifier options { interfaceName="JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.IFSharpIdentifier"; }:
-  IDENTIFIER;
+private identifierToken{ROLE,Getter}:
+  IDENTIFIER<@ROLE,@Getter> |
+  SYMBOLIC_OP<@ROLE,@Getter>;
+
+private identOrOpName{ROLE,Getter}:
+  IDENTIFIER<@ROLE,@Getter> |
+  SYMBOLIC_OP<@ROLE,@Getter> |
+  activePatternId<@ROLE,@Getter>;
+
+activePatternId:
+  LPAREN<LPAREN, LParen>
+  BAR
+  (
+    activePatternCase<ACTIVE_PATTERN_CASE, Cases>
+    BAR
+  )+
+  RPAREN<RPAREN, RParen>;
+
 
 longIdentifier: IDENTIFIER<IDENTIFIER, Identifiers>*;
 
@@ -545,11 +612,11 @@ typeArgumentList:
 
 typeParameterOfTypeDeclaration options { stubBase="FSharpDeclarationBase"; }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
-  identifier<IDENTIFIER, Identifier>;
+  identifierToken{IDENTIFIER, Identifier};
 
 typeParameterOfMethodDeclaration options { stubBase="FSharpDeclarationBase"; }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
-  identifier<IDENTIFIER, Identifier>;
+  identifierToken{IDENTIFIER, Identifier};
 
 
 // Access modifiers
@@ -580,9 +647,9 @@ fakeSeparator: FAKE;
 
 // Local declarations
 
-localDeclaration options { stubBase="FSharpDeclarationBase"; }:
+localDeclaration options { stubBase="LocalDeclarationBase"; }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
-  fSharpIdentifier<IDENTIFIER, Identifier>;
+  identOrOpName{IDENTIFIER, Identifier};
 
 
 typeExpression:

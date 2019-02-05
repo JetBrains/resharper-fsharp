@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Searching;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
@@ -104,7 +104,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         if (mfv.IsUnresolved) return null;
 
         if (!mfv.IsModuleValueOrMember)
-          return FindDeclaration<LocalDeclaration>(mfv.DeclarationLocation, referenceOwnerToken);
+          return FindNode<IFSharpLocalDeclaration>(mfv.DeclarationLocation, referenceOwnerToken);
 
         var memberEntity = mfv.IsModuleValueOrMember ? mfv.DeclaringEntity : null;
         if (memberEntity == null) return null;
@@ -156,13 +156,37 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (symbol is FSharpField field && !field.IsUnresolved)
         return GetTypeElement(field.DeclaringEntity, psiModule)?.EnumerateMembers(field.Name, true).FirstOrDefault();
 
+      // find active pattern entity/member. if it's compiled use wrapper. if it's source defined find actual element
       if (symbol is FSharpActivePatternCase activePatternCase)
-        return
-          activePatternCase.Group.DeclaringEntity != null
-          ? new ResolvedFSharpSymbolElement(activePatternCase, referenceOwnerToken)
-          : FindDeclaration<ActivePatternCaseDeclaration>(activePatternCase.DeclarationLocation, referenceOwnerToken)?.DeclaredElement;
+        return GetActivePatternCaseElement(activePatternCase, psiModule, referenceOwnerToken);
 
       return null;
+    }
+
+    public static IDeclaredElement GetActivePatternCaseElement([NotNull] FSharpActivePatternCase activePatternCase,
+      [NotNull] IPsiModule psiModule, [CanBeNull] FSharpIdentifierToken referenceOwnerToken)
+    {
+      var declaration = GetActivePatternDeclaration(activePatternCase, psiModule, referenceOwnerToken);
+      return declaration?.GetActivePatternByIndex(activePatternCase.Index);
+    }
+
+    private static IFSharpDeclaration GetActivePatternDeclaration([NotNull] FSharpActivePatternCase activePatternCase,
+      [NotNull] IPsiModule psiModule, FSharpIdentifierToken referenceOwnerToken)
+    {
+      var activePattern = activePatternCase.Group;
+      var declaringEntity = activePattern.DeclaringEntity?.Value;
+      if (declaringEntity != null)
+      {
+        var patternName = activePattern.PatternName();
+        var typeElement = GetTypeElement(declaringEntity, psiModule);
+        var patternElement = typeElement.EnumerateMembers(patternName, true).FirstOrDefault();
+        return patternElement?.GetDeclarations().FirstOrDefault() as IFSharpDeclaration;
+      }
+      else
+      {
+        var patternId = FindNode<IActivePatternId>(activePatternCase.DeclarationLocation, referenceOwnerToken);
+        return patternId?.GetContainingNode<IFSharpDeclaration>();
+      }
     }
 
     [CanBeNull]
@@ -183,9 +207,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       }
     }
 
-    private static T FindDeclaration<T>(Range.range range, [CanBeNull] ITreeNode token) where T : class, IDeclaration
+    private static T FindNode<T>(Range.range range, [CanBeNull] ITreeNode node) where T : class, ITreeNode
     {
-      var fsFile = token?.GetContainingFile() as IFSharpFile;
+      var fsFile = node?.GetContainingFile() as IFSharpFile;
       var document = fsFile?.GetSourceFile()?.Document;
       if (document == null) return null;
 

@@ -46,7 +46,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
             let letStart = letStartPos bindings range
             let letMark = x.Mark(letStart)
             for binding in bindings do
-                x.ProcessBinding(binding)
+                x.ProcessBinding(binding, false)
             x.Done(range, letMark, ElementType.LET)
 
         | SynModuleDecl.HashDirective(hashDirective, _) ->
@@ -58,9 +58,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
             x.Done(range, mark, ElementType.DO)
 
         | decl ->
-            let range = decl.Range
-            let mark = x.Mark(range)
-            x.Done(range, mark, ElementType.OTHER_MEMBER_DECLARATION)
+            x.MarkAndDone(decl.Range, ElementType.OTHER_MEMBER_DECLARATION)
 
     member x.ProcessHashDirective(ParsedHashDirective (id, _, range)) =
         let mark = x.Mark(range)
@@ -75,13 +73,9 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
     member internal x.ProcessType (TypeDefn(ComponentInfo(attrs, typeParams,_,lid,_,_,_,_), repr, members, range)) =
         match repr with
         | SynTypeDefnRepr.ObjectModel(SynTypeDefnKind.TyconAugmentation,_,_) ->
-            let tryGetShortName (lid: LongIdent) =
-                List.tryLast lid
-                |> Option.map (fun id -> id.idText)
-
             let extensionOffset = x.GetStartOffset(range)
-            match tryGetShortName lid with
-            | Some name -> x.TypeExtensionsOffsets.Add(name, extensionOffset)
+            match List.tryLast lid with
+            | Some id -> x.TypeExtensionsOffsets.Add(id.idText, extensionOffset)
             | _ -> ()
 
             x.AdvanceToOffset(extensionOffset)
@@ -135,7 +129,107 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
             for m in members do x.ProcessTypeMember m
             x.Done(range, mark, elementType)
 
-    member x.ProcessPat(PatRange range as pat) =
+    member x.ProcessTypeMember (typeMember: SynMemberDefn) =
+        let attrs = typeMember.Attributes
+        // todo: let/attrs range
+        let rangeStart = x.GetStartOffset typeMember.Range
+        let isMember =
+            match typeMember with
+            | SynMemberDefn.Member _ -> true
+            | _ -> false
+
+        if x.Builder.GetTokenOffset() <= rangeStart || (not isMember) then
+            let mark = x.ProcessAttributesAndStartRange attrs None typeMember.Range
+
+            // todo: mark body exprs as synExpr
+            let memberType =
+                match typeMember with
+                | SynMemberDefn.ImplicitCtor(_,_,args,selfId,_) ->
+                    for arg in args do
+                        x.ProcessImplicitCtorParam arg
+                    if selfId.IsSome then x.ProcessLocalId selfId.Value
+                    ElementType.IMPLICIT_CONSTRUCTOR_DECLARATION
+
+                | SynMemberDefn.ImplicitInherit(baseType,args,_,_) ->
+                    x.ProcessSynType(baseType)
+                    x.ProcessExpr(args)
+                    ElementType.TYPE_INHERIT
+
+                | SynMemberDefn.Interface(interfaceType,interfaceMembersOpt,range) ->
+                    x.ProcessSynType(interfaceType)
+                    match interfaceMembersOpt with
+                    | Some members ->
+                        for m in members do
+                            x.ProcessTypeMember(m)
+                    | _ -> ()
+                    ElementType.INTERFACE_IMPLEMENTATION
+
+                | SynMemberDefn.Inherit(baseInterface,_,_) ->
+                    x.ProcessSynType(baseInterface)
+                    ElementType.INTERFACE_INHERIT
+
+                | SynMemberDefn.Member(Binding(_,_,_,_,attrs,_,valData,headPat,ret,expr,_,_),range) ->
+                    let elType =
+                        match headPat with
+                        | SynPat.LongIdent(LongIdentWithDots(lid,_),_,typeParamsOpt,memberParams,_,_) ->
+                            match lid with
+                            | [id] ->
+                                match valData with
+                                | SynValData(Some (flags),_,_) when flags.MemberKind = MemberKind.Constructor ->
+                                    x.ProcessParams(memberParams)
+                                    x.ProcessLocalExpression(expr)
+                                    ElementType.CONSTRUCTOR_DECLARATION
+                                | _ ->
+                                    x.ProcessMemberDeclaration id typeParamsOpt memberParams expr range
+                                    ElementType.MEMBER_DECLARATION
+
+                            | selfId :: id :: _ ->
+                                x.ProcessLocalId selfId
+                                x.ProcessMemberDeclaration id typeParamsOpt memberParams expr range
+                                ElementType.MEMBER_DECLARATION
+
+                            | _ -> ElementType.OTHER_TYPE_MEMBER
+                        | _ -> ElementType.OTHER_TYPE_MEMBER
+                    match ret with
+                    | Some (SynBindingReturnInfo(t,_,_)) -> x.ProcessSynType t
+                    | _ -> ()
+                    elType
+
+                | SynMemberDefn.LetBindings(bindings,_,_,range) ->
+                    for binding in bindings do
+                        x.ProcessBinding(binding, false)
+                    ElementType.LET
+
+                | SynMemberDefn.AbstractSlot(ValSpfn(_,id,typeParams,_,_,_,_,_,_,_,_),_,range) as slot ->
+                    x.ProcessIdentifier id
+                    match typeParams with
+                    | SynValTyparDecls(typeParams,_,_) ->
+                        x.ProcessTypeParametersOfType typeParams range true
+                    ElementType.ABSTRACT_SLOT
+
+                | SynMemberDefn.ValField(Field(_,_,id,_,_,_,_,_),_) ->
+                    if id.IsSome then x.ProcessIdentifier id.Value
+                    ElementType.VAL_FIELD
+
+                | SynMemberDefn.AutoProperty(_,_,id,_,_,_,_,_,expr,_,_) ->
+                    x.ProcessIdentifier id
+                    x.ProcessLocalExpression expr
+                    ElementType.AUTO_PROPERTY
+
+                | _ -> ElementType.OTHER_TYPE_MEMBER
+
+            x.Done(typeMember.Range, mark, memberType)
+
+    member x.ProcessMemberDeclaration id (typeParamsOpt: SynValTyparDecls option) memberParams expr range =
+        x.ProcessIdentifier id
+        match typeParamsOpt with
+        | Some(SynValTyparDecls(typeParams,_,_)) ->
+            x.ProcessTypeParametersOfType typeParams range true
+        | _ -> ()
+        x.ProcessParams(memberParams)
+        x.ProcessLocalExpression(expr)
+    
+    member x.ProcessPat(PatRange range as pat, isLocal) =
         match pat with
         | SynPat.Wild _ -> ()
         | _ ->
@@ -144,20 +238,20 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
         let elementType =
             match pat with
             | SynPat.Named (pat, id, _, _, _) ->
-                x.ProcessPat(pat)
-                if IsActivePatternName id.idText then x.ProcessActivePatternId(id) else x.ProcessIdentifier(id)
-                ElementType.NAMED_PAT
+                x.ProcessPat(pat, isLocal)
+                if IsActivePatternName id.idText then x.ProcessActivePatternId(id, isLocal)
+                if isLocal then ElementType.LOCAL_NAMED_PAT else ElementType.TOP_NAMED_PAT
 
             | SynPat.LongIdent (lid, _, typars, args, _, _) ->
                 match lid.Lid with
                 | [id] when id.idText = "op_ColonColon" ->
                     match args with
-                    | Pats pats -> for p in pats do x.ProcessPat(p)
-                    | NamePatPairs (pats, _) -> for _, p in pats do x.ProcessPat(p)
+                    | Pats pats -> for p in pats do x.ProcessPat(p, isLocal)
+                    | NamePatPairs (pats, _) -> for _, p in pats do x.ProcessPat(p, isLocal)
                     ElementType.CONS_PAT
 
                 | [id] ->
-                    if IsActivePatternName id.idText then x.ProcessActivePatternId id else x.ProcessIdentifier id
+                    if IsActivePatternName id.idText then x.ProcessActivePatternId(id, isLocal)
 
                     match typars with
                     | Some (SynValTyparDecls (typars, _, _)) ->
@@ -165,50 +259,66 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                             x.ProcessTypeParameter(p, ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION)
                     | None -> ()
 
-                    x.ProcessLocalParams(args)
-                    ElementType.LONG_IDENT_PAT
+                    x.ProcessParams(args)
+                    if isLocal then ElementType.LOCAL_LONG_IDENT_PAT else ElementType.TOP_LONG_IDENT_PAT
 
                 | _ ->
-                    ElementType.LONG_IDENT_PAT
+                    if isLocal then ElementType.LOCAL_LONG_IDENT_PAT else ElementType.TOP_LONG_IDENT_PAT
 
             | SynPat.Typed (pat, _, _) ->
-                x.ProcessPat(pat)
+                x.ProcessPat(pat, isLocal)
                 ElementType.TYPED_PAT
 
             | SynPat.Or (pat1, pat2, _) ->
-                x.ProcessPat(pat1)
-                x.ProcessPat(pat2)
+                x.ProcessPat(pat1, isLocal)
+                x.ProcessPat(pat2, isLocal)
                 ElementType.OR_PAT
 
             | SynPat.Ands (pats, _) ->
                 for pat in pats do
-                    x.ProcessPat(pat)
+                    x.ProcessPat(pat, isLocal)
                 ElementType.ANDS_PAT
 
             | SynPat.Tuple (pats, _)
             | SynPat.StructTuple (pats, _)
             | SynPat.ArrayOrList (_, pats, _) ->
                 for pat in pats do
-                    x.ProcessPat(pat)
+                    x.ProcessPat(pat, isLocal)
                 ElementType.LIST_PAT
 
             | SynPat.Paren (pat,_) ->
-                x.ProcessPat(pat)
+                x.ProcessPat(pat, isLocal)
                 ElementType.PAREN_PAT
 
             | SynPat.Record (pats, _) ->
                 for _, pat in pats do
-                    x.ProcessPat(pat)
+                    x.ProcessPat(pat, isLocal)
                 ElementType.RECORD_PAT
 
-            | SynPat.IsInst _ ->
+            | SynPat.IsInst (typ, _) ->
+                x.ProcessSynType(typ)
                 ElementType.IS_INST_PAT
 
             | _ ->
                 ElementType.OTHER_PAT
 
         x.Done(range, mark, elementType)
-    
+
+    member x.ProcessParams(args: SynConstructorArgs) =
+        match args with
+        | Pats pats ->
+            for pat in pats do
+                x.ProcessParam(pat)
+
+        | NamePatPairs (idsAndPats, _) ->
+            for _, pat in idsAndPats do
+                x.ProcessParam(pat)
+
+    member x.ProcessParam(PatRange range as pat) =
+        let mark = x.Mark(range)
+        x.ProcessPat(pat, true)
+        x.Done(range, mark, ElementType.MEMBER_PARAM)
+
     member x.ProcessExpr(ExprRange range as expr) =
         let mark = x.Mark(range)
         x.ProcessLocalExpression expr
@@ -218,13 +328,220 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
         for attr in attrs do
             x.ProcessAttribute(attr)
 
-    member x.ProcessBinding(Binding (_,_,_,_,attrs,_,_,headPat,_, expr,_,_) as binding) =
+    member x.ProcessBinding(Binding(_,_,_,_,attrs,_,_,headPat,_, expr,_,_) as binding, isLocal: bool) =
         // todo: add [< to range?
-        x.AdvanceToPos(binding.StartPos)
+        x.AdvanceTo(binding.StartPos)
         let bindingMark = x.Mark()
 
         x.ProcessAttributes(attrs)
-        x.ProcessPat(headPat)
+        x.ProcessPat(headPat, isLocal) // todo: local bindings
         x.ProcessExpr(expr)
 
-        x.Done(binding.RangeOfBindingAndRhs, bindingMark, ElementType.BINDING)
+        let elementType = if isLocal then ElementType.LOCAL_BINDING else ElementType.TOP_BINDING
+        x.Done(binding.RangeOfBindingAndRhs, bindingMark, elementType)
+
+    member x.ProcessLocalExpression (expr: SynExpr) =
+        match expr with
+        | SynExpr.Paren(expr,_,_,_)
+        | SynExpr.Quote(_,_,expr,_,_) ->
+            x.ProcessLocalExpression expr
+
+        | SynExpr.Const(_) -> ()
+
+        | SynExpr.Typed(expr,synType,_) ->
+            x.ProcessLocalExpression expr
+            x.ProcessSynType synType
+
+        | SynExpr.Tuple(exprs,_,_)
+        | SynExpr.StructTuple(exprs,_,_)
+        | SynExpr.ArrayOrList(_,exprs,_) ->
+            for e in exprs do
+                x.ProcessLocalExpression(e)
+
+        | SynExpr.Record(_,copyInfoOpt,fields,_) ->
+            match copyInfoOpt with
+            | Some (expr,_) -> x.ProcessLocalExpression expr
+            | _ -> ()
+
+            // todo: mark name for getting reference access type
+            for name, expr, _ in fields do
+                if expr.IsSome then x.ProcessLocalExpression expr.Value
+
+        | SynExpr.New(_,t,expr,_) ->
+            x.ProcessSynType(t)
+            x.ProcessLocalExpression(expr)
+
+        | SynExpr.ObjExpr(t,args,bindings,interfaceImpls,_,_) ->
+            x.ProcessSynType(t)
+            match args with
+            | Some (expr,_) -> x.ProcessLocalExpression(expr)
+            | _ -> ()
+
+            for b in bindings do
+                x.ProcessBinding(b, true)
+
+            for InterfaceImpl(_,bindings,_) in interfaceImpls do
+                for b in bindings do x.ProcessBinding(b, true) // todo: it looks weird, add tests
+
+        | SynExpr.While(_,whileExpr,doExpr,_) ->
+            x.ProcessLocalExpression whileExpr
+            x.ProcessLocalExpression doExpr
+
+        | SynExpr.For(_,id,idBody,_,toBody,doBody,_) ->
+            x.ProcessLocalId id
+            x.ProcessLocalExpression idBody
+            x.ProcessLocalExpression toBody
+            x.ProcessLocalExpression doBody
+
+        | SynExpr.ForEach(_,_,_,pat,enumExpr,bodyExpr,_) ->
+            x.ProcessPat(pat, true)
+            x.ProcessLocalExpression enumExpr
+            x.ProcessLocalExpression bodyExpr
+
+        | SynExpr.ArrayOrListOfSeqExpr(_,expr,_)
+        | SynExpr.CompExpr(_,_,expr,_) ->
+            x.ProcessLocalExpression expr
+
+        | SynExpr.Lambda(_,_,pats,expr,_) ->
+            x.ProcessSimplePatterns pats
+            x.ProcessLocalExpression expr
+
+        | SynExpr.MatchLambda(_,_,cases,_,_) ->
+            for case in cases do
+                x.ProcessMatchClause case
+
+        | SynExpr.Match(_,expr,cases,_,_) ->
+            x.ProcessLocalExpression expr
+            for case in cases do
+                x.ProcessMatchClause case
+
+        | SynExpr.Do(expr,_)
+        | SynExpr.Assert(expr,_) ->
+            x.ProcessLocalExpression expr
+
+        | SynExpr.TypeApp(expr,lt,typeArgs,_,rt,_,r) ->
+            x.ProcessLocalExpression expr
+            lt|> x.GetStartOffset |> x.AdvanceToOffset
+            let mark = x.Mark()
+            for t in typeArgs do x.ProcessSynType t
+            (if rt.IsSome then rt.Value else r) |> x.GetEndOffset |> x.AdvanceToOffset
+            x.Done(mark, ElementType.TYPE_ARGUMENT_LIST)
+
+        | SynExpr.LetOrUse(_,_,bindings,bodyExpr,_) ->
+            for binding in bindings do
+                x.ProcessBinding(binding, true)
+            x.ProcessLocalExpression bodyExpr
+
+        | SynExpr.TryWith(tryExpr,_,withCases,_,_,_,_) ->
+            x.ProcessLocalExpression tryExpr
+            for case in withCases do
+                x.ProcessMatchClause case
+
+        | SynExpr.TryFinally(tryExpr,finallyExpr,_,_,_) ->
+            x.ProcessLocalExpression tryExpr
+            x.ProcessLocalExpression finallyExpr
+
+        | SynExpr.Lazy(expr,_) -> x.ProcessLocalExpression expr
+
+        | SynExpr.IfThenElse(ifExpr,thenExpr,elseExprOpt,_,_,_,_) ->
+            x.ProcessLocalExpression ifExpr
+            x.ProcessLocalExpression thenExpr
+            if elseExprOpt.IsSome then
+                x.ProcessLocalExpression elseExprOpt.Value
+
+        | SynExpr.Ident(_)
+        | SynExpr.LongIdent(_) -> ()
+
+        | SynExpr.LongIdentSet(_,expr,_)
+        | SynExpr.DotGet(expr,_,_,_) ->
+            x.ProcessLocalExpression expr
+
+        | SynExpr.NamedIndexedPropertySet(_,expr1,expr2,_)
+        | SynExpr.DotSet(expr1,_,expr2,_) ->
+            x.ProcessLocalExpression expr1
+            x.ProcessLocalExpression expr2
+
+        | SynExpr.DotNamedIndexedPropertySet(expr1,_,expr2,expr3,_) ->
+            x.ProcessLocalExpression expr1
+            x.ProcessLocalExpression expr2
+            x.ProcessLocalExpression expr3
+
+        | SynExpr.DotIndexedGet(expr,indexerArgs,_,_) ->
+            x.ProcessLocalExpression expr
+            for arg in indexerArgs do
+                x.ProcessIndexerArg(arg)
+
+        | SynExpr.DotIndexedSet(expr1,indexerArgs,expr2,_,_,_) ->
+            x.ProcessLocalExpression expr1
+            for arg in indexerArgs do
+                x.ProcessIndexerArg(arg)
+            x.ProcessLocalExpression expr2
+
+        | SynExpr.TypeTest(expr,t,_)
+        | SynExpr.Upcast(expr,t,_)
+        | SynExpr.Downcast(expr,t,_) ->
+            x.ProcessLocalExpression expr
+            x.ProcessSynType t
+
+        | SynExpr.InferredUpcast(expr,_)
+        | SynExpr.InferredDowncast(expr,_) ->
+            x.ProcessLocalExpression expr
+
+        | SynExpr.Null(_) -> ()
+
+        | SynExpr.AddressOf(_,expr,_,_)
+        | SynExpr.TraitCall(_,_,expr,_) ->
+            x.ProcessLocalExpression expr
+
+        | SynExpr.JoinIn(expr1,_,expr2,_) ->
+            x.ProcessLocalExpression expr1
+            x.ProcessLocalExpression expr2
+
+        | SynExpr.ImplicitZero(_) -> ()
+
+        | SynExpr.YieldOrReturn(_,expr,_)
+        | SynExpr.YieldOrReturnFrom(_,expr,_) ->
+            x.ProcessLocalExpression expr
+
+        | SynExpr.LetOrUseBang(_,_,_,pat,expr,inExpr,_) ->
+            x.ProcessPat(pat, true)
+            x.ProcessLocalExpression expr
+            x.ProcessLocalExpression inExpr
+
+        | SynExpr.DoBang(expr,_) ->
+            x.ProcessLocalExpression expr
+
+        | SynExpr.LibraryOnlyILAssembly(_)
+        | SynExpr.LibraryOnlyStaticOptimization(_)
+        | SynExpr.LibraryOnlyUnionCaseFieldGet(_)
+        | SynExpr.LibraryOnlyUnionCaseFieldSet(_)
+        | SynExpr.LibraryOnlyILAssembly(_)
+        | SynExpr.ArbitraryAfterError(_)
+        | SynExpr.FromParseError(_)
+        | SynExpr.DiscardAfterMissingQualificationAfterDot(_) -> ()
+
+        | SynExpr.Fixed(expr,_) ->
+            x.ProcessLocalExpression expr
+
+        | SynExpr.Sequential(_,_,expr1,expr2,_) ->
+            x.ProcessLocalExpression expr1
+            x.ProcessLocalExpression expr2
+
+        | Apps (first, next) ->
+            x.ProcessLocalExpression(first)
+            for expr in next do
+                x.ProcessLocalExpression(expr)
+
+        | _ -> ()
+
+    member x.ProcessMatchClause(Clause (pat,whenExpr,expr,_,_)) =
+        x.ProcessPat(pat, true)
+        match whenExpr with
+        | Some expr -> x.ProcessLocalExpression(expr)
+        | _ -> ()
+
+        x.ProcessLocalExpression(expr)
+
+    member x.ProcessIndexerArg(arg) =
+        for expr in arg.Exprs do
+            x.ProcessLocalExpression(expr)

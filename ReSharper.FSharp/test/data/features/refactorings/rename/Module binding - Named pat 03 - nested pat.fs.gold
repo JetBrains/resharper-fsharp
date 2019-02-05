@@ -1,0 +1,4 @@
+﻿module Module
+
+let (a, zzz) as c = 1, 2
+let x = zzz

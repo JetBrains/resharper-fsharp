@@ -1,0 +1,8 @@
+﻿module Module
+
+type zzz =
+    | Case1 = 1
+    | Case2 = 2
+
+let (e1: zzz) = zzz.Case1
+let (e2: zzz) = zzz.Case2

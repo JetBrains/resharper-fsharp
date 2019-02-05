@@ -14,6 +14,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     protected abstract string DeclaredElementName { get; }
     
+    protected override void ClearCachedData() =>
+      myCachedName = null;
+
     public override string DeclaredName
     {
       get

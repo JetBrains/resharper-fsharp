@@ -1,23 +1,24 @@
 ﻿using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Tree;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal class FSharpValField : FSharpTypeMember<ValField>, IField
+  internal class FSharpValField<TDeclaration> : FSharpTypeMember<TDeclaration>, IField
+    where TDeclaration : FSharpDeclarationBase, ITypeMemberDeclaration, IFSharpDeclaration, 
+    IAccessRightsOwnerDeclaration, IModifiersOwnerDeclaration
   {
     [NotNull]
-    public FSharpField Field { get; }
+    public FSharpType FieldType { get; }
 
-    public FSharpValField([NotNull] ValField declaration, [NotNull] FSharpField field) : base(declaration) =>
-      Field = field;
+    public FSharpValField([NotNull] TDeclaration declaration, [NotNull] FSharpType fieldType) : base(declaration) =>
+      FieldType = fieldType;
 
-    public override DeclaredElementType GetElementType()
-    {
-      return CLRDeclaredElementType.FIELD;
-    }
+    public override DeclaredElementType GetElementType() => CLRDeclaredElementType.FIELD;
 
     public IType Type
     {
@@ -27,7 +28,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
         if (declaration == null)
           return TypeFactory.CreateUnknownType(Module);
 
-        return FSharpTypesUtil.GetType(Field.FieldType, declaration, Module) ??
+        return FSharpTypesUtil.GetType(FieldType, declaration, Module) ??
                TypeFactory.CreateUnknownType(Module);
       }
     }

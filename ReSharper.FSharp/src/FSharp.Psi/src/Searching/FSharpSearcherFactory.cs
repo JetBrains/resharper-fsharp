@@ -41,7 +41,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
     public override ISearchDomain GetDeclaredElementSearchDomain(IDeclaredElement declaredElement)
     {
       // todo: type abbreviations
-      if (declaredElement is ILocalDeclaration localDeclaration)
+      if (declaredElement is IFSharpLocalDeclaration localDeclaration)
         return mySearchDomainFactory.CreateSearchDomain(localDeclaration.GetSourceFile());
 
       if (declaredElement is IFSharpSymbolElement fsSymbolElement)
@@ -62,14 +62,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
             return myClrSearchFactory.GetDeclaredElementSearchDomain(patternTypeElement);
           }
         }
+      }
 
-        if (fsSymbolElement is ActivePatternCase activePatternCaseElement)
-        {
-          var declaration = activePatternCaseElement.GetDeclaration();
-          var containingType = ((ITypeDeclaration) declaration?.GetContainingTypeDeclaration())?.DeclaredElement;
-          if (containingType != null)
-            return myClrSearchFactory.GetDeclaredElementSearchDomain(containingType);
-        }
+      if (declaredElement is TopActivePatternCase activePatternCaseElement)
+      {
+        var declaration = activePatternCaseElement.GetDeclaration();
+        if (declaration?.GetContainingNode<IFSharpLocalDeclaration>() != null)
+          return mySearchDomainFactory.CreateSearchDomain(declaration.GetSourceFile());
+
+        var containingMemberDeclaration = declaration?.GetContainingNode<ITypeMemberDeclaration>();
+        var containingMember = containingMemberDeclaration?.DeclaredElement;
+        if (containingMember != null)
+          return myClrSearchFactory.GetDeclaredElementSearchDomain(containingMember);
       }
 
       return EmptySearchDomain.Instance;
@@ -92,8 +96,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
         var pattern = typeElement.EnumerateMembers(patternNameOption.Value, true).FirstOrDefault() as IDeclaredElement;
         if (pattern is IFSharpTypeMember)
         {
-          var patternDecl = pattern.GetDeclarations().FirstOrDefault();
-          if (patternDecl == null)
+          if (!(pattern.GetDeclarations().FirstOrDefault() is IFSharpDeclaration patternDecl))
             return null;
 
           var caseElement = patternDecl.GetActivePatternByIndex(activePatternCase.Index);

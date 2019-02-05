@@ -17,6 +17,8 @@ open Microsoft.FSharp.Compiler.SourceCodeServices
 
 [<AutoOpen>]
 module Util =
+    open JetBrains.Util.Logging
+
     type IRenameWorkflow with
         member x.RenameWorkflow =
             match x with
@@ -26,8 +28,14 @@ module Util =
         member x.RenameDataModel =
             x.RenameWorkflow.DataModel
 
-        member x.FSharpRenameModel =
-            x.RenameDataModel.FSharpRenameModel
+        member x.FSharpChangeNameKind =
+            match x.RenameWorkflow.DataModel.Model with
+            | :? FSharpCustomRenameModel as fsRenameModel -> fsRenameModel.ChangeNameKind
+            | model ->
+
+            let logger = Logger.GetLogger<FSharpCustomRenameModel>()
+            logger.Warn(sprintf "Got custom rename model %O, workflow: %O" model x.RenameWorkflow)
+            ChangeNameKind.SourceName
 
     type RenameDataModel with
         member x.FSharpRenameModel =
@@ -46,7 +54,7 @@ type FSharpAtomicRename(declaredElement, newName, doNotShowBindingConflicts) =
     override x.SetName(declaration, renameRefactoring) =
         match declaration with
         | :? IFSharpDeclaration as fsDeclaration ->
-            fsDeclaration.SetName(x.NewName, renameRefactoring.Workflow.FSharpRenameModel.ChangeNameKind)
+            fsDeclaration.SetName(x.NewName, renameRefactoring.Workflow.FSharpChangeNameKind)
         | declaration -> failwithf "Got declaration: %O" declaration
 
 
@@ -60,7 +68,7 @@ type FSharpRenameHelper() =
         newDeclaredElement :? IFSharpDeclaredElement ||
         base.IsCheckResolvedTo(newReference, newDeclaredElement)
 
-    override x.IsLocalRename(element: IDeclaredElement) = element :? ILocalDeclaration
+    override x.IsLocalRename(element: IDeclaredElement) = element :? IFSharpLocalDeclaration
     override x.CheckLocalRenameSameDocument(element: IDeclaredElement) = x.IsLocalRename(element)
 
     override x.GetOptionsModel(declaredElement, reference, lifetime) =
@@ -75,7 +83,7 @@ type FSharpRenameHelper() =
         | fsDeclaredElement ->
 
         dataModel.InitialName <-
-            match dataModel.FSharpRenameModel.ChangeNameKind with
+            match workflow.FSharpChangeNameKind with
             | ChangeNameKind.SourceName
             | ChangeNameKind.UseSingleName -> fsDeclaredElement.SourceName
             | _ -> fsDeclaredElement.ShortName
@@ -92,8 +100,8 @@ type FSharpAtomicRenamesFactory() =
 
     override x.CheckRenameAvailability(element: IDeclaredElement) =
         match element with
-        | :? ILocalDeclaration -> RenameAvailabilityCheckResult.CanBeRenamed
-        | _ -> RenameAvailabilityCheckResult.CanNotBeRenamed
+        | :? IFSharpLocalDeclaration -> RenameAvailabilityCheckResult.CanBeRenamed
+        | _ -> RenameAvailabilityCheckResult.CanBeRenamed // todo: add more checks (e.g. for active pattern)
 
     override x.CreateAtomicRenames(declaredElement, newName, doNotAddBindingConflicts) =
         [| FSharpAtomicRename(declaredElement, newName, doNotAddBindingConflicts) :> AtomicRenameBase |] :> _

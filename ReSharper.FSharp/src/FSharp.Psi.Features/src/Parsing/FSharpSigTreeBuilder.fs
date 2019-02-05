@@ -42,7 +42,7 @@ type internal FSharpSigTreeBuilder(file, lexer, sigs, lifetime) =
         | SynModuleSigDecl.Val(ValSpfn(attrs,id,SynValTyparDecls(typeParams,_,_),_,_,_,_,_,_,_,_),range) ->
             let mark = x.ProcessAttributesAndStartRange attrs (Some id) range
             let isActivePattern = IsActivePatternName id.idText 
-            if isActivePattern then x.ProcessActivePatternId id else x.ProcessIdentifier id
+            if isActivePattern then x.ProcessActivePatternId(id, false) else x.ProcessIdentifier id
             for p in typeParams do x.ProcessTypeParameter(p, ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION)
             x.Done(range, mark, ElementType.LET) // todo: replace with proper pattern
         | _ -> ()

@@ -14,6 +14,13 @@
     public const string IDS_SIMPLE_TYPE_DECLARATION = "";
     public const string IDS_TYPE_EXPRESSION = "";
     public const string IDS_HASH_DIRECTIVE = "";
+    public const string IDS_LONG_IDENT_PAT = "";
+    public const string IDS_NAMED_PAT = "";
+    public const string IDS_BINDING = "";
+    public const string IDS_IDENT_OR_OP_NAME = "";
+    public const string IDS_ACTIVE_PATTERN_CASE = "";
+    public const string IDS_ACTIVE_PATTERN_CASE_DECLARATION = "";
+    public const string IDS_IDENTIFIER_TOKEN = "";
 
     public static string GetString(string id) => id;
     public static string GetExpectedMessage(string expectedSymbol) => string.Empty;

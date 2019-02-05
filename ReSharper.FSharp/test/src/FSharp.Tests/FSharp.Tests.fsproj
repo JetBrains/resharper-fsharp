@@ -20,6 +20,7 @@
     <Compile Include="CommentActionTests.fs" />
     <Compile Include="TypingAssistTest.fs" />
     <Compile Include="FSharpTodoTest.fs" />
+    <Compile Include="RenameTest.fs" />
     <Compile Include="FSharpOccurenceKindTest.fs" />
   </ItemGroup>
 

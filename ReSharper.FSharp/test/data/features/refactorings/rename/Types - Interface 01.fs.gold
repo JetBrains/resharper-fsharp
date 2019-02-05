@@ -1,0 +1,8 @@
+﻿module Module
+
+[<Interface>]
+type zzz =
+    abstract Foo: zzz
+
+let (i1: zzz) = Unchecked.defaultof<zzz>
+let (i2: zzz) = obj() :?> zzz

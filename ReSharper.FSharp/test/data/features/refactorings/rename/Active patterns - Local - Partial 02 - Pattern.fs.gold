@@ -1,0 +1,10 @@
+﻿module Module
+
+let x =
+    let (    |  zzz  |    _ | ) x =
+        if x then Some () else None
+
+    match true with
+    | zzz
+    | zzz
+    | _ -> ()

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Xml;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
@@ -12,8 +12,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public virtual string ShortName => DeclaredName;
     public virtual string SourceName => NameIdentifier.GetSourceName();
 
-    public virtual FSharpSymbol GetFSharpSymbol() =>
-      (this.GetContainingFile() as IFSharpFile)?.GetSymbolDeclaration(GetNameIdentifierRange().StartOffset.Offset);
+    public virtual FSharpSymbol GetFSharpSymbol()
+    {
+      var identifierRange = GetNameIdentifierRange();
+      return (this.GetContainingFile() as IFSharpFile)?.GetSymbolDeclaration(identifierRange.StartOffset.Offset);
+    }
 
     public abstract IDeclaredElement DeclaredElement { get; }
     public abstract string DeclaredName { get; }
@@ -30,6 +33,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public void SetName(string name, ChangeNameKind changeNameKind)
     {
+      NameIdentifier.ReplaceIdentifier(name);
     }
   }
 }

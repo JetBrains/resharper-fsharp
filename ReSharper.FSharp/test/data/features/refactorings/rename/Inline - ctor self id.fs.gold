@@ -1,0 +1,7 @@
+﻿module Module
+
+let y = 123
+
+type T() as zzz =
+
+    member x.Foo = zzz

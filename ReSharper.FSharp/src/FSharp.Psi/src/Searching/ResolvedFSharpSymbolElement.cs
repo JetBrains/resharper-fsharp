@@ -20,74 +20,37 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
     FSharpSymbol Symbol { get; }
     IPsiModule Module { get; }
   }
-  
-  
+
   public class ResolvedFSharpSymbolElement : IFSharpSymbolElement
   {
-    private readonly IPsiServices myPsiServices;
-
     public ResolvedFSharpSymbolElement(FSharpSymbol symbol, FSharpIdentifierToken referenceOwnerToken)
     {
       Symbol = symbol;
       Module = referenceOwnerToken.GetPsiModule();
-      myPsiServices = referenceOwnerToken.GetPsiServices();
-    }
-    
-    public FSharpSymbol Symbol { get; }
-    public IPsiModule Module { get; }
-
-    public IPsiServices GetPsiServices()
-    {
-      return myPsiServices;
-    }
-
-    public IList<IDeclaration> GetDeclarations()
-    {
-      return EmptyList<IDeclaration>.Instance;
-    }
-
-    public IList<IDeclaration> GetDeclarationsIn(IPsiSourceFile sourceFile)
-    {
-      return EmptyList<IDeclaration>.Instance;
-    }
-
-    public DeclaredElementType GetElementType()
-    {
-      return FSharpDeclaredElementType.ActivePatternCase;
-    }
-
-    public XmlNode GetXMLDoc(bool inherit)
-    {
-      return null;
-    }
-
-    public XmlNode GetXMLDescriptionSummary(bool inherit)
-    {
-      return null;
-    }
-
-    public bool IsValid()
-    {
-      return true;
-    }
-
-    public bool IsSynthetic()
-    {
-      return false;
-    }
-
-    public HybridCollection<IPsiSourceFile> GetSourceFiles()
-    {
-      return HybridCollection<IPsiSourceFile>.Empty;
-    }
-
-    public bool HasDeclarationsIn(IPsiSourceFile sourceFile)
-    {
-      return false;
     }
 
     public string ShortName => Symbol.DisplayName;
-    public bool CaseSensitiveName => true;
+
+    public FSharpSymbol Symbol { get; }
+    public IPsiModule Module { get; }
+
+    public IPsiServices GetPsiServices() => Module.GetPsiServices();
+
+    public bool HasDeclarationsIn(IPsiSourceFile sourceFile) => false;
+    public IList<IDeclaration> GetDeclarations() => EmptyList<IDeclaration>.Instance;
+    public IList<IDeclaration> GetDeclarationsIn(IPsiSourceFile sourceFile) => EmptyList<IDeclaration>.Instance;
+    public HybridCollection<IPsiSourceFile> GetSourceFiles() => HybridCollection<IPsiSourceFile>.Empty;
+
+    public DeclaredElementType GetElementType() =>
+      FSharpDeclaredElementType.ActivePatternCase; // todo: check this
+
+    public XmlNode GetXMLDoc(bool inherit) => null;
+    public XmlNode GetXMLDescriptionSummary(bool inherit) => null;
+
+    public bool IsValid() => true;  // todo: check this
+
     public PsiLanguageType PresentationLanguage => FSharpLanguage.Instance;
+    public bool CaseSensitiveName => true;
+    public bool IsSynthetic() => false;
   }
 }

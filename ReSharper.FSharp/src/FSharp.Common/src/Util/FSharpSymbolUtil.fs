@@ -134,3 +134,17 @@ let rec getIconId (symbol: FSharpSymbol) =
     | :? FSharpGenericParameter
     | :? FSharpStaticParameter -> PsiSymbolsThemedIcons.Typeparameter.Id
     | _ -> null
+
+
+[<Extension; CompiledName("PatternName")>]
+let patternName (pattern: FSharpActivePatternGroup) =
+    match pattern.Name with
+    | Some name -> name
+    | _ ->
+
+    let joinedNames = String.concat "|" pattern.Names
+    let wildCase = if pattern.IsTotal then "|" else "_|"
+    "|" + joinedNames + wildCase
+
+type FSharpActivePatternGroup with
+    member x.PatternName = patternName x

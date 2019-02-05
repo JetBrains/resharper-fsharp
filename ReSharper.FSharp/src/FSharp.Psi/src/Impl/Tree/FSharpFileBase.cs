@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -94,6 +94,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
           var startOffset = document.GetOffset(range.Start);
           var endOffset = document.GetOffset(range.End);
           var mfv = symbol as FSharpMemberOrFunctionOrValue;
+          var activePatternCase = symbol as FSharpActivePatternCase;
 
           if (symbolUse.IsFromDefinition)
           {
@@ -116,6 +117,38 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
               if (mfvLogicalName != StandardMemberNames.Constructor &&
                   !(FindTokenAt(new TreeOffset(endOffset - 1)) is FSharpIdentifierToken || mfv.IsActivePattern))
                 continue;
+            }
+            else if (activePatternCase != null)
+            {
+              // Skip active pattern cases bindings as these have incorrect ranges.
+              // Active pattern cases uses inside bindings are currently marked as bindings so check the range.
+              // https://github.com/Microsoft/visualfsharp/issues/4423
+              if (activePatternCase.DeclarationLocation.Equals(range))
+              {
+                var activePatternId = this.GetContainingNodeAt<ActivePatternId>(new TreeOffset(endOffset - 1));
+                if (activePatternId == null)
+                  continue;
+
+                var cases = activePatternId.Cases;
+                var caseIndex = activePatternCase.Index;
+                if (caseIndex < 0 ||  caseIndex >= cases.Count)
+                  continue;
+
+                var caseDeclaration = cases[caseIndex] as IActivePatternCaseDeclaration;
+                if (caseDeclaration == null)
+                  continue;
+
+                var caseRange = caseDeclaration.GetTreeTextRange();
+                var caseTextRange = new TextRange(caseRange.StartOffset.Offset, caseRange.EndOffset.Offset);
+                resolvedSymbols.Declarations[startOffset] = new FSharpResolvedSymbolUse(symbolUse, caseTextRange);
+                continue;
+              }
+              else
+              {
+                var caseUseInBindingRange = new TextRange(startOffset, endOffset);
+                resolvedSymbols.Uses[startOffset] = new FSharpResolvedSymbolUse(symbolUse, caseUseInBindingRange);
+                continue;
+              }
             }
             else
             {

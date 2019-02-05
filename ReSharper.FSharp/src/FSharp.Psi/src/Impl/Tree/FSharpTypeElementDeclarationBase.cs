@@ -66,7 +66,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
           if (child is ILet let)
             foreach (var binding in let.Bindings)
-              result.AddRange(binding.HeadPattern.Declarations);
+            {
+              var headPattern = binding.HeadPattern;
+              if (headPattern != null)
+                result.AddRange(headPattern.Declarations);
+            }
         }
 
         return result.ReadOnlyList();

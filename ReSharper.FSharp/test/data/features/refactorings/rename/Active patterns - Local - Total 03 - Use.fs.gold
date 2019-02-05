@@ -1,0 +1,9 @@
+﻿module Module
+
+let x =
+    let (    |  B  |    zzz | ) x =
+        if x then B else zzz
+
+    match true with
+    | B
+    | zzz -> ()

@@ -11,7 +11,6 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
-using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Naming;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Resources.Shell;
@@ -19,6 +18,7 @@ using JetBrains.Util;
 using JetBrains.Util.Logging;
 using JetBrains.Util.Extension;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
+using PrettyNaming = Microsoft.FSharp.Compiler.PrettyNaming;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 {
@@ -101,7 +101,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         if (GetCompiledNameValue(attr, out var value))
           return value;
 
-      return identifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
+      return GetCompiledName(identifier);
+    }
+
+    public static string GetCompiledName([CanBeNull] this IIdentifier identifier)
+    {
+      if (identifier == null)
+        return SharedImplUtil.MISSING_DECLARATION_NAME;
+
+      var name = identifier.Name;
+      if (name == SharedImplUtil.MISSING_DECLARATION_NAME)
+        return name;
+
+      return identifier is IActivePatternId
+        ? name
+        : PrettyNaming.CompileOpName.Invoke(name);
     }
 
     [NotNull]
@@ -116,7 +130,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         return TreeTextRange.InvalidRange;
 
       var nameRange = identifier.GetTreeTextRange();
-      return FSharpNamesUtil.IsEscapedWithBackticks(identifier.IdentifierToken.GetText())
+      var identifierToken = identifier.IdentifierToken;
+      if (identifierToken == null)
+        return nameRange;
+
+      return FSharpNamesUtil.IsEscapedWithBackticks(identifierToken.GetText())
         ? nameRange.TrimLeft(2).TrimRight(2)
         : nameRange;
     }
@@ -199,12 +217,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     [CanBeNull]
-    internal static IDeclaredElement GetActivePatternByIndex(this IDeclaration declaration, int index)
+    internal static IDeclaredElement GetActivePatternByIndex(this IFSharpDeclaration declaration, int index)
     {
-      return null;
-//      var letDecl = declaration as PatternDeclarationBase;
-//      var cases = letDecl?.Identifier.Children<ActivePatternCaseDeclaration>().AsIList();
-//      return cases?.Count > index ? cases[index].DeclaredElement : null;
+      if (!(declaration.NameIdentifier is ActivePatternId patternId))
+        return null;
+
+      var cases = patternId.Cases;
+      if (index < 0 || index >= cases.Count)
+        return null;
+
+      var caseDeclaration = cases[index] as IActivePatternCaseDeclaration;
+      return caseDeclaration?.DeclaredElement;
     }
 
     public static TreeNodeCollection<IFSharpAttribute> GetAttributes([NotNull] this IDeclaration declaration)
@@ -213,10 +236,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       {
         case IFSharpTypeDeclaration typeDeclaration:
           return typeDeclaration.Attributes;
-        case IMemberDeclaration memberDeclarationm:
-          return memberDeclarationm.Attributes;
-//        case IPatternDeclaration letBinding:
-//          return letBinding.Attributes;
+        case IMemberDeclaration memberDeclaration:
+          return memberDeclaration.Attributes;
+        case ISynPat pat:
+          return pat.Attributes;
         case IModuleLikeDeclaration moduleLikeDeclaration:
           return moduleLikeDeclaration.Attributes;
         default: return TreeNodeCollection<IFSharpAttribute>.Empty;

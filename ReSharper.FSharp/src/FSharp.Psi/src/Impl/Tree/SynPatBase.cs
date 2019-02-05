@@ -7,7 +7,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class NamedPat
+  internal partial class TopNamedPat
   {
     public bool IsDeclaration => true;
 
@@ -21,10 +21,32 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       Identifier?.GetTreeStartOffset() ?? GetTreeStartOffset();
   }
 
+  internal partial class LocalNamedPat
+  {
+    public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
+    public bool IsDeclaration => true;
+    public IEnumerable<ITypeMemberDeclaration> Declarations => EmptyList<ITypeMemberDeclaration>.Instance;
+    public TreeOffset GetOffset() => GetTreeStartOffset();
+  }
+
+  internal partial class LocalLongIdentPat
+  {
+    public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
+    public bool IsDeclaration => false; //todo
+    public IEnumerable<ITypeMemberDeclaration> Declarations => EmptyList<ITypeMemberDeclaration>.Instance;
+  }
+
   internal partial class OrPat
   {
-    public override IEnumerable<ITypeMemberDeclaration> Declarations =>
-      EmptyList<ITypeMemberDeclaration>.Instance; // todo
+    public override IEnumerable<ITypeMemberDeclaration> Declarations
+    {
+      get
+      {
+        var pattern1Decls = Pattern1?.Declarations ?? EmptyList<ITypeMemberDeclaration>.Instance;
+        var pattern2Decls = Pattern2?.Declarations ?? EmptyList<ITypeMemberDeclaration>.Instance;
+        return pattern2Decls.Prepend(pattern1Decls);
+      }
+    }
   }
 
   internal partial class AndsPat
@@ -33,7 +55,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       EmptyList<ITypeMemberDeclaration>.Instance;
   }
 
-  internal partial class LongIdentPat
+  internal partial class TopLongIdentPat
   {
     public bool IsDeclaration => Parent is IBinding;
 
@@ -70,7 +92,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class IsInstPat
   {
     public override IEnumerable<ITypeMemberDeclaration> Declarations =>
-      Pattern.Declarations;
+      EmptyList<ITypeMemberDeclaration>.Instance;
   }
 
   internal partial class TypedPat

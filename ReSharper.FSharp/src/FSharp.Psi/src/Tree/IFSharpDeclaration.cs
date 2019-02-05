@@ -7,13 +7,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
   public enum ChangeNameKind
   {
-    // Remove compiled name if present and update all references.
+    /// Remove compiled name if present and update all references.
     UseSingleName,
 
-    // Change the name seen by F# source only and update F# references.
+    /// Change the name seen by F# source only and update F# references.
     SourceName,
 
-    // Change the name seen by other languages and update non-F# references.
+    /// Change the name seen by other languages and update non-F# references.
     CompiledName
   }
 

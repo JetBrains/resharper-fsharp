@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Common.Util
+﻿namespace JetBrains.ReSharper.Plugins.FSharp.Common.Util
 
 [<AutoOpen>]
 module rec CommonUtil =
@@ -119,6 +119,12 @@ module rec CommonUtil =
     let equalsIgnoreCase other (string: string) =
         string.Equals(other, StringComparison.OrdinalIgnoreCase)
 
+    let startsWith other (string: string) =
+        string.StartsWith(other, StringComparison.Ordinal)
+
+    let endsWith other (string: string) =
+        string.EndsWith(other, StringComparison.Ordinal)
+
     let eq a b = a = b
 
     let getCommonParent path1 path2 =
@@ -148,6 +154,7 @@ module rec FcsUtil =
     let (|ExprRange|) (expr: SynExpr) = expr.Range
     let (|PatRange|) (pat: SynPat) = pat.Range
     let (|IdentRange|) (id: Ident) = id.idRange
+    let (|TypeRange|) (typ: SynType) = typ.Range
 
 
 [<AutoOpen>]

@@ -12,11 +12,11 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class LocalDeclaration : ITypeOwner, IFSharpDeclaredElement
+  internal abstract class LocalDeclarationBase : FSharpDeclarationBase, ITypeOwner, IFSharpDeclaredElement, IFSharpLocalDeclaration
   {
     public override IDeclaredElement DeclaredElement => this;
-    public override string DeclaredName => Identifier.GetCompiledName(Attributes);
-    public override IFSharpIdentifier NameIdentifier => Identifier;
+    public override string DeclaredName => SourceName;
+
     public IList<IDeclaration> GetDeclarations() => new IDeclaration[] {this};
 
     public IList<IDeclaration> GetDeclarationsIn(IPsiSourceFile sourceFile) =>
@@ -47,6 +47,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     public override void SetName(string name) =>
-      Identifier.ReplaceIdentifier(name);
+      NameIdentifier.ReplaceIdentifier(name);
+  }
+
+  internal partial class LocalDeclaration
+  {
+    public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
+  }
+
+  internal abstract class LocalPatternDeclarationBase : LocalDeclarationBase
+  {
+    public TreeNodeCollection<IFSharpAttribute> Attributes =>
+      TreeNodeCollection<IFSharpAttribute>.Empty;
+
+    public TreeNodeEnumerable<IFSharpAttribute> AttributesEnumerable =>
+      TreeNodeEnumerable<IFSharpAttribute>.Empty;
   }
 }
