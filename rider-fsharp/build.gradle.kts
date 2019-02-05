@@ -17,7 +17,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.jetbrains.rd:rd-gen:0.191.27")
+        classpath("com.jetbrains.rd:rd-gen:0.191.32")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.10")
     }
 }
