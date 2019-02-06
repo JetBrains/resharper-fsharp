@@ -68,8 +68,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
             foreach (var binding in let.Bindings)
             {
               var headPattern = binding.HeadPattern;
-              if (headPattern != null)
-                result.AddRange(headPattern.Declarations);
+              if (headPattern == null)
+                continue;
+
+              foreach (var declaration in headPattern.Declarations)
+              {
+                if (declaration is ITypeMemberDeclaration typeMemberDeclaration)
+                  result.Add(typeMemberDeclaration);
+              }
             }
         }
 

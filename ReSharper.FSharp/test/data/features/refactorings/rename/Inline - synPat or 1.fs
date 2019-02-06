@@ -7,5 +7,5 @@ type T =
 let x = 123
 
 match A x with
-| A x
-| B x -> {caret}x + 1
+| A {caret}x
+| B x -> x + x

@@ -75,14 +75,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     [CanBeNull]
     protected IBinding GetBinding()
     {
-      ITreeNode node = this;
+      var node = Parent;
       while (node != null)
       {
         switch (node)
         {
           case IBinding binding:
             return binding;
-          case ITopLongIdentPat longIdentPat when !longIdentPat.IsDeclaration:
+          case ITopLongIdentPat _:
             return null;
           default:
             node = node.Parent;
@@ -98,8 +98,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     public virtual bool IsDeclaration => false;
 
-    public virtual IEnumerable<ITypeMemberDeclaration> Declarations =>
-      EmptyList<ITypeMemberDeclaration>.Instance;
+    public virtual IEnumerable<IDeclaration> Declarations =>
+      EmptyList<IDeclaration>.Instance;
     
     public TreeNodeCollection<IFSharpAttribute> Attributes => TreeNodeCollection<IFSharpAttribute>.Empty;
     public TreeNodeEnumerable<IFSharpAttribute> AttributesEnumerable => TreeNodeEnumerable<IFSharpAttribute>.Empty;

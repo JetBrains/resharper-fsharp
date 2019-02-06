@@ -1,3 +1,6 @@
-module Module
+﻿module Module
 
-let foo {caret}x = x + 1
+let x =
+    let foo x{caret} =
+        x + x
+    foo 1

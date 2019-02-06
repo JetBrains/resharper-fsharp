@@ -176,7 +176,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                             | [id] ->
                                 match valData with
                                 | SynValData(Some (flags),_,_) when flags.MemberKind = MemberKind.Constructor ->
-                                    x.ProcessParams(memberParams)
+                                    x.ProcessParams(memberParams, true, true) // todo: should check isLocal
                                     x.ProcessLocalExpression(expr)
                                     ElementType.CONSTRUCTOR_DECLARATION
                                 | _ ->
@@ -226,7 +226,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
         | Some(SynValTyparDecls(typeParams,_,_)) ->
             x.ProcessTypeParametersOfType typeParams range true
         | _ -> ()
-        x.ProcessParams(memberParams)
+        x.ProcessParams(memberParams, true, true) // todo: should check isLocal
         x.ProcessLocalExpression(expr)
     
     member x.ProcessPat(PatRange range as pat, isLocal) =
@@ -259,7 +259,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                             x.ProcessTypeParameter(p, ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION)
                     | None -> ()
 
-                    x.ProcessParams(args)
+                    x.ProcessParams(args, isLocal, false)
                     if isLocal then ElementType.LOCAL_LONG_IDENT_PAT else ElementType.TOP_LONG_IDENT_PAT
 
                 | _ ->
@@ -304,19 +304,21 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
 
         x.Done(range, mark, elementType)
 
-    member x.ProcessParams(args: SynConstructorArgs) =
+    member x.ProcessParams(args: SynConstructorArgs, isLocal, markMember) =
         match args with
         | Pats pats ->
             for pat in pats do
-                x.ProcessParam(pat)
+                x.ProcessParam(pat, isLocal, markMember)
 
         | NamePatPairs (idsAndPats, _) ->
             for _, pat in idsAndPats do
-                x.ProcessParam(pat)
+                x.ProcessParam(pat, isLocal, markMember)
 
-    member x.ProcessParam(PatRange range as pat) =
+    member x.ProcessParam(PatRange range as pat, isLocal, markMember) =
+        if not markMember then x.ProcessPat(pat, isLocal) else
+
         let mark = x.Mark(range)
-        x.ProcessPat(pat, true)
+        x.ProcessPat(pat, isLocal)
         x.Done(range, mark, ElementType.MEMBER_PARAM)
 
     member x.ProcessExpr(ExprRange range as expr) =

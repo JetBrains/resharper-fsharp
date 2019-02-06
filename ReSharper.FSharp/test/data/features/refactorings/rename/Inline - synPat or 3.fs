@@ -8,4 +8,4 @@ let x = 123
 
 match A x with
 | A x
-| B {caret}x -> x + 1
+| B x -> {caret}x + x

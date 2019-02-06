@@ -71,6 +71,21 @@ type FSharpRenameHelper() =
     override x.IsLocalRename(element: IDeclaredElement) = element :? IFSharpLocalDeclaration
     override x.CheckLocalRenameSameDocument(element: IDeclaredElement) = x.IsLocalRename(element)
 
+    override x.GetSecondaryElements(element: IDeclaredElement) =
+        match element with
+        | :? ILocalNamedPat as localNamedPat ->
+            let mutable pat = localNamedPat :> ISynPat
+            while (pat.Parent :? ISynPat) && not (pat.Parent :? ILongIdentPat && (pat.Parent :?> ISynPat).IsDeclaration) do
+                pat <- pat.Parent :?> ISynPat
+
+            let declarartions = pat.Declarations |> Array.ofSeq
+
+            declarartions
+            |> Array.filter (fun d -> d.DeclaredName = localNamedPat.ShortName)
+            |> Seq.cast<IDeclaredElement>
+
+        | _ -> EmptyArray.Instance :> _
+    
     override x.GetOptionsModel(declaredElement, reference, lifetime) =
         FSharpCustomRenameModel(declaredElement, reference, lifetime, (* todo *) ChangeNameKind.SourceName) :> _
 

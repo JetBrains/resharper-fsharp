@@ -191,11 +191,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       }
     }
 
-    private void ProcessTypeMembers(IEnumerable<ITypeMemberDeclaration> memberDeclarations)
+    private void ProcessTypeMembers(IEnumerable<IDeclaration> declarations)
     {
-      foreach (var typeMemberDeclaration in memberDeclarations)
+      foreach (var declaration in declarations)
       {
-        var declaredName = typeMemberDeclaration.DeclaredName;
+        if (!(declaration is ITypeMemberDeclaration))
+          continue;
+
+        var declaredName = declaration.DeclaredName;
         if (declaredName != SharedImplUtil.MISSING_DECLARATION_NAME)
           Builder.AddDeclaredMemberName(declaredName);
       }

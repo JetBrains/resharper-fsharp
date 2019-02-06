@@ -1,3 +1,0 @@
-﻿module Module
-
-let foo zzz = zzz + 1

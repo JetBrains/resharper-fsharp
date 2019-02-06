@@ -15,15 +15,14 @@ type FSharpRenameTest() =
         FSharpProjectPropertiesFactory.CreateProjectProperties(targetFrameworkIds)
 
     [<Test>] member x.``Inline - Declaration``() = x.DoNamedTest()
-    [<Test>] member x.``Inline - Usage``() = x.DoNamedTest()
-    [<Test>] member x.``Inline - Multiple usages``() = x.DoNamedTest()
-    [<Test>] member x.``Inline - member self id``() = x.DoNamedTest()
-    [<Test>] member x.``Inline - ctor self id``() = x.DoNamedTest()
-    [<Test>] member x.``Inline - simple binding``() = x.DoNamedTest()
+    [<Test>] member x.``Inline - Use``() = x.DoNamedTest()
+    [<Test>] member x.``Inline - Member self id``() = x.DoNamedTest()
+    [<Test>] member x.``Inline - Ctor self id``() = x.DoNamedTest()
 
-    [<Test; Ignore>] member x.``Inline - synPat or 1``() = x.DoNamedTest()
-    [<Test; Ignore>] member x.``Inline - synPat or 2``() = x.DoNamedTest()
-    [<Test; Ignore>] member x.``Inline - synPat or 3``() = x.DoNamedTest()
+    [<Test>] member x.``Inline - synPat or 1``() = x.DoNamedTest()
+    [<Test>] member x.``Inline - synPat or 2``() = x.DoNamedTest()
+    [<Test>] member x.``Inline - synPat or 3``() = x.DoNamedTest()
+    [<Test>] member x.``Inline - synPat or 4``() = x.DoNamedTest()
 
     [<Test>] member x.``Module binding - Simple pattern, declaration``() = x.DoNamedTest()
     [<Test>] member x.``Module binding - Simple pattern, reference``() = x.DoNamedTest()
@@ -35,9 +34,13 @@ type FSharpRenameTest() =
 
     [<Test>] member x.``Module binding - synPat or``() = x.DoNamedTest()
 
-    [<Test; Ignore>] member x.``Module binding - nested synPat or 1``() = x.DoNamedTest()
-    [<Test; Ignore>] member x.``Module binding - nested synPat or 2``() = x.DoNamedTest()
-    [<Test; Ignore>] member x.``Module binding - nested synPat or 3``() = x.DoNamedTest()
+    [<Test>] member x.``Module binding - nested synPat or 1``() = x.DoNamedTest()
+    [<Test>] member x.``Module binding - nested synPat or 2``() = x.DoNamedTest()
+    [<Test>] member x.``Module binding - nested synPat or 3``() = x.DoNamedTest()
+
+    [<Test>] member x.``Params - Declaration``() = x.DoNamedTest()
+    [<Test>] member x.``Params - Use``() = x.DoNamedTest()
+    [<Test>] member x.``Params - Or``() = x.DoNamedTest()
 
     [<Test>] member x.``Types - Record 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Record 02 - Struct``() = x.DoNamedTest()

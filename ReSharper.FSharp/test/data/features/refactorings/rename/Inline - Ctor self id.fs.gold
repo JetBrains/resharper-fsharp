@@ -4,4 +4,6 @@ let y = 123
 
 type T() as zzz =
 
+    let y' = zzz
+
     member x.Foo = zzz
