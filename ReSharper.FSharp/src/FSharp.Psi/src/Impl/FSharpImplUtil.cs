@@ -6,6 +6,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
@@ -113,9 +114,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       if (name == SharedImplUtil.MISSING_DECLARATION_NAME)
         return name;
 
-      return identifier is IActivePatternId
-        ? name
-        : PrettyNaming.CompileOpName.Invoke(name);
+      if (identifier is IFSharpIdentifier fsIdentifier &&
+          fsIdentifier.IdentifierToken?.GetTokenType() == FSharpTokenType.SYMBOLIC_OP)
+        return PrettyNaming.CompileOpName.Invoke(name);
+      
+      return name;
     }
 
     [NotNull]
