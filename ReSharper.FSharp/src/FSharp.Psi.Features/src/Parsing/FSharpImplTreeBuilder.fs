@@ -229,7 +229,12 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
         x.ProcessParams(memberParams, true, true) // todo: should check isLocal
         x.ProcessLocalExpression(expr)
     
-    member x.ProcessPat(PatRange range as pat, isLocal) =
+    // isTopLevelPat is needed for to distinguish function def from other long ident pats e.g.
+    // let (Some x) = ...
+    // let Some x = ...
+    // When long pat is a function pat its args are currently mapped as local decls. todo: rewrite it to be params
+    // Getting proper params (with right impl and sig ranges) isn't easy, probably a fix is needed in FCS.
+    member x.ProcessPat(PatRange range as pat, isLocal, isTopLevelPat) =
         match pat with
         | SynPat.Wild _ -> ()
         | _ ->
@@ -238,7 +243,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
         let elementType =
             match pat with
             | SynPat.Named (pat, id, _, _, _) ->
-                x.ProcessPat(pat, isLocal)
+                x.ProcessPat(pat, isLocal, false)
                 if IsActivePatternName id.idText then x.ProcessActivePatternId(id, isLocal)
                 if isLocal then ElementType.LOCAL_NAMED_PAT else ElementType.TOP_NAMED_PAT
 
@@ -246,8 +251,8 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                 match lid.Lid with
                 | [id] when id.idText = "op_ColonColon" ->
                     match args with
-                    | Pats pats -> for p in pats do x.ProcessPat(p, isLocal)
-                    | NamePatPairs (pats, _) -> for _, p in pats do x.ProcessPat(p, isLocal)
+                    | Pats pats -> for p in pats do x.ProcessPat(p, isLocal, false)
+                    | NamePatPairs (pats, _) -> for _, p in pats do x.ProcessPat(p, isLocal, false)
                     ElementType.CONS_PAT
 
                 | [id] ->
@@ -259,40 +264,40 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                             x.ProcessTypeParameter(p, ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION)
                     | None -> ()
 
-                    x.ProcessParams(args, isLocal, false)
+                    x.ProcessParams(args, isLocal || isTopLevelPat, false)
                     if isLocal then ElementType.LOCAL_LONG_IDENT_PAT else ElementType.TOP_LONG_IDENT_PAT
 
                 | _ ->
                     if isLocal then ElementType.LOCAL_LONG_IDENT_PAT else ElementType.TOP_LONG_IDENT_PAT
 
             | SynPat.Typed (pat, _, _) ->
-                x.ProcessPat(pat, isLocal)
+                x.ProcessPat(pat, isLocal, false)
                 ElementType.TYPED_PAT
 
             | SynPat.Or (pat1, pat2, _) ->
-                x.ProcessPat(pat1, isLocal)
-                x.ProcessPat(pat2, isLocal)
+                x.ProcessPat(pat1, isLocal, false)
+                x.ProcessPat(pat2, isLocal, false)
                 ElementType.OR_PAT
 
             | SynPat.Ands (pats, _) ->
                 for pat in pats do
-                    x.ProcessPat(pat, isLocal)
+                    x.ProcessPat(pat, isLocal, false)
                 ElementType.ANDS_PAT
 
             | SynPat.Tuple (pats, _)
             | SynPat.StructTuple (pats, _)
             | SynPat.ArrayOrList (_, pats, _) ->
                 for pat in pats do
-                    x.ProcessPat(pat, isLocal)
+                    x.ProcessPat(pat, isLocal, false)
                 ElementType.LIST_PAT
 
             | SynPat.Paren (pat,_) ->
-                x.ProcessPat(pat, isLocal)
+                x.ProcessPat(pat, isLocal, false)
                 ElementType.PAREN_PAT
 
             | SynPat.Record (pats, _) ->
                 for _, pat in pats do
-                    x.ProcessPat(pat, isLocal)
+                    x.ProcessPat(pat, isLocal, false)
                 ElementType.RECORD_PAT
 
             | SynPat.IsInst (typ, _) ->
@@ -315,10 +320,10 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                 x.ProcessParam(pat, isLocal, markMember)
 
     member x.ProcessParam(PatRange range as pat, isLocal, markMember) =
-        if not markMember then x.ProcessPat(pat, isLocal) else
+        if not markMember then x.ProcessPat(pat, isLocal, false) else
 
         let mark = x.Mark(range)
-        x.ProcessPat(pat, isLocal)
+        x.ProcessPat(pat, isLocal, false)
         x.Done(range, mark, ElementType.MEMBER_PARAM)
 
     member x.ProcessExpr(ExprRange range as expr) =
@@ -336,7 +341,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
         let bindingMark = x.Mark()
 
         x.ProcessAttributes(attrs)
-        x.ProcessPat(headPat, isLocal) // todo: local bindings
+        x.ProcessPat(headPat, isLocal, true)
         x.ProcessExpr(expr)
 
         let elementType = if isLocal then ElementType.LOCAL_BINDING else ElementType.TOP_BINDING
@@ -396,7 +401,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
             x.ProcessLocalExpression doBody
 
         | SynExpr.ForEach(_,_,_,pat,enumExpr,bodyExpr,_) ->
-            x.ProcessPat(pat, true)
+            x.ProcessPat(pat, true, false)
             x.ProcessLocalExpression enumExpr
             x.ProcessLocalExpression bodyExpr
 
@@ -506,7 +511,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
             x.ProcessLocalExpression expr
 
         | SynExpr.LetOrUseBang(_,_,_,pat,expr,inExpr,_) ->
-            x.ProcessPat(pat, true)
+            x.ProcessPat(pat, true, false)
             x.ProcessLocalExpression expr
             x.ProcessLocalExpression inExpr
 
@@ -537,7 +542,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
         | _ -> ()
 
     member x.ProcessMatchClause(Clause (pat,whenExpr,expr,_,_)) =
-        x.ProcessPat(pat, true)
+        x.ProcessPat(pat, true, false)
         match whenExpr with
         | Some expr -> x.ProcessLocalExpression(expr)
         | _ -> ()
