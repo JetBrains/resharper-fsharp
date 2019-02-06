@@ -41,6 +41,10 @@ type FSharpRenameTest() =
     [<Test>] member x.``Params - Declaration``() = x.DoNamedTest()
     [<Test>] member x.``Params - Use``() = x.DoNamedTest()
     [<Test>] member x.``Params - Or``() = x.DoNamedTest()
+    [<Test>] member x.``Params - Type private function``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type private binding - function``() = x.DoNamedTest()
+    [<Test>] member x.``Type private binding - value``() = x.DoNamedTest()
 
     [<Test>] member x.``Types - Record 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Record 02 - Struct``() = x.DoNamedTest()

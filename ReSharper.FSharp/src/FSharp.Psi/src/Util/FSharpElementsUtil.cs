@@ -104,7 +104,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         if (mfv.IsUnresolved) return null;
 
         if (!mfv.IsModuleValueOrMember)
-          return FindNode<IFSharpLocalDeclaration>(mfv.DeclarationLocation, referenceOwnerToken);
+        {
+          var declaration = FindNode<IFSharpDeclaration>(mfv.DeclarationLocation, referenceOwnerToken);
+          if (declaration is IFSharpLocalDeclaration localDeclaration)
+            return localDeclaration;
+
+          if (declaration is ISynPat)
+            return declaration.DeclaredElement;
+
+          return null;
+        }
 
         var memberEntity = mfv.IsModuleValueOrMember ? mfv.DeclaringEntity : null;
         if (memberEntity == null) return null;

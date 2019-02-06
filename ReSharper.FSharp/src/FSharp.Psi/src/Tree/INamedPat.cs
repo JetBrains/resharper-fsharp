@@ -6,4 +6,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
   {
     TreeOffset GetOffset();
   }
+  
+  public partial interface ILongIdentPat : IFSharpDeclaration
+  {
+  }
 }

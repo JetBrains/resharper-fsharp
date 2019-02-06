@@ -1,0 +1,7 @@
+﻿module Module
+
+type T() =
+    let zzz x = 1
+
+    member x.P =
+        zzz 1 + zzz + 1
