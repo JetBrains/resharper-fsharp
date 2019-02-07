@@ -15,7 +15,7 @@ abstract class FSharpTemplatesTestCore : RiderTemplatesTestCoreBase() {
     fun classlibCoreTemplate() {
         var templateId = ProjectTemplateIds.Core.fsharp_classLibrary
         if (testMethod.environment.coreVersion.value == CoreVersion.DOT_NET_CORE_2_1.value)
-            templateId = ProjectTemplateIds.Core.fsharp_classLibrary21
+            templateId = ProjectTemplateIds.Core.fsharp_classLibrary
 
         val projectName = "ClassLibrary"
         doCoreTest(templateId, projectName) { project ->
@@ -29,7 +29,7 @@ abstract class FSharpTemplatesTestCore : RiderTemplatesTestCoreBase() {
     fun classlibNetCoreAppTemplate() {
         var templateId = ProjectTemplateIds.Core.fsharp_classLibrary
         if (testMethod.environment.coreVersion.value == CoreVersion.DOT_NET_CORE_2_1.value)
-            templateId = ProjectTemplateIds.Core.fsharp_classLibrary21
+            templateId = ProjectTemplateIds.Core.fsharp_classLibrary
 
         val projectName = "ClassLibrary"
         doCoreTest(templateId, projectName, "netcoreapp2.1") { project ->
@@ -42,7 +42,7 @@ abstract class FSharpTemplatesTestCore : RiderTemplatesTestCoreBase() {
     fun consoleAppCoreTemplate() {
         var templateId = ProjectTemplateIds.Core.fsharp_consoleApplication
         if (testMethod.environment.coreVersion.value == CoreVersion.DOT_NET_CORE_2_1.value)
-            templateId = ProjectTemplateIds.Core.fsharp_consoleApplication21
+            templateId = ProjectTemplateIds.Core.fsharp_consoleApplication
 
         val projectName = "ConsoleApplication"
         val programFs = activeSolutionDirectory.resolve(projectName).resolve("Program.fs")
@@ -83,7 +83,7 @@ abstract class FSharpTemplatesTestCore : RiderTemplatesTestCoreBase() {
     fun xUnitCoreTemplate() {
         var templateId = ProjectTemplateIds.Core.fsharp_xUnit
         if (testMethod.environment.coreVersion.value == CoreVersion.DOT_NET_CORE_2_1.value)
-            templateId = ProjectTemplateIds.Core.fsharp_xUnit21
+            templateId = ProjectTemplateIds.Core.fsharp_xUnit
         
         val projectName = "UnitTestProject"
         doCoreTest(templateId, projectName) { project ->
