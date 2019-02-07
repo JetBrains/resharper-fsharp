@@ -8,7 +8,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class TopBinding : ITypeMemberDeclaration
+  internal partial class TopBinding : ITypeMemberDeclaration, IFunctionDeclaration
   {
     /// A workaround for getting a declared element for binding in features like Find Usages results and
     /// file member navigation where we're looking for containing type member.
@@ -36,6 +36,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public XmlNode GetXMLDoc(bool inherit) => null;
     public bool IsSynthetic() => false;
+
+    IFunction IFunctionDeclaration.DeclaredElement =>
+      FirstDeclaration?.DeclaredElement as IFunction;
 
     public void SetName(string name)
     {

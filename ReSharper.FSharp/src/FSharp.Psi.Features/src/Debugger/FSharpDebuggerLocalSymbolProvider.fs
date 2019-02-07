@@ -14,7 +14,7 @@ open Microsoft.FSharp.Compiler.SourceCodeServices
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpDebuggerLocalSymbolProvider() =
     interface IDebuggerLocalSymbolProvider with
-        member __.FindLocalDeclarationAt(file: IFile, range: DocumentRange, name: string) =
+        member x.FindLocalDeclarationAt(file: IFile, range: DocumentRange, name: string) =
             match file.AsFSharpFile() with
             | null -> null, null
             | fsFile ->
@@ -70,10 +70,12 @@ type FSharpDebuggerLocalSymbolProvider() =
             | Some declRange ->
                 let endOffset = range.Document.GetTreeEndOffset(declRange)
                 let treeNode = fsFile.FindTokenAt(endOffset - 1)
-                let containingTypeDeclaration = treeNode.GetContainingTypeDeclaration()
-                treeNode, containingTypeDeclaration.DeclaredElement :> _
+                match treeNode.GetContainingNode<IFSharpDeclaration>() with
+                | null -> treeNode, null
+                | declaration -> treeNode, declaration.DeclaredElement
 
             | None -> null, null
 
-        member __.FindContainingFunctionDeclarationBody(functionDeclarationNode: IFunctionDeclaration): ITreeNode = 
-            null
+        member x.FindContainingFunctionDeclarationBody(functionDeclaration: IFunctionDeclaration) =
+            // todo: refactor to get tree node instead of function declaration in SDK
+            functionDeclaration :> _
