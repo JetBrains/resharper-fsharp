@@ -29,3 +29,5 @@ type ErrorsHighlightingTest() =
 
     [<Test>] member x.``Use not allowed 01 - module``() = x.DoNamedTest()
     [<Test>] member x.``Use not allowed 02 - primary ctor``() = x.DoNamedTest()
+
+    [<Test>] member x.``Error - no inherit lid``() = x.DoNamedTest()

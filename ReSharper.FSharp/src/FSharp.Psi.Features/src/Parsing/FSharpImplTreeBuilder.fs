@@ -165,8 +165,9 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                     | _ -> ()
                     ElementType.INTERFACE_IMPLEMENTATION
 
-                | SynMemberDefn.Inherit(baseInterface,_,_) ->
-                    x.ProcessSynType(baseInterface)
+                | SynMemberDefn.Inherit(baseType,_,_) ->
+                    try x.ProcessSynType(baseType)
+                    with _ -> () // Getting type range throws an exception if base type lid is empty.
                     ElementType.INTERFACE_INHERIT
 
                 | SynMemberDefn.Member(Binding(_,_,_,_,attrs,_,valData,headPat,ret,expr,_,_),range) ->
