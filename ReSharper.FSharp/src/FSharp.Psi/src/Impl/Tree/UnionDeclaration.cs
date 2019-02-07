@@ -8,8 +8,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class UnionDeclaration
   {
-    protected override string DeclaredElementName => Identifier.GetCompiledName(Attributes);
-    public override IFSharpIdentifier NameIdentifier => Identifier;
+    protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
+    public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
 
     public override IReadOnlyList<ITypeMemberDeclaration> MemberDeclarations =>
       base.MemberDeclarations.Prepend(UnionCases).AsIReadOnlyList(); // todo: shit, rewrite it

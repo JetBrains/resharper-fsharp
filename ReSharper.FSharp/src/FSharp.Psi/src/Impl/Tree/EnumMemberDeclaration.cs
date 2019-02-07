@@ -7,8 +7,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class EnumMemberDeclaration
   {
-    protected override string DeclaredElementName => Identifier.GetCompiledName(Attributes);
-    public override IFSharpIdentifier NameIdentifier => Identifier;
+    protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
+    public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
 
     protected override IDeclaredElement CreateDeclaredElement() =>
       GetFSharpSymbol() is FSharpField field ? new FSharpEnumMember(this, field) : null;

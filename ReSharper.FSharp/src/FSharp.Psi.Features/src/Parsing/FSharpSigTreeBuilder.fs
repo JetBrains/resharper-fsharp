@@ -35,14 +35,12 @@ type internal FSharpSigTreeBuilder(file, lexer, sigs, lifetime) =
             x.Done(range, mark, ElementType.EXCEPTION_DECLARATION)
 
         | SynModuleSigDecl.ModuleAbbrev(IdentRange idRange as id,_,range) ->
-            let mark = x.Mark(idRange)
-            x.ProcessIdentifier id
-            x.Done(idRange, mark, ElementType.MODULE_ABBREVIATION)
+            x.MarkAndDone(idRange, ElementType.MODULE_ABBREVIATION)
 
         | SynModuleSigDecl.Val(ValSpfn(attrs,id,SynValTyparDecls(typeParams,_,_),_,_,_,_,_,_,_,_),range) ->
             let mark = x.ProcessAttributesAndStartRange attrs (Some id) range
             let isActivePattern = IsActivePatternName id.idText 
-            if isActivePattern then x.ProcessActivePatternId(id, false) else x.ProcessIdentifier id
+            if isActivePattern then x.ProcessActivePatternId(id, false)
             for p in typeParams do x.ProcessTypeParameter(p, ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION)
             x.Done(range, mark, ElementType.LET) // todo: replace with proper pattern
         | _ -> ()
@@ -91,7 +89,6 @@ type internal FSharpSigTreeBuilder(file, lexer, sigs, lifetime) =
         match memberSig with
         | SynMemberSig.Member(ValSpfn(attrs,id,_,_,_,_,_,_,_,_,_),flags,range) ->
             let mark = x.ProcessAttributesAndStartRange attrs (Some id) range
-            x.ProcessIdentifier id
             let elementType =
                 if flags.IsDispatchSlot then
                     ElementType.ABSTRACT_SLOT

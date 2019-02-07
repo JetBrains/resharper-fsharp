@@ -12,18 +12,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       {
         var parentModule = Parent as IModuleLikeDeclaration;
         if (parentModule == null)
-          return Identifier.GetModuleCompiledName(Attributes);
+          return NameIdentifier.GetModuleCompiledName(Attributes);
 
         var sourceName = SourceName;
         foreach (var typeDeclaration in parentModule.Children<IFSharpTypeDeclaration>())
           if (typeDeclaration.ShortName == sourceName && typeDeclaration.TypeParameters.IsEmpty)
             return sourceName + "Module";
 
-        return Identifier.GetModuleCompiledName(Attributes);
+        return NameIdentifier.GetModuleCompiledName(Attributes);
       }
     }
 
-    public override IFSharpIdentifier NameIdentifier => Identifier;
+    public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
 
     public bool IsModule => true;
   }

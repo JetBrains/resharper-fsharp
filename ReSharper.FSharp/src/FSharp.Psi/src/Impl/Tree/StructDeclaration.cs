@@ -5,8 +5,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class StructDeclaration
   {
-    protected override string DeclaredElementName => Identifier.GetCompiledName(Attributes);
-    public override IFSharpIdentifier NameIdentifier => Identifier;
+    protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
+    public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
     public FSharpPartKind TypePartKind => FSharpPartKind.Struct;
   }
 }

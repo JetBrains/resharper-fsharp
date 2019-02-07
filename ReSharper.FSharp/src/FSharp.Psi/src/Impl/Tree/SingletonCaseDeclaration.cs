@@ -6,8 +6,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class SingletonCaseDeclaration
   {
-    protected override string DeclaredElementName => Identifier.GetSourceName();
-    public override IFSharpIdentifier NameIdentifier => Identifier;
+    protected override string DeclaredElementName => NameIdentifier.GetSourceName();
+    public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
 
     protected override IDeclaredElement CreateDeclaredElement() =>
       new FSharpUnionCaseProperty(this);

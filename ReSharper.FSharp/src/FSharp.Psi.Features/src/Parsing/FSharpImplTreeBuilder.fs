@@ -86,6 +86,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
             for m in members do
                 x.ProcessTypeMember m
             x.Done(range, extensionMark, ElementType.TYPE_EXTENSION)
+
         | _ ->
             let mark = x.StartType attrs typeParams lid range
             let elementType =
@@ -201,18 +202,15 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                     ElementType.LET
 
                 | SynMemberDefn.AbstractSlot(ValSpfn(_,id,typeParams,_,_,_,_,_,_,_,_),_,range) as slot ->
-                    x.ProcessIdentifier id
                     match typeParams with
                     | SynValTyparDecls(typeParams,_,_) ->
                         x.ProcessTypeParametersOfType typeParams range true
                     ElementType.ABSTRACT_SLOT
 
                 | SynMemberDefn.ValField(Field(_,_,id,_,_,_,_,_),_) ->
-                    if id.IsSome then x.ProcessIdentifier id.Value
                     ElementType.VAL_FIELD
 
                 | SynMemberDefn.AutoProperty(_,_,id,_,_,_,_,_,expr,_,_) ->
-                    x.ProcessIdentifier id
                     x.ProcessLocalExpression expr
                     ElementType.AUTO_PROPERTY
 
@@ -227,8 +225,8 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
         | _ -> ()
         x.ProcessParams(memberParams, true, true) // todo: should check isLocal
         x.ProcessLocalExpression(expr)
-    
-    // isTopLevelPat is needed for to distinguish function def from other long ident pats e.g.
+
+    // isTopLevelPat is needed to distinguish function definitions from other long ident pats:
     // let (Some x) = ...
     // let Some x = ...
     // When long pat is a function pat its args are currently mapped as local decls. todo: rewrite it to be params
