@@ -11,9 +11,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class MemberDeclaration : IFunctionDeclaration
   {
     IFunction IFunctionDeclaration.DeclaredElement => base.DeclaredElement as IFunction;
-    protected override string DeclaredElementName => Identifier.GetCompiledName(Attributes);
+    protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
 
-    public override IFSharpIdentifier NameIdentifier => Identifier;
+    public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
 
     protected override IDeclaredElement CreateDeclaredElement()
     {

@@ -503,7 +503,7 @@ memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } 
   get { methodName="TypeParameters" path=<memberDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfMethodList:TYPE_PARAMETER> };
 }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
-  fSharpIdentifier<IDENTIFIER, Identifier>
+  identOrOpName{IDENTIFIER, Identifier}
   typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   memberParam<PARAMETER, Parameters>* fakeSeparator;
 
@@ -569,11 +569,8 @@ otherModuleMember: fakeSeparator;
 
 // Identifiers
 
-fSharpIdentifier: IDENTIFIER<IDENTIFIER, IdentifierToken>;
-
-private identifierToken{ROLE,Getter}:
-  IDENTIFIER<@ROLE,@Getter> |
-  SYMBOLIC_OP<@ROLE,@Getter>;
+fSharpIdentifier:
+  IDENTIFIER<IDENTIFIER, IdentifierToken>;
 
 private identOrOpName{ROLE,Getter}:
   IDENTIFIER<@ROLE,@Getter> |
@@ -612,11 +609,11 @@ typeArgumentList:
 
 typeParameterOfTypeDeclaration options { stubBase="FSharpDeclarationBase"; }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
-  identifierToken{IDENTIFIER, Identifier};
+  IDENTIFIER<IDENTIFIER, Identifier>;
 
 typeParameterOfMethodDeclaration options { stubBase="FSharpDeclarationBase"; }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
-  identifierToken{IDENTIFIER, Identifier};
+  IDENTIFIER<IDENTIFIER, Identifier>;
 
 
 // Access modifiers
