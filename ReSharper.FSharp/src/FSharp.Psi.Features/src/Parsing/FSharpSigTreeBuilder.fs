@@ -38,11 +38,18 @@ type internal FSharpSigTreeBuilder(file, lexer, sigs, lifetime) =
             x.MarkAndDone(idRange, ElementType.MODULE_ABBREVIATION)
 
         | SynModuleSigDecl.Val(ValSpfn(attrs,id,SynValTyparDecls(typeParams,_,_),_,_,_,_,_,_,_,_),range) ->
-            let mark = x.ProcessAttributesAndStartRange attrs (Some id) range
-            let isActivePattern = IsActivePatternName id.idText 
-            if isActivePattern then x.ProcessActivePatternId(id, false)
-            for p in typeParams do x.ProcessTypeParameter(p, ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION)
-            x.Done(range, mark, ElementType.LET) // todo: replace with proper pattern
+            let letMark = x.ProcessAttributesAndStartRange attrs (Some id) range
+            let bindingMark = x.Mark()
+
+            let patMark = x.Mark(id.idRange)
+            if IsActivePatternName id.idText then x.ProcessActivePatternId(id, false) else x.AdvanceToEnd(id.idRange)
+            x.Done(patMark, ElementType.TOP_NAMED_PAT)
+
+            for p in typeParams do
+                x.ProcessTypeParameter(p, ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION)
+
+            x.Done(range, bindingMark, ElementType.TOP_BINDING)
+            x.Done(letMark, ElementType.LET)
         | _ -> ()
 
     member x.ProcessTypeSignature (TypeDefnSig(ComponentInfo(attrs, typeParams,_,lid,_,_,_,_), typeSig, members, range)) =
