@@ -77,8 +77,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
             | Some id -> x.TypeExtensionsOffsets.Add(id.idText, extensionOffset)
             | _ -> ()
 
-            x.AdvanceToOffset(extensionOffset)
-            let extensionMark = x.Mark()
+            let extensionMark = x.Mark(extensionOffset)
             let typeExpressionMark = x.Mark()
             x.ProcessLongIdentifier lid
             x.Done(typeExpressionMark, ElementType.NAMED_TYPE_EXPRESSION)
@@ -336,14 +335,9 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
         x.ProcessLocalExpression expr
         x.Done(range, mark, ElementType.EXPR)
 
-    member x.ProcessAttributes(attrs) =
-        for attr in attrs do
-            x.ProcessAttribute(attr)
-
     member x.ProcessBinding(Binding(_,_,_,_,attrs,_,_,headPat,_, expr,_,_) as binding, isLocal: bool) =
         // todo: add [< to range?
-        x.AdvanceTo(binding.StartPos)
-        let bindingMark = x.Mark()
+        let bindingMark = x.Mark(binding.StartPos)
 
         x.ProcessAttributes(attrs)
         x.ProcessPat(headPat, isLocal, true)
@@ -433,11 +427,10 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
 
         | SynExpr.TypeApp(expr,lt,typeArgs,_,rt,_,r) ->
             x.ProcessLocalExpression expr
-            lt|> x.GetStartOffset |> x.AdvanceToOffset
-            let mark = x.Mark()
+            let mark = x.Mark(lt)
             for t in typeArgs do x.ProcessSynType t
-            (if rt.IsSome then rt.Value else r) |> x.GetEndOffset |> x.AdvanceToOffset
-            x.Done(mark, ElementType.TYPE_ARGUMENT_LIST)
+            let endRange = if rt.IsSome then rt.Value else r
+            x.Done(endRange, mark, ElementType.TYPE_ARGUMENT_LIST)
 
         | SynExpr.LetOrUse(_,_,bindings,bodyExpr,_) ->
             for binding in bindings do

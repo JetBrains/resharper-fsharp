@@ -58,6 +58,10 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         x.AdvanceTo(pos)
         x.Mark()
     
+    member x.Mark(offset: int) =
+        x.AdvanceToOffset(offset)
+        x.Mark()
+    
     member x.Done(range, mark, elementType) =
         x.AdvanceToEnd(range)
         x.Done(mark, elementType)
@@ -125,14 +129,13 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
             Some mark, elementType
         | _, false ->
             // global namespace or parse error
-            x.GetStartOffset range |> x.AdvanceToOffset
-            let mark = x.Builder.Mark()
+            let mark = x.Mark(range)
             x.Done(x.Builder.Mark(), ElementType.LONG_IDENTIFIER)
             Some mark, ElementType.F_SHARP_GLOBAL_NAMESPACE_DECLARATION
         | _ -> None, null
 
     member x.FinishTopLevelDeclaration (mark: int option) range elementType =
-        range |> x.GetEndOffset |> x.AdvanceToOffset
+        x.AdvanceToEnd(range)
         if mark.IsSome then
             x.Done(mark.Value, elementType)
 
@@ -140,8 +143,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         if attrs.IsEmpty then
             let rangeStartOffset = x.GetStartOffset range
             let startOffset = if id.IsSome then Math.Min(x.GetStartOffset id.Value.idRange, rangeStartOffset) else rangeStartOffset
-            startOffset |> x.AdvanceToOffset
-            x.Builder.Mark()
+            x.Mark(startOffset)
         else
             let mark = x.Mark(attrs.Head.Range)
             for attr in attrs do x.ProcessAttribute attr
@@ -150,8 +152,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
     member x.StartNestedModule (attrs: SynAttributes) (lid: LongIdent) (range: Range.range) =
         let mark = x.ProcessAttributesAndStartRange attrs (List.tryHead lid) range
         if not lid.IsEmpty then
-            let id = lid.Head
-            x.ProcessModifiersBeforeOffset(x.GetStartOffset(id))
+            x.ProcessModifiersBeforeOffset(x.GetStartOffset(lid.Head))
         mark
 
     member x.StartException (SynExceptionDefnRepr(_,UnionCase(_,id,unionCaseType,_,_,_),_,_,_,range)) =
@@ -161,8 +162,8 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         mark
 
     member x.ProcessModifiersBeforeOffset (endOffset: int) =
-        let mark = x.Builder.Mark()
-        x.AdvanceToOffset endOffset
+        let mark = x.Mark()
+        x.AdvanceToOffset(endOffset)
         x.Done(mark, ElementType.ACCESS_MODIFIERS)
 
     member x.StartType attrs typeParams (lid: LongIdent) range =
@@ -178,14 +179,11 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
 
             x.ProcessModifiersBeforeOffset (min idOffset typeParamsOffset)
 
-            // Needs to advance past id range due to implicit ctor range in class includes id.
             let paramsInBraces = idOffset < typeParamsOffset
-            if paramsInBraces then
-                x.AdvanceToEnd(id.idRange)
-                x.ProcessTypeParametersOfType typeParams range paramsInBraces
-            else
-                x.ProcessTypeParametersOfType typeParams range paramsInBraces
-                x.AdvanceToEnd(id.idRange)
+            x.ProcessTypeParametersOfType typeParams range paramsInBraces
+
+            // Needs to advance past id range due to implicit ctor range in class includes id.
+            x.AdvanceToEnd(id.idRange)
         mark
 
     member x.ProcessTypeParametersOfType typeParams range paramsInBraces =
@@ -219,8 +217,9 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
             x.ProcessUnionCase(case)
         x.Done(range, casesListMark, ElementType.UNION_CASES_LIST)
 
-    member x.ProcessUnionCase (UnionCase(_,id,caseType,_,_,range)) =
-        let mark = x.Mark(range)
+    member x.ProcessUnionCase(UnionCase(attrs,id,caseType,_,_,range)) =
+        let mark = x.MarkTokenOrRange(FSharpTokenType.BAR, range)
+        x.ProcessAttributes(attrs)
         let hasFields = x.ProcessUnionCaseType(caseType)
         let elementType = if hasFields then ElementType.NESTED_TYPE_UNION_CASE_DECLARATION
                                        else ElementType.SINGLETON_CASE_DECLARATION
@@ -231,6 +230,10 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         | SynExpr.LongIdent(_,lid,_,_) -> x.ProcessLongIdentifier lid.Lid
         | SynExpr.Paren(expr,_,_,_) -> x.ProcessAttributeArg expr
         | _ -> () // we need to cover only these cases for now
+
+    member x.ProcessAttributes(attrs) =
+        for attr in attrs do
+            x.ProcessAttribute(attr)
 
     member x.ProcessAttribute (attr: SynAttribute) =
         let mark = x.Mark(attr.Range)
@@ -250,7 +253,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         let mark =
             match id with
             | Some id ->
-                x.AdvanceToOffset (min (x.GetStartOffset id) (x.GetStartOffset range))
+                x.AdvanceToOffset(min (x.GetStartOffset id) (x.GetStartOffset range))
                 x.Mark()
             | None ->
                 x.Mark(range)
