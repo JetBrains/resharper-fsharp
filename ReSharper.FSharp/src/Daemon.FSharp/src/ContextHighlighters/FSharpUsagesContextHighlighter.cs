@@ -13,7 +13,6 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi.DataContext;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
@@ -43,46 +42,65 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
       HighlightingsConsumer consumer)
     {
       var psiView = psiDocumentRangeView.View<FSharpLanguage>();
-      var fsFile = psiView.GetSelectedTreeNode<IFSharpFile>();
-      if (fsFile == null)
-        return;
-
       var document = psiDocumentRangeView.DocumentRangeFromMainDocument.Document;
       var token = psiView.GetSelectedTreeNode<FSharpIdentifierToken>();
       if (token == null)
         return;
 
       // todo: type parameters: t<$caret$type> or t<'$caret$ttype>
-      // todo: namespaces, use R# search?
+
+      var fsFile = psiView.GetSelectedTreeNode<IFSharpFile>();
+      var sourceFile = fsFile?.GetSourceFile();
+      if (sourceFile == null)
+        return;
 
       var offset = token.GetTreeStartOffset().Offset;
       var symbol = fsFile.GetSymbolDeclaration(offset) ?? fsFile.GetSymbolUse(offset)?.Symbol;
       if (symbol == null)
         return;
 
-      var sourceFile = fsFile.GetSourceFile();
-      if (sourceFile == null)
-        return;
+      var isActivePatternCase = symbol is FSharpActivePatternCase;
 
       var checkResults =
         fsFile.CheckerService.TryGetStaleCheckResults(sourceFile)?.Value ??
         fsFile.GetParseAndCheckResults(true)?.Value.CheckResults;
 
       var symbolUsages = checkResults?.GetUsesOfSymbolInFile(symbol).RunAsTask();
+      if (symbolUsages == null)
+        return;
 
-      foreach (var symbolUse in symbolUsages ?? EmptyArray<FSharpSymbolUse>.Instance)
+      foreach (var symbolUse in symbolUsages)
       {
         var treeOffset = document.GetTreeEndOffset(symbolUse.RangeAlternate);
-        var usageToken = fsFile.FindTokenAt(treeOffset - 1) as FSharpIdentifierToken;
+        var usageToken = fsFile.FindTokenAt(treeOffset - 1);
         if (usageToken == null)
           continue;
 
-        var tokenType = usageToken.GetTokenType();
+        if (isActivePatternCase && symbolUse.IsFromDefinition)
+        {
+          if (!(symbolUse.Symbol is FSharpActivePatternCase useSymbol))
+            continue;
+
+          if (useSymbol.DeclarationLocation.Equals(symbolUse.RangeAlternate))
+          {
+            var caseDeclaration = usageToken.GetContainingNode<IActivePatternId>()?.Cases[useSymbol.Index];
+            if (caseDeclaration != null)
+            {
+              consumer.ConsumeHighlighting(HighlightingId, caseDeclaration.GetDocumentRange());
+              continue;
+            }
+          }
+        }
+
+        if (!(usageToken is FSharpIdentifierToken identToken))
+          continue;
+
+        var tokenType = identToken.GetTokenType();
         if ((tokenType == FSharpTokenType.GREATER || tokenType == FSharpTokenType.GREATER_RBRACK) &&
             !(symbol is FSharpMemberOrFunctionOrValue mfv && mfv.CompiledName == StandardOperatorNames.GreaterThan))
           continue; // found usage of generic symbol with specified type parameter
 
-        consumer.ConsumeHighlighting(HighlightingId, usageToken.GetDocumentRange());
+        consumer.ConsumeHighlighting(HighlightingId, identToken.GetDocumentRange());
       }
     }
   }

@@ -48,6 +48,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
           if (myDocument.Buffer.GetText(resolvedSymbolUse.Range) == "new" &&
               mfv.LogicalName == StandardMemberNames.Constructor)
             continue;
+          
+          if (mfv.IsActivePattern)
+            continue;
         }
 
         var documentRange = new DocumentRange(myDocument, resolvedSymbolUse.Range);

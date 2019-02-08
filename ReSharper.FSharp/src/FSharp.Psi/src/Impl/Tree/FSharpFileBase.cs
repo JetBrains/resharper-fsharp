@@ -139,8 +139,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
                   continue;
 
                 var caseRange = caseDeclaration.GetTreeTextRange();
-                var caseTextRange = new TextRange(caseRange.StartOffset.Offset, caseRange.EndOffset.Offset);
-                resolvedSymbols.Declarations[startOffset] = new FSharpResolvedSymbolUse(symbolUse, caseTextRange);
+                var caseStartOffset = caseRange.StartOffset.Offset;
+                var caseTextRange = new TextRange(caseStartOffset, caseRange.EndOffset.Offset);
+                resolvedSymbols.Declarations[caseStartOffset] = new FSharpResolvedSymbolUse(symbolUse, caseTextRange);
                 continue;
               }
               else
