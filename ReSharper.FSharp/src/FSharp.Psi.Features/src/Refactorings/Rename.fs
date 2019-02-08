@@ -78,11 +78,9 @@ type FSharpRenameHelper() =
             while (pat.Parent :? ISynPat) && not (pat.Parent :? ILongIdentPat && (pat.Parent :?> ISynPat).IsDeclaration) do
                 pat <- pat.Parent :?> ISynPat
 
-            let declarartions = pat.Declarations |> Array.ofSeq
-
-            declarartions
-            |> Array.filter (fun d -> d.DeclaredName = localNamedPat.ShortName)
+            pat.Declarations
             |> Seq.cast<IDeclaredElement>
+            |> Seq.filter (fun decl -> decl != element && decl.ShortName = element.ShortName)
 
         | _ -> EmptyArray.Instance :> _
     
