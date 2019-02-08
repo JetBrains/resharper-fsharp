@@ -132,6 +132,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       if (identifier == null)
         return TreeTextRange.InvalidRange;
 
+      if (identifier is IActivePatternId activePatternId)
+        return activePatternId.GetCasesRange();
+
       var nameRange = identifier.GetTreeTextRange();
       var identifierToken = identifier.IdentifierToken;
       if (identifierToken == null)

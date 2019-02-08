@@ -1,7 +1,11 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
@@ -34,6 +38,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       return index >= 0 && index < cases.Count
         ? null
         : cases[index] as IActivePatternCaseDeclaration;
+    }
+
+    public IList<IActivePatternCaseDeclaration> NamedCases =>
+      Cases.OfType<IActivePatternCaseDeclaration>().AsList();
+
+    public TreeTextRange GetCasesRange()
+    {
+      var nameRange = this.GetTreeTextRange();
+      var cases = NamedCases;
+      if (cases.IsEmpty())
+        return nameRange;
+
+      var firstRange = cases[0].NameIdentifier.GetNameRange();
+      var lastRange = cases.Last().NameIdentifier.GetNameRange();
+
+      return firstRange.IsValid() && lastRange.IsValid()
+        ? new TreeTextRange(firstRange.StartOffset, lastRange.EndOffset)
+        : nameRange;
     }
   }
 }
