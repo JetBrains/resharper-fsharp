@@ -71,11 +71,16 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         x.Advance()
         x.Done(caseMark, elementType)
 
+    member x.MarkTokenOrRange(tokenType, range: Range.range) =
+        let rangeStart = x.GetStartOffset(range)
+        x.AdvanceToTokenOrOffset tokenType rangeStart
+        x.Mark()
+    
     member x.AdvanceToOffset offset =
         while x.Builder.GetTokenOffset() < offset && not x.Eof do x.Advance()
 
-    member x.AdvanceToTokenOrOffset (keywordType: TokenNodeType) (maxOffset: int) =
-        while x.Builder.GetTokenOffset() < maxOffset && x.Builder.GetTokenType() != keywordType do
+    member x.AdvanceToTokenOrOffset (tokenType: TokenNodeType) (maxOffset: int) =
+        while x.Builder.GetTokenOffset() < maxOffset && x.Builder.GetTokenType() != tokenType do
             x.Advance()
 
     member x.ProcessLongIdentifier(lid: Ident list) =
@@ -185,9 +190,8 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
 
     member x.ProcessTypeParametersOfType typeParams range paramsInBraces =
         match typeParams with
-        | TyparDecl(_,(Typar(id,_,_))) :: _ ->
-            id.idRange |> x.GetStartOffset |> x.AdvanceToTokenOrOffset FSharpTokenType.LESS
-            let mark = x.Mark()
+        | TyparDecl(_,(Typar(IdentRange idRange,_,_))) :: _ ->
+            let mark = x.MarkTokenOrRange(FSharpTokenType.LESS, idRange)
             for p in typeParams do
                 x.ProcessTypeParameter(p, ElementType.TYPE_PARAMETER_OF_TYPE_DECLARATION)
             if paramsInBraces then

@@ -77,12 +77,9 @@ type FSharpDotSelection(file, document, range: TreeTextRange, parentRanges: Docu
 type FSharpSelectEmbracingConstructProvider() =
     let getRanges = function
         | TraverseStep.Expr(expr) -> [expr.Range]
-        | TraverseStep.Module(moduleDecl) -> [moduleDecl.Range]
-        | TraverseStep.ModuleOrNamespace(moduleOrNamespaceDecl) -> [moduleOrNamespaceDecl.Range]
         | TraverseStep.TypeDefn(typeDefn) -> [typeDefn.Range]
         | TraverseStep.MemberDefn(memberDefn) -> [memberDefn.Range]
-        | TraverseStep.MatchClause(matchClause) -> [matchClause.Range; matchClause.RangeOfGuardAndRhs]
-        | TraverseStep.Binding(binding) -> [binding.RangeOfHeadPat; binding.RangeOfBindingAndRhs; binding.RangeOfBindingSansRhs]
+        | _ -> []
 
     let mapLid (lid: LongIdent) =
         match lid with
@@ -90,8 +87,8 @@ type FSharpSelectEmbracingConstructProvider() =
         | id :: ids ->
             ids
             |> List.fold (fun acc id -> (id :: (List.head acc)) :: acc) [[id]]
-            |> List.map List.rev
             |> List.map (fun lid ->
+                let lid = List.rev lid
                 let range = Range.unionRanges (List.head lid).idRange (List.last lid).idRange
                 TraverseStep.Expr (SynExpr.LongIdent (false, LongIdentWithDots(lid, []), None, range)))
 
@@ -99,44 +96,47 @@ type FSharpSelectEmbracingConstructProvider() =
         member x.IsAvailable(sourceFile) = true
 
         member x.GetSelectedRange(sourceFile, documentRange) =
+            match sourceFile.GetFSharpFile() with
+            | null -> null
+            | fsFile ->
+
+            match fsFile.ParseTree with
+            | None -> null
+            | Some parseTree ->
+
             let mutable documentRange = documentRange
-            let fsFile = sourceFile.GetTheOnlyPsiFile() :?> IFSharpFile
-            match isNotNull fsFile, fsFile.ParseResults with
-            | true, Some parseResults when parseResults.ParseTree.IsSome ->
-                let document = documentRange.Document
-                let pos = document.GetPos(documentRange.StartOffset.Offset)
-                let visitor = { new AstVisitorBase<_>() with
-                    // todo: cover more cases (inner expressions in bindings, match guards)
-                    member x.VisitExpr(path, _, defaultTraverse, expr) =
-                        match expr with
-                        | SynExpr.Ident _ | SynExpr.Const _ -> Some path
-                        | SynExpr.LongIdent (_, lid, _, _) -> Some (mapLid lid.Lid @ path)
-                        | _ -> defaultTraverse expr
-                     
-                    override this.VisitModuleDecl(defaultTraverse, decl) =
-                        match decl with
-                        | SynModuleDecl.Open(lid, range) -> Some(mapLid lid.Lid)
-                        | _ -> defaultTraverse decl }
+            let document = documentRange.Document
+            let pos = document.GetPos(documentRange.StartOffset.Offset)
+            let visitor = { new AstVisitorBase<_>() with
+                member x.VisitExpr(path, _, defaultTraverse, expr) =
+                    match expr with
+                    | SynExpr.Ident _ | SynExpr.Const _ -> Some path
+                    | SynExpr.LongIdent (_, lid, _, _) -> Some (mapLid lid.Lid @ path)
+                    | _ -> defaultTraverse expr
 
-                let containingDeclarations =
-                    match fsFile.FindTokenAt(documentRange.EndOffset) with
-                    | null -> []
-                    | token ->
-                        let rec getParents = function
-                            | null -> []
-                            | (t: ITreeNode) -> t.GetDocumentRange() :: getParents t.Parent
-                        getParents token
+                override this.VisitModuleDecl(defaultTraverse, decl) =
+                    match decl with
+                    | SynModuleDecl.Open(lid, range) -> Some(mapLid lid.Lid)
+                    | _ -> defaultTraverse decl }
 
-                let ranges =
-                    match Traverse(pos, parseResults.ParseTree.Value, visitor) with
-                    | Some traversePath ->
-                        List.map getRanges traversePath
-                        |> List.concat
-                        |> List.map (fun r -> r.ToDocumentRange(document))
-                    | None -> []
-                    |> List.append containingDeclarations
-                    |> List.filter (fun r -> r.Contains(&documentRange))
-                    |> List.sortBy (fun r -> r.Length)
+            let containingDeclarations =
+                match fsFile.FindTokenAt(documentRange.StartOffset) with
+                | null -> []
+                | token ->
+                    let rec getParents = function
+                        | null -> []
+                        | (t: ITreeNode) -> t.GetDocumentRange() :: getParents t.Parent
+                    getParents token
 
-                FSharpDotSelection(fsFile, document, fsFile.Translate(documentRange), ranges) :> _
-            | _ -> null
+            let ranges =
+                match Traverse(pos, parseTree, visitor) with
+                | Some traversePath ->
+                    List.map getRanges traversePath
+                    |> List.concat
+                    |> List.map (fun r -> r.ToDocumentRange(document))
+                | None -> []
+                |> List.append containingDeclarations
+                |> List.filter (fun r -> r.Contains(&documentRange))
+                |> List.sortBy (fun r -> r.Length)
+
+            FSharpDotSelection(fsFile, document, fsFile.Translate(documentRange), ranges) :> _

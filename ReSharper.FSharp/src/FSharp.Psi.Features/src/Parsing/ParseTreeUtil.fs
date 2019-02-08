@@ -24,7 +24,7 @@ type SynMemberDefn with
 
 let letStartPos (bindings: SynBinding list) (range: Range.range) =
     match bindings with
-    | binding :: _ -> binding.StartPos
+    | Binding(_, _, _, _, { Range = r } :: _, _, _, _, _, _, _ , _) :: _ -> r.Start
     | _ -> range.Start
 
 let rec (|Apps|_|) = function

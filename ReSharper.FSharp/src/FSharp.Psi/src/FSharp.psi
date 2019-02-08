@@ -236,6 +236,9 @@ otherPat options { stubBase="SynPatternBase"; }:
 interface synExpr:
   expr;
 
+matchClause options { stubBase="DummyExpression"; }:
+  fakeSeparator;
+
 expr options { stubBase="DummyExpression"; }:
   fakeSeparator;
 
