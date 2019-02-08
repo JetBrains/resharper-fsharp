@@ -14,5 +14,6 @@ type FSharpOccurenceKindTest() =
     override x.GetProjectProperties(targetFrameworkIds, flavours) =
         FSharpProjectPropertiesFactory.CreateProjectProperties(targetFrameworkIds)
 
+    [<Test>] member x.``Import 01``() = x.DoNamedTest()
     [<Test>] member x.``Unions 01``() = x.DoNamedTest()
     [<Test>] member x.``Type arguments 01``() = x.DoNamedTest()

@@ -9,6 +9,7 @@ open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
 type FSharpItemOccurrenceKind() =
+    static member val Import = OccurrenceKind("Module or namespace import", OccurrenceKind.SemanticAxis)
     static member val Pattern = OccurrenceKind("Pattern", OccurrenceKind.SemanticAxis)
     static member val TypeSpecification = OccurrenceKind("Type specification", OccurrenceKind.SemanticAxis)
 
@@ -42,6 +43,7 @@ type FSharpItemOccurenceKindProvider() =
 
             if symbolUse.IsFromType then [| FSharpItemOccurrenceKind.TypeSpecification |] :> _ else
             if symbolUse.IsFromPattern then [| FSharpItemOccurrenceKind.Pattern |] :> _ else
+            if symbolUse.IsFromOpenStatement then [| FSharpItemOccurrenceKind.Import |] :> _ else
 
             match symbolUse.Symbol with
             | :? FSharpUnionCase -> [| OccurrenceKind.NewInstanceCreation |] :> _
@@ -54,6 +56,7 @@ type FSharpItemOccurenceKindProvider() =
         member x.GetAllPossibleOccurrenceKinds() =
             [| OccurrenceKind.ExtendedType
                OccurrenceKind.NewInstanceCreation
+               FSharpItemOccurrenceKind.Import
                FSharpItemOccurrenceKind.Pattern
                FSharpItemOccurrenceKind.TypeSpecification
                CSharpSpecificOccurrenceKinds.TypeArgument
