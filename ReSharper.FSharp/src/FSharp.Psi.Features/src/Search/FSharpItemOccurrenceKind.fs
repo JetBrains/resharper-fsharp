@@ -5,6 +5,8 @@ open JetBrains.ReSharper.Feature.Services.Occurrences
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
@@ -16,6 +18,30 @@ type FSharpItemOccurrenceKind() =
 
 [<SolutionComponent>]
 type FSharpItemOccurenceKindProvider() =
+
+    let getTypeUsageKind (node: ITreeNode) =
+        if isNull node then null else
+
+        let typeArgument = node.GetContainingNode<ITypeArgumentList>() 
+        if isNotNull typeArgument then CSharpSpecificOccurrenceKinds.TypeArgument else
+
+        let isInstPat = node.GetContainingNode<IIsInstPat>() 
+        if isNotNull isInstPat then CSharpSpecificOccurrenceKinds.TypeChecking else
+
+        let typeTest = node.GetContainingNode<ITypeTestExpr>()
+        if isNotNull typeTest && node.IsChildOf(typeTest.Type) then CSharpSpecificOccurrenceKinds.TypeChecking else
+
+        let castExpr = node.GetContainingNode<ICastExpr>()
+        if isNotNull castExpr && node.IsChildOf(castExpr.Type) then CSharpSpecificOccurrenceKinds.TypeConversions else
+
+        let typeInherit = node.GetContainingNode<ITypeInherit>()
+        if isNotNull typeInherit then OccurrenceKind.ExtendedType else
+
+        let interfaceInherit = node.GetContainingNode<IInterfaceInherit>()
+        if isNotNull interfaceInherit then OccurrenceKind.ExtendedType else
+
+        null
+    
     interface IOccurrenceKindProvider with
         member x.GetOccurrenceKinds(occurrence: IOccurrence) =
             match occurrence.As<ReferenceOccurrence>() with
@@ -26,22 +52,18 @@ type FSharpItemOccurenceKindProvider() =
             | null -> EmptyList.Instance :> _
             | symbolReference ->
 
-            let referenceNode = symbolReference.GetTreeNode()
-            if isNotNull referenceNode && isNotNull (referenceNode.GetContainingNode<ITypeArgumentList>()) then
-                [| CSharpSpecificOccurrenceKinds.TypeArgument |] :> _ else
-
-            if isNotNull referenceNode && isNotNull (referenceNode.GetContainingNode<IIsInstPat>()) then
-                [| CSharpSpecificOccurrenceKinds.TypeChecking |] :> _ else
-
-            if isNotNull referenceNode &&
-               (isNotNull (referenceNode.GetContainingNode<ITypeInherit>()) ||
-                isNotNull (referenceNode.GetContainingNode<IInterfaceInherit>())) then
-                [| OccurrenceKind.ExtendedType |] :> _ else
-
             let symbolUse = symbolReference.GetSymbolUse()
             if isNull (box symbolUse) then EmptyList.Instance :> _ else
 
-            if symbolUse.IsFromType then [| FSharpItemOccurrenceKind.TypeSpecification |] :> _ else
+            let isFromType = symbolUse.IsFromType
+
+            let kind =
+                if not isFromType then null else 
+                let referenceNode = symbolReference.GetTreeNode()
+                getTypeUsageKind referenceNode
+
+            if isNotNull kind then [| kind |] :> _ else
+            if isFromType then [| FSharpItemOccurrenceKind.TypeSpecification |] :> _ else
             if symbolUse.IsFromPattern then [| FSharpItemOccurrenceKind.Pattern |] :> _ else
             if symbolUse.IsFromOpenStatement then [| FSharpItemOccurrenceKind.Import |] :> _ else
 

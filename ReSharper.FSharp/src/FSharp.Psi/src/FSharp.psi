@@ -189,7 +189,7 @@ localLongIdentPat options { stubBase="LocalPatternDeclarationBase"; }:
 typedPat options { stubBase="SynPatternBase"; }:
   synPat<PATTERN, Pattern>
   COLON
-  typeExpression;
+  synType;
 
 orPat options { stubBase="SynPatternBase"; }:
   synPat<PATTERN1, Pattern1>
@@ -234,12 +234,33 @@ otherPat options { stubBase="SynPatternBase"; }:
 
 
 interface synExpr:
-  expr;
+  typeTestExpr |
+  castExpr |
+  otherExpr;
+
+interface castExpr:
+  upcastExpr |
+  downcastExpr;
 
 matchClause options { stubBase="DummyExpression"; }:
   fakeSeparator;
 
-expr options { stubBase="DummyExpression"; }:
+typeTestExpr options { stubBase="DummyExpression"; }:
+  synExpr<EXPR, Expression>
+  COLON_QMARK
+  synType<TYPE, Type>;
+
+upcastExpr options { stubBase="DummyExpression"; }:
+  synExpr<EXPR, Expression>
+  COLON_GREATER
+  synType<TYPE, Type>;
+  
+downcastExpr options { stubBase="DummyExpression"; }:
+  synExpr<EXPR, Expression>
+  COLON_QMARK_GREATER
+  synType<TYPE, Type>;
+
+otherExpr options { stubBase="DummyExpression"; }:
   fakeSeparator;
 
 
@@ -648,13 +669,14 @@ localDeclaration options { stubBase="LocalDeclarationBase"; }:
   identOrOpName{IDENTIFIER, Identifier};
 
 
-typeExpression:
+interface synType:
   namedTypeExpression |
-  otherTypeExpression;
+  otherType;
 
 
 namedTypeExpression:
   longIdentifier<LONG_IDENTIFIER, LongIdentifier> fakeSeparator
   typeArgumentList?;
 
-otherTypeExpression: FAKE;
+otherType:
+  fakeSeparator;

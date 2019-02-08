@@ -27,3 +27,7 @@ type IFSharpFile with
         match x.ParseResults with
         | Some parseResults -> parseResults.ParseTree
         | _ -> None
+
+type ITreeNode with
+        member x.IsChildOf(node: ITreeNode) =
+            if isNull node then false else node.Contains(x)

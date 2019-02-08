@@ -1,0 +1,25 @@
+﻿Other
+---
+TO: [O] module |Module| RANGE: (7,13) @ Type Cast 01.fs
+TO: [O] let |o1| = "" :> obj RANGE: (21,23) @ Type Cast 01.fs
+TO: [O] let |o2| = "" :> System.Object RANGE: (41,43) @ Type Cast 01.fs
+TO: [O] let o2 = "" :> |System|.Object RANGE: (52,58) @ Type Cast 01.fs
+TO: [O] let |s1| = obj() :?> string RANGE: (73,75) @ Type Cast 01.fs
+TO: [O] let |s2| = obj() :?> System.String RANGE: (100,102) @ Type Cast 01.fs
+TO: [O] let s2 = obj() :?> |System|.String RANGE: (115,121) @ Type Cast 01.fs
+
+
+Type conversions
+---
+TO: [O] let o1 = "" :> |obj| RANGE: (32,35) @ Type Cast 01.fs
+TO: [O] let o2 = "" :> System.|Object| RANGE: (59,65) @ Type Cast 01.fs
+TO: [O] let s1 = obj() :?> |string| RANGE: (88,94) @ Type Cast 01.fs
+TO: [O] let s2 = obj() :?> System.|String| RANGE: (122,128) @ Type Cast 01.fs
+
+
+New instance creation
+---
+TO: [O] let s1 = |obj|() :?> string RANGE: (78,81) @ Type Cast 01.fs
+TO: [O] let s2 = |obj|() :?> System.String RANGE: (105,108) @ Type Cast 01.fs
+
+

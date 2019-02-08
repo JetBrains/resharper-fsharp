@@ -1,0 +1,42 @@
+﻿Other
+---
+TO: [O] module |Module| RANGE: (7,13) @ Type Argument 01.fs
+TO: [O] let |l|: List<string> = List<string>() RANGE: (56,57) @ Type Argument 01.fs
+TO: [O] | :? IList<|System|.String> -> () RANGE: (147,153) @ Type Argument 01.fs
+
+
+Module or namespace import
+---
+TO: [O] open |System|.Collections.Generic RANGE: (22,28) @ Type Argument 01.fs
+TO: [O] open System.|Collections|.Generic RANGE: (29,40) @ Type Argument 01.fs
+TO: [O] open System.Collections.|Generic| RANGE: (41,48) @ Type Argument 01.fs
+
+
+Type specification
+---
+TO: [O] let l: |List|<string> = List<string>() RANGE: (59,63) @ Type Argument 01.fs
+TO: [O] let l: List<|string|> = List<string>() RANGE: (64,70) @ Type Argument 01.fs
+
+
+New instance creation
+---
+TO: [O] let l: List<string> = |List|<string>() RANGE: (74,78) @ Type Argument 01.fs
+TO: [O] match |obj|() with RANGE: (98,101) @ Type Argument 01.fs
+
+
+Type argument
+---
+TO: [O] let l: List<string> = List<|string|>() RANGE: (79,85) @ Type Argument 01.fs
+TO: [O] | :? IList<|string|> -> () RANGE: (121,127) @ Type Argument 01.fs
+TO: [O] | :? IList<System.|String|> -> () RANGE: (154,160) @ Type Argument 01.fs
+TO: [O] | :? IList<|string| * int> -> () RANGE: (180,186) @ Type Argument 01.fs
+TO: [O] | :? IList<string * |int|> -> () RANGE: (189,192) @ Type Argument 01.fs
+
+
+Type checking
+---
+TO: [O] | :? |IList|<string> -> () RANGE: (115,120) @ Type Argument 01.fs
+TO: [O] | :? |IList|<System.String> -> () RANGE: (141,146) @ Type Argument 01.fs
+TO: [O] | :? |IList|<string * int> -> () RANGE: (174,179) @ Type Argument 01.fs
+
+
