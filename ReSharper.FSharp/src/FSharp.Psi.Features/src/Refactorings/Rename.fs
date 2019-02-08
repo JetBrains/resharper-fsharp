@@ -1,19 +1,19 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings.Rename
 
-open System
 open JetBrains.Application
 open JetBrains.ReSharper.Feature.Services.Refactorings.Specific.Rename
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Naming.Impl
 open JetBrains.ReSharper.Psi.Resolve
-open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Refactorings.Rename
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
+open Microsoft.FSharp.Compiler.PrettyNaming
 
 [<AutoOpen>]
 module Util =
@@ -113,8 +113,13 @@ type FSharpAtomicRenamesFactory() =
 
     override x.CheckRenameAvailability(element: IDeclaredElement) =
         match element with
-        | :? IFSharpLocalDeclaration -> RenameAvailabilityCheckResult.CanBeRenamed
-        | _ -> RenameAvailabilityCheckResult.CanBeRenamed // todo: add more checks (e.g. for active pattern)
+        | :? FSharpGeneratedMemberBase -> RenameAvailabilityCheckResult.CanNotBeRenamed
+        | _ ->
+
+        match element.ShortName with
+        | SharedImplUtil.MISSING_DECLARATION_NAME -> RenameAvailabilityCheckResult.CanNotBeRenamed
+        | name when IsActivePatternName name -> RenameAvailabilityCheckResult.CanNotBeRenamed
+        | _ -> RenameAvailabilityCheckResult.CanBeRenamed
 
     override x.CreateAtomicRenames(declaredElement, newName, doNotAddBindingConflicts) =
         [| FSharpAtomicRename(declaredElement, newName, doNotAddBindingConflicts) :> AtomicRenameBase |] :> _

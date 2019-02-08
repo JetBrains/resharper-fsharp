@@ -82,3 +82,5 @@ type FSharpRenameTest() =
     [<Test>] member x.``Active patterns - Type private 01 - Partial``() = x.DoNamedTest()
     [<Test>] member x.``Active patterns - Type private 02 - Single``() = x.DoNamedTest()
     [<Test>] member x.``Active patterns - Type private 03 - Total``() = x.DoNamedTest()
+
+    [<Test>] member x.``Active patterns - Unavailable``() = x.DoNamedTest()
