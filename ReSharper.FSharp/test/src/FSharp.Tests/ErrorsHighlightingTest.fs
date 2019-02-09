@@ -2,8 +2,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 
 open JetBrains.ReSharper.FeaturesTestFramework.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Tests
+open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
 [<FSharpTest>]
@@ -31,3 +33,6 @@ type ErrorsHighlightingTest() =
     [<Test>] member x.``Use not allowed 02 - primary ctor``() = x.DoNamedTest()
 
     [<Test>] member x.``Error - no inherit lid``() = x.DoNamedTest()
+
+    [<TestFileExtension(FSharpScriptProjectFileType.FsxExtension)>]
+    [<Test>] member x.``Unused value in script``() = x.DoNamedTest()

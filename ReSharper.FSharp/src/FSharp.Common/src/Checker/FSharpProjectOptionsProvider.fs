@@ -190,12 +190,14 @@ type FSharpProjectOptionsProvider
 [<SolutionComponent>]
 type FSharpScriptOptionsProvider(logger: ILogger, checkerService: FSharpCheckerService) =
     let getScriptOptionsLock = obj()
+    let otherFlags = [| "--warnon:1182" |]
 
     member x.GetScriptOptions(file: IPsiSourceFile) =
         let filePath = file.GetLocation().FullPath
         let source = file.Document.GetText()
         lock getScriptOptionsLock (fun _ ->
-        let getScriptOptionsAsync = checkerService.Checker.GetProjectOptionsFromScript(filePath, source)
+        let getScriptOptionsAsync =
+            checkerService.Checker.GetProjectOptionsFromScript(filePath, source, otherFlags = otherFlags)
         try
             let options, errors = getScriptOptionsAsync.RunAsTask()
             if not errors.IsEmpty then

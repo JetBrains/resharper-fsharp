@@ -33,7 +33,9 @@ type FSharpTestAttribute() =
         member x.Extension = FSharpProjectFileType.FsExtension
 
 [<SolutionComponent>]
-type FSharpTestProjectOptionsProvider(lifetime: Lifetime, checkerService: FSharpCheckerService) as this =
+type FSharpTestProjectOptionsProvider
+        (lifetime: Lifetime, checkerService: FSharpCheckerService,
+         scriptOptionsProvider: FSharpScriptOptionsProvider) as this =
     do
         checkerService.OptionsProvider <- this
         lifetime.OnTermination(fun _ -> checkerService.OptionsProvider <- Unchecked.defaultof<_>) |> ignore
@@ -57,9 +59,13 @@ type FSharpTestProjectOptionsProvider(lifetime: Lifetime, checkerService: FSharp
     interface IHideImplementation<FSharpProjectOptionsProvider>
     
     interface IFSharpProjectOptionsProvider with
-        member x.HasPairFile(file) = false
-        member x.GetProjectOptions(file) =
-            let path = getPath file
+        member x.HasPairFile(sourceFile) = false
+
+        member x.GetProjectOptions(sourceFile) =
+            if sourceFile.LanguageType.Is<FSharpScriptProjectFileType>() then
+                scriptOptionsProvider.GetScriptOptions(sourceFile) else
+
+            let path = getPath sourceFile
             let projectOptions = getProjectOptions path [||] 
             Some projectOptions
 
