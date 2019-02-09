@@ -20,8 +20,6 @@ type FSharpItemOccurrenceKind() =
 type FSharpItemOccurenceKindProvider() =
 
     let getTypeUsageKind (node: ITreeNode) =
-        if isNull node then null else
-
         let typeArgument = node.GetContainingNode<ITypeArgumentList>() 
         if isNotNull typeArgument then CSharpSpecificOccurrenceKinds.TypeArgument else
 
@@ -33,9 +31,6 @@ type FSharpItemOccurenceKindProvider() =
 
         let castExpr = node.GetContainingNode<ICastExpr>()
         if isNotNull castExpr && node.IsChildOf(castExpr.Type) then CSharpSpecificOccurrenceKinds.TypeConversions else
-
-        let typeInherit = node.GetContainingNode<ITypeInherit>()
-        if isNotNull typeInherit then OccurrenceKind.ExtendedType else
 
         let interfaceInherit = node.GetContainingNode<IInterfaceInherit>()
         if isNotNull interfaceInherit then OccurrenceKind.ExtendedType else
@@ -56,10 +51,10 @@ type FSharpItemOccurenceKindProvider() =
             if isNull (box symbolUse) then EmptyList.Instance :> _ else
 
             let isFromType = symbolUse.IsFromType
+            let referenceNode = symbolReference.GetTreeNode()
 
             let kind =
-                if not isFromType then null else 
-                let referenceNode = symbolReference.GetTreeNode()
+                if not isFromType then null else
                 getTypeUsageKind referenceNode
 
             if isNotNull kind then [| kind |] :> _ else
@@ -71,6 +66,8 @@ type FSharpItemOccurenceKindProvider() =
             | :? FSharpUnionCase -> [| OccurrenceKind.NewInstanceCreation |] :> _
 
             | :? FSharpMemberOrFunctionOrValue as mfv when mfv.IsConstructor ->
+                let typeInherit = referenceNode.GetContainingNode<ITypeInherit>()
+                if isNotNull typeInherit then [| OccurrenceKind.ExtendedType |] :> _ else
                 [| OccurrenceKind.NewInstanceCreation |] :> _
 
             | _ -> EmptyList.Instance :> _
