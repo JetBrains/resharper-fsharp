@@ -26,3 +26,4 @@ type FSharpOccurenceKindTest() =
 
     [<Test>] member x.``Write 01 - Mutable binding``() = x.DoNamedTest()
     [<Test>] member x.``Write 02 - Val field``() = x.DoNamedTest()
+    [<Test>] member x.``Write 03 - Record fields``() = x.DoNamedTest()

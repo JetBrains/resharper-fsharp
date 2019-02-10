@@ -373,14 +373,28 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
             for e in exprs do
                 x.ProcessLocalExpression(e)
 
-        | SynExpr.Record(_,copyInfoOpt,fields,_) ->
+        | SynExpr.Record(_,copyInfoOpt,fields,range) ->
+            let mark = x.Mark(range)
             match copyInfoOpt with
-            | Some (expr,_) -> x.ProcessLocalExpression expr
+            | Some (expr,_) -> x.MarkOtherExpr(expr)
             | _ -> ()
 
-            // todo: mark name for getting reference access type
-            for name, expr, _ in fields do
-                if expr.IsSome then x.ProcessLocalExpression expr.Value
+            for (lid, _), expr, _ in fields do
+                let lid = lid.Lid
+                match lid, expr with
+                | [], None -> ()
+                | [], Some (ExprRange range as expr) ->
+                    let mark = x.Mark(range)
+                    x.MarkOtherExpr(expr)
+                    x.Done(mark, ElementType.RECORD_EXPR_BINDING)
+
+                | IdentRange headRange :: _, expr ->
+                    let mark = x.Mark(headRange)
+                    x.ProcessLongIdentifier(lid)
+                    if expr.IsSome then
+                        x.MarkOtherExpr(expr.Value)
+                    x.Done(mark, ElementType.RECORD_EXPR_BINDING)
+            x.Done(range, mark, ElementType.RECORD_EXPR)
 
         | SynExpr.New(_,t,expr,_) ->
             x.ProcessSynType(t)

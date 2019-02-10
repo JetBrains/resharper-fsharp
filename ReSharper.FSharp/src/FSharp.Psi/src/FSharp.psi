@@ -235,6 +235,7 @@ otherPat options { stubBase="SynPatternBase"; }:
 
 interface synExpr:
   constExpr |
+  recordExpr |
   setExpr |
   typeTestExpr |
   castExpr |
@@ -250,6 +251,20 @@ interface castExpr:
 
 constExpr options { stubBase="DummyExpression"; }:
   fakeSeparator;
+
+recordExpr options { stubBase="DummyExpression"; }:
+  (
+    synExpr<COPY_INFO, CopyInfo>
+    WITH
+  )?
+  recordExprBinding<BINDING, ExprBindings>*;
+
+
+recordExprBinding:
+  longIdentifier<LONG_IDENTIFIER, LongIdentifier>
+  EQUALS
+  synExpr<EXPR, Expression>
+  SEMICOLON?;
 
 longIdentSetExpr options { stubBase="DummyExpression"; }:
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>
