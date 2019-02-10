@@ -357,7 +357,11 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
         | SynExpr.Quote(_,_,expr,_,_) ->
             x.ProcessLocalExpression expr
 
-        | SynExpr.Const(_) -> ()
+        | SynExpr.Const(synConst, range) ->
+            match synConst with
+            | SynConst.Unit ->
+                x.MarkAndDone(range, ElementType.CONST_EXPR)
+            | _ -> ()
 
         | SynExpr.Typed(expr,synType,_) ->
             x.ProcessLocalExpression expr

@@ -234,6 +234,7 @@ otherPat options { stubBase="SynPatternBase"; }:
 
 
 interface synExpr:
+  constExpr |
   typeTestExpr |
   castExpr |
   otherExpr;
@@ -241,6 +242,9 @@ interface synExpr:
 interface castExpr:
   upcastExpr |
   downcastExpr;
+
+constExpr options { stubBase="DummyExpression"; }:
+  fakeSeparator;
 
 matchClause options { stubBase="DummyExpression"; }:
   fakeSeparator;
