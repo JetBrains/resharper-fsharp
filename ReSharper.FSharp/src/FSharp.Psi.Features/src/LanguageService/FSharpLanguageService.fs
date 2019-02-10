@@ -1,7 +1,9 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService
 
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
+open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
@@ -47,3 +49,17 @@ type FSharpLanguageService
         match declaration with
         | :? INamedPat as namedPat -> namedPat.GetOffset()
         | _ -> base.CalcOffset(declaration)
+
+    override x.GetReferenceAccessType(element, reference) =
+        match reference.As<FSharpSymbolReference>() with
+        | null -> ReferenceAccessType.OTHER
+        | symbolReference ->
+
+        let referenceToken = symbolReference.Token
+        match referenceToken.GetContainingNode<ISetExpr>() with
+        | null -> ReferenceAccessType.OTHER
+        | setExpr ->
+
+        match setExpr.ReferenceIdentifier with
+        | token when token == referenceToken -> ReferenceAccessType.WRITE
+        | _ -> ReferenceAccessType.OTHER

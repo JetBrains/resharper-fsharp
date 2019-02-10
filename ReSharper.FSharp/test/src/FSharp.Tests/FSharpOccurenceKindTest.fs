@@ -16,6 +16,13 @@ type FSharpOccurenceKindTest() =
 
     [<Test>] member x.``Import 01``() = x.DoNamedTest()
     [<Test>] member x.``Unions 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Base Type 01``() = x.DoNamedTest()
+    [<Test>] member x.``Base Type 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Type Argument 01``() = x.DoNamedTest()
     [<Test>] member x.``Type Cast 01``() = x.DoNamedTest()
     [<Test>] member x.``Type Test 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Write 01 - Mutable binding``() = x.DoNamedTest()
+    [<Test>] member x.``Write 02 - Val field``() = x.DoNamedTest()

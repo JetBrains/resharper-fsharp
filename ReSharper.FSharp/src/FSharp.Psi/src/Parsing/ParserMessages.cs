@@ -19,9 +19,10 @@
     public const string IDS_IDENT_OR_OP_NAME = "";
     public const string IDS_ACTIVE_PATTERN_CASE = "";
     public const string IDS_ACTIVE_PATTERN_CASE_DECLARATION = "";
-    public const string IDS_SYN_TYPE = "";
-    public const string IDS_CAST_EXPR = "";
     public const string IDS_SYN_EXPR = "";
+    public const string IDS_SET_EXPR = "";
+    public const string IDS_CAST_EXPR = "";
+    public const string IDS_SYN_TYPE = "";
 
     public static string GetString(string id) => id;
     public static string GetExpectedMessage(string expectedSymbol) => string.Empty;

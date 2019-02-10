@@ -71,5 +71,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     public override ISymbolTable GetReferenceSymbolTable(bool useReferenceName) =>
       throw new System.NotImplementedException();
+
+    public ITokenNode Token => myOwner;
   }
 }

@@ -466,12 +466,23 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
         | SynExpr.Ident(_)
         | SynExpr.LongIdent(_) -> ()
 
-        | SynExpr.LongIdentSet(_,expr,_)
+        | SynExpr.LongIdentSet(lid,expr,range) ->
+            let mark = x.Mark(range)
+            x.ProcessLongIdentifier(lid.Lid)
+            x.MarkOtherExpr(expr)
+            x.Done(range, mark, ElementType.LONG_IDENT_SET_EXPR)
+
         | SynExpr.DotGet(expr,_,_,_) ->
             x.ProcessLocalExpression expr
 
-        | SynExpr.NamedIndexedPropertySet(_,expr1,expr2,_)
-        | SynExpr.DotSet(expr1,_,expr2,_) ->
+        | SynExpr.DotSet(expr1,lid,expr2,range) ->
+            let mark = x.Mark(range)
+            x.MarkOtherExpr(expr1)
+            x.ProcessLongIdentifier(lid.Lid)
+            x.ProcessLocalExpression(expr2)
+            x.Done(range, mark, ElementType.DOT_SET_EXPR)
+
+        | SynExpr.NamedIndexedPropertySet(_,expr1,expr2,_) ->
             x.ProcessLocalExpression expr1
             x.ProcessLocalExpression expr2
 

@@ -235,9 +235,14 @@ otherPat options { stubBase="SynPatternBase"; }:
 
 interface synExpr:
   constExpr |
+  setExpr |
   typeTestExpr |
   castExpr |
   otherExpr;
+
+interface setExpr:
+  longIdentSetExpr |
+  dotSetExpr;
 
 interface castExpr:
   upcastExpr |
@@ -245,6 +250,18 @@ interface castExpr:
 
 constExpr options { stubBase="DummyExpression"; }:
   fakeSeparator;
+
+longIdentSetExpr options { stubBase="DummyExpression"; }:
+  longIdentifier<LONG_IDENTIFIER, LongIdentifier>
+  LARROW<LARROW, LArrow>
+  synExpr<EXPR, Expression>;
+
+dotSetExpr options { stubBase="DummyExpression"; }:
+  synExpr<EXPR1, LeftExpr>
+  longIdentifier<LONG_IDENTIFIER, LongIdentifier>
+  LARROW<LARROW, LArrow>
+  synExpr<EXPR2, RightExpr>;
+
 
 matchClause options { stubBase="DummyExpression"; }:
   fakeSeparator;
