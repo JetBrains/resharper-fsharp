@@ -2,8 +2,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Common.Settings
 
 open JetBrains.Application.Settings
 open JetBrains.Application.UI.Options
-open JetBrains.DataFlow
 open JetBrains.IDE.UI.Options
+open JetBrains.Lifetimes
 open JetBrains.ProjectModel.Resources
 open JetBrains.ProjectModel.Settings.Schema
 open JetBrains.UI.RichText
