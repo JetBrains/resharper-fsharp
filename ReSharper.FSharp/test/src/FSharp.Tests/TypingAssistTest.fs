@@ -1,7 +1,7 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Tests.Features.TypingAssist
 
 open System.IO
-open JetBrains.DataFlow
+open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.FeaturesTestFramework.TypingAssist
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util

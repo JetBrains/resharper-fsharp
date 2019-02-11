@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using JetBrains.Application.changes;
-using JetBrains.DataFlow;
+using JetBrains.Lifetimes;
 using JetBrains.Util;
 using static Microsoft.FSharp.Compiler.AbstractIL.Internal.Library;
 

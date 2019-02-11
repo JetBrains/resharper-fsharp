@@ -9,7 +9,7 @@ open JetBrains.Application.Components
 open JetBrains.Application.DataContext
 open JetBrains.Application.PersistentMap
 open JetBrains.Application.Threading
-open JetBrains.DataFlow
+open JetBrains.Lifetimes
 open JetBrains.Platform.MsBuildHost.Models
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Caches

@@ -7,6 +7,7 @@ module rec CommonUtil =
     open System.Collections.Generic
     open JetBrains.DataFlow
     open JetBrains.DocumentModel
+    open JetBrains.Lifetimes
     open JetBrains.ProjectModel
     open JetBrains.ReSharper.Psi.Modules
     open JetBrains.Util

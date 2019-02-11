@@ -1,11 +1,10 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open System.IO
-open JetBrains.DataFlow
+open JetBrains.Lifetimes
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.TestFramework
-open JetBrains.Util
 open Microsoft.FSharp.Compiler.AbstractIL.Internal.Library
 open NUnit.Framework
 

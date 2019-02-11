@@ -3,7 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi.Settings
 open System
 open System.Linq.Expressions
 open JetBrains.Application.Settings
-open JetBrains.DataFlow
+open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.DataContext
 open JetBrains.ProjectModel.Settings.Schema

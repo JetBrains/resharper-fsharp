@@ -14,6 +14,7 @@ open JetBrains.DataFlow
 open JetBrains.DocumentManagers
 open JetBrains.DocumentManagers.impl
 open JetBrains.DocumentModel
+open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Assemblies.Impl
 open JetBrains.ProjectModel.Model2.Assemblies.Interfaces

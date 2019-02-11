@@ -4,7 +4,7 @@ open System
 open System.Collections.Generic
 open System.Text
 open System.Threading
-open JetBrains.DataFlow
+open JetBrains.Lifetimes
 open JetBrains.Platform.RdFramework.Util
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Host.Features

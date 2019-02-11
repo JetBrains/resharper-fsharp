@@ -1,8 +1,8 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Host
 
 open System.Linq
-open JetBrains.DataFlow
-open JetBrains.Platform.RdFramework
+open JetBrains.Core
+open JetBrains.Lifetimes
 open JetBrains.Platform.RdFramework.Util
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Host.Features
@@ -18,7 +18,7 @@ type FcsHost
         (lifetime: Lifetime, solution: ISolution, checkerService: FSharpCheckerService,
          sourceCache: FSharpSourceCache, itemsContainer: FSharpItemsContainer) =
 
-    let dumpSingleProjectMapping (rdVoid: RdVoid) =
+    let dumpSingleProjectMapping (rdVoid: Unit) =
         let projectMapping =
             itemsContainer.ProjectMappings.Values.SingleOrDefault().NotNull("Expected single project mapping.")
         projectMapping.DumpToString()

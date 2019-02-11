@@ -6,6 +6,7 @@ open JetBrains.Application
 open JetBrains.Application.Components
 open JetBrains.Application.Environment
 open JetBrains.DataFlow
+open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.BuildTools
 open JetBrains.ProjectModel.ProjectsHost.SolutionHost

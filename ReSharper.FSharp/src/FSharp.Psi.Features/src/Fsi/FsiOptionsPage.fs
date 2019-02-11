@@ -7,6 +7,7 @@ open JetBrains.Application
 open JetBrains.Application.UI.Options
 open JetBrains.Application.UI.Options.OptionsDialog.SimpleOptions.ViewModel
 open JetBrains.DataFlow
+open JetBrains.Lifetimes
 open JetBrains.IDE.UI.Extensions
 open JetBrains.IDE.UI.Options
 open JetBrains.ProjectModel

@@ -3,7 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests
 open System
 open JetBrains.Application.Components
 open JetBrains.Application.platforms
-open JetBrains.DataFlow
+open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.MSBuild
 open JetBrains.ProjectModel.Properties.Managed

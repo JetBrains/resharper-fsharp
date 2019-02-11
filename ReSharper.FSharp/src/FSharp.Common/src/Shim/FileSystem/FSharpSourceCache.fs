@@ -6,10 +6,10 @@ open System.Collections.Concurrent
 open System.Runtime.InteropServices
 open System.Text
 open JetBrains.Application.changes
-open JetBrains.DataFlow
 open JetBrains.DocumentManagers
 open JetBrains.DocumentManagers.impl
 open JetBrains.DocumentModel
+open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util.CommonUtil
 open JetBrains.ReSharper.Plugins.FSharp

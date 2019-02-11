@@ -1,6 +1,6 @@
 ﻿using System;
 using JetBrains.Annotations;
-using JetBrains.DataFlow;
+using JetBrains.Lifetimes;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Daemon.CaretDependentFeatures;
 using JetBrains.ReSharper.Daemon.CSharp.ContextHighlighters;
