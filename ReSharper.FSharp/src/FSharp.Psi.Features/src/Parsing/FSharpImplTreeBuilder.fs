@@ -367,11 +367,12 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
             x.ProcessLocalExpression expr
             x.ProcessSynType synType
 
-        | SynExpr.Tuple(exprs,_,_)
-        | SynExpr.StructTuple(exprs,_,_)
-        | SynExpr.ArrayOrList(_,exprs,_) ->
-            for e in exprs do
-                x.ProcessLocalExpression(e)
+        | SynExpr.Tuple(exprs,_,range)
+        | SynExpr.StructTuple(exprs,_,range) ->
+            x.MarkListExpr(exprs, range, ElementType.TUPLE_EXPR)
+
+        | SynExpr.ArrayOrList(_,exprs,range) ->
+            x.MarkListExpr(exprs, range, ElementType.ARRAY_OR_LIST_EXPR)
 
         | SynExpr.Record(_,copyInfoOpt,fields,range) ->
             let mark = x.Mark(range)
@@ -575,6 +576,12 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                 x.ProcessLocalExpression(expr)
 
         | _ -> ()
+
+    member x.MarkListExpr(exprs, range, elementType) =
+        let mark = x.Mark(range)
+        for e in exprs do
+            x.ProcessLocalExpression(e)
+        x.Done(range, mark, elementType)
 
     member x.MarkTypeExpr(expr, typ, range, elementType) =
         let mark = x.Mark(range)

@@ -235,6 +235,8 @@ otherPat options { stubBase="SynPatternBase"; }:
 
 interface synExpr:
   constExpr |
+  tupleExpr |
+  arrayOrListExpr |
   recordExpr |
   setExpr |
   typeTestExpr |
@@ -250,6 +252,12 @@ interface castExpr:
   downcastExpr;
 
 constExpr options { stubBase="DummyExpression"; }:
+  fakeSeparator;
+
+tupleExpr options { stubBase="DummyExpression"; }:
+  fakeSeparator;
+
+arrayOrListExpr options { stubBase="DummyExpression"; }:
   fakeSeparator;
 
 recordExpr options { stubBase="DummyExpression"; }:
