@@ -155,10 +155,10 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
             x.ProcessModifiersBeforeOffset(x.GetStartOffset(lid.Head))
         mark
 
-    member x.StartException (SynExceptionDefnRepr(_,UnionCase(_,id,unionCaseType,_,_,_),_,_,_,range)) =
+    member x.StartException(SynExceptionDefnRepr(_,UnionCase(_,id,unionCaseType,_,_,_),_,_,_,range)) =
         let mark = x.Mark(range)
         x.ProcessModifiersBeforeOffset(x.GetStartOffset id)
-        x.ProcessUnionCaseType(unionCaseType) |> ignore
+        x.ProcessUnionCaseType(unionCaseType, ElementType.EXCEPTION_FIELD_DECLARATION) |> ignore
         mark
 
     member x.ProcessModifiersBeforeOffset (endOffset: int) =
@@ -202,10 +202,10 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
     member x.ProcessTypeParameter(TyparDecl(_,(Typar(IdentRange range,_,_))), elementType) =
         x.MarkAndDone(range, elementType)
 
-    member x.ProcessUnionCaseType caseType =
+    member x.ProcessUnionCaseType(caseType, fieldElementType) =
         match caseType with
         | UnionCaseFields(fields) ->
-            for f in fields do x.ProcessField f ElementType.UNION_CASE_FIELD_DECLARATION
+            for f in fields do x.ProcessField f fieldElementType
             not fields.IsEmpty
 
         | UnionCaseFullType(_) ->
@@ -220,7 +220,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
     member x.ProcessUnionCase(UnionCase(attrs,id,caseType,_,_,range)) =
         let mark = x.MarkTokenOrRange(FSharpTokenType.BAR, range)
         x.ProcessAttributes(attrs)
-        let hasFields = x.ProcessUnionCaseType(caseType)
+        let hasFields = x.ProcessUnionCaseType(caseType, ElementType.UNION_CASE_FIELD_DECLARATION)
         let elementType = if hasFields then ElementType.NESTED_TYPE_UNION_CASE_DECLARATION
                                        else ElementType.SINGLETON_CASE_DECLARATION
         x.Done(range, mark, elementType)

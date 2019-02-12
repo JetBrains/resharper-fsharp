@@ -2,6 +2,7 @@
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
@@ -51,7 +52,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
         // todo: add field list tree node
         var fields = new LocalList<ITypeOwner>();
         foreach (var typeMember in base.GetTypeMembers())
-          if (typeMember is FSharpUnionCaseField fieldProperty)
+          if (typeMember is FSharpUnionCaseField<ExceptionFieldDeclaration> fieldProperty)
             fields.Add(fieldProperty);
         return fields.ResultingList();
       }

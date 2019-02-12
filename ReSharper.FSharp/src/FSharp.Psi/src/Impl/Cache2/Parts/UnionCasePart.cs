@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
@@ -32,7 +33,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public override IDeclaredType GetBaseClassType()
     {
-      var typeElement = TypeElement.GetContainingType();
+      var typeElement = TypeElement?.GetContainingType();
       return typeElement != null
         ? TypeFactory.CreateType(typeElement)
         : null;
@@ -71,18 +72,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     protected override byte SerializationTag => (byte) FSharpPartKind.UnionCase;
 
-    public IList<FSharpUnionCaseField> CaseFields
+    public IList<FSharpUnionCaseField<UnionCaseFieldDeclaration>> CaseFields
     {
       get
       {
         var declaration = GetDeclaration();
         if (declaration == null)
-          return EmptyList<FSharpUnionCaseField>.Instance;
+          return EmptyList<FSharpUnionCaseField<UnionCaseFieldDeclaration>>.Instance;
 
-        var result = new LocalList<FSharpUnionCaseField>();
+        var result = new LocalList<FSharpUnionCaseField<UnionCaseFieldDeclaration>>();
         foreach (var fieldDeclaration in declaration.Fields)
         {
-          if (fieldDeclaration.DeclaredElement is FSharpUnionCaseField field)
+          if (fieldDeclaration.DeclaredElement is FSharpUnionCaseField<UnionCaseFieldDeclaration> field)
             result.Add(field);
         }
 

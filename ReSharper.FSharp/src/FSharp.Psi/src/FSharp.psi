@@ -406,14 +406,21 @@ nestedTypeUnionCaseDeclaration options { stubBase="FSharpTypeElementDeclarationB
   fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   IDENTIFIER<IDENTIFIER, Identifier>
-  unionCaseFieldDeclaration<UNION_FIELD, Fields>*
+  caseFieldDeclaration<UNION_FIELD, Fields>*
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
 
-// Used in union cases and exceptions
-unionCaseFieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+
+interface caseFieldDeclaration:
+  unionCaseFieldDeclaration |
+  exceptionFieldDeclaration;
+
+unionCaseFieldDeclaration options { stubBase="CaseFieldDeclarationBase"; }:
   IDENTIFIER<IDENTIFIER, Identifier>;
+
+exceptionFieldDeclaration options { stubBase="CaseFieldDeclarationBase"; }:
+  IDENTIFIER<IDENTIFIER, Identifier>;
+
 
 // Other members
 
@@ -424,6 +431,7 @@ exceptionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } ex
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   IDENTIFIER<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
+  caseFieldDeclaration<UNION_FIELD, Fields>*
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
 
 typeAbbreviationDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {

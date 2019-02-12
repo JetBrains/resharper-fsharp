@@ -1,5 +1,6 @@
 ﻿using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
@@ -11,14 +12,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
   /// <summary>
   /// Union case or exception field compiled to a property.
   /// </summary>
-  internal class FSharpUnionCaseField : FSharpFieldProperty<UnionCaseFieldDeclaration>
+  internal class FSharpUnionCaseField<T> : FSharpFieldProperty<T>
+    where T : FSharpDeclarationBase, IModifiersOwnerDeclaration, ICaseFieldDeclaration
   {
     internal FSharpUnionCaseField([NotNull] ITypeMemberDeclaration declaration, [NotNull] FSharpField field)
       : base(declaration, field)
     {
     }
 
-    public override string ShortName => Field.Name;
     public override bool IsVisibleFromFSharp => !Field.IsNameGenerated;
   }
 
