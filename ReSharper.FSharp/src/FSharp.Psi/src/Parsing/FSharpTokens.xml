@@ -38,8 +38,8 @@
         <Token name="INTERFACE" representation="interface" />
         <Token name="INTERNAL" representation="internal" />
         <Token name="LAZY" representation="lazy" />
-        <Token name="LET" representation="let" /> <!--check-->
-        <Token name="LET_BANG" representation="let!" /> <!--check-->
+        <Token name="LET" representation="let" />
+        <Token name="LET_BANG" representation="let!" />
         <Token name="MATCH" representation="match" />
         <Token name="MATCH_BANG" representation="match!" />
         <Token name="MEMBER" representation="member" />
@@ -55,8 +55,8 @@
         <Token name="PRIVATE" representation="private" />
         <Token name="PUBLIC" representation="public" />
         <Token name="REC" representation="rec" />
-        <Token name="RETURN" representation="return" /> <!--check-->
-        <Token name="RETURN_BANG" representation="return!" /> <!--check-->
+        <Token name="RETURN" representation="return" />
+        <Token name="RETURN_BANG" representation="return!" />
         <Token name="SIG" representation="sig" />
         <Token name="STATIC" representation="static" />
         <Token name="STRUCT" representation="struct" />
@@ -66,15 +66,15 @@
         <Token name="TRY" representation="try" />
         <Token name="TYPE" representation="type" />
         <Token name="UPCAST" representation="upcast" />
-        <Token name="USE" representation="use" /> <!--check-->
-        <Token name="USE_BANG" representation="use!" /> <!--check-->
+        <Token name="USE" representation="use" />
+        <Token name="USE_BANG" representation="use!" />
         <Token name="VAL" representation="val" />
         <Token name="VOID" representation="void" />
         <Token name="WHEN" representation="when" />
         <Token name="WHILE" representation="while" />
         <Token name="WITH" representation="with" />
         <Token name="YIELD" representation="yield" />
-        <Token name="YIELD_BANG" representation="yield!" /> <!--check-->
+        <Token name="YIELD_BANG" representation="yield!" />
         <Token name="UNDERSCORE" representation="_" />
 
         <Token name="GREATER" representation=">" />
@@ -152,9 +152,7 @@
         <Token name="IDENTIFIER" />
         <Token name="SYMBOLIC_OP" />
         <Token name="BAD_SYMBOLIC_OP" />
-        <Token name="BLOCK_COMMENT" />
         <Token name="SHEBANG" />
-        <Token name="LINE_COMMENT" />
         <Token name="HASH" />
         <Token name="TEXT" />
         <Token name="DEAD_CODE" />

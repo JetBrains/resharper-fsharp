@@ -68,6 +68,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       {
       }
 
+      public override bool IsFiltered => true;
       public override LeafElementBase Create(string text) => new Whitespace(text);
     }
 
@@ -77,7 +78,28 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       {
       }
 
+      public override bool IsFiltered => true;
       public override LeafElementBase Create(string text) => new NewLine(text);
+    }
+
+    private sealed class LineCommentNodeType : FSharpTokenNodeType
+    {
+      public LineCommentNodeType(int nodeTypeIndex) : base("LINE_COMMENT", nodeTypeIndex)
+      {
+      }
+
+      public override bool IsFiltered => true;
+      public override LeafElementBase Create(string text) => new FSharpComment(this, text);
+    }
+
+    private sealed class BlockCommentNodeType : FSharpTokenNodeType
+    {
+      public BlockCommentNodeType(int nodeTypeIndex) : base("BLOCK_COMMENT", nodeTypeIndex)
+      {
+      }
+
+      public override bool IsFiltered => true;
+      public override LeafElementBase Create(string text) => new FSharpComment(this, text);
     }
 
     public const int WHITESPACE_NODE_TYPE_INDEX = LAST_GENERATED_TOKEN_TYPE_INDEX + 1;
@@ -86,6 +108,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const int NEW_LINE_NODE_TYPE_INDEX = LAST_GENERATED_TOKEN_TYPE_INDEX + 2;
     public static readonly TokenNodeType NEW_LINE = new NewLineNodeType(NEW_LINE_NODE_TYPE_INDEX);
 
+    public const int LINE_COMMENT_NODE_TYPE_INDEX = LAST_GENERATED_TOKEN_TYPE_INDEX + 3;
+    public static readonly TokenNodeType LINE_COMMENT = new LineCommentNodeType(LINE_COMMENT_NODE_TYPE_INDEX);
+
+    public const int BLOCK_COMMENT_NODE_TYPE_INDEX = LAST_GENERATED_TOKEN_TYPE_INDEX + 4;
+    public static readonly TokenNodeType BLOCK_COMMENT = new BlockCommentNodeType(BLOCK_COMMENT_NODE_TYPE_INDEX);
 
     public static readonly NodeTypeSet RightBraces;
     public static readonly NodeTypeSet LeftBraces;
