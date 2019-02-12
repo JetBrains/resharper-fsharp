@@ -1,9 +1,9 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Host
 
 open System.Linq
+open JetBrains.Collections.Viewable
 open JetBrains.Core
 open JetBrains.Lifetimes
-open JetBrains.Platform.RdFramework.Util
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Host.Features
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker

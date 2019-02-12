@@ -1,5 +1,6 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Services.Foldings
 
+open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Daemon.CodeFolding
 open JetBrains.ReSharper.Feature.Services.Daemon

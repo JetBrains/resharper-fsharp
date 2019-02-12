@@ -3,6 +3,7 @@ module rec JetBrains.ReSharper.Plugins.FSharp.Common.Paket
 open JetBrains.Application
 open JetBrains.Application.Settings
 open JetBrains.Application.Settings.Implementation
+open JetBrains.Diagnostics
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.DataContext
 open JetBrains.ProjectModel.NuGet.Options

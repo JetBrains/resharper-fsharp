@@ -1,6 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages
 
-open JetBrains.ReSharper.Daemon.UsageChecking
+open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree

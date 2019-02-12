@@ -28,6 +28,7 @@ open JetBrains.ReSharper.Host.Features.Util.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Psi
+open JetBrains.Serialization
 open JetBrains.Threading
 open JetBrains.UI.RichText
 open JetBrains.Util

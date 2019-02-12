@@ -6,6 +6,7 @@ open System.Collections.Concurrent
 open System.Runtime.InteropServices
 open System.Text
 open JetBrains.Application.changes
+open JetBrains.Diagnostics
 open JetBrains.DocumentManagers
 open JetBrains.DocumentManagers.impl
 open JetBrains.DocumentModel
@@ -16,7 +17,6 @@ open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Rider.Model
-open JetBrains.Util.Logging
 
 type FSharpSource =
     { Source: byte[]
