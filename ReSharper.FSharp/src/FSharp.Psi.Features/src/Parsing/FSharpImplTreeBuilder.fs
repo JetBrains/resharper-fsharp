@@ -138,7 +138,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
             | _ -> false
 
         if x.Builder.GetTokenOffset() <= rangeStart || (not isMember) then
-            let mark = x.ProcessAttributesAndStartRange attrs None typeMember.Range
+            let mark = x.MarkAttributesOrIdOrRange(attrs, None, typeMember.Range)
 
             // todo: mark body exprs as synExpr
             let memberType =
@@ -341,15 +341,19 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
         x.Done(range, mark, ElementType.OTHER_TYPE)
 
     member x.ProcessBinding(Binding(_,_,_,_,attrs,_,_,headPat,_, expr,_,_) as binding, isLocal: bool) =
-        // todo: add [< to range?
-        let bindingMark = x.Mark(binding.StartPos)
+        let mark =
+            match attrs with
+            | [] -> x.Mark(binding.StartPos)
+            | { Range = r } :: _ ->
+                let mark = x.MarkTokenOrRange(FSharpTokenType.LBRACK_LESS, r)
+                x.ProcessAttributes(attrs)
+                mark
 
-        x.ProcessAttributes(attrs)
         x.ProcessPat(headPat, isLocal, true)
         x.MarkOtherExpr(expr)
 
         let elementType = if isLocal then ElementType.LOCAL_BINDING else ElementType.TOP_BINDING
-        x.Done(binding.RangeOfBindingAndRhs, bindingMark, elementType)
+        x.Done(binding.RangeOfBindingAndRhs, mark, elementType)
 
     member x.ProcessLocalExpression (expr: SynExpr) =
         match expr with

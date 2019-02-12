@@ -79,7 +79,12 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         let rangeStart = x.GetStartOffset(range)
         x.AdvanceToTokenOrOffset tokenType rangeStart
         x.Mark()
-    
+
+    member x.MarkTokenOrPos(tokenType, pos) =
+        let offset = x.GetOffset(pos)
+        x.AdvanceToTokenOrOffset tokenType offset
+        x.Mark()
+
     member x.AdvanceToOffset offset =
         while x.Builder.GetTokenOffset() < offset && not x.Eof do x.Advance()
 
@@ -118,7 +123,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
                         x.GetStartOffset firstId |> x.AdvanceToTokenOrOffset keywordTokenType
                     x.Builder.Mark()
                 else
-                    x.ProcessAttributesAndStartRange attrs (Some firstId) range
+                    x.MarkAttributesOrIdOrRange(attrs, Some firstId, range)
 
             if isModule then x.ProcessModifiersBeforeOffset (x.GetStartOffset firstId)
             x.ProcessLongIdentifier lid
@@ -139,18 +144,21 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         if mark.IsSome then
             x.Done(mark.Value, elementType)
 
-    member x.ProcessAttributesAndStartRange (attrs: SynAttributes) (id: Ident option) (range: Range.range) =
-        if attrs.IsEmpty then
-            let rangeStartOffset = x.GetStartOffset range
-            let startOffset = if id.IsSome then Math.Min(x.GetStartOffset id.Value.idRange, rangeStartOffset) else rangeStartOffset
-            x.Mark(startOffset)
-        else
-            let mark = x.Mark(attrs.Head.Range)
-            for attr in attrs do x.ProcessAttribute attr
+    member x.MarkAttributesOrIdOrRange(attrs: SynAttributes, id: Ident option, range: Range.range) =
+        match attrs with
+        | head :: _ ->
+            let mark = x.MarkTokenOrRange(FSharpTokenType.LBRACK_LESS, head.Range)
+            for attr in attrs do
+                x.ProcessAttribute(attr)
             mark
 
+        | _ ->
+            let rangeStart = x.GetStartOffset(range)
+            let startOffset = if id.IsSome then Math.Min(x.GetStartOffset id.Value.idRange, rangeStart) else rangeStart
+            x.Mark(startOffset)
+
     member x.StartNestedModule (attrs: SynAttributes) (lid: LongIdent) (range: Range.range) =
-        let mark = x.ProcessAttributesAndStartRange attrs (List.tryHead lid) range
+        let mark = x.MarkAttributesOrIdOrRange(attrs, List.tryHead lid, range)
         if not lid.IsEmpty then
             x.ProcessModifiersBeforeOffset(x.GetStartOffset(lid.Head))
         mark
@@ -167,7 +175,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         x.Done(mark, ElementType.ACCESS_MODIFIERS)
 
     member x.StartType attrs typeParams (lid: LongIdent) range =
-        let mark = x.ProcessAttributesAndStartRange attrs (List.tryHead lid) range
+        let mark = x.MarkAttributesOrIdOrRange(attrs, List.tryHead lid, range)
         if not lid.IsEmpty then
             let id = lid.Head
             let idOffset = x.GetStartOffset id

@@ -4,13 +4,12 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Parsing.ParseTreeUtil
 open System.Collections.Generic
 open Microsoft.FSharp.Compiler
 open Microsoft.FSharp.Compiler.Ast
+open Microsoft.FSharp.Compiler.Range
 
 type SynBinding with
     member x.StartPos =
-        let (Binding(_, _, _, _, attrs, _, _, headPat, _, _, _ , _)) = x
-        match attrs with
-        | { Range = r } :: _ -> r.Start
-        | _ -> headPat.Range.Start
+        let (Binding(_, _, _, _, _, _, _, headPat, _, _, _ , _)) = x
+        headPat.Range.Start
 
 type SynMemberDefn with
     member x.Attributes =
@@ -24,7 +23,9 @@ type SynMemberDefn with
 
 let letStartPos (bindings: SynBinding list) (range: Range.range) =
     match bindings with
-    | Binding(_, _, _, _, { Range = r } :: _, _, _, _, _, _, _ , _) :: _ -> r.Start
+    | Binding(_, _, _, _, { Range = r } :: _, _, _, _, _, _, _ , _) :: _
+        when posLt r.Start range.Start -> r.Start
+
     | _ -> range.Start
 
 let rec (|Apps|_|) = function

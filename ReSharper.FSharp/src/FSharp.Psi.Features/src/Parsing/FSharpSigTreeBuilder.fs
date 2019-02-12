@@ -38,7 +38,7 @@ type internal FSharpSigTreeBuilder(file, lexer, sigs, lifetime) =
             x.MarkAndDone(idRange, ElementType.MODULE_ABBREVIATION)
 
         | SynModuleSigDecl.Val(ValSpfn(attrs,id,SynValTyparDecls(typeParams,_,_),_,_,_,_,_,_,_,_),range) ->
-            let letMark = x.ProcessAttributesAndStartRange attrs (Some id) range
+            let letMark = x.MarkAttributesOrIdOrRange(attrs, Some id, range)
             let bindingMark = x.Mark()
 
             let patMark = x.Mark(id.idRange)
@@ -95,7 +95,7 @@ type internal FSharpSigTreeBuilder(file, lexer, sigs, lifetime) =
     member x.ProcessTypeMemberSignature memberSig =
         match memberSig with
         | SynMemberSig.Member(ValSpfn(attrs,id,_,_,_,_,_,_,_,_,_),flags,range) ->
-            let mark = x.ProcessAttributesAndStartRange attrs (Some id) range
+            let mark = x.MarkAttributesOrIdOrRange(attrs, Some id, range)
             let elementType =
                 if flags.IsDispatchSlot then
                     ElementType.ABSTRACT_SLOT
@@ -107,7 +107,7 @@ type internal FSharpSigTreeBuilder(file, lexer, sigs, lifetime) =
 
         | SynMemberSig.ValField(Field(attrs,_,id,_,_,_,_,_),range) ->
             if id.IsSome then
-                let mark = x.ProcessAttributesAndStartRange attrs id range
+                let mark = x.MarkAttributesOrIdOrRange(attrs, id, range)
                 x.Done(mark,ElementType.VAL_FIELD)
 
         | SynMemberSig.Inherit(SynType.LongIdent(lidWithDots),_) ->
