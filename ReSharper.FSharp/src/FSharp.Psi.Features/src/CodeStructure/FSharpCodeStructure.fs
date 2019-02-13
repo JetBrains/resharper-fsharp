@@ -14,41 +14,74 @@ open JetBrains.UI.RichText
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpCodeStructureProvider() =
-    let isApplicable (node: ITreeNode) =
-        (node :? ITypeMemberDeclaration || (node :? IModuleMemberDeclaration && not (node :? IOtherMemberDeclaration)) ||
-         node :? IFSharpTypeMemberDeclaration  || node :? ITopLevelModuleOrNamespaceDeclaration) &&
-        not (node :? ILocalDeclaration)
+    let rec processNode (node: ITreeNode) (parent: CodeStructureElement) =
+        match node with
+        | :? IFSharpFile as fsFile ->
+            for decl in fsFile.Declarations do
+                processNode decl parent
 
-    let rec processNode (node: ITreeNode) (nodeElement: CodeStructureElement) =
-        for child in node.Children() do
-            match child with
-            | :? IDeclaration as decl when isApplicable child ->
-                processNode child (CodeStructureDeclarationElement(nodeElement, decl))
+        | :? IModuleLikeDeclaration as moduleDeclaration ->
+            let parent =
+                if not moduleDeclaration.IsModule then parent else
+                CodeStructureDeclarationElement(parent, moduleDeclaration) :> CodeStructureElement
 
-            | :? IInterfaceImplementation as node ->
-                processNode node (NamedIdentifierOwner(node, nodeElement, PsiSymbolsThemedIcons.Interface.Id))
+            for memberDeclaration in moduleDeclaration.Members do
+                processNode memberDeclaration parent
 
-            | :? ITypeExtensionDeclaration as node when not node.IsTypePartDeclaration ->
-                // todo: other type kind icons, add extension icon modificator
-                processNode node (NamedIdentifierOwner(node, nodeElement, PsiSymbolsThemedIcons.Class.Id))
+        | :? IUnionDeclaration as unionDecl ->
+            let cases = Seq.cast unionDecl.UnionCases
+            processTypeDeclaration unionDecl cases parent
 
-            | _ -> ()
+        | :? IUnionCaseDeclaration as caseDecl ->
+            CodeStructureDeclarationElement(parent, caseDecl) |> ignore
+
+        | :? IRecordDeclaration as recordDecl ->
+            let fields = Seq.cast recordDecl.Fields 
+            processTypeDeclaration recordDecl fields parent
+
+        | :? ITypeExtensionDeclaration as extensionDecl when not extensionDecl.IsTypePartDeclaration ->
+            let iconId = PsiSymbolsThemedIcons.Class.Id // todo: add extension icon modificator
+            let parent = NamedIdentifierOwner(extensionDecl, parent, iconId)
+            for memberDecl in  extensionDecl.TypeMembers do
+                processNode memberDecl parent
+
+        | :? IFSharpTypeDeclaration as decl ->
+            processTypeDeclaration decl TreeNodeCollection.Empty parent
+
+        | :? ITypeMemberDeclaration as typeMember ->
+            CodeStructureDeclarationElement(parent, typeMember) |> ignore
+
+        | :? IInterfaceImplementation as interfaceImpl ->
+            let parent = NamedIdentifierOwner(interfaceImpl, parent, PsiSymbolsThemedIcons.Interface.Id)
+            for memberDecl in interfaceImpl.TypeMembers do
+                processNode memberDecl parent
+
+        | :? ILet as letBindings ->
+            for binding in Seq.cast<ITopBinding> letBindings.Bindings do
+                CodeStructureDeclarationElement(parent, binding) |> ignore
+
+        | _ -> ()
+
+    and processTypeDeclaration (typeDecl: IFSharpTypeDeclaration) (members: IDeclaration seq) parent =
+        let structureElement = CodeStructureDeclarationElement(parent, typeDecl)
+        for memberDecl in members do
+            processNode memberDecl structureElement
+
+        for memberDecl in typeDecl.TypeMembers do
+            processNode memberDecl structureElement
 
     interface IPsiFileCodeStructureProvider with
         member x.Build(file, _) =
-            match file with
-            | :? IFSharpFile ->
-                let root = FSharpCodeStructureRootElement(file)
-                processNode file (root :> CodeStructureElement)
-                root :> _
-            | _ -> null
+            match file.As<IFSharpFile>() with
+            | null -> null
+            | fsFile ->
+
+            let root = CodeStructureRootElement(fsFile)
+            processNode fsFile root
+            root
 
 
-type FSharpCodeStructureRootElement(file) =
-    inherit CodeStructureRootElement(file)
-
-
-type NamedTypeExpressionNodeAspect(treeNode: INameIdentifierOwner, iconId: IconId) =
+type NameIdentifierOwnerNodeAspect(treeNode: INameIdentifierOwner, iconId: IconId) =
     let interfaceName =
         match treeNode.NameIdentifier with
         | null -> null
@@ -99,7 +132,7 @@ type NamedTypeExpressionNodeAspect(treeNode: INameIdentifierOwner, iconId: IconI
 type NamedIdentifierOwner(treeNode: INameIdentifierOwner, parent, iconId) =
     inherit CodeStructureElement(parent)
 
-    let aspect = NamedTypeExpressionNodeAspect(treeNode, iconId)
+    let aspect = NameIdentifierOwnerNodeAspect(treeNode, iconId)
     let treeNodePointer = treeNode.GetPsiServices().Pointers.CreateTreeElementPointer(treeNode)
 
     let textRange =
@@ -113,4 +146,4 @@ type NamedIdentifierOwner(treeNode: INameIdentifierOwner, parent, iconId) =
     override x.GetGotoMemberAspect() = aspect :> _
     override x.GetMemberNavigationAspect() = aspect :> _
     override x.GetTextRange() = textRange
-    override x.DumpSelf(_) = ()
+    override x.DumpSelf(writer) = writer.Write(aspect.Name)

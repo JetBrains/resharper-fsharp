@@ -555,6 +555,7 @@ interface fSharpTypeMemberDeclaration:
   typeLetBindings |
   valField |
   autoProperty |
+  let |
 
   otherTypeMember;
 
