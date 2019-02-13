@@ -17,7 +17,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     CompiledName
   }
 
-  public partial interface IFSharpDeclaration : IDeclaration
+  public partial interface IFSharpDeclaration : INameIdentifierOwner, IDeclaration
   {
     /// <summary>
     /// May take long time due to waiting for FCS. Symbol is cached in declaration.
@@ -32,8 +32,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     string SourceName { get; }
 
     void SetName(string name, ChangeNameKind changeNameKind);
-
-    [CanBeNull] IFSharpIdentifier NameIdentifier { get; }
 
     TreeTextRange GetNameIdentifierRange();
   }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Checker;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
@@ -31,6 +32,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public override void VisitFSharpFile(IFSharpFile fsFile)
     {
       var sourceFile = fsFile.GetSourceFile();
+      if (sourceFile == null)
+        return;
+
       var fileKind = GetFSharpFileKind(fsFile);
       var hasPairFile = myCheckerService.HasPairFile(sourceFile);
 
@@ -55,7 +59,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public override void VisitFSharpNamespaceDeclaration(IFSharpNamespaceDeclaration decl)
     {
       Builder.StartPart(new DeclaredNamespacePart(decl));
-      FinishModuleLikeDeclaraion(decl);
+      FinishModuleLikeDeclaration(decl);
     }
 
     public override void VisitFSharpGlobalNamespaceDeclaration(IFSharpGlobalNamespaceDeclaration decl)
@@ -67,16 +71,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public override void VisitTopLevelModuleDeclaration(ITopLevelModuleDeclaration decl)
     {
       Builder.StartPart(new TopLevelModulePart(decl, Builder));
-      FinishModuleLikeDeclaraion(decl);
+      FinishModuleLikeDeclaration(decl);
     }
 
     public override void VisitNestedModuleDeclaration(INestedModuleDeclaration decl)
     {
       Builder.StartPart(new NestedModulePart(decl, Builder));
-      FinishModuleLikeDeclaraion(decl);
+      FinishModuleLikeDeclaration(decl);
     }
 
-    private void FinishModuleLikeDeclaraion(IModuleLikeDeclaration decl)
+    private void FinishModuleLikeDeclaration(IModuleLikeDeclaration decl)
     {
       foreach (var memberDecl in decl.MembersEnumerable)
         memberDecl.Accept(this);
@@ -168,24 +172,37 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public override void VisitObjectModelTypeDeclaration(IObjectModelTypeDeclaration decl)
     {
-      Builder.StartPart(CreateObjectTypePart(decl));
+      Builder.StartPart(CreateObjectTypePart(decl, false));
       ProcessTypeMembers(decl.MemberDeclarations);
       Builder.EndPart();
     }
 
-    public override void VisitTypeExtension(ITypeExtension typeExtension) =>
-      ProcessTypeMembers(typeExtension.TypeMembers);
+    public override void VisitTypeExtensionDeclaration(ITypeExtensionDeclaration typeExtension)
+    {
+      if (typeExtension.IsTypePartDeclaration)
+      {
+        Builder.StartPart(CreateObjectTypePart(typeExtension, true));
+        ProcessTypeMembers(typeExtension.MemberDeclarations);
+        Builder.EndPart();
+        return;
+      }
 
-    private Part CreateObjectTypePart(IObjectModelTypeDeclaration decl)
+      if (typeExtension.IsTypeExtensionAllowed)
+        ProcessTypeMembers(typeExtension.MemberDeclarations);
+    }
+
+    private Part CreateObjectTypePart(IFSharpTypeDeclaration decl, bool isExtension)
     {
       switch (decl.TypePartKind)
       {
-        case FSharpPartKind.Class:
-          return new ClassPart(decl, Builder);
-        case FSharpPartKind.Interface:
+        case PartKind.Class:
+          return isExtension ? (Part) new ClassExtensionPart(decl, Builder) : new ClassPart(decl, Builder);
+        case PartKind.Struct:
+          return isExtension ? (Part) new StructExtensionPart(decl, Builder) : new StructPart(decl, Builder);
+        case PartKind.Interface:
           return new InterfacePart(decl, Builder);
-        case FSharpPartKind.Struct:
-          return new StructPart(decl, Builder);
+        case PartKind.Enum:
+          return new EnumPart(decl, Builder);
         default:
           throw new ArgumentOutOfRangeException();
       }

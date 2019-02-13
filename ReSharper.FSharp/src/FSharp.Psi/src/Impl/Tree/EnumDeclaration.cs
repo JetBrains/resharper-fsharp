@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
-using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -12,5 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public override IReadOnlyList<ITypeMemberDeclaration> MemberDeclarations =>
       EnumMembers.Cast<ITypeMemberDeclaration, IEnumMemberDeclaration>();
+
+    public override PartKind TypePartKind => PartKind.Enum;
   }
 }

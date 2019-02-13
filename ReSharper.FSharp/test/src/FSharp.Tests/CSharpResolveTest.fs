@@ -81,6 +81,18 @@ type CSharpResolveTest() =
 
     [<Test>] member x.``Events 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type Extension 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type Extension 02 - Struct``() = x.DoNamedTest()
+    [<Test>] member x.``Type Extension 03 - Struct record``() = x.DoNamedTest()
+    [<Test>] member x.``Type Extension 04 - Struct union``() = x.DoNamedTest()
+    [<Test>] member x.``Type Extension 05 - Interface``() = x.DoNamedTest()
+    [<Test>] member x.``Type Extension 06 - Enum``() = x.DoNamedTest()
+    [<Test>] member x.``Type Extension 07 - Different parameters count``() = x.DoNamedTest()
+    [<Test>] member x.``Type Extension 08 - Multiple extensions``() = x.DoNamedTest()
+    [<Test>] member x.``Type Extension 09 - In namespace``() = x.DoNamedTest()
+    [<Test>] member x.``Type Extension 10 - Compiled name``() = x.DoNamedTest()
+    [<Test>] member x.``Type Extension 11 - Struct compiled name``() = x.DoNamedTest()
+
     override x.RelativeTestDataPath = "cache/csharpResolve"
 
     override x.MainFileExtension = CSharpProjectFileType.CS_EXTENSION

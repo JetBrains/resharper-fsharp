@@ -3,12 +3,13 @@ using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  internal class EnumPart : FSharpTypeParametersOwnerPart<IEnumDeclaration>, Enum.IEnumPart
+  internal class EnumPart : FSharpTypeParametersOwnerPart<IFSharpTypeDeclaration>, Enum.IEnumPart
   {
-    public EnumPart([NotNull] IEnumDeclaration declaration, [NotNull] ICacheBuilder builder)
+    public EnumPart([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder builder)
       : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifiers, declaration.AttributesEnumerable),
         declaration.TypeParameters, builder)
     {
@@ -28,7 +29,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     }
 
     public IList<IField> Fields =>
-      ProcessSubDeclaration<IField, IEnumMemberDeclaration>(input => input.EnumMembers);
+      ProcessSubDeclaration<IField, IEnumMemberDeclaration>(input =>
+        input is IEnumDeclaration enumDeclaration
+          ? enumDeclaration.EnumMembers
+          : EmptyList<IEnumMemberDeclaration>.InstanceList);
 
     protected override byte SerializationTag => (byte) FSharpPartKind.Enum;
   }

@@ -69,23 +69,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
             | _ -> ElementType.OTHER_DIRECTIVE
         x.Done(range, mark, elementType)
 
-    member internal x.ProcessType (TypeDefn(ComponentInfo(attrs, typeParams,_,lid,_,_,_,_), repr, members, range)) =
-        match repr with
-        | SynTypeDefnRepr.ObjectModel(SynTypeDefnKind.TyconAugmentation,_,_) ->
-            let extensionOffset = x.GetStartOffset(range)
-            match List.tryLast lid with
-            | Some id -> x.TypeExtensionsOffsets.Add(id.idText, extensionOffset)
-            | _ -> ()
-
-            let extensionMark = x.Mark(extensionOffset)
-            let typeExpressionMark = x.Mark()
-            x.ProcessLongIdentifier lid
-            x.Done(typeExpressionMark, ElementType.NAMED_TYPE_EXPRESSION)
-            for m in members do
-                x.ProcessTypeMember m
-            x.Done(range, extensionMark, ElementType.TYPE_EXTENSION)
-
-        | _ ->
+    member internal x.ProcessType(TypeDefn(ComponentInfo(attrs, typeParams,_,lid,_,_,_,_), repr, members, range)) =
             let mark = x.StartType attrs typeParams lid range
             let elementType =
                 match repr with
@@ -116,6 +100,9 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
 
                 | SynTypeDefnRepr.Exception(_) ->
                     ElementType.EXCEPTION_DECLARATION
+
+                | SynTypeDefnRepr.ObjectModel(SynTypeDefnKind.TyconAugmentation,_,_) ->
+                    ElementType.TYPE_EXTENSION_DECLARATION
 
                 | SynTypeDefnRepr.ObjectModel(kind, members, _) ->
                     for m in members do x.ProcessTypeMember m

@@ -2,8 +2,8 @@
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-    internal partial class InterfaceImplementation
-    {
-        public INamedTypeExpression TypeExpression => InterfaceType;
-    }
+  internal partial class InterfaceImplementation
+  {
+    public IFSharpIdentifier NameIdentifier => InterfaceType?.LongIdentifier;
+  }
 }

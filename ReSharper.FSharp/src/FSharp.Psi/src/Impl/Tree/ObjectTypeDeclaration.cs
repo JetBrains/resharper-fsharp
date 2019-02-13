@@ -1,6 +1,5 @@
-﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
+﻿using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
-using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
@@ -9,7 +8,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
     public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
 
-    public FSharpPartKind TypePartKind
+    public override PartKind TypePartKind
     {
       get
       {
@@ -18,9 +17,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
         foreach (var member in TypeMembersEnumerable)
           if (!(member is IInterfaceInherit) && !(member is IAbstractSlot))
-            return FSharpPartKind.Class;
+            return PartKind.Class;
 
-        return FSharpPartKind.Interface;
+        return PartKind.Interface;
       }
     }
   }

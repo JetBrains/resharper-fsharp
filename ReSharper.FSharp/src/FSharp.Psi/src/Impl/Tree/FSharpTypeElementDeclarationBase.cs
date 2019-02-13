@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
@@ -58,7 +59,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
               result.Add(implementedMember);
           }
 
-          if (child is ITypeExtension typeExtension)
+          if (child is ITypeExtensionDeclaration typeExtension && !typeExtension.IsTypePartDeclaration)
           {
             foreach (var extensionMember in typeExtension.Children<ITypeMemberDeclaration>())
               result.Add(extensionMember);
@@ -102,5 +103,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         return result.ReadOnlyList();
       }
     }
+    
+    public virtual PartKind TypePartKind => PartKind.Class;
   }
 }

@@ -1,0 +1,18 @@
+﻿using static Module;
+
+namespace ClassLibrary1
+{
+    public class Class1
+    {
+        public Class1()
+        {
+            T a = T.NewA(123);
+            int f = a.Foo;
+        }
+    }
+}
+
+---------------------------------------------------------
+M:Module.T.NewA(System.Int32)
+M:Module.T.NewA(System.Int32)
+P:Module.T.Foo

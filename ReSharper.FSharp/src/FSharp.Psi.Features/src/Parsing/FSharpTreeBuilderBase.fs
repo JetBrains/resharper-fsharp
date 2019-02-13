@@ -9,7 +9,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
-open JetBrains.Util
 open Microsoft.FSharp.Compiler
 open Microsoft.FSharp.Compiler.Ast
 
@@ -36,8 +35,6 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
     member x.Eof = x.Builder.Eof()
 
     override x.SkipWhitespaces() = ()
-
-    member val TypeExtensionsOffsets = OneToListMap<string, int>()
 
     member x.Advance() = x.Builder.AdvanceLexer() |> ignore
     
@@ -104,7 +101,6 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         while not x.Eof do x.Advance()
         x.Done(mark, fileType)
         let fsFile = x.GetTree() :> ITreeNode :?> IFSharpFile
-        fsFile.TypeExtensionsOffsets <- x.TypeExtensionsOffsets
         fsFile
 
     member x.StartTopLevelDeclaration (lid: LongIdent) (attrs: SynAttributes) isModule (range: Range.range) =
@@ -148,8 +144,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         match attrs with
         | head :: _ ->
             let mark = x.MarkTokenOrRange(FSharpTokenType.LBRACK_LESS, head.Range)
-            for attr in attrs do
-                x.ProcessAttribute(attr)
+            x.ProcessAttributes(attrs)
             mark
 
         | _ ->

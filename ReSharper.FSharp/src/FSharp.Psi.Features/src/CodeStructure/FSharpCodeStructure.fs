@@ -2,8 +2,6 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeStructure
 
 open System
 open System.Collections.Generic
-open JetBrains.Annotations
-open JetBrains.Application.UI.Icons.ComposedIcons
 open JetBrains.ReSharper.Feature.Services.CodeStructure
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
@@ -17,19 +15,23 @@ open JetBrains.UI.RichText
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpCodeStructureProvider() =
     let isApplicable (node: ITreeNode) =
-        node :? ITypeMemberDeclaration || (node :? IModuleMemberDeclaration && not (node :? IOtherMemberDeclaration)) ||
-        node :? IFSharpTypeMemberDeclaration  || node :? ITopLevelModuleOrNamespaceDeclaration
+        (node :? ITypeMemberDeclaration || (node :? IModuleMemberDeclaration && not (node :? IOtherMemberDeclaration)) ||
+         node :? IFSharpTypeMemberDeclaration  || node :? ITopLevelModuleOrNamespaceDeclaration) &&
+        not (node :? ILocalDeclaration)
 
     let rec processNode (node: ITreeNode) (nodeElement: CodeStructureElement) =
         for child in node.Children() do
             match child with
-            | :? IDeclaration when isApplicable child ->
-                processNode child (CodeStructureDeclarationElement(nodeElement, child :?> _))
+            | :? IDeclaration as decl when isApplicable child ->
+                processNode child (CodeStructureDeclarationElement(nodeElement, decl))
+
             | :? IInterfaceImplementation as node ->
-                processNode node (NamedTypeExpressionOwner(node, nodeElement, PsiSymbolsThemedIcons.Interface.Id))
-            | :? ITypeExtension as node ->
+                processNode node (NamedIdentifierOwner(node, nodeElement, PsiSymbolsThemedIcons.Interface.Id))
+
+            | :? ITypeExtensionDeclaration as node when not node.IsTypePartDeclaration ->
                 // todo: other type kind icons, add extension icon modificator
-                processNode node (NamedTypeExpressionOwner(node, nodeElement, PsiSymbolsThemedIcons.Class.Id))
+                processNode node (NamedIdentifierOwner(node, nodeElement, PsiSymbolsThemedIcons.Class.Id))
+
             | _ -> ()
 
     interface IPsiFileCodeStructureProvider with
@@ -46,29 +48,31 @@ type FSharpCodeStructureRootElement(file) =
     inherit CodeStructureRootElement(file)
 
 
-type NamedTypeExpressionNodeAspect([<NotNull>] treeNode: INamedTypeExpressionOwner, iconId: IconId) =
+type NamedTypeExpressionNodeAspect(treeNode: INameIdentifierOwner, iconId: IconId) =
     let interfaceName =
-        match treeNode.TypeExpression with
+        match treeNode.NameIdentifier with
         | null -> null
-        | typeName -> typeName.LongIdentifier.GetText()
+        | ident -> ident.Name
 
     let searchNames: IList<string> =
         match interfaceName with
         | null -> EmptyList.InstanceList :> _
-        | name -> [name].AsIList()
+        | name -> [| name |] :> _
 
     let navigationRange =
-        match treeNode.TypeExpression with
+        match treeNode.NameIdentifier with
         | null -> treeNode.GetNavigationRange()
-        | typeName -> typeName.LongIdentifier.GetNavigationRange()
+        | ident -> ident.GetNavigationRange()
+
+    member x.Name =
+        match interfaceName with
+        | null -> RichText("<Invalid>")
+        | name -> RichText(name)
 
     interface IGotoFileMemberAspect with
         member x.Present(descriptor, state) =
             descriptor.Icon <- iconId
-            descriptor.Text <-
-                match treeNode.TypeExpression with
-                | null -> RichText("<Invalid>")
-                | typeName -> RichText(typeName.LongIdentifier.GetText())
+            descriptor.Text <- x.Name
         member x.NavigationRange = treeNode.GetNavigationRange()
         member x.GetQuickSearchTexts() = searchNames
         member x.GetSourceFile() = treeNode.GetSourceFile()
@@ -76,10 +80,7 @@ type NamedTypeExpressionNodeAspect([<NotNull>] treeNode: INamedTypeExpressionOwn
     interface IFileStructureAspect with
         member x.Present(presenter, item, modelNode, state) =
             item.Images.Add(iconId)
-            item.RichText <-
-                match treeNode.TypeExpression with
-                | null -> RichText("<Invalid>")
-                | typeName -> RichText(typeName.LongIdentifier.GetText())
+            item.RichText <- x.Name
 
         member x.NavigationRange = navigationRange
         member x.InitiallyExpanded = true
@@ -95,16 +96,16 @@ type NamedTypeExpressionNodeAspect([<NotNull>] treeNode: INamedTypeExpressionOwn
     interface IMemberNavigationAspect with
         member x.GetNavigationRanges() = [| navigationRange |]
 
-type NamedTypeExpressionOwner(treeNode: INamedTypeExpressionOwner, parent, iconId) =
+type NamedIdentifierOwner(treeNode: INameIdentifierOwner, parent, iconId) =
     inherit CodeStructureElement(parent)
 
     let aspect = NamedTypeExpressionNodeAspect(treeNode, iconId)
     let treeNodePointer = treeNode.GetPsiServices().Pointers.CreateTreeElementPointer(treeNode)
 
     let textRange =
-        match treeNode.TypeExpression with
+        match treeNode.NameIdentifier with
         | null -> treeNode.GetNavigationRange().TextRange
-        | typeName -> typeName.LongIdentifier.GetDocumentRange().TextRange
+        | ident -> ident.GetDocumentRange().TextRange
 
     override x.TreeNode = treeNodePointer.GetTreeNode() :> _
     override x.Language = FSharpLanguage.Instance :> _

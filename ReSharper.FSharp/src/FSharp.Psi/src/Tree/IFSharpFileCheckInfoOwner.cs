@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Checker;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
-using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Core;
 
@@ -32,10 +30,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
     [NotNull]
     FSharpResolvedSymbolUse[] GetAllDeclaredSymbols(FSharpCheckFileResults checkResults = null, Action interruptChecker = null);
-    
-    [CanBeNull]
-    OneToListMap<string, int> TypeExtensionsOffsets { get; set; }
-
-    IEnumerable<ITypeExtension> GetTypeExtensions([NotNull] string shortName);
   }
 }

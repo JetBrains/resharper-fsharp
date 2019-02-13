@@ -310,7 +310,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return AccessRights.PUBLIC;
     }
 
-    public static bool GetTypeKind(IEnumerable<IFSharpAttribute> attributes, out FSharpPartKind fSharpPartKind)
+    public static bool GetTypeKind(IEnumerable<IFSharpAttribute> attributes, out PartKind fSharpPartKind)
     {
       foreach (var attr in attributes)
       {
@@ -322,19 +322,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         {
           case Interface:
           {
-            fSharpPartKind = FSharpPartKind.Interface;
+            fSharpPartKind = PartKind.Interface;
             return true;
           }
           case AbstractClass:
           case Sealed:
           case Class:
           {
-            fSharpPartKind = FSharpPartKind.Class;
+            fSharpPartKind = PartKind.Class;
             return true;
           }
           case Struct:
           {
-            fSharpPartKind = FSharpPartKind.Struct;
+            fSharpPartKind = PartKind.Struct;
             return true;
           }
         }
@@ -342,6 +342,41 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
       fSharpPartKind = default;
       return false;
+    }
+
+    [NotNull]
+    public static TypeAugmentation IsTypePartDeclaration([NotNull] ITypeExtensionDeclaration extensionDeclaration)
+    {
+      var extNameInfo =
+        new NameAndParametersCound(extensionDeclaration.SourceName, extensionDeclaration.TypeParameters.Count);
+
+      var declaredTypeNames = new Dictionary<NameAndParametersCound, TypeAugmentation>();
+      var moduleDeclaration = extensionDeclaration.GetContainingNode<IModuleLikeDeclaration>()
+        .NotNull("moduleDeclaration != null");
+
+      foreach (var member in moduleDeclaration.MembersEnumerable)
+      {
+        if (member is ITypeExtensionDeclaration || !(member is IFSharpTypeDeclaration declaration))
+          continue;
+
+        var sourceName = declaration.SourceName;
+        if (sourceName == SharedImplUtil.MISSING_DECLARATION_NAME)
+          continue;
+
+        var compiledName = declaration.DeclaredName;
+        if (compiledName == SharedImplUtil.MISSING_DECLARATION_NAME)
+          continue;
+
+        var parametersCount = declaration.TypeParameters.Count;
+        var augmentationInfo = TypeAugmentation.NewTypePart(compiledName, parametersCount, declaration.TypePartKind);
+
+        var nameInfo = new NameAndParametersCound(sourceName, parametersCount);
+        declaredTypeNames[nameInfo] = augmentationInfo;
+      }
+
+      return declaredTypeNames.TryGetValue(extNameInfo, out var typeAugmentation)
+        ? typeAugmentation
+        : TypeAugmentation.Extension;
     }
 
     public static string DropAttributeSuffix([NotNull] this string attrName) =>

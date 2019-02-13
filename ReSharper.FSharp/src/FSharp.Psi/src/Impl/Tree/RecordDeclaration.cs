@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
@@ -23,5 +24,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
       return result.ResultingList();
     }
+
+    public override PartKind TypePartKind =>
+      FSharpImplUtil.GetTypeKind(AttributesEnumerable, out var typeKind)
+        ? typeKind
+        : PartKind.Class;
   }
 }

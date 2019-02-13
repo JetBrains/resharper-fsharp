@@ -38,17 +38,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
           result.Add(declaredElement);
       }
 
-      var fsFile = (IFSharpFile) declaration.GetContainingFile().NotNull();
-      foreach (var typeExtension in fsFile.GetTypeExtensions(ShortName))
-      {
-        foreach (var memberDeclaration in typeExtension.TypeMembers)
-        {
-          var declaredElement = memberDeclaration.DeclaredElement;
-          if (declaredElement != null)
-            result.Add(declaredElement);
-        }
-      }
-
       return result.ResultingList();
     }
 

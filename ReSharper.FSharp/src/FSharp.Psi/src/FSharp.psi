@@ -103,7 +103,6 @@ interface moduleMember:
   moduleMemberStatement |
   memberDeclaration |
   hashDirective |
-  typeExtension |
   otherModuleMember;
 
 interface moduleMemberDeclaration:
@@ -308,13 +307,10 @@ otherExpr options { stubBase="DummyExpression"; }:
   fakeSeparator;
 
 
-typeExtension:
-  namedTypeExpression<EXTENDED_TYPE, ExtendedType>
-  memberDeclaration<TYPE_MEMBER, TypeMembers>* fakeSeparator;
-
 interface fSharpTypeDeclaration:
   exceptionDeclaration |
   simpleTypeDeclaration |
+  typeExtensionDeclaration
   objectModelTypeDeclaration |
   nestedTypeUnionCaseDeclaration;
 
@@ -342,7 +338,16 @@ nestedModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; }
   IDENTIFIER<IDENTIFIER, Identifier>
   moduleMember<MODULE_MEMBER, Members>*;
 
-
+typeExtensionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
+   get { methodName="TypeParameters" path=<typeExtensionDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
+   get { methodName="TypeMembers" path=<typeExtensionDeclaration:TYPE_MEMBER> };
+ }:
+  fSharpAttribute<ATTRIBUTE, Attributes>*
+  accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
+  IDENTIFIER<IDENTIFIER, Identifier> // todo: use lid
+  namedTypeExpression<EXTENDED_TYPE, ExtendedType>
+  typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
+  fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
 
 // Enums
 

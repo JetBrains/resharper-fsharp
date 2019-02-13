@@ -29,6 +29,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override bool IsExtensionMember => FSharpSymbol.IsExtensionMember;
     public override bool IsMember => FSharpSymbol.IsMember;
 
+    protected override ITypeElement GetTypeElement(IDeclaration declaration)
+    {
+      var typeDeclaration = declaration.GetContainingNode<ITypeDeclaration>();
+      if (typeDeclaration is ITypeExtensionDeclaration extensionDeclaration &&
+          !extensionDeclaration.IsTypePartDeclaration)
+        return extensionDeclaration.GetContainingNode<ITypeDeclaration>()?.DeclaredElement;
+
+      return typeDeclaration?.DeclaredElement;
+    }
+
     public override IList<IAttributeInstance> GetAttributeInstances(bool inherit) =>
       FSharpAttributeInstance.GetAttributeInstances(FSharpSymbol.Attributes, Module);
 
