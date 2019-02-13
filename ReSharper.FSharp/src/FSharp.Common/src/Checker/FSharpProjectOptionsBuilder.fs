@@ -82,6 +82,20 @@ type FSharpProjectOptionsBuilder
 
     let defaultDelimiters = [| ';'; ','; ' ' |]
 
+    let defaultOptions =
+        [| "--noframework"
+           "--debug:full"
+           "--debug+"
+           "--optimize-"
+           "--tailcalls-"
+           "--fullpaths"
+           "--flaterrors"
+           "--highentropyva+" |]
+
+    let unusedValuesWarns =
+        [| "--warnon:1182"
+           "--warnaswarn:1182" |]
+
     let splitAndTrim (delimiters: char[]) = function
         | null -> EmptyArray.Instance
         | (s: string) -> s.Split(delimiters, StringSplitOptions.RemoveEmptyEntries)
@@ -103,20 +117,11 @@ type FSharpProjectOptionsBuilder
         let properties = project.ProjectProperties
         let buildSettings = properties.BuildSettings :?> _ // todo: can differ by framework id?
 
-        let options = ResizeArray()
-        options.AddRange(seq {
-            yield "--out:" + project.GetOutputFilePath(targetFrameworkId).FullPath
-            yield "--noframework"
-            yield "--debug:full"
-            yield "--debug+"
-            yield "--optimize-"
-            yield "--tailcalls-"
-            yield "--fullpaths"
-            yield "--flaterrors"
-            yield "--highentropyva+"
-            yield "--target:" + x.GetOutputType(buildSettings)
-          })
-
+        let options = List()
+        options.Add("--out:" + project.GetOutputFilePath(targetFrameworkId).FullPath)
+        options.Add("--target:" + x.GetOutputType(buildSettings))
+        options.AddRange(defaultOptions)
+        options.AddRange(unusedValuesWarns)
         options.AddRange(getReferences project psiModule targetFrameworkId)
 
         let definedConstants = x.GetDefinedConstants(properties, targetFrameworkId) |> List.ofSeq
