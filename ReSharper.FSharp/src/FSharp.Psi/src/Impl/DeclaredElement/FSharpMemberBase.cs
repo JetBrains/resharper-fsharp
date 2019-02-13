@@ -13,7 +13,7 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
   internal abstract class FSharpMemberBase<TDeclaration> : FSharpTypeMember<TDeclaration>, IParametersOwner,
-    IOverridableMember
+    IOverridableMember, IFSharpMember
     where TDeclaration : FSharpDeclarationBase, IFSharpDeclaration, IAccessRightsOwnerDeclaration,
     IModifiersOwnerDeclaration
   {
@@ -67,6 +67,30 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       return AccessRights.PUBLIC;
     }
 
+    public override bool Equals(object obj)
+    {
+      if (!base.Equals(obj) || !(obj is FSharpMemberBase<TDeclaration> otherMember))
+        return false;
+
+      var isExtension = FSharpSymbol.IsExtensionMember;
+      var isInstanceMember = FSharpSymbol.IsInstanceMember;
+
+      if (!(isExtension && isInstanceMember))
+        return true;
+
+      var otherSymbol = otherMember.FSharpSymbol;
+      if (!otherSymbol.IsExtensionMember || !otherSymbol.IsInstanceMember)
+        return false;
+
+      var apparentEntity = FSharpSymbol.ApparentEnclosingEntity;
+      var otherApparentEntity = otherSymbol.ApparentEnclosingEntity;
+      return apparentEntity.Equals(otherApparentEntity);
+    }
+
+    public override int GetHashCode() => ShortName.GetHashCode();
+
+    public FSharpEntity ApparentDeclaringEntity => FSharpSymbol.ApparentEnclosingEntity;
+
     public override bool IsStatic => !FSharpSymbol.IsInstanceMember;
 
     // todo: check interface impl
@@ -77,5 +101,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public bool IsExplicitImplementation => false;
     public IList<IExplicitImplementation> ExplicitImplementations => EmptyList<IExplicitImplementation>.Instance;
     public bool CanBeImplicitImplementation => true; // todo: set false and calc proper base element
+  }
+
+  public interface IFSharpMember
+  {
+    FSharpEntity ApparentDeclaringEntity { get; }
   }
 }

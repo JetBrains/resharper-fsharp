@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
@@ -134,6 +135,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
             return null;
           case 1:
             return members[0];
+        }
+
+        if (mfv.IsExtensionMember && mfv.IsInstanceMember)
+        {
+          var extensionMember = members.FirstOrDefault(m =>
+            m is IFSharpMember member && member.ApparentDeclaringEntity.Equals(mfv.ApparentEnclosingEntity));
+          if (extensionMember != null)
+            return extensionMember;
         }
 
         var mfvXmlDocId = GetXmlDocId(mfv);
