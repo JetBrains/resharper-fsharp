@@ -54,7 +54,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       EmptyList<IParametersOwnerDeclaration>.Instance;
 
     public virtual IList<IParameter> Parameters => EmptyList<IParameter>.Instance;
-    public ReferenceKind ReturnKind => ReferenceKind.VALUE;
+    public virtual ReferenceKind ReturnKind => ReferenceKind.VALUE;
     public abstract IType ReturnType { get; }
 
     public override AccessRights GetAccessRights()

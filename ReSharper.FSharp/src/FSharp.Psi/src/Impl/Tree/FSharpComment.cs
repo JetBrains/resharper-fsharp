@@ -51,10 +51,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
                 {
                     var text = GetText();
                     var length = text.Length - (text.EndsWith("*)") ? 4 : 2);
-                    if (length <= 0)
-                        return TreeTextRange.InvalidRange;
-
-                    return new TreeTextRange(startOffset + 2, startOffset + 2 + length);
+                    return length > 0
+                        ? new TreeTextRange(startOffset + 2, startOffset + 2 + length)
+                        : TreeTextRange.InvalidRange;
                 }
             }
 

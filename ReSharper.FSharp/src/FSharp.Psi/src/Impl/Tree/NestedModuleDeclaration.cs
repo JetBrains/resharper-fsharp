@@ -1,5 +1,4 @@
 ﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
-using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -10,8 +9,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       get
       {
-        var parentModule = Parent as IModuleLikeDeclaration;
-        if (parentModule == null)
+        if (!(Parent is IModuleLikeDeclaration parentModule))
           return NameIdentifier.GetModuleCompiledName(Attributes);
 
         var sourceName = SourceName;

@@ -54,8 +54,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
       foreach (var partDeclaration in declarations)
       {
-        var typeDeclaration = partDeclaration as IFSharpTypeElementDeclaration;
-        if (typeDeclaration == null) continue;
+        if (!(partDeclaration is IFSharpTypeElementDeclaration typeDeclaration))
+          continue;
 
         foreach (var member in typeDeclaration.MemberDeclarations)
           if (member.DeclaredName == declaration.DeclaredName && Equals(this, member.DeclaredElement))

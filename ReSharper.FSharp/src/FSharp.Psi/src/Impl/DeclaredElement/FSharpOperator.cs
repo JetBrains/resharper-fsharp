@@ -11,21 +11,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     where TDeclaration : FSharpDeclarationBase, IFSharpDeclaration, IAccessRightsOwnerDeclaration,
     IModifiersOwnerDeclaration
   {
-    private readonly bool myIsExplicitCast;
-
     internal FSharpConversionOperator([NotNull] ITypeMemberDeclaration declaration,
       [NotNull] FSharpMemberOrFunctionOrValue mfv, [CanBeNull] IFSharpTypeDeclaration typeDeclaration,
-      bool isExplicitCast)
-      : base(declaration, mfv, typeDeclaration)
-    {
-      myIsExplicitCast = isExplicitCast;
-    }
-    
+      bool isExplicitCast) : base(declaration, mfv, typeDeclaration) =>
+      IsExplicitCast = isExplicitCast;
+
     public override DeclaredElementType GetElementType() =>
       CLRDeclaredElementType.CONVERSION_OPERATOR;
 
-    public bool IsExplicitCast => myIsExplicitCast;
-    public bool IsImplicitCast => !myIsExplicitCast;
+    public bool IsExplicitCast { get; }
+    public bool IsImplicitCast => !IsExplicitCast;
   }
   
   internal class FSharpSignOperator<TDeclaration> : FSharpOperatorBase<TDeclaration>, ISignOperator

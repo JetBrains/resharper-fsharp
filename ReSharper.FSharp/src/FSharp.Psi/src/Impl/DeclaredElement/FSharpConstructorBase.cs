@@ -29,6 +29,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override bool IsStatic => false;
     public bool IsParameterless => Parameters.IsEmpty();
     public abstract bool IsImplicit { get; }
-    public ReferenceKind ReturnKind => ReferenceKind.VALUE;
   }
 }

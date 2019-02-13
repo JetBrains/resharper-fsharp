@@ -110,10 +110,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
           if (declaration is IFSharpLocalDeclaration localDeclaration)
             return localDeclaration;
 
-          if (declaration is ISynPat)
-            return declaration.DeclaredElement;
-
-          return null;
+          return declaration is ISynPat
+            ? declaration.DeclaredElement
+            : null;
         }
 
         var memberEntity = mfv.IsModuleValueOrMember ? mfv.DeclaringEntity : null;

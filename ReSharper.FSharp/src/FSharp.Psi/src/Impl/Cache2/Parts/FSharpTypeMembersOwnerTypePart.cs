@@ -59,14 +59,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       // RIDER-10263
       (HasPublicDefaultCtor ? MemberPresenceFlag.PUBLIC_DEFAULT_CTOR : MemberPresenceFlag.NONE);
 
-    public override IDeclaredType GetBaseClassType()
-    {
-      // todo: check inherit only
-      if (ExtendsListShortNames.IsEmpty())
-        return null;
-
-      return base.GetBaseClassType();
-    }
+    public override IDeclaredType GetBaseClassType() =>
+      ExtendsListShortNames.IsEmpty()
+        ? null
+        : base.GetBaseClassType();
 
     public override IEnumerable<IDeclaredType> GetSuperTypes()
     {
@@ -74,10 +70,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
         return EmptyList<IDeclaredType>.InstanceList;
 
       var declaration = GetDeclaration();
-      if (declaration == null)
-        return EmptyList<IDeclaredType>.InstanceList;
-
-      return declaration.SuperTypes;
+      return declaration != null ? declaration.SuperTypes : EmptyList<IDeclaredType>.InstanceList;
     }
   }
 }

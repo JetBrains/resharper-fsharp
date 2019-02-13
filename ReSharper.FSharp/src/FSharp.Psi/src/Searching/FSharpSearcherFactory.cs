@@ -56,10 +56,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
           if (patternEntity != null)
           {
             var patternTypeElement = FSharpElementsUtil.GetDeclaredElement(patternEntity, fsSymbolElement.Module);
-            if (patternTypeElement == null)
-              return EmptySearchDomain.Instance;
-
-            return myClrSearchFactory.GetDeclaredElementSearchDomain(patternTypeElement);
+            return patternTypeElement != null
+              ? myClrSearchFactory.GetDeclaredElementSearchDomain(patternTypeElement)
+              : EmptySearchDomain.Instance;
           }
         }
       }
