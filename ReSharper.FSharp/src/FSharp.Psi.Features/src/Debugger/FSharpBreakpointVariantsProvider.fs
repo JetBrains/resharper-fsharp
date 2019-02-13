@@ -25,7 +25,7 @@ type FSharpBreakpointVariantsProvider() =
                     FSharpScriptProjectFileType.FsxExtension
                     FSharpScriptProjectFileType.FsScriptExtension |])
 
-        member x.GetBreakpointVariants(file, line, solution) =
+        member x.GetBreakpointVariants(file, line, _) =
             match file.GetPrimaryPsiFile().AsFSharpFile() with
             | null -> null
             | fsFile ->

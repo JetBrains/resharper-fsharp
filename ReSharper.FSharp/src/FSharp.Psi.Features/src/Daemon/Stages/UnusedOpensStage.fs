@@ -2,7 +2,6 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
 open System.Collections.Generic
 open JetBrains.Application
-open JetBrains.Application.Settings
 open JetBrains.ReSharper.Daemon.UsageChecking
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Feature.Services.Intentions.Scoped
@@ -54,7 +53,7 @@ type UnusedOpensStageProcess(fsFile: IFSharpFile, checkResults, daemonProcess: I
 type UnusedOpensStage(daemonProcess, errors) =
     inherit FSharpDaemonStageBase()
 
-    override x.CreateStageProcess(fsFile: IFSharpFile, settings: IContextBoundSettingsStore, daemonProcess: IDaemonProcess) =
+    override x.CreateStageProcess(fsFile: IFSharpFile, _, daemonProcess: IDaemonProcess) =
         daemonProcess.CustomData.GetData(FSharpDaemonStageBase.TypeCheckResults)
         |> Option.map (fun checkResults ->
             UnusedOpensStageProcess(fsFile, checkResults, daemonProcess) :> IDaemonStageProcess)
@@ -84,14 +83,14 @@ type RemoveUnusedOpensFix(warning: UnusedOpenWarningHighlighting) =
     let [<Literal>] actionText = "Remove unused opens"
 
     override x.Text = actionText
-    override x.IsAvailable(cache: IUserDataHolder) = warning.OpenStatement.IsValid()
-    override x.ExecutePsiTransaction(solution, progress) = null
+    override x.IsAvailable(_) = warning.OpenStatement.IsValid()
+    override x.ExecutePsiTransaction(_,_) = null
 
     interface IHighlightingsSetScopedAction with
         member x.ScopedText = actionText
         member x.FileCollectorInfo = FileCollectorInfo.WithoutCaretFix
 
-        member x.ExecuteAction(hls, solution, progress) =
+        member x.ExecuteAction(hls, _, _) =
             use writeLock = WriteLockCookie.Create(true)
             for hl in hls do
                 match hl.Highlighting with

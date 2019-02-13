@@ -97,7 +97,7 @@ type FSharpFileScopeProvider() =
 
         match sourceFile.GetPsiFile<FSharpLanguage>(context.CaretOffset) with
         | null -> EmptyList.Instance :> _
-        | file -> [| InFSharpFile() :> ITemplateScopePoint |] :> _
+        | _ -> [| InFSharpFile() :> ITemplateScopePoint |] :> _
 
 
 [<ScopeCategoryUIProvider(Priority = -20., ScopeFilter = ScopeFilter.Project)>]

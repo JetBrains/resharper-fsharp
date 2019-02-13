@@ -200,7 +200,6 @@ type FSharpItemsContainer
             | FSharpProjectMark ->
                 let itemsByName = OneToListMap()
                 for rdProject in msBuildProject.RdProjects do
-                    let itemFilter = filterProvider.CreateItemFilter(rdProject, projectDescriptor)
                     for rdItem in rdProject.Items do
                         itemsByName.Add(rdItem.EvaluatedInclude, rdItem.ItemType)
 
@@ -255,7 +254,7 @@ type FSharpItemsContainer
                         (changesOrder oldItemType || changesOrder newItemType) then
                     refresher.ReloadProject(projectMark) else
 
-                updateProject projectMark (fun mapping _ updater ->
+                updateProject projectMark (fun mapping _ _ ->
                     mapping.UpdateFile(oldItemType, oldLocation, newItemType, newLocation)
                     refresher.UpdateFile(projectMark, newLocation))
             | _ -> ()
@@ -369,7 +368,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         let path = viewItem.ProjectItem.Location
         match viewItem with
         | FSharpViewFile _ -> tryGetFile path
-        | FSharpViewFolder (_, identity) as viewFolder ->
+        | FSharpViewFolder (_, identity) ->
             getFolders path
             |> List.tryFind (function | FolderItem (_, id) -> id = identity | _ -> false)
 
@@ -894,7 +893,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
                 tryGetAdjacentRelativeItem (ProjectItem relativeChildItem) modifiedItemBuildAction relativeToType
                 |> Option.map (fun (item, relativeToType) -> item.PhysicalPath, changeDirection relativeToType)
 
-        | Some (item, reltativeToType) -> Some (item.PhysicalPath, relativeToType)
+        | Some (item, relativeToType) -> Some (item.PhysicalPath, relativeToType)
         | _ -> None
 
     member x.GetProjectItemsPaths(targetFrameworkId) =
@@ -1061,11 +1060,11 @@ type FSharpItemsContainerRefresher(lifetime: Lifetime, solution: ISolution, view
                         viewHost.UpdateItemIfExists(viewItem)))
 
     interface IFSharpItemsContainerRefresher with
-        member x.RefreshProject(projectMark, isOnProjectLoad) =
+        member x.RefreshProject(projectMark, _) =
             refresh projectMark (fun project -> [project])
 
         // todo: single identity
-        member x.RefreshFolder(projectMark, folder, folderIdentity) =
+        member x.RefreshFolder(projectMark, folder, _) =
             refresh projectMark (fun project -> project.FindProjectItemsByLocation(folder).OfType<IProjectFolder>()) 
     
         member x.UpdateFile(projectMark, path) =

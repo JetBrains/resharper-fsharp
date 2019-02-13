@@ -16,5 +16,5 @@ type SyntaxErrorsStageProcess(fsFile: IFSharpFile, daemonProcess) =
 type SyntaxErrorsStage(daemonProcess, errors) =
     inherit FSharpDaemonStageBase()
 
-    override x.CreateStageProcess(fsFile, settings, daemonProcess) =
+    override x.CreateStageProcess(fsFile, _, daemonProcess) =
         SyntaxErrorsStageProcess(fsFile, daemonProcess) :> _

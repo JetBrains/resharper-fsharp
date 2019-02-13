@@ -220,7 +220,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
             x.ProcessUnionCase(case)
         x.Done(range, casesListMark, ElementType.UNION_CASES_LIST)
 
-    member x.ProcessUnionCase(UnionCase(attrs,id,caseType,_,_,range)) =
+    member x.ProcessUnionCase(UnionCase(attrs,_,caseType,_,_,range)) =
         let mark = x.MarkTokenOrRange(FSharpTokenType.BAR, range)
         x.ProcessAttributes(attrs)
         let hasFields = x.ProcessUnionCaseType(caseType, ElementType.UNION_CASE_FIELD_DECLARATION)
@@ -249,7 +249,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
 
         x.Done(attr.Range, mark, ElementType.F_SHARP_ATTRIBUTE)
 
-    member x.ProcessEnumCase (EnumCase(_,id,_,_,range)) =
+    member x.ProcessEnumCase (EnumCase(_,_,_,_,range)) =
         x.MarkAndDone(range, ElementType.ENUM_MEMBER_DECLARATION)
 
     member x.ProcessField (Field(_,_,id,t,_,_,_,range)) elementType =

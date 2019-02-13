@@ -15,7 +15,7 @@ type SymbolCacheTest() =
 
     override x.RelativeTestDataPath = "cache/symbolCache"
 
-    override x.GetProjectProperties(targetFrameworkIds, flavours) =
+    override x.GetProjectProperties(targetFrameworkIds, _) =
         FSharpProjectPropertiesFactory.CreateProjectProperties(targetFrameworkIds)
 
     [<Test>] member x.``Module 01 - Simple``() = x.DoNamedTest()

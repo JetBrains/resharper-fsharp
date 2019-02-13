@@ -70,7 +70,7 @@ type NamedTypeExpressionNodeAspect(treeNode: INameIdentifierOwner, iconId: IconI
         | name -> RichText(name)
 
     interface IGotoFileMemberAspect with
-        member x.Present(descriptor, state) =
+        member x.Present(descriptor, _) =
             descriptor.Icon <- iconId
             descriptor.Text <- x.Name
         member x.NavigationRange = treeNode.GetNavigationRange()
@@ -78,15 +78,15 @@ type NamedTypeExpressionNodeAspect(treeNode: INameIdentifierOwner, iconId: IconI
         member x.GetSourceFile() = treeNode.GetSourceFile()
 
     interface IFileStructureAspect with
-        member x.Present(presenter, item, modelNode, state) =
+        member x.Present(_,item,_,_) =
             item.Images.Add(iconId)
             item.RichText <- x.Name
 
         member x.NavigationRange = navigationRange
         member x.InitiallyExpanded = true
         member x.GetQuickSearchTexts() = searchNames
-        member x.CanMoveElements(location, dropElements) = false
-        member x.MoveElements(location, dropElements) = raise (NotSupportedException())
+        member x.CanMoveElements(_, _) = false
+        member x.MoveElements(_, _) = raise (NotSupportedException())
         member x.CanRemove() = false
         member x.Remove() = raise (NotSupportedException())
         member x.CanRename() = false

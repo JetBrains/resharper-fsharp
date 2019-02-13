@@ -239,13 +239,13 @@ type FSharpItemsContainerTest() =
     [<Test>]
     member x.``Add file 01 - Empty project``() =
         x.DoContainerModificationTest(([]: string list),
-            fun container writer ->
+            fun container _ ->
                 container.OnAddFile("Compile", "File1", null, None))
     
     [<Test>]
     member x.``Add file 02 - No relative``() =
         x.DoContainerModificationTest(([]: string list),
-            fun container writer ->
+            fun container _ ->
                 container.OnAddFile("Compile", "Folder/Subfolder/File1", null, None))
 
     [<Test>]
@@ -314,7 +314,7 @@ type FSharpItemsContainerTest() =
         x.DoContainerModificationTest(
             [ "File1"
               "Folder[1]/File2"],
-            fun container writer ->
+            fun container _ ->
                 container.OnAddFile("Compile", "Folder/Subfolder/File1", null, None))
 
     [<Test>]
@@ -322,7 +322,7 @@ type FSharpItemsContainerTest() =
         x.DoContainerModificationTest(
             [ "File1"
               "Folder[1]/SubFolder[1]/File2" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnAddFile("Compile", "Folder/Subfolder/Another/File1", null, None))
 
     [<Test>]
@@ -540,7 +540,7 @@ type FSharpItemsContainerTest() =
             [ "File1"
               "Folder[1]/SubFolder[1]/Subfolder[1]/File1"
               "Folder[1]/File4" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnRemoveFile("Compile", "File1"))
 
     [<Test>]
@@ -549,7 +549,7 @@ type FSharpItemsContainerTest() =
             [ "File1"
               "Folder[1]/SubFolder[1]/File1"
               "Folder[1]/File4" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnRemoveFile("Compile", "Folder/Subfolder/File1"))
 
     [<Test>]
@@ -558,7 +558,7 @@ type FSharpItemsContainerTest() =
             [ "File1"
               "Folder[1]/SubFolder[1]/Subfolder[1]/File1"
               "Folder[1]/File4" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnRemoveFile("Compile", "Folder/Subfolder/Subfolder/File1"))
 
     [<Test>]
@@ -568,7 +568,7 @@ type FSharpItemsContainerTest() =
               "Folder[1]/File2"
               "File3"
               "Folder[2]/File4" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnRemoveFile("Compile", "Folder/File2"))
 
     [<Test>]
@@ -578,7 +578,7 @@ type FSharpItemsContainerTest() =
               "Folder[1]/File2"
               "File3"
               "Folder[2]/File4" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnRemoveFile("Compile", "Folder/File4"))
 
     [<Test>]
@@ -589,7 +589,7 @@ type FSharpItemsContainerTest() =
               "Folder[1]/File2"
               "Folder[1]/Subfolder[2]/File3"
               "Folder[1]/File4" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnRemoveFile("Compile", "Folder/File2"))
 
     [<Test>]
@@ -599,7 +599,7 @@ type FSharpItemsContainerTest() =
               "Folder[1]/SubFolder[1]/File2"
               "File3"
               "Folder[2]/SubFolder[2]/File4" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnRemoveFile("Compile", "Folder/SubFolder/File4"))
 
     [<Test>]
@@ -609,7 +609,7 @@ type FSharpItemsContainerTest() =
               "Folder[1]/File2"
               "File3"
               "Folder[2]/File4" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnRemoveFile("Compile", "Folder/File2"))
 
     [<Test>]
@@ -619,7 +619,7 @@ type FSharpItemsContainerTest() =
               "Folder[1]/SubFolder[1]/File2"
               "File3"
               "Folder[2]/SubFolder[2]/File4" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnRemoveFile("Compile", "Folder/SubFolder/File2"))
 
     [<Test>]
@@ -630,7 +630,7 @@ type FSharpItemsContainerTest() =
               "Another[1]/File3"
               "Folder[2]/SubFolder[2]/File4"
               "Another[2]/File5" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnRemoveFile("Compile", "Another/File3"))
 
     [<Test>]
@@ -704,7 +704,7 @@ type FSharpItemsContainerTest() =
               "File2"
               "File3"
               "Folder[1]/File4" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnUpdateFile("Compile", "File2", "Compile", "NewName1")
                 container.OnUpdateFile("Compile", "File3", "Compile", "NewName2"))
 
@@ -716,7 +716,7 @@ type FSharpItemsContainerTest() =
               "Folder[1]/File3"
               "Folder[1]/File4"
               "File5" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnUpdateFile("Compile", "Folder/File2", "Compile", "Folder/NewName1")
                 container.OnUpdateFile("Compile", "Folder/File3", "Compile", "Folder/NewName2")
                 container.OnUpdateFile("Compile", "Folder/File4", "Compile", "Folder/NewName3"))
@@ -729,7 +729,7 @@ type FSharpItemsContainerTest() =
               "Folder[1]/File3"
               "Folder[1]/SubFolder[2]/File4"
               "File5" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnUpdateFolder("Folder", "NewName"))
 
     [<Test>]
@@ -743,7 +743,7 @@ type FSharpItemsContainerTest() =
               "Folder[2]/File6"
               "Folder[2]/SubFolder/File7"
               "Folder[2]/File8" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnUpdateFolder("Folder", "NewName"))
 
     [<Test>]
@@ -752,7 +752,7 @@ type FSharpItemsContainerTest() =
             [ "Folder[1]/SubFolder[1]/File1"
               "File2"
               "Folder[2]/SubFolder[2]/File3" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnUpdateFolder("Folder/SubFolder", "Folder/NewName"))
 
     [<Test>]
@@ -814,7 +814,7 @@ type FSharpItemsContainerTest() =
     member x.``Update 10 - Change linked item type``() =
         x.DoContainerModificationTest(
             [ createItem "Compile" "..\\ExternalFolder\\File1" |> link "File1" ],
-            fun container writer ->
+            fun container _ ->
                 let (UnixSeparators path) = FileSystemPath.Parse("..\\ExternalFolder\\File1")
                 container.OnUpdateFile("Compile", path, "Resource", path))
 

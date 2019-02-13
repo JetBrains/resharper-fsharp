@@ -35,5 +35,5 @@ type TypeCheckErrorsStageProcess(fsFile: IFSharpFile, daemonProcess, logger: ILo
 type TypeCheckErrorsStage(daemonProcess, logger: ILogger) =
     inherit FSharpDaemonStageBase()
 
-    override x.CreateStageProcess(fsFile, settings, daemonProcess) =
+    override x.CreateStageProcess(fsFile, _, daemonProcess) =
         TypeCheckErrorsStageProcess(fsFile, daemonProcess, logger) :> _

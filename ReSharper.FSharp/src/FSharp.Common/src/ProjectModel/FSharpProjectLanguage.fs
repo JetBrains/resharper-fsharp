@@ -1,6 +1,5 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 
-open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Properties
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 

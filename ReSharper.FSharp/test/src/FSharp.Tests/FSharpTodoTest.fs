@@ -14,7 +14,7 @@ type FSharpTodoTest() =
     
     override x.CompilerIdsLanguage = FSharpLanguage.Instance :> _
     
-    override x.GetProjectProperties(targetFrameworkIds, flavours) =
+    override x.GetProjectProperties(targetFrameworkIds, _) =
         FSharpProjectPropertiesFactory.CreateProjectProperties(targetFrameworkIds)
 
     [<Test>] member x.``Line comment``() = x.DoNamedTest()

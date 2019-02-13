@@ -6,7 +6,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Psi
 open JetBrains.Util
-open System.Runtime.InteropServices
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpBlockCommentActionProvider() = 
@@ -21,7 +20,7 @@ type FSharpBlockCommentActionProvider() =
             if lexer.TokenType == FSharpTokenType.BLOCK_COMMENT then TextRange(lexer.TokenStart, lexer.TokenEnd)
             else TextRange.InvalidRange
 
-        member x.IsAvailable(file, range, [<Out>] disableAllProviders) =
+        member x.IsAvailable(_, _, disableAllProviders) =
             disableAllProviders <- false
             true
 

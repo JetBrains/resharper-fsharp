@@ -45,7 +45,7 @@ type FSharpCheckerExtensions =
             match results with
             | Some(parseResults, checkResults) ->
                 match parseResults.ParseTree with
-                | Some parsedInput -> Some (parseResults, checkResults)
+                | Some _ -> Some (parseResults, checkResults)
                 | None -> None
             | None -> None
 

@@ -10,7 +10,7 @@ open JetBrains.Util
 open Microsoft.FSharp.Compiler.Ast
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
-type internal FSharpParser(file: IPsiSourceFile, checkerService: FSharpCheckerService, logger: ILogger) =
+type internal FSharpParser(file: IPsiSourceFile, checkerService: FSharpCheckerService) =
     let tryCreateTreeBuilder lexer lifetime =
         Option.bind (fun (parseResults: FSharpParseFileResults) ->
             parseResults.ParseTree |> Option.map (function

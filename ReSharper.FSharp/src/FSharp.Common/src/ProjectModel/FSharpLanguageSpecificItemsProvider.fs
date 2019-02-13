@@ -1,7 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 
 open System
-open System.Collections.Generic
 open JetBrains.Application
 open JetBrains.Platform.MsBuildHost.Models
 open JetBrains.ProjectModel
@@ -37,9 +36,8 @@ type FSharpLanguageSpecificItemsProvider() =
 
         member x.CreateSections(lifetime, project, properties) =
             if project.ProjectProperties :? FSharpProjectProperties then
-                [|
-                    EditPropertyItemBuilder.Section(ConfigurationTabProvider.CompileSectionTitle)
-                        .AddCheckBox(properties, "Tailcalls", "Generate tail calls")
-                |] :> _
+                [| EditPropertyItemBuilder
+                       .Section(ConfigurationTabProvider.CompileSectionTitle)
+                       .AddCheckBox(properties, "Tailcalls", "Generate tail calls") |] :> _
 
             else EmptyList.Instance :> _

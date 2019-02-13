@@ -11,7 +11,7 @@ type FSharpRenameTest() =
 
     override x.RelativeTestDataPath = "features/refactorings/rename"
 
-    override x.GetProjectProperties(targetFrameworkIds, flavours) =
+    override x.GetProjectProperties(targetFrameworkIds, _) =
         FSharpProjectPropertiesFactory.CreateProjectProperties(targetFrameworkIds)
 
     [<Test>] member x.``Inline - Declaration``() = x.DoNamedTest()

@@ -141,7 +141,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                     x.MarkOtherExpr(args)
                     ElementType.TYPE_INHERIT
 
-                | SynMemberDefn.Interface(interfaceType,interfaceMembersOpt,range) ->
+                | SynMemberDefn.Interface(interfaceType,interfaceMembersOpt,_) ->
                     x.ProcessSynType(interfaceType)
                     match interfaceMembersOpt with
                     | Some members ->
@@ -155,7 +155,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                     with _ -> () // Getting type range throws an exception if base type lid is empty.
                     ElementType.INTERFACE_INHERIT
 
-                | SynMemberDefn.Member(Binding(_,_,_,_,attrs,_,valData,headPat,ret,expr,_,_),range) ->
+                | SynMemberDefn.Member(Binding(_,_,_,_,_,_,valData,headPat,ret,expr,_,_),range) ->
                     let elType =
                         match headPat with
                         | SynPat.LongIdent(LongIdentWithDots(lid,_),_,typeParamsOpt,memberParams,_,_) ->
@@ -182,21 +182,21 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                     | _ -> ()
                     elType
 
-                | SynMemberDefn.LetBindings(bindings,_,_,range) ->
+                | SynMemberDefn.LetBindings(bindings,_,_,_) ->
                     for binding in bindings do
                         x.ProcessBinding(binding, false)
                     ElementType.LET
 
-                | SynMemberDefn.AbstractSlot(ValSpfn(_,id,typeParams,_,_,_,_,_,_,_,_),_,range) as slot ->
+                | SynMemberDefn.AbstractSlot(ValSpfn(_,_,typeParams,_,_,_,_,_,_,_,_),_,range) as slot ->
                     match typeParams with
                     | SynValTyparDecls(typeParams,_,_) ->
                         x.ProcessTypeParametersOfType typeParams range true
                     ElementType.ABSTRACT_SLOT
 
-                | SynMemberDefn.ValField(Field(_,_,id,_,_,_,_,_),_) ->
+                | SynMemberDefn.ValField(Field(_,_,_,_,_,_,_,_),_) ->
                     ElementType.VAL_FIELD
 
-                | SynMemberDefn.AutoProperty(_,_,id,_,_,_,_,_,expr,_,_) ->
+                | SynMemberDefn.AutoProperty(_,_,_,_,_,_,_,_,expr,_,_) ->
                     x.ProcessLocalExpression expr
                     ElementType.AUTO_PROPERTY
 

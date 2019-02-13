@@ -28,7 +28,7 @@ type FSharpSource =
 [<SolutionComponent>]
 type FSharpSourceCache
         (lifetime: Lifetime, solution: ISolution, changeManager, documentManager: DocumentManager,
-         extensions: IProjectFileExtensions, solutionDocumentChangeProvider: SolutionDocumentChangeProvider,
+         solutionDocumentChangeProvider: SolutionDocumentChangeProvider,
          fileExtensions: IProjectFileExtensions, logger: JetBrains.Util.ILogger) =
     inherit FileSystemShimChangeProvider(Lifetime.Define(lifetime).Lifetime, changeManager)
 
@@ -86,7 +86,7 @@ type FSharpSourceCache
 
     override x.Exists(path) =
         match files.TryGetValue(path) with
-        | true, value -> true
+        | true, _ -> true
         | _ -> base.Exists(path)
 
     member x.ProcessDocumentChange(change: DocumentChange) =

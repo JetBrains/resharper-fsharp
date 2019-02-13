@@ -1,6 +1,5 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages
 
-open System.Linq
 open JetBrains.ReSharper.Daemon.Stages
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
@@ -28,5 +27,5 @@ type DeadCodeHighlightStageProcess(fsFile: IFSharpFile, daemonProcess) =
 type DeadCodeHighlightStage(daemonProcess) =
     inherit FSharpDaemonStageBase()
 
-    override x.CreateStageProcess(fsFile, settings, daemonProcess) =
+    override x.CreateStageProcess(fsFile, _, daemonProcess) =
         DeadCodeHighlightStageProcess(fsFile, daemonProcess) :> _

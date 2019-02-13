@@ -38,7 +38,7 @@ open Microsoft.FSharp.Compiler.SourceCodeServices
 type FSharpScriptPsiModulesProvider
         (lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager, documentManager: DocumentManager,
          checkerService: FSharpCheckerService, platformManager: PlatformManager, assemblyFactory: AssemblyFactory,
-         projectFileExtensions, projectFileTypeCoordinator, logger: ILogger) as this =
+         projectFileExtensions, projectFileTypeCoordinator) as this =
 
     /// There may be multiple project files for a path (i.e. linked in multiple projects) and we must distinguish them.
     let scriptsFromProjectFiles = OneToListMap<FileSystemPath, FSharpScriptPsiModule>()
@@ -294,31 +294,29 @@ type FSharpScriptPsiModulesProvider
             writer.WriteLine("  " + fsPsiModule.SourceFile.ToProjectFile().GetPersistentID())
 
     interface IProjectPsiModuleProviderFilter with
-        member x.OverrideHandler(lifetime, project, handler) =
+        member x.OverrideHandler(lifetime, _, handler) =
             let handler =
-                FSharpScriptPsiModuleHandler(lifetime, solution, handler, this, projectFileExtensions, changeManager)
+                FSharpScriptPsiModuleHandler(lifetime, solution, handler, this, changeManager)
             handler :> _, null
 
     interface IPsiModuleFactory with
         member x.Modules = psiModulesCollection
 
     interface IChangeProvider with
-        member x.Execute(changeMap) = null
+        member x.Execute(_) = null
 
 
 /// Overriding psi module handler for each project (a real project, misc files project, solution folder, etc). 
 type FSharpScriptPsiModuleHandler
-        (lifetime, solution, handler, modulesProvider, projectFileExtensions, changeManager) as this =
+        (lifetime, solution, handler, modulesProvider, changeManager) as this =
     inherit DelegatingProjectPsiModuleHandler(handler)
 
     let locks = solution.Locks
-    let psiModules = solution.PsiModules()
     let sourceFiles = Dictionary<FileSystemPath, IPsiSourceFile>()
 
     do
         lifetime.OnTermination(fun _ ->
             changeManager.ExecuteAfterChange(fun _ ->
-                let changeBuilder = new PsiModuleChangeBuilder()
                 for sourceFile in sourceFiles.Values do
                     let psiModule = sourceFile.PsiModule :?> FSharpScriptPsiModule
                     psiModule.RemoveProjectHandler(this))) |> ignore

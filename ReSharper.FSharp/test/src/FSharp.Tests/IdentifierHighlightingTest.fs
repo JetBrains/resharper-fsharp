@@ -14,10 +14,10 @@ type IdentifierHighlightingTest() =
 
     override x.CompilerIdsLanguage = FSharpLanguage.Instance :> _
 
-    override x.GetProjectProperties(targetFrameworkIds, flavours) =
+    override x.GetProjectProperties(targetFrameworkIds, _) =
         FSharpProjectPropertiesFactory.CreateProjectProperties(targetFrameworkIds)
 
-    override x.HighlightingPredicate(highlighting, _, _) = true
+    override x.HighlightingPredicate(_, _, _) = true
 
     [<Test>] member x.``Backticks 01``() = x.DoNamedTest()
 

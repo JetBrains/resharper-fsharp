@@ -29,7 +29,7 @@ type FSharpLanguageService
 
     override x.GetPrimaryLexerFactory() = lexerFactory :> _
     override x.CreateFilteringLexer(lexer) = lexer
-    override x.CreateParser(lexer, psiModule, sourceFile) = FSharpParser(sourceFile, fsCheckerService, logger) :> _
+    override x.CreateParser(lexer, _, sourceFile) = FSharpParser(sourceFile, fsCheckerService) :> _
 
     override x.IsTypeMemberVisible(typeMember) =
         match typeMember with
@@ -40,7 +40,7 @@ type FSharpLanguageService
     override x.DeclaredElementPresenter = CSharpDeclaredElementPresenter.Instance :> _ // todo: implement F# presenter
 
     override x.CodeFormatter = formatter :> _
-    override x.FindTypeDeclarations(file) = EmptyList<_>.Instance :> _
+    override x.FindTypeDeclarations(_) = EmptyList.Instance :> _
 
     override x.CanContainCachableDeclarations(node) =
         not (node :? IExpression)
@@ -50,7 +50,7 @@ type FSharpLanguageService
         | :? INamedPat as namedPat -> namedPat.GetOffset()
         | _ -> base.CalcOffset(declaration)
 
-    override x.GetReferenceAccessType(element, reference) =
+    override x.GetReferenceAccessType(_,reference) =
         match reference.As<FSharpSymbolReference>() with
         | null -> ReferenceAccessType.OTHER
         | symbolReference ->

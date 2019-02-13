@@ -22,7 +22,7 @@ type FSharpCodeFoldingProcessFactory() =
             FSharpCodeFoldingProcess() :> _
 
 
-and FSharpCodeFoldingProcess(logger) =
+and FSharpCodeFoldingProcess() =
     inherit TreeNodeVisitor<IHighlightingConsumer>()
     let mutable processingFinished = false
 
@@ -74,9 +74,9 @@ and FSharpCodeFoldingProcess(logger) =
                 logger.LogMessage(LoggingLevel.WARN, sprintf "Empty folding: %O %A" textRange x))
 
     interface ICodeFoldingProcessor with
-        member x.InteriorShouldBeProcessed(element, context) = false
-        member x.IsProcessingFinished(context) = processingFinished
-        member x.ProcessAfterInterior(element, context) = ()
+        member x.InteriorShouldBeProcessed(_,_) = false
+        member x.IsProcessingFinished(_) = processingFinished
+        member x.ProcessAfterInterior(_,_) = ()
         member x.ProcessBeforeInterior(element, context) =
             processingFinished <- true
             match element with

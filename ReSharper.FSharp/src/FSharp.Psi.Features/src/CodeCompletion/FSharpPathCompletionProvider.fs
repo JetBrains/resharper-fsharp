@@ -142,7 +142,6 @@ type FSharpPathCompletionProvider() =
                     completedPath.GetChildFiles()
                     |> Seq.iter addFileItem
 
-                let solution = context.BasicContext.Solution
                 completedPath.GetChildDirectories()
                 |> Seq.iter (FSharpFolderCompletionItem >> addItem)
 
@@ -202,7 +201,7 @@ type FSharpPathAutocompletionStrategy() =
                 | tokenType -> tokenType.IsStringLiteral && token.Parent :? IHashDirective
             | _ -> false
 
-        member x.AcceptTyping(char, textControl, _) = Array.contains char FileSystemDefinition.InvalidPathChars |> not
+        member x.AcceptTyping(char,_,_) = Array.contains char FileSystemDefinition.InvalidPathChars |> not
         member x.ProcessSubsequentTyping(_, _) = true
 
         member x.IsEnabledInSettings(_, _) = AutopopupType.HardAutopopup

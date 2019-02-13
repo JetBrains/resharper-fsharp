@@ -1,6 +1,5 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.ContextHighlighters
 
-open JetBrains.Annotations
 open JetBrains.ReSharper.Daemon.CaretDependentFeatures
 open JetBrains.ReSharper.Feature.Services.Contexts
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util

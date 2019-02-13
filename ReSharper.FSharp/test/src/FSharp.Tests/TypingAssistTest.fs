@@ -21,7 +21,7 @@ type FSharpTypingAssistTest() =
 
     override x.RelativeTestDataPath = "features/service/typingAssist"
 
-    override x.GetProjectProperties(targetFrameworkIds, flavours) =
+    override x.GetProjectProperties(targetFrameworkIds, _) =
         FSharpProjectPropertiesFactory.CreateProjectProperties(targetFrameworkIds)
 
     [<Test>] member x.``Enter 00 - File beginning``() = x.DoNamedTest()
@@ -260,7 +260,7 @@ type LineIndentsTestBase() =
 
     override x.RelativeTestDataPath = "features/service/typingAssist"
 
-    override x.GetProjectProperties(targetFrameworkIds, flavours) =
+    override x.GetProjectProperties(targetFrameworkIds, _) =
         FSharpProjectPropertiesFactory.CreateProjectProperties(targetFrameworkIds)
 
     member x.CachingLexerService =
