@@ -4,11 +4,11 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class TypeExtensionDeclaration
+  internal partial class TypeExtensionDeclaration : IFSharpTypeParametersOwnerDeclaration
   {
     [CanBeNull] private TypeAugmentation myTypeAugmentation;
 
-    public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
+    public override IFSharpIdentifier NameIdentifier => LongIdentifier;
     protected override string DeclaredElementName => TypeAugmentation.CompiledName;
 
     protected override void ClearCachedData()

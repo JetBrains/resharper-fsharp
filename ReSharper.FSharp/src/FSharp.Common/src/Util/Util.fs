@@ -5,6 +5,7 @@ module rec CommonUtil =
     open System.Diagnostics
     open System
     open System.Collections.Generic
+    open JetBrains.Application.UI.Icons.ComposedIcons
     open JetBrains.DataFlow
     open JetBrains.DocumentModel
     open JetBrains.Lifetimes
@@ -147,6 +148,8 @@ module rec CommonUtil =
     type Lifetime with
         member x.AddAction2(func: Func<_,_>) =
             x.OnTermination(fun _ -> func.Invoke() |> ignore) |> ignore
+
+    let compose a b = CompositeIconId.Compose(a, b)
 
 [<AutoOpen>]
 module rec FcsUtil =

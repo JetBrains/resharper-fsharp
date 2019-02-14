@@ -69,51 +69,61 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
             | _ -> ElementType.OTHER_DIRECTIVE
         x.Done(range, mark, elementType)
 
-    member internal x.ProcessType(TypeDefn(ComponentInfo(attrs, typeParams,_,lid,_,_,_,_), repr, members, range)) =
-            let mark = x.StartType attrs typeParams lid range
-            let elementType =
-                match repr with
-                | SynTypeDefnRepr.Simple(simpleRepr, _) ->
-                    match simpleRepr with
-                    | SynTypeDefnSimpleRepr.Record(_,fields,_) ->
-                        for field in fields do
-                            x.ProcessField field ElementType.RECORD_FIELD_DECLARATION
-                        ElementType.RECORD_DECLARATION
+    member x.ProcessType(TypeDefn(ComponentInfo(attrs, typeParams,_,lid,_,_,_,_), repr, members, range)) =
+        match repr with
+        | SynTypeDefnRepr.ObjectModel(SynTypeDefnKind.TyconAugmentation,_,_) ->
+            let mark = x.Mark(range)
+            x.ProcessLongIdentifier(lid)
+            x.ProcessTypeParametersOfType typeParams range false
+            for extensionMember in members do
+                x.ProcessTypeMember(extensionMember)
+            x.Done(range, mark, ElementType.TYPE_EXTENSION_DECLARATION)
+        | _ ->
 
-                    | SynTypeDefnSimpleRepr.Enum(enumCases,_) ->
-                        for case in enumCases do
-                            x.ProcessEnumCase case
-                        ElementType.ENUM_DECLARATION
+        let mark = x.StartType attrs typeParams lid range
+        let elementType =
+            match repr with
+            | SynTypeDefnRepr.Simple(simpleRepr, _) ->
+                match simpleRepr with
+                | SynTypeDefnSimpleRepr.Record(_,fields,_) ->
+                    for field in fields do
+                        x.ProcessField field ElementType.RECORD_FIELD_DECLARATION
+                    ElementType.RECORD_DECLARATION
 
-                    | SynTypeDefnSimpleRepr.Union(_,cases, range) ->
-                        x.ProcessUnionCases(cases, range)
-                        ElementType.UNION_DECLARATION
+                | SynTypeDefnSimpleRepr.Enum(enumCases,_) ->
+                    for case in enumCases do
+                        x.ProcessEnumCase case
+                    ElementType.ENUM_DECLARATION
 
-                    | SynTypeDefnSimpleRepr.TypeAbbrev(_,t,_) ->
-                        x.ProcessSynType t
-                        ElementType.TYPE_ABBREVIATION_DECLARATION
+                | SynTypeDefnSimpleRepr.Union(_,cases, range) ->
+                    x.ProcessUnionCases(cases, range)
+                    ElementType.UNION_DECLARATION
 
-                    | SynTypeDefnSimpleRepr.None(_) ->
-                        ElementType.ABSTRACT_TYPE_DECLARATION
+                | SynTypeDefnSimpleRepr.TypeAbbrev(_,t,_) ->
+                    x.ProcessSynType t
+                    ElementType.TYPE_ABBREVIATION_DECLARATION
 
-                    | _ -> ElementType.OTHER_SIMPLE_TYPE_DECLARATION
+                | SynTypeDefnSimpleRepr.None(_) ->
+                    ElementType.ABSTRACT_TYPE_DECLARATION
 
-                | SynTypeDefnRepr.Exception(_) ->
-                    ElementType.EXCEPTION_DECLARATION
+                | _ -> ElementType.OTHER_SIMPLE_TYPE_DECLARATION
 
-                | SynTypeDefnRepr.ObjectModel(SynTypeDefnKind.TyconAugmentation,_,_) ->
-                    ElementType.TYPE_EXTENSION_DECLARATION
+            | SynTypeDefnRepr.Exception(_) ->
+                ElementType.EXCEPTION_DECLARATION
 
-                | SynTypeDefnRepr.ObjectModel(kind, members, _) ->
-                    for m in members do x.ProcessTypeMember m
-                    match kind with
-                    | TyconClass -> ElementType.CLASS_DECLARATION
-                    | TyconInterface -> ElementType.INTERFACE_DECLARATION
-                    | TyconStruct -> ElementType.STRUCT_DECLARATION
-                    | _ -> ElementType.OBJECT_TYPE_DECLARATION
+            | SynTypeDefnRepr.ObjectModel(SynTypeDefnKind.TyconAugmentation,_,_) ->
+                ElementType.TYPE_EXTENSION_DECLARATION
 
-            for m in members do x.ProcessTypeMember m
-            x.Done(range, mark, elementType)
+            | SynTypeDefnRepr.ObjectModel(kind, members, _) ->
+                for m in members do x.ProcessTypeMember m
+                match kind with
+                | TyconClass -> ElementType.CLASS_DECLARATION
+                | TyconInterface -> ElementType.INTERFACE_DECLARATION
+                | TyconStruct -> ElementType.STRUCT_DECLARATION
+                | _ -> ElementType.OBJECT_TYPE_DECLARATION
+
+        for m in members do x.ProcessTypeMember m
+        x.Done(range, mark, elementType)
 
     member x.ProcessTypeMember (typeMember: SynMemberDefn) =
         let attrs = typeMember.Attributes

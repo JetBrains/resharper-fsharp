@@ -1,6 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
-  public partial interface IInterfaceImplementation : INameIdentifierOwner
+  public partial interface IInterfaceImplementation : IFSharpTypeParametersOwnerDeclaration
   {
   }
 }

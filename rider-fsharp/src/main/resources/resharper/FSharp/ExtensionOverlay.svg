@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+  <g id="ExtensionOverlay(Gray)" fill="none" fill-rule="evenodd">
+    <polygon id="Fill-2" fill="#F4F4F4" points="10 5 10 9.057 8.943 8 8 8 8 12.414 11.586 16 12.414 16 16 12.414 16 8 15.058 8 14.001 9.057 14.001 5"/>
+    <path id="Fill-3" fill="#00529C" d="M13,8 L11,8 L11,11.472 L9,9.472 L9,12 L12,15 L15,12 L15,9.472 L13,11.472 L13,8 Z M11,7 L13,7 L13,6 L11,6 L11,7 Z"/>
+  </g>
+</svg>

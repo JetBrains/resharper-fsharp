@@ -35,8 +35,6 @@ let getReturnType (symbol: FSharpSymbol) =
     | :? FSharpUnionCase as case -> Some case.ReturnType
     | _ -> None
 
-let compose a b = CompositeIconId.Compose(a, b)
-
 let addAccessibility (iconId: IconId) (accessibility: FSharpAccessibility) =
     if accessibility.IsPublic then iconId else
     if accessibility.IsInternal then compose iconId PsiSymbolsThemedIcons.ModifiersInternal.Id else

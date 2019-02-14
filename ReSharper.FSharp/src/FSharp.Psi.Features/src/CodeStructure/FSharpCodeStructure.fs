@@ -3,6 +3,8 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeStructure
 open System
 open System.Collections.Generic
 open JetBrains.ReSharper.Feature.Services.CodeStructure
+open JetBrains.ReSharper.Plugins.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Resources
@@ -14,6 +16,8 @@ open JetBrains.UI.RichText
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpCodeStructureProvider() =
+    let typeExtensionIconId = compose PsiSymbolsThemedIcons.Class.Id FSharpIcons.ExtensionOverlay.Id
+
     let rec processNode (node: ITreeNode) (parent: CodeStructureElement) =
         match node with
         | :? IFSharpFile as fsFile ->
@@ -40,8 +44,7 @@ type FSharpCodeStructureProvider() =
             processTypeDeclaration recordDecl fields parent
 
         | :? ITypeExtensionDeclaration as extensionDecl when not extensionDecl.IsTypePartDeclaration ->
-            let iconId = PsiSymbolsThemedIcons.Class.Id // todo: add extension icon modificator
-            let parent = NamedIdentifierOwner(extensionDecl, parent, iconId)
+            let parent = NamedIdentifierOwner(extensionDecl, parent, typeExtensionIconId)
             for memberDecl in  extensionDecl.TypeMembers do
                 processNode memberDecl parent
 
@@ -82,13 +85,15 @@ type FSharpCodeStructureProvider() =
 
 
 type NameIdentifierOwnerNodeAspect(treeNode: INameIdentifierOwner, iconId: IconId) =
-    let interfaceName =
+    static let invalidName = RichText("<Invalid>")
+
+    let name =
         match treeNode.NameIdentifier with
         | null -> null
         | ident -> ident.Name
 
-    let searchNames: IList<string> =
-        match interfaceName with
+    let searchNames: IList<_> =
+        match name with
         | null -> EmptyList.InstanceList :> _
         | name -> [| name |] :> _
 
@@ -98,8 +103,8 @@ type NameIdentifierOwnerNodeAspect(treeNode: INameIdentifierOwner, iconId: IconI
         | ident -> ident.GetNavigationRange()
 
     member x.Name =
-        match interfaceName with
-        | null -> RichText("<Invalid>")
+        match name with
+        | null -> invalidName
         | name -> RichText(name)
 
     interface IGotoFileMemberAspect with

@@ -35,4 +35,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
     TreeTextRange GetNameIdentifierRange();
   }
+
+  public interface IFSharpTypeParametersOwnerDeclaration : IFSharpDeclaration
+  {
+    TreeNodeCollection<ITypeParameterOfTypeDeclaration> TypeParameters { get; }
+  }
 }

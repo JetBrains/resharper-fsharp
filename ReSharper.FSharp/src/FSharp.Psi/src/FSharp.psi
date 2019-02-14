@@ -344,7 +344,7 @@ typeExtensionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; 
  }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
-  IDENTIFIER<IDENTIFIER, Identifier> // todo: use lid
+  longIdentifier<IDENTIFIER, LongIdentifier>
   namedTypeExpression<EXTENDED_TYPE, ExtendedType>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
@@ -562,7 +562,7 @@ interface fSharpTypeMemberDeclaration:
 interfaceInherit: namedTypeExpression<INTERFACE_TYPE, InterfaceType>;
 typeInherit: namedTypeExpression<BASE_TYPE, BaseType>;
 
-interfaceImplementation:
+interfaceImplementation options { stubBase="FSharpDeclarationBase"; }:
   namedTypeExpression<INTERFACE_TYPE, InterfaceType>
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>* fakeSeparator;
 
