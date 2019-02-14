@@ -1,0 +1,7 @@
+﻿File: Union 01.fs
+ Module
+  U
+   A:U
+   B
+   IDisposable
+    Dispose():void

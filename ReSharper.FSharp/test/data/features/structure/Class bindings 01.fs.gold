@@ -1,0 +1,9 @@
+﻿File: Class bindings 01.fs
+ Module
+  T
+   T()
+   x:int
+   f(int):int
+   Foo:int
+   IDisposable
+    Dispose():void

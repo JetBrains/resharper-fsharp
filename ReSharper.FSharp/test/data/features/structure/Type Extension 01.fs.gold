@@ -1,0 +1,4 @@
+﻿File: Type Extension 01.fs
+ Module
+  String
+   Foo:int

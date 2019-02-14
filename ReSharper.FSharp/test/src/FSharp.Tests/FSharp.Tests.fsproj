@@ -22,6 +22,7 @@
     <Compile Include="FSharpTodoTest.fs" />
     <Compile Include="RenameTest.fs" />
     <Compile Include="FSharpOccurenceKindTest.fs" />
+    <Compile Include="StructureTest.fs" />
   </ItemGroup>
 
   <ItemGroup>
