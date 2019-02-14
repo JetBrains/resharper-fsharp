@@ -24,6 +24,8 @@ module rec CommonUtil =
 
     let private interruptCheckTimeout = 30
 
+    let someUnit = Some ()
+
     let inline isNotNull x = not (isNull x)
     
     let inline (|NotNull|_|) x =
@@ -53,15 +55,23 @@ module rec CommonUtil =
     let fsExtensions = ["fs"; "fsi"; "ml"; "mli"; "fsx"; "fsscript"] |> Set.ofList
     let dllExtensions = ["dll"; "exe"] |> Set.ofList
 
-    let (|ImplFile|_|) (path: FileSystemPath) =
-        match path.ExtensionNoDot with
-        | "fs" | "ml" -> Some()
-        | _ -> None
+    let isImplFileExtension extension =
+        extension = "fs" || extension = "ml"
 
-    let (|SigFile|_|) (path: FileSystemPath) =
-        match path.ExtensionNoDot with
-        | "fsi" | "mli" -> Some()
-        | _ -> None
+    let isSigFileExtension extension =
+        extension = "fsi" || extension = "mli"
+
+    let (|ImplExtension|_|) extension =
+        if isImplFileExtension extension then someUnit else None
+
+    let (|SigExtension|_|) extension =
+        if isSigFileExtension extension then someUnit else None
+
+    let isImplFile (path: FileSystemPath) =
+        isImplFileExtension path.ExtensionNoDot
+
+    let isSigFile (path: FileSystemPath) =
+        isSigFileExtension path.ExtensionNoDot
 
     type Line = Int32<DocLine>
     type Column = Int32<DocColumn>
@@ -210,8 +220,6 @@ module rec FSharpMsBuildUtils =
 
     type BuildAction with
         member x.ChangesOrder = changesOrder x.Value
-
-    let someUnit = Some ()
 
 
 namespace global

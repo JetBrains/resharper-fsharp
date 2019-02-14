@@ -4,13 +4,11 @@ open System
 open System.Collections.Generic
 open JetBrains.Annotations
 open JetBrains.Application
-open JetBrains.Application.Components
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Assemblies.Impl
 open JetBrains.ProjectModel.Model2.Assemblies.Interfaces
 open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost.MsBuild
-open JetBrains.ProjectModel.ProjectsHost.SolutionHost
 open JetBrains.ProjectModel.Properties
 open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
@@ -66,19 +64,17 @@ type FSharpTargetsProjectLoadModificator() =
 type FSharpProject =
     { Options: FSharpProjectOptions
       ParsingOptions: FSharpParsingOptions
-      ConfigurationDefines: string list
       FileIndices: IDictionary<FileSystemPath, int>
-      FilesWithPairs: ISet<FileSystemPath> }
+      ImplFilesWithSigs: ISet<FileSystemPath> }
 
-    member x.ContainsFile (file: IPsiSourceFile) =
+    member x.ContainsFile(file: IPsiSourceFile) =
         x.FileIndices.ContainsKey(file.GetLocation())
 
 
 [<SolutionComponent>]
 type FSharpProjectOptionsBuilder
-        (solution: ISolution, checkerService: FSharpCheckerService, psiModules: IPsiModules, logger: ILogger,
+        (checkerService: FSharpCheckerService, psiModules: IPsiModules, logger: ILogger,
          resolveContextManager: ResolveContextManager, itemsContainer: IFSharpItemsContainer) =
-    let msBuildHost = solution.ProjectsHostContainer().GetComponent<MsBuildProjectHost>()
 
     let defaultDelimiters = [| ';'; ','; ' ' |]
 
@@ -155,7 +151,8 @@ type FSharpProjectOptionsBuilder
             |> options.AddRange
         | _ -> ()
 
-        let filePaths, pairFiles, resources = x.GetProjectFilesAndResources(project, targetFrameworkId)
+        let filePaths, implsWithSig, resources = x.GetProjectFilesAndResources(project, targetFrameworkId)
+
         options.AddRange(resources |> Seq.map (fun (r: FileSystemPath) -> "--resource:" + r.FullPath))
         let fileIndices = Dictionary<FileSystemPath, int>()
         Array.iteri (fun i p -> fileIndices.[p] <- i) filePaths
@@ -197,43 +194,46 @@ type FSharpProjectOptionsBuilder
             logger.Warn("Getting parsing options: {0}", concatErrors errors)
 
         { Options = projectOptions
-          ConfigurationDefines = definedConstants
+          ParsingOptions = parsingOptions
           FileIndices = fileIndices
-          FilesWithPairs = pairFiles
-          ParsingOptions = parsingOptions }
+          ImplFilesWithSigs = implsWithSig }
 
-    member private x.GetProjectFilesAndResources(project: IProject, targetFrameworkId: TargetFrameworkId) =
-        let projectMark = project.GetProjectMark().NotNull()
-
+    member x.GetProjectFilesAndResources(project: IProject, targetFrameworkId) =
         let sourceFiles = List()
         let resources = List()
 
-        let sigFiles = HashSet<string>()
-        let pairFiles = HashSet<FileSystemPath>()
+        let sigFiles = HashSet()
+        let implsWithSigs = HashSet()
 
+        let projectMark = project.GetProjectMark().NotNull("projectMark == null")
         let projectItems = itemsContainer.GetProjectItemsPaths(projectMark, targetFrameworkId)
+
         for path, buildAction in projectItems do
             match buildAction with
             | SourceFile ->
                 sourceFiles.Add(path) |> ignore
-                match path with
-                | SigFile -> sigFiles.Add(path.NameWithoutExtension) |> ignore
-                | ImplFile when sigFiles.Contains(path.NameWithoutExtension) -> pairFiles.add(path)
+                let fileName = path.NameWithoutExtension
+                match path.ExtensionNoDot with
+                | SigExtension -> sigFiles.Add(fileName) |> ignore
+                | ImplExtension when sigFiles.Contains(fileName) -> implsWithSigs.add(path)
                 | _ -> ()
 
             | Resource -> resources.Add(path) |> ignore
             | _ -> ()
 
-        sourceFiles.ToArray(), pairFiles, resources
+        let resources: IList<_> = if resources.IsEmpty() then EmptyList.InstanceList else resources :> _
+        let implsWithSigs: ISet<_> = if implsWithSigs.IsEmpty() then EmptySet.Instance :> _ else implsWithSigs :> _
+
+        sourceFiles.ToArray(), implsWithSigs, resources
 
     member private x.GetOutputType([<CanBeNull>] buildSettings: IManagedProjectBuildSettings) =
-        if isNull buildSettings then "library"
-        else
-            match buildSettings.OutputType with
-            | ProjectOutputType.CONSOLE_EXE -> "exe"
-            | ProjectOutputType.WIN_EXE -> "winexe"
-            | ProjectOutputType.MODULE -> "module"
-            | _ -> "library"
+        if isNull buildSettings then "library" else
+
+        match buildSettings.OutputType with
+        | ProjectOutputType.CONSOLE_EXE -> "exe"
+        | ProjectOutputType.WIN_EXE -> "winexe"
+        | ProjectOutputType.MODULE -> "module"
+        | _ -> "library"
 
     member private x.GetDefinedConstants(properties: IProjectProperties, targetFrameworkId: TargetFrameworkId) =
         match properties.ActiveConfigurations.GetOrCreateConfiguration(targetFrameworkId) with

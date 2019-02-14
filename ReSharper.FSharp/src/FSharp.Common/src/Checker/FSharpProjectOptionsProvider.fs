@@ -176,7 +176,7 @@ type FSharpProjectOptionsProvider
             if isScriptLike file then false else
 
             getOrCreateFSharpProject file
-            |> Option.map (fun fsProject -> fsProject.FilesWithPairs.Contains(file.GetLocation()))
+            |> Option.map (fun fsProject -> fsProject.ImplFilesWithSigs.Contains(file.GetLocation()))
             |> Option.defaultValue false
 
         member x.GetParsingOptions(file) =
