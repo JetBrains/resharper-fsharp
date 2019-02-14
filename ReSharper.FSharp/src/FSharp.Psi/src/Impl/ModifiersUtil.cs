@@ -28,8 +28,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       var decoration = MemberDecoration.DefaultValue;
       var modifiers = new JetHashSet<TokenNodeType>();
 
-      foreach (var modifier in accessModifiers.Modifiers)
-        modifiers.Add(modifier.GetTokenType());
+      if (accessModifiers != null)
+        foreach (var modifier in accessModifiers.Modifiers)
+          modifiers.Add(modifier.GetTokenType());
 
       if (modifiers.Contains(FSharpTokenType.PUBLIC)) decoration.Modifiers |= Modifiers.PUBLIC;
       if (modifiers.Contains(FSharpTokenType.INTERNAL)) decoration.Modifiers |= Modifiers.INTERNAL;
