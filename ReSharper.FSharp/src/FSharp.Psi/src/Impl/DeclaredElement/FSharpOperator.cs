@@ -22,7 +22,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public bool IsExplicitCast { get; }
     public bool IsImplicitCast => !IsExplicitCast;
   }
-  
+
   internal class FSharpSignOperator<TDeclaration> : FSharpOperatorBase<TDeclaration>, ISignOperator
     where TDeclaration : FSharpDeclarationBase, IFSharpDeclaration, IAccessRightsOwnerDeclaration,
     IModifiersOwnerDeclaration
@@ -32,11 +32,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       : base(declaration, mfv, typeDeclaration)
     {
     }
-    
+
     public override DeclaredElementType GetElementType() =>
       CLRDeclaredElementType.SIGN_OPERATOR;
   }
-  
+
   internal abstract class FSharpOperatorBase<TDeclaration> : FSharpFunctionBase<TDeclaration>, IOperator
     where TDeclaration : FSharpDeclarationBase, IFSharpDeclaration, IAccessRightsOwnerDeclaration,
     IModifiersOwnerDeclaration
@@ -46,7 +46,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       : base(declaration, mfv, typeDeclaration)
     {
     }
-    
+
     public override bool IsStatic => true;
   }
 }

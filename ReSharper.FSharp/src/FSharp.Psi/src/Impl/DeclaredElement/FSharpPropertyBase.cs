@@ -15,15 +15,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     IModifiersOwnerDeclaration
   {
     protected FSharpPropertyBase([NotNull] ITypeMemberDeclaration declaration,
-      [NotNull] FSharpMemberOrFunctionOrValue mfv)
-      : base(declaration, mfv)
+      [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)
     {
       var property =
         mfv.IsModuleValueOrMember
           ? mfv.DeclaringEntity?.Value.MembersFunctionsAndValues.FirstOrDefault(
               m => m.IsProperty && m.DisplayName == mfv.DisplayName) ?? mfv
           : mfv;
-      
+
       IsReadable = property.HasGetterMethod || property.IsPropertyGetterMethod ||
                    property.IsModuleValueOrMember && !property.IsMember;
       IsWritable = property.IsMutable || property.HasSetterMethod || property.IsPropertySetterMethod;
@@ -34,19 +33,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
                    TypeFactory.CreateUnknownType(Module);
     }
 
+    public IType Type => ReturnType;
     public override IType ReturnType { get; }
 
-    public override DeclaredElementType GetElementType()
-    {
-      return CLRDeclaredElementType.PROPERTY;
-    }
+    public override DeclaredElementType GetElementType() =>
+      CLRDeclaredElementType.PROPERTY;
 
-    public IType Type => ReturnType;
-
-    public string GetDefaultPropertyMetadataName()
-    {
-      return ShortName;
-    }
+    public string GetDefaultPropertyMetadataName() => ShortName;
 
     public IAccessor Getter => IsReadable ? new ImplicitAccessor(this, AccessorKind.GETTER) : null;
     public IAccessor Setter => IsWritable ? new ImplicitAccessor(this, AccessorKind.SETTER) : null;

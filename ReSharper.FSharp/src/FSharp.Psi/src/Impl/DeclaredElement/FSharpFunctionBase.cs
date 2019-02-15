@@ -50,6 +50,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
           FSharpTypesUtil.GetType(paramType, declaration, TypeParameters, Module, false),
           paramName.IsEmpty() ? SharedImplUtil.MISSING_DECLARATION_NAME : paramName));
       }
+
       Parameters = methodParams.ToList();
     }
 
@@ -66,7 +67,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     }
 
     public override int GetHashCode() => ShortName.GetHashCode();
-    
+
     public override IList<IParameter> Parameters { get; }
     public IList<ITypeParameter> TypeParameters { get; }
     public override IType ReturnType { get; }

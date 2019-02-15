@@ -22,9 +22,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     {
     }
 
-    public override DeclaredElementType GetElementType() => CLRDeclaredElementType.METHOD;
+    public override DeclaredElementType GetElementType() =>
+      CLRDeclaredElementType.METHOD;
 
-    public bool IsExtensionMethod => FSharpSymbol.Attributes.HasAttributeInstance(ExtensionAttributeTypeName);
+    public bool IsExtensionMethod =>
+      FSharpSymbol.Attributes.HasAttributeInstance(ExtensionAttributeTypeName);
 
     public bool IsAsync => false;
     public bool IsVarArg => false;

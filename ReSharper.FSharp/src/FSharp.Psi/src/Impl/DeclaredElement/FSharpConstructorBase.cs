@@ -19,10 +19,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     {
     }
 
-    public override DeclaredElementType GetElementType()
-    {
-      return CLRDeclaredElementType.CONSTRUCTOR;
-    }
+    public override DeclaredElementType GetElementType() =>
+      CLRDeclaredElementType.CONSTRUCTOR;
 
     public override string ShortName => GetContainingType()?.ShortName ?? SharedImplUtil.MISSING_DECLARATION_NAME;
     public bool IsDefault => false;

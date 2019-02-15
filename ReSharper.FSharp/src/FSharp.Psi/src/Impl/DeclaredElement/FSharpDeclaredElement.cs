@@ -17,28 +17,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     {
     }
 
-    protected override bool CanBindTo(IDeclaration declaration)
-    {
-      return declaration is TDeclaration;
-    }
+    protected override bool CanBindTo(IDeclaration declaration) =>
+      declaration is TDeclaration;
 
     [CanBeNull]
-    public new TDeclaration GetDeclaration()
-    {
-      return (TDeclaration) base.GetDeclaration();
-    }
+    public new TDeclaration GetDeclaration() =>
+      (TDeclaration) base.GetDeclaration();
 
-    public bool IsSynthetic()
-    {
-      return false;
-    }
-
+    public bool IsSynthetic() => false;
     public bool CaseSensitiveName => true;
 
     public virtual string SourceName =>
       GetDeclaration()?.SourceName ??
       SharedImplUtil.MISSING_DECLARATION_NAME;
-    
+
     public virtual string ShortName =>
       GetDeclaration()?.DeclaredName ??
       SharedImplUtil.MISSING_DECLARATION_NAME;
@@ -48,16 +40,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       EmptySubstitution.INSTANCE;
 
     // ReSharper disable once InconsistentNaming
-    public XmlNode GetXMLDoc(bool inherit)
-    {
-      return null; // todo
-    }
+    public XmlNode GetXMLDoc(bool inherit) => null; // todo
 
     // ReSharper disable once InconsistentNaming
-    public XmlNode GetXMLDescriptionSummary(bool inherit)
-    {
-      return null; // todo
-    }
+    public XmlNode GetXMLDescriptionSummary(bool inherit) => null; // todo
 
     public abstract DeclaredElementType GetElementType();
   }

@@ -17,10 +17,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       Field = field;
     }
 
-    public override DeclaredElementType GetElementType()
-    {
-      return CLRDeclaredElementType.ENUM_MEMBER;
-    }
+    public override DeclaredElementType GetElementType() =>
+      CLRDeclaredElementType.ENUM_MEMBER;
 
     public IType Type
     {
