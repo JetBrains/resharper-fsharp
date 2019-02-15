@@ -1,7 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService
 
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
-open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2

@@ -1,7 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Comment
 
 open JetBrains.ReSharper.Feature.Services.Comment
-open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Psi

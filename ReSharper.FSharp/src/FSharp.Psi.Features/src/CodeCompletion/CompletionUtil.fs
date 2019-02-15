@@ -6,7 +6,6 @@ open JetBrains.Application.Threading
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
-open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.TextControl
 open JetBrains.UI.RichText

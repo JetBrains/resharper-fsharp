@@ -2,7 +2,6 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings.Renam
 
 open JetBrains.Application
 open JetBrains.ReSharper.Feature.Services.Refactorings.Specific.Rename
-open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree

@@ -2,7 +2,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.ContextHighlighters
 
 open JetBrains.ReSharper.Daemon.CaretDependentFeatures
 open JetBrains.ReSharper.Feature.Services.Contexts
-open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Psi.Parsing

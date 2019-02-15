@@ -10,7 +10,6 @@ open JetBrains.ReSharper.Feature.Services.LiveTemplates.Context
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Scope
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Templates
 open JetBrains.ReSharper.LiveTemplates.UI
-open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 open JetBrains.ReSharper.Plugins.FSharp.Psi
