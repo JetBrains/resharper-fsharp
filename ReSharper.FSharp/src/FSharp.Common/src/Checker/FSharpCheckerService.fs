@@ -9,7 +9,7 @@ open JetBrains.DataFlow
 open JetBrains.ReSharper.Feature.Services
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Plugins.FSharp
-open JetBrains.ReSharper.Plugins.FSharp.Common.Settings
+open JetBrains.ReSharper.Plugins.FSharp.Common.Checker.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Util

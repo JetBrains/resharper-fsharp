@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Common.Settings
+namespace JetBrains.ReSharper.Plugins.FSharp.Common.Checker.Settings
 
 open JetBrains.Application.Settings
 open JetBrains.Application.UI.Options

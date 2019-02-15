@@ -135,7 +135,7 @@ module Util =
         | _ -> None
 
     let (|FSharpProjectMark|_|) (mark: IProjectMark) =
-        if isFSharpProject mark.Location mark.Guid then Some() else None
+        if isFSharpProject mark.Location mark.Guid then someUnit else None
 
     type IProject with
         member x.IsFSharp =

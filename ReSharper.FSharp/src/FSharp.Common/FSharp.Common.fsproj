@@ -7,12 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="src\FSharpOptions.fs" />
+    <Compile Include="src\Util\FSharpGlobalUtil.fs" />
+    <Compile Include="src\Util\Util.fs" />
     <Compile Include="src\ProjectModel\FSharpProjectLanguage.fs" />
     <Compile Include="src\ProjectModel\ProjectProperties.fs" />
     <Compile Include="src\ProjectModel\FSharpLanguageSpecificItemsProvider.fs" />
     <Compile Include="src\ProjectModel\ZoneMarker.fs" />
-    <Compile Include="src\Util\Util.fs" />
     <Compile Include="src\ProjectModel\ProjectItems\FSharpItemsContainer.fs" />
     <Compile Include="src\ProjectModel\ProjectItems\ProjectStructure.fs" />
     <Compile Include="src\Shim\FileSystem\FSharpSourceCache.fs" />
@@ -24,6 +24,7 @@
     <Compile Include="src\Checker\FSharpAssemblyContentProvider.fs" />
     <Compile Include="src\Checker\FSharpCheckerExtensions.fs" />
     <Compile Include="src\Checker\FSharpCoreFix.fs" />
+    <Compile Include="src\Checker\FSharpOptions.fs" />
     <Compile Include="src\Checker\FSharpCheckerService.fs" />
     <Compile Include="src\ProjectModel\FSharpScriptPsiModuleFactory.fs" />
     <Compile Include="src\ProjectModel\FSharpFileService.fs" />

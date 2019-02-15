@@ -16,14 +16,7 @@ module rec CommonUtil =
     open Microsoft.FSharp.Compiler
     open Microsoft.FSharp.Compiler.SourceCodeServices
 
-    let private interruptCheckTimeout = 30
-
-    let someUnit = Some ()
-
     let inline isNotNull x = not (isNull x)
-    
-    let inline (|NotNull|_|) x =
-        if isNull x then None else Some()
 
     let ensureAbsolute (path: FileSystemPath) (projectDirectory: FileSystemPath) =
         match path.AsRelative() with
@@ -214,22 +207,3 @@ module rec FSharpMsBuildUtils =
 
     type BuildAction with
         member x.ChangesOrder = changesOrder x.Value
-
-
-namespace global
-
-[<AutoOpen>]
-module FSharpGlobalUtil =
-    type Extension = System.Runtime.CompilerServices.ExtensionAttribute
-
-    type System.Object with
-        member x.As<'T when 'T : null>() =
-            match x with
-            | :? 'T as t -> t
-            | _ -> null
-
-    /// Reference equality.
-    let inline (==) a b = LanguagePrimitives.PhysicalEquality a b
-
-    /// Reference inequality.
-    let inline (!=) a b = not (a == b)
