@@ -186,6 +186,12 @@ type FSharpProjectOptionsProvider
             |> Option.map (fun fsProject -> fsProject.ParsingOptions)
             |> Option.defaultWith (fun _ -> getParsingOptionsForSingleFile file)
 
+        member x.GetFileIndex(sourceFile) =
+            getOrCreateFSharpProject sourceFile
+            |> Option.bind (fun fsProject ->
+                let path = sourceFile.GetLocation()
+                tryGetValue path fsProject.FileIndices)
+            |> Option.defaultWith (fun _ -> -1)
 
 [<SolutionComponent>]
 type FSharpScriptOptionsProvider(logger: ILogger, checkerService: FSharpCheckerService) =

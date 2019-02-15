@@ -97,4 +97,5 @@ type FSharpParseAndCheckResults =
 type IFSharpProjectOptionsProvider =
     abstract member GetProjectOptions: IPsiSourceFile -> FSharpProjectOptions option
     abstract member GetParsingOptions: IPsiSourceFile -> FSharpParsingOptions
+    abstract member GetFileIndex: IPsiSourceFile -> int
     abstract member HasPairFile: IPsiSourceFile -> bool

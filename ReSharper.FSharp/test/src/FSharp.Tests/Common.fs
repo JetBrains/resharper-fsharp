@@ -83,3 +83,5 @@ type FSharpTestProjectOptionsProvider
             { FSharpParsingOptions.Default with
                 SourceFiles = [| getPath file |]
                 IsExe = isExe }
+
+        member x.GetFileIndex(_) = -1
