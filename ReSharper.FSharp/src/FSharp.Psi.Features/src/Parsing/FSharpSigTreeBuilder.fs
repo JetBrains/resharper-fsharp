@@ -103,7 +103,7 @@ type internal FSharpSigTreeBuilder(file, lexer, sigs, lifetime) =
                     match flags.MemberKind with
                     | MemberKind.Constructor -> ElementType.CONSTRUCTOR_DECLARATION
                     | _ -> ElementType.MEMBER_DECLARATION
-            x.Done(mark,elementType)
+            x.Done(range, mark,elementType)
 
         | SynMemberSig.ValField(Field(attrs,_,id,_,_,_,_,_),range) ->
             if id.IsSome then

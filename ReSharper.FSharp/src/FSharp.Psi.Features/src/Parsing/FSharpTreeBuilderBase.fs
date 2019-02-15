@@ -33,6 +33,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
     member x.GetStartOffset(IdentRange range) = x.GetStartOffset(range)
 
     member x.Eof = x.Builder.Eof()
+    member x.CurrentOffset = x.Builder.GetTokenOffset()
 
     override x.SkipWhitespaces() = ()
 
