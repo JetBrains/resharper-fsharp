@@ -18,7 +18,7 @@ open JetBrains.Util
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpLanguageService
         (languageType, constantValueService, cacheProvider: FSharpCacheProvider, formatter: FSharpDummyCodeFormatter,
-         fsCheckerService: FSharpCheckerService, logger: ILogger) =
+         fsCheckerService: FSharpCheckerService) =
     inherit LanguageService(languageType, constantValueService)
 
     let lexerFactory = FSharpLexerFactory()
@@ -55,7 +55,7 @@ type FSharpLanguageService
         | null -> ReferenceAccessType.OTHER
         | symbolReference ->
 
-        let referenceToken = symbolReference.Token
+        let referenceToken = symbolReference.GetElement() :> ITokenNode
         match referenceToken.GetContainingNode<ISetExpr>() with
         | null -> ReferenceAccessType.OTHER
         | setExpr ->

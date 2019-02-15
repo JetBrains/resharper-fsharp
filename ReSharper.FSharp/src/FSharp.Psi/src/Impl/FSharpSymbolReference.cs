@@ -31,12 +31,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       var element = symbol != null
         ? FSharpElementsUtil.GetDeclaredElement(symbol, myOwner.GetPsiModule(), myOwner)
         : null;
+
       return element != null
         ? new ResolveResultWithInfo(new SimpleResolveResult(element), ResolveErrorType.OK) // todo: add substitutions
         : ResolveResultWithInfo.Ignore;
     }
 
     public override string GetName() => myOwner.GetText();
+
+    public override bool IsValid() =>
+      base.IsValid() && myOwner.SymbolReference == this;
 
     public override TreeTextRange GetTreeTextRange() =>
       myOwner.GetTreeTextRange();
@@ -71,7 +75,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     public override ISymbolTable GetReferenceSymbolTable(bool useReferenceName) =>
       throw new System.NotImplementedException();
-
-    public ITokenNode Token => myOwner;
   }
 }
