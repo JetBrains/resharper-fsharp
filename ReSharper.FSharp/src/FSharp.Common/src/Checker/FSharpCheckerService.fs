@@ -1,6 +1,7 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 
 open System
+open System.Runtime.InteropServices
 open JetBrains
 open JetBrains.Annotations
 open JetBrains.Application
@@ -22,13 +23,17 @@ type FSharpCheckerService
 
     let checker =
         Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "20")
-        lazy
-            let checker = FSharpChecker.Create(projectCacheSize = 200, keepAllBackgroundResolutions = false)
-            let enableBgCheck =
-                settingsStore.BindToContextLive(lifetime, ContextRange.ApplicationWide)
-                    .GetValueProperty(lifetime, fun (key: FSharpOptions) -> key.BackgroundTypeCheck)
 
-            checker.ImplicitlyStartBackgroundWork <- enableBgCheck.Value
+        let enableBgCheck =
+            settingsStore.BindToContextLive(lifetime, ContextRange.ApplicationWide)
+                .GetValueProperty(lifetime, fun (key: FSharpOptions) -> key.BackgroundTypeCheck)
+
+        lazy
+            let checker =
+                FSharpChecker.Create(projectCacheSize = 200,
+                                     keepAllBackgroundResolutions = false,
+                                     ImplicitlyStartBackgroundWork = enableBgCheck.Value)
+
             enableBgCheck.Change.Advise_NoAcknowledgement(lifetime, fun (ArgValue enabled) ->
                 checker.ImplicitlyStartBackgroundWork <- enabled)
 
@@ -68,7 +73,8 @@ type FSharpCheckerService
     member x.GetDefines(sourceFile: IPsiSourceFile) =
         x.OptionsProvider.GetParsingOptions(sourceFile).ConditionalCompilationDefines
 
-    member x.ParseAndCheckFile([<NotNull>] file: IPsiSourceFile, allowStaleResults) =
+    member x.ParseAndCheckFile([<NotNull>] file: IPsiSourceFile,
+                               [<Optional; DefaultParameterValue(false)>] allowStaleResults) =
         match x.OptionsProvider.GetProjectOptions(file) with
         | Some options ->
             let path = file.GetLocation().FullPath
