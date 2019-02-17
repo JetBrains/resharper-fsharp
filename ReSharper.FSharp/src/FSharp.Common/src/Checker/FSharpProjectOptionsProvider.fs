@@ -39,7 +39,6 @@ type FSharpProjectOptionsProvider
         ProjectModelChangeType.REFERENCE_TARGET
 
     let projects = Dictionary<IProject, Dictionary<TargetFrameworkId, FSharpProject>>()
-    let checker = checkerService.Checker
     let locker = JetFastSemiReenterableRWLock()
     do
         changeManager.Changed2.Advise(lifetime, this.ProcessChange)
@@ -99,7 +98,7 @@ type FSharpProjectOptionsProvider
             tryGetValue project projects
             |> Option.iter (fun fsProjectsForProject ->
                 for fsProject in fsProjectsForProject.Values do
-                    checker.InvalidateConfiguration(fsProject.Options, false)
+                    checkerService.Checker.InvalidateConfiguration(fsProject.Options, false)
                 fsProjectsForProject.Clear())
 
             invalidatedProjects.Add(project) |> ignore

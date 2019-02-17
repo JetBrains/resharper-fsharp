@@ -57,7 +57,6 @@ type FSharpScriptPsiModulesProvider
         changeManager.Changed2.Advise(lifetime, this.Execute)
 
     let locks = solution.Locks
-    let checker = checkerService.Checker
 
     let targetFrameworkId =
         let platformInfos = platformManager.GetAllPlatformInfos().AsList()
@@ -67,7 +66,7 @@ type FSharpScriptPsiModulesProvider
         platformInfo.TargetFrameworkId
 
     let getScriptOptions (path: FileSystemPath) (document: IDocument) =
-        let options, _ = checker.GetProjectOptionsFromScript(path.FullPath, document.GetText()).RunAsTask()
+        let options, _ = checkerService.Checker.GetProjectOptionsFromScript(path.FullPath, document.GetText()).RunAsTask()
         options
 
     let getScriptReferences scriptPath scriptOptions =
