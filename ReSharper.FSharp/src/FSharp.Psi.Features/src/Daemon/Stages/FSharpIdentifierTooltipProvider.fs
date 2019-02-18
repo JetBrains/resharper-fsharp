@@ -37,40 +37,47 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
         | sourceFile ->
 
         let documentRange = DocumentRange(document, highlighter.Range)
-        match x.GetPsiFile(sourceFile, documentRange) with
-        | :? IFSharpFile as fsFile ->
-            match fsFile.FindTokenAt(documentRange.StartOffset) with
-            | :? FSharpIdentifierToken as token ->
-                match fsFile.GetParseAndCheckResults(true) with
-                | Some results ->
-                    let checkResults = results.CheckResults
-                    let coords = document.GetCoordsByOffset(token.GetTreeEndOffset().Offset)
-                    let names = token.GetQualifiersAndName() |> List.ofArray
-                    let lineText = sourceFile.Document.GetLineText(coords.Line)
+        match x.GetPsiFile(sourceFile, documentRange).As<IFSharpFile>() with
+        | null -> String.Empty
+        | fsFile ->
 
-                    // todo: provide tooltip for #r strings in fsx, should pass String tag
-                    let getTooltip = checkResults.GetToolTipText(int coords.Line + 1, int coords.Column, lineText, names, FSharpTokenTag.Identifier)
-                    let result = ResizeArray()
-                    match getTooltip.RunAsTask() with
-                    | FSharpToolTipText(tooltips) ->
-                        tooltips |> List.iter (function
-                            | FSharpToolTipElement.Group(overloads) ->
-                                overloads |> List.iter (fun overload ->
-                                    let text = overload.MainDescription.TrimStart()
-                                    match xmlDocService.GetXmlDoc(overload.XmlDoc) with
-                                    | null when not (text.IsNullOrWhitespace()) -> result.Add(text)
-                                    | xmlDocText ->
-                                        let xmlDocText = xmlDocText.Text
-                                        match text.IsNullOrWhitespace(), xmlDocText.IsNullOrWhitespace() with
-                                        | false, false -> result.Add(text + "\n\n" + xmlDocText)
-                                        | false, _ -> result.Add(text)
-                                        | _, false -> result.Add(xmlDocText)
-                                        | _ ->  ())
-                            | _ -> ())
-                    result.Join(RiderTooltipSeparator)
-                | _ -> String.Empty
-            | _ -> String.Empty
-        | _ -> String.Empty
+        match fsFile.FindTokenAt(documentRange.StartOffset).As<FSharpIdentifierToken>() with
+        | null -> String.Empty
+        | token ->
+
+        match fsFile.GetParseAndCheckResults(true) with
+        | None -> String.Empty
+        | Some results ->
+
+        let checkResults = results.CheckResults
+        let coords = document.GetCoordsByOffset(token.GetTreeEndOffset().Offset)
+        let names = token.GetQualifiersAndName() |> List.ofArray
+        let lineText = sourceFile.Document.GetLineText(coords.Line)
+
+        // todo: provide tooltip for #r strings in fsx, should pass String tag
+        let getTooltip = checkResults.GetToolTipText(int coords.Line + 1, int coords.Column, lineText, names, FSharpTokenTag.Identifier)
+        let result = ResizeArray()
+        match getTooltip.RunAsTask() with
+        | FSharpToolTipText(tooltips) ->
+            tooltips |> List.iter (function
+                | FSharpToolTipElement.None
+                | FSharpToolTipElement.CompositionError _ -> ()
+
+                | FSharpToolTipElement.Group(overloads) ->
+                    overloads |> List.iter (fun overload ->
+                        let text = overload.MainDescription.TrimStart()
+                        match xmlDocService.GetXmlDoc(overload.XmlDoc) with
+                        | null when not (text.IsNullOrWhitespace()) -> result.Add(text)
+                        | xmlDocText ->
+
+                        let xmlDocText = xmlDocText.Text
+                        match text.IsNullOrWhitespace(), xmlDocText.IsNullOrWhitespace() with
+                        | false, false -> result.Add(text + "\n\n" + xmlDocText)
+                        | false, _ -> result.Add(text)
+                        | _, false -> result.Add(xmlDocText)
+                        | _ -> ()))
+
+        result.Join(RiderTooltipSeparator)
 
     override x.GetRichTooltip(highlighter) =
         RichTextBlock(x.GetTooltip(highlighter))
