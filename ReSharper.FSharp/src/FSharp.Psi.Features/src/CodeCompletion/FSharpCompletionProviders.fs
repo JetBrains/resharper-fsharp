@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
+open JetBrains.Application.Settings
 open System
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
@@ -11,6 +12,7 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.Common.Checker.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -35,40 +37,43 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
         match basicContext.File with
         | :? IFSharpFile as fsFile when fsFile.ParseResults.IsSome ->
             match fsFile.GetParseAndCheckResults(true) with
+            | None -> false
             | Some results ->
-                let checkResults = results.CheckResults
-                let parseResults = fsFile.ParseResults
-                let line, column = int context.Coords.Line + 1, int context.Coords.Column
-                let lineText = context.LineText
 
-                let getAllSymbols () = getAllSymbols checkResults
-                try
-                    let completionInfo =
-                        checkResults
-                            .GetDeclarationListInfo(parseResults, line, lineText, context.PartialLongName,
-                                                    getAllSymbols, filterResolved).RunAsTask()
+            let checkResults = results.CheckResults
+            let parseResults = fsFile.ParseResults
+            let line = int context.Coords.Line + 1
+            let lineText = context.LineText
 
-                    if completionInfo.Items.IsEmpty() then false else
+            let getAllSymbols () = getAllSymbols checkResults
+            try
+                let completionInfo =
+                    checkResults
+                        .GetDeclarationListInfo(parseResults, line, lineText, context.PartialLongName,
+                                                getAllSymbols, filterResolved).RunAsTask()
 
-                    let xmlDocService = basicContext.Solution.GetComponent<FSharpXmlDocService>()
-                    for item in completionInfo.Items do
-                        let (lookupItem: TextLookupItemBase) =
-                            if item.Glyph = FSharpGlyph.Error
-                            then FSharpErrorLookupItem(item) :> _
-                            else FSharpLookupItem(item, context, completionInfo.DisplayContext, xmlDocService) :> _
+                if completionInfo.Items.IsEmpty() then false else
 
-                        lookupItem.InitializeRanges(context.Ranges, basicContext)
-                        collector.Add(lookupItem)
-                    true
-                with
-                | :? OperationCanceledException -> reraise()
-                | e ->
-                    let path = basicContext.SourceFile.GetLocation().FullPath
-                    let coords = context.Coords
-                    logger.LogMessage(LoggingLevel.WARN, "Getting completions at location: {0}: {1}", path, coords)
-                    logger.LogExceptionSilently(e)
-                    false
-            | _ -> false
+                context.XmlDocService <- basicContext.Solution.GetComponent<FSharpXmlDocService>()
+                context.DisplayContext <- completionInfo.DisplayContext
+
+                for item in completionInfo.Items do
+                    let (lookupItem: TextLookupItemBase) =
+                        if item.Glyph = FSharpGlyph.Error
+                        then FSharpErrorLookupItem(item) :> _
+                        else FSharpLookupItem(item, context) :> _
+
+                    lookupItem.InitializeRanges(context.Ranges, basicContext)
+                    collector.Add(lookupItem)
+                true
+            with
+            | :? OperationCanceledException -> reraise()
+            | e ->
+                let path = basicContext.SourceFile.GetLocation().FullPath
+                let coords = context.Coords
+                logger.LogMessage(LoggingLevel.WARN, "Getting completions at location: {0}: {1}", path, coords)
+                logger.LogExceptionSilently(e)
+                false
         | _ -> false
 
 

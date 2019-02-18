@@ -12,7 +12,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Util
-open JetBrains.UI.Icons
 open JetBrains.UI.RichText
 open JetBrains.Util
 open JetBrains.Util.Text
@@ -50,9 +49,7 @@ type FSharpErrorLookupItem(item: FSharpDeclarationListItem) =
             |> Option.toObj
 
 
-type FSharpLookupItem
-        (item: FSharpDeclarationListItem, context: FSharpCodeCompletionContext, displayContext: FSharpDisplayContext,
-         xmlDocService: FSharpXmlDocService) =
+type FSharpLookupItem(item: FSharpDeclarationListItem, context: FSharpCodeCompletionContext) =
     inherit TextLookupItemBase()
 
     let mutable candidates = Unchecked.defaultof<_>
@@ -66,9 +63,9 @@ type FSharpLookupItem
                 match tooltip with
                 | FSharpToolTipElement.Group(overloads) ->
                     for overload in overloads do
-                        result.Add(FSharpLookupCandidate(overload.MainDescription, overload.XmlDoc, xmlDocService))
+                        result.Add(FSharpLookupCandidate(overload.MainDescription, overload.XmlDoc, context.XmlDocService))
                 | FSharpToolTipElement.CompositionError error ->
-                    result.Add(FSharpLookupCandidate(error, FSharpXmlDoc.None, xmlDocService))
+                    result.Add(FSharpLookupCandidate(error, FSharpXmlDoc.None, context.XmlDocService))
                 | _ -> ()
             candidates <- result.ResultingList()
             candidates
@@ -84,7 +81,7 @@ type FSharpLookupItem
     override x.DisplayTypeName =
         try
             match getReturnType item.FSharpSymbol with
-            | Some t -> RichText(t.Format(displayContext))
+            | Some t -> RichText(t.Format(context.DisplayContext))
             | _ -> null
         with _ -> null
 
@@ -156,7 +153,7 @@ type FSharpLookupItem
             let isNullOrWhiteSpace = RichTextBlock.IsNullOrWhiteSpace
 
             let mainDescription = RichTextBlock(candidate.Description)
-            match xmlDocService.GetXmlDoc(candidate.XmlDoc) with
+            match context.XmlDocService.GetXmlDoc(candidate.XmlDoc) with
             | null -> ()
             | xmlDoc ->
                 if not (isNullOrWhiteSpace mainDescription || isNullOrWhiteSpace xmlDoc) then
@@ -165,7 +162,3 @@ type FSharpLookupItem
             mainDescription
 
     interface IRiderAsyncCompletionLookupItem
-
-type FSharpLookupAdditionalInfo =
-    { Icon: IconId
-      ReturnType: string }
