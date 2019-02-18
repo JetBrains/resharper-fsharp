@@ -117,7 +117,10 @@ type FSharpLibraryScopeLookupItemsProvider(logger: ILogger, assemblyContentProvi
     inherit FSharpLookupItemsProviderBase(logger, assemblyContentProvider.GetLibrariesEntities, true)
 
     interface ISlowCodeCompletionItemsProvider with
-        member x.IsAvailable(context) = base.IsAvailable(context)
+        member x.IsAvailable(context) =
+            let settings = context.BasicContext.ContextBoundSettingsStore
+            if settings.GetValue(fun (key: FSharpOptions) -> key.EnableOutOfScopeCompletion) then obj() else null
+
         member x.AddLookupItems(context, collector, data) =
             base.AddLookupItems(context :?> FSharpCodeCompletionContext, collector)
 
