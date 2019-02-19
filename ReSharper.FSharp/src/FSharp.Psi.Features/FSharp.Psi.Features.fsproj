@@ -26,6 +26,8 @@
     <Compile Include="src\Daemon\Stages\TypeCheckErrorsStage.fs" />
     <Compile Include="src\Daemon\Stages\UnusedOpensStage.fs" />
     <Compile Include="src\Daemon\UsageChecking\FSharpUsageCheckingService.fs" />
+    <Compile Include="src\Daemon\Analyzers\ReSpellerHelper.fs" />
+    <Compile Include="src\Daemon\Analyzers\StringProblemsAnalyzer.fs" />
     <Compile Include="src\Comment\FSharpBlockCommentActionProvider.fs" />
     <Compile Include="src\Comment\FSharpLineCommentActionProvider.fs" />
     <Compile Include="src\Debugger\FSharpBreakpointVariantsProvider.fs" />
