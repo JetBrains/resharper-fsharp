@@ -1,7 +1,6 @@
 package templates
 
 import com.intellij.execution.runners.ExecutionEnvironment
-import com.jetbrains.rdclient.util.idea.toVirtualFile
 import com.jetbrains.rider.run.configurations.project.DotNetProjectConfiguration
 import com.jetbrains.rider.test.base.RiderTemplatesTestCoreBase
 import com.jetbrains.rider.test.enums.CoreVersion
@@ -45,7 +44,6 @@ abstract class FSharpTemplatesTestCore : RiderTemplatesTestCoreBase() {
             templateId = ProjectTemplateIds.Core.fsharp_consoleApplication
 
         val projectName = "ConsoleApplication"
-        val programFs = activeSolutionDirectory.resolve(projectName).resolve("Program.fs")
         doCoreTest(templateId, projectName) { project ->
             checkSwea(project)
             checkCanExecuteSelectedRunConfiguration(project)
@@ -61,7 +59,7 @@ abstract class FSharpTemplatesTestCore : RiderTemplatesTestCoreBase() {
                 //envVars.putAll(configuration.environmentVariables)
                 envVars["COREHOST_TRACE"] = "1"
                 //configuration.environmentVariables = envVars
-                toggleBreakpoint(project, programFs.toVirtualFile(true)!!, 7)
+                toggleBreakpoint(project, "Program.fs", 7)
             }
             executeWithGold(debugGoldFile, getGoldFileSystemDependentSuffix()) {
                 debugProgram(project, it, beforeRun,
