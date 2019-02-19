@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
+open JetBrains.Diagnostics
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeStructure
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
@@ -8,7 +9,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Files
 open JetBrains.ReSharper.TestFramework
-open JetBrains.Util
 open NUnit.Framework
 
 [<FSharpTest>]

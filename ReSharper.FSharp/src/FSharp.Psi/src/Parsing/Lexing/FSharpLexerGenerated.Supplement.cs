@@ -1,6 +1,7 @@
 using System;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.Text;
+using JetBrains.Diagnostics;
 using JetBrains.Util;
 
 // ReSharper disable RedundantDisableWarningComment

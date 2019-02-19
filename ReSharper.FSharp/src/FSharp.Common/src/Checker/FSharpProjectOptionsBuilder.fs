@@ -4,6 +4,7 @@ open System
 open System.Collections.Generic
 open JetBrains.Annotations
 open JetBrains.Application
+open JetBrains.Diagnostics
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Assemblies.Impl
 open JetBrains.ProjectModel.Model2.Assemblies.Interfaces

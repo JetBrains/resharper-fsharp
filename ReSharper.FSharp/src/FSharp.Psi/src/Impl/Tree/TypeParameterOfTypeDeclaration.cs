@@ -1,7 +1,7 @@
-﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+﻿using JetBrains.Diagnostics;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
-using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {

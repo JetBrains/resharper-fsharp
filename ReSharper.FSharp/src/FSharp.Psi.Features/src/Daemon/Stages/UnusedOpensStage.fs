@@ -2,6 +2,7 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
 open System.Collections.Generic
 open JetBrains.Application
+open JetBrains.Lifetimes
 open JetBrains.ReSharper.Daemon.UsageChecking
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Feature.Services.Intentions.Scoped
@@ -121,4 +122,4 @@ type RemoveUnusedOpensFix(warning: UnusedOpenWarningHighlighting) =
 [<ShellComponent>]
 type UnusedOpensQuickFixRegistrarComponent(table: IQuickFixes) =
     do
-         table.RegisterQuickFix<UnusedOpenWarningHighlighting>(null, (fun hl -> RemoveUnusedOpensFix(hl) :> _), typeof<RemoveUnusedOpensFix>)
+         table.RegisterQuickFix<UnusedOpenWarningHighlighting>(Lifetime.Eternal, (fun hl -> RemoveUnusedOpensFix(hl) :> _), typeof<RemoveUnusedOpensFix>)

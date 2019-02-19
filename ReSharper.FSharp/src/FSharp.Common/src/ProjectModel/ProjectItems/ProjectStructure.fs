@@ -1,13 +1,13 @@
 module JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ProjectStructure
 
 open System
+open JetBrains.Diagnostics
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Host.Features.ProjectModel.View
 open JetBrains.ReSharper.Host.Features.ProjectModel.View.Appenders.ProjectStructure
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.Rider.Model
-open JetBrains.Util
 
 [<SolutionComponent>]
 type FSharpProjectStructureProvider(container: IFSharpItemsContainer) =

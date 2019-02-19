@@ -5,6 +5,7 @@ open System.Reflection
 open JetBrains.Application
 open JetBrains.Application.Settings
 open JetBrains.Application.UI.Options
+open JetBrains.Diagnostics
 open JetBrains.ProjectModel.Resources
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Context
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Scope

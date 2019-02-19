@@ -5,6 +5,8 @@ open System.Collections.Generic
 open System.IO
 open System.Linq
 open System.Text.RegularExpressions
+open JetBrains.Diagnostics
+open JetBrains.Lifetimes
 open JetBrains.Platform.MsBuildHost.Models
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.ProjectsHost
@@ -1045,7 +1047,7 @@ type LoggingFSharpItemsContainer(writer, refresher) as this =
 
 
 type DummyFSharpItemsContainerLoader() =
-    inherit FSharpItemsContainerLoader(null, null, null)
+    inherit FSharpItemsContainerLoader(Lifetime.Eternal, null, null)
 
     override x.GetMap() = Dictionary<IProjectMark, ProjectMapping>() :> _
     static member val Instance = DummyFSharpItemsContainerLoader()

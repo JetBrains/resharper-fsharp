@@ -1,8 +1,8 @@
-﻿using JetBrains.DocumentModel;
+﻿using JetBrains.Diagnostics;
+using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {

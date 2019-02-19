@@ -4,6 +4,7 @@ open System
 open System.Collections.Generic
 open JetBrains.Application.UI.ActionSystem.Text
 open JetBrains.DocumentModel
+open JetBrains.Diagnostics
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.TypingAssist
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util

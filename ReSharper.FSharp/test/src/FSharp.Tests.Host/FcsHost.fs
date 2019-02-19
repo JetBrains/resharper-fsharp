@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Host
 open System.Linq
 open JetBrains.Collections.Viewable
 open JetBrains.Core
+open JetBrains.Diagnostics
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Host.Features
@@ -10,7 +11,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Common.Shim.FileSystem
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
 open JetBrains.Rider.Model
-open JetBrains.Util
 open Microsoft.FSharp.Compiler.AbstractIL.Internal.Library
 
 [<SolutionComponent>]
