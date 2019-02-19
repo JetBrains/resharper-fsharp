@@ -45,6 +45,8 @@ type FSharpProjectOptionsProvider
         checkerService.OptionsProvider <- this
         lifetime.OnTermination(fun _ -> checkerService.OptionsProvider <- Unchecked.defaultof<_>) |> ignore
 
+    let moduleInvalidated = new Signal<IPsiModule>(lifetime, "FSharpPsiModuleInvalidated")
+    
     let tryGetFSharpProject (project: IProject) (targetFrameworkId: TargetFrameworkId) =
         use lock = locker.UsingReadLock()
         tryGetValue project projects 
@@ -97,8 +99,10 @@ type FSharpProjectOptionsProvider
             logger.Info("Invalidating {0}", project)
             tryGetValue project projects
             |> Option.iter (fun fsProjectsForProject ->
-                for fsProject in fsProjectsForProject.Values do
+                for KeyValuePair (tfid, fsProject) in fsProjectsForProject do
                     checkerService.Checker.InvalidateConfiguration(fsProject.Options, false)
+                    let psiModule = psiModules.GetPrimaryPsiModule(project, tfid)
+                    moduleInvalidated.Fire(psiModule)
                 fsProjectsForProject.Clear())
 
             invalidatedProjects.Add(project) |> ignore
@@ -120,6 +124,8 @@ type FSharpProjectOptionsProvider
 
     let getParsingOptionsForSingleFile (file: IPsiSourceFile) =
         { FSharpParsingOptions.Default with SourceFiles = [| file.GetLocation().FullPath |] }
+
+    member x.ModuleInvalidated = moduleInvalidated
 
     member private x.ProcessChange(obj: ChangeEventArgs) =
         match obj.ChangeMap.GetChange<ProjectModelChange>(solution) with
@@ -186,11 +192,15 @@ type FSharpProjectOptionsProvider
             |> Option.defaultWith (fun _ -> getParsingOptionsForSingleFile file)
 
         member x.GetFileIndex(sourceFile) =
+            if isScriptLike sourceFile then 0 else
+
             getOrCreateFSharpProject sourceFile
             |> Option.bind (fun fsProject ->
                 let path = sourceFile.GetLocation()
                 tryGetValue path fsProject.FileIndices)
             |> Option.defaultWith (fun _ -> -1)
+        
+        member x.ModuleInvalidated = x.ModuleInvalidated :> _
 
 [<SolutionComponent>]
 type FSharpScriptOptionsProvider(logger: ILogger, checkerService: FSharpCheckerService) =

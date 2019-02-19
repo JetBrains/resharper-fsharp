@@ -8,9 +8,9 @@ using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Daemon.UsageChecking;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Highlightings;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
-using JetBrains.Util;
+using JetBrains.Util.DataStructures;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
@@ -30,9 +30,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
     public HighlightIdentifiersStageProcess([NotNull] IFSharpFile fsFile, [NotNull] IDaemonProcess process)
       : base(fsFile, process) => myDocument = process.Document;
 
-    private void HighlightUses(Action<DaemonStageResult> committer, IEnumerable<FSharpResolvedSymbolUse> symbols, int allSymbolsCount)
+    private void HighlightUses(Action<DaemonStageResult> committer,
+      IEnumerable<IReadOnlyList<FSharpResolvedSymbolUse>> allSymbols, int allSymbolsCount)
     {
-      var highlightings = new List<HighlightingInfo>(allSymbolsCount);
+      var highlightings = new ChunkList<HighlightingInfo>(allSymbolsCount);
+      foreach (var symbols in allSymbols)
       foreach (var resolvedSymbolUse in symbols)
       {
         var symbolUse = resolvedSymbolUse.SymbolUse;
@@ -45,10 +47,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 
         if (symbolUse.IsFromDefinition && symbol is FSharpMemberOrFunctionOrValue mfv)
         {
-          if (myDocument.Buffer.GetText(resolvedSymbolUse.Range) == "new" &&
-              mfv.LogicalName == StandardMemberNames.Constructor)
+          if (mfv.LogicalName == StandardMemberNames.Constructor &&
+              myDocument.Buffer.GetText(resolvedSymbolUse.Range) == "new")
             continue;
-          
+
           if (mfv.IsActivePattern)
             continue;
         }
@@ -59,12 +61,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 
         SeldomInterruptChecker.CheckForInterrupt();
       }
+
       committer(new DaemonStageResult(highlightings));
     }
 
     public override void Execute(Action<DaemonStageResult> committer)
     {
-      // todo: add more cases to GetSemanticClassification (e.g. methods, values, namespaces) and use it instead?
       var checkResults = DaemonProcess.CustomData.GetData(FSharpDaemonStageBase.TypeCheckResults);
       var declarations = FSharpFile.GetAllDeclaredSymbols(checkResults?.Value);
       InterruptableActivityCookie.CheckAndThrow();
@@ -72,7 +74,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
       var usages = FSharpFile.GetAllResolvedSymbols();
       InterruptableActivityCookie.CheckAndThrow();
 
-      HighlightUses(committer,  declarations.Concat(usages), declarations.Length + usages.Length);
+      HighlightUses(committer, new[] {declarations, usages}, declarations.Count + usages.Count);
     }
   }
 }

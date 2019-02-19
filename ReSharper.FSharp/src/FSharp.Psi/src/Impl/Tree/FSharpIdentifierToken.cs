@@ -1,4 +1,5 @@
 ﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;

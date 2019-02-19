@@ -2,7 +2,7 @@
 using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
   public class FSharpResolvedSymbolUse
   {

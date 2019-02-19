@@ -3,7 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Search
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Occurrences
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.Tree

@@ -1,9 +1,10 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService
 
+open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -28,7 +29,9 @@ type FSharpLanguageService
 
     override x.GetPrimaryLexerFactory() = lexerFactory :> _
     override x.CreateFilteringLexer(lexer) = lexer
-    override x.CreateParser(lexer, _, sourceFile) = FSharpParser(sourceFile, fsCheckerService) :> _
+    override x.CreateParser(lexer, _, sourceFile) =
+        let resolvedSymbolsCache = sourceFile.GetSolution().GetComponent<IFSharpResolvedSymbolsCache>()
+        FSharpParser(sourceFile, fsCheckerService, resolvedSymbolsCache) :> _
 
     override x.IsTypeMemberVisible(typeMember) =
         match typeMember with

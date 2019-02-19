@@ -4,13 +4,14 @@ open JetBrains.Lifetimes
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
-open JetBrains.Util
 open Microsoft.FSharp.Compiler.Ast
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
-type internal FSharpParser(file: IPsiSourceFile, checkerService: FSharpCheckerService) =
+type internal FSharpParser(file: IPsiSourceFile, checkerService: FSharpCheckerService,
+                           resolvedSymbolsCache: IFSharpResolvedSymbolsCache) =
     let tryCreateTreeBuilder lexer lifetime =
         Option.bind (fun (parseResults: FSharpParseFileResults) ->
             parseResults.ParseTree |> Option.map (function
@@ -34,4 +35,5 @@ type internal FSharpParser(file: IPsiSourceFile, checkerService: FSharpCheckerSe
                             x.FinishFile(x.Mark(), ElementType.F_SHARP_IMPL_FILE) })
 
             treeBuilder.CreateFSharpFile(CheckerService = checkerService,
-                                         ParseResults = parseResults) :> _
+                                         ParseResults = parseResults,
+                                         ResolvedSymbolsCache = resolvedSymbolsCache) :> _

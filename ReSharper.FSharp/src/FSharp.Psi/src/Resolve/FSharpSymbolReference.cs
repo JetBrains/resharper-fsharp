@@ -11,7 +11,7 @@ using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Resources.Shell;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
   public class FSharpSymbolReference : TreeReferenceBase<FSharpIdentifierToken>
   {
@@ -70,8 +70,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       }
     }
 
-    public override IReference BindTo(IDeclaredElement element, ISubstitution substitution) =>
-      throw new System.NotImplementedException();
+    public override IReference BindTo(IDeclaredElement element, ISubstitution substitution)
+    {
+      // Not yet supported (called during refactorings).
+      return this;
+    }
 
     public override ISymbolTable GetReferenceSymbolTable(bool useReferenceName) =>
       throw new System.NotImplementedException();
