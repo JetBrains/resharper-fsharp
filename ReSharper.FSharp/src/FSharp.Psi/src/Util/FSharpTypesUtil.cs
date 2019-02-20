@@ -13,7 +13,6 @@ using JetBrains.Util;
 using JetBrains.Util.Logging;
 using Microsoft.FSharp.Compiler;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
-using Microsoft.FSharp.Core;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {
@@ -22,22 +21,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
   /// </summary>
   public static class FSharpTypesUtil
   {
-    private static readonly object ourFcsLock = new object();
-
     [CanBeNull]
     public static IDeclaredType GetBaseType([NotNull] FSharpEntity entity,
       IList<ITypeParameter> typeParamsFromContext, [NotNull] IPsiModule psiModule)
     {
-      var fsBaseType = GetFSharpBaseType(entity);
+      var fsBaseType = entity.BaseType;
       return fsBaseType != null
         ? GetType(fsBaseType.Value, typeParamsFromContext, psiModule) as IDeclaredType
         : TypeFactory.CreateUnknownType(psiModule);
-    }
-
-    private static FSharpOption<FSharpType> GetFSharpBaseType([NotNull] FSharpEntity entity)
-    {
-      lock (ourFcsLock)
-        return entity.BaseType;
     }
 
     [NotNull]
@@ -188,7 +179,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       if (entity.IsProvidedAndErased)
       {
-        var fsBaseType = GetFSharpBaseType(entity);
+        var fsBaseType = entity.BaseType;
         if (fsBaseType != null)
           return GetType(fsBaseType.Value, typeParamsFromContext, psiModule, isFromMethodSig, isFromReturn);
       }

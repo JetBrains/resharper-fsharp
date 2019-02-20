@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -25,8 +25,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
   /// </summary>
   public static class FSharpElementsUtil
   {
-    private static readonly object ourFcSLock = new object();
-
     [CanBeNull]
     internal static ITypeElement GetTypeElement([NotNull] FSharpEntity entity, [NotNull] IPsiModule psiModule)
     {
@@ -210,18 +208,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     [CanBeNull]
     private static string GetXmlDocId([NotNull] FSharpMemberOrFunctionOrValue mfv)
     {
-      lock (ourFcSLock)
+      try
       {
-        try
-        {
-          return mfv.XmlDocSig;
-        }
-        catch (Exception e)
-        {
-          Logger.LogMessage(LoggingLevel.WARN, "Could not get XmlDocId for {0}", mfv);
-          Logger.LogExceptionSilently(e);
-          return null;
-        }
+        return mfv.XmlDocSig;
+      }
+      catch (Exception e)
+      {
+        Logger.LogMessage(LoggingLevel.WARN, "Could not get XmlDocId for {0}", mfv);
+        Logger.LogExceptionSilently(e);
+        return null;
       }
     }
 
