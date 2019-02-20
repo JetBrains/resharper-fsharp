@@ -3,8 +3,8 @@ using System.Xml;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.Caches;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
@@ -123,11 +123,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       return EmptyList<ITypeMember>.InstanceList;
     }
 
-    public INamespace GetContainingNamespace()
-    {
-      return myMethod.GetContainingType()?.GetContainingNamespace()
-             ?? Module.GetPsiServices().Symbols.GetSymbolScope(LibrarySymbolScope.FULL, true).GlobalNamespace;
-    }
+    public INamespace GetContainingNamespace() =>
+      myMethod.GetContainingType()?.GetContainingNamespace() ??
+      Module.GetSymbolScope().GlobalNamespace;
 
     public IPsiSourceFile GetSingleOrDefaultSourceFile()
     {

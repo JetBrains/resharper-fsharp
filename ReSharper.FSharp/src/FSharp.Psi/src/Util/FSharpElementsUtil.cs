@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -39,7 +39,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
           : null;
       }
 
-      var symbolScope = psiModule.GetPsiServices().Symbols.GetSymbolScope(psiModule, true, true);
+      var symbolScope = psiModule.GetSymbolScope();
       while (entity.IsFSharpAbbreviation)
       {
         // FCS returns Clr names for non-abbreviated types only, using fullname
@@ -75,28 +75,31 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     }
 
     [CanBeNull]
-    private static IClrDeclaredElement GetDeclaredNamespace([NotNull] FSharpEntity entity, IPsiModule psiModule)
+    private static INamespace GetDeclaredNamespace([NotNull] FSharpEntity entity, IPsiModule psiModule)
     {
-      Assertion.Assert(entity.IsNamespace, "entity.IsNamespace");
-      var name = entity.CompiledName;
-      var containingName = entity.Namespace?.Value;
-      var fullName = containingName != null ? containingName + "." + name : name;
-      var symbolScope = psiModule.GetPsiServices().Symbols.GetSymbolScope(psiModule, true, true);
-      return symbolScope.GetElementsByQualifiedName(fullName).FirstOrDefault() as INamespace;
+      var name = entity.LogicalName;
+      var containingNamespace = entity.Namespace?.Value;
+      var fullName = containingNamespace != null ? containingNamespace + "." + name : name;
+      var elements = psiModule.GetSymbolScope().GetElementsByQualifiedName(fullName);
+      return elements.FirstOrDefault() as INamespace;
     }
 
     [CanBeNull]
     public static IDeclaredElement GetDeclaredElement([CanBeNull] FSharpSymbol symbol,
       [NotNull] IPsiModule psiModule, [CanBeNull] FSharpIdentifierToken referenceOwnerToken = null)
     {
-      if (symbol == null) return null;
+      if (symbol == null)
+        return null;
 
       if (symbol is FSharpEntity entity)
       {
-        if (entity.IsUnresolved) return null;
-        return entity.IsNamespace
-          ? GetDeclaredNamespace(entity, psiModule)
-          : GetTypeElement(entity, psiModule);
+        if (entity.IsUnresolved)
+          return null;
+
+        if (entity.IsNamespace)
+          return GetDeclaredNamespace(entity, psiModule);
+
+        return GetTypeElement(entity, psiModule);
       }
 
       if (symbol is FSharpMemberOrFunctionOrValue mfv)
@@ -198,11 +201,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         var patternElement = typeElement.EnumerateMembers(patternName, true).FirstOrDefault();
         return patternElement?.GetDeclarations().FirstOrDefault() as IFSharpDeclaration;
       }
-      else
-      {
-        var patternId = FindNode<IActivePatternId>(activePatternCase.DeclarationLocation, referenceOwnerToken);
-        return patternId?.GetContainingNode<IFSharpDeclaration>();
-      }
+
+      var patternId = FindNode<IActivePatternId>(activePatternCase.DeclarationLocation, referenceOwnerToken);
+      return patternId?.GetContainingNode<IFSharpDeclaration>();
     }
 
     [CanBeNull]

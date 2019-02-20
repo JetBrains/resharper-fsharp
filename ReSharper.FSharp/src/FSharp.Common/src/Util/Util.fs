@@ -1,16 +1,17 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Common.Util
 
+open JetBrains.ProjectModel
+open JetBrains.ReSharper.Psi.Modules
+
 [<AutoOpen>]
 module rec CommonUtil =
-    open System.Diagnostics
     open System
     open System.Collections.Generic
+    open System.Diagnostics
     open JetBrains.Application.UI.Icons.ComposedIcons
     open JetBrains.DataFlow
     open JetBrains.DocumentModel
     open JetBrains.Lifetimes
-    open JetBrains.ProjectModel
-    open JetBrains.ReSharper.Psi.Modules
     open JetBrains.Util
     open JetBrains.Util.dataStructures.TypedIntrinsics
     open Microsoft.FSharp.Compiler
@@ -163,7 +164,6 @@ module rec FSharpMsBuildUtils =
     open BuildActions
     open ItemTypes
     open JetBrains.Platform.MsBuildHost.Models
-    open JetBrains.ProjectModel
 
     module ItemTypes =
         let [<Literal>] compileBeforeItemType = "CompileBefore"
@@ -207,3 +207,9 @@ module rec FSharpMsBuildUtils =
 
     type BuildAction with
         member x.ChangesOrder = changesOrder x.Value
+
+[<Extension>]
+module PsiUtil =
+    [<Extension; CompiledName("GetSymbolScope")>]
+    let getSymbolScope (psiModule: IPsiModule) =
+        psiModule.GetPsiServices().Symbols.GetSymbolScope(psiModule, true, true)
