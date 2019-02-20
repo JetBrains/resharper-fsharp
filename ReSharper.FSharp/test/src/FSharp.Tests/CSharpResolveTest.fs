@@ -20,7 +20,7 @@ type CSharpResolveTest() =
 
     let highlightingManager = HighlightingSettingsManager.Instance
 
-    override x.GetProjectProperties(targetFrameworkIds, flavours) =
+    override x.GetProjectProperties(targetFrameworkIds, _) =
         FSharpProjectPropertiesFactory.CreateProjectProperties(targetFrameworkIds)
 
     [<Test>] member x.``Records 01 - Generated members``() = x.DoNamedTest()
@@ -51,6 +51,7 @@ type CSharpResolveTest() =
 
     [<Test>] member x.``Class 01 - Abstract``() = x.DoNamedTest()
     [<Test>] member x.``Class 02 - Sealed``() = x.DoNamedTest()
+    [<Test>] member x.``Class 03 - No attributes``() = x.DoNamedTest()
 
     [<Test>] member x.``Val fields 01``() = x.DoNamedTest()
     [<Test>] member x.``Val fields 02, compiled name ignored``() = x.DoNamedTest()
@@ -63,6 +64,7 @@ type CSharpResolveTest() =
     [<Test>] member x.``Methods 02, compiled name``() = x.DoNamedTest()
     [<Test>] member x.``Methods 03, optional param``() = x.DoNamedTest()
     [<Test>] member x.``Methods 04, extension methods``() = x.DoNamedTest()
+    [<Test>] member x.``Methods 05, void return``() = x.DoNamedTest()
 
     [<Test>] member x.``Properties 01``() = x.DoNamedTest()
 
@@ -70,6 +72,8 @@ type CSharpResolveTest() =
     [<Test>] member x.``Module bindings 02 - Records``() = x.DoNamedTest()
     [<Test>] member x.``Module bindings 03 - extension methods 01``() = x.DoNamedTest()
     [<Test>] member x.``Module bindings 04 - extension methods 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Nested module 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Operators 01 - Module``() = x.DoNamedTest()
     [<Test>] member x.``Operators 02 - Type``() = x.DoNamedTest()
@@ -92,6 +96,9 @@ type CSharpResolveTest() =
     [<Test>] member x.``Type Extension 09 - In namespace``() = x.DoNamedTest()
     [<Test>] member x.``Type Extension 10 - Compiled name``() = x.DoNamedTest()
     [<Test>] member x.``Type Extension 11 - Struct compiled name``() = x.DoNamedTest()
+    [<Test>] member x.``Type Extension 12 - Optional extension``() = x.DoNamedTest()
+
+    [<Test>] member x.``Generics - Methods 01``() = x.DoNamedTest()
 
     override x.RelativeTestDataPath = "cache/csharpResolve"
 

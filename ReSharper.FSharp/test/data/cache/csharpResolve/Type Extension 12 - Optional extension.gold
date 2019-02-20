@@ -1,0 +1,18 @@
+﻿namespace ClassLibrary1
+{
+    public class Class1
+    {
+        public Class1()
+        {
+            var m = Module.|Method|(0)();
+            var p = Module.|Prop|(1);
+        }
+    }
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Cannot access non-static method 'Method' in static context
+(1): ReSharper Underlined Error Highlighting: Cannot access non-static property 'Prop' in static context
+M:Module.Method
+M:Module.Method
+P:Module.Prop
