@@ -207,23 +207,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       }
 
       var declaredType = TypeFactory.CreateTypeByCLRName(clrName, psiModule);
-      var typeElement = declaredType.GetTypeElement();
-      if (typeElement == null)
-        return TypeFactory.CreateUnknownType(psiModule);
+      var genericArgs = type.GenericArguments;
+      if (genericArgs.IsEmpty())
+        return declaredType;
 
-      var args = type.GenericArguments;
-      return args.Count != 0
-        ? GetTypeWithSubstitution(typeElement, args, typeParamsFromContext, psiModule, isFromMethodSig) ??
-          declaredType
-        : declaredType;
+      var typeElement = declaredType.GetTypeElement();
+      return typeElement != null
+        ? GetTypeWithSubstitution(typeElement, genericArgs, typeParamsFromContext, psiModule, isFromMethodSig)
+        : TypeFactory.CreateUnknownType(psiModule);
     }
 
     [NotNull]
     private static IType GetSingleTypeArgument([NotNull] FSharpType fsType,
       IList<ITypeParameter> typeParamsFromContext, IPsiModule psiModule, bool isFromMethodSig)
     {
-      Assertion.Assert(fsType.GenericArguments.Count == 1, "fsType.GenericArguments.Count == 1");
-      return GetTypeArgumentType(fsType.GenericArguments[0], null, typeParamsFromContext, psiModule,
+      var genericArgs = fsType.GenericArguments;
+      Assertion.Assert(genericArgs.Count == 1, "genericArgs.Count == 1");
+      return GetTypeArgumentType(genericArgs[0], null, typeParamsFromContext, psiModule,
                isFromMethodSig) ??
              TypeFactory.CreateUnknownType(psiModule);
     }
