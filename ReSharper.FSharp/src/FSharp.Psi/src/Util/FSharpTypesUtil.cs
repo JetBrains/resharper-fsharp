@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
+using JetBrains.Metadata.Reader.API;
+using JetBrains.Metadata.Reader.Impl;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
@@ -20,8 +22,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
   /// </summary>
   public static class FSharpTypesUtil
   {
-    private const string ArrayClrName = "System.Array";
-
     private static readonly object ourFcsLock = new object();
 
     [CanBeNull]
@@ -56,17 +56,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     }
 
     [CanBeNull]
-    public static string GetClrName([NotNull] FSharpEntity entity)
+    public static IClrTypeName GetClrName([NotNull] FSharpEntity entity)
     {
-      // F# 4.0 specs 5.1.4
       if (entity.IsArrayType)
-        return ArrayClrName;
+        return PredefinedType.ARRAY_FQN;
 
-      // qualified name may include assembly name, public key, etc and separated with comma, e.g. for unit it returns
-      // "Microsoft.FSharp.Core.Unit, FSharp.Core, Version=4.4.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a"
       try
       {
-        return entity.QualifiedBaseName;
+        return new ClrTypeName(entity.QualifiedBaseName);
       }
       catch (Exception e)
       {

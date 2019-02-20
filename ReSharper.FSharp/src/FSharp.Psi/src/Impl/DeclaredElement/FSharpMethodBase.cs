@@ -14,8 +14,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     where TDeclaration : FSharpDeclarationBase, IFSharpDeclaration, IAccessRightsOwnerDeclaration,
     IModifiersOwnerDeclaration
   {
-    public const string ExtensionAttributeTypeName = "System.Runtime.CompilerServices.ExtensionAttribute";
-
     protected FSharpMethodBase([NotNull] ITypeMemberDeclaration declaration,
       [NotNull] FSharpMemberOrFunctionOrValue mfv, [CanBeNull] IFSharpTypeDeclaration typeDeclaration)
       : base(declaration, mfv, typeDeclaration)
@@ -26,7 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       CLRDeclaredElementType.METHOD;
 
     public bool IsExtensionMethod =>
-      FSharpSymbol.Attributes.HasAttributeInstance(ExtensionAttributeTypeName);
+      FSharpSymbol.Attributes.HasAttributeInstance(PredefinedType.EXTENSION_ATTRIBUTE_CLASS);
 
     public bool IsAsync => false;
     public bool IsVarArg => false;

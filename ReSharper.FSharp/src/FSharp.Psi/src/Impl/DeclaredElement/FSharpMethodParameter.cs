@@ -17,11 +17,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
   public class FSharpMethodParameter : IParameter
   {
-    private const string OptionalTypeName = "System.Runtime.InteropServices.OptionalAttribute";
-
-    private const string DefaultParameterValueTypeName =
-      "System.Runtime.InteropServices.DefaultParameterValueAttribute";
-
     private readonly IParametersOwner myParametersOwner;
     private readonly int myParameterIndex;
 
@@ -73,7 +68,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       {
         // todo: implement DefaultValue in FCS
         var defaultValueAttr = FSharpSymbol.Attributes
-          .FirstOrDefault(a => a.GetClrName() == DefaultParameterValueTypeName)
+          .FirstOrDefault(a => a.GetClrName() == PredefinedType.DEFAULTPARAMETERVALUE_ATTRIBUTE_CLASS.FullName)
           ?.ConstructorArguments.FirstOrDefault();
         return defaultValueAttr == null
           ? new DefaultValue(Type)
@@ -92,7 +87,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     // todo: implement IsCliOptional in FCS
     public bool IsOptional =>
-      FSharpSymbol.Attributes.HasAttributeInstance(OptionalTypeName);
+      FSharpSymbol.Attributes.HasAttributeInstance(PredefinedType.OPTIONAL_ATTRIBUTE_CLASS);
 
     public bool IsVarArg => false;
     public IParametersOwner ContainingParametersOwner => myParametersOwner;
