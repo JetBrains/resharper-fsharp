@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Util;
@@ -61,6 +61,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     public override int GetHashCode() => ShortName.GetHashCode();
 
     public string SourceName => ShortName; // todo
+
     public bool IsExtensionMember => false;
     public bool IsMember => true;
   }

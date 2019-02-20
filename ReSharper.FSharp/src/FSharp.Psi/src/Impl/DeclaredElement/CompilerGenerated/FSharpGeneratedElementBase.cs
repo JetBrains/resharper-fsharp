@@ -44,6 +44,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     public XmlNode GetXMLDescriptionSummary(bool inherit) => null;    
 
     public bool IsSynthetic() => false;
+
     public virtual bool IsVisibleFromFSharp => false;
+    public virtual bool CanNavigateTo => false;
   }
 }

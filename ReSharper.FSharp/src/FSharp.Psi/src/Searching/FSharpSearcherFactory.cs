@@ -108,7 +108,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
         }
       }
 
-      if (!(element is IFSharpTypeMember fsTypeMember) || fsTypeMember.IsVisibleFromFSharp)
+      if (!(element is IFSharpTypeMember fsTypeMember) || fsTypeMember.CanNavigateTo)
         return null;
 
       return fsTypeMember.GetContainingType() is IDeclaredElement containingType

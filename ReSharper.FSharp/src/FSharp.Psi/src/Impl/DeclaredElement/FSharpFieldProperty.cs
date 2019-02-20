@@ -20,7 +20,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     {
     }
 
-    public override bool IsVisibleFromFSharp => !Field.IsNameGenerated;
+    public override bool IsVisibleFromFSharp => false;
+    public override bool CanNavigateTo => true;
   }
 
 

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
@@ -114,6 +114,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       : MemberHidePolicy.HIDE_BY_NAME;
 
     public virtual bool IsVisibleFromFSharp => true;
+    public virtual bool CanNavigateTo => IsVisibleFromFSharp;
+
     public virtual bool IsExtensionMember => false;
     public abstract bool IsMember { get; }
   }
