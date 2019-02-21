@@ -38,7 +38,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
                     return tokenType.Create(null);
 
                 var text =
-                    FSharpTokenType.Identifiers[tokenType]
+                    FSharpTokenType.Identifiers[tokenType] || tokenType.IsWhitespace
                         ? myIdentifierIntern.Intern(buffer, startOffset, endOffset)
                         : buffer.GetText(new TextRange(startOffset, endOffset));
                 return tokenType.Create(text);
