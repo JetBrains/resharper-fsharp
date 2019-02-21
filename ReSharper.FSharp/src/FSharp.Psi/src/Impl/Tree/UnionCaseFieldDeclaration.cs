@@ -26,8 +26,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     protected override IList<FSharpField> GetTypeFields(FSharpSymbol type) =>
       type is FSharpUnionCase unionCase ? unionCase.UnionCaseFields : null;
 
-    protected override IDeclaredElement CreateDeclaredElement(ITypeMemberDeclaration declaration) =>
-      new FSharpUnionCaseField<UnionCaseFieldDeclaration>(declaration);
+    protected override IDeclaredElement CreateDeclaredElement() =>
+      new FSharpUnionCaseField<UnionCaseFieldDeclaration>(this);
   }
 
   internal partial class ExceptionFieldDeclaration
@@ -47,8 +47,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     protected override IList<FSharpField> GetTypeFields(FSharpSymbol type) =>
       type is FSharpEntity entity && entity.IsFSharpExceptionDeclaration ? entity.FSharpFields : null;
 
-    protected override IDeclaredElement CreateDeclaredElement(ITypeMemberDeclaration declaration) =>
-      new FSharpUnionCaseField<ExceptionFieldDeclaration>(declaration);
+    protected override IDeclaredElement CreateDeclaredElement() =>
+      new FSharpUnionCaseField<ExceptionFieldDeclaration>(this);
   }
 
   internal abstract class UnionCaseFieldDeclarationBase : FSharpProperTypeMemberDeclarationBase
@@ -82,8 +82,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     protected abstract bool UseBaseNameForSingleField { get; }
     protected abstract TreeNodeCollection<ICaseFieldDeclaration> GetFields();
 
-    protected abstract IDeclaredElement CreateDeclaredElement(ITypeMemberDeclaration declaration);
-
     public override FSharpSymbol GetFSharpSymbol()
     {
       if (base.GetFSharpSymbol() is FSharpField namedField) // todo: named params have type FSharpParameters
@@ -100,9 +98,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         ? fields[index]
         : null;
     }
-
-    protected override IDeclaredElement CreateDeclaredElement() =>
-      GetFSharpSymbol() is var caseField && caseField != null ? CreateDeclaredElement(this) : null;
 
     [CanBeNull]
     protected abstract IList<FSharpField> GetTypeFields([NotNull] FSharpSymbol type);

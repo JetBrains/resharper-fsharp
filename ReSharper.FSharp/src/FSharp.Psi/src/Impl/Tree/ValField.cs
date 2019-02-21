@@ -10,7 +10,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     protected override string DeclaredElementName => NameIdentifier.GetSourceName();
     public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
 
-    protected override IDeclaredElement CreateDeclaredElement() =>
-      GetFSharpSymbol() is FSharpField ? new FSharpValField(this) : null;
+    protected override IDeclaredElement CreateDeclaredElement() => new FSharpValField(this);
   }
 }
