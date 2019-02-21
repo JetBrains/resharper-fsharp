@@ -1,6 +1,5 @@
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.DeclaredElements;
@@ -10,13 +9,11 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal abstract class FSharpMethodBase<TDeclaration> : FSharpFunctionBase<TDeclaration>, IMethod
-    where TDeclaration : FSharpDeclarationBase, IFSharpDeclaration, IAccessRightsOwnerDeclaration,
-    IModifiersOwnerDeclaration
+  internal abstract class FSharpMethodBase<TDeclaration> : FSharpTypeParametersOwnerBase<TDeclaration>, IMethod
+    where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
     protected FSharpMethodBase([NotNull] ITypeMemberDeclaration declaration,
-      [NotNull] FSharpMemberOrFunctionOrValue mfv, [CanBeNull] IFSharpTypeDeclaration typeDeclaration)
-      : base(declaration, mfv, typeDeclaration)
+      [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)
     {
     }
 
@@ -24,7 +21,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       CLRDeclaredElementType.METHOD;
 
     public bool IsExtensionMethod =>
-      FSharpSymbol.Attributes.HasAttributeInstance(PredefinedType.EXTENSION_ATTRIBUTE_CLASS);
+      Attributes.HasAttributeInstance(PredefinedType.EXTENSION_ATTRIBUTE_CLASS);
 
     public bool IsAsync => false;
     public bool IsVarArg => false;

@@ -45,23 +45,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (!(GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv))
         return null;
 
-      if (typeDeclaration is IFSharpTypeDeclaration fsTypeDeclaration)
+      if (typeDeclaration is IFSharpTypeDeclaration)
       {
         if ((!mfv.CurriedParameterGroups.IsEmpty() || !mfv.GenericParameters.IsEmpty()) && !mfv.IsMutable)
-          return new FSharpTypePrivateMethod(this, mfv, fsTypeDeclaration);
+          return new FSharpTypePrivateMethod(this, mfv);
 
-        return new FSharpValField<TopPatternDeclarationBase>(this, mfv.FullType); 
+        if (mfv.LiteralValue != null)
+          return new FSharpLiteral(this);
+
+        return new FSharpTypePrivateField(this); 
       }
 
       if (mfv.LiteralValue != null)
-        return new FSharpLiteral(this, mfv);
+        return new FSharpLiteral(this);
 
       if (!mfv.IsValCompiledAsMethod())
         return new ModuleValue(this, mfv);
 
       return !mfv.IsInstanceMember && mfv.CompiledName.StartsWith("op_", StringComparison.Ordinal)
-        ? (IDeclaredElement) new FSharpSignOperator<TopPatternDeclarationBase>(this, mfv, null)
-        : new ModuleFunction(this, mfv, null);
+        ? (IDeclaredElement) new FSharpSignOperator<TopPatternDeclarationBase>(this, mfv)
+        : new ModuleFunction(this, mfv);
     }
 
     public TreeNodeCollection<IFSharpAttribute> Attributes =>

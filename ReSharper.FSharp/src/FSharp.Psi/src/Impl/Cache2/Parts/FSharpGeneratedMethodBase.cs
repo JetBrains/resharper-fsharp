@@ -17,18 +17,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       ContainingType = (TypeElement) containingType;
 
     protected override IClrDeclaredElement ContainingElement => ContainingType;
-      
+
     protected IType ContainingTypeType =>
       ContainingType.WithIdSubstitution();
 
     public override ITypeElement GetContainingType() => ContainingType;
     public override ITypeMember GetContainingTypeMember() => ContainingType;
-      
+
     public override DeclaredElementType GetElementType() =>
       CLRDeclaredElementType.METHOD;
-
-    public IList<IExplicitImplementation> ExplicitImplementations =>
-      EmptyList<IExplicitImplementation>.Instance;
 
     public IList<ITypeParameter> TypeParameters => EmptyList<ITypeParameter>.Instance;
     public override IList<IParameter> Parameters => EmptyList<IParameter>.Instance;
@@ -36,8 +33,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public override ISubstitution IdSubstitution =>
       MethodIdSubstitution.Create(this);
 
-    public bool CanBeImplicitImplementation => false;
-    public bool IsExplicitImplementation => false;
     public bool IsXamlImplicitMethod => false;
     public bool IsExtensionMethod => false;
     public bool IsVarArg => false;

@@ -428,10 +428,10 @@ interface caseFieldDeclaration:
   unionCaseFieldDeclaration |
   exceptionFieldDeclaration;
 
-unionCaseFieldDeclaration options { stubBase="CaseFieldDeclarationBase"; }:
+unionCaseFieldDeclaration options { stubBase="UnionCaseFieldDeclarationBase"; }:
   IDENTIFIER<IDENTIFIER, Identifier>;
 
-exceptionFieldDeclaration options { stubBase="CaseFieldDeclarationBase"; }:
+exceptionFieldDeclaration options { stubBase="UnionCaseFieldDeclarationBase"; }:
   IDENTIFIER<IDENTIFIER, Identifier>;
 
 

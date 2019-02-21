@@ -17,8 +17,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     public override ITypeElement GetContainingType() => TypeElement;
     public override ITypeMember GetContainingTypeMember() => (ITypeMember) TypeElement;
 
-    [NotNull]
-    public ITypeElement TypeElement { get; }
+    [NotNull] public ITypeElement TypeElement { get; }
 
     public abstract IType Type { get; }
 
@@ -32,10 +31,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
     public override DeclaredElementType GetElementType() =>
       CLRDeclaredElementType.PROPERTY;
-
-    public bool IsExplicitImplementation => false;
-    public bool CanBeImplicitImplementation => false;
-    public IList<IExplicitImplementation> ExplicitImplementations => EmptyList<IExplicitImplementation>.Instance;
 
     public InvocableSignature GetSignature(ISubstitution substitution) =>
       new InvocableSignature(this, substitution);

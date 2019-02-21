@@ -10,22 +10,46 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
   internal abstract class FSharpConstructorBase<TDeclaration> : FSharpFunctionBase<TDeclaration>, IConstructor
-    where TDeclaration : FSharpDeclarationBase, IFSharpDeclaration, IAccessRightsOwnerDeclaration,
-    IModifiersOwnerDeclaration
+    where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
     protected FSharpConstructorBase([NotNull] ITypeMemberDeclaration declaration,
-      [NotNull] FSharpMemberOrFunctionOrValue mfv, IFSharpTypeDeclaration typeDeclaration)
-      : base(declaration, mfv, typeDeclaration)
+      [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)
     {
     }
 
     public override DeclaredElementType GetElementType() =>
       CLRDeclaredElementType.CONSTRUCTOR;
 
-    public override string ShortName => GetContainingType()?.ShortName ?? SharedImplUtil.MISSING_DECLARATION_NAME;
-    public bool IsDefault => false;
+    public override string ShortName =>
+      GetContainingType()?.ShortName ??
+      SharedImplUtil.MISSING_DECLARATION_NAME;
+
     public override bool IsStatic => false;
-    public bool IsParameterless => Parameters.IsEmpty();
+    public override IType ReturnType => Module.GetPredefinedType().Void;
+
     public abstract bool IsImplicit { get; }
+
+    public bool IsDefault => false;
+    public bool IsParameterless => Parameters.IsEmpty();
+  }
+
+  internal class FSharpConstructor : FSharpConstructorBase<ConstructorDeclaration>
+  {
+    public FSharpConstructor([NotNull] ITypeMemberDeclaration declaration,
+      [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)
+    {
+    }
+
+    public override bool IsImplicit => false;
+  }
+
+  internal class FSharpImplicitConstructor : FSharpConstructorBase<ImplicitConstructorDeclaration>
+  {
+    public FSharpImplicitConstructor([NotNull] ITypeMemberDeclaration declaration,
+      [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)
+    {
+    }
+
+    public override bool IsImplicit => true;
   }
 }

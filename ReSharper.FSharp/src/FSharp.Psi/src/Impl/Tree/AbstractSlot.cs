@@ -29,8 +29,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (property != null)
         return new FSharpProperty<AbstractSlot>(this, property.Value);
 
-      var typeDeclaration = GetContainingTypeDeclaration() as IFSharpTypeDeclaration;
-      return new FSharpMethod<AbstractSlot>(this, mfv, typeDeclaration);
+      return new FSharpMethod<AbstractSlot>(this, mfv);
     }
   }
 }

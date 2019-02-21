@@ -1,8 +1,8 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Impl;
 using JetBrains.ReSharper.Psi.Tree;
@@ -10,12 +10,12 @@ using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 using JetBrains.Util.dataStructures;
 using JetBrains.Util.DataStructures;
+using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal abstract class FSharpTypeMember<TDeclaration> : FSharpDeclaredElement<TDeclaration>, IFSharpTypeMember
-    where TDeclaration : FSharpDeclarationBase, IFSharpDeclaration, IAccessRightsOwnerDeclaration,
-    IModifiersOwnerDeclaration
+  internal abstract class FSharpTypeMember<TDeclaration> : FSharpCachedTypeMemberBase<TDeclaration>, IFSharpTypeMember
+    where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
     protected FSharpTypeMember([NotNull] IDeclaration declaration) : base(declaration)
     {
@@ -55,6 +55,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
           if (member.DeclaredName == declaration.DeclaredName && Equals(this, member.DeclaredElement))
             list.Add(member);
       }
+
       return list.AsIList();
     }
 
@@ -93,7 +94,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     // todo
     public virtual bool IsAbstract => false;
-
     public virtual bool IsSealed => false;
     public virtual bool IsVirtual => false;
     public virtual bool IsOverride => false;
@@ -102,6 +102,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public virtual bool IsExtern => false;
     public virtual bool IsUnsafe => false;
     public virtual bool IsVolatile => false;
+
     public string XMLDocId => XMLDocUtil.GetTypeMemberXmlDocId(this, ShortName);
 
     public IList<TypeMemberInstance> GetHiddenMembers() => HiddenMemberImpl.GetHiddenMembers(this);
@@ -113,10 +114,40 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       ? MemberHidePolicy.HIDE_BY_SIGNATURE
       : MemberHidePolicy.HIDE_BY_NAME;
 
+    // todo
+    public bool CanBeImplicitImplementation => false;
+    public bool IsExplicitImplementation => false;
+    public IList<IExplicitImplementation> ExplicitImplementations => EmptyList<IExplicitImplementation>.Instance;
+
     public virtual bool IsVisibleFromFSharp => true;
     public virtual bool CanNavigateTo => IsVisibleFromFSharp;
 
     public virtual bool IsExtensionMember => false;
-    public abstract bool IsMember { get; }
+    public abstract bool IsFSharpMember { get; }
+
+    [CanBeNull]
+    protected virtual FSharpSymbol GetActualSymbol([NotNull] FSharpSymbol symbol) => symbol;
+
+    public FSharpSymbol Symbol
+    {
+      get
+      {
+        var declaration = GetDeclaration();
+        var symbol = declaration?.GetFSharpSymbol();
+
+        return symbol != null
+          ? GetActualSymbol(symbol)
+          : null;
+      }
+    }
+
+    protected IType GetType([CanBeNull] FSharpType fsType)
+    {
+      if (fsType == null || GetDeclaration() is var declaration && declaration == null)
+        return TypeFactory.CreateUnknownType(Module);
+
+      var type = FSharpTypesUtil.GetType(fsType, declaration, Module);
+      return type ?? TypeFactory.CreateUnknownType(Module);
+    }
   }
 }

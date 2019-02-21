@@ -1,6 +1,5 @@
 ﻿using System.Xml;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
@@ -10,19 +9,17 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal abstract class FSharpDeclaredElement<TDeclaration> : CachedTypeMemberBase
-    where TDeclaration : FSharpDeclarationBase, IFSharpDeclaration
+  internal abstract class FSharpCachedTypeMemberBase<TDeclaration> : CachedTypeMemberBase
+    where TDeclaration : IFSharpDeclaration
   {
-    protected FSharpDeclaredElement([NotNull] IDeclaration declaration) : base(declaration)
+    protected FSharpCachedTypeMemberBase([NotNull] IDeclaration declaration) : base(declaration)
     {
     }
 
-    protected override bool CanBindTo(IDeclaration declaration) =>
-      declaration is TDeclaration;
+    protected override bool CanBindTo(IDeclaration declaration) => declaration is TDeclaration;
 
     [CanBeNull]
-    public new TDeclaration GetDeclaration() =>
-      (TDeclaration) base.GetDeclaration();
+    public new TDeclaration GetDeclaration() => (TDeclaration) base.GetDeclaration();
 
     public bool IsSynthetic() => false;
     public bool CaseSensitiveName => true;
@@ -46,5 +43,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public XmlNode GetXMLDescriptionSummary(bool inherit) => null; // todo
 
     public abstract DeclaredElementType GetElementType();
+
+    [CanBeNull] protected TypeElement ContainingType => GetContainingType() as TypeElement;
   }
 }

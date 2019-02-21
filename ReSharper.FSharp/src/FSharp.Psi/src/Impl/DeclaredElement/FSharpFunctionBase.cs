@@ -1,57 +1,87 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
-using JetBrains.Util.dataStructures;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
   internal abstract class FSharpFunctionBase<TDeclaration> : FSharpMemberBase<TDeclaration>, IFunction
-    where TDeclaration : FSharpDeclarationBase, IFSharpDeclaration, IAccessRightsOwnerDeclaration,
-    IModifiersOwnerDeclaration
+    where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
     protected FSharpFunctionBase([NotNull] ITypeMemberDeclaration declaration,
-      [NotNull] FSharpMemberOrFunctionOrValue mfv, [CanBeNull] IFSharpTypeDeclaration typeDeclaration)
-      : base(declaration, mfv)
+      [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)
     {
-      var mfvTypeParams = mfv.GenericParameters;
-      var typeParams = new FrugalLocalList<ITypeParameter>();
-      var outerTypeParamsCount = typeDeclaration?.TypeParameters.Count ?? 0;
-      for (var i = outerTypeParamsCount; i < mfvTypeParams.Count; i++)
-        typeParams.Add(new FSharpTypeParameterOfMethod(this, mfvTypeParams[i].DisplayName, i - outerTypeParamsCount));
-      TypeParameters = typeParams.ToList();
+    }
 
-      ReturnType = mfv.IsConstructor || mfv.ReturnParameter.Type.IsUnit
-        ? Module.GetPredefinedType().Void
-        : FSharpTypesUtil.GetType(mfv.ReturnParameter.Type, declaration, TypeParameters, Module, true) ??
-          TypeFactory.CreateUnknownType(Module);
-
-      var methodParams = new FrugalLocalList<IParameter>();
-      var mfvParamGroups = mfv.CurriedParameterGroups;
-      if (mfvParamGroups.Count == 1 && mfvParamGroups[0].Count == 1 && mfvParamGroups[0][0].Type.IsUnit)
+    public override IList<IParameter> Parameters
+    {
+      get
       {
-        Parameters = EmptyList<IParameter>.InstanceList;
-        return;
-      }
+        var mfv = Mfv;
+        if (mfv == null)
+          return EmptyList<IParameter>.Instance;
 
-      foreach (var paramsGroup in mfv.CurriedParameterGroups)
-      foreach (var param in paramsGroup)
+        var mfvCurriedParams = mfv.CurriedParameterGroups;
+        if (mfvCurriedParams.Count == 1 && mfvCurriedParams[0].Count == 1 && mfvCurriedParams[0][0].Type.IsUnit)
+          return EmptyArray<IParameter>.Instance;
+
+        var paramsCount = GetElementsCount(mfvCurriedParams);
+        if (paramsCount == 0)
+          return EmptyList<IParameter>.Instance;
+
+        var declaration = GetDeclaration();
+        if (declaration == null)
+          return EmptyList<IParameter>.Instance;
+
+        var methodParams = new List<IParameter>(paramsCount);
+        foreach (var paramsGroup in mfvCurriedParams)
+        foreach (var param in paramsGroup)
+        {
+          var paramType = param.Type;
+          var paramName = param.DisplayName;
+          methodParams.Add(new FSharpMethodParameter(param, this, methodParams.Count,
+            FSharpTypesUtil.GetParameterKind(param),
+            FSharpTypesUtil.GetType(paramType, declaration, TypeParameters, Module, false),
+            paramName.IsEmpty() ? SharedImplUtil.MISSING_DECLARATION_NAME : paramName));
+        }
+
+        return methodParams;
+      }
+    }
+
+    private int GetElementsCount<T>([NotNull] IList<IList<T>> lists)
+    {
+      var count = 0;
+      foreach (var list in lists)
+        count += list.Count;
+      return count;
+    }
+
+    public virtual IList<ITypeParameter> TypeParameters => EmptyList<ITypeParameter>.Instance;
+
+    public override IType ReturnType
+    {
+      get
       {
-        var paramType = param.Type;
-        var paramName = param.DisplayName;
-        methodParams.Add(new FSharpMethodParameter(param, this, methodParams.Count,
-          FSharpTypesUtil.GetParameterKind(param),
-          FSharpTypesUtil.GetType(paramType, declaration, TypeParameters, Module, false),
-          paramName.IsEmpty() ? SharedImplUtil.MISSING_DECLARATION_NAME : paramName));
-      }
+        var returnType = Mfv?.ReturnParameter.Type;
+        if (returnType == null)
+          return TypeFactory.CreateUnknownType(Module);
 
-      Parameters = methodParams.ToList();
+        if (returnType.IsUnit)
+          return Module.GetPredefinedType().Void;
+
+        var declaration = GetDeclaration();
+        if (declaration == null)
+          return TypeFactory.CreateUnknownType(Module);
+
+        return FSharpTypesUtil.GetType(returnType, declaration, TypeParameters, Module, true) ??
+               TypeFactory.CreateUnknownType(Module);
+      }
     }
 
     public override bool Equals(object obj)
@@ -68,12 +98,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public override int GetHashCode() => ShortName.GetHashCode();
 
-    public override IList<IParameter> Parameters { get; }
-    public IList<ITypeParameter> TypeParameters { get; }
-    public override IType ReturnType { get; }
-
     public bool IsPredefined => false;
     public bool IsIterator => false;
-    public IAttributesSet ReturnTypeAttributes => new FSharpAttributeSet(FSharpSymbol.Attributes, Module);
+
+    public IAttributesSet ReturnTypeAttributes =>
+      new FSharpAttributeSet(Attributes, Module);
   }
 }

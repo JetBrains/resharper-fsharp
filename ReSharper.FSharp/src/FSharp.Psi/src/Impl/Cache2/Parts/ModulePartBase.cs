@@ -30,7 +30,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
         return EmptyList<ITypeMember>.Instance;
 
       return declaration.MemberDeclarations.Select(d => d.DeclaredElement)
-        .Where(el => el is IFSharpTypeMember fsMember && (!fsMember.IsMember || fsMember.IsExtensionMember) ||
+        .Where(el => el is IFSharpTypeMember fsMember && (!fsMember.IsFSharpMember || fsMember.IsExtensionMember) ||
                      el != null);
     }
 

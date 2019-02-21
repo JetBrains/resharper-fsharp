@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Impl.Special;
 using JetBrains.ReSharper.Psi.Resolve;
@@ -10,27 +10,26 @@ using JetBrains.Util;
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
   internal abstract class FSharpFieldPropertyBase<T> : FSharpTypeMember<T>, IProperty
-    where T : FSharpDeclarationBase, IModifiersOwnerDeclaration
+    where T : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
-    internal FSharpFieldPropertyBase([NotNull] ITypeMemberDeclaration declaration)
-      : base(declaration)
+    internal FSharpFieldPropertyBase([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {
     }
 
-    public override DeclaredElementType GetElementType() => CLRDeclaredElementType.PROPERTY;
+    public override DeclaredElementType GetElementType() =>
+      CLRDeclaredElementType.PROPERTY;
 
-    public bool CanBeImplicitImplementation => false;
-    public bool IsExplicitImplementation => false;
-    public IList<IExplicitImplementation> ExplicitImplementations => EmptyList<IExplicitImplementation>.Instance;
+    public string GetDefaultPropertyMetadataName() => ShortName;
 
-    public string GetDefaultPropertyMetadataName() => ShortName; // todo: check this
-    public InvocableSignature GetSignature(ISubstitution substitution) => new InvocableSignature(this, substitution);
+    public InvocableSignature GetSignature(ISubstitution substitution) =>
+      new InvocableSignature(this, substitution);
 
     public IEnumerable<IParametersOwnerDeclaration> GetParametersOwnerDeclarations() =>
       EmptyList<IParametersOwnerDeclaration>.Instance;
 
     public IType Type => ReturnType;
     public abstract IType ReturnType { get; }
+
     public IList<IParameter> Parameters => EmptyList<IParameter>.Instance;
     public ReferenceKind ReturnKind => ReferenceKind.VALUE;
 
@@ -41,6 +40,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public IAccessor Getter => new ImplicitAccessor(this, AccessorKind.GETTER);
     public IAccessor Setter => IsWritable ? new ImplicitAccessor(this, AccessorKind.SETTER) : null;
 
-    public override bool IsMember => true;
+    public override bool IsFSharpMember => true;
   }
 }

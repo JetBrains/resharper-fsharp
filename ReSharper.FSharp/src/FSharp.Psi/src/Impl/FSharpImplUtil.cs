@@ -123,10 +123,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     [NotNull]
-    public static string GetSourceName([CanBeNull] this IIdentifier identifier)
-    {
-      return identifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
-    }
+    public static string GetSourceName([CanBeNull] this IIdentifier identifier) =>
+      identifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
 
     public static TreeTextRange GetNameRange([CanBeNull] this IFSharpIdentifier identifier)
     {
@@ -256,8 +254,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static string GetAttributeShortName([NotNull] this string attrName) =>
       attrName.SubstringBeforeLast("Attribute", StringComparison.Ordinal);
 
-    public static bool IsCliMutableRecord([NotNull] this TypeElement typeElement)
+    public static bool IsCliMutableRecord([CanBeNull] this TypeElement typeElement)
     {
+      if (typeElement == null)
+        return false;
+
       // todo: climutable attr can be on anon part (`type R`)
       foreach (var part in typeElement.EnumerateParts())
         if (part is IRecordPart recordPart && recordPart.CliMutable)
@@ -283,16 +284,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return typeElement.ShortName;
     }
     
-    public static AccessRights GetFSharpRepresentationAccessRights([NotNull] this TypeElement typeElement)
+    public static AccessRights GetFSharpRepresentationAccessRights([CanBeNull] this TypeElement typeElement)
     {
+      if (typeElement == null)
+        return AccessRights.NONE;
+
       foreach (var part in typeElement.EnumerateParts())
         if (part is IRepresentationAccessRightsOwner accessRightsOwner)
           return accessRightsOwner.RepresentationAccessRights;
       return AccessRights.PUBLIC;
     }
 
-    public static AccessRights GetRepresentationAccessRights([NotNull] this TypeElement typeElement)
+    public static AccessRights GetRepresentationAccessRights([CanBeNull] this TypeElement typeElement)
     {
+      if (typeElement == null)
+        return AccessRights.NONE;
+
       foreach (var part in typeElement.EnumerateParts())
         switch (part)
         {

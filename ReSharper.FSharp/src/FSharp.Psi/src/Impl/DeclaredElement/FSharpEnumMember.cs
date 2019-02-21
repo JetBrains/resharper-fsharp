@@ -8,28 +8,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
   internal class FSharpEnumMember : FSharpTypeMember<EnumMemberDeclaration>, IField
   {
-    [NotNull]
-    public FSharpField Field { get; }
-
-    public FSharpEnumMember([NotNull] ITypeMemberDeclaration declaration, [NotNull] FSharpField field) :
-      base(declaration)
+    public FSharpEnumMember([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {
-      Field = field;
     }
+
+    [CanBeNull] public FSharpField Field => Symbol as FSharpField;
 
     public override DeclaredElementType GetElementType() =>
       CLRDeclaredElementType.ENUM_MEMBER;
 
-    public IType Type
-    {
-      get
-      {
-        var enumType = GetContainingType();
-        return enumType != null
-          ? TypeFactory.CreateType(enumType)
-          : TypeFactory.CreateUnknownType(Module);
-      }
-    }
+    public IType Type =>
+      GetContainingType() is var typeElement && typeElement != null
+        ? TypeFactory.CreateType(typeElement)
+        : TypeFactory.CreateUnknownType(Module);
 
     public bool IsField => false;
     public bool IsConstant => false;
@@ -37,8 +28,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public int? FixedBufferSize => null;
 
     public ConstantValue ConstantValue =>
-      Field.LiteralValue != null
-        ? new ConstantValue(Field.LiteralValue.Value, Type)
+      Field?.LiteralValue?.Value is var literalValue && literalValue != null
+        ? new ConstantValue(literalValue, Type)
         : ConstantValue.BAD_VALUE;
 
     public override bool IsAbstract => false;
@@ -48,6 +39,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override bool IsStatic => true;
     public override bool IsReadonly => true;
 
-    public override bool IsMember => false;
+    public override bool IsFSharpMember => false;
   }
 }

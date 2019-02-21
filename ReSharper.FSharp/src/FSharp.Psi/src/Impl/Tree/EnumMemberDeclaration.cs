@@ -11,6 +11,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
 
     protected override IDeclaredElement CreateDeclaredElement() =>
-      GetFSharpSymbol() is FSharpField field ? new FSharpEnumMember(this, field) : null;
+      GetFSharpSymbol() is FSharpField ? new FSharpEnumMember(this) : null;
   }
 }

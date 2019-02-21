@@ -5,26 +5,26 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 {
   internal class FSharpAttributeSet : IAttributesSet
   {
-    private readonly IList<FSharpAttribute> myAttrs;
-    private readonly IPsiModule myModule;
+    public readonly IList<FSharpAttribute> Attrs;
+    public readonly IPsiModule Module;
 
     public FSharpAttributeSet(IList<FSharpAttribute> attrs, IPsiModule module)
     {
-      myAttrs = attrs;
-      myModule = module;
+      Attrs = attrs;
+      Module = module;
     }
 
     public IList<IAttributeInstance> GetAttributeInstances(bool inherit) =>
-      FSharpAttributeInstance.GetAttributeInstances(myAttrs, myModule);
+      Attrs.ToAttributeInstances(Module);
 
     public IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName, bool inherit) =>
-      FSharpAttributeInstance.GetAttributeInstances(myAttrs.GetAttributes(clrName), myModule);
+      Attrs.GetAttributes(clrName).ToAttributeInstances(Module);
 
     public bool HasAttributeInstance(IClrTypeName clrName, bool inherit) =>
-      myAttrs.HasAttributeInstance(clrName);
+      Attrs.HasAttributeInstance(clrName);
   }
 }

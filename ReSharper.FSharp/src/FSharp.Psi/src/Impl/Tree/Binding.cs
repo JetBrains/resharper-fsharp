@@ -8,7 +8,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class TopBinding : ITypeMemberDeclaration, IFunctionDeclaration
+  internal partial class TopBinding : IFunctionDeclaration
   {
     /// A workaround for getting a declared element for binding in features like Find Usages results and
     /// file member navigation where we're looking for containing type member.

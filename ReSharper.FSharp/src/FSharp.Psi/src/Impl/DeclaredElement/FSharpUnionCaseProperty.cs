@@ -16,27 +16,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     {
     }
 
-    public override AccessRights GetAccessRights() =>
-      GetContainingType() is TypeElement typeElement
-        ? typeElement.GetRepresentationAccessRights()
-        : AccessRights.NONE;
+    public override AccessRights GetAccessRights() => ContainingType.GetRepresentationAccessRights();
+    public AccessRights RepresentationAccessRights => ContainingType.GetFSharpRepresentationAccessRights();
 
     public override bool IsStatic => true;
 
-    public override IType ReturnType
-    {
-      get
-      {
-        var containingType = GetContainingType();
-        return containingType != null
-          ? TypeFactory.CreateType(containingType)
-          : TypeFactory.CreateUnknownType(Module);
-      }
-    }
-
-    public AccessRights RepresentationAccessRights =>
-      GetContainingType() is TypeElement typeElement
-        ? typeElement.GetFSharpRepresentationAccessRights()
-        : AccessRights.NONE;
+    public override IType ReturnType =>
+      GetContainingType() is var containingType && containingType != null
+        ? TypeFactory.CreateType(containingType)
+        : TypeFactory.CreateUnknownType(Module);
   }
 }

@@ -5,7 +5,8 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal class TopActivePatternCase : FSharpDeclaredElement<TopActivePatternCaseDeclaration>, IFSharpDeclaredElement, IActivePatternCase
+  internal class TopActivePatternCase : FSharpCachedTypeMemberBase<TopActivePatternCaseDeclaration>,
+    IFSharpDeclaredElement, IActivePatternCase
   {
     public TopActivePatternCase(IFSharpDeclaration declaration) : base(declaration)
     {

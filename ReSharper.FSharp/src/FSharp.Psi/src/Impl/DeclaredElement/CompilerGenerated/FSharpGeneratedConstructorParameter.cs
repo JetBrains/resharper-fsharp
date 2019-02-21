@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using JetBrains.Annotations;
-using JetBrains.Metadata.Reader.API;
+﻿using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.Util;
@@ -37,14 +35,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     protected override IClrDeclaredElement ContainingElement => Constructor;
     public override ITypeMember GetContainingTypeMember() => Constructor;
     public override ITypeElement GetContainingType() => Constructor.GetContainingType();
-
-    public IList<IAttributeInstance> GetAttributeInstances(bool inherit) =>
-      EmptyList<IAttributeInstance>.Instance;
-
-    public IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName, bool inherit) =>
-      EmptyList<IAttributeInstance>.Instance;
-
-    public bool HasAttributeInstance(IClrTypeName clrName, bool inherit) => false;
 
     public ParameterKind Kind => ParameterKind.VALUE;
     public DefaultValue GetDefaultValue() => DefaultValue.BAD_VALUE;

@@ -23,8 +23,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         ? unionCaseDeclaration.Fields
         : TreeNodeCollection<ICaseFieldDeclaration>.Empty;
 
-    protected override IDeclaredElement CreateDeclaredElement(ITypeMemberDeclaration declaration, FSharpField fsField) =>
-      new FSharpUnionCaseField<UnionCaseFieldDeclaration>(declaration, fsField);
+    protected override IList<FSharpField> GetTypeFields(FSharpSymbol type) =>
+      type is FSharpUnionCase unionCase ? unionCase.UnionCaseFields : null;
+
+    protected override IDeclaredElement CreateDeclaredElement(ITypeMemberDeclaration declaration) =>
+      new FSharpUnionCaseField<UnionCaseFieldDeclaration>(declaration);
   }
 
   internal partial class ExceptionFieldDeclaration
@@ -41,11 +44,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         ? exceptionDeclaration.Fields
         : TreeNodeCollection<ICaseFieldDeclaration>.Empty;
 
-    protected override IDeclaredElement CreateDeclaredElement(ITypeMemberDeclaration declaration, FSharpField fsField) =>
-      new FSharpUnionCaseField<ExceptionFieldDeclaration>(declaration, fsField);
+    protected override IList<FSharpField> GetTypeFields(FSharpSymbol type) =>
+      type is FSharpEntity entity && entity.IsFSharpExceptionDeclaration ? entity.FSharpFields : null;
+
+    protected override IDeclaredElement CreateDeclaredElement(ITypeMemberDeclaration declaration) =>
+      new FSharpUnionCaseField<ExceptionFieldDeclaration>(declaration);
   }
 
-  internal abstract class CaseFieldDeclarationBase : FSharpProperTypeMemberDeclarationBase
+  internal abstract class UnionCaseFieldDeclarationBase : FSharpProperTypeMemberDeclarationBase
   {
     protected override string DeclaredElementName
     {
@@ -66,7 +72,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       }
     }
 
-    public int GetIndex() => GetIndex(GetFields());
+    public int Index => GetIndex(GetFields());
 
     protected int GetIndex(TreeNodeCollection<ICaseFieldDeclaration> fields) =>
       fields.IndexOf((ICaseFieldDeclaration) this);
@@ -76,40 +82,30 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     protected abstract bool UseBaseNameForSingleField { get; }
     protected abstract TreeNodeCollection<ICaseFieldDeclaration> GetFields();
 
-    protected abstract IDeclaredElement CreateDeclaredElement(ITypeMemberDeclaration declaration,
-      FSharpField fsField);
+    protected abstract IDeclaredElement CreateDeclaredElement(ITypeMemberDeclaration declaration);
 
-    protected override IDeclaredElement CreateDeclaredElement()
+    public override FSharpSymbol GetFSharpSymbol()
     {
+      if (base.GetFSharpSymbol() is FSharpField namedField) // todo: named params have type FSharpParameters
+        return namedField;
+
       var typeDeclaration = Parent as IFSharpTypeDeclaration;
       var typeSymbol = typeDeclaration?.GetFSharpSymbol();
       if (typeSymbol == null)
         return null;
 
-      var index = GetIndex();
-      var fields = GetFieldsSymbols(typeSymbol);
-      var caseField =
-        fields != null && index <= fields.Count
-          ? fields[index]
-          : null;
-
-      return caseField != null
-        ? CreateDeclaredElement(this, caseField)
+      var index = Index;
+      var fields = GetTypeFields(typeSymbol);
+      return fields != null && index <= fields.Count
+        ? fields[index]
         : null;
     }
 
-    private static IList<FSharpField> GetFieldsSymbols([NotNull] FSharpSymbol typeSymbol)
-    {
-      switch (typeSymbol)
-      {
-        case FSharpUnionCase unionCase:
-          return unionCase.UnionCaseFields;
-        case FSharpEntity entity when entity.IsFSharpExceptionDeclaration:
-          return entity.FSharpFields;
-        default:
-          return null;
-      }
-    }
+    protected override IDeclaredElement CreateDeclaredElement() =>
+      GetFSharpSymbol() is var caseField && caseField != null ? CreateDeclaredElement(this) : null;
+
+    [CanBeNull]
+    protected abstract IList<FSharpField> GetTypeFields([NotNull] FSharpSymbol type);
 
     public bool IsNameGenerated => NameIdentifier != null;
   }

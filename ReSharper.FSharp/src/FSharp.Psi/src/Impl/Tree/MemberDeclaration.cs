@@ -32,20 +32,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       }
 
       var compiledName = mfv.CompiledName;
-      var typeDeclaration = GetContainingTypeDeclaration() as IFSharpTypeDeclaration;
       if (!mfv.IsInstanceMember && compiledName.StartsWith("op_", StringComparison.Ordinal))
       {
         switch (compiledName)
         {
           case StandardOperatorNames.Explicit:
-            return new FSharpConversionOperator<MemberDeclaration>(this, mfv, typeDeclaration, true);
+            return new FSharpConversionOperator<MemberDeclaration>(this, mfv, true);
           case StandardOperatorNames.Implicit:
-            return new FSharpConversionOperator<MemberDeclaration>(this, mfv, typeDeclaration, false);
+            return new FSharpConversionOperator<MemberDeclaration>(this, mfv, false);
         }
 
-        return new FSharpSignOperator<MemberDeclaration>(this, mfv, null);
+        return new FSharpSignOperator<MemberDeclaration>(this, mfv);
       }
-      return new FSharpMethod<MemberDeclaration>(this, mfv, typeDeclaration);
+      return new FSharpMethod<MemberDeclaration>(this, mfv);
     }
   }
 }

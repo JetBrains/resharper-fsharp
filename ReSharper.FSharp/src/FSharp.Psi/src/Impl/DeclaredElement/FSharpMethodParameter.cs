@@ -57,10 +57,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       FSharpSymbol.Attributes.HasAttributeInstance(clrName.FullName);
 
     public IList<IAttributeInstance> GetAttributeInstances(bool inherit) =>
-      FSharpAttributeInstance.GetAttributeInstances(FSharpSymbol.Attributes, Module);
+      FSharpSymbol.Attributes.ToAttributeInstances(Module);
 
     public IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName, bool inherit) =>
-      FSharpAttributeInstance.GetAttributeInstances(FSharpSymbol.Attributes.GetAttributes(clrName.FullName), Module);
+      FSharpSymbol.Attributes.GetAttributes(clrName.FullName).ToAttributeInstances(Module);
 
     public DefaultValue GetDefaultValue()
     {

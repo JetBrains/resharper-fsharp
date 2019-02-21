@@ -1,8 +1,9 @@
-using System.Collections.Generic;
-using JetBrains.Metadata.Reader.API;
+﻿using System.Collections.Generic;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
+using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 {
@@ -10,14 +11,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
   {
     protected PredefinedType PredefinedType =>
       ContainingElement.Module.GetPredefinedType();
-
-    public IList<IAttributeInstance> GetAttributeInstances(bool inherit) =>
-      EmptyList<IAttributeInstance>.Instance;
-
-    public IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName, bool inherit) =>
-      EmptyList<IAttributeInstance>.Instance;
-
-    public bool HasAttributeInstance(IClrTypeName clrName, bool inherit) => false;
 
     public virtual AccessRights GetAccessRights() => AccessRights.PUBLIC;
 
@@ -36,6 +29,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
     public IList<TypeMemberInstance> GetHiddenMembers() =>
       EmptyList<TypeMemberInstance>.Instance;
+
+    public bool IsExplicitImplementation => false;
+    public bool CanBeImplicitImplementation => false;
+    public IList<IExplicitImplementation> ExplicitImplementations => EmptyList<IExplicitImplementation>.Instance;
 
     public Hash? CalcHash() => null;
 
@@ -60,9 +57,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
     public override int GetHashCode() => ShortName.GetHashCode();
 
-    public string SourceName => ShortName; // todo
+    public string SourceName => SharedImplUtil.MISSING_DECLARATION_NAME;
 
     public bool IsExtensionMember => false;
-    public bool IsMember => true;
+    public bool IsFSharpMember => true;
+
+    public FSharpSymbol Symbol => null;
   }
 }
