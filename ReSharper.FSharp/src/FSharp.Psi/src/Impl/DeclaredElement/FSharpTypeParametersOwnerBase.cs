@@ -16,18 +16,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     {
     }
 
-    private IList<ITypeParameter> GetTypeParameters(FSharpMemberOrFunctionOrValue mfv,
-      ITypeMemberDeclaration declaration)
+    private IList<ITypeParameter> GetTypeParameters(FSharpMemberOrFunctionOrValue mfv)
     {
       var mfvTypeParams = mfv.GenericParameters;
       if (mfvTypeParams.Count == 0)
         return EmptyList<ITypeParameter>.Instance;
 
-      // todo: optional type extensions
-      if (!(declaration.GetContainingTypeDeclaration() is IFSharpTypeDeclaration typeDeclaration))
-        return EmptyList<ITypeParameter>.Instance;
-
-      var outerTypeParamsCount = typeDeclaration.TypeParameters.Count;
+      var outerTypeParamsCount = ContainingType?.GetAllTypeParameters().Count ?? 0;
       var typeParamsCount = mfvTypeParams.Count - outerTypeParamsCount;
 
       if (typeParamsCount == 0)
@@ -35,13 +30,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
       var typeParams = new ITypeParameter[typeParamsCount];
       for (var i = 0; i < typeParamsCount; i++)
-        typeParams[i] = new FSharpTypeParameterOfMethod(this, mfvTypeParams[i + outerTypeParamsCount].DisplayName, i);
+        typeParams[i] = new FSharpTypeParameterOfMethod(this, mfvTypeParams[i + outerTypeParamsCount].Name, i);
       return typeParams;
     }
 
     public override IList<ITypeParameter> TypeParameters =>
-      Mfv is var mfv && mfv != null && GetDeclaration() is var declaration && declaration != null
-        ? GetTypeParameters(mfv, declaration)
+      Mfv is var mfv && mfv != null
+        ? GetTypeParameters(mfv)
         : EmptyList<ITypeParameter>.Instance;
   }
 }
