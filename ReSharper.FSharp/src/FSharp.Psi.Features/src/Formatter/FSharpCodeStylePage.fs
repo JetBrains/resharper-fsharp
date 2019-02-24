@@ -28,7 +28,7 @@ type FSharpFormatSettingsKey() =
     [<SettingsEntry(true, "Space before argument"); DefaultValue>]
     val mutable SpaceBeforeArgument: bool
     
-    [<SettingsEntry(true, "Space before colon"); DefaultValue>]
+    [<SettingsEntry(false, "Space before colon"); DefaultValue>]
     val mutable SpaceBeforeColon: bool
     
     [<SettingsEntry(true, "Space after comma"); DefaultValue>]
