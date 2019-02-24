@@ -73,12 +73,15 @@ type internal FSharpSigTreeBuilder(file, lexer, sigs, lifetime) =
                 | SynTypeDefnSimpleRepr.TypeAbbrev(_) ->
                     ElementType.TYPE_ABBREVIATION_DECLARATION
 
-                | SynTypeDefnSimpleRepr.None(_) ->
+                | SynTypeDefnSimpleRepr.None _ when not members.IsEmpty ->
+                    ElementType.TYPE_EXTENSION_DECLARATION
+
+                | SynTypeDefnSimpleRepr.None _ ->
                     ElementType.ABSTRACT_TYPE_DECLARATION
 
                 | _ -> ElementType.OTHER_SIMPLE_TYPE_DECLARATION
 
-            | SynTypeDefnSigRepr.Exception(_) ->
+            | SynTypeDefnSigRepr.Exception _ ->
                 ElementType.EXCEPTION_DECLARATION
 
             | SynTypeDefnSigRepr.ObjectModel(kind, members,_) ->
@@ -87,6 +90,7 @@ type internal FSharpSigTreeBuilder(file, lexer, sigs, lifetime) =
                 | TyconClass -> ElementType.CLASS_DECLARATION
                 | TyconInterface -> ElementType.INTERFACE_DECLARATION
                 | TyconStruct -> ElementType.STRUCT_DECLARATION
+                | TyconAugmentation -> ElementType.TYPE_EXTENSION_DECLARATION
                 | _ -> ElementType.OBJECT_TYPE_DECLARATION
 
         for m in members do x.ProcessTypeMemberSignature m
