@@ -1,17 +1,14 @@
 ﻿using System.Collections.Generic;
 using static Module;
 
-namespace ClassLibrary1
+public class Class1
 {
-    public class Class1
-    {
-        public Class1()
-        {
-            var t = new T();
-            |int|(0) m = |t.Method()|(1);
-            |int|(2) sm = |T.StaticMethod()|(3);
-        }
-    }
+  public Class1()
+  {
+    var t = new T();
+    |int|(0) m = |t.Method()|(1);
+    |int|(2) sm = |T.StaticMethod()|(3);
+  }
 }
 
 ---------------------------------------------------------

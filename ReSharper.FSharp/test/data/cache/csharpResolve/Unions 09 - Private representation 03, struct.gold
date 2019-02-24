@@ -1,47 +1,44 @@
 ﻿using static Module;
 
-namespace ClassLibrary1
+public class Class1
 {
-    public class Class1
-    {
-        public Class1()
-        {
-            U? sa = U.|NewCaseA|(0)(item: 123);
-            U? sb = U.|NewCaseB|(1)(named: 123);
-            U? sc = U.|NewCaseC|(2)(item1: 123, other: 123.0);
+  public Class1()
+  {
+    U? sa = U.|NewCaseA|(0)(item: 123);
+    U? sb = U.|NewCaseB|(1)(named: 123);
+    U? sc = U.|NewCaseC|(2)(item1: 123, other: 123.0);
 
-            U a = sa.Value;
-            U b = sb.Value;
-            U c = sc.Value;
+    U a = sa.Value;
+    U b = sb.Value;
+    U c = sc.Value;
 
-            U.|CaseA|(3) caError = (U.|CaseA|(4)) a;
-            U.|CaseB|(5) cbError = (U.|CaseB|(6)) b;
-            U.|CaseC|(7) ccError = (U.|CaseC|(8)) c;
+    U.|CaseA|(3) caError = (U.|CaseA|(4)) a;
+    U.|CaseB|(5) cbError = (U.|CaseB|(6)) b;
+    U.|CaseC|(7) ccError = (U.|CaseC|(8)) c;
 
-            int aItem = a.|Item|(9);
-            int bItem = b.|Item|(10);
-            int cItem = c.|Item|(11);
-            int bNamed = b.|Named|(12);
-            int cItem0 = c.|Item1|(13);
-            double cOther = c.|Other|(14);
+    int aItem = a.|Item|(9);
+    int bItem = b.|Item|(10);
+    int cItem = c.|Item|(11);
+    int bNamed = b.|Named|(12);
+    int cItem0 = c.|Item1|(13);
+    double cOther = c.|Other|(14);
 
-            int aItemError = a.|Item|(15);
-            int bNamedError = b.|Named|(16);
-            int cItem1Error = c.|Item1|(17);
-            double cOtherError = c.|Other|(18);
+    int aItemError = a.|Item|(15);
+    int bNamedError = b.|Named|(16);
+    int cItem1Error = c.|Item1|(17);
+    double cOtherError = c.|Other|(18);
 
-            bool isA = a.|IsCaseA|(19);
-            bool isB = a.|IsCaseB|(20);
-            bool isC = a.|IsCaseC|(21);
+    bool isA = a.|IsCaseA|(19);
+    bool isB = a.|IsCaseB|(20);
+    bool isC = a.|IsCaseC|(21);
 
-            int tA = U.|Tags|(22).CaseA;
-            int tB = U.|Tags|(23).CaseB;
-            int tC = U.|Tags|(24).CaseC;
+    int tA = U.|Tags|(22).CaseA;
+    int tB = U.|Tags|(23).CaseB;
+    int tC = U.|Tags|(24).CaseC;
 
-            int t = a.|Tag|(25);
-            int m = U.Prop;
-        }
-    }
+    int t = a.|Tag|(25);
+    int m = U.Prop;
+  }
 }
 
 ---------------------------------------------------------

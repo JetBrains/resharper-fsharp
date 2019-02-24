@@ -1,13 +1,10 @@
-﻿namespace ClassLibrary1
+﻿public class Class1
 {
-    public class Class1
-    {
-        public Class1()
-        {
-            var m = Module.|Method|(0)();
-            var p = Module.|Prop|(1);
-        }
-    }
+  public Class1()
+  {
+    var m = Module.|Method|(0)();
+    var p = Module.|Prop|(1);
+  }
 }
 
 ---------------------------------------------------------

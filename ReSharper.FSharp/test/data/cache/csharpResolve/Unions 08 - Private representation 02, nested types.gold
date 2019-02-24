@@ -1,42 +1,39 @@
 ﻿using static Module;
 
-namespace ClassLibrary1
+public class Class1
 {
-    public class Class1
-    {
-        public Class1()
-        {
-            U a = U.|NewCaseA|(0)(item: 123);
-            U b = U.|NewCaseB|(1)(named: 123);
-            U c = U.|NewCaseC|(2)(item1: 123, other: 123.0);
+  public Class1()
+  {
+    U a = U.|NewCaseA|(0)(item: 123);
+    U b = U.|NewCaseB|(1)(named: 123);
+    U c = U.|NewCaseC|(2)(item1: 123, other: 123.0);
 
-            U.|CaseA|(3) ca = (U.|CaseA|(4)) a;
-            U.|CaseB|(5) cb = (U.|CaseB|(6)) b;
-            U.|CaseC|(7) cc = (U.|CaseC|(8)) c;
+    U.|CaseA|(3) ca = (U.|CaseA|(4)) a;
+    U.|CaseB|(5) cb = (U.|CaseB|(6)) b;
+    U.|CaseC|(7) cc = (U.|CaseC|(8)) c;
 
-            int aItem = ca.|Item|(9);
-            int bNamed = cb.|Named|(10);
-            int cItem0 = cc.|Item1|(11);
-            double cOther = cc.|Other|(12);
+    int aItem = ca.|Item|(9);
+    int bNamed = cb.|Named|(10);
+    int cItem0 = cc.|Item1|(11);
+    double cOther = cc.|Other|(12);
 
-            int aItemError = a.|Item|(13);
-            int bNamedError = b.|Named|(14);
-            int cItem1Error = c.|Item1|(15);
-            double cOtherError = c.|Other|(16);
+    int aItemError = a.|Item|(13);
+    int bNamedError = b.|Named|(14);
+    int cItem1Error = c.|Item1|(15);
+    double cOtherError = c.|Other|(16);
 
-            bool isA = a.|IsCaseA|(17);
-            bool isB = a.|IsCaseB|(18);
-            bool isC = a.|IsCaseC|(19);
+    bool isA = a.|IsCaseA|(17);
+    bool isB = a.|IsCaseB|(18);
+    bool isC = a.|IsCaseC|(19);
 
-            int tA = U.|Tags|(20).CaseA;
-            int tB = U.|Tags|(21).CaseB;
-            int tC = U.|Tags|(22).CaseC;
+    int tA = U.|Tags|(20).CaseA;
+    int tB = U.|Tags|(21).CaseB;
+    int tC = U.|Tags|(22).CaseC;
 
-            int t = a.|Tag|(23);
+    int t = a.|Tag|(23);
 
-            int m = U.Prop;
-        }
-    }
+    int m = U.Prop;
+  }
 }
 
 ---------------------------------------------------------

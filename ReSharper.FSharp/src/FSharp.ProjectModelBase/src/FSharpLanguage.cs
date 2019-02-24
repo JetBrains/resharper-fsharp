@@ -9,8 +9,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
   {
     public new const string Name = "F#";
 
-    [UsedImplicitly]
-    public static readonly FSharpLanguage Instance;
+    [UsedImplicitly] public static readonly FSharpLanguage Instance;
 
     public FSharpLanguage() : base(Name)
     {

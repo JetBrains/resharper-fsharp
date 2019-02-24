@@ -1,24 +1,21 @@
 ﻿using static Module;
 
-namespace ClassLibrary1
+public class Class1
 {
-    public class Class1
-    {
-        public Class1()
-        {
-            |U?|(0) uError = |U.NewCase(item: 123)|(1);
-            SU? su = SU.NewCase(item: 123);
+  public Class1()
+  {
+    |U?|(0) uError = |U.NewCase(item: 123)|(1);
+    SU? su = SU.NewCase(item: 123);
 
-            SU u = su.Value;
+    SU u = su.Value;
 
-            int t = u.Tag;
-            int i = u.Item;
+    int t = u.Tag;
+    int i = u.Item;
 
-            bool isCaseError = u.|IsCase|(2);
-            int tagsError = U.|Tags|(3).CaseA;
-            U.|Case|(4) c = (U.|Case|(5)) u;
-        }
-    }
+    bool isCaseError = u.|IsCase|(2);
+    int tagsError = U.|Tags|(3).CaseA;
+    U.|Case|(4) c = (U.|Case|(5)) u;
+  }
 }
 
 ---------------------------------------------------------

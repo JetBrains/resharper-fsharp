@@ -1,23 +1,20 @@
 ﻿using static Module;
 
-namespace ClassLibrary1
+public class Class1
 {
-    public class Class1
-    {
-        public Class1()
-        {
-            U a = U.|CaseA|(0);
-            U b = U.|CaseB|(1);
+  public Class1()
+  {
+    U a = U.|CaseA|(0);
+    U b = U.|CaseB|(1);
 
-            bool isA = a.|IsCaseA|(2);
-            bool isB = a.|IsCaseB|(3);
+    bool isA = a.|IsCaseA|(2);
+    bool isB = a.|IsCaseB|(3);
 
-            int t = a.|Tag|(4);
-            int tA = U.|Tags|(5).CaseA;
+    int t = a.|Tag|(4);
+    int tA = U.|Tags|(5).CaseA;
 
-            int m = U.Prop;
-        }
-    }
+    int m = U.Prop;
+  }
 }
 
 ---------------------------------------------------------
