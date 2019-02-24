@@ -14,7 +14,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     protected FSharpTypeParametersOwnerPart([NotNull] T declaration, MemberDecoration memberDecoration,
       TreeNodeCollection<ITypeParameterOfTypeDeclaration> typeParameters, [NotNull] ICacheBuilder cacheBuilder)
-      : base(declaration, cacheBuilder.Intern(declaration.ShortName), memberDecoration, typeParameters.Count, cacheBuilder)
+      : base(declaration, cacheBuilder.Intern(declaration.CompiledName), memberDecoration, typeParameters.Count, cacheBuilder)
     {
       var parameters = declaration.TypeParameters;
       if (parameters.Count == 0)
@@ -25,7 +25,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
       myTypeParameterNames = new string[typeParameters.Count];
       for (var i = 0; i < typeParameters.Count; i++)
-        myTypeParameterNames[i] = cacheBuilder.Intern(typeParameters[i].DeclaredName);
+        myTypeParameterNames[i] = cacheBuilder.Intern(typeParameters[i].CompiledName);
     }
 
     protected FSharpTypeParametersOwnerPart(IReader reader) : base(reader)

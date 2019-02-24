@@ -19,17 +19,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
   public partial interface IFSharpDeclaration : INameIdentifierOwner, IDeclaration
   {
-    /// <summary>
     /// May take long time due to waiting for FCS. Symbol is cached in declaration.
-    /// </summary>
     [CanBeNull]
     FSharpSymbol GetFSharpSymbol();
 
-    [NotNull]
-    string ShortName { get; }
+    /// Name used in F# source code.
+    [NotNull] string SourceName { get; }
 
-    [NotNull]
-    string SourceName { get; }
+    /// Name used in compiled assemblies.
+    [NotNull] string CompiledName { get; }
 
     void SetName(string name, ChangeNameKind changeNameKind);
 

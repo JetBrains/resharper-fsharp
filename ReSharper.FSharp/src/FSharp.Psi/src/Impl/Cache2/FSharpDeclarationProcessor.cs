@@ -89,7 +89,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public override void VisitMemberDeclaration(IMemberDeclaration decl)
     {
-      Builder.AddDeclaredMemberName(decl.DeclaredName);
+      Builder.AddDeclaredMemberName(decl.CompiledName);
     }
 
     public override void VisitLet(ILet let)

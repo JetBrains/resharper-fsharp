@@ -8,7 +8,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   public abstract class FSharpDeclarationBase : FSharpCompositeElement, IFSharpDeclaration
   {
-    public virtual string ShortName => DeclaredName;
+    public abstract string CompiledName { get; }
     public virtual string SourceName => NameIdentifier.GetSourceName();
 
     public virtual FSharpSymbol GetFSharpSymbol()
@@ -18,7 +18,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     public abstract IDeclaredElement DeclaredElement { get; }
-    public abstract string DeclaredName { get; }
+    public virtual string DeclaredName => CompiledName;
 
     public abstract IFSharpIdentifier NameIdentifier { get; }
     public virtual TreeTextRange GetNameRange() => NameIdentifier.GetNameRange();

@@ -1,8 +1,6 @@
-﻿using JetBrains.ReSharper.Psi.Tree;
-
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
-  public partial interface ITypeParameterOfTypeDeclaration : IDeclaration
+  public partial interface ITypeParameterOfTypeDeclaration : IFSharpDeclaration
   {
   }
 }

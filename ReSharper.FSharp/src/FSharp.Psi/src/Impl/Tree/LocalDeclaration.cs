@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Xml;
-using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
@@ -17,7 +16,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     IFSharpLocalDeclaration
   {
     public override IDeclaredElement DeclaredElement => this;
-    public override string DeclaredName => SourceName;
+
+    string IDeclaredElement.ShortName => SourceName;
+    public override string CompiledName => SourceName;
 
     public IList<IDeclaration> GetDeclarations() => new IDeclaration[] {this};
 

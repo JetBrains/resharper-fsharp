@@ -13,7 +13,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     }
 
     public override DeclaredElementType GetElementType() => FSharpDeclaredElementType.ActivePatternCase;
-    public override string ShortName => GetDeclaration()?.ShortName ?? SharedImplUtil.MISSING_DECLARATION_NAME;
+    public override string ShortName => GetDeclaration()?.CompiledName ?? SharedImplUtil.MISSING_DECLARATION_NAME;
 
     public ITypeMember GetContainingTypeMember() =>
       (ITypeMember) GetContainingType();

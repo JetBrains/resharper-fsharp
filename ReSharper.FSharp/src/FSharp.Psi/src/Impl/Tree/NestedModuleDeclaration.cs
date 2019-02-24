@@ -14,7 +14,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
         var sourceName = SourceName;
         foreach (var typeDeclaration in parentModule.Children<IFSharpTypeDeclaration>())
-          if (typeDeclaration.ShortName == sourceName && typeDeclaration.TypeParameters.IsEmpty)
+          if (typeDeclaration.CompiledName == sourceName && typeDeclaration.TypeParameters.IsEmpty)
             return sourceName + "Module";
 
         return NameIdentifier.GetModuleCompiledName(Attributes);

@@ -181,7 +181,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         if (namespaceDeclaration != null)
           clrName.Append(namespaceDeclaration.QualifiedName).Append('.');
       }
-      clrName.Append(declaration.DeclaredName);
+      clrName.Append(declaration.CompiledName);
 
       var typeDeclaration = declaration as IFSharpTypeDeclaration;
       if (typeDeclaration?.TypeParameters.Count > 0)
@@ -370,7 +370,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         if (sourceName == SharedImplUtil.MISSING_DECLARATION_NAME)
           continue;
 
-        var compiledName = declaration.DeclaredName;
+        var compiledName = declaration.CompiledName;
         if (compiledName == SharedImplUtil.MISSING_DECLARATION_NAME)
           continue;
 

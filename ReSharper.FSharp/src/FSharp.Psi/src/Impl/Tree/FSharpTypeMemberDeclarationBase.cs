@@ -20,7 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       myCachedName = null;
     }
 
-    public override string DeclaredName
+    public override string CompiledName
     {
       get
       {

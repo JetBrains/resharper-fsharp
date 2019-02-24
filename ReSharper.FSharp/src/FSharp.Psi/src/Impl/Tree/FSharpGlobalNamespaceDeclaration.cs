@@ -8,7 +8,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     public override TreeTextRange GetNameRange() => TreeTextRange.InvalidRange;
     public override IDeclaredElement DeclaredElement => null;
-    public override string DeclaredName => SharedImplUtil.MISSING_DECLARATION_NAME;
+    public override string CompiledName => SharedImplUtil.MISSING_DECLARATION_NAME;
     public override IFSharpIdentifier NameIdentifier => null;
     public bool IsModule => false;
   }

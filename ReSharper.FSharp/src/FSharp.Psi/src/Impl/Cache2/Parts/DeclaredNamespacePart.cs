@@ -8,7 +8,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   public class DeclaredNamespacePart : NamespacePart
   {
     public DeclaredNamespacePart(IFSharpNamespaceDeclaration declaration)
-      : base(declaration, declaration.GetTreeStartOffset(), declaration.ShortName)
+      : base(declaration, declaration.GetTreeStartOffset(), declaration.CompiledName)
     {
     }
 

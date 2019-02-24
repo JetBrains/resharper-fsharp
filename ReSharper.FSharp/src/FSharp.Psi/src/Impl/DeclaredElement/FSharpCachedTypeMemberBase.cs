@@ -29,7 +29,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       SharedImplUtil.MISSING_DECLARATION_NAME;
 
     public virtual string ShortName =>
-      GetDeclaration()?.DeclaredName ??
+      GetDeclaration()?.CompiledName ??
       SharedImplUtil.MISSING_DECLARATION_NAME;
 
     public virtual ISubstitution IdSubstitution =>

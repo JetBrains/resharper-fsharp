@@ -23,7 +23,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       set => myCachedDeclaredElement = value;
     }
 
-    public override string DeclaredName => NameIdentifier.GetSourceName();
+    public override string CompiledName => NameIdentifier.GetSourceName();
     public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
