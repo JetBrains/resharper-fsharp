@@ -8,11 +8,13 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal abstract class LocalDeclarationBase : FSharpDeclarationBase, ITypeOwner, IFSharpDeclaredElement, IFSharpLocalDeclaration
+  internal abstract class LocalDeclarationBase : FSharpDeclarationBase, ITypeOwner, IFSharpDeclaredElement,
+    IFSharpLocalDeclaration
   {
     public override IDeclaredElement DeclaredElement => this;
     public override string DeclaredName => SourceName;
@@ -28,9 +30,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public bool CaseSensitiveName => true;
     public PsiLanguageType PresentationLanguage => FSharpLanguage.Instance;
     public ITypeElement GetContainingType() => GetContainingNode<ITypeDeclaration>()?.DeclaredElement;
-    public ITypeMember GetContainingTypeMember() => GetContainingNode<ITypeMemberDeclaration>()?.DeclaredElement;
+    public ITypeMember GetContainingTypeMember() => ContainingMember;
     public IPsiModule Module => GetPsiModule();
     public ISubstitution IdSubstitution => EmptySubstitution.INSTANCE;
+
+    public ITypeMember ContainingMember =>
+      GetContainingNode<ITypeMemberDeclaration>()?.DeclaredElement;
 
     public IType Type
     {
@@ -39,10 +44,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         if (!(GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv))
           return TypeFactory.CreateUnknownType(Module);
 
-        var typeMemberDeclaration = GetContainingNode<ITypeMemberDeclaration>();
-        Assertion.AssertNotNull(typeMemberDeclaration, "typeMemberDeclaration != null");
-        return FSharpTypesUtil.GetType(mfv.FullType, typeMemberDeclaration, Module) ??
-               TypeFactory.CreateUnknownType(Module);
+        var typeParameters =
+          ContainingMember is IFSharpTypeParametersOwner parametersOwner
+            ? parametersOwner.GetAllTypeParameters()
+            : EmptyList<ITypeParameter>.Instance;
+
+        return FSharpTypesUtil.GetType(mfv.FullType, typeParameters, Module);
       }
     }
 

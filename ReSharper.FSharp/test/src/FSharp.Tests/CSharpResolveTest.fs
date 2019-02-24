@@ -67,11 +67,15 @@ type CSharpResolveTest() =
     [<Test>] member x.``Methods 05, void return``() = x.DoNamedTest()
 
     [<Test>] member x.``Properties 01``() = x.DoNamedTest()
+    [<Test>] member x.``Properties 02 - Function type``() = x.DoNamedTest()
 
     [<Test>] member x.``Module bindings 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Module bindings 02 - Records``() = x.DoNamedTest()
     [<Test>] member x.``Module bindings 03 - extension methods 01``() = x.DoNamedTest()
     [<Test>] member x.``Module bindings 04 - extension methods 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Module bindings 05 - Generic function``() = x.DoNamedTest()
+    [<Test>] member x.``Module bindings 06 - Type function``() = x.DoNamedTest()
 
     [<Test>] member x.``Nested module 01``() = x.DoNamedTest()
 

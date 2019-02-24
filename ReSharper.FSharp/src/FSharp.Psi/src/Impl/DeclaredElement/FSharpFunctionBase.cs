@@ -3,7 +3,6 @@ using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
@@ -34,27 +33,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
         if (paramsCount == 0)
           return EmptyList<IParameter>.Instance;
 
-        var declaration = GetDeclaration();
-        if (declaration == null)
-          return EmptyList<IParameter>.Instance;
-
+        var typeParameters = GetAllTypeParameters();
         var methodParams = new List<IParameter>(paramsCount);
         foreach (var paramsGroup in mfvCurriedParams)
         foreach (var param in paramsGroup)
-        {
-          var paramType = param.Type;
-          var paramName = param.DisplayName;
           methodParams.Add(new FSharpMethodParameter(param, this, methodParams.Count,
-            FSharpTypesUtil.GetParameterKind(param),
-            FSharpTypesUtil.GetType(paramType, declaration, TypeParameters, Module, false),
-            paramName.IsEmpty() ? SharedImplUtil.MISSING_DECLARATION_NAME : paramName));
-        }
+            FSharpTypesUtil.GetType(param.Type, typeParameters, Module, true)));
 
         return methodParams;
       }
     }
 
-    private int GetElementsCount<T>([NotNull] IList<IList<T>> lists)
+    private static int GetElementsCount<T>([NotNull] IList<IList<T>> lists)
     {
       var count = 0;
       foreach (var list in lists)
@@ -68,19 +58,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     {
       get
       {
-        var returnType = Mfv?.ReturnParameter.Type;
-        if (returnType == null)
+        if (Mfv?.ReturnParameter.Type is var returnType && returnType == null)
           return TypeFactory.CreateUnknownType(Module);
 
-        if (returnType.IsUnit)
-          return Module.GetPredefinedType().Void;
-
-        var declaration = GetDeclaration();
-        if (declaration == null)
-          return TypeFactory.CreateUnknownType(Module);
-
-        return FSharpTypesUtil.GetType(returnType, declaration, TypeParameters, Module, true) ??
-               TypeFactory.CreateUnknownType(Module);
+        // todo: isFromMethod: true?
+        return returnType.IsUnit
+          ? Module.GetPredefinedType().Void
+          : FSharpTypesUtil.GetType(returnType, GetAllTypeParameters(), Module, true, true);
       }
     }
 

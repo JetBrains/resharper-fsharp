@@ -125,6 +125,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public virtual bool IsExtensionMember => false;
     public abstract bool IsFSharpMember { get; }
 
+    public virtual IList<ITypeParameter> GetAllTypeParameters() =>
+      ContainingType.GetAllTypeParameters().ResultingList().Reverse();
+
     [CanBeNull]
     protected virtual FSharpSymbol GetActualSymbol([NotNull] FSharpSymbol symbol) => symbol;
 
@@ -141,13 +144,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       }
     }
 
-    protected IType GetType([CanBeNull] FSharpType fsType)
-    {
-      if (fsType == null || GetDeclaration() is var declaration && declaration == null)
-        return TypeFactory.CreateUnknownType(Module);
-
-      var type = FSharpTypesUtil.GetType(fsType, declaration, Module);
-      return type ?? TypeFactory.CreateUnknownType(Module);
-    }
+    protected IType GetType([CanBeNull] FSharpType fsType) =>
+      fsType != null
+        ? FSharpTypesUtil.GetType(fsType, GetAllTypeParameters(), Module)
+        : TypeFactory.CreateUnknownType(Module);
   }
 }

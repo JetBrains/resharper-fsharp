@@ -7,10 +7,8 @@ using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
-using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 using JetBrains.Util.Logging;
-using Microsoft.FSharp.Compiler;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -21,24 +19,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
   public static class FSharpTypesUtil
   {
     [CanBeNull]
-    public static IDeclaredType GetBaseType([NotNull] FSharpEntity entity,
-      IList<ITypeParameter> typeParamsFromContext, [NotNull] IPsiModule psiModule) =>
-      entity.BaseType is var fsBaseType && fsBaseType != null
-        ? GetType(fsBaseType.Value, typeParamsFromContext, psiModule) as IDeclaredType
+    public static IDeclaredType GetBaseType([NotNull] FSharpEntity entity, IList<ITypeParameter> typeParams,
+      [NotNull] IPsiModule psiModule) =>
+      entity.BaseType?.Value is var baseType && baseType != null
+        ? GetType(baseType, typeParams, psiModule) as IDeclaredType
         : TypeFactory.CreateUnknownType(psiModule);
 
     [NotNull]
     public static IEnumerable<IDeclaredType> GetSuperTypes([NotNull] FSharpEntity entity,
-      IList<ITypeParameter> typeParamsFromContext, [NotNull] IPsiModule psiModule)
+      IList<ITypeParameter> typeParams, [NotNull] IPsiModule psiModule)
     {
       var interfaces = entity.DeclaredInterfaces;
       var types = new List<IDeclaredType>(interfaces.Count + 1);
       foreach (var entityInterface in interfaces)
-        if (GetType(entityInterface, typeParamsFromContext, psiModule) is IDeclaredType declaredType)
+        if (GetType(entityInterface, typeParams, psiModule) is IDeclaredType declaredType)
           types.Add(declaredType);
 
-      var baseType = GetBaseType(entity, typeParamsFromContext, psiModule);
-      if (baseType != null) types.Add(baseType);
+      var baseType = GetBaseType(entity, typeParams, psiModule);
+      if (baseType != null)
+        types.Add(baseType);
+
       return types;
     }
 
@@ -58,54 +58,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         Logger.LogExceptionSilently(e);
         return null;
       }
-    }
-
-    /// <summary>
-    /// Get type from a context of some declaration, possibly containing type parameters declarations.
-    /// </summary>
-    [NotNull]
-    public static IType GetType([NotNull] FSharpType fsType, [NotNull] ITypeMemberDeclaration typeMemberDeclaration,
-      [NotNull] IPsiModule psiModule)
-    {
-      try
-      {
-        return GetType(fsType, GetOuterTypeParameters(typeMemberDeclaration), psiModule);
-      }
-      catch (ErrorLogger.UnresolvedPathReferenceNoRange)
-      {
-        return TypeFactory.CreateUnknownType(psiModule);
-      }
-    }
-
-    /// <summary>
-    /// Get type from a context of some declaration, possibly containing type parameters declarations.
-    /// Overload for method context.
-    /// </summary>
-    [NotNull]
-    public static IType GetType([NotNull] FSharpType fsType,
-      [NotNull] ITypeMemberDeclaration methodDeclaration, [NotNull] IList<ITypeParameter> methodTypeParams,
-      [NotNull] IPsiModule psiModule, bool isFromReturn)
-    {
-      var typeParametersFromType = GetOuterTypeParameters(methodDeclaration);
-      var typeParamsFromContext = typeParametersFromType.Prepend(methodTypeParams).ToIList();
-      try
-      {
-        return GetType(fsType, typeParamsFromContext, psiModule, true, isFromReturn);
-      }
-      catch (ErrorLogger.UnresolvedPathReferenceNoRange)
-      {
-        return TypeFactory.CreateUnknownType(psiModule);
-      }
-    }
-
-    [NotNull]
-    private static IList<ITypeParameter> GetOuterTypeParameters(ITypeMemberDeclaration typeMemberDeclaration)
-    {
-      var typeDeclaration = typeMemberDeclaration.GetContainingTypeDeclaration();
-      var parameters = typeDeclaration?.DeclaredElement?.GetAllTypeParameters();
-
-      return parameters?.ResultingList() ??
-             EmptyList<ITypeParameter>.Instance;
     }
 
     private static bool HasGenericTypeParams([NotNull] FSharpType fsType)
@@ -213,16 +165,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     }
 
     [NotNull]
-    private static IDeclaredType GetTypeWithSubstitution([NotNull] ITypeElement typeElement, IList<FSharpType> fsTypes,
-      [NotNull] IList<ITypeParameter> typeParams, [NotNull] IPsiModule psiModule, bool isFromMethod)
+    private static IDeclaredType GetTypeWithSubstitution([NotNull] ITypeElement typeElement,
+      IList<FSharpType> fsTypeArgs, [NotNull] IList<ITypeParameter> typeParams, [NotNull] IPsiModule psiModule,
+      bool isFromMethod)
     {
       var typeParamsCount = typeElement.GetAllTypeParameters().Count;
       var typeArgs = new IType[typeParamsCount];
       for (var i = 0; i < typeParamsCount; i++)
-      {
-        var typeArg = GetTypeArgumentType(fsTypes[i], typeParams, psiModule, isFromMethod);
-        typeArgs[i] = typeArg;
-      }
+        typeArgs[i] = GetTypeArgumentType(fsTypeArgs[i], typeParams, psiModule, isFromMethod);
 
       return TypeFactory.CreateType(typeElement, typeArgs);
     }
@@ -246,7 +196,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         : TypeFactory.CreateUnknownType(psiModule);
     }
 
-    public static ParameterKind GetParameterKind([NotNull] FSharpParameter param)
+    public static ParameterKind GetParameterKind([NotNull] this FSharpParameter param)
     {
       var fsType = param.Type;
       if (fsType.HasTypeDefinition && fsType.TypeDefinition.IsByRef)

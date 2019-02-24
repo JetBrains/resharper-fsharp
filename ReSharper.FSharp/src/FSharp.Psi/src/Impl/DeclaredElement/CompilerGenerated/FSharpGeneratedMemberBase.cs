@@ -63,5 +63,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     public bool IsFSharpMember => true;
 
     public FSharpSymbol Symbol => null;
+
+    public IList<ITypeParameter> GetAllTypeParameters() =>
+      GetContainingType().GetAllTypeParameters().ResultingList().Reverse();
   }
 }
