@@ -34,7 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 
     public FSharpPreprocessedLexer(ILexer lexer, FSharpPreprocessor preprocessor, HashSet<string> definedConstants)
     {
-      myLexer = lexer is CachingLexer cachingLexer ? cachingLexer : new FSharpLexer(lexer.Buffer).ToCachingLexer();
+      myLexer = lexer is CachingLexer cachingLexer ? cachingLexer : lexer.ToCachingLexer();
       myPreprocessor = preprocessor;
       myDefinedConstants = definedConstants;
     }
