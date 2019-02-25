@@ -329,13 +329,14 @@ type FSharpTypingAssist
     let handleSpace (context: ITypingContext) =
         this.HandleSpaceInsideEmptyBrackets(context.TextControl)
 
-    let isActionHandlerAvailable = Predicate<_>(this.IsActionHandlerAvailabile2)
-    let isTypingHandlerAvailable = Predicate<_>(this.IsTypingHandlerAvailable2)
-
     do
+        let isActionHandlerAvailable = Predicate<_>(this.IsActionHandlerAvailabile2)
+        let isTypingHandlerAvailable = Predicate<_>(this.IsTypingHandlerAvailable2)
+
         manager.AddActionHandler(lifetime, TextControlActions.ActionIds.Enter, this, Func<_,_>(handleEnter), isActionHandlerAvailable)
         manager.AddActionHandler(lifetime, TextControlActions.ActionIds.Backspace, this, Func<_,_>(this.HandleBackspacePressed), isActionHandlerAvailable)
         manager.AddActionHandler(lifetime, TextControlActions.ActionIds.Tab, this, Func<_,_>(this.HandleTabPressed), isActionHandlerAvailable)
+        manager.AddActionHandler(lifetime, TextControlActions.ActionIds.TabLeft, this, Func<_,_>(this.HandleTabLeftPressed), isActionHandlerAvailable)
         manager.AddTypingHandler(lifetime, ' ', this, Func<_,_>(handleSpace), isTypingHandlerAvailable)
 
         manager.AddTypingHandler(lifetime, '\'', this, Func<_,_>(this.HandleSingleQuoteTyped), isTypingHandlerAvailable)
