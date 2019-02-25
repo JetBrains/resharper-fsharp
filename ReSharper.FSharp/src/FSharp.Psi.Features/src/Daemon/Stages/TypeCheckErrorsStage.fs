@@ -16,19 +16,19 @@ type TypeCheckErrorsStageProcess(fsFile: IFSharpFile, daemonProcess, logger: ILo
 
     override x.Execute(committer) =
         match fsFile.GetParseAndCheckResults(false) with
+        | None -> ()
         | Some results ->
-            daemonProcess.CustomData.PutData(FSharpDaemonStageBase.TypeCheckResults, Some results.CheckResults)
-            let projectWarnings, fileErrors  =
-                results.CheckResults.Errors
-                |> Array.partition (fun e ->
-                    e.StartLineAlternate = 0 && e.EndLineAlternate = 0 && e.Severity = FSharpErrorSeverity.Warning)
 
-            if not (Array.isEmpty projectWarnings) then
-                // https://github.com/Microsoft/visualfsharp/issues/4030
-                let errors = Array.fold (fun a e -> a + "\n" + e.ToString()) "" projectWarnings
-                logger.LogMessage(LoggingLevel.WARN, "Project warnings during file typecheck:" + errors)
-            x.Execute(fileErrors, committer)
-        | _ -> ()
+        let projectWarnings, fileErrors =
+            results.CheckResults.Errors
+            |> Array.partition (fun e ->
+                e.StartLineAlternate = 0 && e.EndLineAlternate = 0 && e.Severity = FSharpErrorSeverity.Warning)
+
+        if not (Array.isEmpty projectWarnings) then
+            // https://github.com/Microsoft/visualfsharp/issues/4030
+            let errors = Array.fold (fun a e -> a + "\n" + e.ToString()) "" projectWarnings
+            logger.LogMessage(LoggingLevel.WARN, "Project warnings during file typecheck:" + errors)
+        x.Execute(fileErrors, committer)
 
 
 [<DaemonStage(StagesBefore = [| typeof<SyntaxErrorsStage> |], StagesAfter = [| typeof<HighlightIdentifiersStage> |])>]

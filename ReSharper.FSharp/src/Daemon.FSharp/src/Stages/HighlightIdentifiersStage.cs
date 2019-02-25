@@ -67,8 +67,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 
     public override void Execute(Action<DaemonStageResult> committer)
     {
-      var checkResults = DaemonProcess.CustomData.GetData(FSharpDaemonStageBase.TypeCheckResults);
-      var declarations = FSharpFile.GetAllDeclaredSymbols(checkResults?.Value);
+      var declarations = FSharpFile.GetAllDeclaredSymbols();
       InterruptableActivityCookie.CheckAndThrow();
 
       var usages = FSharpFile.GetAllResolvedSymbols();

@@ -55,10 +55,9 @@ type UnusedOpensStage(daemonProcess, errors) =
     inherit FSharpDaemonStageBase()
 
     override x.CreateStageProcess(fsFile: IFSharpFile, _, daemonProcess: IDaemonProcess) =
-        daemonProcess.CustomData.GetData(FSharpDaemonStageBase.TypeCheckResults)
-        |> Option.map (fun checkResults ->
-            UnusedOpensStageProcess(fsFile, checkResults, daemonProcess) :> IDaemonStageProcess)
-        |> Option.defaultValue null
+        match fsFile.GetParseAndCheckResults(false) with
+        | Some results -> UnusedOpensStageProcess(fsFile, results.CheckResults, daemonProcess) :> _
+        | _ -> null
 
 
 // todo: use ReSharper ErrorsGen
