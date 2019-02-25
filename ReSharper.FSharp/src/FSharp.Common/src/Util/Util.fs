@@ -101,9 +101,6 @@ module rec CommonUtil =
     let (|AddRemoveArgs|) (args: AddRemoveEventArgs<_>) =
         args.Value
 
-    let (|KeyValuePair|) (pair: KeyValuePair<_,_>) =
-        pair.Key, pair.Value
-
     let (|Pair|) (pair: Pair<_,_>) =
         pair.First, pair.Second
 

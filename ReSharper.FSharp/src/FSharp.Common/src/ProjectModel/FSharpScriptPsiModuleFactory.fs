@@ -285,7 +285,7 @@ type FSharpScriptPsiModulesProvider
 
     member x.Dump(writer: TextWriter) =
         writer.WriteLine(sprintf "Scripts from paths:")
-        for KeyValuePair (path, _) in scriptsFromPaths do
+        for KeyValue (path, _) in scriptsFromPaths do
             writer.WriteLine("  " + path.ToString())
 
         writer.WriteLine(sprintf "Scripts from project files:")
@@ -380,7 +380,7 @@ type FSharpScriptPsiModule
     let assemblyCookies = DictionaryEvents<FileSystemPath, IAssemblyCookie>(lifetime, moduleId)
 
     do
-        assemblyCookies.AddRemove.Advise_Remove(lifetime, fun (AddRemoveArgs (KeyValuePair (_, assemblyCookie))) ->
+        assemblyCookies.AddRemove.Advise_Remove(lifetime, fun (AddRemoveArgs (KeyValue (_, assemblyCookie))) ->
             locks.AssertWriteAccessAllowed()
             assemblyCookie.Dispose())
 

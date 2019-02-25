@@ -311,7 +311,7 @@ type FSharpItemsContainer
 
         member x.Dump(writer: TextWriter) =
             use lock = locker.UsingReadLock()
-            for KeyValuePair (projectMark, mapping) in x.ProjectMappings do
+            for KeyValue (projectMark, mapping) in x.ProjectMappings do
                 writer.WriteLine(projectMark.Name)
                 mapping.Dump(writer)
 

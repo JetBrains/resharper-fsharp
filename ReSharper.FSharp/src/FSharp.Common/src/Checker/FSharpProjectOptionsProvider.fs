@@ -99,7 +99,7 @@ type FSharpProjectOptionsProvider
             logger.Info("Invalidating {0}", project)
             tryGetValue project projects
             |> Option.iter (fun fsProjectsForProject ->
-                for KeyValuePair (tfid, fsProject) in fsProjectsForProject do
+                for KeyValue (tfid, fsProject) in fsProjectsForProject do
                     checkerService.Checker.InvalidateConfiguration(fsProject.Options, false)
                     let psiModule = psiModules.GetPrimaryPsiModule(project, tfid)
                     moduleInvalidated.Fire(psiModule)
