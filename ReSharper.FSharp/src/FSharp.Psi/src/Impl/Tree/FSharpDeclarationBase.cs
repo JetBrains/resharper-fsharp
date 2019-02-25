@@ -2,7 +2,6 @@
 using System.Xml;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.Tree;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -15,7 +14,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public virtual FSharpSymbol GetFSharpSymbol()
     {
       var identifierRange = GetNameIdentifierRange();
-      return (this.GetContainingFile() as IFSharpFile)?.GetSymbolDeclaration(identifierRange.StartOffset.Offset);
+      return FSharpFile.GetSymbolDeclaration(identifierRange.StartOffset.Offset);
     }
 
     public abstract IDeclaredElement DeclaredElement { get; }

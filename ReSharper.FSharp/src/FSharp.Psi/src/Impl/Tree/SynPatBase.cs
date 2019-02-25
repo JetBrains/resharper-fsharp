@@ -12,7 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public bool IsDeclaration => true;
 
     public IEnumerable<IDeclaration> Declarations =>
-      Pattern?.Declarations.Prepend(this) ?? new []{this};
+      Pattern?.Declarations.Prepend(this) ?? new[] {this};
 
     /// Workaround for type members cache:
     /// in `let a, b as c = 1, 2` we want `a` and `a, b as c` to have different offsets
@@ -25,14 +25,27 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
     public bool IsDeclaration => true;
-    public IEnumerable<IDeclaration> Declarations => Pattern?.Declarations.Prepend(this) ?? new []{this};
+    public IEnumerable<IDeclaration> Declarations => Pattern?.Declarations.Prepend(this) ?? new[] {this};
     public TreeOffset GetOffset() => GetTreeStartOffset();
   }
 
   internal partial class LocalLongIdentPat
   {
     public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
-    public bool IsDeclaration => Parent is IBinding;
+
+    public bool IsDeclaration
+    {
+      get
+      {
+        if (Parent is IBinding)
+          return true;
+
+        // todo: add check for lid.Length > 1
+        var offsetOffset = GetNameIdentifierRange().StartOffset.Offset;
+        return Parameters.IsEmpty && FSharpFile.GetSymbolUse(offsetOffset) == null;
+      }
+    }
+
     public IEnumerable<IDeclaration> Declarations =>
       IsDeclaration
         ? new[] {this}
