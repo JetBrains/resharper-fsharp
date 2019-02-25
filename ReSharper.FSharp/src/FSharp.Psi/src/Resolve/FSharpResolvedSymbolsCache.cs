@@ -1,18 +1,17 @@
 using System.Collections.Generic;
 using System.IO;
 using JetBrains.Annotations;
-using JetBrains.Application.changes;
 using JetBrains.Application.Progress;
+using JetBrains.Diagnostics;
 using JetBrains.DocumentManagers.impl;
 using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
-using JetBrains.ProjectModel.Build;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Checker;
+using JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Threading;
 using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
@@ -24,34 +23,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     public IPsiModules PsiModules { get; }
     public FSharpCheckerService CheckerService { get; }
     public IFSharpProjectOptionsProvider ProjectOptionsProvider { get; }
-    public OutputAssemblies OutputAssemblies { get; }
+
+    private readonly object myLock = new object();
+    private readonly ISet<IPsiSourceFile> myDirtyFiles = new HashSet<IPsiSourceFile>();
 
     public FSharpResolvedSymbolsCache(Lifetime lifetime, FSharpCheckerService checkerService, IPsiModules psiModules,
-      IFSharpProjectOptionsProvider projectOptionsProvider, OutputAssemblies outputAssemblies, ChangeManager changeManager)
+      IFSharpProjectOptionsProvider projectOptionsProvider)
     {
       PsiModules = psiModules;
       CheckerService = checkerService;
       ProjectOptionsProvider = projectOptionsProvider;
-      OutputAssemblies = outputAssemblies;
 
       projectOptionsProvider.ModuleInvalidated.Advise(lifetime, Invalidate);
-      changeManager.Changed2.Advise(lifetime, ProcessChange);
     }
 
-    private void ProcessChange(ChangeEventArgs args)
-    {
-      var projectOutputChange = args.ChangeMap.GetChange<ProjectOutputChange>(OutputAssemblies);
-      if (projectOutputChange == null)
-        return;
-
-      var changes = projectOutputChange.Changes;
-    }
-
-    private readonly JetFastSemiReenterableRWLock myLock = new JetFastSemiReenterableRWLock();
+    private static bool IsApplicable(IPsiSourceFile sourceFile) =>
+      sourceFile.LanguageType.Is<FSharpProjectFileType>();
 
     public void Invalidate(IPsiModule psiModule)
     {
-      using (myLock.UsingWriteLock())
+      lock (myLock)
       {
         myPsiModules.Remove(psiModule);
         InvalidateReferencingModules(psiModule);
@@ -64,26 +55,28 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       {
         var resolveContext = CompilationContextCookie.GetContext();
         foreach (var psiModuleReference in PsiModules.GetReverseModuleReferences(psiModule, resolveContext))
-        {
           if (myPsiModules.TryGetValue(psiModuleReference.Module, out var moduleSymbols))
             moduleSymbols.Invalidate();
-        }
       }
     }
 
     private void Invalidate(IPsiSourceFile sourceFile)
     {
-      using (myLock.UsingWriteLock())
-      {
-        var psiModule = sourceFile.PsiModule;
-        if (myPsiModules.TryGetValue(psiModule, out var moduleResolvedSymbols))
-          moduleResolvedSymbols.Invalidate(sourceFile);
+      var psiModule = sourceFile.PsiModule;
+      if (myPsiModules.TryGetValue(psiModule, out var moduleResolvedSymbols))
+        moduleResolvedSymbols.Invalidate(sourceFile);
 
-        InvalidateReferencingModules(psiModule);
-      }
+      InvalidateReferencingModules(psiModule);
     }
 
-    public void MarkAsDirty(IPsiSourceFile sourceFile) => Invalidate(sourceFile);
+    public void MarkAsDirty(IPsiSourceFile sourceFile)
+    {
+      if (!IsApplicable(sourceFile))
+        return;
+
+      lock (myLock)
+        myDirtyFiles.Add(sourceFile);
+    }
 
     public object Load(IProgressIndicator progress, bool enablePersistence) => null;
 
@@ -95,7 +88,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     {
     }
 
-    public bool UpToDate(IPsiSourceFile sourceFile) => true;
+    public bool UpToDate(IPsiSourceFile sourceFile)
+    {
+      lock (myLock)
+        return !myDirtyFiles.Contains(sourceFile);
+    }
 
     public object Build(IPsiSourceFile sourceFile, bool isStartup) => null;
 
@@ -103,49 +100,72 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     {
     }
 
-    public void Drop(IPsiSourceFile sourceFile) => Invalidate(sourceFile);
+    public void Drop(IPsiSourceFile sourceFile)
+    {
+      lock (myLock)
+        Invalidate(sourceFile);
+    }
 
     public void OnDocumentChange(IPsiSourceFile sourceFile, ProjectFileDocumentCopyChange change) =>
-      Invalidate(sourceFile);
+      MarkAsDirty(sourceFile);
 
     public void OnPsiChange(ITreeNode elementContainingChanges, PsiChangedElementType type)
     {
-      // todo
+      if (elementContainingChanges == null)
+        return;
+
+      var sourceFile = elementContainingChanges.GetSourceFile();
+      Assertion.Assert(sourceFile != null, "sourceFile != null");
+
+      MarkAsDirty(sourceFile);
     }
 
 
+    private void InvalidateDirty()
+    {
+      foreach (var sourceFile in myDirtyFiles)
+        Invalidate(sourceFile);
+
+      myDirtyFiles.Clear();
+    }
+
     public void SyncUpdate(bool underTransaction)
     {
+      lock (myLock)
+        InvalidateDirty();
     }
 
     public void Dump(TextWriter writer, IPsiSourceFile sourceFile)
     {
     }
 
-    public bool HasDirtyFiles => false;
+    public bool HasDirtyFiles
+    {
+      get
+      {
+        lock (myLock)
+          return !myDirtyFiles.IsEmpty();
+      }
+    }
 
-    // todo: misc files project?
     private readonly IDictionary<IPsiModule, FSharpModuleResolvedSymbols> myPsiModules =
       new Dictionary<IPsiModule, FSharpModuleResolvedSymbols>();
 
-    private FSharpFileResolvedSymbols GetOrCreateResolvedSymbols(IPsiSourceFile sourceFile) =>
+    private IFSharpFileResolvedSymbols GetOrCreateResolvedSymbols(IPsiSourceFile sourceFile) =>
       GetModuleResolvedSymbols(sourceFile).GetResolvedSymbols(sourceFile);
 
     [NotNull]
     private IFSharpModuleResolvedSymbols GetModuleResolvedSymbols(IPsiSourceFile sourceFile)
     {
       var psiModule = sourceFile.PsiModule;
-      if (sourceFile.PsiModule.IsMiscFilesProjectModule())
+      if (psiModule.IsMiscFilesProjectModule())
         return FSharpMiscModuleResolvedSymbols.Instance;
 
-      using (myLock.UsingReadLock())
+      lock (myLock)
       {
-        if (myPsiModules.TryGetValue(psiModule, out var symbols))
-          return symbols;
-      }
+        if (HasDirtyFiles)
+          InvalidateDirty();
 
-      using (myLock.UsingWriteLock())
-      {
         if (myPsiModules.TryGetValue(psiModule, out var symbols))
           return symbols;
 
@@ -159,35 +179,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       }
     }
 
-    public FSharpSymbolUse GetSymbolUse(IPsiSourceFile sourceFile, int offset)
-    {
-      var resolvedSymbols = GetOrCreateResolvedSymbols(sourceFile);
+    public FSharpSymbolUse GetSymbolUse(IPsiSourceFile sourceFile, int offset) =>
+      GetOrCreateResolvedSymbols(sourceFile).GetSymbolUse(offset);
 
-      var resolvedSymbol = resolvedSymbols.Uses.TryGetValue(offset);
-      if (resolvedSymbol == null)
-        return null;
+    public FSharpSymbol GetSymbolDeclaration(IPsiSourceFile sourceFile, int offset) =>
+      GetOrCreateResolvedSymbols(sourceFile).GetSymbolDeclaration(offset);
 
-      return resolvedSymbols.Declarations.TryGetValue(offset) == null
-        ? resolvedSymbol.SymbolUse
-        : null;
-    }
+    public IReadOnlyList<FSharpResolvedSymbolUse> GetAllDeclaredSymbols(IPsiSourceFile sourceFile) =>
+      GetOrCreateResolvedSymbols(sourceFile).GetAllDeclaredSymbols();
 
-    public FSharpSymbol GetSymbolDeclaration(IPsiSourceFile sourceFile, int offset)
-    {
-      var resolvedSymbols = GetOrCreateResolvedSymbols(sourceFile);
-      return resolvedSymbols.Declarations.TryGetValue(offset)?.SymbolUse.Symbol;
-    }
-
-    public IReadOnlyList<FSharpResolvedSymbolUse> GetAllDeclaredSymbols(IPsiSourceFile sourceFile)
-    {
-      var resolvedSymbols = GetOrCreateResolvedSymbols(sourceFile);
-      return resolvedSymbols.Declarations.Values.AsChunkIReadOnlyList();
-    }
-
-    public IReadOnlyList<FSharpResolvedSymbolUse> GetAllResolvedSymbols(IPsiSourceFile sourceFile)
-    {
-      var resolvedSymbols = GetOrCreateResolvedSymbols(sourceFile);
-      return resolvedSymbols.Uses.Values.AsChunkIReadOnlyList();
-    }
+    public IReadOnlyList<FSharpResolvedSymbolUse> GetAllResolvedSymbols(IPsiSourceFile sourceFile) =>
+      GetOrCreateResolvedSymbols(sourceFile).GetAllResolvedSymbols();
   }
 }

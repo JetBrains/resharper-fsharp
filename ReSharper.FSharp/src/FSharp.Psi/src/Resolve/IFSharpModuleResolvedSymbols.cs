@@ -10,6 +10,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     void Invalidate(IPsiSourceFile sourceFile);
 
     [NotNull]
-    FSharpFileResolvedSymbols GetResolvedSymbols(IPsiSourceFile sourceFile);
+    IFSharpFileResolvedSymbols GetResolvedSymbols(IPsiSourceFile sourceFile);
   }
 }
