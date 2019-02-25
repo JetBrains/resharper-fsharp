@@ -24,7 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
 
     [CanBeNull, AsyncContextConsumer]
     public static Action ProcessContext(
-      [NotNull] Lifetime lifetime, [NotNull] HighlightingProlongedLifetime prolongedLifetime,
+      Lifetime lifetime, [NotNull] HighlightingProlongedLifetime prolongedLifetime,
       [NotNull, ContextKey(typeof(ContextHighlighterPsiFileView.ContextKey))]
       IPsiDocumentRangeView psiDocumentRangeView,
       [NotNull] UsagesContextHighlighterAvailabilityComponent contextHighlighterAvailability)

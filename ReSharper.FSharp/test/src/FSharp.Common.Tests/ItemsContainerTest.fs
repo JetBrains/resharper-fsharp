@@ -861,7 +861,6 @@ type FSharpItemsContainerTest() =
                                         relative.Location contextRelativeTo.ReferenceItem.Location)
                         | _ ->
                             let (NormalizedPath path) = viewFile.Location
-                            let (NormalizedPath relativePath) = relativeViewItem.Location
                             writer.Write(path)
                             writer.Write(sprintf " %O %O -> " relativeToType relativeViewItem)
                             writer.WriteLine(

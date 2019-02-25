@@ -15,7 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
   {
     [CanBeNull, AsyncContextConsumer]
     public static Action ProcessDataContext(
-      [NotNull] Lifetime lifetime,
+      Lifetime lifetime,
       [NotNull, ContextKey(typeof(ContextHighlighterPsiFileView.ContextKey))]
       IPsiDocumentRangeView psiDocumentRangeView,
       [NotNull] InvisibleBraceHintManager invisibleBraceHintManager,

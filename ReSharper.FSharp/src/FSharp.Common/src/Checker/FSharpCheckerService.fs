@@ -25,7 +25,8 @@ type FSharpCheckerService
         Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "20")
 
         let enableBgCheck =
-            settingsStore.BindToContextLive(lifetime, ContextRange.ApplicationWide)
+            settingsStore
+                .BindToContextLive(lifetime, ContextRange.ApplicationWide)
                 .GetValueProperty(lifetime, fun (key: FSharpOptions) -> key.BackgroundTypeCheck)
 
         lazy
@@ -44,7 +45,7 @@ type FSharpCheckerService
             if checker.IsValueCreated then
                 checker.Value.InvalidateAll())
 
-    member val OptionsProvider: IFSharpProjectOptionsProvider = Unchecked.defaultof<_> with get, set
+    member val OptionsProvider = Unchecked.defaultof<IFSharpProjectOptionsProvider> with get, set
     member x.Checker = checker.Value
 
     member x.ParseFile([<NotNull>] file: IPsiSourceFile) =
@@ -53,7 +54,7 @@ type FSharpCheckerService
         let parsingOptions =
             if not (Array.isEmpty parsingOptions.SourceFiles) then parsingOptions
             else
-                let project  = file.GetProject().GetLocation().FullPath
+                let project = file.GetProject().GetLocation().FullPath
                 logger.Warn("Loading from caches, don't have source files for {0} yet.", project)
                 { parsingOptions with SourceFiles = [| filePath |] }
         let source = file.Document.GetText()
@@ -101,8 +102,8 @@ type FSharpParseAndCheckResults =
 
 
 type IFSharpProjectOptionsProvider =
-    abstract member GetProjectOptions: IPsiSourceFile -> FSharpProjectOptions option
-    abstract member GetParsingOptions: IPsiSourceFile -> FSharpParsingOptions
-    abstract member GetFileIndex: IPsiSourceFile -> int
-    abstract member HasPairFile: IPsiSourceFile -> bool
-    abstract member ModuleInvalidated: ISignal<IPsiModule>
+    abstract GetProjectOptions: IPsiSourceFile -> FSharpProjectOptions option
+    abstract GetParsingOptions: IPsiSourceFile -> FSharpParsingOptions
+    abstract GetFileIndex: IPsiSourceFile -> int
+    abstract HasPairFile: IPsiSourceFile -> bool
+    abstract ModuleInvalidated: ISignal<IPsiModule>
