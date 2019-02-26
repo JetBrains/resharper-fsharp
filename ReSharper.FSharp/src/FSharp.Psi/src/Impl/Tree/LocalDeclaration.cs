@@ -50,7 +50,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
             ? parametersOwner.GetAllTypeParameters()
             : EmptyList<ITypeParameter>.Instance;
 
-        return FSharpTypesUtil.GetType(mfv.FullType, typeParameters, Module);
+        return mfv.FullType.MapType(typeParameters, Module);
       }
     }
 

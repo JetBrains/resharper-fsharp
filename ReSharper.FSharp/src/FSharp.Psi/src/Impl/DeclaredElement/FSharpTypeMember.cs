@@ -146,7 +146,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     protected IType GetType([CanBeNull] FSharpType fsType) =>
       fsType != null
-        ? FSharpTypesUtil.GetType(fsType, GetAllTypeParameters(), Module)
+        ? fsType.MapType(GetAllTypeParameters(), Module)
         : TypeFactory.CreateUnknownType(Module);
   }
 }

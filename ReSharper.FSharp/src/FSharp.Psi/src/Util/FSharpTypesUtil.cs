@@ -19,10 +19,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
   public static class FSharpTypesUtil
   {
     [CanBeNull]
-    public static IDeclaredType GetBaseType([NotNull] FSharpEntity entity, IList<ITypeParameter> typeParams,
+    public static IDeclaredType MapBaseType([NotNull] this FSharpEntity entity, IList<ITypeParameter> typeParams,
       [NotNull] IPsiModule psiModule) =>
       entity.BaseType?.Value is var baseType && baseType != null
-        ? GetType(baseType, typeParams, psiModule) as IDeclaredType
+        ? MapType(baseType, typeParams, psiModule) as IDeclaredType
         : TypeFactory.CreateUnknownType(psiModule);
 
     [NotNull]
@@ -32,10 +32,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       var interfaces = entity.DeclaredInterfaces;
       var types = new List<IDeclaredType>(interfaces.Count + 1);
       foreach (var entityInterface in interfaces)
-        if (GetType(entityInterface, typeParams, psiModule) is IDeclaredType declaredType)
+        if (MapType(entityInterface, typeParams, psiModule) is IDeclaredType declaredType)
           types.Add(declaredType);
 
-      var baseType = GetBaseType(entity, typeParams, psiModule);
+      var baseType = MapBaseType(entity, typeParams, psiModule);
       if (baseType != null)
         types.Add(baseType);
 
@@ -88,7 +88,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     }
 
     [NotNull]
-    public static IType GetType([NotNull] FSharpType fsType, [NotNull] IList<ITypeParameter> typeParams,
+    public static IType MapType([NotNull] this FSharpType fsType, [NotNull] IList<ITypeParameter> typeParams,
       [NotNull] IPsiModule psiModule, bool isFromMethod = false, bool isFromReturn = false)
     {
       var type = GetStrippedType(fsType);
@@ -130,11 +130,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       // e.g. byref<int>, we need int
       if (entity.IsByRef)
-        return GetType(type.GenericArguments[0], typeParams, psiModule, isFromMethod, isFromReturn);
+        return MapType(type.GenericArguments[0], typeParams, psiModule, isFromMethod, isFromReturn);
 
       if (entity.IsProvidedAndErased)
         return entity.BaseType is var baseType && baseType != null
-          ? GetType(baseType.Value, typeParams, psiModule, isFromMethod, isFromReturn)
+          ? MapType(baseType.Value, typeParams, psiModule, isFromMethod, isFromReturn)
           : TypeFactory.CreateUnknownType(psiModule);
 
       var clrName = GetClrName(entity);
@@ -143,7 +143,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         // bug Microsoft/visualfsharp#3532
         // e.g. byref<int>, we need int
         return entity.CompiledName == "byref`1" && entity.AccessPath == "Microsoft.FSharp.Core"
-          ? GetType(type.GenericArguments[0], typeParams, psiModule, isFromMethod, isFromReturn)
+          ? MapType(type.GenericArguments[0], typeParams, psiModule, isFromMethod, isFromReturn)
           : TypeFactory.CreateUnknownType(psiModule);
       }
 
@@ -185,7 +185,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       [NotNull] IPsiModule psiModule, bool isFromMethod) =>
       arg.IsGenericParameter
         ? GetTypeParameterByName(arg, typeParams, psiModule)
-        : GetType(arg, typeParams, psiModule, isFromMethod);
+        : MapType(arg, typeParams, psiModule, isFromMethod);
 
     // todo: remove and add API to FCS.FSharpParameter
     [NotNull]
@@ -199,7 +199,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         : TypeFactory.CreateUnknownType(psiModule);
     }
 
-    public static ParameterKind GetParameterKind([NotNull] this FSharpParameter param)
+    public static ParameterKind MapParameterKind([NotNull] this FSharpParameter param)
     {
       var fsType = param.Type;
       if (fsType.HasTypeDefinition && fsType.TypeDefinition.IsByRef)

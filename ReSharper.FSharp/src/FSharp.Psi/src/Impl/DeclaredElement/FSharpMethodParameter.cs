@@ -85,7 +85,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       }
     }
 
-    public ParameterKind Kind => FSharpSymbol.GetParameterKind();
+    public ParameterKind Kind => FSharpSymbol.MapParameterKind();
     public bool IsParameterArray => FSharpSymbol.IsParamArrayArg;
     public bool IsValueVariable => false;
 

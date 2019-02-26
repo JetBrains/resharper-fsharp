@@ -64,7 +64,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     protected IType GetType([CanBeNull] FSharpType fsType, bool isReturn) =>
       fsType != null && TypeElement is TypeElement typeElement
-        ? FSharpTypesUtil.GetType(fsType, typeElement.TypeParameters, Module, true, isReturn)
+        ? fsType.MapType(typeElement.TypeParameters, Module, true, isReturn)
         : TypeFactory.CreateUnknownType(Module);
 
     public ReferenceKind ReturnKind => ReferenceKind.VALUE;

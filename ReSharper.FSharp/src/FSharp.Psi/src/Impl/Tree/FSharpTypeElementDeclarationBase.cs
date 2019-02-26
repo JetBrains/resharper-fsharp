@@ -25,7 +25,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     /// May take long time due to waiting for FCS.
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     public IDeclaredType BaseClassType => GetFSharpSymbol() is FSharpEntity entity
-      ? FSharpTypesUtil.GetBaseType(entity, TypeParameters, GetPsiModule())
+      ? entity.MapBaseType(TypeParameters, GetPsiModule())
       : null;
 
     public override FSharpSymbol GetFSharpSymbol()

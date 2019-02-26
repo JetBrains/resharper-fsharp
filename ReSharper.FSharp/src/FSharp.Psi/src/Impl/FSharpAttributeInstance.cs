@@ -32,8 +32,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public IDeclaredType GetAttributeType() => TypeFactory.CreateTypeByCLRName(Attr.GetClrName(), Module);
 
     private AttributeValue GetAttributeValue(Tuple<FSharpType, object> param) =>
-      new AttributeValue(new ConstantValue(param.Item2,
-        FSharpTypesUtil.GetType(param.Item1, EmptyList<ITypeParameter>.Instance, Module)));
+      new AttributeValue(
+        new ConstantValue(param.Item2, param.Item1.MapType(EmptyList<ITypeParameter>.Instance, Module)));
 
     public AttributeValue PositionParameter(int paramIndex) =>
       paramIndex >= 0 && paramIndex < Attr.ConstructorArguments.Count
