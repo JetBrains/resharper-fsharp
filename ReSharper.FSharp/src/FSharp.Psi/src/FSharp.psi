@@ -310,7 +310,8 @@ otherExpr options { stubBase="DummyExpression"; }:
 interface fSharpTypeDeclaration:
   exceptionDeclaration |
   simpleTypeDeclaration |
-  typeExtensionDeclaration
+  typeExtensionDeclaration |
+  delegateDeclaration |
   objectModelTypeDeclaration |
   nestedTypeUnionCaseDeclaration;
 
@@ -537,6 +538,15 @@ structDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extra
 
 objectTypeDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<objectTypeDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
+}:
+  fSharpAttribute<ATTRIBUTE, Attributes>*
+  accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
+  IDENTIFIER<IDENTIFIER, Identifier>
+  typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
+  fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
+
+delegateDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
+  get { methodName="TypeParameters" path=<delegateDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
 }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>

@@ -120,6 +120,11 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                 | TyconClass -> ElementType.CLASS_DECLARATION
                 | TyconInterface -> ElementType.INTERFACE_DECLARATION
                 | TyconStruct -> ElementType.STRUCT_DECLARATION
+
+                | TyconDelegate (synType, _) ->
+                    x.MarkOtherType(synType)                    
+                    ElementType.DELEGATE_DECLARATION
+
                 | _ -> ElementType.OBJECT_TYPE_DECLARATION
 
         for m in members do x.ProcessTypeMember m

@@ -54,19 +54,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public virtual IList<ITypeParameter> TypeParameters => EmptyList<ITypeParameter>.Instance;
 
-    public override IType ReturnType
-    {
-      get
-      {
-        if (Mfv?.ReturnParameter.Type is var returnType && returnType == null)
-          return TypeFactory.CreateUnknownType(Module);
-
-        // todo: isFromMethod: true?
-        return returnType.IsUnit
-          ? Module.GetPredefinedType().Void
-          : FSharpTypesUtil.GetType(returnType, GetAllTypeParameters(), Module, true, true);
-      }
-    }
+    public override IType ReturnType =>
+      Mfv?.ReturnParameter.Type is var returnType && returnType != null
+        ? FSharpTypesUtil.GetType(returnType, GetAllTypeParameters(), Module, true, true) // todo: isFromMethod?
+        : TypeFactory.CreateUnknownType(Module);
 
     public override bool Equals(object obj)
     {

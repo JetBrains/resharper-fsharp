@@ -111,6 +111,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         Logger.LogExceptionSilently(e);
       }
 
+      if (isFromReturn && type.IsUnit)
+      return psiModule.GetPredefinedType().Void;
+
       if (type.IsGenericParameter)
         return GetTypeParameterByName(type, typeParams, psiModule);
 

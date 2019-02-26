@@ -123,6 +123,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
             if (mfvLogicalName != StandardMemberNames.Constructor &&
                 !(fsFile.FindTokenAt(new TreeOffset(endOffset - 1)) is FSharpIdentifierToken || mfv.IsActivePattern))
               continue;
+
+            if (mfvLogicalName == "Invoke" && (mfv.DeclaringEntity?.Value?.IsDelegate ?? false))
+              continue;
           }
           else if (activePatternCase != null)
           {

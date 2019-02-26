@@ -177,6 +177,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       Builder.EndPart();
     }
 
+    public override void VisitDelegateDeclaration(IDelegateDeclaration decl)
+    {
+      Builder.StartPart(new DelegatePart(decl, Builder));
+      Builder.EndPart();
+    }
+
     public override void VisitTypeExtensionDeclaration(ITypeExtensionDeclaration typeExtension)
     {
       if (typeExtension.IsTypePartDeclaration)

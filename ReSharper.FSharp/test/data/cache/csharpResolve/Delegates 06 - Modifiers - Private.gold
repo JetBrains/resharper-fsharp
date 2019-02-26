@@ -1,0 +1,10 @@
+﻿using static Module;
+
+public class Class1
+{
+  |D|(0) d = f;
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Cannot access private delegate 'D' here
+M:Module.f

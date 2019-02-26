@@ -72,6 +72,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
           return new ClassExtensionPart(reader);
         case FSharpPartKind.StructExtension:
           return new StructExtensionPart(reader);
+        case FSharpPartKind.Delegate:
+          return new DelegatePart(reader);
         default:
           throw new SerializationError("Unknown tag:" + tag);
       }

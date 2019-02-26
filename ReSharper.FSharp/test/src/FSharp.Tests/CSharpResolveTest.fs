@@ -55,6 +55,14 @@ type CSharpResolveTest() =
 
     [<Test>] member x.``Class - Ctors 01 - Secondary``() = x.DoNamedTest()
 
+    [<Test>] member x.``Delegates 01 - Action``() = x.DoNamedTest()
+    [<Test>] member x.``Delegates 02 - Parameters``() = x.DoNamedTest()
+    [<Test>] member x.``Delegates 03 - Return type``() = x.DoNamedTest()
+    [<Test>] member x.``Delegates 04 - Generic``() = x.DoNamedTest()
+    [<Test>] member x.``Delegates 05 - Modifiers - Internal``() = x.DoNamedTest()
+    [<Test>] member x.``Delegates 06 - Modifiers - Private``() = x.DoNamedTest()
+    [<Test>] member x.``Delegates 07 - CompiledName``() = x.DoNamedTest()
+
     [<Test>] member x.``Val fields 01``() = x.DoNamedTest()
     [<Test>] member x.``Val fields 02, compiled name ignored``() = x.DoNamedTest()
     [<Test>] member x.``Val fields 03, struct``() = x.DoNamedTest()

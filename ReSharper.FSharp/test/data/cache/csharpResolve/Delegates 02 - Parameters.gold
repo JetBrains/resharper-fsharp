@@ -1,0 +1,22 @@
+﻿using static Module;
+
+public class Class1
+{
+  public static void M(int i, double d)
+  {
+  }
+
+  public Class1()
+  {
+    D d1 = M;
+    var |r1 = d1(1, 1.0)|(0);
+
+    D d2 = f;
+    var |r2 = d2(1, 1.0)|(1);
+  }
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Cannot assign 'void' to an implicitly-typed local variable
+(1): ReSharper Underlined Error Highlighting: Cannot assign 'void' to an implicitly-typed local variable
+M:Module.f(System.Int32,System.Double)

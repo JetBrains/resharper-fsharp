@@ -64,8 +64,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public IList<IType> TypeConstraints => EmptyList<IType>.Instance;
     public TypeParameterConstraintsMask ConstraintsMask => default; // todo
 
-    public IMethod OwnerMethod => Method as IMethod;
+    public IMethod OwnerMethod => (IMethod) Method;
     public ITypeParametersOwner Owner => Method as ITypeParametersOwner;
     public ITypeElement OwnerType => Method.GetContainingType();
+
+    public override bool Equals(object obj) =>
+      obj is FSharpTypeParameterOfMethod other &&
+      ReferenceEquals(Method, other.Method) && Index == other.Index;
+
+    public override int GetHashCode() => Index;
   }
 }

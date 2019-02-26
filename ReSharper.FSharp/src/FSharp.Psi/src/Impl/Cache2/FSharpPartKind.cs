@@ -19,5 +19,6 @@
     StructUnion = 14,
     ClassExtension = 15,
     StructExtension = 16,
+    Delegate = 17,
   }
 }
