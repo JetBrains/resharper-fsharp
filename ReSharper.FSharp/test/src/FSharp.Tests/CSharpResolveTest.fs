@@ -53,6 +53,8 @@ type CSharpResolveTest() =
     [<Test>] member x.``Class 02 - Sealed``() = x.DoNamedTest()
     [<Test>] member x.``Class 03 - No attributes``() = x.DoNamedTest()
 
+    [<Test>] member x.``Class - Ctors 01 - Secondary``() = x.DoNamedTest()
+
     [<Test>] member x.``Val fields 01``() = x.DoNamedTest()
     [<Test>] member x.``Val fields 02, compiled name ignored``() = x.DoNamedTest()
     [<Test>] member x.``Val fields 03, struct``() = x.DoNamedTest()
