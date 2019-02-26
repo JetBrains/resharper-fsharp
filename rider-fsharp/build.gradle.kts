@@ -17,13 +17,13 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath("com.jetbrains.rd:rd-gen:0.191.55")
+        classpath("com.jetbrains.rd:rd-gen:0.191.56")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.10")
     }
 }
 
 plugins {
-    id("org.jetbrains.intellij") version "0.3.9"
+    id("org.jetbrains.intellij") version "0.4.3"
     id("org.jetbrains.grammarkit") version "2018.1.7"
 }
 
@@ -72,6 +72,7 @@ intellij {
         version = "$baseVersion-SNAPSHOT"
     }
 
+    instrumentCode = false
     downloadSources = false
     updateSinceUntilBuild = false
 
