@@ -47,7 +47,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
         var typeParameters =
           ContainingMember is IFSharpTypeParametersOwner parametersOwner
-            ? parametersOwner.GetAllTypeParameters()
+            ? parametersOwner.AllTypeParameters
             : EmptyList<ITypeParameter>.Instance;
 
         return mfv.FullType.MapType(typeParameters, Module);

@@ -33,7 +33,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
         if (paramsCount == 0)
           return EmptyList<IParameter>.Instance;
 
-        var typeParameters = GetAllTypeParameters();
+        var typeParameters = AllTypeParameters;
         var methodParams = new List<IParameter>(paramsCount);
         foreach (var paramsGroup in mfvCurriedParams)
         foreach (var param in paramsGroup)
@@ -56,7 +56,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public override IType ReturnType =>
       Mfv?.ReturnParameter.Type is var returnType && returnType != null
-        ? returnType.MapType(GetAllTypeParameters(), Module, true, true) // todo: isFromMethod?
+        ? returnType.MapType(AllTypeParameters, Module, true, true) // todo: isFromMethod?
         : TypeFactory.CreateUnknownType(Module);
 
     public override bool Equals(object obj)

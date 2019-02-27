@@ -18,7 +18,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 
   public interface IFSharpTypeParametersOwner : IFSharpDeclaredElement
   {
-    IList<ITypeParameter> GetAllTypeParameters();
+    IList<ITypeParameter> AllTypeParameters { get; }
   }
 
   public interface IFSharpExtensionTypeMember : IFSharpTypeMember

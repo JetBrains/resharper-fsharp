@@ -34,23 +34,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       return typeParams;
     }
 
-    public override IList<ITypeParameter> GetAllTypeParameters()
+    public override IList<ITypeParameter> AllTypeParameters
     {
-      var mfvTypeParams = MfvParameters;
-      var mfvParametersCount = mfvTypeParams.Count;
-      if (mfvParametersCount == 0)
-        return EmptyList<ITypeParameter>.Instance;
+      get
+      {
+        var mfvTypeParams = MfvParameters;
+        var mfvParametersCount = mfvTypeParams.Count;
+        if (mfvParametersCount == 0)
+          return EmptyList<ITypeParameter>.Instance;
 
-      var outerTypeParameters = base.GetAllTypeParameters();
-      var outerTypeParametersCount = outerTypeParameters.Count;
+        var outerTypeParameters = base.AllTypeParameters;
+        var outerTypeParametersCount = outerTypeParameters.Count;
 
-      var typeParams = new ITypeParameter[mfvParametersCount];
-      for (var i = 0; i < outerTypeParametersCount; i++)
-        typeParams[i] = outerTypeParameters[i];
+        var typeParams = new ITypeParameter[mfvParametersCount];
+        for (var i = 0; i < outerTypeParametersCount; i++)
+          typeParams[i] = outerTypeParameters[i];
 
-      for (var i = outerTypeParametersCount; i < mfvParametersCount; i++)
-        typeParams[i] = new FSharpTypeParameterOfMethod(this, mfvTypeParams[i].Name, i - outerTypeParametersCount);
-      return typeParams;
+        for (var i = outerTypeParametersCount; i < mfvParametersCount; i++)
+          typeParams[i] = new FSharpTypeParameterOfMethod(this, mfvTypeParams[i].Name, i - outerTypeParametersCount);
+        return typeParams;
+      }
     }
 
     public override IList<ITypeParameter> TypeParameters => GetTypeParameters();
