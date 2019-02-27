@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
@@ -8,23 +7,17 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
 using JetBrains.Util.Extension;
-using Microsoft.FSharp.Core;
 using static Microsoft.FSharp.Compiler.PrettyNaming;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {
   public static class FSharpNamesUtil
   {
-    private const string ModuleSuffix = "Module";
-    private const int EscapedNameAffixLength = 4;
-    private const int EscapedNameStartIndex = 2;
-    private const int ModuleSuffixFlag = (int) CompilationRepresentationFlags.ModuleSuffix;
+    public const int EscapedNameAffixLength = 4;
+    public const int EscapedNameStartIndex = 2;
 
-    private static readonly ClrTypeName SourceNameAttributeAttr =
+    internal static readonly ClrTypeName SourceNameAttributeClrTypeName =
       new ClrTypeName("Microsoft.FSharp.Core.CompilationSourceNameAttribute");
-
-    private static readonly ClrTypeName CompilationRepresentationAttr =
-      new ClrTypeName("Microsoft.FSharp.Core.CompilationRepresentationAttribute");
 
     public static bool IsEscapedWithBackticks([NotNull] string name)
     {
@@ -34,7 +27,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     }
 
     [NotNull]
-    public static string RemoveBackticks([NotNull] this  string name) =>
+    public static string RemoveBackticks([NotNull] this string name) =>
       IsEscapedWithBackticks(name)
         ? name.Substring(EscapedNameStartIndex, name.Length - EscapedNameAffixLength)
         : name;
@@ -48,20 +41,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (element is IFSharpDeclaredElement fsDeclaredElement)
         names.Add(fsDeclaredElement.SourceName);
 
-      var typeElement = (element as IConstructor)?.GetContainingType();
-      if (typeElement != null)
+      if (element is IConstructor ctor && ctor.GetContainingType() is ITypeElement typeElement)
         GetPossibleSourceNames(typeElement, names);
 
       if (element is ITypeElement type)
         GetPossibleSourceNames(type, names);
 
       if (element is IAttributesOwner attrOwner)
-      {
-        if (GetAttributeValue(attrOwner, SourceNameAttributeAttr) is string sourceName)
+        if (GetAttributeValue(attrOwner, SourceNameAttributeClrTypeName) is string sourceName)
           names.Add(sourceName);
-        if (GetAttributeValue(attrOwner, CompilationRepresentationAttr) is int reprFlag && reprFlag == ModuleSuffixFlag)
-          names.Add(name.SubstringBeforeLast(ModuleSuffix, StringComparison.Ordinal));
-      }
 
       return names.SelectMany(n => new[] {n, $"``{n}``"});
     }
@@ -71,8 +59,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       names.Add(type.ShortName);
 
       var typeShortName = type.ShortName;
-      if (typeShortName.EndsWith(FSharpImplUtil.AttributeSuffix))
-        names.Add(typeShortName.SubstringBeforeLast(FSharpImplUtil.AttributeSuffix, StringComparison.Ordinal));
+      names.Add(typeShortName.SubstringBeforeLast(AttributeInstanceExtensions.ATTRIBUTE_SUFFIX));
+      names.Add(typeShortName.SubstringBeforeLast(FSharpImplUtil.ModuleSuffix));
 
       if (type.GetClrName().TryGetAbbreviations(out var abbreviations))
         names.AddRange(abbreviations);

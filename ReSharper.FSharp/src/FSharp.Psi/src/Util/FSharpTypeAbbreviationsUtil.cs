@@ -38,8 +38,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         {new ClrTypeName("System.Decimal"), new[] {"decimal"}},
 
         // Collections and other types
-        {new ClrTypeName("Microsoft.FSharp.Collections.FSharpList"), new[] {"list"}},
-        {new ClrTypeName("Microsoft.FSharp.Collections.FSharpOption"), new[] {"option"}}
+        {new ClrTypeName("Microsoft.FSharp.Collections.FSharpList`1"), new[] {"list"}},
+        {new ClrTypeName("Microsoft.FSharp.Collections.FSharpOption`1"), new[] {"option"}},
+        {new ClrTypeName("Microsoft.FSharp.Core.FSharpRef`1"), new[] {"ref"}},
       };
   }
 }
