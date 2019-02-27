@@ -22,10 +22,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.ParameterInfo
       isParamsArray = false;
     }
 
-    public RichTextBlock GetDescription()
-    {
-      throw new System.NotImplementedException();
-    }
+    public RichTextBlock GetDescription() => null;
 
     public virtual bool Matches(IDeclaredElement signature) => true;
 
