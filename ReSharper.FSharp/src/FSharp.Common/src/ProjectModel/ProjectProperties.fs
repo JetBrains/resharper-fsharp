@@ -8,6 +8,7 @@ open JetBrains.Metadata.Utils
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Impl.Build
 open JetBrains.ProjectModel.ProjectsHost
+open JetBrains.ProjectModel.ProjectsHost.Impl
 open JetBrains.ProjectModel.ProjectsHost.MsBuild.Diagnostic.Components
 open JetBrains.ProjectModel.Properties
 open JetBrains.ProjectModel.Properties.Common
@@ -84,11 +85,22 @@ type FSharpProjectApplicableProvider() =
             isFSharpProject projectMark.Location projectMark.TypeGuid
 
 
+[<ShellFeaturePart>]
+type FSharpProjectMarkTypeGuidProvider() =
+    inherit ProjectMarkTypeGuidProvider()
+
+    override x.IsApplicable(projectMark) =
+        projectMark.Location.ExtensionNoDot = FsprojExtension
+
+    override x.GetActualTypeGuid(projectMark) = fsProjectTypeGuid
+
+
 [<ProjectModelExtension>]
 type FSharpProjectPropertiesFactory() =
     inherit UnknownProjectPropertiesFactory()
 
     static let factoryGuid = Guid("{7B32A26D-3EC5-4A2A-B40C-EC79FF38A223}")
+    static let projectTypeGuids = [| fsProjectTypeGuid |]
 
     override x.FactoryGuid = factoryGuid
 
@@ -103,7 +115,7 @@ type FSharpProjectPropertiesFactory() =
                                 parameters.TargetPlatformData, parameters.DotNetCoreSDK) :> _
 
     static member CreateProjectProperties(targetFrameworkIds): IProjectProperties =
-        FSharpProjectProperties([|fsProjectTypeGuid|], factoryGuid, targetFrameworkIds, null, null) :> _
+        FSharpProjectProperties(projectTypeGuids, factoryGuid, targetFrameworkIds, null, null) :> _
 
     override x.Read(reader) =
         let projectProperties = FSharpProjectProperties(factoryGuid)
