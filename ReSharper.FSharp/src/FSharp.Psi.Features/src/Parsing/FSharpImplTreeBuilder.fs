@@ -177,8 +177,11 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                             match lid with
                             | [id] ->
                                 match valData with
-                                | SynValData(Some (flags),_,_) when flags.MemberKind = MemberKind.Constructor ->
+                                | SynValData(Some flags,_,selfId) when flags.MemberKind = MemberKind.Constructor ->
                                     x.ProcessParams(memberParams, true, true) // todo: should check isLocal
+                                    if selfId.IsSome then
+                                        x.ProcessLocalId(selfId.Value)
+
                                     x.MarkOtherExpr(expr)
                                     ElementType.CONSTRUCTOR_DECLARATION
                                 | _ ->
