@@ -62,9 +62,8 @@ type FSharpRenameTest() =
     [<Test>] member x.``Types - Enum 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Struct 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Interface 01``() = x.DoNamedTest()
-
-    [<Test>] member x.``Types - Exception 01``() = x.DoNamedTest() // todo: make upper case name
-
+    [<Test>] member x.``Types - Exception 01``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Abbreviations 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Active patterns - Local - Partial 01 - Decl``() = x.DoNamedTest()
     [<Test>] member x.``Active patterns - Local - Partial 02 - Pattern``() = x.DoNamedTest()
