@@ -1,12 +1,14 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
 open System
+open JetBrains.Application.Settings
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems.Impl
 open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Feature.Services.ParameterInfo
 open JetBrains.ReSharper.Host.Features.Completion
 open JetBrains.ReSharper.Plugins.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.Common.Checker.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
@@ -96,7 +98,12 @@ type FSharpLookupItem(item: FSharpDeclarationListItem, context: FSharpCodeComple
 
         let line = int context.Coords.Line + 1
         let parseTree = context.FSharpFile.ParseResults.Value.ParseTree.Value
-        let insertionPoint = OpenStatementInsertionPoint.Nearest
+        let insertionPoint =
+            let settings = context.BasicContext.ContextBoundSettingsStore
+            if settings.GetValue(fun (key: FSharpOptions) -> key.TopLevelOpenCompletion) then
+                OpenStatementInsertionPoint.TopLevel
+            else
+                OpenStatementInsertionPoint.Nearest
 
         let document = textControl.Document
         let context = ParsedInput.findNearestPointToInsertOpenDeclaration line parseTree [||] insertionPoint

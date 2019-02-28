@@ -11,7 +11,8 @@ open JetBrains.UI.RichText
 [<AutoOpen>]
 module FSharpOptions =
     let [<Literal>] backgroundTypeCheck = "Enable background type checking"  
-    let [<Literal>] outOfScopeCompletion = "Enable out of scope items completion"  
+    let [<Literal>] outOfScopeCompletion = "Enable out of scope items completion"
+    let [<Literal>] topLevelOpenCompletion = "Open namespaces at top-level when completing out of scope items"
 
 
 [<SettingsKey(typeof<HierarchySettings>, "FSharpOptions")>]
@@ -22,6 +23,9 @@ type FSharpOptions() =
     [<SettingsEntry(true, outOfScopeCompletion); DefaultValue>]
     val mutable EnableOutOfScopeCompletion: bool
 
+    [<SettingsEntry(true, topLevelOpenCompletion); DefaultValue>]
+    val mutable TopLevelOpenCompletion: bool
+
 
 [<OptionsPage("FSharpOptionsPage", "F#", typeof<ProjectModelThemedIcons.Fsharp>)>]
 type FSharpOptionsPage
@@ -31,3 +35,4 @@ type FSharpOptionsPage
     do
         this.AddBoolOption((fun (key: FSharpOptions) -> key.BackgroundTypeCheck), RichText(backgroundTypeCheck), null) |> ignore
         this.AddBoolOption((fun (key: FSharpOptions) -> key.EnableOutOfScopeCompletion), RichText(outOfScopeCompletion), null) |> ignore
+        this.AddBoolOption((fun (key: FSharpOptions) -> key.TopLevelOpenCompletion), RichText(topLevelOpenCompletion), null) |> ignore
