@@ -12,6 +12,7 @@ type DU = DU
             sprintf "|%A|(2)"
         override __.ToString() = 
             sprintf "|%d|(3)" 1
+
 ---------------------------------------------------------
 (0): ReSharper Format String Item: 
 (1): ReSharper Format String Item: 

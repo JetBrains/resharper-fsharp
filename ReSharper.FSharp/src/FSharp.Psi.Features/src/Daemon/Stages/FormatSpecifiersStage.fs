@@ -36,7 +36,3 @@ type FormatSpecifiersStage(daemonProcess, errors) =
 
     override x.CreateStageProcess(fsFile: IFSharpFile, _, daemonProcess: IDaemonProcess) =
         FormatSpecifiersStageProcess(fsFile, daemonProcess) :> _
-        
-
-
-

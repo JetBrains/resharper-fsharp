@@ -2,7 +2,6 @@
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
@@ -15,7 +14,7 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  public abstract class FSharpTypePart<T> : TypePartImplBase<T>, IFSharpTypePart 
+  public abstract class FSharpTypePart<T> : TypePartImplBase<T>, IFSharpTypePart
     where T : class, IFSharpTypeElementDeclaration
   {
     public override ExtensionMethodInfo[] ExtensionMethodInfos { get; } = EmptyArray<ExtensionMethodInfo>.Instance;
@@ -44,6 +43,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
         var offset = member.GetTreeStartOffset().Offset;
         methods.Add(new ExtensionMethodInfo(AnyCandidateType.INSTANCE, offset, member.DeclaredName) {Owner = this});
       }
+
       ExtensionMethodInfos = methods.ToArray();
     }
 
@@ -61,6 +61,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
           if (memberDeclaration.DeclaredElement is IMethod method)
             result = result.Add(method);
         }
+
       return result;
     }
 
@@ -89,16 +90,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
         info.Write(writer);
     }
 
-    protected override ICachedDeclaration2 FindDeclaration(IFile file, ICachedDeclaration2 candidateDeclaration)
-    {
-      if (Offset < TreeOffset.Zero) return null;
-      if (candidateDeclaration is T) return candidateDeclaration;
-      return null;
-    }
+    protected override ICachedDeclaration2 FindDeclaration(IFile file, ICachedDeclaration2 candidateDeclaration) =>
+      Offset >= TreeOffset.Zero && candidateDeclaration is T
+        ? candidateDeclaration
+        : null;
 
     public override string[] ExtendsListShortNames => EmptyArray<string>.Instance;
     public override MemberDecoration Modifiers { get; }
-    public override bool CanBePartial => true; // workaround for F# signatures
+
+    /// All F# elements currently considered partial.
+    /// This is as an easy way to support signatures, type extensions and virtual members. 
+    public override bool CanBePartial => true;
 
     public override IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName)
     {
@@ -118,17 +120,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       return entity?.Attributes.HasAttributeInstance(clrTypeName.FullName) ?? false;
     }
 
-    public override IList<IAttributeInstance> GetTypeParameterAttributeInstances(int index, IClrTypeName typeName)
-    {
-      // todo
-      return EmptyList<IAttributeInstance>.Instance;
-    }
+    public override IList<IAttributeInstance> GetTypeParameterAttributeInstances(int index, IClrTypeName typeName) =>
+      EmptyList<IAttributeInstance>.Instance; // todo
 
-    public override bool HasTypeParameterAttributeInstance(int index, IClrTypeName typeName)
-    {
-      // todo
-      return false;
-    }
+    public override bool HasTypeParameterAttributeInstance(int index, IClrTypeName typeName) =>
+      false; // todo
 
     public override string[] AttributeClassNames { get; }
 

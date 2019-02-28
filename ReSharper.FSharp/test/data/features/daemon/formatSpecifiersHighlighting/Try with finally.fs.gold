@@ -8,6 +8,7 @@ try
         printf "foo |%i|(2) bar" 0
 with _ ->
     failwithf "foo |%d|(3) bar" 0
+
 ---------------------------------------------------------
 (0): ReSharper Format String Item: 
 (1): ReSharper Format String Item: 

@@ -112,7 +112,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       }
 
       if (isFromReturn && type.IsUnit)
-      return psiModule.GetPredefinedType().Void;
+        return psiModule.GetPredefinedType().Void;
 
       if (type.IsGenericParameter)
         return GetTypeParameterByName(type, typeParams, psiModule);

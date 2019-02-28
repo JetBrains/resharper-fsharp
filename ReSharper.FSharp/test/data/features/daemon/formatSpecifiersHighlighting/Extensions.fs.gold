@@ -3,5 +3,6 @@
 type System.Object with
     member __.M1 = 
         sprintf "|%A|(0)" 
+
 ---------------------------------------------------------
 (0): ReSharper Format String Item: 

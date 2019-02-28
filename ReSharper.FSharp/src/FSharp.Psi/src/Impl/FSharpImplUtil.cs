@@ -118,7 +118,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       if (identifier is IFSharpIdentifier fsIdentifier &&
           fsIdentifier.IdentifierToken?.GetTokenType() == FSharpTokenType.SYMBOLIC_OP)
         return PrettyNaming.CompileOpName.Invoke(name);
-      
+
       return name;
     }
 
@@ -162,6 +162,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         names.Add(id.GetText().RemoveBackticks());
         if (id == token) break;
       }
+
       return names.ToArray();
     }
 
@@ -181,6 +182,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         if (namespaceDeclaration != null)
           clrName.Append(namespaceDeclaration.QualifiedName).Append('.');
       }
+
       clrName.Append(declaration.CompiledName);
 
       var typeDeclaration = declaration as IFSharpTypeDeclaration;
@@ -209,6 +211,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         Logger.LogMessage(LoggingLevel.WARN, "Couldn't get CompiledName attribute value:");
         Logger.LogExceptionSilently(e);
       }
+
       return SharedImplUtil.MISSING_DECLARATION_NAME;
     }
 
@@ -216,7 +219,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     {
       var fileExtension = sourceFile?.GetLocation().ExtensionNoDot;
       if (fileExtension == "fsi" || fileExtension == "mli")
-          return FSharpFileKind.SigFile;
+        return FSharpFileKind.SigFile;
 
       return FSharpFileKind.ImplFile;
     }
@@ -283,7 +286,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
       return typeElement.ShortName;
     }
-    
+
     public static AccessRights GetFSharpRepresentationAccessRights([CanBeNull] this TypeElement typeElement)
     {
       if (typeElement == null)
