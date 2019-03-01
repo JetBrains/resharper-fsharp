@@ -92,13 +92,15 @@ type FSharpRenameHelper() =
 
     override x.GetInitialPage(workflow) =
         let dataModel = workflow.RenameDataModel
-        let declaredElement = dataModel.InitialDeclaredElement
-
-        match declaredElement.As<IFSharpDeclaredElement>() with
-        | null -> failwithf "Got declared element: %O" declaredElement
-        | fsDeclaredElement ->
+        match dataModel.InitialDeclaredElement with
+        | null -> null
+        | element ->
 
         dataModel.InitialName <-
+            match element.As<IFSharpDeclaredElement>() with
+            | null -> element.ShortName
+            | fsDeclaredElement ->
+
             match workflow.FSharpChangeNameKind with
             | ChangeNameKind.SourceName
             | ChangeNameKind.UseSingleName -> fsDeclaredElement.SourceName
