@@ -1,0 +1,8 @@
+﻿module Module
+
+type zzz() =
+    class
+    end
+
+let t1 = zzz()
+let t2 = zzz()

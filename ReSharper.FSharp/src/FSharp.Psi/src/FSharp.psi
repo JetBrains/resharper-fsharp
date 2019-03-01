@@ -144,10 +144,12 @@ localBinding:
 interface synPat:
   namedPat |
   typedPat |
+  attribPat |
   orPat |
   andsPat |
-  longIdentPat | // Used for functions, union cases, active patterns and `::` with wrong ranges order.
-  listPat |      // We currently use it for tuples, lists and arrays.
+  longIdentPat | // Used for functions, union cases, active patterns.
+  tuplePat |
+  arrayOrListPat |
   parenPat |
   recordPat |
   optionalValPat |
@@ -163,6 +165,10 @@ interface namedPat:
 interface longIdentPat:
   topLongIdentPat |
   localLongIdentPat;
+
+interface arrayOrListPat:
+  arrayPat |
+  listPat;
 
 topNamedPat options { stubBase="TopPatternDeclarationBase"; }:
   synPat<PATTERN, Pattern>?
@@ -190,6 +196,11 @@ typedPat options { stubBase="SynPatternBase"; }:
   COLON
   synType;
 
+attribPat options { stubBase="SynPatternBase"; }:
+  fSharpAttribute<ATTRIBUTE, Attributes>*
+  synPat<PATTERN, Pattern>
+  fakeSeparator;
+
 orPat options { stubBase="SynPatternBase"; }:
   synPat<PATTERN1, Pattern1>
   BAR
@@ -200,7 +211,17 @@ andsPat options { stubBase="SynPatternBase"; }:
   AMP
   synPat<PATTERN2, Pattern2>;
 
+arrayPat options { stubBase="SynPatternBase"; }:
+  LBRACK_BAR
+  synPat<ATTRIBUTE, Patterns>*
+  LBRACK_BAR;
+
 listPat options { stubBase="SynPatternBase"; }:
+  LBRACK
+  synPat<ATTRIBUTE, Patterns>*
+  RBRACK;
+
+tuplePat options { stubBase="SynPatternBase"; }:
   synPat<ATTRIBUTE, Patterns>*;
 
 parenPat options { stubBase="SynPatternBase"; }:
@@ -209,8 +230,10 @@ parenPat options { stubBase="SynPatternBase"; }:
   RPAREN;
 
 recordPat options { stubBase="SynPatternBase"; }:
+  LBRACE
   synPat<ATTRIBUTE, Patterns>*
-  fakeSeparator;
+  fakeSeparator
+  RBRACE;
 
 optionalValPat options { stubBase="SynPatternBase"; }:
   QMARK
@@ -237,6 +260,9 @@ interface synExpr:
   tupleExpr |
   arrayOrListExpr |
   recordExpr |
+  objExpr |
+  identExpr |
+  longIdentExpr |
   setExpr |
   typeTestExpr |
   castExpr |
@@ -260,11 +286,13 @@ arrayOrListExpr options { stubBase="DummyExpression"; }:
   fakeSeparator;
 
 recordExpr options { stubBase="DummyExpression"; }:
+  LBRACE
   (
     synExpr<COPY_INFO, CopyInfo>
     WITH
   )?
-  recordExprBinding<BINDING, ExprBindings>*;
+  recordExprBinding<BINDING, ExprBindings>*
+  RBRACE;
 
 
 recordExprBinding:
@@ -272,6 +300,14 @@ recordExprBinding:
   EQUALS
   synExpr<EXPR, Expression>
   SEMICOLON?;
+
+objExpr options { stubBase="TypeExpressionBase"; }:
+  namedTypeExpression<BASE_TYPE, BaseType>
+  fakeSeparator;
+
+objExprSecondaryInterface options { stubBase="TypeExpressionBase"; }:
+  namedTypeExpression<BASE_TYPE, BaseType>
+  fakeSeparator;
 
 longIdentSetExpr options { stubBase="DummyExpression"; }:
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>
@@ -284,6 +320,11 @@ dotSetExpr options { stubBase="DummyExpression"; }:
   LARROW<LARROW, LArrow>
   synExpr<EXPR2, RightExpr>;
 
+identExpr options { stubBase="TypeExpressionBase"; }:
+  identOrOpName{IDENTIFIER, Identifier};
+
+longIdentExpr options { stubBase="TypeExpressionBase"; }:
+  longIdentifier<LONG_IDENTIFIER, LongIdentifier>;
 
 matchClause options { stubBase="DummyExpression"; }:
   fakeSeparator;
@@ -557,9 +598,8 @@ delegateDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } ext
 interface fSharpTypeMemberDeclaration:
   implicitConstructorDeclaration |
   constructorDeclaration |
-  typeInherit |
+  inheritMember |
   interfaceImplementation |
-  interfaceInherit |
   abstractSlot |
   memberDeclaration |
   typeLetBindings |
@@ -569,8 +609,15 @@ interface fSharpTypeMemberDeclaration:
 
   otherTypeMember;
 
+interface inheritMember:
+  typeInherit |
+  interfaceInherit;
+
 interfaceInherit: namedTypeExpression<INTERFACE_TYPE, InterfaceType>;
-typeInherit: namedTypeExpression<BASE_TYPE, BaseType>;
+
+typeInherit options { stubBase="TypeExpressionBase"; }:
+  INHERIT
+  namedTypeExpression<BASE_TYPE, BaseType>;
 
 interfaceImplementation options { stubBase="FSharpDeclarationBase"; }:
   namedTypeExpression<INTERFACE_TYPE, InterfaceType>
@@ -717,7 +764,7 @@ private modifier{ROLE,Getter}:
 
 // Attributes
 
-fSharpAttribute options { stubBase="DummyExpression"; }:
+fSharpAttribute options { stubBase="TypeExpressionBase"; }:
   longIdentifier<IDENTIFIER, LongIdentifier>
   argExpression<ARG_EXPRESSION, ArgExpression>
 ;

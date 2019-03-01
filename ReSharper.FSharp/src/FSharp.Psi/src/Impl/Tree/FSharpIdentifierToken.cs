@@ -2,14 +2,15 @@
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
+using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  public class FSharpIdentifierToken : FSharpToken, IFSharpIdentifier
+  public class FSharpIdentifierToken : FSharpToken, IFSharpIdentifier, IReferenceExpression
   {
-    public FSharpSymbolReference SymbolReference;
+    public FSharpSymbolReference Reference { get; set; }
 
     public FSharpIdentifierToken(NodeType nodeType, string text) : base(nodeType, text)
     {
@@ -22,13 +23,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     protected override void PreInit()
     {
       base.PreInit();
-      SymbolReference = new FSharpSymbolReference(this);
+      Reference = new FSharpSymbolReference(this);
     }
 
     public override ReferenceCollection GetFirstClassReferences() =>
-      new ReferenceCollection(SymbolReference);
+      new ReferenceCollection(Reference);
 
     public string Name => GetText().RemoveBackticks();
+
     public ITokenNode IdentifierToken => this;
+
+    IReferenceExpression IReferenceExpression.SetName(string name)
+    {
+      var newToken = new FSharpIdentifierToken(name);
+      LowLevelModificationUtil.ReplaceChildRange(this, this, newToken);
+      return newToken;
+    }
   }
 }

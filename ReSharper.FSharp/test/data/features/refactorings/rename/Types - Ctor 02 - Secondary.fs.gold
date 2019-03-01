@@ -1,0 +1,8 @@
+﻿module Module
+
+type zzz(a: int) =
+    new() = zzz(123)
+
+let t1 = zzz()
+let t2 = zzz(123)
+let t3 = zzz(123)

@@ -1,5 +1,4 @@
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
@@ -13,21 +12,26 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
-  public class FSharpSymbolReference : TreeReferenceBase<FSharpIdentifierToken>
+  public class FSharpSymbolReference : TreeReferenceBase<IReferenceExpression>
   {
-    public FSharpSymbolReference([NotNull] FSharpIdentifierToken owner) : base(owner)
+    public FSharpSymbolReference([NotNull] IReferenceExpression owner) : base(owner)
     {
     }
 
     public FSharpSymbolUse GetSymbolUse() =>
-      (myOwner.GetContainingFile() as IFSharpFile)?.GetSymbolUse(myOwner.GetTreeStartOffset().Offset);
+      myOwner.IdentifierToken is var token && token != null
+        ? myOwner.FSharpFile.GetSymbolUse(token.GetTreeStartOffset().Offset)
+        : null;
+
+    public virtual FSharpSymbol GetFSharpSymbol() =>
+      GetSymbolUse()?.Symbol;
 
     public override ResolveResultWithInfo ResolveWithoutCache()
     {
       if (!myOwner.IsValid())
         return ResolveResultWithInfo.Ignore;
 
-      var symbol = GetSymbolUse()?.Symbol;
+      var symbol = GetFSharpSymbol();
       var element = symbol != null
         ? FSharpElementsUtil.GetDeclaredElement(symbol, myOwner.GetPsiModule(), myOwner)
         : null;
@@ -37,13 +41,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         : ResolveResultWithInfo.Ignore;
     }
 
-    public override string GetName() => myOwner.GetText();
+    public override string GetName() =>
+      myOwner.IdentifierToken?.GetText() ??
+      SharedImplUtil.MISSING_DECLARATION_NAME;
 
     public override bool IsValid() =>
-      base.IsValid() && myOwner.SymbolReference == this;
+      base.IsValid() && myOwner.Reference == this;
 
     public override TreeTextRange GetTreeTextRange() =>
-      myOwner.GetTreeTextRange();
+      myOwner.IdentifierToken?.GetTreeTextRange() ??
+      TreeTextRange.InvalidRange;
 
     public override IAccessContext GetAccessContext() =>
       new DefaultAccessContext(myOwner);
@@ -54,25 +61,32 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       if (!(element is IFSharpDeclaredElement fsElement))
         return this;
 
+      var sourceName = fsElement.SourceName;
+      if (sourceName == SharedImplUtil.MISSING_DECLARATION_NAME)
+        return this;
+
+      var newName = UpdateName(sourceName);
+
+      // todo: replace ident but don't initialize it with this reference, update owner expression
       using (WriteLockCookie.Create(myOwner.IsPhysical()))
       {
-        var name = NamingManager.GetNamingLanguageService(myOwner.Language).MangleNameIfNecessary(fsElement.SourceName);
-        var newToken = new FSharpIdentifierToken(name);
-        LowLevelModificationUtil.ReplaceChildRange(myOwner, myOwner, newToken);
-        var newReference = new FSharpSymbolReference(newToken);
+        var name = NamingManager.GetNamingLanguageService(myOwner.Language).MangleNameIfNecessary(newName);
+        var newExpression = myOwner.SetName(name);
+        var newReference = newExpression.Reference;
 
         // We have to change the reference so it resolves to the new element.
         // We don't, however, want to actually resolve it and to wait for FCS to type check all the needed projects
         // so we set a fake resolve result beforehand.
         ResolveUtil.SetFakedResolveTo(newReference, element, null);
-        newToken.SymbolReference = newReference;
         return newReference;
       }
     }
 
+    protected virtual string UpdateName([NotNull] string name) => name;
+
     public override IReference BindTo(IDeclaredElement element, ISubstitution substitution)
     {
-      // Not yet supported (called during refactorings).
+      // No actual binding, not supported yet.
       return this;
     }
 

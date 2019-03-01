@@ -57,8 +57,15 @@ type FSharpLanguageService
         | null -> ReferenceAccessType.OTHER
         | symbolReference ->
 
-        let referenceToken = symbolReference.GetElement() :> ITokenNode
-        match referenceToken.GetContainingNode<ISetExpr>() with
+        match symbolReference.GetElement().As<IReferenceExpression>() with
+        | null -> ReferenceAccessType.OTHER
+        | referenceExpression ->
+
+        match referenceExpression.IdentifierToken with
+        | null -> ReferenceAccessType.OTHER
+        | referenceToken ->
+
+        match referenceExpression.GetContainingNode<ISetExpr>() with
         | null -> ReferenceAccessType.OTHER
         | setExpr ->
 

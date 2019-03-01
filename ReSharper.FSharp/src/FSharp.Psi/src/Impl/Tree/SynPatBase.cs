@@ -41,8 +41,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
           return true;
 
         // todo: add check for lid.Length > 1
-        var offsetOffset = GetNameIdentifierRange().StartOffset.Offset;
-        return Parameters.IsEmpty && FSharpFile.GetSymbolUse(offsetOffset) == null;
+        var idOffset = GetNameIdentifierRange().StartOffset.Offset;
+        return Parameters.IsEmpty && FSharpFile.GetSymbolUse(idOffset) == null;
       }
     }
 
@@ -81,13 +81,31 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         : Parameters.SelectMany(param => param.Declarations);
   }
 
+  internal partial class ArrayPat
+  {
+    public override IEnumerable<IDeclaration> Declarations =>
+      Patterns.SelectMany(pat => pat.Declarations);
+  }
+
   internal partial class ListPat
   {
     public override IEnumerable<IDeclaration> Declarations =>
       Patterns.SelectMany(pat => pat.Declarations);
   }
 
+  internal partial class TuplePat
+  {
+    public override IEnumerable<IDeclaration> Declarations =>
+      Patterns.SelectMany(pat => pat.Declarations);
+  }
+
   internal partial class ParenPat
+  {
+    public override IEnumerable<IDeclaration> Declarations =>
+      Pattern.Declarations;
+  }
+
+  internal partial class AttribPat
   {
     public override IEnumerable<IDeclaration> Declarations =>
       Pattern.Declarations;
@@ -103,12 +121,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     public override IEnumerable<IDeclaration> Declarations =>
       Pattern.Declarations;
-  }
-
-  internal partial class IsInstPat
-  {
-    public override IEnumerable<IDeclaration> Declarations =>
-      EmptyList<IDeclaration>.Instance;
   }
 
   internal partial class TypedPat

@@ -1,11 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
@@ -85,7 +84,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
     [CanBeNull]
     public static IDeclaredElement GetDeclaredElement([CanBeNull] FSharpSymbol symbol,
-      [NotNull] IPsiModule psiModule, [CanBeNull] FSharpIdentifierToken referenceOwnerToken = null)
+      [NotNull] IPsiModule psiModule, [CanBeNull] IReferenceExpression referenceExpression = null)
     {
       if (symbol == null)
         return null;
@@ -107,7 +106,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
         if (!mfv.IsModuleValueOrMember)
         {
-          var declaration = FindNode<IFSharpDeclaration>(mfv.DeclarationLocation, referenceOwnerToken);
+          var declaration = FindNode<IFSharpDeclaration>(mfv.DeclarationLocation, referenceExpression);
           if (declaration is IFSharpLocalDeclaration localDeclaration)
             return localDeclaration;
 
@@ -119,8 +118,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         var memberEntity = mfv.IsModuleValueOrMember ? mfv.DeclaringEntity : null;
         if (memberEntity == null) return null;
 
-        if (mfv.IsImplicitConstructor)
-          return GetDeclaredElement(memberEntity.Value, psiModule, referenceOwnerToken);
+        if (mfv.IsConstructor && mfv.DeclaringEntity?.Value is FSharpEntity ctorEntity && ctorEntity.IsProvided)
+          return GetDeclaredElement(memberEntity.Value, psiModule, referenceExpression);
 
         var typeElement = GetTypeElement(memberEntity.Value, psiModule);
         if (typeElement == null) return null;
@@ -176,20 +175,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       // find active pattern entity/member. if it's compiled use wrapper. if it's source defined find actual element
       if (symbol is FSharpActivePatternCase activePatternCase)
-        return GetActivePatternCaseElement(activePatternCase, psiModule, referenceOwnerToken);
+        return GetActivePatternCaseElement(activePatternCase, psiModule, referenceExpression);
 
       return null;
     }
 
     public static IDeclaredElement GetActivePatternCaseElement([NotNull] FSharpActivePatternCase activePatternCase,
-      [NotNull] IPsiModule psiModule, [CanBeNull] FSharpIdentifierToken referenceOwnerToken)
+      [NotNull] IPsiModule psiModule, [CanBeNull] IReferenceExpression referenceOwnerToken)
     {
       var declaration = GetActivePatternDeclaration(activePatternCase, psiModule, referenceOwnerToken);
       return declaration?.GetActivePatternByIndex(activePatternCase.Index);
     }
 
     private static IFSharpDeclaration GetActivePatternDeclaration([NotNull] FSharpActivePatternCase activePatternCase,
-      [NotNull] IPsiModule psiModule, FSharpIdentifierToken referenceOwnerToken)
+      [NotNull] IPsiModule psiModule, IReferenceExpression referenceOwnerToken)
     {
       var activePattern = activePatternCase.Group;
       var declaringEntity = activePattern.DeclaringEntity?.Value;

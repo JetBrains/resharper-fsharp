@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
@@ -15,17 +16,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       NodeType = nodeType;
       myText = text;
     }
-    
+
     public override NodeType NodeType { get; }
     private readonly string myText;
-    
+
     public override string GetText() => myText;
     public override int GetTextLength() => myText.Length;
   }
-  
+
   public abstract class FSharpTokenBase : LeafElementBase, IFSharpTreeNode, ITokenNode
   {
-    
     public override PsiLanguageType Language => FSharpLanguage.Instance;
     public TokenNodeType GetTokenType() => (TokenNodeType) NodeType;
 
@@ -47,5 +47,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public virtual TResult Accept<TContext, TResult>(TreeNodeVisitor<TContext, TResult> visitor, TContext context) =>
       visitor.VisitNode(this, context);
+
+    public IFSharpFile FSharpFile =>
+      (this.GetContainingFile() as IFSharpFile).NotNull("FSharpFile != null");
   }
 }

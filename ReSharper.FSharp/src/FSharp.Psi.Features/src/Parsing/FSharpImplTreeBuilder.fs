@@ -313,6 +313,11 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
             | SynPat.Wild _ ->
                 ElementType.WILD_PAT
 
+            | SynPat.Attrib (pat, attrs, _) ->
+                x.ProcessAttributes(attrs)
+                x.ProcessPat(pat, isLocal, false)
+                ElementType.ATTRIB_PAT
+
             | _ ->
                 ElementType.OTHER_PAT
 
@@ -410,7 +415,8 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
             x.ProcessSynType(t)
             x.ProcessLocalExpression(expr)
 
-        | SynExpr.ObjExpr(t,args,bindings,interfaceImpls,_,_) ->
+        | SynExpr.ObjExpr(t,args,bindings,interfaceImpls,_,range) ->
+            let mark = x.Mark(range)
             x.ProcessSynType(t)
             match args with
             | Some (expr,_) -> x.ProcessLocalExpression(expr)
@@ -419,8 +425,14 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
             for b in bindings do
                 x.ProcessBinding(b, true)
 
-            for InterfaceImpl(_,bindings,_) in interfaceImpls do
-                for b in bindings do x.ProcessBinding(b, true) // todo: it looks weird, add tests
+            for InterfaceImpl(interfaceType,bindings,range) in interfaceImpls do
+                let mark = x.Mark(range)
+                x.ProcessSynType(interfaceType)
+                for b in bindings do
+                    x.ProcessBinding(b, true)
+                x.Done(range, mark, ElementType.OBJ_EXPR_SECONDARY_INTERFACE)
+
+            x.Done(range, mark, ElementType.OBJ_EXPR)
 
         | SynExpr.While(_,whileExpr,doExpr,_) ->
             x.ProcessLocalExpression whileExpr
@@ -487,8 +499,13 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
             if elseExprOpt.IsSome then
                 x.ProcessLocalExpression elseExprOpt.Value
 
-        | SynExpr.Ident(_)
-        | SynExpr.LongIdent(_) -> ()
+        | SynExpr.Ident(IdentRange range) ->
+            x.MarkAndDone(range, ElementType.IDENT_EXPR)
+
+        | SynExpr.LongIdent(_,lid,_,range) ->
+            let mark = x.Mark(range)
+            x.ProcessLongIdentifier(lid.Lid)
+            x.Done(range, mark, ElementType.LONG_IDENT_EXPR)
 
         | SynExpr.LongIdentSet(lid,expr,range) ->
             let mark = x.Mark(range)

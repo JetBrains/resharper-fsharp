@@ -1,0 +1,17 @@
+﻿//${NEW_NAME:BarAttribute}
+module Module
+
+type AAttribute() =
+    inherit Attribute()
+
+ 
+type BarAttribute() =
+    class
+    end
+ 
+let foo: BarAttribute = BarAttribute()
+ 
+[<A; Bar>]
+let q =
+    let [<Bar>] qwe = 123
+    1

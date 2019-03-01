@@ -1,0 +1,15 @@
+﻿module Module
+
+type zzz() =
+    abstract M: int
+    default x.M = 123
+
+let t1 = {
+    new zzz() with
+        override x.M = 234
+}
+
+let t2 = {
+    new zzz() with
+        override x.M = 234
+}

@@ -53,6 +53,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public virtual TReturn Accept<TContext, TReturn>(TreeNodeVisitor<TContext, TReturn> visitor, TContext context) =>
       visitor.VisitNode(this, context);
 
+    [NotNull] public IFSharpFile FSharpFile => (IFSharpFile) this;
     [NotNull] public IPsiSourceFile SourceFile => GetSourceFile().NotNull("sourceFile != null");
   }
 }
