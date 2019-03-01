@@ -13,6 +13,7 @@
     <Compile Include="SymbolCacheTest.fs" />
     <Compile Include="ErrorsHighlightingTest.fs" />
     <Compile Include="IdentifierHighlightingTest.fs" />
+    <Compile Include="FormatSpecifiersHighlightingTest.fs" />
     <Compile Include="DelegatingFileSystemShimTest.fs" />
     <Compile Include="FSharpLexerTest.fs" />
     <Compile Include="Stubs.fs" />

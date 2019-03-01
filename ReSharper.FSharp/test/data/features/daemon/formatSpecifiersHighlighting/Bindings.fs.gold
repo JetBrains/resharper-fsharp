@@ -1,0 +1,11 @@
+﻿module Module
+
+let _ = printfn ""
+let _ = printfn "|%s|(0) |%s|(1)"
+do printfn "|%6d|(2) |%%|(3)  |% 06d|(4)" 1 2
+---------------------------------------------------------
+(0): ReSharper Format String Item: 
+(1): ReSharper Format String Item: 
+(2): ReSharper Format String Item: 
+(3): ReSharper Format String Item: 
+(4): ReSharper Format String Item: 
