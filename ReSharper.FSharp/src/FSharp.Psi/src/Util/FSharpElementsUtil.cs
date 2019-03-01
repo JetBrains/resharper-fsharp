@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -177,7 +177,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (symbol is FSharpActivePatternCase activePatternCase)
         return GetActivePatternCaseElement(activePatternCase, psiModule, referenceExpression);
 
+      if (symbol is FSharpGenericParameter parameter)
+        return GetTypeParameter(parameter, referenceExpression);
+
       return null;
+    }
+
+    [CanBeNull]
+    private static ITypeParameter GetTypeParameter([NotNull] FSharpGenericParameter parameter,
+      [CanBeNull] IReferenceExpression referenceOwnerToken = null)
+    {
+      var containingMemberDeclaration = referenceOwnerToken?.GetContainingNode<ITypeMemberDeclaration>();
+      if (!(containingMemberDeclaration?.DeclaredElement is IFSharpTypeParametersOwner containingMember))
+        return null;
+
+      var parameterName = parameter.Name;
+      var typeParameter = containingMember.AllTypeParameters.FirstOrDefault(param => param.ShortName == parameterName);
+     return typeParameter;
     }
 
     public static IDeclaredElement GetActivePatternCaseElement([NotNull] FSharpActivePatternCase activePatternCase,

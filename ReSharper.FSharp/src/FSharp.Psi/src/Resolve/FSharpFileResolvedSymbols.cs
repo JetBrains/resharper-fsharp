@@ -176,6 +176,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
             continue;
 
           var nameRange = FixRange(startOffset, endOffset, mfv?.LogicalName, buffer, fsFile);
+          startOffset = nameRange.StartOffset;
+
+          // Type parameters always reported with ItemOccurence.UseInType, even in declarations.
+          if (symbol is FSharpGenericParameter)
+            startOffset += 1;
 
           // workaround for implicit type usages (e.g. in members with optional params), visualfsharp#3933
           if (symbol is FSharpEntity &&
@@ -183,7 +188,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
             continue;
 
           if (!resolvedSymbols.Declarations.ContainsKey(startOffset))
-            resolvedSymbols.Uses[nameRange.StartOffset] = new FSharpResolvedSymbolUse(symbolUse, nameRange);
+            resolvedSymbols.Uses[startOffset] = new FSharpResolvedSymbolUse(symbolUse, nameRange);
         }
 
         interruptChecker.CheckForInterrupt();
