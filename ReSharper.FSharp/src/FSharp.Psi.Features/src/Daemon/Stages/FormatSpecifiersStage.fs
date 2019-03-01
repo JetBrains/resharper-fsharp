@@ -30,7 +30,7 @@ type FormatSpecifiersStageProcess(fsFile: IFSharpFile, daemonProcess) =
             committer.Invoke(DaemonStageResult(highlightings))    
         | _ -> ()
 
-[<DaemonStage(StagesBefore = [| typeof<UnusedOpensStage> |], StagesAfter = [| typeof<HighlightIdentifiersStage> |])>]
+[<DaemonStage(StagesBefore = [| typeof<HighlightIdentifiersStage> |], StagesAfter = [| typeof<UnusedOpensStage> |])>]
 type FormatSpecifiersStage(daemonProcess, errors) =
     inherit FSharpDaemonStageBase()
 
