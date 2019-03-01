@@ -1,8 +1,8 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Search
 
 open JetBrains.ProjectModel
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Finder

@@ -1,7 +1,7 @@
 ﻿using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 
-namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
+namespace JetBrains.ReSharper.Plugins.FSharp
 {
   [ProjectFileTypeDefinition(Name)]
   public class FSharpScriptProjectFileType : FSharpProjectFileType
@@ -25,6 +25,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
     {
     }
 
-    public override BuildAction DefaultBuildAction => BuildAction.NONE;
+    public override BuildAction GetDefaultBuildAction(string extension) => BuildAction.NONE;
   }
 }

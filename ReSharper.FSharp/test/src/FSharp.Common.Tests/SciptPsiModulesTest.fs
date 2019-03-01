@@ -11,16 +11,16 @@ open JetBrains.ProjectModel
 open JetBrains.ProjectModel.BuildTools
 open JetBrains.ProjectModel.ProjectsHost.SolutionHost
 open JetBrains.ProjectModel.ProjectsHost.SolutionHost.Impl
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ProjectStructure
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
+open JetBrains.ReSharper.TestFramework.Components.SolutionToolset
 open JetBrains.TestFramework
 open JetBrains.TestFramework.Projects
-open JetBrains.ReSharper.TestFramework.Components.SolutionToolset
 open NUnit.Framework
 
 type ScriptPsiModulesTest() =

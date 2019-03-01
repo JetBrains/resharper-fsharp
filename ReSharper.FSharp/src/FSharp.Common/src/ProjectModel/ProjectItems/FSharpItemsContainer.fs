@@ -1177,11 +1177,11 @@ type FSharpModificationSettingsProvider() =
 
 //[<SolutionInstanceComponent>]
 type FSharpBuildActionsProvider() =
+    inherit MsBuildDefaultBuildActionsProvider()
+
     let buildActions =
         [| BuildActions.compileBefore
            BuildActions.compileAfter |]
     
-    interface IMsBuildDefaultBuildActionsProvider with
-        member x.IsApplicable(projectProperties) = projectProperties :? FSharpProjectProperties
-        member x.DefaultBuildActions = buildActions :> _
-        member x.IsAllowed(_) = false
+    override x.DefaultBuildActions = buildActions :> _
+    override x.IsApplicable(projectProperties) = projectProperties :? FSharpProjectProperties

@@ -42,7 +42,7 @@ type TestWithTwoProjects() =
         x.CreateProjectDescriptor(targetFrameworkId, name, [| filePath |], libs, guid)
 
     override x.DoTestSolution([<ParamArray>] names: string[]) =
-        let baseFilePath = x.TestDataPath2 / x.TestName
+        let baseFilePath = x.TestDataPath / x.TestName
         let mainFile = baseFilePath.ChangeExtension(x.MainFileExtension)
         let secondFile = baseFilePath.ChangeExtension(x.SecondFileExtension)
 

@@ -2,7 +2,7 @@
 using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 
-namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
+namespace JetBrains.ReSharper.Plugins.FSharp
 {
   [ProjectFileTypeDefinition(Name)]
   public class FSharpProjectFileType : KnownProjectFileType
@@ -30,8 +30,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
     }
 
     protected FSharpProjectFileType(string name, string presentableName, IEnumerable<string> extensions)
-      : base(name, presentableName, extensions) { }
-    
-    public override BuildAction DefaultBuildAction => BuildAction.COMPILE;
+      : base(name, presentableName, extensions)
+    {
+    }
+
+    public override BuildAction GetDefaultBuildAction(string extension) => BuildAction.COMPILE;
   }
 }

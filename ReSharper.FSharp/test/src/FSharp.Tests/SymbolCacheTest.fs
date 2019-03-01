@@ -66,6 +66,6 @@ type SymbolCacheTest() =
             psiServices.GetComponent<SymbolCache>().TestDump(writer, true)) |> ignore
 
     member x.DoTestFiles([<ParamArray>] names: string[]) =
-        let testDir = x.TestDataPath2 / x.TestMethodName
+        let testDir = x.TestDataPath / x.TestMethodName
         let paths = names |> Array.map (fun name -> testDir.Combine(name).FullPath)
         x.DoTestSolution(paths)

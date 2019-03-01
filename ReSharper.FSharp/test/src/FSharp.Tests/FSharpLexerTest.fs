@@ -1,6 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Lexing
 
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 

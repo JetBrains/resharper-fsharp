@@ -1,7 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 
 open JetBrains.ProjectModel.Properties
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
+open JetBrains.ReSharper.Plugins.FSharp
 
 type FSharpProjectLanguage(name, presentableName, projectFileType) =
     inherit ProjectLanguage(name, presentableName, projectFileType)

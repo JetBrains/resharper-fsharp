@@ -3,10 +3,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService
 open System.Runtime.InteropServices
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Resources
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util.FSharpMsBuildUtils
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Psi

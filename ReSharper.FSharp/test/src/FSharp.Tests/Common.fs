@@ -8,8 +8,8 @@ open JetBrains.ProjectModel
 open JetBrains.ProjectModel.MSBuild
 open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 open JetBrains.ReSharper.TestFramework
 open JetBrains.TestFramework.Projects
 open JetBrains.Util.Dotnet.TargetFrameworkIds
