@@ -25,6 +25,7 @@
     <Compile Include="src\Daemon\Stages\SyntaxErrorsStage.fs" />
     <Compile Include="src\Daemon\Stages\TypeCheckErrorsStage.fs" />
     <Compile Include="src\Daemon\Stages\UnusedOpensStage.fs" />
+    <Compile Include="src\Daemon\Stages\FormatSpecifiersStage.fs" />
     <Compile Include="src\Daemon\UsageChecking\FSharpUsageCheckingService.fs" />
     <Compile Include="src\Daemon\Analyzers\ReSpellerHelper.fs" />
     <Compile Include="src\Daemon\Analyzers\StringProblemsAnalyzer.fs" />
