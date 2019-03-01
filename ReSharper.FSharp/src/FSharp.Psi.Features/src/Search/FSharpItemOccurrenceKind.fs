@@ -43,7 +43,10 @@ type FSharpItemOccurenceKindProvider() =
             | null -> EmptyList.Instance :> _
             | referenceOccurrence ->
 
-            match referenceOccurrence.PrimaryReference.As<FSharpSymbolReference>() with
+            let primaryReference = referenceOccurrence.PrimaryReference
+            if primaryReference :? AttributeTypeReference then [| OccurrenceKind.Attribute |] :> _ else
+
+            match primaryReference.As<FSharpSymbolReference>() with
             | null -> EmptyList.Instance :> _
             | symbolReference ->
 
@@ -52,6 +55,9 @@ type FSharpItemOccurenceKindProvider() =
 
             let isFromType = symbolUse.IsFromType
             let referenceNode = symbolReference.GetTreeNode()
+
+            if referenceNode :? IInheritMember || referenceNode :? IObjExpr then
+                [| OccurrenceKind.ExtendedType |] :> _ else
 
             let kind =
                 if not isFromType then null else
@@ -66,7 +72,7 @@ type FSharpItemOccurenceKindProvider() =
             | :? FSharpUnionCase -> [| OccurrenceKind.NewInstanceCreation |] :> _
 
             | :? FSharpMemberOrFunctionOrValue as mfv when mfv.IsConstructor ->
-                let typeInherit = referenceNode.GetContainingNode<ITypeInherit>()
+                let typeInherit = referenceNode.GetContainingNode<IInheritMember>()
                 if isNotNull typeInherit then [| OccurrenceKind.ExtendedType |] :> _ else
                 [| OccurrenceKind.NewInstanceCreation |] :> _
 
