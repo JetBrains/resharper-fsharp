@@ -1,13 +1,11 @@
-﻿module rec |Module|(0)
+﻿module Module
 
-let [<|Literal|(1)>] |``Foo.bar``|(2) = 123
-match 123 with
-| |Module|(3).|``Foo.bar``|(4) -> ()
-| _ -> ()
-
+let _ = printfn ""
+let _ = printfn "|%s|(0) |%s|(1)"
+do printfn "|%6d|(2) |%%|(3)  |% 06d|(4)" 1 2
 ---------------------------------------------------------
-(0): ReSharper Class Identifier: 
-(1): ReSharper Class Identifier: 
-(2): ReSharper Constant Identifier: 
-(3): ReSharper Class Identifier: 
-(4): ReSharper Constant Identifier: 
+(0): ReSharper Format String Item: 
+(1): ReSharper Format String Item: 
+(2): ReSharper Format String Item: 
+(3): ReSharper Format String Item: 
+(4): ReSharper Format String Item: 
