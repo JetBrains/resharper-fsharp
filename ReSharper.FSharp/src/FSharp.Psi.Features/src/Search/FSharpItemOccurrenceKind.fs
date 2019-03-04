@@ -14,6 +14,7 @@ type FSharpItemOccurrenceKind() =
     static member val Import = OccurrenceKind("Module or namespace import", OccurrenceKind.SemanticAxis)
     static member val Pattern = OccurrenceKind("Pattern", OccurrenceKind.SemanticAxis)
     static member val TypeSpecification = OccurrenceKind("Type specification", OccurrenceKind.SemanticAxis)
+    static member val TypeExtension = OccurrenceKind("Type extension", OccurrenceKind.SemanticAxis)
 
 
 [<SolutionComponent>]
@@ -45,6 +46,7 @@ type FSharpItemOccurenceKindProvider() =
 
             let primaryReference = referenceOccurrence.PrimaryReference
             if primaryReference :? AttributeTypeReference then [| OccurrenceKind.Attribute |] :> _ else
+            if primaryReference :? TypeExtensionReference then [| FSharpItemOccurrenceKind.TypeExtension |] :> _ else
 
             match primaryReference.As<FSharpSymbolReference>() with
             | null -> EmptyList.Instance :> _
@@ -79,10 +81,12 @@ type FSharpItemOccurenceKindProvider() =
             | _ -> EmptyList.Instance :> _
 
         member x.GetAllPossibleOccurrenceKinds() =
-            [| OccurrenceKind.ExtendedType
+            [| OccurrenceKind.Attribute
+               OccurrenceKind.ExtendedType
                OccurrenceKind.NewInstanceCreation
                FSharpItemOccurrenceKind.Import
                FSharpItemOccurrenceKind.Pattern
+               FSharpItemOccurrenceKind.TypeExtension
                FSharpItemOccurrenceKind.TypeSpecification
                CSharpSpecificOccurrenceKinds.TypeArgument
                CSharpSpecificOccurrenceKinds.TypeChecking |] :> _
