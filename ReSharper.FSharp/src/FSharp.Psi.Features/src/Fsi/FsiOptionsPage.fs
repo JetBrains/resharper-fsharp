@@ -107,7 +107,7 @@ type FsiOptionsPage
 
     member x.AddToolChooser() =
         let options = tools |> Array.map (fun fsi -> RadioOptionPoint(fsi, fsi.Title))
-        let toolComboGrid = x.AddComboOption(fsiTool, fsiToolText, null, null, options) :?> BeGrid
+        let toolComboGrid = x.AddComboOption(fsiTool, fsiToolText, "", "", options) :?> BeGrid
 
         for gridItem in toolComboGrid.Items.Value do
             autoDetect.FlowIntoRd(lifetime, gridItem.Content.Enabled, Not)
