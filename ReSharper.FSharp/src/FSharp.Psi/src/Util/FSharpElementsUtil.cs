@@ -136,12 +136,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
             return members[0];
         }
 
+        // F# optional extension member in a module.
         if (mfv.IsExtensionMember && mfv.IsInstanceMember)
         {
-          var extensionMember = members.FirstOrDefault(m =>
-            m is IFSharpExtensionTypeMember e && (e.ApparentEntity?.Equals(mfv.ApparentEnclosingEntity) ?? false));
-          if (extensionMember != null)
-            return extensionMember;
+          var apparentType = GetTypeElement(mfv.ApparentEnclosingEntity, psiModule);
+          if (apparentType != null)
+          {
+            foreach (var member in members)
+            {
+              if (!(member is IFSharpExtensionTypeMember e) || !(e.ApparentEntity is FSharpEntity otherEntity))
+                continue;
+
+              var otherApparentType = GetTypeElement(otherEntity, psiModule);
+              if (otherApparentType != null && Equals(otherApparentType, apparentType))
+                return member;
+            }
+          }
         }
 
         var mfvXmlDocId = GetXmlDocId(mfv);
@@ -193,7 +203,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       var parameterName = parameter.Name;
       var typeParameter = containingMember.AllTypeParameters.FirstOrDefault(param => param.ShortName == parameterName);
-     return typeParameter;
+      return typeParameter;
     }
 
     public static IDeclaredElement GetActivePatternCaseElement([NotNull] FSharpActivePatternCase activePatternCase,
