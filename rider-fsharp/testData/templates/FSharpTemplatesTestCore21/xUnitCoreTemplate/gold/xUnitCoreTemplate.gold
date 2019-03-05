@@ -5,7 +5,9 @@ Opened
  -UnitTestProject * 1 project
   -UnitTestProject
    -Dependencies
-    .NETCoreApp 2.1
+    -.NETCoreApp 2.1
+     Packages
+     SDK
    Tests.fs
    Program.fs
 

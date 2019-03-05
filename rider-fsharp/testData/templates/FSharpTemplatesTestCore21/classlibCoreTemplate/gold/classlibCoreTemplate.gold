@@ -5,7 +5,9 @@ Opened
  -ClassLibrary * 1 project
   -ClassLibrary
    -Dependencies
-    .NETStandard 2.0
+    -.NETStandard 2.0
+     Packages
+     SDK
    Library.fs
 
 

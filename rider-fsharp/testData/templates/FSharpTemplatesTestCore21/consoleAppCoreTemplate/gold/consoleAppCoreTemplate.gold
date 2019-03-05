@@ -5,7 +5,9 @@ Opened
  -ConsoleApplication * 1 project
   -ConsoleApplication
    -Dependencies
-    .NETCoreApp 2.1
+    -.NETCoreApp 2.1
+     Packages
+     SDK
    Program.fs
 
 

@@ -5,7 +5,9 @@ Opened
  -ClassLibrary * 1 project
   -ClassLibrary
    -Dependencies
-    .NETCoreApp 2.1
+    -.NETCoreApp 2.1
+     Packages
+     SDK
    Library.fs
 
 
