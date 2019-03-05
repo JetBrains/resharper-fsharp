@@ -54,6 +54,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public IEnumerable<IEvent> Events => EmptyList<IEvent>.Instance;
     public IEnumerable<string> MemberNames => EmptyList<string>.InstanceList;
 
+    // C# 8 Nullable types
+    public bool? IsNotNullableIfReferenceType => null;
+    public bool? IsNotNullableIfReferenceTypeWithFixedSubstitution(ISubstitution explicitInheritorSubstitution) => null;
+
     public int Index { get; }
     public TypeParameterVariance Variance => TypeParameterVariance.INVARIANT;
 
