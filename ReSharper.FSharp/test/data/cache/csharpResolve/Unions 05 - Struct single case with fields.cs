@@ -1,13 +1,10 @@
 ﻿using static Module;
 
-public class Class1
+public class Class<T> where T : struct
 {
-  public Class1()
+  public Class()
   {
-    U? uError = U.NewCase(item: 123);
-    SU? su = SU.NewCase(item: 123);
-
-    SU u = su.Value;
+    SU u = SU.NewCase(item: 123);
 
     int t = u.Tag;
     int i = u.Item;
@@ -16,4 +13,12 @@ public class Class1
     int tagsError = U.Tags.CaseA;
     U.Case c = (U.Case) u;
   }
+}
+
+public class ClassU : Class<U>
+{
+}
+
+public class ClassSU : Class<SU>
+{
 }

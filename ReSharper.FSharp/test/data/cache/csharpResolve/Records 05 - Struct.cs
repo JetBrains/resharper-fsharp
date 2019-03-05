@@ -1,31 +1,39 @@
 ﻿using System.Collections.Generic;
 using static Module;
 
-public class Class1
+public class Class<T> where T : struct
 {
-  public Class1()
+  public Class()
   {
-    R? rError = new R(field: 123);
-    SR? sr = new SR(field: 123);
+    R r = new R(field: 123);
+    SR sr = new SR(field: 123);
 
-    SR r = new SR(field: 123);
-
+    // Field is internal, and only getter is produced for property.
     r.Field = 123;
+    sr.Field = 123;
 
     var o = new object();
     var c = EqualityComparer<SR>.Default;
 
-    string s = r.ToString();
+    string s = sr.ToString();
 
-    int hc1 = r.GetHashCode();
-    int hc2 = r.GetHashCode(c);
+    int hc1 = sr.GetHashCode();
+    int hc2 = sr.GetHashCode(c);
 
-    bool b1 = r.Equals(r);
-    bool b2 = r.Equals(o);
-    bool b3 = r.Equals(o, c);
+    bool b1 = sr.Equals(r);
+    bool b2 = sr.Equals(o);
+    bool b3 = sr.Equals(o, c);
 
-    int ct1 = r.CompareTo(r);
-    int ct2 = r.CompareTo(o);
-    int ct3 = r.CompareTo(o, Comparer<SR>.Default);
+    int ct1 = sr.CompareTo(r);
+    int ct2 = sr.CompareTo(o);
+    int ct3 = sr.CompareTo(o, Comparer<SR>.Default);
   }
+}
+
+public class ClassR : Class<R>
+{
+}
+
+public class ClassSR : Class<SR>
+{
 }

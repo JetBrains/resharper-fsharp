@@ -1,32 +1,34 @@
 ﻿using static Module;
 
-public class Class1
+public class Class<T> where T : struct
 {
-  public Class1()
+  public Class()
   {
-    |U?|(0) uError = |U.NewCase(item: 123)|(1);
-    SU? su = SU.NewCase(item: 123);
-
-    SU u = su.Value;
+    SU u = SU.NewCase(item: 123);
 
     int t = u.Tag;
     int i = u.Item;
 
-    bool isCaseError = u.|IsCase|(2);
-    int tagsError = U.|Tags|(3).CaseA;
-    U.|Case|(4) c = (U.|Case|(5)) u;
+    bool isCaseError = u.|IsCase|(0);
+    int tagsError = U.|Tags|(1).CaseA;
+    U.|Case|(2) c = (U.|Case|(3)) u;
   }
 }
 
+public class ClassU : Class<|U|(4)>
+{
+}
+
+public class ClassSU : Class<SU>
+{
+}
+
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: Only non-nullable value type could be underlying of 'System.Nullable'
-(1): ReSharper Underlined Error Highlighting: Cannot convert source type 'Module.U' to target type 'System.Nullable<Module.U>'
-(2): ReSharper Error Highlighting: Cannot resolve symbol 'IsCase'
-(3): ReSharper Error Highlighting: Cannot resolve symbol 'Tags'
-(4): ReSharper Underlined Error Highlighting: Cannot access internal class 'Case' here
-(5): ReSharper Underlined Error Highlighting: Cannot access internal class 'Case' here
-M:Module.U.NewCase(System.Int32)
-M:Module.U.NewCase(System.Int32)
+(0): ReSharper Error Highlighting: Cannot resolve symbol 'IsCase'
+(1): ReSharper Error Highlighting: Cannot resolve symbol 'Tags'
+(2): ReSharper Underlined Error Highlighting: Cannot access internal class 'Case' here
+(3): ReSharper Underlined Error Highlighting: Cannot access internal class 'Case' here
+(4): ReSharper Underlined Error Highlighting: The type 'Module.U' must be a non-nullable value type in order to use it as parameter 'T'
 M:Module.SU.NewCase(System.Int32)
 M:Module.SU.NewCase(System.Int32)
 P:Module.SU.Tag
