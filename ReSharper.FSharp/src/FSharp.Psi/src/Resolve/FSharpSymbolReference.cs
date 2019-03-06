@@ -65,24 +65,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       if (sourceName == SharedImplUtil.MISSING_DECLARATION_NAME)
         return this;
 
-      var newName = UpdateName(sourceName);
-
-      // todo: replace ident but don't initialize it with this reference, update owner expression
+      var newName = GetReferenceName(sourceName);
       using (WriteLockCookie.Create(myOwner.IsPhysical()))
       {
         var name = NamingManager.GetNamingLanguageService(myOwner.Language).MangleNameIfNecessary(newName);
         var newExpression = myOwner.SetName(name);
-        var newReference = newExpression.Reference;
-
-        // We have to change the reference so it resolves to the new element.
-        // We don't, however, want to actually resolve it and to wait for FCS to type check all the needed projects
-        // so we set a fake resolve result beforehand.
-        ResolveUtil.SetFakedResolveTo(newReference, element, null);
-        return newReference;
+        return newExpression.Reference;
       }
     }
 
-    protected virtual string UpdateName([NotNull] string name) => name;
+    protected virtual string GetReferenceName([NotNull] string name) => name;
 
     public override IReference BindTo(IDeclaredElement element, ISubstitution substitution)
     {

@@ -8,7 +8,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Naming.Impl
-open JetBrains.ReSharper.Psi.Resolve
 open JetBrains.ReSharper.Refactorings.Rename
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
@@ -63,9 +62,10 @@ type FSharpRenameHelper() =
 
     override x.IsLanguageSupported = true
 
-    override x.IsCheckResolvedTo(newReference: IReference, newDeclaredElement: IDeclaredElement) =
-        newDeclaredElement :? IFSharpDeclaredElement ||
-        base.IsCheckResolvedTo(newReference, newDeclaredElement)
+    override x.IsCheckResolvedTo(newReference, newDeclaredElement) =
+        // We have to change the reference so it resolves to the new element.
+        // We don't, however, want to actually resolve it and to wait for FCS to type check all the needed projects.
+        newDeclaredElement.PresentationLanguage.Is<FSharpLanguage>()
 
     override x.IsLocalRename(element: IDeclaredElement) =
         match element with
