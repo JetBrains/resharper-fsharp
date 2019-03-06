@@ -10,9 +10,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     {
     }
 
-    public override FSharpSymbol GetFSharpSymbol() =>
-      myOwner.IdentifierToken is var token && token != null
-        ? myOwner.FSharpFile.GetSymbolDeclaration(token.GetTreeStartOffset().Offset)
-        : null;
+    public override FSharpSymbol GetFSharpSymbol()
+    {
+      var token = myOwner.IdentifierToken;
+      if (token == null)
+        return null;
+
+      var fsFile = myOwner.FSharpFile;
+      var offset = token.GetTreeStartOffset().Offset;
+      return fsFile.GetSymbolDeclaration(offset) ?? fsFile.GetSymbolUse(offset)?.Symbol;
+    }
   }
 }

@@ -1,0 +1,10 @@
+﻿namespace Ns
+
+module Module =
+    type zzz() =
+        class
+        end
+
+module ModuleEx =
+    type Module.zzz with  
+        member x.Foo = 1

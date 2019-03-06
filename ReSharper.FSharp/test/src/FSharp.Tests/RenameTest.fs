@@ -103,3 +103,5 @@ type FSharpRenameTest() =
     [<Test>] member x.``Type Extension - Optional - Member 01``() = x.DoNamedTest()
     [<Test>] member x.``Type Extension - Optional - Member 02``() = x.DoNamedTest()
     [<Test>] member x.``Type Extension - Optional - Type 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type Extension - Optional - Type 02 - Qualified``() = x.DoNamedTest()
+    [<Test>] member x.``Type Extension - Optional - Type 03 - Qualified 2``() = x.DoNamedTest()
