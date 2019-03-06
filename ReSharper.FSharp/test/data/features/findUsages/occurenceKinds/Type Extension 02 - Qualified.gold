@@ -1,0 +1,14 @@
+﻿Other
+---
+TO: [O] module |Module| RANGE: (7,13) @ Type Extension 02 - Qualified.fs
+TO: [O] type |System|.String with RANGE: (22,28) @ Type Extension 02 - Qualified.fs
+TO: [O] type System.|String| with RANGE: (29,35) @ Type Extension 02 - Qualified.fs
+TO: [O] member |x|.Foo = 123 RANGE: (53,54) @ Type Extension 02 - Qualified.fs
+TO: [O] member x.|Foo| = 123 RANGE: (55,58) @ Type Extension 02 - Qualified.fs
+
+
+Type extension
+---
+TO: [O] type System.|String| with RANGE: (29,35) @ Type Extension 02 - Qualified.fs
+
+
