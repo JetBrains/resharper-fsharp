@@ -164,8 +164,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
               continue;
           }
 
-          var textRange = FixRange(startOffset, endOffset, mfv?.LogicalName, buffer, fsFile);
+          var textRange = mfv != null
+            ? new TextRange(startOffset, endOffset)
+            : FixRange(startOffset, endOffset, null, buffer, fsFile);
           startOffset = textRange.StartOffset;
+
           resolvedSymbols.Declarations[startOffset] = new FSharpResolvedSymbolUse(symbolUse, textRange);
           resolvedSymbols.Uses.Remove(startOffset);
         }
