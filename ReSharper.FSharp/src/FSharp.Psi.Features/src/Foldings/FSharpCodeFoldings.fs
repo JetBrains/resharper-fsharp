@@ -1,9 +1,7 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Services.Foldings
 
-open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Daemon.CodeFolding
-open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -11,19 +9,18 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.TextControl.DocumentMarkup
 open JetBrains.Util
-open JetBrains.Util.Logging
 open Microsoft.FSharp.Compiler.SourceCodeServices
 open Microsoft.FSharp.Compiler.SourceCodeServices.Structure
 
 [<Language(typeof<FSharpLanguage>)>]
-type FSharpCodeFoldingProcessFactory() =
+type FSharpCodeFoldingProcessFactory(logger: ILogger) =
     interface ICodeFoldingProcessorFactory with
         member x.CreateProcessor() =
-            FSharpCodeFoldingProcess() :> _
+            FSharpCodeFoldingProcess(logger) :> _
 
 
-and FSharpCodeFoldingProcess() =
-    inherit TreeNodeVisitor<IHighlightingConsumer>()
+and FSharpCodeFoldingProcess(logger: ILogger) =
+    inherit TreeNodeVisitor<FoldingHighlightingConsumer>()
     let mutable processingFinished = false
 
     let getFoldingAttrId = function
@@ -52,8 +49,9 @@ and FSharpCodeFoldingProcess() =
         Structure.getOutliningRanges lines parseTree
         |> Seq.distinctBy (fun x -> x.Range.StartLine)
         |> Seq.iter (fun x ->
-            let mutable textRange = x.CollapseRange.ToTextRange(document)
-            let docRange = DocumentRange(document, textRange)
+            let textRange = x.CollapseRange.ToTextRange(document)
+            if textRange.IsEmpty then logger.Warn(sprintf "Empty folding: %O %A" textRange x) else
+
             let placeholder =
                 match x.Scope with
                 | Scope.Open -> "..."
@@ -66,12 +64,10 @@ and FSharpCodeFoldingProcess() =
                 | range when not range.IsEmpty -> document.GetText(range) + " ..."
                 | _ -> " ..."
 
-            if not textRange.IsEmpty then
-                let highlighting = CodeFoldingHighlighting(getFoldingAttrId x.Scope, placeholder, docRange, 0)
-                context.AddHighlighting(highlighting)
-            else
-                let logger = Logger.GetLogger<FSharpCodeFoldingProcess>()
-                logger.LogMessage(LoggingLevel.WARN, sprintf "Empty folding: %O %A" textRange x))
+            let highlightingId = getFoldingAttrId x.Scope
+            let documentRange = DocumentRange(document, textRange)
+            context.AddDefaultPriorityFolding(highlightingId, documentRange, placeholder))
+                
 
     interface ICodeFoldingProcessor with
         member x.InteriorShouldBeProcessed(_,_) = false
