@@ -1,0 +1,6 @@
+// ${CHAR:TabLeft}
+module Module
+
+let x =
+    123
+     {caret}

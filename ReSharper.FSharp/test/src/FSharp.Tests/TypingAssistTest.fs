@@ -169,7 +169,8 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Tab 01 - Line start``() = x.DoNamedTest()
     [<Test>] member x.``Tab 02 - To next tab position``() = x.DoNamedTest()
 
-    [<Test; Ignore>] member x.``Tab Left 01``() = x.DoNamedTest()
+    [<Test>] member x.``Tab Left 01``() = x.DoNamedTest()
+    [<Test>] member x.``Tab Left 02 - Align to indent``() = x.DoNamedTest()
 
     [<Test>] member x.``Quotes - Adding third quote``() = x.DoNamedTest()
 
