@@ -9,6 +9,7 @@ open JetBrains.Application.UI.Options
 open JetBrains.Application.UI.Options.OptionsDialog.SimpleOptions.ViewModel
 open JetBrains.DataFlow
 open JetBrains.Lifetimes
+open JetBrains.IDE.UI
 open JetBrains.IDE.UI.Extensions
 open JetBrains.IDE.UI.Options
 open JetBrains.ProjectModel
@@ -24,7 +25,7 @@ open JetBrains.Util
 type FsiOptionsPage
         (lifetime: Lifetime, optionsPageContext, settings, fsiDetector: FsiDetector,
          [<Optional; DefaultParameterValue(null: ISolution)>] solution: ISolution,
-         dialogs: ICommonFileDialogs) as this =
+         dialogs: ICommonFileDialogs, iconHost: IconHostBase) as this =
     inherit BeSimpleOptionsPage(lifetime, optionsPageContext, settings)
 
     let (|FsiTool|) (obj: obj) = obj :?> FsiTool 
@@ -113,7 +114,8 @@ type FsiOptionsPage
             autoDetect.FlowIntoRd(lifetime, gridItem.Content.Enabled, Not)
 
         let fileChooser =
-            x.AddFileChooserOption(fsiPath, null, fsiPath.Value, dialogs, canBeEmpty = true, predefinedValues = [])
+            let path = fsiPath.Value
+            x.AddFileChooserOption(fsiPath, null, path, iconHost, dialogs, canBeEmpty = true, predefinedValues = [])
         fsiOptions.IsCustomTool.FlowIntoRd(lifetime, fileChooser.Enabled)
 
     member x.AddUseAnyCpu() =
