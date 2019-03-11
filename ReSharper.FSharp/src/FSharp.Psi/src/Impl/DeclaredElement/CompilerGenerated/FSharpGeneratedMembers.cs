@@ -5,6 +5,7 @@ using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Impl.Special;
 using JetBrains.Util;
@@ -252,12 +253,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
   #region IsUnionCaseProperty
 
-  public class IsUnionCaseProperty : FSharpGeneratedPropertyBase
+  public class IsUnionCaseProperty : FSharpGeneratedPropertyBase, IFSharpGeneratedFromOtherElement
   {
-    internal IsUnionCaseProperty([NotNull] ITypeElement typeElement, [NotNull] string shortName)
-      : base(typeElement) => ShortName = shortName;
+    internal IsUnionCaseProperty([NotNull] ITypeElement typeElement, [NotNull] IUnionCase unionCase)
+      : base(typeElement) => OriginElement = unionCase;
 
-    public override string ShortName { get; }
+    public IClrDeclaredElement OriginElement { get; set; }
+
+    public override string ShortName =>
+      OriginElement is IUnionCase unionCase
+        ? "Is" + unionCase.ShortName
+        : SharedImplUtil.MISSING_DECLARATION_NAME;
+
     public override IType Type => PredefinedType.Bool;
 
     public override AccessRights GetAccessRights() =>
@@ -285,29 +292,32 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
   #region NewUnionCaseMethod
 
-  public class NewUnionCaseMethod : FSharpGeneratedMethodBase
+  public class NewUnionCaseMethod : FSharpGeneratedMethodBase, IFSharpGeneratedFromOtherElement
   {
-    internal readonly UnionCasePart UnionCasePart;
-
     public NewUnionCaseMethod([NotNull] TypeElement typeElement) : base(typeElement.GetContainingType()) =>
-      UnionCasePart = typeElement.EnumerateParts().OfType<UnionCasePart>().First();
+      OriginElement = typeElement;
 
-    public override string ShortName => "New" + UnionCasePart.ShortName;
+    public IClrDeclaredElement OriginElement { get; set; }
+
+    public override string ShortName =>
+      OriginElement is IUnionCase unionCase
+        ? "New" + unionCase.ShortName
+        : SharedImplUtil.MISSING_DECLARATION_NAME;
+
     public override IType ReturnType => ContainingTypeType;
-
     public override bool IsStatic => true;
 
     public override IList<IParameter> Parameters
     {
       get
       {
-        var fields = UnionCasePart.CaseFields;
+        if (!(OriginElement is TypeElement typeElement))
+          return EmptyList<IParameter>.Instance;
+
+        var fields = typeElement.EnumerateParts().OfType<UnionCasePart>().First().CaseFields;
         var result = new IParameter[fields.Count];
         for (var i = 0; i < fields.Count; i++)
-        {
-          var field = fields[i];
-          result[i] = new Parameter(this, i, ParameterKind.VALUE, field.Type, field.ShortName.Decapitalize());
-        }
+          result[i] = new FSharpGeneratedParameter(this, fields[i]);
 
         return result;
       }

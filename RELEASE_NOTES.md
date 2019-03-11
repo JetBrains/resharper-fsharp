@@ -12,7 +12,8 @@
 * Global navigation and Go to File Member action now work for type-private `let` bindings
 * F# defined delegates are now supported and are properly seen by code in other languages
 * Intrinsic type extensions are now considered type parts with navigation working for every part
-* Navigation to symbols with escaped name now places caret inside escaped identifiers
+* Navigation to generated members from usages in code in other languages now navigates to origin members
+* Navigation to symbols with escaped names now places caret inside escaped identifiers
 
 ### Find usages
 

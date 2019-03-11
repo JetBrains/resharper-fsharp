@@ -25,4 +25,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
   {
     [CanBeNull] FSharpEntity ApparentEntity { get; }
   }
+
+  public interface IFSharpGeneratedFromOtherElement : IFSharpDeclaredElement
+  {
+    [CanBeNull] IClrDeclaredElement OriginElement { get; set; }
+  }
 }

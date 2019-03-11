@@ -5,18 +5,17 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 {
-  public class FSharpGeneratedConstructorParameter : FSharpGeneratedElementBase, IParameter
+  public class FSharpGeneratedParameter : FSharpGeneratedElementBase, IParameter,
+    IFSharpGeneratedFromOtherElement
   {
-    [NotNull]
-    protected IConstructor Constructor { get; }
+    [NotNull] protected IParametersOwner Owner { get; }
 
-    [CanBeNull]
-    protected ITypeOwner Origin { get; }
+    [CanBeNull] protected ITypeOwner Origin => OriginElement as ITypeOwner;
 
-    public FSharpGeneratedConstructorParameter([NotNull] IConstructor constructor, [CanBeNull] ITypeOwner origin)
+    public FSharpGeneratedParameter([NotNull] IParametersOwner owner, [CanBeNull] ITypeOwner origin)
     {
-      Constructor = constructor;
-      Origin = origin;
+      Owner = owner;
+      OriginElement = origin;
     }
 
     public override string ShortName =>
@@ -26,15 +25,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
       Origin?.Type ?? TypeFactory.CreateUnknownType(Module);
 
     public override bool IsValid() =>
-      Constructor.IsValid() && Origin != null && Origin.IsValid();
+      Owner.IsValid() && Origin != null && Origin.IsValid();
 
     public override DeclaredElementType GetElementType() =>
       CLRDeclaredElementType.PARAMETER;
 
-    public IParametersOwner ContainingParametersOwner => Constructor;
-    protected override IClrDeclaredElement ContainingElement => Constructor;
-    public override ITypeMember GetContainingTypeMember() => Constructor;
-    public override ITypeElement GetContainingType() => Constructor.GetContainingType();
+    public IParametersOwner ContainingParametersOwner => Owner;
+    protected override IClrDeclaredElement ContainingElement => Owner;
+    public override ITypeMember GetContainingTypeMember() => Owner as ITypeMember;
+    public override ITypeElement GetContainingType() => Owner.GetContainingType();
 
     public ParameterKind Kind => ParameterKind.VALUE;
     public DefaultValue GetDefaultValue() => DefaultValue.BAD_VALUE;
@@ -45,9 +44,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     public bool IsVarArg => false;
 
     public override bool Equals(object obj) =>
-      obj is FSharpGeneratedConstructorParameter param && ShortName == param.ShortName &&
+      obj is FSharpGeneratedParameter param && ShortName == param.ShortName &&
       ContainingElement.Equals(param.ContainingElement);
 
     public override int GetHashCode() => ShortName.GetHashCode();
+    public IClrDeclaredElement OriginElement { get; set; }
   }
 }

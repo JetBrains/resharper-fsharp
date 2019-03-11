@@ -13,7 +13,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     {
       var parameters = new IParameter[fields.Count];
       for (var i = 0; i < fields.Count; i++)
-        parameters[i] = new FSharpGeneratedConstructorParameter(this, fields[i]);
+        parameters[i] = new FSharpGeneratedParameter(this, fields[i]);
 
       Parameters = parameters;
     }

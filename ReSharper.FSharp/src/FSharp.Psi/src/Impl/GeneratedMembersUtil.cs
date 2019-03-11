@@ -64,7 +64,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
           foreach (var unionCase in cases)
           {
             if (!isSingleCaseUnion)
-              result.Add(new IsUnionCaseProperty(typeElement, "Is" + unionCase.ShortName));
+              result.Add(new IsUnionCaseProperty(typeElement, unionCase));
 
             if (unionCase is FSharpNestedTypeUnionCase typedCase)
             {
