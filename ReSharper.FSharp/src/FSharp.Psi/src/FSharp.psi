@@ -695,7 +695,7 @@ otherDirective:
   PP_DIRECTIVE<PP_DIRECTIVE, HashToken>
   STRING<STRING, Args>*;
 
-openStatement:
+openStatement  options { stubBase="ReferenceExpressionBase"; }:
   OPEN<OPEN, Open>
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>;
 

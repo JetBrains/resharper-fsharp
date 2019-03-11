@@ -20,11 +20,11 @@ public class Class<T> where T : struct
     int hc1 = sr.GetHashCode();
     int hc2 = sr.GetHashCode(c);
 
-    bool b1 = sr.Equals(r);
+    bool b1 = sr.Equals(sr);
     bool b2 = sr.Equals(o);
     bool b3 = sr.Equals(o, c);
 
-    int ct1 = sr.CompareTo(r);
+    int ct1 = sr.CompareTo(sr);
     int ct2 = sr.CompareTo(o);
     int ct3 = sr.CompareTo(o, Comparer<SR>.Default);
   }
