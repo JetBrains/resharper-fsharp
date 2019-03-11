@@ -5,6 +5,7 @@ TO: [O] type |T| = RANGE: (22,23) @ Type Extension 01.fs
 TO: [O] { |Field|: int } RANGE: (33,38) @ Type Extension 01.fs
 TO: [O] namespace |Ns2| RANGE: (59,62) @ Type Extension 01.fs
 TO: [O] module |Module| = RANGE: (73,79) @ Type Extension 01.fs
+TO: [O] open |Ns1| RANGE: (92,95) @ Type Extension 01.fs
 TO: [O] type |T| with RANGE: (108,109) @ Type Extension 01.fs
 TO: [O] member |x|.Foo = 123 RANGE: (131,132) @ Type Extension 01.fs
 TO: [O] member x.|Foo| = 123 RANGE: (133,136) @ Type Extension 01.fs

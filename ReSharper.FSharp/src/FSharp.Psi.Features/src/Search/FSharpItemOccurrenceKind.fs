@@ -44,11 +44,13 @@ type FSharpItemOccurenceKindProvider() =
             | null -> EmptyList.Instance :> _
             | referenceOccurrence ->
 
-            let primaryReference = referenceOccurrence.PrimaryReference
-            if primaryReference :? AttributeTypeReference then [| OccurrenceKind.Attribute |] :> _ else
-            if primaryReference :? TypeExtensionReference then [| FSharpItemOccurrenceKind.TypeExtension |] :> _ else
+            match referenceOccurrence.PrimaryReference with
+            | :? AttributeTypeReference -> [| OccurrenceKind.Attribute |] :> _
+            | :? OpenStatementReference -> [| FSharpItemOccurrenceKind.Import |] :> _
+            | :? TypeExtensionReference -> [| FSharpItemOccurrenceKind.TypeExtension |] :> _
+            | reference ->
 
-            match primaryReference.As<FSharpSymbolReference>() with
+            match reference.As<FSharpSymbolReference>() with
             | null -> EmptyList.Instance :> _
             | symbolReference ->
 
@@ -68,7 +70,6 @@ type FSharpItemOccurenceKindProvider() =
             if isNotNull kind then [| kind |] :> _ else
             if isFromType then [| FSharpItemOccurrenceKind.TypeSpecification |] :> _ else
             if symbolUse.IsFromPattern then [| FSharpItemOccurrenceKind.Pattern |] :> _ else
-            if symbolUse.IsFromOpenStatement then [| FSharpItemOccurrenceKind.Import |] :> _ else
 
             match symbolUse.Symbol with
             | :? FSharpUnionCase -> [| OccurrenceKind.NewInstanceCreation |] :> _
