@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
@@ -56,8 +55,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     }
 
     public override int GetHashCode() => ShortName.GetHashCode();
-
-    public string SourceName => SharedImplUtil.MISSING_DECLARATION_NAME;
 
     public bool IsExtensionMember => false;
     public bool IsFSharpMember => true;

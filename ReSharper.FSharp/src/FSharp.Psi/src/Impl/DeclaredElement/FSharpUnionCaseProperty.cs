@@ -3,7 +3,6 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
@@ -16,8 +15,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     {
     }
 
-    public override AccessRights GetAccessRights() => ContainingType.GetRepresentationAccessRights();
-    public AccessRights RepresentationAccessRights => ContainingType.GetFSharpRepresentationAccessRights();
+    public override AccessRights GetAccessRights() => GetContainingType().GetRepresentationAccessRights();
+    public AccessRights RepresentationAccessRights => GetContainingType().GetFSharpRepresentationAccessRights();
 
     public override bool IsStatic => true;
 

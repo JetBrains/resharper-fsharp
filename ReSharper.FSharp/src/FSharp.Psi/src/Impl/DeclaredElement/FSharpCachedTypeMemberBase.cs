@@ -43,7 +43,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public XmlNode GetXMLDescriptionSummary(bool inherit) => null; // todo
 
     public abstract DeclaredElementType GetElementType();
-
-    [CanBeNull] protected TypeElement ContainingType => GetContainingType() as TypeElement;
   }
 }

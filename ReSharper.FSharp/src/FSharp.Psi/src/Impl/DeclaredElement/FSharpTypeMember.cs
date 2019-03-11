@@ -125,7 +125,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public virtual bool IsExtensionMember => false;
     public abstract bool IsFSharpMember { get; }
 
-    public virtual IList<ITypeParameter> AllTypeParameters => ContainingType.GetAllTypeParameters().ResultingList().Reverse();
+    public virtual IList<ITypeParameter> AllTypeParameters =>
+      GetContainingType().GetAllTypeParameters().ResultingList().Reverse();
 
     [CanBeNull]
     protected virtual FSharpSymbol GetActualSymbol([NotNull] FSharpSymbol symbol) => symbol;

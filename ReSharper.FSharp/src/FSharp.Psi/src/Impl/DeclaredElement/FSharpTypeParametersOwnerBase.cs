@@ -22,7 +22,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       if (mfvTypeParams.Count == 0)
         return EmptyList<ITypeParameter>.Instance;
 
-      var outerTypeParamsCount = ContainingType?.GetAllTypeParameters().Count ?? 0;
+      var outerTypeParamsCount = GetContainingType()?.GetAllTypeParameters().Count ?? 0;
       var typeParamsCount = mfvTypeParams.Count - outerTypeParamsCount;
 
       if (typeParamsCount == 0)

@@ -257,9 +257,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static string GetAttributeShortName([NotNull] this string attrName) =>
       attrName.SubstringBeforeLast("Attribute", StringComparison.Ordinal);
 
-    public static bool IsCliMutableRecord([CanBeNull] this TypeElement typeElement)
+    public static bool IsCliMutableRecord([CanBeNull] this ITypeElement type)
     {
-      if (typeElement == null)
+      if (!(type is TypeElement typeElement))
         return false;
 
       // todo: climutable attr can be on anon part (`type R`)
@@ -287,10 +287,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return typeElement.ShortName;
     }
 
-    public static AccessRights GetFSharpRepresentationAccessRights([CanBeNull] this TypeElement typeElement)
+    public static AccessRights GetFSharpRepresentationAccessRights([CanBeNull] this ITypeElement type)
     {
-      if (typeElement == null)
-        return AccessRights.NONE;
+      if (!(type is TypeElement typeElement))
+        return AccessRights.PUBLIC;
 
       foreach (var part in typeElement.EnumerateParts())
         if (part is IRepresentationAccessRightsOwner accessRightsOwner)
@@ -298,10 +298,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return AccessRights.PUBLIC;
     }
 
-    public static AccessRights GetRepresentationAccessRights([CanBeNull] this TypeElement typeElement)
+    public static AccessRights GetRepresentationAccessRights([CanBeNull] this ITypeElement type)
     {
-      if (typeElement == null)
-        return AccessRights.NONE;
+      if (!(type is TypeElement typeElement))
+        return AccessRights.PUBLIC;
 
       foreach (var part in typeElement.EnumerateParts())
         switch (part)

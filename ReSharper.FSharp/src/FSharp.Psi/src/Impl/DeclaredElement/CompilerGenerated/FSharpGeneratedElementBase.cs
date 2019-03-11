@@ -1,5 +1,6 @@
 ﻿using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Resolve;
 
@@ -8,6 +9,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
   public abstract class FSharpGeneratedElementBase : FSharpDeclaredElementBase
   {
     [NotNull] protected abstract IClrDeclaredElement ContainingElement { get; }
+
+    public string SourceName => SharedImplUtil.MISSING_DECLARATION_NAME;
 
     public override bool IsValid() => ContainingElement.IsValid();
     public override IPsiServices GetPsiServices() => ContainingElement.GetPsiServices();

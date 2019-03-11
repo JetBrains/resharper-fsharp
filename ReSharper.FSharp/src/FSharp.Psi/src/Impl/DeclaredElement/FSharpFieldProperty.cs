@@ -2,7 +2,6 @@
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Tree;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
@@ -30,7 +29,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       myIsMutable = field.IsMutable;
 
     public override bool IsWritable =>
-      myIsMutable || ContainingType.IsCliMutableRecord();
+      myIsMutable || GetContainingType().IsCliMutableRecord();
   }
 
   internal abstract class FSharpFieldProperty<T> : FSharpFieldPropertyBase<T>, IFSharpFieldProperty
@@ -47,8 +46,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override IType ReturnType => GetType(FieldType);
 
     public override AccessRights GetAccessRights() =>
-      GetContainingType() is TypeElement typeElement
-        ? typeElement.GetRepresentationAccessRights()
-        : AccessRights.PUBLIC;
+      GetContainingType().GetRepresentationAccessRights();
   }
 }

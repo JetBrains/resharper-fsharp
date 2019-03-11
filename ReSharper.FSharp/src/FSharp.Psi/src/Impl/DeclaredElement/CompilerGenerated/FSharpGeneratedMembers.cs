@@ -260,9 +260,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     public override string ShortName { get; }
     public override IType Type => PredefinedType.Bool;
 
-    public new TypeElement TypeElement =>
-      (TypeElement) base.TypeElement;
-
     public override AccessRights GetAccessRights() =>
       TypeElement.GetRepresentationAccessRights();
   }
@@ -279,9 +276,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
     public override string ShortName => "Tag";
     public override IType Type => PredefinedType.Int;
-
-    public new TypeElement TypeElement =>
-      (TypeElement) base.TypeElement;
 
     public override AccessRights GetAccessRights() =>
       TypeElement.GetRepresentationAccessRights();
