@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -12,6 +13,7 @@ using JetBrains.ReSharper.Psi.Impl.Search.SearchDomain;
 using JetBrains.ReSharper.Psi.Search;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
+using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
@@ -76,6 +78,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 
       return EmptySearchDomain.Instance;
     }
+
+    public override IEnumerable<RelatedDeclaredElement> GetRelatedDeclaredElements(IDeclaredElement element)
+    {
+      switch (element)
+      {
+        case IUnionCase unionCase:
+          return GetUnionCaseRelatedElements(unionCase);
+        case IGeneratedFromUnionCase generated when generated.OriginElement is IUnionCase unionCase:
+          return GetUnionCaseRelatedElements(unionCase);
+        default:
+          return EmptyList<RelatedDeclaredElement>.Instance;
+      }
+    }
+
+    private static IEnumerable<RelatedDeclaredElement> GetUnionCaseRelatedElements([NotNull] IUnionCase unionCase) =>
+      unionCase.GetUnionCaseGeneratedMembers().Select(member => new RelatedDeclaredElement(member));
 
     public override Tuple<ICollection<IDeclaredElement>, bool> GetNavigateToTargets(IDeclaredElement element)
     {

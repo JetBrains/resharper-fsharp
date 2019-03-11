@@ -56,8 +56,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
       get
       {
         var tags = new LocalList<IField>();
-        for (var i = 0; i < UnionPart.Cases.Count; i++)
-          tags.Add(new UnionCaseTag(this, i));
+        var cases = UnionPart.Cases;
+        for (var i = 0; i < cases.Count; i++)
+          tags.Add(new UnionCaseTag(this, cases[i], i));
 
         return tags.ResultingList();
       }
@@ -97,19 +98,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
     #region UnionCaseTag
 
-    public class UnionCaseTag : FSharpGeneratedMemberBase, IField
+    public class UnionCaseTag : FSharpGeneratedMemberBase, IField, IFSharpGeneratedFromOtherElement
     {
       public FSharpUnionTagsClass TagsClass { get; }
-      private readonly int myIndex;
+      public IClrDeclaredElement OriginElement { get; set; }
+      protected readonly int Index;
 
-      public UnionCaseTag(FSharpUnionTagsClass tagsClass, int index)
+      public UnionCaseTag(FSharpUnionTagsClass tagsClass, IUnionCase unionCase, int index)
       {
         TagsClass = tagsClass;
-        myIndex = index;
+        OriginElement = unionCase;
+        Index = index;
       }
 
       public override string ShortName =>
-        TagsClass.UnionPart.Cases[myIndex].ShortName;
+        UnionCase.ShortName;
+
+      private IUnionCase UnionCase => TagsClass.UnionPart.Cases[Index];
 
       protected override IClrDeclaredElement ContainingElement => TagsClass;
       public override ITypeElement GetContainingType() => TagsClass;
@@ -119,7 +124,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
         CLRDeclaredElementType.CONSTANT;
 
       public IType Type => PredefinedType.Int;
-      public ConstantValue ConstantValue => new ConstantValue(myIndex, Type);
+      public ConstantValue ConstantValue => new ConstantValue(Index, Type);
+
       public bool IsField => false;
       public bool IsConstant => true;
       public bool IsEnumMember => false;

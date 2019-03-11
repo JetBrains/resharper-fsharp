@@ -27,8 +27,9 @@
 	* Write
 	* Attribute reference
 * Highlight Usages in File action now highlights Write occurrences differently to other occurrences
+* Find usages of union cases now also searches for compiler generated union members
 
-### Completion
+### Code completion
 
 * An option for out-of-scope completion to place `open` statements to the top level was added and enabled by default by [@saul](https://github.com/saul) ([#39](https://github.com/JetBrains/fsharp-support/pull/39))
 * Out-of-scope completion can be disabled now
