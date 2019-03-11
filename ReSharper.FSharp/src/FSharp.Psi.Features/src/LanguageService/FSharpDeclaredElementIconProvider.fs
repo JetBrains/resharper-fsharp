@@ -15,6 +15,7 @@ open JetBrains.ReSharper.Psi.Resources
 type FSharpDeclaredElementIconProvider() =
     static let privateCase = compose PsiSymbolsThemedIcons.EnumMember.Id PsiSymbolsThemedIcons.ModifiersPrivate.Id
     static let internalCase = compose PsiSymbolsThemedIcons.EnumMember.Id PsiSymbolsThemedIcons.ModifiersInternal.Id
+    static let mutableField = compose PsiSymbolsThemedIcons.Field.Id PsiSymbolsThemedIcons.ModifiersWrite.Id
 
     interface IDeclaredElementIconProvider with
         member x.GetImageId(declaredElement, languageType, [<Out>] canApplyExtensions) =
@@ -33,5 +34,9 @@ type FSharpDeclaredElementIconProvider() =
 
             | :? TypeElement as typeElement when typeElement.IsUnion() ->
                 PsiSymbolsThemedIcons.Enum.Id
+
+            | :? IFSharpFieldProperty as fieldProp ->
+                canApplyExtensions <- false
+                if fieldProp.IsWritable then mutableField else PsiSymbolsThemedIcons.Field.Id
 
             | _ -> null

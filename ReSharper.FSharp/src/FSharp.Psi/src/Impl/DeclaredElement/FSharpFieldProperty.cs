@@ -33,7 +33,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       myIsMutable || ContainingType.IsCliMutableRecord();
   }
 
-  internal abstract class FSharpFieldProperty<T> : FSharpFieldPropertyBase<T>
+  internal abstract class FSharpFieldProperty<T> : FSharpFieldPropertyBase<T>, IFSharpFieldProperty
     where T : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
     internal FSharpFieldProperty([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
