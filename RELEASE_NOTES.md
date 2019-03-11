@@ -17,7 +17,7 @@
 ### Find usages
 
 * Usages inside `let` bindings are properly grouped by containing members
-* Separte grouping for new occurrence kinds:
+* Separate grouping for new occurrence kinds:
 	* Type argument
 	* Base type
 	* Type checking
@@ -29,12 +29,12 @@
 
 ### Completion
 
-* An option for out-of-scope completion to place `open` statements to the top level was added and enabled by default by @saul
+* An option for out-of-scope completion to place `open` statements to the top level was added and enabled by default by [@saul](github.com/saul)
 * Out-of-scope completion can be disabled now
 
 ### Code analysis
 
-* Format specifiers are now highlighted, by @vasily-kirichenko
+* Format specifiers are now highlighted, by [@vasily-kirichenko](github.com/vasily-kirichenko)
 * Unused local values analysis is now turned on for all projects and scripts by default
 * Debugger now shows local symbols values next to their uses
 
@@ -47,10 +47,10 @@
 
 ### Fixes
 
-* Pair parenth was not inserted in attributes list
+* Pair paren was not inserted in attributes list
 * Tab left action (Shift+Tab) didn't work
 * Tests defined as `let` bindings in types were not found
-* Incremental lexers were not reused, by @misonizhnik
+* Incremental lexers were not reused, by [@misonijnik](github.com/misonijnik)
 * Type hierarchy action icon was shown in wrong places
 * Usages of operators using their compiled names were highlighted incorrectly
 * Local rename didn't work properly for symbols defined in Or patterns
