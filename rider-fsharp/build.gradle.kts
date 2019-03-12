@@ -1,14 +1,10 @@
 import com.jetbrains.rd.generator.gradle.RdgenParams
-import groovy.lang.Closure
-import org.apache.tools.ant.taskdefs.condition.Os
-import org.gradle.internal.jvm.Jvm
-import org.jetbrains.intellij.tasks.PublishTask
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.jetbrains.grammarkit.tasks.GenerateLexer
 import org.jetbrains.intellij.IntelliJPlugin
 import org.jetbrains.intellij.tasks.PrepareSandboxTask
 import org.jetbrains.kotlin.daemon.common.toHexString
-import org.jetbrains.grammarkit.tasks.*
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 buildscript {
     repositories {
@@ -179,7 +175,7 @@ tasks {
         if (name == IntelliJPlugin.PREPARE_TESTING_SANDBOX_TASK_NAME) {
             val testHostPath = "$resharperPluginPath/test/src/FSharp.Tests.Host/bin/$buildConfiguration/net461"
             val testHostName = "$testHostPath/JetBrains.ReSharper.Plugins.FSharp.Tests.Host"
-            files += listOf("$testHostName.dll", "$testHostName.pdb")
+            files = files + listOf("$testHostName.dll", "$testHostName.pdb")
         }
 
         files.forEach {
