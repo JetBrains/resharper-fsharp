@@ -15,5 +15,7 @@ module FSharpGlobalUtil =
 
     /// Reference inequality.
     let inline (!=) a b = not (a == b)
-    
+
+    let inline isNotNull x = not (isNull x)
+
     let someUnit = Some ()

@@ -17,8 +17,6 @@ module rec CommonUtil =
     open Microsoft.FSharp.Compiler
     open Microsoft.FSharp.Compiler.SourceCodeServices
 
-    let inline isNotNull x = not (isNull x)
-
     let ensureAbsolute (path: FileSystemPath) (projectDirectory: FileSystemPath) =
         match path.AsRelative() with
         | null -> path
