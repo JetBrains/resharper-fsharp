@@ -3,6 +3,7 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings.Renam
 open JetBrains.Application
 open JetBrains.ReSharper.Feature.Services.Refactorings.Specific.Rename
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
@@ -85,8 +86,11 @@ type FSharpRenameHelper() =
             |> Seq.cast<IDeclaredElement>
             |> Seq.filter (fun decl -> decl != element && decl.ShortName = element.ShortName)
 
+        | :? IUnionCase as unionCase ->
+            unionCase.GetUnionCaseGeneratedMembers()
+
         | _ -> EmptyArray.Instance :> _
-    
+
     override x.GetOptionsModel(declaredElement, reference, lifetime) =
         FSharpCustomRenameModel(declaredElement, reference, lifetime, (* todo *) ChangeNameKind.SourceName) :> _
 
@@ -121,6 +125,9 @@ type FSharpAtomicRenamesFactory() =
         | :? FSharpGeneratedMemberBase -> RenameAvailabilityCheckResult.CanNotBeRenamed
         | :? ILongIdentPat as pat when not pat.IsDeclaration -> RenameAvailabilityCheckResult.CanNotBeRenamed
 
+        | :? IFSharpDeclaredElement as fsElement when fsElement.SourceName = SharedImplUtil.MISSING_DECLARATION_NAME ->
+            RenameAvailabilityCheckResult.CanNotBeRenamed
+
         | _ ->
 
         match element.ShortName with
@@ -138,3 +145,16 @@ type FSharpNamingService(language: FSharpLanguage) =
 
     override x.MangleNameIfNecessary(name, _) =
         Keywords.QuoteIdentifierIfNeeded name
+
+
+[<RenamePart>]
+type FSharpDeclaredElementForRenameProvider() =
+    interface IPrimaryDeclaredElementForRenameProvider with
+        member x.GetPrimaryDeclaredElement(element, reference) =
+            match element.As<IFSharpGeneratedFromOtherElement>() with
+            | null -> element
+            | generated ->
+
+            match generated.OriginElement with
+            | null -> element
+            | origin -> origin :> _

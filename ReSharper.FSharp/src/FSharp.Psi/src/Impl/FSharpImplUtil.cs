@@ -6,6 +6,7 @@ using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -270,13 +271,30 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return false;
     }
 
-    public static bool IsUnion([NotNull] this TypeElement typeElement)
+    [CanBeNull]
+    private static IUnionPart GetUnionPart([CanBeNull] ITypeElement type)
     {
+      if (!(type is TypeElement typeElement))
+        return null;
+
       foreach (var part in typeElement.EnumerateParts())
-        if (part is IUnionPart)
-          return true;
-      return false;
+        if (part is IUnionPart unionPart)
+          return unionPart;
+      return null;
     }
+
+    public static bool IsUnion([NotNull] this TypeElement type) =>
+      GetUnionPart(type) != null;
+
+    [NotNull]
+    public static IList<IUnionCase> GetUnionCases([CanBeNull] this ITypeElement type) =>
+      GetUnionPart(type)?.Cases ?? EmptyList<IUnionCase>.Instance;
+
+    [CanBeNull]
+    public static FSharpUnionTagsClass GetUnionTagsClass([CanBeNull] this ITypeElement type) =>
+      GetUnionPart(type) is UnionPartBase unionPart && !unionPart.IsSingleCaseUnion
+        ? new FSharpUnionTagsClass(unionPart.TypeElement)
+        : null;
 
     public static string GetSourceName([NotNull] this TypeElement typeElement)
     {

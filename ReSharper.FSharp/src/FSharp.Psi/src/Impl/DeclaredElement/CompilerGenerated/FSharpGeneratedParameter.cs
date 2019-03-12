@@ -1,6 +1,7 @@
 ﻿using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
+using JetBrains.ReSharper.Psi.Pointers;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
@@ -10,12 +11,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
   {
     [NotNull] protected IParametersOwner Owner { get; }
 
-    [CanBeNull] protected ITypeOwner Origin => OriginElement as ITypeOwner;
+    [CanBeNull] internal ITypeOwner Origin { get; }
 
     public FSharpGeneratedParameter([NotNull] IParametersOwner owner, [CanBeNull] ITypeOwner origin)
     {
       Owner = owner;
-      OriginElement = origin;
+      Origin = origin;
     }
 
     public override string ShortName =>
@@ -48,6 +49,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
       ContainingElement.Equals(param.ContainingElement);
 
     public override int GetHashCode() => ShortName.GetHashCode();
-    public IClrDeclaredElement OriginElement { get; set; }
+    public IClrDeclaredElement OriginElement => Owner;
+
+    public IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer() => null; // todo
   }
 }

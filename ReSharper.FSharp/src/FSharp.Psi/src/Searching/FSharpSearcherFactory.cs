@@ -85,7 +85,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
       {
         case IUnionCase unionCase:
           return GetUnionCaseRelatedElements(unionCase);
-        case IGeneratedFromUnionCase generated when generated.OriginElement is IUnionCase unionCase:
+        case IFSharpGeneratedFromOtherElement generated when generated.OriginElement is IUnionCase unionCase:
           return GetUnionCaseRelatedElements(unionCase);
         default:
           return EmptyList<RelatedDeclaredElement>.Instance;

@@ -8,12 +8,17 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
+  public abstract class FSharpGeneratedMethodFromTypeBase : FSharpGeneratedMethodBase
+  {
+    protected FSharpGeneratedMethodFromTypeBase([NotNull] ITypeElement containingType) =>
+      ContainingType = containingType;
+
+    protected override ITypeElement ContainingType { get; }
+  }
+
   public abstract class FSharpGeneratedMethodBase : FSharpGeneratedFunctionBase, IMethod
   {
-    [NotNull] protected readonly ITypeElement ContainingType;
-
-    protected FSharpGeneratedMethodBase([NotNull] ITypeElement containingType) =>
-      ContainingType = containingType;
+    [NotNull] protected abstract ITypeElement ContainingType { get; }
 
     protected override IClrDeclaredElement ContainingElement => ContainingType;
 

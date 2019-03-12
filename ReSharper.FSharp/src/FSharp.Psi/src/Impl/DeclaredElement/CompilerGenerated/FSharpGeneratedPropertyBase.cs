@@ -8,16 +8,21 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 {
+  public abstract class FSharpGeneratedPropertyFromTypeBase : FSharpGeneratedPropertyBase
+  {
+    protected FSharpGeneratedPropertyFromTypeBase(ITypeElement typeElement) =>
+      ContainingType = typeElement;
+
+    public override ITypeElement ContainingType { get; }
+  }
+
   public abstract class FSharpGeneratedPropertyBase : FSharpGeneratedMemberBase, IProperty
   {
-    protected FSharpGeneratedPropertyBase(ITypeElement typeElement) =>
-      TypeElement = typeElement;
+    protected override IClrDeclaredElement ContainingElement => ContainingType;
+    public override ITypeElement GetContainingType() => ContainingType;
+    public override ITypeMember GetContainingTypeMember() => (ITypeMember) ContainingType;
 
-    protected override IClrDeclaredElement ContainingElement => TypeElement;
-    public override ITypeElement GetContainingType() => TypeElement;
-    public override ITypeMember GetContainingTypeMember() => (ITypeMember) TypeElement;
-
-    [NotNull] public ITypeElement TypeElement { get; }
+    [NotNull] public abstract ITypeElement ContainingType { get; }
 
     public abstract IType Type { get; }
 

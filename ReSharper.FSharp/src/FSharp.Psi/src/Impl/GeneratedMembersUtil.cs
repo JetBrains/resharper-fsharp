@@ -14,8 +14,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
   {
     public static IList<ITypeMember> GetGeneratedMembers(this TypePart typePart)
     {
-      var typeElement = typePart.TypeElement;
-      if (typeElement == null)
+      if (!(typePart.TypeElement is TypeElement typeElement))
         return EmptyList<ITypeMember>.Instance;
 
       var result = new LocalList<ITypeMember>(new ITypeMember[]
@@ -57,16 +56,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
           break;
 
         case IUnionPart unionPart:
-          var cases = unionPart.Cases;
-          var isSingleCaseUnion = cases.Count == 1;
-
           result.Add(new UnionTagProperty(typeElement));
-
-          foreach (var unionCase in cases)
+          foreach (var unionCase in unionPart.Cases)
           {
-            if (!isSingleCaseUnion)
-              result.Add(new IsUnionCaseProperty(typeElement, unionCase));
-
             if (unionCase is FSharpNestedTypeUnionCase typedCase)
             {
               result.Add(new NewUnionCaseMethod(typedCase));
@@ -74,10 +66,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
               if (!unionPart.HasPublicNestedTypes)
                 result.AddRange(typedCase.CaseFields);
             }
+
+            if (!unionPart.IsSingleCaseUnion)
+              result.Add(new IsUnionCaseProperty(unionCase));
           }
 
-          if (!isSingleCaseUnion)
-            result.Add(new FSharpUnionTagsClass(typePart));
+          if (!unionPart.IsSingleCaseUnion)
+            result.Add(new FSharpUnionTagsClass(typeElement));
           break;
       }
 

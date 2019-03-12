@@ -54,6 +54,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   internal abstract class UnionPartBase : SimpleTypePartBase, IUnionPart
   {
     public bool HasPublicNestedTypes { get; }
+    public bool IsSingleCaseUnion { get; }
     public AccessRights RepresentationAccessRights { get; }
 
     protected UnionPartBase([NotNull] IUnionDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder,
@@ -61,11 +62,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
       HasPublicNestedTypes = hasPublicNestedTypes;
       RepresentationAccessRights = GetRepresentationAccessRights(declaration);
+      IsSingleCaseUnion = declaration.UnionCases.Count == 1;
     }
 
     protected UnionPartBase(IReader reader) : base(reader)
     {
       HasPublicNestedTypes = reader.ReadBool();
+      IsSingleCaseUnion = reader.ReadBool();
       RepresentationAccessRights = (AccessRights) reader.ReadByte();
     }
 
@@ -73,6 +76,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
       base.Write(writer);
       writer.WriteBool(HasPublicNestedTypes);
+      writer.WriteBool(IsSingleCaseUnion);
       writer.WriteByte((byte) RepresentationAccessRights);
     }
 
@@ -91,6 +95,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
         return result.ResultingList();
       }
     }
+
+    public IList<IUnionCaseDeclaration> CaseDeclarations =>
+      GetDeclaration() is IUnionDeclaration declaration
+        ? declaration.UnionCases
+        : EmptyList<IUnionCaseDeclaration>.InstanceList;
 
     private static AccessRights GetRepresentationAccessRights([NotNull] IUnionDeclaration declaration)
     {
@@ -118,10 +127,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   public interface IUnionPart : ISimpleTypePart, IRepresentationAccessRightsOwner
   {
     bool HasPublicNestedTypes { get; }
+    bool IsSingleCaseUnion { get; }
     IList<IUnionCase> Cases { get; }
-  }
-
-  public interface IUnionCase : ITypeMember, IRepresentationAccessRightsOwner
-  {
+    IList<IUnionCaseDeclaration> CaseDeclarations { get; }
   }
 }

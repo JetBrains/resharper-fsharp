@@ -72,3 +72,8 @@ type FSharpLanguageService
         match setExpr.ReferenceIdentifier with
         | token when token == referenceToken -> ReferenceAccessType.WRITE
         | _ -> ReferenceAccessType.OTHER
+
+    override x.CreateElementPointer(declaredElement) =
+        match declaredElement.As<IFSharpGeneratedFromOtherElement>() with
+        | null -> null
+        | generatedElement -> generatedElement.CreatePointer() :?> _

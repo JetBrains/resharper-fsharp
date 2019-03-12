@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Pointers;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -28,6 +29,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 
   public interface IFSharpGeneratedFromOtherElement : IFSharpDeclaredElement
   {
-    [CanBeNull] IClrDeclaredElement OriginElement { get; set; }
+    [NotNull] IClrDeclaredElement OriginElement { get; }
+    IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer();
   }
 }

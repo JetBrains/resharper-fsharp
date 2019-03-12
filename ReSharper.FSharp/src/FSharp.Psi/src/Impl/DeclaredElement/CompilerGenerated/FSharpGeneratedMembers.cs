@@ -1,14 +1,11 @@
 using System.Collections.Generic;
-using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Impl.Special;
-using JetBrains.Util;
 using static JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated.FSharpGeneratedMembers;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
@@ -164,7 +161,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
   #region GetHashCodeMethod
 
-  public class GetHashCodeMethod : FSharpGeneratedMethodBase
+  public class GetHashCodeMethod : FSharpGeneratedMethodFromTypeBase
   {
     public GetHashCodeMethod([NotNull] ITypeElement containingType) : base(containingType)
     {
@@ -180,7 +177,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
   #region ToStringMethod
 
-  public class ToStringMethod : FSharpGeneratedMethodBase
+  public class ToStringMethod : FSharpGeneratedMethodFromTypeBase
   {
     public ToStringMethod([NotNull] ITypeElement containingType) : base(containingType)
     {
@@ -216,7 +213,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
   #region GeneratedMethodWithOneParam
 
-  public abstract class GeneratedMethodWithOneParam : FSharpGeneratedMethodBase
+  public abstract class GeneratedMethodWithOneParam : FSharpGeneratedMethodFromTypeBase
   {
     protected GeneratedMethodWithOneParam([NotNull] ITypeElement containingType) : base(containingType)
     {
@@ -251,31 +248,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
   #endregion
 
-  #region IsUnionCaseProperty
-
-  public class IsUnionCaseProperty : FSharpGeneratedPropertyBase, IFSharpGeneratedFromOtherElement
-  {
-    internal IsUnionCaseProperty([NotNull] ITypeElement typeElement, [NotNull] IUnionCase unionCase)
-      : base(typeElement) => OriginElement = unionCase;
-
-    public IClrDeclaredElement OriginElement { get; set; }
-
-    public override string ShortName =>
-      OriginElement is IUnionCase unionCase
-        ? "Is" + unionCase.ShortName
-        : SharedImplUtil.MISSING_DECLARATION_NAME;
-
-    public override IType Type => PredefinedType.Bool;
-
-    public override AccessRights GetAccessRights() =>
-      TypeElement.GetRepresentationAccessRights();
-  }
-
-  #endregion
-
   #region UnionTagProperty
 
-  public class UnionTagProperty : FSharpGeneratedPropertyBase
+  public class UnionTagProperty : FSharpGeneratedPropertyFromTypeBase
   {
     public UnionTagProperty([NotNull] ITypeElement typeElement) : base(typeElement)
     {
@@ -283,45 +258,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
     public override string ShortName => "Tag";
     public override IType Type => PredefinedType.Int;
-
-    public override AccessRights GetAccessRights() =>
-      TypeElement.GetRepresentationAccessRights();
-  }
-
-  #endregion
-
-  #region NewUnionCaseMethod
-
-  public class NewUnionCaseMethod : FSharpGeneratedMethodBase, IFSharpGeneratedFromOtherElement
-  {
-    public NewUnionCaseMethod([NotNull] TypeElement typeElement) : base(typeElement.GetContainingType()) =>
-      OriginElement = typeElement;
-
-    public IClrDeclaredElement OriginElement { get; set; }
-
-    public override string ShortName =>
-      OriginElement is IUnionCase unionCase
-        ? "New" + unionCase.ShortName
-        : SharedImplUtil.MISSING_DECLARATION_NAME;
-
-    public override IType ReturnType => ContainingTypeType;
-    public override bool IsStatic => true;
-
-    public override IList<IParameter> Parameters
-    {
-      get
-      {
-        if (!(OriginElement is TypeElement typeElement))
-          return EmptyList<IParameter>.Instance;
-
-        var fields = typeElement.EnumerateParts().OfType<UnionCasePart>().First().CaseFields;
-        var result = new IParameter[fields.Count];
-        for (var i = 0; i < fields.Count; i++)
-          result[i] = new FSharpGeneratedParameter(this, fields[i]);
-
-        return result;
-      }
-    }
 
     public override AccessRights GetAccessRights() =>
       ContainingType.GetRepresentationAccessRights();

@@ -6,48 +6,46 @@ using JetBrains.Metadata.Reader.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
-using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 {
-  internal class FSharpUnionTagsClass : FSharpGeneratedMemberBase, IClass
+  public class FSharpUnionTagsClass : FSharpGeneratedMemberBase, IClass
   {
     private const string TagsClassName = "Tags";
 
-    public readonly TypePart TypePart;
+    public readonly TypeElement Union;
 
-    internal FSharpUnionTagsClass([NotNull] TypePart typePart) =>
-      TypePart = typePart;
+    internal FSharpUnionTagsClass([CanBeNull] TypeElement typeElement) =>
+      Union = typeElement;
 
     public override DeclaredElementType GetElementType() =>
       CLRDeclaredElementType.CLASS;
 
-    protected IUnionPart UnionPart => (IUnionPart) TypePart;
-    protected TypeElement ContainingType => TypePart.TypeElement;
+    internal IUnionPart UnionPart =>
+      (IUnionPart) Union.EnumerateParts().FirstOrDefault(p => p is IUnionPart);
 
-    protected override IClrDeclaredElement ContainingElement => ContainingType;
-    public override ITypeElement GetContainingType() => ContainingType;
-    public override ITypeMember GetContainingTypeMember() => ContainingType;
+    protected override IClrDeclaredElement ContainingElement => Union;
+    public override ITypeElement GetContainingType() => Union;
+    public override ITypeMember GetContainingTypeMember() => Union;
 
     public override string ShortName => TagsClassName;
     public IList<ITypeParameter> TypeParameters => EmptyList<ITypeParameter>.Instance;
 
     public IClrTypeName GetClrName() =>
-      new ClrTypeName($"{ContainingType.GetClrName().FullName}+{TagsClassName}");
+      new ClrTypeName($"{Union.GetClrName().FullName}+{TagsClassName}");
 
     public IEnumerable<ITypeMember> GetMembers() => Constants;
 
     public IEnumerable<string> MemberNames =>
-      UnionPart.Cases.Select(c => c.ShortName);
+      UnionPart.CaseDeclarations.Select(c => c.CompiledName);
 
     public INamespace GetContainingNamespace() =>
-      ContainingType.GetContainingNamespace();
+      Union.GetContainingNamespace();
 
     public IPsiSourceFile GetSingleOrDefaultSourceFile() =>
-      ContainingType.GetSingleOrDefaultSourceFile();
-
+      Union.GetSingleOrDefaultSourceFile();
 
     public override bool IsStatic => true;
 
@@ -55,12 +53,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     {
       get
       {
-        var tags = new LocalList<IField>();
-        var cases = UnionPart.Cases;
-        for (var i = 0; i < cases.Count; i++)
-          tags.Add(new UnionCaseTag(this, cases[i], i));
+        var tags = new List<IField>();
+        foreach (var unionCase in UnionPart.Cases)
+          tags.Add(new UnionCaseTag(unionCase));
 
-        return tags.ResultingList();
+        return tags;
       }
     }
 
@@ -94,64 +91,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
       XMLDocUtil.GetTypeElementXmlDocId(this);
 
     public override AccessRights GetAccessRights() =>
-      ContainingType.GetRepresentationAccessRights();
-
-    #region UnionCaseTag
-
-    public class UnionCaseTag : FSharpGeneratedMemberBase, IField, IFSharpGeneratedFromOtherElement
-    {
-      public FSharpUnionTagsClass TagsClass { get; }
-      public IClrDeclaredElement OriginElement { get; set; }
-      protected readonly int Index;
-
-      public UnionCaseTag(FSharpUnionTagsClass tagsClass, IUnionCase unionCase, int index)
-      {
-        TagsClass = tagsClass;
-        OriginElement = unionCase;
-        Index = index;
-      }
-
-      public override string ShortName =>
-        UnionCase.ShortName;
-
-      private IUnionCase UnionCase => TagsClass.UnionPart.Cases[Index];
-
-      protected override IClrDeclaredElement ContainingElement => TagsClass;
-      public override ITypeElement GetContainingType() => TagsClass;
-      public override ITypeMember GetContainingTypeMember() => TagsClass;
-
-      public override DeclaredElementType GetElementType() =>
-        CLRDeclaredElementType.CONSTANT;
-
-      public IType Type => PredefinedType.Int;
-      public ConstantValue ConstantValue => new ConstantValue(Index, Type);
-
-      public bool IsField => false;
-      public bool IsConstant => true;
-      public bool IsEnumMember => false;
-      public int? FixedBufferSize => null;
-
-      public override bool IsStatic => true;
-      public override bool IsReadonly => true;
-
-      public override ISubstitution IdSubstitution => EmptySubstitution.INSTANCE;
-
-      public override bool Equals(object obj)
-      {
-        if (ReferenceEquals(this, obj))
-          return true;
-
-        if (!(obj is UnionCaseTag tag)) return false;
-
-        if (!ShortName.Equals(tag.ShortName))
-          return false;
-
-        return Equals(GetContainingType(), tag.GetContainingType());
-      }
-
-      public override int GetHashCode() => ShortName.GetHashCode();
-    }
-
-    #endregion
+      Union.GetRepresentationAccessRights();
   }
 }
