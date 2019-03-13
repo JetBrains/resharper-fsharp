@@ -48,19 +48,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
     public override ISubstitution IdSubstitution => EmptySubstitution.INSTANCE;
 
-    public override bool Equals(object obj)
-    {
-      if (ReferenceEquals(this, obj))
-        return true;
+    public override bool IsValid() =>
+      UnionCase.IsValid();
 
-      if (!(obj is UnionCaseTag tag)) return false;
+    public override bool Equals(object obj) =>
+      obj is UnionCaseTag other && Equals(UnionCase, other.UnionCase);
 
-      if (!ShortName.Equals(tag.ShortName))
-        return false;
-
-      return Equals(GetContainingType(), tag.GetContainingType());
-    }
-
-    public override int GetHashCode() => ShortName.GetHashCode();
+    public override int GetHashCode() =>
+      UnionCase.GetHashCode();
   }
 }

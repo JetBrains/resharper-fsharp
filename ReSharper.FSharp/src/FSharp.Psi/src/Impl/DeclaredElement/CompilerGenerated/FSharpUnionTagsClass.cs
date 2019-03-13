@@ -80,12 +80,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
       if (ReferenceEquals(this, obj))
         return true;
 
-      if (!(obj is FSharpUnionTagsClass tags)) return false;
-
-      return Equals(GetContainingType(), tags.GetContainingType());
+      return obj is FSharpUnionTagsClass tags && Equals(GetContainingType(), tags.GetContainingType());
     }
 
-    public override int GetHashCode() => ShortName.GetHashCode();
+    public override int GetHashCode() => Union.GetHashCode();
 
     public override string XMLDocId =>
       XMLDocUtil.GetTypeElementXmlDocId(this);

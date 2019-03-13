@@ -18,13 +18,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
       if (!base.Equals(obj))
         return false;
 
-      if (!(obj is IFSharpTypeMember && obj is IFunction))
+      if (!(obj is IFunction other))
         return false;
 
-      var member = (IFunction) obj;
       var signature = GetSignature(IdSubstitution);
-      var memberSignature = member.GetSignature(member.IdSubstitution);
-      return SignatureComparers.Strict.CompareWithoutName(signature, memberSignature);
+      var otherSignature = other.GetSignature(other.IdSubstitution);
+      return SignatureComparers.Strict.CompareWithoutName(signature, otherSignature);
     }
 
     public override int GetHashCode() =>
@@ -37,7 +36,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     public bool IsIterator => false;
     public IAttributesSet ReturnTypeAttributes => EmptyAttributesSet.Instance;
     public ReferenceKind ReturnKind => ReferenceKind.VALUE;
-    
+
     public abstract IList<IParameter> Parameters { get; }
     public abstract IType ReturnType { get; }
   }

@@ -50,20 +50,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     public bool IsWritable => false;
     public bool IsAuto => false;
     public bool IsDefault => false;
-
-    public override bool Equals(object obj)
-    {
-      if (ReferenceEquals(this, obj))
-        return true;
-
-      if (!(obj is IFSharpTypeMember member)) return false;
-
-      if (!ShortName.Equals(member.ShortName))
-        return false;
-
-      return Equals(GetContainingType(), member.GetContainingType());
-    }
-
-    public override int GetHashCode() => ShortName.GetHashCode();
   }
 }

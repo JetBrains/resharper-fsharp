@@ -28,5 +28,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
 
     public override AccessRights GetAccessRights() =>
       ContainingType.GetRepresentationAccessRights();
+
+    public override bool IsValid() =>
+      OriginElement.IsValid();
+
+    public override bool Equals(object obj) =>
+      obj is IsUnionCaseProperty other && Equals(OriginElement, other.OriginElement);
+
+    public override int GetHashCode() =>
+      OriginElement.GetHashCode();
   }
 }
