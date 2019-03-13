@@ -87,7 +87,7 @@ type FSharpRenameHelper() =
             |> Seq.filter (fun decl -> decl != element && decl.ShortName = element.ShortName)
 
         | :? IUnionCase as unionCase ->
-            unionCase.GetUnionCaseGeneratedMembers()
+            unionCase.GetGeneratedMembers()
 
         | _ -> EmptyArray.Instance :> _
 

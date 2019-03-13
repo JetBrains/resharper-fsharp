@@ -9,20 +9,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
   {
     private IUnionCase UnionCase { get; }
 
-    public IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer() =>
-      new UnionCaseTagPointer(this);
-
     public UnionCaseTag(IUnionCase unionCase) =>
       UnionCase = unionCase;
 
-    public override string ShortName =>
-      UnionCase.ShortName;
+    public override string ShortName => UnionCase.ShortName;
 
-    public IClrDeclaredElement OriginElement => UnionCase;
-    private ITypeElement Union => OriginElement.GetContainingType();
-    private FSharpUnionTagsClass TagsClass => OriginElement.GetContainingType().GetUnionTagsClass();
+    private ITypeElement Union => UnionCase.GetContainingType();
+    private FSharpUnionTagsClass TagsClass => Union.GetUnionTagsClass();
 
-    public int? Index => Union.GetUnionCases().IndexOf(UnionCase);
+    IClrDeclaredElement IFSharpGeneratedFromOtherElement.OriginElement => UnionCase;
+
+    public IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer() =>
+      new UnionCaseTagPointer(this);
+
+    public int Index => Union.GetUnionCases().IndexOf(UnionCase);
 
     protected override IClrDeclaredElement ContainingElement => TagsClass;
     public override ITypeElement GetContainingType() => TagsClass;
@@ -34,7 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     public IType Type => PredefinedType.Int;
 
     public ConstantValue ConstantValue =>
-      Index is int index
+      Index is var index && index != -1
         ? new ConstantValue(index, Type)
         : ConstantValue.BAD_VALUE;
 

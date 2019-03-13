@@ -93,7 +93,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
     }
 
     private static IEnumerable<RelatedDeclaredElement> GetUnionCaseRelatedElements([NotNull] IUnionCase unionCase) =>
-      unionCase.GetUnionCaseGeneratedMembers().Select(member => new RelatedDeclaredElement(member));
+      unionCase.GetGeneratedMembers().Select(member => new RelatedDeclaredElement(member));
 
     public override Tuple<ICollection<IDeclaredElement>, bool> GetNavigateToTargets(IDeclaredElement element)
     {

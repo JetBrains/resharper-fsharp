@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
@@ -79,23 +80,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return result.ResultingList();
     }
 
-    public static IEnumerable<IDeclaredElement> GetUnionCaseGeneratedMembers([NotNull] this IUnionCase unionCase)
+    public static IEnumerable<IDeclaredElement> GetGeneratedMembers([NotNull] this IUnionCase unionCase)
     {
-      var type = unionCase.GetContainingType();
-      if (type == null)
+      if (!(unionCase.GetContainingType().GetUnionPart() is IUnionPart unionPart))
+        return EmptyList<IDeclaredElement>.Instance;
+
+      if (unionPart.IsSingleCaseUnion && unionCase is FSharpUnionCaseProperty)
         return EmptyList<IDeclaredElement>.Instance;
 
       var result = new List<IDeclaredElement>();
-      foreach (var member in type.GetMembers())
-      {
-        if (member is IFSharpGeneratedFromOtherElement generated && unionCase.Equals(generated.OriginElement))
-          result.Add(member);
+      if (unionCase is FSharpNestedTypeUnionCase)
+        result.Add(new NewUnionCaseMethod(unionCase));
 
-        if (member is FSharpUnionTagsClass tagsClass)
-          foreach (var tagsMember in tagsClass.GetMembers())
-            if (tagsMember is IFSharpGeneratedFromOtherElement tag && unionCase.Equals(tag.OriginElement))
-              result.Add(tagsMember);
-      }
+      if (unionPart.IsSingleCaseUnion)
+        return result;
+
+      result.Add(new IsUnionCaseProperty(unionCase));
+      result.Add(new UnionCaseTag(unionCase));
 
       return result;
     }

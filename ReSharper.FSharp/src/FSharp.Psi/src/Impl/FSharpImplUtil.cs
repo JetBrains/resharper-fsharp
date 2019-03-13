@@ -272,7 +272,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     [CanBeNull]
-    private static IUnionPart GetUnionPart([CanBeNull] ITypeElement type)
+    public static IUnionPart GetUnionPart([CanBeNull] this ITypeElement type)
     {
       if (!(type is TypeElement typeElement))
         return null;
