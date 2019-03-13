@@ -1,24 +1,34 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 {
   public class FSharpGeneratedConstructorFromFields : FSharpGeneratedConstructor
   {
-    public FSharpGeneratedConstructorFromFields([NotNull] TypePart typePart,
-      IList<ITypeOwner> fields) : base(typePart)
+    public FSharpGeneratedConstructorFromFields([NotNull] TypePart typePart) : base(typePart)
     {
-      var parameters = new IParameter[fields.Count];
-      for (var i = 0; i < fields.Count; i++)
-        parameters[i] = new FSharpGeneratedParameter(this, fields[i]);
-
-      Parameters = parameters;
     }
 
-    public override IList<IParameter> Parameters { get; }
+    public override IList<IParameter> Parameters
+    {
+      get
+      {
+        if (!(TypePart is IFieldsOwnerPart typePart))
+          return EmptyList<IParameter>.Instance;
+
+        var fields = typePart.Fields;
+        var result = new IParameter[fields.Count];
+        for (var i = 0; i < fields.Count; i++)
+          result[i] = new FSharpGeneratedParameter(this, fields[i]);
+
+        return result;
+      }
+    }
   }
 
   public abstract class FSharpGeneratedConstructor : FSharpGeneratedFunctionBase, IConstructor

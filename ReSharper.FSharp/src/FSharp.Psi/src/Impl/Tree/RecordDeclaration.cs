@@ -14,15 +14,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public IList<ITypeOwner> GetFields()
     {
       var fieldDeclarations = Fields;
-      var result = new LocalList<ITypeOwner>(fieldDeclarations.Count);
-      foreach (var fieldDeclaration in fieldDeclarations)
-      {
-        var field = fieldDeclaration.DeclaredElement;
-        if (field != null)
-          result.Add((ITypeOwner) field);
-      }
+      var result = new ITypeOwner[fieldDeclarations.Count];
+      for (var i = 0; i < fieldDeclarations.Count; i++)
+        if (fieldDeclarations[i].DeclaredElement is ITypeOwner field)
+          result[i] = field;
 
-      return result.ResultingList();
+      return result;
     }
 
     public override PartKind TypePartKind =>

@@ -44,16 +44,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       switch (typePart)
       {
         case IRecordPart recordPart:
-          result.Add(new FSharpGeneratedConstructorFromFields(typePart, recordPart.Fields));
+          result.Add(new FSharpGeneratedConstructorFromFields(typePart));
           if (recordPart.CliMutable && typePart is Class.IClassPart)
             result.Add(new DefaultConstructor(typeElement));
           break;
 
         case IExceptionPart exceptionPart:
           result.Add(new ExceptionConstructor(typePart));
-          var fields = exceptionPart.Fields;
-          if (!fields.IsEmpty())
-            result.Add(new FSharpGeneratedConstructorFromFields(typePart, fields));
+          if (exceptionPart.HasFields)
+            result.Add(new FSharpGeneratedConstructorFromFields(typePart));
           break;
 
         case IUnionPart unionPart:

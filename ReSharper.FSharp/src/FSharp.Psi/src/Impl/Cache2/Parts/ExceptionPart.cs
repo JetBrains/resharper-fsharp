@@ -14,13 +14,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   {
     private static readonly string[] ourExtendsListShortNames = {"Exception", "IStructuralEquatable"};
 
-    public ExceptionPart([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
-      : base(declaration, cacheBuilder)
-    {
-    }
+    public bool HasFields { get; }
 
-    public ExceptionPart(IReader reader) : base(reader)
+    public ExceptionPart([NotNull] IExceptionDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
+      : base(declaration, cacheBuilder) =>
+      HasFields = !declaration.Fields.IsEmpty;
+
+    public ExceptionPart(IReader reader) : base(reader) =>
+      HasFields = reader.ReadBool();
+
+    protected override void Write(IWriter writer)
     {
+      base.Write(writer);
+      writer.WriteBool(HasFields);
     }
 
     public override TypeElement CreateTypeElement() =>
@@ -62,8 +68,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public bool HasCompareTo => false;
   }
 
-  public interface IExceptionPart : Class.IClassPart, ISimpleTypePart
+  public interface IExceptionPart : Class.IClassPart, IFieldsOwnerPart
   {
-    IList<ITypeOwner> Fields { get; }
+    bool HasFields { get; }
   }
 }
