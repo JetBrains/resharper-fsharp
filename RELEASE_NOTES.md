@@ -29,12 +29,12 @@
 
 ### Completion
 
-* An option for out-of-scope completion to place `open` statements to the top level was added and enabled by default by [@saul](https://github.com/saul)
+* An option for out-of-scope completion to place `open` statements to the top level was added and enabled by default by [@saul](https://github.com/saul) ([#39](https://github.com/JetBrains/fsharp-support/pull/39))
 * Out-of-scope completion can be disabled now
 
 ### Code analysis
 
-* Format specifiers are now highlighted, by [@vasily-kirichenko](https://github.com/vasily-kirichenko)
+* Format specifiers are now highlighted, by [@vasily-kirichenko](https://github.com/vasily-kirichenko) ([#40](https://github.com/JetBrains/fsharp-support/pull/40))
 * Unused local values analysis is now turned on for all projects and scripts by default
 * Debugger now shows local symbols values next to their uses
 
