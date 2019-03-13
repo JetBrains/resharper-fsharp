@@ -33,7 +33,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 
     public override bool IsCompatibleWithLanguage(PsiLanguageType languageType) => languageType.Is<FSharpLanguage>();
 
-    public override IDomainSpecificSearcher CreateReferenceSearcher(IDeclaredElementsSet elements, bool findCandidates) =>
+    public override IDomainSpecificSearcher
+      CreateReferenceSearcher(IDeclaredElementsSet elements, bool findCandidates) =>
       new FSharpReferenceSearcher(elements, findCandidates);
 
     public override IEnumerable<string> GetAllPossibleWordsInFile(IDeclaredElement element) =>
@@ -85,8 +86,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
       {
         case IUnionCase unionCase:
           return GetUnionCaseRelatedElements(unionCase);
-        case IFSharpGeneratedFromOtherElement generated when generated.OriginElement is IUnionCase unionCase:
-          return GetUnionCaseRelatedElements(unionCase);
+        case IGeneratedConstructorParameterOwner parameterOwner:
+          return new[] {new RelatedDeclaredElement(parameterOwner.GetParameter())};
         default:
           return EmptyList<RelatedDeclaredElement>.Instance;
       }

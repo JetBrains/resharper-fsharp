@@ -296,6 +296,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         ? new FSharpUnionTagsClass(unionPart.TypeElement)
         : null;
 
+    public static IParametersOwner GetGeneratedConstructor(this ITypeElement type)
+    {
+      if (type is IGeneratedConstructorOwner constructorOwner)
+        return constructorOwner.GetConstructor();
+
+      if (!(type is TypeElement typeElement))
+        return null;
+
+      foreach (var part in typeElement.EnumerateParts())
+      {
+        if (part is IGeneratedConstructorOwner constructorOwnerPart)
+          return constructorOwnerPart.GetConstructor();
+      }
+
+      return null;
+    }
+
     public static string GetSourceName([NotNull] this TypeElement typeElement)
     {
       foreach (var part in typeElement.EnumerateParts())

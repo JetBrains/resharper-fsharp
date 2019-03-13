@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Pointers;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Pointers;
@@ -49,8 +50,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
       ContainingElement.Equals(param.ContainingElement);
 
     public override int GetHashCode() => ShortName.GetHashCode();
-    public IClrDeclaredElement OriginElement => Owner;
+    public IClrDeclaredElement OriginElement => Origin;
 
-    public IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer() => null; // todo
+    public IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer() =>
+      new FSharpGeneratedParameterPointer(this);
   }
 }

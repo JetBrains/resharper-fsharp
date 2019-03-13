@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
@@ -32,7 +33,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       myIsMutable || GetContainingType().IsCliMutableRecord();
   }
 
-  internal abstract class FSharpFieldProperty<T> : FSharpFieldPropertyBase<T>, IFSharpFieldProperty
+  internal abstract class FSharpFieldProperty<T> : FSharpCompiledPropertyBase<T>, IFSharpFieldProperty
     where T : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
     internal FSharpFieldProperty([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
@@ -47,5 +48,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public override AccessRights GetAccessRights() =>
       GetContainingType().GetRepresentationAccessRights();
+
+    public IParameter GetParameter() =>
+      new FSharpGeneratedParameter(GetContainingType().GetGeneratedConstructor(), this);
   }
 }

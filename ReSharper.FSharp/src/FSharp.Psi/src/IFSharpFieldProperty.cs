@@ -1,8 +1,21 @@
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 {
-  public interface IFSharpFieldProperty : IProperty
+  public interface IFSharpFieldProperty : IGeneratedConstructorParameterOwner, IProperty
   {
+  }
+
+  public interface IGeneratedConstructorParameterOwner : ITypeOwner
+  {
+    [NotNull]
+    IParameter GetParameter();
+  }
+
+  public interface IGeneratedConstructorOwner
+  {
+    [NotNull]
+    IParametersOwner GetConstructor();
   }
 }

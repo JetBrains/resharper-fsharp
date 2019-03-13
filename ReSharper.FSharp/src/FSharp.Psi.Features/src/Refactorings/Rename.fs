@@ -89,6 +89,9 @@ type FSharpRenameHelper() =
         | :? IUnionCase as unionCase ->
             unionCase.GetGeneratedMembers()
 
+        | :? IGeneratedConstructorParameterOwner as parameterOwner ->
+            [| parameterOwner.GetParameter() :> IDeclaredElement |] :> _
+
         | _ -> EmptyArray.Instance :> _
 
     override x.GetOptionsModel(declaredElement, reference, lifetime) =

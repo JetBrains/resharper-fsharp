@@ -10,7 +10,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  internal class ExceptionPart : FSharpTypeMembersOwnerTypePart, IExceptionPart
+  internal class ExceptionPart : FSharpTypeMembersOwnerTypePart, IExceptionPart, IGeneratedConstructorOwner
   {
     private static readonly string[] ourExtendsListShortNames = {"Exception", "IStructuralEquatable"};
 
@@ -66,6 +66,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public bool OverridesToString => false;
     public bool HasCompareTo => false;
+
+    public IParametersOwner GetConstructor() =>
+      new FSharpGeneratedConstructorFromFields(this);
   }
 
   public interface IExceptionPart : Class.IClassPart, IFieldsOwnerPart

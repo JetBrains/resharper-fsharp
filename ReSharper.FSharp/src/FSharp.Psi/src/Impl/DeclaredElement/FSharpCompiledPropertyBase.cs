@@ -9,10 +9,11 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal abstract class FSharpFieldPropertyBase<T> : FSharpTypeMember<T>, IProperty
+  /// Base type for F# symbols compiled as properties.
+  internal abstract class FSharpCompiledPropertyBase<T> : FSharpTypeMember<T>, IProperty
     where T : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
-    internal FSharpFieldPropertyBase([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
+    internal FSharpCompiledPropertyBase([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {
     }
 

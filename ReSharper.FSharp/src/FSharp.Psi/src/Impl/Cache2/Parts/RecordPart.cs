@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
@@ -50,7 +51,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public bool IsByRefLike => false;
   }
 
-  internal abstract class RecordPartBase : SimpleTypePartBase, IRecordPart
+  internal abstract class RecordPartBase : SimpleTypePartBase, IRecordPart, IGeneratedConstructorOwner
   {
     public bool CliMutable { get; }
 
@@ -81,6 +82,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       GetDeclaration() is IRecordDeclaration recordDeclaration
         ? recordDeclaration.GetFields()
         : EmptyList<ITypeOwner>.Instance;
+
+    public IParametersOwner GetConstructor() =>
+      new FSharpGeneratedConstructorFromFields(this);
   }
 
   public interface IRecordPart : IFieldsOwnerPart

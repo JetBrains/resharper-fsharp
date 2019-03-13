@@ -9,7 +9,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
   /// <summary>
   /// A union case compiled to a static property.
   /// </summary>
-  internal class FSharpUnionCaseProperty : FSharpFieldPropertyBase<SingletonCaseDeclaration>, IUnionCase
+  internal class FSharpUnionCaseProperty : FSharpCompiledPropertyBase<SingletonCaseDeclaration>, IUnionCase
   {
     internal FSharpUnionCaseProperty([NotNull] ISingletonCaseDeclaration declaration) : base(declaration)
     {
