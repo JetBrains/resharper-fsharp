@@ -39,7 +39,6 @@
       <LogicalName>JetBrains.ReSharper.Plugins.FSharp.Templates.FileTemplates.xml</LogicalName>
     </EmbeddedResource>
     <Compile Include="src\Foldings\FSharpCodeFoldings.fs" />
-    <Compile Include="src\LanguageService\FSharpDeclaredElementIconProvider.fs" />
     <Compile Include="src\Search\FSharpItemOccurrenceKind.fs" />
     <Compile Include="src\Search\FSharpPathReference.fs" />
     <Compile Include="src\Search\FSharpSearchGuru.fs" />
@@ -58,10 +57,12 @@
     <Compile Include="src\Parsing\FSharpSigTreeBuilder.fs" />
     <Compile Include="src\Parsing\FSharpParser.fs" />
     <Compile Include="src\Refactorings\Rename.fs" />
+    <Compile Include="src\LanguageService\FSharpDeclaredElementIconProvider.fs" />
     <Compile Include="src\LanguageService\FSharpPsiProperties.fs" />
     <Compile Include="src\LanguageService\FSharpProjectFileLanguageService.fs" />
     <Compile Include="src\LanguageService\FSharpLanguageService.fs" />
     <Compile Include="src\LanguageService\FSharpClrLanguage.fs" />
+    <Compile Include="src\LanguageService\FSharpBreadcrumbsHelper.fs" />
     <Compile Include="src\FSharpTypingAssist.fs" />
     <Compile Include="src\ZoneMarker.fs" />
   </ItemGroup>
