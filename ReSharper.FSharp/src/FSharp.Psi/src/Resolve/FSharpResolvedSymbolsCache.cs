@@ -44,7 +44,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       lock (myLock)
       {
         myPsiModules.Remove(psiModule);
-        InvalidateReferencingModules(psiModule);
+        if (psiModule.IsValid())
+          InvalidateReferencingModules(psiModule);
       }
     }
 
@@ -62,6 +63,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     private void Invalidate(IPsiSourceFile sourceFile)
     {
       var psiModule = sourceFile.PsiModule;
+      if (!psiModule.IsValid())
+      {
+        Invalidate(psiModule);
+        return;
+      }
+
       if (myPsiModules.TryGetValue(psiModule, out var moduleResolvedSymbols))
         moduleResolvedSymbols.Invalidate(sourceFile);
 
