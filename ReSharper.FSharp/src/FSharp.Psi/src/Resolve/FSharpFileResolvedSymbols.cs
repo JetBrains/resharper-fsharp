@@ -76,6 +76,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       return resolvedSymbols.Uses.Values.AsChunkIReadOnlyList();
     }
 
+    public FSharpSymbol GetSymbol(int offset) =>
+      GetSymbolDeclaration(offset) ?? GetSymbolUse(offset)?.Symbol;
+
     [NotNull]
     private ResolvedSymbols CreateFileResolvedSymbols()
     {

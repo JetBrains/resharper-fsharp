@@ -33,6 +33,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public FSharpOption<FSharpParseAndCheckResults> GetParseAndCheckResults(bool allowStaleResults) =>
       CheckerService.ParseAndCheckFile(SourceFile, allowStaleResults);
 
+    public FSharpSymbol GetSymbol(int offset) =>
+      ResolvedSymbolsCache.GetSymbol(SourceFile, offset);
+
     public IReadOnlyList<FSharpResolvedSymbolUse> GetAllResolvedSymbols(FSharpCheckFileResults checkResults = null) =>
       ResolvedSymbolsCache.GetAllResolvedSymbols(SourceFile);
 

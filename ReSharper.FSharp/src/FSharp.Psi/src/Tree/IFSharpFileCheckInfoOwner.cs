@@ -17,14 +17,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
     [NotNull] IFSharpResolvedSymbolsCache ResolvedSymbolsCache { get; set; }
 
-    [CanBeNull]
-    FSharpOption<FSharpParseFileResults> ParseResults { get; set; }
+    [CanBeNull] FSharpOption<FSharpParseFileResults> ParseResults { get; set; }
 
     [CanBeNull]
     FSharpSymbolUse GetSymbolUse(int offset);
 
     [CanBeNull]
     FSharpSymbol GetSymbolDeclaration(int offset);
+
+    [CanBeNull]
+    FSharpSymbol GetSymbol(int offset);
 
     [NotNull]
     IReadOnlyList<FSharpResolvedSymbolUse> GetAllResolvedSymbols(FSharpCheckFileResults checkResults = null);

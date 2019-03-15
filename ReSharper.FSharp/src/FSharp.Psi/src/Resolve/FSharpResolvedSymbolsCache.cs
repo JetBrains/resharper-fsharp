@@ -196,5 +196,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     public IReadOnlyList<FSharpResolvedSymbolUse> GetAllResolvedSymbols(IPsiSourceFile sourceFile) =>
       GetOrCreateResolvedSymbols(sourceFile).GetAllResolvedSymbols();
+
+    public FSharpSymbol GetSymbol(IPsiSourceFile sourceFile, int offset) =>
+      GetOrCreateResolvedSymbols(sourceFile).GetSymbol(offset);
   }
 }

@@ -17,5 +17,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     [NotNull]
     IReadOnlyList<FSharpResolvedSymbolUse> GetAllResolvedSymbols();
+
+    [CanBeNull] FSharpSymbol GetSymbol(int offset);
   }
 }

@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
+using JetBrains.DocumentModel;
 using JetBrains.Lifetimes;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Daemon.CaretDependentFeatures;
@@ -54,16 +56,31 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
       if (sourceFile == null)
         return;
 
-      var offset = token.GetTreeStartOffset().Offset;
-      var symbol = fsFile.GetSymbolDeclaration(offset) ?? fsFile.GetSymbolUse(offset)?.Symbol;
+      var symbol = fsFile.GetSymbol(token.GetTreeStartOffset().Offset);
       if (symbol == null)
         return;
-
-      var isActivePatternCase = symbol is FSharpActivePatternCase;
 
       var checkResults =
         fsFile.CheckerService.TryGetStaleCheckResults(sourceFile)?.Value ??
         fsFile.GetParseAndCheckResults(true)?.Value.CheckResults;
+
+      var ranges = new HashSet<DocumentRange>();
+      AddUsagesRanges(symbol, ranges, checkResults, document, fsFile);
+
+      if (symbol is FSharpMemberOrFunctionOrValue mfv && mfv.IsConstructor &&
+          mfv.DeclaringEntity?.Value is FSharpEntity entity)
+        AddUsagesRanges(entity, ranges, checkResults, document, fsFile);
+
+      foreach (var range in ranges)
+        consumer.ConsumeHighlighting(HighlightingId, range);
+    }
+
+    private static void AddUsagesRanges(FSharpSymbol symbol, HashSet<DocumentRange> ranges,
+      FSharpCheckFileResults checkResults, IDocument document, IFSharpFile fsFile)
+    {
+      var isActivePatternCase = symbol is FSharpActivePatternCase;
+      var isGreaterOp =
+        symbol is FSharpMemberOrFunctionOrValue mfv && mfv.LogicalName == StandardOperatorNames.GreaterThan;
 
       var symbolUsages = checkResults?.GetUsesOfSymbolInFile(symbol).RunAsTask();
       if (symbolUsages == null)
@@ -86,7 +103,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
             var caseDeclaration = usageToken.GetContainingNode<IActivePatternId>()?.Cases[useSymbol.Index];
             if (caseDeclaration != null)
             {
-              consumer.ConsumeHighlighting(HighlightingId, caseDeclaration.GetDocumentRange());
+              ranges.Add(caseDeclaration.GetDocumentRange());
               continue;
             }
           }
@@ -96,11 +113,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
           continue;
 
         var tokenType = identToken.GetTokenType();
-        if ((tokenType == FSharpTokenType.GREATER || tokenType == FSharpTokenType.GREATER_RBRACK) &&
-            !(symbol is FSharpMemberOrFunctionOrValue mfv && mfv.CompiledName == StandardOperatorNames.GreaterThan))
+
+        if ((tokenType == FSharpTokenType.GREATER || tokenType == FSharpTokenType.GREATER_RBRACK) && !isGreaterOp)
           continue; // found usage of generic symbol with specified type parameter
 
-        consumer.ConsumeHighlighting(HighlightingId, identToken.GetDocumentRange());
+        ranges.Add(identToken.GetDocumentRange());
       }
     }
   }
