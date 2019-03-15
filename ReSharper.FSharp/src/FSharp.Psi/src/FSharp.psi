@@ -260,6 +260,7 @@ interface synExpr:
   tupleExpr |
   arrayOrListExpr |
   recordExpr |
+  newExpr |
   objExpr |
   identExpr |
   longIdentExpr |
@@ -300,6 +301,10 @@ recordExprBinding:
   EQUALS
   synExpr<EXPR, Expression>
   SEMICOLON?;
+
+newExpr options { stubBase="TypeExpressionBase"; }:
+  namedTypeExpression<TYPE, Type>
+  fakeSeparator;
 
 objExpr options { stubBase="TypeExpressionBase"; }:
   namedTypeExpression<BASE_TYPE, BaseType>

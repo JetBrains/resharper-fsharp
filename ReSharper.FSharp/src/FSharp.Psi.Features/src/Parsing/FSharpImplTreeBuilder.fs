@@ -411,9 +411,11 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                     x.Done(mark, ElementType.RECORD_EXPR_BINDING)
             x.Done(range, mark, ElementType.RECORD_EXPR)
 
-        | SynExpr.New(_,t,expr,_) ->
+        | SynExpr.New(_,t,expr,range) ->
+            let mark = x.Mark(range)
             x.ProcessSynType(t)
             x.ProcessLocalExpression(expr)
+            x.Done(range, mark, ElementType.NEW_EXPR)
 
         | SynExpr.ObjExpr(t,args,bindings,interfaceImpls,_,range) ->
             let mark = x.Mark(range)

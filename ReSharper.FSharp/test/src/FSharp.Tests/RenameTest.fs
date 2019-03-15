@@ -76,6 +76,8 @@ type FSharpRenameTest() =
     [<Test>] member x.``Types - Inheritance 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Inheritance 02 - object expressions``() = x.DoNamedTest()
 
+    [<Test>] member x.``Types - New expr 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Active patterns - Local - Partial 01 - Decl``() = x.DoNamedTest()
     [<Test>] member x.``Active patterns - Local - Partial 02 - Pattern``() = x.DoNamedTest()
     [<Test>] member x.``Active patterns - Local - Single 01 - Decl``() = x.DoNamedTest()
