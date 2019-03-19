@@ -1,6 +1,8 @@
 ﻿using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Features;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 using Microsoft.FSharp.Compiler;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
@@ -23,6 +25,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
       LineText = lineText;
       FsCompletionContext = fsCompletionContext;
     }
+
+    public FSharpDisplayContext DisplayContext { get; set; }
+    public FSharpXmlDocService XmlDocService { get; set; }
+
+    public IFSharpFile FSharpFile => (IFSharpFile) BasicContext.File;
 
     public override string ContextId => "FSharpCodeCompletionContext";
     public TextLookupRanges Ranges { get; }

@@ -7,7 +7,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   internal class NestedModulePart : ModulePartBase<INestedModuleDeclaration>
   {
     public NestedModulePart([NotNull] INestedModuleDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
-      : base(declaration, declaration.GetNestedModuleShortName(cacheBuilder),
+      : base(declaration, cacheBuilder.Intern(declaration.CompiledName),
         ModifiersUtil.GetDecoration(declaration.AccessModifiers, declaration.AttributesEnumerable), cacheBuilder)
     {
     }
@@ -16,11 +16,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
     }
 
-    public override TypeElement CreateTypeElement()
-    {
-      return new FSharpModule(this);
-    }
+    public override TypeElement CreateTypeElement() =>
+      new FSharpModule(this);
 
-    protected override byte SerializationTag => (byte) FSharpPartKind.NestedModule;
+    protected override byte SerializationTag =>
+      (byte) FSharpPartKind.NestedModule;
   }
 }

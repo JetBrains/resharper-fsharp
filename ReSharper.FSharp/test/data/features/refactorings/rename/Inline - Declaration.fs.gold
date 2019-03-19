@@ -1,0 +1,6 @@
+﻿module Module
+
+let x =
+    let foo zzz =
+        zzz + zzz
+    foo 1

@@ -2,8 +2,8 @@
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props"
           Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <Import Project="SOLUTION_PATHpackages\FSharp.Compiler.Tools.10.0.1\build\FSharp.Compiler.Tools.props"
-          Condition="Exists('SOLUTION_PATHpackages\FSharp.Compiler.Tools.10.0.1\build\FSharp.Compiler.Tools.props')" />
+  <Import Project="SOLUTION_PATHpackages\FSharp.Compiler.Tools.10.0.2\build\FSharp.Compiler.Tools.props"
+          Condition="Exists('SOLUTION_PATHpackages\FSharp.Compiler.Tools.10.0.2\build\FSharp.Compiler.Tools.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -17,7 +17,7 @@
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
+    <DebugType>portable</DebugType>
     <Optimize>false</Optimize>
     <Tailcalls>false</Tailcalls>
     <OutputPath>bin\$(Configuration)\</OutputPath>
@@ -40,10 +40,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Numerics" />
     <Reference Include="FSharp.Core">
-      <HintPath>SOLUTION_PATHpackages\FSharp.Core.4.3.4\lib\net45\FSharp.Core.dll</HintPath>
-    </Reference>
-    <Reference Include="System.ValueTuple">
-      <HintPath>SOLUTION_PATHpackages\System.ValueTuple.4.4.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+      <HintPath>SOLUTION_PATHpackages\FSharp.Core.4.5.2\lib\net45\FSharp.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

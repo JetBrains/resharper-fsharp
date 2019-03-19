@@ -78,5 +78,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     {
       return GetDocumentOffset(document, (Line) (pos.Line - 1), (Column) pos.Column);
     }
+
+    public static bool Contains(this Range.range range, DocumentCoords coords) =>
+      range.StartLine - 1 >= (int) coords.Line && range.EndLine - 1 <= (int) coords.Line &&
+      range.StartColumn >= (int) coords.Column && range.EndColumn <= (int) coords.Column;
+
+    public static int GetEndOffset(this IDocument document, Range.range range) =>
+      document.GetOffset(range.End);
+
+    public static int GetStartOffset(this IDocument document, Range.range range) =>
+      document.GetOffset(range.Start);
   }
 }

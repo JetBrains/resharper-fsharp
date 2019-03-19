@@ -1,45 +1,21 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Common.Util
 
+open JetBrains.ProjectModel
+open JetBrains.ReSharper.Psi.Modules
+
 [<AutoOpen>]
 module rec CommonUtil =
     open System
     open System.Collections.Generic
-    open System.Linq
-    open System.Threading
-    open JetBrains.Application
-    open JetBrains.Application.Progress
+    open System.Diagnostics
+    open JetBrains.Application.UI.Icons.ComposedIcons
     open JetBrains.DataFlow
     open JetBrains.DocumentModel
-    open JetBrains.ProjectModel
-    open JetBrains.ProjectModel.ProjectsHost
-    open JetBrains.ProjectModel.Properties
-    open JetBrains.ProjectModel.Properties.CSharp
-    open JetBrains.ProjectModel.Properties.Managed
-    open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
-    open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties.FSharpProjectPropertiesFactory
-    open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
-    open JetBrains.ReSharper.Psi.Modules
+    open JetBrains.Lifetimes
     open JetBrains.Util
     open JetBrains.Util.dataStructures.TypedIntrinsics
     open Microsoft.FSharp.Compiler
     open Microsoft.FSharp.Compiler.SourceCodeServices
-
-    let private interruptCheckTimeout = 30
-
-    let inline isNotNull x = not (isNull x)
-    
-    let inline (|NotNull|_|) x =
-        if isNull x then None else Some()
-
-    [<Literal>]
-    let FsprojExtension = "fsproj"
-
-    let isFSharpProject (guids: Guid seq) (projectFile: FileSystemPath) =
-        equalsIgnoreCase FsprojExtension projectFile.ExtensionNoDot ||
-        Seq.exists Factory.IsKnownProjectTypeGuid guids
-
-    let (|FSharProjectMark|_|) (mark: IProjectMark) =
-        if isFSharpProject [mark.Guid] mark.Location then Some() else None
 
     let ensureAbsolute (path: FileSystemPath) (projectDirectory: FileSystemPath) =
         match path.AsRelative() with
@@ -53,26 +29,6 @@ module rec CommonUtil =
     let decompileOpName name =
         PrettyNaming.DecompileOpName name
         
-    [<CompiledName("RunSynchronouslyWithTimeout")>]
-    let runSynchronouslyWithTimeout (action: Func<_>) timeout =
-        Async.RunSynchronously(async { return action.Invoke() }, timeout)
-
-    type Async<'T> with
-        member x.RunAsTask(?interruptChecker) =
-            let interruptChecker = defaultArg interruptChecker (Action(fun _ -> InterruptableActivityCookie.CheckAndThrow()))
-            let cancellationTokenSource = new CancellationTokenSource()
-            let cancellationToken = cancellationTokenSource.Token
-            let task = Async.StartAsTask(x, cancellationToken = cancellationToken)
-
-            while not task.IsCompleted do
-                let finished = task.Wait(interruptCheckTimeout, cancellationToken)
-                if not finished then
-                    try interruptChecker.Invoke()
-                    with :? OperationCanceledException ->
-                        cancellationTokenSource.Cancel()
-                        reraise()
-            task.Result
-
     type IDictionary<'TKey, 'TValue> with
         member x.remove (key: 'TKey) = x.Remove key |> ignore
         member x.add (key: 'TKey, value: 'TValue) = x.Add(key, value) |> ignore
@@ -85,27 +41,44 @@ module rec CommonUtil =
     let fsExtensions = ["fs"; "fsi"; "ml"; "mli"; "fsx"; "fsscript"] |> Set.ofList
     let dllExtensions = ["dll"; "exe"] |> Set.ofList
 
-    let (|ImplFile|_|) (path: FileSystemPath) =
-        match path.ExtensionNoDot with
-        | "fs" | "ml" -> Some()
-        | _ -> None
+    let isImplFileExtension extension =
+        extension = "fs" || extension = "ml"
 
-    let (|SigFile|_|) (path: FileSystemPath) =
-        match path.ExtensionNoDot with
-        | "fsi" | "mli" -> Some()
-        | _ -> None
+    let isSigFileExtension extension =
+        extension = "fsi" || extension = "mli"
+
+    let (|ImplExtension|_|) extension =
+        if isImplFileExtension extension then someUnit else None
+
+    let (|SigExtension|_|) extension =
+        if isSigFileExtension extension then someUnit else None
+
+    let isImplFile (path: FileSystemPath) =
+        isImplFileExtension path.ExtensionNoDot
+
+    let isSigFile (path: FileSystemPath) =
+        isSigFileExtension path.ExtensionNoDot
 
     type Line = Int32<DocLine>
     type Column = Int32<DocColumn>
+    type FileSystemPath = JetBrains.Util.FileSystemPath
 
-    let docLine (x: int)   = Line.op_Explicit(x)
-    let docColumn (x: int) = Column.op_Explicit(x)
+    type Int32<'T> with
+
+        [<DebuggerStepThrough>]
+        member x.Next = x.Plus1()
+
+        [<DebuggerStepThrough>]
+        member x.Previous = x.Minus1()
+
+    let inline docLine (x: int)   = Line.op_Explicit(x)
+    let inline docColumn (x: int) = Column.op_Explicit(x)
 
     type Range.range with
-        member x.GetStartLine()   = x.StartLine - 1 |> docLine
-        member x.GetEndLine()     = x.EndLine - 1   |> docLine
-        member x.GetStartColumn() = x.StartColumn   |> docColumn
-        member x.GetEndColumn()   = x.EndColumn     |> docColumn
+        member inline x.GetStartLine()   = x.StartLine - 1 |> docLine
+        member inline x.GetEndLine()     = x.EndLine - 1   |> docLine
+        member inline x.GetStartColumn() = x.StartColumn   |> docColumn
+        member inline x.GetEndColumn()   = x.EndColumn     |> docColumn
 
         member x.ToTextRange(document: IDocument) =
             let startOffset = document.GetLineStartOffset(x.GetStartLine()) + x.StartColumn
@@ -115,26 +88,16 @@ module rec CommonUtil =
         member x.ToDocumentRange(document: IDocument) =
             DocumentRange(document, x.ToTextRange(document))
 
-    type IProject with
-        member x.IsFSharp =
-            isFSharpProject x.ProjectProperties.ProjectTypeGuids x.ProjectFileLocation
-
-    let (|FSharpProject|_|) (projectModelElement: IProjectModelElement) =
-        match projectModelElement with
-        | :? IProject as project when project.IsFSharp -> Some project
-        | _ -> None
-
     let tryGetValue (key: 'TKey) (dictionary: IDictionary<'TKey,'TValue>) =
         let res = ref Unchecked.defaultof<'TValue>
         match dictionary.TryGetValue(key, res), res with
         | true, value -> Some !value
         | _ -> None
 
+    let (|ArgValue|) (arg: PropertyChangedEventArgs<_>) = arg.New
+
     let (|AddRemoveArgs|) (args: AddRemoveEventArgs<_>) =
         args.Value
-
-    let (|KeyValuePair|) (pair: KeyValuePair<_,_>) =
-        pair.Key, pair.Value
 
     let (|Pair|) (pair: Pair<_,_>) =
         pair.First, pair.Second
@@ -151,25 +114,51 @@ module rec CommonUtil =
     let equalsIgnoreCase other (string: string) =
         string.Equals(other, StringComparison.OrdinalIgnoreCase)
 
+    let startsWith other (string: string) =
+        string.StartsWith(other, StringComparison.Ordinal)
+
+    let endsWith other (string: string) =
+        string.EndsWith(other, StringComparison.Ordinal)
+
     let eq a b = a = b
 
     let getCommonParent path1 path2 =
         FileSystemPath.GetDeepestCommonParent(path1, path2)
 
-    let (|UnixSeparators|) (path: FileSystemPath) =
-        path.NormalizeSeparators(FileSystemPathEx.SeparatorStyle.Unix)
+    /// Used in tests. Should not be invoked on BackSlashSeparatedRelativePath.
+    let (|UnixSeparators|) (path: IPath) =
+        let separatorStyle = FileSystemPathEx.SeparatorStyle.Unix
+        match path with
+        | :? FileSystemPath as path -> path.NormalizeSeparators(separatorStyle)
+        | :? RelativePath as path -> path.NormalizeSeparators(separatorStyle)
+        | _ -> failwith "Should not be invoked on BackSlashSeparatedRelativePath."
 
     let setComparer =
         { new IEqualityComparer<HashSet<_>> with
             member this.Equals(x, y) = x.SetEquals(y)
             member this.GetHashCode(x) = x.Count }
 
+    type Lifetime with
+        member x.AddAction2(func: Func<_,_>) =
+            x.OnTermination(fun _ -> func.Invoke() |> ignore) |> ignore
+
+    let compose a b = CompositeIconId.Compose(a, b)
+
+[<AutoOpen>]
+module rec FcsUtil =
+    open Microsoft.FSharp.Compiler.Ast
+
+    let (|ExprRange|) (expr: SynExpr) = expr.Range
+    let (|PatRange|) (pat: SynPat) = pat.Range
+    let (|IdentRange|) (id: Ident) = id.idRange
+    let (|TypeRange|) (typ: SynType) = typ.Range
+
+
 [<AutoOpen>]
 module rec FSharpMsBuildUtils =
     open BuildActions
     open ItemTypes
     open JetBrains.Platform.MsBuildHost.Models
-    open JetBrains.ProjectModel
 
     module ItemTypes =
         let [<Literal>] compileBeforeItemType = "CompileBefore"
@@ -187,13 +176,13 @@ module rec FSharpMsBuildUtils =
         equalsIgnoreCase compileAfterItemType itemType
 
     let (|CompileBefore|_|) itemType =
-        if isCompileBefore itemType then Some () else None
+        if isCompileBefore itemType then someUnit else None
 
     let (|CompileAfter|_|) itemType =
-        if isCompileAfter itemType then Some () else None
+        if isCompileAfter itemType then someUnit else None
 
     let (|Folder|_|) (itemType: string) =
-        if equalsIgnoreCase folderItemType itemType then Some () else None
+        if equalsIgnoreCase folderItemType itemType then someUnit else None
 
     let (|BuildAction|) itemType =
         BuildAction.GetOrCreate(itemType)
@@ -202,14 +191,20 @@ module rec FSharpMsBuildUtils =
         RdItem (item.ItemType, item.EvaluatedInclude)
 
     let (|SourceFile|_|) (buildAction: BuildAction) =
-        if buildAction.IsCompile() || buildAction = compileBefore || buildAction = compileAfter then Some () else None
+        if buildAction.IsCompile() || buildAction = compileBefore || buildAction = compileAfter then someUnit else None
 
     let (|Resource|_|) buildAction =
-        if buildAction = BuildAction.RESOURCE then Some () else None
+        if buildAction = BuildAction.RESOURCE then someUnit else None
 
     let changesOrder = function
         | CompileBefore | CompileAfter -> true
         | _ -> false
 
     type BuildAction with
-        member x.ChangesOrder() = changesOrder x.Value
+        member x.ChangesOrder = changesOrder x.Value
+
+[<Extension>]
+module PsiUtil =
+    [<Extension; CompiledName("GetSymbolScope")>]
+    let getSymbolScope (psiModule: IPsiModule) =
+        psiModule.GetPsiServices().Symbols.GetSymbolScope(psiModule, true, true)

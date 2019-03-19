@@ -1,17 +1,36 @@
-﻿using JetBrains.Annotations;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
-using JetBrains.ReSharper.Psi;
-using JetBrains.Text;
+﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
+using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  class Whitespace : WhitespaceBase
+  internal class Whitespace : WhitespaceBase
   {
-    public Whitespace([NotNull] IBuffer buffer, TreeOffset startOffset, TreeOffset endOffset)
-      : base(FSharpTokenType.WHITESPACE, buffer, startOffset, endOffset)
+    public Whitespace(string text) : base(FSharpTokenType.WHITESPACE, text)
     {
     }
 
     public override bool IsNewLine => false;
+  }
+
+  internal class NewLine : WhitespaceBase
+  {
+    public NewLine(string text) : base(FSharpTokenType.NEW_LINE, text)
+    {
+    }
+
+    public override bool IsNewLine => true;
+  }
+
+  internal abstract class WhitespaceBase : FSharpToken, IWhitespaceNode
+  {
+    protected WhitespaceBase(NodeType nodeType, string text) : base(nodeType, text)
+    {
+    }
+
+    public override bool IsFiltered() => true;
+
+    public override string ToString() => base.ToString() + " spaces:" + "\"" + GetText() + "\"";
+    public abstract bool IsNewLine { get; }
   }
 }

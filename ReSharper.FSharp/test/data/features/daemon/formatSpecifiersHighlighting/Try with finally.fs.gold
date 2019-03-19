@@ -1,0 +1,16 @@
+﻿module Module
+
+try
+    let _ = sprintf "foo |%A|(0) bar" 0
+    try
+        printfn "foo |%b|(1) bar" true
+    finally
+        printf "foo |%i|(2) bar" 0
+with _ ->
+    failwithf "foo |%d|(3) bar" 0
+
+---------------------------------------------------------
+(0): ReSharper Format String Item: 
+(1): ReSharper Format String Item: 
+(2): ReSharper Format String Item: 
+(3): ReSharper Format String Item: 

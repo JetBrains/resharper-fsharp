@@ -1,0 +1,33 @@
+﻿Other
+---
+TO: [O] module |Module| RANGE: (7,13) @ Write 03 - Record fields.fs
+TO: [O] type |R| = { mutable Field: int } RANGE: (22,23) @ Write 03 - Record fields.fs
+TO: [O] type R = { mutable |Field|: int } RANGE: (36,41) @ Write 03 - Record fields.fs
+TO: [O] let |r| = { Field = 123 } RANGE: (56,57) @ Write 03 - Record fields.fs
+TO: [O] let |r1| = { R.Field = 123 } RANGE: (82,84) @ Write 03 - Record fields.fs
+TO: [O] let |r2| = { r1 with Field = r1.Field + 1 } RANGE: (110,112) @ Write 03 - Record fields.fs
+TO: [O] let r2 = { |r1| with Field = r1.Field + 1 } RANGE: (117,119) @ Write 03 - Record fields.fs
+TO: [O] let r2 = { |r1| with Field = r1.Field + 1 } RANGE: (117,119) @ Write 03 - Record fields.fs
+TO: [O] let r2 = { r1 with Field = r1.|Field| + 1 } RANGE: (136,141) @ Write 03 - Record fields.fs
+TO: [O] let r2 = { r1 with Field = |r1|.Field + 1 } RANGE: (133,135) @ Write 03 - Record fields.fs
+TO: [O] let r2 = { r1 with Field = r1.|Field| + 1 } RANGE: (136,141) @ Write 03 - Record fields.fs
+TO: [O] |r2|.Field <- r1.Field RANGE: (151,153) @ Write 03 - Record fields.fs
+TO: [O] r2.Field <- r1.|Field| RANGE: (166,171) @ Write 03 - Record fields.fs
+TO: [O] r2.Field <- |r1|.Field RANGE: (163,165) @ Write 03 - Record fields.fs
+TO: [O] r2.Field <- r1.|Field| RANGE: (166,171) @ Write 03 - Record fields.fs
+
+
+Type specification
+---
+TO: [O] type R = { mutable Field: |int| } RANGE: (43,46) @ Write 03 - Record fields.fs
+TO: [O] let r1 = { |R|.Field = 123 } RANGE: (89,90) @ Write 03 - Record fields.fs
+
+
+Write access
+---
+TO: [W] let r = { |Field| = 123 } RANGE: (62,67) @ Write 03 - Record fields.fs
+TO: [W] let r1 = { R.|Field| = 123 } RANGE: (91,96) @ Write 03 - Record fields.fs
+TO: [W] let r2 = { r1 with |Field| = r1.Field + 1 } RANGE: (125,130) @ Write 03 - Record fields.fs
+TO: [W] r2.|Field| <- r1.Field RANGE: (154,159) @ Write 03 - Record fields.fs
+
+

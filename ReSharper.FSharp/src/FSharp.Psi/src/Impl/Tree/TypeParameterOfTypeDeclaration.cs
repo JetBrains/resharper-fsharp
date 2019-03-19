@@ -1,13 +1,14 @@
-﻿using JetBrains.ReSharper.Psi;
+﻿using JetBrains.Diagnostics;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
-using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class TypeParameterOfTypeDeclaration : ICachedDeclaration2
   {
-    public override string DeclaredName => Identifier.GetCompiledName(Attributes);
-    public override TreeTextRange GetNameRange() => Identifier.GetNameRange();
+    public override string CompiledName => NameIdentifier.GetCompiledName(Attributes);
+    public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
 
     protected override void PreInit()
     {

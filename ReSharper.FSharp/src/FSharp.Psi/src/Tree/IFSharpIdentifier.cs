@@ -2,7 +2,8 @@
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
-  public partial interface IFSharpIdentifier : IIdentifier
+  public interface IFSharpIdentifier : IIdentifier
   {
+    ITokenNode IdentifierToken { get; }
   }
 }

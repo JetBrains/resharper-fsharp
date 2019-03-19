@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
@@ -8,44 +10,60 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  internal class UnionCasePart : FSharpClassLikePart<IUnionCaseDeclaration>, Class.IClassPart
+  internal class UnionCasePart : FSharpClassLikePart<INestedTypeUnionCaseDeclaration>, Class.IClassPart, IRepresentationAccessRightsOwner
   {
-    private readonly bool myIsHiddenCase;
-
-    public UnionCasePart([NotNull] IUnionCaseDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder,
-      bool isHiddenCase) : base(declaration, ModifiersUtil.GetDecoration(declaration),
-      TreeNodeCollection<ITypeParameterOfTypeDeclaration>.Empty, cacheBuilder)
+    public UnionCasePart([NotNull] INestedTypeUnionCaseDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
+      : base(declaration, ModifiersUtil.GetDecoration(declaration),
+        TreeNodeCollection<ITypeParameterOfTypeDeclaration>.Empty, cacheBuilder)
     {
-      myIsHiddenCase = isHiddenCase;
+      var unionShortName = declaration.GetContainingNode<IUnionDeclaration>()?.CompiledName;
+      ExtendsListShortNames =
+        unionShortName != null
+          ? new[] {cacheBuilder.Intern(unionShortName)}
+          : EmptyArray<string>.Instance;
     }
 
     protected override void Write(IWriter writer)
     {
       base.Write(writer);
-      writer.WriteBool(myIsHiddenCase);
+      writer.WriteStringArray(ExtendsListShortNames);
+    }
+
+    public override string[] ExtendsListShortNames { get; }
+
+    public override IDeclaredType GetBaseClassType()
+    {
+      var typeElement = TypeElement?.GetContainingType();
+      return typeElement != null
+        ? TypeFactory.CreateType(typeElement)
+        : null;
     }
 
     public UnionCasePart(IReader reader) : base(reader)
     {
-      myIsHiddenCase = reader.ReadBool();
+      ExtendsListShortNames = reader.ReadStringArray();
     }
 
     public override IEnumerable<IDeclaredType> GetSuperTypes()
     {
-      var type = (GetDeclaration()?.GetContainingNode<IUnionDeclaration>() as ITypeDeclaration)?.DeclaredElement;
-      return type != null ? new[] {TypeFactory.CreateType(type)} : EmptyList<IDeclaredType>.InstanceList;
+      var baseType = GetBaseClassType();
+      if (baseType == null)
+        return EmptyList<IDeclaredType>.Instance;
+
+      return new[] {baseType};
     }
 
     public override TypeElement CreateTypeElement()
     {
-      return new FSharpUnionCase(this);
+      return new FSharpNestedTypeUnionCase(this);
     }
 
     public override MemberDecoration Modifiers =>
-      myIsHiddenCase || (GetDeclaration()?.Fields.IsEmpty ?? false)
-        ? MemberDecoration.FromModifiers(ReSharper.Psi.Modifiers.INTERNAL)
-        : base.Modifiers;
-
+      MemberDecoration.FromModifiers(
+        Parent is IUnionPart unionPart &&
+        (!unionPart.HasPublicNestedTypes || unionPart.RepresentationAccessRights != AccessRights.PUBLIC)
+          ? ReSharper.Psi.Modifiers.INTERNAL
+          : ReSharper.Psi.Modifiers.PUBLIC);
 
     public MemberPresenceFlag GetMemberPresenceFlag()
     {
@@ -53,5 +71,29 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     }
 
     protected override byte SerializationTag => (byte) FSharpPartKind.UnionCase;
+
+    public IList<FSharpUnionCaseField<UnionCaseFieldDeclaration>> CaseFields
+    {
+      get
+      {
+        var declaration = GetDeclaration();
+        if (declaration == null)
+          return EmptyList<FSharpUnionCaseField<UnionCaseFieldDeclaration>>.Instance;
+
+        var result = new LocalList<FSharpUnionCaseField<UnionCaseFieldDeclaration>>();
+        foreach (var fieldDeclaration in declaration.Fields)
+        {
+          if (fieldDeclaration.DeclaredElement is FSharpUnionCaseField<UnionCaseFieldDeclaration> field)
+            result.Add(field);
+        }
+
+        return result.ResultingList();
+      }
+    }
+
+    public AccessRights RepresentationAccessRights =>
+      Parent is IUnionPart unionPart
+        ? unionPart.RepresentationAccessRights
+        : AccessRights.PUBLIC;
   }
 }

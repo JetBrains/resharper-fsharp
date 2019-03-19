@@ -1,0 +1,7 @@
+﻿Project Files:Union 02 - Single case 02 - No fields.fs:
+FSharpProjectFilePart:ImplFile
+ TopLevelModulePart:Module->Class:Module
+  UnionPart:U->Class:Module+U
+[]: Namespace:
+ [Module]: Class:Module[TestProject]
+  [U]: Class:Module+U[TestProject]

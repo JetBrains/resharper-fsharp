@@ -1,0 +1,8 @@
+﻿module Module
+
+type T =
+    | A of int
+    | B of int
+
+let foo (A zzz | B zzz) =
+    zzz + zzz

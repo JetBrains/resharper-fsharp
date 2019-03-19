@@ -1,0 +1,6 @@
+﻿module Module
+
+type R = { F: int }
+
+let { F = zzz } = { F = 123 }
+let y = zzz + zzz

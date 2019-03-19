@@ -25,5 +25,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     }
 
     protected override byte SerializationTag => (byte) FSharpPartKind.QualifiedNamespace;
+
+    public override string ToString() => $"{GetType().Name}:{ShortName}";
   }
 }

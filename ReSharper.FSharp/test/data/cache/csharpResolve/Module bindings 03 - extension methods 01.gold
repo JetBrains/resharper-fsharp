@@ -1,0 +1,13 @@
+﻿using Ns;
+
+public class Class1
+{
+  public Class1()
+  {
+    string s1 = 1.ext();
+  }
+}
+
+---------------------------------------------------------
+M:Ns.Module.ext(System.Int32)
+M:Ns.Module.ext(System.Int32)

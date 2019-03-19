@@ -1,0 +1,20 @@
+﻿module Module
+
+type R = { Name: string }
+    with 
+        member __.M _ = 
+            sprintf "|%A|(0)"
+        override __.ToString() = 
+            sprintf "|%d|(1)" 1
+type DU = DU
+    with
+        member __.M = 
+            sprintf "|%A|(2)"
+        override __.ToString() = 
+            sprintf "|%d|(3)" 1
+
+---------------------------------------------------------
+(0): ReSharper Format String Item: 
+(1): ReSharper Format String Item: 
+(2): ReSharper Format String Item: 
+(3): ReSharper Format String Item: 

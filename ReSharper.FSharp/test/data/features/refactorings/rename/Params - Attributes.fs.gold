@@ -1,0 +1,5 @@
+﻿module Module
+
+type C() =
+    member x.Foo([<CompiledName("Hello world")>] zzz) =
+        printfn "%s" zzz

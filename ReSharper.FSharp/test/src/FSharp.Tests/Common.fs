@@ -1,13 +1,19 @@
-﻿namespace JetBrains.ReSharper.Plugins.FSharp.Tests
+namespace JetBrains.ReSharper.Plugins.FSharp.Tests
 
 open System
 open JetBrains.Application.Components
 open JetBrains.Application.platforms
 open JetBrains.DataFlow
+open JetBrains.Lifetimes
 open JetBrains.ProjectModel
+open JetBrains.ProjectModel.MSBuild
+open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.TestFramework
+open JetBrains.TestFramework.Projects
+open JetBrains.Util.Dotnet.TargetFrameworkIds
 open Microsoft.FSharp.Compiler.SourceCodeServices
 open NUnit.Framework
 
@@ -16,21 +22,30 @@ module AssemblyInfo =
         do()
 
 type FSharpTestAttribute() =
-    inherit TestPackagesAttribute()
+    inherit TestProjectFilePropertiesProvider(FSharpProjectFileType.FsExtension, MSBuildProjectUtil.CompileElement)
+
+    let targetFrameworkId =
+        TargetFrameworkId.Create(FrameworkIdentifier.NetFramework, new Version(4, 5, 1), ProfileIdentifier.Default)
 
     interface ITestPlatformProvider with
-        member x.GetPlatformID() = PlatformID.CreateFromName(".NETFrameWork", new Version(4, 5));
+        member x.GetTargetFrameworkId() = targetFrameworkId
+
+    interface ITestFileExtensionProvider with
+        member x.Extension = FSharpProjectFileType.FsExtension
 
 [<SolutionComponent>]
-type FSharpTestProjectOptionsProvider(lifetime: Lifetime, checkerService: FSharpCheckerService) as this =
+type FSharpTestProjectOptionsProvider
+        (lifetime: Lifetime, checkerService: FSharpCheckerService,
+         scriptOptionsProvider: FSharpScriptOptionsProvider) as this =
     do
         checkerService.OptionsProvider <- this
-        lifetime.AddAction(fun _ -> checkerService.OptionsProvider <- null) |> ignore
+        lifetime.OnTermination(fun _ -> checkerService.OptionsProvider <- Unchecked.defaultof<_>) |> ignore
 
     let getPath (sourceFile: IPsiSourceFile) = sourceFile.GetLocation().FullPath
 
     let getProjectOptions fileName references =
         { ProjectFileName = fileName + ".fsproj"
+          ProjectId = None
           SourceFiles = [| fileName |]
           OtherOptions = Array.map ((+) "-r:") references
           ReferencedProjects = Array.empty
@@ -45,6 +60,30 @@ type FSharpTestProjectOptionsProvider(lifetime: Lifetime, checkerService: FSharp
     interface IHideImplementation<FSharpProjectOptionsProvider>
     
     interface IFSharpProjectOptionsProvider with
-        member x.GetProjectOptions(file) = getProjectOptions (getPath file) [||] |> Some
-        member x.GetParsingOptions(file) = { FSharpParsingOptions.Default with SourceFiles = [| getPath file |] }
-        member x.HasPairFile(file) = false
+        member x.HasPairFile(sourceFile) = false
+
+        member x.GetProjectOptions(sourceFile) =
+            if sourceFile.LanguageType.Is<FSharpScriptProjectFileType>() then
+                scriptOptionsProvider.GetScriptOptions(sourceFile) else
+
+            let path = getPath sourceFile
+            let projectOptions = getProjectOptions path [||] 
+            Some projectOptions
+
+        member x.GetParsingOptions(file) =
+            let isExe =
+                match file.GetProject() with
+                | null -> false
+                | project ->
+
+                match project.ProjectProperties.BuildSettings with
+                | :? IManagedProjectBuildSettings as buildSettings ->
+                    buildSettings.OutputType = ProjectOutputType.CONSOLE_EXE
+                | _ -> false
+
+            { FSharpParsingOptions.Default with
+                SourceFiles = [| getPath file |]
+                IsExe = isExe }
+
+        member x.GetFileIndex(_) = 0
+        member x.ModuleInvalidated = new Signal<_>("Todo") :> _

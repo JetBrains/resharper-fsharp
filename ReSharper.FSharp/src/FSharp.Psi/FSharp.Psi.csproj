@@ -1,8 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net451</TargetFramework>
+    <TargetFramework>net461</TargetFramework>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Psi</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi</AssemblyName>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -17,17 +18,21 @@
       <SubType>Designer</SubType>
     </TokenGenerator>
 
-    <Compile Remove="Src\Parsing\FSharpTokenType.Generated.cs" />
-    <Compile Include="Src\Parsing\FSharpTokenType.Generated.cs">
+    <Compile Update="Src\Parsing\FSharpTokenType.Generated.cs">
       <DependentUpon>FSharpTokens.xml</DependentUpon>
     </Compile>
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
+    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\FSharp.Common\FSharp.Common.fsproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <CsLex Include="src\Parsing\Lexing\fsharpLexer.lex" />
   </ItemGroup>
 </Project>

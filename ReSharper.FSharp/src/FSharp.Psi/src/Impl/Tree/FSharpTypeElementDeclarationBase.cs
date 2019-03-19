@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
@@ -25,7 +25,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     /// May take long time due to waiting for FCS.
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     public IDeclaredType BaseClassType => GetFSharpSymbol() is FSharpEntity entity
-      ? FSharpTypesUtil.GetBaseType(entity, TypeParameters, GetPsiModule())
+      ? entity.MapBaseType(TypeParameters, GetPsiModule())
       : null;
 
     public override FSharpSymbol GetFSharpSymbol()
@@ -47,19 +47,63 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       get
       {
-        var members = this.Children<ITypeMemberDeclaration>();
-        var implementedMembers = this.Children<IInterfaceImplementation>()
-          .SelectMany(m => m.Children<ITypeMemberDeclaration>());
-        var extensionMembers = this.Children<ITypeExtension>()
-          .SelectMany(m => m.Children<ITypeMemberDeclaration>());
-        return members.Concat(implementedMembers).Concat(extensionMembers).WhereNotNull().ToTreeNodeCollection();
+        var result = new LocalList<ITypeMemberDeclaration>();
+        foreach (var child in this.Children())
+        {
+          if (child is ITypeMemberDeclaration m)
+            result.Add(m);
+
+          if (child is IInterfaceImplementation interfaceImplementation)
+          {
+            foreach (var implementedMember in interfaceImplementation.Children<ITypeMemberDeclaration>())
+              result.Add(implementedMember);
+          }
+
+          if (child is ITypeExtensionDeclaration typeExtension && !typeExtension.IsTypePartDeclaration)
+          {
+            foreach (var extensionMember in typeExtension.Children<ITypeMemberDeclaration>())
+              result.Add(extensionMember);
+          }
+
+          if (child is ILet let)
+            foreach (var binding in let.Bindings)
+            {
+              var headPattern = binding.HeadPattern;
+              if (headPattern == null)
+                continue;
+
+              foreach (var declaration in headPattern.Declarations)
+              {
+                if (declaration is ITypeMemberDeclaration typeMemberDeclaration)
+                  result.Add(typeMemberDeclaration);
+              }
+            }
+        }
+
+        return result.ReadOnlyList();
       }
     }
 
     public string CLRName => this.MakeClrName();
     public IReadOnlyList<ITypeDeclaration> TypeDeclarations => EmptyList<ITypeDeclaration>.Instance;
+    public IEnumerable<ITypeDeclaration> TypeDeclarationsEnumerable => NestedTypeDeclarations;
+    public IEnumerable<ITypeDeclaration> NestedTypeDeclarationsEnumerable => NestedTypeDeclarations;
 
-    public IReadOnlyList<ITypeDeclaration> NestedTypeDeclarations =>
-      MemberDeclarations.OfType<ITypeDeclaration>().ToTreeNodeCollection();
+    public IReadOnlyList<ITypeDeclaration> NestedTypeDeclarations
+    {
+      get
+      {
+        var result = new LocalList<ITypeDeclaration>();
+        foreach (var memberDeclaration in this.Children())
+        {
+          if (memberDeclaration is ITypeDeclaration typeDeclaration)
+            result.Add(typeDeclaration);
+        }
+
+        return result.ReadOnlyList();
+      }
+    }
+    
+    public virtual PartKind TypePartKind => PartKind.Class;
   }
 }

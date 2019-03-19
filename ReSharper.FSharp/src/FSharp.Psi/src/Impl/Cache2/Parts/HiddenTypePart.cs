@@ -24,15 +24,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
     }
 
-    public override TypeElement CreateTypeElement()
-    {
-      return new Class(this);
-    }
+    public override TypeElement CreateTypeElement() =>
+      new FSharpClass(this);
 
-    public MemberPresenceFlag GetMemberPresenceFlag()
-    {
-      return MemberPresenceFlag.NONE;
-    }
+    public MemberPresenceFlag GetMemberPresenceFlag() =>
+      MemberPresenceFlag.NONE;
 
     public override MemberDecoration Modifiers =>
       MemberDecoration.FromModifiers(ReSharper.Psi.Modifiers.INTERNAL); // should not be accessible from other languages

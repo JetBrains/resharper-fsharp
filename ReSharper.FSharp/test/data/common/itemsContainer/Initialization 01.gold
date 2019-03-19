@@ -18,15 +18,15 @@ Project
 5:File8
 
 .NETFramework,Version=v0.0
-C:/Solution/Project/File1
-C:/Solution/Project/Folder/SubFolder/File1
-C:/Solution/Project/Folder/SubFolder/File2
-C:/Solution/Project/Folder/OtherSubFolder/Data/File3
-C:/Solution/Project/Folder/File4
-C:/Solution/Project/File5
-C:/Solution/Project/Folder/SubFolder/File6
-C:/Solution/Project/Folder/SubFolder/File7
-C:/Solution/Project/File8
+File1
+Folder/SubFolder/File1
+Folder/SubFolder/File2
+Folder/OtherSubFolder/Data/File3
+Folder/File4
+File5
+Folder/SubFolder/File6
+Folder/SubFolder/File7
+File8
 
 
 === Structure API ===

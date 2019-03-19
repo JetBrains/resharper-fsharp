@@ -1,0 +1,5 @@
+// ${CHAR:<}
+module Module
+
+[{caret} ]
+let foo = 123

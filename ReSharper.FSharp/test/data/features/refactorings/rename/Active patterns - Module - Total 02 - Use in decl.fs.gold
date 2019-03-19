@@ -1,0 +1,8 @@
+﻿module Module
+
+let (    |  zzz  |    C | ) x =
+    if x then zzz else C
+
+match true with
+| zzz
+| C -> ()

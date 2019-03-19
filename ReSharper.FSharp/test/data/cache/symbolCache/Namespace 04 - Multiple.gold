@@ -1,0 +1,21 @@
+﻿Project Files:Namespace 04 - Multiple.fs:
+FSharpProjectFilePart:ImplFile
+ QualifiedNamespacePart:Qualifier1
+  FSharp.DeclaredNamespacePart:MyNamespace
+   ClassPart:T1->Class:Qualifier1.MyNamespace.T1
+ QualifiedNamespacePart:Qualifier2
+  FSharp.DeclaredNamespacePart:OtherNamespace
+   ClassPart:T2->Class:Qualifier2.OtherNamespace.T2
+ ClassPart:T3->Class:T3
+ FSharp.DeclaredNamespacePart:NoQualifier
+  ClassPart:T4->Class:NoQualifier.T4
+[]: Namespace:
+ [NoQualifier]: Namespace:NoQualifier
+  [T4]: Class:NoQualifier.T4[TestProject]
+ [Qualifier1]: Namespace:Qualifier1
+  [MyNamespace]: Namespace:MyNamespace
+   [T1]: Class:Qualifier1.MyNamespace.T1[TestProject]
+ [Qualifier2]: Namespace:Qualifier2
+  [OtherNamespace]: Namespace:OtherNamespace
+   [T2]: Class:Qualifier2.OtherNamespace.T2[TestProject]
+ [T3]: Class:T3[TestProject]

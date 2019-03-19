@@ -13,33 +13,37 @@
     <fileTypeFactory id="F#" implementation="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpFileTypeFactory" />
     <lang.ast.factory language="F#" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpAstFactory" />
     <lang.parserDefinition language="F#" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpParserDefinition" />
+    <lang.syntaxHighlighterFactory language="F#" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.highlighting.FSharpSyntaxHighlighterFactory"/>
     <lang.altEnter language="F#" implementationClass="com.jetbrains.rider.intentions.altEnter.ReSharperAltEnterActionHandler" />
 
+    <backend.typedHandler language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.editorActions.FSharpTypedHandler" />
     <backend.actions.support language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.actions.FSharpActionSupportPolicy" />
-    <backend.markup.adapterFactory language="F#" implementationClass="com.jetbrains.rider.daemon.RiderMarkupAdapterFactory" />
-    <backend.typedHandler language="F#" implementationClass="com.jetbrains.rider.editorActions.FSharpTypedHandler" />
-    <completion.contributor language="F#" implementationClass="com.jetbrains.rider.completion.ReSharperCompletionContributor" />
+    <backend.markup.adapterFactory language="F#" implementationClass="com.jetbrains.rdclient.daemon.FrontendMarkupAdapterFactory" />
+    <completion.contributor language="F#" implementationClass="com.jetbrains.rdclient.completion.ProtocolCompletionContributor" />
     <completion.completionSessionStrategy language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.services.completion.FSharpCompletionStrategy" />
     <backend.autoPopup.support language="F#" implementationClass="com.jetbrains.rider.completion.BackendAndGenericRider" />
-    <codeInsight.parameterInfo language="F#" implementationClass="com.jetbrains.rider.parameterInfo.RiderParameterInfoHandler" />
+    <codeInsight.parameterInfo language="F#" implementationClass="com.jetbrains.rdclient.parameterInfo.FrontendParameterInfoHandler" />
+    <breadcrumbsInfoProvider implementation="com.jetbrains.rider.plugins.fsharp.breadcrumbs.FSharpBreadcrumbsInfoProvider"/>
     <codeStyleSettingsProvider implementation="com.jetbrains.rider.settings.FSharpCodeStyleSettingsProvider" />
-    <lang.documentationProvider language="F#" implementationClass="com.jetbrains.rider.quickDoc.RiderDocumentationProvider"/>
+    <lang.documentationProvider language="F#" implementationClass="com.jetbrains.rdclient.quickDoc.FrontendDocumentationProvider"/>
 
 
     <fileTypeFactory id="F# Script" implementation="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptFileTypeFactory" />
     <lang.ast.factory language="F# Script" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptAstFactory" />
     <lang.parserDefinition language="F# Script" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptParserDefinition" />
+    <lang.syntaxHighlighterFactory language="F# Script" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.highlighting.FSharpSyntaxHighlighterFactory"/>
     <lang.altEnter language="F# Script" implementationClass="com.jetbrains.rider.intentions.altEnter.ReSharperAltEnterActionHandler" />
 
+    <backend.typedHandler language="F# Script" implementationClass="com.jetbrains.rider.plugins.fsharp.editorActions.FSharpTypedHandler" />
     <backend.actions.support language="F# Script" implementationClass="com.jetbrains.rider.plugins.fsharp.actions.FSharpActionSupportPolicy" />
-    <backend.markup.adapterFactory language="F# Script" implementationClass="com.jetbrains.rider.daemon.RiderMarkupAdapterFactory" />
-    <backend.typedHandler language="F# Script" implementationClass="com.jetbrains.rider.editorActions.FSharpTypedHandler" />
-    <completion.contributor language="F# Script" implementationClass="com.jetbrains.rider.completion.ReSharperCompletionContributor" />
+    <backend.markup.adapterFactory language="F# Script" implementationClass="com.jetbrains.rdclient.daemon.FrontendMarkupAdapterFactory" />
+    <completion.contributor language="F# Script" implementationClass="com.jetbrains.rdclient.completion.ProtocolCompletionContributor" />
     <completion.completionSessionStrategy language="F# Script" implementationClass="com.jetbrains.rider.plugins.fsharp.services.completion.FSharpCompletionStrategy" />
     <backend.autoPopup.support language="F# Script" implementationClass="com.jetbrains.rider.completion.BackendAndGenericRider" />
-    <codeInsight.parameterInfo language="F# Script" implementationClass="com.jetbrains.rider.parameterInfo.RiderParameterInfoHandler" />
+    <codeInsight.parameterInfo language="F# Script" implementationClass="com.jetbrains.rdclient.parameterInfo.FrontendParameterInfoHandler" />
+    <breadcrumbsInfoProvider implementation="com.jetbrains.rider.plugins.fsharp.breadcrumbs.FSharpBreadcrumbsInfoProvider"/>
     <codeStyleSettingsProvider implementation="com.jetbrains.rider.settings.FSharpScriptCodeStyleSettingsProvider" />
-    <lang.documentationProvider language="F# Script" implementationClass="com.jetbrains.rider.quickDoc.RiderDocumentationProvider"/>
+    <lang.documentationProvider language="F# Script" implementationClass="com.jetbrains.rdclient.quickDoc.FrontendDocumentationProvider"/>
 
     <rider.ProjectTypesProvider implementation="com.jetbrains.rider.projectView.projectTypes.FSharpProjectTypeProvider" />
     <moveProviderExtension implementation="com.jetbrains.rider.plugins.fsharp.projectView.FSharpMoveProviderExtension"/>
@@ -48,6 +52,8 @@
     <applicationService serviceImplementation="com.jetbrains.rider.plugins.fsharp.settings.FSharpCodeFoldingSettings"/>
 
     <applicationConfigurable groupId="language" instance="com.jetbrains.rider.plugins.fsharp.services.settings.FsiOptionsPage" id="Fsi" />
+    <applicationConfigurable groupId="language" instance="com.jetbrains.rider.plugins.fsharp.settings.FSharpOptionsPage" id="FSharp" />
+    <projectConfigurable parentId="FileTemplatesSettingsId" instance="com.jetbrains.rider.settings.RiderFSharpFileTemplatesOptionPage" groupWeight="-20"/>
 
     <intentionAction>
       <className>com.jetbrains.rider.plugins.fsharp.services.fsi.SendLineToFsiIntentionAction</className>
@@ -60,6 +66,18 @@
       <category>F#</category>
       <descriptionDirectoryName>SendToFsi</descriptionDirectoryName>
     </intentionAction>
+
+    <intentionAction>
+      <className>com.jetbrains.rider.plugins.fsharp.services.fsi.DebugLineInFsiIntentionAction</className>
+      <category>F#</category>
+      <descriptionDirectoryName>SendToFsi</descriptionDirectoryName>
+    </intentionAction>
+
+    <intentionAction>
+      <className>com.jetbrains.rider.plugins.fsharp.services.fsi.DebugSelectionInFsiIntentionAction</className>
+      <category>F#</category>
+      <descriptionDirectoryName>SendToFsi</descriptionDirectoryName>
+    </intentionAction>
   </extensions>
 
   <actions>
@@ -68,6 +86,10 @@
       <action class="com.jetbrains.rider.plugins.fsharp.services.fsi.SendToFsiAction" id="Rider.Plugins.FSharp.SendToFsi" text="Send to F# Interactive">
         <keyboard-shortcut first-keystroke="control BACK_SLASH" keymap="$default" />
         <keyboard-shortcut first-keystroke="meta BACK_SLASH" keymap="Mac OS X 10.5+" />
+      </action>
+      <action class="com.jetbrains.rider.plugins.fsharp.services.fsi.DebugInFsiAction" id="Rider.Plugins.FSharp.DebugInFsi" text="Debug in F# Interactive">
+        <keyboard-shortcut first-keystroke="control alt BACK_SLASH" keymap="$default" />
+        <keyboard-shortcut first-keystroke="meta alt BACK_SLASH" keymap="Mac OS X 10.5+" />
       </action>
       <add-to-group group-id="ToolsMenu" anchor="last" />
     </group>

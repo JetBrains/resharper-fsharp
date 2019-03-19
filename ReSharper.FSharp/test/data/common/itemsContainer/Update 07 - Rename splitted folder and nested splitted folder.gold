@@ -9,10 +9,10 @@
     1:File4
 
 .NETFramework,Version=v0.0
-C:/Solution/Project/Folder/SubFolder/File1
-C:/Solution/Project/Folder/File2
-C:/Solution/Project/File3
-C:/Solution/Project/Folder/SubFolder/File4
+Folder/SubFolder/File1
+Folder/File2
+File3
+Folder/SubFolder/File4
 
 
 =======
@@ -32,10 +32,10 @@ Project
     1:File4
 
 .NETFramework,Version=v0.0
-C:/Solution/Project/Folder/SubFolderNewName/File1
-C:/Solution/Project/Folder/File2
-C:/Solution/Project/File3
-C:/Solution/Project/Folder/SubFolderNewName/File4
+Folder/SubFolderNewName/File1
+Folder/File2
+File3
+Folder/SubFolderNewName/File4
 
 
 Rename 'Folder' to 'NewName'
@@ -54,9 +54,9 @@ Project
     1:File4
 
 .NETFramework,Version=v0.0
-C:/Solution/Project/NewName/SubFolderNewName/File1
-C:/Solution/Project/NewName/File2
-C:/Solution/Project/File3
-C:/Solution/Project/NewName/SubFolderNewName/File4
+NewName/SubFolderNewName/File1
+NewName/File2
+File3
+NewName/SubFolderNewName/File4
 
 

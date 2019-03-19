@@ -1,0 +1,11 @@
+﻿Project Files:Module 07 - Module suffix, CompiledName.fs:
+FSharpProjectFilePart:ImplFile
+ QualifiedNamespacePart:MyNamespace
+  TopLevelModulePart:TopModule->Class:MyNamespace.TopModule
+   NestedModulePart:UModule->Class:MyNamespace.TopModule+UModule
+   UnionPart:U->Class:MyNamespace.TopModule+U
+[]: Namespace:
+ [MyNamespace]: Namespace:MyNamespace
+  [TopModule]: Class:MyNamespace.TopModule[TestProject]
+   [U]: Class:MyNamespace.TopModule+U[TestProject]
+   [UModule]: Class:MyNamespace.TopModule+UModule[TestProject]

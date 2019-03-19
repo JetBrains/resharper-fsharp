@@ -1,0 +1,7 @@
+﻿Project Files:Enum 01.fs:
+FSharpProjectFilePart:ImplFile
+ TopLevelModulePart:Module->Class:Module
+  EnumPart:E->Enum:Module+E
+[]: Namespace:
+ [Module]: Class:Module[TestProject]
+  [E]: Enum:Module+E[TestProject]

@@ -1,4 +1,5 @@
-﻿using JetBrains.ReSharper.Psi;
+﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -8,14 +9,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     private bool HasExplicitName => !LongIdentifier.IdentifiersEnumerable.IsEmpty();
     private string ImplicitName => GetSourceFile().GetLocation().NameWithoutExtension.Capitalize();
 
-    public override string DeclaredName =>
+    protected override string DeclaredElementName =>
       HasExplicitName
-        ? LongIdentifier.QualifiedName
-        : ImplicitName;
-
-    public override string ShortName =>
-      HasExplicitName
-        ? LongIdentifier.GetCompiledName(Attributes)
+        ? LongIdentifier.GetModuleCompiledName(Attributes)
         : ImplicitName;
 
     public override string SourceName =>
@@ -27,6 +23,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       HasExplicitName
         ? LongIdentifier.GetNameRange()
         : new TreeTextRange(TreeOffset.Zero);
+
+    public override IFSharpIdentifier NameIdentifier => LongIdentifier;
 
     public bool IsModule => true;
   }

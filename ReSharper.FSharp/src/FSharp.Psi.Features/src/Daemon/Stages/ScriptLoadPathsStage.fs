@@ -1,19 +1,14 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages
 
 open System.Collections.Generic
-open System.Collections.ObjectModel
-open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Highlightings
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
-open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
-open System
 
 [<DaemonStage(StagesBefore = [| typeof<DeadCodeHighlightStage> |], StagesAfter = [| typeof<HighlightIdentifiersStage> |])>]
 type ScritpLoadPathsStage(daemonProcess, errors) =
@@ -22,12 +17,12 @@ type ScritpLoadPathsStage(daemonProcess, errors) =
         override x.IsSupported(sourceFile, processKind) =
             processKind = DaemonProcessKind.VISIBLE_DOCUMENT && base.IsSupported(sourceFile, processKind)
 
-        override x.CreateProcess(fsFile, daemonProcess) =
+        override x.CreateStageProcess(fsFile, _, daemonProcess) =
             ScriptLoadPathsStageProcess(fsFile, daemonProcess) :> _
 
 
 type ScriptLoadPathsStageProcess(fsFile, daemonProcess) =
-    inherit FSharpDaemonStageProcessBase(daemonProcess)
+    inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
     override x.Execute(committer) =
         let interruptChecker = x.SeldomInterruptChecker
@@ -51,8 +46,8 @@ type ScriptLoadPathsStageProcess(fsFile, daemonProcess) =
                             | _ -> ()
                         | _ -> ()
 
-                        interruptChecker.CheckForInterrupt()
-            }
+                        interruptChecker.CheckForInterrupt() }
+
         fsFile.Accept(visitor)
         if allDirectives.IsEmpty() then () else
 
@@ -61,17 +56,19 @@ type ScriptLoadPathsStageProcess(fsFile, daemonProcess) =
             let document = daemonProcess.Document
             let linesCount = document.GetLineCount() |> int
             let loadedDirectives =
-                options.OriginalLoadReferences
-                |> Seq.filter (fun (range, _) -> range.EndLine < linesCount)
-                |> Seq.map (fun (range, _) -> document.GetTreeStartOffset(range))
-                |> HashSet
+                let result = HashSet()
+                for (range, _) in options.OriginalLoadReferences do
+                    if range.EndLine < linesCount then
+                        result.Add(document.GetTreeStartOffset(range)) |> ignore
+                result
 
-            let unusedDirectives =            
-                allDirectives
-                |> Seq.filter (fun d -> loadedDirectives.Contains(d.Key) |> not)
-                |> Seq.map (fun d ->
-                    let range = d.Value.GetDocumentRange()
-                    HighlightingInfo(range, DeadCodeHighlighting(range)))
+            let unusedDirectives =
+                let result = LocalList<HighlightingInfo>()
+                for directive in allDirectives do
+                    if not (loadedDirectives.Contains(directive.Key)) then
+                        let range = directive.Value.GetDocumentRange()
+                        result.Add(HighlightingInfo(range, DeadCodeHighlighting(range)))
+                result.ReadOnlyList()
 
-            committer.Invoke(DaemonStageResult(unusedDirectives.AsReadOnlyCollection()))
+            committer.Invoke(DaemonStageResult(unusedDirectives))
         | _ -> ()

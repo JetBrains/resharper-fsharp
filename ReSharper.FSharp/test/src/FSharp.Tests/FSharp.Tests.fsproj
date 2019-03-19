@@ -1,21 +1,34 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net451</TargetFramework>
+    <TargetFramework>net461</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Tests</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Tests</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Include="Common.fs" />
+    <Compile Include="TestWithTwoProjects.fs" />
+    <Compile Include="CSharpResolveTest.fs" />
+    <Compile Include="SymbolCacheTest.fs" />
+    <Compile Include="ErrorsHighlightingTest.fs" />
+    <Compile Include="IdentifierHighlightingTest.fs" />
+    <Compile Include="FormatSpecifiersHighlightingTest.fs" />
+    <Compile Include="DelegatingFileSystemShimTest.fs" />
+    <Compile Include="FSharpLexerTest.fs" />
     <Compile Include="Stubs.fs" />
     <Compile Include="ZoneMarker.fs" />
-    <Compile Include="Common.fs" />
     <Compile Include="CommentActionTests.fs" />
+    <Compile Include="TypingAssistTest.fs" />
+    <Compile Include="FSharpTodoTest.fs" />
+    <Compile Include="RenameTest.fs" />
+    <Compile Include="FSharpOccurenceKindTest.fs" />
+    <Compile Include="StructureTest.fs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FSharp.Core" Version="4.3.4" />
-    <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FCSVersion)" />
+    <PackageReference Include="FSharp.Core" Version="$(FsCoreVersion)" />
+    <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FcsVersion)" />
     <PackageReference Include="JetBrains.Rider.SDK.Tests" Version="$(RiderSDKVersion)" />
   </ItemGroup>
 
@@ -25,10 +38,9 @@
     <ProjectReference Include="..\..\..\src\FSharp.Psi\FSharp.Psi.csproj" />
     <ProjectReference Include="..\..\..\src\FSharp.Psi.Features\FSharp.Psi.Features.fsproj" />
   </ItemGroup>
-  
+
   <ItemGroup>
-    <Content Include="JetBrains.ReSharper.Plugins.FSharp.Tests.dll.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Reference Include="WindowsBase" />
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
 </Project>

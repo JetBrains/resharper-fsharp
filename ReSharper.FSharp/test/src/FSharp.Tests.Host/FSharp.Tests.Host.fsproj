@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net451</TargetFramework>
+    <TargetFramework>net461</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Tests.Host</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Tests.Host</AssemblyName>
@@ -11,8 +11,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FSharp.Core" Version="4.3.4" />
-    <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FCSVersion)" />
+    <PackageReference Include="FSharp.Core" Version="$(FsCoreVersion)" />
+    <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FcsVersion)" />
     <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
   </ItemGroup>
 

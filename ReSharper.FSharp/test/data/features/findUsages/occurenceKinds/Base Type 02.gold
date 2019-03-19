@@ -1,0 +1,23 @@
+﻿Other
+---
+TO: [O] module |Module| RANGE: (7,13) @ Base Type 02.fs
+TO: [O] type |T| = RANGE: (22,23) @ Base Type 02.fs
+TO: [O] inherit |System|.IDisposable RANGE: (39,45) @ Base Type 02.fs
+TO: [O] let |d|: System.IDisposable = Unchecked.defaultof<_> RANGE: (65,66) @ Base Type 02.fs
+TO: [O] let d: |System|.IDisposable = Unchecked.defaultof<_> RANGE: (68,74) @ Base Type 02.fs
+TO: [O] let d: System.IDisposable = Unchecked.|defaultof|<_> RANGE: (99,108) @ Base Type 02.fs
+TO: [O] let d: System.IDisposable = |Unchecked|.defaultof<_> RANGE: (89,98) @ Base Type 02.fs
+TO: [O] let d: System.IDisposable = Unchecked.|defaultof|<_> RANGE: (99,108) @ Base Type 02.fs
+TO: [O] let d: System.IDisposable = Unchecked.defaultof<|_|> RANGE: (109,110) @ Base Type 02.fs
+
+
+Base type
+---
+TO: [O] inherit System.|IDisposable| RANGE: (46,57) @ Base Type 02.fs
+
+
+Type specification
+---
+TO: [O] let d: System.|IDisposable| = Unchecked.defaultof<_> RANGE: (75,86) @ Base Type 02.fs
+
+

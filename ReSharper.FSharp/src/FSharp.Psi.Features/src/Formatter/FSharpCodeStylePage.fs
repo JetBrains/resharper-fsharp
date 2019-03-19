@@ -5,13 +5,13 @@ open System.Linq
 open JetBrains.Application.Settings
 open JetBrains.Application.UI.Options
 open JetBrains.ReSharper.Feature.Services.OptionPages.CodeStyle
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
+open JetBrains.ReSharper.Plugins.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CodeStyle
 open JetBrains.ReSharper.Psi.EditorConfig
 open JetBrains.ReSharper.Psi.Impl.CodeStyle
 open JetBrains.ReSharper.Psi.Format
-open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Resources.Icons
 
@@ -19,7 +19,7 @@ open JetBrains.ReSharper.Resources.Resources.Icons
 type FSharpFormatSettingsKey() =
     inherit FormatSettingsKeyBase()
 
-    [<SettingsEntry(true, "Reorder open declarations"); DefaultValue>]
+    [<SettingsEntry(false, "Reorder open declarations"); DefaultValue>]
     val mutable ReorderOpenDeclarations: bool
     
     [<SettingsEntry(false, "Semicolon at end of line"); DefaultValue>]
@@ -28,7 +28,7 @@ type FSharpFormatSettingsKey() =
     [<SettingsEntry(true, "Space before argument"); DefaultValue>]
     val mutable SpaceBeforeArgument: bool
     
-    [<SettingsEntry(true, "Space before colon"); DefaultValue>]
+    [<SettingsEntry(false, "Space before colon"); DefaultValue>]
     val mutable SpaceBeforeColon: bool
     
     [<SettingsEntry(true, "Space after comma"); DefaultValue>]
@@ -42,6 +42,9 @@ type FSharpFormatSettingsKey() =
     
     [<SettingsEntry(true, "Space around delimiter"); DefaultValue>]
     val mutable SpaceAroundDelimiter: bool
+
+    [<SettingsEntry(true, "Preserve end of line"); DefaultValue>]
+    val mutable PreserveEndOfLine: bool
     
 
 [<Language(typeof<FSharpLanguage>)>]
@@ -55,7 +58,7 @@ type FSharpDummyCodeFormatter(formatterRequirements) =
     override x.CanModifyNode(_,_) = false
 
     override x.GetMinimalSeparator(_,_) = InvalidOperationException() |> raise
-    override x.CreateNewLine(_) = InvalidOperationException() |> raise
+    override x.CreateNewLine(_,_) = InvalidOperationException() |> raise
     override x.CreateSpace(_,_) = InvalidOperationException() |> raise
     override x.FormatInsertedNodes(_,_,_) = InvalidOperationException() |> raise
     override x.FormatInsertedRange(_,_,_) = InvalidOperationException() |> raise 
@@ -91,7 +94,8 @@ type FSharpCodeStylePageSchema(lifetime, smartContext, itemViewModelFactory, con
                    x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.SpaceAfterSemicolon)
                    x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.IndentOnTryWith)
                    x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.SpaceAroundDelimiter)
-                   x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.ReorderOpenDeclarations) ]
+                   x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.ReorderOpenDeclarations)
+                   x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.PreserveEndOfLine) ]
 
 
 [<OptionsPage("FSharpCodeStylePage", "Formatting Style", typeof<PsiFeaturesUnsortedOptionsThemedIcons.Indent>)>]

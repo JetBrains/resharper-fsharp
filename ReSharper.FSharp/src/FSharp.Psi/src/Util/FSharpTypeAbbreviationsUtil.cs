@@ -4,8 +4,12 @@ using JetBrains.Metadata.Reader.Impl;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {
-  public class FSharpTypeAbbreviationsUtil
+  public static class FSharpTypeAbbreviationsUtil
   {
+    // todo: get abbreviations from assemblies
+    public static bool TryGetAbbreviations(this IClrTypeName clrTypeName, out string[] names) =>
+      AbbreviatedTypes.TryGetValue(clrTypeName, out names);
+
     /// <summary>
     /// Used during Find Usages to get display name when searching element without having FSharpSymbol element.
     /// This class should be removed when a better approach is introduced. 
@@ -34,8 +38,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         {new ClrTypeName("System.Decimal"), new[] {"decimal"}},
 
         // Collections and other types
-        {new ClrTypeName("Microsoft.FSharp.Collections.FSharpList"), new[] {"list"}},
-        {new ClrTypeName("Microsoft.FSharp.Collections.FSharpOption"), new[] {"option"}}
+        {new ClrTypeName("Microsoft.FSharp.Collections.FSharpList`1"), new[] {"list"}},
+        {new ClrTypeName("Microsoft.FSharp.Collections.FSharpOption`1"), new[] {"option"}},
+        {new ClrTypeName("Microsoft.FSharp.Core.FSharpRef`1"), new[] {"ref"}},
       };
   }
 }

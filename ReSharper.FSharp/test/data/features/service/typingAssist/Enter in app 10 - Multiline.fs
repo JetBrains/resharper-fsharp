@@ -1,0 +1,7 @@
+// ${CHAR:Enter} 
+module Module
+
+let x =
+   true && {caret}true && 
+
+      true

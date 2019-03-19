@@ -8,12 +8,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class AbstractSlot
   {
-    public override string DeclaredName => Identifier.GetCompiledName(Attributes);
-
-    public override TreeTextRange GetNameRange()
-    {
-      return Identifier.GetNameRange();
-    }
+    protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
+    public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
 
     protected override IDeclaredElement CreateDeclaredElement()
     {
@@ -33,8 +29,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (property != null)
         return new FSharpProperty<AbstractSlot>(this, property.Value);
 
-      var typeDeclaration = GetContainingTypeDeclaration() as IFSharpTypeDeclaration;
-      return new FSharpMethod<AbstractSlot>(this, mfv, typeDeclaration);
+      return new FSharpMethod<AbstractSlot>(this, mfv);
     }
   }
 }

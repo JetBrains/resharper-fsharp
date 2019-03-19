@@ -1,12 +1,12 @@
 ﻿using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 
-namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
+namespace JetBrains.ReSharper.Plugins.FSharp
 {
   [ProjectFileTypeDefinition(Name)]
-  public class FSharpScriptProjectFileType : KnownProjectFileType
+  public class FSharpScriptProjectFileType : FSharpProjectFileType
   {
-    public new const string Name = "F# script";
+    public new const string Name = "F# Script";
     [UsedImplicitly] public new static readonly FSharpScriptProjectFileType Instance;
 
     public const string FsxExtension = ".fsx";
@@ -25,6 +25,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
     {
     }
 
-    public override BuildAction DefaultBuildAction => BuildAction.NONE;
+    public override BuildAction GetDefaultBuildAction(string extension) => BuildAction.NONE;
   }
 }

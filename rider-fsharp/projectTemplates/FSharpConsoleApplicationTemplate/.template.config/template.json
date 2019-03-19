@@ -24,7 +24,7 @@
             "datatype": "text",
             "replaces": "v4.5",
             "isRequired": "true",
-            "defaultValue": "<FullTargetFramework>"
+            "defaultValue": "<FullTargetFramework>[v4.5-]"
         },
         "RelativeSolutionPath": {
             "type": "parameter",

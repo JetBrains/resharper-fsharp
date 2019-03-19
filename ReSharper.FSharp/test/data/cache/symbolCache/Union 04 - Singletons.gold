@@ -1,0 +1,7 @@
+﻿Project Files:Union 04 - Singletons.fs:
+FSharpProjectFilePart:ImplFile
+ TopLevelModulePart:Module->Class:Module
+  UnionPart:U->Class:Module+U
+[]: Namespace:
+ [Module]: Class:Module[TestProject]
+  [U]: Class:Module+U[TestProject]

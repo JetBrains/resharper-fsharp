@@ -1,0 +1,12 @@
+﻿namespace Ns1
+
+type zzz =
+    { Field: int }
+
+namespace Ns2
+
+module Module =
+    open Ns1
+
+    type zzz with
+        member x.Foo = 123

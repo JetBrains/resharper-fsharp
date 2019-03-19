@@ -8,8 +8,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class ImplicitConstructorDeclaration
   {
-    public override string DeclaredName =>
-      GetContainingTypeDeclaration()?.DeclaredName ?? SharedImplUtil.MISSING_DECLARATION_NAME;
+    protected override string DeclaredElementName =>
+      GetContainingTypeDeclaration()?.CompiledName ?? SharedImplUtil.MISSING_DECLARATION_NAME;
 
     public override string SourceName =>
       GetContainingTypeDeclaration()?.SourceName ?? SharedImplUtil.MISSING_DECLARATION_NAME;
@@ -17,12 +17,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override TreeTextRange GetNameRange() =>
       GetContainingTypeDeclaration()?.GetNameRange() ?? TreeTextRange.InvalidRange;
 
-    protected override IDeclaredElement CreateDeclaredElement()
-    {
-      var typeDeclaration = GetContainingTypeDeclaration() as IFSharpTypeDeclaration;
-      return GetFSharpSymbol() is FSharpMemberOrFunctionOrValue ctor
-        ? new FSharpImplicitConstructor(this, ctor, typeDeclaration)
+    protected override IDeclaredElement CreateDeclaredElement() =>
+      GetFSharpSymbol() is FSharpMemberOrFunctionOrValue ctor
+        ? new FSharpImplicitConstructor(this, ctor)
         : null;
-    }
+
+    public override IFSharpIdentifier NameIdentifier => null;
+    public override TreeTextRange GetNameIdentifierRange() => GetNameRange();
   }
 }

@@ -1,37 +1,31 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
+namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
 open System
-open JetBrains.DocumentModel
+open JetBrains.Application.Settings
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems.Impl
 open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Feature.Services.ParameterInfo
+open JetBrains.ReSharper.Host.Features.Completion
+open JetBrains.ReSharper.Plugins.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.Common.Checker.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
-open JetBrains.Text
-open JetBrains.UI.Icons
+open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Util
 open JetBrains.UI.RichText
 open JetBrains.Util
+open JetBrains.Util.Text
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
-type FSharpLookupCandidateInfo =
-    {
-        Description: string
-        XmlDoc: FSharpXmlDoc
-    }
+type FSharpLookupCandidate(description: string, xmlDoc: FSharpXmlDoc, xmlDocService: FSharpXmlDocService) =
+    member x.Description = description
+    member x.XmlDoc = xmlDoc
 
-type FSharpLookupAdditionalInfo =
-    {
-        Icon: IconId
-        ReturnType: string
-    }
-
-type FSharpLookupCandidate(info: FSharpLookupCandidateInfo, xmlDocService: FSharpXmlDocService) =
     interface ICandidate with
-        member x.GetSignature(_, _, _, _, _) = RichText(info.Description)
-        member x.GetDescription() = xmlDocService.GetXmlDoc(info.XmlDoc)
+        member x.GetSignature(_, _, _, _, _) = RichText(description)
+        member x.GetDescription() = xmlDocService.GetXmlDoc(xmlDoc)
         member x.Matches(_) = true
 
         member x.GetParametersInfo(_, _) = ()
@@ -40,7 +34,8 @@ type FSharpLookupCandidate(info: FSharpLookupCandidateInfo, xmlDocService: FShar
         member x.ObsoleteDescription = null
         member val IsFilteredOut = false with get, set
 
-type FSharpErrorLookupItem(item: FSharpDeclarationListItem<FSharpLookupAdditionalInfo>) =
+
+type FSharpErrorLookupItem(item: FSharpDeclarationListItem) =
     inherit TextLookupItemBase()
 
     override x.Image = null
@@ -55,88 +50,122 @@ type FSharpErrorLookupItem(item: FSharpDeclarationListItem<FSharpLookupAdditiona
             |> Option.bind (function | FSharpToolTipElement.CompositionError e -> Some (RichTextBlock(e)) | _ -> None)
             |> Option.toObj
 
-type FSharpLookupItem(item: FSharpDeclarationListItem<FSharpLookupAdditionalInfo>, context: FSharpCodeCompletionContext,
-                      xmlDocService: FSharpXmlDocService) =
+
+type FSharpLookupItem(item: FSharpDeclarationListItem, context: FSharpCodeCompletionContext) =
     inherit TextLookupItemBase()
 
-    let candidates = lazy (let (FSharpToolTipText(tooltips)) = item.DescriptionTextAsync.RunAsTask()
-        tooltips |> List.map (function
-            | FSharpToolTipElement.Group(overloads) ->
-                overloads |> List.map (fun o -> { Description = o.MainDescription; XmlDoc = o.XmlDoc })
-            | FSharpToolTipElement.CompositionError e -> [{ Description = e; XmlDoc = FSharpXmlDoc.None }]
-            | _ -> [])
-        |> List.concat)
+    let mutable candidates = Unchecked.defaultof<_>
 
-    override x.Image = item.AdditionalInfo |> Option.map (fun i -> i.Icon) |> Option.toObj
+    member x.Candidates =
+        match box candidates with
+        | null ->
+            let result = LocalList<ICandidate>()
+            let (FSharpToolTipText(tooltips)) = item.DescriptionTextAsync.RunAsTask()
+            for tooltip in tooltips do
+                match tooltip with
+                | FSharpToolTipElement.Group(overloads) ->
+                    for overload in overloads do
+                        result.Add(FSharpLookupCandidate(overload.MainDescription, overload.XmlDoc, context.XmlDocService))
+                | FSharpToolTipElement.CompositionError error ->
+                    result.Add(FSharpLookupCandidate(error, FSharpXmlDoc.None, context.XmlDocService))
+                | _ -> ()
+            candidates <- result.ResultingList()
+            candidates
+
+        | candidates -> candidates :?> _
+
+    override x.Image =
+        try getIconId item.FSharpSymbol
+        with _ -> null
+
     override x.Text = item.NameInCode
+
+    override x.DisplayTypeName =
+        try
+            match getReturnType item.FSharpSymbol with
+            | Some t -> RichText(t.Format(context.DisplayContext))
+            | _ -> null
+        with _ -> null
+
+    override x.DisableFormatter = true
 
     override x.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret) =
         base.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret)
 
-        // todo: move it to a separate type (and reuse in open namespace Quick Fix)
-        if item.NamespaceToOpen.IsSome then
-            let line = int context.Coords.Line + 1
-            let fullName = item.FullName.Split('.')
-            let parseTree = (context.BasicContext.File :?> IFSharpFile).ParseResults.Value.ParseTree.Value
-            let insertionPoint = OpenStatementInsertionPoint.Nearest
+        match item.NamespaceToOpen with
+        | None -> ()
+        | Some namespaceToOpen ->
 
-            match ParsedInput.tryFindNearestPointToInsertOpenDeclaration line parseTree fullName insertionPoint with
-            | Some context ->
-                let document = textControl.Document
-                let getLineText = fun lineNumber -> document.GetLineText(docLine lineNumber)
-                let pos = context |> ParsedInput.adjustInsertionPoint getLineText
+        let line = int context.Coords.Line + 1
+        let parseTree = context.FSharpFile.ParseResults.Value.ParseTree.Value
+        let insertionPoint =
+            let settings = context.BasicContext.ContextBoundSettingsStore
+            if settings.GetValue(fun (key: FSharpOptions) -> key.TopLevelOpenCompletion) then
+                OpenStatementInsertionPoint.TopLevel
+            else
+                OpenStatementInsertionPoint.Nearest
 
-                let isSystem = item.NamespaceToOpen.Value.StartsWith("System.")
-                let openPrefix = String(' ', pos.Column) + "open "
-                let textToInsert = openPrefix + item.NamespaceToOpen.Value
+        let document = textControl.Document
+        let context = ParsedInput.findNearestPointToInsertOpenDeclaration line parseTree [||] insertionPoint
+        let pos = ParsedInput.adjustInsertionPoint (docLine >> document.GetLineText) context
 
-                let line = pos.Line - 1 |> max 0
-                let lineToInsert =
-                    seq { line - 1 .. -1 .. 0 }
-                    |> Seq.takeWhile (fun i ->
-                        let lineText = document.GetLineText(docLine i)
-                        lineText.StartsWith(openPrefix) &&
-                        (textToInsert < lineText || isSystem && not (lineText.StartsWith("open System")))) // todo: System<smth> namespaces
-                    |> Seq.tryLast
-                    |> Option.defaultValue line
+        let isSystem = namespaceToOpen.StartsWith("System.", StringComparison.Ordinal) || namespaceToOpen = "System"
+        let openPrefix = String(' ', pos.Column) + "open "
+        let textToInsert = openPrefix + namespaceToOpen
 
-                // add empty line after all open expressions if needed
-                let insertEmptyLine = not (document.GetLineText(docLine line).IsNullOrWhitespace())
+        let line = pos.Line - 1 |> max 0
+        let lineToInsert =
+            seq { line - 1 .. -1 .. 0 }
+            |> Seq.takeWhile (fun i ->
+                let lineText = document.GetLineText(docLine i)
+                lineText.StartsWith(openPrefix) &&
+                (textToInsert < lineText || isSystem && not (lineText.StartsWith("open System"))))
+            |> Seq.tryLast
+            |> Option.defaultValue line
 
-                let prevLineEndOffset =
-                    if lineToInsert > 0 then document.GetLineEndOffsetWithLineBreak(docLine (max 0 (lineToInsert - 1)))
-                    else 0
+        // add empty line after all open expressions if needed
+        let insertEmptyLine = not (document.GetLineText(docLine line).IsNullOrWhitespace())
 
-                document.InsertText(prevLineEndOffset, textToInsert + "\n" + (if insertEmptyLine then "\n" else ""))
-            | _ -> ()
+        let prevLineEndOffset =
+            if lineToInsert > 0 then document.GetLineEndOffsetWithLineBreak(docLine (max 0 (lineToInsert - 1)))
+            else 0
+
+        let newLineText = document.GetPsiSourceFile(solution).DetectLineEnding().GetPresentation()
+        let emptyLine = (if insertEmptyLine then newLineText else "")
+        document.InsertText(prevLineEndOffset, textToInsert + newLineText + emptyLine)
 
     override x.GetDisplayName() =
         let name = LookupUtil.FormatLookupString(item.Name, x.TextColor)
-        item.NamespaceToOpen
-        |> Option.iter (fun ns -> LookupUtil.AddInformationText(name, "(in " + ns + ")", itemInfoTextStyle))
+        match item.NamespaceToOpen with
+        | None -> ()
+        | Some ns -> LookupUtil.AddInformationText(name, "(in " + ns + ")", itemInfoTextStyle)
         name
 
     interface IParameterInfoCandidatesProvider with
         member x.HasCandidates =
-            candidates.Value.Length > 1 ||
-            item.Kind |> function CompletionItemKind.Method _ -> true  | _ -> false
+            match item.Kind with
+            | CompletionItemKind.Method _ -> true
+            | _ ->
+                x.Candidates.Count > 1
 
-        member x.CreateCandidates() =
-            candidates.Value |> List.map (fun i -> FSharpLookupCandidate(i, xmlDocService) :> ICandidate) :>_
+        member x.CreateCandidates() = x.Candidates :> _
 
     interface IDescriptionProvidingLookupItem with
-        /// called when x.HasCandidates is false
+        /// Called when x.HasCandidates is false.
         member x.GetDescription() =
-            match List.tryHead candidates.Value with
-            | Some item ->
-                let isNullOrWhiteSpace = RichTextBlock.IsNullOrWhiteSpace
+            let candidates = x.Candidates
+            if candidates.Count = 0 then null else
 
-                let mainDescription = RichTextBlock(item.Description)
-                match xmlDocService.GetXmlDoc(item.XmlDoc) with
-                | null -> ()
-                | xmlDoc ->
-                    if not (isNullOrWhiteSpace mainDescription || isNullOrWhiteSpace xmlDoc) then
-                        mainDescription.AddLines(RichTextBlock(" "))
-                    mainDescription.AddLines(xmlDoc)
-                mainDescription
-            | _ -> null
+            let candidate = candidates.[0] :?> FSharpLookupCandidate
+            let isNullOrWhiteSpace = RichTextBlock.IsNullOrWhiteSpace
+
+            let mainDescription = RichTextBlock(candidate.Description)
+            match context.XmlDocService.GetXmlDoc(candidate.XmlDoc) with
+            | null -> ()
+            | xmlDoc ->
+                if not (isNullOrWhiteSpace mainDescription || isNullOrWhiteSpace xmlDoc) then
+                    mainDescription.AddLines(RichTextBlock(" "))
+                mainDescription.AddLines(xmlDoc)
+            mainDescription
+
+    interface IRiderAsyncCompletionLookupItem

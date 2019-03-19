@@ -1,7 +1,9 @@
-﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+﻿using JetBrains.Annotations;
+
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
-    public interface INamedTypeExpressionOwner : IFSharpTypeMemberDeclaration
-    {
-        INamedTypeExpression TypeExpression { get; }
-    }
+  public interface INameIdentifierOwner : IFSharpTypeMemberDeclaration
+  {
+    [CanBeNull] IFSharpIdentifier NameIdentifier { get; }
+  }
 }

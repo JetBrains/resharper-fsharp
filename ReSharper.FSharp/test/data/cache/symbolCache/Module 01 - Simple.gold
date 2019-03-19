@@ -1,0 +1,5 @@
+﻿Project Files:Module 01 - Simple.fs:
+FSharpProjectFilePart:ImplFile
+ TopLevelModulePart:MyModule->Class:MyModule
+[]: Namespace:
+ [MyModule]: Class:MyModule[TestProject]

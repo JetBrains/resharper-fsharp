@@ -1,9 +1,7 @@
 ﻿using System;
-using JetBrains.Annotations;
 using JetBrains.Application.Threading;
 using JetBrains.ReSharper.Feature.Services.Daemon;
-using JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Highlightings;
-using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using Microsoft.FSharp.Core;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
@@ -13,9 +11,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
   {
     private const int InterruptCheckTime = 20;
     protected readonly SeldomInterruptCheckerWithCheckTime SeldomInterruptChecker;
+    public IFSharpFile FSharpFile;
 
-    protected FSharpDaemonStageProcessBase(IDaemonProcess daemonProcess)
+    protected FSharpDaemonStageProcessBase(IFSharpFile fsFile, IDaemonProcess daemonProcess)
     {
+      FSharpFile = fsFile;
       DaemonProcess = daemonProcess;
       SeldomInterruptChecker = new SeldomInterruptCheckerWithCheckTime(InterruptCheckTime);
     }

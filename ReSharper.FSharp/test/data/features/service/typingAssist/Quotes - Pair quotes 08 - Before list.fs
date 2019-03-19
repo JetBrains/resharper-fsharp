@@ -1,0 +1,7 @@
+// ${CHAR:"}
+module Module
+
+do
+   foo {caret} [
+      123
+   ]

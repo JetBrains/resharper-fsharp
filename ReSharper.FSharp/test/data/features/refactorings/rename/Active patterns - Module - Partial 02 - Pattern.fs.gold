@@ -1,0 +1,8 @@
+﻿module Module
+
+let (    |  zzz  |    _ | ) x =
+    if x then Some () else None
+
+match true with
+| zzz
+| _ -> ()

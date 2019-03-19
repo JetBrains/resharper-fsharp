@@ -1,0 +1,4 @@
+﻿module Module
+
+let zzz x = x + 1
+let x = zzz 1

@@ -1,11 +1,35 @@
-﻿using JetBrains.ReSharper.Psi;
+﻿using System.Collections.Generic;
+using JetBrains.Annotations;
+using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Pointers;
+using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 {
-  public interface IFSharpTypeMember : ITypeMember
+  public interface IFSharpTypeMember : IFSharpTypeParametersOwner, ITypeMember
   {
+    [CanBeNull] FSharpSymbol Symbol { get; }
+
     bool IsVisibleFromFSharp { get; }
+    bool CanNavigateTo { get; }
+
     bool IsExtensionMember { get; }
-    bool IsMember { get; }
+    bool IsFSharpMember { get; }
+  }
+
+  public interface IFSharpTypeParametersOwner : IFSharpDeclaredElement
+  {
+    IList<ITypeParameter> AllTypeParameters { get; }
+  }
+
+  public interface IFSharpExtensionTypeMember : IFSharpTypeMember
+  {
+    [CanBeNull] FSharpEntity ApparentEntity { get; }
+  }
+
+  public interface IFSharpGeneratedFromOtherElement : IFSharpDeclaredElement
+  {
+    [NotNull] IClrDeclaredElement OriginElement { get; }
+    IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer();
   }
 }

@@ -1,63 +1,55 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
-using JetBrains.ReSharper.Psi.Impl.Special;
-using JetBrains.ReSharper.Psi.Resolve;
-using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 {
-  internal class FSharpGeneratedConstructor : FSharpGeneratedMemberBase, IConstructor, IFSharpTypeMember
+  public class FSharpGeneratedConstructorFromFields : FSharpGeneratedConstructor
   {
-    internal FSharpGeneratedConstructor([NotNull] Class containingType,
-      FSharpFieldProperty[] fields) : base(containingType)
+    public FSharpGeneratedConstructorFromFields([NotNull] TypePart typePart) : base(typePart)
     {
-      var parameters = new List<IParameter>(fields.Length);
-      var fieldNames = new HashSet<string>();
-      foreach (var field in fields)
-        fieldNames.Add(field.ShortName);
+    }
 
-      for (var i = 0; i < fields.Length; i++)
+    public override IList<IParameter> Parameters
+    {
+      get
       {
-        var field = fields[i];
-        var fieldName = field.ShortName;
-        var lowerName = !fieldName.IsEmpty() ? fieldName[0].ToLowerFast() + fieldName.Substring(1) : fieldName;
-        var paramName = fieldNames.Contains(lowerName) ? fieldName : lowerName;
-        parameters.Add(new Parameter(this, i, ParameterKind.VALUE, field.Type, paramName));
-      }
-      Parameters = parameters;
-    }
+        if (!(TypePart is IFieldsOwnerPart typePart))
+          return EmptyList<IParameter>.Instance;
 
-    public override DeclaredElementType GetElementType()
-    {
-      return CLRDeclaredElementType.CONSTRUCTOR;
+        var fields = typePart.Fields;
+        var result = new IParameter[fields.Count];
+        for (var i = 0; i < fields.Count; i++)
+          result[i] = new FSharpGeneratedParameter(this, fields[i]);
+
+        return result;
+      }
     }
+  }
+
+  public abstract class FSharpGeneratedConstructor : FSharpGeneratedFunctionBase, IConstructor
+  {
+    [NotNull] protected readonly TypePart TypePart;
+
+    protected FSharpGeneratedConstructor(TypePart typePart) =>
+      TypePart = typePart;
 
     public override string ShortName => StandardMemberNames.Constructor;
 
-    public InvocableSignature GetSignature(ISubstitution substitution)
-    {
-      return new InvocableSignature(this, substitution);
-    }
+    public override DeclaredElementType GetElementType() =>
+      CLRDeclaredElementType.CONSTRUCTOR;
 
-    public IEnumerable<IParametersOwnerDeclaration> GetParametersOwnerDeclarations()
-    {
-      return EmptyList<IParametersOwnerDeclaration>.Instance;
-    }
+    protected override IClrDeclaredElement ContainingElement => TypePart.TypeElement;
+    public override ITypeElement GetContainingType() => (ITypeElement) ContainingElement;
+    public override ITypeMember GetContainingTypeMember() => (ITypeMember) ContainingElement;
 
-    public IList<IParameter> Parameters { get; }
+    public override IType ReturnType => PredefinedType.Void;
 
-    public IType ReturnType => Module.GetPredefinedType().Void;
 
-    public override MemberHidePolicy HidePolicy => MemberHidePolicy.HIDE_BY_SIGNATURE;
-    public bool IsPredefined => false;
-    public bool IsIterator => false;
-    public IAttributesSet ReturnTypeAttributes => EmptyAttributesSet.Instance;
-
-    public override bool IsVisibleFromFSharp => false;
     public bool IsDefault => false;
     public bool IsParameterless => false;
     public bool IsImplicit => true;

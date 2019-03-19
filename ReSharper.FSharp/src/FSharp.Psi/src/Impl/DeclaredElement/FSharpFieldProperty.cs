@@ -1,35 +1,55 @@
 ﻿using JetBrains.Annotations;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Tree;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  /// <summary>
-  /// Field in a record or in a union case or in an exception
-  /// </summary>
-  internal class FSharpFieldProperty : FSharpFieldPropertyBase
+  /// Union case or exception field compiled to a property.
+  internal class FSharpUnionCaseField<T> : FSharpFieldProperty<T>
+    where T : IFSharpDeclaration, IModifiersOwnerDeclaration, ICaseFieldDeclaration, ITypeMemberDeclaration
   {
-    [NotNull]
-    public FSharpField Field { get; }
-
-    internal FSharpFieldProperty([NotNull] IFieldDeclaration declaration, [NotNull] FSharpField field)
-      : base(declaration)
+    internal FSharpUnionCaseField([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {
-      Field = field;
-      ReturnType = FSharpTypesUtil.GetType(field.FieldType, declaration, Module) ??
-                   TypeFactory.CreateUnknownType(Module);
     }
 
-    public override bool IsVisibleFromFSharp => !Field.IsNameGenerated;
+    public override bool IsVisibleFromFSharp => false;
+    public override bool CanNavigateTo => true;
+  }
 
-    public override IType ReturnType { get; }
-    public override string ShortName => Field.Name;
-    public override bool IsStatic => false;
+  /// Record field compiled to a property.
+  internal class FSharpRecordField : FSharpFieldProperty<RecordFieldDeclaration>
+  {
+    private readonly bool myIsMutable;
+
+    internal FSharpRecordField([NotNull] ITypeMemberDeclaration declaration, [NotNull] FSharpField field) :
+      base(declaration) =>
+      myIsMutable = field.IsMutable;
 
     public override bool IsWritable =>
-      Field.IsMutable || ((GetContainingType() as FSharpRecord)?.IsCliMutable ?? false);
+      myIsMutable || GetContainingType().IsCliMutableRecord();
+  }
+
+  internal abstract class FSharpFieldProperty<T> : FSharpCompiledPropertyBase<T>, IFSharpFieldProperty
+    where T : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
+  {
+    internal FSharpFieldProperty([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
+    {
+    }
+
+    // todo: named case fields have FSharpParameter symbols in resolve cache 
+    [CanBeNull] public FSharpField Field => Symbol as FSharpField;
+    [CanBeNull] protected virtual FSharpType FieldType => Field?.FieldType;
+
+    public override IType ReturnType => GetType(FieldType);
+
+    public override AccessRights GetAccessRights() =>
+      GetContainingType().GetRepresentationAccessRights();
+
+    public IParameter GetParameter() =>
+      new FSharpGeneratedParameter(GetContainingType().GetGeneratedConstructor(), this);
   }
 }

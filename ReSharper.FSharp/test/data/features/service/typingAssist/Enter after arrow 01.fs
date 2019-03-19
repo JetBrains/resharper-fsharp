@@ -1,0 +1,7 @@
+// ${CHAR:Enter} 
+module Module
+
+do
+   match foo with
+   | (* comment *) bar when
+         true -> {caret}

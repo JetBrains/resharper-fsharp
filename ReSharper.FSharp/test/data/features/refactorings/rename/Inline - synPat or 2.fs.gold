@@ -1,0 +1,11 @@
+﻿module Module
+
+type T =
+    | A of int
+    | B of int
+
+let x = 123
+
+match A x with
+| A zzz
+| B zzz -> zzz + zzz

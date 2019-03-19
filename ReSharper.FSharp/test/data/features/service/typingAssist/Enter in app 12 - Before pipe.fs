@@ -1,0 +1,5 @@
+// ${CHAR:Enter} 
+module Module
+
+let x =
+   foo () {caret} |> bar

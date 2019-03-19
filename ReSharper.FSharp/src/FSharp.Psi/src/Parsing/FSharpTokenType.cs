@@ -1,4 +1,5 @@
-﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+﻿using System;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Parsing;
@@ -16,74 +17,50 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         TokenRepresentation = name;
       }
 
-      public override LeafElementBase Create(IBuffer buffer, TreeOffset startOffset, TreeOffset endOffset)
+      public override LeafElementBase Create(string text)
       {
         if (Identifiers[this])
-          return new FSharpIdentifierToken(this, buffer, startOffset, endOffset);
+          return new FSharpIdentifierToken(this, text);
+
+        if (IsComment)
+          return new FSharpComment(this, text);
+
+        if (IsStringLiteral)
+          return new FSharpString(this, text);
 
         return this != DEAD_CODE
-          ? new FSharpToken(this, buffer, startOffset, endOffset)
-          : new FSharpDeadCodeToken(this, buffer, startOffset, endOffset);
+          ? new FSharpToken(this, text)
+          : new FSharpDeadCodeToken(this, text);
       }
 
       public override bool IsWhitespace => this == WHITESPACE || this == NEW_LINE;
-      public override bool IsComment => this == COMMENT || this == LINE_COMMENT;
-      public override bool IsStringLiteral => this == STRING;
-      public override bool IsConstantLiteral => this == LITERAL;
+      public override bool IsComment => this == LINE_COMMENT || this == BLOCK_COMMENT;
+      public override bool IsStringLiteral => Strings[this];
+      public override bool IsConstantLiteral => Literals[this];
       public override bool IsIdentifier => Identifiers[this];
       public override bool IsKeyword => Keywords[this];
 
       public override string TokenRepresentation { get; }
+
+      public override LeafElementBase Create(IBuffer buffer, TreeOffset startOffset, TreeOffset endOffset) =>
+        throw new NotImplementedException();
     }
 
-    public static readonly NodeTypeSet RightBraces;
-    public static readonly NodeTypeSet LeftBraces;
-    public static readonly NodeTypeSet CommentsOrWhitespaces;
-    public static readonly NodeTypeSet AccessModifiersKeywords;
-    public static readonly NodeTypeSet Keywords;
-    public static readonly NodeTypeSet Identifiers;
-
-    static FSharpTokenType()
+    private abstract class FixedTokenNodeElement : FSharpTokenBase { }
+    
+    private class FixedTokenNodeType : FSharpTokenNodeType, IFixedTokenNodeType
     {
-      CommentsOrWhitespaces = new NodeTypeSet(COMMENT, WHITESPACE, NEW_LINE);
-      AccessModifiersKeywords = new NodeTypeSet(PUBLIC, PRIVATE, INTERNAL);
+      protected FixedTokenNodeType(string name, int index, string representation) : base(name, index) =>
+        TokenRepresentation = representation;
 
-      LeftBraces = new NodeTypeSet(
-        LPAREN,
-        LBRACE,
-        LBRACK,
-        LQUOTE,
-        LBRACK_BAR,
-        LBRACK_LESS,
-        LQUOTE_TYPED);
+      public override string TokenRepresentation { get; }
 
-      RightBraces = new NodeTypeSet(
-        RPAREN,
-        RBRACE,
-        RBRACK,
-        RQUOTE,
-        BAR_RBRACK,
-        RQUOTE_TYPED,
-        GREATER_RBRACK);
+      public override LeafElementBase Create(string token) =>
+        Create(null, TreeOffset.Zero, TreeOffset.Zero);
 
-      Keywords = new NodeTypeSet(
-        // todo: add other keywords
-        PUBLIC,
-        PRIVATE,
-        INTERNAL,
-        NAMESPACE,
-        MODULE,
-        NEW,
-        HASH,
-        OTHER_KEYWORD);
-
-      Identifiers = new NodeTypeSet(
-        IDENTIFIER,
-        OPERATOR,
-        GREATER,
-        LESS);
+      public LeafElementBase Create() =>
+        throw new NotImplementedException();
     }
-
 
     private sealed class WhitespaceNodeType : FSharpTokenNodeType
     {
@@ -91,10 +68,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       {
       }
 
-      public override LeafElementBase Create(IBuffer buffer, TreeOffset startOffset, TreeOffset endOffset)
-      {
-        return new Whitespace(buffer, startOffset, endOffset);
-      }
+      public override bool IsFiltered => true;
+      public override LeafElementBase Create(string text) => new Whitespace(text);
     }
 
     private sealed class NewLineNodeType : FSharpTokenNodeType
@@ -103,10 +78,28 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       {
       }
 
-      public override LeafElementBase Create(IBuffer buffer, TreeOffset startOffset, TreeOffset endOffset)
+      public override bool IsFiltered => true;
+      public override LeafElementBase Create(string text) => new NewLine(text);
+    }
+
+    private sealed class LineCommentNodeType : FSharpTokenNodeType
+    {
+      public LineCommentNodeType(int nodeTypeIndex) : base("LINE_COMMENT", nodeTypeIndex)
       {
-        return new NewLine(buffer, startOffset, endOffset);
       }
+
+      public override bool IsFiltered => true;
+      public override LeafElementBase Create(string text) => new FSharpComment(this, text);
+    }
+
+    private sealed class BlockCommentNodeType : FSharpTokenNodeType
+    {
+      public BlockCommentNodeType(int nodeTypeIndex) : base("BLOCK_COMMENT", nodeTypeIndex)
+      {
+      }
+
+      public override bool IsFiltered => true;
+      public override LeafElementBase Create(string text) => new FSharpComment(this, text);
     }
 
     public const int WHITESPACE_NODE_TYPE_INDEX = LAST_GENERATED_TOKEN_TYPE_INDEX + 1;
@@ -114,5 +107,141 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 
     public const int NEW_LINE_NODE_TYPE_INDEX = LAST_GENERATED_TOKEN_TYPE_INDEX + 2;
     public static readonly TokenNodeType NEW_LINE = new NewLineNodeType(NEW_LINE_NODE_TYPE_INDEX);
+
+    public const int LINE_COMMENT_NODE_TYPE_INDEX = LAST_GENERATED_TOKEN_TYPE_INDEX + 3;
+    public static readonly TokenNodeType LINE_COMMENT = new LineCommentNodeType(LINE_COMMENT_NODE_TYPE_INDEX);
+
+    public const int BLOCK_COMMENT_NODE_TYPE_INDEX = LAST_GENERATED_TOKEN_TYPE_INDEX + 4;
+    public static readonly TokenNodeType BLOCK_COMMENT = new BlockCommentNodeType(BLOCK_COMMENT_NODE_TYPE_INDEX);
+
+    public static readonly NodeTypeSet RightBraces;
+    public static readonly NodeTypeSet LeftBraces;
+    public static readonly NodeTypeSet AccessModifiersKeywords;
+    public static readonly NodeTypeSet Keywords;
+    public static readonly NodeTypeSet Identifiers;
+    public static readonly NodeTypeSet Strings;
+    public static readonly NodeTypeSet Literals;
+
+    static FSharpTokenType()
+    {
+      AccessModifiersKeywords = new NodeTypeSet(PUBLIC, PRIVATE, INTERNAL);
+
+      LeftBraces = new NodeTypeSet(
+        LPAREN,
+        LBRACE,
+        LBRACK,
+        LQUOTE_UNTYPED,
+        LBRACK_BAR,
+        LBRACK_LESS,
+        LQUOTE_TYPED);
+
+      RightBraces = new NodeTypeSet(
+        RPAREN,
+        RBRACE,
+        RBRACK,
+        RQUOTE_UNTYPED,
+        BAR_RBRACK,
+        RQUOTE_TYPED,
+        GREATER_RBRACK);
+
+      Keywords = new NodeTypeSet(
+        ABSTRACT,
+        AND,
+        AS,
+        ASSERT,
+        BASE,
+        BEGIN,
+        CLASS,
+        DEFAULT,
+        DELEGATE,
+        DO,
+        DO_BANG,
+        DONE,
+        DOWNCAST,
+        DOWNTO,
+        ELIF,
+        ELSE,
+        END,
+        EXCEPTION,
+        EXTERN,
+        FALSE,
+        FINALLY,
+        FIXED,
+        FOR,
+        FUN,
+        FUNCTION,
+        GLOBAL,
+        IF,
+        IN,
+        INHERIT,
+        INLINE,
+        INTERFACE,
+        INTERNAL,
+        LAZY,
+        LET,
+        MATCH,
+        MATCH_BANG,
+        MEMBER,
+        MODULE,
+        MUTABLE,
+        NAMESPACE,
+        NEW,
+        NULL,
+        OF,
+        OPEN,
+        OR,
+        OVERRIDE,
+        PRIVATE,
+        PUBLIC,
+        REC,
+        RETURN,
+        STATIC,
+        STRUCT,
+        THEN,
+        TO,
+        TRUE,
+        TRY,
+        TYPE,
+        UPCAST,
+        USE,
+        VAL,
+        VOID,
+        WHEN,
+        WHILE,
+        WITH,
+        YIELD,
+
+        HASH,
+        RARROW);
+
+      Identifiers = new NodeTypeSet(
+        IDENTIFIER,
+        SYMBOLIC_OP,
+        GREATER,
+        LESS);
+
+      Strings = new NodeTypeSet(
+        CHARACTER_LITERAL,
+        STRING,
+        VERBATIM_STRING,
+        TRIPLE_QUOTED_STRING,
+        BYTEARRAY);
+      
+      Literals = new NodeTypeSet(
+        IEEE32,
+        IEEE64,
+        DECIMAL,
+        BYTE,
+        INT16,
+        INT32,
+        INT64,
+        SBYTE,
+        UINT16,
+        UINT32,
+        UINT64,
+        BIGNUM,
+        NATIVEINT,
+        UNATIVEINT);
+    }
   }
 }

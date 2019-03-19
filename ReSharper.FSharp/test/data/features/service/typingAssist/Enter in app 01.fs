@@ -1,0 +1,5 @@
+// ${CHAR:Enter} 
+module Module
+
+let l =
+   List.map {caret} id []

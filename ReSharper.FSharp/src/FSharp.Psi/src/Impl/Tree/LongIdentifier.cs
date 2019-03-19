@@ -8,19 +8,33 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class LongIdentifier
   {
-    public TreeNodeCollection<ITokenNode> Qualifiers =>
-      Identifiers.IsEmpty
-        ? TreeNodeCollection<ITokenNode>.Empty
-        : new TreeNodeCollection<ITokenNode>(Identifiers.Take(Identifiers.Count - 1).ToArray());
+    public TreeNodeCollection<ITokenNode> Qualifiers
+    {
+      get
+      {
+        var identifiers = Identifiers;
+        return identifiers.IsEmpty
+          ? TreeNodeCollection<ITokenNode>.Empty
+          : new TreeNodeCollection<ITokenNode>(identifiers.Take(identifiers.Count - 1).ToArray());
+      }
+    }
 
-    public string QualifiedName =>
-      Identifiers.IsEmpty
-        ? SharedImplUtil.MISSING_DECLARATION_NAME
-        : Identifiers.Select(id => FSharpNamesUtil.RemoveBackticks(id.GetText())).Join(StringUtil.SDOT);
+    public string QualifiedName
+    {
+      get
+      {
+        var identifiers = Identifiers;
+        return identifiers.IsEmpty
+          ? SharedImplUtil.MISSING_DECLARATION_NAME
+          : identifiers.Select(id => id.GetText().RemoveBackticks()).Join(StringUtil.SDOT);
+      }
+    }
 
     public string Name =>
-      Identifiers.IsEmpty
-        ? SharedImplUtil.MISSING_DECLARATION_NAME
-        : FSharpNamesUtil.RemoveBackticks(Identifiers.Last().GetText());
+      Identifiers.LastOrDefault()?.GetText().RemoveBackticks() ?? 
+      SharedImplUtil.MISSING_DECLARATION_NAME;
+
+    public ITokenNode IdentifierToken =>
+      Identifiers.LastOrDefault();
   }
 }

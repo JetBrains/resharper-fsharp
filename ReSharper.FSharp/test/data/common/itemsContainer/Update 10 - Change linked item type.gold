@@ -1,8 +1,8 @@
 ﻿Project
-1:File1 (from C:/Solution/ExternalFolder/File1)
+1:File1 (from ../ExternalFolder/File1)
 
 .NETFramework,Version=v0.0
-C:/Solution/ExternalFolder/File1
+../ExternalFolder/File1
 
 
 =======
@@ -10,9 +10,9 @@ Update file: '../ExternalFolder/File1' (Compile) -> '../ExternalFolder/File1' (R
 Update view ../ExternalFolder/File1
 
 Project
-1:File1 (Resource) (from C:/Solution/ExternalFolder/File1)
+1:File1 (Resource) (from ../ExternalFolder/File1)
 
 .NETFramework,Version=v0.0
-C:/Solution/ExternalFolder/File1
+../ExternalFolder/File1
 
 

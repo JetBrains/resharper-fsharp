@@ -1,0 +1,13 @@
+﻿module rec |Module|(0)
+
+let [<|Literal|(1)>] |``Foo.bar``|(2) = 123
+match 123 with
+| |Module|(3).|``Foo.bar``|(4) -> ()
+| _ -> ()
+
+---------------------------------------------------------
+(0): ReSharper Class Identifier: 
+(1): ReSharper Class Identifier: 
+(2): ReSharper Constant Identifier: 
+(3): ReSharper Class Identifier: 
+(4): ReSharper Constant Identifier: 

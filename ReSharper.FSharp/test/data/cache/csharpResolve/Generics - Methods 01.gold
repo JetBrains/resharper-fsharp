@@ -1,0 +1,17 @@
+﻿using System;
+using System.Collections.Generic;
+using static Module;
+
+public class Class1
+{
+  public Class1()
+  {
+    var t = new T<int>();
+    Tuple<int, double> m = t.Method<double>();
+  }
+}
+
+---------------------------------------------------------
+M:Module.T`1.#ctor
+M:Module.T`1.Method``1
+M:Module.T`1.Method``1

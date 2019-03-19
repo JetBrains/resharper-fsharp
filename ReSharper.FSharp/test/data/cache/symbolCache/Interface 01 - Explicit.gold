@@ -1,0 +1,7 @@
+﻿Project Files:Interface 01 - Explicit.fs:
+FSharpProjectFilePart:ImplFile
+ TopLevelModulePart:Module->Class:Module
+  InterfacePart:IInterface->Interface:Module+IInterface
+[]: Namespace:
+ [Module]: Class:Module[TestProject]
+  [IInterface]: Interface:Module+IInterface[TestProject]

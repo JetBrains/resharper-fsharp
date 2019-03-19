@@ -3,10 +3,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService
 open System.Runtime.InteropServices
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Resources
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util.FSharpMsBuildUtils
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Psi
@@ -22,7 +22,7 @@ type FSharpProjectFileLanguageService
     override x.GetMixedLexerFactory(_, _, [<Optional; DefaultParameterValue(null: IPsiSourceFile)>] sourceFile) =
         match sourceFile with
         | null -> FSharpLanguage.Instance.LanguageService().GetPrimaryLexerFactory()
-        | _ -> FSharpLexerFactory(sourceFile, fsCheckerService.GetDefines(sourceFile)) :> _
+        | _ -> FSharpPreprocessedLexerFactory(fsCheckerService.GetDefines(sourceFile)) :> _
 
     override x.GetPsiProperties(projectFile, sourceFile, isCompileService) =
         let providesCodeModel =
@@ -37,3 +37,5 @@ type FSharpProjectFileLanguageService
 [<ProjectFileType(typeof<FSharpScriptProjectFileType>)>]
 type FSharpScriptProjectFileLanguageService(projectFileType, fsCheckerService, fsFileService: IFSharpFileService) =
     inherit FSharpProjectFileLanguageService(projectFileType, fsCheckerService, fsFileService)
+
+    override x.PsiLanguageType = FSharpScriptLanguage.Instance :> _

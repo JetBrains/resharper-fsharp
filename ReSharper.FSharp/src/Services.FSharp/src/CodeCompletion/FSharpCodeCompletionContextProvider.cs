@@ -20,30 +20,30 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
 
     public override ISpecificCodeCompletionContext GetCompletionContext(CodeCompletionContext context)
     {
+      if (context.SelectedRange.TextRange.Length > 0)
+        return CreateDummyContext(context);
+
       var fsFile = (IFSharpFile) context.File;
-      var parseResults = fsFile.ParseResults;
+      var parseTree = fsFile.ParseResults?.Value.ParseTree?.Value;
+      if (parseTree == null)
+        return CreateDummyContext(context);
 
       var caretTreeOffset = context.CaretTreeOffset;
       var caretOffset = caretTreeOffset.Offset;
 
       var token = fsFile.FindTokenAt(caretTreeOffset);
+      var tokenType = token?.GetTokenType();
       var tokenBefore = fsFile.FindTokenAt(caretTreeOffset - 1);
       var tokenBeforeType = tokenBefore?.GetTokenType();
 
-      var parseTree = parseResults?.Value.ParseTree?.Value;
-      if (parseTree == null ||
-          tokenBeforeType == FSharpTokenType.LINE_COMMENT ||
-          tokenBeforeType == FSharpTokenType.DEAD_CODE || token?.GetTokenType() == FSharpTokenType.DEAD_CODE ||
-          token == tokenBefore && tokenBeforeType != null &&
+      if (tokenBeforeType == FSharpTokenType.LINE_COMMENT ||
+          tokenBeforeType == FSharpTokenType.DEAD_CODE || tokenType == FSharpTokenType.DEAD_CODE ||
+
+          tokenBeforeType != null && (token == tokenBefore || token == null) &&
           (tokenBeforeType.IsComment || tokenBeforeType.IsStringLiteral ||
            tokenBeforeType.IsConstantLiteral) ||
-          context.SelectedRange.TextRange.Length > 0 ||
           tokenBefore.GetTreeEndOffset() < caretTreeOffset || token.GetTreeEndOffset() < caretTreeOffset)
-      {
-        var selectedRange = context.SelectedRange;
-        return new FSharpCodeCompletionContext(context, CompletionContext.Invalid,
-          new TextLookupRanges(selectedRange, selectedRange), DocumentCoords.Empty, null);
-      }
+        return CreateDummyContext(context);
 
       var document = context.Document;
       var completedRangeStartOffset =
@@ -65,6 +65,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
 
       return new FSharpCodeCompletionContext(context, fsCompletionContext, ranges, coords, partialName, tokenBefore,
         token, lineText);
+    }
+
+    private static ISpecificCodeCompletionContext CreateDummyContext(CodeCompletionContext context)
+    {
+      var selectedRange = context.SelectedRange;
+      return new FSharpCodeCompletionContext(context, CompletionContext.Invalid,
+        new TextLookupRanges(selectedRange, selectedRange), DocumentCoords.Empty, null);
     }
 
     private static bool ShouldReplace([CanBeNull] ITreeNode token)

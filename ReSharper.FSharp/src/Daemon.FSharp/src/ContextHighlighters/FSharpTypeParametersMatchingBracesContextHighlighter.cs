@@ -1,6 +1,6 @@
 using System;
 using JetBrains.Annotations;
-using JetBrains.DataFlow;
+using JetBrains.Lifetimes;
 using JetBrains.ReSharper.Daemon.CaretDependentFeatures;
 using JetBrains.ReSharper.Feature.Services.Contexts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi;
@@ -15,7 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
   {
     [CanBeNull, AsyncContextConsumer]
     public static Action ProcessDataContext(
-      [NotNull] Lifetime lifetime,
+      Lifetime lifetime,
       [NotNull, ContextKey(typeof(ContextHighlighterPsiFileView.ContextKey))]
       IPsiDocumentRangeView psiDocumentRangeView,
       [NotNull] InvisibleBraceHintManager invisibleBraceHintManager,

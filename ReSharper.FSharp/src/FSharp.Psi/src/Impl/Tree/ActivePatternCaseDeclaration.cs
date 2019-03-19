@@ -1,13 +1,13 @@
 ﻿using System.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Tree;
-using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class ActivePatternCaseDeclaration : ICachedTypeMemberDeclaration
+  internal partial class TopActivePatternCaseDeclaration : ICachedTypeMemberDeclaration
   {
     private volatile IDeclaredElement myCachedDeclaredElement;
 
@@ -23,9 +23,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       set => myCachedDeclaredElement = value;
     }
 
-    public override string DeclaredName => Identifier.Name;
-    public override string SourceName => Identifier.GetSourceName();
-    public override TreeTextRange GetNameRange() => Identifier.GetNameRange();
+    public override string CompiledName => NameIdentifier.GetSourceName();
+    public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
 
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
     public override IDeclaredElement DeclaredElement
@@ -38,9 +37,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       }
     }
 
-    private IDeclaredElement DeclaredElementFactory(ActivePatternCaseDeclaration arg) =>
-      GetFSharpSymbol() is FSharpActivePatternCase patternCase ? new ActivePatternCase(this, patternCase) : null;
-
-    public IDeclaredElement CachedDeclaredElement { get; set; }
+    private IDeclaredElement DeclaredElementFactory(ITopActivePatternCaseDeclaration arg) =>
+      new TopActivePatternCase(this);
   }
 }

@@ -1,30 +1,51 @@
-﻿namespace rec JetBrains.ReSharper.Plugins.FSharp.Common.Checker
+namespace rec JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 
 open System
+open System.Runtime.InteropServices
 open JetBrains
 open JetBrains.Annotations
 open JetBrains.Application
-open JetBrains.Application.Progress
+open JetBrains.Application.Settings
 open JetBrains.DataFlow
 open JetBrains.ReSharper.Feature.Services
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Plugins.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.Common.Checker.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Util
-open JetBrains.Util.Logging
 open Microsoft.FSharp.Compiler
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
 [<ShellComponent; AllowNullLiteral>]
-type FSharpCheckerService(lifetime, logger: ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier) =
+type FSharpCheckerService
+        (lifetime, logger: ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier, settingsStore: ISettingsStore) =
+
     let checker =
         Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "20")
-        lazy FSharpChecker.Create(projectCacheSize = 200, keepAllBackgroundResolutions = false)
+
+        let enableBgCheck =
+            settingsStore
+                .BindToContextLive(lifetime, ContextRange.ApplicationWide)
+                .GetValueProperty(lifetime, fun (key: FSharpOptions) -> key.BackgroundTypeCheck)
+
+        lazy
+            let checker =
+                FSharpChecker.Create(projectCacheSize = 200,
+                                     keepAllBackgroundResolutions = false,
+                                     ImplicitlyStartBackgroundWork = enableBgCheck.Value)
+
+            enableBgCheck.Change.Advise_NoAcknowledgement(lifetime, fun (ArgValue enabled) ->
+                checker.ImplicitlyStartBackgroundWork <- enabled)
+
+            checker
 
     do
-        onSolutionCloseNotifier.SolutionIsAboutToClose.Advise(lifetime, fun _ -> checker.Value.InvalidateAll())
+        onSolutionCloseNotifier.SolutionIsAboutToClose.Advise(lifetime, fun _ ->
+            if checker.IsValueCreated then
+                checker.Value.InvalidateAll())
 
-    member val OptionsProvider: IFSharpProjectOptionsProvider = null with get, set
+    member val OptionsProvider = Unchecked.defaultof<IFSharpProjectOptionsProvider> with get, set
     member x.Checker = checker.Value
 
     member x.ParseFile([<NotNull>] file: IPsiSourceFile) =
@@ -33,7 +54,7 @@ type FSharpCheckerService(lifetime, logger: ILogger, onSolutionCloseNotifier: On
         let parsingOptions =
             if not (Array.isEmpty parsingOptions.SourceFiles) then parsingOptions
             else
-                let project  = file.GetProject().GetLocation().FullPath
+                let project = file.GetProject().GetLocation().FullPath
                 logger.Warn("Loading from caches, don't have source files for {0} yet.", project)
                 { parsingOptions with SourceFiles = [| filePath |] }
         let source = file.Document.GetText()
@@ -53,7 +74,8 @@ type FSharpCheckerService(lifetime, logger: ILogger, onSolutionCloseNotifier: On
     member x.GetDefines(sourceFile: IPsiSourceFile) =
         x.OptionsProvider.GetParsingOptions(sourceFile).ConditionalCompilationDefines
 
-    member x.ParseAndCheckFile([<NotNull>] file: IPsiSourceFile, allowStaleResults) =
+    member x.ParseAndCheckFile([<NotNull>] file: IPsiSourceFile,
+                               [<Optional; DefaultParameterValue(false)>] allowStaleResults) =
         match x.OptionsProvider.GetProjectOptions(file) with
         | Some options ->
             let path = file.GetLocation().FullPath
@@ -79,8 +101,9 @@ type FSharpParseAndCheckResults =
       CheckResults: FSharpCheckFileResults }
 
 
-[<AllowNullLiteral>]
 type IFSharpProjectOptionsProvider =
-    abstract member GetProjectOptions: IPsiSourceFile -> FSharpProjectOptions option
-    abstract member GetParsingOptions: IPsiSourceFile -> FSharpParsingOptions
-    abstract member HasPairFile: IPsiSourceFile -> bool
+    abstract GetProjectOptions: IPsiSourceFile -> FSharpProjectOptions option
+    abstract GetParsingOptions: IPsiSourceFile -> FSharpParsingOptions
+    abstract GetFileIndex: IPsiSourceFile -> int
+    abstract HasPairFile: IPsiSourceFile -> bool
+    abstract ModuleInvalidated: ISignal<IPsiModule>

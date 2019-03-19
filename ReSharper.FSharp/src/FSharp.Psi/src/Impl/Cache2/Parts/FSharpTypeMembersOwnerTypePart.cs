@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System.Collections.Generic;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
@@ -56,6 +57,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       MemberPresenceFlag.MAY_EQUALS_OVERRIDE | MemberPresenceFlag.MAY_TOSTRING_OVERRIDE |
 
       // RIDER-10263
-      (HasPublicDefaultCtor.Value ? MemberPresenceFlag.PUBLIC_DEFAULT_CTOR : MemberPresenceFlag.NONE);
+      (HasPublicDefaultCtor ? MemberPresenceFlag.PUBLIC_DEFAULT_CTOR : MemberPresenceFlag.NONE);
+
+    public override IDeclaredType GetBaseClassType() =>
+      ExtendsListShortNames.IsEmpty()
+        ? null
+        : base.GetBaseClassType();
+
+    public override IEnumerable<IDeclaredType> GetSuperTypes()
+    {
+      if (ExtendsListShortNames.IsEmpty())
+        return EmptyList<IDeclaredType>.InstanceList;
+
+      var declaration = GetDeclaration();
+      return declaration != null ? declaration.SuperTypes : EmptyList<IDeclaredType>.InstanceList;
+    }
   }
 }

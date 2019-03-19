@@ -1,0 +1,4 @@
+// ${CHAR:Enter} 
+module Module
+
+let foo = (1 + 1) {caret} .ToString()

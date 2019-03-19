@@ -1,18 +1,18 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
-using JetBrains.Util.Concurrency;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
   internal abstract class FSharpClassLikePart<T> : FSharpTypeParametersOwnerPart<T>,
     ClassLikeTypeElement.IClassLikePart where T : class, IFSharpTypeDeclaration
   {
+    private bool? myHasPublicDefaultCtor;
+    
     protected FSharpClassLikePart([NotNull] T declaration, MemberDecoration memberDecoration,
       TreeNodeCollection<ITypeParameterOfTypeDeclaration> typeParameters, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, memberDecoration, typeParameters, cacheBuilder)
@@ -29,31 +29,55 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       if (declaration == null)
         return EmptyList<ITypeMember>.Instance;
 
-      // todo: ask members from FCS and check `IsCompilerGenerated`
-      var result = new List<ITypeMember>(declaration.MemberDeclarations.Select(d => d.DeclaredElement).WhereNotNull());
+      var result = new LocalList<ITypeMember>();
+      foreach (var memberDeclaration in declaration.MemberDeclarations)
+      {
+        var declaredElement = memberDeclaration.DeclaredElement;
+        if (declaredElement != null)
+          result.Add(declaredElement);
+      }
 
-      var fsFile = declaration.GetContainingNode<IFSharpFile>().NotNull();
-      foreach (var typeExtension in fsFile.GetTypeExtensions(ShortName))
-        result.AddRange(typeExtension.TypeMembers.Select(d => d.DeclaredElement).WhereNotNull());
-
-      return result;
+      return result.ResultingList();
     }
 
-    public virtual IEnumerable<IDeclaredType> GetSuperTypes()
+    public virtual IEnumerable<IDeclaredType> GetSuperTypes() =>
+      GetDeclaration()?.SuperTypes ?? EmptyList<IDeclaredType>.Instance;
+
+    public virtual IDeclaredType GetBaseClassType() =>
+      GetDeclaration()?.BaseClassType ?? GetPsiModule().GetPredefinedType().Object;
+
+    public bool HasPublicDefaultCtor
     {
-      // todo: override in class and ask FCS without getting declaration
-      return GetDeclaration()?.SuperTypes ?? EmptyList<IDeclaredType>.Instance;
-    }
+      get
+      {
+        lock (this)
+        {
+          if (myHasPublicDefaultCtor != null)
+            return myHasPublicDefaultCtor.Value;
 
-    public virtual IDeclaredType GetBaseClassType()
-    {
-      // todo: override in class and ask FCS without getting declaration
-      return GetDeclaration()?.BaseClassType ?? GetPsiModule().GetPredefinedType().Object;
-    }
+          myHasPublicDefaultCtor = false;
+          var declaration = GetDeclaration();
+          if (declaration == null)
+            return false;
 
-    public InterruptibleLazy<bool> HasPublicDefaultCtor =>
-      new InterruptibleLazy<bool>(() =>
-        GetTypeMembers().OfType<IConstructor>()
-          .Any(c => c.IsParameterless && c.GetAccessRights() == AccessRights.PUBLIC));
+          foreach (var memberDeclaration in declaration.MemberDeclarations)
+          {
+            if (memberDeclaration is IConstructorDeclaration || memberDeclaration is IImplicitConstructorDeclaration)
+            {
+              // todo: analyze tree and don't get declared elements here
+              if (memberDeclaration.DeclaredElement is IConstructor ctor &&
+                  ctor.IsParameterless && ctor.GetAccessRights() == AccessRights.PUBLIC)
+              {
+                myHasPublicDefaultCtor = true;
+                return true;
+              }
+            }
+          }
+
+          myHasPublicDefaultCtor = false;
+          return false;
+        }
+      }
+    }
   }
 }

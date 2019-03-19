@@ -1,0 +1,13 @@
+﻿module Module
+
+type T() =
+    let (    | zzz  |    _ | ) x =
+        if x then Some () else None
+
+    do
+        match true with
+        | zzz | _ -> ()
+
+    member x.Foo =
+        match true with
+        | zzz | _ -> ()

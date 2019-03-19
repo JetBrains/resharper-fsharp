@@ -5,4 +5,4 @@ open JetBrains.ProjectModel.ProjectsHost.SolutionHost
 
 [<ZoneMarker>]
 type ZoneMarker() =
-    interface IRequire<ISolutionHostZone>
+    interface IRequire<IHostSolutionZone>

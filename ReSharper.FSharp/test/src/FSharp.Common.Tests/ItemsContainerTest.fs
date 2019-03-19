@@ -5,19 +5,20 @@ open System.Collections.Generic
 open System.IO
 open System.Linq
 open System.Text.RegularExpressions
-open JetBrains.Application.BuildScript.Application.Zones
-open JetBrains.Application.Environment
+open JetBrains.Diagnostics
+open JetBrains.Lifetimes
 open JetBrains.Platform.MsBuildHost.Models
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.ProjectsHost
-open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost.Impl
 open JetBrains.ProjectModel.ProjectsHost.MsBuild
+open JetBrains.ProjectModel.ProjectsHost.MsBuild.Internal
+open JetBrains.ProjectModel.ProjectsHost.MsBuild.Structure
+open JetBrains.ProjectModel.Update
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
-open JetBrains.ReSharper.TestFramework
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.TestFramework
-open JetBrains.TestFramework.Application.Zones
 open JetBrains.Util
 open JetBrains.Util.Logging
 open Moq
@@ -33,6 +34,7 @@ let projectMark = DummyProjectMark(solutionMark, "Project", Guid.Empty, projectD
 
 let projectPath (relativePath: string) = projectDirectory / relativePath 
 
+
 let (|NormalizedPath|) (path: FileSystemPath) =
     path.MakeRelativeTo(projectDirectory).NormalizeSeparators(FileSystemPathEx.SeparatorStyle.Unix)
 
@@ -40,7 +42,7 @@ let (|AbsolutePath|) (path: FileSystemPath) =
     path.MakeAbsoluteBasedOn(projectDirectory)
 
 let removeIdentities path =
-    Regex.Replace(path, @"\[\d+\]", String.Empty);
+    Regex.Replace(path, @"\[\d+\]", String.Empty)
 
 
 let createContainer items writer =
@@ -56,25 +58,27 @@ let createContainer items writer =
 
     let rdProject = RdProject(List(), rdItems.ToList(id), List(), List(), List(), List(), List())
     let rdProjectDescription =
-        RdProjectDescription(projectDirectory.FullPath, projectMark.Location.FullPath, null, List(), List())
+        RdProjectDescription(projectDirectory.FullPath, projectMark.Location.FullPath, null, List(), List(), List())
     let msBuildProject = MsBuildProject(projectMark, Dictionary(), [rdProject].ToList(id), rdProjectDescription)
+    let projectProperties = FSharpProjectPropertiesFactory.CreateProjectProperties(List())
+    let projectDescriptor = ProjectDescriptor.CreateByProjectName(Guid(), projectProperties, null, projectMark.Name)
 
-    (container :> IFSharpItemsContainer).OnProjectLoaded(projectMark, msBuildProject)
+    (container :> IFSharpItemsContainer).OnProjectLoaded(projectMark, msBuildProject, projectDescriptor)
     container
 
 
 let createRefresher (writer: TextWriter) =
     { new IFSharpItemsContainerRefresher with
-        member x.Refresh(_, initial) =
+        member x.RefreshProject(_, initial) =
             if not initial then writer.WriteLine("Refresh whole project")
 
-        member x.Refresh(_, NormalizedPath path, id) =
+        member x.RefreshFolder(_, NormalizedPath path, id) =
             writer.WriteLine(sprintf "Refresh %s[%O]" path id)
 
-        member x.Update(_, NormalizedPath path) =
+        member x.UpdateFile(_, NormalizedPath path) =
             writer.WriteLine(sprintf "Update view %s" path)
 
-        member x.Update(_, NormalizedPath path, id) =
+        member x.UpdateFolder(_, NormalizedPath path, id) =
             writer.WriteLine(sprintf "Update view %s[%O]" path id)
 
         member x.ReloadProject(projectMark) =
@@ -237,13 +241,13 @@ type FSharpItemsContainerTest() =
     [<Test>]
     member x.``Add file 01 - Empty project``() =
         x.DoContainerModificationTest(([]: string list),
-            fun container writer ->
+            fun container _ ->
                 container.OnAddFile("Compile", "File1", null, None))
     
     [<Test>]
     member x.``Add file 02 - No relative``() =
         x.DoContainerModificationTest(([]: string list),
-            fun container writer ->
+            fun container _ ->
                 container.OnAddFile("Compile", "Folder/Subfolder/File1", null, None))
 
     [<Test>]
@@ -312,7 +316,7 @@ type FSharpItemsContainerTest() =
         x.DoContainerModificationTest(
             [ "File1"
               "Folder[1]/File2"],
-            fun container writer ->
+            fun container _ ->
                 container.OnAddFile("Compile", "Folder/Subfolder/File1", null, None))
 
     [<Test>]
@@ -320,7 +324,7 @@ type FSharpItemsContainerTest() =
         x.DoContainerModificationTest(
             [ "File1"
               "Folder[1]/SubFolder[1]/File2" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnAddFile("Compile", "Folder/Subfolder/Another/File1", null, None))
 
     [<Test>]
@@ -538,7 +542,7 @@ type FSharpItemsContainerTest() =
             [ "File1"
               "Folder[1]/SubFolder[1]/Subfolder[1]/File1"
               "Folder[1]/File4" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnRemoveFile("Compile", "File1"))
 
     [<Test>]
@@ -547,7 +551,7 @@ type FSharpItemsContainerTest() =
             [ "File1"
               "Folder[1]/SubFolder[1]/File1"
               "Folder[1]/File4" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnRemoveFile("Compile", "Folder/Subfolder/File1"))
 
     [<Test>]
@@ -556,7 +560,7 @@ type FSharpItemsContainerTest() =
             [ "File1"
               "Folder[1]/SubFolder[1]/Subfolder[1]/File1"
               "Folder[1]/File4" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnRemoveFile("Compile", "Folder/Subfolder/Subfolder/File1"))
 
     [<Test>]
@@ -566,7 +570,7 @@ type FSharpItemsContainerTest() =
               "Folder[1]/File2"
               "File3"
               "Folder[2]/File4" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnRemoveFile("Compile", "Folder/File2"))
 
     [<Test>]
@@ -576,7 +580,7 @@ type FSharpItemsContainerTest() =
               "Folder[1]/File2"
               "File3"
               "Folder[2]/File4" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnRemoveFile("Compile", "Folder/File4"))
 
     [<Test>]
@@ -587,7 +591,7 @@ type FSharpItemsContainerTest() =
               "Folder[1]/File2"
               "Folder[1]/Subfolder[2]/File3"
               "Folder[1]/File4" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnRemoveFile("Compile", "Folder/File2"))
 
     [<Test>]
@@ -597,7 +601,7 @@ type FSharpItemsContainerTest() =
               "Folder[1]/SubFolder[1]/File2"
               "File3"
               "Folder[2]/SubFolder[2]/File4" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnRemoveFile("Compile", "Folder/SubFolder/File4"))
 
     [<Test>]
@@ -607,7 +611,7 @@ type FSharpItemsContainerTest() =
               "Folder[1]/File2"
               "File3"
               "Folder[2]/File4" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnRemoveFile("Compile", "Folder/File2"))
 
     [<Test>]
@@ -617,7 +621,7 @@ type FSharpItemsContainerTest() =
               "Folder[1]/SubFolder[1]/File2"
               "File3"
               "Folder[2]/SubFolder[2]/File4" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnRemoveFile("Compile", "Folder/SubFolder/File2"))
 
     [<Test>]
@@ -628,7 +632,7 @@ type FSharpItemsContainerTest() =
               "Another[1]/File3"
               "Folder[2]/SubFolder[2]/File4"
               "Another[2]/File5" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnRemoveFile("Compile", "Another/File3"))
 
     [<Test>]
@@ -639,7 +643,7 @@ type FSharpItemsContainerTest() =
               "Folder[1]/File4" ],
             fun container writer ->
                 writer.WriteLine("Move 'Folder/File4' after 'File1':")
-                container.OnRemoveFile("Compile", "Folder/File4");
+                container.OnRemoveFile("Compile", "Folder/File4")
                 container.OnAddFile("Compile", "File4", "File1", Some RelativeToType.After))
 
     [<Test>]
@@ -702,7 +706,7 @@ type FSharpItemsContainerTest() =
               "File2"
               "File3"
               "Folder[1]/File4" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnUpdateFile("Compile", "File2", "Compile", "NewName1")
                 container.OnUpdateFile("Compile", "File3", "Compile", "NewName2"))
 
@@ -714,7 +718,7 @@ type FSharpItemsContainerTest() =
               "Folder[1]/File3"
               "Folder[1]/File4"
               "File5" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnUpdateFile("Compile", "Folder/File2", "Compile", "Folder/NewName1")
                 container.OnUpdateFile("Compile", "Folder/File3", "Compile", "Folder/NewName2")
                 container.OnUpdateFile("Compile", "Folder/File4", "Compile", "Folder/NewName3"))
@@ -727,7 +731,7 @@ type FSharpItemsContainerTest() =
               "Folder[1]/File3"
               "Folder[1]/SubFolder[2]/File4"
               "File5" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnUpdateFolder("Folder", "NewName"))
 
     [<Test>]
@@ -741,7 +745,7 @@ type FSharpItemsContainerTest() =
               "Folder[2]/File6"
               "Folder[2]/SubFolder/File7"
               "Folder[2]/File8" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnUpdateFolder("Folder", "NewName"))
 
     [<Test>]
@@ -750,7 +754,7 @@ type FSharpItemsContainerTest() =
             [ "Folder[1]/SubFolder[1]/File1"
               "File2"
               "Folder[2]/SubFolder[2]/File3" ],
-            fun container writer ->
+            fun container _ ->
                 container.OnUpdateFolder("Folder/SubFolder", "Folder/NewName"))
 
     [<Test>]
@@ -812,7 +816,7 @@ type FSharpItemsContainerTest() =
     member x.``Update 10 - Change linked item type``() =
         x.DoContainerModificationTest(
             [ createItem "Compile" "..\\ExternalFolder\\File1" |> link "File1" ],
-            fun container writer ->
+            fun container _ ->
                 let (UnixSeparators path) = FileSystemPath.Parse("..\\ExternalFolder\\File1")
                 container.OnUpdateFile("Compile", path, "Resource", path))
 
@@ -842,7 +846,7 @@ type FSharpItemsContainerTest() =
                         let itemType = itemTypes.TryGetValue(projectItem.Location)
                         let relativeItemType = itemTypes.TryGetValue(relative.Location)
 
-                        let context = provider.CreateModificationContext(viewFile, relativeViewItem, relativeToType)
+                        let context = provider.CreateModificationContext(Some viewFile, relativeViewItem, relativeToType)
                         match relativeViewItem, context with
                         | FSharpViewFile _, Some context when
                                 projectItem <> relative && isNotNull itemType &&
@@ -857,7 +861,6 @@ type FSharpItemsContainerTest() =
                                         relative.Location contextRelativeTo.ReferenceItem.Location)
                         | _ ->
                             let (NormalizedPath path) = viewFile.Location
-                            let (NormalizedPath relativePath) = relativeViewItem.Location
                             writer.Write(path)
                             writer.Write(sprintf " %O %O -> " relativeToType relativeViewItem)
                             writer.WriteLine(
@@ -997,8 +1000,20 @@ type AnItem =
         { ItemType = itemType; EvaluatedInclude = evaluatedInclude; Link = defaultArg link null }
 
 
+let itemFilterProvider =
+    let defaultBuildActions =
+        [| yield! MsBuildCommonBuildActionsProvider().DefaultBuildActions
+           yield BuildActions.compileBefore
+           yield BuildActions.compileAfter |]
+        |> HashSet
+
+    { new IItemTypeFilterProvider with
+        member x.CreateItemFilter(_, _) = MsBuildItemTypeFilter(defaultBuildActions) }
+
+
 type LoggingFSharpItemsContainer(writer, refresher) as this =
-    inherit FSharpItemsContainer(DummyLogger.Instance, DummyFSharpItemsContainerLoader.Instance, refresher)
+    inherit FSharpItemsContainer(DummyLogger.Instance, DummyFSharpItemsContainerLoader.Instance, refresher,
+                                 itemFilterProvider)
 
     let container = this :> IFSharpItemsContainer
 
@@ -1031,7 +1046,7 @@ type LoggingFSharpItemsContainer(writer, refresher) as this =
 
 
 type DummyFSharpItemsContainerLoader() =
-    inherit FSharpItemsContainerLoader(null, null, null)
+    inherit FSharpItemsContainerLoader(Lifetime.Eternal, null, null)
 
     override x.GetMap() = Dictionary<IProjectMark, ProjectMapping>() :> _
-    static member Instance = DummyFSharpItemsContainerLoader()
+    static member val Instance = DummyFSharpItemsContainerLoader()

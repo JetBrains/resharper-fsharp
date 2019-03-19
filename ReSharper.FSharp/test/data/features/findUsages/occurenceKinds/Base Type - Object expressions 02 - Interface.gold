@@ -1,0 +1,19 @@
+﻿Other
+---
+TO: [O] module |Module| RANGE: (7,13) @ Base Type - Object expressions 02 - Interface.fs
+TO: [O] let |t| = { RANGE: (21,22) @ Base Type - Object expressions 02 - Interface.fs
+TO: [O] new |System|.IDisposable with RANGE: (36,42) @ Base Type - Object expressions 02 - Interface.fs
+TO: [O] override |x|.Dispose() = () RANGE: (78,79) @ Base Type - Object expressions 02 - Interface.fs
+TO: [O] override x.|Dispose|() = () RANGE: (80,87) @ Base Type - Object expressions 02 - Interface.fs
+
+
+Base type
+---
+TO: [O] new System.|IDisposable| with RANGE: (43,54) @ Base Type - Object expressions 02 - Interface.fs
+
+
+Type specification
+---
+TO: [O] new System.|IDisposable| with RANGE: (43,54) @ Base Type - Object expressions 02 - Interface.fs
+
+

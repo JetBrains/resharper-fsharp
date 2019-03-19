@@ -6,11 +6,11 @@
 5:File5
 
 .NETFramework,Version=v0.0
-C:/Solution/Project/File1
-C:/Solution/Project/File2
-C:/Solution/Project/File3
-C:/Solution/Project/File4
-C:/Solution/Project/File5
+File1
+File2
+File3
+File4
+File5
 
 
 =======
@@ -27,12 +27,12 @@ Project
 6:File5
 
 .NETFramework,Version=v0.0
-C:/Solution/Project/File1
-C:/Solution/Project/File2
-C:/Solution/Project/File3
-C:/Solution/Project/File6
-C:/Solution/Project/File4
-C:/Solution/Project/File5
+File1
+File2
+File3
+File6
+File4
+File5
 
 
 =======
@@ -49,12 +49,12 @@ Project
 6:File5
 
 .NETFramework,Version=v0.0
-C:/Solution/Project/File1
-C:/Solution/Project/File2
-C:/Solution/Project/File3
-C:/Solution/Project/File6
-C:/Solution/Project/File4
-C:/Solution/Project/File5
+File1
+File2
+File3
+File6
+File4
+File5
 
 
 Dumps are equal: True

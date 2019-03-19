@@ -1,0 +1,9 @@
+﻿module Module
+
+[<Struct>]
+type zzz =
+    val Field: int
+    static member Dummy: zzz = Unchecked.defaultof<zzz>
+
+let (s1: zzz) = zzz()
+let (s2: zzz) = zzz.Dummy

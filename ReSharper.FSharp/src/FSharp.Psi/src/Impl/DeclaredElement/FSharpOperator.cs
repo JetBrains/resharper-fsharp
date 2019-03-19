@@ -8,51 +8,39 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
   internal class FSharpConversionOperator<TDeclaration> : FSharpOperatorBase<TDeclaration>, IConversionOperator
-    where TDeclaration : FSharpDeclarationBase, IFSharpDeclaration, IAccessRightsOwnerDeclaration,
-    IModifiersOwnerDeclaration
+    where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
-    private readonly bool myIsExplicitCast;
-
     internal FSharpConversionOperator([NotNull] ITypeMemberDeclaration declaration,
-      [NotNull] FSharpMemberOrFunctionOrValue mfv, [CanBeNull] IFSharpTypeDeclaration typeDeclaration,
-      bool isExplicitCast)
-      : base(declaration, mfv, typeDeclaration)
-    {
-      myIsExplicitCast = isExplicitCast;
-    }
-    
+      [NotNull] FSharpMemberOrFunctionOrValue mfv, bool isExplicitCast) : base(declaration, mfv) =>
+      IsExplicitCast = isExplicitCast;
+
     public override DeclaredElementType GetElementType() =>
       CLRDeclaredElementType.CONVERSION_OPERATOR;
 
-    public bool IsExplicitCast => myIsExplicitCast;
-    public bool IsImplicitCast => !myIsExplicitCast;
+    public bool IsExplicitCast { get; }
+    public bool IsImplicitCast => !IsExplicitCast;
   }
-  
+
   internal class FSharpSignOperator<TDeclaration> : FSharpOperatorBase<TDeclaration>, ISignOperator
-    where TDeclaration : FSharpDeclarationBase, IFSharpDeclaration, IAccessRightsOwnerDeclaration,
-    IModifiersOwnerDeclaration
+    where TDeclaration : FSharpDeclarationBase, IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
     internal FSharpSignOperator([NotNull] ITypeMemberDeclaration declaration,
-      [NotNull] FSharpMemberOrFunctionOrValue mfv, [CanBeNull] IFSharpTypeDeclaration typeDeclaration)
-      : base(declaration, mfv, typeDeclaration)
+      [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)
     {
     }
-    
+
     public override DeclaredElementType GetElementType() =>
       CLRDeclaredElementType.SIGN_OPERATOR;
   }
-  
-  internal abstract class FSharpOperatorBase<TDeclaration> : FSharpFunctionBase<TDeclaration>, IOperator
-    where TDeclaration : FSharpDeclarationBase, IFSharpDeclaration, IAccessRightsOwnerDeclaration,
-    IModifiersOwnerDeclaration
+
+  internal abstract class FSharpOperatorBase<TDeclaration> : FSharpTypeParametersOwnerBase<TDeclaration>, IOperator
+    where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
     internal FSharpOperatorBase([NotNull] ITypeMemberDeclaration declaration,
-      [NotNull] FSharpMemberOrFunctionOrValue mfv, [CanBeNull] IFSharpTypeDeclaration typeDeclaration)
-      : base(declaration, mfv, typeDeclaration)
+      [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)
     {
     }
-    
-    public override string ShortName => FSharpSymbol.CompiledName;
+
     public override bool IsStatic => true;
   }
 }

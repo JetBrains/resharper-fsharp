@@ -1,11 +1,9 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 
 open JetBrains.ProjectModel
-open JetBrains.ProjectModel.Properties
 open JetBrains.ProjectModel.Resources
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
-open JetBrains.UI.Icons
 
 [<ProjectModelElementPresenter(2.0)>]
 type FSharpProjectPresenter() =
@@ -14,7 +12,7 @@ type FSharpProjectPresenter() =
             match projectModelElement with
             | :? IProject as project when (project.ProjectProperties :? FSharpProjectProperties) ->
                 ProjectModelThemedIcons.FsharpProject.Id
-            | :? FSharpScriptModule as scriptModule ->
+            | :? FSharpScriptModule ->
                 ProjectModelThemedIcons.Fsharp.Id
             | _ -> null
 

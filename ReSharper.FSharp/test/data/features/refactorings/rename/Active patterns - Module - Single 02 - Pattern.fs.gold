@@ -1,0 +1,11 @@
+﻿module Module
+
+let (    | zzz | ) x =
+    not X
+
+let f (zzz x) =
+    let (zzz x) = x
+    x
+
+match true with
+| zzz x -> ()

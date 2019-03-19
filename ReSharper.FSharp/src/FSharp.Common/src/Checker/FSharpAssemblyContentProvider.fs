@@ -1,13 +1,15 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 
-open System
 open JetBrains.Application
-open JetBrains.ReSharper.Plugins.FSharp.Common.Util
+open JetBrains.ReSharper.Feature.Services
+open JetBrains.ReSharper.Plugins.FSharp
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
 [<ShellComponent>]
-type FSharpAssemblyContentProvider() =
+type FSharpAssemblyContentProvider(lifetime, onSolutionCloseNotifier: OnSolutionCloseNotifier) =
     let entityCache = EntityCache()
+    do
+        onSolutionCloseNotifier.SolutionIsAboutToClose.Advise(lifetime, fun _ -> entityCache.Clear())
 
     member x.GetLibrariesEntities(checkResults: FSharpCheckFileResults) =
         let getEntitiesAsync =

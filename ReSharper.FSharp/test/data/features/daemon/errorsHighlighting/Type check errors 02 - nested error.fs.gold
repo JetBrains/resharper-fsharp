@@ -1,0 +1,12 @@
+﻿module Module
+
+let foo x =
+    x + 1
+
+|foo |123.0|(0)|(1)
+---------------------------------------------------------
+(0): ReSharper Warning: The result of this expression has type 'int' and is implicitly ignored. Consider using 'ignore' to discard this value explicitly, e.g. 'expr |> ignore', or 'let' to bind the result to a name, e.g. 'let result = expr'.
+(1): ReSharper Underlined Error Highlighting: This expression was expected to have type
+    'int'    
+but here has type
+    'float'    

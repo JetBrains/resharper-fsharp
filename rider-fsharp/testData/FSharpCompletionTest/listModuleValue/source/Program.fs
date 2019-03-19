@@ -5,5 +5,5 @@ open System
 [<EntryPoint>]
 let main argv =
     printfn "Hello World from F#!"
-    List.{caret}
+    List.<caret>
     0 // return an integer exit code

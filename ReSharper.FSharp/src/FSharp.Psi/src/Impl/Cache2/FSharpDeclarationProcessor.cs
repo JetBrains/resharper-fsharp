@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Checker;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
@@ -32,8 +31,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public override void VisitFSharpFile(IFSharpFile fsFile)
     {
-      fsFile.TokenBuffer = fsFile.ActualTokenBuffer; // todo: remove this when/if a proper lexer is implemented
       var sourceFile = fsFile.GetSourceFile();
+      if (sourceFile == null)
+        return;
+
       var fileKind = GetFSharpFileKind(fsFile);
       var hasPairFile = myCheckerService.HasPairFile(sourceFile);
 
@@ -44,7 +45,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
         var qualifiers = declaration.LongIdentifier.Qualifiers;
         foreach (var qualifier in qualifiers)
         {
-          var qualifierName = FSharpNamesUtil.RemoveBackticks(qualifier.GetText());
+          var qualifierName = qualifier.GetText().RemoveBackticks();
           Builder.StartPart(new QualifiedNamespacePart(qualifier.GetTreeStartOffset(), Builder.Intern(qualifierName)));
         }
 
@@ -58,7 +59,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public override void VisitFSharpNamespaceDeclaration(IFSharpNamespaceDeclaration decl)
     {
       Builder.StartPart(new DeclaredNamespacePart(decl));
-      FinishModuleLikeDeclaraion(decl);
+      FinishModuleLikeDeclaration(decl);
     }
 
     public override void VisitFSharpGlobalNamespaceDeclaration(IFSharpGlobalNamespaceDeclaration decl)
@@ -70,16 +71,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public override void VisitTopLevelModuleDeclaration(ITopLevelModuleDeclaration decl)
     {
       Builder.StartPart(new TopLevelModulePart(decl, Builder));
-      FinishModuleLikeDeclaraion(decl);
+      FinishModuleLikeDeclaration(decl);
     }
 
     public override void VisitNestedModuleDeclaration(INestedModuleDeclaration decl)
     {
       Builder.StartPart(new NestedModulePart(decl, Builder));
-      FinishModuleLikeDeclaraion(decl);
+      FinishModuleLikeDeclaration(decl);
     }
 
-    private void FinishModuleLikeDeclaraion(IModuleLikeDeclaration decl)
+    private void FinishModuleLikeDeclaration(IModuleLikeDeclaration decl)
     {
       foreach (var memberDecl in decl.MembersEnumerable)
         memberDecl.Accept(this);
@@ -88,12 +89,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public override void VisitMemberDeclaration(IMemberDeclaration decl)
     {
-      Builder.AddDeclaredMemberName(decl.DeclaredName);
+      Builder.AddDeclaredMemberName(decl.CompiledName);
     }
 
-    public override void VisitLet(ILet letParam)
+    public override void VisitLet(ILet let)
     {
-      Builder.AddDeclaredMemberName(letParam.DeclaredName);
+      foreach (var binding in let.Bindings)
+      {
+        var headPattern = binding.HeadPattern;
+        if (headPattern != null)
+          ProcessTypeMembers(headPattern.Declarations);
+      }
     }
 
     public override void VisitExceptionDeclaration(IExceptionDeclaration decl)
@@ -113,37 +119,41 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public override void VisitRecordDeclaration(IRecordDeclaration decl)
     {
-      Builder.StartPart(new RecordPart(decl, Builder));
+      var recordPart =
+        decl.HasAttribute(FSharpImplUtil.Struct)
+          ? (Part) new StructRecordPart(decl, Builder)
+          : new RecordPart(decl, Builder);
+
+      Builder.StartPart(recordPart);
       ProcessTypeMembers(decl.MemberDeclarations);
       Builder.EndPart();
     }
 
-    public void FinishUnionDeclaration(IUnionDeclaration decl)
+    public override void VisitUnionDeclaration(IUnionDeclaration decl)
     {
-      foreach (var unionCase in decl.UnionCasesEnumerable)
+      var unionCases = decl.UnionCases;
+
+      var casesWithFieldsCount = 0;
+      foreach (var unionCase in unionCases)
+        if (unionCase is INestedTypeUnionCaseDeclaration)
+          casesWithFieldsCount++;
+      var hasPublicNestedTypes = casesWithFieldsCount > 0 && unionCases.Count > 1;
+
+      var unionPart =
+        decl.HasAttribute(FSharpImplUtil.Struct)
+          ? (Part) new StructUnionPart(decl, Builder, false)
+          : new UnionPart(decl, Builder, hasPublicNestedTypes);
+
+      Builder.StartPart(unionPart);
+      foreach (var unionCase in unionCases)
         unionCase.Accept(this);
       ProcessTypeMembers(decl.MemberDeclarations);
       Builder.EndPart();
     }
 
-    public override void VisitMultipleCasesUnionDeclaration(IMultipleCasesUnionDeclaration decl)
+    public override void VisitNestedTypeUnionCaseDeclaration(INestedTypeUnionCaseDeclaration decl)
     {
-      Builder.StartPart(new UnionPart(decl, Builder));
-      FinishUnionDeclaration(decl);
-    }
-
-    public override void VisitSingleCaseUnionDeclaration(ISingleCaseUnionDeclaration decl)
-    {
-      Builder.StartPart(new UnionPart(decl, Builder));
-      var theOnlyCase = decl.UnionCases.SingleOrDefault();
-      if (theOnlyCase != null)
-        ProcessTypeMembers(theOnlyCase.MemberDeclarations);
-      FinishUnionDeclaration(decl);
-    }
-
-    public override void VisitUnionCaseDeclaration(IUnionCaseDeclaration decl)
-    {
-      Builder.StartPart(new UnionCasePart(decl, Builder, decl.Parent is ISingleCaseUnionDeclaration));
+      Builder.StartPart(new UnionCasePart(decl, Builder));
       ProcessTypeMembers(decl.MemberDeclarations);
       Builder.EndPart();
     }
@@ -162,34 +172,56 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public override void VisitObjectModelTypeDeclaration(IObjectModelTypeDeclaration decl)
     {
-      Builder.StartPart(CreateObjectTypePart(decl));
+      Builder.StartPart(CreateObjectTypePart(decl, false));
       ProcessTypeMembers(decl.MemberDeclarations);
       Builder.EndPart();
     }
 
-    public override void VisitTypeExtension(ITypeExtension typeExtension) =>
-      ProcessTypeMembers(typeExtension.TypeMembers.OfType<ITypeMemberDeclaration>().AsIReadOnlyList());
+    public override void VisitDelegateDeclaration(IDelegateDeclaration decl)
+    {
+      Builder.StartPart(new DelegatePart(decl, Builder));
+      Builder.EndPart();
+    }
 
-    private Part CreateObjectTypePart(IObjectModelTypeDeclaration decl)
+    public override void VisitTypeExtensionDeclaration(ITypeExtensionDeclaration typeExtension)
+    {
+      if (typeExtension.IsTypePartDeclaration)
+      {
+        Builder.StartPart(CreateObjectTypePart(typeExtension, true));
+        ProcessTypeMembers(typeExtension.MemberDeclarations);
+        Builder.EndPart();
+        return;
+      }
+
+      if (typeExtension.IsTypeExtensionAllowed)
+        ProcessTypeMembers(typeExtension.MemberDeclarations);
+    }
+
+    private Part CreateObjectTypePart(IFSharpTypeDeclaration decl, bool isExtension)
     {
       switch (decl.TypePartKind)
       {
-        case FSharpPartKind.Class:
-          return new ClassPart(decl, Builder);
-        case FSharpPartKind.Interface:
+        case PartKind.Class:
+          return isExtension ? (Part) new ClassExtensionPart(decl, Builder) : new ClassPart(decl, Builder);
+        case PartKind.Struct:
+          return isExtension ? (Part) new StructExtensionPart(decl, Builder) : new StructPart(decl, Builder);
+        case PartKind.Interface:
           return new InterfacePart(decl, Builder);
-        case FSharpPartKind.Struct:
-          return new StructPart(decl, Builder);
+        case PartKind.Enum:
+          return new EnumPart(decl, Builder);
         default:
           throw new ArgumentOutOfRangeException();
       }
     }
 
-    private void ProcessTypeMembers(IReadOnlyList<ITypeMemberDeclaration> memberDeclarations)
+    private void ProcessTypeMembers(IEnumerable<IDeclaration> declarations)
     {
-      foreach (var typeMemberDeclaration in memberDeclarations)
+      foreach (var declaration in declarations)
       {
-        var declaredName = typeMemberDeclaration.DeclaredName;
+        if (!(declaration is ITypeMemberDeclaration))
+          continue;
+
+        var declaredName = declaration.DeclaredName;
         if (declaredName != SharedImplUtil.MISSING_DECLARATION_NAME)
           Builder.AddDeclaredMemberName(declaredName);
       }

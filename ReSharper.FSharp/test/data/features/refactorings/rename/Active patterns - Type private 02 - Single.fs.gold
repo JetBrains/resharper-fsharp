@@ -1,0 +1,17 @@
+﻿module Module
+
+type T() =
+    let (    | zzz  | ) x =
+        not x
+
+    let f (zzz x) =
+        let (zzz x) = x
+        x
+
+    do
+        match true with
+        | zzz x -> ()
+
+    member x.Foo =
+        match true with
+        | zzz x -> ()

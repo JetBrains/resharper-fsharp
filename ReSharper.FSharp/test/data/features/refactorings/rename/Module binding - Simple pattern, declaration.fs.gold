@@ -1,0 +1,4 @@
+﻿module Module
+
+let zzz = 123
+let y = zzz + 1

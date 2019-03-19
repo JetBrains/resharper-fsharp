@@ -1,11 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net451</TargetFramework>
-    <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase</RootNamespace>
+    <TargetFramework>net461</TargetFramework>
+    <RootNamespace>JetBrains.ReSharper.Plugins.FSharp</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)"/>
+    <PackageReference Include="FSharp.Core" Version="$(FsCoreVersion)" />
+    <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
+    <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FcsVersion)" />
   </ItemGroup>
 </Project>

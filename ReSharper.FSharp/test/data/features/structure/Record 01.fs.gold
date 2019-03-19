@@ -1,0 +1,6 @@
+﻿File: Record 01.fs
+ Module
+  R
+   Field:int
+   IDisposable
+    Dispose():void

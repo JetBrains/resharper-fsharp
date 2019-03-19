@@ -1,15 +1,13 @@
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.testFramework.LoggedErrorProcessor
-import com.jetbrains.rider.test.LogErrorMessageException
+import com.jetbrains.rdclient.util.BackendException
 import com.jetbrains.rider.test.TestCaseRunner
-import com.jetbrains.rider.util.idea.ReSharperHostException
 import org.testng.annotations.Test
 
 class LogErrorTest : TestCaseRunner() {
 
-    @Test(expectedExceptions = [(LogErrorMessageException::class)])
+    @Test(expectedExceptions = [(BackendException::class)])
     fun testThrowEx() {
-        Logger.getInstance("Projected Logger").error(ReSharperHostException("a", "b"))
+        Logger.getInstance("Projected Logger").error(BackendException("a"))
         testCaseErrorsProcessor.throwIfNotEmpty()
     }
 }

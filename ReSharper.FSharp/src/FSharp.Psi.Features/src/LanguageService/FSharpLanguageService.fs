@@ -1,28 +1,37 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService
 
+open JetBrains.ProjectModel
+open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CSharp.Impl
 open JetBrains.ReSharper.Psi.Impl
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
 [<Language(typeof<FSharpLanguage>)>]
-type FSharpLanguageService(languageType, constantValueService, formatter: FSharpDummyCodeFormatter, fsCheckerService, logger) =
+type FSharpLanguageService
+        (languageType, constantValueService, cacheProvider: FSharpCacheProvider, formatter: FSharpDummyCodeFormatter,
+         fsCheckerService: FSharpCheckerService) =
     inherit LanguageService(languageType, constantValueService)
 
-    let cacheProvider = FSharpCacheProvider(fsCheckerService)
+    let lexerFactory = FSharpLexerFactory()
 
     override x.IsCaseSensitive = true
     override x.SupportTypeMemberCache = true
     override x.CacheProvider = cacheProvider :> _
 
-    override x.GetPrimaryLexerFactory() = FSharpFakeLexerFactory() :> _
+    override x.GetPrimaryLexerFactory() = lexerFactory :> _
     override x.CreateFilteringLexer(lexer) = lexer
-    override x.CreateParser(lexer, psiModule, sourceFile) = FSharpParser(sourceFile, fsCheckerService, logger) :> _
+    override x.CreateParser(lexer, _, sourceFile) =
+        let resolvedSymbolsCache = sourceFile.GetSolution().GetComponent<IFSharpResolvedSymbolsCache>()
+        FSharpParser(lexer, sourceFile, fsCheckerService, resolvedSymbolsCache) :> _
 
     override x.IsTypeMemberVisible(typeMember) =
         match typeMember with
@@ -33,4 +42,38 @@ type FSharpLanguageService(languageType, constantValueService, formatter: FSharp
     override x.DeclaredElementPresenter = CSharpDeclaredElementPresenter.Instance :> _ // todo: implement F# presenter
 
     override x.CodeFormatter = formatter :> _
-    override x.FindTypeDeclarations(file) = EmptyList<_>.Instance :> _
+    override x.FindTypeDeclarations(_) = EmptyList.Instance :> _
+
+    override x.CanContainCachableDeclarations(node) =
+        not (node :? IExpression)
+
+    override x.CalcOffset(declaration) =
+        match declaration with
+        | :? INamedPat as namedPat -> namedPat.GetOffset()
+        | _ -> base.CalcOffset(declaration)
+
+    override x.GetReferenceAccessType(_,reference) =
+        match reference.As<FSharpSymbolReference>() with
+        | null -> ReferenceAccessType.OTHER
+        | symbolReference ->
+
+        match symbolReference.GetElement().As<IReferenceExpression>() with
+        | null -> ReferenceAccessType.OTHER
+        | referenceExpression ->
+
+        match referenceExpression.IdentifierToken with
+        | null -> ReferenceAccessType.OTHER
+        | referenceToken ->
+
+        match referenceExpression.GetContainingNode<ISetExpr>() with
+        | null -> ReferenceAccessType.OTHER
+        | setExpr ->
+
+        match setExpr.ReferenceIdentifier with
+        | token when token == referenceToken -> ReferenceAccessType.WRITE
+        | _ -> ReferenceAccessType.OTHER
+
+    override x.CreateElementPointer(declaredElement) =
+        match declaredElement.As<IFSharpGeneratedFromOtherElement>() with
+        | null -> null
+        | generatedElement -> generatedElement.CreatePointer() :?> _

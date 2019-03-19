@@ -7,8 +7,7 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
   internal class FSharpProperty<TDeclaration> : FSharpPropertyBase<TDeclaration>
-    where TDeclaration : FSharpDeclarationBase, IFSharpDeclaration, IAccessRightsOwnerDeclaration,
-    IModifiersOwnerDeclaration
+    where TDeclaration : FSharpDeclarationBase, IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
     public FSharpProperty([NotNull] ITypeMemberDeclaration declaration,
       [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)

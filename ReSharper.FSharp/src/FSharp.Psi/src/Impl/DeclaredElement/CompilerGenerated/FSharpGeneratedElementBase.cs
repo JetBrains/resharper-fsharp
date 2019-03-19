@@ -1,86 +1,24 @@
-﻿using System.Collections.Generic;
-using System.Xml;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Resolve;
-using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Util;
-using JetBrains.Util.DataStructures;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 {
-  public abstract class FSharpGeneratedElementBase : IClrDeclaredElement
+  public abstract class FSharpGeneratedElementBase : FSharpDeclaredElementBase
   {
-    [NotNull] private readonly IClass myContainingType;
+    [NotNull] protected abstract IClrDeclaredElement ContainingElement { get; }
 
-    protected FSharpGeneratedElementBase([NotNull] IClass containingType)
-    {
-      myContainingType = containingType;
-    }
+    public string SourceName => SharedImplUtil.MISSING_DECLARATION_NAME;
 
-    public IPsiServices GetPsiServices()
-    {
-      return myContainingType.GetPsiServices();
-    }
+    public override bool IsValid() => ContainingElement.IsValid();
+    public override IPsiServices GetPsiServices() => ContainingElement.GetPsiServices();
 
-    public IList<IDeclaration> GetDeclarations()
-    {
-      return EmptyList<IDeclaration>.Instance;
-    }
+    public override IPsiModule Module => ContainingElement.Module;
+    public override ISubstitution IdSubstitution => ContainingElement.IdSubstitution;
 
-    public IList<IDeclaration> GetDeclarationsIn(IPsiSourceFile sourceFile)
-    {
-      return EmptyList<IDeclaration>.Instance;
-    }
-
-    public abstract DeclaredElementType GetElementType();
-
-    public XmlNode GetXMLDoc(bool inherit)
-    {
-      return null;
-    }
-
-    public XmlNode GetXMLDescriptionSummary(bool inherit)
-    {
-      return null;
-    }
-
-    public bool IsValid()
-    {
-      return myContainingType.IsValid();
-    }
-
-    public bool IsSynthetic()
-    {
-      return false;
-    }
-
-    public HybridCollection<IPsiSourceFile> GetSourceFiles()
-    {
-      return HybridCollection<IPsiSourceFile>.Empty;
-    }
-
-    public bool HasDeclarationsIn(IPsiSourceFile sourceFile)
-    {
-      return false;
-    }
-
-    public abstract string ShortName { get; }
-    public bool CaseSensitiveName => true;
-    public PsiLanguageType PresentationLanguage => FSharpLanguage.Instance;
-
-    public virtual ITypeElement GetContainingType()
-    {
-      return myContainingType;
-    }
-
-    public virtual ITypeMember GetContainingTypeMember()
-    {
-      return myContainingType;
-    }
-
-    public IPsiModule Module => myContainingType.Module;
-    public virtual ISubstitution IdSubstitution => myContainingType.IdSubstitution;
+    public virtual bool IsVisibleFromFSharp => false;
+    public virtual bool CanNavigateTo => false;
   }
 }

@@ -1,0 +1,66 @@
+﻿using System.Collections.Generic;
+using static Module;
+
+public class Class<T> where T : struct
+{
+  public Class()
+  {
+    R r = new R(field: 123);
+    SR sr = new SR(field: 123);
+
+    // Field is internal, and only getter is produced for property.
+    r.|Field|(0) = 123;
+    sr.|Field|(1) = 123;
+
+    var o = new object();
+    var c = EqualityComparer<SR>.Default;
+
+    string s = sr.ToString();
+
+    int hc1 = sr.GetHashCode();
+    int hc2 = sr.GetHashCode(c);
+
+    bool b1 = sr.Equals(sr);
+    bool b2 = sr.Equals(o);
+    bool b3 = sr.Equals(o, c);
+
+    int ct1 = sr.CompareTo(sr);
+    int ct2 = sr.CompareTo(o);
+    int ct3 = sr.CompareTo(o, Comparer<SR>.Default);
+  }
+}
+
+public class ClassR : Class<|R|(2)>
+{
+}
+
+public class ClassSR : Class<SR>
+{
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: The property 'Module.R.Field' has no setter
+(1): ReSharper Underlined Error Highlighting: The property 'Module.SR.Field' has no setter
+(2): ReSharper Underlined Error Highlighting: The type 'Module.R' must be a non-nullable value type in order to use it as parameter 'T'
+M:Module.R.#ctor(System.Int32)
+M:Module.SR.#ctor(System.Int32)
+P:Module.R.Field
+P:Module.SR.Field
+M:Module.SR.ToString
+M:Module.SR.ToString
+M:Module.SR.GetHashCode
+M:Module.SR.GetHashCode
+M:Module.SR.GetHashCode(System.Collections.IEqualityComparer)
+M:Module.SR.GetHashCode(System.Collections.IEqualityComparer)
+M:Module.SR.Equals(Module.SR)
+M:Module.SR.Equals(Module.SR)
+M:Module.SR.Equals(System.Object)
+M:Module.SR.Equals(System.Object)
+M:Module.SR.Equals(System.Object,System.Collections.IEqualityComparer)
+M:Module.SR.Equals(System.Object,System.Collections.IEqualityComparer)
+M:Module.SR.CompareTo(Module.SR)
+M:Module.SR.CompareTo(Module.SR)
+M:Module.SR.CompareTo(System.Object)
+M:Module.SR.CompareTo(System.Object)
+M:Module.SR.CompareTo(System.Object,System.Collections.IComparer)
+M:Module.SR.CompareTo(System.Object,System.Collections.IComparer)

@@ -1,43 +1,45 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net451</TargetFramework>
+    <TargetFramework>net461</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Common</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Common</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="src\ProjectModel\FSharpProjectLanguage.fs" />
-    <Compile Include="src\ProjectModel\ProjectProperties\FSharpProjectProperties.fs" />
-    <Compile Include="src\ProjectModel\ProjectProperties\FSharpProjectPropertiesFactory.fs" />
-    <Compile Include="src\ProjectModel\ProjectProperties\FSharpProjectFilePropertiesProvider.fs" />
-    <Compile Include="src\ProjectModel\ZoneMarker.fs" />
+    <Compile Include="src\Util\FSharpGlobalUtil.fs" />
     <Compile Include="src\Util\Util.fs" />
+    <Compile Include="src\ProjectModel\FSharpProjectLanguage.fs" />
+    <Compile Include="src\ProjectModel\ProjectProperties.fs" />
+    <Compile Include="src\ProjectModel\FSharpLanguageSpecificItemsProvider.fs" />
+    <Compile Include="src\ProjectModel\ZoneMarker.fs" />
     <Compile Include="src\ProjectModel\ProjectItems\FSharpItemsContainer.fs" />
     <Compile Include="src\ProjectModel\ProjectItems\ProjectStructure.fs" />
-    <Compile Include="src\FileSystemShim\FSharpSourceCache.fs" />
-    <Compile Include="src\FileSystemShim\AssemblyTimestampCache.fs" />
-    <Compile Include="src\FileSystemShim\FileSystemShim.fs" />
+    <Compile Include="src\Shim\FileSystem\FSharpSourceCache.fs" />
+    <Compile Include="src\Shim\FileSystem\AssemblyInfoShim.fs" />
     <Compile Include="src\Util\FSharpAttributesUtil.fs" />
     <Compile Include="src\Util\FSharpSymbolUtil.fs" />
     <Compile Include="src\Util\FSharpXmlDocService.fs" />
+    <Compile Include="src\Util\CacheUtil.fs" />
     <Compile Include="src\Checker\FSharpAssemblyContentProvider.fs" />
     <Compile Include="src\Checker\FSharpCheckerExtensions.fs" />
     <Compile Include="src\Checker\FSharpCoreFix.fs" />
+    <Compile Include="src\Checker\FSharpOptions.fs" />
     <Compile Include="src\Checker\FSharpCheckerService.fs" />
-    <Compile Include="src\FSharpTargetsAnalyzer.fs" />
     <Compile Include="src\ProjectModel\FSharpScriptPsiModuleFactory.fs" />
     <Compile Include="src\ProjectModel\FSharpFileService.fs" />
     <Compile Include="src\ProjectModel\FSharpProjectPresenter.fs" />
+    <Compile Include="src\ProjectModel\ProjectLoadDiagnostics.fs" />
     <Compile Include="src\Checker\FSharpProjectOptionsBuilder.fs" />
     <Compile Include="src\Checker\FSharpProjectOptionsProvider.fs" />
     <Compile Include="src\PaketRestoreTargetsAnalyzer.fs" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FSharp.Core" Version="4.3.4" />
-    <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FCSVersion)" />
+    <PackageReference Include="FSharp.Core" Version="$(FsCoreVersion)" />
+    <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FcsVersion)" />
     <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
+    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
   </ItemGroup>
 
   <ItemGroup>

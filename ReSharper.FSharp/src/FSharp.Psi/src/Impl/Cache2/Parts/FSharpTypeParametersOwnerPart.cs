@@ -14,7 +14,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     protected FSharpTypeParametersOwnerPart([NotNull] T declaration, MemberDecoration memberDecoration,
       TreeNodeCollection<ITypeParameterOfTypeDeclaration> typeParameters, [NotNull] ICacheBuilder cacheBuilder)
-      : base(declaration, cacheBuilder.Intern(declaration.ShortName), memberDecoration, typeParameters.Count, cacheBuilder)
+      : base(declaration, cacheBuilder.Intern(declaration.CompiledName), memberDecoration, typeParameters.Count,
+        cacheBuilder)
     {
       var parameters = declaration.TypeParameters;
       if (parameters.Count == 0)
@@ -25,11 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
       myTypeParameterNames = new string[typeParameters.Count];
       for (var i = 0; i < typeParameters.Count; i++)
-      {
-        var name = typeParameters[i].GetText();
-        var trimmed = !name.IsEmpty() && name[0] == '\'' ? name.Substring(1) : name;
-        myTypeParameterNames[i] = cacheBuilder.Intern(trimmed);
-      }
+        myTypeParameterNames[i] = cacheBuilder.Intern(typeParameters[i].CompiledName);
     }
 
     protected FSharpTypeParametersOwnerPart(IReader reader) : base(reader)
@@ -59,25 +56,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       return index < TypeParameterNumber ? declaration?.TypeParameters[index] : null;
     }
 
-    public override string GetTypeParameterName(int index)
-    {
-      return myTypeParameterNames[index];
-    }
+    public override string GetTypeParameterName(int index) =>
+      myTypeParameterNames[index];
 
-    public override TypeParameterVariance GetTypeParameterVariance(int index)
-    {
-      return TypeParameterVariance.INVARIANT;
-    }
+    public override TypeParameterVariance GetTypeParameterVariance(int index) =>
+      TypeParameterVariance.INVARIANT;
 
-    public override IEnumerable<IType> GetTypeParameterSuperTypes(int index)
-    {
-      // todo
-      return EmptyList<IType>.Instance;
-    }
+    public override IEnumerable<IType> GetTypeParameterSuperTypes(int index) =>
+      EmptyList<IType>.Instance; // todo
 
-    public override TypeParameterConstraintFlags GetTypeParameterConstraintFlags(int index)
-    {
-      return 0;
-    }
+    public override TypeParameterConstraintFlags GetTypeParameterConstraintFlags(int index) => 0; // todo
+
+    protected override string PrintTypeParameters() =>
+      myTypeParameterNames.Length == 0
+        ? ""
+        : "<" + StringUtil.StringArrayText(myTypeParameterNames) + ">";
   }
 }

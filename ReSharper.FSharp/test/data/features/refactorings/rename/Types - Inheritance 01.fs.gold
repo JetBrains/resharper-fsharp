@@ -1,0 +1,11 @@
+﻿module Module
+
+type zzz() =
+    class
+    end
+
+type Q() =
+    inherit zzz()
+
+type Q1() =
+    inherit zzz()

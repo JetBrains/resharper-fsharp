@@ -1,0 +1,7 @@
+﻿Project Files:Union 08 - Struct singletons.fs:
+FSharpProjectFilePart:ImplFile
+ TopLevelModulePart:Module->Class:Module
+  StructUnionPart:Union->Struct:Module+Union
+[]: Namespace:
+ [Module]: Class:Module[TestProject]
+  [Union]: Struct:Module+Union[TestProject]

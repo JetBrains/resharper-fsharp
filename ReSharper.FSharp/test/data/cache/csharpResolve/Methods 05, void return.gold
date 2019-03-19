@@ -1,0 +1,23 @@
+﻿using System.Collections.Generic;
+using static Module;
+
+public class Class1
+{
+  public Class1()
+  {
+    var t = new T();
+    |int|(0) m = |t.Method()|(1);
+    |int|(2) sm = |T.StaticMethod()|(3);
+  }
+}
+
+---------------------------------------------------------
+(0):<secondary> ReSharper Underlined Error Highlighting: Cannot convert initializer type 'void' to target type 'int'
+(1): ReSharper Underlined Error Highlighting: Cannot convert source type 'void' to target type 'int'
+(2):<secondary> ReSharper Underlined Error Highlighting: Cannot convert initializer type 'void' to target type 'int'
+(3): ReSharper Underlined Error Highlighting: Cannot convert source type 'void' to target type 'int'
+M:Module.T.#ctor
+M:Module.T.Method
+M:Module.T.Method
+M:Module.T.StaticMethod
+M:Module.T.StaticMethod

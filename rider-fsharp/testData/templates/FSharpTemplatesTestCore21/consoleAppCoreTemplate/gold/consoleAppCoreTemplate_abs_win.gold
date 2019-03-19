@@ -1,0 +1,9 @@
+ConsoleApplication/obj/Debug/netcoreapp2.1/ConsoleApplication.fsproj.FileListAbsolute.txt:
+	ConsoleApplication/bin/Debug/netcoreapp2.1/ConsoleApplication.deps.json
+	ConsoleApplication/bin/Debug/netcoreapp2.1/ConsoleApplication.dll
+	ConsoleApplication/bin/Debug/netcoreapp2.1/ConsoleApplication.pdb
+	ConsoleApplication/bin/Debug/netcoreapp2.1/ConsoleApplication.runtimeconfig.dev.json
+	ConsoleApplication/bin/Debug/netcoreapp2.1/ConsoleApplication.runtimeconfig.json
+	ConsoleApplication/obj/Debug/netcoreapp2.1/ConsoleApplication.AssemblyInfo.fs
+	ConsoleApplication/obj/Debug/netcoreapp2.1/ConsoleApplication.dll
+	ConsoleApplication/obj/Debug/netcoreapp2.1/ConsoleApplication.pdb

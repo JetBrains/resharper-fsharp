@@ -1,10 +1,10 @@
 ﻿using JetBrains.Annotations;
 using JetBrains.Application.PersistentMap;
-using JetBrains.Util.PersistentMap;
+using JetBrains.Serialization;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
-  [PolymorphicMarshaller(8)]
+  [PolymorphicMarshaller(17)]
   public class FSharpCacheVersion
   {
     [UsedImplicitly] public static UnsafeReader.ReadDelegate<object> ReadDelegate = r => new FSharpCacheVersion();

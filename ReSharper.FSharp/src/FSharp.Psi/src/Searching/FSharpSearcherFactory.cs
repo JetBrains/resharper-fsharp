@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -18,7 +19,7 @@ using Microsoft.FSharp.Compiler.SourceCodeServices;
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 {
   [PsiSharedComponent]
-  public class FSharpSearcherFactory : IDomainSpecificSearcherFactory
+  public class FSharpSearcherFactory : DomainSpecificSearcherFactoryBase
   {
     private readonly SearchDomainFactory mySearchDomainFactory;
     private readonly CLRDeclaredElementSearcherFactory myClrSearchFactory;
@@ -30,25 +31,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
       myClrSearchFactory = clrSearchFactory;
     }
 
-    public bool IsCompatibleWithLanguage(PsiLanguageType languageType)
-    {
-      return languageType.Is<FSharpLanguage>();
-    }
+    public override bool IsCompatibleWithLanguage(PsiLanguageType languageType) => languageType.Is<FSharpLanguage>();
 
-    public IDomainSpecificSearcher CreateReferenceSearcher(IDeclaredElementsSet elements, bool findCandidates)
-    {
-      return new FSharpReferenceSearcher(elements, findCandidates);
-    }
+    public override IDomainSpecificSearcher
+      CreateReferenceSearcher(IDeclaredElementsSet elements, bool findCandidates) =>
+      new FSharpReferenceSearcher(elements, findCandidates);
 
-    public IEnumerable<string> GetAllPossibleWordsInFile(IDeclaredElement element)
-    {
-      return FSharpNamesUtil.GetPossibleSourceNames(element);
-    }
+    public override IEnumerable<string> GetAllPossibleWordsInFile(IDeclaredElement element) =>
+      FSharpNamesUtil.GetPossibleSourceNames(element);
 
-    public ISearchDomain GetDeclaredElementSearchDomain(IDeclaredElement declaredElement)
+    public override ISearchDomain GetDeclaredElementSearchDomain(IDeclaredElement declaredElement)
     {
       // todo: type abbreviations
-      if (declaredElement is ILocalDeclaration localDeclaration)
+      if (declaredElement is IFSharpLocalDeclaration localDeclaration)
         return mySearchDomainFactory.CreateSearchDomain(localDeclaration.GetSourceFile());
 
       if (declaredElement is IFSharpSymbolElement fsSymbolElement)
@@ -63,113 +58,83 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
           if (patternEntity != null)
           {
             var patternTypeElement = FSharpElementsUtil.GetDeclaredElement(patternEntity, fsSymbolElement.Module);
-            if (patternTypeElement == null)
-              return EmptySearchDomain.Instance;
-
-            declaredElement = patternTypeElement;
+            return patternTypeElement != null
+              ? myClrSearchFactory.GetDeclaredElementSearchDomain(patternTypeElement)
+              : EmptySearchDomain.Instance;
           }
         }
-
-        var activePatternCaseElement = fsSymbolElement as ActivePatternCase;
-        var declaration = activePatternCaseElement?.GetDeclaration();
-        var containingType = ((ITypeDeclaration) declaration?.GetContainingTypeDeclaration())?.DeclaredElement;
-        if (containingType != null)
-          declaredElement = containingType;
       }
 
-      return myClrSearchFactory.GetDeclaredElementSearchDomain(declaredElement);
+      if (declaredElement is TopActivePatternCase activePatternCaseElement)
+      {
+        var declaration = activePatternCaseElement.GetDeclaration();
+        if (declaration?.GetContainingNode<IFSharpLocalDeclaration>() != null)
+          return mySearchDomainFactory.CreateSearchDomain(declaration.GetSourceFile());
+
+        var containingMemberDeclaration = declaration?.GetContainingNode<ITypeMemberDeclaration>();
+        var containingMember = containingMemberDeclaration?.DeclaredElement;
+        if (containingMember != null)
+          return myClrSearchFactory.GetDeclaredElementSearchDomain(containingMember);
+      }
+
+      return EmptySearchDomain.Instance;
     }
 
-    public Tuple<ICollection<IDeclaredElement>, bool> GetNavigateToTargets(IDeclaredElement element)
+    public override IEnumerable<RelatedDeclaredElement> GetRelatedDeclaredElements(IDeclaredElement element)
     {
-      // todo: for union cases navigate to case declarations
+      switch (element)
+      {
+        case IUnionCase unionCase:
+          return GetUnionCaseRelatedElements(unionCase);
+        case IGeneratedConstructorParameterOwner parameterOwner:
+          return new[] {new RelatedDeclaredElement(parameterOwner.GetParameter())};
+        default:
+          return EmptyList<RelatedDeclaredElement>.Instance;
+      }
+    }
 
-      var resolvedSymbolElement = element as ResolvedFSharpSymbolElement;
-      if (resolvedSymbolElement?.Symbol is FSharpActivePatternCase activePatternCase)
+    private static IEnumerable<RelatedDeclaredElement> GetUnionCaseRelatedElements([NotNull] IUnionCase unionCase) =>
+      unionCase.GetGeneratedMembers().Select(member => new RelatedDeclaredElement(member));
+
+    public override Tuple<ICollection<IDeclaredElement>, bool> GetNavigateToTargets(IDeclaredElement element)
+    {
+      if (element is ResolvedFSharpSymbolElement resolvedSymbolElement &&
+          resolvedSymbolElement.Symbol is FSharpActivePatternCase activePatternCase)
       {
         var activePattern = activePatternCase.Group;
 
         var entityOption = activePattern.DeclaringEntity;
         var patternNameOption = activePattern.Name;
-        if (entityOption == null || patternNameOption == null) return null;
+        if (entityOption == null || patternNameOption == null)
+          return null;
 
         var typeElement = FSharpElementsUtil.GetTypeElement(entityOption.Value, resolvedSymbolElement.Module);
         var pattern = typeElement.EnumerateMembers(patternNameOption.Value, true).FirstOrDefault() as IDeclaredElement;
         if (pattern is IFSharpTypeMember)
         {
-          var patternDecl = pattern.GetDeclarations().FirstOrDefault();
-          if (patternDecl == null)
+          if (!(pattern.GetDeclarations().FirstOrDefault() is IFSharpDeclaration patternDecl))
             return null;
 
           var caseElement = patternDecl.GetActivePatternByIndex(activePatternCase.Index);
           if (caseElement != null)
-            return Tuple.Create(new[] {caseElement}.AsCollection(), false);
+            return CreateTarget(caseElement);
         }
         else if (pattern != null)
-        {
-          return Tuple.Create(new[] {pattern}.AsCollection(), false);
-        }
+          return CreateTarget(pattern);
       }
 
-      if (!(element is IFSharpTypeMember fsTypeMember) || fsTypeMember.IsVisibleFromFSharp)
+      if (element is IFSharpGeneratedFromOtherElement generated && generated.OriginElement is IDeclaredElement origin)
+        return CreateTarget(origin);
+
+      if (!(element is IFSharpTypeMember fsTypeMember) || fsTypeMember.CanNavigateTo)
         return null;
 
       return fsTypeMember.GetContainingType() is IDeclaredElement containingType
-        ? Tuple.Create(new[] {containingType}.AsCollection(), false)
+        ? CreateTarget(containingType)
         : null;
     }
 
-    public ICollection<FindResult> TransformNavigationTargets(ICollection<FindResult> targets)
-    {
-      return null;
-    }
-
-    public IEnumerable<RelatedDeclaredElement> GetRelatedDeclaredElements(IDeclaredElement element)
-    {
-      return EmptyList<RelatedDeclaredElement>.Instance;
-    }
-
-    public Tuple<ICollection<IDeclaredElement>, Predicate<IFindResultReference>, bool> GetDerivedFindRequest(
-      IFindResultReference result)
-    {
-      return null;
-    }
-
-    public IDomainSpecificSearcher CreateLateBoundReferenceSearcher(IDeclaredElementsSet elements)
-    {
-      return null;
-    }
-
-    public IDomainSpecificSearcher CreateConstructorSpecialReferenceSearcher(ICollection<IConstructor> constructors)
-    {
-      return null;
-    }
-
-    public IDomainSpecificSearcher CreateMethodsReferencedByDelegateSearcher(IDelegate @delegate)
-    {
-      return null;
-    }
-
-    public IDomainSpecificSearcher CreateTextOccurrenceSearcher(IDeclaredElementsSet elements)
-    {
-      return null;
-    }
-
-    public IDomainSpecificSearcher CreateTextOccurrenceSearcher(string subject)
-    {
-      return null;
-    }
-
-    public IDomainSpecificSearcher CreateAnonymousTypeSearcher(IList<AnonymousTypeDescriptor> typeDescription,
-      bool caseSensitive)
-    {
-      return null;
-    }
-
-    public IDomainSpecificSearcher CreateConstantExpressionSearcher(ConstantValue constantValue,
-      bool onlyLiteralExpression)
-    {
-      return null;
-    }
+    private static Tuple<ICollection<IDeclaredElement>, bool> CreateTarget(IDeclaredElement element) =>
+      new Tuple<ICollection<IDeclaredElement>, bool>(new[] {element}, false);
   }
 }

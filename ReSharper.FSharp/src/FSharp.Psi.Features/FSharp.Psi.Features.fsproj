@@ -1,11 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net451</TargetFramework>
+    <TargetFramework>net461</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi.Features</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="src\Util\StringLiteralsUtil.fs" />
+    <Compile Include="src\Util\PsiUtil.fs" />
     <Compile Include="src\CodeCompletion\CompletionUtil.fs" />
     <Compile Include="src\CodeCompletion\FSharpCodeCompletionContext.fs" />
     <Compile Include="src\CodeCompletion\FSharpPathCompletionProvider.fs" />
@@ -22,35 +24,52 @@
     <Compile Include="src\Daemon\Stages\ScriptLoadPathsStage.fs" />
     <Compile Include="src\Daemon\Stages\SyntaxErrorsStage.fs" />
     <Compile Include="src\Daemon\Stages\TypeCheckErrorsStage.fs" />
+    <Compile Include="src\Daemon\Stages\UnusedOpensStage.fs" />
+    <Compile Include="src\Daemon\Stages\FormatSpecifiersStage.fs" />
     <Compile Include="src\Daemon\UsageChecking\FSharpUsageCheckingService.fs" />
+    <Compile Include="src\Daemon\Analyzers\ReSpellerHelper.fs" />
+    <Compile Include="src\Daemon\Analyzers\StringProblemsAnalyzer.fs" />
     <Compile Include="src\Comment\FSharpBlockCommentActionProvider.fs" />
     <Compile Include="src\Comment\FSharpLineCommentActionProvider.fs" />
     <Compile Include="src\Debugger\FSharpBreakpointVariantsProvider.fs" />
     <Compile Include="src\Debugger\FSharpDebuggerLocalSymbolProvider.fs" />
     <Compile Include="src\Debugger\FSharpExpressionEvaluationInfoProvider.fs" />
+    <Compile Include="src\FileTemplates\FileTemplates.fs" />
+    <EmbeddedResource Include="src\FileTemplates\FileTemplates.xml">
+      <LogicalName>JetBrains.ReSharper.Plugins.FSharp.Templates.FileTemplates.xml</LogicalName>
+    </EmbeddedResource>
     <Compile Include="src\Foldings\FSharpCodeFoldings.fs" />
-    <Compile Include="src\Searching\FSharpPathReference.fs" />
+    <Compile Include="src\Search\FSharpItemOccurrenceKind.fs" />
+    <Compile Include="src\Search\FSharpPathReference.fs" />
+    <Compile Include="src\Search\FSharpSearchGuru.fs" />
+    <Compile Include="src\Search\FSharpGeneratedElementsSearch.fs" />
     <Compile Include="src\SelectEmbracingConsruct\FSharpSelectEmbracingConstructProvider.fs" />
     <Compile Include="src\Formatter\FSharpCodeStylePage.fs" />
     <Compile Include="src\Formatter\ReformatCode.fs" />
-    <Compile Include="src\Settings\FsiOptions.fs" />
-    <Compile Include="src\FsiSessionsHost.fs" />
+    <Compile Include="src\Fsi\FsiOptions.fs" />
+    <Compile Include="src\Fsi\FsiDetector.fs" />
+    <Compile Include="src\Fsi\FsiSessionsHost.fs" />
+    <Compile Include="src\Fsi\FsiOptionsPage.fs" />
     <Compile Include="src\TodoItems\FSharpTodoContentsProvider.fs" />
+    <Compile Include="src\Parsing\ParseTreeUtil.fs" />
     <Compile Include="src\Parsing\FSharpTreeBuilderBase.fs" />
     <Compile Include="src\Parsing\FSharpImplTreeBuilder.fs" />
     <Compile Include="src\Parsing\FSharpSigTreeBuilder.fs" />
     <Compile Include="src\Parsing\FSharpParser.fs" />
+    <Compile Include="src\Refactorings\Rename.fs" />
+    <Compile Include="src\LanguageService\FSharpDeclaredElementIconProvider.fs" />
     <Compile Include="src\LanguageService\FSharpPsiProperties.fs" />
     <Compile Include="src\LanguageService\FSharpProjectFileLanguageService.fs" />
     <Compile Include="src\LanguageService\FSharpLanguageService.fs" />
     <Compile Include="src\LanguageService\FSharpClrLanguage.fs" />
-    <Compile Include="src\LanguageService\FSharpRefactoringLanguageService.fs" />
+    <Compile Include="src\LanguageService\FSharpBreadcrumbsHelper.fs" />
+    <Compile Include="src\FSharpTypingAssist.fs" />
     <Compile Include="src\ZoneMarker.fs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="FSharp.Core" Version="4.3.4" />
-    <PackageReference Include="Fantomas" Version="2.7.1" />
-    <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FCSVersion)" />
+    <PackageReference Include="FSharp.Core" Version="$(FsCoreVersion)" />
+    <PackageReference Include="JetBrains.Fantomas" Version="[2.9.5]" />
+    <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FcsVersion)" />
     <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
   </ItemGroup>
   <ItemGroup>

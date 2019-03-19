@@ -1,0 +1,11 @@
+﻿module Module
+
+let _ = printfn "foo |%s|(0) |%d|(1)
+                 |%A|(2) bar
+|%i|(3)"
+
+---------------------------------------------------------
+(0): ReSharper Format String Item: 
+(1): ReSharper Format String Item: 
+(2): ReSharper Format String Item: 
+(3): ReSharper Format String Item: 

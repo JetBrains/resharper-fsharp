@@ -1,18 +1,22 @@
 package com.jetbrains.rider.plugins.fsharp.projectView
 
 import com.intellij.openapi.project.Project
-import com.jetbrains.rider.projectView.moveProviders.Impl.ActionOrderType
-import com.jetbrains.rider.projectView.moveProviders.Impl.NodeOrderType
+import com.jetbrains.rider.model.RdProjectFileDescriptor
 import com.jetbrains.rider.projectView.moveProviders.extensions.MoveProviderExtension
+import com.jetbrains.rider.projectView.moveProviders.impl.ActionOrderType
+import com.jetbrains.rider.projectView.moveProviders.impl.NodeOrderType
 import com.jetbrains.rider.projectView.nodes.*
 import com.jetbrains.rider.util.idea.application
 
 class FSharpMoveProviderExtension(project: Project) : MoveProviderExtension(project) {
 
     companion object {
-        const val FSharpCompileType: String = "FSharpCompileType"
         const val CompileBeforeType: String = "CompileBefore"
         const val CompileAfterType: String = "CompileAfter"
+
+        fun isSpecialCompileType(descriptor: RdProjectFileDescriptor) : Boolean {
+            return descriptor.buildAction in arrayOf(CompileBeforeType, CompileAfterType)
+        }
     }
 
     override fun supportOrdering(node: IProjectModelNode): NodeOrderType {
@@ -122,8 +126,9 @@ class FSharpMoveProviderExtension(project: Project) : MoveProviderExtension(proj
 
     private fun ProjectModelNode?.isCompileBefore(orderType: ActionOrderType): Boolean {
         this ?: return false
-        if (isProjectFile()) {
-            return descriptor.getUserData(FSharpCompileType) == CompileBeforeType
+        val descriptor = descriptor
+        if (descriptor is RdProjectFileDescriptor) {
+            return descriptor.buildAction == CompileBeforeType
         }
         if (isProjectFolder()) {
             return when (orderType) {
@@ -137,8 +142,9 @@ class FSharpMoveProviderExtension(project: Project) : MoveProviderExtension(proj
 
     private fun ProjectModelNode?.isCompileAfter(orderType: ActionOrderType): Boolean {
         this ?: return false
-        if (isProjectFile()) {
-            return descriptor.getUserData(FSharpCompileType) == CompileAfterType
+        val descriptor = descriptor
+        if (descriptor is RdProjectFileDescriptor) {
+            return descriptor.buildAction == CompileAfterType
         }
         if (isProjectFolder()) {
             return when (orderType) {

@@ -1,0 +1,21 @@
+﻿Project Files:Module 03 - Module suffix.fs:
+FSharpProjectFilePart:ImplFile
+ FSharp.DeclaredNamespacePart:MyNamespace
+  NestedModulePart:RModule->Class:MyNamespace.RModule
+  RecordPart:R->Class:MyNamespace.R
+  NestedModulePart:UModule->Class:MyNamespace.UModule
+  UnionPart:U->Class:MyNamespace.U
+  NestedModulePart:OModule->Class:MyNamespace.OModule
+  ClassPart:O->Class:MyNamespace.O
+  NestedModulePart:EModule->Class:MyNamespace.EModule
+  EnumPart:E->Enum:MyNamespace.E
+[]: Namespace:
+ [MyNamespace]: Namespace:MyNamespace
+  [E]: Enum:MyNamespace.E[TestProject]
+  [EModule]: Class:MyNamespace.EModule[TestProject]
+  [O]: Class:MyNamespace.O[TestProject]
+  [OModule]: Class:MyNamespace.OModule[TestProject]
+  [R]: Class:MyNamespace.R[TestProject]
+  [RModule]: Class:MyNamespace.RModule[TestProject]
+  [U]: Class:MyNamespace.U[TestProject]
+  [UModule]: Class:MyNamespace.UModule[TestProject]

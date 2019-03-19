@@ -1,0 +1,7 @@
+﻿Project Files:Record 03 - Struct.fs:
+FSharpProjectFilePart:ImplFile
+ TopLevelModulePart:Module->Class:Module
+  StructRecordPart:R->Struct:Module+R
+[]: Namespace:
+ [Module]: Class:Module[TestProject]
+  [R]: Struct:Module+R[TestProject]

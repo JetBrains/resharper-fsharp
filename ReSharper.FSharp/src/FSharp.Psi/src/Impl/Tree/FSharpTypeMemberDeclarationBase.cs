@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
@@ -9,6 +10,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     IModifiersOwnerDeclaration
   {
     private volatile IDeclaredElement myCachedDeclaredElement;
+    [CanBeNull] private volatile string myCachedName;
+
+    protected abstract string DeclaredElementName { get; }
+    
+    protected override void ClearCachedData()
+    {
+      base.ClearCachedData();
+      myCachedName = null;
+    }
+
+    public override string CompiledName
+    {
+      get
+      {
+        lock (this)
+        {
+          return myCachedName ?? (myCachedName = DeclaredElementName);
+        }
+      }
+    }
 
     protected override void PreInit()
     {

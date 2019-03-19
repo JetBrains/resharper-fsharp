@@ -2,8 +2,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 
 open JetBrains.Application
 open JetBrains.Application.BuildScript
-open JetBrains.ReSharper.Host.Features.Settings
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
+open JetBrains.ReSharper.Host.Env
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 open JetBrains.ReSharper.Psi
 

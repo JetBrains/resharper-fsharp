@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using JetBrains.Annotations;
-using JetBrains.DataFlow;
+using JetBrains.DocumentModel;
+using JetBrains.Lifetimes;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Daemon.CaretDependentFeatures;
 using JetBrains.ReSharper.Daemon.CSharp.ContextHighlighters;
@@ -13,7 +15,6 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi.DataContext;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.Util;
 using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
@@ -25,7 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
 
     [CanBeNull, AsyncContextConsumer]
     public static Action ProcessContext(
-      [NotNull] Lifetime lifetime, [NotNull] HighlightingProlongedLifetime prolongedLifetime,
+      Lifetime lifetime, [NotNull] HighlightingProlongedLifetime prolongedLifetime,
       [NotNull, ContextKey(typeof(ContextHighlighterPsiFileView.ContextKey))]
       IPsiDocumentRangeView psiDocumentRangeView,
       [NotNull] UsagesContextHighlighterAvailabilityComponent contextHighlighterAvailability)
@@ -43,46 +44,80 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
       HighlightingsConsumer consumer)
     {
       var psiView = psiDocumentRangeView.View<FSharpLanguage>();
-      var fsFile = psiView.GetSelectedTreeNode<IFSharpFile>();
-      if (fsFile == null)
-        return;
-
       var document = psiDocumentRangeView.DocumentRangeFromMainDocument.Document;
       var token = psiView.GetSelectedTreeNode<FSharpIdentifierToken>();
       if (token == null)
         return;
 
       // todo: type parameters: t<$caret$type> or t<'$caret$ttype>
-      // todo: namespaces, use R# search?
 
-      var offset = token.GetTreeStartOffset().Offset;
-      var symbol = fsFile.GetSymbolDeclaration(offset) ?? fsFile.GetSymbolUse(offset);
-      if (symbol == null)
+      var fsFile = psiView.GetSelectedTreeNode<IFSharpFile>();
+      var sourceFile = fsFile?.GetSourceFile();
+      if (sourceFile == null)
         return;
 
-      var sourceFile = fsFile.GetSourceFile();
-      if (sourceFile == null)
+      var symbol = fsFile.GetSymbol(token.GetTreeStartOffset().Offset);
+      if (symbol == null)
         return;
 
       var checkResults =
         fsFile.CheckerService.TryGetStaleCheckResults(sourceFile)?.Value ??
         fsFile.GetParseAndCheckResults(true)?.Value.CheckResults;
 
-      var symbolUsages = checkResults?.GetUsesOfSymbolInFile(symbol).RunAsTask();
+      var ranges = new HashSet<DocumentRange>();
+      AddUsagesRanges(symbol, ranges, checkResults, document, fsFile);
 
-      foreach (var symbolUse in symbolUsages ?? EmptyArray<FSharpSymbolUse>.Instance)
+      if (symbol is FSharpMemberOrFunctionOrValue mfv && mfv.IsConstructor &&
+          mfv.DeclaringEntity?.Value is FSharpEntity entity)
+        AddUsagesRanges(entity, ranges, checkResults, document, fsFile);
+
+      foreach (var range in ranges)
+        consumer.ConsumeHighlighting(HighlightingId, range);
+    }
+
+    private static void AddUsagesRanges(FSharpSymbol symbol, HashSet<DocumentRange> ranges,
+      FSharpCheckFileResults checkResults, IDocument document, IFSharpFile fsFile)
+    {
+      var isActivePatternCase = symbol is FSharpActivePatternCase;
+      var isGreaterOp =
+        symbol is FSharpMemberOrFunctionOrValue mfv && mfv.LogicalName == StandardOperatorNames.GreaterThan;
+
+      var symbolUsages = checkResults?.GetUsesOfSymbolInFile(symbol).RunAsTask();
+      if (symbolUsages == null)
+        return;
+
+      foreach (var symbolUse in symbolUsages)
       {
         var treeOffset = document.GetTreeEndOffset(symbolUse.RangeAlternate);
-        var usageToken = fsFile.FindTokenAt(treeOffset - 1) as FSharpIdentifierToken;
+        var usageToken = fsFile.FindTokenAt(treeOffset - 1);
         if (usageToken == null)
           continue;
 
-        var tokenType = usageToken.GetTokenType();
-        if ((tokenType == FSharpTokenType.GREATER || tokenType == FSharpTokenType.GREATER_RBRACK) &&
-            !(symbol is FSharpMemberOrFunctionOrValue mfv && mfv.CompiledName == StandardOperatorNames.GreaterThan))
+        if (isActivePatternCase && symbolUse.IsFromDefinition)
+        {
+          if (!(symbolUse.Symbol is FSharpActivePatternCase useSymbol))
+            continue;
+
+          if (useSymbol.DeclarationLocation.Equals(symbolUse.RangeAlternate))
+          {
+            var caseDeclaration = usageToken.GetContainingNode<IActivePatternId>()?.Cases[useSymbol.Index];
+            if (caseDeclaration != null)
+            {
+              ranges.Add(caseDeclaration.GetDocumentRange());
+              continue;
+            }
+          }
+        }
+
+        if (!(usageToken is FSharpIdentifierToken identToken))
+          continue;
+
+        var tokenType = identToken.GetTokenType();
+
+        if ((tokenType == FSharpTokenType.GREATER || tokenType == FSharpTokenType.GREATER_RBRACK) && !isGreaterOp)
           continue; // found usage of generic symbol with specified type parameter
 
-        consumer.ConsumeHighlighting(HighlightingId, usageToken.GetDocumentRange());
+        ranges.Add(identToken.GetDocumentRange());
       }
     }
   }

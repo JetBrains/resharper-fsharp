@@ -1,0 +1,4 @@
+﻿module Module
+
+type T() =
+    new(a: int) as zzz = zzz |> ignore T()

@@ -1,0 +1,9 @@
+﻿using System.Collections.Generic;
+using static Module;
+
+public class Class1 : |T|(0)
+{
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Cannot inherit from sealed class 'T'

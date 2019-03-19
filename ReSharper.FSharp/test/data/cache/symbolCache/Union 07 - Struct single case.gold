@@ -1,0 +1,9 @@
+﻿Project Files:Union 07 - Struct single case.fs:
+FSharpProjectFilePart:ImplFile
+ TopLevelModulePart:Module->Class:Module
+  StructUnionPart:Union->Struct:Module+Union
+   UnionCasePart:Case->Class:Module+Union+Case
+[]: Namespace:
+ [Module]: Class:Module[TestProject]
+  [Union]: Struct:Module+Union[TestProject]
+   [Case]: Class:Module+Union+Case[TestProject]

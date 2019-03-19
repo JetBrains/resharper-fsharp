@@ -1,0 +1,13 @@
+﻿module |M|(0)
+
+type |T1|(1) = delegate of |unit|(2) -> |unit|(3)
+type |T2|(4) = delegate of |int|(5) -> |int|(6)
+
+---------------------------------------------------------
+(0): ReSharper Class Identifier: 
+(1): ReSharper Delegate Identifier: 
+(2): ReSharper Class Identifier: 
+(3): ReSharper Class Identifier: 
+(4): ReSharper Delegate Identifier: 
+(5): ReSharper Class Identifier: 
+(6): ReSharper Class Identifier: 

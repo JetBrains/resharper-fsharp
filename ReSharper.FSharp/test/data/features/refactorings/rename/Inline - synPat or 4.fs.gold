@@ -1,0 +1,6 @@
+﻿module Module
+
+let x = 123
+
+match x with
+| zzz | zzz -> zzz + zzz

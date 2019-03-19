@@ -1,16 +1,17 @@
-﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
-open JetBrains.DataFlow
+open JetBrains.Lifetimes
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
-open JetBrains.Util
 open Microsoft.FSharp.Compiler.Ast
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
-type internal FSharpParser(file: IPsiSourceFile, checkerService: FSharpCheckerService, logger: ILogger) =
+type internal FSharpParser(lexer: ILexer, file: IPsiSourceFile, checkerService: FSharpCheckerService,
+                           resolvedSymbolsCache: IFSharpResolvedSymbolsCache) =
     let tryCreateTreeBuilder lexer lifetime =
         Option.bind (fun (parseResults: FSharpParseFileResults) ->
             parseResults.ParseTree |> Option.map (function
@@ -21,17 +22,18 @@ type internal FSharpParser(file: IPsiSourceFile, checkerService: FSharpCheckerSe
 
     interface IParser with
         member this.ParseFile() =
-            let lifetime = Lifetimes.Define().Lifetime
-            let tokenBuffer = TokenBuffer(FSharpLexer(file.Document, checkerService.GetDefines(file)))
-            let lexer = tokenBuffer.CreateLexer()
+            use lifetimeDefintion = Lifetime.Define()
+            let lifetime = lifetimeDefintion.Lifetime
+            let factory = FSharpPreprocessedLexerFactory(checkerService.GetDefines(file))
+            let lexer = factory.CreateLexer(lexer).ToCachingLexer()
             let parseResults = checkerService.ParseFile(file)
             let treeBuilder =
                 tryCreateTreeBuilder lexer lifetime parseResults
                 |> Option.defaultWith (fun _ ->
                     { new FSharpTreeBuilderBase(file, lexer, lifetime) with
                         override x.CreateFSharpFile() =
-                            x.FinishFile(x.Builder.Mark(), ElementType.F_SHARP_IMPL_FILE) })
+                            x.FinishFile(x.Mark(), ElementType.F_SHARP_IMPL_FILE) })
 
-            treeBuilder.CreateFSharpFile(ActualTokenBuffer = tokenBuffer,
-                                         CheckerService = checkerService,
-                                         ParseResults = parseResults) :> _
+            treeBuilder.CreateFSharpFile(CheckerService = checkerService,
+                                         ParseResults = parseResults,
+                                         ResolvedSymbolsCache = resolvedSymbolsCache) :> _

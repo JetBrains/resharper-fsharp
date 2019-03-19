@@ -18,7 +18,7 @@ type FSharpProjectLoadTargetsAnalyzer() =
          interface IMsBuildProjectLoadDiagnosticProvider with
              member x.CollectDiagnostic(projectMark, _, result) =
                  match result.FatalError, projectMark with
-                 | NotNull, FSharProjectMark -> [ diagnostic :> ILoadDiagnostic ].AsCollection()
+                 | NotNull, FSharpProjectMark -> [ diagnostic :> ILoadDiagnostic ].AsCollection()
                  | _ -> EmptyList.Instance :> _
 
 and FSharpTargetsDiagnosticMessage private (title, message) =

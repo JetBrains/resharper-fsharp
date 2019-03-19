@@ -1,26 +1,24 @@
-﻿namespace JetBrains.ReSharper.Plugins.FSharp.Common.Checker
+namespace JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 
 open System
 open System.Collections.Generic
 open JetBrains.Annotations
 open JetBrains.Application
-open JetBrains.Application.Components
-open JetBrains.Metadata.Reader.API
-open JetBrains.Platform.MsBuildHost.Models
-open JetBrains.Platform.MsBuildHost.ProjectModel
+open JetBrains.Diagnostics
 open JetBrains.ProjectModel
+open JetBrains.ProjectModel.Assemblies.Impl
 open JetBrains.ProjectModel.Model2.Assemblies.Interfaces
 open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost.MsBuild
-open JetBrains.ProjectModel.ProjectsHost.SolutionHost
 open JetBrains.ProjectModel.Properties
 open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
-open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
+open JetBrains.Util.Dotnet.TargetFrameworkIds
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
 module FSharpProperties =
@@ -29,6 +27,7 @@ module FSharpProperties =
     let [<Literal>] OtherFlags = "OtherFlags"
     let [<Literal>] NoWarn = "NoWarn"
     let [<Literal>] WarnAsError = "WarnAsError"
+    let [<Literal>] FscToolPath = "FscToolPath"
 
 
 [<ShellComponent>]
@@ -38,23 +37,25 @@ type FSharpProjectPropertiesRequest() =
           FSharpProperties.BaseAddress
           FSharpProperties.OtherFlags
           FSharpProperties.NoWarn
-          FSharpProperties.WarnAsError ]
+          FSharpProperties.WarnAsError
+          FSharpProperties.FscToolPath ]
 
     interface IProjectPropertiesRequest with
         member x.RequestedProperties = properties :> _
 
 
 [<ShellComponent>]
-type VisualFSharpTargetsProjectLoadModificator() =
+type FSharpTargetsProjectLoadModificator() =
     let targets =
         [| "GenerateCode"
            "GenerateFSharpInternalsVisibleToFile"
-           "GenerateAssemblyFileVersionTask" |]
+           "GenerateAssemblyFileVersionTask"
+           "ImplicitlyExpandNETStandardFacades" |]
 
     interface IMsBuildProjectLoadModificator with
         member x.IsApplicable(mark) =
             match mark with
-            | FSharProjectMark -> true
+            | FSharpProjectMark -> true
             | _ -> false
 
         member x.Modify(context) =
@@ -64,60 +65,60 @@ type VisualFSharpTargetsProjectLoadModificator() =
 type FSharpProject =
     { Options: FSharpProjectOptions
       ParsingOptions: FSharpParsingOptions
-      ConfigurationDefines: string list
       FileIndices: IDictionary<FileSystemPath, int>
-      FilesWithPairs: ISet<FileSystemPath> }
+      ImplFilesWithSigs: ISet<FileSystemPath> }
 
-    member x.ContainsFile (file: IPsiSourceFile) =
+    member x.ContainsFile(file: IPsiSourceFile) =
         x.FileIndices.ContainsKey(file.GetLocation())
 
 
 [<SolutionComponent>]
 type FSharpProjectOptionsBuilder
-        (solution: ISolution, checkerService: FSharpCheckerService, psiModules: IPsiModules, logger: ILogger,
-         psiModulesResolveContextManager: PsiModuleResolveContextManager, itemsContainer: IFSharpItemsContainer) =
-    let msBuildHost = solution.ProjectsHostContainer().GetComponent<MsBuildProjectHost>()
+        (checkerService: FSharpCheckerService, psiModules: IPsiModules, logger: ILogger,
+         resolveContextManager: ResolveContextManager, itemsContainer: IFSharpItemsContainer) =
 
     let defaultDelimiters = [| ';'; ','; ' ' |]
 
+    let defaultOptions =
+        [| "--noframework"
+           "--debug:full"
+           "--debug+"
+           "--optimize-"
+           "--tailcalls-"
+           "--fullpaths"
+           "--flaterrors"
+           "--highentropyva+" |]
+
+    let unusedValuesWarns =
+        [| "--warnon:1182"
+           "--warnaswarn:1182" |]
+
     let splitAndTrim (delimiters: char[]) = function
-        | null -> Seq.empty
-        | (s: string) -> seq {
-            for s in s.Split(delimiters) do
-                if not (s.IsNullOrWhitespace()) then yield s.Trim() }
+        | null -> EmptyArray.Instance
+        | (s: string) -> s.Split(delimiters, StringSplitOptions.RemoveEmptyEntries)
 
     let getReferences project psiModule targetFrameworkId =
-        let resolveContext =
-            psiModulesResolveContextManager.GetOrCreateModuleResolveContext(project, psiModule, targetFrameworkId)
-
-        psiModules.GetModuleReferences(psiModule, resolveContext)
-        |> Seq.choose (fun reference ->
-            let targetFrameworkId = reference.Module.TargetFrameworkId
+        let result = List()
+        let resolveContext = resolveContextManager.GetOrCreateProjectResolveContext(project, targetFrameworkId)
+        for reference in psiModules.GetModuleReferences(psiModule, resolveContext) do
             match reference.Module.ContainingProjectModule with
-            | :? IProject as project -> Some (project.GetOutputFilePath(targetFrameworkId))
-            | :? IAssembly as assembly -> Some (assembly.GetLocation())
-            | _ -> None)
-        |> Seq.map (fun path -> "-r:" + path.FullPath)
+            | :? IProject as referencedProject when referencedProject <> project ->
+                result.Add("-r:" + referencedProject.GetOutputFilePath(reference.Module.TargetFrameworkId).FullPath)
+            | :? IAssembly as assembly -> result.Add("-r:" + assembly.GetLocation().FullPath)
+            | _ -> ()
+
+        result
 
     member x.BuildSingleProjectOptions (project: IProject, psiModule: IPsiModule) =
         let targetFrameworkId = psiModule.TargetFrameworkId
         let properties = project.ProjectProperties
         let buildSettings = properties.BuildSettings :?> _ // todo: can differ by framework id?
 
-        let options = ResizeArray()
-        options.AddRange(seq {
-            yield "--out:" + project.GetOutputFilePath(targetFrameworkId).FullPath
-            yield "--noframework"
-            yield "--debug:full"
-            yield "--debug+"
-            yield "--optimize-"
-            yield "--tailcalls-"
-            yield "--fullpaths"
-            yield "--flaterrors"
-            yield "--highentropyva+"
-            yield "--target:" + x.GetOutputType(buildSettings)
-          })
-
+        let options = List()
+        options.Add("--out:" + project.GetOutputFilePath(targetFrameworkId).FullPath)
+        options.Add("--target:" + x.GetOutputType(buildSettings))
+        options.AddRange(defaultOptions)
+        options.AddRange(unusedValuesWarns)
         options.AddRange(getReferences project psiModule targetFrameworkId)
 
         let definedConstants = x.GetDefinedConstants(properties, targetFrameworkId) |> List.ofSeq
@@ -147,17 +148,19 @@ type FSharpProjectOptionsBuilder
 
             match props.TryGetValue(FSharpProperties.OtherFlags) with
             | otherFlags when not (otherFlags.IsNullOrWhitespace()) -> splitAndTrim [| ' ' |] otherFlags
-            | _ -> Seq.empty
+            | _ -> EmptyArray.Instance
             |> options.AddRange
         | _ -> ()
 
-        let filePaths, pairFiles, resources = x.GetProjectFilesAndResources(project, targetFrameworkId)
+        let filePaths, implsWithSig, resources = x.GetProjectFilesAndResources(project, targetFrameworkId)
+
         options.AddRange(resources |> Seq.map (fun (r: FileSystemPath) -> "--resource:" + r.FullPath))
         let fileIndices = Dictionary<FileSystemPath, int>()
         Array.iteri (fun i p -> fileIndices.[p] <- i) filePaths
 
         let projectOptions =
-            { ProjectFileName = project.ProjectFileLocation.FullPath
+            { ProjectFileName = sprintf "%O.%O.fsproj" project.ProjectFileLocation targetFrameworkId
+              ProjectId = None
               SourceFiles = Array.map (fun (p: FileSystemPath ) -> p.FullPath) filePaths
               OtherOptions = options.ToArray()
               ReferencedProjects = Array.empty
@@ -192,45 +195,48 @@ type FSharpProjectOptionsBuilder
             logger.Warn("Getting parsing options: {0}", concatErrors errors)
 
         { Options = projectOptions
-          ConfigurationDefines = definedConstants
+          ParsingOptions = parsingOptions
           FileIndices = fileIndices
-          FilesWithPairs = pairFiles
-          ParsingOptions = parsingOptions }
+          ImplFilesWithSigs = implsWithSig }
 
-    member private x.GetProjectFilesAndResources(project: IProject, targetFrameworkId: TargetFrameworkId) =
-        let projectMark = project.GetProjectMark().NotNull()
-
+    member x.GetProjectFilesAndResources(project: IProject, targetFrameworkId) =
         let sourceFiles = List()
         let resources = List()
 
-        let sigFiles = HashSet<string>()
-        let pairFiles = HashSet<FileSystemPath>()
+        let sigFiles = HashSet()
+        let implsWithSigs = HashSet()
 
+        let projectMark = project.GetProjectMark().NotNull("projectMark == null")
         let projectItems = itemsContainer.GetProjectItemsPaths(projectMark, targetFrameworkId)
+
         for path, buildAction in projectItems do
             match buildAction with
             | SourceFile ->
                 sourceFiles.Add(path) |> ignore
-                match path with
-                | SigFile -> sigFiles.Add(path.NameWithoutExtension) |> ignore
-                | ImplFile when sigFiles.Contains(path.NameWithoutExtension) -> pairFiles.add(path)
+                let fileName = path.NameWithoutExtension
+                match path.ExtensionNoDot with
+                | SigExtension -> sigFiles.Add(fileName) |> ignore
+                | ImplExtension when sigFiles.Contains(fileName) -> implsWithSigs.add(path)
                 | _ -> ()
 
             | Resource -> resources.Add(path) |> ignore
             | _ -> ()
 
-        sourceFiles.ToArray(), pairFiles, resources
+        let resources: IList<_> = if resources.IsEmpty() then EmptyList.InstanceList else resources :> _
+        let implsWithSigs: ISet<_> = if implsWithSigs.IsEmpty() then EmptySet.Instance :> _ else implsWithSigs :> _
+
+        sourceFiles.ToArray(), implsWithSigs, resources
 
     member private x.GetOutputType([<CanBeNull>] buildSettings: IManagedProjectBuildSettings) =
-        if isNull buildSettings then "library"
-        else
-            match buildSettings.OutputType with
-            | ProjectOutputType.CONSOLE_EXE -> "exe"
-            | ProjectOutputType.WIN_EXE -> "winexe"
-            | ProjectOutputType.MODULE -> "module"
-            | _ -> "library"
+        if isNull buildSettings then "library" else
+
+        match buildSettings.OutputType with
+        | ProjectOutputType.CONSOLE_EXE -> "exe"
+        | ProjectOutputType.WIN_EXE -> "winexe"
+        | ProjectOutputType.MODULE -> "module"
+        | _ -> "library"
 
     member private x.GetDefinedConstants(properties: IProjectProperties, targetFrameworkId: TargetFrameworkId) =
         match properties.ActiveConfigurations.GetOrCreateConfiguration(targetFrameworkId) with
         | :? IManagedProjectConfiguration as cfg -> splitAndTrim defaultDelimiters cfg.DefineConstants
-        | _ -> Seq.empty
+        | _ -> EmptyArray.Instance

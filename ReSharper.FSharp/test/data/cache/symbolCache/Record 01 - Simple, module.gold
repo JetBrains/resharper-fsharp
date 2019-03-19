@@ -1,0 +1,7 @@
+﻿Project Files:Record 01 - Simple, module.fs:
+FSharpProjectFilePart:ImplFile
+ TopLevelModulePart:Module->Class:Module
+  RecordPart:R->Class:Module+R
+[]: Namespace:
+ [Module]: Class:Module[TestProject]
+  [R]: Class:Module+R[TestProject]

@@ -1,138 +1,50 @@
 ﻿using System.Collections.Generic;
-using System.Xml;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.Caches;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Resolve;
-using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
-using JetBrains.Util.DataStructures;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal class FSharpTypeParameterOfMethod : ITypeParameter
+  internal class FSharpTypeParameterOfMethod : FSharpDeclaredElementBase, ITypeParameter
   {
-    [NotNull] private readonly ITypeMember myMethod;
+    [NotNull] public readonly IFunction Method;
 
-    public FSharpTypeParameterOfMethod([NotNull] ITypeMember method, [NotNull] string name, int index)
+    public FSharpTypeParameterOfMethod([NotNull] IFunction method, [NotNull] string name, int index)
     {
-      myMethod = method;
+      Method = method;
       Index = index;
       ShortName = name;
     }
 
-    public IPsiServices GetPsiServices()
-    {
-      return myMethod.GetPsiServices();
-    }
+    public override DeclaredElementType GetElementType() =>
+      CLRDeclaredElementType.TYPE_PARAMETER;
 
-    public IList<IDeclaration> GetDeclarations()
-    {
-      return EmptyList<IDeclaration>.Instance;
-    }
+    public override string ShortName { get; }
 
-    public IList<IDeclaration> GetDeclarationsIn(IPsiSourceFile sourceFile)
-    {
-      return EmptyList<IDeclaration>.Instance;
-    }
+    public override bool IsValid() => Method.IsValid();
+    public override IPsiModule Module => Method.Module;
+    public override IPsiServices GetPsiServices() => Method.GetPsiServices();
 
-    public DeclaredElementType GetElementType()
-    {
-      return CLRDeclaredElementType.TYPE_PARAMETER;
-    }
-
-    public XmlNode GetXMLDoc(bool inherit)
-    {
-      return null;
-    }
-
-    public XmlNode GetXMLDescriptionSummary(bool inherit)
-    {
-      return null;
-    }
-
-    public bool IsValid()
-    {
-      return true;
-    }
-
-    public bool IsSynthetic()
-    {
-      return false;
-    }
-
-    public HybridCollection<IPsiSourceFile> GetSourceFiles()
-    {
-      return HybridCollection<IPsiSourceFile>.Empty;
-    }
-
-    public bool HasDeclarationsIn(IPsiSourceFile sourceFile)
-    {
-      return false;
-    }
-
-    public string ShortName { get; }
-    public bool CaseSensitiveName => true;
-    public PsiLanguageType PresentationLanguage => FSharpLanguage.Instance;
-
-    public ITypeElement GetContainingType()
-    {
-      return null;
-    }
-
-    public ITypeMember GetContainingTypeMember()
-    {
-      return myMethod;
-    }
-
-    public IPsiModule Module => myMethod.Module;
-    public ISubstitution IdSubstitution => EmptySubstitution.INSTANCE;
+    public override ITypeElement GetContainingType() => null;
+    public override ITypeMember GetContainingTypeMember() => Method;
 
     public IList<ITypeParameter> TypeParameters => EmptyList<ITypeParameter>.Instance;
+    public override ISubstitution IdSubstitution => EmptySubstitution.INSTANCE;
 
-    public IList<IAttributeInstance> GetAttributeInstances(bool inherit)
-    {
-      return EmptyList<IAttributeInstance>.Instance;
-    }
+    public IClrTypeName GetClrName() => EmptyClrTypeName.Instance;
+    public IList<IDeclaredType> GetSuperTypes() => EmptyList<IDeclaredType>.Instance;
+    public IEnumerable<ITypeMember> GetMembers() => EmptyList<ITypeMember>.InstanceList;
 
-    public IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName, bool inherit)
-    {
-      return EmptyList<IAttributeInstance>.Instance;
-    }
+    public INamespace GetContainingNamespace() =>
+      Method.GetContainingType()?.GetContainingNamespace() ??
+      Module.GetSymbolScope().GlobalNamespace;
 
-    public bool HasAttributeInstance(IClrTypeName clrName, bool inherit)
-    {
-      return false;
-    }
-
-    public IClrTypeName GetClrName()
-    {
-      return EmptyClrTypeName.Instance;
-    }
-
-    public IList<IDeclaredType> GetSuperTypes()
-    {
-      return EmptyList<IDeclaredType>.Instance;
-    }
-
-    public IEnumerable<ITypeMember> GetMembers()
-    {
-      return EmptyList<ITypeMember>.InstanceList;
-    }
-
-    public INamespace GetContainingNamespace()
-    {
-      return myMethod.GetContainingType()?.GetContainingNamespace()
-             ?? Module.GetPsiServices().Symbols.GetSymbolScope(LibrarySymbolScope.FULL, true).GlobalNamespace;
-    }
-
-    public IPsiSourceFile GetSingleOrDefaultSourceFile()
-    {
-      return null;
-    }
+    public IPsiSourceFile GetSingleOrDefaultSourceFile() => null;
 
     public IList<ITypeElement> NestedTypes => EmptyList<ITypeElement>.InstanceList;
     public IEnumerable<IConstructor> Constructors => EmptyList<IConstructor>.Instance;
@@ -142,14 +54,29 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public IEnumerable<IEvent> Events => EmptyList<IEvent>.Instance;
     public IEnumerable<string> MemberNames => EmptyList<string>.InstanceList;
 
+    // C# 8 Nullable types
+    public bool? IsNotNullableIfReferenceType => null;
+    public bool? IsNotNullableIfReferenceTypeWithFixedSubstitution(ISubstitution explicitInheritorSubstitution) => null;
+
     public int Index { get; }
     public TypeParameterVariance Variance => TypeParameterVariance.INVARIANT;
+
     public bool IsValueType => false; // todo
     public bool IsClassType => false; // todo
+    public bool IsUnmanagedType => false;
     public bool HasDefaultConstructor => false;
     public IList<IType> TypeConstraints => EmptyList<IType>.Instance;
-    public ITypeParametersOwner Owner => myMethod as ITypeParametersOwner;
-    public ITypeElement OwnerType => myMethod.GetContainingType();
-    public IMethod OwnerMethod => myMethod as IMethod;
+    public TypeParameterConstraintsMask ConstraintsMask => default; // todo
+
+    public IParametersOwner OwnerFunction => Method;
+    public IMethod OwnerMethod => (IMethod) Method;
+    public ITypeParametersOwner Owner => Method as ITypeParametersOwner;
+    public ITypeElement OwnerType => Method.GetContainingType();
+
+    public override bool Equals(object obj) =>
+      obj is FSharpTypeParameterOfMethod other &&
+      ReferenceEquals(Method, other.Method) && Index == other.Index;
+
+    public override int GetHashCode() => Index;
   }
 }

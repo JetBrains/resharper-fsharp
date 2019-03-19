@@ -9,12 +9,12 @@
 4:File6
 
 .NETFramework,Version=v0.0
-C:/Solution/Project/File1
-C:/Solution/Project/File2
-C:/Solution/Project/Folder/File3
-C:/Solution/Project/Folder/Subfolder/File4
-C:/Solution/Project/Folder/File5
-C:/Solution/Project/File6
+File1
+File2
+Folder/File3
+Folder/Subfolder/File4
+Folder/File5
+File6
 
 
 =======
@@ -38,12 +38,12 @@ Project
 6:File6
 
 .NETFramework,Version=v0.0
-C:/Solution/Project/File1
-C:/Solution/Project/File2
-C:/Solution/Project/Folder/File3
-C:/Solution/Project/Another/Subfolder/File7
-C:/Solution/Project/Folder/Subfolder/File4
-C:/Solution/Project/Folder/File5
-C:/Solution/Project/File6
+File1
+File2
+Folder/File3
+Another/Subfolder/File7
+Folder/Subfolder/File4
+Folder/File5
+File6
 
 

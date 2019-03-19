@@ -1,39 +1,23 @@
-﻿namespace rec JetBrains.ReSharper.Plugins.FSharp.Common.Checker
+namespace rec JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 
 open System
 open System.Collections.Generic
-open System.Linq
-open System.Threading
-open System.Reflection
-open JetBrains
-open JetBrains.Annotations
-open JetBrains.Application
 open JetBrains.Application.changes
-open JetBrains.Application.Components
-open JetBrains.Application.Progress
-open JetBrains.Application.Threading
-open JetBrains.Application.Threading.Tasks
 open JetBrains.DataFlow
-open JetBrains.Metadata.Reader.API
-open JetBrains.Platform.MsBuildHost.Models
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Assemblies.Impl
 open JetBrains.ProjectModel.ProjectsHost
-open JetBrains.ProjectModel.ProjectsHost.MsBuild
-open JetBrains.ProjectModel.ProjectsHost.SolutionHost
-open JetBrains.ReSharper.Daemon.Impl
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
-open JetBrains.ReSharper.Resources.Shell
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.Threading
 open JetBrains.Util
-open Microsoft.FSharp.Compiler
-open Microsoft.FSharp.Compiler.ErrorLogger
+open JetBrains.Util.Dotnet.TargetFrameworkIds
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
 [<SolutionComponent>]
@@ -55,13 +39,14 @@ type FSharpProjectOptionsProvider
         ProjectModelChangeType.REFERENCE_TARGET
 
     let projects = Dictionary<IProject, Dictionary<TargetFrameworkId, FSharpProject>>()
-    let checker = checkerService.Checker
     let locker = JetFastSemiReenterableRWLock()
     do
         changeManager.Changed2.Advise(lifetime, this.ProcessChange)
         checkerService.OptionsProvider <- this
-        lifetime.AddAction(fun _ -> checkerService.OptionsProvider <- null) |> ignore
+        lifetime.OnTermination(fun _ -> checkerService.OptionsProvider <- Unchecked.defaultof<_>) |> ignore
 
+    let moduleInvalidated = new Signal<IPsiModule>(lifetime, "FSharpPsiModuleInvalidated")
+    
     let tryGetFSharpProject (project: IProject) (targetFrameworkId: TargetFrameworkId) =
         use lock = locker.UsingReadLock()
         tryGetValue project projects 
@@ -108,24 +93,30 @@ type FSharpProjectOptionsProvider
                 Some (createFSharpProject project psiModule))
         | _ -> None
 
-    let rec invalidateProject (project: IProject) =
-        logger.Info("Invalidating {0}", project)
-        tryGetValue project projects
-        |> Option.iter (fun fsProjectsForProject ->
-            for fsProject in fsProjectsForProject.Values do
-                checker.InvalidateConfiguration(fsProject.Options, false)
-            fsProjectsForProject.Clear())
+    let invalidateProject project =
+        let invalidatedProjects = HashSet()
+        let rec invalidate (project: IProject) =
+            logger.Info("Invalidating {0}", project)
+            tryGetValue project projects
+            |> Option.iter (fun fsProjectsForProject ->
+                for KeyValue (tfid, fsProject) in fsProjectsForProject do
+                    checkerService.Checker.InvalidateConfiguration(fsProject.Options, false)
+                    let psiModule = psiModules.GetPrimaryPsiModule(project, tfid)
+                    moduleInvalidated.Fire(psiModule)
+                fsProjectsForProject.Clear())
 
-        // todo: keep referencing projects for invalidating removed projects
-        let referencesToProject = referenceResolveStore.GetReferencesToProject(project)
-        if not (referencesToProject.IsEmpty()) then
-            logger.Info("Invalidatnig reverencing projects")
-            for reference in referencesToProject do
-                match reference.GetProject() with
-                | FSharpProject referencingProject when
-                        referencingProject <> project -> invalidateProject referencingProject
-                | _ -> ()
-            logger.Info("Done invalidating {0}", project)
+            invalidatedProjects.Add(project) |> ignore
+            // todo: keep referencing projects for invalidating removed projects
+            let referencesToProject = referenceResolveStore.GetReferencesToProject(project)
+            if not (referencesToProject.IsEmpty()) then
+                logger.Info("Invalidatnig projects reverencing {0}", project)
+                for reference in referencesToProject do
+                    match reference.GetProject() with
+                    | FSharpProject referencingProject when
+                            not (invalidatedProjects.Contains(referencingProject)) -> invalidate referencingProject
+                    | _ -> ()
+                logger.Info("Done invalidating {0}", project)
+        invalidate project
 
 
     let isScriptLike file =
@@ -133,6 +124,8 @@ type FSharpProjectOptionsProvider
 
     let getParsingOptionsForSingleFile (file: IPsiSourceFile) =
         { FSharpParsingOptions.Default with SourceFiles = [| file.GetLocation().FullPath |] }
+
+    member x.ModuleInvalidated = moduleInvalidated
 
     member private x.ProcessChange(obj: ChangeEventArgs) =
         match obj.ChangeMap.GetChange<ProjectModelChange>(solution) with
@@ -188,7 +181,7 @@ type FSharpProjectOptionsProvider
             if isScriptLike file then false else
 
             getOrCreateFSharpProject file
-            |> Option.map (fun fsProject -> fsProject.FilesWithPairs.Contains(file.GetLocation()))
+            |> Option.map (fun fsProject -> fsProject.ImplFilesWithSigs.Contains(file.GetLocation()))
             |> Option.defaultValue false
 
         member x.GetParsingOptions(file) =
@@ -198,17 +191,28 @@ type FSharpProjectOptionsProvider
             |> Option.map (fun fsProject -> fsProject.ParsingOptions)
             |> Option.defaultWith (fun _ -> getParsingOptionsForSingleFile file)
 
+        member x.GetFileIndex(sourceFile) =
+            if isScriptLike sourceFile then 0 else
+
+            getOrCreateFSharpProject sourceFile
+            |> Option.bind (fun fsProject ->
+                let path = sourceFile.GetLocation()
+                tryGetValue path fsProject.FileIndices)
+            |> Option.defaultWith (fun _ -> -1)
+        
+        member x.ModuleInvalidated = x.ModuleInvalidated :> _
 
 [<SolutionComponent>]
 type FSharpScriptOptionsProvider(logger: ILogger, checkerService: FSharpCheckerService) =
     let getScriptOptionsLock = obj()
+    let otherFlags = [| "--warnon:1182" |]
 
     member x.GetScriptOptions(file: IPsiSourceFile) =
-        let path = file.GetLocation()
-        let filePath = path.FullPath
+        let filePath = file.GetLocation().FullPath
         let source = file.Document.GetText()
         lock getScriptOptionsLock (fun _ ->
-        let getScriptOptionsAsync = checkerService.Checker.GetProjectOptionsFromScript(filePath, source)
+        let getScriptOptionsAsync =
+            checkerService.Checker.GetProjectOptionsFromScript(filePath, source, otherFlags = otherFlags)
         try
             let options, errors = getScriptOptionsAsync.RunAsTask()
             if not errors.IsEmpty then

@@ -1,0 +1,15 @@
+﻿module Module
+
+// comment
+// |todo: comment|(0)
+
+let x =
+    // |todo: another (* todo *)|(1)
+    123
+
+---------------------------------------------------------
+(0): ReSharper Todo Item Normal: (T) '' (E) 'todo: comment'
+(1): ReSharper Todo Item Normal: (T) '' (E) 'todo: another (* todo *)'
+---------------------------------------------------------
+(0) Todo: "todo: comment" {@ Namespace  }
+(1) Todo: "todo: another (* todo *)" {@ Namespace  }

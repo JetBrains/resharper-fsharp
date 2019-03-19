@@ -1,0 +1,4 @@
+﻿module Module
+
+[<Measure>] type zzz
+let i: int<zzz> * int<zzz> = 1

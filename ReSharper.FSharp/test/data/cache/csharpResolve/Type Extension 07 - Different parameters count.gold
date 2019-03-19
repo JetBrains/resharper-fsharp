@@ -1,0 +1,14 @@
+﻿using static Module;
+
+public class Class1
+{
+  public Class1()
+  {
+    T t = new T();
+    int f = t.|Foo|(0);
+  }
+}
+
+---------------------------------------------------------
+(0): ReSharper Error Highlighting: Cannot resolve symbol 'Foo'
+M:Module.T.#ctor

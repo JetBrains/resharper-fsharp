@@ -1,7 +1,5 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
-open System
-open System.Collections.Generic
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Resources
@@ -11,14 +9,13 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems.Impl
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.Feature.Services.Lookup
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.Resources
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.TextControl
-open JetBrains.UI.Icons
 open JetBrains.Util
 
 type FSharpPathCompletionContext(context, token, completedPath, ranges) =
@@ -81,8 +78,8 @@ type FSharpPathCompletionContextProvider() =
                 | BasicCompletion ->
                     let nextSeparatorOffset = argValue.IndexOfAny(FileSystemDefinition.SeparatorChars, caretValueOffset)
                     if nextSeparatorOffset < 0 then argValue.Length else nextSeparatorOffset
-                | SmartCompletion -> argValue.Length
-                | completionType -> sprintf "Got completion type: %O" completionType |> failwith
+                | _ -> argValue.Length
+
             valueOffset + valueReplaceEndOffset
 
         let document = context.Document
@@ -108,8 +105,10 @@ type FSharpPathCompletionProvider() =
         if hashTokenText.Length < 2 then None else
 
         match hashTokenText.Substring(1) with
+        | "l"
         | "load" -> Some (fsExtensions, ProjectModelThemedIcons.Fsharp.Id)
-        | "r"    -> Some (dllExtensions, ProjectModelThemedIcons.Assembly.Id)
+        | "r"
+        | "reference"    -> Some (dllExtensions, ProjectModelThemedIcons.Assembly.Id)
         | "I"    -> Some (Set.empty, null)
         | _ -> None
 
@@ -143,7 +142,6 @@ type FSharpPathCompletionProvider() =
                     completedPath.GetChildFiles()
                     |> Seq.iter addFileItem
 
-                let solution = context.BasicContext.Solution
                 completedPath.GetChildDirectories()
                 |> Seq.iter (FSharpFolderCompletionItem >> addItem)
 
@@ -203,7 +201,7 @@ type FSharpPathAutocompletionStrategy() =
                 | tokenType -> tokenType.IsStringLiteral && token.Parent :? IHashDirective
             | _ -> false
 
-        member x.AcceptTyping(char, textControl, _) = Array.contains char FileSystemDefinition.InvalidPathChars |> not
+        member x.AcceptTyping(char,_,_) = Array.contains char FileSystemDefinition.InvalidPathChars |> not
         member x.ProcessSubsequentTyping(_, _) = true
 
         member x.IsEnabledInSettings(_, _) = AutopopupType.HardAutopopup

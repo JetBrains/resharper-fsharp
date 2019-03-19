@@ -18,13 +18,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.ParameterInfo
 
     public void GetParametersInfo(out ParamPresentationInfo[] paramInfos, out bool isParamsArray)
     {
-      throw new System.NotImplementedException();
+      paramInfos = EmptyArray<ParamPresentationInfo>.Instance;
+      isParamsArray = false;
     }
 
-    public RichTextBlock GetDescription()
-    {
-      throw new System.NotImplementedException();
-    }
+    public RichTextBlock GetDescription() => null;
 
     public virtual bool Matches(IDeclaredElement signature) => true;
 

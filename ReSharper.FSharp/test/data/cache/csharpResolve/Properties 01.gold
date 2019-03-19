@@ -1,0 +1,17 @@
+﻿using System.Collections.Generic;
+using static Module;
+
+public class Class1
+{
+  public Class1()
+  {
+    var t = new T();
+    int m = t.Prop;
+    int sm = T.StaticProp;
+  }
+}
+
+---------------------------------------------------------
+M:Module.T.#ctor
+P:Module.T.Prop
+P:Module.T.StaticProp

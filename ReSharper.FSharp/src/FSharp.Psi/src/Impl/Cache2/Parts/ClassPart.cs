@@ -16,10 +16,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
     }
 
-    public override TypeElement CreateTypeElement()
-    {
-      return new FSharpClass(this);
-    }
+    public override TypeElement CreateTypeElement() =>
+      new FSharpClass(this);
 
     public override MemberPresenceFlag GetMemberPresenceFlag()
     {
@@ -29,6 +27,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
              MemberPresenceFlag.IMPLICIT_OP;
     }
 
-    protected override byte SerializationTag => (byte) FSharpPartKind.Class;
+    protected override byte SerializationTag =>
+      (byte) FSharpPartKind.Class;
   }
 }

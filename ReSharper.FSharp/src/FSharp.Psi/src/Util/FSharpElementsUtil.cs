@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Searching;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
@@ -23,8 +23,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
   /// </summary>
   public static class FSharpElementsUtil
   {
-    private static readonly object ourFcSLock = new object();
-
     [CanBeNull]
     internal static ITypeElement GetTypeElement([NotNull] FSharpEntity entity, [NotNull] IPsiModule psiModule)
     {
@@ -39,7 +37,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
           : null;
       }
 
-      var symbolScope = psiModule.GetPsiServices().Symbols.GetSymbolScope(psiModule, true, true);
+      var symbolScope = psiModule.GetSymbolScope();
       while (entity.IsFSharpAbbreviation)
       {
         // FCS returns Clr names for non-abbreviated types only, using fullname
@@ -75,28 +73,31 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     }
 
     [CanBeNull]
-    private static IClrDeclaredElement GetDeclaredNamespace([NotNull] FSharpEntity entity, IPsiModule psiModule)
+    private static INamespace GetDeclaredNamespace([NotNull] FSharpEntity entity, IPsiModule psiModule)
     {
-      Assertion.Assert(entity.IsNamespace, "entity.IsNamespace");
-      var name = entity.CompiledName;
-      var containingName = entity.Namespace?.Value;
-      var fullName = containingName != null ? containingName + "." + name : name;
-      var symbolScope = psiModule.GetPsiServices().Symbols.GetSymbolScope(psiModule, true, true);
-      return symbolScope.GetElementsByQualifiedName(fullName).FirstOrDefault() as INamespace;
+      var name = entity.LogicalName;
+      var containingNamespace = entity.Namespace?.Value;
+      var fullName = containingNamespace != null ? containingNamespace + "." + name : name;
+      var elements = psiModule.GetSymbolScope().GetElementsByQualifiedName(fullName);
+      return elements.FirstOrDefault() as INamespace;
     }
 
     [CanBeNull]
     public static IDeclaredElement GetDeclaredElement([CanBeNull] FSharpSymbol symbol,
-      [NotNull] IPsiModule psiModule, [CanBeNull] FSharpIdentifierToken referenceOwnerToken = null)
+      [NotNull] IPsiModule psiModule, [CanBeNull] IReferenceExpression referenceExpression = null)
     {
-      if (symbol == null) return null;
+      if (symbol == null)
+        return null;
 
       if (symbol is FSharpEntity entity)
       {
-        if (entity.IsUnresolved) return null;
-        return entity.IsNamespace
-          ? GetDeclaredNamespace(entity, psiModule)
-          : GetTypeElement(entity, psiModule);
+        if (entity.IsUnresolved)
+          return null;
+
+        if (entity.IsNamespace)
+          return GetDeclaredNamespace(entity, psiModule);
+
+        return GetTypeElement(entity, psiModule);
       }
 
       if (symbol is FSharpMemberOrFunctionOrValue mfv)
@@ -104,13 +105,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         if (mfv.IsUnresolved) return null;
 
         if (!mfv.IsModuleValueOrMember)
-          return FindDeclaration<LocalDeclaration>(mfv.DeclarationLocation, referenceOwnerToken);
+        {
+          var declaration = FindNode<IFSharpDeclaration>(mfv.DeclarationLocation, referenceExpression);
+          if (declaration is IFSharpLocalDeclaration localDeclaration)
+            return localDeclaration;
+
+          return declaration is ISynPat
+            ? declaration.DeclaredElement
+            : null;
+        }
 
         var memberEntity = mfv.IsModuleValueOrMember ? mfv.DeclaringEntity : null;
         if (memberEntity == null) return null;
 
-        if (mfv.IsImplicitConstructor)
-          return GetDeclaredElement(memberEntity.Value, psiModule, referenceOwnerToken);
+        if (mfv.IsConstructor && mfv.DeclaringEntity?.Value is FSharpEntity ctorEntity && ctorEntity.IsProvided)
+          return GetDeclaredElement(memberEntity.Value, psiModule, referenceExpression);
 
         var typeElement = GetTypeElement(memberEntity.Value, psiModule);
         if (typeElement == null) return null;
@@ -119,67 +128,126 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
           ? typeElement.Constructors.AsList<ITypeMember>()
           : typeElement.EnumerateMembers(mfv.GetMemberCompiledName(), true).AsList();
 
+        switch (members.Count)
+        {
+          case 0:
+            return null;
+          case 1:
+            return members[0];
+        }
+
+        // F# optional extension member in a module.
+        if (mfv.IsExtensionMember && mfv.IsInstanceMember)
+        {
+          var apparentType = GetTypeElement(mfv.ApparentEnclosingEntity, psiModule);
+          if (apparentType != null)
+          {
+            foreach (var member in members)
+            {
+              if (!(member is IFSharpExtensionTypeMember e) || !(e.ApparentEntity is FSharpEntity otherEntity))
+                continue;
+
+              var otherApparentType = GetTypeElement(otherEntity, psiModule);
+              if (otherApparentType != null && Equals(otherApparentType, apparentType))
+                return member;
+            }
+          }
+        }
+
         var mfvXmlDocId = GetXmlDocId(mfv);
-        return members.Count == 1
-          ? members[0]
-          : members.FirstOrDefault(m => m.XMLDocId == mfvXmlDocId);
+        return members.FirstOrDefault(m => m.XMLDocId == mfvXmlDocId);
       }
 
       if (symbol is FSharpUnionCase unionCase)
       {
         if (unionCase.IsUnresolved) return null;
 
-        var unionType = unionCase.ReturnType;
-        Assertion.AssertNotNull(unionType, "unionType != null");
-        var unionTypeElement = GetTypeElement(unionType.TypeDefinition, psiModule);
+        var unionTypeElement = GetTypeElement(unionCase.ReturnType.TypeDefinition, psiModule);
         if (unionTypeElement == null) return null;
 
-        var caseMember = unionTypeElement.EnumerateMembers(unionCase.CompiledName, true).FirstOrDefault();
+        var caseCompiledName = unionCase.CompiledName;
+        var caseMember = unionTypeElement.GetMembers().FirstOrDefault(m =>
+        {
+          var shortName = m.ShortName;
+          return shortName == caseCompiledName || shortName == "New" + caseCompiledName;
+        });
+
         if (caseMember != null)
           return caseMember;
 
-        var newCaseMember = unionTypeElement.EnumerateMembers("New" + unionCase.CompiledName, true).FirstOrDefault();
-        if (newCaseMember != null)
-          return newCaseMember;
-
         var unionClrName = unionTypeElement.GetClrName();
-        var caseDeclaredType = TypeFactory.CreateTypeByCLRName(unionClrName + "+" + unionCase.CompiledName, psiModule);
+        var caseDeclaredType = TypeFactory.CreateTypeByCLRName(unionClrName + "+" + caseCompiledName, psiModule);
         return caseDeclaredType.GetTypeElement();
       }
 
       if (symbol is FSharpField field && !field.IsUnresolved)
         return GetTypeElement(field.DeclaringEntity, psiModule)?.EnumerateMembers(field.Name, true).FirstOrDefault();
 
+      // find active pattern entity/member. if it's compiled use wrapper. if it's source defined find actual element
       if (symbol is FSharpActivePatternCase activePatternCase)
-        return
-          activePatternCase.Group.DeclaringEntity != null
-          ? new ResolvedFSharpSymbolElement(activePatternCase, referenceOwnerToken)
-          : FindDeclaration<ActivePatternCaseDeclaration>(activePatternCase.DeclarationLocation, referenceOwnerToken)?.DeclaredElement;
+        return GetActivePatternCaseElement(activePatternCase, psiModule, referenceExpression);
+
+      if (symbol is FSharpGenericParameter parameter)
+        return GetTypeParameter(parameter, referenceExpression);
 
       return null;
     }
 
     [CanBeNull]
+    private static ITypeParameter GetTypeParameter([NotNull] FSharpGenericParameter parameter,
+      [CanBeNull] IReferenceExpression referenceOwnerToken = null)
+    {
+      var containingMemberDeclaration = referenceOwnerToken?.GetContainingNode<ITypeMemberDeclaration>();
+      if (!(containingMemberDeclaration?.DeclaredElement is IFSharpTypeParametersOwner containingMember))
+        return null;
+
+      var parameterName = parameter.Name;
+      var typeParameter = containingMember.AllTypeParameters.FirstOrDefault(param => param.ShortName == parameterName);
+      return typeParameter;
+    }
+
+    public static IDeclaredElement GetActivePatternCaseElement([NotNull] FSharpActivePatternCase activePatternCase,
+      [NotNull] IPsiModule psiModule, [CanBeNull] IReferenceExpression referenceOwnerToken)
+    {
+      var declaration = GetActivePatternDeclaration(activePatternCase, psiModule, referenceOwnerToken);
+      return declaration?.GetActivePatternByIndex(activePatternCase.Index);
+    }
+
+    private static IFSharpDeclaration GetActivePatternDeclaration([NotNull] FSharpActivePatternCase activePatternCase,
+      [NotNull] IPsiModule psiModule, IReferenceExpression referenceOwnerToken)
+    {
+      var activePattern = activePatternCase.Group;
+      var declaringEntity = activePattern.DeclaringEntity?.Value;
+      if (declaringEntity != null)
+      {
+        var patternName = activePattern.PatternName();
+        var typeElement = GetTypeElement(declaringEntity, psiModule);
+        var patternElement = typeElement.EnumerateMembers(patternName, true).FirstOrDefault();
+        return patternElement?.GetDeclarations().FirstOrDefault() as IFSharpDeclaration;
+      }
+
+      var patternId = FindNode<IActivePatternId>(activePatternCase.DeclarationLocation, referenceOwnerToken);
+      return patternId?.GetContainingNode<IFSharpDeclaration>();
+    }
+
+    [CanBeNull]
     private static string GetXmlDocId([NotNull] FSharpMemberOrFunctionOrValue mfv)
     {
-      lock (ourFcSLock)
+      try
       {
-        try
-        {
-          return mfv.XmlDocSig;
-        }
-        catch (Exception e)
-        {
-          Logger.LogMessage(LoggingLevel.WARN, "Could not get XmlDocId for {0}", mfv);
-          Logger.LogExceptionSilently(e);
-          return null;
-        }
+        return mfv.XmlDocSig;
+      }
+      catch (Exception e)
+      {
+        Logger.LogMessage(LoggingLevel.WARN, "Could not get XmlDocId for {0}", mfv);
+        Logger.LogExceptionSilently(e);
+        return null;
       }
     }
 
-    private static T FindDeclaration<T>(Range.range range, [CanBeNull] ITreeNode token) where T : class, IDeclaration
+    private static T FindNode<T>(Range.range range, [CanBeNull] ITreeNode node) where T : class, ITreeNode
     {
-      var fsFile = token?.GetContainingFile() as IFSharpFile;
+      var fsFile = node?.GetContainingFile() as IFSharpFile;
       var document = fsFile?.GetSourceFile()?.Document;
       if (document == null) return null;
 

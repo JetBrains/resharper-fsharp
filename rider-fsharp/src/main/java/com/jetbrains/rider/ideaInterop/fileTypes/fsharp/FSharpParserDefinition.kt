@@ -6,6 +6,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.psi.tree.IElementType
 import com.jetbrains.rider.ideaInterop.fileTypes.RiderFileElementType
 import com.jetbrains.rider.ideaInterop.fileTypes.RiderParserDefinitionBase
+import com.intellij.psi.tree.IFileElementType
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpLexer
 
 class FSharpParserDefinition : RiderParserDefinitionBase(FSharpFileElementType, FSharpFileType) {
     companion object {
@@ -13,8 +15,8 @@ class FSharpParserDefinition : RiderParserDefinitionBase(FSharpFileElementType, 
         val FSharpFileElementType = RiderFileElementType("RIDER_FSHARP_FILE", FSharpLanguage, FSharpElementType)
     }
 
-    override fun createLexer(project: Project?): Lexer = DummyLexer(FSharpElementType)
-
+    override fun createLexer(project: Project?): Lexer = FSharpLexer()
+    override fun getFileNodeType(): IFileElementType = FSharpFileElementType
 }
 
 class FSharpScriptParserDefinition : RiderParserDefinitionBase(FSharpScriptFileElementType, FSharpScriptFileType) {
@@ -23,6 +25,7 @@ class FSharpScriptParserDefinition : RiderParserDefinitionBase(FSharpScriptFileE
         val FSharpScriptFileElementType = RiderFileElementType("RIDER_FSHARP_SCRIPT_FILE", FSharpScriptLanguage, FSharpScriptElementType)
     }
 
-    override fun createLexer(project: Project?): Lexer = DummyLexer(FSharpScriptElementType)
+    override fun createLexer(project: Project?): Lexer = FSharpLexer()
+    override fun getFileNodeType(): IFileElementType = FSharpParserDefinition.FSharpFileElementType
 
 }

@@ -1,0 +1,11 @@
+﻿module Module
+
+[<Struct>]
+type zzz =
+    { Field: int }
+
+    static member Dummy: zzz = { Field = 123 }
+
+
+let (r1: zzz) = zzz.Dummy
+let (r2: zzz) = zzz.Dummy

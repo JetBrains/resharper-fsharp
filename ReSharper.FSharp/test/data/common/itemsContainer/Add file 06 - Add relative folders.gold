@@ -4,7 +4,7 @@
     1:File1
 
 .NETFramework,Version=v0.0
-C:/Solution/Project/Folder/SubFolder/File1
+Folder/SubFolder/File1
 
 
 =======
@@ -19,7 +19,7 @@ Project
     1:File2
 
 .NETFramework,Version=v0.0
-C:/Solution/Project/Folder/SubFolder/File1
-C:/Solution/Project/Folder/Another/File2
+Folder/SubFolder/File1
+Folder/Another/File2
 
 

@@ -7,10 +7,10 @@
   1:File4
 
 .NETFramework,Version=v0.0
-C:/Solution/Project/File1
-C:/Solution/Project/Folder/File2
-C:/Solution/Project/File3
-C:/Solution/Project/Folder/File4
+File1
+Folder/File2
+File3
+Folder/File4
 
 
 =======
@@ -24,8 +24,8 @@ Project
 3:File3
 
 .NETFramework,Version=v0.0
-C:/Solution/Project/File1
-C:/Solution/Project/Folder/File2
-C:/Solution/Project/File3
+File1
+Folder/File2
+File3
 
 

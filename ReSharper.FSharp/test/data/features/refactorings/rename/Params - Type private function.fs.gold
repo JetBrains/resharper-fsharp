@@ -1,0 +1,5 @@
+﻿module Module
+
+type T() =
+    let foo zzz =
+        zzz + zzz

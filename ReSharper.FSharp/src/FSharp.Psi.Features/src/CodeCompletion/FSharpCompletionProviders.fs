@@ -1,8 +1,8 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
-open JetBrains.Application
+open JetBrains.Application.Settings
 open System
-open JetBrains.Application.Progress
+open JetBrains.Diagnostics
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
@@ -11,14 +11,13 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupIt
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
-open JetBrains.ReSharper.Plugins.FSharp.Common.Util
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
+open JetBrains.ReSharper.Plugins.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.Common.Checker.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
 open JetBrains.ReSharper.Psi
-open JetBrains.UI.RichText
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
@@ -29,8 +28,6 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
     member x.IsAvailable(context: ISpecificCodeCompletionContext) =
         context |> function | :? FSharpCodeCompletionContext -> obj() | _ -> null
 
-    member x.GetAutocompletionBehaviour() = AutocompletionBehaviour.NoRecommendation
-
     member x.AddLookupItems(context: FSharpCodeCompletionContext, collector: IItemsCollector) =
         match context.FsCompletionContext with
         | Some (CompletionContext.Invalid) -> false
@@ -40,60 +37,53 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
         match basicContext.File with
         | :? IFSharpFile as fsFile when fsFile.ParseResults.IsSome ->
             match fsFile.GetParseAndCheckResults(true) with
+            | None -> false
             | Some results ->
-                let checkResults = results.CheckResults
-                let parseResults = fsFile.ParseResults
-                let line, column = int context.Coords.Line + 1, int context.Coords.Column
-                let lineText = context.LineText
-                let getIconId (symbol, context) =
-                        // todo: provide symbol and display context in FCS items, calc this only when needed
-                        let icon = getIconId symbol
-                        let retType =
-                            match getReturnType symbol with
-                            | Some t -> t.Format(context)
-                            | _ -> null
-                        Some { Icon = icon; ReturnType = retType }
 
-                let getAllSymbols () = getAllSymbols checkResults 
-                try
-                    let completions =
-                        checkResults
-                            .GetDeclarationListInfo(parseResults, line, lineText, context.PartialLongName,
-                                                    getAllSymbols, getIconId, true, filterResolved).RunAsTask().Items
+            let checkResults = results.CheckResults
+            let parseResults = fsFile.ParseResults
+            let line = int context.Coords.Line + 1
+            let lineText = context.LineText
 
-                    if Array.isEmpty completions then false else
+            let getAllSymbols () = getAllSymbols checkResults
+            try
+                let completionInfo =
+                    checkResults
+                        .GetDeclarationListInfo(parseResults, line, lineText, context.PartialLongName,
+                                                getAllSymbols, filterResolved).RunAsTask()
 
-                    let xmlDocService = basicContext.Solution.GetComponent<FSharpXmlDocService>()
-                    for item in completions do
-                        let (lookupItem: TextLookupItemBase) =
-                            if item.Glyph = FSharpGlyph.Error
-                            then FSharpErrorLookupItem(item) :> _
-                            else FSharpLookupItem(item, context, xmlDocService) :> _
+                if completionInfo.Items.IsEmpty() then false else
 
-                        lookupItem.InitializeRanges(context.Ranges, basicContext)
-                        lookupItem.DisplayTypeName <-
-                            match item.AdditionalInfo with
-                            | Some info -> RichText(info.ReturnType)
-                            | _ -> null
+                context.XmlDocService <- basicContext.Solution.GetComponent<FSharpXmlDocService>()
+                context.DisplayContext <- completionInfo.DisplayContext
 
-                        collector.Add(lookupItem)
-                    true
-                with
-                | :? OperationCanceledException -> reraise()
-                | e ->
-                    let path = basicContext.SourceFile.GetLocation().FullPath
-                    let coords = context.Coords
-                    logger.LogMessage(LoggingLevel.WARN, "Getting completions at location: {0}: {1}", path, coords)
-                    logger.LogExceptionSilently(e)
-                    false
-            | _ -> false
+                for item in completionInfo.Items do
+                    let (lookupItem: TextLookupItemBase) =
+                        if item.Glyph = FSharpGlyph.Error
+                        then FSharpErrorLookupItem(item) :> _
+                        else FSharpLookupItem(item, context) :> _
+
+                    lookupItem.InitializeRanges(context.Ranges, basicContext)
+                    collector.Add(lookupItem)
+                true
+            with
+            | :? OperationCanceledException -> reraise()
+            | e ->
+                let path = basicContext.SourceFile.GetLocation().FullPath
+                let coords = context.Coords
+                logger.LogMessage(LoggingLevel.WARN, "Getting completions at location: {0}: {1}", path, coords)
+                logger.LogExceptionSilently(e)
+                false
         | _ -> false
 
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpLookupItemsProvider(logger: ILogger) =
     inherit FSharpLookupItemsProviderBase(logger, (fun checkResults ->
-        AssemblyContentProvider.getAssemblySignatureContent AssemblyContentType.Full checkResults.PartialAssemblySignature), false)
+        let assemblySignature = checkResults.PartialAssemblySignature
+        let getSymbolsAsync = async {
+            return AssemblyContentProvider.getAssemblySignatureContent AssemblyContentType.Full assemblySignature }
+        getSymbolsAsync.RunAsTask()), false)
 
     interface ICodeCompletionItemsProvider with
         member x.IsAvailable(context) = base.IsAvailable(context)
@@ -127,7 +117,10 @@ type FSharpLibraryScopeLookupItemsProvider(logger: ILogger, assemblyContentProvi
     inherit FSharpLookupItemsProviderBase(logger, assemblyContentProvider.GetLibrariesEntities, true)
 
     interface ISlowCodeCompletionItemsProvider with
-        member x.IsAvailable(context) = base.IsAvailable(context)
+        member x.IsAvailable(context) =
+            let settings = context.BasicContext.ContextBoundSettingsStore
+            if settings.GetValue(fun (key: FSharpOptions) -> key.EnableOutOfScopeCompletion) then obj() else null
+
         member x.AddLookupItems(context, collector, data) =
             base.AddLookupItems(context :?> FSharpCodeCompletionContext, collector)
 
