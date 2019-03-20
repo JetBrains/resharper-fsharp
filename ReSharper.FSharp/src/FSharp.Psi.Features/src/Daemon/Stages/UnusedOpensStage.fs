@@ -21,7 +21,7 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
-type UnusedOpensStageProcess(fsFile: IFSharpFile, checkResults, daemonProcess: IDaemonProcess) =
+type UnusedOpensStageProcess(fsFile: IFSharpFile, daemonProcess: IDaemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
     let document = fsFile.GetSourceFile().Document
@@ -35,6 +35,11 @@ type UnusedOpensStageProcess(fsFile: IFSharpFile, checkResults, daemonProcess: I
     override x.Execute(committer) =
         let highlightings = List()
         let interruptChecker = daemonProcess.CreateInterruptChecker()
+        match fsFile.GetParseAndCheckResults(false) with
+        | None -> ()
+        | Some results ->
+
+        let checkResults = results.CheckResults
         for range in UnusedOpens.getUnusedOpens(checkResults, getLine).RunAsTask(interruptChecker) do
             x.SeldomInterruptChecker.CheckForInterrupt()
             match fsFile.FindTokenAt(document.GetTreeStartOffset(range)) with
@@ -55,9 +60,7 @@ type UnusedOpensStage(daemonProcess, errors) =
     inherit FSharpDaemonStageBase()
 
     override x.CreateStageProcess(fsFile: IFSharpFile, _, daemonProcess: IDaemonProcess) =
-        match fsFile.GetParseAndCheckResults(false) with
-        | Some results -> UnusedOpensStageProcess(fsFile, results.CheckResults, daemonProcess) :> _
-        | _ -> null
+        UnusedOpensStageProcess(fsFile, daemonProcess) :> _
 
 
 // todo: use ReSharper ErrorsGen
