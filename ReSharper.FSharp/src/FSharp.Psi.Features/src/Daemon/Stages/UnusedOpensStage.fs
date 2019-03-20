@@ -24,6 +24,8 @@ open Microsoft.FSharp.Compiler.SourceCodeServices
 type UnusedOpensStageProcess(fsFile: IFSharpFile, daemonProcess: IDaemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
+    let [<Literal>] opName = "UnusedOpensStageProcess"
+
     let document = fsFile.GetSourceFile().Document
     let lines = Dictionary<int, string>()
 
@@ -35,7 +37,7 @@ type UnusedOpensStageProcess(fsFile: IFSharpFile, daemonProcess: IDaemonProcess)
     override x.Execute(committer) =
         let highlightings = List()
         let interruptChecker = daemonProcess.CreateInterruptChecker()
-        match fsFile.GetParseAndCheckResults(false) with
+        match fsFile.GetParseAndCheckResults(false, opName) with
         | None -> ()
         | Some results ->
 

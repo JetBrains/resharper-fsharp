@@ -13,6 +13,8 @@ open Microsoft.FSharp.Compiler
 type FormatSpecifiersStageProcess(fsFile: IFSharpFile, daemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
+    let [<Literal>] opName = "FormatSpecifiersStageProcess"
+    
     let getDocumentRange (range: Range.range) =
         let document = daemonProcess.Document
         let startOffset =  document.GetDocumentOffset(range.StartLine - 1, range.StartColumn)
@@ -20,7 +22,7 @@ type FormatSpecifiersStageProcess(fsFile: IFSharpFile, daemonProcess) =
         DocumentRange(document, TextRange(startOffset, endOffset))
     
     override x.Execute(committer) =
-        match fsFile.GetParseAndCheckResults(false) with
+        match fsFile.GetParseAndCheckResults(false, opName) with
         | Some results ->
             let highlightings = List()
             for range, _ in results.CheckResults.GetFormatSpecifierLocationsAndArity() do

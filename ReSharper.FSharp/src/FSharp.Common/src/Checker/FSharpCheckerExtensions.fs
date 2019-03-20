@@ -1,28 +1,27 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Common.Checker
+[<AutoOpen>]
+module JetBrains.ReSharper.Plugins.FSharp.Common.Checker.FSharpCheckerExtensions
 
 open System
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
-module FSharpCheckerExtensions =
-    let map (f: 'T -> 'U) (a: Async<'T>) : Async<'U> =
-        async {
-            let! a = a
-            return f a
-        }
+let map (f: 'T -> 'U) (a: Async<'T>) : Async<'U> =
+    async {
+        let! a = a
+        return f a
+    }
 
-    type CheckResults =
-        | Ready of (FSharpParseFileResults * FSharpCheckFileResults) option
-        | StillRunning of Async<(FSharpParseFileResults * FSharpCheckFileResults) option>
+type CheckResults =
+    | Ready of (FSharpParseFileResults * FSharpCheckFileResults) option
+    | StillRunning of Async<(FSharpParseFileResults * FSharpCheckFileResults) option>
 
-open FSharpCheckerExtensions
-
-[<Extension; Sealed; AbstractClass>]
-type FSharpCheckerExtensions =
-    [<Extension>]
-    static member ParseAndCheckDocument(checker: FSharpChecker, filePath: string, sourceText: string, options: FSharpProjectOptions, allowStaleResults: bool) =
+type FSharpChecker with
+    member x.ParseAndCheckDocument(path, source: string, options, allowStale: bool, opName) =
         let parseAndCheckFile =
             async {
-                let! parseResults, checkFileAnswer = checker.ParseAndCheckFileInProject(filePath, sourceText.GetHashCode(), sourceText, options)
+                let! parseResults, checkFileAnswer =
+                    let version = source.GetHashCode()
+                    x.ParseAndCheckFileInProject(path, version, source, options, userOpName = opName)
+
                 return
                     match checkFileAnswer with
                     | FSharpCheckFileAnswer.Aborted ->
@@ -49,7 +48,7 @@ type FSharpCheckerExtensions =
                 | None -> None
             | None -> None
 
-        if allowStaleResults then
+        if allowStale then
             async {
                 let! freshResults = tryGetFreshResultsWithTimeout()
 
@@ -58,7 +57,7 @@ type FSharpCheckerExtensions =
                     | Ready x -> async.Return x
                     | StillRunning worker ->
                         async {
-                            match allowStaleResults, checker.TryGetRecentCheckResultsForFile(filePath, options) with
+                            match allowStale, x.TryGetRecentCheckResultsForFile(path, options) with
                             | true, Some (parseResults, checkFileResults, _) ->
                                 return Some (parseResults, checkFileResults)
                             | _ ->

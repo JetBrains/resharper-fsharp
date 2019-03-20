@@ -20,6 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.ParameterInfo
   [ParameterInfoContextFactory(typeof(FSharpLanguage))]
   public class FSharpParameterInfoContextFactory : IParameterInfoContextFactory
   {
+    private const string OpName = "FSharpParameterInfoContextFactory";
     private static readonly char[] ourPopupChars = {'(', ',', '<'};
 
     public bool ShouldPopup(DocumentOffset caretOffset, char c, ISolution solution,
@@ -42,7 +43,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.ParameterInfo
       if (paramInfoLocationsOption == null)
         return null;
 
-      var checkResults = fsFile.GetParseAndCheckResults(true)?.Value.CheckResults;
+      var checkResults = fsFile.GetParseAndCheckResults(true, OpName)?.Value.CheckResults;
       if (checkResults == null)
         return null;
 

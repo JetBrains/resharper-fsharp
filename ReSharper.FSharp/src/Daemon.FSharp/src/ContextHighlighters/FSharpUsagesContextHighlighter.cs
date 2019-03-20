@@ -22,6 +22,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
   [ContainsContextConsumer]
   public class FSharpUsagesContextHighlighter : ContextHighlighterBase
   {
+    private const string OpName = "FSharpUsagesContextHighlighter";
+
     private const string HighlightingId = HighlightingAttributeIds.USAGE_OF_ELEMENT_UNDER_CURSOR;
 
     [CanBeNull, AsyncContextConsumer]
@@ -61,8 +63,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
         return;
 
       var checkResults =
-        fsFile.CheckerService.TryGetStaleCheckResults(sourceFile)?.Value ??
-        fsFile.GetParseAndCheckResults(true)?.Value.CheckResults;
+        fsFile.CheckerService.TryGetStaleCheckResults(sourceFile, OpName)?.Value ??
+        fsFile.GetParseAndCheckResults(true, OpName)?.Value.CheckResults;
 
       var ranges = new HashSet<DocumentRange>();
       AddUsagesRanges(symbol, ranges, checkResults, document, fsFile);

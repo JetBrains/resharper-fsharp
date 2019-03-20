@@ -11,11 +11,13 @@ open Microsoft.FSharp.Compiler.SourceCodeServices
 type TypeCheckErrorsStageProcess(fsFile: IFSharpFile, daemonProcess, logger: ILogger) =
     inherit ErrorsStageProcessBase(fsFile, daemonProcess)
 
+    let [<Literal>] opName = "TypeCheckErrorsStageProcess"
+
     override x.ShouldAddDiagnostic(error, range) =
         base.ShouldAddDiagnostic(error, range) && error.Subcategory <> BuildPhaseSubcategory.Parse
 
     override x.Execute(committer) =
-        match fsFile.GetParseAndCheckResults(false) with
+        match fsFile.GetParseAndCheckResults(false, opName) with
         | None -> ()
         | Some results ->
 

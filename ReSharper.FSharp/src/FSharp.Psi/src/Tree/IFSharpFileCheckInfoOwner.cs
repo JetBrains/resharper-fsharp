@@ -11,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
   public interface IFSharpFileCheckInfoOwner : ICompositeElement
   {
     [CanBeNull]
-    FSharpOption<FSharpParseAndCheckResults> GetParseAndCheckResults(bool allowStaleResults);
+    FSharpOption<FSharpParseAndCheckResults> GetParseAndCheckResults(bool allowStaleResults, string opName);
 
     [NotNull] FSharpCheckerService CheckerService { get; set; }
 

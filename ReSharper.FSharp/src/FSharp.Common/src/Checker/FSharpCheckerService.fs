@@ -14,7 +14,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Common.Checker.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Util
-open Microsoft.FSharp.Compiler
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
 [<ShellComponent; AllowNullLiteral>]
@@ -74,30 +73,46 @@ type FSharpCheckerService
     member x.GetDefines(sourceFile: IPsiSourceFile) =
         x.OptionsProvider.GetParsingOptions(sourceFile).ConditionalCompilationDefines
 
-    member x.ParseAndCheckFile([<NotNull>] file: IPsiSourceFile,
+    member x.ParseAndCheckFile([<NotNull>] file: IPsiSourceFile, opName,
                                [<Optional; DefaultParameterValue(false)>] allowStaleResults) =
         match x.OptionsProvider.GetProjectOptions(file) with
+        | None -> None
         | Some options ->
-            let path = file.GetLocation().FullPath
-            let source = file.Document.GetText()
-            // todo: don't cancel the computation when file didn't change
-            match x.Checker.ParseAndCheckDocument(path, source, options, allowStaleResults).RunAsTask() with
-            | Some (parseResults, checkResults) when parseResults.ParseTree.IsSome ->
-                let parseTree = parseResults.ParseTree.Value
-                Some { ParseResults = parseResults; ParseTree = parseTree; CheckResults = checkResults }
-            | _ -> None
-        | _ -> None
 
-    member x.TryGetStaleCheckResults([<NotNull>] file: IPsiSourceFile) =
-        x.OptionsProvider.GetProjectOptions(file)
-        |> Option.bind (fun options ->
-            x.Checker.TryGetRecentCheckResultsForFile(file.GetLocation().FullPath, options)
-            |> Option.map (fun (_, checkResults, _) -> checkResults))
+        let path = file.GetLocation().FullPath
+        let source = file.Document.GetText()
+        logger.Trace("ParseAndCheckFile: start {0}, {1}", path, opName)
+
+        // todo: don't cancel the computation when file didn't change
+        match x.Checker.ParseAndCheckDocument(path, source, options, allowStaleResults, opName).RunAsTask() with
+        | Some (parseResults, checkResults) when parseResults.ParseTree.IsSome ->
+            logger.Trace("ParseAndCheckFile: finish {0}, {1}", path, opName)
+            Some { ParseResults = parseResults; CheckResults = checkResults }
+
+        | _ ->
+            logger.Trace("ParseAndCheckFile: fail {0}, {1}", path, opName)
+            None
+
+    member x.TryGetStaleCheckResults([<NotNull>] file: IPsiSourceFile, opName) =
+        match x.OptionsProvider.GetProjectOptions(file) with
+        | None -> None
+        | Some options ->
+
+        let path = file.GetLocation().FullPath
+        logger.Trace("TryGetStaleCheckResults: start {0}, {1}", path, opName)
+
+        match x.Checker.TryGetRecentCheckResultsForFile(path, options) with
+        | Some (_, checkResults, _) ->
+            logger.Trace("TryGetStaleCheckResults: finish {0}, {1}", path, opName)
+            Some checkResults
+
+        | _ ->
+            logger.Trace("TryGetStaleCheckResults: fail {0}, {1}", path, opName)
+            None
 
 
 type FSharpParseAndCheckResults = 
     { ParseResults: FSharpParseFileResults
-      ParseTree: Ast.ParsedInput
       CheckResults: FSharpCheckFileResults }
 
 

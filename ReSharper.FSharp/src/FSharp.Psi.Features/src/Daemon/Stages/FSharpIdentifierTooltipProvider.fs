@@ -24,6 +24,8 @@ let [<Literal>] RiderTooltipSeparator = "_RIDER_HORIZONTAL_LINE_TOOLTIP_SEPARATO
 type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocService: FSharpXmlDocService) =
     inherit IdentifierTooltipProvider<FSharpLanguage>(lifetime, solution, presenter)
 
+    let [<Literal>] opName = "FSharpIdentifierTooltipProvider"
+
     override x.GetTooltip(highlighter) =
         if not highlighter.IsValid then String.Empty else
 
@@ -45,7 +47,7 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
         | null -> String.Empty
         | token ->
 
-        match fsFile.GetParseAndCheckResults(true) with
+        match fsFile.GetParseAndCheckResults(true, opName) with
         | None -> String.Empty
         | Some results ->
 

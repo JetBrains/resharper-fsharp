@@ -22,6 +22,8 @@ open JetBrains.Util
 open Microsoft.FSharp.Compiler.SourceCodeServices
 
 type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolved) =
+    let [<Literal>] opName = "FSharpLookupItemsProviderBase"
+    
     member x.GetDefaultRanges(context: ISpecificCodeCompletionContext) =
         context |> function | :? FSharpCodeCompletionContext as context -> context.Ranges | _ -> null
 
@@ -36,7 +38,7 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
         let basicContext = context.BasicContext
         match basicContext.File with
         | :? IFSharpFile as fsFile when fsFile.ParseResults.IsSome ->
-            match fsFile.GetParseAndCheckResults(true) with
+            match fsFile.GetParseAndCheckResults(true, opName) with
             | None -> false
             | Some results ->
 

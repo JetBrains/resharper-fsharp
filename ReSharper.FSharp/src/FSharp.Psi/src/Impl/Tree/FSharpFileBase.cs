@@ -30,8 +30,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public override PsiLanguageType Language => FSharpLanguage.Instance;
 
-    public FSharpOption<FSharpParseAndCheckResults> GetParseAndCheckResults(bool allowStaleResults) =>
-      CheckerService.ParseAndCheckFile(SourceFile, allowStaleResults);
+    public FSharpOption<FSharpParseAndCheckResults> GetParseAndCheckResults(bool allowStaleResults, string opName) =>
+      CheckerService.ParseAndCheckFile(SourceFile, opName, allowStaleResults);
 
     public FSharpSymbol GetSymbol(int offset) =>
       ResolvedSymbolsCache.GetSymbol(SourceFile, offset);

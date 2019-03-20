@@ -21,6 +21,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
   public class FSharpFileResolvedSymbols : IFSharpFileResolvedSymbols
   {
+    private const string OpName = "FSharpFileResolvedSymbols";
+    
     private ResolvedSymbols mySymbols;
     private readonly object myLock = new object();
 
@@ -87,7 +89,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       if (!(SourceFile.GetPrimaryPsiFile() is IFSharpFile fsFile))
         return ResolvedSymbols.Empty;
 
-      var checkResults = CheckerService.ParseAndCheckFile(SourceFile)?.Value.CheckResults;
+      var checkResults = CheckerService.ParseAndCheckFile(SourceFile, OpName)?.Value.CheckResults;
       var symbolUses = checkResults?.GetAllUsesOfAllSymbolsInFile().RunAsTask();
       if (symbolUses == null)
         return ResolvedSymbols.Empty;
