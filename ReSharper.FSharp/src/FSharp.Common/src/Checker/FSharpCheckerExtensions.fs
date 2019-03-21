@@ -2,6 +2,7 @@
 module JetBrains.ReSharper.Plugins.FSharp.Common.Checker.FSharpCheckerExtensions
 
 open System
+open Microsoft.FSharp.Compiler.Text
 open FSharp.Compiler.SourceCodeServices
 
 let map (f: 'T -> 'U) (a: Async<'T>) : Async<'U> =
@@ -15,7 +16,7 @@ type CheckResults =
     | StillRunning of Async<(FSharpParseFileResults * FSharpCheckFileResults) option>
 
 type FSharpChecker with
-    member x.ParseAndCheckDocument(path, source: string, options, allowStale: bool, opName) =
+    member x.ParseAndCheckDocument(path, source: ISourceText, options, allowStale: bool, opName) =
         let parseAndCheckFile =
             async {
                 let! parseResults, checkFileAnswer =

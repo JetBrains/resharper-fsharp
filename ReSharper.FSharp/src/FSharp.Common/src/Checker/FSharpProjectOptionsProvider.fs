@@ -19,6 +19,7 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.Threading
 open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds
+open Microsoft.FSharp.Compiler.Text
 
 [<SolutionComponent>]
 type FSharpProjectOptionsProvider
@@ -209,7 +210,7 @@ type FSharpScriptOptionsProvider(logger: ILogger, checkerService: FSharpCheckerS
 
     member x.GetScriptOptions(file: IPsiSourceFile) =
         let filePath = file.GetLocation().FullPath
-        let source = file.Document.GetText()
+        let source = SourceText.ofString (file.Document.GetText())
         lock getScriptOptionsLock (fun _ ->
         let getScriptOptionsAsync =
             checkerService.Checker.GetProjectOptionsFromScript(filePath, source, otherFlags = otherFlags)

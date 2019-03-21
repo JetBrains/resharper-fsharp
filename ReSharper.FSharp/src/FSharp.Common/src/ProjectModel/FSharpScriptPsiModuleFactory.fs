@@ -32,6 +32,7 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 open JetBrains.Util.DataStructures
 open JetBrains.Util.Dotnet.TargetFrameworkIds
+open Microsoft.FSharp.Compiler.Text
 
 /// Provides psi modules for script files with referenced assemblies determined by "#r" directives.
 [<SolutionComponent>]
@@ -66,7 +67,8 @@ type FSharpScriptPsiModulesProvider
         platformInfo.TargetFrameworkId
 
     let getScriptOptions (path: FileSystemPath) (document: IDocument) =
-        let options, _ = checkerService.Checker.GetProjectOptionsFromScript(path.FullPath, document.GetText()).RunAsTask()
+        let source = SourceText.ofString (document.GetText())
+        let options, _ = checkerService.Checker.GetProjectOptionsFromScript(path.FullPath, source).RunAsTask()
         options
 
     let getScriptReferences scriptPath scriptOptions =

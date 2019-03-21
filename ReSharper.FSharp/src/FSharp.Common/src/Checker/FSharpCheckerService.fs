@@ -15,6 +15,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Common.Checker.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Util
+open Microsoft.FSharp.Compiler.Text
 
 [<ShellComponent; AllowNullLiteral>]
 type FSharpCheckerService
@@ -56,7 +57,7 @@ type FSharpCheckerService
                 let project = file.GetProject().GetLocation().FullPath
                 logger.Warn("Loading from caches, don't have source files for {0} yet.", project)
                 { parsingOptions with SourceFiles = [| filePath |] }
-        let source = file.Document.GetText()
+        let source = SourceText.ofString (file.Document.GetText())
         try
             let parseResults = x.Checker.ParseFile(filePath, source, parsingOptions).RunAsTask() 
             Some parseResults
@@ -80,7 +81,7 @@ type FSharpCheckerService
         | Some options ->
 
         let path = file.GetLocation().FullPath
-        let source = file.Document.GetText()
+        let source = SourceText.ofString (file.Document.GetText())
         logger.Trace("ParseAndCheckFile: start {0}, {1}", path, opName)
 
         // todo: don't cancel the computation when file didn't change
