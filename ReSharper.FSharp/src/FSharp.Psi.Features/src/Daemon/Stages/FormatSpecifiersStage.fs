@@ -1,14 +1,14 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
+open System.Collections.Generic
+open FSharp.Compiler
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Daemon.Impl
-open System.Collections.Generic
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.Util
-open Microsoft.FSharp.Compiler
 
 type FormatSpecifiersStageProcess(fsFile: IFSharpFile, daemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)

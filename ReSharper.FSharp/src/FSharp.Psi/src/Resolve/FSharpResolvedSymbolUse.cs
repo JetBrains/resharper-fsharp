@@ -1,6 +1,6 @@
-﻿using JetBrains.Annotations;
+﻿using FSharp.Compiler.SourceCodeServices;
+using JetBrains.Annotations;
 using JetBrains.Util;
-using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {

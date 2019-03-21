@@ -1,6 +1,9 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.SelectEmbracingConstruct
 
 open System
+open FSharp.Compiler
+open FSharp.Compiler.Ast
+open FSharp.Compiler.SourceCodeServices.AstTraversal
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.SelectEmbracingConstruct
@@ -12,9 +15,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
-open Microsoft.FSharp.Compiler
-open Microsoft.FSharp.Compiler.Ast
-open Microsoft.FSharp.Compiler.SourceCodeServices.AstTraversal
 
 type FSharpSelection(file, range, parentRanges: DocumentRange list) =
     inherit SelectedRangeBase<IFSharpFile>(file, range)

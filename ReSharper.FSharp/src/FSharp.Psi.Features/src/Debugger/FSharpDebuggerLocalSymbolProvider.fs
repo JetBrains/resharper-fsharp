@@ -1,5 +1,8 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Debugger
 
+open FSharp.Compiler.Ast
+open FSharp.Compiler.Range
+open FSharp.Compiler.SourceCodeServices
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Debugger
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -7,9 +10,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
-open Microsoft.FSharp.Compiler.Ast
-open Microsoft.FSharp.Compiler.Range
-open Microsoft.FSharp.Compiler.SourceCodeServices
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpDebuggerLocalSymbolProvider() =

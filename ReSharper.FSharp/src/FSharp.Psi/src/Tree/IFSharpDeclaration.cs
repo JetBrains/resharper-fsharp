@@ -1,7 +1,7 @@
-﻿using JetBrains.Annotations;
+﻿using FSharp.Compiler.SourceCodeServices;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
-using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {

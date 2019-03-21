@@ -4,7 +4,7 @@ using System.Reflection;
 using JetBrains.Application.changes;
 using JetBrains.Lifetimes;
 using JetBrains.Util;
-using static Microsoft.FSharp.Compiler.AbstractIL.Internal.Library;
+using static FSharp.Compiler.AbstractIL.Internal.Library;
 
 namespace JetBrains.ReSharper.Plugins.FSharp
 {

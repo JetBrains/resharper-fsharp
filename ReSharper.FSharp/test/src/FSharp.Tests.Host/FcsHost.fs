@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Host
 
 open System.Linq
+open FSharp.Compiler.AbstractIL.Internal.Library
 open JetBrains.Core
 open JetBrains.Diagnostics
 open JetBrains.Lifetimes
@@ -10,7 +11,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Common.Shim.FileSystem
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
 open JetBrains.Rider.Model
-open Microsoft.FSharp.Compiler.AbstractIL.Internal.Library
 
 [<SolutionComponent>]
 type FcsHost

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.Application.Settings;
 using JetBrains.DocumentModel;
@@ -11,7 +12,6 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Files;
 using JetBrains.Util;
-using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Control;
 using Microsoft.FSharp.Core;
 

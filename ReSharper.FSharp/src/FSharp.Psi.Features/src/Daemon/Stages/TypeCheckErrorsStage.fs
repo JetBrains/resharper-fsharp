@@ -1,12 +1,12 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages
 
+open FSharp.Compiler.ErrorLogger
+open FSharp.Compiler.SourceCodeServices
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.Util
-open Microsoft.FSharp.Compiler.ErrorLogger
-open Microsoft.FSharp.Compiler.SourceCodeServices
 
 type TypeCheckErrorsStageProcess(fsFile: IFSharpFile, daemonProcess, logger: ILogger) =
     inherit ErrorsStageProcessBase(fsFile, daemonProcess)

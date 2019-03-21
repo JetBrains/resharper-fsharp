@@ -1,7 +1,8 @@
-﻿using JetBrains.Annotations;
+﻿using FSharp.Compiler.SourceCodeServices;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
-using Microsoft.FSharp.Compiler.SourceCodeServices;
+using static FSharp.Compiler.PrettyNaming;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
 {
@@ -52,8 +53,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
       if (mfv.IsMutable || mfv.IsRefCell())
         return HighlightingAttributeIds.MUTABLE_LOCAL_VARIABLE_IDENTIFIER_ATTRIBUTE;
 
-      if (Microsoft.FSharp.Compiler.PrettyNaming.IsMangledOpName(mfv.LogicalName) &&
-          PrettyNaming.IsOperatorName(mfv.DisplayName))
+      if (IsMangledOpName(mfv.LogicalName))
         return HighlightingAttributeIds.OPERATOR_IDENTIFIER_ATTRIBUTE;
 
       return HighlightingAttributeIds.LOCAL_VARIABLE_IDENTIFIER_ATTRIBUTE;

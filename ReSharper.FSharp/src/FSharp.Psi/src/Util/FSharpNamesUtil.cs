@@ -7,7 +7,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
 using JetBrains.Util.Extension;
-using static Microsoft.FSharp.Compiler.PrettyNaming;
+using static FSharp.Compiler.PrettyNaming;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {

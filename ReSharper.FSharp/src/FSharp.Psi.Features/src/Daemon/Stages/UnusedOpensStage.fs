@@ -1,6 +1,7 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
 open System.Collections.Generic
+open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application
 open JetBrains.Lifetimes
 open JetBrains.ReSharper.Daemon.UsageChecking
@@ -19,7 +20,6 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
-open Microsoft.FSharp.Compiler.SourceCodeServices
 
 type UnusedOpensStageProcess(fsFile: IFSharpFile, daemonProcess: IDaemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)

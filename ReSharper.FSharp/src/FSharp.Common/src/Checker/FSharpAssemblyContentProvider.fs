@@ -1,9 +1,9 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 
+open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application
 open JetBrains.ReSharper.Feature.Services
 open JetBrains.ReSharper.Plugins.FSharp
-open Microsoft.FSharp.Compiler.SourceCodeServices
 
 [<ShellComponent>]
 type FSharpAssemblyContentProvider(lifetime, onSolutionCloseNotifier: OnSolutionCloseNotifier) =

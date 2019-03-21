@@ -1,5 +1,7 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings.Rename
 
+open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.PrettyNaming
 open JetBrains.Application
 open JetBrains.ReSharper.Feature.Services.Refactorings.Specific.Rename
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -11,8 +13,6 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Naming.Impl
 open JetBrains.ReSharper.Refactorings.Rename
 open JetBrains.Util
-open Microsoft.FSharp.Compiler.SourceCodeServices
-open Microsoft.FSharp.Compiler.PrettyNaming
 
 [<AutoOpen>]
 module Util =

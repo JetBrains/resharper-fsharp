@@ -1,7 +1,8 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
-open JetBrains.Application.Settings
 open System
+open FSharp.Compiler.SourceCodeServices
+open JetBrains.Application.Settings
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
@@ -19,7 +20,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
 open JetBrains.ReSharper.Psi
 open JetBrains.Util
-open Microsoft.FSharp.Compiler.SourceCodeServices
 
 type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolved) =
     let [<Literal>] opName = "FSharpLookupItemsProviderBase"

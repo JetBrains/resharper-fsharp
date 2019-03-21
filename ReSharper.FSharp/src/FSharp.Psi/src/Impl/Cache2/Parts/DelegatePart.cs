@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
@@ -9,7 +10,6 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Impl.Special;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.Util;
-using Microsoft.FSharp.Compiler.SourceCodeServices;
 using Microsoft.FSharp.Core;
 using Delegate = JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2.Delegate;
 

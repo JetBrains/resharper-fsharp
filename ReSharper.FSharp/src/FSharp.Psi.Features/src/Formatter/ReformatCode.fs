@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
+open FSharp.Compiler
 open Fantomas
 open Fantomas.FormatConfig
 open JetBrains.Application.Infra
@@ -14,7 +15,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.Util
 open JetBrains.Util.Text
-open Microsoft.FSharp.Compiler
 
 [<CodeCleanupModule>]
 type ReformatCode() =

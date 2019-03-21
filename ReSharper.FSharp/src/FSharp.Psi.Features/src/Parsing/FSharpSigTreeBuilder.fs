@@ -1,9 +1,9 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
+open FSharp.Compiler.Ast
+open FSharp.Compiler.PrettyNaming
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
-open Microsoft.FSharp.Compiler.Ast
-open Microsoft.FSharp.Compiler.PrettyNaming
 
 type internal FSharpSigTreeBuilder(file, lexer, sigs, lifetime) =
     inherit FSharpTreeBuilderBase(file, lexer, lifetime)

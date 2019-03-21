@@ -1,8 +1,8 @@
-﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
+﻿using FSharp.Compiler.SourceCodeServices;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
-using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {

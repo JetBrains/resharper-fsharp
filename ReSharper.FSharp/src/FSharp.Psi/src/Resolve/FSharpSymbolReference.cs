@@ -1,3 +1,5 @@
+using System;
+using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
@@ -8,7 +10,6 @@ using JetBrains.ReSharper.Psi.Naming;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Resources.Shell;
-using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
@@ -83,6 +84,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     }
 
     public override ISymbolTable GetReferenceSymbolTable(bool useReferenceName) =>
-      throw new System.NotImplementedException();
+      throw new NotImplementedException();
   }
 }

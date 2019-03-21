@@ -2,6 +2,7 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 
 open System
 open System.Collections.Generic
+open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application.changes
 open JetBrains.DataFlow
 open JetBrains.ProjectModel
@@ -18,7 +19,6 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.Threading
 open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds
-open Microsoft.FSharp.Compiler.SourceCodeServices
 
 [<SolutionComponent>]
 type FSharpProjectOptionsProvider

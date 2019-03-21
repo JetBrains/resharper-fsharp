@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.Application.Threading;
 using JetBrains.Metadata.Reader.API;
@@ -16,8 +17,7 @@ using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Text;
 using JetBrains.Util;
 using JetBrains.Util.DataStructures;
-using Microsoft.FSharp.Compiler.SourceCodeServices;
-using PrettyNaming = Microsoft.FSharp.Compiler.PrettyNaming;
+using PrettyNaming = FSharp.Compiler.PrettyNaming;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {

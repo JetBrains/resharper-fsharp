@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages
 
 open System
 open System.Collections.Generic
+open FSharp.Compiler.SourceCodeServices
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
@@ -9,7 +10,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.Util
-open Microsoft.FSharp.Compiler.SourceCodeServices
 
 [<AutoOpen>]
 module FSharpErrors =

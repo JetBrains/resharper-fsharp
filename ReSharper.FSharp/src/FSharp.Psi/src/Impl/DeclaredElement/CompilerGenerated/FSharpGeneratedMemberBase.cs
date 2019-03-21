@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
+using FSharp.Compiler.SourceCodeServices;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
-using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 {

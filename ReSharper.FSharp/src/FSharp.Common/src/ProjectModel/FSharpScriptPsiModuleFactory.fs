@@ -5,6 +5,7 @@ open System.Collections.Generic
 open System.IO
 open System.Linq
 open System.Runtime.InteropServices
+open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application
 open JetBrains.Application.Progress
 open JetBrains.Application.Threading
@@ -31,7 +32,6 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 open JetBrains.Util.DataStructures
 open JetBrains.Util.Dotnet.TargetFrameworkIds
-open Microsoft.FSharp.Compiler.SourceCodeServices
 
 /// Provides psi modules for script files with referenced assemblies determined by "#r" directives.
 [<SolutionComponent>]

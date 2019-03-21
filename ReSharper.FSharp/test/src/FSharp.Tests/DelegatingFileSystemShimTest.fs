@@ -1,11 +1,11 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open System.IO
+open FSharp.Compiler.AbstractIL.Internal.Library
 open JetBrains.Lifetimes
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.TestFramework
-open Microsoft.FSharp.Compiler.AbstractIL.Internal.Library
 open NUnit.Framework
 
 type DelegatingFileSystemShimTest() =

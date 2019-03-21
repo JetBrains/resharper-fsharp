@@ -2,6 +2,7 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 
 open System
 open System.Runtime.InteropServices
+open FSharp.Compiler.SourceCodeServices
 open JetBrains
 open JetBrains.Annotations
 open JetBrains.Application
@@ -14,7 +15,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Common.Checker.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Util
-open Microsoft.FSharp.Compiler.SourceCodeServices
 
 [<ShellComponent; AllowNullLiteral>]
 type FSharpCheckerService

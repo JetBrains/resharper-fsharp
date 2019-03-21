@@ -1,4 +1,6 @@
 ﻿using System;
+using FSharp.Compiler;
+using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Impl;
@@ -8,8 +10,6 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
-using Microsoft.FSharp.Compiler;
-using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
 {

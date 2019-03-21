@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 
 open System.Collections.Concurrent
+open FSharp.Compiler.SourceCodeServices
 open JetBrains.Annotations
 open JetBrains.Application.Infra
 open JetBrains.ProjectModel
@@ -11,7 +12,6 @@ open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Psi.XmlIndex
 open JetBrains.UI.RichText
 open JetBrains.Util
-open Microsoft.FSharp.Compiler.SourceCodeServices
 
 [<SolutionComponent>]
 type FSharpXmlDocService

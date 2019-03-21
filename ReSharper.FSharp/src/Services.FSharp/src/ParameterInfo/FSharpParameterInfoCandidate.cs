@@ -1,9 +1,9 @@
 ﻿using System.Text;
+using FSharp.Compiler.SourceCodeServices;
 using JetBrains.ReSharper.Feature.Services.Lookup;
 using JetBrains.ReSharper.Feature.Services.ParameterInfo;
 using JetBrains.UI.RichText;
 using JetBrains.Util;
-using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.ParameterInfo
 {

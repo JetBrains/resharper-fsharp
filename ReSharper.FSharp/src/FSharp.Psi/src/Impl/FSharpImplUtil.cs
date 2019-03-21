@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
@@ -18,10 +19,9 @@ using JetBrains.ReSharper.Psi.Naming;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
-using JetBrains.Util.Logging;
 using JetBrains.Util.Extension;
-using Microsoft.FSharp.Compiler.SourceCodeServices;
-using PrettyNaming = Microsoft.FSharp.Compiler.PrettyNaming;
+using JetBrains.Util.Logging;
+using PrettyNaming = FSharp.Compiler.PrettyNaming;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 {

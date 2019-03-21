@@ -1,6 +1,7 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
 open System
+open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application.Settings
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems.Impl
@@ -17,7 +18,6 @@ open JetBrains.ReSharper.Psi.Util
 open JetBrains.UI.RichText
 open JetBrains.Util
 open JetBrains.Util.Text
-open Microsoft.FSharp.Compiler.SourceCodeServices
 
 type FSharpLookupCandidate(description: string, xmlDoc: FSharpXmlDoc, xmlDocService: FSharpXmlDocService) =
     member x.Description = description

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.Application.Settings;
@@ -11,7 +12,6 @@ using JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Highlightings;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.Util;
-using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 {

@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Search
 
+open FSharp.Compiler.SourceCodeServices
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Occurrences
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
@@ -7,7 +8,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
-open Microsoft.FSharp.Compiler.SourceCodeServices
 
 type FSharpItemOccurrenceKind() =
     static member val Import = OccurrenceKind("Module or namespace import", OccurrenceKind.SemanticAxis)

@@ -1,13 +1,13 @@
 [<AutoOpen; Extension>]
 module JetBrains.ReSharper.Plugins.FSharp.Common.Util.FSharpSymbolUtil
 
+open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application.UI.Icons.ComposedIcons
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Psi.Resources
 open JetBrains.UI.Icons
 open JetBrains.Util.Logging
-open Microsoft.FSharp.Compiler.SourceCodeServices
 
 [<Extension; CompiledName("IsRefCell")>]
 let isRefCell (mfv: FSharpMemberOrFunctionOrValue) =

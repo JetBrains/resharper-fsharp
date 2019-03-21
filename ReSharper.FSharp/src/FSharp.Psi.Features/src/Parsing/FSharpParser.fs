@@ -1,5 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
+open FSharp.Compiler.Ast
+open FSharp.Compiler.SourceCodeServices
 open JetBrains.Lifetimes
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Parsing
@@ -7,8 +9,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
-open Microsoft.FSharp.Compiler.Ast
-open Microsoft.FSharp.Compiler.SourceCodeServices
 
 type internal FSharpParser(lexer: ILexer, file: IPsiSourceFile, checkerService: FSharpCheckerService,
                            resolvedSymbolsCache: IFSharpResolvedSymbolsCache) =

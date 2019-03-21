@@ -1,9 +1,9 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Common.Util
 
 open System.Collections.Generic
+open FSharp.Compiler.SourceCodeServices
 open JetBrains.Metadata.Reader.API
 open JetBrains.Util
-open Microsoft.FSharp.Compiler.SourceCodeServices
 
 [<Extension; Sealed; AbstractClass>]
 type FSharpAttributeUtil =

@@ -2,6 +2,9 @@ module rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.TypingAssist
 
 open System
 open System.Collections.Generic
+open FSharp.Compiler.Ast
+open FSharp.Compiler.PrettyNaming
+open FSharp.Compiler.SourceCodeServices.AstTraversal
 open JetBrains.Application.UI.ActionSystem.Text
 open JetBrains.DocumentModel
 open JetBrains.Diagnostics
@@ -17,9 +20,6 @@ open JetBrains.ReSharper.Psi.CodeStyle
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.TextControl
 open JetBrains.Util
-open Microsoft.FSharp.Compiler.Ast
-open Microsoft.FSharp.Compiler.PrettyNaming
-open Microsoft.FSharp.Compiler.SourceCodeServices.AstTraversal
 
 [<SolutionComponent>]
 type FSharpTypingAssist

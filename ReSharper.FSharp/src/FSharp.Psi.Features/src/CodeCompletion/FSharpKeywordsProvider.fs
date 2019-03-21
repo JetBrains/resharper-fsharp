@@ -1,5 +1,6 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
+open FSharp.Compiler.SourceCodeServices
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
@@ -16,7 +17,6 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.TextControl
 open JetBrains.UI.RichText
 open JetBrains.Util
-open Microsoft.FSharp.Compiler.SourceCodeServices
 
 [<RequireQualifiedAccess>]
 type KeywordSuffix =

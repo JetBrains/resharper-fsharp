@@ -1,11 +1,11 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
+open FSharp.Compiler.Ast
+open FSharp.Compiler.PrettyNaming
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
-open Microsoft.FSharp.Compiler.Ast
-open Microsoft.FSharp.Compiler.PrettyNaming
 
 type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
     inherit FSharpTreeBuilderBase(file, lexer, lifetime)

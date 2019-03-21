@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
+using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
-using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 {

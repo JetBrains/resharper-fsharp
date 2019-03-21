@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests
 
 open System
+open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application.Components
 open JetBrains.Application.platforms
 open JetBrains.DataFlow
@@ -14,7 +15,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open JetBrains.ReSharper.TestFramework
 open JetBrains.TestFramework.Projects
 open JetBrains.Util.Dotnet.TargetFrameworkIds
-open Microsoft.FSharp.Compiler.SourceCodeServices
 open NUnit.Framework
 
 module AssemblyInfo =

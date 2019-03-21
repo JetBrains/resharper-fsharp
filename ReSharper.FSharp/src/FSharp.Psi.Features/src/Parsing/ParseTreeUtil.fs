@@ -2,9 +2,9 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Parsing.ParseTreeUtil
 
 open System.Collections.Generic
-open Microsoft.FSharp.Compiler
-open Microsoft.FSharp.Compiler.Ast
-open Microsoft.FSharp.Compiler.Range
+open FSharp.Compiler
+open FSharp.Compiler.Ast
+open FSharp.Compiler.Range
 
 type SynBinding with
     member x.StartPos =

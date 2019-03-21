@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -10,7 +11,6 @@ using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 using JetBrains.Util.dataStructures;
 using JetBrains.Util.DataStructures;
-using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {

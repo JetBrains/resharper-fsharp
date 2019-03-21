@@ -8,14 +8,14 @@ module rec CommonUtil =
     open System
     open System.Collections.Generic
     open System.Diagnostics
+    open FSharp.Compiler
+    open FSharp.Compiler.SourceCodeServices
     open JetBrains.Application.UI.Icons.ComposedIcons
     open JetBrains.DataFlow
     open JetBrains.DocumentModel
     open JetBrains.Lifetimes
     open JetBrains.Util
     open JetBrains.Util.dataStructures.TypedIntrinsics
-    open Microsoft.FSharp.Compiler
-    open Microsoft.FSharp.Compiler.SourceCodeServices
 
     let ensureAbsolute (path: FileSystemPath) (projectDirectory: FileSystemPath) =
         match path.AsRelative() with
@@ -146,7 +146,7 @@ module rec CommonUtil =
 
 [<AutoOpen>]
 module rec FcsUtil =
-    open Microsoft.FSharp.Compiler.Ast
+    open FSharp.Compiler.Ast
 
     let (|ExprRange|) (expr: SynExpr) = expr.Range
     let (|PatRange|) (pat: SynPat) = pat.Range

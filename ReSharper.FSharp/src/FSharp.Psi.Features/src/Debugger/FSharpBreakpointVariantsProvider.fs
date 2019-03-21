@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Debugger
 
 open System
 open System.Collections.Generic
+open FSharp.Compiler
 open JetBrains.ReSharper.Feature.Services.Debugger
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
@@ -10,7 +11,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
-open Microsoft.FSharp.Compiler
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpBreakpointVariantsProvider() =

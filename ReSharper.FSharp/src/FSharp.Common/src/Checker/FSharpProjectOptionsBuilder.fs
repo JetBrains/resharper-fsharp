@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 
 open System
 open System.Collections.Generic
+open FSharp.Compiler.SourceCodeServices
 open JetBrains.Annotations
 open JetBrains.Application
 open JetBrains.Diagnostics
@@ -19,7 +20,6 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds
-open Microsoft.FSharp.Compiler.SourceCodeServices
 
 module FSharpProperties =
     let [<Literal>] TargetProfile = "TargetProfile"

@@ -1,5 +1,7 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Services.Foldings
 
+open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.SourceCodeServices.Structure
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Daemon.CodeFolding
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
@@ -9,8 +11,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.TextControl.DocumentMarkup
 open JetBrains.Util
-open Microsoft.FSharp.Compiler.SourceCodeServices
-open Microsoft.FSharp.Compiler.SourceCodeServices.Structure
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpCodeFoldingProcessFactory(logger: ILogger) =
