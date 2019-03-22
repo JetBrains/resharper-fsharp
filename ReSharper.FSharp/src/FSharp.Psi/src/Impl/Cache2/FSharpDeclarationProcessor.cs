@@ -42,7 +42,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
       foreach (var declaration in fsFile.DeclarationsEnumerable)
       {
-        var qualifiers = declaration.LongIdentifier.Qualifiers;
+        var qualifiers = declaration.LongIdentifier?.Qualifiers;
+        if (qualifiers == null)
+        {
+          declaration.Accept(this);
+          continue;
+        }
+
         foreach (var qualifier in qualifiers)
         {
           var qualifierName = qualifier.GetText().RemoveBackticks();

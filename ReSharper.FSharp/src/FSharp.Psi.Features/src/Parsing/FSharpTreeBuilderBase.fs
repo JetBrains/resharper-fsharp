@@ -104,35 +104,41 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         let fsFile = x.GetTree() :> ITreeNode :?> IFSharpFile
         fsFile
 
-    member x.StartTopLevelDeclaration (lid: LongIdent) (attrs: SynAttributes) isModule (range: Range.range) =
-        match lid.IsEmpty, isModule with
-        | false, _ ->
-            let firstId = lid.Head
-            let idRange = firstId.idRange
+    member x.StartTopLevelDeclaration (lid: LongIdent) (attrs: SynAttributes) moduleKind (range: Range.range) =
+        match lid with
+        | IdentRange idRange as id :: _ ->
             let mark = 
                 if attrs.IsEmpty then
-                    if idRange.Start <> idRange.End then 
-                        // Missing ident may be replaced with file name with range 1,0-1,0.
-
+                    if moduleKind = NamedModule || moduleKind = DeclaredNamespace then 
                         // Ast namespace range starts after its identifier,
                         // try to locate the keyword followed by access modifiers
-                        let keywordTokenType = if isModule then FSharpTokenType.MODULE else FSharpTokenType.NAMESPACE
-                        x.GetStartOffset firstId |> x.AdvanceToTokenOrOffset keywordTokenType
+                        let keywordTokenType =
+                            match moduleKind with
+                            | NamedModule -> FSharpTokenType.MODULE
+                            | DeclaredNamespace -> FSharpTokenType.NAMESPACE
+                            | _ -> null
+                        x.GetStartOffset idRange |> x.AdvanceToTokenOrOffset keywordTokenType
                     x.Builder.Mark()
                 else
-                    x.MarkAttributesOrIdOrRange(attrs, Some firstId, range)
+                    x.MarkAttributesOrIdOrRange(attrs, Some id, range)
 
-            if isModule then x.ProcessModifiersBeforeOffset (x.GetStartOffset firstId)
+            if moduleKind = NamedModule then
+                x.ProcessModifiersBeforeOffset (x.GetStartOffset(idRange))
+
             x.ProcessLongIdentifier lid
             let elementType =
-                if isModule
-                then ElementType.TOP_LEVEL_MODULE_DECLARATION
-                else ElementType.F_SHARP_NAMESPACE_DECLARATION
+                match moduleKind with
+                | AnonModule | NamedModule ->
+                    ElementType.TOP_LEVEL_MODULE_DECLARATION
+
+                | _ -> ElementType.F_SHARP_NAMESPACE_DECLARATION
             Some mark, elementType
-        | _, false ->
-            // global namespace or parse error
+
+        | _ ->
+        
+        match moduleKind with
+        | GlobalNamespace ->
             let mark = x.Mark(range)
-            x.Done(x.Builder.Mark(), ElementType.LONG_IDENTIFIER)
             Some mark, ElementType.F_SHARP_GLOBAL_NAMESPACE_DECLARATION
         | _ -> None, null
 
