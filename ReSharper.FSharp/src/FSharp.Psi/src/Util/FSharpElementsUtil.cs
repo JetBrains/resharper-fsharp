@@ -180,8 +180,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         return caseDeclaredType.GetTypeElement();
       }
 
-      if (symbol is FSharpField field && !field.IsUnresolved)
-        return GetTypeElement(field.DeclaringEntity, psiModule)?.EnumerateMembers(field.Name, true).FirstOrDefault();
+      if (symbol is FSharpField field)
+        if (!field.IsUnresolved && field.DeclaringEntity?.Value is FSharpEntity fieldEntity)
+          return GetTypeElement(fieldEntity, psiModule)?.EnumerateMembers(field.Name, true).FirstOrDefault();
 
       // find active pattern entity/member. if it's compiled use wrapper. if it's source defined find actual element
       if (symbol is FSharpActivePatternCase activePatternCase)
