@@ -71,6 +71,7 @@
     <PackageReference Include="JetBrains.Fantomas" Version="[2.9.5]" />
     <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FcsVersion)" />
     <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
+    <PackageReference Include="System.ValueTuple" Version="$(ValueTupleVersion)" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Daemon.FSharp\Daemon.FSharp.csproj" />

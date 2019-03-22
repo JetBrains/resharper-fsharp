@@ -15,6 +15,7 @@
     <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FcsVersion)" />
     <PackageReference Include="JetBrains.Rider.SDK.Tests" Version="$(RiderSDKVersion)" />
     <PackageReference Include="Moq" Version="4.8.2" />
+    <PackageReference Include="System.ValueTuple" Version="$(ValueTupleVersion)" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\FSharp.Common\FSharp.Common.fsproj" />

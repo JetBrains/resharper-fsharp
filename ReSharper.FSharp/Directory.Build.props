@@ -10,6 +10,7 @@
   <PropertyGroup>
     <FcsVersion>[25.0.5]</FcsVersion>
     <FsCoreVersion>[4.5.4]</FsCoreVersion>
+    <ValueTupleVersion>[4.5.0]</ValueTupleVersion>
   </PropertyGroup>
 
   <Import Project="RiderSdkPackageVersion.props" />
