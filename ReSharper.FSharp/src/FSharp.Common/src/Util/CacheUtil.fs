@@ -11,7 +11,7 @@ type PartKind =
 
 
 [<Struct>]
-type NameAndParametersCound =
+type NameAndParametersCount =
     { Name: string
       ParametersCount: int }
 

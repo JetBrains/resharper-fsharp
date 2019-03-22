@@ -393,9 +393,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static TypeAugmentation IsTypePartDeclaration([NotNull] ITypeExtensionDeclaration extensionDeclaration)
     {
       var extNameInfo =
-        new NameAndParametersCound(extensionDeclaration.SourceName, extensionDeclaration.TypeParameters.Count);
+        new NameAndParametersCount(extensionDeclaration.SourceName, extensionDeclaration.TypeParameters.Count);
 
-      var declaredTypeNames = new Dictionary<NameAndParametersCound, TypeAugmentation>();
+      var declaredTypeNames = new Dictionary<NameAndParametersCount, TypeAugmentation>();
       var moduleDeclaration = extensionDeclaration.GetContainingNode<IModuleLikeDeclaration>()
         .NotNull("moduleDeclaration != null");
 
@@ -415,7 +415,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         var parametersCount = declaration.TypeParameters.Count;
         var augmentationInfo = TypeAugmentation.NewTypePart(compiledName, parametersCount, declaration.TypePartKind);
 
-        var nameInfo = new NameAndParametersCound(sourceName, parametersCount);
+        var nameInfo = new NameAndParametersCount(sourceName, parametersCount);
         declaredTypeNames[nameInfo] = augmentationInfo;
       }
 
