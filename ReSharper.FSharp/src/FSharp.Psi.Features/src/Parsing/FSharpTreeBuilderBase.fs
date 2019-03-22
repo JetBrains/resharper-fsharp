@@ -37,7 +37,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
 
     override x.SkipWhitespaces() = ()
 
-    member x.Advance() = x.Builder.AdvanceLexer() |> ignore
+    member x.AdvanceLexer() = x.Builder.AdvanceLexer() |> ignore
     
     member x.AdvanceToStart(range: Range.range) =
         x.AdvanceToOffset(x.GetStartOffset(range))
@@ -70,7 +70,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
 
     member x.MarkToken(elementType) =
         let caseMark = x.Builder.Mark()
-        x.Advance()
+        x.AdvanceLexer()
         x.Done(caseMark, elementType)
 
     member x.MarkTokenOrRange(tokenType, range: Range.range) =
@@ -84,11 +84,11 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         x.Mark()
 
     member x.AdvanceToOffset offset =
-        while x.Builder.GetTokenOffset() < offset && not x.Eof do x.Advance()
+        while x.Builder.GetTokenOffset() < offset && not x.Eof do x.AdvanceLexer()
 
     member x.AdvanceToTokenOrOffset (tokenType: TokenNodeType) (maxOffset: int) =
         while x.Builder.GetTokenOffset() < maxOffset && x.Builder.GetTokenType() != tokenType do
-            x.Advance()
+            x.AdvanceLexer()
 
     member x.ProcessLongIdentifier(lid: Ident list) =
         match lid with
@@ -99,7 +99,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
             x.Done(last.idRange, mark, ElementType.LONG_IDENTIFIER)
 
     member x.FinishFile(mark, fileType) =
-        while not x.Eof do x.Advance()
+        while not x.Eof do x.AdvanceLexer()
         x.Done(mark, fileType)
         let fsFile = x.GetTree() :> ITreeNode :?> IFSharpFile
         fsFile
@@ -199,7 +199,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
             if paramsInBraces then
                 range |> x.GetEndOffset |> x.AdvanceToTokenOrOffset FSharpTokenType.GREATER
                 if x.Builder.GetTokenType() == FSharpTokenType.GREATER then
-                    x.Advance()
+                    x.AdvanceLexer()
             x.Done(mark, ElementType.TYPE_PARAMETER_OF_TYPE_LIST)
         | [] -> ()
 
@@ -313,7 +313,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
             if isNotNull caseElementType then
                 x.MarkToken(caseElementType)
 
-            x.Advance()
+            x.AdvanceLexer()
 
         x.Done(idMark, ElementType.ACTIVE_PATTERN_ID)
 
