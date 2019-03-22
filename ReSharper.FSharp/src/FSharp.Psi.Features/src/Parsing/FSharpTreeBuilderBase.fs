@@ -365,9 +365,12 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
 
             x.Done(range, mark, ElementType.NAMED_TYPE_EXPRESSION)
 
-        | SynType.Tuple (types,_)
-        | SynType.StructTuple (types,_) ->
+        | SynType.Tuple (_,types,_) ->
             for _, t in types do
+                x.ProcessSynType(t)
+
+        | SynType.AnonRecd(_, fields, _) ->
+            for _, t in fields do
                 x.ProcessSynType(t)
 
         | SynType.StaticConstantNamed(t1,t2,_)

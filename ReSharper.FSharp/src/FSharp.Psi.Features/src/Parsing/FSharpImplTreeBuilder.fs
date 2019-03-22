@@ -290,8 +290,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                     x.ProcessPat(pat, isLocal, false)
                 ElementType.ANDS_PAT
 
-            | SynPat.Tuple (pats, _)
-            | SynPat.StructTuple (pats, _)
+            | SynPat.Tuple (_, pats, _)
             | SynPat.ArrayOrList (_, pats, _) ->
                 for pat in pats do
                     x.ProcessPat(pat, isLocal, false)
@@ -381,8 +380,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
             x.ProcessLocalExpression expr
             x.ProcessSynType synType
 
-        | SynExpr.Tuple(exprs,_,range)
-        | SynExpr.StructTuple(exprs,_,range) ->
+        | SynExpr.Tuple(_, exprs,_,range) ->
             x.MarkListExpr(exprs, range, ElementType.TUPLE_EXPR)
 
         | SynExpr.ArrayOrList(_,exprs,range) ->
@@ -463,7 +461,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
             for case in cases do
                 x.ProcessMatchClause case
 
-        | SynExpr.Match(_,expr,cases,_,_) ->
+        | SynExpr.Match(_,expr,cases,_) ->
             x.ProcessLocalExpression expr
             for case in cases do
                 x.ProcessMatchClause case
