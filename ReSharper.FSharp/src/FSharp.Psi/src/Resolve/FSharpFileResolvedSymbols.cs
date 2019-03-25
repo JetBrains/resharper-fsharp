@@ -10,6 +10,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Files;
+using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Text;
 using JetBrains.Util;
@@ -22,7 +23,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
   public class FSharpFileResolvedSymbols : IFSharpFileResolvedSymbols
   {
     private const string OpName = "FSharpFileResolvedSymbols";
-    
+
     private ResolvedSymbols mySymbols;
     private readonly object myLock = new object();
 
@@ -95,6 +96,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         return ResolvedSymbols.Empty;
 
       var document = SourceFile.Document;
+      var lexer = fsFile.CachingLexer;
       var buffer = document.Buffer;
       var resolvedSymbols = new ResolvedSymbols(symbolUses.Length);
       foreach (var symbolUse in symbolUses)
@@ -126,7 +128,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
             // visualfsharp#3943, visualfsharp#3933
             if (mfvLogicalName != StandardMemberNames.Constructor &&
-                !(fsFile.FindTokenAt(new TreeOffset(endOffset - 1)) is FSharpIdentifierToken || mfv.IsActivePattern))
+                !(lexer.FindTokenAt(endOffset - 1) && (lexer.TokenType?.IsIdentifier ?? false) || mfv.IsActivePattern))
               continue;
 
             if (mfvLogicalName == "Invoke" && (mfv.DeclaringEntity?.Value?.IsDelegate ?? false))
@@ -165,13 +167,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
           else
           {
             // workaround for compiler generated symbols (e.g. fields auto-properties)
-            if (!(fsFile.FindTokenAt(new TreeOffset(endOffset - 1)) is FSharpIdentifierToken))
+            if (!(lexer.FindTokenAt(endOffset - 1) && (lexer.TokenType?.IsIdentifier ?? false)))
               continue;
           }
 
           var textRange = mfv != null
             ? new TextRange(startOffset, endOffset)
-            : FixRange(startOffset, endOffset, null, buffer, fsFile);
+            : FixRange(startOffset, endOffset, null, buffer, lexer);
           startOffset = textRange.StartOffset;
 
           resolvedSymbols.Declarations[startOffset] = new FSharpResolvedSymbolUse(symbolUse, textRange);
@@ -184,7 +186,32 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
               mfv != null && mfv.IsProperty && buffer[endOffset - 1] == ']')
             continue;
 
-          var nameRange = FixRange(startOffset, endOffset, mfv?.LogicalName, buffer, fsFile);
+          var entity =
+            symbol as FSharpEntity ??
+            (mfv != null && mfv.IsConstructor ? mfv.DeclaringEntity?.Value : null);
+
+          // we need `foo` in
+          // inherit mod.foo<bar.baz>()
+          if (entity != null && !entity.GenericParameters.IsEmpty())
+          {
+            if (lexer.FindTokenAt(endOffset - 1) && lexer.TokenType == FSharpTokenType.GREATER)
+            {
+              while (lexer.TokenType != null && lexer.TokenStart >= startOffset &&
+                     lexer.TokenType != FSharpTokenType.LESS)
+                lexer.Advance(-1);
+              if (lexer.TokenType == FSharpTokenType.LESS)
+              {
+                lexer.Advance(-1);
+                if (lexer.TokenType != null)
+                {
+                  startOffset = lexer.TokenStart;
+                  endOffset = lexer.TokenEnd;
+                }
+              }
+            }
+          }
+
+          var nameRange = FixRange(startOffset, endOffset, mfv?.LogicalName, buffer, lexer);
           startOffset = nameRange.StartOffset;
 
           // Type parameters always reported with ItemOccurence.UseInType, even in declarations.
@@ -193,7 +220,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
           // workaround for implicit type usages (e.g. in members with optional params), visualfsharp#3933
           if (symbol is FSharpEntity &&
-              !(fsFile.FindTokenAt(new TreeOffset(nameRange.EndOffset - 1)) is FSharpIdentifierToken))
+              !(lexer.FindTokenAt(nameRange.EndOffset - 1) && (lexer.TokenType?.IsIdentifier ?? false)))
             continue;
 
           if (!resolvedSymbols.Declarations.ContainsKey(startOffset))
@@ -207,7 +234,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     }
 
     private TextRange FixRange(int startOffset, int endOffset, [CanBeNull] string logicalName, IBuffer buffer,
-      IFSharpFile fsFile)
+      CachingLexer lexer)
     {
       // todo: remove when visualfsharp#3920 is implemented
 
@@ -226,10 +253,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
           return new TextRange(startOffset, endOffset);
 
         // todo: use lexer buffer
-        var token = fsFile.FindTokenAt(new TreeOffset(endOffset - 1));
-        if (token != null)
+        if (lexer.FindTokenAt(endOffset - 1) && lexer.TokenType is TokenNodeType tokenType)
         {
-          var opText = token.GetTokenType() == FSharpTokenType.SYMBOLIC_OP ? sourceName : logicalName;
+          var opText = tokenType == FSharpTokenType.SYMBOLIC_OP ? sourceName : logicalName;
           return new TextRange(endOffset - opText.Length, endOffset);
         }
       }
