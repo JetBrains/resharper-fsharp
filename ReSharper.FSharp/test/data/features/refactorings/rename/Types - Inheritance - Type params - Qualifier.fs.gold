@@ -1,0 +1,13 @@
+﻿namespace Ns
+
+type Base<'T>() =
+    class
+    end
+
+module zzz =
+    type Bar =
+        class
+        end
+
+type Derived() =
+    inherit Base<zzz.Bar>()

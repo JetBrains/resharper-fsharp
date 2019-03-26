@@ -1,0 +1,13 @@
+﻿namespace Ns
+
+type Base<'T>() =
+    class
+    end
+
+module Module =
+    type zzz =
+        class
+        end
+
+type Derived() =
+    inherit Base<Module.zzz>()

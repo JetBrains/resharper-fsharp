@@ -1,0 +1,8 @@
+﻿namespace Ns
+
+type zzz<'T>() =
+    class
+    end
+
+type Derived() =
+    inherit zzz<int>()
