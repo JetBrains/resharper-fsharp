@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.Application.Threading;
 using JetBrains.Metadata.Reader.API;
+using JetBrains.ReSharper.Feature.Services.TypingAssist;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Checker;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
@@ -196,10 +197,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
           {
             if (lexer.FindTokenAt(endOffset - 1) && lexer.TokenType == FSharpTokenType.GREATER)
             {
-              while (lexer.TokenType != null && lexer.TokenStart >= startOffset &&
-                     lexer.TokenType != FSharpTokenType.LESS)
-                lexer.Advance(-1);
-              if (lexer.TokenType == FSharpTokenType.LESS)
+              if (new ParenMatcher().FindMatchingBracket(lexer) && lexer.TokenStart >= startOffset)
               {
                 lexer.Advance(-1);
                 if (lexer.TokenType != null)
@@ -278,6 +276,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       {
         Declarations = new CompactMap<int, FSharpResolvedSymbolUse>(symbolUsesCount / 4);
         Uses = new CompactMap<int, FSharpResolvedSymbolUse>(symbolUsesCount);
+      }
+    }
+
+    private class ParenMatcher : BracketMatcher
+    {
+      private static readonly Pair<TokenNodeType, TokenNodeType>[] ourParens =
+        {new Pair<TokenNodeType, TokenNodeType>(FSharpTokenType.LESS, FSharpTokenType.GREATER)};
+
+      public ParenMatcher() : base(ourParens)
+      {
       }
     }
   }

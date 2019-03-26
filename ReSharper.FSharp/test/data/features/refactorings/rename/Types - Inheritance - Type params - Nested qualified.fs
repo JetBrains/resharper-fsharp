@@ -10,4 +10,4 @@ module Module =
         end
 
 type Derived() =
-    inherit Base<Module.Bar{caret}>()
+    inherit Base<Base<Module.Bar{caret}>>()
