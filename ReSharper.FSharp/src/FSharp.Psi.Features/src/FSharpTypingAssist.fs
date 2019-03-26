@@ -128,14 +128,13 @@ type FSharpTypingAssist
     let leftToRightBracket =
         [| '(', ')'
            '[', ']'
-           '{', '}'  |]
+           '{', '}' |]
         |> dict
         
     let rightToLeftBracket =
         leftToRightBracket
         |> Seq.map(fun (KeyValue (key, value)) -> value, key)
-        |> dict
-        
+        |> dict        
         
     let bracketToTokenType =
         [| '(', FSharpTokenType.LPAREN
@@ -143,8 +142,7 @@ type FSharpTypingAssist
            '[', FSharpTokenType.LBRACK
            ']', FSharpTokenType.RBRACK
            '{', FSharpTokenType.LBRACE
-           '}', FSharpTokenType.RBRACE
-        |]
+           '}', FSharpTokenType.RBRACE |]
         |> dict
 
     let getIndentSize (textControl: ITextControl) =
@@ -948,14 +946,16 @@ type FSharpTypingAssist
     member x.HandleSurroundTyping(typingContext, lChar, rChar, lTokenType, rTokenType, shouldNotSurround) =
         base.HandleSurroundTyping(typingContext, lChar, rChar, lTokenType, rTokenType, shouldNotSurround)
         
-    member x.TrySurroundWithBraces(typingContext: ITypingContext , typedBracket, typedBracketIsLeft, matchingBrackets: IDictionary<_, _>) =
-        let mutable secondBrace = Unchecked.defaultof<_>
-        match matchingBrackets.TryGetValue(typedBracket, &secondBrace) with
-        | true ->
-            if not typedBracketIsLeft
-            then x.HandleSurroundTyping(typingContext, secondBrace, typedBracket, bracketToTokenType.[secondBrace], bracketToTokenType.[typedBracket], fun _ -> false)
-            else x.HandleSurroundTyping(typingContext, typedBracket, secondBrace, bracketToTokenType.[typedBracket], bracketToTokenType.[secondBrace], fun _ -> false)                                             
-        | _ -> true            
+    member x.TrySurroundWithBraces(typingContext, typedBracket, typedBracketIsLeft,
+                                   matchingBrackets: IDictionary<_, _>) =
+        let mutable secondBracket = Unchecked.defaultof<_>
+        match matchingBrackets.TryGetValue(typedBracket, &secondBracket) with
+        | false -> true
+        | _ ->
+
+        let lBrace, rBrace = if typedBracketIsLeft then typedBracket, secondBracket else secondBracket, typedBracket  
+        x.HandleSurroundTyping(typingContext, lBrace, rBrace, bracketToTokenType.[lBrace], bracketToTokenType.[rBrace],
+                               fun _ -> false)
     
     member x.HandleLeftBracket(context: ITypingContext) =
         this.HandleLeftBracketTyped
