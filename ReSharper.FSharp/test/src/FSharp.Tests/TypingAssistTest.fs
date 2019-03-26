@@ -238,6 +238,13 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``At 08 - Inside empty typed quotations and spaces 06``() = x.DoNamedTest()
     [<Test>] member x.``At 09 - Inside empty typed quotations and spaces 07``() = x.DoNamedTest()
     [<Test>] member x.``At 10 - Inside empty typed quotations and spaces 08``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Brackets - Surround 01``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Surround 02``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Surround 03``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Surround 04``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Surround 05``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Surround 06``() = x.DoNamedTest()
 
 [<FSharpTest>]
 type LineIndentsTest() =

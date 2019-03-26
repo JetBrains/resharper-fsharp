@@ -124,6 +124,28 @@ type FSharpTypingAssist
            '}', (FSharpTokenType.LBRACE, FSharpTokenType.RBRACE)
            '>', (FSharpTokenType.LESS,   FSharpTokenType.GREATER) |]
         |> dict
+        
+    let leftToRightBracket =
+        [| '(', ')'
+           '[', ']'
+           '{', '}'  |]
+        |> dict
+        
+    let rightToLeftBracket =
+        leftToRightBracket
+        |> Seq.map(fun (KeyValue (key, value)) -> value, key)
+        |> dict
+        
+        
+    let bracketToTokenType =
+        [| '(', FSharpTokenType.LPAREN
+           ')', FSharpTokenType.RPAREN
+           '[', FSharpTokenType.LBRACK
+           ']', FSharpTokenType.RBRACK
+           '{', FSharpTokenType.LBRACE
+           '}', FSharpTokenType.RBRACE
+        |]
+        |> dict
 
     let getIndentSize (textControl: ITextControl) =
         let document = textControl.Document
@@ -923,19 +945,31 @@ type FSharpTypingAssist
 
         else false
 
+    member x.HandleSurroundTyping(typingContext, lChar, rChar, lTokenType, rTokenType, shouldNotSurround) =
+        base.HandleSurroundTyping(typingContext, lChar, rChar, lTokenType, rTokenType, shouldNotSurround)
+        
+    member x.TrySurroundWithBraces(typingContext: ITypingContext , typedBracket, typedBracketIsLeft, matchingBrackets: IDictionary<_, _>) =
+        let mutable secondBrace = Unchecked.defaultof<_>
+        match matchingBrackets.TryGetValue(typedBracket, &secondBrace) with
+        | true ->
+            if not typedBracketIsLeft
+            then x.HandleSurroundTyping(typingContext, secondBrace, typedBracket, bracketToTokenType.[secondBrace], bracketToTokenType.[typedBracket], fun _ -> false)
+            else x.HandleSurroundTyping(typingContext, typedBracket, secondBrace, bracketToTokenType.[typedBracket], bracketToTokenType.[secondBrace], fun _ -> false)                                             
+        | _ -> true            
+    
     member x.HandleLeftBracket(context: ITypingContext) =
         this.HandleLeftBracketTyped
             (context,
              (fun lexer -> leftBrackets.Contains(lexer.TokenType)),
              (fun _ -> FSharpBracketMatcher() :> _),
-             (fun _ -> false),
+             (fun _ -> x.TrySurroundWithBraces(context, context.Char, true, leftToRightBracket)),    
              (fun tokenType _ -> tokensSuitableForRightBracket.Contains(tokenType)),
              (fun _ -> rightBracketsText.[context.Char]))
 
     member x.HandleRightBracket(context: ITypingContext) =
         this.HandleRightBracketTyped
             (context,
-             (fun _ -> false),
+             (fun _ -> x.TrySurroundWithBraces(context, context.Char, false, rightToLeftBracket)),
              (fun tokenType -> tokenType == FSharpTokenType.WHITESPACE),
              (fun lexer -> x.NeedSkipCloseBracket(context.TextControl, lexer, context.Char)))
 
