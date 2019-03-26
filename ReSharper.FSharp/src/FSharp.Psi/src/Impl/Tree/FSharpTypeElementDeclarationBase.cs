@@ -31,17 +31,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override FSharpSymbol GetFSharpSymbol()
     {
       var symbol = base.GetFSharpSymbol();
-      if (symbol is FSharpEntity || symbol is FSharpUnionCase) return symbol;
+      if (symbol is FSharpEntity || symbol is FSharpUnionCase)
+        return symbol;
 
-      if (!(symbol is FSharpMemberOrFunctionOrValue mfv))
-        return null;
-
-      return mfv.IsConstructor || mfv.IsImplicitConstructor ? mfv.DeclaringEntity?.Value : null;
+      return symbol is FSharpMemberOrFunctionOrValue mfv && (mfv.IsConstructor || mfv.IsImplicitConstructor)
+        ? mfv.DeclaringEntity?.Value
+        : null;
     }
 
     [NotNull]
-    private IList<ITypeParameter> TypeParameters => ((ITypeDeclaration) this).DeclaredElement?.TypeParameters ??
-                                                    EmptyList<ITypeParameter>.Instance;
+    private IList<ITypeParameter> TypeParameters =>
+      ((ITypeDeclaration) this).DeclaredElement?.TypeParameters ??
+      EmptyList<ITypeParameter>.Instance;
 
     public virtual IReadOnlyList<ITypeMemberDeclaration> MemberDeclarations
     {
@@ -103,7 +104,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         return result.ReadOnlyList();
       }
     }
-    
+
     public virtual PartKind TypePartKind => PartKind.Class;
   }
 }

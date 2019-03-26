@@ -10,18 +10,19 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  internal class UnionCasePart : FSharpClassLikePart<INestedTypeUnionCaseDeclaration>, Class.IClassPart, IRepresentationAccessRightsOwner
+  internal class UnionCasePart : FSharpClassLikePart<INestedTypeUnionCaseDeclaration>, Class.IClassPart,
+    IRepresentationAccessRightsOwner
   {
     public UnionCasePart([NotNull] INestedTypeUnionCaseDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, ModifiersUtil.GetDecoration(declaration),
-        TreeNodeCollection<ITypeParameterOfTypeDeclaration>.Empty, cacheBuilder)
-    {
-      var unionShortName = declaration.GetContainingNode<IUnionDeclaration>()?.CompiledName;
+        TreeNodeCollection<ITypeParameterOfTypeDeclaration>.Empty, cacheBuilder) =>
       ExtendsListShortNames =
-        unionShortName != null
-          ? new[] {cacheBuilder.Intern(unionShortName)}
+        declaration.GetContainingNode<IUnionDeclaration>()?.CompiledName is var unionName && unionName != null
+          ? new[] {cacheBuilder.Intern(unionName)}
           : EmptyArray<string>.Instance;
-    }
+
+    public UnionCasePart(IReader reader) : base(reader) =>
+      ExtendsListShortNames = reader.ReadStringArray();
 
     protected override void Write(IWriter writer)
     {
@@ -31,32 +32,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public override string[] ExtendsListShortNames { get; }
 
-    public override IDeclaredType GetBaseClassType()
-    {
-      var typeElement = TypeElement?.GetContainingType();
-      return typeElement != null
+    public IDeclaredType GetBaseClassType() =>
+      TypeElement?.GetContainingType() is ITypeElement typeElement
         ? TypeFactory.CreateType(typeElement)
         : null;
-    }
 
-    public UnionCasePart(IReader reader) : base(reader)
-    {
-      ExtendsListShortNames = reader.ReadStringArray();
-    }
+    public override IEnumerable<IDeclaredType> GetSuperTypes() =>
+      GetBaseClassType() is IDeclaredType baseType
+        ? new[] {baseType}
+        : EmptyList<IDeclaredType>.InstanceList;
 
-    public override IEnumerable<IDeclaredType> GetSuperTypes()
-    {
-      var baseType = GetBaseClassType();
-      if (baseType == null)
-        return EmptyList<IDeclaredType>.Instance;
-
-      return new[] {baseType};
-    }
-
-    public override TypeElement CreateTypeElement()
-    {
-      return new FSharpNestedTypeUnionCase(this);
-    }
+    public override TypeElement CreateTypeElement() =>
+      new FSharpNestedTypeUnionCase(this);
 
     public override MemberDecoration Modifiers =>
       MemberDecoration.FromModifiers(

@@ -4,7 +4,7 @@ using JetBrains.Serialization;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
-  [PolymorphicMarshaller(17)]
+  [PolymorphicMarshaller(18)]
   public class FSharpCacheVersion
   {
     [UsedImplicitly] public static UnsafeReader.ReadDelegate<object> ReadDelegate = r => new FSharpCacheVersion();

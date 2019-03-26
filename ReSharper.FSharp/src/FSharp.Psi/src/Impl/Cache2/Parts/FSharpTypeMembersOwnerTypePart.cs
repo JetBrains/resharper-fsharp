@@ -39,10 +39,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       ExtendsListShortNames = extendListShortNames.ToArray();
     }
 
-    protected FSharpTypeMembersOwnerTypePart(IReader reader) : base(reader)
-    {
+    protected FSharpTypeMembersOwnerTypePart(IReader reader) : base(reader) =>
       ExtendsListShortNames = reader.ReadStringArray();
-    }
 
     protected override void Write(IWriter writer)
     {
@@ -59,10 +57,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       // RIDER-10263
       (HasPublicDefaultCtor ? MemberPresenceFlag.PUBLIC_DEFAULT_CTOR : MemberPresenceFlag.NONE);
 
-    public override IDeclaredType GetBaseClassType() =>
+    public virtual IDeclaredType GetBaseClassType() =>
       ExtendsListShortNames.IsEmpty()
         ? null
-        : base.GetBaseClassType();
+        : GetDeclaration()?.BaseClassType ?? GetPsiModule().GetPredefinedType().Object;
 
     public override IEnumerable<IDeclaredType> GetSuperTypes()
     {

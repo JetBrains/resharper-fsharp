@@ -40,11 +40,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       return result.ResultingList();
     }
 
-    public virtual IEnumerable<IDeclaredType> GetSuperTypes() =>
-      GetDeclaration()?.SuperTypes ?? EmptyList<IDeclaredType>.Instance;
-
-    public virtual IDeclaredType GetBaseClassType() =>
-      GetDeclaration()?.BaseClassType ?? GetPsiModule().GetPredefinedType().Object;
+    public abstract IEnumerable<IDeclaredType> GetSuperTypes();
 
     public bool HasPublicDefaultCtor
     {

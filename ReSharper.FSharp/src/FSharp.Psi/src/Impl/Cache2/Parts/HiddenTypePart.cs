@@ -5,18 +5,15 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  /// <summary>
   /// Used for type abbreviations and abstract types
   /// todo: check cases:
   ///   * single union case without bar (parsed as abbreviation)
   ///   * units of measure
   ///   * provided types (cache them in assembly signature?)
-  /// </summary>
-  internal class HiddenTypePart : FSharpClassLikePart<IFSharpTypeDeclaration>, Class.IClassPart
+  internal class HiddenTypePart : FSharpTypeMembersOwnerTypePart, Class.IClassPart
   {
     public HiddenTypePart([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
-      : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifiers, declaration.AttributesEnumerable),
-        declaration.TypeParameters, cacheBuilder)
+      : base(declaration, cacheBuilder)
     {
     }
 
@@ -27,7 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public override TypeElement CreateTypeElement() =>
       new FSharpClass(this);
 
-    public MemberPresenceFlag GetMemberPresenceFlag() =>
+    public override MemberPresenceFlag GetMemberPresenceFlag() =>
       MemberPresenceFlag.NONE;
 
     public override MemberDecoration Modifiers =>

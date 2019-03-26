@@ -17,8 +17,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       : base(declaration, cacheBuilder.Intern(declaration.CompiledName), memberDecoration, typeParameters.Count,
         cacheBuilder)
     {
-      var parameters = declaration.TypeParameters;
-      if (parameters.Count == 0)
+      if (typeParameters.Count == 0)
       {
         myTypeParameterNames = EmptyArray<string>.Instance;
         return;
@@ -50,11 +49,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
         writer.WriteString(parameterName);
     }
 
-    public override IDeclaration GetTypeParameterDeclaration(int index)
-    {
-      var declaration = GetDeclaration() as IFSharpTypeDeclaration;
-      return index < TypeParameterNumber ? declaration?.TypeParameters[index] : null;
-    }
+    public override IDeclaration GetTypeParameterDeclaration(int index) =>
+      index < TypeParameterNumber && GetDeclaration() is IFSharpTypeDeclaration declaration
+        ? declaration.TypeParameters[index]
+        : null;
 
     public override string GetTypeParameterName(int index) =>
       myTypeParameterNames[index];

@@ -24,14 +24,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
       Modifiers = memberDecoration;
 
-      var attributes = declaration.GetAttributes();
       var attrNames = new FrugalLocalHashSet<string>();
-
-      foreach (var attr in attributes)
+      foreach (var attr in declaration.GetAttributes())
         attrNames.Add(cacheBuilder.Intern(attr.LongIdentifier?.Name.GetAttributeShortName()));
       AttributeClassNames = attrNames.ToArray();
 
-      if (!attributes.Any(a => a.ShortNameEquals("Extension")))
+      if (!attrNames.Contains("Extension"))
         return;
 
       var methods = new LocalList<ExtensionMethodInfo>();
@@ -56,11 +54,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       var result = HybridCollection<IMethod>.Empty;
       foreach (var memberDeclaration in declaration.MemberDeclarations)
         if (info.ShortName == memberDeclaration.DeclaredName &&
-            info.Hash == memberDeclaration.GetTreeStartOffset().Offset)
-        {
-          if (memberDeclaration.DeclaredElement is IMethod method)
-            result = result.Add(method);
-        }
+            info.Hash == memberDeclaration.GetTreeStartOffset().Offset &&
+            memberDeclaration.DeclaredElement is IMethod method)
+          result = result.Add(method);
 
       return result;
     }
@@ -99,22 +95,31 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public override MemberDecoration Modifiers { get; }
 
     /// All F# elements currently considered partial.
-    /// This is as an easy way to support signatures, type extensions and virtual members. 
+    /// This is an easy way to support signatures, intrinsic type extensions and virtual members. 
     public override bool CanBePartial => true;
 
     public override IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName)
     {
+      if (AttributeClassNames.IsEmpty())
+        return EmptyList<IAttributeInstance>.Instance;
+
       if (!((GetDeclaration() as IFSharpTypeDeclaration)?.GetFSharpSymbol() is FSharpEntity entity))
         return EmptyList<IAttributeInstance>.Instance;
 
-      var attrs = new List<IAttributeInstance>();
-      foreach (var attr in entity.Attributes)
-        attrs.Add(new FSharpAttributeInstance(attr, GetPsiModule()));
+      var psiModule = GetPsiModule();
+      var entityAttrs = entity.Attributes;
+      var attrs = new IAttributeInstance[entityAttrs.Count];
+      for (var i = 0; i < attrs.Length; i++)
+        attrs[i] = new FSharpAttributeInstance(entityAttrs[i], psiModule);
+
       return attrs;
     }
 
     public override bool HasAttributeInstance(IClrTypeName clrTypeName)
     {
+      if (AttributeClassNames.Contains(clrTypeName.ShortName))
+        return false;
+
       // todo: get entity without getting declaration 
       var entity = (GetDeclaration() as IFSharpTypeDeclaration)?.GetFSharpSymbol() as FSharpEntity;
       return entity?.Attributes.HasAttributeInstance(clrTypeName.FullName) ?? false;
