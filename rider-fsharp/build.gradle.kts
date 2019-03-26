@@ -207,10 +207,6 @@ tasks {
         dependsOn(generateFSharpLexer, "rdgen")
     }
 
-    getByName("buildSearchableOptions") {
-        enabled = false
-    }
-
     withType<Test> {
         useTestNG()
         testLogging {
