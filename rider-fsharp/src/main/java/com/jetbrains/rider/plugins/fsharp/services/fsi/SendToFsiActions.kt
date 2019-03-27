@@ -1,6 +1,7 @@
 package com.jetbrains.rider.plugins.fsharp.services.fsi
 
 import com.intellij.codeInsight.intention.BaseElementAtCaretIntentionAction
+import com.intellij.codeInsight.intention.HighPriorityAction
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
@@ -58,10 +59,10 @@ open class SendToFsiActionBase(private val debug: Boolean, private val sendLineT
     }
 }
 
-class SendLineToFsiIntentionAction : SendLineToFsiIntentionActionBase(false, Fsi.sendLineText)
+class SendLineToFsiIntentionAction : SendLineToFsiIntentionActionBase(false, Fsi.sendLineText), HighPriorityAction
 class DebugLineInFsiIntentionAction : SendLineToFsiIntentionActionBase(true, Fsi.debugLineText)
 
-class SendSelectionToFsiIntentionAction : SendSelectionToFsiIntentionActionBase(false, Fsi.sendSelectionText)
+class SendSelectionToFsiIntentionAction : SendSelectionToFsiIntentionActionBase(false, Fsi.sendSelectionText), HighPriorityAction
 class DebugSelectionInFsiIntentionAction : SendSelectionToFsiIntentionActionBase(true, Fsi.debugSelectionText)
 
 open class SendLineToFsiIntentionActionBase(debug: Boolean, private val titleText: String) : BaseSendToFsiIntentionAction(debug) {
