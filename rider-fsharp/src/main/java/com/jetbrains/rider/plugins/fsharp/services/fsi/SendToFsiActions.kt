@@ -2,9 +2,7 @@ package com.jetbrains.rider.plugins.fsharp.services.fsi
 
 import com.intellij.codeInsight.intention.BaseElementAtCaretIntentionAction
 import com.intellij.codeInsight.intention.HighPriorityAction
-import com.intellij.openapi.actionSystem.AnAction
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.CommonDataKeys
+import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
@@ -13,6 +11,9 @@ import com.intellij.psi.PsiElement
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguageBase
 
 object Fsi {
+    const val sendToFsiActionId = "Rider.Plugins.FSharp.SendToFsi"
+    const val debugInFsiActionId = "Rider.Plugins.FSharp.DebugInFsi"
+
     const val sendLineText = "Send Line to F# Interactive"
     const val debugLineText = "Debug Line in F# Interactive"
 
@@ -59,25 +60,26 @@ open class SendToFsiActionBase(private val debug: Boolean, private val sendLineT
     }
 }
 
-class SendLineToFsiIntentionAction : SendLineToFsiIntentionActionBase(false, Fsi.sendLineText), HighPriorityAction
-class DebugLineInFsiIntentionAction : SendLineToFsiIntentionActionBase(true, Fsi.debugLineText)
+class SendLineToFsiIntentionAction : SendLineToFsiIntentionActionBase(false, Fsi.sendLineText, Fsi.sendToFsiActionId), HighPriorityAction
+class DebugLineInFsiIntentionAction : SendLineToFsiIntentionActionBase(true, Fsi.debugLineText, Fsi.debugInFsiActionId)
 
-class SendSelectionToFsiIntentionAction : SendSelectionToFsiIntentionActionBase(false, Fsi.sendSelectionText), HighPriorityAction
-class DebugSelectionInFsiIntentionAction : SendSelectionToFsiIntentionActionBase(true, Fsi.debugSelectionText)
+class SendSelectionToFsiIntentionAction : SendSelectionToFsiIntentionActionBase(false, Fsi.sendSelectionText, Fsi.sendToFsiActionId), HighPriorityAction
+class DebugSelectionInFsiIntentionAction : SendSelectionToFsiIntentionActionBase(true, Fsi.debugSelectionText, Fsi.debugInFsiActionId)
 
-open class SendLineToFsiIntentionActionBase(debug: Boolean, private val titleText: String) : BaseSendToFsiIntentionAction(debug) {
+open class SendLineToFsiIntentionActionBase(debug: Boolean, private val titleText: String, actionId: String) : BaseSendToFsiIntentionAction(debug, actionId) {
+
     override fun getText() = titleText
     override fun isAvailable(project: Project, editor: Editor?, file: PsiElement) =
             super.isAvailable(project, editor, file) && !editor!!.selectionModel.hasSelection()
 }
 
-open class SendSelectionToFsiIntentionActionBase(debug: Boolean, private val titleText: String) : BaseSendToFsiIntentionAction(debug) {
+open class SendSelectionToFsiIntentionActionBase(debug: Boolean, private val titleText: String, actionId: String) : BaseSendToFsiIntentionAction(debug, actionId) {
     override fun getText() = titleText
     override fun isAvailable(project: Project, editor: Editor?, file: PsiElement) =
             super.isAvailable(project, editor, file) && editor!!.selectionModel.hasSelection()
 }
 
-abstract class BaseSendToFsiIntentionAction(private val debug: Boolean) : BaseElementAtCaretIntentionAction() {
+abstract class BaseSendToFsiIntentionAction(private val debug: Boolean, private val actionId: String) : BaseElementAtCaretIntentionAction(), ShortcutProvider {
     override fun getFamilyName(): String = "Send to F# Interactive"
     override fun startInWriteAction() = false
 
@@ -87,4 +89,7 @@ abstract class BaseSendToFsiIntentionAction(private val debug: Boolean) : BaseEl
     override fun invoke(project: Project, editor: Editor, element: PsiElement) {
         ServiceManager.getService(project, FsiHost::class.java).sendToFsi(editor, element.containingFile, debug)
     }
+
+    override fun getShortcut() =
+            ActionManager.getInstance().getAction(actionId)?.shortcutSet
 }
