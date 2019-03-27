@@ -37,13 +37,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     protected IList<FSharpAttribute> Attributes =>
       Mfv?.Attributes ?? EmptyList<FSharpAttribute>.Instance;
 
-    public override IList<IAttributeInstance> GetAttributeInstances(bool inherit) =>
+    public override IList<IAttributeInstance> GetAttributeInstances(AttributesSource attributesSource) =>
       Attributes.ToAttributeInstances(Module);
 
-    public override IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName, bool inherit) =>
+    public override IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName, AttributesSource attributesSource) =>
       Attributes.GetAttributes(clrName).ToAttributeInstances(Module);
 
-    public override bool HasAttributeInstance(IClrTypeName clrName, bool inherit) =>
+    public override bool HasAttributeInstance(IClrTypeName clrName, AttributesSource attributesSource) =>
       Attributes.HasAttributeInstance(clrName.FullName);
 
     public InvocableSignature GetSignature(ISubstitution substitution) => new InvocableSignature(this, substitution);

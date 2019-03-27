@@ -22,10 +22,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public bool HasDeclarationsIn(IPsiSourceFile sourceFile) => false;
     public HybridCollection<IPsiSourceFile> GetSourceFiles() => HybridCollection<IPsiSourceFile>.Empty;
 
-    public bool HasAttributeInstance(IClrTypeName clrName, bool inherit) => false;
-    public IList<IAttributeInstance> GetAttributeInstances(bool inherit) => EmptyList<IAttributeInstance>.Instance;
+    public bool HasAttributeInstance(IClrTypeName clrName, AttributesSource attributesSource) => false;
+    public IList<IAttributeInstance> GetAttributeInstances(AttributesSource attributesSource) => EmptyList<IAttributeInstance>.Instance;
 
-    public IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName, bool inherit) =>
+    public IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName, AttributesSource attributesSource) =>
       EmptyList<IAttributeInstance>.Instance;
 
     public XmlNode GetXMLDoc(bool inherit) => null;

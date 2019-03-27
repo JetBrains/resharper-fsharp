@@ -18,13 +18,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       Module = module;
     }
 
-    public IList<IAttributeInstance> GetAttributeInstances(bool inherit) =>
+    public IList<IAttributeInstance> GetAttributeInstances(AttributesSource attributesSource) =>
       Attrs.ToAttributeInstances(Module);
 
-    public IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName, bool inherit) =>
+    public IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName, AttributesSource attributesSource) =>
       Attrs.GetAttributes(clrName).ToAttributeInstances(Module);
 
-    public bool HasAttributeInstance(IClrTypeName clrName, bool inherit) =>
+    public bool HasAttributeInstance(IClrTypeName clrName, AttributesSource attributesSource) =>
       Attrs.HasAttributeInstance(clrName);
   }
 }
