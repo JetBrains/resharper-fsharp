@@ -67,7 +67,6 @@ class SendSelectionToFsiIntentionAction : SendSelectionToFsiIntentionActionBase(
 class DebugSelectionInFsiIntentionAction : SendSelectionToFsiIntentionActionBase(true, Fsi.debugSelectionText, Fsi.debugInFsiActionId)
 
 open class SendLineToFsiIntentionActionBase(debug: Boolean, private val titleText: String, actionId: String) : BaseSendToFsiIntentionAction(debug, actionId) {
-
     override fun getText() = titleText
     override fun isAvailable(project: Project, editor: Editor?, file: PsiElement) =
             super.isAvailable(project, editor, file) && !editor!!.selectionModel.hasSelection()
@@ -80,11 +79,13 @@ open class SendSelectionToFsiIntentionActionBase(debug: Boolean, private val tit
 }
 
 abstract class BaseSendToFsiIntentionAction(private val debug: Boolean, private val actionId: String) : BaseElementAtCaretIntentionAction(), ShortcutProvider {
+    private val isAvailable = !debug || SystemInfo.isWindows
+
     override fun getFamilyName(): String = "Send to F# Interactive"
     override fun startInWriteAction() = false
 
     override fun isAvailable(project: Project, editor: Editor?, file: PsiElement) =
-            file.language is FSharpLanguageBase && editor?.caretModel?.caretCount == 1
+            isAvailable && file.language is FSharpLanguageBase && editor?.caretModel?.caretCount == 1
 
     override fun invoke(project: Project, editor: Editor, element: PsiElement) {
         ServiceManager.getService(project, FsiHost::class.java).sendToFsi(editor, element.containingFile, debug)
