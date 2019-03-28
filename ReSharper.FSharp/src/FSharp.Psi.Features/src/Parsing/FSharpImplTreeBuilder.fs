@@ -175,7 +175,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                         match headPat with
                         | SynPat.LongIdent(LongIdentWithDots(lid,_),_,typeParamsOpt,memberParams,_,_) ->
                             match lid with
-                            | [id] ->
+                            | [_] ->
                                 match valData with
                                 | SynValData(Some flags,_,selfId) when flags.MemberKind = MemberKind.Constructor ->
                                     x.ProcessParams(memberParams, true, true) // todo: should check isLocal
@@ -185,12 +185,12 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                                     x.MarkOtherExpr(expr)
                                     ElementType.CONSTRUCTOR_DECLARATION
                                 | _ ->
-                                    x.ProcessMemberDeclaration id typeParamsOpt memberParams expr range
+                                    x.ProcessMemberDeclaration typeParamsOpt memberParams expr range
                                     ElementType.MEMBER_DECLARATION
 
-                            | selfId :: id :: _ ->
+                            | selfId :: _ :: _ ->
                                 x.ProcessLocalId selfId
-                                x.ProcessMemberDeclaration id typeParamsOpt memberParams expr range
+                                x.ProcessMemberDeclaration typeParamsOpt memberParams expr range
                                 ElementType.MEMBER_DECLARATION
 
                             | _ -> ElementType.OTHER_TYPE_MEMBER
@@ -205,7 +205,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                         x.ProcessBinding(binding, false)
                     ElementType.LET
 
-                | SynMemberDefn.AbstractSlot(ValSpfn(_,_,typeParams,_,_,_,_,_,_,_,_),_,range) as slot ->
+                | SynMemberDefn.AbstractSlot(ValSpfn(_,_,typeParams,_,_,_,_,_,_,_,_),_,range) ->
                     match typeParams with
                     | SynValTyparDecls(typeParams,_,_) ->
                         x.ProcessTypeParametersOfType typeParams range true
@@ -222,7 +222,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
 
             x.Done(typeMember.Range, mark, memberType)
 
-    member x.ProcessMemberDeclaration id (typeParamsOpt: SynValTyparDecls option) memberParams expr range =
+    member x.ProcessMemberDeclaration (typeParamsOpt: SynValTyparDecls option) memberParams expr range =
         match typeParamsOpt with
         | Some(SynValTyparDecls(typeParams,_,_)) ->
             x.ProcessTypeParametersOfType typeParams range true
