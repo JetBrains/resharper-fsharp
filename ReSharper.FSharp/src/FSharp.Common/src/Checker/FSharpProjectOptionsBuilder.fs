@@ -87,7 +87,8 @@ type FSharpProjectOptionsBuilder
            "--tailcalls-"
            "--fullpaths"
            "--flaterrors"
-           "--highentropyva+" |]
+           "--highentropyva+"
+           "--noconditionalerasure" |]
 
     let unusedValuesWarns =
         [| "--warnon:1182"
