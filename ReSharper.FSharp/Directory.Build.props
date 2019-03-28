@@ -8,10 +8,15 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <FantomasVersion>[2.9.5]</FantomasVersion>
-    <FSharpCompilerServiceVersion>[25.0.5]</FSharpCompilerServiceVersion>
+    <FantomasVersion>[2.9.6]</FantomasVersion>
+    <FSharpCompilerServiceVersion>[27.0.1]</FSharpCompilerServiceVersion>
     <FSharpCoreVersion>[4.5.4]</FSharpCoreVersion>
     <ValueTupleVersion>[4.5.0]</ValueTupleVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)resharper-fsharp.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <Import Project="RiderSdkPackageVersion.props" />
