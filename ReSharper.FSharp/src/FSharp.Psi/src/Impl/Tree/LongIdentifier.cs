@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
+﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
@@ -13,25 +12,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       get
       {
         var identifiers = Identifiers;
-        return identifiers.IsEmpty
-          ? TreeNodeCollection<ITokenNode>.Empty
-          : new TreeNodeCollection<ITokenNode>(identifiers.Take(identifiers.Count - 1).ToArray());
+        if (identifiers.IsEmpty)
+          return identifiers;
+
+        var qualifiersCount = identifiers.Count - 1;
+        var qualifiers = new ITokenNode[qualifiersCount];
+        for (var i = 0; i < qualifiersCount; i++)
+          qualifiers[i] = identifiers[i];
+        return new TreeNodeCollection<ITokenNode>(qualifiers);
       }
     }
 
-    public string QualifiedName
-    {
-      get
-      {
-        var identifiers = Identifiers;
-        return identifiers.IsEmpty
-          ? SharedImplUtil.MISSING_DECLARATION_NAME
-          : identifiers.Select(id => id.GetText().RemoveBackticks()).Join(StringUtil.SDOT);
-      }
-    }
+    public string QualifiedName =>
+      Identifiers is var identifiers && !identifiers.IsEmpty
+        ? identifiers.Select(id => id.GetText().RemoveBackticks()).Join(StringUtil.SDOT)
+        : SharedImplUtil.MISSING_DECLARATION_NAME;
 
     public string Name =>
-      Identifiers.LastOrDefault()?.GetText().RemoveBackticks() ?? 
+      Identifiers.LastOrDefault()?.GetText().RemoveBackticks() ??
       SharedImplUtil.MISSING_DECLARATION_NAME;
 
     public ITokenNode IdentifierToken =>
