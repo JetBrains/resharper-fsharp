@@ -24,6 +24,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
       if (entity.IsDelegate)
         return HighlightingAttributeIds.TYPE_DELEGATE_ATTRIBUTE;
 
+      if (entity.IsFSharpModule)
+        return HighlightingAttributeIds.TYPE_STATIC_CLASS_ATTRIBUTE;
+
       return entity.IsInterface
         ? HighlightingAttributeIds.TYPE_INTERFACE_ATTRIBUTE
         : HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE;
@@ -36,7 +39,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
         return HighlightingAttributeIds.EVENT_IDENTIFIER_ATTRIBUTE;
 
       if (mfv.IsImplicitConstructor || mfv.IsConstructor)
-        return HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE;
+        return mfv.DeclaringEntity?.Value is FSharpEntity declEntity && declEntity.IsValueType
+          ? HighlightingAttributeIds.TYPE_STRUCT_ATTRIBUTE
+          : HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE;
 
       var entity = mfv.DeclaringEntity;
       if (mfv.IsModuleValueOrMember && (entity != null && !entity.Value.IsFSharpModule || mfv.IsExtensionMember))

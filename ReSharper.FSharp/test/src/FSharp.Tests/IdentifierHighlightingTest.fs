@@ -27,3 +27,5 @@ type IdentifierHighlightingTest() =
     [<Test>] member x.``Active pattern decl``() = x.DoNamedTest()
 
     [<Test>] member x.``Delegates``() = x.DoNamedTest()
+
+    [<Test>] member x.``Struct constructor``() = x.DoNamedTest()
