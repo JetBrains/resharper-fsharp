@@ -133,7 +133,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         LQUOTE_UNTYPED,
         LBRACK_BAR,
         LBRACK_LESS,
-        LQUOTE_TYPED);
+        LQUOTE_TYPED,
+        LBRACE_BAR);
 
       RightBraces = new NodeTypeSet(
         RPAREN,
@@ -142,7 +143,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         RQUOTE_UNTYPED,
         BAR_RBRACK,
         RQUOTE_TYPED,
-        GREATER_RBRACK);
+        GREATER_RBRACK,
+        BAR_RBRACE);
 
       Keywords = new NodeTypeSet(
         ABSTRACT,

@@ -47,6 +47,7 @@ type FSharpMatchingBraceContextHighlighter() =
         if token1 == FSharpTokenType.LBRACK_BAR then token2 == FSharpTokenType.BAR_RBRACK else
         if token1 == FSharpTokenType.LBRACK_LESS then token2 == FSharpTokenType.GREATER_RBRACK else
         if token1 == FSharpTokenType.LQUOTE_TYPED then token2 == FSharpTokenType.RQUOTE_TYPED else
+        if token1 == FSharpTokenType.LBRACE_BAR then token2 == FSharpTokenType.BAR_RBRACE else
     
         if token1 == FSharpTokenType.RPAREN then token2 == FSharpTokenType.LPAREN else
         if token1 == FSharpTokenType.RBRACE then token2 == FSharpTokenType.LBRACE else
@@ -55,5 +56,6 @@ type FSharpMatchingBraceContextHighlighter() =
         if token1 == FSharpTokenType.BAR_RBRACK then token2 == FSharpTokenType.LBRACK_BAR else
         if token1 == FSharpTokenType.GREATER_RBRACK then token2 == FSharpTokenType.LBRACK_LESS else
         if token1 == FSharpTokenType.RQUOTE_TYPED then token2 == FSharpTokenType.LQUOTE_TYPED else
+        if token1 == FSharpTokenType.BAR_RBRACE then token2 == FSharpTokenType.LBRACE_BAR else
 
         false
