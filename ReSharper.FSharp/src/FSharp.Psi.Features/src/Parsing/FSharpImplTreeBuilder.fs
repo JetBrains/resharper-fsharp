@@ -386,9 +386,9 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
         | SynExpr.ArrayOrList(_,exprs,range) ->
             x.MarkListExpr(exprs, range, ElementType.ARRAY_OR_LIST_EXPR)
 
-        | SynExpr.Record(_,copyInfoOpt,fields,range) ->
+        | SynExpr.Record(_,copyInfo,fields,range) ->
             let mark = x.Mark(range)
-            match copyInfoOpt with
+            match copyInfo with
             | Some (expr,_) -> x.MarkOtherExpr(expr)
             | _ -> ()
 
@@ -407,6 +407,18 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                     if expr.IsSome then
                         x.MarkOtherExpr(expr.Value)
                     x.Done(mark, ElementType.RECORD_EXPR_BINDING)
+            x.Done(range, mark, ElementType.RECORD_EXPR)
+
+        | SynExpr.AnonRecd(_,copyInfo,fields,range) ->
+            let mark = x.Mark(range)
+            match copyInfo with
+            | Some (expr, _) -> x.MarkOtherExpr(expr)
+            | _ -> ()
+
+            for IdentRange idRange, expr in fields do
+                let mark = x.Mark(idRange)
+                x.MarkOtherExpr(expr)
+                x.Done(mark, ElementType.RECORD_EXPR_BINDING)
             x.Done(range, mark, ElementType.RECORD_EXPR)
 
         | SynExpr.New(_,t,expr,range) ->
