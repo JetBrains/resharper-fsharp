@@ -124,7 +124,9 @@ type FSharpLibraryScopeLookupItemsProvider(logger: ILogger, assemblyContentProvi
             if settings.GetValue(fun (key: FSharpOptions) -> key.EnableOutOfScopeCompletion) then obj() else null
 
         member x.AddLookupItems(context, collector, data) =
-            base.AddLookupItems(context :?> FSharpCodeCompletionContext, collector)
+            match context with
+            | :? FSharpCodeCompletionContext as fsContext -> base.AddLookupItems(fsContext, collector)
+            | _ -> false
 
         member x.SupportedEvaluationMode = EvaluationMode.Full
 
