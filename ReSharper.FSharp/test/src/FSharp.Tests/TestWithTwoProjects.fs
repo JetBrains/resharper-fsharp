@@ -55,7 +55,12 @@ type TestWithTwoProjects() =
         descriptors.Add(mainDescriptor.First, mainDescriptor.Second)
         descriptors.Add(secondDescriptor.First, secondDescriptor.Second)
 
-        let cfg = BaseTestWithSolution.TestSolutionConfiguration(x.SolutionFileName, descriptors)
+        let solutionFilePath =
+            let path = FileSystemPath.TryParse(x.SolutionFileName)
+            if not (path.IsNullOrEmpty()) && not (path.IsAbsolute) then x.TestDataPath / path.AsRelative()
+            else path
+
+        let cfg = BaseTestWithSolution.TestSolutionConfiguration(solutionFilePath, descriptors)
         BaseTestWithSingleProject.ProcessSdkReferences(cfg, x.ShellInstance.GetComponent<ISdkManager>().Kits)
 
         x.DoTestSolution(fun _ -> cfg)
