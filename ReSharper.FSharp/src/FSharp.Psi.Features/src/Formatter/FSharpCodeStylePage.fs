@@ -1,7 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
 open System
-open System.Linq
 open JetBrains.Application.Settings
 open JetBrains.Application.UI.Options
 open JetBrains.ReSharper.Feature.Services.OptionPages.CodeStyle
@@ -48,10 +47,9 @@ type FSharpFormatSettingsKey() =
     
 
 [<Language(typeof<FSharpLanguage>)>]
-type FSharpDummyCodeFormatter(formatterRequirements) =
-    inherit CodeFormatterBase<FSharpFormatSettingsKey>(formatterRequirements)
+type FSharpDummyCodeFormatter(fsLanguage: FSharpLanguage, formatterRequirements) =
+    inherit CodeFormatterBase<FSharpFormatSettingsKey>(fsLanguage, formatterRequirements)
 
-    override x.LanguageType = FSharpLanguage.Instance :> _
     override x.Format(first,last,_,_) = TreeRange(first, last) :> _
     override x.FormatFile(_,_,_) = ()
     override x.CanModifyInsideNodeRange(_,_,_) = false
