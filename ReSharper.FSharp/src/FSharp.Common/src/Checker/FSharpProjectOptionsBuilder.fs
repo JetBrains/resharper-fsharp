@@ -129,6 +129,9 @@ type FSharpProjectOptionsBuilder
         | :? IManagedProjectConfiguration as cfg ->
             options.Add(sprintf "--warn:%d" cfg.WarningLevel)
 
+            if cfg.TreatWarningsAsErrors then
+                options.Add("--warnaserror")
+
             let doc = cfg.DocumentationFile
             if not (doc.IsNullOrWhitespace()) then options.Add("--doc:" + doc)
 
