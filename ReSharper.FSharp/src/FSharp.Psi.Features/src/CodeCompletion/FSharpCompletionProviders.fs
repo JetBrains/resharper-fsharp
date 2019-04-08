@@ -128,6 +128,8 @@ type FSharpLibraryScopeLookupItemsProvider(logger: ILogger, assemblyContentProvi
             | :? FSharpCodeCompletionContext as fsContext -> base.AddLookupItems(fsContext, collector)
             | _ -> false
 
+        member x.TransformItems(_,_,_) = ()
+
         member x.SupportedEvaluationMode = EvaluationMode.Full
 
 
