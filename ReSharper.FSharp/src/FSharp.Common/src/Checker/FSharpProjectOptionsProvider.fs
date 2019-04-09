@@ -28,7 +28,8 @@ type FSharpProjectOptionsProvider
     inherit RecursiveProjectModelChangeDeltaVisitor()
 
     let invalidatingProjectChangeType =
-        ProjectModelChangeType.PROPERTIES ||| ProjectModelChangeType.TARGET_FRAMEWORK
+        ProjectModelChangeType.PROPERTIES ||| ProjectModelChangeType.TARGET_FRAMEWORK |||
+        ProjectModelChangeType.REFERENCE_TARGET
 
     let invalidatingChildChangeType =
         ProjectModelChangeType.ADDED ||| ProjectModelChangeType.REMOVED |||
@@ -141,11 +142,17 @@ type FSharpProjectOptionsProvider
     member private x.ProcessChange(obj: ChangeEventArgs) =
         match obj.ChangeMap.GetChange<ProjectModelChange>(solution) with
         | null -> ()
-        | change ->
 
-        if not change.IsClosingSolution then
+        | :? ProjectReferenceChange as referenceChange ->
             use lock = locker.UsingWriteLock()
-            x.VisitDelta(change)
+            let referenceProject = referenceChange.ProjectToModuleReference.OwnerModule
+            if referenceProject.IsFSharp then
+                invalidateProject referenceProject
+
+        | change ->
+            if not change.IsClosingSolution then
+                use lock = locker.UsingWriteLock()
+                x.VisitDelta(change)
 
     override x.VisitDelta(change: ProjectModelChange) =
         match change.ProjectModelElement with
