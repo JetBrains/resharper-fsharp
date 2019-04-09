@@ -9,11 +9,12 @@ open JetBrains.Annotations
 open JetBrains.Application
 open JetBrains.Application.Settings
 open JetBrains.DataFlow
+open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services
-open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Util
 open Microsoft.FSharp.Compiler.Text
@@ -73,7 +74,10 @@ type FSharpCheckerService
         x.OptionsProvider.HasPairFile(file)
 
     member x.GetDefines(sourceFile: IPsiSourceFile) =
-        x.OptionsProvider.GetParsingOptions(sourceFile).ConditionalCompilationDefines
+        let isScript = sourceFile.LanguageType.Is<FSharpScriptProjectFileType>()
+        let implicitDefines = getImplicitDefines isScript
+        let projectDefines = x.OptionsProvider.GetParsingOptions(sourceFile).ConditionalCompilationDefines
+        implicitDefines @ projectDefines
 
     member x.ParseAndCheckFile([<NotNull>] file: IPsiSourceFile, opName,
                                [<Optional; DefaultParameterValue(false)>] allowStaleResults) =
@@ -115,6 +119,15 @@ type FSharpCheckerService
     member x.InvalidateFSharpProject(fsProject: FSharpProject) =
         if checker.IsValueCreated then
             checker.Value.InvalidateConfiguration(fsProject.ProjectOptions, false)
+
+
+[<AutoOpen>]
+module ImplicitDefines =
+    let sourceDefines = [ "COMPILED"; "EDITING" ]
+    let scriptDefines = [ "COMPILED"; "INTERACTIVE" ]
+
+    let getImplicitDefines isScript =
+        if isScript then scriptDefines else sourceDefines
 
 
 type FSharpProject =

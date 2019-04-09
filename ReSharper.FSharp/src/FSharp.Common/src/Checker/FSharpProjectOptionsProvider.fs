@@ -27,8 +27,6 @@ type FSharpProjectOptionsProvider
          psiModules: IPsiModules, resolveContextManager: PsiModuleResolveContextManager) as this =
     inherit RecursiveProjectModelChangeDeltaVisitor()
 
-    let scriptDefines = ["INTERACTIVE"]
-
     let invalidatingProjectChangeType =
         ProjectModelChangeType.PROPERTIES ||| ProjectModelChangeType.TARGET_FRAMEWORK
 
@@ -133,8 +131,10 @@ type FSharpProjectOptionsProvider
     let isScriptLike file =
         fsFileService.IsScriptLike(file) || file.PsiModule.IsMiscFilesProjectModule() || isNull (file.GetProject())        
 
-    let getParsingOptionsForSingleFile (file: IPsiSourceFile) =
-        { FSharpParsingOptions.Default with SourceFiles = [| file.GetLocation().FullPath |] }
+    let getParsingOptionsForSingleFile (file: IPsiSourceFile) isScript =
+        { FSharpParsingOptions.Default with
+            SourceFiles = [| file.GetLocation().FullPath |]
+            IsExe = isScript }
 
     member x.ModuleInvalidated = moduleInvalidated
 
@@ -207,11 +207,11 @@ type FSharpProjectOptionsProvider
             |> Option.defaultValue false
 
         member x.GetParsingOptions(file) =
-            if isScriptLike file then { getParsingOptionsForSingleFile file with IsExe = true } else
+            if isScriptLike file then getParsingOptionsForSingleFile file true else
 
             getOrCreateFSharpProject file
             |> Option.map (fun fsProject -> fsProject.ParsingOptions)
-            |> Option.defaultWith (fun _ -> getParsingOptionsForSingleFile file)
+            |> Option.defaultWith (fun _ -> getParsingOptionsForSingleFile file false)
 
         member x.GetFileIndex(sourceFile) =
             if isScriptLike sourceFile then 0 else
