@@ -1,6 +1,7 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 
 open System
+open System.Collections.Generic
 open System.Runtime.InteropServices
 open FSharp.Compiler.SourceCodeServices
 open JetBrains
@@ -110,6 +111,20 @@ type FSharpCheckerService
         | _ ->
             logger.Trace("TryGetStaleCheckResults: fail {0}, {1}", path, opName)
             None
+
+    member x.InvalidateFSharpProject(fsProject: FSharpProject) =
+        if checker.IsValueCreated then
+            checker.Value.InvalidateConfiguration(fsProject.ProjectOptions, false)
+
+
+type FSharpProject =
+    { ProjectOptions: FSharpProjectOptions
+      ParsingOptions: FSharpParsingOptions
+      FileIndices: IDictionary<FileSystemPath, int>
+      ImplFilesWithSigs: ISet<FileSystemPath> }
+
+    member x.ContainsFile(file: IPsiSourceFile) =
+        x.FileIndices.ContainsKey(file.GetLocation())
 
 
 type FSharpParseAndCheckResults = 

@@ -16,7 +16,6 @@ open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
-open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds
@@ -62,16 +61,6 @@ type FSharpTargetsProjectLoadModificator() =
             context.Targets.AddRange(targets)
 
 
-type FSharpProject =
-    { Options: FSharpProjectOptions
-      ParsingOptions: FSharpParsingOptions
-      FileIndices: IDictionary<FileSystemPath, int>
-      ImplFilesWithSigs: ISet<FileSystemPath> }
-
-    member x.ContainsFile(file: IPsiSourceFile) =
-        x.FileIndices.ContainsKey(file.GetLocation())
-
-
 [<SolutionComponent>]
 type FSharpProjectOptionsBuilder
         (checkerService: FSharpCheckerService, psiModules: IPsiModules, logger: ILogger,
@@ -110,7 +99,7 @@ type FSharpProjectOptionsBuilder
 
         result
 
-    member x.BuildSingleProjectOptions (project: IProject, psiModule: IPsiModule) =
+    member x.BuildSingleFSharpProject(project: IProject, psiModule: IPsiModule) =
         let targetFrameworkId = psiModule.TargetFrameworkId
         let properties = project.ProjectProperties
         let buildSettings = properties.BuildSettings :?> _ // todo: can differ by framework id?
@@ -142,11 +131,11 @@ type FSharpProjectOptionsBuilder
                 | v when not (v.IsNullOrWhitespace()) -> Some ("--" + p.ToLower() + ":" + f v)
                 | _ -> None
 
-            [FSharpProperties.TargetProfile; FSharpProperties.BaseAddress]
+            [ FSharpProperties.TargetProfile; FSharpProperties.BaseAddress ]
             |> List.choose (getOption id)
             |> options.AddRange
 
-            [FSharpProperties.NoWarn; FSharpProperties.WarnAsError]
+            [ FSharpProperties.NoWarn; FSharpProperties.WarnAsError ]
             |> List.choose (getOption (fun v -> (splitAndTrim defaultDelimiters v).Join(",")))
             |> options.AddRange
 
@@ -198,7 +187,7 @@ type FSharpProjectOptionsBuilder
         if not errors.IsEmpty then
             logger.Warn("Getting parsing options: {0}", concatErrors errors)
 
-        { Options = projectOptions
+        { ProjectOptions = projectOptions
           ParsingOptions = parsingOptions
           FileIndices = fileIndices
           ImplFilesWithSigs = implsWithSig }
