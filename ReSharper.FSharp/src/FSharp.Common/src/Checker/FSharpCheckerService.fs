@@ -123,8 +123,8 @@ type FSharpCheckerService
 
 [<AutoOpen>]
 module ImplicitDefines =
-    let sourceDefines = [ "COMPILED"; "EDITING" ]
-    let scriptDefines = [ "COMPILED"; "INTERACTIVE" ]
+    let sourceDefines = [ "EDITING"; "COMPILED" ]
+    let scriptDefines = [ "EDITING"; "INTERACTIVE" ]
 
     let getImplicitDefines isScript =
         if isScript then scriptDefines else sourceDefines
