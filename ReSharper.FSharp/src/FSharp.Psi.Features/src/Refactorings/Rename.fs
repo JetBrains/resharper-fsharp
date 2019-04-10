@@ -144,10 +144,12 @@ type FSharpAtomicRenamesFactory() =
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpNamingService(language: FSharpLanguage) =
-    inherit NamingLanguageServiceBase(language)
+    inherit ClrNamingLanguageServiceBase(language)
 
     override x.MangleNameIfNecessary(name, _) =
         Keywords.QuoteIdentifierIfNeeded name
+
+    override x.IsSameNestedNameAllowedForMembers = true
 
 
 [<RenamePart>]
