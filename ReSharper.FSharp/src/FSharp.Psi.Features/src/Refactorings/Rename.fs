@@ -4,6 +4,7 @@ open FSharp.Compiler.SourceCodeServices
 open FSharp.Compiler.PrettyNaming
 open JetBrains.Application
 open JetBrains.ReSharper.Feature.Services.Refactorings.Specific.Rename
+open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
@@ -11,6 +12,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Naming.Impl
+open JetBrains.ReSharper.Psi.Naming.Interfaces
 open JetBrains.ReSharper.Refactorings.Rename
 open JetBrains.Util
 
@@ -65,7 +67,8 @@ type FSharpRenameHelper() =
 
     override x.IsCheckResolvedTo(newReference, newDeclaredElement) =
         // We have to change the reference so it resolves to the new element.
-        // We don't, however, want to actually resolve it and to wait for FCS to type check all the needed projects.
+        // We don't, however, want to actually resolve it and to wait for FCS to type check all the needed projects
+        // so assume it's resolved as a workaround.
         newDeclaredElement.PresentationLanguage.Is<FSharpLanguage>()
 
     override x.IsLocalRename(element: IDeclaredElement) =
@@ -146,8 +149,31 @@ type FSharpAtomicRenamesFactory() =
 type FSharpNamingService(language: FSharpLanguage) =
     inherit ClrNamingLanguageServiceBase(language)
 
+    let (|Word|_|) word (nameRoot: NameInnerElement) =
+        match nameRoot.As<NameWord>() with
+        | null -> None
+        | nameWord -> if nameWord.Text = word then someUnit else None
+
+    let withWords words (nameRoot: NameRoot) =
+        NameRoot(Array.ofList words, nameRoot.PluralityKind, nameRoot.IsFinalPresentation)
+
     override x.MangleNameIfNecessary(name, _) =
         Keywords.QuoteIdentifierIfNeeded name
+
+    override x.SuggestRoots(element: IDeclaredElement, policyProvider: INamingPolicyProvider) =
+        let baseRoots = base.SuggestRoots(element, policyProvider)
+        if not (startsWith "FSharp" element.ShortName) then baseRoots else
+
+        match element.As<ITypeElement>() with
+        | null -> baseRoots
+        | _ ->
+
+        match List.ofSeq baseRoots with
+        | [nameRoot] ->
+            match List.ofSeq nameRoot.Words with
+            | Word "F" :: Word "Sharp" :: rest -> [| withWords rest nameRoot |] :> _
+            | _ -> baseRoots
+        | _ -> baseRoots
 
     override x.IsSameNestedNameAllowedForMembers = true
 
