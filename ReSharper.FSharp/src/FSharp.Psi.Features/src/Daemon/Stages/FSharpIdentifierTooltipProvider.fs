@@ -1,7 +1,7 @@
 module JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages.Tooltips
 
-open FSharp.Compiler.Layout
 open System
+open FSharp.Compiler.Layout
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
@@ -74,9 +74,9 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
                               yield showL overload.MainDescription
                             
                           if not overload.TypeMapping.IsEmpty then
-                              yield "Generic parameters:\n" + (overload.TypeMapping |> List.map (fun tp -> showL tp) |> String.concat "\n")
+                              yield "Generic parameters:\n" + (overload.TypeMapping |> List.map showL |> String.concat "\n")
 
-                          match (xmlDocService.GetXmlDoc(overload.XmlDoc)) with
+                          match xmlDocService.GetXmlDoc(overload.XmlDoc) with
                           | null -> ()
                           | xmlDocText when xmlDocText.Text.IsNullOrWhitespace() -> ()
                           | xmlDocText -> yield xmlDocText.Text
