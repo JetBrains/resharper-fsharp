@@ -62,7 +62,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     }
 
     public IDeclaredType GetBaseClassType() => PredefinedType.Object;
+    public IClass GetSuperClass() => GetBaseClassType().GetClassType();
+
     public IList<IDeclaredType> GetSuperTypes() => new[] {GetBaseClassType()};
+    public IList<ITypeElement> GetSuperTypeElements() => GetSuperTypes().ToTypeElements();
 
     public MemberPresenceFlag GetMemberPresenceFlag() =>
       MemberPresenceFlag.NONE;

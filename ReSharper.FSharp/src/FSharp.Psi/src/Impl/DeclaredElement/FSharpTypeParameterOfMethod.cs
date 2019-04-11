@@ -6,6 +6,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Resolve;
+using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
@@ -38,6 +39,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public IClrTypeName GetClrName() => EmptyClrTypeName.Instance;
     public IList<IDeclaredType> GetSuperTypes() => EmptyList<IDeclaredType>.Instance;
+    public IList<ITypeElement> GetSuperTypeElements() => GetSuperTypes().ToTypeElements();
+
     public IEnumerable<ITypeMember> GetMembers() => EmptyList<ITypeMember>.InstanceList;
 
     public INamespace GetContainingNamespace() =>
