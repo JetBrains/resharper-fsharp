@@ -79,6 +79,10 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
                       | null -> ()
                       | xmlDocText when xmlDocText.Text.IsNullOrWhitespace() -> ()
                       | xmlDocText -> yield xmlDocText.Text
+                      
+                      match overload.Remarks with
+                      | Some remarks -> yield showL remarks
+                      | None -> ()
                     ]
                     |> String.concat "\n\n"
                     |> result.Add))
