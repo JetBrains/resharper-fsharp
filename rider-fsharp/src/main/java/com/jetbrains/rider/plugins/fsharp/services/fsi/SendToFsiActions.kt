@@ -6,8 +6,10 @@ import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
+import com.intellij.openapi.util.Iconable
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.psi.PsiElement
+import com.jetbrains.rider.icons.ReSharperBulbIcons
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguageBase
 
 object Fsi {
@@ -78,7 +80,7 @@ open class SendSelectionToFsiIntentionActionBase(debug: Boolean, private val tit
             super.isAvailable(project, editor, file) && editor!!.selectionModel.hasSelection()
 }
 
-abstract class BaseSendToFsiIntentionAction(private val debug: Boolean, private val actionId: String) : BaseElementAtCaretIntentionAction(), ShortcutProvider {
+abstract class BaseSendToFsiIntentionAction(private val debug: Boolean, private val actionId: String) : BaseElementAtCaretIntentionAction(), ShortcutProvider, Iconable {
     private val isAvailable = !debug || SystemInfo.isWindows
 
     override fun getFamilyName(): String = "Send to F# Interactive"
@@ -90,6 +92,8 @@ abstract class BaseSendToFsiIntentionAction(private val debug: Boolean, private 
     override fun invoke(project: Project, editor: Editor, element: PsiElement) {
         ServiceManager.getService(project, FsiHost::class.java).sendToFsi(editor, element.containingFile, debug)
     }
+
+    override fun getIcon(flags: Int) = ReSharperBulbIcons.GhostBulb
 
     override fun getShortcut() =
             ActionManager.getInstance().getAction(actionId)?.shortcutSet
