@@ -60,29 +60,28 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
         // todo: provide tooltip for #r strings in fsx, should pass String tag
         let getTooltip = checkResults.GetStructuredToolTipText(int coords.Line + 1, int coords.Column, lineText, names, FSharpTokenTag.Identifier)
         let result = ResizeArray()
+        let (FSharpToolTipText layouts) = getTooltip.RunAsTask()
+        
+        layouts |> List.iter (function
+            | FSharpStructuredToolTipElement.None
+            | FSharpStructuredToolTipElement.CompositionError _ -> ()
 
-        match getTooltip.RunAsTask() with
-        | FSharpToolTipText layouts ->
-            layouts |> List.iter (function
-                | FSharpStructuredToolTipElement.None
-                | FSharpStructuredToolTipElement.CompositionError _ -> ()
+            | FSharpStructuredToolTipElement.Group(overloads) ->
+                overloads |> List.iter (fun overload ->
+                    [
+                      if not (isEmptyL overload.MainDescription) then
+                          yield showL overload.MainDescription
+                        
+                      if not overload.TypeMapping.IsEmpty then
+                          yield "Generic parameters:\n" + (overload.TypeMapping |> List.map showL |> String.concat "\n")
 
-                | FSharpStructuredToolTipElement.Group(overloads) ->
-                    overloads |> List.iter (fun overload ->
-                        [
-                          if not (isEmptyL overload.MainDescription) then
-                              yield showL overload.MainDescription
-                            
-                          if not overload.TypeMapping.IsEmpty then
-                              yield "Generic parameters:\n" + (overload.TypeMapping |> List.map showL |> String.concat "\n")
-
-                          match xmlDocService.GetXmlDoc(overload.XmlDoc) with
-                          | null -> ()
-                          | xmlDocText when xmlDocText.Text.IsNullOrWhitespace() -> ()
-                          | xmlDocText -> yield xmlDocText.Text
-                        ]
-                        |> String.concat "\n\n"
-                        |> result.Add))
+                      match xmlDocService.GetXmlDoc(overload.XmlDoc) with
+                      | null -> ()
+                      | xmlDocText when xmlDocText.Text.IsNullOrWhitespace() -> ()
+                      | xmlDocText -> yield xmlDocText.Text
+                    ]
+                    |> String.concat "\n\n"
+                    |> result.Add))
 
         result.Join(RiderTooltipSeparator)
 
