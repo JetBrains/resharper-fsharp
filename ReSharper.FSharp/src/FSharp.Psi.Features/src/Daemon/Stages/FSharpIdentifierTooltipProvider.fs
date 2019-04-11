@@ -1,5 +1,6 @@
 module JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages.Tooltips
 
+open FSharp.Compiler.Layout
 open System
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.DocumentModel
@@ -57,27 +58,31 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
         let lineText = sourceFile.Document.GetLineText(coords.Line)
 
         // todo: provide tooltip for #r strings in fsx, should pass String tag
-        let getTooltip = checkResults.GetToolTipText(int coords.Line + 1, int coords.Column, lineText, names, FSharpTokenTag.Identifier)
+        let getTooltip = checkResults.GetStructuredToolTipText(int coords.Line + 1, int coords.Column, lineText, names, FSharpTokenTag.Identifier)
         let result = ResizeArray()
+
         match getTooltip.RunAsTask() with
-        | FSharpToolTipText(tooltips) ->
-            tooltips |> List.iter (function
-                | FSharpToolTipElement.None
-                | FSharpToolTipElement.CompositionError _ -> ()
+        | FSharpToolTipText layouts ->
+            layouts |> List.iter (function
+                | FSharpStructuredToolTipElement.None
+                | FSharpStructuredToolTipElement.CompositionError _ -> ()
 
-                | FSharpToolTipElement.Group(overloads) ->
+                | FSharpStructuredToolTipElement.Group(overloads) ->
                     overloads |> List.iter (fun overload ->
-                        let text = overload.MainDescription.TrimStart()
-                        match xmlDocService.GetXmlDoc(overload.XmlDoc) with
-                        | null when not (text.IsNullOrWhitespace()) -> result.Add(text)
-                        | xmlDocText ->
+                        [
+                          if not (isEmptyL overload.MainDescription) then
+                              yield showL overload.MainDescription
+                            
+                          if not overload.TypeMapping.IsEmpty then
+                              yield "Generic parameters:\n" + (overload.TypeMapping |> List.map (fun tp -> showL tp) |> String.concat "\n")
 
-                        let xmlDocText = xmlDocText.Text
-                        match text.IsNullOrWhitespace(), xmlDocText.IsNullOrWhitespace() with
-                        | false, false -> result.Add(text + "\n\n" + xmlDocText)
-                        | false, _ -> result.Add(text)
-                        | _, false -> result.Add(xmlDocText)
-                        | _ -> ()))
+                          match (xmlDocService.GetXmlDoc(overload.XmlDoc)) with
+                          | null -> ()
+                          | xmlDocText when xmlDocText.Text.IsNullOrWhitespace() -> ()
+                          | xmlDocText -> yield xmlDocText.Text
+                        ]
+                        |> String.concat "\n\n"
+                        |> result.Add))
 
         result.Join(RiderTooltipSeparator)
 
