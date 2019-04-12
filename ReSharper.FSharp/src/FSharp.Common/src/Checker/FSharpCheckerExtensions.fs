@@ -2,8 +2,8 @@
 module JetBrains.ReSharper.Plugins.FSharp.Common.Checker.FSharpCheckerExtensions
 
 open System
-open Microsoft.FSharp.Compiler.Text
 open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.Text
 
 let map (f: 'T -> 'U) (a: Async<'T>) : Async<'U> =
     async {

@@ -4,6 +4,7 @@ open System
 open System.Collections.Generic
 open System.Runtime.InteropServices
 open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.Text
 open JetBrains
 open JetBrains.Annotations
 open JetBrains.Application
@@ -17,7 +18,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Util
-open Microsoft.FSharp.Compiler.Text
 
 [<ShellComponent; AllowNullLiteral>]
 type FSharpCheckerService

@@ -3,6 +3,7 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Common.Checker
 open System
 open System.Collections.Generic
 open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.Text
 open JetBrains.Application.changes
 open JetBrains.DataFlow
 open JetBrains.ProjectModel
@@ -17,7 +18,6 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.Threading
 open JetBrains.Util
-open Microsoft.FSharp.Compiler.Text
 
 [<SolutionComponent>]
 type FSharpProjectOptionsProvider
