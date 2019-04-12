@@ -191,7 +191,11 @@ type FSharpNamingService(language: FSharpLanguage) =
         | FSharpNameRoot root ->
             let typeArg = declaredType.GetSubstitution().[typeParameters.[0]]
             let typeArgRoots = x.SuggestRoots(typeArg, policyProvider) |> List.ofSeq
-            typeArgRoots |> List.map (withSuffix root.Words) :> _
+            let newRoots = typeArgRoots |> List.map (withSuffix root.Words)
+            seq {
+                yield! roots
+                yield! newRoots
+            }
 
         | _ -> roots
 
