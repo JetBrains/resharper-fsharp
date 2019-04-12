@@ -149,31 +149,63 @@ type FSharpAtomicRenamesFactory() =
 type FSharpNamingService(language: FSharpLanguage) =
     inherit ClrNamingLanguageServiceBase(language)
 
-    let (|Word|_|) word (nameRoot: NameInnerElement) =
-        match nameRoot.As<NameWord>() with
+    let withWords words (nameRoot: NameRoot) =
+        NameRoot(Array.ofList words, nameRoot.PluralityKind, nameRoot.IsFinalPresentation)
+
+    let withSuffix (AsList suffix) (nameRoot: NameRoot) =
+        let words = List.ofSeq nameRoot.Words
+        let words = words @ suffix
+        withWords words nameRoot
+
+    let (|Word|_|) word (nameElement: NameInnerElement) =
+        match nameElement.As<NameWord>() with
         | null -> None
         | nameWord -> if nameWord.Text = word then someUnit else None
 
-    let withWords words (nameRoot: NameRoot) =
-        NameRoot(Array.ofList words, nameRoot.PluralityKind, nameRoot.IsFinalPresentation)
+    let (|FSharpNameRoot|_|) (root: NameRoot) =
+        match List.ofSeq root.Words with
+        | Word "F" :: Word "Sharp" :: rest -> Some (withWords rest root)
+        | _ -> None
 
     override x.MangleNameIfNecessary(name, _) =
         Keywords.QuoteIdentifierIfNeeded name
 
+    override x.SuggestRoots(typ: IType, policyProvider: INamingPolicyProvider) =
+        let roots = base.SuggestRoots(typ, policyProvider)
+
+        match typ.As<IDeclaredType>() with
+        | null -> roots
+        | declaredType ->
+
+        match declaredType.GetTypeElement() with
+        | null -> roots
+        | typeElement ->
+
+        if not (startsWith "FSharp" typeElement.ShortName) then roots else
+
+        let typeParameters = typeElement.TypeParameters
+        if typeParameters.IsEmpty() then roots else
+
+        let psiServices = typeElement.GetPsiServices()
+        match psiServices.Naming.Parsing.GetName(typeElement, "unknown", policyProvider).GetRoot() with
+        | FSharpNameRoot root ->
+            let typeArg = declaredType.GetSubstitution().[typeParameters.[0]]
+            let typeArgRoots = x.SuggestRoots(typeArg, policyProvider) |> List.ofSeq
+            typeArgRoots |> List.map (withSuffix root.Words) :> _
+
+        | _ -> roots
+
     override x.SuggestRoots(element: IDeclaredElement, policyProvider: INamingPolicyProvider) =
-        let baseRoots = base.SuggestRoots(element, policyProvider)
-        if not (startsWith "FSharp" element.ShortName) then baseRoots else
+        let roots = base.SuggestRoots(element, policyProvider)
+        if not (startsWith "FSharp" element.ShortName) then roots else
 
         match element.As<ITypeElement>() with
-        | null -> baseRoots
+        | null -> roots
         | _ ->
 
-        match List.ofSeq baseRoots with
-        | [nameRoot] ->
-            match List.ofSeq nameRoot.Words with
-            | Word "F" :: Word "Sharp" :: rest -> [| withWords rest nameRoot |] :> _
-            | _ -> baseRoots
-        | _ -> baseRoots
+        match List.ofSeq roots with
+        | [ FSharpNameRoot root ] -> [| root |] :> _ 
+        | _ -> roots
 
     override x.IsSameNestedNameAllowedForMembers = true
 

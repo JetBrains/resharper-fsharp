@@ -111,6 +111,8 @@ module rec CommonUtil =
         | :? IProjectFolder as folder -> ProjectFolder folder
         | _ -> UnknownProjectItem
 
+    let (|AsList|) seq = List.ofSeq seq
+
     let equalsIgnoreCase other (string: string) =
         string.Equals(other, StringComparison.OrdinalIgnoreCase)
 
