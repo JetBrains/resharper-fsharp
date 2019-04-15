@@ -72,7 +72,7 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
             .withParameters(fsiArgs)
 
     init {
-        val currentRuntime = project.getComponent<RiderDotNetActiveRuntimeHost>().getCurrentDotNetRuntime(false)
+        val currentRuntime = project.getComponent<RiderDotNetActiveRuntimeHost>().getCurrentDotNetRuntime(false).runtime
         if (currentRuntime != null && currentRuntime is MonoRuntime && sessionInfo.fsiPath.endsWith(".exe", true)) {
             currentRuntime.patchRunCommandLine(cmdLine, listOf())
         }
