@@ -8,7 +8,7 @@ open JetBrains.ReSharper.Feature.Services.LiveTemplates.Scope
 open JetBrains.ReSharper.Host.Features.LiveTemplates.Scope
 open JetBrains.ReSharper.LiveTemplates.UI
 open JetBrains.ReSharper.Plugins.FSharp
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 
 type InAzureFunctionsFSharpProject() =
     inherit InAzureFunctionsProject()
