@@ -1,7 +1,9 @@
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
@@ -21,6 +23,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public override TypeElement CreateTypeElement() =>
       new FSharpClass(this);
+
+    public override IEnumerable<ITypeElement> GetSuperTypeElements() => EmptyList<ITypeElement>.Instance;
   }
 
   internal class StructExtensionPart : FSharpTypeMembersOwnerTypePart, Struct.IStructPart
@@ -46,5 +50,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public bool HasHiddenInstanceFields => false;
     public bool IsReadonly => false;
     public bool IsByRefLike => false;
+
+    public override IEnumerable<ITypeElement> GetSuperTypeElements() => EmptyList<ITypeElement>.Instance;
   }
 }

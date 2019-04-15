@@ -34,20 +34,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
                      el != null);
     }
 
-    public IEnumerable<IDeclaredType> GetSuperTypes()
-    {
-      return new[] {GetBaseClassType()};
-    }
+    public IEnumerable<IDeclaredType> GetSuperTypes() => new[] {GetBaseClassType()};
+    public IDeclaredType GetBaseClassType() => GetPsiModule().GetPredefinedType().Object;
 
-    public IDeclaredType GetBaseClassType()
-    {
-      return GetPsiModule().GetPredefinedType().Object;
-    }
-
-    public MemberPresenceFlag GetMemberPresenceFlag()
-    {
-      return MemberPresenceFlag.NONE;
-    }
+    public MemberPresenceFlag GetMemberPresenceFlag() => MemberPresenceFlag.NONE;
 
     public override MemberDecoration Modifiers
     {
@@ -62,29 +52,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       }
     }
 
-    public override IDeclaration GetTypeParameterDeclaration(int index)
-    {
-      throw new InvalidOperationException();
-    }
+    public override IDeclaration GetTypeParameterDeclaration(int index) => throw new InvalidOperationException();
+    public override string GetTypeParameterName(int index) => throw new InvalidOperationException();
+    public override TypeParameterVariance GetTypeParameterVariance(int index) => throw new InvalidOperationException();
+    public override IEnumerable<IType> GetTypeParameterSuperTypes(int index) => throw new InvalidOperationException();
 
-    public override string GetTypeParameterName(int index)
-    {
+    public override TypeParameterConstraintFlags GetTypeParameterConstraintFlags(int index) =>
       throw new InvalidOperationException();
-    }
-
-    public override TypeParameterVariance GetTypeParameterVariance(int index)
-    {
-      throw new InvalidOperationException();
-    }
-
-    public override IEnumerable<IType> GetTypeParameterSuperTypes(int index)
-    {
-      throw new InvalidOperationException();
-    }
-
-    public override TypeParameterConstraintFlags GetTypeParameterConstraintFlags(int index)
-    {
-      throw new InvalidOperationException();
-    }
   }
 }

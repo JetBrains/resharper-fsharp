@@ -4,15 +4,16 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  internal abstract class FSharpClassLikePart<T> : FSharpTypeParametersOwnerPart<T>,
-    ClassLikeTypeElement.IClassLikePart where T : class, IFSharpTypeDeclaration
+  internal abstract class FSharpClassLikePart<T> : FSharpTypeParametersOwnerPart<T>, IFSharpClassLikePart
+    where T : class, IFSharpTypeDeclaration
   {
     private bool? myHasPublicDefaultCtor;
-    
+
     protected FSharpClassLikePart([NotNull] T declaration, MemberDecoration memberDecoration,
       TreeNodeCollection<ITypeParameterOfTypeDeclaration> typeParameters, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, memberDecoration, typeParameters, cacheBuilder)
@@ -41,6 +42,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     }
 
     public abstract IEnumerable<IDeclaredType> GetSuperTypes();
+    public virtual IEnumerable<ITypeElement> GetSuperTypeElements() => GetSuperTypes().AsIList().ToTypeElements(); 
 
     public bool HasPublicDefaultCtor
     {

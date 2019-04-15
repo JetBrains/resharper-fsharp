@@ -10,10 +10,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     {
     }
 
-    protected override IList<IDeclaredType> CalcSuperTypes()
-    {
-      return new[] {Module.GetPredefinedType().Object};
-    }
+    protected override IList<IDeclaredType> CalcSuperTypes() =>
+      new[] {Module.GetPredefinedType().Object};
   }
 
   public interface IModule : ITypeElement

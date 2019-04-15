@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
+using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
@@ -50,6 +51,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public override string[] ExtendsListShortNames { get; }
 
+    [CanBeNull] internal IClrTypeName[] SuperTypesClrTypeNames;
+
     public virtual MemberPresenceFlag GetMemberPresenceFlag() =>
       MemberPresenceFlag.SIGN_OP | MemberPresenceFlag.EXPLICIT_OP |
       MemberPresenceFlag.MAY_EQUALS_OVERRIDE | MemberPresenceFlag.MAY_TOSTRING_OVERRIDE |
@@ -69,6 +72,29 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
       var declaration = GetDeclaration();
       return declaration != null ? declaration.SuperTypes : EmptyList<IDeclaredType>.InstanceList;
+    }
+
+    public override IEnumerable<ITypeElement> GetSuperTypeElements()
+    {
+      var psiModule = GetPsiModule();
+      if (SuperTypesClrTypeNames != null)
+        return SuperTypesClrTypeNames.ToTypeElements(psiModule);
+
+      var superTypeNames = new JetHashSet<IClrTypeName>();
+      var superTypeElements = new JetHashSet<ITypeElement>();
+
+      foreach (var declaredType in GetSuperTypes())
+      {
+        var typeElement = declaredType.GetTypeElement();
+        if (typeElement == null)
+          continue;
+
+        superTypeNames.Add(typeElement.GetClrName().GetPersistent());
+        superTypeElements.Add(typeElement);
+      }
+
+      SuperTypesClrTypeNames = superTypeNames.ToArray();
+      return superTypeElements;
     }
   }
 }
