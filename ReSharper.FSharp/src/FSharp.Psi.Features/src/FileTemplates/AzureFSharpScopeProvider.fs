@@ -29,7 +29,7 @@ type AzureFSharpScopeProvider() as this =
         let baseItems = base.GetLanguageSpecificScopePoints project
         seq {
             yield! baseItems
-            if project.ProjectProperties.DefaultLanguage = FSharpProjectLanguage.Instance then
+            if project.ProjectProperties :? FSharpProjectProperties then
                 yield InAzureFunctionsFSharpProject()
         }
 
