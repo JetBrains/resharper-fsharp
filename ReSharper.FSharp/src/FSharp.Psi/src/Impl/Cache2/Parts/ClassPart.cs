@@ -39,7 +39,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       if (BaseTypeClrTypeName != null)
         return TypeFactory.CreateTypeByCLRName(BaseTypeClrTypeName, GetPsiModule()).GetTypeElement() as IClass;
 
-      var typeElement = GetBaseClassType().GetTypeElement();
+      var typeElement = GetBaseClassType()?.GetTypeElement();
       if (typeElement == null)
       {
         BaseTypeClrTypeName = EmptyClrTypeName.Instance;

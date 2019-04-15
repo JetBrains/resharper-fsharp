@@ -1,6 +1,7 @@
-﻿module Module
+﻿//${NEW_NAME:Zzz}
+module Module
 
-exception zzz of int
+exception Zzz of int
 
-let e1 = zzz 123
-let e2 = Unchecked.defaultof<zzz>
+let e1 = Zzz 123
+let e2 = Unchecked.defaultof<Zzz>

@@ -349,7 +349,14 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
         x.ProcessSynType(typ)
         x.Done(range, mark, ElementType.OTHER_TYPE)
 
-    member x.ProcessBinding(Binding(_,_,_,_,attrs,_,_,headPat,_, expr,_,_) as binding, isLocal: bool) =
+    member x.ProcessBinding(Binding(_,kind,_,_,attrs,_,_,headPat,_, expr,_,_) as binding, isLocal: bool) =
+        match kind with
+        | StandaloneExpression
+        | DoBinding ->
+            x.MarkOtherExpr(expr)
+
+        | _ ->
+
         let mark =
             match attrs with
             | [] -> x.Mark(binding.StartPos)

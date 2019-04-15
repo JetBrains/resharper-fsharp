@@ -1,0 +1,6 @@
+﻿module Module
+
+type T() =
+    do
+        let zzz = 123  
+        zzz |> ignore
