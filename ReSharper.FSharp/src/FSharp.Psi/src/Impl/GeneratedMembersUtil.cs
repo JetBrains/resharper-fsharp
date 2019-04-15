@@ -81,7 +81,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     public static IEnumerable<IDeclaredElement> GetGeneratedMembers([NotNull] this IUnionCase unionCase)
     {
-      if (!(unionCase.GetContainingType().GetUnionPart() is IUnionPart unionPart))
+      if (!(unionCase.GetContainingType().GetPart<IUnionPart>() is var unionPart && unionPart != null))
         return EmptyList<IDeclaredElement>.Instance;
 
       if (unionPart.IsSingleCaseUnion && unionCase is FSharpUnionCaseProperty)

@@ -1,9 +1,12 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings.Rename
 
+open System
 open FSharp.Compiler.SourceCodeServices
 open FSharp.Compiler.PrettyNaming
 open JetBrains.Application
+open JetBrains.IDE.UI.Extensions.Validation
 open JetBrains.Metadata.Reader.Impl
+open JetBrains.ReSharper.Feature.Services.Refactorings
 open JetBrains.ReSharper.Feature.Services.Refactorings.Specific.Rename
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -11,10 +14,12 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Naming.Impl
 open JetBrains.ReSharper.Psi.Naming.Interfaces
 open JetBrains.ReSharper.Refactorings.Rename
+open JetBrains.ReSharper.Refactorings.Rename.Pages
 open JetBrains.Util
 
 [<AutoOpen>]
@@ -61,7 +66,7 @@ type FSharpAtomicRename(declaredElement, newName, doNotShowBindingConflicts) =
 
 
 [<Language(typeof<FSharpLanguage>)>]
-type FSharpRenameHelper() =
+type FSharpRenameHelper(namingService: FSharpNamingService) =
     inherit RenameHelperBase()
 
     override x.IsLanguageSupported = true
@@ -101,10 +106,20 @@ type FSharpRenameHelper() =
     override x.GetOptionsModel(declaredElement, reference, lifetime) =
         FSharpCustomRenameModel(declaredElement, reference, lifetime, (* todo *) ChangeNameKind.SourceName) :> _
 
+    override x.IsValidName(decl: IDeclaration, elementType: DeclaredElementType, name: string) =
+        namingService.IsValidName(decl.DeclaredElement, name)
+
     override x.GetInitialPage(workflow) =
+        let page: IRefactoringPage =
+            { new RenameInitialControlPage(workflow.RenameWorkflow) with
+                  override x.AddCustomValidation(textBox, element) =
+                      let validate = Func<_,_>(fun property ->
+                          FSharpNameValidationRule(property, element, namingService) :> ValidationRuleWithProperty<_>)
+                      textBox.WithValidationRule(x.Lifetime, validate) |> ignore } :> _
+
         let dataModel = workflow.RenameDataModel
         match dataModel.InitialDeclaredElement with
-        | null -> null
+        | null -> page
         | element ->
 
         dataModel.InitialName <-
@@ -117,7 +132,15 @@ type FSharpRenameHelper() =
             | ChangeNameKind.UseSingleName -> fsDeclaredElement.SourceName
             | _ -> fsDeclaredElement.ShortName
 
-        null            
+        page
+
+
+type FSharpNameValidationRule(property, element: IDeclaredElement, namingService: FSharpNamingService) as this =
+    inherit SimpleValidationRuleOnProperty<string>(property, element.GetSolution().Locks)
+
+    do
+        this.Message <- "Identifier is not valid"
+        this.ValidateAction <- Func<_,_>(fun name -> namingService.IsValidName(element, name))
 
 
 [<ShellFeaturePart>]
@@ -149,6 +172,10 @@ type FSharpAtomicRenamesFactory() =
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpNamingService(language: FSharpLanguage) =
     inherit ClrNamingLanguageServiceBase(language)
+
+    let notAllowedInTypes =
+        // F# 4.1 spec: 3.4 Identifiers and Keywords
+        [| '.'; '+'; '$'; '&'; '['; ']'; '/'; '\\'; '*'; '\"'; '`' |]
 
     let fsListClrTypeName = ClrTypeName("Microsoft.FSharp.Collections.FSharpList`1")
 
@@ -213,6 +240,26 @@ type FSharpNamingService(language: FSharpLanguage) =
         if isFSharpTypeLike element then Seq.map dropFSharpWords roots else roots
 
     override x.IsSameNestedNameAllowedForMembers = true
+
+    member x.IsValidName(element: IDeclaredElement, name: string) =
+        let isValidCaseStart char =
+            // F# 4.1 spec: 8.5 Union Type Definitions
+            Char.IsUpper(char) && not (Char.IsLower(char))
+
+        let isTypeLike (element: IDeclaredElement) =
+            element :? ITypeElement || element :? IUnionCase || element :? INamespace
+
+        let isUnionCaseLike (element: IDeclaredElement) =
+            match element with
+            | :? IUnionCase -> true
+            | :? ITypeElement as typeElement -> typeElement.IsException()
+            | _ -> false
+
+        if name.IsEmpty() then false else
+        if isUnionCaseLike element && not (isValidCaseStart name.[0]) then false else
+        if isTypeLike element && name.IndexOfAny(notAllowedInTypes) <> -1 then false else
+
+        not (startsWith "`" name || endsWith "`" name || name.ContainsNewLine() || name.Contains("``"))
 
 
 [<RenamePart>]

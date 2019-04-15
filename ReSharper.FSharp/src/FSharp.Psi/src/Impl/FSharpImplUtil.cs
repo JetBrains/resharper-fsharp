@@ -274,27 +274,31 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     [CanBeNull]
-    public static IUnionPart GetUnionPart([CanBeNull] this ITypeElement type)
+    public static TPart GetPart<TPart>([CanBeNull] this ITypeElement type)
+      where TPart : class, ClassLikeTypeElement.IClassLikePart
     {
       if (!(type is TypeElement typeElement))
         return null;
 
       foreach (var part in typeElement.EnumerateParts())
-        if (part is IUnionPart unionPart)
-          return unionPart;
+        if (part is TPart expectedPart)
+          return expectedPart;
       return null;
     }
 
-    public static bool IsUnion([NotNull] this TypeElement type) =>
-      GetUnionPart(type) != null;
+    public static bool IsException(this ITypeElement type) =>
+      GetPart<IExceptionPart>(type) != null;
+    
+    public static bool IsUnion([NotNull] this ITypeElement type) =>
+      GetPart<IUnionPart>(type) != null;
 
     [NotNull]
     public static IList<IUnionCase> GetUnionCases([CanBeNull] this ITypeElement type) =>
-      GetUnionPart(type)?.Cases ?? EmptyList<IUnionCase>.Instance;
+      GetPart<IUnionPart>(type)?.Cases ?? EmptyList<IUnionCase>.Instance;
 
     [CanBeNull]
     public static FSharpUnionTagsClass GetUnionTagsClass([CanBeNull] this ITypeElement type) =>
-      GetUnionPart(type) is UnionPartBase unionPart && !unionPart.IsSingleCaseUnion
+      GetPart<IUnionPart>(type) is UnionPartBase unionPart && !unionPart.IsSingleCaseUnion
         ? new FSharpUnionTagsClass(unionPart.TypeElement)
         : null;
 
