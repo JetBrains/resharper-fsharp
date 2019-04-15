@@ -68,10 +68,9 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
 
             | FSharpStructuredToolTipElement.Group(overloads) ->
                 overloads |> List.iter (fun overload ->
-                    [
-                      if not (isEmptyL overload.MainDescription) then
+                    [ if not (isEmptyL overload.MainDescription) then
                           yield showL overload.MainDescription
-                        
+
                       if not overload.TypeMapping.IsEmpty then
                           yield "Generic parameters:\n" + (overload.TypeMapping |> List.map showL |> String.concat "\n")
 
@@ -79,11 +78,11 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
                       | null -> ()
                       | xmlDocText when xmlDocText.Text.IsNullOrWhitespace() -> ()
                       | xmlDocText -> yield xmlDocText.Text
-                      
+
                       match overload.Remarks with
-                      | Some remarks -> yield showL remarks
-                      | None -> ()
-                    ]
+                      | Some remarks when not (isEmptyL remarks) ->
+                          yield showL remarks
+                      | _ -> () ]
                     |> String.concat "\n\n"
                     |> result.Add))
 
