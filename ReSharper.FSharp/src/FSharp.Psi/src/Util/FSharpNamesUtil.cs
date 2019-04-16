@@ -1,13 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
-using JetBrains.Metadata.Reader.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
 using JetBrains.Util.Extension;
+using Microsoft.FSharp.Core;
 using static FSharp.Compiler.PrettyNaming;
+using static JetBrains.ReSharper.Plugins.FSharp.Common.Util.FSharpPredefinedType;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {
@@ -15,9 +17,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
   {
     public const int EscapedNameAffixLength = 4;
     public const int EscapedNameStartIndex = 2;
-
-    internal static readonly ClrTypeName SourceNameAttributeClrTypeName =
-      new ClrTypeName("Microsoft.FSharp.Core.CompilationSourceNameAttribute");
 
     public static bool IsEscapedWithBackticks([NotNull] string name)
     {
@@ -48,8 +47,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         GetPossibleSourceNames(type, names);
 
       if (element is IAttributesOwner attrOwner)
-        if (GetAttributeValue(attrOwner, SourceNameAttributeClrTypeName) is string sourceName)
+      {
+        if (GetAttributeValue(attrOwner, SourceNameAttrTypeName) is string sourceName)
           names.Add(sourceName);
+
+        if (GetAttributeValue(attrOwner, CompilationMappingAttrTypeName) is var flagValue && flagValue != null)
+        {
+          if ((SourceConstructFlags) flagValue == SourceConstructFlags.UnionCase && element is IMethod &&
+              name.StartsWith("New", StringComparison.Ordinal))
+            names.Add(name.Substring(3));
+        }
+      }
 
       return names.SelectMany(n => new[] {n, $"``{n}``"});
     }
@@ -67,8 +75,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     }
 
     [CanBeNull]
-    private static object GetAttributeValue([NotNull] IAttributesSet attrs, [NotNull] IClrTypeName attrName) =>
-      attrs.GetAttributeInstances(attrName, true).FirstOrDefault()?.PositionParameters()
-        .FirstOrDefault()?.ConstantValue.Value;
+    private static object GetAttributeValue([NotNull] IAttributesSet attrs, [NotNull] IClrTypeName attrName)
+    {
+      var instance = attrs.GetAttributeInstances(attrName, false).FirstOrDefault();
+      var parameter = instance?.PositionParameters().FirstOrDefault();
+      return parameter?.ConstantValue.Value;
+    }
   }
 }

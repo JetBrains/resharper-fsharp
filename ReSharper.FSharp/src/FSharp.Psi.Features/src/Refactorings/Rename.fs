@@ -5,7 +5,6 @@ open FSharp.Compiler.SourceCodeServices
 open FSharp.Compiler.PrettyNaming
 open JetBrains.Application
 open JetBrains.IDE.UI.Extensions.Validation
-open JetBrains.Metadata.Reader.Impl
 open JetBrains.ReSharper.Feature.Services.Refactorings
 open JetBrains.ReSharper.Feature.Services.Refactorings.Specific.Rename
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
@@ -177,8 +176,6 @@ type FSharpNamingService(language: FSharpLanguage) =
         // F# 4.1 spec: 3.4 Identifiers and Keywords
         [| '.'; '+'; '$'; '&'; '['; ']'; '/'; '\\'; '*'; '\"'; '`' |]
 
-    let fsListClrTypeName = ClrTypeName("Microsoft.FSharp.Collections.FSharpList`1")
-
     let withWords words (nameRoot: NameRoot) =
         NameRoot(Array.ofList words, nameRoot.PluralityKind, nameRoot.IsFinalPresentation)
 
@@ -217,7 +214,7 @@ type FSharpNamingService(language: FSharpLanguage) =
 
         let typeElement = declaredType.GetTypeElement()
         if not (isFSharpTypeLike typeElement) then roots else
-        if typeElement.GetClrName().Equals(fsListClrTypeName) then roots else
+        if typeElement.GetClrName().Equals(fsListTypeName) then roots else
 
         let typeParameters = typeElement.TypeParameters
         if typeParameters.IsEmpty() then roots else
