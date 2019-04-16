@@ -5,6 +5,7 @@ using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.Special;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
@@ -76,6 +77,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
         if (containingMember != null)
           return myClrSearchFactory.GetDeclaredElementSearchDomain(containingMember);
       }
+
+      if (declaredElement is CompiledActivePatternCase compiledActivePatternCase)
+        return myClrSearchFactory.GetDeclaredElementSearchDomain(compiledActivePatternCase.Origin);
 
       return EmptySearchDomain.Instance;
     }

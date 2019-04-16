@@ -10,9 +10,8 @@ using JetBrains.Util.DataStructures;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  public abstract class FSharpDeclaredElementBase : IClrDeclaredElement
+  public abstract class DeclaredElementBase : IClrDeclaredElement
   {
-    public PsiLanguageType PresentationLanguage => FSharpLanguage.Instance;
     public bool CaseSensitiveName => true;
     public bool IsSynthetic() => false;
 
@@ -34,6 +33,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public abstract string ShortName { get; }
     public abstract bool IsValid();
 
+    public abstract PsiLanguageType PresentationLanguage { get; }
     public abstract IPsiModule Module { get; }
     public abstract IPsiServices GetPsiServices();
 
@@ -42,5 +42,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public abstract ISubstitution IdSubstitution { get; }
     public abstract DeclaredElementType GetElementType();
+  }
+
+  public abstract class FSharpDeclaredElementBase : DeclaredElementBase
+  {
+    public override PsiLanguageType PresentationLanguage => FSharpLanguage.Instance;
   }
 }

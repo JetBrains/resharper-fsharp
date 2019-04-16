@@ -5,8 +5,10 @@ using FSharp.Compiler;
 using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
+using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.Special;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
@@ -184,12 +186,35 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         if (!field.IsUnresolved && field.DeclaringEntity?.Value is FSharpEntity fieldEntity)
           return GetTypeElement(fieldEntity, psiModule)?.EnumerateMembers(field.Name, true).FirstOrDefault();
 
-      // find active pattern entity/member. if it's compiled use wrapper. if it's source defined find actual element
-      if (symbol is FSharpActivePatternCase activePatternCase)
-        return GetActivePatternCaseElement(activePatternCase, psiModule, referenceExpression);
+      if (symbol is FSharpActivePatternCase patternCase)
+        return GetActivePatternCaseElement(psiModule, referenceExpression, patternCase);
 
       if (symbol is FSharpGenericParameter parameter)
         return GetTypeParameter(parameter, referenceExpression);
+
+      return null;
+    }
+
+    private static IDeclaredElement GetActivePatternCaseElement(IPsiModule psiModule,
+      IReferenceExpression referenceExpression, FSharpActivePatternCase patternCase)
+    {
+      var pattern = patternCase.Group;
+      var entity = pattern.DeclaringEntity?.Value;
+      if (entity == null)
+        return GetActivePatternCaseElement(patternCase, psiModule, referenceExpression);
+
+      var typeElement = GetTypeElement(entity, psiModule);
+      var patternName = pattern.Name?.Value;
+      if (typeElement == null || !(patternName is var name) || name == null)
+        return null;
+
+      if (typeElement.Module.ContainingProjectModule is IProject)
+        return GetActivePatternCaseElement(patternCase, psiModule, referenceExpression);
+
+      var patternMfv = entity.MembersFunctionsAndValues.FirstOrDefault(mfv => mfv.LogicalName == patternName);
+      var patternCompiledName = patternMfv?.CompiledName ?? patternCase.Name;
+      if (typeElement.EnumerateMembers(patternCompiledName, true).FirstOrDefault() is IMethod method)
+        return new CompiledActivePatternCase(method, patternCase.Name, patternCase.Index);
 
       return null;
     }
