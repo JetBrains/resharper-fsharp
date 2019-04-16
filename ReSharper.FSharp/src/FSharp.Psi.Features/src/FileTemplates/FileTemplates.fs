@@ -20,7 +20,7 @@ open JetBrains.Util
 type InFSharpProjectScope() =
     inherit InLanguageSpecificProject(FSharpProjectLanguage.Instance)
 
-    let name = "F#"
+    let name = "F# projects"
     let scopeGuid = Guid("12479F92-FC36-4CBD-9D43-568E3AB6CDD0")
     let quickListGuid = Guid("280E6C58-C563-42DF-9BD3-2ABEC2F436B2")
 
@@ -38,7 +38,7 @@ type InFSharpProjectScope() =
 type InFSharpFile() =
     inherit InAnyLanguageFile()
 
-    let name = "F#"
+    let name = "F# files"
     let scopeGuid = Guid("AD4734E3-3BDB-4187-AA4C-BB6322BDB319")
     let quickListGuid = Guid("4623E5C4-FF8A-4EC6-81EF-054B553D886C")
 

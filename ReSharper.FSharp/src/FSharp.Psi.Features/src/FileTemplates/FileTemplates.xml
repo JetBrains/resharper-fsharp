@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
     <s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=586C0E2863C5DF429BD32ABEC2F436B2/@KeyIndexDefined">True</s:Boolean>
-    <s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=586C0E2863C5DF429BD32ABEC2F436B2/Name/@EntryValue">F#</s:String>
+    <s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=586C0E2863C5DF429BD32ABEC2F436B2/Name/@EntryValue">F# projects</s:String>
 	
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=586C0E2863C5DF429BD32ABEC2F436B2/Entry/=9FF767E3D6E1E34FA3753A0A64D429AC/@KeyIndexDefined">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=586C0E2863C5DF429BD32ABEC2F436B2/Entry/=9FF767E3D6E1E34FA3753A0A64D429AC/EntryName/@EntryValue">Source file</s:String>
