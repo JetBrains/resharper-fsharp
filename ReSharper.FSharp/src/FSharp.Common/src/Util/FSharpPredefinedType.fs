@@ -32,8 +32,8 @@ let fsAsyncTypeName = clrTypeName "Microsoft.FSharp.Control.FSharpAsync"
 let fsAsyncGenericTypeName = clrTypeName "Microsoft.FSharp.Control.FSharpAsync`1"
 
 
-/// Used during Find Usages to get display name when searching element without having FSharpSymbol element.
-/// This map should be removed when it's possible to get abbreviations info from assemblies.
+/// This map is used in Find Usages to get source name of element without having FSharpSymbol element.
+/// It should be removed when it's possible to get abbreviation definitions from assemblies.
 [<CompiledName("PredefinedAbbreviations")>]
 let predefinedAbbreviations =
     [| PredefinedType.OBJECT_FQN, [| "obj" |]
@@ -55,15 +55,14 @@ let predefinedAbbreviations =
        PredefinedType.BOOLEAN_FQN, [| "bool" |]
        PredefinedType.DECIMAL_FQN, [| "decimal" |]
 
-        // Collections and other types
        fsListTypeName, [| "list" |]
        fsOptionTypeName, [| "option" |]
        fsRefTypeName, [| "ref" |]
-       fsRefTypeName, [| "result" |]
+       fsResultTypeName, [| "result" |]
        fsAsyncTypeName, [| "async" |]
        fsAsyncGenericTypeName, [| "async" |] |]
     |> dict
 
-[<Extension; CompiledName("TryGetPredefinedAbbreviation")>]
-let tryGetPredefinedAbbreviation(clrTypeName: IClrTypeName, names: outref<string[]>) =
+[<Extension; CompiledName("TryGetPredefinedAbbreviations")>]
+let tryGetPredefinedAbbreviations(clrTypeName: IClrTypeName, names: outref<string[]>) =
     predefinedAbbreviations.TryGetValue(clrTypeName, &names)
