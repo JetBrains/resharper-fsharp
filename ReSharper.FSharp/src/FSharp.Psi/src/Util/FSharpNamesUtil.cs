@@ -70,7 +70,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       names.Add(typeShortName.SubstringBeforeLast(AttributeInstanceExtensions.ATTRIBUTE_SUFFIX));
       names.Add(typeShortName.SubstringBeforeLast(FSharpImplUtil.ModuleSuffix));
 
-      if (type.GetClrName().TryGetAbbreviations(out var abbreviations))
+      if (type.GetClrName().TryGetPredefinedAbbreviation(out var abbreviations))
         names.AddRange(abbreviations);
     }
 
