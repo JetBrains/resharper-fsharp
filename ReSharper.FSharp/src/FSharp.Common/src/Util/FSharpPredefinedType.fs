@@ -58,9 +58,9 @@ let predefinedAbbreviations =
        fsListTypeName, [| "list" |]
        fsOptionTypeName, [| "option" |]
        fsRefTypeName, [| "ref" |]
-       fsResultTypeName, [| "result" |]
-       fsAsyncTypeName, [| "async" |]
-       fsAsyncGenericTypeName, [| "async" |] |]
+       fsResultTypeName, [| "Result" |]
+       fsAsyncTypeName, [| "Async" |]
+       fsAsyncGenericTypeName, [| "Async" |] |]
     |> dict
 
 [<Extension; CompiledName("TryGetPredefinedAbbreviations")>]

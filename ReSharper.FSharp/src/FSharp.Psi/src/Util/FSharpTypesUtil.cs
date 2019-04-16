@@ -202,8 +202,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     public static ParameterKind MapParameterKind([NotNull] this FSharpParameter param)
     {
       var fsType = param.Type;
-      if (fsType.HasTypeDefinition && fsType.TypeDefinition.IsByRef)
-        return param.IsOut ? ParameterKind.OUTPUT : ParameterKind.REFERENCE;
+      if (fsType.HasTypeDefinition && fsType.TypeDefinition is var entity && entity.IsByRef)
+      {
+        if (param.IsOut || entity.LogicalName == "outref`1")
+          return ParameterKind.OUTPUT;
+        if (param.IsInArg || entity.LogicalName == "inref`1")
+          return ParameterKind.INPUT;
+
+        return ParameterKind.REFERENCE;
+      }
+
       return ParameterKind.VALUE;
     }
   }
