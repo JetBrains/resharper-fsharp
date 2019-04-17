@@ -115,7 +115,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       : MemberHidePolicy.HIDE_BY_NAME;
 
     // todo
-    public bool CanBeImplicitImplementation => false;
+    public bool CanBeImplicitImplementation => true;
     public bool IsExplicitImplementation => false;
     public IList<IExplicitImplementation> ExplicitImplementations => EmptyList<IExplicitImplementation>.Instance;
 
