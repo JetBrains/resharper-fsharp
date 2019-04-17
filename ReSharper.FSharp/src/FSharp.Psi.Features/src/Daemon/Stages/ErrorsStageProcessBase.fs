@@ -65,10 +65,10 @@ type ErrorsStageProcessBase(fsFile, daemonProcess) =
         let highlightings = List(errors.Length)
         let errors =
             errors
-            |> Array.map (fun error -> struct (error, getDocumentRange error))
-            |> Array.distinct
+            |> Array.map (fun error -> (error, getDocumentRange error))
+            |> Array.distinctBy (fun (error, range) -> range, error.Message)
 
-        for struct (error, range) in errors  do
+        for (error, range) in errors  do
             if x.ShouldAddDiagnostic(error, range) then
                 let highlighting = createHighlighting error range
                 highlightings.Add(HighlightingInfo(highlighting.CalculateRange(), highlighting))
