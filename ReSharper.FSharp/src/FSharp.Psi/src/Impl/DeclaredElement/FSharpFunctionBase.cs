@@ -61,6 +61,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public override bool Equals(object obj)
     {
+      if (ReferenceEquals(this, obj))
+        return true;
+
       if (!base.Equals(obj))
         return false;
 

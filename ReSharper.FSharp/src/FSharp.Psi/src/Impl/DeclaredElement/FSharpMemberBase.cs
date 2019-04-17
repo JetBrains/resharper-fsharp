@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
@@ -77,6 +77,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public override bool Equals(object obj)
     {
+      if (ReferenceEquals(this, obj))
+        return true;
+
       if (!base.Equals(obj) || !(obj is FSharpMemberBase<TDeclaration> otherMember))
         return false;
 
