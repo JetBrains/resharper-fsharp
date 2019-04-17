@@ -8,7 +8,7 @@ using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.Special;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.Compiled;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
