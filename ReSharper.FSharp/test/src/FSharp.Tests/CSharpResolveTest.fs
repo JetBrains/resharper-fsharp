@@ -77,6 +77,8 @@ type CSharpResolveTest() =
 
     [<Test>] member x.``Properties 01``() = x.DoNamedTest()
     [<Test>] member x.``Properties 02 - Function type``() = x.DoNamedTest()
+    [<Test>] member x.``Properties 03 - Auto with setter``() = x.DoNamedTest()
+    [<Test>] member x.``Properties 04 - With setter``() = x.DoNamedTest()
 
     [<Test>] member x.``Module bindings 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Module bindings 02 - Records``() = x.DoNamedTest()

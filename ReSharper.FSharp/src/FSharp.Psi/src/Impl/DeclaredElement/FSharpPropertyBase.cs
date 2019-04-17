@@ -12,12 +12,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
     protected FSharpPropertyBase([NotNull] ITypeMemberDeclaration declaration,
-      [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)
+      [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration)
     {
-      IsReadable = mfv.HasGetterMethod || mfv.IsPropertyGetterMethod ||
-                   mfv.IsModuleValueOrMember && !mfv.IsMember;
+      var prop = GetProperty(mfv);
 
-      IsWritable = mfv.IsMutable || mfv.HasSetterMethod || mfv.IsPropertySetterMethod;
+      IsReadable = prop.HasGetterMethod || prop.IsPropertyGetterMethod ||
+                   prop.IsModuleValueOrMember && !prop.IsMember;
+
+      IsWritable = prop.IsMutable || prop.HasSetterMethod || prop.IsPropertySetterMethod;
+    }
+
+    [NotNull]
+    private FSharpMemberOrFunctionOrValue GetProperty([NotNull] FSharpMemberOrFunctionOrValue prop)
+    {
+      // Property returned in AccessorProperty currently returns HasSetterMethod = false.
+      // Workaround it by getting mfv property from declaring entity.
+      var entity = prop.DeclaringEntity?.Value;
+      var propertyName = prop.LogicalName;
+      return entity?.MembersFunctionsAndValues.FirstOrDefault(m => m.LogicalName == propertyName) ?? prop;
     }
 
     protected override FSharpSymbol GetActualSymbol(FSharpSymbol symbol)

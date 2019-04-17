@@ -13,7 +13,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
     protected FSharpFunctionBase([NotNull] ITypeMemberDeclaration declaration,
-      [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)
+      [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration)
     {
     }
 

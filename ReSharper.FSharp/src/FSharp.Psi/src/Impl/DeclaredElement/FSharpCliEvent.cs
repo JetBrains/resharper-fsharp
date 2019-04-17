@@ -11,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
     public FSharpCliEvent([NotNull] ITypeMemberDeclaration declaration, FSharpMemberOrFunctionOrValue mfv)
-      : base(declaration, mfv)
+      : base(declaration)
     {
     }
 

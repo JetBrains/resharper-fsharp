@@ -1,0 +1,11 @@
+﻿public class Class1
+{
+  public Class1()
+  {
+    var _ = new Module.Foo {Foo = 123};
+  }
+}
+
+---------------------------------------------------------
+M:Module.Foo.#ctor
+P:Module.Foo.Foo
