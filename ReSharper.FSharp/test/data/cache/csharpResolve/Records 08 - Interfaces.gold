@@ -1,0 +1,11 @@
+﻿public class Class1
+{
+  public Class1()
+  {
+    using (new Module.R(123));
+  }
+}
+
+---------------------------------------------------------
+M:Module.R.Dispose
+M:Module.R.#ctor(System.Int32)

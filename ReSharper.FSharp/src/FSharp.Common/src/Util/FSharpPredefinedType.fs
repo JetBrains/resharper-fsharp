@@ -13,6 +13,7 @@ let sourceNameAttrTypeName = clrTypeName "Microsoft.FSharp.Core.CompilationSourc
 [<CompiledName("CompilationMappingAttrTypeName")>]
 let compilationMappingAttrTypeName = clrTypeName "Microsoft.FSharp.Core.CompilationMappingAttribute"
 
+
 [<CompiledName("FSharpListTypeName")>]
 let fsListTypeName = clrTypeName "Microsoft.FSharp.Collections.FSharpList`1"
 
@@ -30,6 +31,19 @@ let fsAsyncTypeName = clrTypeName "Microsoft.FSharp.Control.FSharpAsync"
 
 [<CompiledName("FSharpAsyncGenericTypeName")>]
 let fsAsyncGenericTypeName = clrTypeName "Microsoft.FSharp.Control.FSharpAsync`1"
+
+
+[<CompiledName("StructuralComparableTypeName")>]
+let structuralComparableTypeName = clrTypeName "System.Collections.IStructuralComparable"
+
+[<CompiledName("StructuralEquatableTypeName")>]
+let structuralEquatableTypeName = clrTypeName "System.Collections.IStructuralEquatable"
+
+[<CompiledName("ComparerTypeName")>]
+let comparerTypeName = clrTypeName "System.Collections.IComparer"
+
+[<CompiledName("EqualityComparerTypeName")>]
+let equalityComparerTypeName = clrTypeName "System.Collections.IEqualityComparer"
 
 
 /// This map is used in Find Usages to get source name of element without having FSharpSymbol element.

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
@@ -45,7 +46,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       new[]
       {
         GetPsiModule().GetPredefinedType().Exception,
-        TypeFactory.CreateTypeByCLRName(FSharpGeneratedMembers.StructuralEquatableInterfaceName, GetPsiModule())
+        TypeFactory.CreateTypeByCLRName(FSharpPredefinedType.StructuralEquatableTypeName, GetPsiModule())
       };
 
     public override IEnumerable<ITypeMember> GetTypeMembers() =>

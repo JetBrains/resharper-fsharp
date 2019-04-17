@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
-using JetBrains.Metadata.Reader.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Impl.Special;
+using static JetBrains.ReSharper.Plugins.FSharp.Common.Util.FSharpPredefinedType;
 using static JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated.FSharpGeneratedMembers;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
@@ -14,18 +14,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
   {
     public static readonly string[] SimpleTypeExtendsListShortNames =
       {"IStructuralEquatable", "IStructuralComparable", "IComparable"};
-
-    public static readonly IClrTypeName StructuralComparableInterfaceName =
-      new ClrTypeName("System.Collections.IStructuralComparable");
-
-    public static readonly IClrTypeName StructuralEquatableInterfaceName =
-      new ClrTypeName("System.Collections.IStructuralEquatable");
-
-    public static readonly IClrTypeName ComparerInterfaceName =
-      new ClrTypeName("System.Collections.IComparer");
-
-    public static readonly IClrTypeName EqualityComparerInterfaceName =
-      new ClrTypeName("System.Collections.IEqualityComparer");
 
     public const string CompareToMethodName = "CompareTo";
     public const string EqualsMethodName = "Equals";
@@ -51,7 +39,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     protected override IType FirstParamType => PredefinedType.Object;
     protected override string FirstParamName => ObjParameterName;
 
-    protected override IType SecondParamType => TypeFactory.CreateTypeByCLRName(ComparerInterfaceName, Module);
+    protected override IType SecondParamType => TypeFactory.CreateTypeByCLRName(ComparerTypeName, Module);
     protected override string SecondParamName => CompParameterName;
   }
 
@@ -105,7 +93,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     protected override IType FirstParamType => PredefinedType.Object;
     protected override string FirstParamName => ObjParameterName;
 
-    protected override IType SecondParamType => TypeFactory.CreateTypeByCLRName(EqualityComparerInterfaceName, Module);
+    protected override IType SecondParamType => TypeFactory.CreateTypeByCLRName(EqualityComparerTypeName, Module);
     protected override string SecondParamName => CompParameterName;
   }
 
@@ -153,7 +141,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     public override string ShortName => GetHashCodeMethodName;
     public override IType ReturnType => PredefinedType.Int;
 
-    protected override IType FirstParamType => TypeFactory.CreateTypeByCLRName(EqualityComparerInterfaceName, Module);
+    protected override IType FirstParamType => TypeFactory.CreateTypeByCLRName(EqualityComparerTypeName, Module);
     protected override string FirstParamName => CompParameterName;
   }
 

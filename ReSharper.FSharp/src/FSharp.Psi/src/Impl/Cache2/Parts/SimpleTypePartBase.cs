@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
@@ -37,15 +38,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
       var psiModule = GetPsiModule();
       var predefinedType = psiModule.GetPredefinedType();
-      return new[]
+      var generated = new[]
       {
         predefinedType.Object,
         predefinedType.IComparable,
         predefinedType.GenericIComparable,
         predefinedType.GenericIEquatable,
-        TypeFactory.CreateTypeByCLRName(FSharpGeneratedMembers.StructuralComparableInterfaceName, psiModule),
-        TypeFactory.CreateTypeByCLRName(FSharpGeneratedMembers.StructuralEquatableInterfaceName, psiModule)
+        TypeFactory.CreateTypeByCLRName(FSharpPredefinedType.StructuralComparableTypeName, psiModule),
+        TypeFactory.CreateTypeByCLRName(FSharpPredefinedType.StructuralEquatableTypeName, psiModule)
       };
+
+      var interfaces = base.GetSuperTypes().AsIList();
+      if (interfaces.IsEmpty())
+        return generated;
+
+      var result = new JetHashSet<IDeclaredType>(generated.Length + interfaces.Count);
+      result.AddRange(generated);
+      result.AddRange(interfaces);
+      return result;
     }
 
     protected virtual IList<ITypeMember> GetGeneratedMembers() =>
