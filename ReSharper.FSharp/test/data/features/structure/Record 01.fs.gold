@@ -3,4 +3,4 @@
   R
    Field:int
    IDisposable
-    Dispose():void
+    IDisposable.Dispose():void

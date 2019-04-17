@@ -1,13 +1,16 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
+using JetBrains.Util.Logging;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
@@ -45,7 +48,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override bool HasAttributeInstance(IClrTypeName clrName, AttributesSource attributesSource) =>
       Attributes.HasAttributeInstance(clrName.FullName);
 
-    public InvocableSignature GetSignature(ISubstitution substitution) => new InvocableSignature(this, substitution);
+    public InvocableSignature GetSignature(ISubstitution substitution) =>
+      new InvocableSignature(this, substitution);
 
     public IEnumerable<IParametersOwnerDeclaration> GetParametersOwnerDeclarations() =>
       EmptyList<IParametersOwnerDeclaration>.Instance;
@@ -56,6 +60,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public override AccessRights GetAccessRights()
     {
+      if (IsExplicitImplementation)
+        return AccessRights.PRIVATE;
+
       var mfv = Mfv;
       if (mfv == null)
         return AccessRights.NONE;
@@ -69,6 +76,33 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     }
 
     public override bool IsStatic => !Mfv?.IsInstanceMember ?? false;
+
+    public bool CanBeImplicitImplementation => false;
+
+    public bool IsExplicitImplementation =>
+      GetDeclaration() is IMemberDeclaration member && member.IsExplicitImplementation;
+
+    public IList<IExplicitImplementation> ExplicitImplementations
+    {
+      get
+      {
+        var mfv = Mfv;
+        var implementations = mfv?.ImplementedAbstractSignatures;
+        if (implementations == null || implementations.IsEmpty())
+          return EmptyList<IExplicitImplementation>.Instance;
+
+        if (implementations.Count > 1)
+          Logger.GetLogger<FSharpMemberBase<TDeclaration>>().Warn("Multiple explicit implementations for {0}", this);
+
+        var impl = implementations.FirstOrDefault();
+        if (impl == null)
+          return EmptyList<IExplicitImplementation>.Instance;
+
+        return GetType(impl.DeclaringType) is IDeclaredType type
+          ? new IExplicitImplementation[] {new ExplicitImplementation(this, type, ShortName, true)}
+          : EmptyList<IExplicitImplementation>.InstanceList;
+      }
+    }
 
     // todo: check interface impl
     public override bool IsOverride => Mfv?.IsOverrideOrExplicitInterfaceImplementation ?? false;

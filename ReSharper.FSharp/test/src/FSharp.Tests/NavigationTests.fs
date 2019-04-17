@@ -34,4 +34,5 @@ type FSharpGoToImplementationTest() =
     
     [<Test>] member x.``Interface 01``() = x.DoNamedTest()
     [<Test>] member x.``Interface 02 - Member``() = x.DoNamedTest()
-    [<Test; Ignore>] member x.``Interface 03 - Internal type impl``() = x.DoNamedTest()
+    [<Test>] member x.``Interface 03 - Internal type impl``() = x.DoNamedTest()
+    [<Test>] member x.``Interface 04 - Overloads``() = x.DoNamedTest()

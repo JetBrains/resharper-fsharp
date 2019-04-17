@@ -1,0 +1,15 @@
+﻿public class Class1
+{
+  public Class1()
+  {
+    var t = new Module.T();
+    t.|Dispose|(0)();
+    ((System.IDisposable) t).Dispose();
+  }
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Cannot access private method 'Dispose' here
+M:Module.T.#ctor
+M:Module.T.Dispose
+M:Module.T.Dispose

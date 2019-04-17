@@ -115,6 +115,8 @@ type CSharpResolveTest() =
 
     [<Test>] member x.``Generics - Methods 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Impementations - Explicit impl 01``() = x.DoNamedTest()
+    
     override x.RelativeTestDataPath = "cache/csharpResolve"
 
     override x.MainFileExtension = CSharpProjectFileType.CS_EXTENSION

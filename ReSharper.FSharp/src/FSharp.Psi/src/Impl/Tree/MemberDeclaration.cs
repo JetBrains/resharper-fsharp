@@ -46,5 +46,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       }
       return new FSharpMethod<MemberDeclaration>(this, mfv);
     }
+
+    public bool IsExplicitImplementation =>
+      Parent is IInterfaceImplementation;
   }
 }

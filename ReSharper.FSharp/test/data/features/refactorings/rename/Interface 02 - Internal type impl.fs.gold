@@ -1,0 +1,8 @@
+﻿module Module
+
+type IInterface =
+    abstract zzz: int
+
+type internal T() =
+    interface IInterface with
+        member x.zzz = 123

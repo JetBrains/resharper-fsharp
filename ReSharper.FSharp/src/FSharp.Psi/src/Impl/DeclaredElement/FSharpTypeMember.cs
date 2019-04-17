@@ -114,11 +114,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       ? MemberHidePolicy.HIDE_BY_SIGNATURE
       : MemberHidePolicy.HIDE_BY_NAME;
 
-    // todo
-    public bool CanBeImplicitImplementation => true;
-    public bool IsExplicitImplementation => false;
-    public IList<IExplicitImplementation> ExplicitImplementations => EmptyList<IExplicitImplementation>.Instance;
-
     public virtual bool IsVisibleFromFSharp => true;
     public virtual bool CanNavigateTo => IsVisibleFromFSharp;
 
@@ -144,6 +139,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       }
     }
 
+    [NotNull]
     protected IType GetType([CanBeNull] FSharpType fsType) =>
       fsType != null
         ? fsType.MapType(AllTypeParameters, Module)

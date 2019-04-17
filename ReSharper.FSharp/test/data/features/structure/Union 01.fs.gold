@@ -4,4 +4,4 @@
    A:U
    B
    IDisposable
-    Dispose():void
+    IDisposable.Dispose():void
