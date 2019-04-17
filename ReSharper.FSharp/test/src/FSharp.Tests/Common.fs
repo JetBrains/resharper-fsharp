@@ -9,9 +9,10 @@ open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.MSBuild
 open JetBrains.ProjectModel.Properties.Managed
-open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.TestFramework
 open JetBrains.TestFramework.Projects
 open JetBrains.Util.Dotnet.TargetFrameworkIds
@@ -32,6 +33,10 @@ type FSharpTestAttribute() =
 
     interface ITestFileExtensionProvider with
         member x.Extension = FSharpProjectFileType.FsExtension
+
+    interface ITestProjectPropertiesProvider with
+        member x.GetProjectProperties(targetFrameworkIds, _) =
+            FSharpProjectPropertiesFactory.CreateProjectProperties(targetFrameworkIds)
 
 [<SolutionComponent>]
 type FSharpTestProjectOptionsProvider

@@ -6,7 +6,6 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.FeaturesTestFramework.Daemon
 open JetBrains.ReSharper.Plugins.FSharp
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Files
@@ -19,9 +18,6 @@ type CSharpResolveTest() =
     inherit TestWithTwoProjects()
 
     let highlightingManager = HighlightingSettingsManager.Instance
-
-    override x.GetProjectProperties(targetFrameworkIds, _) =
-        FSharpProjectPropertiesFactory.CreateProjectProperties(targetFrameworkIds)
 
     [<Test>] member x.``Records 01 - Generated members``() = x.DoNamedTest()
     [<Test>] member x.``Records 02 - CliMutable``() = x.DoNamedTest()

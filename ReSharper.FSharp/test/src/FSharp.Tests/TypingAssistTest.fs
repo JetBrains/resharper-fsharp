@@ -5,7 +5,6 @@ open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.FeaturesTestFramework.TypingAssist
 open JetBrains.ReSharper.Plugins.FSharp.Common.Util
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.TypingAssist
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Tests
@@ -20,9 +19,6 @@ type FSharpTypingAssistTest() =
     inherit TypingAssistTestBase()
 
     override x.RelativeTestDataPath = "features/service/typingAssist"
-
-    override x.GetProjectProperties(targetFrameworkIds, _) =
-        FSharpProjectPropertiesFactory.CreateProjectProperties(targetFrameworkIds)
 
     [<Test>] member x.``Enter 00 - File beginning``() = x.DoNamedTest()
     [<Test>] member x.``Enter 01 - No indent``() = x.DoNamedTest()
@@ -270,9 +266,6 @@ type LineIndentsTestBase() =
     inherit BaseTestWithTextControl()
 
     override x.RelativeTestDataPath = "features/service/typingAssist"
-
-    override x.GetProjectProperties(targetFrameworkIds, _) =
-        FSharpProjectPropertiesFactory.CreateProjectProperties(targetFrameworkIds)
 
     member x.CachingLexerService =
         x.Solution.GetComponent<CachingLexerService>()

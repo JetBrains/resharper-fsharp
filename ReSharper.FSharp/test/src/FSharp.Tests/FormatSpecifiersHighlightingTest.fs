@@ -2,7 +2,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 
 open JetBrains.ReSharper.Daemon.Impl
 open JetBrains.ReSharper.FeaturesTestFramework.Daemon
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
@@ -14,9 +13,6 @@ type FormatSpecifiersHighlightingTest() =
     override x.RelativeTestDataPath = "features/daemon/formatSpecifiersHighlighting"
 
     override x.CompilerIdsLanguage = FSharpLanguage.Instance :> _
-
-    override x.GetProjectProperties(targetFrameworkIds, _) =
-        FSharpProjectPropertiesFactory.CreateProjectProperties(targetFrameworkIds)
 
     override x.HighlightingPredicate(highlighting, _, _) = highlighting :? FormatStringItemHighlighting
 

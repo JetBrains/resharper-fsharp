@@ -3,7 +3,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeStructure
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Psi
@@ -30,9 +29,6 @@ type FSharpStructureTest() =
 
     [<Test>] member x.``Class bindings 01``() = x.DoNamedTest()
     [<Test>] member x.``Type Extension 01``() = x.DoNamedTest()
-
-    override x.GetProjectProperties(targetFrameworkIds, _) =
-        FSharpProjectPropertiesFactory.CreateProjectProperties(targetFrameworkIds)
 
     override x.DoTest(project) =
         let items = project.GetSubItems(x.TestName)

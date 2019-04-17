@@ -2,7 +2,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open System
 open JetBrains.ProjectModel
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Psi.Caches.SymbolCache
@@ -14,9 +13,6 @@ type SymbolCacheTest() =
     inherit BaseTestWithSingleProject()
 
     override x.RelativeTestDataPath = "cache/symbolCache"
-
-    override x.GetProjectProperties(targetFrameworkIds, _) =
-        FSharpProjectPropertiesFactory.CreateProjectProperties(targetFrameworkIds)
 
     [<Test>] member x.``Module 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Module 02 - Qualified``() = x.DoNamedTest()

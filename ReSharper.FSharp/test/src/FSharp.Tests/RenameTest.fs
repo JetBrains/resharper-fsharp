@@ -1,7 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Refactorings
 
 open JetBrains.ReSharper.FeaturesTestFramework.Refactorings
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
@@ -10,9 +9,6 @@ type FSharpRenameTest() =
     inherit RenameTestBase()
 
     override x.RelativeTestDataPath = "features/refactorings/rename"
-
-    override x.GetProjectProperties(targetFrameworkIds, _) =
-        FSharpProjectPropertiesFactory.CreateProjectProperties(targetFrameworkIds)
 
     [<Test>] member x.``Inline - Declaration``() = x.DoNamedTest()
     [<Test>] member x.``Inline - Use``() = x.DoNamedTest()
