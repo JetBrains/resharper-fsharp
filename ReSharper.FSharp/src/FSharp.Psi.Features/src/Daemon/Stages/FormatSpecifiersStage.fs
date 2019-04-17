@@ -33,7 +33,7 @@ type FormatSpecifiersStageProcess(fsFile: IFSharpFile, daemonProcess) =
         | _ -> ()
 
 [<DaemonStage(StagesBefore = [| typeof<HighlightIdentifiersStage> |], StagesAfter = [| typeof<UnusedOpensStage> |])>]
-type FormatSpecifiersStage(daemonProcess, errors) =
+type FormatSpecifiersStage() =
     inherit FSharpDaemonStageBase()
 
     override x.CreateStageProcess(fsFile: IFSharpFile, _, daemonProcess: IDaemonProcess) =

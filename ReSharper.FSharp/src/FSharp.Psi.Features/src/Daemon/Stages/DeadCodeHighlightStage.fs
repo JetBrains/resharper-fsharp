@@ -24,7 +24,7 @@ type DeadCodeHighlightStageProcess(fsFile: IFSharpFile, daemonProcess) =
         committer.Invoke(DaemonStageResult(highlightings.ReadOnlyList()))
 
 [<DaemonStage(StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |])>]
-type DeadCodeHighlightStage(daemonProcess) =
+type DeadCodeHighlightStage() =
     inherit FSharpDaemonStageBase()
 
     override x.CreateStageProcess(fsFile, _, daemonProcess) =

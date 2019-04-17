@@ -58,7 +58,7 @@ type UnusedOpensStageProcess(fsFile: IFSharpFile, daemonProcess: IDaemonProcess)
 
 
 [<DaemonStage(StagesBefore = [| typeof<HighlightIdentifiersStage> |], StagesAfter = [| typeof<CollectUsagesStage> |])>]
-type UnusedOpensStage(daemonProcess, errors) =
+type UnusedOpensStage() =
     inherit FSharpDaemonStageBase()
 
     override x.CreateStageProcess(fsFile: IFSharpFile, _, daemonProcess: IDaemonProcess) =

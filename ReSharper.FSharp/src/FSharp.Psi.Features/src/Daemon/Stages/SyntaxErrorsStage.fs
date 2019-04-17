@@ -13,7 +13,7 @@ type SyntaxErrorsStageProcess(fsFile: IFSharpFile, daemonProcess) =
         | _ -> ()
 
 [<DaemonStage(StagesBefore = [| typeof<DeadCodeHighlightStage> |], StagesAfter = [| typeof<HighlightIdentifiersStage> |])>]
-type SyntaxErrorsStage(daemonProcess, errors) =
+type SyntaxErrorsStage() =
     inherit FSharpDaemonStageBase()
 
     override x.CreateStageProcess(fsFile, _, daemonProcess) =
