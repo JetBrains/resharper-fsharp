@@ -15,8 +15,8 @@ open JetBrains.IDE.UI.Options
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Resources
 open JetBrains.ReSharper.Host.Features.Settings.Layers.ExportImportWorkaround
-open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi.FsiDetector
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.Rider.Model.UIAutomation
 open JetBrains.UI.RichText
 open JetBrains.Util

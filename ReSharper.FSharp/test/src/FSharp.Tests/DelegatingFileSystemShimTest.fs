@@ -4,7 +4,7 @@ open System.IO
 open FSharp.Compiler.AbstractIL.Internal.Library
 open JetBrains.Lifetimes
 open JetBrains.ReSharper.Plugins.FSharp
-open JetBrains.ReSharper.Plugins.FSharp.Common.Util
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.TestFramework
 open NUnit.Framework
 

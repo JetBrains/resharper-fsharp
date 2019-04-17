@@ -1,5 +1,5 @@
 [<AutoOpen; Extension>]
-module JetBrains.ReSharper.Plugins.FSharp.Common.Util.FSharpPredefinedType
+module JetBrains.ReSharper.Plugins.FSharp.Util.FSharpPredefinedType
 
 open JetBrains.Metadata.Reader.API
 open JetBrains.Metadata.Reader.Impl

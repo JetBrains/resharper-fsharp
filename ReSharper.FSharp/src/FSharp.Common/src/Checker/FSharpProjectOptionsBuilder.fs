@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Common.Checker
+namespace JetBrains.ReSharper.Plugins.FSharp.Checker
 
 open System
 open System.Collections.Generic
@@ -13,9 +13,9 @@ open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost.MsBuild
 open JetBrains.ProjectModel.Properties
 open JetBrains.ProjectModel.Properties.Managed
-open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Util
 open JetBrains.Util.Dotnet.TargetFrameworkIds

@@ -1,4 +1,4 @@
-﻿namespace JetBrains.ReSharper.Plugins.FSharp.Common.Util
+﻿namespace JetBrains.ReSharper.Plugins.FSharp.Util
 
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Psi.Modules

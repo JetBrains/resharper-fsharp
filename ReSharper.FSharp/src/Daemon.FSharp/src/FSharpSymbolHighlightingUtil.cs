@@ -1,7 +1,7 @@
 ﻿using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Feature.Services.Daemon;
-using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
+using JetBrains.ReSharper.Plugins.FSharp.Util;
 using static FSharp.Compiler.PrettyNaming;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs

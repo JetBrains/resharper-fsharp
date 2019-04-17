@@ -1,4 +1,4 @@
-module JetBrains.ReSharper.Plugins.FSharp.Common.Checker.FSharpCoreFix
+module JetBrains.ReSharper.Plugins.FSharp.Checker.FSharpCoreFix
 
 open System
 open System.IO

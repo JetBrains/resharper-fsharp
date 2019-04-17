@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Common.Util
+namespace JetBrains.ReSharper.Plugins.FSharp.Util
 
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 

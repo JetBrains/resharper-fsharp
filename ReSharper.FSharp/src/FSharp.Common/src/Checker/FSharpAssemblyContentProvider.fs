@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Common.Checker
+namespace JetBrains.ReSharper.Plugins.FSharp.Checker
 
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application

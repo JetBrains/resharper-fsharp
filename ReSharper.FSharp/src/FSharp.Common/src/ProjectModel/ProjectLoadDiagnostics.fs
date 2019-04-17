@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Common.ProjectModel.Diagnostic
+namespace JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Diagnostic
 
 open System
 open System.Collections.Generic

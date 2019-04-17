@@ -9,7 +9,7 @@ using JetBrains.Util;
 using JetBrains.Util.Extension;
 using Microsoft.FSharp.Core;
 using static FSharp.Compiler.PrettyNaming;
-using static JetBrains.ReSharper.Plugins.FSharp.Common.Util.FSharpPredefinedType;
+using static JetBrains.ReSharper.Plugins.FSharp.Util.FSharpPredefinedType;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {

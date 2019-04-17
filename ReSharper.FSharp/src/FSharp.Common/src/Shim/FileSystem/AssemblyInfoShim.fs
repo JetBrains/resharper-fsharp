@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Common.Shim.FileSystem
+namespace JetBrains.ReSharper.Plugins.FSharp.Shim.FileSystem
 
 open JetBrains.Application.Infra
 open JetBrains.Lifetimes

@@ -26,8 +26,8 @@ open JetBrains.ReSharper.Host.Features.ProjectModel.View
 open JetBrains.ReSharper.Host.Features.ProjectModel.View.Appenders
 open JetBrains.ReSharper.Host.Features.ProjectModel.View.Ordering
 open JetBrains.ReSharper.Host.Features.Util.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Common.Util
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.Serialization
 open JetBrains.Threading

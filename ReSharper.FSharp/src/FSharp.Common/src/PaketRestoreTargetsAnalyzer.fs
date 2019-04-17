@@ -1,4 +1,4 @@
-module rec JetBrains.ReSharper.Plugins.FSharp.Common.Paket
+module rec JetBrains.ReSharper.Plugins.FSharp.Paket
 
 open JetBrains.Application
 open JetBrains.Application.Settings

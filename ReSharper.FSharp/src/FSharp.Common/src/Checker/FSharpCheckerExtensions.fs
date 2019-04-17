@@ -1,5 +1,5 @@
 [<AutoOpen>]
-module JetBrains.ReSharper.Plugins.FSharp.Common.Checker.FSharpCheckerExtensions
+module JetBrains.ReSharper.Plugins.FSharp.Checker.FSharpCheckerExtensions
 
 open System
 open FSharp.Compiler.SourceCodeServices

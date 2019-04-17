@@ -4,7 +4,7 @@ open System
 open System.Collections.Generic
 open JetBrains.ReSharper.Feature.Services.CodeStructure
 open JetBrains.ReSharper.Plugins.FSharp
-open JetBrains.ReSharper.Plugins.FSharp.Common.Util
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Resources

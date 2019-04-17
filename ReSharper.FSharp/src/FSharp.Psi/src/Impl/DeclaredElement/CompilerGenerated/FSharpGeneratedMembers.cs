@@ -5,8 +5,8 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Impl.Special;
-using static JetBrains.ReSharper.Plugins.FSharp.Common.Util.FSharpPredefinedType;
 using static JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated.FSharpGeneratedMembers;
+using static JetBrains.ReSharper.Plugins.FSharp.Util.FSharpPredefinedType;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 {

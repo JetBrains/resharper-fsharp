@@ -1,5 +1,5 @@
-﻿using JetBrains.ReSharper.Plugins.FSharp.Common.Util;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {

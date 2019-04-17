@@ -1,4 +1,4 @@
-namespace rec JetBrains.ReSharper.Plugins.FSharp.Common.Shim.FileSystem
+namespace rec JetBrains.ReSharper.Plugins.FSharp.Shim.FileSystem
 
 open System
 open System.IO
@@ -12,9 +12,8 @@ open JetBrains.DocumentManagers.impl
 open JetBrains.DocumentModel
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
-open JetBrains.ReSharper.Plugins.FSharp.Common.Util.CommonUtil
 open JetBrains.ReSharper.Plugins.FSharp
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Rider.Model
 

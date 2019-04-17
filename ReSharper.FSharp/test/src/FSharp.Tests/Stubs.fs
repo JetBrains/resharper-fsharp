@@ -3,9 +3,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Common
 open JetBrains.Application
 open JetBrains.Application.Components
 open JetBrains.ProjectModel
-open JetBrains.ReSharper.Plugins.FSharp.Common.Checker
-open JetBrains.ReSharper.Plugins.FSharp.Common.ProjectModel.Diagnostic
+open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Diagnostic
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi
 
 [<SolutionComponent>]
