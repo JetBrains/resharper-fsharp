@@ -205,6 +205,12 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Brackets - Skip right 03 - After code and space``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Skip right 04 - Angle``() = x.DoNamedTest()
 
+    [<Test>] member x.``Brackets - Skip 01 - Attributes``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Skip 02 - Array``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Skip 03 - Anon record``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Skip 04 - Typed Quotation``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Skip 05 - Untyped Quotation``() = x.DoNamedTest()
+
     [<Test>] member x.``Brackets - Insert right 01``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Insert right 02 - After code and brace``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Insert right 03 - List``() = x.DoNamedTest()

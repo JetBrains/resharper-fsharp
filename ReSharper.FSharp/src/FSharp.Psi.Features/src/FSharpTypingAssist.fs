@@ -371,7 +371,7 @@ type FSharpTypingAssist
         manager.AddTypingHandler(lifetime, '}', this, Func<_,_>(this.HandleRightBracket), isTypingHandlerAvailable)
         manager.AddTypingHandler(lifetime, '>', this, Func<_,_>(this.HandleRightBracket), isTypingHandlerAvailable)
 
-        manager.AddTypingHandler(lifetime, '<', this, Func<_,_>(this.HandleAngleBracketsInList), isTypingHandlerAvailable)
+        manager.AddTypingHandler(lifetime, '<', this, Func<_,_>(this.HandleRightAngleBracketTyped), isTypingHandlerAvailable)
         manager.AddTypingHandler(lifetime, '@', this, Func<_,_>(this.HandleAtTyped), isTypingHandlerAvailable)
         manager.AddTypingHandler(lifetime, '|', this, Func<_,_>(this.HandleBarTyped), isTypingHandlerAvailable)
 
@@ -968,7 +968,13 @@ type FSharpTypingAssist
              (fun _ -> rightBracketsText.[context.Char]))
 
     member x.HandleRightBracket(context: ITypingContext) =
-        if x.HandleAngleBracketsInList(context) then true else
+        let textControl = context.TextControl
+        let offset = textControl.Caret.Offset()
+        let mutable lexer = Unchecked.defaultof<_>
+        if not (x.GetCachingLexer(textControl, &lexer)) then false else
+
+        if context.Char = '>' && x.HandleAngleBracketsInList(textControl, lexer) then true else
+        if x.SkipCharInRightBracket(context, lexer, offset) then true else
 
         this.HandleRightBracketTyped
             (context,
@@ -1094,10 +1100,13 @@ type FSharpTypingAssist
         textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible)
         true
 
-    member x.HandleAngleBracketsInList(context: ITypingContext) =
+    member x.HandleRightAngleBracketTyped(context: ITypingContext) =
         let textControl = context.TextControl
         let mutable lexer = Unchecked.defaultof<_>
         if not (x.GetCachingLexer(textControl, &lexer)) then false else
+        x.HandleAngleBracketsInList(textControl, lexer)
+
+    member x.HandleAngleBracketsInList(textControl: ITextControl, lexer: CachingLexer) =
         insertCharInBrackets textControl lexer ("<", ">") listBrackets LeftBracketOnly.Yes
 
     member x.HandleBarTyped(context: ITypingContext) =
@@ -1106,9 +1115,24 @@ type FSharpTypingAssist
         let mutable lexer = Unchecked.defaultof<_>
         if not (x.GetCachingLexer(textControl, &lexer)) then false else
 
+        if x.SkipCharInRightBracket(context, lexer, offset) then true else
+
         insertCharInBrackets textControl lexer ("|", "|") listBrackets LeftBracketOnly.Yes ||
         insertCharInBrackets textControl lexer ("|", "|") recordBrackets LeftBracketOnly.Yes
 
+    member x.SkipCharInRightBracket(context, lexer: CachingLexer, offset) =
+        use cookie = LexerStateCookie.Create(lexer)
+        if not (lexer.FindTokenAt(offset)) then false else
+
+        let mutable offsetInTokens = Unchecked.defaultof<_>
+        if not (charOffsetInRightBrackets.TryGetValue(context.Char, &offsetInTokens)) then false else
+
+        let offsetInToken = offset - lexer.TokenStart
+        if not (Array.contains (lexer.TokenType, offsetInToken) offsetInTokens) then false else
+
+        context.TextControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible)
+        true
+    
     member x.HandleAtTyped(context: ITypingContext) =
         let textControl = context.TextControl
         if textControl.Selection.OneDocRangeWithCaret().Length > 0 then false else
@@ -1119,6 +1143,7 @@ type FSharpTypingAssist
         let mutable lexer = Unchecked.defaultof<_>
         if not (x.GetCachingLexer(textControl, &lexer) && lexer.FindTokenAt(offset - 1)) then false else
 
+        if x.SkipCharInRightBracket(context, lexer, offset) then true else
         if x.MakeQuotation(textControl, lexer, offset) then true else
         if x.MakeEmptyQuotationUntyped(textControl, lexer, offset) then true else
 
@@ -1411,6 +1436,28 @@ let skipPairBrackets =
 
 type FSharpSkipPairBracketsMatcher() =
     inherit BracketMatcher(skipPairBrackets)
+
+
+let charOffsetInRightBrackets: IDictionary<char,(TokenNodeType * int)[]> =
+    [| '|', [| FSharpTokenType.BAR_RBRACK, 0
+               FSharpTokenType.BAR_RBRACE, 0
+               FSharpTokenType.GREATER_BAR_RBRACK, 1 |]
+
+       '>', [| FSharpTokenType.GREATER_RBRACK, 0
+               FSharpTokenType.GREATER_BAR_RBRACK, 0
+               FSharpTokenType.RQUOTE_TYPED, 1
+               FSharpTokenType.RQUOTE_UNTYPED, 2 |]
+
+       ']', [| FSharpTokenType.BAR_RBRACK, 1
+               FSharpTokenType.GREATER_RBRACK, 1
+               FSharpTokenType.GREATER_BAR_RBRACK, 2 |]
+
+       '}', [| FSharpTokenType.BAR_RBRACE, 1 |]
+
+       '@', [| FSharpTokenType.RQUOTE_TYPED, 0
+               FSharpTokenType.RQUOTE_UNTYPED, 0
+               FSharpTokenType.RQUOTE_UNTYPED, 1 |] |]
+    |> dict
 
 
 let infixOpTokens =
