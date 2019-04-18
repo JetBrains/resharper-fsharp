@@ -512,11 +512,11 @@ moduleAbbreviation options { stubBase="FSharpTypeElementDeclarationBase"; } extr
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
 
-interface activePatternCase:
-  activePatternCaseDeclaration |
+interface activePatternCaseDeclaration:
+  activePatternNamedCaseDeclaration |
   activePatternWildCase;
 
-interface activePatternCaseDeclaration:
+interface activePatternNamedCaseDeclaration:
   topActivePatternCaseDeclaration |
   localActivePatternCaseDeclaration;
 
@@ -722,7 +722,7 @@ activePatternId:
   LPAREN<LPAREN, LParen>
   BAR
   (
-    activePatternCase<ACTIVE_PATTERN_CASE, Cases>
+    activePatternCaseDeclaration<ACTIVE_PATTERN_CASE, Cases>
     BAR
   )+
   RPAREN<RPAREN, RParen>;

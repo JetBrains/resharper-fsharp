@@ -1,9 +1,8 @@
-﻿//${NEW_NAME:Zzz}
 module Module
 
-let (    |  Zzz  |    _ | ) x =
+let (    |  B{caret}  |    _ | ) x =
     if x then Some () else None
 
 match true with
-| Zzz
+| B
 | _ -> ()

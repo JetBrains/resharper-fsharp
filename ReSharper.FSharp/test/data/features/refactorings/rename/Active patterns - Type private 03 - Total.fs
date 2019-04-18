@@ -1,4 +1,5 @@
-﻿module Module
+﻿//${NEW_NAME:Zzz}
+module Module
 
 type T() =
     let (    |  B  |    C | ) x =

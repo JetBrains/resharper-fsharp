@@ -1,3 +1,4 @@
+//${NEW_NAME:Zzz}
 module Module
 
 let (    |  B{caret}  |    _ | ) x =

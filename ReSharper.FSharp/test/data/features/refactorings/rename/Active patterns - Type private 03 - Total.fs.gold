@@ -1,15 +1,16 @@
-﻿module Module
+﻿//${NEW_NAME:Zzz}
+module Module
 
 type T() =
-    let (    |  zzz  |    C | ) x =
-        if x then zzz else C
+    let (    |  Zzz  |    C | ) x =
+        if x then Zzz else C
 
     do
         match true with
-        | zzz
+        | Zzz
         | C -> ()
 
     member x.Foo =
         match true with
-        | zzz
+        | Zzz
         | C -> ()

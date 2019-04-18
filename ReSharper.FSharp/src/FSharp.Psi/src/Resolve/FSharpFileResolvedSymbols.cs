@@ -151,7 +151,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
               if (caseIndex < 0 || caseIndex >= cases.Count)
                 continue;
 
-              if (!(cases[caseIndex] is IActivePatternCaseDeclaration caseDeclaration))
+              if (!(cases[caseIndex] is IActivePatternNamedCaseDeclaration caseDeclaration))
                 continue;
 
               var (caseStart, caseEnd) = caseDeclaration.GetTreeTextRange();

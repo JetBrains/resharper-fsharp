@@ -248,7 +248,8 @@ type FSharpNamingService(language: FSharpLanguage) =
 
         let isUnionCaseLike (element: IDeclaredElement) =
             match element with
-            | :? IUnionCase -> true
+            | :? IUnionCase
+            | :? IActivePatternCase -> true
             | :? ITypeElement as typeElement -> typeElement.IsException()
             | _ -> false
 

@@ -67,6 +67,9 @@ type FSharpRenameTest() =
 
     [<Test>] member x.``Types - Attributes 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Union Cases 01``() = x.DoNamedTest()
+    [<Test>] member x.``Union Cases 02 - Should start with upper case``() = x.DoNamedTest()
+
     [<Test>] member x.``Types - Ctor 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Ctor 02 - Secondary``() = x.DoNamedTest()
 
@@ -106,6 +109,7 @@ type FSharpRenameTest() =
     [<Test>] member x.``Active patterns - Type private 03 - Total``() = x.DoNamedTest()
 
     [<Test>] member x.``Active patterns - Unavailable``() = x.DoNamedTest()
+    [<Test>] member x.``Active patterns - Should start with upper case``() = x.DoNamedTest()
 
     [<Test>] member x.``Type Extension - Optional - Member 01``() = x.DoNamedTest()
     [<Test>] member x.``Type Extension - Optional - Member 02``() = x.DoNamedTest()

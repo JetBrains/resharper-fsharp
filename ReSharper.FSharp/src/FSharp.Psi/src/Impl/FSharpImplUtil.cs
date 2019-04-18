@@ -237,7 +237,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       if (index < 0 || index >= cases.Count)
         return null;
 
-      var caseDeclaration = cases[index] as IActivePatternCaseDeclaration;
+      var caseDeclaration = cases[index] as IActivePatternNamedCaseDeclaration;
       return caseDeclaration?.DeclaredElement;
     }
 

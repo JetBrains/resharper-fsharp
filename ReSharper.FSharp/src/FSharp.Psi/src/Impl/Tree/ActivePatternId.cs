@@ -25,23 +25,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         var sb = new StringBuilder("|");
         foreach (var @case in cases)
         {
-          sb.Append(@case is IActivePatternCaseDeclaration caseDeclaration1 ? caseDeclaration1.SourceName : "_");
+          sb.Append(@case is IActivePatternNamedCaseDeclaration caseDeclaration1 ? caseDeclaration1.SourceName : "_");
           sb.Append("|");
         }
         return sb.ToString();
       }
     }
 
-    public IActivePatternCaseDeclaration GetCase(int index)
+    public IActivePatternNamedCaseDeclaration GetCase(int index)
     {
       var cases = Cases;
       return index >= 0 && index < cases.Count
         ? null
-        : cases[index] as IActivePatternCaseDeclaration;
+        : cases[index] as IActivePatternNamedCaseDeclaration;
     }
 
-    public IList<IActivePatternCaseDeclaration> NamedCases =>
-      Cases.OfType<IActivePatternCaseDeclaration>().AsList();
+    public IList<IActivePatternNamedCaseDeclaration> NamedCases =>
+      Cases.OfType<IActivePatternNamedCaseDeclaration>().AsList();
 
     public TreeTextRange GetCasesRange()
     {

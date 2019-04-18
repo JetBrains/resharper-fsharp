@@ -5,7 +5,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
   public partial interface IActivePatternId
   {
-    [CanBeNull] IActivePatternCaseDeclaration GetCase(int index);
+    [CanBeNull] IActivePatternNamedCaseDeclaration GetCase(int index);
     TreeTextRange GetCasesRange();
   }
 }

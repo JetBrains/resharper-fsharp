@@ -1,11 +1,12 @@
-﻿module Module
+﻿//${NEW_NAME:Zzz}
+module Module
 
-let (    | zzz | ) x =
+let (    | Zzz | ) x =
     not X
 
-let f (zzz x) =
-    let (zzz x) = x
+let f (Zzz x) =
+    let (Zzz x) = x
     x
 
 match true with
-| zzz x -> ()
+| Zzz x -> ()

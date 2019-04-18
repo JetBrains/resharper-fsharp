@@ -1,8 +1,9 @@
-﻿module Module
+﻿//${NEW_NAME:Zzz}
+module Module
 
-let (    |  B  |    zzz | ) x =
-    if x then B else zzz
+let (    |  B  |    Zzz | ) x =
+    if x then B else Zzz
 
 match true with
 | B
-| zzz -> ()
+| Zzz -> ()
