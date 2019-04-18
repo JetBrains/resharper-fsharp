@@ -18,7 +18,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     public const int EscapedNameAffixLength = 4;
     public const int EscapedNameStartIndex = 2;
 
-    public static bool IsEscapedWithBackticks([NotNull] string name)
+    public static bool IsEscapedWithBackticks([NotNull] this string name)
     {
       var length = name.Length;
       return length > EscapedNameAffixLength &&

@@ -249,6 +249,16 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Brackets - Surround 05``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Surround 06``() = x.DoNamedTest()
 
+    [<Test>] member x.``Backticks 01 - Finish id``() = x.DoNamedTest()
+
+    [<Test>] member x.``Backticks 02 - Insert 01``() = x.DoNamedTest()
+
+    [<Test; Ignore(reason = "Is `` erased in test?")>]
+    member x.``Backticks 03 - Insert 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Backticks 04 - Skip``() = x.DoNamedTest()
+    [<Test>] member x.``Backticks 05 - No skip``() = x.DoNamedTest()
+
 [<FSharpTest>]
 type LineIndentsTest() =
     inherit LineIndentsTestBase()

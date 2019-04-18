@@ -362,6 +362,7 @@ type FSharpTypingAssist
 
         manager.AddTypingHandler(lifetime, '\'', this, Func<_,_>(this.HandleSingleQuoteTyped), isTypingHandlerAvailable)
         manager.AddTypingHandler(lifetime, '"', this, Func<_,_>(this.HandleQuoteTyped), isTypingHandlerAvailable)
+        manager.AddTypingHandler(lifetime, '`', this, Func<_,_>(this.HandleBacktickTyped), isTypingHandlerAvailable)
 
         manager.AddTypingHandler(lifetime, '(', this, Func<_,_>(this.HandleLeftBracket), isTypingHandlerAvailable)
         manager.AddTypingHandler(lifetime, '[', this, Func<_,_>(this.HandleLeftBracket), isTypingHandlerAvailable)
@@ -1005,6 +1006,34 @@ type FSharpTypingAssist
 
         x.InsertPairQuote(textControl, typedChar)
 
+    member x.HandleBacktickTyped(context: ITypingContext) =
+        let textControl = context.TextControl
+        let offset = textControl.Caret.Offset()
+
+        let mutable lexer = Unchecked.defaultof<_>
+        if not (x.GetCachingLexer(textControl, &lexer) && lexer.FindTokenAt(offset - 1)) then false else
+
+        if x.FinishBacktickedId(textControl, lexer, offset) then true else
+        if x.SkipBacktickInId(textControl, lexer, offset) then true else
+        
+        false
+
+    member x.FinishBacktickedId(textControl: ITextControl, lexer, offset) =
+        if not (isBacktick lexer) then false else
+        if prevTokenIs isBacktick lexer || nextTokenIs isBacktick lexer then false else
+
+        textControl.Document.InsertText(offset, "```")
+        textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible)
+        true
+
+    member x.SkipBacktickInId(textControl: ITextControl, lexer: CachingLexer, offset) =
+        if lexer.TokenType != FSharpTokenType.IDENTIFIER then false else
+        if offset + 2 < lexer.TokenEnd then false else
+        if not (lexer.GetTokenText().IsEscapedWithBackticks()) then false else
+
+        textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible)
+        true
+
     member x.SkipQuote(textControl: ITextControl, typedChar: char) =
         let buffer = textControl.Document.Buffer
         let offset = textControl.Caret.Offset()
@@ -1474,6 +1503,22 @@ let isInfixOp (lexer: ILexer) =
 
     lexer.TokenType == FSharpTokenType.SYMBOLIC_OP &&
     IsInfixOperator (lexer.GetTokenText())
+
+
+let isBacktick (lexer: ILexer) =
+    lexer.TokenType == FSharpTokenType.RESERVED_SYMBOLIC_SEQUENCE && lexer.GetTokenText() = "`"
+
+
+let tokenIs delta (predicate: ILexer -> bool) (lexer: CachingLexer) =
+    use cookie = LexerStateCookie.Create(lexer)
+    lexer.Advance(delta)
+    isNotNull lexer.TokenType && predicate lexer
+
+let nextTokenIs predicate lexer =
+    tokenIs 1 predicate lexer
+
+let prevTokenIs predicate lexer =
+    tokenIs (-1) predicate lexer
 
 
 [<RequireQualifiedAccess; Struct>]
