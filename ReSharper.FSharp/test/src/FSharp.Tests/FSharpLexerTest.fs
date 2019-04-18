@@ -83,5 +83,7 @@ type FSharpLexerTest() =
     [<Test>] member x.``Operators 08 - Bad operator``() = x.DoNamedTest()
     [<Test>] member x.``Operators 09 - Left arrow``() = x.DoNamedTest()
 
-    [<Test>] member x.``Identifiers 01 - Double grave accent``() = x.DoNamedTest()
+    [<Test>] member x.``Identifiers 01 - Backticked``() = x.DoNamedTest()
+    [<Test>] member x.``Identifiers 02 - Unfinished backticked``() = x.DoNamedTest()
+
     [<Test>] member x.``Anonymous Records``() = x.DoNamedTest()
