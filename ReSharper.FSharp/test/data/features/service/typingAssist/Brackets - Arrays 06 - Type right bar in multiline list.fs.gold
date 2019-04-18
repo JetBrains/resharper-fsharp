@@ -2,6 +2,6 @@
 module Module
 
 let foo =
-   [| 123
-      234
-      345 |{caret}]
+   [ 123
+     234
+     345 |{caret}]

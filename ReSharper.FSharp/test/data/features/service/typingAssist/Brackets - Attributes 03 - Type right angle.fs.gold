@@ -1,5 +1,5 @@
 ﻿// ${CHAR:>}
 module Module
 
-[< >{caret}]
+[ >{caret}]
 let foo = 123

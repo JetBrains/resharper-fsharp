@@ -278,7 +278,7 @@ type FSharpTypingAssist
         let indent = pos - startOffset
         insertNewLineAt textControl caretOffset indent
 
-    let insertCharInBrackets (textControl: ITextControl) (lexer: CachingLexer) (lChar, rChar) (lBracket, rBracket) =
+    let insertCharInBrackets (textControl: ITextControl) (lexer: CachingLexer) (lChar, rChar) (lBracket, rBracket) leftBracketOnly =
         let offset = textControl.Caret.Offset()
         if offset <= 0 then false else
 
@@ -287,6 +287,7 @@ type FSharpTypingAssist
 
             let matcher = GenericBracketMatcher([| Pair.Of(lBracket, rBracket) |])
             let isAtLeftBracket = matcher.Direction(lexer.TokenType) = 1
+            if not isAtLeftBracket && leftBracketOnly = LeftBracketOnly.Yes then false else
 
             if not (matcher.FindMatchingBracket(lexer)) then false else
 
@@ -1095,11 +1096,9 @@ type FSharpTypingAssist
 
     member x.HandleAngleBracketsInList(context: ITypingContext) =
         let textControl = context.TextControl
-        let offset = textControl.Caret.Offset()
         let mutable lexer = Unchecked.defaultof<_>
         if not (x.GetCachingLexer(textControl, &lexer)) then false else
-
-        insertCharInBrackets textControl lexer ("<", ">") listBrackets
+        insertCharInBrackets textControl lexer ("<", ">") listBrackets LeftBracketOnly.Yes
 
     member x.HandleBarTyped(context: ITypingContext) =
         let textControl = context.TextControl
@@ -1107,8 +1106,8 @@ type FSharpTypingAssist
         let mutable lexer = Unchecked.defaultof<_>
         if not (x.GetCachingLexer(textControl, &lexer)) then false else
 
-        insertCharInBrackets textControl lexer ("|", "|") listBrackets ||
-        insertCharInBrackets textControl lexer ("|", "|") recordBrackets
+        insertCharInBrackets textControl lexer ("|", "|") listBrackets LeftBracketOnly.Yes ||
+        insertCharInBrackets textControl lexer ("|", "|") recordBrackets LeftBracketOnly.Yes
 
     member x.HandleAtTyped(context: ITypingContext) =
         let textControl = context.TextControl
@@ -1138,7 +1137,7 @@ type FSharpTypingAssist
             textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible)
             true else
 
-        insertCharInBrackets textControl lexer ("@", "@") typedQuotationBrackes
+        insertCharInBrackets textControl lexer ("@", "@") typedQuotationBrackes LeftBracketOnly.No
 
     member x.TrimTrailingSpacesAtOffset(textControl: ITextControl, startOffset: byref<int>, trimAfterCaret) =
         let isWhitespace c =

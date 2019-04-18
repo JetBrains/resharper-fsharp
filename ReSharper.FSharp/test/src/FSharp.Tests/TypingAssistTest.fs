@@ -13,8 +13,7 @@ open JetBrains.ReSharper.TestFramework
 open JetBrains.TextControl
 open NUnit.Framework
 
-[<FSharpTest>]
-[<TestSettingsKey(typeof<FSharpFormatSettingsKey>)>]
+[<FSharpTest; TestSettingsKey(typeof<FSharpFormatSettingsKey>)>]
 type FSharpTypingAssistTest() =
     inherit TypingAssistTestBase()
 
@@ -208,6 +207,7 @@ type FSharpTypingAssistTest() =
 
     [<Test>] member x.``Brackets - Insert right 01``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Insert right 02 - After code and brace``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Insert right 03 - List``() = x.DoNamedTest()
 
     [<Test>] member x.``Brackets - Backspace 01 - Erase both``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Backspace 02 - Erase single, unbalanced left``() = x.DoNamedTest()

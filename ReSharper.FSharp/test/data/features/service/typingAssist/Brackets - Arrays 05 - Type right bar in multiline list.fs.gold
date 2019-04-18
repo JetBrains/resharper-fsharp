@@ -1,7 +1,7 @@
 ﻿// ${CHAR:|}
 module Module
 
-let foo = [|
+let foo = [
    123
    234
 |{caret}]
