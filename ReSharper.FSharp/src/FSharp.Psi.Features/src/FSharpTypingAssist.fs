@@ -278,50 +278,59 @@ type FSharpTypingAssist
         let indent = pos - startOffset
         insertNewLineAt textControl caretOffset indent
 
-    let insertCharInBrackets (textControl: ITextControl) (lexer: CachingLexer) (lChar, rChar) (lBracket, rBracket) leftBracketOnly =
+    let insertCharInBrackets (context: ITypingContext) (lexer: CachingLexer) chars brackets leftBracketOnly =
+        let textControl = context.TextControl
+        let typed = context.Char
         let offset = textControl.Caret.Offset()
         if offset <= 0 then false else
 
-        if lexer.FindTokenAt(offset - 1) && lexer.TokenType == lBracket && offset > lexer.TokenStart ||
-           lexer.FindTokenAt(offset)     && lexer.TokenType == rBracket && offset < lexer.TokenEnd then
+        let lChar, rChar = chars
+        let lBracket, rBracket = brackets
+        
+        let canInsertLeft (lexer: ILexer) =
+            lexer.TokenType == lBracket && typed = lChar && offset > lexer.TokenStart
 
-            let matcher = GenericBracketMatcher([| Pair.Of(lBracket, rBracket) |])
-            let isAtLeftBracket = matcher.Direction(lexer.TokenType) = 1
-            if not isAtLeftBracket && leftBracketOnly = LeftBracketOnly.Yes then false else
+        let canInsertRight (lexer: ILexer) =
+            lexer.TokenType == rBracket && typed = rChar && offset < lexer.TokenEnd
 
-            if not (matcher.FindMatchingBracket(lexer)) then false else
+        if not (tokenAtOffsetIs (offset - 1) canInsertLeft lexer ||
+                tokenAtOffsetIs offset canInsertRight lexer) then false else
 
-            let document = textControl.Document
-            let lBracketOffset, rBracketOffset =
-                if isAtLeftBracket then offset, lexer.TokenEnd - 1 else lexer.TokenStart + 1, offset
+        let matcher = GenericBracketMatcher([| Pair.Of(lBracket, rBracket) |])
+        let isAtLeftBracket = matcher.Direction(lexer.TokenType) = 1
+        if not isAtLeftBracket && leftBracketOnly = LeftBracketOnly.Yes then false else
 
-            document.InsertText(rBracketOffset, rChar)
-            document.InsertText(lBracketOffset, lChar)
+        if not (matcher.FindMatchingBracket(lexer)) then false else
 
-            let lBracketLine = int (document.GetCoordsByOffset(lBracketOffset).Line)
-            let rBracketLine = int (document.GetCoordsByOffset(rBracketOffset).Line)
+        let document = textControl.Document
+        let lBracketOffset, rBracketOffset =
+            if isAtLeftBracket then offset, lexer.TokenEnd - 1 else lexer.TokenStart + 1, offset
 
-            let shouldAddIndent =
-                lexer.FindTokenAt(lBracketOffset - 1) &&
-                lBracketLine <> rBracketLine && not (isLastTokenOnLine lexer)
+        document.InsertText(rBracketOffset, string rChar)
+        document.InsertText(lBracketOffset, string lChar)
 
-            let lastLine =
-                if not (lexer.FindTokenAt(rBracketOffset)) then rBracketLine else
-                if isFirstTokenOnLine lexer then rBracketLine - 1 else rBracketLine 
+        let lBracketLine = int (document.GetCoordsByOffset(lBracketOffset).Line)
+        let rBracketLine = int (document.GetCoordsByOffset(rBracketOffset).Line)
 
-            if shouldAddIndent then
-                for line in lBracketLine + 1 .. lastLine do
-                    document.InsertText(document.GetLineStartOffset(docLine line), " ")
+        let shouldAddIndent =
+            lexer.FindTokenAt(lBracketOffset - 1) &&
+            lBracketLine <> rBracketLine && not (isLastTokenOnLine lexer)
 
-            let newCaretOffset =
-                if isAtLeftBracket then offset + 1 else
-                if shouldAddIndent then offset + 2 + (lastLine - lBracketLine) else
-                offset + 2
+        let lastLine =
+            if not (lexer.FindTokenAt(rBracketOffset)) then rBracketLine else
+            if isFirstTokenOnLine lexer then rBracketLine - 1 else rBracketLine 
 
-            textControl.Caret.MoveTo(newCaretOffset, CaretVisualPlacement.DontScrollIfVisible)
-            true
+        if shouldAddIndent then
+            for line in lBracketLine + 1 .. lastLine do
+                document.InsertText(document.GetLineStartOffset(docLine line), " ")
 
-        else false
+        let newCaretOffset =
+            if isAtLeftBracket then offset + 1 else
+            if shouldAddIndent then offset + 2 + (lastLine - lBracketLine) else
+            offset + 2
+
+        textControl.Caret.MoveTo(newCaretOffset, CaretVisualPlacement.DontScrollIfVisible)
+        true
 
     let handleEnter (context: IActionContext) =
         let textControl = context.TextControl
@@ -974,7 +983,6 @@ type FSharpTypingAssist
         let mutable lexer = Unchecked.defaultof<_>
         if not (x.GetCachingLexer(textControl, &lexer)) then false else
 
-        if context.Char = '>' && x.HandleAngleBracketsInList(textControl, lexer) then true else
         if x.SkipCharInRightBracket(context, lexer, offset) then true else
 
         this.HandleRightBracketTyped
@@ -1133,10 +1141,10 @@ type FSharpTypingAssist
         let textControl = context.TextControl
         let mutable lexer = Unchecked.defaultof<_>
         if not (x.GetCachingLexer(textControl, &lexer)) then false else
-        x.HandleAngleBracketsInList(textControl, lexer)
+        x.HandleAngleBracketsInList(context, lexer)
 
-    member x.HandleAngleBracketsInList(textControl: ITextControl, lexer: CachingLexer) =
-        insertCharInBrackets textControl lexer ("<", ">") listBrackets LeftBracketOnly.Yes
+    member x.HandleAngleBracketsInList(context, lexer: CachingLexer) =
+        insertCharInBrackets context lexer angledBracketsChars listBrackets LeftBracketOnly.Yes
 
     member x.HandleBarTyped(context: ITypingContext) =
         let textControl = context.TextControl
@@ -1146,8 +1154,8 @@ type FSharpTypingAssist
 
         if x.SkipCharInRightBracket(context, lexer, offset) then true else
 
-        insertCharInBrackets textControl lexer ("|", "|") listBrackets LeftBracketOnly.Yes ||
-        insertCharInBrackets textControl lexer ("|", "|") recordBrackets LeftBracketOnly.Yes
+        insertCharInBrackets context lexer barChars listBrackets LeftBracketOnly.Yes ||
+        insertCharInBrackets context lexer barChars recordBrackets LeftBracketOnly.Yes
 
     member x.SkipCharInRightBracket(context, lexer: CachingLexer, offset) =
         use cookie = LexerStateCookie.Create(lexer)
@@ -1174,7 +1182,7 @@ type FSharpTypingAssist
 
         if x.SkipCharInRightBracket(context, lexer, offset) then true else
         if x.MakeQuotation(textControl, lexer, offset) then true else
-        if x.MakeEmptyQuotationUntyped(textControl, lexer, offset) then true else
+        if x.MakeEmptyQuotationUntyped(context, lexer, offset) then true else
 
         false
     
@@ -1185,13 +1193,15 @@ type FSharpTypingAssist
         textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible)
         true
 
-    member x.MakeEmptyQuotationUntyped(textControl: ITextControl, lexer: CachingLexer, offset) =
+    member x.MakeEmptyQuotationUntyped(context: ITypingContext, lexer: CachingLexer, offset) =
+        let textControl = context.TextControl
+
         if isInsideEmptyQuoation lexer offset && lexer.GetTokenLength() = 4 then
             textControl.Document.InsertText(offset, "@@")
             textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible)
             true else
 
-        insertCharInBrackets textControl lexer ("@", "@") typedQuotationBrackes LeftBracketOnly.No
+        insertCharInBrackets context lexer atChars typedQuotationBrackes LeftBracketOnly.No
 
     member x.TrimTrailingSpacesAtOffset(textControl: ITextControl, startOffset: byref<int>, trimAfterCaret) =
         let isWhitespace c =
@@ -1489,6 +1499,11 @@ let charOffsetInRightBrackets: IDictionary<char,(TokenNodeType * int)[]> =
     |> dict
 
 
+let atChars = '@', '@'
+let barChars = '|', '|'
+let angledBracketsChars = '<', '>'
+
+
 let infixOpTokens =
     [| FSharpTokenType.BAR_BAR
        FSharpTokenType.AMP_AMP
@@ -1519,6 +1534,11 @@ let nextTokenIs predicate lexer =
 
 let prevTokenIs predicate lexer =
     tokenIs (-1) predicate lexer
+
+
+let tokenAtOffsetIs offset (predicate: ILexer -> bool) (lexer: CachingLexer) =
+    if not (lexer.FindTokenAt(offset)) then false else
+    predicate lexer
 
 
 [<RequireQualifiedAccess; Struct>]
