@@ -1,4 +1,4 @@
-namespace rec JetBrains.ReSharper.Plugins.FSharp.Tests.Features.NavigationTests
+namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Navigation
 
 open JetBrains.ReSharper.Feature.Services.Navigation.ContextNavigation
 open JetBrains.ReSharper.IntentionsTests.Navigation
@@ -36,3 +36,25 @@ type FSharpGoToImplementationTest() =
     [<Test>] member x.``Interface 02 - Member``() = x.DoNamedTest()
     [<Test>] member x.``Interface 03 - Internal type impl``() = x.DoNamedTest()
     [<Test>] member x.``Interface 04 - Overloads``() = x.DoNamedTest()
+
+
+type FSharpGoToBaseTest() =
+    inherit FSharpContextSearchTestBase("base")
+
+    override x.CreateContextAction(solution, textControl) =
+        base.CreateContextAction(solution, textControl)
+        |> Seq.filter (fun p -> p :? INavigateToBaseProvider)
+
+    [<Test>] member x.``Union case 01``() = x.DoNamedTest()
+    [<Test>] member x.``Exception 01``() = x.DoNamedTest()
+    [<Test>] member x.``Enum 01``() = x.DoNamedTest()
+
+
+type FSharpGoToInheritorsTest() =
+    inherit FSharpContextSearchTestBase("inheritors")
+
+    override x.CreateContextAction(solution, textControl) =
+        base.CreateContextAction(solution, textControl)
+        |> Seq.filter (fun p -> p :? IGotoInheritorsProvider)
+
+    [<Test>] member x.``Union case 01``() = x.DoNamedTest()

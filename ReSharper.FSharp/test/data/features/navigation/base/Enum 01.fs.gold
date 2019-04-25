@@ -1,0 +1,93 @@
+﻿-------------- offset 23 line 3 col 7 --------------------
++++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.NavigateToBaseProvider navigation provider results +++
+Occurrences provided for OccurrenceUtil:
+Occurrence's dump:
+[*] DEO: Envoy: Class:System.Enum, PsiLanguageType:UNKNOWN as Envoy: Class:System.Enum, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
+Menu Item presentation: 
+Text: Enum | (in System)
+Shortcut text: mscorlib, Version=4.0.0.0
+Style: Enabled
+Mnemonic: 
+Tooltip: 
+
+Occurrence's navigation result. Opened file: Enum.cs
+------------------
+  [__DynamicallyInvokable]
+  [Serializable]
+  public abstract class |CARET|Enum : ValueType, IComparable, IFormattable, IConvertible
+  {
+    private static readonly char[] enumSeperatorCharArray = new char[1]
+------------------
+
+Occurrence's dump:
+DEO: Envoy: Interface:System.IComparable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.IComparable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
+Menu Item presentation: 
+Text: IComparable | (in System)
+Shortcut text: mscorlib, Version=4.0.0.0
+Style: Enabled
+Mnemonic: 
+Tooltip: 
+
+Occurrence's navigation result. Opened file: IComparable.cs
+------------------
+  [ComVisible(true)]
+  [__DynamicallyInvokable]
+  public interface |CARET|IComparable
+  {
+    [__DynamicallyInvokable]
+------------------
+
+Occurrence's dump:
+DEO: Envoy: Interface:System.IConvertible, PsiLanguageType:UNKNOWN as Envoy: Interface:System.IConvertible, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
+Menu Item presentation: 
+Text: IConvertible | (in System)
+Shortcut text: mscorlib, Version=4.0.0.0
+Style: Enabled
+Mnemonic: 
+Tooltip: 
+
+Occurrence's navigation result. Opened file: IConvertible.cs
+------------------
+  [CLSCompliant(false)]
+  [__DynamicallyInvokable]
+  public interface |CARET|IConvertible
+  {
+    [__DynamicallyInvokable]
+------------------
+
+Occurrence's dump:
+DEO: Envoy: Interface:System.IFormattable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.IFormattable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
+Menu Item presentation: 
+Text: IFormattable | (in System)
+Shortcut text: mscorlib, Version=4.0.0.0
+Style: Enabled
+Mnemonic: 
+Tooltip: 
+
+Occurrence's navigation result. Opened file: IFormattable.cs
+------------------
+  [ComVisible(true)]
+  [__DynamicallyInvokable]
+  public interface |CARET|IFormattable
+  {
+    [__DynamicallyInvokable]
+------------------
+
+Occurrence's dump:
+DEO: Envoy: Class:System.ValueType, PsiLanguageType:UNKNOWN as Envoy: Class:System.ValueType, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
+Menu Item presentation: 
+Text: ValueType | (in System)
+Shortcut text: mscorlib, Version=4.0.0.0
+Style: Enabled
+Mnemonic: 
+Tooltip: 
+
+Occurrence's navigation result. Opened file: ValueType.cs
+------------------
+  [__DynamicallyInvokable]
+  [Serializable]
+  public abstract class |CARET|ValueType
+  {
+    [SecuritySafeCritical]
+------------------
+

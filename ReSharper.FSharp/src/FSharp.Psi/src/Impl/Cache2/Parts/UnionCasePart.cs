@@ -10,7 +10,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  internal class UnionCasePart : FSharpClassLikePart<INestedTypeUnionCaseDeclaration>, Class.IClassPart,
+  internal class UnionCasePart : FSharpClassLikePart<INestedTypeUnionCaseDeclaration>, IFSharpClassPart,
     IRepresentationAccessRightsOwner
   {
     public UnionCasePart([NotNull] INestedTypeUnionCaseDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
@@ -36,6 +36,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       TypeElement?.GetContainingType() is ITypeElement typeElement
         ? TypeFactory.CreateType(typeElement)
         : null;
+
+    public IClass GetSuperClass() => TypeElement?.GetContainingType() as IClass;
 
     public override IEnumerable<IDeclaredType> GetSuperTypes() =>
       GetBaseClassType() is IDeclaredType baseType
