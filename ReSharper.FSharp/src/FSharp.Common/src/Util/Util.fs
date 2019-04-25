@@ -205,7 +205,7 @@ module rec FSharpMsBuildUtils =
     type BuildAction with
         member x.ChangesOrder = changesOrder x.Value
 
-[<Extension>]
+[<Extension; AutoOpen>]
 module PsiUtil =
     [<Extension; CompiledName("GetSymbolScope")>]
     let getSymbolScope (psiModule: IPsiModule) =

@@ -1,0 +1,29 @@
+﻿module Module
+
+type |IInterface|(0) =
+    abstract Foo: int
+    abstract M: 'T -> unit
+    abstract M1: int -> unit
+    abstract M1: double -> unit
+
+type internal T() =
+    interface IInterface with
+        member x.Foo = 123
+        member x.M(_) = ()
+        member x.M1(_: int) = ()
+        member x.M1(_: double) = ()
+
+type U  =
+    | A of int
+    | B of int
+
+type |Base|(1)() =
+    class
+    end
+
+type Inheritred() =
+    inherit Base()
+
+---------------------------------------------------------
+(0): Interface Is Implemented: (T) 'Interface IInterface is inherited (click to navigate)' (E) ''
+(1): Class Is Inherited: (T) 'Class Base is inherited (click to navigate)' (E) ''

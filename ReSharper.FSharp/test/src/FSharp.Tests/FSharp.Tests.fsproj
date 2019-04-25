@@ -9,6 +9,7 @@
   <ItemGroup>
     <Compile Include="Common.fs" />
     <Compile Include="TestWithTwoProjects.fs" />
+    <Compile Include="FSharpHighlightingTestBase.fs" />
     <Compile Include="CSharpResolveTest.fs" />
     <Compile Include="SymbolCacheTest.fs" />
     <Compile Include="ErrorsHighlightingTest.fs" />
@@ -25,6 +26,7 @@
     <Compile Include="FSharpOccurenceKindTest.fs" />
     <Compile Include="StructureTest.fs" />
     <Compile Include="NavigationTests.fs" />
+    <Compile Include="InheritanceGutterMarksTest.fs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,12 +1,62 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
+namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
+open System
+open System.Collections.Generic
 open JetBrains.ReSharper.Daemon.Specific.InheritedGutterMark
+open JetBrains.ReSharper.Feature.Services.Daemon
+open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Search
+open JetBrains.ReSharper.Psi.Tree
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpInheritedMembersHighlighterStageProcessFactory() =
     inherit InheritedMembersHighlighterProcessFactory()
 
     override x.CreateProcess(daemonProcess, file) =
-        null
+        match file.As<IFSharpFile>() with
+        | null -> null
+        | fsFile -> InheritedMembersStageProcess(fsFile, daemonProcess) :> _
+
+
+type InheritedMembersStageProcess(fsFile, daemonProcess) =
+    inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
+
+    let psiModule = fsFile.GetPsiModule()
+    let symbolScope = getSymbolScope psiModule
+    let searchDomain = SearchDomainFactory.Instance.CreateSearchDomain(daemonProcess.Solution, false)
+
+    let processDeclaration (result: IList<_>) (typeMemberDeclaration: ITypeMemberDeclaration) =
+        match typeMemberDeclaration.As<IFSharpDeclaration>() with
+        | null -> ()
+        | fsDeclaration ->
+
+        match fsDeclaration with
+        | :? IUnionDeclaration ->
+            // Don't add inherited icon for unions with cases compiled as nested inherited types.
+            ()
+
+        | :? ITypeDeclaration as typeDecl ->
+            // This is a workaround until we can resolve types without waiting for FCS to type check projects graph
+            // up to the possible inheritor point.
+            // Using this approach may add unwanted gutter icons in some rare cases.
+            let inheritors = symbolScope.GetPossibleInheritors(fsDeclaration.CompiledName)
+            if not (Seq.exists (searchDomain.HasIntersectionWith) inheritors) then () else
+
+            let range = typeDecl.GetNameDocumentRange()
+            result.Add(HighlightingInfo(range, TypeIsInheritedMarkOnGutter(typeDecl, range)))
+
+        | _ -> ()
+
+    override x.Execute(committer) =
+        let result = List()
+        let processor = RecursiveElementProcessor<ITypeMemberDeclaration>(Action<_>(processDeclaration result))
+
+        processor.InteriorShouldBeProcessedHandler <-
+            fun node -> node :? ITypeDeclaration || node :? INamespaceDeclaration
+
+        x.FSharpFile.ProcessDescendants(processor)
+        committer.Invoke(DaemonStageResult(result))

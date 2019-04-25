@@ -1,17 +1,11 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 
-open JetBrains.ReSharper.FeaturesTestFramework.Daemon
-open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
-[<FSharpTest>]
 type IdentifierHighlightingTest() =
-    inherit HighlightingTestBase()
+    inherit FSharpHighlightingTestBase()
 
     override x.RelativeTestDataPath = "features/daemon/identifierHighlighting"
-
-    override x.CompilerIdsLanguage = FSharpLanguage.Instance :> _
 
     override x.HighlightingPredicate(_, _, _) = true
 

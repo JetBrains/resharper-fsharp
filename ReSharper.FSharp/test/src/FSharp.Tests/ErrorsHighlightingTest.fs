@@ -1,19 +1,13 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 
-open JetBrains.ReSharper.FeaturesTestFramework.Daemon
 open JetBrains.ReSharper.Plugins.FSharp
-open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<FSharpTest>]
 type ErrorsHighlightingTest() =
-    inherit HighlightingTestBase()
+    inherit FSharpHighlightingTestBase()
 
     override x.RelativeTestDataPath = "features/daemon/errorsHighlighting"
-
-    override x.CompilerIdsLanguage = FSharpLanguage.Instance :> _
 
     [<Test>] member x.``Empty file``() = x.DoNamedTest()
     [<Test>] member x.``No errors 01``() = x.DoNamedTest()
