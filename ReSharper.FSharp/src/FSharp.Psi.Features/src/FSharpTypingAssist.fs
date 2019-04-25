@@ -956,17 +956,14 @@ type FSharpTypingAssist
 
     member x.HandleSurroundTyping(typingContext, lChar, rChar, lTokenType, rTokenType, shouldNotSurround) =
         base.HandleSurroundTyping(typingContext, lChar, rChar, lTokenType, rTokenType, shouldNotSurround)
-        
-    member x.TrySurroundWithBraces(typingContext, typedBracket, typedBracketIsLeft,
-                                   matchingBrackets: IDictionary<_, _>) =
-        let mutable secondBracket = Unchecked.defaultof<_>
-        match matchingBrackets.TryGetValue(typedBracket, &secondBracket) with
-        | false -> true
-        | _ ->
 
-        let lBrace, rBrace = if typedBracketIsLeft then typedBracket, secondBracket else secondBracket, typedBracket  
-        x.HandleSurroundTyping(typingContext, lBrace, rBrace, bracketToTokenType.[lBrace], bracketToTokenType.[rBrace],
-                               fun _ -> false)
+    member x.TrySurroundWithBraces(context, typedBracket, typedBracketIsLeft, matchingBrackets: IDictionary<_, _>) =
+        let mutable secondBracket = Unchecked.defaultof<_>
+        if not (matchingBrackets.TryGetValue(typedBracket, &secondBracket)) then true else
+
+        let lBrace, rBrace = if typedBracketIsLeft then typedBracket, secondBracket else secondBracket, typedBracket
+        let lToken, rToken = bracketToTokenType.[lBrace], bracketToTokenType.[rBrace]
+        x.HandleSurroundTyping(context, lBrace, rBrace, lToken, rToken, JetFunc<_>.False)
     
     member x.HandleLeftBracket(context: ITypingContext) =
         this.HandleLeftBracketTyped
@@ -993,8 +990,7 @@ type FSharpTypingAssist
 
     member x.NeedSkipCloseBracket(textControl, lexer, charTyped) =
         x.NeedSkipCloseBracket(textControl, lexer, charTyped, bracketTypesForRightBracketChar,
-            (fun _ _ -> false),
-            (fun _ -> FSharpSkipPairBracketsMatcher() :> _))
+            JetFunc<_,_>.False, (fun _ -> FSharpSkipPairBracketsMatcher() :> _))
 
     member x.HandleSingleQuoteTyped(context: ITypingContext) =
         if context.EnsureWritable() <> EnsureWritableResult.SUCCESS then false else
