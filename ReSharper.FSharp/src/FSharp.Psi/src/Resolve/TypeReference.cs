@@ -22,4 +22,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       return null;
     }
   }
+  
+  public class BaseTypeReference : TypeReference
+  {
+    public BaseTypeReference([NotNull] IReferenceExpression owner) : base(owner)
+    {
+    }
+  }
 }

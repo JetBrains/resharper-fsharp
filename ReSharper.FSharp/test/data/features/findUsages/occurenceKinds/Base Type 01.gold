@@ -10,11 +10,11 @@ TO: [O] let o = |System|.Object() RANGE: (68,74) @ Base Type 01.fs
 Base type
 ---
 TO: [O] inherit System.|Object|() RANGE: (48,54) @ Base Type 01.fs
-TO: [O] inherit System.|Object|() RANGE: (48,54) @ Base Type 01.fs
 
 
 New instance creation
 ---
+TO: [O] inherit System.|Object|() RANGE: (48,54) @ Base Type 01.fs
 TO: [O] let o = System.|Object|() RANGE: (75,81) @ Base Type 01.fs
 TO: [O] let o = System.|Object|() RANGE: (75,81) @ Base Type 01.fs
 

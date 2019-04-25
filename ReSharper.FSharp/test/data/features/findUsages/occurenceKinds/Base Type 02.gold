@@ -18,6 +18,7 @@ TO: [O] inherit System.|IDisposable| RANGE: (46,57) @ Base Type 02.fs
 
 Type specification
 ---
+TO: [O] inherit System.|IDisposable| RANGE: (46,57) @ Base Type 02.fs
 TO: [O] let d: System.|IDisposable| = Unchecked.defaultof<_> RANGE: (75,86) @ Base Type 02.fs
 
 

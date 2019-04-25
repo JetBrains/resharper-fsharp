@@ -15,6 +15,8 @@ type FSharpOccurenceKindTest() =
 
     [<Test>] member x.``Base Type 01``() = x.DoNamedTest()
     [<Test>] member x.``Base Type 02``() = x.DoNamedTest()
+    [<Test>] member x.``Base Type 03 - Interface``() = x.DoNamedTest()
+    [<Test>] member x.``Base Type 04 - Inherit arg``() = x.DoNamedTest()
 
     [<Test>] member x.``Base Type - Object expressions 01 - Class``() = x.DoNamedTest()
     [<Test>] member x.``Base Type - Object expressions 02 - Interface``() = x.DoNamedTest()

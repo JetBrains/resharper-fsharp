@@ -32,9 +32,6 @@ type FSharpItemOccurenceKindProvider() =
         let castExpr = node.GetContainingNode<ICastExpr>()
         if isNotNull castExpr && node.IsChildOf(castExpr.Type) then CSharpSpecificOccurrenceKinds.TypeConversions else
 
-        let interfaceInherit = node.GetContainingNode<IInterfaceInherit>()
-        if isNotNull interfaceInherit then OccurrenceKind.ExtendedType else
-
         null
     
     interface IOccurrenceKindProvider with
@@ -47,6 +44,7 @@ type FSharpItemOccurenceKindProvider() =
             | :? AttributeTypeReference -> [| OccurrenceKind.Attribute |] :> _
             | :? OpenStatementReference -> [| FSharpItemOccurrenceKind.Import |] :> _
             | :? TypeExtensionReference -> [| FSharpItemOccurrenceKind.TypeExtension |] :> _
+            | :? BaseTypeReference -> [| OccurrenceKind.ExtendedType |] :> _
             | reference ->
 
             match reference.As<FSharpSymbolReference>() with
@@ -57,14 +55,11 @@ type FSharpItemOccurenceKindProvider() =
             if isNull (box symbolUse) then EmptyList.Instance :> _ else
 
             let isFromType = symbolUse.IsFromType
-            let referenceNode = symbolReference.GetTreeNode()
-
-            if referenceNode :? IInheritMember || referenceNode :? IObjExpr then
-                [| OccurrenceKind.ExtendedType |] :> _ else
+            let node = symbolReference.GetTreeNode()
 
             let kind =
                 if not isFromType then null else
-                getTypeUsageKind referenceNode
+                getTypeUsageKind node
 
             if isNotNull kind then [| kind |] :> _ else
             if isFromType then [| FSharpItemOccurrenceKind.TypeSpecification |] :> _ else
@@ -74,8 +69,6 @@ type FSharpItemOccurenceKindProvider() =
             | :? FSharpUnionCase -> [| OccurrenceKind.NewInstanceCreation |] :> _
 
             | :? FSharpMemberOrFunctionOrValue as mfv when mfv.IsConstructor ->
-                let typeInherit = referenceNode.GetContainingNode<IInheritMember>()
-                if isNotNull typeInherit then [| OccurrenceKind.ExtendedType |] :> _ else
                 [| OccurrenceKind.NewInstanceCreation |] :> _
 
             | _ -> EmptyList.Instance :> _

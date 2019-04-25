@@ -7,4 +7,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     protected override FSharpSymbolReference CreateReference() =>
       new TypeReference(this);
   }
+
+  internal abstract class BaseTypeExpressionBase : TypeExpressionBase
+  {
+    protected override FSharpSymbolReference CreateReference() =>
+      new BaseTypeReference(this);
+  }
 }

@@ -306,11 +306,11 @@ newExpr options { stubBase="TypeExpressionBase"; }:
   namedTypeExpression<TYPE, Type>
   fakeSeparator;
 
-objExpr options { stubBase="TypeExpressionBase"; }:
+objExpr options { stubBase="BaseTypeExpressionBase"; }:
   namedTypeExpression<BASE_TYPE, BaseType>
   fakeSeparator;
 
-objExprSecondaryInterface options { stubBase="TypeExpressionBase"; }:
+objExprSecondaryInterface options { stubBase="BaseTypeExpressionBase"; }:
   namedTypeExpression<BASE_TYPE, BaseType>
   fakeSeparator;
 
@@ -618,13 +618,15 @@ interface inheritMember:
   typeInherit |
   interfaceInherit;
 
-interfaceInherit: namedTypeExpression<INTERFACE_TYPE, InterfaceType>;
-
-typeInherit options { stubBase="TypeExpressionBase"; }:
+interfaceInherit options { stubBase="BaseTypeExpressionBase"; }:
   INHERIT
   namedTypeExpression<BASE_TYPE, BaseType>;
 
-interfaceImplementation options { stubBase="FSharpDeclarationBase"; }:
+typeInherit options { stubBase="BaseTypeExpressionBase"; }:
+  INHERIT
+  namedTypeExpression<BASE_TYPE, BaseType>;
+
+interfaceImplementation options { stubBase="BaseTypeExpressionBase"; }:
   namedTypeExpression<INTERFACE_TYPE, InterfaceType>
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>* fakeSeparator;
 

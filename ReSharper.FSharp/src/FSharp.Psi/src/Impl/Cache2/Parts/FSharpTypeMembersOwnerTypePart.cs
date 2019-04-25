@@ -32,7 +32,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
           continue;
         }
 
-        var interfaceInheritTypeIdentifier = (member as IInterfaceInherit)?.InterfaceType?.LongIdentifier;
+        var interfaceInheritTypeIdentifier = (member as IInterfaceInherit)?.BaseType?.LongIdentifier;
         if (interfaceInheritTypeIdentifier != null)
           extendListShortNames.Add(interfaceInheritTypeIdentifier.Name);
       }
