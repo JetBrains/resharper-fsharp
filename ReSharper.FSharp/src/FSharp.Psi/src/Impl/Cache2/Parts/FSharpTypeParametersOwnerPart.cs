@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -40,6 +41,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       myTypeParameterNames = new string[number];
       for (var index = 0; index < number; index++)
         myTypeParameterNames[index] = reader.ReadString();
+    }
+
+    protected override void AssignDeclaredElement(ICachedDeclaration2 declaration)
+    {
+      base.AssignDeclaredElement(declaration);
+
+      var parameters = TypeElement?.TypeParameters;
+      if (parameters == null || parameters.IsEmpty())
+        return;
+
+      var typeDeclaration = (T) declaration;
+      var typeParameterDeclarations = typeDeclaration.TypeParameters;
+      var parametersCount = Math.Min(parameters.Count, typeParameterDeclarations.Count);
+
+      for (var i = 0; i < parametersCount; i++)
+        AssignToCachedDeclaration((ICachedDeclaration2) typeParameterDeclarations[i], parameters[i]);
     }
 
     protected override void Write(IWriter writer)

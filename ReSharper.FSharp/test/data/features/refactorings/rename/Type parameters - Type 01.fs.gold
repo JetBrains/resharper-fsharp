@@ -1,0 +1,6 @@
+﻿module Module
+
+type R<'zzz> =
+    { Field: 'zzz }
+
+    member x.Prop: 'zzz = Unchecked.defaultof<_>
