@@ -42,8 +42,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
           return new DeclaredNamespacePart(reader);
         case FSharpPartKind.QualifiedNamespace:
           return new QualifiedNamespacePart(reader);
-        case FSharpPartKind.TopLevelModule:
-          return new TopLevelModulePart(reader);
+        case FSharpPartKind.NamedModule:
+          return new NamedModulePart(reader);
         case FSharpPartKind.NestedModule:
           return new NestedModulePart(reader);
         case FSharpPartKind.AnonModule:

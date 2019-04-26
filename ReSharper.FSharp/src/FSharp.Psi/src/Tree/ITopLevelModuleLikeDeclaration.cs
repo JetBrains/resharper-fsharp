@@ -1,6 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
-  public partial interface ITopLevelModuleOrNamespaceDeclaration
+  public partial interface ITopLevelModuleLikeDeclaration
   {
   }
 }

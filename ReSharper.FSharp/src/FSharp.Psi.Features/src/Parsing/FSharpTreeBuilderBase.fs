@@ -136,7 +136,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
 
             let elementType =
                 match moduleKind with
-                | NamedModule -> ElementType.TOP_LEVEL_MODULE_DECLARATION
+                | NamedModule -> ElementType.NAMED_MODULE_DECLARATION
                 | AnonModule -> ElementType.ANON_MODULE_DECLARATION
                 | _ -> ElementType.F_SHARP_NAMESPACE_DECLARATION
 

@@ -1,6 +1,6 @@
 ﻿Project Files:Union 09 - Struct multiple cases with fields.fs:
 FSharpProjectFilePart:ImplFile
- TopLevelModulePart:Module->Class:Module
+ NamedModulePart:Module->Class:Module
   StructUnionPart:Union->Struct:Module+Union
    UnionCasePart:CaseA->Class:Module+Union+CaseA
    UnionCasePart:CaseB->Class:Module+Union+CaseB

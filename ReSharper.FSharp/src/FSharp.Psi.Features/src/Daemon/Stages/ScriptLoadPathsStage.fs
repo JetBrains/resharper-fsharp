@@ -34,7 +34,7 @@ type ScriptLoadPathsStageProcess(fsFile, daemonProcess) =
                     for decl in fsFile.Declarations do
                         decl.Accept(x)
 
-                override __.VisitTopLevelModuleDeclaration(decl) =
+                override __.VisitNamedModuleDeclaration(decl) =
                     for memberDecl in decl.Members do
                         match memberDecl with
                         | :? IHashDirective as directive ->

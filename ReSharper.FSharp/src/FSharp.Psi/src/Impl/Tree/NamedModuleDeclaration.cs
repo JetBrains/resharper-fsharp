@@ -2,7 +2,7 @@
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class TopLevelModuleDeclaration
+  internal partial class NamedModuleDeclaration
   {
     protected override string DeclaredElementName =>
       LongIdentifier.GetModuleCompiledName(Attributes);

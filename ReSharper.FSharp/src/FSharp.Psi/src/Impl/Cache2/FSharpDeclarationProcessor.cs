@@ -75,8 +75,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       FinishModuleLikeDeclaration(decl);
     }
 
-    public override void VisitTopLevelModuleDeclaration(ITopLevelModuleDeclaration decl) =>
-      ProcessNamedModuleLikeDeclaration(decl, new TopLevelModulePart(decl, Builder));
+    public override void VisitNamedModuleDeclaration(INamedModuleDeclaration decl) =>
+      ProcessNamedModuleLikeDeclaration(decl, new NamedModulePart(decl, Builder));
 
     public override void VisitNestedModuleDeclaration(INestedModuleDeclaration decl)
     {

@@ -1,6 +1,6 @@
 ﻿Language: PsiLanguageType:F#
 IFSharpImplFile
-  ITopLevelModuleDeclaration
+  INamedModuleDeclaration
     IAccessModifiers
       FSharpTokenType+ModuleTokenElement(type:MODULE, text:module)
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "

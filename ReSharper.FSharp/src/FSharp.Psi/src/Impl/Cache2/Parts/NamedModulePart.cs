@@ -4,15 +4,15 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  internal class TopLevelModulePart : ModulePartBase<ITopLevelModuleDeclaration>
+  internal class NamedModulePart : ModulePartBase<INamedModuleDeclaration>
   {
-    public TopLevelModulePart([NotNull] ITopLevelModuleDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
+    public NamedModulePart([NotNull] INamedModuleDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, cacheBuilder.Intern(declaration.CompiledName),
         ModifiersUtil.GetDecoration(declaration.AccessModifiers, declaration.Attributes), cacheBuilder)
     {
     }
 
-    public TopLevelModulePart(IReader reader) : base(reader)
+    public NamedModulePart(IReader reader) : base(reader)
     {
     }
 
@@ -20,6 +20,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       new FSharpModule(this);
 
     protected override byte SerializationTag =>
-      (byte) FSharpPartKind.TopLevelModule;
+      (byte) FSharpPartKind.NamedModule;
   }
 }

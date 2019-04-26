@@ -5,7 +5,7 @@
     QualifiedNamespace = 0,
     DeclaredNamespace = 1,
 
-    TopLevelModule = 2,
+    NamedModule = 2,
     NestedModule = 3,
     AnonModule = 4,
 
