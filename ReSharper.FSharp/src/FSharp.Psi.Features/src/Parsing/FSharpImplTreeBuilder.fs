@@ -16,12 +16,13 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
             x.ProcessTopLevelDeclaration(decl)
         x.FinishFile(mark, ElementType.F_SHARP_IMPL_FILE)
 
-    member private x.ProcessTopLevelDeclaration (SynModuleOrNamespace(lid,_,moduleKind,decls,_,attrs,_,range)) =
-        let mark, elementType = x.StartTopLevelDeclaration lid attrs moduleKind range
-        for decl in decls do x.ProcessModuleMemberDeclaration decl
-        x.FinishTopLevelDeclaration mark range elementType  
+    member x.ProcessTopLevelDeclaration(SynModuleOrNamespace(lid,_,moduleKind,decls,_,attrs,_,range)) =
+        let mark, elementType = x.StartTopLevelDeclaration(lid, attrs, moduleKind, range)
+        for decl in decls do
+            x.ProcessModuleMemberDeclaration(decl)
+        x.FinishTopLevelDeclaration(mark, range, elementType)  
 
-    member internal x.ProcessModuleMemberDeclaration moduleMember =
+    member x.ProcessModuleMemberDeclaration moduleMember =
         match moduleMember with
         | SynModuleDecl.NestedModule(ComponentInfo(attrs,_,_,lid,_,_,_,_),_,decls,_,range) ->
             let mark = x.StartNestedModule attrs lid range

@@ -22,7 +22,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
-
-    public bool IsModule => true;
   }
 }

@@ -41,32 +41,27 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       Builder.CreateProjectFilePart(new FSharpProjectFilePart(sourceFile, fileKind, hasPairFile));
 
       foreach (var declaration in fsFile.DeclarationsEnumerable)
-      {
-        var qualifiers = declaration.LongIdentifier?.Qualifiers;
-        if (qualifiers == null)
-        {
-          declaration.Accept(this);
-          continue;
-        }
-
-        foreach (var qualifier in qualifiers)
-        {
-          var qualifierName = qualifier.GetText().RemoveBackticks();
-          Builder.StartPart(new QualifiedNamespacePart(qualifier.GetTreeStartOffset(), Builder.Intern(qualifierName)));
-        }
-
         declaration.Accept(this);
-
-        foreach (var _ in qualifiers)
-          Builder.EndPart();
-      }
     }
 
-    public override void VisitFSharpNamespaceDeclaration(IFSharpNamespaceDeclaration decl)
+    public void ProcessNamedModuleLikeDeclaration(INamedModuleLikeDeclaration decl, Part part)
     {
-      Builder.StartPart(new DeclaredNamespacePart(decl));
+      var qualifiers = decl.LongIdentifier?.Qualifiers ?? TreeNodeCollection<ITokenNode>.Empty;
+      foreach (var qualifier in qualifiers)
+      {
+        var qualifierName = Builder.Intern(qualifier.GetText().RemoveBackticks());
+        Builder.StartPart(new QualifiedNamespacePart(qualifier.GetTreeStartOffset(), qualifierName));
+      }
+
+      Builder.StartPart(part);
       FinishModuleLikeDeclaration(decl);
+
+      foreach (var _ in qualifiers)
+        Builder.EndPart();
     }
+
+    public override void VisitFSharpNamespaceDeclaration(IFSharpNamespaceDeclaration decl) =>
+      ProcessNamedModuleLikeDeclaration(decl, new DeclaredNamespacePart(decl));
 
     public override void VisitFSharpGlobalNamespaceDeclaration(IFSharpGlobalNamespaceDeclaration decl)
     {
@@ -74,11 +69,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
         memberDecl.Accept(this);
     }
 
-    public override void VisitTopLevelModuleDeclaration(ITopLevelModuleDeclaration decl)
+    public override void VisitAnonModuleDeclaration(IAnonModuleDeclaration decl)
     {
-      Builder.StartPart(new TopLevelModulePart(decl, Builder));
+      Builder.StartPart(new AnonModulePart(decl, Builder));
       FinishModuleLikeDeclaration(decl);
     }
+
+    public override void VisitTopLevelModuleDeclaration(ITopLevelModuleDeclaration decl) =>
+      ProcessNamedModuleLikeDeclaration(decl, new TopLevelModulePart(decl, Builder));
 
     public override void VisitNestedModuleDeclaration(INestedModuleDeclaration decl)
     {

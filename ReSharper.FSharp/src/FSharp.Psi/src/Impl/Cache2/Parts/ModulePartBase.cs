@@ -10,7 +10,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  internal abstract class ModulePartBase<T> : FSharpTypePart<T>, Class.IClassPart
+  internal abstract class ModulePartBase<T> : FSharpTypePart<T>, IModulePart
     where T : class, IFSharpTypeElementDeclaration
   {
     protected ModulePartBase([NotNull] T declaration, [NotNull] string shortName, MemberDecoration memberDecoration,
@@ -59,5 +59,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public override TypeParameterConstraintFlags GetTypeParameterConstraintFlags(int index) =>
       throw new InvalidOperationException();
+
+    public virtual bool IsAnonymous => false;
   }
 }

@@ -251,8 +251,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
           return memberDeclaration.Attributes;
         case ISynPat pat:
           return pat.Attributes;
-        case IModuleLikeDeclaration moduleLikeDeclaration:
-          return moduleLikeDeclaration.Attributes;
+        case IModuleDeclaration moduleDeclaration:
+          return moduleDeclaration.Attributes;
         default: return TreeNodeCollection<IFSharpAttribute>.Empty;
       }
     }

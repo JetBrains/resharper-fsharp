@@ -2,6 +2,7 @@
 {
   public class ParserMessages
   {
+    public const string IDS_MODULE_DECLARATION = "";
     public const string IDS_MODULE_MEMBER = "";
     public const string IDS_MODULE_MEMBER_DECLARATION = "";
     public const string IDS_MODULE_MEMBER_STATEMENT = "";

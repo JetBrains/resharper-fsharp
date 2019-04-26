@@ -21,7 +21,7 @@ type SymbolCacheTest() =
     [<Test>] member x.``Module 05 - Module suffix attribute, CompiledName``() = x.DoNamedTest()
     [<Test>] member x.``Module 06 - Module suffix attribute, CompiledName 2``() = x.DoNamedTest()
     [<Test>] member x.``Module 07 - Module suffix, CompiledName``() = x.DoNamedTest()
-    [<Test>] member x.``Module 08 - Implicit``() = x.DoNamedTest()
+    [<Test>] member x.``Module 08 - Anon``() = x.DoNamedTest()
 
     [<Test>] member x.``Namespace 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Namespace 02 - Qualified``() = x.DoNamedTest()

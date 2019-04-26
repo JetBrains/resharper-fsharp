@@ -8,7 +8,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   {
     public TopLevelModulePart([NotNull] ITopLevelModuleDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, cacheBuilder.Intern(declaration.CompiledName),
-        ModifiersUtil.GetDecoration(declaration.AccessModifiers, declaration.AttributesEnumerable), cacheBuilder)
+        ModifiersUtil.GetDecoration(declaration.AccessModifiers, declaration.Attributes), cacheBuilder)
     {
     }
 
@@ -19,6 +19,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public override TypeElement CreateTypeElement() =>
       new FSharpModule(this);
 
-    protected override byte SerializationTag => (byte) FSharpPartKind.TopLevelModule;
+    protected override byte SerializationTag =>
+      (byte) FSharpPartKind.TopLevelModule;
   }
 }

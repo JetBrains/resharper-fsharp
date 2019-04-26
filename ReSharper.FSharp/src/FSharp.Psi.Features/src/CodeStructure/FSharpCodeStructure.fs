@@ -24,12 +24,12 @@ type FSharpCodeStructureProvider() =
             for decl in fsFile.Declarations do
                 processNode decl parent
 
-        | :? IModuleLikeDeclaration as moduleDeclaration ->
+        | :? IModuleLikeDeclaration as moduleLikeDeclaration ->
             let parent =
-                if not moduleDeclaration.IsModule then parent else
-                CodeStructureDeclarationElement(parent, moduleDeclaration) :> CodeStructureElement
+                if not (moduleLikeDeclaration :? IModuleDeclaration) then parent else
+                CodeStructureDeclarationElement(parent, moduleLikeDeclaration) :> CodeStructureElement
 
-            for memberDeclaration in moduleDeclaration.Members do
+            for memberDeclaration in moduleLikeDeclaration.Members do
                 processNode memberDeclaration parent
 
         | :? IUnionDeclaration as unionDecl ->

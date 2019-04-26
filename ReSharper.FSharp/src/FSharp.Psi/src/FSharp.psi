@@ -70,18 +70,24 @@ interface moduleLikeDeclaration:
   nestedModuleDeclaration;
 
 interface topLevelModuleOrNamespaceDeclaration:
-  topLevelModuleDeclaration |
-  fSharpNamespaceDeclaration |
+  namedModuleLikeDeclaration |
+  anonModuleDeclaration |
   fSharpGlobalNamespaceDeclaration;
 
+interface namedModuleLikeDeclaration:
+  topLevelModuleDeclaration |
+  fSharpNamespaceDeclaration;
+
+interface moduleDeclaration:
+  topLevelModuleDeclaration |
+  nestedModuleDeclaration;
+
+
 fSharpNamespaceDeclaration options { stubBase="FSharpDeclarationBase"; }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>
   moduleMember<MODULE_MEMBER, Members>*;
 
 fSharpGlobalNamespaceDeclaration options { stubBase="FSharpDeclarationBase"; }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
-  longIdentifier<LONG_IDENTIFIER, LongIdentifier> // should be empty, needed here for common interface
   moduleMember<MODULE_MEMBER, Members>*
   fakeSeparator;
 
@@ -92,7 +98,9 @@ topLevelModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase";
   moduleMember<MODULE_MEMBER, Members>*
   fakeSeparator;
 
-moduleOrNamespaceSignature: fakeSeparator;
+anonModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; }:
+  moduleMember<MODULE_MEMBER, Members>*
+  fakeSeparator;
 
 
 

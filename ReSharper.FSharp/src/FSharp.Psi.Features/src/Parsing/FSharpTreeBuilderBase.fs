@@ -69,7 +69,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         x.Done(range, mark, elementType)
 
     member x.MarkToken(elementType) =
-        let caseMark = x.Builder.Mark()
+        let caseMark = x.Mark()
         x.AdvanceLexer()
         x.Done(caseMark, elementType)
 
@@ -87,6 +87,8 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         while x.Builder.GetTokenOffset() < offset && not x.Eof do x.AdvanceLexer()
 
     member x.AdvanceToTokenOrOffset (tokenType: TokenNodeType) (maxOffset: int) =
+        if isNull tokenType then () else 
+
         while x.Builder.GetTokenOffset() < maxOffset && x.Builder.GetTokenType() != tokenType do
             x.AdvanceLexer()
 
@@ -104,45 +106,51 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         let fsFile = x.GetTree() :> ITreeNode :?> IFSharpFile
         fsFile
 
-    member x.StartTopLevelDeclaration (lid: LongIdent) (attrs: SynAttributes) moduleKind (range: Range.range) =
+    member x.StartTopLevelDeclaration(lid: LongIdent, attrs: SynAttributes, moduleKind, range: Range.range) =
         match lid with
         | IdentRange idRange as id :: _ ->
-            let mark = 
-                if attrs.IsEmpty then
-                    if moduleKind = NamedModule || moduleKind = DeclaredNamespace then 
-                        // Ast namespace range starts after its identifier,
-                        // try to locate the keyword followed by access modifiers
-                        let keywordTokenType =
-                            match moduleKind with
-                            | NamedModule -> FSharpTokenType.MODULE
-                            | DeclaredNamespace -> FSharpTokenType.NAMESPACE
-                            | _ -> null
-                        x.GetStartOffset idRange |> x.AdvanceToTokenOrOffset keywordTokenType
-                    x.Builder.Mark()
-                else
+            let mark =
+                match moduleKind with
+                | AnonModule ->
+                    x.Mark()
+
+                | _ when attrs.IsEmpty ->
+                    // Ast namespace range starts after its identifier,
+                    // we try to locate the keyword followed by access modifiers.
+                    let keywordTokenType =
+                        match moduleKind with
+                        | NamedModule -> FSharpTokenType.MODULE
+                        | DeclaredNamespace -> FSharpTokenType.NAMESPACE
+                        | _ -> null
+                    x.GetStartOffset idRange |> x.AdvanceToTokenOrOffset keywordTokenType
+                    x.Mark()
+
+                | _ ->
                     x.MarkAttributesOrIdOrRange(attrs, Some id, range)
 
             if moduleKind = NamedModule then
-                x.ProcessModifiersBeforeOffset (x.GetStartOffset(idRange))
+                x.ProcessModifiersBeforeOffset(x.GetStartOffset(idRange))
 
-            x.ProcessLongIdentifier lid
+            if moduleKind <> AnonModule then
+                x.ProcessLongIdentifier(lid)
+
             let elementType =
                 match moduleKind with
-                | AnonModule | NamedModule ->
-                    ElementType.TOP_LEVEL_MODULE_DECLARATION
-
+                | NamedModule -> ElementType.TOP_LEVEL_MODULE_DECLARATION
+                | AnonModule -> ElementType.ANON_MODULE_DECLARATION
                 | _ -> ElementType.F_SHARP_NAMESPACE_DECLARATION
+
             Some mark, elementType
 
         | _ ->
-        
+
         match moduleKind with
         | GlobalNamespace ->
             let mark = x.Mark(range)
             Some mark, ElementType.F_SHARP_GLOBAL_NAMESPACE_DECLARATION
         | _ -> None, null
 
-    member x.FinishTopLevelDeclaration (mark: int option) range elementType =
+    member x.FinishTopLevelDeclaration(mark: int option, range, elementType) =
         x.AdvanceToEnd(range)
         if mark.IsSome then
             x.Done(mark.Value, elementType)

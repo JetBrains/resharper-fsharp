@@ -157,6 +157,9 @@ type FSharpAtomicRenamesFactory() =
         | :? IFSharpDeclaredElement as fsElement when fsElement.SourceName = SharedImplUtil.MISSING_DECLARATION_NAME ->
             RenameAvailabilityCheckResult.CanNotBeRenamed
 
+        | :? IModule as fsModule when fsModule.IsAnonymous ->
+            RenameAvailabilityCheckResult.CanNotBeRenamed // todo: needs a special implementation
+
         | _ ->
 
         match element.ShortName with

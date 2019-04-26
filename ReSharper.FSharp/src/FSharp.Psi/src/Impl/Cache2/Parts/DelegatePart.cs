@@ -18,7 +18,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   internal class DelegatePart : FSharpTypeParametersOwnerPart<IDelegateDeclaration>, Delegate.IDelegatePart
   {
     public DelegatePart([NotNull] IDelegateDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
-      : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifiers, declaration.AttributesEnumerable),
+      : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifiers, declaration.Attributes),
         declaration.TypeParameters, cacheBuilder)
     {
     }

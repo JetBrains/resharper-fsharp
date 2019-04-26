@@ -48,7 +48,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override PartKind TypePartKind => TypeAugmentation.PartKind;
 
     public bool IsTypeExtensionAllowed =>
-      GetContainingNode<IModuleLikeDeclaration>()?.IsModule ?? false;
+      GetContainingNode<IModuleDeclaration>() != null;
 
     public ITokenNode IdentifierToken => LongIdentifier?.IdentifierToken;
 

@@ -14,10 +14,11 @@ type internal FSharpSigTreeBuilder(file, lexer, sigs, lifetime) =
             x.ProcessTopLevelSignature(s)
         x.FinishFile(mark, ElementType.F_SHARP_SIG_FILE)
 
-    member x.ProcessTopLevelSignature (SynModuleOrNamespaceSig(lid,_,isModule,sigs,_,attrs,_,range)) =
-        let mark, elementType = x.StartTopLevelDeclaration lid attrs isModule range
-        for s in sigs do x.ProcessModuleMemberSignature s
-        x.FinishTopLevelDeclaration mark range elementType
+    member x.ProcessTopLevelSignature(SynModuleOrNamespaceSig(lid,_,isModule,sigs,_,attrs,_,range)) =
+        let mark, elementType = x.StartTopLevelDeclaration(lid, attrs, isModule, range)
+        for s in sigs do
+            x.ProcessModuleMemberSignature s
+        x.FinishTopLevelDeclaration(mark, range, elementType)
 
     member x.ProcessModuleMemberSignature moduleMember =
         match moduleMember with

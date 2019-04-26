@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Checker;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
@@ -46,6 +46,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
           return new TopLevelModulePart(reader);
         case FSharpPartKind.NestedModule:
           return new NestedModulePart(reader);
+        case FSharpPartKind.AnonModule:
+          return new AnonModulePart(reader);
         case FSharpPartKind.Exception:
           return new ExceptionPart(reader);
         case FSharpPartKind.Enum:
@@ -56,8 +58,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
           return new UnionPart(reader);
         case FSharpPartKind.UnionCase:
           return new UnionCasePart(reader);
-        case FSharpPartKind.HiddenType:
-          return new HiddenTypePart(reader);
         case FSharpPartKind.Class:
           return new ClassPart(reader);
         case FSharpPartKind.Interface:
@@ -74,6 +74,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
           return new StructExtensionPart(reader);
         case FSharpPartKind.Delegate:
           return new DelegatePart(reader);
+        case FSharpPartKind.HiddenType:
+          return new HiddenTypePart(reader);
         default:
           throw new SerializationError("Unknown tag:" + tag);
       }
