@@ -2,7 +2,6 @@ module rec JetBrains.ReSharper.Plugins.FSharp.Paket
 
 open JetBrains.Application
 open JetBrains.Application.Settings
-open JetBrains.Application.Settings.Implementation
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.DataContext
@@ -27,31 +26,33 @@ type PaketTargetsProjectLoadModificator() =
 
 
 [<SolutionInstanceComponent>]
-type PaketRestoreTargetsAnalyzer(lifetime, solution: ISolution, settingsStore: SettingsStore, logger: ILogger) =
+type PaketRestoreTargetsAnalyzer(lifetime, solution: ISolution, settingsStore: ISettingsStore, logger: ILogger) =
     let mutable restoreOptionsWereReset = false
 
+    let settings = settingsStore.BindToContextLive(lifetime, ContextRange.Smart(solution.ToDataContext()))
+    let restoreResetProp = settings.GetValueProperty(lifetime, fun (s: RestoreResetOptions) -> s.RestoreOptionsWereReset)
+    let restoreEnabledProp = settings.GetValueProperty(lifetime, fun (s: NuGetOptions) -> s.ConfigRestoreEnabled)
+    
     interface IMsBuildProjectLoadDiagnosticProvider with
         member x.CollectDiagnostic(projectMark, _, _) =
             match restoreOptionsWereReset, projectMark.HasPossibleImport(paketTargets) with
             | true, _ | _, false -> EmptyList.Instance :> _
             | _ ->
 
-            let context = solution.ToDataContext()
-            let solutionSettingsStore = settingsStore.BindToContextLive(lifetime, ContextRange.Smart(context))
-            match solutionSettingsStore.GetValue(fun (s: RestoreResetOptions) -> s.RestoreOptionsWereReset) with
+            match restoreResetProp.GetValue() with
             | true ->
                 restoreOptionsWereReset <- true
                 EmptyList.Instance :> _
             | _ ->
 
-            match solutionSettingsStore.GetValue(fun (s: NuGetOptions) -> s.ConfigRestoreEnabled) with
+            match restoreEnabledProp.GetValue() with
             | NuGetOptionConfigPolicy.Disable ->
-                solutionSettingsStore.ResetValue((fun (s: NuGetOptions) -> s.ConfigRestoreEnabled))
-                solutionSettingsStore.SetValue((fun (s: RestoreResetOptions) -> s.RestoreOptionsWereReset), true)
+                settings.ResetValue((fun (s: NuGetOptions) -> s.ConfigRestoreEnabled))
+                settings.SetValue((fun (s: RestoreResetOptions) -> s.RestoreOptionsWereReset), true)
                 logger.LogMessage(LoggingLevel.WARN, "Found core project using Paket. Reset NuGet restore options.")
 
                 restoreOptionsWereReset <- true
-                [NuGetRestoreEnabledMessage.InstanceDiagnostic].AsCollection()
+                [| NuGetRestoreEnabledMessage.InstanceDiagnostic |] :> _
 
             | _ -> EmptyList.Instance :> _
 
