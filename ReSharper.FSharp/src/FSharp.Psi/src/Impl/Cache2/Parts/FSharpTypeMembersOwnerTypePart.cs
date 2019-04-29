@@ -80,8 +80,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       if (SuperTypesClrTypeNames != null)
         return SuperTypesClrTypeNames.ToTypeElements(psiModule);
 
-      var superTypeNames = new JetHashSet<IClrTypeName>();
-      var superTypeElements = new JetHashSet<ITypeElement>();
+      var superTypeNames = new HashSet<IClrTypeName>();
+      var superTypeElements = new HashSet<ITypeElement>();
 
       foreach (var declaredType in GetSuperTypes())
       {

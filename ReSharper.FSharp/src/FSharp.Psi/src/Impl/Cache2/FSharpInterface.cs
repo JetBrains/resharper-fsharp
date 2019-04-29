@@ -17,7 +17,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public override IList<ITypeElement> GetSuperTypeElements()
     {
-      var result = new JetHashSet<ITypeElement>();
+      var result = new HashSet<ITypeElement>();
       foreach (var part in EnumerateParts())
         if (part is IFSharpClassLikePart fsPart)
           result.AddRange(fsPart.GetSuperTypeElements());

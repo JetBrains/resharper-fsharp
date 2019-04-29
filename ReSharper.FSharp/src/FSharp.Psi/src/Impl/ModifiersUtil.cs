@@ -26,7 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       TreeNodeCollection<IFSharpAttribute> attributes)
     {
       var decoration = MemberDecoration.DefaultValue;
-      var modifiers = new JetHashSet<TokenNodeType>();
+      var modifiers = new HashSet<TokenNodeType>();
 
       if (accessModifiers != null)
         foreach (var modifier in accessModifiers.Modifiers)
