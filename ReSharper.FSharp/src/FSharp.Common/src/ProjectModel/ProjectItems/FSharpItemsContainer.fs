@@ -283,7 +283,7 @@ type FSharpItemsContainer
             |> Option.bind tryGetProjectMapping
             |> Option.map (fun mapping ->
                 mapping.TryGetProjectItems(folder.Location)
-                |> List.map (function
+                |> Seq.map (function
                     | FolderItem (_, id) as folderItem ->
                         let parent =
                             match folderItem.Parent with
@@ -291,7 +291,7 @@ type FSharpItemsContainer
                             | _ -> None
                         FSharpViewFolder (folder, id), parent
                     | item -> failwithf "got item %O" item))
-            |> Option.defaultValue []
+            |> Option.defaultValue Seq.empty
 
         member x.TryGetRelativeChildPath(projectMark, modifiedItem, relativeItem, relativeToType) =
             use lock = locker.UsingReadLock()
@@ -338,7 +338,7 @@ type IFSharpItemsContainer =
     abstract member IsApplicable: IProjectItem -> bool
     abstract member TryGetSortKey: FSharpViewItem -> int option
     abstract member TryGetParentFolderIdentity: FSharpViewItem -> FSharpViewFolderIdentity option
-    abstract member CreateFoldersWithParents: IProjectFolder -> (FSharpViewItem * FSharpViewItem option) list
+    abstract member CreateFoldersWithParents: IProjectFolder -> (FSharpViewItem * FSharpViewItem option) seq
     abstract member GetProjectItemsPaths: IProjectMark * TargetFrameworkId -> (FileSystemPath * BuildAction)[]
     abstract member Dump: TextWriter -> unit
 
@@ -359,12 +359,12 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         tryGetValue path files
 
     let getFolders path =
-        folders.GetValuesSafe(path) |> List.ofSeq
+        folders.GetValuesSafe(path)
 
     let getItemsForPath path =
         tryGetFile path
         |> Option.toList
-        |> List.append (getFolders path)
+        |> Seq.append (getFolders path)
 
     let tryGetProjectItem (viewItem: FSharpViewItem) =
         let path = viewItem.ProjectItem.Location
@@ -372,10 +372,10 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         | FSharpViewFile _ -> tryGetFile path
         | FSharpViewFolder (_, identity) ->
             getFolders path
-            |> List.tryFind (function | FolderItem (_, id) -> id = identity | _ -> false)
+            |> Seq.tryFind (function | FolderItem (_, id) -> id = identity | _ -> false)
 
     let getNewFolderIdentity path =
-        { Identity = (getFolders path |> List.length) + 1 }
+        { Identity = (getFolders path).Count + 1 }
 
     let getChildren (parent: FSharpProjectModelElement) =
         folders.Values
@@ -544,7 +544,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
 
     let rec renameFolder oldLocation newLocation itemUpdater =
         getFolders oldLocation
-        |> List.iter (fun folderItem ->
+        |> Seq.iter (fun folderItem ->
             folderItem.ItemInfo.LogicalPath <- newLocation
             folderItem.ItemInfo.PhysicalPath <- newLocation
             folders.AddValue(newLocation, folderItem)
@@ -567,12 +567,12 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         folders.RemoveKey(oldLocation) |> ignore
 
     let rec removeSplittedFolderIfEmpty folder folderPath folderRefresher itemUpdater =
-        let isFolderSplitted path = getFolders path |> List.length > 1
+        let isFolderSplitted path = (getFolders path).Count > 1
 
         match folder with
         | ProjectItem (EmptyFolder (FolderItem (_, folderId)) as folderItem) when isFolderSplitted folderPath ->
             getFolders folderPath
-            |> List.iter (fun folderItem ->
+            |> Seq.iter (fun folderItem ->
                 match folderItem with
                 | FolderItem (_, id) ->
                     if id.Identity > folderId.Identity then id.Identity <- id.Identity - 1
@@ -640,8 +640,11 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
             if isNull path then None else
             tryGetFile path
             |> Option.orElseWith (fun _ ->
-                match getFolders path with
-                | EmptyFolder _ as item :: [] -> Some item
+                let folders = getFolders path
+                if folders.Count <> 1 then None else
+
+                match folders.[0] with
+                | EmptyFolder _ as item -> Some item
                 | _ -> None)
 
         let parent, sortKey =
@@ -848,7 +851,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
 
     member x.RemoveFolder(path, refresher, updater) =
         getFolders path
-        |> List.iter (removeItem refresher updater)
+        |> Seq.iter (removeItem refresher updater)
 
     member x.UpdateFolder(oldLocation, newLocation, updater) =
         Assertion.Assert(oldLocation.Parent = newLocation.Parent, "oldLocation.Parent = newLocation.Parent")
@@ -857,7 +860,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
     member x.TryGetProjectItem(viewItem: FSharpViewItem): FSharpProjectItem option =
         tryGetProjectItem viewItem
 
-    member x.TryGetProjectItems(path: FileSystemPath): FSharpProjectItem list =
+    member x.TryGetProjectItems(path: FileSystemPath): FSharpProjectItem seq =
         getItemsForPath path
 
     member x.AddFile(BuildAction buildAction, path, logicalPath, relativeToPath, relativeToType, refresher, updater) =
