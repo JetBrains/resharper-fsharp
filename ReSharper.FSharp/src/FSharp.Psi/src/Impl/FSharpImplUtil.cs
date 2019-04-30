@@ -39,9 +39,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public const string Sealed = "Sealed";
     public const string Struct = "Struct";
 
-    public static TreeTextRange GetNameRange([CanBeNull] this ILongIdentifier longIdentifier)
+    public static TreeTextRange GetIdentifierNameRange([CanBeNull] this ILongIdentifier longIdentifier)
     {
-      if (longIdentifier == null) return TreeTextRange.InvalidRange;
+      if (longIdentifier == null)
+        return TreeTextRange.InvalidRange;
 
       var ids = longIdentifier.Identifiers;
       return ids.IsEmpty ? TreeTextRange.InvalidRange : ids.Last().GetTreeTextRange();

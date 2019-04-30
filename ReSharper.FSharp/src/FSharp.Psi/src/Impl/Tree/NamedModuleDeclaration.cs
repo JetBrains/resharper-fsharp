@@ -1,4 +1,5 @@
 ﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
@@ -9,5 +10,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public override IFSharpIdentifier NameIdentifier =>
       LongIdentifier;
+
+    public override TreeTextRange GetNameRange() =>
+      LongIdentifier.GetIdentifierNameRange();
   }
 }
