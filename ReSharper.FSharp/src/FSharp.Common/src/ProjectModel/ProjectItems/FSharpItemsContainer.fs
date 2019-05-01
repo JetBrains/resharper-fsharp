@@ -110,23 +110,23 @@ type FSharpItemsContainer
         |> Option.bind tryGetProjectMapping
         |> Option.bind (fun mapping -> mapping.TryGetProjectItem(viewItem))
 
-    let getItems (msBuildProject: MsBuildProject) projectDescriptor itemTypeFilter getItemsByName allowNonDefaultItemType =
+    let getItems (msBuildProject: MsBuildProject) projectDescriptor itemTypeFilter (itemsByName: CompactOneToListMap<_,_>) allowNonDefaultItemType =
         let items = List<RdProjectItemWithTargetFrameworks>()
         for rdProject in msBuildProject.RdProjects do
             let targetFrameworkId = msBuildProject.GetTargetFramework(rdProject)
             let filter = filterProvider.CreateItemFilter(rdProject, projectDescriptor)
 
             rdProject.Items
-            |> List.ofSeq
-            |> List.filter (fun item ->
+            |> Seq.filter (fun item ->
+                itemTypeFilter item.ItemType &&
+
                 // todo: allow passing additional default item types to the filter ctor
-                itemTypeFilter item.ItemType && allowNonDefaultItemType ||
-                not (filter.FilterByItemType(item.ItemType, item.IsImported())))
-            |> List.filter (fun item ->
-                let (BuildAction buildAction) = item.ItemType
-                not (buildAction.IsNone() && getItemsByName item.EvaluatedInclude |> Seq.length > 1))
-            |> List.filter (fun item -> itemTypeFilter item.ItemType)
-            |> List.fold (fun index item ->
+                (allowNonDefaultItemType || not (filter.FilterByItemType(item.ItemType, item.IsImported()))) &&
+
+                (let (BuildAction buildAction) = item.ItemType
+                 not (buildAction.IsNone() && itemsByName.[item.EvaluatedInclude].Count > 1)))
+
+            |> Seq.fold (fun index item ->
                 if index < items.Count && items.[index].Item.EvaluatedInclude = item.EvaluatedInclude then
                     items.[index].TargetFrameworkIds.Add(targetFrameworkId) |> ignore
                     index + 1
@@ -205,12 +205,9 @@ type FSharpItemsContainer
                     for rdItem in rdProject.Items do
                         itemsByName.AddValue(rdItem.EvaluatedInclude, rdItem.ItemType)
 
-                let getItemsByName name =
-                    itemsByName.[name]
-
-                let compileBeforeItems = getItems msBuildProject projectDescriptor isCompileBefore getItemsByName true
-                let compileAfterItems = getItems msBuildProject projectDescriptor isCompileAfter getItemsByName true 
-                let restItems = getItems msBuildProject projectDescriptor (changesOrder >> not) getItemsByName false
+                let compileBeforeItems = getItems msBuildProject projectDescriptor isCompileBefore itemsByName true
+                let compileAfterItems = getItems msBuildProject projectDescriptor isCompileAfter itemsByName true 
+                let restItems = getItems msBuildProject projectDescriptor (changesOrder >> not) itemsByName false
                 let items =
                     compileBeforeItems.Concat(restItems).Concat(compileAfterItems)
                     |> Seq.map (fun item ->
