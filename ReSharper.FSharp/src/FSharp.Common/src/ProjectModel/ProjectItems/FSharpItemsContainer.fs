@@ -33,6 +33,7 @@ open JetBrains.Serialization
 open JetBrains.Threading
 open JetBrains.UI.RichText
 open JetBrains.Util
+open JetBrains.Util.Caches
 open JetBrains.Util.DataStructures
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 open JetBrains.Util.Logging
@@ -66,7 +67,7 @@ type FSharpItemsContainerLoader(lifetime: Lifetime, solution: ISolution, solutio
         let map =
             solutionCaches.Db
                 .GetMap("FSharpItemsContainer", projectMarkMarshaller, ProjectMapping.Marshaller)
-                .ToOptimized(lifetime)
+                .ToOptimized(lifetime, Cache = DirectMappedCache(1 <<< 8))
 
         map.Remove(dummyProjectMark) |> ignore
         map :> _
