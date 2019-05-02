@@ -23,6 +23,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     {
     }
 
+    public override TypeElement CreateTypeElement() =>
+      new FSharpModule(this);
+
     public IEnumerable<ITypeMember> GetTypeMembers()
     {
       var declaration = GetDeclaration();
