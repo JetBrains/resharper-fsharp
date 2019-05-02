@@ -6,6 +6,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
@@ -106,5 +107,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     public virtual PartKind TypePartKind => PartKind.Class;
+
+    public override void SetName(string name, ChangeNameKind changeNameKind)
+    {
+      var oldSourceName = SourceName;
+      base.SetName(name, changeNameKind);
+
+      if (!(Parent is IModuleLikeDeclaration module))
+        return;
+
+      foreach (var member in module.Members)
+        if (member is IModuleDeclaration decl && decl.SourceName == oldSourceName && member is CompositeElement element)
+          element.SubTreeChanged(element, PsiChangedElementType.SourceContentsChanged);
+    }
   }
 }
