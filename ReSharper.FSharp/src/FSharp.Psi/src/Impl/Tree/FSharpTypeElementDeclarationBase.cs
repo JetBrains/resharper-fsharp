@@ -117,8 +117,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         return;
 
       foreach (var member in module.Members)
-        if (member is IModuleDeclaration decl && decl.SourceName == oldSourceName && member is CompositeElement element)
-          element.SubTreeChanged(element, PsiChangedElementType.SourceContentsChanged);
+      {
+        if (!(member is IModuleDeclaration decl))
+          continue;
+
+        if (decl.SourceName == oldSourceName || decl.SourceName == name)
+        {
+          var element = member as CompositeElement;
+          element?.SubTreeChanged(element, PsiChangedElementType.SourceContentsChanged);
+        }
+      }
     }
   }
 }
