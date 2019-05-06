@@ -1,0 +1,10 @@
+﻿module Module
+
+open System
+
+type String with
+    member x.zzz(a) = x.zzz(a)
+    member x.Bar(a, b) = x.Bar(a, b)
+
+let s = ""
+s.zzz(123)

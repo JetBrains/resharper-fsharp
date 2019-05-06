@@ -15,14 +15,14 @@ using JetBrains.Util.Logging;
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
   internal abstract class FSharpMemberBase<TDeclaration> : FSharpTypeMember<TDeclaration>, IParametersOwner,
-    IOverridableMember, IFSharpExtensionTypeMember
+    IOverridableMember, IFSharpMember
     where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
     protected FSharpMemberBase([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {
     }
 
-    [CanBeNull] public FSharpMemberOrFunctionOrValue Mfv => Symbol as FSharpMemberOrFunctionOrValue;
+    public FSharpMemberOrFunctionOrValue Mfv => Symbol as FSharpMemberOrFunctionOrValue;
 
     public override bool IsExtensionMember => Mfv?.IsExtensionMember ?? false;
     public override bool IsFSharpMember => Mfv?.IsMember ?? false;
@@ -121,17 +121,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       if (mfv == null)
         return false;
 
-      var isExtension = mfv.IsExtensionMember;
-      var isInstanceMember = mfv.IsInstanceMember;
-
-      if (!(isExtension && isInstanceMember))
+      if (!mfv.IsExtensionMember)
         return true;
 
       var otherSymbol = otherMember.Mfv;
       if (otherSymbol == null)
         return false;
 
-      if (!otherSymbol.IsExtensionMember || !otherSymbol.IsInstanceMember)
+      if (!otherSymbol.IsExtensionMember)
         return false;
 
       var apparentEntity = mfv.ApparentEnclosingEntity;
@@ -140,6 +137,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     }
 
     public override int GetHashCode() => ShortName.GetHashCode();
-    public FSharpEntity ApparentEntity => Mfv?.ApparentEnclosingEntity;
   }
 }

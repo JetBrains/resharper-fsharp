@@ -197,7 +197,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     [NotNull]
-    public static string GetMemberCompiledName([NotNull] this FSharpMemberOrFunctionOrValue mfv)
+    public static string GetMfvCompiledName([NotNull] this FSharpMemberOrFunctionOrValue mfv)
     {
       try
       {

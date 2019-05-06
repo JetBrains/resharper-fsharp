@@ -17,14 +17,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     bool IsFSharpMember { get; }
   }
 
+  public interface IFSharpMember : IFSharpTypeMember
+  {
+    [CanBeNull] FSharpMemberOrFunctionOrValue Mfv { get; }
+  }
+  
   public interface IFSharpTypeParametersOwner : IFSharpDeclaredElement
   {
     IList<ITypeParameter> AllTypeParameters { get; }
-  }
-
-  public interface IFSharpExtensionTypeMember : IFSharpTypeMember
-  {
-    [CanBeNull] FSharpEntity ApparentEntity { get; }
   }
 
   public interface IFSharpGeneratedFromOtherElement : IFSharpDeclaredElement

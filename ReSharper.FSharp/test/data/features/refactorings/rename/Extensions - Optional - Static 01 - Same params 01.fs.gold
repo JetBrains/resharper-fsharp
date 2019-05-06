@@ -1,0 +1,9 @@
+﻿module Module
+
+open System
+
+type String with
+    static member zzz a b = String.zzz a b
+
+type Int32 with
+    static member Bar a b = Int32.Bar a b

@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Refactorings
 
+open System.Linq
 open JetBrains.ReSharper.FeaturesTestFramework.Refactorings
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
@@ -9,6 +10,13 @@ type FSharpRenameTest() =
     inherit RenameTestBase()
 
     override x.RelativeTestDataPath = "features/refactorings/rename"
+
+    override x.ProvideOccurrencesData(occurrences, context, control) =
+        // When multiple overloads are available, we want to rename initial element.
+        // Current occurences are:
+        // "Rename initial element"
+        // "Rename with overloads"
+        occurrences.FirstOrDefault()
 
     [<Test>] member x.``Inline - Declaration``() = x.DoNamedTest()
     [<Test>] member x.``Inline - Use``() = x.DoNamedTest()
@@ -113,8 +121,16 @@ type FSharpRenameTest() =
     [<Test>] member x.``Active patterns - Unavailable``() = x.DoNamedTest()
     [<Test>] member x.``Active patterns - Should start with upper case``() = x.DoNamedTest()
 
-    [<Test>] member x.``Type Extension - Optional - Member 01``() = x.DoNamedTest()
-    [<Test>] member x.``Type Extension - Optional - Member 02``() = x.DoNamedTest()
-    [<Test>] member x.``Type Extension - Optional - Type 01``() = x.DoNamedTest()
-    [<Test>] member x.``Type Extension - Optional - Type 02 - Qualified``() = x.DoNamedTest()
-    [<Test>] member x.``Type Extension - Optional - Type 03 - Qualified 2``() = x.DoNamedTest()
+    [<Test>] member x.``Extensions - Optional - Instance 01``() = x.DoNamedTest()
+    [<Test>] member x.``Extensions - Optional - Instance 02``() = x.DoNamedTest()
+    [<Test>] member x.``Extensions - Optional - Instance 03 - Overloads 01``() = x.DoNamedTest()
+    [<Test>] member x.``Extensions - Optional - Instance 04 - Overloads 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Extensions - Optional - Static 01 - Same params 01``() = x.DoNamedTest()
+    [<Test>] member x.``Extensions - Optional - Static 02 - Same params 02``() = x.DoNamedTest()
+    [<Test>] member x.``Extensions - Optional - Static 03 - Different params 01``() = x.DoNamedTest()
+    [<Test>] member x.``Extensions - Optional - Static 04 - Different params 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Extensions - Optional - Type 01``() = x.DoNamedTest()
+    [<Test>] member x.``Extensions - Optional - Type 02 - Qualified``() = x.DoNamedTest()
+    [<Test>] member x.``Extensions - Optional - Type 03 - Qualified 2``() = x.DoNamedTest()

@@ -128,7 +128,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
         var members = mfv.IsConstructor
           ? typeElement.Constructors.AsList<ITypeMember>()
-          : typeElement.EnumerateMembers(mfv.GetMemberCompiledName(), true).AsList();
+          : typeElement.EnumerateMembers(mfv.GetMfvCompiledName(), true).AsList();
 
         switch (members.Count)
         {
@@ -138,26 +138,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
             return members[0];
         }
 
-        // F# optional extension member in a module.
-        if (mfv.IsExtensionMember && mfv.IsInstanceMember)
-        {
-          var apparentType = GetTypeElement(mfv.ApparentEnclosingEntity, psiModule);
-          if (apparentType != null)
-          {
-            foreach (var member in members)
-            {
-              if (!(member is IFSharpExtensionTypeMember e) || !(e.ApparentEntity is FSharpEntity otherEntity))
-                continue;
-
-              var otherApparentType = GetTypeElement(otherEntity, psiModule);
-              if (otherApparentType != null && Equals(otherApparentType, apparentType))
-                return member;
-            }
-          }
-        }
-
         var mfvXmlDocId = GetXmlDocId(mfv);
-        return members.FirstOrDefault(m => m.XMLDocId == mfvXmlDocId);
+        return mfv.IsExtensionMember
+          ? members.FirstOrDefault(m => m is IFSharpMember fsMember && fsMember.Mfv?.XmlDocSig == mfvXmlDocId)
+          : members.FirstOrDefault(m => m.XMLDocId == mfvXmlDocId);
       }
 
       if (symbol is FSharpUnionCase unionCase)
