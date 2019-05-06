@@ -469,5 +469,32 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
       return result;
     }
+
+    [CanBeNull]
+    public static IDeclaredElement GetModuleToUpdateName([NotNull] this IFSharpTypeElement fsTypeElement,
+      [CanBeNull] string newName)
+    {
+      if (!(fsTypeElement is TypeElement typeElement))
+        return null;
+
+      var typeSourceName = fsTypeElement.SourceName;
+      foreach (var part in typeElement.EnumerateParts())
+      {
+        foreach (var child in part.Parent.NotNull("part.Parent != null").Children())
+        {
+          if (!(child is IModulePart && child is TypePart typePart))
+            continue;
+
+          if (!(typePart.TypeElement is IFSharpTypeElement otherTypeElement))
+            continue;
+
+          var sourceName = otherTypeElement.SourceName;
+          if (sourceName == typeSourceName || sourceName == newName)
+            return otherTypeElement;
+        }
+      }
+
+      return null;
+    }
   }
 }

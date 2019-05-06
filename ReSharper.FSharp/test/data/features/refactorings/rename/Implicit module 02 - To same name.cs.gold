@@ -1,0 +1,8 @@
+﻿public class Class1
+{
+  public Class1()
+  {
+    var b = new A(123);
+    var x = AModule.x;
+  }
+}

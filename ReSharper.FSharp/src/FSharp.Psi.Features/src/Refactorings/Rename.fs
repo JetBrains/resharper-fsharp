@@ -84,7 +84,7 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
 
     override x.CheckLocalRenameSameDocument(element: IDeclaredElement) = x.IsLocalRename(element)
 
-    override x.GetSecondaryElements(element: IDeclaredElement) =
+    override x.GetSecondaryElements(element: IDeclaredElement, newName) =
         match element with
         | :? ILocalNamedPat as localNamedPat ->
             let mutable pat = localNamedPat :> ISynPat
@@ -100,6 +100,13 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
 
         | :? IGeneratedConstructorParameterOwner as parameterOwner ->
             [| parameterOwner.GetParameter() :> IDeclaredElement |] :> _
+
+        | :? IModule -> EmptyArray.Instance :> _
+
+        | :? IFSharpTypeElement as fsTypeElement ->
+            match fsTypeElement.GetModuleToUpdateName(newName) with
+            | null -> EmptyArray.Instance :> _
+            | fsModule -> [| fsModule |] :> _
 
         | _ -> EmptyArray.Instance :> _
 
@@ -195,7 +202,8 @@ type FSharpNamingService(language: FSharpLanguage) =
 
     let (|FSharpNameRoot|_|) (root: NameRoot) =
         match List.ofSeq root.Words with
-        | Word "F" :: Word "Sharp" :: rest -> Some (withWords rest root)
+        | Word "F" :: Word "Sharp" :: rest
+        | Word "I" :: Word "F" :: Word "Sharp" :: rest -> Some (withWords rest root)
         | _ -> None
 
     let dropFSharpWords root =

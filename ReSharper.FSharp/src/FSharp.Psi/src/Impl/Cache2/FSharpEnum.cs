@@ -2,7 +2,7 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
-  public class FSharpEnum : Enum, IFSharpDeclaredElement
+  public class FSharpEnum : Enum, IFSharpTypeElement
   {
     public FSharpEnum(IEnumPart part) : base(part)
     {

@@ -1,7 +1,9 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Refactorings
 
 open System.Linq
+open JetBrains.ProjectModel
 open JetBrains.ReSharper.FeaturesTestFramework.Refactorings
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
@@ -18,6 +20,12 @@ type FSharpRenameTest() =
         // "Rename with overloads"
         occurrences.FirstOrDefault()
 
+    member x.DoNamedTestFiles() =
+        let testName = x.TestMethodName
+        let csExtension = CSharpProjectFileType.CS_EXTENSION
+        let fsExtension = FSharpProjectFileType.FsExtension
+        x.DoTestFiles(testName + csExtension, testName + fsExtension)
+    
     [<Test>] member x.``Inline - Declaration``() = x.DoNamedTest()
     [<Test>] member x.``Inline - Use``() = x.DoNamedTest()
     [<Test>] member x.``Inline - Member self id``() = x.DoNamedTest()
@@ -134,3 +142,6 @@ type FSharpRenameTest() =
     [<Test>] member x.``Extensions - Optional - Type 01``() = x.DoNamedTest()
     [<Test>] member x.``Extensions - Optional - Type 02 - Qualified``() = x.DoNamedTest()
     [<Test>] member x.``Extensions - Optional - Type 03 - Qualified 2``() = x.DoNamedTest()
+
+    [<Test>] member x.``Implicit module 01 - From same name``() = x.DoNamedTestFiles()
+    [<Test>] member x.``Implicit module 02 - To same name``() = x.DoNamedTestFiles()

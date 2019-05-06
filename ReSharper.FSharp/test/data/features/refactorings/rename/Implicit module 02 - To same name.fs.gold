@@ -1,0 +1,11 @@
+﻿CONFLICTS FOUND:
+Error Conflict with A
+==========
+//${NEW_NAME:A}
+namespace global
+
+type A =
+    { Field: int }
+
+module A =
+    let x = 123

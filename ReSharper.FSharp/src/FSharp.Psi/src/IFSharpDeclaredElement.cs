@@ -6,4 +6,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
   {
     string SourceName { get; }
   }
+
+  public interface IFSharpTypeElement : IFSharpDeclaredElement, ITypeElement
+  {
+  }
 }

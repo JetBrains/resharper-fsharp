@@ -7,7 +7,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
-  public class FSharpStruct : Struct, IFSharpDeclaredElement
+  public class FSharpStruct : Struct, IFSharpTypeElement
   {
     public FSharpStruct([NotNull] IStructPart part) : base(part)
     {

@@ -6,7 +6,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
-  public class FSharpInterface : Interface, IFSharpDeclaredElement
+  public class FSharpInterface : Interface, IFSharpTypeElement
   {
     public FSharpInterface(IInterfacePart part) : base(part)
     {
