@@ -1,0 +1,9 @@
+﻿//${NEW_NAME:Zzz}
+public class Class1
+{
+  public Class1()
+  {
+    var r = new Record(zzz: 123, second: 123);
+    var f = r.Zzz;
+  }
+}

@@ -145,3 +145,5 @@ type FSharpRenameTest() =
 
     [<Test>] member x.``Implicit module 01 - From same name``() = x.DoNamedTestFiles()
     [<Test>] member x.``Implicit module 02 - To same name``() = x.DoNamedTestFiles()
+
+    [<Test>] member x.``Generated members - Record fields 01 - Ctor param``() = x.DoNamedTestFiles()

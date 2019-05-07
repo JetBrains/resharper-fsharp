@@ -1,0 +1,5 @@
+﻿namespace global
+
+type Record =
+    { Zzz: int
+      Second: int }
