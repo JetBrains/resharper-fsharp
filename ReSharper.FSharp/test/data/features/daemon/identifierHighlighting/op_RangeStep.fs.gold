@@ -1,0 +1,8 @@
+﻿module |Module|(0)
+
+let _ =
+    |seq|(1) { 0 .. 1 .. 2 }
+
+---------------------------------------------------------
+(0): ReSharper Static Class Identifier: 
+(1): keyword: 

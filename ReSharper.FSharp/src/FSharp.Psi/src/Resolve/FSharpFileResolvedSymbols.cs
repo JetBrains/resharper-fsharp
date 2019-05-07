@@ -217,7 +217,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
             startOffset += 1;
 
           // workaround for implicit type usages (e.g. in members with optional params), visualfsharp#3933
-          if (symbol is FSharpEntity &&
+          if (CanIgnoreSymbol(symbol) &&
               !(lexer.FindTokenAt(nameRange.EndOffset - 1) && (lexer.TokenType?.IsIdentifier ?? false)))
             continue;
 
@@ -230,6 +230,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
       return resolvedSymbols;
     }
+
+    private static bool CanIgnoreSymbol([NotNull] FSharpSymbol symbol) =>
+      symbol is FSharpEntity || 
+      symbol is FSharpMemberOrFunctionOrValue mfv && mfv.LogicalName == "op_RangeStep";
 
     private TextRange FixRange(int startOffset, int endOffset, [CanBeNull] string logicalName, IBuffer buffer,
       CachingLexer lexer)
