@@ -26,3 +26,5 @@ type ErrorsHighlightingTest() =
 
     [<TestFileExtension(FSharpScriptProjectFileType.FsxExtension)>]
     [<Test>] member x.``Unused value in script``() = x.DoNamedTest()
+
+    [<Test>] member x.``Unfinished let``() = x.DoNamedTest()

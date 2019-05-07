@@ -1,0 +1,10 @@
+﻿namespace ClassLibrary1
+
+module Say =
+    let u =
+        ()
+
+    let
+||(0)
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Incomplete structured construct at or before this point in binding
