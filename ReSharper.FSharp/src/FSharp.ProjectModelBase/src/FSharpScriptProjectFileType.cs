@@ -25,6 +25,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp
     {
     }
 
-    public override BuildAction GetDefaultBuildAction(string extension) => BuildAction.NONE;
+    public override BuildAction GetDefaultBuildAction(IProject project, string extension) => BuildAction.NONE;
   }
 }

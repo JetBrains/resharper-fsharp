@@ -15,7 +15,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp
     public const string MlExtension = ".ml";
     public const string MliExtension = ".mli";
 
-
     private FSharpProjectFileType()
       : base(Name, "F#", new[] {FsExtension, FsiExtension, MlExtension, MliExtension})
     {
@@ -34,6 +33,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp
     {
     }
 
-    public override BuildAction GetDefaultBuildAction(string extension) => BuildAction.COMPILE;
+    public override BuildAction GetDefaultBuildAction(IProject project, string extension) => BuildAction.COMPILE;
   }
 }
