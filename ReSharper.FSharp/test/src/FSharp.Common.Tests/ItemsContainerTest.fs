@@ -689,9 +689,9 @@ type FSharpItemsContainerTest() =
               createItem "Compile" "Folder[1]/SubFolder[2]/File6"
               createItem "Compile" "File7" ])
 
-    [<Test; Ignore>]
+    [<Test; Ignore("Not implemented")>]
     member x.``Create modification context 06 - CompileBefore``() =
-        x.DoCreateModificationContextTest( // todo: fix
+        x.DoCreateModificationContextTest(
             [ createItem "Compile"       "Folder[1]/File3"
               createItem "CompileAfter"  "File5" 
               createItem "CompileAfter"  "File6" 

@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests
 
 open System
+open System.Threading
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application.Components
 open JetBrains.Application.platforms
@@ -19,7 +20,7 @@ open JetBrains.Util.Dotnet.TargetFrameworkIds
 open NUnit.Framework
 
 module AssemblyInfo =
-    [<assembly: RequiresSTA>]
+    [<assembly: Apartment(ApartmentState.STA)>]
         do()
 
 type FSharpTestAttribute() =
