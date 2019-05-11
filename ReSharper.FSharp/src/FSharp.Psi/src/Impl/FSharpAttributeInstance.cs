@@ -31,51 +31,63 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     // todo: containing type type parameters?
     public IDeclaredType GetAttributeType() => TypeFactory.CreateTypeByCLRName(Attr.GetClrName(), Module);
 
-    private AttributeValue GetAttributeValue(Tuple<FSharpType, object> param) =>
-      new AttributeValue(
-        new ConstantValue(param.Item2, param.Item1.MapType(EmptyList<ITypeParameter>.Instance, Module)));
+    private AttributeValue GetArgValue(Tuple<FSharpType, object> arg) =>
+      new AttributeValue(new ConstantValue(arg.Item2, arg.Item1.MapType(EmptyList<ITypeParameter>.Instance, Module)));
 
     public AttributeValue PositionParameter(int paramIndex) =>
-      paramIndex >= 0 && paramIndex < Attr.ConstructorArguments.Count
-        ? GetAttributeValue(Attr.ConstructorArguments[paramIndex])
+      paramIndex >= 0 && AttrConstructorArgs is var args && paramIndex < args.Count
+        ? GetArgValue(args[paramIndex])
         : AttributeValue.BAD_VALUE;
 
-    public IEnumerable<AttributeValue> PositionParameters() => Attr.ConstructorArguments.Select(GetAttributeValue);
+    public IEnumerable<AttributeValue> PositionParameters() => AttrConstructorArgs.Select(GetArgValue);
 
-    public AttributeValue NamedParameter(string name)
-    {
-      var param = Attr.NamedArguments.FirstOrDefault(p => p.Item2 == name);
-      return param != null
+    public AttributeValue NamedParameter(string name) =>
+      AttrNamedArgs.FirstOrDefault(p => p.Item2 == name) is var param && param != null
         ? new AttributeValue(new ConstantValue(param.Item4, type: null))
         : AttributeValue.BAD_VALUE;
-    }
 
     public IEnumerable<Pair<string, AttributeValue>> NamedParameters() =>
-      Attr.NamedArguments.Select(a => new Pair<string, AttributeValue>(a.Item2,
-        GetAttributeValue(new Tuple<FSharpType, object>(a.Item1, a.Item4))));
+      AttrNamedArgs.Select(a => Pair.Of(a.Item2, GetArgValue(Tuple.Create(a.Item1, a.Item4))));
 
     // todo: add property to FCS to get constructor symbol
     public IConstructor Constructor =>
-      FSharpElementsUtil.GetDeclaredElement(
-        Attr.AttributeType.MembersFunctionsAndValues.FirstOrDefault(m => m.IsConstructor), Module) as IConstructor;
+      Attr.AttributeType.MembersFunctionsAndValues.FirstOrDefault(m => m.IsConstructor)
+        .GetDeclaredElement(Module) as IConstructor;
 
-    public int PositionParameterCount
+    public IList<Tuple<FSharpType, object>> AttrConstructorArgs
     {
       get
       {
         try
         {
-          return Attr.ConstructorArguments.Count;
+          return Attr.ConstructorArguments;
         }
         catch (Exception)
         {
           // Possible FCS exception: This custom attribute has an argument that can not yet be converted using this API.
-          return 0;
+          return EmptyList<Tuple<FSharpType, object>>.Instance;
         }
       }
     }
 
-    public int NamedParameterCount => Attr.NamedArguments.Count;
+    public IList<Tuple<FSharpType, string, bool, object>> AttrNamedArgs
+    {
+      get
+      {
+        try
+        {
+          return Attr.NamedArguments;
+        }
+        catch (Exception)
+        {
+          // Possible FCS exception: This custom attribute has an argument that can not yet be converted using this API.
+          return EmptyList<Tuple<FSharpType, string, bool, object>>.Instance;
+        }
+      }
+    }
+
+    public int PositionParameterCount => AttrConstructorArgs.Count;
+    public int NamedParameterCount => AttrNamedArgs.Count;
   }
 
   public static class FSharpAttributeEx
