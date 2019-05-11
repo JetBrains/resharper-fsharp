@@ -26,7 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
   public static class FSharpElementsUtil
   {
     [CanBeNull]
-    internal static ITypeElement GetTypeElement([NotNull] FSharpEntity entity, [NotNull] IPsiModule psiModule)
+    public static ITypeElement GetTypeElement([NotNull] this FSharpEntity entity, [NotNull] IPsiModule psiModule)
     {
       if (((FSharpSymbol) entity).DeclarationLocation == null || entity.IsByRef || entity.IsProvidedAndErased)
         return null;
@@ -85,7 +85,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     }
 
     [CanBeNull]
-    public static IDeclaredElement GetDeclaredElement([CanBeNull] FSharpSymbol symbol,
+    public static IDeclaredElement GetDeclaredElement([CanBeNull] this FSharpSymbol symbol,
       [NotNull] IPsiModule psiModule, [CanBeNull] IReferenceExpression referenceExpression = null)
     {
       if (symbol == null)
