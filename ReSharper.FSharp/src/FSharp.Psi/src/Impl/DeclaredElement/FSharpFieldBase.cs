@@ -40,6 +40,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     private FSharpMemberOrFunctionOrValue Field => Symbol as FSharpMemberOrFunctionOrValue;
     protected override FSharpType FieldType => Field?.FullType;
+
+    public override AccessRights GetAccessRights() => AccessRights.INTERNAL;
   }
 
   internal class FSharpValField : FSharpFieldBase<ValField>
