@@ -7,7 +7,6 @@ open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Highlightings
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.Util
 
@@ -34,8 +33,8 @@ type ErrorsStageProcessBase(fsFile, daemonProcess) =
         if error.StartLineAlternate = 0 || error.ErrorNumber = ModuleOrNamespaceRequired then
             DocumentRange(document, TextRange(0, document.GetLineEndOffsetWithLineBreak(Line.O)))
         else
-            let startOffset = document.GetDocumentOffset(error.StartLineAlternate - 1, error.StartColumn)
-            let endOffset = document.GetDocumentOffset(error.EndLineAlternate - 1, error.EndColumn)
+            let startOffset = getDocumentOffset document (docCoords error.StartLineAlternate error.StartColumn)
+            let endOffset = getDocumentOffset document (docCoords error.EndLineAlternate error.EndColumn)
             DocumentRange(document, TextRange(startOffset, endOffset))
 
     abstract ShouldAddDiagnostic: error: FSharpErrorInfo * range: DocumentRange -> bool

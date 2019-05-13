@@ -35,19 +35,19 @@ type FSharpBreakpointVariantsProvider() =
             | Some parseResults ->
 
             let document = file.ToSourceFile().Document
-            let docLine = docLine line
-            let lineStart = document.GetLineStartOffset(docLine)
-            let lineEnd = document.GetLineEndOffsetWithLineBreak(docLine)
+            let lineStart = document.GetLineStartOffset(docLine line)
+            let lineEnd = document.GetLineEndOffsetWithLineBreak(docLine line)
 
             let variants = Dictionary<Range.range, IBreakpoint>() 
             for token in fsFile.FindTokensAt(TreeTextRange(TreeOffset(lineStart), TreeOffset(lineEnd))) do
-                let pos = document.GetPos(token.GetTreeEndOffset().Offset)
+                let documentEndOffset = token.GetDocumentEndOffset()
+                let pos = getPosFromDocumentOffset documentEndOffset
                 match parseResults.ValidateBreakpointLocation(pos) with
                 | Some range when range.StartLine - 1 = line ->
                     if variants.ContainsKey(range) then () else
 
-                    let startOffset = document.GetStartOffset(range)
-                    let endOffset = document.GetEndOffset(range)
+                    let startOffset = getStartOffset document range
+                    let endOffset = getEndOffset document range
 
                     let text =
                         let breakpointText = document.GetText(TextRange(startOffset, Math.Min(lineEnd, endOffset)))

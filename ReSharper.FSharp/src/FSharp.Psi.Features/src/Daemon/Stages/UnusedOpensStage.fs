@@ -44,7 +44,7 @@ type UnusedOpensStageProcess(fsFile: IFSharpFile, daemonProcess: IDaemonProcess)
         let checkResults = results.CheckResults
         for range in UnusedOpens.getUnusedOpens(checkResults, getLine).RunAsTask(interruptChecker) do
             x.SeldomInterruptChecker.CheckForInterrupt()
-            match fsFile.FindTokenAt(document.GetTreeStartOffset(range)) with
+            match fsFile.FindTokenAt(getTreeStartOffset document range) with
             | null -> ()
             | token ->
 

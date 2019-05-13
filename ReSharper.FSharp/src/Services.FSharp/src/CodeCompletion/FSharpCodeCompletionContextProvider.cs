@@ -7,7 +7,7 @@ using JetBrains.ReSharper.Feature.Services.CodeCompletion.Impl;
 using JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
+using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
@@ -61,7 +61,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
       var coords = document.GetCoordsByOffset(caretOffset);
       var lineText = document.GetLineText(coords.Line);
       var partialName = QuickParse.GetPartialLongNameEx(lineText, (int) coords.Column - 1);
-      var fsCompletionContext = UntypedParseImpl.TryGetCompletionContext(coords.GetPos(), parseTree, lineText);
+      var fsCompletionContext = UntypedParseImpl.TryGetCompletionContext(coords.ToPos(), parseTree, lineText);
 
       return new FSharpCodeCompletionContext(context, fsCompletionContext, ranges, coords, partialName, tokenBefore,
         token, lineText);

@@ -1,17 +1,16 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
-open FSharp.Compiler
 open Fantomas
 open Fantomas.FormatConfig
 open JetBrains.Application.Infra
 open JetBrains.DocumentModel
 open JetBrains.DocumentModel.Impl
 open JetBrains.ReSharper.Feature.Services.CodeCleanup
-open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.CodeStyle
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.CodeStyle
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.Util
 open JetBrains.Util.Text
@@ -53,13 +52,8 @@ type ReformatCode() =
     
                     let change = 
                         if isNotNull rangeMarker then
-                            let getRange (range: DocumentRange) =
-                                let startCoords = document.GetCoordsByOffset(range.StartOffset.Offset)
-                                let endCoords = document.GetCoordsByOffset(range.EndOffset.Offset)
-                                Range.mkRange "" (startCoords.GetPos()) (endCoords.GetPos())
-
                             try
-                                let range = getRange rangeMarker.DocumentRange
+                                let range = ofDocumentRange rangeMarker.DocumentRange
                                 let formatted =
                                     CodeFormatter
                                         .FormatSelection(filePath, range, source, formatConfig)

@@ -8,7 +8,7 @@ using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.ParameterInfo;
 using JetBrains.ReSharper.Plugins.FSharp.Psi;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
+using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Files;
 using JetBrains.Util;
@@ -39,7 +39,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.ParameterInfo
 
       var document = caretOffset.Document;
       var coords = document.GetCoordsByOffset(caretOffset.Offset);
-      var paramInfoLocationsOption = parseResults.FindNoteworthyParamInfoLocations(coords.GetPos());
+      var paramInfoLocationsOption = parseResults.FindNoteworthyParamInfoLocations(coords.ToPos());
       if (paramInfoLocationsOption == null)
         return null;
 

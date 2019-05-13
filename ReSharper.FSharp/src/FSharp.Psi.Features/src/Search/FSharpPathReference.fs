@@ -2,7 +2,6 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Searching
 
 open JetBrains.DataFlow
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Resolve
@@ -52,7 +51,7 @@ type FSharpPathReference(owner, sourceFile) =
         fsFile.CheckerService.OptionsProvider.GetProjectOptions(sourceFile)
         |> Option.bind (fun options ->
             options.OriginalLoadReferences
-            |> List.tryFind (fun (range, _) -> document.GetTreeStartOffset(range) = tokenStartOffset)
+            |> List.tryFind (fun (range, _) -> getTreeStartOffset document range = tokenStartOffset)
             |> Option.bind (fun (_, path) ->
                 let path = FileSystemPath.TryParse(path)
                 let ext = path.ExtensionNoDot.ToLowerInvariant()

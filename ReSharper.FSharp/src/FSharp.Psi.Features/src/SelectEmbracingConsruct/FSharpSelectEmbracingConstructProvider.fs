@@ -106,7 +106,7 @@ type FSharpSelectEmbracingConstructProvider() =
 
             let mutable documentRange = documentRange
             let document = documentRange.Document
-            let pos = document.GetPos(documentRange.StartOffset.Offset)
+            let pos = getPosFromDocumentOffset documentRange.StartOffset
             let visitor = { new AstVisitorBase<_>() with
                 member x.VisitExpr(path, _, defaultTraverse, expr) =
                     match expr with
@@ -133,7 +133,7 @@ type FSharpSelectEmbracingConstructProvider() =
                 | Some traversePath ->
                     List.map getRanges traversePath
                     |> List.concat
-                    |> List.map (fun r -> r.ToDocumentRange(document))
+                    |> List.map (getDocumentRange document)
                 | None -> []
                 |> List.append containingDeclarations
                 |> List.filter (fun r -> r.Contains(&documentRange))

@@ -8,6 +8,7 @@ open JetBrains.ReSharper.Feature.Services.Debugger
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 
@@ -23,7 +24,7 @@ type FSharpDebuggerLocalSymbolProvider() =
             | None -> null, null
             | Some parseTree ->
 
-            let pos = range.Document.GetPos(range.EndOffset.Offset)
+            let pos = getPosFromDocumentOffset range.EndOffset
             let mutable declRange = None
 
             let visitor =
@@ -68,7 +69,7 @@ type FSharpDebuggerLocalSymbolProvider() =
 
             match declRange with
             | Some declRange ->
-                let endOffset = range.Document.GetTreeEndOffset(declRange)
+                let endOffset = getTreeEndOffset range.Document declRange
                 let treeNode = fsFile.FindTokenAt(endOffset - 1)
                 match treeNode.GetContainingNode<IFSharpDeclaration>() with
                 | null -> treeNode, null

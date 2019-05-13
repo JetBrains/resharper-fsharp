@@ -64,7 +64,6 @@ module rec CommonUtil =
     type FileSystemPath = JetBrains.Util.FileSystemPath
 
     type Int32<'T> with
-
         [<DebuggerStepThrough>]
         member x.Next = x.Plus1()
 
@@ -73,20 +72,11 @@ module rec CommonUtil =
 
     let inline docLine (x: int)   = Line.op_Explicit(x)
     let inline docColumn (x: int) = Column.op_Explicit(x)
+    let inline docCoords line column = DocumentCoords(docLine (line - 1), docColumn column)
 
     type Range.range with
         member inline x.GetStartLine()   = x.StartLine - 1 |> docLine
         member inline x.GetEndLine()     = x.EndLine - 1   |> docLine
-        member inline x.GetStartColumn() = x.StartColumn   |> docColumn
-        member inline x.GetEndColumn()   = x.EndColumn     |> docColumn
-
-        member x.ToTextRange(document: IDocument) =
-            let startOffset = document.GetLineStartOffset(x.GetStartLine()) + x.StartColumn
-            let endOffset = document.GetLineStartOffset(x.GetEndLine()) + x.EndColumn
-            TextRange(startOffset, endOffset)
-        
-        member x.ToDocumentRange(document: IDocument) =
-            DocumentRange(document, x.ToTextRange(document))
 
     let tryGetValue (key: 'TKey) (dictionary: IDictionary<'TKey,'TValue>) =
         let res = ref Unchecked.defaultof<'TValue>

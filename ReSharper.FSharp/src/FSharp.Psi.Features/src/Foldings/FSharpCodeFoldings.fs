@@ -49,7 +49,7 @@ and FSharpCodeFoldingProcess(logger: ILogger) =
         Structure.getOutliningRanges lines parseTree
         |> Seq.distinctBy (fun x -> x.Range.StartLine)
         |> Seq.iter (fun x ->
-            let textRange = x.CollapseRange.ToTextRange(document)
+            let textRange = getTextRange document x.CollapseRange
             if textRange.IsEmpty then logger.Warn(sprintf "Empty folding: %O %A" textRange x) else
 
             let placeholder =
