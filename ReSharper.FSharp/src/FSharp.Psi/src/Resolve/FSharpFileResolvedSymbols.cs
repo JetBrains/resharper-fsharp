@@ -247,7 +247,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       if (logicalName != null && PrettyNaming.IsMangledOpName(logicalName))
       {
         var sourceName = PrettyNaming.DecompileOpName.Invoke(logicalName);
-        if (sourceName.Length == endOffset - startOffset)
+        var isUnary = sourceName.StartsWith("~", StringComparison.Ordinal);
+        var sourceLength = isUnary ? sourceName.Length - 1 : sourceName.Length;
+
+        if (sourceLength == endOffset - startOffset)
           return new TextRange(startOffset, endOffset);
 
         // todo: use lexer buffer
