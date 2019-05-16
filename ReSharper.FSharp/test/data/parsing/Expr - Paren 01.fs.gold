@@ -1,0 +1,12 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IDo
+      IOtherExpr
+        IParenExpr
+          FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+          IConstExpr
+            FSharpToken(type:INT32, text:123)
+          FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

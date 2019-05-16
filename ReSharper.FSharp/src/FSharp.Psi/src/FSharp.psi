@@ -259,6 +259,7 @@ otherPat options { stubBase="SynPatternBase"; }:
 
 
 interface synExpr:
+  parenExpr |
   constExpr |
   tupleExpr |
   arrayOrListExpr |
@@ -270,6 +271,7 @@ interface synExpr:
   setExpr |
   typeTestExpr |
   castExpr |
+  nullExpr |
   otherExpr;
 
 interface setExpr:
@@ -279,6 +281,11 @@ interface setExpr:
 interface castExpr:
   upcastExpr |
   downcastExpr;
+
+parenExpr options { stubBase="DummyExpression"; }:
+  LPAREN<LPAREN, LeftParen>
+  synExpr<EXPR, InnerExpression>?
+  RPAREN<RPAREN, RightParen>;
 
 constExpr options { stubBase="DummyExpression"; }:
   fakeSeparator;
@@ -351,6 +358,10 @@ downcastExpr options { stubBase="DummyExpression"; }:
   synExpr<EXPR, Expression>
   COLON_QMARK_GREATER
   synType<TYPE, Type>;
+
+// todo: maybe replace with SynExpr.Const in FCS?
+nullExpr options { stubBase="DummyExpression"; }:
+  NULL<NULL, NullKeyword>;
 
 otherExpr options { stubBase="DummyExpression"; }:
   fakeSeparator;
