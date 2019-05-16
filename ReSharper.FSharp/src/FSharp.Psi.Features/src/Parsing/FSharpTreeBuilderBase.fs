@@ -393,7 +393,9 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         | SynType.Array(_,t,_) ->
             x.ProcessSynType(t)
 
+        | SynType.Var _ ->
+            x.MarkAndDone(range, ElementType.VAR_TYPE)
+
         | SynType.StaticConstantExpr _
         | SynType.StaticConstant _
-        | SynType.Anon _
-        | SynType.Var _ -> ()
+        | SynType.Anon _ -> ()

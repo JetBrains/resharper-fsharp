@@ -6,7 +6,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
   public interface IReferenceExpression : IFSharpTreeNode
   {
-    FSharpSymbolReference Reference { get; set; }
+    FSharpSymbolReference Reference { get; }
 
     [CanBeNull] ITokenNode IdentifierToken { get; }
 

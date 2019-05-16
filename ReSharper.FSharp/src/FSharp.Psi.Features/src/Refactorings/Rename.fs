@@ -78,7 +78,6 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
     override x.IsLocalRename(element: IDeclaredElement) =
         match element with
         | :? ILongIdentPat as longIdentPat -> longIdentPat.IsDeclaration
-        | :? ITypeParameter -> true
         | _ -> element :? IFSharpLocalDeclaration
 
     override x.CheckLocalRenameSameDocument(element: IDeclaredElement) = x.IsLocalRename(element)

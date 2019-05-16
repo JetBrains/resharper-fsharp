@@ -10,7 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class TypeExtensionDeclaration : IFSharpTypeParametersOwnerDeclaration, IReferenceExpression
   {
     [CanBeNull] private TypeAugmentation myTypeAugmentation;
-    public FSharpSymbolReference Reference { get; set; }
+    public FSharpSymbolReference Reference { get; protected set; }
 
     public override IFSharpIdentifier NameIdentifier => LongIdentifier;
     protected override string DeclaredElementName => TypeAugmentation.CompiledName;

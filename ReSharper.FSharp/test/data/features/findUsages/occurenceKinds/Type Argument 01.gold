@@ -16,7 +16,16 @@ TO: [O] open System.Collections.|Generic| RANGE: (41,48) @ Type Argument 01.fs
 Type specification
 ---
 TO: [O] let l: |List|<string> = List<string>() RANGE: (59,63) @ Type Argument 01.fs
+
+
+Type argument
+---
 TO: [O] let l: List<|string|> = List<string>() RANGE: (64,70) @ Type Argument 01.fs
+TO: [O] let l: List<string> = List<|string|>() RANGE: (79,85) @ Type Argument 01.fs
+TO: [O] | :? IList<|string|> -> () RANGE: (121,127) @ Type Argument 01.fs
+TO: [O] | :? IList<System.|String|> -> () RANGE: (154,160) @ Type Argument 01.fs
+TO: [O] | :? IList<|string| * int> -> () RANGE: (180,186) @ Type Argument 01.fs
+TO: [O] | :? IList<string * |int|> -> () RANGE: (189,192) @ Type Argument 01.fs
 
 
 New instance creation
@@ -25,15 +34,6 @@ TO: [O] let l: List<string> = |List|<string>() RANGE: (74,78) @ Type Argument 01
 TO: [O] let l: List<string> = |List|<string>() RANGE: (74,78) @ Type Argument 01.fs
 TO: [O] match |obj|() with RANGE: (98,101) @ Type Argument 01.fs
 TO: [O] match |obj|() with RANGE: (98,101) @ Type Argument 01.fs
-
-
-Type argument
----
-TO: [O] let l: List<string> = List<|string|>() RANGE: (79,85) @ Type Argument 01.fs
-TO: [O] | :? IList<|string|> -> () RANGE: (121,127) @ Type Argument 01.fs
-TO: [O] | :? IList<System.|String|> -> () RANGE: (154,160) @ Type Argument 01.fs
-TO: [O] | :? IList<|string| * int> -> () RANGE: (180,186) @ Type Argument 01.fs
-TO: [O] | :? IList<string * |int|> -> () RANGE: (189,192) @ Type Argument 01.fs
 
 
 Type checking

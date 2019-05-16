@@ -2,6 +2,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
 open FSharp.Compiler.Ast
 open FSharp.Compiler.PrettyNaming
+open FSharp.Compiler.Range
+open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
@@ -171,7 +173,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                     with _ -> () // Getting type range throws an exception if base type lid is empty.
                     ElementType.INTERFACE_INHERIT
 
-                | SynMemberDefn.Member(Binding(_,_,_,_,_,_,valData,headPat,ret,expr,_,_),range) ->
+                | SynMemberDefn.Member(Binding(_,_,_,_,_,_,valData,headPat,returnInfo,expr,_,_),range) ->
                     let elType =
                         match headPat with
                         | SynPat.LongIdent(LongIdentWithDots(lid,_),_,typeParamsOpt,memberParams,_,_) ->
@@ -186,19 +188,16 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                                     x.MarkOtherExpr(expr)
                                     ElementType.CONSTRUCTOR_DECLARATION
                                 | _ ->
-                                    x.ProcessMemberDeclaration typeParamsOpt memberParams expr range
+                                    x.ProcessMemberDeclaration(typeParamsOpt, memberParams, returnInfo, expr, range)
                                     ElementType.MEMBER_DECLARATION
 
                             | selfId :: _ :: _ ->
                                 x.ProcessLocalId selfId
-                                x.ProcessMemberDeclaration typeParamsOpt memberParams expr range
+                                x.ProcessMemberDeclaration(typeParamsOpt, memberParams, returnInfo, expr, range)
                                 ElementType.MEMBER_DECLARATION
 
                             | _ -> ElementType.OTHER_TYPE_MEMBER
                         | _ -> ElementType.OTHER_TYPE_MEMBER
-                    match ret with
-                    | Some (SynBindingReturnInfo(t,_,_)) -> x.ProcessSynType t
-                    | _ -> ()
                     elType
 
                 | SynMemberDefn.LetBindings(bindings,_,_,_) ->
@@ -223,12 +222,19 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
 
             x.Done(typeMember.Range, mark, memberType)
 
-    member x.ProcessMemberDeclaration (typeParamsOpt: SynValTyparDecls option) memberParams expr range =
+    member x.ProcessReturnInfo(returnInfo) =
+        match returnInfo with
+        | Some(SynBindingReturnInfo(returnType,_,_)) -> x.ProcessSynType(returnType)
+        | _ -> ()
+
+    member x.ProcessMemberDeclaration(typeParamsOpt, memberParams, returnInfo, expr, range) =
         match typeParamsOpt with
         | Some(SynValTyparDecls(typeParams,_,_)) ->
-            x.ProcessTypeParametersOfType typeParams range true
+            x.ProcessTypeParametersOfType typeParams range true // todo: of type?..
         | _ -> ()
+
         x.ProcessParams(memberParams, true, true) // todo: should check isLocal
+        x.ProcessReturnInfo(returnInfo)
         x.MarkOtherExpr(expr)
 
     // isTopLevelPat is needed to distinguish function definitions from other long ident pats:
@@ -340,7 +346,18 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
         x.ProcessPat(pat, isLocal, false)
         x.Done(range, mark, ElementType.MEMBER_PARAM)
 
-    member x.MarkOtherExpr(ExprRange range as expr) =
+    member x.FixExpresion(expr) =
+        // A fake SynExpr.Typed node is added for binding with return type specification like in the following
+        // member x.Prop: int = 1
+        // where 1 is replaced with `1: int`. 
+        // These fake nodes have original type specification ranges that are out of the actual expression ranges.
+        match expr with
+        | SynExpr.Typed(inner, synType, range) when not (rangeContainsRange range synType.Range) -> inner
+        | _ -> expr
+
+    member x.MarkOtherExpr(expr) =
+        let (ExprRange range as expr) = x.FixExpresion(expr)
+
         let mark = x.Mark(range)
         x.ProcessLocalExpression(expr)
         x.Done(range, mark, ElementType.OTHER_EXPR)
@@ -350,7 +367,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
         x.ProcessSynType(typ)
         x.Done(range, mark, ElementType.OTHER_TYPE)
 
-    member x.ProcessBinding(Binding(_,kind,_,_,attrs,_,_,headPat,_, expr,_,_) as binding, isLocal: bool) =
+    member x.ProcessBinding(Binding(_,kind,_,_,attrs,_,_,headPat,returnInfo, expr,_,_) as binding, isLocal: bool) =
         match kind with
         | StandaloneExpression
         | DoBinding ->
@@ -367,6 +384,7 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                 mark
 
         x.ProcessPat(headPat, isLocal, true)
+        x.ProcessReturnInfo(returnInfo)
         x.MarkOtherExpr(expr)
 
         let elementType = if isLocal then ElementType.LOCAL_BINDING else ElementType.TOP_BINDING
@@ -384,9 +402,11 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
                 x.MarkAndDone(range, ElementType.CONST_EXPR)
             | _ -> ()
 
-        | SynExpr.Typed(expr,synType,_) ->
-            x.ProcessLocalExpression expr
-            x.ProcessSynType synType
+        | SynExpr.Typed(expr, synType, range) ->
+            Assertion.Assert(rangeContainsRange range synType.Range, "rangeContainsRange range synType.Range")
+
+            x.ProcessLocalExpression(expr)
+            x.ProcessSynType(synType)
 
         | SynExpr.Tuple(_, exprs,_,range) ->
             x.MarkListExpr(exprs, range, ElementType.TUPLE_EXPR)

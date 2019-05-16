@@ -1,6 +1,7 @@
 using System;
 using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
@@ -20,9 +21,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     }
 
     public FSharpSymbolUse GetSymbolUse() =>
-      myOwner.IdentifierToken is var token && token != null
-        ? myOwner.FSharpFile.GetSymbolUse(token.GetTreeStartOffset().Offset)
+      SymbolOffset is var offset && offset.IsValid()
+        ? myOwner.FSharpFile.GetSymbolUse(offset.Offset)
         : null;
+
+    public virtual TreeOffset SymbolOffset =>
+      myOwner.IdentifierToken is var token && token != null
+        ? token.GetTreeStartOffset()
+        : TreeOffset.InvalidOffset;
 
     public virtual FSharpSymbol GetFSharpSymbol() =>
       GetSymbolUse()?.Symbol;
@@ -59,14 +65,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     public override IReference BindTo(IDeclaredElement element)
     {
       // Disable for non-F# elements until such refactorings are possible.
-      if (!(element is IFSharpDeclaredElement fsElement))
+      if (!CanBindTo(element))
         return this;
 
-      var sourceName = fsElement.SourceName;
+      var sourceName = element.GetSourceName();
       if (sourceName == SharedImplUtil.MISSING_DECLARATION_NAME)
         return this;
 
-      var newName = GetReferenceName(sourceName);
+      var newName = GetNewReferenceName(sourceName);
       using (WriteLockCookie.Create(myOwner.IsPhysical()))
       {
         var name = NamingManager.GetNamingLanguageService(myOwner.Language).MangleNameIfNecessary(newName);
@@ -75,7 +81,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       }
     }
 
-    protected virtual string GetReferenceName([NotNull] string name) => name;
+    private static bool CanBindTo(IDeclaredElement element) =>
+      element is IFSharpDeclaredElement || element is ITypeParameter;
+
+    protected virtual string GetNewReferenceName([NotNull] string name) => name;
 
     public override IReference BindTo(IDeclaredElement element, ISubstitution substitution)
     {
