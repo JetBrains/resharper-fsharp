@@ -392,15 +392,16 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
 
     member x.ProcessExpression(expr: SynExpr) =
         match expr with
-        | SynExpr.Paren(expr,_,_,_)
+        | SynExpr.Paren(expr, _, _, range) ->
+            let mark = x.Mark(range)
+            x.ProcessExpression(expr)
+            x.Done(range, mark, ElementType.PAREN_EXPR)
+
         | SynExpr.Quote(_,_,expr,_,_) ->
             x.ProcessExpression(expr)
 
-        | SynExpr.Const(synConst, range) ->
-            match synConst with
-            | SynConst.Unit ->
-                x.MarkAndDone(range, ElementType.CONST_EXPR)
-            | _ -> ()
+        | SynExpr.Const(_, range) ->
+            x.MarkAndDone(range, ElementType.CONST_EXPR)
 
         | SynExpr.Typed(expr, synType, range) ->
             Assertion.Assert(rangeContainsRange range synType.Range, "rangeContainsRange range synType.Range")
@@ -597,7 +598,8 @@ type internal FSharpImplTreeBuilder(file, lexer, decls, lifetime) =
         | SynExpr.InferredDowncast(expr,_) ->
             x.ProcessExpression(expr)
 
-        | SynExpr.Null(_) -> ()
+        | SynExpr.Null(range) ->
+            x.MarkAndDone(range, ElementType.NULL_EXPR)
 
         | SynExpr.AddressOf(_,expr,_,_)
         | SynExpr.TraitCall(_,_,expr,_) ->
