@@ -801,8 +801,13 @@ localDeclaration options { stubBase="LocalDeclarationBase"; }:
 
 
 interface synType:
+  varType |
   namedTypeExpression |
   otherType;
+
+varType options { stubBase="TypeExpressionBase"; }:
+  QUOTE
+  IDENTIFIER<IDENTIFIER, Identifier>;
 
 
 namedTypeExpression:

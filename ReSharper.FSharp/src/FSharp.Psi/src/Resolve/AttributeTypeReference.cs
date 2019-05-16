@@ -11,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     {
     }
 
-    protected override string GetReferenceName(string name) =>
+    protected override string GetNewReferenceName(string name) =>
       name.SubstringBeforeLast(AttributeInstanceExtensions.ATTRIBUTE_SUFFIX);
   }
 }

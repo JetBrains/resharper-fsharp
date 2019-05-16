@@ -130,6 +130,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static string GetSourceName([CanBeNull] this IIdentifier identifier) =>
       identifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
 
+    public static string GetSourceName([CanBeNull] this ITreeNode treeNode) =>
+      GetSourceName(treeNode as IIdentifier);
+
     public static TreeTextRange GetNameRange([CanBeNull] this IFSharpIdentifier identifier)
     {
       if (identifier == null)
@@ -328,6 +331,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
       return typeElement.ShortName;
     }
+
+    public static string GetSourceName([NotNull] this IDeclaredElement declaredElement) =>
+      declaredElement is IFSharpDeclaredElement fsElement
+        ? fsElement.SourceName
+        : declaredElement.ShortName;
 
     public static AccessRights GetFSharpRepresentationAccessRights([CanBeNull] this ITypeElement type)
     {

@@ -10,7 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   public class FSharpIdentifierToken : FSharpToken, IFSharpIdentifier, IReferenceExpression
   {
-    public FSharpSymbolReference Reference { get; set; }
+    public FSharpSymbolReference Reference { get; protected set; }
 
     public FSharpIdentifierToken(NodeType nodeType, string text) : base(nodeType, text)
     {
@@ -27,7 +27,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     public override ReferenceCollection GetFirstClassReferences() =>
-      new ReferenceCollection(Reference);
+      Parent is IPreventsChildResolve
+        ? ReferenceCollection.Empty
+        : new ReferenceCollection(Reference);
 
     public string Name => GetText().RemoveBackticks();
 

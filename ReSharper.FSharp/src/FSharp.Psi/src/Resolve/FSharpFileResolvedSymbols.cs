@@ -212,10 +212,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
           var nameRange = FixRange(startOffset, endOffset, mfv?.LogicalName, buffer, lexer);
           startOffset = nameRange.StartOffset;
 
-          // Type parameters always reported with ItemOccurence.UseInType, even in declarations.
-          if (symbol is FSharpGenericParameter)
-            startOffset += 1;
-
           // workaround for implicit type usages (e.g. in members with optional params), visualfsharp#3933
           if (CanIgnoreSymbol(symbol) &&
               !(lexer.FindTokenAt(nameRange.EndOffset - 1) && (lexer.TokenType?.IsIdentifier ?? false)))
