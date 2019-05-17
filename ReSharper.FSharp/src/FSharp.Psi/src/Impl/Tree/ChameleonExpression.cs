@@ -69,9 +69,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
       var node = ((IClosedChameleonBody) firstChild).Parse(parser => ((IFSharpParser) parser).ParseExpression(this));
 
-      var newTextLength = node.GetTextLength();
-      Assertion.Assert(firstChild.GetTextLength() == newTextLength,
-        "Chameleon length differ after opening! {0} {1}", firstChild.GetTextLength(), newTextLength);
+      var oldLength = firstChild.GetTextLength();
+      var newLength = node.GetTextLength();
+      Assertion.Assert(oldLength == newLength,
+        "Chameleon length is different after opening; old: {0}, new: {1}", oldLength, newLength);
 
       DeleteChildRange(firstChild, lastChild);
       AppendNewChild((TreeElement) node);

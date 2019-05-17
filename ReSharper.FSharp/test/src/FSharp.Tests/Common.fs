@@ -76,9 +76,11 @@ type FSharpTestProjectOptionsProvider
             let projectOptions = getProjectOptions path [||] 
             Some projectOptions
 
-        member x.GetParsingOptions(file) =
+        member x.GetParsingOptions(sourceFile) =
+            let isScript = sourceFile.LanguageType.Is<FSharpScriptProjectFileType>()
+
             let isExe =
-                match file.GetProject() with
+                match sourceFile.GetProject() with
                 | null -> false
                 | project ->
 
@@ -88,8 +90,9 @@ type FSharpTestProjectOptionsProvider
                 | _ -> false
 
             { FSharpParsingOptions.Default with
-                SourceFiles = [| getPath file |]
-                IsExe = isExe }
+                SourceFiles = [| getPath sourceFile |]
+                IsExe = isExe
+                IsInteractive = isScript }
 
         member x.GetFileIndex(_) = 0
         member x.ModuleInvalidated = new Signal<_>("Todo") :> _
