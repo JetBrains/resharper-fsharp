@@ -145,7 +145,7 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
             | SynMemberDefn.Member _ -> true
             | _ -> false
 
-        if x.Builder.GetTokenOffset() <= rangeStart || (not isMember) then
+        if x.CurrentOffset <= rangeStart || (not isMember) then
             let mark = x.MarkAttributesOrIdOrRange(attrs, None, typeMember.Range)
 
             // todo: mark body exprs as synExpr
@@ -226,9 +226,17 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
             x.Done(typeMember.Range, mark, memberType)
 
     member x.ProcessReturnInfo(returnInfo) =
+        // todo: mark return type attributes
         match returnInfo with
-        | Some(SynBindingReturnInfo(returnType,_,_)) -> x.ProcessSynType(returnType)
-        | _ -> ()
+        | None -> ()
+        | Some(SynBindingReturnInfo(returnType,range,_)) ->
+
+        let startOffset = x.GetStartOffset(range)
+        x.AdvanceToTokenOrOffset(FSharpTokenType.COLON, startOffset)
+
+        let mark = x.Mark()
+        x.ProcessSynType(returnType)
+        x.Done(range, mark, ElementType.RETURN_TYPE_INFO)
 
     member x.ProcessMemberDeclaration(typeParamsOpt, memberParams, returnInfo, expr, range) =
         match typeParamsOpt with

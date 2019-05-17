@@ -148,6 +148,9 @@ localBinding:
   synExpr<EXPR, Expression>
   fakeSeparator;
 
+returnTypeInfo:
+  COLON
+  synType<TYPE, ReturnType>;
 
 interface synPat:
   namedPat |
