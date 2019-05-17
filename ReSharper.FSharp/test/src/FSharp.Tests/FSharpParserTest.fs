@@ -19,6 +19,9 @@ type FSharpParserTest() =
     [<Test>] member x.``Let 03 - Typed, var type``() = x.DoNamedTest()
     [<Test>] member x.``Let 04 - Typed, var type, space``() = x.DoNamedTest()
 
+    [<Test>] member x.``Let - Local 01 - Simple``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Local 02 - Typed``() = x.DoNamedTest()
+
     [<Test>] member x.``Expr - Const 01 - Unit``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Null``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Paren 01``() = x.DoNamedTest()

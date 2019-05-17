@@ -138,7 +138,7 @@ topBinding:
   fSharpAttribute<ATTRIBUTE, Attributes>*
   synPat<HEAD_PATTERN, HeadPattern>
   EQUALS
-  synExpr<EXPR, Expression>
+  chameleonExpression<EXPR, Expression>
   fakeSeparator;
 
 localBinding:
@@ -266,6 +266,7 @@ interface synExpr:
   recordExpr |
   newExpr |
   objExpr |
+  letOrUseExpr |
   identExpr |
   longIdentExpr |
   setExpr |
@@ -324,6 +325,9 @@ objExprSecondaryInterface options { stubBase="BaseTypeExpressionBase"; }:
   namedTypeExpression<BASE_TYPE, BaseType>
   fakeSeparator;
 
+letOrUseExpr options { stubBase="DummyExpression"; }:
+  fakeSeparator;
+
 longIdentSetExpr options { stubBase="DummyExpression"; }:
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>
   LARROW<LARROW, LArrow>
@@ -365,6 +369,9 @@ nullExpr options { stubBase="DummyExpression"; }:
 
 otherExpr options { stubBase="DummyExpression"; }:
   fakeSeparator;
+
+chameleonExpression options { stubBase="DummyExpression"; customParseFunction; }:
+  synExpr<EXPR, InnerExpression>;
 
 
 interface fSharpTypeDeclaration:

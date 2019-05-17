@@ -46,8 +46,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         throw new NotImplementedException();
     }
 
-    private abstract class FixedTokenNodeElement : FSharpTokenBase { }
-    
+    private abstract class FixedTokenNodeElement : FSharpTokenBase
+    {
+    }
+
     private class FixedTokenNodeType : FSharpTokenNodeType, IFixedTokenNodeType
     {
       protected FixedTokenNodeType(string name, int index, string representation) : base(name, index) =>
@@ -113,6 +115,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 
     public const int BLOCK_COMMENT_NODE_TYPE_INDEX = LAST_GENERATED_TOKEN_TYPE_INDEX + 4;
     public static readonly TokenNodeType BLOCK_COMMENT = new BlockCommentNodeType(BLOCK_COMMENT_NODE_TYPE_INDEX);
+    
+    public const int CHAMELEON_NODE_TYPE_INDEX = LAST_GENERATED_TOKEN_TYPE_INDEX + 5;
+    public static readonly TokenNodeType CHAMELEON = new FSharpTokenNodeType("CHAMELEON", CHAMELEON_NODE_TYPE_INDEX);
 
     public static readonly NodeTypeSet RightBraces;
     public static readonly NodeTypeSet LeftBraces;
@@ -212,7 +217,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         WHILE,
         WITH,
         YIELD,
-
         HASH,
         RARROW);
 
@@ -228,7 +232,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         VERBATIM_STRING,
         TRIPLE_QUOTED_STRING,
         BYTEARRAY);
-      
+
       Literals = new NodeTypeSet(
         IEEE32,
         IEEE64,

@@ -4,9 +4,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
   public abstract class FSharpCompositeNodeType : CompositeNodeType
   {
-    protected FSharpCompositeNodeType(string s, int index) : base(s, index)
-    {
+    protected FSharpCompositeNodeType(string s, int index) : base(s, index) =>
       FSharpNodeTypeIndexer.Instance.Add(this, index);
-    }
   }
 }
