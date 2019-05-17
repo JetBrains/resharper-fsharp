@@ -418,17 +418,22 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
             x.ProcessExpression(expr)
             x.Done(range, mark, ElementType.PAREN_EXPR)
 
-        | SynExpr.Quote(_,_,expr,_,_) ->
+        | SynExpr.Quote(_,_,expr,_,range) ->
+            let mark = x.Mark(range)
             x.ProcessExpression(expr)
+            x.Done(range, mark, ElementType.QUOTE_EXPR)
 
         | SynExpr.Const(_, range) ->
             x.MarkAndDone(range, ElementType.CONST_EXPR)
 
         | SynExpr.Typed(expr, synType, range) ->
-            Assertion.Assert(rangeContainsRange range synType.Range, "rangeContainsRange range synType.Range, {0};{1}", range, synType.Range)
+            Assertion.Assert(rangeContainsRange range synType.Range,
+                             "rangeContainsRange range synType.Range, {0}; {1}", range, synType.Range)
 
+            let mark = x.Mark(range)
             x.ProcessExpression(expr)
             x.ProcessSynType(synType)
+            x.Done(range, mark, ElementType.TYPED_EXPR)
 
         | SynExpr.Tuple(_, exprs,_,range) ->
             x.MarkListExpr(exprs, range, ElementType.TUPLE_EXPR)
@@ -524,10 +529,12 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
             for case in cases do
                 x.ProcessMatchClause case
 
-        | SynExpr.Match(_,expr,cases,_) ->
+        | SynExpr.Match(_,expr,clauses,range) ->
+            let mark = x.Mark(range)
             x.ProcessExpression(expr)
-            for case in cases do
-                x.ProcessMatchClause case
+            for clause in clauses do
+                x.ProcessMatchClause(clause)
+            x.Done(range, mark, ElementType.MATCH_EXPR)
 
         | SynExpr.Do(expr,_)
         | SynExpr.Assert(expr,_) ->
@@ -558,11 +565,13 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
 
         | SynExpr.Lazy(expr,_) -> x.ProcessExpression(expr)
 
-        | SynExpr.IfThenElse(ifExpr,thenExpr,elseExprOpt,_,_,_,_) ->
+        | SynExpr.IfThenElse(ifExpr,thenExpr,elseExprOpt,_,_,_,range) ->
+            let mark = x.Mark(range)
             x.ProcessExpression(ifExpr)
             x.ProcessExpression(thenExpr)
             if elseExprOpt.IsSome then
                 x.ProcessExpression(elseExprOpt.Value)
+            x.Done(range, mark, ElementType.IF_THEN_ELSE_EXPR)
 
         | SynExpr.Ident(IdentRange range) ->
             x.MarkAndDone(range, ElementType.IDENT_EXPR)
@@ -687,10 +696,10 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
 
         x.ProcessPat(pat, true, false)
         match whenExpr with
-        | Some expr -> x.MarkOtherExpression(expr) // todo: replace with chameleon nodes for non local
+        | Some expr -> x.ProcessExpression(expr)
         | _ -> ()
 
-        x.MarkOtherExpression(expr) // todo: replace with chameleon nodes for non local
+        x.ProcessExpression(expr)
         x.Done(range, mark, ElementType.MATCH_CLAUSE)
 
     member x.ProcessIndexerArg(arg) =

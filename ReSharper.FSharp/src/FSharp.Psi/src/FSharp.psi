@@ -260,13 +260,17 @@ otherPat options { stubBase="SynPatternBase"; }:
 
 interface synExpr:
   parenExpr |
+  quoteExpr |
   constExpr |
+  typedExpr |
   tupleExpr |
   arrayOrListExpr |
   recordExpr |
   newExpr |
   objExpr |
+  matchExpr |
   letOrUseExpr |
+  ifThenElseExpr |
   identExpr |
   longIdentExpr |
   setExpr |
@@ -288,8 +292,25 @@ parenExpr options { stubBase="DummyExpression"; }:
   synExpr<EXPR, InnerExpression>?
   RPAREN<RPAREN, RightParen>;
 
+quoteExpr options { stubBase="DummyExpression"; }:
+  (
+    LQUOTE_TYPED
+    synExpr<EXPR, QuotedExpression>?
+    RQUOTE_TYPED?
+  ) |
+  (
+    LQUOTE_UNTYPED
+    synExpr<EXPR, QuotedExpression>?
+    RQUOTE_UNTYPED?
+  );
+
 constExpr options { stubBase="DummyExpression"; }:
   fakeSeparator;
+
+typedExpr options { stubBase="DummyExpression"; }:
+  synExpr<EXPR, Expression>
+  COLON
+  synType<TYPE, Type>;
 
 tupleExpr options { stubBase="DummyExpression"; }:
   fakeSeparator;
@@ -325,6 +346,12 @@ objExprSecondaryInterface options { stubBase="BaseTypeExpressionBase"; }:
   namedTypeExpression<BASE_TYPE, BaseType>
   fakeSeparator;
 
+matchExpr options { stubBase="DummyExpression"; }:
+  MATCH
+  synExpr<EXPR, Expression>
+  WITH
+  matchClause<MATCH_CLAUSE, clauses>*;
+
 letOrUseExpr options { stubBase="DummyExpression"; }:
   fakeSeparator;
 
@@ -338,6 +365,16 @@ dotSetExpr options { stubBase="DummyExpression"; }:
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>
   LARROW<LARROW, LArrow>
   synExpr<EXPR2, RightExpr>;
+
+ifThenElseExpr options { stubBase="DummyExpression"; }:
+  IF<IF, IfKeyword>
+  synExpr<IF_EXPR, IfExpr>
+  THEN<THEN, ThenKeyword>
+  synExpr<THEN_EXPR, ThenExpr>
+  (
+    ELSE<ELSE, ElseKeyword>
+    synExpr<ELSE_EXPR, ElseExpr>
+  )?;
 
 identExpr options { stubBase="TypeExpressionBase"; }:
   identOrOpName{IDENTIFIER, Identifier};
