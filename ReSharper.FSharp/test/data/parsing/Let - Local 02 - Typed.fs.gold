@@ -18,11 +18,12 @@ IFSharpImplFile
             ILocalBinding
               ILocalNamedPat
                 FSharpIdentifierToken(type:IDENTIFIER, text:x)
-              FSharpTokenType+ColonTokenElement(type:COLON, text::)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              INamedTypeExpression
-                ILongIdentifier
-                  FSharpIdentifierToken(type:IDENTIFIER, text:int)
+              IReturnTypeInfo
+                FSharpTokenType+ColonTokenElement(type:COLON, text::)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                INamedTypeExpression
+                  ILongIdentifier
+                    FSharpIdentifierToken(type:IDENTIFIER, text:int)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
