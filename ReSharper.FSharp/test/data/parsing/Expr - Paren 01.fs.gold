@@ -2,7 +2,7 @@
 IFSharpImplFile
   IAnonModuleDeclaration
     IDo
-      IOtherExpr
+      IChameleonExpression
         IParenExpr
           FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
           IConstExpr

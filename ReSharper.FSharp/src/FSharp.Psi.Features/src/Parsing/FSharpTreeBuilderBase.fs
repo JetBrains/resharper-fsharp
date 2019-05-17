@@ -13,7 +13,7 @@ open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
 
 [<AbstractClass>]
-type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: Lifetime) =
+type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: Lifetime, projectedOffset) =
     inherit TreeBuilderBase(lifetime, lexer)
 
     let document = sourceFile.Document
@@ -24,6 +24,9 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
 
     let getLineOffset line =
         lineOffsets.[line - 1]
+
+    new (sourceFile, lexer, lifetime) =
+        FSharpTreeBuilderBase(sourceFile, lexer, lifetime, 0)
 
     abstract member CreateFSharpFile: unit -> IFSharpFile
 
@@ -64,6 +67,10 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         x.AdvanceToEnd(range)
         x.Done(mark, elementType)
 
+    member x.Done(range, mark, elementType, data) =
+        x.AdvanceToEnd(range)
+        x.Builder.Done(mark, elementType, data)
+
     member x.MarkAndDone(range: Range.range, elementType) =
         let mark = x.Mark(range)
         x.Done(range, mark, elementType)
@@ -83,8 +90,9 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         x.AdvanceToTokenOrOffset tokenType offset
         x.Mark()
 
-    member x.AdvanceToOffset offset =
-        while x.Builder.GetTokenOffset() < offset && not x.Eof do x.AdvanceLexer()
+    member x.AdvanceToOffset(offset) =
+        while x.Builder.GetTokenOffset() + projectedOffset < offset && not x.Eof do
+            x.AdvanceLexer()
 
     member x.AdvanceToTokenOrOffset (tokenType: TokenNodeType) (maxOffset: int) =
         if isNull tokenType then () else 
@@ -100,11 +108,13 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
             let last = List.last lid
             x.Done(last.idRange, mark, ElementType.LONG_IDENTIFIER)
 
+    member x.GetTreeNode() =
+        x.GetTree() :> ITreeNode
+    
     member x.FinishFile(mark, fileType) =
         while not x.Eof do x.AdvanceLexer()
         x.Done(mark, fileType)
-        let fsFile = x.GetTree() :> ITreeNode :?> IFSharpFile
-        fsFile
+        x.GetTreeNode() :?> IFSharpFile
 
     member x.StartTopLevelDeclaration(lid: LongIdent, attrs: SynAttributes, moduleKind, range: Range.range) =
         match lid with

@@ -9,31 +9,47 @@ open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
-type internal FSharpParser(lexer: ILexer, file: IPsiSourceFile, checkerService: FSharpCheckerService,
-                           resolvedSymbolsCache: IFSharpResolvedSymbolsCache) =
+type FSharpParser(lexer: ILexer, sourceFile: IPsiSourceFile, checkerService: FSharpCheckerService,
+                  resolvedSymbolsCache: IFSharpResolvedSymbolsCache) =
+
     let tryCreateTreeBuilder lexer lifetime =
         Option.bind (fun (parseResults: FSharpParseFileResults) ->
             parseResults.ParseTree |> Option.map (function
             | ParsedInput.ImplFile(ParsedImplFileInput(_,_,_,_,_,decls,_)) ->
-                FSharpImplTreeBuilder(file, lexer, decls, lifetime) :> FSharpTreeBuilderBase
+                FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime) :> FSharpTreeBuilderBase
             | ParsedInput.SigFile(ParsedSigFileInput(_,_,_,_,sigs)) ->
-                FSharpSigTreeBuilder(file, lexer, sigs, lifetime) :> FSharpTreeBuilderBase))
+                FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) :> FSharpTreeBuilderBase))
 
-    interface IParser with
+    let createFakeBuilder lexer lifetime =
+        { new FSharpTreeBuilderBase(sourceFile, lexer, lifetime, 0) with
+            override x.CreateFSharpFile() =
+                x.FinishFile(x.Mark(), ElementType.F_SHARP_IMPL_FILE) }
+
+    interface IFSharpParser with
         member this.ParseFile() =
             use lifetimeDefinition = Lifetime.Define()
             let lifetime = lifetimeDefinition.Lifetime
-            let factory = FSharpPreprocessedLexerFactory(checkerService.GetDefines(file))
-            let lexer = factory.CreateLexer(lexer).ToCachingLexer()
-            let parseResults = checkerService.ParseFile(file)
+
+            let lexerFactory = FSharpPreprocessedLexerFactory(checkerService.GetDefines(sourceFile))
+            let lexer = lexerFactory.CreateLexer(lexer).ToCachingLexer()
+            let parseResults = checkerService.ParseFile(sourceFile)
             let treeBuilder =
                 tryCreateTreeBuilder lexer lifetime parseResults
-                |> Option.defaultWith (fun _ ->
-                    { new FSharpTreeBuilderBase(file, lexer, lifetime) with
-                        override x.CreateFSharpFile() =
-                            x.FinishFile(x.Mark(), ElementType.F_SHARP_IMPL_FILE) })
+                |> Option.defaultWith (fun _ -> createFakeBuilder lexer lifetime)
 
-            treeBuilder.CreateFSharpFile(CheckerService = checkerService,
-                                         ParseResults = parseResults,
-                                         ResolvedSymbolsCache = resolvedSymbolsCache) :> _
+            let fsFile =
+                treeBuilder.CreateFSharpFile(CheckerService = checkerService,
+                                             ParseResults = parseResults,
+                                             ResolvedSymbolsCache = resolvedSymbolsCache)
+            fsFile :> _
+
+        member this.ParseExpression(chameleonExpr) =
+            Lifetime.Using(fun lifetime ->
+                let sourceFile = chameleonExpr.GetSourceFile()
+                let projectedOffset = chameleonExpr.GetTreeStartOffset().Offset
+
+                let treeBuilder = FSharpImplTreeBuilder(sourceFile, lexer, [], lifetime, projectedOffset)
+                treeBuilder.ProcessExpression(chameleonExpr.SynExpr)
+                treeBuilder.GetTreeNode()) :?> ISynExpr
