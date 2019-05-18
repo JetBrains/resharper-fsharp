@@ -34,6 +34,7 @@
     public const string IDS_SYN_TYPE = "";
 
     public static string GetString(string id) => id;
-    public static string GetExpectedMessage(string expectedSymbol) => string.Empty;
+    public static string GetExpectedMessage(string s) => string.Empty;
+    public static string GetExpectedMessage(string s1, string s2) => string.Empty;
   }
 }

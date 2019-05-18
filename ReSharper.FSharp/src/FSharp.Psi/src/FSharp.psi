@@ -272,14 +272,19 @@ interface synExpr:
   newExpr |
   objExpr |
   matchExpr |
+  doExpr |
+  assertExpr |
   letOrUseExpr |
+  lazyExpr |
   ifThenElseExpr |
   identExpr |
   longIdentExpr |
   setExpr |
   typeTestExpr |
   castExpr |
+  inferredCastExpr |
   nullExpr |
+  fixedExpr |
   otherExpr;
 
 interface setExpr:
@@ -355,6 +360,14 @@ matchExpr options { stubBase="DummyExpression"; }:
   WITH
   matchClause<MATCH_CLAUSE, clauses>*;
 
+doExpr options { stubBase="DummyExpression"; }:
+  DO
+  synExpr<EXPR, Expression>;
+
+assertExpr options { stubBase="DummyExpression"; }:
+  ASSERT
+  synExpr<EXPR, Expression>;
+
 letOrUseExpr options { stubBase="DummyExpression"; }:
   fakeSeparator;
 
@@ -368,6 +381,10 @@ dotSetExpr options { stubBase="DummyExpression"; }:
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>
   LARROW<LARROW, LArrow>
   synExpr<EXPR2, RightExpr>;
+
+lazyExpr options { stubBase="DummyExpression"; }:
+  LAZY
+  synExpr<EXPR, Expression>;
 
 ifThenElseExpr options { stubBase="DummyExpression"; }:
   IF<IF, IfKeyword>
@@ -403,9 +420,17 @@ downcastExpr options { stubBase="DummyExpression"; }:
   COLON_QMARK_GREATER
   synType<TYPE, Type>;
 
+inferredCastExpr options { stubBase="DummyExpression"; }:
+  (UPCAST | DOWNCAST)
+  synExpr<EXPR, Expression>;
+
 // todo: maybe replace with SynExpr.Const in FCS?
 nullExpr options { stubBase="DummyExpression"; }:
   NULL<NULL, NullKeyword>;
+
+fixedExpr options { stubBase="DummyExpression"; }:
+  FIXED<FIXED, FixedKeyword>
+  synExpr<EXPR, Expression>;
 
 otherExpr options { stubBase="DummyExpression"; }:
   fakeSeparator;

@@ -1,0 +1,8 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IDo
+      IChameleonExpression
+        IIdentExpr
+          FSharpIdentifierToken(type:IDENTIFIER, text:x)
+
