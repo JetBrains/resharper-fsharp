@@ -394,7 +394,7 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
         | StandaloneExpression
         | DoBinding ->
             if isLocal then
-                x.MarkOtherExpression(expr)
+                x.ProcessExpression(expr)
             else
                 x.MarkTopLevelExpression(expr)
 
@@ -412,7 +412,7 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
         x.ProcessReturnInfo(returnInfo)
 
         if isLocal then
-            x.MarkOtherExpression(expr)
+            x.ProcessExpression(expr)
         else
             x.MarkTopLevelExpression(expr)
 
@@ -544,9 +544,15 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
                 x.ProcessMatchClause(clause)
             x.Done(range, mark, ElementType.MATCH_EXPR)
 
-        | SynExpr.Do(expr,_)
-        | SynExpr.Assert(expr,_) ->
+        | SynExpr.Do(expr,_) ->
+            let mark = x.Mark(range)
             x.ProcessExpression(expr)
+            x.Done(range, mark, ElementType.DO_EXPR)
+
+        | SynExpr.Assert(expr,_) ->
+            let mark = x.Mark(range)
+            x.ProcessExpression(expr)
+            x.Done(range, mark, ElementType.ASSERT_EXPR)
 
         | SynExpr.TypeApp(expr,lt,typeArgs,_,rt,_,r) ->
             x.ProcessExpression(expr)
@@ -571,7 +577,10 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
             x.ProcessExpression(tryExpr)
             x.ProcessExpression(finallyExpr)
 
-        | SynExpr.Lazy(expr,_) -> x.ProcessExpression(expr)
+        | SynExpr.Lazy(expr,_) ->
+            let mark = x.Mark(range)
+            x.ProcessExpression(expr)
+            x.Done(range, mark, ElementType.LAZY_EXPR)
 
         | SynExpr.IfThenElse(ifExpr,thenExpr,elseExprOpt,_,_,_,_) ->
             let mark = x.Mark(range)
@@ -636,7 +645,9 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
 
         | SynExpr.InferredUpcast(expr,_)
         | SynExpr.InferredDowncast(expr,_) ->
+            let mark = x.Mark(range)
             x.ProcessExpression(expr)
+            x.Done(range, mark, ElementType.INFERRED_CAST_EXPR)
 
         | SynExpr.Null _ ->
             x.MarkAndDone(range, ElementType.NULL_EXPR)
@@ -673,7 +684,9 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
         | SynExpr.DiscardAfterMissingQualificationAfterDot(_) -> ()
 
         | SynExpr.Fixed(expr,_) ->
+            let mark = x.Mark(range)
             x.ProcessExpression(expr)
+            x.Done(range, mark, ElementType.FIXED_EXPR)
 
         | SynExpr.Sequential(_,_,expr1,expr2,_) ->
             x.ProcessExpression(expr1)

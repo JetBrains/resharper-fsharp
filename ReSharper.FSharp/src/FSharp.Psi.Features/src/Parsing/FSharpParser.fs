@@ -50,6 +50,7 @@ type FSharpParser(lexer: ILexer, sourceFile: IPsiSourceFile, checkerService: FSh
                 let sourceFile = chameleonExpr.GetSourceFile()
                 let projectedOffset = chameleonExpr.GetTreeStartOffset().Offset
 
+                // todo: cover error cases where fsImplFile or multiple expressions may be returned
                 let treeBuilder = FSharpImplTreeBuilder(sourceFile, lexer, [], lifetime, projectedOffset)
                 treeBuilder.ProcessExpression(chameleonExpr.SynExpr)
                 treeBuilder.GetTreeNode()) :?> ISynExpr

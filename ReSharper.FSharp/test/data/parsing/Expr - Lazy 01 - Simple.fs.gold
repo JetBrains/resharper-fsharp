@@ -1,0 +1,11 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IDo
+      IChameleonExpression
+        ILazyExpr
+          FSharpTokenType+LazyTokenElement(type:LAZY, text:lazy)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IConstExpr
+            FSharpToken(type:INT32, text:123)
+

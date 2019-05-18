@@ -1,0 +1,11 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IDo
+      IChameleonExpression
+        IAssertExpr
+          FSharpTokenType+AssertTokenElement(type:ASSERT, text:assert)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IConstExpr
+            FSharpTokenType+TrueTokenElement(type:TRUE, text:true)
+
