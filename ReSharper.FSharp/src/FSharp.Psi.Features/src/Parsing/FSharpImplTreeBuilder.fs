@@ -51,7 +51,7 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
             let letStart = letStartPos bindings range
             let letMark = x.Mark(letStart)
             for binding in bindings do
-                x.ProcessBinding(binding, false)
+                x.ProcessTopLevelBinding(binding)
             x.Done(range, letMark, ElementType.LET)
 
         | SynModuleDecl.HashDirective(hashDirective, _) ->
@@ -59,7 +59,7 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
 
         | SynModuleDecl.DoExpr (_, expr, range) ->
             let mark = x.Mark(range)
-            x.MarkTopLevelExpression(expr)
+            x.MarkChameleonExpression(expr)
             x.Done(range, mark, ElementType.DO)
 
         | decl ->
@@ -159,7 +159,7 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
 
                 | SynMemberDefn.ImplicitInherit(baseType,args,_,_) ->
                     x.ProcessSynType(baseType)
-                    x.MarkTopLevelExpression(args)
+                    x.MarkChameleonExpression(args)
                     ElementType.TYPE_INHERIT
 
                 | SynMemberDefn.Interface(interfaceType,interfaceMembersOpt,_) ->
@@ -188,7 +188,7 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
                                     if selfId.IsSome then
                                         x.ProcessLocalId(selfId.Value)
 
-                                    x.MarkTopLevelExpression(expr)
+                                    x.MarkChameleonExpression(expr)
                                     ElementType.CONSTRUCTOR_DECLARATION
                                 | _ ->
                                     x.ProcessMemberDeclaration(typeParamsOpt, memberParams, returnInfo, expr, range)
@@ -205,7 +205,7 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
 
                 | SynMemberDefn.LetBindings(bindings,_,_,_) ->
                     for binding in bindings do
-                        x.ProcessBinding(binding, false)
+                        x.ProcessTopLevelBinding(binding)
                     ElementType.LET
 
                 | SynMemberDefn.AbstractSlot(ValSpfn(_,_,typeParams,_,_,_,_,_,_,_,_),_,range) ->
@@ -246,7 +246,7 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
 
         x.ProcessParams(memberParams, true, true) // todo: should check isLocal
         x.ProcessReturnInfo(returnInfo)
-        x.MarkTopLevelExpression(expr)
+        x.MarkChameleonExpression(expr)
 
     // isTopLevelPat is needed to distinguish function definitions from other long ident pats:
     // let (Some x) = ...
@@ -366,7 +366,7 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
         | SynExpr.Typed(inner, synType, range) when not (rangeContainsRange range synType.Range) -> inner
         | _ -> expr
 
-    member x.MarkTopLevelExpression(expr) =
+    member x.MarkChameleonExpression(expr) =
         let (ExprRange range as expr) = x.FixExpresion(expr)
 
         let mark = x.Mark(range)
@@ -387,17 +387,12 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
         x.ProcessSynType(typ)
         x.Done(range, mark, ElementType.OTHER_TYPE)
 
-    member x.ProcessBinding(Binding(_,kind,_,_,attrs,_,_,headPat,returnInfo, expr,_,_) as binding, isLocal: bool) =
+    member x.ProcessTopLevelBinding(Binding(_,kind,_,_,attrs,_,_,headPat,returnInfo, expr,_,_) as binding) =
         let expr = x.FixExpresion(expr)
 
         match kind with
         | StandaloneExpression
-        | DoBinding ->
-            if isLocal then
-                x.ProcessExpression(expr)
-            else
-                x.MarkTopLevelExpression(expr)
-
+        | DoBinding -> x.MarkChameleonExpression(expr)
         | _ ->
 
         let mark =
@@ -408,16 +403,33 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
                 x.ProcessAttributes(attrs)
                 mark
 
-        x.ProcessPat(headPat, isLocal, true)
+        x.ProcessPat(headPat, false, true)
         x.ProcessReturnInfo(returnInfo)
+        x.MarkChameleonExpression(expr)
 
-        if isLocal then
-            x.ProcessExpression(expr)
-        else
-            x.MarkTopLevelExpression(expr)
+        x.Done(binding.RangeOfBindingAndRhs, mark, ElementType.TOP_BINDING)
 
-        let elementType = if isLocal then ElementType.LOCAL_BINDING else ElementType.TOP_BINDING
-        x.Done(binding.RangeOfBindingAndRhs, mark, elementType)
+    member x.ProcessLocalBinding(Binding(_,kind,_,_,attrs,_,_,headPat,returnInfo, expr,_,_) as binding) =
+        let expr = x.FixExpresion(expr)
+
+        match kind with
+        | StandaloneExpression
+        | DoBinding -> x.ProcessExpression(expr)
+        | _ ->
+
+        let mark =
+            match attrs with
+            | [] -> x.Mark(binding.StartPos)
+            | { Range = r } :: _ ->
+                let mark = x.MarkTokenOrRange(FSharpTokenType.LBRACK_LESS, r)
+                x.ProcessAttributes(attrs)
+                mark
+
+        x.ProcessPat(headPat, true, true)
+        x.ProcessReturnInfo(returnInfo)
+        x.ProcessExpression(expr)
+
+        x.Done(binding.RangeOfBindingAndRhs, mark, ElementType.LOCAL_BINDING)
 
     member x.ProcessExpression(ExprRange range as expr) =
         match expr with
@@ -498,14 +510,14 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
             | Some (expr,_) -> x.ProcessExpression(expr)
             | _ -> ()
 
-            for b in bindings do
-                x.ProcessBinding(b, true)
+            for binding in bindings do
+                x.ProcessLocalBinding(binding)
 
             for InterfaceImpl(interfaceType,bindings,range) in interfaceImpls do
                 let mark = x.Mark(range)
                 x.ProcessSynType(interfaceType)
-                for b in bindings do
-                    x.ProcessBinding(b, true)
+                for binding in bindings do
+                    x.ProcessLocalBinding(binding)
                 x.Done(range, mark, ElementType.OBJ_EXPR_SECONDARY_INTERFACE)
 
             x.Done(range, mark, ElementType.OBJ_EXPR)
@@ -564,7 +576,7 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
         | SynExpr.LetOrUse(_,_,bindings,bodyExpr,_) ->
             let mark = x.Mark(range)
             for binding in bindings do
-                x.ProcessBinding(binding, true)
+                x.ProcessLocalBinding(binding)
             x.ProcessExpression(bodyExpr)
             x.Done(range, mark, ElementType.LET_OR_USE_EXPR)
 
