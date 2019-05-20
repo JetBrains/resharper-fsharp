@@ -1151,4 +1151,32 @@ class FSharpLexerTest : LexerTestCase() {
                 """.trimMargin()
         )
     }
+
+    @Test
+    fun testAttributeInsideGeneric() {
+        doTest("[<MeasureAnnotatedAbbreviation>] type bool<[<Measure>] 'm> = bool",
+                """
+                |LBRACK_LESS ('[<')
+                |IDENT ('MeasureAnnotatedAbbreviation')
+                |GREATER_RBRACK ('>]')
+                |WHITESPACE (' ')
+                |TYPE ('type')
+                |WHITESPACE (' ')
+                |IDENT ('bool')
+                |LESS ('<')
+                |LBRACK_LESS ('[<')
+                |IDENT ('Measure')
+                |GREATER ('>')
+                |RBRACK (']')
+                |WHITESPACE (' ')
+                |QUOTE (''')
+                |IDENT ('m')
+                |GREATER ('>')
+                |WHITESPACE (' ')
+                |EQUALS ('=')
+                |WHITESPACE (' ')
+                |IDENT ('bool')
+                """.trimMargin()
+        )
+    }
 }
