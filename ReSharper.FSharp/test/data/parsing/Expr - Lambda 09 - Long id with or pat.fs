@@ -1,0 +1,1 @@
+fun (Foo x | Bar(_, x)) -> ()

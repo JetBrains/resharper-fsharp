@@ -551,12 +551,8 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
         | SynExpr.CompExpr(_,_,expr,_) ->
             x.ProcessExpression expr
 
-        | SynExpr.Lambda(_,_,pats,expr,_) ->
-            // todo: cover "desugared" params 
-            let mark = x.Mark(range)
-            x.ProcessSimplePatterns(pats)
-            x.ProcessExpression(expr)
-            x.Done(range, mark, ElementType.LAMBDA_EXPR)
+        | SynExpr.Lambda _ ->
+            x.MarkLambdaExpr(expr)
 
         | SynExpr.MatchLambda(_,_,clauses,_,_) ->
             let mark = x.Mark(range)
@@ -750,6 +746,27 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
         | SynExpr.Sequential(_,_,expr1,expr2,_) ->
             x.ProcessExpression(expr1)
             x.ProcessExpression(expr2)
+
+    member x.MarkLambdaExpr(ExprRange lambdaRange as lambdaExpr) =
+        // Lambdas get "desugared" by being converted to fake nested lambdas and match expressions.
+        // Some patterns are preserved inside the generated lambdas and some patterns are replaced with
+        // generated placeholder patterns and go to generated match expressions inside lambda bodies.
+
+        // Simple patterns like ids are preserved and more complex patterns go to generated expressions.  
+
+        // Generated match expression have have a single generated clause with a generated id pattern and
+        // the same start pos as themselves. Their ranges also overlap with lambda param pattern ranges.
+
+        match lambdaExpr with
+        | SynExpr.Lambda(_, false, _, bodyExpr, _) ->
+            let lambdaMark = x.Mark(lambdaRange)
+
+            let bodyExpr = getLambdaBodyExpr bodyExpr
+            x.ProcessExpression(bodyExpr)
+
+            x.Done(lambdaRange, lambdaMark, ElementType.LAMBDA_EXPR)
+
+        | _ -> failwithf "Expecting non-generated lambda expression, got:\n%A" lambdaExpr
 
     member x.MarkMatchExpr(range: range, expr, clauses) =
         let mark = x.Mark(range)

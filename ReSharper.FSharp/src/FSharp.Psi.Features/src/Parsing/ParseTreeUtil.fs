@@ -20,9 +20,45 @@ type SynMemberDefn with
         | SynMemberDefn.ValField(Field(attrs,_,_,_,_,_,_,_),_) -> attrs
         | _ -> []
 
+type SynSimplePats with
+    member x.Range =
+        match x with
+        | SynSimplePats.SimplePats(range = range)
+        | SynSimplePats.Typed(range = range) -> range
+
+
 let letStartPos (bindings: SynBinding list) (range: Range.range) =
     match bindings with
     | Binding(_, _, _, _, { Range = r } :: _, _, _, _, _, _, _ , _) :: _
         when posLt r.Start range.Start -> r.Start
 
     | _ -> range.Start
+
+
+let rec skipGeneratedLambdas expr =
+    match expr with
+    | SynExpr.Lambda(_, true, _, bodyExpr, _) ->
+        skipGeneratedLambdas bodyExpr
+    | _ -> skipGeneratedMatch expr
+
+and skipGeneratedMatch expr =
+    match expr with
+    | SynExpr.Match(_, _, [ Clause(_, _, innerExpr, clauseRange, _) ], matchRange) when
+            matchRange.Start = clauseRange.Start ->
+        skipGeneratedMatch innerExpr
+    | _ -> expr
+
+let inline getLambdaBodyExpr expr =
+    skipGeneratedLambdas expr
+
+
+let rec getGeneratedLambdaParam dflt expr =
+    match expr with
+    | SynExpr.Lambda(_, true, pats, bodyExpr, _) ->
+        getGeneratedLambdaParam pats bodyExpr
+    | _ -> dflt
+
+let getLastLambdaParam expr =
+    match expr with
+    | SynExpr.Lambda(_, _, pats, bodyExpr, _) -> getGeneratedLambdaParam pats bodyExpr
+    | _ -> failwithf "Expecting lambda expression, got:\n%A" expr

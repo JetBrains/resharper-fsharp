@@ -421,7 +421,8 @@ objExprSecondaryInterface options { stubBase="BaseTypeExpressionBase"; }:
   fakeSeparator;
 
 lambdaExpr options { stubBase="DummyExpression"; }:
-  // todo:
+  FUN
+  synPat<PAT, Patterns>*
   RARROW
   synExpr<EXPR, Expression>;
 
