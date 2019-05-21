@@ -1,0 +1,37 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IDo
+      IChameleonExpression
+        ILambdaExpr
+          FSharpTokenType+FunTokenElement(type:FUN, text:fun)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
+          NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+          Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+          IMatchExpr
+            FSharpTokenType+MatchTokenElement(type:MATCH, text:match)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IConstExpr
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpTokenType+WithTokenElement(type:WITH, text:with)
+            NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+            Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+            IMatchClause
+              FSharpTokenType+BarTokenElement(type:BAR, text:|)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              IWildPat
+                FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              IConstExpr
+                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+

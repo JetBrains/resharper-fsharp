@@ -30,6 +30,17 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Const 01 - Unit``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Typed 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - While 01 - Simple``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - Lambda 01 - Single id``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 02 - Single wild``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 03 - Tuple``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 04 - Long id pattern``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 05 - Multiple wilds``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 06 - Wild and named pats 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 07 - Wild and named pats 02``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 08 - Match expr``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 09 - Long id with or pat``() = x.DoNamedTest()
+
     [<Test>] member x.``Expr - Match 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Do 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Assert 01 - Simple``() = x.DoNamedTest()
