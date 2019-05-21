@@ -29,6 +29,7 @@
     public const string IDS_ACTIVE_PATTERN_NAMED_CASE_DECLARATION = "";
     public const string IDS_SYN_EXPR = "";
     public const string IDS_QUOTE_EXPR = "";
+    public const string IDS_ARRAY_OR_LIST_OF_SEQ_EXPR = "";
     public const string IDS_SET_EXPR = "";
     public const string IDS_CAST_EXPR = "";
     public const string IDS_SYN_TYPE = "";
@@ -36,5 +37,6 @@
     public static string GetString(string id) => id;
     public static string GetExpectedMessage(string s) => string.Empty;
     public static string GetExpectedMessage(string s1, string s2) => string.Empty;
+    public static string GetUnexpectedTokenMessage() => string.Empty;
   }
 }

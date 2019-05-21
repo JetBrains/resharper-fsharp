@@ -1,0 +1,17 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IDo
+      IChameleonExpression
+        IWhileExpr
+          FSharpTokenType+WhileTokenElement(type:WHILE, text:while)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IConstExpr
+            FSharpTokenType+TrueTokenElement(type:TRUE, text:true)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+DoTokenElement(type:DO, text:do)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IConstExpr
+            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+

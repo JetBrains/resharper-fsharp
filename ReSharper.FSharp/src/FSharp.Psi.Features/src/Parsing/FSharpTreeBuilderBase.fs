@@ -306,11 +306,11 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         match pat with
         | SynSimplePat.Id(id,_,isCompilerGenerated,_,_,_) ->
             if not isCompilerGenerated then
-                x.ProcessLocalId id
-        | SynSimplePat.Typed(SynSimplePat.Id(id,_,isCompilerGenerated,_,_,_),t,_) ->
+                x.ProcessLocalId(id)
+        | SynSimplePat.Typed(SynSimplePat.Id(id,_,isCompilerGenerated,_,_,_),synType,_) ->
             if not isCompilerGenerated then
-                x.ProcessLocalId id
-            x.ProcessSynType t
+                x.ProcessLocalId(id)
+            x.ProcessSynType(synType)
         | _ -> ()
 
     member x.ProcessImplicitCtorParam (pat: SynSimplePat) =
@@ -354,12 +354,12 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
     member x.ProcessSimplePatterns(pats: SynSimplePats) =
         match pats with
         | SynSimplePats.SimplePats(pats,_) ->
-            for p in pats do
-                x.ProcessSimplePattern(p)
+            for pat in pats do
+                x.ProcessSimplePattern(pat)
 
-        | SynSimplePats.Typed(pats,t,_) ->
+        | SynSimplePats.Typed(pats,synType,_) ->
             x.ProcessSimplePatterns(pats)
-            x.ProcessSynType(t)
+            x.ProcessSynType(synType)
 
     member x.ProcessTypeArgs(ltRange: Range.range, typeArgs, gtRange) =
         let mark = x.Mark(ltRange)
