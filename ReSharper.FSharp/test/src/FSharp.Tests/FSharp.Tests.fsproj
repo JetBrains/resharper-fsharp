@@ -35,6 +35,7 @@
     <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FSharpCompilerServiceVersion)" />
     <PackageReference Include="JetBrains.Rider.SDK.Tests" Version="$(RiderSDKVersion)" />
     <PackageReference Include="System.ValueTuple" Version="$(ValueTupleVersion)" />
+    <PackageReference Include="NUnit.Console" Version="3.10.0" />
   </ItemGroup>
 
   <ItemGroup>
