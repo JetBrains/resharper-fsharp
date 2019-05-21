@@ -267,14 +267,24 @@ interface synExpr:
   constExpr |
   typedExpr |
   tupleExpr |
+  anonRecdExpr |
   arrayOrListExpr |
   recordExpr |
   newExpr |
   objExpr |
+  whileExpr |
+  forExpr |
+  forEachExpr |
+  arrayOrListOfSeqExpr |
+  lambdaExpr |
+  matchLambdaExpr |
   matchExpr |
   doExpr |
   assertExpr |
+  appExpr |
   letOrUseExpr |
+  tryWithExpr |
+  tryFinallyExpr |
   lazyExpr |
   ifThenElseExpr |
   identExpr |
@@ -284,8 +294,22 @@ interface synExpr:
   castExpr |
   inferredCastExpr |
   nullExpr |
+  addressOfExpr |
+  implicitZeroExpr |
+  yieldOrReturnExpr |
+  letOrUseBangExpr |
+
+  // todo: cover cases
+  libraryOnlyExpr |
+  fromErrorExpr |
+
   fixedExpr |
+  
   otherExpr;
+
+// interface appExpr:
+//   prefixAppExpr |
+//   infixAppExpr;
 
 interface setExpr:
   longIdentSetExpr |
@@ -321,7 +345,18 @@ typedExpr options { stubBase="DummyExpression"; }:
   synType<TYPE, Type>;
 
 tupleExpr options { stubBase="DummyExpression"; }:
+  STRUCT<STRUCT, StructKeyword>?
   fakeSeparator;
+
+anonRecdExpr options { stubBase="DummyExpression"; }:
+  STRUCT<STRUCT, STRUCT_KEYWORD>?
+  LBRACE_BAR
+  (
+    synExpr<COPY_INFO, CopyInfoExpression>
+    WITH
+  )?
+  recordExprBinding<BINDING, ExprBindings>* // todo: FCS has different type here
+  BAR_RBRACE;
 
 arrayOrListExpr options { stubBase="DummyExpression"; }:
   fakeSeparator;
@@ -329,12 +364,11 @@ arrayOrListExpr options { stubBase="DummyExpression"; }:
 recordExpr options { stubBase="DummyExpression"; }:
   LBRACE
   (
-    synExpr<COPY_INFO, CopyInfo>
+    synExpr<COPY_INFO, CopyInfoExpression>
     WITH
   )?
   recordExprBinding<BINDING, ExprBindings>*
   RBRACE;
-
 
 recordExprBinding:
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>
@@ -346,6 +380,38 @@ newExpr options { stubBase="TypeExpressionBase"; }:
   namedTypeExpression<TYPE, Type>
   fakeSeparator;
 
+forExpr options { stubBase="DummyExpression"; }:
+  FOR
+  IDENTIFIER<IDENTIFIER, Identifier>
+  synExpr<IDENT_EXPR, IdentExpression>
+  TO
+  synExpr<TO_EXPR, ToExpression>
+  DO
+  synExpr<DO_EXPR, DoExpression>;
+
+forEachExpr options { stubBase="DummyExpression"; }:
+  FOR
+  synPat<PAT, Pattern>
+  IN
+  synExpr<TO_EXPR, ToExpression>
+  DO
+  synExpr<DO_EXPR, DoExpression>;
+
+arrayOrListOfSeqExpr options { stubBase="DummyExpression"; }:
+  (LBRACK
+   synExpr<EXPR, Expression>
+   RBRACK) |
+
+   (LBRACK_BAR
+    synExpr<EXPR, Expression>
+    BAR_RBRACK);
+
+whileExpr options { stubBase="DummyExpression"; }:
+  WHILE
+  synExpr<WHILE_EXPR, WhileExpression>
+  DO
+  synExpr<DO_EXPR, DoExpression>;
+
 objExpr options { stubBase="BaseTypeExpressionBase"; }:
   namedTypeExpression<BASE_TYPE, BaseType>
   fakeSeparator;
@@ -354,6 +420,16 @@ objExprSecondaryInterface options { stubBase="BaseTypeExpressionBase"; }:
   namedTypeExpression<BASE_TYPE, BaseType>
   fakeSeparator;
 
+lambdaExpr options { stubBase="DummyExpression"; }:
+  // todo:
+  RARROW
+  synExpr<EXPR, Expression>;
+
+matchLambdaExpr options { stubBase="DummyExpression"; }:
+  FUNCTION
+  matchClause<MATCH_CLAUSE, clauses>*;
+
+// todo: separate nodes for bang exprs?
 matchExpr options { stubBase="DummyExpression"; }:
   MATCH
   synExpr<EXPR, Expression>
@@ -368,8 +444,29 @@ assertExpr options { stubBase="DummyExpression"; }:
   ASSERT
   synExpr<EXPR, Expression>;
 
+// todo: infix app
+appExpr options { stubBase="DummyExpression"; }:
+  fakeSeparator
+  synExpr<FUNC_EXPR, FunctionExpression>
+  synExpr<ARG_EXPR, ArgumentExpression>;
+
 letOrUseExpr options { stubBase="DummyExpression"; }:
-  fakeSeparator;
+  LET
+  REC<REC, RecKeyword>?
+  localBinding<BINDING, Bindings>*
+  synExpr<EXPR, Expression>;
+
+tryWithExpr options { stubBase="DummyExpression"; }:
+  TRY
+  synExpr<TRY_EXPR, TryExpression>
+  WITH
+  matchClause<CLAUSE, WithCases>*;
+
+tryFinallyExpr options { stubBase="DummyExpression"; }:
+  TRY
+  synExpr<TRY_EXPR, TryExpression>
+  FINALLY
+  synExpr<FINALLY_EXPR, FinallyExpression>;
 
 longIdentSetExpr options { stubBase="DummyExpression"; }:
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>
@@ -403,7 +500,10 @@ longIdentExpr options { stubBase="TypeExpressionBase"; }:
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>;
 
 matchClause options { stubBase="DummyExpression"; }:
-  fakeSeparator;
+  BAR<BAR, Bar>?
+  synPat<PAT, Pattern>
+  RARROW<RARROW, RArrow>
+  synExpr<EXPR, Expression>;
 
 typeTestExpr options { stubBase="DummyExpression"; }:
   synExpr<EXPR, Expression>
@@ -427,6 +527,30 @@ inferredCastExpr options { stubBase="DummyExpression"; }:
 // todo: maybe replace with SynExpr.Const in FCS?
 nullExpr options { stubBase="DummyExpression"; }:
   NULL<NULL, NullKeyword>;
+
+addressOfExpr options { stubBase="DummyExpression"; }:
+  (AMP | AMP_AMP)
+  synExpr<EXPR, Expression>;
+
+implicitZeroExpr options { stubBase="DummyExpression"; }:
+  fakeSeparator;
+
+yieldOrReturnExpr options { stubBase="DummyExpression"; }:
+  (YIELD | YIELD_BANG | RETURN | RETURN_BANG)
+  synExpr<EXPR, Expression>;
+
+letOrUseBangExpr options { stubBase="DummyExpression"; }:
+  LET_BANG
+  synPat<PAT, Pattern>
+  synExpr<RHS_EXPR, RightHandExpression>
+  IN?
+  synExpr<EXPR, Expression>;
+
+libraryOnlyExpr options { stubBase="DummyExpression"; }:
+  fakeSeparator;
+
+fromErrorExpr options { stubBase="DummyExpression"; }:
+  fakeSeparator;
 
 fixedExpr options { stubBase="DummyExpression"; }:
   FIXED<FIXED, FixedKeyword>
