@@ -6,7 +6,8 @@ IFSharpImplFile
         ILambdaExpr
           FSharpTokenType+FunTokenElement(type:FUN, text:fun)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+          IWildPat
+            FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
