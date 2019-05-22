@@ -30,6 +30,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Const 01 - Unit``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Typed 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - While 01 - Simple``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - CompExpr 01 - Return``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Lambda 01 - Single id``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Lambda 02 - Single wild``() = x.DoNamedTest()

@@ -4,6 +4,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class LongIdentSetExpr
   {
-    public ITokenNode ReferenceIdentifier => LongIdentifier?.IdentifierToken;
+    public override ITokenNode ReferenceIdentifier => LongIdentifier?.IdentifierToken;
   }
 }

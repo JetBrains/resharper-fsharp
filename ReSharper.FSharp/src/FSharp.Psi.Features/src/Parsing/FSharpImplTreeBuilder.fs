@@ -549,7 +549,9 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
             x.Done(range, mark, ElementType.ARRAY_OR_LIST_OF_SEQ_EXPR)
 
         | SynExpr.CompExpr(_,_,expr,_) ->
-            x.ProcessExpression expr
+            let mark = x.Mark(range)
+            x.ProcessExpression(expr)
+            x.Done(range, mark, ElementType.COMP_EXPR)
 
         | SynExpr.Lambda _ ->
             x.MarkLambdaExpr(expr)
@@ -639,7 +641,9 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
             x.Done(range, mark, ElementType.LONG_IDENT_SET_EXPR)
 
         | SynExpr.DotGet(expr,_,_,_) ->
+            let mark = x.Mark(range)
             x.ProcessExpression(expr)
+            x.Done(range, mark, ElementType.DOT_GET_EXPR)
 
         | SynExpr.DotSet(expr1,lid,expr2,__) ->
             let mark = x.Mark(range)
@@ -649,28 +653,39 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
             x.Done(range, mark, ElementType.DOT_SET_EXPR)
 
         | SynExpr.Set(expr1, expr2, _) ->
+            let mark = x.Mark(range)
             x.ProcessExpression(expr1)
             x.ProcessExpression(expr2)
+            x.Done(range, mark, ElementType.EXPR_SET_EXPR)
 
         | SynExpr.NamedIndexedPropertySet(_,expr1,expr2,_) ->
+            let mark = x.Mark(range)
             x.ProcessExpression(expr1)
             x.ProcessExpression(expr2)
+            x.Done(range, mark, ElementType.NAMED_INDEXED_PROPERTY_SET)
 
         | SynExpr.DotNamedIndexedPropertySet(expr1,_,expr2,expr3,_) ->
+            let mark = x.Mark(range)
             x.ProcessExpression(expr1)
             x.ProcessExpression(expr2)
             x.ProcessExpression(expr3)
+            x.Done(range, mark, ElementType.DOT_NAMED_INDEXED_PROPERTY_SET)
 
         | SynExpr.DotIndexedGet(expr,indexerArgs,_,_) ->
+            let mark = x.Mark(range)
             x.ProcessExpression(expr)
             for arg in indexerArgs do
                 x.ProcessIndexerArg(arg)
+            x.Done(range, mark, ElementType.DOT_INDEXED_GET_EXPR)
 
         | SynExpr.DotIndexedSet(expr1,indexerArgs,expr2,_,_,_) ->
+            let mark = x.Mark(range)
             x.ProcessExpression(expr1)
+            // todo: mark indexer expressions
             for arg in indexerArgs do
                 x.ProcessIndexerArg(arg)
             x.ProcessExpression(expr2)
+            x.Done(range, mark, ElementType.DOT_INDEXED_SET_EXPR)
 
         | SynExpr.TypeTest(expr,typ,_) ->
             x.MarkTypeExpr(expr, typ, range, ElementType.TYPE_TEST_EXPR)
@@ -696,11 +711,15 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
             x.Done(range, mark, ElementType.ADDRESS_OF_EXPR)
 
         | SynExpr.TraitCall(_,_,expr,_) ->
+            let mark = x.Mark(range)
             x.ProcessExpression(expr)
+            x.Done(range, mark, ElementType.TRAIT_CALL_EXPR)
 
         | SynExpr.JoinIn(expr1,_,expr2,_) ->
+            let mark = x.Mark(range)
             x.ProcessExpression(expr1)
             x.ProcessExpression(expr2)
+            x.Done(range, mark, ElementType.JOIN_IN_EXPR)
 
         | SynExpr.ImplicitZero _ ->
             x.MarkAndDone(range, ElementType.IMPLICIT_ZERO_EXPR)
@@ -744,8 +763,11 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
             x.Done(range, mark, ElementType.FIXED_EXPR)
 
         | SynExpr.Sequential(_,_,expr1,expr2,_) ->
+            // todo: concat nested sequential expressions
+            let mark = x.Mark(range)
             x.ProcessExpression(expr1)
             x.ProcessExpression(expr2)
+            x.Done(range, mark, ElementType.SEQUENTIAL_EXPR)
 
     member x.MarkLambdaExpr(ExprRange range as lambdaExpr) =
         // Lambdas get "desugared" by being converted to fake nested lambdas and match expressions.
@@ -776,7 +798,7 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
     
     member x.MarkLambdaParams(pats: SynSimplePats, lambdaBody: SynExpr, outerBodyExpr) =
         match pats with
-        | SynSimplePats.SimplePats(pats, range) ->
+        | SynSimplePats.SimplePats(pats, _) ->
             // `pats` can be empty for unit patterns.
 
             x.MarkLambdaParam(pats, lambdaBody, outerBodyExpr)
