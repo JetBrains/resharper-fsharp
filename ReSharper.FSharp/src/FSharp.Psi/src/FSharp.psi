@@ -276,6 +276,7 @@ interface synExpr:
   forExpr |
   forEachExpr |
   arrayOrListOfSeqExpr |
+  compExpr |
   lambdaExpr |
   matchLambdaExpr |
   matchExpr |
@@ -286,15 +287,20 @@ interface synExpr:
   tryWithExpr |
   tryFinallyExpr |
   lazyExpr |
+  sequentialExpr |
   ifThenElseExpr |
   identExpr |
   longIdentExpr |
+  dotGetExpr |
+  dotIndexedGetExpr |
   setExpr |
   typeTestExpr |
   castExpr |
   inferredCastExpr |
   nullExpr |
   addressOfExpr |
+  traitCallExpr |
+  joinInExpr |
   implicitZeroExpr |
   yieldOrReturnExpr |
   letOrUseBangExpr |
@@ -313,7 +319,11 @@ interface synExpr:
 
 interface setExpr:
   longIdentSetExpr |
-  dotSetExpr;
+  dotSetExpr |
+  exprSetExpr |
+  dotIndexedSetExpr |
+  namedIndexedPropertySet |
+  dotNamedIndexedPropertySet;
 
 interface castExpr:
   upcastExpr |
@@ -420,6 +430,11 @@ objExprSecondaryInterface options { stubBase="BaseTypeExpressionBase"; }:
   namedTypeExpression<BASE_TYPE, BaseType>
   fakeSeparator;
 
+compExpr options { stubBase="DummyExpression"; }:
+  LBRACE
+  synExpr<EXPR, Expression>
+  RBRACE;
+
 lambdaExpr options { stubBase="DummyExpression"; }:
   FUN
   synPat<PAT, Patterns>*
@@ -469,20 +484,72 @@ tryFinallyExpr options { stubBase="DummyExpression"; }:
   FINALLY
   synExpr<FINALLY_EXPR, FinallyExpression>;
 
-longIdentSetExpr options { stubBase="DummyExpression"; }:
+longIdentSetExpr options { stubBase="SetExpressionBase"; }:
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>
   LARROW<LARROW, LArrow>
   synExpr<EXPR, Expression>;
 
-dotSetExpr options { stubBase="DummyExpression"; }:
+dotGetExpr options { stubBase="SetExpressionBase"; }:
+  synExpr<EXPR, Expression>
+  DOT
+  longIdentifier<LONG_IDENTIFIER, LongIdentifier>;
+
+dotIndexedGetExpr options { stubBase="SetExpressionBase"; }:
+  synExpr<EXPR, LeftExpr>
+  DOT
+  LBRACK
+  (
+    synExpr<INDEXER_EXPR, IndexerExpressions>
+    COMMA
+  )*
+  RBRACK;
+
+dotSetExpr options { stubBase="SetExpressionBase"; }:
   synExpr<EXPR1, LeftExpr>
+  DOT
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>
+  LARROW<LARROW, LArrow>
+  synExpr<EXPR2, RightExpr>;
+
+exprSetExpr options { stubBase="SetExpressionBase"; }:
+  synExpr<EXPR1, LeftExpr>
+  LARROW<LARROW, LArrow>
+  synExpr<EXPR2, RightExpr>;
+
+dotIndexedSetExpr options { stubBase="SetExpressionBase"; }:
+  synExpr<EXPR, Expression>
+  DOT
+  LBRACK
+  (
+    synExpr<INDEXER_EXPR, IndexerExpressions>
+    COMMA
+  )*
+  RBRACK
+  LARROW<LARROW, LArrow>
+  synExpr<RHS_EXPR, RightExpression>;
+
+namedIndexedPropertySet options { stubBase="SetExpressionBase"; }:
+  longIdentifier<LONG_IDENTIFIER, LongIdentifier>
+  DOT
+  synExpr<EXPR1, LeftExpr>
+  synExpr<INDEXER_EXPR, IndexerExpressions>
+  LARROW<LARROW, LArrow>
+  synExpr<EXPR2, RightExpr>;
+
+dotNamedIndexedPropertySet options { stubBase="SetExpressionBase"; }:
+  synExpr<EXPR1, LeftExpr>
+  DOT
+  longIdentifier<LONG_IDENTIFIER, LongIdentifier>
+  synExpr<INDEXER_EXPR, IndexerExpressions>
   LARROW<LARROW, LArrow>
   synExpr<EXPR2, RightExpr>;
 
 lazyExpr options { stubBase="DummyExpression"; }:
   LAZY
   synExpr<EXPR, Expression>;
+
+sequentialExpr options { stubBase="DummyExpression"; }:
+  synExpr<EXPR, Expressions>*;
 
 ifThenElseExpr options { stubBase="DummyExpression"; }:
   IF<IF, IfKeyword>
@@ -532,6 +599,12 @@ nullExpr options { stubBase="DummyExpression"; }:
 addressOfExpr options { stubBase="DummyExpression"; }:
   (AMP | AMP_AMP)
   synExpr<EXPR, Expression>;
+
+traitCallExpr options { stubBase="DummyExpression"; }:
+  fakeSeparator;
+
+joinInExpr options { stubBase="DummyExpression"; }:
+  fakeSeparator;
 
 implicitZeroExpr options { stubBase="DummyExpression"; }:
   fakeSeparator;
