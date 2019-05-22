@@ -777,7 +777,8 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
     member x.MarkLambdaParams(pats: SynSimplePats, lambdaBody: SynExpr, outerBodyExpr) =
         match pats with
         | SynSimplePats.SimplePats(pats, range) ->
-            Assertion.Assert(not pats.IsEmpty, "not pats.IsEmpty")
+            // `pats` can be empty for unit patterns.
+
             x.MarkLambdaParam(pats, lambdaBody, outerBodyExpr)
 
 //            match pats with
