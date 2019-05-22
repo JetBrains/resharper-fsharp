@@ -40,6 +40,11 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Lambda 07 - Wild and named pats 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Lambda 08 - Match expr``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Lambda 09 - Long id with or pat``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 10 - Multiple tuples``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 11 - Two wilds``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 12 - Paren``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 13 - Two parens``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 14 - Nested parens``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Match 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Do 01 - Simple``() = x.DoNamedTest()

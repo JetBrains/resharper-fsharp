@@ -747,7 +747,7 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
             x.ProcessExpression(expr1)
             x.ProcessExpression(expr2)
 
-    member x.MarkLambdaExpr(ExprRange lambdaRange as lambdaExpr) =
+    member x.MarkLambdaExpr(ExprRange range as lambdaExpr) =
         // Lambdas get "desugared" by being converted to fake nested lambdas and match expressions.
         // Some patterns are preserved inside the generated lambdas and some patterns are replaced with
         // generated placeholder patterns and go to generated match expressions inside lambda bodies.
@@ -759,15 +759,67 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
 
         match lambdaExpr with
         | SynExpr.Lambda(_, false, _, bodyExpr, _) ->
-            let lambdaMark = x.Mark(lambdaRange)
-
-            let bodyExpr = getLambdaBodyExpr bodyExpr
-            x.ProcessExpression(bodyExpr)
-
-            x.Done(lambdaRange, lambdaMark, ElementType.LAMBDA_EXPR)
+            let mark = x.Mark(range)
+            let skippedLambdas = skipGeneratedLambdas bodyExpr
+            x.MarkLambdaParams(lambdaExpr, skippedLambdas, true)
+            x.ProcessExpression(skipGeneratedMatch skippedLambdas)
+            x.Done(range, mark, ElementType.LAMBDA_EXPR)
 
         | _ -> failwithf "Expecting non-generated lambda expression, got:\n%A" lambdaExpr
 
+    member x.MarkLambdaParams(expr, outerBodyExpr, topLevel) =
+        match expr with
+        | SynExpr.Lambda(_, inLambdaSeq, pats, bodyExpr, _) when inLambdaSeq <> topLevel ->
+            x.MarkLambdaParams(pats, bodyExpr, outerBodyExpr)
+
+        | _ -> ()
+    
+    member x.MarkLambdaParams(pats: SynSimplePats, lambdaBody: SynExpr, outerBodyExpr) =
+        match pats with
+        | SynSimplePats.SimplePats(pats, range) ->
+            Assertion.Assert(not pats.IsEmpty, "not pats.IsEmpty")
+            x.MarkLambdaParam(pats, lambdaBody, outerBodyExpr)
+
+//            match pats with
+//            | [pat] ->
+////                if posLt range.Start pat.Range.Start then
+////                    let mark = x.Mark(range)
+//                    x.MarkLambdaParam(pats, lambdaBody, outerBodyExpr)
+////                    x.Done(range, mark, ElementType.PAREN_PAT)
+////                else
+////                    x.MarkLambdaParam(pats, lambdaBody, outerBodyExpr)
+//
+//            | _ ->
+//                let mark = x.Mark(range) // todo: mark before lparen
+//                x.MarkLambdaParam(pats, lambdaBody, outerBodyExpr)
+//                x.Done(range, mark, ElementType.PAREN_PAT) // todo: marp tuple pat
+
+        | SynSimplePats.Typed _ ->
+            failwithf "Expecting SimplePats, got:\n%A" pats
+
+    member x.MarkLambdaParam(pats: SynSimplePat list, lambdaBody: SynExpr, outerBodyExpr) =
+        match pats with
+        | [] -> x.MarkLambdaParams(lambdaBody, outerBodyExpr, false)
+        | pat :: pats ->
+            match pat with
+            | SynSimplePat.Id(_, _, isGenerated, _, _, range) ->
+                if not isGenerated then
+                    x.MarkAndDone(range, ElementType.LOCAL_NAMED_PAT)
+                    x.MarkLambdaParam(pats, lambdaBody, outerBodyExpr)
+                else
+                    match outerBodyExpr with
+                    | SynExpr.Match(_, _, [ Clause(pat, whenExpr, innerExpr, clauseRange, _) ], matchRange) when
+                            matchRange.Start = clauseRange.Start ->
+
+                        Assertion.Assert(whenExpr.IsNone, "whenExpr.IsNone")
+                        x.ProcessPat(pat, true, false)
+                        x.MarkLambdaParam(pats, lambdaBody, innerExpr)
+
+                    | _ ->
+                        failwithf "Expecting generated match expression, got:\n%A" lambdaBody
+            | _ ->
+                x.MarkLambdaParam(pats, lambdaBody, outerBodyExpr)
+    
     member x.MarkMatchExpr(range: range, expr, clauses) =
         let mark = x.Mark(range)
         x.ProcessExpression(expr)

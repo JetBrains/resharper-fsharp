@@ -9,8 +9,9 @@ IFSharpImplFile
           FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
           ILocalNamedPat
             FSharpIdentifierToken(type:IDENTIFIER, text:a)
-          FSharpTokenType+CommaTokenElement(type:COMMA, text:,)
+          FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
           ILocalNamedPat
             FSharpIdentifierToken(type:IDENTIFIER, text:b)
           FSharpTokenType+RparenTokenElement(type:RPAREN, text:))

@@ -26,6 +26,12 @@ type SynSimplePats with
         | SynSimplePats.SimplePats(range = range)
         | SynSimplePats.Typed(range = range) -> range
 
+type SynSimplePat with
+    member x.Range =
+        match x with
+        | SynSimplePat.Id(range = range)
+        | SynSimplePat.Typed(range = range)
+        | SynSimplePat.Attrib(range = range) -> range
 
 let letStartPos (bindings: SynBinding list) (range: Range.range) =
     match bindings with
@@ -39,7 +45,7 @@ let rec skipGeneratedLambdas expr =
     match expr with
     | SynExpr.Lambda(_, true, _, bodyExpr, _) ->
         skipGeneratedLambdas bodyExpr
-    | _ -> skipGeneratedMatch expr
+    | _ -> expr
 
 and skipGeneratedMatch expr =
     match expr with
@@ -49,7 +55,8 @@ and skipGeneratedMatch expr =
     | _ -> expr
 
 let inline getLambdaBodyExpr expr =
-    skipGeneratedLambdas expr
+    let skippedLambdas = skipGeneratedLambdas expr
+    skipGeneratedMatch skippedLambdas
 
 
 let rec getGeneratedLambdaParam dflt expr =
