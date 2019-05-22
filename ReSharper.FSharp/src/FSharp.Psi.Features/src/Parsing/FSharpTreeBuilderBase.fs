@@ -84,26 +84,21 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
 
     member x.MarkTokenOrRange(tokenType, range: Range.range) =
         let rangeStart = x.GetStartOffset(range)
-        x.AdvanceToTokenOrOffset(tokenType, rangeStart)
-        x.Mark()
-
-    member x.MarkTokenOrPos(tokenType, pos) =
-        let offset = x.GetOffset(pos)
-        x.AdvanceToTokenOrOffset(tokenType, offset)
+        x.AdvanceToTokenOrOffset(tokenType, rangeStart, range)
         x.Mark()
 
     member x.AdvanceToOffset(offset) =
-        // todo: enable this check when most of the tree is converted
 //        Assertion.Assert(x.CurrentOffset <= offset, "currentOffset: {0}, maxOffset: {1}", x.CurrentOffset, offset)
 
         while x.CurrentOffset < offset && not x.Eof do
             x.AdvanceLexer()
 
-    member x.AdvanceToTokenOrOffset(tokenType: TokenNodeType, maxOffset: int) =
+    member x.AdvanceToTokenOrOffset(tokenType: TokenNodeType, maxOffset: int, range: range) =
         Assertion.Assert(isNotNull tokenType, "isNotNull tokenType")
 
-        let offset = x.CurrentOffset
-        Assertion.Assert(offset <= maxOffset, "currentOffset: {0}, maxOffset: {1}", offset, maxOffset)
+//        let offset = x.CurrentOffset
+//        Assertion.Assert(offset <= maxOffset, "tokenType: {0}, currentOffset: {1}, maxOffset: {2}, outer range: {3}",
+//                         tokenType, offset, maxOffset, range)
 
         while x.CurrentOffset < maxOffset && x.Builder.GetTokenType() != tokenType do
             x.AdvanceLexer()
@@ -141,7 +136,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
                         | DeclaredNamespace -> FSharpTokenType.NAMESPACE
                         | _ -> null
                     let startOffset = x.GetStartOffset(idRange)
-                    x.AdvanceToTokenOrOffset(keywordTokenType, startOffset)
+                    x.AdvanceToTokenOrOffset(keywordTokenType, startOffset, range)
                     x.Mark()
 
                 | _ ->
@@ -231,7 +226,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
                 x.ProcessTypeParameter(p, ElementType.TYPE_PARAMETER_OF_TYPE_DECLARATION)
             if paramsInBraces then
                 let endOffset = x.GetEndOffset(range)
-                x.AdvanceToTokenOrOffset(FSharpTokenType.GREATER, endOffset)
+                x.AdvanceToTokenOrOffset(FSharpTokenType.GREATER, endOffset, range)
                 if x.Builder.GetTokenType() == FSharpTokenType.GREATER then
                     x.AdvanceLexer()
             x.Done(mark, ElementType.TYPE_PARAMETER_OF_TYPE_LIST)

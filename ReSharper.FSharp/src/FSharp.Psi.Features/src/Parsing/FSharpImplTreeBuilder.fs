@@ -232,7 +232,7 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
         | Some(SynBindingReturnInfo(returnType,range,_)) ->
 
         let startOffset = x.GetStartOffset(range)
-        x.AdvanceToTokenOrOffset(FSharpTokenType.COLON, startOffset)
+        x.AdvanceToTokenOrOffset(FSharpTokenType.COLON, startOffset, range)
 
         let mark = x.Mark()
         x.ProcessSynType(returnType)
