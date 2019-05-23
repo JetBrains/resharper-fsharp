@@ -39,7 +39,7 @@ type InheritedMembersStageProcess(fsFile, daemonProcess) =
             // Don't add inherited icon for unions with cases compiled as nested inherited types.
             ()
 
-        | :? ITypeDeclaration as typeDecl ->
+        | :? ITypeDeclaration as typeDecl when isNotNull typeDecl.DeclaredElement ->
             // This is a workaround until we can resolve types without waiting for FCS to type check projects graph
             // up to the possible inheritor point.
             // Using this approach may add unwanted gutter icons in some rare cases.
