@@ -5,7 +5,6 @@ open FSharp.Compiler.SourceCodeServices
 open FSharp.Compiler.PrettyNaming
 open JetBrains.Application
 open JetBrains.IDE.UI.Extensions.Validation
-open JetBrains.ReSharper.Feature.Services.Refactorings
 open JetBrains.ReSharper.Feature.Services.Refactorings.Specific.Rename
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -117,16 +116,16 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
         namingService.IsValidName(decl.DeclaredElement, name)
 
     override x.GetInitialPage(workflow) =
-        let page: IRefactoringPage =
+        let createPage (workflow: IRenameWorkflow) =
             { new RenameInitialControlPage(workflow.RenameWorkflow) with
                   override x.AddCustomValidation(textBox, element) =
-                      let validate = Func<_,_>(fun property ->
-                          FSharpNameValidationRule(property, element, namingService) :> ValidationRuleWithProperty<_>)
-                      textBox.WithValidationRule(x.Lifetime, validate) |> ignore } :> _
+                      let validate = Func<_,ValidationRuleWithProperty<_>>(fun property ->
+                          FSharpNameValidationRule(property, element, namingService) :> _)
+                      textBox.WithValidationRule(x.Lifetime, validate) |> ignore }
 
         let dataModel = workflow.RenameDataModel
         match dataModel.InitialDeclaredElement with
-        | null -> page
+        | null -> createPage workflow :> _
         | element ->
 
         dataModel.InitialName <-
@@ -139,7 +138,7 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
             | ChangeNameKind.UseSingleName -> fsDeclaredElement.SourceName
             | _ -> fsDeclaredElement.ShortName
 
-        page
+        createPage workflow :> _
 
 
 type FSharpNameValidationRule(property, element: IDeclaredElement, namingService: FSharpNamingService) as this =
