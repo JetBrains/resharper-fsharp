@@ -1,7 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
 open System
-open FSharp.Compiler
 open FSharp.Compiler.Ast
 open FSharp.Compiler.Range
 open JetBrains.Diagnostics
@@ -32,9 +31,9 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
 
     abstract member CreateFSharpFile: unit -> IFSharpFile
 
-    member x.GetOffset(pos: Range.pos) = getLineOffset pos.Line + pos.Column
-    member x.GetStartOffset(range: Range.range) = getLineOffset range.StartLine + range.StartColumn
-    member x.GetEndOffset(range: Range.range) = getLineOffset range.EndLine + range.EndColumn
+    member x.GetOffset(pos: pos) = getLineOffset pos.Line + pos.Column
+    member x.GetStartOffset(range: range) = getLineOffset range.StartLine + range.StartColumn
+    member x.GetEndOffset(range: range) = getLineOffset range.EndLine + range.EndColumn
     member x.GetStartOffset(IdentRange range) = x.GetStartOffset(range)
 
     member x.Eof = x.Builder.Eof()
@@ -44,20 +43,20 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
 
     member x.AdvanceLexer() = x.Builder.AdvanceLexer() |> ignore
     
-    member x.AdvanceToStart(range: Range.range) =
+    member x.AdvanceToStart(range: range) =
         x.AdvanceToOffset(x.GetStartOffset(range))
 
-    member x.AdvanceToEnd(range: Range.range) =
+    member x.AdvanceToEnd(range: range) =
         x.AdvanceToOffset(x.GetEndOffset(range))
 
-    member x.AdvanceTo(pos: Range.pos) =
+    member x.AdvanceTo(pos: pos) =
         x.AdvanceToOffset(x.GetOffset(pos))
 
-    member x.Mark(range: Range.range) =
+    member x.Mark(range: range) =
         x.AdvanceToStart(range)
         x.Mark()
 
-    member x.Mark(pos: Range.pos) =
+    member x.Mark(pos: pos) =
         x.AdvanceTo(pos)
         x.Mark()
     
@@ -73,7 +72,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         x.AdvanceToEnd(range)
         x.Builder.Done(mark, elementType, data)
 
-    member x.MarkAndDone(range: Range.range, elementType) =
+    member x.MarkAndDone(range: range, elementType) =
         let mark = x.Mark(range)
         x.Done(range, mark, elementType)
 
@@ -82,7 +81,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         x.AdvanceLexer()
         x.Done(caseMark, elementType)
 
-    member x.MarkTokenOrRange(tokenType, range: Range.range) =
+    member x.MarkTokenOrRange(tokenType, range: range) =
         let rangeStart = x.GetStartOffset(range)
         x.AdvanceToTokenOrOffset(tokenType, rangeStart, range)
         x.Mark()
@@ -107,19 +106,22 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         match lid with
         | [] -> ()
         | head :: _ ->
-            let mark = x.Mark(head.idRange)
-            let last = List.last lid
-            x.Done(last.idRange, mark, ElementType.LONG_IDENTIFIER)
+
+        let mark = x.Mark(head.idRange)
+        let last = List.last lid
+        x.Done(last.idRange, mark, ElementType.LONG_IDENTIFIER)
 
     member x.GetTreeNode() =
         x.GetTree() :> ITreeNode
     
     member x.FinishFile(mark, fileType) =
-        while not x.Eof do x.AdvanceLexer()
+        while not x.Eof do
+            x.AdvanceLexer()
+
         x.Done(mark, fileType)
         x.GetTreeNode() :?> IFSharpFile
 
-    member x.StartTopLevelDeclaration(lid: LongIdent, attrs: SynAttributes, moduleKind, range: Range.range) =
+    member x.StartTopLevelDeclaration(lid: LongIdent, attrs: SynAttributes, moduleKind, range) =
         match lid with
         | IdentRange idRange as id :: _ ->
             let mark =
@@ -169,7 +171,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         if mark.IsSome then
             x.Done(mark.Value, elementType)
 
-    member x.MarkAttributesOrIdOrRange(attrs: SynAttributes, id: Ident option, range: Range.range) =
+    member x.MarkAttributesOrIdOrRange(attrs: SynAttributes, id: Ident option, range: range) =
         match attrs with
         | head :: _ ->
             let mark = x.MarkTokenOrRange(FSharpTokenType.LBRACK_LESS, head.Range)
@@ -181,19 +183,19 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
             let startOffset = if id.IsSome then Math.Min(x.GetStartOffset id.Value.idRange, rangeStart) else rangeStart
             x.Mark(startOffset)
 
-    member x.StartNestedModule (attrs: SynAttributes) (lid: LongIdent) (range: Range.range) =
+    member x.StartNestedModule (attrs: SynAttributes) (lid: LongIdent) (range: range) =
         let mark = x.MarkAttributesOrIdOrRange(attrs, List.tryHead lid, range)
         if not lid.IsEmpty then
             x.ProcessModifiersBeforeOffset(x.GetStartOffset(lid.Head))
         mark
 
-    member x.StartException(SynExceptionDefnRepr(_,UnionCase(_,id,unionCaseType,_,_,_),_,_,_,range)) =
+    member x.StartException(SynExceptionDefnRepr(_, UnionCase(_, id, unionCaseType, _, _, _), _, _, _, range)) =
         let mark = x.Mark(range)
         x.ProcessModifiersBeforeOffset(x.GetStartOffset id)
         x.ProcessUnionCaseType(unionCaseType, ElementType.EXCEPTION_FIELD_DECLARATION) |> ignore
         mark
 
-    member x.ProcessModifiersBeforeOffset (endOffset: int) =
+    member x.ProcessModifiersBeforeOffset(endOffset: int) =
         let mark = x.Mark()
         x.AdvanceToOffset(endOffset)
         x.Done(mark, ElementType.ACCESS_MODIFIERS)
@@ -206,7 +208,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
 
             let typeParamsOffset =
                 match typeParams with
-                | TyparDecl(_,(Typar(id,_,_))) :: _ -> x.GetStartOffset id
+                | TyparDecl(_, (Typar(id, _, _))) :: _ -> x.GetStartOffset id
                 | [] -> idOffset
 
             x.ProcessModifiersBeforeOffset (min idOffset typeParamsOffset)
@@ -220,7 +222,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
 
     member x.ProcessTypeParametersOfType typeParams range paramsInBraces =
         match typeParams with
-        | TyparDecl(_,(Typar(IdentRange idRange,_,_))) :: _ ->
+        | TyparDecl(_, (Typar(IdentRange idRange, _, _))) :: _ ->
             let mark = x.MarkTokenOrRange(FSharpTokenType.LESS, idRange)
             for p in typeParams do
                 x.ProcessTypeParameter(p, ElementType.TYPE_PARAMETER_OF_TYPE_DECLARATION)
@@ -232,7 +234,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
             x.Done(mark, ElementType.TYPE_PARAMETER_OF_TYPE_LIST)
         | [] -> ()
 
-    member x.ProcessTypeParameter(TyparDecl(_,(Typar(IdentRange range,_,_))), elementType) =
+    member x.ProcessTypeParameter(TyparDecl(_, (Typar(IdentRange range, _, _))), elementType) =
         x.MarkAndDone(range, elementType)
 
     member x.ProcessUnionCaseType(caseType, fieldElementType) =
@@ -244,13 +246,13 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         | UnionCaseFullType(_) ->
             true // todo: used in FSharp.Core only, otherwise warning
 
-    member x.ProcessUnionCases(cases, range: Range.range) =
+    member x.ProcessUnionCases(cases, range: range) =
         let casesListMark = x.Mark(range)
         for case in cases do
             x.ProcessUnionCase(case)
         x.Done(range, casesListMark, ElementType.UNION_CASES_LIST)
 
-    member x.ProcessUnionCase(UnionCase(attrs,_,caseType,_,_,range)) =
+    member x.ProcessUnionCase(UnionCase(attrs, _, caseType, _, _, range)) =
         let mark = x.MarkTokenOrRange(FSharpTokenType.BAR, range)
         x.ProcessAttributes(attrs)
         let hasFields = x.ProcessUnionCaseType(caseType, ElementType.UNION_CASE_FIELD_DECLARATION)
@@ -258,17 +260,17 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
                                        else ElementType.SINGLETON_CASE_DECLARATION
         x.Done(range, mark, elementType)
 
-    member x.ProcessAttributeArg (expr: SynExpr) =
+    member x.ProcessAttributeArg(expr: SynExpr) =
         match expr with
-        | SynExpr.LongIdent(_,lid,_,_) -> x.ProcessLongIdentifier lid.Lid
-        | SynExpr.Paren(expr,_,_,_) -> x.ProcessAttributeArg expr
+        | SynExpr.LongIdent(_, lid, _, _) -> x.ProcessLongIdentifier(lid.Lid)
+        | SynExpr.Paren(expr, _, _, _) -> x.ProcessAttributeArg(expr)
         | _ -> () // we need to cover only these cases for now
 
     member x.ProcessAttributes(attrs) =
         for attr in attrs do
             x.ProcessAttribute(attr)
 
-    member x.ProcessAttribute (attr: SynAttribute) =
+    member x.ProcessAttribute(attr: SynAttribute) =
         let mark = x.Mark(attr.Range)
         x.ProcessLongIdentifier attr.TypeName.Lid
 
@@ -279,10 +281,10 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
 
         x.Done(attr.Range, mark, ElementType.F_SHARP_ATTRIBUTE)
 
-    member x.ProcessEnumCase (EnumCase(_,_,_,_,range)) =
+    member x.ProcessEnumCase(EnumCase(_, _, _, _, range)) =
         x.MarkAndDone(range, ElementType.ENUM_MEMBER_DECLARATION)
 
-    member x.ProcessField (Field(_,_,id,t,_,_,_,range)) elementType =
+    member x.ProcessField(Field(_, _, id, t, _, _, _, range)) elementType =
         let mark =
             match id with
             | Some id ->
@@ -297,31 +299,35 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
     member x.ProcessLocalId(IdentRange range) =
         x.MarkAndDone(range, ElementType.LOCAL_DECLARATION)
 
-    member x.ProcessSimplePattern (pat: SynSimplePat) =
+    member x.ProcessSimplePattern(pat: SynSimplePat) =
         match pat with
-        | SynSimplePat.Id(id,_,isCompilerGenerated,_,_,_) ->
+        | SynSimplePat.Id(id, _, isCompilerGenerated, _, _, _) ->
             if not isCompilerGenerated then
                 x.ProcessLocalId(id)
-        | SynSimplePat.Typed(SynSimplePat.Id(id,_,isCompilerGenerated,_,_,_),synType,_) ->
+
+        | SynSimplePat.Typed(SynSimplePat.Id(id, _, isCompilerGenerated, _, _, _), synType, _) ->
             if not isCompilerGenerated then
                 x.ProcessLocalId(id)
             x.ProcessSynType(synType)
+
         | _ -> ()
 
-    member x.ProcessImplicitCtorParam (pat: SynSimplePat) =
+    member x.ProcessImplicitCtorParam(pat: SynSimplePat) =
         match pat with
-        | SynSimplePat.Id(id,_,_,_,_,range) ->
+        | SynSimplePat.Id(id, _, _, _, _, range) ->
             let mark = x.Mark(range)
             x.ProcessLocalId id
             x.Done(range, mark,ElementType.MEMBER_PARAM)
-        | SynSimplePat.Typed(SynSimplePat.Id(id,_,_,_,_,_),t,range) ->
+
+        | SynSimplePat.Typed(SynSimplePat.Id(id, _, _, _, _, _), t, range) ->
             let mark = x.Mark(range)
             x.ProcessLocalId id
             x.ProcessSynType t
             x.Done(range, mark,ElementType.MEMBER_PARAM)
+
         | _ -> ()
 
-    member x.ProcessTypeMemberTypeParams (SynValTyparDecls(typeParams,_,_)) =
+    member x.ProcessTypeMemberTypeParams(SynValTyparDecls(typeParams, _, _)) =
         for param in typeParams do
             x.ProcessTypeParameter(param, ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION)
 
@@ -348,17 +354,17 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
 
     member x.ProcessSimplePatterns(pats: SynSimplePats) =
         match pats with
-        | SynSimplePats.SimplePats(pats,_) ->
+        | SynSimplePats.SimplePats(pats, _) ->
             for pat in pats do
                 x.ProcessSimplePattern(pat)
 
-        | SynSimplePats.Typed(pats,synType,_) ->
+        | SynSimplePats.Typed(pats, synType, _) ->
             x.ProcessSimplePatterns(pats)
             x.ProcessSynType(synType)
 
-    member x.ProcessTypeArgs(ltRange: Range.range, typeArgs, gtRange) =
+    member x.ProcessTypeArgs(ltRange: range, typeArgs, gtRange) =
         let mark = x.Mark(ltRange)
-        for t in typeArgs do x.ProcessSynType t
+        for t in typeArgs do x.ProcessSynType(t)
         x.Done(gtRange, mark, ElementType.TYPE_ARGUMENT_LIST)
 
     member x.ProcessSynType(TypeRange range as synType) =
@@ -368,7 +374,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
             x.ProcessLongIdentifier(lid.Lid)
             x.Done(range, mark, ElementType.NAMED_TYPE_EXPRESSION)
 
-        | SynType.App(typeName,ltRange,typeArgs,_,gtRange,isPostfix,_) ->
+        | SynType.App(typeName, ltRange, typeArgs, _, gtRange, isPostfix, _) ->
             let mark = x.Mark(range)
             match typeName with
             | SynType.LongIdent(lid) -> x.ProcessLongIdentifier(lid.Lid)
@@ -380,7 +386,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
 
             x.Done(range, mark, ElementType.NAMED_TYPE_EXPRESSION)
 
-        | SynType.LongIdentApp(_,_,ltRange,typeArgs,_,gtRange,_) ->
+        | SynType.LongIdentApp(_, _, ltRange, typeArgs, _, gtRange, _) ->
             let mark = x.Mark(range)
             match ltRange, gtRange with
             | Some ltRange, Some gtRange -> x.ProcessTypeArgs(ltRange, typeArgs, gtRange)
@@ -388,7 +394,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
 
             x.Done(range, mark, ElementType.NAMED_TYPE_EXPRESSION)
 
-        | SynType.Tuple (_,types,_) ->
+        | SynType.Tuple (_, types, _) ->
             for _, t in types do
                 x.ProcessSynType(t)
 
@@ -396,16 +402,16 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
             for _, t in fields do
                 x.ProcessSynType(t)
 
-        | SynType.StaticConstantNamed(t1,t2,_)
-        | SynType.MeasureDivide(t1,t2,_)
-        | SynType.Fun(t1,t2,_) ->
+        | SynType.StaticConstantNamed(t1, t2, _)
+        | SynType.MeasureDivide(t1, t2, _)
+        | SynType.Fun(t1, t2, _) ->
             x.ProcessSynType(t1)
             x.ProcessSynType(t2)
 
-        | SynType.WithGlobalConstraints(t,_,_)
-        | SynType.HashConstraint(t,_)
-        | SynType.MeasurePower(t,_,_)
-        | SynType.Array(_,t,_) ->
+        | SynType.WithGlobalConstraints(t, _, _)
+        | SynType.HashConstraint(t, _)
+        | SynType.MeasurePower(t, _, _)
+        | SynType.Array(_, t, _) ->
             x.ProcessSynType(t)
 
         | SynType.Var _ ->
