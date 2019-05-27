@@ -1071,24 +1071,24 @@ type FSharpItemsContainerRefresher(lifetime: Lifetime, solution: ISolution, view
 
     let refresh projectMark getFolders =
         use lock = solution.Locks.UsingReadLock()
-        tryGetProject projectMark
-        |> Option.iter (fun project ->
-            for projectFolder in getFolders project do
-                solution.Locks.QueueReadLock(lifetime, "Refresh View", fun _ ->
-                    match solution.TryGetComponent<ProjectModelAppender>() with
-                    | null -> ()
-                    | appender -> appender.Refresh(projectFolder)))
+        solution.Locks.QueueReadLock(lifetime, "Refresh View", fun _ ->
+            tryGetProject projectMark
+            |> Option.iter (fun project ->
+                for projectFolder in getFolders project do
+                        match solution.TryGetComponent<ProjectModelAppender>() with
+                        | null -> ()
+                        | appender -> appender.Refresh(projectFolder)))
 
     let update projectMark path viewItemCtor =
         use lock = solution.Locks.UsingReadLock()
-        tryGetProject projectMark
-        |> Option.iter (fun project ->
-            for projectItem in project.FindProjectItemsByLocation(path) do
-                match viewItemCtor projectItem with
-                | None -> ()
-                | Some viewItem ->
+        solution.Locks.QueueReadLock(lifetime, "Update Items View", fun _ ->
+            tryGetProject projectMark
+            |> Option.iter (fun project ->
+                for projectItem in project.FindProjectItemsByLocation(path) do
+                    match viewItemCtor projectItem with
+                    | None -> ()
+                    | Some viewItem ->
 
-                solution.Locks.QueueReadLock(lifetime, "Refresh View", fun _ ->
                     if solution.GetComponent<FSharpItemsContainer>().IsValid(viewItem) then
                         viewHost.UpdateItemIfExists(viewItem)))
 
@@ -1101,10 +1101,14 @@ type FSharpItemsContainerRefresher(lifetime: Lifetime, solution: ISolution, view
             refresh projectMark (fun project -> project.FindProjectItemsByLocation(folder).OfType<IProjectFolder>()) 
     
         member x.UpdateFile(projectMark, path) =
-            update projectMark path (function | ProjectFile x -> Some (FSharpViewFile(x)) | _ -> None)
+            update projectMark path (function
+                | ProjectFile file -> Some(FSharpViewFile(file))
+                | _ -> None)
 
         member x.UpdateFolder(projectMark, path, id) =
-            update projectMark path (function | ProjectFolder x -> Some (FSharpViewFolder (x, id)) | _ -> None)
+            update projectMark path (function
+                | ProjectFolder folder -> Some(FSharpViewFolder(folder, id))
+                | _ -> None)
 
         member x.ReloadProject(projectMark) =
             let opName = sprintf "Reload %O after FSharpItemsContainer change" projectMark
