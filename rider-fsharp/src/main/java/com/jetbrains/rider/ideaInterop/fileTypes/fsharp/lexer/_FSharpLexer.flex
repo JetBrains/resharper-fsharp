@@ -30,6 +30,7 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
 %{
   private int zzNestedCommentLevel = 0;
   private int zzParenLevel = 0;
+  private int zzBrackLevel = 0;
 %}
 
 %{
@@ -44,6 +45,10 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
 
   private IElementType FindReservedKeywordByCurrentToken() {
     return FSharpReservedKeywordsMap.findKeyword(zzBuffer, zzStartRead, zzMarkedPos);
+  }
+
+  private int zzLevel() {
+    return zzParenLevel + zzBrackLevel;
   }
 
   private void initBlockComment() {
@@ -89,8 +94,19 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
     return makeToken(tokenType);
   }
 
+  private void checkGreatRBrack(int state, int finalState) {
+    if (zzBrackLevel > 0) {
+      zzBrackLevel--;
+      yybegin(SYMBOLIC_OPERATOR);
+    }
+    else {
+      initSmashAdjacent(state, finalState);
+    }
+  }
+
   private void initSmashAdjacent(int state, int finalState) {
-    if (--zzParenLevel <= 0) {
+    zzParenLevel--;
+    if (zzLevel() <= 0) {
       yybegin(finalState);
     }
     else {
@@ -98,16 +114,27 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
     }
   }
 
-  private void deepIntoParenLevel() {
-    if (++zzParenLevel > 1 && yystate() == INIT_ADJACENT_TYAPP)
+  private void deepInto()
+  {
+    if (zzLevel() > 1 && yystate() == INIT_ADJACENT_TYAPP)
       yybegin(ADJACENT_TYAPP);
+  }
+
+  private void deepIntoParenLevel() {
+    zzParenLevel++;
+    deepInto();
+  }
+
+  private void deepIntoBrackLevel() {
+    zzBrackLevel++;
+    deepInto();
   }
 
   private void riseFromParenLevel(int n) {
     zzParenLevel -= n;
-    if (zzParenLevel > 1) {
+    if (zzLevel() > 1) {
       yybegin(ADJACENT_TYAPP);
-    } else if (zzParenLevel <= 0) {
+    } else if (zzLevel() <= 0) {
       yybegin(LINE);
     } else {
       yybegin(INIT_ADJACENT_TYAPP);
@@ -122,6 +149,7 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
       yypushback(1);
     }
     zzParenLevel = 0;
+    zzBrackLevel = 0;
     yybegin(INIT_ADJACENT_TYAPP);
   }
 
@@ -129,7 +157,7 @@ import static com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpToken
   {
     zzParenLevel -= yylength();
     yypushback(yylength());
-    if (zzParenLevel > 0) {
+    if (zzLevel() > 0) {
       yybegin(SYMBOLIC_OPERATOR);
     }
     else {

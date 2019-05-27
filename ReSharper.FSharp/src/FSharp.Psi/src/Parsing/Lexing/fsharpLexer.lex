@@ -215,12 +215,12 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {LESS}                        { deepIntoParenLevel(); return makeToken(LESS); }
 <INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {LPAREN}                      { deepIntoParenLevel(); return makeToken(LPAREN); }
 <INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {LBRACK}                      { deepIntoParenLevel(); return makeToken(LBRACK); }
-<INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {LBRACK_LESS}                 { deepIntoParenLevel(); return makeToken(LBRACK_LESS); }
+<INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {LBRACK_LESS}                 { deepIntoBrackLevel(); return makeToken(LBRACK_LESS); }
 <INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> ({GREATER})+                  { riseFromParenLevel(yylength()); yypushback(yylength()); yybegin(GREATER_OP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
 <INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> "</"                          { deepIntoParenLevel(); yypushback(2); yybegin(SMASH_ADJACENT_LESS_OP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break;}
 <INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {RPAREN}                      { riseFromParenLevel(1); return makeToken(RPAREN); }
 <INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {RBRACK}                      { riseFromParenLevel(1); return makeToken(RBRACK); }
-<INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {GREATER_RBRACK}              { yypushback(yylength()); initSmashAdjacent(SMASH_ADJACENT_GREATER_RBRACK, SMASH_ADJACENT_GREATER_RBRACK_FIN); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
+<INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {GREATER_RBRACK}              { yypushback(yylength()); checkGreatRBrack(SMASH_ADJACENT_GREATER_RBRACK, SMASH_ADJACENT_GREATER_RBRACK_FIN); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
 <INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> {GREATER_BAR_RBRACK}          { yypushback(yylength()); initSmashAdjacent(SMASH_ADJACENT_GREATER_BAR_RBRACK, SMASH_ADJACENT_GREATER_BAR_RBRACK_FIN); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
 <INIT_ADJACENT_TYAPP, ADJACENT_TYAPP> ({GREATER})+{BAD_SYMBOLIC_OP} { yypushback(yylength()); yybegin(ADJACENT_TYPE_CLOSE_OP); clear(out yy_lookahead, out yy_anchor, out yy_state, out yy_next_state, out yy_last_accept_state, out yy_initial, out yy_this_accept); break; }
 

@@ -23,11 +23,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
     private TokenNodeType currTokenType;
     private readonly ReusableBufferRange myBuffer = new ReusableBufferRange();
     protected static readonly LexerDictionary<TokenNodeType> keywords = new LexerDictionary<TokenNodeType>();
-    
+
     private int zzNestedCommentLevel;
     private int zzParenLevel;
     private int zzTokenLength;
-    
+    private int zzBrackLevel;
+
     static FSharpLexerGenerated()
     {
       foreach (var nodeType in FSharpTokenType.Keywords)
@@ -58,7 +59,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
         yy_buffer_end = yy_buffer_index;
       }
     }
-    
+
     private TokenNodeType FindKeywordByCurrentToken()
     {
       return keywords.GetValueSafe(myBuffer, yy_buffer, yy_buffer_start, yy_buffer_end);
@@ -73,7 +74,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
     {
       zzTokenLength = 0;
     }
-    
+
     private void increaseTokenLength(int n)
     {
       zzTokenLength += n;
@@ -90,6 +91,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
       yy_buffer_index -= n;
       yy_buffer_end -= n;
     }
+
+    private int zzLevel => zzParenLevel + zzBrackLevel;
 
     private void initBlockComment()
     {
@@ -144,31 +147,58 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
       zzNestedCommentLevel = 0;
       return setTokenLength(tokenType);
     }
-  
+
+    private void checkGreatRBrack(int state, int finalState)
+    {
+      if (zzBrackLevel > 0)
+      {
+        zzBrackLevel--;
+        yybegin(SYMBOLIC_OPERATOR);
+      }
+      else
+      {
+        initSmashAdjacent(state, finalState);
+      }
+    }
     private void initSmashAdjacent(int state, int finalState)
     {
-      if (--zzParenLevel <= 0) {
+      zzParenLevel--;
+      if (zzLevel <= 0)
+      {
         yybegin(finalState);
       }
-      else {
+      else
+      {
         yybegin(state);
       }
     }
-  
-    private void deepIntoParenLevel()
+
+    private void deepInto()
     {
-      if (++zzParenLevel > 1 && yy_lexical_state == INIT_ADJACENT_TYAPP)
+      if (zzLevel > 1 && yy_lexical_state == INIT_ADJACENT_TYAPP)
         yybegin(ADJACENT_TYAPP);
     }
-  
+
+    private void deepIntoParenLevel()
+    {
+      zzParenLevel++;
+      deepInto();
+    }
+
+    private void deepIntoBrackLevel()
+    {
+      zzBrackLevel++;
+      deepInto();
+    }
+
     private void riseFromParenLevel(int n)
     {
       zzParenLevel -= n;
-      if (zzParenLevel > 1)
+      if (zzLevel > 1)
       {
         yybegin(ADJACENT_TYAPP);
       }
-      else if (zzParenLevel <= 0)
+      else if (zzLevel <= 0)
       {
         yybegin(LINE);
       }
@@ -177,7 +207,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
         yybegin(INIT_ADJACENT_TYAPP);
       }
     }
-  
+
     private void initAdjacentTypeApp()
     {
       if (yytext()[yylength() - 1] == '/')
@@ -189,14 +219,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
         yypushback(1);
       }
       zzParenLevel = 0;
+      zzBrackLevel = 0;
       yybegin(INIT_ADJACENT_TYAPP);
     }
-  
+
     private void adjacentTypeCloseOp()
     {
       zzParenLevel -= yylength();
       yypushback(yylength());
-      if (zzParenLevel > 0)
+      if (zzLevel > 0)
       {
         yybegin(SYMBOLIC_OPERATOR);
       }
@@ -205,7 +236,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
         yybegin(GREATER_OP_SYMBOLIC_OP);
       }
     }
-  
+
     private void exitSmash(int state)
     {
       if (yy_lexical_state == state)
@@ -217,7 +248,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
         riseFromParenLevel(0);
       }
     }
-  
+
     private void initSmash(int initState, int anotherState)
     {
       if (yy_lexical_state == LINE)
@@ -229,7 +260,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
         yybegin(anotherState);
       }
     }
-  
+
     private void exitGreaterOp()
     {
       if (yy_lexical_state == GREATER_OP)
@@ -241,12 +272,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
         yybegin(SYMBOLIC_OPERATOR);
       }
     }
-    
+
     public void Start()
     {
       Start(0, yy_buffer.Length, YYINITIAL);
     }
-    
+
     public void Start(int startOffset, int endOffset, uint state)
     {
       yy_buffer_index = startOffset;
@@ -388,5 +419,4 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.Lexing
       return state;
     }
   }
-  
 }
