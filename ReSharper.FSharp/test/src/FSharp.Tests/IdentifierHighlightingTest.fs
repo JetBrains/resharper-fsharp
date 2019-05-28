@@ -1,13 +1,15 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 
 open NUnit.Framework
+open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Highlightings
 
 type IdentifierHighlightingTest() =
     inherit FSharpHighlightingTestBase()
 
     override x.RelativeTestDataPath = "features/daemon/identifierHighlighting"
 
-    override x.HighlightingPredicate(_, _, _) = true
+    override x.HighlightingPredicate(highlighting, _, _) =
+        highlighting :? FSharpIdentifierHighlighting
 
     [<Test>] member x.``Backticks 01``() = x.DoNamedTest()
 
