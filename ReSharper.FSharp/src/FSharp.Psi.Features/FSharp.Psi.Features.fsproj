@@ -27,6 +27,7 @@
     <Compile Include="src\Daemon\Stages\UnusedOpensStage.fs" />
     <Compile Include="src\Daemon\Stages\FormatSpecifiersStage.fs" />
     <Compile Include="src\Daemon\Stages\FSharpInheritedMembersHighlighterStage.fs" />
+    <Compile Include="src\Daemon\Stages\FSharpVcsCodeVisionRangesProviderStage.fs" />
     <Compile Include="src\Daemon\UsageChecking\FSharpUsageCheckingService.fs" />
     <Compile Include="src\Daemon\Analyzers\ReSpellerHelper.fs" />
     <Compile Include="src\Daemon\Analyzers\StringProblemsAnalyzer.fs" />
