@@ -139,9 +139,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         }
 
         var mfvXmlDocId = GetXmlDocId(mfv);
-        return mfv.IsExtensionMember
-          ? members.FirstOrDefault(m => m is IFSharpMember fsMember && fsMember.Mfv?.XmlDocSig == mfvXmlDocId)
-          : members.FirstOrDefault(m => m.XMLDocId == mfvXmlDocId);
+        return members.FirstOrDefault(member =>
+          member is IFSharpMember fsMember && fsMember.Mfv?.XmlDocSig == mfvXmlDocId || 
+          member.XMLDocId == mfvXmlDocId);
       }
 
       if (symbol is FSharpUnionCase unionCase)
