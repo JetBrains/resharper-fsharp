@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
+open System.Collections.Generic
 open FSharp.Compiler.Ast
 open FSharp.Compiler.PrettyNaming
 open FSharp.Compiler.Range
@@ -8,12 +9,17 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 
-type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projectedOffset) =
+type FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projectedOffset) =
     inherit FSharpTreeBuilderBase(sourceFile, lexer, lifetime, projectedOffset)
+
+    let nextSteps = Stack<ITreeBuilderStep>()
 
     new (sourceFile, lexer, decls, lifetime) =
         FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, 0) 
+
+    member x.NextSteps = nextSteps
 
     override x.CreateFSharpFile() =
         let mark = x.Mark()
@@ -109,7 +115,7 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
                     ElementType.UNION_DECLARATION
 
                 | SynTypeDefnSimpleRepr.TypeAbbrev(_, synType, _) ->
-                    x.ProcessSynType(synType)
+                    x.ProcessType(synType)
                     ElementType.TYPE_ABBREVIATION_DECLARATION
 
                 | SynTypeDefnSimpleRepr.None _ ->
@@ -161,12 +167,12 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
                     ElementType.IMPLICIT_CONSTRUCTOR_DECLARATION
 
                 | SynMemberDefn.ImplicitInherit(baseType, args, _, _) ->
-                    x.ProcessSynType(baseType)
+                    x.ProcessType(baseType)
                     x.MarkChameleonExpression(args)
                     ElementType.TYPE_INHERIT
 
                 | SynMemberDefn.Interface(interfaceType, interfaceMembersOpt , _) ->
-                    x.ProcessSynType(interfaceType)
+                    x.ProcessType(interfaceType)
                     match interfaceMembersOpt with
                     | Some members ->
                         for m in members do
@@ -175,7 +181,7 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
                     ElementType.INTERFACE_IMPLEMENTATION
 
                 | SynMemberDefn.Inherit(baseType, _, _) ->
-                    try x.ProcessSynType(baseType)
+                    try x.ProcessType(baseType)
                     with _ -> () // Getting type range throws an exception if base type lid is empty.
                     ElementType.INTERFACE_INHERIT
 
@@ -221,7 +227,7 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
                     ElementType.VAL_FIELD
 
                 | SynMemberDefn.AutoProperty(_, _, _, _, _, _, _, _, expr, _, _) ->
-                    x.ProcessExpression(expr)
+                    x.MarkChameleonExpression(expr)
                     ElementType.AUTO_PROPERTY
 
                 | _ -> ElementType.OTHER_TYPE_MEMBER
@@ -238,7 +244,7 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
         x.AdvanceToTokenOrOffset(FSharpTokenType.COLON, startOffset, range)
 
         let mark = x.Mark()
-        x.ProcessSynType(returnType)
+        x.ProcessType(returnType)
         x.Done(range, mark, ElementType.RETURN_TYPE_INFO)
 
     member x.ProcessMemberDeclaration(typeParamsOpt, memberParams, returnInfo, expr, range) =
@@ -332,7 +338,7 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
                 ElementType.RECORD_PAT
 
             | SynPat.IsInst(typ, _) ->
-                x.ProcessSynType(typ)
+                x.ProcessType(typ)
                 ElementType.IS_INST_PAT
 
             | SynPat.Wild _ ->
@@ -379,20 +385,16 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
 
         let mark = x.Mark(range)
 
+        // Replace all tokens with single chameleon token.
         let tokenMark = x.Mark(range)
         x.AdvanceToEnd(range)
         x.Builder.AlterToken(tokenMark, FSharpTokenType.CHAMELEON)
 
         x.Done(range, mark, ChameleonExpressionNodeType.Instance, expr)
 
-    member x.MarkOtherExpression(ExprRange range as expr) =
-        let mark = x.Mark(range)
-        x.ProcessExpression(expr)
-        x.Done(range, mark, ElementType.OTHER_EXPR)
-
     member x.MarkOtherType(TypeRange range as typ) =
         let mark = x.Mark(range)
-        x.ProcessSynType(typ)
+        x.ProcessType(typ)
         x.Done(range, mark, ElementType.OTHER_TYPE)
 
     member x.ProcessTopLevelBinding(Binding(_, kind, _, _, attrs, _, _ , headPat, returnInfo, expr, _, _) as binding) =
@@ -433,23 +435,46 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
                 x.ProcessAttributes(attrs)
                 mark
 
+        x.PushRangeForMark(binding.RangeOfBindingAndRhs, mark, ElementType.LOCAL_BINDING)
         x.ProcessPat(headPat, true, true)
         x.ProcessReturnInfo(returnInfo)
         x.ProcessExpression(expr)
 
-        x.Done(binding.RangeOfBindingAndRhs, mark, ElementType.LOCAL_BINDING)
+    member x.PushRange(range: range, elementType) =
+        x.PushRangeForMark(range, x.Mark(range), elementType)
+
+    member x.PushRangeForMark(range, mark, elementType) =
+        nextSteps.Push(EndRangeStep(range, mark, elementType))
+
+    member x.PushRangeAndProcessExpression(expr, range, elementType) =
+        x.PushRange(range, elementType)
+        x.ProcessExpression(expr)
+
+    member x.PushType(synType) =
+        nextSteps.Push(ProcessTypeStep(synType))
+
+    member x.PushLondIdentifier(lid) =
+        nextSteps.Push(ProcessLidStep(lid))
+
+    member x.PushExpression(synExpr) =
+        nextSteps.Push(ProcessExpressionStep(synExpr))
+
+    member x.PushExpressionList(exprs: SynExpr list) =
+        nextSteps.Push(ExpressionListStep(exprs))
+
+    member x.ProcessTopLevelExpression(expr) =
+        x.ProcessExpression(expr)
+
+        while nextSteps.Count > 0 do
+            nextSteps.Peek().DoStep(x, nextSteps)
 
     member x.ProcessExpression(ExprRange range as expr) =
         match expr with
         | SynExpr.Paren(expr, _, _, _) ->
-            let mark = x.Mark(range)
-            x.ProcessExpression(expr)
-            x.Done(range, mark, ElementType.PAREN_EXPR)
+            x.PushRangeAndProcessExpression(expr, range, ElementType.PAREN_EXPR)
 
         | SynExpr.Quote(_, _, expr, _, _) ->
-            let mark = x.Mark(range)
-            x.ProcessExpression(expr)
-            x.Done(range, mark, ElementType.QUOTE_EXPR)
+            x.PushRangeAndProcessExpression(expr, range, ElementType.QUOTE_EXPR)
 
         | SynExpr.Const(_, _) ->
             x.MarkAndDone(range, ElementType.CONST_EXPR)
@@ -458,181 +483,154 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
             Assertion.Assert(rangeContainsRange range synType.Range,
                              "rangeContainsRange range synType.Range; {0}; {1}", range, synType.Range)
 
-            let mark = x.Mark(range)
+            x.PushRange(range, ElementType.TYPED_EXPR)
+            x.PushType(synType)
             x.ProcessExpression(expr)
-            x.ProcessSynType(synType)
-            x.Done(range, mark, ElementType.TYPED_EXPR)
 
-        | SynExpr.Tuple(_, exprs, _, _) ->
-            x.MarkListExpr(exprs, range, ElementType.TUPLE_EXPR)
+        | SynExpr.Tuple(isStruct, exprs, _, _) ->
+            let tupleRangeStart = x.GetStartOffset(range)
+            if isStruct then
+                x.AdvanceToTokenOrOffset(FSharpTokenType.STRUCT, tupleRangeStart, range)
+            else
+                x.AdvanceToOffset(tupleRangeStart)
+
+            x.PushRangeForMark(range, x.Mark(), ElementType.TUPLE_EXPR)
+            x.ProcessListExpr(exprs)
 
         | SynExpr.ArrayOrList(_, exprs, _) ->
             x.MarkListExpr(exprs, range, ElementType.ARRAY_OR_LIST_EXPR)
 
         | SynExpr.AnonRecd(_, copyInfo, fields, _) ->
-            let mark = x.Mark(range)
+            x.PushRange(range, ElementType.ANON_RECD_EXPR)
+
             match copyInfo with
-            | Some(expr, _) -> x.MarkOtherExpression(expr)
+            | Some(expr, _) -> x.ProcessExpression(expr)
             | _ -> ()
 
             for IdentRange idRange, expr in fields do
                 let mark = x.Mark(idRange)
-                x.MarkOtherExpression(expr)
+                x.ProcessExpression(expr)
                 x.Done(mark, ElementType.RECORD_EXPR_BINDING)
-            x.Done(range, mark, ElementType.ANON_RECD_EXPR)
-        
+
         | SynExpr.Record(_, copyInfo, fields, _) ->
-            let mark = x.Mark(range)
+            x.PushRange(range, ElementType.RECORD_EXPR)
+            nextSteps.Push(RecordFieldExprListStep(fields))
             match copyInfo with
-            | Some(expr, _) ->
-                x.MarkOtherExpression(expr)
+            | Some(expr, _) -> x.ProcessExpression(expr)
             | _ -> ()
 
-            for (lid, _), expr, _ in fields do
-                let lid = lid.Lid
-                match lid, expr with
-                | [], None -> ()
-                | [], Some(ExprRange range as expr) ->
-                    let mark = x.Mark(range)
-                    x.MarkOtherExpression(expr)
-                    x.Done(mark, ElementType.RECORD_EXPR_BINDING)
-
-                | IdentRange headRange :: _, expr ->
-                    let mark = x.Mark(headRange)
-                    x.ProcessLongIdentifier(lid)
-                    if expr.IsSome then
-                        x.MarkOtherExpression(expr.Value)
-                    x.Done(mark, ElementType.RECORD_EXPR_BINDING)
-            x.Done(range, mark, ElementType.RECORD_EXPR)
-
         | SynExpr.New(_, synType, expr, _) ->
-            let mark = x.Mark(range)
-            x.ProcessSynType(synType)
+            x.PushRange(range, ElementType.NEW_EXPR)
+            x.ProcessType(synType)
             x.ProcessExpression(expr)
-            x.Done(range, mark, ElementType.NEW_EXPR)
 
-        | SynExpr.ObjExpr(t, args, bindings, interfaceImpls, _, _) ->
-            let mark = x.Mark(range)
-            x.ProcessSynType(t)
+        | SynExpr.ObjExpr(synType, args, bindings, interfaceImpls, _, _) ->
+            x.PushRange(range, ElementType.OBJ_EXPR)
+            x.ProcessType(synType)
+            nextSteps.Push(InterfaceImplementationListStep(interfaceImpls))
+            nextSteps.Push(BindingListStep(bindings))
+
             match args with
             | Some(expr, _) -> x.ProcessExpression(expr)
             | _ -> ()
 
-            for binding in bindings do
-                x.ProcessLocalBinding(binding)
-
-            for InterfaceImpl(interfaceType,bindings,range) in interfaceImpls do
-                let mark = x.Mark(range)
-                x.ProcessSynType(interfaceType)
-                for binding in bindings do
-                    x.ProcessLocalBinding(binding)
-                x.Done(range, mark, ElementType.OBJ_EXPR_SECONDARY_INTERFACE)
-
-            x.Done(range, mark, ElementType.OBJ_EXPR)
-
         | SynExpr.While(_, whileExpr, doExpr, _) ->
-            let mark = x.Mark(range)
+            x.PushRange(range, ElementType.WHILE_EXPR)
+            x.PushExpression(doExpr)
             x.ProcessExpression(whileExpr)
-            x.ProcessExpression(doExpr)
-            x.Done(range, mark, ElementType.WHILE_EXPR)
 
-        | SynExpr.For(_, id, idBody, _, toBody, doBody , _) ->
-            let mark = x.Mark(range)
+        | SynExpr.For(_, id, idBody, _, toBody, doBody, _) ->
+            x.PushRange(range, ElementType.FOR_EXPR)
+            x.PushExpression(doBody)
+            x.PushExpression(toBody)
             x.ProcessLocalId(id)
             x.ProcessExpression(idBody)
-            x.ProcessExpression(toBody)
-            x.ProcessExpression(doBody)
-            x.Done(range, mark, ElementType.FOR_EXPR)
 
         | SynExpr.ForEach(_, _, _, pat, enumExpr, bodyExpr, _) ->
-            let mark = x.Mark(range)
+            x.PushRange(range, ElementType.FOR_EACH_EXPR)
             x.ProcessPat(pat, true, false)
+            x.PushExpression(bodyExpr)
             x.ProcessExpression(enumExpr)
-            x.ProcessExpression(bodyExpr)
-            x.Done(range, mark, ElementType.FOR_EACH_EXPR)
 
         | SynExpr.ArrayOrListOfSeqExpr(_, expr, _) ->
-            let mark = x.Mark(range)
-            x.ProcessExpression(expr)
-            x.Done(range, mark, ElementType.ARRAY_OR_LIST_OF_SEQ_EXPR)
+            x.PushRangeAndProcessExpression(expr, range, ElementType.ARRAY_OR_LIST_OF_SEQ_EXPR)
 
         | SynExpr.CompExpr(_, _, expr, _) ->
-            let mark = x.Mark(range)
-            x.ProcessExpression(expr)
-            x.Done(range, mark, ElementType.COMP_EXPR)
+            x.PushRangeAndProcessExpression(expr, range, ElementType.COMP_EXPR)
 
-        | SynExpr.Lambda _ ->
-            x.MarkLambdaExpr(expr)
+        | SynExpr.Lambda(_, inLambdaSeq, _, bodyExpr, _) ->
+            // Lambdas get "desugared" by converting to fake nested lambdas and match expressions.
+            // Simple patterns like ids are preserved in lambdas and more complex ones are replaced
+            // with generated placeholder patterns and go to generated match expressions inside lambda bodies.
+
+            // Generated match expression have have a single generated clause with a generated id pattern.
+            // Their ranges overlap with lambda param pattern ranges and they have the same start pos as lambdas. 
+
+            Assertion.Assert(not inLambdaSeq, "Expecting non-generated lambda expression, got:\n{0}", expr)
+            x.PushRange(range, ElementType.LAMBDA_EXPR)
+
+            let skippedLambdas = skipGeneratedLambdas bodyExpr
+            x.MarkLambdaParams(expr, skippedLambdas, true)
+            x.ProcessExpression(skipGeneratedMatch skippedLambdas)
 
         | SynExpr.MatchLambda(_, _, clauses, _, _) ->
-            let mark = x.Mark(range)
-            for clause in clauses do
-                x.ProcessMatchClause(clause)
-            x.Done(range, mark, ElementType.MATCH_LAMBDA_EXPR)
+            x.PushRange(range, ElementType.MATCH_LAMBDA_EXPR)
+            x.ProcessMatchClauses(clauses)
 
         | SynExpr.Match(_, expr, clauses, _) ->
             x.MarkMatchExpr(range, expr, clauses)
 
         | SynExpr.Do(expr, _) ->
-            let mark = x.Mark(range)
-            x.ProcessExpression(expr)
-            x.Done(range, mark, ElementType.DO_EXPR)
+            x.PushRangeAndProcessExpression(expr, range, ElementType.DO_EXPR)
 
         | SynExpr.Assert(expr, _) ->
-            let mark = x.Mark(range)
-            x.ProcessExpression(expr)
-            x.Done(range, mark, ElementType.ASSERT_EXPR)
+            x.PushRangeAndProcessExpression(expr, range, ElementType.ASSERT_EXPR)
 
         | SynExpr.App(_, isInfix, funcExpr, argExpr, _) ->
             // todo: mark separate nodes for infix apps
-            let mark = x.Mark(range)
+            x.PushRange(range, ElementType.APP_EXPR)
             if isInfix then
+                x.PushExpression(funcExpr)
                 x.ProcessExpression(argExpr)
-                x.ProcessExpression(funcExpr)
             else
+                x.PushExpression(argExpr)
                 x.ProcessExpression(funcExpr)
-                x.ProcessExpression(argExpr)
-            x.Done(range, mark, ElementType.APP_EXPR)
 
-        | SynExpr.TypeApp(expr, lt, typeArgs, _, rt, _, r) ->
+        | SynExpr.TypeApp(expr, lessRange, typeArgs, _, greaterRangeOpt, _, _) ->
+            x.PushRange(range, ElementType.TYPE_APP_EXPR)
             x.ProcessExpression(expr)
-            let mark = x.Mark(lt)
-            for t in typeArgs do x.ProcessSynType t
-            let endRange = if rt.IsSome then rt.Value else r
+
+            let mark = x.Mark(lessRange)
+            for synType in typeArgs do
+                x.ProcessType(synType)
+
+            let endRange = if greaterRangeOpt.IsSome then greaterRangeOpt.Value else range
             x.Done(endRange, mark, ElementType.TYPE_ARGUMENT_LIST)
 
         | SynExpr.LetOrUse(_, _, bindings, bodyExpr, _) ->
-            let mark = x.Mark(range)
-            for binding in bindings do
-                x.ProcessLocalBinding(binding)
-            x.ProcessExpression(bodyExpr)
-            x.Done(range, mark, ElementType.LET_OR_USE_EXPR)
+            x.PushRange(range, ElementType.LET_OR_USE_EXPR)
+            x.PushExpression(bodyExpr)
+            x.ProcessBindings(bindings)
 
         | SynExpr.TryWith(tryExpr, _, withCases, _, _, _, _) ->
-            let mark = x.Mark(range)
+            x.PushRange(range, ElementType.TRY_WITH_EXPR)
+            nextSteps.Push(MatchClauseListStep(withCases))
             x.ProcessExpression(tryExpr)
-            for case in withCases do
-                x.ProcessMatchClause(case)
-            x.Done(range, mark, ElementType.TRY_WITH_EXPR)
 
         | SynExpr.TryFinally(tryExpr, finallyExpr, _, _, _) ->
-            let mark = x.Mark(range)
+            x.PushRange(range, ElementType.TRY_FINALLY_EXPR)
+            x.PushExpression(finallyExpr)
             x.ProcessExpression(tryExpr)
-            x.ProcessExpression(finallyExpr)
-            x.Done(range, mark, ElementType.TRY_FINALLY_EXPR)
 
         | SynExpr.Lazy(expr, _) ->
-            let mark = x.Mark(range)
-            x.ProcessExpression(expr)
-            x.Done(range, mark, ElementType.LAZY_EXPR)
+            x.PushRangeAndProcessExpression(expr, range, ElementType.LAZY_EXPR)
 
         | SynExpr.IfThenElse(ifExpr, thenExpr, elseExprOpt, _, _, _, _) ->
-            let mark = x.Mark(range)
-            x.ProcessExpression(ifExpr)
-            x.ProcessExpression(thenExpr)
+            x.PushRange(range, ElementType.IF_THEN_ELSE_EXPR)
             if elseExprOpt.IsSome then
-                x.ProcessExpression(elseExprOpt.Value)
-            x.Done(range, mark, ElementType.IF_THEN_ELSE_EXPR)
+                x.PushExpression(elseExprOpt.Value)
+            x.PushExpression(thenExpr)
+            x.ProcessExpression(ifExpr)
 
         | SynExpr.Ident _ ->
             x.MarkAndDone(range, ElementType.IDENT_EXPR)
@@ -643,115 +641,97 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
             x.Done(range, mark, ElementType.LONG_IDENT_EXPR)
 
         | SynExpr.LongIdentSet(lid, expr, _) ->
-            let mark = x.Mark(range)
+            x.PushRange(range, ElementType.LONG_IDENT_SET_EXPR)
             x.ProcessLongIdentifier(lid.Lid)
-            x.MarkOtherExpression(expr)
-            x.Done(range, mark, ElementType.LONG_IDENT_SET_EXPR)
-
-        | SynExpr.DotGet(expr, _, _, _) ->
-            let mark = x.Mark(range)
             x.ProcessExpression(expr)
-            x.Done(range, mark, ElementType.DOT_GET_EXPR)
 
-        | SynExpr.DotSet(expr1, lid, expr2, _) ->
-            let mark = x.Mark(range)
-            x.MarkOtherExpression(expr1)
-            x.ProcessLongIdentifier(lid.Lid)
-            x.ProcessExpression(expr2)
-            x.Done(range, mark, ElementType.DOT_SET_EXPR)
+        | SynExpr.DotGet(expr, _, lidWithDots, _) ->
+            x.PushRange(range, ElementType.DOT_GET_EXPR)
+            x.PushLondIdentifier(lidWithDots.Lid)
+            x.ProcessExpression(expr)
+
+        | SynExpr.DotSet(expr1, lidWithDots, expr2, _) ->
+            x.PushRange(range, ElementType.DOT_SET_EXPR)
+            x.PushExpression(expr2)
+            x.PushLondIdentifier(lidWithDots.Lid)
+            x.PushExpression(expr1)
 
         | SynExpr.Set(expr1, expr2, _) ->
-            let mark = x.Mark(range)
+            x.PushRange(range, ElementType.EXPR_SET_EXPR)
+            x.PushExpression(expr2)
             x.ProcessExpression(expr1)
-            x.ProcessExpression(expr2)
-            x.Done(range, mark, ElementType.EXPR_SET_EXPR)
 
         | SynExpr.NamedIndexedPropertySet(_, expr1, expr2, _) ->
-            let mark = x.Mark(range)
+            x.PushRange(range, ElementType.NAMED_INDEXED_PROPERTY_SET)
+            x.PushExpression(expr2)
             x.ProcessExpression(expr1)
-            x.ProcessExpression(expr2)
-            x.Done(range, mark, ElementType.NAMED_INDEXED_PROPERTY_SET)
 
-        | SynExpr.DotNamedIndexedPropertySet(expr1, _, expr2, expr3, _) ->
-            let mark = x.Mark(range)
-            x.ProcessExpression(expr1)
-            x.ProcessExpression(expr2)
-            x.ProcessExpression(expr3)
-            x.Done(range, mark, ElementType.DOT_NAMED_INDEXED_PROPERTY_SET)
+        | SynExpr.DotNamedIndexedPropertySet(expr1, lidWithDots, expr2, expr3, _) ->
+            x.PushRange(range, ElementType.DOT_NAMED_INDEXED_PROPERTY_SET)
+            x.PushExpression(expr3)
+            x.PushExpression(expr2)
+            x.PushLondIdentifier(lidWithDots.Lid)
+            x.PushExpression(expr1)
 
         | SynExpr.DotIndexedGet(expr, indexerArgs, _, _) ->
-            let mark = x.Mark(range)
-            x.ProcessExpression(expr)
+            x.PushRange(range, ElementType.DOT_INDEXED_GET_EXPR)
+            x.ProcessExpression(expr) // todo
             for arg in indexerArgs do
                 x.ProcessIndexerArg(arg)
-            x.Done(range, mark, ElementType.DOT_INDEXED_GET_EXPR)
 
         | SynExpr.DotIndexedSet(expr1, indexerArgs, expr2, _, _ , _) ->
-            let mark = x.Mark(range)
+            x.PushRange(range, ElementType.DOT_INDEXED_SET_EXPR)
             x.ProcessExpression(expr1)
             // todo: mark indexer expressions
             for arg in indexerArgs do
                 x.ProcessIndexerArg(arg)
             x.ProcessExpression(expr2)
-            x.Done(range, mark, ElementType.DOT_INDEXED_SET_EXPR)
 
-        | SynExpr.TypeTest(expr, typ, _) ->
-            x.MarkTypeExpr(expr, typ, range, ElementType.TYPE_TEST_EXPR)
+        | SynExpr.TypeTest(expr, synType, _) ->
+            x.MarkTypeExpr(expr, synType, range, ElementType.TYPE_TEST_EXPR)
 
-        | SynExpr.Upcast(expr, typ, _) ->
-            x.MarkTypeExpr(expr, typ, range, ElementType.UPCAST_EXPR)
+        | SynExpr.Upcast(expr, synType, _) ->
+            x.MarkTypeExpr(expr, synType, range, ElementType.UPCAST_EXPR)
 
-        | SynExpr.Downcast(expr, typ, _) ->
-            x.MarkTypeExpr(expr, typ, range, ElementType.DOWNCAST_EXPR)
+        | SynExpr.Downcast(expr, synType, _) ->
+            x.MarkTypeExpr(expr, synType, range, ElementType.DOWNCAST_EXPR)
 
         | SynExpr.InferredUpcast(expr, _)
         | SynExpr.InferredDowncast(expr, _) ->
-            let mark = x.Mark(range)
-            x.ProcessExpression(expr)
-            x.Done(range, mark, ElementType.INFERRED_CAST_EXPR)
+            x.PushRangeAndProcessExpression(expr, range, ElementType.INFERRED_CAST_EXPR)
 
         | SynExpr.Null _ ->
             x.MarkAndDone(range, ElementType.NULL_EXPR)
 
         | SynExpr.AddressOf(_, expr, _, _) ->
-            let mark = x.Mark(range)
-            x.ProcessExpression(expr)
-            x.Done(range, mark, ElementType.ADDRESS_OF_EXPR)
+            x.PushRangeAndProcessExpression(expr, range, ElementType.ADDRESS_OF_EXPR)
 
         | SynExpr.TraitCall(_, _, expr, _) ->
-            let mark = x.Mark(range)
-            x.ProcessExpression(expr)
-            x.Done(range, mark, ElementType.TRAIT_CALL_EXPR)
+            x.PushRangeAndProcessExpression(expr, range, ElementType.TRAIT_CALL_EXPR)
 
         | SynExpr.JoinIn(expr1, _, expr2, _) ->
-            let mark = x.Mark(range)
+            x.PushRange(range, ElementType.JOIN_IN_EXPR)
+            x.PushExpression(expr2)
             x.ProcessExpression(expr1)
-            x.ProcessExpression(expr2)
-            x.Done(range, mark, ElementType.JOIN_IN_EXPR)
 
         | SynExpr.ImplicitZero _ ->
             x.MarkAndDone(range, ElementType.IMPLICIT_ZERO_EXPR)
 
         | SynExpr.YieldOrReturn(_, expr, _)
         | SynExpr.YieldOrReturnFrom(_, expr, _) ->
-            let mark = x.Mark(range)
-            x.ProcessExpression(expr)
-            x.Done(range, mark, ElementType.YIELD_OR_RETURN_EXPR)
+            x.PushRangeAndProcessExpression(expr, range, ElementType.YIELD_OR_RETURN_EXPR)
 
         | SynExpr.LetOrUseBang(_, _, _, pat, expr, inExpr, _) ->
-            let mark = x.Mark(range)
+            x.PushRange(range, ElementType.LET_OR_USE_BANG_EXPR)
             x.ProcessPat(pat, true, false)
+            x.PushExpression(inExpr)
             x.ProcessExpression(expr)
-            x.ProcessExpression(inExpr)
-            x.Done(range, mark, ElementType.LET_OR_USE_BANG_EXPR)
 
         | SynExpr.MatchBang(_, expr, clauses, _) ->
             x.MarkMatchExpr(range, expr, clauses)
 
         | SynExpr.DoBang(expr, _) ->
-            let mark = x.Mark(range)
-            x.ProcessExpression(expr)
-            x.Done(range, mark, ElementType.DO_EXPR)
+            x.PushRangeAndProcessExpression(expr, range, ElementType.DO_EXPR)
 
         | SynExpr.LibraryOnlyILAssembly _
         | SynExpr.LibraryOnlyStaticOptimization _
@@ -766,36 +746,13 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
             x.MarkAndDone(range, ElementType.FROM_ERROR_EXPR)
 
         | SynExpr.Fixed(expr, _) ->
-            let mark = x.Mark(range)
-            x.ProcessExpression(expr)
-            x.Done(range, mark, ElementType.FIXED_EXPR)
+            x.PushRangeAndProcessExpression(expr, range, ElementType.FIXED_EXPR)
 
         | SynExpr.Sequential(_, _, expr1, expr2, _) ->
             // todo: concat nested sequential expressions
-            let mark = x.Mark(range)
+            x.PushRange(range, ElementType.SEQUENTIAL_EXPR)
+            x.PushExpression(expr2)
             x.ProcessExpression(expr1)
-            x.ProcessExpression(expr2)
-            x.Done(range, mark, ElementType.SEQUENTIAL_EXPR)
-
-    member x.MarkLambdaExpr(ExprRange range as lambdaExpr) =
-        // Lambdas get "desugared" by being converted to fake nested lambdas and match expressions.
-        // Some patterns are preserved inside the generated lambdas and some patterns are replaced with
-        // generated placeholder patterns and go to generated match expressions inside lambda bodies.
-
-        // Simple patterns like ids are preserved and more complex patterns go to generated expressions.  
-
-        // Generated match expression have have a single generated clause with a generated id pattern and
-        // the same start pos as themselves. Their ranges also overlap with lambda param pattern ranges.
-
-        match lambdaExpr with
-        | SynExpr.Lambda(_, false, _, bodyExpr, _) ->
-            let mark = x.Mark(range)
-            let skippedLambdas = skipGeneratedLambdas bodyExpr
-            x.MarkLambdaParams(lambdaExpr, skippedLambdas, true)
-            x.ProcessExpression(skipGeneratedMatch skippedLambdas)
-            x.Done(range, mark, ElementType.LAMBDA_EXPR)
-
-        | _ -> failwithf "Expecting non-generated lambda expression, got:\n%A" lambdaExpr
 
     member x.MarkLambdaParams(expr, outerBodyExpr, topLevel) =
         match expr with
@@ -852,36 +809,174 @@ type internal FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projecte
                 x.MarkLambdaParam(pats, lambdaBody, outerBodyExpr)
     
     member x.MarkMatchExpr(range: range, expr, clauses) =
-        let mark = x.Mark(range)
+        x.PushRange(range, ElementType.MATCH_EXPR)
+        nextSteps.Push(MatchClauseListStep(clauses))
         x.ProcessExpression(expr)
-        for clause in clauses do
+
+    member x.ProcessMatchClauses(clauses) =
+        match clauses with
+        | [] -> ()
+        | [ clause ] ->
             x.ProcessMatchClause(clause)
-        x.Done(range, mark, ElementType.MATCH_EXPR)
 
-    member x.MarkListExpr(exprs, range, elementType) =
-        let mark = x.Mark(range)
-        for expr in exprs do
+        | clause :: clauses ->
+            nextSteps.Push(MatchClauseListStep(clauses))
+            x.ProcessMatchClause(clause)
+
+    member x.ProcessBindings(clauses) =
+        match clauses with
+        | [] -> ()
+        | [ binding ] ->
+            x.ProcessLocalBinding(binding)
+
+        | binding :: bindings ->
+            nextSteps.Push(BindingListStep(bindings))
+            x.ProcessLocalBinding(binding)
+    
+    member x.ProcessListExpr(exprs) =
+        match exprs with
+        | [] -> ()
+        | [ expr ] ->
             x.ProcessExpression(expr)
-        x.Done(range, mark, elementType)
 
-    member x.MarkTypeExpr(expr, typ, range, elementType) =
-        let mark = x.Mark(range)
-        x.MarkOtherExpression(expr)
-        x.MarkOtherType(typ)
-        x.Done(range, mark, elementType)
+        | [ expr1; expr2 ] ->
+            x.PushExpression(expr2)
+            x.ProcessExpression(expr1)
 
-    member x.ProcessMatchClause(Clause(pat, whenExpr, expr, _, _) as clause) =
+        | expr :: rest ->
+            x.PushExpressionList(rest)
+            x.ProcessExpression(expr)
+    
+    member x.ProcessInterfaceImplementation(InterfaceImpl(interfaceType, bindings, range)) =
+        x.PushRange(range, ElementType.OBJ_EXPR_SECONDARY_INTERFACE)
+        x.ProcessType(interfaceType)
+        x.ProcessBindings(bindings)
+
+    member x.ProcessAnonRecordFieldExpr(IdentRange idRange, (ExprRange range as expr)) =
+        let mark = x.Mark(idRange)
+        x.PushRangeForMark(range, mark, ElementType.RECORD_EXPR_BINDING)
+        x.ProcessExpression(expr)
+
+    member x.ProcessRecordFieldExpr(lid, expr) =
+        match lid, expr with
+        | [], None -> ()
+        | [], Some(ExprRange range as expr) ->
+            x.PushRangeAndProcessExpression(expr, range, ElementType.RECORD_EXPR_BINDING)
+
+        | IdentRange headRange :: _, expr ->
+            let mark = x.Mark(headRange)
+            x.PushRangeForMark(headRange, mark, ElementType.RECORD_EXPR_BINDING)
+            x.ProcessLongIdentifier(lid)
+            if expr.IsSome then
+                x.ProcessExpression(expr.Value)
+    
+    member x.MarkListExpr(exprs, range, elementType) =
+        x.PushRange(range, elementType)
+        x.ProcessListExpr(exprs)
+
+    member x.MarkTypeExpr(expr, synType, range, elementType) =
+        x.PushRange(range, elementType)
+        x.PushType(synType)
+        x.ProcessExpression(expr)
+
+    member x.ProcessMatchClause(Clause(pat, whenExprOpt, expr, _, _) as clause) =
         let range = clause.Range
         let mark = x.MarkTokenOrRange(FSharpTokenType.BAR, range)
+        x.PushRangeForMark(range, mark, ElementType.MATCH_CLAUSE)
 
         x.ProcessPat(pat, true, false)
-        match whenExpr with
-        | Some expr -> x.ProcessExpression(expr)
-        | _ -> ()
-
-        x.ProcessExpression(expr)
-        x.Done(range, mark, ElementType.MATCH_CLAUSE)
+        match whenExprOpt with
+        | Some whenExpr ->
+            x.PushExpression(expr)
+            x.ProcessExpression(whenExpr)
+        | _ ->
+            x.ProcessExpression(expr)
 
     member x.ProcessIndexerArg(arg) =
         for expr in arg.Exprs do
             x.ProcessExpression(expr)
+
+
+and ITreeBuilderStep =
+    abstract DoStep: FSharpImplTreeBuilder * Stack<ITreeBuilderStep> -> unit
+
+and ExpressionListStep(exprs) =
+    inherit ProcessListStepBase<SynExpr>(exprs)
+
+    override x.DoStep(builder, expr) =
+        builder.ProcessExpression(expr)
+
+and MatchClauseListStep(clauses) =
+    inherit ProcessListStepBase<SynMatchClause>(clauses)
+
+    override x.DoStep(builder, clause) =
+        builder.ProcessMatchClause(clause)
+
+and BindingListStep(bindings) =
+    inherit ProcessListStepBase<SynBinding>(bindings)
+
+    override x.DoStep(builder, binding) =
+        builder.ProcessLocalBinding(binding)
+
+and AnonRecordFieldExprListStep(fields) =
+    inherit ProcessListStepBase<Ident * SynExpr>(fields)
+
+    override x.DoStep(builder, field) =
+        builder.ProcessAnonRecordFieldExpr(field)
+
+and RecordFieldExprListStep(fields) =
+    inherit ProcessListStepBase<RecordFieldName * (SynExpr option) * BlockSeparator option>(fields)
+
+    override x.DoStep(builder, field) =
+        let (lid, _), expr, _ = field 
+        builder.ProcessRecordFieldExpr(lid.Lid, expr)
+
+and InterfaceImplementationListStep(interfaceImpls) =
+    inherit ProcessListStepBase<SynInterfaceImpl>(interfaceImpls)
+
+    override x.DoStep(builder, interfaceImpl) =
+        builder.ProcessInterfaceImplementation(interfaceImpl)
+
+and EndRangeStep(range: range, mark, elementType: NodeType) =
+    interface ITreeBuilderStep with
+        member x.DoStep(builder, nextSteps) =
+            nextSteps.Pop() |> ignore
+            builder.Done(range, mark, elementType)
+
+and ProcessExpressionStep(expr: SynExpr) =
+    interface ITreeBuilderStep with
+        member x.DoStep(builder, nextSteps) =
+            nextSteps.Pop() |> ignore
+            builder.ProcessExpression(expr)
+
+and ProcessTypeStep(synType: SynType) =
+    interface ITreeBuilderStep with
+        member x.DoStep(builder, nextSteps) =
+            nextSteps.Pop() |> ignore
+            builder.ProcessType(synType)
+
+and ProcessLidStep(lid: LongIdent) =
+    interface ITreeBuilderStep with
+        member x.DoStep(builder, nextSteps) =
+            nextSteps.Pop() |> ignore
+            builder.ProcessLongIdentifier(lid)
+
+and
+    [<AbstractClass>]
+    ProcessListStepBase<'T>(items: 'T list) =
+        let mutable items = items
+
+        abstract DoStep: FSharpImplTreeBuilder * 'T -> unit
+
+        interface ITreeBuilderStep with
+            member x.DoStep(builder, nextSteps) =
+                match items with
+                | [] -> nextSteps.Pop() |> ignore
+
+                | [ item ] ->
+                    nextSteps.Pop() |> ignore
+                    x.DoStep(builder, item)
+
+                | item :: rest ->
+                    items <- rest
+                    x.DoStep(builder, item)

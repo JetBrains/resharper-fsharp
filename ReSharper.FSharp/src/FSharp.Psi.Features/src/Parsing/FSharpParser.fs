@@ -52,5 +52,5 @@ type FSharpParser(lexer: ILexer, sourceFile: IPsiSourceFile, checkerService: FSh
 
                 // todo: cover error cases where fsImplFile or multiple expressions may be returned
                 let treeBuilder = FSharpImplTreeBuilder(sourceFile, lexer, [], lifetime, projectedOffset)
-                treeBuilder.ProcessExpression(chameleonExpr.SynExpr)
+                treeBuilder.ProcessTopLevelExpression(chameleonExpr.SynExpr)
                 treeBuilder.GetTreeNode()) :?> ISynExpr
