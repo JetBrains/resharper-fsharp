@@ -4,10 +4,13 @@ open System.IO
 open FSharp.Compiler.AbstractIL.Internal.Library
 open JetBrains.Lifetimes
 open JetBrains.ReSharper.Plugins.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.TestFramework
+open JetBrains.Util
 open NUnit.Framework
 
+[<FSharpTest>]
 type DelegatingFileSystemShimTest() =
     inherit BaseTest()
 
@@ -21,12 +24,15 @@ type DelegatingFileSystemShimTest() =
     [<Test>]
     member x.``Getting path request``() =
         x.DoTest(fun lifetime writer ->
+            use tempFolderCookie = TemporaryDirectoryCookie.CreateFolder()
             let shim = LoggingShim(shim1name, lifetime, writer)
-            Shim.FileSystem.GetLastWriteTimeShim(fakePath) |> ignore)
+            let path = tempFolderCookie.Path / fakePath
+            Shim.FileSystem.GetLastWriteTimeShim(path.FullPath) |> ignore)
 
     [<Test>]
     member x.``Multiple shims``() =
         x.DoTest(fun lifetime writer ->
+            use tempFolderCookie = TemporaryDirectoryCookie.CreateFolder()
             let shim1 = LoggingShim(shim1name, lifetime, writer)
 
             let lifetime2 = Lifetime.Define(lifetime).Lifetime
@@ -35,7 +41,8 @@ type DelegatingFileSystemShimTest() =
             let lifetime3 = Lifetime.Define(lifetime2).Lifetime
             let shim3 = LoggingShim(shim3name, lifetime3, writer)
 
-            Shim.FileSystem.GetLastWriteTimeShim(fakePath) |> ignore)
+            let path = tempFolderCookie.Path / fakePath
+            Shim.FileSystem.GetLastWriteTimeShim(path.FullPath) |> ignore)
 
     member x.DoTest(action: Lifetime -> TextWriter -> unit) =
         x.ExecuteWithGold(fun writer ->
@@ -57,9 +64,10 @@ type LoggingShim(name, lifetime: Lifetime, writer: TextWriter) =
     member x.Name = name
 
     override x.GetLastWriteTime(path) =
-        writer.WriteLine(sprintf "%s: Get last write time (path): %O" name path)
+        writer.WriteLine(sprintf "%s: Get last write time (path): %O" name path.Name)
         base.GetLastWriteTime(path)
 
     override x.GetLastWriteTimeShim(fileName) =
-        writer.WriteLine(sprintf "%s: Get last write time (string): %s" name fileName)
+        let path = FileSystemPath.Parse(fileName)
+        writer.WriteLine(sprintf "%s: Get last write time (string): %s" name path.Name)
         base.GetLastWriteTimeShim(fileName)
