@@ -284,7 +284,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
     member x.ProcessEnumCase(EnumCase(_, _, _, _, range)) =
         x.MarkAndDone(range, ElementType.ENUM_MEMBER_DECLARATION)
 
-    member x.ProcessField(Field(_, _, id, t, _, _, _, range)) elementType =
+    member x.ProcessField(Field(_, _, id, synType, _, _, _, range)) elementType =
         let mark =
             match id with
             | Some id ->
@@ -293,7 +293,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
             | None ->
                 x.Mark(range)
 
-        x.ProcessSynType t
+        x.ProcessType(synType)
         x.Done(range, mark, elementType)
 
     member x.ProcessLocalId(IdentRange range) =
@@ -308,7 +308,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         | SynSimplePat.Typed(SynSimplePat.Id(id, _, isCompilerGenerated, _, _, _), synType, _) ->
             if not isCompilerGenerated then
                 x.ProcessLocalId(id)
-            x.ProcessSynType(synType)
+            x.ProcessType(synType)
 
         | _ -> ()
 
@@ -316,13 +316,13 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         match pat with
         | SynSimplePat.Id(id, _, _, _, _, range) ->
             let mark = x.Mark(range)
-            x.ProcessLocalId id
+            x.ProcessLocalId(id)
             x.Done(range, mark,ElementType.MEMBER_PARAM)
 
-        | SynSimplePat.Typed(SynSimplePat.Id(id, _, _, _, _, _), t, range) ->
+        | SynSimplePat.Typed(SynSimplePat.Id(id, _, _, _, _, _), synType, range) ->
             let mark = x.Mark(range)
-            x.ProcessLocalId id
-            x.ProcessSynType t
+            x.ProcessLocalId(id)
+            x.ProcessType(synType)
             x.Done(range, mark,ElementType.MEMBER_PARAM)
 
         | _ -> ()
@@ -360,14 +360,14 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
 
         | SynSimplePats.Typed(pats, synType, _) ->
             x.ProcessSimplePatterns(pats)
-            x.ProcessSynType(synType)
+            x.ProcessType(synType)
 
     member x.ProcessTypeArgs(ltRange: range, typeArgs, gtRange) =
         let mark = x.Mark(ltRange)
-        for t in typeArgs do x.ProcessSynType(t)
+        for t in typeArgs do x.ProcessType(t)
         x.Done(gtRange, mark, ElementType.TYPE_ARGUMENT_LIST)
 
-    member x.ProcessSynType(TypeRange range as synType) =
+    member x.ProcessType(TypeRange range as synType) =
         match synType with
         | SynType.LongIdent(lid) ->
             let mark = x.Mark(range)
@@ -395,24 +395,24 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
             x.Done(range, mark, ElementType.NAMED_TYPE_EXPRESSION)
 
         | SynType.Tuple (_, types, _) ->
-            for _, t in types do
-                x.ProcessSynType(t)
+            for _, synType in types do
+                x.ProcessType(synType)
 
         | SynType.AnonRecd(_, fields, _) ->
-            for _, t in fields do
-                x.ProcessSynType(t)
+            for _, synType in fields do
+                x.ProcessType(synType)
 
-        | SynType.StaticConstantNamed(t1, t2, _)
-        | SynType.MeasureDivide(t1, t2, _)
-        | SynType.Fun(t1, t2, _) ->
-            x.ProcessSynType(t1)
-            x.ProcessSynType(t2)
+        | SynType.StaticConstantNamed(synType1, synType2, _)
+        | SynType.MeasureDivide(synType1, synType2, _)
+        | SynType.Fun(synType1, synType2, _) ->
+            x.ProcessType(synType1)
+            x.ProcessType(synType2)
 
-        | SynType.WithGlobalConstraints(t, _, _)
-        | SynType.HashConstraint(t, _)
-        | SynType.MeasurePower(t, _, _)
-        | SynType.Array(_, t, _) ->
-            x.ProcessSynType(t)
+        | SynType.WithGlobalConstraints(synType, _, _)
+        | SynType.HashConstraint(synType, _)
+        | SynType.MeasurePower(synType, _, _)
+        | SynType.Array(_, synType, _) ->
+            x.ProcessType(synType)
 
         | SynType.Var _ ->
             x.MarkAndDone(range, ElementType.VAR_TYPE)

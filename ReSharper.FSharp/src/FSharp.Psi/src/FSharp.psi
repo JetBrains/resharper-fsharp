@@ -283,6 +283,7 @@ interface synExpr:
   doExpr |
   assertExpr |
   appExpr |
+  typeAppExpr |
   letOrUseExpr |
   tryWithExpr |
   tryFinallyExpr |
@@ -465,6 +466,16 @@ appExpr options { stubBase="DummyExpression"; }:
   fakeSeparator
   synExpr<FUNC_EXPR, FunctionExpression>
   synExpr<ARG_EXPR, ArgumentExpression>;
+
+typeAppExpr options { stubBase="DummyExpression"; }:
+  synExpr<EXPR, Expression>
+  LESS
+  synType<TYPE_ARG, TypeArgs>
+  (
+    COMMA
+    synType<TYPE_ARG, TypeArgs>
+  )*
+  GREATER;
 
 letOrUseExpr options { stubBase="DummyExpression"; }:
   LET
