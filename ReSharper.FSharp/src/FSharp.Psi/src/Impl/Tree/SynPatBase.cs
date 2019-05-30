@@ -40,7 +40,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         if (Parent is IBinding)
           return true;
 
-        // todo: add check for lid.Length > 1
+        if (Identifier is ILongIdentifier lid && lid.Identifiers.Count > 1)
+          return false;
+
         var idOffset = GetNameIdentifierRange().StartOffset.Offset;
         return Parameters.IsEmpty && FSharpFile.GetSymbolUse(idOffset) == null;
       }

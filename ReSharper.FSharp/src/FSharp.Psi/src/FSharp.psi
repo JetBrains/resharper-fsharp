@@ -184,10 +184,7 @@ topNamedPat options { stubBase="TopPatternDeclarationBase"; }:
 
 topLongIdentPat options { stubBase="TopPatternDeclarationBase"; }:
   identOrOpName{IDENTIFIER, Identifier}
-  fakeSeparator
-  // todo: use longIdentifier<LONG_IDENTIFIER, LongIdentifier>
-  synPat<PARAMETER, Parameters>*
-  fakeSeparator;
+  synPat<PARAMETER, Parameters>*;
 
 localNamedPat options { stubBase="LocalPatternDeclarationBase"; }:
   synPat<PATTERN, Pattern>?
@@ -195,9 +192,7 @@ localNamedPat options { stubBase="LocalPatternDeclarationBase"; }:
 
 localLongIdentPat options { stubBase="LocalPatternDeclarationBase"; }:
   identOrOpName{IDENTIFIER, Identifier}
-  // todo: use longIdentifier<LONG_IDENTIFIER, LongIdentifier>
-  synPat<PARAMETER, Parameters>*
-  fakeSeparator;
+  synPat<PARAMETER, Parameters>*;
 
 typedPat options { stubBase="SynPatternBase"; }:
   synPat<PATTERN, Pattern>
@@ -726,7 +721,8 @@ otherModuleMember: fakeSeparator;
 private identOrOpName{ROLE,Getter}:
   IDENTIFIER<@ROLE,@Getter> |
   SYMBOLIC_OP<@ROLE,@Getter> |
-  activePatternId<@ROLE,@Getter>;
+  activePatternId<@ROLE,@Getter> | 
+  longIdentifier<@ROLE, @Getter>;
 
 activePatternId:
   LPAREN<LPAREN, LParen>
