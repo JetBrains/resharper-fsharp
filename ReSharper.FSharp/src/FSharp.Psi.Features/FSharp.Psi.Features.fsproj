@@ -15,7 +15,17 @@
     <Compile Include="src\CodeCompletion\FSharpLookupItem.fs" />
     <Compile Include="src\CodeCompletion\FSharpCompletionProviders.fs" />
     <Compile Include="src\CodeStructure\FSharpCodeStructure.fs" />
+    <Compile Include="src\Daemon\QuickFixesStub.fs" />
     <Compile Include="src\Daemon\Highlightings\ErrorHighlightings.fs" />
+    <Compile Include="Src\Daemon\Highlightings\CommonErrors.Generated.fs">
+      <DependentUpon>CommonErrors.xml</DependentUpon>
+    </Compile>
+    <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
+      <Mode>ERRORS</Mode>
+      <Namespace>JetBrains.ReSharper.Plugins.FSharp.Daemon.Highlightings.CommonErrors</Namespace>
+      <OutputFile>src\Daemon\Highlightings\CommonErrors.Generated.fs</OutputFile>
+      <SubType>Designer</SubType>
+    </ErrorsGen>
     <Compile Include="src\Daemon\ContextHighlighters\FSharpMatchingBraceContextHighlighter.fs" />
     <Compile Include="src\Daemon\Stages\FSharpIdentifierTooltipProvider.fs" />
     <Compile Include="src\Daemon\Stages\ErrorsStageProcessBase.fs" />
@@ -31,6 +41,13 @@
     <Compile Include="src\Daemon\UsageChecking\FSharpUsageCheckingService.fs" />
     <Compile Include="src\Daemon\Analyzers\ReSpellerHelper.fs" />
     <Compile Include="src\Daemon\Analyzers\StringProblemsAnalyzer.fs" />
+    <Compile Include="src\Daemon\QuickFixes\RemoveUnusedOpensFix.fs" />
+    <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
+      <Mode>QUICKFIX</Mode>
+      <Namespace>JetBrains.ReSharper.Plugins.FSharp.Daemon.QuickFixes.Fixes</Namespace>
+      <OutputFile>src\Daemon\QuickFixes\CommonQuickFixes.Generated.fs</OutputFile>
+      <SubType>Designer</SubType>
+    </ErrorsGen>
     <Compile Include="src\Comment\FSharpBlockCommentActionProvider.fs" />
     <Compile Include="src\Comment\FSharpLineCommentActionProvider.fs" />
     <Compile Include="src\Debugger\FSharpBreakpointVariantsProvider.fs" />

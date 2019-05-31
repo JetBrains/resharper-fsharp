@@ -1,0 +1,21 @@
+<Errors language="F#">
+
+  <Usings>
+    JetBrains.ReSharper.Plugins.FSharp.Daemon.Highlightings;
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes;
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+  </Usings>
+
+  <StaticSeverityGroups>
+    <Group name="F# Errors" key="FSharpErrors"/>
+  </StaticSeverityGroups>
+
+  <Warning staticGroup="FSharpErrors" name="UnusedOpen">
+    <Parameter type="IOpenStatement" name="openStatement"/>
+    <Message value="Open directive is not required by the code and can be safely removed"/>
+    <Range>openStatement.GetHighlightingRange()</Range>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
+    <QuickFix>RemoveUnusedOpensFix</QuickFix>
+  </Warning>
+
+</Errors>
