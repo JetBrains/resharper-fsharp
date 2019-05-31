@@ -18,4 +18,11 @@
     <QuickFix>RemoveUnusedOpensFix</QuickFix>
   </Warning>
 
+  <Warning staticGroup="FSharpErrors" name="RedundantParenExpression" isSuppressedInTests="true">
+    <Parameter type="IParenExpr" name="parenExpr"/>
+    <Message value="Redundant parentheses"/>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <QuickFix>RemoveRedundantParens</QuickFix>
+  </Warning>
+
 </Errors>

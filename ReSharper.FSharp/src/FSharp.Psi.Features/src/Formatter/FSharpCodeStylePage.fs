@@ -62,7 +62,7 @@ type FSharpDummyCodeFormatter(fsLanguage: FSharpLanguage, formatterRequirements)
     override x.FormatInsertedRange(_,_,_) = InvalidOperationException() |> raise 
     override x.FormatReplacedRange(_,_,_) = InvalidOperationException() |> raise
     override x.FormatDeletedNodes(_,_,_) = InvalidOperationException() |> raise
-    override x.FormatReplacedNode(_,_) = InvalidOperationException() |> raise
+    override x.FormatReplacedNode(_,_) = ()
     
     override x.CreateFormatterContext(profile, firstNode, lastNode, parameters, _) =
         CodeFormattingContext(x, firstNode, lastNode, profile, formatterRequirements.FormatterLoggerProvider.FormatterLogger, parameters);
