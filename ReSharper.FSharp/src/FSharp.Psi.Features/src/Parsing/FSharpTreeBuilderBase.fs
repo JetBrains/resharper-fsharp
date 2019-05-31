@@ -92,6 +92,12 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         while x.CurrentOffset < offset && not x.Eof do
             x.AdvanceLexer()
 
+    member x.AdvaneToTokenOrRangeStart(tokenType: TokenNodeType, range: range) =
+        x.AdvanceToTokenOrOffset(tokenType, x.GetStartOffset(range), range)
+    
+    member x.AdvaneToTokenOrRangeEnd(tokenType: TokenNodeType, range: range) =
+        x.AdvanceToTokenOrOffset(tokenType, x.GetEndOffset(range), range)
+
     member x.AdvanceToTokenOrOffset(tokenType: TokenNodeType, maxOffset: int, range: range) =
         Assertion.Assert(isNotNull tokenType, "isNotNull tokenType")
 
@@ -271,13 +277,28 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
             x.ProcessAttribute(attr)
 
     member x.ProcessAttribute(attr: SynAttribute) =
-        let mark = x.Mark(attr.Range)
-        x.ProcessLongIdentifier attr.TypeName.Lid
+        let mark =
+            match attr.Target with
+            | Some (IdentRange targetRange) ->
+                let attrMark = x.Mark(targetRange)
+                let targetMark = x.Mark()
 
-        let argExpr = attr.ArgExpr
-        let argMark = x.Mark(argExpr.Range.StartRange)
-        x.ProcessAttributeArg attr.ArgExpr
-        x.Done(argExpr.Range.EndRange, argMark, ElementType.ARG_EXPRESSION)
+                x.AdvaneToTokenOrRangeStart(FSharpTokenType.COLON, attr.Range)
+                x.Done(targetRange, targetMark, ElementType.ATTRIBUTE_TARGET)
+                attrMark
+
+            | _ -> x.Mark(attr.Range)
+
+        match attr.TypeName.Lid with
+        | IdentRange headRange :: _ as typeLid ->
+            x.ProcessLongIdentifier(typeLid)
+
+            let (ExprRange argRange as argExpr) = attr.ArgExpr
+            if headRange <> argRange then
+                // Arg range is the same when fake SynExpr.Const is added
+                x.MarkChameleonExpression(argExpr)
+
+        | [] -> failwithf "Attribute lid is empty: %A" attr
 
         x.Done(attr.Range, mark, ElementType.F_SHARP_ATTRIBUTE)
 
@@ -420,3 +441,26 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         | SynType.StaticConstantExpr _
         | SynType.StaticConstant _
         | SynType.Anon _ -> ()
+
+    member x.FixExpresion(expr: SynExpr) =
+        // A fake SynExpr.Typed node is added for binding with return type specification like in the following
+        // member x.Prop: int = 1
+        // where 1 is replaced with `1: int`. 
+        // These fake nodes have original type specification ranges that are out of the actual expression ranges.
+        match expr with
+        | SynExpr.Typed(inner, synType, range) when not (rangeContainsRange range synType.Range) -> inner
+        | _ -> expr
+
+    member x.MarkChameleonExpression(expr: SynExpr) =
+        // todo: check and mark simple expressions in place.
+
+        let (ExprRange range as expr) = x.FixExpresion(expr)
+
+        let mark = x.Mark(range)
+
+        // Replace all tokens with single chameleon token.
+        let tokenMark = x.Mark(range)
+        x.AdvanceToEnd(range)
+        x.Builder.AlterToken(tokenMark, FSharpTokenType.CHAMELEON)
+
+        x.Done(range, mark, ChameleonExpressionNodeType.Instance, expr)

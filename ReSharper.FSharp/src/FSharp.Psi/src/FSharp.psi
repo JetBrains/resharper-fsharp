@@ -310,9 +310,7 @@ interface synExpr:
   libraryOnlyExpr |
   fromErrorExpr |
 
-  fixedExpr |
-  
-  otherExpr;
+  fixedExpr;
 
 // interface appExpr:
 //   prefixAppExpr |
@@ -641,11 +639,8 @@ fixedExpr options { stubBase="DummyExpression"; }:
   FIXED<FIXED, FixedKeyword>
   synExpr<EXPR, Expression>;
 
-otherExpr options { stubBase="DummyExpression"; }:
-  fakeSeparator;
-
 chameleonExpression options { stubBase="DummyExpression"; customParseFunction; }:
-  synExpr<EXPR, InnerExpression>;
+  synExpr<EXPR, Expression>;
 
 
 interface fSharpTypeDeclaration:
@@ -1073,14 +1068,13 @@ private modifier{ROLE,Getter}:
 // Attributes
 
 fSharpAttribute options { stubBase="TypeExpressionBase"; }:
+  attributeTarget<ATTR_TARGET, Target>?
   longIdentifier<IDENTIFIER, LongIdentifier>
-  argExpression<ARG_EXPRESSION, ArgExpression>
-;
+  chameleonExpression<ARG_EXPRESSION, ArgExpression>?;
 
-argExpression:
-  longIdentifier<LONG_IDENTIFIER, LongIdentifier>
-  STRING<STRING, String>;
-// todo: cover more cases (this is a temp mock for the only case we actually look at it now)
+attributeTarget:
+  IDENTIFIER<IDENTIFIER, Identifier>
+  COLON;
 
 
 fakeSeparator: FAKE;

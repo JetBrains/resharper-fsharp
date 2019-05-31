@@ -49,6 +49,8 @@ type CSharpResolveTest() =
     [<Test>] member x.``Class 01 - Abstract``() = x.DoNamedTest()
     [<Test>] member x.``Class 02 - Sealed``() = x.DoNamedTest()
     [<Test>] member x.``Class 03 - No attributes``() = x.DoNamedTest()
+    [<Test>] member x.``Class 04 - Compiled Name - No Parens``() = x.DoNamedTest()
+    [<Test>] member x.``Class 05 - Compiled Name - Double Parens``() = x.DoNamedTest()
 
     [<Test>] member x.``Class - Ctors 01 - Secondary``() = x.DoNamedTest()
 

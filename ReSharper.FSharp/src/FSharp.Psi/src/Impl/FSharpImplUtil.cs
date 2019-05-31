@@ -54,25 +54,57 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static bool ShortNameEquals([NotNull] this IFSharpAttribute attr, [NotNull] string shortName) =>
       attr.GetShortName() == shortName;
 
+    [CanBeNull]
+    private static FSharpString GetStringConst([CanBeNull] ISynExpr expr)
+    {
+      switch (expr)
+      {
+        case IParenExpr parenExpr:
+          return GetStringConst(parenExpr.InnerExpression);
+        case IConstExpr constExpr:
+          return constExpr.FirstChild as FSharpString;
+      }
+      return null;
+    }
+
     private static bool GetCompiledNameValue(IFSharpAttribute attr, out string compiledName)
     {
+      if (!attr.ShortNameEquals(CompiledName))
+      {
+        compiledName = null;
+        return false;
+      }
+
       // todo: proper expressions evaluation, e.g. "S1" + "S2"
-      if (!attr.ShortNameEquals(CompiledName) || attr.ArgExpression.String == null)
+      var stringArg = GetStringConst(attr.ArgExpression?.Expression);
+      if (stringArg == null)
       {
         compiledName = null;
         return false;
       }
 
       compiledName =
-        attr.ArgExpression.String.GetText()
-          .Substring(1, attr.ArgExpression.String.GetText().Length - 2)
+        stringArg.GetText()
+          .Substring(1, stringArg.GetText().Length - 2)
           .SubstringBeforeLast("`", StringComparison.Ordinal);
       return true;
     }
 
+    private static bool IsModuleSuffixExpr([CanBeNull] ISynExpr expr)
+    {
+      switch (expr)
+      {
+        case ParenExpr parenExpr:
+          return IsModuleSuffixExpr(parenExpr.InnerExpression);
+        case ILongIdentExpr longIdentExpr:
+          return longIdentExpr.LongIdentifier.QualifiedName == ModuleSuffix;
+      }
+
+      return false;
+    }
+
     private static bool IsModuleSuffixAttribute([NotNull] this IFSharpAttribute attr) =>
-      attr.ShortNameEquals("CompilationRepresentation") &&
-      attr.ArgExpression.LongIdentifier?.QualifiedName == ModuleSuffix;
+      attr.ShortNameEquals("CompilationRepresentation") && IsModuleSuffixExpr(attr.ArgExpression?.Expression);
 
     public static string GetModuleCompiledName([CanBeNull] this IIdentifier identifier,
       TreeNodeCollection<IFSharpAttribute> attributes)
@@ -146,7 +178,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       if (identifierToken == null)
         return nameRange;
 
-      return FSharpNamesUtil.IsEscapedWithBackticks(identifierToken.GetText())
+      return identifierToken.GetText().IsEscapedWithBackticks()
         ? nameRange.TrimLeft(2).TrimRight(2)
         : nameRange;
     }
@@ -373,18 +405,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static bool GetTypeKind(IEnumerable<IFSharpAttribute> attributes, out PartKind fSharpPartKind)
     {
       foreach (var attr in attributes)
-      {
-        var attrIds = attr.LongIdentifier.Identifiers;
-        if (attrIds.IsEmpty)
-          continue;
-
-        switch (attrIds.LastOrDefault()?.GetText().DropAttributeSuffix())
+        switch (attr.LongIdentifier?.Name.DropAttributeSuffix())
         {
           case Interface:
           {
             fSharpPartKind = PartKind.Interface;
             return true;
           }
+
           case AbstractClass:
           case Sealed:
           case Class:
@@ -392,13 +420,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
             fSharpPartKind = PartKind.Class;
             return true;
           }
+
           case Struct:
           {
             fSharpPartKind = PartKind.Struct;
             return true;
           }
         }
-      }
 
       fSharpPartKind = default;
       return false;

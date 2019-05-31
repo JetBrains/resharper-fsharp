@@ -1,0 +1,12 @@
+﻿public class Class1
+{
+  public Class1()
+  {
+    var y = new Y();
+    var t = new |T|(0)();
+  }
+}
+
+---------------------------------------------------------
+(0): ReSharper Error Highlighting: Cannot resolve symbol 'T'
+M:Y.#ctor
