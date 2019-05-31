@@ -1,0 +1,7 @@
+﻿Project Files:Module 11 - Module suffix attribute - Wrong attr.fs:
+FSharpProjectFilePart:ImplFile
+ NestedModulePart:WrongAttr->Class:WrongAttr
+ NestedModulePart:WrongArg->Class:WrongArg
+[]: Namespace:
+ [WrongArg]: Class:WrongArg[TestProject]
+ [WrongAttr]: Class:WrongAttr[TestProject]

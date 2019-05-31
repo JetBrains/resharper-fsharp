@@ -71,6 +71,10 @@ type FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projectedOffset) 
             x.MarkChameleonExpression(expr)
             x.Done(range, mark, ElementType.DO)
 
+        | SynModuleDecl.Attributes(attributes, _) ->
+            for attribute in attributes do
+                x.ProcessAttribute(attribute)
+
         | decl ->
             x.MarkAndDone(decl.Range, ElementType.OTHER_MEMBER_DECLARATION)
 
@@ -370,27 +374,6 @@ type FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projectedOffset) 
         let mark = x.Mark(range)
         x.ProcessPat(pat, isLocal, false)
         x.Done(range, mark, ElementType.MEMBER_PARAM)
-
-    member x.FixExpresion(expr) =
-        // A fake SynExpr.Typed node is added for binding with return type specification like in the following
-        // member x.Prop: int = 1
-        // where 1 is replaced with `1: int`. 
-        // These fake nodes have original type specification ranges that are out of the actual expression ranges.
-        match expr with
-        | SynExpr.Typed(inner, synType, range) when not (rangeContainsRange range synType.Range) -> inner
-        | _ -> expr
-
-    member x.MarkChameleonExpression(expr) =
-        let (ExprRange range as expr) = x.FixExpresion(expr)
-
-        let mark = x.Mark(range)
-
-        // Replace all tokens with single chameleon token.
-        let tokenMark = x.Mark(range)
-        x.AdvanceToEnd(range)
-        x.Builder.AlterToken(tokenMark, FSharpTokenType.CHAMELEON)
-
-        x.Done(range, mark, ChameleonExpressionNodeType.Instance, expr)
 
     member x.MarkOtherType(TypeRange range as typ) =
         let mark = x.Mark(range)

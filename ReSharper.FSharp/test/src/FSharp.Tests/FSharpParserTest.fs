@@ -62,3 +62,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Null``() = x.DoNamedTest()
     [<Test>] member x.``Expr - AddressOf 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Fixed 01 - Simple``() = x.DoNamedTest()
+
+    [<Test>] member x.``Attribute 01``() = x.DoNamedTest()
+    [<Test>] member x.``Attribute 02 - Simple arg``() = x.DoNamedTest()
+    [<Test>] member x.``Attribute 03 - Simple arg - No parens``() = x.DoNamedTest()

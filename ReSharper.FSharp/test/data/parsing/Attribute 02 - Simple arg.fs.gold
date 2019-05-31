@@ -1,0 +1,21 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
+    IFSharpAttribute
+      ILongIdentifier
+        FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
+      IChameleonExpression
+        IParenExpr
+          FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+          IConstExpr
+            FSharpString(type:STRING, text:"Bar")
+          FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+    FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    IDo
+      IChameleonExpression
+        IConstExpr
+          FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+          FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+
