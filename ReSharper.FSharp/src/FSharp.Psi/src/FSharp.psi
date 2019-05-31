@@ -733,7 +733,12 @@ activePatternId:
   )+
   RPAREN<RPAREN, RParen>;
 
-longIdentifier: IDENTIFIER<IDENTIFIER, Identifiers>*;
+longIdentifier:
+  IDENTIFIER
+  (
+    DOT
+    IDENTIFIER<IDENTIFIER, Identifiers>
+  )*;
 
 
 
