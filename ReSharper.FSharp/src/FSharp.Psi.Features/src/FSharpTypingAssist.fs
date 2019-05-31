@@ -1234,7 +1234,7 @@ type FSharpTypingAssist
     member x.GetNewLineText(textControl: ITextControl) =
         x.GetNewLineText(textControl.Document.GetPsiSourceFile(x.Solution))
 
-    member x.IsActionHandlerAvailabile2(context) = base.IsActionHandlerAvailabile(context)
+    member x.IsActionHandlerAvailabile2(context) = base.IsActionHandlerAvailable(context)
     member x.IsTypingHandlerAvailable2(context) = base.IsTypingHandlerAvailable(context)
 
     member x.GetFSharpTree(textControl: ITextControl) =
