@@ -222,7 +222,7 @@ type FSharpScriptPsiModulesProvider
         let moduleId = projectFile.GetPersistentID()
         let existingModule =
             scriptsFromProjectFiles.GetValuesSafe(path)
-            |> Seq.tryFind (fun psiModule -> psiModule.PersistenID = moduleId)
+            |> Seq.tryFind (fun psiModule -> psiModule.PersistentID = moduleId)
 
         match existingModule with
         | Some _ -> false
