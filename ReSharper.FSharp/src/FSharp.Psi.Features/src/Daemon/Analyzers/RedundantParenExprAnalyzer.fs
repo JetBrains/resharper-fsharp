@@ -9,8 +9,7 @@ type RedundantParenExprAnalyzer() =
     inherit ElementProblemAnalyzer<IParenExpr>()
 
     override x.Run(parenExpr, _, consumer) =
-        if parenExpr.Parent :? IParenExpr && isNotNull parenExpr.InnerExpression then
-
+        let highlight () =
             let leftParen = parenExpr.LeftParen
             let rightParen = parenExpr.RightParen
             if isNull leftParen || isNull rightParen then () else
@@ -19,3 +18,10 @@ type RedundantParenExprAnalyzer() =
 
             consumer.AddHighlighting(highlighting, leftParen.GetHighlightingRange())
             consumer.AddHighlighting(highlighting, rightParen.GetHighlightingRange(), isSecondaryHighlighting = true)
+
+        let parent = parenExpr.Parent
+        if (parent :? IParenExpr || parent :? IChameleonExpression) && isNotNull parenExpr.InnerExpression then
+            highlight () else
+
+        let letOrUseExpr = LocalBindingNavigator.GetByExpression(parenExpr)
+        if isNotNull letOrUseExpr then highlight ()
