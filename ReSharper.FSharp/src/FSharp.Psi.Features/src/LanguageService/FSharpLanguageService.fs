@@ -77,3 +77,5 @@ type FSharpLanguageService
         match declaredElement.As<IFSharpGeneratedFromOtherElement>() with
         | null -> null
         | generatedElement -> generatedElement.CreatePointer() :?> _
+
+    override x.AnalyzePossibleInfiniteInheritance = false
