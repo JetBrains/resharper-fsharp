@@ -360,7 +360,7 @@ type FSharpTypingAssist
         this.HandleSpaceInsideEmptyBrackets(context.TextControl)
 
     do
-        let isActionHandlerAvailable = Predicate<_>(this.IsActionHandlerAvailabile2)
+        let isActionHandlerAvailable = Predicate<_>(this.IsActionHandlerAvailable2)
         let isTypingHandlerAvailable = Predicate<_>(this.IsTypingHandlerAvailable2)
 
         manager.AddActionHandler(lifetime, TextControlActions.ActionIds.Enter, this, Func<_,_>(handleEnter), isActionHandlerAvailable)
@@ -1199,7 +1199,7 @@ type FSharpTypingAssist
             textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible)
             true else
 
-        insertCharInBrackets context lexer atChars typedQuotationBrackes LeftBracketOnly.No
+        insertCharInBrackets context lexer atChars typedQuotationBrackets LeftBracketOnly.No
 
     member x.TrimTrailingSpacesAtOffset(textControl: ITextControl, startOffset: byref<int>, trimAfterCaret) =
         let isWhitespace c =
@@ -1234,7 +1234,7 @@ type FSharpTypingAssist
     member x.GetNewLineText(textControl: ITextControl) =
         x.GetNewLineText(textControl.Document.GetPsiSourceFile(x.Solution))
 
-    member x.IsActionHandlerAvailabile2(context) = base.IsActionHandlerAvailable(context)
+    member x.IsActionHandlerAvailable2(context) = base.IsActionHandlerAvailable(context)
     member x.IsTypingHandlerAvailable2(context) = base.IsTypingHandlerAvailable(context)
 
     member x.GetFSharpTree(textControl: ITextControl) =
@@ -1406,7 +1406,7 @@ let shouldTrimSpacesBeforeToken (tokenType: TokenNodeType) =
     else TrimTrailingSpaces.Yes
 
 
-let typedQuotationBrackes = FSharpTokenType.LQUOTE_TYPED, FSharpTokenType.RQUOTE_TYPED
+let typedQuotationBrackets = FSharpTokenType.LQUOTE_TYPED, FSharpTokenType.RQUOTE_TYPED
 let listBrackets = FSharpTokenType.LBRACK, FSharpTokenType.RBRACK
 let recordBrackets = FSharpTokenType.LBRACE, FSharpTokenType.RBRACE
 
@@ -1430,7 +1430,7 @@ let isInsideEmptyQuoation (lexer: CachingLexer) offset =
     emptyQuotationsStrings.TryGetValue(tokenText, &leftBracketText) &&
     tokenText.Substring(0, leftBracketText.Length) = leftBracketText
 
-let stringLiteralStopperss =
+let stringLiteralStoppers =
     [| FSharpTokenType.WHITESPACE
        FSharpTokenType.NEW_LINE
        FSharpTokenType.LINE_COMMENT
@@ -1447,7 +1447,7 @@ let stringLiteralStopperss =
     |> HashSet
 
 let isStringLiteralStopper tokenType =
-    stringLiteralStopperss.Contains(tokenType) ||
+    stringLiteralStoppers.Contains(tokenType) ||
     isNotNull tokenType && tokenType.IsStringLiteral
 
 

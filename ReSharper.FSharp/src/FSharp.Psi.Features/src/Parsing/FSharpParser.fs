@@ -22,8 +22,8 @@ type internal FSharpParser(lexer: ILexer, file: IPsiSourceFile, checkerService: 
 
     interface IParser with
         member this.ParseFile() =
-            use lifetimeDefintion = Lifetime.Define()
-            let lifetime = lifetimeDefintion.Lifetime
+            use lifetimeDefinition = Lifetime.Define()
+            let lifetime = lifetimeDefinition.Lifetime
             let factory = FSharpPreprocessedLexerFactory(checkerService.GetDefines(file))
             let lexer = factory.CreateLexer(lexer).ToCachingLexer()
             let parseResults = checkerService.ParseFile(file)

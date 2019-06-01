@@ -73,7 +73,7 @@ type FSharpLexerTest() =
     [<Test>] member x.``Hash directives 02 - Include``() = x.DoNamedTest()
     [<Test>] member x.``Hash directives 03 - Light``() = x.DoNamedTest()
 
-    [<Test>] member x.``Operators 01 - Simple arifmetic``() = x.DoNamedTest()
+    [<Test>] member x.``Operators 01 - Simple arithmetic``() = x.DoNamedTest()
     [<Test>] member x.``Operators 02 - Logic``() = x.DoNamedTest()
     [<Test>] member x.``Operators 03 - Pipes``() = x.DoNamedTest()
     [<Test>] member x.``Operators 04 - Comparison``() = x.DoNamedTest()

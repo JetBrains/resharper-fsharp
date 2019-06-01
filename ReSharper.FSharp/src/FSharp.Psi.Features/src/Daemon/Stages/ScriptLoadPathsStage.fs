@@ -11,7 +11,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
 [<DaemonStage(StagesBefore = [| typeof<DeadCodeHighlightStage> |], StagesAfter = [| typeof<HighlightIdentifiersStage> |])>]
-type ScritpLoadPathsStage() =
+type ScriptLoadPathsStage() =
     inherit FSharpDaemonStageBase()
 
         override x.IsSupported(sourceFile, processKind) =

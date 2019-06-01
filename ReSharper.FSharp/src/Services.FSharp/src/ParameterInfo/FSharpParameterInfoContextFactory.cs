@@ -30,7 +30,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.ParameterInfo
     }
 
     public IParameterInfoContext CreateContext(ISolution solution, DocumentOffset caretOffset,
-      DocumentOffset expectedLParenthOffset, char invocationChar, IContextBoundSettingsStore settingsStore)
+      DocumentOffset expectedLParenOffset, char invocationChar, IContextBoundSettingsStore settingsStore)
     {
       var fsFile = solution.GetPsiServices().GetPsiFile<FSharpLanguage>(caretOffset) as IFSharpFile;
       var parseResults = fsFile?.ParseResults?.Value;

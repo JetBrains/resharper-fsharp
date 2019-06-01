@@ -53,7 +53,7 @@ let getStringEndingQuotesOffset (tokenType: TokenNodeType) =
 let emptyString = "\"\""
 let emptyChar = "''"
 
-let getCorresponingQuotesPair char =
+let getCorrespondingQuotesPair char =
     match char with
     | '"' -> emptyString
     | '\'' -> emptyChar

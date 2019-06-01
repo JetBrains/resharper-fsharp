@@ -11,9 +11,9 @@ type FSharpVcsCodeVisionRangesProviderStage() =
     inherit CodeInsightsVcsRangesStageBase<FSharpLanguage>()
 
     override x.CreateProcess(file, daemonProcess) =
-        FSharoVcsCodeVisionRangesProviderProcess(file, daemonProcess) :> _
+        FSharpVcsCodeVisionRangesProviderProcess(file, daemonProcess) :> _
 
-and FSharoVcsCodeVisionRangesProviderProcess(file, daemonProcess) =
+and FSharpVcsCodeVisionRangesProviderProcess(file, daemonProcess) =
     inherit CodeInsightsVcsRangesDaemonProcess(file, daemonProcess)
 
     override x.IsApplicable(declaration) =

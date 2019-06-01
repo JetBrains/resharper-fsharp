@@ -392,7 +392,7 @@ type FSharpScriptPsiModule
     member x.Path = path
     member x.SourceFile: IPsiSourceFile = sourceFile.Value
     member x.ResolveContext = resolveContext.Value
-    member x.PersistenID = moduleId
+    member x.PersistentID = moduleId
     member x.LifetimeDefinition: LifetimeDefinition = lifetimeDefinition
 
     member x.IsValid = psiServices.Modules.HasModule(this)

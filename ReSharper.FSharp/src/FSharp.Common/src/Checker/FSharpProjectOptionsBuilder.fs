@@ -171,11 +171,11 @@ type FSharpProjectOptionsBuilder
                 s.StartsWith("-r:", StringComparison.Ordinal) &&
                 s.EndsWith("FSharp.Core.dll", StringComparison.Ordinal))
 
-        let shoudAddFSharpCore options =
+        let shouldAddFSharpCore options =
             not (hasFSharpCoreReference options || options.OtherOptions |> Array.contains "--compiling-fslib")
 
         let options =
-            if shoudAddFSharpCore projectOptions then 
+            if shouldAddFSharpCore projectOptions then 
                 { projectOptions with
                     OtherOptions = FSharpCoreFix.ensureCorrectFSharpCore projectOptions.OtherOptions }
             else projectOptions

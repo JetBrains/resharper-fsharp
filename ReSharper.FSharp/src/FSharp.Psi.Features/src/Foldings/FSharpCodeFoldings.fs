@@ -41,8 +41,8 @@ and FSharpCodeFoldingProcess(logger: ILogger) =
         | None -> ()
         | Some parseTree ->
 
-        let sourcefile = element.GetSourceFile()
-        let document = sourcefile.Document
+        let sourceFile = element.GetSourceFile()
+        let document = sourceFile.Document
         let lines = [| for line in 0 .. (int (document.GetLineCount().Minus1())) do
                         yield document.GetLineText(docLine line) |]
 

@@ -252,7 +252,7 @@ type FSharpItemsContainerTest() =
 
     [<Test>]
     member x.``Add file 03 - Split folders top level``() =
-        x.DoAddFileRelaviteToTests(
+        x.DoAddFileRelativeToTests(
             [ "Folder[1]/File1"
               "Folder[1]/File2" ],
             "File3",
@@ -261,7 +261,7 @@ type FSharpItemsContainerTest() =
 
     [<Test>]
     member x.``Add file 04 - Split nested folders``() =
-        x.DoAddFileRelaviteToTests(
+        x.DoAddFileRelativeToTests(
             [ "Folder[1]/SubFolder[1]/File1"
               "Folder[1]/SubFolder[1]/File2" ],
             "Folder/File3",
@@ -270,7 +270,7 @@ type FSharpItemsContainerTest() =
 
     [<Test>]
     member x.``Add file 05 - Split nested folders, add folders``() =
-        x.DoAddFileRelaviteToTests(
+        x.DoAddFileRelativeToTests(
             [ "Folder[1]/SubFolder[1]/File1"
               "Folder[1]/SubFolder[1]/File2"
               "Folder[1]/Another[1]/SubFolder[1]/File3"
@@ -281,7 +281,7 @@ type FSharpItemsContainerTest() =
 
     [<Test>]
     member x.``Add file 06 - Add relative folders``() =
-        x.DoAddFileRelaviteToTests(
+        x.DoAddFileRelativeToTests(
             [ "Folder[1]/SubFolder[1]/File1"],
             "Folder/Another/File2",
             null,
@@ -289,7 +289,7 @@ type FSharpItemsContainerTest() =
 
     [<Test>]
     member x.``Add file 07 - Top level``() =
-        x.DoAddFileRelaviteToTests(
+        x.DoAddFileRelativeToTests(
             [ "File1"
               "File2"
               "File3"
@@ -301,7 +301,7 @@ type FSharpItemsContainerTest() =
 
     [<Test>]
     member x.``Add file 08 - Top level, add folders``() =
-        x.DoAddFileRelaviteToTests(
+        x.DoAddFileRelativeToTests(
             [ "File1"
               "File2"
               "File3"
@@ -385,7 +385,7 @@ type FSharpItemsContainerTest() =
 
     [<Test>]
     member x.``Add file 16 - Split nested folders``() =
-        x.DoAddFileRelaviteToTests(
+        x.DoAddFileRelativeToTests(
             [ "Folder[1]/SubFolder[1]/File1"
               "Folder[1]/SubFolder[1]/File2" ],
             "File3",
@@ -394,7 +394,7 @@ type FSharpItemsContainerTest() =
 
     [<Test>]
     member x.``Add file 17 - Split nested folders``() =
-        x.DoAddFileRelaviteToTests(
+        x.DoAddFileRelativeToTests(
             [ "Folder[1]/File1"
               "Folder[1]/File2"
               "Folder[1]/SubFolder[1]/File3"
@@ -405,7 +405,7 @@ type FSharpItemsContainerTest() =
 
     [<Test>]
     member x.``Add file 18 - Split nested folders``() =
-        x.DoAddFileRelaviteToTests(
+        x.DoAddFileRelativeToTests(
             [ "File1"
               "Folder[1]/File2"
               "Folder[1]/File3"
@@ -873,12 +873,12 @@ type FSharpItemsContainerTest() =
 
 
     member x.DoAddFileRelativeBeforeTest(items: string list, filePath, relativeBefore) =
-        x.DoAddFileRelaviteToTests(items, filePath, relativeBefore, null)
+        x.DoAddFileRelativeToTests(items, filePath, relativeBefore, null)
 
     member x.DoAddFileRelativeAfterTest(items: string list, filePath, relativeAfter) =
-        x.DoAddFileRelaviteToTests(items, filePath, null, relativeAfter)
+        x.DoAddFileRelativeToTests(items, filePath, null, relativeAfter)
     
-    member x.DoAddFileRelaviteToTests(items: string list, filePath, relativeBefore, relativeAfter) =
+    member x.DoAddFileRelativeToTests(items: string list, filePath, relativeBefore, relativeAfter) =
         x.ExecuteWithGold(fun writer ->
             let mutable addBeforeDump: string = null
             let mutable addAfterDump: string = null
