@@ -14,5 +14,7 @@ type ReSpellerPsiHelper() =
         match declaration with
         | :? ISynPat as synPat -> not synPat.IsDeclaration
         | :? IFSharpDeclaration as fsDeclaration -> fsDeclaration.NameIdentifier :? IActivePatternId
-        | :? INamespaceDeclaration -> true // A workaround for a spell-checker bug, todo: remove
         | _ -> true
+
+    override x.GetNameRange(identifier, _) =
+        identifier.GetDocumentRange()
