@@ -451,7 +451,7 @@ type FSharpScriptPsiModule
 type FSharpScriptModule(path: FileSystemPath, solution: ISolution) =
     inherit UserDataHolder()
 
-    let path = path.MakeRelativeTo(solution.SolutionFilePath.Directory)
+    let path = path.MakeRelativeTo(solution.SolutionDirectory)
 
     interface IModule with
         member x.Presentation = path.Name
