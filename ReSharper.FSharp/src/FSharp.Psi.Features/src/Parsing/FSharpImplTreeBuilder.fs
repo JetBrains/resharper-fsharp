@@ -326,10 +326,12 @@ type FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projectedOffset) 
                     x.ProcessPat(pat, isLocal, false)
                 ElementType.ANDS_PAT
 
-            | SynPat.Tuple(_, pats, _)
+            | SynPat.Tuple(_, pats, _) ->
+                x.ProcessListLikePat(pats, isLocal)
+                ElementType.TUPLE_PAT
+
             | SynPat.ArrayOrList(_, pats, _) ->
-                for pat in pats do
-                    x.ProcessPat(pat, isLocal, false)
+                x.ProcessListLikePat(pats, isLocal)
                 ElementType.LIST_PAT
 
             | SynPat.Paren(pat, _) ->
@@ -353,10 +355,17 @@ type FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projectedOffset) 
                 x.ProcessPat(pat, isLocal, false)
                 ElementType.ATTRIB_PAT
 
+            | SynPat.Const _ ->
+                ElementType.CONST_PAT
+
             | _ ->
                 ElementType.OTHER_PAT
 
         x.Done(range, mark, elementType)
+
+    member x.ProcessListLikePat(pats, isLocal) =
+        for pat in pats do
+            x.ProcessPat(pat, isLocal, false)
 
     member x.ProcessParams(args: SynConstructorArgs, isLocal, markMember) =
         match args with

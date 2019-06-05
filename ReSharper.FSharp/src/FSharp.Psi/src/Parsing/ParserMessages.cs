@@ -20,6 +20,7 @@
     public const string IDS_NOT_COMPILED_TYPE_DECLARATION = "";
     public const string IDS_SIMPLE_TYPE_DECLARATION = "";
     public const string IDS_HASH_DIRECTIVE = "";
+    public const string IDS_CONST_PAT = "";
     public const string IDS_LONG_IDENT_PAT = "";
     public const string IDS_NAMED_PAT = "";
     public const string IDS_ARRAY_OR_LIST_PAT = "";

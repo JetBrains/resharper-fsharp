@@ -158,7 +158,7 @@ interface synPat:
   attribPat |
   orPat |
   andsPat |
-  longIdentPat | // Used for functions, union cases, active patterns.
+  longIdentPat | // Used for functions, union cases and active patterns with parameters.
   tuplePat |
   arrayOrListPat |
   parenPat |
@@ -167,6 +167,7 @@ interface synPat:
   isInstPat |
   consPat |
   wildPat |
+  constPat |
   otherPat;
 
 interface namedPat:
@@ -256,6 +257,14 @@ consPat options { stubBase="SynPatternBase"; }:
 
 wildPat options { stubBase="SynPatternBase"; }:
   UNDERSCORE;
+
+constPat options { stubBase="SynPatternBase"; }:
+  (
+    TRUE |
+    FALSE |
+    STRING // todo: add more
+  );
+  
 
 otherPat options { stubBase="SynPatternBase"; }:
   fakeSeparator;
