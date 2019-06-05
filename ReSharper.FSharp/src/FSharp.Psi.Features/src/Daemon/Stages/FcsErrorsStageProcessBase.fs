@@ -22,7 +22,7 @@ module FSharpErrors =
     let [<Literal>] UnusedValue = 1182
 
 [<AbstractClass>]
-type ErrorsStageProcessBase(fsFile, daemonProcess) =
+type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
     let [<Literal>] UseKeywordLength = 3
@@ -38,7 +38,7 @@ type ErrorsStageProcessBase(fsFile, daemonProcess) =
             DocumentRange(document, TextRange(startOffset, endOffset))
 
     abstract ShouldAddDiagnostic: error: FSharpErrorInfo * range: DocumentRange -> bool
-    default x.ShouldAddDiagnostic(error: FSharpErrorInfo, range: DocumentRange) =
+    default x.ShouldAddDiagnostic(error: FSharpErrorInfo, _) =
         error.ErrorNumber <> UnrecognizedOption
 
     member x.Execute(errors: FSharpErrorInfo[], committer: Action<DaemonStageResult>) =

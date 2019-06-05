@@ -7,7 +7,7 @@ using Microsoft.FSharp.Core;
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 {
   [AllowNullLiteral]
-  public abstract class FSharpDaemonStageProcessBase : IDaemonStageProcess
+  public abstract class FSharpDaemonStageProcessBase : TreeNodeVisitor<IHighlightingConsumer>, IDaemonStageProcess
   {
     private const int InterruptCheckTime = 20;
     protected readonly SeldomInterruptCheckerWithCheckTime SeldomInterruptChecker;

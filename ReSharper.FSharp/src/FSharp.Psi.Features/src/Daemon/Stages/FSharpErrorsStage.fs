@@ -11,7 +11,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 
 [<DaemonStage(StagesBefore = [| typeof<HighlightIdentifiersStage> |])>]
-type FSharpErrorStage(elementProblemAnalyzerRegistrar) =
+type FSharpErrorsStage(elementProblemAnalyzerRegistrar) =
     inherit FSharpDaemonStageBase()
 
     override x.CreateStageProcess(fsFile, settings, daemonProcess) =
@@ -21,7 +21,7 @@ type FSharpErrorStage(elementProblemAnalyzerRegistrar) =
 and FSharpErrorStageProcess
         (fsFile: IFSharpFile, daemonProcess: IDaemonProcess, settings: IContextBoundSettingsStore,
          analyzerRegistrar: ElementProblemAnalyzerRegistrar) =
-    inherit TreeNodeVisitor<IHighlightingConsumer>()
+    inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
     static let analyzerRunKind = ElementProblemAnalyzerRunKind.FullDaemon
 
@@ -29,22 +29,17 @@ and FSharpErrorStageProcess
     let elementProblemAnalyzerData = ElementProblemAnalyzerData(fsFile, settings, analyzerRunKind, interruptCheck)
     let analyzerDispatcher = analyzerRegistrar.CreateDispatcher(elementProblemAnalyzerData)
 
-    member x.DaemonProcess = daemonProcess
-
     override x.VisitNode(element: ITreeNode, consumer: IHighlightingConsumer) =
         analyzerDispatcher.Run(element, consumer)
 
-    interface IDaemonStageProcess with
-        member x.Execute(committer) =
-            // todo: schedule separate processors for different top level nodes
-            let consumer = FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settings)
-            fsFile.ProcessThisAndDescendants(Processor(x, consumer))
-            committer.Invoke(DaemonStageResult(consumer.Highlightings))
-
-        member x.DaemonProcess = x.DaemonProcess
+    override x.Execute(committer) =
+        // todo: schedule separate processors for different top level nodes
+        let consumer = FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settings)
+        fsFile.ProcessThisAndDescendants(Processor(x, consumer))
+        committer.Invoke(DaemonStageResult(consumer.Highlightings))
 
 
-and Processor(daemonProcess: FSharpErrorStageProcess, consumer: IHighlightingConsumer) =
+and Processor(daemonProcess: FSharpDaemonStageProcessBase, consumer: IHighlightingConsumer) =
     abstract InteriorShouldBeProcessed: ITreeNode -> bool
     default x.InteriorShouldBeProcessed _ = true
 
@@ -64,5 +59,8 @@ and Processor(daemonProcess: FSharpErrorStageProcess, consumer: IHighlightingCon
             | :? FSharpToken as token ->
                 if not (token.GetTokenType().IsWhitespace) then
                     token.Accept(daemonProcess, consumer)
+
+            | :? IFSharpTreeNode as fsTreeNode ->
+                fsTreeNode.Accept(daemonProcess, consumer)
 
             | _ -> daemonProcess.VisitNode(element, consumer)

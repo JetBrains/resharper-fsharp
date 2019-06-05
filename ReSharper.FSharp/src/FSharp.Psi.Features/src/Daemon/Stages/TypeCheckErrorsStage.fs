@@ -5,11 +5,18 @@ open FSharp.Compiler.SourceCodeServices
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.Util
 
-type TypeCheckErrorsStageProcess(fsFile: IFSharpFile, daemonProcess, logger: ILogger) =
-    inherit ErrorsStageProcessBase(fsFile, daemonProcess)
+[<DaemonStage(StagesBefore = [| typeof<SyntaxErrorsStage> |], StagesAfter = [| typeof<HighlightIdentifiersStage> |])>]
+type TypeCheckErrorsStage(logger: ILogger) =
+    inherit FSharpDaemonStageBase()
+
+    override x.CreateStageProcess(fsFile, _, daemonProcess) =
+        TypeCheckErrorsStageProcess(fsFile, daemonProcess, logger) :> _
+
+
+and TypeCheckErrorsStageProcess(fsFile, daemonProcess, logger: ILogger) =
+    inherit FcsErrorsStageProcessBase(fsFile, daemonProcess)
 
     let [<Literal>] opName = "TypeCheckErrorsStageProcess"
 
@@ -28,14 +35,7 @@ type TypeCheckErrorsStageProcess(fsFile: IFSharpFile, daemonProcess, logger: ILo
 
         if not (Array.isEmpty projectWarnings) then
             // https://github.com/Microsoft/visualfsharp/issues/4030
-            let errors = Array.fold (fun a e -> a + "\n" + e.ToString()) "" projectWarnings
-            logger.LogMessage(LoggingLevel.WARN, "Project warnings during file typecheck:" + errors)
+            let errors = projectWarnings |> Array.fold (fun result info -> result + "\n" + info.ToString()) ""
+            logger.LogMessage(LoggingLevel.WARN, "Project warnings during file typeCheck:" + errors)
+
         x.Execute(fileErrors, committer)
-
-
-[<DaemonStage(StagesBefore = [| typeof<SyntaxErrorsStage> |], StagesAfter = [| typeof<HighlightIdentifiersStage> |])>]
-type TypeCheckErrorsStage(logger: ILogger) =
-    inherit FSharpDaemonStageBase()
-
-    override x.CreateStageProcess(fsFile, _, daemonProcess) =
-        TypeCheckErrorsStageProcess(fsFile, daemonProcess, logger) :> _
