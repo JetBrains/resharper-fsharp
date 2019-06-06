@@ -7,7 +7,7 @@ IFSharpImplFile
           FSharpTokenType+FunTokenElement(type:FUN, text:fun)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-          IOtherPat
+          IConstPat
             FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
             FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           FSharpTokenType+RparenTokenElement(type:RPAREN, text:))

@@ -92,10 +92,10 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         while x.CurrentOffset < offset && not x.Eof do
             x.AdvanceLexer()
 
-    member x.AdvaneToTokenOrRangeStart(tokenType: TokenNodeType, range: range) =
+    member x.AdvanceToTokenOrRangeStart(tokenType: TokenNodeType, range: range) =
         x.AdvanceToTokenOrOffset(tokenType, x.GetStartOffset(range), range)
     
-    member x.AdvaneToTokenOrRangeEnd(tokenType: TokenNodeType, range: range) =
+    member x.AdvanceToTokenOrRangeEnd(tokenType: TokenNodeType, range: range) =
         x.AdvanceToTokenOrOffset(tokenType, x.GetEndOffset(range), range)
 
     member x.AdvanceToTokenOrOffset(tokenType: TokenNodeType, maxOffset: int, range: range) =
@@ -283,7 +283,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
                 let attrMark = x.Mark(targetRange)
                 let targetMark = x.Mark()
 
-                x.AdvaneToTokenOrRangeStart(FSharpTokenType.COLON, attr.Range)
+                x.AdvanceToTokenOrRangeStart(FSharpTokenType.COLON, attr.Range)
                 x.Done(targetRange, targetMark, ElementType.ATTRIBUTE_TARGET)
                 attrMark
 
@@ -383,10 +383,16 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
             x.ProcessSimplePatterns(pats)
             x.ProcessType(synType)
 
-    member x.ProcessTypeArgs(ltRange: range, typeArgs, gtRange) =
+    member x.ProcessTypeArgs(typeArgs, ltRange: range, gtRange: range option) =
         let mark = x.Mark(ltRange)
-        for t in typeArgs do x.ProcessType(t)
-        x.Done(gtRange, mark, ElementType.TYPE_ARGUMENT_LIST)
+
+        for synType in typeArgs do
+            x.ProcessType(synType)
+
+        match gtRange with
+        | Some range ->
+            x.Done(range, mark, ElementType.TYPE_ARGUMENT_LIST)
+        | _ -> x.Done(mark, ElementType.TYPE_ARGUMENT_LIST)
 
     member x.ProcessType(TypeRange range as synType) =
         match synType with
@@ -401,16 +407,16 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
             | SynType.LongIdent(lid) -> x.ProcessLongIdentifier(lid.Lid)
             | _ -> ()
 
-            match isPostfix, ltRange, gtRange with
-            | false, Some ltRange, Some gtRange -> x.ProcessTypeArgs(ltRange, typeArgs, gtRange)
+            match isPostfix, ltRange with
+            | false, Some ltRange -> x.ProcessTypeArgs(typeArgs, ltRange, gtRange)
             | _ -> ()
 
             x.Done(range, mark, ElementType.NAMED_TYPE_EXPRESSION)
 
         | SynType.LongIdentApp(_, _, ltRange, typeArgs, _, gtRange, _) ->
             let mark = x.Mark(range)
-            match ltRange, gtRange with
-            | Some ltRange, Some gtRange -> x.ProcessTypeArgs(ltRange, typeArgs, gtRange)
+            match ltRange with
+            | Some ltRange -> x.ProcessTypeArgs(typeArgs, ltRange, gtRange)
             | _ -> () // todo: prefix? e.g. int list
 
             x.Done(range, mark, ElementType.NAMED_TYPE_EXPRESSION)

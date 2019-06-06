@@ -1,0 +1,15 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IDo
+      IChameleonExpression
+        IDotIndexedGetExpr
+          IIdentExpr
+            FSharpIdentifierToken(type:IDENTIFIER, text:foo)
+          FSharpTokenType+DotTokenElement(type:DOT, text:.)
+          IIndexerArg
+            FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
+            IConstExpr
+              FSharpToken(type:INT32, text:1)
+            FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])
+

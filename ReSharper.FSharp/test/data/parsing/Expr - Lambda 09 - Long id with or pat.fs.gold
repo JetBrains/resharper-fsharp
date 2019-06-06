@@ -20,7 +20,7 @@ IFSharpImplFile
               FSharpIdentifierToken(type:IDENTIFIER, text:Bar)
               IParenPat
                 FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-                IListPat
+                ITuplePat
                   IWildPat
                     FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
                   FSharpTokenType+CommaTokenElement(type:COMMA, text:,)

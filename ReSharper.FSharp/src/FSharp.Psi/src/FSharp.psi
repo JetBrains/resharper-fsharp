@@ -515,11 +515,15 @@ dotGetExpr options { stubBase="SetExpressionBase"; }:
 dotIndexedGetExpr options { stubBase="SetExpressionBase"; }:
   synExpr<EXPR, LeftExpr>
   DOT
+  indexerArg<ARG, IndexerArg>;
+
+indexerArg:
   LBRACK
+  synExpr<EXPRS, Expressions>
   (
-    synExpr<INDEXER_EXPR, IndexerExpressions>
-    COMMA
-  )*
+    DOT_DOT
+    synExpr<EXPRS, Expressions>
+  )?
   RBRACK;
 
 dotSetExpr options { stubBase="SetExpressionBase"; }:
