@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
+namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
 open System.Collections.Generic
 open FSharp.Compiler.Ast
@@ -11,15 +11,23 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 
+[<Struct>]
+type BuilderStep =
+    { Item: obj
+      Processor: IBuilderStepProcessor }
+
+
+and IBuilderStepProcessor =
+    abstract Process: step: obj * builder: FSharpImplTreeBuilder -> unit
+
+
 type FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projectedOffset) =
     inherit FSharpTreeBuilderBase(sourceFile, lexer, lifetime, projectedOffset)
 
-    let nextSteps = Stack<ITreeBuilderStep>()
+    let nextSteps = Stack<BuilderStep>()
 
     new (sourceFile, lexer, decls, lifetime) =
         FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, 0) 
-
-    member x.NextSteps = nextSteps
 
     override x.CreateFSharpFile() =
         let mark = x.Mark()
@@ -436,29 +444,38 @@ type FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projectedOffset) 
         x.PushRangeForMark(range, x.Mark(range), elementType)
 
     member x.PushRangeForMark(range, mark, elementType) =
-        nextSteps.Push(EndRangeStep(range, mark, elementType))
+        x.PushStep({ Range = range; Mark = mark; ElementType = elementType }, endRangeProcessor)
 
     member x.PushRangeAndProcessExpression(expr, range, elementType) =
         x.PushRange(range, elementType)
         x.ProcessExpression(expr)
 
-    member x.PushType(synType) =
-        nextSteps.Push(ProcessTypeStep(synType))
+    member x.PushStep(step: obj, processor: IBuilderStepProcessor) =
+        nextSteps.Push({ Item = step; Processor = processor })
 
-    member x.PushLongIdentifier(lid) =
-        nextSteps.Push(ProcessLidStep(lid))
+    member x.PushType(synType: SynType) =
+        x.PushStep(synType, synTypeProcessor)
 
-    member x.PushExpression(synExpr) =
-        nextSteps.Push(ProcessExpressionStep(synExpr))
+    member x.PushLongIdentifier(lid: LongIdent) =
+        x.PushStep(lid, lidProcessor)
 
+    member x.PushExpression(synExpr: SynExpr) =
+        x.PushStep(synExpr, expressionProcessor)
+
+    member x.PushStepList(items, processor) =
+        match items with
+        | [] -> ()
+        | _ -> x.PushStep(items, processor)
+    
     member x.PushExpressionList(exprs: SynExpr list) =
-        nextSteps.Push(ExpressionListStep(exprs))
+        x.PushStepList(exprs, expressionListProcessor)
 
     member x.ProcessTopLevelExpression(expr) =
-        x.ProcessExpression(expr)
+        x.PushExpression(expr)
 
         while nextSteps.Count > 0 do
-            nextSteps.Peek().DoStep(x, nextSteps)
+            let step = nextSteps.Pop()
+            step.Processor.Process(step.Item, x)
 
     member x.ProcessExpression(ExprRange range as expr) =
         match expr with
@@ -493,14 +510,14 @@ type FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projectedOffset) 
 
         | SynExpr.AnonRecd(_, copyInfo, fields, _) ->
             x.PushRange(range, ElementType.ANON_RECD_EXPR)
-            nextSteps.Push(AnonRecordFieldExprListStep(fields))
+            x.PushStepList(fields, anonRecordFieldListProcessor)
             match copyInfo with
             | Some(expr, _) -> x.ProcessExpression(expr)
             | _ -> ()
 
         | SynExpr.Record(_, copyInfo, fields, _) ->
             x.PushRange(range, ElementType.RECORD_EXPR)
-            nextSteps.Push(RecordFieldExprListStep(fields))
+            x.PushStepList(fields, recordFieldListProcessor)
             match copyInfo with
             | Some(expr, _) -> x.ProcessExpression(expr)
             | _ -> ()
@@ -513,8 +530,8 @@ type FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projectedOffset) 
         | SynExpr.ObjExpr(synType, args, bindings, interfaceImpls, _, _) ->
             x.PushRange(range, ElementType.OBJ_EXPR)
             x.ProcessType(synType)
-            nextSteps.Push(InterfaceImplementationListStep(interfaceImpls))
-            nextSteps.Push(BindingListStep(bindings))
+            x.PushStepList(interfaceImpls, interfaceImplementationListProcessor)
+            x.PushStepList(bindings, bindingListProcessor)
 
             match args with
             | Some(expr, _) -> x.ProcessExpression(expr)
@@ -582,9 +599,9 @@ type FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projectedOffset) 
                 x.PushExpression(argExpr)
                 x.ProcessExpression(funcExpr)
 
-        | SynExpr.TypeApp(expr, lessRange, typeArgs, _, greaterRangeOpt, _, _) ->
+        | SynExpr.TypeApp(expr, _, _, _, _, _, _) as typeApp ->
             x.PushRange(range, ElementType.TYPE_APP_EXPR)
-            nextSteps.Push(ProcessTypeArgsStep(typeArgs, lessRange, greaterRangeOpt))
+            x.PushStep(typeApp, typeArgsProcessor)
             x.ProcessExpression(expr)
 
         | SynExpr.LetOrUse(_, _, bindings, bodyExpr, _) ->
@@ -594,7 +611,7 @@ type FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projectedOffset) 
 
         | SynExpr.TryWith(tryExpr, _, withCases, _, _, _, _) ->
             x.PushRange(range, ElementType.TRY_WITH_EXPR)
-            nextSteps.Push(MatchClauseListStep(withCases))
+            x.PushStepList(withCases, matchClauseListProcessor)
             x.ProcessExpression(tryExpr)
 
         | SynExpr.TryFinally(tryExpr, finallyExpr, _, _, _) ->
@@ -653,17 +670,15 @@ type FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projectedOffset) 
             x.PushLongIdentifier(lidWithDots.Lid)
             x.ProcessExpression(expr1)
 
-        | SynExpr.DotIndexedGet(expr, indexerArgs, dotRange, _) ->
-            let indexerRange = mkFileIndexRange range.FileIndex dotRange.End range.End
+        | SynExpr.DotIndexedGet(expr, _, _, _) as get ->
             x.PushRange(range, ElementType.DOT_INDEXED_GET_EXPR)
-            nextSteps.Push(IndexerArgListStep(indexerArgs, indexerRange))
+            x.PushStep(get, indexerArgsProcessor)
             x.ProcessExpression(expr)
 
-        | SynExpr.DotIndexedSet(expr1, indexerArgs, expr2, _, dotRange, _) ->
-            let indexerRange = mkFileIndexRange range.FileIndex dotRange.End range.End
+        | SynExpr.DotIndexedSet(expr1, _, expr2, _, _, _) as set ->
             x.PushRange(range, ElementType.DOT_INDEXED_SET_EXPR)
             x.PushExpression(expr2)
-            nextSteps.Push(IndexerArgListStep(indexerArgs, indexerRange))
+            x.PushStep(set, indexerArgsProcessor)
             x.ProcessExpression(expr1)
 
         | SynExpr.TypeTest(expr, synType, _) ->
@@ -789,7 +804,7 @@ type FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projectedOffset) 
     
     member x.MarkMatchExpr(range: range, expr, clauses) =
         x.PushRange(range, ElementType.MATCH_EXPR)
-        nextSteps.Push(MatchClauseListStep(clauses))
+        x.PushStepList(clauses, matchClauseListProcessor)
         x.ProcessExpression(expr)
 
     member x.ProcessMatchClauses(clauses) =
@@ -799,7 +814,7 @@ type FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projectedOffset) 
             x.ProcessMatchClause(clause)
 
         | clause :: clauses ->
-            nextSteps.Push(MatchClauseListStep(clauses))
+            x.PushStepList(clauses, matchClauseListProcessor)
             x.ProcessMatchClause(clause)
 
     member x.ProcessBindings(clauses) =
@@ -809,7 +824,7 @@ type FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projectedOffset) 
             x.ProcessLocalBinding(binding)
 
         | binding :: bindings ->
-            nextSteps.Push(BindingListStep(bindings))
+            x.PushStepList(bindings, bindingListProcessor)
             x.ProcessLocalBinding(binding)
     
     member x.ProcessExpressionList(exprs) =
@@ -831,13 +846,13 @@ type FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projectedOffset) 
         x.ProcessType(interfaceType)
         x.ProcessBindings(bindings)
 
-    member x.ProcessAnonRecordFieldExpr(IdentRange idRange, (ExprRange range as expr)) =
+    member x.ProcessAnonRecordField(IdentRange idRange, (ExprRange range as expr)) =
         // Start node at id range, end at expr range.
         let mark = x.Mark(idRange)
         x.PushRangeForMark(range, mark, ElementType.RECORD_EXPR_BINDING)
         x.ProcessExpression(expr)
 
-    member x.ProcessRecordFieldExpr(lid, expr) =
+    member x.ProcessRecordField(lid, expr) =
         match lid, expr with
         | [], None -> ()
         | [], Some(ExprRange range as expr) ->
@@ -872,111 +887,149 @@ type FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projectedOffset) 
         | _ ->
             x.ProcessExpression(expr)
 
-    member x.ProcessIndexerArg(arg: SynIndexerArg, indexerRange) =
-        x.PushRange(indexerRange, ElementType.INDEXER_ARG)
+    member x.ProcessIndexerArg(arg: SynIndexerArg) =
         x.ProcessExpressionList(arg.Exprs)
 
-and ITreeBuilderStep =
-    abstract DoStep: FSharpImplTreeBuilder * Stack<ITreeBuilderStep> -> unit
 
-and ExpressionListStep(exprs) =
-    inherit ProcessListStepBase<SynExpr>(exprs)
+[<AbstractClass>]
+type StepProcessorBase<'TStep>() =
+    abstract Process: step: 'TStep * builder: FSharpImplTreeBuilder -> unit
 
-    override x.DoStep(builder, expr) =
+    interface IBuilderStepProcessor with
+        member x.Process(step, builder) =
+            x.Process(step :?> 'TStep, builder)
+
+[<AbstractClass>]
+type StepListProcessorBase<'TStep>() =
+    abstract Process: 'TStep * FSharpImplTreeBuilder -> unit
+
+    interface IBuilderStepProcessor with
+        member x.Process(step, builder) =
+            match step :?> 'TStep list with
+            | [ item ] ->
+                x.Process(item, builder)
+
+            | item :: rest ->
+                builder.PushStepList(rest, x)
+                x.Process(item, builder)
+
+            | [] -> failwithf "Unexpected empty items list"
+
+
+type ExpressionProcessor() =
+    inherit StepProcessorBase<SynExpr>()
+
+    override x.Process(expr, builder) =
         builder.ProcessExpression(expr)
 
-and MatchClauseListStep(clauses) =
-    inherit ProcessListStepBase<SynMatchClause>(clauses)
 
-    override x.DoStep(builder, clause) =
-        builder.ProcessMatchClause(clause)
+type RangeMarkAndType =
+    { Range: range
+      Mark: int
+      ElementType: NodeType }
 
-and BindingListStep(bindings) =
-    inherit ProcessListStepBase<SynBinding>(bindings)
+type EndRangeProcessor() =
+    inherit StepProcessorBase<RangeMarkAndType>()
 
-    override x.DoStep(builder, binding) =
-        builder.ProcessLocalBinding(binding)
+    override x.Process(item, builder) =
+        builder.Done(item.Range, item.Mark, item.ElementType)
 
-and AnonRecordFieldExprListStep(fields) =
-    inherit ProcessListStepBase<Ident * SynExpr>(fields)
 
-    override x.DoStep(builder, field) =
-        builder.ProcessAnonRecordFieldExpr(field)
+type LidProcessor() =
+    inherit StepProcessorBase<LongIdent>()
 
-and RecordFieldExprListStep(fields) =
-    inherit ProcessListStepBase<RecordFieldName * (SynExpr option) * BlockSeparator option>(fields)
-
-    override x.DoStep(builder, field) =
-        let (lid, _), expr, _ = field 
-        builder.ProcessRecordFieldExpr(lid.Lid, expr)
-
-and InterfaceImplementationListStep(interfaceImpls) =
-    inherit ProcessListStepBase<SynInterfaceImpl>(interfaceImpls)
-
-    override x.DoStep(builder, interfaceImpl) =
-        builder.ProcessInterfaceImplementation(interfaceImpl)
-
-and IndexerArgListStep(indexerArgs, indexerRange) =
-    inherit ProcessListStepBase<SynIndexerArg>(indexerArgs)
-
-    override x.DoStep(builder, indexerArg) =
-        builder.ProcessIndexerArg(indexerArg, indexerRange)
-
-and EndRangeStep(range: range, mark, elementType: NodeType) =
-    inherit ProcessStepBase()
-
-    override x.DoStep(builder) =
-        builder.Done(range, mark, elementType)
-
-and ProcessExpressionStep(expr: SynExpr) =
-    inherit ProcessStepBase()
-
-    override x.DoStep(builder) =
-        builder.ProcessExpression(expr)
-
-and ProcessTypeStep(synType: SynType) =
-    inherit ProcessStepBase()
-
-    override x.DoStep(builder) =
-        builder.ProcessType(synType)
-
-and ProcessLidStep(lid: LongIdent) =
-    inherit ProcessStepBase()
-
-    override x.DoStep(builder) =
+    override x.Process(lid, builder) =
         builder.ProcessLongIdentifier(lid)
 
-and ProcessTypeArgsStep(typeArgs, ltRange, gtRange) =
-    inherit ProcessStepBase()
-    override x.DoStep(builder) =
-        builder.ProcessTypeArgs(typeArgs, ltRange, gtRange)
 
-and
-    [<AbstractClass>]
-    ProcessListStepBase<'T>(items: 'T list) =
-        let mutable items = items
+type SynTypeProcessor() =
+    inherit StepProcessorBase<SynType>()
 
-        abstract DoStep: FSharpImplTreeBuilder * 'T -> unit
+    override x.Process(synType, builder) =
+        builder.ProcessType(synType)
 
-        interface ITreeBuilderStep with
-            member x.DoStep(builder, nextSteps) =
-                match items with
-                | [] -> nextSteps.Pop() |> ignore
 
-                | [ item ] ->
-                    nextSteps.Pop() |> ignore
-                    x.DoStep(builder, item)
+type TypeArgsProcessor() =
+    inherit StepProcessorBase<SynExpr>()
 
-                | item :: rest ->
-                    items <- rest
-                    x.DoStep(builder, item)
+    override x.Process(synExpr, builder) =
+        match synExpr with
+            | SynExpr.TypeApp(_, ltRange, typeArgs, _, gtRangeOpt, _, _) ->
+                builder.ProcessTypeArgs(typeArgs, ltRange, gtRangeOpt)
+            | _ -> failwithf "Expecting typeApp, got: %A" synExpr
 
-and
-    [<AbstractClass>]
-    ProcessStepBase() =
-        abstract DoStep: FSharpImplTreeBuilder -> unit
 
-        interface ITreeBuilderStep with
-            member x.DoStep(builder, nextSteps) =
-                nextSteps.Pop() |> ignore
-                x.DoStep(builder)
+type ExpressionListProcessor() =
+    inherit StepListProcessorBase<SynExpr>()
+
+    override x.Process(expr, builder) =
+        builder.ProcessExpression(expr)
+
+
+type BindingListProcessor() =
+    inherit StepListProcessorBase<SynBinding>()
+
+    override x.Process(binding, builder) =
+        builder.ProcessLocalBinding(binding)
+
+
+type RecordFieldListProcessor() =
+    inherit StepListProcessorBase<RecordFieldName * (SynExpr option) * BlockSeparator option>()
+
+    override x.Process(field, builder) =
+        let (lid, _), expr, _ = field 
+        builder.ProcessRecordField(lid.Lid, expr)
+
+
+type AnonRecordFieldListProcessor() =
+    inherit StepListProcessorBase<Ident * SynExpr>()
+
+    override x.Process(field, builder) =
+        builder.ProcessAnonRecordField(field)
+
+
+type MatchClauseListProcessor() =
+    inherit StepListProcessorBase<SynMatchClause>()
+
+    override x.Process(matchClause, builder) =
+        builder.ProcessMatchClause(matchClause)
+
+
+type InterfaceImplementationListProcessor() =
+    inherit StepListProcessorBase<SynInterfaceImpl>()
+
+    override x.Process(interfaceImpl, builder) =
+        builder.ProcessInterfaceImplementation(interfaceImpl)
+
+
+type IndexerArgsProcessor() =
+    inherit StepProcessorBase<SynExpr>()
+
+    override x.Process(synExpr, builder) =
+        match synExpr with
+        | SynExpr.DotIndexedGet(_, [indexerArg], dotRange, range)
+        | SynExpr.DotIndexedSet(_, [indexerArg], _, _, dotRange, range) ->
+            let indexerRange = mkFileIndexRange range.FileIndex dotRange.End range.End
+            builder.PushRange(indexerRange, ElementType.INDEXER_ARG)
+            builder.PushExpressionList(indexerArg.Exprs)
+
+        | _ -> failwithf "Expecting dotIndexedGet/Set, got: %A" synExpr
+
+
+[<AutoOpen>]
+module BuilderStepProcessors =
+    // We have to create these singletons this way instead of object expressions
+    // due to compiler producing additional recursive init checks otherwise in this case.
+
+    let expressionProcessor = ExpressionProcessor()
+    let endRangeProcessor = EndRangeProcessor()
+    let lidProcessor = LidProcessor()
+    let synTypeProcessor = SynTypeProcessor()
+    let typeArgsProcessor = TypeArgsProcessor()
+    let expressionListProcessor = ExpressionListProcessor()
+    let bindingListProcessor = BindingListProcessor()
+    let recordFieldListProcessor = RecordFieldListProcessor()
+    let anonRecordFieldListProcessor = AnonRecordFieldListProcessor()
+    let matchClauseListProcessor = MatchClauseListProcessor()
+    let interfaceImplementationListProcessor = InterfaceImplementationListProcessor()
+    let indexerArgsProcessor = IndexerArgsProcessor()
