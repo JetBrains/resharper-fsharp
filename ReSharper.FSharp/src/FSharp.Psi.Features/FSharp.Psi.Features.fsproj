@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
@@ -40,6 +40,7 @@
     <Compile Include="src\Daemon\Stages\FSharpInheritedMembersHighlighterStage.fs" />
     <Compile Include="src\Daemon\Stages\FSharpVcsCodeVisionRangesProviderStage.fs" />
     <Compile Include="src\Daemon\Stages\FSharpErrorsStage.fs" />
+    <Compile Include="src\Daemon\Stages\InferredTypeCodeVisionProvider.fs" />
     <Compile Include="src\Daemon\UsageChecking\FSharpUsageCheckingService.fs" />
     <Compile Include="src\Daemon\Analyzers\ReSpellerHelper.fs" />
     <Compile Include="src\Daemon\Analyzers\StringProblemsAnalyzer.fs" />
