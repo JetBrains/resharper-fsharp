@@ -45,7 +45,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public FSharpSymbolUse GetSymbolUse(int offset) =>
       ResolvedSymbolsCache.GetSymbolUse(SourceFile, offset);
 
-    public FSharpSymbol GetSymbolDeclaration(int offset) =>
+    public FSharpSymbolUse GetSymbolDeclaration(int offset) =>
       ResolvedSymbolsCache.GetSymbolDeclaration(SourceFile, offset);
 
     public virtual void Accept(TreeNodeVisitor visitor) => visitor.VisitNode(this);

@@ -23,7 +23,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     FSharpSymbolUse GetSymbolUse(int offset);
 
     [CanBeNull]
-    FSharpSymbol GetSymbolDeclaration(int offset);
+    FSharpSymbolUse GetSymbolDeclaration(int offset);
 
     [CanBeNull]
     FSharpSymbol GetSymbol(int offset);

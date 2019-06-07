@@ -62,10 +62,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         : null;
     }
 
-    public FSharpSymbol GetSymbolDeclaration(int offset)
+    public FSharpSymbolUse GetSymbolDeclaration(int offset)
     {
       var resolvedSymbols = GetResolvedSymbols();
-      return resolvedSymbols.Declarations.TryGetValue(offset)?.SymbolUse.Symbol;
+      return resolvedSymbols.Declarations.TryGetValue(offset)?.SymbolUse;
     }
 
     public IReadOnlyList<FSharpResolvedSymbolUse> GetAllDeclaredSymbols()
@@ -81,7 +81,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     }
 
     public FSharpSymbol GetSymbol(int offset) =>
-      GetSymbolDeclaration(offset) ?? GetSymbolUse(offset)?.Symbol;
+      GetSymbolDeclaration(offset)?.Symbol ?? GetSymbolUse(offset)?.Symbol;
 
     [NotNull]
     private ResolvedSymbols CreateFileResolvedSymbols()

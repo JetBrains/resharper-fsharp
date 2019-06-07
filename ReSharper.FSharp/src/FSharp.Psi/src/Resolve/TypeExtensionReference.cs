@@ -18,7 +18,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
       var fsFile = myOwner.FSharpFile;
       var offset = token.GetTreeStartOffset().Offset;
-      return fsFile.GetSymbolDeclaration(offset) ?? fsFile.GetSymbolUse(offset)?.Symbol;
+      return fsFile.GetSymbolDeclaration(offset)?.Symbol ?? fsFile.GetSymbolUse(offset)?.Symbol;
     }
   }
 }

@@ -10,7 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     FSharpSymbolUse GetSymbolUse(int offset);
 
     [CanBeNull]
-    FSharpSymbol GetSymbolDeclaration(int offset);
+    FSharpSymbolUse GetSymbolDeclaration(int offset);
 
     [NotNull]
     IReadOnlyList<FSharpResolvedSymbolUse> GetAllDeclaredSymbols();
