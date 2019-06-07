@@ -28,6 +28,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public string CompiledName => DeclaredName;
     public string SourceName => DeclaredName;
     public FSharpSymbol GetFSharpSymbol() => null;
+    public FSharpSymbolUse GetFSharpSymbolUse() => null;
     public FSharpSymbol Symbol { get; set; }
   }
 }
