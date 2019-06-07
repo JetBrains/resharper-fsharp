@@ -379,7 +379,7 @@ anonRecdExpr options { stubBase="DummyExpression"; }:
 arrayOrListExpr options { stubBase="DummyExpression"; }:
   fakeSeparator;
 
-recordExpr options { stubBase="DummyExpression"; }:
+recordExpr options { stubBase="ReferenceExpressionBase"; }:
   LBRACE
   (
     synExpr<COPY_INFO, CopyInfoExpression>
