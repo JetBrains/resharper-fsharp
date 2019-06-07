@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Search
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Occurrences
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -14,6 +15,7 @@ type FSharpItemOccurrenceKind() =
     static member val Pattern = OccurrenceKind("Pattern", OccurrenceKind.SemanticAxis)
     static member val TypeSpecification = OccurrenceKind("Type specification", OccurrenceKind.SemanticAxis)
     static member val TypeExtension = OccurrenceKind("Type extension", OccurrenceKind.SemanticAxis)
+    static member val CopyAndUpdate = OccurrenceKind("Copy and update", OccurrenceKind.SemanticAxis)
 
 
 [<SolutionComponent>]
@@ -45,6 +47,12 @@ type FSharpItemOccurenceKindProvider() =
             | :? OpenStatementReference -> [| FSharpItemOccurrenceKind.Import |] :> _
             | :? TypeExtensionReference -> [| FSharpItemOccurrenceKind.TypeExtension |] :> _
             | :? BaseTypeReference -> [| OccurrenceKind.ExtendedType |] :> _
+
+            | :? RecordCtorReference as recordCtorReference ->
+                match recordCtorReference.RecordExpr.CopyInfoExpression with
+                | null -> [| OccurrenceKind.NewInstanceCreation |] :> _
+                | _ ->    [| FSharpItemOccurrenceKind.CopyAndUpdate |] :> _
+
             | reference ->
 
             match reference.As<FSharpSymbolReference>() with

@@ -65,6 +65,7 @@
     <Compile Include="src\Search\FSharpPathReference.fs" />
     <Compile Include="src\Search\FSharpSearchGuru.fs" />
     <Compile Include="src\Search\FSharpGeneratedElementsSearch.fs" />
+    <Compile Include="src\Search\RecordCtorSearch.fs" />
     <Compile Include="src\SelectEmbracingConsruct\FSharpSelectEmbracingConstructProvider.fs" />
     <Compile Include="src\Formatter\FSharpCodeStylePage.fs" />
     <Compile Include="src\Formatter\ReformatCode.fs" />

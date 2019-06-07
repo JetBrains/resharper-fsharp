@@ -39,9 +39,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         return ResolveResultWithInfo.Ignore;
 
       var symbol = GetFSharpSymbol();
-      var element = symbol != null
-        ? FSharpElementsUtil.GetDeclaredElement(symbol, myOwner.GetPsiModule(), myOwner)
-        : null;
+      var element = symbol?.GetDeclaredElement(myOwner.GetPsiModule(), myOwner);
 
       return element != null
         ? new ResolveResultWithInfo(new SimpleResolveResult(element), ResolveErrorType.OK) // todo: add substitutions

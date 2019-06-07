@@ -34,8 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
 
     public override bool IsCompatibleWithLanguage(PsiLanguageType languageType) => languageType.Is<FSharpLanguage>();
 
-    public override IDomainSpecificSearcher
-      CreateReferenceSearcher(IDeclaredElementsSet elements, bool findCandidates) =>
+    public override IDomainSpecificSearcher CreateReferenceSearcher(IDeclaredElementsSet elements, bool findCandidates) =>
       new FSharpReferenceSearcher(elements, findCandidates);
 
     public override IEnumerable<string> GetAllPossibleWordsInFile(IDeclaredElement element) =>

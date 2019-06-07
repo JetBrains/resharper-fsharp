@@ -23,11 +23,22 @@ TO: [O] type R = { mutable Field: |int| } RANGE: (43,46) @ Write 03 - Record fie
 TO: [O] let r1 = { |R|.Field = 123 } RANGE: (89,90) @ Write 03 - Record fields.fs
 
 
+New instance creation
+---
+TO: [O] let r = |{ Field = 123 }| RANGE: (60,75) @ Write 03 - Record fields.fs
+TO: [O] let r1 = |{ R.Field = 123 }| RANGE: (87,104) @ Write 03 - Record fields.fs
+
+
 Write access
 ---
 TO: [W] let r = { |Field| = 123 } RANGE: (62,67) @ Write 03 - Record fields.fs
 TO: [W] let r1 = { R.|Field| = 123 } RANGE: (91,96) @ Write 03 - Record fields.fs
 TO: [W] let r2 = { r1 with |Field| = r1.Field + 1 } RANGE: (125,130) @ Write 03 - Record fields.fs
 TO: [W] r2.|Field| <- r1.Field RANGE: (154,159) @ Write 03 - Record fields.fs
+
+
+Copy and update
+---
+TO: [O] let r2 = |{ r1 with Field = r1.Field + 1 }| RANGE: (115,147) @ Write 03 - Record fields.fs
 
 
