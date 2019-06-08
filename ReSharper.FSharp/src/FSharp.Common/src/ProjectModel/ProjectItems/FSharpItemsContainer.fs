@@ -318,12 +318,6 @@ type FSharpItemsContainer
             use lock = locker.UsingReadLock()
             tryGetProjectItem viewItem |> Option.map (fun item -> item.SortKey)
 
-        member x.IsApplicable(projectItem) =
-            use lock = locker.UsingReadLock()
-            tryGetProjectMark projectItem
-            |> Option.bind tryGetProjectMapping
-            |> Option.isSome
-
         member x.GetProjectItemsPaths(projectMark, targetFrameworkId) =
             tryGetProjectMapping projectMark
             |> Option.map (fun mapping -> mapping.GetProjectItemsPaths(targetFrameworkId))
@@ -333,7 +327,6 @@ type IFSharpItemsContainer =
     inherit IMsBuildProjectListener
     inherit IMsBuildProjectModificationListener
 
-    abstract member IsApplicable: IProjectItem -> bool
     abstract member TryGetSortKey: FSharpViewItem -> int option
     abstract member TryGetParentFolderIdentity: FSharpViewItem -> FSharpViewFolderIdentity option
     abstract member CreateFoldersWithParents: IProjectFolder -> (FSharpViewItem * FSharpViewItem option) seq
