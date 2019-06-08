@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Navigation
 
 open JetBrains.ReSharper.Feature.Services.Navigation.ContextNavigation
+open JetBrains.ReSharper.Features.Navigation.Features.GoToDeclaration
 open JetBrains.ReSharper.IntentionsTests.Navigation
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
@@ -63,3 +64,13 @@ type FSharpGoToInheritorsTest() =
         |> Seq.filter (fun p -> p :? IGotoInheritorsProvider)
 
     [<Test>] member x.``Union case 01``() = x.DoNamedTest()
+
+
+type FSharpGoToDeclarationTest() =
+    inherit FSharpContextSearchTestBase("declaration")
+
+    override x.CreateContextAction(solution, textControl) =
+        base.CreateContextAction(solution, textControl)
+        |> Seq.filter (fun p -> p :? IGotoDeclarationProvider)
+
+    [<Test>] member x.``Own member vs interface``() = x.DoNamedTest()
