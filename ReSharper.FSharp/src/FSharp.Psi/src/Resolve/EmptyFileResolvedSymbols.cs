@@ -9,7 +9,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     public static IFSharpFileResolvedSymbols Instance = new EmptyFileResolvedSymbols();
 
     public FSharpSymbolUse GetSymbolUse(int offset) => null;
-    public FSharpSymbol GetSymbolDeclaration(int offset) => null;
+    public FSharpSymbolUse GetSymbolDeclaration(int offset) => null;
 
     public IReadOnlyList<FSharpResolvedSymbolUse> GetAllDeclaredSymbols() =>
       EmptyList<FSharpResolvedSymbolUse>.Instance;

@@ -11,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     FSharpSymbolUse GetSymbolUse(IPsiSourceFile sourceFile, int offset);
 
     [CanBeNull]
-    FSharpSymbol GetSymbolDeclaration(IPsiSourceFile sourceFile, int offset);
+    FSharpSymbolUse GetSymbolDeclaration(IPsiSourceFile sourceFile, int offset);
 
     [NotNull]
     IReadOnlyList<FSharpResolvedSymbolUse> GetAllDeclaredSymbols(IPsiSourceFile sourceFile);
