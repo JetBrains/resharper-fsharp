@@ -67,7 +67,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
               result.Add(extensionMember);
           }
 
-          if (child is ILet let)
+          if (child is ILetModuleDecl let)
             foreach (var binding in let.Bindings)
             {
               var headPattern = binding.HeadPattern;

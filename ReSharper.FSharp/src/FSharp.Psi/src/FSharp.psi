@@ -116,7 +116,7 @@ interface moduleMember:
 interface moduleMemberDeclaration:
   nestedModuleDeclaration |
   fSharpTypeDeclaration |
-  let |
+  letModuleDecl |
   moduleAbbreviation |
   otherMemberDeclaration;
 
@@ -124,11 +124,23 @@ interface moduleMemberStatement:
   openStatement |
   do;
 
-let options { stubBase="DummyDeclaration"; }:
-  // todo: add `let` `rec` keyword
-  binding<BINDING, Bindings>*
-  fakeSeparator;
+letModuleDecl options { stubBase="DummyDeclaration"; }:
+  letOrUse{LET, LetOrUseToken}
+  REC<REC, RecKeyword>?
+  binding<BINDING, Bindings>
+  (
+    AND
+    binding<BINDING, Bindings>
+  )*;
 
+
+interface let:
+  letBindings |
+  letOrUseBangExpr;
+
+interface letBindings:
+  letModuleDecl |
+  letOrUseExpr;
 
 interface binding:
   topBinding |
@@ -136,17 +148,17 @@ interface binding:
 
 topBinding:
   fSharpAttribute<ATTRIBUTE, Attributes>*
+  MUTABLE<MUTABLE, MutableKeyword>
   synPat<HEAD_PATTERN, HeadPattern>
   EQUALS
-  chameleonExpression<EXPR, Expression>
-  fakeSeparator;
+  chameleonExpression<EXPR, Expression>;
 
 localBinding:
   fSharpAttribute<ATTRIBUTE, Attributes>*
+  MUTABLE<MUTABLE, MutableKeyword>
   synPat<HEAD_PATTERN, HeadPattern>
   EQUALS
-  synExpr<EXPR, Expression>
-  fakeSeparator;
+  synExpr<EXPR, Expression>;
 
 returnTypeInfo:
   COLON
@@ -205,8 +217,7 @@ typedPat options { stubBase="SynPatternBase"; }:
 
 attribPat options { stubBase="SynPatternBase"; }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
-  synPat<PATTERN, Pattern>
-  fakeSeparator;
+  synPat<PATTERN, Pattern>;
 
 orPat options { stubBase="SynPatternBase"; }:
   synPat<PATTERN1, Pattern1>
@@ -229,7 +240,11 @@ listPat options { stubBase="SynPatternBase"; }:
   RBRACK;
 
 tuplePat options { stubBase="SynPatternBase"; }:
-  synPat<ATTRIBUTE, Patterns>*;
+  synPat<ATTRIBUTE, Patterns>
+  (
+    COMMA
+    synPat<ATTRIBUTE, Patterns>
+  )*;
 
 parenPat options { stubBase="SynPatternBase"; }:
   LPAREN
@@ -248,7 +263,7 @@ optionalValPat options { stubBase="SynPatternBase"; }:
 
 isInstPat options { stubBase="SynPatternBase"; }:
   COLON_QMARK
-  fakeSeparator;
+  synType<SYN_TYPE, Type>;
 
 consPat options { stubBase="SynPatternBase"; }:
   synPat<PATTERN1, Pattern1>
@@ -485,10 +500,13 @@ typeAppExpr options { stubBase="DummyExpression"; }:
   GREATER;
 
 letOrUseExpr options { stubBase="DummyExpression"; }:
-  LET
+  letOrUse{LET, LetOrUseToken}
   REC<REC, RecKeyword>?
-  localBinding<BINDING, Bindings>*
-  synExpr<EXPR, Expression>;
+  binding<BINDING, Bindings>
+  (
+    AND
+    binding<BINDING, Bindings>
+  )*;
 
 tryWithExpr options { stubBase="DummyExpression"; }:
   TRY
@@ -636,7 +654,7 @@ yieldOrReturnExpr options { stubBase="DummyExpression"; }:
   synExpr<EXPR, Expression>;
 
 letOrUseBangExpr options { stubBase="DummyExpression"; }:
-  LET_BANG
+  letOrUseBang{LET, LetOrUseToken}
   synPat<PAT, Pattern>
   synExpr<RHS_EXPR, RightHandExpression>
   IN?
@@ -913,7 +931,7 @@ interface fSharpTypeMemberDeclaration:
   typeLetBindings |
   valField |
   autoProperty |
-  let |
+  letModuleDecl |
 
   otherTypeMember;
 
@@ -1018,10 +1036,18 @@ otherModuleMember: fakeSeparator;
 
 // Identifiers
 
-private identOrOpName{ROLE,Getter}:
-  IDENTIFIER<@ROLE,@Getter> |
-  SYMBOLIC_OP<@ROLE,@Getter> |
-  activePatternId<@ROLE,@Getter> | 
+private letOrUse{ROLE, Getter}:
+  LET<@ROLE, @Getter> |
+  USE<@ROLE, @Getter>;
+
+private letOrUseBang{ROLE, Getter}:
+  LET_BANG<@ROLE, @Getter> |
+  USE_BANG<@ROLE, @Getter>;
+
+private identOrOpName{ROLE, Getter}:
+  IDENTIFIER<@ROLE, @Getter> |
+  SYMBOLIC_OP<@ROLE, @Getter> |
+  activePatternId<@ROLE, @Getter> | 
   longIdentifier<@ROLE, @Getter>;
 
 activePatternId:

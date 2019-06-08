@@ -69,7 +69,7 @@ type FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projectedOffset) 
             let letMark = x.Mark(letStart)
             for binding in bindings do
                 x.ProcessTopLevelBinding(binding)
-            x.Done(range, letMark, ElementType.LET)
+            x.Done(range, letMark, ElementType.LET_MODULE_DECL)
 
         | SynModuleDecl.HashDirective(hashDirective, _) ->
             x.ProcessHashDirective(hashDirective)
@@ -227,7 +227,7 @@ type FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projectedOffset) 
                 | SynMemberDefn.LetBindings(bindings, _, _, _) ->
                     for binding in bindings do
                         x.ProcessTopLevelBinding(binding)
-                    ElementType.LET
+                    ElementType.LET_MODULE_DECL
 
                 | SynMemberDefn.AbstractSlot(ValSpfn(_, _, typeParams, _, _, _, _, _, _, _, _), _, range) ->
                     match typeParams with

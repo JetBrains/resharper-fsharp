@@ -50,7 +50,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
                 x.ProcessTypeParameter(p, ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION)
 
             x.Done(range, bindingMark, ElementType.TOP_BINDING)
-            x.Done(letMark, ElementType.LET)
+            x.Done(letMark, ElementType.LET_MODULE_DECL)
         | _ -> ()
 
     member x.ProcessTypeSignature(TypeDefnSig(ComponentInfo(attrs, typeParams, _, lid, _, _, _, _), typeSig, memberSigs, range)) =

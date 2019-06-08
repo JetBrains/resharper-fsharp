@@ -96,9 +96,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       Builder.AddDeclaredMemberName(decl.CompiledName);
     }
 
-    public override void VisitLet(ILet let)
+    public override void VisitLetModuleDecl(ILetModuleDecl letModuleDecl)
     {
-      foreach (var binding in let.Bindings)
+      foreach (var binding in letModuleDecl.Bindings)
       {
         var headPattern = binding.HeadPattern;
         if (headPattern != null)
