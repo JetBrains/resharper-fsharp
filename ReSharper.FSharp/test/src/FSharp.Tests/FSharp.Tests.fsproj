@@ -34,6 +34,7 @@
     <PackageReference Include="FSharp.Core" Version="$(FSharpCoreVersion)" />
     <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FSharpCompilerServiceVersion)" />
     <PackageReference Include="JetBrains.Rider.SDK.Tests" Version="$(RiderSDKVersion)" />
+    <PackageReference Include="Moq" Version="4.8.2" />
     <PackageReference Include="System.ValueTuple" Version="$(ValueTupleVersion)" />
     <PackageReference Include="NUnit.Console" Version="3.10.0" />
   </ItemGroup>

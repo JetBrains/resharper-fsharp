@@ -25,7 +25,9 @@ type FSharpGoToUsagesTest() =
     [<Test>] member x.``Compiled union case``() = x.DoNamedTest()
 
     [<Test>] member x.``Record Ctor 01 - Source``() = x.DoNamedTest()
-    [<Test; Ignore("Add references to tests via attrs")>] member x.``Record Ctor 02 - Compiled``() = x.DoNamedTest()
+
+    [<TestReferences("FSharpRecord.dll")>]
+    [<Test>] member x.``Record Ctor 02 - Compiled``() = x.DoNamedTest()
 
 
 type FSharpGoToImplementationTest() =
