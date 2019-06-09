@@ -150,6 +150,7 @@ topBinding:
   fSharpAttribute<ATTRIBUTE, Attributes>*
   MUTABLE<MUTABLE, MutableKeyword>
   synPat<HEAD_PATTERN, HeadPattern>
+  returnTypeInfo<RETURN_INFO, ReturnTypeInfo>
   EQUALS
   chameleonExpression<EXPR, Expression>;
 
@@ -157,11 +158,13 @@ localBinding:
   fSharpAttribute<ATTRIBUTE, Attributes>*
   MUTABLE<MUTABLE, MutableKeyword>
   synPat<HEAD_PATTERN, HeadPattern>
+  returnTypeInfo<RETURN_INFO, ReturnTypeInfo>
   EQUALS
   synExpr<EXPR, Expression>;
 
 returnTypeInfo:
   COLON
+  fSharpAttribute<ATTRIBUTE, Attributes>*
   synType<TYPE, ReturnType>;
 
 interface synPat:

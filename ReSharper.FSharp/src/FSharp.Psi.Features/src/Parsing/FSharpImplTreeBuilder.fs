@@ -247,15 +247,15 @@ type FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projectedOffset) 
             x.Done(typeMember.Range, mark, memberType)
 
     member x.ProcessReturnInfo(returnInfo) =
-        // todo: mark return type attributes
         match returnInfo with
         | None -> ()
-        | Some(SynBindingReturnInfo(returnType, range, _)) ->
+        | Some(SynBindingReturnInfo(returnType, range, attrs)) ->
 
         let startOffset = x.GetStartOffset(range)
         x.AdvanceToTokenOrOffset(FSharpTokenType.COLON, startOffset, range)
 
         let mark = x.Mark()
+        x.ProcessAttributes(attrs)
         x.ProcessType(returnType)
         x.Done(range, mark, ElementType.RETURN_TYPE_INFO)
 

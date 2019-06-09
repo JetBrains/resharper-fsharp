@@ -70,6 +70,10 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - DotIndexerGet 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - DotIndexerGet 03``() = x.DoNamedTest()
 
+    [<Test>] member x.``Binding - Return type 01``() = x.DoNamedTest()
+    [<Test>] member x.``Binding - Return type 02 - Attrs``() = x.DoNamedTest()
+    [<Test>] member x.``Binding - Return type 03 - Attrs, wild type``() = x.DoNamedTest()
+
     [<Test>] member x.``Attribute 01``() = x.DoNamedTest()
     [<Test>] member x.``Attribute 02 - Simple arg``() = x.DoNamedTest()
     [<Test>] member x.``Attribute 03 - Simple arg - No parens``() = x.DoNamedTest()
