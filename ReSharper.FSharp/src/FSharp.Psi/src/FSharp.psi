@@ -72,35 +72,36 @@ interface moduleLikeDeclaration:
 interface topLevelModuleLikeDeclaration:
   namedModuleLikeDeclaration |
   anonModuleDeclaration |
-  fSharpGlobalNamespaceDeclaration;
+  globalNamespaceDeclaration;
 
 interface namedModuleLikeDeclaration:
   namedModuleDeclaration |
-  fSharpNamespaceDeclaration;
+  namedNamespaceDeclaration;
 
 interface moduleDeclaration:
   namedModuleDeclaration |
   nestedModuleDeclaration;
 
 
-fSharpNamespaceDeclaration options { stubBase="FSharpDeclarationBase"; }:
+namedNamespaceDeclaration options { stubBase="FSharpDeclarationBase"; }:
+  NAMESPACE<NAMESPACE, NamespaceToken>
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>
   moduleMember<MODULE_MEMBER, Members>*;
 
-fSharpGlobalNamespaceDeclaration options { stubBase="FSharpDeclarationBase"; }:
-  moduleMember<MODULE_MEMBER, Members>*
-  fakeSeparator;
+globalNamespaceDeclaration options { stubBase="FSharpDeclarationBase"; }:
+  NAMESPACE<NAMESPACE, NamespaceToken>
+  GLOBAL
+  moduleMember<MODULE_MEMBER, Members>*;
 
 namedModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
+  MODULE<MODULE, ModuleToken>
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>
-  moduleMember<MODULE_MEMBER, Members>*
-  fakeSeparator;
+  moduleMember<MODULE_MEMBER, Members>*;
 
 anonModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; }:
-  moduleMember<MODULE_MEMBER, Members>*
-  fakeSeparator;
+  moduleMember<MODULE_MEMBER, Members>*;
 
 
 

@@ -160,7 +160,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
                 match moduleKind with
                 | NamedModule -> ElementType.NAMED_MODULE_DECLARATION
                 | AnonModule -> ElementType.ANON_MODULE_DECLARATION
-                | _ -> ElementType.F_SHARP_NAMESPACE_DECLARATION
+                | _ -> ElementType.NAMED_NAMESPACE_DECLARATION
 
             Some mark, elementType
 
@@ -169,7 +169,7 @@ type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: 
         match moduleKind with
         | GlobalNamespace ->
             let mark = x.Mark(range)
-            Some mark, ElementType.F_SHARP_GLOBAL_NAMESPACE_DECLARATION
+            Some mark, ElementType.GLOBAL_NAMESPACE_DECLARATION
         | _ -> None, null
 
     member x.FinishTopLevelDeclaration(mark: int option, range, elementType) =

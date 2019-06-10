@@ -7,7 +7,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
   public class DeclaredNamespacePart : NamespacePart
   {
-    public DeclaredNamespacePart(IFSharpNamespaceDeclaration declaration)
+    public DeclaredNamespacePart(INamedNamespaceDeclaration declaration)
       : base(declaration, declaration.GetTreeStartOffset(), declaration.CompiledName)
     {
     }
@@ -19,7 +19,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     protected override ICachedDeclaration2 FindDeclaration(IFile file, ICachedDeclaration2 candidateDeclaration)
     {
       if (Offset < TreeOffset.Zero) return null;
-      if (candidateDeclaration is IFSharpNamespaceDeclaration) return candidateDeclaration;
+      if (candidateDeclaration is INamedNamespaceDeclaration) return candidateDeclaration;
       return null;
     }
 

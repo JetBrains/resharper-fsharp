@@ -60,10 +60,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
         Builder.EndPart();
     }
 
-    public override void VisitFSharpNamespaceDeclaration(IFSharpNamespaceDeclaration decl) =>
+    public override void VisitNamedNamespaceDeclaration(INamedNamespaceDeclaration decl) =>
       ProcessNamedModuleLikeDeclaration(decl, new DeclaredNamespacePart(decl));
 
-    public override void VisitFSharpGlobalNamespaceDeclaration(IFSharpGlobalNamespaceDeclaration decl)
+    public override void VisitGlobalNamespaceDeclaration(IGlobalNamespaceDeclaration decl)
     {
       foreach (var memberDecl in decl.MembersEnumerable)
         memberDecl.Accept(this);

@@ -3,7 +3,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
-  public partial interface IFSharpNamespaceDeclaration : INamespaceDeclaration, ICachedDeclaration2
+  public partial interface INamedNamespaceDeclaration : INamespaceDeclaration, ICachedDeclaration2
   {
   }
 }
