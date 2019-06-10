@@ -147,21 +147,27 @@ interface binding:
   topBinding |
   localBinding;
 
-topBinding:
+topBinding
+  extras {
+    get { methodName="Expression" path=<topBinding:CHAMELEON_EXPR/chameleonExpression:EXPR> };
+  }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
   MUTABLE<MUTABLE, MutableKeyword>
   synPat<HEAD_PATTERN, HeadPattern>
   returnTypeInfo<RETURN_INFO, ReturnTypeInfo>
   EQUALS
-  chameleonExpression<EXPR, Expression>;
+  chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>;
 
-localBinding:
+localBinding
+  extras {
+    get { methodName="Expression" path=<localBinding:CHAMELEON_EXPR/chameleonExpression:EXPR> };
+  }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
   MUTABLE<MUTABLE, MutableKeyword>
   synPat<HEAD_PATTERN, HeadPattern>
   returnTypeInfo<RETURN_INFO, ReturnTypeInfo>
   EQUALS
-  synExpr<EXPR, Expression>;
+  chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>;
 
 returnTypeInfo:
   COLON
@@ -674,7 +680,7 @@ fixedExpr options { stubBase="DummyExpression"; }:
   FIXED<FIXED, FixedKeyword>
   synExpr<EXPR, Expression>;
 
-chameleonExpression options { stubBase="DummyExpression"; customParseFunction; }:
+chameleonExpression options { stubBase="DummyExpression"; }:
   synExpr<EXPR, Expression>;
 
 
@@ -1110,10 +1116,13 @@ private modifier{ROLE,Getter}:
 
 // Attributes
 
-fSharpAttribute options { stubBase="TypeExpressionBase"; }:
+fSharpAttribute options { stubBase="TypeExpressionBase"; }
+  extras {
+    get { methodName="Expression" path=<fSharpAttribute:CHAMELEON_EXPR/chameleonExpression:EXPR> };
+  }:
   attributeTarget<ATTR_TARGET, Target>?
   longIdentifier<IDENTIFIER, LongIdentifier>
-  chameleonExpression<ARG_EXPRESSION, ArgExpression>?;
+  chameleonExpression<CHAMELEON_EXPR, ArgExpression>?;
 
 attributeTarget:
   IDENTIFIER<IDENTIFIER, Identifier>
