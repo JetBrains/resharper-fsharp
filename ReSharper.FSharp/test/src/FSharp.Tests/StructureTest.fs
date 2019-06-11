@@ -30,7 +30,7 @@ type FSharpStructureTest() =
     [<Test>] member x.``Class bindings 01``() = x.DoNamedTest()
     [<Test>] member x.``Type Extension 01``() = x.DoNamedTest()
 
-    override x.DoTest(project) =
+    override x.DoTest(project: IProject) =
         let items = project.GetSubItems(x.TestName)
         let projectFile = items.FirstOrDefault().As<IProjectFile>().NotNull("projectFile == null")
         let sourceFile = projectFile.ToSourceFile().NotNull("sourceFile == null")
