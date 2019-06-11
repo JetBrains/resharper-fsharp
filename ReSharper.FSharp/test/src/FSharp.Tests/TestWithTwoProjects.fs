@@ -7,6 +7,7 @@ open JetBrains.Application.Components
 open JetBrains.Application.Progress
 open JetBrains.Application.Threading
 open JetBrains.DocumentManagers.Transactions
+open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Impl.Sdk
 open JetBrains.ReSharper.Plugins.FSharp.Tests
@@ -63,4 +64,4 @@ type TestWithTwoProjects() =
         let cfg = BaseTestWithSolution.TestSolutionConfiguration(solutionFilePath, descriptors)
         BaseTestWithSingleProject.ProcessSdkReferences(cfg, x.ShellInstance.GetComponent<ISdkManager>().Kits)
 
-        x.DoTestSolution(fun _ -> cfg)
+        x.DoTestSolution((fun _ -> cfg), (null: Func<Action<Lifetime>, Action<Lifetime>>))
