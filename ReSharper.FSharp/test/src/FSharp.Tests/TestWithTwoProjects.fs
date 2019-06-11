@@ -28,7 +28,7 @@ type TestWithTwoProjects() =
 
     abstract DoTest: mainProject: IProject * secondProject: IProject -> unit
 
-    override x.DoTest(project: IProject) =
+    override x.DoTest(lifetime: Lifetime, project: IProject) =
         x.AddProjectReference(project)
         x.DoTest(project, x.SecondProject)
 
