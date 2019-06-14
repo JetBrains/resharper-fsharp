@@ -76,7 +76,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       }
 
       // todo: proper expressions evaluation, e.g. "S1" + "S2"
-      var stringArg = GetStringConst(attr.ArgExpression?.Expression);
+      var stringArg = GetStringConst(attr.Expression);
       if (stringArg == null)
       {
         compiledName = null;
@@ -104,7 +104,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     private static bool IsModuleSuffixAttribute([NotNull] this IFSharpAttribute attr) =>
-      attr.ShortNameEquals("CompilationRepresentation") && IsModuleSuffixExpr(attr.ArgExpression?.Expression);
+      attr.ShortNameEquals("CompilationRepresentation") && IsModuleSuffixExpr(attr.Expression);
 
     public static string GetModuleCompiledName([CanBeNull] this IIdentifier identifier,
       TreeNodeCollection<IFSharpAttribute> attributes)

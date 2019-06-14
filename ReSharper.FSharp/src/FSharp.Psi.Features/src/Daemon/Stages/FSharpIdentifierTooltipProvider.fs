@@ -72,7 +72,7 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
                           yield showL overload.MainDescription
 
                       if not overload.TypeMapping.IsEmpty then
-                          yield "Generic parameters:\n" + (overload.TypeMapping |> List.map showL |> String.concat "\n")
+                          yield overload.TypeMapping |> List.map showL |> String.concat "\n"
 
                       match xmlDocService.GetXmlDoc(overload.XmlDoc) with
                       | null -> ()

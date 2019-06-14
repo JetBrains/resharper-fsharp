@@ -20,10 +20,13 @@
     public const string IDS_NOT_COMPILED_TYPE_DECLARATION = "";
     public const string IDS_SIMPLE_TYPE_DECLARATION = "";
     public const string IDS_HASH_DIRECTIVE = "";
+    public const string IDS_SYN_PAT = "";
     public const string IDS_CONST_PAT = "";
     public const string IDS_LONG_IDENT_PAT = "";
     public const string IDS_NAMED_PAT = "";
     public const string IDS_ARRAY_OR_LIST_PAT = "";
+    public const string IDS_LET = "";
+    public const string IDS_LET_BINDINGS = "";
     public const string IDS_BINDING = "";
     public const string IDS_IDENT_OR_OP_NAME = "";
     public const string IDS_ACTIVE_PATTERN_CASE_DECLARATION = "";
@@ -33,6 +36,8 @@
     public const string IDS_SET_EXPR = "";
     public const string IDS_CAST_EXPR = "";
     public const string IDS_SYN_TYPE = "";
+    public const string IDS_LET_OR_USE = "";
+    public const string IDS_LET_OR_USE_BANG = "";
 
     public static string GetString(string id) => id;
     public static string GetExpectedMessage(string s) => string.Empty;

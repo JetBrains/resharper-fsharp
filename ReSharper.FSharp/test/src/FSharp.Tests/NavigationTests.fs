@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Navigation
 
 open JetBrains.ReSharper.Feature.Services.Navigation.ContextNavigation
+open JetBrains.ReSharper.Features.Navigation.Features.GoToDeclaration
 open JetBrains.ReSharper.IntentionsTests.Navigation
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
@@ -25,7 +26,9 @@ type FSharpGoToUsagesTest() =
     [<Test>] member x.``Compiled union case``() = x.DoNamedTest()
 
     [<Test>] member x.``Record Ctor 01 - Source``() = x.DoNamedTest()
-    [<Test; Ignore("Add references to tests via attrs")>] member x.``Record Ctor 02 - Compiled``() = x.DoNamedTest()
+
+    [<TestReferences("FSharpRecord.dll")>]
+    [<Test>] member x.``Record Ctor 02 - Compiled``() = x.DoNamedTest()
 
 
 type FSharpGoToImplementationTest() =
@@ -61,3 +64,16 @@ type FSharpGoToInheritorsTest() =
         |> Seq.filter (fun p -> p :? IGotoInheritorsProvider)
 
     [<Test>] member x.``Union case 01``() = x.DoNamedTest()
+
+
+type FSharpGoToDeclarationTest() =
+    inherit FSharpContextSearchTestBase("declaration")
+
+    override x.CreateContextAction(solution, textControl) =
+        base.CreateContextAction(solution, textControl)
+        |> Seq.filter (fun p -> p :? IGotoDeclarationProvider)
+
+    [<Test>] member x.``Own member vs interface``() = x.DoNamedTest()
+
+    [<TestReferences("Library1.dll", "Library2.dll")>]
+    [<Test>] member x.``Same type from different assemblies``() = x.DoNamedTest()

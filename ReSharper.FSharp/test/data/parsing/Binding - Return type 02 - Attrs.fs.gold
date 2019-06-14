@@ -10,6 +10,12 @@ IFSharpImplFile
         IReturnTypeInfo
           FSharpTokenType+ColonTokenElement(type:COLON, text::)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
+          IFSharpAttribute
+            ILongIdentifier
+              FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
+          FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           INamedTypeExpression
             ILongIdentifier
               FSharpIdentifierToken(type:IDENTIFIER, text:int)
@@ -18,6 +24,5 @@ IFSharpImplFile
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         IChameleonExpression
           IConstExpr
-            FSharpToken(type:INT32, text:123)
-    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+            FSharpToken(type:INT32, text:1)
 

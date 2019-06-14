@@ -72,35 +72,36 @@ interface moduleLikeDeclaration:
 interface topLevelModuleLikeDeclaration:
   namedModuleLikeDeclaration |
   anonModuleDeclaration |
-  fSharpGlobalNamespaceDeclaration;
+  globalNamespaceDeclaration;
 
 interface namedModuleLikeDeclaration:
   namedModuleDeclaration |
-  fSharpNamespaceDeclaration;
+  namedNamespaceDeclaration;
 
 interface moduleDeclaration:
   namedModuleDeclaration |
   nestedModuleDeclaration;
 
 
-fSharpNamespaceDeclaration options { stubBase="FSharpDeclarationBase"; }:
+namedNamespaceDeclaration options { stubBase="FSharpDeclarationBase"; }:
+  NAMESPACE<NAMESPACE, NamespaceToken>
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>
   moduleMember<MODULE_MEMBER, Members>*;
 
-fSharpGlobalNamespaceDeclaration options { stubBase="FSharpDeclarationBase"; }:
-  moduleMember<MODULE_MEMBER, Members>*
-  fakeSeparator;
+globalNamespaceDeclaration options { stubBase="FSharpDeclarationBase"; }:
+  NAMESPACE<NAMESPACE, NamespaceToken>
+  GLOBAL
+  moduleMember<MODULE_MEMBER, Members>*;
 
 namedModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
+  MODULE<MODULE, ModuleToken>
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>
-  moduleMember<MODULE_MEMBER, Members>*
-  fakeSeparator;
+  moduleMember<MODULE_MEMBER, Members>*;
 
 anonModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; }:
-  moduleMember<MODULE_MEMBER, Members>*
-  fakeSeparator;
+  moduleMember<MODULE_MEMBER, Members>*;
 
 
 
@@ -116,7 +117,7 @@ interface moduleMember:
 interface moduleMemberDeclaration:
   nestedModuleDeclaration |
   fSharpTypeDeclaration |
-  let |
+  letModuleDecl |
   moduleAbbreviation |
   otherMemberDeclaration;
 
@@ -124,32 +125,53 @@ interface moduleMemberStatement:
   openStatement |
   do;
 
-let options { stubBase="DummyDeclaration"; }:
-  // todo: add `let` `rec` keyword
-  binding<BINDING, Bindings>*
-  fakeSeparator;
+letModuleDecl options { stubBase="DummyDeclaration"; }:
+  letOrUse{LET, LetOrUseToken}
+  REC<REC, RecKeyword>?
+  binding<BINDING, Bindings>
+  (
+    AND
+    binding<BINDING, Bindings>
+  )*;
 
+
+interface let:
+  letBindings |
+  letOrUseBangExpr;
+
+interface letBindings:
+  letModuleDecl |
+  letOrUseExpr;
 
 interface binding:
   topBinding |
   localBinding;
 
-topBinding:
+topBinding
+  extras {
+    get { methodName="Expression" path=<topBinding:CHAMELEON_EXPR/chameleonExpression:EXPR> };
+  }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
+  MUTABLE<MUTABLE, MutableKeyword>
   synPat<HEAD_PATTERN, HeadPattern>
+  returnTypeInfo<RETURN_INFO, ReturnTypeInfo>
   EQUALS
-  chameleonExpression<EXPR, Expression>
-  fakeSeparator;
+  chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>;
 
-localBinding:
+localBinding
+  extras {
+    get { methodName="Expression" path=<localBinding:CHAMELEON_EXPR/chameleonExpression:EXPR> };
+  }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
+  MUTABLE<MUTABLE, MutableKeyword>
   synPat<HEAD_PATTERN, HeadPattern>
+  returnTypeInfo<RETURN_INFO, ReturnTypeInfo>
   EQUALS
-  synExpr<EXPR, Expression>
-  fakeSeparator;
+  chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>;
 
 returnTypeInfo:
   COLON
+  fSharpAttribute<ATTRIBUTE, Attributes>*
   synType<TYPE, ReturnType>;
 
 interface synPat:
@@ -205,8 +227,7 @@ typedPat options { stubBase="SynPatternBase"; }:
 
 attribPat options { stubBase="SynPatternBase"; }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
-  synPat<PATTERN, Pattern>
-  fakeSeparator;
+  synPat<PATTERN, Pattern>;
 
 orPat options { stubBase="SynPatternBase"; }:
   synPat<PATTERN1, Pattern1>
@@ -229,7 +250,11 @@ listPat options { stubBase="SynPatternBase"; }:
   RBRACK;
 
 tuplePat options { stubBase="SynPatternBase"; }:
-  synPat<ATTRIBUTE, Patterns>*;
+  synPat<ATTRIBUTE, Patterns>
+  (
+    COMMA
+    synPat<ATTRIBUTE, Patterns>
+  )*;
 
 parenPat options { stubBase="SynPatternBase"; }:
   LPAREN
@@ -248,7 +273,7 @@ optionalValPat options { stubBase="SynPatternBase"; }:
 
 isInstPat options { stubBase="SynPatternBase"; }:
   COLON_QMARK
-  fakeSeparator;
+  synType<SYN_TYPE, Type>;
 
 consPat options { stubBase="SynPatternBase"; }:
   synPat<PATTERN1, Pattern1>
@@ -485,10 +510,13 @@ typeAppExpr options { stubBase="DummyExpression"; }:
   GREATER;
 
 letOrUseExpr options { stubBase="DummyExpression"; }:
-  LET
+  letOrUse{LET, LetOrUseToken}
   REC<REC, RecKeyword>?
-  localBinding<BINDING, Bindings>*
-  synExpr<EXPR, Expression>;
+  binding<BINDING, Bindings>
+  (
+    AND
+    binding<BINDING, Bindings>
+  )*;
 
 tryWithExpr options { stubBase="DummyExpression"; }:
   TRY
@@ -636,7 +664,7 @@ yieldOrReturnExpr options { stubBase="DummyExpression"; }:
   synExpr<EXPR, Expression>;
 
 letOrUseBangExpr options { stubBase="DummyExpression"; }:
-  LET_BANG
+  letOrUseBang{LET, LetOrUseToken}
   synPat<PAT, Pattern>
   synExpr<RHS_EXPR, RightHandExpression>
   IN?
@@ -652,7 +680,7 @@ fixedExpr options { stubBase="DummyExpression"; }:
   FIXED<FIXED, FixedKeyword>
   synExpr<EXPR, Expression>;
 
-chameleonExpression options { stubBase="DummyExpression"; customParseFunction; }:
+chameleonExpression options { stubBase="DummyExpression"; }:
   synExpr<EXPR, Expression>;
 
 
@@ -913,7 +941,7 @@ interface fSharpTypeMemberDeclaration:
   typeLetBindings |
   valField |
   autoProperty |
-  let |
+  letModuleDecl |
 
   otherTypeMember;
 
@@ -1018,10 +1046,18 @@ otherModuleMember: fakeSeparator;
 
 // Identifiers
 
-private identOrOpName{ROLE,Getter}:
-  IDENTIFIER<@ROLE,@Getter> |
-  SYMBOLIC_OP<@ROLE,@Getter> |
-  activePatternId<@ROLE,@Getter> | 
+private letOrUse{ROLE, Getter}:
+  LET<@ROLE, @Getter> |
+  USE<@ROLE, @Getter>;
+
+private letOrUseBang{ROLE, Getter}:
+  LET_BANG<@ROLE, @Getter> |
+  USE_BANG<@ROLE, @Getter>;
+
+private identOrOpName{ROLE, Getter}:
+  IDENTIFIER<@ROLE, @Getter> |
+  SYMBOLIC_OP<@ROLE, @Getter> |
+  activePatternId<@ROLE, @Getter> | 
   longIdentifier<@ROLE, @Getter>;
 
 activePatternId:
@@ -1080,10 +1116,13 @@ private modifier{ROLE,Getter}:
 
 // Attributes
 
-fSharpAttribute options { stubBase="TypeExpressionBase"; }:
+fSharpAttribute options { stubBase="TypeExpressionBase"; }
+  extras {
+    get { methodName="Expression" path=<fSharpAttribute:CHAMELEON_EXPR/chameleonExpression:EXPR> };
+  }:
   attributeTarget<ATTR_TARGET, Target>?
   longIdentifier<IDENTIFIER, LongIdentifier>
-  chameleonExpression<ARG_EXPRESSION, ArgExpression>?;
+  chameleonExpression<CHAMELEON_EXPR, ArgExpression>?;
 
 attributeTarget:
   IDENTIFIER<IDENTIFIER, Identifier>

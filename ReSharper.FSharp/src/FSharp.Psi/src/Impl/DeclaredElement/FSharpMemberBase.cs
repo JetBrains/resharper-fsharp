@@ -117,6 +117,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       if (!base.Equals(obj) || !(obj is FSharpMemberBase<TDeclaration> otherMember))
         return false;
 
+      if (IsExplicitImplementation != otherMember.IsExplicitImplementation)
+        return false;
+
       var mfv = Mfv;
       if (mfv == null)
         return false;

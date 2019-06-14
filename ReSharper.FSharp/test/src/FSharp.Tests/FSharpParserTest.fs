@@ -20,6 +20,9 @@ type FSharpParserTest() =
     [<Test>] member x.``Let 04 - Typed, var type, space``() = x.DoNamedTest()
     [<Test>] member x.``Let 05 - Typed, space``() = x.DoNamedTest()
 
+    [<Test>] member x.``Let - Rec 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Rec 02 - And``() = x.DoNamedTest()
+
     [<Test>] member x.``Let - Local 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Let - Local 02 - Typed``() = x.DoNamedTest()
     [<Test>] member x.``Let - Local 03 - Typed expr``() = x.DoNamedTest()
@@ -66,6 +69,10 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - DotIndexerGet 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - DotIndexerGet 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - DotIndexerGet 03``() = x.DoNamedTest()
+
+    [<Test>] member x.``Binding - Return type 01``() = x.DoNamedTest()
+    [<Test>] member x.``Binding - Return type 02 - Attrs``() = x.DoNamedTest()
+    [<Test>] member x.``Binding - Return type 03 - Attrs, wild type``() = x.DoNamedTest()
 
     [<Test>] member x.``Attribute 01``() = x.DoNamedTest()
     [<Test>] member x.``Attribute 02 - Simple arg``() = x.DoNamedTest()

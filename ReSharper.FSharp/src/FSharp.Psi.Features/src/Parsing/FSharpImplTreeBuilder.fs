@@ -69,7 +69,7 @@ type FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projectedOffset) 
             let letMark = x.Mark(letStart)
             for binding in bindings do
                 x.ProcessTopLevelBinding(binding)
-            x.Done(range, letMark, ElementType.LET)
+            x.Done(range, letMark, ElementType.LET_MODULE_DECL)
 
         | SynModuleDecl.HashDirective(hashDirective, _) ->
             x.ProcessHashDirective(hashDirective)
@@ -227,7 +227,7 @@ type FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projectedOffset) 
                 | SynMemberDefn.LetBindings(bindings, _, _, _) ->
                     for binding in bindings do
                         x.ProcessTopLevelBinding(binding)
-                    ElementType.LET
+                    ElementType.LET_MODULE_DECL
 
                 | SynMemberDefn.AbstractSlot(ValSpfn(_, _, typeParams, _, _, _, _, _, _, _, _), _, range) ->
                     match typeParams with
@@ -247,15 +247,15 @@ type FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projectedOffset) 
             x.Done(typeMember.Range, mark, memberType)
 
     member x.ProcessReturnInfo(returnInfo) =
-        // todo: mark return type attributes
         match returnInfo with
         | None -> ()
-        | Some(SynBindingReturnInfo(returnType, range, _)) ->
+        | Some(SynBindingReturnInfo(returnType, range, attrs)) ->
 
         let startOffset = x.GetStartOffset(range)
         x.AdvanceToTokenOrOffset(FSharpTokenType.COLON, startOffset, range)
 
         let mark = x.Mark()
+        x.ProcessAttributes(attrs)
         x.ProcessType(returnType)
         x.Done(range, mark, ElementType.RETURN_TYPE_INFO)
 

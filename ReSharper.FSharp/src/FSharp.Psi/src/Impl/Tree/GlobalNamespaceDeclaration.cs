@@ -4,7 +4,7 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class FSharpGlobalNamespaceDeclaration
+  internal partial class GlobalNamespaceDeclaration
   {
     public override TreeTextRange GetNameRange() => TreeTextRange.InvalidRange;
     public override IDeclaredElement DeclaredElement => null;

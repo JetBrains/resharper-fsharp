@@ -61,6 +61,10 @@ type FSharpTargetsProjectLoadModificator() =
             context.Targets.AddRange(targets)
 
 
+type IFSharpProjectOptionsBuilder =
+    abstract BuildSingleFSharpProject: IProject * IPsiModule -> FSharpProject
+
+
 [<SolutionComponent>]
 type FSharpProjectOptionsBuilder
         (checkerService: FSharpCheckerService, psiModules: IPsiModules, logger: ILogger,
@@ -99,98 +103,12 @@ type FSharpProjectOptionsBuilder
 
         result
 
-    member x.BuildSingleFSharpProject(project: IProject, psiModule: IPsiModule) =
-        let targetFrameworkId = psiModule.TargetFrameworkId
-        let properties = project.ProjectProperties
-        let buildSettings = properties.BuildSettings :?> _ // todo: can differ by framework id?
+    abstract GetProjectItemsPaths:
+        project: IProject * targetFrameworkId: TargetFrameworkId -> (FileSystemPath * BuildAction)[]
 
-        let options = List()
-        options.Add("--out:" + project.GetOutputFilePath(targetFrameworkId).FullPath)
-        options.Add("--target:" + x.GetOutputType(buildSettings))
-        options.AddRange(defaultOptions)
-        options.AddRange(unusedValuesWarns)
-        options.AddRange(getReferences project psiModule targetFrameworkId)
-
-        let definedConstants = x.GetDefinedConstants(properties, targetFrameworkId) |> List.ofSeq
-        options.AddRange(definedConstants |> Seq.map (fun c -> "--define:" + c))
-
-        match properties.ActiveConfigurations.GetOrCreateConfiguration(targetFrameworkId) with
-        | :? IManagedProjectConfiguration as cfg ->
-            options.Add(sprintf "--warn:%d" cfg.WarningLevel)
-
-            if cfg.TreatWarningsAsErrors then
-                options.Add("--warnaserror")
-
-            let doc = cfg.DocumentationFile
-            if not (doc.IsNullOrWhitespace()) then options.Add("--doc:" + doc)
-
-            let props = cfg.PropertiesCollection
-
-            let getOption f p =
-                match props.TryGetValue(p) with
-                | v when not (v.IsNullOrWhitespace()) -> Some ("--" + p.ToLower() + ":" + f v)
-                | _ -> None
-
-            [ FSharpProperties.TargetProfile; FSharpProperties.BaseAddress ]
-            |> List.choose (getOption id)
-            |> options.AddRange
-
-            [ FSharpProperties.NoWarn; FSharpProperties.WarnAsError ]
-            |> List.choose (getOption (fun v -> (splitAndTrim defaultDelimiters v).Join(",")))
-            |> options.AddRange
-
-            match props.TryGetValue(FSharpProperties.OtherFlags) with
-            | otherFlags when not (otherFlags.IsNullOrWhitespace()) -> splitAndTrim [| ' ' |] otherFlags
-            | _ -> EmptyArray.Instance
-            |> options.AddRange
-        | _ -> ()
-
-        let filePaths, implsWithSig, resources = x.GetProjectFilesAndResources(project, targetFrameworkId)
-
-        options.AddRange(resources |> Seq.map (fun (r: FileSystemPath) -> "--resource:" + r.FullPath))
-        let fileIndices = Dictionary<FileSystemPath, int>()
-        Array.iteri (fun i p -> fileIndices.[p] <- i) filePaths
-
-        let projectOptions =
-            { ProjectFileName = sprintf "%O.%O.fsproj" project.ProjectFileLocation targetFrameworkId
-              ProjectId = None
-              SourceFiles = Array.map (fun (p: FileSystemPath ) -> p.FullPath) filePaths
-              OtherOptions = options.ToArray()
-              ReferencedProjects = Array.empty
-              IsIncompleteTypeCheckEnvironment = false
-              UseScriptResolutionRules = false
-              LoadTime = DateTime.Now
-              OriginalLoadReferences = List.empty
-              UnresolvedReferences = None
-              ExtraProjectInfo = None
-              Stamp = None }
-
-        let hasFSharpCoreReference options =
-            options.OtherOptions
-            |> Seq.exists (fun s ->
-                s.StartsWith("-r:", StringComparison.Ordinal) &&
-                s.EndsWith("FSharp.Core.dll", StringComparison.Ordinal))
-
-        let shouldAddFSharpCore options =
-            not (hasFSharpCoreReference options || options.OtherOptions |> Array.contains "--compiling-fslib")
-
-        let options =
-            if shouldAddFSharpCore projectOptions then 
-                { projectOptions with
-                    OtherOptions = FSharpCoreFix.ensureCorrectFSharpCore projectOptions.OtherOptions }
-            else projectOptions
-
-        let parsingOptions, errors =
-            checkerService.Checker.GetParsingOptionsFromCommandLineArgs(List.ofArray options.OtherOptions)
-
-        let parsingOptions = { parsingOptions with SourceFiles = options.SourceFiles }
-        if not errors.IsEmpty then
-            logger.Warn("Getting parsing options: {0}", concatErrors errors)
-
-        { ProjectOptions = projectOptions
-          ParsingOptions = parsingOptions
-          FileIndices = fileIndices
-          ImplFilesWithSigs = implsWithSig }
+    default x.GetProjectItemsPaths(project, targetFrameworkId) =
+        let projectMark = project.GetProjectMark().NotNull("projectMark == null")
+        itemsContainer.GetProjectItemsPaths(projectMark, targetFrameworkId)
 
     member x.GetProjectFilesAndResources(project: IProject, targetFrameworkId) =
         let sourceFiles = List()
@@ -199,8 +117,7 @@ type FSharpProjectOptionsBuilder
         let sigFiles = HashSet()
         let implsWithSigs = HashSet()
 
-        let projectMark = project.GetProjectMark().NotNull("projectMark == null")
-        let projectItems = itemsContainer.GetProjectItemsPaths(projectMark, targetFrameworkId)
+        let projectItems = x.GetProjectItemsPaths(project, targetFrameworkId)
 
         for path, buildAction in projectItems do
             match buildAction with
@@ -233,3 +150,101 @@ type FSharpProjectOptionsBuilder
         match properties.ActiveConfigurations.GetOrCreateConfiguration(targetFrameworkId) with
         | :? IManagedProjectConfiguration as cfg -> splitAndTrim defaultDelimiters cfg.DefineConstants
         | _ -> EmptyArray.Instance
+
+    interface IFSharpProjectOptionsBuilder with
+        member x.BuildSingleFSharpProject(project: IProject, psiModule: IPsiModule) =
+            let targetFrameworkId = psiModule.TargetFrameworkId
+            let properties = project.ProjectProperties
+            let buildSettings = properties.BuildSettings :?> _ // todo: can differ by framework id?
+
+            let options = List()
+
+            let outPath = project.GetOutputFilePath(targetFrameworkId)
+            if not outPath.IsEmpty then
+                options.Add("--out:" + outPath.FullPath)
+
+            options.Add("--target:" + x.GetOutputType(buildSettings))
+            options.AddRange(defaultOptions)
+            options.AddRange(unusedValuesWarns)
+            options.AddRange(getReferences project psiModule targetFrameworkId)
+
+            let definedConstants = x.GetDefinedConstants(properties, targetFrameworkId) |> List.ofSeq
+            options.AddRange(definedConstants |> Seq.map (fun c -> "--define:" + c))
+
+            match properties.ActiveConfigurations.GetOrCreateConfiguration(targetFrameworkId) with
+            | :? IManagedProjectConfiguration as cfg ->
+                options.Add(sprintf "--warn:%d" cfg.WarningLevel)
+
+                if cfg.TreatWarningsAsErrors then
+                    options.Add("--warnaserror")
+
+                let doc = cfg.DocumentationFile
+                if not (doc.IsNullOrWhitespace()) then options.Add("--doc:" + doc)
+
+                let props = cfg.PropertiesCollection
+
+                let getOption f p =
+                    match props.TryGetValue(p) with
+                    | v when not (v.IsNullOrWhitespace()) -> Some ("--" + p.ToLower() + ":" + f v)
+                    | _ -> None
+
+                [ FSharpProperties.TargetProfile; FSharpProperties.BaseAddress ]
+                |> List.choose (getOption id)
+                |> options.AddRange
+
+                [ FSharpProperties.NoWarn; FSharpProperties.WarnAsError ]
+                |> List.choose (getOption (fun v -> (splitAndTrim defaultDelimiters v).Join(",")))
+                |> options.AddRange
+
+                match props.TryGetValue(FSharpProperties.OtherFlags) with
+                | otherFlags when not (otherFlags.IsNullOrWhitespace()) -> splitAndTrim [| ' ' |] otherFlags
+                | _ -> EmptyArray.Instance
+                |> options.AddRange
+            | _ -> ()
+
+            let filePaths, implsWithSig, resources = x.GetProjectFilesAndResources(project, targetFrameworkId)
+
+            options.AddRange(resources |> Seq.map (fun (r: FileSystemPath) -> "--resource:" + r.FullPath))
+            let fileIndices = Dictionary<FileSystemPath, int>()
+            Array.iteri (fun i p -> fileIndices.[p] <- i) filePaths
+
+            let projectOptions =
+                { ProjectFileName = sprintf "%O.%O.fsproj" project.ProjectFileLocation targetFrameworkId
+                  ProjectId = None
+                  SourceFiles = Array.map (fun (p: FileSystemPath ) -> p.FullPath) filePaths
+                  OtherOptions = options.ToArray()
+                  ReferencedProjects = Array.empty
+                  IsIncompleteTypeCheckEnvironment = false
+                  UseScriptResolutionRules = false
+                  LoadTime = DateTime.Now
+                  OriginalLoadReferences = List.empty
+                  UnresolvedReferences = None
+                  ExtraProjectInfo = None
+                  Stamp = None }
+
+            let hasFSharpCoreReference options =
+                options.OtherOptions
+                |> Seq.exists (fun s ->
+                    s.StartsWith("-r:", StringComparison.Ordinal) &&
+                    s.EndsWith("FSharp.Core.dll", StringComparison.Ordinal))
+
+            let shouldAddFSharpCore options =
+                not (hasFSharpCoreReference options || options.OtherOptions |> Array.contains "--compiling-fslib")
+
+            let options =
+                if shouldAddFSharpCore projectOptions then 
+                    { projectOptions with
+                        OtherOptions = FSharpCoreFix.ensureCorrectFSharpCore projectOptions.OtherOptions }
+                else projectOptions
+
+            let parsingOptions, errors =
+                checkerService.Checker.GetParsingOptionsFromCommandLineArgs(List.ofArray options.OtherOptions)
+
+            let parsingOptions = { parsingOptions with SourceFiles = options.SourceFiles }
+            if not errors.IsEmpty then
+                logger.Warn("Getting parsing options: {0}", concatErrors errors)
+
+            { ProjectOptions = projectOptions
+              ParsingOptions = parsingOptions
+              FileIndices = fileIndices
+              ImplFilesWithSigs = implsWithSig }

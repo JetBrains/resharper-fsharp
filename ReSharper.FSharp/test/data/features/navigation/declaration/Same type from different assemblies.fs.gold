@@ -1,0 +1,28 @@
+﻿-------------- offset 9 line 1 col 10 --------------------
++++ JetBrains.ReSharper.Features.Navigation.Features.GoToDeclaration.GotoDeclarationProvider navigation provider results +++
+MULTIPLE CANDIDATES EXECUTION:
+--> CANDIDATE DEO: Envoy: Constructor:T..ctor(), PsiLanguageType:UNKNOWN as Envoy: Constructor:T..ctor(), PsiLanguageType:UNKNOWN RANGE: (0,0) @ Library2
+Immediate result: Occurrence's dump:
+CEO: Envoy: Constructor:T..ctor(), PsiLanguageType:UNKNOWN Target:  Module: Library2 Platform: .NETStandard,Version=v2.0 TargetPosition: #0 in Unknown
+Occurrence's navigation result. Opened file: T.cs
+------------------
+public class T
+{
+  public |CARET|T()
+  {
+    base.\u002Ector();
+------------------
+
+--> CANDIDATE DEO: Envoy: Class:T, PsiLanguageType:UNKNOWN as Envoy: Class:T, PsiLanguageType:UNKNOWN RANGE: (0,0) @ Library2
+Immediate result: Occurrence's dump:
+CEO: Envoy: Class:T, PsiLanguageType:UNKNOWN Target:  Module: Library2 Platform: .NETStandard,Version=v2.0 TargetPosition: #0 in Unknown
+Occurrence's navigation result. Opened file: T.cs
+------------------
+[CompilationMapping(SourceConstructFlags.ObjectType)]
+[Serializable]
+public class |CARET|T
+{
+  public T()
+------------------
+
+END OF MULTIPLE CANDIDATES EXECUTION

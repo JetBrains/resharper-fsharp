@@ -1,4 +1,5 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Tests
+[<AutoOpen>]
+module JetBrains.ReSharper.Plugins.FSharp.Tests.Common
 
 open System
 open System.Threading
@@ -12,12 +13,14 @@ open JetBrains.ProjectModel.MSBuild
 open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.TestFramework
 open JetBrains.TestFramework.Projects
 open JetBrains.Util.Dotnet.TargetFrameworkIds
 open NUnit.Framework
+open Moq
 
 module AssemblyInfo =
     [<assembly: Apartment(ApartmentState.STA)>]
@@ -39,42 +42,40 @@ type FSharpTestAttribute() =
         member x.GetProjectProperties(targetFrameworkIds, _) =
             FSharpProjectPropertiesFactory.CreateProjectProperties(targetFrameworkIds)
 
+
+let itemsContainer = Mock<IFSharpItemsContainer>().Object
+
+[<SolutionComponent>]
+type FSharpTestProjectOptionsBuilder(checkerService, psiModules, logger, resolveContextManager) =
+    inherit FSharpProjectOptionsBuilder(checkerService, psiModules, logger, resolveContextManager, itemsContainer)
+
+    override x.GetProjectItemsPaths(_, _) = [||]
+
+    interface IHideImplementation<IFSharpProjectOptionsBuilder>
+
+
 [<SolutionComponent>]
 type FSharpTestProjectOptionsProvider
-        (lifetime: Lifetime, checkerService: FSharpCheckerService,
+        (lifetime: Lifetime, checkerService: FSharpCheckerService, projectOptionsBuilder: IFSharpProjectOptionsBuilder,
          scriptOptionsProvider: FSharpScriptOptionsProvider) as this =
     do
         checkerService.OptionsProvider <- this
         lifetime.OnTermination(fun _ -> checkerService.OptionsProvider <- Unchecked.defaultof<_>) |> ignore
 
-    let getPath (sourceFile: IPsiSourceFile) = sourceFile.GetLocation().FullPath
-
-    let getProjectOptions fileName references =
-        { ProjectFileName = fileName + ".fsproj"
-          ProjectId = None
-          SourceFiles = [| fileName |]
-          OtherOptions = Array.map ((+) "-r:") references
-          ReferencedProjects = Array.empty
-          IsIncompleteTypeCheckEnvironment = false
-          UseScriptResolutionRules = false
-          LoadTime = DateTime.Now
-          OriginalLoadReferences = List.empty
-          UnresolvedReferences = None
-          ExtraProjectInfo = None
-          Stamp = None }
+    let getProjectOptions (sourceFile: IPsiSourceFile) =
+        let fsProject = projectOptionsBuilder.BuildSingleFSharpProject(sourceFile.GetProject(), sourceFile.PsiModule)
+        Some { fsProject.ProjectOptions with SourceFiles = [| sourceFile.GetLocation().FullPath |] }
 
     interface IHideImplementation<FSharpProjectOptionsProvider>
     
     interface IFSharpProjectOptionsProvider with
-        member x.HasPairFile(sourceFile) = false
+        member x.HasPairFile _ = false
 
         member x.GetProjectOptions(sourceFile) =
             if sourceFile.LanguageType.Is<FSharpScriptProjectFileType>() then
                 scriptOptionsProvider.GetScriptOptions(sourceFile) else
 
-            let path = getPath sourceFile
-            let projectOptions = getProjectOptions path [||] 
-            Some projectOptions
+            getProjectOptions sourceFile
 
         member x.GetParsingOptions(sourceFile) =
             let isScript = sourceFile.LanguageType.Is<FSharpScriptProjectFileType>()
@@ -90,7 +91,7 @@ type FSharpTestProjectOptionsProvider
                 | _ -> false
 
             { FSharpParsingOptions.Default with
-                SourceFiles = [| getPath sourceFile |]
+                SourceFiles = [| sourceFile.GetLocation().FullPath |]
                 IsExe = isExe
                 IsInteractive = isScript }
 

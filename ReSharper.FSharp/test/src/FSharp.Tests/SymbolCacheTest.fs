@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open System
+open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Tests
@@ -58,7 +59,7 @@ type SymbolCacheTest() =
     [<Test>] member x.``Union 08 - Struct singletons``() = x.DoNamedTest()
     [<Test>] member x.``Union 09 - Struct multiple cases with fields``() = x.DoNamedTest()
 
-    override x.DoTest(project: IProject) =
+    override x.DoTest(lifetime: Lifetime, project: IProject) =
         let psiServices = x.Solution.GetPsiServices()
         psiServices.Files.CommitAllDocuments()
         x.ExecuteWithGold(fun writer ->

@@ -22,7 +22,7 @@ open JetBrains.Util
 [<SolutionComponent>]
 type FSharpProjectOptionsProvider
         (lifetime, solution: ISolution, changeManager: ChangeManager, checkerService: FSharpCheckerService,
-         optionsBuilder: FSharpProjectOptionsBuilder, scriptOptionsProvider: FSharpScriptOptionsProvider,
+         optionsBuilder: IFSharpProjectOptionsBuilder, scriptOptionsProvider: FSharpScriptOptionsProvider,
          fsFileService: IFSharpFileService, moduleReferenceResolveStore: ModuleReferencesResolveStore, logger: ILogger,
          psiModules: IPsiModules, resolveContextManager: PsiModuleResolveContextManager) as this =
     inherit RecursiveProjectModelChangeDeltaVisitor()
@@ -118,7 +118,7 @@ type FSharpProjectOptionsProvider
             // todo: keep referencing projects for invalidating removed projects
             let referencesToProject = moduleReferenceResolveStore.GetReferencesToProject(project)
             if not (referencesToProject.IsEmpty()) then
-                logger.Info("Invalidatnig projects reverencing {0}", project)
+                logger.Info("Invalidating projects reverencing {0}", project)
                 for reference in referencesToProject do
                     match reference.GetProject() with
                     | FSharpProject referencingProject when

@@ -43,7 +43,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     }
 
     [CanBeNull]
-    public static IClrTypeName GetClrName([NotNull] FSharpEntity entity)
+    public static IClrTypeName GetClrName([NotNull] this FSharpEntity entity)
     {
       if (entity.IsArrayType)
         return PredefinedType.ARRAY_FQN;
@@ -137,7 +137,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
           ? MapType(baseType.Value, typeParams, psiModule, isFromMethod, isFromReturn)
           : TypeFactory.CreateUnknownType(psiModule);
 
-      var clrName = GetClrName(entity);
+      var clrName = entity.GetClrName();
       if (clrName == null)
       {
         // bug Microsoft/visualfsharp#3532

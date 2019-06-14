@@ -6,7 +6,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class FSharpNamespaceDeclaration
+  internal partial class NamedNamespaceDeclaration
   {
     public override string DeclaredName => QualifiedName;
     public string QualifiedName => LongIdentifier.QualifiedName;

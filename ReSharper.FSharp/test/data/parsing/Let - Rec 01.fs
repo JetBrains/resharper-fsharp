@@ -1,0 +1,2 @@
+let rec foo x =
+    ()

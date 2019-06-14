@@ -10,14 +10,17 @@ IFSharpImplFile
         IReturnTypeInfo
           FSharpTokenType+ColonTokenElement(type:COLON, text::)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          INamedTypeExpression
+          FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
+          IFSharpAttribute
             ILongIdentifier
-              FSharpIdentifierToken(type:IDENTIFIER, text:int)
+              FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
+          FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         IChameleonExpression
           IConstExpr
-            FSharpToken(type:INT32, text:123)
-    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+            FSharpToken(type:INT32, text:1)
 
