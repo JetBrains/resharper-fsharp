@@ -85,9 +85,10 @@ type FSharpTestProjectOptionsProvider
                 | null -> false
                 | project ->
 
-                match project.ProjectProperties.BuildSettings with
-                | :? IManagedProjectBuildSettings as buildSettings ->
-                    buildSettings.OutputType = ProjectOutputType.CONSOLE_EXE
+                let targetFrameworkId = sourceFile.PsiModule.TargetFrameworkId
+                match project.ProjectProperties.ActiveConfigurations.GetOrCreateConfiguration(targetFrameworkId) with
+                | :? IManagedProjectConfiguration as cfg ->
+                    cfg.OutputType = ProjectOutputType.CONSOLE_EXE
                 | _ -> false
 
             { FSharpParsingOptions.Default with
