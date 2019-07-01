@@ -25,6 +25,7 @@
     <breadcrumbsInfoProvider implementation="com.jetbrains.rider.plugins.fsharp.breadcrumbs.FSharpBreadcrumbsInfoProvider"/>
     <codeStyleSettingsProvider implementation="com.jetbrains.rider.settings.FSharpCodeStyleSettingsProvider" />
     <lang.documentationProvider language="F#" implementationClass="com.jetbrains.rdclient.quickDoc.FrontendDocumentationProvider"/>
+    <lineIndentProvider implementation="com.jetbrains.rider.plugins.fsharp.actions.FSharpDummyLineIndentProvider"/>
 
 
     <fileType name="F# Script" language="F# Script" extensions="fsx;fsscript" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptFileType" />
@@ -43,6 +44,7 @@
     <breadcrumbsInfoProvider implementation="com.jetbrains.rider.plugins.fsharp.breadcrumbs.FSharpScriptBreadcrumbsInfoProvider"/>
     <codeStyleSettingsProvider implementation="com.jetbrains.rider.settings.FSharpScriptCodeStyleSettingsProvider" />
     <lang.documentationProvider language="F# Script" implementationClass="com.jetbrains.rdclient.quickDoc.FrontendDocumentationProvider"/>
+    <lineIndentProvider implementation="com.jetbrains.rider.plugins.fsharp.actions.FSharpScriptDummyLineIndentProvider"/>
 
     <rider.ProjectTypesProvider implementation="com.jetbrains.rider.projectView.projectTypes.FSharpProjectTypeProvider" />
     <moveProviderExtension implementation="com.jetbrains.rider.plugins.fsharp.projectView.FSharpMoveProviderExtension"/>
