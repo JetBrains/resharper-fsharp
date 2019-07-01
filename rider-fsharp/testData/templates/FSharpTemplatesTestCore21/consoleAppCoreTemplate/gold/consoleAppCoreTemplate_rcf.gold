@@ -12,5 +12,5 @@ Start browser browser name: null
 Project kind: DotNetCore
 Exe path: $PROJECT_DIR$/ConsoleApplication/bin/Debug/netcoreapp2.1/ConsoleApplication.dll
 Arguments: 
-Working directory: $PROJECT_DIR$/ConsoleApplication
+Working directory: $PROJECT_DIR$/ConsoleApplication/bin/Debug/netcoreapp2.1
 Environment variables: {}

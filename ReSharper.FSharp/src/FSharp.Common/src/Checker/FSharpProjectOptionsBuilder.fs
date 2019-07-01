@@ -3,7 +3,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Checker
 open System
 open System.Collections.Generic
 open FSharp.Compiler.SourceCodeServices
-open JetBrains.Annotations
 open JetBrains.Application
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
@@ -103,6 +102,13 @@ type FSharpProjectOptionsBuilder
 
         result
 
+    let getOutputType outputType =
+        match outputType with
+        | ProjectOutputType.CONSOLE_EXE -> "exe"
+        | ProjectOutputType.WIN_EXE -> "winexe"
+        | ProjectOutputType.MODULE -> "module"
+        | _ -> "library"
+
     abstract GetProjectItemsPaths:
         project: IProject * targetFrameworkId: TargetFrameworkId -> (FileSystemPath * BuildAction)[]
 
@@ -137,25 +143,10 @@ type FSharpProjectOptionsBuilder
 
         sourceFiles.ToArray(), implsWithSigs, resources
 
-    member private x.GetOutputType([<CanBeNull>] buildSettings: IManagedProjectBuildSettings) =
-        if isNull buildSettings then "library" else
-
-        match buildSettings.OutputType with
-        | ProjectOutputType.CONSOLE_EXE -> "exe"
-        | ProjectOutputType.WIN_EXE -> "winexe"
-        | ProjectOutputType.MODULE -> "module"
-        | _ -> "library"
-
-    member private x.GetDefinedConstants(properties: IProjectProperties, targetFrameworkId: TargetFrameworkId) =
-        match properties.ActiveConfigurations.GetOrCreateConfiguration(targetFrameworkId) with
-        | :? IManagedProjectConfiguration as cfg -> splitAndTrim defaultDelimiters cfg.DefineConstants
-        | _ -> EmptyArray.Instance
-
     interface IFSharpProjectOptionsBuilder with
         member x.BuildSingleFSharpProject(project: IProject, psiModule: IPsiModule) =
             let targetFrameworkId = psiModule.TargetFrameworkId
             let properties = project.ProjectProperties
-            let buildSettings = properties.BuildSettings :?> _ // todo: can differ by framework id?
 
             let options = List()
 
@@ -163,16 +154,17 @@ type FSharpProjectOptionsBuilder
             if not outPath.IsEmpty then
                 options.Add("--out:" + outPath.FullPath)
 
-            options.Add("--target:" + x.GetOutputType(buildSettings))
             options.AddRange(defaultOptions)
             options.AddRange(unusedValuesWarns)
             options.AddRange(getReferences project psiModule targetFrameworkId)
 
-            let definedConstants = x.GetDefinedConstants(properties, targetFrameworkId) |> List.ofSeq
-            options.AddRange(definedConstants |> Seq.map (fun c -> "--define:" + c))
-
             match properties.ActiveConfigurations.GetOrCreateConfiguration(targetFrameworkId) with
             | :? IManagedProjectConfiguration as cfg ->
+                let definedConstants = splitAndTrim defaultDelimiters cfg.DefineConstants
+                options.AddRange(definedConstants |> Seq.map (fun c -> "--define:" + c))
+
+                options.Add("--target:" + getOutputType cfg.OutputType)
+
                 options.Add(sprintf "--warn:%d" cfg.WarningLevel)
 
                 if cfg.TreatWarningsAsErrors then
