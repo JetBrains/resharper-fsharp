@@ -1,0 +1,4 @@
+﻿// ${COMPLETE_ITEM:printfn}
+module Module
+
+printfn{caret}
