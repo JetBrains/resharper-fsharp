@@ -2,8 +2,7 @@
   <name>F# Support</name>
   <id>com.jetbrains.rider.fsharp</id>
   <vendor url="https://jetbrains.com">JetBrains</vendor>
-  <description>F# language support in Rider</description>
-  <change-notes />
+  <description>F# language support plugin for JetBrains Rider.</description>
 
   <version>0.9999</version>
   <idea-version since-build="171.3655" />
