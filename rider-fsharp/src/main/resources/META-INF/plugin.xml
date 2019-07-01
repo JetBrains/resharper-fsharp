@@ -23,7 +23,7 @@
     <backend.autoPopup.support language="F#" implementationClass="com.jetbrains.rider.completion.BackendAndGenericRider" />
     <codeInsight.parameterInfo language="F#" implementationClass="com.jetbrains.rdclient.parameterInfo.FrontendParameterInfoHandler" />
     <breadcrumbsInfoProvider implementation="com.jetbrains.rider.plugins.fsharp.breadcrumbs.FSharpBreadcrumbsInfoProvider"/>
-    <codeStyleSettingsProvider implementation="com.jetbrains.rider.settings.FSharpCodeStyleSettingsProvider" />
+    <langCodeStyleSettingsProvider implementation="com.jetbrains.rider.settings.FSharpCodeStyleSettingsProvider" />
     <lang.documentationProvider language="F#" implementationClass="com.jetbrains.rdclient.quickDoc.FrontendDocumentationProvider"/>
     <lineIndentProvider implementation="com.jetbrains.rider.plugins.fsharp.actions.FSharpDummyLineIndentProvider"/>
 
@@ -42,7 +42,7 @@
     <backend.autoPopup.support language="F# Script" implementationClass="com.jetbrains.rider.completion.BackendAndGenericRider" />
     <codeInsight.parameterInfo language="F# Script" implementationClass="com.jetbrains.rdclient.parameterInfo.FrontendParameterInfoHandler" />
     <breadcrumbsInfoProvider implementation="com.jetbrains.rider.plugins.fsharp.breadcrumbs.FSharpScriptBreadcrumbsInfoProvider"/>
-    <codeStyleSettingsProvider implementation="com.jetbrains.rider.settings.FSharpScriptCodeStyleSettingsProvider" />
+    <langCodeStyleSettingsProvider implementation="com.jetbrains.rider.settings.FSharpScriptCodeStyleSettingsProvider" />
     <lang.documentationProvider language="F# Script" implementationClass="com.jetbrains.rdclient.quickDoc.FrontendDocumentationProvider"/>
     <lineIndentProvider implementation="com.jetbrains.rider.plugins.fsharp.actions.FSharpScriptDummyLineIndentProvider"/>
 
