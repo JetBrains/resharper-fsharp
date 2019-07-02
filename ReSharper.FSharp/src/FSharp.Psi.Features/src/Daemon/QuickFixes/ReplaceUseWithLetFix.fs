@@ -22,9 +22,8 @@ type ReplaceUseWithLetFix(letNode: ILet) =
 
     override x.ExecutePsiTransaction(_, _) =
         let useKeyword = letNode.LetOrUseToken
-
         Assertion.Assert(useKeyword.GetTokenType() == FSharpTokenType.USE,
-                         sprintf "Expecting use, got: %O" (useKeyword.GetTokenType().ToString()))
+                         sprintf "Expecting use, got: %O" (useKeyword.GetTokenType()))
 
         use writeLock = WriteLockCookie.Create(letNode.IsPhysical())
         ModificationUtil.ReplaceChild(useKeyword, FSharpTokenType.LET.CreateLeafElement()) |> ignore
