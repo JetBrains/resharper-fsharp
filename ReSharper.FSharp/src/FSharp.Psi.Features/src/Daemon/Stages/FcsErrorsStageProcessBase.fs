@@ -4,10 +4,13 @@ open System
 open System.Collections.Generic
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.DocumentModel
+open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.Util
 
 [<AutoOpen>]
@@ -24,8 +27,6 @@ module FSharpErrors =
 [<AbstractClass>]
 type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
-
-    let [<Literal>] UseKeywordLength = 3
 
     let document = daemonProcess.Document
 
@@ -50,10 +51,10 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             | UnusedValue -> UnusedHighlighting(message, range) :> _
 
             | UseBindingsIllegalInModules ->
-                UseKeywordIllegalInModule(message, range.StartOffset.ExtendRight(UseKeywordLength)) :> _
+                UseBindingsIllegalInModulesWarning(fsFile.GetNode<ILetModuleDecl>(range).NotNull()) :> _
 
             | UseBindingsIllegalInImplicitClassConstructors ->
-                UseKeywordIllegalInPrimaryCtor(message, range.StartOffset.ExtendRight(UseKeywordLength)) :> _
+                UseKeywordIllegalInPrimaryCtorError(fsFile.GetNode<ILetModuleDecl>(range).NotNull()) :> _
 
             | _ ->
 
