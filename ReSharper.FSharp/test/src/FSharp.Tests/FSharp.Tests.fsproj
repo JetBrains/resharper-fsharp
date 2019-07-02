@@ -28,6 +28,7 @@
     <Compile Include="NavigationTests.fs" />
     <Compile Include="InheritanceGutterMarksTest.fs" />
     <Compile Include="FSharpParserTest.fs" />
+    <Compile Include="FSharpCompletionTest.fs" />
   </ItemGroup>
 
   <ItemGroup>
