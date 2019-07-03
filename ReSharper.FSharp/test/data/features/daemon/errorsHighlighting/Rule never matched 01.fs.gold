@@ -1,0 +1,9 @@
+﻿module Module
+
+match 1 with
+| 0 -> ()
+|| 0 -> ()|(0)
+| _ -> ()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: This rule will never be matched

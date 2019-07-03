@@ -34,4 +34,11 @@
     <QuickFix>ReplaceUseWithLetFix</QuickFix>
   </Error>
 
+  <Warning staticGroup="FSharpErrors" name="RuleNeverMatched">
+    <Parameter type="IMatchClause" name="matchClause"/>
+    <Message value="This rule will never be matched"/>
+    <Range>matchClause.GetHighlightingRange()</Range>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
+  </Warning>
+
 </Errors>

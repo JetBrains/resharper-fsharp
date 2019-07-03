@@ -17,6 +17,7 @@ open JetBrains.Util
 module FSharpErrors =
     // https://github.com/fsharp/FSharp.Compiler.Service/blob/9.0.0/src/fsharp/CompileOps.fs#L246
     // https://github.com/fsharp/FSharp.Compiler.Service/blob/9.0.0/src/fsharp/FSComp.txt
+    let [<Literal>] RuleNeverMatched = 26
     let [<Literal>] UndefinedName = 39
     let [<Literal>] ModuleOrNamespaceRequired = 222
     let [<Literal>] UnrecognizedOption = 243
@@ -38,37 +39,41 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             let endOffset = getDocumentOffset document (docCoords error.EndLineAlternate error.EndColumn)
             DocumentRange(document, TextRange(startOffset, endOffset))
 
+    let createGenericHighlighting (error: FSharpErrorInfo) range: IHighlighting =
+        match error.Severity with
+        | FSharpErrorSeverity.Warning -> WarningHighlighting(error.Message, range) :> _
+        | _ -> ErrorHighlighting(error.Message, range) :> _
+
+    let createHighlighting (error: FSharpErrorInfo) (range: DocumentRange): IHighlighting =
+        match error.ErrorNumber with
+        | UndefinedName -> UnresolvedHighlighting(error.Message, range) :> _
+        | UnusedValue -> UnusedHighlighting(error.Message, range) :> _
+
+        | RuleNeverMatched ->
+            match fsFile.GetNode<IMatchClause>(range).NotNull() with
+            | null -> createGenericHighlighting error range
+            | matchClause -> RuleNeverMatchedWarning(matchClause) :> _
+
+        | UseBindingsIllegalInModules ->
+            UseBindingsIllegalInModulesWarning(fsFile.GetNode<ILetModuleDecl>(range).NotNull()) :> _
+
+        | UseBindingsIllegalInImplicitClassConstructors ->
+            UseKeywordIllegalInPrimaryCtorError(fsFile.GetNode<ILetModuleDecl>(range).NotNull()) :> _
+
+        | _ -> createGenericHighlighting error range
+    
     abstract ShouldAddDiagnostic: error: FSharpErrorInfo * range: DocumentRange -> bool
     default x.ShouldAddDiagnostic(error: FSharpErrorInfo, _) =
         error.ErrorNumber <> UnrecognizedOption
 
     member x.Execute(errors: FSharpErrorInfo[], committer: Action<DaemonStageResult>) =
-        let createHighlighting (error: FSharpErrorInfo) (range: DocumentRange): IHighlighting =
-            let message = error.Message
-
-            match error.ErrorNumber with
-            | UndefinedName -> UnresolvedHighlighting(message, range) :> _
-            | UnusedValue -> UnusedHighlighting(message, range) :> _
-
-            | UseBindingsIllegalInModules ->
-                UseBindingsIllegalInModulesWarning(fsFile.GetNode<ILetModuleDecl>(range).NotNull()) :> _
-
-            | UseBindingsIllegalInImplicitClassConstructors ->
-                UseKeywordIllegalInPrimaryCtorError(fsFile.GetNode<ILetModuleDecl>(range).NotNull()) :> _
-
-            | _ ->
-
-            match error.Severity with
-            | FSharpErrorSeverity.Warning -> WarningHighlighting(message, range) :> _
-            | _ -> ErrorHighlighting(message, range) :> _
-
         let highlightings = List(errors.Length)
         let errors =
             errors
             |> Array.map (fun error -> (error, getDocumentRange error))
             |> Array.distinctBy (fun (error, range) -> range, error.Message)
 
-        for (error, range) in errors  do
+        for error, range in errors  do
             if x.ShouldAddDiagnostic(error, range) then
                 let highlighting = createHighlighting error range
                 highlightings.Add(HighlightingInfo(highlighting.CalculateRange(), highlighting))

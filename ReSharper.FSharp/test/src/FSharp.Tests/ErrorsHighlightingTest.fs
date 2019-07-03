@@ -28,3 +28,6 @@ type ErrorsHighlightingTest() =
     [<Test>] member x.``Unused value in script``() = x.DoNamedTest()
 
     [<Test>] member x.``Unfinished let``() = x.DoNamedTest()
+
+    [<Test>] member x.``Rule never matched 01``() = x.DoNamedTest()
+    [<Test>] member x.``Rule never matched 02 - Function``() = x.DoNamedTest()
