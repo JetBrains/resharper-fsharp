@@ -10,6 +10,7 @@ open JetBrains.Annotations
 open JetBrains.Application
 open JetBrains.Application.Settings
 open JetBrains.DataFlow
+open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services
 open JetBrains.ReSharper.Plugins.FSharp
@@ -50,18 +51,10 @@ type FSharpCheckerService
     member val OptionsProvider = Unchecked.defaultof<IFSharpProjectOptionsProvider> with get, set
     member x.Checker = checker.Value
 
-    member x.ParseFile([<NotNull>] file: IPsiSourceFile) =
-        let parsingOptions = x.OptionsProvider.GetParsingOptions(file)
-        let filePath = file.GetLocation().FullPath
-        let parsingOptions =
-            if not (Array.isEmpty parsingOptions.SourceFiles) then parsingOptions
-            else
-                let project = file.GetProject().GetLocation().FullPath
-                logger.Warn("Loading from caches, don't have source files for {0} yet.", project)
-                { parsingOptions with SourceFiles = [| filePath |] }
-        let source = SourceText.ofString (file.Document.GetText())
+    member x.ParseFile(path: FileSystemPath, document: IDocument, parsingOptions: FSharpParsingOptions) =
+        let source = SourceText.ofString (document.GetText())
         try
-            let parseResults = x.Checker.ParseFile(filePath, source, parsingOptions).RunAsTask() 
+            let parseResults = x.Checker.ParseFile(path.FullPath, source, parsingOptions).RunAsTask() 
             Some parseResults
         with
         | :? OperationCanceledException -> reraise()
@@ -70,10 +63,20 @@ type FSharpCheckerService
             logger.Warn(sprintf "Parse file error, parsing options: %A" parsingOptions)
             None
 
+    member x.ParseFile([<NotNull>] sourceFile: IPsiSourceFile) =
+        let parsingOptions = x.OptionsProvider.GetParsingOptions(sourceFile)
+        x.ParseFile(sourceFile.GetLocation(), sourceFile.Document, parsingOptions)
+
+    member x.GetParsingOptions([<NotNull>] sourceFile: IPsiSourceFile) =
+        if isNull sourceFile then { FSharpParsingOptions.Default with SourceFiles = [| "Sandbox.fs" |] } else 
+        x.OptionsProvider.GetParsingOptions(sourceFile)
+
     member x.HasPairFile([<NotNull>] file: IPsiSourceFile) =
         x.OptionsProvider.HasPairFile(file)
 
-    member x.GetDefines(sourceFile: IPsiSourceFile) =
+    member x.GetDefines([<CanBeNull>] sourceFile: IPsiSourceFile) =
+        if isNull sourceFile then [] else
+
         let isScript = sourceFile.LanguageType.Is<FSharpScriptProjectFileType>()
         let implicitDefines = getImplicitDefines isScript
         let projectDefines = x.OptionsProvider.GetParsingOptions(sourceFile).ConditionalCompilationDefines

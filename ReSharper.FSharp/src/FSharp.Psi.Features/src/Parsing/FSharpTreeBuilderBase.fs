@@ -4,8 +4,8 @@ open System
 open FSharp.Compiler.Ast
 open FSharp.Compiler.Range
 open JetBrains.Diagnostics
+open JetBrains.DocumentModel
 open JetBrains.Lifetimes
-open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -14,10 +14,8 @@ open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
 
 [<AbstractClass>]
-type FSharpTreeBuilderBase(sourceFile: IPsiSourceFile, lexer: ILexer, lifetime: Lifetime, projectedOffset) =
+type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetime, projectedOffset) =
     inherit TreeBuilderBase(lifetime, lexer)
-
-    let document = sourceFile.Document
 
     let lineOffsets =
         let lineCount = document.GetLineCount()

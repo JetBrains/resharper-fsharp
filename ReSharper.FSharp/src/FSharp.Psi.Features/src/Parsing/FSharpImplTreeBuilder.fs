@@ -21,13 +21,13 @@ and IBuilderStepProcessor =
     abstract Process: step: obj * builder: FSharpImplTreeBuilder -> unit
 
 
-type FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, projectedOffset) =
-    inherit FSharpTreeBuilderBase(sourceFile, lexer, lifetime, projectedOffset)
+type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
+    inherit FSharpTreeBuilderBase(lexer, document, lifetime, projectedOffset)
 
     let nextSteps = Stack<BuilderStep>()
 
-    new (sourceFile, lexer, decls, lifetime) =
-        FSharpImplTreeBuilder(sourceFile, lexer, decls, lifetime, 0) 
+    new (lexer, document, decls, lifetime) =
+        FSharpImplTreeBuilder(lexer, document, decls, lifetime, 0) 
 
     override x.CreateFSharpFile() =
         let mark = x.Mark()
