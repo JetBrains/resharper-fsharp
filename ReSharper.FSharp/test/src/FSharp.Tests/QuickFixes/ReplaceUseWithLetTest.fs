@@ -1,0 +1,15 @@
+namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
+
+open JetBrains.ReSharper.FeaturesTestFramework.Intentions
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
+open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
+open NUnit.Framework
+
+[<FSharpTest>]
+type ReplaceUseWithLet() =
+    inherit QuickFixTestBase<ReplaceUseWithLetFix>()
+
+    override x.RelativeTestDataPath = "features/quickFixes/replaceUseWithLet"
+    
+    [<Test>] member x.``Module 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type let binding 01``() = x.DoNamedTest()

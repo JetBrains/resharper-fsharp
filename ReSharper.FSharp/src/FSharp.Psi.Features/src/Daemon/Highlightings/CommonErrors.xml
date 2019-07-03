@@ -18,4 +18,20 @@
     <QuickFix>RemoveUnusedOpensFix</QuickFix>
   </Warning>
 
+  <Warning staticGroup="FSharpErrors" name="UseBindingsIllegalInModules">
+    <Parameter type="ILetModuleDecl" name="letModuleDecl"/>
+    <Message value="'use' bindings are treated as 'let' bindings in modules"/>
+    <Range>letModuleDecl.LetOrUseToken.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ReplaceUseWithLetFix</QuickFix>
+  </Warning>
+
+  <Error staticGroup="FSharpErrors" name="UseKeywordIllegalInPrimaryCtor">
+    <Parameter type="ILetModuleDecl" name="letModuleDecl"/>
+    <Message value="'use' bindings are not permitted in primary constructors"/>
+    <Range>letModuleDecl.LetOrUseToken.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ReplaceUseWithLetFix</QuickFix>
+  </Error>
+
 </Errors>

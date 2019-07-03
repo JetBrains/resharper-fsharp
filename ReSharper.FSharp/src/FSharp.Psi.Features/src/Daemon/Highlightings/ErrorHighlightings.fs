@@ -41,13 +41,6 @@ type UnusedHighlighting(message, range) =
     inherit FSharpErrorHighlightingBase(message, range)
 
 
-[<StaticSeverityHighlighting(Severity.WARNING, HighlightingGroupIds.IdentifierHighlightingsGroup, 
-                             AttributeId = HighlightingAttributeIds.WARNING_ATTRIBUTE, 
-                             OverlapResolve = OverlapResolveKind.NONE)>]
-type UseKeywordIllegalInModule(message, range) = 
-    inherit FSharpErrorHighlightingBase(message, range)
-
-
 [<StaticSeverityHighlighting(Severity.ERROR, HighlightingGroupIds.IdentifierHighlightingsGroup, 
                              AttributeId = HighlightingAttributeIds.ERROR_ATTRIBUTE, 
                              OverlapResolve = OverlapResolveKind.NONE)>]

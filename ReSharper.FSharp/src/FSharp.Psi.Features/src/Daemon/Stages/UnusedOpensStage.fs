@@ -9,6 +9,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
@@ -44,11 +45,7 @@ and UnusedOpensStageProcess(fsFile: IFSharpFile, daemonProcess: IDaemonProcess) 
         let checkResults = results.CheckResults
         for range in UnusedOpens.getUnusedOpens(checkResults, getLine).RunAsTask(interruptChecker) do
             x.SeldomInterruptChecker.CheckForInterrupt()
-            match fsFile.FindTokenAt(getTreeStartOffset document range) with
-            | null -> ()
-            | token ->
-
-            match token.GetContainingNode<IOpenStatement>() with
+            match fsFile.GetNode<IOpenStatement>(document, range) with
             | null -> ()
             | openDirective ->
 

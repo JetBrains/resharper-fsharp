@@ -45,6 +45,7 @@
     <Compile Include="src\Daemon\Analyzers\StringProblemsAnalyzer.fs" />
       <Compile Include="src\Daemon\Analyzers\AttributeTargetAnalyzer.fs" />
       <Compile Include="src\Daemon\QuickFixes\RemoveUnusedOpensFix.fs" />
+      <Compile Include="src\Daemon\QuickFixes\ReplaceUseWithLetFix.fs" />
     <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
       <Mode>QUICKFIX</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Daemon.QuickFixes.Fixes</Namespace>

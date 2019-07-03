@@ -29,6 +29,7 @@
     <Compile Include="InheritanceGutterMarksTest.fs" />
     <Compile Include="FSharpParserTest.fs" />
     <Compile Include="FSharpCompletionTest.fs" />
+    <Compile Include="QuickFixes\ReplaceUseWithLetTest.fs" />
   </ItemGroup>
 
   <ItemGroup>

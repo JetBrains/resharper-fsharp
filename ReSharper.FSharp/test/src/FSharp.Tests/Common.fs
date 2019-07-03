@@ -22,9 +22,8 @@ open JetBrains.Util.Dotnet.TargetFrameworkIds
 open NUnit.Framework
 open Moq
 
-module AssemblyInfo =
-    [<assembly: Apartment(ApartmentState.STA)>]
-        do()
+[<assembly: Apartment(ApartmentState.STA)>]
+do()
 
 type FSharpTestAttribute() =
     inherit TestProjectFilePropertiesProvider(FSharpProjectFileType.FsExtension, MSBuildProjectUtil.CompileElement)
