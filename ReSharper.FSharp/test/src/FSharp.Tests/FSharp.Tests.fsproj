@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
@@ -30,6 +30,7 @@
     <Compile Include="FSharpParserTest.fs" />
     <Compile Include="FSharpCompletionTest.fs" />
     <Compile Include="QuickFixes\ReplaceUseWithLetTest.fs" />
+    <Compile Include="FSharpElementFactoryTest.fs" />
   </ItemGroup>
 
   <ItemGroup>
