@@ -4,6 +4,7 @@ open System
 open System.Collections.Generic
 open FSharp.Compiler.SourceCodeServices
 open FSharp.Compiler.Text
+open JetBrains.Annotations
 open JetBrains.Application.changes
 open JetBrains.DataFlow
 open JetBrains.ProjectModel
@@ -132,9 +133,9 @@ type FSharpProjectOptionsProvider
     let isScriptLike file =
         fsFileService.IsScriptLike(file) || file.PsiModule.IsMiscFilesProjectModule() || isNull (file.GetProject())        
 
-    let getParsingOptionsForSingleFile (file: IPsiSourceFile) isScript =
+    let getParsingOptionsForSingleFile ([<NotNull>] sourceFile: IPsiSourceFile) isScript =
         { FSharpParsingOptions.Default with
-            SourceFiles = [| file.GetLocation().FullPath |]
+            SourceFiles = [| sourceFile.GetLocation().FullPath |]
             IsExe = isScript }
 
     member x.ModuleInvalidated = moduleInvalidated
@@ -213,12 +214,12 @@ type FSharpProjectOptionsProvider
             |> Option.map (fun fsProject -> fsProject.ImplFilesWithSigs.Contains(file.GetLocation()))
             |> Option.defaultValue false
 
-        member x.GetParsingOptions(file) =
-            if isScriptLike file then getParsingOptionsForSingleFile file true else
+        member x.GetParsingOptions(sourceFile) =
+            if isScriptLike sourceFile then getParsingOptionsForSingleFile sourceFile true else
 
-            getOrCreateFSharpProject file
+            getOrCreateFSharpProject sourceFile
             |> Option.map (fun fsProject -> fsProject.ParsingOptions)
-            |> Option.defaultWith (fun _ -> getParsingOptionsForSingleFile file false)
+            |> Option.defaultWith (fun _ -> getParsingOptionsForSingleFile sourceFile false)
 
         member x.GetFileIndex(sourceFile) =
             if isScriptLike sourceFile then 0 else

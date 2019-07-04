@@ -1,0 +1,9 @@
+﻿module Module
+
+let f = function
+    | 0 -> ()
+    || 0 -> ()|(0)
+    | _ -> ()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: This rule will never be matched
