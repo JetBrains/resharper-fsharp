@@ -1,6 +1,5 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
-open System
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.ReSharper.Daemon.CodeInsights
 open JetBrains.ReSharper.Feature.Services.Daemon
@@ -20,6 +19,29 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings,  daemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
     let [<Literal>] id = "Inferred types"
+
+    let formatMemberOrFunctionOrValue (mfv: FSharpMemberOrFunctionOrValue, symbolUse: FSharpSymbolUse) =
+        let returnTy = mfv.ReturnParameter.Type.Format symbolUse.DisplayContext
+
+        let curriedParameterGroups =
+            if mfv.IsPropertyGetterMethod then []
+            else
+              let groups =
+                mfv.CurriedParameterGroups
+                |> Seq.map (Seq.map (fun p -> p.DisplayName, p.Type.Format symbolUse.DisplayContext) >> Seq.toList)
+                |> Seq.toList
+
+              match groups with
+              | [[]] when mfv.IsMember && (not mfv.IsPropertyGetterMethod) -> [["unit", "unit"]]
+              | _ -> groups
+
+        [ for curriedGroup in curriedParameterGroups do
+              let group = [ for _name, ty in curriedGroup -> ty ] |> String.concat " * "
+              if curriedGroup.Length = 1 then yield group
+              else yield sprintf "(%s)" group
+
+          yield returnTy ]
+        |> String.concat " → "
 
     override x.Execute(committer) =
         let consumer = new FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settings)
@@ -41,7 +63,7 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings,  daemonProcess) =
             match symbolUse.Symbol with
             | :? FSharpMemberOrFunctionOrValue as mfv ->
                 let range = binding.GetNavigationRange()
-                let text = mfv.FullType.Format(symbolUse.DisplayContext)
+                let text = formatMemberOrFunctionOrValue (mfv, symbolUse)
                 consumer.AddHighlighting(CodeInsightsHighlighting(range, text, "", "", x, null, null))
             | :? FSharpField as f ->
                 let range = binding.GetNavigationRange()
@@ -58,33 +80,7 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings,  daemonProcess) =
             match symbolUse.Symbol with
             | :? FSharpMemberOrFunctionOrValue as mfv ->
                 let range = decl.GetNavigationRange()
-                let returnTy = mfv.ReturnParameter.Type.Format symbolUse.DisplayContext
-
-                let curriedParameterGroups =
-                    if mfv.IsPropertyGetterMethod then []
-                    else
-                      let groups =
-                        mfv.CurriedParameterGroups
-                        |> Seq.map (Seq.map (fun p -> p.DisplayName, p.Type.Format symbolUse.DisplayContext) >> Seq.toList)
-                        |> Seq.toList
-
-                      match groups with
-                      | [[]] when mfv.IsMember && (not mfv.IsPropertyGetterMethod) -> [["unit", "unit"]]
-                      | _ -> groups
-
-                let text =
-                    [ for curriedGroup in curriedParameterGroups do
-                        yield
-                          [ for name, ty in curriedGroup do
-                              if not (String.IsNullOrWhiteSpace name) then
-                                  yield sprintf "%s:%s" name ty
-                              else
-                                  yield ty ]
-                          |> String.concat " * "
-
-                      yield returnTy ]
-                    |> String.concat " -> "
-
+                let text = formatMemberOrFunctionOrValue (mfv, symbolUse)
                 consumer.AddHighlighting(CodeInsightsHighlighting(range, text, "", "", x, null, null))
             | _ -> ()
 
