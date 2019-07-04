@@ -41,7 +41,7 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings,  daemonProcess) =
               else yield sprintf "(%s)" group
 
           yield returnTy ]
-        |> String.concat " → "
+        |> String.concat " -> "
 
     override x.Execute(committer) =
         let consumer = new FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settings)
