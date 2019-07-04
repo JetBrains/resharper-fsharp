@@ -1,0 +1,28 @@
+﻿Other
+---
+TO: [O] module |Module| RANGE: (7,13) @ Exceptions 01.fs
+TO: [O] exception |Exn1| RANGE: (27,31) @ Exceptions 01.fs
+TO: [O] with static member |Foo| = 123 RANGE: (52,55) @ Exceptions 01.fs
+TO: [O] |Exn1| RANGE: (65,69) @ Exceptions 01.fs
+TO: [O] Exn1.|Foo| RANGE: (76,79) @ Exceptions 01.fs
+TO: [O] |Exn1|.Foo RANGE: (71,75) @ Exceptions 01.fs
+TO: [O] Exn1.|Foo| RANGE: (76,79) @ Exceptions 01.fs
+TO: [O] exception |Exn2| of int RANGE: (93,97) @ Exceptions 01.fs
+TO: [O] with static member |Foo| = 123 RANGE: (125,128) @ Exceptions 01.fs
+TO: [O] |Exn2|(123) RANGE: (138,142) @ Exceptions 01.fs
+TO: [O] Exn2.|Foo| RANGE: (154,157) @ Exceptions 01.fs
+TO: [O] |Exn2|.Foo RANGE: (149,153) @ Exceptions 01.fs
+TO: [O] Exn2.|Foo| RANGE: (154,157) @ Exceptions 01.fs
+
+
+New instance creation
+---
+TO: [O] |Exn1| RANGE: (65,69) @ Exceptions 01.fs
+TO: [O] |Exn2|(123) RANGE: (138,142) @ Exceptions 01.fs
+
+
+Type specification
+---
+TO: [O] exception Exn2 of |int| RANGE: (101,104) @ Exceptions 01.fs
+
+
