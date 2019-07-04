@@ -20,6 +20,29 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings,  daemonProcess) =
 
     let [<Literal>] id = "Inferred types"
 
+    let formatMemberOrFunctionOrValue (mfv: FSharpMemberOrFunctionOrValue, symbolUse: FSharpSymbolUse) =
+        let returnTy = mfv.ReturnParameter.Type.Format symbolUse.DisplayContext
+
+        let curriedParameterGroups =
+            if mfv.IsPropertyGetterMethod then []
+            else
+              let groups =
+                mfv.CurriedParameterGroups
+                |> Seq.map (Seq.map (fun p -> p.DisplayName, p.Type.Format symbolUse.DisplayContext) >> Seq.toList)
+                |> Seq.toList
+
+              match groups with
+              | [[]] when mfv.IsMember && (not mfv.IsPropertyGetterMethod) -> [["unit", "unit"]]
+              | _ -> groups
+
+        [ for curriedGroup in curriedParameterGroups do
+              let group = [ for _name, ty in curriedGroup -> ty ] |> String.concat " * "
+              if curriedGroup.Length = 1 then yield group
+              else yield sprintf "(%s)" group
+
+          yield returnTy ]
+        |> String.concat " -> "
+
     override x.Execute(committer) =
         let consumer = new FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settings)
         fsFile.ProcessThisAndDescendants(Processor(x, consumer))
@@ -40,10 +63,26 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings,  daemonProcess) =
             match symbolUse.Symbol with
             | :? FSharpMemberOrFunctionOrValue as mfv ->
                 let range = binding.GetNavigationRange()
-                let text = mfv.FullType.Format(symbolUse.DisplayContext)
+                let text = formatMemberOrFunctionOrValue (mfv, symbolUse)
+                consumer.AddHighlighting(CodeInsightsHighlighting(range, text, "", "", x, null, null))
+            | :? FSharpField as f ->
+                let range = binding.GetNavigationRange()
+                let text = f.FieldType.Format(symbolUse.DisplayContext)
                 consumer.AddHighlighting(CodeInsightsHighlighting(range, text, "", "", x, null, null))
             | _ -> ()
         | _ -> ()
+
+    override x.VisitMemberDeclaration(decl, consumer) =
+        match box ((decl :> IFSharpDeclaration).GetFSharpSymbolUse()) with
+        | null -> ()
+        | symbolUse ->
+            let symbolUse = symbolUse :?> FSharpSymbolUse
+            match symbolUse.Symbol with
+            | :? FSharpMemberOrFunctionOrValue as mfv ->
+                let range = decl.GetNavigationRange()
+                let text = formatMemberOrFunctionOrValue (mfv, symbolUse)
+                consumer.AddHighlighting(CodeInsightsHighlighting(range, text, "", "", x, null, null))
+            | _ -> ()
 
     interface ICodeInsightsProvider with
         member x.ProviderId = id
