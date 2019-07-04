@@ -30,7 +30,7 @@ type FSharpCheckerService
         let enableBgCheck =
             settingsStore
                 .BindToContextLive(lifetime, ContextRange.ApplicationWide)
-                .GetValueProperty(lifetime, fun (key: FSharpOptions) -> key.BackgroundTypeCheck)
+                .GetValueProperty(lifetime, fun key -> key.BackgroundTypeCheck)
 
         lazy
             let checker =

@@ -16,15 +16,15 @@ module FSharpOptions =
 
 
 [<SettingsKey(typeof<HierarchySettings>, "FSharpOptions")>]
-type FSharpOptions() =
-    [<SettingsEntry(false, backgroundTypeCheck); DefaultValue>]
-    val mutable BackgroundTypeCheck: bool
+type FSharpOptions =
+    { [<SettingsEntry(false, backgroundTypeCheck); DefaultValue>]
+      mutable BackgroundTypeCheck: bool
 
-    [<SettingsEntry(true, outOfScopeCompletion); DefaultValue>]
-    val mutable EnableOutOfScopeCompletion: bool
+      [<SettingsEntry(true, outOfScopeCompletion); DefaultValue>]
+      mutable EnableOutOfScopeCompletion: bool
 
-    [<SettingsEntry(true, topLevelOpenCompletion); DefaultValue>]
-    val mutable TopLevelOpenCompletion: bool
+      [<SettingsEntry(true, topLevelOpenCompletion); DefaultValue>]
+      mutable TopLevelOpenCompletion: bool }
 
 
 [<OptionsPage("FSharpOptionsPage", "F#", typeof<ProjectModelThemedIcons.Fsharp>)>]
@@ -33,6 +33,6 @@ type FSharpOptionsPage
     inherit BeSimpleOptionsPage(lifetime, optionsPageContext, settings)
 
     do
-        this.AddBoolOption((fun (key: FSharpOptions) -> key.BackgroundTypeCheck), RichText(backgroundTypeCheck), null) |> ignore
-        this.AddBoolOption((fun (key: FSharpOptions) -> key.EnableOutOfScopeCompletion), RichText(outOfScopeCompletion), null) |> ignore
-        this.AddBoolOption((fun (key: FSharpOptions) -> key.TopLevelOpenCompletion), RichText(topLevelOpenCompletion), null) |> ignore
+        this.AddBoolOption((fun key -> key.BackgroundTypeCheck), RichText(backgroundTypeCheck), null) |> ignore
+        this.AddBoolOption((fun key -> key.EnableOutOfScopeCompletion), RichText(outOfScopeCompletion), null) |> ignore
+        this.AddBoolOption((fun key -> key.TopLevelOpenCompletion), RichText(topLevelOpenCompletion), null) |> ignore
