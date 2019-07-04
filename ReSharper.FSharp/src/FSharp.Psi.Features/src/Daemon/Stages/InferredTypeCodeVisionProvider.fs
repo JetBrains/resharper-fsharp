@@ -27,9 +27,12 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings,  daemonProcess) =
             if mfv.IsPropertyGetterMethod then []
             else
               let groups =
-                mfv.CurriedParameterGroups
-                |> Seq.map (Seq.map (fun p -> p.DisplayName, p.Type.Format symbolUse.DisplayContext) >> Seq.toList)
-                |> Seq.toList
+                [ for group in mfv.CurriedParameterGroups ->
+                    [ for p in group do
+                        let ty = p.Type.Format symbolUse.DisplayContext
+                        yield
+                          p.DisplayName,
+                          if p.Type.IsFunctionType then sprintf "(%s)" ty else ty ]]
 
               match groups with
               | [[]] when mfv.IsMember && (not mfv.IsPropertyGetterMethod) -> [["unit", "unit"]]
