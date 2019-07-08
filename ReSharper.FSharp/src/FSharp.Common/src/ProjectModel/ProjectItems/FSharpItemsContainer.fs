@@ -758,7 +758,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
 
     member x.Write(writer: UnsafeWriter) =
         let writeTargetFrameworkIds ids =
-            writer.Write(UnsafeWriter.WriteDelegate(fun writer (value: TargetFrameworkId) ->
+            writer.Write(UnsafeWriter.WriteDelegate<_>(fun writer (value: TargetFrameworkId) ->
                 value.Write(writer)), ids)
 
         writer.Write(projectDirectory)
@@ -802,9 +802,9 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
         let projectUniqueName = reader.ReadString()
         let targetFrameworkIdIntern = DataIntern(setComparer)
         let readTargetFrameworkIds () =
-            let ids = reader.ReadCollection(UnsafeReader.ReadDelegate(TargetFrameworkId.Read), fun _ -> HashSet())
-            targetFrameworkIdIntern.Intern(ids) 
-    
+            let ids = reader.ReadCollection(UnsafeReader.ReadDelegate<_>(TargetFrameworkId.Read), fun _ -> HashSet())
+            targetFrameworkIdIntern.Intern(ids)
+
         let logger = Logger.GetLogger<FSharpItemsContainer>()
         let mapping = ProjectMapping(projectDirectory, projectUniqueName, readTargetFrameworkIds (), logger)
         let foldersById = Dictionary<int, FSharpProjectModelElement>()
