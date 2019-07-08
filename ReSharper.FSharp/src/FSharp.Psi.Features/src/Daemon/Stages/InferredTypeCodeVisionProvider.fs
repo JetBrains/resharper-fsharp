@@ -21,29 +21,31 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings,  daemonProcess) =
     let [<Literal>] id = "Inferred types"
 
     let formatMemberOrFunctionOrValue (mfv: FSharpMemberOrFunctionOrValue, symbolUse: FSharpSymbolUse) =
-        let returnTy = mfv.ReturnParameter.Type.Format symbolUse.DisplayContext
+        let returnTypeStr = mfv.ReturnParameter.Type.Format symbolUse.DisplayContext
 
-        let curriedParameterGroups =
+        let parameterGroups =
             if mfv.IsPropertyGetterMethod then []
             else
               let groups =
                 [ for group in mfv.CurriedParameterGroups ->
                     [ for p in group do
-                        let ty = p.Type.Format symbolUse.DisplayContext
-                        yield
-                          p.DisplayName,
-                          if p.Type.IsFunctionType then sprintf "(%s)" ty else ty ]]
+                        let typeStr = p.Type.Format symbolUse.DisplayContext
+                        if p.Type.IsFunctionType then yield sprintf "(%s)" typeStr
+                        else yield typeStr ]]
 
               match groups with
-              | [[]] when mfv.IsMember && (not mfv.IsPropertyGetterMethod) -> [["unit", "unit"]]
+              | [[]] when mfv.IsMember -> [["unit"]]
               | _ -> groups
 
-        [ for curriedGroup in curriedParameterGroups do
-            let group = [ for _name, ty in curriedGroup -> ty ] |> String.concat " * "
-            if curriedGroup.Length = 1 then yield group
-            else yield sprintf "(%s)" group
-          yield returnTy ]
+        [ for group in parameterGroups do
+            let groupStr = group |> String.concat " * "
+            if group.Length = 1 then yield groupStr
+            else yield sprintf "(%s)" groupStr
+          yield returnTypeStr ]
         |> String.concat " -> "
+
+    member private x.AddHighlighting(consumer: IHighlightingConsumer, range, text) =
+        consumer.AddHighlighting(CodeInsightsHighlighting(range, text, "", "", x, null, null))
 
     override x.Execute(committer) =
         let consumer = new FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settings)
@@ -62,15 +64,17 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings,  daemonProcess) =
             | symbolUse ->
 
             let symbolUse = symbolUse :?> FSharpSymbolUse
+
             match symbolUse.Symbol with
             | :? FSharpMemberOrFunctionOrValue as mfv ->
                 let range = binding.GetNavigationRange()
                 let text = formatMemberOrFunctionOrValue (mfv, symbolUse)
-                consumer.AddHighlighting(CodeInsightsHighlighting(range, text, "", "", x, null, null))
-            | :? FSharpField as f ->
+                x.AddHighlighting(consumer, range, text)
+
+            | :? FSharpField as field ->
                 let range = binding.GetNavigationRange()
-                let text = f.FieldType.Format(symbolUse.DisplayContext)
-                consumer.AddHighlighting(CodeInsightsHighlighting(range, text, "", "", x, null, null))
+                let text = field.FieldType.Format(symbolUse.DisplayContext)
+                x.AddHighlighting(consumer, range, text)
             | _ -> ()
         | _ -> ()
 
@@ -83,7 +87,7 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings,  daemonProcess) =
             | :? FSharpMemberOrFunctionOrValue as mfv ->
                 let range = decl.GetNavigationRange()
                 let text = formatMemberOrFunctionOrValue (mfv, symbolUse)
-                consumer.AddHighlighting(CodeInsightsHighlighting(range, text, "", "", x, null, null))
+                x.AddHighlighting(consumer, range, text)
             | _ -> ()
 
     interface ICodeInsightsProvider with
