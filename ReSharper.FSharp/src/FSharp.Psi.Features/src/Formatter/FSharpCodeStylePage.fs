@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
 open System
+open JetBrains.Application.Components
 open JetBrains.Application.Settings
 open JetBrains.Application.UI.Options
 open JetBrains.ReSharper.Feature.Services.OptionPages.CodeStyle

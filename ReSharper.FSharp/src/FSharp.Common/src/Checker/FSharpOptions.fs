@@ -5,7 +5,7 @@ open JetBrains.Application.UI.Options
 open JetBrains.IDE.UI.Options
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel.Resources
-open JetBrains.ProjectModel.Settings.Schema
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.UI.RichText
 
 [<AutoOpen>]
@@ -15,7 +15,7 @@ module FSharpOptions =
     let [<Literal>] topLevelOpenCompletion = "Open namespaces at top-level when completing out of scope items"
 
 
-[<SettingsKey(typeof<HierarchySettings>, "FSharpOptions")>]
+[<SettingsKey(typeof<FSharpSettings>, "FSharpOptions")>]
 type FSharpOptions =
     { [<SettingsEntry(false, backgroundTypeCheck); DefaultValue>]
       mutable BackgroundTypeCheck: bool

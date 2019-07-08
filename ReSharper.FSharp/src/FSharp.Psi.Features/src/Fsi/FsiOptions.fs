@@ -6,7 +6,7 @@ open JetBrains.Application.Settings
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.DataContext
-open JetBrains.ProjectModel.Settings.Schema
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.Util
 
 [<AutoOpen>]
@@ -41,7 +41,7 @@ module FsiOptions =
         "When disabled, copy recent command to F# Interactive editor."
 
 
-[<SettingsKey(typeof<HierarchySettings>, "Fsi")>]
+[<SettingsKey(typeof<FSharpSettings>, "Fsi")>]
 type FsiOptions =
     { [<SettingsEntry(true, autoDetectToolText); DefaultValue>]
       mutable AutoDetect: bool
