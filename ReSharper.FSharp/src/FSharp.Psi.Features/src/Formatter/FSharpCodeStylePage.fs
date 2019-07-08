@@ -98,8 +98,8 @@ type FSharpCodeStylePageSchema(lifetime, smartContext, itemViewModelFactory, con
 
 [<OptionsPage("FSharpCodeStylePage", "Formatting Style", typeof<PsiFeaturesUnsortedOptionsThemedIcons.Indent>)>]
 type FSharpCodeStylePage(lifetime, smartContext: OptionsSettingsSmartContext, env,
-                         schema: FSharpCodeStylePageSchema, preview) =
-    inherit CodeStylePage(lifetime, smartContext, env, schema, preview)
+                         schema: FSharpCodeStylePageSchema, preview, componentContainer: IComponentContainer) =
+    inherit CodeStylePage(lifetime, smartContext, env, schema, preview, componentContainer)
     let _ = PsiFeaturesUnsortedOptionsThemedIcons.Indent // workaround to create assembly reference (Microsoft/visualfsharp#3522)
 
     override x.Id = "FSharpIndentStylePage"
