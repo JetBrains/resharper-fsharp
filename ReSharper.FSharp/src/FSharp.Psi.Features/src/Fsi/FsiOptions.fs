@@ -42,36 +42,36 @@ module FsiOptions =
 
 
 [<SettingsKey(typeof<HierarchySettings>, "Fsi")>]
-type FsiOptions() =
-    [<SettingsEntry(true, autoDetectToolText); DefaultValue>]
-    val mutable AutoDetect: bool
+type FsiOptions =
+    { [<SettingsEntry(true, autoDetectToolText); DefaultValue>]
+      mutable AutoDetect: bool
 
-    [<SettingsEntry(false, customToolText); DefaultValue>]
-    val mutable IsCustomTool: bool
-    
-    [<SettingsEntry(false, useAnyCpuText); DefaultValue>]
-    val mutable UseAnyCpu: bool
+      [<SettingsEntry(false, customToolText); DefaultValue>]
+      mutable IsCustomTool: bool
 
-    [<SettingsEntry(false, shadowCopyReferencesText); DefaultValue>]
-    val mutable ShadowCopyReferences: bool
+      [<SettingsEntry(false, useAnyCpuText); DefaultValue>]
+      mutable UseAnyCpu: bool
 
-    [<SettingsEntry("--optimize+", fsiArgsText); DefaultValue>]
-    val mutable FsiArgs: string
+      [<SettingsEntry(false, shadowCopyReferencesText); DefaultValue>]
+      mutable ShadowCopyReferences: bool
 
-    [<SettingsEntry("--fsi-server:0 --readline-", fsiInternalArgsText); DefaultValue>]
-    val mutable FsiInternalArgs: string
+      [<SettingsEntry("--optimize+", fsiArgsText); DefaultValue>]
+      mutable FsiArgs: string
 
-    [<SettingsEntry(true, moveCaretOnSendLineText); DefaultValue>]
-    val mutable MoveCaretOnSendLine: bool
+      [<SettingsEntry("--fsi-server:0 --readline-", fsiInternalArgsText); DefaultValue>]
+      mutable FsiInternalArgs: string
 
-    [<SettingsEntry(true, executeRecentsText); DefaultValue>]
-    val mutable ExecuteRecents: bool
+      [<SettingsEntry(true, moveCaretOnSendLineText); DefaultValue>]
+      mutable MoveCaretOnSendLine: bool
 
-    [<SettingsEntry(false, fixOptionsForDebugText); DefaultValue>]
-    val mutable FixOptionsForDebug: bool
+      [<SettingsEntry(true, executeRecentsText); DefaultValue>]
+      mutable ExecuteRecents: bool
 
-    [<SettingsEntry(null, fsiPathText); DefaultValue>]
-    val mutable FsiPath: string
+      [<SettingsEntry(false, fixOptionsForDebugText); DefaultValue>]
+      mutable FixOptionsForDebug: bool
+
+      [<SettingsEntry(null, fsiPathText); DefaultValue>]
+      mutable FsiPath: string }
 
     static member GetValue(settings: IContextBoundSettingsStore, getter: Expression<Func<FsiOptions,_>>) =
         settings.GetValue(getter)
@@ -89,16 +89,16 @@ type FsiOptionsProvider(lifetime: Lifetime, settings: IContextBoundSettingsStore
         let settings = settingsStore.BindToContextLive(lifetime, ContextRange.Smart(solution.ToDataContext()))
         FsiOptionsProvider(lifetime, settings)
 
-    member val AutoDetect           = FsiOptions.GetProperty(lifetime, settings, fun s -> s.AutoDetect)
-    member val IsCustomTool         = FsiOptions.GetProperty(lifetime, settings, fun s -> s.IsCustomTool)
-    member val UseAnyCpu            = FsiOptions.GetProperty(lifetime, settings, fun s -> s.UseAnyCpu)
-    member val ShadowCopyReferences = FsiOptions.GetProperty(lifetime, settings, fun s -> s.ShadowCopyReferences)
-    member val FsiArgs              = FsiOptions.GetProperty(lifetime, settings, fun s -> s.FsiArgs)
-    member val FsiInternalArgs      = FsiOptions.GetProperty(lifetime, settings, fun s -> s.FsiInternalArgs)
-    member val MoveCaretOnSendLine  = FsiOptions.GetProperty(lifetime, settings, fun s -> s.MoveCaretOnSendLine)
-    member val ExecuteRecents       = FsiOptions.GetProperty(lifetime, settings, fun s -> s.ExecuteRecents)
-    member val FixOptionsForDebug   = FsiOptions.GetProperty(lifetime, settings, fun s -> s.FixOptionsForDebug)
-    member val FsiPath              = FsiOptions.GetProperty(lifetime, settings, fun s -> s.FsiPath)
+    member val AutoDetect           = settings.GetValueProperty(lifetime, fun s -> s.AutoDetect)
+    member val IsCustomTool         = settings.GetValueProperty(lifetime, fun s -> s.IsCustomTool)
+    member val UseAnyCpu            = settings.GetValueProperty(lifetime, fun s -> s.UseAnyCpu)
+    member val ShadowCopyReferences = settings.GetValueProperty(lifetime, fun s -> s.ShadowCopyReferences)
+    member val FsiArgs              = settings.GetValueProperty(lifetime, fun s -> s.FsiArgs)
+    member val FsiInternalArgs      = settings.GetValueProperty(lifetime, fun s -> s.FsiInternalArgs)
+    member val MoveCaretOnSendLine  = settings.GetValueProperty(lifetime, fun s -> s.MoveCaretOnSendLine)
+    member val ExecuteRecents       = settings.GetValueProperty(lifetime, fun s -> s.ExecuteRecents)
+    member val FixOptionsForDebug   = settings.GetValueProperty(lifetime, fun s -> s.FixOptionsForDebug)
+    member val FsiPath              = settings.GetValueProperty(lifetime, fun s -> s.FsiPath)
 
     member x.FsiPathAsPath =
         FileSystemPath.TryParse(x.FsiPath.Value)

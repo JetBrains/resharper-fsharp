@@ -35,7 +35,24 @@ type FSharpItemOccurenceKindProvider() =
         if isNotNull castExpr && node.IsChildOf(castExpr.Type) then CSharpSpecificOccurrenceKinds.TypeConversions else
 
         null
-    
+
+    /// Is checked when IsPattern, IsFromType, etc are false.
+    let isInstanceCreation (node: ITreeNode) (symbol: FSharpSymbol) =
+        match symbol with
+        | :? FSharpMemberOrFunctionOrValue as mfv -> mfv.IsConstructor
+        | :? FSharpUnionCase -> true
+
+        | :? FSharpEntity as entity when entity.IsFSharpExceptionDeclaration ->
+            match node.As<ITokenNode>() with
+            | null -> false
+            | tokenNode ->
+
+            match node.GetContainingNode<ILongIdentifier>() with
+            | null -> true
+            | longIdentifier -> longIdentifier.IdentifierToken == tokenNode
+
+        | _ -> false
+
     interface IOccurrenceKindProvider with
         member x.GetOccurrenceKinds(occurrence: IOccurrence) =
             match occurrence.As<ReferenceOccurrence>() with
@@ -72,14 +89,9 @@ type FSharpItemOccurenceKindProvider() =
             if isNotNull kind then [| kind |] :> _ else
             if isFromType then [| FSharpItemOccurrenceKind.TypeSpecification |] :> _ else
             if symbolUse.IsFromPattern then [| FSharpItemOccurrenceKind.Pattern |] :> _ else
+            if isInstanceCreation node symbolUse.Symbol then [| OccurrenceKind.NewInstanceCreation |] :> _ else
 
-            match symbolUse.Symbol with
-            | :? FSharpUnionCase -> [| OccurrenceKind.NewInstanceCreation |] :> _
-
-            | :? FSharpMemberOrFunctionOrValue as mfv when mfv.IsConstructor ->
-                [| OccurrenceKind.NewInstanceCreation |] :> _
-
-            | _ -> EmptyList.Instance :> _
+            EmptyList.Instance :> _
 
         member x.GetAllPossibleOccurrenceKinds() =
             [| OccurrenceKind.Attribute

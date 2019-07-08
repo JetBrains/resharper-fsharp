@@ -30,7 +30,7 @@ type PaketRestoreTargetsAnalyzer(lifetime, solution: ISolution, settingsStore: I
     let mutable restoreOptionsWereReset = false
 
     let settings = settingsStore.BindToContextLive(lifetime, ContextRange.Smart(solution.ToDataContext()))
-    let restoreResetProp = settings.GetValueProperty(lifetime, fun (s: RestoreResetOptions) -> s.RestoreOptionsWereReset)
+    let restoreResetProp = settings.GetValueProperty(lifetime, fun key -> key.RestoreOptionsWereReset)
     let restoreEnabledProp = settings.GetValueProperty(lifetime, fun (s: NuGetOptions) -> s.ConfigRestoreEnabled)
     
     interface IMsBuildProjectLoadDiagnosticProvider with
@@ -48,7 +48,7 @@ type PaketRestoreTargetsAnalyzer(lifetime, solution: ISolution, settingsStore: I
             match restoreEnabledProp.GetValue() with
             | NuGetOptionConfigPolicy.Disable ->
                 settings.ResetValue((fun (s: NuGetOptions) -> s.ConfigRestoreEnabled))
-                settings.SetValue((fun (s: RestoreResetOptions) -> s.RestoreOptionsWereReset), true)
+                settings.SetValue((fun key -> key.RestoreOptionsWereReset), true)
                 logger.LogMessage(LoggingLevel.WARN, "Found core project using Paket. Reset NuGet restore options.")
 
                 restoreOptionsWereReset <- true
@@ -69,6 +69,6 @@ type NuGetRestoreEnabledMessage(title, message) =
 
 
 [<SettingsKey(typeof<HierarchySettings>, "RestoreOptionsWereReset")>]
-type RestoreResetOptions() =
-    [<SettingsEntry(false, "RestoreOptionsWereReset"); DefaultValue>]
-    val mutable RestoreOptionsWereReset: bool
+type RestoreResetOptions =
+    { [<SettingsEntry(false, "RestoreOptionsWereReset"); DefaultValue>]
+      mutable RestoreOptionsWereReset: bool }

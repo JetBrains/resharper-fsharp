@@ -1,23 +1,18 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
-open System
 open FSharp.Compiler.SourceCodeServices
-open JetBrains.Application.Settings
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems.Impl
 open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Feature.Services.ParameterInfo
 open JetBrains.ReSharper.Host.Features.Completion
 open JetBrains.ReSharper.Plugins.FSharp
-open JetBrains.ReSharper.Plugins.FSharp.Checker.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Util
-open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.Util
 open JetBrains.UI.RichText
 open JetBrains.Util
-open JetBrains.Util.Text
 
 type FSharpLookupCandidate(description: string, xmlDoc: FSharpXmlDoc, xmlDocService: FSharpXmlDocService) =
     member x.Description = description
@@ -55,6 +50,9 @@ type FSharpLookupItem(item: FSharpDeclarationListItem, context: FSharpCodeComple
     inherit TextLookupItemBase()
 
     let mutable candidates = Unchecked.defaultof<_>
+
+    let addOpen ns =
+        addOpen context.Coords context.FSharpFile context.BasicContext.ContextBoundSettingsStore ns
 
     member x.Candidates =
         match box candidates with
@@ -94,45 +92,7 @@ type FSharpLookupItem(item: FSharpDeclarationListItem, context: FSharpCodeComple
 
         match item.NamespaceToOpen with
         | None -> ()
-        | Some namespaceToOpen ->
-
-        let line = int context.Coords.Line + 1
-        let parseTree = context.FSharpFile.ParseResults.Value.ParseTree.Value
-        let insertionPoint =
-            let settings = context.BasicContext.ContextBoundSettingsStore
-            if settings.GetValue(fun (key: FSharpOptions) -> key.TopLevelOpenCompletion) then
-                OpenStatementInsertionPoint.TopLevel
-            else
-                OpenStatementInsertionPoint.Nearest
-
-        let document = textControl.Document
-        let context = ParsedInput.findNearestPointToInsertOpenDeclaration line parseTree [||] insertionPoint
-        let pos = ParsedInput.adjustInsertionPoint (docLine >> document.GetLineText) context
-
-        let isSystem = namespaceToOpen.StartsWith("System.", StringComparison.Ordinal) || namespaceToOpen = "System"
-        let openPrefix = String(' ', pos.Column) + "open "
-        let textToInsert = openPrefix + namespaceToOpen
-
-        let line = pos.Line - 1 |> max 0
-        let lineToInsert =
-            seq { line - 1 .. -1 .. 0 }
-            |> Seq.takeWhile (fun i ->
-                let lineText = document.GetLineText(docLine i)
-                lineText.StartsWith(openPrefix) &&
-                (textToInsert < lineText || isSystem && not (lineText.StartsWith("open System"))))
-            |> Seq.tryLast
-            |> Option.defaultValue line
-
-        // add empty line after all open expressions if needed
-        let insertEmptyLine = not (document.GetLineText(docLine line).IsNullOrWhitespace())
-
-        let prevLineEndOffset =
-            if lineToInsert > 0 then document.GetLineEndOffsetWithLineBreak(docLine (max 0 (lineToInsert - 1)))
-            else 0
-
-        let newLineText = document.GetPsiSourceFile(solution).DetectLineEnding().GetPresentation()
-        let emptyLine = (if insertEmptyLine then newLineText else "")
-        document.InsertText(prevLineEndOffset, textToInsert + newLineText + emptyLine)
+        | Some namespaceToOpen -> addOpen namespaceToOpen
 
     override x.GetDisplayName() =
         let name = LookupUtil.FormatLookupString(item.Name, x.TextColor)
