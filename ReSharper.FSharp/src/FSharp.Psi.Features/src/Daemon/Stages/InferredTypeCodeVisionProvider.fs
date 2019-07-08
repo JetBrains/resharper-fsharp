@@ -39,10 +39,9 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings,  daemonProcess) =
               | _ -> groups
 
         [ for curriedGroup in curriedParameterGroups do
-              let group = [ for _name, ty in curriedGroup -> ty ] |> String.concat " * "
-              if curriedGroup.Length = 1 then yield group
-              else yield sprintf "(%s)" group
-
+            let group = [ for _name, ty in curriedGroup -> ty ] |> String.concat " * "
+            if curriedGroup.Length = 1 then yield group
+            else yield sprintf "(%s)" group
           yield returnTy ]
         |> String.concat " -> "
 
