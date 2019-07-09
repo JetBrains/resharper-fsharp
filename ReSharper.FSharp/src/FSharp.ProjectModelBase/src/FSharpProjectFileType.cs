@@ -8,7 +8,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp
   public class FSharpProjectFileType : KnownProjectFileType
   {
     public new const string Name = "F#";
-    [UsedImplicitly] public new static readonly FSharpProjectFileType Instance;
+    [CanBeNull, UsedImplicitly]
+    public new static FSharpProjectFileType Instance { get; private set; }
 
     public const string FsExtension = ".fs";
     public const string FsiExtension = ".fsi";

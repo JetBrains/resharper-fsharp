@@ -7,7 +7,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp
   public class FSharpScriptProjectFileType : FSharpProjectFileType
   {
     public new const string Name = "F# Script";
-    [UsedImplicitly] public new static readonly FSharpScriptProjectFileType Instance;
+    [CanBeNull, UsedImplicitly]
+    public new static FSharpScriptProjectFileType Instance { get; private set; }
 
     public const string FsxExtension = ".fsx";
     public const string FsScriptExtension = ".fsscript";
