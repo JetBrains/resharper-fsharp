@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
+open System.Text
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application
 open JetBrains.ReSharper.Daemon.CodeInsights
@@ -7,7 +8,9 @@ open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Rider.Model
+open JetBrains.Util
 
 
 [<StaticSeverityHighlighting(
@@ -49,31 +52,47 @@ type InferredTypeCodeVisionStage(provider: InferredTypeCodeVisionProvider) =
 and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provider: ICodeInsightsProvider) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
-    let formatMemberOrFunctionOrValue (mfv: FSharpMemberOrFunctionOrValue, symbolUse: FSharpSymbolUse) =
-        let returnTypeStr = mfv.ReturnParameter.Type.Format symbolUse.DisplayContext
+    let append (stringBuilder: StringBuilder) (s: string) =
+        stringBuilder.Append(s) |> ignore
 
-        let parameterGroups =
-            if mfv.IsPropertyGetterMethod then []
-            else
-              let groups =
-                [ for group in mfv.CurriedParameterGroups ->
-                    [ for p in group do
-                        let typeStr = p.Type.Format symbolUse.DisplayContext
-                        if p.Type.IsFunctionType then yield sprintf "(%s)" typeStr
-                        else yield typeStr ]]
+    let formatMfv (symbolUse: FSharpSymbolUse) (mfv: FSharpMemberOrFunctionOrValue) =
+        let displayContext = symbolUse.DisplayContext
+        let returnTypeStr = mfv.ReturnParameter.Type.Format(displayContext)
 
-              match groups with
-              | [[]] when mfv.IsMember -> [["unit"]]
-              | _ -> groups
+        if mfv.IsPropertyGetterMethod then returnTypeStr else
 
-        [ for group in parameterGroups do
-            let groupStr = group |> String.concat " * "
-            if group.Length = 1 then yield groupStr
-            else yield sprintf "(%s)" groupStr
-          yield returnTypeStr ]
-        |> String.concat " -> "
+        let paramGroups = mfv.CurriedParameterGroups
+        if paramGroups.IsEmpty() then returnTypeStr else
+        if paramGroups.Count = 1 && paramGroups.[0].IsEmpty() && mfv.IsMember then "unit -> " + returnTypeStr else
 
-    member private x.AddHighlighting(consumer: IHighlightingConsumer, range, text) =
+        let builder = StringBuilder()
+        let isSingleGroup = paramGroups.Count = 1
+
+        for group in paramGroups do
+            let addTupleParens = not isSingleGroup && group.Count > 1
+            if addTupleParens then append builder "("
+
+            let mutable isFirstParam = true
+            for param in group do
+                if not isFirstParam then append builder " * "
+
+                let fsType = param.Type
+                let isFunctionType = fsType.IsFunctionType
+
+                if isFunctionType then append builder "("
+                append builder (fsType.Format(displayContext))
+                if isFunctionType then append builder ")"
+
+                isFirstParam <- false
+
+            if addTupleParens then append builder ")"
+            append builder " -> "
+
+        append builder returnTypeStr
+        builder.ToString()
+
+    member private x.AddHighlighting(consumer: IHighlightingConsumer, node: ITreeNode, text) =
+        let range = node.GetNavigationRange()
         consumer.AddHighlighting(FSharpInferredTypeHighlighting(range, text, provider))
 
     override x.Execute(committer) =
@@ -92,29 +111,26 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
             | null -> ()
             | symbolUse ->
 
-            let symbolUse = symbolUse :?> FSharpSymbolUse
-
+            let symbolUse = (symbolUse :?> FSharpSymbolUse)
             match symbolUse.Symbol with
             | :? FSharpMemberOrFunctionOrValue as mfv ->
-                let range = binding.GetNavigationRange()
-                let text = formatMemberOrFunctionOrValue (mfv, symbolUse)
-                x.AddHighlighting(consumer, range, text)
+                let text = formatMfv symbolUse mfv
+                x.AddHighlighting(consumer, binding, text)
 
             | :? FSharpField as field ->
-                let range = binding.GetNavigationRange()
                 let text = field.FieldType.Format(symbolUse.DisplayContext)
-                x.AddHighlighting(consumer, range, text)
+                x.AddHighlighting(consumer, binding, text)
             | _ -> ()
         | _ -> ()
 
     override x.VisitMemberDeclaration(decl, consumer) =
-        match box ((decl :> IFSharpDeclaration).GetFSharpSymbolUse()) with
+        match box (decl.GetFSharpSymbolUse()) with
         | null -> ()
         | symbolUse ->
-            let symbolUse = symbolUse :?> FSharpSymbolUse
-            match symbolUse.Symbol with
-            | :? FSharpMemberOrFunctionOrValue as mfv ->
-                let range = decl.GetNavigationRange()
-                let text = formatMemberOrFunctionOrValue (mfv, symbolUse)
-                x.AddHighlighting(consumer, range, text)
-            | _ -> ()
+
+        let symbolUse = symbolUse :?> FSharpSymbolUse
+        match symbolUse.Symbol with
+        | :? FSharpMemberOrFunctionOrValue as mfv ->
+            let text = formatMfv symbolUse mfv
+            x.AddHighlighting(consumer, decl, text)
+        | _ -> ()
