@@ -14,10 +14,13 @@ open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi.Settings
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.Rider.Model
 open JetBrains.Util
+open NuGet.Versioning
 
 let [<Literal>] defaultFsiName        = "fsi.exe"
 let [<Literal>] defaultAnyCpuFsiName  = "fsiAnyCpu.exe"
+let [<Literal>] coreFsiName = "fsi"
 let [<Literal>] monoFsiName           = "fsharpi"
 let [<Literal>] monoAnyCpuMonoFsiName = "fsharpiAnyCpu"
 
@@ -25,53 +28,60 @@ let [<Literal>] fctPackageName = "FSharp.Compiler.Tools"
 
 
 [<RequireQualifiedAccess>]
-type FsiNaming =
-    | Default
-    | Mono
+module RequiredVersion =
+    let fSharpCompilerToolsPackage = NuGetVersion(10, 0, 0)
+    let shadowCopyWithFSharpCompilerTools = NuGetVersion(10, 1, 0)
+    let coreSdk = NuGetVersion(2, 2, 300)
+
 
 type FsiTool =
     { Title: string
       Path: FileSystemPath
-      FsiNaming: FsiNaming
+      Runtime: RdFsiRuntime
       ShadowCopyAllowed: bool }
 
-    static member FromFctNupkg(nupkg: NuGetNupkg, source) =
+    static member FromFSharpCompilerToolsPackage(nupkg: NuGetNupkg, source) =
         let version = nupkg.PackageIdentity.Version
-        if version.Major < 10 then None else
+        if version < RequiredVersion.fSharpCompilerToolsPackage then None else
 
         Some
             { Title = sprintf "%s %s (%s)" fctPackageName nupkg.Version source
               Path = nupkg.InstallationDirectory / "tools"
-              FsiNaming = FsiNaming.Default
-              ShadowCopyAllowed = version.Major >= 10 && version.Minor >= 1 }
+              Runtime = RdFsiRuntime.NetFramework
+              ShadowCopyAllowed = version >= RequiredVersion.shadowCopyWithFSharpCompilerTools }
 
     static member Create(title, dir) =
         { Title = title
           Path = dir
-          FsiNaming = FsiNaming.Default
-          ShadowCopyAllowed = true  }
+          Runtime = RdFsiRuntime.NetFramework
+          ShadowCopyAllowed = true }
 
     member x.GetFsiName(useAnyCpu) =
-        match x.FsiNaming with
-        | FsiNaming.Default  -> if useAnyCpu then defaultAnyCpuFsiName  else defaultFsiName
-        | FsiNaming.Mono     -> if useAnyCpu then monoAnyCpuMonoFsiName else monoFsiName
+        match x.Runtime, useAnyCpu with
+        | RdFsiRuntime.Mono, true  -> monoAnyCpuMonoFsiName
+        | RdFsiRuntime.Mono, false -> monoFsiName
+        | _, true  -> defaultAnyCpuFsiName
+        | _, false -> defaultFsiName
     
     member x.GetFsiPath(useAnyCpu) =
-        x.Path / x.GetFsiName(useAnyCpu)
+        match x.Runtime with
+        | RdFsiRuntime.Core -> x.Path
+        | _ -> x.Path / x.GetFsiName(useAnyCpu)
 
     member x.IsCustom = x == customTool
 
 let customTool: FsiTool =
     { Title = customToolText
       Path = FileSystemPath.Empty
-      FsiNaming = FsiNaming.Default
+      Runtime = RdFsiRuntime.NetFramework
       ShadowCopyAllowed = true }
 
 
 [<ShellComponent>]
-type FsiDetector(providers: IFsiDirectoryProvider seq) =
+type FsiDetector() =
     let providers: IFsiDirectoryProvider[] =
-        [| MsBuildPropertiesFsiProvider()
+        [| CoreFsiProvider()
+           MsBuildPropertiesFsiProvider()
            SolutionInstalledFsiProvider()
            VsFsiProvider()
            MonoFsiProvider()
@@ -193,7 +203,7 @@ type SolutionInstalledFsiProvider() =
             |> Array.choose (fun pkg ->
                 match nugetStorage.GetNupkg(pkg.PackageIdentity) with
                 | null -> None
-                | nupkg -> FsiTool.FromFctNupkg(nupkg, source)) :> _
+                | nupkg -> FsiTool.FromFSharpCompilerToolsPackage(nupkg, source)) :> _
 
 
 type MsBuildPropertiesFsiProvider() =
@@ -235,7 +245,7 @@ type NugetCacheFsiProvider() =
 
             nugetStorage.GetAllNupkgsByName(fctPackageName)
             |> Seq.sortByDescending (fun pkg -> pkg.PackageIdentity.Version)
-            |> Seq.choose (fun nupkg -> FsiTool.FromFctNupkg(nupkg, source))
+            |> Seq.choose (fun nupkg -> FsiTool.FromFSharpCompilerToolsPackage(nupkg, source))
 
 
 type CustomFsiProvider() =
@@ -243,3 +253,20 @@ type CustomFsiProvider() =
     interface IFsiDirectoryProvider with
         member x.GetFsiTools(_) =
             tools :> _
+
+
+type CoreFsiProvider() =
+    interface IFsiDirectoryProvider with
+        member x.GetFsiTools(solution) =
+            if isNull solution then [] :> _ else
+
+            let currentToolset = solution.GetComponent<RiderSolutionToolset>()
+            match currentToolset.CurrentDotNetCoreToolset with
+            | null -> EmptyList.Instance :> _
+            | toolset when toolset.Sdk.Version < RequiredVersion.coreSdk -> EmptyList.Instance :> _
+            | toolset ->
+
+            [| { Title = ".NET Core SDK " + toolset.Sdk.Version.ToString()
+                 Path = FileSystemPath.Parse("fsi")
+                 Runtime = RdFsiRuntime.Core
+                 ShadowCopyAllowed = true } |] :> _

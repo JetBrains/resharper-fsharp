@@ -7,11 +7,19 @@ import com.jetbrains.rd.generator.nova.PredefinedType.*
 @Suppress("unused")
 object RdFSharpModel : Ext(SolutionModel.Solution) {
 
+    private val fsiRuntime = enum("RdFsiRuntime") {
+        +"NetFramework"
+        +"Mono"
+        +"Core"
+    }
+
     private val RdFSharpInteractiveHost = aggregatedef("RdFSharpInteractiveHost") {
         call("requestNewFsiSessionInfo", void, structdef("RdFsiSessionInfo") {
             field("fsiPath", string)
+            field("runtime", fsiRuntime)
+            field("isCustomTool", bool)
             field("args", immutableList(string))
-            field("FixArgsForAttach", bool)
+            field("fixArgsForAttach", bool)
         })
         property("moveCaretOnSendLine", bool).readonly
         property("copyRecentToEditor", bool).readonly

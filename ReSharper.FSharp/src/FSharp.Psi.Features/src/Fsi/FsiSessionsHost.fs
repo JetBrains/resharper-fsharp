@@ -17,18 +17,20 @@ open JetBrains.Util
 type FsiSessionsHost
         (lifetime: Lifetime, solution: ISolution, fsiDetector: FsiDetector, fsiOptions: FsiOptionsProvider) =
 
-    let stringArg option arg = sprintf "--%s:%O" option arg
+    let stringArg = sprintf "--%s:%O"
     let boolArg option arg = sprintf "--%s%s" option (if arg then "+" else "-")
 
     let stringArrayArgs (arg: string) =
         arg.Split([|' '|], StringSplitOptions.RemoveEmptyEntries)
 
     let getNewFsiSessionInfo _ =
-        let fsiPath =
-            if not fsiOptions.AutoDetect.Value then fsiOptions.FsiPathAsPath else
+        let fsi = fsiDetector.GetAutodetected(solution)
 
-            let fsi = fsiDetector.GetAutodetected(solution)
-            fsi.GetFsiPath(fsiOptions.UseAnyCpu.Value)
+        let fsiPath =
+            if fsiOptions.AutoDetect.Value then
+                fsi.GetFsiPath(fsiOptions.UseAnyCpu.Value)
+            else
+                fsiOptions.FsiPathAsPath
 
         let args =
             [| yield! stringArrayArgs fsiOptions.FsiArgs.Value
@@ -42,11 +44,11 @@ type FsiSessionsHost
 
                yield stringArg "fsi-server-lcid" Thread.CurrentThread.CurrentUICulture.LCID |]
 
-        RdFsiSessionInfo(fsiPath.FullPath, List(args), fsiOptions.FixOptionsForDebug.Value)
+        RdFsiSessionInfo(fsiPath.FullPath, fsi.Runtime, fsi.IsCustom, List(args), fsiOptions.FixOptionsForDebug.Value)
 
     do
         let rdFsiHost = solution.GetProtocolSolution().GetRdFSharpModel().FSharpInteractiveHost
         rdFsiHost.RequestNewFsiSessionInfo.Set(getNewFsiSessionInfo)
 
         fsiOptions.MoveCaretOnSendLine.FlowInto(lifetime, rdFsiHost.MoveCaretOnSendLine)
-        fsiOptions.ExecuteRecents.FlowInto(lifetime, rdFsiHost.CopyRecentToEditor)
+        fsiOptions.ExecuteRecent.FlowInto(lifetime, rdFsiHost.CopyRecentToEditor)

@@ -38,8 +38,10 @@ import com.intellij.xdebugger.attach.LocalAttachHost
 import com.intellij.xdebugger.attach.XAttachDebuggerProvider
 import com.jetbrains.rdclient.util.idea.pumpMessages
 import com.jetbrains.rider.debugger.DotNetDebugProcess
+import com.jetbrains.rider.model.RdFsiRuntime
 import com.jetbrains.rider.model.RdFsiSessionInfo
 import com.jetbrains.rider.plugins.fsharp.FSharpIcons
+import com.jetbrains.rider.runtime.DotNetRuntime
 import com.jetbrains.rider.runtime.RiderDotNetActiveRuntimeHost
 import com.jetbrains.rider.runtime.mono.MonoRuntime
 import com.jetbrains.rider.util.idea.application
@@ -72,9 +74,25 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
             .withParameters(fsiArgs)
 
     init {
-        val currentRuntime = project.getComponent<RiderDotNetActiveRuntimeHost>().getCurrentDotNetRuntime(false).runtime
-        if (currentRuntime != null && currentRuntime is MonoRuntime && sessionInfo.fsiPath.endsWith(".exe", true)) {
-            currentRuntime.patchRunCommandLine(cmdLine, listOf())
+        val runtimeHost = project.getComponent<RiderDotNetActiveRuntimeHost>()
+        when (sessionInfo.runtime) {
+            RdFsiRuntime.Core -> {
+                val runtime = runtimeHost.dotNetCoreRuntime.value
+                if (runtime != null) {
+                    cmdLine.parametersList.addAt(0, cmdLine.exePath)
+                    cmdLine.withExePath(runtime.cliExePath)
+                }
+            }
+
+            RdFsiRuntime.Mono -> {
+                val runtime = runtimeHost.getCurrentDotNetRuntime(false).runtime
+                if (runtime != null && runtime is MonoRuntime && sessionInfo.fsiPath.endsWith(".exe", true)) {
+                    runtime.patchRunCommandLine(cmdLine, listOf())
+                }
+            }
+
+            else -> {
+            }
         }
 
         if (project.isDirectoryBased) {

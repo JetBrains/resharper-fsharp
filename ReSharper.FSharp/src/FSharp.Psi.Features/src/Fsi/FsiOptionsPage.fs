@@ -94,7 +94,7 @@ type FsiOptionsPage
         this.AddHeader(commandsSectionTitle)
         this.AddBool(moveCaretOnSendLineText, fsiOptions.MoveCaretOnSendLine)
 
-        this.AddBool(executeRecentsText, fsiOptions.ExecuteRecents)
+        this.AddBool(executeRecentText, fsiOptions.ExecuteRecent)
         this.AddDescription(executeRecentsDescription)
 
         if PlatformUtil.IsRunningUnderWindows then

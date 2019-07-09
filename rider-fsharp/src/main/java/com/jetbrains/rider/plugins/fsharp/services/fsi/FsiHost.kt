@@ -14,6 +14,7 @@ import com.jetbrains.rider.plugins.fsharp.FSharpIcons
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rd.util.reactive.Property
 import com.jetbrains.rd.util.reactive.flowInto
+import com.jetbrains.rider.model.RdFsiRuntime
 import org.jetbrains.concurrency.AsyncPromise
 import org.jetbrains.concurrency.Promise
 
@@ -71,7 +72,7 @@ class FsiHost(project: Project) : LifetimedProjectComponent(project) {
                     return consoleRunner
 
                 val fsiPath = sessionInfo.fsiPath
-                if (!FileUtil.exists(fsiPath)) {
+                if (sessionInfo.runtime != RdFsiRuntime.Core && !FileUtil.exists(fsiPath)) {
                     notifyFsiNotFound(fsiPath)
                     return null
                 }

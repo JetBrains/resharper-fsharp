@@ -27,7 +27,7 @@ module FsiOptions =
     let [<Literal>] fsiInternalArgsText       = "Internal launch arguments"
 
     let [<Literal>] moveCaretOnSendLineText   = "Move editor caret down on Send Line"
-    let [<Literal>] executeRecentsText        = "Execute recent commands immediately"
+    let [<Literal>] executeRecentText        = "Execute recent commands immediately"
     let [<Literal>] fsiPathText               = "F# Interactive executable path"
     let [<Literal>] fixOptionsForDebugText    = "Ensure correct launch options for debugging"
 
@@ -64,8 +64,8 @@ type FsiOptions =
       [<SettingsEntry(true, moveCaretOnSendLineText); DefaultValue>]
       mutable MoveCaretOnSendLine: bool
 
-      [<SettingsEntry(true, executeRecentsText); DefaultValue>]
-      mutable ExecuteRecents: bool
+      [<SettingsEntry(true, executeRecentText); DefaultValue>]
+      mutable ExecuteRecent: bool
 
       [<SettingsEntry(false, fixOptionsForDebugText); DefaultValue>]
       mutable FixOptionsForDebug: bool
@@ -96,7 +96,7 @@ type FsiOptionsProvider(lifetime: Lifetime, settings: IContextBoundSettingsStore
     member val FsiArgs              = settings.GetValueProperty(lifetime, fun s -> s.FsiArgs)
     member val FsiInternalArgs      = settings.GetValueProperty(lifetime, fun s -> s.FsiInternalArgs)
     member val MoveCaretOnSendLine  = settings.GetValueProperty(lifetime, fun s -> s.MoveCaretOnSendLine)
-    member val ExecuteRecents       = settings.GetValueProperty(lifetime, fun s -> s.ExecuteRecents)
+    member val ExecuteRecent       = settings.GetValueProperty(lifetime, fun s -> s.ExecuteRecent)
     member val FixOptionsForDebug   = settings.GetValueProperty(lifetime, fun s -> s.FixOptionsForDebug)
     member val FsiPath              = settings.GetValueProperty(lifetime, fun s -> s.FsiPath)
 
