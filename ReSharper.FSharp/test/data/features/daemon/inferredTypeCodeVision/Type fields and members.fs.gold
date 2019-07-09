@@ -1,0 +1,22 @@
+﻿type T() =
+    let |x|(0) = 1
+    let |f|(1) x = x
+    let |h|(2) = fun x -> x + 1
+    member __.|P1|(3) = 1
+    member __.|P2|(4) = fun x -> x
+    member __.|M1|(5)() = 1
+    member __.|M2|(6)(x: int) = x
+    member __.|M3|(7)(x, y) z (a, b, c) = x + y + string z + a + b + c
+    interface System.IDisposable with
+        member __.|Dispose|(8)() = ()
+
+---------------------------------------------------------
+(0): CodeInsights: int
+(1): CodeInsights: 'a -> 'a
+(2): CodeInsights: int -> int
+(3): CodeInsights: int
+(4): CodeInsights: obj -> obj
+(5): CodeInsights: unit -> int
+(6): CodeInsights: int -> int
+(7): CodeInsights: (string * string) -> obj -> (string * string * string) -> string
+(8): CodeInsights: unit -> unit
