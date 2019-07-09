@@ -13,3 +13,4 @@ type InferredTypeCodeVisionProviderTest() =
 
     [<Test>] member x.``Module functions and values``() = x.DoNamedTest()
     [<Test>] member x.``Type fields and members``() = x.DoNamedTest()
+    [<Test>] member x.``Unopened namespace``() = x.DoNamedTest()
