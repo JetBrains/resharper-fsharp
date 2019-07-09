@@ -11,4 +11,5 @@ type InferredTypeCodeVisionProviderTest() =
     override x.HighlightingPredicate(highlighting, _, _) =
         highlighting :? FSharpInferredTypeHighlighting
 
-    [<Test>] member x.``Common``() = x.DoNamedTest()
+    [<Test>] member x.ModuleFunctionsAndValues() = x.DoNamedTest()
+    [<Test>] member x.FieldsAndMembers() = x.DoNamedTest()
