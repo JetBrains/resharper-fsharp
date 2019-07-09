@@ -1,5 +1,31 @@
 # Release notes
 
+## 2019.2
+
+### Code Vision support
+
+* Inferred types are shown for functions, values and members
+* Version control author is shown for declarations
+
+### Code analysis and navigation
+
+* R# spell checker now works for F# symbol declarations, strings and comments
+* Escape sequences are highlighted in strings
+* Better highlighting of never matched rules in `match` expressions
+
+### Find Usages
+
+* Record construction and copy-and-update expressions are now found
+* New Instance occurrence kind is shown for F# exception creation expressions
+
+### Fixes
+
+* Completion for names starting with `_` is fixed
+* Fix resolve for same type defined in different projects or assemblies
+* Fix resolve for members with same signature in a type and interface implementation in it
+* Rename wouldn't work for some local values
+* Lexing of attributes inside type application was fixed by [@misonijnik](https://github.com/misonijnik) ([#51](https://github.com/JetBrains/fsharp-support/pull/51))
+
 ## 2019.1
 
 ### Refactorings
