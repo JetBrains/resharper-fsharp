@@ -180,6 +180,15 @@ type FSharpItemsContainer
             projectMappings.Value.[projectMark] <- mapping
             refresh ())
 
+    let addProjectMapping targetFrameworkIds items projectMark =
+        use lock = locker.UsingWriteLock()
+        projectMappings.Value.[projectMark] <-
+            let projectDirectory = projectMark.Location.Directory
+            let projectUniqueName = projectMark.UniqueProjectName
+            let mapping = ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds, logger)
+            mapping.Update(items)
+            mapping
+
     member x.ProjectMappings = projectMappings.Value
 
     member x.IsValid(viewItem: FSharpViewItem) =
@@ -216,16 +225,7 @@ type FSharpItemsContainer
                     |> List.ofSeq
                 let targetFrameworkIds = HashSet(msBuildProject.TargetFrameworkIds)
 
-                begin
-                use lock = locker.UsingWriteLock()
-                x.ProjectMappings.[projectMark] <-
-                    let projectDirectory = projectMark.Location.Directory
-                    let projectUniqueName = projectMark.UniqueProjectName
-                    let mapping = ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds, logger)
-                    mapping.Update(items)
-                    mapping
-                end
-
+                addProjectMapping targetFrameworkIds items projectMark
                 projectRefresher.RefreshProject(projectMark, true)
             | _ -> ()
 

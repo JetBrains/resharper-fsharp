@@ -31,12 +31,12 @@ module FSharpProperties =
 [<ShellComponent>]
 type FSharpProjectPropertiesRequest() =
     let properties =
-        [ FSharpProperties.TargetProfile
-          FSharpProperties.BaseAddress
-          FSharpProperties.OtherFlags
-          FSharpProperties.NoWarn
-          FSharpProperties.WarnAsError
-          FSharpProperties.FscToolPath ]
+        [| FSharpProperties.TargetProfile
+           FSharpProperties.BaseAddress
+           FSharpProperties.OtherFlags
+           FSharpProperties.NoWarn
+           FSharpProperties.WarnAsError
+           FSharpProperties.FscToolPath |]
 
     interface IProjectPropertiesRequest with
         member x.RequestedProperties = properties :> _

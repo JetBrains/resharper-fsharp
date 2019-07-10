@@ -28,11 +28,11 @@ type FSharpProjectOptionsProvider
          psiModules: IPsiModules, resolveContextManager: PsiModuleResolveContextManager) as this =
     inherit RecursiveProjectModelChangeDeltaVisitor()
 
-    let invalidatingProjectChangeType =
+    let [<Literal>] invalidatingProjectChangeType =
         ProjectModelChangeType.PROPERTIES ||| ProjectModelChangeType.TARGET_FRAMEWORK |||
         ProjectModelChangeType.REFERENCE_TARGET
 
-    let invalidatingChildChangeType =
+    let [<Literal>] invalidatingChildChangeType =
         ProjectModelChangeType.ADDED ||| ProjectModelChangeType.REMOVED |||
         ProjectModelChangeType.MOVED_IN ||| ProjectModelChangeType.MOVED_OUT |||
         ProjectModelChangeType.REFERENCE_TARGET
