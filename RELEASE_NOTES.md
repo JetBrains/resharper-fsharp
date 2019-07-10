@@ -7,16 +7,20 @@
 * Inferred types are shown for functions, values and members
 * Version control author is shown for declarations
 
-### Code analysis and navigation
+### Code analysis
 
 * R# spell checker now works for F# symbol declarations, strings and comments
 * Escape sequences are highlighted in strings
 * Better highlighting of never matched rules in `match` expressions
 
-### Find Usages
+### Find Usages & navigation
 
-* Record construction and copy-and-update expressions are now found
+* Find Usages and Go to Declaration now work for record construction and copy-and-update expressions
 * New Instance occurrence kind is shown for F# exception creation expressions
+
+### Misc
+
+* Allow running F# Interactive from .NET Core SDK 2.2.300+
 
 ### Fixes
 
