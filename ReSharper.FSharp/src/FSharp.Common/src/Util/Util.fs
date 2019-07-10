@@ -61,7 +61,6 @@ module rec CommonUtil =
 
     type Line = Int32<DocLine>
     type Column = Int32<DocColumn>
-    type FileSystemPath = JetBrains.Util.FileSystemPath
 
     type Int32<'T> with
         [<DebuggerStepThrough>]

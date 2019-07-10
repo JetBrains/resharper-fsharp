@@ -2,8 +2,6 @@ namespace global
 
 [<AutoOpen>]
 module FSharpGlobalUtil =
-    type Extension = System.Runtime.CompilerServices.ExtensionAttribute
-
     type System.Object with
         member x.As<'T when 'T: null>() =
             match x with
@@ -19,3 +17,10 @@ module FSharpGlobalUtil =
     let inline isNotNull x = not (isNull x)
 
     let someUnit = Some ()
+
+[<AutoOpen>]
+module FSharpGlobalAbbreviations =
+    type Extension = System.Runtime.CompilerServices.ExtensionAttribute
+
+    type ILogger = JetBrains.Util.ILogger
+    type FileSystemPath = JetBrains.Util.FileSystemPath
