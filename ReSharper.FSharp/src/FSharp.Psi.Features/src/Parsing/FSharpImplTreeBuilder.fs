@@ -1008,7 +1008,7 @@ type IndexerArgsProcessor() =
     override x.Process(synExpr, builder) =
         match synExpr with
         | SynExpr.DotIndexedGet(_, [indexerArg], dotRange, range)
-        | SynExpr.DotIndexedSet(_, [indexerArg], _, _, dotRange, range) ->
+        | SynExpr.DotIndexedSet(_, [indexerArg], _, range, dotRange, _) ->
             let indexerRange = mkFileIndexRange range.FileIndex dotRange.End range.End
             builder.PushRange(indexerRange, ElementType.INDEXER_ARG)
             builder.PushExpressionList(indexerArg.Exprs)
