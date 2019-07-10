@@ -28,7 +28,7 @@ type FSharpSource =
 type FSharpSourceCache
         (lifetime: Lifetime, solution: ISolution, changeManager, documentManager: DocumentManager,
          solutionDocumentChangeProvider: SolutionDocumentChangeProvider,
-         fileExtensions: IProjectFileExtensions, logger: JetBrains.Util.ILogger) =
+         fileExtensions: IProjectFileExtensions, logger: ILogger) =
     inherit FileSystemShimChangeProvider(Lifetime.Define(lifetime).Lifetime, changeManager)
 
     let files = ConcurrentDictionary<FileSystemPath, FSharpSource>()
@@ -46,14 +46,16 @@ type FSharpSourceCache
             match documentManager.GetOrCreateDocument(path) with
             | null -> ()
             | document ->
-                let timestamp = File.GetLastWriteTimeUtc(path.FullPath)
-                source <- Some { Source = getText document; Timestamp = timestamp }
-                logger.Verbose("tryAddSource, add: {0}", path)
-                files.[path] <- source.Value) |> ignore
+
+            let timestamp = File.GetLastWriteTimeUtc(path.FullPath)
+            source <- Some { Source = getText document; Timestamp = timestamp }
+            logger.Verbose("tryAddSource, add: {0}", path)
+            files.[path] <- source.Value) |> ignore
+
         source
 
-    member x.IsApplicable(path: FileSystemPath) =
-        fileExtensions.GetFileType(path).Is<FSharpProjectFileType>()
+    let isApplicable (path: FileSystemPath) =
+        not path.IsEmpty && fileExtensions.GetFileType(path).Is<FSharpProjectFileType>()
 
     member x.TryGetSource(path: FileSystemPath, [<Out>] source: byref<FSharpSource>) =
         match files.TryGetValue(path) with
@@ -66,26 +68,32 @@ type FSharpSourceCache
 
     override x.FileStreamReadShim(fileName) =
         let path = FileSystemPath.TryParse(fileName)
-        if path.IsEmpty || not (x.IsApplicable(path)) then base.FileStreamReadShim(fileName) else
+        if not (isApplicable path) then base.FileStreamReadShim(fileName) else
 
         match x.TryGetSource(path) with
         | true, source -> new MemoryStream(source.Source) :> Stream
         | _ ->
-            logger.Warn("FileStreamReadShim miss: {0}", path)
-            base.FileStreamReadShim(fileName)
+
+        logger.Warn("FileStreamReadShim miss: {0}", path)
+        base.FileStreamReadShim(fileName)
 
     override x.GetLastWriteTime(path) =
-        if not (x.IsApplicable(path)) then base.GetLastWriteTime(path) else
+        if not (isApplicable path) then base.GetLastWriteTime(path) else
 
         match x.TryGetSource(path) with
         | true, source -> source.Timestamp
         | _ ->
-            logger.Warn("GetLastWriteTime miss: {0}", path)
-            base.GetLastWriteTime(path)
+
+        logger.Warn("GetLastWriteTime miss: {0}", path)
+        base.GetLastWriteTime(path)
 
     override x.Exists(path) =
         match files.TryGetValue(path) with
         | true, _ -> true
+        | _ ->
+
+        match tryAddSource path with
+        | Some _ -> true
         | _ -> base.Exists(path)
 
     member x.ProcessDocumentChange(change: DocumentChange) =
@@ -104,27 +112,33 @@ type FSharpSourceCache
 
     member x.ProcessProjectModelChange(change: ProjectModelChange) =
         if isNull change then () else
+
         let visitor =
             { new RecursiveProjectModelChangeDeltaVisitor() with
                 override v.VisitItemDelta(change) =
                     base.VisitItemDelta(change)
-                    if not (change.ContainsChangeType(ProjectModelChangeType.EXTERNAL_CHANGE)) then () else
 
-                    match change.ProjectItem with
-                    | :? IProjectFile as file when file.LanguageType.Is<FSharpProjectFileType>() ->
-                        match file.GetDocument() with
+                    if change.ContainsChangeType(ProjectModelChangeType.REMOVED) then
+                        files.remove(change.OldLocation)
+
+                    elif change.ContainsChangeType(ProjectModelChangeType.EXTERNAL_CHANGE) then
+                        match change.ProjectItem.As<IProjectFile>() with
+                        | null -> ()
+                        | projectFile when not (projectFile.LanguageType.Is<FSharpProjectFileType>()) -> ()
+                        | projectFile ->
+
+                        match projectFile.GetDocument() with
                         | null -> ()
                         | document ->
 
-                        let path = file.Location
+                        let path = projectFile.Location
                         let text = getText document
 
                         let mutable fsSource = Unchecked.defaultof<_>
                         if files.TryGetValue(path, &fsSource) && text = fsSource.Source then () else
 
                         logger.Verbose("ProcessProjectModelChange, add: {0}", path)
-                        files.[path] <- { Source = text; Timestamp = DateTime.UtcNow }
-                    | _ -> () }
+                        files.[path] <- { Source = text; Timestamp = DateTime.UtcNow } }
 
         visitor.VisitDelta(change)
 
