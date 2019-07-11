@@ -31,6 +31,7 @@
     <Compile Include="FSharpParserTest.fs" />
     <Compile Include="FSharpCompletionTest.fs" />
     <Compile Include="QuickFixes\ReplaceUseWithLetTest.fs" />
+    <Compile Include="QuickFixes\RemoveUnusedSelfIdVariableFix.fs" />
     <Compile Include="FSharpElementFactoryTest.fs" />
   </ItemGroup>
 

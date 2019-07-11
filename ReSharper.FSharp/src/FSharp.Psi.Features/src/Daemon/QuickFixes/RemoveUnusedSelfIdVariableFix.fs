@@ -22,6 +22,9 @@ type RemoveUnusedSelfIdVariableFix(warning: UnusedThisVariableWarning) =
 
         let ctor = ImplicitConstructorDeclarationNavigator.GetBySelfIdentifier(selfId).NotNull("ctor")
 
+        // todo: move comments (if any) out of ctor node (see example below) to outer node
+        // type T() (* foo *) as this = ...
+
         match selfId.PrevSibling with
         | Whitespace node -> ModificationUtil.DeleteChildRange(node, selfId)
         | _ -> ModificationUtil.DeleteChild(selfId)
