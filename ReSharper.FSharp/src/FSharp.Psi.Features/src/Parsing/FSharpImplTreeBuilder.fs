@@ -175,7 +175,13 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                 | SynMemberDefn.ImplicitCtor(_, _, args, selfId, _) ->
                     for arg in args do
                         x.ProcessImplicitCtorParam arg
-                    if selfId.IsSome then x.ProcessLocalId selfId.Value
+
+                    match selfId with
+                    | Some (IdentRange range) ->
+                        x.AdvanceToTokenOrRangeStart(FSharpTokenType.AS, range)
+                        x.Done(range, x.Mark(), ElementType.SELF_ID)
+                    | _ -> ()
+
                     ElementType.IMPLICIT_CONSTRUCTOR_DECLARATION
 
                 | SynMemberDefn.ImplicitInherit(baseType, args, _, _) ->

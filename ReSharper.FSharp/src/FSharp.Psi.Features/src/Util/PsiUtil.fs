@@ -4,6 +4,7 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Util.PsiUtil
 open FSharp.Compiler.Range
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Files
@@ -50,3 +51,15 @@ type IFSharpFile with
 type ITreeNode with
         member x.IsChildOf(node: ITreeNode) =
             if isNull node then false else node.Contains(x)
+
+
+let getNode<'T when 'T :> ITreeNode and 'T : null> (fsFile: IFSharpFile) (range: DocumentRange) =
+    let node = fsFile.GetNode<'T>(range)
+    if isNull node then failwithf "Couldn't get %O from range %O" typeof<'T>.Name range else
+    node
+
+let (|TokenType|_|) tokenType (treeNode: ITreeNode) =
+    if isNotNull treeNode && treeNode.GetTokenType() == tokenType then Some treeNode else None
+
+let (|Whitespace|_|) (treeNode: ITreeNode) =
+    if isNotNull treeNode && treeNode.GetTokenType() == FSharpTokenType.WHITESPACE then Some treeNode else None

@@ -27,5 +27,4 @@ type ReplaceUseWithLetFix(letNode: ILet) =
 
         use writeLock = WriteLockCookie.Create(letNode.IsPhysical())
         ModificationUtil.ReplaceChild(useKeyword, FSharpTokenType.LET.CreateLeafElement()) |> ignore
-
         null

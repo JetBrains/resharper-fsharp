@@ -59,10 +59,10 @@ type FSharpDummyCodeFormatter(fsLanguage: FSharpLanguage, formatterRequirements)
     override x.GetMinimalSeparator(_,_) = InvalidOperationException() |> raise
     override x.CreateNewLine(_,_) = InvalidOperationException() |> raise
     override x.CreateSpace(_,_) = InvalidOperationException() |> raise
-    override x.FormatInsertedNodes(_,_,_) = InvalidOperationException() |> raise
+    override x.FormatInsertedNodes(_,_,_) = ()
     override x.FormatInsertedRange(_,_,_) = InvalidOperationException() |> raise 
     override x.FormatReplacedRange(_,_,_) = InvalidOperationException() |> raise
-    override x.FormatDeletedNodes(_,_,_) = InvalidOperationException() |> raise
+    override x.FormatDeletedNodes(_,_,_) = ()
     override x.FormatReplacedNode(_,_) = ()
     
     override x.CreateFormatterContext(profile, firstNode, lastNode, parameters, _) =

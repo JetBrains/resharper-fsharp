@@ -966,7 +966,17 @@ otherTypeMember: fakeSeparator;
 typeLetBindings: fakeSeparator;
 
 implicitConstructorDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
-  memberParam<PARAMETER, Parameters>* fakeSeparator;
+  memberParam<PARAMETER, Parameters>
+  (
+    memberParam<PARAMETER, Parameters>
+    COMMA
+  )*
+  selfId<SELF_ID, SelfIdentifier>?;
+
+selfId options { stubBase="LocalDeclarationBase"; }:
+  AS
+  IDENTIFIER<IDENTIFIER, Identifier>;
+  
 
 constructorDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
   localDeclaration<PARAMETER, Parameters>* fakeSeparator

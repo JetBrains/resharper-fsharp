@@ -4,16 +4,24 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal class Whitespace : WhitespaceBase
+  public class Whitespace : WhitespaceBase
   {
     public Whitespace(string text) : base(FSharpTokenType.WHITESPACE, text)
     {
     }
 
+    public Whitespace(int length) : this(new string(' ', length))
+    {
+    }
+
+    public Whitespace() : this(1)
+    {
+    }
+    
     public override bool IsNewLine => false;
   }
 
-  internal class NewLine : WhitespaceBase
+  public class NewLine : WhitespaceBase
   {
     public NewLine(string text) : base(FSharpTokenType.NEW_LINE, text)
     {
@@ -22,7 +30,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override bool IsNewLine => true;
   }
 
-  internal abstract class WhitespaceBase : FSharpToken, IWhitespaceNode
+  public abstract class WhitespaceBase : FSharpToken, IWhitespaceNode
   {
     protected WhitespaceBase(NodeType nodeType, string text) : base(nodeType, text)
     {

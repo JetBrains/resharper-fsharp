@@ -4,13 +4,11 @@ open System
 open System.Collections.Generic
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.DocumentModel
-open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.Util
 
 [<AutoOpen>]
@@ -24,6 +22,7 @@ module FSharpErrors =
     let [<Literal>] UseBindingsIllegalInImplicitClassConstructors = 523
     let [<Literal>] UseBindingsIllegalInModules = 524
     let [<Literal>] UnusedValue = 1182
+    let [<Literal>] UnusedThisVariable = 1183
 
 [<AbstractClass>]
 type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
@@ -44,24 +43,31 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | FSharpErrorSeverity.Warning -> WarningHighlighting(error.Message, range) :> _
         | _ -> ErrorHighlighting(error.Message, range) :> _
 
+    let getNode range =
+        getNode fsFile range
+
     let createHighlighting (error: FSharpErrorInfo) (range: DocumentRange): IHighlighting =
+
         match error.ErrorNumber with
         | UndefinedName -> UnresolvedHighlighting(error.Message, range) :> _
         | UnusedValue -> UnusedHighlighting(error.Message, range) :> _
 
         | RuleNeverMatched ->
-            match fsFile.GetNode<IMatchClause>(range).NotNull() with
+            match fsFile.GetNode(range) with
             | null -> createGenericHighlighting error range
             | matchClause -> RuleNeverMatchedWarning(matchClause) :> _
 
         | UseBindingsIllegalInModules ->
-            UseBindingsIllegalInModulesWarning(fsFile.GetNode<ILetModuleDecl>(range).NotNull()) :> _
+            UseBindingsIllegalInModulesWarning(getNode range) :> _
 
         | UseBindingsIllegalInImplicitClassConstructors ->
-            UseKeywordIllegalInPrimaryCtorError(fsFile.GetNode<ILetModuleDecl>(range).NotNull()) :> _
+            UseKeywordIllegalInPrimaryCtorError(getNode range) :> _
+
+        | UnusedThisVariable ->
+            UnusedThisVariableWarning(getNode range) :> _
 
         | _ -> createGenericHighlighting error range
-    
+
     abstract ShouldAddDiagnostic: error: FSharpErrorInfo * range: DocumentRange -> bool
     default x.ShouldAddDiagnostic(error: FSharpErrorInfo, _) =
         error.ErrorNumber <> UnrecognizedOption
