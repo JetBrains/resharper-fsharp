@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Highlightings
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 
 open System
 open JetBrains.DocumentModel

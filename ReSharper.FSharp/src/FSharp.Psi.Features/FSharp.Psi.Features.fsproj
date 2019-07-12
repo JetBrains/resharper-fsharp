@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
@@ -16,14 +16,13 @@
     <Compile Include="src\CodeCompletion\FSharpLookupItem.fs" />
     <Compile Include="src\CodeCompletion\FSharpCompletionProviders.fs" />
     <Compile Include="src\CodeStructure\FSharpCodeStructure.fs" />
-    <Compile Include="src\Daemon\QuickFixesStub.fs" />
     <Compile Include="src\Daemon\Highlightings\ErrorHighlightings.fs" />
     <Compile Include="Src\Daemon\Highlightings\CommonErrors.Generated.fs">
       <DependentUpon>CommonErrors.xml</DependentUpon>
     </Compile>
     <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
       <Mode>ERRORS</Mode>
-      <Namespace>JetBrains.ReSharper.Plugins.FSharp.Daemon.Highlightings.CommonErrors</Namespace>
+      <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.CommonErrors</Namespace>
       <OutputFile>src\Daemon\Highlightings\CommonErrors.Generated.fs</OutputFile>
       <SubType>Designer</SubType>
     </ErrorsGen>
@@ -50,7 +49,7 @@
       <Compile Include="src\Daemon\QuickFixes\RemoveUnusedSelfIdVariableFix.fs" />
     <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
       <Mode>QUICKFIX</Mode>
-      <Namespace>JetBrains.ReSharper.Plugins.FSharp.Daemon.QuickFixes.Fixes</Namespace>
+      <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>
       <OutputFile>src\Daemon\QuickFixes\CommonQuickFixes.Generated.fs</OutputFile>
       <SubType>Designer</SubType>
     </ErrorsGen>

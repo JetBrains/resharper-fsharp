@@ -3,7 +3,7 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages
 open System.Collections.Generic
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
-open JetBrains.ReSharper.Plugins.FSharp.Daemon.Highlightings
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi

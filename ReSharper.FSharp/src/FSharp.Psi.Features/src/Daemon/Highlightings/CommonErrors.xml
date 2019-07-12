@@ -1,8 +1,7 @@
 <Errors language="F#">
 
   <Usings>
-    JetBrains.ReSharper.Plugins.FSharp.Daemon.Highlightings;
-    JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes;
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
   </Usings>
 

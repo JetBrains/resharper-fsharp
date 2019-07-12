@@ -2,7 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.QuickFixes
-open JetBrains.ReSharper.Plugins.FSharp.Daemon.Highlightings.CommonErrors
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.CommonErrors
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
