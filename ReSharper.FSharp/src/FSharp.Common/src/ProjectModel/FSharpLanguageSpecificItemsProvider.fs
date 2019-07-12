@@ -42,5 +42,4 @@ type FSharpLanguageSpecificItemsProvider() =
 
             else EmptyList.Instance :> _
 
-        member x.GetTabTitle _ =
-            "F# properties"
+        member x.GetTabTitle _ = "General"
