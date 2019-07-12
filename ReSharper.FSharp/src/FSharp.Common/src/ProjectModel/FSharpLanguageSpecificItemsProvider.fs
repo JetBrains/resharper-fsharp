@@ -34,10 +34,13 @@ type FSharpLanguageSpecificItemsProvider() =
     interface IMsBuildConfigurationTabProvider with
         member x.Order = Int32.MaxValue
 
-        member x.CreateSections(lifetime, project, properties) =
+        member x.CreateSections(_, project, properties, _) =
             if project.ProjectProperties :? FSharpProjectProperties then
                 [| EditPropertyItemBuilder
                        .Section(ConfigurationTabProvider.CompileSectionTitle)
                        .AddCheckBox(properties, "Tailcalls", "Generate tail calls") |] :> _
 
             else EmptyList.Instance :> _
+
+        member x.GetTabTitle _ =
+            "F# properties"
