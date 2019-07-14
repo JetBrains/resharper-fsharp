@@ -35,3 +35,13 @@ type FSharpElementFactoryTest() =
             let ns = "System.Linq"
             let openStatement = elementFactory.CreateOpenStatement(ns)
             Assert.AreEqual("open " + ns, openStatement.GetText()))
+
+    [<Test>]
+    member x.``Wild pat 01``() =
+        x.DoTest(fun elementFactory ->
+            use readCookie = ReadLockCookie.Create()
+            let wildPat = elementFactory.CreateWildPat()
+            Assert.AreEqual(ElementType.WILD_PAT, wildPat.NodeType)
+            Assert.AreEqual(1, wildPat.Children().Count())
+            Assert.AreEqual(FSharpTokenType.UNDERSCORE, wildPat.FirstChild.GetTokenType())
+            Assert.AreEqual("_", wildPat.GetText()))
