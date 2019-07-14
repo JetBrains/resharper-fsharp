@@ -158,16 +158,13 @@ topBinding
   EQUALS
   chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>;
 
-localBinding
-  extras {
-    get { methodName="Expression" path=<localBinding:CHAMELEON_EXPR/chameleonExpression:EXPR> };
-  }:
+localBinding:
   fSharpAttribute<ATTRIBUTE, Attributes>*
   MUTABLE<MUTABLE, MutableKeyword>
   synPat<HEAD_PATTERN, HeadPattern>
   returnTypeInfo<RETURN_INFO, ReturnTypeInfo>
   EQUALS
-  chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>;
+  synExpr<EXPR, Expression>;
 
 returnTypeInfo:
   COLON
@@ -205,7 +202,10 @@ interface arrayOrListPat:
   listPat;
 
 topNamedPat options { stubBase="TopPatternDeclarationBase"; }:
-  synPat<PATTERN, Pattern>?
+  (
+    synPat<PATTERN, Pattern>
+    AS<AS, AsKeyword>
+  )?
   identOrOpName{IDENTIFIER, Identifier};
 
 topLongIdentPat options { stubBase="TopPatternDeclarationBase"; }:
@@ -213,7 +213,10 @@ topLongIdentPat options { stubBase="TopPatternDeclarationBase"; }:
   synPat<PARAMETER, Parameters>*;
 
 localNamedPat options { stubBase="LocalPatternDeclarationBase"; }:
-  synPat<PATTERN, Pattern>?
+  (
+    synPat<PATTERN, Pattern>
+    AS<AS, AsKeyword>
+  )?
   identOrOpName{IDENTIFIER, Identifier};
 
 localLongIdentPat options { stubBase="LocalPatternDeclarationBase"; }:
@@ -495,8 +498,8 @@ assertExpr options { stubBase="DummyExpression"; }:
 
 // todo: infix app
 appExpr options { stubBase="DummyExpression"; }:
-  fakeSeparator
   synExpr<FUNC_EXPR, FunctionExpression>
+  fakeSeparator
   synExpr<ARG_EXPR, ArgumentExpression>;
 
 typeAppExpr options { stubBase="DummyExpression"; }:
@@ -516,7 +519,8 @@ letOrUseExpr options { stubBase="DummyExpression"; }:
   (
     AND
     binding<BINDING, Bindings>
-  )*;
+  )*
+  synExpr<BODY_EXPR, BodyExpression>;
 
 tryWithExpr options { stubBase="DummyExpression"; }:
   TRY
@@ -1047,8 +1051,11 @@ openStatement  options { stubBase="ReferenceExpressionBase"; }:
   OPEN<OPEN, Open>
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>;
 
-do options { stubBase="DummyDeclaration"; }:
-  fakeSeparator;
+do options { stubBase="DummyDeclaration"; } extras {
+    get { methodName="Expression" path=<do:CHAMELEON_EXPR/chameleonExpression:EXPR> };
+}:
+  DO<DO, DoKeyword>?
+  chameleonExpression<CHAMELEON_EXPR, DoExpression>;
 
 otherModuleMember: fakeSeparator;
 
