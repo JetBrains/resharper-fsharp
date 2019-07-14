@@ -33,9 +33,9 @@ type FSharpStructureTest() =
 
     override x.DoTest(lifetime: Lifetime, project: IProject) =
         let items = project.GetSubItems(x.TestName)
-        let projectFile = items.FirstOrDefault().As<IProjectFile>().NotNull("projectFile == null")
-        let sourceFile = projectFile.ToSourceFile().NotNull("sourceFile == null")
-        let fsFile = sourceFile.GetDominantPsiFile<FSharpLanguage>().NotNull("fsFile == null")
+        let projectFile = items.FirstOrDefault().As<IProjectFile>().NotNull()
+        let sourceFile = projectFile.ToSourceFile().NotNull()
+        let fsFile = sourceFile.GetDominantPsiFile<FSharpLanguage>().NotNull()
 
         let structureProvider = x.LanguageManager.TryGetService<IPsiFileCodeStructureProvider>(fsFile.Language)
         let root = structureProvider.Build(fsFile, CodeStructureOptions.Default)

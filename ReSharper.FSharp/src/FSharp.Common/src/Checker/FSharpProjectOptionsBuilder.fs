@@ -113,7 +113,7 @@ type FSharpProjectOptionsBuilder
         project: IProject * targetFrameworkId: TargetFrameworkId -> (FileSystemPath * BuildAction)[]
 
     default x.GetProjectItemsPaths(project, targetFrameworkId) =
-        let projectMark = project.GetProjectMark().NotNull("projectMark == null")
+        let projectMark = project.GetProjectMark().NotNull()
         itemsContainer.GetProjectItemsPaths(projectMark, targetFrameworkId)
 
     member x.GetProjectFilesAndResources(project: IProject, targetFrameworkId) =

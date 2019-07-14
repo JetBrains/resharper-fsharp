@@ -129,6 +129,6 @@ type FSharpDefaultFileTemplates() =
         member x.Name = "Default F# file templates"
 
         member x.GetDefaultSettingsStream(lifetime) =
-            let stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(xmlPath).NotNull("stream == null")
+            let stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(xmlPath).NotNull()
             lifetime.OnTermination(stream) |> ignore
             stream

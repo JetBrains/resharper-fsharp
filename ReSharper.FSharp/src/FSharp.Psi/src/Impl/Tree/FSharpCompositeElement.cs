@@ -9,7 +9,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   public abstract class FSharpCompositeElement : CompositeElement, IFSharpTreeNode
   {
     public IFSharpFile FSharpFile =>
-      (this.GetContainingFile() as IFSharpFile).NotNull("FSharpFile != null");
+      (this.GetContainingFile() as IFSharpFile).NotNull();
 
     public override PsiLanguageType Language => FSharpLanguage.Instance;
     public virtual void Accept(TreeNodeVisitor visitor) => visitor.VisitNode(this);

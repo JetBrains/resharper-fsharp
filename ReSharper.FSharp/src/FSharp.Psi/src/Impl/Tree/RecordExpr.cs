@@ -25,7 +25,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
     }
 
-    public IRecordExpr RecordExpr => (myOwner as IRecordExpr).NotNull("myOwner as IRecordExpr != null");
+    public IRecordExpr RecordExpr => (myOwner as IRecordExpr).NotNull();
 
     public override bool HasMultipleNames => true;
 

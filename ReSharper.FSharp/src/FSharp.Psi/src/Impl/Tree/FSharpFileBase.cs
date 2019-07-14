@@ -60,6 +60,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       visitor.VisitNode(this, context);
 
     [NotNull] public IFSharpFile FSharpFile => (IFSharpFile) this;
-    [NotNull] public IPsiSourceFile SourceFile => GetSourceFile().NotNull("sourceFile != null");
+    [NotNull] public IPsiSourceFile SourceFile => GetSourceFile().NotNull();
   }
 }

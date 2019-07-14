@@ -440,7 +440,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
       var declaredTypeNames = new Dictionary<NameAndParametersCount, TypeAugmentation>();
       var moduleDeclaration = extensionDeclaration.GetContainingNode<IModuleLikeDeclaration>()
-        .NotNull("moduleDeclaration != null");
+        .NotNull();
 
       foreach (var member in moduleDeclaration.MembersEnumerable)
       {

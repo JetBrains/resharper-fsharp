@@ -49,6 +49,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       visitor.VisitNode(this, context);
 
     public IFSharpFile FSharpFile =>
-      (this.GetContainingFile() as IFSharpFile).NotNull("FSharpFile != null");
+      (this.GetContainingFile() as IFSharpFile).NotNull();
   }
 }
