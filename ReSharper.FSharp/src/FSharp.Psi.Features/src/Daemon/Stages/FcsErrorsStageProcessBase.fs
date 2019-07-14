@@ -15,6 +15,7 @@ open JetBrains.Util
 module FSharpErrors =
     // https://github.com/fsharp/FSharp.Compiler.Service/blob/9.0.0/src/fsharp/CompileOps.fs#L246
     // https://github.com/fsharp/FSharp.Compiler.Service/blob/9.0.0/src/fsharp/FSComp.txt
+    let [<Literal>] UnitTypeExpected = 20
     let [<Literal>] RuleNeverMatched = 26
     let [<Literal>] UndefinedName = 39
     let [<Literal>] ModuleOrNamespaceRequired = 222
@@ -58,7 +59,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             | matchClause -> RuleNeverMatchedWarning(matchClause) :> _
 
         | UnitTypeExpected ->
-            UnitTypeExpectedWarning(ExpressionSelectionUtil.GetExpressionInRange(fsFile, range, false, null)) :> _
+            UnitTypeExpectedWarning(ExpressionSelectionUtil.GetExpressionInRange(fsFile, range, false, null), error.Message) :> _
         
         | UseBindingsIllegalInModules ->
             UseBindingsIllegalInModulesWarning(getNode range) :> _

@@ -50,6 +50,10 @@
 
   <Warning staticGroup="FSharpErrors" name="UnitTypeExpected">
     <Parameter type="ISynExpr" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
     <Message value="Expecting unit type"/>
     <Range>expr.GetNavigationRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
