@@ -6,6 +6,7 @@
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi.Features</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="src\Util\IFSharpElementFactory.fs" />
     <Compile Include="src\Util\StringLiteralsUtil.fs" />
     <Compile Include="src\Util\PsiUtil.fs" />
     <Compile Include="src\Util\OpensUtil.fs" />
@@ -86,10 +87,10 @@
     <Compile Include="src\LanguageService\FSharpDeclaredElementIconProvider.fs" />
     <Compile Include="src\LanguageService\FSharpPsiProperties.fs" />
     <Compile Include="src\LanguageService\FSharpProjectFileLanguageService.fs" />
+    <Compile Include="src\LanguageService\FSharpElementFactory.fs" />
     <Compile Include="src\LanguageService\FSharpLanguageService.fs" />
     <Compile Include="src\LanguageService\FSharpClrLanguage.fs" />
     <Compile Include="src\LanguageService\FSharpBreadcrumbsHelper.fs" />
-    <Compile Include="src\LanguageService\FSharpElementFactory.fs" />
     <Compile Include="src\FSharpTypingAssist.fs" />
     <Compile Include="src\ZoneMarker.fs" />
   </ItemGroup>

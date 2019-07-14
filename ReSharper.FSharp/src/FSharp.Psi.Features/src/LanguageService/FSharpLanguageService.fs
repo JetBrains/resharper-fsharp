@@ -4,11 +4,13 @@ open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 open JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CSharp.Impl
@@ -27,6 +29,7 @@ type FSharpLanguageService
     let lexerFactory = FSharpLexerFactory()
 
     let getSymbolsCache (psiModule: IPsiModule) =
+        if isNull psiModule then null else
         psiModule.GetSolution().GetComponent<IFSharpResolvedSymbolsCache>()
 
     override x.IsCaseSensitive = true
@@ -37,7 +40,8 @@ type FSharpLanguageService
     override x.CreateFilteringLexer(lexer) = lexer
 
     override x.CreateParser(lexer, _, sourceFile) =
-        FSharpParser(lexer, sourceFile, checkerService, getSymbolsCache sourceFile.PsiModule) :> _
+        let psiModule = if isNotNull sourceFile then sourceFile.PsiModule else null
+        FSharpParser(lexer, sourceFile, checkerService, getSymbolsCache psiModule) :> _
 
     member x.CreateParser(document: IDocument, psiModule: IPsiModule) =
         let lexer = TokenBuffer(lexerFactory.CreateLexer(document.Buffer)).CreateLexer()
@@ -89,3 +93,10 @@ type FSharpLanguageService
         | generatedElement -> generatedElement.CreatePointer() :?> _
 
     override x.AnalyzePossibleInfiniteInheritance = false
+
+    interface IFSharpLanguageService with
+        member x.CreateParser(document: IDocument) =
+            let lexer = TokenBuffer(lexerFactory.CreateLexer(document.Buffer)).CreateLexer()
+            FSharpParser(lexer, document, checkerService, null) :> _
+        
+        member x.CreateElementFactory(psiModule) = FSharpElementFactory(x, psiModule) :> _

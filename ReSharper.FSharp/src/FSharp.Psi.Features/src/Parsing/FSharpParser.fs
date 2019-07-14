@@ -12,7 +12,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Util
 
 type FSharpParser(lexer: ILexer, document: IDocument, path: FileSystemPath, sourceFile: IPsiSourceFile,
                   checkerService: FSharpCheckerService, symbolsCache: IFSharpResolvedSymbolsCache) =
@@ -30,8 +29,28 @@ type FSharpParser(lexer: ILexer, document: IDocument, path: FileSystemPath, sour
             override x.CreateFSharpFile() =
                 x.FinishFile(x.Mark(), ElementType.F_SHARP_IMPL_FILE) }
 
+    let parseFile () =
+        use lifetimeDefinition = Lifetime.Define()
+        let lifetime = lifetimeDefinition.Lifetime
+
+        let defines = checkerService.GetDefines(sourceFile)
+        let parsingOptions = checkerService.GetParsingOptions(sourceFile)
+
+        let lexer = FSharpPreprocessedLexerFactory(defines).CreateLexer(lexer).ToCachingLexer()
+        let parseResults = checkerService.ParseFile(path, document, parsingOptions)
+
+        let treeBuilder =
+            tryCreateTreeBuilder lexer lifetime parseResults
+            |> Option.defaultWith (fun _ -> createFakeBuilder lexer lifetime)
+
+        treeBuilder.CreateFSharpFile(CheckerService = checkerService,
+                                     ParseResults = parseResults,
+                                     ResolvedSymbolsCache = symbolsCache)
+
     new (lexer, [<NotNull>] sourceFile: IPsiSourceFile, checkerService, symbolsCache) =
-        FSharpParser(lexer, sourceFile.Document, sourceFile.GetLocation(), sourceFile, checkerService, symbolsCache)
+        let document = if isNotNull sourceFile then sourceFile.Document else null
+        let path = if isNotNull sourceFile then sourceFile.GetLocation() else null
+        FSharpParser(lexer, document, path, sourceFile, checkerService, symbolsCache)
 
     new (lexer, document, checkerService, symbolsCache) =
         FSharpParser(lexer, document, FSharpParser.SandBoxPath, null, checkerService, symbolsCache)
@@ -39,30 +58,15 @@ type FSharpParser(lexer: ILexer, document: IDocument, path: FileSystemPath, sour
     static member val SandBoxPath = FileSystemPath.Parse("Sandbox.fs")
 
     interface IFSharpParser with
-        member this.ParseFile() =
-            use lifetimeDefinition = Lifetime.Define()
-            let lifetime = lifetimeDefinition.Lifetime
+        member this.ParseFSharpFile() = parseFile ()
+        member this.ParseFile() = parseFile () :> _
 
-            let defines = checkerService.GetDefines(sourceFile)
-            let parsingOptions = checkerService.GetParsingOptions(sourceFile)
+        member this.ParseExpression(chameleonExpr: IChameleonExpression, document) =
+            let document = if isNotNull document then document else chameleonExpr.GetSourceFile().Document
+            let projectedOffset = chameleonExpr.GetTreeStartOffset().Offset
 
-            let lexer = FSharpPreprocessedLexerFactory(defines).CreateLexer(lexer).ToCachingLexer()
-            let parseResults = checkerService.ParseFile(path, document, parsingOptions)
-
-            let treeBuilder =
-                tryCreateTreeBuilder lexer lifetime parseResults
-                |> Option.defaultWith (fun _ -> createFakeBuilder lexer lifetime)
-
-            treeBuilder.CreateFSharpFile(CheckerService = checkerService,
-                                         ParseResults = parseResults,
-                                         ResolvedSymbolsCache = symbolsCache) :> _
-
-        member this.ParseExpression(chameleonExpr) =
             Lifetime.Using(fun lifetime ->
-                let sourceFile = chameleonExpr.GetSourceFile()
-                let projectedOffset = chameleonExpr.GetTreeStartOffset().Offset
-
                 // todo: cover error cases where fsImplFile or multiple expressions may be returned
-                let treeBuilder = FSharpImplTreeBuilder(lexer, sourceFile.Document, [], lifetime, projectedOffset)
+                let treeBuilder = FSharpImplTreeBuilder(lexer, document, [], lifetime, projectedOffset)
                 treeBuilder.ProcessTopLevelExpression(chameleonExpr.SynExpr)
                 treeBuilder.GetTreeNode()) :?> ISynExpr

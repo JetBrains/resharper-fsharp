@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
+using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Plugins.FSharp.Checker;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
@@ -33,5 +34,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
     [NotNull]
     IReadOnlyList<FSharpResolvedSymbolUse> GetAllDeclaredSymbols(FSharpCheckFileResults checkResults = null);
+
+    /// Documents are currently used in F# files parsing for getting line index info.
+    /// This property is only set in FSharpElementFactory to make the document accessible without having source file
+    /// while opening chameleon expressions.
+    [CanBeNull]
+    IDocument StandaloneDocument { get; set; }
   }
 }

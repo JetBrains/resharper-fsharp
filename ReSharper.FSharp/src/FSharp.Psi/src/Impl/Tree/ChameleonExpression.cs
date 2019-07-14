@@ -67,7 +67,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       Assertion.Assert(firstChild == lastChild && firstChild is IClosedChameleonBody,
         "One ChameleonElement child but found also {0}", lastChild.NodeType);
 
-      var node = ((IClosedChameleonBody) firstChild).Parse(parser => ((IFSharpParser) parser).ParseExpression(this));
+      var node = ((IClosedChameleonBody) firstChild).Parse(parser =>
+        ((IFSharpParser) parser).ParseExpression(this, FSharpFile.StandaloneDocument));
 
       var oldLength = firstChild.GetTextLength();
       var newLength = node.GetTextLength();
