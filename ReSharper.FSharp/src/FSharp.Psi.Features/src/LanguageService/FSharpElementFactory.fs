@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 
+open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -40,3 +41,19 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let letModuleDecl = moduleDeclaration.Members.First().As<ILetModuleDecl>()
             let binding = letModuleDecl.Bindings.First()
             binding.HeadPattern :?> _
+
+        member x.CreateIgnoreApp(expr) =
+            let source = "() |> ignore"
+            let moduleDeclaration = getModuleDeclaration source
+
+            let doDecl = moduleDeclaration.Members.First().As<IDo>().NotNull()
+            match doDecl.Expression.As<IAppExpr>() with
+            | null -> failwith "Could not get outer appExpr"
+            | outerAppExpr ->
+
+            match outerAppExpr.FunctionExpression.As<IAppExpr>() with
+            | null -> failwith "Could not get inner appExpr"
+            | innerAppExpr ->
+
+            replace innerAppExpr.FunctionExpression expr
+            outerAppExpr
