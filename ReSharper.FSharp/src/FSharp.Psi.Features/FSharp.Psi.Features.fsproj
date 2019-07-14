@@ -48,6 +48,7 @@
       <Compile Include="src\Daemon\QuickFixes\RemoveUnusedOpensFix.fs" />
       <Compile Include="src\Daemon\QuickFixes\ReplaceUseWithLetFix.fs" />
       <Compile Include="src\Daemon\QuickFixes\RemoveUnusedSelfIdVariableFix.fs" />
+      <Compile Include="src\Daemon\QuickFixes\AddIgnoreFix.fs" />
     <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
       <Mode>QUICKFIX</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>
