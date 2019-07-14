@@ -12,7 +12,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal abstract class LocalDeclarationBase : FSharpDeclarationBase, ITypeOwner, IFSharpDeclaredElement,
+  internal abstract class LocalDeclarationBase : FSharpDeclarationBase, ILocalVariable, IFSharpDeclaredElement,
     IFSharpLocalDeclaration
   {
     public override IDeclaredElement DeclaredElement => this;
@@ -56,6 +56,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public override void SetName(string name) =>
       NameIdentifier.ReplaceIdentifier(name);
+
+    public ConstantValue ConstantValue => ConstantValue.BAD_VALUE;
+    public bool IsConstant => false;
+    public bool IsWritable => false;
+    public bool IsStatic => false;
   }
 
   internal partial class LocalDeclaration
