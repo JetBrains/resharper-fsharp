@@ -90,3 +90,26 @@ module PsiModificationUtil =
 
     let deleteChildRange first last =
         ModificationUtil.DeleteChildRange(first, last)
+
+
+let getPrevNodeOfType nodeType (node: ITreeNode) =
+    let mutable prev = node.PrevSibling
+    while prev.NodeType != nodeType do
+        prev <- prev.PrevSibling
+    prev
+
+let getNextNodeOfType nodeType (node: ITreeNode) =
+    let mutable next = node.NextSibling
+    while next.NodeType != nodeType do
+        next <- next.NextSibling
+    next
+
+
+let rec getNonPatParent (pat: ISynPat) =
+    match pat.Parent with
+    | :? ISynPat as pat -> getNonPatParent pat
+    | node -> node
+
+
+let isValid (node: ITreeNode) =
+    isNotNull node && node.IsValid()

@@ -36,7 +36,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       public LeafElementBase CreateToken(TokenNodeType tokenType, IBuffer buffer, int startOffset, int endOffset)
       {
         if (tokenType == FSharpTokenType.CHAMELEON)
-          return new ClosedChameleonElement(FSharpTokenType.CHAMELEON, new TreeOffset(startOffset),
+          return new ClosedChameleonElement(FSharpTokenType.CHAMELEON, buffer, new TreeOffset(startOffset),
             new TreeOffset(endOffset));
 
         if (tokenType is IFixedTokenNodeType)

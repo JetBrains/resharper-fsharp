@@ -57,6 +57,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             | null -> createGenericHighlighting error range
             | matchClause -> RuleNeverMatchedWarning(matchClause) :> _
 
+        | UnitTypeExpected ->
+            UnitTypeExpectedWarning(ExpressionSelectionUtil.GetExpressionInRange(fsFile, range, false, null)) :> _
+        
         | UseBindingsIllegalInModules ->
             UseBindingsIllegalInModulesWarning(getNode range) :> _
 

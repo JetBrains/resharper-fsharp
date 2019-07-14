@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
@@ -32,6 +32,7 @@
     <Compile Include="FSharpCompletionTest.fs" />
     <Compile Include="QuickFixes\ReplaceUseWithLetTest.fs" />
     <Compile Include="QuickFixes\RemoveUnusedSelfIdVariableFix.fs" />
+    <Compile Include="QuickFixes\AddIgnoreTest.fs" />
     <Compile Include="FSharpElementFactoryTest.fs" />
   </ItemGroup>
 

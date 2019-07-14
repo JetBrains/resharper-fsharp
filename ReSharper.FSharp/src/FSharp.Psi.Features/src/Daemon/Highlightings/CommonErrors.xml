@@ -47,4 +47,12 @@
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
     <QuickFix>RemoveUnusedSelfIdVariableFix</QuickFix>
   </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="UnitTypeExpected">
+    <Parameter type="ISynExpr" name="expr"/>
+    <Message value="Expecting unit type"/>
+    <Range>expr.GetNavigationRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>AddIgnoreFix</QuickFix>
+  </Warning>
 </Errors>
