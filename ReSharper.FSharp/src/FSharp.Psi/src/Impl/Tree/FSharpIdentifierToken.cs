@@ -41,5 +41,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       LowLevelModificationUtil.ReplaceChildRange(this, this, newToken);
       return newToken;
     }
+
+    public FSharpSymbolReference QualifierReference =>
+      Parent is LongIdentifier longIdentifier && longIdentifier.Identifiers is var identifiers
+        ? identifiers.IndexOf(this) is var index && index > 0
+          ? (identifiers[index - 1] as IReferenceExpression)?.Reference
+          : null
+        : null;
   }
 }

@@ -172,12 +172,11 @@ returnTypeInfo:
   synType<TYPE, ReturnType>;
 
 interface synPat:
-  namedPat |
+  declarationPat |
   typedPat |
   attribPat |
   orPat |
   andsPat |
-  longIdentPat | // Used for functions, union cases and active patterns with parameters.
   tuplePat |
   arrayOrListPat |
   parenPat |
@@ -189,11 +188,15 @@ interface synPat:
   constPat |
   otherPat;
 
+interface declarationPat:
+  namedPat |
+  longIdentPat;
+
 interface namedPat:
   topNamedPat |
   localNamedPat;
 
-interface longIdentPat:
+interface longIdentPat: // Used for functions, union cases and active patterns with parameters.
   topLongIdentPat |
   localLongIdentPat;
 
