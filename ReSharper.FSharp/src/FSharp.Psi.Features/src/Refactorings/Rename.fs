@@ -140,14 +140,23 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
     override x.AddExtraNames(namesCollection, declaredElement) =
         match declaredElement with
         | :? IDeclarationPat as declarationPat ->
-            match BindingNavigator.GetByHeadPattern(declarationPat) with
-            | null -> ()
-            | binding ->
+            let pat = declarationPat :> ISynPat
+            match declarationPat.Parent with
+            | :? IBinding as binding when binding.HeadPattern == pat ->
+                match binding.Expression with
+                | null -> ()
+                | expr -> namesCollection.Add(expr, EntryOptions())
 
-            match binding.Expression with
-            | null -> ()
-            | expr -> namesCollection.Add(expr, EntryOptions())
+            | :? IMatchClause as matchClause when matchClause.Pattern == pat ->
+                match MatchExprNavigator.GetByClause(matchClause) with
+                | null -> ()
+                | matchExpr ->
 
+                match matchExpr.Expression with
+                | null -> ()
+                | expr -> namesCollection.Add(expr, EntryOptions())
+
+            | _ -> ()
         | _ -> ()
 
 type FSharpNameValidationRule(property, element: IDeclaredElement, namingService: FSharpNamingService) as this =

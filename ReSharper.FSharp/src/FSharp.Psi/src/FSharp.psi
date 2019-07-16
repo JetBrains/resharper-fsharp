@@ -489,7 +489,7 @@ matchExpr options { stubBase="DummyExpression"; }:
   MATCH
   synExpr<EXPR, Expression>
   WITH
-  matchClause<MATCH_CLAUSE, clauses>*;
+  matchClause<MATCH_CLAUSE, Clauses>*;
 
 doExpr options { stubBase="DummyExpression"; }:
   DO
