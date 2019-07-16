@@ -673,9 +673,10 @@ yieldOrReturnExpr options { stubBase="DummyExpression"; }:
 letOrUseBangExpr options { stubBase="DummyExpression"; }:
   letOrUseBang{LET, LetOrUseToken}
   synPat<PAT, Pattern>
-  synExpr<RHS_EXPR, RightHandExpression>
+  EQUALS<EQUALS, EqualsToken>
+  synExpr<EXPR, Expression>
   IN?
-  synExpr<EXPR, Expression>;
+  synExpr<IN_EXPR, InExpression>;
 
 libraryOnlyExpr options { stubBase="DummyExpression"; }:
   fakeSeparator;

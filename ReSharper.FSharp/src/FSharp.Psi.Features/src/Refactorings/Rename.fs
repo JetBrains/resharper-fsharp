@@ -156,6 +156,11 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
                 | null -> ()
                 | expr -> namesCollection.Add(expr, EntryOptions())
 
+            | :? ILetOrUseBangExpr as letOrUseBangExpr when letOrUseBangExpr.Pattern == pat ->
+                match letOrUseBangExpr.Expression with
+                | null -> ()
+                | expr -> namesCollection.Add(expr, EntryOptions())
+
             | _ -> ()
         | _ -> ()
 
