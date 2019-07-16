@@ -35,6 +35,7 @@
     <Compile Include="QuickFixes\RemoveUnusedSelfIdVariableFix.fs" />
     <Compile Include="QuickFixes\ReplaceWithWildPatTest.fs" />
     <Compile Include="QuickFixes\AddIgnoreTest.fs" />
+    <Compile Include="QuickFixes\RemoveUnusedNamedAsPatTest.fs" />
     <Compile Include="FSharpElementFactoryTest.fs" />
   </ItemGroup>
 
