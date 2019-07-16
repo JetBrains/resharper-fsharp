@@ -20,7 +20,7 @@
   <ItemGroup>
     <Compile Include="..\ExternalFolder\LinkedFile1.fs" />
     <Compile Include="..\ExternalFolder\LinkedFile2.fs">
-      <Link>LinkedFolder\x</Link>
+      <Link>LinkedFolder\LinkedFile2.fs</Link>
     </Compile>
   </ItemGroup>
 </Project>
