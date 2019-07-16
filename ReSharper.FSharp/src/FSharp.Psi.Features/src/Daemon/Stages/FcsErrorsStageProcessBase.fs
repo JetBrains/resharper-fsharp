@@ -52,7 +52,11 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         match error.ErrorNumber with
         | UndefinedName -> UnresolvedHighlighting(error.Message, range) :> _
-        | UnusedValue -> UnusedHighlighting(error.Message, range) :> _
+
+        | UnusedValue ->
+            match fsFile.GetNode(range) with
+            | null -> UnusedHighlighting(error.Message, range) :> _
+            | pat -> UnusedValueWarning(pat) :> _
 
         | RuleNeverMatched ->
             match fsFile.GetNode(range) with

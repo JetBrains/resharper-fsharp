@@ -15,12 +15,12 @@ type RemoveUnusedSelfIdVariableFix(warning: UnusedThisVariableWarning) =
     let selfId = warning.SelfId
 
     override x.Text = "Remove self id"
-    override x.IsAvailable _ = selfId.IsValid()
+    override x.IsAvailable _ = isValid selfId
 
     override x.ExecutePsiTransaction(_, _) =
         use writeLock = WriteLockCookie.Create(selfId.IsPhysical())
 
-        let ctor = ImplicitConstructorDeclarationNavigator.GetBySelfIdentifier(selfId).NotNull("ctor")
+        let ctor = ImplicitConstructorDeclarationNavigator.GetBySelfIdentifier(selfId).NotNull()
 
         // todo: move comments (if any) out of ctor node (see example below) to outer node
         // type T() (* foo *) as this = ...

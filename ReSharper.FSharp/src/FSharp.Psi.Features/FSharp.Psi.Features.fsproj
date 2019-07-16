@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
@@ -48,6 +48,7 @@
       <Compile Include="src\Daemon\QuickFixes\RemoveUnusedOpensFix.fs" />
       <Compile Include="src\Daemon\QuickFixes\ReplaceUseWithLetFix.fs" />
       <Compile Include="src\Daemon\QuickFixes\RemoveUnusedSelfIdVariableFix.fs" />
+      <Compile Include="src\Daemon\QuickFixes\ReplaceWithWildPatFix.fs" />
       <Compile Include="src\Daemon\QuickFixes\AddIgnoreFix.fs" />
     <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
       <Mode>QUICKFIX</Mode>

@@ -42,10 +42,20 @@
 
   <Warning staticGroup="FSharpErrors" name="UnusedThisVariable">
     <Parameter type="ISelfId" name="selfId"/>
-    <Message value="The self reference is unused and adds runtime initialization checks to members in this and derived types."/>
+    <Message value="The self reference is unused and adds runtime initialization checks to members in this and derived types"/>
     <Range>selfId.Identifier.GetHighlightingRange()</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
     <QuickFix>RemoveUnusedSelfIdVariableFix</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="UnusedValue">
+    <Parameter type="IDeclarationPat" name="pat"/>
+    <Message value="The value '{0}' is unused">
+      <Argument>pat.SourceName</Argument>
+    </Message>
+    <Range>pat.GetNavigationRange()</Range>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
+    <QuickFix>ReplaceWithWildPatFix</QuickFix>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="UnitTypeExpected">
