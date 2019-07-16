@@ -80,7 +80,15 @@ type FSharpNamingService(language: FSharpLanguage) =
 
     override x.SuggestRoots(element: IDeclaredElement, policyProvider: INamingPolicyProvider) =
         let roots = base.SuggestRoots(element, policyProvider)
-        if isFSharpTypeLike element then Seq.map dropFSharpWords roots else roots
+        seq {
+            if isFSharpTypeLike element then
+                yield! Seq.map dropFSharpWords roots
+            else
+                yield! roots
+
+            if element :? ISelfId then
+                yield NameRoot([| NameWord("this", "this") |], PluralityKinds.Single, true)
+        }
 
     override x.IsSameNestedNameAllowedForMembers = true
 
