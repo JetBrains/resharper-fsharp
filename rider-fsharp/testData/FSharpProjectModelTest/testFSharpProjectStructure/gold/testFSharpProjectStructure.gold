@@ -126,7 +126,7 @@ File Path Index
     1:Class2.fs
 7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
 8:LinkedFolder[1]
-  1:x (from ../ExternalFolder/LinkedFile2.fs)
+  1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
 9:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
@@ -272,7 +272,7 @@ File Path Index
     1:Class2.fs
 7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
 8:LinkedFolder[1]
-  1:x (from ../ExternalFolder/LinkedFile2.fs)
+  1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
 9:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
@@ -418,7 +418,7 @@ File Path Index
     1:Class2.fs
 7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
 8:LinkedFolder[1]
-  1:x (from ../ExternalFolder/LinkedFile2.fs)
+  1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
 9:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
@@ -564,7 +564,7 @@ File Path Index
     1:Class2.fs
 8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
 9:LinkedFolder[1]
-  1:x (from ../ExternalFolder/LinkedFile2.fs)
+  1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
 10:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
@@ -710,7 +710,7 @@ File Path Index
     1:Class2.fs
 6:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
 7:LinkedFolder[1]
-  1:x (from ../ExternalFolder/LinkedFile2.fs)
+  1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
 8:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
@@ -856,7 +856,7 @@ File Path Index
     1:Class2.fs
 7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
 8:LinkedFolder[1]
-  1:x (from ../ExternalFolder/LinkedFile2.fs)
+  1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
 9:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
@@ -1002,7 +1002,7 @@ File Path Index
     1:Class2.fs
 7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
 8:LinkedFolder[1]
-  1:x (from ../ExternalFolder/LinkedFile2.fs)
+  1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
 9:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
@@ -1146,7 +1146,7 @@ File Path Index
   4:Class2.fs
 7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
 8:LinkedFolder[1]
-  1:x (from ../ExternalFolder/LinkedFile2.fs)
+  1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
 9:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
@@ -1290,7 +1290,7 @@ File Path Index
   4:Class2.fs
 7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
 8:LinkedFolder[1]
-  1:x (from ../ExternalFolder/LinkedFile2.fs)
+  1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
 9:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
@@ -1434,7 +1434,7 @@ File Path Index
   4:Class2.fs
 8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
 9:LinkedFolder[1]
-  1:x (from ../ExternalFolder/LinkedFile2.fs)
+  1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
 10:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
@@ -1578,7 +1578,7 @@ File Path Index
   4:Class2.fs
 8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
 9:LinkedFolder[1]
-  1:x (from ../ExternalFolder/LinkedFile2.fs)
+  1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
 10:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
@@ -1723,7 +1723,7 @@ File Path Index
   4:Class2.fs
 7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
 8:LinkedFolder[1]
-  1:x (from ../ExternalFolder/LinkedFile2.fs)
+  1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
 9:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
@@ -1867,7 +1867,7 @@ File Path Index
   4:Class2.fs
 8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
 9:LinkedFolder[1]
-  1:x (from ../ExternalFolder/LinkedFile2.fs)
+  1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
 10:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
@@ -2010,7 +2010,7 @@ File Path Index
   6:Class2.fs
 8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
 9:LinkedFolder[1]
-  1:x (from ../ExternalFolder/LinkedFile2.fs)
+  1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
 10:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
