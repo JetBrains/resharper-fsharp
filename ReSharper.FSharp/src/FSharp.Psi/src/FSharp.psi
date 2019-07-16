@@ -442,7 +442,7 @@ forEachExpr options { stubBase="DummyExpression"; }:
   FOR
   synPat<PAT, Pattern>
   IN
-  synExpr<TO_EXPR, ToExpression>
+  synExpr<IN_EXPR, InExpression>
   DO
   synExpr<DO_EXPR, DoExpression>;
 

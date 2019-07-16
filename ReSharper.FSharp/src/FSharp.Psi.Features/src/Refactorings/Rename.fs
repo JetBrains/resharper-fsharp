@@ -11,9 +11,10 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.Naming.Extentions
-open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
+open JetBrains.ReSharper.Psi.Naming.Extentions
+open JetBrains.ReSharper.Psi.Naming.Impl
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Refactorings.Rename
 open JetBrains.ReSharper.Refactorings.Rename.Pages
 open JetBrains.Util
@@ -160,6 +161,20 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
                 match letOrUseBangExpr.Expression with
                 | null -> ()
                 | expr -> namesCollection.Add(expr, EntryOptions())
+
+            | :? IForEachExpr as forEachExpr when forEachExpr.Pattern == pat ->
+                match forEachExpr.InExpression with
+                | null -> ()
+                | expr ->
+
+                let naming = declaredElement.GetPsiServices().Naming
+                let collection =
+                    naming.Suggestion.CreateEmptyCollection(
+                        PluralityKinds.Single, declaredElement.PresentationLanguage, namesCollection.PolicyProvider)
+
+                collection.Add(expr, EntryOptions(PluralityKinds.Plural))
+                for nameRoot in collection.GetRoots() do
+                    namesCollection.Add(nameRoot, EntryOptions())
 
             | _ -> ()
         | _ -> ()
