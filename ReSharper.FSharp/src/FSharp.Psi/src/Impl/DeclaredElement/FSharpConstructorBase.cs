@@ -33,7 +33,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public bool IsParameterless => Parameters.IsEmpty();
   }
 
-  internal class FSharpConstructor : FSharpConstructorBase<ConstructorDeclaration>
+  internal class FSharpConstructor : FSharpConstructorBase<MemberConstructorDeclaration>
   {
     public FSharpConstructor([NotNull] ITypeMemberDeclaration declaration,
       [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)

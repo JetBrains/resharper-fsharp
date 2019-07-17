@@ -1,0 +1,4 @@
+﻿module Module
+
+type T(x) =
+    new (){caret} = T(1)

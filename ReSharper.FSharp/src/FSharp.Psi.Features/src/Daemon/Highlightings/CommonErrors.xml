@@ -41,7 +41,7 @@
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="UnusedThisVariable">
-    <Parameter type="ISelfId" name="selfId"/>
+    <Parameter type="ICtorSelfId" name="selfId"/>
     <Message value="The self reference is unused and adds runtime initialization checks to members in this and derived types"/>
     <Range>selfId.Identifier.GetHighlightingRange()</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>

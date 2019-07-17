@@ -60,7 +60,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
           foreach (var memberDeclaration in declaration.MemberDeclarations)
           {
-            if (memberDeclaration is IConstructorDeclaration || memberDeclaration is IImplicitConstructorDeclaration)
+            if (memberDeclaration is IConstructorDeclaration)
             {
               // todo: analyze tree and don't get declared elements here
               if (memberDeclaration.DeclaredElement is IConstructor ctor &&

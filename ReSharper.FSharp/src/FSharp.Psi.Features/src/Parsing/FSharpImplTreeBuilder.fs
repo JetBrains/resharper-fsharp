@@ -175,13 +175,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                 | SynMemberDefn.ImplicitCtor(_, _, args, selfId, _) ->
                     for arg in args do
                         x.ProcessImplicitCtorParam arg
-
-                    match selfId with
-                    | Some (IdentRange range) ->
-                        x.AdvanceToTokenOrRangeStart(FSharpTokenType.AS, range)
-                        x.Done(range, x.Mark(), ElementType.SELF_ID)
-                    | _ -> ()
-
+                    x.ProcessCtorSelfId(selfId)
                     ElementType.IMPLICIT_CONSTRUCTOR_DECLARATION
 
                 | SynMemberDefn.ImplicitInherit(baseType, args, _, _) ->
@@ -212,17 +206,16 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                                 match valData with
                                 | SynValData(Some(flags), _, selfId) when flags.MemberKind = MemberKind.Constructor ->
                                     x.ProcessParams(memberParams, true, true) // todo: should check isLocal
-                                    if selfId.IsSome then
-                                        x.ProcessLocalId(selfId.Value)
+                                    x.ProcessCtorSelfId(selfId)
 
                                     x.MarkChameleonExpression(expr)
-                                    ElementType.CONSTRUCTOR_DECLARATION
+                                    ElementType.MEMBER_CONSTRUCTOR_DECLARATION
                                 | _ ->
                                     x.ProcessMemberDeclaration(typeParamsOpt, memberParams, returnInfo, expr, range)
                                     ElementType.MEMBER_DECLARATION
 
                             | selfId :: _ :: _ ->
-                                x.ProcessLocalId(selfId)
+                                x.Done(selfId.idRange, x.Mark(), ElementType.MEMBER_SELF_ID)
                                 x.ProcessMemberDeclaration(typeParamsOpt, memberParams, returnInfo, expr, range)
                                 ElementType.MEMBER_DECLARATION
 
@@ -252,6 +245,13 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
 
             x.Done(typeMember.Range, mark, memberType)
 
+    member x.ProcessCtorSelfId(selfId) =
+        match selfId with
+        | Some (IdentRange range) ->
+            x.AdvanceToTokenOrRangeStart(FSharpTokenType.AS, range)
+            x.Done(range, x.Mark(), ElementType.CTOR_SELF_ID)
+        | _ -> ()
+    
     member x.ProcessReturnInfo(returnInfo) =
         match returnInfo with
         | None -> ()

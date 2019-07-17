@@ -17,3 +17,5 @@ type RemoveUnusedSelfIdVariableTest() =
     [<Test>] member x.``Space 04 - Add space 2``() = x.DoNamedTest()
 
     [<Test>] member x.``Comments 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Member ctor 01``() = x.DoNamedTest()

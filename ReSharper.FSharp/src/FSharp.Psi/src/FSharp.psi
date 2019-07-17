@@ -940,7 +940,6 @@ delegateDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } ext
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
 
 interface fSharpTypeMemberDeclaration:
-  implicitConstructorDeclaration |
   constructorDeclaration |
   inheritMember |
   interfaceImplementation |
@@ -952,6 +951,10 @@ interface fSharpTypeMemberDeclaration:
   letModuleDecl |
 
   otherTypeMember;
+
+interface constructorDeclaration:
+  implicitConstructorDeclaration |
+  memberConstructorDeclaration;
 
 interface inheritMember:
   typeInherit |
@@ -979,16 +982,23 @@ implicitConstructorDeclaration options { stubBase="FSharpProperTypeMemberDeclara
     memberParam<PARAMETER, Parameters>
     COMMA
   )*
-  selfId<SELF_ID, SelfIdentifier>?;
+  ctorSelfId<SELF_ID, SelfIdentifier>?;
 
-selfId options { stubBase="LocalDeclarationBase"; }:
+interface selfId:
+  ctorSelfId |
+  memberSelfId;
+
+ctorSelfId options { stubBase="LocalDeclarationBase"; }:
   AS
   IDENTIFIER<IDENTIFIER, Identifier>;
-  
 
-constructorDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
+memberSelfId options { stubBase="LocalDeclarationBase"; }:
+  IDENTIFIER<IDENTIFIER, Identifier>;  
+
+memberConstructorDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
+  NEW<NEW, NewKeyword>
   localDeclaration<PARAMETER, Parameters>* fakeSeparator
-  NEW<NEW, NewKeyword>;
+  ctorSelfId<SELF_ID, SelfIdentifier>?;
 
 
 
@@ -998,6 +1008,8 @@ memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } 
   get { methodName="TypeParameters" path=<memberDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfMethodList:TYPE_PARAMETER> };
 }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
+  accessModifiers<ACCESS_MODIFIERS, AccessModifiers>?
+  memberSelfId<SELF_ID, SelfId>?
   identOrOpName{IDENTIFIER, Identifier}
   typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   memberParam<PARAMETER, Parameters>* fakeSeparator;
