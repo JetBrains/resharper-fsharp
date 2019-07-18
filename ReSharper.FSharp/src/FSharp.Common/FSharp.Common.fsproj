@@ -11,6 +11,7 @@
     <Compile Include="src\Util\Util.fs" />
     <Compile Include="src\Util\FSharpPredefinedType.fs" />
     <Compile Include="src\Util\FSharpRangeUtil.fs" />
+    <Compile Include="src\Util\FSharpCompilerAttributesUtil.fs" />
     <Compile Include="src\ProjectModel\FSharpProjectLanguage.fs" />
     <Compile Include="src\ProjectModel\ProjectProperties.fs" />
     <Compile Include="src\ProjectModel\FSharpLanguageSpecificItemsProvider.fs" />

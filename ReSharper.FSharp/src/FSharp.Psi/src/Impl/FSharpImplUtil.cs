@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
@@ -23,6 +24,7 @@ using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 using JetBrains.Util.Extension;
 using JetBrains.Util.Logging;
+using Microsoft.FSharp.Core;
 using PrettyNaming = FSharp.Compiler.PrettyNaming;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -531,6 +533,35 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       }
 
       return null;
+    }
+
+    public static bool IsRecord([NotNull] this ITypeElement typeElement)
+    {
+      switch (typeElement)
+      {
+        case IFSharpTypeElement fsTypeElement:
+          return fsTypeElement.GetPart<IRecordPart>() != null;
+        case ICompiledElement compiledElement:
+          return compiledElement.GetCompilationMappingFlag() == SourceConstructFlags.RecordType;
+        default:
+          return false;
+      }
+    }
+
+    public static ICollection<string> GetRecordFieldNames([NotNull] this ITypeElement typeElement)
+    {
+      switch (typeElement)
+      {
+        case IFSharpTypeElement fsTypeElement:
+          return fsTypeElement.GetPart<IRecordPart>()?.Fields.Select(f => f.ShortName).AsCollection() ??
+                 EmptyList<string>.InstanceList;
+
+        case ICompiledElement _:
+          return typeElement.Properties.Where(p => p.IsFSharpField()).Select(p => p.ShortName).AsCollection();
+
+        default:
+          return EmptyArray<string>.Instance;
+      }
     }
   }
 }

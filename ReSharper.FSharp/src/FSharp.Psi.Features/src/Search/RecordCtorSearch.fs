@@ -2,9 +2,7 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Search.RecordCtorSearch
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpPredefinedType
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Finder
@@ -12,44 +10,6 @@ open JetBrains.ReSharper.Psi.Files
 open JetBrains.ReSharper.Psi.Search
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
-
-let getCompilationMappingAttrInstanceFlag (attrInstance: IAttributeInstance) =
-    match Seq.tryHead (attrInstance.PositionParameters()) with
-    | None -> SourceConstructFlags.None
-    | Some parameter -> parameter.ConstantValue.Value :?> SourceConstructFlags
-
-let getCompilationMappingFlag (attrsOwner: IAttributesOwner) =
-    attrsOwner.GetAttributeInstances(compilationMappingAttrTypeName, false)
-    |> Seq.tryHead
-    |> Option.map getCompilationMappingAttrInstanceFlag
-    |> Option.defaultValue SourceConstructFlags.None
-
-let isFSharpField (property: IProperty) =
-    getCompilationMappingFlag property = SourceConstructFlags.Field
-
-let isRecord (typeElement: ITypeElement) =
-    match typeElement with
-    | :? IFSharpTypeElement as fsTypeElement ->
-        isNotNull (fsTypeElement.GetPart<IRecordPart>())
-
-    | :? ICompiledElement ->
-        getCompilationMappingFlag typeElement = SourceConstructFlags.RecordType
-
-    | _ -> false
-
-let getRecordFieldNames (typeElement: ITypeElement) =
-    match typeElement.GetPart<IRecordPart>() with
-    | null ->
-        typeElement.Properties
-        |> Seq.filter isFSharpField
-        |> Array.ofSeq
-        |> Array.map (fun property -> property.ShortName)
-
-    | recordPart ->
-        recordPart.Fields
-        |> Array.ofSeq
-        |> Array.map (fun field -> field.ShortName)
-
 
 [<PsiSharedComponent>]
 type RecordCtorSearchFactory() =
@@ -60,13 +20,13 @@ type RecordCtorSearchFactory() =
 
     override x.GetAllPossibleWordsInFile(declaredElement) =
         match declaredElement with
-        | :? ITypeElement as typeElement when isRecord typeElement -> getRecordFieldNames typeElement :> _
+        | :? ITypeElement as typeElement when typeElement.IsRecord() -> typeElement.GetRecordFieldNames() :> _
         | _ -> EmptyList.Instance :> _
 
     override x.CreateReferenceSearcher(declaredElements, findCandidates) =
         let recordTypeElements =
             declaredElements.FilterByType<ITypeElement>()
-            |> Seq.filter isRecord
+            |> Seq.filter (fun typeElement -> typeElement.IsRecord())
             |> Array.ofSeq
 
         if recordTypeElements.IsEmpty() then null else
@@ -77,9 +37,10 @@ and RecordCtorReferenceSearcher(recordTypeElements, findCandidates) =
     member x.ProcessElement<'TResult>(treeNode: ITreeNode, consumer: IFindResultConsumer<'TResult>) =
         let names =
             recordTypeElements
-            |> Array.map getRecordFieldNames
-            |> Array.concat
-            |> Array.distinct
+            |> Array.map (fun typeElement -> typeElement.GetRecordFieldNames())
+            |> Seq.concat
+            |> Seq.distinct
+            |> Array.ofSeq
 
         let elements = DeclaredElementsSet(Seq.cast recordTypeElements)
         let processor = RecordCtorReferenceProcessor(treeNode, findCandidates, consumer, elements, names)
