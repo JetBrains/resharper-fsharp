@@ -411,19 +411,19 @@ arrayOrListExpr options { stubBase="DummyExpression"; }:
   fakeSeparator;
 
 recordExpr options { stubBase="ReferenceExpressionBase"; }:
-  LBRACE
+  LBRACE<LBRACE, LeftBrace>
   (
     synExpr<COPY_INFO, CopyInfoExpression>
     WITH
   )?
   recordExprBinding<BINDING, ExprBindings>*
-  RBRACE;
+  RBRACE<RBRACE, RightBrace>;
 
 recordExprBinding:
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>
   EQUALS
   synExpr<EXPR, Expression>
-  SEMICOLON?;
+  SEMICOLON<SEMI, Semicolon>?;
 
 newExpr options { stubBase="TypeExpressionBase"; }:
   namedTypeExpression<TYPE, Type>

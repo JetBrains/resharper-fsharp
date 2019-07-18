@@ -858,19 +858,29 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         x.PushRangeForMark(range, mark, ElementType.RECORD_EXPR_BINDING)
         x.ProcessExpression(expr)
 
-    member x.ProcessRecordField(lid, expr) =
+    member x.ProcessRecordField(field: (RecordFieldName * (SynExpr option) * BlockSeparator option)) =
+        let (lid, _), expr, blockSep = field
+        let lid = lid.Lid
         match lid, expr with
         | [], None -> ()
         | [], Some(ExprRange range as expr) ->
-            x.PushRangeAndProcessExpression(expr, range, ElementType.RECORD_EXPR_BINDING)
+            x.PushRange(range, ElementType.RECORD_EXPR_BINDING)
+            x.PushRecordBlockSep(blockSep)
+            x.ProcessExpression(expr)
 
         | IdentRange headRange :: _, expr ->
             let mark = x.Mark(headRange)
             x.PushRangeForMark(headRange, mark, ElementType.RECORD_EXPR_BINDING)
+            x.PushRecordBlockSep(blockSep)
             x.ProcessLongIdentifier(lid)
             if expr.IsSome then
                 x.ProcessExpression(expr.Value)
-    
+
+    member x.PushRecordBlockSep(blockSep) =
+        match blockSep with
+        | Some(range, _) -> x.PushStep(range, advanceToEndProcessor)
+        | _ -> ()
+
     member x.MarkListExpr(exprs, range, elementType) =
         x.PushRange(range, elementType)
         x.ProcessExpressionList(exprs)
@@ -934,6 +944,12 @@ type RangeMarkAndType =
       Mark: int
       ElementType: NodeType }
 
+type AdvanceToEndProcessor() =
+    inherit StepProcessorBase<range>()
+
+    override x.Process(item, builder) =
+        builder.AdvanceToEnd(item)
+
 type EndRangeProcessor() =
     inherit StepProcessorBase<RangeMarkAndType>()
 
@@ -983,8 +999,7 @@ type RecordFieldListProcessor() =
     inherit StepListProcessorBase<RecordFieldName * (SynExpr option) * BlockSeparator option>()
 
     override x.Process(field, builder) =
-        let (lid, _), expr, _ = field 
-        builder.ProcessRecordField(lid.Lid, expr)
+        builder.ProcessRecordField(field)
 
 
 type AnonRecordFieldListProcessor() =
@@ -1028,6 +1043,7 @@ module BuilderStepProcessors =
     // due to compiler producing additional recursive init checks otherwise in this case.
 
     let expressionProcessor = ExpressionProcessor()
+    let advanceToEndProcessor = AdvanceToEndProcessor()
     let endRangeProcessor = EndRangeProcessor()
     let lidProcessor = LidProcessor()
     let synTypeProcessor = SynTypeProcessor()

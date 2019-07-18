@@ -34,6 +34,13 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Tuple 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Const 01 - Unit``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Typed 01 - Simple``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - Record 01 - Single Line``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record 02 - Multiline``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record 03 - Multiline, semicolons``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record 04 - Empty``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record 05 - Single Line with end semicolon``() = x.DoNamedTest()
+
     [<Test>] member x.``Expr - While 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - CompExpr 01 - Return``() = x.DoNamedTest()
 
