@@ -47,8 +47,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override FSharpSymbol GetFSharpSymbol()
     {
       var symbolUse = GetSymbolUse();
-      var field = symbolUse?.Symbol as FSharpField;
-      return field?.DeclaringEntity?.Value;
+      if (symbolUse?.Symbol is FSharpField field)
+        return field.DeclaringEntity?.Value;
+
+      // todo: cover other contexts
+      var binding = BindingNavigator.GetByExpression(RecordExpr.IgnoreParentParens());
+      if (binding == null || !(binding.HeadPattern is INamedPat namedPat))
+        return null;
+
+      var mfv = namedPat.GetFSharpSymbol() as FSharpMemberOrFunctionOrValue;
+      var fsType = mfv?.FullType;
+      if (fsType == null || !fsType.HasTypeDefinition)
+        return null;
+
+      var entity = fsType.TypeDefinition;
+      return entity.IsFSharpRecord ? entity : null;
     }
 
     public override string GetName() =>

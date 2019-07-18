@@ -563,5 +563,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
           return EmptyArray<string>.Instance;
       }
     }
+
+    public static ISynExpr IgnoreParentParens([NotNull] this ISynExpr synExpr)
+    {
+      while (synExpr.Parent is IParenExpr parenExpr)
+        synExpr = parenExpr;
+      return synExpr;
+    }
   }
 }
