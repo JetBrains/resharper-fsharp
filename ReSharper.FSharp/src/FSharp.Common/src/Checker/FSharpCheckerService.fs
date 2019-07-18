@@ -57,7 +57,7 @@ type FSharpCheckerService
             let parseResults = x.Checker.ParseFile(path.FullPath, source, parsingOptions).RunAsTask() 
             Some parseResults
         with
-        | :? OperationCanceledException -> reraise()
+        | OperationCanceled -> reraise()
         | exn ->
             Util.Logging.Logger.LogException(exn)
             logger.Warn(sprintf "Parse file error, parsing options: %A" parsingOptions)

@@ -250,7 +250,7 @@ type FSharpScriptOptionsProvider(logger: ILogger, checkerService: FSharpCheckerS
             let options = x.FixScriptOptions(options)
             Some options
         with
-        | :? OperationCanceledException -> reraise()
+        | OperationCanceled -> reraise()
         | exn ->
             logger.Warn("Error while getting script options for {0}: {1}", filePath, exn.Message)
             logger.LogExceptionSilently(exn)

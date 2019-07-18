@@ -16,6 +16,7 @@ module rec CommonUtil =
     open JetBrains.Lifetimes
     open JetBrains.Util
     open JetBrains.Util.dataStructures.TypedIntrinsics
+    open JetBrains.Util.Threading
 
     let ensureAbsolute (path: FileSystemPath) (projectDirectory: FileSystemPath) =
         match path.AsRelative() with
@@ -101,6 +102,9 @@ module rec CommonUtil =
         | _ -> UnknownProjectItem
 
     let (|AsList|) seq = List.ofSeq seq
+
+    let (|OperationCanceled|_|) (exn: Exception) =
+        if exn.IsOperationCanceled() then someUnit else None
 
     let equalsIgnoreCase other (string: string) =
         string.Equals(other, StringComparison.OrdinalIgnoreCase)
