@@ -394,7 +394,15 @@ typedExpr options { stubBase="DummyExpression"; }:
   synType<TYPE, Type>;
 
 tupleExpr options { stubBase="DummyExpression"; }:
-  STRUCT<STRUCT, StructKeyword>?
+  (
+    LPAREN
+    STRUCT<STRUCT, StructKeyword>
+  )?
+  synExpr<EXPR, Expressions>
+  (
+    synExpr<EXPR, Expressions>
+    COMMA
+  )*
   fakeSeparator;
 
 anonRecdExpr options { stubBase="DummyExpression"; }:

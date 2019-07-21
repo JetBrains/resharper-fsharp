@@ -19,3 +19,7 @@ let getCompilationMappingFlag (attrsOwner: IAttributesOwner) =
 [<Extension; CompiledName("IsFSharpField")>]
 let isFSharpField (property: IProperty) =
     getCompilationMappingFlag property = SourceConstructFlags.Field
+
+[<Extension; CompiledName("IsUnionCase")>]
+let isUnionCase (property: IAttributesOwner) =
+    getCompilationMappingFlag property = SourceConstructFlags.UnionCase

@@ -18,10 +18,13 @@ let compilationMappingAttrTypeName = clrTypeName "Microsoft.FSharp.Core.Compilat
 let fsListTypeName = clrTypeName "Microsoft.FSharp.Collections.FSharpList`1"
 
 [<CompiledName("FSharpOptionTypeName")>]
-let fsOptionTypeName = clrTypeName "Microsoft.FSharp.Collections.FSharpOption`1"
+let fsOptionTypeName = clrTypeName "Microsoft.FSharp.Core.FSharpOption`1"
+
+[<CompiledName("FSharpValueOptionTypeName")>]
+let fsValueOptionTypeName = clrTypeName "Microsoft.FSharp.Core.FSharpValueOption`1"
 
 [<CompiledName("FSharpRefTypeName")>]
-let fsRefTypeName = clrTypeName "Microsoft.FSharp.Collections.FSharpRef`1"
+let fsRefTypeName = clrTypeName "Microsoft.FSharp.Core.FSharpRef`1"
 
 [<CompiledName("FSharpResultTypeName")>]
 let fsResultTypeName = clrTypeName "Microsoft.FSharp.Core.FSharpResult`2"

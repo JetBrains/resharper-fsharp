@@ -570,5 +570,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         synExpr = parenExpr;
       return synExpr;
     }
+    
+    public static ISynPat IgnoreParentParens([NotNull] this ISynPat synPat)
+    {
+      while (synPat.Parent is IParenPat parenPat)
+        synPat = parenPat;
+      return synPat;
+    }
   }
 }

@@ -12,8 +12,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerat
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
-open JetBrains.ReSharper.Psi.Naming.Extentions
-open JetBrains.ReSharper.Psi.Naming.Impl
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Refactorings.Rename
 open JetBrains.ReSharper.Refactorings.Rename.Pages
@@ -68,7 +66,7 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
 
     override x.IsLanguageSupported = true
 
-    override x.IsCheckResolvedTo(newReference, newDeclaredElement) =
+    override x.IsCheckResolvedTo(_, newDeclaredElement) =
         // We have to change the reference so it resolves to the new element.
         // We don't, however, want to actually resolve it and to wait for FCS to type check all the needed projects
         // so assume it's resolved as a workaround.
@@ -110,7 +108,7 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
     override x.GetOptionsModel(declaredElement, reference, lifetime) =
         FSharpCustomRenameModel(declaredElement, reference, lifetime, (* todo *) ChangeNameKind.SourceName) :> _
 
-    override x.IsValidName(decl: IDeclaration, elementType: DeclaredElementType, name: string) =
+    override x.IsValidName(decl: IDeclaration, _: DeclaredElementType, name: string) =
         namingService.IsValidName(decl.DeclaredElement, name)
 
     override x.GetInitialPage(workflow) =
@@ -140,43 +138,7 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
 
     override x.AddExtraNames(namesCollection, declaredElement) =
         match declaredElement with
-        | :? IDeclarationPat as declarationPat ->
-            let pat = declarationPat :> ISynPat
-            match declarationPat.Parent with
-            | :? IBinding as binding when binding.HeadPattern == pat ->
-                match binding.Expression with
-                | null -> ()
-                | expr -> namesCollection.Add(expr, EntryOptions())
-
-            | :? IMatchClause as matchClause when matchClause.Pattern == pat ->
-                match MatchExprNavigator.GetByClause(matchClause) with
-                | null -> ()
-                | matchExpr ->
-
-                match matchExpr.Expression with
-                | null -> ()
-                | expr -> namesCollection.Add(expr, EntryOptions())
-
-            | :? ILetOrUseBangExpr as letOrUseBangExpr when letOrUseBangExpr.Pattern == pat ->
-                match letOrUseBangExpr.Expression with
-                | null -> ()
-                | expr -> namesCollection.Add(expr, EntryOptions())
-
-            | :? IForEachExpr as forEachExpr when forEachExpr.Pattern == pat ->
-                match forEachExpr.InExpression with
-                | null -> ()
-                | expr ->
-
-                let naming = declaredElement.GetPsiServices().Naming
-                let collection =
-                    naming.Suggestion.CreateEmptyCollection(
-                        PluralityKinds.Single, declaredElement.PresentationLanguage, namesCollection.PolicyProvider)
-
-                collection.Add(expr, EntryOptions(PluralityKinds.Plural))
-                for nameRoot in collection.GetRoots() do
-                    namesCollection.Add(nameRoot, EntryOptions())
-
-            | _ -> ()
+        | :? IDeclarationPat as pat -> namingService.AddExtraNames(namesCollection, pat)
         | _ -> ()
 
 type FSharpNameValidationRule(property, element: IDeclaredElement, namingService: FSharpNamingService) as this =
@@ -219,7 +181,7 @@ type FSharpAtomicRenamesFactory() =
 [<RenamePart>]
 type FSharpDeclaredElementForRenameProvider() =
     interface IPrimaryDeclaredElementForRenameProvider with
-        member x.GetPrimaryDeclaredElement(element, reference) =
+        member x.GetPrimaryDeclaredElement(element, _) =
             match element.As<IFSharpGeneratedFromOtherElement>() with
             | null -> element
             | generated ->

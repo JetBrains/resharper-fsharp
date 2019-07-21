@@ -4,6 +4,7 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Util.PsiUtil
 open FSharp.Compiler.Range
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -13,6 +14,7 @@ open JetBrains.ReSharper.Psi.Files
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.TextControl
+open JetBrains.Util.Text
 
 type IFile with
     member x.AsFSharpFile() =
@@ -76,6 +78,12 @@ let (|TokenType|_|) tokenType (treeNode: ITreeNode) =
 let (|Whitespace|_|) (treeNode: ITreeNode) =
     if isNotNull treeNode && treeNode.GetTokenType() == FSharpTokenType.WHITESPACE then Some treeNode else None
 
+let (|IgnoreParenPat|) (pat: ISynPat) = pat.IgnoreParentParens()
+
+let (|IgnoreInnerParenExpr|) (expr: ISynExpr) =
+    match expr with
+    | :? IParenExpr as parenExpr -> parenExpr.InnerExpression
+    | _ -> expr
 
 [<AutoOpen>]
 module PsiModificationUtil =

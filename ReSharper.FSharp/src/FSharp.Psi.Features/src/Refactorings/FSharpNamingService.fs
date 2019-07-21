@@ -2,16 +2,48 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
 
 open System
 open FSharp.Compiler.SourceCodeServices
+open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Psi.Naming.Extentions
 open JetBrains.ReSharper.Psi.Naming.Impl
 open JetBrains.ReSharper.Psi.Naming.Interfaces
 open JetBrains.Util
+
+[<AutoOpen>]
+module Traverse =
+    type TraverseStep =
+        | TupleItem of item: int
+
+    let makeTuplePatPath pat =
+        let rec tryMakePatPath path (IgnoreParenPat pat: ISynPat) =
+            match pat.Parent with
+            | :? ITuplePat as tuplePat ->
+                let item = tuplePat.Patterns.IndexOf(pat)
+                Assertion.Assert(item <> -1, "item <> -1")
+                tryMakePatPath (TupleItem(item) :: path) tuplePat
+            | _ -> pat, path
+
+        tryMakePatPath [] pat
+
+    let rec tryTraverseExprPath (path: TraverseStep list) (IgnoreInnerParenExpr expr: ISynExpr) =
+        match path with
+        | [] -> expr
+        | step :: rest ->
+
+        match expr, step with
+        | :? ITupleExpr as tupleExpr, TupleItem(n) ->
+            let tupleItems = tupleExpr.Expressions
+            if tupleItems.Count <= n then null else
+            tryTraverseExprPath rest tupleItems.[n]
+
+        | _ -> null
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpNamingService(language: FSharpLanguage) =
@@ -47,6 +79,12 @@ type FSharpNamingService(language: FSharpLanguage) =
 
     let isFSharpTypeLike (element: IDeclaredElement) =
         element :? ITypeElement && startsWith "FSharp" element.ShortName
+
+    let addSingleParamSuggestions =
+        [| "Some", fsOptionTypeName
+           "ValueSome", fsValueOptionTypeName
+           "Ok", fsResultTypeName |]
+        |> dict
 
     override x.MangleNameIfNecessary(name, _) =
         Keywords.QuoteIdentifierIfNeeded name
@@ -149,3 +187,70 @@ type FSharpNamingService(language: FSharpLanguage) =
             x.SuggestRoots(longIdentifier.IdentifierToken, useExpectedTypes, policyProvider)
 
         | _ -> EmptyList.Instance :> _
+
+    member x.AddExtraNames(namesCollection: INamesCollection, pat: ISynPat) =
+        let pat, path = makeTuplePatPath pat
+
+        let entryOptions =
+            EntryOptions(subrootPolicy = SubrootPolicy.Decompose, emphasis = Emphasis.Good)
+
+        let addNamesForExpr expr =
+            match tryTraverseExprPath path expr with
+            | null -> ()
+            | expr -> namesCollection.Add(expr, entryOptions)
+
+        match pat.Parent with
+        | :? IBinding as binding when binding.HeadPattern == pat ->
+            match binding.Expression with
+            | null -> ()
+            | expr -> addNamesForExpr expr
+
+        | :? IMatchClause as matchClause when matchClause.Pattern == pat ->
+            match MatchExprNavigator.GetByClause(matchClause) with
+            | null -> ()
+            | matchExpr ->
+
+            match matchExpr.Expression with
+            | null -> ()
+            | expr -> addNamesForExpr expr
+
+        | :? ILetOrUseBangExpr as letOrUseBangExpr when letOrUseBangExpr.Pattern == pat ->
+            match letOrUseBangExpr.Expression with
+            | null -> ()
+            | expr -> addNamesForExpr expr
+
+        | :? IForEachExpr as forEachExpr when forEachExpr.Pattern == pat ->
+            match forEachExpr.InExpression with
+            | null -> ()
+            | expr ->
+
+            let naming = pat.GetPsiServices().Naming
+            let collection =
+                naming.Suggestion.CreateEmptyCollection(
+                    PluralityKinds.Unknown, pat.Language, namesCollection.PolicyProvider)
+
+            collection.Add(expr, entryOptions)
+            for nameRoot in collection.GetRoots() do
+                let single = NamingUtil.PluralToSingle(nameRoot)
+                if isNotNull single then
+                    addNamesForExpr expr
+
+        | _ -> ()
+
+        match pat with
+        | :? INamedPat as namedPat ->
+            let longIdentPat = LongIdentPatNavigator.GetByParameter(namedPat.IgnoreParentParens())
+            if isNull longIdentPat || longIdentPat.Parameters.Count <> 1 then () else
+
+            let typeName = addSingleParamSuggestions.TryGetValue(longIdentPat.SourceName)
+            if isNull typeName then () else
+
+            let reference = longIdentPat.NameIdentifier.GetFirstClassReferences().FirstOrDefault()
+            if isNull reference then () else
+
+            let declaredElement = reference.Resolve().DeclaredElement.As<IAttributesOwner>()
+            if isNull declaredElement || not (isUnionCase declaredElement) then () else
+            if declaredElement.GetContainingType().GetClrName() <> typeName then () else 
+
+            x.AddExtraNames(namesCollection, longIdentPat)            
+        | _ -> ()
