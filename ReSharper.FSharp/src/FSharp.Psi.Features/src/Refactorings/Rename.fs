@@ -138,8 +138,14 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
 
     override x.AddExtraNames(namesCollection, declaredElement) =
         match declaredElement with
-        | :? IDeclarationPat as pat -> namingService.AddExtraNames(namesCollection, pat)
-        | _ -> ()
+        | :? INamespace
+        | :? ITypeElement -> ()
+        | _ ->
+
+        for declaration in declaredElement.GetDeclarations() do
+            match declaration with
+            | :? IDeclarationPat as pat -> namingService.AddExtraNames(namesCollection, pat)
+            | _ -> ()
 
 type FSharpNameValidationRule(property, element: IDeclaredElement, namingService: FSharpNamingService) as this =
     inherit SimpleValidationRuleOnProperty<string>(property, element.GetSolution().Locks)
