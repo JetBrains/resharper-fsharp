@@ -188,8 +188,8 @@ type FSharpNamingService(language: FSharpLanguage) =
 
         | _ -> EmptyList.Instance :> _
 
-    member x.AddExtraNames(namesCollection: INamesCollection, pat: ISynPat) =
-        let pat, path = makeTuplePatPath pat
+    member x.AddExtraNames(namesCollection: INamesCollection, declaredElementPat: ISynPat) =
+        let pat, path = makeTuplePatPath declaredElementPat
 
         let entryOptions =
             EntryOptions(subrootPolicy = SubrootPolicy.Decompose, emphasis = Emphasis.Good)
@@ -227,17 +227,17 @@ type FSharpNamingService(language: FSharpLanguage) =
             let naming = pat.GetPsiServices().Naming
             let collection =
                 naming.Suggestion.CreateEmptyCollection(
-                    PluralityKinds.Unknown, pat.Language, namesCollection.PolicyProvider)
+                    PluralityKinds.Plural, pat.Language, namesCollection.PolicyProvider)
 
             collection.Add(expr, entryOptions)
             for nameRoot in collection.GetRoots() do
-                let single = NamingUtil.PluralToSingle(nameRoot)
+                let single = NamingUtil.TryPluralToSingle(nameRoot)
                 if isNotNull single then
-                    addNamesForExpr expr
+                    namesCollection.Add(single, entryOptions)
 
         | _ -> ()
 
-        match pat with
+        match declaredElementPat with
         | :? INamedPat as namedPat ->
             let longIdentPat = LongIdentPatNavigator.GetByParameter(namedPat.IgnoreParentParens())
             if isNull longIdentPat || longIdentPat.Parameters.Count <> 1 then () else

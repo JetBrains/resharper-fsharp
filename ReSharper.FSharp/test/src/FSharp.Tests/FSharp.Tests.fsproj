@@ -37,6 +37,7 @@
     <Compile Include="QuickFixes\AddIgnoreTest.fs" />
     <Compile Include="QuickFixes\RemoveUnusedNamedAsPatTest.fs" />
     <Compile Include="FSharpElementFactoryTest.fs" />
+    <Compile Include="FSharpNamingTest.fs" />
   </ItemGroup>
 
   <ItemGroup>
