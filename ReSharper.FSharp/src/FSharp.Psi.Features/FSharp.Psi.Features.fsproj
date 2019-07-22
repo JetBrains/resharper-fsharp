@@ -44,13 +44,13 @@
     <Compile Include="src\Daemon\UsageChecking\FSharpUsageCheckingService.fs" />
     <Compile Include="src\Daemon\Analyzers\ReSpellerHelper.fs" />
     <Compile Include="src\Daemon\Analyzers\StringProblemsAnalyzer.fs" />
-      <Compile Include="src\Daemon\Analyzers\AttributeTargetAnalyzer.fs" />
-      <Compile Include="src\Daemon\QuickFixes\RemoveUnusedOpensFix.fs" />
-      <Compile Include="src\Daemon\QuickFixes\ReplaceUseWithLetFix.fs" />
-      <Compile Include="src\Daemon\QuickFixes\RemoveUnusedSelfIdVariableFix.fs" />
-      <Compile Include="src\Daemon\QuickFixes\RemoveUnusedNamedAsPatFix.fs" />
-      <Compile Include="src\Daemon\QuickFixes\ReplaceWithWildPatFix.fs" />
-      <Compile Include="src\Daemon\QuickFixes\AddIgnoreFix.fs" />
+    <Compile Include="src\Daemon\Analyzers\AttributeTargetAnalyzer.fs" />
+    <Compile Include="src\Daemon\QuickFixes\RemoveUnusedOpensFix.fs" />
+    <Compile Include="src\Daemon\QuickFixes\ReplaceUseWithLetFix.fs" />
+    <Compile Include="src\Daemon\QuickFixes\RemoveUnusedSelfIdVariableFix.fs" />
+    <Compile Include="src\Daemon\QuickFixes\RemoveUnusedNamedAsPatFix.fs" />
+    <Compile Include="src\Daemon\QuickFixes\ReplaceWithWildPatFix.fs" />
+    <Compile Include="src\Daemon\QuickFixes\AddIgnoreFix.fs" />
     <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
       <Mode>QUICKFIX</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>
@@ -88,6 +88,7 @@
     <Compile Include="src\Parsing\FSharpParser.fs" />
     <Compile Include="src\Refactorings\FSharpNamingService.fs" />
     <Compile Include="src\Refactorings\Rename.fs" />
+    <Compile Include="src\Intentions\DataProviders.fs" />
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />
     <Compile Include="src\LanguageService\FSharpDeclaredElementIconProvider.fs" />
     <Compile Include="src\LanguageService\FSharpPsiProperties.fs" />
@@ -99,6 +100,7 @@
     <Compile Include="src\FSharpTypingAssist.fs" />
     <Compile Include="src\ZoneMarker.fs" />
   </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="$(FSharpCoreVersion)" />
     <PackageReference Include="JetBrains.Fantomas" Version="$(FantomasVersion)" />
@@ -106,11 +108,13 @@
     <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
     <PackageReference Include="System.ValueTuple" Version="$(ValueTupleVersion)" />
   </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\Daemon.FSharp\Daemon.FSharp.csproj" />
     <ProjectReference Include="..\FSharp.Psi\FSharp.Psi.csproj" />
     <ProjectReference Include="..\Services.FSharp\Services.FSharp.csproj" />
   </ItemGroup>
+
   <ItemGroup>
     <Reference Include="PresentationFramework" />
     <Reference Include="System.Web" />
