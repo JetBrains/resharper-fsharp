@@ -86,9 +86,9 @@ type FSharpProjectScopeProvider() =
 
 [<ShellComponent>]
 type FSharpFileScopeProvider() =
-    inherit ScopeProvider()
+    inherit FSharpScopeProviderBase()
 
-    member x.TryCreate(typeName) = base.TryToCreate<InFSharpFile>(typeName)
+    override x.TryCreate(typeName) = base.TryToCreate<InFSharpFile>(typeName)
 
     override x.ProvideScopePoints(context: TemplateAcceptanceContext) =
         match context.SourceFile with
