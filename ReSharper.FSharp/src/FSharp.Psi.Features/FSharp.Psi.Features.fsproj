@@ -90,6 +90,7 @@
     <Compile Include="src\Refactorings\Rename.fs" />
     <Compile Include="src\Intentions\DataProviders.fs" />
     <Compile Include="src\Intentions\ToRecursiveLetBindings.fs" />
+    <Compile Include="src\Intentions\ToMultilineRecord.fs" />
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />
     <Compile Include="src\LanguageService\FSharpDeclaredElementIconProvider.fs" />
     <Compile Include="src\LanguageService\FSharpPsiProperties.fs" />

@@ -57,6 +57,13 @@ type IFSharpTreeNode with
     member x.FSharpLanguageService =
         x.Language.LanguageService().As<IFSharpLanguageService>()
 
+    member x.CreateElementFactory() =
+        x.FSharpLanguageService.CreateElementFactory(x.GetPsiModule())
+
+    member x.GetLineEnding() =
+        let fsFile = x.FSharpFile
+        fsFile.DetectLineEnding(fsFile.GetPsiServices()).GetPresentation()
+
 type FSharpLanguage with
     member x.FSharpLanguageService =
         x.LanguageService().As<IFSharpLanguageService>()        
@@ -66,6 +73,27 @@ type ITreeNode with
         member x.IsChildOf(node: ITreeNode) =
             if isNull node then false else node.Contains(x)
 
+        member x.GetIndent(document: IDocument) =
+            let startOffset = x.GetDocumentStartOffset().Offset
+            let startCoords = document.GetCoordsByOffset(startOffset)
+            startOffset - document.GetLineStartOffset(startCoords.Line)
+
+        member x.Indent =
+            let document = x.GetSourceFile().Document
+            x.GetIndent(document)
+
+        member x.GetStartLine(document: IDocument) =
+            document.GetCoordsByOffset(x.GetDocumentStartOffset().Offset).Line
+
+        member x.GetEndLine(document: IDocument) =
+            document.GetCoordsByOffset(x.GetDocumentEndOffset().Offset).Line
+        
+        member x.StartLine = x.GetStartLine(x.GetSourceFile().Document)
+        member x.EndLine = x.GetEndLine(x.GetSourceFile().Document)
+
+        member x.IsSingleLine =
+            let document = x.GetSourceFile().Document
+            x.GetStartLine(document) = x.GetEndLine(document)
 
 let getNode<'T when 'T :> ITreeNode and 'T : null> (fsFile: IFSharpFile) (range: DocumentRange) =
     let node = fsFile.GetNode<'T>(range)
