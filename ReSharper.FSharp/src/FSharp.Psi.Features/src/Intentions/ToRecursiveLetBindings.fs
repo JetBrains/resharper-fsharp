@@ -12,7 +12,7 @@ type ToRecursiveLetBindings(dataProvider: FSharpContextActionDataProvider) =
 
     override x.IsAvailable _ =
         let letBindings = dataProvider.GetSelectedElement<ILetBindings>()
-        if letBindings.IsRecursive then false else
+        if isNull letBindings || letBindings.IsRecursive then false else
 
         let letToken = letBindings.LetOrUseToken
         if isNull letToken then false else

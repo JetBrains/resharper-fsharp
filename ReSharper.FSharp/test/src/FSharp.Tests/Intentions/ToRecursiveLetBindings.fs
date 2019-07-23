@@ -29,3 +29,5 @@ type ToRecursiveLetBindingsAvailabilityTest() =
 
     [<Test>] member x.``Expression - Name 01``() = x.DoNamedTest()
     [<Test>] member x.``Expression - Keyword 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Not available``() = x.DoNamedTest()
