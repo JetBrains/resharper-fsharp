@@ -28,21 +28,26 @@ type KeywordSuffix =
 type FSharpKeywordsProvider() =
     inherit FSharpItemsProviderBase()
 
-    let hashDirectives =
-        [ KeywordSuffix.Quotes, ["#load"; "#r"; "#I"; "#nowarn"; "#time"]
-          KeywordSuffix.None, ["#if"; "#else"; "#endif"] ]
-        |> List.map (fun (suffix, directives) ->
-            directives |> List.map (fun d -> FSharpHashDirectiveLookupItem(d, suffix) :> TextLookupItemBase))
-        |> List.concat
+    let lookupItems =
+        lazy
+            let hashDirectives =
+                [| KeywordSuffix.Quotes, [| "#load"; "#r"; "#I"; "#nowarn"; "#time" |]
+                   KeywordSuffix.None, [| "#if"; "#else"; "#endif" |] |]
+                |> Array.map (fun (suffix, directives) ->
+                    directives |> Array.map (fun d -> FSharpHashDirectiveLookupItem(d, suffix) :> TextLookupItemBase))
+                |> Array.concat
 
-    let keywords =
-        Keywords.KeywordsWithDescription
-        // todo: implement auto-popup completion strategy that will cover operators
-        |> List.filter (fun (keyword, _) -> not (PrettyNaming.IsOperatorName keyword))
-        |> List.map (fun (keyword, description) ->
-            FSharpKeywordLookupItem(keyword, description, KeywordSuffix.None) :> TextLookupItemBase)
+            let keywords =
+                Keywords.KeywordsWithDescription
+                // todo: implement auto-popup completion strategy that will cover operators
+                |> List.filter (fun (keyword, _) -> not (PrettyNaming.IsOperatorName keyword))
+                |> List.map (fun (keyword, description) ->
+                    FSharpKeywordLookupItem(keyword, description, KeywordSuffix.None) :> TextLookupItemBase)
+                |> Array.ofList
 
-    let lookupItems = hashDirectives @ keywords
+            Array.append keywords hashDirectives
+
+    member x.LookupItems = lookupItems.Value
 
     override x.IsAvailable(_) = true
 
@@ -64,7 +69,7 @@ type FSharpKeywordsProvider() =
 
         if not context.PartialLongName.QualifyingIdents.IsEmpty then false else
 
-        for item in lookupItems do
+        for item in x.LookupItems do
             item.InitializeRanges(context.Ranges, context.BasicContext)
             collector.Add(item)
 
