@@ -25,7 +25,7 @@ open Moq
 
 type Assert = NUnit.Framework.Assert
 type TestAttribute = NUnit.Framework.TestAttribute
-type IgnoreAttribute = NUnit.Framework.IgnoreAttribute
+type ExplicitAttribute = NUnit.Framework.ExplicitAttribute
 type TestFixtureAttribute = NUnit.Framework.TestFixtureAttribute
 
 let projectDirectory = FileSystemPath.Parse(@"C:\Solution\Project")
@@ -689,7 +689,7 @@ type FSharpItemsContainerTest() =
               createItem "Compile" "Folder[1]/SubFolder[2]/File6"
               createItem "Compile" "File7" ])
 
-    [<Test; Ignore("Not implemented")>]
+    [<Test; Explicit("Not implemented")>]
     member x.``Create modification context 06 - CompileBefore``() =
         x.DoCreateModificationContextTest(
             [ createItem "Compile"       "Folder[1]/File3"

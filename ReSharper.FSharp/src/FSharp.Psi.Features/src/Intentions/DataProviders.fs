@@ -4,8 +4,8 @@ open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
-type FSharpContextActionDataProvider(solution, textControl, file) =
-    inherit CachedContextActionDataProviderBase<IFSharpFile>(solution, textControl, file)
+type FSharpContextActionDataProvider(solution, textControl, fsFile) =
+    inherit CachedContextActionDataProviderBase<IFSharpFile>(solution, textControl, fsFile)
 
 
 [<ContextActionDataBuilder(typeof<FSharpContextActionDataProvider>)>]

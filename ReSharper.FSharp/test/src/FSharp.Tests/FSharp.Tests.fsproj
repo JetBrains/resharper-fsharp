@@ -36,6 +36,8 @@
     <Compile Include="QuickFixes\ReplaceWithWildPatTest.fs" />
     <Compile Include="QuickFixes\AddIgnoreTest.fs" />
     <Compile Include="QuickFixes\RemoveUnusedNamedAsPatTest.fs" />
+    <Compile Include="Intentions\IntentionsTestBase.fs" />
+    <Compile Include="Intentions\ToRecursiveLetBindings.fs" />
     <Compile Include="FSharpElementFactoryTest.fs" />
     <Compile Include="FSharpNamingTest.fs" />
   </ItemGroup>

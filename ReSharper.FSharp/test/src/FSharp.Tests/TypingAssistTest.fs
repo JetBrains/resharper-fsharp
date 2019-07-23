@@ -254,7 +254,7 @@ type FSharpTypingAssistTest() =
 
     [<Test>] member x.``Backticks 02 - Insert 01``() = x.DoNamedTest()
 
-    [<Test; Ignore(reason = "Is `` erased in test?")>]
+    [<Test; Explicit(reason = "Is `` erased in test?")>]
     member x.``Backticks 03 - Insert 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Backticks 04 - Skip``() = x.DoNamedTest()

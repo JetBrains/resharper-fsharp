@@ -17,8 +17,10 @@ using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Naming;
+using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
@@ -492,6 +494,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         LowLevelModificationUtil.ReplaceChildRange(token, token, new FSharpIdentifierToken(name));
     }
 
+    public static void AddModifierToken([NotNull] this ITreeNode anchor, [NotNull] TokenNodeType tokenType)
+    {
+      anchor =
+        anchor.NextSibling is Whitespace space
+          ? ModificationUtil.ReplaceChild(space, new Whitespace())
+          : ModificationUtil.AddChildAfter(anchor, new Whitespace());
+
+      var addSpaceAfter = anchor.NextSibling?.GetTokenType() != FSharpTokenType.NEW_LINE;
+
+      anchor = ModificationUtil.AddChildAfter(anchor, tokenType.CreateLeafElement());
+      if (addSpaceAfter)
+        ModificationUtil.AddChildAfter(anchor, new Whitespace());
+    }
+    
     public static IList<ITypeElement> ToTypeElements(this IList<IClrTypeName> names, IPsiModule psiModule)
     {
       var result = new List<ITypeElement>(names.Count);
