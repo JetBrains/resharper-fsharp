@@ -10,13 +10,29 @@ open JetBrains.Util
 type FSharpTodoContentsProvider() =
     inherit DefaultTodoContentsProvider()
 
+    let startsWith string range (text: string) =
+        text.RangeStartsWith(range, string, StringComparison.Ordinal)
+
+    let endsWith string range (text: string) =
+        text.RangeEndsWith(range, string, StringComparison.Ordinal)
+
     override x.GetTokenContentsRange(text, range, tokenType) =
-        if not tokenType.IsComment then Nullable() else
+        if tokenType.IsComment then
+            if startsWith "///" range text then Nullable(range.TrimLeft(3)) else
+            if startsWith "//" range text then Nullable(range.TrimLeft(2)) else
+            if startsWith "(*" range text then
+                if endsWith "*)" range text then
+                    Nullable(range.TrimLeft(2).TrimRight(2))
+                else
+                    Nullable(range.Left(2))
+            else
+                Nullable()
 
-        if text.RangeStartsWith(range, "///", StringComparison.Ordinal) then Nullable(range.TrimLeft(3)) else
-        if text.RangeStartsWith(range, "//", StringComparison.Ordinal) then Nullable(range.TrimLeft(2)) else
-        if text.RangeStartsWith(range, "(*", StringComparison.Ordinal) then
-            if text.RangeEndsWith(range, "*)", StringComparison.Ordinal) then Nullable(range.TrimLeft(2).TrimRight(2))
-            else Nullable(range.Left(2))
+        elif tokenType.IsIdentifier then
+            if startsWith "``" range text && endsWith "``" range text then
+                Nullable(range.TrimLeft(2).TrimRight(2))
+            else
+                Nullable(range)
 
-        else Nullable()
+        else
+            Nullable()

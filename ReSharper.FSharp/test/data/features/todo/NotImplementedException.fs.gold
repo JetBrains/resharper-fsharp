@@ -1,0 +1,10 @@
+﻿module Module
+
+open System
+
+raise (|NotImplementedException|(0)())
+
+---------------------------------------------------------
+(0): ReSharper Todo Item Edit: (T) '' (E) 'NotImplementedException'
+---------------------------------------------------------
+(0) Not implemented: "NotImplementedException" {@ Namespace  }
