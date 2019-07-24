@@ -8,20 +8,8 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
-[<Language(typeof<FSharpLanguage>)>]
-type FSharpPostfixTemplateContextFactory() =
-    interface IPostfixTemplateContextFactory with
-        member x.GetReparseStrings() = EmptyArray.Instance
-
-        member x.TryCreate(treeNode, executionContext) =
-            FSharpPostfixTemplateContext(treeNode, executionContext) :> _
-
-
-and FSharpPostfixExpressionContext(postfixContext, expression) =
-    inherit PostfixExpressionContext(postfixContext, expression)
-
-
-and FSharpPostfixTemplateContext(treeNode: ITreeNode, executionContext: PostfixTemplateExecutionContext) as this =
+[<AllowNullLiteral>]
+type FSharpPostfixTemplateContext(treeNode: ITreeNode, executionContext: PostfixTemplateExecutionContext) as this =
     inherit PostfixTemplateContext(treeNode, executionContext)
 
     override x.Language = FSharpLanguage.Instance :> _
@@ -30,7 +18,21 @@ and FSharpPostfixTemplateContext(treeNode: ITreeNode, executionContext: PostfixT
         [| FSharpPostfixExpressionContext(this, treeNode) :> PostfixExpressionContext |] :> _
 
 
-[<Language(typeof<FSharpLanguage>)>]
+and FSharpPostfixExpressionContext(postfixContext, expression) =
+    inherit PostfixExpressionContext(postfixContext, expression)
+
+
+//[<Language(typeof<FSharpLanguage>)>]
+type FSharpPostfixTemplateContextFactory() =
+    interface IPostfixTemplateContextFactory with
+        member x.GetReparseStrings() = EmptyArray.Instance
+
+        member x.TryCreate(treeNode, executionContext) =
+            if isNull treeNode then null else
+            FSharpPostfixTemplateContext(treeNode, executionContext) :> _
+
+
+//[<Language(typeof<FSharpLanguage>)>]
 type FSharpPostfixTemplatesProvider(templatesManager, sessionExecutor, usageStatistics) =
     inherit PostfixTemplatesItemProviderBase<FSharpCodeCompletionContext, FSharpPostfixTemplateContext>(
         templatesManager, sessionExecutor, usageStatistics)
@@ -40,4 +42,6 @@ type FSharpPostfixTemplatesProvider(templatesManager, sessionExecutor, usageStat
         let settings = context.ContextBoundSettingsStore
         let executionContext = PostfixTemplateExecutionContext(context.Solution, context.TextControl, settings, "__")
 
-        FSharpPostfixTemplateContext(fsCompletionContext.TokenBeforeCaret, executionContext)
+        match fsCompletionContext.TokenBeforeCaret with
+        | null -> null
+        | treeNode -> FSharpPostfixTemplateContext(treeNode, executionContext)
