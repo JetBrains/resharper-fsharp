@@ -83,18 +83,19 @@ type FSharpCodeStylePageSchema(lifetime, smartContext, itemViewModelFactory, con
 
     override x.Language = FSharpLanguage.Instance :> _
     override x.PageName = "Formatting Style"
+
     override x.Describe() =
-      Seq.ofList [ x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.WRAP_LIMIT)
-                   x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.INDENT_SIZE)
-                   x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.SemicolonAtEndOfLine)
-                   x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.SpaceBeforeArgument)
-                   x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.SpaceBeforeColon)
-                   x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.SpaceAfterComma)
-                   x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.SpaceAfterSemicolon)
-                   x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.IndentOnTryWith)
-                   x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.SpaceAroundDelimiter)
-                   x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.ReorderOpenDeclarations)
-                   x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.PreserveEndOfLine) ]
+      [| x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.WRAP_LIMIT)
+         x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.INDENT_SIZE)
+         x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.SemicolonAtEndOfLine)
+         x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.SpaceBeforeArgument)
+         x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.SpaceBeforeColon)
+         x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.SpaceAfterComma)
+         x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.SpaceAfterSemicolon)
+         x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.IndentOnTryWith)
+         x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.SpaceAroundDelimiter)
+         x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.ReorderOpenDeclarations)
+         x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.PreserveEndOfLine) |] :> _
 
 
 [<OptionsPage("FSharpCodeStylePage", "Formatting Style", typeof<PsiFeaturesUnsortedOptionsThemedIcons.Indent>)>]
