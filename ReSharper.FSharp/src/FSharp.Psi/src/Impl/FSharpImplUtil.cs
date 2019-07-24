@@ -587,8 +587,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return synExpr;
     }
     
-    public static ISynPat IgnoreParentParens([NotNull] this ISynPat synPat)
+    public static ISynPat IgnoreParentParens([CanBeNull] this ISynPat synPat)
     {
+      if (synPat == null)
+        return null;
+
       while (synPat.Parent is IParenPat parenPat)
         synPat = parenPat;
       return synPat;
