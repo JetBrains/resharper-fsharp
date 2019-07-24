@@ -61,7 +61,7 @@ type FSharpDummyCodeFormatter(fsLanguage: FSharpLanguage, formatterRequirements)
     override x.CreateSpace(_,_) = InvalidOperationException() |> raise
     override x.FormatInsertedNodes(_,_,_) = ()
     override x.FormatInsertedRange(_,_,_) = InvalidOperationException() |> raise 
-    override x.FormatReplacedRange(_,_,_) = InvalidOperationException() |> raise
+    override x.FormatReplacedRange(_,_,_) = ()
     override x.FormatDeletedNodes(_,_,_) = ()
     override x.FormatReplacedNode(_,_) = ()
     

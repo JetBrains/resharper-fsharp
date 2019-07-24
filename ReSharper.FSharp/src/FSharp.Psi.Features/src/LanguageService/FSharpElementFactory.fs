@@ -2,14 +2,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Modules
+open JetBrains.ReSharper.Psi.Naming
 open JetBrains.ReSharper.Resources.Shell
 
 type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IPsiModule) =
     let [<Literal>] moniker = "F# element factory"
+
+    let namingService = NamingManager.GetNamingLanguageService(FSharpLanguage.Instance)
 
     let createDocument source =
         let documentFactory = Shell.Instance.GetComponent<IInMemoryDocumentFactory>()
@@ -29,6 +33,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
     interface IFSharpElementFactory with
         member x.CreateOpenStatement(ns) =
+            // todo: mangle ns
             let source = "open " + ns
             let moduleDeclaration = getModuleDeclaration source
 
@@ -57,3 +62,15 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
             replace innerAppExpr.FunctionExpression expr
             outerAppExpr
+
+        member x.CreateRecordExprBinding(field, addSemicolon) =
+            let field = namingService.MangleNameIfNecessary(field)
+            let semicolon = if addSemicolon then ";" else ""
+
+            let source = sprintf """{ %s = failwith "todo"%s }""" field semicolon
+            let moduleDeclaration = getModuleDeclaration source
+
+            let doDecl = moduleDeclaration.Members.First().As<IDo>()
+            match doDecl.Expression.As<IRecordExpr>() with
+            | null -> failwith "Could not get record expr"
+            | recordExpr -> recordExpr.ExprBindings.First()

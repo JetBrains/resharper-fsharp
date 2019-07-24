@@ -51,6 +51,7 @@
     <Compile Include="src\Daemon\QuickFixes\RemoveUnusedNamedAsPatFix.fs" />
     <Compile Include="src\Daemon\QuickFixes\ReplaceWithWildPatFix.fs" />
     <Compile Include="src\Daemon\QuickFixes\AddIgnoreFix.fs" />
+    <Compile Include="src\Daemon\QuickFixes\GenerateMissingRecordFieldsFix.fs" />
     <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
       <Mode>QUICKFIX</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>

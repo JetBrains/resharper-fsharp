@@ -12,6 +12,7 @@ type IFSharpElementFactory =
     abstract CreateOpenStatement: ns: string -> IOpenStatement
     abstract CreateWildPat: unit -> IWildPat
     abstract CreateIgnoreApp: ISynExpr -> IAppExpr
+    abstract CreateRecordExprBinding: fieldName: string * addSemicolon: bool -> IRecordExprBinding
 
 
 [<AllowNullLiteral>]

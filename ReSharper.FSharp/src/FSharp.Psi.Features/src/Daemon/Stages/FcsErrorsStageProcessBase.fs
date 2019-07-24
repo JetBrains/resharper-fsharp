@@ -22,6 +22,8 @@ module FSharpErrors =
     let [<Literal>] ModuleOrNamespaceRequired = 222
     let [<Literal>] UnrecognizedOption = 243
     let [<Literal>] UseBindingsIllegalInImplicitClassConstructors = 523
+    let [<Literal>] FieldRequiresAssignment = 764
+    let [<Literal>] EmptyRecordInvalid = 789
     let [<Literal>] UseBindingsIllegalInModules = 524
     let [<Literal>] UnusedValue = 1182
     let [<Literal>] UnusedThisVariable = 1183
@@ -75,6 +77,12 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | UnusedThisVariable ->
             UnusedThisVariableWarning(getNode range) :> _
 
+        | FieldRequiresAssignment ->
+            FieldRequiresAssignmentError(getNode range, error.Message) :> _
+
+        | EmptyRecordInvalid ->
+            EmptyRecordInvalidError(getNode range, error.Message) :> _
+        
         | _ -> createGenericHighlighting error range
 
     abstract ShouldAddDiagnostic: error: FSharpErrorInfo * range: DocumentRange -> bool

@@ -65,9 +65,30 @@
     <Message value="{0}">
       <Argument>fcsMessage</Argument>
     </Message>
-    <Message value="Expecting unit type"/>
     <Range>expr.GetNavigationRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>AddIgnoreFix</QuickFix>
   </Warning>
+
+  <Error staticGroup="FSharpErrors" name="FieldRequiresAssignment">
+    <Parameter type="IRecordExpr" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.GetNavigationRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>GenerateMissingRecordFieldsFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="EmptyRecordInvalid">
+    <Parameter type="IRecordExpr" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.GetNavigationRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>GenerateMissingRecordFieldsFix</QuickFix>
+  </Error>
 </Errors>
