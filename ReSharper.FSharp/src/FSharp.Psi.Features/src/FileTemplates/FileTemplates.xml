@@ -12,6 +12,7 @@
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=9FF767E3D6E1E34FA3753A0A64D429AC/CustomProperties/=FileName/@EntryIndexedValue">Module</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=9FF767E3D6E1E34FA3753A0A64D429AC/CustomProperties/=ValidateFileName/@EntryIndexedValue">False</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=9FF767E3D6E1E34FA3753A0A64D429AC/Description/@EntryValue">Source file</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=9FF767E3D6E1E34FA3753A0A64D429AC/UITag/@EntryValue">File</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=9FF767E3D6E1E34FA3753A0A64D429AC/Image/@EntryValue">FSharp</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=9FF767E3D6E1E34FA3753A0A64D429AC/Field/=MODULE/@KeyIndexDefined">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=9FF767E3D6E1E34FA3753A0A64D429AC/Field/=MODULE/Expression/@EntryValue">getAlphaNumericFileNameWithoutExtension()</s:String>
@@ -40,6 +41,7 @@ $END$</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=D8A7E5F0B628DB4EA1A395B6B01B4F80/CustomProperties/=Extension/@EntryIndexedValue">fsi</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=D8A7E5F0B628DB4EA1A395B6B01B4F80/CustomProperties/=FileName/@EntryIndexedValue">Module</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=D8A7E5F0B628DB4EA1A395B6B01B4F80/CustomProperties/=ValidateFileName/@EntryIndexedValue">False</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=D8A7E5F0B628DB4EA1A395B6B01B4F80/UITag/@EntryValue">File</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=D8A7E5F0B628DB4EA1A395B6B01B4F80/Description/@EntryValue">Signature file</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=D8A7E5F0B628DB4EA1A395B6B01B4F80/Image/@EntryValue">FSharp</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=D8A7E5F0B628DB4EA1A395B6B01B4F80/Field/=MODULE/@KeyIndexDefined">True</s:Boolean>
@@ -68,6 +70,7 @@ $END$</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=81E2BE1BF581C545BBBC401EA5F92B89/CustomProperties/=Extension/@EntryIndexedValue">fsx</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=81E2BE1BF581C545BBBC401EA5F92B89/CustomProperties/=FileName/@EntryIndexedValue">Script</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=81E2BE1BF581C545BBBC401EA5F92B89/CustomProperties/=ValidateFileName/@EntryIndexedValue">False</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=81E2BE1BF581C545BBBC401EA5F92B89/UITag/@EntryValue">File</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=81E2BE1BF581C545BBBC401EA5F92B89/Description/@EntryValue">Script</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=81E2BE1BF581C545BBBC401EA5F92B89/Image/@EntryValue">FSharp</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=81E2BE1BF581C545BBBC401EA5F92B89/Reformat/@EntryValue">True</s:Boolean>
