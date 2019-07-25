@@ -151,13 +151,6 @@ type FSharpTypingAssist
         let sourceFile = document.GetPsiSourceFile(this.Solution).NotNull("psiSourceFile is null for {0}", document)
         sourceFile.GetFormatterSettings(sourceFile.PrimaryPsiLanguage).INDENT_SIZE
 
-    let getBaseIndentLine (document: IDocument) initialLine =
-        let mutable line = initialLine
-        while line > Line.O && document.GetLineText(line).IsWhitespace() do
-            line <- line - Line.I
-
-        if document.GetLineText(line).IsWhitespace() then initialLine else line
-
     let getOffsetInLine (document: IDocument) line offset =
         offset - document.GetLineStartOffset(line)
 
@@ -180,7 +173,7 @@ type FSharpTypingAssist
         while lexer.TokenType == FSharpTokenType.WHITESPACE do
             lexer.Advance() 
 
-        // Emtpy list with spaces, add the same space as before caret.
+        // Empty list with spaces, add the same space as before caret.
         if lexer.TokenStart >= offset then offset - leftBracketEndOffset - 1 else
 
         // Empty list with no spaces, no additional spaces should be added.
@@ -251,14 +244,14 @@ type FSharpTypingAssist
 
         tryFindContinuedLine line lineStartOffset (lexer.TokenType == FSharpTokenType.LPAREN)
 
-    let insertNewLineAt textControl insertPos indent trimAfterCaret =
+    let insertNewLineAt textControl indent trimAfterCaret =
         let insertPos = trimTrailingSpaces textControl trimAfterCaret
         let text = this.GetNewLineText(textControl) + String(' ', indent)
         insertText textControl insertPos text "Indent on Enter"
 
-    let insertIndentFromLine textControl insertPos line =
+    let insertIndentFromLine textControl line =
         let indentSize = getLineWhitespaceIndent textControl line
-        insertNewLineAt textControl insertPos indentSize
+        insertNewLineAt textControl indentSize
 
     let doDumpIndent (textControl: ITextControl) =
         let document = textControl.Document
@@ -267,7 +260,7 @@ type FSharpTypingAssist
         let caretOffset = textControl.Caret.Offset()
         let caretLine = document.GetCoordsByOffset(caretOffset).Line
         let line = getContinuedIndentLine textControl caretOffset LeadingParenContinuesLine.No
-        if line <> caretLine then insertIndentFromLine textControl caretOffset line else
+        if line <> caretLine then insertIndentFromLine textControl line else
 
         let startOffset = document.GetLineStartOffset(caretLine)
         let mutable pos = startOffset
@@ -276,7 +269,7 @@ type FSharpTypingAssist
             pos <- pos + 1
 
         let indent = pos - startOffset
-        insertNewLineAt textControl caretOffset indent
+        insertNewLineAt textControl indent
 
     let insertCharInBrackets (context: ITypingContext) (lexer: CachingLexer) chars brackets leftBracketOnly =
         let textControl = context.TextControl
@@ -397,7 +390,7 @@ type FSharpTypingAssist
         match tryGetNestedIndentBelow cachingLexerService textControl caretLine (int caretCoords.Column) with
         | None -> false
         | Some (_, (Source indent | Comments indent)) ->
-            insertNewLineAt textControl caretOffset indent TrimTrailingSpaces.No
+            insertNewLineAt textControl indent TrimTrailingSpaces.No
 
     member x.HandleEnterInLineComment(textControl) =
         x.DoHandleEnterInLineCommentPressed
@@ -436,7 +429,7 @@ type FSharpTypingAssist
 
             else lexer.TokenStart - lineStartOffset
 
-        insertNewLineAt textControl caretOffset indent TrimTrailingSpaces.Yes
+        insertNewLineAt textControl indent TrimTrailingSpaces.Yes
 
     member x.HandleEnterAddIndent(textControl) =
         let mutable lexer = Unchecked.defaultof<_>
@@ -476,11 +469,11 @@ type FSharpTypingAssist
             let caretLine = document.GetCoordsByOffset(offset).Line
             if nestedIndentLine = caretLine then false else
 
-            insertNewLineAt textControl offset indent TrimTrailingSpaces.Yes
+            insertNewLineAt textControl indent TrimTrailingSpaces.Yes
         | _ ->
 
-        if x.DeindentAfterUnfinishedExpr(textControl, lexer, offset) then true else
-        if x.IndentAfterRArrow(textControl, lexer, offset) then true else
+        if x.DeindentAfterUnfinishedExpr(textControl, lexer) then true else
+        if x.IndentAfterRArrow(textControl, lexer) then true else
 
         let indentSize =
             let defaultIndent = getIndentSize textControl
@@ -492,9 +485,9 @@ type FSharpTypingAssist
                 getLineWhitespaceIndent textControl line
             prevIndentSize + defaultIndent
 
-        insertNewLineAt textControl offset indentSize TrimTrailingSpaces.Yes
+        insertNewLineAt textControl indentSize TrimTrailingSpaces.Yes
 
-    member x.DeindentAfterUnfinishedExpr(textControl: ITextControl, lexer: CachingLexer, offset) =
+    member x.DeindentAfterUnfinishedExpr(textControl: ITextControl, lexer: CachingLexer) =
         let mutable allowedTokens = null 
         if not (tryDeindentTokens.TryGetValue(lexer.TokenType, &allowedTokens)) then false else
 
@@ -553,9 +546,9 @@ type FSharpTypingAssist
             let offsetInLine = getOffsetInLine document tokenLine lexer.TokenStart
             offsetInLine + getIndentSize textControl
 
-        insertNewLineAt textControl offset indent TrimTrailingSpaces.Yes        
+        insertNewLineAt textControl indent TrimTrailingSpaces.Yes        
 
-    member x.IndentAfterRArrow(textControl: ITextControl, lexer: CachingLexer, offset) =
+    member x.IndentAfterRArrow(textControl: ITextControl, lexer: CachingLexer) =
         if lexer.TokenType != FSharpTokenType.RARROW then false else
 
         let prevTokenEnd =
@@ -602,7 +595,7 @@ type FSharpTypingAssist
             let offsetInLine = getOffsetInLine document tokenLine lexer.TokenStart
             offsetInLine + getIndentSize textControl
 
-        insertNewLineAt textControl offset indent TrimTrailingSpaces.Yes
+        insertNewLineAt textControl indent TrimTrailingSpaces.Yes
 
     member x.HandleEnterInsideSingleLineBrackets(textControl: ITextControl, lexer: CachingLexer, line) =
         use cookie = LexerStateCookie.Create(lexer)
@@ -773,7 +766,7 @@ type FSharpTypingAssist
             let additionalIndent = getIndentSize textControl 
             offsetInLine + additionalIndent
 
-        insertNewLineAt textControl offset indent TrimTrailingSpaces.Yes
+        insertNewLineAt textControl indent TrimTrailingSpaces.Yes
 
     member x.HandleEnterAfterErrorAndInfixOp(textControl: ITextControl) =
         let mutable lexer = Unchecked.defaultof<_>
@@ -809,15 +802,12 @@ type FSharpTypingAssist
             Some lexer.TokenEnd
 
         let document = textControl.Document
-        let caretCoords = document.GetCoordsByOffset(offset)
-        let caretLine = caretCoords.Line
 
         match x.GetFSharpTree(textControl) with
         | None -> false
         | Some parseTree ->
 
         let mutable foundError = false
-        let mutable foundExpr = None
         let visitor =
             { new AstVisitorBase<_>() with
                 member x.VisitExpr(path, _, defaultTraverse, expr) =
@@ -846,7 +836,7 @@ type FSharpTypingAssist
             let offset = getStartOffset document expr.Range
             getOffsetInLine document startLine offset
 
-        if not (insertNewLineAt textControl offset indent TrimTrailingSpaces.Yes) then false else
+        if not (insertNewLineAt textControl indent TrimTrailingSpaces.Yes) then false else
 
         if nextTokenIsKeyword then
             document.InsertText(textControl.Caret.Offset(), " ")
@@ -906,7 +896,7 @@ type FSharpTypingAssist
             getOffsetInLine document caretLine (getStartOffset document range) +
             getIndentSize textControl
 
-        insertNewLineAt textControl dotOffset indent TrimTrailingSpaces.Yes
+        insertNewLineAt textControl indent TrimTrailingSpaces.Yes
 
     member x.HandleBackspacePressed(context: IActionContext) =
         let textControl = context.TextControl
@@ -1259,7 +1249,7 @@ type FSharpTypingAssist
         sourceFile.Properties.ProvidesCodeModel
 
     interface ITypingHandler with
-        member x.QuickCheckAvailability(textControl, sourceFile) =
+        member x.QuickCheckAvailability(_, sourceFile) =
             sourceFile.PrimaryPsiLanguage.Is<FSharpLanguage>()
 
 
