@@ -29,7 +29,7 @@ type FSharpTypingAssist
         (solution, settingsStore, cachingLexerService, commandProcessor, psiServices, externalIntellisenseHost,
          skippingTypingAssist)
 
-    let indentingTokens =
+    let indentFromToken =
         [| FSharpTokenType.LBRACK_LESS
            FSharpTokenType.LQUOTE_TYPED
            FSharpTokenType.LQUOTE_UNTYPED
@@ -41,7 +41,28 @@ type FSharpTypingAssist
            FSharpTokenType.LAZY |]
         |> HashSet
 
-    let allowingNoIndentTokens =
+    let indentFromPrevLine =
+        [| FSharpTokenType.FUNCTION
+           FSharpTokenType.EQUALS
+           FSharpTokenType.LARROW
+           FSharpTokenType.RARROW
+           FSharpTokenType.MATCH
+           FSharpTokenType.WHILE
+           FSharpTokenType.WHEN
+           FSharpTokenType.DO
+           FSharpTokenType.DO_BANG
+           FSharpTokenType.YIELD
+           FSharpTokenType.YIELD_BANG
+           FSharpTokenType.BEGIN |]
+        |> HashSet
+
+    let indentTokens =
+        let hs = HashSet()
+        hs.AddRange(indentFromToken)
+        hs.AddRange(indentFromPrevLine)
+        hs
+
+    let allowKeepIndent =
         [| FSharpTokenType.LPAREN
            FSharpTokenType.LBRACK
            FSharpTokenType.LBRACE
@@ -447,8 +468,8 @@ type FSharpTypingAssist
                         encounteredNewLine <- true
                     lexer.Advance(-1)
 
-                not encounteredNewLine && allowingNoIndentTokens.Contains(lexer.TokenType) ||
-                indentingTokens.Contains(lexer.TokenType))
+                not encounteredNewLine && allowKeepIndent.Contains(lexer.TokenType) ||
+                indentTokens.Contains(lexer.TokenType))
 
         if not isAvailable then false else
 
@@ -477,7 +498,7 @@ type FSharpTypingAssist
 
         let indentSize =
             let defaultIndent = getIndentSize textControl
-            if not (allowingNoIndentTokens.Contains(tokenType)) then
+            if indentFromToken.Contains(tokenType) then
                 defaultIndent + getOffsetInLine document line tokenStart else
 
             let prevIndentSize =

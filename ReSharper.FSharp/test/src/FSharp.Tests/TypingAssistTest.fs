@@ -91,6 +91,8 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter 59 - After when, add space before rarrow``() = x.DoNamedTest()
     [<Test>] member x.``Enter 59 - After new``() = x.DoNamedTest()
     [<Test>] member x.``Enter 60 - After larrow``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 61 - After function``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 62 - After function, new line``() = x.DoNamedTest()
 
     [<Test>] member x.``Enter after arrow 01``() = x.DoNamedTest()
     
