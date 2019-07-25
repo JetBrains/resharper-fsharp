@@ -4,6 +4,7 @@ using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
@@ -44,6 +45,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       }
     }
 
+    public InvocableSignature GetSignature(ISubstitution substitution) =>
+      new InvocableSignature(this, substitution);
+
     private static int GetElementsCount<T>([NotNull] IList<IList<T>> lists)
     {
       var count = 0;
@@ -67,7 +71,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       if (!base.Equals(obj))
         return false;
 
-      if (!(obj is FSharpMemberBase<TDeclaration> member) || IsStatic != member.IsStatic) // RIDER-11321, RSRP-467025
+      if (!(obj is FSharpFunctionBase<TDeclaration> member) || IsStatic != member.IsStatic) // RIDER-11321, RSRP-467025
         return false;
 
       return SignatureComparers.Strict.CompareWithoutName(GetSignature(IdSubstitution),

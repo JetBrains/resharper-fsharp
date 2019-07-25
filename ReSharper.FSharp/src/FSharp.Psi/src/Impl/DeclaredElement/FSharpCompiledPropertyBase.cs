@@ -2,6 +2,7 @@
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Impl.Special;
+using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
@@ -20,6 +21,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public string GetDefaultPropertyMetadataName() => ShortName;
 
     public IType Type => ReturnType;
+
+    public InvocableSignature GetSignature(ISubstitution substitution) =>
+      new InvocableSignature(this, substitution);
 
     public bool IsAuto => false;
     public bool IsDefault => false;

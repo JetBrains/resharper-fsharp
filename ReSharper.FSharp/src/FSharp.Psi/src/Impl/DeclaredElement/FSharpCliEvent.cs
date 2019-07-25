@@ -1,5 +1,7 @@
-﻿using FSharp.Compiler.SourceCodeServices;
+﻿using System.Linq;
+using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Impl.Special;
@@ -21,13 +23,30 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override DeclaredElementType GetElementType() =>
       CLRDeclaredElementType.EVENT;
 
-    public IType Type => GetType(Mfv?.FullType);
+    public IType Type => GetType(MfvType);
     public override IType ReturnType => Type;
+
+    protected virtual FSharpType MfvType => Mfv?.FullType;
 
     public IAccessor Adder => new ImplicitAccessor(this, AccessorKind.ADDER);
     public IAccessor Remover => new ImplicitAccessor(this, AccessorKind.REMOVER);
     public IAccessor Raiser => null;
 
     public bool IsFieldLikeEvent => false;
+  }
+
+  internal class AbstractFSharpCliEvent : FSharpCliEvent<AbstractSlot>
+  {
+    public AbstractFSharpCliEvent([NotNull] ITypeMemberDeclaration declaration, FSharpMemberOrFunctionOrValue mfv)
+      : base(declaration, mfv)
+    {
+    }
+
+    protected override FSharpType MfvType =>
+      Mfv?.CurriedParameterGroups.FirstOrDefault()?.FirstOrDefault() is FSharpParameter parameter
+        ? parameter.Type
+        : null;
+
+    protected override FSharpSymbol GetActualSymbol(FSharpSymbol symbol) => symbol;
   }
 }

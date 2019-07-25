@@ -13,6 +13,8 @@ let sourceNameAttrTypeName = clrTypeName "Microsoft.FSharp.Core.CompilationSourc
 [<CompiledName("CompilationMappingAttrTypeName")>]
 let compilationMappingAttrTypeName = clrTypeName "Microsoft.FSharp.Core.CompilationMappingAttribute"
 
+[<CompiledName("CLIEventAttribute")>]
+let cliEventAttrTypeName = clrTypeName "Microsoft.FSharp.Core.CLIEventAttribute"
 
 [<CompiledName("FSharpListTypeName")>]
 let fsListTypeName = clrTypeName "Microsoft.FSharp.Collections.FSharpList`1"

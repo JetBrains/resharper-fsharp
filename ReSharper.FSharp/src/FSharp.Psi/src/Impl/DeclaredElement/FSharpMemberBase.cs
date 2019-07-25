@@ -14,7 +14,7 @@ using JetBrains.Util.Logging;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
-  internal abstract class FSharpMemberBase<TDeclaration> : FSharpTypeMember<TDeclaration>, IParametersOwner,
+  internal abstract class FSharpMemberBase<TDeclaration> : FSharpTypeMember<TDeclaration>,
     IOverridableMember, IFSharpMember
     where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
@@ -47,9 +47,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public override bool HasAttributeInstance(IClrTypeName clrName, AttributesSource attributesSource) =>
       Attributes.HasAttributeInstance(clrName.FullName);
-
-    public InvocableSignature GetSignature(ISubstitution substitution) =>
-      new InvocableSignature(this, substitution);
 
     public IEnumerable<IParametersOwnerDeclaration> GetParametersOwnerDeclarations() =>
       EmptyList<IParametersOwnerDeclaration>.Instance;
