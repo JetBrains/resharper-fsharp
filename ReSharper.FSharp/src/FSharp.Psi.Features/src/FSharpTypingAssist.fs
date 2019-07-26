@@ -45,7 +45,6 @@ type FSharpTypingAssist
         [| FSharpTokenType.FUNCTION
            FSharpTokenType.EQUALS
            FSharpTokenType.LARROW
-           FSharpTokenType.RARROW
            FSharpTokenType.MATCH
            FSharpTokenType.WHILE
            FSharpTokenType.WHEN
