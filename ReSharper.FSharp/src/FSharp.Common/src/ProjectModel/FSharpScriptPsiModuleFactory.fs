@@ -364,14 +364,9 @@ type FSharpScriptPsiModule
     let lifetimeDefinition = Lifetime.Define(lifetime)
     let lifetime = lifetimeDefinition.Lifetime 
 
-    let locks = solution.Locks
-    let psiServices = solution.GetPsiServices()
-    let psiModules = solution.PsiModules()
-
     let containingModule = FSharpScriptModule(path, solution)
-    let targetFrameworkId = modulesProvider.TargetFrameworkId
     let sourceFile = lazy (sourceFileCtor this)
-    let resolveContext = lazy (PsiModuleResolveContext(this, targetFrameworkId, null))
+    let resolveContext = lazy (PsiModuleResolveContext(this, modulesProvider.TargetFrameworkId, null))
 
     // There is a separate project handler for each target framework.
     // Each overriden handler provides a psi module and a source file for each script project file.
@@ -382,7 +377,7 @@ type FSharpScriptPsiModule
 
     do
         assemblyCookies.AddRemove.Advise_Remove(lifetime, fun (AddRemoveArgs (KeyValue (_, assemblyCookie))) ->
-            locks.AssertWriteAccessAllowed()
+            solution.Locks.AssertWriteAccessAllowed()
             assemblyCookie.Dispose())
 
         lifetime.OnTermination(fun _ ->
@@ -395,15 +390,18 @@ type FSharpScriptPsiModule
     member x.PersistentID = moduleId
     member x.LifetimeDefinition: LifetimeDefinition = lifetimeDefinition
 
-    member x.IsValid = psiServices.Modules.HasModule(this)
+    member x.PsiServices = solution.GetPsiServices()
+    member x.PsiModules = solution.PsiModules()
+
+    member x.IsValid = x.PsiServices.Modules.HasModule(this)
 
     member x.AddReference(path: FileSystemPath) =
-        locks.AssertWriteAccessAllowed()
+        solution.Locks.AssertWriteAccessAllowed()
         if not (assemblyCookies.ContainsKey(path)) then
             assemblyCookies.Add(path, assemblyFactory.AddRef(path, moduleId, this.ResolveContext))
 
     member x.RemoveReference(path: FileSystemPath) =
-        locks.AssertWriteAccessAllowed()
+        solution.Locks.AssertWriteAccessAllowed()
         if assemblyCookies.ContainsKey(path) then
             assemblyCookies.Remove(path) |> ignore
 
@@ -421,17 +419,17 @@ type FSharpScriptPsiModule
         member x.GetPersistentID() = moduleId
 
         member x.GetSolution() = solution
-        member x.GetPsiServices() = psiServices
+        member x.GetPsiServices() = x.PsiServices
 
         member x.SourceFiles = [x.SourceFile] :> _
-        member x.TargetFrameworkId = targetFrameworkId
+        member x.TargetFrameworkId = modulesProvider.TargetFrameworkId
         member x.ContainingProjectModule = containingModule :> _
 
-        member x.GetReferences(resolveContext) =
-            locks.AssertReadAccessAllowed()
+        member x.GetReferences _ =
+            solution.Locks.AssertReadAccessAllowed()
             let result = LocalList<IPsiModuleReference>()
             for assemblyCookie in assemblyCookies.Values do
-                match psiModules.GetPrimaryPsiModule(assemblyCookie.Assembly, targetFrameworkId) with
+                match x.PsiModules.GetPrimaryPsiModule(assemblyCookie.Assembly, modulesProvider.TargetFrameworkId) with
                 | null -> ()
                 | psiModule -> result.Add(PsiModuleReference(psiModule))
 
