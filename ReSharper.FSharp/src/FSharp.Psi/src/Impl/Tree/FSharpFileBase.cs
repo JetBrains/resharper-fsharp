@@ -4,6 +4,7 @@ using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Plugins.FSharp.Checker;
+using JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
@@ -29,7 +30,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       set => myParseResults.SetValue(this, value);
     }
 
-    public override PsiLanguageType Language => FSharpLanguage.Instance;
+    public override PsiLanguageType Language =>
+      // ReSharper disable once AssignNullToNotNullAttribute
+      GetPsiModule() is FSharpScriptPsiModule
+        ? FSharpScriptLanguage.Instance
+        : FSharpLanguage.Instance;
 
     public FSharpOption<FSharpParseAndCheckResults> GetParseAndCheckResults(bool allowStaleResults, string opName) =>
       CheckerService.ParseAndCheckFile(SourceFile, opName, allowStaleResults);
