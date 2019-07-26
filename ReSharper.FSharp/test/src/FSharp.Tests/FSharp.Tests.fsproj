@@ -42,6 +42,7 @@
     <Compile Include="Intentions\ToMultilineRecordTest.fs" />
     <Compile Include="FSharpElementFactoryTest.fs" />
     <Compile Include="FSharpNamingTest.fs" />
+    <Compile Include="SyntaxHighlightingTest.fs" />
   </ItemGroup>
 
   <ItemGroup>
