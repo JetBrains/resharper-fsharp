@@ -484,9 +484,9 @@ type FSharpTypingAssist
         if leftBracketsToAddIndent.Contains(tokenType) && not (isSingleLineBrackets lexer document) &&
                 not (isLastTokenOnLine lexer) && isFirstTokenOnLine lexer then false else
 
+        let caretLine = document.GetCoordsByOffset(offset).Line
         match tryGetNestedIndentBelowLine cachingLexerService textControl line with
         | Some (nestedIndentLine, (Source indent | Comments indent)) ->
-            let caretLine = document.GetCoordsByOffset(offset).Line
             if nestedIndentLine = caretLine then false else
 
             insertNewLineAt textControl indent TrimTrailingSpaces.Yes
@@ -497,6 +497,10 @@ type FSharpTypingAssist
 
         let indentSize =
             let defaultIndent = getIndentSize textControl
+            match getLineIndent cachingLexerService textControl caretLine with
+            | Some(Comments n) -> n
+            | _ ->
+
             if indentFromToken.Contains(tokenType) then
                 defaultIndent + getOffsetInLine document line tokenStart else
 

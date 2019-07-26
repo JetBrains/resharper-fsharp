@@ -1,0 +1,5 @@
+// ${CHAR:Enter} 
+module Module
+
+x <-
+{caret}2

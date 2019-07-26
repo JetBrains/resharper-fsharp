@@ -94,8 +94,11 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter 61 - After function``() = x.DoNamedTest()
     [<Test>] member x.``Enter 62 - After function, new line``() = x.DoNamedTest()
     [<Test>] member x.``Enter 63 - In existing line``() = x.DoNamedTest()
-    [<Test>] member x.``Enter 64 - After arrow``() = x.DoNamedTest()
-    [<Test>] member x.``Enter 65 - After arrow``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 64 - After rarrow``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 65 - After larrow``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 66 - After larrow - Comment``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 67 - After larrow``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 68 - After larrow``() = x.DoNamedTest()
 
     [<Test>] member x.``Enter after arrow 01``() = x.DoNamedTest()
     
