@@ -22,15 +22,20 @@ open JetBrains.Util
 
 [<ShellComponent; AllowNullLiteral>]
 type FSharpCheckerService
-        (lifetime, logger: ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier, settingsStore: ISettingsStore) =
+        (lifetime, logger: ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier, settingsStore: ISettingsStore,
+         settingsSchema: SettingsSchema) =
 
     let checker =
         Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "20")
 
+        let settingsEntry =
+            let settingsKey = settingsSchema.GetKey<FSharpOptions>()
+            settingsKey.TryFindEntryByMemberName("BackgroundTypeCheck") :?> SettingsScalarEntry
+
         let enableBgCheck =
             settingsStore
                 .BindToContextLive(lifetime, ContextRange.ApplicationWide)
-                .GetValueProperty(lifetime, fun key -> key.BackgroundTypeCheck)
+                .GetValueProperty(lifetime, settingsEntry, null)
 
         lazy
             let checker =

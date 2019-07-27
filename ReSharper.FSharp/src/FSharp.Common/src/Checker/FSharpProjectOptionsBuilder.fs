@@ -84,7 +84,7 @@ type FSharpProjectOptionsBuilder
 
     let unusedValuesWarns =
         [| "--warnon:1182"
-           "--warnaswarn:1182" |]
+           "--warnaserror-:1182" |]
 
     let splitAndTrim (delimiters: char[]) = function
         | null -> EmptyArray.Instance
