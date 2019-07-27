@@ -364,6 +364,9 @@ type FSharpScriptPsiModule
     let lifetimeDefinition = Lifetime.Define(lifetime)
     let lifetime = lifetimeDefinition.Lifetime 
 
+    let psiServices = solution.GetPsiServices()
+    let psiModules = solution.PsiModules()
+
     let containingModule = FSharpScriptModule(path, solution)
     let sourceFile = lazy (sourceFileCtor this)
     let resolveContext = lazy (PsiModuleResolveContext(this, modulesProvider.TargetFrameworkId, null))
@@ -390,10 +393,10 @@ type FSharpScriptPsiModule
     member x.PersistentID = moduleId
     member x.LifetimeDefinition: LifetimeDefinition = lifetimeDefinition
 
-    member x.PsiServices = solution.GetPsiServices()
+    member x.PsiServices = psiServices
     member x.PsiModules = solution.PsiModules()
 
-    member x.IsValid = x.PsiServices.Modules.HasModule(this)
+    member x.IsValid = psiServices.Modules.HasModule(this)
 
     member x.AddReference(path: FileSystemPath) =
         solution.Locks.AssertWriteAccessAllowed()
@@ -429,7 +432,7 @@ type FSharpScriptPsiModule
             solution.Locks.AssertReadAccessAllowed()
             let result = LocalList<IPsiModuleReference>()
             for assemblyCookie in assemblyCookies.Values do
-                match x.PsiModules.GetPrimaryPsiModule(assemblyCookie.Assembly, modulesProvider.TargetFrameworkId) with
+                match psiModules.GetPrimaryPsiModule(assemblyCookie.Assembly, modulesProvider.TargetFrameworkId) with
                 | null -> ()
                 | psiModule -> result.Add(PsiModuleReference(psiModule))
 

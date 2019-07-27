@@ -8,9 +8,10 @@ open JetBrains.Lifetimes
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Checker
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve.SymbolsCache
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
 type FSharpParser(lexer: ILexer, document: IDocument, path: FileSystemPath, sourceFile: IPsiSourceFile,
@@ -39,13 +40,19 @@ type FSharpParser(lexer: ILexer, document: IDocument, path: FileSystemPath, sour
         let lexer = FSharpPreprocessedLexerFactory(defines).CreateLexer(lexer).ToCachingLexer()
         let parseResults = checkerService.ParseFile(path, document, parsingOptions)
 
+        let language =
+            match sourceFile with
+            | null -> FSharpLanguage.Instance :> PsiLanguageType
+            | sourceFile -> sourceFile.PrimaryPsiLanguage
+
         let treeBuilder =
             tryCreateTreeBuilder lexer lifetime parseResults
             |> Option.defaultWith (fun _ -> createFakeBuilder lexer lifetime)
 
         treeBuilder.CreateFSharpFile(CheckerService = checkerService,
                                      ParseResults = parseResults,
-                                     ResolvedSymbolsCache = symbolsCache)
+                                     ResolvedSymbolsCache = symbolsCache,
+                                     LanguageType = language)
 
     new (lexer, [<NotNull>] sourceFile: IPsiSourceFile, checkerService, symbolsCache) =
         let document = if isNotNull sourceFile then sourceFile.Document else null
