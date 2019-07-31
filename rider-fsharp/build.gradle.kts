@@ -228,6 +228,10 @@ tasks {
 </Project>
 """)
         }
+
+        getByName("buildSearchableOptions") {
+            enabled = buildConfiguration == "Release"
+        }
     }
 
     create("writeNuGetConfig") {
