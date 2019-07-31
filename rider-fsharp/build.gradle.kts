@@ -276,6 +276,21 @@ tasks {
         }
     }
 
+    create("postProcessSandbox") {
+        group = riderFSharpTargetsGroup
+        dependsOn(IntelliJPlugin.PREPARE_SANDBOX_TASK_NAME)
+        doLast {
+            exec {
+                executable = "dotnet"
+                args = listOf("run", "--project", "$resharperPluginPath/build/ProcessSandbox.csproj")
+            }
+        }
+    }
+
+    getByName(IntelliJPlugin.BUILD_PLUGIN_TASK_NAME) {
+        dependsOn("postProcessSandbox")
+    }
+
     task<Wrapper>("wrapper") {
         gradleVersion = "4.10"
         distributionType = Wrapper.DistributionType.ALL
