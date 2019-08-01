@@ -1,0 +1,5 @@
+﻿module Module
+
+[<CompiledName("Foo")>]
+let rec [<CompiledName("Bar")>] foo x = 1
+and{caret} bar x = 1

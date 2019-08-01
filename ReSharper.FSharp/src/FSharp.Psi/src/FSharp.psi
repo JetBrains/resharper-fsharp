@@ -131,7 +131,7 @@ letModuleDecl options { stubBase="DummyDeclaration"; }:
   REC<REC, RecKeyword>?
   binding<BINDING, Bindings>
   (
-    AND
+    AND<AND, Separators>
     binding<BINDING, Bindings>
   )*;
 
@@ -529,7 +529,7 @@ letOrUseExpr options { stubBase="DummyExpression"; }:
   REC<REC, RecKeyword>?
   binding<BINDING, Bindings>
   (
-    AND
+    AND<AND, Separators>
     binding<BINDING, Bindings>
   )*
   synExpr<BODY_EXPR, BodyExpression>;

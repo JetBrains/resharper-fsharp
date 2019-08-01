@@ -22,6 +22,7 @@ module FSharpErrors =
     let [<Literal>] ModuleOrNamespaceRequired = 222
     let [<Literal>] UnrecognizedOption = 243
     let [<Literal>] UseBindingsIllegalInImplicitClassConstructors = 523
+    let [<Literal>] LetAndForNonRecBindings = 576
     let [<Literal>] FieldRequiresAssignment = 764
     let [<Literal>] EmptyRecordInvalid = 789
     let [<Literal>] UseBindingsIllegalInModules = 524
@@ -73,6 +74,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | UseBindingsIllegalInImplicitClassConstructors ->
             UseKeywordIllegalInPrimaryCtorError(getNode range) :> _
+
+        | LetAndForNonRecBindings ->
+            LetAndForNonRecBindingsError(getNode range) :> _
 
         | UnusedThisVariable ->
             UnusedThisVariableWarning(getNode range) :> _

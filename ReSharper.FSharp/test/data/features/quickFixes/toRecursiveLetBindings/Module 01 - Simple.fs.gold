@@ -1,0 +1,4 @@
+﻿module Module
+
+let rec foo x = 1
+and{caret} bar x = 1
