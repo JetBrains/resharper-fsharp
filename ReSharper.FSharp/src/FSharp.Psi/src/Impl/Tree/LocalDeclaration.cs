@@ -72,8 +72,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     public TreeNodeCollection<IFSharpAttribute> Attributes =>
       TreeNodeCollection<IFSharpAttribute>.Empty;
-
-    public TreeNodeEnumerable<IFSharpAttribute> AttributesEnumerable =>
-      TreeNodeEnumerable<IFSharpAttribute>.Empty;
   }
 }

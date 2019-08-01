@@ -9,6 +9,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     IEnumerable<IDeclaration> Declarations { get; }
 
     TreeNodeCollection<IFSharpAttribute> Attributes { get; }
-    TreeNodeEnumerable<IFSharpAttribute> AttributesEnumerable { get; }
   }
 }

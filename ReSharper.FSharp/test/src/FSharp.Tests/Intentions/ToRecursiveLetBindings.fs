@@ -22,10 +22,10 @@ type ToRecursiveLetBindingsAvailabilityTest() =
     override x.ExtraPath = "toRecursiveLetBindings"
 
     [<Test>] member x.``Module - Name 01``() = x.DoNamedTest()
-    [<Test; Explicit("Fix getting keyword")>] member x.``Name 02 - Attributes``() = x.DoNamedTest()
+    [<Test>] member x.``Module - Name 02 - Attributes``() = x.DoNamedTest()
 
     [<Test>] member x.``Module - Keyword 01``() = x.DoNamedTest()
-    [<Test; Explicit("Fix getting keyword")>] member x.``Keyword 02 - Attributes``() = x.DoNamedTest()
+    [<Test>] member x.``Module - Keyword 02 - Attributes``() = x.DoNamedTest()
 
     [<Test>] member x.``Expression - Name 01``() = x.DoNamedTest()
     [<Test>] member x.``Expression - Keyword 01``() = x.DoNamedTest()

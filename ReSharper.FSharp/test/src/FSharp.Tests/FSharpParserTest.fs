@@ -87,3 +87,12 @@ type FSharpParserTest() =
     [<Test>] member x.``Attribute 01``() = x.DoNamedTest()
     [<Test>] member x.``Attribute 02 - Simple arg``() = x.DoNamedTest()
     [<Test>] member x.``Attribute 03 - Simple arg - No parens``() = x.DoNamedTest()
+
+    [<Test>] member x.``Attributes - Let bindings 01``() = x.DoNamedTest()
+    [<Test>] member x.``Attributes - Let bindings 02``() = x.DoNamedTest()
+    [<Test>] member x.``Attributes - Let bindings 03 - Modifiers``() = x.DoNamedTest()
+    [<Test>] member x.``Attributes - Let bindings 04 - Multiple bindings``() = x.DoNamedTest()
+    [<Test>] member x.``Attributes - Type let bindings 01``() = x.DoNamedTest()
+    [<Test>] member x.``Attributes - Type let bindings 02``() = x.DoNamedTest()
+    [<Test>] member x.``Attributes - Type let bindings 03 - Modifiers``() = x.DoNamedTest()
+    [<Test>] member x.``Attributes - Type let bindings 04 - Multiple bindings``() = x.DoNamedTest()

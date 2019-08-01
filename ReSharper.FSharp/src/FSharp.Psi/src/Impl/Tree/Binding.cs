@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Xml;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Tree;
@@ -22,6 +23,29 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     IDeclaredElement IDeclaration.DeclaredElement => DeclaredElement;
 
     public string DeclaredName => SharedImplUtil.MISSING_DECLARATION_NAME;
+
+    public TreeNodeCollection<IFSharpAttribute> AllAttributes
+    {
+      get
+      {
+        var attributes = Attributes;
+
+        var letModuleDecl = LetModuleDeclNavigator.GetByBinding(this);
+        if (letModuleDecl == null)
+          return attributes;
+
+        if (letModuleDecl.BindingsEnumerable.FirstOrDefault() != this)
+          return attributes;
+
+        var letAttributes = letModuleDecl.Attributes;
+        if (letAttributes.IsEmpty)
+          return attributes;
+
+        return attributes.IsEmpty
+          ? letAttributes
+          : attributes.Prepend(letAttributes).ToTreeNodeCollection();
+      }
+    }
 
     public TreeTextRange GetNameRange()
     {

@@ -67,8 +67,14 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         | SynModuleDecl.Let(_, bindings, range) ->
             let letStart = letStartPos bindings range
             let letMark = x.Mark(letStart)
+
+            match bindings with
+            | [] -> ()
+            | Binding(_, _, _, _, attrs, _, _, _, _, _, _ , _) :: _ ->
+                x.ProcessOuterAttrs(attrs, range)
+
             for binding in bindings do
-                x.ProcessTopLevelBinding(binding)
+                x.ProcessTopLevelBinding(binding, range)
             x.Done(range, letMark, ElementType.LET_MODULE_DECL)
 
         | SynModuleDecl.HashDirective(hashDirective, _) ->
@@ -223,9 +229,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                         | _ -> ElementType.OTHER_TYPE_MEMBER
                     elType
 
-                | SynMemberDefn.LetBindings(bindings, _, _, _) ->
+                | SynMemberDefn.LetBindings(bindings, _, _, range) ->
                     for binding in bindings do
-                        x.ProcessTopLevelBinding(binding)
+                        x.ProcessTopLevelBinding(binding, range)
                     ElementType.LET_MODULE_DECL
 
                 | SynMemberDefn.AbstractSlot(ValSpfn(_, _, typeParams, _, _, _, _, _, _, _, _), _, range) ->
@@ -403,7 +409,22 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         x.ProcessType(typ)
         x.Done(range, mark, ElementType.OTHER_TYPE)
 
-    member x.ProcessTopLevelBinding(Binding(_, kind, _, _, attrs, _, _ , headPat, returnInfo, expr, _, _) as binding) =
+    member x.SkipOuterAttrs(attrs: SynAttribute list, outerRange: range) =
+        match attrs with
+        | [] -> []
+        | { Range = r } :: rest ->
+            if posGt r.End outerRange.Start then attrs else
+            x.SkipOuterAttrs(rest, outerRange)
+
+    member x.ProcessOuterAttrs(attrs: SynAttribute list, range: range) =
+        match attrs with
+        | { Range = r } as attr :: rest when posLt r.End range.Start ->
+            x.ProcessAttribute(attr)
+            x.ProcessOuterAttrs(rest, range)
+
+        | _ -> ()
+    
+    member x.ProcessTopLevelBinding(Binding(_, kind, _, _, attrs, _, _ , headPat, returnInfo, expr, _, _) as binding, letRange) =
         let expr = x.FixExpresion(expr)
 
         match kind with
@@ -412,6 +433,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         | _ ->
 
         let mark =
+            let attrs = x.SkipOuterAttrs(attrs, letRange)
             match attrs with
             | [] -> x.Mark(binding.StartPos)
             | { Range = r } :: _ ->
