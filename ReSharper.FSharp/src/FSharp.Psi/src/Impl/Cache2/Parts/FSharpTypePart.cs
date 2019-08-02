@@ -124,7 +124,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
         return false;
 
       // todo: get entity without getting declaration 
-      var entity = (GetDeclaration() as IFSharpTypeDeclaration)?.GetFSharpSymbol() as FSharpEntity;
+      var entity = GetDeclaration()?.GetFSharpSymbol() as FSharpEntity;
       return entity?.Attributes.HasAttributeInstance(clrTypeName.FullName) ?? false;
     }
 
