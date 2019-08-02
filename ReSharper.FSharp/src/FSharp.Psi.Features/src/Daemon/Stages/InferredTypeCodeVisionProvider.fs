@@ -45,6 +45,9 @@ type InferredTypeCodeVisionProvider() =
 type InferredTypeCodeVisionStage(provider: InferredTypeCodeVisionProvider) =
     inherit FSharpDaemonStageBase()
 
+    override x.IsSupported(sourceFile, processKind) =
+        processKind = DaemonProcessKind.VISIBLE_DOCUMENT && base.IsSupported(sourceFile, processKind)
+
     override x.CreateStageProcess(fsFile, settings, daemonProcess) =
         InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provider) :> _
 

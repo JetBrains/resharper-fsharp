@@ -11,6 +11,7 @@ using JetBrains.ReSharper.Feature.Services.Daemon;
 using JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Highlightings;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
@@ -18,6 +19,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
   [DaemonStage(StagesAfter = new[] {typeof(CollectUsagesStage)})]
   public class HighlightIdentifiersStage : FSharpDaemonStageBase
   {
+    protected override bool IsSupported(IPsiSourceFile sourceFile, DaemonProcessKind processKind) =>
+      processKind == DaemonProcessKind.VISIBLE_DOCUMENT && base.IsSupported(sourceFile, processKind);
+
     protected override IDaemonStageProcess CreateStageProcess(IFSharpFile psiFile, IContextBoundSettingsStore settings,
       IDaemonProcess process) =>
       new HighlightIdentifiersStageProcess(psiFile, process);
