@@ -74,6 +74,7 @@ type CSharpResolveTest() =
     [<Test>] member x.``Methods 03, optional param``() = x.DoNamedTest()
     [<Test>] member x.``Methods 04, extension methods``() = x.DoNamedTest()
     [<Test>] member x.``Methods 05, void return``() = x.DoNamedTest()
+    [<Test>] member x.``Methods 06, extension methods 02 - Parts``() = x.DoNamedTest()
 
     [<Test>] member x.``Methods - Parameters - outref``() = x.DoNamedTest()
 

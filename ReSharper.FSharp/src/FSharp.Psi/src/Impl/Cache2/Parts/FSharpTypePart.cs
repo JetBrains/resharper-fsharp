@@ -29,9 +29,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
         attrNames.Add(cacheBuilder.Intern(attr.LongIdentifier?.Name.GetAttributeShortName()));
       AttributeClassNames = attrNames.ToArray();
 
-      if (!attrNames.Contains("Extension"))
-        return;
-
       var methods = new LocalList<ExtensionMethodInfo>();
       foreach (var member in declaration.MemberDeclarations)
       {
@@ -42,11 +39,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
         methods.Add(new ExtensionMethodInfo(AnyCandidateType.INSTANCE, offset, member.DeclaredName) {Owner = this});
       }
 
+      if (methods.IsEmpty())
+        return;
+
       ExtensionMethodInfos = methods.ToArray();
     }
 
     public override HybridCollection<IMethod> FindExtensionMethod(ExtensionMethodInfo info)
     {
+      if (!TypeElement.HasAttributeInstance(PredefinedType.EXTENSION_ATTRIBUTE_CLASS, false))
+        return HybridCollection<IMethod>.Empty;
+
       var declaration = GetDeclaration();
       if (declaration == null)
         return HybridCollection<IMethod>.Empty;
