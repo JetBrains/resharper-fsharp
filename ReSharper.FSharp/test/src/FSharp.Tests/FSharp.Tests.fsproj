@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <Compile Include="Common.fs" />
+    <Compile Include="IsFSharpAssemblyTest.fs" />
     <Compile Include="TestWithTwoProjects.fs" />
     <Compile Include="FSharpHighlightingTestBase.fs" />
     <Compile Include="CSharpResolveTest.fs" />
