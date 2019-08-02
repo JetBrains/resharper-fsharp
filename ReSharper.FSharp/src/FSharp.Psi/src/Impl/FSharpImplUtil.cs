@@ -557,7 +557,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       {
         case IFSharpTypeElement fsTypeElement:
           return fsTypeElement.GetPart<IRecordPart>() != null;
-        case ICompiledElement compiledElement:
+        case ICompiledElement compiledElement when compiledElement.Module.IsFSharpAssembly():
           return compiledElement.GetCompilationMappingFlag() == SourceConstructFlags.RecordType;
         default:
           return false;

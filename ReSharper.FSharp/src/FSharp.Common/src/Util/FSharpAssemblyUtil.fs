@@ -1,4 +1,4 @@
-[<AutoOpen>]
+[<AutoOpen; Extension>]
 module JetBrains.ReSharper.Plugins.FSharp.Util.FSharpAssemblyUtil
 
 open JetBrains.ProjectModel
