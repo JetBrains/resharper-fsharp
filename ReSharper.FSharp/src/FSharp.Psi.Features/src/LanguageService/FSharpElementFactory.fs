@@ -60,7 +60,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             | null -> failwith "Could not get inner appExpr"
             | innerAppExpr ->
 
-            replace innerAppExpr.FunctionExpression expr
+            replace innerAppExpr.ArgumentExpression expr
             outerAppExpr
 
         member x.CreateRecordExprBinding(field, addSemicolon) =

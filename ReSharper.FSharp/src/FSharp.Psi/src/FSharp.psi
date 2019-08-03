@@ -353,9 +353,9 @@ interface synExpr:
 
   fixedExpr;
 
-// interface appExpr:
-//   prefixAppExpr |
-//   infixAppExpr;
+interface appExpr:
+  prefixAppExpr |
+  infixAppExpr;
 
 interface setExpr:
   longIdentSetExpr |
@@ -508,11 +508,13 @@ assertExpr options { stubBase="DummyExpression"; }:
   ASSERT
   synExpr<EXPR, Expression>;
 
-// todo: infix app
-appExpr options { stubBase="DummyExpression"; }:
+prefixAppExpr options { stubBase="DummyExpression"; }:
   synExpr<FUNC_EXPR, FunctionExpression>
-  fakeSeparator
   synExpr<ARG_EXPR, ArgumentExpression>;
+
+infixAppExpr options { stubBase="DummyExpression"; }:
+  synExpr<ARG_EXPR, ArgumentExpression>
+  synExpr<FUNC_EXPR, FunctionExpression>;
 
 typeAppExpr options { stubBase="DummyExpression"; }:
   synExpr<EXPR, Expression>
@@ -615,7 +617,8 @@ lazyExpr options { stubBase="DummyExpression"; }:
   synExpr<EXPR, Expression>;
 
 sequentialExpr options { stubBase="DummyExpression"; }:
-  synExpr<EXPR, Expressions>*;
+  synExpr<EXPR1, Expression1>
+  synExpr<EXPR2, Expression2>;
 
 ifThenElseExpr options { stubBase="DummyExpression"; }:
   IF<IF, IfKeyword>

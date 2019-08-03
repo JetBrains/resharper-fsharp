@@ -618,12 +618,12 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             x.PushRangeAndProcessExpression(expr, range, ElementType.ASSERT_EXPR)
 
         | SynExpr.App(_, isInfix, funcExpr, argExpr, _) ->
-            // todo: mark separate nodes for infix apps
-            x.PushRange(range, ElementType.APP_EXPR)
             if isInfix then
+                x.PushRange(range, ElementType.INFIX_APP_EXPR)
                 x.PushExpression(funcExpr)
                 x.ProcessExpression(argExpr)
             else
+                x.PushRange(range, ElementType.PREFIX_APP_EXPR)
                 x.PushExpression(argExpr)
                 x.ProcessExpression(funcExpr)
 
