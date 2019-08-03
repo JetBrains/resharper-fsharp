@@ -99,4 +99,11 @@
     <Message value="The declaration form 'let ... and ...' is only allowed for recursive bindings. Consider using a sequence of 'let' bindings"/>
     <QuickFix>ToRecursiveLetBindingsFix</QuickFix>
   </Error>
+
+  <Warning staticGroup="FSharpErrors" name="ExtensionMemberInNonExtensionType">
+    <Parameter type="IFSharpAttribute" name="attr"/>
+    <Range>attr.GetNavigationRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <Message value="Extension member in non-extension type looks suspicious"/>
+  </Warning>
 </Errors>
