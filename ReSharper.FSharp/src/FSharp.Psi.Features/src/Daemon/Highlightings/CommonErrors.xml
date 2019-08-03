@@ -106,4 +106,18 @@
     <Behavour overlapResolvePolicy="NONE"/>
     <Message value="Extension member in non-extension type looks suspicious"/>
   </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="ExtensionTypeWithNoExtensionMembers">
+    <Parameter type="IFSharpAttribute" name="attr"/>
+    <Range>attr.GetNavigationRange()</Range>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
+    <Message value="Extension type doesn't have any extension members"/>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="ExtensionTypeShouldBeStatic">
+    <Parameter type="IFSharpAttribute" name="attr"/>
+    <Range>attr.GetNavigationRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <Message value="Extension type should be a static class or a module"/>
+  </Warning>
 </Errors>
