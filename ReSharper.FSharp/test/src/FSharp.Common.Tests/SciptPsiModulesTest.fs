@@ -18,7 +18,6 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ProjectStructu
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
-open JetBrains.ReSharper.TestFramework.Components.SolutionToolset
 open JetBrains.TestFramework
 open JetBrains.TestFramework.Projects
 open NUnit.Framework
@@ -78,7 +77,7 @@ type ScriptPsiModulesTest() =
 
 [<SolutionInstanceComponent>]
 type MyTestSolutionToolset(lifetime: Lifetime, buildToolContainer: BuildToolContainer) =
-    inherit TestSolutionToolset(lifetime)
+    inherit DefaultSolutionToolset(lifetime)
     
     let changed = new SimpleSignal(lifetime, "MySolutionToolset::Changed")
     let buildTool = buildToolContainer.GetAutoDetected(BuildToolEnvironment.EmptyEnvironment)
