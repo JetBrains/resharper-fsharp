@@ -31,7 +31,7 @@ and FSharpTargetsDiagnosticMessage private (title, message) =
             | PlatformUtil.Platform.Linux -> "linux"
             | PlatformUtil.Platform.MacOsX -> "mac"
             | _ -> Logger.GetLogger<FSharpProjectLoadTargetsAnalyzer>().Error("Unknown runtime platfrom"); String.Empty
-        let installLink = NotificationHelper.MakeLink(sprintf "http://fsharp.org/use/%s/" osName, "install F# SDK")
+        let installLink = NotificationHelper.MakeLink(sprintf "https://fsharp.org/use/%s/" osName, "install F# SDK")
         let message = "F# SDK or project dependencies are missing. " + 
                       sprintf "Try restoring NuGet packages; if the problem persists, please %s." installLink
         FSharpTargetsDiagnosticMessage(messageTitle, message)

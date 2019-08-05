@@ -32,7 +32,7 @@ and FSharpTargetsDiagnosticMessage private (title, message) =
 
     private new() =
         let osName = platformName PlatformUtil.RuntimePlatform
-        let url = sprintf "http://fsharp.org/use/%s/" osName
+        let url = sprintf "https://fsharp.org/use/%s/" osName
         let link = RiderContextNotificationHelper.MakeLink(url, "install F# SDK")
         let message = "F# SDK or project dependencies are missing. " + 
                       sprintf "Try restoring NuGet packages; if the problem persists, please %s." link

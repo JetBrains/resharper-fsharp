@@ -1,6 +1,6 @@
 # F# language support in JetBrains Rider
 
-[![JetBrains official project](http://jb.gg/badges/official.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
+[![JetBrains official project](https://jb.gg/badges/official.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
 [![Join the chat at https://gitter.im/JetBrains/fsharp-support](https://badges.gitter.im/JetBrains/fsharp-support.svg)](https://gitter.im/JetBrains/fsharp-support?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 F# support in Rider is implemented as a plugin made of two major components: 
@@ -15,7 +15,7 @@ F# support in Rider makes use of open source software, most notably [FSharp.Comp
 
 * [.NET Framework 4.6.1 Developer Pack](https://www.microsoft.com/en-us/download/details.aspx?id=49978)
 * [.NET Core SDK 2.0+](https://www.microsoft.com/net/download/windows) for MSBuild 15 and F# build targets
-* [JDK 1.8](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+* [JDK 1.8](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
 
 ### Optional
 
