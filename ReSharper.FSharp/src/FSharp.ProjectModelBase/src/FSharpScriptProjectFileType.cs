@@ -1,4 +1,4 @@
-﻿using JetBrains.Annotations;
+using JetBrains.Annotations;
 using JetBrains.ProjectModel;
 
 namespace JetBrains.ReSharper.Plugins.FSharp
@@ -7,6 +7,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
   public class FSharpScriptProjectFileType : FSharpProjectFileType
   {
     public new const string Name = "F# Script";
+
     [CanBeNull, UsedImplicitly]
     public new static FSharpScriptProjectFileType Instance { get; private set; }
 
@@ -14,7 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp
     public const string FsScriptExtension = ".fsscript";
 
     private FSharpScriptProjectFileType()
-      : base(Name, "F#", new[] {FsxExtension, FsScriptExtension})
+      : base(Name, Name, new[] {FsxExtension, FsScriptExtension})
     {
     }
 

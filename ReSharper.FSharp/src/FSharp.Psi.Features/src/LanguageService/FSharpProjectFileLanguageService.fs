@@ -34,8 +34,16 @@ type FSharpProjectFileLanguageService
             buildAction = BuildActions.compileBefore || buildAction = BuildActions.compileAfter
         FSharpPsiProperties(projectFile, sourceFile, providesCodeModel) :> _
 
+
+[<ProjectFileType(typeof<FSharpSignatureProjectFileType>)>]
+type FSharpSignatureProjectFileLanguageService(projectFileType, fsCheckerService, fsFileService) =
+    inherit FSharpProjectFileLanguageService(projectFileType, fsCheckerService, fsFileService)
+
+    override x.PsiLanguageType = FSharpLanguage.Instance :> _
+
+
 [<ProjectFileType(typeof<FSharpScriptProjectFileType>)>]
-type FSharpScriptProjectFileLanguageService(projectFileType, fsCheckerService, fsFileService: IFSharpFileService) =
+type FSharpScriptProjectFileLanguageService(projectFileType, fsCheckerService, fsFileService) =
     inherit FSharpProjectFileLanguageService(projectFileType, fsCheckerService, fsFileService)
 
     override x.PsiLanguageType = FSharpScriptLanguage.Instance :> _

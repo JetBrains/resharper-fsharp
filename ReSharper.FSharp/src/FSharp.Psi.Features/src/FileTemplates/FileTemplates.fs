@@ -44,9 +44,9 @@ type InFSharpFile() =
 
     static let extensions = 
         [ FSharpProjectFileType.FsExtension
-          FSharpProjectFileType.FsiExtension
           FSharpProjectFileType.MlExtension
-          FSharpProjectFileType.MliExtension
+          FSharpSignatureProjectFileType.FsiExtension
+          FSharpSignatureProjectFileType.MliExtension
           FSharpScriptProjectFileType.FsxExtension
           FSharpScriptProjectFileType.FsScriptExtension ]
 
