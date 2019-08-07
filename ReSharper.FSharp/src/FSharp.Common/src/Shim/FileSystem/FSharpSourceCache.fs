@@ -55,7 +55,8 @@ type FSharpSourceCache
         source
 
     let isApplicable (path: FileSystemPath) =
-        not path.IsEmpty && fileExtensions.GetFileType(path).Is<FSharpProjectFileType>()
+        // todo: support FCS fake paths like `startup`, prevent going to FS to check existence, etc.
+        not path.IsEmpty && path.IsAbsolute && fileExtensions.GetFileType(path).Is<FSharpProjectFileType>()
 
     member x.TryGetSource(path: FileSystemPath, [<Out>] source: byref<FSharpSource>) =
         match files.TryGetValue(path) with
