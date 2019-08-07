@@ -94,7 +94,7 @@
 
   <Error staticGroup="FSharpErrors" name="LetAndForNonRecBindings">
     <Parameter type="ILetBindings" name="letBindings"/>
-    <Range>letBindings.Separators.[0].GetNavigationRange()</Range>
+    <Range>(letBindings.Separators |> Seq.tryHead |> Option.defaultWith (fun _ -> letBindings.LetOrUseToken)).GetNavigationRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <Message value="The declaration form 'let ... and ...' is only allowed for recursive bindings. Consider using a sequence of 'let' bindings"/>
     <QuickFix>ToRecursiveLetBindingsFix</QuickFix>
