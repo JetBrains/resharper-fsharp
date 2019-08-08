@@ -24,7 +24,7 @@
 * Remove unused self identifier in types
 * Remove unused `as` pattern
 * Replace unused pattern with `_`
-* Replave `use` with `let` in modules and types
+* Replace `use` with `let` in modules and types
 * Add missing `rec` in `let ... and` bindings
 
 
