@@ -39,6 +39,7 @@
     <Compile Include="QuickFixes\RemoveUnusedNamedAsPatTest.fs" />
     <Compile Include="QuickFixes\GenerateMissingRecordFieldsTest.fs" />
     <Compile Include="QuickFixes\ToRecursiveLetBindingsTest.fs" />
+    <Compile Include="QuickFixes\RemoveInlineTest.fs" />
     <Compile Include="Intentions\IntentionsTestBase.fs" />
     <Compile Include="Intentions\ToRecursiveLetBindings.fs" />
     <Compile Include="Intentions\ToMultilineRecordTest.fs" />

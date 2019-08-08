@@ -1,5 +1,6 @@
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
+using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Resources.Shell;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -16,6 +17,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
       using (var _ = WriteLockCookie.Create(IsPhysical()))
         LetOrUseToken.NotNull().AddModifierToken(FSharpTokenType.REC);
+    }
+
+    public void SetIsInline(bool value)
+    {
+      if (value)
+        throw new System.NotImplementedException();
+
+      using (var _ = WriteLockCookie.Create(IsPhysical()))
+      {
+        var inlineKeyword = InlineKeyword;
+        if (inlineKeyword.PrevSibling is Whitespace whitespace)
+          ModificationUtil.DeleteChildRange(whitespace, inlineKeyword);
+        else
+          ModificationUtil.DeleteChild(inlineKeyword);
+      }
     }
   }
 }

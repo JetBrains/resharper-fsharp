@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
@@ -54,6 +54,7 @@
     <Compile Include="src\Daemon\QuickFixes\AddIgnoreFix.fs" />
     <Compile Include="src\Daemon\QuickFixes\GenerateMissingRecordFieldsFix.fs" />
     <Compile Include="src\Daemon\QuickFixes\ToRecursiveLetBindingsFix.fs" />
+    <Compile Include="src\Daemon\QuickFixes\RemoveInlineFix.fs" />
     <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
       <Mode>QUICKFIX</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>

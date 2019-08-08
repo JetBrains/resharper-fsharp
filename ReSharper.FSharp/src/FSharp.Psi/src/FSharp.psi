@@ -128,6 +128,7 @@ interface moduleMemberStatement:
 letModuleDecl options { stubBase="DummyDeclaration"; }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
   letOrUse{LET, LetOrUseToken}
+  INLINE<INLINE, InlineKeyword>?
   REC<REC, RecKeyword>?
   binding<BINDING, Bindings>
   (

@@ -100,6 +100,14 @@
     <QuickFix>ToRecursiveLetBindingsFix</QuickFix>
   </Error>
 
+  <Error staticGroup="FSharpErrors" name="LocalClassBindingsCannotBeInline">
+    <Parameter type="ILetModuleDecl" name="letModuleDecl"/>
+    <Range>letModuleDecl.InlineKeyword.GetNavigationRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <Message value="Class local bindings cannot be inline"/>
+    <QuickFix>RemoveInlineFix</QuickFix>
+  </Error>
+  
   <Warning staticGroup="FSharpErrors" name="ExtensionMemberInNonExtensionType">
     <Parameter type="IFSharpAttribute" name="attr"/>
     <Range>attr.GetNavigationRange()</Range>

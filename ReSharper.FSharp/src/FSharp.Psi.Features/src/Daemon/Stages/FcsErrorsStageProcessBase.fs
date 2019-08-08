@@ -26,6 +26,7 @@ module FSharpErrors =
     let [<Literal>] FieldRequiresAssignment = 764
     let [<Literal>] EmptyRecordInvalid = 789
     let [<Literal>] UseBindingsIllegalInModules = 524
+    let [<Literal>] LocalClassBindingsCannotBeInline = 894
     let [<Literal>] UnusedValue = 1182
     let [<Literal>] UnusedThisVariable = 1183
 
@@ -74,6 +75,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | UseBindingsIllegalInImplicitClassConstructors ->
             UseKeywordIllegalInPrimaryCtorError(getNode range) :> _
+
+        | LocalClassBindingsCannotBeInline ->
+            LocalClassBindingsCannotBeInlineError(getNode range) :> _
 
         | LetAndForNonRecBindings ->
             LetAndForNonRecBindingsError(getNode range) :> _
