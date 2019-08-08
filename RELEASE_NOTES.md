@@ -13,6 +13,21 @@
 * Escape sequences are highlighted in strings
 * Better highlighting of never matched rules in `match` expressions
 
+### Refactorings
+
+* Context-based rename suggestions
+
+### Quick Fixes
+
+* Generate missing record fields
+* Ignore unused expression
+* Remove unused self identifier in types
+* Remove unused `as` pattern
+* Replace unused pattern with `_`
+* Replave `use` with `let` in modules and types
+* Add missing `rec` in `let ... and` bindings
+
+
 ### Find Usages & navigation
 
 * Find Usages and Go to Declaration now work for record construction and copy-and-update expressions
