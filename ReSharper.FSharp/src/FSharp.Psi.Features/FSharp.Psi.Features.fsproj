@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
@@ -46,6 +46,7 @@
     <Compile Include="src\Daemon\Analyzers\StringProblemsAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\AttributeTargetAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\ExtensionAttributeAnalyzer.fs" />
+    <Compile Include="src\Daemon\Analyzers\RedundantBackticksAnalyzer.fs" />
     <Compile Include="src\Daemon\QuickFixes\RemoveUnusedOpensFix.fs" />
     <Compile Include="src\Daemon\QuickFixes\ReplaceUseWithLetFix.fs" />
     <Compile Include="src\Daemon\QuickFixes\RemoveUnusedSelfIdVariableFix.fs" />
@@ -54,6 +55,7 @@
     <Compile Include="src\Daemon\QuickFixes\AddIgnoreFix.fs" />
     <Compile Include="src\Daemon\QuickFixes\GenerateMissingRecordFieldsFix.fs" />
     <Compile Include="src\Daemon\QuickFixes\ToRecursiveLetBindingsFix.fs" />
+    <Compile Include="src\Daemon\QuickFixes\RemoveRedundantBackticksFix.fs" />
     <Compile Include="src\Daemon\QuickFixes\RemoveInlineFix.fs" />
     <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
       <Mode>QUICKFIX</Mode>

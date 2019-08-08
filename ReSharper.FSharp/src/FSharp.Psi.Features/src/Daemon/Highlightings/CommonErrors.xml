@@ -2,6 +2,7 @@
 
   <Usings>
     JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings;
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
   </Usings>
 
@@ -127,5 +128,12 @@
     <Range>attr.GetNavigationRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <Message value="Extension type should be a static class or a module"/>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="RedundantBackticks">
+    <Parameter type="FSharpIdentifierToken" name="identifier"/>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message value="Redundant identifier quotation"/>
+    <QuickFix>RemoveRedundantBackticksFix</QuickFix>
   </Warning>
 </Errors>
