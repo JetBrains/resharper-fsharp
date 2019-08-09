@@ -24,13 +24,13 @@ type FsiSessionsHost
         arg.Split([|' '|], StringSplitOptions.RemoveEmptyEntries)
 
     let getNewFsiSessionInfo _ =
-        let fsi = fsiDetector.GetAutodetected(solution)
-
-        let fsiPath =
+        let fsi =
             if fsiOptions.AutoDetect.Value then
-                fsi.GetFsiPath(fsiOptions.UseAnyCpu.Value)
+                fsiDetector.GetAutodetected(solution)
             else
-                fsiOptions.FsiPathAsPath
+                fsiDetector.GetActiveTool(solution, fsiOptions)
+
+        let fsiPath = fsi.GetFsiPath(fsiOptions.UseAnyCpu.Value)
 
         let args =
             [| yield! stringArrayArgs fsiOptions.FsiArgs.Value

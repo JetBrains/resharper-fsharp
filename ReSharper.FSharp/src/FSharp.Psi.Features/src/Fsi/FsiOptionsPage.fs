@@ -41,17 +41,12 @@ type FsiOptionsPage
         if autoDetectAllowed then fsiOptions.AutoDetect else
         new Property<bool>(lifetime, "FsiNoAutoDetect", false) :> _
 
-    let findTool (path: FileSystemPath) =
+    let getActiveTool () =
         if fsiOptions.IsCustomTool.Value || not autoDetectAllowed then customTool else
-
-        tools
-        |> Array.tryFind (fun fsi -> fsi.Path = path.Directory)
-        |> Option.defaultValue customTool
+        fsiDetector.GetActiveTool(solution, fsiOptions)
 
     let parsedPath = fsiOptions.FsiPathAsPath
-    let fsiTool =
-            if autoDetect.Value then tools.[0] else
-            findTool parsedPath
+    let fsiTool = if autoDetect.Value then tools.[0] else getActiveTool ()
 
     let initialPath = if fsiTool.IsCustom then parsedPath else fsiTool.GetFsiPath(fsiOptions.UseAnyCpu.Value)
     let fsiPath = new Property<_>(lifetime, "FsiExePath", initialPath)
@@ -67,7 +62,7 @@ type FsiOptionsPage
 
                 let path = fsiOptions.FsiPathAsPath
                 if path.IsEmpty && autoDetectAllowed then tools.[0] else
-                findTool path)
+                getActiveTool ())
 
         fsiTool.Change.Advise_NoAcknowledgement(lifetime, fun (ArgValue (FsiTool fsi)) ->
             fsiOptions.IsCustomTool.Value <- fsi.IsCustom
@@ -159,7 +154,7 @@ type FSharpSettingsCategoryProvider() =
     let [<Literal>] categoryKey = "F# Interactive settings"
 
     interface IExportableSettingsCategoryProvider with
-        member x.TryGetRelatedIdeaConfigsBy(category, configs) =
+        member x.TryGetRelatedIdeaConfigsBy(_, configs) =
             configs <- EmptyArray.Instance
             false
 
