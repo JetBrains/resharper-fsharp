@@ -1096,6 +1096,7 @@ type FSharpTypingAssist
             true
         else
 
+        if lexer.FindTokenAt(offset - 1) && lexer.TokenType.IsComment then false else
         if not (lexer.FindTokenAt(offset)) then false else
 
         let tokenType = lexer.TokenType
