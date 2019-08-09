@@ -36,7 +36,7 @@ module RequiredVersion =
 
 type FsiTool =
     { Title: string
-      Path: FileSystemPath
+      Directory: FileSystemPath
       Runtime: RdFsiRuntime
       ShadowCopyAllowed: bool }
 
@@ -46,13 +46,13 @@ type FsiTool =
 
         Some
             { Title = sprintf "%s %s (%s)" fctPackageName nupkg.Version source
-              Path = nupkg.InstallationDirectory / "tools"
+              Directory = nupkg.InstallationDirectory / "tools"
               Runtime = RdFsiRuntime.NetFramework
               ShadowCopyAllowed = version >= RequiredVersion.shadowCopyWithFSharpCompilerTools }
 
     static member Create(title, dir) =
         { Title = title
-          Path = dir
+          Directory = dir
           Runtime = RdFsiRuntime.NetFramework
           ShadowCopyAllowed = true }
 
@@ -65,14 +65,14 @@ type FsiTool =
     
     member x.GetFsiPath(useAnyCpu) =
         match x.Runtime with
-        | RdFsiRuntime.Core -> x.Path
-        | _ -> x.Path / x.GetFsiName(useAnyCpu)
+        | RdFsiRuntime.Core -> CoreFsiProvider.FsiPath
+        | _ -> x.Directory / x.GetFsiName(useAnyCpu)
 
     member x.IsCustom = x == customTool
 
 let customTool: FsiTool =
     { Title = customToolText
-      Path = FileSystemPath.Empty
+      Directory = FileSystemPath.Empty
       Runtime = RdFsiRuntime.NetFramework
       ShadowCopyAllowed = true }
 
@@ -96,7 +96,7 @@ type FsiDetector() =
         packagesByProvider
         |> Seq.concat
         |> List.ofSeq
-        |> List.distinctBy (fun fsiTool -> fsiTool.Path)
+        |> List.distinctBy (fun fsiTool -> fsiTool.Directory, fsiTool.IsCustom)
         |> Array.ofList
 
     member x.GetAutodetected(solution) =
@@ -104,6 +104,13 @@ type FsiDetector() =
         |> Seq.map (fun provider -> provider.GetFsiTools(solution))
         |> Seq.concat
         |> Seq.head
+
+    member x.GetActiveTool(solution, fsiOptions: FsiOptionsProvider) =
+        let directory = fsiOptions.FsiPathAsPath.Directory
+
+        x.GetFsiTools(solution)
+        |> Array.tryFind (fun fsi -> fsi.Directory = directory)
+        |> Option.defaultValue customTool
 
 type IFsiDirectoryProvider =
     abstract GetFsiTools: ISolution -> FsiTool seq
@@ -157,8 +164,8 @@ type MonoFsiProvider() =
     let fsiRelativePath = RelativePath.Parse("lib/mono/fsharp") / defaultFsiName
     let fsiToolPathComparer =
         { new IEqualityComparer<FsiTool> with
-            member __.Equals(x, y) = x.Path = y.Path
-            member __.GetHashCode(obj) = obj.Path.GetHashCode() }
+            member __.Equals(x, y) = x.Directory = y.Directory
+            member __.GetHashCode(obj) = obj.Directory.GetHashCode() }
 
     interface IFsiDirectoryProvider with
         member x.GetFsiTools(solution) =
@@ -250,12 +257,15 @@ type NugetCacheFsiProvider() =
 
 type CustomFsiProvider() =
     let tools = [| customTool |]
+
     interface IFsiDirectoryProvider with
         member x.GetFsiTools(_) =
             tools :> _
 
 
 type CoreFsiProvider() =
+    static member val FsiPath = FileSystemPath.Parse("fsi")
+
     interface IFsiDirectoryProvider with
         member x.GetFsiTools(solution) =
             if isNull solution then [] :> _ else
@@ -267,6 +277,6 @@ type CoreFsiProvider() =
             | toolset ->
 
             [| { Title = ".NET Core SDK " + toolset.Sdk.Version.ToString()
-                 Path = FileSystemPath.Parse("fsi")
+                 Directory = FileSystemPath.Empty
                  Runtime = RdFsiRuntime.Core
                  ShadowCopyAllowed = true } |] :> _
