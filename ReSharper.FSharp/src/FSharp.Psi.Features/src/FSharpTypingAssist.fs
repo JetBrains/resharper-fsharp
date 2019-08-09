@@ -1042,7 +1042,12 @@ type FSharpTypingAssist
         if not (isBacktick lexer) then false else
         if prevTokenIs isBacktick lexer || nextTokenIs isBacktick lexer then false else
 
-        textControl.Document.InsertText(offset, "```")
+        if lexer.FindTokenAt(offset) && lexer.TokenType == FSharpTokenType.IDENTIFIER then
+            textControl.Document.InsertText(lexer.TokenEnd, "``")
+            textControl.Document.InsertText(offset, "`")
+        else
+            textControl.Document.InsertText(offset, "```")
+
         textControl.Caret.MoveTo(offset + 1, CaretVisualPlacement.DontScrollIfVisible)
         true
 

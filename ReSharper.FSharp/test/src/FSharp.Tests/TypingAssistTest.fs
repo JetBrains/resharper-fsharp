@@ -267,6 +267,7 @@ type FSharpTypingAssistTest() =
 
     [<Test>] member x.``Backticks 04 - Skip``() = x.DoNamedTest()
     [<Test>] member x.``Backticks 05 - No skip``() = x.DoNamedTest()
+    [<Test>] member x.``Backticks 06 - Before ident``() = x.DoNamedTest()
 
 [<FSharpTest>]
 type LineIndentsTest() =
