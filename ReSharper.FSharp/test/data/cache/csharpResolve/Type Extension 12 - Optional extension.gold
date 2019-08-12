@@ -8,8 +8,8 @@
 }
 
 ---------------------------------------------------------
-(0): ReSharper Underlined Error Highlighting: Cannot access non-static method 'Method' in static context
-(1): ReSharper Underlined Error Highlighting: Cannot access non-static property 'Prop' in static context
-M:Module.Method
-M:Module.Method
+(0): ReSharper Underlined Error Highlighting: Cannot access internal method 'Method' here
+(1): ReSharper Underlined Error Highlighting: Cannot access internal property 'Prop' here
+M:Module.Method(System.String)
+M:Module.Method(System.String)
 P:Module.Prop

@@ -7,7 +7,6 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
-using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 using JetBrains.Util.Logging;
@@ -63,6 +62,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       var mfv = Mfv;
       if (mfv == null)
         return AccessRights.NONE;
+
+      // Workaround to hide extension methods from resolve in C#.
+      // todo: calc compiled names for extension members (it'll hide needed ones properly)
+      // todo: implement F# declared element presenter to hide compiled names in features/ui
+      if (mfv.IsExtensionMember && GetDeclaration() is IMemberDeclaration memberDeclaration)
+        if (!memberDeclaration.Attributes.GetCompiledName(out _))
+          return AccessRights.INTERNAL;
 
       var accessibility = mfv.Accessibility;
       if (accessibility.IsInternal)

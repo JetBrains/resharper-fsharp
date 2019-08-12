@@ -26,17 +26,35 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
         if (mfv == null)
           return EmptyList<IParameter>.Instance;
 
-        var mfvCurriedParams = mfv.CurriedParameterGroups;
-        if (mfvCurriedParams.Count == 1 && mfvCurriedParams[0].Count == 1 && mfvCurriedParams[0][0].Type.IsUnit)
+        var paramGroups = mfv.CurriedParameterGroups;
+        var isFsExtension = mfv.IsExtensionMember;
+        var isVoidReturn = paramGroups.Count == 1 && paramGroups[0].Count == 1 && paramGroups[0][0].Type.IsUnit;
+
+        if (!isFsExtension && isVoidReturn)
           return EmptyArray<IParameter>.Instance;
 
-        var paramsCount = GetElementsCount(mfvCurriedParams);
+        var paramsCount = GetElementsCount(paramGroups);
         if (paramsCount == 0)
           return EmptyList<IParameter>.Instance;
 
         var typeParameters = AllTypeParameters;
         var methodParams = new List<IParameter>(paramsCount);
-        foreach (var paramsGroup in mfvCurriedParams)
+        if (isFsExtension)
+        {
+          var typeElement = mfv.ApparentEnclosingEntity.GetTypeElement(Module);
+
+          var type =
+            typeElement != null
+              ? TypeFactory.CreateType(typeElement)
+              : TypeFactory.CreateUnknownType(Module);
+
+          methodParams.Add(new FSharpExtensionMemberParameter(this, type));
+        }
+
+        if (isVoidReturn)
+          return methodParams;
+        
+        foreach (var paramsGroup in paramGroups)
         foreach (var param in paramsGroup)
           methodParams.Add(new FSharpMethodParameter(param, this, methodParams.Count,
             param.Type.MapType(typeParameters, Module, true)));

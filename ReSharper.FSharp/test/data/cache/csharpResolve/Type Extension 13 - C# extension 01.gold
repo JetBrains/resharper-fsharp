@@ -1,0 +1,12 @@
+﻿public class Class1
+{
+  public Class1()
+  {
+    var i = 1;
+    i.M(1);
+  }
+}
+
+---------------------------------------------------------
+M:Module.M(System.Int32,System.Int32)
+M:Module.M(System.Int32,System.Int32)

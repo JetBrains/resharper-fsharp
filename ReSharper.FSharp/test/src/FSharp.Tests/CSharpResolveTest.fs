@@ -90,6 +90,7 @@ type CSharpResolveTest() =
 
     [<Test>] member x.``Module bindings 05 - Generic function``() = x.DoNamedTest()
     [<Test>] member x.``Module bindings 06 - Type function``() = x.DoNamedTest()
+    [<Test>] member x.``Module bindings 07 - extension methods 03 - Two params``() = x.DoNamedTest()
 
     [<Test>] member x.``Nested module 01``() = x.DoNamedTest()
 
@@ -116,6 +117,8 @@ type CSharpResolveTest() =
     [<Test>] member x.``Type Extension 10 - Compiled name``() = x.DoNamedTest()
     [<Test>] member x.``Type Extension 11 - Struct compiled name``() = x.DoNamedTest()
     [<Test>] member x.``Type Extension 12 - Optional extension``() = x.DoNamedTest()
+    [<Test>] member x.``Type Extension 13 - C# extension 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type Extension 14 - C# extension 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Generics - Methods 01``() = x.DoNamedTest()
 

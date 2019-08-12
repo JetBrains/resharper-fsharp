@@ -134,17 +134,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         : compiledName ?? sourceName ?? SharedImplUtil.MISSING_DECLARATION_NAME;
     }
 
-
-    [NotNull]
-    public static string GetCompiledName([CanBeNull] this IIdentifier identifier,
-      TreeNodeCollection<IFSharpAttribute> attributes)
+    public static bool GetCompiledName(this TreeNodeCollection<IFSharpAttribute> attributes, out string name)
     {
       foreach (var attr in attributes)
         if (GetCompiledNameValue(attr, out var value))
-          return value;
+        {
+          name = value;
+          return true;
+        }
 
-      return GetCompiledName(identifier);
+      name = default;
+      return false;
     }
+
+    [NotNull]
+    public static string GetCompiledName([CanBeNull] this IIdentifier identifier,
+      TreeNodeCollection<IFSharpAttribute> attributes) =>
+      GetCompiledName(attributes, out var name)
+        ? name
+        : GetCompiledName(identifier);
 
     public static string GetCompiledName([CanBeNull] this IIdentifier identifier)
     {

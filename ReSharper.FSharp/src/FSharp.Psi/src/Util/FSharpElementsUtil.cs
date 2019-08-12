@@ -136,9 +136,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         var typeElement = GetTypeElement(memberEntity.Value, psiModule);
         if (typeElement == null) return null;
 
+        var mfvCompiledName = mfv.GetMfvCompiledName();
         var members = mfv.IsConstructor
           ? typeElement.Constructors.AsList<ITypeMember>()
-          : typeElement.EnumerateMembers(mfv.GetMfvCompiledName(), true).AsList();
+          : typeElement.EnumerateMembers(mfvCompiledName, true).AsList();
 
         switch (members.Count)
         {
@@ -150,6 +151,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
         var mfvXmlDocId = GetXmlDocId(mfv);
         return members.FirstOrDefault(member =>
+          // todo: Fix signature for extension properties
           member is IFSharpMember fsMember && fsMember.Mfv?.XmlDocSig == mfvXmlDocId || 
           member.XMLDocId == mfvXmlDocId);
       }
