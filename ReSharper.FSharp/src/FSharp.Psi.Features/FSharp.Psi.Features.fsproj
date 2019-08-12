@@ -189,4 +189,8 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.ReSharperAutomationTools_src_ReSharperHost.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.ReSharperAutomationTools_src_ReSharperHost.Props')" />
+
+  <ItemGroup>
+    <Compile Include="src\UnitTesting\Expecto.fs" />
+  </ItemGroup>
 </Project>
