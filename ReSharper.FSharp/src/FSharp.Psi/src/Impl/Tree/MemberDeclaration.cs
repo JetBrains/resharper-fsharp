@@ -11,7 +11,27 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class MemberDeclaration : IFunctionDeclaration
   {
     IFunction IFunctionDeclaration.DeclaredElement => base.DeclaredElement as IFunction;
-    protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
+
+    protected override string DeclaredElementName
+    {
+      get
+      {
+        if (!(Parent is ITypeExtensionDeclaration extensionDeclaration) || extensionDeclaration.IsTypePartDeclaration)
+          return NameIdentifier.GetCompiledName(Attributes);
+
+        if (Attributes.GetCompiledName(out var name))
+          return name;
+
+        var typeName = extensionDeclaration.SourceName;
+        var typeParameters = extensionDeclaration.TypeParameters;
+        var compiledName = NameIdentifier.GetCompiledName();
+        var elementName = typeParameters.IsEmpty
+          ? typeName + "." + compiledName
+          : typeName + "`" + typeParameters.Count + "." + compiledName;
+
+        return IsStatic ? elementName + ".Static" : elementName;
+      }
+    }
 
     public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
 
@@ -44,6 +64,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
         return new FSharpSignOperator<MemberDeclaration>(this, mfv);
       }
+
       return new FSharpMethod<MemberDeclaration>(this, mfv);
     }
 

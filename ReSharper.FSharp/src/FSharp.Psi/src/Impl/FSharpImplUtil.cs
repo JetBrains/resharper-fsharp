@@ -248,6 +248,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     {
       try
       {
+        if (mfv.IsExtensionMember)
+        {
+          if (!mfv.IsProperty)
+            return mfv.CompiledName;
+
+          var extendedType = mfv.ApparentEnclosingEntity;
+          var typeParameters = extendedType.GenericParameters;
+          return typeParameters.IsEmpty()
+            ? extendedType.CompiledName + "." + mfv.LogicalName
+            : extendedType.CompiledName + "`" + typeParameters.Count + "." + mfv.LogicalName;
+        }
+
         var compiledNameAttr = mfv.Attributes.TryFindAttribute(CompiledNameAttrName);
         var compiledName = compiledNameAttr != null && !compiledNameAttr.Value.ConstructorArguments.IsEmpty()
           ? compiledNameAttr.Value.ConstructorArguments[0].Item2 as string
