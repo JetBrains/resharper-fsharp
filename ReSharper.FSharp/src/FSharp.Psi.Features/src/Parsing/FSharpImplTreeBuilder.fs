@@ -89,8 +89,13 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             for attribute in attributes do
                 x.ProcessAttribute(attribute)
 
+        | SynModuleDecl.ModuleAbbrev(_, lid, range) ->
+            let mark = x.Mark(range)
+            x.ProcessLongIdentifier(lid)
+            x.Done(range, mark, ElementType.TYPE_ABBREVIATION_DECLARATION) // todo: mark as separate element type
+
         | decl ->
-            x.MarkAndDone(decl.Range, ElementType.OTHER_MEMBER_DECLARATION)
+            failwithf "unexpected decl: %O" decl
 
     member x.ProcessHashDirective(ParsedHashDirective(id, _, range)) =
         let mark = x.Mark(range)
@@ -102,7 +107,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             | _ -> ElementType.OTHER_DIRECTIVE
         x.Done(range, mark, elementType)
 
-    member x.ProcessTypeDefn(TypeDefn(ComponentInfo(attrs, typeParams, _, lid , _, _, _, _), repr, members, range)) =
+    member x.ProcessTypeDefn(TypeDefn(ComponentInfo(attrs, typeParams, _, lid , _, _, _, _), repr, members, range) as typeDefn) =
         match repr with
         | SynTypeDefnRepr.ObjectModel(SynTypeDefnKind.TyconAugmentation, _, _) ->
             let mark = x.Mark(range)
@@ -142,7 +147,8 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                 | _ -> ElementType.OTHER_SIMPLE_TYPE_DECLARATION
 
             | SynTypeDefnRepr.Exception _ ->
-                ElementType.EXCEPTION_DECLARATION
+                // This is compiler-internal union case with instances created inside type checker only.
+                failwithf "unexpected exception type: %O" typeDefn 
 
             | SynTypeDefnRepr.ObjectModel(SynTypeDefnKind.TyconAugmentation, _, _) ->
                 ElementType.TYPE_EXTENSION_DECLARATION

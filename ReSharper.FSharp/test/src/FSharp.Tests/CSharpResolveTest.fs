@@ -123,6 +123,8 @@ type CSharpResolveTest() =
     [<Test>] member x.``Generics - Methods 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Implementations - Explicit impl 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Abbreviations - Module 01``() = x.DoNamedTest()
     
     override x.RelativeTestDataPath = "cache/csharpResolve"
 

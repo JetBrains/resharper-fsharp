@@ -59,6 +59,9 @@ type SymbolCacheTest() =
     [<Test>] member x.``Union 08 - Struct singletons``() = x.DoNamedTest()
     [<Test>] member x.``Union 09 - Struct multiple cases with fields``() = x.DoNamedTest()
 
+    [<Test>] member x.``Abbreviations - Module 01``() = x.DoNamedTest()
+    [<Test>] member x.``Abbreviations - Module 02``() = x.DoNamedTest()
+
     override x.DoTest(lifetime: Lifetime, project: IProject) =
         let psiServices = x.Solution.GetPsiServices()
         psiServices.Files.CommitAllDocuments()

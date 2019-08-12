@@ -99,3 +99,6 @@ type FSharpParserTest() =
     [<Test>] member x.``Attributes - Type let bindings 02``() = x.DoNamedTest()
     [<Test>] member x.``Attributes - Type let bindings 03 - Modifiers``() = x.DoNamedTest()
     [<Test>] member x.``Attributes - Type let bindings 04 - Multiple bindings``() = x.DoNamedTest()
+
+    [<Test>] member x.``Module abbreviation 01``() = x.DoNamedTest()
+    [<Test>] member x.``Module abbreviation 02``() = x.DoNamedTest()

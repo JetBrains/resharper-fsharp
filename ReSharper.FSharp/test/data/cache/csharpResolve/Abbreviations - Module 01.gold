@@ -1,0 +1,7 @@
+﻿public class Class1
+{
+  |M1|(0) m;
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Cannot access internal class 'M1' here
