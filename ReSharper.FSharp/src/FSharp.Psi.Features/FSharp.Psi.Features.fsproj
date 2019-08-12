@@ -131,4 +131,8 @@
     <Reference Include="WindowsBase" />
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="src\UnitTesting\Expecto.fs" />
+  </ItemGroup>
 </Project>

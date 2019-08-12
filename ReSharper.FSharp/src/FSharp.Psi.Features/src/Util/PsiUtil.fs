@@ -147,5 +147,5 @@ let rec getNonPatParent (pat: ISynPat) =
     | node -> node
 
 
-let isValid (node: ITreeNode) =
-    isNotNull node && node.IsValid()
+let inline isValid x =
+    isNotNull x && (^T: (member IsValid: unit -> bool) x)
