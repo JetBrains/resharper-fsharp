@@ -6,7 +6,6 @@ import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguage
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptLanguage
 
 class FSharpCodeStyleSettingsProvider : FSharpCodeStyleSettingsProviderBase(FSharpLanguage)
-class FSharpScriptCodeStyleSettingsProvider : FSharpCodeStyleSettingsProviderBase(FSharpScriptLanguage)
 
 abstract class FSharpCodeStyleSettingsProviderBase(private val lang: Language) : RiderLanguageCodeStyleSettingsProvider() {
     override fun createConfigurable(baseSettings: CodeStyleSettings, modelSettings: CodeStyleSettings) =

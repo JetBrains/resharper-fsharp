@@ -43,7 +43,6 @@
     <backend.autoPopup.support language="F# Script" implementationClass="com.jetbrains.rider.completion.BackendAndGenericRider" />
     <codeInsight.parameterInfo language="F# Script" implementationClass="com.jetbrains.rdclient.parameterInfo.FrontendParameterInfoHandler" />
     <breadcrumbsInfoProvider implementation="com.jetbrains.rider.plugins.fsharp.breadcrumbs.FSharpScriptBreadcrumbsInfoProvider"/>
-    <langCodeStyleSettingsProvider implementation="com.jetbrains.rider.settings.FSharpScriptCodeStyleSettingsProvider" />
     <lang.documentationProvider language="F# Script" implementationClass="com.jetbrains.rdclient.quickDoc.FrontendDocumentationProvider"/>
     <rider.debuggerSupportPolicy language="F# Script" implementationClass="com.jetbrains.rider.debugger.RiderDebuggerSupportPolicy" />
     <lineIndentProvider implementation="com.jetbrains.rider.plugins.fsharp.actions.FSharpScriptDummyLineIndentProvider"/>
