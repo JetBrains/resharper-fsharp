@@ -3,21 +3,19 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.UnitTesting.Expecto
 open System
 open JetBrains.Application.UI.BindableLinq.Collections
 open JetBrains.ProjectModel
-open JetBrains.ProjectModel.Assemblies.AssemblyToAssemblyResolvers
-open JetBrains.ProjectModel.Assemblies.Impl
 open JetBrains.ReSharper.Feature.Services.ClrLanguages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.UnitTestFramework
 open JetBrains.ReSharper.UnitTestFramework.AttributeChecker
 open JetBrains.ReSharper.UnitTestFramework.Elements
 open JetBrains.ReSharper.UnitTestFramework.Exploration
 open JetBrains.ReSharper.UnitTestFramework.Strategy
-open JetBrains.Util
 open JetBrains.Util.Reflection
 
 let expectoAssemblyName = AssemblyNameInfoFactory.Create("Expecto")
@@ -26,10 +24,47 @@ let testsAttribute = clrTypeName "Expecto.TestsAttribute"
 let pTestsAttribute = clrTypeName "Expecto.PTestsAttribute"
 let fTestsAttribute = clrTypeName "Expecto.FTestsAttribute"
 
+let expectoTestType = clrTypeName "Expecto.Test"
+
 let attributes =
     [| testsAttribute
        pTestsAttribute
        fTestsAttribute |]
+
+let getReturnType (declaredElement: IDeclaredElement) =
+    match declaredElement with
+    | :? IMethod as method -> method.ReturnType
+    | :? IProperty as property -> property.Type
+    | :? IField as field -> field.Type
+    | _ -> null
+
+let hasTestReturnType (declaredElement: IDeclaredElement) =
+    match getReturnType declaredElement with
+    | null -> false
+    | returnType ->
+
+    match returnType.GetTypeElement() with
+    | null -> false
+    | typeElement ->
+
+    typeElement.GetClrName() = expectoTestType && typeElement.Module.Name = "Expecto"
+
+let isExpectoTest (declaredElement: IDeclaredElement) =
+    match declaredElement.As<IModifiersOwner>() with
+    | null -> false
+    | modifiersOwner ->
+
+    if not modifiersOwner.IsStatic ||
+       modifiersOwner.GetAccessRights() <> AccessRights.PUBLIC then false else
+
+    if not (hasTestReturnType declaredElement) then false else
+
+    let solution = declaredElement.GetSolution()
+    let attributeChecker = solution.GetComponent<IUnitTestAttributeChecker>()
+
+    match declaredElement.As<IAttributesOwner>() with
+    | null -> false
+    | attributesOwner -> attributeChecker.HasDerivedAttribute(attributesOwner, attributes)
 
 
 [<UnitTestProvider>]
@@ -52,14 +87,13 @@ type ExpectoProvider() =
             element :? ExpectoTestElement
 
         member x.IsElementOfKind(declaredElement: IDeclaredElement, elementKind: UnitTestElementKind) =
-            if elementKind <> UnitTestElementKind.Test then false else
-
-            let solution = declaredElement.GetSolution()
-            let attributeChecker = solution.GetComponent<IUnitTestAttributeChecker>()
-
-            match declaredElement.As<IAttributesOwner>() with
-            | null -> false
-            | attributesOwner -> attributeChecker.HasDerivedAttribute(attributesOwner, attributes)
+            match elementKind with
+            | UnitTestElementKind.Test -> isExpectoTest declaredElement
+            | UnitTestElementKind.TestContainer ->
+                match declaredElement.As<ITypeElement>() with
+                | null -> false
+                | typeElement -> typeElement.GetMembers() |> Seq.exists isExpectoTest
+            | _ -> false
 
         member x.IsSupported(project, targetFrameworkId) = isSupported project targetFrameworkId
         member x.IsSupported(_, project, targetFrameworkId) = isSupported project targetFrameworkId
@@ -163,9 +197,6 @@ type Processor
         if interrupted.Invoke() then
             raise (OperationCanceledException())
 
-    let canBeTestElement (declaredElement: IDeclaredElement) =
-        declaredElement :? IMethod || declaredElement :? IField || declaredElement :? IProperty
-
     interface IRecursiveElementProcessor with
         member x.ProcessingIsFinished = false
         member x.ProcessAfterInterior _ = ()
@@ -179,17 +210,17 @@ type Processor
             let declaration = element.As<IDeclaration>()
             if isNull declaration || declaration :? IBinding then () else
 
-            let attributesOwner = declaration.DeclaredElement.As<IAttributesOwner>()
-            if isNull attributesOwner || not (canBeTestElement attributesOwner) then () else
+            let declaredElement = declaration.DeclaredElement
+            if not (isExpectoTest declaredElement) then () else
 
-            if not (attributeChecker.HasDerivedAttribute(attributesOwner, attributes)) then () else
-
-            let testElement = factory.CreateTestElement(attributesOwner, project, observer.TargetFrameworkId)
+            let testElement = factory.CreateTestElement(declaredElement, project, observer.TargetFrameworkId)
 
             let navigationRange = declaration.GetNameDocumentRange().TextRange
-            let containingRange = declaration.GetDocumentRange().TextRange
-            if (navigationRange.IsValid && containingRange.IsValid) then
-                observer.OnUnitTestElementDisposition(new UnitTestElementDisposition(testElement, projectFile, navigationRange, containingRange))
+            let documentRange = declaration.GetDocumentRange().TextRange
+
+            if navigationRange.IsValid && documentRange.IsValid then
+                let disposition = UnitTestElementDisposition(testElement, projectFile, navigationRange, documentRange)
+                observer.OnUnitTestElementDisposition(disposition)
 
 
 [<SolutionComponent>]
