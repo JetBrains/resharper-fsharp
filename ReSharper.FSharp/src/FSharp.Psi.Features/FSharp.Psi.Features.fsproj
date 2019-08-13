@@ -200,6 +200,7 @@
     <Compile Include="src\PostfixTemplates\MatchPostfixTemplate.fs" />
     <Compile Include="src\PostfixTemplates\ForPostfixTemplate.fs" />
     <Compile Include="src\RunMarkers\FSharpRunMarkerProvider.fs" />
+    <Compile Include="src\UnitTesting\Expecto.fs" />
     <Compile Include="src\LanguageService\FSharpDeclaredElementIconProvider.fs" />
     <Compile Include="src\LanguageService\FSharpPsiProperties.fs" />
     <Compile Include="src\LanguageService\FSharpProjectFileLanguageService.fs" />
@@ -232,8 +233,4 @@
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.ReSharperAutomationTools_src_ReSharperHost.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.ReSharperAutomationTools_src_ReSharperHost.Props')" />
-
-  <ItemGroup>
-    <Compile Include="src\UnitTesting\Expecto.fs" />
-  </ItemGroup>
 </Project>
