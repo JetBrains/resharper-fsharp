@@ -16,6 +16,7 @@ open JetBrains.ReSharper.UnitTestFramework.AttributeChecker
 open JetBrains.ReSharper.UnitTestFramework.Elements
 open JetBrains.ReSharper.UnitTestFramework.Exploration
 open JetBrains.ReSharper.UnitTestFramework.Strategy
+open JetBrains.Util
 open JetBrains.Util.Reflection
 
 let expectoAssemblyName = AssemblyNameInfoFactory.Create("Expecto")
@@ -66,6 +67,9 @@ let isExpectoTest (declaredElement: IDeclaredElement) =
     | null -> false
     | attributesOwner -> attributeChecker.HasDerivedAttribute(attributesOwner, attributes)
 
+let inline ensureValid (declaredElement: #IDeclaredElement) =
+    if not (isValid declaredElement) then null else
+    declaredElement :> IDeclaredElement
 
 [<UnitTestProvider>]
 type ExpectoProvider() =
@@ -105,15 +109,44 @@ type ExpectoProvider() =
 and [<SolutionComponent>]
     ExpectoService =
     { Provider: ExpectoProvider
+      IdFactory: IUnitTestElementIdFactory
       ElementManager: IUnitTestElementManager
-      IdFactory: IUnitTestElementIdFactory }
+      CachingService: UnitTestingCachingService }
 
 
 and [<AllowNullLiteral>]
-    ExpectoTestElement(id, name, declaredElement, service: ExpectoService) =
+    ExpectoTestElement(id: UnitTestElementId, name, declaredElement, service: ExpectoService) =
+
     let mutable parent: IUnitTestElement = Unchecked.defaultof<_>
     let children = new BindableSetCollectionWithoutIndexTracking<_>(UT.Locks.ReadLock, UnitTestElement.EqualityComparer)
 
+    let declaredElement = declaredElement.As<IXmlDocIdOwner>()
+    let containingType = declaredElement.GetContainingType()
+
+    let typeName = containingType.GetClrName().GetPersistent()
+    let xmlDocId = declaredElement.XMLDocId
+
+    let getContainingType () =
+        use cookie = ReadLockCookie.Create()
+        service.CachingService.GetTypeElement(id.Project, id.TargetFrameworkId, typeName, true, true)
+
+    let getDeclaredElement () =
+        match getContainingType () with
+        | null -> null
+        | containingType ->
+
+        let members = containingType.EnumerateMembers(name, true).AsList()
+        match members.Count with
+        | 0 -> null
+        | 1 -> ensureValid members.[0]
+        | _ ->
+
+        members
+        |> Seq.cast<IXmlDocIdOwner>
+        |> Seq.tryFind (fun m -> m.XMLDocId = xmlDocId)
+        |> Option.toObj
+        |> ensureValid
+    
     member x.RemoveChild(child) = children.Remove(child) |> ignore
     member x.AppendChild(child) = children.Add(child)
 
@@ -124,9 +157,12 @@ and [<AllowNullLiteral>]
         member x.ShortName = name
         member x.GetPresentation(_, _) = name
 
-        member x.GetDeclaredElement() = declaredElement
+        member x.GetDeclaredElement() = getDeclaredElement ()
 
         member x.GetProjectFiles() =
+            let declaredElement = getDeclaredElement ()
+            if isNull declaredElement then null else
+
             declaredElement.GetSourceFiles()
             |> Seq.map (fun sourceFile -> sourceFile.ToProjectFile())
 
@@ -135,7 +171,8 @@ and [<AllowNullLiteral>]
             UnitTestElementNamespaceFactory.Create(cl.GetContainingType().GetClrName().NamespaceNames)
 
         member x.GetDisposition() =
-            if not (isValid declaredElement) then UnitTestElementDisposition.InvalidDisposition else
+            let declaredElement = getDeclaredElement ()
+            if isNull declaredElement then UnitTestElementDisposition.InvalidDisposition else
 
             let locations =
                 declaredElement.GetDeclarations()
@@ -178,13 +215,20 @@ and [<AllowNullLiteral>]
 
 
 type ExpectoElementFactory(expectoService: ExpectoService) =
-//    let elements = new WeakToWeakDictionary<UnitTestElementId, IUnitTestElement>()
+    let elements = new WeakToWeakDictionary<UnitTestElementId, IUnitTestElement>()
 
     member x.CreateTestElement(el: IDeclaredElement, project: IProject, targetFrameworkId) =
         let id = expectoService.IdFactory.Create(expectoService.Provider, project, targetFrameworkId, el.ShortName)
+
+        let mutable element = Unchecked.defaultof<_>
+        if elements.TryGetValue(id, &element) then element else
+
+        let element = expectoService.ElementManager.GetElementById(id)
+        if isNotNull element then element else
+
         match expectoService.ElementManager.GetElementById(id) with
         | null -> ExpectoTestElement(id, el.ShortName, el, expectoService) :> IUnitTestElement
-        | el -> el
+        | element -> element
 
 
 type Processor
