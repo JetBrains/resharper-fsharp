@@ -650,7 +650,7 @@ typeTestExpr options { stubBase="DummyExpression"; }:
 
 upcastExpr options { stubBase="DummyExpression"; }:
   synExpr<EXPR, Expression>
-  COLON_GREATER
+  COLON_GREATER<OP, OperatorToken>
   synType<TYPE, Type>;
   
 downcastExpr options { stubBase="DummyExpression"; }:

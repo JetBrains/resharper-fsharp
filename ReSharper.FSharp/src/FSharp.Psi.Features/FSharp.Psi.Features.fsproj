@@ -17,6 +17,7 @@
     <Compile Include="src\CodeCompletion\FSharpLookupItem.fs" />
     <Compile Include="src\CodeCompletion\FSharpCompletionProviders.fs" />
     <Compile Include="src\CodeStructure\FSharpCodeStructure.fs" />
+    <Compile Include="src\Daemon\Highlightings\FSharpErrorUtil.fs" />
     <Compile Include="src\Daemon\Highlightings\ErrorHighlightings.fs" />
     <Compile Include="Src\Daemon\Highlightings\CommonErrors.Generated.fs">
       <DependentUpon>CommonErrors.xml</DependentUpon>
@@ -57,6 +58,7 @@
     <Compile Include="src\Daemon\QuickFixes\ToRecursiveLetBindingsFix.fs" />
     <Compile Include="src\Daemon\QuickFixes\RemoveRedundantBackticksFix.fs" />
     <Compile Include="src\Daemon\QuickFixes\RemoveInlineFix.fs" />
+    <Compile Include="src\Daemon\QuickFixes\RemoveUnnecessaryUpcastFix.fs" />
     <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
       <Mode>QUICKFIX</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>

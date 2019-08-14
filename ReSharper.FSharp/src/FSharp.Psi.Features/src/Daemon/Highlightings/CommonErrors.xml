@@ -136,4 +136,12 @@
     <Message value="Redundant identifier quotation"/>
     <QuickFix>RemoveRedundantBackticksFix</QuickFix>
   </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="UpcastUnnecessary">
+    <Parameter type="IUpcastExpr" name="upcastExpr"/>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Range>FSharpErrorUtil.getUpcastRange upcastExpr</Range>
+    <Message value="Upcast is unnecessary"/>
+    <QuickFix>RemoveUnnecessaryUpcastFix</QuickFix>
+  </Warning>
 </Errors>
