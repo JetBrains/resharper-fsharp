@@ -4,6 +4,7 @@ open System
 open JetBrains.Application.UI.BindableLinq.Collections
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.ClrLanguages
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.UnitTesting.ExpectoRunner
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -67,24 +68,27 @@ let isExpectoTest (declaredElement: IDeclaredElement) =
     | null -> false
     | attributesOwner -> attributeChecker.HasDerivedAttribute(attributesOwner, attributes)
 
+let isSupported project tfId =
+    use cookie = ReadLockCookie.Create()
+
+    let mutable info = Unchecked.defaultof<_>
+    ReferencedAssembliesService.IsProjectReferencingAssemblyByName(project, tfId, expectoAssemblyName, &info) ||
+    ReferencedProjectsService.IsProjectReferencingAssemblyByName(project, tfId, expectoAssemblyName, &info)
+
 let inline ensureValid (declaredElement: #IDeclaredElement) =
     if not (isValid declaredElement) then null else
     declaredElement :> IDeclaredElement
+
+let [<Literal>] expectoId = "Expecto"
+
 
 [<UnitTestProvider>]
 type ExpectoProvider() =
     let elementComparer = UnitTestElementComparer(typeof<ExpectoTestElement>)
 
-    let isSupported project targetFrameworkId =
-        use cookie = ReadLockCookie.Create()
-
-        let mutable info = Unchecked.defaultof<_>
-        ReferencedAssembliesService.IsProjectReferencingAssemblyByName(project, targetFrameworkId, expectoAssemblyName, &info) ||
-        ReferencedProjectsService.IsProjectReferencingAssemblyByName(project, targetFrameworkId, expectoAssemblyName, &info)
-    
     interface IUnitTestProvider with
-        member x.ID = "Expecto"
-        member x.Name = "Expecto"
+        member x.ID = expectoId
+        member x.Name = expectoId
 
         member x.IsElementOfKind(element: IUnitTestElement, elementKind: UnitTestElementKind) =
             if elementKind <> UnitTestElementKind.Test then false else
@@ -109,6 +113,7 @@ type ExpectoProvider() =
 and [<SolutionComponent>]
     ExpectoService =
     { Provider: ExpectoProvider
+      Strategy: ExpectoTestRunStrategy
       IdFactory: IUnitTestElementIdFactory
       ElementManager: IUnitTestElementManager
       CachingService: UnitTestingCachingService }
@@ -146,7 +151,7 @@ and [<AllowNullLiteral>]
         |> Seq.tryFind (fun m -> m.XMLDocId = xmlDocId)
         |> Option.toObj
         |> ensureValid
-    
+
     member x.RemoveChild(child) = children.Remove(child) |> ignore
     member x.AppendChild(child) = children.Add(child)
 
@@ -167,8 +172,11 @@ and [<AllowNullLiteral>]
             |> Seq.map (fun sourceFile -> sourceFile.ToProjectFile())
 
         member x.GetNamespace() =
-            let cl = declaredElement.As<IClrDeclaredElement>()
-            UnitTestElementNamespaceFactory.Create(cl.GetContainingType().GetClrName().NamespaceNames)
+            let declaredElement = getDeclaredElement ()
+            if isNull declaredElement then UnitTestElementNamespace.Empty else
+
+            let clrDeclaredElement = declaredElement.As<IClrDeclaredElement>()
+            UnitTestElementNamespaceFactory.Create(clrDeclaredElement.GetContainingType().GetClrName().NamespaceNames)
 
         member x.GetDisposition() =
             let declaredElement = getDeclaredElement ()
@@ -203,14 +211,25 @@ and [<AllowNullLiteral>]
 
         member x.Children = children :> _
 
-        member x.GetRunStrategy _ = DoNothingRunStrategy() :> _
-        member x.GetTaskSequence(explicitElements, run) = null // todo
+        member x.GetRunStrategy _ = service.Strategy :> _
+
+        member x.GetTaskSequence(explicitElements, run) =
+            let assemblyTask = ExpectoAssemblyTask(id.Project.GetOutputFilePath(id.TargetFrameworkId).FullPath)
+            let elementTask = ExpectTestElementTask(id.Id)
+
+            [| UnitTestTask(null, assemblyTask)
+               UnitTestTask(x, elementTask) |] :> _
 
         member val OwnCategories = Unchecked.defaultof<_> with get, set
         member val Origin = Unchecked.defaultof<_> with get, set
 
         member x.Explicit = false
         member x.ExplicitReason = ""
+
+
+and [<SolutionComponent>]
+    ExpectoTestRunStrategy(agentManager, resultManager) =
+    inherit TaskRunnerOutOfProcessUnitTestRunStrategy(agentManager, resultManager, ExpectoTaskRunner.RunnerInfo)
 
 
 
@@ -232,8 +251,8 @@ type ExpectoElementFactory(expectoService: ExpectoService) =
 
 
 type Processor
-        (interrupted: Func<bool>, attributeChecker: IUnitTestAttributeChecker, factory: ExpectoElementFactory,
-         observer: IUnitTestElementsObserver, projectFile: IProjectFile) =
+        (interrupted: Func<bool>, factory: ExpectoElementFactory, observer: IUnitTestElementsObserver,
+         projectFile: IProjectFile) =
 
     let project = projectFile.GetProject()
 
@@ -280,5 +299,5 @@ type ExpectoTestFileExplorer
             if isNull projectFile then () else
 
             let factory = ExpectoElementFactory(service)
-            let processor = Processor(interrupted, attributeChecker, factory, observer, projectFile)
+            let processor = Processor(interrupted, factory, observer, projectFile)
             file.ProcessDescendants(processor)

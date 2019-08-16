@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net461</TargetFramework>
+    <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.UnitTesting</RootNamespace>
+    <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Expecto.Runner</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="ExpectoRunner.fs" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
+  </ItemGroup>
+</Project>
