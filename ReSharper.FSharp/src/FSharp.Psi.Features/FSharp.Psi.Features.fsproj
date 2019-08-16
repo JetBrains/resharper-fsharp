@@ -224,6 +224,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FSharp.Psi\FSharp.Psi.csproj" />
+    <ProjectReference Include="..\Expecto.Runner\Expecto.Runner.fsproj" />
   </ItemGroup>
 
   <ItemGroup>
