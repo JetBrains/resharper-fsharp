@@ -495,6 +495,8 @@ type FSharpTypingAssist
         if x.DeindentAfterUnfinishedExpr(textControl, lexer) then true else
         if x.IndentAfterRArrow(textControl, lexer) then true else
 
+        if lexer.FindTokenAt(offset) && isFirstTokenOnLine lexer && not (isLastTokenOnLine lexer) then false else
+
         let indentSize =
             let defaultIndent = getIndentSize textControl
             match getLineIndent cachingLexerService textControl caretLine with
