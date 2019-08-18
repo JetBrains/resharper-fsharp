@@ -99,6 +99,8 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter 66 - After larrow - Comment``() = x.DoNamedTest()
     [<Test>] member x.``Enter 67 - After larrow``() = x.DoNamedTest()
     [<Test>] member x.``Enter 68 - After larrow``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 69 - After parens on new line``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 70 - After parens on new line 2``() = x.DoNamedTest()
 
     [<Test>] member x.``Enter after arrow 01``() = x.DoNamedTest()
     
