@@ -1,0 +1,8 @@
+﻿//${NEW_NAME:Zzz}
+public class Class1
+{
+  public Class1()
+  {
+    Zzz zzz = Zzz.NewZzz(123);
+  }
+}

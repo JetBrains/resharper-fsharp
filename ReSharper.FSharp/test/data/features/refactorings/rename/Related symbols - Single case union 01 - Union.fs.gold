@@ -1,0 +1,7 @@
+﻿namespace global
+
+type Zzz =
+    | Zzz of int
+
+module Module =
+    let u: Zzz = Zzz 123

@@ -1,8 +1,10 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings.Rename
 
 open System
+open System.Linq
 open FSharp.Compiler.PrettyNaming
 open JetBrains.Application
+open JetBrains.Diagnostics
 open JetBrains.IDE.UI.Extensions.Validation
 open JetBrains.ReSharper.Feature.Services.Refactorings.Specific.Rename
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -195,3 +197,24 @@ type FSharpDeclaredElementForRenameProvider() =
             match generated.OriginElement with
             | null -> element
             | origin -> origin :> _
+
+
+[<DerivedRenamesEvaluator>]
+type SingleUnionCaseRenameEvaluator() =
+    interface IDerivedRenamesEvaluator with
+        member x.SuggestedElementsHaveDerivedName = false
+        member x.CreateFromReference(_, _) = EmptyList.Instance :> _
+
+        member x.CreateFromElement(initialElement, _) =
+            match initialElement.FirstOrDefault() with
+            | :? ITypeElement as typeElement when typeElement.IsUnion() ->
+                let unionCases = typeElement.GetUnionCases()
+                if unionCases.Count <> 1 then [] :> _ else
+                [| unionCases.[0] :> IDeclaredElement |] :> _
+
+            | :? IUnionCase as unionCase ->
+                let containingType = unionCase.GetContainingType().NotNull()
+                if containingType.GetUnionCases().Count <> 1 then [] :> _ else
+                [| containingType :> IDeclaredElement |] :> _
+
+            | _ -> [] :> _

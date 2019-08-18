@@ -83,7 +83,7 @@ type FSharpRenameTest() =
 
     [<Test>] member x.``Types - Attributes 01``() = x.DoNamedTest()
 
-    [<Test>] member x.``Union Cases 01``() = x.DoNamedTest()
+    [<Test>] member x.``Union Cases 01``() = x.DoNamedTest() // todo: option to disable renaming related symbols in test
     [<Test>] member x.``Union Cases 02 - Should start with upper case``() = x.DoNamedTest()
 
     [<Test>] member x.``Types - Ctor 01``() = x.DoNamedTest()
@@ -147,3 +147,6 @@ type FSharpRenameTest() =
     [<Test>] member x.``Implicit module 02 - To same name``() = x.DoNamedTestFiles()
 
     [<Test>] member x.``Generated members - Record fields 01 - Ctor param``() = x.DoNamedTestFiles()
+
+    [<Test>] member x.``Related symbols - Single case union 01 - Union``() = x.DoNamedTestFiles()
+    [<Test>] member x.``Related symbols - Single case union 02 - Case``() = x.DoNamedTestFiles()
