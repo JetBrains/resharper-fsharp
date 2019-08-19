@@ -64,5 +64,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       throw new InvalidOperationException();
 
     public virtual bool IsAnonymous => false;
+
+    public ITypeElement AssociatedTypeElement =>
+      GetDeclaration() is INestedModuleDeclaration moduleDeclaration
+        ? ((ITypeDeclaration) moduleDeclaration.GetAssociatedTypeDeclaration(out _)).DeclaredElement
+        : null;
   }
 }

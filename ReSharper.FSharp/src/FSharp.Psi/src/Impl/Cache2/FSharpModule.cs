@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
@@ -20,5 +22,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     protected override bool AcceptsPart(TypePart part) =>
       part is IModulePart;
+
+    public ITypeElement AssociatedTypeElement =>
+      EnumerateParts()
+        .Select(part => (part as IModulePart)?.AssociatedTypeElement)
+        .WhereNotNull()
+        .FirstOrDefault();
   }
 }
