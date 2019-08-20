@@ -27,6 +27,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "FSharp.Common.Tests", "test
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Expecto.Runner", "src\Expecto.Runner\Expecto.Runner.fsproj", "{B7F83D4A-3BCF-471B-9585-373FC4B2AAA4}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Expecto.Tasks", "src\Expecto.Tasks\Expecto.Tasks.fsproj", "{91712967-20BD-4AD4-8ADB-7D35E4D5519A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,6 +75,10 @@ Global
 		{B7F83D4A-3BCF-471B-9585-373FC4B2AAA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B7F83D4A-3BCF-471B-9585-373FC4B2AAA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B7F83D4A-3BCF-471B-9585-373FC4B2AAA4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91712967-20BD-4AD4-8ADB-7D35E4D5519A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91712967-20BD-4AD4-8ADB-7D35E4D5519A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91712967-20BD-4AD4-8ADB-7D35E4D5519A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91712967-20BD-4AD4-8ADB-7D35E4D5519A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -88,5 +94,6 @@ Global
 		{3FF7EEB4-24B5-4E52-8A11-EF731BF6A9BD} = {7B41BA27-ACA5-43D2-9EBA-2E604D63A4E2}
 		{83C5104C-057E-4AF8-B3FE-3437968CA621} = {7B41BA27-ACA5-43D2-9EBA-2E604D63A4E2}
 		{B7F83D4A-3BCF-471B-9585-373FC4B2AAA4} = {2E19336B-3133-4C1A-8E65-E2F7C465663B}
+		{91712967-20BD-4AD4-8ADB-7D35E4D5519A} = {2E19336B-3133-4C1A-8E65-E2F7C465663B}
 	EndGlobalSection
 EndGlobal

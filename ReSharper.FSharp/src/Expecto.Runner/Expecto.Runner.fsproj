@@ -3,6 +3,8 @@
     <TargetFramework>net461</TargetFramework>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.UnitTesting</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Expecto.Runner</AssemblyName>
+    <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,6 +12,17 @@
   </ItemGroup>
   
   <ItemGroup>
+    <PackageReference Include="FSharp.Core" Version="$(FSharpCoreVersion)" />
     <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Reference Include="Expecto">
+      <HintPath>..\..\..\..\expecto\Expecto\bin\Debug\net461\Expecto.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Expecto.Tasks\Expecto.Tasks.fsproj" />
   </ItemGroup>
 </Project>
