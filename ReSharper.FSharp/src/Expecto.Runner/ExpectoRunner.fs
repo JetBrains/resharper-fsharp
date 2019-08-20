@@ -23,6 +23,10 @@ type ExpectoTestRunner() =
         | None -> ()
         | Some test ->
 
+        // Tests may fail to be discovered, e.g. due to duplicate test names.
+        // We set this value in `beforeRun` and checking at test session run end. 
+        let mutable testsSuccessfullyDiscovered = false
+
         let testSummary _ testSummary =
             for executionNode in assemblyTaskNode.Children do
                 server.TaskDuration(executionNode.RemoteTask, testSummary.duration)
@@ -33,6 +37,7 @@ type ExpectoTestRunner() =
             async.Zero()
 
         let beforeRun _ =
+            testsSuccessfullyDiscovered <- true
             async.Zero()
 
         let beforeEach _ =
@@ -63,21 +68,13 @@ type ExpectoTestRunner() =
               failed = failed
               exn = exn }
 
-        let tests = Expecto.Test.toTestCodeList test
-        let conf = { defaultConfig with printer = testPrinters }
+        let cliArgs = [ CLIArguments.Printer testPrinters ]
+        let args = [| |]
 
-//        server.TaskDiscovered(DiscoveryFinishedTask(expectoId))
-        
-//        for executionNode in assemblyTaskNode.Children do
-//            server.TaskDiscovered(executionNode.RemoteTask)
-//            server.TaskStarting(executionNode.RemoteTask)
-
-        Expecto.Tests.runTests conf test |> ignore
-
-        let _ =
-            test,
-            tests
-        ()
+        let returnCode = Expecto.Tests.runTestsWithCLIArgs cliArgs args test
+        if returnCode <> 0 && not testsSuccessfullyDiscovered then
+            // todo: use proper task
+            server.TaskFinished(assemblyTaskNode.Children.[0].RemoteTask, "", TaskResult.Exception)
 
 
 and ExpectoTaskRunner(server) =
