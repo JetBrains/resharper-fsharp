@@ -1,10 +1,11 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.UnitTesting.Expecto
 
 open System
+open System.IO
 open JetBrains.Application.UI.BindableLinq.Collections
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.ClrLanguages
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.UnitTesting.ExpectoRunner
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.UnitTesting.Expecto.Tasks
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -12,6 +13,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.ReSharper.TaskRunnerFramework
 open JetBrains.ReSharper.UnitTestFramework
 open JetBrains.ReSharper.UnitTestFramework.AttributeChecker
 open JetBrains.ReSharper.UnitTestFramework.Elements
@@ -79,8 +81,18 @@ let inline ensureValid (declaredElement: #IDeclaredElement) =
     if not (isValid declaredElement) then null else
     declaredElement :> IDeclaredElement
 
-let [<Literal>] expectoId = "Expecto"
+let runnerInfo =
+    let location = typeof<RemoteTask>.Assembly.Location
+    let dir = Path.GetDirectoryName(location)
+    
+    let expectoTaskType = typeof<ExpectoAssemblyTask>
+    let location2 = expectoTaskType.Assembly.Location
+    let dir2 = Path.GetDirectoryName(location2)
+    let path = Path.Combine(dir2, "JetBrains.ReSharper.Plugins.FSharp.Expecto.Runner.dll")
 
+    let typeName = "JetBrains.ReSharper.Plugins.FSharp.Psi.Features.UnitTesting.ExpectoRunner+ExpectoTaskRunner"
+    
+    RemoteTaskRunnerInfo(expectoId, path, typeName, [| dir |])
 
 [<UnitTestProvider>]
 type ExpectoProvider() =
@@ -213,9 +225,13 @@ and [<AllowNullLiteral>]
 
         member x.GetRunStrategy _ = service.Strategy :> _
 
-        member x.GetTaskSequence(explicitElements, run) =
+        member x.GetTaskSequence(_, run) =
             let assemblyTask = ExpectoAssemblyTask(id.Project.GetOutputFilePath(id.TargetFrameworkId).FullPath)
-            let elementTask = ExpectTestElementTask(id.Id)
+
+            let elementTask =
+                match run.GetRemoteTaskForElement(x) with
+                | null -> ExpectoTestsTask(id.Id)
+                | task -> task
 
             [| UnitTestTask(null, assemblyTask)
                UnitTestTask(x, elementTask) |] :> _
@@ -229,8 +245,7 @@ and [<AllowNullLiteral>]
 
 and [<SolutionComponent>]
     ExpectoTestRunStrategy(agentManager, resultManager) =
-    inherit TaskRunnerOutOfProcessUnitTestRunStrategy(agentManager, resultManager, ExpectoTaskRunner.RunnerInfo)
-
+    inherit TaskRunnerOutOfProcessUnitTestRunStrategy(agentManager, resultManager, runnerInfo)
 
 
 type ExpectoElementFactory(expectoService: ExpectoService) =
@@ -242,11 +257,12 @@ type ExpectoElementFactory(expectoService: ExpectoService) =
         let mutable element = Unchecked.defaultof<_>
         if elements.TryGetValue(id, &element) then element else
 
-        let element = expectoService.ElementManager.GetElementById(id)
-        if isNotNull element then element else
-
         match expectoService.ElementManager.GetElementById(id) with
-        | null -> ExpectoTestElement(id, el.ShortName, el, expectoService) :> IUnitTestElement
+        | null ->
+            let element = ExpectoTestElement(id, el.ShortName, el, expectoService) :> IUnitTestElement
+            elements.[id] <- element
+            element
+
         | element -> element
 
 
@@ -287,8 +303,7 @@ type Processor
 
 
 [<SolutionComponent>]
-type ExpectoTestFileExplorer
-        (service: ExpectoService, clrLanguages: ClrLanguagesKnown, attributeChecker: IUnitTestAttributeChecker) =
+type ExpectoTestFileExplorer(service: ExpectoService, clrLanguages: ClrLanguagesKnown) =
     interface IUnitTestExplorerFromFile with
         member x.Provider = service.Provider :> _
 
@@ -301,3 +316,15 @@ type ExpectoTestFileExplorer
             let factory = ExpectoElementFactory(service)
             let processor = Processor(interrupted, factory, observer, projectFile)
             file.ProcessDescendants(processor)
+
+
+//[<SolutionComponent>]
+//type ExpectoTestMetadataExplorer(provider: ExpectoProvider, resolveManager, resolveContextManager, logger) =
+//    inherit UnitTestExplorerFrom.DotNetArtifacts(provider, resolveManager, resolveContextManager, logger)
+//
+//    override x.ProcessProject(project, assemblyPath, loader, observer, cancellationToken) =
+//        MetadataElementsSource.ExploreProject(project, assemblyPath, loader, observer, logger, cancellationToken,
+//            fun assembly ->
+//
+//            ()
+//        )
