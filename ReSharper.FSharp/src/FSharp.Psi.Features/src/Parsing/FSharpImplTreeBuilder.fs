@@ -222,6 +222,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
 
                                     x.MarkChameleonExpression(expr)
                                     ElementType.MEMBER_CONSTRUCTOR_DECLARATION
+
                                 | _ ->
                                     x.ProcessMemberDeclaration(typeParamsOpt, memberParams, returnInfo, expr, range)
                                     ElementType.MEMBER_DECLARATION
@@ -232,6 +233,12 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                                 ElementType.MEMBER_DECLARATION
 
                             | _ -> ElementType.OTHER_TYPE_MEMBER
+
+                        | SynPat.Named _ ->
+                            // In some cases patterns for static members inside records are represented this way.
+                            x.ProcessMemberDeclaration(None, SynConstructorArgs.Pats [], returnInfo, expr, range)
+                            ElementType.MEMBER_DECLARATION
+
                         | _ -> ElementType.OTHER_TYPE_MEMBER
                     elType
 
