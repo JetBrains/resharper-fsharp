@@ -1,6 +1,7 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.UnitTesting.ExpectoRunner
 
 open System
+open System.Collections.Generic
 open System.IO
 open System.Reflection
 open global.Expecto
@@ -12,14 +13,45 @@ open JetBrains.ReSharper.TaskRunnerFramework
 type ExpectoTestRunner() =
     inherit MarshalByRefObject()
 
-    member x.Run(server: IRemoteTaskServer, configuration: TaskExecutorConfiguration, logger: SimpleLogger,
-                 assemblyTaskNode: TaskExecutionNode,  shadowCopyCookie: IShadowCopyCookie, task: ExpectoAssemblyTask) =
-        TaskExecutor.Configuration <- configuration
-        TaskExecutor.Logger <- logger
+    let listToTestListOption test =
+        match test with
+        | [] -> None
+        | [test] -> Some(test)
+        | tests -> Some(TestList(tests, Normal))
 
-        let assemblyPath = task.Path
-        let assembly = Assembly.LoadFrom(assemblyPath)
-        match testFromAssembly assembly with
+    member x.Run(server: IRemoteTaskServer, assemblyTaskNode: TaskExecutionNode, task: ExpectoAssemblyTask) =
+        // todo: pass proper nodes tree
+        let testTask = assemblyTaskNode.Children.[0].RemoteTask :?> ExpectoTestsTask
+        let testsName = testTask.TestId
+
+        let test =
+            let assemblyPath = task.Path
+            let assembly = Assembly.LoadFrom(assemblyPath)
+
+            let bindingFlags = BindingFlags.Public ||| BindingFlags.Static
+
+            let testMembers = List<MemberInfo>()
+            for exportedType in  assembly.GetExportedTypes() do
+                let typeInfo = exportedType.GetTypeInfo()
+
+                let typeMembers: MemberInfo seq =
+                    seq {
+                        yield! typeInfo.GetMethods(bindingFlags) |> Seq.cast
+                        yield! typeInfo.GetFields(bindingFlags) |> Seq.cast
+                        yield! typeInfo.GetProperties(bindingFlags) |> Seq.cast
+                    }
+
+                for m in typeMembers do
+                    // todo: check method overloads
+                    if m.Name = testsName then
+                        testMembers.Add(m)
+
+            testMembers
+            |> Seq.choose testFromMember
+            |> List.ofSeq
+            |> listToTestListOption
+
+        match test with
         | None -> ()
         | Some test ->
 
@@ -86,10 +118,8 @@ type ExpectoTestRunner() =
             server.TaskFinished(assemblyTaskNode.Children.[0].RemoteTask, "", TaskResult.Exception)
 
 
-and ExpectoTaskRunner(server) =
+type ExpectoTaskRunner(server) =
     inherit RecursiveRemoteTaskRunner(server)
-
-    let mutable runner = null
 
     override x.ExecuteRecursive(node: TaskExecutionNode) =
         let assemblyTask = node.RemoteTask :?> ExpectoAssemblyTask
@@ -117,11 +147,8 @@ and ExpectoTaskRunner(server) =
         ourAssemblyLoader.RegisterPath(assemblyDir)
         domainAssemblyLoader.RegisterPath(assemblyDir)
 
-        // todo: remove
-        ourAssemblyLoader.RegisterPathOf<AssemblyLoader>()
-
-        runner <- domainCookie.CreateAndUnwrapFrom<ExpectoTestRunner>()
-        runner.Run(x.Server, TaskExecutor.Configuration, TaskExecutor.Logger, node, shadowCopyCookie, assemblyTask)
+        let runner = domainCookie.CreateAndUnwrapFrom<ExpectoTestRunner>()
+        runner.Run(x.Server, node, assemblyTask)
 
     static member val RunnerInfo =
         let location = typeof<RemoteTask>.Assembly.Location
