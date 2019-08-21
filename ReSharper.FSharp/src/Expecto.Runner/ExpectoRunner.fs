@@ -1,4 +1,4 @@
-﻿module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.UnitTesting.ExpectoRunner
+module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.UnitTesting.ExpectoRunner
 
 open System
 open System.IO
@@ -68,10 +68,19 @@ type ExpectoTestRunner() =
               failed = failed
               exn = exn }
 
-        let cliArgs = [ CLIArguments.Printer testPrinters ]
-        let args = [| |]
+        let cliArgs = [ CLIArguments.Printer testPrinters; CLIArguments.Allow_Duplicate_Names ]
 
-        let returnCode = Expecto.Tests.runTestsWithCLIArgs cliArgs args test
+        let config =
+            // This path requires Expecto 8.9.0+.
+            let expectoAssembly = typeof<Expecto.TestsAttribute>.Assembly
+            let testsModule = expectoAssembly.GetType("Expecto.Tests")
+            let bindingFlags = BindingFlags.Static ||| BindingFlags.NonPublic
+            let foldMethod = testsModule.GetMethod("foldCLIArgumentToConfig", bindingFlags)
+
+            let foldArg config arg = (foldMethod.Invoke(null, [| arg |]) :?> _) config
+            Seq.fold foldArg ExpectoConfig.defaultConfig cliArgs
+
+        let returnCode = Expecto.Tests.runTests config test
         if returnCode <> 0 && not testsSuccessfullyDiscovered then
             // todo: use proper task
             server.TaskFinished(assemblyTaskNode.Children.[0].RemoteTask, "", TaskResult.Exception)
