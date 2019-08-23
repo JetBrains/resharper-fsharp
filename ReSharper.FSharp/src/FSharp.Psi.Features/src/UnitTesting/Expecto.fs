@@ -1,7 +1,9 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.UnitTesting.Expecto
 
 open System
+open System.Collections.Generic
 open System.IO
+open System.Linq
 open JetBrains.Application.UI.BindableLinq.Collections
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.ClrLanguages
@@ -10,6 +12,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
@@ -96,7 +99,10 @@ let runnerInfo =
 
 [<UnitTestProvider>]
 type ExpectoProvider() =
-    let elementComparer = UnitTestElementComparer(typeof<ExpectoTestElement>)
+    let elementComparer = UnitTestElementComparer(typeof<ExpectoTestsElement>)
+
+    // todo: remove
+    let taskIds = Dictionary<int, string>()
 
     interface IUnitTestProvider with
         member x.ID = expectoId
@@ -104,7 +110,7 @@ type ExpectoProvider() =
 
         member x.IsElementOfKind(element: IUnitTestElement, elementKind: UnitTestElementKind) =
             if elementKind <> UnitTestElementKind.Test then false else
-            element :? ExpectoTestElement
+            element :? ExpectoTestsElement
 
         member x.IsElementOfKind(declaredElement: IDeclaredElement, elementKind: UnitTestElementKind) =
             match elementKind with
@@ -121,6 +127,29 @@ type ExpectoProvider() =
         member x.CompareUnitTestElements(a, b) = elementComparer.Compare(a, b)
         member x.SupportsResultEventsForParentOf _ = false
 
+    interface IDynamicUnitTestProvider with
+        member x.GetDynamicElement(remoteTask, taskIdsToElements) =
+            match remoteTask.As<ExpectoTestTaskBase>() with
+            | null -> failwith "unknown task"
+            | task ->
+
+            taskIds.[task.UniqueId] <- task.Id
+
+            let testElement =
+                if task.ParentUniqueId = 0 then taskIdsToElements.Values.FirstOrDefault().As<ExpectoTestElementBase>()
+                else taskIdsToElements.[taskIds.[task.ParentUniqueId]] :?> _
+
+            let declaredElement = testElement.DeclaredElement :?> IClrDeclaredElement
+
+            let solution = declaredElement.GetSolution()
+            let idFactory = solution.GetComponent<IUnitTestElementIdFactory>()
+            let service = solution.GetComponent<ExpectoService>()
+
+            let psiModule = declaredElement.Module
+            let project = psiModule.ContainingProjectModule :?> IProject
+            let id = idFactory.Create(x, project, psiModule.TargetFrameworkId, task.Name)
+            ExpectoTestCaseElement(task.Name, id, service, Parent = testElement) :> _
+
 
 and [<SolutionComponent>]
     ExpectoService =
@@ -132,40 +161,34 @@ and [<SolutionComponent>]
 
 
 and [<AllowNullLiteral>]
-    ExpectoTestElement(id: UnitTestElementId, name, declaredElement, service: ExpectoService) =
+    ExpectoTestCaseElement(name, id: UnitTestElementId, service: ExpectoService) =
+    inherit ExpectoTestElementBase(name, id, service)
 
+and [<AbstractClass; AllowNullLiteral>]
+    ExpectoTestElementBase(name: string, id: UnitTestElementId, service: ExpectoService) =
     let mutable parent: IUnitTestElement = Unchecked.defaultof<_>
     let children = new BindableSetCollectionWithoutIndexTracking<_>(UT.Locks.ReadLock, UnitTestElement.EqualityComparer)
 
-    let declaredElement = declaredElement.As<IXmlDocIdOwner>()
-    let containingType = declaredElement.GetContainingType()
-
-    let typeName = containingType.GetClrName().GetPersistent()
-    let xmlDocId = declaredElement.XMLDocId
-
-    let getContainingType () =
-        use cookie = ReadLockCookie.Create()
-        service.CachingService.GetTypeElement(id.Project, id.TargetFrameworkId, typeName, true, true)
-
-    let getDeclaredElement () =
-        match getContainingType () with
-        | null -> null
-        | containingType ->
-
-        let members = containingType.EnumerateMembers(name, true).AsList()
-        match members.Count with
-        | 0 -> null
-        | 1 -> ensureValid members.[0]
-        | _ ->
-
-        members
-        |> Seq.cast<IXmlDocIdOwner>
-        |> Seq.tryFind (fun m -> m.XMLDocId = xmlDocId)
-        |> Option.toObj
-        |> ensureValid
-
     member x.RemoveChild(child) = children.Remove(child) |> ignore
     member x.AppendChild(child) = children.Add(child)
+
+    member x.Parent
+        with get () = parent
+        and set (value: IUnitTestElement) =
+            if value == parent then () else
+            begin
+                use lock = UT.WriteLock()
+                if isNotNull parent then
+                    (parent :?> ExpectoTestElementBase).RemoveChild(x)
+
+                if isNotNull value then
+                    parent <- value
+                    (parent :?> ExpectoTestElementBase).AppendChild(x)
+            end
+            service.ElementManager.FireElementChanged(x)
+
+    abstract DeclaredElement: IDeclaredElement
+    default x.DeclaredElement = x.Parent.GetDeclaredElement()
 
     interface IUnitTestElement with
         member x.Id = id
@@ -174,24 +197,24 @@ and [<AllowNullLiteral>]
         member x.ShortName = name
         member x.GetPresentation(_, _) = name
 
-        member x.GetDeclaredElement() = getDeclaredElement ()
+        member x.GetDeclaredElement() = x.DeclaredElement
 
         member x.GetProjectFiles() =
-            let declaredElement = getDeclaredElement ()
+            let declaredElement = x.DeclaredElement
             if isNull declaredElement then null else
 
             declaredElement.GetSourceFiles()
             |> Seq.map (fun sourceFile -> sourceFile.ToProjectFile())
 
         member x.GetNamespace() =
-            let declaredElement = getDeclaredElement ()
+            let declaredElement = x.DeclaredElement
             if isNull declaredElement then UnitTestElementNamespace.Empty else
 
             let clrDeclaredElement = declaredElement.As<IClrDeclaredElement>()
             UnitTestElementNamespaceFactory.Create(clrDeclaredElement.GetContainingType().GetClrName().NamespaceNames)
 
         member x.GetDisposition() =
-            let declaredElement = getDeclaredElement ()
+            let declaredElement = x.DeclaredElement
             if isNull declaredElement then UnitTestElementDisposition.InvalidDisposition else
 
             let locations =
@@ -207,19 +230,8 @@ and [<AllowNullLiteral>]
             UnitTestElementDisposition(locations, x)
 
         member x.Parent
-            with get () = parent
-            and set (value) =
-                if value == parent then () else
-                begin
-                    use lock = UT.WriteLock()
-                    if isNotNull parent then
-                        (parent :?> ExpectoTestElement).RemoveChild(x)
-
-                    if isNotNull value then
-                        parent <- value
-                        (parent :?> ExpectoTestElement).AppendChild(x)
-                end
-                service.ElementManager.FireElementChanged(x)
+            with get() = x.Parent
+            and set(value) = x.Parent <- value
 
         member x.Children = children :> _
 
@@ -243,6 +255,42 @@ and [<AllowNullLiteral>]
         member x.ExplicitReason = ""
 
 
+and [<AllowNullLiteral>]
+    ExpectoTestsElement(declaredElement, name, id, service) =
+
+    inherit ExpectoTestElementBase(name, id, service)
+
+    let declaredElement = declaredElement.As<IXmlDocIdOwner>()
+    let containingType = declaredElement.GetContainingType()
+
+    let typeName = containingType.GetClrName().GetPersistent()
+    let xmlDocId = declaredElement.XMLDocId
+
+    let getContainingType () =
+        service.CachingService.GetTypeElement(id.Project, id.TargetFrameworkId, typeName, true, true)
+
+    let getDeclaredElement () =
+        use cookie = ReadLockCookie.Create()
+
+        match getContainingType () with
+        | null -> null
+        | containingType ->
+
+        use cookie = CompilationContextCookie.GetOrCreate(containingType.Module.GetContextFromModule())
+        let members = containingType.EnumerateMembers(name, true).AsList()
+        match members.Count with
+        | 0 -> null
+        | 1 -> ensureValid members.[0]
+        | _ ->
+
+        members
+        |> Seq.cast<IXmlDocIdOwner>
+        |> Seq.tryFind (fun m -> m.XMLDocId = xmlDocId)
+        |> Option.toObj
+        |> ensureValid
+
+    override x.DeclaredElement = getDeclaredElement ()
+
 and [<SolutionComponent>]
     ExpectoTestRunStrategy(agentManager, resultManager) =
     inherit TaskRunnerOutOfProcessUnitTestRunStrategy(agentManager, resultManager, runnerInfo)
@@ -259,7 +307,7 @@ type ExpectoElementFactory(expectoService: ExpectoService) =
 
         match expectoService.ElementManager.GetElementById(id) with
         | null ->
-            let element = ExpectoTestElement(id, el.ShortName, el, expectoService) :> IUnitTestElement
+            let element = ExpectoTestsElement(el, el.ShortName, id, expectoService) :> IUnitTestElement
             elements.[id] <- element
             element
 

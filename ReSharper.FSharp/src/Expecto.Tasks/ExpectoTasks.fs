@@ -8,6 +8,9 @@ open JetBrains.ReSharper.TaskRunnerFramework
 let [<Literal>] expectoId = "Expecto"
 let [<Literal>] assemblyPathId = "PathId"
 let [<Literal>] testId = "TestId"
+let [<Literal>] testNameId = "TestNameId"
+let [<Literal>] testUniqueId = "TestUniqueId"
+let [<Literal>] testParentUniqueId = "TestParentUniqueId"
 
 [<AllowNullLiteral; Serializable>]
 type ExpectoAssemblyTask =
@@ -73,3 +76,64 @@ type ExpectoTestsTask =
         | _ -> false
 
     override x.GetHashCode() = x.TestId.GetHashCode()
+
+
+[<AbstractClass; AllowNullLiteral; Serializable>]
+type ExpectoTestTaskBase =
+    inherit RemoteTask
+
+    val Name: string
+    val UniqueId: int
+    val ParentUniqueId: int
+
+    new (name: string, id: int, parentId: int) =
+        { inherit RemoteTask(expectoId)
+          Name = name
+          UniqueId = id
+          ParentUniqueId = parentId }
+
+    new (xmlElement: XmlElement) =
+        { inherit RemoteTask(xmlElement)
+          Name = RemoteTask.GetXmlAttribute(xmlElement, testNameId)
+          UniqueId = RemoteTask.GetXmlAttribute(xmlElement, testUniqueId) |> int
+          ParentUniqueId = RemoteTask.GetXmlAttribute(xmlElement, testParentUniqueId) |> int }
+
+    override x.SaveXml(xmlElement) =
+        base.SaveXml(xmlElement)
+        RemoteTask.SetXmlAttribute(xmlElement, testNameId, x.Name)
+        RemoteTask.SetXmlAttribute(xmlElement, testUniqueId, x.UniqueId.ToString())
+        RemoteTask.SetXmlAttribute(xmlElement, testParentUniqueId, x.ParentUniqueId.ToString())
+
+    override x.IsMeaningfulTask = true
+
+    override x.Equals(other: obj) =
+        match other with
+        | :? ExpectoTestTaskBase as task -> x.Equals(task)
+        | _ -> false
+
+    override x.Equals(other: RemoteTask) =
+        match other with
+        | :? ExpectoTestTaskBase as task -> task.UniqueId = x.UniqueId
+        | _ -> false
+
+    override x.GetHashCode() = x.UniqueId
+
+
+type ExpectoTestCaseTask =
+    inherit ExpectoTestTaskBase
+
+    new (name: string, id, parentId: int) =
+        { inherit ExpectoTestTaskBase(name, id, parentId) }
+
+    new (xmlElement: XmlElement) =
+        { inherit ExpectoTestTaskBase(xmlElement) }
+
+
+type ExpectoTestListTask =
+    inherit ExpectoTestTaskBase
+
+    new (name: string, id, parentId) =
+        { inherit ExpectoTestTaskBase(name, id, parentId) }
+
+    new (xmlElement: XmlElement) =
+        { inherit ExpectoTestTaskBase(xmlElement) }
