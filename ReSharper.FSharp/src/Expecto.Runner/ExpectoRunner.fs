@@ -1,4 +1,4 @@
-module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.UnitTesting.ExpectoRunner
+﻿module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.UnitTesting.ExpectoRunner
 
 open System
 open System.Collections.Generic
@@ -12,6 +12,50 @@ open JetBrains.ReSharper.TaskRunnerFramework
 [<AllowNullLiteral>]
 type ExpectoTestRunner() =
     inherit MarshalByRefObject()
+
+    let testsByFullName = Dictionary<string, ExpectoTestCaseTask>()
+
+    let processTestTree (server: IRemoteTaskServer) test =
+        // let flatTests = Expecto.Test.toTestCodeList test
+        // let _ = flatTests
+
+        let getId =
+            let mutable nextId = 0
+            fun _ ->
+                let result = nextId
+                nextId <- nextId + 1
+                result
+
+        // todo: support null named case
+
+        // todo: support name duplicates:
+        //   * remember parent so it's possible to replace the child
+        //   * add/change parent label
+
+        let rec loop name (fullPath: string) parentId test =
+            match test with
+            | Test.TestLabel(name, test, _) ->
+                let fullPath =
+                    if fullPath.Length = 0 then name else
+                    fullPath + "/" + name
+                loop name fullPath parentId test
+
+            | Test.TestCase _ ->
+                let id = getId ()
+                let task = ExpectoTestCaseTask(name, id, parentId)
+                server.CreateDynamicElement(task)
+                testsByFullName.[fullPath] <- task
+
+            | Test.TestList(tests, _) ->
+                let id = getId ()
+                server.CreateDynamicElement(ExpectoTestListTask(name, id, parentId))
+                for test in tests do
+                    loop null fullPath id test
+
+            | Test.Sequenced(_, test) ->
+                loop name fullPath parentId test
+
+        loop null "" (getId ()) test
 
     let listToTestListOption test =
         match test with
@@ -55,6 +99,8 @@ type ExpectoTestRunner() =
         | None -> ()
         | Some test ->
 
+        processTestTree server test
+
         // Tests may fail to be discovered, e.g. due to duplicate test names.
         // We set this value in `beforeRun` and checking at test session run end. 
         let mutable testsSuccessfullyDiscovered = false
@@ -72,22 +118,34 @@ type ExpectoTestRunner() =
             testsSuccessfullyDiscovered <- true
             async.Zero()
 
-        let beforeEach _ =
+        let beforeEach testFullName =
+            let t = testsByFullName.[testFullName]
+            server.TaskStarting(t)
             async.Zero()
 
-        let info _ =
+        let info _ = async.Zero()
+
+        let passed testFullName timeSpan =
+            let t = testsByFullName.[testFullName]
+            server.TaskDuration(t, timeSpan)
+            server.TaskFinished(t, "", TaskResult.Success)
             async.Zero()
 
-        let passed _ _ =
+        let ignored testFullName message =
+            let t = testsByFullName.[testFullName]
+            server.TaskFinished(t, message, TaskResult.Skipped)
             async.Zero()
 
-        let ignored _ _ =
+        let failed testFullName message timeSpan =
+            let t = testsByFullName.[testFullName]
+            server.TaskDuration(t, timeSpan)
+            server.TaskFinished(t, message, TaskResult.Error)
             async.Zero()
 
-        let failed _ _ _ =
-            async.Zero()
-
-        let exn _ _ _ =
+        let exn testFullName (exn: Exception) timeSpan =
+            let t = testsByFullName.[testFullName]
+            server.TaskDuration(t, timeSpan)
+            server.TaskFinished(t, exn.Message, TaskResult.Exception)
             async.Zero()
 
         let testPrinters =
@@ -100,7 +158,7 @@ type ExpectoTestRunner() =
               failed = failed
               exn = exn }
 
-        let cliArgs = [ CLIArguments.Printer testPrinters; CLIArguments.Allow_Duplicate_Names ]
+        let cliArgs = [ CLIArguments.Printer testPrinters ]
 
         let config =
             // This path requires Expecto 8.9.0+.
