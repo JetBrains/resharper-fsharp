@@ -47,6 +47,10 @@
     <PackageReference Include="System.ValueTuple" Version="$(ValueTupleVersion)" />
   </ItemGroup>
 
+  <Target Name="CopyFSharpCoreXmlDoc" AfterTargets="AfterBuild">
+    <Copy SourceFiles="$(NugetPackageRoot)\FSharp.Core\$(FSharpCoreVersion)\lib\net45\FSharp.Core.xml" DestinationFolder="$(OutDir)" />
+  </Target>
+  
   <ItemGroup>
     <ProjectReference Include="..\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj" />
   </ItemGroup>

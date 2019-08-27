@@ -8,10 +8,10 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <FantomasVersion>[2.9.9]</FantomasVersion>
-    <FSharpCompilerServiceVersion>[28.0.5]</FSharpCompilerServiceVersion>
-    <FSharpCoreVersion>[4.6.2]</FSharpCoreVersion>
-    <ValueTupleVersion>[4.5.0]</ValueTupleVersion>
+    <FantomasVersion>2.9.9</FantomasVersion>
+    <FSharpCompilerServiceVersion>28.0.5</FSharpCompilerServiceVersion>
+    <FSharpCoreVersion>4.6.2</FSharpCoreVersion>
+    <ValueTupleVersion>4.5.0</ValueTupleVersion>
   </PropertyGroup>
 
   <PropertyGroup>
