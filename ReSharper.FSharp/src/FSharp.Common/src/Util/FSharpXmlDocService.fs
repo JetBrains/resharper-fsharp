@@ -26,18 +26,21 @@ type FSharpXmlDocService
         |> Option.orElseWith (fun _ ->
             match FileSystemPath.TryParse(dllFile) with
             | dllPath when not (dllPath.IsNullOrEmpty()) ->
+                let assemblyName = assemblyInfoDatabase.GetAssemblyName(dllPath)
                 let index =
-                    assemblyInfoDatabase.GetAssemblyName(dllPath)
+                    assemblyName
                     |> Option.ofObj
                     |> Option.bind (fun assemblyName ->
-                        psiModules.GetAssemblyPsiModuleByName(assemblyName)
-                        |> Seq.tryFind (fun psiModule -> psiModule.Assembly.Location.Equals(dllPath)))
-                    |> Option.map (fun psiModule -> psiServices.Symbols.GetLibraryFile(psiModule.Assembly).XmlDocIndex)
+                        let psiModules = psiModules.GetAssemblyPsiModuleByName(assemblyName)
+                        psiModules |> Seq.tryFind (fun psiModule -> psiModule.Assembly.Location.Equals(dllPath)))
+                    |> Option.map (fun psiModule ->
+                        let assemblyFile = psiServices.Symbols.GetLibraryFile(psiModule.Assembly)
+                        assemblyFile.XmlDocIndex)
                     |> Option.defaultWith (fun _ ->
                         XmlDocIndex(dllPath.ChangeExtension(ExtensionConstants.Xml), true, psiConfig, xmlDocThread))
                 indexCache.[dllFile] <- index
                 Some index
-            | _ -> None)
+            | _ -> None) 
 
     [<CanBeNull>]
     member x.GetXmlDoc(fsXmlDoc: FSharpXmlDoc) =
