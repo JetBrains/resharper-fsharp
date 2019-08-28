@@ -15,6 +15,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.UI.RichText
 open JetBrains.Util
@@ -56,6 +57,8 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
         let coords = document.GetCoordsByOffset(token.GetTreeEndOffset().Offset)
         let names = token.GetQualifiersAndName() |> List.ofArray
         let lineText = sourceFile.Document.GetLineText(coords.Line)
+
+        use cookie = CompilationContextCookie.GetOrCreate(fsFile.GetPsiModule().GetContextFromModule())
 
         // todo: provide tooltip for #r strings in fsx, should pass String tag
         let getTooltip = checkResults.GetStructuredToolTipText(int coords.Line + 1, int coords.Column, lineText, names, FSharpTokenTag.Identifier)
