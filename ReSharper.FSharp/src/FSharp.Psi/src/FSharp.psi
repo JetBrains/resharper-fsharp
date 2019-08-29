@@ -1025,7 +1025,18 @@ memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } 
   memberSelfId<SELF_ID, SelfId>?
   identOrOpName{IDENTIFIER, Identifier}
   typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
-  memberParam<PARAMETER, Parameters>* fakeSeparator;
+  (
+    memberParam<PARAMETER, Parameters>*
+    EQUALS
+    chameleonExpression
+  |
+    WITH
+    accessorDeclaration
+    (
+      AND
+      accessorDeclaration
+    )
+  );
 
 abstractSlot options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<abstractSlot:TYPE_PARAMETERS_LIST/typeParameterOfMethodList:TYPE_PARAMETER> };
@@ -1033,15 +1044,36 @@ abstractSlot options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extra
   fSharpAttribute<ATTRIBUTE, Attributes>*
   IDENTIFIER<IDENTIFIER, Identifier>
   typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
-  memberParam<PARAMETER, Parameters>* fakeSeparator;
+  memberParam<PARAMETER, Parameters>*;
 
 valField options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
   IDENTIFIER<IDENTIFIER, Identifier>;
 
-autoProperty options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
+autoProperty options { stubBase="FSharpProperTypeMemberDeclarationBase"; }  extras {
+  get { methodName="Expression" path=<autoProperty:CHAMELEON_EXPR/chameleonExpression:EXPR> };
+}:
   fSharpAttribute<ATTRIBUTE, Attributes>*
-  IDENTIFIER<IDENTIFIER, Identifier>;
+  IDENTIFIER<IDENTIFIER, Identifier>
+  EQUALS
+  chameleonExpression<CHAMELEON_EXPR, InitExpression>
+  accessorsNamesClause<ACESSORS_CLAUSE, AccessorsClause>?;
+
+accessorsNamesClause:
+  WITH
+  (
+    IDENTIFIER<ACESSOR, AccessorsNames>
+  |
+    IDENTIFIER<ACESSOR, AccessorsNames>
+    COMMA
+    IDENTIFIER<ACESSOR, AccessorsNames>
+  );
+
+accessorDeclaration:
+  IDENTIFIER<IDENTIFIER, Identifier>
+  memberParam<PARAMETER, Parameters>*
+  EQUALS
+  chameleonExpression<CHAMELEON_EXPR, BodyExpression>;
 
 memberParam:
   synPat<PATTERN, Pattern>;
