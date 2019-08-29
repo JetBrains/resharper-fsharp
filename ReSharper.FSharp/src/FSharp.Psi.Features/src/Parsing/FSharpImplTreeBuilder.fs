@@ -26,6 +26,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
 
     let nextSteps = Stack<BuilderStep>()
 
+    /// FCS splits property declaration into separate fake members when both getter and setter bodies are present.
+    let mutable unfinishedProperty: (int * range) option = None
+
     new (lexer, document, decls, lifetime) =
         FSharpImplTreeBuilder(lexer, document, decls, lifetime, 0) 
 
@@ -57,6 +60,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             let mark = x.StartException(exn)
             for memberDefn in memberDefns do
                 x.ProcessTypeMember(memberDefn)
+            x.EnsureMembersAreFinished()
             x.Done(range, mark, ElementType.EXCEPTION_DECLARATION)
 
         | SynModuleDecl.Open(lidWithDots, range) ->
@@ -115,6 +119,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             x.ProcessTypeParametersOfType typeParams range false
             for extensionMember in members do
                 x.ProcessTypeMember(extensionMember)
+            x.EnsureMembersAreFinished()
             x.Done(range, mark, ElementType.TYPE_EXTENSION_DECLARATION)
         | _ ->
 
@@ -154,7 +159,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                 ElementType.TYPE_EXTENSION_DECLARATION
 
             | SynTypeDefnRepr.ObjectModel(kind, members, _) ->
-                for m in members do x.ProcessTypeMember m
+                for m in members do
+                    x.ProcessTypeMember m
+                x.EnsureMembersAreFinished()
                 match kind with
                 | TyconClass -> ElementType.CLASS_DECLARATION
                 | TyconInterface -> ElementType.INTERFACE_DECLARATION
@@ -166,103 +173,142 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
 
                 | _ -> ElementType.OBJECT_TYPE_DECLARATION
 
-        for m in members do x.ProcessTypeMember m
+        for m in members do
+            x.ProcessTypeMember m
+        x.EnsureMembersAreFinished()
         x.Done(range, mark, elementType)
 
     member x.ProcessTypeMember(typeMember: SynMemberDefn) =
-        let attrs = typeMember.Attributes
-        // todo: let/attrs range
-        let rangeStart = x.GetStartOffset typeMember.Range
-        let isMember =
+        let mark =
+            match unfinishedProperty with
+            | Some(mark, unfinishedRange) when unfinishedRange = typeMember.Range ->
+                unfinishedProperty <- None
+                mark
+
+            | _ ->
+                x.MarkAttributesOrIdOrRange(typeMember.Attributes, None, typeMember.Range)
+
+        let memberType =
             match typeMember with
-            | SynMemberDefn.Member _ -> true
-            | _ -> false
+            | SynMemberDefn.ImplicitCtor(_, _, args, selfId, _) ->
+                for arg in args do
+                    x.ProcessImplicitCtorParam arg
+                x.ProcessCtorSelfId(selfId)
+                ElementType.IMPLICIT_CONSTRUCTOR_DECLARATION
 
-        if x.CurrentOffset <= rangeStart || (not isMember) then
-            let mark = x.MarkAttributesOrIdOrRange(attrs, None, typeMember.Range)
+            | SynMemberDefn.ImplicitInherit(baseType, args, _, _) ->
+                x.ProcessType(baseType)
+                x.MarkChameleonExpression(args)
+                ElementType.TYPE_INHERIT
 
-            // todo: mark body exprs as synExpr
-            let memberType =
-                match typeMember with
-                | SynMemberDefn.ImplicitCtor(_, _, args, selfId, _) ->
-                    for arg in args do
-                        x.ProcessImplicitCtorParam arg
-                    x.ProcessCtorSelfId(selfId)
-                    ElementType.IMPLICIT_CONSTRUCTOR_DECLARATION
+            | SynMemberDefn.Interface(interfaceType, interfaceMembersOpt , _) ->
+                x.ProcessType(interfaceType)
+                match interfaceMembersOpt with
+                | Some members ->
+                    for m in members do
+                        x.ProcessTypeMember(m)
+                    x.EnsureMembersAreFinished()
+                | _ -> ()
+                ElementType.INTERFACE_IMPLEMENTATION
 
-                | SynMemberDefn.ImplicitInherit(baseType, args, _, _) ->
-                    x.ProcessType(baseType)
-                    x.MarkChameleonExpression(args)
-                    ElementType.TYPE_INHERIT
+            | SynMemberDefn.Inherit(baseType, _, _) ->
+                try x.ProcessType(baseType)
+                with _ -> () // Getting type range throws an exception if base type lid is empty.
+                ElementType.INTERFACE_INHERIT
 
-                | SynMemberDefn.Interface(interfaceType, interfaceMembersOpt , _) ->
-                    x.ProcessType(interfaceType)
-                    match interfaceMembersOpt with
-                    | Some members ->
-                        for m in members do
-                            x.ProcessTypeMember(m)
-                    | _ -> ()
-                    ElementType.INTERFACE_IMPLEMENTATION
+            | SynMemberDefn.Member(Binding(_, _, _, _, _, _, valData, headPat, returnInfo, expr, _, _), range) ->
+                let elType =
+                    match headPat with
+                    | SynPat.LongIdent(LongIdentWithDots(lid, _), accessorId, typeParamsOpt, memberParams, _, _) ->
+                        match lid with
+                        | [_] ->
+                            match valData with
+                            | SynValData(Some(flags), _, selfId) when flags.MemberKind = MemberKind.Constructor ->
+                                x.ProcessParams(memberParams, true, true) // todo: should check isLocal
+                                x.ProcessCtorSelfId(selfId)
 
-                | SynMemberDefn.Inherit(baseType, _, _) ->
-                    try x.ProcessType(baseType)
-                    with _ -> () // Getting type range throws an exception if base type lid is empty.
-                    ElementType.INTERFACE_INHERIT
+                                x.MarkChameleonExpression(expr)
+                                ElementType.MEMBER_CONSTRUCTOR_DECLARATION
 
-                | SynMemberDefn.Member(Binding(_, _, _, _, _, _, valData, headPat, returnInfo, expr, _, _) ,range) ->
-                    let elType =
-                        match headPat with
-                        | SynPat.LongIdent(LongIdentWithDots(lid, _), _, typeParamsOpt, memberParams, _, _) ->
-                            match lid with
-                            | [_] ->
-                                match valData with
-                                | SynValData(Some(flags), _, selfId) when flags.MemberKind = MemberKind.Constructor ->
-                                    x.ProcessParams(memberParams, true, true) // todo: should check isLocal
-                                    x.ProcessCtorSelfId(selfId)
-
-                                    x.MarkChameleonExpression(expr)
-                                    ElementType.MEMBER_CONSTRUCTOR_DECLARATION
-
-                                | _ ->
-                                    x.ProcessMemberDeclaration(typeParamsOpt, memberParams, returnInfo, expr, range)
+                            | _ ->
+                                match accessorId with
+                                | Some ident ->
+                                    x.ProcessAccessor(ident, memberParams, expr)
                                     ElementType.MEMBER_DECLARATION
+                                | _ ->
 
-                            | selfId :: _ :: _ ->
-                                x.Done(selfId.idRange, x.Mark(), ElementType.MEMBER_SELF_ID)
                                 x.ProcessMemberDeclaration(typeParamsOpt, memberParams, returnInfo, expr, range)
                                 ElementType.MEMBER_DECLARATION
 
-                            | _ -> ElementType.OTHER_TYPE_MEMBER
+                        | selfId :: _ :: _ ->
+                            x.MarkAndDone(selfId.idRange, ElementType.MEMBER_SELF_ID)
 
-                        | SynPat.Named _ ->
-                            // In some cases patterns for static members inside records are represented this way.
-                            x.ProcessMemberDeclaration(None, SynConstructorArgs.Pats [], returnInfo, expr, range)
+                            match accessorId with
+                            | Some ident ->
+                                x.ProcessAccessor(ident, memberParams, expr)
+                                ElementType.MEMBER_DECLARATION
+                            | _ ->
+
+                            x.ProcessMemberDeclaration(typeParamsOpt, memberParams, returnInfo, expr, range)
                             ElementType.MEMBER_DECLARATION
 
                         | _ -> ElementType.OTHER_TYPE_MEMBER
-                    elType
 
-                | SynMemberDefn.LetBindings(bindings, _, _, range) ->
-                    for binding in bindings do
-                        x.ProcessTopLevelBinding(binding, range)
-                    ElementType.LET_MODULE_DECL
+                    | SynPat.Named _ ->
+                        // In some cases patterns for static members inside records are represented this way.
+                        x.ProcessMemberDeclaration(None, SynConstructorArgs.Pats [], returnInfo, expr, range)
+                        ElementType.MEMBER_DECLARATION
 
-                | SynMemberDefn.AbstractSlot(ValSpfn(_, _, typeParams, _, _, _, _, _, _, _, _), _, range) ->
-                    match typeParams with
-                    | SynValTyparDecls(typeParams, _, _) ->
-                        x.ProcessTypeParametersOfType typeParams range true
-                    ElementType.ABSTRACT_SLOT
+                    | _ -> ElementType.OTHER_TYPE_MEMBER
 
-                | SynMemberDefn.ValField(Field(_, _, _, _, _, _, _, _), _) ->
-                    ElementType.VAL_FIELD
+                match valData with
+                | SynValData(Some(flags), _, _) when
+                        flags.MemberKind = MemberKind.PropertyGet || flags.MemberKind = MemberKind.PropertySet ->
+                    if expr.Range.End <> range.End then
+                        unfinishedProperty <- Some(mark, range)
 
-                | SynMemberDefn.AutoProperty(_, _, _, _, _, _, _, _, expr, _, _) ->
-                    x.MarkChameleonExpression(expr)
-                    ElementType.AUTO_PROPERTY
+                | _ -> ()
 
-                | _ -> ElementType.OTHER_TYPE_MEMBER
+                elType
 
+            | SynMemberDefn.LetBindings(bindings, _, _, range) ->
+                for binding in bindings do
+                    x.ProcessTopLevelBinding(binding, range)
+                ElementType.LET_MODULE_DECL
+
+            | SynMemberDefn.AbstractSlot(ValSpfn(_, _, typeParams, _, _, _, _, _, _, _, _), _, range) ->
+                match typeParams with
+                | SynValTyparDecls(typeParams, _, _) ->
+                    x.ProcessTypeParametersOfType typeParams range true
+                ElementType.ABSTRACT_SLOT
+
+            | SynMemberDefn.ValField(Field(_, _, _, _, _, _, _, _), _) ->
+                ElementType.VAL_FIELD
+
+            | SynMemberDefn.AutoProperty(_, _, _, _, _, _, _, _, expr, accessorClause, _) ->
+                x.MarkChameleonExpression(expr)
+                match accessorClause with
+                | Some clause -> x.MarkAndDone(clause, ElementType.ACCESSORS_NAMES_CLAUSE)
+                | _ -> ()
+                ElementType.AUTO_PROPERTY
+
+            | _ -> ElementType.OTHER_TYPE_MEMBER
+
+        if unfinishedProperty.IsNone then
             x.Done(typeMember.Range, mark, memberType)
+
+    member x.ProcessAccessor(IdentRange range, memberParams, expr) =
+        let mark = x.Mark(range)
+        x.ProcessParams(memberParams, true, true)
+        x.MarkChameleonExpression(expr)
+        x.Done(mark, ElementType.ACCESSOR_DECLARATION)
+
+    member x.EnsureMembersAreFinished() =
+        match unfinishedProperty with
+        | Some(mark, unfinishedRange) ->
+            unfinishedProperty <- None
+            x.Done(unfinishedRange, mark, ElementType.MEMBER_DECLARATION)
+        | _ -> ()
 
     member x.ProcessCtorSelfId(selfId) =
         match selfId with
