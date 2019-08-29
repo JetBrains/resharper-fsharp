@@ -6,7 +6,6 @@ open System.IO
 open System.Linq
 open System.Runtime.InteropServices
 open FSharp.Compiler.SourceCodeServices
-open FSharp.Compiler.Text
 open JetBrains.Application
 open JetBrains.Application.Progress
 open JetBrains.Application.Threading
@@ -37,8 +36,8 @@ open JetBrains.Util.Dotnet.TargetFrameworkIds
 [<SolutionComponent>]
 type FSharpScriptPsiModulesProvider
         (lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager, documentManager: DocumentManager,
-         checkerService: FSharpCheckerService, platformManager: PlatformManager, assemblyFactory: AssemblyFactory,
-         projectFileExtensions, projectFileTypeCoordinator) as this =
+         scriptOptionsProvider: IFSharpScriptOptionsProvider, platformManager: PlatformManager,
+         assemblyFactory: AssemblyFactory, projectFileExtensions, projectFileTypeCoordinator) as this =
 
     /// There may be multiple project files for a path (i.e. linked in multiple projects) and we must distinguish them.
     let scriptsFromProjectFiles = OneToListMap<FileSystemPath, FSharpScriptPsiModule>()
@@ -66,9 +65,9 @@ type FSharpScriptPsiModulesProvider
         platformInfo.TargetFrameworkId
 
     let getScriptOptions (path: FileSystemPath) (document: IDocument) =
-        let source = SourceText.ofString (document.GetText())
-        let options, _ = checkerService.Checker.GetProjectOptionsFromScript(path.FullPath, source).RunAsTask()
-        options
+        scriptOptionsProvider.GetScriptOptions(path, document.GetText())
+        |> Option.orElseWith (fun _ -> failwithf "Could not get script options for: %O" path)
+        |> Option.get
 
     let getScriptReferences scriptPath scriptOptions =
         let assembliesPaths = HashSet<FileSystemPath>()
@@ -277,6 +276,7 @@ type FSharpScriptPsiModulesProvider
         targetFrameworkId
 
     member x.Execute(change: ChangeEventArgs) =
+        // todo: external changes
         match change.ChangeMap.GetChange<ProjectFileDocumentCopyChange>(documentManager.ChangeProvider) with
         | null -> ()
         | change ->
