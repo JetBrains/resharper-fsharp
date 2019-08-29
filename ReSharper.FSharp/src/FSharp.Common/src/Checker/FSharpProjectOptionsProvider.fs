@@ -1,6 +1,5 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Checker
 
-open System
 open System.Collections.Generic
 open FSharp.Compiler.SourceCodeServices
 open FSharp.Compiler.Text
@@ -23,7 +22,7 @@ open JetBrains.Util
 [<SolutionComponent>]
 type FSharpProjectOptionsProvider
         (lifetime, solution: ISolution, changeManager: ChangeManager, checkerService: FSharpCheckerService,
-         optionsBuilder: IFSharpProjectOptionsBuilder, scriptOptionsProvider: FSharpScriptOptionsProvider,
+         optionsBuilder: IFSharpProjectOptionsBuilder, scriptOptionsProvider: IFSharpScriptOptionsProvider,
          fsFileService: IFSharpFileService, moduleReferenceResolveStore: ModuleReferencesResolveStore, logger: ILogger,
          psiModules: IPsiModules, resolveContextManager: PsiModuleResolveContextManager) as this =
     inherit RecursiveProjectModelChangeDeltaVisitor()
@@ -237,24 +236,33 @@ type FSharpScriptOptionsProvider(logger: ILogger, checkerService: FSharpCheckerS
     let getScriptOptionsLock = obj()
     let otherFlags = [| "--warnon:1182" |]
 
-    member x.GetScriptOptions(file: IPsiSourceFile) =
-        let filePath = file.GetLocation().FullPath
-        let source = SourceText.ofString (file.Document.GetText())
-        lock getScriptOptionsLock (fun _ ->
-        let getScriptOptionsAsync =
-            checkerService.Checker.GetProjectOptionsFromScript(filePath, source, otherFlags = otherFlags)
-        try
-            let options, errors = getScriptOptionsAsync.RunAsTask()
-            if not errors.IsEmpty then
-                logger.Warn("Script options for {0}: {1}", filePath, concatErrors errors)
-            let options = x.FixScriptOptions(options)
-            Some options
-        with
-        | OperationCanceled -> reraise()
-        | exn ->
-            logger.Warn("Error while getting script options for {0}: {1}", filePath, exn.Message)
-            logger.LogExceptionSilently(exn)
-            None)
-
-    member private x.FixScriptOptions(options) =
+    let fixScriptOptions options =
         { options with OtherOptions = FSharpCoreFix.ensureCorrectFSharpCore options.OtherOptions }
+
+    let getOptions (path: FileSystemPath) source =
+        let path = path.FullPath
+        let source = SourceText.ofString source
+        lock getScriptOptionsLock (fun _ ->
+            let getScriptOptionsAsync =
+                checkerService.Checker.GetProjectOptionsFromScript(path, source, otherFlags = otherFlags)
+            try
+                let options, errors = getScriptOptionsAsync.RunAsTask()
+                if not errors.IsEmpty then
+                    logger.Warn("Script options for {0}: {1}", path, concatErrors errors)
+                let options = fixScriptOptions options
+                Some options
+            with
+            | OperationCanceled -> reraise()
+            | exn ->
+                logger.Warn("Error while getting script options for {0}: {1}", path, exn.Message)
+                logger.LogExceptionSilently(exn)
+                None)
+
+    interface IFSharpScriptOptionsProvider with
+        member x.GetScriptOptions(path: FileSystemPath, source) =
+            getOptions path source
+
+        member x.GetScriptOptions(file: IPsiSourceFile) =
+            let path = file.GetLocation()
+            let source = file.Document.GetText()
+            getOptions path source
