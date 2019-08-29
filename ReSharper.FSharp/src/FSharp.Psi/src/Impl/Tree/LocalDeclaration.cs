@@ -38,7 +38,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public ITypeMember ContainingMember =>
       GetContainingNode<ITypeMemberDeclaration>()?.DeclaredElement;
 
-    public IType Type
+    public virtual IType Type
     {
       get
       {
