@@ -5,6 +5,7 @@ open System.Collections.Generic
 open System.IO
 open System.Linq
 open JetBrains.Application.UI.BindableLinq.Collections
+open JetBrains.Metadata.Reader.API
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.ClrLanguages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.UnitTesting.Expecto.Tasks
@@ -109,16 +110,29 @@ type ExpectoProvider() =
         member x.Name = expectoId
 
         member x.IsElementOfKind(element: IUnitTestElement, elementKind: UnitTestElementKind) =
-            if elementKind <> UnitTestElementKind.Test then false else
-            element :? ExpectoTestsElement
+            match elementKind with
+            | UnitTestElementKind.Test
+            | UnitTestElementKind.TestContainer -> element :? ExpectoTestsElement
+            | UnitTestElementKind.TestStuff -> element :? ExpectoTestElementBase
+            | _ -> false
 
         member x.IsElementOfKind(declaredElement: IDeclaredElement, elementKind: UnitTestElementKind) =
+            // todo: remove duplication
             match elementKind with
-            | UnitTestElementKind.Test -> isExpectoTest declaredElement
+            | UnitTestElementKind.Test ->
+                isExpectoTest declaredElement
+
             | UnitTestElementKind.TestContainer ->
                 match declaredElement.As<ITypeElement>() with
                 | null -> false
                 | typeElement -> typeElement.GetMembers() |> Seq.exists isExpectoTest
+
+            | UnitTestElementKind.TestStuff ->
+                isExpectoTest declaredElement ||
+                match declaredElement.As<ITypeElement>() with
+                | null -> false
+                | typeElement -> typeElement.GetMembers() |> Seq.exists isExpectoTest
+
             | _ -> false
 
         member x.IsSupported(project, targetFrameworkId) = isSupported project targetFrameworkId
@@ -366,13 +380,36 @@ type ExpectoTestFileExplorer(service: ExpectoService, clrLanguages: ClrLanguages
             file.ProcessDescendants(processor)
 
 
-//[<SolutionComponent>]
-//type ExpectoTestMetadataExplorer(provider: ExpectoProvider, resolveManager, resolveContextManager, logger) =
-//    inherit UnitTestExplorerFrom.DotNetArtifacts(provider, resolveManager, resolveContextManager, logger)
-//
-//    override x.ProcessProject(project, assemblyPath, loader, observer, cancellationToken) =
-//        MetadataElementsSource.ExploreProject(project, assemblyPath, loader, observer, logger, cancellationToken,
-//            fun assembly ->
-//
-//            ()
-//        )
+let inline isPublic m = (^M: (member IsPublic: bool) m)
+let inline isStatic m = (^M: (member IsStatic: bool) m)
+let inline returnType m = (^M: (member ReturnValue: IMetadataReturnValue) m).Type
+let inline fieldType m = (^M: (member Type: IMetadataType) m)
+
+let isExpectoType (t: IMetadataType) = t.FullName = "Expecto.Test"
+
+let isExpectoValue m = isPublic m && isStatic m && isExpectoType (fieldType m)
+let isExpectoFunction m = isPublic m && isStatic m && isExpectoType (returnType m)
+
+
+[<SolutionComponent>]
+type ExpectoTestMetadataExplorer(provider: ExpectoProvider, resolveManager, resolveContextManager, logger) =
+    inherit UnitTestExplorerFrom.DotNetArtifacts(provider, resolveManager, resolveContextManager, logger)
+
+    override x.ProcessProject(project, assemblyPath, loader, observer, cancellationToken) =
+        MetadataElementsSource.ExploreProject(project, assemblyPath, loader, observer, logger, cancellationToken,
+                fun assembly ->
+
+            let members = List<IMetadataTypeMember>()
+
+            for t in assembly.GetTypes() do
+                for field in t.GetFields() do
+                    if isExpectoValue field then members.Add(field)
+
+                for property in t.GetProperties() do
+                    let getter = property.Getter
+                    if isExpectoFunction getter then members.Add(property)
+ 
+                for method in t.GetMethods() do
+                    if isExpectoFunction method then members.Add(method)
+
+            ())
