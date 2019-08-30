@@ -249,7 +249,7 @@ type FSharpNamingService(language: FSharpLanguage) =
             if isNull reference then () else
 
             let declaredElement = reference.Resolve().DeclaredElement.As<IAttributesOwner>()
-            if isNull declaredElement || not (isUnionCase declaredElement) then () else
+            if isNull declaredElement || not (isCompiledUnionCase declaredElement) then () else
             if declaredElement.GetContainingType().GetClrName() <> typeName then () else 
 
             x.AddExtraNames(namesCollection, longIdentPat)            
