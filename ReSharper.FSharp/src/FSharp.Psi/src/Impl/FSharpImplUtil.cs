@@ -584,7 +584,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
                  EmptyList<string>.InstanceList;
 
         case ICompiledElement _:
-          return typeElement.Properties.Where(p => p.IsFSharpField()).Select(p => p.ShortName).AsCollection();
+          return typeElement.Properties.Where(p => p.IsCompiledFSharpField()).Select(p => p.ShortName).AsCollection();
 
         default:
           return EmptyArray<string>.Instance;

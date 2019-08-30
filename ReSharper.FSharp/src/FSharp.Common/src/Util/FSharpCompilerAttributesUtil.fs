@@ -16,10 +16,10 @@ let getCompilationMappingFlag (attrsOwner: IAttributesOwner) =
     |> Option.map getCompilationMappingAttrInstanceFlag
     |> Option.defaultValue SourceConstructFlags.None
 
-[<Extension; CompiledName("IsFSharpField")>]
-let isFSharpField (property: IProperty) =
+[<Extension; CompiledName("IsCompiledFSharpField")>]
+let isCompiledFSharpField (property: IProperty) =
     getCompilationMappingFlag property = SourceConstructFlags.Field
 
-[<Extension; CompiledName("IsUnionCase")>]
-let isUnionCase (property: IAttributesOwner) =
+[<Extension; CompiledName("IsCompiledUnionCase")>]
+let isCompiledUnionCase (property: IAttributesOwner) =
     getCompilationMappingFlag property = SourceConstructFlags.UnionCase
