@@ -57,19 +57,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public IEnumerable<IEvent> Events => EmptyList<IEvent>.Instance;
     public IEnumerable<string> MemberNames => EmptyList<string>.InstanceList;
 
-    // C# 8 Nullable types
-    public bool? IsNotNullableIfReferenceType => null;
-    public bool? IsNotNullableIfReferenceTypeWithFixedSubstitution(ISubstitution explicitInheritorSubstitution) => null;
+    public TypeParameterNullability Nullability => TypeParameterNullability.Unknown;
+    public TypeParameterNullability GetNullability(ISubstitution explicitInheritorSubstitution) =>
+      TypeParameterNullability.Unknown;
 
     public int Index { get; }
     public TypeParameterVariance Variance => TypeParameterVariance.INVARIANT;
 
     public bool IsValueType => false; // todo
-    public bool IsClassType => false; // todo
+    public bool IsReferenceType => false; // todo
     public bool IsUnmanagedType => false;
     public bool HasDefaultConstructor => false;
+    public bool IsNotNullableValueOrReferenceType => false;
+    public bool HasTypeConstraints => false; // todo
     public IList<IType> TypeConstraints => EmptyList<IType>.Instance;
-    public TypeParameterConstraintsMask ConstraintsMask => default; // todo
+    public TypeParameterConstraintFlags Constraints => default; // todo
 
     public IParametersOwner OwnerFunction => Method;
     public IMethod OwnerMethod => (IMethod) Method;

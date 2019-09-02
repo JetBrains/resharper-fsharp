@@ -228,8 +228,8 @@ type MsBuildPropertiesFsiProvider() =
                 project.ProjectProperties.GetActiveConfigurations()
                 |> Seq.tryPick (fun cfg ->
                     match cfg.PropertiesCollection.TryGetValue(FSharpProperties.FscToolPath) with
-                    | null -> None
-                    | path ->
+                    | false, _ | true, null -> None
+                    | _, path ->
 
                     let toolDirPath = FileSystemPath.TryParse(path)
                     if toolDirPath.IsEmpty then None else

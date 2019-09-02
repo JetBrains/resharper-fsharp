@@ -176,7 +176,7 @@ type FSharpProjectOptionsBuilder
 
                 let getOption f p =
                     match props.TryGetValue(p) with
-                    | v when not (v.IsNullOrWhitespace()) -> Some ("--" + p.ToLower() + ":" + f v)
+                    | true, v when not (v.IsNullOrWhitespace()) -> Some ("--" + p.ToLower() + ":" + f v)
                     | _ -> None
 
                 [ FSharpProperties.TargetProfile; FSharpProperties.BaseAddress ]
@@ -188,7 +188,7 @@ type FSharpProjectOptionsBuilder
                 |> options.AddRange
 
                 match props.TryGetValue(FSharpProperties.OtherFlags) with
-                | otherFlags when not (otherFlags.IsNullOrWhitespace()) -> splitAndTrim [| ' ' |] otherFlags
+                | true, otherFlags when not (otherFlags.IsNullOrWhitespace()) -> splitAndTrim [| ' ' |] otherFlags
                 | _ -> EmptyArray.Instance
                 |> options.AddRange
             | _ -> ()

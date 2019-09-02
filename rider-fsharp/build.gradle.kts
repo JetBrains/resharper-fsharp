@@ -40,7 +40,7 @@ java {
 }
 
 
-val baseVersion = "2019.2"
+val baseVersion = "2019.3"
 val buildCounter = ext.properties["build.number"] ?: "9999"
 version = "$baseVersion.$buildCounter"
 
