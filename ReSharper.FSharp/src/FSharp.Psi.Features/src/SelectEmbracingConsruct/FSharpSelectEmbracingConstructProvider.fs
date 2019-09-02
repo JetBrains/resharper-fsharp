@@ -16,6 +16,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 
+[<AllowNullLiteral>]
 type FSharpSelection(file, range, parentRanges: DocumentRange list) =
     inherit SelectedRangeBase<IFSharpFile>(file, range)
 
@@ -27,18 +28,68 @@ type FSharpSelection(file, range, parentRanges: DocumentRange list) =
     override x.ExtendToWholeLine = ExtendToTheWholeLinePolicy.DO_NOT_EXTEND
 
 
-type FSharpDotSelection(file, document, range: TreeTextRange, parentRanges: DocumentRange list) =
-    inherit DotSelection<IFSharpFile>(file, range.StartOffset, range.Length = 0, false)
+type FSharpTokenPartSelection(fsFile, range, token, parentRanges: DocumentRange list) =
+    inherit TokenPartSelection<IFSharpFile>(fsFile, range, token)
 
-    let getTrimmedSelection (token: ITokenNode) trimStart trimEnd =
-        let tokRange = token.GetDocumentRange()
-        if tokRange.Length <= trimStart + trimEnd then null else
+    let tokenText = token.GetText()
 
-        let ranges = tokRange :: parentRanges
-        FSharpSelection(file, tokRange.TrimLeft(trimStart).TrimRight(trimEnd), ranges) :> ISelectedRange
+    let trim left right =
+        let range = token.GetTreeTextRange()
+        if range.Length >= left + right then
+            tokenText.Substring(left, tokenText.Length - left - right), left
+        else tokenText, left
+
+    let getParentSelection () =
+        match parentRanges with
+        | parent :: rest -> FSharpSelection(fsFile, parent, rest)
+        | _ -> null
+    
+    override x.Parent =
+        let text, start =
+            let tokenType = token.GetTokenType()
+            if tokenType.IsStringLiteral then
+                match tokenType.GetLiteralType() with
+                | FSharpLiteralType.Character
+                | FSharpLiteralType.RegularString -> trim 1 1
+                | FSharpLiteralType.VerbatimString -> trim 2 1
+                | FSharpLiteralType.TripleQuoteString -> trim 3 3
+                | FSharpLiteralType.ByteArray -> trim 1 2
+
+            elif tokenType == FSharpTokenType.IDENTIFIER then
+                let tokenText = token.GetText()
+                if tokenText.Length > 4 &&
+                        tokenText.StartsWith("``", StringComparison.Ordinal) &&
+                        tokenText.EndsWith("``", StringComparison.Ordinal) then
+                    trim 2 2
+                else tokenText, 0
+
+            elif tokenType == FSharpTokenType.LINE_COMMENT then
+                let left = if tokenText.StartsWith("///") then 3 else 2
+                trim left 0
+
+            elif tokenType == FSharpTokenType.BLOCK_COMMENT then
+                let right = if tokenText.EndsWith("*)") then 2 else 0
+                trim 2 right
+
+            else tokenText, 0
+
+        if range.IsValid() then
+            let localRange = range.Shift(-token.GetTreeStartOffset().Offset - start)
+            let range = TokenPartSelection<_>.GetLocalParent(text, localRange)
+            if range.IsValid() && range.Contains(&localRange) then
+                let range = range.Shift(token.GetTreeStartOffset() + start)
+                FSharpTokenPartSelection(fsFile, range, token, parentRanges) :> _
+            else
+                getParentSelection () :> _
+        else
+            getParentSelection () :> _
+
+
+type FSharpDotSelection(fsFile, range: TreeTextRange, parentRanges: DocumentRange list) =
+    inherit DotSelection<IFSharpFile>(fsFile, range.StartOffset, range.Length = 0, false)
 
     override x.CreateTreeNodeSelection(tokenNode) =
-        FSharpSelection(file, tokenNode.GetDocumentRange(), parentRanges) :> _
+        FSharpSelection(fsFile, tokenNode.GetDocumentRange(), parentRanges) :> _
 
     override x.IsWordToken(token) =
         let tokenType = token.GetTokenType()
@@ -50,26 +101,15 @@ type FSharpDotSelection(file, document, range: TreeTextRange, parentRanges: Docu
 
     override x.IsSpaceToken(token) = token.GetTokenType().IsWhitespace
     override x.IsNewLineToken(token) = token.GetTokenType() = FSharpTokenType.NEW_LINE
+
     override x.GetParentInternal(token) =
-        match token.GetTokenType() with
-        | tokenType when tokenType.IsStringLiteral ->
-            match tokenType.GetLiteralType() with
-            | FSharpLiteralType.Character
-            | FSharpLiteralType.RegularString -> getTrimmedSelection token 1 1
-            | FSharpLiteralType.VerbatimString -> getTrimmedSelection token 2 1
-            | FSharpLiteralType.TripleQuoteString -> getTrimmedSelection token 3 3
-            | FSharpLiteralType.ByteArray -> getTrimmedSelection token 1 2
+        let tokenType = token.GetTokenType()
+        if tokenType.IsComment || tokenType.IsStringLiteral || tokenType.IsIdentifier then
+            FSharpTokenPartSelection(fsFile, TreeTextRange(range.StartOffset), token, parentRanges) :> _
+        else null
 
-        | tokenType when tokenType == FSharpTokenType.IDENTIFIER ->
-            let tokenText = token.GetText()
-            if tokenText.Length > 4 &&
-                    tokenText.StartsWith("``", StringComparison.Ordinal) &&
-                    tokenText.EndsWith("``", StringComparison.Ordinal) then
-                getTrimmedSelection token 2 2
-            else null
-
-        | _ -> null
-    override x.CreateTokenPartSelection(tokenNode, treeTextRange) = null
+    override x.CreateTokenPartSelection(node, range) =
+        FSharpTokenPartSelection(fsFile, range, node, parentRanges) :> _
 
     override x.ExtendToWholeLine = ExtendToTheWholeLinePolicy.DO_NOT_EXTEND
 
@@ -93,7 +133,7 @@ type FSharpSelectEmbracingConstructProvider() =
                 TraverseStep.Expr (SynExpr.LongIdent (false, LongIdentWithDots(lid, []), None, range)))
 
     interface ISelectEmbracingConstructProvider with
-        member x.IsAvailable(sourceFile) = true
+        member x.IsAvailable _ = true
 
         member x.GetSelectedRange(sourceFile, documentRange) =
             match sourceFile.GetFSharpFile() with
@@ -116,7 +156,7 @@ type FSharpSelectEmbracingConstructProvider() =
 
                 override this.VisitModuleDecl(defaultTraverse, decl) =
                     match decl with
-                    | SynModuleDecl.Open(lid, range) -> Some(mapLid lid.Lid)
+                    | SynModuleDecl.Open(lid, _) -> Some(mapLid lid.Lid)
                     | _ -> defaultTraverse decl }
 
             let containingDeclarations =
@@ -139,4 +179,4 @@ type FSharpSelectEmbracingConstructProvider() =
                 |> List.filter (fun r -> r.Contains(&documentRange))
                 |> List.sortBy (fun r -> r.Length)
 
-            FSharpDotSelection(fsFile, document, fsFile.Translate(documentRange), ranges) :> _
+            FSharpDotSelection(fsFile, fsFile.Translate(documentRange), ranges) :> _
