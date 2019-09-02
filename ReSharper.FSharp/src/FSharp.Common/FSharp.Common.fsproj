@@ -47,10 +47,15 @@
     <PackageReference Include="System.ValueTuple" Version="$(ValueTupleVersion)" />
   </ItemGroup>
 
+  <PropertyGroup>
+    <FSharpCoreXmlDocRelativePath>FSharp.Core\$(FSharpCoreVersion)\lib\net45\FSharp.Core.xml</FSharpCoreXmlDocRelativePath>
+  </PropertyGroup>
+
   <Target Name="CopyFSharpCoreXmlDoc" AfterTargets="AfterBuild">
-    <Copy SourceFiles="$(NugetPackageRoot)\FSharp.Core\$(FSharpCoreVersion)\lib\net45\FSharp.Core.xml" DestinationFolder="$(OutDir)" />
+    <Copy SourceFiles="$([System.IO.Path]::Combine($(NugetPackageRoot), $(FSharpCoreXmlDocRelativePath)))"
+          DestinationFolder="$(OutDir)" />
   </Target>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj" />
   </ItemGroup>
