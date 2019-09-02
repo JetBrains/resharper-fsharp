@@ -48,7 +48,7 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <FSharpCoreXmlDocRelativePath>FSharp.Core\$(FSharpCoreVersion)\lib\net45\FSharp.Core.xml</FSharpCoreXmlDocRelativePath>
+    <FSharpCoreXmlDocRelativePath>fsharp.core\$(FSharpCoreVersion)\lib\net45\FSharp.Core.xml</FSharpCoreXmlDocRelativePath>
   </PropertyGroup>
 
   <Target Name="CopyFSharpCoreXmlDoc" AfterTargets="AfterBuild">
