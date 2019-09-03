@@ -18,3 +18,8 @@ type AddIgnoreTest() =
     [<Test>] member x.``Expression 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expression 02 - App``() = x.DoNamedTest()
     [<Test>] member x.``Expression 03 - Multiline``() = x.DoNamedTest()
+
+    [<Test>] member x.``New line - Lazy 01``() = x.DoNamedTest()
+    [<Test>] member x.``New line - Match 01``() = x.DoNamedTest()
+    [<Test>] member x.``New line - Match 02``() = x.DoNamedTest()
+    [<Test>] member x.``New line - Match 03 - Single line``() = x.DoNamedTest()

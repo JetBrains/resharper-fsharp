@@ -3,11 +3,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Naming
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IPsiModule) =
@@ -47,8 +49,10 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let binding = letModuleDecl.Bindings.First()
             binding.HeadPattern :?> _
 
-        member x.CreateIgnoreApp(expr) =
+        member x.CreateIgnoreApp(expr, newLine) =
             let source = "() |> ignore"
+
+            let indent = expr.Indent
             let moduleDeclaration = getModuleDeclaration source
 
             let doDecl = moduleDeclaration.Members.First().As<IDo>().NotNull()
@@ -60,7 +64,12 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             | null -> failwith "Could not get inner appExpr"
             | innerAppExpr ->
 
-            replace innerAppExpr.ArgumentExpression expr
+            let expr = ModificationUtil.ReplaceChild(innerAppExpr.ArgumentExpression, expr.Copy())
+
+            if newLine then
+                ModificationUtil.ReplaceChild(expr.NextSibling, Whitespace(indent)) |> ignore
+                ModificationUtil.AddChildBefore(expr.NextSibling, NewLine(expr.FSharpFile.GetLineEnding())) |> ignore
+
             outerAppExpr
 
         member x.CreateRecordExprBinding(field, addSemicolon) =
