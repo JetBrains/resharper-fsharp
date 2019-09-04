@@ -3,7 +3,7 @@ IFSharpImplFile
   IAnonModuleDeclaration
     IDo
       IChameleonExpression
-        IAppExpr
+        IPrefixAppExpr
           IIdentExpr
             FSharpIdentifierToken(type:IDENTIFIER, text:async)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "

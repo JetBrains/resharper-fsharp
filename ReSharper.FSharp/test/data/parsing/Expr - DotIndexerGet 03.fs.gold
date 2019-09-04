@@ -9,7 +9,7 @@ IFSharpImplFile
           FSharpTokenType+DotTokenElement(type:DOT, text:.)
           IIndexerArg
             FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
-            IAppExpr
+            IPrefixAppExpr
               ILongIdentExpr
                 ILongIdentifier
                   FSharpToken(type:INT32, text:1)
@@ -17,7 +17,7 @@ IFSharpImplFile
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+DotDotTokenElement(type:DOT_DOT, text:..)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IAppExpr
+            IPrefixAppExpr
               ILongIdentExpr
                 ILongIdentifier
                   FSharpToken(type:INT32, text:2)
