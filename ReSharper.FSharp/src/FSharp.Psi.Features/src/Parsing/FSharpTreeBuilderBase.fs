@@ -437,7 +437,6 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
         | SynType.LongIdentApp(_, _, ltRange, typeArgs, _, gtRange, _) ->
             let mark = x.Mark(range)
             x.ProcessTypeArgs(typeArgs, ltRange, gtRange, ElementType.PREFIX_APP_TYPE_ARGUMENT_LIST)
-
             x.Done(range, mark, ElementType.NAMED_TYPE)
 
         | SynType.Tuple (_, types, _) ->
@@ -446,20 +445,34 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
                 x.ProcessType(synType)
             x.Done(range, mark, ElementType.TUPLE_TYPE)
 
+        // todo: struct keyword?
         | SynType.AnonRecd(_, fields, _) ->
-            for _, synType in fields do
+            let mark = x.Mark(range)
+            for IdentRange range, synType in fields do
+                let mark = x.Mark(range)
                 x.ProcessType(synType)
+                x.Done(range, mark, ElementType.ANON_RECORD_FIELD)
+            x.Done(range, mark, ElementType.ANON_RECORD_TYPE)
 
         | SynType.StaticConstantNamed(synType1, synType2, _)
-        | SynType.MeasureDivide(synType1, synType2, _)
-        | SynType.Fun(synType1, synType2, _) ->
+        | SynType.MeasureDivide(synType1, synType2, _) ->
+            let mark = x.Mark(range)
             x.ProcessType(synType1)
             x.ProcessType(synType2)
+            x.Done(range, mark, ElementType.OTHER_TYPE)
+
+        | SynType.Fun(synType1, synType2, _) ->
+            let mark = x.Mark(range)
+            x.ProcessType(synType1)
+            x.ProcessType(synType2)
+            x.Done(range, mark, ElementType.FUN_TYPE)
 
         | SynType.WithGlobalConstraints(synType, _, _)
         | SynType.HashConstraint(synType, _)
         | SynType.MeasurePower(synType, _, _) ->
+            let mark = x.Mark(range)
             x.ProcessType(synType)
+            x.Done(range, mark, ElementType.OTHER_TYPE)
 
         | SynType.Array(_, synType, _) ->
             let mark = x.Mark(range)
@@ -469,8 +482,10 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
         | SynType.Var _ ->
             x.MarkAndDone(range, ElementType.VAR_TYPE)
 
+        // todo: mark expressions
         | SynType.StaticConstantExpr _
-        | SynType.StaticConstant _ -> ()
+        | SynType.StaticConstant _ ->
+            x.MarkAndDone(range, ElementType.OTHER_TYPE)
 
         | SynType.Anon _ ->
             x.MarkAndDone(range, ElementType.ANON_TYPE)

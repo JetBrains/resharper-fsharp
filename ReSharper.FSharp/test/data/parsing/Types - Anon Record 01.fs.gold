@@ -1,0 +1,42 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    ILetModuleDecl
+      FSharpTokenType+LetTokenElement(type:LET, text:let)
+      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+      ITopBinding
+        IWildPat
+          FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+        IReturnTypeInfo
+          FSharpTokenType+ColonTokenElement(type:COLON, text::)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IAnonRecordType
+            FSharpTokenType+LbraceBarTokenElement(type:LBRACE_BAR, text:{|)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IAnonRecordField
+              FSharpIdentifierToken(type:IDENTIFIER, text:A)
+              FSharpTokenType+ColonTokenElement(type:COLON, text::)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              INamedType
+                ITypeReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:int)
+            FSharpTokenType+SemicolonTokenElement(type:SEMICOLON, text:;)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IAnonRecordField
+              FSharpIdentifierToken(type:IDENTIFIER, text:B)
+              FSharpTokenType+ColonTokenElement(type:COLON, text::)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              INamedType
+                ITypeReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:int)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpTokenType+BarRbraceTokenElement(type:BAR_RBRACE, text:|})
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        IChameleonExpression
+          IConstExpr
+            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

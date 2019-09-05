@@ -1272,35 +1272,52 @@ typeReferenceName:
 
 
 interface synType:
-  arrayType |
+  namedType |
   tupleType |
+  anonRecordType |
+  arrayType |
+  funType |
   varType |
   anonType |
-  namedType |
   otherType;
-  
-anonType:
-  UNDERSCORE;
+
+
+namedType:
+  typeReferenceName<TYPE_REFERENCE, ReferenceName>;
+
+tupleType:
+  synType<ITEM, Items>
+  (
+    STAR
+    synType<ITEM, Items>
+  )*;
+
+anonRecordType:
+  LBRACE_BAR
+  anonRecordField<FIELD, Fields>*
+  BAR_RBRACE;
+
+anonRecordField:
+  IDENTIFIER<IDENTIFIER, Identifier>
+  COLON
+  synType<TYPE, Type>;
 
 arrayType:
   synType<TYPE, Type>
   LBRACK
   RBRACK;
 
-tupleType:
-  synType<ITEM, ItemType>
-  (
-    STAR
-    synType<ITEM, ItemType>
-  )*;
+funType:
+  synType
+  RARROW
+  synType;
 
 varType options { stubBase="TypeExpressionBase"; }:
   QUOTE
   IDENTIFIER<IDENTIFIER, Identifier>;
 
-
-namedType:
-  referenceName<TYPE_REFERENCE, ReferenceName>;
+anonType:
+  UNDERSCORE;
 
 otherType:
   fakeSeparator;

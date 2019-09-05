@@ -122,3 +122,9 @@ type FSharpParserTest() =
     [<Test>] member x.``Types - Tuple 04 - Struct``() = x.DoNamedTest()
     [<Test>] member x.``Types - Tuple 05 - More items``() = x.DoNamedTest()
     [<Test>] member x.``Types - Tuple 06 - Parens``() = x.DoNamedTest()
+
+    [<Test>] member x.``Types - Fun 01``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Fun 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Types - Anon record 01``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Array 01``() = x.DoNamedTest()
