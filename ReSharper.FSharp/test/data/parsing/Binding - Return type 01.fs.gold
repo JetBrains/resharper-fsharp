@@ -10,8 +10,8 @@ IFSharpImplFile
         IReturnTypeInfo
           FSharpTokenType+ColonTokenElement(type:COLON, text::)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          INamedTypeExpression
-            ILongIdentifier
+          INamedType
+            ITypeReferenceName
               FSharpIdentifierToken(type:IDENTIFIER, text:int)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)

@@ -43,6 +43,12 @@
     public const string IDS_SYN_TYPE = "";
     public const string IDS_LET_OR_USE = "";
     public const string IDS_LET_OR_USE_BANG = "";
+    public const string IDS_REFERENCE_NAME = "";
+    public const string IDS_EXPRESSION_REFERENCE_NAME = "";
+    public const string IDS_TYPE_REFERENCE_NAME = "";
+    public const string IDS_TYPE_ARGUMENT_LIST = "";
+    public const string IDS_PREFIX_APP_TYPE_ARGUMENT_LIST = "";
+    public const string IDS_POSTFIX_APP_TYPE_ARGUMENT_LIST = "";
 
     public static string GetString(string id) => id;
     public static string GetExpectedMessage(string s) => string.Empty;

@@ -436,7 +436,7 @@ recordExprBinding:
   SEMICOLON<SEMI, Semicolon>?;
 
 newExpr options { stubBase="TypeExpressionBase"; }:
-  namedTypeExpression<TYPE, Type>
+  namedType<TYPE, Type>
   fakeSeparator;
 
 forExpr options { stubBase="DummyExpression"; }:
@@ -472,11 +472,11 @@ whileExpr options { stubBase="DummyExpression"; }:
   synExpr<DO_EXPR, DoExpression>;
 
 objExpr options { stubBase="BaseTypeExpressionBase"; }:
-  namedTypeExpression<BASE_TYPE, BaseType>
+  namedType<BASE_TYPE, BaseType>
   fakeSeparator;
 
 objExprSecondaryInterface options { stubBase="BaseTypeExpressionBase"; }:
-  namedTypeExpression<BASE_TYPE, BaseType>
+  namedType<BASE_TYPE, BaseType>
   fakeSeparator;
 
 compExpr options { stubBase="DummyExpression"; }:
@@ -744,7 +744,7 @@ typeExtensionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; 
   fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   longIdentifier<IDENTIFIER, LongIdentifier>
-  namedTypeExpression<EXTENDED_TYPE, ExtendedType>
+  namedType<EXTENDED_TYPE, ExtendedType>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
 
@@ -975,14 +975,14 @@ interface inheritMember:
 
 interfaceInherit options { stubBase="BaseTypeExpressionBase"; }:
   INHERIT
-  namedTypeExpression<BASE_TYPE, BaseType>;
+  namedType<BASE_TYPE, BaseType>;
 
 typeInherit options { stubBase="BaseTypeExpressionBase"; }:
   INHERIT
-  namedTypeExpression<BASE_TYPE, BaseType>;
+  namedType<BASE_TYPE, BaseType>;
 
 interfaceImplementation options { stubBase="BaseTypeExpressionBase"; }:
-  namedTypeExpression<INTERFACE_TYPE, InterfaceType>
+  namedType<INTERFACE_TYPE, InterfaceType>
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>* fakeSeparator;
 
 
@@ -1168,10 +1168,6 @@ typeParameterOfMethodList:
   typeParameterOfMethodDeclaration<TYPE_PARAMETER, TypeParameters>*
   GREATER<GREATER,RAngle>;
 
-typeArgumentList:
-  LESS<LESS,LAngle>
-  GREATER<GREATER,RAngle>;
-
 typeParameterOfTypeDeclaration options { stubBase="FSharpDeclarationBase"; }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
   IDENTIFIER<IDENTIFIER, Identifier>;
@@ -1216,19 +1212,95 @@ localDeclaration options { stubBase="LocalDeclarationBase"; }:
   identOrOpName{IDENTIFIER, Identifier};
 
 
+interface referenceName:
+  expressionReferenceName |
+  typeReferenceName;
+
+interface typeArgumentList:
+  prefixAppTypeArgumentList |
+  postfixAppTypeArgumentList;
+
+
+postfixAppTypeArgumentList:
+  (
+    synType<TYPE, Types>
+  |
+    LPAREN
+    synType<TYPE, Types>
+    (
+      COMMA
+      synType<TYPE, Types>
+    )*
+    RPAREN
+ );
+
+prefixAppTypeArgumentList:
+  LESS<LESS,LAngle>
+  synType<TYPE, Types>
+  (
+    COMMA
+    synType<TYPE, Types>
+  )*
+  GREATER<GREATER,RAngle>;
+
+
+expressionReferenceName:
+  (
+    referenceName<QUALIFIER, Qualifier>
+    DOT<DELIMITER, Dot>
+  )?
+  IDENTIFIER<IDENTIFIER, IdentifierInternal>
+  prefixAppTypeArgumentList<TYPE_ARG, TypeArgumentList>;
+
+
+typeReferenceName:
+  (
+    postfixAppTypeArgumentList<TYPE_ARG, TypeArgumentList>
+    (
+      typeReferenceName<QUALIFIER, Qualifier>
+      DOT<DELIMITER, Dot>
+    )?
+    IDENTIFIER<IDENTIFIER, IdentifierInternal>
+  |
+    (
+      typeReferenceName<QUALIFIER, Qualifier>
+      DOT<DELIMITER, Dot>
+    )?
+    IDENTIFIER<IDENTIFIER, IdentifierInternal>
+    prefixAppTypeArgumentList<TYPE_ARG, TypeArgumentList>
+  );
+
+
 interface synType:
+  arrayType |
+  tupleType |
   varType |
-  namedTypeExpression |
+  anonType |
+  namedType |
   otherType;
+  
+anonType:
+  UNDERSCORE;
+
+arrayType:
+  synType<TYPE, Type>
+  LBRACK
+  RBRACK;
+
+tupleType:
+  synType<ITEM, ItemType>
+  (
+    STAR
+    synType<ITEM, ItemType>
+  )*;
 
 varType options { stubBase="TypeExpressionBase"; }:
   QUOTE
   IDENTIFIER<IDENTIFIER, Identifier>;
 
 
-namedTypeExpression:
-  longIdentifier<LONG_IDENTIFIER, LongIdentifier> fakeSeparator
-  typeArgumentList?;
+namedType:
+  referenceName<TYPE_REFERENCE, ReferenceName>;
 
 otherType:
   fakeSeparator;

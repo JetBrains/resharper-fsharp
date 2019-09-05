@@ -10,8 +10,8 @@ IFSharpImplFile
               FSharpToken(type:INT32, text:123)
             FSharpTokenType+ColonTokenElement(type:COLON, text::)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            INamedTypeExpression
-              ILongIdentifier
+            INamedType
+              ITypeReferenceName
                 FSharpIdentifierToken(type:IDENTIFIER, text:int)
           FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
 

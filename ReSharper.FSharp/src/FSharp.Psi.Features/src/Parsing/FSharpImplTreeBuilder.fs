@@ -1057,9 +1057,9 @@ type TypeArgsProcessor() =
 
     override x.Process(synExpr, builder) =
         match synExpr with
-            | SynExpr.TypeApp(_, ltRange, typeArgs, _, gtRangeOpt, _, _) ->
-                builder.ProcessTypeArgs(typeArgs, ltRange, gtRangeOpt)
-            | _ -> failwithf "Expecting typeApp, got: %A" synExpr
+        | SynExpr.TypeApp(_, ltRange, typeArgs, _, gtRangeOpt, _, _) ->
+            builder.ProcessTypeArgs(typeArgs, Some ltRange, gtRangeOpt, ElementType.PREFIX_APP_TYPE_ARGUMENT_LIST)
+        | _ -> failwithf "Expecting typeApp, got: %A" synExpr
 
 
 type ExpressionListProcessor() =

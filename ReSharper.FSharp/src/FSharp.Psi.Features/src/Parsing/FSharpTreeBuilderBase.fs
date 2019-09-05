@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
 open System
+open System.Collections.Generic
 open FSharp.Compiler.Ast
 open FSharp.Compiler.Range
 open JetBrains.Diagnostics
@@ -114,6 +115,25 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
         let mark = x.Mark(head.idRange)
         let last = List.last lid
         x.Done(last.idRange, mark, ElementType.LONG_IDENTIFIER)
+
+    member x.ProcessNamedTypeReference(lid: Ident list, typeArgs: SynType list, ltOption, gtOption, isPostfixApp) =
+        // todo: revise checking empty lid/args?
+        if not isPostfixApp && lid.IsEmpty || isPostfixApp && typeArgs.IsEmpty then () else
+
+        let marks = Stack()
+
+        let head = if isPostfixApp then typeArgs.Head.Range else lid.Head.idRange
+        x.AdvanceToStart(head)
+
+        for _ in lid do
+            marks.Push(x.Mark())
+            if isPostfixApp && marks.Count = 1 then
+                x.ProcessTypeArgs(typeArgs, ltOption, gtOption, ElementType.POSTFIX_APP_TYPE_ARGUMENT_LIST)
+
+        for IdentRange id in lid do
+            if not isPostfixApp && marks.Count = 1 then
+                x.ProcessTypeArgs(typeArgs, ltOption, gtOption, ElementType.PREFIX_APP_TYPE_ARGUMENT_LIST)
+            x.Done(id, marks.Pop(), ElementType.TYPE_REFERENCE_NAME)
 
     member x.GetTreeNode() =
         x.GetTree() :> ITreeNode
@@ -381,47 +401,50 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
             x.ProcessSimplePatterns(pats)
             x.ProcessType(synType)
 
-    member x.ProcessTypeArgs(typeArgs, ltRange: range, gtRange: range option) =
-        let mark = x.Mark(ltRange)
+    member x.ProcessTypeArgs(typeArgs, ltRange: range option, gtRange: range option, elementType) =
+        match ltRange, typeArgs with
+        | Some head, _
+        | _, TypeRange head :: _ ->
+            let mark = x.Mark(head)
 
-        for synType in typeArgs do
-            x.ProcessType(synType)
+            for synType in typeArgs do
+                x.ProcessType(synType)
 
-        match gtRange with
-        | Some range ->
-            x.Done(range, mark, ElementType.TYPE_ARGUMENT_LIST)
-        | _ -> x.Done(mark, ElementType.TYPE_ARGUMENT_LIST)
+            match gtRange with
+            | Some range -> x.Done(range, mark, elementType)
+            | _ -> x.Done(mark, elementType)
+
+        | _ -> () // todo: failwith?
 
     member x.ProcessType(TypeRange range as synType) =
         match synType with
         | SynType.LongIdent(lid) ->
             let mark = x.Mark(range)
-            x.ProcessLongIdentifier(lid.Lid)
-            x.Done(range, mark, ElementType.NAMED_TYPE_EXPRESSION)
+            x.ProcessNamedTypeReference(lid.Lid, [], None, None, false)
+            x.Done(range, mark, ElementType.NAMED_TYPE)
 
         | SynType.App(typeName, ltRange, typeArgs, _, gtRange, isPostfix, _) ->
             let mark = x.Mark(range)
-            match typeName with
-            | SynType.LongIdent(lid) -> x.ProcessLongIdentifier(lid.Lid)
-            | _ -> ()
+            let lid =
+                match typeName with
+                | SynType.LongIdent(lid) -> lid.Lid
+                | _ -> failwithf "unexpected type: %O" typeName
 
-            match isPostfix, ltRange with
-            | false, Some ltRange -> x.ProcessTypeArgs(typeArgs, ltRange, gtRange)
-            | _ -> ()
-
-            x.Done(range, mark, ElementType.NAMED_TYPE_EXPRESSION)
+            // todo: fix isPostfix
+            x.ProcessNamedTypeReference(lid, typeArgs, ltRange, gtRange, isPostfix)
+            x.Done(range, mark, ElementType.NAMED_TYPE)
 
         | SynType.LongIdentApp(_, _, ltRange, typeArgs, _, gtRange, _) ->
             let mark = x.Mark(range)
-            match ltRange with
-            | Some ltRange -> x.ProcessTypeArgs(typeArgs, ltRange, gtRange)
-            | _ -> () // todo: prefix? e.g. int list
+            x.ProcessTypeArgs(typeArgs, ltRange, gtRange, ElementType.PREFIX_APP_TYPE_ARGUMENT_LIST)
 
-            x.Done(range, mark, ElementType.NAMED_TYPE_EXPRESSION)
+            x.Done(range, mark, ElementType.NAMED_TYPE)
 
         | SynType.Tuple (_, types, _) ->
+            let mark = x.Mark(range)
             for _, synType in types do
                 x.ProcessType(synType)
+            x.Done(range, mark, ElementType.TUPLE_TYPE)
 
         | SynType.AnonRecd(_, fields, _) ->
             for _, synType in fields do
@@ -435,16 +458,22 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
 
         | SynType.WithGlobalConstraints(synType, _, _)
         | SynType.HashConstraint(synType, _)
-        | SynType.MeasurePower(synType, _, _)
-        | SynType.Array(_, synType, _) ->
+        | SynType.MeasurePower(synType, _, _) ->
             x.ProcessType(synType)
+
+        | SynType.Array(_, synType, _) ->
+            let mark = x.Mark(range)
+            x.ProcessType(synType)
+            x.Done(range, mark, ElementType.ARRAY_TYPE)
 
         | SynType.Var _ ->
             x.MarkAndDone(range, ElementType.VAR_TYPE)
 
         | SynType.StaticConstantExpr _
-        | SynType.StaticConstant _
-        | SynType.Anon _ -> ()
+        | SynType.StaticConstant _ -> ()
+
+        | SynType.Anon _ ->
+            x.MarkAndDone(range, ElementType.ANON_TYPE)
 
     member x.FixExpresion(expr: SynExpr) =
         // A fake SynExpr.Typed node is added for binding with return type specification like in the following

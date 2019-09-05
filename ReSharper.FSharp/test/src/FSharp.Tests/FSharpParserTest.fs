@@ -102,3 +102,23 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Module abbreviation 01``() = x.DoNamedTest()
     [<Test>] member x.``Module abbreviation 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Types - Simple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Simple 02 - Long ident``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Simple 03 - Type app``() = x.DoNamedTest()
+
+    // todo: fix parens are not in type nodes in FCS
+    [<Test>] member x.``Types - Simple 04 - Parens``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Simple 05 - Nested parens``() = x.DoNamedTest()
+
+    [<Test>] member x.``Types - Type app 01``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Type app 02 - ML-style``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Type app 03 - tuple``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Type app 04 - ML-style tuple``() = x.DoNamedTest()
+
+    [<Test>] member x.``Types - Tuple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Tuple 02 - Nested``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Tuple 03 - Nested 2``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Tuple 04 - Struct``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Tuple 05 - More items``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Tuple 06 - Parens``() = x.DoNamedTest()

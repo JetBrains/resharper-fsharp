@@ -64,6 +64,8 @@ type FSharpGoToInheritorsTest() =
         |> Seq.filter (fun p -> p :? IGotoInheritorsProvider)
 
     [<Test>] member x.``Union case 01``() = x.DoNamedTest()
+    [<Test>] member x.``Types 01``() = x.DoNamedTest()
+    [<Test>] member x.``Types 02``() = x.DoNamedTest()
 
 
 type FSharpGoToDeclarationTest() =

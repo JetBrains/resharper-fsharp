@@ -1,0 +1,1 @@
+let _: list<int> = ()

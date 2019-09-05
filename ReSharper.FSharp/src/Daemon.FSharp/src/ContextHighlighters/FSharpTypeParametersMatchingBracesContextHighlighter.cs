@@ -32,7 +32,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
       TryConsumeHighlighting<ITypeParameterOfTypeList>(psiView, consumer, _ => _.LAngle, _ => _.RAngle);
       TryConsumeHighlighting<ITypeParameterOfMethodList>(psiView, consumer, _ => _.LAngle, _ => _.RAngle);
 
-      TryConsumeHighlighting<ITypeArgumentList>(psiView, consumer, _ => _.LAngle, _ => _.RAngle);
+      TryConsumeHighlighting<IPrefixAppTypeArgumentList>(psiView, consumer, _ => _.LAngle, _ => _.RAngle);
     }
   }
 }
