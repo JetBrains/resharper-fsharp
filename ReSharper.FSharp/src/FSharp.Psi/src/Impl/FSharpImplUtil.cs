@@ -100,8 +100,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       {
         case ParenExpr parenExpr:
           return IsModuleSuffixExpr(parenExpr.InnerExpression);
-        case ILongIdentExpr longIdentExpr:
-          return longIdentExpr.LongIdentifier.QualifiedName == ModuleSuffix;
+        case IReferenceExpr referenceExpr:
+          return referenceExpr.QualifiedName == ModuleSuffix;
       }
 
       return false;

@@ -3,6 +3,6 @@ IFSharpImplFile
   IAnonModuleDeclaration
     IDo
       IChameleonExpression
-        IIdentExpr
+        IReferenceExpr
           FSharpIdentifierToken(type:IDENTIFIER, text:x)
 

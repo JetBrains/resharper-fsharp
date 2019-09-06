@@ -43,10 +43,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     public FSharpSymbolReference QualifierReference =>
-      Parent is LongIdentifier longIdentifier && longIdentifier.Identifiers is var identifiers
-        ? identifiers.IndexOf(this) is var index && index > 0
-          ? (identifiers[index - 1] as IReferenceExpression)?.Reference
-          : null
+      // todo: ignore inner parens of qualifier
+      // todo: make non-terminal rule for identifier
+      Parent is IReferenceExpr referenceExpr && referenceExpr.Identifier == this
+        ? referenceExpr.Qualifier is IReferenceExpression qualifier ? qualifier.Reference : null
         : null;
   }
 }

@@ -10,9 +10,11 @@ TO: [O] let r2 = { |r1| with Field = r1.Field + 1 } RANGE: (117,119) @ Write 03 
 TO: [O] let r2 = { |r1| with Field = r1.Field + 1 } RANGE: (117,119) @ Write 03 - Record fields.fs
 TO: [O] let r2 = { r1 with Field = r1.|Field| + 1 } RANGE: (136,141) @ Write 03 - Record fields.fs
 TO: [O] let r2 = { r1 with Field = |r1|.Field + 1 } RANGE: (133,135) @ Write 03 - Record fields.fs
+TO: [O] let r2 = { r1 with Field = |r1|.Field + 1 } RANGE: (133,135) @ Write 03 - Record fields.fs
 TO: [O] let r2 = { r1 with Field = r1.|Field| + 1 } RANGE: (136,141) @ Write 03 - Record fields.fs
 TO: [O] |r2|.Field <- r1.Field RANGE: (151,153) @ Write 03 - Record fields.fs
 TO: [O] r2.Field <- r1.|Field| RANGE: (166,171) @ Write 03 - Record fields.fs
+TO: [O] r2.Field <- |r1|.Field RANGE: (163,165) @ Write 03 - Record fields.fs
 TO: [O] r2.Field <- |r1|.Field RANGE: (163,165) @ Write 03 - Record fields.fs
 TO: [O] r2.Field <- r1.|Field| RANGE: (166,171) @ Write 03 - Record fields.fs
 

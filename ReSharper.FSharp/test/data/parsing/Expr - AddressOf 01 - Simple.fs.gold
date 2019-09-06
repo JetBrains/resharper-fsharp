@@ -5,13 +5,13 @@ IFSharpImplFile
       IChameleonExpression
         IAddressOfExpr
           FSharpTokenType+AmpTokenElement(type:AMP, text:&)
-          IIdentExpr
+          IReferenceExpr
             FSharpIdentifierToken(type:IDENTIFIER, text:x)
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
     IDo
       IChameleonExpression
         IAddressOfExpr
           FSharpTokenType+AmpAmpTokenElement(type:AMP_AMP, text:&&)
-          IIdentExpr
+          IReferenceExpr
             FSharpIdentifierToken(type:IDENTIFIER, text:x)
 

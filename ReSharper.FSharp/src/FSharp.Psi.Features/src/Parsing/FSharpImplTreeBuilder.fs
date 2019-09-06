@@ -686,6 +686,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                 x.PushExpression(argExpr)
                 x.ProcessExpression(funcExpr)
 
+        // todo: check if expression can always be referenceExpr, move inside refExpr if true
         | SynExpr.TypeApp(expr, _, _, _, _, _, _) as typeApp ->
             x.PushRange(range, ElementType.TYPE_APP_EXPR)
             x.PushStep(typeApp, typeArgsProcessor)
@@ -717,12 +718,11 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             x.ProcessExpression(ifExpr)
 
         | SynExpr.Ident _ ->
-            x.MarkAndDone(range, ElementType.IDENT_EXPR)
+            x.MarkAndDone(range, ElementType.REFERENCE_EXPR)
 
+        // todo: isOptional
         | SynExpr.LongIdent(_, lid, _, _) ->
-            let mark = x.Mark(range)
-            x.ProcessLongIdentifier(lid.Lid)
-            x.Done(range, mark, ElementType.LONG_IDENT_EXPR)
+            x.ProcessLongIdentifierExpression(lid.Lid, range)
 
         | SynExpr.LongIdentSet(lid, expr, _) ->
             x.PushRange(range, ElementType.LONG_IDENT_SET_EXPR)
@@ -835,6 +835,17 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             x.PushExpression(expr2)
             x.ProcessExpression(expr1)
 
+    member x.ProcessLongIdentifierExpression(lid, range) =
+        let marks = Stack()
+
+        x.AdvanceToStart(range)
+        for _ in lid do
+            marks.Push(x.Mark())
+
+        for IdentRange idRange in lid do
+            let range = if marks.Count <> 1 then idRange else range
+            x.Done(range, marks.Pop(), ElementType.REFERENCE_EXPR)
+    
     member x.MarkLambdaParams(expr, outerBodyExpr, topLevel) =
         match expr with
         | SynExpr.Lambda(_, inLambdaSeq, pats, bodyExpr, _) when inLambdaSeq <> topLevel ->
@@ -1107,13 +1118,27 @@ type InterfaceImplementationListProcessor() =
 type IndexerArgsProcessor() =
     inherit StepProcessorBase<SynExpr>()
 
+    let getGeneratedAppArg (expr: SynExpr) =
+        if not expr.Range.IsSynthetic then expr else
+
+        match expr with
+        | SynExpr.App(_, false, func, arg, _) when func.Range.IsSynthetic -> arg
+        | _ -> expr
+
     override x.Process(synExpr, builder) =
         match synExpr with
         | SynExpr.DotIndexedGet(_, [indexerArg], dotRange, range)
         | SynExpr.DotIndexedSet(_, [indexerArg], _, range, dotRange, _) ->
             let indexerRange = mkFileIndexRange range.FileIndex dotRange.End range.End
             builder.PushRange(indexerRange, ElementType.INDEXER_ARG)
-            builder.PushExpressionList(indexerArg.Exprs)
+
+            match indexerArg with
+            | SynIndexerArg.One expr ->
+                builder.PushExpression(getGeneratedAppArg expr)
+
+            | SynIndexerArg.Two(expr1, expr2) ->
+                builder.PushExpression(getGeneratedAppArg expr2)
+                builder.PushExpression(getGeneratedAppArg expr1)
 
         | _ -> failwithf "Expecting dotIndexedGet/Set, got: %A" synExpr
 

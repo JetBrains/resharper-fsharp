@@ -4,7 +4,7 @@ IFSharpImplFile
     IDo
       IChameleonExpression
         IPrefixAppExpr
-          IIdentExpr
+          IReferenceExpr
             FSharpIdentifierToken(type:IDENTIFIER, text:async)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           ICompExpr

@@ -159,11 +159,13 @@ type FSharpNamingService(language: FSharpLanguage) =
         | :? ITypedExpr as typedExpr ->
             x.SuggestRoots(typedExpr.Expression, useExpectedTypes, policyProvider)
         
-        | :? IIdentExpr as identExpr ->
-            x.SuggestRoots(identExpr.IdentifierToken, useExpectedTypes, policyProvider)
-
-        | :? ILongIdentExpr as longIdentExpr ->
-            x.SuggestRoots(longIdentExpr.LongIdentifier, useExpectedTypes, policyProvider)
+        | :? IReferenceExpr as referenceExpr ->
+            match referenceExpr.Qualifier with
+            | :? IReferenceExpr as qualifierExpr ->
+                // todo: ignore qualifier inner parens
+                // todo: use expression references (don't look at identifiers)
+                x.SuggestRoots(referenceExpr.Identifier.Reference, qualifierExpr.Identifier.Reference, policyProvider)
+            | _ -> x.SuggestRoots(referenceExpr.Identifier, useExpectedTypes, policyProvider)
 
         | :? IDotGetExpr as dotGetExpr ->
             x.SuggestRoots(dotGetExpr.LongIdentifier, useExpectedTypes, policyProvider)

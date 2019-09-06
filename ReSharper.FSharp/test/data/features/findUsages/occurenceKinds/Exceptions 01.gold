@@ -18,7 +18,9 @@ TO: [O] Exn2.|Foo| RANGE: (154,157) @ Exceptions 01.fs
 New instance creation
 ---
 TO: [O] |Exn1| RANGE: (65,69) @ Exceptions 01.fs
+TO: [O] |Exn1|.Foo RANGE: (71,75) @ Exceptions 01.fs
 TO: [O] |Exn2|(123) RANGE: (138,142) @ Exceptions 01.fs
+TO: [O] |Exn2|.Foo RANGE: (149,153) @ Exceptions 01.fs
 
 
 Type specification

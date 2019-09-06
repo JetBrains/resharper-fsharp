@@ -303,6 +303,13 @@ otherPat options { stubBase="SynPatternBase"; }:
   fakeSeparator;
 
 
+interface qualifiableExpr:
+  referenceExpr |
+  parenExpr;
+
+
+
+
 interface synExpr:
   parenExpr |
   quoteExpr |
@@ -332,8 +339,7 @@ interface synExpr:
   lazyExpr |
   sequentialExpr |
   ifThenElseExpr |
-  identExpr |
-  longIdentExpr |
+  referenceExpr |
   dotGetExpr |
   dotIndexedGetExpr |
   setExpr |
@@ -371,6 +377,10 @@ interface castExpr:
   downcastExpr;
 
 parenExpr options { stubBase="DummyExpression"; }:
+  (
+    synExpr<QUALIFIER_EXPR, Qualifier>
+    DOT
+  )?
   LPAREN<LPAREN, LeftParen>
   synExpr<EXPR, InnerExpression>?
   RPAREN<RPAREN, RightParen>;
@@ -631,11 +641,13 @@ ifThenElseExpr options { stubBase="DummyExpression"; }:
     synExpr<ELSE_EXPR, ElseExpr>
   )?;
 
-identExpr options { stubBase="TypeExpressionBase"; }:
-  identOrOpName{IDENTIFIER, Identifier};
-
-longIdentExpr options { stubBase="TypeExpressionBase"; }:
-  longIdentifier<LONG_IDENTIFIER, LongIdentifier>;
+// todo: change base to ReferenceExpressionBase
+referenceExpr options { stubBase="TypeExpressionBase"; }:
+  (
+    synExpr<QUALIFIER_EXPR, Qualifier>
+    DOT
+  )?
+  IDENTIFIER<IDENTIFIER, IdentifierInternal>;
 
 matchClause options { stubBase="DummyExpression"; }:
   BAR<BAR, Bar>?
