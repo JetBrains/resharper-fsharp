@@ -17,5 +17,10 @@ IFSharpImplFile
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               IConstExpr
                 FSharpToken(type:INT32, text:2)
+            FSharpTokenType+CommaTokenElement(type:COMMA, text:,)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IIndexerArg
+              IConstExpr
+                FSharpToken(type:INT32, text:3)
             FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])
 

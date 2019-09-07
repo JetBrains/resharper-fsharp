@@ -305,7 +305,8 @@ otherPat options { stubBase="SynPatternBase"; }:
 
 interface qualifiableExpr:
   referenceExpr |
-  parenExpr;
+  parenExpr |
+  namedIndexerExpr;
 
 
 
@@ -340,9 +341,8 @@ interface synExpr:
   sequentialExpr |
   ifThenElseExpr |
   referenceExpr |
-  dotGetExpr |
-  dotIndexedGetExpr |
   setExpr |
+  indexerExpr |
   typeTestExpr |
   castExpr |
   inferredCastExpr |
@@ -364,13 +364,44 @@ interface appExpr:
   prefixAppExpr |
   infixAppExpr;
 
-interface setExpr:
-  longIdentSetExpr |
-  dotSetExpr |
-  exprSetExpr |
-  dotIndexedSetExpr |
-  namedIndexedPropertySet |
-  dotNamedIndexedPropertySet;
+setExpr options { stubBase="DummyExpression"; }:
+  synExpr<LEFT_EXPR, LeftExpression>
+  LARROW<LARROW, LArrow>
+  synExpr<RIGHT_EXPR, RightExpression>;
+
+interface indexerExpr:
+  itemIndexerExpr |
+  namedIndexerExpr;
+
+itemIndexerExpr options { stubBase="DummyExpression"; } extras {
+  get { methodName="Args" path=<itemIndexerExpr:ARG_LIST/indexerArgList:INDEXER_ARG> };
+}:
+  synExpr<EXPR, Expression>
+  DOT
+  indexerArgList<ARG_LIST, IndexerArgList>;
+
+namedIndexerExpr options { stubBase="DummyExpression"; } extras {
+  get { methodName="Args" path=<namedIndexerExpr:INDEXER_ARG> };
+}:
+  // todo: maybe: expr, dot, ident, arg?
+  referenceExpr<EXPR, Expression>
+  indexerArg<INDEXER_ARG, IndexerArg>;
+
+indexerArgList:
+  LBRACK
+  synExpr<INDEXER_ARG, IndexerArgs>
+    (
+      COMMA
+      synExpr<INDEXER_ARG, IndexerArgs>
+    )*
+  RBRACK;
+
+indexerArg:
+  synExpr<EXPR, Expressions>
+  (
+    DOT_DOT
+    synExpr<EXPR, Expressions>
+  )?;
 
 interface castExpr:
   upcastExpr |
@@ -558,70 +589,6 @@ tryFinallyExpr options { stubBase="DummyExpression"; }:
   synExpr<TRY_EXPR, TryExpression>
   FINALLY
   synExpr<FINALLY_EXPR, FinallyExpression>;
-
-longIdentSetExpr options { stubBase="SetExpressionBase"; }:
-  longIdentifier<LONG_IDENTIFIER, LongIdentifier>
-  LARROW<LARROW, LArrow>
-  synExpr<EXPR, Expression>;
-
-dotGetExpr options { stubBase="SetExpressionBase"; }:
-  synExpr<EXPR, Expression>
-  DOT
-  longIdentifier<LONG_IDENTIFIER, LongIdentifier>;
-
-dotIndexedGetExpr options { stubBase="SetExpressionBase"; }:
-  synExpr<EXPR, LeftExpr>
-  DOT
-  indexerArg<ARG, IndexerArg>;
-
-indexerArg:
-  LBRACK
-  synExpr<EXPRS, Expressions>
-  (
-    DOT_DOT
-    synExpr<EXPRS, Expressions>
-  )?
-  RBRACK;
-
-dotSetExpr options { stubBase="SetExpressionBase"; }:
-  synExpr<EXPR1, LeftExpr>
-  DOT
-  longIdentifier<LONG_IDENTIFIER, LongIdentifier>
-  LARROW<LARROW, LArrow>
-  synExpr<EXPR2, RightExpr>;
-
-exprSetExpr options { stubBase="SetExpressionBase"; }:
-  synExpr<EXPR1, LeftExpr>
-  LARROW<LARROW, LArrow>
-  synExpr<EXPR2, RightExpr>;
-
-dotIndexedSetExpr options { stubBase="SetExpressionBase"; }:
-  synExpr<EXPR, Expression>
-  DOT
-  LBRACK
-  (
-    synExpr<INDEXER_EXPR, IndexerExpressions>
-    COMMA
-  )*
-  RBRACK
-  LARROW<LARROW, LArrow>
-  synExpr<RHS_EXPR, RightExpression>;
-
-namedIndexedPropertySet options { stubBase="SetExpressionBase"; }:
-  longIdentifier<LONG_IDENTIFIER, LongIdentifier>
-  DOT
-  synExpr<EXPR1, LeftExpr>
-  synExpr<INDEXER_EXPR, IndexerExpressions>
-  LARROW<LARROW, LArrow>
-  synExpr<EXPR2, RightExpr>;
-
-dotNamedIndexedPropertySet options { stubBase="SetExpressionBase"; }:
-  synExpr<EXPR1, LeftExpr>
-  DOT
-  longIdentifier<LONG_IDENTIFIER, LongIdentifier>
-  synExpr<INDEXER_EXPR, IndexerExpressions>
-  LARROW<LARROW, LArrow>
-  synExpr<EXPR2, RightExpr>;
 
 lazyExpr options { stubBase="DummyExpression"; }:
   LAZY

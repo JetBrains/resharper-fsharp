@@ -3,13 +3,14 @@ IFSharpImplFile
   IAnonModuleDeclaration
     IDo
       IChameleonExpression
-        IDotIndexedGetExpr
+        IItemIndexerExpr
           IReferenceExpr
             FSharpIdentifierToken(type:IDENTIFIER, text:foo)
           FSharpTokenType+DotTokenElement(type:DOT, text:.)
-          IIndexerArg
+          IIndexerArgList
             FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
-            IConstExpr
-              FSharpToken(type:INT32, text:1)
+            IIndexerArg
+              IConstExpr
+                FSharpToken(type:INT32, text:1)
             FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])
 

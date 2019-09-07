@@ -69,3 +69,10 @@ let getLastLambdaParam expr =
     match expr with
     | SynExpr.Lambda(_, _, pats, bodyExpr, _) -> getGeneratedLambdaParam pats bodyExpr
     | _ -> failwithf "Expecting lambda expression, got:\n%A" expr
+
+let getGeneratedAppArg (expr: SynExpr) =
+    if not expr.Range.IsSynthetic then expr else
+
+    match expr with
+    | SynExpr.App(_, false, func, arg, _) when func.Range.IsSynthetic -> arg
+    | _ -> expr

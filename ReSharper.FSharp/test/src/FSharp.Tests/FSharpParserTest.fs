@@ -68,17 +68,30 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - TryFinally 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Lazy 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - IfThenElse 01 - Simple``() = x.DoNamedTest()
+
     [<Test>] member x.``Expr - Ident 01 - Simple``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - LongIdentSet 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Expr - Null``() = x.DoNamedTest()
     [<Test>] member x.``Expr - AddressOf 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Fixed 01 - Simple``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - DotGet 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - DotSet 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Expr - DotIndexerGet 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - DotIndexerGet 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - DotIndexerGet 03``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - DotIndexerGet 04 - Multiple args``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - DotIndexerSet 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - DotIndexerSet 02 - Record``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - DotIndexerSet 03 - Two args``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - DotIndexerSet 04 - Three args``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - DotIndexerSet 05 - Tuple arg``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - DotNamedIndexerSet 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - NamedIndexerSet 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Sequential 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Sequential 02``() = x.DoNamedTest()

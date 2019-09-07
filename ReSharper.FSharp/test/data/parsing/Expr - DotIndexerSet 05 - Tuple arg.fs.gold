@@ -6,17 +6,23 @@ IFSharpImplFile
         ISetExpr
           IItemIndexerExpr
             IReferenceExpr
-              FSharpIdentifierToken(type:IDENTIFIER, text:foo)
+              FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
             FSharpTokenType+DotTokenElement(type:DOT, text:.)
             IIndexerArgList
               FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
               IIndexerArg
-                IConstExpr
-                  FSharpToken(type:INT32, text:1)
+                ITupleExpr
+                  IConstExpr
+                    FSharpToken(type:INT32, text:1)
+                  FSharpTokenType+CommaTokenElement(type:COMMA, text:,)
+                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                  IConstExpr
+                    FSharpToken(type:INT32, text:2)
               FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+LarrowTokenElement(type:LARROW, text:<-)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             IConstExpr
               FSharpToken(type:INT32, text:1)
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

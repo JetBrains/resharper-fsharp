@@ -3,29 +3,31 @@ IFSharpImplFile
   IAnonModuleDeclaration
     IDo
       IChameleonExpression
-        IDotIndexedSetExpr
-          IReferenceExpr
-            FSharpIdentifierToken(type:IDENTIFIER, text:foo)
-          FSharpTokenType+DotTokenElement(type:DOT, text:.)
-          IIndexerArg
-            FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
-            IConstExpr
-              FSharpToken(type:INT32, text:1)
-            FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          FSharpTokenType+LarrowTokenElement(type:LARROW, text:<-)
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IRecordExpr
-            FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
+        ISetExpr
+          IItemIndexerExpr
+            IReferenceExpr
+              FSharpIdentifierToken(type:IDENTIFIER, text:foo)
+            FSharpTokenType+DotTokenElement(type:DOT, text:.)
+            IIndexerArgList
+              FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
+              IIndexerArg
+                IConstExpr
+                  FSharpToken(type:INT32, text:1)
+              FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IRecordExprBinding
-              ILongIdentifier
-                FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              IConstExpr
-                FSharpToken(type:INT32, text:1)
+            FSharpTokenType+LarrowTokenElement(type:LARROW, text:<-)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+RbraceTokenElement(type:RBRACE, text:})
+            IRecordExpr
+              FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              IRecordExprBinding
+                ILongIdentifier
+                  FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                IConstExpr
+                  FSharpToken(type:INT32, text:1)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              FSharpTokenType+RbraceTokenElement(type:RBRACE, text:})
 

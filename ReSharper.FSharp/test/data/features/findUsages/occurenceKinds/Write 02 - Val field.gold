@@ -6,11 +6,14 @@ TO: [O] type C<'|T|>() = RANGE: (25,26) @ Write 02 - Val field.fs
 TO: [O] [<DefaultValue>] val mutable |Foo|: int RANGE: (66,69) @ Write 02 - Val field.fs
 TO: [O] let |t| = C<_>() RANGE: (82,83) @ Write 02 - Val field.fs
 TO: [O] let t = C<|_|>() RANGE: (88,89) @ Write 02 - Val field.fs
+TO: [O] t.|Foo| <- t.Foo + 1 RANGE: (96,99) @ Write 02 - Val field.fs
+TO: [O] |t|.Foo <- t.Foo + 1 RANGE: (94,95) @ Write 02 - Val field.fs
 TO: [O] |t|.Foo <- t.Foo + 1 RANGE: (94,95) @ Write 02 - Val field.fs
 TO: [O] t.Foo <- t.|Foo| + 1 RANGE: (105,108) @ Write 02 - Val field.fs
 TO: [O] t.Foo <- |t|.Foo + 1 RANGE: (103,104) @ Write 02 - Val field.fs
 TO: [O] t.Foo <- |t|.Foo + 1 RANGE: (103,104) @ Write 02 - Val field.fs
 TO: [O] t.Foo <- t.|Foo| + 1 RANGE: (105,108) @ Write 02 - Val field.fs
+TO: [O] C<_>().|Foo| <- 123 RANGE: (123,126) @ Write 02 - Val field.fs
 TO: [O] C<|_|>().Foo <- 123 RANGE: (118,119) @ Write 02 - Val field.fs
 
 

@@ -725,45 +725,47 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             x.ProcessLongIdentifierExpression(lid.Lid, range)
 
         | SynExpr.LongIdentSet(lid, expr, _) ->
-            x.PushRange(range, ElementType.LONG_IDENT_SET_EXPR)
-            x.ProcessLongIdentifier(lid.Lid)
+            x.PushRange(range, ElementType.SET_EXPR)
+            x.ProcessLongIdentifierExpression(lid.Lid, lid.Range)
             x.ProcessExpression(expr)
 
-        | SynExpr.DotGet(expr, _, lidWithDots, _) ->
-            x.PushRange(range, ElementType.DOT_GET_EXPR)
-            x.PushLongIdentifier(lidWithDots.Lid)
-            x.ProcessExpression(expr)
+        | SynExpr.DotGet(expr, _, lid, _) ->
+            x.ProcessLongIdentifierAndQualifierExpression(expr, lid)
 
-        | SynExpr.DotSet(expr1, lidWithDots, expr2, _) ->
-            x.PushRange(range, ElementType.DOT_SET_EXPR)
+        | SynExpr.DotSet(expr1, lid, expr2, _) ->
+            x.PushRange(range, ElementType.SET_EXPR)
             x.PushExpression(expr2)
-            x.PushLongIdentifier(lidWithDots.Lid)
-            x.ProcessExpression(expr1)
+            x.ProcessLongIdentifierAndQualifierExpression(expr1, lid)
 
         | SynExpr.Set(expr1, expr2, _) ->
-            x.PushRange(range, ElementType.EXPR_SET_EXPR)
+            x.PushRange(range, ElementType.SET_EXPR)
             x.PushExpression(expr2)
             x.ProcessExpression(expr1)
 
-        | SynExpr.NamedIndexedPropertySet(_, expr1, expr2, _) ->
-            x.PushRange(range, ElementType.NAMED_INDEXED_PROPERTY_SET)
+        // todo: mark lid
+        | SynExpr.NamedIndexedPropertySet(lid, expr1, expr2, _) ->
+            x.PushRange(range, ElementType.SET_EXPR)
+            x.PushRange(unionRanges lid.Range expr2.Range, ElementType.NAMED_INDEXER_EXPR)
             x.PushExpression(expr2)
+            x.ProcessLongIdentifierExpression(lid.Lid, lid.Range)
+            x.PushRange(expr1.Range, ElementType.INDEXER_ARG)
             x.ProcessExpression(expr1)
 
-        | SynExpr.DotNamedIndexedPropertySet(expr1, lidWithDots, expr2, expr3, _) ->
-            x.PushRange(range, ElementType.DOT_NAMED_INDEXED_PROPERTY_SET)
+        | SynExpr.DotNamedIndexedPropertySet(expr1, lid, expr2, expr3, _) ->
+            x.PushRange(range, ElementType.SET_EXPR)
+            x.PushRange(unionRanges expr1.Range expr2.Range, ElementType.NAMED_INDEXER_EXPR)
             x.PushExpression(expr3)
-            x.PushExpression(expr2)
-            x.PushLongIdentifier(lidWithDots.Lid)
-            x.ProcessExpression(expr1)
+            x.PushNamedIndexerArgExpression(expr2)
+            x.ProcessLongIdentifierAndQualifierExpression(expr1, lid)
 
         | SynExpr.DotIndexedGet(expr, _, _, _) as get ->
-            x.PushRange(range, ElementType.DOT_INDEXED_GET_EXPR)
+            x.PushRange(range, ElementType.ITEM_INDEXER_EXPR)
             x.PushStep(get, indexerArgsProcessor)
             x.ProcessExpression(expr)
 
-        | SynExpr.DotIndexedSet(expr1, _, expr2, _, _, _) as set ->
-            x.PushRange(range, ElementType.DOT_INDEXED_SET_EXPR)
+        | SynExpr.DotIndexedSet(expr1, _, expr2, leftRange, _, _) as set ->
+            x.PushRange(range, ElementType.SET_EXPR)
+            x.PushRange(leftRange, ElementType.ITEM_INDEXER_EXPR)
             x.PushExpression(expr2)
             x.PushStep(set, indexerArgsProcessor)
             x.ProcessExpression(expr1)
@@ -845,6 +847,17 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         for IdentRange idRange in lid do
             let range = if marks.Count <> 1 then idRange else range
             x.Done(range, marks.Pop(), ElementType.REFERENCE_EXPR)
+
+    member x.ProcessLongIdentifierAndQualifierExpression(ExprRange exprRange as expr, lid) =
+        x.AdvanceToStart(exprRange)
+
+        let mutable isFirstId = true 
+        for IdentRange idRange in List.rev lid.Lid do
+            let range = if not isFirstId then idRange else lid.Range
+            x.PushRangeForMark(range, x.Mark(), ElementType.REFERENCE_EXPR)
+            isFirstId <- false
+
+        x.ProcessExpression(expr)
     
     member x.MarkLambdaParams(expr, outerBodyExpr, topLevel) =
         match expr with
@@ -944,6 +957,21 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         x.ProcessType(interfaceType)
         x.ProcessBindings(bindings)
 
+    member x.ProcessSynIndexerArg(arg) =
+        match arg with
+        | SynIndexerArg.One(expr) ->
+            x.PushRange(expr.Range, ElementType.INDEXER_ARG)
+            x.PushExpression(getGeneratedAppArg expr)
+
+        | SynIndexerArg.Two(expr1, expr2) ->
+            x.PushRange(unionRanges expr1.Range expr2.Range, ElementType.INDEXER_ARG)
+            x.PushExpression(getGeneratedAppArg expr2)
+            x.PushExpression(getGeneratedAppArg expr1)
+
+    member x.PushNamedIndexerArgExpression(expr) =
+        let wrappedArgExpr = { Expression = expr; ElementType = ElementType.INDEXER_ARG }
+        x.PushStep(wrappedArgExpr, wrapExpressionProcessor)
+
     member x.ProcessAnonRecordField(IdentRange idRange, (ExprRange range as expr)) =
         // Start node at id range, end at expr range.
         let mark = x.Mark(idRange)
@@ -1031,6 +1059,19 @@ type ExpressionProcessor() =
         builder.ProcessExpression(expr)
 
 
+[<Struct>]
+type ExpressionAndWrapperType =
+    { Expression: SynExpr
+      ElementType: CompositeNodeType }
+
+type WrapExpressionProcessor() =
+    inherit StepProcessorBase<ExpressionAndWrapperType>()
+
+    override x.Process(arg, builder) =
+        builder.PushRange(arg.Expression.Range, arg.ElementType)
+        builder.ProcessExpression(arg.Expression)
+
+
 type RangeMarkAndType =
     { Range: range
       Mark: int
@@ -1115,30 +1156,23 @@ type InterfaceImplementationListProcessor() =
         builder.ProcessInterfaceImplementation(interfaceImpl)
 
 
+type IndexerArgListProcessor() =
+    inherit StepListProcessorBase<SynIndexerArg>()
+
+    override x.Process(indexerArg, builder) =
+        builder.ProcessSynIndexerArg(indexerArg)
+
+
 type IndexerArgsProcessor() =
     inherit StepProcessorBase<SynExpr>()
 
-    let getGeneratedAppArg (expr: SynExpr) =
-        if not expr.Range.IsSynthetic then expr else
-
-        match expr with
-        | SynExpr.App(_, false, func, arg, _) when func.Range.IsSynthetic -> arg
-        | _ -> expr
-
     override x.Process(synExpr, builder) =
         match synExpr with
-        | SynExpr.DotIndexedGet(_, [indexerArg], dotRange, range)
-        | SynExpr.DotIndexedSet(_, [indexerArg], _, range, dotRange, _) ->
-            let indexerRange = mkFileIndexRange range.FileIndex dotRange.End range.End
-            builder.PushRange(indexerRange, ElementType.INDEXER_ARG)
-
-            match indexerArg with
-            | SynIndexerArg.One expr ->
-                builder.PushExpression(getGeneratedAppArg expr)
-
-            | SynIndexerArg.Two(expr1, expr2) ->
-                builder.PushExpression(getGeneratedAppArg expr2)
-                builder.PushExpression(getGeneratedAppArg expr1)
+        | SynExpr.DotIndexedGet(_, args, dotRange, range)
+        | SynExpr.DotIndexedSet(_, args, _, range, dotRange, _) ->
+            let argsListRange = mkFileIndexRange range.FileIndex dotRange.End range.End
+            builder.PushRange(argsListRange, ElementType.INDEXER_ARG_LIST)
+            builder.PushStepList(args, indexerArgListProcessor)
 
         | _ -> failwithf "Expecting dotIndexedGet/Set, got: %A" synExpr
 
@@ -1149,15 +1183,18 @@ module BuilderStepProcessors =
     // due to compiler producing additional recursive init checks otherwise in this case.
 
     let expressionProcessor = ExpressionProcessor()
+    let wrapExpressionProcessor = WrapExpressionProcessor()
     let advanceToEndProcessor = AdvanceToEndProcessor()
     let endRangeProcessor = EndRangeProcessor()
     let lidProcessor = LidProcessor()
     let synTypeProcessor = SynTypeProcessor()
     let typeArgsProcessor = TypeArgsProcessor()
+    let indexerArgsProcessor = IndexerArgsProcessor()
+
     let expressionListProcessor = ExpressionListProcessor()
     let bindingListProcessor = BindingListProcessor()
     let recordFieldListProcessor = RecordFieldListProcessor()
     let anonRecordFieldListProcessor = AnonRecordFieldListProcessor()
     let matchClauseListProcessor = MatchClauseListProcessor()
     let interfaceImplementationListProcessor = InterfaceImplementationListProcessor()
-    let indexerArgsProcessor = IndexerArgsProcessor()
+    let indexerArgListProcessor = IndexerArgListProcessor()

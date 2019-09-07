@@ -167,11 +167,8 @@ type FSharpNamingService(language: FSharpLanguage) =
                 x.SuggestRoots(referenceExpr.Identifier.Reference, qualifierExpr.Identifier.Reference, policyProvider)
             | _ -> x.SuggestRoots(referenceExpr.Identifier, useExpectedTypes, policyProvider)
 
-        | :? IDotGetExpr as dotGetExpr ->
-            x.SuggestRoots(dotGetExpr.LongIdentifier, useExpectedTypes, policyProvider)
-
-        | :? IDotIndexedGetExpr as dotIndexedGetExpr ->
-            let roots = x.SuggestRoots(dotIndexedGetExpr.LeftExpr, useExpectedTypes, policyProvider)
+        | :? IIndexerExpr as dotIndexedGetExpr ->
+            let roots = x.SuggestRoots(dotIndexedGetExpr.Expression, useExpectedTypes, policyProvider)
             FSharpNamingService.PluralToSingle(roots)
 
         | :? ICastExpr as castExpr ->
