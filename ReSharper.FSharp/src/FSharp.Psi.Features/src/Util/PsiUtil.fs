@@ -48,7 +48,7 @@ type IFSharpFile with
     member x.GetNode<'T when 'T :> ITreeNode and 'T : null>(documentOffset: DocumentOffset) =
         match x.FindTokenAt(documentOffset) with
         | null -> null
-        | token -> token.GetContainingNode<'T>()
+        | token -> token.GetContainingNode<'T>(true)
 
     member x.GetNode<'T when 'T :> ITreeNode and 'T : null>(documentRange: DocumentRange) =
         x.GetNode<'T>(documentRange.StartOffset)

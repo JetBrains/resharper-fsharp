@@ -59,6 +59,7 @@
     <Compile Include="src\Daemon\QuickFixes\RemoveRedundantBackticksFix.fs" />
     <Compile Include="src\Daemon\QuickFixes\RemoveInlineFix.fs" />
     <Compile Include="src\Daemon\QuickFixes\RemoveUnnecessaryUpcastFix.fs" />
+    <Compile Include="src\Daemon\QuickFixes\ToRecursiveFunctionFix.fs" />
     <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
       <Mode>QUICKFIX</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>

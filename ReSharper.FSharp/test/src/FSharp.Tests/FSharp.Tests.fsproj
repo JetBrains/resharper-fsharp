@@ -42,6 +42,7 @@
     <Compile Include="QuickFixes\RemoveInlineTest.fs" />
     <Compile Include="QuickFixes\RemoveRedundantBackticksTest.fs" />
     <Compile Include="QuickFixes\RemoveUnnecessaryUpcastTest.fs" />
+    <Compile Include="QuickFixes\ToRecursiveFunctionTest.fs" />
     <Compile Include="Intentions\IntentionsTestBase.fs" />
     <Compile Include="Intentions\ToRecursiveLetBindings.fs" />
     <Compile Include="Intentions\ToMultilineRecordTest.fs" />

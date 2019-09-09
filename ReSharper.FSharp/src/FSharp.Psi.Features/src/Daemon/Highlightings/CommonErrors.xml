@@ -144,4 +144,15 @@
     <Message value="Upcast is unnecessary"/>
     <QuickFix>RemoveUnnecessaryUpcastFix</QuickFix>
   </Warning>
+
+  <Error staticGroup="FSharpErrors" name="UndefinedName">
+    <Parameter type="IReferenceExpr" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.Identifier.GetNavigationRange()</Range>
+    <Behavour attributeID="UNRESOLVED_ERROR" overlapResolvePolicy="NONE"/>
+    <QuickFix>ToRecursiveFunctionFix</QuickFix>
+  </Error>
 </Errors>
