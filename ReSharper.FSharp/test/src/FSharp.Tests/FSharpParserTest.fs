@@ -79,6 +79,10 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - DotGet 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - DotSet 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - TypeApp 01 - Simple``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - TypeApp 02 - Lid``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - TypeApp 03 - DotGet``() = x.DoNamedTest()
+
     [<Test>] member x.``Expr - DotIndexerGet 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - DotIndexerGet 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - DotIndexerGet 03``() = x.DoNamedTest()

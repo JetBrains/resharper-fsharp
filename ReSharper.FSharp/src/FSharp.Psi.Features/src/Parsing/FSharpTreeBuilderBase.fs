@@ -11,8 +11,10 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Psi.TreeBuilder
 
 [<AbstractClass>]
 type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetime, projectedOffset) =
@@ -415,6 +417,44 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
             | _ -> x.Done(mark, elementType)
 
         | _ -> () // todo: failwith?
+
+    member x.ProcessTypeArgsInReferenceExpr(synExpr) =
+        match synExpr with
+        | SynExpr.TypeApp(expr, ltRange, typeArgs, _, gtRangeOpt, _, _) ->
+            // Get existing psi builder markers.
+            let productions = x.Builder.myProduction
+
+            // The last one is an already processed reference expr from this type app (see ProcessExpression).
+            let exprEndIndex = productions.Count - 1
+            let mutable exprEndMarker = productions.[exprEndIndex]
+
+            let expectedType = ElementType.REFERENCE_EXPR :> NodeType
+            Assertion.Assert(exprEndMarker.ElementType == expectedType, "exprEnd.ElementType <> refExpr; {0}", expr)
+
+            // Get reference expr start marker.
+            let exprStart = exprEndIndex + exprEndMarker.OppositeMarker
+            let mutable exprStartMarker = productions.[exprStart]
+
+            // Remove the Done marker, reset start marker so it's considered unfinished.
+            productions.RemoveAt(exprEndIndex)
+            exprStartMarker.OppositeMarker <- Marker.InvalidPointer
+            productions.[exprStart] <- exprStartMarker
+
+            // Process type args as part of reference expr.
+            match ltRange, typeArgs with
+            | head, _
+            | _, TypeRange head :: _ ->
+                let mark = x.Mark(head)
+
+                for synType in typeArgs do
+                    x.ProcessType(synType)
+
+                match gtRangeOpt with
+                | Some range -> x.Done(range, mark, ElementType.PREFIX_APP_TYPE_ARGUMENT_LIST)
+                | _ -> x.Done(mark, ElementType.PREFIX_APP_TYPE_ARGUMENT_LIST)
+
+            x.Done(exprStart, ElementType.REFERENCE_EXPR)
+        | _ -> failwithf "Expecting typeApp, got: %A" synExpr
 
     member x.ProcessType(TypeRange range as synType) =
         match synType with

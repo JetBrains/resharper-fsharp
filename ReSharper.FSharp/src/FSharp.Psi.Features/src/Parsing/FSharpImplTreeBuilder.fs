@@ -686,10 +686,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                 x.PushExpression(argExpr)
                 x.ProcessExpression(funcExpr)
 
-        // todo: check if expression can always be referenceExpr, move inside refExpr if true
         | SynExpr.TypeApp(expr, _, _, _, _, _, _) as typeApp ->
-            x.PushRange(range, ElementType.TYPE_APP_EXPR)
-            x.PushStep(typeApp, typeArgsProcessor)
+            // Process expression first, then inject type args into it in the processor.
+            x.PushStep(typeApp, typeArgsInReferenceExprProcessor)
             x.ProcessExpression(expr)
 
         | SynExpr.LetOrUse(_, _, bindings, bodyExpr, _) ->
@@ -1104,14 +1103,11 @@ type SynTypeProcessor() =
         builder.ProcessType(synType)
 
 
-type TypeArgsProcessor() =
+type TypeArgsInReferenceExprProcessor() =
     inherit StepProcessorBase<SynExpr>()
 
     override x.Process(synExpr, builder) =
-        match synExpr with
-        | SynExpr.TypeApp(_, ltRange, typeArgs, _, gtRangeOpt, _, _) ->
-            builder.ProcessTypeArgs(typeArgs, Some ltRange, gtRangeOpt, ElementType.PREFIX_APP_TYPE_ARGUMENT_LIST)
-        | _ -> failwithf "Expecting typeApp, got: %A" synExpr
+        builder.ProcessTypeArgsInReferenceExpr(synExpr)
 
 
 type ExpressionListProcessor() =
@@ -1188,7 +1184,7 @@ module BuilderStepProcessors =
     let endRangeProcessor = EndRangeProcessor()
     let lidProcessor = LidProcessor()
     let synTypeProcessor = SynTypeProcessor()
-    let typeArgsProcessor = TypeArgsProcessor()
+    let typeArgsInReferenceExprProcessor = TypeArgsInReferenceExprProcessor()
     let indexerArgsProcessor = IndexerArgsProcessor()
 
     let expressionListProcessor = ExpressionListProcessor()

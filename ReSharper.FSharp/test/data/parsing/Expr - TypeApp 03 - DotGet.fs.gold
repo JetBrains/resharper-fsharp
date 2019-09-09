@@ -1,0 +1,20 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IDo
+      IChameleonExpression
+        IReferenceExpr
+          IParenExpr
+            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            IReferenceExpr
+              FSharpIdentifierToken(type:IDENTIFIER, text:foo)
+            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+          FSharpTokenType+DotTokenElement(type:DOT, text:.)
+          FSharpIdentifierToken(type:IDENTIFIER, text:bar)
+          IPrefixAppTypeArgumentList
+            FSharpTokenType+LessTokenElement(type:LESS, text:<)
+            INamedType
+              ITypeReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:int)
+            FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
+

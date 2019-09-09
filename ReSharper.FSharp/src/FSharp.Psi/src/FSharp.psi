@@ -333,7 +333,6 @@ interface synExpr:
   doExpr |
   assertExpr |
   appExpr |
-  typeAppExpr |
   letOrUseExpr |
   tryWithExpr |
   tryFinallyExpr |
@@ -558,16 +557,6 @@ infixAppExpr options { stubBase="DummyExpression"; }:
   synExpr<ARG_EXPR, ArgumentExpression>
   synExpr<FUNC_EXPR, FunctionExpression>;
 
-typeAppExpr options { stubBase="DummyExpression"; }:
-  synExpr<EXPR, Expression>
-  LESS
-  synType<TYPE_ARG, TypeArgs>
-  (
-    COMMA
-    synType<TYPE_ARG, TypeArgs>
-  )*
-  GREATER;
-
 letOrUseExpr options { stubBase="DummyExpression"; }:
   letOrUse{LET, LetOrUseToken}
   REC<REC, RecKeyword>?
@@ -608,13 +597,16 @@ ifThenElseExpr options { stubBase="DummyExpression"; }:
     synExpr<ELSE_EXPR, ElseExpr>
   )?;
 
-// todo: change base to ReferenceExpressionBase
-referenceExpr options { stubBase="TypeExpressionBase"; }:
+// todo: change base type to ReferenceExpressionBase
+referenceExpr options { stubBase="TypeExpressionBase"; } extras {
+  get { methodName="TypeArguments" path=<referenceExpr:TYPE_ARG_LIST/prefixAppTypeArgumentList:TYPE> };
+}:
   (
     synExpr<QUALIFIER_EXPR, Qualifier>
     DOT
   )?
-  IDENTIFIER<IDENTIFIER, IdentifierInternal>;
+  IDENTIFIER<IDENTIFIER, IdentifierInternal>
+  prefixAppTypeArgumentList<TYPE_ARG_LIST, TypeArgumentsList>?;
 
 matchClause options { stubBase="DummyExpression"; }:
   BAR<BAR, Bar>?
