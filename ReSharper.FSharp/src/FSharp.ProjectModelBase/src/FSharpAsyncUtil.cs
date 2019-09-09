@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 using JetBrains.Application;
 using JetBrains.Application.Threading;
 using JetBrains.ReSharper.Resources.Shell;
-using JetBrains.Util.Threading;
+using JetBrains.Threading;
 using Microsoft.FSharp.Control;
 
 namespace JetBrains.ReSharper.Plugins.FSharp

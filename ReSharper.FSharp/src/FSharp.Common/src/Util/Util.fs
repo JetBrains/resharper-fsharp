@@ -2,6 +2,7 @@
 
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Psi.Modules
+open JetBrains.Threading
 
 [<AutoOpen>]
 module rec CommonUtil =
