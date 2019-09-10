@@ -64,7 +64,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
             let refExpr = id.Parent.As<IReferenceExpr>()
             if isNotNull refExpr || refExpr.Identifier == id then
-                UndefinedNameError(refExpr, error.Message) :> _
+                UndefinedNameError(refExpr.Reference, error.Message) :> _
             else
                 UnresolvedHighlighting(error.Message, range) :> _
 

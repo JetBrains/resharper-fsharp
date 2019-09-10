@@ -12,7 +12,7 @@ open JetBrains.UI.RichText
 module FSharpOptions =
     let [<Literal>] backgroundTypeCheck = "Enable background type checking"  
     let [<Literal>] outOfScopeCompletion = "Enable out of scope items completion"
-    let [<Literal>] topLevelOpenCompletion = "Open namespaces at top-level when completing out of scope items"
+    let [<Literal>] topLevelOpenCompletion = "Add 'open' declarations to top level module or namespace"
 
 
 [<SettingsKey(typeof<FSharpSettings>, "FSharpOptions")>]

@@ -1,8 +1,10 @@
 <Errors language="F#">
 
   <Usings>
+    JetBrains.ReSharper.Intentions.QuickFixes;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
   </Usings>
 
@@ -146,13 +148,14 @@
   </Warning>
 
   <Error staticGroup="FSharpErrors" name="UndefinedName">
-    <Parameter type="IReferenceExpr" name="expr"/>
+    <Parameter type="FSharpSymbolReference" name="reference"/> <!-- todo: change to IReference? -->
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
       <Argument>fcsMessage</Argument>
     </Message>
-    <Range>expr.Identifier.GetNavigationRange()</Range>
+    <Range>reference.GetElement().IdentifierToken.GetNavigationRange()</Range>
     <Behavour attributeID="UNRESOLVED_ERROR" overlapResolvePolicy="NONE"/>
     <QuickFix>ToRecursiveFunctionFix</QuickFix>
+    <QuickFix arguments="h.Reference">ImportTypeFix</QuickFix>
   </Error>
 </Errors>

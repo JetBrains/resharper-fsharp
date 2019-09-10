@@ -108,6 +108,7 @@
     <Compile Include="src\LanguageService\FSharpLanguageService.fs" />
     <Compile Include="src\LanguageService\FSharpClrLanguage.fs" />
     <Compile Include="src\LanguageService\FSharpBreadcrumbsHelper.fs" />
+    <Compile Include="src\LanguageService\FSharpImportTypeHelper.fs" />
     <Compile Include="src\FSharpTypingAssist.fs" />
     <Compile Include="src\ZoneMarker.fs" />
   </ItemGroup>

@@ -23,7 +23,10 @@ let addOpen (coords: DocumentCoords) (fsFile: IFSharpFile) (settings: IContextBo
     let line = int coords.Line + 1
     let document = fsFile.GetSourceFile().Document
 
-    let insertionPoint = if settings.GetValue(fun key -> key.TopLevelOpenCompletion) then TopLevel else Nearest
+    let insertionPoint =
+        // todo: remove this check 
+        if isNull settings || settings.GetValue(fun key -> key.TopLevelOpenCompletion) then TopLevel else Nearest
+
     let insertContext = findNearestPointToInsertOpenDeclaration line parseTree [||] insertionPoint
     let pos = adjustInsertionPoint (docLine >> document.GetLineText) insertContext
 

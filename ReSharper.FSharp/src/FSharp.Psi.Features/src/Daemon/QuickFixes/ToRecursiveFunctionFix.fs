@@ -14,7 +14,7 @@ open JetBrains.UI.RichText
 type ToRecursiveFunctionFix(warning: UndefinedNameError) =
     inherit QuickFixBase()
 
-    let referenceExpr = warning.Expr
+    let referenceExpr = warning.Reference.GetElement().As<IReferenceExpr>()
     let mutable chosenLetBindings = Unchecked.defaultof<_>
 
     let getContainingBindings (refExpr: IReferenceExpr) =
@@ -25,6 +25,7 @@ type ToRecursiveFunctionFix(warning: UndefinedNameError) =
         loop refExpr []
 
     let isSuitable (letBindings: ILetBindings) =
+        if isNull referenceExpr then false else
         if letBindings.IsRecursive then false else
 
         letBindings.BindingsEnumerable
