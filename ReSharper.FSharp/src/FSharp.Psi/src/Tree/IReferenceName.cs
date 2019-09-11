@@ -1,9 +1,9 @@
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+using JetBrains.Annotations;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
   public partial interface IReferenceName
   {
-    FSharpIdentifierToken Identifier { get; }
+    [NotNull] string ShortName { get; }
   }
 }

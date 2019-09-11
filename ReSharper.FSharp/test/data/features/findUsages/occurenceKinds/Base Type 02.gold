@@ -7,8 +7,6 @@ TO: [O] let |d|: System.IDisposable = Unchecked.defaultof<_> RANGE: (65,66) @ Ba
 TO: [O] let d: |System|.IDisposable = Unchecked.defaultof<_> RANGE: (68,74) @ Base Type 02.fs
 TO: [O] let d: System.IDisposable = Unchecked.|defaultof|<_> RANGE: (99,108) @ Base Type 02.fs
 TO: [O] let d: System.IDisposable = |Unchecked|.defaultof<_> RANGE: (89,98) @ Base Type 02.fs
-TO: [O] let d: System.IDisposable = |Unchecked|.defaultof<_> RANGE: (89,98) @ Base Type 02.fs
-TO: [O] let d: System.IDisposable = Unchecked.|defaultof|<_> RANGE: (99,108) @ Base Type 02.fs
 TO: [O] let d: System.IDisposable = Unchecked.defaultof<|_|> RANGE: (109,110) @ Base Type 02.fs
 
 

@@ -8,7 +8,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  public class FSharpIdentifierToken : FSharpToken, IFSharpIdentifierLikeNode, IReferenceOwner, IFSharpIdentifier
+  public class FSharpIdentifierToken : FSharpToken, IReferenceOwner, IFSharpIdentifier
   {
     private FSharpSymbolReference myReference;
 

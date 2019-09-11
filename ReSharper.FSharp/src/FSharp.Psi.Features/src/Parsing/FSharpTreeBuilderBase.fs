@@ -118,6 +118,15 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
         let last = List.last lid
         x.Done(last.idRange, mark, ElementType.LONG_IDENTIFIER)
 
+    member x.ProcessReferenceName(lid: Ident list) =
+        let marks = Stack()
+
+        for _ in lid do
+            marks.Push(x.Mark())
+
+        for IdentRange id in lid do
+            x.Done(id, marks.Pop(), ElementType.EXPRESSION_REFERENCE_NAME)
+
     member x.ProcessNamedTypeReference(lid: Ident list) =
         x.ProcessNamedTypeReference(lid, [], None, None, false)
     

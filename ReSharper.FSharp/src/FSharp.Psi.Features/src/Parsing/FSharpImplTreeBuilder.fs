@@ -991,7 +991,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             let mark = x.Mark(headRange)
             x.PushRangeForMark(headRange, mark, ElementType.RECORD_EXPR_BINDING)
             x.PushRecordBlockSep(blockSep)
-            x.ProcessLongIdentifier(lid)
+            x.ProcessReferenceName(lid)
             if expr.IsSome then
                 x.ProcessExpression(expr.Value)
 

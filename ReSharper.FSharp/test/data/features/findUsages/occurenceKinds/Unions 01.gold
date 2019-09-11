@@ -4,15 +4,12 @@ TO: [O] module |Module| RANGE: (7,13) @ Unions 01.fs
 TO: [O] let |s| = Some 123 RANGE: (21,22) @ Unions 01.fs
 TO: [O] let |n| = None RANGE: (39,40) @ Unions 01.fs
 TO: [O] match |s| with RANGE: (57,58) @ Unions 01.fs
-TO: [O] match |s| with RANGE: (57,58) @ Unions 01.fs
 TO: [O] | Some |x| -> () RANGE: (72,73) @ Unions 01.fs
 
 
 New instance creation
 ---
 TO: [O] let s = |Some| 123 RANGE: (25,29) @ Unions 01.fs
-TO: [O] let s = |Some| 123 RANGE: (25,29) @ Unions 01.fs
-TO: [O] let n = |None| RANGE: (43,47) @ Unions 01.fs
 TO: [O] let n = |None| RANGE: (43,47) @ Unions 01.fs
 
 

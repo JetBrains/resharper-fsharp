@@ -9,7 +9,6 @@ TO: [O] module |Module2| = RANGE: (106,113) @ Base Type 04 - Inherit arg.fs
 TO: [O] type |T|() = RANGE: (126,127) @ Base Type 04 - Inherit arg.fs
 TO: [O] inherit |Module1|.Base(System.String('a', 1)) RANGE: (149,156) @ Base Type 04 - Inherit arg.fs
 TO: [O] inherit Module1.Base(|System|.String('a', 1)) RANGE: (162,168) @ Base Type 04 - Inherit arg.fs
-TO: [O] inherit Module1.Base(|System|.String('a', 1)) RANGE: (162,168) @ Base Type 04 - Inherit arg.fs
 
 
 Type specification
@@ -25,7 +24,6 @@ TO: [O] inherit Module1.|Base|(System.String('a', 1)) RANGE: (157,161) @ Base Ty
 New instance creation
 ---
 TO: [O] inherit Module1.|Base|(System.String('a', 1)) RANGE: (157,161) @ Base Type 04 - Inherit arg.fs
-TO: [O] inherit Module1.Base(System.|String|('a', 1)) RANGE: (169,175) @ Base Type 04 - Inherit arg.fs
 TO: [O] inherit Module1.Base(System.|String|('a', 1)) RANGE: (169,175) @ Base Type 04 - Inherit arg.fs
 
 

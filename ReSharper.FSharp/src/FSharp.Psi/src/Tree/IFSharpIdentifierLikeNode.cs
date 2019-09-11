@@ -2,6 +2,7 @@
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
+  // todo: remove this interface, keep IFSharpIdentifier
   public interface IFSharpIdentifierLikeNode : IIdentifier
   {
     ITokenNode IdentifierToken { get; }

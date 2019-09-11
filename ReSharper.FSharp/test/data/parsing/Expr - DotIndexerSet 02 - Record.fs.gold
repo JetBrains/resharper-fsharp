@@ -21,7 +21,7 @@ IFSharpImplFile
               FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               IRecordExprBinding
-                ILongIdentifier
+                IExpressionReferenceName
                   FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
                 Whitespace(type:WHITE_SPACE, text: ) spaces:" "
                 FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)

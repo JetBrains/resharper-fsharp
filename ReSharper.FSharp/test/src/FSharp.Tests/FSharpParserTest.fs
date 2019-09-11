@@ -40,6 +40,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Record 03 - Multiline, semicolons``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record 04 - Empty``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record 05 - Single Line with end semicolon``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record 06 - With qualifier``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - While 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - CompExpr 01 - Return``() = x.DoNamedTest()

@@ -57,7 +57,7 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
 
         let fieldsToAdd = HashSet(fieldNames)
         for binding in existingBindings do
-            fieldsToAdd.Remove(binding.LongIdentifier.Name) |> ignore
+            fieldsToAdd.Remove(binding.ReferenceName.ShortName) |> ignore
 
         let fsFile = recordExpr.FSharpFile
         let lineEnding = fsFile.GetLineEnding()
@@ -133,7 +133,7 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
             let hotspotInfos =
                 generatedBindings.ToArray()
                 |> Array.map (fun binding ->
-                    let templateField = TemplateField(binding.LongIdentifier.Name, SimpleHotspotExpression(null), 0)
+                    let templateField = TemplateField(binding.ReferenceName.ShortName, SimpleHotspotExpression(null), 0)
                     HotspotInfo(templateField, binding.Expression.GetDocumentRange(), KeepExistingText = true))
 
             let hotspotSession =

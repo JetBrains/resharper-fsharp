@@ -470,7 +470,7 @@ recordExpr options { stubBase="ReferenceOwnerBase"; }:
   RBRACE<RBRACE, RightBrace>;
 
 recordExprBinding:
-  longIdentifier<LONG_IDENTIFIER, LongIdentifier>
+  expressionReferenceName<REFERENCE_NAME, ReferenceName>
   EQUALS
   synExpr<EXPR, Expression>
   SEMICOLON<SEMI, Semicolon>?;
@@ -1217,12 +1217,12 @@ prefixAppTypeArgumentList:
   GREATER<GREATER,RAngle>;
 
 
-expressionReferenceName:
+expressionReferenceName options { stubBase="ReferenceOwnerBase"; }:
   (
     referenceName<QUALIFIER, Qualifier>
     DOT<DELIMITER, Dot>
   )?
-  IDENTIFIER<IDENTIFIER, IdentifierInternal>
+  identifier<IDENTIFIER, Identifier>
   prefixAppTypeArgumentList<TYPE_ARG, TypeArgumentList>;
 
 
@@ -1233,13 +1233,13 @@ typeReferenceName options { stubBase="TypeReferenceOwnerBase"; }:
       typeReferenceName<QUALIFIER, Qualifier>
       DOT<DELIMITER, Dot>
     )?
-    IDENTIFIER<IDENTIFIER, IdentifierInternal>
+    identifier<IDENTIFIER, Identifier>
   |
     (
       typeReferenceName<QUALIFIER, Qualifier>
       DOT<DELIMITER, Dot>
     )?
-    IDENTIFIER<IDENTIFIER, IdentifierInternal>
+    identifier<IDENTIFIER, Identifier>
     prefixAppTypeArgumentList<TYPE_ARG, TypeArgumentList>
   );
 

@@ -5,7 +5,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class ReferenceExpr : IPreventsChildResolve
+  internal partial class ReferenceExpr
   {
     private FSharpSymbolReference myCtorTypeReference;
 

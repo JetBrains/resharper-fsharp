@@ -15,12 +15,8 @@ TO: [O] let s: |string| = "" RANGE: (24,30) @ Type Test 01.fs
 New instance creation
 ---
 TO: [O] |obj| :?> string RANGE: (37,40) @ Type Test 01.fs
-TO: [O] |obj| :?> string RANGE: (37,40) @ Type Test 01.fs
-TO: [O] |obj|() :? string RANGE: (55,58) @ Type Test 01.fs
 TO: [O] |obj|() :? string RANGE: (55,58) @ Type Test 01.fs
 TO: [O] |obj|() :? System.String RANGE: (72,75) @ Type Test 01.fs
-TO: [O] |obj|() :? System.String RANGE: (72,75) @ Type Test 01.fs
-TO: [O] match |obj|() with RANGE: (104,107) @ Type Test 01.fs
 TO: [O] match |obj|() with RANGE: (104,107) @ Type Test 01.fs
 
 

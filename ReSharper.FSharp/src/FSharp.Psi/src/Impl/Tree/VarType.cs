@@ -6,7 +6,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class VarType : IPreventsChildResolve
+  internal partial class VarType
   {
     public override ITokenNode IdentifierToken => Identifier;
 

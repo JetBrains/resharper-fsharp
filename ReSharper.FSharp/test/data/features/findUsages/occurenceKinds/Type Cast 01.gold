@@ -20,8 +20,6 @@ TO: [O] let s2 = obj() :?> System.|String| RANGE: (122,128) @ Type Cast 01.fs
 New instance creation
 ---
 TO: [O] let s1 = |obj|() :?> string RANGE: (78,81) @ Type Cast 01.fs
-TO: [O] let s1 = |obj|() :?> string RANGE: (78,81) @ Type Cast 01.fs
-TO: [O] let s2 = |obj|() :?> System.String RANGE: (105,108) @ Type Cast 01.fs
 TO: [O] let s2 = |obj|() :?> System.String RANGE: (105,108) @ Type Cast 01.fs
 
 

@@ -31,8 +31,6 @@ TO: [O] | :? IList<string * |int|> -> () RANGE: (189,192) @ Type Argument 01.fs
 New instance creation
 ---
 TO: [O] let l: List<string> = |List|<string>() RANGE: (74,78) @ Type Argument 01.fs
-TO: [O] let l: List<string> = |List|<string>() RANGE: (74,78) @ Type Argument 01.fs
-TO: [O] match |obj|() with RANGE: (98,101) @ Type Argument 01.fs
 TO: [O] match |obj|() with RANGE: (98,101) @ Type Argument 01.fs
 
 

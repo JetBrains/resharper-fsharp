@@ -6,7 +6,7 @@ using JetBrains.ReSharper.Psi.Tree;
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   // todo: add more specific references, replace current inheritors.
-  internal abstract class ReferenceOwnerBase : FSharpCompositeElement, IReferenceOwner
+  internal abstract class ReferenceOwnerBase : FSharpCompositeElement, IReferenceOwner, IPreventsChildResolve
   {
     private FSharpSymbolReference myReference;
 
