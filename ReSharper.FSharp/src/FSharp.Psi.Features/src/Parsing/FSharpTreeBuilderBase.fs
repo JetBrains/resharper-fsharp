@@ -298,12 +298,6 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
                                        else ElementType.SINGLETON_CASE_DECLARATION
         x.Done(range, mark, elementType)
 
-    member x.ProcessAttributeArg(expr: SynExpr) =
-        match expr with
-        | SynExpr.LongIdent(_, lid, _, _) -> x.ProcessLongIdentifier(lid.Lid)
-        | SynExpr.Paren(expr, _, _, _) -> x.ProcessAttributeArg(expr)
-        | _ -> () // we need to cover only these cases for now
-
     member x.ProcessAttributes(attrs) =
         for attr in attrs do
             x.ProcessAttribute(attr)
@@ -550,10 +544,7 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
         | _ -> expr
 
     member x.MarkChameleonExpression(expr: SynExpr) =
-        // todo: check and mark simple expressions in place.
-
         let (ExprRange range as expr) = x.FixExpresion(expr)
-
         let mark = x.Mark(range)
 
         // Replace all tokens with single chameleon token.

@@ -543,9 +543,6 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
     member x.PushType(synType: SynType) =
         x.PushStep(synType, synTypeProcessor)
 
-    member x.PushLongIdentifier(lid: LongIdent) =
-        x.PushStep(lid, lidProcessor)
-
     member x.PushExpression(synExpr: SynExpr) =
         x.PushStep(synExpr, expressionProcessor)
 
@@ -1089,13 +1086,6 @@ type EndRangeProcessor() =
         builder.Done(item.Range, item.Mark, item.ElementType)
 
 
-type LidProcessor() =
-    inherit StepProcessorBase<LongIdent>()
-
-    override x.Process(lid, builder) =
-        builder.ProcessLongIdentifier(lid)
-
-
 type SynTypeProcessor() =
     inherit StepProcessorBase<SynType>()
 
@@ -1182,7 +1172,6 @@ module BuilderStepProcessors =
     let wrapExpressionProcessor = WrapExpressionProcessor()
     let advanceToEndProcessor = AdvanceToEndProcessor()
     let endRangeProcessor = EndRangeProcessor()
-    let lidProcessor = LidProcessor()
     let synTypeProcessor = SynTypeProcessor()
     let typeArgsInReferenceExprProcessor = TypeArgsInReferenceExprProcessor()
     let indexerArgsProcessor = IndexerArgsProcessor()
