@@ -321,16 +321,14 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
 
             | _ -> x.Mark(attr.Range)
 
-        match attr.TypeName.Lid with
-        | IdentRange headRange :: _ as typeLid ->
-            x.ProcessLongIdentifier(typeLid)
+        let lidWithDots = attr.TypeName
+        x.ProcessNamedTypeReference(lidWithDots.Lid)
 
-            let (ExprRange argRange as argExpr) = attr.ArgExpr
-            if headRange <> argRange then
-                // Arg range is the same when fake SynExpr.Const is added
-                x.MarkChameleonExpression(argExpr)
+        let (ExprRange argRange as argExpr) = attr.ArgExpr
+        if lidWithDots.Range <> argRange then
+            // Arg range is the same when fake SynExpr.Const is added
+            x.MarkChameleonExpression(argExpr)
 
-        | [] -> failwithf "Attribute lid is empty: %A" attr
 
         x.Done(attr.Range, mark, ElementType.F_SHARP_ATTRIBUTE)
 

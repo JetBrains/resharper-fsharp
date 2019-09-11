@@ -1168,7 +1168,7 @@ fSharpAttribute options { stubBase="TypeReferenceOwnerBase"; }
     get { methodName="Expression" path=<fSharpAttribute:CHAMELEON_EXPR/chameleonExpression:EXPR> };
   }:
   attributeTarget<ATTR_TARGET, Target>?
-  longIdentifier<IDENTIFIER, LongIdentifier>
+  typeReferenceName<REFERENCE_NAME, ReferenceName>
   chameleonExpression<CHAMELEON_EXPR, ArgExpression>?;
 
 attributeTarget:

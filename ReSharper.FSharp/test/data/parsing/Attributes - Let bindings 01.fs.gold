@@ -4,7 +4,7 @@ IFSharpImplFile
     FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
     ILetModuleDecl
       IFSharpAttribute
-        ILongIdentifier
+        ITypeReferenceName
           FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
       FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
       NewLine(type:NEW_LINE, text:\n) spaces:"\n"

@@ -5,10 +5,10 @@ IFSharpImplFile
     IFSharpAttribute
       ITypeReferenceName
         FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
-      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
       IChameleonExpression
         IConstExpr
-          FSharpString(type:STRING, text:"Bar")
+          FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+          FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
     FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
     IDo

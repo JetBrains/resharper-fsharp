@@ -53,7 +53,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     public static string GetShortName([NotNull] this IFSharpAttribute attr) =>
-      attr.LongIdentifier?.Name.GetAttributeShortName();
+      attr.ReferenceName?.ShortName.GetAttributeShortName();
 
     public static bool ShortNameEquals([NotNull] this IFSharpAttribute attr, [NotNull] string shortName) =>
       attr.GetShortName() == shortName;
@@ -417,7 +417,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static bool GetTypeKind(IEnumerable<IFSharpAttribute> attributes, out PartKind fSharpPartKind)
     {
       foreach (var attr in attributes)
-        switch (attr.LongIdentifier?.Name.DropAttributeSuffix())
+        switch (attr.ReferenceName?.ShortName.DropAttributeSuffix())
         {
           case Interface:
           {

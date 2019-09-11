@@ -12,7 +12,7 @@ IFSharpImplFile
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
           IFSharpAttribute
-            ILongIdentifier
+            ITypeReferenceName
               FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
           FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "

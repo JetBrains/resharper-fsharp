@@ -108,6 +108,9 @@ type FSharpParserTest() =
     [<Test>] member x.``Attribute 01``() = x.DoNamedTest()
     [<Test>] member x.``Attribute 02 - Simple arg``() = x.DoNamedTest()
     [<Test>] member x.``Attribute 03 - Simple arg - No parens``() = x.DoNamedTest()
+    [<Test>] member x.``Attribute 04 - Qualifiers``() = x.DoNamedTest()
+    [<Test>] member x.``Attribute 05 - Qualifiers and arg``() = x.DoNamedTest()
+    [<Test>] member x.``Attribute 06 - Unit arg``() = x.DoNamedTest()
 
     [<Test>] member x.``Attributes - Let bindings 01``() = x.DoNamedTest()
     [<Test>] member x.``Attributes - Let bindings 02``() = x.DoNamedTest()

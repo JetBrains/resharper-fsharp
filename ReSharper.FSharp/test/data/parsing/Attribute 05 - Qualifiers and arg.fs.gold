@@ -4,12 +4,18 @@ IFSharpImplFile
     FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
     IFSharpAttribute
       ITypeReferenceName
-        FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
+        ITypeReferenceName
+          ITypeReferenceName
+            FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
+          FSharpTokenType+DotTokenElement(type:DOT, text:.)
+          FSharpIdentifierToken(type:IDENTIFIER, text:Bar)
+        FSharpTokenType+DotTokenElement(type:DOT, text:.)
+        FSharpIdentifierToken(type:IDENTIFIER, text:Baz)
       IChameleonExpression
         IParenExpr
           FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
           IConstExpr
-            FSharpString(type:STRING, text:"Bar")
+            FSharpTokenType+TrueTokenElement(type:TRUE, text:true)
           FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
     FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
