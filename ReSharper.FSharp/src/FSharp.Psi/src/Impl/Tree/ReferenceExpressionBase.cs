@@ -8,14 +8,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   // todo: add more specific references, replace current inheritors.
   internal abstract class ReferenceExpressionBase : FSharpCompositeElement, IReferenceExpression
   {
-    public FSharpSymbolReference Reference { get; protected set; }
-    public abstract ITokenNode IdentifierToken { get; }
+    private FSharpSymbolReference myReference;
 
-    protected override void PreInit()
+    public FSharpSymbolReference Reference
     {
-      base.PreInit();
-      Reference = CreateReference();
+      get
+      {
+        if (myReference == null)
+        {
+          lock (this)
+          {
+            if (myReference == null)
+              myReference = CreateReference();
+          }
+        }
+
+        return myReference;
+      }
     }
+
+    public abstract ITokenNode IdentifierToken { get; }
 
     protected abstract FSharpSymbolReference CreateReference();
 

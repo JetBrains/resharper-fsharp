@@ -1,4 +1,4 @@
-﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
@@ -10,7 +10,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   public class FSharpIdentifierToken : FSharpToken, IFSharpIdentifier, IReferenceExpression
   {
-    public FSharpSymbolReference Reference { get; protected set; }
+    private FSharpSymbolReference myReference;
+
+    public FSharpSymbolReference Reference
+    {
+      get
+      {
+        if (myReference == null)
+        {
+          lock (this)
+          {
+            if (myReference == null)
+              myReference = new FSharpSymbolReference(this);
+          }
+        }
+
+        return myReference;
+      }
+    }
 
     public FSharpIdentifierToken(NodeType nodeType, string text) : base(nodeType, text)
     {
@@ -18,12 +35,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public FSharpIdentifierToken(string text) : base(FSharpTokenType.IDENTIFIER, text)
     {
-    }
-
-    protected override void PreInit()
-    {
-      base.PreInit();
-      Reference = new FSharpSymbolReference(this);
     }
 
     public override ReferenceCollection GetFirstClassReferences() =>
