@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 open FSharp.Compiler.Ast
 open FSharp.Compiler.PrettyNaming
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Util
 
 type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
@@ -51,6 +52,12 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
 
             x.Done(range, bindingMark, ElementType.TOP_BINDING)
             x.Done(letMark, ElementType.LET_MODULE_DECL)
+
+        | SynModuleSigDecl.Open(lid, range) ->
+            let mark = x.MarkTokenOrRange(FSharpTokenType.OPEN, range)
+            x.ProcessNamedTypeReference(lid)
+            x.Done(range, mark, ElementType.OPEN_STATEMENT)
+
         | _ -> ()
 
     member x.ProcessTypeSignature(TypeDefnSig(ComponentInfo(attrs, typeParams, _, lid, _, _, _, _), typeSig, memberSigs, range)) =

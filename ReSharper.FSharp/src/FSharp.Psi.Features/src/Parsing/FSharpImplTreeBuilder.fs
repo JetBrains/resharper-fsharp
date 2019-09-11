@@ -65,7 +65,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
 
         | SynModuleDecl.Open(lidWithDots, range) ->
             let mark = x.MarkTokenOrRange(FSharpTokenType.OPEN, range)
-            x.ProcessLongIdentifier(lidWithDots.Lid)
+            x.ProcessNamedTypeReference(lidWithDots.Lid)
             x.Done(range, mark, ElementType.OPEN_STATEMENT)
 
         | SynModuleDecl.Let(_, bindings, range) ->

@@ -118,6 +118,9 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
         let last = List.last lid
         x.Done(last.idRange, mark, ElementType.LONG_IDENTIFIER)
 
+    member x.ProcessNamedTypeReference(lid: Ident list) =
+        x.ProcessNamedTypeReference(lid, [], None, None, false)
+    
     member x.ProcessNamedTypeReference(lid: Ident list, typeArgs: SynType list, ltOption, gtOption, isPostfixApp) =
         // todo: revise checking empty lid/args?
         if not isPostfixApp && lid.IsEmpty || isPostfixApp && typeArgs.IsEmpty then () else
@@ -460,7 +463,7 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
         match synType with
         | SynType.LongIdent(lid) ->
             let mark = x.Mark(range)
-            x.ProcessNamedTypeReference(lid.Lid, [], None, None, false)
+            x.ProcessNamedTypeReference(lid.Lid)
             x.Done(range, mark, ElementType.NAMED_TYPE)
 
         | SynType.App(typeName, ltRange, typeArgs, _, gtRange, isPostfix, _) ->

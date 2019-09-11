@@ -150,3 +150,6 @@ type FSharpParserTest() =
     [<Test>] member x.``Type member - Inherit - Type 02 - Qualified``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Inherit - Type 03 - Arguments``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Inherit - Type 04 - Type parameters 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Module member - Open 01``() = x.DoNamedTest()
+    [<Test>] member x.``Module member - Open 02 - Qualifier``() = x.DoNamedTest()

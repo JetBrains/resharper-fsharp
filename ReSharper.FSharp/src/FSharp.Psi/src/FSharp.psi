@@ -1081,7 +1081,7 @@ otherDirective:
 
 openStatement  options { stubBase="ReferenceOwnerBase"; }:
   OPEN<OPEN, Open>
-  longIdentifier<LONG_IDENTIFIER, LongIdentifier>;
+  typeReferenceName<TYPE_REFERENCE, ImportedName>;
 
 do options { stubBase="DummyDeclaration"; } extras {
     get { methodName="Expression" path=<do:CHAMELEON_EXPR/chameleonExpression:EXPR> };

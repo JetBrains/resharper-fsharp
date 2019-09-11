@@ -5,7 +5,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class OpenStatement
   {
-    public override ITokenNode IdentifierToken => LongIdentifier?.IdentifierToken;
+    public override ITokenNode IdentifierToken => ImportedName?.Identifier;
 
     protected override FSharpSymbolReference CreateReference() =>
       new OpenStatementReference(this);
