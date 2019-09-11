@@ -13,7 +13,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     IFunction IFunctionDeclaration.DeclaredElement => base.DeclaredElement as IFunction;
     protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
 
-    public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
+    public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
 
     protected override IDeclaredElement CreateDeclaredElement()
     {

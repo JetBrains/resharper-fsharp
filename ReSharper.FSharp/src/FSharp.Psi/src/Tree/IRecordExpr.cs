@@ -1,6 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
-  public partial interface IRecordExpr : IReferenceExpression
+  public partial interface IRecordExpr : IReferenceOwner
   {
   }
 }

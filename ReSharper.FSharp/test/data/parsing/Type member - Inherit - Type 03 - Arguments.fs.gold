@@ -1,0 +1,29 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
+    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+    IObjectTypeDeclaration
+      IAccessModifiers
+      FSharpIdentifierToken(type:IDENTIFIER, text:T)
+      IImplicitConstructorDeclaration
+      FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+      FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+      FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+      NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+      Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+      ITypeInherit
+        FSharpTokenType+InheritTokenElement(type:INHERIT, text:inherit)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        INamedType
+          ITypeReferenceName
+            FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
+        IChameleonExpression
+          IParenExpr
+            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            IConstExpr
+              FSharpToken(type:INT32, text:1)
+            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

@@ -17,7 +17,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
     public override TreeTextRange GetNameRange() => NameIdentifier.GetNameRange();
 
-    public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
+    public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
   }
 
   internal partial class TopLongIdentPat
@@ -26,7 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override string SourceName => IsDeclaration ? base.SourceName : SharedImplUtil.MISSING_DECLARATION_NAME;
     public override TreeTextRange GetNameRange() => IsDeclaration ? base.GetNameRange() : TreeTextRange.InvalidRange;
 
-    public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
+    public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
 
     protected override IDeclaredElement CreateDeclaredElement() =>
       IsDeclaration ? base.CreateDeclaredElement() : null;

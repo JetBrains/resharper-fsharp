@@ -8,7 +8,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class RecordFieldDeclaration
   {
     protected override string DeclaredElementName => NameIdentifier.GetSourceName();
-    public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
+    public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
 
     protected override IDeclaredElement CreateDeclaredElement() =>
       GetFSharpSymbol() is FSharpField field ? new FSharpRecordField(this, field) : null;

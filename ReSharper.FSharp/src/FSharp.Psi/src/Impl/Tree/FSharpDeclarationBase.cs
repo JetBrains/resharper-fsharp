@@ -23,7 +23,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public abstract IDeclaredElement DeclaredElement { get; }
     public virtual string DeclaredName => CompiledName;
 
-    public abstract IFSharpIdentifier NameIdentifier { get; }
+    public abstract IFSharpIdentifierLikeNode NameIdentifier { get; }
     public virtual TreeTextRange GetNameRange() => NameIdentifier.GetNameRange();
     public virtual TreeTextRange GetNameIdentifierRange() => NameIdentifier.GetNameIdentifierRange();
 

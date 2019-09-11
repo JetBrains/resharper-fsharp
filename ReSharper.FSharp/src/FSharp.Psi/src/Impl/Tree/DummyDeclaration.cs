@@ -18,7 +18,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
     }
 
-    public IFSharpIdentifier NameIdentifier => null;
+    public IFSharpIdentifierLikeNode NameIdentifier => null;
     public TreeTextRange GetNameRange() => TreeTextRange.InvalidRange;
     public TreeTextRange GetNameIdentifierRange() => TreeTextRange.InvalidRange;
 

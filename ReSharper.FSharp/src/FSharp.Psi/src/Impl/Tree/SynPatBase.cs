@@ -23,7 +23,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
   internal partial class LocalNamedPat
   {
-    public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
+    public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
     public bool IsDeclaration => true;
     public IEnumerable<IDeclaration> Declarations => Pattern?.Declarations.Prepend(this) ?? new[] {this};
     public TreeOffset GetOffset() => GetTreeStartOffset();
@@ -31,7 +31,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
   internal partial class LocalLongIdentPat
   {
-    public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
+    public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
 
     public bool IsDeclaration
     {

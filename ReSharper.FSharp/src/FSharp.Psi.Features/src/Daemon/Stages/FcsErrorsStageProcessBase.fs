@@ -9,7 +9,6 @@ open JetBrains.ReSharper.Feature.Services.ExpressionSelection
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Util
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.Util
@@ -59,14 +58,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         match error.ErrorNumber with
         | UndefinedName ->
-            let id = fsFile.GetNode<FSharpIdentifierToken>(range)
-            if isNull id then UnresolvedHighlighting(error.Message, range) :> _ else
-
-            let refExpr = id.Parent.As<IReferenceExpr>()
-            if isNotNull refExpr || refExpr.Identifier == id then
-                UndefinedNameError(refExpr.Reference, error.Message) :> _
-            else
-                UnresolvedHighlighting(error.Message, range) :> _
+            match ReferenceExprNavigator.GetByIdentifier(fsFile.GetNode(range)) with
+            | null -> UnresolvedHighlighting(error.Message, range) :> _
+            | refExpr -> UndefinedNameError(refExpr.Reference, error.Message) :> _
 
         | UpcastUnnecessary -> UpcastUnnecessaryWarning(getNode range) :> _
 

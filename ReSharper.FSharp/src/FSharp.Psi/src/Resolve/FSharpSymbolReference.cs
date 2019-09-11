@@ -14,9 +14,9 @@ using JetBrains.ReSharper.Resources.Shell;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
-  public class FSharpSymbolReference : TreeReferenceBase<IReferenceExpression>
+  public class FSharpSymbolReference : TreeReferenceBase<IReferenceOwner>
   {
-    public FSharpSymbolReference([NotNull] IReferenceExpression owner) : base(owner)
+    public FSharpSymbolReference([NotNull] IReferenceOwner owner) : base(owner)
     {
     }
 
@@ -49,9 +49,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     public override string GetName() =>
       myOwner.IdentifierToken?.GetText() ??
       SharedImplUtil.MISSING_DECLARATION_NAME;
-
-    public override bool IsValid() =>
-      base.IsValid() && myOwner.Reference == this;
 
     public override TreeTextRange GetTreeTextRange() =>
       myOwner.IdentifierToken?.GetTreeTextRange() ??

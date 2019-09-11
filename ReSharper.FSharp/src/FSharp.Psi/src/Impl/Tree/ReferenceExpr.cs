@@ -1,13 +1,39 @@
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class ReferenceExpr
+  internal partial class ReferenceExpr : IPreventsChildResolve
   {
-    public FSharpIdentifierToken Identifier => IdentifierInternal as FSharpIdentifierToken;
-    public override ITokenNode IdentifierToken => IdentifierInternal;
+    private FSharpSymbolReference myCtorTypeReference;
+
+    public FSharpSymbolReference CtorTypeReference
+    {
+      get
+      {
+        if (myCtorTypeReference == null)
+        {
+          lock (this)
+          {
+            if (myCtorTypeReference == null)
+              myCtorTypeReference = new CtorTypeReference(this);
+          }
+        }
+
+        return myCtorTypeReference;
+      }
+    }
+
+    protected override FSharpSymbolReference CreateReference() =>
+      new FSharpSymbolReference(this);
+
+    public override ReferenceCollection GetFirstClassReferences() =>
+      // todo: workaround array allocation?
+      new ReferenceCollection(Reference, CtorTypeReference);
+
+    public override ITokenNode IdentifierToken => Identifier;
 
     public string ShortName => Identifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
 

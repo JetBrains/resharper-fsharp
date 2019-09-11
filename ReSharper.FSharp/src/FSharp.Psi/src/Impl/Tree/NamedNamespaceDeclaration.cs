@@ -12,7 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public string QualifiedName => LongIdentifier.QualifiedName;
     public override string CompiledName => LongIdentifier.Name;
 
-    public override IFSharpIdentifier NameIdentifier => LongIdentifier;
+    public override IFSharpIdentifierLikeNode NameIdentifier => LongIdentifier;
     public DocumentRange GetDeclaredNameDocumentRange() => LongIdentifier.GetDocumentRange();
 
     protected override void PreInit()

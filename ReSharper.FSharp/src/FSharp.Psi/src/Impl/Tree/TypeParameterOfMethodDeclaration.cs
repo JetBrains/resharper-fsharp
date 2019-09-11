@@ -6,7 +6,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class TypeParameterOfMethodDeclaration
   {
     public override string CompiledName => NameIdentifier.GetCompiledName(Attributes);
-    public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
+    public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
     public override IDeclaredElement DeclaredElement => null;
   }
 }

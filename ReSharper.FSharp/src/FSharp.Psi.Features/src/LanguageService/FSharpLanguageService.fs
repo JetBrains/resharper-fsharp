@@ -5,7 +5,9 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
@@ -66,26 +68,24 @@ type FSharpLanguageService
         | :? INamedPat as namedPat -> namedPat.GetOffset()
         | _ -> base.CalcOffset(declaration)
 
-    override x.GetReferenceAccessType(_,reference) =
+    override x.GetReferenceAccessType(_, reference) =
         match reference.As<FSharpSymbolReference>() with
         | null -> ReferenceAccessType.OTHER
         | symbolReference ->
 
-        match symbolReference.GetElement().As<IReferenceExpression>() with
-        | null -> ReferenceAccessType.OTHER
-        | referenceExpression ->
+        let referenceExpression: ISynExpr =
+            match symbolReference.GetElement().As<IReferenceOwner>() with
+            | :? FSharpIdentifierToken as idToken ->
+                ReferenceExprNavigator.GetByIdentifier(idToken.As<IFSharpIdentifier>()) :> _
 
-        match referenceExpression.IdentifierToken with
-        | null -> ReferenceAccessType.OTHER
-        | referenceToken ->
+            | :? IReferenceExpr as refExpr ->
+                refExpr.IgnoreParentParens()
 
-        match referenceExpression.GetContainingNode<ISetExpr>() with
-        | null -> ReferenceAccessType.OTHER
-        | setExpr ->
+            | _ -> null
 
-        match setExpr.ReferenceIdentifier with
-        | token when token == referenceToken -> ReferenceAccessType.WRITE
-        | _ -> ReferenceAccessType.OTHER
+        match SetExprNavigator.GetByLeftExpression(referenceExpression) with
+        | null -> ReferenceAccessType.OTHER
+        | _ -> ReferenceAccessType.WRITE
 
     override x.CreateElementPointer(declaredElement) =
         match declaredElement.As<IFSharpGeneratedFromOtherElement>() with

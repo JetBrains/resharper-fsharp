@@ -7,12 +7,12 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class TypeExtensionDeclaration : IFSharpTypeParametersOwnerDeclaration, IReferenceExpression
+  internal partial class TypeExtensionDeclaration : IFSharpTypeParametersOwnerDeclaration, IReferenceOwner
   {
     [CanBeNull] private TypeAugmentation myTypeAugmentation;
     public FSharpSymbolReference Reference { get; protected set; }
 
-    public override IFSharpIdentifier NameIdentifier => LongIdentifier;
+    public override IFSharpIdentifierLikeNode NameIdentifier => LongIdentifier;
     protected override string DeclaredElementName => TypeAugmentation.CompiledName;
 
     protected override void ClearCachedData()
@@ -52,7 +52,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public ITokenNode IdentifierToken => LongIdentifier?.IdentifierToken;
 
-    IReferenceExpression IReferenceExpression.SetName(string name)
+    IReferenceOwner IReferenceOwner.SetName(string name)
     {
       if (IdentifierToken is var id && id != null)
         LowLevelModificationUtil.ReplaceChildRange(id, id, new FSharpIdentifierToken(name));

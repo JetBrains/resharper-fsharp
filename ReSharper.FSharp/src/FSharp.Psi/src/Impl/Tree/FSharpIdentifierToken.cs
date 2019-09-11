@@ -1,4 +1,4 @@
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
+﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
@@ -8,7 +8,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  public class FSharpIdentifierToken : FSharpToken, IFSharpIdentifier, IReferenceExpression
+  public class FSharpIdentifierToken : FSharpToken, IFSharpIdentifierLikeNode, IReferenceOwner, IFSharpIdentifier
   {
     private FSharpSymbolReference myReference;
 
@@ -16,7 +16,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       get
       {
-        if (myReference == null)
+        if (myReference == null && !(Parent is IPreventsChildResolve))
         {
           lock (this)
           {
@@ -46,7 +46,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public ITokenNode IdentifierToken => this;
 
-    IReferenceExpression IReferenceExpression.SetName(string name)
+    IReferenceOwner IReferenceOwner.SetName(string name)
     {
       var newToken = new FSharpIdentifierToken(name);
       LowLevelModificationUtil.ReplaceChildRange(this, this, newToken);
@@ -55,9 +55,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public FSharpSymbolReference QualifierReference =>
       // todo: ignore inner parens of qualifier
-      // todo: make non-terminal rule for identifier
-      Parent is IReferenceExpr referenceExpr && referenceExpr.Identifier == this
-        ? referenceExpr.Qualifier is IReferenceExpression qualifier ? qualifier.Reference : null
+      ReferenceExprNavigator.GetByIdentifier(this)?.Qualifier is ReferenceExpr qualifier
+        ? qualifier.Reference is var reference && reference.IsValid() ? reference : null
         : null;
   }
 }

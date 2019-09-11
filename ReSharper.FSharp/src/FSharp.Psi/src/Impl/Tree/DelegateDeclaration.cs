@@ -5,7 +5,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class DelegateDeclaration
   {
-    public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
+    public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
     protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
 
     public FSharpEntity Delegate => GetFSharpSymbol() as FSharpEntity;

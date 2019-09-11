@@ -460,7 +460,7 @@ anonRecdExpr options { stubBase="DummyExpression"; }:
 arrayOrListExpr options { stubBase="DummyExpression"; }:
   fakeSeparator;
 
-recordExpr options { stubBase="ReferenceExpressionBase"; }:
+recordExpr options { stubBase="ReferenceOwnerBase"; }:
   LBRACE<LBRACE, LeftBrace>
   (
     synExpr<COPY_INFO, CopyInfoExpression>
@@ -475,7 +475,7 @@ recordExprBinding:
   synExpr<EXPR, Expression>
   SEMICOLON<SEMI, Semicolon>?;
 
-newExpr options { stubBase="TypeExpressionBase"; }:
+newExpr options { stubBase="TypeReferenceOwnerBase"; }:
   namedType<TYPE, Type>
   fakeSeparator;
 
@@ -511,11 +511,11 @@ whileExpr options { stubBase="DummyExpression"; }:
   DO
   synExpr<DO_EXPR, DoExpression>;
 
-objExpr options { stubBase="BaseTypeExpressionBase"; }:
+objExpr options { stubBase="BaseTypeReferenceOwnerBase"; }:
   namedType<BASE_TYPE, BaseType>
   fakeSeparator;
 
-objExprSecondaryInterface options { stubBase="BaseTypeExpressionBase"; }:
+objExprSecondaryInterface options { stubBase="BaseTypeReferenceOwnerBase"; }:
   namedType<BASE_TYPE, BaseType>
   fakeSeparator;
 
@@ -597,15 +597,14 @@ ifThenElseExpr options { stubBase="DummyExpression"; }:
     synExpr<ELSE_EXPR, ElseExpr>
   )?;
 
-// todo: change base type to ReferenceExpressionBase
-referenceExpr options { stubBase="TypeExpressionBase"; } extras {
+referenceExpr options { stubBase="ReferenceOwnerBase"; } extras {
   get { methodName="TypeArguments" path=<referenceExpr:TYPE_ARG_LIST/prefixAppTypeArgumentList:TYPE> };
 }:
   (
     synExpr<QUALIFIER_EXPR, Qualifier>
     DOT
   )?
-  IDENTIFIER<IDENTIFIER, IdentifierInternal>
+  identifier<IDENTIFIER, Identifier>
   prefixAppTypeArgumentList<TYPE_ARG_LIST, TypeArgumentsList>?;
 
 matchClause options { stubBase="DummyExpression"; }:
@@ -944,15 +943,16 @@ interface inheritMember:
   typeInherit |
   interfaceInherit;
 
-interfaceInherit options { stubBase="BaseTypeExpressionBase"; }:
+interfaceInherit options { stubBase="BaseTypeReferenceOwnerBase"; }:
   INHERIT
   namedType<BASE_TYPE, BaseType>;
 
-typeInherit options { stubBase="BaseTypeExpressionBase"; }:
+typeInherit options { stubBase="BaseTypeReferenceOwnerBase"; }:
   INHERIT
-  namedType<BASE_TYPE, BaseType>;
+  namedType<BASE_TYPE, BaseType>
+  chameleonExpression<CHAMELEON_EXPR, CtorArg>;
 
-interfaceImplementation options { stubBase="BaseTypeExpressionBase"; }:
+interfaceImplementation options { stubBase="BaseTypeReferenceOwnerBase"; }:
   namedType<INTERFACE_TYPE, InterfaceType>
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>* fakeSeparator;
 
@@ -1079,7 +1079,7 @@ otherDirective:
   PP_DIRECTIVE<PP_DIRECTIVE, HashToken>
   STRING<STRING, Args>*;
 
-openStatement  options { stubBase="ReferenceExpressionBase"; }:
+openStatement  options { stubBase="ReferenceOwnerBase"; }:
   OPEN<OPEN, Open>
   longIdentifier<LONG_IDENTIFIER, LongIdentifier>;
 
@@ -1125,6 +1125,8 @@ longIdentifier:
     IDENTIFIER<IDENTIFIER, Identifiers>
   )*;
 
+abstract identifier options { interfaceName="IFSharpIdentifier"; }:
+  IDENTIFIER;
 
 
 // Type parameters
@@ -1161,7 +1163,7 @@ private modifier{ROLE,Getter}:
 
 // Attributes
 
-fSharpAttribute options { stubBase="TypeExpressionBase"; }
+fSharpAttribute options { stubBase="TypeReferenceOwnerBase"; }
   extras {
     get { methodName="Expression" path=<fSharpAttribute:CHAMELEON_EXPR/chameleonExpression:EXPR> };
   }:
@@ -1224,7 +1226,7 @@ expressionReferenceName:
   prefixAppTypeArgumentList<TYPE_ARG, TypeArgumentList>;
 
 
-typeReferenceName:
+typeReferenceName options { stubBase="TypeReferenceOwnerBase"; }:
   (
     postfixAppTypeArgumentList<TYPE_ARG, TypeArgumentList>
     (
@@ -1283,7 +1285,7 @@ funType:
   RARROW
   synType;
 
-varType options { stubBase="TypeExpressionBase"; }:
+varType options { stubBase="TypeReferenceOwnerBase"; }:
   QUOTE
   IDENTIFIER<IDENTIFIER, Identifier>;
 

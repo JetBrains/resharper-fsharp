@@ -8,7 +8,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     protected override string DeclaredElementName =>
       LongIdentifier.GetModuleCompiledName(Attributes);
 
-    public override IFSharpIdentifier NameIdentifier =>
+    public override IFSharpIdentifierLikeNode NameIdentifier =>
       LongIdentifier;
 
     public override TreeTextRange GetNameRange() =>

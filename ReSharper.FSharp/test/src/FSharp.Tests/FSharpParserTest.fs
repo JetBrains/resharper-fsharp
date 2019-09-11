@@ -145,3 +145,8 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Types - Anon record 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Array 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type member - Inherit - Type 01 - Simple``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Inherit - Type 02 - Qualified``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Inherit - Type 03 - Arguments``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Inherit - Type 04 - Type parameters 01``() = x.DoNamedTest()

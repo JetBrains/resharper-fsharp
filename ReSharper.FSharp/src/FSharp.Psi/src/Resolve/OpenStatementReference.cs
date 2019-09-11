@@ -5,7 +5,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
   public class OpenStatementReference : FSharpSymbolReference
   {
-    public OpenStatementReference([NotNull] IReferenceExpression owner) : base(owner)
+    public OpenStatementReference([NotNull] IReferenceOwner owner) : base(owner)
     {
     }
   }

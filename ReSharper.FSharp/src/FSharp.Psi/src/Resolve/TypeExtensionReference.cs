@@ -6,7 +6,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
   public class TypeExtensionReference : FSharpSymbolReference
   {
-    public TypeExtensionReference([NotNull] IReferenceExpression owner) : base(owner)
+    public TypeExtensionReference([NotNull] IReferenceOwner owner) : base(owner)
     {
     }
 

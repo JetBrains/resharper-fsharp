@@ -22,7 +22,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         ? new FSharpImplicitConstructor(this, ctor)
         : null;
 
-    public override IFSharpIdentifier NameIdentifier => null;
+    public override IFSharpIdentifierLikeNode NameIdentifier => null;
     public override TreeTextRange GetNameIdentifierRange() => GetNameRange();
   }
 }

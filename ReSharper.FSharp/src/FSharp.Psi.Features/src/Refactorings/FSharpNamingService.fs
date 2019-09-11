@@ -163,8 +163,7 @@ type FSharpNamingService(language: FSharpLanguage) =
             match referenceExpr.Qualifier with
             | :? IReferenceExpr as qualifierExpr ->
                 // todo: ignore qualifier inner parens
-                // todo: use expression references (don't look at identifiers)
-                x.SuggestRoots(referenceExpr.Identifier.Reference, qualifierExpr.Identifier.Reference, policyProvider)
+                x.SuggestRoots(referenceExpr.Reference, qualifierExpr.Reference, policyProvider)
             | _ -> x.SuggestRoots(referenceExpr.Identifier, useExpectedTypes, policyProvider)
 
         | :? IIndexerExpr as dotIndexedGetExpr ->
@@ -179,7 +178,7 @@ type FSharpNamingService(language: FSharpLanguage) =
             let elseRoots = x.SuggestRoots(ifThenElseExpr.ElseExpr, useExpectedTypes, policyProvider)
             Seq.append thenRoots elseRoots
 
-        | :? FSharpIdentifierToken as idToken ->
+        | :? FSharpIdentifierToken as idToken when isNotNull idToken.Reference ->
             x.SuggestRoots(idToken.Reference, idToken.QualifierReference, policyProvider)
 
         | :? ILongIdentifier as longIdentifier ->

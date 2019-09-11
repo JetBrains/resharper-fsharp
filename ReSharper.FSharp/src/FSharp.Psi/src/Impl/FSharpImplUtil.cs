@@ -163,7 +163,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       if (name == SharedImplUtil.MISSING_DECLARATION_NAME)
         return name;
 
-      if (identifier is IFSharpIdentifier fsIdentifier &&
+      if (identifier is IFSharpIdentifierLikeNode fsIdentifier &&
           fsIdentifier.IdentifierToken?.GetTokenType() == FSharpTokenType.SYMBOLIC_OP)
         return PrettyNaming.CompileOpName.Invoke(name);
 
@@ -177,7 +177,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static string GetSourceName([CanBeNull] this ITreeNode treeNode) =>
       GetSourceName(treeNode as IIdentifier);
 
-    public static TreeTextRange GetNameRange([CanBeNull] this IFSharpIdentifier identifier)
+    public static TreeTextRange GetNameRange([CanBeNull] this IFSharpIdentifierLikeNode identifier)
     {
       if (identifier == null)
         return TreeTextRange.InvalidRange;
@@ -195,7 +195,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         : nameRange;
     }
 
-    public static TreeTextRange GetNameIdentifierRange([CanBeNull] this IFSharpIdentifier identifier) =>
+    public static TreeTextRange GetNameIdentifierRange([CanBeNull] this IFSharpIdentifierLikeNode identifier) =>
       identifier?.GetTreeTextRange() ?? TreeTextRange.InvalidRange;
 
     /// <summary>
@@ -494,7 +494,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static bool HasAttribute([NotNull] this IFSharpTypeDeclaration typeDeclaration, [NotNull] string shortName) =>
       HasAttribute(typeDeclaration.Attributes, shortName);
 
-    public static void ReplaceIdentifier([CanBeNull] this IFSharpIdentifier fsIdentifier, string name)
+    public static void ReplaceIdentifier([CanBeNull] this IFSharpIdentifierLikeNode fsIdentifier, string name)
     {
       var token = fsIdentifier?.IdentifierToken;
       if (token == null)

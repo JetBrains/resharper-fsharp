@@ -33,6 +33,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       return null;
     }
 
-    public override IFSharpIdentifier NameIdentifier => (IFSharpIdentifier) Identifier;
+    public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
   }
 }

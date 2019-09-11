@@ -26,7 +26,7 @@ type ToRecursiveLetBindings(dataProvider: FSharpContextActionDataProvider) =
         | null -> false
         | longIdentPat ->
 
-        match longIdentPat.Identifier.As<IFSharpIdentifier>() with
+        match longIdentPat.Identifier.As<IFSharpIdentifierLikeNode>() with
         | null -> false
         | identifier ->
 
