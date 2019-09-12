@@ -76,7 +76,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
       var highlightings = new List<HighlightingInfo>(declarations.Count + usages.Count);
       AddHighlightings(declarations, highlightings);
       AddHighlightings(usages, highlightings);
-      committer(new DaemonStageResult(highlightings.AsReadOnlyCollection()));
+      committer(new DaemonStageResult(highlightings.AsIReadOnlyList()));
     }
   }
 }

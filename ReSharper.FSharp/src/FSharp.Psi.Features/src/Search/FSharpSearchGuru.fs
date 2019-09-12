@@ -33,8 +33,8 @@ type FSharpSearchGuru(fsProjectOptionsProvider: IFSharpProjectOptionsProvider) =
             | null -> null
             | typeElement ->
 
-            let sourceFiles = typeElement.GetSourceFiles()
-            if sourceFiles.IsEmpty then null else
+            let sourceFiles = typeElement.GetSourceFiles().ReadOnlyList()
+            if sourceFiles.Count = 0 then null else
 
             let declarationFileIndex =
                 sourceFiles

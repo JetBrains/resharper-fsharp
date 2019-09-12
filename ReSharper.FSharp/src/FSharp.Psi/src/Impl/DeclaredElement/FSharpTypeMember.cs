@@ -56,7 +56,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
             list.Add(member);
       }
 
-      return list.AsIList();
+      return list.ResultingList();
     }
 
     public override HybridCollection<IPsiSourceFile> GetSourceFiles() =>
