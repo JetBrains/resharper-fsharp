@@ -63,6 +63,8 @@ type FSharpKeywordsProvider() =
         if tokenBeforeType == FSharpTokenType.LINE_COMMENT ||
            tokenBeforeType == FSharpTokenType.DEAD_CODE ||
            tokenBeforeType == FSharpTokenType.DOT ||
+           tokenBeforeType == FSharpTokenType.RESERVED_LITERAL_FORMATS ||
+           isNotNull tokenBeforeType && tokenBeforeType.IsConstantLiteral ||
            tokenBefore == context.TokenAtCaret && isNotNull tokenBeforeType &&
                (tokenBeforeType.IsComment || tokenBeforeType.IsStringLiteral || tokenBeforeType.IsConstantLiteral)
         then false else
