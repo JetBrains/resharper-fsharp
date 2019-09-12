@@ -31,6 +31,6 @@ type AddIgnoreFix(warning: UnitTypeExpectedWarning) =
 
     override x.ExecutePsiTransaction(_, _) =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
-        let elementFactory = expr.FSharpLanguageService.CreateElementFactory(expr.GetPsiModule())
+        let elementFactory = expr.CreateElementFactory()
         replace expr (elementFactory.CreateIgnoreApp(expr, addNewLine expr)) 
         null

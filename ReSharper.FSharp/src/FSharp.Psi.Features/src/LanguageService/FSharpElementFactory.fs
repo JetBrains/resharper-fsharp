@@ -83,3 +83,47 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             match doDecl.Expression.As<IRecordExpr>() with
             | null -> failwith "Could not get record expr"
             | recordExpr -> recordExpr.ExprBindings.First()
+
+        member x.CreateAppExpr(funcName, expr) =
+            let source = sprintf "%s ()" funcName
+            let moduleDeclaration = getModuleDeclaration source
+            let doDecl = moduleDeclaration.Members.First().As<IDo>().NotNull()
+            let appExpr = doDecl.Expression.As<IAppExpr>()
+            ModificationUtil.ReplaceChild(appExpr.ArgumentExpression, expr) |> ignore
+            appExpr
+
+        member x.CreateLetBindingExpr(bindingName, expr) =
+            let source = sprintf "do (let %s = ())" bindingName
+            let moduleDeclaration = getModuleDeclaration source
+            let doDecl = moduleDeclaration.Members.First().As<IDo>().NotNull()
+            let letOrUseExpr = doDecl.Expression.As<IDoExpr>().Expression.As<IParenExpr>().InnerExpression.As<ILetOrUseExpr>()
+            ModificationUtil.ReplaceChild(letOrUseExpr.Bindings.[0].Expression, expr) |> ignore
+            letOrUseExpr
+
+        member x.CreateConstExpr(text) =
+            let source = sprintf "%s" text
+            let moduleDeclaration = getModuleDeclaration source
+            let doDecl = moduleDeclaration.Members.First().As<IDo>().NotNull()
+            doDecl.Expression.As<IConstExpr>()
+
+        member x.CreateMatchExpr(expr) =
+            let source = "match () with | _ -> ()"
+
+            let indent = expr.Indent
+            let moduleDeclaration = getModuleDeclaration source
+
+            let doDecl = moduleDeclaration.Members.First().As<IDo>().NotNull()
+            match doDecl.Expression.As<IMatchExpr>() with
+            | null -> failwith "Could not get outer appExpr"
+            | matchExpr ->
+
+            match matchExpr.Clauses.[0].As<IMatchClause>() with
+            | null -> failwith "Could not get inner appExpr"
+            | matchClause ->
+
+            let expr = ModificationUtil.ReplaceChild(matchExpr.Expression, expr.Copy())
+
+            let whitespace = ModificationUtil.ReplaceChild(matchClause.PrevSibling, Whitespace(indent))
+            ModificationUtil.AddChildBefore(whitespace, NewLine(expr.FSharpFile.GetLineEnding())) |> ignore
+
+            matchExpr

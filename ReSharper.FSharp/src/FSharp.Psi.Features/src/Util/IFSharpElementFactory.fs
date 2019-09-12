@@ -11,8 +11,12 @@ open JetBrains.ReSharper.Psi.Modules
 type IFSharpElementFactory =
     abstract CreateOpenStatement: ns: string -> IOpenStatement
     abstract CreateWildPat: unit -> IWildPat
+    abstract CreateConstExpr: text: string -> IConstExpr
+    abstract CreateAppExpr: funcName: string * arg: ISynExpr -> IAppExpr
+    abstract CreateLetBindingExpr: bindingName: string * expr: ISynExpr -> ILetOrUseExpr
     abstract CreateIgnoreApp: ISynExpr * newLine: bool -> IAppExpr
     abstract CreateRecordExprBinding: fieldName: string * addSemicolon: bool -> IRecordExprBinding
+    abstract CreateMatchExpr: ISynExpr -> IMatchExpr
 
 
 [<AllowNullLiteral>]

@@ -1,11 +1,21 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.PostfixTemplates
 
+open System
+open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.PostfixTemplates
+open JetBrains.ReSharper.Feature.Services.PostfixTemplates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates.Contexts
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
+open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
+open JetBrains.Util.Extension
 
 [<AllowNullLiteral>]
 type FSharpPostfixTemplateContext(treeNode: ITreeNode, executionContext: PostfixTemplateExecutionContext) as this =
@@ -21,7 +31,7 @@ and FSharpPostfixExpressionContext(postfixContext, expression) =
     inherit PostfixExpressionContext(postfixContext, expression)
 
 
-//[<Language(typeof<FSharpLanguage>)>]
+[<Language(typeof<FSharpLanguage>)>]
 type FSharpPostfixTemplateContextFactory() =
     interface IPostfixTemplateContextFactory with
         member x.GetReparseStrings() = EmptyArray.Instance
@@ -31,7 +41,7 @@ type FSharpPostfixTemplateContextFactory() =
             FSharpPostfixTemplateContext(treeNode, executionContext) :> _
 
 
-//[<Language(typeof<FSharpLanguage>)>]
+[<Language(typeof<FSharpLanguage>)>]
 type FSharpPostfixTemplatesProvider(templatesManager, sessionExecutor, usageStatistics) =
     inherit PostfixTemplatesItemProviderBase<FSharpCodeCompletionContext, FSharpPostfixTemplateContext>(
         templatesManager, sessionExecutor, usageStatistics)
@@ -42,5 +52,46 @@ type FSharpPostfixTemplatesProvider(templatesManager, sessionExecutor, usageStat
         let executionContext = PostfixTemplateExecutionContext(context.Solution, context.TextControl, settings, "__")
 
         match fsCompletionContext.TokenBeforeCaret with
-        | null -> null
-        | treeNode -> FSharpPostfixTemplateContext(treeNode, executionContext)
+        | identifier when isNotNull identifier && (identifier.Parent :? ISynExpr) ->
+            FSharpPostfixTemplateContext(identifier, executionContext)
+
+        | _ -> null
+
+
+[<AbstractClass>]
+type FSharpPostfixTemplateBehaviorBase(info) =
+    inherit PostfixTemplateBehavior(info)
+
+    let rec getContainingArgExpr (expr: ISynExpr) =
+        match PrefixAppExprNavigator.GetByArgumentExpression(expr) with
+        | null -> expr
+        | appExpr -> getContainingArgExpr appExpr
+
+    let getParentExpression (token: IFSharpTreeNode): ISynExpr =
+        match token with
+        | TokenType FSharpTokenType.RESERVED_LITERAL_FORMATS _ ->
+            match token.Parent.As<IConstExpr>() with
+            | null -> null
+            | parent ->
+
+            let literalText = token.GetText().SubstringBeforeLast(".", StringComparison.Ordinal)
+            let constExpr = token.CreateElementFactory().CreateConstExpr(literalText)
+            let newChild = ModificationUtil.ReplaceChild(parent.FirstChild, constExpr.FirstChild)
+            newChild.Parent :?> _
+
+        | :? IFSharpIdentifier as identifier ->
+            match ReferenceExprNavigator.GetByIdentifier(identifier) with
+            | null -> failwith "Getting refExpr"
+            | refExpr ->
+
+            let qualifier = refExpr.Qualifier
+            Assertion.Assert(isNotNull qualifier, "isNotNull qualifier")
+
+            ModificationUtil.ReplaceChild(refExpr, qualifier)
+
+        | _ -> null
+
+    member x.GetExpression(context: PostfixExpressionContext) =
+        let token = context.Expression :?> IFSharpTreeNode
+        let parent = getParentExpression token
+        getContainingArgExpr parent
