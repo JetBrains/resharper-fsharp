@@ -6,7 +6,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
   public class CtorTypeReference : FSharpSymbolReference
   {
-    public CtorTypeReference([NotNull] IReferenceOwner owner) : base(owner)
+    public CtorTypeReference([NotNull] IFSharpReferenceOwner owner) : base(owner)
     {
     }
 

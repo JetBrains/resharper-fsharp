@@ -6,7 +6,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
   public class TypeReference : FSharpSymbolReference
   {
-    public TypeReference([NotNull] IReferenceOwner owner) : base(owner)
+    public TypeReference([NotNull] IFSharpReferenceOwner owner) : base(owner)
     {
     }
 
@@ -25,7 +25,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
   
   public class BaseTypeReference : TypeReference
   {
-    public BaseTypeReference([NotNull] IReferenceOwner owner) : base(owner)
+    public BaseTypeReference([NotNull] IFSharpReferenceOwner owner) : base(owner)
     {
     }
   }

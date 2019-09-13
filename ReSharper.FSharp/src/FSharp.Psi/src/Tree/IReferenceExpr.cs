@@ -2,7 +2,7 @@ using JetBrains.Annotations;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
-  public partial interface IReferenceExpr : IReferenceOwner
+  public partial interface IReferenceExpr : IFSharpReferenceOwner
   {
     [NotNull] string ShortName { get; }
 

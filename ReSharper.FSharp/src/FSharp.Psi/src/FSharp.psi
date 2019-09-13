@@ -303,14 +303,6 @@ otherPat options { stubBase="SynPatternBase"; }:
   fakeSeparator;
 
 
-interface qualifiableExpr:
-  referenceExpr |
-  parenExpr |
-  namedIndexerExpr;
-
-
-
-
 interface synExpr:
   parenExpr |
   quoteExpr |
@@ -363,7 +355,7 @@ interface appExpr:
   prefixAppExpr |
   infixAppExpr;
 
-setExpr options { stubBase="DummyExpression"; }:
+setExpr options { stubBase="FSharpExpressionBase"; }:
   synExpr<LEFT_EXPR, LeftExpression>
   LARROW<LARROW, LArrow>
   synExpr<RIGHT_EXPR, RightExpression>;
@@ -372,14 +364,14 @@ interface indexerExpr:
   itemIndexerExpr |
   namedIndexerExpr;
 
-itemIndexerExpr options { stubBase="DummyExpression"; } extras {
+itemIndexerExpr options { stubBase="FSharpExpressionBase"; } extras {
   get { methodName="Args" path=<itemIndexerExpr:ARG_LIST/indexerArgList:INDEXER_ARG> };
 }:
   synExpr<EXPR, Expression>
   DOT
   indexerArgList<ARG_LIST, IndexerArgList>;
 
-namedIndexerExpr options { stubBase="DummyExpression"; } extras {
+namedIndexerExpr options { stubBase="FSharpExpressionBase"; } extras {
   get { methodName="Args" path=<namedIndexerExpr:INDEXER_ARG> };
 }:
   // todo: maybe: expr, dot, ident, arg?
@@ -406,16 +398,12 @@ interface castExpr:
   upcastExpr |
   downcastExpr;
 
-parenExpr options { stubBase="DummyExpression"; }:
-  (
-    synExpr<QUALIFIER_EXPR, Qualifier>
-    DOT
-  )?
+parenExpr options { stubBase="FSharpExpressionBase"; }:
   LPAREN<LPAREN, LeftParen>
   synExpr<EXPR, InnerExpression>?
   RPAREN<RPAREN, RightParen>;
 
-quoteExpr options { stubBase="DummyExpression"; }:
+quoteExpr options { stubBase="FSharpExpressionBase"; }:
   (
     LQUOTE_TYPED
     synExpr<EXPR, QuotedExpression>?
@@ -427,15 +415,15 @@ quoteExpr options { stubBase="DummyExpression"; }:
     RQUOTE_UNTYPED?
   );
 
-constExpr options { stubBase="DummyExpression"; }:
+constExpr options { stubBase="FSharpExpressionBase"; }:
   fakeSeparator;
 
-typedExpr options { stubBase="DummyExpression"; }:
+typedExpr options { stubBase="FSharpExpressionBase"; }:
   synExpr<EXPR, Expression>
   COLON
   synType<TYPE, Type>;
 
-tupleExpr options { stubBase="DummyExpression"; }:
+tupleExpr options { stubBase="FSharpExpressionBase"; }:
   (
     LPAREN
     STRUCT<STRUCT, StructKeyword>
@@ -447,7 +435,7 @@ tupleExpr options { stubBase="DummyExpression"; }:
   )*
   fakeSeparator;
 
-anonRecdExpr options { stubBase="DummyExpression"; }:
+anonRecdExpr options { stubBase="FSharpExpressionBase"; }:
   STRUCT<STRUCT, STRUCT_KEYWORD>?
   LBRACE_BAR
   (
@@ -457,10 +445,10 @@ anonRecdExpr options { stubBase="DummyExpression"; }:
   recordExprBinding<BINDING, ExprBindings>* // todo: FCS has different type here
   BAR_RBRACE;
 
-arrayOrListExpr options { stubBase="DummyExpression"; }:
+arrayOrListExpr options { stubBase="FSharpExpressionBase"; }:
   fakeSeparator;
 
-recordExpr options { stubBase="ReferenceOwnerBase"; }:
+recordExpr options { stubBase="FSharpExpressionBase"; }:
   LBRACE<LBRACE, LeftBrace>
   (
     synExpr<COPY_INFO, CopyInfoExpression>
@@ -475,11 +463,12 @@ recordExprBinding:
   synExpr<EXPR, Expression>
   SEMICOLON<SEMI, Semicolon>?;
 
-newExpr options { stubBase="TypeReferenceOwnerBase"; }:
+newExpr options { stubBase="FSharpExpressionBase"; }:
   namedType<TYPE, Type>
+  typeReferenceName<TYPE_REFERENCE, TypeName>
   fakeSeparator;
 
-forExpr options { stubBase="DummyExpression"; }:
+forExpr options { stubBase="FSharpExpressionBase"; }:
   FOR
   IDENTIFIER<IDENTIFIER, Identifier>
   synExpr<IDENT_EXPR, IdentExpression>
@@ -488,7 +477,7 @@ forExpr options { stubBase="DummyExpression"; }:
   DO
   synExpr<DO_EXPR, DoExpression>;
 
-forEachExpr options { stubBase="DummyExpression"; }:
+forEachExpr options { stubBase="FSharpExpressionBase"; }:
   FOR
   synPat<PAT, Pattern>
   IN
@@ -496,7 +485,7 @@ forEachExpr options { stubBase="DummyExpression"; }:
   DO
   synExpr<DO_EXPR, DoExpression>;
 
-arrayOrListOfSeqExpr options { stubBase="DummyExpression"; }:
+arrayOrListOfSeqExpr options { stubBase="FSharpExpressionBase"; }:
   (LBRACK
    synExpr<EXPR, Expression>
    RBRACK) |
@@ -505,13 +494,13 @@ arrayOrListOfSeqExpr options { stubBase="DummyExpression"; }:
     synExpr<EXPR, Expression>
     BAR_RBRACK);
 
-whileExpr options { stubBase="DummyExpression"; }:
+whileExpr options { stubBase="FSharpExpressionBase"; }:
   WHILE
   synExpr<WHILE_EXPR, WhileExpression>
   DO
   synExpr<DO_EXPR, DoExpression>;
 
-objExpr options { stubBase="BaseTypeReferenceOwnerBase"; }:
+objExpr options { stubBase="FSharpExpressionBase"; }:
   namedType<BASE_TYPE, BaseType>
   fakeSeparator;
 
@@ -519,45 +508,45 @@ objExprSecondaryInterface options { stubBase="BaseTypeReferenceOwnerBase"; }:
   namedType<BASE_TYPE, BaseType>
   fakeSeparator;
 
-compExpr options { stubBase="DummyExpression"; }:
+compExpr options { stubBase="FSharpExpressionBase"; }:
   LBRACE
   synExpr<EXPR, Expression>
   RBRACE;
 
-lambdaExpr options { stubBase="DummyExpression"; }:
+lambdaExpr options { stubBase="FSharpExpressionBase"; }:
   FUN
   synPat<PAT, Patterns>*
   RARROW
   synExpr<EXPR, Expression>;
 
-matchLambdaExpr options { stubBase="DummyExpression"; }:
+matchLambdaExpr options { stubBase="FSharpExpressionBase"; }:
   FUNCTION
   matchClause<MATCH_CLAUSE, clauses>*;
 
 // todo: separate nodes for bang exprs?
-matchExpr options { stubBase="DummyExpression"; }:
+matchExpr options { stubBase="FSharpExpressionBase"; }:
   MATCH
   synExpr<EXPR, Expression>
   WITH
   matchClause<MATCH_CLAUSE, Clauses>*;
 
-doExpr options { stubBase="DummyExpression"; }:
+doExpr options { stubBase="FSharpExpressionBase"; }:
   DO
   synExpr<EXPR, Expression>;
 
-assertExpr options { stubBase="DummyExpression"; }:
+assertExpr options { stubBase="FSharpExpressionBase"; }:
   ASSERT
   synExpr<EXPR, Expression>;
 
-prefixAppExpr options { stubBase="DummyExpression"; }:
+prefixAppExpr options { stubBase="FSharpExpressionBase"; }:
   synExpr<FUNC_EXPR, FunctionExpression>
   synExpr<ARG_EXPR, ArgumentExpression>;
 
-infixAppExpr options { stubBase="DummyExpression"; }:
+infixAppExpr options { stubBase="FSharpExpressionBase"; }:
   synExpr<ARG_EXPR, ArgumentExpression>
   synExpr<FUNC_EXPR, FunctionExpression>;
 
-letOrUseExpr options { stubBase="DummyExpression"; }:
+letOrUseExpr options { stubBase="FSharpExpressionBase"; }:
   letOrUse{LET, LetOrUseToken}
   REC<REC, RecKeyword>?
   binding<BINDING, Bindings>
@@ -567,27 +556,27 @@ letOrUseExpr options { stubBase="DummyExpression"; }:
   )*
   synExpr<BODY_EXPR, BodyExpression>;
 
-tryWithExpr options { stubBase="DummyExpression"; }:
+tryWithExpr options { stubBase="FSharpExpressionBase"; }:
   TRY
   synExpr<TRY_EXPR, TryExpression>
   WITH
   matchClause<CLAUSE, WithCases>*;
 
-tryFinallyExpr options { stubBase="DummyExpression"; }:
+tryFinallyExpr options { stubBase="FSharpExpressionBase"; }:
   TRY
   synExpr<TRY_EXPR, TryExpression>
   FINALLY
   synExpr<FINALLY_EXPR, FinallyExpression>;
 
-lazyExpr options { stubBase="DummyExpression"; }:
+lazyExpr options { stubBase="FSharpExpressionBase"; }:
   LAZY
   synExpr<EXPR, Expression>;
 
-sequentialExpr options { stubBase="DummyExpression"; }:
+sequentialExpr options { stubBase="FSharpExpressionBase"; }:
   synExpr<EXPR1, Expression1>
   synExpr<EXPR2, Expression2>;
 
-ifThenElseExpr options { stubBase="DummyExpression"; }:
+ifThenElseExpr options { stubBase="FSharpExpressionBase"; }:
   IF<IF, IfKeyword>
   synExpr<IF_EXPR, IfExpr>
   THEN<THEN, ThenKeyword>
@@ -597,7 +586,7 @@ ifThenElseExpr options { stubBase="DummyExpression"; }:
     synExpr<ELSE_EXPR, ElseExpr>
   )?;
 
-referenceExpr options { stubBase="ReferenceOwnerBase"; } extras {
+referenceExpr options { stubBase="FSharpExpressionBase"; } extras {
   get { methodName="TypeArguments" path=<referenceExpr:TYPE_ARG_LIST/prefixAppTypeArgumentList:TYPE> };
 }:
   (
@@ -607,53 +596,53 @@ referenceExpr options { stubBase="ReferenceOwnerBase"; } extras {
   identifier<IDENTIFIER, Identifier>
   prefixAppTypeArgumentList<TYPE_ARG_LIST, TypeArgumentsList>?;
 
-matchClause options { stubBase="DummyExpression"; }:
+matchClause options { stubBase="FSharpExpressionBase"; }:
   BAR<BAR, Bar>?
   synPat<PAT, Pattern>
   RARROW<RARROW, RArrow>
   synExpr<EXPR, Expression>;
 
-typeTestExpr options { stubBase="DummyExpression"; }:
+typeTestExpr options { stubBase="FSharpExpressionBase"; }:
   synExpr<EXPR, Expression>
   COLON_QMARK
   synType<TYPE, Type>;
 
-upcastExpr options { stubBase="DummyExpression"; }:
+upcastExpr options { stubBase="FSharpExpressionBase"; }:
   synExpr<EXPR, Expression>
   COLON_GREATER<OP, OperatorToken>
   synType<TYPE, Type>;
   
-downcastExpr options { stubBase="DummyExpression"; }:
+downcastExpr options { stubBase="FSharpExpressionBase"; }:
   synExpr<EXPR, Expression>
   COLON_QMARK_GREATER
   synType<TYPE, Type>;
 
-inferredCastExpr options { stubBase="DummyExpression"; }:
+inferredCastExpr options { stubBase="FSharpExpressionBase"; }:
   (UPCAST | DOWNCAST)
   synExpr<EXPR, Expression>;
 
 // todo: maybe replace with SynExpr.Const in FCS?
-nullExpr options { stubBase="DummyExpression"; }:
+nullExpr options { stubBase="FSharpExpressionBase"; }:
   NULL<NULL, NullKeyword>;
 
-addressOfExpr options { stubBase="DummyExpression"; }:
+addressOfExpr options { stubBase="FSharpExpressionBase"; }:
   (AMP | AMP_AMP)
   synExpr<EXPR, Expression>;
 
-traitCallExpr options { stubBase="DummyExpression"; }:
+traitCallExpr options { stubBase="FSharpExpressionBase"; }:
   fakeSeparator;
 
-joinInExpr options { stubBase="DummyExpression"; }:
+joinInExpr options { stubBase="FSharpExpressionBase"; }:
   fakeSeparator;
 
-implicitZeroExpr options { stubBase="DummyExpression"; }:
+implicitZeroExpr options { stubBase="FSharpExpressionBase"; }:
   fakeSeparator;
 
-yieldOrReturnExpr options { stubBase="DummyExpression"; }:
+yieldOrReturnExpr options { stubBase="FSharpExpressionBase"; }:
   (YIELD | YIELD_BANG | RETURN | RETURN_BANG)
   synExpr<EXPR, Expression>;
 
-letOrUseBangExpr options { stubBase="DummyExpression"; }:
+letOrUseBangExpr options { stubBase="FSharpExpressionBase"; }:
   letOrUseBang{LET, LetOrUseToken}
   synPat<PAT, Pattern>
   EQUALS<EQUALS, EqualsToken>
@@ -661,17 +650,17 @@ letOrUseBangExpr options { stubBase="DummyExpression"; }:
   IN?
   synExpr<IN_EXPR, InExpression>;
 
-libraryOnlyExpr options { stubBase="DummyExpression"; }:
+libraryOnlyExpr options { stubBase="FSharpExpressionBase"; }:
   fakeSeparator;
 
-fromErrorExpr options { stubBase="DummyExpression"; }:
+fromErrorExpr options { stubBase="FSharpExpressionBase"; }:
   fakeSeparator;
 
-fixedExpr options { stubBase="DummyExpression"; }:
+fixedExpr options { stubBase="FSharpExpressionBase"; }:
   FIXED<FIXED, FixedKeyword>
   synExpr<EXPR, Expression>;
 
-chameleonExpression options { stubBase="DummyExpression"; }:
+chameleonExpression options { stubBase="FSharpExpressionBase"; }:
   synExpr<EXPR, Expression>;
 
 

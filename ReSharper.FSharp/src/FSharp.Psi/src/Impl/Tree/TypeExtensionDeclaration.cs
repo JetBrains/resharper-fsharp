@@ -7,7 +7,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class TypeExtensionDeclaration : IFSharpTypeParametersOwnerDeclaration, IReferenceOwner
+  internal partial class TypeExtensionDeclaration : IFSharpTypeParametersOwnerDeclaration, IFSharpReferenceOwner
   {
     [CanBeNull] private TypeAugmentation myTypeAugmentation;
     public FSharpSymbolReference Reference { get; protected set; }
@@ -52,7 +52,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public ITokenNode IdentifierToken => LongIdentifier?.IdentifierToken;
 
-    IReferenceOwner IReferenceOwner.SetName(string name)
+    IFSharpReferenceOwner IFSharpReferenceOwner.SetName(string name)
     {
       if (IdentifierToken is var id && id != null)
         LowLevelModificationUtil.ReplaceChildRange(id, id, new FSharpIdentifierToken(name));

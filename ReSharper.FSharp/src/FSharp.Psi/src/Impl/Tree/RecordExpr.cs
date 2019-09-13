@@ -13,10 +13,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class RecordExpr
   {
-    public override ITokenNode IdentifierToken => null;
+    public FSharpSymbolReference Reference { get; private set; }
+    public ITokenNode IdentifierToken => null;
 
-    protected override FSharpSymbolReference CreateReference() =>
-      new RecordCtorReference(this);
+    public IFSharpReferenceOwner SetName(string name) => this;
+
+    protected override void PreInit()
+    {
+      base.PreInit();
+      Reference = new RecordCtorReference(this);
+    }
+
+    public override ReferenceCollection GetFirstClassReferences() =>
+      new ReferenceCollection(Reference);
   }
 
   public class RecordCtorReference : FSharpSymbolReference

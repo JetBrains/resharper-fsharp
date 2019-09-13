@@ -8,7 +8,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  public class FSharpIdentifierToken : FSharpToken, IReferenceOwner, IFSharpIdentifier
+  public class FSharpIdentifierToken : FSharpToken, IFSharpReferenceOwner, IFSharpIdentifier
   {
     private FSharpSymbolReference myReference;
 
@@ -46,7 +46,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public ITokenNode IdentifierToken => this;
 
-    IReferenceOwner IReferenceOwner.SetName(string name)
+    IFSharpReferenceOwner IFSharpReferenceOwner.SetName(string name)
     {
       var newToken = new FSharpIdentifierToken(name);
       LowLevelModificationUtil.ReplaceChildRange(this, this, newToken);

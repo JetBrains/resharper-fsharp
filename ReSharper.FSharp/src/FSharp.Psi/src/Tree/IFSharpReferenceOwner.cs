@@ -4,13 +4,13 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
-  public interface IReferenceOwner : IFSharpTreeNode
+  public interface IFSharpReferenceOwner : IFSharpTreeNode
   {
     FSharpSymbolReference Reference { get; }
 
     [CanBeNull] ITokenNode IdentifierToken { get; }
 
     [NotNull]
-    IReferenceOwner SetName([NotNull] string name);
+    IFSharpReferenceOwner SetName([NotNull] string name);
   }
 }

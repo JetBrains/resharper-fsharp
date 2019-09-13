@@ -74,7 +74,7 @@ type FSharpLanguageService
         | symbolReference ->
 
         let referenceExpression: ISynExpr =
-            match symbolReference.GetElement().As<IReferenceOwner>() with
+            match symbolReference.GetElement().As<IFSharpReferenceOwner>() with
             | :? FSharpIdentifierToken as idToken ->
                 ReferenceExprNavigator.GetByIdentifier(idToken.As<IFSharpIdentifier>()) :> _
 

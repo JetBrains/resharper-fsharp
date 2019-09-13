@@ -14,9 +14,9 @@ using JetBrains.ReSharper.Resources.Shell;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
-  public class FSharpSymbolReference : TreeReferenceBase<IReferenceOwner>
+  public class FSharpSymbolReference : TreeReferenceBase<IFSharpReferenceOwner>
   {
-    public FSharpSymbolReference([NotNull] IReferenceOwner owner) : base(owner)
+    public FSharpSymbolReference([NotNull] IFSharpReferenceOwner owner) : base(owner)
     {
     }
 

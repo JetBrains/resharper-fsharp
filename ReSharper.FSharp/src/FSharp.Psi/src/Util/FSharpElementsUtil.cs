@@ -96,7 +96,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
     [CanBeNull]
     public static IDeclaredElement GetDeclaredElement([CanBeNull] this FSharpSymbol symbol,
-      [NotNull] IPsiModule psiModule, [CanBeNull] IReferenceOwner referenceExpression = null)
+      [NotNull] IPsiModule psiModule, [CanBeNull] IFSharpReferenceOwner referenceExpression = null)
     {
       if (symbol == null)
         return null;
@@ -192,7 +192,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     }
 
     private static IDeclaredElement GetActivePatternCaseElement(IPsiModule psiModule,
-      IReferenceOwner referenceExpression, FSharpActivePatternCase patternCase)
+      IFSharpReferenceOwner referenceExpression, FSharpActivePatternCase patternCase)
     {
       var pattern = patternCase.Group;
       var entity = pattern.DeclaringEntity?.Value;
@@ -217,7 +217,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
     [CanBeNull]
     private static ITypeParameter GetTypeParameter([NotNull] FSharpGenericParameter parameter,
-      [CanBeNull] IReferenceOwner referenceOwnerToken = null)
+      [CanBeNull] IFSharpReferenceOwner referenceOwnerToken = null)
     {
       var containingMemberDeclaration = referenceOwnerToken?.GetContainingNode<ITypeMemberDeclaration>();
       if (!(containingMemberDeclaration?.DeclaredElement is IFSharpTypeParametersOwner containingMember))
@@ -229,14 +229,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     }
 
     public static IDeclaredElement GetActivePatternCaseElement([NotNull] FSharpActivePatternCase activePatternCase,
-      [NotNull] IPsiModule psiModule, [CanBeNull] IReferenceOwner referenceOwnerToken)
+      [NotNull] IPsiModule psiModule, [CanBeNull] IFSharpReferenceOwner referenceOwnerToken)
     {
       var declaration = GetActivePatternDeclaration(activePatternCase, psiModule, referenceOwnerToken);
       return declaration?.GetActivePatternByIndex(activePatternCase.Index);
     }
 
     private static IFSharpDeclaration GetActivePatternDeclaration([NotNull] FSharpActivePatternCase activePatternCase,
-      [NotNull] IPsiModule psiModule, IReferenceOwner referenceOwnerToken)
+      [NotNull] IPsiModule psiModule, IFSharpReferenceOwner referenceOwnerToken)
     {
       var activePattern = activePatternCase.Group;
       var declaringEntity = activePattern.DeclaringEntity?.Value;

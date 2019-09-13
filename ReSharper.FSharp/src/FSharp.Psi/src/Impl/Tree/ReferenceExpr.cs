@@ -1,39 +1,30 @@
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
+using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.ReSharper.Psi.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class ReferenceExpr
   {
-    private FSharpSymbolReference myCtorTypeReference;
+    public FSharpSymbolReference SymbolReference { get; private set; }
+    public FSharpSymbolReference CtorTypeReference { get; private set; }
 
-    public FSharpSymbolReference CtorTypeReference
+    private IReference[] myReferences;
+
+    protected override void PreInit()
     {
-      get
-      {
-        if (myCtorTypeReference == null)
-        {
-          lock (this)
-          {
-            if (myCtorTypeReference == null)
-              myCtorTypeReference = new CtorTypeReference(this);
-          }
-        }
-
-        return myCtorTypeReference;
-      }
+      base.PreInit();
+      SymbolReference = new FSharpSymbolReference(this);
+      CtorTypeReference = new TypeReference(this);
+      myReferences = new IReference[] {SymbolReference, CtorTypeReference};
     }
 
-    protected override FSharpSymbolReference CreateReference() =>
-      new FSharpSymbolReference(this);
-
     public override ReferenceCollection GetFirstClassReferences() =>
-      // todo: workaround array allocation?
-      new ReferenceCollection(Reference, CtorTypeReference);
-
-    public override ITokenNode IdentifierToken => Identifier;
+      new ReferenceCollection(myReferences);
 
     public string ShortName => Identifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
 
@@ -42,5 +33,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       Qualifier is IReferenceExpr qualifier && qualifier.QualifiedName is var qualifierName && qualifierName != null
         ? qualifierName + "." + ShortName
         : ShortName;
+
+    public override IType Type() =>
+      SymbolReference.Resolve().DeclaredElement?.Type() ?? TypeFactory.CreateUnknownType(this);
+
+    public FSharpSymbolReference Reference => SymbolReference;
+    public ITokenNode IdentifierToken => Identifier;
+
+    public IFSharpReferenceOwner SetName(string name)
+    {
+      if (IdentifierToken is var id && id != null)
+        LowLevelModificationUtil.ReplaceChildRange(id, id, new FSharpIdentifierToken(name));
+
+      return this;
+    }
   }
 }

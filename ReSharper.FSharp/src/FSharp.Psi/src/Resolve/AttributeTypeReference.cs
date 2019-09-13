@@ -7,7 +7,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
   public class AttributeTypeReference : TypeReference
   {
-    public AttributeTypeReference([NotNull] IReferenceOwner owner) : base(owner)
+    public AttributeTypeReference([NotNull] IFSharpReferenceOwner owner) : base(owner)
     {
     }
 

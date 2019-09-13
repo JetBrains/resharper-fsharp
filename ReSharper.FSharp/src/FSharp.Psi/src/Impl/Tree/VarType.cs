@@ -16,7 +16,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
   internal class VarTypeReference : FSharpSymbolReference
   {
-    public VarTypeReference([NotNull] IReferenceOwner owner) : base(owner)
+    public VarTypeReference([NotNull] IFSharpReferenceOwner owner) : base(owner)
     {
     }
 

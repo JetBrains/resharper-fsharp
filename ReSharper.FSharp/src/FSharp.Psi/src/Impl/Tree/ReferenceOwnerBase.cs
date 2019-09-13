@@ -6,7 +6,7 @@ using JetBrains.ReSharper.Psi.Tree;
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   // todo: add more specific references, replace current inheritors.
-  internal abstract class ReferenceOwnerBase : FSharpCompositeElement, IReferenceOwner, IPreventsChildResolve
+  internal abstract class ReferenceOwnerBase : FSharpCompositeElement, IFSharpReferenceOwner, IPreventsChildResolve
   {
     private FSharpSymbolReference myReference;
 
@@ -34,7 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override ReferenceCollection GetFirstClassReferences() =>
       new ReferenceCollection(Reference);
 
-    public IReferenceOwner SetName(string name)
+    public IFSharpReferenceOwner SetName(string name)
     {
       if (IdentifierToken is var id && id != null)
         LowLevelModificationUtil.ReplaceChildRange(id, id, new FSharpIdentifierToken(name));
