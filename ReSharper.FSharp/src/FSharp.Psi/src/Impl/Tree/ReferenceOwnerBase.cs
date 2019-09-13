@@ -34,12 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override ReferenceCollection GetFirstClassReferences() =>
       new ReferenceCollection(Reference);
 
-    public IFSharpReferenceOwner SetName(string name)
-    {
-      if (IdentifierToken is var id && id != null)
-        LowLevelModificationUtil.ReplaceChildRange(id, id, new FSharpIdentifierToken(name));
-
-      return this;
-    }
+    public IFSharpReferenceOwner SetName(string name) =>
+      FSharpImplUtil.SetName(this, name);
   }
 }

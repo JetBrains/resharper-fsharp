@@ -607,5 +607,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         synPat = parenPat;
       return synPat;
     }
+
+    [NotNull]
+    public static IFSharpReferenceOwner SetName([NotNull] this IFSharpReferenceOwner referenceOwner, 
+      [NotNull] string name)
+    {
+      if (referenceOwner.IdentifierToken is var id && id != null)
+        LowLevelModificationUtil.ReplaceChildRange(id, id, new FSharpIdentifierToken(name));
+
+      return referenceOwner;
+    }
   }
 }
