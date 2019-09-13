@@ -504,8 +504,8 @@ objExpr options { stubBase="FSharpExpressionBase"; }:
   namedType<BASE_TYPE, BaseType>
   fakeSeparator;
 
-objExprSecondaryInterface options { stubBase="BaseTypeReferenceOwnerBase"; }:
-  namedType<BASE_TYPE, BaseType>
+objExprSecondaryInterface:
+  typeReferenceName<TYPE_REFERENCE, TypeName>
   fakeSeparator;
 
 compExpr options { stubBase="FSharpExpressionBase"; }:
@@ -932,18 +932,22 @@ interface inheritMember:
   typeInherit |
   interfaceInherit;
 
-interfaceInherit options { stubBase="BaseTypeReferenceOwnerBase"; }:
+interfaceInherit:
   INHERIT
-  namedType<BASE_TYPE, BaseType>;
+  typeReferenceName<TYPE_REFERENCE, TypeName>;
 
-typeInherit options { stubBase="BaseTypeReferenceOwnerBase"; }:
+typeInherit:
   INHERIT
-  namedType<BASE_TYPE, BaseType>
+  typeReferenceName<TYPE_REFERENCE, TypeName>
   chameleonExpression<CHAMELEON_EXPR, CtorArg>;
 
-interfaceImplementation options { stubBase="BaseTypeReferenceOwnerBase"; }:
-  namedType<INTERFACE_TYPE, InterfaceType>
-  fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>* fakeSeparator;
+interfaceImplementation:
+  INTERFACE
+  typeReferenceName<TYPE_REFERENCE, TypeName>
+  (
+    WITH
+    fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*
+  )?;
 
 
 otherTypeMember: fakeSeparator;

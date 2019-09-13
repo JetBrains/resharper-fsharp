@@ -39,6 +39,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
   public interface IFSharpTypeParametersOwnerDeclaration : IFSharpDeclaration
   {
+    // todo: check interface implementation
     TreeNodeCollection<ITypeParameterOfTypeDeclaration> TypeParameters { get; }
   }
 }

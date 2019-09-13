@@ -18,21 +18,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       var extendListShortNames = new FrugalLocalHashSet<string>();
       foreach (var member in declaration.TypeMembersEnumerable)
       {
-        var baseTypeIdentifier = (member as ITypeInherit)?.BaseType?.ReferenceName.Identifier;
+        var baseTypeIdentifier = (member as ITypeInherit)?.TypeName?.Identifier;
         if (baseTypeIdentifier != null)
         {
           extendListShortNames.Add(baseTypeIdentifier.Name);
           continue;
         }
 
-        var interfaceImplTypeIdentifier = (member as IInterfaceImplementation)?.InterfaceType?.ReferenceName.Identifier;
+        var interfaceImplTypeIdentifier = (member as IInterfaceImplementation)?.TypeName?.Identifier;
         if (interfaceImplTypeIdentifier != null)
         {
           extendListShortNames.Add(interfaceImplTypeIdentifier.Name);
           continue;
         }
 
-        var interfaceInheritTypeIdentifier = (member as IInterfaceInherit)?.BaseType?.ReferenceName.Identifier;
+        var interfaceInheritTypeIdentifier = (member as IInterfaceInherit)?.TypeName?.Identifier;
         if (interfaceInheritTypeIdentifier != null)
           extendListShortNames.Add(interfaceInheritTypeIdentifier.Name);
       }

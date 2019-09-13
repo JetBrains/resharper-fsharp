@@ -16,12 +16,11 @@ IFSharpImplFile
       ITypeInherit
         FSharpTokenType+InheritTokenElement(type:INHERIT, text:inherit)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-        INamedType
+        ITypeReferenceName
           ITypeReferenceName
-            ITypeReferenceName
-              FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
-            FSharpTokenType+DotTokenElement(type:DOT, text:.)
-            FSharpIdentifierToken(type:IDENTIFIER, text:Bar)
+            FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
+          FSharpTokenType+DotTokenElement(type:DOT, text:.)
+          FSharpIdentifierToken(type:IDENTIFIER, text:Bar)
         IChameleonExpression
           IConstExpr
             FSharpTokenType+LparenTokenElement(type:LPAREN, text:()

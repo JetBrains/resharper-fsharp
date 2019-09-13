@@ -197,12 +197,12 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                 ElementType.IMPLICIT_CONSTRUCTOR_DECLARATION
 
             | SynMemberDefn.ImplicitInherit(baseType, args, _, _) ->
-                x.ProcessType(baseType)
+                x.ProcessTypeAsTypeReference(baseType)
                 x.MarkChameleonExpression(args)
                 ElementType.TYPE_INHERIT
 
             | SynMemberDefn.Interface(interfaceType, interfaceMembersOpt , _) ->
-                x.ProcessType(interfaceType)
+                x.ProcessTypeAsTypeReference(interfaceType)
                 match interfaceMembersOpt with
                 | Some members ->
                     for m in members do
@@ -212,7 +212,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                 ElementType.INTERFACE_IMPLEMENTATION
 
             | SynMemberDefn.Inherit(baseType, _, _) ->
-                try x.ProcessType(baseType)
+                try x.ProcessTypeAsTypeReference(baseType)
                 with _ -> () // Getting type range throws an exception if base type lid is empty.
                 ElementType.INTERFACE_INHERIT
 

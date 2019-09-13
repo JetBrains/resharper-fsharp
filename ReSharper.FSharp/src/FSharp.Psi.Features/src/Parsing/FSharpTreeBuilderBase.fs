@@ -460,6 +460,16 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
             x.Done(exprStart, ElementType.REFERENCE_EXPR)
         | _ -> failwithf "Expecting typeApp, got: %A" synExpr
 
+    member x.ProcessTypeAsTypeReference(synType) =
+        match synType with
+        | SynType.LongIdent(lid) ->
+            x.ProcessNamedTypeReference(lid.Lid)
+
+        | SynType.App(SynType.LongIdent(lid), ltRange, typeArgs, _, gtRange, isPostfix, _) ->
+            x.ProcessNamedTypeReference(lid.Lid, typeArgs, ltRange, gtRange, isPostfix)
+
+        | _ -> failwithf "unexpected type: %O" synType
+
     member x.ProcessType(TypeRange range as synType) =
         match synType with
         | SynType.LongIdent(lid) ->
@@ -479,6 +489,7 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
             x.Done(range, mark, ElementType.NAMED_TYPE)
 
         | SynType.LongIdentApp(_, _, ltRange, typeArgs, _, gtRange, _) ->
+            // todo: mark types
             let mark = x.Mark(range)
             x.ProcessTypeArgs(typeArgs, ltRange, gtRange, ElementType.PREFIX_APP_TYPE_ARGUMENT_LIST)
             x.Done(range, mark, ElementType.NAMED_TYPE)

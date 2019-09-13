@@ -63,7 +63,7 @@ type FSharpItemOccurenceKindProvider() =
             | :? AttributeTypeReference -> [| OccurrenceKind.Attribute |] :> _
             | :? OpenStatementReference -> [| FSharpItemOccurrenceKind.Import |] :> _
             | :? TypeExtensionReference -> [| FSharpItemOccurrenceKind.TypeExtension |] :> _
-            | :? BaseTypeReference -> [| OccurrenceKind.ExtendedType |] :> _
+//            | :? BaseTypeReference -> [| OccurrenceKind.ExtendedType |] :> _
 
             | :? RecordCtorReference as recordCtorReference ->
                 match recordCtorReference.RecordExpr.CopyInfoExpression with

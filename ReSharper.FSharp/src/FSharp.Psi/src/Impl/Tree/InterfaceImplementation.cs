@@ -5,12 +5,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class InterfaceImplementation
   {
-    public IFSharpIdentifierLikeNode NameIdentifier => InterfaceType?.ReferenceName.Identifier;
-
-    public TreeNodeCollection<ITypeParameterOfTypeDeclaration> TypeParameters =>
-      TreeNodeCollection<ITypeParameterOfTypeDeclaration>.Empty;
-
-    public override ITokenNode IdentifierToken =>
-      NameIdentifier?.IdentifierToken;
+    public IFSharpIdentifierLikeNode NameIdentifier => TypeName?.Identifier;
   }
 }
