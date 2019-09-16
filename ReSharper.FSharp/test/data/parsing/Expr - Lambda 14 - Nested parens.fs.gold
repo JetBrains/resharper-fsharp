@@ -8,7 +8,7 @@ IFSharpImplFile
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
           FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-          ILocalNamedPat
+          ILocalReferencePat
             FSharpIdentifierToken(type:IDENTIFIER, text:a)
           FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           FSharpTokenType+RparenTokenElement(type:RPAREN, text:))

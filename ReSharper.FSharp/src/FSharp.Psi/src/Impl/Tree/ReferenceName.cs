@@ -6,13 +6,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class TypeReferenceName
   {
-    public override ITokenNode IdentifierToken => Identifier;
+    public override ITokenNode IdentifierToken => Identifier as ITokenNode;
     public string ShortName => Identifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
   }
 
   internal partial class ExpressionReferenceName
   {
-    public override ITokenNode IdentifierToken => Identifier;
+    public override ITokenNode IdentifierToken => Identifier as ITokenNode;
 
     protected override FSharpSymbolReference CreateReference() =>
       new FSharpSymbolReference(this);

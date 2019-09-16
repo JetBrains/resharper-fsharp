@@ -1,4 +1,4 @@
-﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 {
   public class ParserMessages
   {
@@ -24,8 +24,9 @@
     public const string IDS_HASH_DIRECTIVE = "";
     public const string IDS_SYN_PAT = "";
     public const string IDS_CONST_PAT = "";
-    public const string IDS_DECLARATION_PAT = "";
-    public const string IDS_LONG_IDENT_PAT = "";
+    public const string IDS_F_SHARP_IDENTIFIER = "";
+    public const string IDS_REFERENCE_PAT = "";
+    public const string IDS_AS_PAT = "";
     public const string IDS_NAMED_PAT = "";
     public const string IDS_ARRAY_OR_LIST_PAT = "";
     public const string IDS_LET = "";

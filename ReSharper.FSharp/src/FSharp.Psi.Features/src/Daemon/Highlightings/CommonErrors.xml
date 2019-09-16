@@ -52,7 +52,7 @@
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="UnusedValue">
-    <Parameter type="IDeclarationPat" name="pat"/>
+    <Parameter type="INamedPat" name="pat"/>
     <Message value="The value '{0}' is unused">
       <Argument>pat.SourceName</Argument>
     </Message>

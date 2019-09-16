@@ -7,12 +7,12 @@ IFSharpImplFile
           FSharpTokenType+FunTokenElement(type:FUN, text:fun)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-          ILocalNamedPat
+          ILocalReferencePat
             FSharpIdentifierToken(type:IDENTIFIER, text:a)
           FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-          ILocalNamedPat
+          ILocalReferencePat
             FSharpIdentifierToken(type:IDENTIFIER, text:b)
           FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "

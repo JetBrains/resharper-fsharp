@@ -22,7 +22,7 @@ type ToRecursiveLetBindings(dataProvider: FSharpContextActionDataProvider) =
         let bindings = letBindings.Bindings
         if bindings.Count <> 1 then false else
 
-        match bindings.[0].HeadPattern.As<ILongIdentPat>() with
+        match bindings.[0].HeadPattern.As<IParametersOwnerPat>() with
         | null -> false
         | longIdentPat ->
 

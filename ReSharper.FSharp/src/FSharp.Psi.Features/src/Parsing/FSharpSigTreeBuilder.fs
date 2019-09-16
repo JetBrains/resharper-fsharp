@@ -44,8 +44,10 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
             let bindingMark = x.Mark()
 
             let patMark = x.Mark(id.idRange)
+            let referenceNameMark = x.Mark()
             if IsActivePatternName id.idText then x.ProcessActivePatternId(id, false) else x.AdvanceToEnd(id.idRange)
-            x.Done(patMark, ElementType.TOP_NAMED_PAT)
+            x.Done(referenceNameMark, ElementType.EXPRESSION_REFERENCE_NAME)
+            x.Done(patMark, ElementType.TOP_REFERENCE_PAT)
 
             for p in typeParams do
                 x.ProcessTypeParameter(p, ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION)

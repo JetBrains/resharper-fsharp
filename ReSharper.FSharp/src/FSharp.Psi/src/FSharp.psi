@@ -174,7 +174,7 @@ returnTypeInfo:
   synType<TYPE, ReturnType>;
 
 interface synPat:
-  declarationPat |
+  namedPat |
   typedPat |
   attribPat |
   orPat |
@@ -190,43 +190,61 @@ interface synPat:
   constPat |
   otherPat;
 
-interface declarationPat:
-  namedPat |
-  longIdentPat;
-
 interface namedPat:
-  topNamedPat |
-  localNamedPat;
+  referencePat |
+  parametersOwnerPat |
+  asPat;
 
-interface longIdentPat: // Used for functions, union cases and active patterns with parameters.
-  topLongIdentPat |
-  localLongIdentPat;
+interface referencePat:
+  localReferencePat |
+  topReferencePat;
+
+// todo: fix active pattern and operator decls
+interface parametersOwnerPat:
+  localParametersOwnerPat
+  topParametersOwnerPat;
+
+interface asPat:
+  localAsPat |
+  topAsPat;
+
+
+localReferencePat options { stubBase="LocalPatternDeclarationBase"; }extras {
+  get { methodName="Identifier" path=<localReferencePat:REFERENCE_NAME/expressionReferenceName:IDENTIFIER> };
+}:
+  expressionReferenceName<REFERENCE_NAME, ReferenceName>;
+
+topReferencePat options { stubBase="TopPatternDeclarationBase"; } extras {
+  get { methodName="Identifier" path=<topReferencePat:REFERENCE_NAME/expressionReferenceName:IDENTIFIER> };
+}:
+  expressionReferenceName<REFERENCE_NAME, ReferenceName>;
+
+localParametersOwnerPat options { stubBase="LocalPatternDeclarationBase"; } extras {
+  get { methodName="Identifier" path=<localParametersOwnerPat:REFERENCE_NAME/expressionReferenceName:IDENTIFIER> };
+}:
+  expressionReferenceName<REFERENCE_NAME, ReferenceName>
+  synPat<PARAMETER, Parameters>*;
+
+topParametersOwnerPat options { stubBase="TopPatternDeclarationBase"; } extras {
+  get { methodName="Identifier" path=<topParametersOwnerPat:REFERENCE_NAME/expressionReferenceName:IDENTIFIER> };
+}:
+  expressionReferenceName<REFERENCE_NAME, ReferenceName>
+  synPat<PARAMETER, Parameters>*;
+
+localAsPat options { stubBase="LocalPatternDeclarationBase"; }:
+  synPat<PATTERN, Pattern>
+  AS
+  fSharpIdentifier<IDENTIFIER, Identifier>;
+
+topAsPat options { stubBase="TopPatternDeclarationBase"; }:
+  synPat<PATTERN, Pattern>
+  AS
+  fSharpIdentifier<IDENTIFIER, Identifier>;
+
 
 interface arrayOrListPat:
   arrayPat |
   listPat;
-
-topNamedPat options { stubBase="TopPatternDeclarationBase"; }:
-  (
-    synPat<PATTERN, Pattern>
-    AS<AS, AsKeyword>
-  )?
-  identOrOpName{IDENTIFIER, Identifier};
-
-topLongIdentPat options { stubBase="TopPatternDeclarationBase"; }:
-  identOrOpName{IDENTIFIER, Identifier}
-  synPat<PARAMETER, Parameters>*;
-
-localNamedPat options { stubBase="LocalPatternDeclarationBase"; }:
-  (
-    synPat<PATTERN, Pattern>
-    AS<AS, AsKeyword>
-  )?
-  identOrOpName{IDENTIFIER, Identifier};
-
-localLongIdentPat options { stubBase="LocalPatternDeclarationBase"; }:
-  identOrOpName{IDENTIFIER, Identifier}
-  synPat<PARAMETER, Parameters>*;
 
 typedPat options { stubBase="SynPatternBase"; }:
   synPat<PATTERN, Pattern>
@@ -593,7 +611,7 @@ referenceExpr options { stubBase="FSharpExpressionBase"; } extras {
     synExpr<QUALIFIER_EXPR, Qualifier>
     DOT
   )?
-  identifier<IDENTIFIER, Identifier>
+  fSharpIdentifier<IDENTIFIER, Identifier>
   prefixAppTypeArgumentList<TYPE_ARG_LIST, TypeArgumentsList>?;
 
 matchClause options { stubBase="FSharpExpressionBase"; }:
@@ -1118,9 +1136,16 @@ longIdentifier:
     IDENTIFIER<IDENTIFIER, Identifiers>
   )*;
 
+interface fSharpIdentifier:
+  identifier |
+  symbolicOp |
+  activePatternId;
+
 abstract identifier options { interfaceName="IFSharpIdentifier"; }:
   IDENTIFIER;
 
+abstract symbolicOp options { interfaceName="IFSharpIdentifier"; }:
+  SYMBOLIC_OP;
 
 // Type parameters
 
@@ -1212,10 +1237,10 @@ prefixAppTypeArgumentList:
 
 expressionReferenceName options { stubBase="ReferenceOwnerBase"; }:
   (
-    referenceName<QUALIFIER, Qualifier>
+    expressionReferenceName<QUALIFIER, Qualifier>
     DOT<DELIMITER, Dot>
   )?
-  identifier<IDENTIFIER, Identifier>
+  fSharpIdentifier<IDENTIFIER, Identifier>
   prefixAppTypeArgumentList<TYPE_ARG, TypeArgumentList>;
 
 
@@ -1226,13 +1251,13 @@ typeReferenceName options { stubBase="TypeReferenceOwnerBase"; }:
       typeReferenceName<QUALIFIER, Qualifier>
       DOT<DELIMITER, Dot>
     )?
-    identifier<IDENTIFIER, Identifier>
+    fSharpIdentifier<IDENTIFIER, Identifier>
   |
     (
       typeReferenceName<QUALIFIER, Qualifier>
       DOT<DELIMITER, Dot>
     )?
-    identifier<IDENTIFIER, Identifier>
+    fSharpIdentifier<IDENTIFIER, Identifier>
     prefixAppTypeArgumentList<TYPE_ARG, TypeArgumentList>
   );
 

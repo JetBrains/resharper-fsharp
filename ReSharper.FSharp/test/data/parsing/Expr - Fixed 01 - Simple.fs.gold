@@ -9,8 +9,9 @@ IFSharpImplFile
             FSharpTokenType+UseTokenElement(type:USE, text:use)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             ILocalBinding
-              ILocalNamedPat
-                FSharpIdentifierToken(type:IDENTIFIER, text:x)
+              ILocalReferencePat
+                IExpressionReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:x)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "

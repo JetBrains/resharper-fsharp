@@ -23,6 +23,9 @@ type FSharpParserTest() =
     [<Test>] member x.``Let - Rec 01``() = x.DoNamedTest()
     [<Test>] member x.``Let - Rec 02 - And``() = x.DoNamedTest()
 
+    [<Test>] member x.``Let - As 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let - As 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Let - Local 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Let - Local 02 - Typed``() = x.DoNamedTest()
     [<Test>] member x.``Let - Local 03 - Typed expr``() = x.DoNamedTest()
@@ -61,6 +64,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Lambda 14 - Nested parens``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Lambda 15 - Unit``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Lambda 16 - Unit in parens``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 17 - As``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Match 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Do 01 - Simple``() = x.DoNamedTest()

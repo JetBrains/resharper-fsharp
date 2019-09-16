@@ -5,21 +5,19 @@ IFSharpImplFile
       FSharpTokenType+LetTokenElement(type:LET, text:let)
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "
       ITopBinding
-        ITopReferencePat
-          IExpressionReferenceName
-            FSharpIdentifierToken(type:IDENTIFIER, text:x)
-        IReturnTypeInfo
-          FSharpTokenType+ColonTokenElement(type:COLON, text::)
+        ITopAsPat
+          ITopReferencePat
+            IExpressionReferenceName
+              FSharpIdentifierToken(type:IDENTIFIER, text:a)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IVarType
-            FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpIdentifierToken(type:IDENTIFIER, text:T)
+          FSharpTokenType+AsTokenElement(type:AS, text:as)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpIdentifierToken(type:IDENTIFIER, text:b)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         IChameleonExpression
           IConstExpr
-            FSharpToken(type:INT32, text:123)
+            FSharpToken(type:INT32, text:1)
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

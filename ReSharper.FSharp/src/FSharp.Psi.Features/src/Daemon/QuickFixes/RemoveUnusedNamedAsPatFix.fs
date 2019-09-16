@@ -9,7 +9,7 @@ open JetBrains.ReSharper.Resources.Shell
 type RemoveUnusedNamedAsPatFix(warning: UnusedValueWarning) =
     inherit QuickFixBase()
 
-    let pat = warning.Pat.As<INamedPat>()
+    let pat = warning.Pat.As<IAsPat>()
 
     override x.Text = "Remove unused pattern"
 

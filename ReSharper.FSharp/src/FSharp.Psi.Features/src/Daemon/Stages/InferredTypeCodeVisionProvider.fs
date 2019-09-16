@@ -111,8 +111,9 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
         if not headPattern.IsDeclaration then () else
 
         match headPattern with
-        | :? ITopNamedPat
-        | :? ITopLongIdentPat ->
+        | :? ITopReferencePat
+        | :? ITopParametersOwnerPat
+        | :? ITopAsPat ->
             match box ((headPattern :?> IFSharpDeclaration).GetFSharpSymbolUse()) with
             | null -> ()
             | symbolUse ->

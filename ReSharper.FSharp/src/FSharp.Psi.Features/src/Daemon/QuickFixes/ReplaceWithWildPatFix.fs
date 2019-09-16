@@ -9,12 +9,12 @@ open JetBrains.ReSharper.Resources.Shell
 type ReplaceWithWildPatFix(warning: UnusedValueWarning) =
     inherit QuickFixBase()
 
-    let pat = warning.Pat.As<INamedPat>()
+    let pat = warning.Pat.As<IReferencePat>()
 
     override x.Text = "Replace with '_'"
 
     override x.IsAvailable _ =
-        isValid pat && isNull pat.Pattern &&
+        isValid pat &&
 
         let node = getNonPatParent pat
         node :? IBinding ||

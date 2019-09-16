@@ -237,18 +237,18 @@ type FSharpNamingService(language: FSharpLanguage) =
 
         match declaredElementPat with
         | :? INamedPat as namedPat ->
-            let longIdentPat = LongIdentPatNavigator.GetByParameter(namedPat.IgnoreParentParens())
-            if isNull longIdentPat || longIdentPat.Parameters.Count <> 1 then () else
+            let parametersOwner = ParametersOwnerPatNavigator.GetByParameter(namedPat.IgnoreParentParens())
+            if isNull parametersOwner || parametersOwner.Parameters.Count <> 1 then () else
 
-            let typeName = addSingleParamSuggestions.TryGetValue(longIdentPat.SourceName)
+            let typeName = addSingleParamSuggestions.TryGetValue(parametersOwner.SourceName)
             if isNull typeName then () else
 
-            let reference = longIdentPat.NameIdentifier.GetFirstClassReferences().FirstOrDefault()
+            let reference = parametersOwner.ReferenceName.GetFirstClassReferences().FirstOrDefault()
             if isNull reference then () else
 
             let declaredElement = reference.Resolve().DeclaredElement.As<IAttributesOwner>()
             if isNull declaredElement || not (isCompiledUnionCase declaredElement) then () else
             if declaredElement.GetContainingType().GetClrName() <> typeName then () else 
 
-            x.AddExtraNames(namesCollection, longIdentPat)            
+            x.AddExtraNames(namesCollection, parametersOwner)            
         | _ -> ()

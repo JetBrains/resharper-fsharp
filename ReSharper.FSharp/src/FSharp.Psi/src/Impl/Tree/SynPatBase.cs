@@ -1,37 +1,28 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
-using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class TopNamedPat
+  internal partial class TopReferencePat
   {
     public bool IsDeclaration => true;
 
-    public IEnumerable<IDeclaration> Declarations =>
-      Pattern?.Declarations.Prepend(this) ?? new[] {this};
-
-    /// Workaround for type members cache:
-    /// in `let a, b as c = 1, 2` we want `a` and `a, b as c` to have different offsets
-    /// so use `c` offset when identifier exists.
-    public TreeOffset GetOffset() =>
-      Identifier?.GetTreeStartOffset() ?? GetTreeStartOffset();
+    public IEnumerable<IDeclaration> Declarations => new[] {this};
   }
 
-  internal partial class LocalNamedPat
+  internal partial class LocalReferencePat
   {
-    public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
+    public override IFSharpIdentifierLikeNode NameIdentifier => ReferenceName?.Identifier;
     public bool IsDeclaration => true;
-    public IEnumerable<IDeclaration> Declarations => Pattern?.Declarations.Prepend(this) ?? new[] {this};
-    public TreeOffset GetOffset() => GetTreeStartOffset();
+    public IEnumerable<IDeclaration> Declarations => new[] {this};
   }
 
-  internal partial class LocalLongIdentPat
+  internal partial class LocalParametersOwnerPat
   {
-    public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
+    public override IFSharpIdentifierLikeNode NameIdentifier => ReferenceName?.Identifier;
 
     public bool IsDeclaration
     {
@@ -40,7 +31,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         if (Parent is IBinding)
           return true;
 
-        if (Identifier is ILongIdentifier lid && lid.Identifiers.Count > 1)
+        if (ReferenceName?.Qualifier != null)
           return false;
 
         var idOffset = GetNameIdentifierRange().StartOffset.Offset;
@@ -52,6 +43,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       IsDeclaration
         ? new[] {this}
         : Parameters.SelectMany(param => param.Declarations);
+  }
+
+  internal partial class TopAsPat
+  {
+    public override IFSharpIdentifierLikeNode NameIdentifier => Identifier;
+    protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
+    public bool IsDeclaration => true;
+    public IEnumerable<IDeclaration> Declarations => Pattern?.Declarations.Prepend(this) ?? new[] {this};
+  }
+
+  internal partial class LocalAsPat
+  {
+    public override IFSharpIdentifierLikeNode NameIdentifier => Identifier;
+    public bool IsDeclaration => true;
+    public IEnumerable<IDeclaration> Declarations => Pattern?.Declarations.Prepend(this) ?? new[] {this};
   }
 
   internal partial class OrPat
@@ -73,7 +79,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       EmptyList<IDeclaration>.Instance;
   }
 
-  internal partial class TopLongIdentPat
+  internal partial class TopParametersOwnerPat
   {
     public bool IsDeclaration => Parent is IBinding;
 

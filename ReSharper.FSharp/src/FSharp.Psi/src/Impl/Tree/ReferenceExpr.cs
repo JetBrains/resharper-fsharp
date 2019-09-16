@@ -38,7 +38,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       SymbolReference.Resolve().DeclaredElement?.Type() ?? TypeFactory.CreateUnknownType(this);
 
     public FSharpSymbolReference Reference => SymbolReference;
-    public ITokenNode IdentifierToken => Identifier;
+    public ITokenNode IdentifierToken => Identifier as ITokenNode;
 
     public IFSharpReferenceOwner SetName(string name) =>
       FSharpImplUtil.SetName(this, name);

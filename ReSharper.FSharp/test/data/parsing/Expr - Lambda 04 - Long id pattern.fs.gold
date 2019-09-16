@@ -7,11 +7,13 @@ IFSharpImplFile
           FSharpTokenType+FunTokenElement(type:FUN, text:fun)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-          ILocalLongIdentPat
-            FSharpIdentifierToken(type:IDENTIFIER, text:Some)
+          ILocalParametersOwnerPat
+            IExpressionReferenceName
+              FSharpIdentifierToken(type:IDENTIFIER, text:Some)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            ILocalNamedPat
-              FSharpIdentifierToken(type:IDENTIFIER, text:x)
+            ILocalReferencePat
+              IExpressionReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:x)
           FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)

@@ -12,21 +12,21 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class TopNamedPat
+  internal partial class TopReferencePat
   {
     protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
     public override TreeTextRange GetNameRange() => NameIdentifier.GetNameRange();
 
-    public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
+    public override IFSharpIdentifierLikeNode NameIdentifier => ReferenceName?.Identifier;
   }
 
-  internal partial class TopLongIdentPat
+  internal partial class TopParametersOwnerPat
   {
     protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
     public override string SourceName => IsDeclaration ? base.SourceName : SharedImplUtil.MISSING_DECLARATION_NAME;
     public override TreeTextRange GetNameRange() => IsDeclaration ? base.GetNameRange() : TreeTextRange.InvalidRange;
 
-    public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
+    public override IFSharpIdentifierLikeNode NameIdentifier => Identifier;
 
     protected override IDeclaredElement CreateDeclaredElement() =>
       IsDeclaration ? base.CreateDeclaredElement() : null;
@@ -81,7 +81,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         {
           case IBinding binding:
             return binding;
-          case ITopLongIdentPat _:
+          case ITopParametersOwnerPat _:
             return null;
           default:
             node = node.Parent;

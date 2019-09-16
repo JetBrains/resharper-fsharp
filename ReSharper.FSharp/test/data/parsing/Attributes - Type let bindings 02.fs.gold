@@ -32,8 +32,9 @@ IFSharpImplFile
             ITypeReferenceName
           FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          ITopNamedPat
-            FSharpIdentifierToken(type:IDENTIFIER, text:x)
+          ITopReferencePat
+            IExpressionReferenceName
+              FSharpIdentifierToken(type:IDENTIFIER, text:x)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "

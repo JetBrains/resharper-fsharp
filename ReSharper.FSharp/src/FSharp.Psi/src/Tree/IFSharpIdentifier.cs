@@ -1,8 +1,6 @@
-using JetBrains.ReSharper.Psi.Tree;
-
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
-  public interface IFSharpIdentifier : ITokenNode, IFSharpTreeNode, IFSharpIdentifierLikeNode
+  public partial interface IFSharpIdentifier : IFSharpIdentifierLikeNode
   {
   }
 }

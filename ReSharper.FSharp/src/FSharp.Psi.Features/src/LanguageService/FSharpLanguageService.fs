@@ -65,7 +65,7 @@ type FSharpLanguageService
 
     override x.CalcOffset(declaration) =
         match declaration with
-        | :? INamedPat as namedPat -> namedPat.GetOffset()
+        | :? IAsPat as asPat -> asPat.Identifier.GetTreeStartOffset()
         | _ -> base.CalcOffset(declaration)
 
     override x.GetReferenceAccessType(_, reference) =

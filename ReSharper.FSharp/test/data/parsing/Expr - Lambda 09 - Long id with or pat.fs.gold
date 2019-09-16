@@ -8,16 +8,19 @@ IFSharpImplFile
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
           IOrPat
-            ILocalLongIdentPat
-              FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
+            ILocalParametersOwnerPat
+              IExpressionReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              ILocalNamedPat
-                FSharpIdentifierToken(type:IDENTIFIER, text:x)
+              ILocalReferencePat
+                IExpressionReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:x)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+BarTokenElement(type:BAR, text:|)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            ILocalLongIdentPat
-              FSharpIdentifierToken(type:IDENTIFIER, text:Bar)
+            ILocalParametersOwnerPat
+              IExpressionReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:Bar)
               IParenPat
                 FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
                 ITuplePat
@@ -25,8 +28,9 @@ IFSharpImplFile
                     FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
                   FSharpTokenType+CommaTokenElement(type:COMMA, text:,)
                   Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                  ILocalNamedPat
-                    FSharpIdentifierToken(type:IDENTIFIER, text:x)
+                  ILocalReferencePat
+                    IExpressionReferenceName
+                      FSharpIdentifierToken(type:IDENTIFIER, text:x)
                 FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "

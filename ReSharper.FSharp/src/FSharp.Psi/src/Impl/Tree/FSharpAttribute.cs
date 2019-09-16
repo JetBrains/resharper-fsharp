@@ -8,6 +8,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     protected override FSharpSymbolReference CreateReference() =>
       new AttributeTypeReference(this);
 
-    public override ITokenNode IdentifierToken => ReferenceName?.Identifier;
+    public override ITokenNode IdentifierToken => ReferenceName?.Identifier as ITokenNode;
   }
 }

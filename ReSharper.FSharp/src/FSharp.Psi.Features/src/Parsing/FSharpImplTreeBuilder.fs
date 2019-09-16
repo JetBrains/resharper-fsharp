@@ -352,11 +352,15 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             match pat with
             | SynPat.Named(pat, id, _, _, _) ->
                 match pat with
-                | SynPat.Wild _ -> ()
-                | _ -> x.ProcessPat(pat, isLocal, false)
+                | SynPat.Wild _ ->
+                    let mark = x.Mark(id.idRange)
+                    if IsActivePatternName id.idText then x.ProcessActivePatternId(id, isLocal)
+                    x.Done(id.idRange, mark, ElementType.EXPRESSION_REFERENCE_NAME)
+                    if isLocal then ElementType.LOCAL_REFERENCE_PAT else ElementType.TOP_REFERENCE_PAT
 
-                if IsActivePatternName id.idText then x.ProcessActivePatternId(id, isLocal)
-                if isLocal then ElementType.LOCAL_NAMED_PAT else ElementType.TOP_NAMED_PAT
+                | _ ->
+                    x.ProcessPat(pat, isLocal, false)
+                    if isLocal then ElementType.LOCAL_AS_PAT else ElementType.TOP_AS_PAT
 
             | SynPat.LongIdent(lid, _, typars, args, _, _) ->
                 match lid.Lid with
@@ -373,10 +377,13 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
 
                 | _ ->
 
+                // todo: replace all lids
                 match lid.Lid with
                 | [id] ->
                     if IsActivePatternName id.idText then
                         x.ProcessActivePatternId(id, isLocal)
+                    else
+                        x.ProcessReferenceName(lid.Lid)
     
                     match typars with
                     | None -> ()
@@ -386,10 +393,10 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                         x.ProcessTypeParameter(typarDecl, ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION)
 
                 | lid ->
-                    x.ProcessLongIdentifier(lid)
+                    x.ProcessReferenceName(lid)
 
                 x.ProcessParams(args, isLocal || isTopLevelPat, false)
-                if isLocal then ElementType.LOCAL_LONG_IDENT_PAT else ElementType.TOP_LONG_IDENT_PAT
+                if isLocal then ElementType.LOCAL_PARAMETERS_OWNER_PAT else ElementType.TOP_PARAMETERS_OWNER_PAT
 
             | SynPat.Typed(pat, _, _) ->
                 x.ProcessPat(pat, isLocal, false)
@@ -893,7 +900,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             match pat with
             | SynSimplePat.Id(_, _, isGenerated, _, _, range) ->
                 if not isGenerated then
-                    x.MarkAndDone(range, ElementType.LOCAL_NAMED_PAT)
+                    x.MarkAndDone(range, ElementType.LOCAL_REFERENCE_PAT)
                     x.MarkLambdaParam(pats, lambdaBody, outerBodyExpr)
                 else
                     match outerBodyExpr with

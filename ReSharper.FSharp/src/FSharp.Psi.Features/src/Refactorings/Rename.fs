@@ -76,16 +76,16 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
 
     override x.IsLocalRename(element: IDeclaredElement) =
         match element with
-        | :? ILongIdentPat as longIdentPat -> longIdentPat.IsDeclaration
+        | :? IParametersOwnerPat as longIdentPat -> longIdentPat.IsDeclaration
         | _ -> element :? IFSharpLocalDeclaration
 
     override x.CheckLocalRenameSameDocument(element: IDeclaredElement) = x.IsLocalRename(element)
 
     override x.GetSecondaryElements(element: IDeclaredElement, newName) =
         match element with
-        | :? ILocalNamedPat as localNamedPat ->
+        | :? ILocalReferencePat as localNamedPat ->
             let mutable pat = localNamedPat :> ISynPat
-            while (pat.Parent :? ISynPat) && not (pat.Parent :? ILongIdentPat && (pat.Parent :?> ISynPat).IsDeclaration) do
+            while (pat.Parent :? ISynPat) && not (pat.Parent :? IParametersOwnerPat && (pat.Parent :?> ISynPat).IsDeclaration) do
                 pat <- pat.Parent :?> ISynPat
 
             pat.Declarations
@@ -146,7 +146,7 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
 
         for declaration in declaredElement.GetDeclarations() do
             match declaration with
-            | :? IDeclarationPat as pat -> namingService.AddExtraNames(namesCollection, pat)
+            | :? INamedPat as pat -> namingService.AddExtraNames(namesCollection, pat)
             | _ -> ()
 
 type FSharpNameValidationRule(property, element: IDeclaredElement, namingService: FSharpNamingService) as this =
@@ -167,7 +167,7 @@ type FSharpAtomicRenamesFactory() =
     override x.CheckRenameAvailability(element: IDeclaredElement) =
         match element with
         | :? FSharpGeneratedMemberBase -> RenameAvailabilityCheckResult.CanNotBeRenamed
-        | :? ILongIdentPat as pat when not pat.IsDeclaration -> RenameAvailabilityCheckResult.CanNotBeRenamed
+        | :? IParametersOwnerPat as pat when not pat.IsDeclaration -> RenameAvailabilityCheckResult.CanNotBeRenamed
 
         | :? IFSharpDeclaredElement as fsElement when fsElement.SourceName = SharedImplUtil.MISSING_DECLARATION_NAME ->
             RenameAvailabilityCheckResult.CanNotBeRenamed
