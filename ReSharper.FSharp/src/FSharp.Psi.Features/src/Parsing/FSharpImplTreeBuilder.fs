@@ -615,12 +615,12 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
 
         | SynExpr.New(_, synType, expr, _) ->
             x.PushRange(range, ElementType.NEW_EXPR)
-            x.ProcessType(synType)
+            x.ProcessTypeAsTypeReference(synType)
             x.ProcessExpression(expr)
 
         | SynExpr.ObjExpr(synType, args, bindings, interfaceImpls, _, _) ->
             x.PushRange(range, ElementType.OBJ_EXPR)
-            x.ProcessType(synType)
+            x.ProcessTypeAsTypeReference(synType)
             x.PushStepList(interfaceImpls, interfaceImplementationListProcessor)
             x.PushStepList(bindings, bindingListProcessor)
 
@@ -745,7 +745,6 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             x.PushExpression(expr2)
             x.ProcessExpression(expr1)
 
-        // todo: mark lid
         | SynExpr.NamedIndexedPropertySet(lid, expr1, expr2, _) ->
             x.PushRange(range, ElementType.SET_EXPR)
             x.PushRange(unionRanges lid.Range expr2.Range, ElementType.NAMED_INDEXER_EXPR)
@@ -957,7 +956,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
     
     member x.ProcessInterfaceImplementation(InterfaceImpl(interfaceType, bindings, range)) =
         x.PushRange(range, ElementType.OBJ_EXPR_SECONDARY_INTERFACE)
-        x.ProcessType(interfaceType)
+        x.ProcessTypeAsTypeReference(interfaceType)
         x.ProcessBindings(bindings)
 
     member x.ProcessSynIndexerArg(arg) =

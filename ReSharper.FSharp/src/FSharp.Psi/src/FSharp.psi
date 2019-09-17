@@ -482,9 +482,9 @@ recordExprBinding:
   SEMICOLON<SEMI, Semicolon>?;
 
 newExpr options { stubBase="FSharpExpressionBase"; }:
-  namedType<TYPE, Type>
+  NEW
   typeReferenceName<TYPE_REFERENCE, TypeName>
-  fakeSeparator;
+  synExpr<EXPR, ArgExpression>;
 
 forExpr options { stubBase="FSharpExpressionBase"; }:
   FOR
@@ -519,8 +519,12 @@ whileExpr options { stubBase="FSharpExpressionBase"; }:
   synExpr<DO_EXPR, DoExpression>;
 
 objExpr options { stubBase="FSharpExpressionBase"; }:
-  namedType<BASE_TYPE, BaseType>
-  fakeSeparator;
+  LBRACE
+  NEW
+  typeReferenceName<TYPE_REFERENCE, TypeName>
+  WITH
+  fakeSeparator
+  RBRACE;
 
 objExprSecondaryInterface:
   typeReferenceName<TYPE_REFERENCE, TypeName>
