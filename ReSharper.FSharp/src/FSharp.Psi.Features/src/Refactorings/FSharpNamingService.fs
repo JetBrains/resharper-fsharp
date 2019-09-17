@@ -53,6 +53,22 @@ type FSharpNamingService(language: FSharpLanguage) =
         // F# 4.1 spec: 3.4 Identifiers and Keywords
         [| '.'; '+'; '$'; '&'; '['; ']'; '/'; '\\'; '*'; '\"'; '`' |]
 
+    let abbreviationsMap =
+        [| "object", "o"
+           "char", "c"
+           "int32", "i"
+           "string", "s"
+           "bool", "b"
+           "byte", "b"
+           "int16", "s"
+           "uint32", "u"
+           "double", "d"
+           "single", "s"
+           "long", "l"
+           "namespace", "ns"
+           "list", "l" |]
+        |> dict
+
     let withWords words (nameRoot: NameRoot) =
         NameRoot(Array.ofList words, nameRoot.PluralityKind, nameRoot.IsFinalPresentation)
 
@@ -252,3 +268,11 @@ type FSharpNamingService(language: FSharpLanguage) =
 
             x.AddExtraNames(namesCollection, parametersOwner)            
         | _ -> ()
+
+    override x.GetAbbreviation(root) =
+        if root.Words.Count <> 1 then null else
+
+        let mutable value = Unchecked.defaultof<_>
+        if not (abbreviationsMap.TryGetValue(root.FirstWord.Text.ToLower(), &value)) then null else
+
+        NameRoot.FromWords(root.Emphasis, false, value)
