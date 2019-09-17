@@ -26,6 +26,7 @@ module FSharpErrors =
     let [<Literal>] UseBindingsIllegalInImplicitClassConstructors = 523
     let [<Literal>] LetAndForNonRecBindings = 576
     let [<Literal>] FieldRequiresAssignment = 764
+    let [<Literal>] SuccessiveArgsShouldBeSpacedOrTupled = 597
     let [<Literal>] EmptyRecordInvalid = 789
     let [<Literal>] UseBindingsIllegalInModules = 524
     let [<Literal>] LocalClassBindingsCannotBeInline = 894
@@ -101,6 +102,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | FieldRequiresAssignment ->
             FieldRequiresAssignmentError(getNode range, error.Message) :> _
+
+        | SuccessiveArgsShouldBeSpacedOrTupled ->
+            SuccessiveArgsShouldBeSpacedOrTupledError(getNode range) :> _
 
         | EmptyRecordInvalid ->
             EmptyRecordInvalidError(getNode range, error.Message) :> _

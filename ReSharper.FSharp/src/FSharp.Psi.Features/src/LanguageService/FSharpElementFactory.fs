@@ -127,3 +127,8 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             ModificationUtil.AddChildBefore(whitespace, NewLine(expr.FSharpFile.GetLineEnding())) |> ignore
 
             matchExpr
+
+        member x.CreateParenExpr() =
+            let moduleDeclaration = getModuleDeclaration "(())"
+            let doDecl = moduleDeclaration.Members.First().As<IDo>().NotNull()
+            doDecl.Expression.As<IParenExpr>()

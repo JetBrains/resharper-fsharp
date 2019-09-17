@@ -166,4 +166,13 @@
     <Message value="Cannot apply indexing to an expression"/>
     <Behavour overlapResolvePolicy="NONE"/>
   </Error>
+
+  <Error staticGroup="FSharpErrors" name="SuccessiveArgsShouldBeSpacedOrTupled">
+    <Parameter type="IPrefixAppExpr" name="expr"/>
+    <Range>expr.GetHighlightingRange()</Range>
+    <Message value="Successive arguments should be separated by spaces, tupled, or parenthesized"/>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>AddParensFix</QuickFix>
+  </Error>
+  
 </Errors>
