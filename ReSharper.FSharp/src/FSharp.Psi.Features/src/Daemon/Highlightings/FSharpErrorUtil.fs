@@ -2,6 +2,7 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.FSharpErrorUtil
 
 open JetBrains.DocumentModel
+open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.Util
@@ -13,3 +14,8 @@ let getUpcastRange (upcastExpr: IUpcastExpr) =
     let operatorRange = upcastExpr.OperatorToken.GetNavigationRange()
 
     DocumentRange(documentRange.Document, TextRange(operatorRange.StartOffset.Offset, documentRange.EndOffset.Offset))
+
+let getIndexerArgListRange (indexerExpr: IItemIndexerExpr) =
+    match indexerExpr.IndexerArgList with
+    | null -> indexerExpr.GetHighlightingRange()
+    | argList -> argList.GetHighlightingRange()

@@ -32,6 +32,8 @@ module FSharpErrors =
     let [<Literal>] UnusedValue = 1182
     let [<Literal>] UnusedThisVariable = 1183
 
+    let [<Literal>] undefinedIndexerMessage = "The field, constructor or member 'Item' is not defined."
+
 [<AbstractClass>]
 type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
@@ -58,9 +60,14 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         match error.ErrorNumber with
         | UndefinedName ->
-            match ReferenceExprNavigator.GetByIdentifier(fsFile.GetNode(range)) with
-            | null -> UnresolvedHighlighting(error.Message, range) :> _
-            | refExpr -> UndefinedNameError(refExpr.Reference, error.Message) :> _
+            if (error.Message = undefinedIndexerMessage &&
+                    let indexer = fsFile.GetNode(range) in isNotNull indexer) then
+                UndefinedIndexerError(fsFile.GetNode(range)) :> _ else
+
+            let refExpr = ReferenceExprNavigator.GetByIdentifier(fsFile.GetNode(range))
+            if isNotNull refExpr then UndefinedNameError(refExpr.Reference, error.Message) :> _ else
+
+            UnresolvedHighlighting(error.Message, range) :> _
 
         | UpcastUnnecessary -> UpcastUnnecessaryWarning(getNode range) :> _
 

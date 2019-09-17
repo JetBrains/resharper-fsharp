@@ -142,7 +142,7 @@
   <Warning staticGroup="FSharpErrors" name="UpcastUnnecessary">
     <Parameter type="IUpcastExpr" name="upcastExpr"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
-    <Range>FSharpErrorUtil.getUpcastRange upcastExpr</Range>
+    <Range>getUpcastRange upcastExpr</Range>
     <Message value="Upcast is unnecessary"/>
     <QuickFix>RemoveUnnecessaryUpcastFix</QuickFix>
   </Warning>
@@ -153,9 +153,17 @@
     <Message value="{0}">
       <Argument>fcsMessage</Argument>
     </Message>
+    <!--todo: identifier null check-->
     <Range>reference.GetElement().IdentifierToken.GetNavigationRange()</Range>
     <Behavour attributeID="UNRESOLVED_ERROR" overlapResolvePolicy="NONE"/>
     <QuickFix>ToRecursiveFunctionFix</QuickFix>
     <QuickFix arguments="h.Reference">ImportTypeFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="UndefinedIndexer">
+    <Parameter type="IItemIndexerExpr" name="indexerExpr"/>
+    <Range>getIndexerArgListRange indexerExpr</Range>
+    <Message value="Cannot apply indexing to an expression"/>
+    <Behavour overlapResolvePolicy="NONE"/>
   </Error>
 </Errors>
