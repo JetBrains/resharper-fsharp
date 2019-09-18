@@ -112,8 +112,9 @@ type FSharpPathCompletionProvider() =
         | "I"    -> Some (Set.empty, null)
         | _ -> None
 
-    override x.IsAvailable(_) = true
+    override x.IsAvailable _ = true
     override x.GetDefaultRanges(context) = context.Ranges
+    override x.GetLookupFocusBehaviour _ = LookupFocusBehaviour.Soft
 
     override x.AddLookupItems(context, collector) =
         let filePath = context.BasicContext.SourceFile.GetLocation()
@@ -182,7 +183,7 @@ type FSharpFolderCompletionItem(path: FileSystemPath) =
     override x.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret) =
         base.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret)
         textControl.RescheduleCompletion(solution)
-        
+
 
 [<SolutionComponent>]
 type FSharpPathAutocompletionStrategy() =
@@ -190,19 +191,22 @@ type FSharpPathAutocompletionStrategy() =
 
         member x.Language = FSharpLanguage.Instance :> _
         member x.AcceptsFile(file, textControl) =
-            match file with
-            | :? IFSharpFile as fsFile ->
-                let offset = TreeOffset(textControl.Caret.Offset() - 1)
-                let token = fsFile.FindTokenAt(offset)
-                if isNull token then false else
+            match file.As<IFSharpFile>() with
+            | null -> false
+            | fsFile ->
 
-                match token.GetTokenType() with
-                | null -> false
-                | tokenType -> tokenType.IsStringLiteral && token.Parent :? IHashDirective
-            | _ -> false
+            let offset = TreeOffset(textControl.Caret.Offset() - 1)
+            let token = fsFile.FindTokenAt(offset)
+            if isNull token then false else
 
-        member x.AcceptTyping(char,_,_) = Array.contains char FileSystemDefinition.InvalidPathChars |> not
+            match token.GetTokenType() with
+            | null -> false
+            | tokenType -> tokenType.IsStringLiteral && token.Parent :? IHashDirective
+
+        member x.AcceptTyping(char, _, _) =
+            not (Array.contains char FileSystemDefinition.InvalidPathChars)
+
         member x.ProcessSubsequentTyping(_, _) = true
 
-        member x.IsEnabledInSettings(_, _) = AutopopupType.HardAutopopup
+        member x.IsEnabledInSettings(_, _) = AutopopupType.SoftAutopopup
         member x.ForceHideCompletion = false
