@@ -13,12 +13,17 @@ type IFSharpElementFactory =
     abstract CreateWildPat: unit -> IWildPat
     abstract CreateParenExpr: unit -> IParenExpr
     abstract CreateConstExpr: text: string -> IConstExpr
+
+    abstract CreateAppExpr: addSpace: bool -> IAppExpr
     abstract CreateAppExpr: funcName: string * arg: ISynExpr -> IAppExpr
+    abstract CreateAppExpr: funExpr: ISynExpr * argExpr: ISynExpr * addSpace: bool -> IAppExpr
+
     abstract CreateLetBindingExpr: bindingName: string * expr: ISynExpr -> ILetOrUseExpr
     abstract CreateIgnoreApp: ISynExpr * newLine: bool -> IAppExpr
     abstract CreateRecordExprBinding: fieldName: string * addSemicolon: bool -> IRecordExprBinding
     abstract CreateMatchExpr: ISynExpr -> IMatchExpr
 
+    abstract AsReferenceExpr: typeReference: ITypeReferenceName -> IReferenceExpr
 
 [<AllowNullLiteral>]
 type IFSharpLanguageService =

@@ -33,6 +33,12 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         let fsFile = createFile source
         fsFile.Declarations.First()
 
+    let createAppExpr addSpace =
+        let space = if addSpace then " " else ""
+        let source = sprintf "()%s()" space
+        let moduleDeclaration = getModuleDeclaration source
+        moduleDeclaration.Members.First().As<IDo>().NotNull().Expression.As<IAppExpr>().NotNull()
+
     interface IFSharpElementFactory with
         member x.CreateOpenStatement(ns) =
             // todo: mangle ns
@@ -92,6 +98,15 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             ModificationUtil.ReplaceChild(appExpr.ArgumentExpression, expr) |> ignore
             appExpr
 
+        member x.CreateAppExpr(addSpace) =
+            createAppExpr addSpace
+
+        member x.CreateAppExpr(funExpr, argExpr, addSpace) =
+            let appExpr = createAppExpr addSpace
+            appExpr.SetFunctionExpression(funExpr.Copy()) |> ignore
+            appExpr.SetArgumentExpression(argExpr.Copy()) |> ignore
+            appExpr
+
         member x.CreateLetBindingExpr(bindingName, expr) =
             let source = sprintf "do (let %s = ())" bindingName
             let moduleDeclaration = getModuleDeclaration source
@@ -132,3 +147,8 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let moduleDeclaration = getModuleDeclaration "(())"
             let doDecl = moduleDeclaration.Members.First().As<IDo>().NotNull()
             doDecl.Expression.As<IParenExpr>()
+
+        member x.AsReferenceExpr(typeReference: ITypeReferenceName) =
+            let moduleDeclaration = getModuleDeclaration (typeReference.GetText())
+            let doDecl = moduleDeclaration.Members.First().As<IDo>().NotNull()
+            doDecl.Expression.As<IReferenceExpr>()

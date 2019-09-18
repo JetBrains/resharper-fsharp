@@ -482,7 +482,7 @@ recordExprBinding:
   SEMICOLON<SEMI, Semicolon>?;
 
 newExpr options { stubBase="FSharpExpressionBase"; }:
-  NEW
+  NEW<NEW, NewKeyword>
   typeReferenceName<TYPE_REFERENCE, TypeName>
   synExpr<EXPR, ArgExpression>;
 
