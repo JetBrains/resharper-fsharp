@@ -14,6 +14,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Naming.Extentions
 open JetBrains.ReSharper.Psi.Naming.Impl
 open JetBrains.ReSharper.Psi.Naming.Interfaces
+open JetBrains.ReSharper.Psi.Naming.Settings
 open JetBrains.Util
 
 [<AutoOpen>]
@@ -276,3 +277,10 @@ type FSharpNamingService(language: FSharpLanguage) =
         if not (abbreviationsMap.TryGetValue(root.FirstWord.Text.ToLower(), &value)) then null else
 
         NameRoot.FromWords(root.Emphasis, false, value)
+
+    override x.GetNamedElementKind(element) =
+        let declarations = element.GetDeclarations()
+        if declarations |> Seq.exists (fun decl -> decl :? ISynPat) then
+            NamedElementKinds.Locals
+        else
+            base.GetNamedElementKind(element)
