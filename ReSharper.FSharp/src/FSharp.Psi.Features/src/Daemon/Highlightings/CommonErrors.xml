@@ -71,6 +71,7 @@
     <Range>expr.GetNavigationRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>AddIgnoreFix</QuickFix>
+    <QuickFix>RemoveSubsequentFix</QuickFix>
   </Warning>
 
   <Error staticGroup="FSharpErrors" name="FieldRequiresAssignment">

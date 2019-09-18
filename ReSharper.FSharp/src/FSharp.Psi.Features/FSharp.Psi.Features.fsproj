@@ -61,6 +61,7 @@
     <Compile Include="src\Daemon\QuickFixes\RemoveUnnecessaryUpcastFix.fs" />
     <Compile Include="src\Daemon\QuickFixes\ToRecursiveFunctionFix.fs" />
     <Compile Include="src\Daemon\QuickFixes\AddParensFix.fs" />
+    <Compile Include="src\Daemon\QuickFixes\RemoveSubsequentFix.fs" />
     <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
       <Mode>QUICKFIX</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>
