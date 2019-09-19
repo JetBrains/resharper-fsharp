@@ -12,8 +12,3 @@ Base type
 TO: [O] interface System.|IDisposable| with RANGE: (50,61) @ Base Type 03 - Interface.fs
 
 
-Type specification
----
-TO: [O] interface System.|IDisposable| with RANGE: (50,61) @ Base Type 03 - Interface.fs
-
-

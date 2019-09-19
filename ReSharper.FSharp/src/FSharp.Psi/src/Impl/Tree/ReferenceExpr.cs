@@ -1,3 +1,5 @@
+using FSharp.Compiler.SourceCodeServices;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
@@ -8,7 +10,7 @@ using JetBrains.ReSharper.Psi.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class ReferenceExpr
+  internal partial class ReferenceExpr : IPreventsChildResolve
   {
     public FSharpSymbolReference SymbolReference { get; private set; }
     public FSharpSymbolReference CtorTypeReference { get; private set; }
@@ -19,7 +21,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       base.PreInit();
       SymbolReference = new FSharpSymbolReference(this);
-      CtorTypeReference = new TypeReference(this);
+      CtorTypeReference = new ReferenceExpressionTypeReference(this);
       myReferences = new IReference[] {SymbolReference, CtorTypeReference};
     }
 
@@ -42,5 +44,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public IFSharpReferenceOwner SetName(string name) =>
       FSharpImplUtil.SetName(this, name);
+  }
+
+  public class ReferenceExpressionTypeReference : FSharpSymbolReference
+  {
+    public ReferenceExpressionTypeReference([NotNull] IFSharpReferenceOwner owner) : base(owner)
+    {
+    }
+
+    public override FSharpSymbol GetFSharpSymbol()
+    {
+      if (base.GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv && mfv.IsConstructor)
+        return mfv.DeclaringEntity?.Value;
+
+      return null;
+    }
   }
 }

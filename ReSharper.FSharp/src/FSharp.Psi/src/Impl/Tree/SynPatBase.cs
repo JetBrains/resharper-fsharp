@@ -122,7 +122,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class RecordPat
   {
     public override IEnumerable<IDeclaration> Declarations =>
-      Patterns.SelectMany(pat => pat.Declarations);
+      FieldPatterns.SelectMany(pat => pat.Pattern?.Declarations).WhereNotNull();
   }
 
   internal partial class OptionalValPat

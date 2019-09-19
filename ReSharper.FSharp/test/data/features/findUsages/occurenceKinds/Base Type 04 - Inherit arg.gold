@@ -1,29 +1,30 @@
 ﻿Other
 ---
 TO: [O] namespace |Ns| RANGE: (10,12) @ Base Type 04 - Inherit arg.fs
-TO: [O] module |Module1| = RANGE: (23,30) @ Base Type 04 - Inherit arg.fs
-TO: [O] type |Base|(s: System.String) = RANGE: (43,47) @ Base Type 04 - Inherit arg.fs
-TO: [O] type Base(|s|: System.String) = RANGE: (48,49) @ Base Type 04 - Inherit arg.fs
-TO: [O] type Base(s: |System|.String) = RANGE: (51,57) @ Base Type 04 - Inherit arg.fs
-TO: [O] module |Module2| = RANGE: (106,113) @ Base Type 04 - Inherit arg.fs
-TO: [O] type |T|() = RANGE: (126,127) @ Base Type 04 - Inherit arg.fs
-TO: [O] inherit |Module1|.Base(System.String('a', 1)) RANGE: (149,156) @ Base Type 04 - Inherit arg.fs
-TO: [O] inherit Module1.Base(|System|.String('a', 1)) RANGE: (162,168) @ Base Type 04 - Inherit arg.fs
+TO: [O] open |System| RANGE: (21,27) @ Base Type 04 - Inherit arg.fs
+TO: [O] module |Module1| = RANGE: (38,45) @ Base Type 04 - Inherit arg.fs
+TO: [O] type |Base|(s: String) = RANGE: (58,62) @ Base Type 04 - Inherit arg.fs
+TO: [O] type Base(|s|: String) = RANGE: (63,64) @ Base Type 04 - Inherit arg.fs
+TO: [O] type Base(s: |String|) = RANGE: (66,72) @ Base Type 04 - Inherit arg.fs
+TO: [O] module |Module2| = RANGE: (114,121) @ Base Type 04 - Inherit arg.fs
+TO: [O] type |T|() = RANGE: (134,135) @ Base Type 04 - Inherit arg.fs
+TO: [O] inherit Module1.|Base|(String('a', 1)) RANGE: (165,169) @ Base Type 04 - Inherit arg.fs
+TO: [O] inherit |Module1|.Base(String('a', 1)) RANGE: (157,164) @ Base Type 04 - Inherit arg.fs
+TO: [O] inherit Module1.Base(|String|('a', 1)) RANGE: (170,176) @ Base Type 04 - Inherit arg.fs
 
 
-Type specification
+Module or namespace import
 ---
-TO: [O] type Base(s: System.|String|) = RANGE: (58,64) @ Base Type 04 - Inherit arg.fs
+TO: [O] open |System| RANGE: (21,27) @ Base Type 04 - Inherit arg.fs
 
 
 Base type
 ---
-TO: [O] inherit Module1.|Base|(System.String('a', 1)) RANGE: (157,161) @ Base Type 04 - Inherit arg.fs
+TO: [O] inherit Module1.|Base|(String('a', 1)) RANGE: (165,169) @ Base Type 04 - Inherit arg.fs
 
 
 New instance creation
 ---
-TO: [O] inherit Module1.|Base|(System.String('a', 1)) RANGE: (157,161) @ Base Type 04 - Inherit arg.fs
-TO: [O] inherit Module1.Base(System.|String|('a', 1)) RANGE: (169,175) @ Base Type 04 - Inherit arg.fs
+TO: [O] inherit Module1.Base(|String|('a', 1)) RANGE: (170,176) @ Base Type 04 - Inherit arg.fs
 
 

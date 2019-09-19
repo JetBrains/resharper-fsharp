@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService
 
+open FSharp.Compiler.SourceCodeServices
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Checker
@@ -68,24 +69,47 @@ type FSharpLanguageService
         | :? IAsPat as asPat -> asPat.Identifier.GetTreeStartOffset()
         | _ -> base.CalcOffset(declaration)
 
-    override x.GetReferenceAccessType(_, reference) =
+    member x.GetDefaultAccessType(declaredElement: IDeclaredElement) =
+        // todo: invocations, partial applications
+        match declaredElement with
+        | :? IField
+        | :? IProperty -> ReferenceAccessType.READ
+
+        | :? IFSharpLocalDeclaration as localDecl ->
+            let fsSymbol = localDecl.GetFSharpSymbol()
+            if not (fsSymbol :? FSharpMemberOrFunctionOrValue) then ReferenceAccessType.OTHER else
+
+            let mfv = fsSymbol :?> FSharpMemberOrFunctionOrValue
+            if not mfv.FullType.IsFunctionType then ReferenceAccessType.READ else 
+
+            ReferenceAccessType.OTHER
+
+        | _ -> ReferenceAccessType.OTHER
+
+    override x.GetReferenceAccessType(declaredElement, reference) =
         match reference.As<FSharpSymbolReference>() with
         | null -> ReferenceAccessType.OTHER
         | symbolReference ->
 
-        let referenceExpression: ISynExpr =
-            match symbolReference.GetElement().As<IFSharpReferenceOwner>() with
-            | :? FSharpIdentifierToken as idToken ->
-                ReferenceExprNavigator.GetByIdentifier(idToken.As<IFSharpIdentifier>()) :> _
+        match symbolReference.GetElement() with
+        | :? IReferenceExpr as referenceExpr ->
+            if isNotNull (SetExprNavigator.GetByLeftExpression(referenceExpr.IgnoreParentParens())) then
+                ReferenceAccessType.WRITE else
 
-            | :? IReferenceExpr as refExpr ->
-                refExpr.IgnoreParentParens()
+            let indexerExpr = IndexerExprNavigator.GetByExpression(referenceExpr.IgnoreParentParens())
+            if isNotNull indexerExpr && isNotNull (SetExprNavigator.GetByLeftExpression(indexerExpr)) then
+                ReferenceAccessType.READ else
 
-            | _ -> null
+            x.GetDefaultAccessType(declaredElement)
 
-        match SetExprNavigator.GetByLeftExpression(referenceExpression) with
-        | null -> ReferenceAccessType.OTHER
-        | _ -> ReferenceAccessType.WRITE
+        | :? IExpressionReferenceName as referenceName ->
+            if isNotNull (RecordExprBindingNavigator.GetByReferenceName(referenceName)) then
+                ReferenceAccessType.WRITE else
+
+            x.GetDefaultAccessType(declaredElement)
+
+        | _ ->
+            x.GetDefaultAccessType(declaredElement)
 
     override x.CreateElementPointer(declaredElement) =
         match declaredElement.As<IFSharpGeneratedFromOtherElement>() with

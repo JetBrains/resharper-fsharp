@@ -69,7 +69,10 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Match 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Do 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Assert 01 - Simple``() = x.DoNamedTest()
+
     [<Test>] member x.``Expr - TryWith 01 - Simple``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - TryWith 02 - Parameters``() = x.DoNamedTest()
+
     [<Test>] member x.``Expr - TryFinally 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Lazy 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - IfThenElse 01 - Simple``() = x.DoNamedTest()
@@ -166,3 +169,7 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Module member - Open 01``() = x.DoNamedTest()
     [<Test>] member x.``Module member - Open 02 - Qualifier``() = x.DoNamedTest()
+
+    [<Test>] member x.``Pattern - Record 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Record 02 - Qualified name``() = x.DoNamedTest()
+

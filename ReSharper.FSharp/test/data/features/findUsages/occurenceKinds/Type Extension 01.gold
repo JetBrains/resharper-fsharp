@@ -11,7 +11,7 @@ TO: [O] member |x|.Foo = 123 RANGE: (131,132) @ Type Extension 01.fs
 TO: [O] member x.|Foo| = 123 RANGE: (133,136) @ Type Extension 01.fs
 
 
-Type specification
+Field declaration
 ---
 TO: [O] { Field: |int| } RANGE: (40,43) @ Type Extension 01.fs
 

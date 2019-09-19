@@ -1,0 +1,12 @@
+﻿Other
+---
+TO: [O] module |Module| RANGE: (7,13) @ Type Test 02 - Pattern.fs
+TO: [O] | :? |System|.String -> () RANGE: (56,62) @ Type Test 02 - Pattern.fs
+
+
+Type checking
+---
+TO: [O] | :? |string| -> () RANGE: (37,43) @ Type Test 02 - Pattern.fs
+TO: [O] | :? System.|String| -> () RANGE: (63,69) @ Type Test 02 - Pattern.fs
+
+

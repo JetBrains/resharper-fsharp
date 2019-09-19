@@ -1,0 +1,17 @@
+﻿Other
+---
+TO: [O] module |Module| RANGE: (7,13) @ Exception - Singleton 01.fs
+TO: [O] exception |Exn| RANGE: (27,30) @ Exception - Singleton 01.fs
+TO: [O] let e = |Exn| RANGE: (42,45) @ Exception - Singleton 01.fs
+
+
+Pattern
+---
+TO: [O] let |e| = Exn RANGE: (38,39) @ Exception - Singleton 01.fs
+
+
+New instance creation
+---
+TO: [O] let e = |Exn| RANGE: (42,45) @ Exception - Singleton 01.fs
+
+

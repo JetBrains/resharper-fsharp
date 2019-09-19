@@ -1,0 +1,20 @@
+﻿Other
+---
+TO: [O] module |Module| RANGE: (7,13) @ Exception - Fields 03 - Members.fs
+TO: [O] exception |Exn| of int RANGE: (27,30) @ Exception - Fields 03 - Members.fs
+TO: [O] with static member |Foo| = 123 RANGE: (58,61) @ Exception - Fields 03 - Members.fs
+TO: [O] Exn.|Foo| RANGE: (75,78) @ Exception - Fields 03 - Members.fs
+TO: [O] |Exn|.Foo RANGE: (71,74) @ Exception - Fields 03 - Members.fs
+TO: [O] |Exn|.Foo RANGE: (71,74) @ Exception - Fields 03 - Members.fs
+
+
+Field declaration
+---
+TO: [O] exception Exn of |int| RANGE: (34,37) @ Exception - Fields 03 - Members.fs
+
+
+Read access
+---
+TO: [R] Exn.|Foo| RANGE: (75,78) @ Exception - Fields 03 - Members.fs
+
+

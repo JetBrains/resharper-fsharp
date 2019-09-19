@@ -96,6 +96,7 @@ type ITreeNode with
             x.GetStartLine(document) = x.GetEndLine(document)
 
 let getNode<'T when 'T :> ITreeNode and 'T : null> (fsFile: IFSharpFile) (range: DocumentRange) =
+    // todo: use IExpressionSelectionProvider
     let node = fsFile.GetNode<'T>(range)
     if isNull node then failwithf "Couldn't get %O from range %O" typeof<'T>.Name range else
     node
@@ -109,9 +110,7 @@ let (|Whitespace|_|) (treeNode: ITreeNode) =
 let (|IgnoreParenPat|) (pat: ISynPat) = pat.IgnoreParentParens()
 
 let (|IgnoreInnerParenExpr|) (expr: ISynExpr) =
-    match expr with
-    | :? IParenExpr as parenExpr -> parenExpr.InnerExpression
-    | _ -> expr
+    expr.IgnoreInnerParens()
 
 [<AutoOpen>]
 module PsiModificationUtil =

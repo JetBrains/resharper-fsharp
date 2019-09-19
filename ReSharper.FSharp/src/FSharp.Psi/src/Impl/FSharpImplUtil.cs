@@ -340,6 +340,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static bool IsUnion([NotNull] this ITypeElement type) =>
       GetPart<IUnionPart>(type) != null;
 
+    public static bool IsUnionCase([NotNull] this ITypeElement type) =>
+      GetPart<UnionCasePart>(type) != null;
+
     [NotNull]
     public static IList<IUnionCase> GetUnionCases([CanBeNull] this ITypeElement type) =>
       GetPart<IUnionPart>(type)?.Cases ?? EmptyList<IUnionCase>.Instance;
@@ -595,6 +598,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     {
       while (synExpr.Parent is IParenExpr parenExpr)
         synExpr = parenExpr;
+      return synExpr;
+    }
+    
+    [CanBeNull]
+    public static ISynExpr IgnoreInnerParens([CanBeNull] this ISynExpr synExpr)
+    {
+      if (synExpr == null)
+        return null;
+
+      while (synExpr is IParenExpr parenExpr && parenExpr.InnerExpression != null)
+        synExpr = parenExpr.InnerExpression;
       return synExpr;
     }
     

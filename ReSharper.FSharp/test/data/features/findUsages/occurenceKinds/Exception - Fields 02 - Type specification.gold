@@ -1,0 +1,21 @@
+﻿Other
+---
+TO: [O] module |Module| RANGE: (7,13) @ Exception - Fields 02 - Type specification.fs
+TO: [O] exception |Exn| of int RANGE: (27,30) @ Exception - Fields 02 - Type specification.fs
+
+
+Field declaration
+---
+TO: [O] exception Exn of |int| RANGE: (34,37) @ Exception - Fields 02 - Type specification.fs
+
+
+Pattern
+---
+TO: [O] let |e|: Exn = () RANGE: (45,46) @ Exception - Fields 02 - Type specification.fs
+
+
+Type specification
+---
+TO: [O] let e: |Exn| = () RANGE: (48,51) @ Exception - Fields 02 - Type specification.fs
+
+

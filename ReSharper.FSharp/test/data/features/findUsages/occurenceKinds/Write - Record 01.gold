@@ -1,0 +1,27 @@
+﻿Other
+---
+TO: [O] module |Module| RANGE: (7,13) @ Write - Record 01.fs
+TO: [O] type |R| = { mutable F: int } RANGE: (22,23) @ Write - Record 01.fs
+TO: [O] type R = { mutable |F|: int } RANGE: (36,37) @ Write - Record 01.fs
+
+
+Field declaration
+---
+TO: [O] type R = { mutable F: |int| } RANGE: (39,42) @ Write - Record 01.fs
+
+
+Pattern
+---
+TO: [O] let |r| = { F = 123 } RANGE: (50,51) @ Write - Record 01.fs
+
+
+New instance creation
+---
+TO: [O] let r = |{ F = 123 }| RANGE: (54,65) @ Write - Record 01.fs
+
+
+Write access
+---
+TO: [W] let r = { |F| = 123 } RANGE: (56,57) @ Write - Record 01.fs
+
+

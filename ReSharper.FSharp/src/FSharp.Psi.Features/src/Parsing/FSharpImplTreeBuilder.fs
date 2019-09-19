@@ -425,8 +425,23 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                 ElementType.PAREN_PAT
 
             | SynPat.Record(pats, _) ->
-                for _, pat in pats do
+                for (lid, IdentRange range), pat in pats do
+                    let fieldMark =
+                        match lid with
+                        | IdentRange headRange :: _ ->
+                            let fieldMark = x.Mark(headRange)
+                            let referenceNameMark = x.Mark()
+                            x.ProcessReferenceName(lid)
+                            x.Done(range, referenceNameMark, ElementType.EXPRESSION_REFERENCE_NAME)
+                            fieldMark
+
+                        | _ ->
+                            let fieldMark = x.Mark(range)
+                            x.MarkAndDone(range, ElementType.EXPRESSION_REFERENCE_NAME)
+                            fieldMark
+
                     x.ProcessPat(pat, isLocal, false)
+                    x.Done(fieldMark, ElementType.RECORD_FIELD_PAT)
                 ElementType.RECORD_PAT
 
             | SynPat.IsInst(typ, _) ->

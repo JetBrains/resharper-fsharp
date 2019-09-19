@@ -119,8 +119,9 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
         x.Done(last.idRange, mark, ElementType.LONG_IDENTIFIER)
 
     member x.ProcessReferenceName(lid: Ident list) =
-        let marks = Stack()
+        if lid.IsEmpty then () else
 
+        let marks = Stack()
         for _ in lid do
             marks.Push(x.Mark())
 

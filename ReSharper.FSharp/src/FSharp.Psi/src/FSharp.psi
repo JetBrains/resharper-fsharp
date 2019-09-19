@@ -249,7 +249,7 @@ interface arrayOrListPat:
 typedPat options { stubBase="SynPatternBase"; }:
   synPat<PATTERN, Pattern>
   COLON
-  synType;
+  synType<TYPE, Type>;
 
 attribPat options { stubBase="SynPatternBase"; }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
@@ -289,9 +289,13 @@ parenPat options { stubBase="SynPatternBase"; }:
 
 recordPat options { stubBase="SynPatternBase"; }:
   LBRACE
-  synPat<ATTRIBUTE, Patterns>*
-  fakeSeparator
+  recordFieldPat<FIELD_PAT, FieldPatterns>*
   RBRACE;
+
+recordFieldPat:
+  expressionReferenceName<REFERENCE_NAME, ReferenceName>
+  EQUALS
+  synPat<PAT, Pattern>;
 
 optionalValPat options { stubBase="SynPatternBase"; }:
   QMARK
@@ -762,7 +766,9 @@ recordDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extra
 
 recordFieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
-  IDENTIFIER<IDENTIFIER, Identifier>;
+  IDENTIFIER<IDENTIFIER, Identifier>
+  COLON
+  synType<TYPE, Type>;
 
 
 
@@ -809,10 +815,12 @@ interface caseFieldDeclaration:
   exceptionFieldDeclaration;
 
 unionCaseFieldDeclaration options { stubBase="UnionCaseFieldDeclarationBase"; }:
-  IDENTIFIER<IDENTIFIER, Identifier>;
+  IDENTIFIER<IDENTIFIER, Identifier>?
+  synType<TYPE, Type>;
 
 exceptionFieldDeclaration options { stubBase="UnionCaseFieldDeclarationBase"; }:
-  IDENTIFIER<IDENTIFIER, Identifier>;
+  IDENTIFIER<IDENTIFIER, Identifier>?
+  synType<TYPE, Type>;
 
 
 // Other members
@@ -834,6 +842,8 @@ typeAbbreviationDeclaration options { stubBase="FSharpTypeElementDeclarationBase
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   IDENTIFIER<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
+  EQUALS
+  synType<TYPE, AbbreviatedType>
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
 
 moduleAbbreviation options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
@@ -958,7 +968,7 @@ interfaceInherit:
   INHERIT
   typeReferenceName<TYPE_REFERENCE, TypeName>;
 
-typeInherit:
+typeInherit options { stubBase="ReferenceOwnerBase"; }:
   INHERIT
   typeReferenceName<TYPE_REFERENCE, TypeName>
   chameleonExpression<CHAMELEON_EXPR, CtorArg>;
@@ -1094,9 +1104,9 @@ otherDirective:
   PP_DIRECTIVE<PP_DIRECTIVE, HashToken>
   STRING<STRING, Args>*;
 
-openStatement  options { stubBase="ReferenceOwnerBase"; }:
+openStatement  options { stubBase="TypeReferenceOwnerBase"; }:
   OPEN<OPEN, Open>
-  typeReferenceName<TYPE_REFERENCE, ImportedName>;
+  typeReferenceName<TYPE_REFERENCE, ReferenceName>;
 
 do options { stubBase="DummyDeclaration"; } extras {
     get { methodName="Expression" path=<do:CHAMELEON_EXPR/chameleonExpression:EXPR> };
