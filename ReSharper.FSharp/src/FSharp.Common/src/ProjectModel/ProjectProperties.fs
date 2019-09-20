@@ -112,7 +112,7 @@ type FSharpProjectPropertiesFactory() =
 
     override x.CreateProjectProperties(parameters) =
         FSharpProjectProperties(parameters.ProjectTypeGuids, factoryGuid, parameters.TargetFrameworkIds,
-                                parameters.TargetPlatformData, parameters.DotNetCoreSDK) :> _
+                                parameters.TargetPlatformData, parameters.DotNetCorePlatform) :> _
 
     static member CreateProjectProperties(targetFrameworkIds): IProjectProperties =
         FSharpProjectProperties(projectTypeGuids, factoryGuid, targetFrameworkIds, null, null) :> _
