@@ -379,11 +379,11 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
 
                 // todo: replace all lids
                 match lid.Lid with
-                | [id] ->
+                | [ IdentRange idRange as id ] ->
+                    let mark = x.Mark(idRange)
                     if IsActivePatternName id.idText then
                         x.ProcessActivePatternId(id, isLocal)
-                    else
-                        x.ProcessReferenceName(lid.Lid)
+                    x.Done(idRange, mark, ElementType.EXPRESSION_REFERENCE_NAME)
     
                     match typars with
                     | None -> ()
@@ -612,7 +612,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             x.ProcessExpressionList(exprs)
 
         | SynExpr.ArrayOrList(_, exprs, _) ->
-            x.MarkListExpr(exprs, range, ElementType.ARRAY_OR_LIST_EXPR)
+            x.ProcessListExpr(exprs, range, ElementType.ARRAY_OR_LIST_EXPR)
 
         | SynExpr.AnonRecd(_, copyInfo, fields, _) ->
             x.PushRange(range, ElementType.ANON_RECD_EXPR)
@@ -1018,7 +1018,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         | Some(range, _) -> x.PushStep(range, advanceToEndProcessor)
         | _ -> ()
 
-    member x.MarkListExpr(exprs, range, elementType) =
+    member x.ProcessListExpr(exprs, range, elementType) =
         x.PushRange(range, elementType)
         x.ProcessExpressionList(exprs)
 

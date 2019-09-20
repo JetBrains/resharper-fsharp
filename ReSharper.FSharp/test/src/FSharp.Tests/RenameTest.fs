@@ -32,6 +32,7 @@ type FSharpRenameTest() =
     [<Test>] member x.``Inline - Ctor self id``() = x.DoNamedTest()
     [<Test>] member x.``Inline - Secondary ctor self id``() = x.DoNamedTest()
     [<Test>] member x.``Inline - Ctor do``() = x.DoNamedTest()
+    [<Test>] member x.``Inline - Pattern 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Inline - synPat or 1``() = x.DoNamedTest()
     [<Test>] member x.``Inline - synPat or 2``() = x.DoNamedTest()
