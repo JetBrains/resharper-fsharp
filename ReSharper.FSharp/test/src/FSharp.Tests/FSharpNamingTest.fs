@@ -30,7 +30,7 @@ type FSharpNamingTest() =
     [<Test>] member x.``Indexer 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Record field 01``() = x.DoNamedTest()
-    [<Test; Explicit("find reference to foo")>] member x.``Record field 02 - Parens``() = x.DoNamedTest()
+    [<Test>] member x.``Record field 02 - Parens``() = x.DoNamedTest()
 
     [<Test>] member x.``Type 01``() = x.DoNamedTest()
 

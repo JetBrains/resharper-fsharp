@@ -177,11 +177,10 @@ type FSharpNamingService(language: FSharpLanguage) =
             x.SuggestRoots(typedExpr.Expression, useExpectedTypes, policyProvider)
         
         | :? IReferenceExpr as referenceExpr ->
-            match referenceExpr.Qualifier with
+            match referenceExpr.Qualifier.IgnoreInnerParens() with
             | :? IReferenceExpr as qualifierExpr ->
-                // todo: ignore qualifier inner parens
                 x.SuggestRoots(referenceExpr.Reference, qualifierExpr.Reference, policyProvider)
-            | _ -> x.SuggestRoots(referenceExpr.Identifier, useExpectedTypes, policyProvider)
+            | _ -> x.SuggestRoots(referenceExpr.Reference, null, policyProvider)
 
         | :? IIndexerExpr as dotIndexedGetExpr ->
             let roots = x.SuggestRoots(dotIndexedGetExpr.Expression, useExpectedTypes, policyProvider)
