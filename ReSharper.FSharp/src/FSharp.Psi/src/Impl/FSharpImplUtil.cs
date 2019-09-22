@@ -43,15 +43,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public const string Sealed = "Sealed";
     public const string Struct = "Struct";
 
-    public static TreeTextRange GetIdentifierNameRange([CanBeNull] this ILongIdentifier longIdentifier)
-    {
-      if (longIdentifier == null)
-        return TreeTextRange.InvalidRange;
-
-      var ids = longIdentifier.Identifiers;
-      return ids.IsEmpty ? TreeTextRange.InvalidRange : ids.Last().GetTreeTextRange();
-    }
-
     public static string GetShortName([NotNull] this IFSharpAttribute attr) =>
       attr.ReferenceName?.ShortName.GetAttributeShortName();
 
@@ -630,6 +621,32 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         LowLevelModificationUtil.ReplaceChildRange(id, id, new FSharpIdentifierToken(name));
 
       return referenceOwner;
+    }
+
+    [NotNull]
+    public static string GetQualifiedName([NotNull] this IReferenceName referenceName)
+    {
+      var qualifier = referenceName.Qualifier;
+      var shortName = referenceName.ShortName;
+
+      return qualifier == null
+        ? shortName
+        : qualifier.QualifiedName + "." + shortName;
+    }
+
+    [NotNull]
+    public static string GetQualifiedName([CanBeNull] IReferenceName qualifier,
+      [CanBeNull] IFSharpIdentifier identifier)
+    {
+      if (qualifier == null && identifier == null)
+        return SharedImplUtil.MISSING_DECLARATION_NAME;
+
+      if (qualifier == null)
+        return identifier.Name;
+
+      return identifier != null
+        ? qualifier.QualifiedName + "." + identifier.Name
+        : qualifier.QualifiedName;
     }
   }
 }

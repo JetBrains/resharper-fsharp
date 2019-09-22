@@ -85,7 +85,11 @@ interface moduleDeclaration:
 
 namedNamespaceDeclaration options { stubBase="FSharpDeclarationBase"; }:
   NAMESPACE<NAMESPACE, NamespaceToken>
-  longIdentifier<LONG_IDENTIFIER, LongIdentifier>
+  (
+    referenceName<REFERENCE_NAME, QualifierReferenceName>
+    DOT
+  )?
+  fSharpIdentifier<IDENTIFIER, Identifier>
   moduleMember<MODULE_MEMBER, Members>*;
 
 globalNamespaceDeclaration options { stubBase="FSharpDeclarationBase"; }:
@@ -97,7 +101,11 @@ namedModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
   MODULE<MODULE, ModuleToken>
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
-  longIdentifier<LONG_IDENTIFIER, LongIdentifier>
+  (
+    referenceName<REFERENCE_NAME, QualifierReferenceName>
+    DOT
+  )?
+  fSharpIdentifier<IDENTIFIER, Identifier>
   moduleMember<MODULE_MEMBER, Members>*;
 
 anonModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; }:
@@ -454,8 +462,7 @@ tupleExpr options { stubBase="FSharpExpressionBase"; }:
   (
     synExpr<EXPR, Expressions>
     COMMA
-  )*
-  fakeSeparator;
+  )*;
 
 anonRecdExpr options { stubBase="FSharpExpressionBase"; }:
   STRUCT<STRUCT, STRUCT_KEYWORD>?
@@ -464,7 +471,7 @@ anonRecdExpr options { stubBase="FSharpExpressionBase"; }:
     synExpr<COPY_INFO, CopyInfoExpression>
     WITH
   )?
-  recordExprBinding<BINDING, ExprBindings>* // todo: FCS has different type here
+  recordExprBinding<BINDING, ExprBindings>*
   BAR_RBRACE;
 
 arrayOrListExpr options { stubBase="FSharpExpressionBase"; }:

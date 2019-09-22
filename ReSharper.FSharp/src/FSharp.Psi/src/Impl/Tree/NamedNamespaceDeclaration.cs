@@ -9,11 +9,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class NamedNamespaceDeclaration
   {
     public override string DeclaredName => QualifiedName;
-    public string QualifiedName => LongIdentifier.QualifiedName;
-    public override string CompiledName => LongIdentifier.Name;
+    public string QualifiedName => FSharpImplUtil.GetQualifiedName(QualifierReferenceName, Identifier);
+    public override string CompiledName => Identifier.GetCompiledName();
 
-    public override IFSharpIdentifierLikeNode NameIdentifier => LongIdentifier;
-    public DocumentRange GetDeclaredNameDocumentRange() => LongIdentifier.GetDocumentRange();
+    public override IFSharpIdentifierLikeNode NameIdentifier => Identifier;
+
+    public DocumentRange GetDeclaredNameDocumentRange()
+    {
+      var qualification = QualifierReferenceName;
+      if (qualification == null)
+        return this.GetNameDocumentRange();
+
+      var identifier = NameIdentifier;
+      var qualifierRange = qualification.GetDocumentRange();
+
+      return identifier != null
+        ? qualifierRange.Join(Identifier.GetDocumentRange())
+        : qualifierRange;
+    }
 
     protected override void PreInit()
     {

@@ -8,6 +8,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     public override ITokenNode IdentifierToken => Identifier as ITokenNode;
     public string ShortName => Identifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
+    public string QualifiedName => this.GetQualifiedName();
   }
 
   internal partial class ExpressionReferenceName
@@ -18,5 +19,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       new FSharpSymbolReference(this);
 
     public string ShortName => Identifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
+    public string QualifiedName => this.GetQualifiedName();
   }
 }

@@ -122,11 +122,30 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
         if lid.IsEmpty then () else
 
         let marks = Stack()
+        x.AdvanceToStart(lid.Head.idRange)
         for _ in lid do
             marks.Push(x.Mark())
 
         for IdentRange id in lid do
             x.Done(id, marks.Pop(), ElementType.EXPRESSION_REFERENCE_NAME)
+
+    member x.ProcessReferenceNameSkipLast(lid: Ident list) =
+        if lid.IsEmpty then () else
+
+        let marks = Stack()
+
+        x.AdvanceToStart(lid.Head.idRange)
+        for id in lid do
+            marks.Push(struct {| Mark = x.Mark(); Range = id.idRange |})
+
+        let lastRangeIdAndMark = marks.Pop()
+        x.Builder.Drop(lastRangeIdAndMark.Mark)
+
+        while marks.Count > 0 do
+            let rangeAndMark = marks.Pop()
+            x.Done(rangeAndMark.Range, rangeAndMark.Mark, ElementType.EXPRESSION_REFERENCE_NAME)
+
+        x.AdvanceToEnd(lastRangeIdAndMark.Range)
 
     member x.ProcessNamedTypeReference(lid: Ident list) =
         x.ProcessNamedTypeReference(lid, [], None, None, false)
@@ -187,7 +206,7 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
                 x.ProcessModifiersBeforeOffset(x.GetStartOffset(idRange))
 
             if moduleKind <> AnonModule then
-                x.ProcessLongIdentifier(lid)
+                x.ProcessReferenceNameSkipLast(lid)
 
             let elementType =
                 match moduleKind with

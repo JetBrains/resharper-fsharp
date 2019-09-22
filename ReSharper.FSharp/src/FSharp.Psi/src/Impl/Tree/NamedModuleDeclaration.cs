@@ -5,13 +5,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class NamedModuleDeclaration
   {
-    protected override string DeclaredElementName =>
-      LongIdentifier.GetModuleCompiledName(Attributes);
+    protected override string DeclaredElementName => Identifier.GetModuleCompiledName(Attributes);
 
-    public override IFSharpIdentifierLikeNode NameIdentifier =>
-      LongIdentifier;
-
-    public override TreeTextRange GetNameRange() =>
-      LongIdentifier.GetIdentifierNameRange();
+    public override IFSharpIdentifierLikeNode NameIdentifier => Identifier;
+    IFSharpTreeNode IModuleDeclaration.Identifier => Identifier;
   }
 }

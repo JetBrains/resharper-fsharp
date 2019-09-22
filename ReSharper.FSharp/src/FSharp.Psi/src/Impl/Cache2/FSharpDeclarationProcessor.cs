@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Checker;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
@@ -46,18 +46,29 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
     public void ProcessNamedModuleLikeDeclaration(INamedModuleLikeDeclaration decl, Part part)
     {
-      var qualifiers = decl.LongIdentifier?.Qualifiers ?? TreeNodeCollection<ITokenNode>.Empty;
-      foreach (var qualifier in qualifiers)
-      {
-        var qualifierName = Builder.Intern(qualifier.GetText().RemoveBackticks());
-        Builder.StartPart(new QualifiedNamespacePart(qualifier.GetTreeStartOffset(), qualifierName));
-      }
-
+      StartNamespaceQualifier(decl.QualifierReferenceName);
       Builder.StartPart(part);
       FinishModuleLikeDeclaration(decl);
+      EndNamespaceQualifier(decl.QualifierReferenceName);
+    }
 
-      foreach (var _ in qualifiers)
-        Builder.EndPart();
+    private void StartNamespaceQualifier([CanBeNull] IReferenceName referenceName)
+    {
+      if (referenceName == null)
+        return;
+
+      StartNamespaceQualifier(referenceName.Qualifier);
+      var qualifierName = Builder.Intern(referenceName.ShortName);
+      Builder.StartPart(new QualifiedNamespacePart(referenceName.Identifier.GetTreeStartOffset(), qualifierName));
+    }
+
+    private void EndNamespaceQualifier([CanBeNull] IReferenceName referenceName)
+    {
+      if (referenceName == null)
+        return;
+
+      EndNamespaceQualifier(referenceName.Qualifier);
+      Builder.EndPart();
     }
 
     public override void VisitNamedNamespaceDeclaration(INamedNamespaceDeclaration decl) =>

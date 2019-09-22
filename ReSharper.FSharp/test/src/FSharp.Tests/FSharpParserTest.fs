@@ -14,6 +14,10 @@ type FSharpParserTest() =
     [<Test>] member x.``Module - Anon 01``() = x.DoNamedTest()
     [<Test>] member x.``Module - Top level 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Namespace 01``() = x.DoNamedTest()
+    [<Test>] member x.``Namespace 02 - Qualifier``() = x.DoNamedTest()
+    [<Test>] member x.``Namespace 03 - Multiple``() = x.DoNamedTest()
+
     [<Test>] member x.``Let 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Let 02 - Typed``() = x.DoNamedTest()
     [<Test>] member x.``Let 03 - Typed, var type``() = x.DoNamedTest()
