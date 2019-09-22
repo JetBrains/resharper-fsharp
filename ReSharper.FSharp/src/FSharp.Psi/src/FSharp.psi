@@ -871,6 +871,9 @@ moduleAbbreviation options { stubBase="FSharpTypeElementDeclarationBase"; } extr
   fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   IDENTIFIER<IDENTIFIER, Identifier>
+  EQUALS
+  typeReferenceName<TYPE_REFERENCE, TypeName>
+  // todo: remove rules below
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
 

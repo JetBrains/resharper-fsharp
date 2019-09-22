@@ -4,14 +4,17 @@ IFSharpImplFile
     IModuleAbbreviation
       FSharpTokenType+ModuleTokenElement(type:MODULE, text:module)
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-      FSharpIdentifierToken(type:IDENTIFIER, text:M1)
+      FSharpIdentifierToken(type:IDENTIFIER, text:Abbr)
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "
       FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "
       ITypeReferenceName
         ITypeReferenceName
-          FSharpIdentifierToken(type:IDENTIFIER, text:Ns)
+          ITypeReferenceName
+            FSharpIdentifierToken(type:IDENTIFIER, text:FSharp)
+          FSharpTokenType+DotTokenElement(type:DOT, text:.)
+          FSharpIdentifierToken(type:IDENTIFIER, text:Core)
         FSharpTokenType+DotTokenElement(type:DOT, text:.)
-        FSharpIdentifierToken(type:IDENTIFIER, text:M2)
+        FSharpIdentifierToken(type:IDENTIFIER, text:Operators)
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

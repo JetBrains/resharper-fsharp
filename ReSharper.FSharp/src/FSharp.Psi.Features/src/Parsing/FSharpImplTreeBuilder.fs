@@ -95,8 +95,8 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
 
         | SynModuleDecl.ModuleAbbrev(_, lid, range) ->
             let mark = x.Mark(range)
-            x.ProcessLongIdentifier(lid)
-            x.Done(range, mark, ElementType.TYPE_ABBREVIATION_DECLARATION) // todo: mark as separate element type
+            x.ProcessNamedTypeReference(lid)
+            x.Done(range, mark, ElementType.MODULE_ABBREVIATION)
 
         | decl ->
             failwithf "unexpected decl: %O" decl

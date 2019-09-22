@@ -173,13 +173,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       Builder.EndPart();
     }
 
-    public override void VisitTypeAbbreviationDeclaration(ITypeAbbreviationDeclaration decl)
-    {
-      Builder.StartPart(new HiddenTypePart(decl, Builder));
-      Builder.EndPart();
-    }
+    public override void VisitTypeAbbreviationDeclaration(ITypeAbbreviationDeclaration decl) =>
+      ProcessHiddenTypeDeclaration(decl);
 
-    public override void VisitAbstractTypeDeclaration(IAbstractTypeDeclaration decl)
+    public override void VisitModuleAbbreviation(IModuleAbbreviation decl) =>
+      ProcessHiddenTypeDeclaration(decl);
+
+    public override void VisitAbstractTypeDeclaration(IAbstractTypeDeclaration decl) =>
+      ProcessHiddenTypeDeclaration(decl);
+
+    private void ProcessHiddenTypeDeclaration(IFSharpTypeDeclaration decl)
     {
       Builder.StartPart(new HiddenTypePart(decl, Builder));
       Builder.EndPart();

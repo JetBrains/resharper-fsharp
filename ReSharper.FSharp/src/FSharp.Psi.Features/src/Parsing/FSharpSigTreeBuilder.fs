@@ -36,7 +36,8 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
             for m in members do x.ProcessTypeMemberSignature(m)
             x.Done(range, mark, ElementType.EXCEPTION_DECLARATION)
 
-        | SynModuleSigDecl.ModuleAbbrev(IdentRange range, _, _) ->
+        | SynModuleSigDecl.ModuleAbbrev(IdentRange range, lid, _) ->
+            x.ProcessNamedTypeReference(lid)
             x.MarkAndDone(range, ElementType.MODULE_ABBREVIATION)
 
         | SynModuleSigDecl.Val(ValSpfn(attrs, id, SynValTyparDecls(typeParams, _, _), _, _, _, _, _, _, _, _), range) ->

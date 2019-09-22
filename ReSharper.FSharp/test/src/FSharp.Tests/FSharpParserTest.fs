@@ -174,6 +174,8 @@ type FSharpParserTest() =
     [<Test>] member x.``Module member - Open 01``() = x.DoNamedTest()
     [<Test>] member x.``Module member - Open 02 - Qualifier``() = x.DoNamedTest()
 
+    [<Test>] member x.``Module member - Module abbr 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Pattern - Record 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Record 02 - Qualified name``() = x.DoNamedTest()
 
