@@ -132,15 +132,17 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
         | SynMemberSig.Inherit(SynType.LongIdent(lidWithDots), _) ->
             let lid = lidWithDots.Lid
             if not lid.IsEmpty then
+                // todo: start at member range
                 let mark = x.Mark(lid.Head.idRange)
-                x.ProcessLongIdentifier lid
+                x.ProcessNamedTypeReference(lid)
                 x.Done(mark, ElementType.INTERFACE_INHERIT)
 
         | SynMemberSig.Interface(SynType.LongIdent(lidWithDots), _) ->
             let lid = lidWithDots.Lid
             if not lid.IsEmpty then
+                // todo: start at member range
                 let mark = x.Mark(lid.Head.idRange)
-                x.ProcessLongIdentifier lid
+                x.ProcessNamedTypeReference(lid)
                 x.Done(mark, ElementType.INTERFACE_INHERIT)
 
         | _ -> ()
