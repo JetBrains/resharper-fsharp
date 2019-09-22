@@ -475,7 +475,16 @@ anonRecdExpr options { stubBase="FSharpExpressionBase"; }:
   BAR_RBRACE;
 
 arrayOrListExpr options { stubBase="FSharpExpressionBase"; }:
-  fakeSeparator;
+  (
+    LBRACK
+    synExpr<EXPR, Expressions>*
+    RBRACK
+  ) |
+  (
+    LBRACK_BAR
+    synExpr<EXPR, Expressions>*
+    BAR_RBRACK
+  );
 
 recordExpr options { stubBase="FSharpExpressionBase"; }:
   LBRACE<LBRACE, LeftBrace>
