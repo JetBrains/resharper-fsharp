@@ -34,6 +34,10 @@ type FSharpNamingTest() =
 
     [<Test>] member x.``Type 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``AppExpr 01``() = x.DoNamedTest()
+    [<Test>] member x.``AppExpr 02 - More args``() = x.DoNamedTest()
+    [<Test>] member x.``AppExpr 03 - Partial``() = x.DoNamedTest()
+
     override x.DoTest(lifetime, _) =
         let textControl = x.OpenTextControl(lifetime)
         let sourceFile = textControl.Document.GetPsiSourceFile(x.Solution)

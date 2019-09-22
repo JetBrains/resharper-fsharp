@@ -200,6 +200,13 @@ type FSharpNamingService(language: FSharpLanguage) =
         | :? ILongIdentifier as longIdentifier ->
             x.SuggestRoots(longIdentifier.IdentifierToken, useExpectedTypes, policyProvider)
 
+        // todo: partially applied functions?
+        | :? IAppExpr as appExpr when isNotNull appExpr.InvokedFunctionReference ->
+            x.SuggestRoots(appExpr.InvokedFunctionReference, null, policyProvider)
+
+//        | :? IExpression as expr ->
+//            x.SuggestRoots(expr.Type(), policyProvider)
+
         | _ -> EmptyList.Instance :> _
 
     member x.AddExtraNames(namesCollection: INamesCollection, declaredElementPat: ISynPat) =
