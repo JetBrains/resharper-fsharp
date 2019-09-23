@@ -1120,7 +1120,7 @@ otherDirective:
   PP_DIRECTIVE<PP_DIRECTIVE, HashToken>
   STRING<STRING, Args>*;
 
-openStatement  options { stubBase="TypeReferenceOwnerBase"; }:
+openStatement:
   OPEN<OPEN, Open>
   typeReferenceName<TYPE_REFERENCE, ReferenceName>;
 
