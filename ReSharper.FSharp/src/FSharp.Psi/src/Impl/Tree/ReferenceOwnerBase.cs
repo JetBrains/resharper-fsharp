@@ -1,12 +1,10 @@
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
-using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  // todo: add more specific references, replace current inheritors.
-  internal abstract class ReferenceOwnerBase : FSharpCompositeElement, IFSharpReferenceOwner, IPreventsChildResolve
+  internal abstract class ReferenceOwnerBase : FSharpCompositeElement, IFSharpReferenceOwner
   {
     private FSharpSymbolReference myReference;
 

@@ -1,6 +1,5 @@
 ﻿Other
 ---
-TO: [O] module |Module| RANGE: (7,13) @ Import 01.fs
 TO: [O] open |System| RANGE: (22,28) @ Import 01.fs
 TO: [O] open System.Collections.|Generic| RANGE: (54,61) @ Import 01.fs
 TO: [O] open System.|Collections|.Generic RANGE: (42,53) @ Import 01.fs

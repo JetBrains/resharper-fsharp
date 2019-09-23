@@ -1,15 +1,12 @@
-﻿Other
+﻿Read access
 ---
-TO: [O] module |Module| RANGE: (7,13) @ Exception - Singleton 03 - Members.fs
-TO: [O] exception |Exn| RANGE: (27,30) @ Exception - Singleton 03 - Members.fs
-TO: [O] with static member |Foo| = 123 RANGE: (51,54) @ Exception - Singleton 03 - Members.fs
+TO: [R] Exn.|Foo| RANGE: (68,71) @ Exception - Singleton 03 - Members.fs
+
+
+Other
+---
 TO: [O] Exn.|Foo| RANGE: (68,71) @ Exception - Singleton 03 - Members.fs
 TO: [O] |Exn|.Foo RANGE: (64,67) @ Exception - Singleton 03 - Members.fs
 TO: [O] |Exn|.Foo RANGE: (64,67) @ Exception - Singleton 03 - Members.fs
-
-
-Read access
----
-TO: [R] Exn.|Foo| RANGE: (68,71) @ Exception - Singleton 03 - Members.fs
 
 

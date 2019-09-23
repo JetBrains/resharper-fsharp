@@ -1,12 +1,4 @@
-﻿Other
----
-TO: [O] module |Module| RANGE: (7,13) @ Write - Record 02 - Qualified name.fs
-TO: [O] type |R| = { mutable F: int } RANGE: (22,23) @ Write - Record 02 - Qualified name.fs
-TO: [O] type R = { mutable |F|: int } RANGE: (36,37) @ Write - Record 02 - Qualified name.fs
-TO: [O] let r1 = { |R|.F = 123 } RANGE: (57,58) @ Write - Record 02 - Qualified name.fs
-
-
-Field declaration
+﻿Field declaration
 ---
 TO: [O] type R = { mutable F: |int| } RANGE: (39,42) @ Write - Record 02 - Qualified name.fs
 
@@ -24,5 +16,10 @@ TO: [O] let r1 = |{ R.F = 123 }| RANGE: (55,68) @ Write - Record 02 - Qualified 
 Write access
 ---
 TO: [W] let r1 = { R.|F| = 123 } RANGE: (59,60) @ Write - Record 02 - Qualified name.fs
+
+
+Other
+---
+TO: [O] let r1 = { |R|.F = 123 } RANGE: (57,58) @ Write - Record 02 - Qualified name.fs
 
 

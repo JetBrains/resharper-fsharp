@@ -10,7 +10,7 @@ using JetBrains.ReSharper.Psi.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class ReferenceExpr : IPreventsChildResolve
+  internal partial class ReferenceExpr
   {
     public FSharpSymbolReference SymbolReference { get; private set; }
     public FSharpSymbolReference CtorTypeReference { get; private set; }

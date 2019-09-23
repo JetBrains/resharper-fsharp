@@ -1,9 +1,4 @@
-﻿Other
----
-TO: [O] module |Module| RANGE: (7,13) @ Type Argument 06 - ML.fs
-
-
-Pattern
+﻿Pattern
 ---
 TO: [O] let |l|: string List = () RANGE: (21,22) @ Type Argument 06 - ML.fs
 

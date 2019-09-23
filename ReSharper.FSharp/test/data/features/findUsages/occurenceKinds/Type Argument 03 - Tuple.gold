@@ -1,13 +1,12 @@
-﻿Other
----
-TO: [O] module |Module| RANGE: (7,13) @ Type Argument 03 - Tuple.fs
-TO: [O] let l = |List|<string * string>() RANGE: (25,29) @ Type Argument 03 - Tuple.fs
-TO: [O] let l = |List|<string * string>() RANGE: (25,29) @ Type Argument 03 - Tuple.fs
-
-
-Pattern
+﻿Pattern
 ---
 TO: [O] let |l| = List<string * string>() RANGE: (21,22) @ Type Argument 03 - Tuple.fs
+
+
+Other
+---
+TO: [O] let l = |List|<string * string>() RANGE: (25,29) @ Type Argument 03 - Tuple.fs
+TO: [O] let l = |List|<string * string>() RANGE: (25,29) @ Type Argument 03 - Tuple.fs
 
 
 Type argument

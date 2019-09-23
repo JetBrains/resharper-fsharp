@@ -1,13 +1,12 @@
-﻿Other
+﻿New instance creation
 ---
-TO: [O] module |Module| RANGE: (7,13) @ New instance 01.fs
+TO: [O] System.|String|([||]) RANGE: (24,30) @ New instance 01.fs
+
+
+Other
+---
 TO: [O] System.|String|([||]) RANGE: (24,30) @ New instance 01.fs
 TO: [O] |System|.String([||]) RANGE: (17,23) @ New instance 01.fs
 TO: [O] |System|.String([||]) RANGE: (17,23) @ New instance 01.fs
-
-
-New instance creation
----
-TO: [O] System.|String|([||]) RANGE: (24,30) @ New instance 01.fs
 
 

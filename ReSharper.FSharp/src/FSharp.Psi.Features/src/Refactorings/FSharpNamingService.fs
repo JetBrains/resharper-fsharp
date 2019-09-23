@@ -194,9 +194,6 @@ type FSharpNamingService(language: FSharpLanguage) =
             let elseRoots = x.SuggestRoots(ifThenElseExpr.ElseExpr, useExpectedTypes, policyProvider)
             Seq.append thenRoots elseRoots
 
-        | :? FSharpIdentifierToken as idToken when isNotNull idToken.Reference ->
-            x.SuggestRoots(idToken.Reference, idToken.QualifierReference, policyProvider)
-
         | :? ILongIdentifier as longIdentifier ->
             x.SuggestRoots(longIdentifier.IdentifierToken, useExpectedTypes, policyProvider)
 

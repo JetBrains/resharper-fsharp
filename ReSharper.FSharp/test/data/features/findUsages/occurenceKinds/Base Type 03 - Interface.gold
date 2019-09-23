@@ -1,14 +1,10 @@
-﻿Other
----
-TO: [O] module |Module| RANGE: (7,13) @ Base Type 03 - Interface.fs
-TO: [O] type |T|() = RANGE: (22,23) @ Base Type 03 - Interface.fs
-TO: [O] interface |System|.IDisposable with RANGE: (43,49) @ Base Type 03 - Interface.fs
-TO: [O] member |x|.Dispose() = () RANGE: (83,84) @ Base Type 03 - Interface.fs
-TO: [O] member x.|Dispose|() = () RANGE: (85,92) @ Base Type 03 - Interface.fs
-
-
-Base type
+﻿Base type
 ---
 TO: [O] interface System.|IDisposable| with RANGE: (50,61) @ Base Type 03 - Interface.fs
+
+
+Other
+---
+TO: [O] interface |System|.IDisposable with RANGE: (43,49) @ Base Type 03 - Interface.fs
 
 

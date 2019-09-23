@@ -1,7 +1,5 @@
 ﻿Other
 ---
-TO: [O] module |Module| RANGE: (7,13) @ Base Type 01.fs
-TO: [O] type |T|() = RANGE: (22,23) @ Base Type 01.fs
 TO: [O] inherit System.|Object|() RANGE: (48,54) @ Base Type 01.fs
 TO: [O] inherit |System|.Object() RANGE: (41,47) @ Base Type 01.fs
 

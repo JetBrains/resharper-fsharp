@@ -1,14 +1,4 @@
-﻿Other
----
-TO: [O] module |Module| RANGE: (7,13) @ Write - Record 03 - Copy and update.fs
-TO: [O] type |R| = { mutable F: int } RANGE: (22,23) @ Write - Record 03 - Copy and update.fs
-TO: [O] type R = { mutable |F|: int } RANGE: (36,37) @ Write - Record 03 - Copy and update.fs
-TO: [O] let r2 = { |r1| with F = r1.F + 1 } RANGE: (77,79) @ Write - Record 03 - Copy and update.fs
-TO: [O] let r2 = { r1 with F = r1.|F| + 1 } RANGE: (92,93) @ Write - Record 03 - Copy and update.fs
-TO: [O] let r2 = { r1 with F = |r1|.F + 1 } RANGE: (89,91) @ Write - Record 03 - Copy and update.fs
-
-
-Field declaration
+﻿Field declaration
 ---
 TO: [O] type R = { mutable F: |int| } RANGE: (39,42) @ Write - Record 03 - Copy and update.fs
 
@@ -40,5 +30,12 @@ Read access
 TO: [R] let r2 = { |r1| with F = r1.F + 1 } RANGE: (77,79) @ Write - Record 03 - Copy and update.fs
 TO: [R] let r2 = { r1 with F = r1.|F| + 1 } RANGE: (92,93) @ Write - Record 03 - Copy and update.fs
 TO: [R] let r2 = { r1 with F = |r1|.F + 1 } RANGE: (89,91) @ Write - Record 03 - Copy and update.fs
+
+
+Other
+---
+TO: [O] let r2 = { |r1| with F = r1.F + 1 } RANGE: (77,79) @ Write - Record 03 - Copy and update.fs
+TO: [O] let r2 = { r1 with F = r1.|F| + 1 } RANGE: (92,93) @ Write - Record 03 - Copy and update.fs
+TO: [O] let r2 = { r1 with F = |r1|.F + 1 } RANGE: (89,91) @ Write - Record 03 - Copy and update.fs
 
 

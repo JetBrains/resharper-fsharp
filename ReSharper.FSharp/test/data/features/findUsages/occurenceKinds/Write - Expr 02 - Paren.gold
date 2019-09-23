@@ -1,11 +1,4 @@
-﻿Other
----
-TO: [O] module |Module| RANGE: (7,13) @ Write - Expr 02 - Paren.fs
-TO: [O] (|aaa|) <- aaa + 1 RANGE: (41,44) @ Write - Expr 02 - Paren.fs
-TO: [O] (aaa) <- |aaa| + 1 RANGE: (49,52) @ Write - Expr 02 - Paren.fs
-
-
-Pattern
+﻿Pattern
 ---
 TO: [O] let mutable |aaa| = 123 RANGE: (29,32) @ Write - Expr 02 - Paren.fs
 
@@ -13,6 +6,12 @@ TO: [O] let mutable |aaa| = 123 RANGE: (29,32) @ Write - Expr 02 - Paren.fs
 Write access
 ---
 TO: [W] (|aaa|) <- aaa + 1 RANGE: (41,44) @ Write - Expr 02 - Paren.fs
+
+
+Other
+---
+TO: [O] (|aaa|) <- aaa + 1 RANGE: (41,44) @ Write - Expr 02 - Paren.fs
+TO: [O] (aaa) <- |aaa| + 1 RANGE: (49,52) @ Write - Expr 02 - Paren.fs
 
 
 Read access

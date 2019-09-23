@@ -1,9 +1,4 @@
-﻿Other
----
-TO: [O] module |Module| RANGE: (7,13) @ Type Argument 04 - Array.fs
-
-
-Pattern
+﻿Pattern
 ---
 TO: [O] let |l|: string[] = [||] RANGE: (21,22) @ Type Argument 04 - Array.fs
 

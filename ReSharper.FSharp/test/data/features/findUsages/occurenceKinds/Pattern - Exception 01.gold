@@ -1,10 +1,4 @@
-﻿Other
----
-TO: [O] module |Module| RANGE: (7,13) @ Pattern - Exception 01.fs
-TO: [O] exception |Exn| RANGE: (27,30) @ Pattern - Exception 01.fs
-
-
-Pattern
+﻿Pattern
 ---
 TO: [O] with |Exn| -> () RANGE: (47,50) @ Pattern - Exception 01.fs
 

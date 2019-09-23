@@ -1,9 +1,4 @@
-﻿Other
----
-TO: [O] module |Module| RANGE: (7,13) @ Type Argument 02 - Pattern.fs
-
-
-Type checking
+﻿Type checking
 ---
 TO: [O] | :? |IList|<string> -> () RANGE: (37,42) @ Type Argument 02 - Pattern.fs
 

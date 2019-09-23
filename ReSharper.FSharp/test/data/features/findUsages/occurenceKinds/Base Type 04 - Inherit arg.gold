@@ -1,13 +1,7 @@
 ﻿Other
 ---
-TO: [O] namespace |Ns| RANGE: (10,12) @ Base Type 04 - Inherit arg.fs
 TO: [O] open |System| RANGE: (21,27) @ Base Type 04 - Inherit arg.fs
-TO: [O] module |Module1| = RANGE: (38,45) @ Base Type 04 - Inherit arg.fs
-TO: [O] type |Base|(s: String) = RANGE: (58,62) @ Base Type 04 - Inherit arg.fs
-TO: [O] type Base(|s|: String) = RANGE: (63,64) @ Base Type 04 - Inherit arg.fs
 TO: [O] type Base(s: |String|) = RANGE: (66,72) @ Base Type 04 - Inherit arg.fs
-TO: [O] module |Module2| = RANGE: (114,121) @ Base Type 04 - Inherit arg.fs
-TO: [O] type |T|() = RANGE: (134,135) @ Base Type 04 - Inherit arg.fs
 TO: [O] inherit Module1.|Base|(String('a', 1)) RANGE: (165,169) @ Base Type 04 - Inherit arg.fs
 TO: [O] inherit |Module1|.Base(String('a', 1)) RANGE: (157,164) @ Base Type 04 - Inherit arg.fs
 TO: [O] inherit Module1.Base(|String|('a', 1)) RANGE: (170,176) @ Base Type 04 - Inherit arg.fs

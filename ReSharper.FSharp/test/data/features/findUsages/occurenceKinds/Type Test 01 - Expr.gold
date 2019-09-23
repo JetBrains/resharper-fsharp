@@ -1,12 +1,11 @@
-﻿Other
----
-TO: [O] module |Module| RANGE: (7,13) @ Type Test 01 - Expr.fs
-TO: [O] () :? |System|.String RANGE: (37,43) @ Type Test 01 - Expr.fs
-
-
-Type checking
+﻿Type checking
 ---
 TO: [O] () :? |string| RANGE: (23,29) @ Type Test 01 - Expr.fs
 TO: [O] () :? System.|String| RANGE: (44,50) @ Type Test 01 - Expr.fs
+
+
+Other
+---
+TO: [O] () :? |System|.String RANGE: (37,43) @ Type Test 01 - Expr.fs
 
 
