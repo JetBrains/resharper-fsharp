@@ -113,8 +113,9 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
 
     member x.ProcessTypeMemberSignature(memberSig) =
         match memberSig with
-        | SynMemberSig.Member(ValSpfn(attrs, id, _, _, _, _, _, _, _, _, _), flags, range) ->
+        | SynMemberSig.Member(ValSpfn(attrs, id, _, synType, _, _, _, _, _, _, _), flags, range) ->
             let mark = x.MarkAttributesOrIdOrRange(attrs, Some id, range)
+            x.ProcessType(synType)
             let elementType =
                 if flags.IsDispatchSlot then
                     ElementType.ABSTRACT_SLOT
@@ -124,9 +125,10 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
                     | _ -> ElementType.MEMBER_DECLARATION
             x.Done(range, mark, elementType)
 
-        | SynMemberSig.ValField(Field(attrs, _, id, _, _, _, _, _), range) ->
+        | SynMemberSig.ValField(Field(attrs, _, id, synType, _, _, _, _), range) ->
             if id.IsSome then
                 let mark = x.MarkAttributesOrIdOrRange(attrs, id, range)
+                x.ProcessType(synType)
                 x.Done(mark,ElementType.VAL_FIELD)
 
         | SynMemberSig.Inherit(SynType.LongIdent(lidWithDots), _) ->

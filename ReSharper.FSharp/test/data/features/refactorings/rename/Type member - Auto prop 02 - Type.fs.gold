@@ -1,0 +1,8 @@
+﻿module Module
+
+type zzz() = class end
+
+type T() =
+    member val Prop: zzz = zzz() with get, set
+
+let i: zzz = T().Prop

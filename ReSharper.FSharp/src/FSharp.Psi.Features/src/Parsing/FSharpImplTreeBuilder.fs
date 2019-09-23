@@ -276,16 +276,21 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                     x.ProcessTopLevelBinding(binding, range)
                 ElementType.LET_MODULE_DECL
 
-            | SynMemberDefn.AbstractSlot(ValSpfn(_, _, typeParams, _, _, _, _, _, _, _, _), _, range) ->
+            | SynMemberDefn.AbstractSlot(ValSpfn(_, _, typeParams, synType, _, _, _, _, _, _, _), _, range) ->
                 match typeParams with
                 | SynValTyparDecls(typeParams, _, _) ->
                     x.ProcessTypeParametersOfType typeParams range true
+                x.ProcessType(synType)
                 ElementType.ABSTRACT_SLOT
 
-            | SynMemberDefn.ValField(Field(_, _, _, _, _, _, _, _), _) ->
+            | SynMemberDefn.ValField(Field(_, _, _, synType, _, _, _, _), _) ->
+                x.ProcessType(synType)
                 ElementType.VAL_FIELD
 
-            | SynMemberDefn.AutoProperty(_, _, _, _, _, _, _, _, expr, accessorClause, _) ->
+            | SynMemberDefn.AutoProperty(_, _, _, synTypeOpt, _, _, _, _, expr, accessorClause, _) ->
+                match synTypeOpt with
+                | Some synType -> x.ProcessType(synType)
+                | _ -> ()
                 x.MarkChameleonExpression(expr)
                 match accessorClause with
                 | Some clause -> x.MarkAndDone(clause, ElementType.ACCESSORS_NAMES_CLAUSE)
@@ -398,8 +403,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                 x.ProcessParams(args, isLocal || isTopLevelPat, false)
                 if isLocal then ElementType.LOCAL_PARAMETERS_OWNER_PAT else ElementType.TOP_PARAMETERS_OWNER_PAT
 
-            | SynPat.Typed(pat, _, _) ->
+            | SynPat.Typed(pat, synType, _) ->
                 x.ProcessPat(pat, isLocal, false)
+                x.ProcessType(synType)
                 ElementType.TYPED_PAT
 
             | SynPat.Or(pat1, pat2, _) ->

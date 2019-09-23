@@ -1,0 +1,13 @@
+﻿module Module
+
+type zzz() = class end
+
+type IInterface =
+    abstract Prop: zzz
+
+type T() =
+    interface IInterface with
+        member x.Prop = zzz()
+
+let i: IInterface = Unchecked.defaultof<_>
+i.Prop

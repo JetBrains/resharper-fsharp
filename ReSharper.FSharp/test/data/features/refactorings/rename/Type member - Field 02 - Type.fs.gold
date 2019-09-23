@@ -1,0 +1,6 @@
+﻿type zzz() = class end
+
+type T() =
+    [<DefaultValue>] val mutable F: zzz
+
+T().F

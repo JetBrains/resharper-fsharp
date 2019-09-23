@@ -1,0 +1,13 @@
+﻿module Module
+
+type Foo() = class end
+
+type IInterface =
+    abstract zzz: Foo
+
+type T() =
+    interface IInterface with
+        member x.zzz = Foo()
+
+let i: IInterface = Unchecked.defaultof<_>
+i.zzz

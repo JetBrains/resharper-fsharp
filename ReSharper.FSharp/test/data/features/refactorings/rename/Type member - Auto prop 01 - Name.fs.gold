@@ -1,0 +1,6 @@
+﻿module Module
+
+type T() =
+    member val zzz: int = 1 with get, set
+
+T().zzz
