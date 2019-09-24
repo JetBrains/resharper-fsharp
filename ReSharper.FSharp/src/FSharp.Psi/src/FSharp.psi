@@ -744,8 +744,11 @@ typeExtensionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; 
  }:
   fSharpAttribute<ATTRIBUTE, Attributes>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
-  longIdentifier<IDENTIFIER, LongIdentifier>
-  namedType<EXTENDED_TYPE, ExtendedType>
+  (
+    referenceName<REFERENCE_NAME, QualifierReferenceName>
+    DOT
+  )?
+  IDENTIFIER<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
 

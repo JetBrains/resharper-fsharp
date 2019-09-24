@@ -2,7 +2,6 @@ using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
-using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -12,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     [CanBeNull] private TypeAugmentation myTypeAugmentation;
     public FSharpSymbolReference Reference { get; protected set; }
 
-    public override IFSharpIdentifierLikeNode NameIdentifier => LongIdentifier;
+    public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
     protected override string DeclaredElementName => TypeAugmentation.CompiledName;
 
     protected override void ClearCachedData()
@@ -50,7 +49,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public bool IsTypeExtensionAllowed =>
       GetContainingNode<IModuleDeclaration>() != null;
 
-    public ITokenNode IdentifierToken => LongIdentifier?.IdentifierToken;
+    public ITokenNode IdentifierToken => Identifier;
 
     IFSharpReferenceOwner IFSharpReferenceOwner.SetName(string name) =>
       FSharpImplUtil.SetName(this, name);
