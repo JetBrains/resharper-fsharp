@@ -1,32 +1,17 @@
 ﻿Other
 ---
-TO: [O] module |Module| RANGE: (7,13) @ Base Type - Object expressions 03 - Secondary interfaces.fs
-TO: [O] type |Ta|() = RANGE: (22,24) @ Base Type - Object expressions 03 - Secondary interfaces.fs
-TO: [O] abstract |M|: int RANGE: (43,44) @ Base Type - Object expressions 03 - Secondary interfaces.fs
-TO: [O] default |x|.M = 123 RANGE: (63,64) @ Base Type - Object expressions 03 - Secondary interfaces.fs
-TO: [O] default x.|M| = 123 RANGE: (65,66) @ Base Type - Object expressions 03 - Secondary interfaces.fs
-TO: [O] let |t| = { RANGE: (80,81) @ Base Type - Object expressions 03 - Secondary interfaces.fs
-TO: [O] override |x|.M = 234 RANGE: (123,124) @ Base Type - Object expressions 03 - Secondary interfaces.fs
-TO: [O] override x.|M| = 234 RANGE: (125,126) @ Base Type - Object expressions 03 - Secondary interfaces.fs
-TO: [O] interface |System|.IDisposable with RANGE: (150,156) @ Base Type - Object expressions 03 - Secondary interfaces.fs
-TO: [O] override |x|.Dispose() = () RANGE: (192,193) @ Base Type - Object expressions 03 - Secondary interfaces.fs
-TO: [O] override x.|Dispose|() = () RANGE: (194,201) @ Base Type - Object expressions 03 - Secondary interfaces.fs
-
-
-Type specification
----
 TO: [O] abstract M: |int| RANGE: (46,49) @ Base Type - Object expressions 03 - Secondary interfaces.fs
-TO: [O] interface System.|IDisposable| with RANGE: (157,168) @ Base Type - Object expressions 03 - Secondary interfaces.fs
+TO: [O] interface |System|.IDisposable with RANGE: (150,156) @ Base Type - Object expressions 03 - Secondary interfaces.fs
+
+
+Pattern
+---
+TO: [O] let |t| = { RANGE: (80,81) @ Base Type - Object expressions 03 - Secondary interfaces.fs
 
 
 Base type
 ---
 TO: [O] new |Ta|() with RANGE: (95,97) @ Base Type - Object expressions 03 - Secondary interfaces.fs
 TO: [O] interface System.|IDisposable| with RANGE: (157,168) @ Base Type - Object expressions 03 - Secondary interfaces.fs
-
-
-New instance creation
----
-TO: [O] new |Ta|() with RANGE: (95,97) @ Base Type - Object expressions 03 - Secondary interfaces.fs
 
 

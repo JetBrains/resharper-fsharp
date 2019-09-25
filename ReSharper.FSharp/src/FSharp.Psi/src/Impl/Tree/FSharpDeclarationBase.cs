@@ -14,11 +14,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public virtual FSharpSymbol GetFSharpSymbol() =>
       GetFSharpSymbolUse()?.Symbol;
 
-    public FSharpSymbolUse GetFSharpSymbolUse()
-    {
-      var identifierRange = GetNameIdentifierRange();
-      return FSharpFile.GetSymbolDeclaration(identifierRange.StartOffset.Offset);
-    }
+    public FSharpSymbolUse GetFSharpSymbolUse() =>
+      GetSymbolDeclaration(GetNameIdentifierRange());
+
+    protected virtual FSharpSymbolUse GetSymbolDeclaration(TreeTextRange identifierRange) =>
+      FSharpFile.GetSymbolDeclaration(identifierRange.StartOffset.Offset);
 
     public abstract IDeclaredElement DeclaredElement { get; }
     public virtual string DeclaredName => CompiledName;

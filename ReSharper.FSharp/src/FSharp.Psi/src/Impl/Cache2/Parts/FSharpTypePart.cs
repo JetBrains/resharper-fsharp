@@ -97,8 +97,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public override string[] ExtendsListShortNames => EmptyArray<string>.Instance;
     public override MemberDecoration Modifiers { get; }
 
-    /// All F# elements currently considered partial.
-    /// This is an easy way to support signatures, intrinsic type extensions and virtual members. 
+    /// Most F# elements are considered partial as an easy way
+    /// to support signatures, intrinsic type extensions and virtual members. 
     public override bool CanBePartial => true;
 
     public override IList<IAttributeInstance> GetAttributeInstances(IClrTypeName clrName)

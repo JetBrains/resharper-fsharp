@@ -139,6 +139,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       }
     }
 
+    public FSharpSymbolUse SymbolUse =>
+      GetDeclaration()?.GetFSharpSymbolUse();
+
     [NotNull]
     protected IType GetType([CanBeNull] FSharpType fsType) =>
       fsType != null

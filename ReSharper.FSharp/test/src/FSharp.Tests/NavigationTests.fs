@@ -31,17 +31,28 @@ type FSharpGoToUsagesTest() =
     [<Test>] member x.``Record Ctor 02 - Compiled``() = x.DoNamedTest()
 
 
-type FSharpGoToImplementationTest() =
-    inherit FSharpContextSearchTestBase("implementation")
+type FSharpGoToInheritorsTest() =
+    inherit FSharpContextSearchTestBase("inheritors")
 
     override x.CreateContextAction(solution, textControl) =
         base.CreateContextAction(solution, textControl)
-        |> Seq.filter (fun p -> p :? IGotoImplementationsProvider)
-    
+        |> Seq.filter (fun p -> p :? IGotoInheritorsProvider)
+
+    [<Test>] member x.``Union case 01``() = x.DoNamedTest()
+    [<Test>] member x.``Types 01``() = x.DoNamedTest()
+    [<Test>] member x.``Types 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Interface 01``() = x.DoNamedTest()
     [<Test>] member x.``Interface 02 - Member``() = x.DoNamedTest()
     [<Test>] member x.``Interface 03 - Internal type impl``() = x.DoNamedTest()
     [<Test>] member x.``Interface 04 - Overloads``() = x.DoNamedTest()
+
+    [<Test>] member x.``Object expr - Interface 01``() = x.DoNamedTest()
+    [<Test>] member x.``Object expr - Interface 02 - Dispose``() = x.DoNamedTest()
+    [<Test>] member x.``Object expr - Override 01 - Default member``() = x.DoNamedTest()
+    [<Test>] member x.``Object expr - Override 02 - Default member and interface``() = x.DoNamedTest()
+    [<Test>] member x.``Object expr - Override 03 - Interface and default member``() = x.DoNamedTest()
+    [<Test>] member x.``Object expr - Type 01``() = x.DoNamedTest()
 
 
 type FSharpGoToBaseTest() =
@@ -55,17 +66,13 @@ type FSharpGoToBaseTest() =
     [<Test>] member x.``Exception 01``() = x.DoNamedTest()
     [<Test>] member x.``Enum 01``() = x.DoNamedTest()
 
-
-type FSharpGoToInheritorsTest() =
-    inherit FSharpContextSearchTestBase("inheritors")
-
-    override x.CreateContextAction(solution, textControl) =
-        base.CreateContextAction(solution, textControl)
-        |> Seq.filter (fun p -> p :? IGotoInheritorsProvider)
-
-    [<Test>] member x.``Union case 01``() = x.DoNamedTest()
-    [<Test>] member x.``Types 01``() = x.DoNamedTest()
-    [<Test>] member x.``Types 02``() = x.DoNamedTest()
+    [<Test>] member x.``Object expr - Interface 01``() = x.DoNamedTest()
+    [<Test>] member x.``Object expr - Interface 02 - Dispose``() = x.DoNamedTest()
+    [<Test>] member x.``Object expr - Override 01 - ToString``() = x.DoNamedTest()
+    [<Test>] member x.``Object expr - Override 02 - Default member``() = x.DoNamedTest()
+    [<Test>] member x.``Object expr - Override 03 - Default member and interface``() = x.DoNamedTest()
+    [<Test>] member x.``Object expr - Override 04 - Interface and default member``() = x.DoNamedTest()
+    [<Test>] member x.``Object expr - Type 01``() = x.DoNamedTest()
 
 
 type FSharpGoToDeclarationTest() =

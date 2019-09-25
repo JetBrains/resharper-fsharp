@@ -5,6 +5,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Checker;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Tree;
@@ -42,6 +43,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
       foreach (var declaration in fsFile.DeclarationsEnumerable)
         declaration.Accept(this);
+
+      // todo: process only needed nodes
+      fsFile.ProcessDescendants(new RecursiveElementProcessor(treeNode =>
+      {
+        if (treeNode is IObjExpr objExpr)
+          VisitObjExpr(objExpr);
+      }));
     }
 
     public void ProcessNamedModuleLikeDeclaration(INamedModuleLikeDeclaration decl, Part part)
@@ -182,11 +190,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public override void VisitAbstractTypeDeclaration(IAbstractTypeDeclaration decl) =>
       ProcessHiddenTypeDeclaration(decl);
 
-    private void ProcessHiddenTypeDeclaration(IFSharpTypeDeclaration decl)
-    {
-      Builder.StartPart(new HiddenTypePart(decl, Builder));
-      Builder.EndPart();
-    }
+    private void ProcessHiddenTypeDeclaration(IFSharpTypeDeclaration decl) =>
+      ProcessPart(new HiddenTypePart(decl, Builder));
 
     public override void VisitObjectModelTypeDeclaration(IObjectModelTypeDeclaration decl)
     {
@@ -195,11 +200,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       Builder.EndPart();
     }
 
-    public override void VisitDelegateDeclaration(IDelegateDeclaration decl)
-    {
-      Builder.StartPart(new DelegatePart(decl, Builder));
-      Builder.EndPart();
-    }
+    public override void VisitDelegateDeclaration(IDelegateDeclaration decl) =>
+      ProcessPart(new DelegatePart(decl, Builder));
 
     public override void VisitTypeExtensionDeclaration(ITypeExtensionDeclaration typeExtension)
     {
@@ -232,6 +234,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       }
     }
 
+    public override void VisitObjExpr(IObjExpr objExpr)
+    {
+      Builder.StartPart(new ObjectExpressionTypePart(objExpr, Builder));
+      ProcessTypeMembers(objExpr.MemberDeclarations);
+      ProcessTypeMembers(objExpr.InterfaceMembers);
+      Builder.EndPart();
+    }
+
+    private void ProcessPart([NotNull] Part part)
+    {
+      Builder.StartPart(part);
+      Builder.EndPart();
+    }
+    
     private void ProcessTypeMembers(IEnumerable<IDeclaration> declarations)
     {
       foreach (var declaration in declarations)

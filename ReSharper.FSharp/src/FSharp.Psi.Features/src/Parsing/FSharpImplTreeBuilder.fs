@@ -115,7 +115,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         match repr with
         | SynTypeDefnRepr.ObjectModel(SynTypeDefnKind.TyconAugmentation, _, _) ->
             let mark = x.Mark(range)
-            x.ProcessLongIdentifier(lid)
+            x.ProcessReferenceNameSkipLast(lid)
             x.ProcessTypeParametersOfType typeParams range false
             for extensionMember in members do
                 x.ProcessTypeMember(extensionMember)
@@ -216,60 +216,8 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                 with _ -> () // Getting type range throws an exception if base type lid is empty.
                 ElementType.INTERFACE_INHERIT
 
-            | SynMemberDefn.Member(Binding(_, _, _, _, _, _, valData, headPat, returnInfo, expr, _, _), range) ->
-                let elType =
-                    match headPat with
-                    | SynPat.LongIdent(LongIdentWithDots(lid, _), accessorId, typeParamsOpt, memberParams, _, _) ->
-                        match lid with
-                        | [_] ->
-                            match valData with
-                            | SynValData(Some(flags), _, selfId) when flags.MemberKind = MemberKind.Constructor ->
-                                x.ProcessParams(memberParams, true, true) // todo: should check isLocal
-                                x.ProcessCtorSelfId(selfId)
-
-                                x.MarkChameleonExpression(expr)
-                                ElementType.MEMBER_CONSTRUCTOR_DECLARATION
-
-                            | _ ->
-                                match accessorId with
-                                | Some ident ->
-                                    x.ProcessAccessor(ident, memberParams, expr)
-                                    ElementType.MEMBER_DECLARATION
-                                | _ ->
-
-                                x.ProcessMemberDeclaration(typeParamsOpt, memberParams, returnInfo, expr, range)
-                                ElementType.MEMBER_DECLARATION
-
-                        | selfId :: _ :: _ ->
-                            x.MarkAndDone(selfId.idRange, ElementType.MEMBER_SELF_ID)
-
-                            match accessorId with
-                            | Some ident ->
-                                x.ProcessAccessor(ident, memberParams, expr)
-                                ElementType.MEMBER_DECLARATION
-                            | _ ->
-
-                            x.ProcessMemberDeclaration(typeParamsOpt, memberParams, returnInfo, expr, range)
-                            ElementType.MEMBER_DECLARATION
-
-                        | _ -> ElementType.OTHER_TYPE_MEMBER
-
-                    | SynPat.Named _ ->
-                        // In some cases patterns for static members inside records are represented this way.
-                        x.ProcessMemberDeclaration(None, SynConstructorArgs.Pats [], returnInfo, expr, range)
-                        ElementType.MEMBER_DECLARATION
-
-                    | _ -> ElementType.OTHER_TYPE_MEMBER
-
-                match valData with
-                | SynValData(Some(flags), _, _) when
-                        flags.MemberKind = MemberKind.PropertyGet || flags.MemberKind = MemberKind.PropertySet ->
-                    if expr.Range.End <> range.End then
-                        unfinishedProperty <- Some(mark, range)
-
-                | _ -> ()
-
-                elType
+            | SynMemberDefn.Member(binding, range) ->
+                x.ProcessMemberBinding(mark, binding, range)
 
             | SynMemberDefn.LetBindings(bindings, _, _, range) ->
                 for binding in bindings do
@@ -302,6 +250,61 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         if unfinishedProperty.IsNone then
             x.Done(typeMember.Range, mark, memberType)
 
+    member x.ProcessMemberBinding(mark, Binding(_, _, _, _, _, _, valData, headPat, returnInfo, expr, _, _), range) =
+        let elType =
+            match headPat with
+            | SynPat.LongIdent(LongIdentWithDots(lid, _), accessorId, typeParamsOpt, memberParams, _, _) ->
+                match lid with
+                | [_] ->
+                    match valData with
+                    | SynValData(Some(flags), _, selfId) when flags.MemberKind = MemberKind.Constructor ->
+                        x.ProcessParams(memberParams, true, true) // todo: should check isLocal
+                        x.ProcessCtorSelfId(selfId)
+
+                        x.MarkChameleonExpression(expr)
+                        ElementType.MEMBER_CONSTRUCTOR_DECLARATION
+
+                    | _ ->
+                        match accessorId with
+                        | Some ident ->
+                            x.ProcessAccessor(ident, memberParams, expr)
+                            ElementType.MEMBER_DECLARATION
+                        | _ ->
+
+                        x.ProcessMemberDeclaration(typeParamsOpt, memberParams, returnInfo, expr, range)
+                        ElementType.MEMBER_DECLARATION
+
+                | selfId :: _ :: _ ->
+                    x.MarkAndDone(selfId.idRange, ElementType.MEMBER_SELF_ID)
+
+                    match accessorId with
+                    | Some ident ->
+                        x.ProcessAccessor(ident, memberParams, expr)
+                        ElementType.MEMBER_DECLARATION
+                    | _ ->
+
+                    x.ProcessMemberDeclaration(typeParamsOpt, memberParams, returnInfo, expr, range)
+                    ElementType.MEMBER_DECLARATION
+
+                | _ -> ElementType.OTHER_TYPE_MEMBER
+
+            | SynPat.Named _ ->
+                // In some cases patterns for static members inside records are represented this way.
+                x.ProcessMemberDeclaration(None, SynConstructorArgs.Pats [], returnInfo, expr, range)
+                ElementType.MEMBER_DECLARATION
+
+            | _ -> ElementType.OTHER_TYPE_MEMBER
+
+        match valData with
+        | SynValData(Some(flags), _, _) when
+                flags.MemberKind = MemberKind.PropertyGet || flags.MemberKind = MemberKind.PropertySet ->
+            if expr.Range.End <> range.End then
+                unfinishedProperty <- Some(mark, range)
+
+        | _ -> ()
+
+        elType
+    
     member x.ProcessAccessor(IdentRange range, memberParams, expr) =
         let mark = x.Mark(range)
         x.ProcessParams(memberParams, true, true)
@@ -574,7 +577,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
     member x.PushExpression(synExpr: SynExpr) =
         x.PushStep(synExpr, expressionProcessor)
 
-    member x.PushStepList(items, processor) =
+    member x.PushStepList(items, processor: StepListProcessorBase<_>) =
         match items with
         | [] -> ()
         | _ -> x.PushStep(items, processor)
@@ -643,7 +646,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             x.PushRange(range, ElementType.OBJ_EXPR)
             x.ProcessTypeAsTypeReference(synType)
             x.PushStepList(interfaceImpls, interfaceImplementationListProcessor)
-            x.PushStepList(bindings, bindingListProcessor)
+            x.PushStepList(bindings, objectExpressionMemberListProcessor)
 
             match args with
             | Some(expr, _) -> x.ProcessExpression(expr)
@@ -976,9 +979,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             x.ProcessExpression(expr)
     
     member x.ProcessInterfaceImplementation(InterfaceImpl(interfaceType, bindings, range)) =
-        x.PushRange(range, ElementType.OBJ_EXPR_SECONDARY_INTERFACE)
+        x.PushRange(range, ElementType.INTERFACE_IMPLEMENTATION)
         x.ProcessTypeAsTypeReference(interfaceType)
-        x.ProcessBindings(bindings)
+        x.PushStepList(bindings, objectExpressionMemberListProcessor)
 
     member x.ProcessSynIndexerArg(arg) =
         match arg with
@@ -1161,6 +1164,14 @@ type MatchClauseListProcessor() =
     override x.Process(matchClause, builder) =
         builder.ProcessMatchClause(matchClause)
 
+type ObjectExpressionMemberListProcessor() =
+    inherit StepListProcessorBase<SynBinding>()
+
+    override x.Process(binding, builder) =
+        let (Binding(_, _, _, _, _, _, _, _, _, _, range, _)) = binding
+        let mark = builder.Mark(range)
+        let elementType = builder.ProcessMemberBinding(mark, binding, range)
+        builder.Done(range, mark, elementType)
 
 type InterfaceImplementationListProcessor() =
     inherit StepListProcessorBase<SynInterfaceImpl>()
@@ -1208,5 +1219,6 @@ module BuilderStepProcessors =
     let recordFieldListProcessor = RecordFieldListProcessor()
     let anonRecordFieldListProcessor = AnonRecordFieldListProcessor()
     let matchClauseListProcessor = MatchClauseListProcessor()
+    let objectExpressionMemberListProcessor = ObjectExpressionMemberListProcessor()
     let interfaceImplementationListProcessor = InterfaceImplementationListProcessor()
     let indexerArgListProcessor = IndexerArgListProcessor()

@@ -50,15 +50,11 @@ type FSharpItemOccurenceKindProvider() =
             | :? ITypeReferenceName as typeReferenceName ->
                 if isNotNull (InheritMemberNavigator.GetByTypeName(typeReferenceName)) ||
                    isNotNull (InterfaceImplementationNavigator.GetByTypeName(typeReferenceName)) ||
-                   isNotNull (ObjExprSecondaryInterfaceNavigator.GetByTypeName(typeReferenceName)) then
+                   isNotNull (ObjExprNavigator.GetByTypeName(typeReferenceName)) then
                     [| OccurrenceKind.ExtendedType |] :> _ else
             
                 if isNotNull (OpenStatementNavigator.GetByReferenceName(typeReferenceName)) then
                     [| FSharpOccurrenceKinds.import |] :> _ else
-
-                if isNotNull (ObjExprNavigator.GetByTypeName(typeReferenceName)) then
-                    // todo: we have two references here, how do we distinguish them?
-                    [| OccurrenceKind.ExtendedType |] :> _ else
 
                 let namedType = NamedTypeNavigator.GetByReferenceName(typeReferenceName)
                 if isNull namedType then EmptyList.Instance :> _ else

@@ -1,0 +1,57 @@
+﻿-------------- offset 87 line 5 col 26 --------------------
++++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.NavigateToBaseProvider navigation provider results +++
+Occurrences provided for OccurrenceUtil:
+Occurrence's dump:
+DEO: Envoy: Method:System.Object.ToString(), PsiLanguageType:UNKNOWN as Envoy: Method:System.Object.ToString(), PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
+Menu Item presentation: 
+Text: Object | (in System.Object)
+Shortcut text: mscorlib, Version=4.0.0.0, msil
+Style: Enabled
+Mnemonic: 
+Tooltip: 
+
+Occurrence's navigation result. Opened file: Object.cs
+------------------
+
+    [__DynamicallyInvokable]
+    public virtual string |CARET|ToString()
+    {
+      return this.GetType().ToString();
+------------------
+
+Occurrence's dump:
+DEO: Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpMethod`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.MemberDeclaration], PsiLanguageType:F# as Envoy: JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.FSharpMethod`1[JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree.MemberDeclaration], PsiLanguageType:F# RANGE: (0,0) @ Object expr - Override 01 - ToString.fs
+Menu Item presentation: 
+Text: Object expr - Override 01 - ToString.T | (in Object expr - Override 01 - ToString.T)
+Shortcut text: TestProject
+Style: Enabled
+Mnemonic: 
+Tooltip: 
+
++++ JetBrains.ReSharper.Features.Navigation.Features.FindHierarchy.NavigateToBaseProvider navigation provider results +++
+Occurrences provided for OccurrenceUtil:
+Occurrence's dump:
+TO: [O] override x.|ToString|() = "" RANGE: (27,35) @ Object expr - Override 01 - ToString.fs
+Menu Item presentation: 
+Text: Object expr - Override 01 - ToString.fs| (2)
+Shortcut text: in <TestProject>
+Style: Enabled
+Mnemonic: 
+Tooltip: override x.ToString() = ""
+
+Occurrence's navigation result. Opened file: Object expr - Override 01 - ToString.fs
+------------------
+type T() =
+    override x.|CARET|ToString() = ""
+
+{ new T() with
+------------------
+
+Occurrence's navigation result. Opened file: Object expr - Override 01 - ToString.fs
+------------------
+type T() =
+    override x.|CARET|ToString() = ""
+
+{ new T() with
+------------------
+

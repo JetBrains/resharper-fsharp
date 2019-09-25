@@ -15,6 +15,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
 
+    protected override FSharpSymbolUse GetSymbolDeclaration(TreeTextRange identifierRange) =>
+      ObjExprNavigator.GetByMember(this) != null
+        ? FSharpFile.GetSymbolUse(identifierRange.StartOffset.Offset)
+        : base.GetSymbolDeclaration(identifierRange);
+
     protected override IDeclaredElement CreateDeclaredElement()
     {
       if (!(GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv)) return null;
@@ -44,10 +49,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
         return new FSharpSignOperator<MemberDeclaration>(this, mfv);
       }
+
       return new FSharpMethod<MemberDeclaration>(this, mfv);
     }
 
     public bool IsExplicitImplementation =>
-      Parent is IInterfaceImplementation;
+      InterfaceImplementationNavigator.GetByTypeMember(this) != null ||
+      ObjExprNavigator.GetByMemberDeclaration(this) != null;
   }
 }

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Checker;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
@@ -74,6 +75,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
           return new StructExtensionPart(reader);
         case FSharpPartKind.Delegate:
           return new DelegatePart(reader);
+        case FSharpPartKind.ObjectExpression:
+          return new ObjectExpressionTypePart(reader);
         case FSharpPartKind.HiddenType:
           return new HiddenTypePart(reader);
         default:

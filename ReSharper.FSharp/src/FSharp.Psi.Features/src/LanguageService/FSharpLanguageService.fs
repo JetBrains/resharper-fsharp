@@ -62,7 +62,10 @@ type FSharpLanguageService
     override x.FindTypeDeclarations(_) = EmptyList.Instance :> _
 
     override x.CanContainCachableDeclarations(node) =
-        not (node :? IExpression)
+        // workaround for object expressions
+        // todo: add API providing additional cachable nodes inside chameleons
+        true
+//        not (node :? IExpression) || node :? IObjExpr
 
     override x.CalcOffset(declaration) =
         match declaration with

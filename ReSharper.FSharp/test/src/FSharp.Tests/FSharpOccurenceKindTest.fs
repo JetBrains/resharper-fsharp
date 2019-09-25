@@ -28,9 +28,9 @@ type FSharpOccurenceKindTest() =
     [<Test>] member x.``Base Type 03 - Interface``() = x.DoNamedTest()
     [<Test>] member x.``Base Type 04 - Inherit arg``() = x.DoNamedTest()
 
-    [<Test; Explicit("Fix patterns")>] member x.``Base Type - Object expressions 01 - Class``() = x.DoNamedTest()
-    [<Test; Explicit("Fix patterns")>] member x.``Base Type - Object expressions 02 - Interface``() = x.DoNamedTest()
-    [<Test; Explicit("Fix patterns")>] member x.``Base Type - Object expressions 03 - Secondary interfaces``() = x.DoNamedTest()
+    [<Test>] member x.``Base Type - Object expressions 01 - Class``() = x.DoNamedTest()
+    [<Test>] member x.``Base Type - Object expressions 02 - Interface``() = x.DoNamedTest()
+    [<Test>] member x.``Base Type - Object expressions 03 - Secondary interfaces``() = x.DoNamedTest()
 
     [<Test>] member x.``Type Argument 01``() = x.DoNamedTest()
     [<Test>] member x.``Type Argument 02 - Pattern``() = x.DoNamedTest()

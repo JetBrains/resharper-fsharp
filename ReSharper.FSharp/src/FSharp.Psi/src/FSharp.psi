@@ -538,17 +538,17 @@ whileExpr options { stubBase="FSharpExpressionBase"; }:
   DO
   synExpr<DO_EXPR, DoExpression>;
 
-objExpr options { stubBase="FSharpExpressionBase"; }:
+objExpr options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
+  get { methodName="InterfaceMembers" path=<objExpr:INTERFACE_IMPL/interfaceImplementation:MEMBER_DECL> };
+}:
   LBRACE
   NEW
   typeReferenceName<TYPE_REFERENCE, TypeName>
+  synExpr<ARG_EXPR, ArgExpression>
   WITH
-  fakeSeparator
+  memberDeclaration<MEMBER_DECL, MemberDeclarations>*
+  interfaceImplementation<INTERFACE_IMPL, InterfaceImplementations>*
   RBRACE;
-
-objExprSecondaryInterface:
-  typeReferenceName<TYPE_REFERENCE, TypeName>
-  fakeSeparator;
 
 compExpr options { stubBase="FSharpExpressionBase"; }:
   LBRACE
@@ -1000,7 +1000,7 @@ interfaceImplementation:
   typeReferenceName<TYPE_REFERENCE, TypeName>
   (
     WITH
-    fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*
+    memberDeclaration<MEMBER_DECL, TypeMembers>*
   )?;
 
 

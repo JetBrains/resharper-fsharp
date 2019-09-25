@@ -24,6 +24,8 @@
     StructExtension = 16,
     Delegate = 17,
 
-    HiddenType = 18,
+    ObjectExpression = 18,
+
+    HiddenType = 19,
   }
 }

@@ -4,6 +4,7 @@ using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
@@ -83,14 +84,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public bool CanBeImplicitImplementation => false;
 
     public bool IsExplicitImplementation =>
-      GetDeclaration() is IMemberDeclaration member && member.IsExplicitImplementation;
+      GetDeclaration() is IMemberDeclaration member && member.IsExplicitImplementation ||
+      (SymbolUse?.IsFromDispatchSlotImplementation ?? false) && (Mfv?.DeclaringEntity?.Value.IsInterface ?? false);
 
     public IList<IExplicitImplementation> ExplicitImplementations
     {
       get
       {
         var mfv = Mfv;
-        var implementations = mfv?.ImplementedAbstractSignatures;
+        if (mfv == null)
+          return EmptyList<IExplicitImplementation>.Instance;
+
+        if (GetDeclaration() is IMemberDeclaration member && ObjExprNavigator.GetByMember(member) != null)
+        {
+          return mfv.DeclaringEntity?.Value is FSharpEntity entity && entity.GetTypeElement(Module) is ITypeElement typeElement
+            ? new IExplicitImplementation[]
+              {new ExplicitImplementation(this, TypeFactory.CreateType(typeElement), ShortName, true)}
+            : EmptyList<IExplicitImplementation>.InstanceList;
+        }
+
+        var implementations = mfv.ImplementedAbstractSignatures;
         if (implementations == null || implementations.IsEmpty())
           return EmptyList<IExplicitImplementation>.Instance;
 
@@ -108,8 +121,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     }
 
     // todo: check interface impl
-    public override bool IsOverride => Mfv?.IsOverrideOrExplicitInterfaceImplementation ?? false;
-    public override bool IsAbstract => Mfv?.IsDispatchSlot ?? false;
+    public override bool IsOverride => 
+      (SymbolUse?.IsFromDispatchSlotImplementation ?? false) && (!Mfv?.DeclaringEntity?.Value.IsInterface ?? false) ||
+      (Mfv?.IsOverrideOrExplicitInterfaceImplementation ?? false);
+
+    public override bool IsAbstract =>
+      (Mfv?.IsDispatchSlot ?? false) &&
+      ObjExprNavigator.GetByMember(GetDeclaration() as IMemberDeclaration) == null;
+
     public override bool IsVirtual => false; // todo
 
     public override bool Equals(object obj)

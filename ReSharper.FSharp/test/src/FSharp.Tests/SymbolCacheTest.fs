@@ -62,6 +62,8 @@ type SymbolCacheTest() =
     [<Test>] member x.``Abbreviations - Module 01``() = x.DoNamedTest()
     [<Test>] member x.``Abbreviations - Module 02``() = x.DoNamedTest()
 
+    [<Test>] member x.``Object expr - Interface 01``() = x.DoNamedTest()
+
     override x.DoTest(lifetime: Lifetime, project: IProject) =
         let psiServices = x.Solution.GetPsiServices()
         psiServices.Files.CommitAllDocuments()

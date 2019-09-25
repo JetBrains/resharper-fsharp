@@ -1,26 +1,14 @@
 ﻿Other
 ---
-TO: [O] module |Module| RANGE: (7,13) @ Base Type - Object expressions 01 - Class.fs
-TO: [O] type |Ta|() = RANGE: (22,24) @ Base Type - Object expressions 01 - Class.fs
-TO: [O] abstract |M|: int RANGE: (43,44) @ Base Type - Object expressions 01 - Class.fs
-TO: [O] default |x|.M = 123 RANGE: (63,64) @ Base Type - Object expressions 01 - Class.fs
-TO: [O] default x.|M| = 123 RANGE: (65,66) @ Base Type - Object expressions 01 - Class.fs
-TO: [O] let |t| = { RANGE: (80,81) @ Base Type - Object expressions 01 - Class.fs
-TO: [O] override |x|.M = 234 RANGE: (123,124) @ Base Type - Object expressions 01 - Class.fs
-TO: [O] override x.|M| = 234 RANGE: (125,126) @ Base Type - Object expressions 01 - Class.fs
-
-
-Type specification
----
 TO: [O] abstract M: |int| RANGE: (46,49) @ Base Type - Object expressions 01 - Class.fs
 
 
-Base type
+Pattern
 ---
-TO: [O] new |Ta|() with RANGE: (95,97) @ Base Type - Object expressions 01 - Class.fs
+TO: [O] let |t| = { RANGE: (80,81) @ Base Type - Object expressions 01 - Class.fs
 
 
-New instance creation
+Base type
 ---
 TO: [O] new |Ta|() with RANGE: (95,97) @ Base Type - Object expressions 01 - Class.fs
 
