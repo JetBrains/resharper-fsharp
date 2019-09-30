@@ -8,6 +8,7 @@ using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.Compiled;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
@@ -185,8 +186,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (symbol is FSharpActivePatternCase patternCase)
         return GetActivePatternCaseElement(psiModule, referenceExpression, patternCase);
 
-      if (symbol is FSharpGenericParameter parameter)
-        return GetTypeParameter(parameter, referenceExpression);
+      if (symbol is FSharpGenericParameter genericParameter)
+        return GetTypeParameter(genericParameter, referenceExpression);
+
+      if (symbol is FSharpParameter parameter && referenceExpression != null)
+        return parameter.GetOwner(referenceExpression.Reference); // todo: map to parameter
 
       return null;
     }

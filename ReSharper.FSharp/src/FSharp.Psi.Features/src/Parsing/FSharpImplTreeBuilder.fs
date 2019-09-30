@@ -450,7 +450,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                             fieldMark
 
                     x.ProcessPat(pat, isLocal, false)
-                    x.Done(fieldMark, ElementType.RECORD_FIELD_PAT)
+                    x.Done(fieldMark, ElementType.FIELD_PAT)
                 ElementType.RECORD_PAT
 
             | SynPat.IsInst(typ, _) ->
@@ -484,8 +484,11 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                 x.ProcessParam(pat, isLocal, markMember)
 
         | NamePatPairs(idsAndPats, _) ->
-            for _, pat in idsAndPats do
+            for IdentRange range, pat in idsAndPats do
+                let mark = x.Mark(range)
+                x.MarkAndDone(range, ElementType.EXPRESSION_REFERENCE_NAME)
                 x.ProcessParam(pat, isLocal, markMember)
+                x.Done(range, mark, ElementType.FIELD_PAT)
 
     member x.ProcessParam(PatRange range as pat, isLocal, markMember) =
         if not markMember then x.ProcessPat(pat, isLocal, false) else

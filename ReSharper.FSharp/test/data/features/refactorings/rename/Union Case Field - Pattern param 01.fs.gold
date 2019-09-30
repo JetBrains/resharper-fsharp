@@ -1,0 +1,11 @@
+﻿CONFLICTS FOUND:
+Warning Module.U.C.zzz will hide Module.U.C.zzz
+==========
+module Module
+
+type U =
+    | C of zzz: int
+
+match C 1 with
+| C (zzz = f) -> ()
+| _ -> ()

@@ -8,7 +8,7 @@ IFSharpImplFile
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "
       ITopBinding
         IRecordPat
-          IRecordFieldPat
+          IFieldPat
             IExpressionReferenceName
               FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "

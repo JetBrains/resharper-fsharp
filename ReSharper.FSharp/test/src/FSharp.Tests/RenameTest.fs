@@ -160,3 +160,7 @@ type FSharpRenameTest() =
 
     [<Test>] member x.``Type member - Field 01 - Name``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Field 02 - Type``() = x.DoNamedTest()
+
+    [<Test>] member x.``Union Case Field - Creation param 01``() = x.DoNamedTest()
+    [<Test>] member x.``Union Case Field - Creation param 02 - Tuple``() = x.DoNamedTest()
+    [<Test>] member x.``Union Case Field - Pattern param 01``() = x.DoNamedTest()

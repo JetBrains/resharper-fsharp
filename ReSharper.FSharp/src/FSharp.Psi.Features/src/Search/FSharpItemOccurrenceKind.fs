@@ -92,7 +92,7 @@ type FSharpItemOccurenceKindProvider() =
             | :? IExpressionReferenceName as referenceName ->
                 if isNotNull (ReferencePatNavigator.GetByReferenceName(referenceName)) ||
                    isNotNull (ParametersOwnerPatNavigator.GetByReferenceName(referenceName)) ||
-                   isNotNull (RecordFieldPatNavigator.GetByReferenceName(referenceName)) then
+                   isNotNull (FieldPatNavigator.GetByReferenceName(referenceName)) then
                     [| FSharpOccurrenceKinds.pattern |] :> _ else
 
                 EmptyList.Instance :> _
