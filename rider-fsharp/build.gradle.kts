@@ -5,6 +5,7 @@ import org.jetbrains.intellij.IntelliJPlugin
 import org.jetbrains.intellij.tasks.PrepareSandboxTask
 import org.jetbrains.kotlin.daemon.common.toHexString
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.net.URI
 
 buildscript {
     repositories {
@@ -74,6 +75,24 @@ intellij {
 
     // Workaround for https://youtrack.jetbrains.com/issue/IDEA-179607
     setPlugins("rider-plugins-appender")
+}
+
+repositories.forEach {
+    fun replaceWithCacheRedirector(u: URI): URI {
+        val cacheHost = "cache-redirector.jetbrains.com"
+        return if (u.scheme.startsWith("http") && u.host != cacheHost)
+            URI("https", cacheHost, "/${u.host}/${u.path}", u.query, u.fragment)
+        else u
+    }
+
+    when (it) {
+        is MavenArtifactRepository -> {
+            it.url = replaceWithCacheRedirector(it.url)
+        }
+        is IvyArtifactRepository -> {
+            it.url = replaceWithCacheRedirector(it.url)
+        }
+    }
 }
 
 val repoRoot = projectDir.parentFile!!
@@ -295,6 +314,19 @@ tasks {
         gradleVersion = "4.10"
         distributionType = Wrapper.DistributionType.ALL
         distributionUrl = "https://cache-redirector.jetbrains.com/services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
+    }
+
+    task("listrepos"){
+        doLast {
+            logger.lifecycle("Repositories:")
+            project.repositories.forEach {
+                when (it) {
+                    is MavenArtifactRepository -> logger.lifecycle("Name: ${it.name}, url: ${it.url}")
+                    is IvyArtifactRepository -> logger.lifecycle("Name: ${it.name}, url: ${it.url}")
+                    else -> logger.lifecycle("Name: ${it.name}, $it")
+                }
+            }
+        }
     }
 }
 
