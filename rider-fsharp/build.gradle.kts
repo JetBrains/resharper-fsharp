@@ -18,6 +18,11 @@ buildscript {
     }
 }
 
+repositories {
+    maven { setUrl("https://cache-redirector.jetbrains.com/repo.maven.org/maven2")}
+    maven { setUrl("https://cache-redirector.jetbrains.com/repo.maven.apache.org/maven2")}
+}
+
 plugins {
     id("org.jetbrains.intellij") version "0.4.7"
     id("org.jetbrains.grammarkit") version "2018.1.7"
@@ -27,11 +32,6 @@ apply {
     plugin("kotlin")
     plugin("com.jetbrains.rdgen")
     plugin("org.jetbrains.grammarkit")
-}
-
-repositories {
-    maven { setUrl("https://cache-redirector.jetbrains.com/repo.maven.org/maven2")}
-    maven { setUrl("https://cache-redirector.jetbrains.com/repo.maven.apache.org/maven2")}
 }
 
 java {
