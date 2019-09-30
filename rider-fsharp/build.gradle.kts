@@ -10,7 +10,7 @@ buildscript {
     repositories {
         maven { setUrl("https://cache-redirector.jetbrains.com/www.myget.org/F/rd-snapshots/maven") }
         maven { setUrl("https://cache-redirector.jetbrains.com/dl.bintray.com/kotlin/kotlin-eap") }
-        mavenCentral()
+        maven { setUrl("https://cache-redirector.jetbrains.com/repo.maven.apache.org/maven2")}
     }
     dependencies {
         classpath("com.jetbrains.rd:rd-gen:0.192.2")
@@ -30,8 +30,8 @@ apply {
 }
 
 repositories {
-    mavenCentral()
-    maven { setUrl("https://cache-redirector.jetbrains.com/dl.bintray.com/kotlin/kotlin-eap") }
+    maven { setUrl("https://cache-redirector.jetbrains.com/repo.maven.org/maven2")}
+    maven { setUrl("https://cache-redirector.jetbrains.com/repo.maven.apache.org/maven2")}
 }
 
 java {
