@@ -24,7 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public string DeclaredName => SharedImplUtil.MISSING_DECLARATION_NAME;
 
-    public TreeNodeCollection<IFSharpAttribute> AllAttributes
+    public TreeNodeCollection<IAttribute> AllAttributes
     {
       get
       {

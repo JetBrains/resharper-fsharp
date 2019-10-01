@@ -43,10 +43,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public const string Sealed = "Sealed";
     public const string Struct = "Struct";
 
-    public static string GetShortName([NotNull] this IFSharpAttribute attr) =>
+    public static string GetShortName([NotNull] this IAttribute attr) =>
       attr.ReferenceName?.ShortName.GetAttributeShortName();
 
-    public static bool ShortNameEquals([NotNull] this IFSharpAttribute attr, [NotNull] string shortName) =>
+    public static bool ShortNameEquals([NotNull] this IAttribute attr, [NotNull] string shortName) =>
       attr.GetShortName() == shortName;
 
     [CanBeNull]
@@ -62,7 +62,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return null;
     }
 
-    private static bool GetCompiledNameValue(IFSharpAttribute attr, out string compiledName)
+    private static bool GetCompiledNameValue(IAttribute attr, out string compiledName)
     {
       if (!attr.ShortNameEquals(CompiledName))
       {
@@ -98,11 +98,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return false;
     }
 
-    private static bool IsModuleSuffixAttribute([NotNull] this IFSharpAttribute attr) =>
+    private static bool IsModuleSuffixAttribute([NotNull] this IAttribute attr) =>
       attr.ShortNameEquals("CompilationRepresentation") && IsModuleSuffixExpr(attr.Expression);
 
     public static string GetModuleCompiledName([CanBeNull] this IIdentifier identifier,
-      TreeNodeCollection<IFSharpAttribute> attributes)
+      TreeNodeCollection<IAttribute> attributes)
     {
       var hasModuleSuffix = false;
       string compiledName = null;
@@ -125,7 +125,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         : compiledName ?? sourceName ?? SharedImplUtil.MISSING_DECLARATION_NAME;
     }
 
-    public static bool GetCompiledName(this TreeNodeCollection<IFSharpAttribute> attributes, out string name)
+    public static bool GetCompiledName(this TreeNodeCollection<IAttribute> attributes, out string name)
     {
       foreach (var attr in attributes)
         if (GetCompiledNameValue(attr, out var value))
@@ -140,7 +140,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
     [NotNull]
     public static string GetCompiledName([CanBeNull] this IIdentifier identifier,
-      TreeNodeCollection<IFSharpAttribute> attributes) =>
+      TreeNodeCollection<IAttribute> attributes) =>
       GetCompiledName(attributes, out var name)
         ? name
         : GetCompiledName(identifier);
@@ -280,7 +280,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return caseDeclaration?.DeclaredElement;
     }
 
-    public static TreeNodeCollection<IFSharpAttribute> GetAttributes([NotNull] this IDeclaration declaration)
+    public static TreeNodeCollection<IAttribute> GetAttributes([NotNull] this IDeclaration declaration)
     {
       switch (declaration)
       {
@@ -292,7 +292,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
           return pat.Attributes;
         case IModuleDeclaration moduleDeclaration:
           return moduleDeclaration.Attributes;
-        default: return TreeNodeCollection<IFSharpAttribute>.Empty;
+        default: return TreeNodeCollection<IAttribute>.Empty;
       }
     }
 
@@ -408,7 +408,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return AccessRights.PUBLIC;
     }
 
-    public static bool GetTypeKind(IEnumerable<IFSharpAttribute> attributes, out PartKind fSharpPartKind)
+    public static bool GetTypeKind(IEnumerable<IAttribute> attributes, out PartKind fSharpPartKind)
     {
       foreach (var attr in attributes)
         switch (attr.ReferenceName?.ShortName.DropAttributeSuffix())
@@ -476,7 +476,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static string DropAttributeSuffix([NotNull] this string attrName) =>
       attrName.SubstringBeforeLast(AttributeSuffix, StringComparison.Ordinal);
 
-    public static bool HasAttribute(this TreeNodeCollection<IFSharpAttribute> attributes, [NotNull] string shortName)
+    public static bool HasAttribute(this TreeNodeCollection<IAttribute> attributes, [NotNull] string shortName)
     {
       foreach (var attr in attributes)
         if (attr.ShortNameEquals(shortName))

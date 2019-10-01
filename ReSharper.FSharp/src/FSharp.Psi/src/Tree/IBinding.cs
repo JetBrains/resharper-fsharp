@@ -4,6 +4,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
   public partial interface IBinding
   {
-    TreeNodeCollection<IFSharpAttribute> AllAttributes { get; }
+    TreeNodeCollection<IAttribute> AllAttributes { get; }
   }
 }

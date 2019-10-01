@@ -97,8 +97,10 @@ globalNamespaceDeclaration options { stubBase="FSharpDeclarationBase"; }:
   GLOBAL
   moduleMember<MODULE_MEMBER, Members>*;
 
-namedModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+namedModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
+  get { methodName="Attributes" path=<namedModuleDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+}:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   MODULE<MODULE, ModuleToken>
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   (
@@ -133,8 +135,10 @@ interface moduleMemberStatement:
   openStatement |
   do;
 
-letModuleDecl options { stubBase="DummyDeclaration"; }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+letModuleDecl options { stubBase="DummyDeclaration"; } extras {
+  get { methodName="Attributes" path=<letModuleDecl:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+}:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   letOrUse{LET, LetOrUseToken}
   INLINE<INLINE, InlineKeyword>?
   REC<REC, RecKeyword>?
@@ -157,28 +161,32 @@ interface binding:
   topBinding |
   localBinding;
 
-topBinding
-  extras {
-    get { methodName="Expression" path=<topBinding:CHAMELEON_EXPR/chameleonExpression:EXPR> };
-  }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+topBinding extras {
+  get { methodName="Expression" path=<topBinding:CHAMELEON_EXPR/chameleonExpression:EXPR> };
+  get { methodName="Attributes" path=<topBinding:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+}:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   MUTABLE<MUTABLE, MutableKeyword>
   synPat<HEAD_PATTERN, HeadPattern>
   returnTypeInfo<RETURN_INFO, ReturnTypeInfo>
   EQUALS
   chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>;
 
-localBinding:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+localBinding extras {
+  get { methodName="Attributes" path=<localBinding:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+}:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   MUTABLE<MUTABLE, MutableKeyword>
   synPat<HEAD_PATTERN, HeadPattern>
   returnTypeInfo<RETURN_INFO, ReturnTypeInfo>
   EQUALS
   synExpr<EXPR, Expression>;
 
-returnTypeInfo:
+returnTypeInfo extras {
+  get { methodName="Attributes" path=<returnTypeInfo:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+}:
   COLON
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   synType<TYPE, ReturnType>;
 
 interface synPat:
@@ -260,8 +268,10 @@ typedPat options { stubBase="SynPatternBase"; }:
   COLON
   synType<TYPE, Type>;
 
-attribPat options { stubBase="SynPatternBase"; }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+attribPat options { stubBase="SynPatternBase"; } extras {
+  get { methodName="Attributes" path=<attribPat:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+}:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   synPat<PATTERN, Pattern>;
 
 orPat options { stubBase="SynPatternBase"; }:
@@ -733,8 +743,10 @@ interface objectModelTypeDeclaration:
   structDeclaration |
   objectTypeDeclaration;
 
-nestedModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+nestedModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
+  get { methodName="Attributes" path=<nestedModuleDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+}:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   IDENTIFIER<IDENTIFIER, Identifier>
   moduleMember<MODULE_MEMBER, Members>*;
@@ -742,8 +754,9 @@ nestedModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; }
 typeExtensionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
    get { methodName="TypeParameters" path=<typeExtensionDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
    get { methodName="TypeMembers" path=<typeExtensionDeclaration:TYPE_MEMBER> };
+   get { methodName="Attributes" path=<typeExtensionDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
  }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   (
     referenceName<REFERENCE_NAME, QualifierReferenceName>
@@ -757,16 +770,19 @@ typeExtensionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; 
 
 enumDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<enumDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
+  get { methodName="Attributes" path=<enumDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   IDENTIFIER<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   enumMemberDeclaration<ENUM_MEMBER, EnumMembers>*
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
 
-enumMemberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+enumMemberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
+  get { methodName="Attributes" path=<enumMemberDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+}:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   IDENTIFIER<IDENTIFIER, Identifier>;
 
 
@@ -775,8 +791,9 @@ enumMemberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"
 
 recordDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<recordDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
+  get { methodName="Attributes" path=<recordDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   IDENTIFIER<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
@@ -784,8 +801,10 @@ recordDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extra
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
 
 
-recordFieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+recordFieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
+  get { methodName="Attributes" path=<recordFieldDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+}:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   IDENTIFIER<IDENTIFIER, Identifier>
   COLON
   synType<TYPE, Type>;
@@ -801,8 +820,9 @@ unionCasesList:
 unionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<unionDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
   get { methodName="UnionCases" path=<unionDeclaration:UNION_CASES_LIST/unionCasesList:UNION_CASE> };
+  get { methodName="Attributes" path=<unionDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   IDENTIFIER<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
@@ -814,15 +834,18 @@ interface unionCaseDeclaration:
   singletonCaseDeclaration |
   nestedTypeUnionCaseDeclaration;
 
-singletonCaseDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+singletonCaseDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
+  get { methodName="Attributes" path=<singletonCaseDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+}:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   IDENTIFIER<IDENTIFIER, Identifier>;
 
 nestedTypeUnionCaseDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<nestedTypeUnionCaseDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
+  get { methodName="Attributes" path=<nestedTypeUnionCaseDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   IDENTIFIER<IDENTIFIER, Identifier>
   caseFieldDeclaration<UNION_FIELD, Fields>*
@@ -847,8 +870,9 @@ exceptionFieldDeclaration options { stubBase="UnionCaseFieldDeclarationBase"; }:
 
 exceptionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<exceptionDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
+  get { methodName="Attributes" path=<exceptionDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   IDENTIFIER<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
@@ -857,8 +881,9 @@ exceptionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } ex
 
 typeAbbreviationDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<typeAbbreviationDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
+  get { methodName="Attributes" path=<typeAbbreviationDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   IDENTIFIER<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
@@ -868,8 +893,9 @@ typeAbbreviationDeclaration options { stubBase="FSharpTypeElementDeclarationBase
 
 moduleAbbreviation options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<moduleAbbreviation:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
+  get { methodName="Attributes" path=<moduleAbbreviation:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   IDENTIFIER<IDENTIFIER, Identifier>
   EQUALS
@@ -902,8 +928,9 @@ otherMemberDeclaration options { stubBase="DummyDeclaration"; }:
 
 otherSimpleTypeDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<otherSimpleTypeDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
+  get { methodName="Attributes" path=<otherSimpleTypeDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   IDENTIFIER<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
@@ -911,8 +938,9 @@ otherSimpleTypeDeclaration options { stubBase="FSharpTypeElementDeclarationBase"
 
 abstractTypeDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<abstractTypeDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
+  get { methodName="Attributes" path=<abstractTypeDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   IDENTIFIER<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
@@ -923,8 +951,9 @@ abstractTypeDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; }
 
 classDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<classDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
+  get { methodName="Attributes" path=<classDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   IDENTIFIER<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
@@ -932,8 +961,9 @@ classDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras
 
 interfaceDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<interfaceDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
+  get { methodName="Attributes" path=<interfaceDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   IDENTIFIER<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
@@ -941,8 +971,9 @@ interfaceDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } ex
 
 structDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<structDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
+  get { methodName="Attributes" path=<structDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   IDENTIFIER<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
@@ -950,8 +981,9 @@ structDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extra
 
 objectTypeDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<objectTypeDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
+  get { methodName="Attributes" path=<objectTypeDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   IDENTIFIER<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
@@ -959,8 +991,9 @@ objectTypeDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } e
 
 delegateDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<delegateDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
+  get { methodName="Attributes" path=<delegateDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
   IDENTIFIER<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
@@ -1038,8 +1071,9 @@ memberConstructorDeclaration options { stubBase="FSharpProperTypeMemberDeclarati
 
 memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<memberDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfMethodList:TYPE_PARAMETER> };
+  get { methodName="Attributes" path=<memberDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>?
   memberSelfId<SELF_ID, SelfId>?
   identOrOpName{IDENTIFIER, Identifier}
@@ -1059,20 +1093,24 @@ memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } 
 
 abstractSlot options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<abstractSlot:TYPE_PARAMETERS_LIST/typeParameterOfMethodList:TYPE_PARAMETER> };
+  get { methodName="Attributes" path=<abstractSlot:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   IDENTIFIER<IDENTIFIER, Identifier>
   typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   memberParam<PARAMETER, Parameters>*;
 
-valField options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+valField options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
+  get { methodName="Attributes" path=<valField:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+}:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   IDENTIFIER<IDENTIFIER, Identifier>;
 
 autoProperty options { stubBase="FSharpProperTypeMemberDeclarationBase"; }  extras {
   get { methodName="Expression" path=<autoProperty:CHAMELEON_EXPR/chameleonExpression:EXPR> };
+  get { methodName="Attributes" path=<autoProperty:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   IDENTIFIER<IDENTIFIER, Identifier>
   EQUALS
   chameleonExpression<CHAMELEON_EXPR, InitExpression>
@@ -1196,12 +1234,16 @@ typeParameterOfMethodList:
   typeParameterOfMethodDeclaration<TYPE_PARAMETER, TypeParameters>*
   GREATER<GREATER,RAngle>;
 
-typeParameterOfTypeDeclaration options { stubBase="FSharpDeclarationBase"; }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+typeParameterOfTypeDeclaration options { stubBase="FSharpDeclarationBase"; } extras {
+  get { methodName="Attributes" path=<typeParameterOfTypeDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+}:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   IDENTIFIER<IDENTIFIER, Identifier>;
 
-typeParameterOfMethodDeclaration options { stubBase="FSharpDeclarationBase"; }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+typeParameterOfMethodDeclaration options { stubBase="FSharpDeclarationBase"; } extras {
+  get { methodName="Attributes" path=<typeParameterOfMethodDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+}:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   IDENTIFIER<IDENTIFIER, Identifier>;
 
 
@@ -1218,10 +1260,14 @@ private modifier{ROLE,Getter}:
 
 // Attributes
 
-fSharpAttribute options { stubBase="TypeReferenceOwnerBase"; }
-  extras {
-    get { methodName="Expression" path=<fSharpAttribute:CHAMELEON_EXPR/chameleonExpression:EXPR> };
-  }:
+attributeList:
+  LBRACK<LBRACK, LBrack>
+  attribute<ATTRIBUTE, Attributes>*
+  RBRACK<RBRACK, RBrack>;
+
+attribute options { stubBase="TypeReferenceOwnerBase"; } extras {
+  get { methodName="Expression" path=<attribute:CHAMELEON_EXPR/chameleonExpression:EXPR> };
+}:
   attributeTarget<ATTR_TARGET, Target>?
   typeReferenceName<REFERENCE_NAME, ReferenceName>
   chameleonExpression<CHAMELEON_EXPR, ArgExpression>?;
@@ -1235,8 +1281,10 @@ fakeSeparator: FAKE;
 
 // Local declarations
 
-localDeclaration options { stubBase="LocalDeclarationBase"; }:
-  fSharpAttribute<ATTRIBUTE, Attributes>*
+localDeclaration options { stubBase="LocalDeclarationBase"; } extras {
+  get { methodName="Attributes" path=<localDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+}:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
   identOrOpName{IDENTIFIER, Identifier};
 
 

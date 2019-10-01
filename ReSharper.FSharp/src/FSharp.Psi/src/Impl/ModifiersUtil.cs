@@ -18,12 +18,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         return MemberDecoration.FromModifiers(Modifiers.INTERNAL);
 
       return caseDeclaration.GetContainingTypeDeclaration() is IUnionDeclaration unionDeclaration
-        ? GetDecoration(unionDeclaration.AccessModifiers, TreeNodeCollection<IFSharpAttribute>.Empty)
+        ? GetDecoration(unionDeclaration.AccessModifiers, TreeNodeCollection<IAttribute>.Empty)
         : MemberDecoration.DefaultValue;
     }
 
     public static MemberDecoration GetDecoration(IAccessModifiers accessModifiers,
-      TreeNodeCollection<IFSharpAttribute> attributes)
+      TreeNodeCollection<IAttribute> attributes)
     {
       var decoration = MemberDecoration.DefaultValue;
       var modifiers = new HashSet<TokenNodeType>();

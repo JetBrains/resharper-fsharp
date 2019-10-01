@@ -89,9 +89,8 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             x.MarkChameleonExpression(expr)
             x.Done(range, mark, ElementType.DO)
 
-        | SynModuleDecl.Attributes(attributes, _) ->
-            for attribute in attributes do
-                x.ProcessAttribute(attribute)
+        | SynModuleDecl.Attributes(attributeLists, _) ->
+            x.ProcessAttributeLists(attributeLists)
 
         | SynModuleDecl.ModuleAbbrev(_, lid, range) ->
             let mark = x.Mark(range)
@@ -186,7 +185,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                 mark
 
             | _ ->
-                x.MarkAttributesOrIdOrRange(typeMember.Attributes, None, typeMember.Range)
+                x.MarkAttributesOrIdOrRange(typeMember.OuterAttributes, None, typeMember.Range)
 
         let memberType =
             match typeMember with
@@ -334,7 +333,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         x.AdvanceToTokenOrOffset(FSharpTokenType.COLON, startOffset, range)
 
         let mark = x.Mark()
-        x.ProcessAttributes(attrs)
+        x.ProcessAttributeLists(attrs)
         x.ProcessType(returnType)
         x.Done(range, mark, ElementType.RETURN_TYPE_INFO)
 
@@ -461,7 +460,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                 ElementType.WILD_PAT
 
             | SynPat.Attrib(pat, attrs, _) ->
-                x.ProcessAttributes(attrs)
+                x.ProcessAttributeLists(attrs)
                 x.ProcessPat(pat, isLocal, false)
                 ElementType.ATTRIB_PAT
 
@@ -502,17 +501,17 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         x.ProcessType(typ)
         x.Done(range, mark, ElementType.OTHER_TYPE)
 
-    member x.SkipOuterAttrs(attrs: SynAttribute list, outerRange: range) =
+    member x.SkipOuterAttrs(attrs: SynAttributeList list, outerRange: range) =
         match attrs with
         | [] -> []
         | { Range = r } :: rest ->
             if posGt r.End outerRange.Start then attrs else
             x.SkipOuterAttrs(rest, outerRange)
 
-    member x.ProcessOuterAttrs(attrs: SynAttribute list, range: range) =
+    member x.ProcessOuterAttrs(attrs: SynAttributeList list, range: range) =
         match attrs with
-        | { Range = r } as attr :: rest when posLt r.End range.Start ->
-            x.ProcessAttribute(attr)
+        | { Range = r } as attributeList :: rest when posLt r.End range.Start ->
+            x.ProcessAttributeList(attributeList)
             x.ProcessOuterAttrs(rest, range)
 
         | _ -> ()
@@ -531,7 +530,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             | [] -> x.Mark(binding.StartPos)
             | { Range = r } :: _ ->
                 let mark = x.MarkTokenOrRange(FSharpTokenType.LBRACK_LESS, r)
-                x.ProcessAttributes(attrs)
+                x.ProcessAttributeLists(attrs)
                 mark
 
         x.ProcessPat(headPat, false, true)
@@ -553,7 +552,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             | [] -> x.Mark(binding.StartPos)
             | { Range = r } :: _ ->
                 let mark = x.MarkTokenOrRange(FSharpTokenType.LBRACK_LESS, r)
-                x.ProcessAttributes(attrs)
+                x.ProcessAttributeLists(attrs)
                 mark
 
         x.PushRangeForMark(binding.RangeOfBindingAndRhs, mark, ElementType.LOCAL_BINDING)

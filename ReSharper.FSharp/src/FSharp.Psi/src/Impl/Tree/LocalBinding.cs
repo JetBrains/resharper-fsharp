@@ -5,6 +5,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class LocalBinding
   {
-    public TreeNodeCollection<IFSharpAttribute> AllAttributes => Attributes;
+    public TreeNodeCollection<IAttribute> AllAttributes => Attributes;
   }
 }

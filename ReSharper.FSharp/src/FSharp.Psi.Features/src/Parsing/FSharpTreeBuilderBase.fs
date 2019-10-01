@@ -233,7 +233,7 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
         match attrs with
         | head :: _ ->
             let mark = x.MarkTokenOrRange(FSharpTokenType.LBRACK_LESS, head.Range)
-            x.ProcessAttributes(attrs)
+            x.ProcessAttributeLists(attrs)
             mark
 
         | _ ->
@@ -312,15 +312,22 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
 
     member x.ProcessUnionCase(UnionCase(attrs, _, caseType, _, _, range)) =
         let mark = x.MarkTokenOrRange(FSharpTokenType.BAR, range)
-        x.ProcessAttributes(attrs)
+        x.ProcessAttributeLists(attrs)
         let hasFields = x.ProcessUnionCaseType(caseType, ElementType.UNION_CASE_FIELD_DECLARATION)
         let elementType = if hasFields then ElementType.NESTED_TYPE_UNION_CASE_DECLARATION
                                        else ElementType.SINGLETON_CASE_DECLARATION
         x.Done(range, mark, elementType)
 
-    member x.ProcessAttributes(attrs) =
-        for attr in attrs do
-            x.ProcessAttribute(attr)
+    member x.ProcessAttributeLists(attributeLists) =
+        for attributeList in attributeLists do
+            x.ProcessAttributeList(attributeList)
+
+    member x.ProcessAttributeList(attributeList) =
+        let range = attributeList.Range
+        let mark = x.Mark(range)
+        for attribute in attributeList.Attributes do
+            x.ProcessAttribute(attribute)
+        x.Done(range, mark, ElementType.ATTRIBUTE_LIST)
 
     member x.ProcessAttribute(attr: SynAttribute) =
         let mark =
@@ -344,7 +351,7 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
             x.MarkChameleonExpression(argExpr)
 
 
-        x.Done(attr.Range, mark, ElementType.F_SHARP_ATTRIBUTE)
+        x.Done(attr.Range, mark, ElementType.ATTRIBUTE)
 
     member x.ProcessEnumCase(EnumCase(_, _, _, _, range)) =
         x.MarkAndDone(range, ElementType.ENUM_MEMBER_DECLARATION)
