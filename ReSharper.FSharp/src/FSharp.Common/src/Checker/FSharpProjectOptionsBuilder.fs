@@ -9,7 +9,7 @@ open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Assemblies.Impl
 open JetBrains.ProjectModel.Model2.Assemblies.Interfaces
 open JetBrains.ProjectModel.ProjectsHost
-open JetBrains.ProjectModel.ProjectsHost.MsBuild
+open JetBrains.ProjectModel.ProjectsHost.MsBuild.Strategies
 open JetBrains.ProjectModel.Properties
 open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
@@ -50,14 +50,14 @@ type FSharpTargetsProjectLoadModificator() =
            "GenerateAssemblyFileVersionTask"
            "ImplicitlyExpandNETStandardFacades" |]
 
-    interface IMsBuildProjectLoadModificator with
+    interface MsBuildLegacyLoadStrategy.IModificator with
         member x.IsApplicable(mark) =
             match mark with
             | FSharpProjectMark -> true
             | _ -> false
 
-        member x.Modify(context) =
-            context.Targets.AddRange(targets)
+        member x.Modify(targets) =
+            targets.AddRange(targets)
 
 
 type IFSharpProjectOptionsBuilder =
