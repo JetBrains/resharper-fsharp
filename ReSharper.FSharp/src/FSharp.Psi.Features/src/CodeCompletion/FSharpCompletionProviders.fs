@@ -102,7 +102,7 @@ type FSharpLookupItemsProvider(logger: ILogger) =
         member x.IsDynamic = false
         member x.IsFinal = false
         member x.SupportedCompletionMode = CompletionMode.Single
-        member x.SupportedEvaluationMode = EvaluationMode.Light
+        member x.SupportedEvaluationMode = EvaluationMode.LightAndFull
 
 
 [<Language(typeof<FSharpLanguage>)>]
@@ -118,18 +118,24 @@ type FSharpRangesProvider() =
 type FSharpLibraryScopeLookupItemsProvider(logger: ILogger, assemblyContentProvider: FSharpAssemblyContentProvider) =
     inherit FSharpLookupItemsProviderBase(logger, assemblyContentProvider.GetLibrariesEntities, true)
 
-    interface ISlowCodeCompletionItemsProvider with
+    interface ICodeCompletionItemsProvider with
         member x.IsAvailable(context) =
             let settings = context.BasicContext.ContextBoundSettingsStore
             if settings.GetValue(fun (key: FSharpOptions) -> key.EnableOutOfScopeCompletion) then obj() else null
 
-        member x.AddLookupItems(context, collector, data) =
-            match context with
-            | :? FSharpCodeCompletionContext as fsContext -> base.AddLookupItems(fsContext, collector)
-            | _ -> false
+        member x.GetDefaultRanges(context) = base.GetDefaultRanges(context)
+        member x.AddLookupItems(context, collector, _) =
+            base.AddLookupItems(context :?> FSharpCodeCompletionContext, collector)
 
-        member x.TransformItems(_,_,_) = ()
+        member x.TransformItems(context, collector, data) = ()
+        member x.DecorateItems(context, collector, data) = ()
 
+        member x.GetLookupFocusBehaviour(_, _) = LookupFocusBehaviour.Soft
+        member x.GetAutocompletionBehaviour(_, _) = AutocompletionBehaviour.NoRecommendation
+
+        member x.IsDynamic = false
+        member x.IsFinal = false
+        member x.SupportedCompletionMode = CompletionMode.Single
         member x.SupportedEvaluationMode = EvaluationMode.Full
 
 
