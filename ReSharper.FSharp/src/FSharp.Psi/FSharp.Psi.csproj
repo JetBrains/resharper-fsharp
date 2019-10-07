@@ -26,6 +26,7 @@
   <ItemGroup>
     <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
     <PackageReference Include="System.ValueTuple" Version="$(ValueTupleVersion)" />
+    <PackageReference Include="Microsoft.Win32.SystemEvents" Version="4.6.0" />
   </ItemGroup>
 
   <ItemGroup>
