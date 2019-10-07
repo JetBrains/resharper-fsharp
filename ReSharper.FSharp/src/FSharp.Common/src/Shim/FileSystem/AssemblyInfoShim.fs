@@ -25,6 +25,6 @@ type AssemblyInfoShim
         base.Exists(path)
 
     override x.IsStableFile(path) =
-        match toolset.CurrentBuildTool with
+        match toolset.GetBuildTool() with
         | null -> base.IsStableFile(path)
         | buildTool -> buildTool.Directory.IsPrefixOf(path)

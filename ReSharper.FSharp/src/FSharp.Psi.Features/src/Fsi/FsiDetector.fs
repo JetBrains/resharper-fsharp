@@ -173,7 +173,7 @@ type MonoFsiProvider() =
             seq {
                 if isNotNull solution && PlatformUtil.IsRunningOnMono then
                     let currentToolset = solution.GetComponent<RiderSolutionToolset>()
-                    let fsiPath = currentToolset.CurrentMonoRuntime.RootPath / fsiRelativePath
+                    let fsiPath = currentToolset.GetMonoRuntime().RootPath / fsiRelativePath
                     if fsiPath.ExistsFile then
                         let fsiTool = FsiTool.Create("Current Mono toolset", fsiPath.Directory)
                         tools.Add(fsiTool) |> ignore
@@ -271,7 +271,7 @@ type CoreFsiProvider() =
             if isNull solution then [] :> _ else
 
             let currentToolset = solution.GetComponent<RiderSolutionToolset>()
-            match currentToolset.CurrentDotNetCoreToolset with
+            match currentToolset.GetDotNetCoreToolset() with
             | null -> EmptyList.Instance :> _
             | toolset when toolset.Sdk.Version < RequiredVersion.coreSdk -> EmptyList.Instance :> _
             | toolset ->

@@ -79,12 +79,12 @@ type ScriptPsiModulesTest() =
 type MyTestSolutionToolset(lifetime: Lifetime, buildToolContainer: BuildToolContainer) =
     inherit DefaultSolutionToolset(lifetime)
     
-    let changed = new SimpleSignal(lifetime, "MySolutionToolset::Changed")
+    let changed = new Signal<_>(lifetime, "MySolutionToolset::Changed")
     let buildTool = buildToolContainer.GetAutoDetected(BuildToolEnvironment.EmptyEnvironment)
     
     interface ISolutionToolset with
-                member x.CurrentBuildTool = buildTool
-                member x.Changed = changed :> _
+        member x.GetBuildTool() = buildTool
+        member x.Changed = changed :> _
 
 [<ZoneActivator>]
 type SolutionHostZoneActivator() =
