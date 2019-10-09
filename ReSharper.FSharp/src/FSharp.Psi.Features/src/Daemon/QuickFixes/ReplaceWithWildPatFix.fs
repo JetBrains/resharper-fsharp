@@ -19,7 +19,7 @@ type ReplaceWithWildPatFix(warning: UnusedValueWarning) =
         let node = getNonPatParent pat
         node :? IBinding ||
         node :? IMatchClause ||
-        node :? IMemberParam && node.Parent :? IMemberDeclaration ||
+        node :? IMemberParamDeclaration && node.Parent :? IMemberDeclaration || // todo: check this check
         node :? ILetOrUseBangExpr
 
     override x.ExecutePsiTransaction(_, _) =

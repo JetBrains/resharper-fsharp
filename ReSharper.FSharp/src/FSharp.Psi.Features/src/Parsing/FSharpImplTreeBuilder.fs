@@ -190,8 +190,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         let memberType =
             match typeMember with
             | SynMemberDefn.ImplicitCtor(_, _, args, selfId, _) ->
-                for arg in args do
-                    x.ProcessImplicitCtorParam arg
+                x.ProcessImplicitCtorSimplePats(args)
                 x.ProcessCtorSelfId(selfId)
                 ElementType.IMPLICIT_CONSTRUCTOR_DECLARATION
 
@@ -257,7 +256,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                 | [_] ->
                     match valData with
                     | SynValData(Some(flags), _, selfId) when flags.MemberKind = MemberKind.Constructor ->
-                        x.ProcessParams(memberParams, true, true) // todo: should check isLocal
+                        x.ProcessPatternParams(memberParams, true, true) // todo: should check isLocal
                         x.ProcessCtorSelfId(selfId)
 
                         x.MarkChameleonExpression(expr)
@@ -306,7 +305,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
     
     member x.ProcessAccessor(IdentRange range, memberParams, expr) =
         let mark = x.Mark(range)
-        x.ProcessParams(memberParams, true, true)
+        x.ProcessPatternParams(memberParams, true, true)
         x.MarkChameleonExpression(expr)
         x.Done(mark, ElementType.ACCESSOR_DECLARATION)
 
@@ -343,7 +342,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             x.ProcessTypeParametersOfType typeParams range true // todo: of type?..
         | _ -> ()
 
-        x.ProcessParams(memberParams, true, true) // todo: should check isLocal
+        x.ProcessMemberParams(memberParams, true, true) // todo: should check isLocal
         x.ProcessReturnInfo(returnInfo)
         x.MarkChameleonExpression(expr)
 
@@ -402,7 +401,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                 | lid ->
                     x.ProcessReferenceName(lid)
 
-                x.ProcessParams(args, isLocal || isTopLevelPat, false)
+                x.ProcessPatternParams(args, isLocal || isTopLevelPat, false)
                 if isLocal then ElementType.LOCAL_PARAMETERS_OWNER_PAT else ElementType.TOP_PARAMETERS_OWNER_PAT
 
             | SynPat.Typed(pat, synType, _) ->
@@ -476,7 +475,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         for pat in pats do
             x.ProcessPat(pat, isLocal, false)
 
-    member x.ProcessParams(args: SynConstructorArgs, isLocal, markMember) =
+    member x.ProcessPatternParams(args: SynConstructorArgs, isLocal, markMember) =
         match args with
         | Pats pats ->
             for pat in pats do
@@ -489,12 +488,20 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                 x.ProcessParam(pat, isLocal, markMember)
                 x.Done(range, mark, ElementType.FIELD_PAT)
 
+    member x.ProcessMemberParams(args: SynConstructorArgs, isLocal, markMember) =
+        match args with
+        | Pats pats ->
+            for pat in pats do
+                x.ProcessParam(pat, isLocal, markMember)
+
+        | _ -> failwithf "args: %O" args
+
     member x.ProcessParam(PatRange range as pat, isLocal, markMember) =
         if not markMember then x.ProcessPat(pat, isLocal, false) else
 
         let mark = x.Mark(range)
         x.ProcessPat(pat, isLocal, false)
-        x.Done(range, mark, ElementType.MEMBER_PARAM)
+        x.Done(range, mark, ElementType.MEMBER_PARAM_DECLARATION)
 
     member x.MarkOtherType(TypeRange range as typ) =
         let mark = x.Mark(range)

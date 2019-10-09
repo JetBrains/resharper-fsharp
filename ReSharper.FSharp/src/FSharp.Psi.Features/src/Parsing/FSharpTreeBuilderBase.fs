@@ -371,31 +371,33 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
     member x.ProcessLocalId(IdentRange range) =
         x.MarkAndDone(range, ElementType.LOCAL_DECLARATION)
 
-    member x.ProcessSimplePattern(pat: SynSimplePat) =
-        match pat with
-        | SynSimplePat.Id(id, _, isCompilerGenerated, _, _, _) ->
-            if not isCompilerGenerated then
-                x.ProcessLocalId(id)
+    member x.ProcessImplicitCtorSimplePats(pats: SynSimplePats) =
+        match pats with
+        | SynSimplePats.SimplePats(pats, range) ->
+            let mark = x.Mark(range)
+            for pat in pats do
+                x.ProcessImplicitCtorParam(pat)
+            x.Done(range, mark, ElementType.MEMBER_PARAM_DECLARATION_GROUP)
 
-        | SynSimplePat.Typed(SynSimplePat.Id(id, _, isCompilerGenerated, _, _, _), synType, _) ->
-            if not isCompilerGenerated then
-                x.ProcessLocalId(id)
+        | SynSimplePats.Typed(pats, synType, range) ->
+            let mark = x.Mark(range)
+            x.ProcessImplicitCtorSimplePats(pats)
             x.ProcessType(synType)
-
-        | _ -> ()
+            x.Done(range, mark, ElementType.MEMBER_PARAM_DECLARATION_GROUP)
 
     member x.ProcessImplicitCtorParam(pat: SynSimplePat) =
         match pat with
         | SynSimplePat.Id(id, _, _, _, _, range) ->
             let mark = x.Mark(range)
             x.ProcessLocalId(id)
-            x.Done(range, mark,ElementType.MEMBER_PARAM)
+            x.Done(range, mark,ElementType.MEMBER_PARAM_DECLARATION)
 
+        // todo: check isCompilerGenerated?
         | SynSimplePat.Typed(SynSimplePat.Id(id, _, _, _, _, _), synType, range) ->
             let mark = x.Mark(range)
             x.ProcessLocalId(id)
             x.ProcessType(synType)
-            x.Done(range, mark,ElementType.MEMBER_PARAM)
+            x.Done(range, mark,ElementType.MEMBER_PARAM_DECLARATION)
 
         | _ -> ()
 
@@ -423,16 +425,6 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
             x.AdvanceLexer()
 
         x.Done(idMark, ElementType.ACTIVE_PATTERN_ID)
-
-    member x.ProcessSimplePatterns(pats: SynSimplePats) =
-        match pats with
-        | SynSimplePats.SimplePats(pats, _) ->
-            for pat in pats do
-                x.ProcessSimplePattern(pat)
-
-        | SynSimplePats.Typed(pats, synType, _) ->
-            x.ProcessSimplePatterns(pats)
-            x.ProcessType(synType)
 
     member x.ProcessTypeArgs(typeArgs, ltRange: range option, gtRange: range option, elementType) =
         match ltRange, typeArgs with

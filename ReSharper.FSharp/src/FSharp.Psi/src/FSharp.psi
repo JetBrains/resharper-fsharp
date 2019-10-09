@@ -1041,12 +1041,10 @@ interfaceImplementation:
 otherTypeMember: fakeSeparator;
 typeLetBindings: fakeSeparator;
 
-implicitConstructorDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
-  memberParam<PARAMETER, Parameters>
-  (
-    memberParam<PARAMETER, Parameters>
-    COMMA
-  )*
+implicitConstructorDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
+  get { methodName="Parameters" path=<implicitConstructorDeclaration:PARAM_GROUP/memberParamDeclarationGroup:PARAMETER> };
+}:
+  memberParamDeclarationGroup<PARAM_GROUP, ParameterGroup>
   ctorSelfId<SELF_ID, SelfIdentifier>?;
 
 interface selfId:
@@ -1071,6 +1069,7 @@ memberConstructorDeclaration options { stubBase="FSharpProperTypeMemberDeclarati
 
 memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<memberDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfMethodList:TYPE_PARAMETER> };
+  get { methodName="Parameters" path=<memberDeclaration:PARAM_GROUP/memberParamDeclarationGroup:PARAMETER> };
   get { methodName="Attributes" path=<memberDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
@@ -1079,7 +1078,7 @@ memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } 
   identOrOpName{IDENTIFIER, Identifier}
   typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   (
-    memberParam<PARAMETER, Parameters>*
+    memberParamDeclarationGroup<PARAM_GROUP, ParameterGroups>*
     EQUALS
     chameleonExpression
   |
@@ -1088,7 +1087,7 @@ memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } 
     (
       AND
       accessorDeclaration
-    )
+    )?
   );
 
 abstractSlot options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
@@ -1098,7 +1097,7 @@ abstractSlot options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extra
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   IDENTIFIER<IDENTIFIER, Identifier>
   typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
-  memberParam<PARAMETER, Parameters>*;
+  memberParamDeclaration<PARAMETER, Parameters>*;
 
 valField options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
   get { methodName="Attributes" path=<valField:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
@@ -1128,11 +1127,28 @@ accessorsNamesClause:
 
 accessorDeclaration:
   IDENTIFIER<IDENTIFIER, Identifier>
-  memberParam<PARAMETER, Parameters>*
+  memberParamDeclaration<PARAMETER, Parameters>*
   EQUALS
   chameleonExpression<CHAMELEON_EXPR, BodyExpression>;
 
-memberParam:
+
+memberParamDeclarationGroup:
+  (
+    memberParamDeclarationList
+  |
+    LPAREN
+    memberParamDeclarationList
+    RPAREN
+  );
+  
+private memberParamDeclarationList:
+  memberParamDeclaration<PARAMETER, Parameters>
+  (
+    COMMA
+    memberParamDeclaration<PARAMETER, Parameters>
+  )*;
+
+memberParamDeclaration:
   synPat<PATTERN, Pattern>;
 
 
