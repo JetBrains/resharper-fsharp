@@ -102,7 +102,7 @@ type FSharpLookupItemsProvider(logger: ILogger) =
         member x.IsDynamic = false
         member x.IsFinal = false
         member x.SupportedCompletionMode = CompletionMode.Single
-        member x.SupportedEvaluationMode = EvaluationMode.LightAndFull
+        member x.SupportedEvaluationMode = EvaluationMode.Light
 
 
 [<Language(typeof<FSharpLanguage>)>]
