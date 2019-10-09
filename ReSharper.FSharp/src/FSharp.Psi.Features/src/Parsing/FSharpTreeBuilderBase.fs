@@ -138,14 +138,14 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
         for id in lid do
             marks.Push(struct {| Mark = x.Mark(); Range = id.idRange |})
 
-        let lastRangeIdAndMark = marks.Pop()
-        x.Builder.Drop(lastRangeIdAndMark.Mark)
+        let lastIdRangeAndMark = marks.Pop()
+        x.Builder.Drop(lastIdRangeAndMark.Mark)
 
-        while marks.Count > 0 do
-            let rangeAndMark = marks.Pop()
-            x.Done(rangeAndMark.Range, rangeAndMark.Mark, ElementType.EXPRESSION_REFERENCE_NAME)
+        for IdentRange idRange in lid do
+            if marks.Count > 0 then
+                x.Done(idRange, marks.Pop().Mark, ElementType.EXPRESSION_REFERENCE_NAME)
 
-        x.AdvanceToEnd(lastRangeIdAndMark.Range)
+        x.AdvanceToEnd(lastIdRangeAndMark.Range)
 
     member x.ProcessNamedTypeReference(lid: Ident list) =
         x.ProcessNamedTypeReference(lid, [], None, None, false)

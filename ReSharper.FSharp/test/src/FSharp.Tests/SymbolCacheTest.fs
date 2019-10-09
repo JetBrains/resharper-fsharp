@@ -31,6 +31,7 @@ type SymbolCacheTest() =
     [<Test>] member x.``Namespace 02 - Qualified``() = x.DoNamedTest()
     [<Test>] member x.``Namespace 03 - Global``() = x.DoNamedTest()
     [<Test>] member x.``Namespace 04 - Multiple``() = x.DoNamedTest()
+    [<Test>] member x.``Namespace 05 - Multiple qualifiers``() = x.DoNamedTest()
 
     [<Test>] member x.``Interface 01 - Explicit``() = x.DoNamedTest()
     [<Test>] member x.``Interface 02 - Attribute``() = x.DoNamedTest()

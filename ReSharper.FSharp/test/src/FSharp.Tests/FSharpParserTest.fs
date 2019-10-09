@@ -17,6 +17,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Namespace 01``() = x.DoNamedTest()
     [<Test>] member x.``Namespace 02 - Qualifier``() = x.DoNamedTest()
     [<Test>] member x.``Namespace 03 - Multiple``() = x.DoNamedTest()
+    [<Test>] member x.``Namespace 04 - Multiple qualifiers``() = x.DoNamedTest()
 
     [<Test>] member x.``Let 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Let 02 - Typed``() = x.DoNamedTest()
@@ -82,6 +83,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - IfThenElse 01 - Simple``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Ident 01 - Simple``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - LongIdent 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - LongIdentSet 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Null``() = x.DoNamedTest()

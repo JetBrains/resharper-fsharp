@@ -1,0 +1,14 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  INamedNamespaceDeclaration
+    FSharpTokenType+NamespaceTokenElement(type:NAMESPACE, text:namespace)
+    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+    IExpressionReferenceName
+      IExpressionReferenceName
+        FSharpIdentifierToken(type:IDENTIFIER, text:Ns1)
+      FSharpTokenType+DotTokenElement(type:DOT, text:.)
+      FSharpIdentifierToken(type:IDENTIFIER, text:Ns2)
+    FSharpTokenType+DotTokenElement(type:DOT, text:.)
+    FSharpIdentifierToken(type:IDENTIFIER, text:Ns3)
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

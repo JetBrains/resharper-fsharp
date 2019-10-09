@@ -1,0 +1,6 @@
+﻿Project Files:Namespace 05 - Multiple qualifiers.fs:
+FSharpProjectFilePart:ImplFile
+ QualifiedNamespacePart:Namespace1
+  QualifiedNamespacePart:Namespace2
+   FSharp.DeclaredNamespacePart:Namespace3
+[]: Namespace:
