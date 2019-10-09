@@ -4,10 +4,10 @@ IFSharpImplFile
     ILetModuleDecl
       FSharpTokenType+LetTokenElement(type:LET, text:let)
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-      FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
-      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
       ITopBinding
         IRecordPat
+          FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           IFieldPat
             IExpressionReferenceName
               IExpressionReferenceName
