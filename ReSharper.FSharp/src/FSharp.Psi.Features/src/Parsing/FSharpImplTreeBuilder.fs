@@ -832,8 +832,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             x.PushExpression(expr2)
             x.ProcessExpression(expr1)
 
+        | SynExpr.SequentialOrImplicitYield _
         | SynExpr.ImplicitZero _ ->
-            x.MarkAndDone(range, ElementType.IMPLICIT_ZERO_EXPR)
+            failwithf "Unexpected internal type checker node: %A" expr
 
         | SynExpr.YieldOrReturn(_, expr, _)
         | SynExpr.YieldOrReturnFrom(_, expr, _) ->
