@@ -132,9 +132,6 @@ type FsiOptionsPage
                 let (FsiTool fsi) = fsiTool.Value
                 fsiPath.Value <- fsi.GetFsiPath(fsiOptions.UseAnyCpu.Value))
 
-    member x.AddString(text: string, getter: Expression<Func<FsiOptions,_>>) =
-        x.AddString(text, FsiOptions.GetProperty(lifetime, settings, getter))
-
 
 [<ShellComponent>]
 type FSharpSettingsCategoryProvider() =

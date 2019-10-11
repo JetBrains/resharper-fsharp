@@ -21,9 +21,21 @@ module FSharpGlobalUtil =
     let (|IsNonNull|_|) value =
         if isNotNull value then Some value else None
 
+
 [<AutoOpen>]
 module FSharpGlobalAbbreviations =
     type Extension = System.Runtime.CompilerServices.ExtensionAttribute
 
     type ILogger = JetBrains.Util.ILogger
     type FileSystemPath = JetBrains.Util.FileSystemPath
+
+
+[<AutoOpen>]
+module IgnoreAll =
+    type IgnoreAllBuilder() =
+        member _.Yield _ = ()
+        member _.Zero() = ()
+        member _.Combine(_, _) = ()
+        member _.Delay(f) = f ()
+
+    let ignoreAll = IgnoreAllBuilder()

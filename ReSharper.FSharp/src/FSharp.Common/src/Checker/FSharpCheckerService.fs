@@ -161,6 +161,6 @@ type IFSharpProjectOptionsProvider =
     abstract ModuleInvalidated: ISignal<IPsiModule>
 
 
-type IFSharpScriptOptionsProvider =
+type IFSharpScriptProjectOptionsProvider =
     abstract GetScriptOptions: IPsiSourceFile -> FSharpProjectOptions option
     abstract GetScriptOptions: FileSystemPath * string -> FSharpProjectOptions option

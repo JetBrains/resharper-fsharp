@@ -56,7 +56,7 @@ type FSharpTestProjectOptionsBuilder(checkerService, psiModules, logger, resolve
 [<SolutionComponent>]
 type FSharpTestProjectOptionsProvider
         (lifetime: Lifetime, checkerService: FSharpCheckerService, projectOptionsBuilder: IFSharpProjectOptionsBuilder,
-         scriptOptionsProvider: IFSharpScriptOptionsProvider) as this =
+         scriptOptionsProvider: IFSharpScriptProjectOptionsProvider) as this =
     do
         checkerService.OptionsProvider <- this
         lifetime.OnTermination(fun _ -> checkerService.OptionsProvider <- Unchecked.defaultof<_>) |> ignore

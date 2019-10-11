@@ -15,6 +15,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
+open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.Threading
 open JetBrains.Util
@@ -22,7 +23,7 @@ open JetBrains.Util
 [<SolutionComponent>]
 type FSharpProjectOptionsProvider
         (lifetime, solution: ISolution, changeManager: ChangeManager, checkerService: FSharpCheckerService,
-         optionsBuilder: IFSharpProjectOptionsBuilder, scriptOptionsProvider: IFSharpScriptOptionsProvider,
+         optionsBuilder: IFSharpProjectOptionsBuilder, scriptOptionsProvider: IFSharpScriptProjectOptionsProvider,
          fsFileService: IFSharpFileService, moduleReferenceResolveStore: ModuleReferencesResolveStore, logger: ILogger,
          psiModules: IPsiModules, resolveContextManager: PsiModuleResolveContextManager) as this =
     inherit RecursiveProjectModelChangeDeltaVisitor()
@@ -232,9 +233,25 @@ type FSharpProjectOptionsProvider
         member x.ModuleInvalidated = x.ModuleInvalidated :> _
 
 [<SolutionComponent>]
-type FSharpScriptOptionsProvider(logger: ILogger, checkerService: FSharpCheckerService) =
+type FSharpScriptProjectOptionsProvider
+        (lifetime, logger: ILogger, checkerService: FSharpCheckerService, scriptOptions: FSharpScriptOptionsProvider) =
+
     let getScriptOptionsLock = obj()
-    let otherFlags = [| "--warnon:1182" |]
+    let defaultFlags = [| "--warnon:1182" |]
+
+    let getOtherFlags languageVersion =
+        if languageVersion = FSharpLanguageVersion.Default then defaultFlags else
+
+        let languageVersionOption = FSharpLanguageVersion.toCompilerOption languageVersion
+        let languageVersionOptionArg = sprintf "--langversion:%s" languageVersionOption
+        Array.append defaultFlags [| languageVersionOptionArg |]  
+
+    let otherFlags =
+        lazy
+            let languageVersion = scriptOptions.LanguageVersion
+            let flags = new Property<_>("FSharpScriptOtherFlags", getOtherFlags languageVersion.Value)
+            IPropertyEx.FlowInto(languageVersion, lifetime, flags, fun version -> getOtherFlags version)
+            flags
 
     let fixScriptOptions options =
         { options with OtherOptions = FSharpCoreFix.ensureCorrectFSharpCore options.OtherOptions }
@@ -244,7 +261,7 @@ type FSharpScriptOptionsProvider(logger: ILogger, checkerService: FSharpCheckerS
         let source = SourceText.ofString source
         lock getScriptOptionsLock (fun _ ->
             let getScriptOptionsAsync =
-                checkerService.Checker.GetProjectOptionsFromScript(path, source, otherFlags = otherFlags)
+                checkerService.Checker.GetProjectOptionsFromScript(path, source, otherFlags = otherFlags.Value.Value)
             try
                 let options, errors = getScriptOptionsAsync.RunAsTask()
                 if not errors.IsEmpty then
@@ -258,7 +275,7 @@ type FSharpScriptOptionsProvider(logger: ILogger, checkerService: FSharpCheckerS
                 logger.LogExceptionSilently(exn)
                 None)
 
-    interface IFSharpScriptOptionsProvider with
+    interface IFSharpScriptProjectOptionsProvider with
         member x.GetScriptOptions(path: FileSystemPath, source) =
             getOptions path source
 
