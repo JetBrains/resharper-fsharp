@@ -46,7 +46,7 @@ type FSharpProjectPropertiesRequest() =
 
 [<ShellComponent>]
 type FSharpTargetsProjectLoadModificator() =
-    let targets =
+    let fsTargets =
         [| "GenerateCode"
            "GenerateFSharpInternalsVisibleToFile"
            "GenerateAssemblyFileVersionTask"
@@ -59,7 +59,7 @@ type FSharpTargetsProjectLoadModificator() =
             | _ -> false
 
         member x.Modify(targets) =
-            targets.AddRange(targets)
+            targets.AddRange(fsTargets)
 
 
 type IFSharpProjectOptionsBuilder =
