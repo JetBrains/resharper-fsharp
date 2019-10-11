@@ -65,8 +65,16 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                     let indexer = fsFile.GetNode(range) in isNotNull indexer) then
                 UndefinedIndexerError(fsFile.GetNode(range)) :> _ else
 
-            let refExpr = ReferenceExprNavigator.GetByIdentifier(fsFile.GetNode(range))
-            if isNotNull refExpr then UndefinedNameError(refExpr.Reference, error.Message) :> _ else
+            let identifier = fsFile.GetNode(range)
+
+            let reference =
+                let refExpr = ReferenceExprNavigator.GetByIdentifier(identifier)
+                if isNotNull refExpr then refExpr.Reference else
+
+                let referenceName = ReferenceNameNavigator.GetByIdentifier(identifier)
+                if isNotNull referenceName then referenceName.Reference else null
+
+            if isNotNull reference then UndefinedNameError(reference, error.Message) :> _ else
 
             UnresolvedHighlighting(error.Message, range) :> _
 

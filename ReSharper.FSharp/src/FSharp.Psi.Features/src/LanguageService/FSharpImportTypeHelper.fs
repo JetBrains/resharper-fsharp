@@ -7,25 +7,33 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Resolve
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpImportTypeHelper() =
+    let isAllowed (reference: IReference) =
+        match reference.As<FSharpSymbolReference>() with
+        | null -> false
+        | reference ->
+
+        match reference.GetElement() with
+        | :? IReferenceExpr as refExpr -> isNull refExpr.Qualifier
+        | :? IReferenceName as referenceName -> isNull referenceName.Qualifier
+        | _ -> false
+
     interface IImportTypeHelper with
         member x.FindTypeCandidates(reference, importTypeCacheFactory) =
-            let reference = reference.As<FSharpSymbolReference>()
+            if not (isAllowed reference) then Seq.empty else
+
+            let reference = reference :?> FSharpSymbolReference
             if isNull reference then Seq.empty else
-
-            let refExpr = reference.GetElement().As<IReferenceExpr>()
-            if isNull refExpr then Seq.empty else
-
-            if isNotNull refExpr.Qualifier then Seq.empty else
 
             importTypeCacheFactory.Invoke(reference.GetElement()).Invoke(reference.GetName())
             |> Seq.filter (fun clrDeclaredElement -> clrDeclaredElement :? ITypeElement)
             |> Seq.cast
 
-        member x.ReferenceTargetCanBeType(reference) = true
-        member x.ReferenceTargetIsUnlikelyBeType(reference) = false
+        member x.ReferenceTargetCanBeType _ = true
+        member x.ReferenceTargetIsUnlikelyBeType _ = false
 
 
 [<Language(typeof<FSharpLanguage>)>]
@@ -47,7 +55,7 @@ type FSharpQuickFixUtilComponent() =
 
             reference :> _
 
-        member x.AddImportsForExtensionMethod(reference, extensionMethods) = reference
+        member x.AddImportsForExtensionMethod(reference, _) = reference
 
 
 // todo: ExtensionMethodImportUtilBase
