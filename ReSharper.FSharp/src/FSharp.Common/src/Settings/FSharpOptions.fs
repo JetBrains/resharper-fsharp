@@ -1,11 +1,11 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Checker.Settings
+namespace JetBrains.ReSharper.Plugins.FSharp.Settings
 
+open System.Reflection
 open JetBrains.Application.Settings
 open JetBrains.Application.UI.Options
 open JetBrains.IDE.UI.Options
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel.Resources
-open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.UI.RichText
 
 [<AutoOpen>]
@@ -13,6 +13,12 @@ module FSharpOptions =
     let [<Literal>] backgroundTypeCheck = "Enable background type checking"  
     let [<Literal>] outOfScopeCompletion = "Enable out of scope items completion"
     let [<Literal>] topLevelOpenCompletion = "Add 'open' declarations to top level module or namespace"
+
+
+[<SettingsKey(typeof<Missing>, "F# settings")>]
+type FSharpSettings() =
+    class
+    end
 
 
 [<SettingsKey(typeof<FSharpSettings>, "FSharpOptions")>]

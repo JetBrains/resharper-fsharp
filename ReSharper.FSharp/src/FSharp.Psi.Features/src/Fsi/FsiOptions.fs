@@ -6,7 +6,7 @@ open JetBrains.Application.Settings
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.DataContext
-open JetBrains.ReSharper.Plugins.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.Util
 
 [<AutoOpen>]
