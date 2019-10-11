@@ -40,7 +40,7 @@ module FSharpLanguageVersion =
         | FSharpLanguageVersion.Preview -> "Preview"
         | _ -> failwithf "Unexpected language version: %A" version
 
-    let toCompilerOption (version: FSharpLanguageVersion) =
+    let toCompilerOptionValue (version: FSharpLanguageVersion) =
         match version with
         | FSharpLanguageVersion.Default -> "default"
         | FSharpLanguageVersion.FSharp46 -> "4.6"
@@ -49,3 +49,6 @@ module FSharpLanguageVersion =
         | FSharpLanguageVersion.Latest -> "latest"
         | FSharpLanguageVersion.Preview -> "preview"
         | _ -> failwithf "Unexpected language version: %A" version
+    
+    let toCompilerArg =
+        toCompilerOptionValue >> sprintf "--langversion:%s"

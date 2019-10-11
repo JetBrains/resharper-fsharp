@@ -8,6 +8,7 @@ open JetBrains.Lifetimes
 open JetBrains.Platform.RdFramework.Util
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Host.Features
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi.FsiDetector
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi.Settings
 open JetBrains.Rider.Model
@@ -37,6 +38,9 @@ type FsiSessionsHost
                yield! stringArrayArgs fsiOptions.FsiInternalArgs.Value
 
                yield boolArg "shadowcopyreferences" fsiOptions.ShadowCopyReferences.Value
+
+               if fsiOptions.SpecifyLanguageVersion.Value then
+                   yield FSharpLanguageVersion.toCompilerArg fsiOptions.LanguageVersion.Value
 
                if PlatformUtil.IsRunningUnderWindows then
                    yield stringArg "fsi-server-output-codepage" Encoding.UTF8.CodePage

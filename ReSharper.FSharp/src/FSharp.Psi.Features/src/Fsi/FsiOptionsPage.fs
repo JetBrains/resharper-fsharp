@@ -14,6 +14,7 @@ open JetBrains.IDE.UI.Extensions
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Resources
 open JetBrains.ReSharper.Host.Features.Settings.Layers.ExportImportWorkaround
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi.FsiDetector
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -85,6 +86,13 @@ type FsiOptionsPage
         this.AddDescription(shadowCopyReferencesDescription)
 
         this.AddString(fsiArgsText, fun key -> key.FsiArgs)
+
+        this.AddHeader(FSharpScriptOptions.languageVersion)
+        this.AddBool(FsiOptions.specifyLanguageVersion, fsiOptions.SpecifyLanguageVersion)
+
+        let languageVersion =
+            this.AddComboEnum((fun (key: FsiOptions) -> key.LanguageVersion), FSharpScriptOptions.languageVersion, FSharpLanguageVersion.toString)
+        fsiOptions.SpecifyLanguageVersion.FlowIntoRd(lifetime, languageVersion.Enabled)
 
         this.AddHeader(commandsSectionTitle)
         this.AddBool(moveCaretOnSendLineText, fsiOptions.MoveCaretOnSendLine)

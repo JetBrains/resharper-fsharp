@@ -242,9 +242,8 @@ type FSharpScriptProjectOptionsProvider
     let getOtherFlags languageVersion =
         if languageVersion = FSharpLanguageVersion.Default then defaultFlags else
 
-        let languageVersionOption = FSharpLanguageVersion.toCompilerOption languageVersion
-        let languageVersionOptionArg = sprintf "--langversion:%s" languageVersionOption
-        Array.append defaultFlags [| languageVersionOptionArg |]  
+        let languageVersionOptionArg = FSharpLanguageVersion.toCompilerArg languageVersion
+        Array.append defaultFlags [| languageVersionOptionArg |]
 
     let otherFlags =
         lazy

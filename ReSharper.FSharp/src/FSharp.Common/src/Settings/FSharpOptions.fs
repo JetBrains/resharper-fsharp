@@ -1,7 +1,5 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Settings
 
-open System
-open System.Linq.Expressions
 open System.Reflection
 open JetBrains.Application.Settings
 open JetBrains.Application.UI.Options
@@ -47,9 +45,6 @@ type FSharpScriptOptions =
 
       [<SettingsEntry("", FSharpScriptOptions.customDefines)>]
       mutable CustomDefines: string }
-
-    static member GetProperty(lifetime, settings: IContextBoundSettingsStoreLive, getter: Expression<Func<FSharpScriptOptions,_>>) =
-        settings.GetValueProperty(lifetime, getter)
 
 
 [<SolutionInstanceComponent>]
