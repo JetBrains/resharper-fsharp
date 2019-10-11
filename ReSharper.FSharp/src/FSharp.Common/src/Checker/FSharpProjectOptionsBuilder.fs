@@ -26,6 +26,7 @@ module FSharpProperties =
     let [<Literal>] NoWarn = "NoWarn"
     let [<Literal>] WarnAsError = "WarnAsError"
     let [<Literal>] FscToolPath = "FscToolPath"
+    let [<Literal>] LangVersion = "LangVersion"
 
 
 [<ShellComponent>]
@@ -36,7 +37,8 @@ type FSharpProjectPropertiesRequest() =
            FSharpProperties.OtherFlags
            FSharpProperties.NoWarn
            FSharpProperties.WarnAsError
-           FSharpProperties.FscToolPath |]
+           FSharpProperties.FscToolPath
+           FSharpProperties.LangVersion |]
 
     interface IProjectPropertiesRequest with
         member x.RequestedProperties = properties :> _
@@ -179,7 +181,7 @@ type FSharpProjectOptionsBuilder
                     | true, v when not (v.IsNullOrWhitespace()) -> Some ("--" + p.ToLower() + ":" + f v)
                     | _ -> None
 
-                [ FSharpProperties.TargetProfile; FSharpProperties.BaseAddress ]
+                [ FSharpProperties.TargetProfile; FSharpProperties.BaseAddress; FSharpProperties.LangVersion ]
                 |> List.choose (getOption id)
                 |> options.AddRange
 
