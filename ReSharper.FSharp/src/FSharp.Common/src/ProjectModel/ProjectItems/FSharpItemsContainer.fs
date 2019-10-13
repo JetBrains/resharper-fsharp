@@ -1211,9 +1211,10 @@ type FSharpItemModificationContextProvider(container: IFSharpItemsContainer) =
             | _ -> failwithf "Relative item: %O" relativeViewItem
 
         container.TryGetRelativeChildPath(project.GetProjectMark(), modifiedViewItem, relativeElement, relativeToType)
-        |> Option.map (fun (path, relativeToType) ->
-            let relativeProjectItem = project.FindProjectItemsByLocation(path).First()
-            OrderingContext(RelativeTo(relativeProjectItem, relativeToType)))
+        |> Option.bind (fun (path, relativeToType) ->
+            match project.FindProjectItemsByLocation(path).FirstOrDefault() with
+            | null -> None
+            | item -> Some(OrderingContext(RelativeTo(item, relativeToType))))
 
 
 [<ShellComponent>]
