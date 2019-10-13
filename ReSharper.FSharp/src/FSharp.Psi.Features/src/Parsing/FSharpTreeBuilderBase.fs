@@ -356,14 +356,21 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
     member x.ProcessEnumCase(EnumCase(_, _, _, _, range)) =
         x.MarkAndDone(range, ElementType.ENUM_MEMBER_DECLARATION)
 
-    member x.ProcessField(Field(_, _, id, synType, _, _, _, range)) elementType =
+    member x.ProcessField(Field(attrs, _, id, synType, _, _, _, range)) elementType =
         let mark =
-            match id with
-            | Some id ->
-                x.AdvanceToOffset(min (x.GetStartOffset id) (x.GetStartOffset range))
-                x.Mark()
-            | None ->
-                x.Mark(range)
+            match attrs with
+            | attrList :: _ ->
+                let mark = x.Mark(attrList.Range)
+                x.ProcessAttributeLists(attrs)
+                mark
+
+            | _ ->
+                match id with
+                | Some id ->
+                    x.AdvanceToOffset(min (x.GetStartOffset id) (x.GetStartOffset range))
+                    x.Mark()
+                | None ->
+                    x.Mark(range)
 
         x.ProcessType(synType)
         x.Done(range, mark, elementType)

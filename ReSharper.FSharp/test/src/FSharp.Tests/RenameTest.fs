@@ -82,7 +82,8 @@ type FSharpRenameTest() =
     [<Test>] member x.``Types - Abbreviations 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Measure 01``() = x.DoNamedTest()
 
-    [<Test>] member x.``Types - Attributes 01``() = x.DoNamedTest()
+    [<Test>] member x.``Attribute - Arg 01 - Record field``() = x.DoNamedTest()
+    [<Test>] member x.``Attribute - Attribute type 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Union Cases 01``() = x.DoNamedTest() // todo: option to disable renaming related symbols in test
     [<Test>] member x.``Union Cases 02 - Should start with upper case``() = x.DoNamedTest()
