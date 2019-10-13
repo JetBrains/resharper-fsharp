@@ -8,12 +8,12 @@ import com.intellij.util.xmlb.XmlSerializerUtil
 import com.jetbrains.rider.settings.foldings.RiderCodeFoldingOptionsProvider
 import com.jetbrains.rider.settings.foldings.RiderCodeFoldingSettings
 
-class FSharpCodeFoldingProvider : RiderCodeFoldingOptionsProvider<FSharpCodeFoldingSettings>(FSharpCodeFoldingSettings.instance)
+class FSharpCodeFoldingProvider : RiderCodeFoldingOptionsProvider<FSharpCodeFoldingSettings>(FSharpCodeFoldingSettings.instance, "F#")
 
 @Suppress("unused")
 @State(name = "FSharpCodeFoldingSettings", storages = [(Storage("editor.codeinsight.xml"))])
 class FSharpCodeFoldingSettings : RiderCodeFoldingSettings(), PersistentStateComponent<FSharpCodeFoldingSettings> {
-    var collapseHashDirectives by foldingCheckBox("F# hash directives blocks", true)
+    var collapseHashDirectives by foldingCheckBox("ReSharper F# Hash Directives Block Folding", "F# hash directives blocks", true)
 
     override fun getState(): FSharpCodeFoldingSettings = this
     override fun loadState(state: FSharpCodeFoldingSettings) = XmlSerializerUtil.copyBean(state, this)
