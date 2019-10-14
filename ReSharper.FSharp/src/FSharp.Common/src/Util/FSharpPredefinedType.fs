@@ -13,6 +13,9 @@ let sourceNameAttrTypeName = clrTypeName "Microsoft.FSharp.Core.CompilationSourc
 [<CompiledName("CompilationMappingAttrTypeName")>]
 let compilationMappingAttrTypeName = clrTypeName "Microsoft.FSharp.Core.CompilationMappingAttribute"
 
+[<CompiledName("AutoOpenAttrTypeName")>]
+let autoOpenAttrTypeName = clrTypeName "Microsoft.FSharp.Core.AutoOpenAttribute"
+
 [<CompiledName("CLIEventAttribute")>]
 let cliEventAttrTypeName = clrTypeName "Microsoft.FSharp.Core.CLIEventAttribute"
 

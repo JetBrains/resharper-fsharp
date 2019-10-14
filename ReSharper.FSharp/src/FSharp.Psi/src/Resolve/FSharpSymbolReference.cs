@@ -10,6 +10,7 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI.Resolve;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Resources.Shell;
+using JetBrains.Util.DataStructures;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
@@ -48,6 +49,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     public override string GetName() =>
       myOwner.IdentifierToken?.GetText() ??
       SharedImplUtil.MISSING_DECLARATION_NAME;
+
+    public override bool HasMultipleNames =>
+      AttributeNavigator.GetByReferenceName(myOwner as ITypeReferenceName) != null;
+
+    public override HybridCollection<string> GetAllNames()
+    {
+      var name = GetName();
+      return HasMultipleNames
+        ? new HybridCollection<string>(name, name + "Attribute")
+        : new HybridCollection<string>(name);
+    }
 
     public override TreeTextRange GetTreeTextRange() =>
       myOwner.IdentifierToken?.GetTreeTextRange() ??

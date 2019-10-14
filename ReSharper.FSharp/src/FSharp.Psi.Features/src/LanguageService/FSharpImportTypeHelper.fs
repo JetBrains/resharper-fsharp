@@ -28,7 +28,10 @@ type FSharpImportTypeHelper() =
             let reference = reference :?> FSharpSymbolReference
             if isNull reference then Seq.empty else
 
-            importTypeCacheFactory.Invoke(reference.GetElement()).Invoke(reference.GetName())
+            let factory = importTypeCacheFactory.Invoke(reference.GetElement())
+
+            reference.GetAllNames().ResultingList()
+            |> Seq.collect factory.Invoke
             |> Seq.filter (fun clrDeclaredElement -> clrDeclaredElement :? ITypeElement)
             |> Seq.cast
 

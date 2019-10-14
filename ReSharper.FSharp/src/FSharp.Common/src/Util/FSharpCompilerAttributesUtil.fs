@@ -16,6 +16,7 @@ let getCompilationMappingFlag (attrsOwner: IAttributesOwner) =
     |> Option.map getCompilationMappingAttrInstanceFlag
     |> Option.defaultValue SourceConstructFlags.None
 
+
 [<Extension; CompiledName("IsCompiledFSharpField")>]
 let isCompiledFSharpField (property: IProperty) =
     getCompilationMappingFlag property = SourceConstructFlags.Field
@@ -23,3 +24,12 @@ let isCompiledFSharpField (property: IProperty) =
 [<Extension; CompiledName("IsCompiledUnionCase")>]
 let isCompiledUnionCase (property: IAttributesOwner) =
     getCompilationMappingFlag property = SourceConstructFlags.UnionCase
+
+[<Extension; CompiledName("IsCompiledModule")>]
+let isCompiledModule (property: IAttributesOwner) =
+    getCompilationMappingFlag property = SourceConstructFlags.Module
+
+
+[<Extension; CompiledName("HasAutoOpenAttribute")>]
+let hasAutoOpenAttribute (attrsOwner: IAttributesOwner) =
+    attrsOwner.GetAttributeInstances(autoOpenAttrTypeName, false)
