@@ -6,7 +6,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class Attribute
   {
     protected override FSharpSymbolReference CreateReference() =>
-      new AttributeTypeReference(this);
+      new CtorReference(this);
 
     public override ITokenNode IdentifierToken => ReferenceName?.Identifier as ITokenNode;
   }

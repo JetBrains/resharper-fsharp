@@ -7,7 +7,6 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Resolve;
-using JetBrains.ReSharper.Psi.Naming;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Resources.Shell;
@@ -67,19 +66,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       if (sourceName == SharedImplUtil.MISSING_DECLARATION_NAME)
         return this;
 
-      var newName = GetNewReferenceName(sourceName);
       using (WriteLockCookie.Create(myOwner.IsPhysical()))
-      {
-        var name = NamingManager.GetNamingLanguageService(myOwner.Language).MangleNameIfNecessary(newName);
-        var newExpression = myOwner.SetName(name);
-        return newExpression.Reference;
-      }
+        return myOwner.SetName(FSharpBindingUtil.SuggestShortReferenceName(this, element)).Reference;
     }
 
     private static bool CanBindTo(IDeclaredElement element) =>
       element is IFSharpDeclaredElement || element is ITypeParameter;
-
-    protected virtual string GetNewReferenceName([NotNull] string name) => name;
 
     public override IReference BindTo(IDeclaredElement element, ISubstitution substitution)
     {

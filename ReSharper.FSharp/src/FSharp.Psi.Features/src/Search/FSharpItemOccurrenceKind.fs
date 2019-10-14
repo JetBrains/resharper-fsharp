@@ -32,7 +32,6 @@ type FSharpItemOccurenceKindProvider() =
             | referenceOccurrence ->
 
             match referenceOccurrence.PrimaryReference with
-            | :? AttributeTypeReference -> [| OccurrenceKind.Attribute |] :> _
             | :? TypeExtensionReference -> [| FSharpOccurrenceKinds.typeExtension |] :> _
 
             | :? RecordCtorReference as recordCtorReference ->
@@ -48,6 +47,9 @@ type FSharpItemOccurenceKindProvider() =
 
             match symbolReference.GetElement() with
             | :? ITypeReferenceName as typeReferenceName ->
+                if isNotNull (AttributeNavigator.GetByReferenceName(typeReferenceName)) then
+                    [| OccurrenceKind.Attribute |] :> _ else
+
                 if isNotNull (InheritMemberNavigator.GetByTypeName(typeReferenceName)) ||
                    isNotNull (InterfaceImplementationNavigator.GetByTypeName(typeReferenceName)) ||
                    isNotNull (ObjExprNavigator.GetByTypeName(typeReferenceName)) then
