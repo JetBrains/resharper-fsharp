@@ -6,6 +6,7 @@ open FSharp.Compiler.Ast
 open FSharp.Compiler.PrettyNaming
 open FSharp.Compiler.SourceCodeServices.AstTraversal
 open JetBrains.Application.UI.ActionSystem.Text
+open JetBrains.Application.Settings
 open JetBrains.DocumentModel
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
@@ -13,12 +14,14 @@ open JetBrains.ReSharper.Feature.Services.TypingAssist
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CachingLexers
 open JetBrains.ReSharper.Psi.CodeStyle
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.TextControl
+open JetBrains.TextControl.DataContext
 open JetBrains.Util
 
 [<SolutionComponent>]
@@ -1234,8 +1237,21 @@ type FSharpTypingAssist
 
         let mutable endOffset = startOffset
         let buffer = document.Buffer
-        while startOffset > 0 && isWhitespace buffer.[startOffset - 1] do
-            startOffset <- startOffset - 1
+
+        let rec skipWithConditionBefore offset =
+            if offset > 0 && isWhitespace buffer.[offset - 1] then
+                skipWithConditionBefore (offset - 1)
+            else offset
+
+        startOffset <- skipWithConditionBefore startOffset
+
+        let settingsStore = x.SettingsStore.BindToContextTransient(textControl.ToContextRange())
+        if not (settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SemicolonAtEndOfLine)) then
+            if startOffset > 0 && buffer.[startOffset - 1] = ';' then
+                if startOffset > 1 && buffer.[startOffset - 2] <> ';' then
+                    startOffset <- startOffset - 1
+
+            startOffset <- skipWithConditionBefore startOffset
 
         let lineEndOffset = document.GetLineEndOffsetNoLineBreak(line)
         if trimAfterCaret = TrimTrailingSpaces.Yes then
