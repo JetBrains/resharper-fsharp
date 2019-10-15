@@ -5,6 +5,7 @@ open System.Collections.Generic
 open FSharp.Compiler.Ast
 open FSharp.Compiler.PrettyNaming
 open FSharp.Compiler.SourceCodeServices.AstTraversal
+open JetBrains.Application.CommandProcessing
 open JetBrains.Application.UI.ActionSystem.Text
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
@@ -268,6 +269,7 @@ type FSharpTypingAssist
         tryFindContinuedLine line lineStartOffset (lexer.TokenType == FSharpTokenType.LPAREN)
 
     let insertNewLineAt textControl indent trimAfterCaret =
+        use command = this.CommandProcessor.UsingCommand("New Line")
         let insertPos = trimTrailingSpaces textControl trimAfterCaret
         let text = this.GetNewLineText(textControl) + String(' ', indent)
         insertText textControl insertPos text "Indent on Enter"
@@ -653,6 +655,7 @@ type FSharpTypingAssist
 
             bracketsAllowingDeindent.Contains(tokenType) && lexer.TokenType != FSharpTokenType.NEW_LINE
 
+        use command = x.CommandProcessor.UsingCommand("New Line")
         let baseIndentLength =
             if not shouldDeindent then
                 getOffsetInLine document line leftBracketStartOffset
@@ -694,6 +697,7 @@ type FSharpTypingAssist
         let strEndLine = document.GetCoordsByOffset(lexer.TokenEnd).Line
         if strStartLine <> strEndLine then false else
 
+        use command = x.CommandProcessor.UsingCommand("New Line")
         let newLineString = x.GetNewLineText(textControl)
         document.InsertText(lexer.TokenEnd - 3, newLineString)
         document.InsertText(offset, newLineString)
@@ -865,6 +869,7 @@ type FSharpTypingAssist
             let offset = getStartOffset document expr.Range
             getOffsetInLine document startLine offset
 
+        use command = x.CommandProcessor.UsingCommand("New Line")
         if not (insertNewLineAt textControl indent TrimTrailingSpaces.Yes) then false else
 
         if nextTokenIsKeyword then
