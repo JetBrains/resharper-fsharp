@@ -9,6 +9,7 @@ open JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Templates
 open JetBrains.ReSharper.Feature.Services.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
@@ -85,35 +86,39 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
 
             | binding -> binding :> _
 
+        let isSingleLine = recordExpr.IsSingleLine
+
+        let generateSingleLine =
+            existingBindings.Count > 1 && fieldNames.Count <= 4 && isSingleLine
+
+        if isSingleLine && not generateSingleLine && existingBindings.Count > 0 then
+            ToMultilineRecord.Execute(recordExpr)
+
+        if generateSingleLine && not existingBindings.IsEmpty then
+            addSemicolon (existingBindings.Last())
+
+        let generatedBindings = List<IRecordExprBinding>()
+
         let indent =
             match anchor with
             | :? IRecordExprBinding -> anchor.Indent
             | _ -> anchor.Indent + 1
 
-        let singleLine =
-            existingBindings.Count > 1 && fieldNames.Count <= 4 &&
-            recordExpr.IsSingleLine
-
-        if singleLine && not existingBindings.IsEmpty then
-            addSemicolon (existingBindings.Last())
-
-        let generatedBindings = List<IRecordExprBinding>()
-
         for name in fieldsToAdd do
             if anchor :? IRecordExprBinding then
-                if singleLine then
+                if generateSingleLine then
                     anchor <- ModificationUtil.AddChildAfter(anchor, Whitespace())
                 else
                     anchor <- ModificationUtil.AddChildAfter(anchor, NewLine(lineEnding))
                     anchor <- ModificationUtil.AddChildAfter(anchor, Whitespace(indent))
 
-            let binding = elementFactory.CreateRecordExprBinding(name, singleLine)
+            let binding = elementFactory.CreateRecordExprBinding(name, generateSingleLine)
             anchor <- ModificationUtil.AddChildAfter(anchor, binding)
             generatedBindings.Add(anchor :?> _)
 
         let lastBinding = generatedBindings.Last()
 
-        if singleLine then
+        if generateSingleLine then
             ModificationUtil.DeleteChild(lastBinding.Semicolon)
 
             for binding in existingBindings do

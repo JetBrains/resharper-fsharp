@@ -28,7 +28,10 @@ type ToMultilineRecord(dataProvider: FSharpContextActionDataProvider) =
         ranges.Contains(dataProvider.SelectedTreeRange)
 
     override x.ExecutePsiTransaction(_, _) =
-        let recordExpr = dataProvider.GetSelectedElement<IRecordExpr>()
+        ToMultilineRecord.Execute(dataProvider.GetSelectedElement<IRecordExpr>())
+        null
+
+    static member Execute(recordExpr: IRecordExpr) =
         let lineEnding = recordExpr.FSharpFile.GetLineEnding()
 
         use writeCookie = WriteLockCookie.Create(recordExpr.IsPhysical())
@@ -54,5 +57,3 @@ type ToMultilineRecord(dataProvider: FSharpContextActionDataProvider) =
             match semicolon.PrevSibling with
             | Whitespace node -> ModificationUtil.DeleteChildRange(node, semicolon)
             | _ -> ModificationUtil.DeleteChild(semicolon)
-
-        null
