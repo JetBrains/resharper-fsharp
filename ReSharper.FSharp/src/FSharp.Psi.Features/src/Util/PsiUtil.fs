@@ -112,6 +112,11 @@ let (|IgnoreParenPat|) (pat: ISynPat) = pat.IgnoreParentParens()
 let (|IgnoreInnerParenExpr|) (expr: ISynExpr) =
     expr.IgnoreInnerParens()
 
+let isWhitespace (node: ITreeNode) =
+    let tokenType = node.GetTokenType()
+    isNotNull tokenType && tokenType.IsWhitespace
+
+
 [<AutoOpen>]
 module PsiModificationUtil =
     let replace oldChild newChild =

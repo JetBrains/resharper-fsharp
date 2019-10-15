@@ -626,8 +626,11 @@ lazyExpr options { stubBase="FSharpExpressionBase"; }:
   synExpr<EXPR, Expression>;
 
 sequentialExpr options { stubBase="FSharpExpressionBase"; }:
-  synExpr<EXPR1, Expression1>
-  synExpr<EXPR2, Expression2>;
+  synExpr<EXPR, Expressions>
+  (
+    SEMICOLON<SEMI, Separator>?
+    synExpr<EXPR, Expressions>
+  )*;
 
 ifThenElseExpr options { stubBase="FSharpExpressionBase"; }:
   IF<IF, IfKeyword>

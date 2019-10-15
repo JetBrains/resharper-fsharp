@@ -586,6 +586,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
     member x.PushExpression(synExpr: SynExpr) =
         x.PushStep(synExpr, expressionProcessor)
 
+    member x.PushSequentialExpression(synExpr: SynExpr) =
+        x.PushStep(synExpr, sequentialExpressionProcessor)
+    
     member x.PushStepList(items, processor: StepListProcessorBase<_>) =
         match items with
         | [] -> ()
@@ -868,9 +871,8 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             x.PushRangeAndProcessExpression(expr, range, ElementType.FIXED_EXPR)
 
         | SynExpr.Sequential(_, _, expr1, expr2, _) ->
-            // todo: concat nested sequential expressions
             x.PushRange(range, ElementType.SEQUENTIAL_EXPR)
-            x.PushExpression(expr2)
+            x.PushSequentialExpression(expr2)
             x.ProcessExpression(expr1)
 
     member x.ProcessLongIdentifierExpression(lid, range) =
@@ -1094,6 +1096,22 @@ type ExpressionProcessor() =
     override x.Process(expr, builder) =
         builder.ProcessExpression(expr)
 
+type SequentialExpressionProcessor() =
+    inherit StepProcessorBase<SynExpr>()
+
+    override x.Process(expr, builder) =
+        match expr with
+        | SynExpr.Sequential(_, _, currentExpr, SynExpr.Sequential(_, _, nextExpr1, nextExpr2, _), _) ->
+            builder.PushSequentialExpression(nextExpr2)
+            builder.PushExpression(nextExpr1)
+            builder.ProcessExpression(currentExpr)
+
+        | SynExpr.Sequential(_, _, currentExpr, nextExpr, _) ->
+            builder.PushExpression(nextExpr)
+            builder.ProcessExpression(currentExpr)
+
+        | _ -> builder.ProcessExpression(expr)
+
 
 [<Struct>]
 type ExpressionAndWrapperType =
@@ -1217,6 +1235,7 @@ module BuilderStepProcessors =
     // due to compiler producing additional recursive init checks otherwise in this case.
 
     let expressionProcessor = ExpressionProcessor()
+    let sequentialExpressionProcessor = SequentialExpressionProcessor()
     let wrapExpressionProcessor = WrapExpressionProcessor()
     let advanceToEndProcessor = AdvanceToEndProcessor()
     let endRangeProcessor = EndRangeProcessor()
