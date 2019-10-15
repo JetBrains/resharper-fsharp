@@ -2,17 +2,20 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Util.PsiUtil
 
 open FSharp.Compiler.Range
+open JetBrains.Application.Settings
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Files
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Psi.Util
 open JetBrains.TextControl
 open JetBrains.Util.Text
 
@@ -101,11 +104,19 @@ let getNode<'T when 'T :> ITreeNode and 'T : null> (fsFile: IFSharpFile) (range:
     if isNull node then failwithf "Couldn't get %O from range %O" typeof<'T>.Name range else
     node
 
+
+let getPrevSibling (node: ITreeNode) =
+    if isNotNull node then node.PrevSibling else null
+
+
+let getTokenType (node: ITreeNode) =
+    if isNotNull node then node.GetTokenType() else null
+
 let (|TokenType|_|) tokenType (treeNode: ITreeNode) =
-    if isNotNull treeNode && treeNode.GetTokenType() == tokenType then Some treeNode else None
+    if getTokenType treeNode == tokenType then Some treeNode else None
 
 let (|Whitespace|_|) (treeNode: ITreeNode) =
-    if isNotNull treeNode && treeNode.GetTokenType() == FSharpTokenType.WHITESPACE then Some treeNode else None
+    if getTokenType treeNode == FSharpTokenType.WHITESPACE then Some treeNode else None
 
 let (|IgnoreParenPat|) (pat: ISynPat) = pat.IgnoreParentParens()
 
@@ -113,8 +124,55 @@ let (|IgnoreInnerParenExpr|) (expr: ISynExpr) =
     expr.IgnoreInnerParens()
 
 let isWhitespace (node: ITreeNode) =
-    let tokenType = node.GetTokenType()
+    let tokenType = getTokenType node
     isNotNull tokenType && tokenType.IsWhitespace
+
+let isSemicolon (node: ITreeNode) =
+    getTokenType node == FSharpTokenType.SEMICOLON
+
+let rec skipTokensOfTypeAfter tokenType (node: ITreeNode) =
+    let nextSibling = node.NextSibling
+    if getTokenType nextSibling == tokenType then
+        skipTokensOfTypeAfter tokenType nextSibling
+    else
+        node
+
+let rec skipOneTokenOfTypeAfter (tokenType) (node: ITreeNode) =
+    let nextSibling = node.NextSibling
+    if getTokenType nextSibling == tokenType then nextSibling else node
+
+let getRangeWithNewLineAfter (node: ITreeNode) =
+    let nextSibling = node.NextSibling
+    if not (isWhitespace nextSibling) then TreeRange(node) else
+
+    let last = skipTokensOfTypeAfter FSharpTokenType.WHITESPACE nextSibling
+    let last = skipOneTokenOfTypeAfter FSharpTokenType.NEW_LINE last
+    TreeRange(node.FirstChild, last)
+
+let shouldEraseSemicolon (node: ITreeNode) =
+    let settingsStore = node.GetSettingsStore()
+    not (settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SemicolonAtEndOfLine))
+
+let rec skipThisWhitespaceBeforeNode node =
+    let rec skip seenSemicolon node =
+        if isWhitespace node then
+            skip seenSemicolon node.PrevSibling
+        elif not seenSemicolon && isSemicolon node && shouldEraseSemicolon node then
+            skip true node.PrevSibling
+        else
+            node
+    skip false node
+
+let rec skipPreviousWhitespaceBeforeNode node =
+    let rec skip seenSemicolon (node: ITreeNode) =
+        let prevSibling = node.PrevSibling
+        if isWhitespace prevSibling then
+            skip seenSemicolon prevSibling
+        elif not seenSemicolon && isSemicolon prevSibling && shouldEraseSemicolon node then
+            skip true prevSibling
+        else
+            node
+    skip false node
 
 
 [<AutoOpen>]

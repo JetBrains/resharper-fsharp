@@ -6,6 +6,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
 
 type RemoveSubsequentFix(warning: UnitTypeExpectedWarning) =
@@ -31,11 +32,15 @@ type RemoveSubsequentFix(warning: UnitTypeExpectedWarning) =
         let exprs = seqExpr.Expressions
         let exprIndex = Seq.findIndex ((==) expr) exprs
 
-        let mutable first: ITreeNode = Seq.skip (exprIndex + 1) exprs |> Seq.head :> _
-        while isWhitespace first.PrevSibling do
-            first <- first.PrevSibling
+        let firstExprToRemove: ITreeNode =
+            Seq.skip (exprIndex + 1) exprs |> Seq.head :> _
 
-        let last = seqExpr.LastChild
-        ModificationUtil.DeleteChildRange(first, last)
-
-        null
+        if exprIndex = 0 && exprs.Count = 2 then
+            let rangeToReplace = getRangeWithNewLineAfter seqExpr
+            let last = firstExprToRemove |> getPrevSibling |> skipThisWhitespaceBeforeNode
+            ModificationUtil.ReplaceChildRange(rangeToReplace, TreeRange(seqExpr.FirstChild, last)) |> ignore
+            null
+        else
+            let first = firstExprToRemove |> skipPreviousWhitespaceBeforeNode
+            ModificationUtil.DeleteChildRange(first, seqExpr.LastChild)
+            null
