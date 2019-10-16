@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.ui.SimpleTextAttributes
 import com.jetbrains.rider.model.RdProjectFileDescriptor
 import com.jetbrains.rider.projectView.nodes.ProjectModelNode
+import com.jetbrains.rider.projectView.nodes.containingProject
 import com.jetbrains.rider.projectView.views.solutionExplorer.SolutionExplorerCustomization
 
 class FSharpSolutionExplorerCustomization(project: Project) : SolutionExplorerCustomization(project) {
@@ -15,4 +16,7 @@ class FSharpSolutionExplorerCustomization(project: Project) : SolutionExplorerCu
             presentation.addText(" [${descriptor.buildAction}]", SimpleTextAttributes.GRAY_ATTRIBUTES)
         }
     }
+
+    override fun ignoreFoldersOnTop(node: ProjectModelNode) =
+            node.containingProject()?.getVirtualFile()?.extension == "fsproj"
 }
