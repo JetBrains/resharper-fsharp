@@ -8,14 +8,23 @@ IFSharpImplFile
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           IParenPat
             FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-            ILocalAsPat
-              ILocalReferencePat
-                IExpressionReferenceName
-                  FSharpIdentifierToken(type:IDENTIFIER, text:a)
+            ITypedPat
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              ITypedPat
+                ILocalReferencePat
+                  IExpressionReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:x)
+                FSharpTokenType+ColonTokenElement(type:COLON, text::)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                INamedType
+                  ITypeReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:int)
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+              FSharpTokenType+ColonTokenElement(type:COLON, text::)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpTokenType+AsTokenElement(type:AS, text:as)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpIdentifierToken(type:IDENTIFIER, text:b)
+              INamedType
+                ITypeReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:int)
             FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)

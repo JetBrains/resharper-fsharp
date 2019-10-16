@@ -24,6 +24,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Let 03 - Typed, var type``() = x.DoNamedTest()
     [<Test>] member x.``Let 04 - Typed, var type, space``() = x.DoNamedTest()
     [<Test>] member x.``Let 05 - Typed, space``() = x.DoNamedTest()
+    [<Test>] member x.``Let 06 - Unit param``() = x.DoNamedTest()
 
     [<Test>] member x.``Let - Rec 01``() = x.DoNamedTest()
     [<Test>] member x.``Let - Rec 02 - And``() = x.DoNamedTest()
@@ -70,6 +71,12 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Lambda 15 - Unit``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Lambda 16 - Unit in parens``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Lambda 17 - As``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 18 - Typed``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 19 - Typed - Multiple params``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 20 - Two units``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 21 - Nested types``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 22 - Attribute``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 23 - Attribute, Typed``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Match 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Do 01 - Simple``() = x.DoNamedTest()

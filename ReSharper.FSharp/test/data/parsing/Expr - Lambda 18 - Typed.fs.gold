@@ -8,9 +8,15 @@ IFSharpImplFile
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           IParenPat
             FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-            ILocalReferencePat
-              IExpressionReferenceName
-                FSharpIdentifierToken(type:IDENTIFIER, text:a)
+            ITypedPat
+              ILocalReferencePat
+                IExpressionReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:x)
+              FSharpTokenType+ColonTokenElement(type:COLON, text::)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              INamedType
+                ITypeReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:int)
             FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
@@ -18,4 +24,5 @@ IFSharpImplFile
           IConstExpr
             FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
             FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 
