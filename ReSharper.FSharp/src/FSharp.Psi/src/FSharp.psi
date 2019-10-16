@@ -361,14 +361,12 @@ interface synExpr:
   arrayOrListOfSeqExpr |
   compExpr |
   lambdaExpr |
-  matchLambdaExpr |
-  matchExpr |
+  matchLikeExpr |
   doExpr |
   assertExpr |
   appExpr |
   letOrUseExpr |
-  tryWithExpr |
-  tryFinallyExpr |
+  tryLikeExpr |
   lazyExpr |
   sequentialExpr |
   ifThenElseExpr |
@@ -572,9 +570,13 @@ lambdaExpr options { stubBase="FSharpExpressionBase"; }:
   RARROW
   synExpr<EXPR, Expression>;
 
+interface matchLikeExpr:
+  matchExpr |
+  matchLambdaExpr;
+
 matchLambdaExpr options { stubBase="FSharpExpressionBase"; }:
   FUNCTION
-  matchClause<MATCH_CLAUSE, clauses>*;
+  matchClause<MATCH_CLAUSE, Clauses>*;
 
 // todo: separate nodes for bang exprs?
 matchExpr options { stubBase="FSharpExpressionBase"; }:
@@ -608,6 +610,10 @@ letOrUseExpr options { stubBase="FSharpExpressionBase"; }:
     binding<BINDING, Bindings>
   )*
   synExpr<BODY_EXPR, BodyExpression>;
+
+interface tryLikeExpr:
+  tryWithExpr |
+  tryFinallyExpr;
 
 tryWithExpr options { stubBase="FSharpExpressionBase"; }:
   TRY
