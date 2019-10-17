@@ -16,7 +16,7 @@ type ReplaceWithWildPatFix(warning: UnusedValueWarning) =
     override x.IsAvailable _ =
         isValid pat &&
 
-        let node = getNonPatParent pat
+        let node = skipIntermediatePatParents pat |> getParent
         node :? IBinding ||
         node :? IMatchClause ||
         node :? IMemberParamDeclaration && node.Parent :? IMemberDeclaration || // todo: check this check

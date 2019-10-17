@@ -609,7 +609,8 @@ letOrUseExpr options { stubBase="FSharpExpressionBase"; }:
     AND<AND, Separators>
     binding<BINDING, Bindings>
   )*
-  synExpr<BODY_EXPR, BodyExpression>;
+  IN<IN, InKeyword>?
+  synExpr<IN_EXPR, InExpression>;
 
 interface tryLikeExpr:
   tryWithExpr |

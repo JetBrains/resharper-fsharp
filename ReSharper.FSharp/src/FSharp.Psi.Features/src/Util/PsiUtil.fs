@@ -105,8 +105,14 @@ let getNode<'T when 'T :> ITreeNode and 'T : null> (fsFile: IFSharpFile) (range:
     node
 
 
+let getParent (node: ITreeNode) =
+    if isNotNull node then node.Parent else null
+
 let getPrevSibling (node: ITreeNode) =
     if isNotNull node then node.PrevSibling else null
+
+let getNextSibling (node: ITreeNode) =
+    if isNotNull node then node.NextSibling else null
 
 
 let getTokenType (node: ITreeNode) =
@@ -130,6 +136,7 @@ let isWhitespace (node: ITreeNode) =
 let isSemicolon (node: ITreeNode) =
     getTokenType node == FSharpTokenType.SEMICOLON
 
+
 let rec skipTokensOfTypeAfter tokenType (node: ITreeNode) =
     let nextSibling = node.NextSibling
     if getTokenType nextSibling == tokenType then
@@ -137,17 +144,60 @@ let rec skipTokensOfTypeAfter tokenType (node: ITreeNode) =
     else
         node
 
-let rec skipOneTokenOfTypeAfter (tokenType) (node: ITreeNode) =
+let rec skipTokensOfTypeBefore tokenType (node: ITreeNode) =
+    let prevSibling = node.PrevSibling
+    if getTokenType prevSibling == tokenType then
+        skipTokensOfTypeBefore tokenType prevSibling
+    else
+        node
+
+
+let rec skipOneTokenOfTypeAfter tokenType (node: ITreeNode) =
+    if getTokenType node == tokenType then node else
+
     let nextSibling = node.NextSibling
     if getTokenType nextSibling == tokenType then nextSibling else node
 
-let getRangeWithNewLineAfter (node: ITreeNode) =
+let rec skipOneTokenOfTypeBefore tokenType (node: ITreeNode) =
+    if getTokenType node == tokenType then node else
+
+    let prevSibling = node.PrevSibling
+    if getTokenType prevSibling == tokenType then prevSibling else node
+
+
+let getRangeEndWithSpaceBefore (node: ITreeNode) =
+    let prevSibling = node.PrevSibling
+    if not (getTokenType prevSibling == FSharpTokenType.WHITESPACE) then node else
+
+    skipTokensOfTypeAfter FSharpTokenType.WHITESPACE prevSibling
+
+let getRangeEndWithSpaceAfter (node: ITreeNode) =
     let nextSibling = node.NextSibling
-    if not (isWhitespace nextSibling) then TreeRange(node) else
+    if not (getTokenType nextSibling == FSharpTokenType.WHITESPACE) then node else
+
+    skipTokensOfTypeAfter FSharpTokenType.WHITESPACE nextSibling
+
+let getRangeEndWithNewLineAfter (node: ITreeNode) =
+    let nextSibling = node.NextSibling
+    if not (isWhitespace nextSibling) then node else
 
     let last = skipTokensOfTypeAfter FSharpTokenType.WHITESPACE nextSibling
-    let last = skipOneTokenOfTypeAfter FSharpTokenType.NEW_LINE last
-    TreeRange(node.FirstChild, last)
+    skipOneTokenOfTypeAfter FSharpTokenType.NEW_LINE last
+
+let getRangeStartWithNewLineBefore (node: ITreeNode) =
+    let prevSibling = node.PrevSibling
+    if not (isWhitespace prevSibling) then node else
+
+    let last = skipTokensOfTypeBefore FSharpTokenType.WHITESPACE prevSibling
+    skipOneTokenOfTypeBefore FSharpTokenType.NEW_LINE last
+
+
+let getRangeWithNewLineAfter (node: ITreeNode) =
+    TreeRange(node, getRangeEndWithNewLineAfter node)
+
+let getRangeWithNewLineBefore (node: ITreeNode) =
+    TreeRange(getRangeStartWithNewLineBefore node, node)
+
 
 let shouldEraseSemicolon (node: ITreeNode) =
     let settingsStore = node.GetSettingsStore()
@@ -203,10 +253,13 @@ let getNextNodeOfType nodeType (node: ITreeNode) =
     next
 
 
-let rec getNonPatParent (pat: ISynPat) =
-    match pat.Parent with
-    | :? ISynPat as pat -> getNonPatParent pat
-    | node -> node
+let rec skipIntermediateParentsOfSameType<'T when 'T :> ITreeNode> (node: 'T) =
+    match node.Parent with
+    | :? 'T as pat -> skipIntermediateParentsOfSameType pat
+    | _ -> node
+
+let rec skipIntermediatePatParents (pat: ISynPat) =
+    skipIntermediateParentsOfSameType<ISynPat> pat
 
 
 let isValid (node: ITreeNode) =

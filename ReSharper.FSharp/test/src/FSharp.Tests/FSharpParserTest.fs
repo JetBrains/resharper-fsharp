@@ -79,7 +79,11 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Lambda 23 - Attribute, Typed``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Match 01 - Simple``() = x.DoNamedTest()
+
     [<Test>] member x.``Expr - Do 01 - Simple``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Do 02 - Let``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Do 03 - Let in do``() = x.DoNamedTest()
+
     [<Test>] member x.``Expr - Assert 01 - Simple``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - TryWith 01 - Simple``() = x.DoNamedTest()
@@ -122,6 +126,8 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Sequential 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Sequential 03``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Sequential 04 - Let``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Sequential 05 - Let``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Sequential 06 - Let``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - New 01 - Lid``() = x.DoNamedTest()
     [<Test>] member x.``Expr - New 02 - Generics``() = x.DoNamedTest()

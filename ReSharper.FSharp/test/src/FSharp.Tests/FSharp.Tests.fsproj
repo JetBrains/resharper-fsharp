@@ -46,6 +46,7 @@
     <Compile Include="QuickFixes\AddParensTest.fs" />
     <Compile Include="QuickFixes\RemoveSubsequentTest.fs" />
     <Compile Include="QuickFixes\RemoveRedundantNewTest.fs" />
+    <Compile Include="QuickFixes\RemoveUnusedLocalBindingTest.fs" />
     <Compile Include="Intentions\IntentionsTestBase.fs" />
     <Compile Include="Intentions\ToRecursiveLetBindings.fs" />
     <Compile Include="Intentions\ToMultilineRecordTest.fs" />
