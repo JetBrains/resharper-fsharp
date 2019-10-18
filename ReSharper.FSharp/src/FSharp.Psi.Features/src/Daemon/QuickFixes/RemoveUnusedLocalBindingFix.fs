@@ -21,11 +21,9 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
     // todo: we can also check that every top declaration pat is unused instead
 
     let binding = LocalBindingNavigator.GetByHeadPattern(pat)
-    let letOrUseExpr = LetOrUseExprNavigator.GetByBinding(binding)
+    let letExpr = LetLikeExprNavigator.GetByBinding(binding)
 
-    let getRanges (expr: ILetOrUseExpr) =
-        Assertion.Assert(expr.Bindings.Count = 1, "expr.Bindings.Count = 1")
-
+    let getRanges (expr: ILetLikeExpr) =
         let outerSeqExpr = SequentialExprNavigator.GetByExpression(expr)
         let inExpr = expr.InExpression
 
@@ -38,7 +36,9 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
             TreeRange(expr), TreeRange(start.NextSibling, inExpr) else
 
         let replaceRange =
-            getRangeWithNewLineBefore expr
+            match CompExprNavigator.GetByExpression(expr) with
+            | null -> getRangeWithNewLineBefore expr
+            | _ -> TreeRange(expr)
         
         let copyRange =
             let start = getRangeEndWithNewLineAfter expr.Bindings.[0]
@@ -52,29 +52,31 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
         | _ -> "Remove unused value"
 
     override x.IsAvailable _ =
-        isValid pat && isValid letOrUseExpr && isValid letOrUseExpr.InExpression
+        isValid pat && isValid letExpr
 
     override x.ExecutePsiTransaction(_, _) =
         use writeLock = WriteLockCookie.Create(pat.IsPhysical())
-        let bindings = letOrUseExpr.Bindings
+
+        let bindings = letExpr.Bindings
         if bindings.Count = 1 then
-            let toReplace, toCopy = getRanges letOrUseExpr
+            let toReplace, toCopy = getRanges letExpr
             ModificationUtil.ReplaceChildRange(toReplace, toCopy) |> ignore
             null
         else
+            let letBindings = letExpr.As<ILetBindings>().NotNull()
             let bindingIndex = bindings.IndexOf(binding)
 
             let rangeToDelete =
                 if bindingIndex = 0 then
-                    let andKeyword = letOrUseExpr.Separators.[0]
+                    let andKeyword = letBindings.Separators.[0]
                     TreeRange(getRangeEndWithSpaceBefore binding, andKeyword)
                 else
-                    let andKeyword = letOrUseExpr.Separators.[bindingIndex - 1]
+                    let andKeyword = letBindings.Separators.[bindingIndex - 1]
                     TreeRange(getRangeStartWithNewLineBefore andKeyword, getRangeEndWithSpaceAfter binding)
 
             ModificationUtil.DeleteChildRange(rangeToDelete)
 
             Action<_>(fun textControl ->
-                let anchorBindingIndex = if bindingIndex > 0 then bindingIndex - 1 else 0
-                let offset = letOrUseExpr.Bindings.[anchorBindingIndex].GetNavigationRange().EndOffset
+                let anchorIndex = if bindingIndex > 0 then bindingIndex - 1 else 0
+                let offset = letBindings.Bindings.[anchorIndex].GetNavigationRange().EndOffset
                 textControl.Caret.MoveTo(offset, CaretVisualPlacement.DontScrollIfVisible))

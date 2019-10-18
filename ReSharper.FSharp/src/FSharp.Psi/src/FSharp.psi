@@ -157,6 +157,11 @@ interface letBindings:
   letModuleDecl |
   letOrUseExpr;
 
+interface letLikeExpr:
+  letOrUseExpr |
+  letOrUseBangExpr;
+
+
 interface binding:
   topBinding |
   localBinding;
@@ -365,7 +370,7 @@ interface synExpr:
   doExpr |
   assertExpr |
   appExpr |
-  letOrUseExpr |
+  letLikeExpr |
   tryLikeExpr |
   lazyExpr |
   sequentialExpr |
@@ -382,7 +387,6 @@ interface synExpr:
   joinInExpr |
   implicitZeroExpr |
   yieldOrReturnExpr |
-  letOrUseBangExpr |
 
   // todo: cover cases
   libraryOnlyExpr |
@@ -411,6 +415,7 @@ itemIndexerExpr options { stubBase="FSharpExpressionBase"; } extras {
   indexerArgList<ARG_LIST, IndexerArgList>;
 
 namedIndexerExpr options { stubBase="FSharpExpressionBase"; } extras {
+  // todo: fix this, it's always empty now
   get { methodName="Args" path=<namedIndexerExpr:INDEXER_ARG> };
 }:
   // todo: maybe: expr, dot, ident, arg?
@@ -705,12 +710,12 @@ yieldOrReturnExpr options { stubBase="FSharpExpressionBase"; }:
   (YIELD | YIELD_BANG | RETURN | RETURN_BANG)
   synExpr<EXPR, Expression>;
 
-letOrUseBangExpr options { stubBase="FSharpExpressionBase"; }:
+letOrUseBangExpr options { customImpl; stubBase="FSharpExpressionBase"; } extras {
+  get { methodName="Bindings" path=<letOrUseBangExpr:BINDING> };
+}:
   letOrUseBang{LET, LetOrUseToken}
-  synPat<PAT, Pattern>
-  EQUALS<EQUALS, EqualsToken>
-  synExpr<EXPR, Expression>
-  IN?
+  binding<BINDING, Binding>
+  IN<IN, InKeyword>?
   synExpr<IN_EXPR, InExpression>;
 
 libraryOnlyExpr options { stubBase="FSharpExpressionBase"; }:

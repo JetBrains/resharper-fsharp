@@ -134,6 +134,8 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Expr - ObjExpr 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - LetOrUseBang 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Binding - Return type 01``() = x.DoNamedTest()
     [<Test>] member x.``Binding - Return type 02 - Attrs``() = x.DoNamedTest()
     [<Test>] member x.``Binding - Return type 03 - Attrs, wild type``() = x.DoNamedTest()

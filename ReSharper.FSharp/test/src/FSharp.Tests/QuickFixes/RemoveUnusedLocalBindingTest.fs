@@ -13,6 +13,7 @@ type RemoveUnusedLocalBindingTest() =
 
     [<Test>] member x.``Inline 01``() = x.DoNamedTest()
     [<Test>] member x.``Inline 02 - Comment``() = x.DoNamedTest()
+    [<Test>] member x.``Inline 03 - In other let``() = x.DoNamedTest()
 
     [<Test>] member x.``Multiline 01``() = x.DoNamedTest()
     [<Test>] member x.``Multiline 02 - Wrong seq``() = x.DoNamedTest()
@@ -20,6 +21,7 @@ type RemoveUnusedLocalBindingTest() =
     [<Test>] member x.``Multiline 04 - New lines``() = x.DoNamedTest()
     [<Test>] member x.``Multiline 05``() = x.DoNamedTest()
     [<Test>] member x.``Multiline 06 - Nested pattern``() = x.DoNamedTest()
+    [<Test>] member x.``Multiline 07 - In other let``() = x.DoNamedTest()
 
     [<Test>] member x.``Recursive 01``() = x.DoNamedTest()
     [<Test>] member x.``Recursive 02 - Comment after and``() = x.DoNamedTest()
@@ -27,6 +29,10 @@ type RemoveUnusedLocalBindingTest() =
     [<Test>] member x.``Recursive 04 - First``() = x.DoNamedTest()
     [<Test>] member x.``Recursive 05 - First, more space``() = x.DoNamedTest()
     [<Test>] member x.``Recursive 06 - With binding after, comment``() = x.DoNamedTest()
+
+    [<Test>] member x.``Comp 01``() = x.DoNamedTest()
+    [<Test>] member x.``Comp 02 - Inline``() = x.DoNamedTest()
+    [<Test>] member x.``Comp 03 - Inline, multiline``() = x.DoNamedTest()
 
 
 [<FSharpTest>]

@@ -32,6 +32,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_ARRAY_OR_LIST_PAT = "";
     public const string IDS_LET = "";
     public const string IDS_LET_BINDINGS = "";
+    public const string IDS_LET_LIKE_EXPR = "";
     public const string IDS_BINDING = "";
     public const string IDS_IDENT_OR_OP_NAME = "";
     public const string IDS_ACTIVE_PATTERN_CASE_DECLARATION = "";

@@ -845,8 +845,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
 
         | SynExpr.LetOrUseBang(_, _, _, pat, expr, inExpr, _) ->
             x.PushRange(range, ElementType.LET_OR_USE_BANG_EXPR)
-            x.ProcessPat(pat, true, false)
             x.PushExpression(inExpr)
+            x.PushRangeForMark(expr.Range, x.Mark(pat.Range), ElementType.LOCAL_BINDING)
+            x.ProcessPat(pat, true, false)
             x.ProcessExpression(expr)
 
         | SynExpr.MatchBang(_, expr, clauses, _) ->
