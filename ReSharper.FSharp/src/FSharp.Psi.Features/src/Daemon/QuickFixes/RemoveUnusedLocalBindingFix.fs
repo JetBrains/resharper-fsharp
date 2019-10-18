@@ -20,8 +20,8 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
     // todo: check there's a single declaration pat
     // todo: we can also check that every top declaration pat is unused instead
 
-    let binding = LocalBindingNavigator.GetByHeadPattern(pat)
-    let letExpr = LetLikeExprNavigator.GetByBinding(binding)
+    let binding = BindingNavigator.GetByHeadPattern(pat)
+    let letOrUse = LetNavigator.GetByBinding(binding)
 
     let getRanges (expr: ILetLikeExpr) =
         let outerSeqExpr = SequentialExprNavigator.GetByExpression(expr)
@@ -52,18 +52,28 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
         | _ -> "Remove unused value"
 
     override x.IsAvailable _ =
-        isValid pat && isValid letExpr
+        isValid pat && isValid letOrUse
 
     override x.ExecutePsiTransaction(_, _) =
         use writeLock = WriteLockCookie.Create(pat.IsPhysical())
 
-        let bindings = letExpr.Bindings
+        let bindings = letOrUse.Bindings
         if bindings.Count = 1 then
-            let toReplace, toCopy = getRanges letExpr
-            ModificationUtil.ReplaceChildRange(toReplace, toCopy) |> ignore
+            match letOrUse with
+            | :? ILetModuleDecl as letModuleDecl ->
+                let first = getRangeStartWithNewLineBefore letModuleDecl
+                let last = getRangeEndWithSpaceAfter letModuleDecl
+                ModificationUtil.DeleteChildRange(TreeRange(first, last))
+
+            | :? ILetLikeExpr as letExpr ->
+                let toReplace, toCopy = getRanges letExpr
+                ModificationUtil.ReplaceChildRange(toReplace, toCopy) |> ignore
+
+            | _ ->
+                failwithf "Unexpected let: %O" letOrUse
             null
         else
-            let letBindings = letExpr.As<ILetBindings>().NotNull()
+            let letBindings = letOrUse.As<ILetBindings>().NotNull()
             let bindingIndex = bindings.IndexOf(binding)
 
             let rangeToDelete =

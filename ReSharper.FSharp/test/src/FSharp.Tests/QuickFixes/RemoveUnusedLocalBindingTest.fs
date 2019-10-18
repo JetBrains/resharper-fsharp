@@ -34,6 +34,10 @@ type RemoveUnusedLocalBindingTest() =
     [<Test>] member x.``Comp 02 - Inline``() = x.DoNamedTest()
     [<Test>] member x.``Comp 03 - Inline, multiline``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type - Single 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type - Single 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type - Recursive 01``() = x.DoNamedTest()
+
 
 [<FSharpTest>]
 type RemoveUnusedLocalBindingAvailabilityTest() =

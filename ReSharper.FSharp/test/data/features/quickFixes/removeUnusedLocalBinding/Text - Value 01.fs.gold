@@ -6,5 +6,5 @@ do
 ------------------------------------------------
 0: The value 'x' is unused
 QUICKFIXES:
-Remove unused value
 Replace with '_'
+Remove unused value
