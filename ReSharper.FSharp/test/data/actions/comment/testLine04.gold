@@ -1,6 +1,17 @@
-﻿module Module
+﻿StickComment = True
+module Module
 
 let f x =
 //    let f' = "foo"{source0}
 //    let x' = 42
 {target0}{caret}    ()
+
+================
+StickComment = False
+module Module
+
+let f x =
+    // let f' = "foo"{source0}
+    // let x' = 42
+{target0}{caret}    ()
+

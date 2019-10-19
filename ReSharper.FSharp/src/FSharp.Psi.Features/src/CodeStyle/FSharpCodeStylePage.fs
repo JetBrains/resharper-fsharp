@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
 open System
+open System.Linq.Expressions
 open JetBrains.Application.Components
 open JetBrains.Application.Settings
 open JetBrains.Application.UI.Options
@@ -45,7 +46,10 @@ type FSharpFormatSettingsKey() =
 
     [<SettingsEntry(true, "Preserve end of line"); DefaultValue>]
     val mutable PreserveEndOfLine: bool
-    
+
+    [<SettingsEntry(true, "Don't indent comments started at first column"); DefaultValue>]
+    val mutable StickComment: bool
+
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpDummyCodeFormatter(fsLanguage: FSharpLanguage, formatterRequirements) =
@@ -66,7 +70,9 @@ type FSharpDummyCodeFormatter(fsLanguage: FSharpLanguage, formatterRequirements)
     override x.FormatReplacedNode(_,_) = ()
     
     override x.CreateFormatterContext(profile, firstNode, lastNode, parameters, _) =
-        CodeFormattingContext(x, firstNode, lastNode, profile, formatterRequirements.FormatterLoggerProvider.FormatterLogger, parameters);
+        let logger = formatterRequirements.FormatterLoggerProvider.FormatterLogger
+        CodeFormattingContext(x, firstNode, lastNode, profile, logger, parameters)
+
 
 [<CodePreviewPreparatorComponent>]
 type FSharpCodePreviewPreparator() = 
@@ -76,6 +82,7 @@ type FSharpCodePreviewPreparator() =
     override x.ProjectFileType = FSharpProjectFileType.Instance :> _
     override x.Parse(parser,_) = parser.ParseFile() :> _
 
+
 [<FormattingSettingsPresentationComponent>]
 type FSharpCodeStylePageSchema(lifetime, smartContext, itemViewModelFactory, container, settingsToHide) =
     inherit CodeStylePageSchema<FSharpFormatSettingsKey, FSharpCodePreviewPreparator>(lifetime, smartContext,
@@ -84,24 +91,28 @@ type FSharpCodeStylePageSchema(lifetime, smartContext, itemViewModelFactory, con
     override x.Language = FSharpLanguage.Instance :> _
     override x.PageName = "Formatting Style"
 
+    member x.GetItem(getter: Expression<Func<FSharpFormatSettingsKey,_>>) =
+        base.ItemFor(getter)
+
     override x.Describe() =
-      [| x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.WRAP_LIMIT)
-         x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.INDENT_SIZE)
-         x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.SemicolonAtEndOfLine)
-         x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.SpaceBeforeArgument)
-         x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.SpaceBeforeColon)
-         x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.SpaceAfterComma)
-         x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.SpaceAfterSemicolon)
-         x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.IndentOnTryWith)
-         x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.SpaceAroundDelimiter)
-         x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.ReorderOpenDeclarations)
-         x.ItemFor(fun (key: FSharpFormatSettingsKey) -> key.PreserveEndOfLine) |] :> _
+        [| x.GetItem(fun key -> key.WRAP_LIMIT)
+           x.GetItem(fun key -> key.INDENT_SIZE)
+           x.GetItem(fun key -> key.SemicolonAtEndOfLine)
+           x.GetItem(fun key -> key.SpaceBeforeArgument)
+           x.GetItem(fun key -> key.SpaceBeforeColon)
+           x.GetItem(fun key -> key.SpaceAfterComma)
+           x.GetItem(fun key -> key.SpaceAfterSemicolon)
+           x.GetItem(fun key -> key.IndentOnTryWith)
+           x.GetItem(fun key -> key.SpaceAroundDelimiter)
+           x.GetItem(fun key -> key.ReorderOpenDeclarations)
+           x.GetItem(fun key -> key.PreserveEndOfLine)
+           x.GetItem(fun key -> key.StickComment) |] :> _
 
 
 [<OptionsPage("FSharpCodeStylePage", "Formatting Style", typeof<PsiFeaturesUnsortedOptionsThemedIcons.Indent>)>]
 type FSharpCodeStylePage(lifetime, smartContext: OptionsSettingsSmartContext, env,
                          schema: FSharpCodeStylePageSchema, preview, componentContainer: IComponentContainer) =
     inherit CodeStylePage(lifetime, smartContext, env, schema, preview, componentContainer)
-    let _ = PsiFeaturesUnsortedOptionsThemedIcons.Indent // workaround to create assembly reference (Microsoft/visualfsharp#3522)
+    let _ = PsiFeaturesUnsortedOptionsThemedIcons.Indent // workaround to create assembly reference (dotnet/fsharp#3522)
 
     override x.Id = "FSharpIndentStylePage"

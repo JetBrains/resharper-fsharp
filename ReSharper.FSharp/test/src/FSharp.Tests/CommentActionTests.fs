@@ -1,17 +1,22 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Actions
 
+open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
+open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<Category("CommentAction")>]
+[<FSharpTest>]
+[<TestSettingsKey(typeof<FSharpFormatSettingsKey>)>]
+[<TestSettings("{StickComment:All}")>]
 type FSharpCommentLineTests() =
-    inherit ExecuteActionTestBase()
+    inherit ExecuteActionIteratableTestBase()
 
-    override x.RelativeTestDataPath = @"actions\comment"
+    override x.RelativeTestDataPath = "actions/comment"
     override x.ActionId = "LineComment"
 
-    [<Test>] member x.testLine01() = x.DoTestFiles("testLine01.fs")
-    [<Test>] member x.testLine02() = x.DoTestFiles("testLine02.fs")
-    [<Test>] member x.testLine03() = x.DoTestFiles("testLine03.fs")
-    [<Test>] member x.testLine04() = x.DoTestFiles("testLine04.fs")
-    [<Test>] member x.testLine05() = x.DoTestFiles("testLine05.fs")
+    [<Test>] member x.testLine01() = x.DoNamedTest()
+    [<Test>] member x.testLine02() = x.DoNamedTest()
+    [<Test>] member x.testLine03() = x.DoNamedTest()
+    [<Test>] member x.testLine04() = x.DoNamedTest()
+    [<Test>] member x.testLine05() = x.DoNamedTest()
+    [<Test>] member x.testLine06() = x.DoNamedTest()

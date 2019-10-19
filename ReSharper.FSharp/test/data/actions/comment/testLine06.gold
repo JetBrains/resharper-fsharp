@@ -1,9 +1,15 @@
 ﻿StickComment = True
 module Module
 
-//let x = "foo"{caret}
+let x =
+//    "bar"
+    {caret}"foo"
+
 ================
 StickComment = False
 module Module
 
-// let x = "foo"{caret}
+let x =
+    // "bar"
+    {caret}"foo"
+
