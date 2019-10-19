@@ -64,6 +64,9 @@ type IFSharpTreeNode with
     member x.CreateElementFactory() =
         x.FSharpLanguageService.CreateElementFactory(x.GetPsiModule())
 
+    member x.CheckerService =
+        x.FSharpFile.CheckerService
+    
     member x.GetLineEnding() =
         let fsFile = x.FSharpFile
         fsFile.DetectLineEnding(fsFile.GetPsiServices()).GetPresentation()

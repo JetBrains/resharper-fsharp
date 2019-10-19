@@ -13,3 +13,17 @@ type RemoveRedundantNewTest() =
 
     [<Test>] member x.``Simple 01``() = x.DoNamedTest()
     [<Test>] member x.``Simple 02 - Type args``() = x.DoNamedTest()
+
+
+[<FSharpTest>]
+type RemoveRedundantNewAvailabilityTest() =
+    inherit QuickFixAvailabilityTestBase()
+
+    override x.RelativeTestDataPath = "features/quickFixes/removeRedundantNew"
+
+    [<Test>] member x.``Function 01 - String, not available``() = x.DoNamedTest()
+    [<Test>] member x.``Function 02 - Qualified name``() = x.DoNamedTest()
+
+    [<Test>] member x.``String 01 - Type``() = x.DoNamedTest()
+    [<Test>] member x.``String 02 - Type, qualified``() = x.DoNamedTest()
+    [<Test>] member x.``String 03 - Redefined type``() = x.DoNamedTest()

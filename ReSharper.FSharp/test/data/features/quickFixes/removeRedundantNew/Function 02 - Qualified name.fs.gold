@@ -1,0 +1,16 @@
+﻿module Module
+
+module A =
+    type B = System.String
+
+let B = 123 
+
+|new|(0) A.B(' ', 1) |> ignore
+
+------------------------------------------------
+0: 'new' keyword is redundant
+QUICKFIXES:
+Remove redundant 'new'
+--Remove redundant 'new' in file
+--Remove redundant 'new' in project
+--Remove redundant 'new' in solution

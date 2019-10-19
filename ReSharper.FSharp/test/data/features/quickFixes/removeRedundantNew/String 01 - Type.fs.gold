@@ -1,0 +1,13 @@
+﻿module Module
+
+open System
+
+|new|(0) String(' ', 123) |> ignore
+
+------------------------------------------------
+0: 'new' keyword is redundant
+QUICKFIXES:
+Remove redundant 'new'
+--Remove redundant 'new' in file
+--Remove redundant 'new' in project
+--Remove redundant 'new' in solution

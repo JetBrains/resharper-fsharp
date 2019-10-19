@@ -128,6 +128,20 @@ type FSharpCheckerService
         if checker.IsValueCreated then
             checker.Value.InvalidateConfiguration(fsProject.ProjectOptions, false)
 
+    /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.
+    member x.ResolveNameAtLocation(sourceFile: IPsiSourceFile, names, coords, opName) =
+        // todo: different type parameters count
+        x.ParseAndCheckFile(sourceFile, opName, true)
+        |> Option.bind (fun results ->
+            let checkResults = results.CheckResults
+            let fcsPos = getPosFromCoords coords
+            let lineText = sourceFile.Document.GetLineText(coords.Line)
+            checkResults.GetSymbolUseAtLocation(fcsPos.Line, fcsPos.Column, lineText, names, opName).RunAsTask())
+
+    /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.
+    member x.ResolveNameAtLocation(sourceFile: IPsiSourceFile, name, coords, opName) =
+        x.ResolveNameAtLocation(sourceFile, [name], coords, opName)
+
 
 [<AutoOpen>]
 module ImplicitDefines =

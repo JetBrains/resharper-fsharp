@@ -648,5 +648,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         ? qualifier.QualifiedName + "." + identifier.Name
         : qualifier.QualifiedName;
     }
+
+    public static IList<string> GetNames([CanBeNull] this IReferenceName referenceName)
+    {
+      var result = new List<string>();
+      while (referenceName != null)
+      {
+        var shortName = referenceName.ShortName;
+        if (shortName.IsEmpty() || shortName == SharedImplUtil.MISSING_DECLARATION_NAME)
+          break;
+
+        result.Insert(0, shortName);
+        referenceName = referenceName.Qualifier;
+      }
+
+      return result;
+    }
   }
 }

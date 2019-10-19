@@ -53,6 +53,7 @@
     <Compile Include="FSharpElementFactoryTest.fs" />
     <Compile Include="FSharpNamingTest.fs" />
     <Compile Include="SyntaxHighlightingTest.fs" />
+    <Compile Include="NameResolutionTest.fs" />
   </ItemGroup>
 
   <ItemGroup>
