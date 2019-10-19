@@ -728,7 +728,7 @@ fixedExpr options { stubBase="FSharpExpressionBase"; }:
   FIXED<FIXED, FixedKeyword>
   synExpr<EXPR, Expression>;
 
-chameleonExpression options { stubBase="FSharpExpressionBase"; }:
+chameleonExpression:
   synExpr<EXPR, Expression>;
 
 

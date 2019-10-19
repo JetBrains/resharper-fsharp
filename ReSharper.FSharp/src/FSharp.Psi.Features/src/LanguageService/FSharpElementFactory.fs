@@ -152,3 +152,9 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let moduleDeclaration = getModuleDeclaration (typeReference.GetText())
             let doDecl = moduleDeclaration.Members.First().As<IDo>().NotNull()
             doDecl.Expression.As<IReferenceExpr>()
+
+        member x.CreateReferenceExpr(name) =
+            let source = sprintf "do %s" name
+            let moduleDeclaration = getModuleDeclaration source
+            let doDecl = moduleDeclaration.Members.First().As<IDo>().NotNull()
+            doDecl.Expression.As<IDoExpr>().Expression.As<IReferenceExpr>() :> _

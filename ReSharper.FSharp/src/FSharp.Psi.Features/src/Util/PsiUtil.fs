@@ -4,6 +4,7 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Util.PsiUtil
 open FSharp.Compiler.Range
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
+open JetBrains.ReSharper.Feature.Services.ExpressionSelection
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -264,3 +265,13 @@ let rec skipIntermediatePatParents (pat: ISynPat) =
 
 let isValid (node: ITreeNode) =
     isNotNull node && node.IsValid()
+
+
+[<Language(typeof<FSharpLanguage>)>]
+type FSharpExpressionSelectionProviderBase() =
+    inherit ExpressionSelectionProviderBase<ISynExpr>()
+
+    override x.IsTokenSkipped(token) =
+        // todo: also ;; ?
+        getTokenType token == FSharpTokenType.SEMICOLON ||
+        base.IsTokenSkipped(token)
