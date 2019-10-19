@@ -987,12 +987,12 @@ type FSharpTypingAssist
 
     member x.TrySurroundWithBraces(context, typedBracket, typedBracketIsLeft, matchingBrackets: IDictionary<_, _>) =
         let mutable secondBracket = Unchecked.defaultof<_>
-        if not (matchingBrackets.TryGetValue(typedBracket, &secondBracket)) then true else
+        if not (matchingBrackets.TryGetValue(typedBracket, &secondBracket)) then false else
 
         let lBrace, rBrace = if typedBracketIsLeft then typedBracket, secondBracket else secondBracket, typedBracket
         let lToken, rToken = bracketToTokenType.[lBrace], bracketToTokenType.[rBrace]
         x.HandleSurroundTyping(context, lBrace, rBrace, lToken, rToken, JetFunc<_>.False)
-    
+
     member x.HandleLeftBracket(context: ITypingContext) =
         this.HandleLeftBracketTyped
             (context,
