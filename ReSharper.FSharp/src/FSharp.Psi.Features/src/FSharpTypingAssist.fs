@@ -14,6 +14,7 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.TypingAssist
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -21,6 +22,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CachingLexers
 open JetBrains.ReSharper.Psi.CodeStyle
 open JetBrains.ReSharper.Psi.Parsing
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.TextControl
 open JetBrains.TextControl.DataContext
 open JetBrains.Util
@@ -1243,20 +1245,26 @@ type FSharpTypingAssist
         let mutable endOffset = startOffset
         let buffer = document.Buffer
 
-        let rec skipWithConditionBefore offset =
+        let rec skipWhitespaceBefore offset =
             if offset > 0 && isWhitespace buffer.[offset - 1] then
-                skipWithConditionBefore (offset - 1)
+                skipWhitespaceBefore (offset - 1)
             else offset
 
-        startOffset <- skipWithConditionBefore startOffset
+        startOffset <- skipWhitespaceBefore startOffset
 
-        let settingsStore = x.SettingsStore.BindToContextTransient(textControl.ToContextRange())
-        if not (settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SemicolonAtEndOfLine)) then
-            if startOffset > 0 && buffer.[startOffset - 1] = ';' then
-                if startOffset > 1 && buffer.[startOffset - 2] <> ';' then
-                    startOffset <- startOffset - 1
+        if startOffset > 0 && buffer.[startOffset - 1] = ';' then
+            let settingsStore = x.SettingsStore.BindToContextTransient(textControl.ToContextRange())
+            if not (settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SemicolonAtEndOfLine)) then
+                let fsFile = textControl.GetFSharpFile(solution)
+                let token = fsFile.FindTokenAt(DocumentOffset(document, startOffset - 1))
+                if isNull token || getTokenType token <> FSharpTokenType.SEMICOLON then () else
 
-            startOffset <- skipWithConditionBefore startOffset
+                // No offside rule in attribute lists, dotnet/fsharp#7752
+                if token.Parent :? IAttributeList then () else
+
+                startOffset <- startOffset - 1
+
+            startOffset <- skipWhitespaceBefore startOffset
 
         let lineEndOffset = document.GetLineEndOffsetNoLineBreak(line)
         if trimAfterCaret = TrimTrailingSpaces.Yes then

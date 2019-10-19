@@ -102,6 +102,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter 69 - After parens on new line``() = x.DoNamedTest()
     [<Test>] member x.``Enter 70 - After parens on new line 2``() = x.DoNamedTest()
     [<Test>] member x.``Enter 71 - After double semi``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 72 - Semicolon inside attribute list``() = x.DoNamedTest()
 
     [<Test>] member x.``Enter after arrow 01``() = x.DoNamedTest()
     
