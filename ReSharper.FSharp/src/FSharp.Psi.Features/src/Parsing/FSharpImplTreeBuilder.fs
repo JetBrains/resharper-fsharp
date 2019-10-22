@@ -466,6 +466,12 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             | SynPat.Const _ ->
                 ElementType.CONST_PAT
 
+            | SynPat.OptionalVal(id, _) ->
+                let mark = x.Mark(id.idRange)
+                x.MarkAndDone(id.idRange, ElementType.EXPRESSION_REFERENCE_NAME)
+                x.Done(mark, if isLocal then ElementType.LOCAL_REFERENCE_PAT else ElementType.TOP_REFERENCE_PAT)
+                ElementType.OPTIONAL_VAL_PAT
+
             | _ ->
                 ElementType.OTHER_PAT
 

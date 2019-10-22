@@ -71,6 +71,7 @@ type FSharpRenameTest() =
     [<Test>] member x.``Params - Or``() = x.DoNamedTest()
     [<Test>] member x.``Params - Type private function``() = x.DoNamedTest()
     [<Test>] member x.``Params - Attributes``() = x.DoNamedTest()
+    [<Test>] member x.``Params - Optional param 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Type private binding - function``() = x.DoNamedTest()
     [<Test>] member x.``Type private binding - value``() = x.DoNamedTest()
