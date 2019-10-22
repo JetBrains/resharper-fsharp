@@ -46,7 +46,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
     }
 
     @Test
-    @TestEnvironment(solution = "FSharpProjectTree", toolset = ToolsetVersion.TOOLSET_15_CORE)
+    @TestEnvironment(solution = "FSharpProjectTree", toolset = ToolsetVersion.TOOLSET_16_CORE)
     fun testFSharpProjectStructure() {
         doTestDumpProjectsView {
             dump2("Init", false, false) {
