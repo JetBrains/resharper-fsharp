@@ -91,13 +91,3 @@ type FSharpIntroduceVarHelper() =
 
     override x.CheckAvailability(node) =
         node.IsSingleLine // todo: change to something meaningful. :)
-
-
-[<Language(typeof<FSharpLanguage>)>]
-type FSharpRefactoringLanguageService() =
-    inherit InternalRefactoringLanguageService()
-
-    override x.CreateIntroduceVariableHelper() = FSharpIntroduceVarHelper() :> _
-
-    override x.CreateIntroduceVariable(workflow, solution, driver) =
-        FSharpIntroduceVariable(workflow, solution, driver) :> _
