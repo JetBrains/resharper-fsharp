@@ -28,7 +28,7 @@ class FSharpCompletionTest : CompletionTestBase() {
     fun listModule() = doTest("Lis")
 
     @Test
-    @TestEnvironment(toolset = ToolsetVersion.TOOLSET_15_CORE)
+    @TestEnvironment(toolset = ToolsetVersion.TOOLSET_16_CORE)
     fun listModuleValue() = doTest("filt")
 
     private fun waitForFcs() {
