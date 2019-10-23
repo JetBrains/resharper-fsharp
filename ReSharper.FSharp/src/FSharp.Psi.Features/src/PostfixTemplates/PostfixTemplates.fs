@@ -38,6 +38,10 @@ type FSharpPostfixTemplateContextFactory() =
 
         member x.TryCreate(treeNode, executionContext) =
             if isNull treeNode then null else
+
+            let solution = executionContext.Solution
+            if not solution.RdFSharpModel.EnableExperimentalFeatures.Value then null else
+
             FSharpPostfixTemplateContext(treeNode, executionContext) :> _
 
 
@@ -48,8 +52,12 @@ type FSharpPostfixTemplatesProvider(templatesManager, sessionExecutor, usageStat
 
     override x.TryCreatePostfixContext(fsCompletionContext) =
         let context = fsCompletionContext.BasicContext
+        let solution = context.Solution
+
+        if not solution.RdFSharpModel.EnableExperimentalFeatures.Value then null else
+
         let settings = context.ContextBoundSettingsStore
-        let executionContext = PostfixTemplateExecutionContext(context.Solution, context.TextControl, settings, "__")
+        let executionContext = PostfixTemplateExecutionContext(solution, context.TextControl, settings, "__")
 
         match fsCompletionContext.TokenBeforeCaret with
         | identifier when isNotNull identifier && (identifier.Parent :? ISynExpr) ->

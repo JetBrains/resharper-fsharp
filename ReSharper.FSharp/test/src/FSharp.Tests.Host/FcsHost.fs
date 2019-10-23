@@ -23,7 +23,7 @@ type FcsHost
         projectMapping.DumpToString()
 
     do
-        let fcsHost = solution.GetProtocolSolution().GetRdFSharpModel().FSharpCompilerServiceHost
+        let fcsHost = solution.RdFSharpModel.FSharpCompilerServiceHost
 
         // We want to get events published by background checker.
         checkerService.Checker.ImplicitlyStartBackgroundWork <- true

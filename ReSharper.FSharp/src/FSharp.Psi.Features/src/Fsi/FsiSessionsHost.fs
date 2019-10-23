@@ -51,7 +51,7 @@ type FsiSessionsHost
         RdFsiSessionInfo(fsiPath.FullPath, fsi.Runtime, fsi.IsCustom, List(args), fsiOptions.FixOptionsForDebug.Value)
 
     do
-        let rdFsiHost = solution.GetProtocolSolution().GetRdFSharpModel().FSharpInteractiveHost
+        let rdFsiHost = solution.RdFSharpModel.FSharpInteractiveHost
         rdFsiHost.RequestNewFsiSessionInfo.Set(getNewFsiSessionInfo)
 
         fsiOptions.MoveCaretOnSendLine.FlowInto(lifetime, rdFsiHost.MoveCaretOnSendLine)
