@@ -1046,6 +1046,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         // Start node at id range, end at expr range.
         let mark = x.Mark(idRange)
         x.PushRangeForMark(range, mark, ElementType.RECORD_EXPR_BINDING)
+        x.MarkAndDone(idRange, ElementType.EXPRESSION_REFERENCE_NAME)
         x.ProcessExpression(expr)
 
     member x.ProcessRecordField(field: (RecordFieldName * (SynExpr option) * BlockSeparator option)) =

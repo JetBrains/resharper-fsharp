@@ -47,8 +47,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     }
 
     public override string GetName() =>
-      myOwner.IdentifierToken?.GetText() ??
-      SharedImplUtil.MISSING_DECLARATION_NAME;
+      myOwner.IdentifierToken.GetSourceName();
 
     public override bool HasMultipleNames =>
       AttributeNavigator.GetByReferenceName(myOwner as ITypeReferenceName) != null;

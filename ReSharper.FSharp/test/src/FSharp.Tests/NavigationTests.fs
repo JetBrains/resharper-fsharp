@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Navigation
 
 open JetBrains.ReSharper.Feature.Services.Navigation.ContextNavigation
+open JetBrains.ReSharper.Features.Navigation.Features.FindDeclarations
 open JetBrains.ReSharper.Features.Navigation.Features.GoToDeclaration
 open JetBrains.ReSharper.IntentionsTests.Navigation
 open JetBrains.ReSharper.Plugins.FSharp.Tests
@@ -29,6 +30,10 @@ type FSharpGoToUsagesTest() =
 
     [<TestReferences("FSharpRecord.dll")>]
     [<Test>] member x.``Record Ctor 02 - Compiled``() = x.DoNamedTest()
+
+    [<Test>] member x.``Anon record 01 - Ctor``() = x.DoNamedTest()
+    [<Test>] member x.``Anon record 02 - Type``() = x.DoNamedTest()
+    [<Test>] member x.``Anon record 03 - Getter``() = x.DoNamedTest()
 
 
 type FSharpGoToInheritorsTest() =
@@ -86,3 +91,16 @@ type FSharpGoToDeclarationTest() =
 
     [<TestReferences("Library1.dll", "Library2.dll")>]
     [<Test>] member x.``Same type from different assemblies``() = x.DoNamedTest()
+
+
+type FSharpGoToTypeTest() =
+    inherit FSharpContextSearchTestBase("type")
+
+    override x.CreateContextAction(solution, textControl) =
+        base.CreateContextAction(solution, textControl)
+        |> Seq.filter (fun p -> p :? GotoTypeDeclarationProvider)
+
+    [<Test>] member x.``Anon record field 01``() = x.DoNamedTest()
+
+    [<Test; Explicit("Support external type parameters")>]
+    member x.``Anon record field 02 - Substitution``() = x.DoNamedTest()

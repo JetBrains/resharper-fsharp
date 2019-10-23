@@ -97,6 +97,9 @@ type FSharpItemOccurenceKindProvider() =
                    isNotNull (FieldPatNavigator.GetByReferenceName(referenceName)) then
                     [| FSharpOccurrenceKinds.pattern |] :> _ else
 
+                if isNotNull (AnonRecordFieldNavigator.GetByReferenceName(referenceName)) then
+                   [| OccurrenceKind.FieldTypeDeclaration |] :> _ else
+
                 EmptyList.Instance :> _
 
             | :? ITypeInherit ->

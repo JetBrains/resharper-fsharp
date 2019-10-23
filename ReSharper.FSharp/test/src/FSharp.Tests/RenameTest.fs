@@ -15,7 +15,7 @@ type FSharpRenameTest() =
 
     override x.ProvideOccurrencesData(occurrences, context, control) =
         // When multiple overloads are available, we want to rename initial element.
-        // Current occurences are:
+        // Current occurrences are:
         // "Rename initial element"
         // "Rename with overloads"
         occurrences.FirstOrDefault()
@@ -169,3 +169,6 @@ type FSharpRenameTest() =
     [<Test>] member x.``Union Case Field - Creation param 01``() = x.DoNamedTest()
     [<Test>] member x.``Union Case Field - Creation param 02 - Tuple``() = x.DoNamedTest()
     [<Test>] member x.``Union Case Field - Pattern param 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Anon record 01``() = x.DoNamedTest()
+    [<Test>] member x.``Anon record 02 - Invalid name``() = x.DoNamedTest()

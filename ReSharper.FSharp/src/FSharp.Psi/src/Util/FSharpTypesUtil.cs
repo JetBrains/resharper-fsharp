@@ -8,6 +8,7 @@ using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 using JetBrains.Util.Logging;
 
@@ -157,6 +158,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         ? GetTypeWithSubstitution(typeElement, genericArgs, typeParams, psiModule, isFromMethod)
         : TypeFactory.CreateUnknownType(psiModule);
     }
+
+    public static IType MapType([NotNull] this FSharpType fsType, [NotNull] ITreeNode treeNode) =>
+      // todo: get external type parameters
+      MapType(fsType, EmptyList<ITypeParameter>.Instance, treeNode.GetPsiModule());
 
     [NotNull]
     private static IType GetSingleTypeArgument([NotNull] FSharpType fsType, IList<ITypeParameter> typeParams,

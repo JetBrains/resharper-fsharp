@@ -1405,7 +1405,7 @@ anonRecordType:
   BAR_RBRACE;
 
 anonRecordField:
-  IDENTIFIER<IDENTIFIER, Identifier>
+  expressionReferenceName<REFERENCE_NAME, ReferenceName>
   COLON
   synType<TYPE, Type>;
 

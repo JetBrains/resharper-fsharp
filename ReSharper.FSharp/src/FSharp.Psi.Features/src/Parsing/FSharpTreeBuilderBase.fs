@@ -531,6 +531,7 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
             let mark = x.Mark(range)
             for IdentRange range, synType in fields do
                 let mark = x.Mark(range)
+                x.MarkAndDone(range, ElementType.EXPRESSION_REFERENCE_NAME)
                 x.ProcessType(synType)
                 x.Done(range, mark, ElementType.ANON_RECORD_FIELD)
             x.Done(range, mark, ElementType.ANON_RECORD_TYPE)
