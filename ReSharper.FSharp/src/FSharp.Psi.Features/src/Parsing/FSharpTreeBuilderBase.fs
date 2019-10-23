@@ -591,3 +591,13 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
         x.Builder.AlterToken(tokenMark, FSharpTokenType.CHAMELEON)
 
         x.Done(range, mark, ChameleonExpressionNodeType.Instance, expr)
+
+    member x.ProcessHashDirective(ParsedHashDirective(id, _, range)) =
+        let mark = x.Mark(range)
+        let elementType =
+            match id with
+            | "l" | "load" -> ElementType.LOAD_DIRECTIVE
+            | "r" | "reference" -> ElementType.REFERENCE_DIRECTIVE
+            | "I" -> ElementType.I_DIRECTIVE
+            | _ -> ElementType.OTHER_DIRECTIVE
+        x.Done(range, mark, elementType)

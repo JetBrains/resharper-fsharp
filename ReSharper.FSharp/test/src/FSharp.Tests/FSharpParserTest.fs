@@ -201,3 +201,28 @@ type FSharpParserTest() =
     [<Test>] member x.``Pattern - Record 02 - Qualified name``() = x.DoNamedTest()
 
     [<Test>] member x.``Record field 01 - Attribute``() = x.DoNamedTest()
+
+
+[<FSharpSignatureTest>]
+type FSharpSignatureParserTest() =
+    inherit ParserTestBase<FSharpLanguage>()
+
+    override x.RelativeTestDataPath = "parsing/signatures"
+
+    [<Test>] member x.``Val - Value 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Val - Function 01``() = x.DoNamedTest()
+    [<Test>] member x.``Val - Function 02 - Named param``() = x.DoNamedTest()
+    [<Test>] member x.``Val - Function 03 - Multiple named params``() = x.DoNamedTest()
+    [<Test>] member x.``Val - Function 04 - Named tuple param``() = x.DoNamedTest()
+
+    [<Test>] member x.``Val - Active pattern 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type member - Inherit 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Inherit 02 - Qualifiers``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Inherit 03 - Generic``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type member - Interface 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Constructor 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Hash directive 01``() = x.DoNamedTest()
