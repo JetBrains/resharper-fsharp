@@ -185,4 +185,14 @@
     <QuickFix>RemoveRedundantNewFix</QuickFix>
   </Warning>
 
+  <Error staticGroup="FSharpErrors" name="ExpectedExpressionAfterLet">
+    <Parameter type="ILetOrUseExpr" name="letExpr"/>
+    <Range>letExpr.LetOrUseToken.GetNavigationRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <Message value="'{0}' is missing expression">
+      <Argument>getLetTokenText letExpr.LetOrUseToken</Argument>
+    </Message>
+    <QuickFix>ReplaceLetWithExpressionFix</QuickFix>
+  </Error>
+
 </Errors>

@@ -226,3 +226,15 @@ type FSharpSignatureParserTest() =
     [<Test>] member x.``Type member - Constructor 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Hash directive 01``() = x.DoNamedTest()
+
+
+[<FSharpTest>]
+type FSharpErrorsParserTest() =
+    inherit ParserTestBase<FSharpLanguage>()
+
+    override x.RelativeTestDataPath = "parsing/errors"
+
+    [<Test>] member x.``Expr - Unfinished let 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Unfinished let 02 - In``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Unfinished let 03 - Inline in``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Unfinished let 04 - In, before other``() = x.DoNamedTest()

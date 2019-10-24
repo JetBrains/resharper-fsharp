@@ -69,6 +69,7 @@
     <Compile Include="src\Daemon\QuickFixes\RemoveSubsequentFix.fs" />
     <Compile Include="src\Daemon\QuickFixes\RemoveRedundantNewFix.fs" />
     <Compile Include="src\Daemon\QuickFixes\RemoveUnusedLocalBindingFix.fs" />
+    <Compile Include="src\Daemon\QuickFixes\ReplaceLetWithExpressionFix.fs" />
     <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
       <Mode>QUICKFIX</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>

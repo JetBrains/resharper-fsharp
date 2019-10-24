@@ -1,0 +1,9 @@
+﻿module Module
+
+do
+    |use|(0) x = 1 + 1
+
+------------------------------------------------
+0: 'use' is missing expression
+QUICKFIXES:
+Replace 'use' with expression
