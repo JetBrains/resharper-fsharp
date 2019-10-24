@@ -48,4 +48,12 @@ module ProtocolSolutionExtensions =
     open JetBrains.Rider.Model
 
     type ISolution with
-        member x.RdFSharpModel = x.GetProtocolSolution().GetRdFSharpModel()
+        member x.RdFSharpModel =
+            try x.GetProtocolSolution().GetRdFSharpModel()
+            with _ -> null
+
+    type RdFSharpModel with
+        member x.EnableExperimentalFeaturesSafe =
+            match x with
+            | null -> false
+            | fsModel -> fsModel.EnableExperimentalFeatures.Value
