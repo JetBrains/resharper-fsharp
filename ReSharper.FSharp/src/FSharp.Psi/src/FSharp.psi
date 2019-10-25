@@ -61,12 +61,6 @@ fSharpSigFile options { stubBase="FSharpFileBase"; }:
   topLevelModuleLikeDeclaration<MODULE_OR_NAMESPACE_DECLARATION, ModuleDeclarations>*;
 
 
-interface fSharpDeclaration:
-  moduleLikeDeclaration |
-  moduleMemberDeclaration |
-  fSharpTypeDeclaration;
-
-
 // Modules and namespaces
 
 interface moduleLikeDeclaration:
@@ -131,22 +125,13 @@ anonModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; }:
 // Module members
 
 interface moduleMember:
-  moduleMemberDeclaration |
-  moduleMemberStatement |
-  memberDeclaration |
-  hashDirective |
-  otherModuleMember;
-
-interface moduleMemberDeclaration:
   nestedModuleDeclaration |
   fSharpTypeDeclaration |
   letModuleDecl |
   moduleAbbreviation |
-  otherMemberDeclaration;
-
-interface moduleMemberStatement:
   openStatement |
-  do;
+  do |
+  hashDirective;
 
 letModuleDecl options { stubBase="DummyDeclaration"; } extras {
   get { methodName="Attributes" path=<letModuleDecl:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
@@ -184,9 +169,10 @@ topBinding extras {
   get { methodName="Attributes" path=<topBinding:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
-  MUTABLE<MUTABLE, MutableKeyword>
+  INLINE<INLINE, InlineKeyword>?
+  MUTABLE<MUTABLE, MutableKeyword>?
   synPat<HEAD_PATTERN, HeadPattern>
-  returnTypeInfo<RETURN_INFO, ReturnTypeInfo>
+  returnTypeInfo<RETURN_INFO, ReturnTypeInfo>?
   EQUALS
   chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>;
 
@@ -194,9 +180,10 @@ localBinding extras {
   get { methodName="Attributes" path=<localBinding:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
-  MUTABLE<MUTABLE, MutableKeyword>
+  INLINE<INLINE, InlineKeyword>?
+  MUTABLE<MUTABLE, MutableKeyword>?
   synPat<HEAD_PATTERN, HeadPattern>
-  returnTypeInfo<RETURN_INFO, ReturnTypeInfo>
+  returnTypeInfo<RETURN_INFO, ReturnTypeInfo>?
   EQUALS
   synExpr<EXPR, Expression>;
 
@@ -775,8 +762,11 @@ nestedModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; }
   get { methodName="Attributes" path=<nestedModuleDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
+  MODULE<MODULE, ModuleOrNamespaceKeyword>
+  REC<REC, RecKeyword>?
   accessModifier{ACCESS_MODIFIER, AccessModifiers}*
   fSharpIdentifier<IDENTIFIER, Identifier>
+  EQUALS
   moduleMember<MODULE_MEMBER, Members>*;
 
 typeExtensionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
@@ -833,6 +823,7 @@ recordFieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase
   get { methodName="Attributes" path=<recordFieldDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
+  MUTABLE<MUTABLE, MutableKeyword>?
   IDENTIFIER<IDENTIFIER, Identifier>
   COLON
   synType<TYPE, Type>;
@@ -924,6 +915,7 @@ moduleAbbreviation options { stubBase="FSharpTypeElementDeclarationBase"; } extr
   get { methodName="Attributes" path=<moduleAbbreviation:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
+  MODULE<MODULE, ModuleOrNamespaceKeyword>
   accessModifier{ACCESS_MODIFIER, AccessModifiers}*
   IDENTIFIER<IDENTIFIER, Identifier>
   EQUALS
@@ -949,10 +941,6 @@ localActivePatternCaseDeclaration options { stubBase="LocalDeclarationBase"; }:
 activePatternWildCase:
   wildPat;
 
-
-otherMemberDeclaration options { stubBase="DummyDeclaration"; }:
-  accessModifier{ACCESS_MODIFIER, AccessModifiers}*
-  IDENTIFIER<IDENTIFIER, Identifier>;
 
 otherSimpleTypeDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<otherSimpleTypeDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
@@ -1218,8 +1206,6 @@ do options { stubBase="DummyDeclaration"; } extras {
 }:
   DO<DO, DoKeyword>?
   chameleonExpression<CHAMELEON_EXPR, DoExpression>;
-
-otherModuleMember: fakeSeparator;
 
 
 
