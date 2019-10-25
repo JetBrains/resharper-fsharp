@@ -202,9 +202,6 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
                 | _ ->
                     x.MarkAttributesOrIdOrRange(attrs, Some id, range)
 
-            if moduleKind = NamedModule then
-                x.ProcessModifiersBeforeOffset(x.GetStartOffset(idRange))
-
             if moduleKind <> AnonModule then
                 x.ProcessReferenceNameSkipLast(lid)
 
@@ -241,22 +238,10 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
             let startOffset = if id.IsSome then Math.Min(x.GetStartOffset id.Value.idRange, rangeStart) else rangeStart
             x.Mark(startOffset)
 
-    member x.StartNestedModule (attrs: SynAttributes) (lid: LongIdent) (range: range) =
-        let mark = x.MarkAttributesOrIdOrRange(attrs, List.tryHead lid, range)
-        if not lid.IsEmpty then
-            x.ProcessModifiersBeforeOffset(x.GetStartOffset(lid.Head))
-        mark
-
     member x.StartException(SynExceptionDefnRepr(_, UnionCase(_, id, unionCaseType, _, _, _), _, _, _, range)) =
         let mark = x.Mark(range)
-        x.ProcessModifiersBeforeOffset(x.GetStartOffset id)
         x.ProcessUnionCaseType(unionCaseType, ElementType.EXCEPTION_FIELD_DECLARATION) |> ignore
         mark
-
-    member x.ProcessModifiersBeforeOffset(endOffset: int) =
-        let mark = x.Mark()
-        x.AdvanceToOffset(endOffset)
-        x.Done(mark, ElementType.ACCESS_MODIFIERS)
 
     member x.StartType attrs typeParams (lid: LongIdent) range =
         let mark = x.MarkAttributesOrIdOrRange(attrs, List.tryHead lid, range)
@@ -268,8 +253,6 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
                 match typeParams with
                 | TyparDecl(_, (Typar(id, _, _))) :: _ -> x.GetStartOffset id
                 | [] -> idOffset
-
-            x.ProcessModifiersBeforeOffset (min idOffset typeParamsOffset)
 
             let paramsInBraces = idOffset < typeParamsOffset
             x.ProcessTypeParametersOfType typeParams range paramsInBraces

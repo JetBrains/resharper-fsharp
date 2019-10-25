@@ -24,7 +24,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
     member x.ProcessModuleMemberSignature(moduleMember) =
         match moduleMember with
         | SynModuleSigDecl.NestedModule(ComponentInfo(attrs, _, _, lid, _, _, _, _), _, sigs, range) ->
-            let mark = x.StartNestedModule attrs lid range
+            let mark = x.MarkAttributesOrIdOrRange(attrs, List.tryHead lid, range)
             for s in sigs do x.ProcessModuleMemberSignature s
             x.Done(range, mark, ElementType.NESTED_MODULE_DECLARATION)
 

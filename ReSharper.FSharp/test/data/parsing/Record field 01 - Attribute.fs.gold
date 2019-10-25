@@ -4,7 +4,6 @@ IFSharpImplFile
     FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
     Whitespace(type:WHITE_SPACE, text: ) spaces:" "
     IRecordDeclaration
-      IAccessModifiers
       FSharpIdentifierToken(type:IDENTIFIER, text:R)
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "
       FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)

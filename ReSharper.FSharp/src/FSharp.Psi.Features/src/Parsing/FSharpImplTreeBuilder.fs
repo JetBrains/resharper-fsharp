@@ -47,7 +47,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
     member x.ProcessModuleMemberDeclaration(moduleMember) =
         match moduleMember with
         | SynModuleDecl.NestedModule(ComponentInfo(attrs, _, _, lid, _, _, _, _), _ ,decls, _, range) ->
-            let mark = x.StartNestedModule attrs lid range
+            let mark = x.MarkAttributesOrIdOrRange(attrs, List.tryHead lid, range)
             for decl in decls do
                 x.ProcessModuleMemberDeclaration(decl)
             x.Done(range, mark, ElementType.NESTED_MODULE_DECLARATION)

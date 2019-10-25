@@ -22,15 +22,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         : MemberDecoration.DefaultValue;
     }
 
-    public static MemberDecoration GetDecoration(IAccessModifiers accessModifiers,
+    public static MemberDecoration GetDecoration(TreeNodeCollection<ITokenNode> accessModifiers,
       TreeNodeCollection<IAttribute> attributes)
     {
       var decoration = MemberDecoration.DefaultValue;
       var modifiers = new HashSet<TokenNodeType>();
 
-      if (accessModifiers != null)
-        foreach (var modifier in accessModifiers.Modifiers)
-          modifiers.Add(modifier.GetTokenType());
+      foreach (var modifier in accessModifiers)
+        modifiers.Add(modifier.GetTokenType());
 
       if (modifiers.Contains(FSharpTokenType.PUBLIC)) decoration.Modifiers |= Modifiers.PUBLIC;
       if (modifiers.Contains(FSharpTokenType.INTERNAL)) decoration.Modifiers |= Modifiers.INTERNAL;

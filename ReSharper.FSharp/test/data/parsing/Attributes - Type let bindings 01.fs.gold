@@ -4,7 +4,6 @@ IFSharpImplFile
     FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
     Whitespace(type:WHITE_SPACE, text: ) spaces:" "
     IObjectTypeDeclaration
-      IAccessModifiers
       FSharpIdentifierToken(type:IDENTIFIER, text:T)
       IImplicitConstructorDeclaration
         IMemberParamDeclarationGroup
