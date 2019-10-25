@@ -499,8 +499,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         LowLevelModificationUtil.ReplaceChildRange(token, token, new FSharpIdentifierToken(name));
     }
 
-    public static void AddModifierToken([NotNull] this ITreeNode anchor, [NotNull] TokenNodeType tokenType)
+    public static void AddModifierTokenAfter([NotNull] this ITreeNode anchor, [NotNull] TokenNodeType tokenType)
     {
+      using var _ = WriteLockCookie.Create(anchor.NotNull().IsPhysical());
       anchor =
         anchor.NextSibling is Whitespace space
           ? ModificationUtil.ReplaceChild(space, new Whitespace())
@@ -512,7 +513,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       if (addSpaceAfter)
         ModificationUtil.AddChildAfter(anchor, new Whitespace());
     }
-    
+
     public static IList<ITypeElement> ToTypeElements(this IList<IClrTypeName> names, IPsiModule psiModule)
     {
       var result = new List<ITypeElement>(names.Count);

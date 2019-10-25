@@ -4,8 +4,8 @@ open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Feature.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
-[<ContextAction(Name = "ToRecursive", Group = "F#", Description = "To recursive")>]
-type ToRecursiveLetBindings(dataProvider: FSharpContextActionDataProvider) =
+[<ContextAction(Name = "ToRecursiveLetBindings", Group = "F#", Description = "To recursive")>]
+type ToRecursiveLetBindingsAction(dataProvider: FSharpContextActionDataProvider) =
     inherit ContextActionBase()
 
     override x.Text = "To recursive"
@@ -22,11 +22,11 @@ type ToRecursiveLetBindings(dataProvider: FSharpContextActionDataProvider) =
         let bindings = letBindings.Bindings
         if bindings.Count <> 1 then false else
 
-        match bindings.[0].HeadPattern.As<IParametersOwnerPat>() with
+        match bindings.[0].HeadPattern.As<INamedPat>() with
         | null -> false
-        | longIdentPat ->
+        | namedPat ->
 
-        match longIdentPat.Identifier.As<IFSharpIdentifierLikeNode>() with
+        match namedPat.Identifier with
         | null -> false
         | identifier ->
 

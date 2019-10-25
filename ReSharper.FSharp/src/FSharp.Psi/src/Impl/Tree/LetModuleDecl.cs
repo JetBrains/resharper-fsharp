@@ -15,8 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (!value)
         throw new System.NotImplementedException();
 
-      using (var _ = WriteLockCookie.Create(IsPhysical()))
-        LetOrUseToken.NotNull().AddModifierToken(FSharpTokenType.REC);
+      LetOrUseToken.NotNull().AddModifierTokenAfter(FSharpTokenType.REC);
     }
 
     public void SetIsInline(bool value)
@@ -24,14 +23,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (value)
         throw new System.NotImplementedException();
 
-      using (var _ = WriteLockCookie.Create(IsPhysical()))
-      {
-        var inlineKeyword = InlineKeyword;
-        if (inlineKeyword.PrevSibling is Whitespace whitespace)
-          ModificationUtil.DeleteChildRange(whitespace, inlineKeyword);
-        else
-          ModificationUtil.DeleteChild(inlineKeyword);
-      }
+      using var _ = WriteLockCookie.Create(IsPhysical());
+      var inlineKeyword = InlineKeyword;
+      if (inlineKeyword.PrevSibling is Whitespace whitespace)
+        ModificationUtil.DeleteChildRange(whitespace, inlineKeyword);
+      else
+        ModificationUtil.DeleteChild(inlineKeyword);
     }
   }
 }

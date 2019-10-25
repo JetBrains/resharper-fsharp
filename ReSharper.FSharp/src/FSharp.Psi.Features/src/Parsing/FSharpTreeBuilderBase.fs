@@ -217,7 +217,8 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
 
         match moduleKind with
         | GlobalNamespace ->
-            let mark = x.Mark(range)
+            x.AdvanceToTokenOrRangeStart(FSharpTokenType.NAMESPACE, range)
+            let mark = x.Mark()
             Some mark, ElementType.GLOBAL_NAMESPACE_DECLARATION
         | _ -> None, null
 

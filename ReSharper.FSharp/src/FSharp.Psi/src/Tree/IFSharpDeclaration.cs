@@ -17,7 +17,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     CompiledName
   }
 
-  public partial interface IFSharpDeclaration : INameIdentifierOwner, IDeclaration
+  public interface IFSharpDeclaration : INameIdentifierOwner, IDeclaration
   {
     /// May take long time due to waiting for FCS. Symbol is cached in declaration.
     [CanBeNull]

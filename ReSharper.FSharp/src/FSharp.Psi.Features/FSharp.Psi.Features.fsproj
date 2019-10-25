@@ -12,8 +12,9 @@
     <Compile Include="src\Util\PsiUtil.fs" />
     <Compile Include="src\Util\OpensUtil.fs" />
     <Compile Include="src\Intentions\DataProviders.fs" />
-    <Compile Include="src\Intentions\ToRecursiveLetBindings.fs" />
+    <Compile Include="src\Intentions\ToRecursiveLetBindingsAction.fs" />
     <Compile Include="src\Intentions\ToMultilineRecord.fs" />
+    <Compile Include="src\Intentions\ToRecursiveModuleAction.fs" />
     <Compile Include="src\CodeCompletion\CompletionUtil.fs" />
     <Compile Include="src\CodeCompletion\FSharpCodeCompletionContext.fs" />
     <Compile Include="src\CodeCompletion\FSharpPathCompletionProvider.fs" />

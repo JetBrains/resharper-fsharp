@@ -1,4 +1,6 @@
 ﻿using JetBrains.Annotations;
+using JetBrains.Diagnostics;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 
@@ -33,6 +35,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       return null;
     }
 
-    public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
+    public override IFSharpIdentifierLikeNode NameIdentifier => Identifier;
+
+    public bool IsRecursive => RecKeyword != null;
+
+    public void SetIsRecursive(bool value)
+    {
+      if (!value)
+        throw new System.NotImplementedException();
+
+      ModuleOrNamespaceKeyword.NotNull().AddModifierTokenAfter(FSharpTokenType.REC);
+    }
   }
 }
