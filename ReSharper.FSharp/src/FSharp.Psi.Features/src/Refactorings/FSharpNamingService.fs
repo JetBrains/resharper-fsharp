@@ -209,7 +209,8 @@ type FSharpNamingService(language: FSharpLanguage) =
         let pat, path = makeTuplePatPath declaredElementPat
 
         let entryOptions =
-            EntryOptions(subrootPolicy = SubrootPolicy.Decompose, emphasis = Emphasis.Good)
+            EntryOptions(subrootPolicy = SubrootPolicy.Decompose, emphasis = Emphasis.Good,
+                         prefixPolicy = PredefinedPrefixPolicy.Remove)
 
         let addNamesForExpr expr =
             match tryTraverseExprPath path expr with
