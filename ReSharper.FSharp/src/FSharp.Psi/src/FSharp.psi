@@ -74,9 +74,14 @@ interface topLevelModuleLikeDeclaration:
   anonModuleDeclaration |
   globalNamespaceDeclaration;
 
-interface namedModuleLikeDeclaration:
+interface qualifiableModuleLikeDeclaration:
   namedModuleDeclaration |
   namedNamespaceDeclaration;
+
+
+interface namedModuleLikeDeclaration:
+  qualifiableModuleLikeDeclaration |
+  nestedModuleDeclaration;
 
 interface moduleDeclaration:
   namedModuleDeclaration |
@@ -763,7 +768,7 @@ nestedModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; }
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifiers<ACCESS_MODIFIERS, AccessModifiers>
-  IDENTIFIER<IDENTIFIER, Identifier>
+  fSharpIdentifier<IDENTIFIER, Identifier>
   moduleMember<MODULE_MEMBER, Members>*;
 
 typeExtensionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
