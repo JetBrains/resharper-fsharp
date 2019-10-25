@@ -290,7 +290,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
           return memberDeclaration.Attributes;
         case ISynPat pat:
           return pat.Attributes;
-        case IModuleDeclaration moduleDeclaration:
+        case IDeclaredModuleDeclaration moduleDeclaration:
           return moduleDeclaration.Attributes;
         default: return TreeNodeCollection<IAttribute>.Empty;
       }

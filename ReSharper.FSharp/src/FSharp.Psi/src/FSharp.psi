@@ -50,46 +50,52 @@ interface fSharpFile options { customParseFunction; noInternalParseFunction; }:
   fSharpImplFile |
   fSharpSigFile;
 
-fSharpImplFile options { stubBase="FSharpFileBase"; }:
-  topLevelModuleLikeDeclaration<MODULE_OR_NAMESPACE_DECLARATION, Declarations>*;
+fSharpImplFile options { customParseFunction; noInternalParseFunction; stubBase="FSharpFileBase"; }:
+  (
+    topLevelModuleLikeDeclaration<MODULE_OR_NAMESPACE_DECLARATION, ModuleDeclarations>*
+  |
+    anonModuleDeclaration<MODULE_OR_NAMESPACE_DECLARATION, ModuleDeclarations>
+  );
 
 fSharpSigFile options { stubBase="FSharpFileBase"; }:
-  topLevelModuleLikeDeclaration<MODULE_OR_NAMESPACE_DECLARATION, Declarations>*;
+  topLevelModuleLikeDeclaration<MODULE_OR_NAMESPACE_DECLARATION, ModuleDeclarations>*;
 
-
-
-// Modules and namespaces
 
 interface fSharpDeclaration:
   moduleLikeDeclaration |
   moduleMemberDeclaration |
   fSharpTypeDeclaration;
 
+
+// Modules and namespaces
+
 interface moduleLikeDeclaration:
+  anonModuleDeclaration
+  declaredModuleLikeDeclaration;
+
+interface declaredModuleLikeDeclaration:
   topLevelModuleLikeDeclaration |
   nestedModuleDeclaration;
 
 interface topLevelModuleLikeDeclaration:
-  namedModuleLikeDeclaration |
-  anonModuleDeclaration |
+  qualifiableModuleLikeDeclaration |
   globalNamespaceDeclaration;
 
 interface qualifiableModuleLikeDeclaration:
   namedModuleDeclaration |
   namedNamespaceDeclaration;
 
-
-interface namedModuleLikeDeclaration:
-  qualifiableModuleLikeDeclaration |
-  nestedModuleDeclaration;
-
 interface moduleDeclaration:
+  anonModuleDeclaration |
+  declaredModuleDeclaration;
+
+interface declaredModuleDeclaration:
   namedModuleDeclaration |
   nestedModuleDeclaration;
 
-
 namedNamespaceDeclaration options { stubBase="FSharpDeclarationBase"; }:
-  NAMESPACE<NAMESPACE, NamespaceToken>
+  NAMESPACE<NAMESPACE, ModuleOrNamespaceKeyword>
+  REC<REC, RecKeyword>?
   (
     referenceName<REFERENCE_NAME, QualifierReferenceName>
     DOT
@@ -98,7 +104,8 @@ namedNamespaceDeclaration options { stubBase="FSharpDeclarationBase"; }:
   moduleMember<MODULE_MEMBER, Members>*;
 
 globalNamespaceDeclaration options { stubBase="FSharpDeclarationBase"; }:
-  NAMESPACE<NAMESPACE, NamespaceToken>
+  NAMESPACE<NAMESPACE, ModuleOrNamespaceKeyword>
+  REC<REC, RecKeyword>?
   GLOBAL
   moduleMember<MODULE_MEMBER, Members>*;
 
@@ -106,7 +113,8 @@ namedModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } 
   get { methodName="Attributes" path=<namedModuleDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
-  MODULE<MODULE, ModuleToken>
+  MODULE<MODULE, ModuleOrNamespaceKeyword>
+  REC<REC, RecKeyword>?
   accessModifier{ACCESS_MODIFIER, AccessModifiers}*
   (
     referenceName<REFERENCE_NAME, QualifierReferenceName>

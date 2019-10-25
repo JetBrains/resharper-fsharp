@@ -31,7 +31,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
     let getModuleDeclaration source =
         let fsFile = createFile source
-        fsFile.Declarations.First()
+        fsFile.ModuleDeclarations.First()
 
     let createAppExpr addSpace =
         let space = if addSpace then " " else ""

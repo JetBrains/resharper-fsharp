@@ -31,7 +31,7 @@ type ScriptLoadPathsStageProcess(fsFile, daemonProcess) =
         let visitor =
             { new TreeNodeVisitor() with
                 override x.VisitFSharpFile(fsFile) =
-                    for decl in fsFile.Declarations do
+                    for decl in fsFile.ModuleDeclarations do
                         decl.Accept(x)
 
                 override __.VisitNamedModuleDeclaration(decl) =

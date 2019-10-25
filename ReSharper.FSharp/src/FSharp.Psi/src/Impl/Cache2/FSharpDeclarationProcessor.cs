@@ -41,7 +41,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
       Builder.CreateProjectFilePart(new FSharpProjectFilePart(sourceFile, fileKind, hasPairFile));
 
-      foreach (var declaration in fsFile.DeclarationsEnumerable)
+      foreach (var declaration in fsFile.ModuleDeclarations)
         declaration.Accept(this);
 
       // todo: process only needed nodes
