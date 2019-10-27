@@ -6,6 +6,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Psi.CodeStyle
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Naming
@@ -97,10 +98,9 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
         member x.CreateAppExpr(funcName, expr) =
             let source = sprintf "%s ()" funcName
-            let doDecl = getDoDecl source
-            let appExpr = doDecl.Expression.As<IAppExpr>()
-            ModificationUtil.ReplaceChild(appExpr.ArgumentExpression, expr) |> ignore
-            appExpr
+            let newExpr = getExpression source :?> IAppExpr
+            ModificationUtil.ReplaceChild(newExpr.ArgumentExpression, expr) |> ignore
+            newExpr
 
         member x.CreateAppExpr(addSpace) =
             createAppExpr addSpace
@@ -152,3 +152,15 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let source = sprintf "do %s" name
             let newExpr = getExpression source
             newExpr.As<IDoExpr>().Expression.As<IReferenceExpr>() :> _
+
+        member x.CreateForEachExpr(expr) =
+            let sourceFile = expr.GetSourceFile()
+            let indent = expr.Indent + sourceFile.GetFormatterSettings(expr.Language).INDENT_SIZE
+
+            let forExpr = getExpression "for _ in () do ()" :?> IForEachExpr
+            
+            let expr = ModificationUtil.ReplaceChild(forExpr.InExpression, expr.Copy())
+            let whitespace = ModificationUtil.ReplaceChild(forExpr.DoExpression.PrevSibling, Whitespace(indent))
+            ModificationUtil.AddChildBefore(whitespace, NewLine(expr.FSharpFile.GetLineEnding())) |> ignore
+
+            forExpr

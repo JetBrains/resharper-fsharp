@@ -113,6 +113,7 @@
     <Compile Include="src\PostfixTemplates\NotTemplate.fs" />
     <Compile Include="src\PostfixTemplates\IntroduceBindingTemplate.fs" />
     <Compile Include="src\PostfixTemplates\MatchTemplate.fs" />
+    <Compile Include="src\PostfixTemplates\ForPostfixTemplate.fs" />
     <Compile Include="src\LanguageService\FSharpDeclaredElementIconProvider.fs" />
     <Compile Include="src\LanguageService\FSharpPsiProperties.fs" />
     <Compile Include="src\LanguageService\FSharpProjectFileLanguageService.fs" />

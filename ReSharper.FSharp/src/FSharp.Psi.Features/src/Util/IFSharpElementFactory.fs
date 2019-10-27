@@ -23,7 +23,9 @@ type IFSharpElementFactory =
     abstract CreateLetBindingExpr: bindingName: string * expr: ISynExpr -> ILetOrUseExpr
     abstract CreateIgnoreApp: ISynExpr * newLine: bool -> IAppExpr
     abstract CreateRecordExprBinding: fieldName: string * addSemicolon: bool -> IRecordExprBinding
+
     abstract CreateMatchExpr: ISynExpr -> IMatchExpr
+    abstract CreateForEachExpr: ISynExpr -> IForEachExpr
 
     abstract AsReferenceExpr: typeReference: ITypeReferenceName -> IReferenceExpr
 
