@@ -33,11 +33,18 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         let fsFile = createFile source
         fsFile.ModuleDeclarations.First()
 
+    let getDoDecl source =
+        let moduleDeclaration = getModuleDeclaration source
+        moduleDeclaration.Members.First().As<IDo>().NotNull()
+    
+    let getExpression source =
+        let doDecl = getDoDecl source
+        doDecl.Expression.NotNull()
+    
     let createAppExpr addSpace =
         let space = if addSpace then " " else ""
         let source = sprintf "()%s()" space
-        let moduleDeclaration = getModuleDeclaration source
-        moduleDeclaration.Members.First().As<IDo>().NotNull().Expression.As<IAppExpr>().NotNull()
+        getExpression source :?> IAppExpr
 
     interface IFSharpElementFactory with
         member x.CreateOpenStatement(ns) =
@@ -59,10 +66,9 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let source = "() |> ignore"
 
             let indent = expr.Indent
-            let moduleDeclaration = getModuleDeclaration source
+            let newExpr = getExpression source
 
-            let doDecl = moduleDeclaration.Members.First().As<IDo>().NotNull()
-            match doDecl.Expression.As<IAppExpr>() with
+            match newExpr.As<IAppExpr>() with
             | null -> failwith "Could not get outer appExpr"
             | outerAppExpr ->
 
@@ -83,17 +89,15 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let semicolon = if addSemicolon then ";" else ""
 
             let source = sprintf """{ %s = failwith "todo"%s }""" field semicolon
-            let moduleDeclaration = getModuleDeclaration source
+            let newExpr = getExpression source
 
-            let doDecl = moduleDeclaration.Members.First().As<IDo>()
-            match doDecl.Expression.As<IRecordExpr>() with
+            match newExpr.As<IRecordExpr>() with
             | null -> failwith "Could not get record expr"
             | recordExpr -> recordExpr.ExprBindings.First()
 
         member x.CreateAppExpr(funcName, expr) =
             let source = sprintf "%s ()" funcName
-            let moduleDeclaration = getModuleDeclaration source
-            let doDecl = moduleDeclaration.Members.First().As<IDo>().NotNull()
+            let doDecl = getDoDecl source
             let appExpr = doDecl.Expression.As<IAppExpr>()
             ModificationUtil.ReplaceChild(appExpr.ArgumentExpression, expr) |> ignore
             appExpr
@@ -109,26 +113,21 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
         member x.CreateLetBindingExpr(bindingName, expr) =
             let source = sprintf "do (let %s = ())" bindingName
-            let moduleDeclaration = getModuleDeclaration source
-            let doDecl = moduleDeclaration.Members.First().As<IDo>().NotNull()
-            let letOrUseExpr = doDecl.Expression.As<IDoExpr>().Expression.As<IParenExpr>().InnerExpression.As<ILetOrUseExpr>()
+            let newExpr = getExpression source
+            let letOrUseExpr = newExpr.As<IDoExpr>().Expression.As<IParenExpr>().InnerExpression.As<ILetOrUseExpr>()
             ModificationUtil.ReplaceChild(letOrUseExpr.Bindings.[0].Expression, expr) |> ignore
             letOrUseExpr
 
         member x.CreateConstExpr(text) =
-            let source = sprintf "%s" text
-            let moduleDeclaration = getModuleDeclaration source
-            let doDecl = moduleDeclaration.Members.First().As<IDo>().NotNull()
-            doDecl.Expression.As<IConstExpr>()
+            getExpression text :?> _
 
         member x.CreateMatchExpr(expr) =
             let source = "match () with | _ -> ()"
 
             let indent = expr.Indent
-            let moduleDeclaration = getModuleDeclaration source
+            let newExpr = getExpression source
 
-            let doDecl = moduleDeclaration.Members.First().As<IDo>().NotNull()
-            match doDecl.Expression.As<IMatchExpr>() with
+            match newExpr.As<IMatchExpr>() with
             | null -> failwith "Could not get outer appExpr"
             | matchExpr ->
 
@@ -144,17 +143,12 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             matchExpr
 
         member x.CreateParenExpr() =
-            let moduleDeclaration = getModuleDeclaration "(())"
-            let doDecl = moduleDeclaration.Members.First().As<IDo>().NotNull()
-            doDecl.Expression.As<IParenExpr>()
+            getExpression "(())" :?> _
 
         member x.AsReferenceExpr(typeReference: ITypeReferenceName) =
-            let moduleDeclaration = getModuleDeclaration (typeReference.GetText())
-            let doDecl = moduleDeclaration.Members.First().As<IDo>().NotNull()
-            doDecl.Expression.As<IReferenceExpr>()
+            getExpression (typeReference.GetText()) :?> _
 
         member x.CreateReferenceExpr(name) =
             let source = sprintf "do %s" name
-            let moduleDeclaration = getModuleDeclaration source
-            let doDecl = moduleDeclaration.Members.First().As<IDo>().NotNull()
-            doDecl.Expression.As<IDoExpr>().Expression.As<IReferenceExpr>() :> _
+            let newExpr = getExpression source
+            newExpr.As<IDoExpr>().Expression.As<IReferenceExpr>() :> _
