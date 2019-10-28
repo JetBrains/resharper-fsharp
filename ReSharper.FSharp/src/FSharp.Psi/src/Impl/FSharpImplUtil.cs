@@ -614,6 +614,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return synPat;
     }
 
+    public static ISynPat IgnoreInnerParens([CanBeNull] this ISynPat synPat)
+    {
+      if (synPat == null)
+        return null;
+
+      while (synPat is IParenPat parenPat && parenPat.Pattern != null)
+        synPat = parenPat.Pattern;
+      return synPat;
+    }
+    
     [NotNull]
     public static IFSharpReferenceOwner SetName([NotNull] this IFSharpReferenceOwner referenceOwner, 
       [NotNull] string name)

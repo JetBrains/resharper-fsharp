@@ -54,6 +54,7 @@
     <Compile Include="src\Daemon\Analyzers\ExtensionAttributeAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\RedundantBackticksAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\RedundantNew.fs" />
+    <Compile Include="src\Daemon\Analyzers\LetDisposableAnalyzer.fs" />
     <Compile Include="src\Daemon\QuickFixes\RemoveUnusedOpensFix.fs" />
     <Compile Include="src\Daemon\QuickFixes\ReplaceUseWithLetFix.fs" />
     <Compile Include="src\Daemon\QuickFixes\RemoveUnusedSelfIdVariableFix.fs" />
@@ -71,6 +72,7 @@
     <Compile Include="src\Daemon\QuickFixes\RemoveRedundantNewFix.fs" />
     <Compile Include="src\Daemon\QuickFixes\RemoveUnusedLocalBindingFix.fs" />
     <Compile Include="src\Daemon\QuickFixes\ReplaceLetWithExpressionFix.fs" />
+    <Compile Include="src\Daemon\QuickFixes\ConvertToUseFix.fs" />
     <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
       <Mode>QUICKFIX</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>

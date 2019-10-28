@@ -185,6 +185,14 @@
     <QuickFix>RemoveRedundantNewFix</QuickFix>
   </Warning>
 
+  <Warning staticGroup="FSharpErrors" name="ConvertToUseBinding">
+    <Parameter type="ILetLikeExpr" name="letExpr"/>
+    <Range>letExpr.LetOrUseToken.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <Message value="Convert to 'use' binding"/>
+    <QuickFix>ConvertToUseFix</QuickFix>
+  </Warning>
+  
   <Error staticGroup="FSharpErrors" name="ExpectedExpressionAfterLet">
     <Parameter type="ILetOrUseExpr" name="letExpr"/>
     <Range>letExpr.LetOrUseToken.GetHighlightingRange()</Range>

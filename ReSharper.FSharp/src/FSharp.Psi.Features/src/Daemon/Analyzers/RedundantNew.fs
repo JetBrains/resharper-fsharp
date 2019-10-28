@@ -19,7 +19,7 @@ type RedundantNewAnalyzer() =
         | null -> ()
         | typeElement ->
 
-        let predefinedType = newExpr.GetPsiModule().GetPredefinedType()
+        let predefinedType = newExpr.GetPredefinedType()
         if typeElement.IsDescendantOf(predefinedType.IDisposable.GetTypeElement()) then () else
         if isNull newExpr.NewKeyword then () else
 
