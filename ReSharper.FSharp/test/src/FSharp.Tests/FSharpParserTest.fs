@@ -222,7 +222,7 @@ type FSharpSignatureParserTest() =
     [<Test>] member x.``Val - Active pattern 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Type repr - Record 01``() = x.DoNamedTest()
-    [<Test>] member x.``Type repr - Record 02 - Mutable field``() = x.DoNamedTest()
+    [<Test; Explicit("Needs FCS update")>] member x.``Type repr - Record 02 - Mutable field``() = x.DoNamedTest()
     [<Test>] member x.``Type repr - Record 03 - Field attributes``() = x.DoNamedTest()
 
     [<Test>] member x.``Type member - Inherit 01``() = x.DoNamedTest()
