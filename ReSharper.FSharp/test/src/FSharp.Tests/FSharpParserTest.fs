@@ -18,6 +18,9 @@ type FSharpParserTest() =
     [<Test>] member x.``Namespace 02 - Qualifier``() = x.DoNamedTest()
     [<Test>] member x.``Namespace 03 - Multiple``() = x.DoNamedTest()
     [<Test>] member x.``Namespace 04 - Multiple qualifiers``() = x.DoNamedTest()
+    [<Test>] member x.``Namespace 05 - Global``() = x.DoNamedTest()
+    [<Test>] member x.``Namespace 06 - Global, type``() = x.DoNamedTest()
+    [<Test>] member x.``Namespace 07 - Global, Multiple``() = x.DoNamedTest()
 
     [<Test>] member x.``Let 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Let 02 - Typed``() = x.DoNamedTest()
@@ -217,6 +220,10 @@ type FSharpSignatureParserTest() =
     [<Test>] member x.``Val - Function 04 - Named tuple param``() = x.DoNamedTest()
 
     [<Test>] member x.``Val - Active pattern 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type repr - Record 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type repr - Record 02 - Mutable field``() = x.DoNamedTest()
+    [<Test>] member x.``Type repr - Record 03 - Field attributes``() = x.DoNamedTest()
 
     [<Test>] member x.``Type member - Inherit 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Inherit 02 - Qualifiers``() = x.DoNamedTest()

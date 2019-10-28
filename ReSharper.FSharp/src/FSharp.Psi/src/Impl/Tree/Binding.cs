@@ -67,5 +67,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public void SetName(string name)
     {
     }
+
+    public bool IsMutable => MutableKeyword != null;
+
+    public void SetIsMutable(bool value) =>
+      throw new System.NotImplementedException();
   }
 }
