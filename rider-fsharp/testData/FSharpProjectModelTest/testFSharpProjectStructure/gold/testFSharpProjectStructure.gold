@@ -37,11 +37,11 @@ Init
    AfterFile.fs [CompileAfter]
 
 
-Project [Name:&, GUID:]
+Project [Name:&, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : FSharpProjectTree.sln)[]
 
-Project [Name:ClassLibrary1, GUID:]
+Project [Name:ClassLibrary1, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : AfterFile.fs)[COMPILEAFTER ]
     ProjectFileImpl(Path : BeforeFile.fs)[COMPILEBEFORE ]
@@ -59,10 +59,10 @@ Project [Name:ClassLibrary1, GUID:]
           Child items:
             ProjectFileImpl(Path : Class1.fs)[COMPILE ]
             ProjectFileImpl(Path : Class2.fs)[COMPILE ]
-    ProjectFileImpl(Path : LinkedFile1.fs (..\ExternalFolder\LinkedFile1.fs))[COMPILE ]
+    ProjectFileImpl(Path : LinkedFile1.fs (../ExternalFolder/LinkedFile1.fs))[COMPILE ]
     Folder [Name:LinkedFolder, AllowsNonExistence:true]
       Child items:
-        ProjectFileImpl(Path : LinkedFile2.fs (..\..\ExternalFolder\LinkedFile2.fs))[COMPILE ]
+        ProjectFileImpl(Path : LinkedFile2.fs (../../ExternalFolder/LinkedFile2.fs))[COMPILE ]
     Folder [Name:obj, IsHidden:true]
       Child items:
         Folder [Name:Debug, IsHidden:true]
@@ -71,7 +71,7 @@ Project [Name:ClassLibrary1, GUID:]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
-Project [Name:Miscellaneous Files, GUID:]
+Project [Name:Miscellaneous Files, GUID:GUID]
 
 
 
@@ -107,16 +107,17 @@ File Path Index
 
 
 1:BeforeFile.fs (CompileBefore)
-2:obj[1]
+2:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore) (from ../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs)
+3:obj[1]
   1:Debug[1]
     1:net45[1]
       1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:Folder[1]
+4:Folder[1]
   1:File1.fs
   2:File2.fs
-4:File3.fs
-5:EmptyFolder[1]
-6:Folder[2]
+5:File3.fs
+6:EmptyFolder[1]
+7:Folder[2]
   1:File3.fs
   2:File4.fs
   3:Sub[1]
@@ -124,13 +125,14 @@ File Path Index
   4:File5.fs
   5:Sub[2]
     1:Class2.fs
-7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-8:LinkedFolder[1]
+8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+9:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-9:AfterFile.fs (CompileAfter)
+10:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
+../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs
 obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 Folder/File1.fs
 Folder/File2.fs
@@ -183,11 +185,11 @@ AfterFile.fs
    AfterFile.fs [CompileAfter]
 
 
-Project [Name:&, GUID:]
+Project [Name:&, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : FSharpProjectTree.sln)[]
 
-Project [Name:ClassLibrary1, GUID:]
+Project [Name:ClassLibrary1, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : AfterFile.fs)[COMPILEAFTER ]
     ProjectFileImpl(Path : BeforeFile.fs)[COMPILEBEFORE ]
@@ -205,10 +207,10 @@ Project [Name:ClassLibrary1, GUID:]
           Child items:
             ProjectFileImpl(Path : Class1.fs)[COMPILE ]
             ProjectFileImpl(Path : Class2.fs)[COMPILE ]
-    ProjectFileImpl(Path : LinkedFile1.fs (..\ExternalFolder\LinkedFile1.fs))[COMPILE ]
+    ProjectFileImpl(Path : LinkedFile1.fs (../ExternalFolder/LinkedFile1.fs))[COMPILE ]
     Folder [Name:LinkedFolder, AllowsNonExistence:true]
       Child items:
-        ProjectFileImpl(Path : LinkedFile2.fs (..\..\ExternalFolder\LinkedFile2.fs))[COMPILE ]
+        ProjectFileImpl(Path : LinkedFile2.fs (../../ExternalFolder/LinkedFile2.fs))[COMPILE ]
     Folder [Name:obj, IsHidden:true]
       Child items:
         Folder [Name:Debug, IsHidden:true]
@@ -217,7 +219,7 @@ Project [Name:ClassLibrary1, GUID:]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
-Project [Name:Miscellaneous Files, GUID:]
+Project [Name:Miscellaneous Files, GUID:GUID]
 
 
 
@@ -253,15 +255,16 @@ File Path Index
 
 
 1:BeforeFile.fs (CompileBefore)
-2:obj[1]
+2:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore) (from ../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs)
+3:obj[1]
   1:Debug[1]
     1:net45[1]
       1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:Folder[1]
+4:Folder[1]
   1:File2.fs
-4:File3.fs
-5:EmptyFolder[1]
-6:Folder[2]
+5:File3.fs
+6:EmptyFolder[1]
+7:Folder[2]
   1:File3.fs
   2:File4.fs
   3:File1.fs
@@ -270,13 +273,14 @@ File Path Index
   5:File5.fs
   6:Sub[2]
     1:Class2.fs
-7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-8:LinkedFolder[1]
+8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+9:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-9:AfterFile.fs (CompileAfter)
+10:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
+../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs
 obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 Folder/File2.fs
 File3.fs
@@ -329,11 +333,11 @@ AfterFile.fs
    AfterFile.fs [CompileAfter]
 
 
-Project [Name:&, GUID:]
+Project [Name:&, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : FSharpProjectTree.sln)[]
 
-Project [Name:ClassLibrary1, GUID:]
+Project [Name:ClassLibrary1, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : AfterFile.fs)[COMPILEAFTER ]
     ProjectFileImpl(Path : BeforeFile.fs)[COMPILEBEFORE ]
@@ -351,10 +355,10 @@ Project [Name:ClassLibrary1, GUID:]
           Child items:
             ProjectFileImpl(Path : Class1.fs)[COMPILE ]
             ProjectFileImpl(Path : Class2.fs)[COMPILE ]
-    ProjectFileImpl(Path : LinkedFile1.fs (..\ExternalFolder\LinkedFile1.fs))[COMPILE ]
+    ProjectFileImpl(Path : LinkedFile1.fs (../ExternalFolder/LinkedFile1.fs))[COMPILE ]
     Folder [Name:LinkedFolder, AllowsNonExistence:true]
       Child items:
-        ProjectFileImpl(Path : LinkedFile2.fs (..\..\ExternalFolder\LinkedFile2.fs))[COMPILE ]
+        ProjectFileImpl(Path : LinkedFile2.fs (../../ExternalFolder/LinkedFile2.fs))[COMPILE ]
     Folder [Name:obj, IsHidden:true]
       Child items:
         Folder [Name:Debug, IsHidden:true]
@@ -363,7 +367,7 @@ Project [Name:ClassLibrary1, GUID:]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
-Project [Name:Miscellaneous Files, GUID:]
+Project [Name:Miscellaneous Files, GUID:GUID]
 
 
 
@@ -399,16 +403,17 @@ File Path Index
 
 
 1:BeforeFile.fs (CompileBefore)
-2:obj[1]
+2:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore) (from ../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs)
+3:obj[1]
   1:Debug[1]
     1:net45[1]
       1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:Folder[1]
+4:Folder[1]
   1:File3.fs
   2:File2.fs
-4:File3.fs
-5:EmptyFolder[1]
-6:Folder[2]
+5:File3.fs
+6:EmptyFolder[1]
+7:Folder[2]
   1:File4.fs
   2:File1.fs
   3:Sub[1]
@@ -416,13 +421,14 @@ File Path Index
   4:File5.fs
   5:Sub[2]
     1:Class2.fs
-7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-8:LinkedFolder[1]
+8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+9:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-9:AfterFile.fs (CompileAfter)
+10:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
+../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs
 obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 Folder/File3.fs
 Folder/File2.fs
@@ -475,11 +481,11 @@ AfterFile.fs
    AfterFile.fs [CompileAfter]
 
 
-Project [Name:&, GUID:]
+Project [Name:&, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : FSharpProjectTree.sln)[]
 
-Project [Name:ClassLibrary1, GUID:]
+Project [Name:ClassLibrary1, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : AfterFile.fs)[COMPILEAFTER ]
     ProjectFileImpl(Path : BeforeFile.fs)[COMPILEBEFORE ]
@@ -497,10 +503,10 @@ Project [Name:ClassLibrary1, GUID:]
           Child items:
             ProjectFileImpl(Path : Class1.fs)[COMPILE ]
             ProjectFileImpl(Path : Class2.fs)[COMPILE ]
-    ProjectFileImpl(Path : LinkedFile1.fs (..\ExternalFolder\LinkedFile1.fs))[COMPILE ]
+    ProjectFileImpl(Path : LinkedFile1.fs (../ExternalFolder/LinkedFile1.fs))[COMPILE ]
     Folder [Name:LinkedFolder, AllowsNonExistence:true]
       Child items:
-        ProjectFileImpl(Path : LinkedFile2.fs (..\..\ExternalFolder\LinkedFile2.fs))[COMPILE ]
+        ProjectFileImpl(Path : LinkedFile2.fs (../../ExternalFolder/LinkedFile2.fs))[COMPILE ]
     Folder [Name:obj, IsHidden:true]
       Child items:
         Folder [Name:Debug, IsHidden:true]
@@ -509,7 +515,7 @@ Project [Name:ClassLibrary1, GUID:]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
-Project [Name:Miscellaneous Files, GUID:]
+Project [Name:Miscellaneous Files, GUID:GUID]
 
 
 
@@ -545,30 +551,32 @@ File Path Index
 
 
 1:BeforeFile.fs (CompileBefore)
-2:obj[1]
+2:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore) (from ../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs)
+3:obj[1]
   1:Debug[1]
     1:net45[1]
       1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:Folder[1]
+4:Folder[1]
   1:File3.fs
   2:File2.fs
-4:File3.fs
-5:EmptyFolder[1]
-6:File1.fs
-7:Folder[2]
+5:File3.fs
+6:EmptyFolder[1]
+7:File1.fs
+8:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:Class1.fs
   3:File5.fs
   4:Sub[2]
     1:Class2.fs
-8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-9:LinkedFolder[1]
+9:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+10:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-10:AfterFile.fs (CompileAfter)
+11:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
+../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs
 obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 Folder/File3.fs
 Folder/File2.fs
@@ -621,11 +629,11 @@ AfterFile.fs
    AfterFile.fs [CompileAfter]
 
 
-Project [Name:&, GUID:]
+Project [Name:&, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : FSharpProjectTree.sln)[]
 
-Project [Name:ClassLibrary1, GUID:]
+Project [Name:ClassLibrary1, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : AfterFile.fs)[COMPILEAFTER ]
     ProjectFileImpl(Path : BeforeFile.fs)[COMPILEBEFORE ]
@@ -643,10 +651,10 @@ Project [Name:ClassLibrary1, GUID:]
             ProjectFileImpl(Path : Class2.fs)[COMPILE ]
             ProjectFileImpl(Path : File1.fs)[COMPILE ]
             ProjectFileImpl(Path : File3.fs)[COMPILE ]
-    ProjectFileImpl(Path : LinkedFile1.fs (..\ExternalFolder\LinkedFile1.fs))[COMPILE ]
+    ProjectFileImpl(Path : LinkedFile1.fs (../ExternalFolder/LinkedFile1.fs))[COMPILE ]
     Folder [Name:LinkedFolder, AllowsNonExistence:true]
       Child items:
-        ProjectFileImpl(Path : LinkedFile2.fs (..\..\ExternalFolder\LinkedFile2.fs))[COMPILE ]
+        ProjectFileImpl(Path : LinkedFile2.fs (../../ExternalFolder/LinkedFile2.fs))[COMPILE ]
     Folder [Name:obj, IsHidden:true]
       Child items:
         Folder [Name:Debug, IsHidden:true]
@@ -655,7 +663,7 @@ Project [Name:ClassLibrary1, GUID:]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
-Project [Name:Miscellaneous Files, GUID:]
+Project [Name:Miscellaneous Files, GUID:GUID]
 
 
 
@@ -691,15 +699,16 @@ File Path Index
 
 
 1:BeforeFile.fs (CompileBefore)
-2:obj[1]
+2:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore) (from ../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs)
+3:obj[1]
   1:Debug[1]
     1:net45[1]
       1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:Folder[1]
+4:Folder[1]
   1:File3.fs
   2:File2.fs
-4:EmptyFolder[1]
-5:Folder[2]
+5:EmptyFolder[1]
+6:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:File3.fs
@@ -708,13 +717,14 @@ File Path Index
   3:File5.fs
   4:Sub[2]
     1:Class2.fs
-6:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-7:LinkedFolder[1]
+7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+8:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-8:AfterFile.fs (CompileAfter)
+9:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
+../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs
 obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 Folder/File3.fs
 Folder/File2.fs
@@ -767,11 +777,11 @@ AfterFile.fs
    AfterFile.fs [CompileAfter]
 
 
-Project [Name:&, GUID:]
+Project [Name:&, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : FSharpProjectTree.sln)[]
 
-Project [Name:ClassLibrary1, GUID:]
+Project [Name:ClassLibrary1, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : AfterFile.fs)[COMPILEAFTER ]
     ProjectFileImpl(Path : BeforeFile.fs)[COMPILEBEFORE ]
@@ -789,10 +799,10 @@ Project [Name:ClassLibrary1, GUID:]
             ProjectFileImpl(Path : Class1.fs)[COMPILE ]
             ProjectFileImpl(Path : Class2.fs)[COMPILE ]
             ProjectFileImpl(Path : File1.fs)[COMPILE ]
-    ProjectFileImpl(Path : LinkedFile1.fs (..\ExternalFolder\LinkedFile1.fs))[COMPILE ]
+    ProjectFileImpl(Path : LinkedFile1.fs (../ExternalFolder/LinkedFile1.fs))[COMPILE ]
     Folder [Name:LinkedFolder, AllowsNonExistence:true]
       Child items:
-        ProjectFileImpl(Path : LinkedFile2.fs (..\..\ExternalFolder\LinkedFile2.fs))[COMPILE ]
+        ProjectFileImpl(Path : LinkedFile2.fs (../../ExternalFolder/LinkedFile2.fs))[COMPILE ]
     Folder [Name:obj, IsHidden:true]
       Child items:
         Folder [Name:Debug, IsHidden:true]
@@ -801,7 +811,7 @@ Project [Name:ClassLibrary1, GUID:]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
-Project [Name:Miscellaneous Files, GUID:]
+Project [Name:Miscellaneous Files, GUID:GUID]
 
 
 
@@ -837,16 +847,17 @@ File Path Index
 
 
 1:BeforeFile.fs (CompileBefore)
-2:obj[1]
+2:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore) (from ../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs)
+3:obj[1]
   1:Debug[1]
     1:net45[1]
       1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:Folder[1]
+4:Folder[1]
   1:File3.fs
   2:File2.fs
-4:File3.fs
-5:EmptyFolder[1]
-6:Folder[2]
+5:File3.fs
+6:EmptyFolder[1]
+7:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:File1.fs
@@ -854,13 +865,14 @@ File Path Index
   3:File5.fs
   4:Sub[2]
     1:Class2.fs
-7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-8:LinkedFolder[1]
+8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+9:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-9:AfterFile.fs (CompileAfter)
+10:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
+../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs
 obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 Folder/File3.fs
 Folder/File2.fs
@@ -913,11 +925,11 @@ AfterFile.fs
    AfterFile.fs [CompileAfter]
 
 
-Project [Name:&, GUID:]
+Project [Name:&, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : FSharpProjectTree.sln)[]
 
-Project [Name:ClassLibrary1, GUID:]
+Project [Name:ClassLibrary1, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : AfterFile.fs)[COMPILEAFTER ]
     ProjectFileImpl(Path : BeforeFile.fs)[COMPILEBEFORE ]
@@ -935,10 +947,10 @@ Project [Name:ClassLibrary1, GUID:]
             ProjectFileImpl(Path : Class1.fs)[COMPILE ]
             ProjectFileImpl(Path : Class2.fs)[COMPILE ]
             ProjectFileImpl(Path : File1.fs)[COMPILE ]
-    ProjectFileImpl(Path : LinkedFile1.fs (..\ExternalFolder\LinkedFile1.fs))[COMPILE ]
+    ProjectFileImpl(Path : LinkedFile1.fs (../ExternalFolder/LinkedFile1.fs))[COMPILE ]
     Folder [Name:LinkedFolder, AllowsNonExistence:true]
       Child items:
-        ProjectFileImpl(Path : LinkedFile2.fs (..\..\ExternalFolder\LinkedFile2.fs))[COMPILE ]
+        ProjectFileImpl(Path : LinkedFile2.fs (../../ExternalFolder/LinkedFile2.fs))[COMPILE ]
     Folder [Name:obj, IsHidden:true]
       Child items:
         Folder [Name:Debug, IsHidden:true]
@@ -947,7 +959,7 @@ Project [Name:ClassLibrary1, GUID:]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
-Project [Name:Miscellaneous Files, GUID:]
+Project [Name:Miscellaneous Files, GUID:GUID]
 
 
 
@@ -983,16 +995,17 @@ File Path Index
 
 
 1:BeforeFile.fs (CompileBefore)
-2:obj[1]
+2:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore) (from ../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs)
+3:obj[1]
   1:Debug[1]
     1:net45[1]
       1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:Folder[1]
+4:Folder[1]
   1:File3.fs
   2:File2.fs
-4:EmptyFolder[1]
-5:File3.fs
-6:Folder[2]
+5:EmptyFolder[1]
+6:File3.fs
+7:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:File1.fs
@@ -1000,13 +1013,14 @@ File Path Index
   3:File5.fs
   4:Sub[2]
     1:Class2.fs
-7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-8:LinkedFolder[1]
+8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+9:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-9:AfterFile.fs (CompileAfter)
+10:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
+../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs
 obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 Folder/File3.fs
 Folder/File2.fs
@@ -1058,11 +1072,11 @@ AfterFile.fs
    AfterFile.fs [CompileAfter]
 
 
-Project [Name:&, GUID:]
+Project [Name:&, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : FSharpProjectTree.sln)[]
 
-Project [Name:ClassLibrary1, GUID:]
+Project [Name:ClassLibrary1, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : AfterFile.fs)[COMPILEAFTER ]
     ProjectFileImpl(Path : BeforeFile.fs)[COMPILEBEFORE ]
@@ -1080,10 +1094,10 @@ Project [Name:ClassLibrary1, GUID:]
           Child items:
             ProjectFileImpl(Path : Class1.fs)[COMPILE ]
             ProjectFileImpl(Path : File1.fs)[COMPILE ]
-    ProjectFileImpl(Path : LinkedFile1.fs (..\ExternalFolder\LinkedFile1.fs))[COMPILE ]
+    ProjectFileImpl(Path : LinkedFile1.fs (../ExternalFolder/LinkedFile1.fs))[COMPILE ]
     Folder [Name:LinkedFolder, AllowsNonExistence:true]
       Child items:
-        ProjectFileImpl(Path : LinkedFile2.fs (..\..\ExternalFolder\LinkedFile2.fs))[COMPILE ]
+        ProjectFileImpl(Path : LinkedFile2.fs (../../ExternalFolder/LinkedFile2.fs))[COMPILE ]
     Folder [Name:obj, IsHidden:true]
       Child items:
         Folder [Name:Debug, IsHidden:true]
@@ -1092,7 +1106,7 @@ Project [Name:ClassLibrary1, GUID:]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
-Project [Name:Miscellaneous Files, GUID:]
+Project [Name:Miscellaneous Files, GUID:GUID]
 
 
 
@@ -1128,29 +1142,31 @@ File Path Index
 
 
 1:BeforeFile.fs (CompileBefore)
-2:obj[1]
+2:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore) (from ../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs)
+3:obj[1]
   1:Debug[1]
     1:net45[1]
       1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:Folder[1]
+4:Folder[1]
   1:File3.fs
   2:File2.fs
-4:EmptyFolder[1]
-5:File3.fs
-6:Folder[2]
+5:EmptyFolder[1]
+6:File3.fs
+7:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:File1.fs
     2:Class1.fs
   3:File5.fs
   4:Class2.fs
-7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-8:LinkedFolder[1]
+8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+9:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-9:AfterFile.fs (CompileAfter)
+10:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
+../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs
 obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 Folder/File3.fs
 Folder/File2.fs
@@ -1202,11 +1218,11 @@ AfterFile.fs
    AfterFile.fs [CompileAfter]
 
 
-Project [Name:&, GUID:]
+Project [Name:&, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : FSharpProjectTree.sln)[]
 
-Project [Name:ClassLibrary1, GUID:]
+Project [Name:ClassLibrary1, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : AfterFile.fs)[COMPILEAFTER ]
     ProjectFileImpl(Path : BeforeFile.fs)[COMPILEBEFORE ]
@@ -1224,10 +1240,10 @@ Project [Name:ClassLibrary1, GUID:]
           Child items:
             ProjectFileImpl(Path : Class1.fs)[COMPILE ]
             ProjectFileImpl(Path : File1.fs)[COMPILE ]
-    ProjectFileImpl(Path : LinkedFile1.fs (..\ExternalFolder\LinkedFile1.fs))[COMPILE ]
+    ProjectFileImpl(Path : LinkedFile1.fs (../ExternalFolder/LinkedFile1.fs))[COMPILE ]
     Folder [Name:LinkedFolder, AllowsNonExistence:true]
       Child items:
-        ProjectFileImpl(Path : LinkedFile2.fs (..\..\ExternalFolder\LinkedFile2.fs))[COMPILE ]
+        ProjectFileImpl(Path : LinkedFile2.fs (../../ExternalFolder/LinkedFile2.fs))[COMPILE ]
     Folder [Name:obj, IsHidden:true]
       Child items:
         Folder [Name:Debug, IsHidden:true]
@@ -1236,7 +1252,7 @@ Project [Name:ClassLibrary1, GUID:]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
-Project [Name:Miscellaneous Files, GUID:]
+Project [Name:Miscellaneous Files, GUID:GUID]
 
 
 
@@ -1272,29 +1288,31 @@ File Path Index
 
 
 1:BeforeFile.fs (CompileBefore)
-2:obj[1]
+2:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore) (from ../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs)
+3:obj[1]
   1:Debug[1]
     1:net45[1]
       1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:Folder[1]
+4:Folder[1]
   1:File2.fs
   2:File3.fs
-4:EmptyFolder[1]
-5:File3.fs
-6:Folder[2]
+5:EmptyFolder[1]
+6:File3.fs
+7:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:File1.fs
     2:Class1.fs
   3:File5.fs
   4:Class2.fs
-7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-8:LinkedFolder[1]
+8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+9:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-9:AfterFile.fs (CompileAfter)
+10:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
+../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs
 obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 Folder/File2.fs
 Folder/File3.fs
@@ -1346,11 +1364,11 @@ AfterFile.fs
    AfterFile.fs [CompileAfter]
 
 
-Project [Name:&, GUID:]
+Project [Name:&, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : FSharpProjectTree.sln)[]
 
-Project [Name:ClassLibrary1, GUID:]
+Project [Name:ClassLibrary1, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : AfterFile.fs)[COMPILEAFTER ]
     ProjectFileImpl(Path : BeforeFile.fs)[COMPILEBEFORE ]
@@ -1368,10 +1386,10 @@ Project [Name:ClassLibrary1, GUID:]
           Child items:
             ProjectFileImpl(Path : Class1.fs)[COMPILE ]
             ProjectFileImpl(Path : File1.fs)[COMPILE ]
-    ProjectFileImpl(Path : LinkedFile1.fs (..\ExternalFolder\LinkedFile1.fs))[COMPILE ]
+    ProjectFileImpl(Path : LinkedFile1.fs (../ExternalFolder/LinkedFile1.fs))[COMPILE ]
     Folder [Name:LinkedFolder, AllowsNonExistence:true]
       Child items:
-        ProjectFileImpl(Path : LinkedFile2.fs (..\..\ExternalFolder\LinkedFile2.fs))[COMPILE ]
+        ProjectFileImpl(Path : LinkedFile2.fs (../../ExternalFolder/LinkedFile2.fs))[COMPILE ]
     Folder [Name:obj, IsHidden:true]
       Child items:
         Folder [Name:Debug, IsHidden:true]
@@ -1380,7 +1398,7 @@ Project [Name:ClassLibrary1, GUID:]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
-Project [Name:Miscellaneous Files, GUID:]
+Project [Name:Miscellaneous Files, GUID:GUID]
 
 
 
@@ -1416,29 +1434,31 @@ File Path Index
 
 
 1:BeforeFile.fs (CompileBefore)
-2:obj[1]
+2:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore) (from ../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs)
+3:obj[1]
   1:Debug[1]
     1:net45[1]
       1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:File2.fs
-4:Folder[1]
+4:File2.fs
+5:Folder[1]
   1:File3.fs
-5:EmptyFolder[1]
-6:File3.fs
-7:Folder[2]
+6:EmptyFolder[1]
+7:File3.fs
+8:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:File1.fs
     2:Class1.fs
   3:File5.fs
   4:Class2.fs
-8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-9:LinkedFolder[1]
+9:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+10:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-10:AfterFile.fs (CompileAfter)
+11:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
+../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs
 obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 File2.fs
 Folder/File3.fs
@@ -1490,11 +1510,11 @@ AfterFile.fs
    AfterFile.fs [CompileAfter]
 
 
-Project [Name:&, GUID:]
+Project [Name:&, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : FSharpProjectTree.sln)[]
 
-Project [Name:ClassLibrary1, GUID:]
+Project [Name:ClassLibrary1, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : AfterFile.fs)[COMPILEAFTER ]
     ProjectFileImpl(Path : BeforeFile.fs)[COMPILEBEFORE ]
@@ -1512,10 +1532,10 @@ Project [Name:ClassLibrary1, GUID:]
             ProjectFileImpl(Path : Class1.fs)[COMPILE ]
             ProjectFileImpl(Path : File1.fs)[COMPILE ]
     ProjectFileImpl(Path : Foo.fs)[COMPILE ]
-    ProjectFileImpl(Path : LinkedFile1.fs (..\ExternalFolder\LinkedFile1.fs))[COMPILE ]
+    ProjectFileImpl(Path : LinkedFile1.fs (../ExternalFolder/LinkedFile1.fs))[COMPILE ]
     Folder [Name:LinkedFolder, AllowsNonExistence:true]
       Child items:
-        ProjectFileImpl(Path : LinkedFile2.fs (..\..\ExternalFolder\LinkedFile2.fs))[COMPILE ]
+        ProjectFileImpl(Path : LinkedFile2.fs (../../ExternalFolder/LinkedFile2.fs))[COMPILE ]
     Folder [Name:obj, IsHidden:true]
       Child items:
         Folder [Name:Debug, IsHidden:true]
@@ -1524,7 +1544,7 @@ Project [Name:ClassLibrary1, GUID:]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
-Project [Name:Miscellaneous Files, GUID:]
+Project [Name:Miscellaneous Files, GUID:GUID]
 
 
 
@@ -1560,29 +1580,31 @@ File Path Index
 
 
 1:BeforeFile.fs (CompileBefore)
-2:obj[1]
+2:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore) (from ../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs)
+3:obj[1]
   1:Debug[1]
     1:net45[1]
       1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:File2.fs
-4:Folder[1]
+4:File2.fs
+5:Folder[1]
   1:File3.fs
-5:EmptyFolder[1]
-6:Foo.fs
-7:Folder[2]
+6:EmptyFolder[1]
+7:Foo.fs
+8:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:File1.fs
     2:Class1.fs
   3:File5.fs
   4:Class2.fs
-8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-9:LinkedFolder[1]
+9:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+10:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-10:AfterFile.fs (CompileAfter)
+11:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
+../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs
 obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 File2.fs
 Folder/File3.fs
@@ -1634,11 +1656,11 @@ AfterFile.fs
    AfterFile.fs [CompileAfter]
 
 
-Project [Name:&, GUID:]
+Project [Name:&, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : FSharpProjectTree.sln)[]
 
-Project [Name:ClassLibrary1, GUID:]
+Project [Name:ClassLibrary1, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : AfterFile.fs)[COMPILEAFTER ]
     ProjectFileImpl(Path : BeforeFile.fs)[COMPILEBEFORE ]
@@ -1657,10 +1679,10 @@ Project [Name:ClassLibrary1, GUID:]
           Child items:
             ProjectFileImpl(Path : Class1.fs)[COMPILE ]
             ProjectFileImpl(Path : File1.fs)[COMPILE ]
-    ProjectFileImpl(Path : LinkedFile1.fs (..\ExternalFolder\LinkedFile1.fs))[COMPILE ]
+    ProjectFileImpl(Path : LinkedFile1.fs (../ExternalFolder/LinkedFile1.fs))[COMPILE ]
     Folder [Name:LinkedFolder, AllowsNonExistence:true]
       Child items:
-        ProjectFileImpl(Path : LinkedFile2.fs (..\..\ExternalFolder\LinkedFile2.fs))[COMPILE ]
+        ProjectFileImpl(Path : LinkedFile2.fs (../../ExternalFolder/LinkedFile2.fs))[COMPILE ]
     Folder [Name:obj, IsHidden:true]
       Child items:
         Folder [Name:Debug, IsHidden:true]
@@ -1669,7 +1691,7 @@ Project [Name:ClassLibrary1, GUID:]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
-Project [Name:Miscellaneous Files, GUID:]
+Project [Name:Miscellaneous Files, GUID:GUID]
 
 
 
@@ -1705,29 +1727,31 @@ File Path Index
 
 
 1:BeforeFile.fs (CompileBefore)
-2:obj[1]
+2:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore) (from ../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs)
+3:obj[1]
   1:Debug[1]
     1:net45[1]
       1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:File2.fs
-4:Folder[1]
+4:File2.fs
+5:Folder[1]
   1:File3.fs
-5:EmptyFolder[1]
+6:EmptyFolder[1]
   1:Foo.fs
-6:Folder[2]
+7:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:File1.fs
     2:Class1.fs
   3:File5.fs
   4:Class2.fs
-7:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-8:LinkedFolder[1]
+8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+9:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-9:AfterFile.fs (CompileAfter)
+10:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
+../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs
 obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 File2.fs
 Folder/File3.fs
@@ -1779,11 +1803,11 @@ AfterFile.fs
    AfterFile.fs [CompileAfter]
 
 
-Project [Name:&, GUID:]
+Project [Name:&, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : FSharpProjectTree.sln)[]
 
-Project [Name:ClassLibrary1, GUID:]
+Project [Name:ClassLibrary1, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : AfterFile.fs)[COMPILEAFTER ]
     ProjectFileImpl(Path : BeforeFile.fs)[COMPILEBEFORE ]
@@ -1801,10 +1825,10 @@ Project [Name:ClassLibrary1, GUID:]
             ProjectFileImpl(Path : Class1.fs)[COMPILE ]
             ProjectFileImpl(Path : File1.fs)[COMPILE ]
     ProjectFileImpl(Path : Foo.fs)[COMPILE ]
-    ProjectFileImpl(Path : LinkedFile1.fs (..\ExternalFolder\LinkedFile1.fs))[COMPILE ]
+    ProjectFileImpl(Path : LinkedFile1.fs (../ExternalFolder/LinkedFile1.fs))[COMPILE ]
     Folder [Name:LinkedFolder, AllowsNonExistence:true]
       Child items:
-        ProjectFileImpl(Path : LinkedFile2.fs (..\..\ExternalFolder\LinkedFile2.fs))[COMPILE ]
+        ProjectFileImpl(Path : LinkedFile2.fs (../../ExternalFolder/LinkedFile2.fs))[COMPILE ]
     Folder [Name:obj, IsHidden:true]
       Child items:
         Folder [Name:Debug, IsHidden:true]
@@ -1813,7 +1837,7 @@ Project [Name:ClassLibrary1, GUID:]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
-Project [Name:Miscellaneous Files, GUID:]
+Project [Name:Miscellaneous Files, GUID:GUID]
 
 
 
@@ -1849,29 +1873,31 @@ File Path Index
 
 
 1:BeforeFile.fs (CompileBefore)
-2:obj[1]
+2:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore) (from ../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs)
+3:obj[1]
   1:Debug[1]
     1:net45[1]
       1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:File2.fs
-4:Folder[1]
+4:File2.fs
+5:Folder[1]
   1:File3.fs
-5:Foo.fs
-6:EmptyFolder[1]
-7:Folder[2]
+6:Foo.fs
+7:EmptyFolder[1]
+8:Folder[2]
   1:File4.fs
   2:Sub[1]
     1:File1.fs
     2:Class1.fs
   3:File5.fs
   4:Class2.fs
-8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-9:LinkedFolder[1]
+9:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+10:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-10:AfterFile.fs (CompileAfter)
+11:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
+../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs
 obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 File2.fs
 Folder/File3.fs
@@ -1923,11 +1949,11 @@ Move file 'File1.fs' and 'Class1.fs' in folder 'Folder(2)' before 'Sub(1)'
    AfterFile.fs [CompileAfter]
 
 
-Project [Name:&, GUID:]
+Project [Name:&, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : FSharpProjectTree.sln)[]
 
-Project [Name:ClassLibrary1, GUID:]
+Project [Name:ClassLibrary1, GUID:GUID]
   Child items:
     ProjectFileImpl(Path : AfterFile.fs)[COMPILEAFTER ]
     ProjectFileImpl(Path : BeforeFile.fs)[COMPILEBEFORE ]
@@ -1944,10 +1970,10 @@ Project [Name:ClassLibrary1, GUID:]
         ProjectFileImpl(Path : File5.fs)[COMPILE ]
         Folder [Name:Sub]
     ProjectFileImpl(Path : Foo.fs)[COMPILE ]
-    ProjectFileImpl(Path : LinkedFile1.fs (..\ExternalFolder\LinkedFile1.fs))[COMPILE ]
+    ProjectFileImpl(Path : LinkedFile1.fs (../ExternalFolder/LinkedFile1.fs))[COMPILE ]
     Folder [Name:LinkedFolder, AllowsNonExistence:true]
       Child items:
-        ProjectFileImpl(Path : LinkedFile2.fs (..\..\ExternalFolder\LinkedFile2.fs))[COMPILE ]
+        ProjectFileImpl(Path : LinkedFile2.fs (../../ExternalFolder/LinkedFile2.fs))[COMPILE ]
     Folder [Name:obj, IsHidden:true]
       Child items:
         Folder [Name:Debug, IsHidden:true]
@@ -1956,7 +1982,7 @@ Project [Name:ClassLibrary1, GUID:]
               Child items:
                 ProjectFileImpl(Path : ClassLibrary1.AssemblyInfo.fs)[Hidden COMPILEBEFORE ]
 
-Project [Name:Miscellaneous Files, GUID:]
+Project [Name:Miscellaneous Files, GUID:GUID]
 
 
 
@@ -1992,29 +2018,31 @@ File Path Index
 
 
 1:BeforeFile.fs (CompileBefore)
-2:obj[1]
+2:.NETFramework,Version=v4.5.AssemblyAttributes.fs (CompileBefore) (from ../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs)
+3:obj[1]
   1:Debug[1]
     1:net45[1]
       1:ClassLibrary1.AssemblyInfo.fs (CompileBefore)
-3:File2.fs
-4:Folder[1]
+4:File2.fs
+5:Folder[1]
   1:File3.fs
-5:Foo.fs
-6:EmptyFolder[1]
-7:Folder[2]
+6:Foo.fs
+7:EmptyFolder[1]
+8:Folder[2]
   1:File4.fs
   2:File1.fs
   3:Class1.fs
   4:Sub[1]
   5:File5.fs
   6:Class2.fs
-8:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
-9:LinkedFolder[1]
+9:LinkedFile1.fs (from ../ExternalFolder/LinkedFile1.fs)
+10:LinkedFolder[1]
   1:LinkedFile2.fs (from ../ExternalFolder/LinkedFile2.fs)
-10:AfterFile.fs (CompileAfter)
+11:AfterFile.fs (CompileAfter)
 
 .NETFramework,Version=v4.5
 BeforeFile.fs
+../../../../../.NETFramework,Version=v4.5.AssemblyAttributes.fs
 obj/Debug/net45/ClassLibrary1.AssemblyInfo.fs
 File2.fs
 Folder/File3.fs

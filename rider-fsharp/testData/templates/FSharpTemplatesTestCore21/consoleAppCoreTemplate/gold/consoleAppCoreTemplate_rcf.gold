@@ -2,7 +2,7 @@ Count: 1
 ---
 IsSingleton: true
 IsShared: false
-Name: Default
+Name: ConsoleApplication
 Type: .NET Project
 Project filePath: $PROJECT_DIR$/ConsoleApplication/ConsoleApplication.fsproj
 Start browser on launch: false
