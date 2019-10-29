@@ -6,11 +6,10 @@ open JetBrains.Core
 open JetBrains.Diagnostics
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
-open JetBrains.ReSharper.Host.Features
+open JetBrains.Rd.Tasks
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.Shim.FileSystem
-open JetBrains.Rider.Model
 
 [<SolutionComponent>]
 type FcsHost
