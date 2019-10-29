@@ -15,7 +15,7 @@ buildscript {
     }
     dependencies {
         classpath("com.jetbrains.rd:rd-gen:0.193.100")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.10")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.50")
     }
 }
 
