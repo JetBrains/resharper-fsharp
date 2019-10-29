@@ -7,10 +7,10 @@ open System.Threading
 open JetBrains.Lifetimes
 open JetBrains.Platform.RdFramework.Util
 open JetBrains.ProjectModel
-open JetBrains.ReSharper.Host.Features
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi.FsiDetector
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi.Settings
+open JetBrains.Rd.Tasks
 open JetBrains.Rider.Model
 open JetBrains.Util
 
@@ -24,7 +24,7 @@ type FsiSessionsHost
     let stringArrayArgs (arg: string) =
         arg.Split([|' '|], StringSplitOptions.RemoveEmptyEntries)
 
-    let getNewFsiSessionInfo _ =
+    let getNewFsiSessionInfo _ _ =
         let fsi =
             if fsiOptions.AutoDetect.Value then
                 fsiDetector.GetAutodetected(solution)
@@ -49,6 +49,7 @@ type FsiSessionsHost
                yield stringArg "fsi-server-lcid" Thread.CurrentThread.CurrentUICulture.LCID |]
 
         RdFsiSessionInfo(fsiPath.FullPath, fsi.Runtime, fsi.IsCustom, List(args), fsiOptions.FixOptionsForDebug.Value)
+        |> RdTask.Successful
 
     do
         let rdFsiHost = solution.RdFSharpModel.FSharpInteractiveHost

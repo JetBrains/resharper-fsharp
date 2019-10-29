@@ -14,7 +14,7 @@ buildscript {
         maven { setUrl("https://cache-redirector.jetbrains.com/repo.maven.apache.org/maven2")}
     }
     dependencies {
-        classpath("com.jetbrains.rd:rd-gen:0.192.2")
+        classpath("com.jetbrains.rd:rd-gen:0.193.100")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.10")
     }
 }
