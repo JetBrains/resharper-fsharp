@@ -26,8 +26,10 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
 
     let nextSteps = Stack<BuilderStep>()
 
-    /// FCS splits property declaration into separate fake members when both getter and setter bodies are present.
-    let mutable unfinishedProperty: (int * range) option = None
+    /// FCS splits some declarations into separate fake ones:
+    ///   * property declaration when both getter and setter bodies are present
+    ///   * attributes for module-level do
+    let mutable unfinishedDeclaration: (int * range) option = None
 
     new (lexer, document, decls, lifetime) =
         FSharpImplTreeBuilder(lexer, document, decls, lifetime, 0) 
@@ -45,6 +47,10 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         x.FinishTopLevelDeclaration(mark, range, elementType)
 
     member x.ProcessModuleMemberDeclaration(moduleMember) =
+        Assertion.Assert(unfinishedDeclaration.IsNone ||
+                         (match moduleMember with | SynModuleDecl.DoExpr _ -> true | _ -> false),
+                         "Expecting Do, got {0}", moduleMember)
+
         match moduleMember with
         | SynModuleDecl.NestedModule(ComponentInfo(attrs, _, _, lid, _, _, _, _), _ ,decls, _, range) ->
             let mark = x.MarkAttributesOrIdOrRange(attrs, List.tryHead lid, range)
@@ -85,12 +91,20 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             x.ProcessHashDirective(hashDirective)
 
         | SynModuleDecl.DoExpr(_, expr, range) ->
-            let mark = x.Mark(range)
+            let mark =
+                match unfinishedDeclaration with
+                | Some(mark, _) ->
+                    unfinishedDeclaration <- None
+                    mark
+                | _ -> x.Mark(range)
+
             x.MarkChameleonExpression(expr)
             x.Done(range, mark, ElementType.DO)
 
-        | SynModuleDecl.Attributes(attributeLists, _) ->
+        | SynModuleDecl.Attributes(attributeLists, range) ->
+            let mark = x.Mark(range)
             x.ProcessAttributeLists(attributeLists)
+            unfinishedDeclaration <- Some(mark, range)
 
         | SynModuleDecl.ModuleAbbrev(_, lid, range) ->
             let mark = x.Mark(range)
@@ -169,9 +183,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
 
     member x.ProcessTypeMember(typeMember: SynMemberDefn) =
         let mark =
-            match unfinishedProperty with
+            match unfinishedDeclaration with
             | Some(mark, unfinishedRange) when unfinishedRange = typeMember.Range ->
-                unfinishedProperty <- None
+                unfinishedDeclaration <- None
                 mark
 
             | _ ->
@@ -235,7 +249,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
 
             | _ -> ElementType.OTHER_TYPE_MEMBER
 
-        if unfinishedProperty.IsNone then
+        if unfinishedDeclaration.IsNone then
             x.Done(typeMember.Range, mark, memberType)
 
     member x.ProcessMemberBinding(mark, Binding(_, _, _, _, _, _, valData, headPat, returnInfo, expr, _, _), range) =
@@ -287,7 +301,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         | SynValData(Some(flags), _, _) when
                 flags.MemberKind = MemberKind.PropertyGet || flags.MemberKind = MemberKind.PropertySet ->
             if expr.Range.End <> range.End then
-                unfinishedProperty <- Some(mark, range)
+                unfinishedDeclaration <- Some(mark, range)
 
         | _ -> ()
 
@@ -300,9 +314,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         x.Done(mark, ElementType.ACCESSOR_DECLARATION)
 
     member x.EnsureMembersAreFinished() =
-        match unfinishedProperty with
+        match unfinishedDeclaration with
         | Some(mark, unfinishedRange) ->
-            unfinishedProperty <- None
+            unfinishedDeclaration <- None
             x.Done(unfinishedRange, mark, ElementType.MEMBER_DECLARATION)
         | _ -> ()
 
