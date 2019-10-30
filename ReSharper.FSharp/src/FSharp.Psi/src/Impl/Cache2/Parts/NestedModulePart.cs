@@ -4,7 +4,7 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  internal class NestedModulePart : ModulePartBase<INestedModuleDeclaration>
+  internal class NestedModulePart : DeclaredModulePartBase<INestedModuleDeclaration>
   {
     public NestedModulePart([NotNull] INestedModuleDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, cacheBuilder.Intern(declaration.CompiledName),

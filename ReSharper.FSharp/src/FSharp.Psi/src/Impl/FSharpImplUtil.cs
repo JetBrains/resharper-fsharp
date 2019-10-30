@@ -316,12 +316,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static TPart GetPart<TPart>([CanBeNull] this ITypeElement type)
       where TPart : class, ClassLikeTypeElement.IClassLikePart
     {
+      // todo: check signature first if one is present
+
       if (!(type is TypeElement typeElement))
         return null;
 
       foreach (var part in typeElement.EnumerateParts())
         if (part is TPart expectedPart)
           return expectedPart;
+
       return null;
     }
 
@@ -674,6 +677,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       }
 
       return result;
+    }
+
+    public static bool IsAutoOpen([CanBeNull] this IDeclaredModuleDeclaration moduleDeclaration)
+    {
+      if (moduleDeclaration == null)
+        return false;
+
+      foreach (var attr in moduleDeclaration.AttributesEnumerable)
+        if (attr.ReferenceName?.ShortName.DropAttributeSuffix() == "AutoOpen")
+          return true;
+
+      return false;
     }
   }
 }

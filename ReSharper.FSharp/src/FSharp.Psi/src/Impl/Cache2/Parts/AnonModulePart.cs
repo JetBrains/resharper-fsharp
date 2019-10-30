@@ -21,5 +21,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       (byte) FSharpPartKind.AnonModule;
 
     public override bool IsAnonymous => true;
+    public override bool IsAutoOpen => false;
   }
 }

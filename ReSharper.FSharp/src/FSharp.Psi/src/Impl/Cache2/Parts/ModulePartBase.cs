@@ -65,6 +65,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public virtual bool IsAnonymous => false;
 
+    public abstract bool IsAutoOpen { get; }
+
     public ITypeElement AssociatedTypeElement =>
       GetDeclaration() is INestedModuleDeclaration moduleDeclaration
         ? ((ITypeDeclaration) moduleDeclaration.GetAssociatedTypeDeclaration(out _)).DeclaredElement
