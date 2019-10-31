@@ -29,7 +29,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
     /// FCS splits some declarations into separate fake ones:
     ///   * property declaration when both getter and setter bodies are present
     ///   * attributes for module-level do
-    let mutable unfinishedDeclaration: (int * range) option = None
+    let mutable unfinishedDeclaration: (int * range * CompositeNodeType) option = None
 
     new (lexer, document, decls, lifetime) =
         FSharpImplTreeBuilder(lexer, document, decls, lifetime, 0) 
@@ -44,12 +44,18 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         let mark, elementType = x.StartTopLevelDeclaration(lid, attrs, moduleKind, range)
         for decl in decls do
             x.ProcessModuleMemberDeclaration(decl)
+        x.EnsureMembersAreFinished()
         x.FinishTopLevelDeclaration(mark, range, elementType)
 
     member x.ProcessModuleMemberDeclaration(moduleMember) =
-        Assertion.Assert(unfinishedDeclaration.IsNone ||
-                         (match moduleMember with | SynModuleDecl.DoExpr _ -> true | _ -> false),
-                         "Expecting Do, got {0}", moduleMember)
+        match unfinishedDeclaration with
+        | None -> ()
+        | Some(mark, range, elementType) ->
+            match moduleMember with
+            | SynModuleDecl.DoExpr _ -> ()
+            | _ ->
+                unfinishedDeclaration <- None
+                x.Done(range, mark, elementType)
 
         match moduleMember with
         | SynModuleDecl.NestedModule(ComponentInfo(attrs, _, _, lid, _, _, _, _), _ ,decls, _, range) ->
@@ -93,7 +99,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         | SynModuleDecl.DoExpr(_, expr, range) ->
             let mark =
                 match unfinishedDeclaration with
-                | Some(mark, _) ->
+                | Some(mark, _, _) ->
                     unfinishedDeclaration <- None
                     mark
                 | _ -> x.Mark(range)
@@ -104,7 +110,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         | SynModuleDecl.Attributes(attributeLists, range) ->
             let mark = x.Mark(range)
             x.ProcessAttributeLists(attributeLists)
-            unfinishedDeclaration <- Some(mark, range)
+            unfinishedDeclaration <- Some(mark, range, ElementType.DO)
 
         | SynModuleDecl.ModuleAbbrev(_, lid, range) ->
             let mark = x.Mark(range)
@@ -184,7 +190,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
     member x.ProcessTypeMember(typeMember: SynMemberDefn) =
         let mark =
             match unfinishedDeclaration with
-            | Some(mark, unfinishedRange) when unfinishedRange = typeMember.Range ->
+            | Some(mark, unfinishedRange, _) when unfinishedRange = typeMember.Range ->
                 unfinishedDeclaration <- None
                 mark
 
@@ -301,7 +307,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         | SynValData(Some(flags), _, _) when
                 flags.MemberKind = MemberKind.PropertyGet || flags.MemberKind = MemberKind.PropertySet ->
             if expr.Range.End <> range.End then
-                unfinishedDeclaration <- Some(mark, range)
+                unfinishedDeclaration <- Some(mark, range, ElementType.MEMBER_DECLARATION)
 
         | _ -> ()
 
@@ -315,9 +321,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
 
     member x.EnsureMembersAreFinished() =
         match unfinishedDeclaration with
-        | Some(mark, unfinishedRange) ->
+        | Some(mark, unfinishedRange, elementType) ->
             unfinishedDeclaration <- None
-            x.Done(unfinishedRange, mark, ElementType.MEMBER_DECLARATION)
+            x.Done(unfinishedRange, mark, elementType)
         | _ -> ()
 
     member x.ProcessCtorSelfId(selfId) =

@@ -245,3 +245,5 @@ type FSharpErrorsParserTest() =
     [<Test>] member x.``Expr - Unfinished let 02 - In``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Unfinished let 03 - Inline in``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Unfinished let 04 - In, before other``() = x.DoNamedTest()
+
+    [<Test>] member x.``Line separators 01``() = x.DoNamedTest()
