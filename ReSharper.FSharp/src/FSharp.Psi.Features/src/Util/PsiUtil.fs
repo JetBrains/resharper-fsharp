@@ -27,13 +27,13 @@ type IFile with
         | _ -> null
 
 type IPsiSourceFile with
-    member x.GetFSharpFile() =
+    member x.FSharpFile =
         if isNull x then null else
-        x.GetPrimaryPsiFile().AsFSharpFile()
+        x.GetDominantPsiFile<FSharpLanguage>().AsFSharpFile()
 
 type ITextControl with
     member x.GetFSharpFile(solution) =
-        x.Document.GetPsiSourceFile(solution).GetFSharpFile()
+        x.Document.GetPsiSourceFile(solution).FSharpFile
 
 type IFSharpFile with
     member x.ParseTree =

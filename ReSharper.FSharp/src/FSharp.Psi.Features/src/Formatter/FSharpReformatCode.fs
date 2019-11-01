@@ -28,7 +28,7 @@ type FSharpReformatCode() =
         member x.Process(sourceFile, rangeMarker, profile, _) =
             if not (profile.GetSetting(ReformatCode.REFORMAT_CODE_DESCRIPTOR)) then () else
 
-            match sourceFile.GetFSharpFile() with
+            match sourceFile.FSharpFile with
             | null -> ()
             | fsFile ->
 
