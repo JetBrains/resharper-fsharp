@@ -1,10 +1,13 @@
 package typingAssist
 
+import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.TypingAssistTestBase
+import com.jetbrains.rider.test.enums.CoreVersion
 import com.jetbrains.rider.test.scriptingApi.typeOrCallAction
 import org.testng.annotations.DataProvider
 import org.testng.annotations.Test
 
+@TestEnvironment(coreVersion = CoreVersion.DEFAULT)
 class FSharpTypingAssistTest: TypingAssistTestBase() {
 
     override fun getSolutionDirectoryName(): String = "CoreConsoleApp"
