@@ -60,7 +60,11 @@ type FSharpPostfixTemplatesProvider(templatesManager, sessionExecutor, usageStat
         let executionContext = PostfixTemplateExecutionContext(solution, context.TextControl, settings, "__")
 
         match fsCompletionContext.TokenBeforeCaret with
-        | identifier when isNotNull identifier && (identifier.Parent :? ISynExpr) ->
+        | identifier when
+                isNotNull identifier &&
+ 
+                let parent = identifier.Parent
+                (parent :? ISynExpr || parent :? IReferenceName) ->
             FSharpPostfixTemplateContext(identifier, executionContext)
 
         | _ -> null
@@ -75,6 +79,22 @@ type FSharpPostfixTemplateBehaviorBase(info) =
         | null -> expr
         | appExpr -> getContainingArgExpr appExpr
 
+    let getContainingTypeExpression (typeName: IReferenceName) =
+        match NamedTypeNavigator.GetByReferenceName(typeName.As()) with
+        | null -> null
+        | namedType ->
+
+        let castExpr = CastExprNavigator.GetByType(namedType)
+        if isNotNull castExpr then
+            getContainingArgExpr castExpr else
+
+        let typedExpr = TypedExprNavigator.GetByType(namedType)
+        if isNotNull typedExpr then
+            getContainingArgExpr typedExpr else
+
+        null
+
+    
     let getParentExpression (token: IFSharpTreeNode): ISynExpr =
         match token with
         | TokenType FSharpTokenType.RESERVED_LITERAL_FORMATS _ ->
@@ -85,17 +105,21 @@ type FSharpPostfixTemplateBehaviorBase(info) =
             let literalText = token.GetText().SubstringBeforeLast(".", StringComparison.Ordinal)
             let constExpr = token.CreateElementFactory().CreateConstExpr(literalText)
             let newChild = ModificationUtil.ReplaceChild(parent.FirstChild, constExpr.FirstChild)
-            newChild.Parent :?> _
+            getContainingArgExpr (newChild.Parent.As())
 
         | :? IFSharpIdentifier as identifier ->
-            match ReferenceExprNavigator.GetByIdentifier(identifier) with
-            | null -> failwith "Getting refExpr"
-            | refExpr ->
+            let refExpr = ReferenceExprNavigator.GetByIdentifier(identifier)
+            if isNotNull refExpr && isNull (ReferenceExprNavigator.GetByQualifier(refExpr)) then
+                let qualifier = refExpr.Qualifier.NotNull()
+                ModificationUtil.ReplaceChild(refExpr, qualifier.Copy()) else
 
-            let qualifier = refExpr.Qualifier
-            Assertion.Assert(isNotNull qualifier, "isNotNull qualifier")
+            let referenceName = ReferenceNameNavigator.GetByIdentifier(identifier)
+            if isNotNull referenceName && isNull (ReferenceNameNavigator.GetByQualifier(referenceName)) then
+                let qualifier = referenceName.Qualifier.NotNull()
+                let newReferenceName = ModificationUtil.ReplaceChild(referenceName, qualifier.Copy())
+                getContainingTypeExpression newReferenceName else
 
-            ModificationUtil.ReplaceChild(refExpr, qualifier)
+            null
 
         | _ -> null
 

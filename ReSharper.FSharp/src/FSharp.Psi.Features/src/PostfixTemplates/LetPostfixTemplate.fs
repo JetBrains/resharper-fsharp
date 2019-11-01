@@ -14,20 +14,20 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 [<PostfixTemplate("let", "Introduce let binding", "let _ = expr")>]
-type IntroduceBindingTemplate() =
+type LetPostfixTemplate() =
     interface IPostfixTemplate with
         member x.Language = FSharpLanguage.Instance :> _
-        member x.CreateBehavior(info) = IntroduceBindingTemplateBehavior(info) :> _
+        member x.CreateBehavior(info) = LetPostfixTemplateBehavior(info) :> _
 
         member x.TryCreateInfo(context) =
-            IntroduceBindingTemplateInfo(context.AllExpressions.[0]) :> _
+            LetPostfixTemplateInfo(context.AllExpressions.[0]) :> _
 
 
-and IntroduceBindingTemplateInfo(expressionContext: PostfixExpressionContext) =
+and LetPostfixTemplateInfo(expressionContext: PostfixExpressionContext) =
     inherit PostfixTemplateInfo("let", expressionContext)
 
 
-and IntroduceBindingTemplateBehavior(info) =
+and LetPostfixTemplateBehavior(info) =
     inherit FSharpPostfixTemplateBehaviorBase(info)
 
     override x.ExpandPostfix(context) =
