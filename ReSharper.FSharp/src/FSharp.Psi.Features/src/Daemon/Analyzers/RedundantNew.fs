@@ -23,10 +23,7 @@ type RedundantNewAnalyzer() =
         if typeElement.IsDescendantOf(predefinedType.IDisposable.GetTypeElement()) then () else
         if isNull newExpr.NewKeyword then () else
 
-        let sourceFile = newExpr.GetSourceFile()
-        let names = List.ofSeq typeName.Names
-        let coords = newExpr.GetNavigationRange().StartOffset.ToDocumentCoords()
-        match newExpr.CheckerService.ResolveNameAtLocation(sourceFile, names, coords, "RedundantNewAnalyzer") with
+        match newExpr.CheckerService.ResolveNameAtLocation(newExpr, typeName.Names, "RedundantNewAnalyzer") with
         | None -> ()
         | Some symbolUse ->
 

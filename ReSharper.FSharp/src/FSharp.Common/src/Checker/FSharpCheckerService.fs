@@ -17,7 +17,9 @@ open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Resolve
 open JetBrains.ReSharper.Psi.Modules
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
 [<ShellComponent; AllowNullLiteral>]
@@ -141,6 +143,19 @@ type FSharpCheckerService
     /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.
     member x.ResolveNameAtLocation(sourceFile: IPsiSourceFile, name, coords, opName) =
         x.ResolveNameAtLocation(sourceFile, [name], coords, opName)
+
+    /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.
+    member x.ResolveNameAtLocation(context: ITreeNode, names, opName) =
+        let sourceFile = context.GetSourceFile()
+        let names = List.ofSeq names
+        let coords = context.GetNavigationRange().StartOffset.ToDocumentCoords()
+        x.ResolveNameAtLocation(sourceFile, names, coords, opName)
+
+    /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.
+    member x.ResolveNameAtLocation(reference: TreeReferenceBase<_>, opName) =
+        let context = reference.GetElement()
+        let names = reference.GetAllNames().ResultingList()
+        x.ResolveNameAtLocation(context, names, opName)
 
 
 [<AutoOpen>]

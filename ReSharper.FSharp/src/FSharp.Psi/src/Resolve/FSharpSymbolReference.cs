@@ -92,5 +92,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     public override ISymbolTable GetReferenceSymbolTable(bool useReferenceName) =>
       throw new NotImplementedException();
+
+    public bool IsQualified =>
+      GetElement() switch
+      {
+        IReferenceExpr referenceExpr => referenceExpr.Qualifier != null,
+        IReferenceName referenceName => referenceName.Qualifier != null,
+        _ => false
+      };
   }
 }

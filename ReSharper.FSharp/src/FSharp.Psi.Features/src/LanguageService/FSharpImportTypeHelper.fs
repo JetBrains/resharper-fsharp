@@ -3,34 +3,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 open JetBrains.Application.Threading
 open JetBrains.ReSharper.Intentions.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.Resolve
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpImportTypeHelper() =
-    let isAllowed (reference: IReference) =
-        match reference.As<FSharpSymbolReference>() with
-        | null -> false
-        | reference ->
-
-        match reference.GetElement() with
-        | :? IReferenceExpr as refExpr -> isNull refExpr.Qualifier
-        | :? IReferenceName as referenceName -> isNull referenceName.Qualifier
-        | _ -> false
+    let [<Literal>] opName = "FSharpImportTypeHelper.FindTypeCandidates"
 
     interface IImportTypeHelper with
         member x.FindTypeCandidates(reference, importTypeCacheFactory) =
-            if not (isAllowed reference) then Seq.empty else
+            let reference = reference.As<FSharpSymbolReference>()
+            if isNull reference || reference.IsQualified then Seq.empty else
 
-            let reference = reference :?> FSharpSymbolReference
-            if isNull reference then Seq.empty else
+            let context = reference.GetElement()
+            let names = reference.GetAllNames().ResultingList()
+            let factory = importTypeCacheFactory.Invoke(context)
 
-            let factory = importTypeCacheFactory.Invoke(reference.GetElement())
-
-            reference.GetAllNames().ResultingList()
+            names
             |> Seq.collect factory.Invoke
             |> Seq.filter (fun clrDeclaredElement -> clrDeclaredElement :? ITypeElement)
             |> Seq.cast
