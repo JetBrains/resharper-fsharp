@@ -16,6 +16,70 @@ open JetBrains.ReSharper.Psi.Tree
 
 [<ProjectFileType(typeof<FSharpProjectFileType>)>]
 type FSharpSelectEmbracingConstructProvider(settingsStore: ISettingsStore) =
+    static member ExtendNodeSelection(fsFile: IFSharpFile, node: ITreeNode): ISelectedRange =
+        match node with
+        | :? IFSharpIdentifier as identifier ->
+            let decl = QualifiableModuleLikeDeclarationNavigator.GetByIdentifier(identifier)
+            if isNotNull decl && isNotNull decl.QualifierReferenceName then
+                FSharpTreeRangeSelection(fsFile, decl.QualifierReferenceName, identifier) :> _ else
+
+            null
+
+        | :? IReferenceName as referenceName ->
+            let decl = QualifiableModuleLikeDeclarationNavigator.GetByQualifierReferenceName(referenceName)
+            if isNotNull decl && isNotNull decl.Identifier then
+                FSharpTreeRangeSelection(fsFile, referenceName, decl.Identifier) :> _ else
+
+            null
+
+        | :? ISynPat as synPat ->
+            let matchClause = MatchClauseNavigator.GetByPattern(synPat)
+            if isNotNull matchClause && isNotNull matchClause.WhenExpression then
+                FSharpTreeRangeSelection(fsFile, synPat, matchClause.WhenExpression) :> _ else
+
+            null
+
+        | :? ISynExpr as expr ->
+            let matchClause = MatchClauseNavigator.GetByWhenExpression(expr)
+            if isNotNull matchClause && isNotNull matchClause.Pattern then
+                FSharpTreeRangeSelection(fsFile, matchClause.Pattern, expr) :> _ else
+
+            let binding = BindingNavigator.GetByExpression(expr)
+            let letExpr = LetLikeExprNavigator.GetByBinding(binding)
+            if isNotNull letExpr && letExpr.Bindings.[0] == binding then
+                FSharpTreeRangeSelection(fsFile, letExpr.FirstChild, binding) :> _ else
+
+            null
+
+        | :? IBinding as binding ->
+            let letExpr = LetLikeExprNavigator.GetByBinding(binding)
+            if isNotNull letExpr && letExpr.Bindings.[0] == binding then
+                FSharpTreeRangeSelection(fsFile, letExpr.FirstChild, binding) :> _ else
+
+            null
+
+        | :? ITokenNode as token ->
+            let parent = token.Parent
+
+            let letExpr = parent.As<ILetLikeExpr>()
+            if isNotNull letExpr && letExpr.LetOrUseToken == token && letExpr.Bindings.Count > 0 then
+                FSharpTreeRangeSelection(fsFile, letExpr.FirstChild, letExpr.Bindings.[0]) :> _ else
+
+            let matchClause = parent.As<IMatchClause>()
+            if isNotNull matchClause && matchClause.WhenKeyword == token && isNotNull matchClause.WhenExpression then
+                FSharpTreeRangeSelection(fsFile, matchClause.Pattern, matchClause.WhenExpression) :> _ else
+
+            null
+
+        | _ -> null
+
+    static member FindBetterNode(fsFile, node: ITreeNode) =
+        let shouldTryFindBetterNode (node: ITreeNode) =
+            node :? IBinding
+
+        if not (shouldTryFindBetterNode node) then null else
+        FSharpSelectEmbracingConstructProvider.ExtendNodeSelection(fsFile, node)
+
     interface ISelectEmbracingConstructProvider with
         member x.IsAvailable(sourceFile) =
             sourceFile.LanguageType :? FSharpProjectFileType
@@ -65,17 +129,26 @@ and FSharpTreeNodeSelection(fsFile, node: ITreeNode) =
     inherit TreeNodeSelection<IFSharpFile>(fsFile, node)
 
     override x.Parent =
+        let extended = FSharpSelectEmbracingConstructProvider.ExtendNodeSelection(fsFile, node)
+        if isNotNull extended then extended else
+
         let parent = x.TreeNode.Parent
         if isNull parent then null else
+
+        let betterParent = FSharpSelectEmbracingConstructProvider.FindBetterNode(fsFile, parent)
+        if isNotNull betterParent then betterParent else
+
         FSharpTreeNodeSelection(fsFile, parent) :> _
 
     override x.ExtendToWholeLine = ExtendToTheWholeLinePolicy.DO_NOT_EXTEND
 
 
-and FSharpTreeRangeSelection(fsFile, first, last) =
+and FSharpTreeRangeSelection(fsFile, first: ITreeNode, last: ITreeNode) =
     inherit TreeRangeSelection<IFSharpFile>(fsFile, first, last)
 
-    override x.Parent = null
+    override x.Parent = FSharpTreeNodeSelection(fsFile, first.Parent) :> _
+
+    override x.ExtendToWholeLine = ExtendToTheWholeLinePolicy.DO_NOT_EXTEND
 
 
 and FSharpTokenPartSelection(fsFile, treeTextRange, token) =

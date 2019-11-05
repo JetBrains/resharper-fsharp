@@ -84,6 +84,8 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Lambda 23 - Attribute, Typed``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Match 01 - Simple``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Match 02 - Simple pat``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Match 03 - When Expr``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Do 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Do 02 - Let``() = x.DoNamedTest()

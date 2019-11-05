@@ -1,0 +1,3 @@
+do
+    {caret}let x = ()
+    ()
