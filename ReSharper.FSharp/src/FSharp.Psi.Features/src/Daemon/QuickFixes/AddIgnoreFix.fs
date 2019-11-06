@@ -10,10 +10,10 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.UI.RichText
 
-type AddIgnoreFix(warning: UnitTypeExpectedWarning) =
+type AddIgnoreFix(expr: ISynExpr) =
     inherit QuickFixBase()
 
-    let mutable expr = warning.Expr
+    let mutable expr = expr
 
     let shouldAddNewLine (expr: ISynExpr) =
         if expr.IsSingleLine then false else
@@ -37,6 +37,12 @@ type AddIgnoreFix(warning: UnitTypeExpectedWarning) =
             |> Option.map (fun clause -> clause.Expression, "First clause")
 
         | _ -> None
+
+    new (warning: UnitTypeExpectedWarning) =
+        AddIgnoreFix(warning.Expr)
+
+    new (error: UnitTypeExpectedError) =
+        AddIgnoreFix(error.Expr)
 
     override x.Text = "Ignore value"
     override x.IsAvailable _ = isValid expr

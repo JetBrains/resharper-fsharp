@@ -17,6 +17,7 @@ open JetBrains.Util
 module FSharpErrors =
     // https://github.com/fsharp/FSharp.Compiler.Service/blob/9.0.0/src/fsharp/CompileOps.fs#L246
     // https://github.com/fsharp/FSharp.Compiler.Service/blob/9.0.0/src/fsharp/FSComp.txt
+    let [<Literal>] TypeEquation = 1
     let [<Literal>] UnitTypeExpected = 20
     let [<Literal>] RuleNeverMatched = 26
     let [<Literal>] UndefinedName = 39
@@ -35,6 +36,7 @@ module FSharpErrors =
     let [<Literal>] UnusedThisVariable = 1183
 
     let [<Literal>] undefinedIndexerMessage = "The field, constructor or member 'Item' is not defined."
+    let [<Literal>] ifExprMissingElseBranch = "This 'if' expression is missing an 'else' branch."
 
 [<AbstractClass>]
 type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
@@ -61,6 +63,14 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
     let createHighlighting (error: FSharpErrorInfo) (range: DocumentRange): IHighlighting =
 
         match error.ErrorNumber with
+        | TypeEquation ->
+            if (error.Message.StartsWith(ifExprMissingElseBranch, StringComparison.Ordinal) &&
+                let indexer = fsFile.GetNode(range) in isNotNull indexer) then
+                UnitTypeExpectedError(fsFile.GetNode(range), error.Message) :> _
+
+            else
+                createGenericHighlighting error range 
+
         | UndefinedName ->
             if (error.Message = undefinedIndexerMessage &&
                     let indexer = fsFile.GetNode(range) in isNotNull indexer) then

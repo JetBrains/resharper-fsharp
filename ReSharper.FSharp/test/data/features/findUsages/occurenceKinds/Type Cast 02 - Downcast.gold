@@ -7,19 +7,19 @@ TO: [O] let |s2| = obj() :?> System.String RANGE: (48,50) @ Type Cast 02 - Downc
 New instance creation
 ---
 TO: [O] let s1 = |obj|() :?> string RANGE: (26,29) @ Type Cast 02 - Downcast.fs
-TO: [O] let s2 = |obj|() :?> System.String RANGE: (53,56) @ Type Cast 02 - Downcast.fs
-
-
-Other
----
 TO: [O] let s1 = |obj|() :?> string RANGE: (26,29) @ Type Cast 02 - Downcast.fs
 TO: [O] let s2 = |obj|() :?> System.String RANGE: (53,56) @ Type Cast 02 - Downcast.fs
-TO: [O] let s2 = obj() :?> |System|.String RANGE: (63,69) @ Type Cast 02 - Downcast.fs
+TO: [O] let s2 = |obj|() :?> System.String RANGE: (53,56) @ Type Cast 02 - Downcast.fs
 
 
 Type conversions
 ---
 TO: [O] let s1 = obj() :?> |string| RANGE: (36,42) @ Type Cast 02 - Downcast.fs
 TO: [O] let s2 = obj() :?> System.|String| RANGE: (70,76) @ Type Cast 02 - Downcast.fs
+
+
+Other
+---
+TO: [O] let s2 = obj() :?> |System|.String RANGE: (63,69) @ Type Cast 02 - Downcast.fs
 
 

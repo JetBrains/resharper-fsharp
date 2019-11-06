@@ -33,6 +33,8 @@ type AddIgnoreTest() =
     [<Test>] member x.``Inner expression - Try 01 - With``() = x.DoNamedTest()
     [<Test>] member x.``Inner expression - Try 02 - Finally``() = x.DoNamedTest()
 
+    [<Test>] member x.``Missing else branch 01``() = x.DoNamedTest()
+
     override x.DoTestOnTextControlAndExecuteWithGold(project, textControl, projectFile) =
         let occurrenceName = QuickFixTestBase.GetSetting(textControl, OccurrenceName)
         if isNotNull occurrenceName then
