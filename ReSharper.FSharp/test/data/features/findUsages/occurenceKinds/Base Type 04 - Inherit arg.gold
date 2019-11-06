@@ -8,7 +8,6 @@ Other
 TO: [O] type Base(s: |String|) = RANGE: (66,72) @ Base Type 04 - Inherit arg.fs
 TO: [O] inherit Module1.|Base|(String('a', 1)) RANGE: (165,169) @ Base Type 04 - Inherit arg.fs
 TO: [O] inherit |Module1|.Base(String('a', 1)) RANGE: (157,164) @ Base Type 04 - Inherit arg.fs
-TO: [O] inherit Module1.Base(|String|('a', 1)) RANGE: (170,176) @ Base Type 04 - Inherit arg.fs
 
 
 Base type
@@ -18,6 +17,7 @@ TO: [O] inherit Module1.|Base|(String('a', 1)) RANGE: (165,169) @ Base Type 04 -
 
 New instance creation
 ---
+TO: [O] inherit Module1.Base(|String|('a', 1)) RANGE: (170,176) @ Base Type 04 - Inherit arg.fs
 TO: [O] inherit Module1.Base(|String|('a', 1)) RANGE: (170,176) @ Base Type 04 - Inherit arg.fs
 
 

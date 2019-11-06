@@ -14,9 +14,3 @@ TO: [R] ar.|F| RANGE: (42,43) @ Read 02 - Anon record field.fs
 TO: [R] |ar|.F RANGE: (39,41) @ Read 02 - Anon record field.fs
 
 
-Other
----
-TO: [O] ar.|F| RANGE: (42,43) @ Read 02 - Anon record field.fs
-TO: [O] |ar|.F RANGE: (39,41) @ Read 02 - Anon record field.fs
-
-

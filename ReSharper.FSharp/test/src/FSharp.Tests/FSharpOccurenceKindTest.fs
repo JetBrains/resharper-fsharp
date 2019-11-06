@@ -13,6 +13,7 @@ type FSharpOccurenceKindTest() =
     [<Test>] member x.``Import 01``() = x.DoNamedTest()
 
     [<Test>] member x.``New instance 01``() = x.DoNamedTest()
+    [<Test>] member x.``New instance 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Unions 01``() = x.DoNamedTest()
 

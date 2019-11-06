@@ -34,6 +34,8 @@ type FSharpItemOccurenceKindProvider() =
             match referenceOccurrence.PrimaryReference with
             | :? TypeExtensionReference -> [| FSharpOccurrenceKinds.typeExtension |] :> _
 
+            | :? ReferenceExpressionTypeReference -> [| OccurrenceKind.NewInstanceCreation |] :> _
+
             | :? RecordCtorReference as recordCtorReference ->
                 match recordCtorReference.RecordExpr.CopyInfoExpression with
                 | null -> [| OccurrenceKind.NewInstanceCreation |] :> _

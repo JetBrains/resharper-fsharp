@@ -11,10 +11,6 @@ TO: [O] let |e| = Exn(123) RANGE: (45,46) @ Exception - Fields 01.fs
 New instance creation
 ---
 TO: [O] let e = |Exn|(123) RANGE: (49,52) @ Exception - Fields 01.fs
-
-
-Other
----
 TO: [O] let e = |Exn|(123) RANGE: (49,52) @ Exception - Fields 01.fs
 
 

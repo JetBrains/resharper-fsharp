@@ -20,13 +20,38 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     protected override void PreInit()
     {
       base.PreInit();
-      SymbolReference = new FSharpSymbolReference(this);
-      CtorTypeReference = new ReferenceExpressionTypeReference(this);
-      myReferences = new IReference[] {SymbolReference, CtorTypeReference};
+      SymbolReference = null;
+      CtorTypeReference = null;
+      myReferences = null;
     }
 
-    public override ReferenceCollection GetFirstClassReferences() =>
-      new ReferenceCollection(myReferences);
+    public override ReferenceCollection GetFirstClassReferences()
+    {
+      if (myReferences == null)
+      {
+        lock (this)
+        {
+          if (myReferences == null)
+          {
+            if (SymbolReference == null)
+              SymbolReference = new FSharpSymbolReference(this);
+
+            var appExpr = PrefixAppExprNavigator.GetByFunctionExpression(this.IgnoreParentParens());
+            if (appExpr == null)
+            {
+              myReferences = new IReference[] {SymbolReference};
+            }
+            else
+            {
+              CtorTypeReference = new ReferenceExpressionTypeReference(this);
+              myReferences = new IReference[] {SymbolReference, CtorTypeReference};
+            }
+          }
+        }
+      }
+
+      return new ReferenceCollection(myReferences);
+    }
 
     public string ShortName => Identifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
 
@@ -37,9 +62,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         : ShortName;
 
     public override IType Type() =>
-      SymbolReference.Resolve().DeclaredElement?.Type() ?? TypeFactory.CreateUnknownType(this);
+      Reference.Resolve().DeclaredElement?.Type() ?? TypeFactory.CreateUnknownType(this);
 
-    public FSharpSymbolReference Reference => SymbolReference;
+    public FSharpSymbolReference Reference
+    {
+      get
+      {
+        if (SymbolReference != null)
+          return SymbolReference;
+
+        lock (this)
+        {
+          if (SymbolReference == null)
+            SymbolReference = new FSharpSymbolReference(this);
+        }
+        return SymbolReference;
+      }
+    }
+
     public ITokenNode IdentifierToken => Identifier as ITokenNode;
 
     public IFSharpReferenceOwner SetName(string name) =>
