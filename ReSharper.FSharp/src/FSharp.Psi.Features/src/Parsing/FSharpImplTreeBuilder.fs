@@ -799,16 +799,16 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
 
         | SynExpr.NamedIndexedPropertySet(lid, expr1, expr2, _) ->
             x.PushRange(range, ElementType.SET_EXPR)
-            x.PushRange(unionRanges lid.Range expr2.Range, ElementType.NAMED_INDEXER_EXPR)
             x.PushExpression(expr2)
+            x.PushRange(unionRanges lid.Range expr1.Range, ElementType.NAMED_INDEXER_EXPR)
             x.ProcessLongIdentifierExpression(lid.Lid, lid.Range)
             x.PushRange(expr1.Range, ElementType.INDEXER_ARG)
             x.ProcessExpression(expr1)
 
         | SynExpr.DotNamedIndexedPropertySet(expr1, lid, expr2, expr3, _) ->
             x.PushRange(range, ElementType.SET_EXPR)
-            x.PushRange(unionRanges expr1.Range expr2.Range, ElementType.NAMED_INDEXER_EXPR)
             x.PushExpression(expr3)
+            x.PushRange(unionRanges expr1.Range expr2.Range, ElementType.NAMED_INDEXER_EXPR)
             x.PushNamedIndexerArgExpression(expr2)
             x.ProcessLongIdentifierAndQualifierExpression(expr1, lid)
 
