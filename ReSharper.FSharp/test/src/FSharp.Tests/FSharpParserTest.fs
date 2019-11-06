@@ -93,6 +93,8 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Expr - Assert 01 - Simple``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - LetOrUse 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Expr - TryWith 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - TryWith 02 - Parameters``() = x.DoNamedTest()
 
