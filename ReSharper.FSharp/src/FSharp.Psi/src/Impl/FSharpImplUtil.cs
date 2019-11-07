@@ -397,13 +397,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       foreach (var part in typeElement.EnumerateParts())
         switch (part)
         {
-          case IUnionPart unionPart:
-            if (unionPart.RepresentationAccessRights != AccessRights.PUBLIC)
+          case UnionCasePart casePart:
+            if (casePart.Parent is IUnionPart parent && parent.RepresentationAccessRights != AccessRights.PUBLIC)
               return AccessRights.INTERNAL;
             break;
 
-          case UnionCasePart casePart:
-            if (casePart.Parent is IUnionPart parent && parent.RepresentationAccessRights != AccessRights.PUBLIC)
+          case IRepresentationAccessRightsOwner accessRightsOwner:
+            if (accessRightsOwner.RepresentationAccessRights != AccessRights.PUBLIC)
               return AccessRights.INTERNAL;
             break;
         }

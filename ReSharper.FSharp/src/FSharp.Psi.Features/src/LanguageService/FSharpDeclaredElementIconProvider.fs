@@ -4,7 +4,7 @@ open System.Runtime.InteropServices
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2
@@ -17,15 +17,15 @@ type FSharpDeclaredElementIconProvider() =
     let mutableField = compose PsiSymbolsThemedIcons.Field.Id PsiSymbolsThemedIcons.ModifiersWrite.Id
 
     interface IDeclaredElementIconProvider with
-        member x.GetImageId(declaredElement, languageType, [<Out>] canApplyExtensions) =
+        member x.GetImageId(declaredElement, _, [<Out>] canApplyExtensions) =
             canApplyExtensions <- true
 
             match declaredElement with
             | :? IModule -> FSharpIcons.FSharpModule.Id
 
-            | :? IUnionCase as unionCase ->
+            | :? IRepresentationAccessRightsOwner as accessRightsOwner ->
                 canApplyExtensions <- false
-                match unionCase.RepresentationAccessRights with
+                match accessRightsOwner.RepresentationAccessRights with
                 | AccessRights.PRIVATE -> privateCase
                 | AccessRights.INTERNAL -> internalCase
                 | _ -> PsiSymbolsThemedIcons.EnumMember.Id

@@ -1,5 +1,6 @@
 ﻿using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -21,7 +22,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
   }
 
   /// Record field compiled to a property.
-  internal class FSharpRecordField : FSharpFieldProperty<RecordFieldDeclaration>
+  internal class FSharpRecordField : FSharpFieldProperty<RecordFieldDeclaration>, IRepresentationAccessRightsOwner
   {
     private readonly bool myIsMutable;
 
@@ -31,6 +32,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public override bool IsWritable =>
       myIsMutable || GetContainingType().IsCliMutableRecord();
+
+    public override AccessRights GetAccessRights() => GetContainingType().GetRepresentationAccessRights();
+    public AccessRights RepresentationAccessRights => GetContainingType().GetFSharpRepresentationAccessRights();
   }
 
   internal abstract class FSharpFieldProperty<T> : FSharpCompiledPropertyBase<T>, IFSharpFieldProperty

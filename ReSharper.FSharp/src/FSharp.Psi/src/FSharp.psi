@@ -825,7 +825,7 @@ recordDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extra
 
 recordRepresentation:
   LBRACE
-  accessModifier{ACCESS_MODIFIER, AccessModifiers}*
+  accessModifier{ACCESS_MODIFIER, AccessModifier}?
   recordFieldDeclaration<RECORD_FIELD, Fields>*
   RBRACE;
 

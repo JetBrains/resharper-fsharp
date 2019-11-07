@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
@@ -101,22 +100,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
         ? declaration.UnionCases
         : EmptyList<IUnionCaseDeclaration>.InstanceList;
 
-    private static AccessRights GetRepresentationAccessRights([NotNull] IUnionDeclaration declaration)
-    {
-      var representation = declaration.UnionRepresentation;
-      var modifier = representation.AccessModifier;
-      if (modifier != null)
-      {
-        var tokenNodeType = modifier.GetTokenType();
-        if (tokenNodeType == FSharpTokenType.PRIVATE)
-          return AccessRights.PRIVATE;
-        if (tokenNodeType == FSharpTokenType.INTERNAL)
-          return AccessRights.INTERNAL;
-      }
-
-      // todo: hidden by signature in fsi
-      return AccessRights.PUBLIC;
-    }
+    // todo: hidden by signature in fsi
+    private static AccessRights GetRepresentationAccessRights([NotNull] IUnionDeclaration declaration) =>
+      ModifiersUtil.GetAccessRights(declaration.UnionRepresentation.AccessModifier);
   }
 
   public interface IRepresentationAccessRightsOwner

@@ -94,5 +94,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
       return null;
     }
+
+    public static AccessRights GetAccessRights([CanBeNull] ITokenNode accessModifier)
+    {
+      var modifierTokenType = accessModifier?.GetTokenType();
+      if (modifierTokenType == FSharpTokenType.PRIVATE)
+        return AccessRights.PRIVATE;
+      if (modifierTokenType == FSharpTokenType.INTERNAL)
+        return AccessRights.INTERNAL;
+
+      return AccessRights.PUBLIC;
+    }
   }
 }

@@ -1,0 +1,13 @@
+﻿public class Class1
+{
+  public Class1()
+  {
+    var r = new Module.R(1);
+    var field = r.|Field|(0);
+  }
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Cannot access internal property 'Field' here
+M:Module.R.#ctor(System.Int32)
+P:Module.R.Field

@@ -10,7 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
   internal class RecordPart : RecordPartBase, Class.IClassPart
   {
-    public RecordPart([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
+    public RecordPart([NotNull] IRecordDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, cacheBuilder)
     {
     }
@@ -28,7 +28,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
   internal class StructRecordPart : RecordPartBase, Struct.IStructPart
   {
-    public StructRecordPart([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
+    public StructRecordPart([NotNull] IRecordDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, cacheBuilder)
     {
     }
@@ -54,18 +54,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   internal abstract class RecordPartBase : SimpleTypePartBase, IRecordPart, IGeneratedConstructorOwner
   {
     public bool CliMutable { get; }
+    public AccessRights RepresentationAccessRights { get; }
 
-    protected RecordPartBase([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
-      : base(declaration, cacheBuilder) =>
+    protected RecordPartBase([NotNull] IRecordDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)
+      : base(declaration, cacheBuilder)
+    {
       CliMutable = declaration.HasAttribute("CLIMutable");
+      RepresentationAccessRights = GetRepresentationAccessRights(declaration);
+    }
 
-    protected RecordPartBase(IReader reader) : base(reader) =>
+    protected RecordPartBase(IReader reader) : base(reader)
+    {
       CliMutable = reader.ReadBool();
+      RepresentationAccessRights = (AccessRights) reader.ReadByte();
+    }
 
     protected override void Write(IWriter writer)
     {
       base.Write(writer);
       writer.WriteBool(CliMutable);
+      writer.WriteByte((byte) RepresentationAccessRights);
     }
 
     public override MemberDecoration Modifiers
@@ -85,9 +93,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     public IParametersOwner GetConstructor() =>
       new FSharpGeneratedConstructorFromFields(this);
+    
+    private static AccessRights GetRepresentationAccessRights([NotNull] IRecordDeclaration declaration) =>
+      ModifiersUtil.GetAccessRights(declaration.RecordRepresentation.AccessModifier);
   }
 
-  public interface IRecordPart : IFieldsOwnerPart
+  public interface IRecordPart : IFieldsOwnerPart, IRepresentationAccessRightsOwner
   {
     bool CliMutable { get; }
   }
