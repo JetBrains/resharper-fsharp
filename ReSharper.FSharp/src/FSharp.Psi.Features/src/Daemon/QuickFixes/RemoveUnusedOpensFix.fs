@@ -5,8 +5,7 @@ open JetBrains.ReSharper.Feature.Services.Intentions.Scoped.Actions
 open JetBrains.ReSharper.Feature.Services.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
-open JetBrains.ReSharper.Psi.ExtensionsAPI
-open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
 
 type RemoveUnusedOpensFix(warning: UnusedOpenWarning) =
@@ -31,19 +30,12 @@ type RemoveUnusedOpensFix(warning: UnusedOpenWarning) =
 
                 let openStatement = warning.OpenStatement
 
-                let mutable first = openStatement :> ITreeNode
-                while isNotNull first.PrevSibling && first.PrevSibling.GetTokenType() == FSharpTokenType.WHITESPACE do
-                    first <- first.PrevSibling
-
-                let mutable last = openStatement :> ITreeNode
-                while isNotNull last.NextSibling &&
-                        let tokenType = last.NextSibling.GetTokenType()
-                        tokenType == FSharpTokenType.WHITESPACE || tokenType == FSharpTokenType.SEMICOLON do
-                    last <- last.NextSibling
-
-                if isNotNull last.NextSibling && last.NextSibling.GetTokenType() == FSharpTokenType.NEW_LINE then
-                    last <- last.NextSibling
-
-                LowLevelModificationUtil.DeleteChildRange(first, last)
+                let first = skipTokensOfTypeBefore FSharpTokenType.WHITESPACE openStatement
+                let last =
+                    openStatement
+                    |> skipSemicolonsAndWhiteSpacesAfter
+                    |> skipOneTokenOfTypeAfter FSharpTokenType.NEW_LINE
+                    
+                deleteChildRange first last
 
             null

@@ -227,6 +227,17 @@ let rec skipPreviousWhitespaceBeforeNode node =
         else
             node
     skip false node
+    
+    
+let rec skipSemicolonsAndWhiteSpacesAfter node =
+    let nextSibling = getNextSibling node
+    let tokenType = getTokenType nextSibling
+    if tokenType == FSharpTokenType.WHITESPACE ||
+       tokenType == FSharpTokenType.SEMICOLON  ||
+       tokenType == FSharpTokenType.SEMICOLON_SEMICOLON then
+           skipSemicolonsAndWhiteSpacesAfter nextSibling
+    else
+        node
 
 
 [<AutoOpen>]
