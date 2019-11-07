@@ -11,7 +11,7 @@ let (|>->|(15)) = () in (|>->|(16))
 let (|>>.~|(17)) = () in (|>>.~|(18))
 
 ---------------------------------------------------------
-(0): ReSharper Static Class Identifier: 
+(0): ReSharper C# Static Class Identifier: 
 (1): ReSharper Operator Identifier: 
 (2): ReSharper Operator Identifier: 
 (3): ReSharper Operator Identifier: 

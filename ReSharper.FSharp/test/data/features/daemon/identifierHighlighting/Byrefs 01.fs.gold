@@ -4,7 +4,7 @@ let |hello|(1) (|name|(2): |byref|(3)<|string|(4)>) (|other|(5): |inref|(6)<|int
     ()
 
 ---------------------------------------------------------
-(0): ReSharper Static Class Identifier: 
+(0): ReSharper C# Static Class Identifier: 
 (1): ReSharper Local Variable Identifier: 
 (2): ReSharper Mutable Local Variable Identifier: 
 (3): ReSharper Class Identifier: 

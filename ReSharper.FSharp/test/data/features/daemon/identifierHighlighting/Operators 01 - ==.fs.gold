@@ -27,32 +27,32 @@ module |ModuleQualifier|(22) =
     let _ = |Op|(27).|``op_EqualsEquals``|(28)
 
 ---------------------------------------------------------
-(0): ReSharper Static Class Identifier: 
-(1): ReSharper Static Class Identifier: 
+(0): ReSharper C# Static Class Identifier: 
+(1): ReSharper C# Static Class Identifier: 
 (2): ReSharper Operator Identifier: 
 (3): ReSharper Operator Identifier: 
-(4): ReSharper Static Class Identifier: 
+(4): ReSharper C# Static Class Identifier: 
 (5): ReSharper Operator Identifier: 
 (6): ReSharper Operator Identifier: 
 (7): ReSharper Operator Identifier: 
-(8): ReSharper Static Class Identifier: 
+(8): ReSharper C# Static Class Identifier: 
 (9): ReSharper Operator Identifier: 
 (10): ReSharper Local Variable Identifier: 
 (11): ReSharper Local Variable Identifier: 
 (12): ReSharper Operator Identifier: 
 (13): ReSharper Operator Identifier: 
 (14): ReSharper Operator Identifier: 
-(15): ReSharper Static Class Identifier: 
+(15): ReSharper C# Static Class Identifier: 
 (16): ReSharper Operator Identifier: 
 (17): ReSharper Local Variable Identifier: 
 (18): ReSharper Local Variable Identifier: 
 (19): ReSharper Operator Identifier: 
 (20): ReSharper Operator Identifier: 
 (21): ReSharper Operator Identifier: 
-(22): ReSharper Static Class Identifier: 
-(23): ReSharper Static Class Identifier: 
+(22): ReSharper C# Static Class Identifier: 
+(23): ReSharper C# Static Class Identifier: 
 (24): ReSharper Operator Identifier: 
-(25): ReSharper Static Class Identifier: 
+(25): ReSharper C# Static Class Identifier: 
 (26): ReSharper Operator Identifier: 
-(27): ReSharper Static Class Identifier: 
+(27): ReSharper C# Static Class Identifier: 
 (28): ReSharper Operator Identifier: 
