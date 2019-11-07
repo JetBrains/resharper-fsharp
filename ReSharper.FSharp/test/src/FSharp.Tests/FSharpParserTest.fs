@@ -143,6 +143,8 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Expr - ObjExpr 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - ImplicitZero 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Expr - LetOrUseBang 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Binding - Return type 01``() = x.DoNamedTest()
