@@ -73,31 +73,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
         let elementType =
             match typeSig with
             | SynTypeDefnSigRepr.Simple(simpleRepr, _) ->
-                match simpleRepr with
-                | SynTypeDefnSimpleRepr.Record(_, fields, _) ->
-                    for field in fields do
-                        x.ProcessField field ElementType.RECORD_FIELD_DECLARATION
-                    ElementType.RECORD_DECLARATION
-
-                | SynTypeDefnSimpleRepr.Enum(enumCases, _) ->
-                    for case in enumCases do
-                        x.ProcessEnumCase(case)
-                    ElementType.ENUM_DECLARATION
-
-                | SynTypeDefnSimpleRepr.Union(_, cases, range) ->
-                    x.ProcessUnionCases(cases, range)
-                    ElementType.UNION_DECLARATION
-
-                | SynTypeDefnSimpleRepr.TypeAbbrev _ ->
-                    ElementType.TYPE_ABBREVIATION_DECLARATION
-
-                | SynTypeDefnSimpleRepr.None _ when not memberSigs.IsEmpty ->
-                    ElementType.TYPE_EXTENSION_DECLARATION
-
-                | SynTypeDefnSimpleRepr.None _ ->
-                    ElementType.ABSTRACT_TYPE_DECLARATION
-
-                | _ -> ElementType.OTHER_SIMPLE_TYPE_DECLARATION
+                x.ProcessSimpleTypeRepresentation(simpleRepr)
 
             | SynTypeDefnSigRepr.Exception _ ->
                 ElementType.EXCEPTION_DECLARATION

@@ -136,29 +136,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         let elementType =
             match repr with
             | SynTypeDefnRepr.Simple(simpleRepr, _) ->
-                match simpleRepr with
-                | SynTypeDefnSimpleRepr.Record(_, fields, _) ->
-                    for field in fields do
-                        x.ProcessField field ElementType.RECORD_FIELD_DECLARATION
-                    ElementType.RECORD_DECLARATION
-
-                | SynTypeDefnSimpleRepr.Enum(enumCases, _) ->
-                    for case in enumCases do
-                        x.ProcessEnumCase case
-                    ElementType.ENUM_DECLARATION
-
-                | SynTypeDefnSimpleRepr.Union(_, cases, range) ->
-                    x.ProcessUnionCases(cases, range)
-                    ElementType.UNION_DECLARATION
-
-                | SynTypeDefnSimpleRepr.TypeAbbrev(_, synType, _) ->
-                    x.ProcessType(synType)
-                    ElementType.TYPE_ABBREVIATION_DECLARATION
-
-                | SynTypeDefnSimpleRepr.None _ ->
-                    ElementType.ABSTRACT_TYPE_DECLARATION
-
-                | _ -> ElementType.OTHER_SIMPLE_TYPE_DECLARATION
+                x.ProcessSimpleTypeRepresentation(simpleRepr)
 
             | SynTypeDefnRepr.Exception _ ->
                 // This is compiler-internal union case with instances created inside type checker only.

@@ -288,11 +288,35 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
         | UnionCaseFullType(_) ->
             true // todo: used in FSharp.Core only, otherwise warning
 
-    member x.ProcessUnionCases(cases, range: range) =
-        let casesListMark = x.Mark(range)
-        for case in cases do
-            x.ProcessUnionCase(case)
-        x.Done(range, casesListMark, ElementType.UNION_CASES_LIST)
+    member x.ProcessSimpleTypeRepresentation(repr) =
+        match repr with
+        | SynTypeDefnSimpleRepr.Record(_, fields, range) ->
+            let mark = x.Mark(range)
+            for field in fields do
+                x.ProcessField field ElementType.RECORD_FIELD_DECLARATION
+            x.Done(range, mark, ElementType.RECORD_REPRESENTATION)
+            ElementType.RECORD_DECLARATION
+
+        | SynTypeDefnSimpleRepr.Enum(enumCases, _) ->
+            for case in enumCases do
+                x.ProcessEnumCase case
+            ElementType.ENUM_DECLARATION
+
+        | SynTypeDefnSimpleRepr.Union(_, cases, range) ->
+            let casesListMark = x.Mark(range)
+            for case in cases do
+                x.ProcessUnionCase(case)
+            x.Done(range, casesListMark, ElementType.UNION_REPRESENTATION)
+            ElementType.UNION_DECLARATION
+
+        | SynTypeDefnSimpleRepr.TypeAbbrev(_, synType, _) ->
+            x.ProcessType(synType)
+            ElementType.TYPE_ABBREVIATION_DECLARATION
+
+        | SynTypeDefnSimpleRepr.None _ ->
+            ElementType.ABSTRACT_TYPE_DECLARATION
+
+        | _ -> ElementType.OTHER_SIMPLE_TYPE_DECLARATION
 
     member x.ProcessUnionCase(UnionCase(attrs, _, caseType, _, _, range)) =
         let mark = x.MarkTokenOrRange(FSharpTokenType.BAR, range)

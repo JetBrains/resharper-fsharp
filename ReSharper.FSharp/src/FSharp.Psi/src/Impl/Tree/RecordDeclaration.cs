@@ -2,6 +2,8 @@
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
@@ -25,5 +27,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       FSharpImplUtil.GetTypeKind(AttributesEnumerable, out var typeKind)
         ? typeKind
         : PartKind.Class;
+
+    public override IReadOnlyList<ITypeMemberDeclaration> MemberDeclarations =>
+      base.MemberDeclarations.Prepend(Fields).AsIReadOnlyList();
   }
 }

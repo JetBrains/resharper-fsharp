@@ -814,14 +814,20 @@ enumMemberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"
 recordDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<recordDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
   get { methodName="Attributes" path=<recordDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+  get { methodName="Fields" path=<recordDeclaration:RECORD_REPR/recordRepresentation:RECORD_FIELD> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifiers}*
   IDENTIFIER<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
-  recordFieldDeclaration<RECORD_FIELD, Fields>*
+  recordRepresentation<RECORD_REPR, RecordRepresentation>
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
 
+recordRepresentation:
+  LBRACE
+  accessModifier{ACCESS_MODIFIER, AccessModifiers}*
+  recordFieldDeclaration<RECORD_FIELD, Fields>*
+  RBRACE;
 
 recordFieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
   get { methodName="Attributes" path=<recordFieldDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
@@ -836,20 +842,20 @@ recordFieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase
 
 // Discriminated unions
 
-unionCasesList:
-  accessModifier{ACCESS_MODIFIER, Modifier}?
+unionRepresentation:
+  accessModifier{ACCESS_MODIFIER, AccessModifier}?
   unionCaseDeclaration<UNION_CASE, UnionCases>*;
 
 unionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<unionDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
-  get { methodName="UnionCases" path=<unionDeclaration:UNION_CASES_LIST/unionCasesList:UNION_CASE> };
+  get { methodName="UnionCases" path=<unionDeclaration:UNION_REPR/unionRepresentation:UNION_CASE> };
   get { methodName="Attributes" path=<unionDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifiers}*
   IDENTIFIER<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
-  unionCasesList<UNION_CASES_LIST, UnionCasesList>
+  unionRepresentation<UNION_REPR, UnionRepresentation>
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
 
 

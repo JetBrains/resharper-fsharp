@@ -103,8 +103,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
     private static AccessRights GetRepresentationAccessRights([NotNull] IUnionDeclaration declaration)
     {
-      var casesList = declaration.UnionCasesList;
-      var modifier = casesList.Modifier;
+      var representation = declaration.UnionRepresentation;
+      var modifier = representation.AccessModifier;
       if (modifier != null)
       {
         var tokenNodeType = modifier.GetTokenType();
