@@ -1,7 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open JetBrains.ReSharper.FeaturesTestFramework.Completion
-open JetBrains.ReSharper.Plugins.FSharp.Checker.Settings
+open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
