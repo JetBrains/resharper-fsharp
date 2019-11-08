@@ -14,16 +14,17 @@ IFSharpSigFile
       FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
       NewLine(type:NEW_LINE, text:\n) spaces:"\n"
       Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-      FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
-      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-      IRecordFieldDeclaration
-        FSharpIdentifierToken(type:IDENTIFIER, text:Field)
-        FSharpTokenType+ColonTokenElement(type:COLON, text::)
+      IRecordRepresentation
+        FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-        INamedType
-          ITypeReferenceName
-            FSharpIdentifierToken(type:IDENTIFIER, text:int)
-      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-      FSharpTokenType+RbraceTokenElement(type:RBRACE, text:})
+        IRecordFieldDeclaration
+          FSharpIdentifierToken(type:IDENTIFIER, text:Field)
+          FSharpTokenType+ColonTokenElement(type:COLON, text::)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          INamedType
+            ITypeReferenceName
+              FSharpIdentifierToken(type:IDENTIFIER, text:int)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpTokenType+RbraceTokenElement(type:RBRACE, text:})
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 
