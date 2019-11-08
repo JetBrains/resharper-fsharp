@@ -1,0 +1,7 @@
+// ${COMPLETE_ITEM:Task (in System.Threading.Tasks)}
+namespace SomeNamespace
+
+open System
+open System.Threading.Tasks
+
+Task{caret}
