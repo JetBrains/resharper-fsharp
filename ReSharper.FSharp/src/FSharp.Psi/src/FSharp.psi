@@ -140,11 +140,7 @@ letModuleDecl options { stubBase="DummyDeclaration"; } extras {
   letOrUse{LET, LetOrUseToken}
   INLINE<INLINE, InlineKeyword>?
   REC<REC, RecKeyword>?
-  binding<BINDING, Bindings>
-  (
-    AND<AND, Separators>
-    binding<BINDING, Bindings>
-  )*;
+  LIST binding<BINDING, Bindings> SEP AND<AND, Separators>;
 
 
 interface let:
@@ -424,11 +420,7 @@ namedIndexerExpr options { stubBase="FSharpExpressionBase"; } extras {
 
 indexerArgList:
   LBRACK
-  synExpr<INDEXER_ARG, IndexerArgs>
-    (
-      COMMA
-      synExpr<INDEXER_ARG, IndexerArgs>
-    )*
+  LIST synExpr<INDEXER_ARG, IndexerArgs> SEP COMMA<COMMA, Commas>
   RBRACK;
 
 indexerArg:
@@ -609,11 +601,7 @@ infixAppExpr options { stubBase="FSharpExpressionBase"; }:
 letOrUseExpr options { stubBase="FSharpExpressionBase"; }:
   letOrUse{LET, LetOrUseToken}
   REC<REC, RecKeyword>?
-  binding<BINDING, Bindings>
-  (
-    AND<AND, Separators>
-    binding<BINDING, Bindings>
-  )*
+  LIST binding<BINDING, Bindings> SEP AND<AND, Separators>  
   IN<IN, InKeyword>?
   synExpr<IN_EXPR, InExpression>;
 
@@ -638,11 +626,7 @@ lazyExpr options { stubBase="FSharpExpressionBase"; }:
   synExpr<EXPR, Expression>;
 
 sequentialExpr options { stubBase="FSharpExpressionBase"; }:
-  synExpr<EXPR, Expressions>
-  (
-    SEMICOLON<SEMI, Separator>?
-    synExpr<EXPR, Expressions>
-  )*;
+  LIST synExpr<EXPR, Expressions> SEP SEMICOLON<SEMI, Separators>;
 
 ifThenElseExpr options { stubBase="FSharpExpressionBase"; }:
   IF<IF, IfKeyword>
@@ -1302,7 +1286,7 @@ private accessModifier{ROLE,Getter}:
 
 attributeList:
   LBRACK<LBRACK, LBrack>
-  attribute<ATTRIBUTE, Attributes>*
+  LIST attribute<ATTRIBUTE, Attributes> SEP SEMICOLON<SEMI, Separators>
   RBRACK<RBRACK, RBrack>;
 
 attribute options { stubBase="TypeReferenceOwnerBase"; } extras {
