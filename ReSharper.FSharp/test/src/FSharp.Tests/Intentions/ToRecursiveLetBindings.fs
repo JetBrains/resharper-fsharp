@@ -3,8 +3,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open NUnit.Framework
 
-type ToRecursiveLetBindingsExecuteTest() =
-    inherit FSharpContextActionExecuteTestBase<ToRecursiveLetBindings>()
+type ToRecursiveLetBindingsActionExecuteTest() =
+    inherit FSharpContextActionExecuteTestBase<ToRecursiveLetBindingsAction>()
 
     override x.ExtraPath = "toRecursiveLetBindings"
 
@@ -16,8 +16,8 @@ type ToRecursiveLetBindingsExecuteTest() =
     [<Test>] member x.``Expression - Simple 01``() = x.DoNamedTest()
     [<Test>] member x.``Expression - Next line 01``() = x.DoNamedTest()
 
-type ToRecursiveLetBindingsAvailabilityTest() =
-    inherit FSharpContextActionAvailabilityTestBase<ToRecursiveLetBindings>()
+type ToRecursiveLetBindingsActionAvailabilityTest() =
+    inherit FSharpContextActionAvailabilityTestBase<ToRecursiveLetBindingsAction>()
 
     override x.ExtraPath = "toRecursiveLetBindings"
 

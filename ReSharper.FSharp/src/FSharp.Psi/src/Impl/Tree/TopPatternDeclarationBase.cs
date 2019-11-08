@@ -67,9 +67,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         : new ModuleFunction(this, mfv);
     }
 
-    public TreeNodeCollection<IFSharpAttribute> Attributes =>
+    public TreeNodeCollection<IAttribute> Attributes =>
       GetBinding()?.AllAttributes ??
-      TreeNodeCollection<IFSharpAttribute>.Empty;
+      TreeNodeCollection<IAttribute>.Empty;
 
     [CanBeNull]
     protected IBinding GetBinding()
@@ -100,6 +100,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public virtual IEnumerable<IDeclaration> Declarations =>
       EmptyList<IDeclaration>.Instance;
     
-    public TreeNodeCollection<IFSharpAttribute> Attributes => TreeNodeCollection<IFSharpAttribute>.Empty;
+    public TreeNodeCollection<IAttribute> Attributes => TreeNodeCollection<IAttribute>.Empty;
   }
 }

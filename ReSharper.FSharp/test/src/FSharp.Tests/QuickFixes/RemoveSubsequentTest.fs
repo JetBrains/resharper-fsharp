@@ -12,3 +12,10 @@ type RemoveSubsequentTest() =
     override x.RelativeTestDataPath = "features/quickFixes/removeSubsequent"
 
     [<Test>] member x.``Simple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Simple 02 - Multiple subsequent``() = x.DoNamedTest()
+    [<Test>] member x.``Simple 03 - Not the first``() = x.DoNamedTest()
+    [<Test>] member x.``Simple 04 - Comment``() = x.DoNamedTest()
+    [<Test>] member x.``Simple 05 - Comment``() = x.DoNamedTest()
+    [<Test>] member x.``Simple 06 - Single line``() = x.DoNamedTest()
+    [<Test>] member x.``Simple 07 - Semicolon``() = x.DoNamedTest()
+    [<Test>] member x.``Simple 08 - Semicolon``() = x.DoNamedTest()

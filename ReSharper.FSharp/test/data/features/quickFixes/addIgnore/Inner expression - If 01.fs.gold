@@ -1,0 +1,7 @@
+﻿//${OCCURRENCE:Then branch}
+module Module
+
+if true then
+    "hello" |> ignore
+else (){caret}
+

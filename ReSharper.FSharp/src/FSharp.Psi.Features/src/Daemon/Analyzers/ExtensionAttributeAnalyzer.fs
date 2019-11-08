@@ -18,7 +18,7 @@ type ExtensionAttributeAnalyzer() =
         typeElement.EnumerateParts()
         |> Seq.exists (fun p -> p.ExtensionMethodInfos.Length > 0)
 
-    let isExtension (attr: IFSharpAttribute) =
+    let isExtension (attr: IAttribute) =
         let reference = attr.Reference
         if isNull reference then false else
 

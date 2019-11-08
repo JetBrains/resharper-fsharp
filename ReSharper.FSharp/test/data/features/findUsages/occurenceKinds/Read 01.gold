@@ -8,8 +8,3 @@ Read access
 TO: [R] |foo| RANGE: (32,35) @ Read 01.fs
 
 
-Other
----
-TO: [O] |foo| RANGE: (32,35) @ Read 01.fs
-
-

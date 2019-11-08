@@ -1,0 +1,6 @@
+// ${CHAR:Enter} 
+module Module
+
+[<AbstractClass; {caret} Sealed>] 
+type T =
+    class end 

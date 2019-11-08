@@ -1,0 +1,17 @@
+﻿module |Module|(0)
+
+let |hello|(1) (|name|(2): |byref|(3)<|string|(4)>) (|other|(5): |inref|(6)<|int|(7)>) (|another|(8): |outref|(9)<|int|(10)>) =
+    ()
+
+---------------------------------------------------------
+(0): ReSharper C# Static Class Identifier: 
+(1): ReSharper Local Variable Identifier: 
+(2): ReSharper Mutable Local Variable Identifier: 
+(3): ReSharper Class Identifier: 
+(4): ReSharper Class Identifier: 
+(5): ReSharper Mutable Local Variable Identifier: 
+(6): ReSharper Class Identifier: 
+(7): ReSharper Class Identifier: 
+(8): ReSharper Mutable Local Variable Identifier: 
+(9): ReSharper Class Identifier: 
+(10): ReSharper Class Identifier: 

@@ -16,9 +16,9 @@ IFSharpImplFile
                 IConstExpr
                   FSharpToken(type:INT32, text:1)
                 FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+LarrowTokenElement(type:LARROW, text:<-)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IConstExpr
-              FSharpString(type:CHARACTER_LITERAL, text:'c')
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+LarrowTokenElement(type:LARROW, text:<-)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IConstExpr
+            FSharpString(type:CHARACTER_LITERAL, text:'c')
 

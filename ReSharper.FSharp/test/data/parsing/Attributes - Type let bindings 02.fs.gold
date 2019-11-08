@@ -4,33 +4,33 @@ IFSharpImplFile
     FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
     Whitespace(type:WHITE_SPACE, text: ) spaces:" "
     IObjectTypeDeclaration
-      IAccessModifiers
       FSharpIdentifierToken(type:IDENTIFIER, text:T)
       IImplicitConstructorDeclaration
-      FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-      FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+        IMemberParamDeclarationGroup
+          FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+          FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "
       FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
       NewLine(type:NEW_LINE, text:\n) spaces:"\n"
       Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
       ILetModuleDecl
-        FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
-        IFSharpAttribute
-          ITypeReferenceName
-            FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
-        FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
+        IAttributeList
+          FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
+          IAttribute
+            ITypeReferenceName
+              FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
+          FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"
         Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
         FSharpTokenType+LetTokenElement(type:LET, text:let)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-        FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
-        IFSharpAttribute
-          ITypeReferenceName
-            FSharpIdentifierToken(type:IDENTIFIER, text:Bar)
         ITopBinding
-          IFSharpAttribute
-            ITypeReferenceName
-          FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
+          IAttributeList
+            FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
+            IAttribute
+              ITypeReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:Bar)
+            FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           ITopReferencePat
             IExpressionReferenceName

@@ -20,6 +20,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     public bool IsAnonymous =>
       this.GetPart<IModulePart>() is var part && part != null && part.IsAnonymous;
 
+    public bool IsAutoOpen =>
+      this.GetPart<IModulePart>() is var part && part != null && part.IsAutoOpen;
+
     protected override bool AcceptsPart(TypePart part) =>
       part is IModulePart;
 

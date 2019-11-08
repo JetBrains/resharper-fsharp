@@ -32,8 +32,9 @@ type FSharpItemOccurenceKindProvider() =
             | referenceOccurrence ->
 
             match referenceOccurrence.PrimaryReference with
-            | :? AttributeTypeReference -> [| OccurrenceKind.Attribute |] :> _
             | :? TypeExtensionReference -> [| FSharpOccurrenceKinds.typeExtension |] :> _
+
+            | :? ReferenceExpressionTypeReference -> [| OccurrenceKind.NewInstanceCreation |] :> _
 
             | :? RecordCtorReference as recordCtorReference ->
                 match recordCtorReference.RecordExpr.CopyInfoExpression with
@@ -48,6 +49,9 @@ type FSharpItemOccurenceKindProvider() =
 
             match symbolReference.GetElement() with
             | :? ITypeReferenceName as typeReferenceName ->
+                if isNotNull (AttributeNavigator.GetByReferenceName(typeReferenceName)) then
+                    [| OccurrenceKind.Attribute |] :> _ else
+
                 if isNotNull (InheritMemberNavigator.GetByTypeName(typeReferenceName)) ||
                    isNotNull (InterfaceImplementationNavigator.GetByTypeName(typeReferenceName)) ||
                    isNotNull (ObjExprNavigator.GetByTypeName(typeReferenceName)) then
@@ -94,6 +98,9 @@ type FSharpItemOccurenceKindProvider() =
                    isNotNull (ParametersOwnerPatNavigator.GetByReferenceName(referenceName)) ||
                    isNotNull (FieldPatNavigator.GetByReferenceName(referenceName)) then
                     [| FSharpOccurrenceKinds.pattern |] :> _ else
+
+                if isNotNull (AnonRecordFieldNavigator.GetByReferenceName(referenceName)) then
+                   [| OccurrenceKind.FieldTypeDeclaration |] :> _ else
 
                 EmptyList.Instance :> _
 

@@ -7,7 +7,7 @@ match true with
 | |C|(8) -> ()
 
 ---------------------------------------------------------
-(0): ReSharper Static Class Identifier: 
+(0): ReSharper C# Static Class Identifier: 
 (1): ReSharper Method Identifier: 
 (2): ReSharper Method Identifier: 
 (3): ReSharper Local Variable Identifier: 

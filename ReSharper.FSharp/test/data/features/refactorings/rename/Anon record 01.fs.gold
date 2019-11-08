@@ -1,0 +1,5 @@
+﻿module Module
+
+type AR = {| zzz: int |}
+let ar = {| zzz = 123 |}
+ar.zzz

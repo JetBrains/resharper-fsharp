@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.PostfixTemplates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates.Contexts
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
@@ -38,4 +39,10 @@ and NotPostfixTemplateBehavior(info) =
             let refExpr = x.GetExpression(context)
 
             let appExpr = elementFactory.CreateAppExpr("not", refExpr)
-            ModificationUtil.ReplaceChild(refExpr, appExpr) :> ITreeNode)
+            let appExpr = ModificationUtil.ReplaceChild(refExpr, appExpr)
+
+            let expr = appExpr.ArgumentExpression
+            if not (needsParens expr) then appExpr :> ITreeNode else
+
+            addParens expr |> ignore
+            appExpr :> ITreeNode)

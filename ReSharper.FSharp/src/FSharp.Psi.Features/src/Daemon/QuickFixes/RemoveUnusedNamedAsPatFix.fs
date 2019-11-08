@@ -11,7 +11,7 @@ type RemoveUnusedNamedAsPatFix(warning: UnusedValueWarning) =
 
     let pat = warning.Pat.As<IAsPat>()
 
-    override x.Text = "Remove unused pattern"
+    override x.Text = "Remove unused 'as' pattern"
 
     override x.IsAvailable _ =
         isValid pat && isNotNull pat.Pattern

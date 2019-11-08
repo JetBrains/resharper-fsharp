@@ -11,13 +11,22 @@ type SynBinding with
         headPat.Range.Start
 
 type SynMemberDefn with
-    member x.Attributes =
+    member x.OuterAttributes =
         match x with
-        | SynMemberDefn.LetBindings(Binding(_,_,_,_,attrs,_,_,_,_,_,_,_) :: _, _, _, _)
-        | SynMemberDefn.Member(Binding(_,_,_,_,attrs,_,_,_,_,_,_,_),_)
-        | SynMemberDefn.AbstractSlot(ValSpfn(attrs,_,_,_,_,_,_,_,_,_,_),_,_)
-        | SynMemberDefn.AutoProperty(attrs,_,_,_,_,_,_,_,_,_,_)
-        | SynMemberDefn.ValField(Field(attrs,_,_,_,_,_,_,_),_) -> attrs
+        | SynMemberDefn.Member(Binding(_, _, _, _, attrs, _, _, _, _, _, _, _), _)
+        | SynMemberDefn.AbstractSlot(ValSpfn(attrs, _, _, _, _, _, _, _, _, _, _), _, _)
+        | SynMemberDefn.AutoProperty(attrs, _, _, _, _, _, _, _, _, _, _)
+        | SynMemberDefn.ValField(Field(attrs, _, _, _, _, _, _, _), _) -> attrs
+
+        | SynMemberDefn.LetBindings(Binding(_, _, _, _,attrs, _, _, _, _, _, _, _) :: _, _, _, range) ->
+            match attrs with
+            | [] -> []
+            | head :: _ ->
+
+            let letStart = range.Start
+            if posGeq head.Range.Start letStart then attrs else  
+            attrs |> List.takeWhile (fun attrList -> posLt attrList.Range.Start letStart)
+
         | _ -> []
 
 type SynSimplePats with

@@ -8,12 +8,6 @@ Write access
 TO: [W] (|aaa|) <- aaa + 1 RANGE: (41,44) @ Write - Expr 02 - Paren.fs
 
 
-Other
----
-TO: [O] (|aaa|) <- aaa + 1 RANGE: (41,44) @ Write - Expr 02 - Paren.fs
-TO: [O] (aaa) <- |aaa| + 1 RANGE: (49,52) @ Write - Expr 02 - Paren.fs
-
-
 Read access
 ---
 TO: [R] (aaa) <- |aaa| + 1 RANGE: (49,52) @ Write - Expr 02 - Paren.fs

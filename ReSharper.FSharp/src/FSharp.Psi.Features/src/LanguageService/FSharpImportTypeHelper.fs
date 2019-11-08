@@ -3,29 +3,30 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 open JetBrains.Application.Threading
 open JetBrains.ReSharper.Intentions.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpImportTypeHelper() =
+    let [<Literal>] opName = "FSharpImportTypeHelper.FindTypeCandidates"
+
     interface IImportTypeHelper with
         member x.FindTypeCandidates(reference, importTypeCacheFactory) =
             let reference = reference.As<FSharpSymbolReference>()
-            if isNull reference then Seq.empty else
+            if isNull reference || reference.IsQualified then Seq.empty else
 
-            let refExpr = reference.GetElement().As<IReferenceExpr>()
-            if isNull refExpr then Seq.empty else
+            let context = reference.GetElement()
+            let names = reference.GetAllNames().ResultingList()
+            let factory = importTypeCacheFactory.Invoke(context)
 
-            if isNotNull refExpr.Qualifier then Seq.empty else
-
-            importTypeCacheFactory.Invoke(reference.GetElement()).Invoke(reference.GetName())
+            names
+            |> Seq.collect factory.Invoke
             |> Seq.filter (fun clrDeclaredElement -> clrDeclaredElement :? ITypeElement)
             |> Seq.cast
 
-        member x.ReferenceTargetCanBeType(reference) = true
-        member x.ReferenceTargetIsUnlikelyBeType(reference) = false
+        member x.ReferenceTargetCanBeType _ = true
+        member x.ReferenceTargetIsUnlikelyBeType _ = false
 
 
 [<Language(typeof<FSharpLanguage>)>]
@@ -47,7 +48,7 @@ type FSharpQuickFixUtilComponent() =
 
             reference :> _
 
-        member x.AddImportsForExtensionMethod(reference, extensionMethods) = reference
+        member x.AddImportsForExtensionMethod(reference, _) = reference
 
 
 // todo: ExtensionMethodImportUtilBase

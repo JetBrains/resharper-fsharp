@@ -5,7 +5,7 @@ open |System|(1)
 let |dt|(2): |DateTime|(3) = |DateTime|(4)()
 
 ---------------------------------------------------------
-(0): ReSharper Static Class Identifier: 
+(0): ReSharper C# Static Class Identifier: 
 (1): ReSharper Namespace Identifier: 
 (2): ReSharper Local Variable Identifier: 
 (3): ReSharper Struct Identifier: 

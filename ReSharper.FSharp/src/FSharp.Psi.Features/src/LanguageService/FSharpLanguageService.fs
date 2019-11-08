@@ -8,7 +8,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
@@ -20,7 +19,6 @@ open JetBrains.ReSharper.Psi.CSharp.Impl
 open JetBrains.ReSharper.Psi.Impl
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Parsing
-open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
 [<Language(typeof<FSharpLanguage>)>]
@@ -76,7 +74,9 @@ type FSharpLanguageService
         // todo: invocations, partial applications
         match declaredElement with
         | :? IField
-        | :? IProperty -> ReferenceAccessType.READ
+        | :? IProperty
+        | :? IFSharpAnonRecordFieldProperty ->
+            ReferenceAccessType.READ
 
         | :? IFSharpLocalDeclaration as localDecl ->
             let fsSymbol = localDecl.GetFSharpSymbol()

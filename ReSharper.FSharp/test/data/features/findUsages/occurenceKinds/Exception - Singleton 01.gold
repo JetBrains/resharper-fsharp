@@ -8,8 +8,3 @@ New instance creation
 TO: [O] let e = |Exn| RANGE: (42,45) @ Exception - Singleton 01.fs
 
 
-Other
----
-TO: [O] let e = |Exn| RANGE: (42,45) @ Exception - Singleton 01.fs
-
-

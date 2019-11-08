@@ -6,7 +6,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_MODULE_LIKE_DECLARATION = "";
     public const string IDS_NAMED_MODULE_LIKE_DECLARATION = "";
     public const string IDS_TOP_LEVEL_MODULE_LIKE_DECLARATION = "";
+    public const string IDS_QUALIFIABLE_MODULE_LIKE_DECLARATION = "";
+    public const string IDS_DECLARED_MODULE_LIKE_DECLARATION = "";
+    public const string IDS_ACCESS_MODIFIER = "";
     public const string IDS_MODULE_DECLARATION = "";
+    public const string IDS_DECLARED_MODULE_DECLARATION = "";
     public const string IDS_MODULE_MEMBER = "";
     public const string IDS_MODULE_MEMBER_DECLARATION = "";
     public const string IDS_MODULE_MEMBER_STATEMENT = "";
@@ -17,6 +21,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_OBJECT_MODEL_TYPE_DECLARATION = "";
     public const string IDS_INHERIT_MEMBER = "";
     public const string IDS_CONSTRUCTOR_DECLARATION = "";
+    public const string IDS_MEMBER_PARAM_DECLARATION_GROUP = "";
     public const string IDS_SELF_ID = "";
     public const string IDS_MODIFIER = "";
     public const string IDS_NOT_COMPILED_TYPE_DECLARATION = "";
@@ -31,6 +36,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_ARRAY_OR_LIST_PAT = "";
     public const string IDS_LET = "";
     public const string IDS_LET_BINDINGS = "";
+    public const string IDS_LET_LIKE_EXPR = "";
     public const string IDS_BINDING = "";
     public const string IDS_IDENT_OR_OP_NAME = "";
     public const string IDS_ACTIVE_PATTERN_CASE_DECLARATION = "";
@@ -42,6 +48,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_APP_EXPR = "";
     public const string IDS_QUOTE_EXPR = "";
     public const string IDS_ARRAY_OR_LIST_OF_SEQ_EXPR = "";
+    public const string IDS_MATCH_LIKE_EXPR = "";
+    public const string IDS_TRY_LIKE_EXPR = "";
     public const string IDS_SET_EXPR = "";
     public const string IDS_CAST_EXPR = "";
     public const string IDS_SYN_TYPE = "";

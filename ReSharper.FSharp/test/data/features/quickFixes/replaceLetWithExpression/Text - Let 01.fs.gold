@@ -1,0 +1,9 @@
+﻿module Module
+
+do
+    |let|(0) x = 1 + 1
+
+------------------------------------------------
+0: 'let' is missing expression
+QUICKFIXES:
+Replace 'let' with expression

@@ -58,8 +58,9 @@
     </Message>
     <Range>pat.GetNavigationRange()</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
-    <QuickFix>RemoveUnusedNamedAsPatFix</QuickFix>
     <QuickFix>ReplaceWithWildPatFix</QuickFix>
+    <QuickFix>RemoveUnusedLocalBindingFix</QuickFix>
+    <QuickFix>RemoveUnusedNamedAsPatFix</QuickFix>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="UnitTypeExpected">
@@ -68,19 +69,30 @@
     <Message value="{0}">
       <Argument>fcsMessage</Argument>
     </Message>
-    <Range>expr.GetNavigationRange()</Range>
+    <Range>expr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>AddIgnoreFix</QuickFix>
     <QuickFix>RemoveSubsequentFix</QuickFix>
   </Warning>
 
+  <Error staticGroup="FSharpErrors" name="UnitTypeExpected">
+    <Parameter type="ISynExpr" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>AddIgnoreFix</QuickFix>
+  </Error>
+  
   <Error staticGroup="FSharpErrors" name="FieldRequiresAssignment">
     <Parameter type="IRecordExpr" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
       <Argument>fcsMessage</Argument>
     </Message>
-    <Range>expr.GetNavigationRange()</Range>
+    <Range>expr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>GenerateMissingRecordFieldsFix</QuickFix>
   </Error>
@@ -91,14 +103,14 @@
     <Message value="{0}">
       <Argument>fcsMessage</Argument>
     </Message>
-    <Range>expr.GetNavigationRange()</Range>
+    <Range>expr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>GenerateMissingRecordFieldsFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="LetAndForNonRecBindings">
     <Parameter type="ILetBindings" name="letBindings"/>
-    <Range>(letBindings.Separators |> Seq.tryHead |> Option.defaultWith (fun _ -> letBindings.LetOrUseToken)).GetNavigationRange()</Range>
+    <Range>(letBindings.Separators |> Seq.tryHead |> Option.defaultWith (fun _ -> letBindings.LetOrUseToken)).GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <Message value="The declaration form 'let ... and ...' is only allowed for recursive bindings. Consider using a sequence of 'let' bindings"/>
     <QuickFix>ToRecursiveLetBindingsFix</QuickFix>
@@ -106,29 +118,29 @@
 
   <Error staticGroup="FSharpErrors" name="LocalClassBindingsCannotBeInline">
     <Parameter type="ILetModuleDecl" name="letModuleDecl"/>
-    <Range>letModuleDecl.InlineKeyword.GetNavigationRange()</Range>
+    <Range>letModuleDecl.InlineKeyword.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <Message value="Class local bindings cannot be inline"/>
     <QuickFix>RemoveInlineFix</QuickFix>
   </Error>
   
   <Warning staticGroup="FSharpErrors" name="ExtensionMemberInNonExtensionType">
-    <Parameter type="IFSharpAttribute" name="attr"/>
-    <Range>attr.GetNavigationRange()</Range>
+    <Parameter type="IAttribute" name="attr"/>
+    <Range>attr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <Message value="Extension member in non-extension type looks suspicious"/>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="ExtensionTypeWithNoExtensionMembers">
-    <Parameter type="IFSharpAttribute" name="attr"/>
-    <Range>attr.GetNavigationRange()</Range>
+    <Parameter type="IAttribute" name="attr"/>
+    <Range>attr.GetHighlightingRange()</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
     <Message value="Extension type doesn't have any extension members"/>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="ExtensionTypeShouldBeStatic">
-    <Parameter type="IFSharpAttribute" name="attr"/>
-    <Range>attr.GetNavigationRange()</Range>
+    <Parameter type="IAttribute" name="attr"/>
+    <Range>attr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <Message value="Extension type should be a static class or a module"/>
   </Warning>
@@ -155,7 +167,7 @@
       <Argument>fcsMessage</Argument>
     </Message>
     <!--todo: identifier null check-->
-    <Range>reference.GetElement().IdentifierToken.GetNavigationRange()</Range>
+    <Range>reference.GetElement().IdentifierToken.GetHighlightingRange()</Range>
     <Behavour attributeID="UNRESOLVED_ERROR" overlapResolvePolicy="NONE"/>
     <QuickFix>ToRecursiveFunctionFix</QuickFix>
     <QuickFix arguments="h.Reference">ImportTypeFix</QuickFix>
@@ -178,10 +190,28 @@
 
   <Warning staticGroup="FSharpErrors" name="RedundantNew">
     <Parameter type="INewExpr" name="newExpr"/>
-    <Range>newExpr.NewKeyword.GetNavigationRange()</Range>
+    <Range>newExpr.NewKeyword.GetHighlightingRange()</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
     <Message value="'new' keyword is redundant"/>
     <QuickFix>RemoveRedundantNewFix</QuickFix>
   </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="ConvertToUseBinding">
+    <Parameter type="ILetLikeExpr" name="letExpr"/>
+    <Range>letExpr.LetOrUseToken.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <Message value="Convert to 'use' binding"/>
+    <QuickFix>ConvertToUseFix</QuickFix>
+  </Warning>
+  
+  <Error staticGroup="FSharpErrors" name="ExpectedExpressionAfterLet">
+    <Parameter type="ILetOrUseExpr" name="letExpr"/>
+    <Range>letExpr.LetOrUseToken.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <Message value="'{0}' is missing expression">
+      <Argument>getLetTokenText letExpr.LetOrUseToken</Argument>
+    </Message>
+    <QuickFix>ReplaceLetWithExpressionFix</QuickFix>
+  </Error>
 
 </Errors>

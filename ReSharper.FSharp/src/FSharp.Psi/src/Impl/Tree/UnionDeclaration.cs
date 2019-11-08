@@ -12,8 +12,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
 
     public override IReadOnlyList<ITypeMemberDeclaration> MemberDeclarations =>
-      base.MemberDeclarations.Prepend(UnionCases).AsIReadOnlyList(); // todo: shit, rewrite it
-    
+      base.MemberDeclarations.Prepend(UnionCases).AsIReadOnlyList();
+
     public override PartKind TypePartKind =>
       FSharpImplUtil.GetTypeKind(AttributesEnumerable, out var typeKind)
         ? typeKind

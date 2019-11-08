@@ -16,11 +16,10 @@ type ReplaceWithWildPatFix(warning: UnusedValueWarning) =
     override x.IsAvailable _ =
         isValid pat &&
 
-        let node = getNonPatParent pat
+        let node = skipIntermediatePatParents pat |> getParent
         node :? IBinding ||
         node :? IMatchClause ||
-        node :? IMemberParam && node.Parent :? IMemberDeclaration ||
-        node :? ILetOrUseBangExpr
+        node :? IMemberParamDeclaration && node.Parent :? IMemberDeclaration // todo: check this check
 
     override x.ExecutePsiTransaction(_, _) =
         use writeLock = WriteLockCookie.Create(pat.IsPhysical())

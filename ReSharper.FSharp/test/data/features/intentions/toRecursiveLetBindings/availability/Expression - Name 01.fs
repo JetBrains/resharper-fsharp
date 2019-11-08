@@ -1,6 +1,6 @@
 module Module
 
 let x =
-    let x{off} = 1
+    let x{on} = 1
     let foo{on} {off}x = ()
     ()

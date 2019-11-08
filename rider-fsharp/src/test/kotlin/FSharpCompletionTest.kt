@@ -11,9 +11,11 @@ import com.jetbrains.rider.test.scriptingApi.typeWithLatency
 import com.jetbrains.rider.test.scriptingApi.waitForCompletion
 import com.jetbrains.rdclient.util.idea.waitAndPump
 import com.jetbrains.rd.util.lifetime.Lifetime
+import com.jetbrains.rider.test.enums.CoreVersion
 import org.testng.annotations.Test
 
 @Test
+@TestEnvironment(coreVersion = CoreVersion.DEFAULT)
 class FSharpCompletionTest : CompletionTestBase() {
     override fun getSolutionDirectoryName() = "CoreConsoleApp"
     override val restoreNuGetPackages = true
@@ -28,7 +30,7 @@ class FSharpCompletionTest : CompletionTestBase() {
     fun listModule() = doTest("Lis")
 
     @Test
-    @TestEnvironment(toolset = ToolsetVersion.TOOLSET_15_CORE)
+    @TestEnvironment(toolset = ToolsetVersion.TOOLSET_16_CORE)
     fun listModuleValue() = doTest("filt")
 
     private fun waitForFcs() {

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using JetBrains.Annotations;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -6,5 +7,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
   {
     [NotNull] string ShortName { get; }
     [NotNull] string QualifiedName { get; }
+    IList<string> Names { get; }
   }
 }

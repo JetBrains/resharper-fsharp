@@ -1,3 +1,4 @@
+﻿unaffected by StickComment
 module Module
 
 {caret}let x = "foo"

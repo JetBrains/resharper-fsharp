@@ -1,0 +1,6 @@
+﻿//${NEW_NAME:1}
+module Module
+
+type AR = {| ``1``: int |}
+let ar = {| ``1`` = 123 |}
+ar.``1``

@@ -24,7 +24,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
     member x.ProcessModuleMemberSignature(moduleMember) =
         match moduleMember with
         | SynModuleSigDecl.NestedModule(ComponentInfo(attrs, _, _, lid, _, _, _, _), _, sigs, range) ->
-            let mark = x.StartNestedModule attrs lid range
+            let mark = x.MarkAttributesOrIdOrRange(attrs, List.tryHead lid, range)
             for s in sigs do x.ProcessModuleMemberSignature s
             x.Done(range, mark, ElementType.NESTED_MODULE_DECLARATION)
 
@@ -40,7 +40,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
             x.ProcessNamedTypeReference(lid)
             x.MarkAndDone(range, ElementType.MODULE_ABBREVIATION)
 
-        | SynModuleSigDecl.Val(ValSpfn(attrs, id, SynValTyparDecls(typeParams, _, _), _, _, _, _, _, _, _, _), range) ->
+        | SynModuleSigDecl.Val(ValSpfn(attrs, id, SynValTyparDecls(typeParams, _, _), synType, _, _, _, _, _, _, _), range) ->
             let letMark = x.MarkAttributesOrIdOrRange(attrs, Some id, range)
             let bindingMark = x.Mark()
 
@@ -53,6 +53,8 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
             for p in typeParams do
                 x.ProcessTypeParameter(p, ElementType.TYPE_PARAMETER_OF_METHOD_DECLARATION)
 
+            x.ProcessType(synType)
+
             x.Done(range, bindingMark, ElementType.TOP_BINDING)
             x.Done(letMark, ElementType.LET_MODULE_DECL)
 
@@ -61,6 +63,9 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
             x.ProcessNamedTypeReference(lid)
             x.Done(range, mark, ElementType.OPEN_STATEMENT)
 
+        | SynModuleSigDecl.HashDirective(hashDirective, _) ->
+            x.ProcessHashDirective(hashDirective)
+
         | _ -> ()
 
     member x.ProcessTypeSignature(TypeDefnSig(ComponentInfo(attrs, typeParams, _, lid, _, _, _, _), typeSig, memberSigs, range)) =
@@ -68,31 +73,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
         let elementType =
             match typeSig with
             | SynTypeDefnSigRepr.Simple(simpleRepr, _) ->
-                match simpleRepr with
-                | SynTypeDefnSimpleRepr.Record(_, fields, _) ->
-                    for field in fields do
-                        x.ProcessField field ElementType.RECORD_FIELD_DECLARATION
-                    ElementType.RECORD_DECLARATION
-
-                | SynTypeDefnSimpleRepr.Enum(enumCases, _) ->
-                    for case in enumCases do
-                        x.ProcessEnumCase(case)
-                    ElementType.ENUM_DECLARATION
-
-                | SynTypeDefnSimpleRepr.Union(_, cases, range) ->
-                    x.ProcessUnionCases(cases, range)
-                    ElementType.UNION_DECLARATION
-
-                | SynTypeDefnSimpleRepr.TypeAbbrev _ ->
-                    ElementType.TYPE_ABBREVIATION_DECLARATION
-
-                | SynTypeDefnSimpleRepr.None _ when not memberSigs.IsEmpty ->
-                    ElementType.TYPE_EXTENSION_DECLARATION
-
-                | SynTypeDefnSimpleRepr.None _ ->
-                    ElementType.ABSTRACT_TYPE_DECLARATION
-
-                | _ -> ElementType.OTHER_SIMPLE_TYPE_DECLARATION
+                x.ProcessSimpleTypeRepresentation(simpleRepr)
 
             | SynTypeDefnSigRepr.Exception _ ->
                 ElementType.EXCEPTION_DECLARATION
@@ -132,20 +113,14 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
                 x.ProcessType(synType)
                 x.Done(mark,ElementType.VAL_FIELD)
 
-        | SynMemberSig.Inherit(SynType.LongIdent(lidWithDots), _) ->
-            let lid = lidWithDots.Lid
-            if not lid.IsEmpty then
-                // todo: start at member range
-                let mark = x.Mark(lid.Head.idRange)
-                x.ProcessNamedTypeReference(lid)
-                x.Done(mark, ElementType.INTERFACE_INHERIT)
+        | SynMemberSig.Inherit(synType, range) ->
+            let mark = x.Mark(range)
+            x.ProcessTypeAsTypeReference(synType)
+            x.Done(mark, ElementType.INTERFACE_INHERIT)
 
-        | SynMemberSig.Interface(SynType.LongIdent(lidWithDots), _) ->
-            let lid = lidWithDots.Lid
-            if not lid.IsEmpty then
-                // todo: start at member range
-                let mark = x.Mark(lid.Head.idRange)
-                x.ProcessNamedTypeReference(lid)
-                x.Done(mark, ElementType.INTERFACE_INHERIT)
+        | SynMemberSig.Interface(synType, range) ->
+            let mark = x.Mark(range)
+            x.ProcessTypeAsTypeReference(synType)
+            x.Done(mark, ElementType.INTERFACE_IMPLEMENTATION)
 
         | _ -> ()

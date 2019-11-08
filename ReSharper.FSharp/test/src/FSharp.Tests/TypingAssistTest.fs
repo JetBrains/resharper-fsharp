@@ -101,6 +101,8 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Enter 68 - After larrow``() = x.DoNamedTest()
     [<Test>] member x.``Enter 69 - After parens on new line``() = x.DoNamedTest()
     [<Test>] member x.``Enter 70 - After parens on new line 2``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 71 - After double semi``() = x.DoNamedTest()
+    [<Test>] member x.``Enter 72 - Semicolon inside attribute list``() = x.DoNamedTest()
 
     [<Test>] member x.``Enter after arrow 01``() = x.DoNamedTest()
     
@@ -244,6 +246,8 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Brackets - Arrays 05 - Type right bar in multiline list``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Arrays 06 - Type right bar in multiline list``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Arrays 07 - Type bar in multiline list wrong formatting``() = x.DoNamedTest()
+
+    [<Test>] member x.``Brackets - Angle 01 - Replace``() = x.DoNamedTest()
 
     [<Test>] member x.``At 01 - Make quotation after left angle``() = x.DoNamedTest()
     [<Test>] member x.``At 02 - Inside empty typed quotations``() = x.DoNamedTest()

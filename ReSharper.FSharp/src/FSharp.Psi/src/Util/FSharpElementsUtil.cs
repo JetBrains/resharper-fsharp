@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.Compiled;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -180,8 +181,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       }
 
       if (symbol is FSharpField field)
+      {
+        if (field.IsAnonRecordField)
+          return new FSharpAnonRecordFieldProperty(referenceExpression.Reference);
+
         if (!field.IsUnresolved && field.DeclaringEntity?.Value is FSharpEntity fieldEntity)
-          return GetTypeElement(fieldEntity, psiModule)?.EnumerateMembers(field.Name, true).FirstOrDefault();
+          return GetTypeElement(fieldEntity, psiModule)?.EnumerateMembers(field.Name, true).FirstOrDefault();}
 
       if (symbol is FSharpActivePatternCase patternCase)
         return GetActivePatternCaseElement(psiModule, referenceExpression, patternCase);

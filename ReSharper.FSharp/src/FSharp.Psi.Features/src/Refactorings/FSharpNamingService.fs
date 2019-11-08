@@ -5,7 +5,6 @@ open FSharp.Compiler.SourceCodeServices
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -210,7 +209,8 @@ type FSharpNamingService(language: FSharpLanguage) =
         let pat, path = makeTuplePatPath declaredElementPat
 
         let entryOptions =
-            EntryOptions(subrootPolicy = SubrootPolicy.Decompose, emphasis = Emphasis.Good)
+            EntryOptions(subrootPolicy = SubrootPolicy.Decompose, emphasis = Emphasis.Good,
+                         prefixPolicy = PredefinedPrefixPolicy.Remove)
 
         let addNamesForExpr expr =
             match tryTraverseExprPath path expr with
@@ -232,8 +232,8 @@ type FSharpNamingService(language: FSharpLanguage) =
             | null -> ()
             | expr -> addNamesForExpr expr
 
-        | :? ILetOrUseBangExpr as letOrUseBangExpr when letOrUseBangExpr.Pattern == pat ->
-            match letOrUseBangExpr.Expression with
+        | :? ILetOrUseBangExpr as letOrUseBangExpr when letOrUseBangExpr.Binding.HeadPattern == pat ->
+            match letOrUseBangExpr.Binding.Expression with
             | null -> ()
             | expr -> addNamesForExpr expr
 

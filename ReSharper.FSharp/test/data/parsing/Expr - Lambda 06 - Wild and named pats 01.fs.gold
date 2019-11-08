@@ -10,7 +10,8 @@ IFSharpImplFile
             FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           ILocalReferencePat
-            FSharpIdentifierToken(type:IDENTIFIER, text:x)
+            IExpressionReferenceName
+              FSharpIdentifierToken(type:IDENTIFIER, text:x)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "

@@ -6,5 +6,5 @@ import com.jetbrains.rider.test.enums.ToolsetVersion
 import org.testng.annotations.Test
 
 @Test
-@TestEnvironment(toolset = ToolsetVersion.TOOLSET_15_CORE, coreVersion = CoreVersion.DOT_NET_CORE_2_1)
+@TestEnvironment(toolset = ToolsetVersion.TOOLSET_16_CORE, coreVersion = CoreVersion.DOT_NET_CORE_2_1)
 class FSharpTemplatesTestCore21 : FSharpTemplatesTestCore()

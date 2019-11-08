@@ -39,5 +39,6 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
     init {
         field("fSharpInteractiveHost", RdFSharpInteractiveHost)
         field("fSharpCompilerServiceHost", RdFSharpCompilerServiceHost)
+        property("enableExperimentalFeatures", bool)
     }
 }

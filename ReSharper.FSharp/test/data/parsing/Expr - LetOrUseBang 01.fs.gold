@@ -1,0 +1,35 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IDo
+      IChameleonExpression
+        IPrefixAppExpr
+          IReferenceExpr
+            FSharpIdentifierToken(type:IDENTIFIER, text:async)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          ICompExpr
+            FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
+            NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+            Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+            ILetOrUseBangExpr
+              FSharpTokenType+LetBangTokenElement(type:LET_BANG, text:let!)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              ILocalBinding
+                ILocalReferencePat
+                  IExpressionReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:x)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                IConstExpr
+                  FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                  FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+              NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+              Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+              IConstExpr
+                FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+            NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+            FSharpTokenType+RbraceTokenElement(type:RBRACE, text:})
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

@@ -17,6 +17,7 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Refactorings.Rename
 open JetBrains.ReSharper.Refactorings.Rename.Pages
+open JetBrains.ReSharper.Refactorings.RenameModel
 open JetBrains.Util
 
 [<AutoOpen>]
@@ -60,6 +61,16 @@ type FSharpAtomicRename(declaredElement, newName, doNotShowBindingConflicts) =
         | :? IFSharpDeclaration as fsDeclaration ->
             fsDeclaration.SetName(x.NewName, renameRefactoring.Workflow.FSharpChangeNameKind)
         | declaration -> failwithf "Got declaration: %O" declaration
+
+
+type FSharpAnonRecordFieldAtomicRename(declaredElement, newName) =
+    inherit AnonymousTypePropertyAtomicRenameBase(declaredElement, newName)
+
+    override x.SetName(element, newName) =
+        let fieldProperty = element :?> IFSharpAnonRecordFieldProperty
+        fieldProperty.SetName(newName) :> _
+
+    override x.CompareReferencesOnMemberDeclarations(_, _) = 0
 
 
 [<Language(typeof<FSharpLanguage>)>]
@@ -112,6 +123,9 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
 
     override x.IsValidName(decl: IDeclaration, _: DeclaredElementType, name: string) =
         namingService.IsValidName(decl.DeclaredElement, name)
+
+    override x.IsValidName(element: IDeclaredElement, _: DeclaredElementType, name: string) =
+        namingService.IsValidName(element, name)
 
     override x.GetInitialPage(workflow) =
         let createPage (workflow: IRenameWorkflow) =
@@ -183,7 +197,12 @@ type FSharpAtomicRenamesFactory() =
         | _ -> RenameAvailabilityCheckResult.CanBeRenamed
 
     override x.CreateAtomicRenames(declaredElement, newName, doNotAddBindingConflicts) =
-        [| FSharpAtomicRename(declaredElement, newName, doNotAddBindingConflicts) :> AtomicRenameBase |] :> _
+        match declaredElement with
+        | :? IFSharpAnonRecordFieldProperty ->
+            [| FSharpAnonRecordFieldAtomicRename(declaredElement, newName) :> AtomicRenameBase |] :> _
+
+        | _ ->
+            [| FSharpAtomicRename(declaredElement, newName, doNotAddBindingConflicts) :> AtomicRenameBase |] :> _
 
 
 [<RenamePart>]

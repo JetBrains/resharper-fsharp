@@ -1,0 +1,4 @@
+﻿namespace Ns
+
+module rec {caret}Module =
+    ()

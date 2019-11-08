@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
@@ -6,10 +6,16 @@
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Psi.Features</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="src\CodeStyle\FSharpCodeStylePage.fs" />
     <Compile Include="src\Util\IFSharpElementFactory.fs" />
     <Compile Include="src\Util\StringLiteralsUtil.fs" />
     <Compile Include="src\Util\PsiUtil.fs" />
     <Compile Include="src\Util\OpensUtil.fs" />
+    <Compile Include="src\Util\FSharpParensUtil.fs" />
+    <Compile Include="src\Intentions\DataProviders.fs" />
+    <Compile Include="src\Intentions\ToRecursiveLetBindingsAction.fs" />
+    <Compile Include="src\Intentions\ToMultilineRecord.fs" />
+    <Compile Include="src\Intentions\ToRecursiveModuleAction.fs" />
     <Compile Include="src\CodeCompletion\CompletionUtil.fs" />
     <Compile Include="src\CodeCompletion\FSharpCodeCompletionContext.fs" />
     <Compile Include="src\CodeCompletion\FSharpPathCompletionProvider.fs" />
@@ -49,6 +55,7 @@
     <Compile Include="src\Daemon\Analyzers\ExtensionAttributeAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\RedundantBackticksAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\RedundantNew.fs" />
+    <Compile Include="src\Daemon\Analyzers\LetDisposableAnalyzer.fs" />
     <Compile Include="src\Daemon\QuickFixes\RemoveUnusedOpensFix.fs" />
     <Compile Include="src\Daemon\QuickFixes\ReplaceUseWithLetFix.fs" />
     <Compile Include="src\Daemon\QuickFixes\RemoveUnusedSelfIdVariableFix.fs" />
@@ -64,6 +71,9 @@
     <Compile Include="src\Daemon\QuickFixes\AddParensFix.fs" />
     <Compile Include="src\Daemon\QuickFixes\RemoveSubsequentFix.fs" />
     <Compile Include="src\Daemon\QuickFixes\RemoveRedundantNewFix.fs" />
+    <Compile Include="src\Daemon\QuickFixes\RemoveUnusedLocalBindingFix.fs" />
+    <Compile Include="src\Daemon\QuickFixes\ReplaceLetWithExpressionFix.fs" />
+    <Compile Include="src\Daemon\QuickFixes\ConvertToUseFix.fs" />
     <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
       <Mode>QUICKFIX</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>
@@ -86,8 +96,7 @@
     <Compile Include="src\Search\FSharpSearchGuru.fs" />
     <Compile Include="src\Search\FSharpGeneratedElementsSearch.fs" />
     <Compile Include="src\Search\RecordCtorSearch.fs" />
-    <Compile Include="src\SelectEmbracingConsruct\FSharpSelectEmbracingConstructProvider.fs" />
-    <Compile Include="src\Formatter\FSharpCodeStylePage.fs" />
+    <Compile Include="src\ExtendSelection\FSharpExtendSelectionProvider.fs" />
     <Compile Include="src\Formatter\FSharpReformatCode.fs" />
     <Compile Include="src\Fsi\FsiOptions.fs" />
     <Compile Include="src\Fsi\FsiDetector.fs" />
@@ -101,13 +110,13 @@
     <Compile Include="src\Parsing\FSharpParser.fs" />
     <Compile Include="src\Refactorings\FSharpNamingService.fs" />
     <Compile Include="src\Refactorings\Rename.fs" />
-    <Compile Include="src\Intentions\DataProviders.fs" />
-    <Compile Include="src\Intentions\ToRecursiveLetBindings.fs" />
-    <Compile Include="src\Intentions\ToMultilineRecord.fs" />
+    <Compile Include="src\Refactorings\FSharpIntroduceVarHelper.fs" />
+    <Compile Include="src\Refactorings\FSharpRefactoringLanguageService.fs" />
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />
     <Compile Include="src\PostfixTemplates\NotTemplate.fs" />
-    <Compile Include="src\PostfixTemplates\IntroduceBindingTemplate.fs" />
-    <Compile Include="src\PostfixTemplates\MatchTemplate.fs" />
+    <Compile Include="src\PostfixTemplates\LetPostfixTemplate.fs" />
+    <Compile Include="src\PostfixTemplates\MatchPostfixTemplate.fs" />
+    <Compile Include="src\PostfixTemplates\ForPostfixTemplate.fs" />
     <Compile Include="src\LanguageService\FSharpDeclaredElementIconProvider.fs" />
     <Compile Include="src\LanguageService\FSharpPsiProperties.fs" />
     <Compile Include="src\LanguageService\FSharpProjectFileLanguageService.fs" />
@@ -116,6 +125,7 @@
     <Compile Include="src\LanguageService\FSharpClrLanguage.fs" />
     <Compile Include="src\LanguageService\FSharpBreadcrumbsHelper.fs" />
     <Compile Include="src\LanguageService\FSharpImportTypeHelper.fs" />
+    <Compile Include="src\LanguageService\FSharpQuickDefinitionService.fs" />
     <Compile Include="src\FSharpTypingAssist.fs" />
     <Compile Include="src\ZoneMarker.fs" />
   </ItemGroup>

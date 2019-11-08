@@ -7,10 +7,10 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Resolve;
-using JetBrains.ReSharper.Psi.Naming;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Resources.Shell;
+using JetBrains.Util.DataStructures;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
@@ -47,8 +47,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     }
 
     public override string GetName() =>
-      myOwner.IdentifierToken?.GetText() ??
-      SharedImplUtil.MISSING_DECLARATION_NAME;
+      myOwner.IdentifierToken.GetSourceName();
+
+    public override bool HasMultipleNames =>
+      AttributeNavigator.GetByReferenceName(myOwner as ITypeReferenceName) != null;
+
+    public override HybridCollection<string> GetAllNames()
+    {
+      var name = GetName();
+      return HasMultipleNames
+        ? new HybridCollection<string>(name, name + "Attribute")
+        : new HybridCollection<string>(name);
+    }
 
     public override TreeTextRange GetTreeTextRange() =>
       myOwner.IdentifierToken?.GetTreeTextRange() ??
@@ -67,19 +77,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       if (sourceName == SharedImplUtil.MISSING_DECLARATION_NAME)
         return this;
 
-      var newName = GetNewReferenceName(sourceName);
       using (WriteLockCookie.Create(myOwner.IsPhysical()))
-      {
-        var name = NamingManager.GetNamingLanguageService(myOwner.Language).MangleNameIfNecessary(newName);
-        var newExpression = myOwner.SetName(name);
-        return newExpression.Reference;
-      }
+        return myOwner.SetName(FSharpBindingUtil.SuggestShortReferenceName(this, element)).Reference;
     }
 
     private static bool CanBindTo(IDeclaredElement element) =>
       element is IFSharpDeclaredElement || element is ITypeParameter;
-
-    protected virtual string GetNewReferenceName([NotNull] string name) => name;
 
     public override IReference BindTo(IDeclaredElement element, ISubstitution substitution)
     {
@@ -89,5 +92,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     public override ISymbolTable GetReferenceSymbolTable(bool useReferenceName) =>
       throw new NotImplementedException();
+
+    public bool IsQualified =>
+      GetElement() switch
+      {
+        IReferenceExpr referenceExpr => referenceExpr.Qualifier != null,
+        IReferenceName referenceName => referenceName.Qualifier != null,
+        _ => false
+      };
   }
 }

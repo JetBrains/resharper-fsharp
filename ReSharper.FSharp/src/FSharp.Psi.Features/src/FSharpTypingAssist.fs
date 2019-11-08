@@ -5,20 +5,26 @@ open System.Collections.Generic
 open FSharp.Compiler.Ast
 open FSharp.Compiler.PrettyNaming
 open FSharp.Compiler.SourceCodeServices.AstTraversal
+open JetBrains.Application.CommandProcessing
 open JetBrains.Application.UI.ActionSystem.Text
+open JetBrains.Application.Settings
 open JetBrains.DocumentModel
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.TypingAssist
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CachingLexers
 open JetBrains.ReSharper.Psi.CodeStyle
 open JetBrains.ReSharper.Psi.Parsing
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.TextControl
+open JetBrains.TextControl.DataContext
 open JetBrains.Util
 
 [<SolutionComponent>]
@@ -29,7 +35,7 @@ type FSharpTypingAssist
         (solution, settingsStore, cachingLexerService, commandProcessor, psiServices, externalIntellisenseHost,
          skippingTypingAssist)
 
-    let indentFromToken =
+    static let indentFromToken =
         [| FSharpTokenType.LBRACK_LESS
            FSharpTokenType.LQUOTE_TYPED
            FSharpTokenType.LQUOTE_UNTYPED
@@ -41,7 +47,7 @@ type FSharpTypingAssist
            FSharpTokenType.LAZY |]
         |> HashSet
 
-    let indentFromPrevLine =
+    static let indentFromPrevLine =
         [| FSharpTokenType.FUNCTION
            FSharpTokenType.EQUALS
            FSharpTokenType.LARROW
@@ -55,13 +61,13 @@ type FSharpTypingAssist
            FSharpTokenType.BEGIN |]
         |> HashSet
 
-    let indentTokens =
+    static let indentTokens =
         let hs = HashSet()
         hs.AddRange(indentFromToken)
         hs.AddRange(indentFromPrevLine)
         hs
 
-    let allowKeepIndent =
+    static let allowKeepIndent =
         [| FSharpTokenType.LPAREN
            FSharpTokenType.LBRACK
            FSharpTokenType.LBRACE
@@ -83,7 +89,7 @@ type FSharpTypingAssist
            FSharpTokenType.BEGIN |]
         |> HashSet
 
-    let deindentingTokens =
+    static let deindentingTokens =
         [| FSharpTokenType.RPAREN
            FSharpTokenType.RBRACK
            FSharpTokenType.BAR_RBRACK
@@ -94,7 +100,7 @@ type FSharpTypingAssist
            FSharpTokenType.END |]
         |> HashSet
 
-    let emptyBracketsToAddSpace =
+    static let emptyBracketsToAddSpace =
         [| FSharpTokenType.LBRACE, FSharpTokenType.RBRACE
            FSharpTokenType.LBRACK, FSharpTokenType.RBRACK
            FSharpTokenType.LBRACK_BAR, FSharpTokenType.BAR_RBRACK
@@ -103,22 +109,22 @@ type FSharpTypingAssist
            FSharpTokenType.LQUOTE_UNTYPED, FSharpTokenType.RQUOTE_UNTYPED |]
         |> HashSet
 
-    let rightBracketsToAddSpace =
+    static let rightBracketsToAddSpace =
         emptyBracketsToAddSpace |> Seq.map snd |> HashSet
 
-    let bracketsAllowingDeindent =
+    static let bracketsAllowingDeindent =
         [| FSharpTokenType.LBRACE
            FSharpTokenType.LBRACK
            FSharpTokenType.LBRACK_BAR |]
         |> HashSet
 
-    let leftBrackets =
+    static let leftBrackets =
         [| FSharpTokenType.LPAREN
            FSharpTokenType.LBRACK
            FSharpTokenType.LBRACE |]
         |> HashSet
 
-    let tokensSuitableForRightBracket =
+    static let tokensSuitableForRightBracket =
         [| FSharpTokenType.WHITESPACE
            FSharpTokenType.NEW_LINE
            FSharpTokenType.LINE_COMMENT
@@ -133,31 +139,31 @@ type FSharpTypingAssist
            FSharpTokenType.RQUOTE_UNTYPED |]
         |> HashSet
 
-    let rightBracketsText =
+    static let rightBracketsText =
         [| '(', ")"
            '[', "]"
            '{', "}" |]
         |> dict
 
-    let bracketTypesForRightBracketChar =
+    static let bracketTypesForRightBracketChar =
         [| ')', (FSharpTokenType.LPAREN, FSharpTokenType.RPAREN)
            ']', (FSharpTokenType.LBRACK, FSharpTokenType.RBRACK)
            '}', (FSharpTokenType.LBRACE, FSharpTokenType.RBRACE)
            '>', (FSharpTokenType.LESS,   FSharpTokenType.GREATER) |]
         |> dict
         
-    let leftToRightBracket =
+    static let leftToRightBracket =
         [| '(', ')'
            '[', ']'
            '{', '}' |]
         |> dict
         
-    let rightToLeftBracket =
+    static let rightToLeftBracket =
         leftToRightBracket
         |> Seq.map(fun (KeyValue (key, value)) -> value, key)
         |> dict        
         
-    let bracketToTokenType =
+    static let bracketToTokenType =
         [| '(', FSharpTokenType.LPAREN
            ')', FSharpTokenType.RPAREN
            '[', FSharpTokenType.LBRACK
@@ -165,6 +171,123 @@ type FSharpTypingAssist
            '{', FSharpTokenType.LBRACE
            '}', FSharpTokenType.RBRACE |]
         |> dict
+
+
+    static let stringLiteralStoppers =
+        [| FSharpTokenType.WHITESPACE
+           FSharpTokenType.NEW_LINE
+           FSharpTokenType.LINE_COMMENT
+           FSharpTokenType.BLOCK_COMMENT
+           FSharpTokenType.SEMICOLON
+           FSharpTokenType.COMMA
+           FSharpTokenType.RPAREN
+           FSharpTokenType.RBRACK
+           FSharpTokenType.RBRACE
+           FSharpTokenType.RQUOTE_TYPED
+           FSharpTokenType.RQUOTE_UNTYPED
+           FSharpTokenType.BAR_RBRACK
+           FSharpTokenType.GREATER_RBRACK |]
+        |> HashSet
+
+    let isStringLiteralStopper tokenType =
+        stringLiteralStoppers.Contains(tokenType) ||
+        isNotNull tokenType && tokenType.IsStringLiteral
+
+
+    static let infixOpTokens =
+        [| FSharpTokenType.BAR_BAR
+           FSharpTokenType.AMP_AMP
+           FSharpTokenType.PLUS
+           FSharpTokenType.MINUS |]
+        |> HashSet
+
+    let isInfixOp (lexer: ILexer) =
+        if isNull lexer.TokenType then false else
+
+        infixOpTokens.Contains(lexer.TokenType) ||
+
+        lexer.TokenType == FSharpTokenType.SYMBOLIC_OP &&
+        IsInfixOperator (lexer.GetTokenText())
+
+
+    static let charOffsetInRightBrackets: IDictionary<char, (TokenNodeType * int)[]> =
+        [| '|', [| FSharpTokenType.BAR_RBRACK, 0
+                   FSharpTokenType.BAR_RBRACE, 0
+                   FSharpTokenType.GREATER_BAR_RBRACK, 1 |]
+
+           '>', [| FSharpTokenType.GREATER_RBRACK, 0
+                   FSharpTokenType.GREATER_BAR_RBRACK, 0
+                   FSharpTokenType.RQUOTE_TYPED, 1
+                   FSharpTokenType.RQUOTE_UNTYPED, 2 |]
+
+           ']', [| FSharpTokenType.BAR_RBRACK, 1
+                   FSharpTokenType.GREATER_RBRACK, 1
+                   FSharpTokenType.GREATER_BAR_RBRACK, 2 |]
+
+           '}', [| FSharpTokenType.BAR_RBRACE, 1 |]
+
+           '@', [| FSharpTokenType.RQUOTE_TYPED, 0
+                   FSharpTokenType.RQUOTE_UNTYPED, 0
+                   FSharpTokenType.RQUOTE_UNTYPED, 1 |] |]
+        |> dict
+
+
+    static let typedQuotationBrackets = FSharpTokenType.LQUOTE_TYPED, FSharpTokenType.RQUOTE_TYPED
+    static let listBrackets = FSharpTokenType.LBRACK, FSharpTokenType.RBRACK
+    static let recordBrackets = FSharpTokenType.LBRACE, FSharpTokenType.RBRACE
+
+
+    static let tryDeindentTokens: IDictionary<TokenNodeType, TokenNodeType[]> =
+        [| FSharpTokenType.THEN, [| FSharpTokenType.IF; FSharpTokenType.ELIF |]
+           FSharpTokenType.DO,   [| FSharpTokenType.WHILE; FSharpTokenType.FOR |] |]
+        |> dict
+
+
+    static let bracketsToAddIndent =
+        [| FSharpTokenType.LPAREN, FSharpTokenType.RPAREN
+           FSharpTokenType.LBRACE, FSharpTokenType.RBRACE
+           FSharpTokenType.LBRACK, FSharpTokenType.RBRACK
+           FSharpTokenType.LBRACK_BAR, FSharpTokenType.BAR_RBRACK
+           FSharpTokenType.LBRACK_LESS, FSharpTokenType.GREATER_RBRACK
+           FSharpTokenType.LQUOTE_TYPED, FSharpTokenType.RQUOTE_TYPED
+           FSharpTokenType.LQUOTE_UNTYPED, FSharpTokenType.RQUOTE_UNTYPED |]
+        |> HashSet
+
+    static let leftBracketsToAddIndent: HashSet<TokenNodeType> =
+        bracketsToAddIndent |> Seq.map fst |> HashSet
+
+    let findRightBracket (lexer: CachingLexer) =
+        leftBracketsToAddIndent.Contains(lexer.TokenType) &&
+        FSharpBracketMatcher().FindMatchingBracket(lexer)
+
+    let isSingleLineBrackets (lexer: CachingLexer) (document: IDocument) =
+        use cookie = LexerStateCookie.Create(lexer)
+
+        let startLine = document.GetCoordsByOffset(lexer.TokenStart).Line
+        if not (findRightBracket lexer) then false else
+
+        document.GetCoordsByOffset(lexer.TokenStart).Line = startLine
+
+
+    static let emptyQuotationsStrings =
+        [| "<@@>", "<@"
+           "<@@@@>", "<@@" |]
+        |> dict
+
+    let isInsideEmptyQuoation (lexer: CachingLexer) offset =
+        if not (lexer.FindTokenAt(offset - 1)) then false else
+        let leftStart = lexer.TokenStart
+
+        if not (lexer.FindTokenAt(offset)) then false else
+
+        lexer.TokenType == FSharpTokenType.SYMBOLIC_OP &&
+        leftStart = lexer.TokenStart &&
+
+        let tokenText = lexer.GetTokenText()
+        let mutable leftBracketText = Unchecked.defaultof<_>
+        emptyQuotationsStrings.TryGetValue(tokenText, &leftBracketText) &&
+        tokenText.Substring(0, leftBracketText.Length) = leftBracketText
+
 
     let getIndentSize (textControl: ITextControl) =
         let document = textControl.Document
@@ -265,6 +388,7 @@ type FSharpTypingAssist
         tryFindContinuedLine line lineStartOffset (lexer.TokenType == FSharpTokenType.LPAREN)
 
     let insertNewLineAt textControl indent trimAfterCaret =
+        use command = this.CommandProcessor.UsingCommand("New Line")
         let insertPos = trimTrailingSpaces textControl trimAfterCaret
         let text = this.GetNewLineText(textControl) + String(' ', indent)
         insertText textControl insertPos text "Indent on Enter"
@@ -650,6 +774,7 @@ type FSharpTypingAssist
 
             bracketsAllowingDeindent.Contains(tokenType) && lexer.TokenType != FSharpTokenType.NEW_LINE
 
+        use command = x.CommandProcessor.UsingCommand("New Line")
         let baseIndentLength =
             if not shouldDeindent then
                 getOffsetInLine document line leftBracketStartOffset
@@ -691,6 +816,7 @@ type FSharpTypingAssist
         let strEndLine = document.GetCoordsByOffset(lexer.TokenEnd).Line
         if strStartLine <> strEndLine then false else
 
+        use command = x.CommandProcessor.UsingCommand("New Line")
         let newLineString = x.GetNewLineText(textControl)
         document.InsertText(lexer.TokenEnd - 3, newLineString)
         document.InsertText(offset, newLineString)
@@ -862,6 +988,7 @@ type FSharpTypingAssist
             let offset = getStartOffset document expr.Range
             getOffsetInLine document startLine offset
 
+        use command = x.CommandProcessor.UsingCommand("New Line")
         if not (insertNewLineAt textControl indent TrimTrailingSpaces.Yes) then false else
 
         if nextTokenIsKeyword then
@@ -977,12 +1104,12 @@ type FSharpTypingAssist
 
     member x.TrySurroundWithBraces(context, typedBracket, typedBracketIsLeft, matchingBrackets: IDictionary<_, _>) =
         let mutable secondBracket = Unchecked.defaultof<_>
-        if not (matchingBrackets.TryGetValue(typedBracket, &secondBracket)) then true else
+        if not (matchingBrackets.TryGetValue(typedBracket, &secondBracket)) then false else
 
         let lBrace, rBrace = if typedBracketIsLeft then typedBracket, secondBracket else secondBracket, typedBracket
         let lToken, rToken = bracketToTokenType.[lBrace], bracketToTokenType.[rBrace]
         x.HandleSurroundTyping(context, lBrace, rBrace, lToken, rToken, JetFunc<_>.False)
-    
+
     member x.HandleLeftBracket(context: ITypingContext) =
         this.HandleLeftBracketTyped
             (context,
@@ -1234,8 +1361,27 @@ type FSharpTypingAssist
 
         let mutable endOffset = startOffset
         let buffer = document.Buffer
-        while startOffset > 0 && isWhitespace buffer.[startOffset - 1] do
-            startOffset <- startOffset - 1
+
+        let rec skipWhitespaceBefore offset =
+            if offset > 0 && isWhitespace buffer.[offset - 1] then
+                skipWhitespaceBefore (offset - 1)
+            else offset
+
+        startOffset <- skipWhitespaceBefore startOffset
+
+        if startOffset > 0 && buffer.[startOffset - 1] = ';' then
+            let settingsStore = x.SettingsStore.BindToContextTransient(textControl.ToContextRange())
+            if not (settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SemicolonAtEndOfLine)) then
+                let fsFile = textControl.GetFSharpFile(solution)
+                let token = fsFile.FindTokenAt(DocumentOffset(document, startOffset - 1))
+                if isNull token || getTokenType token <> FSharpTokenType.SEMICOLON then () else
+
+                // No offside rule in attribute lists, dotnet/fsharp#7752
+                if token.Parent :? IAttributeList then () else
+
+                startOffset <- startOffset - 1
+
+            startOffset <- skipWhitespaceBefore startOffset
 
         let lineEndOffset = document.GetLineEndOffsetNoLineBreak(line)
         if trimAfterCaret = TrimTrailingSpaces.Yes then
@@ -1391,158 +1537,47 @@ let lineEndsWithString (lexer: CachingLexer) (document: IDocument) line =
     tokenType == FSharpTokenType.STRING || tokenType == FSharpTokenType.UNFINISHED_STRING
 
 
-let bracketsToAddIndent =
-    [| FSharpTokenType.LPAREN, FSharpTokenType.RPAREN
-       FSharpTokenType.LBRACE, FSharpTokenType.RBRACE
-       FSharpTokenType.LBRACK, FSharpTokenType.RBRACK
-       FSharpTokenType.LBRACK_BAR, FSharpTokenType.BAR_RBRACK
-       FSharpTokenType.LBRACK_LESS, FSharpTokenType.GREATER_RBRACK
-       FSharpTokenType.LQUOTE_TYPED, FSharpTokenType.RQUOTE_TYPED
-       FSharpTokenType.LQUOTE_UNTYPED, FSharpTokenType.RQUOTE_UNTYPED |]
-    |> HashSet
-
-let leftBracketsToAddIndent: HashSet<TokenNodeType> =
-    bracketsToAddIndent |> Seq.map fst |> HashSet
-
-let findRightBracket (lexer: CachingLexer) =
-    leftBracketsToAddIndent.Contains(lexer.TokenType) &&
-    FSharpBracketMatcher().FindMatchingBracket(lexer)
-
-let isSingleLineBrackets (lexer: CachingLexer) (document: IDocument) =
-    use cookie = LexerStateCookie.Create(lexer)
-
-    let startLine = document.GetCoordsByOffset(lexer.TokenStart).Line
-    if not (findRightBracket lexer) then false else
-
-    document.GetCoordsByOffset(lexer.TokenStart).Line = startLine
-
-
-let tryDeindentTokens: IDictionary<TokenNodeType, TokenNodeType[]> =
-    [| FSharpTokenType.THEN, [| FSharpTokenType.IF; FSharpTokenType.ELIF |]
-       FSharpTokenType.DO,   [| FSharpTokenType.WHILE; FSharpTokenType.FOR |] |]
-    |> dict
-
-
 let shouldTrimSpacesBeforeToken (tokenType: TokenNodeType) =
     if isNull tokenType || FSharpTokenType.RightBraces.[tokenType] || tokenType.IsComment then TrimTrailingSpaces.No
     else TrimTrailingSpaces.Yes
 
 
-let typedQuotationBrackets = FSharpTokenType.LQUOTE_TYPED, FSharpTokenType.RQUOTE_TYPED
-let listBrackets = FSharpTokenType.LBRACK, FSharpTokenType.RBRACK
-let recordBrackets = FSharpTokenType.LBRACE, FSharpTokenType.RBRACE
+type FSharpBracketMatcher private (brackets) =
+    inherit BracketMatcher(brackets)
+
+    static let matchingBrackets =
+        [| Pair.Of(FSharpTokenType.LPAREN, FSharpTokenType.RPAREN)
+           Pair.Of(FSharpTokenType.LBRACK, FSharpTokenType.RBRACK)
+           Pair.Of(FSharpTokenType.LBRACE, FSharpTokenType.RBRACE)
+           Pair.Of(FSharpTokenType.LBRACK_BAR, FSharpTokenType.BAR_RBRACK)
+           Pair.Of(FSharpTokenType.LBRACE_BAR, FSharpTokenType.BAR_RBRACE)
+           Pair.Of(FSharpTokenType.LBRACK_LESS, FSharpTokenType.GREATER_RBRACK)
+           Pair.Of(FSharpTokenType.LQUOTE_TYPED, FSharpTokenType.RQUOTE_TYPED)
+           Pair.Of(FSharpTokenType.LQUOTE_UNTYPED, FSharpTokenType.RQUOTE_UNTYPED) |]
+
+    new () =
+        FSharpBracketMatcher(matchingBrackets)
 
 
-let emptyQuotationsStrings =
-    [| "<@@>", "<@"
-       "<@@@@>", "<@@" |]
-    |> dict
+type FSharpSkipPairBracketsMatcher private (brackets) =
+    inherit BracketMatcher(brackets)
 
-let isInsideEmptyQuoation (lexer: CachingLexer) offset =
-    if not (lexer.FindTokenAt(offset - 1)) then false else
-    let leftStart = lexer.TokenStart
+    static let skipPairBrackets =
+        [| Pair.Of(FSharpTokenType.LPAREN, FSharpTokenType.RPAREN)
+           Pair.Of(FSharpTokenType.LBRACK, FSharpTokenType.RBRACK)
+           Pair.Of(FSharpTokenType.LBRACE, FSharpTokenType.RBRACE)
+           Pair.Of(FSharpTokenType.LESS, FSharpTokenType.GREATER) |]
 
-    if not (lexer.FindTokenAt(offset)) then false else
-
-    lexer.TokenType == FSharpTokenType.SYMBOLIC_OP &&
-    leftStart = lexer.TokenStart &&
-
-    let tokenText = lexer.GetTokenText()
-    let mutable leftBracketText = Unchecked.defaultof<_>
-    emptyQuotationsStrings.TryGetValue(tokenText, &leftBracketText) &&
-    tokenText.Substring(0, leftBracketText.Length) = leftBracketText
-
-let stringLiteralStoppers =
-    [| FSharpTokenType.WHITESPACE
-       FSharpTokenType.NEW_LINE
-       FSharpTokenType.LINE_COMMENT
-       FSharpTokenType.BLOCK_COMMENT
-       FSharpTokenType.SEMICOLON
-       FSharpTokenType.COMMA
-       FSharpTokenType.RPAREN
-       FSharpTokenType.RBRACK
-       FSharpTokenType.RBRACE
-       FSharpTokenType.RQUOTE_TYPED
-       FSharpTokenType.RQUOTE_UNTYPED
-       FSharpTokenType.BAR_RBRACK
-       FSharpTokenType.GREATER_RBRACK |]
-    |> HashSet
-
-let isStringLiteralStopper tokenType =
-    stringLiteralStoppers.Contains(tokenType) ||
-    isNotNull tokenType && tokenType.IsStringLiteral
-
-
-let matchingBrackets =
-    [| Pair.Of(FSharpTokenType.LPAREN, FSharpTokenType.RPAREN)
-       Pair.Of(FSharpTokenType.LBRACK, FSharpTokenType.RBRACK)
-       Pair.Of(FSharpTokenType.LBRACE, FSharpTokenType.RBRACE)
-       Pair.Of(FSharpTokenType.LBRACK_BAR, FSharpTokenType.BAR_RBRACK)
-       Pair.Of(FSharpTokenType.LBRACE_BAR, FSharpTokenType.BAR_RBRACE)
-       Pair.Of(FSharpTokenType.LBRACK_LESS, FSharpTokenType.GREATER_RBRACK)
-       Pair.Of(FSharpTokenType.LQUOTE_TYPED, FSharpTokenType.RQUOTE_TYPED)
-       Pair.Of(FSharpTokenType.LQUOTE_UNTYPED, FSharpTokenType.RQUOTE_UNTYPED) |]
-
-type FSharpBracketMatcher() =
-    inherit BracketMatcher(matchingBrackets)
-
-
-let skipPairBrackets =
-    [| Pair.Of(FSharpTokenType.LPAREN, FSharpTokenType.RPAREN)
-       Pair.Of(FSharpTokenType.LBRACK, FSharpTokenType.RBRACK)
-       Pair.Of(FSharpTokenType.LBRACE, FSharpTokenType.RBRACE)
-       Pair.Of(FSharpTokenType.LESS, FSharpTokenType.GREATER) |]
-
-type FSharpSkipPairBracketsMatcher() =
-    inherit BracketMatcher(skipPairBrackets)
-
-
-let charOffsetInRightBrackets: IDictionary<char,(TokenNodeType * int)[]> =
-    [| '|', [| FSharpTokenType.BAR_RBRACK, 0
-               FSharpTokenType.BAR_RBRACE, 0
-               FSharpTokenType.GREATER_BAR_RBRACK, 1 |]
-
-       '>', [| FSharpTokenType.GREATER_RBRACK, 0
-               FSharpTokenType.GREATER_BAR_RBRACK, 0
-               FSharpTokenType.RQUOTE_TYPED, 1
-               FSharpTokenType.RQUOTE_UNTYPED, 2 |]
-
-       ']', [| FSharpTokenType.BAR_RBRACK, 1
-               FSharpTokenType.GREATER_RBRACK, 1
-               FSharpTokenType.GREATER_BAR_RBRACK, 2 |]
-
-       '}', [| FSharpTokenType.BAR_RBRACE, 1 |]
-
-       '@', [| FSharpTokenType.RQUOTE_TYPED, 0
-               FSharpTokenType.RQUOTE_UNTYPED, 0
-               FSharpTokenType.RQUOTE_UNTYPED, 1 |] |]
-    |> dict
+    new () =
+        FSharpSkipPairBracketsMatcher(skipPairBrackets)
 
 
 let atChars = '@', '@'
 let barChars = '|', '|'
 let angledBracketsChars = '<', '>'
 
-
-let infixOpTokens =
-    [| FSharpTokenType.BAR_BAR
-       FSharpTokenType.AMP_AMP
-       FSharpTokenType.PLUS
-       FSharpTokenType.MINUS |]
-    |> HashSet
-
-let isInfixOp (lexer: ILexer) =
-    if isNull lexer.TokenType then false else
-
-    infixOpTokens.Contains(lexer.TokenType) ||
-
-    lexer.TokenType == FSharpTokenType.SYMBOLIC_OP &&
-    IsInfixOperator (lexer.GetTokenText())
-
-
 let isBacktick (lexer: ILexer) =
     lexer.TokenType == FSharpTokenType.RESERVED_SYMBOLIC_SEQUENCE && lexer.GetTokenText() = "`"
-
 
 let tokenIs delta (predicate: ILexer -> bool) (lexer: CachingLexer) =
     use cookie = LexerStateCookie.Create(lexer)

@@ -14,8 +14,8 @@ buildscript {
         maven { setUrl("https://cache-redirector.jetbrains.com/repo.maven.apache.org/maven2")}
     }
     dependencies {
-        classpath("com.jetbrains.rd:rd-gen:0.192.2")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.10")
+        classpath("com.jetbrains.rd:rd-gen:0.193.100")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.50")
     }
 }
 
@@ -277,26 +277,6 @@ tasks {
     create("prepare") {
         group = riderFSharpTargetsGroup
         dependsOn("rdgen", "writeNuGetConfig", "writeRiderSdkVersionProps")
-        doLast {
-            /* !FUN!
-             *
-             * We need the FSharp.Core package's xmldocs to be present in the NuGet cache.
-             *
-             * When environment variable NUGET_XMLDOC_MODE is set to `skip`, (e.g. nanoserver docker images from MS)
-             * NuGet will not extract xmldocs from the nupkg. Just setting the env var on restore is not enough,
-             * because we may already have a package without the .xml in cache, and NuGet only checks the marker file.
-             * Using --force also doesn't help. So the workaround is as follows:
-             * 1) delete the folder containing the package, thus forcing the redownload
-             * 2) for the time of restore, force NUGET_XMLDOC_MODE to something other than `skip`
-             */
-            val home = System.getProperty("user.home")
-            file("$home/.nuget/packages/fsharp.core").deleteRecursively()
-            exec {
-                environment("NUGET_XMLDOC_MODE", "please")
-                executable = "dotnet"
-                args = listOf("restore", "$resharperPluginPath/ReSharper.FSharp.sln")
-            }
-        }
     }
 
     create("buildReSharperPlugin") {

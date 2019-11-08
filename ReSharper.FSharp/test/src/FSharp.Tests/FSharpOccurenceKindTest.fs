@@ -13,6 +13,7 @@ type FSharpOccurenceKindTest() =
     [<Test>] member x.``Import 01``() = x.DoNamedTest()
 
     [<Test>] member x.``New instance 01``() = x.DoNamedTest()
+    [<Test>] member x.``New instance 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Unions 01``() = x.DoNamedTest()
 
@@ -49,6 +50,7 @@ type FSharpOccurenceKindTest() =
     [<Test>] member x.``Type abbreviation 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Read 01``() = x.DoNamedTest()
+    [<Test>] member x.``Read 02 - Anon record field``() = x.DoNamedTest()
 
     [<Test>] member x.``Write - Expr 01 - Reference``() = x.DoNamedTest()
     [<Test>] member x.``Write - Expr 02 - Paren``() = x.DoNamedTest()
@@ -66,3 +68,5 @@ type FSharpOccurenceKindTest() =
 
     [<Test>] member x.``Members - Interface 01``() = x.DoNamedTest()
     [<Test>] member x.``Members - Override 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Field decl - Anon record 01``() = x.DoNamedTest()

@@ -12,11 +12,11 @@ open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
-open JetBrains.ReSharper.Plugins.FSharp.Checker.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
+open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.Util
@@ -102,7 +102,7 @@ type FSharpLookupItemsProvider(logger: ILogger) =
         member x.IsDynamic = false
         member x.IsFinal = false
         member x.SupportedCompletionMode = CompletionMode.Single
-        member x.SupportedEvaluationMode = EvaluationMode.LightAndFull
+        member x.SupportedEvaluationMode = EvaluationMode.Light
 
 
 [<Language(typeof<FSharpLanguage>)>]

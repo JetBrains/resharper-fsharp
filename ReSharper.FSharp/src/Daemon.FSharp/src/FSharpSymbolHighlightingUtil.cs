@@ -54,12 +54,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
 
       if (mfv.IsActivePattern)
         return HighlightingAttributeIds.METHOD_IDENTIFIER_ATTRIBUTE;
-      
+
       if (mfv.IsMutable || mfv.IsRefCell())
         return HighlightingAttributeIds.MUTABLE_LOCAL_VARIABLE_IDENTIFIER_ATTRIBUTE;
 
       if (IsMangledOpName(mfv.LogicalName))
         return HighlightingAttributeIds.OPERATOR_IDENTIFIER_ATTRIBUTE;
+
+      var fsType = mfv.FullType;
+      if (fsType.HasTypeDefinition && fsType.TypeDefinition is var mfvTypeEntity && mfvTypeEntity.IsByRef)
+        return HighlightingAttributeIds.MUTABLE_LOCAL_VARIABLE_IDENTIFIER_ATTRIBUTE;
 
       return HighlightingAttributeIds.LOCAL_VARIABLE_IDENTIFIER_ATTRIBUTE;
     }
@@ -85,7 +89,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
 
         case FSharpGenericParameter _:
           return HighlightingAttributeIds.TYPE_PARAMETER_ATTRIBUTE;
-        
+
         case FSharpActivePatternCase _:
           return HighlightingAttributeIds.METHOD_IDENTIFIER_ATTRIBUTE;
       }

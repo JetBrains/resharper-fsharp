@@ -20,6 +20,7 @@ type GenerateMissingRecordFieldsTest() =
     [<Test>] member x.``Single line 03 - Spaces``() = x.DoNamedTest()
     [<Test>] member x.``Single line 04 - Add two fields``() = x.DoNamedTest()
     [<Test>] member x.``Single line 05 - Name with spaces``() = x.DoNamedTest()
+    [<Test>] member x.``Single line 06 - Convert to multiline``() = x.DoNamedTest()
 
     [<Test>] member x.``Multiline 01``() = x.DoNamedTest()
     [<Test>] member x.``Multiline 02``() = x.DoNamedTest()

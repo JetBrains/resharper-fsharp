@@ -1,0 +1,4 @@
+﻿module Module
+
+do
+    if ({caret}1) then ()

@@ -5,6 +5,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class LocalBinding
   {
-    public TreeNodeCollection<IFSharpAttribute> AllAttributes => Attributes;
+    public TreeNodeCollection<IAttribute> AllAttributes => Attributes;
+    public bool IsMutable => MutableKeyword != null;
+
+    public void SetIsMutable(bool value) =>
+      throw new System.NotImplementedException();
   }
 }

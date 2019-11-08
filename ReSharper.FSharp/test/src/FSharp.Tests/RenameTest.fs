@@ -15,7 +15,7 @@ type FSharpRenameTest() =
 
     override x.ProvideOccurrencesData(occurrences, context, control) =
         // When multiple overloads are available, we want to rename initial element.
-        // Current occurences are:
+        // Current occurrences are:
         // "Rename initial element"
         // "Rename with overloads"
         occurrences.FirstOrDefault()
@@ -33,6 +33,9 @@ type FSharpRenameTest() =
     [<Test>] member x.``Inline - Secondary ctor self id``() = x.DoNamedTest()
     [<Test>] member x.``Inline - Ctor do``() = x.DoNamedTest()
     [<Test>] member x.``Inline - Pattern 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Inline - Lambda param 01``() = x.DoNamedTest()
+    [<Test>] member x.``Inline - Lambda param 02 - Typed``() = x.DoNamedTest()
 
     [<Test>] member x.``Inline - synPat or 1``() = x.DoNamedTest()
     [<Test>] member x.``Inline - synPat or 2``() = x.DoNamedTest()
@@ -68,6 +71,7 @@ type FSharpRenameTest() =
     [<Test>] member x.``Params - Or``() = x.DoNamedTest()
     [<Test>] member x.``Params - Type private function``() = x.DoNamedTest()
     [<Test>] member x.``Params - Attributes``() = x.DoNamedTest()
+    [<Test>] member x.``Params - Optional param 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Type private binding - function``() = x.DoNamedTest()
     [<Test>] member x.``Type private binding - value``() = x.DoNamedTest()
@@ -82,7 +86,8 @@ type FSharpRenameTest() =
     [<Test>] member x.``Types - Abbreviations 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Measure 01``() = x.DoNamedTest()
 
-    [<Test>] member x.``Types - Attributes 01``() = x.DoNamedTest()
+    [<Test>] member x.``Attribute - Arg 01 - Record field``() = x.DoNamedTest()
+    [<Test>] member x.``Attribute - Attribute type 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Union Cases 01``() = x.DoNamedTest() // todo: option to disable renaming related symbols in test
     [<Test>] member x.``Union Cases 02 - Should start with upper case``() = x.DoNamedTest()
@@ -164,3 +169,6 @@ type FSharpRenameTest() =
     [<Test>] member x.``Union Case Field - Creation param 01``() = x.DoNamedTest()
     [<Test>] member x.``Union Case Field - Creation param 02 - Tuple``() = x.DoNamedTest()
     [<Test>] member x.``Union Case Field - Pattern param 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Anon record 01``() = x.DoNamedTest()
+    [<Test>] member x.``Anon record 02 - Invalid name``() = x.DoNamedTest()

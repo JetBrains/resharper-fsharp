@@ -2,7 +2,7 @@
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
-  public interface INameIdentifierOwner : IFSharpTypeMemberDeclaration
+  public interface INameIdentifierOwner : IFSharpTreeNode
   {
     [CanBeNull] IFSharpIdentifierLikeNode NameIdentifier { get; }
   }

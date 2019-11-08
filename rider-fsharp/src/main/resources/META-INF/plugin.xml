@@ -81,6 +81,8 @@
       <category>F#</category>
       <descriptionDirectoryName>SendToFsi</descriptionDirectoryName>
     </intentionAction>
+
+    <registryKey key="rider.fsharp.experimental" description="Enable experimental F# features" defaultValue="false" restartRequired="false"/>
   </extensions>
 
   <actions>
@@ -101,6 +103,9 @@
   <project-components>
     <component>
       <implementation-class>com.jetbrains.rider.plugins.fsharp.services.fsi.FsiHost</implementation-class>
+    </component>
+    <component>
+      <implementation-class>com.jetbrains.rider.plugins.fsharp.FSharpHost</implementation-class>
     </component>
   </project-components>
 </idea-plugin>

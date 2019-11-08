@@ -41,7 +41,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
       Builder.CreateProjectFilePart(new FSharpProjectFilePart(sourceFile, fileKind, hasPairFile));
 
-      foreach (var declaration in fsFile.DeclarationsEnumerable)
+      foreach (var declaration in fsFile.ModuleDeclarations)
         declaration.Accept(this);
 
       // todo: process only needed nodes
@@ -52,7 +52,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       }));
     }
 
-    public void ProcessNamedModuleLikeDeclaration(INamedModuleLikeDeclaration decl, Part part)
+    public void ProcessQualifiableModuleLikeDeclaration(IQualifiableModuleLikeDeclaration decl, Part part)
     {
       StartNamespaceQualifier(decl.QualifierReferenceName);
       Builder.StartPart(part);
@@ -80,7 +80,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     }
 
     public override void VisitNamedNamespaceDeclaration(INamedNamespaceDeclaration decl) =>
-      ProcessNamedModuleLikeDeclaration(decl, new DeclaredNamespacePart(decl));
+      ProcessQualifiableModuleLikeDeclaration(decl, new DeclaredNamespacePart(decl));
 
     public override void VisitGlobalNamespaceDeclaration(IGlobalNamespaceDeclaration decl)
     {
@@ -95,7 +95,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     }
 
     public override void VisitNamedModuleDeclaration(INamedModuleDeclaration decl) =>
-      ProcessNamedModuleLikeDeclaration(decl, new NamedModulePart(decl, Builder));
+      ProcessQualifiableModuleLikeDeclaration(decl, new NamedModulePart(decl, Builder));
 
     public override void VisitNestedModuleDeclaration(INestedModuleDeclaration decl)
     {
@@ -149,6 +149,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
       Builder.StartPart(recordPart);
       ProcessTypeMembers(decl.MemberDeclarations);
+      ProcessTypeMembers(decl.Fields);
       Builder.EndPart();
     }
 

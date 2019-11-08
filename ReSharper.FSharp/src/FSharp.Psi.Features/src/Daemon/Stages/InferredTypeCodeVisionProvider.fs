@@ -131,6 +131,8 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
         | _ -> ()
 
     override x.VisitMemberDeclaration(decl, consumer) =
+        if isNotNull (ObjExprNavigator.GetByMember(decl)) then () else
+
         match box (decl.GetFSharpSymbolUse()) with
         | null -> ()
         | symbolUse ->

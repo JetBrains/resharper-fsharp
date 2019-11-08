@@ -12,5 +12,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     protected override IDeclaredElement CreateDeclaredElement() =>
       GetFSharpSymbol() is FSharpField field ? new FSharpRecordField(this, field) : null;
+
+    public bool IsMutable => MutableKeyword != null;
+
+    public void SetIsMutable(bool value) =>
+      throw new System.NotImplementedException();
   }
 }

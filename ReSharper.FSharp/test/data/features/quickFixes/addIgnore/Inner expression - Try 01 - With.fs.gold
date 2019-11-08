@@ -1,0 +1,6 @@
+﻿//${OCCURRENCE:Try branch}
+module Module
+
+try
+    123 |> ignore
+with _ -> (){caret}

@@ -70,7 +70,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
   internal abstract class LocalPatternDeclarationBase : LocalDeclarationBase
   {
-    public TreeNodeCollection<IFSharpAttribute> Attributes =>
-      TreeNodeCollection<IFSharpAttribute>.Empty;
+    public TreeNodeCollection<IAttribute> Attributes =>
+      TreeNodeCollection<IAttribute>.Empty;
   }
 }

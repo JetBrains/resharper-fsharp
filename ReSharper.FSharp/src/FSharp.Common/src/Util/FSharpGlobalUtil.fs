@@ -21,9 +21,39 @@ module FSharpGlobalUtil =
     let (|IsNonNull|_|) value =
         if isNotNull value then Some value else None
 
+
 [<AutoOpen>]
 module FSharpGlobalAbbreviations =
     type Extension = System.Runtime.CompilerServices.ExtensionAttribute
 
     type ILogger = JetBrains.Util.ILogger
     type FileSystemPath = JetBrains.Util.FileSystemPath
+
+
+[<AutoOpen>]
+module IgnoreAll =
+    type IgnoreAllBuilder() =
+        member _.Yield _ = ()
+        member _.Zero() = ()
+        member _.Combine(_, _) = ()
+        member _.Delay(f) = f ()
+
+    let ignoreAll = IgnoreAllBuilder()
+
+
+[<AutoOpen>]
+module ProtocolSolutionExtensions =
+    open JetBrains.ProjectModel
+    open JetBrains.ReSharper.Host.Features
+    open JetBrains.Rider.Model
+
+    type ISolution with
+        member x.RdFSharpModel =
+            try x.GetProtocolSolution().GetRdFSharpModel()
+            with _ -> null
+
+    type RdFSharpModel with
+        member x.EnableExperimentalFeaturesSafe =
+            match x with
+            | null -> false
+            | fsModel -> fsModel.EnableExperimentalFeatures.Value

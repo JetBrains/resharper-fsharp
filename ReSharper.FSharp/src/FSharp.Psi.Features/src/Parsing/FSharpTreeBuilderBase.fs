@@ -138,14 +138,14 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
         for id in lid do
             marks.Push(struct {| Mark = x.Mark(); Range = id.idRange |})
 
-        let lastRangeIdAndMark = marks.Pop()
-        x.Builder.Drop(lastRangeIdAndMark.Mark)
+        let lastIdRangeAndMark = marks.Pop()
+        x.Builder.Drop(lastIdRangeAndMark.Mark)
 
-        while marks.Count > 0 do
-            let rangeAndMark = marks.Pop()
-            x.Done(rangeAndMark.Range, rangeAndMark.Mark, ElementType.EXPRESSION_REFERENCE_NAME)
+        for IdentRange idRange in lid do
+            if marks.Count > 0 then
+                x.Done(idRange, marks.Pop().Mark, ElementType.EXPRESSION_REFERENCE_NAME)
 
-        x.AdvanceToEnd(lastRangeIdAndMark.Range)
+        x.AdvanceToEnd(lastIdRangeAndMark.Range)
 
     member x.ProcessNamedTypeReference(lid: Ident list) =
         x.ProcessNamedTypeReference(lid, [], None, None, false)
@@ -202,9 +202,6 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
                 | _ ->
                     x.MarkAttributesOrIdOrRange(attrs, Some id, range)
 
-            if moduleKind = NamedModule then
-                x.ProcessModifiersBeforeOffset(x.GetStartOffset(idRange))
-
             if moduleKind <> AnonModule then
                 x.ProcessReferenceNameSkipLast(lid)
 
@@ -220,7 +217,8 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
 
         match moduleKind with
         | GlobalNamespace ->
-            let mark = x.Mark(range)
+            x.AdvanceToTokenOrRangeStart(FSharpTokenType.NAMESPACE, range)
+            let mark = x.Mark()
             Some mark, ElementType.GLOBAL_NAMESPACE_DECLARATION
         | _ -> None, null
 
@@ -233,7 +231,7 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
         match attrs with
         | head :: _ ->
             let mark = x.MarkTokenOrRange(FSharpTokenType.LBRACK_LESS, head.Range)
-            x.ProcessAttributes(attrs)
+            x.ProcessAttributeLists(attrs)
             mark
 
         | _ ->
@@ -241,22 +239,10 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
             let startOffset = if id.IsSome then Math.Min(x.GetStartOffset id.Value.idRange, rangeStart) else rangeStart
             x.Mark(startOffset)
 
-    member x.StartNestedModule (attrs: SynAttributes) (lid: LongIdent) (range: range) =
-        let mark = x.MarkAttributesOrIdOrRange(attrs, List.tryHead lid, range)
-        if not lid.IsEmpty then
-            x.ProcessModifiersBeforeOffset(x.GetStartOffset(lid.Head))
-        mark
-
     member x.StartException(SynExceptionDefnRepr(_, UnionCase(_, id, unionCaseType, _, _, _), _, _, _, range)) =
         let mark = x.Mark(range)
-        x.ProcessModifiersBeforeOffset(x.GetStartOffset id)
         x.ProcessUnionCaseType(unionCaseType, ElementType.EXCEPTION_FIELD_DECLARATION) |> ignore
         mark
-
-    member x.ProcessModifiersBeforeOffset(endOffset: int) =
-        let mark = x.Mark()
-        x.AdvanceToOffset(endOffset)
-        x.Done(mark, ElementType.ACCESS_MODIFIERS)
 
     member x.StartType attrs typeParams (lid: LongIdent) range =
         let mark = x.MarkAttributesOrIdOrRange(attrs, List.tryHead lid, range)
@@ -268,8 +254,6 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
                 match typeParams with
                 | TyparDecl(_, (Typar(id, _, _))) :: _ -> x.GetStartOffset id
                 | [] -> idOffset
-
-            x.ProcessModifiersBeforeOffset (min idOffset typeParamsOffset)
 
             let paramsInBraces = idOffset < typeParamsOffset
             x.ProcessTypeParametersOfType typeParams range paramsInBraces
@@ -304,23 +288,54 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
         | UnionCaseFullType(_) ->
             true // todo: used in FSharp.Core only, otherwise warning
 
-    member x.ProcessUnionCases(cases, range: range) =
-        let casesListMark = x.Mark(range)
-        for case in cases do
-            x.ProcessUnionCase(case)
-        x.Done(range, casesListMark, ElementType.UNION_CASES_LIST)
+    member x.ProcessSimpleTypeRepresentation(repr) =
+        match repr with
+        | SynTypeDefnSimpleRepr.Record(_, fields, range) ->
+            let mark = x.Mark(range)
+            for field in fields do
+                x.ProcessField field ElementType.RECORD_FIELD_DECLARATION
+            x.Done(range, mark, ElementType.RECORD_REPRESENTATION)
+            ElementType.RECORD_DECLARATION
+
+        | SynTypeDefnSimpleRepr.Enum(enumCases, _) ->
+            for case in enumCases do
+                x.ProcessEnumCase case
+            ElementType.ENUM_DECLARATION
+
+        | SynTypeDefnSimpleRepr.Union(_, cases, range) ->
+            let casesListMark = x.Mark(range)
+            for case in cases do
+                x.ProcessUnionCase(case)
+            x.Done(range, casesListMark, ElementType.UNION_REPRESENTATION)
+            ElementType.UNION_DECLARATION
+
+        | SynTypeDefnSimpleRepr.TypeAbbrev(_, synType, _) ->
+            x.ProcessType(synType)
+            ElementType.TYPE_ABBREVIATION_DECLARATION
+
+        | SynTypeDefnSimpleRepr.None _ ->
+            ElementType.ABSTRACT_TYPE_DECLARATION
+
+        | _ -> ElementType.OTHER_SIMPLE_TYPE_DECLARATION
 
     member x.ProcessUnionCase(UnionCase(attrs, _, caseType, _, _, range)) =
         let mark = x.MarkTokenOrRange(FSharpTokenType.BAR, range)
-        x.ProcessAttributes(attrs)
+        x.ProcessAttributeLists(attrs)
         let hasFields = x.ProcessUnionCaseType(caseType, ElementType.UNION_CASE_FIELD_DECLARATION)
         let elementType = if hasFields then ElementType.NESTED_TYPE_UNION_CASE_DECLARATION
                                        else ElementType.SINGLETON_CASE_DECLARATION
         x.Done(range, mark, elementType)
 
-    member x.ProcessAttributes(attrs) =
-        for attr in attrs do
-            x.ProcessAttribute(attr)
+    member x.ProcessAttributeLists(attributeLists) =
+        for attributeList in attributeLists do
+            x.ProcessAttributeList(attributeList)
+
+    member x.ProcessAttributeList(attributeList) =
+        let range = attributeList.Range
+        let mark = x.Mark(range)
+        for attribute in attributeList.Attributes do
+            x.ProcessAttribute(attribute)
+        x.Done(range, mark, ElementType.ATTRIBUTE_LIST)
 
     member x.ProcessAttribute(attr: SynAttribute) =
         let mark =
@@ -344,19 +359,26 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
             x.MarkChameleonExpression(argExpr)
 
 
-        x.Done(attr.Range, mark, ElementType.F_SHARP_ATTRIBUTE)
+        x.Done(attr.Range, mark, ElementType.ATTRIBUTE)
 
     member x.ProcessEnumCase(EnumCase(_, _, _, _, range)) =
         x.MarkAndDone(range, ElementType.ENUM_MEMBER_DECLARATION)
 
-    member x.ProcessField(Field(_, _, id, synType, _, _, _, range)) elementType =
+    member x.ProcessField(Field(attrs, _, id, synType, _, _, _, range)) elementType =
         let mark =
-            match id with
-            | Some id ->
-                x.AdvanceToOffset(min (x.GetStartOffset id) (x.GetStartOffset range))
-                x.Mark()
-            | None ->
-                x.Mark(range)
+            match attrs with
+            | attrList :: _ ->
+                let mark = x.Mark(attrList.Range)
+                x.ProcessAttributeLists(attrs)
+                mark
+
+            | _ ->
+                match id with
+                | Some id ->
+                    x.AdvanceToOffset(min (x.GetStartOffset id) (x.GetStartOffset range))
+                    x.Mark()
+                | None ->
+                    x.Mark(range)
 
         x.ProcessType(synType)
         x.Done(range, mark, elementType)
@@ -364,31 +386,33 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
     member x.ProcessLocalId(IdentRange range) =
         x.MarkAndDone(range, ElementType.LOCAL_DECLARATION)
 
-    member x.ProcessSimplePattern(pat: SynSimplePat) =
-        match pat with
-        | SynSimplePat.Id(id, _, isCompilerGenerated, _, _, _) ->
-            if not isCompilerGenerated then
-                x.ProcessLocalId(id)
+    member x.ProcessImplicitCtorSimplePats(pats: SynSimplePats) =
+        match pats with
+        | SynSimplePats.SimplePats(pats, range) ->
+            let mark = x.Mark(range)
+            for pat in pats do
+                x.ProcessImplicitCtorParam(pat)
+            x.Done(range, mark, ElementType.MEMBER_PARAM_DECLARATION_GROUP)
 
-        | SynSimplePat.Typed(SynSimplePat.Id(id, _, isCompilerGenerated, _, _, _), synType, _) ->
-            if not isCompilerGenerated then
-                x.ProcessLocalId(id)
+        | SynSimplePats.Typed(pats, synType, range) ->
+            let mark = x.Mark(range)
+            x.ProcessImplicitCtorSimplePats(pats)
             x.ProcessType(synType)
-
-        | _ -> ()
+            x.Done(range, mark, ElementType.MEMBER_PARAM_DECLARATION_GROUP)
 
     member x.ProcessImplicitCtorParam(pat: SynSimplePat) =
         match pat with
         | SynSimplePat.Id(id, _, _, _, _, range) ->
             let mark = x.Mark(range)
             x.ProcessLocalId(id)
-            x.Done(range, mark,ElementType.MEMBER_PARAM)
+            x.Done(range, mark,ElementType.MEMBER_PARAM_DECLARATION)
 
+        // todo: check isCompilerGenerated?
         | SynSimplePat.Typed(SynSimplePat.Id(id, _, _, _, _, _), synType, range) ->
             let mark = x.Mark(range)
             x.ProcessLocalId(id)
             x.ProcessType(synType)
-            x.Done(range, mark,ElementType.MEMBER_PARAM)
+            x.Done(range, mark,ElementType.MEMBER_PARAM_DECLARATION)
 
         | _ -> ()
 
@@ -416,16 +440,6 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
             x.AdvanceLexer()
 
         x.Done(idMark, ElementType.ACTIVE_PATTERN_ID)
-
-    member x.ProcessSimplePatterns(pats: SynSimplePats) =
-        match pats with
-        | SynSimplePats.SimplePats(pats, _) ->
-            for pat in pats do
-                x.ProcessSimplePattern(pat)
-
-        | SynSimplePats.Typed(pats, synType, _) ->
-            x.ProcessSimplePatterns(pats)
-            x.ProcessType(synType)
 
     member x.ProcessTypeArgs(typeArgs, ltRange: range option, gtRange: range option, elementType) =
         match ltRange, typeArgs with
@@ -525,6 +539,7 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
             let mark = x.Mark(range)
             for IdentRange range, synType in fields do
                 let mark = x.Mark(range)
+                x.MarkAndDone(range, ElementType.EXPRESSION_REFERENCE_NAME)
                 x.ProcessType(synType)
                 x.Done(range, mark, ElementType.ANON_RECORD_FIELD)
             x.Done(range, mark, ElementType.ANON_RECORD_TYPE)
@@ -584,3 +599,13 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
         x.Builder.AlterToken(tokenMark, FSharpTokenType.CHAMELEON)
 
         x.Done(range, mark, ChameleonExpressionNodeType.Instance, expr)
+
+    member x.ProcessHashDirective(ParsedHashDirective(id, _, range)) =
+        let mark = x.Mark(range)
+        let elementType =
+            match id with
+            | "l" | "load" -> ElementType.LOAD_DIRECTIVE
+            | "r" | "reference" -> ElementType.REFERENCE_DIRECTIVE
+            | "I" -> ElementType.I_DIRECTIVE
+            | _ -> ElementType.OTHER_DIRECTIVE
+        x.Done(range, mark, elementType)

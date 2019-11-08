@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
-using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -18,23 +16,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         return MemberDecoration.FromModifiers(Modifiers.INTERNAL);
 
       return caseDeclaration.GetContainingTypeDeclaration() is IUnionDeclaration unionDeclaration
-        ? GetDecoration(unionDeclaration.AccessModifiers, TreeNodeCollection<IFSharpAttribute>.Empty)
+        ? GetDecoration(unionDeclaration.AccessModifier, TreeNodeCollection<IAttribute>.Empty)
         : MemberDecoration.DefaultValue;
     }
 
-    public static MemberDecoration GetDecoration(IAccessModifiers accessModifiers,
-      TreeNodeCollection<IFSharpAttribute> attributes)
+    public static MemberDecoration GetDecoration([CanBeNull] ITokenNode accessModifier,
+      TreeNodeCollection<IAttribute> attributes)
     {
       var decoration = MemberDecoration.DefaultValue;
-      var modifiers = new HashSet<TokenNodeType>();
-
-      if (accessModifiers != null)
-        foreach (var modifier in accessModifiers.Modifiers)
-          modifiers.Add(modifier.GetTokenType());
-
-      if (modifiers.Contains(FSharpTokenType.PUBLIC)) decoration.Modifiers |= Modifiers.PUBLIC;
-      if (modifiers.Contains(FSharpTokenType.INTERNAL)) decoration.Modifiers |= Modifiers.INTERNAL;
-      if (modifiers.Contains(FSharpTokenType.PRIVATE)) decoration.Modifiers |= Modifiers.PRIVATE;
+      if (accessModifier != null)
+      {
+        var tokenType = accessModifier.GetTokenType();
+        if (tokenType == FSharpTokenType.INTERNAL)
+          decoration.Modifiers |= Modifiers.INTERNAL;
+        else if (tokenType == FSharpTokenType.PRIVATE)
+          decoration.Modifiers |= Modifiers.PRIVATE;
+        else if (tokenType == FSharpTokenType.PUBLIC)
+          decoration.Modifiers |= Modifiers.PUBLIC;
+      }
 
       foreach (var attr in attributes)
       {
@@ -94,6 +93,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       }
 
       return null;
+    }
+
+    public static AccessRights GetAccessRights([CanBeNull] ITokenNode accessModifier)
+    {
+      var modifierTokenType = accessModifier?.GetTokenType();
+      if (modifierTokenType == FSharpTokenType.PRIVATE)
+        return AccessRights.PRIVATE;
+      if (modifierTokenType == FSharpTokenType.INTERNAL)
+        return AccessRights.INTERNAL;
+
+      return AccessRights.PUBLIC;
     }
   }
 }

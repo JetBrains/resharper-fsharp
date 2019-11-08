@@ -7,10 +7,13 @@ import com.jetbrains.rider.test.base.BaseTestWithSolution
 import com.jetbrains.rider.test.scriptingApi.changeFileContent
 import com.jetbrains.rider.util.idea.lifetime
 import com.jetbrains.rdclient.util.idea.waitAndPump
+import com.jetbrains.rider.test.annotations.TestEnvironment
+import com.jetbrains.rider.test.enums.CoreVersion
 import org.testng.annotations.Test
 import java.io.File
 
 @Test
+@TestEnvironment(coreVersion = CoreVersion.DEFAULT)
 class FileSystemShimTest : BaseTestWithSolution() {
     override fun getSolutionDirectoryName() = "CoreConsoleApp"
 

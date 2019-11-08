@@ -36,7 +36,7 @@ open JetBrains.Util.Dotnet.TargetFrameworkIds
 [<SolutionComponent>]
 type FSharpScriptPsiModulesProvider
         (lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager, documentManager: DocumentManager,
-         scriptOptionsProvider: IFSharpScriptOptionsProvider, platformManager: PlatformManager,
+         scriptOptionsProvider: IFSharpScriptProjectOptionsProvider, platformManager: PlatformManager,
          assemblyFactory: AssemblyFactory, projectFileExtensions, projectFileTypeCoordinator) as this =
 
     /// There may be multiple project files for a path (i.e. linked in multiple projects) and we must distinguish them.

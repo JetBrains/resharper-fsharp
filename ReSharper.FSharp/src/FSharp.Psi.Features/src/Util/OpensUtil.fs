@@ -6,8 +6,8 @@ open FSharp.Compiler.SourceCodeServices
 open FSharp.Compiler.SourceCodeServices.ParsedInput
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
-open JetBrains.ReSharper.Plugins.FSharp.Checker.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree

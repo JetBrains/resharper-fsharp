@@ -18,10 +18,14 @@ type IFSharpElementFactory =
     abstract CreateAppExpr: funcName: string * arg: ISynExpr -> IAppExpr
     abstract CreateAppExpr: funExpr: ISynExpr * argExpr: ISynExpr * addSpace: bool -> IAppExpr
 
+    abstract CreateReferenceExpr: string -> ISynExpr
+    
     abstract CreateLetBindingExpr: bindingName: string * expr: ISynExpr -> ILetOrUseExpr
     abstract CreateIgnoreApp: ISynExpr * newLine: bool -> IAppExpr
     abstract CreateRecordExprBinding: fieldName: string * addSemicolon: bool -> IRecordExprBinding
+
     abstract CreateMatchExpr: ISynExpr -> IMatchExpr
+    abstract CreateForEachExpr: ISynExpr -> IForEachExpr
 
     abstract AsReferenceExpr: typeReference: ITypeReferenceName -> IReferenceExpr
 
@@ -29,10 +33,3 @@ type IFSharpElementFactory =
 type IFSharpLanguageService =
     abstract CreateParser: IDocument -> IFSharpParser
     abstract CreateElementFactory: IPsiModule -> IFSharpElementFactory
-
-
-[<Language(typeof<FSharpLanguage>)>]
-type FSharpExpressionProvider() =
-    inherit ExpressionSelectionProviderBase<IFSharpTreeNode>()
-
-    override x.IsTokenSkipped _ = false

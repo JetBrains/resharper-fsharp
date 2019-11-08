@@ -14,8 +14,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (!value)
         throw new System.NotImplementedException();
 
-      using (var _ = WriteLockCookie.Create(IsPhysical()))
-        LetOrUseToken.NotNull().AddModifierToken(FSharpTokenType.REC);
+      LetOrUseToken.NotNull().AddModifierTokenAfter(FSharpTokenType.REC);
     }
   }
 }

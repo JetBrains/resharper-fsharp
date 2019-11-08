@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
@@ -46,12 +46,17 @@
     <Compile Include="QuickFixes\AddParensTest.fs" />
     <Compile Include="QuickFixes\RemoveSubsequentTest.fs" />
     <Compile Include="QuickFixes\RemoveRedundantNewTest.fs" />
+    <Compile Include="QuickFixes\RemoveUnusedLocalBindingTest.fs" />
+    <Compile Include="QuickFixes\ReplaceLetWithExpressionTest.fs" />
     <Compile Include="Intentions\IntentionsTestBase.fs" />
     <Compile Include="Intentions\ToRecursiveLetBindings.fs" />
     <Compile Include="Intentions\ToMultilineRecordTest.fs" />
+    <Compile Include="Intentions\ToRecursiveModuleActionTest.fs" />
     <Compile Include="FSharpElementFactoryTest.fs" />
     <Compile Include="FSharpNamingTest.fs" />
     <Compile Include="SyntaxHighlightingTest.fs" />
+    <Compile Include="NameResolutionTest.fs" />
+    <Compile Include="FSharpExtendSelectionTest.fs" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,0 +1,8 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IGlobalNamespaceDeclaration
+    FSharpTokenType+NamespaceTokenElement(type:NAMESPACE, text:namespace)
+    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+    FSharpTokenType+GlobalTokenElement(type:GLOBAL, text:global)
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

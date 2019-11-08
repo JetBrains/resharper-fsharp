@@ -14,7 +14,8 @@ IFSharpImplFile
             FSharpTokenType+LbraceBarTokenElement(type:LBRACE_BAR, text:{|)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             IAnonRecordField
-              FSharpIdentifierToken(type:IDENTIFIER, text:A)
+              IExpressionReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:A)
               FSharpTokenType+ColonTokenElement(type:COLON, text::)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               INamedType
@@ -23,7 +24,8 @@ IFSharpImplFile
             FSharpTokenType+SemicolonTokenElement(type:SEMICOLON, text:;)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             IAnonRecordField
-              FSharpIdentifierToken(type:IDENTIFIER, text:B)
+              IExpressionReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:B)
               FSharpTokenType+ColonTokenElement(type:COLON, text::)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               INamedType

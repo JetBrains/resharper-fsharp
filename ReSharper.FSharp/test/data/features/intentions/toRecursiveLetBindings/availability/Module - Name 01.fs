@@ -1,4 +1,4 @@
 module Module
 
-let x{off} = 1
+let x{on} = 1
 let foo{on} {off}x = ()

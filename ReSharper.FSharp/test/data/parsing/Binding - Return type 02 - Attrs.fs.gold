@@ -11,11 +11,12 @@ IFSharpImplFile
         IReturnTypeInfo
           FSharpTokenType+ColonTokenElement(type:COLON, text::)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
-          IFSharpAttribute
-            ITypeReferenceName
-              FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
-          FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
+          IAttributeList
+            FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
+            IAttribute
+              ITypeReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
+            FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           INamedType
             ITypeReferenceName

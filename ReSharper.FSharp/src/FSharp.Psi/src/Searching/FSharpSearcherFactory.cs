@@ -80,6 +80,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
       if (declaredElement is CompiledActivePatternCase compiledActivePatternCase)
         return myClrSearchFactory.GetDeclaredElementSearchDomain(compiledActivePatternCase.Origin);
 
+      if (declaredElement is IFSharpAnonRecordFieldProperty fieldProperty)
+        return mySearchDomainFactory.CreateSearchDomain(fieldProperty.Module);
+
       return EmptySearchDomain.Instance;
     }
 

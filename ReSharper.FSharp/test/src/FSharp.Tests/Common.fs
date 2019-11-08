@@ -25,21 +25,32 @@ open Moq
 [<assembly: Apartment(ApartmentState.STA)>]
 do()
 
-type FSharpTestAttribute() =
-    inherit TestProjectFilePropertiesProvider(FSharpProjectFileType.FsExtension, MSBuildProjectUtil.CompileElement)
+type FSharpTestAttribute(extension) =
+    inherit TestProjectFilePropertiesProvider(extension, MSBuildProjectUtil.CompileElement)
 
     let targetFrameworkId =
-        TargetFrameworkId.Create(FrameworkIdentifier.NetFramework, new Version(4, 5, 1), ProfileIdentifier.Default)
+        TargetFrameworkId.Create(FrameworkIdentifier.NetFramework, Version(4, 5, 1), ProfileIdentifier.Default)
+
+    new () =
+        FSharpTestAttribute(FSharpProjectFileType.FsExtension)
 
     interface ITestPlatformProvider with
         member x.GetTargetFrameworkId() = targetFrameworkId
 
     interface ITestFileExtensionProvider with
-        member x.Extension = FSharpProjectFileType.FsExtension
+        member x.Extension = extension
 
     interface ITestProjectPropertiesProvider with
         member x.GetProjectProperties(targetFrameworkIds, _) =
             FSharpProjectPropertiesFactory.CreateProjectProperties(targetFrameworkIds)
+
+
+type FSharpSignatureTestAttribute() =
+    inherit FSharpTestAttribute(FSharpSignatureProjectFileType.FsiExtension)
+
+
+type FSharpScriptTestAttribute() =
+    inherit FSharpTestAttribute(FSharpScriptProjectFileType.FsxExtension)
 
 
 let itemsContainer = Mock<IFSharpItemsContainer>().Object
@@ -56,7 +67,7 @@ type FSharpTestProjectOptionsBuilder(checkerService, psiModules, logger, resolve
 [<SolutionComponent>]
 type FSharpTestProjectOptionsProvider
         (lifetime: Lifetime, checkerService: FSharpCheckerService, projectOptionsBuilder: IFSharpProjectOptionsBuilder,
-         scriptOptionsProvider: IFSharpScriptOptionsProvider) as this =
+         scriptOptionsProvider: IFSharpScriptProjectOptionsProvider) as this =
     do
         checkerService.OptionsProvider <- this
         lifetime.OnTermination(fun _ -> checkerService.OptionsProvider <- Unchecked.defaultof<_>) |> ignore

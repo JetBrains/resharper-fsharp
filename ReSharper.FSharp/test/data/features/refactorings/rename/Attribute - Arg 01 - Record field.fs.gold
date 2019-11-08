@@ -1,0 +1,8 @@
+﻿//${NEW_NAME:Bar}
+module Module
+
+let [<Literal>] Bar = ""
+
+type R =
+    { [<CompiledName(Bar)>]
+      Field: int }

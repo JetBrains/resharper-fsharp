@@ -1,0 +1,9 @@
+﻿module Module
+do
+    let foo |x|(0) = ()
+    foo ()
+
+------------------------------------------------
+0: The value 'x' is unused
+QUICKFIXES:
+Replace with '_'

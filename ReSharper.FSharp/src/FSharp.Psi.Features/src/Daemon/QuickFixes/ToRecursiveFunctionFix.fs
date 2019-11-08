@@ -51,12 +51,11 @@ type ToRecursiveFunctionFix(warning: UndefinedNameError) =
 
     override x.Execute(solution, textControl) =
         let letBindings = getContainingBindings referenceExpr |> List.filter isSuitable
+        let name = RichText(referenceExpr.ShortName)
 
         let occurrences =
             letBindings
-            |> List.map (fun letBindings ->
-                let name = RichText(referenceExpr.ShortName)
-                WorkflowPopupMenuOccurrence(name, RichText.Empty, letBindings, getNameRange))
+            |> List.map (fun bindings -> WorkflowPopupMenuOccurrence(name, RichText.Empty, bindings, getNameRange))
             |> Array.ofSeq
 
         let occurrence =

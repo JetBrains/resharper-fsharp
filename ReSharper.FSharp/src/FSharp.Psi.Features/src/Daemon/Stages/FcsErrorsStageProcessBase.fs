@@ -17,6 +17,7 @@ open JetBrains.Util
 module FSharpErrors =
     // https://github.com/fsharp/FSharp.Compiler.Service/blob/9.0.0/src/fsharp/CompileOps.fs#L246
     // https://github.com/fsharp/FSharp.Compiler.Service/blob/9.0.0/src/fsharp/FSComp.txt
+    let [<Literal>] TypeEquation = 1
     let [<Literal>] UnitTypeExpected = 20
     let [<Literal>] RuleNeverMatched = 26
     let [<Literal>] UndefinedName = 39
@@ -26,6 +27,7 @@ module FSharpErrors =
     let [<Literal>] UseBindingsIllegalInImplicitClassConstructors = 523
     let [<Literal>] LetAndForNonRecBindings = 576
     let [<Literal>] FieldRequiresAssignment = 764
+    let [<Literal>] ExpectedExpressionAfterLet = 588
     let [<Literal>] SuccessiveArgsShouldBeSpacedOrTupled = 597
     let [<Literal>] EmptyRecordInvalid = 789
     let [<Literal>] UseBindingsIllegalInModules = 524
@@ -34,6 +36,7 @@ module FSharpErrors =
     let [<Literal>] UnusedThisVariable = 1183
 
     let [<Literal>] undefinedIndexerMessage = "The field, constructor or member 'Item' is not defined."
+    let [<Literal>] ifExprMissingElseBranch = "This 'if' expression is missing an 'else' branch."
 
 [<AbstractClass>]
 type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
@@ -60,13 +63,29 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
     let createHighlighting (error: FSharpErrorInfo) (range: DocumentRange): IHighlighting =
 
         match error.ErrorNumber with
+        | TypeEquation ->
+            if (error.Message.StartsWith(ifExprMissingElseBranch, StringComparison.Ordinal) &&
+                let indexer = fsFile.GetNode(range) in isNotNull indexer) then
+                UnitTypeExpectedError(fsFile.GetNode(range), error.Message) :> _
+
+            else
+                createGenericHighlighting error range 
+
         | UndefinedName ->
             if (error.Message = undefinedIndexerMessage &&
                     let indexer = fsFile.GetNode(range) in isNotNull indexer) then
                 UndefinedIndexerError(fsFile.GetNode(range)) :> _ else
 
-            let refExpr = ReferenceExprNavigator.GetByIdentifier(fsFile.GetNode(range))
-            if isNotNull refExpr then UndefinedNameError(refExpr.Reference, error.Message) :> _ else
+            let identifier = fsFile.GetNode(range)
+
+            let reference =
+                let refExpr = ReferenceExprNavigator.GetByIdentifier(identifier)
+                if isNotNull refExpr then refExpr.Reference else
+
+                let referenceName = ReferenceNameNavigator.GetByIdentifier(identifier)
+                if isNotNull referenceName then referenceName.Reference else null
+
+            if isNotNull reference then UndefinedNameError(reference, error.Message) :> _ else
 
             UnresolvedHighlighting(error.Message, range) :> _
 
@@ -102,6 +121,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | FieldRequiresAssignment ->
             FieldRequiresAssignmentError(getNode range, error.Message) :> _
+
+        | ExpectedExpressionAfterLet ->
+            ExpectedExpressionAfterLetError(getNode range) :> _
 
         | SuccessiveArgsShouldBeSpacedOrTupled ->
             SuccessiveArgsShouldBeSpacedOrTupledError(getNode range) :> _

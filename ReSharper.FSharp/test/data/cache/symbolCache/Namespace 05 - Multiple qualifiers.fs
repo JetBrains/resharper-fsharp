@@ -1,0 +1,1 @@
+namespace Namespace1.Namespace2.Namespace3

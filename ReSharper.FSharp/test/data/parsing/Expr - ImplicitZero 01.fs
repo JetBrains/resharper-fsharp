@@ -1,0 +1,4 @@
+foo {
+    let! x = ()
+    yield
+}

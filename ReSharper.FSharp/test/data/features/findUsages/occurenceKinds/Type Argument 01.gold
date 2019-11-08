@@ -6,6 +6,10 @@ TO: [O] let |l| = List<string>() RANGE: (21,22) @ Type Argument 01.fs
 Other
 ---
 TO: [O] let l = |List|<string>() RANGE: (25,29) @ Type Argument 01.fs
+
+
+New instance creation
+---
 TO: [O] let l = |List|<string>() RANGE: (25,29) @ Type Argument 01.fs
 
 

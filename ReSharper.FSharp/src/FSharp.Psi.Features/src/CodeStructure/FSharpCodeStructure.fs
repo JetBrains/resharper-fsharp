@@ -21,7 +21,7 @@ type FSharpCodeStructureProvider() =
     let rec processNode (node: ITreeNode) (parent: CodeStructureElement) =
         match node with
         | :? IFSharpFile as fsFile ->
-            for decl in fsFile.Declarations do
+            for decl in fsFile.ModuleDeclarations do
                 processNode decl parent
 
         | :? IModuleLikeDeclaration as moduleLikeDeclaration ->

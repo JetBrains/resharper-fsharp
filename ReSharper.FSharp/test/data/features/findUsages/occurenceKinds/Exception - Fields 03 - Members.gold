@@ -10,8 +10,6 @@ TO: [R] Exn.|Foo| RANGE: (75,78) @ Exception - Fields 03 - Members.fs
 
 Other
 ---
-TO: [O] Exn.|Foo| RANGE: (75,78) @ Exception - Fields 03 - Members.fs
-TO: [O] |Exn|.Foo RANGE: (71,74) @ Exception - Fields 03 - Members.fs
 TO: [O] |Exn|.Foo RANGE: (71,74) @ Exception - Fields 03 - Members.fs
 
 

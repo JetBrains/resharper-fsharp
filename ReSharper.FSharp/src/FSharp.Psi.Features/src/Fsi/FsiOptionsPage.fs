@@ -11,11 +11,12 @@ open JetBrains.DataFlow
 open JetBrains.Lifetimes
 open JetBrains.IDE.UI
 open JetBrains.IDE.UI.Extensions
-open JetBrains.IDE.UI.Options
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Resources
 open JetBrains.ReSharper.Host.Features.Settings.Layers.ExportImportWorkaround
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi.FsiDetector
+open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.Rider.Model.UIAutomation
 open JetBrains.UI.RichText
@@ -26,7 +27,7 @@ type FsiOptionsPage
         (lifetime: Lifetime, optionsPageContext, settings, fsiDetector: FsiDetector,
          [<Optional; DefaultParameterValue(null: ISolution)>] solution: ISolution,
          dialogs: ICommonFileDialogs, iconHost: IconHostBase) as this =
-    inherit BeSimpleOptionsPage(lifetime, optionsPageContext, settings)
+    inherit FSharpOptionsPageBase(lifetime, optionsPageContext, settings)
 
     let (|FsiTool|) (obj: obj) = obj :?> FsiTool 
 
@@ -86,6 +87,13 @@ type FsiOptionsPage
 
         this.AddString(fsiArgsText, fun key -> key.FsiArgs)
 
+        this.AddHeader(FSharpScriptOptions.languageVersion)
+        this.AddBool(FsiOptions.specifyLanguageVersion, fsiOptions.SpecifyLanguageVersion)
+
+        let languageVersion =
+            this.AddComboEnum((fun (key: FsiOptions) -> key.LanguageVersion), FSharpScriptOptions.languageVersion, FSharpLanguageVersion.toString)
+        fsiOptions.SpecifyLanguageVersion.FlowIntoRd(lifetime, languageVersion.Enabled)
+
         this.AddHeader(commandsSectionTitle)
         this.AddBool(moveCaretOnSendLineText, fsiOptions.MoveCaretOnSendLine)
 
@@ -131,22 +139,6 @@ type FsiOptionsPage
 
                 let (FsiTool fsi) = fsiTool.Value
                 fsiPath.Value <- fsi.GetFsiPath(fsiOptions.UseAnyCpu.Value))
-
-    member x.AddString(text: string, getter: Expression<Func<FsiOptions,_>>) =
-        let prop = FsiOptions.GetProperty(lifetime, settings, getter)
-        let grid = [| prop.GetBeTextBox(lifetime).WithDescription(text, lifetime) |].GetGrid()
-        x.AddControl(grid)
-        x.AddKeyword(text)
-
-    member x.AddDescription(text) =
-        use indent = x.Indent()
-        this.AddRichText(RichText(text)) |> ignore
-
-    member x.AddBool(text, property) =
-        this.AddBoolOption(property, RichText(text), text) |> ignore
-
-    member x.AddHeader(text: string) =
-        base.AddHeader(text) |> ignore
 
 
 [<ShellComponent>]
