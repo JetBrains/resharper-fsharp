@@ -44,14 +44,25 @@ let addOpen (coords: DocumentCoords) (fsFile: IFSharpFile) (settings: IContextBo
         |> Seq.tryLast
         |> Option.defaultValue line
 
+    // if this is the first open statement, add a new line before
+    let insertEmptyLineBefore =
+        if line > 0 then
+            let lineText = document.GetLineText(docLine (line - 1))
+            not (lineText.StartsWith(openPrefix) || lineText.Trim().Length = 0)
+        else
+            false
+
     // add empty line after all open expressions if needed
-    let insertEmptyLine = not (document.GetLineText(docLine line).IsNullOrWhitespace())
+    let insertEmptyLineAfter = not (document.GetLineText(docLine line).IsNullOrWhitespace())
 
     let prevLineEndOffset =
         if lineToInsert > 0 then document.GetLineEndOffsetWithLineBreak(docLine (max 0 (lineToInsert - 1)))
         else 0
 
     let newLineText = document.GetPsiSourceFile(fsFile.GetSolution()).DetectLineEnding().GetPresentation()
-    let emptyLine = if insertEmptyLine then newLineText else ""
-    document.InsertText(prevLineEndOffset, textToInsert + newLineText + emptyLine)
+
+    let prefix = if insertEmptyLineBefore then newLineText else ""
+    let postfix = if insertEmptyLineAfter then newLineText else ""
+
+    document.InsertText(prevLineEndOffset, prefix + textToInsert + newLineText + postfix)
 

@@ -1,0 +1,7 @@
+// ${COMPLETE_ITEM:IDisposable (in System)}
+namespace SomeNamespace
+
+open System
+
+// Some comment here
+IDisposable{caret}

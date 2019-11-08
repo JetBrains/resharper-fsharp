@@ -1,0 +1,5 @@
+// ${COMPLETE_ITEM:IDisposable (in System)}
+
+open System
+
+IDisposable{caret}
