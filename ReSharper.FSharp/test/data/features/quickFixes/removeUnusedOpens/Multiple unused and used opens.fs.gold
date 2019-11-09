@@ -1,0 +1,7 @@
+module Module
+
+open System.Collections
+{caret}open System.Linq
+
+Hashtable()
+Enumerable.Empty()
