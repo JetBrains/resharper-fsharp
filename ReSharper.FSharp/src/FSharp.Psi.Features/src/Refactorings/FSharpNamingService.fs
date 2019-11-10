@@ -193,9 +193,6 @@ type FSharpNamingService(language: FSharpLanguage) =
             let elseRoots = x.SuggestRoots(ifThenElseExpr.ElseExpr, useExpectedTypes, policyProvider)
             Seq.append thenRoots elseRoots
 
-        | :? ILongIdentifier as longIdentifier ->
-            x.SuggestRoots(longIdentifier.IdentifierToken, useExpectedTypes, policyProvider)
-
         // todo: partially applied functions?
         | :? IAppExpr as appExpr when isNotNull appExpr.InvokedFunctionReference ->
             x.SuggestRoots(appExpr.InvokedFunctionReference, null, policyProvider)

@@ -189,25 +189,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static TreeTextRange GetNameIdentifierRange([CanBeNull] this IFSharpIdentifierLikeNode identifier) =>
       identifier?.GetTreeTextRange() ?? TreeTextRange.InvalidRange;
 
-    /// <summary>
-    /// Get name and qualifiers without backticks. Qualifiers added if the token is in ILongIdentifier.
-    /// </summary>
-    [NotNull]
-    public static string[] GetQualifiersAndName(this FSharpIdentifierToken token)
-    {
-      if (!(token.Parent is ILongIdentifier longIdentifier))
-        return new[] {token.GetText().RemoveBackticks()};
-
-      var names = new FrugalLocalHashSet<string>();
-      foreach (var id in longIdentifier.IdentifiersEnumerable)
-      {
-        names.Add(id.GetText().RemoveBackticks());
-        if (id == token) break;
-      }
-
-      return names.ToArray();
-    }
-
     [NotNull]
     public static string MakeClrName([NotNull] this IFSharpTypeElementDeclaration declaration)
     {

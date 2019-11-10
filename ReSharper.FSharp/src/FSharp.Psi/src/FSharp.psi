@@ -1218,8 +1218,7 @@ private letOrUseBang{ROLE, Getter}:
 private identOrOpName{ROLE, Getter}:
   IDENTIFIER<@ROLE, @Getter> |
   SYMBOLIC_OP<@ROLE, @Getter> |
-  activePatternId<@ROLE, @Getter> | 
-  longIdentifier<@ROLE, @Getter>;
+  activePatternId<@ROLE, @Getter>;
 
 activePatternId:
   LPAREN<LPAREN, LParen>
@@ -1229,13 +1228,6 @@ activePatternId:
     BAR
   )+
   RPAREN<RPAREN, RParen>;
-
-longIdentifier:
-  IDENTIFIER
-  (
-    DOT
-    IDENTIFIER<IDENTIFIER, Identifiers>
-  )*;
 
 interface fSharpIdentifier:
   identifier |

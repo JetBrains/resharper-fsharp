@@ -55,7 +55,8 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
 
         let checkResults = results.CheckResults
         let coords = document.GetCoordsByOffset(token.GetTreeEndOffset().Offset)
-        let names = token.GetQualifiersAndName() |> List.ofArray
+        // todo: fix getting qualifiers
+        let names = [token.Name]
         let lineText = sourceFile.Document.GetLineText(coords.Line)
 
         use cookie = CompilationContextCookie.GetOrCreate(fsFile.GetPsiModule().GetContextFromModule())

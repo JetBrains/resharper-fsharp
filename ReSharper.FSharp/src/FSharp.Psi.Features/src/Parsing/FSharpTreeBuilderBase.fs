@@ -109,15 +109,6 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
         while x.CurrentOffset < maxOffset && x.Builder.GetTokenType() != tokenType do
             x.AdvanceLexer()
 
-    member x.ProcessLongIdentifier(lid: Ident list) =
-        match lid with
-        | [] -> ()
-        | head :: _ ->
-
-        let mark = x.Mark(head.idRange)
-        let last = List.last lid
-        x.Done(last.idRange, mark, ElementType.LONG_IDENTIFIER)
-
     member x.ProcessReferenceName(lid: Ident list) =
         if lid.IsEmpty then () else
 
