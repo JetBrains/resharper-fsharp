@@ -79,6 +79,10 @@ interface qualifiableModuleLikeDeclaration:
   namedModuleDeclaration |
   namedNamespaceDeclaration;
 
+interface qualifiableDeclaration:
+  qualifiableModuleLikeDeclaration |
+  typeExtensionDeclaration;
+
 interface moduleDeclaration:
   anonModuleDeclaration |
   declaredModuleDeclaration;

@@ -20,14 +20,14 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
     static member ExtendNodeSelection(fsFile: IFSharpFile, node: ITreeNode): ISelectedRange =
         match node with
         | :? IFSharpIdentifier as identifier ->
-            let decl = QualifiableModuleLikeDeclarationNavigator.GetByIdentifier(identifier)
+            let decl = QualifiableDeclarationNavigator.GetByIdentifier(identifier)
             if isNotNull decl && isNotNull decl.QualifierReferenceName then
                 FSharpTreeRangeSelection(fsFile, decl.QualifierReferenceName, identifier) :> _ else
 
             null
 
         | :? IReferenceName as referenceName ->
-            let decl = QualifiableModuleLikeDeclarationNavigator.GetByQualifierReferenceName(referenceName)
+            let decl = QualifiableDeclarationNavigator.GetByQualifierReferenceName(referenceName)
             if isNotNull decl && isNotNull decl.Identifier then
                 FSharpTreeRangeSelection(fsFile, referenceName, decl.Identifier) :> _ else
 

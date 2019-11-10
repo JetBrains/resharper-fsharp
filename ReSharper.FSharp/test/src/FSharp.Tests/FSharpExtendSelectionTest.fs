@@ -14,6 +14,9 @@ type FSharpExtendSelectionTest() =
     [<Test>] member x.``Module qualifier 02 - Qualifier``() = x.DoNamedTest()
     [<Test>] member x.``Module qualifier 03 - Multiple qualifiers``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type extension qualifier 01 - Name``() = x.DoNamedTest()
+    [<Test>] member x.``Type extension qualifier 02 - Qualifier``() = x.DoNamedTest()
+
     [<Test>] member x.``Match clause - When 01 - Pat``() = x.DoNamedTest()
     [<Test>] member x.``Match clause - When 02 - When``() = x.DoNamedTest()
     [<Test>] member x.``Match clause - When 03 - Expr``() = x.DoNamedTest()

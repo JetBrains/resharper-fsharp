@@ -6,6 +6,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_MODULE_LIKE_DECLARATION = "";
     public const string IDS_NAMED_MODULE_LIKE_DECLARATION = "";
     public const string IDS_TOP_LEVEL_MODULE_LIKE_DECLARATION = "";
+    public const string IDS_QUALIFIABLE_DECLARATION = "";
     public const string IDS_QUALIFIABLE_MODULE_LIKE_DECLARATION = "";
     public const string IDS_DECLARED_MODULE_LIKE_DECLARATION = "";
     public const string IDS_ACCESS_MODIFIER = "";
