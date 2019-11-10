@@ -115,6 +115,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       Builder.AddDeclaredMemberName(decl.CompiledName);
     }
 
+    public override void VisitTypeDeclarationGroup(ITypeDeclarationGroup typeDeclarationGroupParam)
+    {
+      foreach (var typeDeclaration in typeDeclarationGroupParam.TypeDeclarations) 
+        typeDeclaration.Accept(this);
+    }
+
     public override void VisitLetModuleDecl(ILetModuleDecl letModuleDecl)
     {
       foreach (var binding in letModuleDecl.Bindings)

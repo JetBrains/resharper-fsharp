@@ -56,7 +56,7 @@ type InheritedMembersStageProcess(fsFile, daemonProcess) =
         let processor = RecursiveElementProcessor<ITypeMemberDeclaration>(Action<_>(processDeclaration result))
 
         processor.InteriorShouldBeProcessedHandler <-
-            fun node -> node :? ITypeDeclaration || node :? INamespaceDeclaration
+            fun node -> node :? IModuleLikeDeclaration || node :? ITypeDeclarationGroup
 
         x.FSharpFile.ProcessDescendants(processor)
         committer.Invoke(DaemonStageResult(result))

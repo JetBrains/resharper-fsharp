@@ -317,6 +317,14 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
                                        else ElementType.SINGLETON_CASE_DECLARATION
         x.Done(range, mark, elementType)
 
+    member x.ProcessOuterAttrs(attrs: SynAttributeList list, range: range) =
+        match attrs with
+        | { Range = r } as attributeList :: rest when posLt r.End range.Start ->
+            x.ProcessAttributeList(attributeList)
+            x.ProcessOuterAttrs(rest, range)
+
+        | _ -> ()
+
     member x.ProcessAttributeLists(attributeLists) =
         for attributeList in attributeLists do
             x.ProcessAttributeList(attributeList)

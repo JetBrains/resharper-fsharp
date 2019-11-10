@@ -22,6 +22,11 @@ type FSharpParserTest() =
     [<Test>] member x.``Namespace 06 - Global, type``() = x.DoNamedTest()
     [<Test>] member x.``Namespace 07 - Global, Multiple``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type decl - Exception 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Exception 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type decl - Extension 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Let 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Let 02 - Typed``() = x.DoNamedTest()
     [<Test>] member x.``Let 03 - Typed, var type``() = x.DoNamedTest()

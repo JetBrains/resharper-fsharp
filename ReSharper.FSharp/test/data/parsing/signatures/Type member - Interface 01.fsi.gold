@@ -6,18 +6,19 @@ IFSharpSigFile
     FSharpIdentifierToken(type:IDENTIFIER, text:Module)
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-    FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
-    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-    IObjectTypeDeclaration
-      FSharpIdentifierToken(type:IDENTIFIER, text:T)
+    ITypeDeclarationGroup
+      FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-      FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
-      NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-      Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-      IInterfaceImplementation
-        FSharpTokenType+InterfaceTokenElement(type:INTERFACE, text:interface)
+      IObjectTypeDeclaration
+        FSharpIdentifierToken(type:IDENTIFIER, text:T)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-        ITypeReferenceName
-          FSharpIdentifierToken(type:IDENTIFIER, text:IDisposable)
-      NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+        FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+        NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+        Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
+        IInterfaceImplementation
+          FSharpTokenType+InterfaceTokenElement(type:INTERFACE, text:interface)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          ITypeReferenceName
+            FSharpIdentifierToken(type:IDENTIFIER, text:IDisposable)
+        NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

@@ -26,6 +26,9 @@ type SymbolCacheTest() =
     [<Test>] member x.``Module 09 - Module suffix attribute - Space``() = x.DoNamedTest()
     [<Test>] member x.``Module 10 - Module suffix attribute - Backtics``() = x.DoNamedTest()
     [<Test>] member x.``Module 11 - Module suffix attribute - Wrong attr``() = x.DoNamedTest()
+    [<Test>] member x.``Module 12 - Module suffix - types group``() = x.DoNamedTest()
+    [<Test>] member x.``Module 13 - Module suffix, exception``() = x.DoNamedTest()
+    [<Test>] member x.``Module 14 - Module suffix - abbreviation``() = x.DoNamedTest()
 
     [<Test>] member x.``Namespace 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Namespace 02 - Qualified``() = x.DoNamedTest()

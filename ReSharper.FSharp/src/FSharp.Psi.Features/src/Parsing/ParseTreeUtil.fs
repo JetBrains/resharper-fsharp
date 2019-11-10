@@ -42,11 +42,27 @@ type SynSimplePat with
         | SynSimplePat.Typed(range = range)
         | SynSimplePat.Attrib(range = range) -> range
 
-let letStartPos (bindings: SynBinding list) (range: Range.range) =
-    match bindings with
-    | Binding(_, _, _, _, { Range = r } :: _, _, _, _, _, _, _ , _) :: _
-        when posLt r.Start range.Start -> r.Start
 
+let attrOwnerStartPos (attrLists: SynAttributeList list) (ownerRange: Range.range) =
+    match attrLists with
+    | { Range = attrsRange } :: _ ->
+        let attrsStart = attrsRange.Start
+        if posLt attrsStart ownerRange.Start then attrsStart else ownerRange.Start
+    | _ -> ownerRange.Start
+
+let typeDefnGroupStartPos (bindings: SynTypeDefn list) (range: Range.range) =
+    match bindings with
+    | TypeDefn(ComponentInfo(attrLists, _, _, _, _, _, _, _), _, _, _) :: _ -> attrOwnerStartPos attrLists range
+    | _ -> range.Start
+
+let typeSigGroupStartPos (bindings: SynTypeDefnSig list) (range: Range.range) =
+    match bindings with
+    | TypeDefnSig(ComponentInfo(attrLists, _, _, _, _, _, _, _), _, _, _) :: _ -> attrOwnerStartPos attrLists range
+    | _ -> range.Start
+
+let letBindingGroupStartPos (bindings: SynBinding list) (range: Range.range) =
+    match bindings with
+    | Binding(_, _, _, _, attrLists, _, _, _, _, _, _ , _) :: _ -> attrOwnerStartPos attrLists range
     | _ -> range.Start
 
 

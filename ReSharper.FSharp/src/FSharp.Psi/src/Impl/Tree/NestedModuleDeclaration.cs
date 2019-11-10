@@ -28,9 +28,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         return null;
 
       sourceName = SourceName;
-      foreach (var typeDeclaration in parentModule.Children<IFSharpTypeDeclaration>())
-        if (typeDeclaration.CompiledName == sourceName && typeDeclaration.TypeParameters.IsEmpty)
-          return typeDeclaration;
+      foreach (var moduleMember in parentModule.Members)
+      {
+        // Only type declarations are taken into account, exception declarations are ignored.
+        if (!(moduleMember is ITypeDeclarationGroup typeDeclarationGroup)) 
+          continue;
+
+        foreach (var typeDeclaration in typeDeclarationGroup.TypeDeclarations)
+          if (typeDeclaration.CompiledName == sourceName && typeDeclaration.TypeParameters.IsEmpty)
+            return typeDeclaration;
+      }
 
       return null;
     }

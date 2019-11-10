@@ -266,7 +266,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       switch (declaration)
       {
         case IFSharpTypeDeclaration typeDeclaration:
-          return typeDeclaration.Attributes;
+          return typeDeclaration.AllAttributes;
         case IMemberDeclaration memberDeclaration:
           return memberDeclaration.Attributes;
         case ISynPat pat:
@@ -423,36 +423,50 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     [NotNull]
-    public static TypeAugmentation IsTypePartDeclaration([NotNull] ITypeExtensionDeclaration extensionDeclaration)
+    public static TypeAugmentation GetTypeAugmentationInfo([NotNull] ITypeExtensionDeclaration declaration)
     {
-      var extNameInfo =
-        new NameAndParametersCount(extensionDeclaration.SourceName, extensionDeclaration.TypeParameters.Count);
-
+      var extensionNameInfo = new NameAndParametersCount(declaration.SourceName, declaration.TypeParameters.Count);
       var declaredTypeNames = new Dictionary<NameAndParametersCount, TypeAugmentation>();
-      var moduleDeclaration = extensionDeclaration.GetContainingNode<IModuleLikeDeclaration>()
-        .NotNull();
 
-      foreach (var member in moduleDeclaration.MembersEnumerable)
+      void RecordName(IFSharpTypeDeclaration typeDeclaration)
       {
-        if (member is ITypeExtensionDeclaration || !(member is IFSharpTypeDeclaration declaration))
-          continue;
-
-        var sourceName = declaration.SourceName;
+        var sourceName = typeDeclaration.SourceName;
         if (sourceName == SharedImplUtil.MISSING_DECLARATION_NAME)
-          continue;
+          return;
 
-        var compiledName = declaration.CompiledName;
+        // todo: should check source name only
+        var compiledName = typeDeclaration.CompiledName;
         if (compiledName == SharedImplUtil.MISSING_DECLARATION_NAME)
-          continue;
+          return;
 
-        var parametersCount = declaration.TypeParameters.Count;
-        var augmentationInfo = TypeAugmentation.NewTypePart(compiledName, parametersCount, declaration.TypePartKind);
+        var parametersCount = typeDeclaration.TypeParameters.Count;
+        var augmentationInfo =
+          TypeAugmentation.NewTypePart(compiledName, parametersCount, typeDeclaration.TypePartKind);
 
         var nameInfo = new NameAndParametersCount(sourceName, parametersCount);
         declaredTypeNames[nameInfo] = augmentationInfo;
       }
 
-      return declaredTypeNames.TryGetValue(extNameInfo, out var typeAugmentation)
+      var ownTypeDeclarationGroup = TypeDeclarationGroupNavigator.GetByTypeDeclaration(declaration);
+      var moduleDeclaration = ModuleLikeDeclarationNavigator.GetByMember(ownTypeDeclarationGroup).NotNull();
+
+      foreach (var member in moduleDeclaration.MembersEnumerable)
+      {
+        if (member is IExceptionDeclaration exceptionDeclaration)
+        {
+          RecordName(exceptionDeclaration);
+          continue;
+        }
+
+        if (!(member is ITypeDeclarationGroup declarationGroup))
+          continue;
+
+        foreach (var typeDeclaration in declarationGroup.TypeDeclarations)
+          if (!(typeDeclaration is ITypeExtensionDeclaration))
+            RecordName(typeDeclaration);
+      }
+
+      return declaredTypeNames.TryGetValue(extensionNameInfo, out var typeAugmentation)
         ? typeAugmentation
         : TypeAugmentation.Extension;
     }
@@ -470,7 +484,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
     
     public static bool HasAttribute([NotNull] this IFSharpTypeDeclaration typeDeclaration, [NotNull] string shortName) =>
-      HasAttribute(typeDeclaration.Attributes, shortName);
+      HasAttribute(typeDeclaration.AllAttributes, shortName);
 
     public static void ReplaceIdentifier([CanBeNull] this IFSharpIdentifierLikeNode fsIdentifier, string name)
     {

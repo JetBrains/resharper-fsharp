@@ -5,14 +5,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class ObjectTypeDeclaration
   {
-    protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
+    protected override string DeclaredElementName => NameIdentifier.GetCompiledName(AllAttributes);
     public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
 
     public override PartKind TypePartKind
     {
       get
       {
-        if (FSharpImplUtil.GetTypeKind(AttributesEnumerable, out var typeKind))
+        if (FSharpImplUtil.GetTypeKind(AllAttributes, out var typeKind))
           return typeKind;
 
         foreach (var member in TypeMembersEnumerable)

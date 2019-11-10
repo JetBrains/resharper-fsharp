@@ -9,7 +9,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class RecordDeclaration
   {
-    protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
+    protected override string DeclaredElementName => NameIdentifier.GetCompiledName(AllAttributes);
     public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
 
     public IList<ITypeOwner> GetFields()
@@ -24,7 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     }
 
     public override PartKind TypePartKind =>
-      FSharpImplUtil.GetTypeKind(AttributesEnumerable, out var typeKind)
+      FSharpImplUtil.GetTypeKind(AllAttributes, out var typeKind)
         ? typeKind
         : PartKind.Class;
 

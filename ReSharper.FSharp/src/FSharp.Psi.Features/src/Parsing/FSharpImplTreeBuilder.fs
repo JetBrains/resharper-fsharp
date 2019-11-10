@@ -64,9 +64,16 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                 x.ProcessModuleMemberDeclaration(decl)
             x.Done(range, mark, ElementType.NESTED_MODULE_DECLARATION)
 
-        | SynModuleDecl.Types(typeDefns, _) ->
+        | SynModuleDecl.Types(typeDefns, range) ->
+            let mark = x.Mark(typeDefnGroupStartPos typeDefns range)
+            match typeDefns with
+            | [] -> ()
+            | TypeDefn(ComponentInfo(attrs, _, _, _, _, _, _, _), _, _, _) :: _ ->
+                x.ProcessOuterAttrs(attrs, range)
+
             for typeDefn in typeDefns do
                 x.ProcessTypeDefn(typeDefn)
+            x.Done(range, mark, ElementType.TYPE_DECLARATION_GROUP)
 
         | SynModuleDecl.Exception(SynExceptionDefn(exn, memberDefns, range), _) ->
             let mark = x.StartException(exn)
@@ -81,9 +88,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             x.Done(range, mark, ElementType.OPEN_STATEMENT)
 
         | SynModuleDecl.Let(_, bindings, range) ->
-            let letStart = letStartPos bindings range
-            let letMark = x.Mark(letStart)
-
+            let letMark = x.Mark(letBindingGroupStartPos bindings range)
             match bindings with
             | [] -> ()
             | Binding(_, _, _, _, attrs, _, _, _, _, _, _ , _) :: _ ->
@@ -509,14 +514,6 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             if posGt r.End outerRange.Start then attrs else
             x.SkipOuterAttrs(rest, outerRange)
 
-    member x.ProcessOuterAttrs(attrs: SynAttributeList list, range: range) =
-        match attrs with
-        | { Range = r } as attributeList :: rest when posLt r.End range.Start ->
-            x.ProcessAttributeList(attributeList)
-            x.ProcessOuterAttrs(rest, range)
-
-        | _ -> ()
-    
     member x.ProcessTopLevelBinding(Binding(_, kind, _, _, attrs, _, _ , headPat, returnInfo, expr, _, _) as binding, letRange) =
         let expr = x.FixExpresion(expr)
 

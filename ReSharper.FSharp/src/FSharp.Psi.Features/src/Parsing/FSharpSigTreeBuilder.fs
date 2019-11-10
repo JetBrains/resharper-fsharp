@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
 open FSharp.Compiler.Ast
 open FSharp.Compiler.PrettyNaming
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -28,8 +29,16 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
             for s in sigs do x.ProcessModuleMemberSignature s
             x.Done(range, mark, ElementType.NESTED_MODULE_DECLARATION)
 
-        | SynModuleSigDecl.Types(types, _) ->
-            for t in types do x.ProcessTypeSignature t
+        | SynModuleSigDecl.Types(typeSigs, range) ->
+            let mark = x.Mark(typeSigGroupStartPos typeSigs range)
+            match typeSigs with
+            | [] -> ()
+            | TypeDefnSig(ComponentInfo(attrs, _, _, _, _, _, _, _), _, _, _) :: _ ->
+                x.ProcessOuterAttrs(attrs, range)
+
+            for typeSig in typeSigs do
+                x.ProcessTypeSignature(typeSig)
+            x.Done(range, mark, ElementType.TYPE_DECLARATION_GROUP)
 
         | SynModuleSigDecl.Exception(SynExceptionSig(exn, members, range), _) ->
             let mark = x.StartException(exn)

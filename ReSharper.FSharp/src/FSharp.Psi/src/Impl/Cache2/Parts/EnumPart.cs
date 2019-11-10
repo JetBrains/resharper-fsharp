@@ -10,7 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   internal class EnumPart : FSharpTypeParametersOwnerPart<IFSharpTypeDeclaration>, Enum.IEnumPart
   {
     public EnumPart([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder builder)
-      : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifier, declaration.Attributes),
+      : base(declaration, ModifiersUtil.GetDecoration(declaration.AccessModifier, declaration.AllAttributes),
         declaration.TypeParameters, builder)
     {
     }

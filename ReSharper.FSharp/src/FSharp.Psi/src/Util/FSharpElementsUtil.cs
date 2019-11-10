@@ -22,9 +22,7 @@ using JetBrains.Util.Logging;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 {
-  /// <summary>
-  /// Map FSharpSymbol elements (as seen by FSharp.Compiler.Service) to declared elements.
-  /// </summary>
+  /// Maps FSharpSymbol elements (produced by FSharp.Compiler.Service) to declared elements.
   public static class FSharpElementsUtil
   {
     [CanBeNull]
@@ -46,10 +44,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         if (typeElements.Length == 1)
           return typeElements[0];
 
-        var assemblySimpleName = entity.Assembly?.SimpleName;
-        return assemblySimpleName != null
-          ? typeElements.FirstOrDefault(typeElement => typeElement.Module.DisplayName == assemblySimpleName)
-          : null;
+        // If there are multiple entities with given FQN, try to choose one based on assembly name or entity kind.
+        var fcsAssemblySimpleName = entity.Assembly?.SimpleName;
+        if (fcsAssemblySimpleName == null)
+          return null;
+
+        var isModule = entity.IsFSharpModule;
+        return typeElements.FirstOrDefault(typeElement =>
+        {
+          if (typeElement.Module.DisplayName != fcsAssemblySimpleName)
+            return false;
+
+          // Happens when there are an exception and a module with the same name.
+          // It's now allowed, but we want keep resolve working where possible.
+          if (typeElement is IFSharpDeclaredElement)
+            return isModule == typeElement is IModule;
+
+          return true;
+        });
       }
 
       var symbolScope = psiModule.GetSymbolScope();

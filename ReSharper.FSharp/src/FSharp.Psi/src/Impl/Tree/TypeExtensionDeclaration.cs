@@ -36,10 +36,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       get
       {
+        if (myTypeAugmentation != null)
+          return myTypeAugmentation;
+
         lock (this)
-        {
-          return myTypeAugmentation ?? (myTypeAugmentation = FSharpImplUtil.IsTypePartDeclaration(this));
-        }
+          return myTypeAugmentation ??= FSharpImplUtil.GetTypeAugmentationInfo(this);
       }
     }
 
@@ -47,7 +48,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override PartKind TypePartKind => TypeAugmentation.PartKind;
 
     public bool IsTypeExtensionAllowed =>
-      GetContainingNode<IModuleDeclaration>() != null;
+      ModuleDeclarationNavigator.GetByMember(TypeDeclarationGroupNavigator.GetByTypeDeclaration(this)) != null;
 
     public ITokenNode IdentifierToken => Identifier;
 

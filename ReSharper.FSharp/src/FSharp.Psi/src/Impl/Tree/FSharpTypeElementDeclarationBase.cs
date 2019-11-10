@@ -56,16 +56,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
             result.Add(m);
 
           if (child is IInterfaceImplementation interfaceImplementation)
-          {
             foreach (var implementedMember in interfaceImplementation.Children<ITypeMemberDeclaration>())
               result.Add(implementedMember);
-          }
 
-          if (child is ITypeExtensionDeclaration typeExtension && !typeExtension.IsTypePartDeclaration)
-          {
-            foreach (var extensionMember in typeExtension.Children<ITypeMemberDeclaration>())
-              result.Add(extensionMember);
-          }
+          if (child is ITypeDeclarationGroup typeDeclarationGroup)
+            foreach (var typeDeclaration in typeDeclarationGroup.TypeDeclarations)
+            {
+              if (typeDeclaration is ITypeExtensionDeclaration typeExtension && !typeExtension.IsTypePartDeclaration)
+                foreach (var extensionMember in typeExtension.Children<ITypeMemberDeclaration>())
+                  result.Add(extensionMember);
+              else
+                result.Add(typeDeclaration);
+            }
 
           if (child is ILetModuleDecl let)
             foreach (var binding in let.Bindings)
@@ -95,6 +97,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       get
       {
+        if (!(this is IModuleDeclaration))
+          return EmptyList<ITypeDeclaration>.Instance;
+
         var result = new LocalList<ITypeDeclaration>();
         foreach (var memberDeclaration in this.Children())
         {
@@ -108,24 +113,54 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public virtual PartKind TypePartKind => PartKind.Class;
 
+    public TreeNodeCollection<IAttribute> AllAttributes
+    {
+      get
+      {
+        if (!(this is IFSharpTypeDeclaration typeDeclaration))
+          return TreeNodeCollection<IAttribute>.Empty;
+
+        var attributes = typeDeclaration.Attributes;
+
+        var typeDeclarationGroup = TypeDeclarationGroupNavigator.GetByTypeDeclaration(typeDeclaration);
+        if (typeDeclarationGroup == null)
+          return attributes;
+
+        if (typeDeclarationGroup.TypeDeclarations.FirstOrDefault() != this)
+          return attributes;
+
+        var typeGroupAttributes = typeDeclarationGroup.Attributes;
+        if (typeGroupAttributes.IsEmpty)
+          return attributes;
+
+        return attributes.IsEmpty
+          ? typeGroupAttributes
+          : attributes.Prepend(typeGroupAttributes).ToTreeNodeCollection();
+      }
+    }
+
     public override void SetName(string name, ChangeNameKind changeNameKind)
     {
       var oldSourceName = SourceName;
       base.SetName(name, changeNameKind);
 
-      if (!(Parent is IModuleLikeDeclaration module))
+      var module =
+        ModuleLikeDeclarationNavigator.GetByMember(
+          this as IModuleMember ?? TypeDeclarationGroupNavigator.GetByTypeDeclaration(this as IFSharpTypeDeclaration));
+
+      if (module == null)
         return;
 
       foreach (var member in module.Members)
       {
-        if (!(member is IModuleDeclaration decl))
+        if (!(member is IModuleDeclaration moduleDeclaration))
           continue;
 
-        if (decl.SourceName == oldSourceName || decl.SourceName == name)
-        {
-          var element = member as CompositeElement;
-          element?.SubTreeChanged(element, PsiChangedElementType.SourceContentsChanged);
-        }
+        if (moduleDeclaration.SourceName != oldSourceName && moduleDeclaration.SourceName != name)
+          continue;
+
+        var element = member as CompositeElement;
+        element?.SubTreeChanged(element, PsiChangedElementType.SourceContentsChanged);
       }
     }
   }

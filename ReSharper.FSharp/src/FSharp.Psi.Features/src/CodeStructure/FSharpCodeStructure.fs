@@ -63,6 +63,10 @@ type FSharpCodeStructureProvider() =
             for binding in Seq.cast<ITopBinding> letDecl.Bindings do
                 CodeStructureDeclarationElement(parent, binding) |> ignore
 
+        | :? ITypeDeclarationGroup as declarationGroup ->
+            for typeDeclaration in declarationGroup.TypeDeclarations do
+                processNode typeDeclaration parent
+
         | _ -> ()
 
     and processTypeDeclaration (typeDecl: IFSharpTypeDeclaration) (members: IDeclaration seq) parent =

@@ -126,7 +126,8 @@ anonModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; }:
 
 interface moduleMember:
   nestedModuleDeclaration |
-  fSharpTypeDeclaration |
+  typeDeclarationGroup |
+  exceptionDeclaration |
   letModuleDecl |
   moduleAbbreviation |
   openStatement |
@@ -718,6 +719,14 @@ fixedExpr options { stubBase="FSharpExpressionBase"; }:
 
 chameleonExpression:
   synExpr<EXPR, Expression>;
+
+
+typeDeclarationGroup extras {
+  get { methodName="Attributes" path=<typeDeclarationGroup:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+}:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
+  TYPE<TYPE, TypeKeyword>
+  LIST fSharpTypeDeclaration<TYPE_DECLARATION, TypeDeclarations> SEP AND<AND, Separators>;
 
 
 interface fSharpTypeDeclaration:

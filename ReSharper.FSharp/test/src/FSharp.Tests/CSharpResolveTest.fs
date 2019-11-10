@@ -33,6 +33,7 @@ type CSharpResolveTest() =
     [<Test>] member x.``Exceptions 02 - Single field``() = x.DoNamedTest()
     [<Test>] member x.``Exceptions 03 - Multiple fields``() = x.DoNamedTest()
     [<Test>] member x.``Exceptions 04 - Protected ctor``() = x.DoNamedTest()
+    [<Test>] member x.``Exceptions 05 - Augmentation``() = x.DoNamedTest()
 
     [<Test>] member x.``Unions 01 - Simple generated members``() = x.DoNamedTest()
     [<Test>] member x.``Unions 02 - Singletons``() = x.DoNamedTest()

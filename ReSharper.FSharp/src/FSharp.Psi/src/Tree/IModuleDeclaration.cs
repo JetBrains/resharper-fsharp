@@ -1,6 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
-  public partial interface IModuleDeclaration : IFSharpDeclaration
+  public partial interface IModuleDeclaration : IFSharpTypeElementDeclaration
   {
   }
 }
