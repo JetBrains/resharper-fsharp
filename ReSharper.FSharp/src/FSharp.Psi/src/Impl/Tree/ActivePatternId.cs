@@ -9,7 +9,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class ActivePatternId : IFSharpIdentifierLikeNode
+  internal partial class ActivePatternId
   {
     public ITokenNode IdentifierToken => null;
 

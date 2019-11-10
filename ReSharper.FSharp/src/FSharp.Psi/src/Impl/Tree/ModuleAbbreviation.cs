@@ -5,6 +5,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class ModuleAbbreviation
   {
     protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
-    public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
+    public override IFSharpIdentifierLikeNode NameIdentifier => Identifier;
   }
 }

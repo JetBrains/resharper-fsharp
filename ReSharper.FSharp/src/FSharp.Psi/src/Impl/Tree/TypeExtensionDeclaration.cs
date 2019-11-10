@@ -11,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     [CanBeNull] private TypeAugmentation myTypeAugmentation;
     public FSharpSymbolReference Reference { get; protected set; }
 
-    public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
+    public override IFSharpIdentifierLikeNode NameIdentifier => Identifier;
     protected override string DeclaredElementName => TypeAugmentation.CompiledName;
 
     protected override void ClearCachedData()
@@ -50,7 +50,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public bool IsTypeExtensionAllowed =>
       ModuleDeclarationNavigator.GetByMember(TypeDeclarationGroupNavigator.GetByTypeDeclaration(this)) != null;
 
-    public ITokenNode IdentifierToken => Identifier;
+    public ITokenNode IdentifierToken => Identifier as ITokenNode;
 
     IFSharpReferenceOwner IFSharpReferenceOwner.SetName(string name) =>
       FSharpImplUtil.SetName(this, name);

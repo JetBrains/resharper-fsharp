@@ -5,6 +5,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class NestedTypeUnionCaseDeclaration
   {
     protected override string DeclaredElementName => NameIdentifier.GetSourceName();
-    public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
+    public override IFSharpIdentifierLikeNode NameIdentifier => Identifier;
   }
 }

@@ -6,7 +6,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class ObjectTypeDeclaration
   {
     protected override string DeclaredElementName => NameIdentifier.GetCompiledName(AllAttributes);
-    public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
+    public override IFSharpIdentifierLikeNode NameIdentifier => Identifier;
 
     public override PartKind TypePartKind
     {
