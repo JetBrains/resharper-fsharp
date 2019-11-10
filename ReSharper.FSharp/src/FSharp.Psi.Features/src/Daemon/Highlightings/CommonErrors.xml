@@ -205,7 +205,7 @@
   </Warning>
   
   <Error staticGroup="FSharpErrors" name="ExpectedExpressionAfterLet">
-    <Parameter type="ILetOrUseExpr" name="letExpr"/>
+    <Parameter type="ILetLikeExpr" name="letExpr"/>
     <Range>letExpr.LetOrUseToken.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <Message value="'{0}' is missing expression">
