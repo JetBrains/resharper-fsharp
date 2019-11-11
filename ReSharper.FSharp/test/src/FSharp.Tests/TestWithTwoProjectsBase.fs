@@ -15,7 +15,7 @@ open JetBrains.ReSharper.TestFramework
 open JetBrains.Util
 
 [<AbstractClass; FSharpTest>]
-type TestWithTwoProjects() =
+type TestWithTwoProjectsBase() =
     inherit BaseTestWithSingleProject()
 
     abstract MainFileExtension: string

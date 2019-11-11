@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
@@ -8,29 +8,26 @@
 
   <ItemGroup>
     <Compile Include="Common.fs" />
-    <Compile Include="IsFSharpAssemblyTest.fs" />
-    <Compile Include="TestWithTwoProjects.fs" />
-    <Compile Include="FSharpHighlightingTestBase.fs" />
-    <Compile Include="CSharpResolveTest.fs" />
-    <Compile Include="SymbolCacheTest.fs" />
-    <Compile Include="ErrorsHighlightingTest.fs" />
-    <Compile Include="IdentifierHighlightingTest.fs" />
-    <Compile Include="FormatSpecifiersHighlightingTest.fs" />
-    <Compile Include="InferredTypeCodeVisionProviderTest.fs" />
-    <Compile Include="DelegatingFileSystemShimTest.fs" />
-    <Compile Include="FSharpLexerTest.fs" />
     <Compile Include="Stubs.fs" />
     <Compile Include="ZoneMarker.fs" />
-    <Compile Include="CommentActionTests.fs" />
-    <Compile Include="TypingAssistTest.fs" />
-    <Compile Include="FSharpTodoTest.fs" />
-    <Compile Include="RenameTest.fs" />
-    <Compile Include="FSharpOccurenceKindTest.fs" />
-    <Compile Include="StructureTest.fs" />
-    <Compile Include="NavigationTests.fs" />
-    <Compile Include="InheritanceGutterMarksTest.fs" />
-    <Compile Include="FSharpParserTest.fs" />
-    <Compile Include="FSharpCompletionTest.fs" />
+    <Compile Include="TestWithTwoProjectsBase.fs" />
+    <Compile Include="Service\DelegatingFileSystemShimTest.fs" />
+    <Compile Include="Service\NameResolutionTest.fs" />
+    <Compile Include="Service\StructureTest.fs" />
+    <Compile Include="Service\IsFSharpAssemblyTest.fs" />
+    <Compile Include="Service\FSharpElementFactoryTest.fs" />
+    <Compile Include="Service\FSharpNamingTest.fs" />
+    <Compile Include="Cache\CSharpResolveTest.fs" />
+    <Compile Include="Cache\SymbolCacheTest.fs" />
+    <Compile Include="Parsing\FSharpLexerTest.fs" />
+    <Compile Include="Parsing\FSharpParserTest.fs" />
+    <Compile Include="Daemon\FSharpHighlightingTestBase.fs" />
+    <Compile Include="Daemon\IdentifierHighlightingTest.fs" />
+    <Compile Include="Daemon\ErrorsHighlightingTest.fs" />
+    <Compile Include="Daemon\FormatSpecifiersHighlightingTest.fs" />
+    <Compile Include="Daemon\InferredTypeCodeVisionProviderTest.fs" />
+    <Compile Include="Daemon\InheritanceGutterMarksTest.fs" />
+    <Compile Include="Daemon\SyntaxHighlightingTest.fs" />
     <Compile Include="QuickFixes\NotAvailableAttribute.fs" />
     <Compile Include="QuickFixes\ReplaceUseWithLetTest.fs" />
     <Compile Include="QuickFixes\RemoveUnusedSelfIdVariableFix.fs" />
@@ -52,11 +49,14 @@
     <Compile Include="Intentions\ToRecursiveLetBindings.fs" />
     <Compile Include="Intentions\ToMultilineRecordTest.fs" />
     <Compile Include="Intentions\ToRecursiveModuleActionTest.fs" />
-    <Compile Include="FSharpElementFactoryTest.fs" />
-    <Compile Include="FSharpNamingTest.fs" />
-    <Compile Include="SyntaxHighlightingTest.fs" />
-    <Compile Include="NameResolutionTest.fs" />
-    <Compile Include="FSharpExtendSelectionTest.fs" />
+    <Compile Include="Actions\CommentActionTests.fs" />
+    <Compile Include="Actions\TypingAssistTest.fs" />
+    <Compile Include="Actions\FSharpExtendSelectionTest.fs" />
+    <Compile Include="Refactotings\RenameTest.fs" />
+    <Compile Include="FSharpTodoTest.fs" />
+    <Compile Include="FSharpOccurenceKindTest.fs" />
+    <Compile Include="NavigationTests.fs" />
+    <Compile Include="FSharpCompletionTest.fs" />
   </ItemGroup>
 
   <ItemGroup>

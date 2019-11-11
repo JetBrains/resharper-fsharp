@@ -15,7 +15,7 @@ open NUnit.Framework
 
 [<TestPackages("FSharp.Core")>]
 type CSharpResolveTest() =
-    inherit TestWithTwoProjects()
+    inherit TestWithTwoProjectsBase()
 
     let highlightingManager = HighlightingSettingsManager.Instance
 
