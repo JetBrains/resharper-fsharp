@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
+open FSharp.Compiler.Text
 open Fantomas
 open Fantomas.FormatConfig
 open JetBrains.Application.Infra
@@ -7,12 +8,14 @@ open JetBrains.DocumentModel
 open JetBrains.DocumentModel.Impl
 open JetBrains.ReSharper.Feature.Services.CSharp.CodeCleanup
 open JetBrains.ReSharper.Feature.Services.CodeCleanup
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CodeStyle
 open JetBrains.ReSharper.Psi.Util
+open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 open JetBrains.Util.Text
 
@@ -28,9 +31,8 @@ type FSharpReformatCode() =
         member x.Process(sourceFile, rangeMarker, profile, _) =
             if not (profile.GetSetting(ReformatCode.REFORMAT_CODE_DESCRIPTOR)) then () else
 
-            match sourceFile.FSharpFile with
-            | null -> ()
-            | fsFile ->
+            let fsFile = sourceFile.FSharpFile
+            if isNull fsFile then () else
 
             match fsFile.ParseTree with // todo: completion on enter after with
             | None -> ()
@@ -38,7 +40,9 @@ type FSharpReformatCode() =
 
             let filePath = sourceFile.GetLocation().FullPath
             let document = sourceFile.Document :?> DocumentBase
-            let source = document.GetText()
+            let text = document.GetText()
+            let source = SourceOrigin.SourceText(SourceText.ofString(document.GetText()))
+            let checkerService = fsFile.CheckerService
 
             let settings = sourceFile.GetFormatterSettings(fsFile.Language) :?> FSharpFormatSettingsKey
             let formatConfig = { FormatConfig.Default with
@@ -50,7 +54,7 @@ type FSharpReformatCode() =
                                      SpaceAfterSemicolon = settings.SpaceAfterSemicolon
                                      IndentOnTryWith = settings.IndentOnTryWith
                                      SpaceAroundDelimiter = settings.SpaceAroundDelimiter
-                                     PreserveEndOfLine = settings.PreserveEndOfLine }
+                                     KeepNewlineAfter = settings.PreserveEndOfLine }
 
             let stamp = document.LastModificationStamp
             let modificationSide = TextModificationSide.NotSpecified
@@ -60,23 +64,29 @@ type FSharpReformatCode() =
                 if isNotNull rangeMarker then
                     try
                         let range = ofDocumentRange rangeMarker.DocumentRange
+                        let parsingOptions = checkerService.GetParsingOptions(sourceFile)
+                        let checker = checkerService.Checker
                         let formatted =
                             CodeFormatter
-                                .FormatSelection(filePath, range, source, formatConfig)
+                                .FormatSelectionAsync(filePath, range, source, formatConfig, parsingOptions, checker)
+                                .RunAsTask()
                                 .Replace("\r\n", newLineText)
                         let offset = rangeMarker.DocumentRange.StartOffset.Offset
                         let oldLength = rangeMarker.DocumentRange.Length
                         Some(DocumentChange(document, offset, oldLength, formatted, stamp, modificationSide))
                     with _ -> None
                 else
+                    let defines = checkerService.GetDefines(sourceFile)
                     let formatted =
                         CodeFormatter
-                            .FormatAST(parseTree, filePath, Some source, formatConfig)
+                            .FormatASTAsync(parseTree, filePath, defines,  Some source, formatConfig)
+                            .RunAsTask()
                             .Replace("\r\n", newLineText)
-                    Some(DocumentChange(document, 0, source.Length, formatted, stamp, modificationSide))
+                    Some(DocumentChange(document, 0, text.Length, formatted, stamp, modificationSide))
 
             match change with
             | Some change ->
+                use cookie = WriteLockCookie.Create()
                 document.ChangeDocument(change, TimeStamp.NextValue)
                 sourceFile.GetPsiServices().Files.CommitAllDocuments()
             | _ -> ()
