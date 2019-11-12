@@ -13,7 +13,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.CodeStyle
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
@@ -44,7 +44,15 @@ type FSharpReformatCode() =
             let source = SourceOrigin.SourceText(SourceText.ofString(document.GetText()))
             let checkerService = fsFile.CheckerService
 
-            let settings = sourceFile.GetFormatterSettings(fsFile.Language) :?> FSharpFormatSettingsKey
+            
+            let solution = fsFile.GetSolution()
+            let settings = sourceFile.GetSettingsStore()
+            let languageService = fsFile.Language.LanguageServiceNotNull()
+            let formatter = languageService.CodeFormatter
+
+            let settings =
+                formatter.GetFormatterSettings(solution, sourceFile, settings, false) :?> FSharpFormatSettingsKey
+
             let formatConfig = { FormatConfig.Default with
                                      PageWidth = settings.WRAP_LIMIT
                                      IndentSpaceNum = settings.INDENT_SIZE
