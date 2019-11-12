@@ -31,7 +31,3 @@ class FSharpSyntaxHighlighter : SyntaxHighlighterBase() {
     override fun getHighlightingLexer() = FSharpLexer()
     override fun getTokenHighlights(tokenType: IElementType): Array<TextAttributesKey> = pack(ourKeys[tokenType])
 }
-
-class FSharpSyntaxHighlighterFactory : SyntaxHighlighterFactory() {
-    override fun getSyntaxHighlighter(project: Project?, virtualFile: VirtualFile?) = FSharpSyntaxHighlighter()
-}
