@@ -1,6 +1,6 @@
 ﻿using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
-using JetBrains.ReSharper.Feature.Services.Daemon;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using static FSharp.Compiler.PrettyNaming;
 
@@ -13,59 +13,65 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
     public static string GetEntityHighlightingAttributeId([NotNull] this FSharpEntity entity)
     {
       if (entity.IsNamespace)
-        return HighlightingAttributeIds.NAMESPACE_IDENTIFIER_ATTRIBUTE;
+        return FSharpHighlightingAttributeIds.Namespace;
 
       if (entity.IsEnum)
-        return HighlightingAttributeIds.TYPE_ENUM_ATTRIBUTE;
+        return FSharpHighlightingAttributeIds.Enum;
 
       if (entity.IsValueType)
-        return HighlightingAttributeIds.TYPE_STRUCT_ATTRIBUTE;
+        return FSharpHighlightingAttributeIds.Struct;
 
       if (entity.IsDelegate)
-        return HighlightingAttributeIds.TYPE_DELEGATE_ATTRIBUTE;
+        return FSharpHighlightingAttributeIds.Delegate;
 
       if (entity.IsFSharpModule)
-        return HighlightingAttributeIds.TYPE_STATIC_CLASS_ATTRIBUTE;
+        return FSharpHighlightingAttributeIds.Module;
+
+      if (entity.IsFSharpUnion)
+        return FSharpHighlightingAttributeIds.Union;
+
+      if (entity.IsFSharpRecord)
+        return FSharpHighlightingAttributeIds.Record;
 
       return entity.IsInterface
-        ? HighlightingAttributeIds.TYPE_INTERFACE_ATTRIBUTE
-        : HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE;
+        ? FSharpHighlightingAttributeIds.Interface
+        : FSharpHighlightingAttributeIds.Class;
     }
 
     [NotNull]
     public static string GetMfvHighlightingAttributeId([NotNull] this FSharpMemberOrFunctionOrValue mfv)
     {
       if (mfv.IsEvent || mfv.IsEventAddMethod || mfv.IsEventRemoveMethod || mfv.EventForFSharpProperty != null)
-        return HighlightingAttributeIds.EVENT_IDENTIFIER_ATTRIBUTE;
+        return FSharpHighlightingAttributeIds.Event;
 
       if (mfv.IsImplicitConstructor || mfv.IsConstructor)
         return mfv.DeclaringEntity?.Value is FSharpEntity declEntity && declEntity.IsValueType
-          ? HighlightingAttributeIds.TYPE_STRUCT_ATTRIBUTE
-          : HighlightingAttributeIds.TYPE_CLASS_ATTRIBUTE;
+          ? FSharpHighlightingAttributeIds.Struct
+          : FSharpHighlightingAttributeIds.Class;
 
       var entity = mfv.DeclaringEntity;
       if (mfv.IsModuleValueOrMember && (entity != null && !entity.Value.IsFSharpModule || mfv.IsExtensionMember))
         return mfv.IsProperty || mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod
-          ? HighlightingAttributeIds.FIELD_IDENTIFIER_ATTRIBUTE
-          : HighlightingAttributeIds.METHOD_IDENTIFIER_ATTRIBUTE;
+          ? FSharpHighlightingAttributeIds.Property
+          : FSharpHighlightingAttributeIds.Method;
 
       if (mfv.LiteralValue != null)
-        return HighlightingAttributeIds.CONSTANT_IDENTIFIER_ATTRIBUTE;
+        return FSharpHighlightingAttributeIds.Literal;
 
       if (mfv.IsActivePattern)
-        return HighlightingAttributeIds.METHOD_IDENTIFIER_ATTRIBUTE;
+        return FSharpHighlightingAttributeIds.ActivePatternCase;
 
       if (mfv.IsMutable || mfv.IsRefCell())
-        return HighlightingAttributeIds.MUTABLE_LOCAL_VARIABLE_IDENTIFIER_ATTRIBUTE;
+        return FSharpHighlightingAttributeIds.MutableValue;
 
       if (IsMangledOpName(mfv.LogicalName))
-        return HighlightingAttributeIds.OPERATOR_IDENTIFIER_ATTRIBUTE;
+        return FSharpHighlightingAttributeIds.Operator;
 
       var fsType = mfv.FullType;
       if (fsType.HasTypeDefinition && fsType.TypeDefinition is var mfvTypeEntity && mfvTypeEntity.IsByRef)
-        return HighlightingAttributeIds.MUTABLE_LOCAL_VARIABLE_IDENTIFIER_ATTRIBUTE;
+        return FSharpHighlightingAttributeIds.MutableValue;
 
-      return HighlightingAttributeIds.LOCAL_VARIABLE_IDENTIFIER_ATTRIBUTE;
+      return FSharpHighlightingAttributeIds.Value;
     }
 
     [NotNull]
@@ -81,21 +87,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
 
         case FSharpField field:
           return field.IsLiteral
-            ? HighlightingAttributeIds.CONSTANT_IDENTIFIER_ATTRIBUTE
-            : HighlightingAttributeIds.FIELD_IDENTIFIER_ATTRIBUTE;
+            ? FSharpHighlightingAttributeIds.Literal
+            : FSharpHighlightingAttributeIds.Field;
 
         case FSharpUnionCase _:
-          return HighlightingAttributeIds.TYPE_ENUM_ATTRIBUTE;
+          return FSharpHighlightingAttributeIds.Class;
 
         case FSharpGenericParameter _:
-          return HighlightingAttributeIds.TYPE_PARAMETER_ATTRIBUTE;
+          return FSharpHighlightingAttributeIds.TypeParameter;
 
         case FSharpActivePatternCase _:
-          return HighlightingAttributeIds.METHOD_IDENTIFIER_ATTRIBUTE;
+          return FSharpHighlightingAttributeIds.ActivePatternCase;
       }
 
       // some highlighting is needed for tooltip provider
-      return HighlightingAttributeIds.LOCAL_VARIABLE_IDENTIFIER_ATTRIBUTE;
+      return FSharpHighlightingAttributeIds.Value;
     }
   }
 }
