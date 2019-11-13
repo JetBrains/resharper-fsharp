@@ -343,7 +343,7 @@ type FSharpSettingsNamesProvider() =
   assembly:
       RegisterHighlighter(
           FSharpHighlightingAttributeIds.Operator,
-          FallbackAttributeId = DefaultLanguageAttributeIds.OPERATOR,
+          FallbackAttributeId = DefaultLanguageAttributeIds.OVERLOADED_OPERATOR,
           GroupId = FSharpHighlightingAttributeIds.GroupId,
           RiderPresentableName = "Values//Operator",
           Layer = HighlighterLayer.SYNTAX,
