@@ -6,8 +6,8 @@ match 123 with
 | _ -> ()
 
 ---------------------------------------------------------
-(0): ReSharper C# Static Class Identifier: 
-(1): ReSharper Class Identifier: 
-(2): ReSharper Constant Identifier: 
-(3): ReSharper C# Static Class Identifier: 
-(4): ReSharper Constant Identifier: 
+(0): ReSharper F# Module Identifier: 
+(1): ReSharper F# Class Identifier: 
+(2): ReSharper F# Literal Identifier: 
+(3): ReSharper F# Module Identifier: 
+(4): ReSharper F# Literal Identifier: 
