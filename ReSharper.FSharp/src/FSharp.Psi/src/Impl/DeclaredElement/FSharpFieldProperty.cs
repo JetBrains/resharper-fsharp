@@ -22,7 +22,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
   }
 
   /// Record field compiled to a property.
-  internal class FSharpRecordField : FSharpFieldProperty<RecordFieldDeclaration>, IRepresentationAccessRightsOwner
+  internal class FSharpRecordField : FSharpFieldProperty<RecordFieldDeclaration>, IRecordField
   {
     private readonly bool myIsMutable;
 
@@ -30,8 +30,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       base(declaration) =>
       myIsMutable = field.IsMutable;
 
-    public override bool IsWritable =>
+    public bool IsMutable =>
       myIsMutable || GetContainingType().IsCliMutableRecord();
+
+    public override bool IsWritable => IsMutable;
 
     public override AccessRights GetAccessRights() => GetContainingType().GetRepresentationAccessRights();
     public AccessRights RepresentationAccessRights => GetContainingType().GetFSharpRepresentationAccessRights();
@@ -55,5 +57,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public IParameter GetParameter() =>
       new FSharpGeneratedParameter(GetContainingType().GetGeneratedConstructor(), this);
+  }
+
+  public interface IRecordField : IProperty, IRepresentationAccessRightsOwner
+  {
+    bool IsMutable { get; }
   }
 }
