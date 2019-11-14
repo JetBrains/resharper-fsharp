@@ -25,6 +25,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public InvocableSignature GetSignature(ISubstitution substitution) =>
       new InvocableSignature(this, substitution);
 
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(this, obj))
+        return true;
+
+      if (!(obj is FSharpCompiledPropertyBase<T> field))
+        return false;
+
+      if (!ShortName.Equals(field.ShortName))
+        return false;
+
+      return Equals(GetContainingType(), field.GetContainingType());
+    }
+
+    public override int GetHashCode() => ShortName.GetHashCode();
+
     public bool IsAuto => false;
     public bool IsDefault => false;
     public bool IsReadable => true;
