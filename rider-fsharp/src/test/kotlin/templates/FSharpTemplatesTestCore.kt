@@ -2,14 +2,14 @@ package templates
 
 import com.intellij.execution.runners.ExecutionEnvironment
 import com.jetbrains.rider.run.configurations.project.DotNetProjectConfiguration
-import com.jetbrains.rider.test.base.RiderTemplatesTestCoreBase
+import com.jetbrains.rider.test.base.RiderTemplatesTestBase
 import com.jetbrains.rider.test.enums.CoreVersion
 import com.jetbrains.rider.test.framework.executeWithGold
 import com.jetbrains.rider.test.scriptingApi.*
 import org.testng.annotations.Test
 
 @Test
-abstract class FSharpTemplatesTestCore : RiderTemplatesTestCoreBase() {
+abstract class FSharpTemplatesTestCore : RiderTemplatesTestBase() {
 
     fun classlibCoreTemplate() {
         var templateId = ProjectTemplateIds.Core.fsharp_classLibrary

@@ -25,7 +25,7 @@ repositories {
 }
 
 plugins {
-    id("org.jetbrains.intellij") version "0.4.12"
+    id("org.jetbrains.intellij") version "0.4.13"
     id("org.jetbrains.grammarkit") version "2018.1.7"
 }
 
@@ -75,7 +75,6 @@ intellij {
 
     // Workaround for https://youtrack.jetbrains.com/issue/IDEA-179607
     setPlugins("rider-plugins-appender")
-    useProductionClassLoaderInTests = true
 }
 
 repositories.forEach {
