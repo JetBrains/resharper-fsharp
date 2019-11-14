@@ -361,3 +361,6 @@ type FSharpSettingsNamesProvider() =
           EffectType = EffectType.TEXT, ForegroundColor = "DarkCyan:Blue", DarkForegroundColor = "Cyan")>]
 do
     ()
+
+module MissingAssemblyReferenceWorkaround =
+    FontStyle.Bold |> ignore

@@ -64,6 +64,7 @@
 
   <ItemGroup>
     <Reference Include="WindowsBase" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" /> <!--needed for completion to work -->
   </ItemGroup>
 </Project>
