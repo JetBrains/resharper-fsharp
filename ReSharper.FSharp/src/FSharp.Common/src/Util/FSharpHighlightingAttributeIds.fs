@@ -363,4 +363,5 @@ do
     ()
 
 module MissingAssemblyReferenceWorkaround =
-    FontStyle.Bold |> ignore
+    type T(p: FontStyle) =
+        class end
