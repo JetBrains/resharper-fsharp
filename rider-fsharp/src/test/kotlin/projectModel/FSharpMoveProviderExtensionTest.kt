@@ -10,11 +10,11 @@ import com.jetbrains.rider.test.base.ProjectModelBaseTest
 import org.testng.Assert
 import org.testng.annotations.Test
 
-//@Test
+@Test
 class FSharpMoveProviderExtensionTest : ProjectModelBaseTest() {
     override fun getSolutionDirectoryName() = "EmptySolution"
 
-//    @Test
+    @Test
     fun testAllowPaste01() {
         doTest { provider ->
             Assert.assertTrue(
@@ -23,7 +23,7 @@ class FSharpMoveProviderExtensionTest : ProjectModelBaseTest() {
         }
     }
 
-//    @Test
+    @Test
     fun testAllowPaste02_Mix() {
         doTest { provider ->
             Assert.assertTrue(
@@ -41,7 +41,7 @@ class FSharpMoveProviderExtensionTest : ProjectModelBaseTest() {
         }
     }
 
-//    @Test
+    @Test
     fun testAllowPaste03_DifferentFiles() {
         doTest { provider ->
             /* CompileBefore [0]
@@ -108,7 +108,7 @@ class FSharpMoveProviderExtensionTest : ProjectModelBaseTest() {
         }
     }
 
-//    @Test
+    @Test
     fun testAllowPaste04_DifferentFilesInFolders() {
         doTest { provider ->
             /* Folder1/CompileBefore [0]

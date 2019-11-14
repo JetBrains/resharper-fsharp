@@ -5,7 +5,7 @@ import com.intellij.lexer.Lexer
 import com.intellij.testFramework.LexerTestCase
 import org.testng.annotations.Test
 
-//@Test
+@Test
 class FSharpLexerTest : LexerTestCase() {
     override fun createLexer(): Lexer {
         return FSharpLexer()
@@ -15,7 +15,7 @@ class FSharpLexerTest : LexerTestCase() {
         return null
     }
 
-//    @Test
+    @Test
     fun testDigit() {
         doTest("1234567890 1234567890u 1234567890l 0XABCDEFy 0x001100010s 3.0F 0x0000000000000000LF 34742626263193832612536171N 0o7 0b1 1F",
                 """
@@ -44,35 +44,35 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testString() {
         doTest("\"STRING\n \\ NEW_LINE\n\"",
                 """STRING ('"STRING\n \ NEW_LINE\n"')"""
         )
     }
 
-//    @Test
+    @Test
     fun testVerbatimString() {
         doTest("@\"VERBATIM STRING\"",
                 """VERBATIM_STRING ('@"VERBATIM STRING"')"""
         )
     }
 
-//    @Test
+    @Test
     fun testByteArray() {
         doTest("\"ByteArray\"B",
                 """BYTEARRAY ('"ByteArray"B')"""
         )
     }
 
-//    @Test
+    @Test
     fun testTripleQuotedString() {
         doTest("\"\"\"triple-quoted-string \ntriple-quoted-string\"\"\"",
                 "TRIPLE_QUOTED_STRING ('\"\"\"triple-quoted-string \\ntriple-quoted-string\"\"\"')"
         )
     }
 
-//    @Test
+    @Test
     fun testSymbolicOperator() {
         doTest("&&& ||| ?<- @-><-= ?-> >-> >>= >>- |> .>>. .>> >>",
                 """
@@ -103,26 +103,26 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testSimpleBlockComment() {
         doTest("(* HAHA *)", "BLOCK_COMMENT ('(* HAHA *)')")
     }
 
-//    @Test
+    @Test
     fun testBlockComment() {
         doTest("(* Here's a code snippet: let s = \"*)\" *)",
                 """BLOCK_COMMENT ('(* Here's a code snippet: let s = "*)" *)')"""
         )
     }
 
-//    @Test
+    @Test
     fun testBlockCommentError() {
         doTest("(* \" *)",
                 "UNFINISHED_STRING_IN_COMMENT ('(* \" *)')"
         )
     }
 
-//    @Test
+    @Test
     fun testSymbolicKeyword() {
         doTest("let! use! do! yield! return! match! | -> <- . : ( ) [ ] [< >] " +
                 "[| |] { } ' # :?> :? :> .. :: := ;; ; = _ ? ?? (*) <@ @> <@@ @@>",
@@ -210,12 +210,12 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testStringEscapeChar() {
         doTest("\"\\n\\t\\b\\r\\a\\f\\v\"", "STRING ('\"\\n\\t\\b\\r\\a\\f\\v\"')")
     }
 
-//    @Test
+    @Test
     fun testEscapeChar() {
         doTest("'\\n' '\\t' '\\b' '\\r' '\"' '\\a' '\\f' '\\v'",
                 """
@@ -238,7 +238,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testKeywordString() {
         doTest("__SOURCE_FILE__ __SOURCE_DIRECTORY__ __LINE__",
                 """
@@ -251,7 +251,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testUnfinishedTripleQuoteStringInComment() {
         doTest("(* \"\"\" *)\n" +
                 """
@@ -263,7 +263,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testIntDotDot() {
         doTest("1..20",
                 """
@@ -274,13 +274,13 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testIdent() {
         doTest("``value.with odd#name``",
                 "IDENT ('``value.with odd#name``')")
     }
 
-//    @Test
+    @Test
     fun testEndOfLineComment() {
         doTest("//hello world!\n//hello second world!",
                 """
@@ -291,7 +291,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testUnfinishedString() {
         doTest("(* \"\"\"hello\"\"\" *)\n" +
                 "        let str = \"STRING\n",
@@ -310,7 +310,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testCodeQuotation() {
         doTest("<@ 1 + 1 @>.ToString() <@@ 1 + 1 @@>.ToString()",
                 """
@@ -345,7 +345,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testBadOperator() {
         doTest(".?:%? .?$%?",
                 """
@@ -356,7 +356,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testAttribute() {
         doTest("[<SomeAttribute>]",
                 """
@@ -367,7 +367,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testTypeApp() {
         doTest("let typeApp = typeof<Map<Map<Map<Map<_,_>[],Map<_,_[]>>,_>,_>>.FullName",
                 """
@@ -416,7 +416,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testCorrectTypeApp() {
         doTest("[typeof<int>] [typeof<int >]",
                 """
@@ -438,7 +438,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testIncorrectTypeApp() {
         doTest("C<M<int >] >>> C<M<int >] > >>",
                 """
@@ -471,7 +471,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testGenericDeclaration() {
         doTest("""
             |type U<'a> = Choice1 of 'a
@@ -516,7 +516,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testIfDirective() {
         doTest("""
             |#if
@@ -552,7 +552,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testElseDirective() {
         doTest("""
             |#else (symbol || symbol) && symbol
@@ -584,7 +584,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testEndIfDirective() {
         doTest("""
             |#endif
@@ -616,7 +616,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testLightDirective() {
         doTest("""
             |#light
@@ -671,7 +671,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testLineDirective() {
         doTest("""
             |#line
@@ -718,7 +718,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testBadCommentInDirective() {
         doTest("""
             |#if asdfasdf /*asdfasdfasdfasdfasdfasdf*/ asdfasdf
@@ -751,7 +751,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testEscapeCharacterInString() {
         doTest(""""\\" ()""",
                 """
@@ -763,7 +763,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testEscapeCharacterInTripleQuotedString() {
         doTest("""""${'"'}\""${'"'} ()""",
                 """
@@ -775,7 +775,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testEscapeCharacterInVerbatimString() {
         doTest("""@"\" ()""",
                 """
@@ -787,7 +787,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testInteractiveDirective() {
         doTest("""
             |#r "file.dll";;
@@ -831,7 +831,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testHelpQuitDirective() {
         doTest("""
             |#help
@@ -845,7 +845,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testLoadDirective() {
         doTest("""
             |#l
@@ -879,7 +879,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testReferenceDirective() {
         doTest("""
             |#r
@@ -913,7 +913,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testTimeDirective() {
         doTest("""
             |#time
@@ -934,7 +934,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testIDirective() {
         doTest("""
             |#I
@@ -955,7 +955,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testSpaceDirective() {
         doTest(" #r \"on\"",
                 """
@@ -967,7 +967,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testFlexibleType() {
         doTest("let app : #r\nlet app1 : #if_",
                 """
@@ -992,7 +992,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testCharInString() {
         doTest(""""string 'c'" ()""",
                 """
@@ -1004,7 +1004,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testCharVerbatimString() {
         doTest("""@"string 'c'" ()""",
                 """
@@ -1016,7 +1016,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testCharTripleQuoteString() {
         doTest("""""${'"'}string 'c'""${'"'} ()""",
                 """
@@ -1028,7 +1028,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testLeftArrow() {
         doTest("ident<-ident",
                 """
@@ -1039,7 +1039,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testRightArrow() {
         doTest("t< -> t< ->>",
                 """
@@ -1056,7 +1056,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testBackslashInString() {
         doTest("""
         |"a\
@@ -1072,7 +1072,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testCommentInTypeApp() {
         doTest("typeof<int//>",
                 """
@@ -1084,7 +1084,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testBlockCommentInTypeApp() {
         doTest("typeof<int(*comment*)> typeof<int<int(*comment*)>>",
                 """
@@ -1106,12 +1106,12 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testValidIdentifiers() {
         doTest("``s<>,.;':\"`~!@#\$%^&*()_+-=``","IDENT ('``s<>,.;':\"`~!@#\$%^&*()_+-=``')")
     }
 
-//    @Test
+    @Test
     fun testSmashingGreaterBarRBrack() {
         doTest("let t = [|typeof<string>|]",
                 """
@@ -1131,7 +1131,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testAnonymousRecords() {
         doTest("f<{| C : int |}>x",
                 """
@@ -1152,7 +1152,7 @@ class FSharpLexerTest : LexerTestCase() {
         )
     }
 
-//    @Test
+    @Test
     fun testAttributeInsideGeneric() {
         doTest("[<MeasureAnnotatedAbbreviation>] type bool<[<Measure>] 'm> = bool",
                 """
