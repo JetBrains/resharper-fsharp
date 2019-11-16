@@ -79,7 +79,7 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
             let rangeToDelete =
                 if bindingIndex = 0 then
                     let andKeyword = letBindings.Separators.[0]
-                    TreeRange(getRangeEndWithSpaceBefore binding, andKeyword)
+                    TreeRange(getRangeStartWithSpaceBefore binding, andKeyword)
                 else
                     let andKeyword = letBindings.Separators.[bindingIndex - 1]
                     TreeRange(getRangeStartWithNewLineBefore andKeyword, getRangeEndWithSpaceAfter binding)

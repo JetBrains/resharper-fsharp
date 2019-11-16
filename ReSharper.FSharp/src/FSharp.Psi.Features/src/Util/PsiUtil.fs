@@ -169,11 +169,11 @@ let rec skipOneTokenOfTypeBefore tokenType (node: ITreeNode) =
     if getTokenType prevSibling == tokenType then prevSibling else node
 
 
-let getRangeEndWithSpaceBefore (node: ITreeNode) =
+let getRangeStartWithSpaceBefore (node: ITreeNode) =
     let prevSibling = node.PrevSibling
     if not (getTokenType prevSibling == FSharpTokenType.WHITESPACE) then node else
 
-    skipTokensOfTypeAfter FSharpTokenType.WHITESPACE prevSibling
+    skipTokensOfTypeBefore FSharpTokenType.WHITESPACE prevSibling
 
 let getRangeEndWithSpaceAfter (node: ITreeNode) =
     let nextSibling = node.NextSibling
