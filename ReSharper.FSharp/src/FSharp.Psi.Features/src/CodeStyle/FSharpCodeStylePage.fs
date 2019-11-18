@@ -44,7 +44,7 @@ type FSharpFormatSettingsKey() =
     [<SettingsEntry(true, "Space around delimiter"); DefaultValue>]
     val mutable SpaceAroundDelimiter: bool
 
-    [<SettingsEntry(true, "Preserve end of line"); DefaultValue>]
+    [<SettingsEntry(true, "Keep newline after"); DefaultValue>]
     val mutable PreserveEndOfLine: bool
 
     [<SettingsEntry(true, "Don't indent comments started at first column"); DefaultValue>]
