@@ -75,23 +75,17 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
 
     init {
         val runtimeHost = project.getComponent<RiderDotNetActiveRuntimeHost>()
-        when (sessionInfo.runtime) {
-            RdFsiRuntime.Core -> {
-                val runtime = runtimeHost.dotNetCoreRuntime.value
-                if (runtime != null) {
-                    cmdLine.parametersList.addAt(0, cmdLine.exePath)
-                    cmdLine.withExePath(runtime.cliExePath)
-                }
+        if (sessionInfo.runtime == RdFsiRuntime.Core) {
+            val runtime = runtimeHost.dotNetCoreRuntime.value
+            if (runtime != null) {
+                cmdLine.parametersList.addAt(0, cmdLine.exePath)
+                cmdLine.withExePath(runtime.cliExePath)
+                runtime.patchRunCommandLine(cmdLine, listOf())
             }
-
-            RdFsiRuntime.Mono -> {
-                val runtime = runtimeHost.getCurrentDotNetRuntime(false).runtime
-                if (runtime != null && runtime is MonoRuntime && sessionInfo.fsiPath.endsWith(".exe", true)) {
-                    runtime.patchRunCommandLine(cmdLine, listOf())
-                }
-            }
-
-            else -> {
+        } else {
+            val runtime = runtimeHost.getCurrentDotNetRuntime(false).runtime
+            if (runtime != null && runtime is MonoRuntime && sessionInfo.fsiPath.endsWith(".exe", true)) {
+                runtime.patchRunCommandLine(cmdLine, listOf())
             }
         }
 
