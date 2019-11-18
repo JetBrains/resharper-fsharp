@@ -14,6 +14,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.Util
 
 [<ProjectFileType(typeof<FSharpProjectFileType>)>]
 type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
@@ -235,7 +236,7 @@ and FSharpTokenPartSelection(fsFile, treeTextRange, token) =
 
         if treeTextRange.IsValid() then
             let localRange = treeTextRange.Shift(-token.GetTreeStartOffset().Offset - start)
-            let range = TokenPartSelection<_>.GetLocalParent(text, localRange)
+            let range = TokenPartSelection<_>.GetLocalParent(StringSlice(text), localRange)
             if range.IsValid() && range.Contains(&localRange) then
                 let range = range.Shift(token.GetTreeStartOffset() + start)
                 FSharpTokenPartSelection(fsFile, range, token) :> _
