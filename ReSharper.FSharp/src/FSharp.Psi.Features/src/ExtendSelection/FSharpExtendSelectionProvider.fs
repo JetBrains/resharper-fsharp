@@ -95,11 +95,7 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
 
                 FSharpExtendSelectionProvider.CreateLetBindingSelection(fsFile, letExpr, bindings.[bindingIndex])
 
-            | :? IWhenExpr as whenExpr ->
-                if whenExpr.WhenKeyword == token && isNotNull whenExpr.Expression then
-                    FSharpTreeNodeSelection(fsFile, whenExpr) :> _ else
-
-                null
+            | :? IWhenExpr as whenExpr -> FSharpTreeNodeSelection(fsFile, whenExpr) :> _
 
             | _ -> null
         | _ -> null
