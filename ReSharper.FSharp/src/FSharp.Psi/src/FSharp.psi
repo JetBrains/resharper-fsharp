@@ -661,8 +661,8 @@ matchClause:
   synExpr<EXPR, Expression>;
   
 whenExpr:
-    WHEN<WHEN, WhenKeyword>
-    synExpr<EXPR, Expression>;
+  WHEN<WHEN, WhenKeyword>
+  synExpr<EXPR, Expression>;
 
 typeTestExpr options { stubBase="FSharpExpressionBase"; }:
   synExpr<EXPR, Expression>
