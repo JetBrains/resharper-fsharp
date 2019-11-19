@@ -90,9 +90,8 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Expr - Match 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Match 02 - Simple pat``() = x.DoNamedTest()
-    [<Test>] member x.``Expr - Match 03 - Const When Expr``() = x.DoNamedTest()
-    [<Test>] member x.``Expr - Match 04 - When Expr``() = x.DoNamedTest()
-    [<Test>] member x.``Expr - Match 05 - Multiple When clauses``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Match 03 - When Expr``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Match 04 - Multiple When clauses``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Do 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Do 02 - Let``() = x.DoNamedTest()
