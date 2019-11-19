@@ -44,7 +44,7 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
         | :? ISynExpr as expr ->
             let whenExpr = WhenExprNavigator.GetByExpression(expr)
             if isNotNull whenExpr then
-                FSharpTreeRangeSelection(fsFile, whenExpr.WhenKeyword, expr) :> _ else
+                FSharpTreeNodeSelection(fsFile, whenExpr) :> _ else
 
             let binding = BindingNavigator.GetByExpression(expr)
             let letExpr = LetLikeExprNavigator.GetByBinding(binding)
@@ -97,7 +97,7 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
 
             | :? IWhenExpr as whenExpr ->
                 if whenExpr.WhenKeyword == token && isNotNull whenExpr.Expression then
-                    FSharpTreeRangeSelection(fsFile, token, whenExpr.Expression) :> _ else
+                    FSharpTreeNodeSelection(fsFile, whenExpr) :> _ else
 
                 null
 
