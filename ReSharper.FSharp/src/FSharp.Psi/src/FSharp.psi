@@ -656,11 +656,12 @@ referenceExpr options { stubBase="FSharpExpressionBase"; } extras {
 matchClause:
   BAR<BAR, Bar>?
   synPat<PAT, Pattern>
-  (
-    WHEN<WHEN, WhenKeyword>
-    synExpr<WHEN_EXPR, WhenExpression>
-  )?
+  whenExpr<WHEN_EXPR, WhenExpression>?
   RARROW<RARROW, RArrow>
+  synExpr<EXPR, Expression>;
+  
+whenExpr:
+  WHEN<WHEN, WhenKeyword>
   synExpr<EXPR, Expression>;
 
 typeTestExpr options { stubBase="FSharpExpressionBase"; }:

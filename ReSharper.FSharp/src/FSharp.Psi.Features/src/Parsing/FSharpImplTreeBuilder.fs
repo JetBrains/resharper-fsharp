@@ -1073,12 +1073,19 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         x.PushRangeForMark(range, mark, ElementType.MATCH_CLAUSE)
 
         x.ProcessPat(pat, true, false)
-        match whenExprOpt with
+        x.PushExpression(expr)
+        x.ProcessWhenExpr(whenExprOpt)
+            
+    member x.ProcessWhenExpr(whenExpr) =
+        match whenExpr with
+        | None -> ()
         | Some whenExpr ->
-            x.PushExpression(expr)
-            x.ProcessExpression(whenExpr)
-        | _ ->
-            x.ProcessExpression(expr)
+            
+        let range = whenExpr.Range
+        let mark = x.MarkTokenOrRange(FSharpTokenType.WHEN, range)
+        x.PushRangeForMark(range, mark, ElementType.WHEN_EXPR)
+        
+        x.ProcessExpression(whenExpr)
 
     member x.ProcessIndexerArg(arg: SynIndexerArg) =
         x.ProcessExpressionList(arg.Exprs)
