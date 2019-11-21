@@ -23,28 +23,25 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
     let binding = BindingNavigator.GetByHeadPattern(pat)
     let letOrUse = LetNavigator.GetByBinding(binding)
 
-    let getRanges (expr: ILetLikeExpr) =
-        let outerSeqExpr = SequentialExprNavigator.GetByExpression(expr)
+    let getCopyRange (expr: ILetLikeExpr) =
         let inExpr = expr.InExpression
-
-        if isNotNull outerSeqExpr && inExpr :? ISequentialExpr then
-            TreeRange(expr), TreeRange(inExpr.FirstChild, inExpr.LastChild) else
 
         let inKeyword = expr.InKeyword
         if isNotNull inKeyword then
-            let start = getRangeEndWithNewLineAfter inKeyword
-            TreeRange(expr), TreeRange(start.NextSibling, inExpr) else
+            let start =
+                inKeyword
+                |> skipMatchingNodesAfter isInlineSpaceOrComment
+                |> skipNewLineAfter
 
-        let replaceRange =
-            match CompExprNavigator.GetByExpression(expr) with
-            | null -> getRangeWithNewLineBefore expr
-            | _ -> TreeRange(expr)
-        
-        let copyRange =
-            let start = getRangeEndWithNewLineAfter expr.Bindings.[0]
-            TreeRange(start.NextSibling, inExpr)
+            TreeRange(start, inExpr) else
 
-        replaceRange, copyRange
+        let first =
+            binding
+            |> skipMatchingNodesAfter isInlineSpaceOrComment
+            |> getThisOrNextNewLine
+            |> skipMatchingNodesAfter isInlineSpaceOrComment
+
+        TreeRange(first, inExpr)
 
     override x.Text =
         match pat with
@@ -61,13 +58,20 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
         if bindings.Count = 1 then
             match letOrUse with
             | :? ILetModuleDecl as letModuleDecl ->
-                let first = getRangeStartWithNewLineBefore letModuleDecl
-                let last = getRangeEndWithSpaceAfter letModuleDecl
+                let first =
+                    letModuleDecl
+                    |> skipMatchingNodesBefore isInlineSpaceOrComment
+                    |> getThisOrPrevNewLIne
+
+                let last =
+                    letModuleDecl
+                    |> getLastMatchingNodeAfter isInlineSpaceOrComment
+
                 ModificationUtil.DeleteChildRange(TreeRange(first, last))
 
             | :? ILetLikeExpr as letExpr ->
-                let toReplace, toCopy = getRanges letExpr
-                ModificationUtil.ReplaceChildRange(toReplace, toCopy) |> ignore
+                let rangeToCopy = getCopyRange letExpr
+                ModificationUtil.ReplaceChildRange(TreeRange(letExpr), rangeToCopy) |> ignore
 
             | _ ->
                 failwithf "Unexpected let: %O" letOrUse
@@ -79,10 +83,17 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
             let rangeToDelete =
                 if bindingIndex = 0 then
                     let andKeyword = letBindings.Separators.[0]
-                    TreeRange(getRangeStartWithSpaceBefore binding, andKeyword)
+                    TreeRange(getFirstMatchingNodeBefore isInlineSpaceOrComment binding, andKeyword)
                 else
                     let andKeyword = letBindings.Separators.[bindingIndex - 1]
-                    TreeRange(getRangeStartWithNewLineBefore andKeyword, getRangeEndWithSpaceAfter binding)
+                    let rangeStart = getFirstMatchingNodeBefore isInlineSpaceOrComment andKeyword
+
+                    let rangeEnd =
+                        binding
+                        |> skipMatchingNodesAfter isInlineSpaceOrComment
+                        |> getThisOrNextNewLine
+
+                    TreeRange(rangeStart, rangeEnd)
 
             ModificationUtil.DeleteChildRange(rangeToDelete)
 

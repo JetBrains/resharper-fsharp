@@ -23,6 +23,15 @@ type RemoveUnusedLocalBindingTest() =
     [<Test>] member x.``Multiline 06 - Nested pattern``() = x.DoNamedTest()
     [<Test>] member x.``Multiline 07 - In other let``() = x.DoNamedTest()
 
+    [<Test>] member x.``Multiple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Multiple 02 - Space``() = x.DoNamedTest()
+    [<Test>] member x.``Multiple 03 - Space``() = x.DoNamedTest()
+
+    [<Test>] member x.``For 01``() = x.DoNamedTest()
+    [<Test>] member x.``For 02 - Space``() = x.DoNamedTest()
+
+    [<Test>] member x.``Match clause 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Recursive 01``() = x.DoNamedTest()
     [<Test>] member x.``Recursive 02 - Comment after and``() = x.DoNamedTest()
     [<Test>] member x.``Recursive 03 - With binding after``() = x.DoNamedTest()

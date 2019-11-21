@@ -1,0 +1,7 @@
+﻿module Module
+do
+    let a = ()
+
+    {caret}
+    let c = ()
+    [a;c]

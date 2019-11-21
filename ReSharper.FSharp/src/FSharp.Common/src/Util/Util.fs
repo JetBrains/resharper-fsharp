@@ -1,7 +1,9 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Util
 
+open JetBrains.Annotations
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Psi.Modules
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Threading
 
 [<AutoOpen>]
@@ -17,7 +19,6 @@ module rec CommonUtil =
     open JetBrains.Lifetimes
     open JetBrains.Util
     open JetBrains.Util.dataStructures.TypedIntrinsics
-    open JetBrains.Util.Threading
 
     let ensureAbsolute (path: FileSystemPath) (projectDirectory: FileSystemPath) =
         match path.AsRelative() with
@@ -204,3 +205,7 @@ module PsiUtil =
     [<Extension; CompiledName("GetSymbolScope")>]
     let getSymbolScope (psiModule: IPsiModule) =
         psiModule.GetPsiServices().Symbols.GetSymbolScope(psiModule, true, true)
+
+    [<Extension; CompiledName("GetTokenTypeSafe")>]
+    let getTokenType ([<CanBeNull>] node: ITreeNode) =
+        if isNotNull node then node.GetTokenType() else null

@@ -4,7 +4,6 @@ open JetBrains.ReSharper.Feature.Services.Intentions.Scoped
 open JetBrains.ReSharper.Feature.Services.Intentions.Scoped.Actions
 open JetBrains.ReSharper.Feature.Services.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
 
@@ -30,12 +29,12 @@ type RemoveUnusedOpensFix(warning: UnusedOpenWarning) =
 
                 let openStatement = warning.OpenStatement
 
-                let first = skipTokensOfTypeBefore FSharpTokenType.WHITESPACE openStatement
+                let first = getFirstMatchingNodeBefore isInlineSpaceOrComment openStatement
                 let last =
                     openStatement
                     |> skipSemicolonsAndWhiteSpacesAfter
-                    |> skipOneTokenOfTypeAfter FSharpTokenType.NEW_LINE
-                    
+                    |> getThisOrNextNewLine
+
                 deleteChildRange first last
 
             null

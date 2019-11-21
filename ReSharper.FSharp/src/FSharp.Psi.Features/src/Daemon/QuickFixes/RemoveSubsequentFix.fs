@@ -5,7 +5,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
-open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
 
@@ -32,15 +31,23 @@ type RemoveSubsequentFix(warning: UnitTypeExpectedWarning) =
         let exprs = seqExpr.Expressions
         let exprIndex = Seq.findIndex ((==) expr) exprs
 
-        let firstExprToRemove: ITreeNode =
-            Seq.skip (exprIndex + 1) exprs |> Seq.head :> _
+        let firstExprToRemove =
+            Seq.skip (exprIndex + 1) exprs |> Seq.head
 
         if exprIndex = 0 && exprs.Count = 2 then
-            let rangeToReplace = getRangeWithNewLineAfter seqExpr
-            let last = firstExprToRemove |> getPrevSibling |> skipThisWhitespaceBeforeNode
-            ModificationUtil.ReplaceChildRange(rangeToReplace, TreeRange(seqExpr.FirstChild, last)) |> ignore
+            // replace the whole sequential expression with the expression to keep
+            let last =
+                skipMatchingNodesBefore isInlineSpace firstExprToRemove
+                |> skipNewLineBefore
+
+            ModificationUtil.ReplaceChildRange(TreeRange(seqExpr), TreeRange(seqExpr.FirstChild, last)) |> ignore
             null
         else
-            let first = firstExprToRemove |> skipPreviousWhitespaceBeforeNode
+            // remove the subsequent expressions range
+            let first =
+                firstExprToRemove
+                |> skipMatchingNodesBefore isInlineSpace
+                |> getThisOrPrevNewLIne
+
             ModificationUtil.DeleteChildRange(first, seqExpr.LastChild)
             null

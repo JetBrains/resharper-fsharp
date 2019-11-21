@@ -1,4 +1,5 @@
 module Module
 
 let x =
-    1{caret};()
+    1{caret};
+    ()

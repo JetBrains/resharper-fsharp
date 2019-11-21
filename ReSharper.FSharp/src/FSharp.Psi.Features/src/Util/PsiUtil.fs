@@ -119,9 +119,6 @@ let getNextSibling (node: ITreeNode) =
     if isNotNull node then node.NextSibling else null
 
 
-let getTokenType (node: ITreeNode) =
-    if isNotNull node then node.GetTokenType() else null
-
 let (|TokenType|_|) tokenType (treeNode: ITreeNode) =
     if getTokenType treeNode == tokenType then Some treeNode else None
 
@@ -133,102 +130,101 @@ let (|IgnoreParenPat|) (pat: ISynPat) = pat.IgnoreParentParens()
 let (|IgnoreInnerParenExpr|) (expr: ISynExpr) =
     expr.IgnoreInnerParens()
 
+let isInlineSpaceOrComment (node: ITreeNode) =
+    let tokenType = getTokenType node
+    tokenType == FSharpTokenType.WHITESPACE || isNotNull tokenType && tokenType.IsComment
+
+let isInlineSpace (node: ITreeNode) =
+    getTokenType node == FSharpTokenType.WHITESPACE
+
 let isWhitespace (node: ITreeNode) =
     let tokenType = getTokenType node
     isNotNull tokenType && tokenType.IsWhitespace
+
+let isFiltered (node: ITreeNode) =
+    let tokenType = getTokenType node
+    isNotNull tokenType && tokenType.IsFiltered
 
 let isSemicolon (node: ITreeNode) =
     getTokenType node == FSharpTokenType.SEMICOLON
 
 
-let rec skipTokensOfTypeAfter tokenType (node: ITreeNode) =
+let skipMatchingNodesAfter predicate (node: ITreeNode): ITreeNode =
     let nextSibling = node.NextSibling
-    if getTokenType nextSibling == tokenType then
-        skipTokensOfTypeAfter tokenType nextSibling
+    if isNull nextSibling then node else
+
+    let rec skip (node: ITreeNode) =
+        if predicate node then
+            skip node.NextSibling
+        else
+            node
+
+    skip nextSibling
+
+let skipMatchingNodesBefore predicate (node: ITreeNode) =
+    let prebSibling = node.PrevSibling
+    if isNull prebSibling then node else
+
+    let rec skip (node: ITreeNode) =
+        if predicate node then
+            skip node.PrevSibling
+        else
+            node
+    
+    skip prebSibling
+
+
+let rec getLastMatchingNodeAfter predicate (node: ITreeNode) =
+    let nextSibling = node.NextSibling
+    if predicate nextSibling then
+        getLastMatchingNodeAfter predicate nextSibling
     else
         node
 
-let rec skipTokensOfTypeBefore tokenType (node: ITreeNode) =
+let rec getFirstMatchingNodeBefore (predicate: ITreeNode -> bool) (node: ITreeNode) =
     let prevSibling = node.PrevSibling
-    if getTokenType prevSibling == tokenType then
-        skipTokensOfTypeBefore tokenType prevSibling
+    if predicate prevSibling then
+        getFirstMatchingNodeBefore predicate prevSibling
     else
         node
 
 
-let rec skipOneTokenOfTypeAfter tokenType (node: ITreeNode) =
+let rec getThisOrNextTokenOfType tokenType (node: ITreeNode) =
     if getTokenType node == tokenType then node else
 
     let nextSibling = node.NextSibling
     if getTokenType nextSibling == tokenType then nextSibling else node
 
-let rec skipOneTokenOfTypeBefore tokenType (node: ITreeNode) =
+let rec getThisOrPrevTokenOfType tokenType (node: ITreeNode) =
     if getTokenType node == tokenType then node else
 
     let prevSibling = node.PrevSibling
     if getTokenType prevSibling == tokenType then prevSibling else node
 
 
-let getRangeStartWithSpaceBefore (node: ITreeNode) =
-    let prevSibling = node.PrevSibling
-    if not (getTokenType prevSibling == FSharpTokenType.WHITESPACE) then node else
+let skipTokenOfTypeBefore tokenType (node: ITreeNode) =
+    if getTokenType node == tokenType then node.PrevSibling
+    else node
 
-    skipTokensOfTypeBefore FSharpTokenType.WHITESPACE prevSibling
-
-let getRangeEndWithSpaceAfter (node: ITreeNode) =
-    let nextSibling = node.NextSibling
-    if not (getTokenType nextSibling == FSharpTokenType.WHITESPACE) then node else
-
-    skipTokensOfTypeAfter FSharpTokenType.WHITESPACE nextSibling
-
-let getRangeEndWithNewLineAfter (node: ITreeNode) =
-    let nextSibling = node.NextSibling
-    if not (isWhitespace nextSibling) then node else
-
-    let last = skipTokensOfTypeAfter FSharpTokenType.WHITESPACE nextSibling
-    skipOneTokenOfTypeAfter FSharpTokenType.NEW_LINE last
-
-let getRangeStartWithNewLineBefore (node: ITreeNode) =
-    let prevSibling = node.PrevSibling
-    if not (isWhitespace prevSibling) then node else
-
-    let last = skipTokensOfTypeBefore FSharpTokenType.WHITESPACE prevSibling
-    skipOneTokenOfTypeBefore FSharpTokenType.NEW_LINE last
+let skipTokenOfTypeAfter tokenType (node: ITreeNode) =
+    if getTokenType node == tokenType then node.NextSibling
+    else node
 
 
-let getRangeWithNewLineAfter (node: ITreeNode) =
-    TreeRange(node, getRangeEndWithNewLineAfter node)
+let skipNewLineBefore (node: ITreeNode) =
+    skipTokenOfTypeBefore FSharpTokenType.NEW_LINE node
 
-let getRangeWithNewLineBefore (node: ITreeNode) =
-    TreeRange(getRangeStartWithNewLineBefore node, node)
+let skipNewLineAfter (node: ITreeNode) =
+    skipTokenOfTypeAfter FSharpTokenType.NEW_LINE node
 
 
-let shouldEraseSemicolon (node: ITreeNode) =
-    let settingsStore = node.GetSettingsStore()
-    not (settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SemicolonAtEndOfLine))
+let getThisOrPrevNewLIne (node: ITreeNode) =
+    getThisOrPrevTokenOfType FSharpTokenType.NEW_LINE node
 
-let rec skipThisWhitespaceBeforeNode node =
-    let rec skip seenSemicolon node =
-        if isWhitespace node then
-            skip seenSemicolon node.PrevSibling
-        elif not seenSemicolon && isSemicolon node && shouldEraseSemicolon node then
-            skip true node.PrevSibling
-        else
-            node
-    skip false node
+let getThisOrNextNewLine (node: ITreeNode) =
+    getThisOrNextTokenOfType FSharpTokenType.NEW_LINE node
 
-let rec skipPreviousWhitespaceBeforeNode node =
-    let rec skip seenSemicolon (node: ITreeNode) =
-        let prevSibling = node.PrevSibling
-        if isWhitespace prevSibling then
-            skip seenSemicolon prevSibling
-        elif not seenSemicolon && isSemicolon prevSibling && shouldEraseSemicolon node then
-            skip true prevSibling
-        else
-            node
-    skip false node
-    
-    
+
 let rec skipSemicolonsAndWhiteSpacesAfter node =
     let nextSibling = getNextSibling node
     let tokenType = getTokenType nextSibling
@@ -289,3 +285,8 @@ type FSharpExpressionSelectionProviderBase() =
         // todo: also ;; ?
         getTokenType token == FSharpTokenType.SEMICOLON ||
         base.IsTokenSkipped(token)
+
+
+let shouldEraseSemicolon (node: ITreeNode) =
+    let settingsStore = node.GetSettingsStore()
+    not (settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SemicolonAtEndOfLine))

@@ -11,11 +11,14 @@ type RemoveSubsequentTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/removeSubsequent"
 
-    [<Test>] member x.``Simple 01``() = x.DoNamedTest()
-    [<Test>] member x.``Simple 02 - Multiple subsequent``() = x.DoNamedTest()
-    [<Test>] member x.``Simple 03 - Not the first``() = x.DoNamedTest()
-    [<Test>] member x.``Simple 04 - Comment``() = x.DoNamedTest()
-    [<Test>] member x.``Simple 05 - Comment``() = x.DoNamedTest()
-    [<Test>] member x.``Simple 06 - Single line``() = x.DoNamedTest()
-    [<Test>] member x.``Simple 07 - Semicolon``() = x.DoNamedTest()
-    [<Test>] member x.``Simple 08 - Semicolon``() = x.DoNamedTest()
+    [<Test>] member x.``Remove expr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Remove expr 02 - Not the first``() = x.DoNamedTest()
+    [<Test>] member x.``Remove expr 03 - Semicolon``() = x.DoNamedTest()
+
+    [<Test>] member x.``Replace seq 01``() = x.DoNamedTest()
+    [<Test>] member x.``Replace seq 02 - Comment``() = x.DoNamedTest()
+    [<Test>] member x.``Replace seq 03 - Comment on new line``() = x.DoNamedTest()
+    [<Test>] member x.``Replace seq 04 - Semicolon``() = x.DoNamedTest()
+    [<Test>] member x.``Replace seq 05 - Semicolon and space``() = x.DoNamedTest()
+    [<Test>] member x.``Replace seq 06 - Semicolon and new line``() = x.DoNamedTest()
+    [<Test>] member x.``Replace seq 07 - Comment and semicolon``() = x.DoNamedTest()
