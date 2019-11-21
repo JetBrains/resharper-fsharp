@@ -102,6 +102,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public bool IsIterator => false;
 
     public IAttributesSet ReturnTypeAttributes =>
-      new FSharpAttributeSet(Attributes, Module);
+      new FSharpAttributeSet(Mfv?.ReturnParameter.Attributes ?? EmptyList<FSharpAttribute>.Instance, Module);
   }
 }
