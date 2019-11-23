@@ -10,6 +10,7 @@ open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
@@ -43,6 +44,15 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
             null
 
         | :? ISynExpr as expr ->
+            let infixAppExpr =
+                match expr with
+                | :? IReferenceExpr -> InfixAppExprNavigator.GetByFunctionExpression(expr)
+                | _ -> InfixAppExprNavigator.GetByArgumentExpression(expr)
+
+            let prefixAppExpr = PrefixAppExprNavigator.GetByFunctionExpression(infixAppExpr)
+            if isNotNull prefixAppExpr then
+                FSharpTreeNodeSelection(fsFile, prefixAppExpr) :> _ else
+
             let binding = BindingNavigator.GetByExpression(expr)
             let letExpr = LetLikeExprNavigator.GetByBinding(binding)
             if isNotNull letExpr then
