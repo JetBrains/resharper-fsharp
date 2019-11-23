@@ -37,3 +37,5 @@ type FSharpExtendSelectionTest() =
     
     [<Test>] member x.``Infix expr 01``() = x.DoNamedTest()
     [<Test>] member x.``Infix expr 02``() = x.DoNamedTest()
+    [<Test>] member x.``Infix expr 03``() = x.DoNamedTest()
+    [<Test>] member x.``Infix expr 04``() = x.DoNamedTest()

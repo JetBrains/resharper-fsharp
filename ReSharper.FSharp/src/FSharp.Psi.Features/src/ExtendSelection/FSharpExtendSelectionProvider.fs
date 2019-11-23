@@ -43,11 +43,7 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
             null
 
         | :? ISynExpr as expr ->
-            let infixAppExpr =
-                match expr with
-                | :? IReferenceExpr -> InfixAppExprNavigator.GetByFunctionExpression(expr)
-                | _ -> InfixAppExprNavigator.GetByArgumentExpression(expr)
-
+            let infixAppExpr = expr.Parent.As<IInfixAppExpr>()
             let prefixAppExpr = PrefixAppExprNavigator.GetByFunctionExpression(infixAppExpr)
             if isNotNull prefixAppExpr then
                 FSharpTreeNodeSelection(fsFile, prefixAppExpr) :> _ else
