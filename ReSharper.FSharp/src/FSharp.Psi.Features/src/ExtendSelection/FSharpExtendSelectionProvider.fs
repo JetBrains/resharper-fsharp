@@ -43,8 +43,7 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
             null
 
         | :? ISynExpr as expr ->
-            let infixAppExpr = expr.Parent.As<IInfixAppExpr>()
-            let prefixAppExpr = PrefixAppExprNavigator.GetByFunctionExpression(infixAppExpr)
+            let prefixAppExpr = expr.Parent.As<IPrefixAppExpr>()
             if isNotNull prefixAppExpr then
                 FSharpTreeNodeSelection(fsFile, prefixAppExpr) :> _ else
 
@@ -102,7 +101,7 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
 
     static member FindBetterNode(fsFile, node: ITreeNode) =
         let shouldTryFindBetterNode (node: ITreeNode) =
-            node :? IBinding
+            node :? IBinding || node :? IInfixAppExpr
 
         if not (shouldTryFindBetterNode node) then null else
         FSharpExtendSelectionProvider.ExtendNodeSelection(fsFile, node)
