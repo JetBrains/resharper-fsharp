@@ -42,11 +42,14 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
 
             null
 
-        | :? ISynExpr as expr ->
-            let prefixAppExpr = expr.Parent.As<IPrefixAppExpr>()
+        | :? IInfixAppExpr as infixAppExpr ->
+            let prefixAppExpr = infixAppExpr.Parent.As<IPrefixAppExpr>()
             if isNotNull prefixAppExpr then
                 FSharpTreeNodeSelection(fsFile, prefixAppExpr) :> _ else
 
+            null
+
+        | :? ISynExpr as expr ->
             let binding = BindingNavigator.GetByExpression(expr)
             let letExpr = LetLikeExprNavigator.GetByBinding(binding)
             if isNotNull letExpr then
