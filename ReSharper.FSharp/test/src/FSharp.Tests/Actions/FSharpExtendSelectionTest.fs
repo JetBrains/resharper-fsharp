@@ -34,3 +34,10 @@ type FSharpExtendSelectionTest() =
     [<Test>] member x.``Let - Top level 01``() = x.DoNamedTest()
     [<Test>] member x.``Let - Top level 02 - Rec, other``() = x.DoNamedTest()
     [<Test>] member x.``Let - Top level 03 - Rec, attrs``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Infix expr - Argument``() = x.DoNamedTest()
+    [<Test>] member x.``Infix expr - Operator``() = x.DoNamedTest()
+    [<Test>] member x.``Infix expr - Nested - Argument 01``() = x.DoNamedTest()
+    [<Test>] member x.``Infix expr - Nested - Argument 02``() = x.DoNamedTest()
+    [<Test>] member x.``Infix expr - Nested - Operator 01``() = x.DoNamedTest()
+    [<Test>] member x.``Infix expr - Nested - Operator 02``() = x.DoNamedTest()
