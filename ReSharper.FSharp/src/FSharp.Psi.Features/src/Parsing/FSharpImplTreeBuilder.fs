@@ -137,6 +137,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             x.Done(range, mark, ElementType.TYPE_EXTENSION_DECLARATION)
         | _ ->
 
+        let attrs = x.SkipOuterAttrs(attrs, range)
         let mark = x.StartType attrs typeParams lid range
         let elementType =
             match repr with
