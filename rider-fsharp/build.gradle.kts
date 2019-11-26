@@ -3,6 +3,7 @@ import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.grammarkit.tasks.GenerateLexer
 import org.jetbrains.intellij.IntelliJPlugin
 import org.jetbrains.intellij.tasks.PrepareSandboxTask
+import org.jetbrains.intellij.tasks.RunIdeTask
 import org.jetbrains.kotlin.daemon.common.toHexString
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.net.URI
@@ -213,6 +214,14 @@ tasks {
                 logger.warn("$name: ${file.name} -> $destinationDir/${intellij.pluginName}/dotnet")
             }
         }
+    }
+
+    // Initially introduced in:
+    // https://github.com/JetBrains/ForTea/blob/master/Frontend/build.gradle.kts
+    withType<RunIdeTask> {
+        // IDEs from SDK are launched with 512m by default, which is not enough for Rider.
+        // Rider uses this value when launched not from SDK.
+        maxHeapSize = "1500m"
     }
 
     val generateFSharpLexer = task<GenerateLexer>("generateFSharpLexer") {
