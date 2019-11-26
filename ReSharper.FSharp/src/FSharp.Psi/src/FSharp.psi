@@ -1048,7 +1048,9 @@ interfaceInherit:
   INHERIT
   typeReferenceName<TYPE_REFERENCE, TypeName>;
 
-typeInherit options { stubBase="ReferenceOwnerBase"; }:
+typeInherit options { stubBase="ReferenceOwnerBase"; } extras {
+  get { methodName="CtorArgExpression" path=<typeInherit:CHAMELEON_EXPR/chameleonExpression:EXPR> };
+}:
   INHERIT
   typeReferenceName<TYPE_REFERENCE, TypeName>
   chameleonExpression<CHAMELEON_EXPR, CtorArg>;
