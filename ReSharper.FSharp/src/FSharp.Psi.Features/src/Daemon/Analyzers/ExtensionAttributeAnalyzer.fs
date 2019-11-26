@@ -19,9 +19,10 @@ type ExtensionAttributeAnalyzer() =
         |> Seq.exists (fun p -> p.ExtensionMethodInfos.Length > 0)
 
     let isExtension (attr: IAttribute) =
-        let reference = attr.Reference
+        let reference = attr.ReferenceName.Reference
         if isNull reference then false else
 
+        // todo: we should also account type abbreviations in future
         let referenceName = reference.GetName()
         if referenceName <> "Extension" && referenceName <> "ExtensionAttribute" then false else
 

@@ -32,6 +32,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       var methods = new LocalList<ExtensionMethodInfo>();
       foreach (var member in declaration.MemberDeclarations)
       {
+        // There are two interesting scenarios:
+        // * Members in types
+        // * Bindings in modules
+        // Type declaration as a member can only appear in module and we ignore it.
+        if (member is ITypeDeclaration)
+          continue;
+
+        // A cheap check until we have a proper attributes resolve during cache building.
         if (!member.GetAttributes().Any(a => a.ShortNameEquals("Extension")))
           continue;
 

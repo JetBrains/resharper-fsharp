@@ -1,0 +1,39 @@
+﻿namespace global
+
+open System.Runtime.CompilerServices
+
+[<|Extension|(0)>]
+module Module1 =
+    [<||Extension|(1)|(2)>]
+    type T1() =
+        class end
+
+    [<|Extension|(3); AbstractClass; Sealed>]
+    type T2() =
+        class end
+
+    [<|Extension|(4)>]
+    type T3() =
+        [<Extension>]
+        member x.Foo(_: int) = ()
+
+    type T4() =
+        [<|Extension|(5)>]
+        member x.Foo(_: int) = ()
+
+[<Extension>]
+module Module2 =
+    [<Extension>]
+    let foo (_: int) = ()
+
+module Module3 =
+    [<|Extension|(6)>]
+    let foo (_: int) = ()
+---------------------------------------------------------
+(0): ReSharper Dead Code: Extension type doesn't have any extension members
+(1): ReSharper Dead Code: Extension type doesn't have any extension members
+(2): ReSharper Warning: Extension type should be a static class or a module
+(3): ReSharper Dead Code: Extension type doesn't have any extension members
+(4): ReSharper Warning: Extension type should be a static class or a module
+(5): ReSharper Warning: Extension member in non-extension type looks suspicious
+(6): ReSharper Warning: Extension member in non-extension type looks suspicious
