@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
@@ -57,6 +57,7 @@
     <Compile Include="src\Daemon\Analyzers\RedundantBackticksAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\RedundantNew.fs" />
     <Compile Include="src\Daemon\Analyzers\LetDisposableAnalyzer.fs" />
+    <Compile Include="src\Daemon\QuickFixes\FSharpQuickFixBase.fs" />
     <Compile Include="src\Daemon\QuickFixes\RemoveUnusedOpensFix.fs" />
     <Compile Include="src\Daemon\QuickFixes\ReplaceUseWithLetFix.fs" />
     <Compile Include="src\Daemon\QuickFixes\RemoveUnusedSelfIdVariableFix.fs" />
@@ -75,6 +76,7 @@
     <Compile Include="src\Daemon\QuickFixes\RemoveUnusedLocalBindingFix.fs" />
     <Compile Include="src\Daemon\QuickFixes\ReplaceLetWithExpressionFix.fs" />
     <Compile Include="src\Daemon\QuickFixes\ConvertToUseFix.fs" />
+    <Compile Include="src\Daemon\QuickFixes\ToUpcastFix.fs" />
     <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
       <Mode>QUICKFIX</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>

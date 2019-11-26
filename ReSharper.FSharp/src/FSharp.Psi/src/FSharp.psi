@@ -676,7 +676,7 @@ upcastExpr options { stubBase="FSharpExpressionBase"; }:
   
 downcastExpr options { stubBase="FSharpExpressionBase"; }:
   synExpr<EXPR, Expression>
-  COLON_QMARK_GREATER
+  COLON_QMARK_GREATER<OP, OperatorToken>
   synType<TYPE, Type>;
 
 inferredCastExpr options { stubBase="FSharpExpressionBase"; }:

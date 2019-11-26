@@ -115,6 +115,9 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - LongIdent 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - LongIdentSet 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - Cast - Downcast 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Cast - Upcast 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Expr - Null``() = x.DoNamedTest()
     [<Test>] member x.``Expr - AddressOf 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Fixed 01 - Simple``() = x.DoNamedTest()

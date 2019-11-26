@@ -22,6 +22,7 @@ module FSharpErrors =
     let [<Literal>] RuleNeverMatched = 26
     let [<Literal>] UndefinedName = 39
     let [<Literal>] UpcastUnnecessary = 66
+    let [<Literal>] TypeTestUnnecessary = 67
     let [<Literal>] ModuleOrNamespaceRequired = 222
     let [<Literal>] UnrecognizedOption = 243
     let [<Literal>] UseBindingsIllegalInImplicitClassConstructors = 523
@@ -90,6 +91,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             UnresolvedHighlighting(error.Message, range) :> _
 
         | UpcastUnnecessary -> UpcastUnnecessaryWarning(getNode range) :> _
+        | TypeTestUnnecessary -> TypeTestUnnecessaryError(getNode range, error.Message) :> _
 
         | UnusedValue ->
             match fsFile.GetNode(range) with
