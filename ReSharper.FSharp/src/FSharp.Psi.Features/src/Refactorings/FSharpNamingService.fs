@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
 
 open System
+open System.Collections.Generic
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -69,6 +70,12 @@ type FSharpNamingService(language: FSharpLanguage) =
            "list", "l" |]
         |> dict
 
+    let pipeRightOperatorNames =
+        [| "|>"; "||>"; "|||>" |] |> HashSet
+
+    let pipeLeftOperatorNames =
+        [| "<|"; "<||"; "<|||" |] |> HashSet
+    
     let withWords words (nameRoot: NameRoot) =
         NameRoot(Array.ofList words, nameRoot.PluralityKind, nameRoot.IsFinalPresentation)
 
@@ -186,6 +193,7 @@ type FSharpNamingService(language: FSharpLanguage) =
             FSharpNamingService.PluralToSingle(roots)
 
         | :? ICastExpr as castExpr ->
+            // todo: suggest type
             x.SuggestRoots(castExpr.Expression, useExpectedTypes, policyProvider)
 
         | :? IIfThenElseExpr as ifThenElseExpr ->
@@ -194,8 +202,27 @@ type FSharpNamingService(language: FSharpLanguage) =
             Seq.append thenRoots elseRoots
 
         // todo: partially applied functions?
-        | :? IAppExpr as appExpr when isNotNull appExpr.InvokedFunctionReference ->
-            x.SuggestRoots(appExpr.InvokedFunctionReference, null, policyProvider)
+        | :? IAppExpr as appExpr ->
+            match appExpr.FunctionExpression with
+            | :? IInfixAppExpr as infixApp ->
+                let refExpr = infixApp.FunctionExpression.As<IReferenceExpr>()
+                if isNull refExpr then EmptyList.Instance :> _ else
+
+                let name = refExpr.Reference.GetName()
+                if pipeRightOperatorNames.Contains(name) && isNotNull appExpr.ArgumentExpression then
+                    x.SuggestRoots(appExpr.ArgumentExpression, useExpectedTypes, policyProvider) else
+
+                if pipeLeftOperatorNames.Contains(name) && isNotNull infixApp.ArgumentExpression then
+                    x.SuggestRoots(infixApp.ArgumentExpression, useExpectedTypes, policyProvider) else
+
+                EmptyList.Instance :> _
+            | _ ->
+
+            let invokedFunctionReference = appExpr.InvokedFunctionReference
+            if isNotNull invokedFunctionReference then
+                x.SuggestRoots(invokedFunctionReference, null, policyProvider)
+
+            else EmptyList.Instance :> _
 
 //        | :? IExpression as expr ->
 //            x.SuggestRoots(expr.Type(), policyProvider)

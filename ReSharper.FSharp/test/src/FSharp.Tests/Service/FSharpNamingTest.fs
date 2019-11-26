@@ -38,6 +38,9 @@ type FSharpNamingTest() =
     [<Test>] member x.``AppExpr 02 - More args``() = x.DoNamedTest()
     [<Test>] member x.``AppExpr 03 - Partial``() = x.DoNamedTest()
 
+    [<Test>] member x.``Pipe 01 - Right``() = x.DoNamedTest()
+    [<Test>] member x.``Pipe 02 - Left``() = x.DoNamedTest()
+
     override x.DoTest(lifetime, _) =
         let textControl = x.OpenTextControl(lifetime)
         let sourceFile = textControl.Document.GetPsiSourceFile(x.Solution)

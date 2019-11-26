@@ -33,10 +33,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
           return null;
 
         var paramGroups = mfv.CurriedParameterGroups;
-        if (paramGroups.Count != argsCount)
-          return null;
-
-        return reference;
+        return paramGroups.Count >= argsCount ? reference : null;
       }
     }
 
