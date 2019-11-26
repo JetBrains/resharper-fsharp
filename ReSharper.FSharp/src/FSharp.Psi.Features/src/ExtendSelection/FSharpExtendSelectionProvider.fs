@@ -36,10 +36,6 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
             null
 
         | :? IReferenceName as referenceName ->
-            let typeInherit = TypeInheritNavigator.GetByTypeName(referenceName.As<ITypeReferenceName>())
-            if isNotNull typeInherit then
-                FSharpTreeRangeSelection(fsFile, referenceName, typeInherit.CtorArg) :> _ else
-
             let decl = QualifiableDeclarationNavigator.GetByQualifierReferenceName(referenceName)
             if isNotNull decl && isNotNull decl.Identifier then
                 FSharpTreeRangeSelection(fsFile, referenceName, decl.Identifier) :> _ else
