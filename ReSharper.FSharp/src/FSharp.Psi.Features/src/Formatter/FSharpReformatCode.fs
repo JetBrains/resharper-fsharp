@@ -67,13 +67,14 @@ type FSharpReformatCode() =
             let stamp = document.LastModificationStamp
             let modificationSide = TextModificationSide.NotSpecified
             let newLineText = sourceFile.DetectLineEnding().GetPresentation()
+            let parsingOptions = checkerService.GetParsingOptions(sourceFile)
+            let checker = checkerService.Checker
 
             let change = 
                 if isNotNull rangeMarker then
                     try
                         let range = ofDocumentRange rangeMarker.DocumentRange
-                        let parsingOptions = checkerService.GetParsingOptions(sourceFile)
-                        let checker = checkerService.Checker
+
                         let formatted =
                             CodeFormatter
                                 .FormatSelectionAsync(filePath, range, source, formatConfig, parsingOptions, checker)
@@ -85,9 +86,13 @@ type FSharpReformatCode() =
                     with _ -> None
                 else
                     let defines = checkerService.GetDefines(sourceFile)
+                    let formatTask =
+                            if List.isEmpty defines
+                            then CodeFormatter.FormatASTAsync(parseTree, filePath, defines,  Some source, formatConfig)
+                            else CodeFormatter.FormatDocumentAsync(filePath, source, formatConfig, parsingOptions, checker)
+
                     let formatted =
-                        CodeFormatter
-                            .FormatASTAsync(parseTree, filePath, defines,  Some source, formatConfig)
+                        formatTask
                             .RunAsTask()
                             .Replace("\r\n", newLineText)
                     Some(DocumentChange(document, 0, text.Length, formatted, stamp, modificationSide))
