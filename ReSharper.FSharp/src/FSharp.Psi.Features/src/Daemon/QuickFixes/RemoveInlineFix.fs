@@ -1,11 +1,10 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
-open JetBrains.ReSharper.Feature.Services.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
 type RemoveInlineFix(error: LocalClassBindingsCannotBeInlineError) =
-    inherit QuickFixBase()
+    inherit FSharpQuickFixBase()
 
     let letModuleDecl = error.LetModuleDecl
 
@@ -14,6 +13,5 @@ type RemoveInlineFix(error: LocalClassBindingsCannotBeInlineError) =
         isValid letModuleDecl &&
         isNotNull letModuleDecl.InlineKeyword
 
-    override x.ExecutePsiTransaction(_, _) =
+    override x.ExecutePsiTransaction _ =
         letModuleDecl.SetIsInline(false)
-        null

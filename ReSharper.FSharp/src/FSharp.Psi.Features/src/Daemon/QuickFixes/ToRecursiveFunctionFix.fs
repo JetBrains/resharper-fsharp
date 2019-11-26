@@ -2,7 +2,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Navigation.CustomHighlighting
-open JetBrains.ReSharper.Feature.Services.QuickFixes
 open JetBrains.ReSharper.Feature.Services.Refactorings.WorkflowOccurrences
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -12,7 +11,7 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.UI.RichText
 
 type ToRecursiveFunctionFix(warning: UndefinedNameError) =
-    inherit QuickFixBase()
+    inherit FSharpQuickFixBase()
 
     let referenceExpr = warning.Reference.GetElement().As<IReferenceExpr>()
     let mutable chosenLetBindings = Unchecked.defaultof<_>
@@ -67,7 +66,6 @@ type ToRecursiveFunctionFix(warning: UndefinedNameError) =
         chosenLetBindings <- Seq.head occurrence.Entities
         base.Execute(solution, textControl)
     
-    override x.ExecutePsiTransaction(_, _) =
+    override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(referenceExpr.IsPhysical())
         chosenLetBindings.SetIsRecursive(true)
-        null

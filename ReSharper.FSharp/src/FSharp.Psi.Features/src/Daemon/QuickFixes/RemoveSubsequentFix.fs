@@ -1,6 +1,5 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
-open JetBrains.ReSharper.Feature.Services.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -9,7 +8,7 @@ open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
 
 type RemoveSubsequentFix(warning: UnitTypeExpectedWarning) =
-    inherit QuickFixBase()
+    inherit FSharpQuickFixBase()
 
     let expr = warning.Expr
 
@@ -24,7 +23,7 @@ type RemoveSubsequentFix(warning: UnitTypeExpectedWarning) =
         let lastExpr = seqExpr.Expressions.LastOrDefault()
         isNotNull lastExpr && expr != lastExpr
 
-    override x.ExecutePsiTransaction(_, _) =
+    override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
         let seqExpr = SequentialExprNavigator.GetByExpression(expr)
 
@@ -41,7 +40,6 @@ type RemoveSubsequentFix(warning: UnitTypeExpectedWarning) =
                 |> skipNewLineBefore
 
             ModificationUtil.ReplaceChildRange(TreeRange(seqExpr), TreeRange(seqExpr.FirstChild, last)) |> ignore
-            null
         else
             // remove the subsequent expressions range
             let first =
@@ -50,4 +48,3 @@ type RemoveSubsequentFix(warning: UnitTypeExpectedWarning) =
                 |> getThisOrPrevNewLIne
 
             ModificationUtil.DeleteChildRange(first, seqExpr.LastChild)
-            null

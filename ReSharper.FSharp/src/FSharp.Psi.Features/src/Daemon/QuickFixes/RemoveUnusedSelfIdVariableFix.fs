@@ -1,7 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open JetBrains.Diagnostics
-open JetBrains.ReSharper.Feature.Services.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.CommonErrors
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -10,14 +9,14 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 type RemoveUnusedSelfIdVariableFix(warning: UnusedThisVariableWarning) =
-    inherit QuickFixBase()
+    inherit FSharpQuickFixBase()
 
     let selfId = warning.SelfId
 
     override x.Text = "Remove self id"
     override x.IsAvailable _ = isValid selfId
 
-    override x.ExecutePsiTransaction(_, _) =
+    override x.ExecutePsiTransaction _ =
         use writeLock = WriteLockCookie.Create(selfId.IsPhysical())
 
         let ctor = ConstructorDeclarationNavigator.GetBySelfIdentifier(selfId).NotNull()
@@ -33,8 +32,8 @@ type RemoveUnusedSelfIdVariableFix(warning: UnusedThisVariableWarning) =
         | Whitespace node ->
             if node.GetTextLength() <> 1 then
                 ModificationUtil.ReplaceChild(node, Whitespace()) |> ignore
+
         | IsNonNull node ->
             ModificationUtil.AddChildBefore(node, Whitespace()) |> ignore
-        | _ -> ()
 
-        null
+        | _ -> ()

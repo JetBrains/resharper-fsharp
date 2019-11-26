@@ -1,7 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open JetBrains.Diagnostics
-open JetBrains.ReSharper.Feature.Services.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -9,7 +8,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
 
 type ReplaceUseWithLetFix(letNode: ILet) =
-    inherit QuickFixBase()
+    inherit FSharpQuickFixBase()
 
     new (warning: UseBindingsIllegalInModulesWarning) =
         ReplaceUseWithLetFix(warning.LetModuleDecl)
@@ -20,11 +19,10 @@ type ReplaceUseWithLetFix(letNode: ILet) =
     override x.Text = "Replace with 'let'"
     override x.IsAvailable _ = isValid letNode
 
-    override x.ExecutePsiTransaction(_, _) =
+    override x.ExecutePsiTransaction _ =
         let useKeyword = letNode.LetOrUseToken
         Assertion.Assert(useKeyword.GetTokenType() == FSharpTokenType.USE,
                          sprintf "Expecting use, got: %O" (useKeyword.GetTokenType()))
 
         use writeLock = WriteLockCookie.Create(letNode.IsPhysical())
         replaceWithToken useKeyword FSharpTokenType.LET
-        null

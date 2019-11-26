@@ -1,13 +1,12 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
-open JetBrains.ReSharper.Feature.Services.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util.PsiUtil
 open JetBrains.ReSharper.Resources.Shell
 
 type ReplaceWithWildPatFix(warning: UnusedValueWarning) =
-    inherit QuickFixBase()
+    inherit FSharpQuickFixBase()
 
     let pat = warning.Pat.As<IReferencePat>()
 
@@ -21,7 +20,6 @@ type ReplaceWithWildPatFix(warning: UnusedValueWarning) =
         node :? IMatchClause ||
         node :? IMemberParamDeclaration && node.Parent :? IMemberDeclaration // todo: check this check
 
-    override x.ExecutePsiTransaction(_, _) =
+    override x.ExecutePsiTransaction _ =
         use writeLock = WriteLockCookie.Create(pat.IsPhysical())
         replace pat (pat.FSharpLanguageService.CreateElementFactory(pat.GetPsiModule()).CreateWildPat())
-        null
