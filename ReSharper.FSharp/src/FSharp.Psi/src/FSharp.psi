@@ -35,7 +35,7 @@ options {
   "tokenElementClassFQName"="JetBrains.ReSharper.Psi.Tree.ITokenNode";
   "customImplSuffix"="";
   "objectClassFQName"="System.Object";
-  publicChildRolePrefix="FS_";
+  publicChildRolePrefix="FSHARP_";
   tokenBitsetThreshold=4;
   elementTypeBaseClass="JetBrains.ReSharper.Plugins.FSharp.Psi.Tree.FSharpCompositeNodeType";
   parserMessagesClass="JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing.ParserMessages";
@@ -145,7 +145,7 @@ letModuleDecl options { stubBase="DummyDeclaration"; } extras {
   letOrUse{LET, LetOrUseToken}
   INLINE<INLINE, InlineKeyword>?
   REC<REC, RecKeyword>?
-  LIST binding<BINDING, Bindings> SEP AND<AND, Separators>;
+  LIST binding<BINDING, Bindings> SEP AND<FSHARP_AND, Separators>;
 
 
 interface let:
@@ -301,11 +301,7 @@ listPat options { stubBase="SynPatternBase"; }:
   RBRACK;
 
 tuplePat options { stubBase="SynPatternBase"; }:
-  synPat<ATTRIBUTE, Patterns>
-  (
-    COMMA
-    synPat<ATTRIBUTE, Patterns>
-  )*;
+  LIST synPat<ATTRIBUTE, Patterns> SEP COMMA<FSHARP_COMMA, Commas>;
 
 parenPat options { stubBase="SynPatternBase"; }:
   LPAREN
@@ -425,7 +421,7 @@ namedIndexerExpr options { stubBase="FSharpExpressionBase"; } extras {
 
 indexerArgList:
   LBRACK
-  LIST synExpr<INDEXER_ARG, IndexerArgs> SEP COMMA<COMMA, Commas>
+  LIST synExpr<INDEXER_ARG, IndexerArgs> SEP COMMA<FSHARP_COMMA, Commas>
   RBRACK;
 
 indexerArg:
@@ -469,11 +465,7 @@ tupleExpr options { stubBase="FSharpExpressionBase"; }:
     LPAREN
     STRUCT<STRUCT, StructKeyword>
   )?
-  synExpr<EXPR, Expressions>
-  (
-    synExpr<EXPR, Expressions>
-    COMMA
-  )*;
+  LIST synExpr<EXPR, Expressions> SEP COMMA<FSHARP_COMMA, Commas>;
 
 anonRecdExpr options { stubBase="FSharpExpressionBase"; }:
   STRUCT<STRUCT, STRUCT_KEYWORD>?
@@ -510,7 +502,7 @@ recordExprBinding:
   expressionReferenceName<REFERENCE_NAME, ReferenceName>
   EQUALS
   synExpr<EXPR, Expression>
-  SEMICOLON<SEMI, Semicolon>?;
+  SEMICOLON<FSHARP_SEMI, Semicolon>?;
 
 newExpr options { stubBase="FSharpExpressionBase"; }:
   NEW<NEW, NewKeyword>
@@ -606,7 +598,7 @@ infixAppExpr options { stubBase="FSharpExpressionBase"; }:
 letOrUseExpr options { stubBase="FSharpExpressionBase"; }:
   letOrUse{LET, LetOrUseToken}
   REC<REC, RecKeyword>?
-  LIST binding<BINDING, Bindings> SEP AND<AND, Separators>  
+  LIST binding<BINDING, Bindings> SEP AND<FSHARP_AND, Separators>  
   IN<IN, InKeyword>?
   synExpr<IN_EXPR, InExpression>;
 
@@ -631,7 +623,7 @@ lazyExpr options { stubBase="FSharpExpressionBase"; }:
   synExpr<EXPR, Expression>;
 
 sequentialExpr options { stubBase="FSharpExpressionBase"; }:
-  LIST synExpr<EXPR, Expressions> SEP SEMICOLON<SEMI, Separators>;
+  LIST synExpr<EXPR, Expressions> SEP SEMICOLON<FSHARP_SEMI, Separators>;
 
 ifThenElseExpr options { stubBase="FSharpExpressionBase"; }:
   IF<IF, IfKeyword>
@@ -731,7 +723,7 @@ typeDeclarationGroup extras {
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   TYPE<TYPE, TypeKeyword>
-  LIST fSharpTypeDeclaration<TYPE_DECLARATION, TypeDeclarations> SEP AND<AND, Separators>;
+  LIST fSharpTypeDeclaration<TYPE_DECLARATION, TypeDeclarations> SEP AND<FSHARP_AND, Separators>;
 
 
 interface fSharpTypeDeclaration:
@@ -1168,11 +1160,7 @@ memberParamDeclarationGroup:
   );
   
 private memberParamDeclarationList:
-  memberParamDeclaration<PARAMETER, Parameters>
-  (
-    COMMA
-    memberParamDeclaration<PARAMETER, Parameters>
-  )*;
+  LIST memberParamDeclaration<PARAMETER, Parameters> SEP COMMA<FSHARP_COMMA, Commas>;
 
 memberParamDeclaration:
   synPat<PATTERN, Pattern>;
@@ -1294,7 +1282,7 @@ private accessModifier{ROLE,Getter}:
 
 attributeList:
   LBRACK<LBRACK, LBrack>
-  LIST attribute<ATTRIBUTE, Attributes> SEP SEMICOLON<SEMI, Separators>
+  LIST attribute<ATTRIBUTE, Attributes> SEP SEMICOLON<FSHARP_SEMI, Separators>
   RBRACK<RBRACK, RBrack>;
 
 attribute options { stubBase="TypeReferenceOwnerBase"; } extras {
@@ -1334,21 +1322,13 @@ postfixAppTypeArgumentList:
     synType<TYPE, Types>
   |
     LPAREN
-    synType<TYPE, Types>
-    (
-      COMMA
-      synType<TYPE, Types>
-    )*
+    LIST synType<TYPE, Types> SEP COMMA<FSHARP_COMMA, Commas>
     RPAREN
  );
 
 prefixAppTypeArgumentList:
   LESS<LESS,LAngle>
-  synType<TYPE, Types>
-  (
-    COMMA
-    synType<TYPE, Types>
-  )*
+  LIST synType<TYPE, Types> SEP COMMA<FSHARP_COMMA, Commas>
   GREATER<GREATER,RAngle>;
 
 
