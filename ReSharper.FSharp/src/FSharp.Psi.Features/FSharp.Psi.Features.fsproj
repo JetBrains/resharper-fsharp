@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
@@ -12,10 +12,6 @@
     <Compile Include="src\Util\PsiUtil.fs" />
     <Compile Include="src\Util\OpensUtil.fs" />
     <Compile Include="src\Util\FSharpParensUtil.fs" />
-    <Compile Include="src\Intentions\DataProviders.fs" />
-    <Compile Include="src\Intentions\ToRecursiveLetBindingsAction.fs" />
-    <Compile Include="src\Intentions\ToMultilineRecord.fs" />
-    <Compile Include="src\Intentions\ToRecursiveModuleAction.fs" />
     <Compile Include="src\CodeCompletion\CompletionUtil.fs" />
     <Compile Include="src\CodeCompletion\FSharpCodeCompletionContext.fs" />
     <Compile Include="src\CodeCompletion\FSharpPathCompletionProvider.fs" />
@@ -57,32 +53,6 @@
     <Compile Include="src\Daemon\Analyzers\RedundantBackticksAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\RedundantNew.fs" />
     <Compile Include="src\Daemon\Analyzers\LetDisposableAnalyzer.fs" />
-    <Compile Include="src\Daemon\QuickFixes\FSharpQuickFixBase.fs" />
-    <Compile Include="src\Daemon\QuickFixes\RemoveUnusedOpensFix.fs" />
-    <Compile Include="src\Daemon\QuickFixes\ReplaceUseWithLetFix.fs" />
-    <Compile Include="src\Daemon\QuickFixes\RemoveUnusedSelfIdVariableFix.fs" />
-    <Compile Include="src\Daemon\QuickFixes\RemoveUnusedNamedAsPatFix.fs" />
-    <Compile Include="src\Daemon\QuickFixes\ReplaceWithWildPatFix.fs" />
-    <Compile Include="src\Daemon\QuickFixes\AddIgnoreFix.fs" />
-    <Compile Include="src\Daemon\QuickFixes\GenerateMissingRecordFieldsFix.fs" />
-    <Compile Include="src\Daemon\QuickFixes\ToRecursiveLetBindingsFix.fs" />
-    <Compile Include="src\Daemon\QuickFixes\RemoveRedundantBackticksFix.fs" />
-    <Compile Include="src\Daemon\QuickFixes\RemoveInlineFix.fs" />
-    <Compile Include="src\Daemon\QuickFixes\RemoveUnnecessaryUpcastFix.fs" />
-    <Compile Include="src\Daemon\QuickFixes\ToRecursiveFunctionFix.fs" />
-    <Compile Include="src\Daemon\QuickFixes\AddParensFix.fs" />
-    <Compile Include="src\Daemon\QuickFixes\RemoveSubsequentFix.fs" />
-    <Compile Include="src\Daemon\QuickFixes\RemoveRedundantNewFix.fs" />
-    <Compile Include="src\Daemon\QuickFixes\RemoveUnusedLocalBindingFix.fs" />
-    <Compile Include="src\Daemon\QuickFixes\ReplaceLetWithExpressionFix.fs" />
-    <Compile Include="src\Daemon\QuickFixes\ConvertToUseFix.fs" />
-    <Compile Include="src\Daemon\QuickFixes\ToUpcastFix.fs" />
-    <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
-      <Mode>QUICKFIX</Mode>
-      <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>
-      <OutputFile>src\Daemon\QuickFixes\CommonQuickFixes.Generated.fs</OutputFile>
-      <SubType>Designer</SubType>
-    </ErrorsGen>
     <Compile Include="src\Comment\FSharpBlockCommentActionProvider.fs" />
     <Compile Include="src\Comment\FSharpLineCommentActionProvider.fs" />
     <Compile Include="src\Debugger\FSharpBreakpointVariantsProvider.fs" />
@@ -115,6 +85,36 @@
     <Compile Include="src\Refactorings\Rename.fs" />
     <Compile Include="src\Refactorings\FSharpIntroduceVarHelper.fs" />
     <Compile Include="src\Refactorings\FSharpRefactoringLanguageService.fs" />
+    <Compile Include="src\Intentions\DataProviders.fs" />
+    <Compile Include="src\Intentions\ToRecursiveLetBindingsAction.fs" />
+    <Compile Include="src\Intentions\ToMultilineRecord.fs" />
+    <Compile Include="src\Intentions\ToRecursiveModuleAction.fs" />
+    <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
+      <Mode>QUICKFIX</Mode>
+      <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>
+      <OutputFile>src\QuickFixes\CommonQuickFixes.Generated.fs</OutputFile>
+      <SubType>Designer</SubType>
+    </ErrorsGen>
+    <Compile Include="src\QuickFixes\FSharpQuickFixBase.fs" />
+    <Compile Include="src\QuickFixes\RemoveUnusedOpensFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceUseWithLetFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveUnusedSelfIdVariableFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveUnusedNamedAsPatFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceWithWildPatFix.fs" />
+    <Compile Include="src\QuickFixes\AddIgnoreFix.fs" />
+    <Compile Include="src\QuickFixes\GenerateMissingRecordFieldsFix.fs" />
+    <Compile Include="src\QuickFixes\ToRecursiveLetBindingsFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveRedundantBackticksFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveInlineFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveUnnecessaryUpcastFix.fs" />
+    <Compile Include="src\QuickFixes\ToRecursiveFunctionFix.fs" />
+    <Compile Include="src\QuickFixes\AddParensFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveSubsequentFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveRedundantNewFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveUnusedLocalBindingFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceLetWithExpressionFix.fs" />
+    <Compile Include="src\QuickFixes\ConvertToUseFix.fs" />
+    <Compile Include="src\QuickFixes\ToUpcastFix.fs" />
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />
     <Compile Include="src\PostfixTemplates\NotTemplate.fs" />
     <Compile Include="src\PostfixTemplates\LetPostfixTemplate.fs" />
