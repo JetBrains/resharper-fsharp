@@ -38,8 +38,10 @@ type FSharpNamingTest() =
     [<Test>] member x.``AppExpr 02 - More args``() = x.DoNamedTest()
     [<Test>] member x.``AppExpr 03 - Partial``() = x.DoNamedTest()
 
-    [<Test>] member x.``Pipe 01 - Right``() = x.DoNamedTest()
-    [<Test>] member x.``Pipe 02 - Left``() = x.DoNamedTest()
+    [<Test>] member x.``Pipe - Right 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pipe - Right 02 - Nested``() = x.DoNamedTest()
+    [<Test>] member x.``Pipe - Left 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pipe - Left 02 - Nested``() = x.DoNamedTest()
 
     override x.DoTest(lifetime, _) =
         let textControl = x.OpenTextControl(lifetime)
