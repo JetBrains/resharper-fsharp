@@ -128,7 +128,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             ExpectedExpressionAfterLetError(getNode range) :> _
 
         | SuccessiveArgsShouldBeSpacedOrTupled ->
-            SuccessiveArgsShouldBeSpacedOrTupledError(getNode range) :> _
+            let expr = ExpressionSelectionUtil.GetExpressionInRange(fsFile, range, false, null)
+            if isNotNull expr then SuccessiveArgsShouldBeSpacedOrTupledError(expr) :> _ else
+            createGenericHighlighting error range
 
         | EmptyRecordInvalid ->
             EmptyRecordInvalidError(getNode range, error.Message) :> _
