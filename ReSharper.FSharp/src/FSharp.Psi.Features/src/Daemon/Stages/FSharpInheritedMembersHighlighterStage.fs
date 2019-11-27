@@ -9,6 +9,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2
 open JetBrains.ReSharper.Psi.Search
 open JetBrains.ReSharper.Psi.Tree
 
@@ -42,7 +43,14 @@ type InheritedMembersStageProcess(fsFile, daemonProcess) =
         | :? ITypeDeclaration as typeDecl when isNotNull typeDecl.DeclaredElement ->
             // This is a workaround until we can resolve types without waiting for FCS to type check projects graph
             // up to the possible inheritor point.
-            // Using this approach may add unwanted gutter icons in some rare cases.
+            // Using this approach may add unwanted gutter icons in some cases.
+
+            let typeElement = typeDecl.DeclaredElement
+            if not (typeElement :? IClass || typeElement :? IInterface) then () else
+
+            let typeElement = typeElement.As<TypeElement>()
+            if isNotNull typeElement && typeElement.IsSealed then () else
+
             let inheritors = symbolScope.GetPossibleInheritors(fsDeclaration.CompiledName)
             if not (Seq.exists (searchDomain.HasIntersectionWith) inheritors) then () else
 

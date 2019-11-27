@@ -12,3 +12,6 @@ type InheritanceGutterMarks() =
     override x.InheritanceGutterMarks = true
 
     [<Test>] member x.``Inherited gutter mark``() = x.DoNamedTest()
+
+    [<Test>] member x.``Module 01``() = x.DoNamedTest()
+    [<Test>] member x.``Struct 01``() = x.DoNamedTest()
