@@ -1,0 +1,7 @@
+﻿module Module
+
+let getName _ = ""
+
+do
+    let {selstart}name{selend} = (getName 123)
+    ()

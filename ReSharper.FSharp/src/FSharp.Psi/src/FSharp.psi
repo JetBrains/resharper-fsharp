@@ -659,17 +659,17 @@ whenExpr:
 typeTestExpr options { stubBase="FSharpExpressionBase"; }:
   synExpr<EXPR, Expression>
   COLON_QMARK
-  synType<TYPE, Type>;
+  synType<TYPE, TypeUsage>;
 
 upcastExpr options { stubBase="FSharpExpressionBase"; }:
   synExpr<EXPR, Expression>
   COLON_GREATER<OP, OperatorToken>
-  synType<TYPE, Type>;
+  synType<TYPE, TypeUsage>;
   
 downcastExpr options { stubBase="FSharpExpressionBase"; }:
   synExpr<EXPR, Expression>
   COLON_QMARK_GREATER<OP, OperatorToken>
-  synType<TYPE, Type>;
+  synType<TYPE, TypeUsage>;
 
 inferredCastExpr options { stubBase="FSharpExpressionBase"; }:
   (UPCAST | DOWNCAST)

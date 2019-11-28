@@ -1,14 +1,16 @@
 using System.Collections.Generic;
 using FSharp.Compiler.SourceCodeServices;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
-using JetBrains.ReSharper.Psi.Resolve;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class PrefixAppExpr
   {
-    public IReference InvokedFunctionReference
+    public FSharpSymbolReference InvokedFunctionReference
     {
       get
       {
@@ -37,7 +39,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       }
     }
 
-    public IEnumerable<IExpression> Arguments
+    public IList<IExpression> Arguments
     {
       get
       {
@@ -53,6 +55,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         args.Reverse();
         return args;
       }
+    }
+
+    public override IType Type()
+    {
+      var reference = InvokedFunctionReference;
+      if (reference == null)
+        return TypeFactory.CreateUnknownType(GetPsiModule());
+
+      var mfv = (FSharpMemberOrFunctionOrValue) reference.GetFSharpSymbol();
+      return !mfv.IsConstructor && mfv.CurriedParameterGroups.Count == Arguments.Count
+        ? mfv.ReturnParameter.Type.MapType(reference.GetElement())
+        : TypeFactory.CreateUnknownType(GetPsiModule());
     }
   }
 }

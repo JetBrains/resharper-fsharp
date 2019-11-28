@@ -1,0 +1,7 @@
+﻿module Module
+
+let name = ""
+
+do
+    let {selstart}nameLength{selend} = name.Length
+    ()

@@ -1,0 +1,8 @@
+﻿module Module
+
+type Roar =
+    { Field: int }
+
+do
+    let {selstart}roar{selend} = { Field = 123 }
+    ()

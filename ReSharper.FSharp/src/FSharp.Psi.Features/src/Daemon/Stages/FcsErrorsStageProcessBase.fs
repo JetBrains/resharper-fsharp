@@ -93,7 +93,10 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             UnresolvedHighlighting(error.Message, range) :> _
 
         | UpcastUnnecessary -> UpcastUnnecessaryWarning(getNode range) :> _
-        | TypeTestUnnecessary -> TypeTestUnnecessaryWarning(getNode range, error.Message) :> _
+        | TypeTestUnnecessary ->
+            let expr = ExpressionSelectionUtil.GetExpressionInRange(fsFile, range, false, null)
+            if isNotNull expr then TypeTestUnnecessaryWarning(expr, error.Message) :> _ else
+            createGenericHighlighting error range
 
         | UnusedValue ->
             match fsFile.GetNode(range) with

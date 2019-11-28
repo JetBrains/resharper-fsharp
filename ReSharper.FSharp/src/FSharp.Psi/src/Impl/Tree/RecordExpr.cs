@@ -6,6 +6,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
 using JetBrains.Util.DataStructures;
 
@@ -26,6 +27,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public override ReferenceCollection GetFirstClassReferences() =>
       new ReferenceCollection(Reference);
+
+    public override IType Type()
+    {
+      var resolveResult = Reference.Resolve().Result;
+      return resolveResult.DeclaredElement is ITypeElement typeElement
+        ? TypeFactory.CreateType(typeElement)
+        : TypeFactory.CreateUnknownType(GetPsiModule());
+    }
   }
 
   public class RecordCtorReference : FSharpSymbolReference

@@ -77,10 +77,10 @@ type FSharpItemOccurenceKindProvider() =
                     [| FSharpOccurrenceKinds.typeSpecification |] :> _ else
 
                 if isNotNull (IsInstPatNavigator.GetByType(namedType)) ||
-                   isNotNull (TypeTestExprNavigator.GetByType(namedType)) then
+                   isNotNull (TypeTestExprNavigator.GetByTypeUsage(namedType)) then
                     [| CSharpSpecificOccurrenceKinds.TypeChecking |] :> _ else
 
-                if isNotNull (CastExprNavigator.GetByType(namedType)) then
+                if isNotNull (CastExprNavigator.GetByTypeUsage(namedType)) then
                     [| CSharpSpecificOccurrenceKinds.TypeConversions |] :> _ else
 
                 if isNotNull (TypeAbbreviationDeclarationNavigator.GetByAbbreviatedType(namedType)) then

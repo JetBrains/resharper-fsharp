@@ -84,7 +84,7 @@ type FSharpPostfixTemplateBehaviorBase(info) =
         | null -> null
         | namedType ->
 
-        let castExpr = CastExprNavigator.GetByType(namedType)
+        let castExpr = CastExprNavigator.GetByTypeUsage(namedType)
         if isNotNull castExpr then
             getContainingArgExpr castExpr else
 
