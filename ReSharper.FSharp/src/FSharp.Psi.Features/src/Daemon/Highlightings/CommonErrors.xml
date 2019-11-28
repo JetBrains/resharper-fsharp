@@ -86,7 +86,7 @@
     <QuickFix>AddIgnoreFix</QuickFix>
   </Error>
 
-  <Error staticGroup="FSharpErrors" name="TypeTestUnnecessary">
+  <Warning staticGroup="FSharpErrors" name="TypeTestUnnecessary">
     <Parameter type="IDowncastExpr" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
@@ -95,7 +95,7 @@
     <Range>expr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>ToUpcastFix</QuickFix>
-  </Error>
+  </Warning>
 
   <Error staticGroup="FSharpErrors" name="FieldRequiresAssignment">
     <Parameter type="IRecordExpr" name="expr"/>

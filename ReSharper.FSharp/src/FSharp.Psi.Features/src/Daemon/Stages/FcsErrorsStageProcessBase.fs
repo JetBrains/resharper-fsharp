@@ -91,7 +91,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             UnresolvedHighlighting(error.Message, range) :> _
 
         | UpcastUnnecessary -> UpcastUnnecessaryWarning(getNode range) :> _
-        | TypeTestUnnecessary -> TypeTestUnnecessaryError(getNode range, error.Message) :> _
+        | TypeTestUnnecessary -> TypeTestUnnecessaryWarning(getNode range, error.Message) :> _
 
         | UnusedValue ->
             match fsFile.GetNode(range) with

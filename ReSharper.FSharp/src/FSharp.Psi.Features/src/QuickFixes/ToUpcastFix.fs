@@ -10,7 +10,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
-type ToUpcastFix(error: TypeTestUnnecessaryError) =
+type ToUpcastFix(error: TypeTestUnnecessaryWarning) =
     inherit FSharpQuickFixBase()
 
     let expr = error.Expr
