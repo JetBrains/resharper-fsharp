@@ -59,14 +59,16 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
                 LowLevelModificationUtil.AddChild(newSeqExpr, Array.ofSeq inRange)
                 {| ReplaceRange = TreeRange(expr, newSeqExpr)
-                   InRange = TreeRange(newSeqExpr) |}
+                   InRange = TreeRange(newSeqExpr)
+                   AddNewLine = false |}
             else
                 // The last expression can be moved as is.
                 {| ReplaceRange = TreeRange(expr, sequentialExpr.LastChild)
-                   InRange = inRange |}
+                   InRange = inRange
+                   AddNewLine = false |}
         else
             let range = TreeRange(parent)
-            {| ReplaceRange = range; InRange = range |}
+            {| ReplaceRange = range; InRange = range; AddNewLine = true |}
 
     static member val Key = Key("")
 
@@ -79,6 +81,9 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
         expr.UserData.RemoveKey(FSharpIntroduceVariable.Key)
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
+
+        let lineEnding = expr.GetLineEnding()
+        let parentExprIndent = parentExpr.Indent
 
         let elementFactory = expr.CreateElementFactory()
         let letOrUseExpr = elementFactory.CreateLetBindingExpr(name, expr)
@@ -96,7 +101,10 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let letOrUseExpr = replaced.First :?> ILetBindings
 
         let binding = letOrUseExpr.Bindings.[0]
-        ModificationUtil.ReplaceChildRange(TreeRange(binding.NextSibling, letOrUseExpr.LastChild), ranges.InRange) |> ignore
+        let replaced = ModificationUtil.ReplaceChildRange(TreeRange(binding.NextSibling, letOrUseExpr.LastChild), ranges.InRange)
+        if ranges.AddNewLine then
+            let anchor = ModificationUtil.AddChildBefore(replaced.First, NewLine(lineEnding))
+            ModificationUtil.AddChildAfter(anchor, Whitespace(parentExprIndent)) |> ignore
 
         let nodes =
             let replacedNodes =
