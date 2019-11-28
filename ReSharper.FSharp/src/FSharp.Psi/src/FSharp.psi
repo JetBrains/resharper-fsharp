@@ -174,7 +174,7 @@ topBinding extras {
   MUTABLE<MUTABLE, MutableKeyword>?
   synPat<HEAD_PATTERN, HeadPattern>
   returnTypeInfo<RETURN_INFO, ReturnTypeInfo>?
-  EQUALS
+  EQUALS<EQUALS, EqualsToken>
   chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>;
 
 localBinding extras {
@@ -185,7 +185,7 @@ localBinding extras {
   MUTABLE<MUTABLE, MutableKeyword>?
   synPat<HEAD_PATTERN, HeadPattern>
   returnTypeInfo<RETURN_INFO, ReturnTypeInfo>?
-  EQUALS
+  EQUALS<EQUALS, EqualsToken>
   synExpr<EXPR, Expression>;
 
 returnTypeInfo extras {

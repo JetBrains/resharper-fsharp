@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
@@ -115,6 +115,7 @@
     <Compile Include="src\QuickFixes\ReplaceLetWithExpressionFix.fs" />
     <Compile Include="src\QuickFixes\ConvertToUseFix.fs" />
     <Compile Include="src\QuickFixes\ToUpcastFix.fs" />
+    <Compile Include="src\QuickFixes\IntroduceVarFix.fs" />
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />
     <Compile Include="src\PostfixTemplates\NotTemplate.fs" />
     <Compile Include="src\PostfixTemplates\LetPostfixTemplate.fs" />

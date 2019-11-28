@@ -7,16 +7,17 @@ open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.ExpressionSelection
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.CodeStyle
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Files
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
-open JetBrains.ReSharper.Psi.Util
 open JetBrains.TextControl
 open JetBrains.Util.Text
 
@@ -70,6 +71,10 @@ type IFSharpTreeNode with
     member x.GetLineEnding() =
         let fsFile = x.FSharpFile
         fsFile.DetectLineEnding(fsFile.GetPsiServices()).GetPresentation()
+
+    member x.GetIndentSize() =
+        let sourceFile = x.GetSourceFile()
+        sourceFile.GetFormatterSettings(x.Language).INDENT_SIZE
 
 type FSharpLanguage with
     member x.FSharpLanguageService =
@@ -290,3 +295,21 @@ type FSharpExpressionSelectionProviderBase() =
 let shouldEraseSemicolon (node: ITreeNode) =
     let settingsStore = node.GetSettingsStore()
     not (settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SemicolonAtEndOfLine))
+
+
+let shiftExpr shift (expr: ISynExpr) =
+    for child in List.ofSeq (expr.Tokens()) do
+        if not (child :? NewLine) then () else
+
+        let nextSibling = child.NextSibling
+        if nextSibling :? NewLine then () else
+        if not (expr.Contains(nextSibling)) then () else
+
+        if nextSibling :? Whitespace then
+            // Skip empty lines
+            if nextSibling.NextSibling.IsWhitespaceToken() then () else
+
+            let length = nextSibling.GetTextLength() + shift
+            ModificationUtil.ReplaceChild(nextSibling, Whitespace(length)) |> ignore
+        else
+            ModificationUtil.AddChildAfter(child, Whitespace(shift)) |> ignore

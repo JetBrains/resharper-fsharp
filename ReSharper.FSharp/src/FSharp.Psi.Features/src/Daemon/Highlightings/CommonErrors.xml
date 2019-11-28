@@ -72,6 +72,7 @@
     <Range>expr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>AddIgnoreFix</QuickFix>
+    <QuickFix>IntroduceVarFix</QuickFix>
     <QuickFix>RemoveSubsequentFix</QuickFix>
   </Warning>
 

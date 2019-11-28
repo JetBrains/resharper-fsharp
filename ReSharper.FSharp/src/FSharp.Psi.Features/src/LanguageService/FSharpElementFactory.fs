@@ -34,18 +34,36 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         let fsFile = createFile source
         fsFile.ModuleDeclarations.First()
 
-    let getDoDecl source =
+    let getModuleMember source =
         let moduleDeclaration = getModuleDeclaration source
-        moduleDeclaration.Members.First().As<IDo>().NotNull()
-    
+        moduleDeclaration.Members.First()
+
+    let getDoDecl source =
+        let moduleMember = getModuleMember source
+        moduleMember.As<IDo>().NotNull()
+
     let getExpression source =
         let doDecl = getDoDecl source
         doDecl.Expression.NotNull()
-    
+
     let createAppExpr addSpace =
         let space = if addSpace then " " else ""
         let source = sprintf "()%s()" space
         getExpression source :?> IAppExpr
+
+    let createLetBinding bindingName =
+        let source = sprintf "do (let %s = ())" bindingName
+        let newExpr = getExpression source
+        newExpr.As<IDoExpr>().Expression.As<IParenExpr>().InnerExpression.As<ILetOrUseExpr>()
+
+    let setBindingExpression (expr: ISynExpr) (letBindings: #ILetBindings) =
+        let newExpr = letBindings.Bindings.[0].SetExpression(expr.Copy())
+        if not expr.IsSingleLine then
+            let indentSize = expr.GetIndentSize()
+            ModificationUtil.AddChildBefore(newExpr, NewLine(expr.GetLineEnding())) |> ignore
+            ModificationUtil.AddChildBefore(newExpr, Whitespace(expr.Indent + indentSize)) |> ignore
+            shiftExpr indentSize newExpr
+        letBindings
 
     interface IFSharpElementFactory with
         member x.CreateOpenStatement(ns) =
@@ -81,7 +99,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
             if newLine then
                 ModificationUtil.ReplaceChild(expr.NextSibling, Whitespace(indent)) |> ignore
-                ModificationUtil.AddChildBefore(expr.NextSibling, NewLine(expr.FSharpFile.GetLineEnding())) |> ignore
+                ModificationUtil.AddChildBefore(expr.NextSibling, NewLine(expr.GetLineEnding())) |> ignore
 
             outerAppExpr
 
@@ -111,12 +129,17 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             appExpr.SetArgumentExpression(argExpr.Copy()) |> ignore
             appExpr
 
+        member x.CreateLetBindingExpr(bindingName) =
+            createLetBinding bindingName
+
         member x.CreateLetBindingExpr(bindingName, expr) =
-            let source = sprintf "do (let %s = ())" bindingName
-            let newExpr = getExpression source
-            let letOrUseExpr = newExpr.As<IDoExpr>().Expression.As<IParenExpr>().InnerExpression.As<ILetOrUseExpr>()
-            ModificationUtil.ReplaceChild(letOrUseExpr.Bindings.[0].Expression, expr) |> ignore
-            letOrUseExpr
+            let letOrUseExpr = createLetBinding bindingName
+            setBindingExpression expr letOrUseExpr
+
+        member x.CreateLetModuleDecl(bindingName, expr) =
+            let source = sprintf "let %s = ()" bindingName
+            let letModuleDecl = getModuleMember source  :?> ILetModuleDecl
+            setBindingExpression expr letModuleDecl
 
         member x.CreateConstExpr(text) =
             getExpression text :?> _
@@ -138,7 +161,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let expr = ModificationUtil.ReplaceChild(matchExpr.Expression, expr.Copy())
 
             let whitespace = ModificationUtil.ReplaceChild(matchClause.PrevSibling, Whitespace(indent))
-            ModificationUtil.AddChildBefore(whitespace, NewLine(expr.FSharpFile.GetLineEnding())) |> ignore
+            ModificationUtil.AddChildBefore(whitespace, NewLine(expr.GetLineEnding())) |> ignore
 
             matchExpr
 
@@ -158,9 +181,9 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let indent = expr.Indent + sourceFile.GetFormatterSettings(expr.Language).INDENT_SIZE
 
             let forExpr = getExpression "for _ in () do ()" :?> IForEachExpr
-            
+
             let expr = ModificationUtil.ReplaceChild(forExpr.InExpression, expr.Copy())
             let whitespace = ModificationUtil.ReplaceChild(forExpr.DoExpression.PrevSibling, Whitespace(indent))
-            ModificationUtil.AddChildBefore(whitespace, NewLine(expr.FSharpFile.GetLineEnding())) |> ignore
+            ModificationUtil.AddChildBefore(whitespace, NewLine(expr.GetLineEnding())) |> ignore
 
             forExpr

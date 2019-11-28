@@ -1,12 +1,13 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
 
+open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots
 open JetBrains.ReSharper.Feature.Services.Refactorings.Specific
-open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Naming.Elements
 open JetBrains.ReSharper.Psi.Naming.Extentions
@@ -14,23 +15,15 @@ open JetBrains.ReSharper.Psi.Naming.Impl
 open JetBrains.ReSharper.Psi.Naming.Settings
 open JetBrains.ReSharper.Psi.Pointers
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Refactorings.IntroduceVariable
-open JetBrains.ReSharper.Refactorings.Workflow
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.Util
 
 type FSharpIntroduceVariable(workflow, solution, driver) =
     inherit IntroduceVariableBase(workflow, solution, driver)
 
-    override x.Process(data) =
-        let expr = data.SourceExpression.As<ISynExpr>()
-
-        match data.Usages.FindLCA().As<ISynExpr>() with
-        | null -> null
-        | parentExpr ->
-
-        let lineEnding = expr.GetLineEnding()
-        let elementFactory = expr.CreateElementFactory()
-
+    let getNames (expr: ISynExpr) =
         let language = expr.Language
         let sourceFile = expr.GetSourceFile()
 
@@ -48,29 +41,67 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
             namingManager.Policy.GetDefaultRule(sourceFile, language, settingsStore, elementKind, descriptor)
 
         let suggestionOptions = SuggestionOptions(null, DefaultName = "foo")
-        let names = namesCollection.Prepare(namingRule, ScopeKind.Common, suggestionOptions).AllNames()
+        namesCollection.Prepare(namingRule, ScopeKind.Common, suggestionOptions).AllNames()
+
+    let getRaplaceRanges (expr: ISynExpr) (parent: ISynExpr) =
+        let sequentialExpr = SequentialExprNavigator.GetByExpression(expr)
+        if expr == parent && isNotNull sequentialExpr then
+            Assertion.Assert(expr == parent, "expr == parent")
+            let inRange = TreeRange(expr.NextSibling, sequentialExpr.LastChild)
+
+            let seqExprs = sequentialExpr.Expressions
+            let index = seqExprs.IndexOf(expr)
+
+            if seqExprs.Count - index > 2 then
+                // Replace rest expressions with a sequential expr node.
+                let newSeqExpr = ElementType.SEQUENTIAL_EXPR.Create()
+                let newSeqExpr = ModificationUtil.ReplaceChildRange(inRange, TreeRange(newSeqExpr)).First
+
+                LowLevelModificationUtil.AddChild(newSeqExpr, Array.ofSeq inRange)
+                {| ReplaceRange = TreeRange(expr, newSeqExpr)
+                   InRange = TreeRange(newSeqExpr) |}
+            else
+                // The last expression can be moved as is.
+                {| ReplaceRange = TreeRange(expr, sequentialExpr.LastChild)
+                   InRange = inRange |}
+        else
+            let range = TreeRange(parent)
+            {| ReplaceRange = range; InRange = range |}
+
+    static member val Key = Key("")
+
+    override x.Process(data) =
+        let expr = data.SourceExpression.As<ISynExpr>()
+        let parentExpr = data.Usages.FindLCA().As<ISynExpr>()
+
+        let names = getNames expr
         let name = if names.Count > 0 then names.[0] else "x"
-        
+
+        expr.UserData.RemoveKey(FSharpIntroduceVariable.Key)
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
+
+        let elementFactory = expr.CreateElementFactory()
+        let letOrUseExpr = elementFactory.CreateLetBindingExpr(name, expr)
 
         let replacedUsages =
             data.Usages
             |> Array.ofSeq
-            |> Array.map (fun usage ->
+            |> Array.choose (fun usage ->
+                if not (isValid usage) || obj.ReferenceEquals(usage, parentExpr) then None else
                 let ref = elementFactory.CreateReferenceExpr(name)
-                ModificationUtil.ReplaceChild(usage, ref).As<ITreeNode>().CreateTreeElementPointer())
+                Some (ModificationUtil.ReplaceChild(usage, ref).As<ITreeNode>().CreateTreeElementPointer()))
 
-        let letOrUseExpr = elementFactory.CreateLetBindingExpr(name, expr)
+        let ranges = getRaplaceRanges expr parentExpr
+        let replaced = ModificationUtil.ReplaceChildRange(ranges.ReplaceRange, TreeRange(letOrUseExpr))
+        let letOrUseExpr = replaced.First :?> ILetBindings
 
-        letOrUseExpr.SetInExpression(parentExpr) |> ignore
-        let anchor = ModificationUtil.AddChildAfter(letOrUseExpr.Bindings.[0], NewLine(lineEnding))
-        ModificationUtil.AddChildAfter(anchor, Whitespace(parentExpr.Indent)) |> ignore
-
-        let letOrUseExpr = ModificationUtil.ReplaceChild(parentExpr, letOrUseExpr) :> ITreeNode
+        let binding = letOrUseExpr.Bindings.[0]
+        ModificationUtil.ReplaceChildRange(TreeRange(binding.NextSibling, letOrUseExpr.LastChild), ranges.InRange) |> ignore
 
         let nodes =
             let replacedNodes =
-                replacedUsages |> Array.map (fun pointer -> pointer.GetTreeNode())
+                replacedUsages
+                |> Array.choose (fun pointer -> pointer.GetTreeNode() |> Option.ofObj)
 
             [| letOrUseExpr.As<ILet>().Bindings.[0].HeadPattern :> ITreeNode |]
             |> Array.append replacedNodes 
@@ -90,4 +121,13 @@ type FSharpIntroduceVarHelper() =
     override x.IsLanguageSupported = true
 
     override x.CheckAvailability(node) =
-        node.IsSingleLine // todo: change to something meaningful. :)
+        node.UserData.HasKey(FSharpIntroduceVariable.Key) ||
+
+        // todo: change to something meaningful. :)
+        node.IsSingleLine && node.GetSolution().RdFSharpModel.EnableExperimentalFeaturesSafe
+
+    override x.CheckOccurrence(expr, occurrence) =
+        // Disable getting other expressions when invoked via quick fix.
+        // todo: change platform APIs in next release
+        expr.GetSolution().RdFSharpModel.EnableExperimentalFeaturesSafe ||
+        occurrence.UserData.HasKey(FSharpIntroduceVariable.Key)
