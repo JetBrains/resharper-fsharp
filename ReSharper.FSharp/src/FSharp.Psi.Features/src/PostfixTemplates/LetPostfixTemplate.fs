@@ -6,12 +6,14 @@ open JetBrains.ReSharper.Feature.Services.LiveTemplates.Templates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates.Contexts
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Transactions
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.Util
 
 [<PostfixTemplate("let", "Introduce let binding", "let _ = expr")>]
 type LetPostfixTemplate() =
@@ -30,22 +32,30 @@ and LetPostfixTemplateInfo(expressionContext: PostfixExpressionContext) =
 and LetPostfixTemplateBehavior(info) =
     inherit FSharpPostfixTemplateBehaviorBase(info)
 
+    static member val PreventIntroduceVarKey = Key("PreventIntroduceVarKey")
+    
     override x.ExpandPostfix(context) =
         let psiModule = context.PostfixContext.PsiModule
         let psiServices = psiModule.GetPsiServices()
 
+        // todo: top level bindings should be created as module members, not as let expressions
         psiServices.Transactions.Execute(x.ExpandCommandName, fun _ ->
             let node = context.Expression :?> IFSharpTreeNode
             let elementFactory = node.CreateElementFactory()
             use writeCookie = WriteLockCookie.Create(node.IsPhysical())
             let refExpr = x.GetExpression(context)
 
-            // todo: we create wrong let bindings node here
-            // todo: top level bindings should be create as module members, not as let expressions
-            let letOrUseExpr = elementFactory.CreateLetBindingExpr("_", refExpr)
-            ModificationUtil.ReplaceChild(refExpr, letOrUseExpr) :> ITreeNode)
+            if (FSharpIntroduceVariable.CanIntroduceVar(refExpr)) then refExpr :> ITreeNode else
 
+            let letOrUseExpr = elementFactory.CreateLetBindingExpr("_", refExpr)
+            let replaced = ModificationUtil.ReplaceChild(refExpr, letOrUseExpr)
+            replaced.UserData.PutKey(LetPostfixTemplateBehavior.PreventIntroduceVarKey)
+            replaced :> _)
+            
     override x.AfterComplete(textControl, node, _) =
+        if not (node.UserData.HasKey(LetPostfixTemplateBehavior.PreventIntroduceVarKey)) then
+            FSharpIntroduceVariable.IntroduceVar(node :?> _, textControl) else
+
         match node.As<ILetOrUseExpr>() with
         | null -> ()
         | letExpr ->

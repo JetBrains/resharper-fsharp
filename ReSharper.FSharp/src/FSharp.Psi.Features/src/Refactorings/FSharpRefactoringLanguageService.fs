@@ -21,6 +21,3 @@ type FSharpRefactoringLanguageService() =
     override x.CreateInlineVar(workflow, solution, driver) =
 //        FSharpInlineVar(workflow, solution, driver) :> _
         null
-
-and IntroduceVarFixWorkflow(solution) =
-    inherit IntroduceVariableWorkflow(solution, null)

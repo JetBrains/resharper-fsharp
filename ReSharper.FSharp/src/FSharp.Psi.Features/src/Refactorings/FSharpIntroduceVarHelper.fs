@@ -1,12 +1,19 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
 
+open JetBrains.Application.DataContext
+open JetBrains.Application.UI.Actions.ActionManager
 open JetBrains.Diagnostics
+open JetBrains.DocumentModel.DataContext
+open JetBrains.Lifetimes
+open JetBrains.ProjectModel.DataContext
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots
+open JetBrains.ReSharper.Feature.Services.Refactorings
 open JetBrains.ReSharper.Feature.Services.Refactorings.Specific
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Naming.Elements
@@ -18,6 +25,8 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Refactorings.IntroduceVariable
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.TextControl
+open JetBrains.TextControl.DataContext
 open JetBrains.Util
 
 type FSharpIntroduceVariable(workflow, solution, driver) =
@@ -121,6 +130,40 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let expr = letOrUseExpr :?> ILetLikeExpr
 
         IntroduceVariableResult(hotspotsRegistry, expr.Bindings.[0].HeadPattern.As<ITreeNode>().CreateTreeElementPointer())
+
+    static member IntroduceVar(expr: ISynExpr, textControl: ITextControl) =
+        let name = "IntroduceVarFix"
+        let document = textControl.Document
+        let solution = expr.GetSolution()
+
+        let rules =
+            DataRules
+                .AddRule(name, ProjectModelDataConstants.SOLUTION, solution)
+                .AddRule(name, DocumentModelDataConstants.DOCUMENT, document)
+                .AddRule(name, TextControlDataConstants.TEXT_CONTROL, textControl)
+                .AddRule(name, PsiDataConstants.SELECTED_EXPRESSION, expr)
+
+        use lifetime = Lifetime.Define(Lifetime.Eternal)
+
+        let actionManager = Shell.Instance.GetComponent<IActionManager>()
+        let dataContext = actionManager.DataContexts.CreateWithDataRules(lifetime.Lifetime, rules)
+
+        expr.UserData.PutKey(FSharpIntroduceVariable.TaggedByQuickFixKey)
+        let workflow = IntroduceVarFixWorkflow(solution)
+        RefactoringActionUtil.ExecuteRefactoring(dataContext, workflow)
+
+    static member CanIntroduceVar(expr: ISynExpr) =
+        if not (isValid expr) then false else
+
+        let sequentialExpr = SequentialExprNavigator.GetByExpression(expr)
+        if isNull sequentialExpr then false else
+
+        let nextMeaningfulSibling = expr.GetNextMeaningfulSibling()
+        nextMeaningfulSibling :? ISynExpr && nextMeaningfulSibling.Indent = expr.Indent
+
+
+and IntroduceVarFixWorkflow(solution) =
+    inherit IntroduceVariableWorkflow(solution, null)
 
 
 type FSharpIntroduceVarHelper() =
