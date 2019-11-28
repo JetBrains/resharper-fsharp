@@ -18,10 +18,14 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.TextControl.DataContext
 open JetBrains.Util
 
-type IntroduceVarFix(warning: UnitTypeExpectedWarning) =
+type IntroduceVarFix(expr: ISynExpr) =
     inherit QuickFixBase()
 
-    let expr = warning.Expr
+    new (warning: UnitTypeExpectedWarning) =
+        IntroduceVarFix(warning.Expr)
+
+    new (warning: FunctionValueUnexpectedWarning) =
+        IntroduceVarFix(warning.Expr)
 
     override x.Text = "Introduce 'let' binding"
 

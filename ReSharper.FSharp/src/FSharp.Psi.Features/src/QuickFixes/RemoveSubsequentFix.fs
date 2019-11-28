@@ -7,10 +7,14 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
 
-type RemoveSubsequentFix(warning: UnitTypeExpectedWarning) =
+type RemoveSubsequentFix(expr: ISynExpr) =
     inherit FSharpQuickFixBase()
 
-    let expr = warning.Expr
+    new (warning: UnitTypeExpectedWarning) =
+        RemoveSubsequentFix(warning.Expr)
+
+    new (warning: FunctionValueUnexpectedWarning) =
+        RemoveSubsequentFix(warning.Expr)
 
     override x.Text = "Remove subsequent expressions"
 

@@ -40,6 +40,9 @@ type AddIgnoreFix(expr: ISynExpr) =
     new (warning: UnitTypeExpectedWarning) =
         AddIgnoreFix(warning.Expr)
 
+    new (warning: FunctionValueUnexpectedWarning) =
+        AddIgnoreFix(warning.Expr)
+
     new (error: UnitTypeExpectedError) =
         AddIgnoreFix(error.Expr)
 

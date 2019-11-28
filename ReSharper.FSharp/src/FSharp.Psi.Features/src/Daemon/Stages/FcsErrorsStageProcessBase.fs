@@ -36,8 +36,11 @@ module FSharpErrors =
     let [<Literal>] UnusedValue = 1182
     let [<Literal>] UnusedThisVariable = 1183
 
+    let [<Literal>] MissingErrorNumber = 193
+
     let [<Literal>] undefinedIndexerMessage = "The field, constructor or member 'Item' is not defined."
     let [<Literal>] ifExprMissingElseBranch = "This 'if' expression is missing an 'else' branch."
+    let [<Literal>] expressionIsAFunctionMessage = "This expression is a function value, i.e. is missing arguments. Its type is string -> unit."
 
 [<AbstractClass>]
 type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
@@ -62,7 +65,6 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         getNode fsFile range
 
     let createHighlighting (error: FSharpErrorInfo) (range: DocumentRange): IHighlighting =
-
         match error.ErrorNumber with
         | TypeEquation ->
             if (error.Message.StartsWith(ifExprMissingElseBranch, StringComparison.Ordinal) &&
@@ -134,7 +136,12 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | EmptyRecordInvalid ->
             EmptyRecordInvalidError(getNode range, error.Message) :> _
-        
+
+        | MissingErrorNumber when startsWith expressionIsAFunctionMessage error.Message ->
+            let expr = ExpressionSelectionUtil.GetExpressionInRange(fsFile, range, false, null)
+            if isNotNull expr then FunctionValueUnexpectedWarning(expr, error.Message) :> _ else
+            createGenericHighlighting error range
+
         | _ -> createGenericHighlighting error range
 
     abstract ShouldAddDiagnostic: error: FSharpErrorInfo * range: DocumentRange -> bool
