@@ -55,6 +55,6 @@ type IntroduceVarFix(expr: ISynExpr) =
             let actionManager = Shell.Instance.GetComponent<IActionManager>()
             let dataContext = actionManager.DataContexts.CreateWithDataRules(lifetime.Lifetime, rules)
 
-            expr.UserData.PutKey(FSharpIntroduceVariable.Key)
+            expr.UserData.PutKey(FSharpIntroduceVariable.TaggedByQuickFixKey)
             let workflow = IntroduceVarFixWorkflow(solution)
             RefactoringActionUtil.ExecuteRefactoring(dataContext, workflow))

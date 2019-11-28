@@ -70,7 +70,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
             let range = TreeRange(parent)
             {| ReplaceRange = range; InRange = range; AddNewLine = true |}
 
-    static member val Key = Key("")
+    static member val TaggedByQuickFixKey = Key("")
 
     override x.Process(data) =
         let expr = data.SourceExpression.As<ISynExpr>()
@@ -79,7 +79,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let names = getNames expr
         let name = if names.Count > 0 then names.[0] else "x"
 
-        expr.UserData.RemoveKey(FSharpIntroduceVariable.Key)
+        expr.UserData.RemoveKey(FSharpIntroduceVariable.TaggedByQuickFixKey)
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
 
         let lineEnding = expr.GetLineEnding()
@@ -126,16 +126,23 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 type FSharpIntroduceVarHelper() =
     inherit IntroduceVariableHelper()
 
+    let isTaggedNode (expr: ITreeNode) =
+        expr.UserData.HasKey(FSharpIntroduceVariable.TaggedByQuickFixKey)
+
+    let isInsideTaggedNode (expr: ITreeNode) =
+        isNotNull (expr.GetContainingNode<ISynExpr>(System.Predicate<_>(isTaggedNode), false))
+
     override x.IsLanguageSupported = true
 
     override x.CheckAvailability(node) =
-        node.UserData.HasKey(FSharpIntroduceVariable.Key) ||
+        if isTaggedNode node then true else
+
+        // Skip inner expressions in quick fix by now.
+        if isInsideTaggedNode node then false else
 
         // todo: change to something meaningful. :)
         node.IsSingleLine && node.GetSolution().RdFSharpModel.EnableExperimentalFeaturesSafe
 
     override x.CheckOccurrence(expr, occurrence) =
-        // Disable getting other expressions when invoked via quick fix.
-        // todo: change platform APIs in next release
-        expr.GetSolution().RdFSharpModel.EnableExperimentalFeaturesSafe ||
-        occurrence.UserData.HasKey(FSharpIntroduceVariable.Key)
+        if isTaggedNode occurrence then true else
+        expr.GetSolution().RdFSharpModel.EnableExperimentalFeaturesSafe
