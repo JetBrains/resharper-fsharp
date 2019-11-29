@@ -88,6 +88,7 @@ type FSharpSourceCache
         base.GetLastWriteTime(path)
 
     override x.Exists(path) =
+        if not (isApplicable path) then base.Exists(path) else
         match files.TryGetValue(path) with
         | true, _ -> true
         | _ ->
