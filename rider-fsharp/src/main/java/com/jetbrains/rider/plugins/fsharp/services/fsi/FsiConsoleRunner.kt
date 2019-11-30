@@ -233,7 +233,7 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
     }
 
     override fun createConsoleView(): LanguageConsoleView {
-        val gutterProvider = object : BasicGutterContentProvider() {
+        val gutterProvider = object : BasicGutterContentProvider(false) {
             override fun beforeEvaluate(e: Editor) = Unit
         }
         val consoleView = LanguageConsoleBuilder().gutterContentProvider(gutterProvider).build(project, PlainTextLanguage.INSTANCE)
