@@ -44,3 +44,6 @@ type FSharpExtendSelectionTest() =
 
     [<Test>] member x.``Type inheritance 01 - Type name``() = x.DoNamedTest()
     [<Test>] member x.``Type inheritance 02 - Ctor arg``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Target attribute 01 - Type name``() = x.DoNamedTest()
+    [<Test>] member x.``Target attribute 02 - Arg expr``() = x.DoNamedTest()

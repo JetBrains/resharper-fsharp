@@ -1,0 +1,2 @@
+[<assembly: Foo({caret})>]
+()
