@@ -11,7 +11,9 @@ type RemoveNeverMatchingRuleTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/removeNeverMatchingRule"
 
-    [<Test>] member x.``Single rule 01``() = x.DoNamedTest()
-    [<Test>] member x.``Single rule 02 - Comment``() = x.DoNamedTest()
-    [<Test>] member x.``Multiple rules 01``() = x.DoNamedTest()
-    [<Test>] member x.``Multiple rules 02 - Comment``() = x.DoNamedTest()
+    [<Test>] member x.``Match expr - Single rule 01``() = x.DoNamedTest()
+    [<Test>] member x.``Match expr - Single rule 02 - Comment``() = x.DoNamedTest()
+    [<Test>] member x.``Match expr - Multiple rules 01``() = x.DoNamedTest()
+    [<Test>] member x.``Match expr - Multiple rules 02 - Comment``() = x.DoNamedTest()
+    [<Test>] member x.``Match lambda expr``() = x.DoNamedTest()
+    [<Test>] member x.``Try with expr``() = x.DoNamedTest()

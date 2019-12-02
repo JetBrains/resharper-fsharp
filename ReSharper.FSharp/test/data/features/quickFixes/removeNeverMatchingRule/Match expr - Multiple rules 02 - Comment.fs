@@ -3,6 +3,6 @@ module Module
 do
     match () with
     | _ -> ()
-    |{caret} _ -> () // comment
+    |{caret} deleted -> () // comment
     | _ -> ()
     ()
