@@ -17,9 +17,9 @@ type RemoveNeverMatchingRuleFix(warning: RuleNeverMatchedWarning) =
         use writeLock = WriteLockCookie.Create(matchClause.IsPhysical())
 
         if isLastChild matchClause then
-            let matchExpr = MatchExprNavigator.GetByClause(matchClause)
-            if isInlineSpaceOrComment matchExpr.NextSibling then
-                let first = matchExpr.NextSibling
+            let parent = getParent matchClause
+            if isNotNull parent && isInlineSpaceOrComment parent.NextSibling then
+                let first = parent.NextSibling
                 let last = getLastMatchingNodeAfter isInlineSpaceOrComment first
                 deleteChildRange first last
 
