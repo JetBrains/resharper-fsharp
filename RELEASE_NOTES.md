@@ -1,5 +1,110 @@
 # Release notes
 
+## 2019.3
+
+### Tools update and internals
+
+* Update FSharp.Compiler.Service with F# 4.7 support, most notably:
+  * `_` self identifier in member definitions
+  * Implicit `yield` in computational expressions
+  * F# 5.0 features preview when enabled with compiler option
+* Update Fantomas to 3.0 with various fixes
+* Rewritten parse tree nodes for expressions and types
+  * Allows significantly simplified code for features like quick fixes, analyzers, and others
+  * Better context tracking, optimized references creation, references are now qualifier-aware
+  * Improved infrastructure for upcoming refactorings, postfix templates, and other features
+
+### Quick fixes
+
+* **FS0039**: Undefined name
+  * **Add** Initial Import Type quick fix
+  * **Add** Make outer function recursive fix
+* **FS0020**: Expression in unused
+  * **Add** Introduce 'let' binding fix for local expressions
+  * **Update** Ignore expression fix
+     * Better `|> ignore` placement for multiline expressions
+     * Option to ignore inner expression in `match` and `if` expressions
+  * **Add** Remove subsequent expressions fix
+* **FS1182**: Unused let binding
+  * **Add** Remove unused local binding
+* **FS0597**: Successive arguments should be separated by spaces, tupled, or parenthesized
+  * **Add** Surround with parens fix
+* **FS0001**: Unit type expected
+  * **Add** Ignore expression fix for `if` expressions without `else` branch
+* **FS0066**: Unnecessary upcast
+  * **Add** Remove upcast fix
+* **FS0588**: Expected expression after let
+  * **Add** Replace `let` with bound expression fix
+* **FS0576**: `and` is not allowed for non-recursive let bindings
+  * **Add** To recursive let bindings fix
+* **FS0894**: Let bindings inside class cannot be inline
+  * **Add** Remove `inline` fix
+
+### Inspections / Problem analyzers
+
+* Redundant `new` analyzer
+  * **Add** Remove redundant `new` fix
+* Redundant identifier escaping
+  * **Add** Remove backticks fix
+* **Add** Extension attribute usage analyzer:
+  * Extension member inside non-extension type
+  * Extension type doesn't define extension members
+  * Extension type should be static
+
+### Rename
+
+* Rename additional symbols:
+  * Suggest renaming of a single case union when renaming its case and vice versa
+* Suggest camelCase names for let bindings
+* **Add** renaming anonymous records fields
+* **Fix** renaming union case fields when used as named args
+* **Fix** renaming typed parameters inside lambda functions
+* Better naming sugestions for predefined types
+
+### Intentions / Context actions
+
+* **Add** To recursive module or namespace action
+
+### Extend selection
+
+* Rewritten from scratch for the parse tree changes
+  * Words are selected first when invoked inside comments and strings
+  * Better selection for many language constructs, with contributions by [@reacheight](https://github.com/reacheight)
+  * **Fix** declaration selection could miss starting keywords and attributes
+
+### Find usages
+
+* Parts of results grouping is rewritten from scratch for the parse tree changes
+  * **Fix** various cases could be reported incorrectly
+
+### Typing assistance
+
+* Significantly improved undo/redo changes workflow
+* **Add** Complete pair escape identifier backticks assist
+* **Add** Escape identifier with backticks assist
+* **Add** Erase trailing semicolon in Enter assist when enabled in Code Style settings
+* **Fix** Pair quotes assists no longer applied inside comments
+* **Update** Better indentation in Enter assist
+
+### Highlighting
+
+* Separate highlighting options for F#:
+  * **Add** F#-specific symbols like Unions or Active Patterns can now be highligted differently
+* **Add** Highlight `byref` values as mutable
+* **Fix** unary operators highlighting
+
+### Misc
+
+* **Add** option to specify language version for scripts and F# Interactive
+* **Fix** Don't use auto-detected code style settings in Reformat Code action
+* **Add** helper for Quick Definition
+* **Fix** record private representations resolve in C#
+* **Fix** adding new file to a project could fail
+* **Update** Ignore `Folders on top` option in F# projects
+* **Fix** getting F# Interactive paths
+* **Fix** resolve of extension members with specified compiled names
+* **Update** Don't show inferred type lenses inside object expressions
+
 ## 2019.2
 
 ### Code Vision support
