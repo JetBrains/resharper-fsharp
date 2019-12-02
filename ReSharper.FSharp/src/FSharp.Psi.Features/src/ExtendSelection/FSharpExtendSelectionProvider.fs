@@ -29,6 +29,10 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
             null
 
         | :? ITypeReferenceName as typeReferenceName ->
+            let attribute = AttributeNavigator.GetByReferenceName(typeReferenceName)
+            if isNotNull attribute && isNotNull attribute.ArgExpression then
+                FSharpTreeRangeSelection(fsFile, typeReferenceName, attribute.ArgExpression) :> _ else
+
             let typeInherit = TypeInheritNavigator.GetByTypeName(typeReferenceName)
             if isNotNull typeInherit && isNotNull typeInherit.CtorArg then
                 FSharpTreeRangeSelection(fsFile, typeReferenceName, typeInherit.CtorArg) :> _ else
@@ -57,6 +61,10 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
             null
 
         | :? ISynExpr as expr ->
+            let attribute = AttributeNavigator.GetByExpression(expr)
+            if isNotNull attribute && isNotNull attribute.ReferenceName && isNotNull attribute.ArgExpression then
+                FSharpTreeRangeSelection(fsFile, attribute.ReferenceName, attribute.ArgExpression) :> _ else
+
             let typeInherit = TypeInheritNavigator.GetByCtorArgExpression(expr)
             if isNotNull typeInherit && isNotNull typeInherit.TypeName && isNotNull typeInherit.CtorArg then
                 FSharpTreeRangeSelection(fsFile, typeInherit.TypeName, typeInherit.CtorArg) :> _ else
