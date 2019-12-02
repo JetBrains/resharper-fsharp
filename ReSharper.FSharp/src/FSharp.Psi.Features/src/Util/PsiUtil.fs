@@ -153,6 +153,10 @@ let isFiltered (node: ITreeNode) =
 let isSemicolon (node: ITreeNode) =
     getTokenType node == FSharpTokenType.SEMICOLON
 
+let isLastChild (node: ITreeNode) =
+    let parent = getParent node
+    isNotNull parent && parent.LastChild == node
+
 
 let skipMatchingNodesAfter predicate (node: ITreeNode): ITreeNode =
     let nextSibling = node.NextSibling
