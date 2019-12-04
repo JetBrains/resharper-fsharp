@@ -61,18 +61,25 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | FSharpErrorSeverity.Warning -> WarningHighlighting(error.Message, range) :> _
         | _ -> ErrorHighlighting(error.Message, range) :> _
 
-    let getNode range =
-        getNode fsFile range
+    let createHighlightingFromNode highlightingCtor range: IHighlighting =
+        match ExpressionSelectionUtil.GetExpressionInRange(fsFile, range, false, null) with
+        | null -> null
+        | expr -> highlightingCtor expr :> _
+
+    let createHighlightingFromParentNode highlightingCtor range: IHighlighting =
+        match ExpressionSelectionUtil.GetExpressionInRange(fsFile, range, false, null) with
+        | null -> null
+        | node -> highlightingCtor (node.GetContainingNode()) :> _
+    
+    let createHighlightingFromNodeWithMessage highlightingCtor range (error: FSharpErrorInfo): IHighlighting =
+        let expr = ExpressionSelectionUtil.GetExpressionInRange(fsFile, range, false, null)
+        if isNotNull expr then highlightingCtor (expr, error.Message) :> _ else
+        null
 
     let createHighlighting (error: FSharpErrorInfo) (range: DocumentRange): IHighlighting =
         match error.ErrorNumber with
-        | TypeEquation ->
-            if (error.Message.StartsWith(ifExprMissingElseBranch, StringComparison.Ordinal) &&
-                let indexer = fsFile.GetNode(range) in isNotNull indexer) then
-                UnitTypeExpectedError(fsFile.GetNode(range), error.Message) :> _
-
-            else
-                createGenericHighlighting error range 
+        | TypeEquation when error.Message.StartsWith(ifExprMissingElseBranch, StringComparison.Ordinal) ->
+            createHighlightingFromNodeWithMessage UnitTypeExpectedError range error 
 
         | UndefinedName ->
             if (error.Message = undefinedIndexerMessage &&
@@ -92,11 +99,11 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
             UnresolvedHighlighting(error.Message, range) :> _
 
-        | UpcastUnnecessary -> UpcastUnnecessaryWarning(getNode range) :> _
+        | UpcastUnnecessary ->
+            createHighlightingFromNode UpcastUnnecessaryWarning range
+
         | TypeTestUnnecessary ->
-            let expr = ExpressionSelectionUtil.GetExpressionInRange(fsFile, range, false, null)
-            if isNotNull expr then TypeTestUnnecessaryWarning(expr, error.Message) :> _ else
-            createGenericHighlighting error range
+            createHighlightingFromNodeWithMessage TypeTestUnnecessaryWarning range error
 
         | UnusedValue ->
             match fsFile.GetNode(range) with
@@ -104,46 +111,40 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             | pat -> UnusedValueWarning(pat) :> _
 
         | RuleNeverMatched ->
-            match fsFile.GetNode(range) with
-            | null -> createGenericHighlighting error range
-            | matchClause -> RuleNeverMatchedWarning(matchClause) :> _
+            createHighlightingFromParentNode RuleNeverMatchedWarning range
 
         | UnitTypeExpected ->
-            UnitTypeExpectedWarning(ExpressionSelectionUtil.GetExpressionInRange(fsFile, range, false, null), error.Message) :> _
+            createHighlightingFromNodeWithMessage UnitTypeExpectedWarning range error
         
         | UseBindingsIllegalInModules ->
-            UseBindingsIllegalInModulesWarning(getNode range) :> _
+            createHighlightingFromNode UseBindingsIllegalInModulesWarning range
 
         | UseBindingsIllegalInImplicitClassConstructors ->
-            UseKeywordIllegalInPrimaryCtorError(getNode range) :> _
+            createHighlightingFromNode UseKeywordIllegalInPrimaryCtorError range
 
         | LocalClassBindingsCannotBeInline ->
-            LocalClassBindingsCannotBeInlineError(getNode range) :> _
+            createHighlightingFromParentNode LocalClassBindingsCannotBeInlineError range
 
         | LetAndForNonRecBindings ->
-            LetAndForNonRecBindingsError(getNode range) :> _
+            createHighlightingFromParentNode LetAndForNonRecBindingsError range
 
         | UnusedThisVariable ->
-            UnusedThisVariableWarning(getNode range) :> _
+            createHighlightingFromParentNode UnusedThisVariableWarning range
 
         | FieldRequiresAssignment ->
-            FieldRequiresAssignmentError(getNode range, error.Message) :> _
+            createHighlightingFromNodeWithMessage FieldRequiresAssignmentError range error
 
         | ExpectedExpressionAfterLet ->
-            ExpectedExpressionAfterLetError(getNode range) :> _
+            createHighlightingFromParentNode ExpectedExpressionAfterLetError range
 
         | SuccessiveArgsShouldBeSpacedOrTupled ->
-            let expr = ExpressionSelectionUtil.GetExpressionInRange(fsFile, range, false, null)
-            if isNotNull expr then SuccessiveArgsShouldBeSpacedOrTupledError(expr) :> _ else
-            createGenericHighlighting error range
+            createHighlightingFromNode SuccessiveArgsShouldBeSpacedOrTupledError range
 
         | EmptyRecordInvalid ->
-            EmptyRecordInvalidError(getNode range, error.Message) :> _
+            createHighlightingFromNodeWithMessage EmptyRecordInvalidError range error
 
         | MissingErrorNumber when startsWith expressionIsAFunctionMessage error.Message ->
-            let expr = ExpressionSelectionUtil.GetExpressionInRange(fsFile, range, false, null)
-            if isNotNull expr then FunctionValueUnexpectedWarning(expr, error.Message) :> _ else
-            createGenericHighlighting error range
+            createHighlightingFromNodeWithMessage FunctionValueUnexpectedWarning range error
 
         | _ -> createGenericHighlighting error range
 
@@ -160,7 +161,11 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         for error, range in errors  do
             if x.ShouldAddDiagnostic(error, range) then
-                let highlighting = createHighlighting error range
+                let highlighting =
+                    match createHighlighting error range with
+                    | null -> createGenericHighlighting error range
+                    | highlighting -> highlighting
+
                 highlightings.Add(HighlightingInfo(highlighting.CalculateRange(), highlighting))
             x.SeldomInterruptChecker.CheckForInterrupt()
 

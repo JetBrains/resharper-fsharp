@@ -284,7 +284,7 @@ let isValid (node: ITreeNode) =
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpExpressionSelectionProviderBase() =
-    inherit ExpressionSelectionProviderBase<ISynExpr>()
+    inherit ExpressionSelectionProviderBase<IFSharpTreeNode>()
 
     override x.IsTokenSkipped(token) =
         // todo: also ;; ?
