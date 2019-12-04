@@ -51,6 +51,7 @@
     <Compile Include="Intentions\ToRecursiveLetBindings.fs" />
     <Compile Include="Intentions\ToMultilineRecordTest.fs" />
     <Compile Include="Intentions\ToRecursiveModuleActionTest.fs" />
+    <Compile Include="Intentions\ToModuleNamespaceActionTest.fs" />
     <Compile Include="Actions\CommentActionTests.fs" />
     <Compile Include="Actions\TypingAssistTest.fs" />
     <Compile Include="Actions\FSharpExtendSelectionTest.fs" />

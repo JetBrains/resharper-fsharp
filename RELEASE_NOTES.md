@@ -63,6 +63,7 @@
 
 ### Intentions / Context actions
 
+* **Add** To namespace/module action
 * **Add** To recursive module or namespace action
 
 ### Extend selection

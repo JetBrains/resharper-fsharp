@@ -89,6 +89,7 @@
     <Compile Include="src\Intentions\ToRecursiveLetBindingsAction.fs" />
     <Compile Include="src\Intentions\ToMultilineRecord.fs" />
     <Compile Include="src\Intentions\ToRecursiveModuleAction.fs" />
+    <Compile Include="src\Intentions\ToModuleNamespaceDeclarationAction.fs" />
     <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
       <Mode>QUICKFIX</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>

@@ -1,0 +1,4 @@
+﻿namespace Module{caret}
+
+type T() =
+    class end

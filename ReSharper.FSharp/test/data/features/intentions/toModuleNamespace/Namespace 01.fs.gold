@@ -1,0 +1,4 @@
+﻿module Ns{caret}
+
+type T() =
+    class end
