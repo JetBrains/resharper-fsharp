@@ -581,6 +581,10 @@ lambdaExpr options { stubBase="FSharpExpressionBase"; }:
   RARROW
   synExpr<EXPR, Expression>;
 
+interface matchClauseListOwner:
+  matchLikeExpr |
+  tryWithExpr;
+
 interface matchLikeExpr:
   matchExpr |
   matchLambdaExpr;
@@ -627,7 +631,7 @@ tryWithExpr options { stubBase="FSharpExpressionBase"; }:
   TRY
   synExpr<TRY_EXPR, TryExpression>
   WITH
-  matchClause<CLAUSE, WithCases>*;
+  matchClause<CLAUSE, Clauses>*;
 
 tryFinallyExpr options { stubBase="FSharpExpressionBase"; }:
   TRY
