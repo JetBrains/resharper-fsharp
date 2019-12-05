@@ -1,28 +1,45 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 
 open JetBrains.Application.Threading
+open JetBrains.ProjectModel
 open JetBrains.ReSharper.Intentions.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Search
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Finder
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpImportTypeHelper() =
-    let [<Literal>] opName = "FSharpImportTypeHelper.FindTypeCandidates"
-
     interface IImportTypeHelper with
         member x.FindTypeCandidates(reference, importTypeCacheFactory) =
             let reference = reference.As<FSharpSymbolReference>()
             if isNull reference || reference.IsQualified then Seq.empty else
 
             let context = reference.GetElement()
+            let sourceFile = context.GetSourceFile()
+            let psiModule = context.GetPsiModule()
+
             let names = reference.GetAllNames().ResultingList()
             let factory = importTypeCacheFactory.Invoke(context)
 
             names
             |> Seq.collect factory.Invoke
-            |> Seq.filter (fun clrDeclaredElement -> clrDeclaredElement :? ITypeElement)
+            |> Seq.filter (fun clrDeclaredElement ->
+                let typeElement = clrDeclaredElement.As<ITypeElement>()
+                if isNull typeElement then false else
+
+                // todo: enable when singleton property cases are supported
+                if typeElement.IsUnionCase() then false else
+
+                // Module accessibility is calculated by the factory for us,
+                // we only need to check the order inside the project. 
+                if typeElement.Module != psiModule then true else
+
+                let searchGuru = psiModule.GetSolution().GetComponent<FSharpSearchGuru>() :> ISearchGuru
+                searchGuru.CanContainReferences(sourceFile, searchGuru.GetElementId(typeElement)))
             |> Seq.cast
 
         member x.ReferenceTargetCanBeType _ = true

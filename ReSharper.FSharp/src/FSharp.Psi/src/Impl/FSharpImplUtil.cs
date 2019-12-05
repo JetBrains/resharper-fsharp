@@ -309,17 +309,32 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return null;
     }
 
-    public static bool IsException(this ITypeElement type) =>
-      GetPart<IExceptionPart>(type) != null;
+    public static bool IsException(this ITypeElement typeElement) =>
+      typeElement switch
+      {
+        IFSharpTypeElement fsTypeElement => fsTypeElement.GetPart<IExceptionPart>() != null,
+        ICompiledElement compiled when compiled.IsFromFSharpAssembly() => compiled.IsCompiledException(),
+        _ => false
+      };
     
-    public static bool IsUnion([NotNull] this ITypeElement type) =>
-      GetPart<IUnionPart>(type) != null;
+    public static bool IsUnion([NotNull] this ITypeElement typeElement) =>
+      typeElement switch
+      {
+        IFSharpTypeElement fsTypeElement => fsTypeElement.GetPart<IUnionPart>() != null,
+        ICompiledElement compiled when compiled.IsFromFSharpAssembly() => compiled.IsCompiledUnion(),
+        _ => false
+      };
 
-    public static bool IsUnionCase([NotNull] this ITypeElement type) =>
-      GetPart<UnionCasePart>(type) != null;
+    public static bool IsUnionCase([NotNull] this ITypeElement typeElement) => 
+      typeElement switch
+      {
+        IFSharpTypeElement fsTypeElement => fsTypeElement.GetPart<UnionCasePart>() != null,
+        ICompiledElement compiled when compiled.IsFromFSharpAssembly() => compiled.IsCompiledUnionCase(),
+        _ => false
+      };
 
     [NotNull]
-    public static IList<IUnionCase> GetUnionCases([CanBeNull] this ITypeElement type) =>
+    public static IList<IUnionCase> GetSourceUnionCases([CanBeNull] this ITypeElement type) =>
       GetPart<IUnionPart>(type)?.Cases ?? EmptyList<IUnionCase>.Instance;
 
     [CanBeNull]
@@ -555,18 +570,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return null;
     }
 
-    public static bool IsRecord([NotNull] this ITypeElement typeElement)
-    {
-      switch (typeElement)
+    public static bool IsRecord([NotNull] this ITypeElement typeElement) =>
+      typeElement switch
       {
-        case IFSharpTypeElement fsTypeElement:
-          return fsTypeElement.GetPart<IRecordPart>() != null;
-        case ICompiledElement compiledElement when compiledElement.Module.IsFSharpAssembly():
-          return compiledElement.GetCompilationMappingFlag() == SourceConstructFlags.RecordType;
-        default:
-          return false;
-      }
-    }
+        IFSharpTypeElement fsTypeElement => (fsTypeElement.GetPart<IRecordPart>() != null),
+        ICompiledElement compiledElement when compiledElement.Module.IsFSharpAssembly() =>
+        (compiledElement.GetCompilationMappingFlag() == SourceConstructFlags.RecordType),
+        _ => false
+      };
 
     public static ICollection<string> GetRecordFieldNames([NotNull] this ITypeElement typeElement)
     {

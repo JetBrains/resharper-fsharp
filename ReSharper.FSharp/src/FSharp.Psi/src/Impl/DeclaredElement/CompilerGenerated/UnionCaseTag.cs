@@ -22,7 +22,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGe
     public IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer() =>
       new UnionCaseTagPointer(this);
 
-    public int Index => Union.GetUnionCases().IndexOf(UnionCase);
+    public int Index => Union.GetSourceUnionCases().IndexOf(UnionCase);
 
     protected override IClrDeclaredElement ContainingElement => TagsClass;
     public override ITypeElement GetContainingType() => TagsClass;

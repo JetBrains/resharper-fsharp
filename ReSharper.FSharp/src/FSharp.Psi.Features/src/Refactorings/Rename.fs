@@ -227,13 +227,13 @@ type SingleUnionCaseRenameEvaluator() =
         member x.CreateFromElement(initialElement, _) =
             match initialElement.FirstOrDefault() with
             | :? ITypeElement as typeElement when typeElement.IsUnion() ->
-                let unionCases = typeElement.GetUnionCases()
+                let unionCases = typeElement.GetSourceUnionCases()
                 if unionCases.Count <> 1 then [] :> _ else
                 [| unionCases.[0] :> IDeclaredElement |] :> _
 
             | :? IUnionCase as unionCase ->
                 let containingType = unionCase.GetContainingType().NotNull()
-                if containingType.GetUnionCases().Count <> 1 then [] :> _ else
+                if containingType.GetSourceUnionCases().Count <> 1 then [] :> _ else
                 [| containingType :> IDeclaredElement |] :> _
 
             | _ -> [] :> _

@@ -17,9 +17,17 @@ let getCompilationMappingFlag (attrsOwner: IAttributesOwner) =
     |> Option.defaultValue SourceConstructFlags.None
 
 
+[<Extension; CompiledName("IsCompiledRecord")>]
+let isCompiledRecord (property: IAttributesOwner) =
+    getCompilationMappingFlag property = SourceConstructFlags.RecordType
+
 [<Extension; CompiledName("IsCompiledFSharpField")>]
 let isCompiledFSharpField (property: IProperty) =
     getCompilationMappingFlag property = SourceConstructFlags.Field
+
+[<Extension; CompiledName("IsCompiledUnion")>]
+let isCompiledUnion (property: IAttributesOwner) =
+    getCompilationMappingFlag property = SourceConstructFlags.SumType
 
 [<Extension; CompiledName("IsCompiledUnionCase")>]
 let isCompiledUnionCase (property: IAttributesOwner) =
@@ -28,6 +36,10 @@ let isCompiledUnionCase (property: IAttributesOwner) =
 [<Extension; CompiledName("IsCompiledModule")>]
 let isCompiledModule (property: IAttributesOwner) =
     getCompilationMappingFlag property = SourceConstructFlags.Module
+
+[<Extension; CompiledName("IsCompiledException")>]
+let isCompiledException (property: IAttributesOwner) =
+    getCompilationMappingFlag property = SourceConstructFlags.Exception
 
 
 [<Extension; CompiledName("HasAutoOpenAttribute")>]
