@@ -53,6 +53,9 @@ let comparerTypeName = clrTypeName "System.Collections.IComparer"
 [<CompiledName("EqualityComparerTypeName")>]
 let equalityComparerTypeName = clrTypeName "System.Collections.IEqualityComparer"
 
+[<CompiledName("OperatorsModuleTypeName")>]
+let operatorsModuleTypeName = clrTypeName "Microsoft.FSharp.Core.Operators"
+
 
 /// This map is used in Find Usages to get source name of element without having FSharpSymbol element.
 /// It should be removed when it's possible to get abbreviation definitions from assemblies.

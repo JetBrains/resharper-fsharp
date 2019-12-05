@@ -28,3 +28,7 @@ let isFSharpAssembly (psiModule: IPsiModule) =
         isFSharpAssembly
 
     | value -> value == BooleanBoxes.True
+
+[<Extension; CompiledName("IsFromFSharpAssembly")>]
+let isFromFSharpAssembly (declaredElement: IClrDeclaredElement) =
+    isFSharpAssembly declaredElement.Module

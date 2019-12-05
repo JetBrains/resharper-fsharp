@@ -44,4 +44,4 @@ let isCompiledException (property: IAttributesOwner) =
 
 [<Extension; CompiledName("HasAutoOpenAttribute")>]
 let hasAutoOpenAttribute (attrsOwner: IAttributesOwner) =
-    attrsOwner.GetAttributeInstances(autoOpenAttrTypeName, false)
+    attrsOwner.HasAttributeInstance(autoOpenAttrTypeName, false)
