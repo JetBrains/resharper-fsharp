@@ -19,7 +19,7 @@
 * **FS0039**: Undefined name
   * **Add** Initial Import Type quick fix
   * **Add** Make outer function recursive fix
-* **FS0020**: Expression in unused
+* **FS0020**: Expression is unused
   * **Add** Introduce 'let' binding fix for local expressions
   * **Update** Ignore expression fix
      * Better `|> ignore` placement for multiline expressions
