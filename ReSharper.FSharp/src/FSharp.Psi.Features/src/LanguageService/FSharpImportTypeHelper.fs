@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 
+open System.Collections.Generic
 open JetBrains.Application.Threading
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Intentions.QuickFixes
@@ -7,9 +8,11 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Search
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Finder
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
 [<Language(typeof<FSharpLanguage>)>]
@@ -22,6 +25,12 @@ type FSharpImportTypeHelper() =
             let context = reference.GetElement()
             let sourceFile = context.GetSourceFile()
             let psiModule = context.GetPsiModule()
+
+            let containingModules = 
+                reference.GetElement().ContainingNodes<IModuleLikeDeclaration>().ToEnumerable()
+                |> Seq.map (fun decl -> decl.DeclaredElement)
+                |> Seq.filter isNotNull
+                |> HashSet
 
             let names = reference.GetAllNames().ResultingList()
             let factory = importTypeCacheFactory.Invoke(context)
@@ -40,7 +49,11 @@ type FSharpImportTypeHelper() =
                 if typeElement.Module != psiModule then true else
 
                 let searchGuru = psiModule.GetSolution().GetComponent<FSharpSearchGuru>() :> ISearchGuru
-                searchGuru.CanContainReferences(sourceFile, searchGuru.GetElementId(typeElement)))
+                let elementId = searchGuru.GetElementId(typeElement)
+                if not (searchGuru.CanContainReferences(sourceFile, elementId)) then false else
+
+                let moduleToOpen = getModuleToOpen typeElement
+                not (containingModules.Contains(moduleToOpen)))
             |> Seq.cast
 
         member x.ReferenceTargetCanBeType _ = true
