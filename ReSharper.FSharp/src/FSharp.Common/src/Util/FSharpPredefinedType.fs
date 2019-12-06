@@ -16,6 +16,9 @@ let compilationMappingAttrTypeName = clrTypeName "Microsoft.FSharp.Core.Compilat
 [<CompiledName("AutoOpenAttrTypeName")>]
 let autoOpenAttrTypeName = clrTypeName "Microsoft.FSharp.Core.AutoOpenAttribute"
 
+[<CompiledName("RequireQualifiedAccessAttrTypeName")>]
+let requireQualifiedAccessAttrTypeName = clrTypeName "Microsoft.FSharp.Core.RequireQualifiedAccessAttribute"
+
 [<CompiledName("CLIEventAttribute")>]
 let cliEventAttrTypeName = clrTypeName "Microsoft.FSharp.Core.CLIEventAttribute"
 

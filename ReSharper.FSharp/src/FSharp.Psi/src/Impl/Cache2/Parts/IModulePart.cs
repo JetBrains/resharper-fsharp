@@ -7,7 +7,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   public interface IModulePart : Class.IClassPart
   {
     bool IsAnonymous { get; }
-    bool IsAutoOpen { get; }
+    ModuleMembersAccessKind AccessKind { get; }
 
     [CanBeNull] ITypeElement AssociatedTypeElement { get; }
   }

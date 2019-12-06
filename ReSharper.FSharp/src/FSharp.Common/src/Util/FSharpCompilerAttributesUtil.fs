@@ -45,3 +45,7 @@ let isCompiledException (property: IAttributesOwner) =
 [<Extension; CompiledName("HasAutoOpenAttribute")>]
 let hasAutoOpenAttribute (attrsOwner: IAttributesOwner) =
     attrsOwner.HasAttributeInstance(autoOpenAttrTypeName, false)
+
+[<Extension; CompiledName("HasRequireQualifiedAccessAttribute")>]
+let hasRequireQualifiedAccessAttribute (attrsOwner: IAttributesOwner) =
+    attrsOwner.HasAttributeInstance(requireQualifiedAccessAttrTypeName, false)

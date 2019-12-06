@@ -595,6 +595,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       }
     }
 
+    public static bool IsModule(this ITypeElement typeElement) =>
+      typeElement is IModule ||
+      typeElement is ICompiledElement compiledElement && compiledElement.IsCompiledModule();
+
+    public static ModuleMembersAccessKind GetAccessType([NotNull] this ITypeElement typeElement)
+    {
+      Assertion.Assert(typeElement.IsModule(), "typeElement.IsModule()");
+      return typeElement switch
+      {
+        IModule module => module.AccessKind,
+        ICompiledElement _ =>
+          typeElement.HasRequireQualifiedAccessAttribute()
+            ? ModuleMembersAccessKind.RequiresQualifiedAccess
+            : typeElement.HasAutoOpenAttribute() ? ModuleMembersAccessKind.AutoOpen : ModuleMembersAccessKind.Normal,
+        _ => throw new InvalidOperationException()
+      };
+    }
+
     public static ISynExpr IgnoreParentParens([NotNull] this ISynExpr synExpr)
     {
       while (synExpr.Parent is IParenExpr parenExpr)
@@ -685,16 +703,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return result;
     }
 
-    public static bool IsAutoOpen([CanBeNull] this IDeclaredModuleDeclaration moduleDeclaration)
+    public static ModuleMembersAccessKind GetAccessType([NotNull] this IDeclaredModuleDeclaration moduleDeclaration)
     {
-      if (moduleDeclaration == null)
-        return false;
+      var autoOpen = false;
 
       foreach (var attr in moduleDeclaration.AttributesEnumerable)
-        if (attr.ReferenceName?.ShortName.DropAttributeSuffix() == "AutoOpen")
-          return true;
+        switch (attr.ReferenceName?.ShortName.DropAttributeSuffix())
+        {
+          case "AutoOpen":
+            autoOpen = true;
+            break;
+          case "RequireQualifiedAccess":
+            return ModuleMembersAccessKind.RequiresQualifiedAccess;
+        }
 
-      return false;
+      return autoOpen
+        ? ModuleMembersAccessKind.AutoOpen
+        : ModuleMembersAccessKind.Normal;
     }
   }
 }

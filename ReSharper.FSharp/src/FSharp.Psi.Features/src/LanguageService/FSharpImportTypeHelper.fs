@@ -10,6 +10,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Finder
+open JetBrains.Util
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpImportTypeHelper() =
@@ -57,11 +58,14 @@ type FSharpQuickFixUtilComponent() =
             let sourceFile = fsFile.GetSourceFile()
             let document = fsFile.GetSourceFile().Document
             let coords = document.GetCoordsByOffset(reference.GetTreeTextRange().StartOffset.Offset)
-            let ns = typeElement.GetContainingNamespace().QualifiedName
+
+            let moduleToOpen = getModuleToOpen typeElement
+            let nameToOpen = getModuleNameToOpen moduleToOpen
+            if nameToOpen.IsNullOrEmpty() then reference :> _ else
 
             // todo: rewrite addOpen to change psi instead
             sourceFile.GetSolution().Locks.QueueReadLock("Hack for import during psi transaction", fun _ ->
-                addOpen coords fsFile null ns)
+                addOpen coords fsFile null nameToOpen)
 
             reference :> _
 

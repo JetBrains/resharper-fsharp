@@ -4,8 +4,11 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Util.OpensUtil
 open System
 open FSharp.Compiler.SourceCodeServices
 open FSharp.Compiler.SourceCodeServices.ParsedInput
+open JetBrains.Annotations
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
+open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -14,6 +17,26 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.Util
 open JetBrains.Util.Text
+
+let rec getModuleToOpen (typeElement: ITypeElement): IClrDeclaredElement =
+    match typeElement.GetContainingType() with
+    | null ->
+        typeElement.GetContainingNamespace() :> _
+
+    | containingType ->
+        if containingType.IsModule() && containingType.GetAccessType() = ModuleMembersAccessKind.Normal then
+            containingType :> _
+        else
+            getModuleToOpen containingType
+
+
+[<CanBeNull>]
+let getModuleNameToOpen (moduleOrNamespace: IClrDeclaredElement) =
+    match moduleOrNamespace with
+    | :? ITypeElement as typeElement -> typeElement.GetClrName().FullName
+    | :? INamespace as ns -> ns.QualifiedName
+    | _ -> failwithf "moduleOrNamespace: %O" moduleOrNamespace
+
 
 let addOpen (coords: DocumentCoords) (fsFile: IFSharpFile) (settings: IContextBoundSettingsStore) (ns: string) =
     match fsFile.ParseTree with

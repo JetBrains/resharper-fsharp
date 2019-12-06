@@ -8,20 +8,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   internal abstract class DeclaredModulePartBase<T> : ModulePartBase<T>
     where T : class, IDeclaredModuleDeclaration
   {
+    public override ModuleMembersAccessKind AccessKind { get; }
+
     protected DeclaredModulePartBase([NotNull] T declaration, [NotNull] string shortName,
       MemberDecoration memberDecoration, [NotNull] ICacheBuilder cacheBuilder)
       : base(declaration, shortName, memberDecoration, cacheBuilder) =>
-      IsAutoOpen = GetDeclaration() is var moduleDeclaration && moduleDeclaration.IsAutoOpen();
+      AccessKind = declaration.GetAccessType();
 
     protected DeclaredModulePartBase(IReader reader) : base(reader) =>
-      IsAutoOpen = reader.ReadBool();
+      AccessKind = (ModuleMembersAccessKind) reader.ReadByte();
 
     protected override void Write(IWriter writer)
     {
       base.Write(writer);
-      writer.WriteBool(IsAutoOpen);
+      writer.WriteByte((byte) AccessKind);
     }
-
-    public override bool IsAutoOpen { get; }
   }
 }

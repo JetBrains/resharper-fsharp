@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
@@ -17,11 +18,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
     protected override IList<IDeclaredType> CalcSuperTypes() =>
       new[] {Module.GetPredefinedType().Object};
 
-    public bool IsAnonymous =>
-      this.GetPart<IModulePart>() is var part && part != null && part.IsAnonymous;
+    private IModulePart ModulePart =>
+      this.GetPart<IModulePart>().NotNull();
 
-    public bool IsAutoOpen =>
-      this.GetPart<IModulePart>() is var part && part != null && part.IsAutoOpen;
+    public bool IsAnonymous => ModulePart.IsAnonymous;
+
+    public ModuleMembersAccessKind AccessKind => ModulePart.AccessKind;
+
+    public bool IsAutoOpen => AccessKind == ModuleMembersAccessKind.AutoOpen;
+    public bool RequiresQualifiedAccess => AccessKind == ModuleMembersAccessKind.RequiresQualifiedAccess;
 
     protected override bool AcceptsPart(TypePart part) =>
       part is IModulePart;
