@@ -101,6 +101,7 @@
 * **Add** helper for Quick Definition
 * **Fix** record private representations resolve in C#
 * **Fix** adding new file to a project could fail
+* **Update** adding `open` now adds empty line when needed, by [@saul](https://github.com/saul) ([#65]
 * **Update** Ignore `Folders on top` option in F# projects
 * **Fix** getting F# Interactive paths
 * **Fix** resolve of extension members with specified compiled names
