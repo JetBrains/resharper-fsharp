@@ -3,7 +3,6 @@ package com.jetbrains.rider.plugins.fsharp.services.fsi
 import com.intellij.execution.ExecutionManager
 import com.intellij.execution.Executor
 import com.intellij.execution.configurations.GeneralCommandLine
-import com.intellij.execution.console.BasicGutterContentProvider
 import com.intellij.execution.console.LanguageConsoleBuilder
 import com.intellij.execution.console.LanguageConsoleView
 import com.intellij.execution.console.ProcessBackedConsoleExecuteActionHandler
@@ -20,7 +19,6 @@ import com.intellij.notification.NotificationType
 import com.intellij.notification.Notifications
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.diagnostic.Logger
-import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.extensions.Extensions
 import com.intellij.openapi.fileTypes.PlainTextLanguage
@@ -41,7 +39,6 @@ import com.jetbrains.rider.debugger.DotNetDebugProcess
 import com.jetbrains.rider.model.RdFsiRuntime
 import com.jetbrains.rider.model.RdFsiSessionInfo
 import com.jetbrains.rider.plugins.fsharp.FSharpIcons
-import com.jetbrains.rider.runtime.DotNetRuntime
 import com.jetbrains.rider.runtime.RiderDotNetActiveRuntimeHost
 import com.jetbrains.rider.runtime.mono.MonoRuntime
 import com.jetbrains.rider.util.idea.application
@@ -72,6 +69,7 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
     private var cmdLine = GeneralCommandLine()
             .withExePath(sessionInfo.fsiPath)
             .withParameters(fsiArgs)
+    private val inputSeparatorGutterContentProvider = InputSeparatorGutterContentProvider(true)
 
     init {
         val runtimeHost = project.getComponent<RiderDotNetActiveRuntimeHost>()
@@ -147,6 +145,8 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
 
     private fun sendText(visibleText: String, fsiText: String) {
         UIUtil.invokeLaterIfNeeded {
+            inputSeparatorGutterContentProvider.addLineSeparator(consoleView.historyViewer.document.lineCount)
+
             consoleView.print(visibleText, ConsoleViewContentType.USER_INPUT)
             consoleView.print("\n", ConsoleViewContentType.NORMAL_OUTPUT)
             EditorUtil.scrollToTheEnd(consoleView.historyViewer)
@@ -233,10 +233,7 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
     }
 
     override fun createConsoleView(): LanguageConsoleView {
-        val gutterProvider = object : BasicGutterContentProvider(false) {
-            override fun beforeEvaluate(e: Editor) = Unit
-        }
-        val consoleView = LanguageConsoleBuilder().gutterContentProvider(gutterProvider).build(project, PlainTextLanguage.INSTANCE)
+        val consoleView = LanguageConsoleBuilder().gutterContentProvider(inputSeparatorGutterContentProvider).build(project, PlainTextLanguage.INSTANCE)
 
         val historyKeyListener = HistoryKeyListener(fsiHost.project, consoleView.consoleEditor, commandHistory)
         consoleView.consoleEditor.contentComponent.addKeyListener(historyKeyListener)
