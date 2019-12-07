@@ -1,12 +1,8 @@
 package com.jetbrains.rider.ideaInterop.fileTypes.fsharp.highlighting
 
-
 import com.intellij.openapi.editor.HighlighterColors
 import com.intellij.openapi.editor.colors.TextAttributesKey
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase
-import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory
-import com.intellij.openapi.project.Project
-import com.intellij.openapi.vfs.VirtualFile
 import com.intellij.psi.TokenType
 import com.intellij.psi.tree.IElementType
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpLexer
@@ -15,7 +11,7 @@ import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.lexer.FSharpTokenType.*
 class FSharpSyntaxHighlighter : SyntaxHighlighterBase() {
     companion object {
         private val keywords = IDENT_KEYWORDS.types.map { it to FSharpTextAttributeKeys.KEYWORD }
-        private val pp_keywords = PP_KEYWORDS.types.map { it to FSharpTextAttributeKeys.KEYWORD }
+        private val pp_keywords = PP_KEYWORDS.types.map { it to FSharpTextAttributeKeys.PREPROCESSOR_KEYWORD }
         private val strings = STRINGS.types.map { it to FSharpTextAttributeKeys.STRING }
         private val comments = COMMENTS.types.map { it to FSharpTextAttributeKeys.BLOCK_COMMENT }
         private val numbers = NUMBERS.types.map { it to FSharpTextAttributeKeys.NUMBER }
