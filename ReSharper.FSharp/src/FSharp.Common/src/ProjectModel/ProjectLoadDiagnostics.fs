@@ -4,6 +4,7 @@ open System
 open System.Collections.Generic
 open JetBrains.Application
 open JetBrains.ProjectModel.ProjectsHost.Diagnostic
+open JetBrains.ProjectModel.ProjectsHost.Impl
 open JetBrains.ProjectModel.ProjectsHost.MsBuild.Diagnostic
 open JetBrains.ReSharper.Host.Features.BackgroundTasks
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
@@ -46,6 +47,9 @@ and FSharpTargetsDiagnosticMessage private (title, message) =
 type FSharpProjectTypeGuidAnalyzer() =
     interface IMsBuildProjectLoadDiagnosticProvider with
         member x.CollectDiagnostic(projectMark, _, _) =
+            // Don't check guid when opening a single project or directory, e.g. not a solution file.
+            if projectMark :? VirtualProjectMark then EmptyArray.Instance :> _ else
+
             if projectMark.Location.ExtensionNoDot <> FsprojExtension then EmptyArray.Instance :> _ else
             if isFSharpGuid projectMark.TypeGuid || projectMark.Guid = Guid.Empty then EmptyArray.Instance :> _ else 
 
