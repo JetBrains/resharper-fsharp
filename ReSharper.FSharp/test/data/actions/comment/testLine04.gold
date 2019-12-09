@@ -2,16 +2,16 @@
 module Module
 
 let f x =
-//    let f' = "foo"{source0}
+//    let f' = "foo"{selstart}
 //    let x' = 42
-{target0}{caret}    ()
+{selend}    ()
 
 ================
 StickComment = False
 module Module
 
 let f x =
-    // let f' = "foo"{source0}
+    // let f' = "foo"{selstart}
     // let x' = 42
-{target0}{caret}    ()
+{selend}    ()
 

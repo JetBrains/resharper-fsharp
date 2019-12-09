@@ -1,15 +1,15 @@
 ﻿StickComment = True
 module Module
 
-//let f x ={source0}
+//let f x ={selstart}
 //    let f' = "foo"
-//    (){target0}{caret}
+//    (){selend}
 
 ================
 StickComment = False
 module Module
 
-// let f x ={source0}
+// let f x ={selstart}
 //     let f' = "foo"
-//     (){target0}{caret}
+//     (){selend}
 
