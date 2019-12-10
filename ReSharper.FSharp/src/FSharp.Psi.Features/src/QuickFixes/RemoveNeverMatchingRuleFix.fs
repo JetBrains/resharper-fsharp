@@ -1,10 +1,8 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.CommonErrors
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
-open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
@@ -14,7 +12,7 @@ type RemoveNeverMatchingRuleFix(warning: RuleNeverMatchedWarning) =
     let matchClause = warning.MatchClause
 
     let isNotMatchClause (node: ITreeNode) =
-        node.NodeType != ElementType.MATCH_CLAUSE.As<NodeType>()
+        not (node :? IMatchClause)
 
     override x.Text = "Remove never matching rule"
     override x.IsAvailable _ = isValid matchClause
