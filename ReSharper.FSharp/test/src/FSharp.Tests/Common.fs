@@ -16,6 +16,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.TestFramework
 open JetBrains.TestFramework.Projects
 open JetBrains.Util.Dotnet.TargetFrameworkIds
@@ -53,11 +54,9 @@ type FSharpScriptTestAttribute() =
     inherit FSharpTestAttribute(FSharpScriptProjectFileType.FsxExtension)
 
 
-let itemsContainer = Mock<IFSharpItemsContainer>().Object
-
 [<SolutionComponent>]
-type FSharpTestProjectOptionsBuilder(checkerService, psiModules, logger, resolveContextManager) =
-    inherit FSharpProjectOptionsBuilder(checkerService, psiModules, logger, resolveContextManager, itemsContainer)
+type FSharpTestProjectOptionsBuilder(checkerService, logger) =
+    inherit FSharpProjectOptionsBuilder(checkerService, logger, Mock<_>().Object)
 
     override x.GetProjectItemsPaths(_, _) = [||]
 

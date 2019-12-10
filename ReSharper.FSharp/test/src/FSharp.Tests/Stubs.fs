@@ -8,7 +8,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi
 
 [<SolutionComponent>]
 type FsiSessionsHostStub() =
-    interface IHideImplementation<FsiSessionsHost>
+    interface IHideImplementation<FsiHost>
 
 [<ShellComponent>]
 type FSharpFileServiceStub() =

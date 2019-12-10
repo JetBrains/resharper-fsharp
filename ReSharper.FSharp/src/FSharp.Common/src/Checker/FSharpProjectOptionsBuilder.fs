@@ -6,12 +6,11 @@ open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
-open JetBrains.ProjectModel.Assemblies.Impl
-open JetBrains.ProjectModel.Model2.Assemblies.Interfaces
 open JetBrains.ProjectModel.ProjectsHost
 open JetBrains.ProjectModel.ProjectsHost.MsBuild.Strategies
 open JetBrains.ProjectModel.Properties
 open JetBrains.ProjectModel.Properties.Managed
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -68,8 +67,7 @@ type IFSharpProjectOptionsBuilder =
 
 [<SolutionComponent>]
 type FSharpProjectOptionsBuilder
-        (checkerService: FSharpCheckerService, psiModules: IPsiModules, logger: ILogger,
-         resolveContextManager: ResolveContextManager, itemsContainer: IFSharpItemsContainer) =
+        (checkerService: FSharpCheckerService, logger: ILogger, itemsContainer: IFSharpItemsContainer) =
 
     let defaultDelimiters = [| ';'; ','; ' ' |]
 
@@ -91,17 +89,9 @@ type FSharpProjectOptionsBuilder
         | null -> EmptyArray.Instance
         | (s: string) -> s.Split(delimiters, StringSplitOptions.RemoveEmptyEntries)
 
-    let getReferences project psiModule targetFrameworkId =
-        let result = List()
-        let resolveContext = resolveContextManager.GetOrCreateProjectResolveContext(project, targetFrameworkId)
-        for reference in psiModules.GetModuleReferences(psiModule, resolveContext) do
-            match reference.Module.ContainingProjectModule with
-            | :? IProject as referencedProject when referencedProject <> project ->
-                result.Add("-r:" + referencedProject.GetOutputFilePath(reference.Module.TargetFrameworkId).FullPath)
-            | :? IAssembly as assembly -> result.Add("-r:" + assembly.GetLocation().FullPath)
-            | _ -> ()
-
-        result
+    let getReferences psiModule =
+        getReferencePaths (fun _ -> true) psiModule
+        |> Seq.map (fun r -> "-r:" + r)
 
     let getOutputType outputType =
         match outputType with
@@ -157,7 +147,7 @@ type FSharpProjectOptionsBuilder
 
             options.AddRange(defaultOptions)
             options.AddRange(unusedValuesWarns)
-            options.AddRange(getReferences project psiModule targetFrameworkId)
+            options.AddRange(getReferences psiModule)
 
             match properties.ActiveConfigurations.GetOrCreateConfiguration(targetFrameworkId) with
             | :? IManagedProjectConfiguration as cfg ->

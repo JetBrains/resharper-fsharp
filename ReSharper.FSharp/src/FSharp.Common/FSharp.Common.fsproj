@@ -20,6 +20,7 @@
     <Compile Include="src\ProjectModel\ZoneMarker.fs" />
     <Compile Include="src\ProjectModel\ProjectItems\FSharpItemsContainer.fs" />
     <Compile Include="src\ProjectModel\ProjectItems\ProjectStructure.fs" />
+    <Compile Include="src\ProjectModel\FSharpProjectModelUtil.fs" />
     <Compile Include="src\Shim\FileSystem\FSharpSourceCache.fs" />
     <Compile Include="src\Shim\FileSystem\AssemblyInfoShim.fs" />
     <Compile Include="src\Util\FSharpAttributesUtil.fs" />

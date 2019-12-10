@@ -1,6 +1,7 @@
 [<AutoOpen; Extension>]
 module JetBrains.ReSharper.Plugins.FSharp.Util.FSharpAssemblyUtil
 
+open JetBrains.Metadata.Utils
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
@@ -32,3 +33,9 @@ let isFSharpAssembly (psiModule: IPsiModule) =
 [<Extension; CompiledName("IsFromFSharpAssembly")>]
 let isFromFSharpAssembly (declaredElement: IClrDeclaredElement) =
     isFSharpAssembly declaredElement.Module
+
+
+let [<Literal>] FSharpCore = "FSharp.Core"
+
+let isFSharpCore (assemblyName: AssemblyNameInfo) =
+    isNotNull assemblyName && AssemblyNameInfo.SimpleNameComparer.Equals(FSharpCore, assemblyName.Name)

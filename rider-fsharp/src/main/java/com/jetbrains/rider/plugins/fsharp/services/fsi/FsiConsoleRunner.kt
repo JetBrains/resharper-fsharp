@@ -158,7 +158,7 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
 
             // show the window without getting focus
             ExecutionManager.getInstance(project).contentManager.selectRunContent(contentDescriptor)
-            ToolWindowManager.getInstance(project).getToolWindow(executor.id).show(null)
+            ToolWindowManager.getInstance(project).getToolWindow(executor.id)?.show(null)
 
             val stream = processHandler.processInput ?: error("Broken Fsi stream")
             stream.write(fsiText.toByteArray(Charsets.UTF_8))

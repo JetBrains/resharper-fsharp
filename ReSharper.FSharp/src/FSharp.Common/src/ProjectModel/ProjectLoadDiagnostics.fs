@@ -47,7 +47,7 @@ and FSharpTargetsDiagnosticMessage private (title, message) =
 type FSharpProjectTypeGuidAnalyzer() =
     interface IMsBuildProjectLoadDiagnosticProvider with
         member x.CollectDiagnostic(projectMark, _, _) =
-            // Don't check guid when opening a single project or directory, e.g. not a solution file.
+            // Don't check guid when opening a single project or directory, i.e. not a solution file.
             if projectMark :? VirtualProjectMark then EmptyArray.Instance :> _ else
 
             if projectMark.Location.ExtensionNoDot <> FsprojExtension then EmptyArray.Instance :> _ else

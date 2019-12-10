@@ -21,11 +21,12 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
             field("args", immutableList(string))
             field("fixArgsForAttach", bool)
         })
+        call("getProjectReferences", int, immutableList(string))
         property("moveCaretOnSendLine", bool).readonly
         property("copyRecentToEditor", bool).readonly
     }
 
-    private val RdFSharpCompilerServiceHost = aggregatedef("RdFSharpCompilerServiceHost")  {
+    private val RdFSharpCompilerServiceHost = aggregatedef("RdFSharpCompilerServiceHost") {
         sink("fileChecked", string).async
         sink("projectChecked", string).async
         call("getLastModificationStamp", string, dateTime)
