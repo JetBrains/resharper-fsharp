@@ -511,7 +511,8 @@ newExpr options { stubBase="FSharpExpressionBase"; }:
 
 forExpr options { stubBase="FSharpExpressionBase"; }:
   FOR
-  IDENTIFIER<IDENTIFIER, Identifier>
+  localDeclaration<IDENTIFIER, Identifier>
+  EQUALS
   synExpr<IDENT_EXPR, IdentExpression>
   TO
   synExpr<TO_EXPR, ToExpression>
