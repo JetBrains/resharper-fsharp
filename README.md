@@ -7,15 +7,13 @@ F# support in Rider is implemented as a plugin made of two major components:
 * ReSharper.Host plugin (referred to as the *backend*) that adds F# support to ReSharper and is implemented in ReSharper.FSharp solution. ReSharper.Host is a modification of ReSharper used as a language service that the IntelliJ Platform interacts with. The backend is written in C# and F#.
 * IntelliJ Platform plugin for Rider (referred to as the *frontend*) that defines F# as a new IntelliJ Platform language but delegates most of the work to the backend. This part also adds F# Interactive support. The frontend is written in Kotlin.
 
-F# support in Rider makes use of open source software, most notably [FSharp.Compiler.Service](https://github.com/Microsoft/visualfsharp) and [Fantomas](https://github.com/dungpa/fantomas).
+F# support in Rider makes use of open source software, most notably [FSharp.Compiler.Service](https://github.com/dotnet/fsharp) and [Fantomas](https://github.com/fsprojects/fantomas).
 
 ## Building the plugin
 
 ### Requirements
 
-* [.NET Framework 4.6.1 Developer Pack](https://www.microsoft.com/en-us/download/details.aspx?id=49978)
-* [.NET Core SDK 2.0+](https://www.microsoft.com/net/download/windows) for MSBuild 15 and F# build targets
-* [JDK 1.8](https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
+* [.NET Core SDK 3.0.100](https://www.microsoft.com/net/download/windows)
 
 ### Optional
 
@@ -70,8 +68,6 @@ As soon as you are done with changes in your fork, please open a pull request fo
 
 Note that the public CI server is not set up at this point but it's going to be available shortly.
 
-The project currently lacks a solid test suite. There's currently no requirement to add new tests, but as soon as more functionality is covered, adding new tests along with code changes will become necessary for a PR to be accepted.
-
 We suggest that you read docs on the two SDKs that this plugin uses:
 
 * [ReSharper SDK](https://www.jetbrains.com/help/resharper/sdk/README.html)
@@ -96,6 +92,5 @@ As soon as you build the backend for the first time, Rider will show false red c
 
 ## Roadmap
 
-* Cover more functionality with tests, e.g. add tests for mapping FCS representations to ReSharper for declared elements and types.
 * Set up a public Continuous Integration server for test runs.
 * Enable development on macOS and Linux.
