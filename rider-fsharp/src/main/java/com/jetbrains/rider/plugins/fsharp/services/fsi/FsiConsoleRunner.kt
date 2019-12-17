@@ -29,7 +29,7 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.UserDataHolderBase
 import com.intellij.openapi.vfs.VfsUtil
-import com.intellij.openapi.wm.impl.ToolWindowManagerImpl
+import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.project.isDirectoryBased
 import com.intellij.util.containers.ContainerUtil
 import com.intellij.util.ui.UIUtil
@@ -41,7 +41,6 @@ import com.jetbrains.rider.debugger.DotNetDebugProcess
 import com.jetbrains.rider.model.RdFsiRuntime
 import com.jetbrains.rider.model.RdFsiSessionInfo
 import com.jetbrains.rider.plugins.fsharp.FSharpIcons
-import com.jetbrains.rider.runtime.DotNetRuntime
 import com.jetbrains.rider.runtime.RiderDotNetActiveRuntimeHost
 import com.jetbrains.rider.runtime.mono.MonoRuntime
 import com.jetbrains.rider.util.idea.application
@@ -50,6 +49,7 @@ import org.jetbrains.concurrency.AsyncPromise
 import org.jetbrains.concurrency.Promise
 import org.jetbrains.concurrency.resolvedPromise
 import java.io.File
+import java.time.Duration
 import javax.swing.event.HyperlinkEvent
 import kotlin.properties.Delegates
 
@@ -155,7 +155,7 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
 
             // show the window without getting focus
             ExecutionManager.getInstance(project).contentManager.selectRunContent(contentDescriptor)
-            ToolWindowManagerImpl.getInstance(project).getToolWindow(executor.id).show(null)
+            ToolWindowManager.getInstance(project).getToolWindow(executor.id).show(null)
 
             val stream = processHandler.processInput ?: error("Broken Fsi stream")
             stream.write(fsiText.toByteArray(Charsets.UTF_8))
@@ -184,7 +184,7 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
             }
             //need to free dispatcher thread to pump messages over protocol for async debug runner
             application.executeOnPooledThread {
-                if (!pumpMessages(waitForDebugSessionTimeout) {
+                if (!pumpMessages(Duration.ofSeconds(waitForDebugSessionTimeout)) {
                             getDebugProcessForThisFsi() != null
                         }) {
                     promise.setError(IllegalStateException("Failed to get debug process for fsi.exe with pid $pid"))

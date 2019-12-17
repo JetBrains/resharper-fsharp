@@ -11,6 +11,7 @@ import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.enums.CoreVersion
 import org.testng.annotations.Test
 import java.io.File
+import java.time.Duration
 
 @Test
 @TestEnvironment(coreVersion = CoreVersion.DEFAULT)
@@ -30,7 +31,7 @@ class FileSystemShimTest : BaseTestWithSolution() {
         changeFileContent(project, file) { newText }
 
         LocalFileSystem.getInstance().refresh(false)
-        waitAndPump(project.lifetime, { getTimestamp(file) > stampBefore }, 15000, { "Timestamp wasn't changed." })
+        waitAndPump(project.lifetime, { getTimestamp(file) > stampBefore }, Duration.ofSeconds(15000), { "Timestamp wasn't changed." })
         val stampAfter = getTimestamp(file)
 
         val (source, timestamp) = fcsHost.getSourceCache.sync(file.path).shouldNotBeNull("Couldn't get the source.")

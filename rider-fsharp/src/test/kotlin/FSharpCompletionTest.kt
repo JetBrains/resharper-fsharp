@@ -13,6 +13,7 @@ import com.jetbrains.rdclient.util.idea.waitAndPump
 import com.jetbrains.rd.util.lifetime.Lifetime
 import com.jetbrains.rider.test.enums.CoreVersion
 import org.testng.annotations.Test
+import java.time.Duration
 
 @Test
 @TestEnvironment(coreVersion = CoreVersion.DEFAULT)
@@ -34,7 +35,7 @@ class FSharpCompletionTest : CompletionTestBase() {
     fun listModuleValue() = doTest("filt")
 
     private fun waitForFcs() {
-        waitAndPump(Lifetime.Eternal, { isFcsReady }, 60000)
+        waitAndPump(Lifetime.Eternal, { isFcsReady }, Duration.ofSeconds(60000))
     }
 
     private fun doTest(typed: String) {
