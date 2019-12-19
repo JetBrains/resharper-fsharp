@@ -19,6 +19,7 @@ import com.intellij.notification.NotificationType
 import com.intellij.notification.Notifications
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.diagnostic.Logger
+import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.extensions.Extensions
 import com.intellij.openapi.fileTypes.PlainTextLanguage
@@ -47,6 +48,7 @@ import org.jetbrains.concurrency.AsyncPromise
 import org.jetbrains.concurrency.Promise
 import org.jetbrains.concurrency.resolvedPromise
 import java.io.File
+import javax.swing.BorderFactory
 import javax.swing.event.HyperlinkEvent
 import kotlin.properties.Delegates
 
@@ -234,6 +236,10 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
 
     override fun createConsoleView(): LanguageConsoleView {
         val consoleView = LanguageConsoleBuilder().gutterContentProvider(inputSeparatorGutterContentProvider).build(project, PlainTextLanguage.INSTANCE)
+
+        val consoleEditorBorder = BorderFactory.createMatteBorder(
+                2, 0, 0, 0, consoleView.consoleEditor.colorsScheme.getColor(EditorColors.INDENT_GUIDE_COLOR))
+        consoleView.consoleEditor.component.border = consoleEditorBorder
 
         val historyKeyListener = HistoryKeyListener(fsiHost.project, consoleView.consoleEditor, commandHistory)
         consoleView.consoleEditor.contentComponent.addKeyListener(historyKeyListener)
