@@ -1,0 +1,15 @@
+﻿[|Foo|(0)]
+[Bar]
+public class Class1
+{
+    [Foo]
+    [Bar]
+    public void M() {}
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Attribute 'FooAttribute' is not valid on this declaration type. It is valid on 'Method' declarations only.
+M:FooAttribute.#ctor
+M:BarAttribute.#ctor
+M:FooAttribute.#ctor
+M:BarAttribute.#ctor

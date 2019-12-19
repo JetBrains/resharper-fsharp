@@ -43,8 +43,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public const string Sealed = "Sealed";
     public const string Struct = "Struct";
 
-    public static string GetShortName([NotNull] this IAttribute attr) =>
-      attr.ReferenceName?.ShortName.GetAttributeShortName();
+    [NotNull] public static string GetShortName([NotNull] this IAttribute attr) =>
+      attr.ReferenceName?.ShortName.GetAttributeShortName() ?? SharedImplUtil.MISSING_DECLARATION_NAME;
 
     public static bool ShortNameEquals([NotNull] this IAttribute attr, [NotNull] string shortName) =>
       attr.GetShortName() == shortName;
@@ -278,7 +278,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     public static string GetAttributeShortName([NotNull] this string attrName) =>
-      attrName.SubstringBeforeLast("Attribute", StringComparison.Ordinal);
+      attrName.TrimFromEnd(AttributeSuffix);
 
     public static bool IsCliMutableRecord([CanBeNull] this ITypeElement type)
     {
