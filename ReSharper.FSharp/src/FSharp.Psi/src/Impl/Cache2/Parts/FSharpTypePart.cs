@@ -26,7 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 
       var attrNames = new FrugalLocalHashSet<string>();
       foreach (var attr in declaration.GetAttributes())
-        attrNames.Add(cacheBuilder.Intern(attr.ReferenceName?.ShortName.GetAttributeShortName()));
+        attrNames.Add(cacheBuilder.Intern(attr.GetShortName()));
       AttributeClassNames = attrNames.ToArray();
 
       var methods = new LocalList<ExtensionMethodInfo>();

@@ -127,6 +127,9 @@ type CSharpResolveTest() =
     [<Test>] member x.``Implementations - Explicit impl 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Abbreviations - Module 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``AttributeUsage 01 - AllowMultiple``() = x.DoNamedTest()
+    [<Test>] member x.``AttributeUsage 02 - AttributeTargets``() = x.DoNamedTest()
     
     override x.RelativeTestDataPath = "cache/csharpResolve"
 

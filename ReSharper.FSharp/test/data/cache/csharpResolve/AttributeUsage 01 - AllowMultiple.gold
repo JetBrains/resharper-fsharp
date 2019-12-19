@@ -1,0 +1,15 @@
+﻿[Foo]
+[Foo]
+[|Bar|(0)]
+[|Bar|(1)]
+public class Class1
+{
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Duplicate 'BarAttribute' attribute
+(1): ReSharper Underlined Error Highlighting: Duplicate 'BarAttribute' attribute
+M:FooAttribute.#ctor
+M:FooAttribute.#ctor
+M:BarAttribute.#ctor
+M:BarAttribute.#ctor
