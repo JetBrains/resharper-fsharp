@@ -15,7 +15,7 @@ buildscript {
         maven { setUrl("https://cache-redirector.jetbrains.com/repo.maven.apache.org/maven2")}
     }
     dependencies {
-        classpath("com.jetbrains.rd:rd-gen:0.193.100")
+        classpath("com.jetbrains.rd:rd-gen:0.201.18")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.50")
     }
 }
@@ -28,7 +28,7 @@ repositories {
 plugins {
     id("org.jetbrains.intellij") version "0.4.13"
     id("org.jetbrains.grammarkit") version "2018.1.7"
-    id("me.filippov.gradle.jvm.wrapper") version "0.9.2"
+    id("me.filippov.gradle.jvm.wrapper") version "0.9.3"
 }
 
 apply {
