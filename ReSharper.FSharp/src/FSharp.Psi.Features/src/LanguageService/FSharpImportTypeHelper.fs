@@ -66,14 +66,19 @@ type FSharpQuickFixUtilComponent() =
         member x.BindTo(reference, typeElement, _, _) =
             // todo: fix addOpen
             let reference = reference :?> FSharpSymbolReference
-            let fsFile = reference.GetElement().FSharpFile
+            let context = reference.GetElement()
+            let fsFile = context.FSharpFile
 
             let sourceFile = fsFile.GetSourceFile()
             let document = fsFile.GetSourceFile().Document
             let coords = document.GetCoordsByOffset(reference.GetTreeTextRange().StartOffset.Offset)
 
             let moduleToOpen = getModuleToOpen typeElement
-            let nameToOpen = getModuleNameToOpen moduleToOpen
+
+            let nameToOpen =
+                let style = DeclaredElementPresenter.QUALIFIED_NAME_PRESENTER
+                DeclaredElementPresenter.Format(context.Language, style, moduleToOpen).Text
+
             if nameToOpen.IsNullOrEmpty() then reference :> _ else
 
             // todo: rewrite addOpen to change psi instead
