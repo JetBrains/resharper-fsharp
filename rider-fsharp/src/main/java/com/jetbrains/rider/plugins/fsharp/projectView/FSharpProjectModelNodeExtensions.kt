@@ -6,7 +6,7 @@ import com.jetbrains.rider.projectView.nodes.ProjectModelNode
 import com.jetbrains.rider.projectView.nodes.containingProject
 
 fun ProjectModelNode.isFromFSharpProject(): Boolean =
-        this.containingProject()?.getVirtualFile()?.extension == "fsproj"
+        this.containingProject()?.getVirtualFile()?.extension.equals("fsproj", true)
 
 fun ProjectModelNode.getSortKey(): Int =
         when (val descriptor = this.descriptor) {
