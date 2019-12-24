@@ -49,6 +49,7 @@
 
     <rider.ProjectTypesProvider implementation="com.jetbrains.rider.projectView.projectTypes.FSharpProjectTypeProvider" />
     <moveProviderExtension implementation="com.jetbrains.rider.plugins.fsharp.projectView.FSharpMoveProviderExtension"/>
+    <projectModelViewExtensions implementation="com.jetbrains.rider.plugins.fsharp.projectView.FSharpProjectModelViewExtensions"/>
     <solutionExplorerCustomization implementation="com.jetbrains.rider.plugins.fsharp.projectView.FSharpSolutionExplorerCustomization" />
     <codeFoldingOptionsProvider instance="com.jetbrains.rider.plugins.fsharp.settings.FSharpCodeFoldingProvider" />
     <applicationService serviceImplementation="com.jetbrains.rider.plugins.fsharp.settings.FSharpCodeFoldingSettings"/>
