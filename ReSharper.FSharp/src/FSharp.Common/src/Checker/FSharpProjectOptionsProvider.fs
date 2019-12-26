@@ -8,6 +8,8 @@ open JetBrains.Application.changes
 open JetBrains.DataFlow
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Assemblies.Impl
+open JetBrains.ProjectModel.Build
+open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Plugins.FSharp
@@ -17,6 +19,7 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Psi.Files
 open JetBrains.Threading
 open JetBrains.Util
 
@@ -103,6 +106,8 @@ type FSharpProjectOptionsProvider
 
     let invalidateProject project =
         let invalidatedProjects = HashSet()
+        let mutable invalidated = false
+
         let rec invalidate (project: IProject) =
             logger.Info("Invalidating {0}", project)
             match tryGetValue project projects with
@@ -112,6 +117,7 @@ type FSharpProjectOptionsProvider
                     checkerService.InvalidateFSharpProject(fsProject)
                     moduleInvalidated.Fire(psiModule)
                     psiModulesToFsProjects.Remove(psiModule) |> ignore
+                    invalidated <- true
 
                 fsProjectsForProject.Clear()
 
@@ -128,6 +134,7 @@ type FSharpProjectOptionsProvider
                     | _ -> ()
                 logger.Info("Done invalidating {0}", project)
         invalidate project
+        invalidated
 
 
     let isScriptLike file =
@@ -140,6 +147,11 @@ type FSharpProjectOptionsProvider
 
     member x.ModuleInvalidated = moduleInvalidated
 
+    member x.Invalidate(project: IProject) =
+        invalidateProject project
+
+    member x.HasFSharpProjects = not (projects.IsEmpty())
+
     member private x.ProcessChange(obj: ChangeEventArgs) =
         match obj.ChangeMap.GetChange<ProjectModelChange>(solution) with
         | null -> ()
@@ -148,7 +160,7 @@ type FSharpProjectOptionsProvider
             use lock = locker.UsingWriteLock()
             let referenceProject = referenceChange.ProjectToModuleReference.OwnerModule
             if referenceProject.IsFSharp then
-                invalidateProject referenceProject
+                invalidateProject referenceProject |> ignore
 
         | change ->
             if not change.IsClosingSolution then
@@ -160,7 +172,7 @@ type FSharpProjectOptionsProvider
         | :? IProject as project ->
             if project.IsFSharp then
                 if change.ContainsChangeType(invalidatingProjectChangeType) then
-                    invalidateProject project
+                    invalidateProject project |> ignore
 
                 else if change.IsSubtreeChanged then
                     let mutable shouldInvalidate = false
@@ -175,7 +187,7 @@ type FSharpProjectOptionsProvider
 
                     change.Accept(changeVisitor)
                     if shouldInvalidate then
-                        invalidateProject project
+                        invalidateProject project |> ignore
     
                 if change.IsRemoved then
                     solution.GetComponent<FSharpItemsContainer>().RemoveProject(project)
@@ -282,3 +294,15 @@ type FSharpScriptProjectOptionsProvider
             let path = file.GetLocation()
             let source = file.Document.GetText()
             getOptions path source
+
+
+[<SolutionComponent>]
+type OutputAssemblyChangeInvalidator(lifetime, outputAssemblies: OutputAssemblies, provider: FSharpProjectOptionsProvider,
+                               daemon: IDaemon, psiFiles: IPsiFiles) =
+    do
+        outputAssemblies.ProjectOutputAssembliesChanged.Advise(lifetime, fun (project: IProject) ->
+            if not provider.HasFSharpProjects || project.IsFSharp then () else
+
+            if provider.Invalidate(project) then
+                psiFiles.IncrementModificationTimestamp(null)
+                daemon.Invalidate())
