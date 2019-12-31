@@ -28,6 +28,7 @@ repositories {
 plugins {
     id("org.jetbrains.intellij") version "0.4.13"
     id("org.jetbrains.grammarkit") version "2018.1.7"
+    id("me.filippov.gradle.jvm.wrapper") version "0.9.3"
 }
 
 apply {
@@ -297,12 +298,6 @@ tasks {
                 args = listOf("$resharperPluginPath/ReSharper.FSharp.sln")
             }
         }
-    }
-
-    task<Wrapper>("wrapper") {
-        gradleVersion = "4.10"
-        distributionType = Wrapper.DistributionType.ALL
-        distributionUrl = "https://cache-redirector.jetbrains.com/services.gradle.org/distributions/gradle-$gradleVersion-all.zip"
     }
 
     task("listrepos"){
