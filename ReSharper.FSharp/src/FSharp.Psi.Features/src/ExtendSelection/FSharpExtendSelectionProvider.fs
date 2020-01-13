@@ -180,8 +180,11 @@ and FSharpDotSelection(fsFile, offset, selectBetterToken, useCamelHumps) =
         FSharpTokenPartSelection(fsFile, range, node) :> _
 
     override x.CreateTreeNodeSelection(tokenNode) =
-        // todo: build more complex selection?
-        FSharpTreeNodeSelection(fsFile, tokenNode) :> _
+        match tokenNode.Parent with
+        | :? IUnitExpr as unitExpr ->
+            FSharpTreeNodeSelection(fsFile, unitExpr) :> _
+        | _ ->
+            FSharpTreeNodeSelection(fsFile, tokenNode) :> _
 
     override x.GetParentInternal(token) =
         let shouldCreateTokenPartSelection (tokenType: TokenNodeType) =
