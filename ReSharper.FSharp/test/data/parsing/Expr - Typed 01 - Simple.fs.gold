@@ -6,7 +6,7 @@ IFSharpImplFile
         IParenExpr
           FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
           ITypedExpr
-            IConstExpr
+            ILiteralExpr
               FSharpToken(type:INT32, text:123)
             FSharpTokenType+ColonTokenElement(type:COLON, text::)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "

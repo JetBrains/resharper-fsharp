@@ -6,7 +6,7 @@ IFSharpImplFile
         ITryWithExpr
           FSharpTokenType+TryTokenElement(type:TRY, text:try)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IConstExpr
+          IUnitExpr
             FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
             FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           NewLine(type:NEW_LINE, text:\n) spaces:"\n"
@@ -23,7 +23,7 @@ IFSharpImplFile
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IConstExpr
+            IUnitExpr
               FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
               FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
 

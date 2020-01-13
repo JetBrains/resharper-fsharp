@@ -6,6 +6,6 @@ IFSharpImplFile
         ILazyExpr
           FSharpTokenType+LazyTokenElement(type:LAZY, text:lazy)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IConstExpr
+          ILiteralExpr
             FSharpToken(type:INT32, text:123)
 

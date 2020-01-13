@@ -452,7 +452,15 @@ quoteExpr options { stubBase="FSharpExpressionBase"; }:
     RQUOTE_UNTYPED?
   );
 
-constExpr options { stubBase="FSharpExpressionBase"; }:
+interface constExpr:
+  unitExpr |
+  literalExpr;
+
+unitExpr options { stubBase="FSharpExpressionBase"; }:
+  LPAREN<LPAREN, LParen>
+  RPAREN<RPAREN, RParen>;
+
+literalExpr options { stubBase="FSharpExpressionBase"; }:
   fakeSeparator;
 
 typedExpr options { stubBase="FSharpExpressionBase"; }:

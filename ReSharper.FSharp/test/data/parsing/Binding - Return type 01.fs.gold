@@ -18,6 +18,6 @@ IFSharpImplFile
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         IChameleonExpression
-          IConstExpr
+          ILiteralExpr
             FSharpToken(type:INT32, text:1)
 

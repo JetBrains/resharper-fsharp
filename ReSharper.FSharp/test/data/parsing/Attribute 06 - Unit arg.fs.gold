@@ -8,13 +8,13 @@ IFSharpImplFile
           ITypeReferenceName
             FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
           IChameleonExpression
-            IConstExpr
+            IUnitExpr
               FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
               FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
         FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
       NewLine(type:NEW_LINE, text:\n) spaces:"\n"
       IChameleonExpression
-        IConstExpr
+        IUnitExpr
           FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
           FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
 

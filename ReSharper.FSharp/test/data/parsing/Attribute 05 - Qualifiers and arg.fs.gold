@@ -16,13 +16,13 @@ IFSharpImplFile
           IChameleonExpression
             IParenExpr
               FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-              IConstExpr
+              ILiteralExpr
                 FSharpTokenType+TrueTokenElement(type:TRUE, text:true)
               FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
         FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
       NewLine(type:NEW_LINE, text:\n) spaces:"\n"
       IChameleonExpression
-        IConstExpr
+        IUnitExpr
           FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
           FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
 

@@ -6,7 +6,7 @@ IFSharpImplFile
     IDo
       IChameleonExpression
         IDoExpr
-          IConstExpr
+          IUnitExpr
             FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
             FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
 

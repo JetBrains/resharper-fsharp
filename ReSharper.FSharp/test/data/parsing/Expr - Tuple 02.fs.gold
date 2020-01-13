@@ -4,14 +4,14 @@ IFSharpImplFile
     IDo
       IChameleonExpression
         ITupleExpr
-          IConstExpr
+          ILiteralExpr
             FSharpToken(type:INT32, text:1)
           FSharpTokenType+CommaTokenElement(type:COMMA, text:,)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IConstExpr
+          ILiteralExpr
             FSharpToken(type:INT32, text:2)
           FSharpTokenType+CommaTokenElement(type:COMMA, text:,)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IConstExpr
+          ILiteralExpr
             FSharpToken(type:INT32, text:3)
 

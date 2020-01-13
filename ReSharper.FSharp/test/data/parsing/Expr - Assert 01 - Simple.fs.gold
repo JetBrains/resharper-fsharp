@@ -6,6 +6,6 @@ IFSharpImplFile
         IAssertExpr
           FSharpTokenType+AssertTokenElement(type:ASSERT, text:assert)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IConstExpr
+          ILiteralExpr
             FSharpTokenType+TrueTokenElement(type:TRUE, text:true)
 

@@ -1,4 +1,4 @@
-Language: PsiLanguageType:F#
+﻿Language: PsiLanguageType:F#
 IFSharpImplFile
   IAnonModuleDeclaration
     IDo
@@ -6,7 +6,7 @@ IFSharpImplFile
         IMatchExpr
           FSharpTokenType+MatchTokenElement(type:MATCH, text:match)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IConstExpr
+          IUnitExpr
             FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
             FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
@@ -24,18 +24,18 @@ IFSharpImplFile
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               IPrefixAppExpr
                 IInfixAppExpr
-                  IConstExpr
+                  ILiteralExpr
                     FSharpToken(type:INT32, text:5)
                   Whitespace(type:WHITE_SPACE, text: ) spaces:" "
                   IReferenceExpr
                     FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
                 Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                IConstExpr
+                ILiteralExpr
                   FSharpToken(type:INT32, text:5)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IConstExpr
+            IUnitExpr
               FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
               FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
 

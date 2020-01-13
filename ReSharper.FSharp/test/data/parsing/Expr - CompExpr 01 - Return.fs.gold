@@ -13,7 +13,7 @@ IFSharpImplFile
             IYieldOrReturnExpr
               FSharpTokenType+ReturnTokenElement(type:RETURN, text:return)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              IConstExpr
+              ILiteralExpr
                 FSharpToken(type:INT32, text:123)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+RbraceTokenElement(type:RBRACE, text:})

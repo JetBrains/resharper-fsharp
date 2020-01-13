@@ -6,13 +6,13 @@ IFSharpImplFile
         ITryFinallyExpr
           FSharpTokenType+TryTokenElement(type:TRY, text:try)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IConstExpr
+          IUnitExpr
             FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
             FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           NewLine(type:NEW_LINE, text:\n) spaces:"\n"
           FSharpTokenType+FinallyTokenElement(type:FINALLY, text:finally)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IConstExpr
+          IUnitExpr
             FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
             FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
 

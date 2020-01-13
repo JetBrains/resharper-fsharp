@@ -11,28 +11,28 @@ IFSharpImplFile
             IIndexerArgList
               FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
               IIndexerArg
-                IConstExpr
+                ILiteralExpr
                   FSharpToken(type:INT32, text:1)
               FSharpTokenType+CommaTokenElement(type:COMMA, text:,)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               IIndexerArg
-                IConstExpr
+                ILiteralExpr
                   FSharpToken(type:INT32, text:2)
                 Whitespace(type:WHITE_SPACE, text: ) spaces:" "
                 FSharpTokenType+DotDotTokenElement(type:DOT_DOT, text:..)
                 Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                IConstExpr
+                ILiteralExpr
                   FSharpToken(type:INT32, text:3)
               FSharpTokenType+CommaTokenElement(type:COMMA, text:,)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               IIndexerArg
-                IConstExpr
+                ILiteralExpr
                   FSharpToken(type:INT32, text:4)
               FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+LarrowTokenElement(type:LARROW, text:<-)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IConstExpr
+            ILiteralExpr
               FSharpToken(type:INT32, text:1)
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

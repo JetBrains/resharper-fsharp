@@ -12,7 +12,7 @@ IFSharpImplFile
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IConstExpr
+            ILiteralExpr
               FSharpToken(type:INT32, text:1)
             FSharpTokenType+SemicolonTokenElement(type:SEMICOLON, text:;)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
@@ -22,7 +22,7 @@ IFSharpImplFile
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IConstExpr
+            ILiteralExpr
               FSharpToken(type:INT32, text:2)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+RbraceTokenElement(type:RBRACE, text:})

@@ -9,12 +9,12 @@ IFSharpImplFile
             FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           IChameleonExpression
-            IConstExpr
+            ILiteralExpr
               FSharpString(type:STRING, text:"Bar")
         FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
       NewLine(type:NEW_LINE, text:\n) spaces:"\n"
       IChameleonExpression
-        IConstExpr
+        IUnitExpr
           FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
           FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
 

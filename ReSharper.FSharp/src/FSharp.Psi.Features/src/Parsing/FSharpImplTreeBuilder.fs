@@ -604,8 +604,12 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         | SynExpr.Quote(_, _, expr, _, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.QUOTE_EXPR)
 
-        | SynExpr.Const(_, _) ->
-            x.MarkAndDone(range, ElementType.CONST_EXPR)
+        | SynExpr.Const(synConst, _) ->
+            let elementType =
+                match synConst with
+                | SynConst.Unit -> ElementType.UNIT_EXPR
+                | _ -> ElementType.LITERAL_EXPR
+            x.MarkAndDone(range, elementType)
 
         | SynExpr.Typed(expr, synType, _) ->
             Assertion.Assert(rangeContainsRange range synType.Range,

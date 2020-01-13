@@ -52,7 +52,11 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Quote 02 - Untyped``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Tuple 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Tuple 02``() = x.DoNamedTest()
-    [<Test>] member x.``Expr - Const 01 - Unit``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - Const - Numbers 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Const - Unit 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Const - Unit 02 - Parens``() = x.DoNamedTest()
+
     [<Test>] member x.``Expr - Typed 01 - Simple``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Anon record 01``() = x.DoNamedTest()

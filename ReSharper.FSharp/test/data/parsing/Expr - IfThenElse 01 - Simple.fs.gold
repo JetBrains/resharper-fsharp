@@ -6,16 +6,16 @@ IFSharpImplFile
         IIfThenElseExpr
           FSharpTokenType+IfTokenElement(type:IF, text:if)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IConstExpr
+          ILiteralExpr
             FSharpTokenType+TrueTokenElement(type:TRUE, text:true)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+ThenTokenElement(type:THEN, text:then)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IConstExpr
+          ILiteralExpr
             FSharpToken(type:INT32, text:1)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+ElseTokenElement(type:ELSE, text:else)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IConstExpr
+          ILiteralExpr
             FSharpToken(type:INT32, text:2)
 
