@@ -247,6 +247,7 @@ public interface FSharpTokenType {
             BASE,
             BEGIN,
             CLASS,
+            CONST,
             DEFAULT,
             DELEGATE,
             DO,

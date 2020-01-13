@@ -159,6 +159,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         BASE,
         BEGIN,
         CLASS,
+        CONST,
         DEFAULT,
         DELEGATE,
         DO,
