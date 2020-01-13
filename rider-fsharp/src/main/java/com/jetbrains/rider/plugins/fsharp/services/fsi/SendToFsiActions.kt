@@ -9,8 +9,9 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Iconable
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.psi.PsiElement
-import com.jetbrains.rider.icons.ReSharperBulbIcons
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguageBase
+import icons.ReSharperIcons
+import javax.swing.Icon
 
 object Fsi {
     const val sendToFsiActionId = "Rider.Plugins.FSharp.SendToFsi"
@@ -93,7 +94,7 @@ abstract class BaseSendToFsiIntentionAction(private val debug: Boolean, private 
         ServiceManager.getService(project, FsiHost::class.java).sendToFsi(editor, element.containingFile, debug)
     }
 
-    override fun getIcon(flags: Int) = ReSharperBulbIcons.GhostBulb
+    override fun getIcon(flags: Int): Icon = ReSharperIcons.Bulb.GhostBulb
 
     override fun getShortcut() =
             ActionManager.getInstance().getAction(actionId)?.shortcutSet
