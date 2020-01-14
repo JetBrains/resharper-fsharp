@@ -69,6 +69,14 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Record 06 - With qualifier``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - While 01 - Simple``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - For 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - ForEach - Range 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - ForEach - Range 02 - Step``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - ForEach 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - CompExpr - Range 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - CompExpr - Range 02 - Step``() = x.DoNamedTest()
     [<Test>] member x.``Expr - CompExpr 01 - Return``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Lambda 01 - Single id``() = x.DoNamedTest()
@@ -269,3 +277,7 @@ type FSharpErrorsParserTest() =
     [<Test>] member x.``Expr - Unfinished let 04 - In, before other``() = x.DoNamedTest()
 
     [<Test>] member x.``Line separators 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - CompExpr - Range 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - CompExpr - Range 02 - Step``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - CompExpr - Range 03``() = x.DoNamedTest()

@@ -361,7 +361,7 @@ interface synExpr:
   forExpr |
   forEachExpr |
   arrayOrListOfSeqExpr |
-  compExpr |
+  computationLikeExpr |
   lambdaExpr |
   matchLikeExpr |
   doExpr |
@@ -531,9 +531,13 @@ forEachExpr options { stubBase="FSharpExpressionBase"; }:
   FOR
   synPat<PAT, Pattern>
   IN
-  synExpr<IN_EXPR, InExpression>
+  forEachInClause{IN_CLAUSE, InClause}
   DO
   synExpr<DO_EXPR, DoExpression>;
+
+private forEachInClause{ROLE, Getter}:
+  synExpr<@ROLE, @Getter> |
+  rangeSequence<@ROLE, @Getter>;
 
 arrayOrListOfSeqExpr options { stubBase="FSharpExpressionBase"; }:
   (LBRACK
@@ -562,7 +566,11 @@ objExpr options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   interfaceImplementation<INTERFACE_IMPL, InterfaceImplementations>*
   RBRACE;
 
-compExpr options { stubBase="FSharpExpressionBase"; }:
+interface computationLikeExpr:
+  computationExpr |
+  rangeSequenceExpr;
+
+computationExpr options { stubBase="FSharpExpressionBase"; }:
   LBRACE
   synExpr<EXPR, Expression>
   RBRACE;
@@ -722,6 +730,20 @@ fromErrorExpr options { stubBase="FSharpExpressionBase"; }:
 fixedExpr options { stubBase="FSharpExpressionBase"; }:
   FIXED<FIXED, FixedKeyword>
   synExpr<EXPR, Expression>;
+
+rangeSequence:
+  synExpr<FROM_EXPR, FromExpr>
+  (
+    DOT_DOT
+    synExpr<STEP_EXPR, StepExpr>
+  )?
+  DOT_DOT
+  synExpr<TO_EXPR, ToExpr>;
+
+rangeSequenceExpr options { stubBase="FSharpExpressionBase"; }:
+  LBRACE
+  rangeSequence<RANGE, RangeSequence>
+  RBRACE;
 
 chameleonExpression:
   synExpr<EXPR, Expression>;

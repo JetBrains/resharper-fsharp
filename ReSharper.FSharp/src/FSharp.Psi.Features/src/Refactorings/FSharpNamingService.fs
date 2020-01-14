@@ -262,7 +262,7 @@ type FSharpNamingService(language: FSharpLanguage) =
             | expr -> addNamesForExpr expr
 
         | :? IForEachExpr as forEachExpr when forEachExpr.Pattern == pat ->
-            match forEachExpr.InExpression with
+            match forEachExpr.InClause.As<ISynExpr>() with
             | null -> ()
             | expr ->
 

@@ -5,16 +5,18 @@ IFSharpImplFile
       IChameleonExpression
         IPrefixAppExpr
           IReferenceExpr
-            FSharpIdentifierToken(type:IDENTIFIER, text:async)
+            FSharpIdentifierToken(type:IDENTIFIER, text:seq)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IComputationExpr
+          IRangeSequenceExpr
             FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IYieldOrReturnExpr
-              FSharpTokenType+ReturnTokenElement(type:RETURN, text:return)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IRangeSequence
               ILiteralExpr
-                FSharpToken(type:INT32, text:123)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                FSharpToken(type:INT32, text:1)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              FSharpTokenType+DotDotTokenElement(type:DOT_DOT, text:..)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              IFromErrorExpr
             FSharpTokenType+RbraceTokenElement(type:RBRACE, text:})
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

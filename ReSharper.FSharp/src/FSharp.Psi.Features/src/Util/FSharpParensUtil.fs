@@ -13,7 +13,7 @@ let needsParens (expr: ISynExpr) =
     | :? IConstExpr | :? INullExpr
     | :? IRecordExpr | :? IAnonRecdExpr
     | :? IArrayOrListExpr | :? IArrayOrListOfSeqExpr
-    | :? IObjExpr | :? ICompExpr
+    | :? IObjExpr | :? IComputationLikeExpr
     | :? IAddressOfExpr -> false
     | _ -> true
 

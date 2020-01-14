@@ -682,7 +682,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             x.PushRangeAndProcessExpression(expr, range, ElementType.ARRAY_OR_LIST_OF_SEQ_EXPR)
 
         | SynExpr.CompExpr(_, _, expr, _) ->
-            x.PushRangeAndProcessExpression(expr, range, ElementType.COMP_EXPR)
+            x.PushRangeAndProcessExpression(expr, range, ElementType.COMPUTATION_EXPR)
 
         | SynExpr.Lambda(_, inLambdaSeq, _, bodyExpr, _) ->
             // Lambdas get "desugared" by converting to fake nested lambdas and match expressions.
@@ -714,6 +714,11 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
 
         | SynExpr.App(_, isInfix, funcExpr, argExpr, _) ->
             if isInfix then
+                match funcExpr with
+                | SynExpr.Ident(id) when id.idText = "op_Range" -> x.ProcessRangeSequenceExpr(argExpr, false)
+                | SynExpr.Ident(id) when id.idText = "op_RangeStep" -> x.ProcessRangeSequenceExpr(argExpr, true)
+                | _ ->
+
                 x.PushRange(range, ElementType.INFIX_APP_EXPR)
                 x.PushExpression(funcExpr)
                 x.ProcessExpression(argExpr)
@@ -872,6 +877,41 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             x.PushRange(range, ElementType.SEQUENTIAL_EXPR)
             x.PushSequentialExpression(expr2)
             x.ProcessExpression(expr1)
+
+    member x.ProcessRangeSequenceExpr(ExprRange fromExprRange as fromExpr, hasStepExpr) =
+        // Range sequences are hacked to look like function applications.
+        // We need to change already pushed builder steps to fix it. 
+
+        let stepExpr =
+            if hasStepExpr then
+                let expr = nextSteps.Pop().Item :?> SynExpr
+                // There's one extra app expr for ranges with step specified, remove it.
+                let stepAppExprItem = nextSteps.Pop().Item :?> RangeMarkAndType
+                x.Builder.Drop(stepAppExprItem.Mark)
+                expr
+            else
+                Unchecked.defaultof<_>
+
+        let toExprStep = nextSteps.Pop()
+        let rangeSeqAppExprStep = nextSteps.Pop().Item :?> RangeMarkAndType
+
+        let toExpr = toExprStep.Item :?> SynExpr 
+        let rangeSeqRange = unionRanges fromExprRange toExpr.Range
+
+        if rangeSeqAppExprStep.Range <> rangeSeqRange then
+            // Range sequence expr also contains braces in the fake app expr, mark it as a separate expr node.
+            x.PushRangeForMark(rangeSeqAppExprStep.Range, rangeSeqAppExprStep.Mark, ElementType.RANGE_SEQUENCE_EXPR)
+            x.PushRange(rangeSeqRange, ElementType.RANGE_SEQUENCE)
+        else
+            // Ranges are equals when no actual expression is present.
+            // Currently it only happens inside ForEach expressions.
+            x.PushRangeForMark(rangeSeqAppExprStep.Range, rangeSeqAppExprStep.Mark, ElementType.RANGE_SEQUENCE)
+
+        x.PushExpression(toExpr)
+        if hasStepExpr then
+            x.PushExpression(stepExpr)
+
+        x.ProcessExpression(fromExpr)
 
     member x.ProcessLongIdentifierExpression(lid, range) =
         let marks = Stack()
@@ -1160,7 +1200,7 @@ type WrapExpressionProcessor() =
 type RangeMarkAndType =
     { Range: range
       Mark: int
-      ElementType: NodeType }
+      mutable ElementType: NodeType }
 
 type AdvanceToEndProcessor() =
     inherit StepProcessorBase<range>()

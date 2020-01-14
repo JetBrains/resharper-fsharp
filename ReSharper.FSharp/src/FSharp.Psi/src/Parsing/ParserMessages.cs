@@ -50,6 +50,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_APP_EXPR = "";
     public const string IDS_QUOTE_EXPR = "";
     public const string IDS_ARRAY_OR_LIST_OF_SEQ_EXPR = "";
+    public const string IDS_COMPUTATION_LIKE_EXPR = "";
     public const string IDS_MATCH_LIKE_EXPR = "";
     public const string IDS_TRY_LIKE_EXPR = "";
     public const string IDS_SET_EXPR = "";
@@ -63,6 +64,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_TYPE_ARGUMENT_LIST = "";
     public const string IDS_PREFIX_APP_TYPE_ARGUMENT_LIST = "";
     public const string IDS_POSTFIX_APP_TYPE_ARGUMENT_LIST = "";
+    public const string IDS_FOR_EACH_IN_CLAUSE = "";
 
     public static string GetString(string id) => id;
     public static string GetExpectedMessage(string s) => string.Empty;
