@@ -187,7 +187,9 @@ type IFSharpProjectOptionsProvider =
     abstract GetParsingOptions: IPsiSourceFile -> FSharpParsingOptions
     abstract GetFileIndex: IPsiSourceFile -> int
     abstract HasPairFile: IPsiSourceFile -> bool
+    abstract Invalidate: IProject -> bool
     abstract ModuleInvalidated: ISignal<IPsiModule>
+    abstract HasFSharpProjects: bool
 
 
 type IFSharpScriptProjectOptionsProvider =

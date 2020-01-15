@@ -147,11 +147,6 @@ type FSharpProjectOptionsProvider
 
     member x.ModuleInvalidated = moduleInvalidated
 
-    member x.Invalidate(project: IProject) =
-        invalidateProject project
-
-    member x.HasFSharpProjects = not (projects.IsEmpty())
-
     member private x.ProcessChange(obj: ChangeEventArgs) =
         match obj.ChangeMap.GetChange<ProjectModelChange>(solution) with
         | null -> ()
@@ -244,6 +239,11 @@ type FSharpProjectOptionsProvider
         
         member x.ModuleInvalidated = x.ModuleInvalidated :> _
 
+        member x.Invalidate(project: IProject) =
+            invalidateProject project
+
+        member x.HasFSharpProjects = not (projects.IsEmpty())
+
 [<SolutionComponent>]
 type FSharpScriptProjectOptionsProvider
         (lifetime, logger: ILogger, checkerService: FSharpCheckerService, scriptOptions: FSharpScriptOptionsProvider) =
@@ -297,8 +297,8 @@ type FSharpScriptProjectOptionsProvider
 
 
 [<SolutionComponent>]
-type OutputAssemblyChangeInvalidator(lifetime, outputAssemblies: OutputAssemblies, provider: FSharpProjectOptionsProvider,
-                               daemon: IDaemon, psiFiles: IPsiFiles) =
+type OutputAssemblyChangeInvalidator(lifetime, outputAssemblies: OutputAssemblies, daemon: IDaemon, psiFiles: IPsiFiles,
+                                     provider: IFSharpProjectOptionsProvider) =
     do
         outputAssemblies.ProjectOutputAssembliesChanged.Advise(lifetime, fun (project: IProject) ->
             if not provider.HasFSharpProjects || project.IsFSharp then () else

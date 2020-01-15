@@ -13,15 +13,13 @@ open JetBrains.ProjectModel.MSBuild
 open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.TestFramework
 open JetBrains.TestFramework.Projects
 open JetBrains.Util.Dotnet.TargetFrameworkIds
-open NUnit.Framework
 open Moq
+open NUnit.Framework
 
 [<assembly: Apartment(ApartmentState.STA)>]
 do()
@@ -105,5 +103,8 @@ type FSharpTestProjectOptionsProvider
                 IsExe = isExe
                 IsInteractive = isScript }
 
-        member x.GetFileIndex(_) = 0
+        member x.GetFileIndex _ = 0
         member x.ModuleInvalidated = new Signal<_>("Todo") :> _
+
+        member x.Invalidate _ = false
+        member x.HasFSharpProjects = false
