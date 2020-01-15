@@ -130,9 +130,9 @@ let (|TokenType|_|) tokenType (treeNode: ITreeNode) =
 let (|Whitespace|_|) (treeNode: ITreeNode) =
     if getTokenType treeNode == FSharpTokenType.WHITESPACE then Some treeNode else None
 
-let (|IgnoreParenPat|) (pat: ISynPat) = pat.IgnoreParentParens()
+let inline (|IgnoreParenPat|) (pat: ISynPat) = pat.IgnoreParentParens()
 
-let (|IgnoreInnerParenExpr|) (expr: ISynExpr) =
+let inline (|IgnoreInnerParenExpr|) (expr: ISynExpr) =
     expr.IgnoreInnerParens()
 
 let isInlineSpaceOrComment (node: ITreeNode) =

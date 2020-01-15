@@ -86,15 +86,15 @@ module rec CommonUtil =
         | true, value -> Some !value
         | _ -> None
 
-    let (|ArgValue|) (arg: PropertyChangedEventArgs<_>) = arg.New
+    let inline (|ArgValue|) (arg: PropertyChangedEventArgs<_>) = arg.New
 
-    let (|AddRemoveArgs|) (args: AddRemoveEventArgs<_>) =
+    let inline (|AddRemoveArgs|) (args: AddRemoveEventArgs<_>) =
         args.Value
 
-    let (|Pair|) (pair: Pair<_,_>) =
+    let inline (|Pair|) (pair: Pair<_,_>) =
         pair.First, pair.Second
 
-    let (|PsiModuleReference|) (ref: IPsiModuleReference) =
+    let inline (|PsiModuleReference|) (ref: IPsiModuleReference) =
         ref.Module
 
     let (|ProjectFile|ProjectFolder|UnknownProjectItem|) (projectItem: IProjectItem) =
@@ -103,7 +103,7 @@ module rec CommonUtil =
         | :? IProjectFolder as folder -> ProjectFolder folder
         | _ -> UnknownProjectItem
 
-    let (|AsList|) seq = List.ofSeq seq
+    let inline (|AsList|) seq = List.ofSeq seq
 
     let (|OperationCanceled|_|) (exn: Exception) =
         if exn.IsOperationCanceled() then someUnit else None
@@ -145,10 +145,10 @@ module rec CommonUtil =
 module rec FcsUtil =
     open FSharp.Compiler.Ast
 
-    let (|ExprRange|) (expr: SynExpr) = expr.Range
-    let (|PatRange|) (pat: SynPat) = pat.Range
-    let (|IdentRange|) (id: Ident) = id.idRange
-    let (|TypeRange|) (typ: SynType) = typ.Range
+    let inline (|ExprRange|) (expr: SynExpr) = expr.Range
+    let inline (|PatRange|) (pat: SynPat) = pat.Range
+    let inline (|IdentRange|) (id: Ident) = id.idRange
+    let inline (|TypeRange|) (typ: SynType) = typ.Range
 
 
 [<AutoOpen>]
