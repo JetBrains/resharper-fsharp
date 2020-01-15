@@ -1,0 +1,9 @@
+﻿module Module
+
+type T(|p|(0)) =
+    class
+    end
+
+------------------------------------------------
+0: The value 'p' is unused
+NO QUICKFIXES

@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util.PsiUtil
 open JetBrains.ReSharper.Resources.Shell
@@ -14,6 +15,8 @@ type ReplaceWithWildPatFix(warning: UnusedValueWarning) =
 
     override x.IsAvailable _ =
         isValid pat &&
+
+        if pat.IgnoreParentParens().Parent :? IAttribPat then false else
 
         let node = skipIntermediatePatParents pat |> getParent
         node :? IBinding ||

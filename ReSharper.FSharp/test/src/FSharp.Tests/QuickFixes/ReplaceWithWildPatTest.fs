@@ -20,5 +20,14 @@ type ReplaceWithWildPatTest() =
 
     [<Test>] member x.``Match clause pat 01``() = x.DoNamedTest()
 
-    [<Test; NotAvailable>] member x.``Not available - Ctor 01``() = x.DoNamedTest()
-    [<Test; NotAvailable>] member x.``Not available - Function 01``() = x.DoNamedTest()
+[<FSharpTest>]
+type ReplaceWithWildPatAvailabilityTest() =
+    inherit QuickFixAvailabilityTestBase()
+
+    override x.RelativeTestDataPath = "features/quickFixes/replaceWithWildPat"
+
+    [<Test>] member x.``Not available - Ctor 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - Function 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Not available - Let - Attribute 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - Let - Attribute 02 - Parens``() = x.DoNamedTest()

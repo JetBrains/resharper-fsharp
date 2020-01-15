@@ -1,0 +1,11 @@
+﻿module Module
+
+let foo |x|(0) |y|(1) = ()
+
+------------------------------------------------
+0: The value 'x' is unused
+QUICKFIXES:
+Replace with '_'
+1: The value 'y' is unused
+QUICKFIXES:
+Replace with '_'
