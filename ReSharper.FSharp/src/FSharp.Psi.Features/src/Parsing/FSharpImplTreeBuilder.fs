@@ -1200,7 +1200,7 @@ type WrapExpressionProcessor() =
 type RangeMarkAndType =
     { Range: range
       Mark: int
-      mutable ElementType: NodeType }
+      ElementType: NodeType }
 
 type AdvanceToEndProcessor() =
     inherit StepProcessorBase<range>()
