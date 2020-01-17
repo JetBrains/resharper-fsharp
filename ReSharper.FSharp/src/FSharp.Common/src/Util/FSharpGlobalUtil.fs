@@ -3,7 +3,7 @@ namespace global
 [<AutoOpen>]
 module FSharpGlobalUtil =
     type System.Object with
-        member x.As<'T when 'T: null>() =
+        member x.As() =
             match x with
             | :? 'T as t -> t
             | _ -> null
