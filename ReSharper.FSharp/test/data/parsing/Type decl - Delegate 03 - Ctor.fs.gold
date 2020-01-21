@@ -1,0 +1,40 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    ITypeDeclarationGroup
+      FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
+      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+      IDelegateDeclaration
+        FSharpIdentifierToken(type:IDENTIFIER, text:D)
+        IImplicitConstructorDeclaration
+          IMemberParamDeclarationGroup
+            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            IMemberParamDeclaration
+              ILocalDeclaration
+                FSharpIdentifierToken(type:IDENTIFIER, text:x)
+              FSharpTokenType+ColonTokenElement(type:COLON, text::)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              INamedType
+                ITypeReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:int)
+            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        IDelegateRepresentation
+          FSharpTokenType+DelegateTokenElement(type:DELEGATE, text:delegate)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+OfTokenElement(type:OF, text:of)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IFunType
+            INamedType
+              ITypeReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:int)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            INamedType
+              ITypeReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:int)
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

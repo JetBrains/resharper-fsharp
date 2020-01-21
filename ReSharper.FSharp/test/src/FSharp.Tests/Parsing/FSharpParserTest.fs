@@ -27,6 +27,10 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Type decl - Extension 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type decl - Delegate 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Delegate 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Delegate 03 - Ctor``() = x.DoNamedTest()
+
     [<Test>] member x.``Type decl - Attributes 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Attributes 02``() = x.DoNamedTest()
 

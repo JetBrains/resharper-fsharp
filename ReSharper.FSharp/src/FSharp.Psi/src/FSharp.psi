@@ -1044,7 +1044,15 @@ delegateDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } ext
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
+  EQUALS
+  delegateRepresentation<DELEGATE_REPR, DelegateRepresentation>
+  // todo: remove members
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
+
+delegateRepresentation:
+  DELEGATE
+  OF
+  synType<TYPE, Type>;
 
 interface fSharpTypeMemberDeclaration:
   constructorDeclaration |

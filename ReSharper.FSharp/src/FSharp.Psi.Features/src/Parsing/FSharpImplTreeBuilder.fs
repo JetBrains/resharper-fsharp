@@ -151,19 +151,28 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             | SynTypeDefnRepr.ObjectModel(SynTypeDefnKind.TyconAugmentation, _, _) ->
                 ElementType.TYPE_EXTENSION_DECLARATION
 
-            | SynTypeDefnRepr.ObjectModel(kind, members, _) ->
+            | SynTypeDefnRepr.ObjectModel(kind, members, range) ->
+                match kind with
+                | TyconDelegate(synType, _) ->
+                    match members with
+                    | SynMemberDefn.ImplicitCtor _ as ctor :: _ -> x.ProcessTypeMember(ctor)
+                    | _ -> ()
+
+                    let mark = x.Mark(range)
+                    x.ProcessType(synType)
+                    x.Done(range, mark, ElementType.DELEGATE_REPRESENTATION)
+                    ElementType.DELEGATE_DECLARATION
+
+                | _ ->
+
                 for m in members do
                     x.ProcessTypeMember m
                 x.EnsureMembersAreFinished()
+
                 match kind with
                 | TyconClass -> ElementType.CLASS_DECLARATION
                 | TyconInterface -> ElementType.INTERFACE_DECLARATION
                 | TyconStruct -> ElementType.STRUCT_DECLARATION
-
-                | TyconDelegate(synType, _) ->
-                    x.MarkOtherType(synType)                    
-                    ElementType.DELEGATE_DECLARATION
-
                 | _ -> ElementType.OBJECT_TYPE_DECLARATION
 
         for m in members do
