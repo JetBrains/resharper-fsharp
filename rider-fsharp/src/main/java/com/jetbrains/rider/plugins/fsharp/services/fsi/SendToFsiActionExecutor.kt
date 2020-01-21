@@ -7,7 +7,8 @@ import com.intellij.psi.PsiFile
 
 class SendToFsiActionExecutor(private val consoleRunner: FsiConsoleRunner) {
     fun execute(editor: Editor, file: PsiFile, debug: Boolean) {
-        val hasSelection = editor.selectionModel.hasSelection()
+        val selectionModel = editor.selectionModel
+        val hasSelection = selectionModel.hasSelection()
         val visibleText = getVisibleText(editor, hasSelection)
         if (!visibleText.isEmpty()) {
             val fsiText = "\n" +
@@ -20,6 +21,11 @@ class SendToFsiActionExecutor(private val consoleRunner: FsiConsoleRunner) {
         }
         if (!hasSelection && consoleRunner.fsiHost.moveCaretOnSendLine.value)
             editor.caretModel.moveCaretRelatively(0, 1, false, false, true)
+
+        if (hasSelection && consoleRunner.fsiHost.moveCaretOnSendSelection.value) {
+            editor.caretModel.moveToOffset(selectionModel.selectionEnd)
+            editor.caretModel.currentCaret.removeSelection()
+        }
     }
 
     private fun getVisibleText(editor: Editor, hasSelection: Boolean) =

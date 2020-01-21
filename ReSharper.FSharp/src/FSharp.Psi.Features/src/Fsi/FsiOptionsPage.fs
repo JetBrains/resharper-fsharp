@@ -1,7 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi.Settings
 
 open System
-open System.Linq.Expressions
 open System.Runtime.InteropServices
 open JetBrains.Application
 open JetBrains.Application.UI.Controls.FileSystem
@@ -96,6 +95,7 @@ type FsiOptionsPage
 
         this.AddHeader(commandsSectionTitle)
         this.AddBool(moveCaretOnSendLineText, fsiOptions.MoveCaretOnSendLine)
+        this.AddBool(moveCaretOnSendSelectionText, fsiOptions.MoveCaretOnSendSelection)
 
         this.AddBool(executeRecentText, fsiOptions.ExecuteRecent)
         this.AddDescription(executeRecentsDescription)

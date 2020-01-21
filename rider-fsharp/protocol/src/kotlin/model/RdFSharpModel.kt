@@ -23,6 +23,7 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
         })
         call("getProjectReferences", int, immutableList(string))
         property("moveCaretOnSendLine", bool).readonly
+        property("moveCaretOnSendSelection", bool).readonly
         property("copyRecentToEditor", bool).readonly
     }
 

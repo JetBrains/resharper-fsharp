@@ -22,10 +22,12 @@ class FsiHost(project: Project) : LifetimedProjectComponent(project) {
     private val rdFsiHost = project.solution.rdFSharpModel.fSharpInteractiveHost
 
     val moveCaretOnSendLine = Property(true)
+    val moveCaretOnSendSelection = Property(true)
     val copyRecentToEditor = Property(false)
 
     init {
         rdFsiHost.moveCaretOnSendLine.flowInto(componentLifetime, moveCaretOnSendLine)
+        rdFsiHost.moveCaretOnSendSelection.flowInto(componentLifetime, moveCaretOnSendSelection)
         rdFsiHost.copyRecentToEditor.flowInto(componentLifetime, copyRecentToEditor)
     }
 
