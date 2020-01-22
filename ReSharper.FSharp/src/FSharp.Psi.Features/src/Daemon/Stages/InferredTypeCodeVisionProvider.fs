@@ -3,14 +3,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open System.Text
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application
+open JetBrains.Application.UI.Components
+open JetBrains.Application.UI.PopupLayout
+open JetBrains.Application.UI.Tooltips
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Daemon.CodeInsights
 open JetBrains.ReSharper.Feature.Services.Daemon
+open JetBrains.ReSharper.Host.Features.Services
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Rider.Model
 open JetBrains.Util
 
@@ -21,7 +26,7 @@ open JetBrains.Util
     AttributeId = HighlightingGroupIds.CodeInsightsGroup,
     OverlapResolve = OverlapResolveKind.NONE)>]
 type FSharpInferredTypeHighlighting(range, text, provider: ICodeInsightsProvider) =
-    inherit CodeInsightsHighlighting(range, text, "", "", provider, null, null)
+    inherit CodeInsightsHighlighting(range, text, "", "Copy inferred type", provider, null, null)
 
     interface IHighlightingWithTestOutput with
         member x.TestOutput = text
@@ -30,6 +35,7 @@ type FSharpInferredTypeHighlighting(range, text, provider: ICodeInsightsProvider
 [<ShellComponent>]
 type InferredTypeCodeVisionProvider() =
     let [<Literal>] id = "F# Inferred types"
+    let [<Literal>] copiedText = "Inferred type copied to clipboard"
 
     interface ICodeInsightsProvider with
         member x.ProviderId = id
@@ -39,7 +45,16 @@ type InferredTypeCodeVisionProvider() =
 
         member x.IsAvailableIn _ = true
 
-        member x.OnClick(_, _) = ()
+        member x.OnClick(highlighting, _) =
+            let entry = highlighting.Entry.As<TextCodeLensEntry>()
+            if isNull entry then () else
+
+            let shell = Shell.Instance
+            shell.GetComponent<Clipboard>().SetText(entry.Text)
+            shell.GetComponent<ITooltipManager>().Show(copiedText, PopupWindowContextSource(fun _ ->
+                let offset = highlighting.Range.StartOffset.Offset
+                RiderEditorOffsetPopupWindowContext(offset) :> _)) |> ignore
+
         member x.OnExtraActionClick(_, _, _) = ()
 
 
