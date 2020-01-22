@@ -43,7 +43,7 @@ open class SendToFsiActionBase(private val debug: Boolean, private val sendLineT
         val editor = CommonDataKeys.EDITOR.getData(e.dataContext)!!
         val file = CommonDataKeys.PSI_FILE.getData(e.dataContext)!!
         val project = CommonDataKeys.PROJECT.getData(e.dataContext) ?: return
-        ServiceManager.getService(project, FsiHost::class.java).sendToFsi(editor, file, debug)
+        project.getComponent(FsiHost::class.java).sendToFsi(editor, file, debug)
     }
 
     override fun update(e: AnActionEvent) {
