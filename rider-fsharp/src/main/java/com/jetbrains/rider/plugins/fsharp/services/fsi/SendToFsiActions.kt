@@ -5,6 +5,7 @@ import com.intellij.codeInsight.intention.HighPriorityAction
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.editor.Editor
+import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Iconable
 import com.intellij.openapi.util.SystemInfo
@@ -36,7 +37,7 @@ class SendToFsiAction : SendToFsiActionBase(false, Fsi.sendLineText, Fsi.sendSel
 class DebugInFsiAction : SendToFsiActionBase(true, Fsi.debugLineText, Fsi.debugSelectionText)
 
 open class SendToFsiActionBase(private val debug: Boolean, private val sendLineText: String,
-                               private val sendSelectionText: String) : AnAction() {
+                               private val sendSelectionText: String) : AnAction(), DumbAware {
 
     override fun actionPerformed(e: AnActionEvent) {
         val editor = CommonDataKeys.EDITOR.getData(e.dataContext)!!
@@ -81,7 +82,7 @@ open class SendSelectionToFsiIntentionActionBase(debug: Boolean, private val tit
             super.isAvailable(project, editor, file) && editor!!.selectionModel.hasSelection()
 }
 
-abstract class BaseSendToFsiIntentionAction(private val debug: Boolean, private val actionId: String) : BaseElementAtCaretIntentionAction(), ShortcutProvider, Iconable {
+abstract class BaseSendToFsiIntentionAction(private val debug: Boolean, private val actionId: String) : BaseElementAtCaretIntentionAction(), ShortcutProvider, Iconable, DumbAware {
     private val isAvailable = !debug || SystemInfo.isWindows
 
     override fun getFamilyName(): String = "Send to F# Interactive"
