@@ -1,0 +1,4 @@
+﻿module Module
+
+match 1, 2 with
+| n, _{caret} -> n

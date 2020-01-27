@@ -185,6 +185,16 @@
     <QuickFix>RemoveUnnecessaryUpcastFix</QuickFix>
   </Warning>
 
+  <Error staticGroup="FSharpErrors" name="VarBoundTwice">
+    <Parameter type="INamedPat" name="pat"/>
+    <Message value="The value '{0}' is unused">
+      <Argument>pat.SourceName</Argument>
+    </Message>
+    <Range>pat.GetNavigationRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ReplaceWithWildPatFix</QuickFix>
+  </Error>
+
   <Error staticGroup="FSharpErrors" name="UndefinedName">
     <Parameter type="FSharpSymbolReference" name="reference"/> <!-- todo: change to IReference? -->
     <Parameter type="string" name="fcsMessage"/>

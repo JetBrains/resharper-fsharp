@@ -6,10 +6,16 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util.PsiUtil
 open JetBrains.ReSharper.Resources.Shell
 
-type ReplaceWithWildPatFix(warning: UnusedValueWarning) =
+type ReplaceWithWildPatFix(pat: INamedPat) =
     inherit FSharpQuickFixBase()
 
-    let pat = warning.Pat.As<IReferencePat>()
+    let pat = pat.As<IReferencePat>()
+
+    new (warning: UnusedValueWarning) =
+        ReplaceWithWildPatFix(warning.Pat)
+
+    new (error: VarBoundTwiceError) =
+        ReplaceWithWildPatFix(error.Pat)
 
     override x.Text = "Replace with '_'"
 

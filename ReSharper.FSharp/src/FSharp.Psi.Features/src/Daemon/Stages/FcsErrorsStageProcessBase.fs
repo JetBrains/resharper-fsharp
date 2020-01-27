@@ -20,6 +20,7 @@ module FSharpErrors =
     let [<Literal>] TypeEquation = 1
     let [<Literal>] UnitTypeExpected = 20
     let [<Literal>] RuleNeverMatched = 26
+    let [<Literal>] VarBoundTwice = 38
     let [<Literal>] UndefinedName = 39
     let [<Literal>] UpcastUnnecessary = 66
     let [<Literal>] TypeTestUnnecessary = 67
@@ -80,6 +81,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         match error.ErrorNumber with
         | TypeEquation when error.Message.StartsWith(ifExprMissingElseBranch, StringComparison.Ordinal) ->
             createHighlightingFromNodeWithMessage UnitTypeExpectedError range error 
+
+        | VarBoundTwice ->
+            createHighlightingFromNode VarBoundTwiceError range
 
         | UndefinedName ->
             if (error.Message = undefinedIndexerMessage &&
