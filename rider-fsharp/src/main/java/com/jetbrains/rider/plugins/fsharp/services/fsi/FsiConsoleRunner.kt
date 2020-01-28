@@ -11,6 +11,7 @@ import com.intellij.execution.process.OSProcessUtil
 import com.intellij.execution.runners.AbstractConsoleRunnerWithHistory
 import com.intellij.execution.ui.ConsoleViewContentType
 import com.intellij.execution.ui.RunContentDescriptor
+import com.intellij.execution.ui.RunContentManager
 import com.intellij.icons.AllIcons
 import com.intellij.ide.DataManager
 import com.intellij.notification.Notification
@@ -157,7 +158,7 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
             commandHistory.addEntry(CommandHistory.Entry(visibleText, fsiText))
 
             // show the window without getting focus
-            ExecutionManager.getInstance(project).contentManager.selectRunContent(contentDescriptor)
+            RunContentManager.getInstance(project).selectRunContent(contentDescriptor)
             ToolWindowManager.getInstance(project).getToolWindow(executor.id)?.show(null)
 
             val stream = processHandler.processInput ?: error("Broken Fsi stream")
