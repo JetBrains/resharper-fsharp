@@ -1,6 +1,7 @@
 [<AutoOpen; Extension>]
 module JetBrains.ReSharper.Plugins.FSharp.Util.FSharpAssemblyUtil
 
+open System.Collections.Generic
 open JetBrains.Diagnostics
 open JetBrains.Metadata.Reader.API
 open JetBrains.Metadata.Utils
@@ -43,6 +44,10 @@ let isFSharpCore (assemblyName: AssemblyNameInfo) =
     isNotNull assemblyName && AssemblyNameInfo.SimpleNameComparer.Equals(FSharpCore, assemblyName.Name)
 
 
+type FSharpSignatureDataResource =
+    { CompilationUnitName: string
+      MetadataResource: IManifestResourceDisposition }
+
 let [<Literal>] signatureInfoResourceName = "FSharpSignatureInfo."
 let [<Literal>] signatureInfoResourceNameOld = "FSharpSignatureData."
 
@@ -56,8 +61,8 @@ let internal isSignatureDataResource (manifestResource: IMetadataManifestResourc
         true
     else false
 
-[<CompiledName("GetFsharpSignatureInfos")>]
-let getFSharpSignatureInfos (psiModule: IPsiModule) =
+[<CompiledName("GetFSharpMetadataResources")>]
+let getFSharpMetadataResources (psiModule: IPsiModule) =
     match psiModule.As<IAssemblyPsiModule>() with
     | null -> null
     | assemblyPsiModule ->
@@ -71,14 +76,14 @@ let getFSharpSignatureInfos (psiModule: IPsiModule) =
     let metadataAssembly = metadataLoader.TryLoadFrom(path, JetFunc<_>.False)
     if isNull metadataAssembly then null else
 
-    let resources = metadataAssembly.GetManifestResources()
-
-    for manifestResource in resources do
+    let resources = List()
+    for manifestResource in metadataAssembly.GetManifestResources() do
         let mutable compilationUnitName = Unchecked.defaultof<_>
-        if not (isSignatureDataResource manifestResource &compilationUnitName) then () else
+        if isSignatureDataResource manifestResource &compilationUnitName then
+            let disposition = manifestResource.GetDisposition()
+            if isNotNull disposition then
+                resources.Add({ CompilationUnitName = compilationUnitName; MetadataResource = disposition })
 
-        use stream = manifestResource.GetDisposition().CreateResourceReader()
-        // todo: add metadata reading
-        ()
+    // todo: external metadata in FSharp.Core
 
-    null
+    resources.AsReadOnly()
