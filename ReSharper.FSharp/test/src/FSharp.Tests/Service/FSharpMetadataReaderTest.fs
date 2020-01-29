@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Service
+namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
@@ -11,6 +11,8 @@ open NUnit.Framework
 type FSharpMetadataReaderTest() =
     inherit BaseTestWithSingleProject()
 
+    override x.RelativeTestDataPath = "common/metadataReader"
+    
     member x.DoTest(moduleName: string) =
         x.WithSingleProject([], fun lifetime solution (project: IProject) ->
             let modules = project.GetSolution().PsiModules().GetModules()
@@ -20,3 +22,6 @@ type FSharpMetadataReaderTest() =
 
     [<Test; TestPackages("FSharp.Core")>]
     member x.FSharpCore() = x.DoTest("FSharp.Core")
+
+    [<Test; TestReferences("TypeInGlobalNamespace.dll")>]
+    member x.``Type in global namespace``() = x.DoTest("TypeInGlobalNamespace")

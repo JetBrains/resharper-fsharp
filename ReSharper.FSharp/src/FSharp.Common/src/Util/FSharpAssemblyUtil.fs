@@ -72,7 +72,7 @@ let getFSharpMetadataResources (psiModule: IPsiModule) =
 
     Assertion.Assert(isFSharpAssembly psiModule, "isFSharpAssembly psiModule")
 
-    let metadataLoader = new MetadataLoader()
+    use metadataLoader = new MetadataLoader()
     let metadataAssembly = metadataLoader.TryLoadFrom(path, JetFunc<_>.False)
     if isNull metadataAssembly then null else
 
