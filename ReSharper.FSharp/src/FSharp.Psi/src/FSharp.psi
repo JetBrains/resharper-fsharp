@@ -1406,6 +1406,9 @@ interface synType:
   funType |
   varType |
   anonType |
+  staticConstant |
+  staticConstantExpr |
+  staticConstantNamed |
   otherType;
 
 
@@ -1448,3 +1451,13 @@ anonType:
 
 otherType:
   fakeSeparator;
+
+staticConstant:
+  fakeSeparator; 
+staticConstantExpr:
+  fakeSeparator;
+
+staticConstantNamed: 
+  IDENTIFIER<IDENTIFIER, Identifier>
+  EQUALS
+  staticConstant<VALUE, Value>;

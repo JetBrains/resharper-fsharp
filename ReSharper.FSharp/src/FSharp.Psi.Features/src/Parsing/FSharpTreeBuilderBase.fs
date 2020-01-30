@@ -543,7 +543,6 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
                 x.Done(range, mark, ElementType.ANON_RECORD_FIELD)
             x.Done(range, mark, ElementType.ANON_RECORD_TYPE)
 
-        | SynType.StaticConstantNamed(synType1, synType2, _)
         | SynType.MeasureDivide(synType1, synType2, _) ->
             let mark = x.Mark(range)
             x.ProcessType(synType1)
@@ -571,10 +570,19 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
         | SynType.Var _ ->
             x.MarkAndDone(range, ElementType.VAR_TYPE)
 
+        | SynType.StaticConstantNamed (synType1, synType2, _) ->
+            let mark = x.Mark(range)
+            x.ProcessType(synType1)
+            x.ProcessType(synType2)
+            x.Done(range, mark, ElementType.STATIC_CONSTANT_NAMED)
+
         // todo: mark expressions
-        | SynType.StaticConstantExpr _
+        | SynType.StaticConstantExpr _ ->
+            let mark = x.Mark(range)
+            x.Done(range, mark, ElementType.STATIC_CONSTANT_EXPR)
+            
         | SynType.StaticConstant _ ->
-            x.MarkAndDone(range, ElementType.OTHER_TYPE)
+            x.MarkAndDone(range, ElementType.STATIC_CONSTANT)
 
         | SynType.Anon _ ->
             x.MarkAndDone(range, ElementType.ANON_TYPE)
