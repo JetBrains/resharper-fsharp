@@ -12,5 +12,11 @@ public class Class1
 
     r.Foo = 123;
     r.Bar = 123.0;
+
+    M(r);
+  }
+
+  private void M<T>(T t) where T : class, new()
+  {
   }
 }

@@ -86,6 +86,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       }
     }
 
+    public override MemberPresenceFlag GetMemberPresenceFlag() =>
+      CliMutable
+        ? base.GetMemberPresenceFlag() | MemberPresenceFlag.PUBLIC_DEFAULT_CTOR
+        : base.GetMemberPresenceFlag();
+
     public IList<ITypeOwner> Fields =>
       GetDeclaration() is IRecordDeclaration recordDeclaration
         ? recordDeclaration.GetFields()
