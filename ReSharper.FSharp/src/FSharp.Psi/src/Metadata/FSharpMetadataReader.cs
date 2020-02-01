@@ -414,7 +414,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     {
       var tag = ReadByte();
       Assertion.Assert(tag <= 1, "ReadParentRef: tag <= 1, {0}", tag);
-      var parentRef = ReadTypeRef();
+
+      if (tag == 1)
+        ReadTypeRef();
 
       return null;
     }
@@ -570,11 +572,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 
       if (tag == 1)
       {
-        ReadArray(reader =>
-          reader.ReadTuple2(
-            reader => reader.ReadOption(ReadIntFunc),
-            reader => reader.ReadOption(ReadIntFunc)));
-
+        ReadIlArrayShape();
         ReadIlType();
       }
 
@@ -604,10 +602,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       return null;
     }
 
+    private object ReadIlArrayShape()
+    {
+      return ReadArray(reader =>
+        reader.ReadTuple2(
+          reader => reader.ReadOption(ReadIntFunc),
+          reader => reader.ReadOption(ReadIntFunc)));
+    }
+
+    private object ReadIlTypes()
+    {
+      return ReadArray(ReadIlTypeFunc);
+    }
+
     private object ReadIlTypeSpec()
     {
       var typeRef = ReadIlTypeRef();
-      var substitution = ReadArray(reader => reader.ReadIlType());
+      var substitution = ReadIlTypes();
 
       return null;
     }
@@ -645,9 +656,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       }
 
       if (tag == 6)
-      {
-        throw new NotImplementedException();
-      }
+        ReadMeasureExpression();
 
       if (tag == 7)
       {
@@ -662,6 +671,36 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       {
         var anonRecord = ReadAnonRecord();
         var substitution = ReadTypes();
+      }
+
+      return null;
+    }
+
+    private object ReadMeasureExpression()
+    {
+      var tag = ReadByte();
+      Assertion.Assert(tag <= 5, "ReadMeasureExpression: tag <= 5, {0}", tag);
+
+      if (tag == 0)
+        ReadTypeRef();
+
+      if (tag == 1)
+        ReadMeasureExpression();
+
+      if (tag == 2)
+      {
+        ReadMeasureExpression();
+        ReadMeasureExpression();
+      }
+
+      if (tag == 3)
+        ReadTypeParameterRef();
+
+      if (tag == 5)
+      {
+        ReadMeasureExpression();
+        ReadPackedInt();
+        ReadPackedInt();
       }
 
       return null;
@@ -753,7 +792,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       var callingConvention = ReadCallingConvention();
       var typeParametersCount = ReadPackedInt();
       var name = ReadUniqueString();
-      var substitution = ReadArray(reader => reader.ReadIlType());
+      var substitution = ReadIlTypes();
       var returnType = ReadIlType();
 
       return enclosingTypeRef + "." + name;
@@ -899,7 +938,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       }
 
       if (tag == 3)
-        throw new NotImplementedException();
+        ReadExpression();
 
       if (tag == 4)
       {
@@ -915,7 +954,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
         var fieldIndex = ReadPackedInt();
       }
 
-      throw new NotImplementedException();
+      return null;
     }
 
     private object ReadFieldRef()
@@ -957,7 +996,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       }
 
       if (tag == 2)
-        throw new NotImplementedException();
+      {
+        ReadOperation();
+        ReadTypes();
+        ReadArray(ReadExpressionFunc);
+      }
 
       if (tag == 3)
       {
@@ -987,7 +1030,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
         ReadExpression();
         ReadType();
         ReadTypes();
-        ReadArray(reader => reader.ReadExpression());
+        ReadArray(ReadExpressionFunc);
       }
 
       if (tag == 7)
@@ -1004,7 +1047,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 
       if (tag == 9)
       {
-        throw new NotImplementedException();
+        ReadDecisionTree();
+        ReadArray(reader => reader.ReadTuple2(reader => reader.ReadValue(), ReadExpressionFunc));
+        ReadType();
       }
 
       if (tag == 10)
@@ -1039,6 +1084,252 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       }
 
       return null;
+    }
+
+    private object ReadDecisionTree()
+    {
+      var tag = ReadByte();
+      Assertion.Assert(tag <= 2, "ReadDecisionTree: tag <= 2, {0}", tag);
+
+      if (tag == 0)
+      {
+        ReadExpression();
+        ReadArray(reader => reader.DecisionTreeCase());
+        ReadOption(reader => reader.ReadDecisionTree());
+      }
+
+      if (tag == 1)
+      {
+        ReadArray(ReadExpressionFunc);
+        ReadPackedInt();
+      }
+
+      if (tag == 3)
+      {
+        ReadType();
+        ReadType();
+      }
+
+      if (tag == 4)
+      {
+        ReadPackedInt();
+        ReadType();
+      }
+
+      return null;
+    }
+
+    private object DecisionTreeCase()
+    {
+      ReadDecisionTreeDiscriminator();
+      ReadDecisionTree();
+
+      return null;
+    }
+
+    private object ReadDecisionTreeDiscriminator()
+    {
+      var tag = ReadByte();
+      Assertion.Assert(tag <= 4, "ReadDecisionTreeDiscriminator: tag <= 4, {0}", tag);
+      if (tag == 0)
+      {
+        ReadUnionCaseRef();
+        ReadTypes();
+      }
+
+      if (tag == 1)
+        ReadConst();
+
+      if (tag == 3)
+      {
+        ReadType();
+        ReadType();
+      }
+
+      if (tag == 4)
+      {
+        ReadPackedInt();
+        ReadType();
+      }
+
+      return null;
+    }
+
+    private object ReadOperation()
+    {
+      var tag = ReadByte();
+      Assertion.Assert(tag <= 32, "ReadOperation: tag <= 32, {0}", tag);
+
+      if (tag == 0)
+        ReadUnionCaseRef();
+
+      if (tag == 1 || tag == 3)
+        ReadTypeRef();
+
+      if (tag == 4 || tag == 5)
+        ReadFieldRef();
+
+      if (tag == 6)
+        ReadTypeRef();
+
+      if (tag == 7 || tag == 8)
+      {
+        ReadUnionCaseRef();
+        ReadPackedInt();
+      }
+
+      if (tag == 9 || tag == 10)
+      {
+        ReadTypeRef();
+        ReadPackedInt();
+      }
+
+      if (tag == 11)
+        ReadPackedInt();
+
+      if (tag == 12)
+      {
+        ReadArray(reader => reader.ReadIlInstruction());
+        ReadTypes();
+      }
+
+      if (tag == 14)
+        ReadUnionCaseRef();
+
+      if (tag == 16)
+        ReadMemberConstraint();
+
+      if (tag == 17)
+      {
+        var tag17 = ReadByte();
+        Assertion.Assert(tag17 <= 3, "ReadOperation: tag17 <= 3, {0}", tag17);
+        ReadValueRef();
+      }
+
+      if (tag == 18)
+      {
+        ReadBoolean();
+        ReadBoolean();
+        ReadBoolean();
+        ReadBoolean();
+        ReadValueRefFlags();
+        ReadBoolean();
+        ReadBoolean();
+        ReadIlMethodRef();
+        ReadTypes();
+        ReadTypes();
+        ReadTypes();
+      }
+
+      if (tag == 21)
+        ReadPackedInt();
+
+      if (tag == 22)
+        ReadBytes();
+
+      if (tag == 25)
+        ReadFieldRef();
+
+      if (tag == 26)
+        ReadArray(ReadIntFunc);
+
+      if (tag == 28)
+      {
+        ReadUnionCaseRef();
+        ReadPackedInt();
+      }
+
+      if (tag == 30)
+        ReadPackedInt();
+
+      if (tag == 31)
+        ReadAnonRecord();
+
+      if (tag == 32)
+      {
+        ReadAnonRecord();
+        ReadPackedInt();
+      }
+
+      return null;
+    }
+
+    private object ReadIlInstruction()
+    {
+      var tag = ReadByte();
+      Assertion.Assert(tag <= 66, "ReadIlInstruction: tag <= 66, {0}", tag);
+
+      if (tag == 1)
+        ReadPackedInt();
+
+      if (tag == 4 || tag == 24 || tag == 55)
+      {
+        ReadIlMethodRef();
+        ReadIlType();
+        ReadIlTypes();
+      }
+
+      if (tag == 20 || tag == 22 || tag == 23)
+      {
+        var basicTypeTag = ReadPackedInt();
+        Assertion.Assert(basicTypeTag <= 13, "ReadIlInstruction: basicTypeTag <= 13, {0}", basicTypeTag);
+      }
+
+      if (tag == 31 || tag == 33 | tag == 34 || tag == 36)
+      {
+        var volatilityTag = ReadPackedInt();
+        Assertion.Assert(volatilityTag <= 1, "ReadIlInstruction: volatilityTag <= 1, {0}", volatilityTag);
+        ReadIlFieldSpec();
+      }
+
+      if (tag == 32 || tag == 35)
+        ReadIlFieldSpec();
+
+      if (tag == 43 || tag == 38 || tag == 29 || tag == 61 || tag == 27 || tag == 28 || tag == 25 || tag == 37 ||
+          tag == 58 || tag == 3 || tag == 63 || tag == 65)
+        ReadIlType();
+
+      if (tag == 26)
+        ReadUniqueString();
+
+      if (tag == 39 || tag == 60 || tag == 59)
+      {
+        ReadIlArrayShape();
+        ReadIlType();
+      }
+
+      if (tag == 41)
+      {
+        var readonlyTag = ReadPackedInt();
+        Assertion.Assert(readonlyTag <= 1, "ReadIlInstruction: readonlyTag <= 1, {0}", readonlyTag);
+        ReadIlArrayShape();
+        ReadIlType();
+      }
+
+      if (tag == 62)
+      {
+        ReadPackedInt();
+        ReadPackedInt();
+      }
+
+      return null;
+    }
+
+    private object ReadIlFieldSpec()
+    {
+      var fieldRef = ReadIlFieldRef();
+      var containingType = ReadIlType();
+
+      return null;
+    }
+
+    private object ReadIlFieldRef()
+    {
+      ReadIlTypeRef();
+      var name = ReadUniqueString();
+      ReadIlType();
+
+      return name;
     }
 
     private object ReadObjectExpressionMethod()
