@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text;
 using FSharp.Compiler;
 using JetBrains.Annotations;
@@ -13,9 +16,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 {
   public class FSharpMetadataReader : BinaryReader
   {
+    private class MetadataType
+    {
+      public int Index;
+      public string Name;
+    }
+
     public FSharpMetadataReader([NotNull] Stream input, [NotNull] Encoding encoding) : base(input, encoding)
     {
     }
+
+    private readonly Stack<MetadataType> myState = new Stack<MetadataType>();
 
     private static readonly Func<FSharpMetadataReader, int> ReadIntFunc = reader => reader.ReadPackedInt();
     private static readonly Func<FSharpMetadataReader, bool> ReadBoolFunc = reader => reader.ReadBoolean();
@@ -33,6 +44,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
 
     private string[] myStrings;
     private int[][] myPublicPaths;
+
+    [Conditional("JET_MODE_ASSERT")]
+    private void CheckTagValue(int value, int maxValue, [CallerMemberName] string methodName = "") =>
+      CheckTagValue(value, maxValue, methodName, "tag");
+
+    [Conditional("JET_MODE_ASSERT")]
+    private void CheckTagValue(string tagName, int value, int maxValue, [CallerMemberName] string methodName = "") =>
+      CheckTagValue(value, maxValue, methodName, tagName);
+
+    [Conditional("JET_MODE_ASSERT")]
+    private void CheckTagValue(int value, int maxValue, string methodName, string tagName)
+    {
+      if (value > maxValue)
+        Assertion.Fail($"{methodName}: {tagName} <= {maxValue}, actual: {value}");
+    }
 
     private Tuple<T1, T2> ReadTuple2<T1, T2>(Func<FSharpMetadataReader, T1> reader1,
       Func<FSharpMetadataReader, T2> reader2)
@@ -78,7 +104,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private FSharpOption<T> ReadOption<T>(Func<FSharpMetadataReader, T> reader)
     {
       var tag = ReadByte();
-      Assertion.Assert(tag <= 1, "ReadOption: tag <= 1, {0}", tag);
+      CheckTagValue(tag, 1);
 
       if (tag == 0)
         return FSharpOption<T>.None;
@@ -173,9 +199,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private object ReadEntitySpec()
     {
       var index = ReadPackedInt();
+      myState.Push(new MetadataType {Index = index});
 
       var typeParameters = ReadArray(reader => reader.ReadTypeParameterSpec());
       var logicalName = ReadUniqueString();
+      myState.Peek().Name = logicalName;
+
       var compiledName = ReadOption(ReadUniqueStringFunc);
       var range = ReadRange();
       var publicPath = ReadOption(reader => reader.ReadPublicPath());
@@ -192,6 +221,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       var moduleType = ReadModuleType();
       var exceptionRepresentation = ReadExceptionRepresentation();
       var possibleXmlDoc = ReadPossibleXmlDoc();
+
+      myState.Pop();
 
       return null;
     }
@@ -222,7 +253,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private object ReadTypeObjectModelKind()
     {
       var tag = ReadByte();
-      Assertion.Assert(tag <= 4, "ReadTypeObjectModelKind: tag <= 4, {0}", tag);
+      CheckTagValue(tag, 4);
 
       if (tag == 3)
         ReadAbstractSlotSignature();
@@ -267,14 +298,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private object ReadModuleOrNamespaceKind()
     {
       var tag = ReadByte();
-      Assertion.Assert(tag <= 2, "tag <= 2, {0}", tag);
+      CheckTagValue(tag, 2);
       return null;
     }
 
     private object ReadIlScopeRef()
     {
       var tag = ReadByte();
-      Assertion.Assert(tag <= 2, "ReadIlScopeRef: tag <= 2, {0}", tag);
+      CheckTagValue(tag, 2);
       if (tag == 0)
         return null;
 
@@ -299,7 +330,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private object ReadIlAssemblyRef()
     {
       var tag = ReadByte();
-      Assertion.Assert(tag == 0, "ReadIlAssemblyRef: tag == 0, {0}", tag);
+      CheckTagValue(tag, 0);
 
       var name = ReadUniqueString();
       var hash = ReadOption(reader => reader.ReadBytes());
@@ -315,7 +346,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private object ReadIlPublicKey()
     {
       var tag = ReadByte();
-      Assertion.Assert(tag <= 2, "ReadIlPublicKey: tag <= 2, {0}", tag);
+      CheckTagValue(tag, 2);
       ReadBytes();
 
       return null;
@@ -405,7 +436,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       var isFinal = ReadBoolean();
 
       var tag = ReadByte();
-      Assertion.Assert(tag <= 4, "ReadByte: tag <= 4, {0}", tag);
+      CheckTagValue(tag, 4);
 
       return null;
     }
@@ -413,7 +444,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private object ReadParentRef()
     {
       var tag = ReadByte();
-      Assertion.Assert(tag <= 1, "ReadParentRef: tag <= 1, {0}", tag);
+      CheckTagValue(tag, 1);
 
       if (tag == 1)
         ReadTypeRef();
@@ -443,7 +474,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private object ReadExceptionRepresentation()
     {
       var tag = ReadByte();
-      Assertion.Assert(tag <= 3, "ReadExceptionRepresentation: tag <= 3, {0}", tag);
+      CheckTagValue(tag, 3);
+
       if (tag == 0)
         ReadTypeRef();
 
@@ -473,7 +505,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private Func<bool, object> ReadTypeRepresentation()
     {
       var tag1 = ReadByte();
-      Assertion.Assert(tag1 <= 1, "tag2 <= 1, {0}", tag1);
+      CheckTagValue(nameof(tag1), tag1, 1);
 
       if (tag1 == 0)
         return IgnoreBoolFunc;
@@ -481,7 +513,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       if (tag1 == 1)
       {
         var tag2 = ReadByte();
-        Assertion.Assert(tag2 <= 4, "tag2 <= 4, {0}", tag2);
+        CheckTagValue(nameof(tag2), tag2, 4);
         if (tag2 == 0)
         {
           ReadFieldsTable();
@@ -565,7 +597,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private object ReadIlType()
     {
       var tag = ReadByte();
-      Assertion.Assert(tag <= 8, "ReadIlType: tag <= 8, {0}", tag);
+      CheckTagValue(tag, 8);
 
       if (tag == 0)
         return null;
@@ -626,7 +658,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private object ReadType()
     {
       var tag = ReadByte();
-      Assertion.Assert(tag <= 9, "ReadType: tag <= 9, {0}", tag);
+      CheckTagValue(tag, 9);
 
       if (tag == 0)
         ReadArray(ReadTypeFunc);
@@ -679,7 +711,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private object ReadMeasureExpression()
     {
       var tag = ReadByte();
-      Assertion.Assert(tag <= 5, "ReadMeasureExpression: tag <= 5, {0}", tag);
+      CheckTagValue(tag, 5);
 
       if (tag == 0)
         ReadTypeRef();
@@ -761,7 +793,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private object ReadAttributeKind()
     {
       var tag = ReadByte();
-      Assertion.Assert(tag <= 1, "ReadAttributeKind: tag <= 1, {0}", tag);
+      CheckTagValue(tag, 1);
       if (tag == 0)
         return ReadIlMethodRef();
       if (tag == 1)
@@ -801,16 +833,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private object ReadCallingConvention()
     {
       var tag1 = ReadByte();
-      Assertion.Assert(tag1 <= 2, "ReadCallConv: tag1 <= 2, {0}", tag1);
+      CheckTagValue(nameof(tag1), tag1, 2);
       var tag2 = ReadByte();
-      Assertion.Assert(tag2 <= 5, "ReadCallConv: tag1 <= 5, {0}", tag2);
+      CheckTagValue(nameof(tag2), tag2, 5);
       return null;
     }
 
     private object ReadValueRef()
     {
       var tag = ReadByte();
-      Assertion.Assert(tag <= 1, "ReadValueRef: tag <= 1, {0}", tag);
+      CheckTagValue(tag, 1);
       if (tag == 0)
       {
         var index = ReadPackedInt();
@@ -836,7 +868,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private object ReadValueRefFlags()
     {
       var tag = ReadByte();
-      Assertion.Assert(tag <= 4, "ReadValueRefFlags: tag <= 4, {0}", tag);
+      CheckTagValue(tag, 4);
 
       if (tag == 3)
         ReadType();
@@ -847,7 +879,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private object ReadTypeRef()
     {
       var tag = ReadByte();
-      Assertion.Assert(tag <= 1, "ReadTypeRef: tag <= 1, {0}", tag);
+      CheckTagValue(tag, 1);
       var index = ReadPackedInt();
 
       return null;
@@ -879,7 +911,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private object ReadTypeParameterConstraint()
     {
       var tag = ReadByte();
-      Assertion.Assert(tag <= 12, "ReadTypeParameterConstraint: tag <= 12, {0}", tag);
+      CheckTagValue(tag, 12);
 
       if (tag == 0)
         ReadType();
@@ -920,7 +952,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private object ReadMemberConstraintSolution()
     {
       var tag = ReadByte();
-      Assertion.Assert(tag <= 5, "ReadMemberConstraintSolution: tag <= 5, {0}", tag);
+      CheckTagValue(tag, 5);
 
       if (tag == 0)
       {
@@ -979,7 +1011,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private object ReadExpression()
     {
       var tag = ReadByte();
-      Assertion.Assert(tag <= 13, "ReadExpression: tag <= 13, {0}", tag);
+      CheckTagValue(tag, 13);
 
       if (tag == 0)
       {
@@ -1089,7 +1121,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private object ReadDecisionTree()
     {
       var tag = ReadByte();
-      Assertion.Assert(tag <= 2, "ReadDecisionTree: tag <= 2, {0}", tag);
+      CheckTagValue(tag, 2);
 
       if (tag == 0)
       {
@@ -1130,7 +1162,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private object ReadDecisionTreeDiscriminator()
     {
       var tag = ReadByte();
-      Assertion.Assert(tag <= 4, "ReadDecisionTreeDiscriminator: tag <= 4, {0}", tag);
+      CheckTagValue(tag, 4);
       if (tag == 0)
       {
         ReadUnionCaseRef();
@@ -1158,7 +1190,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private object ReadOperation()
     {
       var tag = ReadByte();
-      Assertion.Assert(tag <= 32, "ReadOperation: tag <= 32, {0}", tag);
+      CheckTagValue(tag, 32);
 
       if (tag == 0)
         ReadUnionCaseRef();
@@ -1202,7 +1234,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       if (tag == 17)
       {
         var tag17 = ReadByte();
-        Assertion.Assert(tag17 <= 3, "ReadOperation: tag17 <= 3, {0}", tag17);
+        CheckTagValue(nameof(tag17), tag17, 3);
         ReadValueRef();
       }
 
@@ -1257,7 +1289,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private object ReadIlInstruction()
     {
       var tag = ReadByte();
-      Assertion.Assert(tag <= 66, "ReadIlInstruction: tag <= 66, {0}", tag);
+      CheckTagValue(tag, 66);
 
       if (tag == 1)
         ReadPackedInt();
@@ -1272,13 +1304,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       if (tag == 20 || tag == 22 || tag == 23)
       {
         var basicTypeTag = ReadPackedInt();
-        Assertion.Assert(basicTypeTag <= 13, "ReadIlInstruction: basicTypeTag <= 13, {0}", basicTypeTag);
+        CheckTagValue(nameof(basicTypeTag), basicTypeTag, 13);
       }
 
       if (tag == 31 || tag == 33 | tag == 34 || tag == 36)
       {
         var volatilityTag = ReadPackedInt();
-        Assertion.Assert(volatilityTag <= 1, "ReadIlInstruction: volatilityTag <= 1, {0}", volatilityTag);
+        CheckTagValue(nameof(volatilityTag), volatilityTag, 1);
         ReadIlFieldSpec();
       }
 
@@ -1301,7 +1333,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       if (tag == 41)
       {
         var readonlyTag = ReadPackedInt();
-        Assertion.Assert(readonlyTag <= 1, "ReadIlInstruction: readonlyTag <= 1, {0}", readonlyTag);
+        CheckTagValue(nameof(readonlyTag), readonlyTag, 1);
         ReadIlArrayShape();
         ReadIlType();
       }
@@ -1346,7 +1378,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private object ReadStaticOptimizationConstraint()
     {
       var tag = ReadByte();
-      Assertion.Assert(tag <= 1, "ReadStaticOptimizationConstraint: tag <= 1, {0}", tag);
+      CheckTagValue(tag, 1);
 
       if (tag == 0)
       {
@@ -1371,7 +1403,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private object ReadConst()
     {
       var tag = ReadByte();
-      Assertion.Assert(tag <= 17, "ReadConst: tag <= 17, {0}", tag);
+      CheckTagValue(tag, 17);
       return tag switch
       {
         0 => ReadBoolean(),
@@ -1399,7 +1431,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       // u_used_space1 u_xmldoc
 
       var tag = ReadByte();
-      Assertion.Assert(tag <= 1, "ReadPossibleXmlDoc: tag <= 1, {0}", tag);
+      CheckTagValue(tag, 1);
 
       if (tag == 0)
         return null;
@@ -1434,7 +1466,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private object ReadTypeKind()
     {
       var tag = ReadByte();
-      Assertion.Assert(tag <= 1, "ReadTypeKind: tag <= 1, {0}", tag);
+      CheckTagValue(tag, 1);
       return null;
     }
 
@@ -1463,7 +1495,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private void SkipSeparator()
     {
       var separator = ReadPackedInt();
-      Assertion.Assert(separator == 0, "SkipSeparator: separator == 0, {0}", separator);
+      CheckTagValue(nameof(separator), separator, 0);
     }
 
     private void SkipBytes(int bytes)
@@ -1471,7 +1503,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       for (var i = 0; i < bytes; i++)
       {
         var b = ReadByte();
-        Assertion.Assert(b == 0, "SkipBytes: b == 0, {0}", b);
+        CheckTagValue(nameof(b), b, 0);
       }
     }
 
