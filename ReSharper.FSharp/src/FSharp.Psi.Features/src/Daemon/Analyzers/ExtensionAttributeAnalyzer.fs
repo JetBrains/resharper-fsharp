@@ -9,8 +9,7 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2
 
 [<ElementProblemAnalyzer(typeof<IFSharpTypeElementDeclaration>,
                          HighlightingTypes = [| typeof<ExtensionMemberInNonExtensionTypeWarning>
-                                                typeof<ExtensionTypeWithNoExtensionMembersWarning>
-                                                typeof<ExtensionTypeShouldBeStaticWarning> |])>]
+                                                typeof<ExtensionTypeWithNoExtensionMembersWarning> |])>]
 type ExtensionAttributeAnalyzer() =
     inherit ElementProblemAnalyzer<IFSharpTypeElementDeclaration>()
 
@@ -36,21 +35,23 @@ type ExtensionAttributeAnalyzer() =
         | null -> ()
         | typeElement ->
 
-        let mutable foundExtensionAttr = false
-        let mayHaveExtensionAttrs = mayHaveExtensions typeElement
+        let mutable typeDeclHasExtensionAttr = false
+        let membersMayHaveExtensionAttrs = mayHaveExtensions typeElement
 
         for attr in typeDeclaration.GetAttributes() do
-            if not foundExtensionAttr && isExtension attr then
-                foundExtensionAttr <- true
+            if not typeDeclHasExtensionAttr && isExtension attr then
+                typeDeclHasExtensionAttr <- true
 
-                if not mayHaveExtensionAttrs then
+                if not membersMayHaveExtensionAttrs then
                     consumer.AddHighlighting(ExtensionTypeWithNoExtensionMembersWarning(attr))
 
-                if not (typeElement.IsAbstract && typeElement.IsSealed) then
-                    consumer.AddHighlighting(ExtensionTypeShouldBeStaticWarning(attr))
+        if not membersMayHaveExtensionAttrs then () else
 
-        if foundExtensionAttr || not mayHaveExtensionAttrs then () else
-        if typeElement.HasAttributeInstance(PredefinedType.EXTENSION_ATTRIBUTE_CLASS, false) then () else
+        let typeHasExtensionAttr =
+            typeDeclHasExtensionAttr ||
+            typeElement.HasAttributeInstance(PredefinedType.EXTENSION_ATTRIBUTE_CLASS, false)
+
+        if typeHasExtensionAttr then () else
 
         for memberDecl in typeDeclaration.MemberDeclarations do
             for attr in memberDecl.GetAttributes() do
