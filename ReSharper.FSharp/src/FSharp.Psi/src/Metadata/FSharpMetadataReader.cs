@@ -94,13 +94,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       return array;
     }
 
-    private void SkipArray(Action<FSharpMetadataReader> reader)
-    {
-      var arrayLength = ReadPackedInt();
-      for (var i = 0; i < arrayLength; i++)
-        reader(this);
-    }
-
     private FSharpOption<T> ReadOption<T>(Func<FSharpMetadataReader, T> reader)
     {
       var tag = ReadByte();
@@ -230,7 +223,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
     private object ReadUnionCaseSpec()
     {
       var fields = ReadFieldsTable();
-      ;
       var returnType = ReadType();
       var ignoredCaseCompiledName = ReadUniqueString();
       var name = ReadIdent();
@@ -282,7 +274,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       var isOptional = ReadBoolean();
       var attributes = ReadAttributes();
 
-      return null;
+      return name;
     }
 
     private object ReadCompilationPath()
@@ -1476,10 +1468,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
       var names = new string[ccuRefNamesCount];
       for (var i = 0; i < ccuRefNamesCount; i++)
       {
-        SkipSeparator();
+        var separator = ReadPackedInt();
+        CheckTagValue(nameof(separator), separator, 0);
         names[i] = ReadString();
       }
-
       return names;
     }
 
@@ -1492,12 +1484,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
         : encodedTypeDeclsNumber;
     }
 
-    private void SkipSeparator()
-    {
-      var separator = ReadPackedInt();
-      CheckTagValue(nameof(separator), separator, 0);
-    }
-
     private void SkipBytes(int bytes)
     {
       for (var i = 0; i < bytes; i++)
@@ -1505,11 +1491,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Metadata
         var b = ReadByte();
         CheckTagValue(nameof(b), b, 0);
       }
-    }
-
-    private void SkipInt()
-    {
-      ReadPackedInt();
     }
   }
 }
