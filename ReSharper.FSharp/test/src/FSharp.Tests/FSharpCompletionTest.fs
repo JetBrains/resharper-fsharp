@@ -29,4 +29,13 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Open 03 - Comment after namespace``() = x.DoNamedTest()
 
     [<TestSetting(typeof<FSharpOptions>, "TopLevelOpenCompletion", "false")>]
-    [<Test; Explicit("FCS returns wrong insertion pos")>] member x.``Open 04 - Inside module``() = x.DoNamedTest()
+    [<Test>] member x.``Open 04 - Inside module``() = x.DoNamedTest()
+
+    [<TestSetting(typeof<FSharpOptions>, "TopLevelOpenCompletion", "false")>]
+    [<Test>] member x.``Open 06 - Inside module, space``() = x.DoNamedTest()
+
+    [<Test>] member x.``Import - Anon module 01 - First line``() = x.DoNamedTest()
+    [<Test>] member x.``Import - Anon module 02 - Before open``() = x.DoNamedTest()
+    [<Test>] member x.``Import - Anon module 03 - After open``() = x.DoNamedTest()
+
+    [<Test>] member x.``Import - Sibling namespace``() = x.DoNamedTest()

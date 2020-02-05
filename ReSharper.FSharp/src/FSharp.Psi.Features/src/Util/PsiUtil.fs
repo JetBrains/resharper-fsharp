@@ -240,6 +240,17 @@ let rec skipSemicolonsAndWhiteSpacesAfter node =
     else
         node
 
+let isFollowedByEmptyLine (node: ITreeNode) =
+    let newLine =
+        node
+        |> skipMatchingNodesAfter isInlineSpaceOrComment
+        |> getThisOrNextNewLine
+
+    if isNull newLine then false else
+
+    let afterWhitespace = newLine |> skipMatchingNodesAfter isInlineSpace
+    afterWhitespace != newLine && afterWhitespace :? NewLine
+
 
 [<AutoOpen>]
 module PsiModificationUtil =
@@ -255,6 +266,13 @@ module PsiModificationUtil =
     let deleteChildRange first last =
         ModificationUtil.DeleteChildRange(first, last)
 
+    let addNodesAfter anchor (nodes: ITreeNode list) =
+        nodes |> List.fold (fun anchor treeNode ->
+            ModificationUtil.AddChildAfter(anchor, treeNode)) anchor
+
+    let addNodesBefore anchor (nodes: ITreeNode list) =
+        nodes |> List.rev |> List.fold (fun anchor treeNode ->
+            ModificationUtil.AddChildBefore(anchor, treeNode)) anchor
 
 let getPrevNodeOfType nodeType (node: ITreeNode) =
     let mutable prev = node.PrevSibling

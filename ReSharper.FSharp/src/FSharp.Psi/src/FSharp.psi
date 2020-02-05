@@ -63,6 +63,8 @@ fSharpSigFile options { stubBase="FSharpFileBase"; }:
 
 // Modules and namespaces
 
+// todo: rewrite to make anon module top level module interface
+
 interface moduleLikeDeclaration:
   anonModuleDeclaration
   declaredModuleLikeDeclaration;
@@ -791,7 +793,7 @@ nestedModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; }
   REC<REC, RecKeyword>?
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   fSharpIdentifier<IDENTIFIER, Identifier>
-  EQUALS
+  EQUALS<FSHARP_EQUALS, EqualsToken>
   moduleMember<MODULE_MEMBER, Members>*;
 
 typeExtensionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {

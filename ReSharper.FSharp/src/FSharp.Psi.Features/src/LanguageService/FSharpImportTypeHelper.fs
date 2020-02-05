@@ -1,7 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 
 open System.Collections.Generic
-open JetBrains.Application.Threading
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Intentions.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -64,14 +63,10 @@ type FSharpImportTypeHelper() =
 type FSharpQuickFixUtilComponent() =
     interface IQuickFixUtilComponent with
         member x.BindTo(reference, typeElement, _, _) =
-            // todo: fix addOpen
             let reference = reference :?> FSharpSymbolReference
             let context = reference.GetElement()
             let fsFile = context.FSharpFile
-
-            let sourceFile = fsFile.GetSourceFile()
-            let document = fsFile.GetSourceFile().Document
-            let coords = document.GetCoordsByOffset(reference.GetTreeTextRange().StartOffset.Offset)
+            let settings = fsFile.GetSettingsStore()
 
             let moduleToOpen = getModuleToOpen typeElement
 
@@ -81,10 +76,7 @@ type FSharpQuickFixUtilComponent() =
 
             if nameToOpen.IsNullOrEmpty() then reference :> _ else
 
-            // todo: rewrite addOpen to change psi instead
-            sourceFile.GetSolution().Locks.QueueReadLock("Hack for import during psi transaction", fun _ ->
-                addOpen coords fsFile null nameToOpen)
-
+            addOpen (context.GetDocumentStartOffset()) fsFile settings nameToOpen
             reference :> _
 
         member x.AddImportsForExtensionMethod(reference, _) = reference

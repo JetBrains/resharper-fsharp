@@ -11,6 +11,9 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Transactions
+open JetBrains.ReSharper.Resources.Shell
 open JetBrains.UI.RichText
 open JetBrains.Util
 
@@ -52,7 +55,14 @@ type FSharpLookupItem(item: FSharpDeclarationListItem, context: FSharpCodeComple
     let mutable candidates = Unchecked.defaultof<_>
 
     let addOpen ns =
-        addOpen context.Coords context.FSharpFile context.BasicContext.ContextBoundSettingsStore ns
+        let offset = context.Ranges.InsertRange.StartOffset
+        let fsFile = context.BasicContext.SourceFile.FSharpFile
+        let psiServices = fsFile.GetPsiServices()
+
+        use writeCookie = WriteLockCookie.Create(fsFile.IsPhysical())
+        use transactionCookie = PsiTransactionCookie.CreateAutoCommitCookieWithCachesUpdate(psiServices, "Add open")
+
+        addOpen offset fsFile context.BasicContext.ContextBoundSettingsStore ns
 
     member x.Candidates =
         match box candidates with
@@ -87,12 +97,16 @@ type FSharpLookupItem(item: FSharpDeclarationListItem, context: FSharpCodeComple
 
     override x.DisableFormatter = true
 
-    override x.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret) =
-        base.Accept(textControl, nameRange, insertType, suffix, solution, keepCaret)
+    override x.OnAfterComplete(textControl, nameRange, decorationRange, tailType, suffix, caretPositionRangeMarker) =
+        base.OnAfterComplete(textControl, &nameRange, &decorationRange, tailType, &suffix, &caretPositionRangeMarker)
 
         match item.NamespaceToOpen with
         | None -> ()
-        | Some namespaceToOpen -> addOpen namespaceToOpen
+        | Some namespaceToOpen ->
+
+        let solution = context.BasicContext.Solution
+        solution.GetPsiServices().Files.CommitAllDocuments()    
+        addOpen namespaceToOpen
 
     override x.GetDisplayName() =
         let name = LookupUtil.FormatLookupString(item.Name, x.TextColor)

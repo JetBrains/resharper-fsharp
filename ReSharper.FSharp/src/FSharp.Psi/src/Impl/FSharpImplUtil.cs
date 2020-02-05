@@ -721,5 +721,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         ? ModuleMembersAccessKind.AutoOpen
         : ModuleMembersAccessKind.Normal;
     }
+
+    [CanBeNull]
+    public static IReferenceName GetFirstQualifier([NotNull] this IReferenceName referenceName)
+    {
+      var qualifier = referenceName.Qualifier;
+      while (qualifier != null)
+      {
+        referenceName = qualifier;
+        qualifier = referenceName.Qualifier;
+      }
+
+      return referenceName;
+    }
+
+    public static IReferenceName GetFirstName([NotNull] this IReferenceName referenceName)
+    {
+      var firstQualifier = referenceName.GetFirstQualifier();
+      return firstQualifier ?? referenceName;
+    }
   }
 }

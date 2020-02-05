@@ -1,21 +1,16 @@
 [<AutoOpen>]
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Util.OpensUtil
 
-open System
-open FSharp.Compiler.SourceCodeServices
-open FSharp.Compiler.SourceCodeServices.ParsedInput
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
-open JetBrains.ReSharper.Psi.Util
-open JetBrains.Util
-open JetBrains.Util.Text
 
 let rec getModuleToOpen (typeElement: ITypeElement): IClrDeclaredElement =
     match typeElement.GetContainingType() with
@@ -28,55 +23,98 @@ let rec getModuleToOpen (typeElement: ITypeElement): IClrDeclaredElement =
         else
             getModuleToOpen containingType
 
+let findModuleToInsert (fsFile: IFSharpFile) (offset: DocumentOffset) (settings: IContextBoundSettingsStore) =
+    if not (settings.GetValue(fun key -> key.TopLevelOpenCompletion)) then
+        fsFile.GetNode<IModuleLikeDeclaration>(offset)
+    else
+        match fsFile.GetNode<ITopLevelModuleLikeDeclaration>(offset) with
+        | null -> fsFile.GetNode<IAnonModuleDeclaration>(offset) :> _
+        | moduleDecl -> moduleDecl :> _
 
-let addOpen (coords: DocumentCoords) (fsFile: IFSharpFile) (settings: IContextBoundSettingsStore) (ns: string) =
-    match fsFile.ParseTree with
-    | None -> failwith "isNotNull ParseTree"
-    | Some parseTree ->
+let tryGetFirstOpensGroup (moduleDecl: IModuleLikeDeclaration) =
+    let opens =
+        moduleDecl.MembersEnumerable
+        |> Seq.takeWhile (fun m -> m :? IOpenStatement)
+        |> Seq.cast<IOpenStatement>
+        |> List.ofSeq
 
-    let line = int coords.Line + 1
-    let document = fsFile.GetSourceFile().Document
+    if opens.IsEmpty then None else Some opens
 
-    let insertionPoint =
-        // todo: remove this check 
-        if isNull settings || settings.GetValue(fun key -> key.TopLevelOpenCompletion) then TopLevel else Nearest
+let isSystemNs ns =
+    ns = "System" || startsWith "System." ns
 
-    let insertContext = findNearestPointToInsertOpenDeclaration line parseTree [||] insertionPoint
-    let pos = adjustInsertionPoint (docLine >> document.GetLineText) insertContext
+let canInsertBefore ns (openStatement: IOpenStatement) =
+    if isSystemNs ns && not openStatement.IsSystem then true else
 
-    let isSystem = ns.StartsWith("System.", StringComparison.Ordinal) || ns = "System"
-    let openPrefix = String(' ', pos.Column) + "open "
-    let textToInsert = openPrefix + ns
+    ns < openStatement.ReferenceName.QualifiedName
 
-    let line = pos.Line - 1 |> max 0
-    let lineToInsert =
-        seq { line - 1 .. -1 .. 0 }
-        |> Seq.takeWhile (fun i ->
-            let lineText = document.GetLineText(docLine i)
-            lineText.StartsWith(openPrefix) &&
-            (textToInsert < lineText || isSystem && not (lineText.StartsWith("open System"))))
-        |> Seq.tryLast
-        |> Option.defaultValue line
+let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBoundSettingsStore) (ns: string) =
+    let elementFactory = fsFile.CreateElementFactory()
+    let lineEnding = fsFile.GetLineEnding()
 
-    // if this is the first open statement, add a new line before
-    let insertEmptyLineBefore =
-        if line > 0 then
-            let lineText = document.GetLineText(docLine (line - 1))
-            not (lineText.StartsWith(openPrefix) || lineText.Trim().Length = 0)
+    let insertBeforeModuleMember (moduleMember: IModuleMember) =
+        let indent = moduleMember.Indent
+        addNodesBefore moduleMember [
+            // todo: add only if needed
+            // Add space before new opens group.
+            if not (moduleMember :? IOpenStatement) then
+                NewLine(lineEnding)
+
+            if indent > 0 then
+                Whitespace(indent)
+            elementFactory.CreateOpenStatement(ns)
+            NewLine(lineEnding)
+
+            // Add space after new opens group.
+            if not (moduleMember :? IOpenStatement) && not (isFollowedByEmptyLine moduleMember) then
+                NewLine(lineEnding)
+        ] |> ignore
+
+    let insertAfterAnchor (anchor: ITreeNode) indent =
+        addNodesAfter anchor [
+            if not (anchor :? IOpenStatement) then
+                NewLine(lineEnding)
+            NewLine(lineEnding)
+            if indent > 0 then
+                Whitespace(indent)
+            elementFactory.CreateOpenStatement(ns)
+            if not (anchor :? IOpenStatement) && not (isFollowedByEmptyLine anchor) then
+                NewLine(lineEnding)
+        ] |> ignore
+
+    let rec addOpenToOpensGroup (opens: IOpenStatement list) =
+        match opens with
+        | [] -> failwith "Expecting non-empty list"
+        | openStatement :: rest ->
+
+        if canInsertBefore ns openStatement then
+            insertBeforeModuleMember openStatement
         else
-            false
+            match rest with
+            | [] -> insertAfterAnchor openStatement openStatement.Indent
+            | _ -> addOpenToOpensGroup rest
 
-    // add empty line after all open expressions if needed
-    let insertEmptyLineAfter = not (document.GetLineText(docLine line).IsNullOrWhitespace())
+    let moduleDecl = findModuleToInsert fsFile offset settings
+    match tryGetFirstOpensGroup moduleDecl with
+    | Some opens -> addOpenToOpensGroup opens
+    | _ ->
 
-    let prevLineEndOffset =
-        if lineToInsert > 0 then document.GetLineEndOffsetWithLineBreak(docLine (max 0 (lineToInsert - 1)))
-        else 0
+    match Seq.tryHead moduleDecl.MembersEnumerable with
+    | None -> failwith "Expecting any module member"
+    | Some firstModuleMember ->
 
-    let newLineText = document.GetPsiSourceFile(fsFile.GetSolution()).DetectLineEnding().GetPresentation()
+    match moduleDecl with
+    | :? IAnonModuleDeclaration ->
+        // Skip all leading comments and add a new opens group before the first existing member.
+        insertBeforeModuleMember firstModuleMember
+    | _ ->
 
-    let prefix = if insertEmptyLineBefore then newLineText else ""
-    let postfix = if insertEmptyLineAfter then newLineText else ""
+    let indent = firstModuleMember.Indent
 
-    document.InsertText(prevLineEndOffset, prefix + textToInsert + newLineText + postfix)
+    let anchor =
+        match moduleDecl with
+        | :? INestedModuleDeclaration as nestedModule -> nestedModule.EqualsToken :> ITreeNode
+        | :? ITopLevelModuleLikeDeclaration as moduleDecl -> moduleDecl.NameIdentifier :> _
+        | _ -> failwithf "Unexpected module: %O" moduleDecl
 
+    insertAfterAnchor anchor indent
