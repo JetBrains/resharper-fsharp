@@ -8,15 +8,16 @@ module Module1 =
     type T1() =
         class end
 
-    [<Extension; AbstractClass; Sealed>]
-    type T2() =
-        class end
-
     [<Extension>]
+    type T2() =
+        [<Extension>]
+        static member Foo(_: int) = ()
+
     type T3() =
         [<Extension>]
-        member x.Foo(_: int) = ()
+        static member Foo(_: int) = ()
 
+    [<Extension>]
     type T4() =
         [<Extension>]
         member x.Foo(_: int) = ()

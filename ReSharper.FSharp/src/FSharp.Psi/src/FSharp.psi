@@ -1136,6 +1136,8 @@ memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } 
   get { methodName="Attributes" path=<memberDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
+  STATIC<STATIC, StaticKeyword>?
+  MEMBER<MEMBER, MemberKeyword>
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   memberSelfId<SELF_ID, SelfId>?
   identOrOpName{IDENTIFIER, Identifier}

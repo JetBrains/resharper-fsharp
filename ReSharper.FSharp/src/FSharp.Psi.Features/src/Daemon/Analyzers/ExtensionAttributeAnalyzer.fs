@@ -45,15 +45,19 @@ type ExtensionAttributeAnalyzer() =
                 if not membersMayHaveExtensionAttrs then
                     consumer.AddHighlighting(ExtensionTypeWithNoExtensionMembersWarning(attr))
 
-        if not membersMayHaveExtensionAttrs then () else
+        if not typeDeclHasExtensionAttr && not membersMayHaveExtensionAttrs then () else
 
         let typeHasExtensionAttr =
             typeDeclHasExtensionAttr ||
             typeElement.HasAttributeInstance(PredefinedType.EXTENSION_ATTRIBUTE_CLASS, false)
 
-        if typeHasExtensionAttr then () else
-
         for memberDecl in typeDeclaration.MemberDeclarations do
             for attr in memberDecl.GetAttributes() do
-                if isExtension attr then
+                if not (isExtension attr) then () else
+
+                if not typeHasExtensionAttr then
                     consumer.AddHighlighting(ExtensionMemberInNonExtensionTypeWarning(attr))
+
+                let memberDeclaration = memberDecl.As<IMemberDeclaration>()
+                if isNotNull memberDeclaration && not memberDeclaration.IsStatic then
+                    consumer.AddHighlighting(ExtensionMemberShouldBeStaticWarning(attr))

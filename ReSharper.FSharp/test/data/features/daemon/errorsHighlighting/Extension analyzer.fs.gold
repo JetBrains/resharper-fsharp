@@ -8,15 +8,16 @@ module Module1 =
     type T1() =
         class end
 
-    [<|Extension|(2); AbstractClass; Sealed>]
+    [<Extension>]
     type T2() =
-        class end
+        [<Extension>]
+        static member Foo(_: int) = ()
+
+    type T3() =
+        [<|Extension|(2)>]
+        static member Foo(_: int) = ()
 
     [<Extension>]
-    type T3() =
-        [<Extension>]
-        member x.Foo(_: int) = ()
-
     type T4() =
         [<|Extension|(3)>]
         member x.Foo(_: int) = ()
@@ -32,6 +33,6 @@ module Module3 =
 ---------------------------------------------------------
 (0): ReSharper Dead Code: Extension type doesn't have any extension members
 (1): ReSharper Dead Code: Extension type doesn't have any extension members
-(2): ReSharper Dead Code: Extension type doesn't have any extension members
-(3): ReSharper Warning: Extension member in non-extension type looks suspicious
+(2): ReSharper Warning: Extension member in non-extension type looks suspicious
+(3): ReSharper Warning: Extension member should be static
 (4): ReSharper Warning: Extension member in non-extension type looks suspicious

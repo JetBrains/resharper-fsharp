@@ -164,11 +164,11 @@
     <Message value="Extension type doesn't have any extension members"/>
   </Warning>
 
-  <Warning staticGroup="FSharpErrors" name="ExtensionTypeShouldBeStatic">
+  <Warning staticGroup="FSharpErrors" name="ExtensionMemberShouldBeStatic">
     <Parameter type="IAttribute" name="attr"/>
     <Range>attr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
-    <Message value="Extension type should be a static class or a module"/>
+    <Message value="Extension member should be static"/>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="RedundantBackticks">
