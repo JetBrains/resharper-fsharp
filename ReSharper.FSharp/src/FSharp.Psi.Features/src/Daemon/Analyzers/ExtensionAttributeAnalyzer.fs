@@ -9,7 +9,8 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2
 
 [<ElementProblemAnalyzer(typeof<IFSharpTypeElementDeclaration>,
                          HighlightingTypes = [| typeof<ExtensionMemberInNonExtensionTypeWarning>
-                                                typeof<ExtensionTypeWithNoExtensionMembersWarning> |])>]
+                                                typeof<ExtensionTypeWithNoExtensionMembersWarning>
+                                                typeof<ExtensionMemberShouldBeStaticWarning> |])>]
 type ExtensionAttributeAnalyzer() =
     inherit ElementProblemAnalyzer<IFSharpTypeElementDeclaration>()
 
