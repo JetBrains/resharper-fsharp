@@ -1,0 +1,6 @@
+module Module
+
+let f =
+    function
+    | _ -> ()
+    |{caret} deleted -> ()

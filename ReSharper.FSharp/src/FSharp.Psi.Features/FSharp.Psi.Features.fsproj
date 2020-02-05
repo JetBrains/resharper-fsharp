@@ -117,6 +117,7 @@
     <Compile Include="src\QuickFixes\ConvertToUseFix.fs" />
     <Compile Include="src\QuickFixes\ToUpcastFix.fs" />
     <Compile Include="src\QuickFixes\IntroduceVarFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveNeverMatchingRuleFix.fs" />
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />
     <Compile Include="src\PostfixTemplates\NotTemplate.fs" />
     <Compile Include="src\PostfixTemplates\LetPostfixTemplate.fs" />

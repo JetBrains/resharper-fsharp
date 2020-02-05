@@ -41,6 +41,7 @@
     <Message value="This rule will never be matched"/>
     <Range>matchClause.GetHighlightingRange()</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
+    <QuickFix>RemoveNeverMatchingRuleFix</QuickFix>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="UnusedThisVariable">
