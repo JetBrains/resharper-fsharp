@@ -188,7 +188,7 @@
 
   <Error staticGroup="FSharpErrors" name="VarBoundTwice">
     <Parameter type="INamedPat" name="pat"/>
-    <Message value="The value '{0}' is unused">
+    <Message value="'{0}' is bound multiple times">
       <Argument>pat.SourceName</Argument>
     </Message>
     <Range>pat.GetNavigationRange()</Range>
