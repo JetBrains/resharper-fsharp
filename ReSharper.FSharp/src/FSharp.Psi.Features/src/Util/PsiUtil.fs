@@ -305,13 +305,19 @@ let isValid (node: ITreeNode) =
 
 
 [<Language(typeof<FSharpLanguage>)>]
-type FSharpExpressionSelectionProviderBase() =
-    inherit ExpressionSelectionProviderBase<IFSharpTreeNode>()
+type FSharpExpressionSelectionProvider() =
+    inherit ExpressionSelectionProviderBase<ISynExpr>()
 
     override x.IsTokenSkipped(token) =
         // todo: also ;; ?
         getTokenType token == FSharpTokenType.SEMICOLON ||
         base.IsTokenSkipped(token)
+
+
+type FSharpTreeNodeSelectionProvider() =
+    inherit ExpressionSelectionProviderBase<IFSharpTreeNode>()
+
+    static member val Instance = FSharpTreeNodeSelectionProvider()
 
 
 let shouldEraseSemicolon (node: ITreeNode) =

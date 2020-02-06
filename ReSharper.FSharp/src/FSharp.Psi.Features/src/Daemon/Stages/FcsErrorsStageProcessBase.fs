@@ -5,7 +5,6 @@ open System.Collections.Generic
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.ReSharper.Feature.Services.ExpressionSelection
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -48,6 +47,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
     let document = daemonProcess.Document
+    let nodeSelectionProvider = FSharpTreeNodeSelectionProvider.Instance
 
     let getDocumentRange (error: FSharpErrorInfo) =
         if error.StartLineAlternate = 0 || error.ErrorNumber = ModuleOrNamespaceRequired then
@@ -63,17 +63,17 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | _ -> ErrorHighlighting(error.Message, range) :> _
 
     let createHighlightingFromNode highlightingCtor range: IHighlighting =
-        match ExpressionSelectionUtil.GetExpressionInRange(fsFile, range, false, null) with
+        match nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) with
         | null -> null
         | expr -> highlightingCtor expr :> _
 
     let createHighlightingFromParentNode highlightingCtor range: IHighlighting =
-        match ExpressionSelectionUtil.GetExpressionInRange(fsFile, range, false, null) with
+        match nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) with
         | null -> null
         | node -> highlightingCtor (node.GetContainingNode()) :> _
     
     let createHighlightingFromNodeWithMessage highlightingCtor range (error: FSharpErrorInfo): IHighlighting =
-        let expr = ExpressionSelectionUtil.GetExpressionInRange(fsFile, range, false, null)
+        let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
         if isNotNull expr then highlightingCtor (expr, error.Message) :> _ else
         null
 
