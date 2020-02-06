@@ -19,7 +19,7 @@ module FSharpHighlightingAttributeIds =
     let [<Literal>] EscapeCharacter1 = "ReSharper F# Escape Character 1"
     let [<Literal>] EscapeCharacter2 = "ReSharper F# Escape Character 2"
 
-    let [<Literal>] PreprocessorKeyword = "ReSharper F# Preprocessor Keyword" // todo: add setting
+    let [<Literal>] PreprocessorKeyword = "ReSharper F# Preprocessor Keyword"
     let [<Literal>] PreprocessorInactiveBranch = "ReSharper F# Preprocessor Inactive Branch"
 
     let [<Literal>] Namespace = "ReSharper F# Namespace Identifier"
@@ -137,6 +137,15 @@ type FSharpSettingsNamesProvider() =
           Layer = FSharpHighlightingAttributeIds.LayerSyntaxPlusOne,
           VSPriority = FSharpHighlightingAttributeIds.VsPriorityPlusOne,
           EffectType = EffectType.TEXT, ForegroundColor = "#FF66B2", DarkForegroundColor = "#FF8D1C");
+
+  assembly:
+    RegisterHighlighter(
+      FSharpHighlightingAttributeIds.PreprocessorKeyword,
+      FallbackAttributeId = DefaultLanguageAttributeIds.PREPROCESSOR_KEYWORD,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Preprocessor//Keyword",
+      Layer = HighlighterLayer.SYNTAX,
+      EffectType = EffectType.TEXT, ForegroundColor = "#0000E0", DarkForegroundColor = "#569CD6");
 
   assembly:
       RegisterHighlighter(
