@@ -84,5 +84,73 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
       myOpened = true;
     }
+
+    public override int GetTextLength()
+    {
+      lock (mySyncObject)
+      {
+        return base.GetTextLength();
+      }
+    }
+
+    public override StringBuilder GetText(StringBuilder to)
+    {
+      lock (mySyncObject)
+      {
+        return base.GetText(to);
+      }
+    }
+
+    public override IBuffer GetTextAsBuffer()
+    {
+      lock (mySyncObject)
+      {
+        return base.GetTextAsBuffer();
+      }
+    }
+
+    protected override TreeElement DeepClone(TreeNodeCopyContext context)
+    {
+      lock (mySyncObject)
+      {
+        return base.DeepClone(context);
+      }
+    }
+
+
+    public override IChameleonNode FindChameleonWhichCoversRange(TreeTextRange textRange)
+    {
+      lock (mySyncObject)
+      {
+        if (textRange.ContainedIn(TreeTextRange.FromLength(GetTextLength())))
+        {
+          if (!myOpened)
+            return this;
+
+          return base.FindChameleonWhichCoversRange(textRange) ?? this;
+        }
+      }
+
+      return null;
+    }
+
+    public override ITreeNode FindNodeAt(TreeTextRange treeRange)
+    {
+      if (treeRange.IntersectsOrContacts(TreeTextRange.FromLength(GetTextLength())))
+      {
+        return base.FindNodeAt(treeRange);
+      }
+
+      return null;
+    }
+
+    public override void FindNodesAtInternal(TreeTextRange relativeRange, List<ITreeNode> result,
+      bool includeContainingNodes)
+    {
+      if (relativeRange.ContainedIn(TreeTextRange.FromLength(GetTextLength())))
+      {
+        base.FindNodesAtInternal(relativeRange, result, includeContainingNodes);
+      }
+    }
   }
 }
