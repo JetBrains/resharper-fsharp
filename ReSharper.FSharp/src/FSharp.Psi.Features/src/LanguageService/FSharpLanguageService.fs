@@ -19,6 +19,7 @@ open JetBrains.ReSharper.Psi.CSharp.Impl
 open JetBrains.ReSharper.Psi.Impl
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Parsing
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
 [<Language(typeof<FSharpLanguage>)>]
@@ -60,11 +61,13 @@ type FSharpLanguageService
     override x.FindTypeDeclarations(_) = EmptyList.Instance :> _
 
     override x.CanContainCachableDeclarations(node) =
-        // workaround for object expressions
-        // todo: add API providing additional cachable nodes inside chameleons
-        true
-//        not (node :? IExpression) || node :? IObjExpr
+        not (node :? IExpression || node :? IChameleonExpression) || node :? IObjExpr
 
+    override x.GetAdditionalCachableDeclarations(file) =
+        let fsFile = file.As<IFSharpFile>()
+        let sourceFile = fsFile.GetSourceFile()
+        FSharpCacheDeclarationProcessor.GetObjectExpressions(fsFile, sourceFile) |> Seq.cast
+    
     override x.CalcOffset(declaration) =
         match declaration with
         | :? IAsPat as asPat -> asPat.Identifier.GetTreeStartOffset()

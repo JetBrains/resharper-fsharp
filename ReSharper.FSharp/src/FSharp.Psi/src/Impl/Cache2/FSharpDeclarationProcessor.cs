@@ -1,14 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
+using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Plugins.FSharp.Checker;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
@@ -44,12 +48,47 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       foreach (var declaration in fsFile.ModuleDeclarations)
         declaration.Accept(this);
 
-      // todo: process only needed nodes
-      fsFile.ProcessDescendants(new RecursiveElementProcessor(treeNode =>
+      foreach (var objExpr in GetObjectExpressions(fsFile, sourceFile))
+        objExpr.Accept(this);
+    }
+
+    public static IEnumerable<IObjExpr> GetObjectExpressions(IFSharpFile fsFile, IPsiSourceFile sourceFile)
+    {
+      var tokens = fsFile.CachingLexer.TokenBuffer.CachedTokens;
+      if (tokens == null)
+        return EmptyList<IObjExpr>.Instance;
+
+      var document = sourceFile.Document;
+      var objExprs = new List<IObjExpr>();
+
+      var seenLBrace = false;
+      for (var i = 0; i < tokens.Count; i++)
       {
-        if (treeNode is IObjExpr objExpr)
-          VisitObjExpr(objExpr);
-      }));
+        var token = tokens[i];
+        var tokenType = token.Type;
+        Assertion.Assert(tokenType != null, "tokenType != null");
+        if (tokenType.IsFiltered)
+          continue;
+
+        if (tokenType == FSharpTokenType.LBRACE)
+        {
+          seenLBrace = true;
+          continue;
+        }
+
+        if (seenLBrace && tokenType == FSharpTokenType.NEW)
+        {
+          var offset = new DocumentOffset(document, token.Start);
+          var tokenAt = fsFile.FindTokenAt(offset);
+          var objExpr = tokenAt?.GetContainingNode<IObjExpr>();
+          if (objExpr != null)
+            objExprs.Add(objExpr);
+        }
+
+        seenLBrace = false;
+      }
+
+      return objExprs;
     }
 
     public void ProcessQualifiableModuleLikeDeclaration(IQualifiableModuleLikeDeclaration decl, Part part)
