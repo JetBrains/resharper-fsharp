@@ -1,10 +1,14 @@
+using System.Collections.Generic;
+using System.Text;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
+using JetBrains.ReSharper.Psi.Impl;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.Text;
 using static FSharp.Compiler.Ast;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
