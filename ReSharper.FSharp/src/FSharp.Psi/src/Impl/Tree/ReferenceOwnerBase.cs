@@ -8,6 +8,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     private FSharpSymbolReference myReference;
 
+    protected override void PreInit()
+    {
+      base.PreInit();
+      myReference = null;
+    }
+
     public FSharpSymbolReference Reference
     {
       get
