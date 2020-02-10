@@ -12,6 +12,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Finder
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
 [<Language(typeof<FSharpLanguage>)>]
@@ -76,6 +77,7 @@ type FSharpQuickFixUtilComponent() =
 
             if nameToOpen.IsNullOrEmpty() then reference :> _ else
 
+            use writeCookie = WriteLockCookie.Create(context.IsPhysical())
             addOpen (context.GetDocumentStartOffset()) fsFile settings nameToOpen
             reference :> _
 

@@ -43,10 +43,13 @@ let tryGetFirstOpensGroup (moduleDecl: IModuleLikeDeclaration) =
 let isSystemNs ns =
     ns = "System" || startsWith "System." ns
 
-let canInsertBefore ns (openStatement: IOpenStatement) =
-    if isSystemNs ns && not openStatement.IsSystem then true else
-
-    ns < openStatement.ReferenceName.QualifiedName
+let canInsertBefore (openStatement: IOpenStatement) ns =
+    if isSystemNs ns then
+        not openStatement.IsSystem ||
+        ns < openStatement.ReferenceName.QualifiedName
+    else
+        not openStatement.IsSystem &&
+        ns < openStatement.ReferenceName.QualifiedName
 
 let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBoundSettingsStore) (ns: string) =
     let elementFactory = fsFile.CreateElementFactory()
@@ -87,7 +90,7 @@ let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBo
         | [] -> failwith "Expecting non-empty list"
         | openStatement :: rest ->
 
-        if canInsertBefore ns openStatement then
+        if canInsertBefore openStatement ns then
             insertBeforeModuleMember openStatement
         else
             match rest with

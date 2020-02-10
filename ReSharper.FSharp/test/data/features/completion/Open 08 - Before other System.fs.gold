@@ -1,0 +1,10 @@
+﻿// ${COMPLETE_ITEM:IDisposable (in System)}
+namespace SomeNamespace
+
+open System
+open System.IO
+
+module Module =
+
+    let foo () =
+        IDisposable{caret}
