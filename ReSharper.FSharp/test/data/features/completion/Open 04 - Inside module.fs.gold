@@ -1,9 +1,9 @@
-// ${COMPLETE_ITEM:IDisposable (in System)}
+﻿// ${COMPLETE_ITEM:IDisposable (in System)}
 namespace SomeNamespace
 
 module Module =
 
-    open System
+  open System
 
-    let foo () =
+  let foo () =
         IDisposable{caret}

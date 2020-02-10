@@ -33,7 +33,6 @@ type RemoveUnusedOpensFix(warning: UnusedOpenWarning) =
                 let last =
                     openStatement
                     |> skipSemicolonsAndWhiteSpacesAfter
-                    |> getThisOrNextNewLine
 
                 deleteChildRange first last
 

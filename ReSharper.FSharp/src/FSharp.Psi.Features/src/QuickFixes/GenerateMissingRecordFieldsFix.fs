@@ -16,6 +16,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util.PsiUtil
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
@@ -104,16 +105,18 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
             | :? IRecordExprBinding -> anchor.Indent
             | _ -> anchor.Indent + 1
 
+        // todo: rewrite using only ModificationUtil when code formatter rules are ready
         for name in fieldsToAdd do
             if anchor :? IRecordExprBinding then
                 if generateSingleLine then
                     anchor <- ModificationUtil.AddChildAfter(anchor, Whitespace())
                 else
-                    anchor <- ModificationUtil.AddChildAfter(anchor, NewLine(lineEnding))
-                    anchor <- ModificationUtil.AddChildAfter(anchor, Whitespace(indent))
+                    LowLevelModificationUtil.AddChildAfter(anchor, NewLine(lineEnding), Whitespace(indent))
+                    anchor <- anchor.NextSibling.NextSibling
 
             let binding = elementFactory.CreateRecordExprBinding(name, generateSingleLine)
-            anchor <- ModificationUtil.AddChildAfter(anchor, binding)
+            LowLevelModificationUtil.AddChildAfter(anchor, binding)
+            anchor <- anchor.NextSibling
             generatedBindings.Add(anchor :?> _)
 
         let lastBinding = generatedBindings.Last()

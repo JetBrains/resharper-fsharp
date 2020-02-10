@@ -1,7 +1,7 @@
 ﻿//${NEW_NAME:Zzz}
 module Module
 
-let (    |  Zzz  |    _ | ) x =
+let (    | Zzz |    _ | ) x =
     if x then Some () else None
 
 match true with

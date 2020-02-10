@@ -5,6 +5,7 @@ open JetBrains.ReSharper.Feature.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
 
@@ -40,14 +41,15 @@ type ToMultilineRecord(dataProvider: FSharpContextActionDataProvider) =
         let firstBinding = bindings.[0]
         let indent = firstBinding.Indent
 
+        // todo: rewrite using ModificationUtil when code formatter rules are ready
         for binding in bindings do
             if binding != firstBinding then
-                let newLine =
-                    match binding.PrevSibling with
-                    | Whitespace node -> ModificationUtil.ReplaceChild(node, NewLine(lineEnding))
-                    | node -> ModificationUtil.AddChildAfter(node, NewLine(lineEnding))
+                let newLine = NewLine(lineEnding)
+                match binding.PrevSibling with
+                | Whitespace node -> LowLevelModificationUtil.ReplaceChildRange(node, node, newLine)
+                | node -> LowLevelModificationUtil.AddChildAfter(node, newLine)
 
-                ModificationUtil.AddChildAfter(newLine, Whitespace(indent)) |> ignore
+                LowLevelModificationUtil.AddChildAfter(newLine, Whitespace(indent))
 
             match binding.Semicolon with
             | null -> ()

@@ -1,5 +1,5 @@
 ﻿module Module
 
 let x =
-    1 |> ignore{caret}
-    ()
+  1 |> ignore{caret}
+  ()

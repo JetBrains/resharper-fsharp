@@ -6,7 +6,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
-open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
@@ -39,7 +38,8 @@ type ToModuleNamespaceDeclarationAction(dataProvider: FSharpContextActionDataPro
 
         let tokenType, nodeType = getNewNodeTypes moduleDeclaration
         replaceWithToken moduleDeclaration.ModuleOrNamespaceKeyword tokenType
-        let upcastExpr = ModificationUtil.ReplaceChild(moduleDeclaration, nodeType.Create())
-        LowLevelModificationUtil.AddChild(upcastExpr, moduleDeclaration.Children().AsArray())
+        let newDeclaration = nodeType.Create()
+        LowLevelModificationUtil.ReplaceChildRange(moduleDeclaration, moduleDeclaration, newDeclaration)
+        LowLevelModificationUtil.AddChild(newDeclaration, moduleDeclaration.Children().AsArray())
 
         null

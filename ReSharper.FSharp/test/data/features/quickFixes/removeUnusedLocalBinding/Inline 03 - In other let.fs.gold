@@ -1,4 +1,4 @@
 ﻿module Module
 
 let _ =
-    {caret}()
+  {caret}()

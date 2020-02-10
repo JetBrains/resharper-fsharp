@@ -1,4 +1,4 @@
 ﻿module Module
 do
     for _ in [] do
-        {caret}()
+      {caret}()

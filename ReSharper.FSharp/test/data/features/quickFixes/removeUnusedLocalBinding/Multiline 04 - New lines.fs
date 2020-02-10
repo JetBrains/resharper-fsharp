@@ -1,5 +1,5 @@
 module Module
 do
-    let x{caret} = ()
+  let x{caret} = ()
 
-    ()
+  ()

@@ -1,7 +1,7 @@
 ﻿module Module
 
 let a =
-    lazy{caret}
-        1
-    |> ignore
-    ()
+  lazy{caret}
+    1
+  |> ignore
+  ()

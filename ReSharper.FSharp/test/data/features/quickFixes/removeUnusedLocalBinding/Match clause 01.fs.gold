@@ -2,4 +2,4 @@
 do
     match () with
     | _ ->
-        {caret}()
+      {caret}()

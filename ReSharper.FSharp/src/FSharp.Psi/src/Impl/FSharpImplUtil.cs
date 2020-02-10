@@ -509,22 +509,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
       name = NamingManager.GetNamingLanguageService(fsIdentifier.Language).MangleNameIfNecessary(name);
       using (WriteLockCookie.Create(fsIdentifier.IsPhysical()))
-        LowLevelModificationUtil.ReplaceChildRange(token, token, new FSharpIdentifierToken(name));
+        ModificationUtil.ReplaceChild(token, new FSharpIdentifierToken(name));
     }
 
     public static void AddModifierTokenAfter([NotNull] this ITreeNode anchor, [NotNull] TokenNodeType tokenType)
     {
-      using var _ = WriteLockCookie.Create(anchor.NotNull().IsPhysical());
-      anchor =
-        anchor.NextSibling is Whitespace space
-          ? ModificationUtil.ReplaceChild(space, new Whitespace())
-          : ModificationUtil.AddChildAfter(anchor, new Whitespace());
-
-      var addSpaceAfter = anchor.NextSibling?.GetTokenType() != FSharpTokenType.NEW_LINE;
-
-      anchor = ModificationUtil.AddChildAfter(anchor, tokenType.CreateLeafElement());
-      if (addSpaceAfter)
-        ModificationUtil.AddChildAfter(anchor, new Whitespace());
+      using (WriteLockCookie.Create(anchor.NotNull().IsPhysical()))
+        ModificationUtil.AddChildAfter(anchor, tokenType.CreateLeafElement());
     }
 
     public static IList<ITypeElement> ToTypeElements(this IList<IClrTypeName> names, IPsiModule psiModule)

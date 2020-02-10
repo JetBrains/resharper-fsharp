@@ -2,7 +2,7 @@
 module Module
 
 type T() =
-    let (    | Zzz  | ) x =
+    let (    | Zzz | ) x =
         not x
 
     let f (Zzz x) =

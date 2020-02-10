@@ -19,9 +19,8 @@ type RemoveUnusedLocalBindingTest() =
     [<Test>] member x.``Multiline 02 - Wrong seq``() = x.DoNamedTest()
     [<Test>] member x.``Multiline 03 - Wrong seq in seq``() = x.DoNamedTest()
     [<Test>] member x.``Multiline 04 - New lines``() = x.DoNamedTest()
-    [<Test>] member x.``Multiline 05``() = x.DoNamedTest()
-    [<Test>] member x.``Multiline 06 - Nested pattern``() = x.DoNamedTest()
-    [<Test>] member x.``Multiline 07 - In other let``() = x.DoNamedTest()
+    [<Test>] member x.``Multiline 05 - Nested pattern``() = x.DoNamedTest()
+    [<Test>] member x.``Multiline 06 - In other let``() = x.DoNamedTest()
 
     [<Test>] member x.``Multiple 01``() = x.DoNamedTest()
     [<Test>] member x.``Multiple 02 - Space``() = x.DoNamedTest()

@@ -3,7 +3,7 @@ namespace SomeNamespace
 
 module Module =
 
-    open System
+  open System
 
-    let foo () =
+  let foo () =
         IDisposable{caret}

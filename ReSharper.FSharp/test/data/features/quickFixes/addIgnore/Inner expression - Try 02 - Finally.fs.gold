@@ -2,5 +2,5 @@
 module Module
 
 try
-    123 |> ignore
+  123 |> ignore
 finally (){caret}
