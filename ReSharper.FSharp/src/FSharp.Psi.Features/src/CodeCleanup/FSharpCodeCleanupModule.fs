@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
+namespace JetBrains.ReSharper.Plugins.FSharp.Services.CodeCleanup
 
 open FSharp.Compiler.Text
 open Fantomas
@@ -10,6 +10,7 @@ open JetBrains.ReSharper.Feature.Services.CSharp.CodeCleanup
 open JetBrains.ReSharper.Feature.Services.CodeCleanup
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
@@ -20,7 +21,7 @@ open JetBrains.Util
 open JetBrains.Util.Text
 
 [<CodeCleanupModule>]
-type FSharpReformatCode() =
+type FSharpCodeCleanupModule() =
     interface ICodeCleanupModule with
         member x.LanguageType = FSharpLanguage.Instance :> _
         member x.Descriptors = EmptyList.Instance :> _

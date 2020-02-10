@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
@@ -70,7 +70,7 @@
     <Compile Include="src\Search\FSharpGeneratedElementsSearch.fs" />
     <Compile Include="src\Search\RecordCtorSearch.fs" />
     <Compile Include="src\ExtendSelection\FSharpExtendSelectionProvider.fs" />
-    <Compile Include="src\Formatter\FSharpReformatCode.fs" />
+    <Compile Include="src\CodeCleanup\FSharpCodeCleanupModule.fs" />
     <Compile Include="src\Fsi\FsiOptions.fs" />
     <Compile Include="src\Fsi\FsiDetector.fs" />
     <Compile Include="src\Fsi\FsiHost.fs" />

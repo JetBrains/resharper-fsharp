@@ -543,10 +543,9 @@ private forEachInClause{ROLE, Getter}:
 
 arrayOrListOfSeqExpr options { stubBase="FSharpExpressionBase"; }:
   (LBRACK
-   synExpr<EXPR, Expression>
-   RBRACK) |
-
-   (LBRACK_BAR
+    synExpr<EXPR, Expression>
+    RBRACK) |
+  (LBRACK_BAR
     synExpr<EXPR, Expression>
     BAR_RBRACK);
 
@@ -1145,7 +1144,7 @@ memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } 
   (
     memberParamDeclarationGroup<PARAM_GROUP, ParameterGroups>*
     EQUALS
-    chameleonExpression
+    chameleonExpression<CHAMELEON_EXPR, ChameleonExpr>
   |
     WITH
     accessorDeclaration

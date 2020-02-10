@@ -4,8 +4,8 @@ open System.IO
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.FeaturesTestFramework.TypingAssist
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.TypingAssist
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.TypingAssist
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.CachingLexers

@@ -1,79 +1,14 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
+namespace JetBrains.ReSharper.Plugins.FSharp.Services.CodeStyle
 
 open System
 open System.Linq.Expressions
 open JetBrains.Application.Components
-open JetBrains.Application.Settings
 open JetBrains.Application.UI.Options
 open JetBrains.ReSharper.Feature.Services.OptionPages.CodeStyle
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.CodeStyle
-open JetBrains.ReSharper.Psi.EditorConfig
-open JetBrains.ReSharper.Psi.Impl.CodeStyle
-open JetBrains.ReSharper.Psi.Format
-open JetBrains.ReSharper.Psi.Util
+open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Resources.Resources.Icons
-
-[<SettingsKey(typeof<CodeFormattingSettingsKey>, "Code formatting in F#"); EditorConfigKey("fsharp")>]
-type FSharpFormatSettingsKey() =
-    inherit FormatSettingsKeyBase()
-
-    [<SettingsEntry(false, "Reorder open declarations"); DefaultValue>]
-    val mutable ReorderOpenDeclarations: bool
-    
-    [<SettingsEntry(false, "Semicolon at end of line"); DefaultValue>]
-    val mutable SemicolonAtEndOfLine: bool
-    
-    [<SettingsEntry(true, "Space before argument"); DefaultValue>]
-    val mutable SpaceBeforeArgument: bool
-    
-    [<SettingsEntry(false, "Space before colon"); DefaultValue>]
-    val mutable SpaceBeforeColon: bool
-    
-    [<SettingsEntry(true, "Space after comma"); DefaultValue>]
-    val mutable SpaceAfterComma: bool
-    
-    [<SettingsEntry(true, "Space after semicolon"); DefaultValue>]
-    val mutable SpaceAfterSemicolon: bool
-    
-    [<SettingsEntry(false, "Indent on try with"); DefaultValue>]
-    val mutable IndentOnTryWith: bool
-    
-    [<SettingsEntry(true, "Space around delimiter"); DefaultValue>]
-    val mutable SpaceAroundDelimiter: bool
-
-    [<SettingsEntry(true, "Keep newline after"); DefaultValue>]
-    val mutable PreserveEndOfLine: bool
-
-    [<SettingsEntry(true, "Don't indent comments started at first column"); DefaultValue>]
-    val mutable StickComment: bool
-
-
-[<Language(typeof<FSharpLanguage>)>]
-type FSharpDummyCodeFormatter(fsLanguage: FSharpLanguage, formatterRequirements) =
-    inherit CodeFormatterBase<FSharpFormatSettingsKey>(fsLanguage, formatterRequirements)
-
-    override x.Format(first,last,_,_) = TreeRange(first, last) :> _
-    override x.FormatFile(_,_,_) = ()
-    override x.CanModifyInsideNodeRange(_,_,_) = false
-    override x.CanModifyNode(_,_) = false
-
-    override x.GetMinimalSeparator(_,_) = InvalidOperationException() |> raise
-    override x.GetMinimalSeparatorByNodeTypes(_,_) = InvalidOperationException() |> raise
-    override x.CreateNewLine(_,_) = InvalidOperationException() |> raise
-    override x.CreateSpace(_,_) = InvalidOperationException() |> raise
-    override x.FormatInsertedNodes(_,_,_) = ()
-    override x.FormatInsertedRange(_,_,_) = InvalidOperationException() |> raise 
-    override x.FormatReplacedRange(_,_,_) = ()
-    override x.FormatDeletedNodes(_,_,_) = ()
-    override x.FormatReplacedNode(_,_) = ()
-    
-    override x.CreateFormatterContext(profile, firstNode, lastNode, parameters, _) =
-        let logger = formatterRequirements.FormatterLoggerProvider.FormatterLogger
-        CodeFormattingContext(x, firstNode, lastNode, profile, logger, parameters)
-
 
 [<CodePreviewPreparatorComponent>]
 type FSharpCodePreviewPreparator() = 
