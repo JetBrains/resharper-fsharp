@@ -21,4 +21,3 @@ type RemoveUnexpectedArgumentsTest() =
     [<Test>] member x.``Function 5 - several errors in single line 3``() = x.DoNamedTest()
     [<Test>] member x.``Property 1 - simple``() = x.DoNamedTest()
     [<Test>] member x.``Expression 1 - simple``() = x.DoNamedTest()
-    

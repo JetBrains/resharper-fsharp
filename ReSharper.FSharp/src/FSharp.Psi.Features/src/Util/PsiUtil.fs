@@ -342,7 +342,7 @@ let shiftExpr shift (expr: ISynExpr) =
         else
             ModificationUtil.AddChildAfter(child, Whitespace(shift)) |> ignore
             
-let inspectUnexpectedArgs (visitorAction: IPrefixAppExpr -> unit) (notAFunctionNode: ITreeNode) =
+let inspectPrefixAppsWhereExpressionIsMainFunction (visitorAction: IPrefixAppExpr -> unit) (notAFunctionNode: ITreeNode) =
     let rec inspectRootPrefixAppNode (expr: ITreeNode) =
         match expr.Parent with
         | null -> ()

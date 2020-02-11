@@ -8,13 +8,9 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
 type RemoveUnexpectedArgumentsFix(warning: NotAFunctionError) =
     inherit FSharpQuickFixBase()
-    
-    let removeUnexpectedArgumentsWithWhitespaces (prefixApp: IPrefixAppExpr) =
-        let firstToDelete = getFirstMatchingNodeBefore (fun x -> x.IsWhitespaceToken()) prefixApp.LastChild
-        let lastToDelete = getLastMatchingNodeAfter (fun x -> x.IsWhitespaceToken()) prefixApp.LastChild
-        deleteChildRange firstToDelete lastToDelete
         
     let notAFunctionExpr = warning.NotAFunctionExpr
+    let unexpectedArgs = warning.UnexpectedArgs
     
     override x.Text = "Remove unexpected arguments"
 
@@ -23,4 +19,7 @@ type RemoveUnexpectedArgumentsFix(warning: NotAFunctionError) =
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(notAFunctionExpr.IsPhysical())     
-        inspectUnexpectedArgs removeUnexpectedArgumentsWithWhitespaces notAFunctionExpr
+        for arg in unexpectedArgs do
+            let firstToDelete = getFirstMatchingNodeBefore (fun x -> x.IsWhitespaceToken()) arg
+            let lastToDelete = getLastMatchingNodeAfter (fun x -> x.IsWhitespaceToken()) arg
+            deleteChildRange firstToDelete lastToDelete

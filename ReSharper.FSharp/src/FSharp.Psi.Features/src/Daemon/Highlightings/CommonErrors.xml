@@ -252,12 +252,19 @@
 
   <Error staticGroup="FSharpErrors" name="NotAFunction">
     <Parameter type="ISynExpr" name="notAFunctionExpr"/>
-    <Parameter type="ISynExpr" name="unexpectedArg"/>
+    <Parameter type="ISynExpr seq" name="unexpectedArgs"/>
     <Parameter type="string" name="message"/>
     <Message value="{0}">
       <Argument>message</Argument>
     </Message>
-    <Range>unexpectedArg.GetHighlightingRange()</Range>
+    <IsValid>
+      <![CDATA[
+         (isNull notAFunctionExpr || notAFunctionExpr.IsValid()) && 
+         unexpectedArgs |> Seq.forall (fun x -> x = null || x.IsValid())
+      ]]>
+    </IsValid>
+    <Range>(Seq.head unexpectedArgs).GetHighlightingRange()</Range>
+    <SecondaryRanges>unexpectedArgs |> Seq.skip 1 |> Seq.map (fun x -> x.GetHighlightingRange())</SecondaryRanges>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>RemoveUnexpectedArgumentsFix</QuickFix>
   </Error>
