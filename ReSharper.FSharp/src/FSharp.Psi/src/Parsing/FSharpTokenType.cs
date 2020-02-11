@@ -224,6 +224,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
       Identifiers = new NodeTypeSet(
         IDENTIFIER,
         SYMBOLIC_OP,
+        AMP_AMP,
         GREATER,
         LESS);
 

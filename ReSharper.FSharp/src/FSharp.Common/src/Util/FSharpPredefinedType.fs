@@ -59,6 +59,18 @@ let equalityComparerTypeName = clrTypeName "System.Collections.IEqualityComparer
 [<CompiledName("OperatorsModuleTypeName")>]
 let operatorsModuleTypeName = clrTypeName "Microsoft.FSharp.Core.Operators"
 
+[<CompiledName("LanguagePrimitivesModuleTypeName")>]
+let languagePrimitivesModuleTypeName = clrTypeName "Microsoft.FSharp.Core.LanguagePrimitives"
+
+[<CompiledName("IntrinsicTypeName")>]
+let intrinsicOperatorsTypeName = clrTypeName "Microsoft.FSharp.Core.LanguagePrimitives+IntrinsicOperators"
+
+let predefinedFunctionTypes =
+    [| "not", operatorsModuleTypeName
+       "||", intrinsicOperatorsTypeName
+       "&&", intrinsicOperatorsTypeName |]
+    |> dict
+
 
 /// This map is used in Find Usages to get source name of element without having FSharpSymbol element.
 /// It should be removed when it's possible to get abbreviation definitions from assemblies.

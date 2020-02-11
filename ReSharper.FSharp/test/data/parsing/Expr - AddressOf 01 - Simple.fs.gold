@@ -11,7 +11,7 @@ IFSharpImplFile
     IDo
       IChameleonExpression
         IAddressOfExpr
-          FSharpTokenType+AmpAmpTokenElement(type:AMP_AMP, text:&&)
+          FSharpIdentifierToken(type:AMP_AMP, text:&&)
           IReferenceExpr
             FSharpIdentifierToken(type:IDENTIFIER, text:x)
 

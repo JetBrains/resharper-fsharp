@@ -13,7 +13,7 @@ type ToRecursiveModuleAction(dataProvider: FSharpContextActionDataProvider) =
         let moduleDeclaration = dataProvider.GetSelectedElement<IDeclaredModuleLikeDeclaration>()
         if isNull moduleDeclaration || moduleDeclaration.IsRecursive then false else
 
-        isAtModuleDeclaration dataProvider moduleDeclaration
+        isAtModuleDeclarationKeyword dataProvider moduleDeclaration
 
     override x.ExecutePsiTransaction(_, _) =
         let moduleLikeDeclaration = dataProvider.GetSelectedElement<IDeclaredModuleLikeDeclaration>()

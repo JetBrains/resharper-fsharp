@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -65,6 +66,11 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             shiftExpr indentSize newExpr
         letBindings
 
+    let createParenExpr (expr: ISynExpr) =
+        let parenExpr = getExpression "(())" :?> IParenExpr
+        ModificationUtil.ReplaceChild(parenExpr.InnerExpression, expr.Copy()) |> ignore
+        parenExpr
+    
     interface IFSharpElementFactory with
         member x.CreateOpenStatement(ns) =
             // todo: mangle ns
@@ -114,10 +120,11 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             | null -> failwith "Could not get record expr"
             | recordExpr -> recordExpr.ExprBindings.First()
 
-        member x.CreateAppExpr(funcName, expr) =
+        member x.CreateAppExpr(funcName, argExpr) =
             let source = sprintf "%s ()" funcName
             let newExpr = getExpression source :?> IAppExpr
-            ModificationUtil.ReplaceChild(newExpr.ArgumentExpression, expr) |> ignore
+            let argExpr = if not (needsParens argExpr) then argExpr.Copy() else createParenExpr argExpr :> _
+            newExpr.SetArgumentExpression(argExpr) |> ignore
             newExpr
 
         member x.CreateAppExpr(addSpace) =
@@ -168,6 +175,9 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         member x.CreateParenExpr() =
             getExpression "(())" :?> _
 
+        member x.CreateParenExpr(expr) =
+            createParenExpr expr
+
         member x.AsReferenceExpr(typeReference: ITypeReferenceName) =
             getExpression (typeReference.GetText()) :?> _
 
@@ -187,3 +197,17 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             ModificationUtil.AddChildBefore(whitespace, NewLine(expr.GetLineEnding())) |> ignore
 
             forExpr
+
+        member x.CreateExpr(text) =
+            getExpression text
+
+        member x.CreateBinaryAppExpr(text, arg1, arg2) =
+            let source = "() " + text + " ()"
+            let expr = getExpression source
+            let appExpr = expr.As<IPrefixAppExpr>()
+            ModificationUtil.ReplaceChild(appExpr.ArgumentExpression, arg2) |> ignore
+            
+            let infixApp = appExpr.FunctionExpression.As<IInfixAppExpr>()
+            ModificationUtil.ReplaceChild(infixApp.ArgumentExpression, arg1) |> ignore
+
+            expr

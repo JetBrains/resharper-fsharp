@@ -8,13 +8,18 @@ open JetBrains.ReSharper.Psi.Modules
 type IFSharpElementFactory =
     abstract CreateOpenStatement: ns: string -> IOpenStatement
     abstract CreateWildPat: unit -> IWildPat
+
     abstract CreateParenExpr: unit -> IParenExpr
+    abstract CreateParenExpr: ISynExpr -> IParenExpr
+
     abstract CreateConstExpr: text: string -> IConstExpr
 
     abstract CreateAppExpr: addSpace: bool -> IAppExpr
     abstract CreateAppExpr: funcName: string * arg: ISynExpr -> IAppExpr
     abstract CreateAppExpr: funExpr: ISynExpr * argExpr: ISynExpr * addSpace: bool -> IAppExpr
+    abstract CreateBinaryAppExpr: string * left: ISynExpr * right: ISynExpr -> ISynExpr
 
+    abstract CreateExpr: string -> ISynExpr
     abstract CreateReferenceExpr: string -> ISynExpr
     
     abstract CreateLetBindingExpr: bindingName: string -> ILetOrUseExpr

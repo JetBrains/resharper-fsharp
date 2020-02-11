@@ -1,0 +1,3 @@
+﻿let foo = true
+
+if{caret} (not foo) then "b" else "a"

@@ -1,0 +1,4 @@
+﻿let a = true
+let b = true
+
+if{caret} not a || not b then "b" else "a"

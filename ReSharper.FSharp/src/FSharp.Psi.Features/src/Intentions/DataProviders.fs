@@ -18,7 +18,7 @@ type FSharpContextActionDataBuilder() =
         FSharpContextActionDataProvider(solution, textControl, fsFile) :> _
 
 
-let isAtModuleDeclaration (dataProvider: IContextActionDataProvider) (declaration: IDeclaredModuleLikeDeclaration) =
+let isAtModuleDeclarationKeyword (dataProvider: IContextActionDataProvider) (declaration: IDeclaredModuleLikeDeclaration) =
     if isNull declaration then false else
 
     let moduleToken = declaration.ModuleOrNamespaceKeyword
@@ -30,5 +30,23 @@ let isAtModuleDeclaration (dataProvider: IContextActionDataProvider) (declaratio
     | :? IGlobalNamespaceDeclaration as globalNs -> ranges.Then(globalNs.GlobalKeyword)
     | _ -> ranges.Then(declaration.NameIdentifier)
     |> ignore
+
+    ranges.Contains(dataProvider.SelectedTreeRange)
+
+let isAtIfExprKeyword (dataProvider: IContextActionDataProvider) (ifExpr: IIfThenElseExpr) =
+    if isNull ifExpr then false else
+
+    let ifKeyword = ifExpr.IfKeyword
+    if isNull ifKeyword then false else
+
+    let thenKeyword = ifExpr.ThenKeyword
+    if isNull thenKeyword then false else
+
+    let ranges = DisjointedTreeTextRange.From(ifKeyword)
+    ranges.Then(thenKeyword) |> ignore
+
+    let elseKeyword = ifExpr.ElseKeyword
+    if isNotNull elseKeyword then
+        ranges.Then(elseKeyword) |> ignore
 
     ranges.Contains(dataProvider.SelectedTreeRange)

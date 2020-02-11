@@ -29,7 +29,7 @@ type ToModuleNamespaceDeclarationAction(dataProvider: FSharpContextActionDataPro
 
     override x.IsAvailable _ =
         let moduleDeclaration = dataProvider.GetSelectedElement<IQualifiableModuleLikeDeclaration>()
-        if not (isAtModuleDeclaration dataProvider moduleDeclaration) then false else
+        if not (isAtModuleDeclarationKeyword dataProvider moduleDeclaration) then false else
 
         true
 

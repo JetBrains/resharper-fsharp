@@ -101,7 +101,6 @@
         <Token name="RQUOTE_TYPED" representation="@>" />
         
         <Token name="AMP" representation="&amp;" />
-        <Token name="AMP_AMP" representation="&amp;&amp;" />
         <Token name="BAR" representation="|" />
         <Token name="BAR_BAR" representation="||" />
         <Token name="STAR" representation="*" />
@@ -153,6 +152,8 @@
     <Tokens NodeType="FSharpTokenNodeType">
         <Token name="IDENTIFIER" />
         <Token name="SYMBOLIC_OP" />
+        <!-- todo: Add fixed identifier tokens -->
+        <Token name="AMP_AMP" />
         <Token name="BAD_SYMBOLIC_OP" />
         <Token name="SHEBANG" />
         <Token name="HASH" />
