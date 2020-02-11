@@ -15,13 +15,14 @@ type InvertIfTest() =
     [<Test>] member x.``Literal 02 - False``() = x.DoNamedTest()
 
     [<Test>] member x.``Reference 01``() = x.DoNamedTest()
-    [<Test>] member x.``Reference 02 - Qualified``() = x.DoNamedTest()
-    [<Test>] member x.``Reference 03 - Parens``() = x.DoNamedTest()
+    [<Test>] member x.``Reference 02 - Parens``() = x.DoNamedTest()
+    [<Test>] member x.``Reference 03 - Qualified``() = x.DoNamedTest()
+    [<Test>] member x.``Reference 04 - Qualified with method``() = x.DoNamedTest()
+
+    [<Test>] member x.``App - Not 01``() = x.DoNamedTest()
 
     [<Test>] member x.``App 01``() = x.DoNamedTest()
     [<Test>] member x.``App 02 - Parens``() = x.DoNamedTest()
     [<Test>] member x.``App 03 - Inside other expr``() = x.DoNamedTest()
-
-    [<Test>] member x.``App - Not 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Logic operators 01``() = x.DoNamedTest()

@@ -6,9 +6,15 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 
-let needsParens (expr: ISynExpr) =
+let rec needsParens (expr: ISynExpr) =
     match expr with
-    | :? IReferenceExpr | :? IIndexerExpr 
+    | :? IReferenceExpr as refExpr ->
+        let qualifier = refExpr.Qualifier
+        isNotNull qualifier && needsParens qualifier
+
+    | :? IIndexerExpr as indexerExpr ->
+        needsParens indexerExpr.Expression
+
     | :? IParenExpr | :? IQuoteExpr
     | :? IConstExpr | :? INullExpr
     | :? IRecordExpr | :? IAnonRecdExpr
