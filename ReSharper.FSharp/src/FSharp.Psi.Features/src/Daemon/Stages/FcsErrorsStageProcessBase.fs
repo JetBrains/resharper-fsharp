@@ -173,15 +173,14 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             if x.ShouldAddDiagnostic(error, range) then
                 let highlighting =
                     match createHighlighting error range with
-                        | null -> createGenericHighlighting error range
-                        | :? IHighlightingWithSecondaryRanges as highlighting ->
-                            for range in highlighting.CalculateSecondaryRanges() do
-                                highlightings.Add(HighlightingInfo(range, highlighting))
-                            highlighting :> _   
-                        | highlighting -> highlighting
+                    | null -> createGenericHighlighting error range
+                    | :? IHighlightingWithSecondaryRanges as highlighting ->
+                        for range in highlighting.CalculateSecondaryRanges() do
+                            highlightings.Add(HighlightingInfo(range, highlighting))
+                        highlighting :> _   
+                    | highlighting -> highlighting
 
                 highlightings.Add(HighlightingInfo(highlighting.CalculateRange(), highlighting))
-                
             x.SeldomInterruptChecker.CheckForInterrupt()
 
         committer.Invoke(DaemonStageResult(highlightings))
