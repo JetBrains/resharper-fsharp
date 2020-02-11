@@ -47,7 +47,6 @@ module FSharpErrors =
     let [<Literal>] unexpectedArgument = "Unexpected argument"
     let [<Literal>] unexpectedArguments = "Unexpected arguments"
 
-
 [<AbstractClass>]
 type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)

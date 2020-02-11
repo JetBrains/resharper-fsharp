@@ -342,14 +342,15 @@ let shiftExpr shift (expr: ISynExpr) =
         else
             ModificationUtil.AddChildAfter(child, Whitespace(shift)) |> ignore
             
-let inspectPrefixAppsWhereExpressionIsMainFunction (visitorAction: IPrefixAppExpr -> unit) (notAFunctionNode: ITreeNode) =
-    let rec inspectRootPrefixAppNode (expr: ITreeNode) =
+let inspectPrefixAppsWhereExpressionIsMainFunction (visitorAction: IPrefixAppExpr -> unit)
+                                                   (notAFunctionNode: ITreeNode) =
+    let rec inspectPrefixAppsRec (expr: ITreeNode) =
         match expr.Parent with
         | null -> ()
         | :? IInfixAppExpr -> ()
         | :? IPrefixAppExpr as x when x.FirstChild <> expr -> ()
         | :? IPrefixAppExpr as x -> visitorAction(x)
-                                    inspectRootPrefixAppNode x
-        | x -> inspectRootPrefixAppNode x
+                                    inspectPrefixAppsRec x
+        | x -> inspectPrefixAppsRec x
         
-    inspectRootPrefixAppNode notAFunctionNode
+    inspectPrefixAppsRec notAFunctionNode
