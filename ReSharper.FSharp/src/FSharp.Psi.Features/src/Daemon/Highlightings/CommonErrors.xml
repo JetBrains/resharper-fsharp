@@ -264,7 +264,13 @@
       ]]>
     </IsValid>
     <Range>(Seq.head unexpectedArgs).GetHighlightingRange()</Range>
-    <SecondaryRanges>unexpectedArgs |> Seq.skip 1 |> Seq.map (fun x -> x.GetHighlightingRange())</SecondaryRanges>
+    <SecondaryRanges>
+      <![CDATA[
+           match unexpectedArgs |> Seq.tryItem 2 with
+           | Some(_) -> unexpectedArgs |> Seq.skip 1 |> Seq.map (fun x -> x.GetHighlightingRange())
+           | None -> Seq.empty
+      ]]>
+    </SecondaryRanges>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>RemoveUnexpectedArgumentsFix</QuickFix>
   </Error>

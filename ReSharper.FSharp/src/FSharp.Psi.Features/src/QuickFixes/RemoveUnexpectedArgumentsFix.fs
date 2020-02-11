@@ -18,7 +18,7 @@ type RemoveUnexpectedArgumentsFix(warning: NotAFunctionError) =
         isValid notAFunctionExpr && not (notAFunctionExpr :? ILiteralExpr)
 
     override x.ExecutePsiTransaction _ =
-        use writeCookie = WriteLockCookie.Create(notAFunctionExpr.IsPhysical())     
+        use writeCookie = WriteLockCookie.Create(notAFunctionExpr.IsPhysical())
         for arg in unexpectedArgs do
             let firstToDelete = getFirstMatchingNodeBefore (fun x -> x.IsWhitespaceToken()) arg
             let lastToDelete = getLastMatchingNodeAfter (fun x -> x.IsWhitespaceToken()) arg

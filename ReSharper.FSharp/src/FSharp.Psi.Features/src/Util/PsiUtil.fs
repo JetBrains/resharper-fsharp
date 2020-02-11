@@ -152,12 +152,15 @@ let isFiltered (node: ITreeNode) =
 
 let isSemicolon (node: ITreeNode) =
     getTokenType node == FSharpTokenType.SEMICOLON
+    
+let isFirstChild (node: ITreeNode) =
+    let parent = getParent node
+    isNotNull parent && parent.FirstChild == node
 
 let isLastChild (node: ITreeNode) =
     let parent = getParent node
     isNotNull parent && parent.LastChild == node
-
-
+    
 let skipMatchingNodesAfter predicate (node: ITreeNode): ITreeNode =
     let nextSibling = node.NextSibling
     if isNull nextSibling then node else
@@ -345,10 +348,10 @@ let shiftExpr shift (expr: ISynExpr) =
 let inspectPrefixAppsWhereExpressionIsMainFunction (visitorAction: IPrefixAppExpr -> unit)
                                                    (notAFunctionNode: ITreeNode) =
     let rec inspectPrefixAppsRec (expr: ITreeNode) =
-        match expr.Parent with
+        match getParent expr with
         | null -> ()
         | :? IInfixAppExpr -> ()
-        | :? IPrefixAppExpr as x when x.FirstChild <> expr -> ()
+        | :? IPrefixAppExpr when not <| isFirstChild expr -> ()
         | :? IPrefixAppExpr as x -> visitorAction(x)
                                     inspectPrefixAppsRec x
         | x -> inspectPrefixAppsRec x
