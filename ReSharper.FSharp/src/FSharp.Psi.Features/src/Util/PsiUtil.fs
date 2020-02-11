@@ -341,3 +341,15 @@ let shiftExpr shift (expr: ISynExpr) =
             ModificationUtil.ReplaceChild(nextSibling, Whitespace(length)) |> ignore
         else
             ModificationUtil.AddChildAfter(child, Whitespace(shift)) |> ignore
+            
+let inspectUnexpectedArgs (visitorAction: IPrefixAppExpr -> unit) (notAFunctionNode: ITreeNode) =
+    let rec inspectRootPrefixAppNode (expr: ITreeNode) =
+        match expr.Parent with
+        | null -> ()
+        | :? IInfixAppExpr -> ()
+        | :? IPrefixAppExpr as x when x.FirstChild <> expr -> ()
+        | :? IPrefixAppExpr as x -> visitorAction(x)
+                                    inspectRootPrefixAppNode x
+        | x -> inspectRootPrefixAppNode x
+        
+    inspectRootPrefixAppNode notAFunctionNode

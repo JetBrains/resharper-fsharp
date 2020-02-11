@@ -250,4 +250,15 @@
     <QuickFix>ReplaceLetWithExpressionFix</QuickFix>
   </Error>
 
+  <Error staticGroup="FSharpErrors" name="NotAFunction">
+    <Parameter type="ISynExpr" name="notAFunctionExpr"/>
+    <Parameter type="ISynExpr" name="unexpectedArg"/>
+    <Parameter type="string" name="message"/>
+    <Message value="{0}">
+      <Argument>message</Argument>
+    </Message>
+    <Range>unexpectedArg.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>RemoveUnexpectedArgumentsFix</QuickFix>
+  </Error>
 </Errors>

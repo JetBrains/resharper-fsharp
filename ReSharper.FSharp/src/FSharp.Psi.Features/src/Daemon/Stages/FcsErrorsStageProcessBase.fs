@@ -5,11 +5,13 @@ open System.Collections.Generic
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Daemon
+open JetBrains.ReSharper.Feature.Services.ExpressionSelection
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
 [<AutoOpen>]
@@ -17,6 +19,7 @@ module FSharpErrors =
     // https://github.com/fsharp/FSharp.Compiler.Service/blob/9.0.0/src/fsharp/CompileOps.fs#L246
     // https://github.com/fsharp/FSharp.Compiler.Service/blob/9.0.0/src/fsharp/FSComp.txt
     let [<Literal>] TypeEquation = 1
+    let [<Literal>] NotAFunction = 3
     let [<Literal>] UnitTypeExpected = 20
     let [<Literal>] RuleNeverMatched = 26
     let [<Literal>] VarBoundTwice = 38
@@ -41,6 +44,9 @@ module FSharpErrors =
     let [<Literal>] undefinedIndexerMessage = "The field, constructor or member 'Item' is not defined."
     let [<Literal>] ifExprMissingElseBranch = "This 'if' expression is missing an 'else' branch."
     let [<Literal>] expressionIsAFunctionMessage = "This expression is a function value, i.e. is missing arguments. Its type is string -> unit."
+    let [<Literal>] unexpectedArgument = "Unexpected argument"
+    let [<Literal>] unexpectedArguments = "Unexpected arguments"
+
 
 [<AbstractClass>]
 type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
@@ -77,73 +83,82 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         if isNotNull expr then highlightingCtor (expr, error.Message) :> _ else
         null
 
-    let createHighlighting (error: FSharpErrorInfo) (range: DocumentRange): IHighlighting =
+    let createHighlighting (error: FSharpErrorInfo) (range: DocumentRange): IHighlighting seq =
+        seq {
         match error.ErrorNumber with
         | TypeEquation when error.Message.StartsWith(ifExprMissingElseBranch, StringComparison.Ordinal) ->
-            createHighlightingFromNodeWithMessage UnitTypeExpectedError range error 
+            yield createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
+            
+        | NotAFunction ->
+            let notAFunctionNode = ExpressionSelectionUtil.GetExpressionInRange(fsFile, range, false, null) :> ISynExpr
+            let unexpectedArgs = List()
+            inspectUnexpectedArgs (fun x -> unexpectedArgs.Add(x.LastChild :?> ISynExpr)) notAFunctionNode
+            let message = if unexpectedArgs.Count > 1 then unexpectedArguments else unexpectedArgument
+            for arg in unexpectedArgs -> NotAFunctionError(notAFunctionNode, arg, message)
 
-        | VarBoundTwice ->
-            createHighlightingFromNode VarBoundTwiceError range
+        | VarBoundTwice -> 
+            yield createHighlightingFromNode VarBoundTwiceError range
 
         | UndefinedName ->
             if (error.Message = undefinedIndexerMessage &&
                     let indexer = fsFile.GetNode(range) in isNotNull indexer) then
-                UndefinedIndexerError(fsFile.GetNode(range)) :> _ else
+                yield UndefinedIndexerError(fsFile.GetNode(range)) else
 
             let identifier = fsFile.GetNode(range)
             let referenceOwner = FSharpReferenceOwnerNavigator.GetByIdentifier(identifier)
             if isNotNull referenceOwner then UndefinedNameError(referenceOwner.Reference, error.Message) :> _ else
 
-            UnresolvedHighlighting(error.Message, range) :> _
+            yield UnresolvedHighlighting(error.Message, range)
 
         | UpcastUnnecessary ->
-            createHighlightingFromNode UpcastUnnecessaryWarning range
+            yield createHighlightingFromNode UpcastUnnecessaryWarning range
 
         | TypeTestUnnecessary ->
-            createHighlightingFromNodeWithMessage TypeTestUnnecessaryWarning range error
+            yield createHighlightingFromNodeWithMessage TypeTestUnnecessaryWarning range error
 
         | UnusedValue ->
             match fsFile.GetNode(range) with
-            | null -> UnusedHighlighting(error.Message, range) :> _
-            | pat -> UnusedValueWarning(pat) :> _
+            | null -> yield UnusedHighlighting(error.Message, range)
+            | pat -> yield UnusedValueWarning(pat)
 
         | RuleNeverMatched ->
-            createHighlightingFromParentNode RuleNeverMatchedWarning range
+            yield createHighlightingFromParentNode RuleNeverMatchedWarning range
 
         | UnitTypeExpected ->
-            createHighlightingFromNodeWithMessage UnitTypeExpectedWarning range error
+            yield createHighlightingFromNodeWithMessage UnitTypeExpectedWarning range error
         
         | UseBindingsIllegalInModules ->
-            createHighlightingFromNode UseBindingsIllegalInModulesWarning range
+            yield createHighlightingFromNode UseBindingsIllegalInModulesWarning range
 
         | UseBindingsIllegalInImplicitClassConstructors ->
-            createHighlightingFromNode UseKeywordIllegalInPrimaryCtorError range
+            yield createHighlightingFromNode UseKeywordIllegalInPrimaryCtorError range
 
         | LocalClassBindingsCannotBeInline ->
-            createHighlightingFromParentNode LocalClassBindingsCannotBeInlineError range
+            yield createHighlightingFromParentNode LocalClassBindingsCannotBeInlineError range
 
         | LetAndForNonRecBindings ->
-            createHighlightingFromParentNode LetAndForNonRecBindingsError range
+            yield createHighlightingFromParentNode LetAndForNonRecBindingsError range
 
         | UnusedThisVariable ->
-            createHighlightingFromParentNode UnusedThisVariableWarning range
+            yield createHighlightingFromParentNode UnusedThisVariableWarning range
 
         | FieldRequiresAssignment ->
-            createHighlightingFromNodeWithMessage FieldRequiresAssignmentError range error
+            yield createHighlightingFromNodeWithMessage FieldRequiresAssignmentError range error
 
         | ExpectedExpressionAfterLet ->
-            createHighlightingFromParentNode ExpectedExpressionAfterLetError range
+            yield createHighlightingFromParentNode ExpectedExpressionAfterLetError range
 
         | SuccessiveArgsShouldBeSpacedOrTupled ->
-            createHighlightingFromNode SuccessiveArgsShouldBeSpacedOrTupledError range
+            yield createHighlightingFromNode SuccessiveArgsShouldBeSpacedOrTupledError range
 
         | EmptyRecordInvalid ->
-            createHighlightingFromNodeWithMessage EmptyRecordInvalidError range error
+            yield createHighlightingFromNodeWithMessage EmptyRecordInvalidError range error
 
         | MissingErrorNumber when startsWith expressionIsAFunctionMessage error.Message ->
-            createHighlightingFromNodeWithMessage FunctionValueUnexpectedWarning range error
+            yield createHighlightingFromNodeWithMessage FunctionValueUnexpectedWarning range error
 
-        | _ -> createGenericHighlighting error range
+        | _ -> yield createGenericHighlighting error range
+        }
 
     abstract ShouldAddDiagnostic: error: FSharpErrorInfo * range: DocumentRange -> bool
     default x.ShouldAddDiagnostic(error: FSharpErrorInfo, _) =
@@ -158,12 +173,13 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         for error, range in errors  do
             if x.ShouldAddDiagnostic(error, range) then
-                let highlighting =
-                    match createHighlighting error range with
-                    | null -> createGenericHighlighting error range
-                    | highlighting -> highlighting
+                for highlightingDraft in createHighlighting error range do
+                    let highlighting =
+                        match highlightingDraft with
+                        | null -> createGenericHighlighting error range
+                        | highlighting -> highlighting
 
-                highlightings.Add(HighlightingInfo(highlighting.CalculateRange(), highlighting))
+                    highlightings.Add(HighlightingInfo(highlighting.CalculateRange(), highlighting))
             x.SeldomInterruptChecker.CheckForInterrupt()
 
         committer.Invoke(DaemonStageResult(highlightings))
