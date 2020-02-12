@@ -5,7 +5,7 @@ Occurrence's dump:
 DEO: Envoy: Interface:System.Runtime.InteropServices._Exception, PsiLanguageType:UNKNOWN as Envoy: Interface:System.Runtime.InteropServices._Exception, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
 Menu Item presentation: 
 Text: _Exception | (in System.Runtime.InteropServices)
-Shortcut text: mscorlib, Version=4.0.0.0, msil
+Shortcut text: mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1
 Style: Enabled
 Mnemonic: 
 Tooltip: 
@@ -23,7 +23,7 @@ Occurrence's dump:
 [*] DEO: Envoy: Class:System.Exception, PsiLanguageType:UNKNOWN as Envoy: Class:System.Exception, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
 Menu Item presentation: 
 Text: Exception | (in System)
-Shortcut text: mscorlib, Version=4.0.0.0, msil
+Shortcut text: mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1
 Style: Enabled
 Mnemonic: 
 Tooltip: 
@@ -41,7 +41,7 @@ Occurrence's dump:
 DEO: Envoy: Interface:System.Runtime.Serialization.ISerializable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.Runtime.Serialization.ISerializable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
 Menu Item presentation: 
 Text: ISerializable | (in System.Runtime.Serialization)
-Shortcut text: mscorlib, Version=4.0.0.0, msil
+Shortcut text: mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1
 Style: Enabled
 Mnemonic: 
 Tooltip: 
@@ -59,7 +59,7 @@ Occurrence's dump:
 [*] DEO: Envoy: Interface:System.Collections.IStructuralEquatable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.Collections.IStructuralEquatable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
 Menu Item presentation: 
 Text: IStructuralEquatable | (in System.Collections)
-Shortcut text: mscorlib, Version=4.0.0.0, msil
+Shortcut text: mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1
 Style: Enabled
 Mnemonic: 
 Tooltip: 

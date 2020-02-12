@@ -5,7 +5,7 @@ Occurrence's dump:
 DEO: Envoy: Interface:System.IComparable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.IComparable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
 Menu Item presentation: 
 Text: IComparable | (in System)
-Shortcut text: mscorlib, Version=4.0.0.0, msil
+Shortcut text: mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1
 Style: Enabled
 Mnemonic: 
 Tooltip: 
@@ -23,7 +23,7 @@ Occurrence's dump:
 DEO: Envoy: Interface:System.IComparable`1, PsiLanguageType:UNKNOWN as Envoy: Interface:System.IComparable`1, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
 Menu Item presentation: 
 Text: IComparable<in T> | (in System)
-Shortcut text: mscorlib, Version=4.0.0.0, msil
+Shortcut text: mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1
 Style: Enabled
 Mnemonic: 
 Tooltip: 
@@ -41,7 +41,7 @@ Occurrence's dump:
 DEO: Envoy: Interface:System.IEquatable`1, PsiLanguageType:UNKNOWN as Envoy: Interface:System.IEquatable`1, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
 Menu Item presentation: 
 Text: IEquatable<T> | (in System)
-Shortcut text: mscorlib, Version=4.0.0.0, msil
+Shortcut text: mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1
 Style: Enabled
 Mnemonic: 
 Tooltip: 
@@ -59,7 +59,7 @@ Occurrence's dump:
 DEO: Envoy: Interface:System.Collections.IStructuralComparable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.Collections.IStructuralComparable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
 Menu Item presentation: 
 Text: IStructuralComparable | (in System.Collections)
-Shortcut text: mscorlib, Version=4.0.0.0, msil
+Shortcut text: mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1
 Style: Enabled
 Mnemonic: 
 Tooltip: 
@@ -77,7 +77,7 @@ Occurrence's dump:
 DEO: Envoy: Interface:System.Collections.IStructuralEquatable, PsiLanguageType:UNKNOWN as Envoy: Interface:System.Collections.IStructuralEquatable, PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
 Menu Item presentation: 
 Text: IStructuralEquatable | (in System.Collections)
-Shortcut text: mscorlib, Version=4.0.0.0, msil
+Shortcut text: mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1
 Style: Enabled
 Mnemonic: 
 Tooltip: 

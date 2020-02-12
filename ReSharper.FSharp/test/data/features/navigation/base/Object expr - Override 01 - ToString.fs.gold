@@ -5,7 +5,7 @@ Occurrence's dump:
 DEO: Envoy: Method:System.Object.ToString(), PsiLanguageType:UNKNOWN as Envoy: Method:System.Object.ToString(), PsiLanguageType:UNKNOWN RANGE: (0,0) @ mscorlib
 Menu Item presentation: 
 Text: Object | (in System.Object)
-Shortcut text: mscorlib, Version=4.0.0.0, msil
+Shortcut text: mscorlib, 4.0.0.0, msil, .Net Framework v4.5.1
 Style: Enabled
 Mnemonic: 
 Tooltip: 
