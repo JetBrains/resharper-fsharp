@@ -8,7 +8,7 @@ using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Daemon.CaretDependentFeatures;
 using JetBrains.ReSharper.Daemon.CSharp.ContextHighlighters;
 using JetBrains.ReSharper.Feature.Services.Contexts;
-using JetBrains.ReSharper.Feature.Services.Daemon;
+using JetBrains.ReSharper.Feature.Services.Daemon.Attributes;
 using JetBrains.ReSharper.Plugins.FSharp.Psi;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
@@ -24,7 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
   {
     private const string OpName = "FSharpUsagesContextHighlighter";
 
-    private const string HighlightingId = HighlightingAttributeIds.USAGE_OF_ELEMENT_UNDER_CURSOR;
+    private const string HighlightingId = GeneralHighlightingAttributeIds.USAGE_OF_ELEMENT_UNDER_CURSOR;
 
     [CanBeNull, AsyncContextConsumer]
     public static Action ProcessContext(

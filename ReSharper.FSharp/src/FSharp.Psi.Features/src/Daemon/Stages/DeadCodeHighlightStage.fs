@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages
 open JetBrains.ReSharper.Daemon.Stages
 open JetBrains.ReSharper.Daemon.SyntaxHighlighting
 open JetBrains.ReSharper.Feature.Services.Daemon
+open JetBrains.ReSharper.Feature.Services.Daemon.Attributes
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -12,7 +13,7 @@ open JetBrains.Util
 type DeadCodeHighlightStageProcess(fsFile: IFSharpFile, daemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
-    let [<Literal>] highlightingId = HighlightingAttributeIds.INACTIVE_PREPROCESSOR_BRANCH
+    let [<Literal>] highlightingId = DefaultLanguageAttributeIds.PREPROCESSOR_INACTIVE_BRANCH
     let [<Literal>] tooltip = "Inactive Preprocessor Branch"
 
     override x.Execute(committer) =

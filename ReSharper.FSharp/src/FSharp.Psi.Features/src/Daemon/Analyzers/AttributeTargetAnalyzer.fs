@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
 open System.Collections.Generic
 open JetBrains.ReSharper.Daemon.SyntaxHighlighting
 open JetBrains.ReSharper.Feature.Services.Daemon
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Tree
 
@@ -18,4 +19,4 @@ type AttributeTargetAnalyzer() =
         let target = attributeTarget.Identifier
         if isNotNull target && allowedTargets.Contains(target.GetText()) then
             let range = target.GetDocumentRange()
-            consumer.AddHighlighting(ReSharperSyntaxHighlighting(HighlightingAttributeIds.KEYWORD, null, range))
+            consumer.AddHighlighting(ReSharperSyntaxHighlighting(FSharpHighlightingAttributeIds.Keyword, null, range))
