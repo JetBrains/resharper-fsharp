@@ -348,7 +348,7 @@ let shiftExpr shift (expr: ISynExpr) =
             
 let getUnexpectedArgs (notAFunctionNode: ISynExpr) (result: ICollection<_>) =
     let rec getUnexpectedArgsRec (expr: ISynExpr) =
-        let prefixApp = PrefixAppExprNavigator.GetByFunctionExpression <| expr.IgnoreParentParens()
+        let prefixApp = PrefixAppExprNavigator.GetByFunctionExpression(expr.IgnoreParentParens())
         if isNotNull prefixApp && isNotNull prefixApp.ArgumentExpression then
             result.Add prefixApp.ArgumentExpression
             getUnexpectedArgsRec prefixApp
