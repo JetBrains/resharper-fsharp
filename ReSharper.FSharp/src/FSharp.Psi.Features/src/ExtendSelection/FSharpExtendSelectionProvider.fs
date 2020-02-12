@@ -90,13 +90,24 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
 
             null
 
+        | :? IFSharpTypeDeclaration as typeDecl ->
+            let typeDeclGroup = TypeDeclarationGroupNavigator.GetByTypeDeclaration(typeDecl)
+            if isNotNull typeDeclGroup then
+                FSharpExtendSelectionProvider.CreateTypeDeclarationSelection(fsFile, typeDeclGroup, typeDecl) else
+
+            null
+
         | :? IAttributeList as attrList ->
             let letBindings = LetModuleDeclNavigator.GetByAttributeList(attrList)
             if isNotNull letBindings then
                 FSharpExtendSelectionProvider.CreateLetBindingSelection(fsFile, letBindings) else
 
+            let typeDeclGroup = TypeDeclarationGroupNavigator.GetByAttributeList(attrList)
+            if isNotNull typeDeclGroup then
+                FSharpExtendSelectionProvider.CreateTypeDeclarationSelection(fsFile, typeDeclGroup) else
+
             null
-        
+
         | :? ITokenNode as token ->
             match token.Parent with
             | :? ILet as letExpr ->
@@ -117,13 +128,28 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
                 if bindingIndex >= bindings.Count then null else
 
                 FSharpExtendSelectionProvider.CreateLetBindingSelection(fsFile, letExpr, bindings.[bindingIndex])
+                
+            | :? ITypeDeclarationGroup as declGroup ->
+                let declarations = declGroup.TypeDeclarations
+                if declarations.IsEmpty then null else
+                
+                let tokenType = getTokenType token
+                if tokenType == FSharpTokenType.TYPE then
+                    FSharpExtendSelectionProvider.CreateTypeDeclarationSelection(fsFile, declGroup, declarations.[0]) else
+
+                if tokenType != FSharpTokenType.AND then null else
+
+                let declIndex = declGroup.Separators.IndexOf(token) + 1
+                if declIndex <= 0 || declIndex >= declarations.Count then null else
+
+                FSharpExtendSelectionProvider.CreateTypeDeclarationSelection(fsFile, declGroup, declarations.[declIndex])
 
             | _ -> null
         | _ -> null
 
     static member FindBetterNode(fsFile, node: ITreeNode) =
         let shouldTryFindBetterNode (node: ITreeNode) =
-            node :? IBinding || node :? IInfixAppExpr
+            node :? IBinding || node :? IInfixAppExpr || node :? IFSharpTypeDeclaration
 
         if not (shouldTryFindBetterNode node) then null else
         FSharpExtendSelectionProvider.ExtendNodeSelection(fsFile, node)
@@ -146,6 +172,22 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
         if index = -1 || index >= separators.Count then null else
 
         FSharpLetExprBindingSelection(fsFile, letBindings, separators.[index], binding) :> _
+
+    static member CreateTypeDeclarationSelection(fsFile, typeDeclGroup : ITypeDeclarationGroup): ISelectedRange =
+        let declarations = typeDeclGroup.TypeDeclarations
+        if declarations.IsEmpty then null else
+        FSharpExtendSelectionProvider.CreateTypeDeclarationSelection(fsFile, typeDeclGroup, declarations.[0])
+
+    static member CreateTypeDeclarationSelection(fsFile, typeDeclGroup : ITypeDeclarationGroup, typeDecl): ISelectedRange =
+        let declarations = typeDeclGroup.TypeDeclarations
+        if declarations.[0] == typeDecl then
+            FSharpTreeRangeSelection(fsFile, typeDeclGroup.FirstChild, typeDecl) :> _ else
+
+        let separatorIndex = declarations.IndexOf(typeDecl) - 1
+        let separators = typeDeclGroup.Separators
+        if separatorIndex = -1 || separatorIndex >= separators.Count then null else
+
+        FSharpTreeRangeSelection(fsFile, separators.[separatorIndex], typeDecl) :> _
 
     interface ISelectEmbracingConstructProvider with
         member x.IsAvailable(sourceFile) =

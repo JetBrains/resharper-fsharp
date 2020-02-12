@@ -51,3 +51,9 @@ type FSharpExtendSelectionTest() =
     
     [<Test>] member x.``Target attribute 01 - Type name``() = x.DoNamedTest()
     [<Test>] member x.``Target attribute 02 - Arg expr``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Type declaration group 01 - Type``() = x.DoNamedTest()
+    [<Test>] member x.``Type declaration group 02 - First``() = x.DoNamedTest()
+    [<Test>] member x.``Type declaration group 03 - Other``() = x.DoNamedTest()
+    [<Test>] member x.``Type declaration group 04 - And``() = x.DoNamedTest()
+    [<Test>] member x.``Type declaration group 05 - Attrs``() = x.DoNamedTest()
