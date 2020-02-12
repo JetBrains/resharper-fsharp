@@ -90,7 +90,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | NotAFunction ->
             let notAFunctionNode = ExpressionSelectionUtil.GetExpressionInRange(fsFile, range, false, null) :> ISynExpr
             let unexpectedArgs = List()
-            inspectPrefixAppsWhereExpressionIsMainFunction (fun x -> unexpectedArgs.Add(x.LastChild :?> ISynExpr)) notAFunctionNode
+            getUnexpectedArgs notAFunctionNode unexpectedArgs
             let message = if unexpectedArgs.Count > 1 then unexpectedArguments else unexpectedArgument
             NotAFunctionError(notAFunctionNode, unexpectedArgs, message) :> _
 

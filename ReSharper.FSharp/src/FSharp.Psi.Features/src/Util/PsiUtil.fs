@@ -1,6 +1,7 @@
 [<AutoOpen>]
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Util.PsiUtil
 
+open System.Collections.Generic
 open FSharp.Compiler.Range
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
@@ -345,15 +346,12 @@ let shiftExpr shift (expr: ISynExpr) =
         else
             ModificationUtil.AddChildAfter(child, Whitespace(shift)) |> ignore
             
-let inspectPrefixAppsWhereExpressionIsMainFunction (visitorAction: IPrefixAppExpr -> unit)
-                                                   (notAFunctionNode: ITreeNode) =
-    let rec inspectPrefixAppsRec (expr: ITreeNode) =
-        match getParent expr with
-        | null -> ()
-        | :? IInfixAppExpr -> ()
-        | :? IPrefixAppExpr when not <| isFirstChild expr -> ()
-        | :? IPrefixAppExpr as x -> visitorAction(x)
-                                    inspectPrefixAppsRec x
-        | x -> inspectPrefixAppsRec x
+let getUnexpectedArgs (notAFunctionNode: ISynExpr) (result: ICollection<_>) =
+    let rec getUnexpectedArgsRec (expr: ISynExpr) =
+        let prefixApp = PrefixAppExprNavigator.GetByFunctionExpression <| expr.IgnoreParentParens()
+        if isNotNull prefixApp && isNotNull prefixApp.ArgumentExpression then
+            result.Add prefixApp.ArgumentExpression
+            getUnexpectedArgsRec prefixApp
+        else ()
         
-    inspectPrefixAppsRec notAFunctionNode
+    getUnexpectedArgsRec notAFunctionNode
