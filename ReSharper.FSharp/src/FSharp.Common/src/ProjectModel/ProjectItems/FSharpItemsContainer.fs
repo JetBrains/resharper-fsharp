@@ -1125,7 +1125,7 @@ type FSharpItemsContainerRefresher(lifetime: Lifetime, solution: ISolution, view
         member x.ReloadProject(projectMark) =
             let opName = sprintf "Reload %O after FSharpItemsContainer change" projectMark
             solution.Locks.QueueReadLock(lifetime, opName, fun _ ->
-                solution.ProjectsHostContainer().GetComponent<ISolutionHost>().ReloadProject(projectMark))
+                solution.ProjectsHostContainer().GetComponent<ISolutionHost>().ReloadProjectAsync(projectMark))
 
         member x.SelectItem(projectMark, filePath) =
             let opName = sprintf "Select %O after FSharpItemsContainer change" filePath
