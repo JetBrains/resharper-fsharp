@@ -346,12 +346,12 @@ let shiftExpr shift (expr: ISynExpr) =
         else
             ModificationUtil.AddChildAfter(child, Whitespace(shift)) |> ignore
             
-let getUnexpectedArgs (notAFunctionNode: ISynExpr) (result: ICollection<_>) =
+let getExpressionArgs (expr: ISynExpr) (result: ICollection<_>) =
     let rec getUnexpectedArgsRec (expr: ISynExpr) =
         let prefixApp = PrefixAppExprNavigator.GetByFunctionExpression(expr.IgnoreParentParens())
         if isNotNull prefixApp && isNotNull prefixApp.ArgumentExpression then
-            result.Add prefixApp.ArgumentExpression
+            result.Add(prefixApp.ArgumentExpression)
             getUnexpectedArgsRec prefixApp
         else ()
         
-    getUnexpectedArgsRec notAFunctionNode
+    getUnexpectedArgsRec expr
