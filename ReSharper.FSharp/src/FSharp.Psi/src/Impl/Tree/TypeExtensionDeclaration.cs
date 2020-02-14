@@ -6,7 +6,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class TypeExtensionDeclaration : IFSharpTypeParametersOwnerDeclaration, IFSharpReferenceOwner
+  internal partial class TypeExtensionDeclaration : IFSharpTypeParametersOwnerDeclaration
   {
     [CanBeNull] private TypeAugmentation myTypeAugmentation;
     public FSharpSymbolReference Reference { get; protected set; }

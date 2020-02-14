@@ -98,6 +98,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       {
         IReferenceExpr referenceExpr => referenceExpr.Qualifier != null,
         IReferenceName referenceName => referenceName.Qualifier != null,
+        ITypeExtensionDeclaration typeExtension => typeExtension.QualifierReferenceName != null,
         _ => false
       };
   }
