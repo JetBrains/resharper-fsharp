@@ -22,7 +22,7 @@ type RemoveRedundantNewFix(warning: RedundantNewWarning) =
         let factory = newExpr.CreateElementFactory()
         let refExpr = factory.AsReferenceExpr(newExpr.TypeName)
 
-        let appExpr = factory.CreateAppExpr(refExpr, newExpr.ArgExpression, false)
+        let appExpr = factory.CreateAppExpr(refExpr, newExpr.ArgumentExpression, false)
         ModificationUtil.ReplaceChild(newExpr, appExpr) |> ignore
         
         null

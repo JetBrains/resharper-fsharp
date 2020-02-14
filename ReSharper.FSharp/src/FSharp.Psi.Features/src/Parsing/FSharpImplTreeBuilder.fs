@@ -827,9 +827,11 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         | SynExpr.Downcast(expr, synType, _) ->
             x.MarkTypeExpr(expr, synType, range, ElementType.DOWNCAST_EXPR)
 
-        | SynExpr.InferredUpcast(expr, _)
+        | SynExpr.InferredUpcast(expr, _) ->
+            x.PushRangeAndProcessExpression(expr, range, ElementType.INFERRED_UPCAST_EXPR)
+
         | SynExpr.InferredDowncast(expr, _) ->
-            x.PushRangeAndProcessExpression(expr, range, ElementType.INFERRED_CAST_EXPR)
+            x.PushRangeAndProcessExpression(expr, range, ElementType.INFERRED_DOWNCAST_EXPR)
 
         | SynExpr.Null _ ->
             x.MarkAndDone(range, ElementType.NULL_EXPR)

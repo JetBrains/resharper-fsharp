@@ -44,6 +44,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_ACTIVE_PATTERN_NAMED_CASE_DECLARATION = "";
     public const string IDS_SYN_EXPR = "";
     public const string IDS_CONST_EXPR = "";
+    public const string IDS_DO_LIKE_EXPR = "";
+    public const string IDS_INFERRED_CAST_EXPR = "";
+    public const string IDS_APP_LIKE_EXPR = "";
+    public const string IDS_TYPED_LIKE_EXPR = "";
     public const string IDS_LITERAL_EXPR = "";
     public const string IDS_ARRAY_OR_LIST_EXPR = "";
     public const string IDS_INDEXER_EXPR = "";

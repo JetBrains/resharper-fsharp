@@ -352,12 +352,11 @@ interface synExpr:
   parenExpr |
   quoteExpr |
   constExpr |
-  typedExpr |
+  typedLikeExpr |
   tupleExpr |
   anonRecdExpr |
   arrayOrListExpr |
   recordExpr |
-  newExpr |
   objExpr |
   whileExpr |
   forExpr |
@@ -366,20 +365,15 @@ interface synExpr:
   computationLikeExpr |
   lambdaExpr |
   matchLikeExpr |
-  doExpr |
-  assertExpr |
-  appExpr |
+  doLikeExpr |
+  appLikeExpr |
   letLikeExpr |
   tryLikeExpr |
-  lazyExpr |
   sequentialExpr |
   ifThenElseExpr |
   referenceExpr |
   setExpr |
   indexerExpr |
-  typeTestExpr |
-  castExpr |
-  inferredCastExpr |
   nullExpr |
   addressOfExpr |
   traitCallExpr |
@@ -389,13 +383,28 @@ interface synExpr:
 
   // todo: cover cases
   libraryOnlyExpr |
-  fromErrorExpr |
+  fromErrorExpr;
 
-  fixedExpr;
+interface doLikeExpr:
+  doExpr |
+  assertExpr |
+  lazyExpr |
+  fixedExpr |
+  inferredCastExpr;
+
+interface appLikeExpr:
+  appExpr |
+  newExpr;
 
 interface appExpr:
   prefixAppExpr |
   infixAppExpr;
+
+interface typedLikeExpr:
+  typedExpr |
+  typeTestExpr |
+  castExpr;
+  
 
 setExpr options { stubBase="FSharpExpressionBase"; }:
   synExpr<LEFT_EXPR, LeftExpression>
@@ -520,7 +529,7 @@ recordExprBinding:
 newExpr options { stubBase="FSharpExpressionBase"; }:
   NEW<NEW, NewKeyword>
   typeReferenceName<TYPE_REFERENCE, TypeName>
-  synExpr<EXPR, ArgExpression>;
+  synExpr<EXPR, ArgumentExpression>;
 
 forExpr options { stubBase="FSharpExpressionBase"; }:
   FOR
@@ -606,11 +615,11 @@ matchExpr options { stubBase="FSharpExpressionBase"; }:
   matchClause<MATCH_CLAUSE, Clauses>*;
 
 doExpr options { stubBase="FSharpExpressionBase"; }:
-  DO
+  DO<KEYWORD, Keyword>
   synExpr<EXPR, Expression>;
 
 assertExpr options { stubBase="FSharpExpressionBase"; }:
-  ASSERT
+  ASSERT<KEYWORD, Keyword>
   synExpr<EXPR, Expression>;
 
 prefixAppExpr options { stubBase="FSharpExpressionBase"; }:
@@ -645,7 +654,7 @@ tryFinallyExpr options { stubBase="FSharpExpressionBase"; }:
   synExpr<FINALLY_EXPR, FinallyExpression>;
 
 lazyExpr options { stubBase="FSharpExpressionBase"; }:
-  LAZY
+  LAZY<KEYWORD, Keyword>
   synExpr<EXPR, Expression>;
 
 sequentialExpr options { stubBase="FSharpExpressionBase"; }:
@@ -697,8 +706,16 @@ downcastExpr options { stubBase="FSharpExpressionBase"; }:
   COLON_QMARK_GREATER<OP, OperatorToken>
   synType<TYPE, TypeUsage>;
 
-inferredCastExpr options { stubBase="FSharpExpressionBase"; }:
-  (UPCAST | DOWNCAST)
+interface inferredCastExpr:
+  inferredUpcastExpr |
+  inferredDowncastExpr;
+
+inferredUpcastExpr options { stubBase="FSharpExpressionBase"; }:
+  UPCAST<KEYWORD, Keyword>
+  synExpr<EXPR, Expression>;
+
+inferredDowncastExpr options { stubBase="FSharpExpressionBase"; }:
+  DOWNCAST<KEYWORD, Keyword>
   synExpr<EXPR, Expression>;
 
 // todo: maybe replace with SynExpr.Const in FCS?
@@ -737,7 +754,7 @@ fromErrorExpr options { stubBase="FSharpExpressionBase"; }:
   fakeSeparator;
 
 fixedExpr options { stubBase="FSharpExpressionBase"; }:
-  FIXED<FIXED, FixedKeyword>
+  FIXED<KEYWORD, Keyword>
   synExpr<EXPR, Expression>;
 
 rangeSequence:
