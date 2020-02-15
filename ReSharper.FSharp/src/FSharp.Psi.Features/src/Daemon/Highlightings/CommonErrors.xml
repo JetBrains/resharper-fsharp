@@ -256,7 +256,7 @@
     <Parameter type="ISynExpr" name="expr"/>
     <Parameter type="IPrefixAppExpr" name="prefixApp"/>
     <Message value="{0}">
-      <Argument>if prefixApp.FunctionExpression == expr then "Unexpected argument" else "Unexpected arguments"</Argument>
+      <Argument>if prefixApp.FunctionExpression == expr.IgnoreParentParens() then "Unexpected argument" else "Unexpected arguments"</Argument>
     </Message>
     <Range>PrefixAppExprNavigator.GetByFunctionExpression(expr.IgnoreParentParens()).ArgumentExpression.GetHighlightingRange()</Range>
     <SecondaryRanges>getAllExpressionArgs(expr) |> Seq.tail |> Seq.map (fun x -> x.GetHighlightingRange())</SecondaryRanges>

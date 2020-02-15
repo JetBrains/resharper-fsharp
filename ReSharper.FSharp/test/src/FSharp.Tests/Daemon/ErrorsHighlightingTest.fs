@@ -38,3 +38,8 @@ type ErrorsHighlightingTest() =
     [<Test>] member x.``Undefined indexer 02 - Undefined id``() = x.DoNamedTest()
 
     [<Test>] member x.``Extension analyzer``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Unexpected args 01 - single arg``() = x.DoNamedTest()
+    [<Test>] member x.``Unexpected args 02 - many args``() = x.DoNamedTest()
+    [<Test>] member x.``Unexpected args 03 - multiline arg``() = x.DoNamedTest()
+    [<Test>] member x.``Unexpected args 04 - several errors in single line``() = x.DoNamedTest()

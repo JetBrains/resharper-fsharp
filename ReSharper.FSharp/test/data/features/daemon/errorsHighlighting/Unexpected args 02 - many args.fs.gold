@@ -1,0 +1,9 @@
+module Module
+
+let f x y = x + y
+let g = (((f 2 3) |3|(0)) |4|(1)) |7|(2) |8|(3)
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Unexpected arguments
+(1): ReSharper Underlined Error Highlighting: Unexpected arguments
+(2): ReSharper Underlined Error Highlighting: Unexpected arguments
+(3): ReSharper Underlined Error Highlighting: Unexpected arguments

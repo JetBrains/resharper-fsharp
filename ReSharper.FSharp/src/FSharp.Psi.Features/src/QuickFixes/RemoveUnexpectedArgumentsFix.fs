@@ -1,9 +1,9 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
 [<AutoOpen>]
 module private FixNames =
@@ -23,8 +23,4 @@ type RemoveUnexpectedArgumentsFix(warning: NotAFunctionError) =
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
-        let replaceExpr =
-            match ParenExprNavigator.GetByInnerExpression(expr) with
-            | null -> expr
-            | x -> x :> _
-        replace prefixApp replaceExpr
+        replace prefixApp (expr.IgnoreParentParens())
