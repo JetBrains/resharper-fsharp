@@ -74,8 +74,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
                         return text.Substring(3);
 
                     case CommentType.MultilineComment:
-                        var length = text.Length - (text.EndsWith("*/") ? 4 : 2);
-                        return (length <= 0) ? string.Empty : text.Substring(2, length);
+                        var length = text.Length - (text.EndsWith("*)") ? 4 : 2);
+                        return length <= 0
+                            ? string.Empty
+                            : text.Substring(2, length);
                 }
 
                 return string.Empty;
