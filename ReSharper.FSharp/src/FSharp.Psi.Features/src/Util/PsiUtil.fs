@@ -354,7 +354,7 @@ let rec tryFindRootPrefixAppWhereExpressionIsFunc (expr: ISynExpr) =
 let rec getAllExpressionArgs (expr: ISynExpr) =
     let mutable currentExpr = expr
     seq {
-        while (isNotNull currentExpr) do        
+        while isNotNull currentExpr do        
             let prefixApp = PrefixAppExprNavigator.GetByFunctionExpression(currentExpr.IgnoreParentParens())
             if isNotNull prefixApp && isNotNull prefixApp.ArgumentExpression then
                 currentExpr <- prefixApp

@@ -3,7 +3,6 @@
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
 [<AutoOpen>]
 module private FixNames =
@@ -17,10 +16,10 @@ type RemoveUnexpectedArgumentsFix(warning: NotAFunctionError) =
     let prefixApp = warning.PrefixApp
     
     override x.Text =
-        if prefixApp.FunctionExpression == expr.IgnoreParentParens() then RemoveUnexpectedArgument else RemoveUnexpectedArguments
+        if prefixApp.FunctionExpression == expr then RemoveUnexpectedArgument else RemoveUnexpectedArguments
 
     override x.IsAvailable _ = isValid prefixApp && isValid expr
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
-        replace prefixApp (expr.IgnoreParentParens())
+        replaceWithCopy prefixApp expr

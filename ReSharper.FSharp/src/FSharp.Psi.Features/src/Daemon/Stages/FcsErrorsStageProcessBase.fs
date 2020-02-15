@@ -10,6 +10,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.Util
 
 [<AutoOpen>]
@@ -86,7 +87,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | NotAFunction ->
             let notAFunctionNode = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
             let prefixAppExpr = (tryFindRootPrefixAppWhereExpressionIsFunc notAFunctionNode).As<IPrefixAppExpr>()
-            NotAFunctionError(notAFunctionNode, prefixAppExpr) :> _
+            NotAFunctionError(notAFunctionNode.IgnoreParentParens(), prefixAppExpr) :> _
 
         | VarBoundTwice -> 
             createHighlightingFromNode VarBoundTwiceError range
