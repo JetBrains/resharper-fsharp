@@ -261,6 +261,7 @@ let isFollowedByEmptyLine (node: ITreeNode) =
 
 [<AutoOpen>]
 module PsiModificationUtil =
+    /// Warning: newChild should not be child of oldChild
     let replace oldChild newChild =
         ModificationUtil.ReplaceChild(oldChild, newChild) |> ignore
 

@@ -22,4 +22,4 @@ type RemoveUnexpectedArgumentsFix(warning: NotAFunctionError) =
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
-        replaceWithCopy prefixApp expr
+        replaceWithCopy prefixApp expr //TODO: save comments before first unexpected arg
