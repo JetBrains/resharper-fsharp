@@ -17,7 +17,7 @@ type RemoveUnexpectedArgumentsFix(warning: NotAFunctionError) =
     let prefixApp = warning.PrefixApp
     
     override x.Text =
-        if prefixApp.FunctionExpression == expr then RemoveUnexpectedArgument else RemoveUnexpectedArguments
+        if prefixApp.FunctionExpression == expr.IgnoreParentParens() then RemoveUnexpectedArgument else RemoveUnexpectedArguments
 
     override x.IsAvailable _ = isValid prefixApp && isValid expr
 
