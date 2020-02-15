@@ -38,6 +38,7 @@ module FSharpErrors =
     let [<Literal>] LocalClassBindingsCannotBeInline = 894
     let [<Literal>] UnusedValue = 1182
     let [<Literal>] UnusedThisVariable = 1183
+    let [<Literal>] RedundantArgumentsAreBeingIgnored = 3189
 
     let [<Literal>] MissingErrorNumber = 193
 
@@ -86,13 +87,13 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         match error.ErrorNumber with
         | TypeEquation when error.Message.StartsWith(ifExprMissingElseBranch, StringComparison.Ordinal) ->
             createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
-            
+
         | NotAFunction ->
-            let notAFunctionNode = ExpressionSelectionUtil.GetExpressionInRange(fsFile, range, false, null) :> ISynExpr
+            let notAFunctionNode = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
             let unexpectedArgs = List()
-            getExpressionArgs notAFunctionNode unexpectedArgs
+            let prefixAppExpr = (getExpressionArgsAndTryReturnPrefixApp notAFunctionNode unexpectedArgs).As<IPrefixAppExpr>()
             let message = if unexpectedArgs.Count > 1 then unexpectedArguments else unexpectedArgument
-            NotAFunctionError(notAFunctionNode, unexpectedArgs, message) :> _
+            NotAFunctionError(notAFunctionNode, unexpectedArgs |> List.ofSeq, prefixAppExpr, message) :> _
 
         | VarBoundTwice -> 
             createHighlightingFromNode VarBoundTwiceError range
