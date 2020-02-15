@@ -1,7 +1,6 @@
 [<AutoOpen>]
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Util.PsiUtil
 
-open System.Collections.Generic
 open FSharp.Compiler.Range
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
@@ -345,13 +344,20 @@ let shiftExpr shift (expr: ISynExpr) =
             ModificationUtil.ReplaceChild(nextSibling, Whitespace(length)) |> ignore
         else
             ModificationUtil.AddChildAfter(child, Whitespace(shift)) |> ignore
-            
-let getExpressionArgsAndTryReturnPrefixApp (expr: ISynExpr) (collectionForArgs: ICollection<_>) =
-    let rec getExpressionArgsRec (expr: ISynExpr) =
-        let prefixApp = PrefixAppExprNavigator.GetByFunctionExpression(expr.IgnoreParentParens())
-        if isNotNull prefixApp && isNotNull prefixApp.ArgumentExpression then
-            collectionForArgs.Add(prefixApp.ArgumentExpression)
-            getExpressionArgsRec(prefixApp)
-        else expr
-        
-    getExpressionArgsRec(expr)
+
+let rec tryFindRootPrefixAppWhereExpressionIsFunc (expr: ISynExpr) =
+    let prefixApp = PrefixAppExprNavigator.GetByFunctionExpression(expr.IgnoreParentParens())
+    if isNotNull prefixApp && isNotNull prefixApp.ArgumentExpression then
+        tryFindRootPrefixAppWhereExpressionIsFunc(prefixApp)
+    else expr
+
+let rec getAllExpressionArgs (expr: ISynExpr) =
+    let mutable currentExpr = expr
+    seq {
+        while (isNotNull currentExpr) do        
+            let prefixApp = PrefixAppExprNavigator.GetByFunctionExpression(currentExpr.IgnoreParentParens())
+            if isNotNull prefixApp && isNotNull prefixApp.ArgumentExpression then
+                currentExpr <- prefixApp
+                yield prefixApp.ArgumentExpression
+            else currentExpr <- null
+    }

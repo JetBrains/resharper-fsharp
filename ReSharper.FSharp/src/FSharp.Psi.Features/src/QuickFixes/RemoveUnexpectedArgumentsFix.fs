@@ -13,11 +13,11 @@ module private FixNames =
 type RemoveUnexpectedArgumentsFix(warning: NotAFunctionError) =
     inherit FSharpQuickFixBase()
 
-    let expr = warning.NotAFunctionExpr
-    let prefixApp = warning.PrefixAppExpr
+    let expr = warning.Expr
+    let prefixApp = warning.PrefixApp
     
     override x.Text =
-        if warning.UnexpectedArgs.Length > 1 then RemoveUnexpectedArguments else RemoveUnexpectedArgument 
+        if prefixApp.FunctionExpression == expr then RemoveUnexpectedArgument else RemoveUnexpectedArguments
 
     override x.IsAvailable _ = isValid prefixApp && isValid expr
 

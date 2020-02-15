@@ -3,8 +3,10 @@
   <Usings>
     JetBrains.ReSharper.Intentions.QuickFixes;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings;
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Util.PsiUtil;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
   </Usings>
 
@@ -251,23 +253,13 @@
   </Error>
 
   <Error staticGroup="FSharpErrors" name="NotAFunction">
-    <Parameter type="ISynExpr" name="notAFunctionExpr"/>
-    <Parameter type="ISynExpr list" name="unexpectedArgs"/>
-    <Parameter type="IPrefixAppExpr" name="prefixAppExpr"/>
-    <Parameter type="string" name="message"/>
+    <Parameter type="ISynExpr" name="expr"/>
+    <Parameter type="IPrefixAppExpr" name="prefixApp"/>
     <Message value="{0}">
-      <Argument>message</Argument>
+      <Argument>if prefixApp.FunctionExpression == expr then "Unexpected argument" else "Unexpected arguments"</Argument>
     </Message>
-    <IsValid>
-      <![CDATA[
-         (isNull notAFunctionExpr || notAFunctionExpr.IsValid()) && 
-         unexpectedArgs |> List.forall (fun x -> x = null || x.IsValid())
-      ]]>
-    </IsValid>
-    <Range>(Seq.head unexpectedArgs).GetHighlightingRange()</Range>
-    <SecondaryRanges>
-      unexpectedArgs |> List.tail |> List.map (fun x -> x.GetHighlightingRange()) |> Seq.ofList
-    </SecondaryRanges>
+    <Range>PrefixAppExprNavigator.GetByFunctionExpression(expr.IgnoreParentParens()).ArgumentExpression.GetHighlightingRange()</Range>
+    <SecondaryRanges>getAllExpressionArgs(expr) |> Seq.tail |> Seq.map (fun x -> x.GetHighlightingRange())</SecondaryRanges>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>RemoveUnexpectedArgumentsFix</QuickFix>
   </Error>

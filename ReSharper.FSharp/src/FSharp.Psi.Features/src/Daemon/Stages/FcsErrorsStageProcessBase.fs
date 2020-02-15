@@ -5,13 +5,11 @@ open System.Collections.Generic
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.ReSharper.Feature.Services.ExpressionSelection
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
-open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
 [<AutoOpen>]
@@ -38,15 +36,12 @@ module FSharpErrors =
     let [<Literal>] LocalClassBindingsCannotBeInline = 894
     let [<Literal>] UnusedValue = 1182
     let [<Literal>] UnusedThisVariable = 1183
-    let [<Literal>] RedundantArgumentsAreBeingIgnored = 3189
 
     let [<Literal>] MissingErrorNumber = 193
 
     let [<Literal>] undefinedIndexerMessage = "The field, constructor or member 'Item' is not defined."
     let [<Literal>] ifExprMissingElseBranch = "This 'if' expression is missing an 'else' branch."
     let [<Literal>] expressionIsAFunctionMessage = "This expression is a function value, i.e. is missing arguments. Its type is string -> unit."
-    let [<Literal>] unexpectedArgument = "Unexpected argument"
-    let [<Literal>] unexpectedArguments = "Unexpected arguments"
 
 [<AbstractClass>]
 type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
@@ -90,10 +85,8 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | NotAFunction ->
             let notAFunctionNode = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
-            let unexpectedArgs = List()
-            let prefixAppExpr = (getExpressionArgsAndTryReturnPrefixApp notAFunctionNode unexpectedArgs).As<IPrefixAppExpr>()
-            let message = if unexpectedArgs.Count > 1 then unexpectedArguments else unexpectedArgument
-            NotAFunctionError(notAFunctionNode, unexpectedArgs |> List.ofSeq, prefixAppExpr, message) :> _
+            let prefixAppExpr = (tryFindRootPrefixAppWhereExpressionIsFunc notAFunctionNode).As<IPrefixAppExpr>()
+            NotAFunctionError(notAFunctionNode, prefixAppExpr) :> _
 
         | VarBoundTwice -> 
             createHighlightingFromNode VarBoundTwiceError range
