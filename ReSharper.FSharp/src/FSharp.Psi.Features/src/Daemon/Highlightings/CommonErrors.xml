@@ -3,8 +3,10 @@
   <Usings>
     JetBrains.ReSharper.Intentions.QuickFixes;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings;
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Util.PsiUtil;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
+    JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
   </Usings>
 
@@ -250,4 +252,15 @@
     <QuickFix>ReplaceLetWithExpressionFix</QuickFix>
   </Error>
 
+  <Error staticGroup="FSharpErrors" name="NotAFunction">
+    <Parameter type="ISynExpr" name="expr"/>
+    <Parameter type="IPrefixAppExpr" name="prefixApp"/>
+    <Message value="{0}">
+      <Argument>if prefixApp.FunctionExpression == expr then "Unexpected argument" else "Unexpected arguments"</Argument>
+    </Message>
+    <Range>PrefixAppExprNavigator.GetByFunctionExpression(expr).ArgumentExpression.GetHighlightingRange()</Range>
+    <SecondaryRanges>getAllExpressionArgs(expr) |> Seq.tail |> getExpressionsRanges</SecondaryRanges>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>RemoveUnexpectedArgumentsFix</QuickFix>
+  </Error>
 </Errors>

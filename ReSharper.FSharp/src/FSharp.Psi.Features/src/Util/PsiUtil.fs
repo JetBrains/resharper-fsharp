@@ -152,12 +152,15 @@ let isFiltered (node: ITreeNode) =
 
 let isSemicolon (node: ITreeNode) =
     getTokenType node == FSharpTokenType.SEMICOLON
+    
+let isFirstChild (node: ITreeNode) =
+    let parent = getParent node
+    isNotNull parent && parent.FirstChild == node
 
 let isLastChild (node: ITreeNode) =
     let parent = getParent node
     isNotNull parent && parent.LastChild == node
-
-
+    
 let skipMatchingNodesAfter predicate (node: ITreeNode): ITreeNode =
     let nextSibling = node.NextSibling
     if isNull nextSibling then node else
@@ -258,6 +261,7 @@ let isFollowedByEmptyLine (node: ITreeNode) =
 
 [<AutoOpen>]
 module PsiModificationUtil =
+    /// Warning: newChild should not be child of oldChild
     let replace oldChild newChild =
         ModificationUtil.ReplaceChild(oldChild, newChild) |> ignore
 
@@ -341,3 +345,20 @@ let shiftExpr shift (expr: ISynExpr) =
             ModificationUtil.ReplaceChild(nextSibling, Whitespace(length)) |> ignore
         else
             ModificationUtil.AddChildAfter(child, Whitespace(shift)) |> ignore
+
+let rec tryFindRootPrefixAppWhereExpressionIsFunc (expr: ISynExpr) =
+    let prefixApp = PrefixAppExprNavigator.GetByFunctionExpression(expr.IgnoreParentParens())
+    if isNotNull prefixApp && isNotNull prefixApp.ArgumentExpression then
+        tryFindRootPrefixAppWhereExpressionIsFunc(prefixApp)
+    else expr
+
+let rec getAllExpressionArgs (expr: ISynExpr) =
+    let mutable currentExpr = expr
+    seq {
+        while isNotNull currentExpr do        
+            let prefixApp = PrefixAppExprNavigator.GetByFunctionExpression(currentExpr.IgnoreParentParens())
+            if isNotNull prefixApp && isNotNull prefixApp.ArgumentExpression then
+                currentExpr <- prefixApp
+                yield prefixApp.ArgumentExpression
+            else currentExpr <- null
+    }

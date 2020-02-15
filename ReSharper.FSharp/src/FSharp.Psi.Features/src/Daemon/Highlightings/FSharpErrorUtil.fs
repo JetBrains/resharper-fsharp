@@ -27,3 +27,6 @@ let getLetTokenText (token: ITokenNode) =
     let tokenType = getTokenType token
     let tokenType = if isNull tokenType then FSharpTokenType.LET else tokenType 
     tokenType.TokenRepresentation
+
+let getExpressionsRanges (exprs: ISynExpr seq) =
+    exprs |> Seq.map (fun x -> if isValid x then x.GetHighlightingRange() else DocumentRange.InvalidRange) 

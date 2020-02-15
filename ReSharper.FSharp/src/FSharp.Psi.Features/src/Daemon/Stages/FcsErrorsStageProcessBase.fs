@@ -10,6 +10,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.Util
 
 [<AutoOpen>]
@@ -17,6 +18,7 @@ module FSharpErrors =
     // https://github.com/fsharp/FSharp.Compiler.Service/blob/9.0.0/src/fsharp/CompileOps.fs#L246
     // https://github.com/fsharp/FSharp.Compiler.Service/blob/9.0.0/src/fsharp/FSComp.txt
     let [<Literal>] TypeEquation = 1
+    let [<Literal>] NotAFunction = 3
     let [<Literal>] UnitTypeExpected = 20
     let [<Literal>] RuleNeverMatched = 26
     let [<Literal>] VarBoundTwice = 38
@@ -80,9 +82,14 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
     let createHighlighting (error: FSharpErrorInfo) (range: DocumentRange): IHighlighting =
         match error.ErrorNumber with
         | TypeEquation when error.Message.StartsWith(ifExprMissingElseBranch, StringComparison.Ordinal) ->
-            createHighlightingFromNodeWithMessage UnitTypeExpectedError range error 
+            createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
 
-        | VarBoundTwice ->
+        | NotAFunction ->
+            let notAFunctionNode = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
+            let prefixAppExpr = (tryFindRootPrefixAppWhereExpressionIsFunc notAFunctionNode).As<IPrefixAppExpr>()
+            NotAFunctionError(notAFunctionNode.IgnoreParentParens(), prefixAppExpr) :> _
+
+        | VarBoundTwice -> 
             createHighlightingFromNode VarBoundTwiceError range
 
         | UndefinedName ->
@@ -161,6 +168,10 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
                 let highlighting =
                     match createHighlighting error range with
                     | null -> createGenericHighlighting error range
+                    | :? IHighlightingWithSecondaryRanges as highlighting ->
+                        for range in highlighting.CalculateSecondaryRanges() do
+                            highlightings.Add(HighlightingInfo(range, highlighting))
+                        highlighting :> _   
                     | highlighting -> highlighting
 
                 highlightings.Add(HighlightingInfo(highlighting.CalculateRange(), highlighting))
