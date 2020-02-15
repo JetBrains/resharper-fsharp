@@ -91,7 +91,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
             : FSharpHighlightingAttributeIds.Field;
 
         case FSharpUnionCase _:
-          return FSharpHighlightingAttributeIds.Class;
+          return FSharpHighlightingAttributeIds.UnionCase;
 
         case FSharpGenericParameter _:
           return FSharpHighlightingAttributeIds.TypeParameter;

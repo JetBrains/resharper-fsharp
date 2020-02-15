@@ -1,0 +1,12 @@
+﻿module |Module|(0)
+
+type |U|(1) =
+    | |A|(2) of |int|(3)
+    | |B|(4)
+
+---------------------------------------------------------
+(0): ReSharper F# Module Identifier: 
+(1): ReSharper F# Union Identifier: 
+(2): ReSharper F# Union Case Identifier: 
+(3): ReSharper F# Class Identifier: 
+(4): ReSharper F# Union Case Identifier: 

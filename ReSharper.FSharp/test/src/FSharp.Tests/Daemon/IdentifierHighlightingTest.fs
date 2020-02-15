@@ -26,3 +26,5 @@ type IdentifierHighlightingTest() =
     [<Test>] member x.``op_RangeStep``() = x.DoNamedTest()
 
     [<Test>] member x.``Byrefs 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Union case 01``() = x.DoNamedTest()
