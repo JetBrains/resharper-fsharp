@@ -12,6 +12,9 @@ type ImportTypeTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/importType"
 
-    [<Test>] member x.``Type 01``() = x.DoNamedTest()
+    override x.OnQuickFixNotAvailable(_, _) = Assert.Fail(ErrorText.NotAvailable);
 
+    [<Test>] member x.``Type 01``() = x.DoNamedTest()
     [<Test>] member x.``Type extension 01``() = x.DoNamedTest()
+
+    [<Test; NotAvailable>] member x.``Not available 01 - Open``() = x.DoNamedTest()

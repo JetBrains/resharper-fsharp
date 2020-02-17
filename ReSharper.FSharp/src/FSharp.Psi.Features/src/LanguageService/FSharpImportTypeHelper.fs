@@ -17,12 +17,20 @@ open JetBrains.Util
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpImportTypeHelper() =
+    let isApplicable (context: IFSharpReferenceOwner) =
+        let referenceName = context.As<ITypeReferenceName>()
+        if isNotNull (OpenStatementNavigator.GetByReferenceName(referenceName)) then false else
+
+        true
+    
     interface IImportTypeHelper with
         member x.FindTypeCandidates(reference, importTypeCacheFactory) =
             let reference = reference.As<FSharpSymbolReference>()
             if isNull reference || reference.IsQualified then Seq.empty else
 
             let context = reference.GetElement()
+            if not (isApplicable context) then Seq.empty else
+
             let sourceFile = context.GetSourceFile()
             let psiModule = context.GetPsiModule()
 
