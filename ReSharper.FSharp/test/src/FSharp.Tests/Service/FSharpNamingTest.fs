@@ -18,6 +18,8 @@ type FSharpNamingTest() =
     
     [<Test>] member x.``Let 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Let 02 - Tuple``() = x.DoNamedTest()
+    [<Test>] member x.``Let 03 - Literal - Module``() = x.DoNamedTest()
+    [<Test>] member x.``Let 04 - Literal - Type``() = x.DoNamedTest()
 
     [<Test>] member x.``Match 01``() = x.DoNamedTest()
     [<Test>] member x.``Match 02 - Some``() = x.DoNamedTest()
