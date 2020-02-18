@@ -72,4 +72,4 @@ type AddIgnoreFix(expr: ISynExpr) =
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
         let elementFactory = expr.CreateElementFactory()
-        replace expr (elementFactory.CreateIgnoreApp(expr, shouldAddNewLine expr)) |> ignore
+        replace expr (elementFactory.CreateIgnoreApp(expr, shouldAddNewLine expr)) 

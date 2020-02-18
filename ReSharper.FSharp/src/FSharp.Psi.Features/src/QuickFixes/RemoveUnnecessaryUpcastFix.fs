@@ -16,4 +16,4 @@ type RemoveUnnecessaryUpcastFix(warning: UpcastUnnecessaryWarning) =
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(upcastExpr.IsPhysical())
-        replaceWithCopy upcastExpr upcastExpr.Expression |> ignore
+        replaceWithCopy upcastExpr upcastExpr.Expression
