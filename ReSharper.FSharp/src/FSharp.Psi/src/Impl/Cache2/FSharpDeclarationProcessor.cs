@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
-using JetBrains.DocumentModel;
 using JetBrains.ReSharper.Plugins.FSharp.Checker;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
@@ -58,8 +57,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       if (tokens == null)
         return EmptyList<IObjExpr>.Instance;
 
-      var document = sourceFile.Document;
-      var objExprs = new List<IObjExpr>();
+      var objectExpressions = new List<IObjExpr>();
 
       var seenLBrace = false;
       for (var i = 0; i < tokens.Count; i++)
@@ -77,18 +75,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
         }
 
         if (seenLBrace && tokenType == FSharpTokenType.NEW)
-        {
-          var offset = new DocumentOffset(document, token.Start);
-          var tokenAt = fsFile.FindTokenAt(offset);
-          var objExpr = tokenAt?.GetContainingNode<IObjExpr>();
-          if (objExpr != null)
-            objExprs.Add(objExpr);
-        }
+          if (fsFile.FindNodeAt(new TreeOffset(token.Start)) is ITokenNode node && node.Parent is IObjExpr objExpr)
+            objectExpressions.Add(objExpr);
 
         seenLBrace = false;
       }
 
-      return objExprs;
+      return objectExpressions;
     }
 
     public void ProcessQualifiableModuleLikeDeclaration(IQualifiableModuleLikeDeclaration decl, Part part)
