@@ -200,6 +200,13 @@ let rec getFirstMatchingNodeBefore (predicate: ITreeNode -> bool) (node: ITreeNo
     else
         node
 
+let getAllMatchingNodesAfter predicate (node: ITreeNode) =
+    let mutable nextSibling = node.NextSibling
+    [
+        while isNotNull nextSibling do
+            if predicate nextSibling then yield nextSibling
+            nextSibling <- nextSibling.NextSibling
+    ]
 
 let rec getThisOrNextTokenOfType tokenType (node: ITreeNode) =
     if getTokenType node == tokenType then node else
@@ -266,7 +273,7 @@ module PsiModificationUtil =
     /// 
     /// Warning: newChild should not be child of oldChild.
     let replace oldChild newChild =
-        ModificationUtil.ReplaceChild(oldChild, newChild) |> ignore
+        ModificationUtil.ReplaceChild(oldChild, newChild)
 
     /// Wraps ModificationUtil.ReplaceChild and ignores the resulting replaced node.
     /// Use ModificationUtil.ReplaceChild if resulting node is needed.
@@ -370,3 +377,7 @@ let rec getAllExpressionArgs (expr: ISynExpr) =
                 yield prefixApp.ArgumentExpression
             else currentExpr <- null
     }
+
+type ITreeNode with
+    member this.IsNewLineToken() =
+        this.GetTokenType() == FSharpTokenType.NEW_LINE

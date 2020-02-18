@@ -17,4 +17,4 @@ type RemoveUnusedNamedAsPatFix(warning: UnusedValueWarning) =
 
     override x.ExecutePsiTransaction _ =
         use writeLock = WriteLockCookie.Create(pat.IsPhysical())
-        replaceWithCopy pat pat.Pattern
+        replaceWithCopy pat pat.Pattern |> ignore
