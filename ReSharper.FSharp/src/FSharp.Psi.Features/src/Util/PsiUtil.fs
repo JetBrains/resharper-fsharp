@@ -261,13 +261,21 @@ let isFollowedByEmptyLine (node: ITreeNode) =
 
 [<AutoOpen>]
 module PsiModificationUtil =
-    /// Warning: newChild should not be child of oldChild
+    /// Wraps ModificationUtil.ReplaceChild and ignores the resulting replaced node.
+    /// Use ModificationUtil.ReplaceChild if resulting node is needed.
+    /// 
+    /// Warning: newChild should not be child of oldChild.
     let replace oldChild newChild =
         ModificationUtil.ReplaceChild(oldChild, newChild) |> ignore
 
+    /// Wraps ModificationUtil.ReplaceChild and ignores the resulting replaced node.
+    /// Use ModificationUtil.ReplaceChild if resulting node is needed.
+    ///
+    /// Should be used when newChild is a child of oldChild.
     let replaceWithCopy oldChild newChild =
         replace oldChild (newChild.Copy())
 
+    /// A shorthand helper for PsiModificationUtil.replace.
     let replaceWithToken oldChild (newChildTokenType: TokenNodeType) =
         replace oldChild (newChildTokenType.CreateLeafElement())
 
