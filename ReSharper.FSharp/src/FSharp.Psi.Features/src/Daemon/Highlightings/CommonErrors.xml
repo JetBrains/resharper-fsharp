@@ -263,4 +263,11 @@
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>RemoveUnexpectedArgumentsFix</QuickFix>
   </Error>
+
+  <Warning staticGroup="FSharpErrors" name="RedundantParenExpr" isSuppressedInTests="true">
+    <Parameter type="IParenExpr" name="parenExpr"/>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message value="Redundant parentheses"/>
+  </Warning>
+
 </Errors>

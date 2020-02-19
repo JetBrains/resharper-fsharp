@@ -371,9 +371,8 @@ interface synExpr:
   tryLikeExpr |
   sequentialExpr |
   ifThenElseExpr |
-  referenceExpr |
+  qualifiedExpr |
   setExpr |
-  indexerExpr |
   nullExpr |
   addressOfExpr |
   traitCallExpr |
@@ -404,7 +403,10 @@ interface typedLikeExpr:
   typedExpr |
   typeTestExpr |
   castExpr;
-  
+
+interface qualifiedExpr:
+  referenceExpr |
+  indexerExpr;
 
 setExpr options { stubBase="FSharpExpressionBase"; }:
   synExpr<LEFT_EXPR, LeftExpression>
@@ -418,7 +420,7 @@ interface indexerExpr:
 itemIndexerExpr options { stubBase="FSharpExpressionBase"; } extras {
   get { methodName="Args" path=<itemIndexerExpr:ARG_LIST/indexerArgList:INDEXER_ARG> };
 }:
-  synExpr<EXPR, Expression>
+  synExpr<QUALIFIER_EXPR, Qualifier>
   DOT
   indexerArgList<ARG_LIST, IndexerArgList>;
 
@@ -426,8 +428,8 @@ namedIndexerExpr options { stubBase="FSharpExpressionBase"; } extras {
   // todo: fix this, it's always empty now
   get { methodName="Args" path=<namedIndexerExpr:INDEXER_ARG> };
 }:
-  // todo: maybe: expr, dot, ident, arg?
-  referenceExpr<EXPR, Expression>
+  // todo: maybe: refExpr?
+  synExpr<QUALIFIER_EXPR, Qualifier>
   indexerArg<INDEXER_ARG, IndexerArg>;
 
 indexerArgList:

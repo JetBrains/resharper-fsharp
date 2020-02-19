@@ -189,7 +189,7 @@ type FSharpNamingService(language: FSharpLanguage) =
             | _ -> x.SuggestRoots(referenceExpr.Reference, null, policyProvider)
 
         | :? IIndexerExpr as dotIndexedGetExpr ->
-            let roots = x.SuggestRoots(dotIndexedGetExpr.Expression, useExpectedTypes, policyProvider)
+            let roots = x.SuggestRoots(dotIndexedGetExpr.Qualifier, useExpectedTypes, policyProvider)
             FSharpNamingService.PluralToSingle(roots)
 
         | :? ICastExpr as castExpr ->

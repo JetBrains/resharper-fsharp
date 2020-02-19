@@ -102,7 +102,7 @@ type FSharpLanguageService
             if isNotNull (SetExprNavigator.GetByLeftExpression(referenceExpr.IgnoreParentParens())) then
                 ReferenceAccessType.WRITE else
 
-            let indexerExpr = IndexerExprNavigator.GetByExpression(referenceExpr.IgnoreParentParens())
+            let indexerExpr = IndexerExprNavigator.GetByQualifier(referenceExpr.IgnoreParentParens())
             if isNotNull indexerExpr && isNotNull (SetExprNavigator.GetByLeftExpression(indexerExpr)) then
                 ReferenceAccessType.READ else
 

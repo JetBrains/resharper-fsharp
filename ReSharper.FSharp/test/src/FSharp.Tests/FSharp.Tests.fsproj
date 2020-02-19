@@ -30,6 +30,7 @@
     <Compile Include="Daemon\InferredTypeCodeVisionProviderTest.fs" />
     <Compile Include="Daemon\InheritanceGutterMarksTest.fs" />
     <Compile Include="Daemon\SyntaxHighlightingTest.fs" />
+    <Compile Include="Daemon\RedundantParensTest.fs" />
     <Compile Include="QuickFixes\ErrorAttributes.fs" />
     <Compile Include="QuickFixes\ReplaceUseWithLetTest.fs" />
     <Compile Include="QuickFixes\RemoveUnusedSelfIdVariableFix.fs" />

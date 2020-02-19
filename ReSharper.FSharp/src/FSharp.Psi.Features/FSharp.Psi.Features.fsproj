@@ -54,6 +54,7 @@
     <Compile Include="src\Daemon\Analyzers\RedundantBackticksAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\RedundantNew.fs" />
     <Compile Include="src\Daemon\Analyzers\LetDisposableAnalyzer.fs" />
+    <Compile Include="src\Daemon\Analyzers\RedundantParenAnalyzer.fs" />
     <Compile Include="src\Comment\FSharpBlockCommentActionProvider.fs" />
     <Compile Include="src\Comment\FSharpLineCommentActionProvider.fs" />
     <Compile Include="src\Debugger\FSharpBreakpointVariantsProvider.fs" />

@@ -144,6 +144,15 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - App - Logic 01 - And``() = x.DoNamedTest()
     [<Test>] member x.``Expr - App - Logic 02 - Or``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - App - Precedence 01 - High``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - App - Precedence 02 - Low``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - App - Precedence 03``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - App - Precedence 04 - High - List``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - App - Precedence 05 - High - Multiple``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - App - Precedence 06 - High - Multiple``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - App - Prefix op 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Expr - TypeApp 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - TypeApp 02 - Lid``() = x.DoNamedTest()
     [<Test>] member x.``Expr - TypeApp 03 - DotGet``() = x.DoNamedTest()

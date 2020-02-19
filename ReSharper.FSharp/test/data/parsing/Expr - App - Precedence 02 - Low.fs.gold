@@ -1,0 +1,18 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IDo
+      IChameleonExpression
+        IPrefixAppExpr
+          IReferenceExpr
+            FSharpIdentifierToken(type:IDENTIFIER, text:f)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IReferenceExpr
+            IParenExpr
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              IReferenceExpr
+                FSharpIdentifierToken(type:IDENTIFIER, text:x)
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+            FSharpTokenType+DotTokenElement(type:DOT, text:.)
+            FSharpIdentifierToken(type:IDENTIFIER, text:P)
+
