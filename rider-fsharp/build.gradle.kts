@@ -116,33 +116,16 @@ val pluginFiles = listOf(
         "Daemon.FSharp/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs",
         "Services.FSharp/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.Services.Cs")
 
-val nugetPackagesPath by lazy {
-    val sdkPath = intellij.ideaDependency.classes
+val dotNetSdkPath by lazy {
+    val sdkPath = intellij.ideaDependency.classes.resolve("lib").resolve("DotNetSdkForRdPlugins")
+    if (sdkPath.isDirectory.not()) error("$sdkPath does not exist or not a directory")
 
     println("SDK path: $sdkPath")
-    val path = File(sdkPath, "lib/ReSharperHostSdk")
-
-    println("NuGet packages: $path")
-    if (!path.isDirectory) error("$path does not exist or not a directory")
-
-    return@lazy path
-}
-
-val riderSdkPackageVersion by lazy {
-    val sdkPackageName = "JetBrains.Rider.SDK"
-
-    val regex = Regex("${Regex.escape(sdkPackageName)}\\.([\\d\\.]+.*)\\.nupkg")
-    val version = nugetPackagesPath
-            .listFiles()
-            .mapNotNull { regex.matchEntire(it.name)?.groupValues?.drop(1)?.first() }
-            .singleOrNull() ?: error("$sdkPackageName package is not found in $nugetPackagesPath (or multiple matches)")
-    println("$sdkPackageName version is $version")
-
-    return@lazy version
+    return@lazy sdkPath
 }
 
 val nugetConfigPath = File(repoRoot, "NuGet.Config")
-val riderSdkVersionPropsPath = File(resharperPluginPath, "RiderSdkPackageVersion.props")
+val dotNetSdkPathPropsPath = File("build", "DotNetSdkPath.generated.props")
 
 val riderFSharpTargetsGroup = "rider-fsharp"
 
@@ -248,12 +231,12 @@ tasks {
         ignoreFailures = true
     }
 
-    create("writeRiderSdkVersionProps") {
+    create("writeDotNetSdkPathProps") {
         group = riderFSharpTargetsGroup
         doLast {
-            riderSdkVersionPropsPath.writeTextIfChanged("""<Project>
+            dotNetSdkPathPropsPath.writeTextIfChanged("""<Project>
   <PropertyGroup>
-    <RiderSDKVersion>[$riderSdkPackageVersion]</RiderSDKVersion>
+    <DotNetSdkPath>$dotNetSdkPath</DotNetSdkPath>
   </PropertyGroup>
 </Project>
 """)
@@ -270,7 +253,7 @@ tasks {
             nugetConfigPath.writeTextIfChanged("""<?xml version="1.0" encoding="utf-8"?>
 <configuration>
   <packageSources>
-    <add key="resharper-sdk" value="$nugetPackagesPath" />
+    <add key="resharper-sdk" value="$dotNetSdkPath" />
   </packageSources>
 </configuration>
 """)
@@ -286,7 +269,7 @@ tasks {
 
     create("prepare") {
         group = riderFSharpTargetsGroup
-        dependsOn("rdgen", "writeNuGetConfig", "writeRiderSdkVersionProps")
+        dependsOn("rdgen", "writeNuGetConfig", "writeDotNetSdkPathProps")
     }
 
     create("buildReSharperPlugin") {

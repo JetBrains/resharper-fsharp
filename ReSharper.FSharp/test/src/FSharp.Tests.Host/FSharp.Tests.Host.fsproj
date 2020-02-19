@@ -4,6 +4,7 @@
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Tests.Host</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Tests.Host</AssemblyName>
+    <JetTestProject>true</JetTestProject>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,8 +14,6 @@
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="$(FSharpCoreVersion)" />
     <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FSharpCompilerServiceVersion)" />
-    <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
-    <PackageReference Include="System.ValueTuple" Version="$(ValueTupleVersion)" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,4 +24,8 @@
     <Reference Include="WindowsBase" />
     <Reference Include="System.Windows.Forms" /> <!--needed for completion to work -->
   </ItemGroup>
+  
+  <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Platform_Sdk.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Platform_Sdk.Props')" />
+  <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.ReSharperAutomationTools_src_ReSharperHost.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.ReSharperAutomationTools_src_ReSharperHost.Props')" />
+  <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_test_Framework.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_test_Framework.Props')" />
 </Project>

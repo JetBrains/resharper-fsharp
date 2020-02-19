@@ -23,5 +23,5 @@
     <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)resharper-fsharp.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
-  <Import Project="RiderSdkPackageVersion.props" />
+  <Import Project="$(MSBuildThisFileDirectory)..\rider-fsharp\build\DotNetSdkPath.generated.props" />
 </Project>

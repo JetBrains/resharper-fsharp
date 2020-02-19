@@ -11,7 +11,7 @@
 
   <ItemGroup>
     <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FSharpCompilerServiceVersion)" />
-    <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
-    <PackageReference Include="System.ValueTuple" Version="$(ValueTupleVersion)" />
   </ItemGroup>
+  
+  <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props')" />
 </Project>
