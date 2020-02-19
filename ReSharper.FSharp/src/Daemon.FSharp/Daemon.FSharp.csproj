@@ -8,12 +8,10 @@
   <ItemGroup>
     <ProjectReference Include="..\FSharp.Psi\FSharp.Psi.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
-    <PackageReference Include="System.ValueTuple" Version="$(ValueTupleVersion)" />
-  </ItemGroup>
+  
   <ItemGroup>
     <Reference Include="System.Web" />
   </ItemGroup>
+  
+  <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props')" />
 </Project>

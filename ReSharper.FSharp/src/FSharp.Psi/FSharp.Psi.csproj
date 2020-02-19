@@ -22,12 +22,7 @@
       <DependentUpon>FSharpTokens.xml</DependentUpon>
     </Compile>
   </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
-    <PackageReference Include="System.ValueTuple" Version="$(ValueTupleVersion)" />
-  </ItemGroup>
-
+  
   <ItemGroup>
     <ProjectReference Include="..\FSharp.Common\FSharp.Common.fsproj" />
   </ItemGroup>
@@ -35,4 +30,6 @@
   <ItemGroup>
     <CsLex Include="src\Parsing\Lexing\fsharpLexer.lex" />
   </ItemGroup>
+  
+  <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props')" />
 </Project>
