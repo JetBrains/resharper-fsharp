@@ -200,14 +200,6 @@ let rec getFirstMatchingNodeBefore (predicate: ITreeNode -> bool) (node: ITreeNo
     else
         node
 
-let getAllMatchingNodesAfter predicate (node: ITreeNode) =
-    let mutable nextSibling = node.NextSibling
-    [
-        while isNotNull nextSibling do
-            if predicate nextSibling then yield nextSibling
-            nextSibling <- nextSibling.NextSibling
-    ]
-
 let rec getThisOrNextTokenOfType tokenType (node: ITreeNode) =
     if getTokenType node == tokenType then node else
 
@@ -289,8 +281,8 @@ module PsiModificationUtil =
     let deleteChildRange first last =
         ModificationUtil.DeleteChildRange(first, last)
 
-    let addNodesAfter anchor (nodes: ITreeNode list) =
-        nodes |> List.fold (fun anchor treeNode ->
+    let addNodesAfter anchor (nodes: ITreeNode seq) =
+        nodes |> Seq.fold (fun anchor treeNode ->
             ModificationUtil.AddChildAfter(anchor, treeNode)) anchor
 
     let addNodesBefore anchor (nodes: ITreeNode list) =

@@ -1,10 +1,12 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
-open JetBrains.ReSharper.Resources.Shell
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Psi.Util
 
 [<AutoOpen>]
 module private FixNames =
@@ -15,14 +17,8 @@ type RemoveUnexpectedArgumentsFix(warning: NotAFunctionError) =
     inherit FSharpQuickFixBase()
 
     let expr = warning.Expr
+    let exprNode = expr :> ITreeNode
     let prefixApp = warning.PrefixApp
-
-    let rec isFromCommentTokensRegion (x: ITreeNode) =
-        match x with
-        | x when x.IsCommentToken() -> true
-        | x when x.IsWhitespaceToken() && x.NextSibling.IsCommentToken() -> true
-        | x when x.IsNewLineToken() -> isFromCommentTokensRegion(x.NextSibling)
-        | _ -> false
     
     override x.Text =
         if prefixApp.FunctionExpression == expr then RemoveUnexpectedArgument else RemoveUnexpectedArguments
@@ -31,6 +27,9 @@ type RemoveUnexpectedArgumentsFix(warning: NotAFunctionError) =
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
-        let commentTokensRegion = getAllMatchingNodesAfter isFromCommentTokensRegion expr
+        let firstUnexpectedArg = PrefixAppExprNavigator.GetByFunctionExpression(expr).ArgumentExpression
+        let lastCommentNode = (getFirstMatchingNodeBefore isWhitespace firstUnexpectedArg).PrevSibling
         let updatedRoot = ModificationUtil.ReplaceChild(prefixApp, expr.Copy())
-        addNodesAfter updatedRoot commentTokensRegion |> ignore
+        
+        if not (lastCommentNode == exprNode) then
+            addNodesAfter updatedRoot (TreeRange(expr.NextSibling, lastCommentNode)) |> ignore
