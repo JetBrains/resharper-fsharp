@@ -36,6 +36,7 @@ type ToModuleNamespaceDeclarationAction(dataProvider: FSharpContextActionDataPro
     override x.ExecutePsiTransaction(_, _) =
         let moduleDeclaration = dataProvider.GetSelectedElement<IDeclaredModuleLikeDeclaration>()
         use writeCookie = WriteLockCookie.Create(moduleDeclaration.IsPhysical())
+        use disableFormatter = new DisableCodeFormatter()
 
         let tokenType, nodeType = getNewNodeTypes moduleDeclaration
         replaceWithToken moduleDeclaration.ModuleOrNamespaceKeyword tokenType

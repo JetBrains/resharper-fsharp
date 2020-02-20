@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.CommonErrors
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
@@ -19,6 +20,7 @@ type RemoveNeverMatchingRuleFix(warning: RuleNeverMatchedWarning) =
 
     override x.ExecutePsiTransaction _ =
         use writeLock = WriteLockCookie.Create(matchClause.IsPhysical())
+        use disableFormatter = new DisableCodeFormatter()
 
         if isLastChild matchClause then
             let matchClauseOwner = MatchClauseListOwnerNavigator.GetByClause(matchClause)

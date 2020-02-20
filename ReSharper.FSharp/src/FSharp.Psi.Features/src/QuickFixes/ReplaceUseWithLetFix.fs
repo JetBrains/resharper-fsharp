@@ -5,6 +5,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
 type ReplaceUseWithLetFix(letNode: ILet) =
@@ -25,4 +26,5 @@ type ReplaceUseWithLetFix(letNode: ILet) =
                          sprintf "Expecting use, got: %O" (useKeyword.GetTokenType()))
 
         use writeLock = WriteLockCookie.Create(letNode.IsPhysical())
+        use disableFormatter = new DisableCodeFormatter()
         replaceWithToken useKeyword FSharpTokenType.LET

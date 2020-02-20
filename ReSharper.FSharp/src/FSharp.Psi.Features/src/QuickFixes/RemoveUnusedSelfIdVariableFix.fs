@@ -5,6 +5,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.Common
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
 
@@ -18,6 +19,7 @@ type RemoveUnusedSelfIdVariableFix(warning: UnusedThisVariableWarning) =
 
     override x.ExecutePsiTransaction _ =
         use writeLock = WriteLockCookie.Create(selfId.IsPhysical())
+        use disableFormatter = new DisableCodeFormatter()
 
         let ctor = ConstructorDeclarationNavigator.GetBySelfIdentifier(selfId).NotNull()
 

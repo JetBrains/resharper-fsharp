@@ -16,6 +16,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util.PsiUtil
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
@@ -65,6 +66,7 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
         let elementFactory = fsFile.CreateElementFactory()
 
         use writeCookie = WriteLockCookie.Create(recordExpr.IsPhysical())
+        use disableFormatter = new DisableCodeFormatter()
 
         let mutable anchor: ITreeNode =
             match existingBindings.LastOrDefault() with

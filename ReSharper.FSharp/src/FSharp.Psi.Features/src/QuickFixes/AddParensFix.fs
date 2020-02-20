@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
 type AddParensFix(error: SuccessiveArgsShouldBeSpacedOrTupledError) =
@@ -15,4 +16,5 @@ type AddParensFix(error: SuccessiveArgsShouldBeSpacedOrTupledError) =
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
+        use diableFormatter = new DisableCodeFormatter()
         addParens expr |> ignore
