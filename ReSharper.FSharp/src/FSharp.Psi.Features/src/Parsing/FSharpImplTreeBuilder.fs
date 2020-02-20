@@ -721,20 +721,27 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         | SynExpr.Assert(expr, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.ASSERT_EXPR)
 
-        | SynExpr.App(_, isInfix, funcExpr, argExpr, _) ->
-            if isInfix then
-                match funcExpr with
-                | SynExpr.Ident(id) when id.idText = "op_Range" -> x.ProcessRangeSequenceExpr(argExpr, false)
-                | SynExpr.Ident(id) when id.idText = "op_RangeStep" -> x.ProcessRangeSequenceExpr(argExpr, true)
-                | _ ->
+        | SynExpr.App(_, false, SynExpr.App(_, true, funcExpr, leftArg, _), rightArg, prefixAppRange) ->
+            match funcExpr with
+            | SynExpr.Ident(id) when id.idText = "op_Range" ->
+                x.ProcessRangeExpr(leftArg, rightArg, prefixAppRange)
 
-                x.PushRange(range, ElementType.INFIX_APP_EXPR)
-                x.PushExpression(funcExpr)
-                x.ProcessExpression(argExpr)
-            else
-                x.PushRange(range, ElementType.PREFIX_APP_EXPR)
-                x.PushExpression(argExpr)
-                x.ProcessExpression(funcExpr)
+            | SynExpr.Ident(id) when id.idText = "op_RangeStep" ->
+                x.ProcessRangeStepExpr(leftArg, rightArg)
+
+            | _ ->
+
+            x.PushRange(range, ElementType.BINARY_APP_EXPR)
+            x.PushExpression(rightArg)
+            x.PushExpression(funcExpr)
+            x.ProcessExpression(leftArg)
+
+        | SynExpr.App(_, isInfix, funcExpr, argExpr, _) ->
+            Assertion.Assert(not isInfix, sprintf "Expecting prefix app, got: %A" expr)
+
+            x.PushRange(range, ElementType.PREFIX_APP_EXPR)
+            x.PushExpression(argExpr)
+            x.ProcessExpression(funcExpr)
 
         | SynExpr.TypeApp(expr, _, _, _, _, _, _) as typeApp ->
             // Process expression first, then inject type args into it in the processor.
@@ -889,38 +896,38 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             x.PushSequentialExpression(expr2)
             x.ProcessExpression(expr1)
 
-    member x.ProcessRangeSequenceExpr(ExprRange fromExprRange as fromExpr, hasStepExpr) =
+    member x.ProcessRangeStepExpr(fromExpr: SynExpr, stepExpr: SynExpr) =
+        let toExpr = nextSteps.Pop().Item :?> SynExpr
+
+        // There's one extra app expr for ranges with step specified, remove it.
+        let rangeSeqAppExprStep = nextSteps.Pop().Item :?> RangeMarkAndType
+        x.Builder.Drop(rangeSeqAppExprStep.Mark)
+
+        x.ProcessRangeStepExpr(fromExpr, ValueSome(stepExpr), toExpr, rangeSeqAppExprStep.Range)
+
+    member x.ProcessRangeExpr(fromExpr: SynExpr, toExpr: SynExpr, r) =
+        x.ProcessRangeStepExpr(fromExpr, ValueNone, toExpr, r)
+
+    member x.ProcessRangeStepExpr(fromExpr: SynExpr, stepExpr: SynExpr voption, toExpr: SynExpr, appRange) =
         // Range sequences are hacked to look like function applications.
         // We need to change already pushed builder steps to fix it. 
 
-        let stepExpr =
-            if hasStepExpr then
-                let expr = nextSteps.Pop().Item :?> SynExpr
-                // There's one extra app expr for ranges with step specified, remove it.
-                let stepAppExprItem = nextSteps.Pop().Item :?> RangeMarkAndType
-                x.Builder.Drop(stepAppExprItem.Mark)
-                expr
-            else
-                Unchecked.defaultof<_>
+        let fromRange = fromExpr.Range
+        let toRange = toExpr.Range
 
-        let toExprStep = nextSteps.Pop()
-        let rangeSeqAppExprStep = nextSteps.Pop().Item :?> RangeMarkAndType
+        let rangeSeqRange = unionRanges fromRange toRange
 
-        let toExpr = toExprStep.Item :?> SynExpr 
-        let rangeSeqRange = unionRanges fromExprRange toExpr.Range
+        // Range sequence expr also contains braces in the fake app expr, mark it as a separate expr node.
+        if appRange <> rangeSeqRange then
+            x.PushRange(appRange, ElementType.RANGE_SEQUENCE_EXPR)
 
-        if rangeSeqAppExprStep.Range <> rangeSeqRange then
-            // Range sequence expr also contains braces in the fake app expr, mark it as a separate expr node.
-            x.PushRangeForMark(rangeSeqAppExprStep.Range, rangeSeqAppExprStep.Mark, ElementType.RANGE_SEQUENCE_EXPR)
-            x.PushRange(rangeSeqRange, ElementType.RANGE_SEQUENCE)
-        else
-            // Ranges are equals when no actual expression is present.
-            // Currently it only happens inside ForEach expressions.
-            x.PushRangeForMark(rangeSeqAppExprStep.Range, rangeSeqAppExprStep.Mark, ElementType.RANGE_SEQUENCE)
-
+        let seqMark = x.Mark(fromRange)
+        x.PushRangeForMark(toRange, seqMark, ElementType.RANGE_SEQUENCE)
         x.PushExpression(toExpr)
-        if hasStepExpr then
-            x.PushExpression(stepExpr)
+
+        match stepExpr with
+        | ValueSome stepExpr -> x.PushExpression(stepExpr)
+        | _ -> ()
 
         x.ProcessExpression(fromExpr)
 

@@ -50,7 +50,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
     let createAppExpr addSpace =
         let space = if addSpace then " " else ""
         let source = sprintf "()%s()" space
-        getExpression source :?> IAppExpr
+        getExpression source :?> IPrefixAppExpr
 
     let createLetBinding bindingName =
         let source = sprintf "do (let %s = ())" bindingName
@@ -93,21 +93,17 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let indent = expr.Indent
             let newExpr = getExpression source
 
-            match newExpr.As<IAppExpr>() with
+            match newExpr.As<IBinaryAppExpr>() with
             | null -> failwith "Could not get outer appExpr"
-            | outerAppExpr ->
+            | binaryAppExpr ->
 
-            match outerAppExpr.FunctionExpression.As<IAppExpr>() with
-            | null -> failwith "Could not get inner appExpr"
-            | innerAppExpr ->
-
-            let expr = ModificationUtil.ReplaceChild(innerAppExpr.ArgumentExpression, expr.Copy())
+            let expr = ModificationUtil.ReplaceChild(binaryAppExpr.LeftArgumentExpression, expr.Copy())
 
             if newLine then
                 ModificationUtil.ReplaceChild(expr.NextSibling, Whitespace(indent)) |> ignore
                 ModificationUtil.AddChildBefore(expr.NextSibling, NewLine(expr.GetLineEnding())) |> ignore
 
-            outerAppExpr
+            binaryAppExpr
 
         member x.CreateRecordExprBinding(field, addSemicolon) =
             let field = namingService.MangleNameIfNecessary(field)
@@ -122,7 +118,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
         member x.CreateAppExpr(funcName, argExpr) =
             let source = sprintf "%s ()" funcName
-            let newExpr = getExpression source :?> IAppExpr
+            let newExpr = getExpression source :?> IPrefixAppExpr
             let argExpr = if not (needsParens argExpr) then argExpr.Copy() else createParenExpr argExpr :> _
             newExpr.SetArgumentExpression(argExpr) |> ignore
             newExpr
@@ -204,10 +200,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         member x.CreateBinaryAppExpr(text, arg1, arg2) =
             let source = "() " + text + " ()"
             let expr = getExpression source
-            let appExpr = expr.As<IPrefixAppExpr>()
-            ModificationUtil.ReplaceChild(appExpr.ArgumentExpression, arg2) |> ignore
-            
-            let infixApp = appExpr.FunctionExpression.As<IInfixAppExpr>()
-            ModificationUtil.ReplaceChild(infixApp.ArgumentExpression, arg1) |> ignore
-
+            let appExpr = expr.As<IBinaryAppExpr>()
+            ModificationUtil.ReplaceChild(appExpr.LeftArgumentExpression, arg1) |> ignore
+            ModificationUtil.ReplaceChild(appExpr.RightArgumentExpression, arg2) |> ignore
             expr

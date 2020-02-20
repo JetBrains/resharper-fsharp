@@ -7,7 +7,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 
-let isHighPrecedenceApp (appExpr: IAppExpr) =
+let isHighPrecedenceApp (appExpr: IPrefixAppExpr) =
     if isNull appExpr then false else
 
     let funExpr = appExpr.FunctionExpression
@@ -22,7 +22,7 @@ let private canBeTopLevelArgInHighPrecedenceApp (expr: ISynExpr) =
     expr :? IArrayOrListExpr || expr :? IArrayOrListOfSeqExpr ||
     expr :? IObjExpr || expr :? IRecordExpr
 
-let rec private isHighPrecedenceAppRequired (appExpr: IAppExpr) =
+let rec private isHighPrecedenceAppRequired (appExpr: IPrefixAppExpr) =
     let argExpr = appExpr.ArgumentExpression.IgnoreInnerParens()
     if canBeTopLevelArgInHighPrecedenceApp argExpr then false else
 

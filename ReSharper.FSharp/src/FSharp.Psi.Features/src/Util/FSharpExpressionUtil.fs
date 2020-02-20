@@ -10,12 +10,12 @@ open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 
-let isPredefinedFuctionApp name (appExpr: IAppExpr) =
+let inline isPredefinedFuctionApp name (appExpr: ^T) =
     Assertion.Assert(predefinedFunctionTypes.ContainsKey(name), "Predefined function is not added: {0}", name)
 
-    if isNull appExpr || isNull appExpr.ArgumentExpression then false else
+    if isNull appExpr then false else
 
-    let refExpr = appExpr.FunctionExpression.As<IReferenceExpr>()
+    let refExpr = (^T: (member FunctionExpression: ISynExpr) appExpr).As<IReferenceExpr>()
     if isNull refExpr then false else
 
     let exprReference = refExpr.Reference
@@ -43,15 +43,15 @@ let rec createLogicallyNegatedExpression (expr: ISynExpr): ISynExpr =
         // todo: check if parens are needed
         appExpr.ArgumentExpression.Copy() else
 
-    let infixApp = if isNotNull appExpr then appExpr.FunctionExpression.As<IInfixAppExpr>() else null
-    if isNotNull infixApp && isPredefinedFuctionApp "||" infixApp then
-        let arg1 = createLogicallyNegatedExpression infixApp.ArgumentExpression
-        let arg2 = createLogicallyNegatedExpression appExpr.ArgumentExpression
+    let binaryApp = expr.As<IBinaryAppExpr>()
+    if isNotNull binaryApp && isPredefinedFuctionApp "||" binaryApp then
+        let arg1 = createLogicallyNegatedExpression binaryApp.LeftArgumentExpression
+        let arg2 = createLogicallyNegatedExpression binaryApp.RightArgumentExpression
         factory.CreateBinaryAppExpr("&&", arg1, arg2) else
 
-    if isNotNull infixApp && isPredefinedFuctionApp "&&" infixApp then
-        let arg1 = createLogicallyNegatedExpression infixApp.ArgumentExpression
-        let arg2 = createLogicallyNegatedExpression appExpr.ArgumentExpression
+    if isNotNull binaryApp && isPredefinedFuctionApp "&&" binaryApp then
+        let arg1 = createLogicallyNegatedExpression binaryApp.LeftArgumentExpression
+        let arg2 = createLogicallyNegatedExpression binaryApp.RightArgumentExpression
         factory.CreateBinaryAppExpr("||", arg1, arg2) else
 
     let literalExpr = expr.As<ILiteralExpr>()

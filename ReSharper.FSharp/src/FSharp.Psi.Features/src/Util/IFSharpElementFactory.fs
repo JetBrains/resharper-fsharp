@@ -14,9 +14,9 @@ type IFSharpElementFactory =
 
     abstract CreateConstExpr: text: string -> IConstExpr
 
-    abstract CreateAppExpr: addSpace: bool -> IAppExpr
-    abstract CreateAppExpr: funcName: string * arg: ISynExpr -> IAppExpr
-    abstract CreateAppExpr: funExpr: ISynExpr * argExpr: ISynExpr * addSpace: bool -> IAppExpr
+    abstract CreateAppExpr: addSpace: bool -> IPrefixAppExpr
+    abstract CreateAppExpr: funcName: string * arg: ISynExpr -> IPrefixAppExpr
+    abstract CreateAppExpr: funExpr: ISynExpr * argExpr: ISynExpr * addSpace: bool -> IPrefixAppExpr
     abstract CreateBinaryAppExpr: string * left: ISynExpr * right: ISynExpr -> ISynExpr
 
     abstract CreateExpr: string -> ISynExpr
@@ -27,7 +27,7 @@ type IFSharpElementFactory =
 
     abstract CreateLetModuleDecl: bindingName: string * expr: ISynExpr -> ILetModuleDecl
 
-    abstract CreateIgnoreApp: ISynExpr * newLine: bool -> IAppExpr
+    abstract CreateIgnoreApp: ISynExpr * newLine: bool -> IBinaryAppExpr
     abstract CreateRecordExprBinding: fieldName: string * addSemicolon: bool -> IRecordExprBinding
 
     abstract CreateMatchExpr: ISynExpr -> IMatchExpr

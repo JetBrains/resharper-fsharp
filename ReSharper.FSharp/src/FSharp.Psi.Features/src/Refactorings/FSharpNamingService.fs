@@ -201,23 +201,21 @@ type FSharpNamingService(language: FSharpLanguage) =
             let elseRoots = x.SuggestRoots(ifThenElseExpr.ElseExpr, useExpectedTypes, policyProvider)
             Seq.append thenRoots elseRoots
 
+        | :? IBinaryAppExpr as binaryApp ->
+            let refExpr = binaryApp.FunctionExpression.As<IReferenceExpr>()
+            if isNull refExpr then EmptyList.Instance :> _ else
+
+            let name = refExpr.Reference.GetName()
+            if pipeRightOperatorNames.Contains(name) && isNotNull binaryApp.RightArgumentExpression then
+                x.SuggestRoots(binaryApp.RightArgumentExpression, useExpectedTypes, policyProvider) else
+
+            if pipeLeftOperatorNames.Contains(name) && isNotNull binaryApp.LeftArgumentExpression then
+                x.SuggestRoots(binaryApp.LeftArgumentExpression, useExpectedTypes, policyProvider) else
+
+            EmptyList.Instance :> _
+
         // todo: partially applied functions?
-        | :? IAppExpr as appExpr ->
-            match appExpr.FunctionExpression with
-            | :? IInfixAppExpr as infixApp ->
-                let refExpr = infixApp.FunctionExpression.As<IReferenceExpr>()
-                if isNull refExpr then EmptyList.Instance :> _ else
-
-                let name = refExpr.Reference.GetName()
-                if pipeRightOperatorNames.Contains(name) && isNotNull appExpr.ArgumentExpression then
-                    x.SuggestRoots(appExpr.ArgumentExpression, useExpectedTypes, policyProvider) else
-
-                if pipeLeftOperatorNames.Contains(name) && isNotNull infixApp.ArgumentExpression then
-                    x.SuggestRoots(infixApp.ArgumentExpression, useExpectedTypes, policyProvider) else
-
-                EmptyList.Instance :> _
-            | _ ->
-
+        | :? IPrefixAppExpr as appExpr ->
             let invokedFunctionReference = appExpr.InvokedFunctionReference
             if isNotNull invokedFunctionReference then
                 x.SuggestRoots(invokedFunctionReference, null, policyProvider)

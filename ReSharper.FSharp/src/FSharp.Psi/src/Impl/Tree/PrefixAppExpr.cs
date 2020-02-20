@@ -15,8 +15,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       get
       {
         var argsCount = 0;
-        var funExpr = (IAppExpr) this;
-        while (funExpr.FunctionExpression.IgnoreInnerParens() is IAppExpr appExpr)
+        var funExpr = (IPrefixAppExpr) this;
+        while (funExpr.FunctionExpression.IgnoreInnerParens() is IPrefixAppExpr appExpr)
         {
           funExpr = appExpr;
           argsCount++;
@@ -44,8 +44,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       get
       {
         var args = new List<IExpression>();
-        var funExpr = (IAppExpr) this;
-        while (funExpr.FunctionExpression.IgnoreInnerParens() is IAppExpr appExpr)
+        var funExpr = (IPrefixAppExpr) this;
+        while (funExpr.FunctionExpression.IgnoreInnerParens() is IPrefixAppExpr appExpr)
         {
           args.Add(funExpr.ArgumentExpression);
           funExpr = appExpr;

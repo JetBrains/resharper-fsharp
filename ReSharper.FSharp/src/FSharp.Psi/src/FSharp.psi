@@ -367,6 +367,7 @@ interface synExpr:
   matchLikeExpr |
   doLikeExpr |
   appLikeExpr |
+  binaryAppExpr |
   letLikeExpr |
   tryLikeExpr |
   sequentialExpr |
@@ -392,12 +393,8 @@ interface doLikeExpr:
   inferredCastExpr;
 
 interface appLikeExpr:
-  appExpr |
-  newExpr;
-
-interface appExpr:
   prefixAppExpr |
-  infixAppExpr;
+  newExpr;
 
 interface typedLikeExpr:
   typedExpr |
@@ -628,9 +625,10 @@ prefixAppExpr options { stubBase="FSharpExpressionBase"; }:
   synExpr<FUNC_EXPR, FunctionExpression>
   synExpr<ARG_EXPR, ArgumentExpression>;
 
-infixAppExpr options { stubBase="FSharpExpressionBase"; }:
-  synExpr<ARG_EXPR, ArgumentExpression>
-  synExpr<FUNC_EXPR, FunctionExpression>;
+binaryAppExpr options { stubBase="FSharpExpressionBase"; }:
+  synExpr<LEFT_ARG_EXPR, LeftArgumentExpression>
+  synExpr<FUNC_EXPR, FunctionExpression>
+  synExpr<RIGHT_ARG_EXPR, RightArgumentExpression>;
 
 letOrUseExpr options { stubBase="FSharpExpressionBase"; }:
   letOrUse{LET, LetOrUseToken}

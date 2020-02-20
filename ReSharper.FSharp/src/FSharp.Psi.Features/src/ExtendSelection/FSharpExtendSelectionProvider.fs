@@ -53,13 +53,6 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
 
             null
 
-        | :? IInfixAppExpr as infixAppExpr ->
-            let prefixAppExpr = infixAppExpr.Parent.As<IPrefixAppExpr>()
-            if isNotNull prefixAppExpr then
-                FSharpTreeNodeSelection(fsFile, prefixAppExpr) :> _ else
-
-            null
-
         | :? ISynExpr as expr ->
             let attribute = AttributeNavigator.GetByExpression(expr)
             if isNotNull attribute && isNotNull attribute.ReferenceName && isNotNull attribute.ArgExpression then
@@ -123,7 +116,7 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
 
     static member FindBetterNode(fsFile, node: ITreeNode) =
         let shouldTryFindBetterNode (node: ITreeNode) =
-            node :? IBinding || node :? IInfixAppExpr
+            node :? IBinding
 
         if not (shouldTryFindBetterNode node) then null else
         FSharpExtendSelectionProvider.ExtendNodeSelection(fsFile, node)
