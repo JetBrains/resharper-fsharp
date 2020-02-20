@@ -1,4 +1,3 @@
 module Module
 
-let f x = x + 1
-let g = f 22 {caret}2
+let g = (id 2) {caret}2

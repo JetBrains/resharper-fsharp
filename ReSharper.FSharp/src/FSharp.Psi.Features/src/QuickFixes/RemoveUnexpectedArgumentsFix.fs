@@ -1,8 +1,12 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
-open JetBrains.ReSharper.Resources.Shell
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Resources.Shell
+open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Psi.Util
 
 [<AutoOpen>]
 module private FixNames =
@@ -13,6 +17,7 @@ type RemoveUnexpectedArgumentsFix(warning: NotAFunctionError) =
     inherit FSharpQuickFixBase()
 
     let expr = warning.Expr
+    let exprNode = expr :> ITreeNode
     let prefixApp = warning.PrefixApp
     
     override x.Text =
@@ -22,4 +27,9 @@ type RemoveUnexpectedArgumentsFix(warning: NotAFunctionError) =
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
-        replaceWithCopy prefixApp expr //TODO: save comments before first unexpected arg
+        let firstUnexpectedArg = PrefixAppExprNavigator.GetByFunctionExpression(expr).ArgumentExpression
+        let commentNodeCandidate = skipMatchingNodesBefore isWhitespace firstUnexpectedArg
+        let updatedRoot = ModificationUtil.ReplaceChild(prefixApp, expr.Copy())
+        
+        if commentNodeCandidate != exprNode then
+            addNodesAfter updatedRoot (TreeRange(expr.NextSibling, commentNodeCandidate)) |> ignore
