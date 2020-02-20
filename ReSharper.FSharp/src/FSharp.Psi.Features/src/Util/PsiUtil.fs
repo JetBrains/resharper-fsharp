@@ -369,7 +369,3 @@ let rec getAllExpressionArgs (expr: ISynExpr) =
                 yield prefixApp.ArgumentExpression
             else currentExpr <- null
     }
-
-type ITreeNode with
-    member this.IsNewLineToken() =
-        this.GetTokenType() == FSharpTokenType.NEW_LINE

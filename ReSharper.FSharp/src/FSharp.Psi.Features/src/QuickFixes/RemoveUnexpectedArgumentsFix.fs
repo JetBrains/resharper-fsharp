@@ -28,8 +28,8 @@ type RemoveUnexpectedArgumentsFix(warning: NotAFunctionError) =
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
         let firstUnexpectedArg = PrefixAppExprNavigator.GetByFunctionExpression(expr).ArgumentExpression
-        let lastCommentNode = (getFirstMatchingNodeBefore isWhitespace firstUnexpectedArg).PrevSibling
+        let commentNodeCandidate = skipMatchingNodesBefore isWhitespace firstUnexpectedArg
         let updatedRoot = ModificationUtil.ReplaceChild(prefixApp, expr.Copy())
         
-        if not (lastCommentNode == exprNode) then
-            addNodesAfter updatedRoot (TreeRange(expr.NextSibling, lastCommentNode)) |> ignore
+        if commentNodeCandidate != exprNode then
+            addNodesAfter updatedRoot (TreeRange(expr.NextSibling, commentNodeCandidate)) |> ignore
