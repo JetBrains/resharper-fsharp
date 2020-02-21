@@ -125,7 +125,11 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Expr - TryFinally 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Lazy 01 - Simple``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - IfThenElse - Elif 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - IfThenElse - Elif 02``() = x.DoNamedTest()
     [<Test>] member x.``Expr - IfThenElse 01 - Simple``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - IfThenElse 02 - Nested 01 - Single line``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Ident 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - LongIdent 01``() = x.DoNamedTest()

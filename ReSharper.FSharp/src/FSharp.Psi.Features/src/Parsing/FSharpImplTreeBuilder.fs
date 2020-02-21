@@ -767,7 +767,18 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             x.PushRangeAndProcessExpression(expr, range, ElementType.LAZY_EXPR)
 
         | SynExpr.IfThenElse(ifExpr, thenExpr, elseExprOpt, _, _, _, _) ->
-            x.PushRange(range, ElementType.IF_THEN_ELSE_EXPR)
+            // Nested ifExpr may have wrong range, e.g. `else` goes inside the nested expr range here:
+            // `if true then "a" else if true then "b" else "c"`
+            // However, elif expressions actually start this way.
+            x.AdvanceToStart(range)
+            let isElif = x.TokenType == FSharpTokenType.ELIF
+
+            if not isElif then
+                x.AdvanceToTokenOrRangeStart(FSharpTokenType.IF, thenExpr.Range)
+
+            let elementType = if isElif then ElementType.ELIF_EXPR else ElementType.IF_THEN_ELSE_EXPR
+            x.PushRangeForMark(range, x.Mark(), elementType)
+
             if elseExprOpt.IsSome then
                 x.PushExpression(elseExprOpt.Value)
             x.PushExpression(thenExpr)

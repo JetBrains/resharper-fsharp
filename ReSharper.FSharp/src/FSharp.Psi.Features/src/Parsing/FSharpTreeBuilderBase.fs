@@ -39,6 +39,7 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
 
     member x.Eof = x.Builder.Eof()
     member x.CurrentOffset = x.Builder.GetTokenOffset() + projectedOffset
+    member x.TokenType = x.Builder.GetTokenType()
 
     override x.SkipWhitespaces() = ()
 
@@ -106,7 +107,7 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
 //        Assertion.Assert(offset <= maxOffset, "tokenType: {0}, currentOffset: {1}, maxOffset: {2}, outer range: {3}",
 //                         tokenType, offset, maxOffset, range)
 
-        while x.CurrentOffset < maxOffset && x.Builder.GetTokenType() != tokenType do
+        while x.CurrentOffset < maxOffset && x.TokenType != tokenType do
             x.AdvanceLexer()
 
     member x.ProcessReferenceName(lid: Ident list) =

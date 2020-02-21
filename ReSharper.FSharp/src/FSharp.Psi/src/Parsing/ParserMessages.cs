@@ -72,6 +72,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_PREFIX_APP_TYPE_ARGUMENT_LIST = "";
     public const string IDS_POSTFIX_APP_TYPE_ARGUMENT_LIST = "";
     public const string IDS_FOR_EACH_IN_CLAUSE = "";
+    public const string IDS_IF_EXPR = "";
+    public const string IDS_ELSE_CLAUSE = "";
 
     public static string GetString(string id) => id;
     public static string GetExpectedMessage(string s) => string.Empty;

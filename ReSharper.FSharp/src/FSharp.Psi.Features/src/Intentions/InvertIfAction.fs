@@ -16,7 +16,10 @@ type InvertIfAction(dataProvider: FSharpContextActionDataProvider) =
 
     override x.IsAvailable _ =
         let ifExpr = dataProvider.GetSelectedElement<IIfThenElseExpr>()
-        if isNull ifExpr || isNull ifExpr.ElseExpr then false else
+        if isNull ifExpr then false else
+
+        let elseExpr = ifExpr.ElseExpr
+        if isNull elseExpr || elseExpr :? IElifExpr then false else
 
         // todo: remove
         if not ifExpr.IsSingleLine then false else

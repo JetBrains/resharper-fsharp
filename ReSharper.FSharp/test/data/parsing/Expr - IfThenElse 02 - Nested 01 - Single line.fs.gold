@@ -1,0 +1,35 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IDo
+      IChameleonExpression
+        IIfThenElseExpr
+          FSharpTokenType+IfTokenElement(type:IF, text:if)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          ILiteralExpr
+            FSharpTokenType+TrueTokenElement(type:TRUE, text:true)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+ThenTokenElement(type:THEN, text:then)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          ILiteralExpr
+            FSharpString(type:STRING, text:"a")
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+ElseTokenElement(type:ELSE, text:else)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IIfThenElseExpr
+            FSharpTokenType+IfTokenElement(type:IF, text:if)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            ILiteralExpr
+              FSharpTokenType+TrueTokenElement(type:TRUE, text:true)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpTokenType+ThenTokenElement(type:THEN, text:then)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            ILiteralExpr
+              FSharpString(type:STRING, text:"b")
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpTokenType+ElseTokenElement(type:ELSE, text:else)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            ILiteralExpr
+              FSharpString(type:STRING, text:"c")
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

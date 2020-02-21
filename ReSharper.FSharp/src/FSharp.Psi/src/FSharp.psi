@@ -371,7 +371,7 @@ interface synExpr:
   letLikeExpr |
   tryLikeExpr |
   sequentialExpr |
-  ifThenElseExpr |
+  ifExpr |
   qualifiedExpr |
   setExpr |
   nullExpr |
@@ -408,6 +408,10 @@ interface typedLikeExpr:
 interface qualifiedExpr:
   referenceExpr |
   indexerExpr;
+
+interface ifExpr:
+  ifThenElseExpr |
+  elifExpr;
 
 setExpr options { stubBase="FSharpExpressionBase"; }:
   synExpr<LEFT_EXPR, LeftExpression>
@@ -671,10 +675,23 @@ ifThenElseExpr options { stubBase="FSharpExpressionBase"; }:
   synExpr<IF_EXPR, ConditionExpr>
   THEN<THEN, ThenKeyword>
   synExpr<THEN_EXPR, ThenExpr>
+  elseClause{ELSE_CLAUSE, ElseExpr}?;
+
+elifExpr options { stubBase="FSharpExpressionBase"; }:
+  ELIF<ELIF, IfKeyword>
+  synExpr<IF_EXPR, ConditionExpr>
+  THEN<THEN, ThenKeyword>
+  synExpr<THEN_EXPR, ThenExpr>
+  elseClause{ELSE_CLAUSE, ElseExpr}?;
+
+private elseClause{ROLE, Getter}:
   (
     ELSE<ELSE, ElseKeyword>
-    synExpr<ELSE_EXPR, ElseExpr>
-  )?;
+    synExpr<@ROLE, @Getter>)
+  |
+  (
+    elifExpr<@ROLE, @Getter>
+  );
 
 referenceExpr options { stubBase="FSharpExpressionBase"; } extras {
   get { methodName="TypeArguments" path=<referenceExpr:TYPE_ARG_LIST/prefixAppTypeArgumentList:TYPE> };
