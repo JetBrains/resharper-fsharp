@@ -72,7 +72,7 @@ type FsiHost
         getReferencePaths assemblyFilter psiModule
 
     do
-        let rdFsiHost = solution.RdFSharpModel.FSharpInteractiveHost
+        let rdFsiHost = solution.RdFSharpModel().FSharpInteractiveHost
         rdFsiHost.RequestNewFsiSessionInfo.Set(getNewFsiSessionInfo)
         rdFsiHost.GetProjectReferences.Set(getProjectReferences)
 

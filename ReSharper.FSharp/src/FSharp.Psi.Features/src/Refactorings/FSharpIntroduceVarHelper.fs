@@ -184,8 +184,8 @@ type FSharpIntroduceVarHelper() =
         if isInsideTaggedNode node then false else
 
         // todo: change to something meaningful. :)
-        node.IsSingleLine && node.GetSolution().RdFSharpModel.EnableExperimentalFeaturesSafe
+        node.IsSingleLine && node.GetSolution().RdFSharpModel().EnableExperimentalFeaturesSafe()
 
     override x.CheckOccurrence(expr, occurrence) =
         if isTaggedNode occurrence then true else
-        expr.GetSolution().RdFSharpModel.EnableExperimentalFeaturesSafe
+        expr.GetSolution().RdFSharpModel().EnableExperimentalFeaturesSafe()

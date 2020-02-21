@@ -2,7 +2,6 @@ using System.Collections.Concurrent;
 using JetBrains.ReSharper.Plugins.FSharp.Psi;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.CodeStyle;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
@@ -84,7 +83,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
       if (task.FirstElement == null)
         return new TreeRange(firstElement, lastElement);
 
+      var solution = task.FirstElement.GetSolution();
+      if (!solution.RdFSharpModel().EnableExperimentalFeaturesSafe())
+        return new TreeRange(firstElement, lastElement);
+
       var formatterSettings = GetFormattingSettings(task.FirstElement, parameters);
+
       DoDeclarativeFormat(
         formatterSettings,
         formatterInfoProvider,
