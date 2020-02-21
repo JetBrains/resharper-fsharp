@@ -67,6 +67,8 @@ let intrinsicOperatorsTypeName = clrTypeName "Microsoft.FSharp.Core.LanguagePrim
 
 let predefinedFunctionTypes =
     [| "not", operatorsModuleTypeName
+       "|>", operatorsModuleTypeName
+       "<|", operatorsModuleTypeName
        "||", intrinsicOperatorsTypeName
        "&&", intrinsicOperatorsTypeName |]
     |> dict

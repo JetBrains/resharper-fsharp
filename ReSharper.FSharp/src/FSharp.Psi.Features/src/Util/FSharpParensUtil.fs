@@ -1,11 +1,41 @@
 [<AutoOpen>]
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpParensUtil
 
+open System
+open FSharp.Compiler
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
+
+let (|Prefix|_|) (other: string) (str: string) =
+    if str.StartsWith(other, StringComparison.Ordinal) then someUnit else None
+
+let precedence (expr: ISynExpr): int =
+    match expr with
+    | :? IBinaryAppExpr as binaryApp ->
+        let refExpr = binaryApp.Operator
+        if isNull refExpr then 0 else
+
+        // todo: fix op tokens in references
+        let name = PrettyNaming.DecompileOpName (refExpr.GetText())
+        if name.Length = 0 then 0 else
+
+        match name with
+        | "|" | "||" -> 1
+        | "&" | "&&" -> 2
+        | Prefix "!=" | Prefix "<" | Prefix ">" | Prefix "|" | Prefix "&" | "$" | "=" -> 3
+        | Prefix "^" -> 4
+        | Prefix "::" -> 5
+        | Prefix "+" | Prefix "-" -> 6
+        | Prefix "*" | Prefix "/" | Prefix "%" -> 7
+        | Prefix "**" -> 8
+        | _ -> 0
+
+    | :? IPrefixAppExpr -> 9
+    | _ -> 0
+
 
 let isHighPrecedenceApp (appExpr: IPrefixAppExpr) =
     if isNull appExpr then false else
@@ -49,6 +79,20 @@ let rec needsParens (expr: ISynExpr) =
     | :? IArrayOrListExpr | :? IArrayOrListOfSeqExpr
     | :? IObjExpr | :? IComputationLikeExpr
     | :? IAddressOfExpr -> false
+
+    | :? IBinaryAppExpr as binaryAppExpr when
+            // todo: app expr (and check prefix too)
+            let outerApp = BinaryAppExprNavigator.GetByArgument(context)
+            precedence outerApp < precedence binaryAppExpr ->
+        false
+
+    | :? IAppExpr when
+            // todo: for each
+            isNotNull (BinaryAppExprNavigator.GetByArgument(context)) ||
+            isNotNull (IfThenElseExprNavigator.GetByConditionExpr(context)) ||
+            isNotNull (WhileExprNavigator.GetByWhileExpression(context)) ->
+        false
+
     | _ -> true
 
 
@@ -60,8 +104,7 @@ let addParens (expr: ISynExpr) =
     let parenExpr = ModificationUtil.ReplaceChild(expr, parenExpr)
     let expr = parenExpr.SetInnerExpression(exprCopy)
 
-    if not expr.IsSingleLine then
-        shiftExpr 1 expr
+    shiftExpr 1 expr
     expr
 
 

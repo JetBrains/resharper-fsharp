@@ -1,6 +1,3 @@
-type System.String with
-    member x.IsEmpty = x.Length = 0
+let l = []
 
-let foo = ""
-
-if{caret} foo.ToString().IsEmpty then "a" else "b"
+if{caret} l.GetSlice(None, None).IsEmpty then "a" else "b"

@@ -1,6 +1,3 @@
-type System.String with
-    member x.IsEmpty = x.Length = 0
+let l = []
 
-let foo = ""
-
-if{caret} foo.IsEmpty then "a" else "b"
+if{caret} l.IsEmpty then "a" else "b"

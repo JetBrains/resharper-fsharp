@@ -396,6 +396,10 @@ interface appLikeExpr:
   prefixAppExpr |
   newExpr;
 
+interface appExpr:
+  prefixAppExpr |
+  binaryAppExpr;
+
 interface typedLikeExpr:
   typedExpr |
   typeTestExpr |
@@ -625,10 +629,12 @@ prefixAppExpr options { stubBase="FSharpExpressionBase"; }:
   synExpr<FUNC_EXPR, FunctionExpression>
   synExpr<ARG_EXPR, ArgumentExpression>;
 
-binaryAppExpr options { stubBase="FSharpExpressionBase"; }:
-  synExpr<LEFT_ARG_EXPR, LeftArgumentExpression>
-  synExpr<FUNC_EXPR, FunctionExpression>
-  synExpr<RIGHT_ARG_EXPR, RightArgumentExpression>;
+binaryAppExpr options { stubBase="FSharpExpressionBase"; } extras {
+  get { methodName="FunctionExpression" path=<binaryAppExpr:OP_REF_EXPR> };
+}:
+  synExpr<LEFT_ARG_EXPR, LeftArgument>
+  referenceExpr<OP_REF_EXPR, Operator>
+  synExpr<RIGHT_ARG_EXPR, RightArgument>;
 
 letOrUseExpr options { stubBase="FSharpExpressionBase"; }:
   letOrUse{LET, LetOrUseToken}

@@ -10,13 +10,11 @@ open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 
-let inline isPredefinedFuctionApp name (appExpr: ^T) =
-    Assertion.Assert(predefinedFunctionTypes.ContainsKey(name), "Predefined function is not added: {0}", name)
-
-    if isNull appExpr then false else
-
-    let refExpr = (^T: (member FunctionExpression: ISynExpr) appExpr).As<IReferenceExpr>()
+let isPredefinedFunctionRef name (expr: ISynExpr) =
+    let refExpr = expr.IgnoreInnerParens().As<IReferenceExpr>()
     if isNull refExpr then false else
+
+    Assertion.Assert(predefinedFunctionTypes.ContainsKey(name), "Predefined function is not added to map: {0}", name)
 
     let exprReference = refExpr.Reference
     if exprReference.GetName() <> name then false else
@@ -27,31 +25,50 @@ let inline isPredefinedFuctionApp name (appExpr: ^T) =
     let containingType = declaredElement.GetContainingType()
     isNotNull containingType && containingType.GetClrName() = predefinedFunctionTypes.[name]
 
+let inline isPredefinedInfixOpApp name (binaryAppExpr: IBinaryAppExpr) =
+    if isNull binaryAppExpr then false else
+    isPredefinedFunctionRef name binaryAppExpr.Operator
+
+let inline isPredefinedFuctionApp name (expr: ISynExpr) (arg: outref<ISynExpr>) =
+    match expr with
+    | :? IPrefixAppExpr as prefixApp when
+            isPredefinedFunctionRef name prefixApp.FunctionExpression ->
+        arg <- prefixApp.ArgumentExpression
+        true
+
+    | :? IBinaryAppExpr as binaryApp when
+            isPredefinedInfixOpApp "|>" binaryApp &&
+            isPredefinedFunctionRef name binaryApp.RightArgument ->
+        arg <- binaryApp.LeftArgument
+        true
+
+    | :? IBinaryAppExpr as binaryApp when
+            isPredefinedInfixOpApp "<|" binaryApp &&
+            isPredefinedFunctionRef name binaryApp.LeftArgument ->
+        arg <- binaryApp.RightArgument
+        true
+
+    | _ -> false
 
 let rec createLogicallyNegatedExpression (expr: ISynExpr): ISynExpr =
     if isNull expr then null else
 
+    let expr = expr.IgnoreInnerParens()
     let factory = expr.CreateElementFactory()
 
-    let parenExpr = expr.As<IParenExpr>()
-    if isNotNull parenExpr then
-        let negatedExpression = createLogicallyNegatedExpression parenExpr.InnerExpression
-        factory.CreateParenExpr(negatedExpression.IgnoreInnerParens()) :> _ else
-
-    let appExpr = expr.As<IPrefixAppExpr>()
-    if isNotNull appExpr && isPredefinedFuctionApp "not" appExpr then
-        // todo: check if parens are needed
-        appExpr.ArgumentExpression.Copy() else
+    let mutable arg = Unchecked.defaultof<_>
+    if isPredefinedFuctionApp "not" expr &arg && isNotNull arg then
+        arg.IgnoreInnerParens().Copy() else
 
     let binaryApp = expr.As<IBinaryAppExpr>()
-    if isNotNull binaryApp && isPredefinedFuctionApp "||" binaryApp then
-        let arg1 = createLogicallyNegatedExpression binaryApp.LeftArgumentExpression
-        let arg2 = createLogicallyNegatedExpression binaryApp.RightArgumentExpression
+    if isPredefinedInfixOpApp "||" binaryApp then
+        let arg1 = createLogicallyNegatedExpression binaryApp.LeftArgument
+        let arg2 = createLogicallyNegatedExpression binaryApp.RightArgument
         factory.CreateBinaryAppExpr("&&", arg1, arg2) else
 
-    if isNotNull binaryApp && isPredefinedFuctionApp "&&" binaryApp then
-        let arg1 = createLogicallyNegatedExpression binaryApp.LeftArgumentExpression
-        let arg2 = createLogicallyNegatedExpression binaryApp.RightArgumentExpression
+    if isPredefinedInfixOpApp "&&" binaryApp then
+        let arg1 = createLogicallyNegatedExpression binaryApp.LeftArgument
+        let arg2 = createLogicallyNegatedExpression binaryApp.RightArgument
         factory.CreateBinaryAppExpr("||", arg1, arg2) else
 
     let literalExpr = expr.As<ILiteralExpr>()

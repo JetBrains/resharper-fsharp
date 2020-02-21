@@ -1,3 +1,1 @@
-let foo _ = true
-
-if{caret} a && foo 123 then "a" else "b"
+if{caret} true && id true then "a" else "b"

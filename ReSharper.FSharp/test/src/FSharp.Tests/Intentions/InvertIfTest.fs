@@ -20,9 +20,14 @@ type InvertIfTest() =
     [<Test>] member x.``Reference 04 - Qualified with method``() = x.DoNamedTest()
 
     [<Test>] member x.``App - Not 01``() = x.DoNamedTest()
+    [<Test>] member x.``App - Not 02 - Pipe right``() = x.DoNamedTest()
+    [<Test>] member x.``App - Not 03 - Pipe left``() = x.DoNamedTest()
+    [<Test>] member x.``App - Not 04 - Parens``() = x.DoNamedTest()
 
     [<Test>] member x.``App 01``() = x.DoNamedTest()
     [<Test>] member x.``App 02 - Parens``() = x.DoNamedTest()
     [<Test>] member x.``App 03 - Inside other expr``() = x.DoNamedTest()
 
     [<Test>] member x.``Logic operators 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Condition - If 01``() = x.DoNamedTest()

@@ -202,15 +202,15 @@ type FSharpNamingService(language: FSharpLanguage) =
             Seq.append thenRoots elseRoots
 
         | :? IBinaryAppExpr as binaryApp ->
-            let refExpr = binaryApp.FunctionExpression.As<IReferenceExpr>()
+            let refExpr = binaryApp.Operator
             if isNull refExpr then EmptyList.Instance :> _ else
 
             let name = refExpr.Reference.GetName()
-            if pipeRightOperatorNames.Contains(name) && isNotNull binaryApp.RightArgumentExpression then
-                x.SuggestRoots(binaryApp.RightArgumentExpression, useExpectedTypes, policyProvider) else
+            if pipeRightOperatorNames.Contains(name) && isNotNull binaryApp.RightArgument then
+                x.SuggestRoots(binaryApp.RightArgument, useExpectedTypes, policyProvider) else
 
-            if pipeLeftOperatorNames.Contains(name) && isNotNull binaryApp.LeftArgumentExpression then
-                x.SuggestRoots(binaryApp.LeftArgumentExpression, useExpectedTypes, policyProvider) else
+            if pipeLeftOperatorNames.Contains(name) && isNotNull binaryApp.LeftArgument then
+                x.SuggestRoots(binaryApp.LeftArgument, useExpectedTypes, policyProvider) else
 
             EmptyList.Instance :> _
 

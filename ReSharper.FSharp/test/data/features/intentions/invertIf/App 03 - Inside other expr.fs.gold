@@ -1,3 +1,1 @@
-﻿let foo _ = true
-
-if{caret} not a || not (foo 123) then "b" else "a"
+﻿if{caret} false || not (id true) then "b" else "a"

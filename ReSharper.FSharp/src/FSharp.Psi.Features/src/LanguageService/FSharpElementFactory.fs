@@ -4,6 +4,7 @@ open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -97,7 +98,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             | null -> failwith "Could not get outer appExpr"
             | binaryAppExpr ->
 
-            let expr = ModificationUtil.ReplaceChild(binaryAppExpr.LeftArgumentExpression, expr.Copy())
+            let expr = ModificationUtil.ReplaceChild(binaryAppExpr.LeftArgument, expr.Copy())
 
             if newLine then
                 ModificationUtil.ReplaceChild(expr.NextSibling, Whitespace(indent)) |> ignore
@@ -119,8 +120,8 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         member x.CreateAppExpr(funcName, argExpr) =
             let source = sprintf "%s ()" funcName
             let newExpr = getExpression source :?> IPrefixAppExpr
-            let argExpr = if not (needsParens argExpr) then argExpr.Copy() else createParenExpr argExpr :> _
-            newExpr.SetArgumentExpression(argExpr) |> ignore
+            let newArg = newExpr.SetArgumentExpression(argExpr.Copy())
+            addParensIfNeeded newArg |> ignore
             newExpr
 
         member x.CreateAppExpr(addSpace) =
@@ -197,10 +198,15 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         member x.CreateExpr(text) =
             getExpression text
 
-        member x.CreateBinaryAppExpr(text, arg1, arg2) =
+        member x.CreateBinaryAppExpr(text, arg1: ISynExpr, arg2: ISynExpr) =
             let source = "() " + text + " ()"
             let expr = getExpression source
             let appExpr = expr.As<IBinaryAppExpr>()
-            ModificationUtil.ReplaceChild(appExpr.LeftArgumentExpression, arg1) |> ignore
-            ModificationUtil.ReplaceChild(appExpr.RightArgumentExpression, arg2) |> ignore
+
+            let leftArg = ModificationUtil.ReplaceChild(appExpr.LeftArgument, arg1.IgnoreInnerParens())
+            addParensIfNeeded leftArg |> ignore
+
+            let rightArg = ModificationUtil.ReplaceChild(appExpr.RightArgument, arg2.IgnoreInnerParens())
+            addParensIfNeeded rightArg |> ignore
+
             expr

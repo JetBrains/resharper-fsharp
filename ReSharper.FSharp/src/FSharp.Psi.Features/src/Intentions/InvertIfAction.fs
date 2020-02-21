@@ -4,6 +4,7 @@ open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
@@ -28,7 +29,8 @@ type InvertIfAction(dataProvider: FSharpContextActionDataProvider) =
 
         let conditionExpr = ifExpr.ConditionExpr
         let negatedExpression = createLogicallyNegatedExpression conditionExpr
-        replace conditionExpr negatedExpression 
+        let replaced = ModificationUtil.ReplaceChild(conditionExpr, negatedExpression)
+        addParensIfNeeded replaced |> ignore
 
         let oldThenExpr = ifExpr.ThenExpr
         let thenExpr = oldThenExpr.Copy()
