@@ -88,11 +88,14 @@
     <Compile Include="src\Refactorings\FSharpIntroduceVarHelper.fs" />
     <Compile Include="src\Refactorings\FSharpRefactoringLanguageService.fs" />
     <Compile Include="src\Intentions\DataProviders.fs" />
+    <Compile Include="src\Intentions\FSharpContextActionBase.fs" />
     <Compile Include="src\Intentions\ToRecursiveLetBindingsAction.fs" />
     <Compile Include="src\Intentions\ToMultilineRecord.fs" />
     <Compile Include="src\Intentions\ToRecursiveModuleAction.fs" />
     <Compile Include="src\Intentions\ToModuleNamespaceDeclarationAction.fs" />
     <Compile Include="src\Intentions\InvertIfAction.fs" />
+    <Compile Include="src\Intentions\ElifToIfAction.fs" />
+    <Compile Include="src\Intentions\IfToElifAction.fs" />
     <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
       <Mode>QUICKFIX</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>

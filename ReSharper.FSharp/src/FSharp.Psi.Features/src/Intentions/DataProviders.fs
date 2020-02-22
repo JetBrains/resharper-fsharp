@@ -5,6 +5,7 @@ open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Feature.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Psi.Tree
 
 type FSharpContextActionDataProvider(solution, textControl, fsFile) =
     inherit CachedContextActionDataProviderBase<IFSharpFile>(solution, textControl, fsFile)
@@ -50,3 +51,6 @@ let isAtIfExprKeyword (dataProvider: IContextActionDataProvider) (ifExpr: IIfThe
         ranges.Then(elseKeyword) |> ignore
 
     ranges.Contains(dataProvider.SelectedTreeRange)
+
+let isAtKeyword (dataProvider: IContextActionDataProvider) (keyword: ITreeNode) =
+    isNotNull keyword && DisjointedTreeTextRange.From(keyword).Contains(dataProvider.SelectedTreeRange)

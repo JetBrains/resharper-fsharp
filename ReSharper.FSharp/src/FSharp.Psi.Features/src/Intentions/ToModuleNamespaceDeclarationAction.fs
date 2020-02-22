@@ -39,7 +39,7 @@ type ToModuleNamespaceDeclarationAction(dataProvider: FSharpContextActionDataPro
 
         let tokenType, nodeType = getNewNodeTypes moduleDeclaration
         replaceWithToken moduleDeclaration.ModuleOrNamespaceKeyword tokenType
-        let upcastExpr = ModificationUtil.ReplaceChild(moduleDeclaration, nodeType.Create())
-        LowLevelModificationUtil.AddChild(upcastExpr, moduleDeclaration.Children().AsArray())
+        let newModuleDeclaration = ModificationUtil.ReplaceChild(moduleDeclaration, nodeType.Create())
+        LowLevelModificationUtil.AddChild(newModuleDeclaration, moduleDeclaration.Children().AsArray())
 
         null
