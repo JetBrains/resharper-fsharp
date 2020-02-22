@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
@@ -37,8 +38,9 @@ type InvertIfAction(dataProvider: FSharpContextActionDataProvider) =
 
         let oldThenExpr = ifExpr.ThenExpr
         let thenExpr = oldThenExpr.Copy()
+        let elseExpr = ifExpr.ElseExpr
 
-        replaceWithCopy oldThenExpr ifExpr.ElseExpr
-        replace ifExpr.ElseExpr thenExpr
+        ModificationUtil.ReplaceChild(oldThenExpr, elseExpr.IgnoreInnerParens().Copy()) |> addParensIfNeeded |> ignore
+        ModificationUtil.ReplaceChild(elseExpr, thenExpr.IgnoreInnerParens()) |> addParensIfNeeded |> ignore
 
         null

@@ -31,3 +31,6 @@ type InvertIfTest() =
     [<Test>] member x.``Logic operators 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Condition - If 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Else - If 01``() = x.DoNamedTest()
+    [<Test>] member x.``Else - If 02``() = x.DoNamedTest()
