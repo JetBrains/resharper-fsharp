@@ -9,6 +9,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Transactions
 open JetBrains.ReSharper.Psi.Tree
@@ -43,6 +44,7 @@ and LetPostfixTemplateBehavior(info) =
             let node = context.Expression :?> IFSharpTreeNode
             let elementFactory = node.CreateElementFactory()
             use writeCookie = WriteLockCookie.Create(node.IsPhysical())
+            use disableFormatter = new DisableCodeFormatter()
             let refExpr = x.GetExpression(context)
 
             if (FSharpIntroduceVariable.CanIntroduceVar(refExpr)) then refExpr :> ITreeNode else

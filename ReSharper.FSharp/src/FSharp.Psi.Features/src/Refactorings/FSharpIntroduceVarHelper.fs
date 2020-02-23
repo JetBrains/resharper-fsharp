@@ -90,6 +90,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
         expr.UserData.RemoveKey(FSharpIntroduceVariable.TaggedByQuickFixKey)
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
+        use disableFormatter = new DisableCodeFormatter()
 
         let lineEnding = expr.GetLineEnding()
         let parentExprIndent = parentExpr.Indent
