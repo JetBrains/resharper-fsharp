@@ -15,8 +15,7 @@ type FSharpProjectLoadTargetsAnalyzer() =
      interface IMsBuildProjectLoadDiagnosticProvider with
          member x.CollectDiagnostic(_, _, result) =
              match result.FatalError with
-             | null -> EmptyArray.Instance :> _
-             | error when error.PresentableTest.Contains("Microsoft.FSharp.Targets") ->
+             | error when isNotNull error && error.PresentableText.Contains("Microsoft.FSharp.Targets") ->
                  FSharpTargetsDiagnosticMessage.InstanceCollection
              | _ -> EmptyArray.Instance :> _
 
