@@ -157,6 +157,7 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
 
         for IdentRange id in lid do
             if not isPostfixApp && marks.Count = 1 then
+                // todo: include measure types const range
                 x.ProcessTypeArgs(typeArgs, ltOption, gtOption, ElementType.PREFIX_APP_TYPE_ARGUMENT_LIST)
             x.Done(id, marks.Pop(), ElementType.TYPE_REFERENCE_NAME)
 
@@ -515,6 +516,8 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
             let lid =
                 match typeName with
                 | SynType.LongIdent(lid) -> lid.Lid
+                | SynType.MeasurePower(SynType.LongIdent(lid), _, _) -> lid.Lid
+                | SynType.MeasureDivide(SynType.LongIdent(lid), _, _) -> lid.Lid
                 | _ -> failwithf "unexpected type: %O" typeName
 
             // todo: fix isPostfix
