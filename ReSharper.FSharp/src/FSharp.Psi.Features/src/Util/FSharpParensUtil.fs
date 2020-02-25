@@ -9,6 +9,25 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 
+let deindentsBody (expr: ISynExpr) =
+    match expr with
+    | :? IMatchClauseListOwner as matchExpr ->
+        if expr.IsSingleLine then false else
+
+        let clause = matchExpr.Clauses.LastOrDefault()
+        if isNull clause then false else
+
+        let clauseExpr = clause.Expression
+        isNotNull clauseExpr && clauseExpr.Indent = expr.Indent
+
+    | :? IIfExpr as ifExpr ->
+        if expr.IsSingleLine then false else
+
+        let elseExpr = ifExpr.ElseExpr
+        isNotNull elseExpr && elseExpr.Indent = expr.Indent
+
+    | _ -> false
+
 let (|Prefix|_|) (other: string) (str: string) =
     if str.StartsWith(other, StringComparison.Ordinal) then someUnit else None
 
@@ -89,15 +108,27 @@ let rec needsParens (expr: ISynExpr) =
     | :? IAppExpr when
             // todo: for each
             isNotNull (BinaryAppExprNavigator.GetByArgument(context)) ||
-            isNotNull (IfExprNavigator.GetByConditionExpr(context)) ||
-            isNotNull (WhileExprNavigator.GetByWhileExpression(context)) ->
+            isNotNull (ConditionOwnerExprNavigator.GetByConditionExpr(context)) ->
         false
 
     | :? IIfThenElseExpr when
             isNotNull (IfThenElseExprNavigator.GetByElseExpr(context)) ->
         false
 
-    | _ -> true
+    | _ ->
+
+    let binaryApp = BinaryAppExprNavigator.GetByLeftArgument(context)
+    if isNull binaryApp then true else
+
+    if deindentsBody expr then true else
+
+    let operator = binaryApp.Operator
+    if isNotNull operator && context.Indent = operator.Indent then false else
+
+    let rightArgument = binaryApp.RightArgument
+    if isNotNull rightArgument && context.Indent = rightArgument.Indent then false else
+
+    true
 
 
 let addParens (expr: ISynExpr) =

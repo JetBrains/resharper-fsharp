@@ -4,8 +4,10 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Navigation.CustomHighlighting
 open JetBrains.ReSharper.Feature.Services.Refactorings.WorkflowOccurrences
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.UI.RichText
 
@@ -16,6 +18,7 @@ type AddIgnoreFix(expr: ISynExpr) =
 
     let shouldAddNewLine (expr: ISynExpr) =
         if expr.IsSingleLine then false else
+        if deindentsBody expr then false else
 
         match expr with
         | :? IMatchLikeExpr | :? IIfThenElseExpr | :? ITryLikeExpr | :? ILambdaExpr
@@ -71,5 +74,7 @@ type AddIgnoreFix(expr: ISynExpr) =
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
-        let elementFactory = expr.CreateElementFactory()
-        replace expr (elementFactory.CreateIgnoreApp(expr, shouldAddNewLine expr)) 
+        let ignoreApp = expr.CreateElementFactory().CreateIgnoreApp(expr, shouldAddNewLine expr)
+
+        let replaced = ModificationUtil.ReplaceChild(expr, ignoreApp).As<IBinaryAppExpr>()
+        addParensIfNeeded replaced.LeftArgument |> ignore
