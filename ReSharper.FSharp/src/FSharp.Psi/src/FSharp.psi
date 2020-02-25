@@ -358,7 +358,6 @@ interface synExpr:
   arrayOrListExpr |
   recordExpr |
   objExpr |
-  whileExpr |
   forExpr |
   forEachExpr |
   arrayOrListOfSeqExpr |
@@ -371,7 +370,7 @@ interface synExpr:
   letLikeExpr |
   tryLikeExpr |
   sequentialExpr |
-  ifExpr |
+  conditionOwnerExpr |
   qualifiedExpr |
   setExpr |
   nullExpr |
@@ -412,6 +411,10 @@ interface qualifiedExpr:
 interface ifExpr:
   ifThenElseExpr |
   elifExpr;
+
+interface conditionOwnerExpr:
+  ifExpr |
+  whileExpr;
 
 setExpr options { stubBase="FSharpExpressionBase"; }:
   synExpr<LEFT_EXPR, LeftExpression>
@@ -570,8 +573,8 @@ arrayOrListOfSeqExpr options { stubBase="FSharpExpressionBase"; }:
     BAR_RBRACK);
 
 whileExpr options { stubBase="FSharpExpressionBase"; }:
-  WHILE
-  synExpr<WHILE_EXPR, WhileExpression>
+  WHILE<WHILE_KEYWORD, WhileKeyword>
+  synExpr<WHILE_EXPR, ConditionExpr>
   DO
   synExpr<DO_EXPR, DoExpression>;
 

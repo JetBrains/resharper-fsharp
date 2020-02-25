@@ -96,6 +96,7 @@
     <Compile Include="src\Intentions\InvertIfAction.fs" />
     <Compile Include="src\Intentions\ElifToIfAction.fs" />
     <Compile Include="src\Intentions\IfToElifAction.fs" />
+    <Compile Include="src\Intentions\NegateConditionActions.fs" />
     <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
       <Mode>QUICKFIX</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>

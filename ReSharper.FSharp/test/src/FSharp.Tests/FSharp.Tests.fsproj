@@ -62,6 +62,7 @@
     <Compile Include="Intentions\InvertIfTest.fs" />
     <Compile Include="Intentions\ElifToIfTest.fs" />
     <Compile Include="Intentions\IfToElifTest.fs" />
+    <Compile Include="Intentions\NegateConditionTest.fs" />
     <Compile Include="Actions\CommentActionTests.fs" />
     <Compile Include="Actions\TypingAssistTest.fs" />
     <Compile Include="Actions\FSharpExtendSelectionTest.fs" />

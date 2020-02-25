@@ -1,0 +1,1 @@
+﻿{caret}if false && not (id true) then "a" else "b"
