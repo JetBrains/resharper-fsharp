@@ -51,6 +51,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     private void InvalidateReferencingModules(IPsiModule psiModule)
     {
+      if (myPsiModules.IsEmpty())
+        return;
+
       using (CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule()))
       {
         var resolveContext = CompilationContextCookie.GetContext();
@@ -109,7 +112,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     public void Drop(IPsiSourceFile sourceFile)
     {
       lock (myLock)
+      {
+        if (myPsiModules.IsEmpty())
+          return;
+
         Invalidate(sourceFile);
+      }
     }
 
     public void OnDocumentChange(IPsiSourceFile sourceFile, ProjectFileDocumentCopyChange change) =>
