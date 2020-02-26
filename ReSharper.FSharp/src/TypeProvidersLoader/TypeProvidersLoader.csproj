@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net461</TargetFramework>
+        <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader</RootNamespace>
+        <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader</AssemblyName>
+        <OutputType>Exe</OutputType>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\FSharp.Common\FSharp.Common.fsproj" />
+        <ProjectReference Include="..\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj" />
+        <ProjectReference Include="..\FSharp.TypeProvidersProtocol\FSharp.TypeProvidersProtocol.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="TypeProvidersLoader.exe.config" />
+    </ItemGroup>
+</Project>

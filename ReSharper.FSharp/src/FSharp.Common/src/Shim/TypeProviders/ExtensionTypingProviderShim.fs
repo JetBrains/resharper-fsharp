@@ -11,6 +11,11 @@ open JetBrains.ProjectModel
 open Microsoft.FSharp.Core.CompilerServices
 open FSharp.Compiler.AbstractIL.Internal.Library
 open FSharp.Compiler.ErrorLogger
+open JetBrains.ReSharper.Plugins.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.Models
+open JetBrains.Rider.FSharp.TypeProvidersProtocol.Server
+open JetBrains.ReSharper.Plugins.FSharp.Util.TypeProvidersProtocolConverter
+open JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders.Hack
 
 module FCSTypeProviderErrors =
     let etTypeProviderConstructorException (exnMessage: string) =
@@ -25,60 +30,14 @@ module FCSTypeProviderErrors =
     let etProviderHasWrongDesignerAssembly(tpAsmAtrName, designTimeAssemblyNameString, errorMessage) =
         (3031, sprintf "Assembly attribute '%s' refers to a designer assembly '%s' which cannot be loaded or doesn't exist. %s" tpAsmAtrName designTimeAssemblyNameString errorMessage)
 
-[<SolutionComponent>]
-type ExtensionTypingProviderShim (lifetime: Lifetime) as this =
- 
-    let StripException (e: exn) =
-        match e with
-        |   :? System.Reflection.TargetInvocationException as e -> e.InnerException
-        |   :? TypeInitializationException as e -> e.InnerException
-        |   _ -> e
-   
-    let defaultExtensionTypingProvider = ExtensionTypingProvider
-    
-    let CreateTypeProvider (typeProviderImplementationType: System.Type, 
-                            runtimeAssemblyPath, 
-                            resolutionEnvironment: ResolutionEnvironment, 
-                            isInvalidationSupported: bool, 
-                            isInteractive: bool, 
-                            systemRuntimeContainsType: string -> bool, 
-                            systemRuntimeAssemblyVersion, 
-                            m) =
-
-        // Protect a .NET reflection call as we load the type provider component into the host process, 
-        // reporting errors.
-        let protect f =
-            try 
-                f ()
-            with err ->
-                let e = StripException (StripException err)
-                raise (TypeProviderError(FCSTypeProviderErrors.etTypeProviderConstructorException(e.Message), typeProviderImplementationType.FullName, m))
-
-        if typeProviderImplementationType.GetConstructor([| typeof<TypeProviderConfig> |]) <> null then
-
-            let tpConfig = TypeProviderConfig(systemRuntimeContainsType, 
-                                              ResolutionFolder=resolutionEnvironment.resolutionFolder, 
-                                              RuntimeAssembly=runtimeAssemblyPath, 
-                                              ReferencedAssemblies=Array.copy resolutionEnvironment.referencedAssemblies, 
-                                              TemporaryFolder=resolutionEnvironment.temporaryFolder, 
-                                              IsInvalidationSupported=isInvalidationSupported, 
-                                              IsHostedExecution= isInteractive, 
-                                              SystemRuntimeAssemblyVersion = systemRuntimeAssemblyVersion)
-
-            protect (fun () -> Activator.CreateInstance(typeProviderImplementationType, [| box tpConfig|]) :?> ITypeProvider )
-
-        elif typeProviderImplementationType.GetConstructor [| |] <> null then 
-            protect (fun () -> Activator.CreateInstance typeProviderImplementationType :?> ITypeProvider )
-
-        else
-            raise (TypeProviderError(FCSTypeProviderErrors.etProviderDoesNotHaveValidConstructor, typeProviderImplementationType.FullName, m))
-      
-    let GetTypeProviderImplementationTypes (runTimeAssemblyFileName, designTimeAssemblyNameString, m: range) =
+module TypeProviderInstantiateHelpers =
+        //range можем не сериализовать
+        let GetTypeProviderImplementationTypes (runTimeAssemblyFileName, designTimeAssemblyNameString: string) =
 
         // Report an error, blaming the particular type provider component
         let raiseError (e: exn) =
-            raise (TypeProviderError(FCSTypeProviderErrors.etProviderHasWrongDesignerAssembly(typeof<TypeProviderAssemblyAttribute>.Name, designTimeAssemblyNameString, e.Message), runTimeAssemblyFileName, m))
-
+            //raise (TypeProviderError(FCSTypeProviderErrors.etProviderHasWrongDesignerAssembly(typeof<TypeProviderAssemblyAttribute>.Name, designTimeAssemblyNameString, e.Message), runTimeAssemblyFileName, null))
+            failwith "лох"
         // Find and load the designer assembly for the type provider component.
         //
         // We look in the directories stepping up from the location of the runtime assembly.
@@ -137,18 +96,32 @@ type ExtensionTypingProviderShim (lifetime: Lifetime) as this =
         match designTimeAssemblyOpt with
         | Some loadedDesignTimeAssembly ->
             try
-                let exportedTypes = loadedDesignTimeAssembly.GetExportedTypes() 
+                let exportedTypes = loadedDesignTimeAssembly.GetExportedTypes()
                 let filtered = [ for t in exportedTypes do 
-                                 let ca = t.GetCustomAttributes(typeof<TypeProviderAttribute>, true)
+                                 let ca = t.GetCustomAttributes(true) |> Seq.filter (fun x -> x.GetType().Name = "TypeProviderAttribute") |> Seq.toArray
                                  if ca <> null && ca.Length > 0 then yield t ]
                 filtered
             with e ->
                 raiseError e
         | None -> []
+
+[<SolutionComponent>]
+type ExtensionTypingProviderShim (lifetime: Lifetime,
+                                  typeProvidersLoadersFactory: TypeProvidersLoaderExternalProcessFactory) as this =
+    let defaultExtensionTypingProvider = ExtensionTypingProvider
+    let mutable ourModel = null
     
     do ExtensionTypingProvider <- this :> IExtensionTypingProvider
-       lifetime.OnTermination(fun () -> ExtensionTypingProvider <- defaultExtensionTypingProvider) |> ignore
+       lifetime.OnTermination(fun () ->
+           (this :> IDisposable).Dispose()
+           ExtensionTypingProvider <- defaultExtensionTypingProvider) |> ignore
        ()
+       
+    let onInitialized lifetime model =
+        ourModel <- model
+        ()
+        
+    let onFailed() = ()
     
     interface IExtensionTypingProvider with
         member this.InstantiateTypeProvidersOfAssembly
@@ -158,9 +131,19 @@ type ExtensionTypingProviderShim (lifetime: Lifetime) as this =
                      resolutionEnvironment: ResolutionEnvironment, 
                      isInvalidationSupported: bool, 
                      isInteractive: bool, 
-                     systemRuntimeContainsType: string -> bool, 
+                     systemRuntimeContainsType: string -> bool, //не забыть
                      systemRuntimeAssemblyVersion: System.Version,
                      m: range) =
+            
+            if ourModel = null then 
+                let typeProvidersLoader = typeProvidersLoadersFactory.Create(lifetime)
+                typeProvidersLoader.RunAsync(Action<_, _>(onInitialized), Action(onFailed))
+           
+            let fakeTcImports = getFakeTcImports(systemRuntimeContainsType)
+            
+            //TODO: need to secure lifetime 
+            let rdSystemRuntimeContainsType = RdSystemRuntimeContainsType(SystemRuntimeContainsTypeRef(Value(fakeTcImports)))
+            //rdSystemRuntimeContainsType.SystemRuntimeContainsTypeRef.Value.ConSystemRuntimeContainsType.Set(fun a b -> RdTask.Successful(systemRuntimeContainsType b))
             
             let providerSpecs = 
                 try
@@ -179,19 +162,35 @@ type ExtensionTypingProviderShim (lifetime: Lifetime) as this =
                                                                                    Path.GetFileNameWithoutExtension path,
                                                                                    StringComparison.OrdinalIgnoreCase) = 0 -> ()
                       | Some _, _ ->
-                          for tp in GetTypeProviderImplementationTypes (runTimeAssemblyFileName, designTimeAssemblyNameString, m) do
-                            let tpInstance = CreateTypeProvider (tp, runTimeAssemblyFileName, resolutionEnvironment,
-                                                                 isInvalidationSupported, isInteractive,
-                                                                 systemRuntimeContainsType,
-                                                                 systemRuntimeAssemblyVersion,
-                                                                 m)
-                            if box tpInstance <> null then yield (tpInstance, ilScopeRefOfRuntimeAssembly)
+                          let res = ourModel.InstantiateTypeProvidersOfAssembly.Sync(InstantiateTypeProvidersOfAssemblyParameters(
+                                                                                                                                  runTimeAssemblyFileName,
+                                                                                                                                  ilScopeRefOfRuntimeAssembly.toRdILScopeRef(),
+                                                                                                                                  designTimeAssemblyNameString, 
+                                                                                                                                  resolutionEnvironment.toRdResolutionEnvironment(), 
+                                                                                                                                  isInvalidationSupported, 
+                                                                                                                                  isInteractive, 
+                                                                                                                                  systemRuntimeAssemblyVersion.toRdVersion(),
+                                                                                                                                  rdSystemRuntimeContainsType))
+                          for tp in res
+                            -> (new OutOfProcessProxyTypeProvider(tp) :> ITypeProvider, ilScopeRefOfRuntimeAssembly)
                       |   None, _ -> () ]
 
                 with :? TypeProviderError as tpe ->
                     tpe.Iter(fun e -> errorR(NumberedError((e.Number, e.ContextualErrorMessage), m)) )                        
-                    []
-
+                    [] //local try catch
+                    
             let providers = Tainted<_>.CreateAll providerSpecs
             providers
+            
+        member this.GetProvidedTypes(pn: Tainted<IProvidedNamespace>, m: range) =
+            let types = pn.PApplyArray((fun r -> r.As<IOutOfProcessProxyProvidedNamespace>().GetRdTypes()), "GetTypes", m)
+            let providedTypes = [| for t in types -> t.PApply((fun ty -> ty |> ProxyProvidedType.Create :> ProvidedType), m) |]
+            providedTypes
+            
+        member this.ResolveTypeName(pn: Tainted<IProvidedNamespace>, typeName: string, m: range) =
+            pn.PApply((fun providedNamespace -> ProxyProvidedType.Create(providedNamespace.As<IOutOfProcessProxyProvidedNamespace>().ResolveRdTypeName typeName) :> _), range=m) 
+
+            
+    interface IDisposable with
+        member this.Dispose() = () //terminate connection
            

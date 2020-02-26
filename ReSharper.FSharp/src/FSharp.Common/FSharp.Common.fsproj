@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net461</TargetFramework>
     <DisableImplicitFSharpCoreReference>true</DisableImplicitFSharpCoreReference>
@@ -14,6 +14,7 @@
     <Compile Include="src\Util\FSharpRangeUtil.fs" />
     <Compile Include="src\Util\FSharpCompilerAttributesUtil.fs" />
     <Compile Include="src\Util\FSharpAssemblyUtil.fs" />
+    <Compile Include="src\Util\FSharpConverter.fs" />
     <Compile Include="src\ProjectModel\FSharpLanguageVersion.fs" />
     <Compile Include="src\ProjectModel\FSharpProjectLanguage.fs" />
     <Compile Include="src\ProjectModel\ProjectProperties.fs" />
@@ -24,6 +25,9 @@
     <Compile Include="src\ProjectModel\FSharpProjectModelUtil.fs" />
     <Compile Include="src\Shim\FileSystem\FSharpSourceCache.fs" />
     <Compile Include="src\Shim\FileSystem\AssemblyInfoShim.fs" />
+    <Compile Include="src\Shim\TypeProviders\OutOfProcessProxyTypeProvider.fs" />
+    <Compile Include="src\Shim\TypeProviders\HackSupport.fs" />
+    <Compile Include="src\Shim\TypeProviders\ExtensionTypingProviderShim.fs" />
     <Compile Include="src\Util\FSharpAttributesUtil.fs" />
     <Compile Include="src\Util\FSharpSymbolUtil.fs" />
     <Compile Include="src\Util\FSharpXmlDocService.fs" />
@@ -54,8 +58,7 @@
   </PropertyGroup>
 
   <Target Name="CopyFSharpCoreXmlDoc" AfterTargets="AfterBuild">
-    <Copy SourceFiles="$([System.IO.Path]::Combine($(NugetPackageRoot), $(FSharpCoreXmlDocRelativePath)))"
-          DestinationFolder="$(OutDir)" />
+    <Copy SourceFiles="$([System.IO.Path]::Combine($(NugetPackageRoot), $(FSharpCoreXmlDocRelativePath)))" DestinationFolder="$(OutDir)" />
   </Target>
 
   <ItemGroup>

@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net461</TargetFramework>
+        <RootNamespace>JetBrains.ReSharper.Plugins.FSharp</RootNamespace>
+        <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol</AssemblyName>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="FSharp.Core" Version="$(FSharpCoreVersion)" />
+        <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
+        <PackageReference Include="JetBrains.FSharp.Compiler.Service" Version="$(FSharpCompilerServiceVersion)" />
+    </ItemGroup>
+
+</Project>

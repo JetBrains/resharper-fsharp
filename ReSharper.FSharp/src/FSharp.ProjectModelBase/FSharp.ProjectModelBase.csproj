@@ -11,4 +11,8 @@
   </ItemGroup>
   
   <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props')" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\FSharp.TypeProvidersProtocol\FSharp.TypeProvidersProtocol.csproj" />
+  </ItemGroup>
 </Project>
