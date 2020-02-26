@@ -736,6 +736,14 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             x.PushExpression(funcExpr)
             x.ProcessExpression(leftArg)
 
+        | SynExpr.App(_, true, (SynExpr.Ident(id) as funcExpr), SynExpr.Tuple(_, [first; second], _, _), _) when
+                id.idText = "op_ColonColon" ->
+
+            x.PushRange(range, ElementType.BINARY_APP_EXPR)
+            x.PushExpression(second)
+            x.PushExpression(funcExpr)
+            x.ProcessExpression(first)
+
         | SynExpr.App(_, isInfix, funcExpr, argExpr, _) ->
             Assertion.Assert(not isInfix, sprintf "Expecting prefix app, got: %A" expr)
 
@@ -874,7 +882,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         | SynExpr.YieldOrReturnFrom(_, expr, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.YIELD_OR_RETURN_EXPR)
 
-        | SynExpr.LetOrUseBang(_, _, _, pat, expr, inExpr, _) ->
+        | SynExpr.LetOrUseBang(_, _, _, pat, expr, _, inExpr, _) ->
             x.PushRange(range, ElementType.LET_OR_USE_BANG_EXPR)
             x.PushExpression(inExpr)
             x.PushRangeForMark(expr.Range, x.Mark(pat.Range), ElementType.LOCAL_BINDING)
@@ -1089,12 +1097,12 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
 
     member x.ProcessSynIndexerArg(arg) =
         match arg with
-        | SynIndexerArg.One(expr) ->
-            x.PushRange(expr.Range, ElementType.INDEXER_ARG)
+        | SynIndexerArg.One(expr, _, range) ->
+            x.PushRange(range, ElementType.INDEXER_ARG)
             x.PushExpression(getGeneratedAppArg expr)
 
-        | SynIndexerArg.Two(expr1, expr2) ->
-            x.PushRange(unionRanges expr1.Range expr2.Range, ElementType.INDEXER_ARG)
+        | SynIndexerArg.Two(expr1, _, expr2, _, range1, range2) ->
+            x.PushRange(unionRanges range1 range2, ElementType.INDEXER_ARG)
             x.PushExpression(getGeneratedAppArg expr2)
             x.PushExpression(getGeneratedAppArg expr1)
 

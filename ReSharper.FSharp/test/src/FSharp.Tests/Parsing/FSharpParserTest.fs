@@ -157,6 +157,9 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Expr - App - Prefix op 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - App - List 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - App - List 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Expr - TypeApp 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - TypeApp 02 - Lid``() = x.DoNamedTest()
     [<Test>] member x.``Expr - TypeApp 03 - DotGet``() = x.DoNamedTest()
