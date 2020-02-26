@@ -5,8 +5,8 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.Common
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
-[<ElementProblemAnalyzer(typeof<IParenExpr>,
-                         HighlightingTypes = [| typeof<RedundantParenExprWarning> |])>]
+//[<ElementProblemAnalyzer(typeof<IParenExpr>,
+//                         HighlightingTypes = [| typeof<RedundantParenExprWarning> |])>]
 type RedundantParenAnalyzer() =
     inherit ElementProblemAnalyzer<IParenExpr>()
 

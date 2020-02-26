@@ -5,7 +5,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 open NUnit.Framework
 
-[<FSharpTest>]
+[<Explicit>]
 type RedundantParensTest() =
     inherit FSharpHighlightingTestBase()
 
