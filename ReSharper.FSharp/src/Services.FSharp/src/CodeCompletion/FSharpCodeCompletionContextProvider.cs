@@ -37,6 +37,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
       var tokenBefore = fsFile.FindTokenAt(caretTreeOffset - 1);
       var tokenBeforeType = tokenBefore?.GetTokenType();
 
+      if (tokenType == FSharpTokenType.COLON_COLON || tokenBeforeType == FSharpTokenType.COLON_COLON)
+        return null;
+
       if (tokenBeforeType == FSharpTokenType.LINE_COMMENT ||
           tokenBeforeType == FSharpTokenType.DEAD_CODE || tokenType == FSharpTokenType.DEAD_CODE ||
           tokenBeforeType != null && (token == tokenBefore || token == null) &&
