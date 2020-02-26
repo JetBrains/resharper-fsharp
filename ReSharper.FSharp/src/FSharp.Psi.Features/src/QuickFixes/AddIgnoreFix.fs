@@ -34,9 +34,10 @@ type AddIgnoreFix(expr: ISynExpr) =
             Some(tryExpr.TryExpression, "Try branch")
 
         | :? IMatchLikeExpr as matchExpr ->
-            matchExpr.Clauses
-            |> Seq.tryHead
-            |> Option.map (fun clause -> clause.Expression, "First clause")
+            let clauses = matchExpr.Clauses
+            if clauses.Count <= 1 then None else
+
+            Some(clauses.[0].Expression, "First clause")
 
         | _ -> None
 
