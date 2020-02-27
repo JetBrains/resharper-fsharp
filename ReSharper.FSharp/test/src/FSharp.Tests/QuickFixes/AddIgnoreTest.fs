@@ -24,10 +24,13 @@ type AddIgnoreTest() =
     [<Test>] member x.``Expression 03 - Multiline``() = x.DoNamedTest()
 
     [<Test>] member x.``New line - Lazy 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``New line - Match - Deindent 01``() = x.DoNamedTest()
+    [<Test>] member x.``New line - Match - Deindent 02``() = x.DoNamedTest()
+
     [<Test>] member x.``New line - Match 01``() = x.DoNamedTest()
     [<Test>] member x.``New line - Match 02``() = x.DoNamedTest()
     [<Test>] member x.``New line - Match 03 - Single line``() = x.DoNamedTest()
-    [<Test>] member x.``New line - Match 04 - Deindent``() = x.DoNamedTest()
 
     [<Test>] member x.``Inner expression - If 01``() = x.DoNamedTest()
     [<Test>] member x.``Inner expression - Match 01``() = x.DoNamedTest()
