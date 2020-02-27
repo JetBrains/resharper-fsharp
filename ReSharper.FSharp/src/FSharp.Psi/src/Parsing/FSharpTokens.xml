@@ -5,6 +5,7 @@
     <Tokens NodeType="FixedTokenNodeType" TokenElement="FixedTokenNodeElement">
         <Token name="ABSTRACT" representation="abstract" />
         <Token name="AND" representation="and" />
+        <Token name="AND_BANG" representation="and!" />
         <Token name="AS" representation="as" />
         <Token name="ASR" representation="asr" />
         <Token name="ASSERT" representation="assert" />

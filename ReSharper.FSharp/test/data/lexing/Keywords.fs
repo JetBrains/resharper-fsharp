@@ -5,7 +5,7 @@ abstract member default extern static override
 mutable inline fixed
 begin end new
 let do match yield use return
-let! do! match! yield! use! return!
+let! do! match! yield! use! return! and!
 as lazy of val
 try when finally with
 if then else elif

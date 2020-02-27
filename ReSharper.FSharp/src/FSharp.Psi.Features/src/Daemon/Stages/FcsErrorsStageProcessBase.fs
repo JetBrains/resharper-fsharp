@@ -40,7 +40,7 @@ module FSharpErrors =
 
     let [<Literal>] MissingErrorNumber = 193
 
-    let [<Literal>] undefinedIndexerMessage = "The field, constructor or member 'Item' is not defined."
+    let [<Literal>] undefinedIndexerMessageSuffix = " does not define the field, constructor or member 'Item'."
     let [<Literal>] ifExprMissingElseBranch = "This 'if' expression is missing an 'else' branch."
     let [<Literal>] expressionIsAFunctionMessage = "This expression is a function value, i.e. is missing arguments. Its type is string -> unit."
 
@@ -93,7 +93,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             createHighlightingFromNode VarBoundTwiceError range
 
         | UndefinedName ->
-            if (error.Message = undefinedIndexerMessage &&
+            if (endsWith undefinedIndexerMessageSuffix error.Message &&
                     let indexer = fsFile.GetNode(range) in isNotNull indexer) then
                 UndefinedIndexerError(fsFile.GetNode(range)) :> _ else
 

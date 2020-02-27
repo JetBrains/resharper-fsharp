@@ -51,8 +51,8 @@ type FSharpPathReference(owner, sourceFile) =
         fsFile.CheckerService.OptionsProvider.GetProjectOptions(sourceFile)
         |> Option.bind (fun options ->
             options.OriginalLoadReferences
-            |> List.tryFind (fun (range, _) -> getTreeStartOffset document range = tokenStartOffset)
-            |> Option.bind (fun (_, path) ->
+            |> List.tryFind (fun (range, _, _) -> getTreeStartOffset document range = tokenStartOffset)
+            |> Option.bind (fun (_, _, path) ->
                 let path = FileSystemPath.TryParse(path)
                 let ext = path.ExtensionNoDot.ToLowerInvariant()
                 if not path.IsEmpty && Set.contains ext fsExtensions && path.ExistsFile then

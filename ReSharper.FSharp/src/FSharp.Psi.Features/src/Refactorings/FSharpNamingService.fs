@@ -254,11 +254,6 @@ type FSharpNamingService(language: FSharpLanguage) =
             | null -> ()
             | expr -> addNamesForExpr expr
 
-        | :? ILetOrUseBangExpr as letOrUseBangExpr when letOrUseBangExpr.Binding.HeadPattern == pat ->
-            match letOrUseBangExpr.Binding.Expression with
-            | null -> ()
-            | expr -> addNamesForExpr expr
-
         | :? IForEachExpr as forEachExpr when forEachExpr.Pattern == pat ->
             match forEachExpr.InClause.As<ISynExpr>() with
             | null -> ()

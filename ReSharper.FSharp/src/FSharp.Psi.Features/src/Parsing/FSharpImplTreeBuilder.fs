@@ -882,9 +882,10 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         | SynExpr.YieldOrReturnFrom(_, expr, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.YIELD_OR_RETURN_EXPR)
 
-        | SynExpr.LetOrUseBang(_, _, _, pat, expr, _, inExpr, _) ->
+        | SynExpr.LetOrUseBang(_, _, _, pat, expr, ands, inExpr, range) ->
             x.PushRange(range, ElementType.LET_OR_USE_BANG_EXPR)
             x.PushExpression(inExpr)
+            x.PushStepList(ands, andLocalBindingListProcessor)
             x.PushRangeForMark(expr.Range, x.Mark(pat.Range), ElementType.LOCAL_BINDING)
             x.ProcessPat(pat, true, false)
             x.ProcessExpression(expr)
@@ -914,6 +915,11 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             x.PushRange(range, ElementType.SEQUENTIAL_EXPR)
             x.PushSequentialExpression(expr2)
             x.ProcessExpression(expr1)
+
+    member x.ProcessAndLocalBinding(_, _, _, pat: SynPat, expr: SynExpr, _) =
+        x.PushRangeForMark(expr.Range, x.Mark(pat.Range), ElementType.LOCAL_BINDING)
+        x.ProcessPat(pat, true, false)
+        x.ProcessExpression(expr)
 
     member x.ProcessRangeStepExpr(fromExpr: SynExpr, stepExpr: SynExpr) =
         let toExpr = nextSteps.Pop().Item :?> SynExpr
@@ -1280,6 +1286,13 @@ type BindingListProcessor() =
         builder.ProcessLocalBinding(binding)
 
 
+type AndLocalBindingListProcessor() =
+    inherit StepListProcessorBase<SequencePointInfoForBinding * bool * bool * SynPat * SynExpr * range>()
+
+    override x.Process(binding, builder) =
+        builder.ProcessAndLocalBinding(binding)
+
+
 type RecordFieldListProcessor() =
     inherit StepListProcessorBase<RecordFieldName * (SynExpr option) * BlockSeparator option>()
 
@@ -1353,6 +1366,7 @@ module BuilderStepProcessors =
 
     let expressionListProcessor = ExpressionListProcessor()
     let bindingListProcessor = BindingListProcessor()
+    let andLocalBindingListProcessor = AndLocalBindingListProcessor()
     let recordFieldListProcessor = RecordFieldListProcessor()
     let anonRecordFieldListProcessor = AnonRecordFieldListProcessor()
     let matchClauseListProcessor = MatchClauseListProcessor()

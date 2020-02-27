@@ -38,6 +38,7 @@ public interface FSharpTokenType {
     IElementType YIELD_BANG = createToken("YIELD_BANG");
     IElementType RETURN_BANG = createToken("RETURN_BANG");
     IElementType MATCH_BANG = createToken("MATCH_BANG");
+    IElementType AND_BANG = createToken("AND_BANG");
     IElementType BAR = createToken("BAR");
     IElementType RARROW = createToken("RARROW");
     IElementType LARROW = createToken("LARROW");
@@ -242,6 +243,7 @@ public interface FSharpTokenType {
     TokenSet IDENT_KEYWORDS = TokenSet.create(
             ABSTRACT,
             AND,
+            AND_BANG,
             AS,
             ASSERT,
             BASE,
@@ -278,6 +280,7 @@ public interface FSharpTokenType {
             LET,
             LET_BANG,
             MATCH,
+            MATCH_BANG,
             MEMBER,
             MODULE,
             MUTABLE,

@@ -57,7 +57,7 @@ type ScriptLoadPathsStageProcess(fsFile, daemonProcess) =
             let linesCount = document.GetLineCount() |> int
             let loadedDirectives =
                 let result = HashSet()
-                for (range, _) in options.OriginalLoadReferences do
+                for range, _, _ in options.OriginalLoadReferences do
                     if range.EndLine < linesCount then
                         result.Add(getTreeStartOffset document range) |> ignore
                 result

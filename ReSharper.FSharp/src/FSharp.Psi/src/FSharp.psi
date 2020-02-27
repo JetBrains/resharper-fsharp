@@ -765,11 +765,11 @@ yieldOrReturnExpr options { stubBase="FSharpExpressionBase"; }:
   (YIELD | YIELD_BANG | RETURN | RETURN_BANG)
   synExpr<EXPR, Expression>;
 
-letOrUseBangExpr options { customImpl; stubBase="FSharpExpressionBase"; } extras {
+letOrUseBangExpr options { stubBase="FSharpExpressionBase"; } extras {
   get { methodName="Bindings" path=<letOrUseBangExpr:BINDING> };
 }:
   letOrUseBang{LET, LetOrUseToken}
-  binding<BINDING, Binding>
+  LIST binding<BINDING, Bindings> SEP AND_BANG<FSHARP_AND, Separators>
   IN<IN, InKeyword>?
   synExpr<IN_EXPR, InExpression>;
 

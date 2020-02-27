@@ -12,6 +12,7 @@ type FSharpParserTest() =
     override x.RelativeTestDataPath = "parsing"
 
     [<Test>] member x.``Module - Anon 01``() = x.DoNamedTest()
+    [<Test>] member x.``Module - Anon 02``() = x.DoNamedTest()
     [<Test>] member x.``Module - Top level 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Namespace 01``() = x.DoNamedTest()
@@ -82,6 +83,8 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - CompExpr - Range 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - CompExpr - Range 02 - Step``() = x.DoNamedTest()
     [<Test>] member x.``Expr - CompExpr 01 - Return``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - CompExpr - AndBang 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Lambda 01 - Single id``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Lambda 02 - Single wild``() = x.DoNamedTest()
