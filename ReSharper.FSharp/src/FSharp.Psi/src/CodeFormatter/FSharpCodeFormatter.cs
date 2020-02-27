@@ -23,28 +23,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
     private readonly ConcurrentDictionary<FormatterImplHelper.TokenTypePair, bool> glueingCache =
       new ConcurrentDictionary<FormatterImplHelper.TokenTypePair, bool>();
 
-    public FSharpCodeFormatter(
-      FSharpLanguage language,
-      CodeFormatterRequirements requirements,
+    public FSharpCodeFormatter(FSharpLanguage language, CodeFormatterRequirements requirements,
       FSharpFormatterInfoProvider formatterInfoProvider)
       : base(language, requirements)
     {
       this.formatterInfoProvider = formatterInfoProvider;
     }
 
-    protected override CodeFormattingContext CreateFormatterContext(CodeFormatProfile profile,
-      ITreeNode firstNode,
-      ITreeNode lastNode,
-      AdditionalFormatterParameters parameters,
-      ICustomFormatterInfoProvider provider)
+    protected override CodeFormattingContext CreateFormatterContext(CodeFormatProfile profile, ITreeNode firstNode,
+      ITreeNode lastNode, AdditionalFormatterParameters parameters, ICustomFormatterInfoProvider provider)
     {
-      return new CodeFormattingContext(
-        this,
-        firstNode,
-        lastNode,
-        profile,
-        FormatterLoggerProvider.FormatterLogger,
-        parameters);
+      return new CodeFormattingContext(this, firstNode, lastNode, profile,
+        FormatterLoggerProvider.FormatterLogger, parameters);
     }
 
     public override MinimalSeparatorType GetMinimalSeparatorByNodeTypes(TokenNodeType leftTokenType, TokenNodeType rightTokenType)
@@ -72,9 +62,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
     public override ITreeNode CreateNewLine(LineEnding lineEnding, NodeType lineBreakType = null) =>
       new NewLine(lineEnding.GetPresentation());
 
-    public override ITreeRange Format(ITreeNode firstElement,
-      ITreeNode lastElement,
-      CodeFormatProfile profile,
+    public override ITreeRange Format(ITreeNode firstElement, ITreeNode lastElement, CodeFormatProfile profile,
       AdditionalFormatterParameters parameters = null)
     {
       parameters ??= AdditionalFormatterParameters.Empty;
@@ -89,16 +77,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
       var formatterSettings = GetFormattingSettings(task.FirstElement, parameters);
 
-      DoDeclarativeFormat(
-        formatterSettings,
-        formatterInfoProvider,
-        null,
-        new[] {task},
-        parameters,
-        null,
-        null,
-        null,
-        false);
+      DoDeclarativeFormat(formatterSettings, formatterInfoProvider, null, new[] {task},
+        parameters, null, null, null, false);
 
       return new TreeRange(firstElement, lastElement);
     }
@@ -123,8 +103,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
       FormatterImplHelper.CheckForMinimumSeparator(this, first, last);
     }
 
-    public override void FormatDeletedNodes(ITreeNode parent, ITreeNode prevNode, ITreeNode nextNode)
-      => FormatterImplHelper.FormatDeletedNodesHelper(this, parent, prevNode, nextNode, false);
+    public override void FormatDeletedNodes(ITreeNode parent, ITreeNode prevNode, ITreeNode nextNode) =>
+      FormatterImplHelper.FormatDeletedNodesHelper(this, parent, prevNode, nextNode, false);
 
     public override string OverridenSettingPrefix => "// @formatter:";
 
