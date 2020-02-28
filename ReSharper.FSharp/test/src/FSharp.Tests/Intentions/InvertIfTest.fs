@@ -34,3 +34,8 @@ type InvertIfTest() =
 
     [<Test>] member x.``Else - If 01``() = x.DoNamedTest()
     [<Test>] member x.``Else - If 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Single line expressions 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Deindent - Single line expressions 01``() = x.DoNamedTest()
+    [<Test; Explicit>] member x.``Deindent - Single line expressions 02 - Comment``() = x.DoNamedTest()

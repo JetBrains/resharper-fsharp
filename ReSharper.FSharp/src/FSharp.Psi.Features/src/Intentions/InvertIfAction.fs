@@ -3,8 +3,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
@@ -19,13 +21,26 @@ type InvertIfAction(dataProvider: FSharpContextActionDataProvider) =
         let ifExpr = dataProvider.GetSelectedElement<IIfThenElseExpr>()
         if isNull ifExpr then false else
 
+        let thenExpr = ifExpr.ThenExpr
         let elseExpr = ifExpr.ElseExpr
-        if isNull elseExpr || elseExpr :? IElifExpr then false else
+        if isNull thenExpr || isNull elseExpr || elseExpr :? IElifExpr then false else
 
-        // todo: remove
-        if not ifExpr.IsSingleLine then false else
+        if not (isAtIfExprKeyword dataProvider ifExpr) then false else
 
-        isAtIfExprKeyword dataProvider ifExpr
+        if ifExpr.IsSingleLine then true else
+
+        // Allow inverting simple expressions of form
+        // if foo then "a" else
+        //
+        // "b"
+
+        if not (thenExpr.IsSingleLine && elseExpr.IsSingleLine) then false else
+
+        let beforeThenExpr = skipMatchingNodesBefore isWhitespace thenExpr
+        let beforeElseExpr = skipMatchingNodesBefore isWhitespace elseExpr
+
+        getTokenType beforeThenExpr == FSharpTokenType.THEN &&
+        getTokenType beforeElseExpr == FSharpTokenType.ELSE
 
     override x.ExecutePsiTransaction(_, _) =
         let ifExpr = dataProvider.GetSelectedElement<IIfThenElseExpr>()
