@@ -26,7 +26,7 @@ let getReferencePaths assemblyFilter (psiModule: IPsiModule) =
         | :? IProjectPsiModule as projectPsiModule ->
             let referencedProject = projectPsiModule.Project
             if referencedProject <> project then
-                result.Add(referencedProject.GetOutputFilePath(psiModule.TargetFrameworkId).FullPath)
+                result.Add(referencedProject.GetOutputFilePath(projectPsiModule.TargetFrameworkId).FullPath)
 
         | _ -> ()
 
