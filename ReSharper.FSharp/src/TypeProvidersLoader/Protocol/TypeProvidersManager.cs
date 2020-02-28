@@ -8,19 +8,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
 {
   public class TypeProvidersManager: IOutOfProcessProtocolManager<ITypeProvider, RdTypeProvider>
   {
-    private IOutOfProcessProtocolManager<IProvidedNamespace, RdProvidedNamespace> myProvidedNamespacesManger;
+    private readonly IOutOfProcessProtocolManager<IProvidedNamespace, RdProvidedNamespace> myProvidedNamespacesManager;
 
-    public TypeProvidersManager(IOutOfProcessProtocolManager<IProvidedNamespace, RdProvidedNamespace> providedNamespacesManger)
+    public TypeProvidersManager(IOutOfProcessProtocolManager<IProvidedNamespace, RdProvidedNamespace> providedNamespacesManager)
     {
-      myProvidedNamespacesManger = providedNamespacesManger;
+      myProvidedNamespacesManager = providedNamespacesManager;
     }
 
-    public RdTypeProvider Register(ITypeProvider providedType)
+    public RdTypeProvider Register(ITypeProvider providedMethod)
     {
       var tpProtocolModel = new RdTypeProvider();
       
       //tpProtocolModel.GetGeneratedAssemblyContents.Set((lifetime, ) => GetGeneratedAssemblyContents(lifetime, typeProvider));
-      tpProtocolModel.GetNamespaces.Set((lifetime, _) => GetTypeProviderNamespaces(lifetime, providedType));
+      tpProtocolModel.GetNamespaces.Set((lifetime, _) => GetTypeProviderNamespaces(lifetime, providedMethod));
       //tpProtocolModel.ApplyStaticArguments.Set(ApplyStaticArguments);
       //tpProtocolModel.GetStaticParameters.Set(GetStaticParameters);
 
@@ -29,7 +29,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
 
     private RdTask<RdProvidedNamespace[]> GetTypeProviderNamespaces(Lifetime lifetime, ITypeProvider typeProvider)
     {
-      var namespaces = typeProvider.GetNamespaces().Select(myProvidedNamespacesManger.Register).ToArray();
+      var namespaces = typeProvider.GetNamespaces().Select(myProvidedNamespacesManager.Register).ToArray();
       return RdTask<RdProvidedNamespace[]>.Successful(namespaces);
     }
   }

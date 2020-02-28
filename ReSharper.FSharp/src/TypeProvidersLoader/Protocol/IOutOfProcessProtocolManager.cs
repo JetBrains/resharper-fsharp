@@ -4,6 +4,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
 {
   public interface IOutOfProcessProtocolManager<in T, out TU> where TU : RdBindableBase
   {
-    TU Register(T providedType);
+    TU Register(T providedMethod);
   }
 }

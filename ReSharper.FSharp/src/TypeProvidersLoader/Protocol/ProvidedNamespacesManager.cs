@@ -9,22 +9,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
 {
   public class ProvidedNamespacesManager : IOutOfProcessProtocolManager<IProvidedNamespace, RdProvidedNamespace>
   {
-    private IOutOfProcessProtocolManager<ProvidedType, RdProvidedType> myProvidedTypesManager;
+    private readonly IOutOfProcessProtocolManager<ProvidedType, RdProvidedType> myProvidedTypesManager;
 
     public ProvidedNamespacesManager(IOutOfProcessProtocolManager<ProvidedType, RdProvidedType> providedTypesManager)
     {
       myProvidedTypesManager = providedTypesManager;
     }
 
-    public RdProvidedNamespace Register(IProvidedNamespace providedType)
+    public RdProvidedNamespace Register(IProvidedNamespace providedMethod)
     {
-      var pnProtocolModel = new RdProvidedNamespace(providedType.NamespaceName);
+      var pnProtocolModel = new RdProvidedNamespace(providedMethod.NamespaceName);
 
       pnProtocolModel.GetNestedNamespaces.Set((lifetime, _) =>
-        GetNestedNamespaces(lifetime, providedType));
-      pnProtocolModel.GetTypes.Set((lifetime, _) => GetTypes(lifetime, providedType));
+        GetNestedNamespaces(lifetime, providedMethod));
+      pnProtocolModel.GetTypes.Set((lifetime, _) => GetTypes(lifetime, providedMethod));
       pnProtocolModel.ResolveTypeName.Set((lifetime, typeName) =>
-        ResolveTypeName(lifetime, providedType, typeName));
+        ResolveTypeName(lifetime, providedMethod, typeName));
 
       return pnProtocolModel;
     }

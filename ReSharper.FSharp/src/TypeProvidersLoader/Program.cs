@@ -9,17 +9,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader
   internal class Program
   {
     public static void Main(string[] args)
-    { 
-      var endPoint = new OutOfProcessTypeProvidersLoaderEndPoint(ProtocolConstants.TypeProvidersLoaderPid, new TypeProvidersLoader(),
-        new TypeProvidersManager(new ProvidedNamespacesManager(new ProvidedTypesManager())));
-      
+    {
+      var endPoint = new OutOfProcessTypeProvidersLoaderEndPoint(ProtocolConstants.TypeProvidersLoaderPid,
+        new TypeProvidersLoader(),
+        new TypeProvidersManager(
+          new ProvidedNamespacesManager(new ProvidedTypesManager(new ProvidedPropertyInfoManager()))));
+
       var portValue = args[0];
       var logPath = string.Empty;
       if (args.Length > 1)
       {
         logPath = args[1];
       }
-      
+
       Console.WriteLine("Try to start with port: " + portValue);
       try
       {

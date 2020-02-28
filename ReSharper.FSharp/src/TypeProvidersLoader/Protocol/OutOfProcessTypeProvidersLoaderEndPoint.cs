@@ -69,7 +69,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       throw new NotImplementedException();
     }
 
-    private RdTask<ParameterInfo[]> ApplyStaticArguments(Lifetime arg1, ApplyStaticArgumentsParameters arg2)
+    private RdTask<string[]> ApplyStaticArguments(Lifetime arg1, ApplyStaticArgumentsParameters arg2)
     {
       throw new NotImplementedException();
     }

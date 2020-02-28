@@ -11,36 +11,35 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         CSharp50Generator(FlowTransform.AsIs, "JetBrains.Rider.FSharp.TypeProvidersProtocol.Server", File("C:\\Programming\\fsharp-support\\ReSharper.FSharp\\src\\FSharp.TypeProvidersProtocol\\src\\Server")),
         CSharp50Generator(FlowTransform.Reversed, "JetBrains.Rider.FSharp.TypeProvidersProtocol.Client", File("C:\\Programming\\fsharp-support\\ReSharper.FSharp\\src\\FSharp.TypeProvidersProtocol\\src\\Client"))
 ) {
-    private val RdProvidedType = classdef {
+
+    lateinit var RdProvidedType: Class.Concrete
+    lateinit var RdProvidedPropertyInfo: Class.Concrete
+    lateinit var RdProvidedMethodInfo: Class.Concrete
+    lateinit var RdProvidedParameterInfo: Class.Concrete
+
+    val RdProvidedMemberInfo = baseclass {
         field("Name", string)
-        field("FullName", string.nullable)
-        field("Namespace", string.nullable)
-        field("IsGenericParameter", bool)
-        field("IsValueType", bool)
-        field("IsByRef", bool)
-        field("IsPointer", bool)
-        field("IsEnum", bool)
-        field("IsInterface", bool)
-        field("IsClass", bool)
-        field("IsSealed", bool)
-        field("IsAbstract", bool)
+        field("DeclaringType", RdProvidedType)
+    }
+
+    val RdProvidedMethodBase = baseclass extends RdProvidedMemberInfo {
+        field("IsGenericMethod", bool)
+        field("IsStatic", bool)
+        field("IsFamily", bool)
+        field("IsFamilyAndAssembly", bool)
+        field("IsFamilyOrAssembly", bool)
+        field("IsVirtual", bool)
+        field("IsFinal", bool)
         field("IsPublic", bool)
-        field("IsNestedPublic", bool)
-        field("IsSuppressRelocate", bool)
-        field("IsErased", bool)
-        field("IsGenericType", bool)
-        field("BaseType", this)
+        field("IsAbstract", bool)
+        field("IsHideBySig", bool)
+        field("IsConstructor", bool)
 
-        call("GetNestedType", string, this)
-        call("GetNestedTypes", void, array(this))
-        call("GetAllNestedTypes", void, array(this))
-        call("GetInterfaces", void, array(this))
-        call("GetGenericTypeDefinition", void, this)
+        call("GetParameters", void, array(RdProvidedParameterInfo))
+        call("GetGenericArguments", void, array(RdProvidedType))
+        //call("GetStaticParametersForMethod", RdTypeProvider, array(RdProvidedParameterInfo))
     }
 
-    private val ParameterInfo = structdef {
-
-    }
 
     private val RdResolutionEnvironment = structdef {
         field("resolutionFolder", string)
@@ -63,7 +62,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
 
         call("GetNamespaces", void, array(RdProvidedNamespace))
         call("GetStaticParameters", GetStaticArgumentsParameters, array(string))
-        call("ApplyStaticArguments", ApplyStaticArgumentsParameters, array(ParameterInfo))
+        call("ApplyStaticArguments", ApplyStaticArgumentsParameters, array(string))
         call("GetInvokerExpression", GetInvokerExpressionParameters, string)
         call("GetGeneratedAssemblyContents", GetGeneratedAssemblyContentsParameters, array(byte))
     }
@@ -165,6 +164,64 @@ object RdFSharpTypeProvidersLoaderModel : Root(
     }
 
     init {
+        RdProvidedType = classdef extends RdProvidedMemberInfo {
+            field("FullName", string.nullable)
+            field("Namespace", string.nullable)
+            field("IsGenericParameter", bool)
+            field("IsValueType", bool)
+            field("IsByRef", bool)
+            field("IsPointer", bool)
+            field("IsEnum", bool)
+            field("IsInterface", bool)
+            field("IsClass", bool)
+            field("IsSealed", bool)
+            field("IsAbstract", bool)
+            field("IsPublic", bool)
+            field("IsNestedPublic", bool)
+            field("IsSuppressRelocate", bool)
+            field("IsErased", bool)
+            field("IsGenericType", bool)
+            field("BaseType", this.nullable)
+
+            call("GetNestedType", string, this)
+            call("GetNestedTypes", void, array(this))
+            call("GetAllNestedTypes", void, array(this))
+            call("GetInterfaces", void, array(this))
+            call("GetGenericTypeDefinition", void, this)
+            call("GetElementType", void, this)
+            call("GetGenericArguments", void, array(this))
+            call("GetArrayRank", void, int)
+            call("GetEnumUnderlyingType", void, this.nullable)
+            call("GetProperties", void, array(RdProvidedPropertyInfo))
+            call("GetProperty", string, RdProvidedPropertyInfo)
+            call("GenericParameterPosition", void, int)
+        }
+
+        RdProvidedPropertyInfo = classdef extends RdProvidedMemberInfo {
+            field("CanRead", bool)
+            field("CanWrite", bool)
+            field("PropertyType", RdProvidedType)
+
+            call("GetGetMethod", void, RdProvidedMethodInfo)
+            call("GetSetMethod", void, RdProvidedMethodInfo)
+            call("GetIndexParameters", void, array(RdProvidedParameterInfo))
+        }
+
+        RdProvidedParameterInfo = classdef {
+            field("Name", string)
+            field("ParameterType", RdProvidedType)
+            field("IsIn", bool)
+            field("IsOut", bool)
+            field("IsOptional", bool)
+            //field("RawDefaultValue : obj
+            field("HasDefaultValue", bool)
+        }
+
+        RdProvidedMethodInfo = classdef extends RdProvidedMethodBase {
+            field("ReturnType", RdProvidedType)
+            field("MetadataToken", int)
+        }
+
         call("InstantiateTypeProvidersOfAssembly", InstantiateTypeProvidersOfAssemblyParameters, array(RdTypeProvider))
     }
 }
