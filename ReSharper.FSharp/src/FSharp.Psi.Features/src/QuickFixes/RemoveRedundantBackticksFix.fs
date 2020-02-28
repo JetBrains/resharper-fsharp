@@ -5,6 +5,7 @@ open JetBrains.ReSharper.Feature.Services.Intentions.Scoped.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
 type RemoveRedundantBackticksFix(warning: RedundantBackticksWarning) =
@@ -17,6 +18,7 @@ type RemoveRedundantBackticksFix(warning: RedundantBackticksWarning) =
 
     member x.ExecutePsiTransaction() =
         use writeCookie = WriteLockCookie.Create(identifier.IsPhysical())
+        use disableFormatter = new DisableCodeFormatter()
         let name = identifier.GetText().RemoveBackticks()
         let newId = FSharpIdentifierToken(name)
         replace identifier newId

@@ -5,6 +5,7 @@ open JetBrains.ReSharper.Feature.Services.Intentions.Scoped.Actions
 open JetBrains.ReSharper.Feature.Services.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
 type RemoveUnusedOpensFix(warning: UnusedOpenWarning) =
@@ -22,6 +23,7 @@ type RemoveUnusedOpensFix(warning: UnusedOpenWarning) =
 
         member x.ExecuteAction(highlightingInfos, _, _) =
             use writeLock = WriteLockCookie.Create(true)
+            use disableFormatter = new DisableCodeFormatter()
             for highlightingInfo in highlightingInfos do
                 match highlightingInfo.Highlighting.As<UnusedOpenWarning>() with
                 | null -> ()

@@ -1,5 +1,9 @@
 namespace global
 
+open JetBrains.ProjectModel
+open JetBrains.ReSharper.Host.Features
+open JetBrains.Rider.Model
+
 [<AutoOpen>]
 module FSharpGlobalUtil =
     type System.Object with
@@ -41,19 +45,16 @@ module IgnoreAll =
     let ignoreAll = IgnoreAllBuilder()
 
 
-[<AutoOpen>]
-module ProtocolSolutionExtensions =
-    open JetBrains.ProjectModel
-    open JetBrains.ReSharper.Host.Features
-    open JetBrains.Rider.Model
+[<Extension>]
+[<AbstractClass; Sealed>]
+type ProtocolSolutionExtensions =
+    [<Extension>]
+    static member RdFSharpModel(solution: ISolution) =
+        try solution.GetProtocolSolution().GetRdFSharpModel()
+        with _ -> null
 
-    type ISolution with
-        member x.RdFSharpModel =
-            try x.GetProtocolSolution().GetRdFSharpModel()
-            with _ -> null
-
-    type RdFSharpModel with
-        member x.EnableExperimentalFeaturesSafe =
-            match x with
-            | null -> false
-            | fsModel -> fsModel.EnableExperimentalFeatures.Value
+    [<Extension>]
+    static member EnableExperimentalFeaturesSafe(rdFSharpModel: RdFSharpModel) =
+        match rdFSharpModel with
+        | null -> false
+        | fsModel -> fsModel.EnableExperimentalFeatures.Value

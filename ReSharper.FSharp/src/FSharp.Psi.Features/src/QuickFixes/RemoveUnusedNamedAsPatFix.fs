@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util.PsiUtil
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
 type RemoveUnusedNamedAsPatFix(warning: UnusedValueWarning) =
@@ -17,4 +18,5 @@ type RemoveUnusedNamedAsPatFix(warning: UnusedValueWarning) =
 
     override x.ExecutePsiTransaction _ =
         use writeLock = WriteLockCookie.Create(pat.IsPhysical())
+        use disableFormatter = new DisableCodeFormatter()
         replaceWithCopy pat pat.Pattern

@@ -7,6 +7,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
@@ -53,6 +54,7 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
 
     override x.ExecutePsiTransaction(_, _) =
         use writeLock = WriteLockCookie.Create(pat.IsPhysical())
+        use disableFormatter = new DisableCodeFormatter()
 
         let bindings = letOrUse.Bindings
         if bindings.Count = 1 then

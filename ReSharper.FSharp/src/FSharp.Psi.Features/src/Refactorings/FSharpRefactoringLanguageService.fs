@@ -14,7 +14,7 @@ type FSharpRefactoringLanguageService() =
 
     override x.CreateIntroduceVariable(workflow, solution, driver) =
            if workflow :? IntroduceVarFixWorkflow ||
-              solution.RdFSharpModel.EnableExperimentalFeaturesSafe then
+              solution.RdFSharpModel().EnableExperimentalFeaturesSafe() then
                 FSharpIntroduceVariable(workflow, solution, driver) :> _
            else null
 

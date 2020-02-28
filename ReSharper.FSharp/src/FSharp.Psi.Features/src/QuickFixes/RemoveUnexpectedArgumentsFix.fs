@@ -3,6 +3,7 @@
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Psi.Tree
@@ -27,6 +28,7 @@ type RemoveUnexpectedArgumentsFix(warning: NotAFunctionError) =
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
+        use disableFormatter = new DisableCodeFormatter()
         let firstUnexpectedArg = PrefixAppExprNavigator.GetByFunctionExpression(expr).ArgumentExpression
         let commentNodeCandidate = skipMatchingNodesBefore isWhitespace firstUnexpectedArg
         let updatedRoot = ModificationUtil.ReplaceChild(prefixApp, expr.Copy())

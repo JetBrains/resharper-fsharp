@@ -7,6 +7,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
@@ -45,6 +46,7 @@ type InvertIfAction(dataProvider: FSharpContextActionDataProvider) =
     override x.ExecutePsiTransaction(_, _) =
         let ifExpr = dataProvider.GetSelectedElement<IIfThenElseExpr>()
         use writeCookie = WriteLockCookie.Create(ifExpr.IsPhysical())
+        use disableFormatter = new DisableCodeFormatter()
 
         let conditionExpr = ifExpr.ConditionExpr
         let negatedExpression = createLogicallyNegatedExpression conditionExpr
