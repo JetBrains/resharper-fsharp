@@ -17,7 +17,7 @@ using JetBrains.Util;
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
   [SolutionComponent]
-  public class FSharpResolvedSymbolsCache : ICache, IFSharpResolvedSymbolsCache
+  public class FSharpResolvedSymbolsCache : IPsiSourceFileCache, IFSharpResolvedSymbolsCache
   {
     public IPsiModules PsiModules { get; }
     public FSharpCheckerService CheckerService { get; }
