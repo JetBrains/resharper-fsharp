@@ -22,6 +22,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
     private readonly IOutOfProcessProtocolManager<ITypeProvider, RdTypeProvider> myTypeProvidersManager;
     private TypeProviderExternal myDispatcher;
 
+    protected override string ProtocolName { get; } = "Out-of-Process Type Provider";
+
+    public OutOfProcessTypeProvidersLoaderEndPoint(string parentProcessPidEnvVariable,
+      ITypeProvidersLoader loader,
+      IOutOfProcessProtocolManager<ITypeProvider, RdTypeProvider> typeProvidersManager) :
+      base(parentProcessPidEnvVariable)
+    {
+      myLoader = loader;
+      myTypeProvidersManager = typeProvidersManager;
+    }
+
     protected override TypeProviderExternal InitDispatcher(Lifetime lifetime, ILogger logger)
     {
       myDispatcher = new TypeProviderExternal(lifetime);
@@ -31,20 +42,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
     protected override void InitLogger(Lifetime lifetime, string path)
     {
       LogManager.Instance.SetConfig(new XmlLogConfigModel());
-      var path1 = FileSystemPath.TryParse(path);
-      if (path1.IsNullOrEmpty())
+      var logPath = FileSystemPath.TryParse(path);
+      if (logPath.IsNullOrEmpty())
       {
         return;
       }
 
-      var logEventListener = new FileLogEventListener(path1);
+      var logEventListener = new FileLogEventListener(logPath);
       LogManager.Instance.AddOmnipresentLogger(lifetime, logEventListener, LoggingLevel.TRACE);
-      File.WriteAllText("tplog.txt", "initlogger lol");
     }
 
     protected override RdFSharpTypeProvidersLoaderModel InitModel(Lifetime lifetime, Rd.Impl.Protocol protocol)
     {
-      File.WriteAllText("tplog.txt", "createmodel");
       var model = new RdFSharpTypeProvidersLoaderModel(lifetime, protocol);
       model.InstantiateTypeProvidersOfAssembly.Set(InstantiateTypeProvidersOfAssembly);
       return model;
@@ -54,42 +63,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       InstantiateTypeProvidersOfAssemblyParameters @params)
     {
       var instantiateResults = myLoader.InstantiateTypeProvidersOfAssembly(@params)
-        .Select(myTypeProvidersManager.Register)
+        .Select(t => myTypeProvidersManager.Register(t, t))
         .ToArray();
       return RdTask<RdTypeProvider[]>.Successful(instantiateResults);
     }
 
-    private RdTask<byte[]> GetGeneratedAssemblyContents(Lifetime arg1, GetGeneratedAssemblyContentsParameters arg2)
-    {
-      throw new NotImplementedException();
-    }
-
-    private RdTask<string[]> GetStaticParameters(Lifetime arg1, GetStaticArgumentsParameters arg2)
-    {
-      throw new NotImplementedException();
-    }
-
-    private RdTask<string[]> ApplyStaticArguments(Lifetime arg1, ApplyStaticArgumentsParameters arg2)
-    {
-      throw new NotImplementedException();
-    }
     protected override void Run(Lifetime lifetime, TypeProviderExternal dispatcher)
     {
       while (true)
       {
       }
-    }
-
-    protected override string ProtocolName { get; } = "Out-of-Process Type Provider";
-
-    public OutOfProcessTypeProvidersLoaderEndPoint(string parentProcessPidEnvVariable, 
-      ITypeProvidersLoader loader,
-      IOutOfProcessProtocolManager<ITypeProvider, RdTypeProvider> typeProvidersManager) :
-      base(parentProcessPidEnvVariable)
-    {
-      myLoader = loader;
-      myTypeProvidersManager = typeProvidersManager;
-      Console.WriteLine("Endpoint created.");
     }
 
     //on shutdown requested

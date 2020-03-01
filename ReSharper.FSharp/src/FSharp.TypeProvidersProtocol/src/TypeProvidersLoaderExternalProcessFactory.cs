@@ -5,7 +5,7 @@ using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.Util;
 
-namespace JetBrains.ReSharper.Plugins.FSharp
+namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol
 {
   [SolutionComponent]
   public class TypeProvidersLoaderExternalProcessFactory

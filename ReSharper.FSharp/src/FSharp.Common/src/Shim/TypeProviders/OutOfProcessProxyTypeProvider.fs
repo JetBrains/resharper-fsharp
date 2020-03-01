@@ -14,18 +14,19 @@ type OutOfProcessProxyTypeProvider(typeProvider: RdTypeProvider) =
             typeProvider.GetNamespaces.Sync(JetBrains.Core.Unit.Instance) |> Array.map (fun x -> x.toProvidedNamespace())
 
         member this.GetStaticParameters(typeWithoutArguments) =
-                    [||]
+            // We know FCS
+            raise (Exception("this code should be unreachable"))
                     
         member this.ApplyStaticArguments(typeWithoutArguments, typePathWithArguments, staticArguments) =
-                    //typeProvider.ApplyStaticArguments(typeWithoutArguments, typePathWithArguments, staticArguments)
-                    null
+            // We know FCS
+            raise (Exception("this code should be unreachable"))
+                    
         member this.GetInvokerExpression(syntheticMethodBase, parameters) =
                     //typeProvider.GetInvokerExpression(syntheticMethodBase, parameters)
                     raise null
                     
         member this.GetGeneratedAssemblyContents(assembly) =
-                    //typeProvider.GetGeneratedAssemblyContents(assembly)
-                    null
+                    [||]
                     
         [<CLIEvent>]
         member this.Invalidate = invalidateEvent

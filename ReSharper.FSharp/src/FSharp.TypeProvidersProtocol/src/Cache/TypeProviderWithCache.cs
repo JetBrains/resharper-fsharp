@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.FSharp.Core.CompilerServices;
 using Microsoft.FSharp.Quotations;
@@ -9,11 +10,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache
   {
     private readonly ITypeProvider myTypeProvider;
     private IProvidedNamespace[] myProvidedNamespaces;
+    private Dictionary<string, byte[]> myGeneratedAssemblyContents;
+    private Dictionary<string, ParameterInfo[]> myStaticParameters;
 
     public TypeProviderWithCache(ITypeProvider typeProvider)
     {
       myTypeProvider = typeProvider;
       myTypeProvider.Invalidate += TypeProviderOnInvalidate;
+      InitCaches();
     }
 
     public void Dispose()
@@ -42,7 +46,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache
 
     public byte[] GetGeneratedAssemblyContents(Assembly assembly)
     {
-      return myTypeProvider.GetGeneratedAssemblyContents(assembly);
+      if (!myGeneratedAssemblyContents.TryGetValue(assembly.FullName, out var contents))
+      {
+        contents = myTypeProvider.GetGeneratedAssemblyContents(assembly);
+        myGeneratedAssemblyContents.Add(assembly.FullName, contents);
+      }
+
+      return contents;
     }
 
     private void TypeProviderOnInvalidate(object sender, EventArgs e)
@@ -51,9 +61,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache
       Invalidate?.Invoke(sender, e);
     }
 
+    private void InitCaches()
+    {
+      myGeneratedAssemblyContents = new Dictionary<string, byte[]>();
+      myStaticParameters = new Dictionary<string, ParameterInfo[]>();
+    }
+
     private void ClearCaches()
     {
       myProvidedNamespaces = null;
+      myGeneratedAssemblyContents.Clear();
     }
 
     public event EventHandler Invalidate;

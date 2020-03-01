@@ -4,7 +4,7 @@ using JetBrains.Annotations;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
 using ProvidedType = FSharp.Compiler.ExtensionTyping.ProvidedType;
 
-namespace JetBrains.ReSharper.Plugins.FSharp.Models
+namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 {
   public class ProxyProvidedType : ProvidedType
   {
@@ -17,10 +17,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Models
     }
 
     [ContractAnnotation("null => null")]
-    public static ProxyProvidedType Create(RdProvidedType type)
-    {
-      return type == null ? null : new ProxyProvidedType(type);
-    }
+    public static ProxyProvidedType Create(RdProvidedType type) =>
+      type == null ? null : new ProxyProvidedType(type);
 
     public override string Name => myRdProvidedType.Name;
     public override string FullName => myRdProvidedType.FullName;

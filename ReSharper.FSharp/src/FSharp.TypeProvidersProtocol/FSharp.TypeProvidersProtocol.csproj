@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net461</TargetFramework>
-        <RootNamespace>JetBrains.ReSharper.Plugins.FSharp</RootNamespace>
+        <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol</RootNamespace>
         <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol</AssemblyName>
     </PropertyGroup>
 

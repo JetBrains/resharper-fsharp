@@ -1,6 +1,6 @@
 ﻿using JetBrains.Util;
 
-namespace JetBrains.ReSharper.Plugins.FSharp
+namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol
 {
   public class ProtocolConstants
   {

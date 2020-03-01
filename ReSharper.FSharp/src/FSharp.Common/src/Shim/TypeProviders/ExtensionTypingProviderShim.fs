@@ -11,11 +11,12 @@ open JetBrains.ProjectModel
 open Microsoft.FSharp.Core.CompilerServices
 open FSharp.Compiler.AbstractIL.Internal.Library
 open FSharp.Compiler.ErrorLogger
-open JetBrains.ReSharper.Plugins.FSharp
-open JetBrains.ReSharper.Plugins.FSharp.Models
 open JetBrains.Rider.FSharp.TypeProvidersProtocol.Server
 open JetBrains.ReSharper.Plugins.FSharp.Util.TypeProvidersProtocolConverter
 open JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders.Hack
+open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol
+open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache
+open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
 module FCSTypeProviderErrors =
     let etTypeProviderConstructorException (exnMessage: string) =
@@ -172,7 +173,7 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
                                                                                                                                   systemRuntimeAssemblyVersion.toRdVersion(),
                                                                                                                                   rdSystemRuntimeContainsType))
                           for tp in res
-                            -> (new OutOfProcessProxyTypeProvider(tp) :> ITypeProvider, ilScopeRefOfRuntimeAssembly)
+                            -> (new TypeProviderWithCache(new OutOfProcessProxyTypeProvider(tp)) :> ITypeProvider, ilScopeRefOfRuntimeAssembly)
                       |   None, _ -> () ]
 
                 with :? TypeProviderError as tpe ->
@@ -183,12 +184,12 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
             providers
             
         member this.GetProvidedTypes(pn: Tainted<IProvidedNamespace>, m: range) =
-            let types = pn.PApplyArray((fun r -> r.As<IOutOfProcessProxyProvidedNamespace>().GetRdTypes()), "GetTypes", m)
+            let types = pn.PApplyArray((fun r -> r.As<IProxyProvidedNamespace>().GetRdTypes()), "GetTypes", m)
             let providedTypes = [| for t in types -> t.PApply((fun ty -> ty |> ProxyProvidedType.Create :> ProvidedType), m) |]
             providedTypes
             
         member this.ResolveTypeName(pn: Tainted<IProvidedNamespace>, typeName: string, m: range) =
-            pn.PApply((fun providedNamespace -> ProxyProvidedType.Create(providedNamespace.As<IOutOfProcessProxyProvidedNamespace>().ResolveRdTypeName typeName) :> _), range=m) 
+            pn.PApply((fun providedNamespace -> ProxyProvidedType.Create(providedNamespace.As<IProxyProvidedNamespace>().ResolveRdTypeName typeName) :> _), range=m) 
 
             
     interface IDisposable with

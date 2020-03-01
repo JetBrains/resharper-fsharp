@@ -6,7 +6,7 @@ open FSharp.Compiler.AbstractIL.IL
 open JetBrains.Rider.FSharp.TypeProvidersProtocol.Server
 open FSharp.Compiler.ExtensionTyping
 open FSharp.Compiler.AbstractIL.Internal.Library
-open JetBrains.ReSharper.Plugins.FSharp.Models
+open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 open Microsoft.FSharp.Core.CompilerServices
 open System.Reflection
 
@@ -78,7 +78,7 @@ type ResolutionEnvironment with
 type RdProvidedNamespace with
     [<Extension>]
     member this.toProvidedNamespace() =
-        { new IOutOfProcessProxyProvidedNamespace with
+        { new IProxyProvidedNamespace with
            member x.NamespaceName = this.NamespaceName
            member x.GetNestedNamespaces() = this.GetNestedNamespaces.Sync(JetBrains.Core.Unit.Instance) |> Array.map(fun x -> x.toProvidedNamespace())
            member x.GetTypes() = [||]

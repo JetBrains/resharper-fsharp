@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader
 {
@@ -10,10 +11,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader
   {
     public static void Main(string[] args)
     {
-      var endPoint = new OutOfProcessTypeProvidersLoaderEndPoint(ProtocolConstants.TypeProvidersLoaderPid,
+      var endPoint = new OutOfProcessTypeProvidersLoaderEndPoint(
+        ProtocolConstants.TypeProvidersLoaderPid,
         new TypeProvidersLoader(),
-        new TypeProvidersManager(
-          new ProvidedNamespacesManager(new ProvidedTypesManager(new ProvidedPropertyInfoManager()))));
+        new TypeProvidersManager());
 
       var portValue = args[0];
       var logPath = string.Empty;
@@ -25,7 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader
       Console.WriteLine("Try to start with port: " + portValue);
       try
       {
-        endPoint.Start(portValue, "TpLog");
+        endPoint.Start(portValue, logPath);
       }
       catch (Exception e)
       {

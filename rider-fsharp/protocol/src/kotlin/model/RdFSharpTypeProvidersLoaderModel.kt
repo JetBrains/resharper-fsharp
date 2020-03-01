@@ -17,12 +17,12 @@ object RdFSharpTypeProvidersLoaderModel : Root(
     lateinit var RdProvidedMethodInfo: Class.Concrete
     lateinit var RdProvidedParameterInfo: Class.Concrete
 
-    val RdProvidedMemberInfo = baseclass {
+    private val RdProvidedMemberInfo = baseclass {
         field("Name", string)
-        field("DeclaringType", RdProvidedType)
+        field("DeclaringType", RdProvidedType.nullable)
     }
 
-    val RdProvidedMethodBase = baseclass extends RdProvidedMemberInfo {
+    private val RdProvidedMethodBase = baseclass extends RdProvidedMemberInfo {
         field("IsGenericMethod", bool)
         field("IsStatic", bool)
         field("IsFamily", bool)
@@ -61,8 +61,6 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         //sink("invalidate", void).async
 
         call("GetNamespaces", void, array(RdProvidedNamespace))
-        call("GetStaticParameters", GetStaticArgumentsParameters, array(string))
-        call("ApplyStaticArguments", ApplyStaticArgumentsParameters, array(string))
         call("GetInvokerExpression", GetInvokerExpressionParameters, string)
         call("GetGeneratedAssemblyContents", GetGeneratedAssemblyContentsParameters, array(byte))
     }
@@ -195,6 +193,8 @@ object RdFSharpTypeProvidersLoaderModel : Root(
             call("GetProperties", void, array(RdProvidedPropertyInfo))
             call("GetProperty", string, RdProvidedPropertyInfo)
             call("GenericParameterPosition", void, int)
+            call("GetStaticParameters", void, array(RdProvidedParameterInfo))
+            //call("ApplyStaticArguments", ApplyStaticArgumentsParameters, this)
         }
 
         RdProvidedPropertyInfo = classdef extends RdProvidedMemberInfo {

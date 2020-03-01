@@ -8,7 +8,7 @@ using JetBrains.Rd;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
 using JetBrains.Util;
 
-namespace JetBrains.ReSharper.Plugins.FSharp
+namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol
 {
   public class OutOfProcessTypeProvidersProtocol : ConfiguredProtocolExternalProcess<RdFSharpTypeProvidersLoaderModel>
   {

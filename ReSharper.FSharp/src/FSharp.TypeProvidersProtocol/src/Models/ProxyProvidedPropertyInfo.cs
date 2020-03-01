@@ -1,11 +1,10 @@
 ﻿using System.Linq;
-using FSharp.Compiler;
+using JetBrains.Annotations;
+using JetBrains.Core;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
-using ProvidedPropertyInfo = FSharp.Compiler.ExtensionTyping.ProvidedPropertyInfo;
-using ProvidedTypeContext = FSharp.Compiler.ExtensionTyping.ProvidedTypeContext;
-using ProvidedType = FSharp.Compiler.ExtensionTyping.ProvidedType;
+using static FSharp.Compiler.ExtensionTyping;
 
-namespace JetBrains.ReSharper.Plugins.FSharp.Models
+namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 {
   public class ProxyProvidedPropertyInfo : ProvidedPropertyInfo
   {
@@ -17,29 +16,28 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Models
       myPropertyInfo = propertyInfo;
     }
 
-    public static ProxyProvidedPropertyInfo Create(RdProvidedPropertyInfo propertyInfo)
-    {
-      return new ProxyProvidedPropertyInfo(propertyInfo);
-    }
+    [ContractAnnotation("null => null")]
+    public static ProxyProvidedPropertyInfo Create(RdProvidedPropertyInfo propertyInfo) =>
+      propertyInfo == null ? null : new ProxyProvidedPropertyInfo(propertyInfo);
 
     public override string Name => myPropertyInfo.Name;
     public override bool CanRead => myPropertyInfo.CanRead;
     public override bool CanWrite => myPropertyInfo.CanWrite;
     public override ProvidedType DeclaringType => ProxyProvidedType.Create(myPropertyInfo.DeclaringType);
     public override ProvidedType PropertyType => ProxyProvidedType.Create(myPropertyInfo.PropertyType);
-    public override ExtensionTyping.ProvidedMethodInfo GetGetMethod()
-    {
-      return ProxyProvidedMethodInfo.Create(myPropertyInfo.GetGetMethod.Sync(Core.Unit.Instance));
-    }
 
-    public override ExtensionTyping.ProvidedMethodInfo GetSetMethod()
-    {
-      return base.GetSetMethod();
-    }
+    public override ProvidedMethodInfo GetGetMethod() =>
+      ProxyProvidedMethodInfo.Create(myPropertyInfo.GetGetMethod.Sync(Core.Unit.Instance));
 
-    public override ExtensionTyping.ProvidedParameterInfo[] GetIndexParameters()
+    public override ProvidedMethodInfo GetSetMethod() =>
+      ProxyProvidedMethodInfo.Create(myPropertyInfo.GetSetMethod.Sync(Core.Unit.Instance));
+
+    public override ProvidedParameterInfo[] GetIndexParameters()
     {
-      return base.GetIndexParameters();
+      return myPropertyInfo.GetIndexParameters
+        .Sync(Unit.Instance)
+        .Select(ProxyProvidedParameterInfo.Create)
+        .ToArray();
     }
   }
 }
