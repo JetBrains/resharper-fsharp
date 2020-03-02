@@ -185,11 +185,11 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
             
         member this.GetProvidedTypes(pn: Tainted<IProvidedNamespace>, m: range) =
             let types = pn.PApplyArray((fun r -> r.As<IProxyProvidedNamespace>().GetRdTypes()), "GetTypes", m)
-            let providedTypes = [| for t in types -> t.PApply((fun ty -> ty |> ProxyProvidedType.Create :> ProvidedType), m) |]
+            let providedTypes = [| for t in types -> t.PApply((fun ty -> ty |> ProxyProvidedType.CreateNoContext :> ProvidedType), m) |]
             providedTypes
             
         member this.ResolveTypeName(pn: Tainted<IProvidedNamespace>, typeName: string, m: range) =
-            pn.PApply((fun providedNamespace -> ProxyProvidedType.Create(providedNamespace.As<IProxyProvidedNamespace>().ResolveRdTypeName typeName) :> _), range=m) 
+            pn.PApply((fun providedNamespace -> ProxyProvidedType.CreateNoContext(providedNamespace.As<IProxyProvidedNamespace>().ResolveRdTypeName typeName) :> _), range=m) 
 
             
     interface IDisposable with

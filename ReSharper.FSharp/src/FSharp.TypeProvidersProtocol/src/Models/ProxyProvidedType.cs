@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using FSharp.Compiler;
 using JetBrains.Annotations;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
 using Microsoft.FSharp.Core.CompilerServices;
@@ -17,8 +16,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     }
 
     [ContractAnnotation("null => null")]
-    public static ProxyProvidedType Create(RdProvidedType type) =>
+    public static ProxyProvidedType CreateNoContext(RdProvidedType type) =>
       type == null ? null : new ProxyProvidedType(type, ProvidedTypeContext.Empty);
+    
+    [ContractAnnotation("type:null => null")]
+    public static ProxyProvidedType Create(RdProvidedType type, ProvidedTypeContext ctxt) =>
+      type == null ? null : new ProxyProvidedType(type, ctxt);
 
     public override string Name => myRdProvidedType.Name;
     public override string FullName => myRdProvidedType.FullName;
@@ -39,15 +42,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override bool IsErased => myRdProvidedType.IsErased;
     public override bool IsGenericType => myRdProvidedType.IsGenericType;
     public override int GenericParameterPosition => myRdProvidedType.GenericParameterPosition.Sync(Core.Unit.Instance);
-    public override ProvidedType BaseType => Create(myRdProvidedType.BaseType);
-    public override ProvidedType DeclaringType => Create(myRdProvidedType.DeclaringType);
-    public override ProvidedType GetNestedType(string nm) => Create(myRdProvidedType.GetNestedType.Sync(nm));
+    public override ProvidedType BaseType => Create(myRdProvidedType.BaseType, Context);
+    public override ProvidedType DeclaringType => Create(myRdProvidedType.DeclaringType, Context);
+    public override ProvidedType GetNestedType(string nm) => Create(myRdProvidedType.GetNestedType.Sync(nm), Context);
 
     public override ProvidedType[] GetNestedTypes()
     {
       return myRdProvidedType.GetNestedTypes
         .Sync(Core.Unit.Instance)
-        .Select(Create)
+        .Select(t => Create(t, Context))
         .ToArray();
     }
 
@@ -55,48 +58,48 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     {
       return myRdProvidedType.GetAllNestedTypes
         .Sync(Core.Unit.Instance)
-        .Select(Create)
+        .Select(t => Create(t, Context))
         .ToArray();
     }
 
     public override ProvidedType GetGenericTypeDefinition()
     {
-      return Create(myRdProvidedType.GetGenericTypeDefinition.Sync(Core.Unit.Instance));
+      return Create(myRdProvidedType.GetGenericTypeDefinition.Sync(Core.Unit.Instance), Context);
     }
 
     public override ProvidedPropertyInfo[] GetProperties()
     {
       return myRdProvidedType.GetProperties
         .Sync(Core.Unit.Instance)
-        .Select(ProxyProvidedPropertyInfo.Create)
+        .Select(t => ProxyProvidedPropertyInfo.Create(t, Context))
         .ToArray();
     }
 
     public override ProvidedPropertyInfo GetProperty(string nm)
     {
-      return ProxyProvidedPropertyInfo.Create(myRdProvidedType.GetProperty.Sync(nm));
+      return ProxyProvidedPropertyInfo.Create(myRdProvidedType.GetProperty.Sync(nm), Context);
     }
 
     public override int GetArrayRank() => myRdProvidedType.GetArrayRank.Sync(Core.Unit.Instance);
 
-    public override ProvidedType GetElementType() => Create(myRdProvidedType.GetElementType.Sync(Core.Unit.Instance));
+    public override ProvidedType GetElementType() => Create(myRdProvidedType.GetElementType.Sync(Core.Unit.Instance), Context);
 
     public override ProvidedType[] GetGenericArguments()
     {
       return myRdProvidedType.GetGenericArguments
         .Sync(Core.Unit.Instance)
-        .Select(Create)
+        .Select(t => Create(t, Context))
         .ToArray();
     }
 
     public override ProvidedType GetEnumUnderlyingType() =>
-      Create(myRdProvidedType.GetEnumUnderlyingType.Sync(Core.Unit.Instance));
+      Create(myRdProvidedType.GetEnumUnderlyingType.Sync(Core.Unit.Instance), Context);
 
     public override ProvidedParameterInfo[] GetStaticParameters(ITypeProvider provider)
     {
       return myRdProvidedType.GetStaticParameters
         .Sync(Core.Unit.Instance)
-        .Select(ProxyProvidedParameterInfo.Create)
+        .Select(t => ProxyProvidedParameterInfo.Create(t, Context))
         .ToArray();
     }
 
@@ -104,7 +107,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     {
       return myRdProvidedType.GetInterfaces
         .Sync(Core.Unit.Instance)
-        .Select(Create)
+        .Select(t => Create(t, Context))
         .ToArray();
     }
 
@@ -112,7 +115,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     {
       return myRdProvidedType.GetMethods
         .Sync(Core.Unit.Instance)
-        .Select(ProxyProvidedMethodInfo.Create)
+        .Select(t => ProxyProvidedMethodInfo.Create(t, Context))
         .ToArray();
     }
 
