@@ -15,4 +15,3 @@ open Xunit
 let ``My test`` () =
     Assert.True(true)
 
-
