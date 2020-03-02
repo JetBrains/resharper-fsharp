@@ -94,7 +94,7 @@ $END$</s:String>
 
 type $TYPE$$END$</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=97B0BBD8F8E9D44DB40DBFC8E77422A4/Field/=MODULE_005FOR_005FNAMESPACE/@KeyIndexDefined">True</s:Boolean>
-	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=97B0BBD8F8E9D44DB40DBFC8E77422A4/Field/=MODULE_005FOR_005FNAMESPACE/Expression/@EntryValue">list("module,namespace")</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=97B0BBD8F8E9D44DB40DBFC8E77422A4/Field/=MODULE_005FOR_005FNAMESPACE/Expression/@EntryValue">list("namespace,module")</s:String>
 	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=97B0BBD8F8E9D44DB40DBFC8E77422A4/Field/=MODULE_005FOR_005FNAMESPACE/Order/@EntryValue">0</s:Int64>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=97B0BBD8F8E9D44DB40DBFC8E77422A4/Field/=NAMESPACE/@KeyIndexDefined">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=97B0BBD8F8E9D44DB40DBFC8E77422A4/Field/=NAMESPACE/Expression/@EntryValue">fileDefaultNamespace()</s:String>
