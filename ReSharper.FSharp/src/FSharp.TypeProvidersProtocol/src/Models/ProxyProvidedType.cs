@@ -1,5 +1,7 @@
 ﻿using System.Linq;
 using JetBrains.Annotations;
+using JetBrains.Core;
+using JetBrains.Rd.Tasks;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
 using Microsoft.FSharp.Core.CompilerServices;
 using static FSharp.Compiler.ExtensionTyping;
@@ -42,8 +44,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override bool IsErased => myRdProvidedType.IsErased;
     public override bool IsGenericType => myRdProvidedType.IsGenericType;
     public override int GenericParameterPosition => myRdProvidedType.GenericParameterPosition.Sync(Core.Unit.Instance);
-    public override ProvidedType BaseType => Create(myRdProvidedType.BaseType, Context);
-    public override ProvidedType DeclaringType => Create(myRdProvidedType.DeclaringType, Context);
+    public override ProvidedType BaseType => Create(myRdProvidedType.BaseType.Sync(Unit.Instance), Context);
+    public override ProvidedType DeclaringType => Create(myRdProvidedType.DeclaringType.Sync(Unit.Instance), Context);
     public override ProvidedType GetNestedType(string nm) => Create(myRdProvidedType.GetNestedType.Sync(nm), Context);
 
     public override ProvidedType[] GetNestedTypes()
@@ -70,7 +72,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override ProvidedPropertyInfo[] GetProperties()
     {
       return myRdProvidedType.GetProperties
-        .Sync(Core.Unit.Instance)
+        .Sync(Core.Unit.Instance, RpcTimeouts.Maximal)
         .Select(t => ProxyProvidedPropertyInfo.Create(t, Context))
         .ToArray();
     }

@@ -19,7 +19,8 @@ object RdFSharpTypeProvidersLoaderModel : Root(
 
     private val RdProvidedMemberInfo = baseclass {
         field("Name", string)
-        field("DeclaringType", RdProvidedType.nullable)
+
+        call("DeclaringType", void, RdProvidedType.nullable)
     }
 
     private val RdProvidedMethodBase = baseclass extends RdProvidedMemberInfo {
@@ -155,12 +156,6 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         field("dllInfos", array(RdFakeDllInfo))
     }
 
-    private val InstantiateResult = structdef {
-        field("TypeProviderTypeName", string)
-        field("isSuccsessful", bool)
-        field("TypeProviderId", int)
-    }
-
     init {
         RdProvidedType = classdef extends RdProvidedMemberInfo {
             field("FullName", string.nullable)
@@ -180,8 +175,8 @@ object RdFSharpTypeProvidersLoaderModel : Root(
             field("IsSuppressRelocate", bool)
             field("IsErased", bool)
             field("IsGenericType", bool)
-            field("BaseType", this.nullable)
 
+            call("BaseType", void, this.nullable)
             call("GetNestedType", string, this)
             call("GetNestedTypes", void, array(this))
             call("GetAllNestedTypes", void, array(this))
@@ -202,8 +197,8 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         RdProvidedPropertyInfo = classdef extends RdProvidedMemberInfo {
             field("CanRead", bool)
             field("CanWrite", bool)
-            field("PropertyType", RdProvidedType)
 
+            call("PropertyType", void, RdProvidedType)
             call("GetGetMethod", void, RdProvidedMethodInfo)
             call("GetSetMethod", void, RdProvidedMethodInfo)
             call("GetIndexParameters", void, array(RdProvidedParameterInfo))
@@ -211,17 +206,19 @@ object RdFSharpTypeProvidersLoaderModel : Root(
 
         RdProvidedParameterInfo = classdef {
             field("Name", string)
-            field("ParameterType", RdProvidedType)
             field("IsIn", bool)
             field("IsOut", bool)
             field("IsOptional", bool)
             //field("RawDefaultValue : obj
             field("HasDefaultValue", bool)
+
+            call("ParameterType", void, RdProvidedType)
         }
 
         RdProvidedMethodInfo = classdef extends RdProvidedMethodBase {
-            field("ReturnType", RdProvidedType)
             field("MetadataToken", int)
+
+            call("ReturnType", void, RdProvidedType)
         }
 
         call("InstantiateTypeProvidersOfAssembly", InstantiateTypeProvidersOfAssemblyParameters, array(RdTypeProvider))

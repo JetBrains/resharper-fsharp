@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using JetBrains.Annotations;
+using JetBrains.Core;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
 using static FSharp.Compiler.ExtensionTyping;
 
@@ -30,6 +31,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override bool IsOptional => myParameterInfo.IsOptional;
     public override bool IsOut => myParameterInfo.IsOut;
     public override bool HasDefaultValue => myParameterInfo.HasDefaultValue;
-    public override ProvidedType ParameterType => ProxyProvidedType.Create(myParameterInfo.ParameterType, myCtxt);
+
+    public override ProvidedType ParameterType =>
+      ProxyProvidedType.Create(myParameterInfo.ParameterType.Sync(Unit.Instance), myCtxt);
   }
 }

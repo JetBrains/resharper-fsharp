@@ -49,10 +49,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
         providedNativeModel.IsSuppressRelocate,
         providedNativeModel.IsErased,
         providedNativeModel.IsGenericType,
-        Register(providedNativeModel.BaseType, providedModelOwner),
-        providedNativeModel.Name,
-        Register(providedNativeModel.DeclaringType, providedModelOwner));
+        providedNativeModel.Name);
 
+      providedNativeModelProtocolModel.BaseType.Set((lifetime, _) =>
+        GetBaseType(lifetime, providedNativeModel, providedModelOwner));
+      providedNativeModelProtocolModel.DeclaringType.Set((lifetime, _) =>
+        GetDeclaringType(lifetime, providedNativeModel, providedModelOwner));
       providedNativeModelProtocolModel.GetInterfaces.Set((lifetime, _) =>
         GetInterfaces(lifetime, providedNativeModel, providedModelOwner));
       providedNativeModelProtocolModel.GetNestedType.Set((lifetime, typeName) =>
@@ -82,6 +84,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
         GetMethods(lifetime, providedNativeModel, providedModelOwner));
 
       return providedNativeModelProtocolModel;
+    }
+
+    private RdTask<RdProvidedType> GetDeclaringType(
+      in Lifetime lifetime,
+      ProvidedType providedNativeModel,
+      ITypeProvider providedModelOwner)
+    {
+      var declaringType = Register(providedNativeModel.DeclaringType, providedModelOwner);
+      return RdTask<RdProvidedType>.Successful(declaringType);
+    }
+
+    private RdTask<RdProvidedType> GetBaseType(
+      in Lifetime lifetime,
+      ProvidedType providedNativeModel,
+      ITypeProvider providedModelOwner)
+    {
+      var baseType = Register(providedNativeModel.BaseType, providedModelOwner);
+      return RdTask<RdProvidedType>.Successful(baseType);
     }
 
     private RdTask<RdProvidedMethodInfo[]> GetMethods(in Lifetime lifetime, ProvidedType providedNativeModel,

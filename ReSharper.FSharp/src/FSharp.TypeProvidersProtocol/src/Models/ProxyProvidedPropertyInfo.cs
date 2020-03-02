@@ -29,8 +29,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override string Name => myPropertyInfo.Name;
     public override bool CanRead => myPropertyInfo.CanRead;
     public override bool CanWrite => myPropertyInfo.CanWrite;
-    public override ProvidedType DeclaringType => ProxyProvidedType.Create(myPropertyInfo.DeclaringType, myCtxt);
-    public override ProvidedType PropertyType => ProxyProvidedType.Create(myPropertyInfo.PropertyType, myCtxt);
+
+    public override ProvidedType DeclaringType =>
+      ProxyProvidedType.Create(myPropertyInfo.DeclaringType.Sync(Unit.Instance), myCtxt);
+
+    public override ProvidedType PropertyType =>
+      ProxyProvidedType.Create(myPropertyInfo.PropertyType.Sync(Unit.Instance), myCtxt);
 
     public override ProvidedMethodInfo GetGetMethod() =>
       ProxyProvidedMethodInfo.Create(myPropertyInfo.GetGetMethod.Sync(Core.Unit.Instance), myCtxt);

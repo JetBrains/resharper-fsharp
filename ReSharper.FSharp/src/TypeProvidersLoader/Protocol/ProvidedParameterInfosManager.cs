@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using JetBrains.Lifetimes;
+using JetBrains.Rd.Tasks;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
 using Microsoft.FSharp.Core.CompilerServices;
 using static FSharp.Compiler.ExtensionTyping;
@@ -22,13 +24,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       ITypeProvider providedModelOwner)
     {
       var parameterModel = new RdProvidedParameterInfo(providedNativeModel.Name,
-        myProvidedTypesManager.Register(providedNativeModel.ParameterType, providedModelOwner),
         providedNativeModel.IsIn,
         providedNativeModel.IsOut,
         providedNativeModel.IsOptional,
         providedNativeModel.HasDefaultValue);
 
+      parameterModel.ParameterType.Set((lifetime, _) =>
+        GetParameterType(lifetime, providedNativeModel, providedModelOwner));
+
       return parameterModel;
+    }
+
+    private RdTask<RdProvidedType> GetParameterType(
+      in Lifetime lifetime,
+      ProvidedParameterInfo providedNativeModel,
+      ITypeProvider providedModelOwner)
+    {
+      var parameterType = myProvidedTypesManager.Register(providedNativeModel.ParameterType, providedModelOwner);
+      return RdTask<RdProvidedType>.Successful(parameterType);
     }
   }
 

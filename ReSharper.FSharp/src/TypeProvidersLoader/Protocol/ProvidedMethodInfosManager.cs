@@ -28,7 +28,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       ITypeProvider providedModelOwner)
     {
       var methodInfoModel = new RdProvidedMethodInfo(
-        myProvidedTypesManager.Register(providedNativeModel.ReturnType, providedModelOwner),
         providedNativeModel.MetadataToken,
         providedNativeModel.IsGenericMethod,
         providedNativeModel.IsStatic,
@@ -41,15 +40,36 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
         providedNativeModel.IsAbstract,
         providedNativeModel.IsHideBySig,
         providedNativeModel.IsConstructor,
-        providedNativeModel.Name,
-        myProvidedTypesManager.Register(providedNativeModel.DeclaringType, providedModelOwner));
+        providedNativeModel.Name);
 
+      methodInfoModel.ReturnType.Set((lifetime, _) =>
+        GetReturnType(lifetime, providedNativeModel, providedModelOwner));
+      methodInfoModel.DeclaringType.Set((lifetime, _) =>
+        GetDeclaringType(lifetime, providedNativeModel, providedModelOwner));
       methodInfoModel.GetParameters.Set((lifetime, _) =>
         GetParameters(lifetime, providedNativeModel, providedModelOwner));
       methodInfoModel.GetGenericArguments.Set((lifetime, _) =>
         GetGenericArguments(lifetime, providedNativeModel, providedModelOwner));
 
       return methodInfoModel;
+    }
+
+    private RdTask<RdProvidedType> GetDeclaringType(
+      in Lifetime lifetime,
+      ProvidedMethodInfo providedNativeModel,
+      ITypeProvider providedModelOwner)
+    {
+      var declaringType = myProvidedTypesManager.Register(providedNativeModel.DeclaringType, providedModelOwner);
+      return RdTask<RdProvidedType>.Successful(declaringType);
+    }
+
+    private RdTask<RdProvidedType> GetReturnType(
+      in Lifetime lifetime,
+      ProvidedMethodInfo providedNativeModel,
+      ITypeProvider providedModelOwner)
+    {
+      var declaringType = myProvidedTypesManager.Register(providedNativeModel.DeclaringType, providedModelOwner);
+      return RdTask<RdProvidedType>.Successful(declaringType);
     }
 
     private RdTask<RdProvidedType[]> GetGenericArguments(

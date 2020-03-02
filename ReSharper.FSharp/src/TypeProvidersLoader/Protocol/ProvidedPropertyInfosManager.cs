@@ -36,18 +36,37 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       ProvidedPropertyInfo providedNativeModel,
       ITypeProvider providedModelOwner)
     {
-      var ppModel = new RdProvidedPropertyInfo(providedNativeModel.CanRead,
+      var ppModel = new RdProvidedPropertyInfo(
+        providedNativeModel.CanRead,
         providedNativeModel.CanWrite,
-        myProvidedTypesManager.Register(providedNativeModel.PropertyType, providedModelOwner),
-        providedNativeModel.Name,
-        myProvidedTypesManager.Register(providedNativeModel.DeclaringType, providedModelOwner));
+        providedNativeModel.Name);
 
+      ppModel.PropertyType.Set((lifetime, _) => GetPropertyType(lifetime, providedNativeModel, providedModelOwner));
+      ppModel.DeclaringType.Set((lifetime, _) => GetDeclaringType(lifetime, providedNativeModel, providedModelOwner)); 
       ppModel.GetGetMethod.Set((lifetime, _) => GetGetMethod(lifetime, providedNativeModel, providedModelOwner));
       ppModel.GetSetMethod.Set((lifetime, _) => GetSetMethod(lifetime, providedNativeModel, providedModelOwner));
       ppModel.GetIndexParameters.Set((lifetime, _) =>
         GetIndexParameters(lifetime, providedNativeModel, providedModelOwner));
 
       return ppModel;
+    }
+
+    private RdTask<RdProvidedType> GetDeclaringType(
+      in Lifetime lifetime, 
+      ProvidedPropertyInfo providedNativeModel, 
+      ITypeProvider providedModelOwner)
+    {
+      var declaringType = myProvidedTypesManager.Register(providedNativeModel.DeclaringType, providedModelOwner);
+      return RdTask<RdProvidedType>.Successful(declaringType);
+    }
+
+    private RdTask<RdProvidedType> GetPropertyType(
+    in Lifetime lifetime, 
+    ProvidedPropertyInfo providedNativeModel, 
+    ITypeProvider providedModelOwner)
+    {
+      var propertyType = myProvidedTypesManager.Register(providedNativeModel.PropertyType, providedModelOwner);
+      return RdTask<RdProvidedType>.Successful(propertyType);
     }
 
     private RdTask<RdProvidedParameterInfo[]> GetIndexParameters(

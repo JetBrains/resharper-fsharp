@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using JetBrains.Annotations;
+using JetBrains.Core;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
 using static FSharp.Compiler.ExtensionTyping;
 
@@ -38,8 +39,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override bool IsFamilyAndAssembly => myMethodInfo.IsFamilyAndAssembly;
     public override bool IsFamilyOrAssembly => myMethodInfo.IsFamilyOrAssembly;
     public override bool IsHideBySig => myMethodInfo.IsHideBySig;
-    public override ProvidedType DeclaringType => ProxyProvidedType.Create(myMethodInfo.DeclaringType, myCtxt);
-    public override ProvidedType ReturnType => ProxyProvidedType.Create(myMethodInfo.ReturnType, myCtxt);
+    public override ProvidedType DeclaringType => ProxyProvidedType.Create(myMethodInfo.DeclaringType.Sync(Unit.Instance), myCtxt);
+    public override ProvidedType ReturnType => ProxyProvidedType.Create(myMethodInfo.ReturnType.Sync(Unit.Instance), myCtxt);
 
     public override ProvidedParameterInfo[] GetParameters()
     {
