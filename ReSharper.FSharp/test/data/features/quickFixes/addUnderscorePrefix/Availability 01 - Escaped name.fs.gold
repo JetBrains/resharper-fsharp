@@ -1,0 +1,17 @@
+﻿module Module
+
+do
+    let |foo|(0) = ()
+    let ``|foo bar|(1)`` = ()
+    ()
+
+------------------------------------------------
+0: The value 'foo' is unused
+QUICKFIXES:
+Replace with '_'
+Rename to '_foo'
+Remove unused value
+1: The value 'foo bar' is unused
+QUICKFIXES:
+Replace with '_'
+Remove unused value

@@ -62,6 +62,7 @@
     <Range>pat.GetNavigationRange()</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
     <QuickFix>ReplaceWithWildPatFix</QuickFix>
+    <QuickFix>AddUnderscorePrefixFix</QuickFix>
     <QuickFix>RemoveUnusedLocalBindingFix</QuickFix>
     <QuickFix>RemoveUnusedNamedAsPatFix</QuickFix>
   </Warning>

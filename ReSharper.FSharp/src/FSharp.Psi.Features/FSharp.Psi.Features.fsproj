@@ -128,6 +128,7 @@
     <Compile Include="src\QuickFixes\RemoveNeverMatchingRuleFix.fs" />
     <Compile Include="src\QuickFixes\RemoveUnexpectedArgumentsFix.fs" />
     <Compile Include="src\QuickFixes\ToMutableRecordFieldFix.fs" />
+    <Compile Include="src\QuickFixes\AddUnderscorePrefixFix.fs" />
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />
     <Compile Include="src\PostfixTemplates\NotTemplate.fs" />
     <Compile Include="src\PostfixTemplates\LetPostfixTemplate.fs" />

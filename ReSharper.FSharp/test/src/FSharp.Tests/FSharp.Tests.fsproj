@@ -55,6 +55,7 @@
     <Compile Include="QuickFixes\RemoveUnexpectedArgumentsTest.fs" />
     <Compile Include="QuickFixes\ImportTypeTest.fs" />
     <Compile Include="QuickFixes\ToMutableTest.fs" />
+    <Compile Include="QuickFixes\AddUnderscorePrefixFixTest.fs" />
     <Compile Include="Intentions\IntentionsTestBase.fs" />
     <Compile Include="Intentions\ToRecursiveLetBindings.fs" />
     <Compile Include="Intentions\ToMultilineRecordTest.fs" />
