@@ -170,6 +170,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
             field("IsByRef", bool)
             field("IsPointer", bool)
             field("IsEnum", bool)
+            field("IsArray", bool)
             field("IsInterface", bool)
             field("IsClass", bool)
             field("IsSealed", bool)
@@ -195,6 +196,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
             call("GenericParameterPosition", void, int)
             call("GetStaticParameters", void, array(RdProvidedParameterInfo))
             //call("ApplyStaticArguments", ApplyStaticArgumentsParameters, this)
+            call("GetMethods", void, array(RdProvidedMethodInfo))
         }
 
         RdProvidedPropertyInfo = classdef extends RdProvidedMemberInfo {

@@ -11,15 +11,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
   {
     private readonly RdProvidedType myRdProvidedType;
 
-    internal ProxyProvidedType(RdProvidedType rdProvidedType) : base(typeof(string),
-      ExtensionTyping.ProvidedTypeContext.Empty)
+    internal ProxyProvidedType(RdProvidedType rdProvidedType, ProvidedTypeContext ctxt) : base(typeof(string), ctxt)
     {
       myRdProvidedType = rdProvidedType;
     }
 
     [ContractAnnotation("null => null")]
     public static ProxyProvidedType Create(RdProvidedType type) =>
-      type == null ? null : new ProxyProvidedType(type);
+      type == null ? null : new ProxyProvidedType(type, ProvidedTypeContext.Empty);
 
     public override string Name => myRdProvidedType.Name;
     public override string FullName => myRdProvidedType.FullName;
@@ -30,6 +29,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override bool IsPointer => myRdProvidedType.IsPointer;
     public override bool IsPublic => myRdProvidedType.IsPublic;
     public override bool IsNestedPublic => myRdProvidedType.IsNestedPublic;
+    public override bool IsArray => myRdProvidedType.IsArray;
     public override bool IsEnum => myRdProvidedType.IsEnum;
     public override bool IsClass => myRdProvidedType.IsClass;
     public override bool IsSealed => myRdProvidedType.IsSealed;
@@ -64,7 +64,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       return Create(myRdProvidedType.GetGenericTypeDefinition.Sync(Core.Unit.Instance));
     }
 
-    public override ExtensionTyping.ProvidedPropertyInfo[] GetProperties()
+    public override ProvidedPropertyInfo[] GetProperties()
     {
       return myRdProvidedType.GetProperties
         .Sync(Core.Unit.Instance)
@@ -72,7 +72,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
         .ToArray();
     }
 
-    public override ExtensionTyping.ProvidedPropertyInfo GetProperty(string nm)
+    public override ProvidedPropertyInfo GetProperty(string nm)
     {
       return ProxyProvidedPropertyInfo.Create(myRdProvidedType.GetProperty.Sync(nm));
     }
@@ -98,6 +98,27 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
         .Sync(Core.Unit.Instance)
         .Select(ProxyProvidedParameterInfo.Create)
         .ToArray();
+    }
+
+    public override ProvidedType[] GetInterfaces()
+    {
+      return myRdProvidedType.GetInterfaces
+        .Sync(Core.Unit.Instance)
+        .Select(Create)
+        .ToArray();
+    }
+
+    public override ProvidedMethodInfo[] GetMethods()
+    {
+      return myRdProvidedType.GetMethods
+        .Sync(Core.Unit.Instance)
+        .Select(ProxyProvidedMethodInfo.Create)
+        .ToArray();
+    }
+
+    public override ProvidedType ApplyContext(ProvidedTypeContext ctxt)
+    {
+      return new ProxyProvidedType(myRdProvidedType, ctxt);
     }
   }
 }

@@ -23,13 +23,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
     public ProvidedPropertyInfoManager(
       IOutOfProcessProtocolManager<ProvidedParameterInfo, RdProvidedParameterInfo>
         providedParameterInfosManager,
-      IOutOfProcessProtocolManager<ProvidedType, RdProvidedType> providedTypesManager) : base(
+      IOutOfProcessProtocolManager<ProvidedType, RdProvidedType> providedTypesManager,
+      IOutOfProcessProtocolManager<ProvidedMethodInfo, RdProvidedMethodInfo> providedMethodInfosManager) : base(
       new ProvidedPropertyInfoEqualityComparer())
     {
       myProvidedTypesManager = providedTypesManager;
+      myProvidedMethodInfosManager = providedMethodInfosManager;
       myProvidedParameterInfosManager = providedParameterInfosManager;
-      myProvidedMethodInfosManager =
-        new ProvidedMethodInfosManager(myProvidedTypesManager, myProvidedParameterInfosManager);
     }
 
     protected override RdProvidedPropertyInfo CreateProcessModel(

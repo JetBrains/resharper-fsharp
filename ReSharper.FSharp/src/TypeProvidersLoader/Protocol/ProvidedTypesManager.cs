@@ -13,13 +13,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
     private readonly IOutOfProcessProtocolManager<ProvidedParameterInfo, RdProvidedParameterInfo>
       myProvidedParameterInfosManager;
 
+    private readonly IOutOfProcessProtocolManager<ProvidedMethodInfo, RdProvidedMethodInfo>
+      myProvidedMethodInfosManager;
+
     private readonly IOutOfProcessProtocolManager<ProvidedPropertyInfo, RdProvidedPropertyInfo>
       myProvidedPropertiesManager;
 
     public ProvidedTypesManager() : base(new ProvidedTypeEqualityComparer())
     {
       myProvidedParameterInfosManager = new ProvidedParametersManager(this);
-      myProvidedPropertiesManager = new ProvidedPropertyInfoManager(myProvidedParameterInfosManager, this);
+      myProvidedMethodInfosManager = new ProvidedMethodInfosManager(this, myProvidedParameterInfosManager);
+      myProvidedPropertiesManager =
+        new ProvidedPropertyInfoManager(myProvidedParameterInfosManager, this, myProvidedMethodInfosManager);
     }
 
     protected override RdProvidedType CreateProcessModel(
@@ -33,6 +38,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
         providedNativeModel.IsValueType,
         providedNativeModel.IsByRef,
         providedNativeModel.IsPointer,
+        providedNativeModel.IsArray,
         providedNativeModel.IsEnum,
         providedNativeModel.IsInterface,
         providedNativeModel.IsClass,
@@ -72,8 +78,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
         GetGenericParameterPosition(lifetime, providedNativeModel));
       providedNativeModelProtocolModel.GetStaticParameters.Set((lifetime, _) =>
         GetStaticParameters(lifetime, providedNativeModel, providedModelOwner));
+      providedNativeModelProtocolModel.GetMethods.Set((lifetime, _) =>
+        GetMethods(lifetime, providedNativeModel, providedModelOwner));
 
       return providedNativeModelProtocolModel;
+    }
+
+    private RdTask<RdProvidedMethodInfo[]> GetMethods(in Lifetime lifetime, ProvidedType providedNativeModel,
+      ITypeProvider providedModelOwner)
+    {
+      var interfaces = providedNativeModel
+        .GetMethods()
+        .Select(t => myProvidedMethodInfosManager.Register(t, providedModelOwner)).ToArray();
+      return RdTask<RdProvidedMethodInfo[]>.Successful(interfaces);
     }
 
     private RdTask<RdProvidedParameterInfo[]> GetStaticParameters(
