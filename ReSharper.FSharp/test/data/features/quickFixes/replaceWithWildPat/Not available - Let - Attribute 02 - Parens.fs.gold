@@ -8,4 +8,5 @@ let foo ([<Foo>] (|x|(0))) =
 
 ------------------------------------------------
 0: The value 'x' is unused
-NO QUICKFIXES
+QUICKFIXES:
+Rename to '_x'

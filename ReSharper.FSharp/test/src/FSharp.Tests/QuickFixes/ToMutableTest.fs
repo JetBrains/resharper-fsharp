@@ -15,3 +15,4 @@ type ToMutableRecordFieldFixTest() =
     override x.RelativeTestDataPath = "features/quickFixes/toMutable"
 
     [<Test>] member x.``Record field 01``() = x.DoNamedTest()
+    [<Test>] member x.``Record field 02 - Attributes``() = x.DoNamedTest()

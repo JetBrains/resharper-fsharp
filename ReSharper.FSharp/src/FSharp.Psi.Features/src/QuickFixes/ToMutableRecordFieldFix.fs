@@ -20,8 +20,5 @@ type ToMutableRecordFieldFix(error: FieldNotMutableError) =
         element :? IRecordField
 
     override x.ExecutePsiTransaction _ =
-        let element = refExpr.Reference.Resolve().DeclaredElement
-        for decl in element.GetDeclarations() do
-            let fieldDecl = decl.As<IRecordFieldDeclaration>()
-            if isNotNull fieldDecl then
-                fieldDecl.SetIsMutable(true)
+        let element = refExpr.Reference.Resolve().DeclaredElement.As<IRecordField>()
+        element.SetIsMutable(true)
