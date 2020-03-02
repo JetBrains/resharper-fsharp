@@ -311,8 +311,8 @@ let rec skipIntermediatePatParents (pat: ISynPat) =
     skipIntermediateParentsOfSameType<ISynPat> pat
 
 
-let isValid (node: ITreeNode) =
-    isNotNull node && node.IsValid()
+let inline isValid (node: ^T) =
+    isNotNull node && (^T: (member IsValid: unit -> bool) node)
 
 
 [<Language(typeof<FSharpLanguage>)>]

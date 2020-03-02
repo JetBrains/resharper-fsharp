@@ -270,4 +270,14 @@
     <Message value="Redundant parentheses"/>
   </Warning>
 
+  <Error staticGroup="FSharpErrors" name="FieldNotMutable">
+    <Parameter type="IReferenceExpr" name="refExpr"/>
+    <Message value="{0} is not mutable">
+      <Argument>refExpr.Identifier.GetSourceName()</Argument>
+    </Message>
+    <Range>getRefExprNameRange refExpr</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ToMutableRecordFieldFix</QuickFix>
+  </Error>
+
 </Errors>

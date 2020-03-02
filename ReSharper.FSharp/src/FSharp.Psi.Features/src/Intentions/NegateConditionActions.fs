@@ -20,7 +20,7 @@ type NegateConditionActionBase<'T when 'T: null and 'T :> IConditionOwnerExpr>
         if isNull expr then false else
 
         let keyword = x.GetKeyword(expr)
-        x.IsAtKeyword(keyword)
+        x.IsAtTreeNode(keyword)
 
     override x.ExecutePsiTransaction(_, _) =
         let expr = x.GetExpression().ConditionExpr

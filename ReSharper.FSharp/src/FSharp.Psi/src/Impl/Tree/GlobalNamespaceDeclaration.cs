@@ -20,7 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (!value)
         throw new System.NotImplementedException();
 
-      ModuleOrNamespaceKeyword.NotNull().AddModifierTokenAfter(FSharpTokenType.REC);
+      ModuleOrNamespaceKeyword.NotNull().AddTokenAfter(FSharpTokenType.REC);
     }
   }
 }

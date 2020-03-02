@@ -512,7 +512,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         LowLevelModificationUtil.ReplaceChildRange(token, token, new FSharpIdentifierToken(name));
     }
 
-    public static void AddModifierTokenAfter([NotNull] this ITreeNode anchor, [NotNull] TokenNodeType tokenType)
+    public static void AddTokenAfter([NotNull] this ITreeNode anchor, [NotNull] TokenNodeType tokenType)
     {
       using var _ = WriteLockCookie.Create(anchor.NotNull().IsPhysical());
       anchor =
@@ -527,6 +527,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         ModificationUtil.AddChildAfter(anchor, new Whitespace());
     }
 
+    public static void AddTokenBefore([NotNull] ITreeNode anchor, [NotNull] TokenNodeType tokenType)
+    {
+      using var _ = WriteLockCookie.Create(anchor.NotNull().IsPhysical());
+      var space = ModificationUtil.AddChildBefore(anchor, new Whitespace());
+      ModificationUtil.AddChildBefore(space, tokenType.CreateLeafElement());
+    }
+    
     public static IList<ITypeElement> ToTypeElements(this IList<IClrTypeName> names, IPsiModule psiModule)
     {
       var result = new List<ITypeElement>(names.Count);

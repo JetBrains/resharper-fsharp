@@ -26,12 +26,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
   {
     private readonly bool myIsMutable;
 
-    internal FSharpRecordField([NotNull] ITypeMemberDeclaration declaration, [NotNull] FSharpField field) :
+    internal FSharpRecordField([NotNull] IRecordFieldDeclaration declaration, [NotNull] FSharpField field) :
       base(declaration) =>
       myIsMutable = field.IsMutable;
 
     public bool IsMutable =>
       myIsMutable || GetContainingType().IsCliMutableRecord();
+
+    public void SetIsMutable(bool value)
+    {
+      foreach (var declaration in GetDeclarations())
+        if (declaration is IRecordFieldDeclaration fieldDeclaration)
+          fieldDeclaration.SetIsMutable(value);
+    }
 
     public override bool IsWritable => IsMutable;
 
@@ -62,5 +69,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
   public interface IRecordField : IProperty, IRepresentationAccessRightsOwner
   {
     bool IsMutable { get; }
+    void SetIsMutable(bool value);
   }
 }

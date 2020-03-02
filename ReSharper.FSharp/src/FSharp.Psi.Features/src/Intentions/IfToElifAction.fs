@@ -23,18 +23,18 @@ type IfToElifAction(dataProvider: FSharpContextActionDataProvider) =
         let ifExpr = dataProvider.GetSelectedElement<IIfExpr>()
         if not (isValid ifExpr) then false else
 
-        if x.IsAtKeyword(ifExpr.ElseKeyword) && ifExpr.ElseExpr :? IIfThenElseExpr then true else
+        if x.IsAtTreeNode(ifExpr.ElseKeyword) && ifExpr.ElseExpr :? IIfThenElseExpr then true else
 
         let ifExpr = ifExpr.As<IIfThenElseExpr>()
         let outerIfExpr = IfExprNavigator.GetByElseExpr(ifExpr)
         if isNull ifExpr || isNull (outerIfExpr) then false else
 
-        isNotNull outerIfExpr.ElseKeyword && x.IsAtKeyword(ifExpr.IfKeyword)
+        isNotNull outerIfExpr.ElseKeyword && x.IsAtTreeNode(ifExpr.IfKeyword)
 
     override x.ExecutePsiTransaction(_, _) =
         let ifExpr =
             let ifExpr = dataProvider.GetSelectedElement<IIfExpr>()
-            if x.IsAtKeyword(ifExpr.ElseKeyword) then ifExpr.ElseExpr :?> IIfThenElseExpr else ifExpr :?> _
+            if x.IsAtTreeNode(ifExpr.ElseKeyword) then ifExpr.ElseExpr :?> IIfThenElseExpr else ifExpr :?> _
 
         use writeCookie = WriteLockCookie.Create(ifExpr.IsPhysical())
 

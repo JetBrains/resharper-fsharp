@@ -15,7 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (!value)
         throw new System.NotImplementedException();
 
-      LetOrUseToken.NotNull().AddModifierTokenAfter(FSharpTokenType.REC);
+      LetOrUseToken.NotNull().AddTokenAfter(FSharpTokenType.REC);
     }
 
     public void SetIsInline(bool value)

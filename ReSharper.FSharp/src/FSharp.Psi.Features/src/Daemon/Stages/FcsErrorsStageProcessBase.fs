@@ -19,6 +19,7 @@ module FSharpErrors =
     // https://github.com/fsharp/FSharp.Compiler.Service/blob/9.0.0/src/fsharp/FSComp.txt
     let [<Literal>] TypeEquation = 1
     let [<Literal>] NotAFunction = 3
+    let [<Literal>] FieldNotMutable = 5
     let [<Literal>] UnitTypeExpected = 20
     let [<Literal>] RuleNeverMatched = 26
     let [<Literal>] VarBoundTwice = 38
@@ -88,6 +89,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             let notAFunctionNode = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
             let prefixAppExpr = (tryFindRootPrefixAppWhereExpressionIsFunc notAFunctionNode).As<IPrefixAppExpr>()
             NotAFunctionError(notAFunctionNode.IgnoreParentParens(), prefixAppExpr) :> _
+
+        | FieldNotMutable ->
+            createHighlightingFromNode FieldNotMutableError range
 
         | VarBoundTwice -> 
             createHighlightingFromNode VarBoundTwiceError range

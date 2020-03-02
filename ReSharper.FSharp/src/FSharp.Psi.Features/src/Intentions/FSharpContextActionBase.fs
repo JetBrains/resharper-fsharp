@@ -7,5 +7,5 @@ open JetBrains.ReSharper.Psi.Tree
 type FSharpContextActionBase(dataProvider: FSharpContextActionDataProvider) =
     inherit ContextActionBase()
 
-    member x.IsAtKeyword(keyword: ITreeNode) =
-        DataProviders.isAtKeyword dataProvider keyword
+    member x.IsAtTreeNode(node: ITreeNode) =
+        DataProviders.isAtTreeNode dataProvider node

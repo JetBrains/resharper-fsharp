@@ -1,5 +1,6 @@
 ﻿using FSharp.Compiler.SourceCodeServices;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 
@@ -15,7 +16,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public bool IsMutable => MutableKeyword != null;
 
-    public void SetIsMutable(bool value) =>
-      throw new System.NotImplementedException();
+    public void SetIsMutable(bool value)
+    {
+      if (value == IsMutable)
+        return;
+
+      if (!value)
+        throw new System.NotImplementedException();
+
+      var identifier = Identifier;
+      if (identifier != null)
+        FSharpImplUtil.AddTokenBefore(identifier, FSharpTokenType.MUTABLE);
+    }
   }
 }

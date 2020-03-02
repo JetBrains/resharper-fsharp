@@ -52,5 +52,5 @@ let isAtIfExprKeyword (dataProvider: IContextActionDataProvider) (ifExpr: IIfThe
 
     ranges.Contains(dataProvider.SelectedTreeRange)
 
-let isAtKeyword (dataProvider: IContextActionDataProvider) (keyword: ITreeNode) =
-    isNotNull keyword && DisjointedTreeTextRange.From(keyword).Contains(dataProvider.SelectedTreeRange)
+let isAtTreeNode (dataProvider: IContextActionDataProvider) (node: ITreeNode) =
+    isNotNull node && DisjointedTreeTextRange.From(node).Contains(dataProvider.SelectedTreeRange)

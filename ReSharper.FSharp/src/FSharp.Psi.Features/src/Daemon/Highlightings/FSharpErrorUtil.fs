@@ -30,3 +30,8 @@ let getLetTokenText (token: ITokenNode) =
 
 let getExpressionsRanges (exprs: ISynExpr seq) =
     exprs |> Seq.map (fun x -> if isValid x then x.GetHighlightingRange() else DocumentRange.InvalidRange) 
+
+let getRefExprNameRange (refExpr: IReferenceExpr) =
+    match refExpr.Identifier with
+    | null -> refExpr.GetHighlightingRange()
+    | identifier -> identifier.GetHighlightingRange()
