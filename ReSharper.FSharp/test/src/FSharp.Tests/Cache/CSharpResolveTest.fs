@@ -94,6 +94,9 @@ type CSharpResolveTest() =
     [<Test>] member x.``Module bindings 06 - Type function``() = x.DoNamedTest()
     [<Test>] member x.``Module bindings 07 - extension methods 03 - Two params``() = x.DoNamedTest()
 
+    [<Test>] member x.``Module bindings - Compiled name 01``() = x.DoNamedTest()
+    [<Test>] member x.``Module bindings - Compiled name 02 - Nested pat``() = x.DoNamedTest()
+
     [<Test>] member x.``Nested module 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Operators 01 - Module``() = x.DoNamedTest()

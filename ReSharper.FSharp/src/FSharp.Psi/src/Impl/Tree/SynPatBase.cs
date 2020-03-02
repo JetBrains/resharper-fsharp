@@ -51,6 +51,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
     public bool IsDeclaration => true;
     public IEnumerable<IDeclaration> Declarations => Pattern?.Declarations.Prepend(this) ?? new[] {this};
+
+    public TreeNodeCollection<IAttribute> Attributes =>
+      this.GetBinding()?.AllAttributes ??
+      TreeNodeCollection<IAttribute>.Empty;
   }
 
   internal partial class LocalAsPat

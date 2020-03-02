@@ -18,6 +18,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override TreeTextRange GetNameRange() => NameIdentifier.GetNameRange();
 
     public override IFSharpIdentifierLikeNode NameIdentifier => ReferenceName?.Identifier;
+
+    public TreeNodeCollection<IAttribute> Attributes =>
+      this.GetBinding()?.AllAttributes ??
+      TreeNodeCollection<IAttribute>.Empty;
   }
 
   internal partial class TopParametersOwnerPat
@@ -30,6 +34,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     protected override IDeclaredElement CreateDeclaredElement() =>
       IsDeclaration ? base.CreateDeclaredElement() : null;
+
+    public TreeNodeCollection<IAttribute> Attributes =>
+      this.GetBinding()?.AllAttributes ??
+      TreeNodeCollection<IAttribute>.Empty;
   }
   
   internal abstract class TopPatternDeclarationBase : FSharpProperTypeMemberDeclarationBase, IFunctionDeclaration
@@ -66,31 +74,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         ? (IDeclaredElement) new FSharpSignOperator<TopPatternDeclarationBase>(this, mfv)
         : new ModuleFunction(this, mfv);
     }
-
-    public TreeNodeCollection<IAttribute> Attributes =>
-      GetBinding()?.AllAttributes ??
-      TreeNodeCollection<IAttribute>.Empty;
-
-    [CanBeNull]
-    protected IBinding GetBinding()
-    {
-      var node = Parent;
-      while (node != null)
-      {
-        switch (node)
-        {
-          case IBinding binding:
-            return binding;
-          case ITopParametersOwnerPat _:
-            return null;
-          default:
-            node = node.Parent;
-            break;
-        }
-      }
-
-      return null;
-    }
   }
 
   internal abstract class SynPatternBase : FSharpCompositeElement
@@ -101,5 +84,32 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       EmptyList<IDeclaration>.Instance;
     
     public TreeNodeCollection<IAttribute> Attributes => TreeNodeCollection<IAttribute>.Empty;
+  }
+
+  public static class NamedPatEx
+  {
+    [CanBeNull]
+    public static IBinding GetBinding([CanBeNull] this INamedPat pat)
+    {
+      if (pat == null)
+        return null;
+
+      var node = pat.Parent;
+      while (node != null)
+      {
+        switch (node)
+        {
+          case IBinding binding:
+            return binding;
+          case ITopParametersOwnerPat parametersOwner when parametersOwner.IsDeclaration:
+            return null;
+          default:
+            node = node.Parent;
+            break;
+        }
+      }
+
+      return null;
+    }
   }
 }
