@@ -1,4 +1,6 @@
-﻿using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
+﻿using System;
+using System.Collections.Generic;
+using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
 using Microsoft.FSharp.Core.CompilerServices;
 using static FSharp.Compiler.ExtensionTyping;
 
@@ -9,7 +11,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
   {
     private readonly IOutOfProcessProtocolManager<ProvidedType, RdProvidedType> myProvidedTypesManager;
 
-    public ProvidedParametersManager(IOutOfProcessProtocolManager<ProvidedType, RdProvidedType> providedTypesManager)
+    public ProvidedParametersManager(IOutOfProcessProtocolManager<ProvidedType, RdProvidedType> providedTypesManager) :
+      base(new ProvidedParameterInfoEqualityComparer())
     {
       myProvidedTypesManager = providedTypesManager;
     }
@@ -26,6 +29,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
         providedNativeModel.HasDefaultValue);
 
       return parameterModel;
+    }
+  }
+
+  internal class ProvidedParameterInfoEqualityComparer : IEqualityComparer<ProvidedParameterInfo>
+  {
+    public bool Equals(ProvidedParameterInfo x, ProvidedParameterInfo y)
+    {
+      return ReferenceEquals(x, y);
+    }
+
+    public int GetHashCode(ProvidedParameterInfo obj)
+    {
+      return obj.Name.GetHashCode();
     }
   }
 }

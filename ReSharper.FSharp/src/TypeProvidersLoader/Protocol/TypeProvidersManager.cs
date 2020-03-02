@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Lifetimes;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
 using Microsoft.FSharp.Core.CompilerServices;
@@ -10,12 +11,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
   {
     private readonly IOutOfProcessProtocolManager<IProvidedNamespace, RdProvidedNamespace> myProvidedNamespacesManager;
 
-    public TypeProvidersManager()
+    public TypeProvidersManager() : base(EqualityComparer<ITypeProvider>.Default)
     {
       myProvidedNamespacesManager = new ProvidedNamespacesManager();
     }
 
-    protected override RdTypeProvider CreateProcessModel(ITypeProvider providedNativeModel, ITypeProvider providedModelOwner)
+    protected override RdTypeProvider CreateProcessModel(ITypeProvider providedNativeModel,
+      ITypeProvider providedModelOwner)
     {
       var tpProtocolModel = new RdTypeProvider();
       tpProtocolModel.GetNamespaces.Set((lifetime, _) => GetTypeProviderNamespaces(lifetime, providedNativeModel));

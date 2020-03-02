@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Rd.Tasks;
 using JetBrains.Lifetimes;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
@@ -11,7 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
   {
     private readonly IOutOfProcessProtocolManager<ProvidedType, RdProvidedType> myProvidedTypesManager;
 
-    public ProvidedNamespacesManager()
+    public ProvidedNamespacesManager() : base(EqualityComparer<IProvidedNamespace>.Default)
     {
       myProvidedTypesManager = new ProvidedTypesManager();
     }

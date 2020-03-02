@@ -2,7 +2,8 @@
 using FSharp.Compiler;
 using JetBrains.Annotations;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
-using ProvidedType = FSharp.Compiler.ExtensionTyping.ProvidedType;
+using Microsoft.FSharp.Core.CompilerServices;
+using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 {
@@ -90,5 +91,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
     public override ProvidedType GetEnumUnderlyingType() =>
       Create(myRdProvidedType.GetEnumUnderlyingType.Sync(Core.Unit.Instance));
+
+    public override ProvidedParameterInfo[] GetStaticParameters(ITypeProvider provider)
+    {
+      return myRdProvidedType.GetStaticParameters
+        .Sync(Core.Unit.Instance)
+        .Select(ProxyProvidedParameterInfo.Create)
+        .ToArray();
+    }
   }
 }

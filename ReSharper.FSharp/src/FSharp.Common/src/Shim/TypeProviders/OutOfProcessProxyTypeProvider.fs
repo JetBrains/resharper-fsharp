@@ -15,11 +15,11 @@ type OutOfProcessProxyTypeProvider(typeProvider: RdTypeProvider) =
 
         member this.GetStaticParameters(typeWithoutArguments) =
             // We know FCS
-            raise (Exception("this code should be unreachable"))
+            raise (Exception("GetStaticParameters should be unreachable"))
                     
         member this.ApplyStaticArguments(typeWithoutArguments, typePathWithArguments, staticArguments) =
             // We know FCS
-            raise (Exception("this code should be unreachable"))
+            raise (Exception("ApplyStaticArguments should be unreachable"))
                     
         member this.GetInvokerExpression(syntheticMethodBase, parameters) =
                     //typeProvider.GetInvokerExpression(syntheticMethodBase, parameters)

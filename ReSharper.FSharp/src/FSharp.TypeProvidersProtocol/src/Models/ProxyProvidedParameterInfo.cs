@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System.Linq;
+using JetBrains.Annotations;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
 using static FSharp.Compiler.ExtensionTyping;
 
@@ -8,7 +9,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
   {
     private readonly RdProvidedParameterInfo myParameterInfo;
 
-    public ProxyProvidedParameterInfo(RdProvidedParameterInfo parameterInfo) : base(null, ProvidedTypeContext.Empty)
+    public ProxyProvidedParameterInfo(RdProvidedParameterInfo parameterInfo) : base(typeof(string).GetMethods().First().ReturnParameter, ProvidedTypeContext.Empty)
     {
       myParameterInfo = parameterInfo;
     }

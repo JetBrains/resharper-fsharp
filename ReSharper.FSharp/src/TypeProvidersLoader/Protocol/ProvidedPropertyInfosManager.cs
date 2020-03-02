@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Lifetimes;
 using JetBrains.Rd.Tasks;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
@@ -21,7 +23,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
     public ProvidedPropertyInfoManager(
       IOutOfProcessProtocolManager<ProvidedParameterInfo, RdProvidedParameterInfo>
         providedParameterInfosManager,
-      IOutOfProcessProtocolManager<ProvidedType, RdProvidedType> providedTypesManager)
+      IOutOfProcessProtocolManager<ProvidedType, RdProvidedType> providedTypesManager) : base(
+      new ProvidedPropertyInfoEqualityComparer())
     {
       myProvidedTypesManager = providedTypesManager;
       myProvidedParameterInfosManager = providedParameterInfosManager;
@@ -75,6 +78,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
     {
       var getMethod = myProvidedMethodInfosManager.Register(providedNativeModel.GetGetMethod(), providedModelOwner);
       return RdTask<RdProvidedMethodInfo>.Successful(getMethod);
+    }
+  }
+
+  internal class ProvidedPropertyInfoEqualityComparer : IEqualityComparer<ProvidedPropertyInfo>
+  {
+    public bool Equals(ProvidedPropertyInfo x, ProvidedPropertyInfo y)
+    {
+      return ReferenceEquals(x, y);
+    }
+
+    public int GetHashCode(ProvidedPropertyInfo obj)
+    {
+      return obj.Name.GetHashCode();
     }
   }
 }
