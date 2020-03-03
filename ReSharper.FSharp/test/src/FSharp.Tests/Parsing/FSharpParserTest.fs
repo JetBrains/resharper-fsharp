@@ -250,6 +250,9 @@ type FSharpParserTest() =
     [<Test>] member x.``Types - Measure 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Measure 02 - Negate``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type member - Ctor - Primary 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Ctor - Primary 02 - Modifier``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Ctor - Primary 03 - Attributes``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Ctor - Secondary 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Ctor - Secondary 02 - Modifier``() = x.DoNamedTest()
 

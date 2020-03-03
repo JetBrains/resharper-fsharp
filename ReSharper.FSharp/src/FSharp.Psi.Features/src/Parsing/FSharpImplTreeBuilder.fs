@@ -188,11 +188,18 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                 mark
 
             | _ ->
+                match typeMember with
+                | SynMemberDefn.ImplicitCtor _ ->
+                    while (isNotNull x.TokenType && x.TokenType.IsWhitespace) && not x.Eof do
+                        x.AdvanceLexer()
+                | _ -> ()
+                
                 x.MarkAttributesOrIdOrRange(typeMember.OuterAttributes, None, typeMember.Range)
 
         let memberType =
             match typeMember with
-            | SynMemberDefn.ImplicitCtor(_, _, args, selfId, _) ->
+            | SynMemberDefn.ImplicitCtor(_, attrs, args, selfId, _) ->
+                x.ProcessAttributeLists(attrs)
                 x.ProcessImplicitCtorSimplePats(args)
                 x.ProcessCtorSelfId(selfId)
                 ElementType.IMPLICIT_CONSTRUCTOR_DECLARATION
