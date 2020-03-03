@@ -104,7 +104,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
   {
     public bool Equals(ProvidedPropertyInfo x, ProvidedPropertyInfo y)
     {
-      return ReferenceEquals(x, y);
+      return x.Name == y.Name;
     }
 
     public int GetHashCode(ProvidedPropertyInfo obj)

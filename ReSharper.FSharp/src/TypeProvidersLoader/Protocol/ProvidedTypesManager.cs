@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Lifetimes;
 using JetBrains.Rd.Tasks;
@@ -250,12 +251,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
   {
     public bool Equals(ProvidedType x, ProvidedType y)
     {
-      return ReferenceEquals(x, y);
+      return string.Equals(x.FullName, y.FullName, StringComparison.Ordinal);
     }
 
     public int GetHashCode(ProvidedType obj)
     {
-      return obj.Name.GetHashCode();
+      return obj.FullName.GetHashCode();
     }
   }
 }

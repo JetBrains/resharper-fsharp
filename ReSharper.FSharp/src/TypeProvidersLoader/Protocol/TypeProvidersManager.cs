@@ -11,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
   {
     private readonly IOutOfProcessProtocolManager<IProvidedNamespace, RdProvidedNamespace> myProvidedNamespacesManager;
 
-    public TypeProvidersManager() : base(EqualityComparer<ITypeProvider>.Default)
+    public TypeProvidersManager() : base(new TypeProviderEqualityComparer())
     {
       myProvidedNamespacesManager = new ProvidedNamespacesManager();
     }
@@ -31,6 +31,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
         .GetNamespaces()
         .Select(t => myProvidedNamespacesManager.Register(t, typeProvider)).ToArray();
       return RdTask<RdProvidedNamespace[]>.Successful(namespaces);
+    }
+  }
+
+  internal class TypeProviderEqualityComparer : IEqualityComparer<ITypeProvider>
+  {
+    public bool Equals(ITypeProvider x, ITypeProvider y)
+    {
+      return x.GetType().FullName == y.GetType().FullName;
+    }
+
+    public int GetHashCode(ITypeProvider obj)
+    {
+      return obj.GetType().FullName.GetHashCode();
     }
   }
 }
