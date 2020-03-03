@@ -84,6 +84,7 @@
     </intentionAction>
 
     <registryKey key="rider.fsharp.experimental" description="Enable experimental F# features" defaultValue="false" restartRequired="false"/>
+    <registryKey key="rider.fsharp.formatter" description="Enable F# code formatter" defaultValue="false" restartRequired="false"/>
   </extensions>
 
   <actions>

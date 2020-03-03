@@ -8,12 +8,13 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Rider.Model
 
 module FSharpRegistryUtil =
-    type AllowExperimentalFeaturesCookie() =
+    [<AbstractClass>]
+    type EnabledCookieBase<'T when 'T :> EnabledCookieBase<'T> and 'T : (new : unit -> 'T)>() =
         static let mutable enabled = false
 
         static member Create() =
             enabled <- true
-            new AllowExperimentalFeaturesCookie()
+            new 'T()
 
         static member Enabled = enabled
 
@@ -21,6 +22,8 @@ module FSharpRegistryUtil =
             member _.Dispose() =
                 enabled <- false
 
+    type AllowExperimentalFeaturesCookie() = inherit EnabledCookieBase<AllowExperimentalFeaturesCookie>()
+    type AllowFormatterCookie() = inherit EnabledCookieBase<AllowFormatterCookie>()
 
 [<AbstractClass; Sealed; Extension>]
 type ProtocolSolutionExtensions =
@@ -30,15 +33,30 @@ type ProtocolSolutionExtensions =
         with _ -> null
 
 [<AbstractClass; Sealed; Extension>]
-type FSharpExperimentalFeaturesEx =
-    [<Extension>]
-    static member FSharpExperimentalFeaturesEnabled(solution: ISolution) =
-        if FSharpRegistryUtil.AllowExperimentalFeaturesCookie.Enabled then true else
+type FSharpExperimentalFeaturesEx() =
+    static let getFsModelFlagIfNotEnabled property enabled (solution : ISolution) =
+        if enabled then true else
 
         match solution.RdFSharpModel() with
         | null -> false
-        | fsModel -> fsModel.EnableExperimentalFeatures.Value
+        | fsModel -> property fsModel
+        
+    [<Extension>]
+    static member FSharpExperimentalFeaturesEnabled(solution: ISolution) =
+        getFsModelFlagIfNotEnabled (fun fsModel -> fsModel.EnableExperimentalFeatures.Value)
+            FSharpRegistryUtil.AllowExperimentalFeaturesCookie.Enabled
+            solution
 
     [<Extension>]
     static member FSharpExperimentalFeaturesEnabled(node: ITreeNode) =
         FSharpExperimentalFeaturesEx.FSharpExperimentalFeaturesEnabled(node.GetSolution())
+
+    [<Extension>]
+    static member FSharpFormatterEnabled(solution: ISolution) =
+        getFsModelFlagIfNotEnabled (fun fsModel -> fsModel.EnableFormatter.Value)
+            FSharpRegistryUtil.AllowFormatterCookie.Enabled
+            solution
+
+    [<Extension>]
+    static member FSharpFormatterEnabled(node: ITreeNode) =
+        FSharpExperimentalFeaturesEx.FSharpFormatterEnabled(node.GetSolution())
