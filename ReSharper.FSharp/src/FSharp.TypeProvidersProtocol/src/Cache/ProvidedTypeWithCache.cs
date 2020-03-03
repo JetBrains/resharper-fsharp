@@ -50,7 +50,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache
     public override ProvidedType GetNestedType(string nm)
     {
       var types = GetAllNestedTypes();
-      return types.First(t => t.Name == nm); //TODO: Optimize
+      return types.First(t => t.FullName == nm); //TODO: Optimize
     }
 
     public override ProvidedType[] GetNestedTypes()
