@@ -14,14 +14,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache
       myProvidedType = providedType;
 
       myBaseType = new Lazy<ProvidedType>(() => myProvidedType.BaseType);
-      myElementType = new Lazy<ProvidedType>(() => myProvidedType.GetElementType());
-      myDeclaringType = new Lazy<ProvidedType>(() => myProvidedType.DeclaringType);
-      myInterfaces = new Lazy<ProvidedType[]>(() => myProvidedType.GetInterfaces());
-      myEnumUnderlyingType = new Lazy<ProvidedType>(() => myProvidedType.GetEnumUnderlyingType());
-      myGenericArguments = new Lazy<ProvidedType[]>(() => myProvidedType.GetGenericArguments());
-      myGenericTypeDefinition = new Lazy<ProvidedType>(() => myProvidedType.GetGenericTypeDefinition());
+      myElementType = new Lazy<ProvidedType>(() => myProvidedType.GetElementType().WithCache());
+      myDeclaringType = new Lazy<ProvidedType>(() => myProvidedType.DeclaringType.WithCache());
+      myInterfaces = new Lazy<ProvidedType[]>(() => myProvidedType.GetInterfaces().WithCache());
+      myEnumUnderlyingType = new Lazy<ProvidedType>(() => myProvidedType.GetEnumUnderlyingType().WithCache());
+      myGenericArguments = new Lazy<ProvidedType[]>(() => myProvidedType.GetGenericArguments().WithCache());
+      myGenericTypeDefinition = new Lazy<ProvidedType>(() => myProvidedType.GetGenericTypeDefinition().WithCache());
       myMethods = new Lazy<ProvidedMethodInfo[]>(() => myProvidedType.GetMethods());
-      myAllNestedTypes = new Lazy<ProvidedType[]>(() => myProvidedType.GetAllNestedTypes());
+      myAllNestedTypes = new Lazy<ProvidedType[]>(() => myProvidedType.GetAllNestedTypes().WithCache());
       myProperties = new Lazy<ProvidedPropertyInfo[]>(() => myProvidedType.GetProperties());
     }
 
