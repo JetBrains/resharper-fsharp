@@ -1,0 +1,22 @@
+﻿using System.Collections.Generic;
+using static Module;
+
+public class Class1
+{
+  public Class1()
+  {
+    T1 t11 = new T1(|1|(0));
+    T1 t12 = new T1();
+
+    T2 t21 = new T2(1);
+    T2 t22 = new T2|()|(1);
+  }
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Constructor 'T1' has 0 parameter(s) but is invoked with 1 argument(s)
+(1): ReSharper Underlined Error Highlighting: Constructor 'T2' has 1 parameter(s) but is invoked with 0 argument(s)
+M:Module.T1.#ctor
+M:Module.T1.#ctor
+M:Module.T2.#ctor(System.Int32)
+M:Module.T2.#ctor(System.Int32)

@@ -250,12 +250,17 @@ type FSharpParserTest() =
     [<Test>] member x.``Types - Measure 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Measure 02 - Negate``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type member - Ctor - Secondary 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Ctor - Secondary 02 - Modifier``() = x.DoNamedTest()
+
     [<Test>] member x.``Type member - Inherit - Type 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Inherit - Type 02 - Qualified``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Inherit - Type 03 - Arguments``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Inherit - Type 04 - Type parameters 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Type member - Let bindings 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type member - Member 01 - Wild self id``() = x.DoNamedTest()
 
     [<Test>] member x.``Module member - Open 01``() = x.DoNamedTest()
     [<Test>] member x.``Module member - Open 02 - Qualifier``() = x.DoNamedTest()
