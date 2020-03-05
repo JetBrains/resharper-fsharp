@@ -1,10 +1,11 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
-open System
 open JetBrains.ReSharper.Feature.Services.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Psi.Tree
+open JetBrains.TextControl
 
 type IntroduceVarFix(expr: ISynExpr) =
     inherit QuickFixBase()
@@ -20,6 +21,12 @@ type IntroduceVarFix(expr: ISynExpr) =
     override x.IsAvailable _ =
         FSharpIntroduceVariable.CanIntroduceVar(expr)
 
+    override x.Execute(solution, textControl) =
+        base.Execute(solution, textControl)
+
+        use cookie = FSharpRegistryUtil.AllowExperimentalFeaturesCookie.Create()
+        textControl.Selection.SetRange(expr.GetDocumentRange().TextRange)
+        FSharpIntroduceVariable.IntroduceVar(expr, textControl)
+
     override x.ExecutePsiTransaction(_, _) =
-        Action<_>(fun textControl ->
-            FSharpIntroduceVariable.IntroduceVar(expr, textControl))
+        null
