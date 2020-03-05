@@ -122,8 +122,10 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             createHighlightingFromParentNode RuleNeverMatchedWarning range
 
         | UnitTypeExpected ->
-            createHighlightingFromNodeWithMessage UnitTypeExpectedWarning range error
-        
+            let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
+            let expr = getUnusedExpr expr
+            UnitTypeExpectedWarning(expr, error.Message) :> _
+
         | UseBindingsIllegalInModules ->
             createHighlightingFromNode UseBindingsIllegalInModulesWarning range
 
@@ -152,7 +154,9 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             createHighlightingFromNodeWithMessage EmptyRecordInvalidError range error
 
         | MissingErrorNumber when startsWith expressionIsAFunctionMessage error.Message ->
-            createHighlightingFromNodeWithMessage FunctionValueUnexpectedWarning range error
+            let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
+            let expr = getUnusedExpr expr
+            FunctionValueUnexpectedWarning(expr, error.Message) :> _
 
         | _ -> createGenericHighlighting error range
 

@@ -35,3 +35,15 @@ let getRefExprNameRange (refExpr: IReferenceExpr) =
     match refExpr.Identifier with
     | null -> refExpr.GetHighlightingRange()
     | identifier -> identifier.GetHighlightingRange()
+
+let rec getUnusedExpr (expr: ISynExpr) =
+    match expr with
+    | :? ILetOrUseExpr as letExpr ->
+        let inExpr = letExpr.InExpression
+        if isNotNull inExpr then getUnusedExpr inExpr else expr
+
+    | :? ISequentialExpr as seqExpr ->
+        let lastExpr = seqExpr.Expressions.LastOrDefault()
+        if isNotNull lastExpr then getUnusedExpr lastExpr else expr
+
+    | _ -> expr

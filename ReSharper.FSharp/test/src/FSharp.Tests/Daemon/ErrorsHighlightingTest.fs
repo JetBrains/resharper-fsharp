@@ -43,3 +43,5 @@ type ErrorsHighlightingTest() =
     [<Test>] member x.``Unexpected args 02 - many args``() = x.DoNamedTest()
     [<Test>] member x.``Unexpected args 03 - multiline arg``() = x.DoNamedTest()
     [<Test>] member x.``Unexpected args 04 - several errors in single line``() = x.DoNamedTest()
+
+    [<Test>] member x.``Unused expr 01``() = x.DoNamedTest()
