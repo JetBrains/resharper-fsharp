@@ -97,7 +97,7 @@
     <Compile Include="src\Intentions\ElifToIfAction.fs" />
     <Compile Include="src\Intentions\IfToElifAction.fs" />
     <Compile Include="src\Intentions\NegateConditionActions.fs" />
-    <Compile Include="src\Intentions\ToMutableRecordFieldAction.fs" />
+    <Compile Include="src\Intentions\ToMutableAction.fs" />
     <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
       <Mode>QUICKFIX</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>
@@ -127,7 +127,7 @@
     <Compile Include="src\QuickFixes\IntroduceVarFix.fs" />
     <Compile Include="src\QuickFixes\RemoveNeverMatchingRuleFix.fs" />
     <Compile Include="src\QuickFixes\RemoveUnexpectedArgumentsFix.fs" />
-    <Compile Include="src\QuickFixes\ToMutableRecordFieldFix.fs" />
+    <Compile Include="src\QuickFixes\ToMutableFix.fs" />
     <Compile Include="src\QuickFixes\AddUnderscorePrefixFix.fs" />
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />
     <Compile Include="src\PostfixTemplates\NotTemplate.fs" />

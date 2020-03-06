@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
@@ -11,6 +12,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public bool IsDeclaration => true;
 
     public IEnumerable<IDeclaration> Declarations => new[] {this};
+
+    public bool IsMutable => Binding?.IsMutable ?? false;
+
+    public void SetIsMutable(bool value)
+    {
+      var binding = Binding;
+      Assertion.Assert(binding != null, "GetBinding() != null");
+      binding.SetIsMutable(true);
+    }
+
+    public bool CanBeMutable => Binding != null;
+
+    public IBinding Binding => this.GetBinding();
   }
 
   internal partial class LocalReferencePat
@@ -18,6 +32,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override IFSharpIdentifierLikeNode NameIdentifier => ReferenceName?.Identifier;
     public bool IsDeclaration => true;
     public IEnumerable<IDeclaration> Declarations => new[] {this};
+
+    public bool IsMutable => Binding?.IsMutable ?? false;
+
+    public void SetIsMutable(bool value)
+    {
+      var binding = Binding;
+      Assertion.Assert(binding != null, "GetBinding() != null");
+      binding.SetIsMutable(true);
+    }
+
+    public bool CanBeMutable => Binding != null;
+
+    public IBinding Binding => this.GetBinding();
   }
 
   internal partial class LocalParametersOwnerPat

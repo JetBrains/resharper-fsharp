@@ -1,0 +1,5 @@
+﻿module M
+
+do
+    let mutable x = 1
+    x{caret} <- 1

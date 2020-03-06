@@ -32,7 +32,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override bool IsFSharpMember => false;
   }
 
-  internal class FSharpTypePrivateField : FSharpFieldBase<TopPatternDeclarationBase>
+  internal class FSharpTypePrivateField : FSharpFieldBase<TopPatternDeclarationBase>, IMutableModifierOwner
   {
     public FSharpTypePrivateField([NotNull] TopPatternDeclarationBase declaration) : base(declaration)
     {
@@ -42,6 +42,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     protected override FSharpType FieldType => Field?.FullType;
 
     public override AccessRights GetAccessRights() => AccessRights.INTERNAL;
+
+    public bool IsMutable =>
+      GetDeclaration() is ITopReferencePat referencePat && referencePat.IsMutable;
+
+    public void SetIsMutable(bool value)
+    {
+      foreach (var declaration in GetDeclarations())
+        if (declaration is ITopReferencePat referencePat)
+          referencePat.SetIsMutable(true);
+    }
+
+    public bool CanBeMutable =>
+      GetDeclaration() is ITopReferencePat referencePat && referencePat.CanBeMutable;
   }
 
   internal class FSharpValField : FSharpFieldBase<ValField>

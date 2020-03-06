@@ -22,6 +22,7 @@ module FSharpErrors =
     let [<Literal>] FieldNotMutable = 5
     let [<Literal>] UnitTypeExpected = 20
     let [<Literal>] RuleNeverMatched = 26
+    let [<Literal>] ValNotMutable = 27
     let [<Literal>] VarBoundTwice = 38
     let [<Literal>] UndefinedName = 39
     let [<Literal>] UpcastUnnecessary = 66
@@ -91,7 +92,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             NotAFunctionError(notAFunctionNode.IgnoreParentParens(), prefixAppExpr) :> _
 
         | FieldNotMutable ->
-            createHighlightingFromNode FieldNotMutableError range
+            createHighlightingFromNode FieldOrValueNotMutableError range
 
         | VarBoundTwice -> 
             createHighlightingFromNode VarBoundTwiceError range
@@ -120,6 +121,15 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | RuleNeverMatched ->
             createHighlightingFromParentNode RuleNeverMatchedWarning range
+
+        | ValNotMutable ->
+            let setExpr = fsFile.GetNode<ISetExpr>(range)
+            if isNull setExpr then createGenericHighlighting error range else
+
+            let refExpr = setExpr.LeftExpression.As<IReferenceExpr>()
+            if isNull refExpr then createGenericHighlighting error range else
+
+            FieldOrValueNotMutableError(refExpr) :> _
 
         | UnitTypeExpected ->
             let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)

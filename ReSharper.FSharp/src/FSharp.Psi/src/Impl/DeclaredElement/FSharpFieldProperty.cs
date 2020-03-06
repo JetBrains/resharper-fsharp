@@ -40,6 +40,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
           fieldDeclaration.SetIsMutable(value);
     }
 
+    public bool CanBeMutable => true;
+
     public override bool IsWritable => IsMutable;
 
     public override AccessRights GetAccessRights() => GetContainingType().GetRepresentationAccessRights();
@@ -66,9 +68,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       new FSharpGeneratedParameter(GetContainingType().GetGeneratedConstructor(), this);
   }
 
-  public interface IRecordField : IProperty, IRepresentationAccessRightsOwner
+  public interface IRecordField : IProperty, IRepresentationAccessRightsOwner, IMutableModifierOwner
   {
-    bool IsMutable { get; }
-    void SetIsMutable(bool value);
   }
 }

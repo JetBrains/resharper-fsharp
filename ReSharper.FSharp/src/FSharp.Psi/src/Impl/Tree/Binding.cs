@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Xml;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
@@ -70,7 +71,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public bool IsMutable => MutableKeyword != null;
 
-    public void SetIsMutable(bool value) =>
-      throw new System.NotImplementedException();
+    public void SetIsMutable(bool value)
+    {
+      if (!value)
+        throw new System.NotImplementedException();
+
+      var headPat = HeadPattern;
+      if (headPat != null)
+        FSharpImplUtil.AddTokenBefore(headPat, FSharpTokenType.MUTABLE);
+    }
   }
 }

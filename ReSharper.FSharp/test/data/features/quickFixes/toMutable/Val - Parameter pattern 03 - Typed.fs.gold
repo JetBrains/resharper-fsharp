@@ -1,0 +1,4 @@
+﻿module M
+
+let mutable (Some x): int option = None
+x{caret} <- 123

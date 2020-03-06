@@ -260,7 +260,7 @@
       <Argument>if prefixApp.FunctionExpression == expr then "Unexpected argument" else "Unexpected arguments"</Argument>
     </Message>
     <Range>PrefixAppExprNavigator.GetByFunctionExpression(expr).ArgumentExpression.GetHighlightingRange()</Range>
-    <SecondaryRanges>getAllExpressionArgs(expr) |> Seq.tail |> getExpressionsRanges</SecondaryRanges>
+    <SecondaryRanges>getAllExpressionArgs expr |> Seq.tail |> getExpressionsRanges</SecondaryRanges>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>RemoveUnexpectedArgumentsFix</QuickFix>
   </Error>
@@ -271,14 +271,14 @@
     <Message value="Redundant parentheses"/>
   </Warning>
 
-  <Error staticGroup="FSharpErrors" name="FieldNotMutable">
+  <Error staticGroup="FSharpErrors" name="FieldOrValueNotMutable">
     <Parameter type="IReferenceExpr" name="refExpr"/>
     <Message value="{0} is not mutable">
       <Argument>refExpr.Identifier.GetSourceName()</Argument>
     </Message>
     <Range>getRefExprNameRange refExpr</Range>
     <Behavour overlapResolvePolicy="NONE"/>
-    <QuickFix>ToMutableRecordFieldFix</QuickFix>
+    <QuickFix>ToMutableFix</QuickFix>
   </Error>
 
 </Errors>

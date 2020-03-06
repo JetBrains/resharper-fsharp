@@ -1,12 +1,11 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
-type ToMutableRecordFieldFix(error: FieldNotMutableError) =
+type ToMutableFix(error: FieldOrValueNotMutableError) =
     inherit FSharpQuickFixBase()
 
     let refExpr = error.RefExpr
@@ -16,9 +15,11 @@ type ToMutableRecordFieldFix(error: FieldNotMutableError) =
     override x.IsAvailable _ =
         if not (isValid refExpr) then false else
 
-        let element = refExpr.Reference.Resolve().DeclaredElement
-        element :? IRecordField
+        let mutableModifierOwner = refExpr.Reference.Resolve().DeclaredElement.As<IMutableModifierOwner>()
+        if isNull mutableModifierOwner then false else
+
+        mutableModifierOwner.CanBeMutable && not mutableModifierOwner.IsMutable
 
     override x.ExecutePsiTransaction _ =
-        let element = refExpr.Reference.Resolve().DeclaredElement.As<IRecordField>()
+        let element = refExpr.Reference.Resolve().DeclaredElement.As<IMutableModifierOwner>()
         element.SetIsMutable(true)
