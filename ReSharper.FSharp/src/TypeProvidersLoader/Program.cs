@@ -12,7 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader
       var endPoint = new OutOfProcessTypeProvidersLoaderEndPoint(
         ProtocolConstants.TypeProvidersLoaderPid,
         new TypeProvidersLoader(),
-        new TypeProvidersManager());
+        new TypeProvidersHost());
 
       var portValue = args[0];
       var logPath = string.Empty;

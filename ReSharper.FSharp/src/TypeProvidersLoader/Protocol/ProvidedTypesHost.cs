@@ -1,34 +1,68 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using JetBrains.Lifetimes;
 using JetBrains.Rd.Tasks;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
 using Microsoft.FSharp.Core.CompilerServices;
 using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
 {
-  public class ProvidedTypesManager : OutOfProcessProtocolManagerBase<ProvidedType, RdProvidedType>
+  public class ProvidedTypesHost : OutOfProcessProtocolHostBase<ProvidedType, RdProvidedType>
   {
-    private readonly IOutOfProcessProtocolManager<ProvidedParameterInfo, RdProvidedParameterInfo>
-      myProvidedParameterInfosManager;
+    private readonly IOutOfProcessProtocolHost<ProvidedParameterInfo, RdProvidedParameterInfo>
+      myProvidedParameterInfosHost;
 
-    private readonly IOutOfProcessProtocolManager<ProvidedMethodInfo, RdProvidedMethodInfo>
-      myProvidedMethodInfosManager;
+    private readonly IOutOfProcessProtocolHost<ProvidedMethodInfo, RdProvidedMethodInfo>
+      myProvidedMethodInfosHost;
 
-    private readonly IOutOfProcessProtocolManager<ProvidedPropertyInfo, RdProvidedPropertyInfo>
-      myProvidedPropertiesManager;
+    private readonly IOutOfProcessProtocolHost<ProvidedPropertyInfo, RdProvidedPropertyInfo>
+      myProvidedPropertiesHost;
 
-    public ProvidedTypesManager() : base(new ProvidedTypeEqualityComparer())
+    private readonly RdProvidedTypeProcessModel myRdProvidedTypeProcessModel;
+
+    public ProvidedTypesHost() : base(new ProvidedTypeEqualityComparer())
     {
-      myProvidedParameterInfosManager = new ProvidedParametersManager(this);
-      myProvidedMethodInfosManager = new ProvidedMethodInfosManager(this, myProvidedParameterInfosManager);
-      myProvidedPropertiesManager =
-        new ProvidedPropertyInfoManager(myProvidedParameterInfosManager, this, myProvidedMethodInfosManager);
+      myProvidedParameterInfosHost = new ProvidedParametersHost(this);
+      myProvidedMethodInfosHost = new ProvidedMethodInfosHost(this, myProvidedParameterInfosHost);
+      myProvidedPropertiesHost =
+        new ProvidedPropertyInfoHost(myProvidedParameterInfosHost, this, myProvidedMethodInfosHost);
+      
+      myRdProvidedTypeProcessModel = new RdProvidedTypeProcessModel();
+      myRdProvidedTypeProcessModel.BaseType.Set((lifetime, _) =>
+        GetBaseType(lifetime, providedNativeModel, providedModelOwner));
+      myRdProvidedTypeProcessModel.DeclaringType.Set((lifetime, _) =>
+        GetDeclaringType(lifetime, providedNativeModel, providedModelOwner));
+      myRdProvidedTypeProcessModel.GetInterfaces.Set((lifetime, _) =>
+        GetInterfaces(lifetime, providedNativeModel, providedModelOwner));
+      myRdProvidedTypeProcessModel.GetNestedType.Set((lifetime, typeName) =>
+        GetNestedType(lifetime, providedNativeModel, providedModelOwner, typeName));
+      myRdProvidedTypeProcessModel.GetNestedTypes.Set(
+        (lifetime, _) => GetNestedTypes(lifetime, providedNativeModel, providedModelOwner));
+      myRdProvidedTypeProcessModel.GetAllNestedTypes.Set((lifetime, _) =>
+        GetAllNestedTypes(lifetime, providedNativeModel, providedModelOwner));
+      myRdProvidedTypeProcessModel.GetGenericTypeDefinition.Set((lifetime, _) =>
+        GetGenericTypeDefinition(lifetime, providedNativeModel, providedModelOwner));
+      myRdProvidedTypeProcessModel.GetElementType.Set(
+        (lifetime, _) => GetElementType(lifetime, providedNativeModel, providedModelOwner));
+      myRdProvidedTypeProcessModel.GetGenericArguments.Set((lifetime, _) =>
+        GetGenericArguments(lifetime, providedNativeModel, providedModelOwner));
+      myRdProvidedTypeProcessModel.GetArrayRank.Set((lifetime, _) => GetArrayRank(lifetime, providedNativeModel));
+      myRdProvidedTypeProcessModel.GetEnumUnderlyingType.Set(
+        (lifetime, _) => GetEnumUnderlyingType(lifetime, providedNativeModel, providedModelOwner));
+      myRdProvidedTypeProcessModel.GetProperties.Set((lifetime, _) =>
+        GetProperties(lifetime, providedNativeModel, providedModelOwner));
+      myRdProvidedTypeProcessModel.GetProperty.Set((lifetime, propName) =>
+        GetProperty(lifetime, providedNativeModel, providedModelOwner, propName));
+      myRdProvidedTypeProcessModel.GenericParameterPosition.Set((lifetime, _) =>
+        GetGenericParameterPosition(lifetime, providedNativeModel));
+      myRdProvidedTypeProcessModel.GetStaticParameters.Set((lifetime, _) =>
+        GetStaticParameters(lifetime, providedNativeModel, providedModelOwner));
+      myRdProvidedTypeProcessModel.GetMethods.Set((lifetime, _) =>
+        GetMethods(lifetime, providedNativeModel, providedModelOwner));
     }
 
-    protected override RdProvidedType CreateProcessModel(
+    protected override RdProvidedType CreateRdModel(
       ProvidedType providedNativeModel,
       ITypeProvider providedModelOwner)
     {
@@ -92,7 +126,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       ProvidedType providedNativeModel,
       ITypeProvider providedModelOwner)
     {
-      var declaringType = Register(providedNativeModel.DeclaringType, providedModelOwner);
+      var declaringType = GetRdModel(providedNativeModel.DeclaringType, providedModelOwner);
       return RdTask<RdProvidedType>.Successful(declaringType);
     }
 
@@ -101,7 +135,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       ProvidedType providedNativeModel,
       ITypeProvider providedModelOwner)
     {
-      var baseType = Register(providedNativeModel.BaseType, providedModelOwner);
+      var baseType = GetRdModel(providedNativeModel.BaseType, providedModelOwner);
       return RdTask<RdProvidedType>.Successful(baseType);
     }
 
@@ -110,7 +144,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
     {
       var interfaces = providedNativeModel
         .GetMethods()
-        .Select(t => myProvidedMethodInfosManager.Register(t, providedModelOwner)).ToArray();
+        .Select(t => myProvidedMethodInfosHost.GetRdModel(t, providedModelOwner)).ToArray();
       return RdTask<RdProvidedMethodInfo[]>.Successful(interfaces);
     }
 
@@ -121,7 +155,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
     {
       var staticParameters = providedNativeModel
         .GetStaticParameters(providedModelOwner)
-        .Select(t => myProvidedParameterInfosManager.Register(t, providedModelOwner))
+        .Select(t => myProvidedParameterInfosHost.GetRdModel(t, providedModelOwner))
         .ToArray();
       return RdTask<RdProvidedParameterInfo[]>.Successful(staticParameters);
     }
@@ -139,7 +173,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       string propName)
     {
       var property =
-        myProvidedPropertiesManager.Register(providedNativeModel.GetProperty(propName), providedModelOwner);
+        myProvidedPropertiesHost.GetRdModel(providedNativeModel.GetProperty(propName), providedModelOwner);
       return RdTask<RdProvidedPropertyInfo>.Successful(property);
     }
 
@@ -149,7 +183,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       ITypeProvider providedModelOwner)
     {
       var properties = providedNativeModel.GetProperties()
-        .Select(t => myProvidedPropertiesManager.Register(t, providedModelOwner))
+        .Select(t => myProvidedPropertiesHost.GetRdModel(t, providedModelOwner))
         .ToArray();
       return RdTask<RdProvidedPropertyInfo[]>.Successful(properties);
     }
@@ -159,7 +193,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       ProvidedType providedNativeModel,
       ITypeProvider providedModelOwner)
     {
-      var enumUnderlyingType = Register(providedNativeModel.GetEnumUnderlyingType(), providedModelOwner);
+      var enumUnderlyingType = GetRdModel(providedNativeModel.GetEnumUnderlyingType(), providedModelOwner);
       return RdTask<RdProvidedType>.Successful(enumUnderlyingType);
     }
 
@@ -178,7 +212,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
     {
       var genericArguments = providedNativeModel
         .GetGenericArguments()
-        .Select(t => Register(t, providedModelOwner))
+        .Select(t => GetRdModel(t, providedModelOwner))
         .ToArray();
       return RdTask<RdProvidedType[]>.Successful(genericArguments);
     }
@@ -188,7 +222,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       ProvidedType providedNativeModel,
       ITypeProvider providedModelOwner)
     {
-      var elementType = Register(providedNativeModel.GetElementType(), providedModelOwner);
+      var elementType = GetRdModel(providedNativeModel.GetElementType(), providedModelOwner);
       return RdTask<RdProvidedType>.Successful(elementType);
     }
 
@@ -197,7 +231,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       ProvidedType providedNativeModel,
       ITypeProvider providedModelOwner)
     {
-      var genericTypeDefinition = Register(providedNativeModel.GetGenericTypeDefinition(), providedModelOwner);
+      var genericTypeDefinition = GetRdModel(providedNativeModel.GetGenericTypeDefinition(), providedModelOwner);
       return RdTask<RdProvidedType>.Successful(genericTypeDefinition);
     }
 
@@ -208,7 +242,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
     {
       var nestedTypes = providedNativeModel
         .GetAllNestedTypes()
-        .Select(t => Register(t, providedModelOwner))
+        .Select(t => GetRdModel(t, providedModelOwner))
         .ToArray();
       return RdTask<RdProvidedType[]>.Successful(nestedTypes);
     }
@@ -220,7 +254,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
     {
       var nestedTypes = providedNativeModel
         .GetNestedTypes()
-        .Select(t => Register(t, providedModelOwner))
+        .Select(t => GetRdModel(t, providedModelOwner))
         .ToArray();
       return RdTask<RdProvidedType[]>.Successful(nestedTypes);
     }
@@ -231,7 +265,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       ITypeProvider providedModelOwner,
       string typeName)
     {
-      var nestedType = Register(providedNativeModel.GetNestedType(typeName), providedModelOwner);
+      var nestedType = GetRdModel(providedNativeModel.GetNestedType(typeName), providedModelOwner);
       return RdTask<RdProvidedType>.Successful(nestedType);
     }
 
@@ -242,21 +276,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
     {
       var interfaces = providedNativeModel
         .GetInterfaces()
-        .Select(t => Register(t, providedModelOwner)).ToArray();
+        .Select(t => GetRdModel(t, providedModelOwner)).ToArray();
       return RdTask<RdProvidedType[]>.Successful(interfaces);
-    }
-  }
-
-  internal class ProvidedTypeEqualityComparer : IEqualityComparer<ProvidedType>
-  {
-    public bool Equals(ProvidedType x, ProvidedType y)
-    {
-      return string.Equals(x.FullName, y.FullName, StringComparison.Ordinal);
-    }
-
-    public int GetHashCode(ProvidedType obj)
-    {
-      return obj.FullName.GetHashCode();
     }
   }
 }

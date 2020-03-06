@@ -1,23 +1,23 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using JetBrains.Rd.Tasks;
 using JetBrains.Lifetimes;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
 using Microsoft.FSharp.Core.CompilerServices;
 using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
 {
-  public class ProvidedNamespacesManager : OutOfProcessProtocolManagerBase<IProvidedNamespace, RdProvidedNamespace>
+  public class ProvidedNamespacesHost : OutOfProcessProtocolHostBase<IProvidedNamespace, RdProvidedNamespace>
   {
-    private readonly IOutOfProcessProtocolManager<ProvidedType, RdProvidedType> myProvidedTypesManager;
+    private readonly IOutOfProcessProtocolHost<ProvidedType, RdProvidedType> myProvidedTypesHost;
 
-    public ProvidedNamespacesManager() : base(new ProvidedNamespaceEqualityComparer())
+    public ProvidedNamespacesHost() : base(new ProvidedNamespaceEqualityComparer())
     {
-      myProvidedTypesManager = new ProvidedTypesManager();
+      myProvidedTypesHost = new ProvidedTypesHost();
     }
 
-    protected override RdProvidedNamespace CreateProcessModel(
+    protected override RdProvidedNamespace CreateRdModel(
       IProvidedNamespace providedNativeModel,
       ITypeProvider providedModelOwner)
     {
@@ -39,7 +39,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       string typeName)
     {
       var providedType = ProvidedType.CreateNoContext(providedNamespace.ResolveTypeName(typeName));
-      var rdProvidedType = myProvidedTypesManager.Register(providedType, providedModelOwner);
+      var rdProvidedType = myProvidedTypesHost.GetRdModel(providedType, providedModelOwner);
       return RdTask<RdProvidedType>.Successful(rdProvidedType);
     }
 
@@ -50,7 +50,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
     {
       var types = providedNamespace.GetTypes()
         .Select(ProvidedType.CreateNoContext)
-        .Select(t => myProvidedTypesManager.Register(t, providedModelOwner))
+        .Select(t => myProvidedTypesHost.GetRdModel(t, providedModelOwner))
         .ToArray();
 
       return RdTask<RdProvidedType[]>.Successful(types);
@@ -63,21 +63,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
     {
       var namespaces = providedNamespace
         .GetNestedNamespaces()
-        .Select(t => Register(t, providedModelOwner)).ToArray();
+        .Select(t => GetRdModel(t, providedModelOwner)).ToArray();
       return RdTask<RdProvidedNamespace[]>.Successful(namespaces);
-    }
-  }
-  
-  internal class ProvidedNamespaceEqualityComparer : IEqualityComparer<IProvidedNamespace>
-  {
-    public bool Equals(IProvidedNamespace x, IProvidedNamespace y)
-    {
-      return x.NamespaceName == y.NamespaceName;
-    }
-
-    public int GetHashCode(IProvidedNamespace obj)
-    {
-      return obj.NamespaceName.GetHashCode();
     }
   }
 }

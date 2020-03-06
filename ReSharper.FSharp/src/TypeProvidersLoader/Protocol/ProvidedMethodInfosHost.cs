@@ -1,29 +1,29 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using JetBrains.Lifetimes;
 using JetBrains.Rd.Tasks;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
 using Microsoft.FSharp.Core.CompilerServices;
 using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
 {
-  public class ProvidedMethodInfosManager : OutOfProcessProtocolManagerBase<ProvidedMethodInfo, RdProvidedMethodInfo>
+  public class ProvidedMethodInfosHost : OutOfProcessProtocolHostBase<ProvidedMethodInfo, RdProvidedMethodInfo>
   {
-    private readonly IOutOfProcessProtocolManager<ProvidedType, RdProvidedType> myProvidedTypesManager;
+    private readonly IOutOfProcessProtocolHost<ProvidedType, RdProvidedType> myProvidedTypesHost;
 
-    private readonly IOutOfProcessProtocolManager<ProvidedParameterInfo, RdProvidedParameterInfo>
-      myProvidedParameterInfosManager;
+    private readonly IOutOfProcessProtocolHost<ProvidedParameterInfo, RdProvidedParameterInfo>
+      myProvidedParameterInfosHost;
 
-    public ProvidedMethodInfosManager(IOutOfProcessProtocolManager<ProvidedType, RdProvidedType> providedTypesManager,
-      IOutOfProcessProtocolManager<ProvidedParameterInfo, RdProvidedParameterInfo> providedParameterInfosManager) :
+    public ProvidedMethodInfosHost(IOutOfProcessProtocolHost<ProvidedType, RdProvidedType> providedTypesHost,
+      IOutOfProcessProtocolHost<ProvidedParameterInfo, RdProvidedParameterInfo> providedParameterInfosHost) :
       base(new ProvidedMethodInfoEqualityComparer())
     {
-      myProvidedTypesManager = providedTypesManager;
-      myProvidedParameterInfosManager = providedParameterInfosManager;
+      myProvidedTypesHost = providedTypesHost;
+      myProvidedParameterInfosHost = providedParameterInfosHost;
     }
 
-    protected override RdProvidedMethodInfo CreateProcessModel(
+    protected override RdProvidedMethodInfo CreateRdModel(
       ProvidedMethodInfo providedNativeModel,
       ITypeProvider providedModelOwner)
     {
@@ -59,7 +59,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       ProvidedMethodInfo providedNativeModel,
       ITypeProvider providedModelOwner)
     {
-      var declaringType = myProvidedTypesManager.Register(providedNativeModel.DeclaringType, providedModelOwner);
+      var declaringType = myProvidedTypesHost.GetRdModel(providedNativeModel.DeclaringType, providedModelOwner);
       return RdTask<RdProvidedType>.Successful(declaringType);
     }
 
@@ -68,7 +68,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       ProvidedMethodInfo providedNativeModel,
       ITypeProvider providedModelOwner)
     {
-      var declaringType = myProvidedTypesManager.Register(providedNativeModel.DeclaringType, providedModelOwner);
+      var declaringType = myProvidedTypesHost.GetRdModel(providedNativeModel.DeclaringType, providedModelOwner);
       return RdTask<RdProvidedType>.Successful(declaringType);
     }
 
@@ -79,7 +79,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
     {
       var genericArgs = providedMethod
         .GetGenericArguments()
-        .Select(t => myProvidedTypesManager.Register(t, providedModelOwner)).ToArray();
+        .Select(t => myProvidedTypesHost.GetRdModel(t, providedModelOwner)).ToArray();
       return RdTask<RdProvidedType[]>.Successful(genericArgs);
     }
 
@@ -90,21 +90,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
     {
       var parameters = providedMethod
         .GetParameters()
-        .Select(t => myProvidedParameterInfosManager.Register(t, providedModelOwner)).ToArray();
+        .Select(t => myProvidedParameterInfosHost.GetRdModel(t, providedModelOwner)).ToArray();
       return RdTask<RdProvidedParameterInfo[]>.Successful(parameters);
-    }
-  }
-
-  internal class ProvidedMethodInfoEqualityComparer : IEqualityComparer<ProvidedMethodInfo>
-  {
-    public bool Equals(ProvidedMethodInfo x, ProvidedMethodInfo y)
-    {
-      return ReferenceEquals(x, y);
-    }
-
-    public int GetHashCode(ProvidedMethodInfo obj)
-    {
-      return obj.Name.GetHashCode();
     }
   }
 }

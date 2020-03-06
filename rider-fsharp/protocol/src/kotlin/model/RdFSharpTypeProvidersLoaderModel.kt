@@ -11,16 +11,24 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         CSharp50Generator(FlowTransform.AsIs, "JetBrains.Rider.FSharp.TypeProvidersProtocol.Server", File("C:\\Programming\\fsharp-support\\ReSharper.FSharp\\src\\FSharp.TypeProvidersProtocol\\src\\Server")),
         CSharp50Generator(FlowTransform.Reversed, "JetBrains.Rider.FSharp.TypeProvidersProtocol.Client", File("C:\\Programming\\fsharp-support\\ReSharper.FSharp\\src\\FSharp.TypeProvidersProtocol\\src\\Client"))
 ) {
-
     lateinit var RdProvidedType: Class.Concrete
     lateinit var RdProvidedPropertyInfo: Class.Concrete
     lateinit var RdProvidedMethodInfo: Class.Concrete
     lateinit var RdProvidedParameterInfo: Class.Concrete
 
-    private val RdProvidedMemberInfo = baseclass {
-        field("Name", string)
+    private val RdProvidedMemberProcessModel = baseclass {
+        call("DeclaringType", int, RdProvidedType.nullable)
+    }
 
-        call("DeclaringType", void, RdProvidedType.nullable)
+    private val RdProvidedMethodBaseProcessModel = baseclass extends RdProvidedMemberProcessModel {
+        call("GetParameters", int, array(RdProvidedParameterInfo))
+        call("GetGenericArguments", int, array(RdProvidedType))
+        //call("GetStaticParametersForMethod", RdTypeProvider, array(RdProvidedParameterInfo))
+    }
+
+    private val RdProvidedMemberInfo = baseclass {
+        field("EntityId", int)
+        field("Name", string)
     }
 
     private val RdProvidedMethodBase = baseclass extends RdProvidedMemberInfo {
@@ -35,12 +43,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         field("IsAbstract", bool)
         field("IsHideBySig", bool)
         field("IsConstructor", bool)
-
-        call("GetParameters", void, array(RdProvidedParameterInfo))
-        call("GetGenericArguments", void, array(RdProvidedType))
-        //call("GetStaticParametersForMethod", RdTypeProvider, array(RdProvidedParameterInfo))
     }
-
 
     private val RdResolutionEnvironment = structdef {
         field("resolutionFolder", string)
@@ -50,20 +53,25 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         field("temporaryFolder", string)
     }
 
-    private val RdProvidedNamespace = classdef {
-        field("namespaceName", string)
-
-        call("getNestedNamespaces", void, array(this))
-        call("getTypes", void, array(RdProvidedType))
-        call("resolveTypeName", string, RdProvidedType)
+    private val RdProvidedNamespaceProcessModel = aggregatedef("RdProvidedNamespaceProcessModel") {
+        call("GetNestedNamespaces", int, array(RdProvidedNamespace))
+        call("GetTypes", int, array(RdProvidedType))
+        call("ResolveTypeName", structdef("ResolveTypeNameArgs") {
+            field("Id", int)
+            field("TypeFullName", string)
+        }, RdProvidedType)
     }
 
-    private val RdTypeProvider = classdef {
-        //sink("invalidate", void).async
+    private val RdProvidedNamespace = classdef {
+        field("NamespaceName", string)
+        field("EntityId", int)
+    }
 
-        call("GetNamespaces", void, array(RdProvidedNamespace))
+    private val RdTypeProviderProcessModel = aggregatedef("RdTypeProviderProcessModel") {
+        //sink("invalidate", void).async
+        call("GetNamespaces", int, array(RdProvidedNamespace))
         call("GetInvokerExpression", GetInvokerExpressionParameters, string)
-        call("GetGeneratedAssemblyContents", GetGeneratedAssemblyContentsParameters, array(byte))
+        call("Dispose", int, void)
     }
 
     private val ApplyStaticArgumentsParameters = structdef {
@@ -131,7 +139,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
     private val RdSystemRuntimeContainsType = structdef {
         field("systemRuntimeContainsTypeRef", structdef {
             field("value", structdef {
-              field("fakeTcImports", RdFakeTcImports)
+                field("fakeTcImports", RdFakeTcImports)
             })
         })
     }
@@ -144,6 +152,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         field("isInvalidationSupported", bool)
         field("isInteractive", bool)
         field("systemRuntimeAssemblyRdVersion", RdVersion)
+        field("compilerToolsPath", array(string))
         field("systemRuntimeContainsType", RdSystemRuntimeContainsType)
     }
 
@@ -154,6 +163,56 @@ object RdFSharpTypeProvidersLoaderModel : Root(
     private val RdFakeTcImports = structdef {
         field("Base", this.nullable)
         field("dllInfos", array(RdFakeDllInfo))
+    }
+
+    private val RdProvidedTypeProcessModel = aggregatedef("RdProvidedTypeProcessModel") {
+        call("BaseType", int, RdProvidedType.nullable)
+        call("GetNestedType", structdef("GetNestedTypeArgs") {
+            field("Id", int)
+            field("TypeName", string)
+        }, RdProvidedType)
+        call("GetNestedTypes", int, array(RdProvidedType))
+        call("GetAllNestedTypes", int, array(RdProvidedType))
+        call("GetInterfaces", int, array(RdProvidedType))
+        call("GetGenericTypeDefinition", int, RdProvidedType)
+        call("GetElementType", int, RdProvidedType)
+        call("GetGenericArguments", int, array(RdProvidedType))
+        call("GetArrayRank", int, int)
+        call("GetEnumUnderlyingType", int, RdProvidedType.nullable)
+        call("GetProperties", int, array(RdProvidedPropertyInfo))
+        call("GetProperty", structdef("GetPropertyArgs") {
+            field("Id", int)
+            field("PropertyName", string)
+        }, RdProvidedPropertyInfo)
+        call("GenericParameterPosition", int, int)
+        call("GetStaticParameters", int, array(RdProvidedParameterInfo))
+        //call("ApplyStaticArguments", ApplyStaticArgumentsParameters, this)
+        call("GetMethods", int, array(RdProvidedMethodInfo))
+        call("DeclaringType", int, RdProvidedType.nullable)
+    }
+
+    private val RdProvidedMethodInfoProcessModel = aggregatedef("RdProvidedMethodInfoProcessModel") {
+        call("DeclaringType", int, RdProvidedType.nullable)
+        call("ReturnType", int, RdProvidedType)
+        call("GetParameters", int, array(RdProvidedParameterInfo))
+        call("GetGenericArguments", int, array(RdProvidedType))
+    }
+
+    private val InstantiationResult = structdef {
+        field("IsSuccsses", bool)
+        field("EntityId", int)
+    }
+
+    private val RdProvidedPropertyInfoProcessModel = aggregatedef("RdProvidedPropertyInfoProcessModel") {
+        call("DeclaringType", int, RdProvidedType.nullable)
+        call("PropertyType", int, RdProvidedType)
+        call("GetGetMethod", int, RdProvidedMethodInfo)
+        call("GetSetMethod", int, RdProvidedMethodInfo)
+        call("GetIndexParameters", int, array(RdProvidedParameterInfo))
+    }
+
+    private val RdTypeProvider = structdef {
+        field("EntityId", int)
     }
 
     init {
@@ -175,33 +234,11 @@ object RdFSharpTypeProvidersLoaderModel : Root(
             field("IsSuppressRelocate", bool)
             field("IsErased", bool)
             field("IsGenericType", bool)
-
-            call("BaseType", void, this.nullable)
-            call("GetNestedType", string, this)
-            call("GetNestedTypes", void, array(this))
-            call("GetAllNestedTypes", void, array(this))
-            call("GetInterfaces", void, array(this))
-            call("GetGenericTypeDefinition", void, this)
-            call("GetElementType", void, this)
-            call("GetGenericArguments", void, array(this))
-            call("GetArrayRank", void, int)
-            call("GetEnumUnderlyingType", void, this.nullable)
-            call("GetProperties", void, array(RdProvidedPropertyInfo))
-            call("GetProperty", string, RdProvidedPropertyInfo)
-            call("GenericParameterPosition", void, int)
-            call("GetStaticParameters", void, array(RdProvidedParameterInfo))
-            //call("ApplyStaticArguments", ApplyStaticArgumentsParameters, this)
-            call("GetMethods", void, array(RdProvidedMethodInfo))
         }
 
         RdProvidedPropertyInfo = classdef extends RdProvidedMemberInfo {
             field("CanRead", bool)
             field("CanWrite", bool)
-
-            call("PropertyType", void, RdProvidedType)
-            call("GetGetMethod", void, RdProvidedMethodInfo)
-            call("GetSetMethod", void, RdProvidedMethodInfo)
-            call("GetIndexParameters", void, array(RdProvidedParameterInfo))
         }
 
         RdProvidedParameterInfo = classdef {
@@ -220,6 +257,12 @@ object RdFSharpTypeProvidersLoaderModel : Root(
 
             call("ReturnType", void, RdProvidedType)
         }
+
+        field("RdTypeProviderProcessModel", RdTypeProviderProcessModel)
+        field("RdProvidedNamespaceProcessModel", RdProvidedNamespaceProcessModel)
+        field("RdProvidedTypeProcessModel", RdProvidedTypeProcessModel)
+        field("RdProvidedPropertyInfoProcessModel", RdProvidedPropertyInfoProcessModel)
+        field("RdProvidedMethodInfoProcessModel", RdProvidedMethodInfoProcessModel)
 
         call("InstantiateTypeProvidersOfAssembly", InstantiateTypeProvidersOfAssemblyParameters, array(RdTypeProvider))
     }

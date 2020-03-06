@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Lifetimes;
 using JetBrains.Rd.Tasks;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
 using Microsoft.FSharp.Core.CompilerServices;
 using static FSharp.Compiler.ExtensionTyping;
@@ -10,29 +10,29 @@ using static FSharp.Compiler.ExtensionTyping;
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
 {
   public class
-    ProvidedPropertyInfoManager : OutOfProcessProtocolManagerBase<ProvidedPropertyInfo, RdProvidedPropertyInfo>
+    ProvidedPropertyInfoHost : OutOfProcessProtocolHostBase<ProvidedPropertyInfo, RdProvidedPropertyInfo>
   {
-    private readonly IOutOfProcessProtocolManager<ProvidedParameterInfo, RdProvidedParameterInfo>
-      myProvidedParameterInfosManager;
+    private readonly IOutOfProcessProtocolHost<ProvidedParameterInfo, RdProvidedParameterInfo>
+      myProvidedParameterInfosHost;
 
-    private readonly IOutOfProcessProtocolManager<ProvidedMethodInfo, RdProvidedMethodInfo>
-      myProvidedMethodInfosManager;
+    private readonly IOutOfProcessProtocolHost<ProvidedMethodInfo, RdProvidedMethodInfo>
+      myProvidedMethodInfosHost;
 
-    private readonly IOutOfProcessProtocolManager<ProvidedType, RdProvidedType> myProvidedTypesManager;
+    private readonly IOutOfProcessProtocolHost<ProvidedType, RdProvidedType> myProvidedTypesHost;
 
-    public ProvidedPropertyInfoManager(
-      IOutOfProcessProtocolManager<ProvidedParameterInfo, RdProvidedParameterInfo>
-        providedParameterInfosManager,
-      IOutOfProcessProtocolManager<ProvidedType, RdProvidedType> providedTypesManager,
-      IOutOfProcessProtocolManager<ProvidedMethodInfo, RdProvidedMethodInfo> providedMethodInfosManager) : base(
+    public ProvidedPropertyInfoHost(
+      IOutOfProcessProtocolHost<ProvidedParameterInfo, RdProvidedParameterInfo>
+        providedParameterInfosHost,
+      IOutOfProcessProtocolHost<ProvidedType, RdProvidedType> providedTypesHost,
+      IOutOfProcessProtocolHost<ProvidedMethodInfo, RdProvidedMethodInfo> providedMethodInfosHost) : base(
       new ProvidedPropertyInfoEqualityComparer())
     {
-      myProvidedTypesManager = providedTypesManager;
-      myProvidedMethodInfosManager = providedMethodInfosManager;
-      myProvidedParameterInfosManager = providedParameterInfosManager;
+      myProvidedTypesHost = providedTypesHost;
+      myProvidedMethodInfosHost = providedMethodInfosHost;
+      myProvidedParameterInfosHost = providedParameterInfosHost;
     }
 
-    protected override RdProvidedPropertyInfo CreateProcessModel(
+    protected override RdProvidedPropertyInfo CreateRdModel(
       ProvidedPropertyInfo providedNativeModel,
       ITypeProvider providedModelOwner)
     {
@@ -42,7 +42,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
         providedNativeModel.Name);
 
       ppModel.PropertyType.Set((lifetime, _) => GetPropertyType(lifetime, providedNativeModel, providedModelOwner));
-      ppModel.DeclaringType.Set((lifetime, _) => GetDeclaringType(lifetime, providedNativeModel, providedModelOwner)); 
+      ppModel.DeclaringType.Set((lifetime, _) => GetDeclaringType(lifetime, providedNativeModel, providedModelOwner));
       ppModel.GetGetMethod.Set((lifetime, _) => GetGetMethod(lifetime, providedNativeModel, providedModelOwner));
       ppModel.GetSetMethod.Set((lifetime, _) => GetSetMethod(lifetime, providedNativeModel, providedModelOwner));
       ppModel.GetIndexParameters.Set((lifetime, _) =>
@@ -56,7 +56,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       ProvidedPropertyInfo providedNativeModel, 
       ITypeProvider providedModelOwner)
     {
-      var declaringType = myProvidedTypesManager.Register(providedNativeModel.DeclaringType, providedModelOwner);
+      var declaringType = myProvidedTypesHost.GetRdModel(providedNativeModel.DeclaringType, providedModelOwner);
       return RdTask<RdProvidedType>.Successful(declaringType);
     }
 
@@ -65,7 +65,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
     ProvidedPropertyInfo providedNativeModel, 
     ITypeProvider providedModelOwner)
     {
-      var propertyType = myProvidedTypesManager.Register(providedNativeModel.PropertyType, providedModelOwner);
+      var propertyType = myProvidedTypesHost.GetRdModel(providedNativeModel.PropertyType, providedModelOwner);
       return RdTask<RdProvidedType>.Successful(propertyType);
     }
 
@@ -76,7 +76,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
     {
       var indexParameters = providedNativeModel
         .GetIndexParameters()
-        .Select(t => myProvidedParameterInfosManager.Register(t, providedModelOwner))
+        .Select(t => myProvidedParameterInfosHost.GetRdModel(t, providedModelOwner))
         .ToArray();
       return RdTask<RdProvidedParameterInfo[]>.Successful(indexParameters);
     }
@@ -86,7 +86,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       ProvidedPropertyInfo providedNativeModel,
       ITypeProvider providedModelOwner)
     {
-      var setMethod = myProvidedMethodInfosManager.Register(providedNativeModel.GetSetMethod(), providedModelOwner);
+      var setMethod = myProvidedMethodInfosHost.GetRdModel(providedNativeModel.GetSetMethod(), providedModelOwner);
       return RdTask<RdProvidedMethodInfo>.Successful(setMethod);
     }
 
@@ -95,21 +95,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       ProvidedPropertyInfo providedNativeModel,
       ITypeProvider providedModelOwner)
     {
-      var getMethod = myProvidedMethodInfosManager.Register(providedNativeModel.GetGetMethod(), providedModelOwner);
+      var getMethod = myProvidedMethodInfosHost.GetRdModel(providedNativeModel.GetGetMethod(), providedModelOwner);
       return RdTask<RdProvidedMethodInfo>.Successful(getMethod);
-    }
-  }
-
-  internal class ProvidedPropertyInfoEqualityComparer : IEqualityComparer<ProvidedPropertyInfo>
-  {
-    public bool Equals(ProvidedPropertyInfo x, ProvidedPropertyInfo y)
-    {
-      return x.Name == y.Name;
-    }
-
-    public int GetHashCode(ProvidedPropertyInfo obj)
-    {
-      return obj.Name.GetHashCode();
     }
   }
 }

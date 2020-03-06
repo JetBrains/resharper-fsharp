@@ -25,7 +25,6 @@
     <Compile Include="src\ProjectModel\FSharpProjectModelUtil.fs" />
     <Compile Include="src\Shim\FileSystem\FSharpSourceCache.fs" />
     <Compile Include="src\Shim\FileSystem\AssemblyInfoShim.fs" />
-    <Compile Include="src\Shim\TypeProviders\OutOfProcessProxyTypeProvider.fs" />
     <Compile Include="src\Shim\TypeProviders\HackSupport.fs" />
     <Compile Include="src\Shim\TypeProviders\ExtensionTypingProviderShim.fs" />
     <Compile Include="src\Util\FSharpAttributesUtil.fs" />

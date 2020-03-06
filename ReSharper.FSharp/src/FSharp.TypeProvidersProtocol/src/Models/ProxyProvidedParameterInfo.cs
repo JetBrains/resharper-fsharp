@@ -9,22 +9,32 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
   public class ProxyProvidedParameterInfo : ProvidedParameterInfo
   {
     private readonly RdProvidedParameterInfo myParameterInfo;
-    private readonly ProvidedTypeContext myCtxt;
-
-    public ProxyProvidedParameterInfo(RdProvidedParameterInfo parameterInfo, ProvidedTypeContext ctxt) : base(
-      typeof(string).GetMethods().First().ReturnParameter, ctxt)
+    private readonly RdFSharpTypeProvidersLoaderModel myProcessModel;
+    private readonly ProvidedTypeContext myContext;
+    
+      public ProxyProvidedParameterInfo(
+        RdProvidedParameterInfo parameterInfo,
+        RdFSharpTypeProvidersLoaderModel processModel,
+        ProvidedTypeContext context) : base(
+      typeof(string).GetMethods().First().ReturnParameter, context)
     {
       myParameterInfo = parameterInfo;
-      myCtxt = ctxt;
+      myProcessModel = processModel;
+      myContext = context;
     }
 
-    [ContractAnnotation("null => null")]
-    public static ProxyProvidedParameterInfo CreateNoContext(RdProvidedParameterInfo parameter) =>
-      parameter == null ? null : new ProxyProvidedParameterInfo(parameter, ProvidedTypeContext.Empty);
+    [ContractAnnotation("parameter:null => null")]
+    public static ProxyProvidedParameterInfo CreateNoContext(
+      RdProvidedParameterInfo parameter,
+      RdFSharpTypeProvidersLoaderModel processModel) =>
+      parameter == null ? null : new ProxyProvidedParameterInfo(parameter, processModel, ProvidedTypeContext.Empty);
 
     [ContractAnnotation("parameter:null => null")]
-    public static ProxyProvidedParameterInfo Create(RdProvidedParameterInfo parameter, ProvidedTypeContext ctxt) =>
-      parameter == null ? null : new ProxyProvidedParameterInfo(parameter, ctxt);
+    public static ProxyProvidedParameterInfo Create(
+      RdProvidedParameterInfo parameter,
+      RdFSharpTypeProvidersLoaderModel processModel,
+      ProvidedTypeContext context) =>
+      parameter == null ? null : new ProxyProvidedParameterInfo(parameter, processModel, context);
 
     public override string Name => myParameterInfo.Name;
     public override bool IsIn => myParameterInfo.IsIn;
@@ -33,6 +43,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override bool HasDefaultValue => myParameterInfo.HasDefaultValue;
 
     public override ProvidedType ParameterType =>
-      ProxyProvidedType.Create(myParameterInfo.ParameterType.Sync(Unit.Instance), myCtxt);
+      ProxyProvidedType.Create(myParameterInfo.ParameterType.Sync(Unit.Instance), myProcessModel, myContext);
   }
 }

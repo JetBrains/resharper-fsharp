@@ -9,6 +9,7 @@ open FSharp.Compiler.AbstractIL.Internal.Library
 open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 open Microsoft.FSharp.Core.CompilerServices
 open System.Reflection
+open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol
 
 type JetBrains.Rider.FSharp.TypeProvidersProtocol.Client.RdVersion with
     [<Extension; CompiledName("ToSystemVersion")>]
@@ -60,11 +61,12 @@ type ILAssemblyRef with
 type ILScopeRef with
     [<Extension>]
     member this.toRdILScopeRef() =
-        RdILScopeRef(this.IsModuleRef,
+        (*RdILScopeRef(this.IsModuleRef,
                      this.IsAssemblyRef,
                      (if this.IsModuleRef then this.ModuleRef.toRdILModuleRef() else null),
                      (if this.IsAssemblyRef then this.AssemblyRef.toRdILAssemblyRef() else null),
-                     this.QualifiedName)
+                     this.QualifiedName) *)
+        null
         
 type ResolutionEnvironment with
     [<Extension>]
@@ -74,22 +76,6 @@ type ResolutionEnvironment with
                                 this.showResolutionMessages,
                                 this.referencedAssemblies,
                                 this.temporaryFolder)
-        
-type RdProvidedNamespace with
-    [<Extension>]
-    member this.toProvidedNamespace() =
-        { new IProxyProvidedNamespace with
-           member x.NamespaceName = this.NamespaceName
-           member x.GetNestedNamespaces() = this.GetNestedNamespaces.Sync(JetBrains.Core.Unit.Instance) |> Array.map(fun x -> x.toProvidedNamespace())
-           member x.GetTypes() = [||]
-           member x.GetRdTypes() = this.GetTypes.Sync(JetBrains.Core.Unit.Instance)
-           member x.ResolveTypeName(typeName) = this.GetType()
-           member x.ResolveRdTypeName(typeName: string) = this.ResolveTypeName.Sync(typeName) } :> _
-        
-type IProvidedNamespace with
-    [<Extension; CompiledName("ToRdProvidedNamespace")>]
-    member this.toRdProvidedNamespace() =
-        JetBrains.Rider.FSharp.TypeProvidersProtocol.Client.RdProvidedNamespace(this.NamespaceName)
       
 let bindAll = BindingFlags.DeclaredOnly ||| BindingFlags.Public ||| BindingFlags.NonPublic ||| BindingFlags.Static ||| BindingFlags.Instance
 

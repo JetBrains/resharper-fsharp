@@ -19,18 +19,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
     OutOfProcessTypeProvidersLoaderEndPoint : ProtocolEndPoint<RdFSharpTypeProvidersLoaderModel, TypeProviderExternal>
   {
     private readonly ITypeProvidersLoader myLoader;
-    private readonly IOutOfProcessProtocolManager<ITypeProvider, RdTypeProvider> myTypeProvidersManager;
+    private readonly IOutOfProcessProtocolHost<ITypeProvider, RdTypeProvider> myTypeProvidersHost;
     private TypeProviderExternal myDispatcher;
 
     protected override string ProtocolName { get; } = "Out-of-Process Type Provider";
 
     public OutOfProcessTypeProvidersLoaderEndPoint(string parentProcessPidEnvVariable,
       ITypeProvidersLoader loader,
-      IOutOfProcessProtocolManager<ITypeProvider, RdTypeProvider> typeProvidersManager) :
+      IOutOfProcessProtocolHost<ITypeProvider, RdTypeProvider> typeProvidersHost) :
       base(parentProcessPidEnvVariable)
     {
       myLoader = loader;
-      myTypeProvidersManager = typeProvidersManager;
+      myTypeProvidersHost = typeProvidersHost;
     }
 
     protected override TypeProviderExternal InitDispatcher(Lifetime lifetime, ILogger logger)
@@ -63,7 +63,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       InstantiateTypeProvidersOfAssemblyParameters @params)
     {
       var instantiateResults = myLoader.InstantiateTypeProvidersOfAssembly(@params)
-        .Select(t => myTypeProvidersManager.Register(t, t))
+        .Select(t => myTypeProvidersHost.GetRdModel(t, t))
         .ToArray();
       return RdTask<RdTypeProvider[]>.Successful(instantiateResults);
     }

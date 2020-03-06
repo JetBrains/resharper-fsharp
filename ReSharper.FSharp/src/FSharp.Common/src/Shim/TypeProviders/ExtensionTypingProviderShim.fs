@@ -1,6 +1,7 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders
 
 open System
+open System.Collections.Generic
 open FSharp.Compiler
 open System.IO
 open FSharp.Compiler.AbstractIL.IL
@@ -123,6 +124,7 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
         ()
         
     let onFailed() = ()
+    let typeProvidersCache: IDictionary<string, ITypeProvider list> = Dictionary<string, ITypeProvider list>() :> _
     
     interface IExtensionTypingProvider with
         member this.InstantiateTypeProvidersOfAssembly
@@ -134,19 +136,24 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
                      isInteractive: bool, 
                      systemRuntimeContainsType: string -> bool, //не забыть
                      systemRuntimeAssemblyVersion: System.Version,
+                     compilerToolsPath: string list,
                      m: range) =
             
             if ourModel = null then 
                 let typeProvidersLoader = typeProvidersLoadersFactory.Create(lifetime)
                 typeProvidersLoader.RunAsync(Action<_, _>(onInitialized), Action(onFailed))
            
-            let fakeTcImports = getFakeTcImports(systemRuntimeContainsType)
+            let typeProviders = 
+                if typeProvidersCache.ContainsKey(designTimeAssemblyNameString) then
+                    typeProvidersCache.[designTimeAssemblyNameString]
+                else 
+            
+                let fakeTcImports = getFakeTcImports(systemRuntimeContainsType)
             
             //TODO: need to secure lifetime 
-            let rdSystemRuntimeContainsType = RdSystemRuntimeContainsType(SystemRuntimeContainsTypeRef(Value(fakeTcImports)))
-            //rdSystemRuntimeContainsType.SystemRuntimeContainsTypeRef.Value.ConSystemRuntimeContainsType.Set(fun a b -> RdTask.Successful(systemRuntimeContainsType b))
+                let rdSystemRuntimeContainsType = RdSystemRuntimeContainsType(SystemRuntimeContainsTypeRef(Value(fakeTcImports)))
+                //rdSystemRuntimeContainsType.SystemRuntimeContainsTypeRef.Value.ConSystemRuntimeContainsType.Set(fun a b -> RdTask.Successful(systemRuntimeContainsType b))
             
-            let providerSpecs = 
                 try
                     let designTimeAssemblyName = 
                         try
@@ -158,12 +165,13 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
                             errorR(Error(FCSTypeProviderErrors.etInvalidTypeProviderAssemblyName(runTimeAssemblyFileName, designTimeAssemblyNameString), m))
                             None
 
-                    [ match designTimeAssemblyName, resolutionEnvironment.outputFile with
-                      | Some designTimeAssemblyName, Some path when String.Compare(designTimeAssemblyName.Name,
-                                                                                   Path.GetFileNameWithoutExtension path,
-                                                                                   StringComparison.OrdinalIgnoreCase) = 0 -> ()
-                      | Some _, _ ->
-                          let res = ourModel.InstantiateTypeProvidersOfAssembly.Sync(InstantiateTypeProvidersOfAssemblyParameters(
+                    let newTypeProviders = 
+                        [ match designTimeAssemblyName, resolutionEnvironment.outputFile with
+                            | Some designTimeAssemblyName, Some path when String.Compare(designTimeAssemblyName.Name,
+                                                                                         Path.GetFileNameWithoutExtension path,
+                                                                                         StringComparison.OrdinalIgnoreCase) = 0 -> ()
+                            | Some _, _ ->
+                            let res = ourModel.InstantiateTypeProvidersOfAssembly.Sync(InstantiateTypeProvidersOfAssemblyParameters(
                                                                                                                                   runTimeAssemblyFileName,
                                                                                                                                   ilScopeRefOfRuntimeAssembly.toRdILScopeRef(),
                                                                                                                                   designTimeAssemblyNameString, 
@@ -171,25 +179,30 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
                                                                                                                                   isInvalidationSupported, 
                                                                                                                                   isInteractive, 
                                                                                                                                   systemRuntimeAssemblyVersion.toRdVersion(),
+                                                                                                                                  compilerToolsPath |> Array.ofList,
                                                                                                                                   rdSystemRuntimeContainsType))
-                          for tp in res
-                            -> (new TypeProviderWithCache(new OutOfProcessProxyTypeProvider(tp)) :> ITypeProvider, ilScopeRefOfRuntimeAssembly)
-                      |   None, _ -> () ]
+                            for tp in res
+                                -> new TypeProviderWithCache(new ProxyTypeProvider(tp, ourModel)) :> ITypeProvider
+                            |   None, _ -> () ]
+                    
+                    typeProvidersCache.Add(designTimeAssemblyNameString, newTypeProviders)
+                    newTypeProviders
 
                 with :? TypeProviderError as tpe ->
                     tpe.Iter(fun e -> errorR(NumberedError((e.Number, e.ContextualErrorMessage), m)) )                        
                     [] //local try catch
                     
-            let providers = Tainted<_>.CreateAll providerSpecs
-            providers
+            let providerSpecs = typeProviders |> List.map (fun t -> (t, ilScopeRefOfRuntimeAssembly))
+            let taintedProviders = Tainted<_>.CreateAll providerSpecs
+            taintedProviders
             
         member this.GetProvidedTypes(pn: Tainted<IProvidedNamespace>, m: range) =
             let types = pn.PApplyArray((fun r -> r.As<IProxyProvidedNamespace>().GetRdTypes()), "GetTypes", m)
-            let providedTypes = [| for t in types -> t.PApply((fun ty -> (ty |> ProxyProvidedType.CreateNoContext).WithCache() :> ProvidedType), m) |]
+            let providedTypes = [| for t in types -> t.PApply((fun ty -> (ProxyProvidedType.CreateNoContext(ty, ourModel)).WithCache()), m) |]
             providedTypes
             
         member this.ResolveTypeName(pn: Tainted<IProvidedNamespace>, typeName: string, m: range) =
-            pn.PApply((fun providedNamespace -> ProxyProvidedType.CreateNoContext(providedNamespace.As<IProxyProvidedNamespace>().ResolveRdTypeName typeName).WithCache() :> _), range=m) 
+            pn.PApply((fun providedNamespace -> ProxyProvidedType.CreateNoContext(providedNamespace.As<IProxyProvidedNamespace>().ResolveRdTypeName typeName, ourModel).WithCache()), range=m) 
 
             
     interface IDisposable with

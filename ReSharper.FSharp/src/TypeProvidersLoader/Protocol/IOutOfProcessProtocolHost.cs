@@ -4,8 +4,8 @@ using Microsoft.FSharp.Core.CompilerServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
 {
-  public interface IOutOfProcessProtocolManager<in T, out TU> where TU : RdBindableBase
+  public interface IOutOfProcessProtocolHost<in T, out TU> where TU : RdBindableBase
   {
-    TU Register([CanBeNull] T providedNativeModel, [NotNull] ITypeProvider providedModelOwner);
+    TU GetRdModel([CanBeNull] T providedNativeModel, [NotNull] ITypeProvider providedModelOwner);
   }
 }
