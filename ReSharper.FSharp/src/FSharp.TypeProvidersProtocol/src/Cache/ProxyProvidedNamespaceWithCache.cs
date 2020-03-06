@@ -22,7 +22,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache
 
     public IProvidedNamespace[] GetNestedNamespaces() => myNestedNamespaces.Value;
 
-    public RdProvidedType[] GetRdTypes() => myRdTypes.Value;
+    public ProvidedType[] GetRdTypes() => myRdTypes.Value;
 
     public RdProvidedType ResolveRdTypeName(string typeName)
     {

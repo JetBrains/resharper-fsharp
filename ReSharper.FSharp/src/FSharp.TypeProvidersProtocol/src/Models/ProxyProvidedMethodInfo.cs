@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
 using static FSharp.Compiler.ExtensionTyping;
 
@@ -10,34 +11,35 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     private readonly RdProvidedMethodInfo myMethodInfo;
     private readonly RdFSharpTypeProvidersLoaderModel myProcessModel;
     private readonly ProvidedTypeContext myContext;
+    private readonly ITypeProviderCache myCache;
     private int EntityId => myMethodInfo.EntityId;
 
     private RdProvidedMethodInfoProcessModel RdProvidedMethodInfoProcessModel =>
       myProcessModel.RdProvidedMethodInfoProcessModel;
 
-    private ProxyProvidedMethodInfo(
-      RdProvidedMethodInfo methodInfo,
-      RdFSharpTypeProvidersLoaderModel processModel,
-      ProvidedTypeContext context) : base(
+    private ProxyProvidedMethodInfo(RdProvidedMethodInfo methodInfo, RdFSharpTypeProvidersLoaderModel processModel,
+      ProvidedTypeContext context, ITypeProviderCache cache) : base(
       typeof(string).GetMethods().First(),
       ProvidedTypeContext.Empty)
     {
       myMethodInfo = methodInfo;
       myProcessModel = processModel;
       myContext = context;
+      myCache = cache;
     }
 
     [ContractAnnotation("methodInfo:null => null")]
-    public static ProxyProvidedMethodInfo CreateNoContext(
-      RdProvidedMethodInfo methodInfo,
-      RdFSharpTypeProvidersLoaderModel processModel) =>
-      methodInfo == null ? null : new ProxyProvidedMethodInfo(methodInfo, processModel, ProvidedTypeContext.Empty);
+    public static ProxyProvidedMethodInfo CreateNoContext(RdProvidedMethodInfo methodInfo,
+      RdFSharpTypeProvidersLoaderModel processModel, ITypeProviderCache cache) =>
+      methodInfo == null
+        ? null
+        : new ProxyProvidedMethodInfo(methodInfo, processModel, ProvidedTypeContext.Empty, cache);
 
     [ContractAnnotation("methodInfo:null => null")]
     public static ProxyProvidedMethodInfo Create(
       RdProvidedMethodInfo methodInfo,
-      RdFSharpTypeProvidersLoaderModel processModel, ProvidedTypeContext context) =>
-      methodInfo == null ? null : new ProxyProvidedMethodInfo(methodInfo, processModel, context);
+      RdFSharpTypeProvidersLoaderModel processModel, ProvidedTypeContext context, ITypeProviderCache cache) =>
+      methodInfo == null ? null : new ProxyProvidedMethodInfo(methodInfo, processModel, context, cache);
 
     public override string Name => myMethodInfo.Name;
     public override bool IsAbstract => myMethodInfo.IsAbstract;
@@ -54,26 +56,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override bool IsHideBySig => myMethodInfo.IsHideBySig;
 
     public override ProvidedType DeclaringType =>
-      ProxyProvidedType.Create(
-        RdProvidedMethodInfoProcessModel.DeclaringType.Sync(EntityId),
-        myProcessModel,
+      myCache.GetOrCreateWithContextProvidedType(RdProvidedMethodInfoProcessModel.DeclaringType.Sync(EntityId),
         myContext);
 
     public override ProvidedType ReturnType =>
-      ProxyProvidedType.Create(RdProvidedMethodInfoProcessModel.ReturnType.Sync(EntityId), myProcessModel, myContext);
+      myCache.GetOrCreateWithContextProvidedType(RdProvidedMethodInfoProcessModel.ReturnType.Sync(EntityId), myContext);
 
     public override ProvidedParameterInfo[] GetParameters() =>
       // ReSharper disable once CoVariantArrayConversion
       RdProvidedMethodInfoProcessModel.GetParameters
         .Sync(EntityId)
-        .Select(t => ProxyProvidedParameterInfo.Create(t, myProcessModel, myContext))
+        .Select(t => ProxyProvidedParameterInfo.Create(t, myProcessModel, myContext, myCache))
         .ToArray();
 
     public override ProvidedType[] GetGenericArguments() =>
       // ReSharper disable once CoVariantArrayConversion
       RdProvidedMethodInfoProcessModel.GetGenericArguments
         .Sync(EntityId)
-        .Select(t => ProxyProvidedType.Create(t, myProcessModel, myContext))
+        .Select(t => myCache.GetOrCreateWithContextProvidedType(t, myContext))
         .ToArray();
   }
 }

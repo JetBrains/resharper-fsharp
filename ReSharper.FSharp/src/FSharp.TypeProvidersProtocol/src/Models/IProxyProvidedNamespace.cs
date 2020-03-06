@@ -1,11 +1,11 @@
-﻿using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
-using Microsoft.FSharp.Core.CompilerServices;
+﻿using Microsoft.FSharp.Core.CompilerServices;
+using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 {
   public interface IProxyProvidedNamespace : IProvidedNamespace
   {
-    RdProvidedType[] GetRdTypes();
-    RdProvidedType ResolveRdTypeName(string typeName);
+    ProvidedType[] GetProvidedTypes();
+    ProvidedType ResolveProvidedTypeName(string typeName);
   }
 }

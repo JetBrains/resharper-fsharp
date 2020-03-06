@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models;
+using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
 using Microsoft.FSharp.Core.CompilerServices;
 using Microsoft.FSharp.Quotations;
 
@@ -9,12 +12,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache
   public class TypeProviderWithCache : ITypeProvider
   {
     private readonly ITypeProvider myTypeProvider;
+    private readonly RdFSharpTypeProvidersLoaderModel myProcessModel;
     private Lazy<IProvidedNamespace[]> myProvidedNamespaces;
     private Dictionary<string, byte[]> myGeneratedAssemblyContents;
+    private ITypeProviderCache myTypeProviderCache;
 
-    public TypeProviderWithCache(ITypeProvider typeProvider)
+    public TypeProviderWithCache(ITypeProvider typeProvider, RdFSharpTypeProvidersLoaderModel processModel)
     {
       myTypeProvider = typeProvider;
+      myProcessModel = processModel;
       myTypeProvider.Invalidate += TypeProviderOnInvalidate;
       InitCaches();
     }
@@ -61,7 +67,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache
 
     private void InitCaches()
     {
-      myProvidedNamespaces = new Lazy<IProvidedNamespace[]>(() => myTypeProvider.GetNamespaces());
+      myTypeProviderCache = new TypeProviderCache(myTypeProvider, myProcessModel);
+      myProvidedNamespaces = new Lazy<IProvidedNamespace[]>(() =>
+        myTypeProvider.GetNamespaces()
+          .Select(t => new ProxyProvidedNamespace(t, myProcessModel, myTypeProviderCache)));
       myGeneratedAssemblyContents = new Dictionary<string, byte[]>();
     }
 

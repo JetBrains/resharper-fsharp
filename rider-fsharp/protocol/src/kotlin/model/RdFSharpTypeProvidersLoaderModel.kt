@@ -55,11 +55,11 @@ object RdFSharpTypeProvidersLoaderModel : Root(
 
     private val RdProvidedNamespaceProcessModel = aggregatedef("RdProvidedNamespaceProcessModel") {
         call("GetNestedNamespaces", int, array(RdProvidedNamespace))
-        call("GetTypes", int, array(RdProvidedType))
+        call("GetTypes", int, array(int))
         call("ResolveTypeName", structdef("ResolveTypeNameArgs") {
             field("Id", int)
             field("TypeFullName", string)
-        }, RdProvidedType)
+        }, int)
     }
 
     private val RdProvidedNamespace = classdef {
@@ -71,6 +71,10 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         //sink("invalidate", void).async
         call("GetNamespaces", int, array(RdProvidedNamespace))
         call("GetInvokerExpression", GetInvokerExpressionParameters, string)
+        call("GetProvidedType", structdef("GetProvidedTypeArgs") {
+            field("ProviderId", int)
+            field("ProvidedTypeId", int)
+        }, RdProvidedType)
         call("Dispose", int, void)
     }
 
@@ -166,19 +170,19 @@ object RdFSharpTypeProvidersLoaderModel : Root(
     }
 
     private val RdProvidedTypeProcessModel = aggregatedef("RdProvidedTypeProcessModel") {
-        call("BaseType", int, RdProvidedType.nullable)
+        call("BaseType", int, int.nullable)
         call("GetNestedType", structdef("GetNestedTypeArgs") {
             field("Id", int)
             field("TypeName", string)
-        }, RdProvidedType)
-        call("GetNestedTypes", int, array(RdProvidedType))
-        call("GetAllNestedTypes", int, array(RdProvidedType))
-        call("GetInterfaces", int, array(RdProvidedType))
-        call("GetGenericTypeDefinition", int, RdProvidedType)
-        call("GetElementType", int, RdProvidedType)
-        call("GetGenericArguments", int, array(RdProvidedType))
+        }, int)
+        call("GetNestedTypes", int, array(int))
+        call("GetAllNestedTypes", int, array(int))
+        call("GetInterfaces", int, array(int))
+        call("GetGenericTypeDefinition", int, int)
+        call("GetElementType", int, int)
+        call("GetGenericArguments", int, array(int))
         call("GetArrayRank", int, int)
-        call("GetEnumUnderlyingType", int, RdProvidedType.nullable)
+        call("GetEnumUnderlyingType", int, int.nullable)
         call("GetProperties", int, array(RdProvidedPropertyInfo))
         call("GetProperty", structdef("GetPropertyArgs") {
             field("Id", int)
@@ -188,14 +192,14 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         call("GetStaticParameters", int, array(RdProvidedParameterInfo))
         //call("ApplyStaticArguments", ApplyStaticArgumentsParameters, this)
         call("GetMethods", int, array(RdProvidedMethodInfo))
-        call("DeclaringType", int, RdProvidedType.nullable)
+        call("DeclaringType", int, int.nullable)
     }
 
     private val RdProvidedMethodInfoProcessModel = aggregatedef("RdProvidedMethodInfoProcessModel") {
-        call("DeclaringType", int, RdProvidedType.nullable)
-        call("ReturnType", int, RdProvidedType)
+        call("DeclaringType", int, int.nullable)
+        call("ReturnType", int, int)
         call("GetParameters", int, array(RdProvidedParameterInfo))
-        call("GetGenericArguments", int, array(RdProvidedType))
+        call("GetGenericArguments", int, array(int))
     }
 
     private val InstantiationResult = structdef {
@@ -204,8 +208,8 @@ object RdFSharpTypeProvidersLoaderModel : Root(
     }
 
     private val RdProvidedPropertyInfoProcessModel = aggregatedef("RdProvidedPropertyInfoProcessModel") {
-        call("DeclaringType", int, RdProvidedType.nullable)
-        call("PropertyType", int, RdProvidedType)
+        call("DeclaringType", int, int.nullable)
+        call("PropertyType", int, int)
         call("GetGetMethod", int, RdProvidedMethodInfo)
         call("GetSetMethod", int, RdProvidedMethodInfo)
         call("GetIndexParameters", int, array(RdProvidedParameterInfo))
@@ -249,13 +253,13 @@ object RdFSharpTypeProvidersLoaderModel : Root(
             //field("RawDefaultValue : obj
             field("HasDefaultValue", bool)
 
-            call("ParameterType", void, RdProvidedType)
+            call("ParameterType", void, int)
         }
 
         RdProvidedMethodInfo = classdef extends RdProvidedMethodBase {
             field("MetadataToken", int)
 
-            call("ReturnType", void, RdProvidedType)
+            call("ReturnType", void, int)
         }
 
         field("RdTypeProviderProcessModel", RdTypeProviderProcessModel)

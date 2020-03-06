@@ -25,12 +25,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
     protected override string ProtocolName { get; } = "Out-of-Process Type Provider";
 
     public OutOfProcessTypeProvidersLoaderEndPoint(string parentProcessPidEnvVariable,
-      ITypeProvidersLoader loader,
-      IOutOfProcessProtocolHost<ITypeProvider, RdTypeProvider> typeProvidersHost) :
+      ITypeProvidersLoader loader) :
       base(parentProcessPidEnvVariable)
     {
       myLoader = loader;
-      myTypeProvidersHost = typeProvidersHost;
     }
 
     protected override TypeProviderExternal InitDispatcher(Lifetime lifetime, ILogger logger)
