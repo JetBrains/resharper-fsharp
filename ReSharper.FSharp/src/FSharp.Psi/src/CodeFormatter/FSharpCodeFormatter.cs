@@ -18,16 +18,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
   [Language(typeof(FSharpLanguage))]
   public class FSharpCodeFormatter : CodeFormatterBase<FSharpFormatSettingsKey>
   {
-    private readonly FSharpFormatterInfoProvider formatterInfoProvider;
+    private readonly FSharpFormatterInfoProvider myFormatterInfoProvider;
 
-    private readonly ConcurrentDictionary<FormatterImplHelper.TokenTypePair, bool> glueingCache =
+    private readonly ConcurrentDictionary<FormatterImplHelper.TokenTypePair, bool> myGluingCache =
       new ConcurrentDictionary<FormatterImplHelper.TokenTypePair, bool>();
 
     public FSharpCodeFormatter(FSharpLanguage language, CodeFormatterRequirements requirements,
-      FSharpFormatterInfoProvider formatterInfoProvider)
-      : base(language, requirements)
+      FSharpFormatterInfoProvider formatterInfoProvider) : base(language, requirements)
     {
-      this.formatterInfoProvider = formatterInfoProvider;
+      myFormatterInfoProvider = formatterInfoProvider;
     }
 
     protected override CodeFormattingContext CreateFormatterContext(CodeFormatProfile profile, ITreeNode firstNode,
@@ -37,20 +36,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         FormatterLoggerProvider.FormatterLogger, parameters);
     }
 
-    public override MinimalSeparatorType GetMinimalSeparatorByNodeTypes(TokenNodeType leftTokenType, TokenNodeType rightTokenType)
+    public override MinimalSeparatorType GetMinimalSeparatorByNodeTypes(TokenNodeType leftTokenType,
+      TokenNodeType rightTokenType)
     {
-      if (!(leftTokenType is FSharpTokenType.FSharpTokenNodeType) || !(rightTokenType is FSharpTokenType.FSharpTokenNodeType))
+      if (!(leftTokenType is FSharpTokenType.FSharpTokenNodeType) ||
+          !(rightTokenType is FSharpTokenType.FSharpTokenNodeType))
         return MinimalSeparatorType.NotRequired;
 
       if (leftTokenType.IsWhitespace || rightTokenType.IsWhitespace)
         return MinimalSeparatorType.NotRequired;
 
-      if (glueingCache.GetOrAdd(new FormatterImplHelper.TokenTypePair(leftTokenType, rightTokenType), AreTokensGlued))
-      {
+      if (myGluingCache.GetOrAdd(new FormatterImplHelper.TokenTypePair(leftTokenType, rightTokenType), AreTokensGlued))
         return leftTokenType == FSharpTokenType.LINE_COMMENT
           ? MinimalSeparatorType.NewLine
           : MinimalSeparatorType.Space;
-      }
 
       return MinimalSeparatorType.NotRequired;
     }
@@ -77,7 +76,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
       var formatterSettings = GetFormattingSettings(task.FirstElement, parameters);
 
-      DoDeclarativeFormat(formatterSettings, formatterInfoProvider, null, new[] {task},
+      DoDeclarativeFormat(formatterSettings, myFormatterInfoProvider, null, new[] {task},
         parameters, null, null, null, false);
 
       return new TreeRange(firstElement, lastElement);
