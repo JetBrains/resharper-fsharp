@@ -1,0 +1,2 @@
+﻿{caret}if false &&
+   false then "a" else "b"

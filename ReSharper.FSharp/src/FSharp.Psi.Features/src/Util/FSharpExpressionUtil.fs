@@ -54,6 +54,7 @@ let rec createLogicallyNegatedExpression (expr: ISynExpr): ISynExpr =
     if isNull expr then null else
 
     let expr = expr.IgnoreInnerParens()
+    let lineEnding = expr.GetLineEnding()
     let factory = expr.CreateElementFactory()
 
     let mutable arg = Unchecked.defaultof<_>
@@ -64,12 +65,22 @@ let rec createLogicallyNegatedExpression (expr: ISynExpr): ISynExpr =
     if isPredefinedInfixOpApp "||" binaryApp then
         let arg1 = createLogicallyNegatedExpression binaryApp.LeftArgument
         let arg2 = createLogicallyNegatedExpression binaryApp.RightArgument
-        factory.CreateBinaryAppExpr("&&", arg1, arg2) else
+
+        let newBinaryApp = factory.CreateBinaryAppExpr("&&", arg1, arg2) :?> IBinaryAppExpr
+        if binaryApp.LeftArgument.EndLine <> binaryApp.RightArgument.StartLine then
+            moveToNewLine lineEnding binaryApp.LeftArgument.Indent newBinaryApp.RightArgument
+
+        newBinaryApp :> _ else
 
     if isPredefinedInfixOpApp "&&" binaryApp then
         let arg1 = createLogicallyNegatedExpression binaryApp.LeftArgument
         let arg2 = createLogicallyNegatedExpression binaryApp.RightArgument
-        factory.CreateBinaryAppExpr("||", arg1, arg2) else
+
+        let newBinaryApp = factory.CreateBinaryAppExpr("||", arg1, arg2) :?> IBinaryAppExpr
+        if binaryApp.LeftArgument.EndLine <> binaryApp.RightArgument.StartLine then
+            moveToNewLine lineEnding binaryApp.LeftArgument.Indent newBinaryApp.RightArgument
+
+        newBinaryApp :> _ else
 
     let literalExpr = expr.As<ILiteralExpr>()
     let literalTokenType = if isNotNull literalExpr then getTokenType literalExpr.Literal else null

@@ -13,6 +13,7 @@ type NegateIfConditionTest() =
     override x.ExtraPath = "negateCondition"
 
     [<Test>] member x.``If 01``() = x.DoNamedTest()
+    [<Test>] member x.``If 02 - Separate lines``() = x.DoNamedTest()
 
 [<FSharpTest; TestPackages("FSharp.Core")>]
 type NegateWhileConditionTest() =

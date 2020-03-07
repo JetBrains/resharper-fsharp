@@ -289,6 +289,16 @@ module PsiModificationUtil =
         nodes |> List.rev |> List.fold (fun anchor treeNode ->
             ModificationUtil.AddChildBefore(anchor, treeNode)) anchor
 
+    let moveToNewLine lineEnding (indent: int) (node: ITreeNode) =
+        let prevSibling = node.PrevSibling
+        if isInlineSpace prevSibling then
+            ModificationUtil.DeleteChild(prevSibling)
+
+        addNodesBefore node [
+            NewLine(lineEnding)
+            Whitespace(indent)
+        ] |> ignore
+
 let getPrevNodeOfType nodeType (node: ITreeNode) =
     let mutable prev = node.PrevSibling
     while prev.NodeType != nodeType do
