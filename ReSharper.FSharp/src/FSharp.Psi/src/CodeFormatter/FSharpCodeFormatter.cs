@@ -70,8 +70,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
       if (task.FirstElement == null)
         return new TreeRange(firstElement, lastElement);
 
-      var solution = task.FirstElement.GetSolution();
-      if (!solution.RdFSharpModel().EnableExperimentalFeaturesSafe())
+      if (!firstElement.FSharpExperimentalFeaturesEnabled())
         return new TreeRange(firstElement, lastElement);
 
       var formatterSettings = GetFormattingSettings(task.FirstElement, parameters);

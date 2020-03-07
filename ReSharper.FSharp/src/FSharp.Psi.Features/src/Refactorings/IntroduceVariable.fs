@@ -79,8 +79,6 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
             let range = TreeRange(parent)
             {| ReplaceRange = range; InRange = range; AddNewLine = true |}
 
-    static member val TaggedByQuickFixKey = Key("")
-
     override x.Process(data) =
         let expr = data.SourceExpression.As<ISynExpr>()
         let parentExpr = data.Usages.FindLCA().As<ISynExpr>()
@@ -88,7 +86,6 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let names = getNames expr
         let name = if names.Count > 0 then names.[0] else "x"
 
-        expr.UserData.RemoveKey(FSharpIntroduceVariable.TaggedByQuickFixKey)
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
@@ -149,8 +146,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let actionManager = Shell.Instance.GetComponent<IActionManager>()
         let dataContext = actionManager.DataContexts.CreateWithDataRules(lifetime.Lifetime, rules)
 
-        expr.UserData.PutKey(FSharpIntroduceVariable.TaggedByQuickFixKey)
-        let workflow = IntroduceVarFixWorkflow(solution)
+        let workflow = IntroduceVariableWorkflow(solution, null)
         RefactoringActionUtil.ExecuteRefactoring(dataContext, workflow)
 
     static member CanIntroduceVar(expr: ISynExpr) =
@@ -163,30 +159,14 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         nextMeaningfulSibling :? ISynExpr && nextMeaningfulSibling.Indent = expr.Indent
 
 
-and IntroduceVarFixWorkflow(solution) =
-    inherit IntroduceVariableWorkflow(solution, null)
-
-
 type FSharpIntroduceVarHelper() =
     inherit IntroduceVariableHelper()
-
-    let isTaggedNode (expr: ITreeNode) =
-        expr.UserData.HasKey(FSharpIntroduceVariable.TaggedByQuickFixKey)
-
-    let isInsideTaggedNode (expr: ITreeNode) =
-        isNotNull (expr.GetContainingNode<ISynExpr>(System.Predicate<_>(isTaggedNode), false))
 
     override x.IsLanguageSupported = true
 
     override x.CheckAvailability(node) =
-        if isTaggedNode node then true else
+        if not (node.FSharpExperimentalFeaturesEnabled()) then false else
 
-        // Skip inner expressions in quick fix by now.
-        if isInsideTaggedNode node then false else
+        node.IsSingleLine // todo: change to something meaningful. :)
 
-        // todo: change to something meaningful. :)
-        node.IsSingleLine && node.GetSolution().RdFSharpModel().EnableExperimentalFeaturesSafe()
-
-    override x.CheckOccurrence(expr, occurrence) =
-        if isTaggedNode occurrence then true else
-        expr.GetSolution().RdFSharpModel().EnableExperimentalFeaturesSafe()
+    override x.CheckOccurrence(expr, occurrence) = true

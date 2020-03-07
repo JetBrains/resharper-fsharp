@@ -1,8 +1,10 @@
 namespace global
 
 open System
+open JetBrains.Annotations
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Host.Features
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Rider.Model
 
 module FSharpRegistryUtil =
@@ -22,15 +24,21 @@ module FSharpRegistryUtil =
 
 [<AbstractClass; Sealed; Extension>]
 type ProtocolSolutionExtensions =
-    [<Extension>]
+    [<Extension; CanBeNull>]
     static member RdFSharpModel(solution: ISolution) =
         try solution.GetProtocolSolution().GetRdFSharpModel()
         with _ -> null
 
+[<AbstractClass; Sealed; Extension>]
+type FSharpExperimentalFeaturesEx =
     [<Extension>]
-    static member EnableExperimentalFeaturesSafe(rdFSharpModel: RdFSharpModel) =
+    static member FSharpExperimentalFeaturesEnabled(solution: ISolution) =
         if FSharpRegistryUtil.AllowExperimentalFeaturesCookie.Enabled then true else
 
-        match rdFSharpModel with
+        match solution.RdFSharpModel() with
         | null -> false
         | fsModel -> fsModel.EnableExperimentalFeatures.Value
+
+    [<Extension>]
+    static member FSharpExperimentalFeaturesEnabled(node: ITreeNode) =
+        FSharpExperimentalFeaturesEx.FSharpExperimentalFeaturesEnabled(node.GetSolution())
