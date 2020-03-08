@@ -85,7 +85,7 @@
     <Compile Include="src\Parsing\FSharpParser.fs" />
     <Compile Include="src\Refactorings\FSharpNamingService.fs" />
     <Compile Include="src\Refactorings\Rename.fs" />
-    <Compile Include="src\Refactorings\FSharpIntroduceVarHelper.fs" />
+    <Compile Include="src\Refactorings\IntroduceVariable.fs" />
     <Compile Include="src\Refactorings\FSharpRefactoringLanguageService.fs" />
     <Compile Include="src\Intentions\DataProviders.fs" />
     <Compile Include="src\Intentions\FSharpContextActionBase.fs" />
