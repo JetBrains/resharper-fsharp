@@ -70,7 +70,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
       if (task.FirstElement == null)
         return new TreeRange(firstElement, lastElement);
 
-      if (!firstElement.FSharpExperimentalFeaturesEnabled())
+      if (!firstElement.FSharpFormatterEnabled())
         return new TreeRange(firstElement, lastElement);
 
       var formatterSettings = GetFormattingSettings(task.FirstElement, parameters);

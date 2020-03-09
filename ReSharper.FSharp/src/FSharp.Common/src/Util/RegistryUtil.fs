@@ -8,12 +8,13 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Rider.Model
 
 module FSharpRegistryUtil =
-    type AllowExperimentalFeaturesCookie() =
+    [<AbstractClass>]
+    type EnabledCookieBase<'T when 'T :> EnabledCookieBase<'T> and 'T : (new : unit -> 'T)>() =
         static let mutable enabled = false
 
         static member Create() =
             enabled <- true
-            new AllowExperimentalFeaturesCookie()
+            new 'T()
 
         static member Enabled = enabled
 
@@ -21,6 +22,8 @@ module FSharpRegistryUtil =
             member _.Dispose() =
                 enabled <- false
 
+    type AllowExperimentalFeaturesCookie() = inherit EnabledCookieBase<AllowExperimentalFeaturesCookie>()
+    type AllowFormatterCookie() = inherit EnabledCookieBase<AllowFormatterCookie>()
 
 [<AbstractClass; Sealed; Extension>]
 type ProtocolSolutionExtensions =
@@ -42,3 +45,15 @@ type FSharpExperimentalFeaturesEx =
     [<Extension>]
     static member FSharpExperimentalFeaturesEnabled(node: ITreeNode) =
         FSharpExperimentalFeaturesEx.FSharpExperimentalFeaturesEnabled(node.GetSolution())
+
+    [<Extension>]
+    static member FSharpFormatterEnabled(solution: ISolution) =
+        if FSharpRegistryUtil.AllowFormatterCookie.Enabled then true else
+
+        match solution.RdFSharpModel() with
+        | null -> false
+        | fsModel -> fsModel.EnableFormatter.Value
+
+    [<Extension>]
+    static member FSharpFormatterEnabled(node: ITreeNode) =
+        FSharpExperimentalFeaturesEx.FSharpFormatterEnabled(node.GetSolution())
