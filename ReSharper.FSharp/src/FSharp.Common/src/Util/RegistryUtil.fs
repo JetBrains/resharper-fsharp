@@ -33,19 +33,14 @@ type ProtocolSolutionExtensions =
         with _ -> null
 
 [<AbstractClass; Sealed; Extension>]
-type FSharpExperimentalFeaturesEx() =
-    static let getFsModelFlagIfNotEnabled property enabled (solution : ISolution) =
-        if enabled then true else
+type FSharpExperimentalFeaturesEx =
+    [<Extension>]
+    static member FSharpExperimentalFeaturesEnabled(solution: ISolution) =
+        if FSharpRegistryUtil.AllowExperimentalFeaturesCookie.Enabled then true else
 
         match solution.RdFSharpModel() with
         | null -> false
-        | fsModel -> property fsModel
-        
-    [<Extension>]
-    static member FSharpExperimentalFeaturesEnabled(solution: ISolution) =
-        getFsModelFlagIfNotEnabled (fun fsModel -> fsModel.EnableExperimentalFeatures.Value)
-            FSharpRegistryUtil.AllowExperimentalFeaturesCookie.Enabled
-            solution
+        | fsModel -> fsModel.EnableExperimentalFeatures.Value
 
     [<Extension>]
     static member FSharpExperimentalFeaturesEnabled(node: ITreeNode) =
@@ -53,9 +48,11 @@ type FSharpExperimentalFeaturesEx() =
 
     [<Extension>]
     static member FSharpFormatterEnabled(solution: ISolution) =
-        getFsModelFlagIfNotEnabled (fun fsModel -> fsModel.EnableFormatter.Value)
-            FSharpRegistryUtil.AllowFormatterCookie.Enabled
-            solution
+        if FSharpRegistryUtil.AllowFormatterCookie.Enabled then true else
+
+        match solution.RdFSharpModel() with
+        | null -> false
+        | fsModel -> fsModel.EnableFormatter.Value
 
     [<Extension>]
     static member FSharpFormatterEnabled(node: ITreeNode) =
