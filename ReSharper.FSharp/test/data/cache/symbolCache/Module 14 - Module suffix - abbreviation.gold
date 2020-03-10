@@ -2,7 +2,7 @@
 FSharpProjectFilePart:ImplFile
  FSharp.DeclaredNamespacePart:Ns
   NestedModulePart:TModule->Class:Ns.TModule
-  HiddenTypePart:T->Class:Ns.T
+  TypeAbbreviationOrDeclarationPart:T->Class:Ns.T
 []: Namespace:
  [Ns]: Namespace:Ns
   [T]: Class:Ns.T[TestProject]

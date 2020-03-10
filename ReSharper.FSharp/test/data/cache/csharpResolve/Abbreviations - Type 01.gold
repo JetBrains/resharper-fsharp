@@ -1,0 +1,12 @@
+public class Class1
+{
+  public Class1()
+  {
+    |Abbr|(0) a = |Abbr|(1).|Int32|(2);
+  }
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Cannot access internal class 'Abbr' here
+(1): ReSharper Underlined Error Highlighting: Cannot access internal class 'Abbr' here
+(2): ReSharper Error Highlighting: Cannot resolve symbol 'Int32'

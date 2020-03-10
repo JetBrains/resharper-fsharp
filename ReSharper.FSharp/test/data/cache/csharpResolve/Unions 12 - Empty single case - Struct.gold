@@ -1,0 +1,34 @@
+﻿public class Class1
+{
+    public Class1()
+    {
+        U a = U.A;
+        int uTags = U.|Tags|(0).A;
+        int aTag = a.Tag;
+        int isA = a.|IsA|(1);
+        bool equalsU = a.Equals(a);
+        bool equalsObj = a.Equals("");
+        bool equalsObjWithComparer = a.Equals("", null);
+
+        |F|(2)(a, a);
+    }
+
+    public static void F<T1, T2>(T1 t1, T2 t2)
+        where T1 : class
+        where T2 : struct
+    {
+    }
+}
+
+---------------------------------------------------------
+(0): ReSharper Error Highlighting: Cannot resolve symbol 'Tags'
+(1): ReSharper Error Highlighting: Cannot resolve symbol 'IsA'
+(2): ReSharper Underlined Error Highlighting: The type 'U' must be a reference type in order to use it as parameter 'T1'
+P:U.A
+P:U.Tag
+M:U.Equals(U)
+M:U.Equals(U)
+M:U.Equals(System.Object)
+M:U.Equals(System.Object)
+M:U.Equals(System.Object,System.Collections.IEqualityComparer)
+M:U.Equals(System.Object,System.Collections.IEqualityComparer)

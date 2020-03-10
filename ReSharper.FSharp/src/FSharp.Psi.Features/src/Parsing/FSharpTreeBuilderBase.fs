@@ -302,8 +302,10 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
             x.Done(range, casesListMark, ElementType.UNION_REPRESENTATION)
             ElementType.UNION_DECLARATION
 
-        | SynTypeDefnSimpleRepr.TypeAbbrev(_, synType, _) ->
+        | SynTypeDefnSimpleRepr.TypeAbbrev(_, (TypeRange range as synType), _) ->
+            let mark = x.Mark(range)
             x.ProcessType(synType)
+            x.Done(mark, ElementType.ABBREVIATED_TYPE_OR_UNION_CASE_DECLARATION)
             ElementType.TYPE_ABBREVIATION_DECLARATION
 
         | SynTypeDefnSimpleRepr.None _ ->

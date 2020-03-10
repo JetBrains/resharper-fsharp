@@ -1,5 +1,6 @@
 ﻿using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
@@ -61,8 +62,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         return MemberDecoration.DefaultValue;
 
       var decoration = typePart.Modifiers;
-      var isHiddenBySignature = (typePart.GetRoot() as FSharpProjectFilePart)?.HasPairFile ?? false;
-      if (isHiddenBySignature)
+
+      if (typePart.GetRoot() is FSharpProjectFilePart projectFilePart && projectFilePart.HasPairFile)
+        // We already know there's no type part in a signature file.
+        // If there's a signature file then this type is hidden. 
+        decoration.AccessRights = AccessRights.INTERNAL;
+
+      if (typePart is TypeAbbreviationOrDeclarationPartBase part && !part.IsUnionCase)
+        // Type abbreviation is a union case declaration when its right part is a simple named type
+        // that is not resolved to anything.
+        // When the part is abbreviation, we modify it's visibility to hide from other languages.
+        //
+        // We cannot set it directly in the part modifiers,
+        // since it depends on resolve which needs committed documents and is slow.
         decoration.AccessRights = AccessRights.INTERNAL;
 
       return Normalize(decoration);

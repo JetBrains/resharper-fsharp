@@ -5,11 +5,9 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
 {
-  /// Used for type abbreviations and abstract types
-  /// todo: check cases:
-  ///   * single union case without bar (parsed as abbreviation)
+  /// Used for the following things
+  ///   * abstract types (i.e. no representation in a signature file)
   ///   * units of measure
-  ///   * provided types (cache them in assembly signature?)
   internal class HiddenTypePart : FSharpTypeMembersOwnerTypePart, Class.IClassPart
   {
     public HiddenTypePart([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder)

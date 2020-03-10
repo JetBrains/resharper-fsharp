@@ -407,7 +407,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return AccessRights.PUBLIC;
     }
 
-    public static bool GetTypeKind(IEnumerable<IAttribute> attributes, out PartKind fSharpPartKind)
+    public static bool GetTypeKind(TreeNodeCollection<IAttribute> attributes, out PartKind fSharpPartKind)
     {
       foreach (var attr in attributes)
         switch (attr.ReferenceName?.ShortName.DropAttributeSuffix())

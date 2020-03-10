@@ -3,6 +3,7 @@ using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
@@ -10,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   internal class UnionPart : UnionPartBase, Class.IClassPart
   {
     public UnionPart([NotNull] IUnionDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder,
-      bool hasPublicNestedTypes) : base(declaration, cacheBuilder, hasPublicNestedTypes)
+      bool hasPublicNestedTypes, bool isSingleCase) : base(declaration, cacheBuilder, hasPublicNestedTypes, isSingleCase)
     {
     }
 
@@ -28,7 +29,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
   internal class StructUnionPart : UnionPartBase, Struct.IStructPart
   {
     public StructUnionPart([NotNull] IUnionDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder,
-      bool hasPublicNestedTypes) : base(declaration, cacheBuilder, hasPublicNestedTypes)
+      bool isSingleCase) : base(declaration, cacheBuilder, false, isSingleCase)
     {
     }
 
@@ -56,12 +57,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public bool IsSingleCaseUnion { get; }
     public AccessRights RepresentationAccessRights { get; }
 
-    protected UnionPartBase([NotNull] IUnionDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder,
-      bool hasPublicNestedTypes) : base(declaration, cacheBuilder)
+    protected UnionPartBase([NotNull] IFSharpTypeDeclaration declaration, [NotNull] ICacheBuilder cacheBuilder,
+      bool hasPublicNestedTypes, bool isSingleCaseUnion) : base(declaration, cacheBuilder)
     {
       HasPublicNestedTypes = hasPublicNestedTypes;
       RepresentationAccessRights = GetRepresentationAccessRights(declaration);
-      IsSingleCaseUnion = declaration.UnionCases.Count == 1;
+      IsSingleCaseUnion = isSingleCaseUnion;
     }
 
     protected UnionPartBase(IReader reader) : base(reader)
@@ -95,14 +96,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       }
     }
 
-    public IList<IUnionCaseDeclaration> CaseDeclarations =>
+    public TreeNodeCollection<IUnionCaseDeclaration> CaseDeclarations =>
       GetDeclaration() is IUnionDeclaration declaration
         ? declaration.UnionCases
-        : EmptyList<IUnionCaseDeclaration>.InstanceList;
+        : TreeNodeCollection<IUnionCaseDeclaration>.Empty;
 
     // todo: hidden by signature in fsi
-    private static AccessRights GetRepresentationAccessRights([NotNull] IUnionDeclaration declaration) =>
-      ModifiersUtil.GetAccessRights(declaration.UnionRepresentation.AccessModifier);
+    private static AccessRights GetRepresentationAccessRights([NotNull] IFSharpTypeDeclaration declaration) =>
+      declaration is IUnionDeclaration unionDeclaration
+        ? ModifiersUtil.GetAccessRights(unionDeclaration.UnionRepresentation.AccessModifier)
+        : AccessRights.PUBLIC;
   }
 
   public interface IRepresentationAccessRightsOwner
@@ -115,6 +118,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     bool HasPublicNestedTypes { get; }
     bool IsSingleCaseUnion { get; }
     IList<IUnionCase> Cases { get; }
-    IList<IUnionCaseDeclaration> CaseDeclarations { get; }
+    TreeNodeCollection<IUnionCaseDeclaration> CaseDeclarations { get; }
   }
 }

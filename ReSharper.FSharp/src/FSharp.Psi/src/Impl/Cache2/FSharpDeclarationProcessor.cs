@@ -199,12 +199,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       foreach (var unionCase in unionCases)
         if (unionCase is INestedTypeUnionCaseDeclaration)
           casesWithFieldsCount++;
-      var hasPublicNestedTypes = casesWithFieldsCount > 0 && unionCases.Count > 1;
+
+      var casesCount = unionCases.Count;
+      var hasPublicNestedTypes = casesWithFieldsCount > 0 && casesCount > 1;
+      var isSingleCase = casesCount == 1;
 
       var unionPart =
         decl.HasAttribute(FSharpImplUtil.Struct)
-          ? (Part) new StructUnionPart(decl, Builder, false)
-          : new UnionPart(decl, Builder, hasPublicNestedTypes);
+          ? (Part) new StructUnionPart(decl, Builder, isSingleCase)
+          : new UnionPart(decl, Builder, hasPublicNestedTypes, isSingleCase);
 
       Builder.StartPart(unionPart);
       foreach (var unionCase in unionCases)
@@ -220,8 +223,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       Builder.EndPart();
     }
 
-    public override void VisitTypeAbbreviationDeclaration(ITypeAbbreviationDeclaration decl) =>
-      ProcessHiddenTypeDeclaration(decl);
+    public override void VisitTypeAbbreviationDeclaration(ITypeAbbreviationDeclaration decl)
+    {
+      var typePart = decl.TypePartKind == PartKind.Class
+        ? (TypePart) new TypeAbbreviationOrDeclarationPart(decl, Builder)
+        : new StructTypeAbbreviationOrDeclarationPart(decl, Builder);
+      ProcessPart(typePart);
+
+      var declaredName = decl.AbbreviatedTypeOrUnionCase?.GetSourceName();
+      if (declaredName != SharedImplUtil.MISSING_DECLARATION_NAME)
+        Builder.AddDeclaredMemberName(declaredName);
+    }
 
     public override void VisitModuleAbbreviation(IModuleAbbreviation decl) =>
       ProcessHiddenTypeDeclaration(decl);

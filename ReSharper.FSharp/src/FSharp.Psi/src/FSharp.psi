@@ -934,7 +934,8 @@ unionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras
 
 interface unionCaseDeclaration:
   singletonCaseDeclaration |
-  nestedTypeUnionCaseDeclaration;
+  nestedTypeUnionCaseDeclaration |
+  abbreviatedTypeOrUnionCaseDeclaration;
 
 singletonCaseDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
   get { methodName="Attributes" path=<singletonCaseDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
@@ -984,14 +985,18 @@ exceptionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } ex
 typeAbbreviationDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<typeAbbreviationDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
   get { methodName="Attributes" path=<typeAbbreviationDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+  get { methodName="AbbreviatedType" path=<typeAbbreviationDeclaration:TYPE_OR_UNION_CASE/abbreviatedTypeOrUnionCaseDeclaration:TYPE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   EQUALS
-  synType<TYPE, AbbreviatedType>
+  abbreviatedTypeOrUnionCaseDeclaration<TYPE_OR_UNION_CASE, AbbreviatedTypeOrUnionCase>
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
+
+abbreviatedTypeOrUnionCaseDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
+  synType<TYPE, AbbreviatedType>;
 
 moduleAbbreviation options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<moduleAbbreviation:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };

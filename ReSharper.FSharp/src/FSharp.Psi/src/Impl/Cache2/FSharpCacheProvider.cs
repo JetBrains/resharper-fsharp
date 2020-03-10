@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Checker;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
@@ -17,10 +16,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
   {
     private readonly FSharpCheckerService myCheckerService;
 
-    public FSharpCacheProvider(FSharpCheckerService checkerService)
-    {
+    public FSharpCacheProvider(FSharpCheckerService checkerService) =>
       myCheckerService = checkerService;
-    }
 
     public void BuildCache(IFile file, ICacheBuilder builder)
     {
@@ -35,54 +32,33 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
       new FSharpProjectFilePart(sourceFile, reader, sourceFile.GetFSharpFileKind(),
         sourceFile != null && myCheckerService.HasPairFile(sourceFile));
 
-    public Part ReadPart(byte tag, IReader reader)
-    {
-      switch ((FSharpPartKind) tag)
+    public Part ReadPart(byte tag, IReader reader) =>
+      (FSharpPartKind) tag switch
       {
-        case FSharpPartKind.DeclaredNamespace:
-          return new DeclaredNamespacePart(reader);
-        case FSharpPartKind.QualifiedNamespace:
-          return new QualifiedNamespacePart(reader);
-        case FSharpPartKind.NamedModule:
-          return new NamedModulePart(reader);
-        case FSharpPartKind.NestedModule:
-          return new NestedModulePart(reader);
-        case FSharpPartKind.AnonModule:
-          return new AnonModulePart(reader);
-        case FSharpPartKind.Exception:
-          return new ExceptionPart(reader);
-        case FSharpPartKind.Enum:
-          return new EnumPart(reader);
-        case FSharpPartKind.Record:
-          return new RecordPart(reader);
-        case FSharpPartKind.Union:
-          return new UnionPart(reader);
-        case FSharpPartKind.UnionCase:
-          return new UnionCasePart(reader);
-        case FSharpPartKind.Class:
-          return new ClassPart(reader);
-        case FSharpPartKind.Interface:
-          return new InterfacePart(reader);
-        case FSharpPartKind.Struct:
-          return new StructPart(reader);
-        case FSharpPartKind.StructRecord:
-          return new StructRecordPart(reader);
-        case FSharpPartKind.StructUnion:
-          return new StructUnionPart(reader);
-        case FSharpPartKind.ClassExtension:
-          return new ClassExtensionPart(reader);
-        case FSharpPartKind.StructExtension:
-          return new StructExtensionPart(reader);
-        case FSharpPartKind.Delegate:
-          return new DelegatePart(reader);
-        case FSharpPartKind.ObjectExpression:
-          return new ObjectExpressionTypePart(reader);
-        case FSharpPartKind.HiddenType:
-          return new HiddenTypePart(reader);
-        default:
-          throw new SerializationError("Unknown tag:" + tag);
-      }
-    }
+        FSharpPartKind.DeclaredNamespace => new DeclaredNamespacePart(reader),
+        FSharpPartKind.QualifiedNamespace => new QualifiedNamespacePart(reader),
+        FSharpPartKind.NamedModule => new NamedModulePart(reader),
+        FSharpPartKind.NestedModule => new NestedModulePart(reader),
+        FSharpPartKind.AnonModule => new AnonModulePart(reader),
+        FSharpPartKind.Exception => new ExceptionPart(reader),
+        FSharpPartKind.Enum => new EnumPart(reader),
+        FSharpPartKind.Record => new RecordPart(reader),
+        FSharpPartKind.Union => new UnionPart(reader),
+        FSharpPartKind.UnionCase => new UnionCasePart(reader),
+        FSharpPartKind.Class => new ClassPart(reader),
+        FSharpPartKind.Interface => new InterfacePart(reader),
+        FSharpPartKind.Struct => new StructPart(reader),
+        FSharpPartKind.StructRecord => new StructRecordPart(reader),
+        FSharpPartKind.StructUnion => new StructUnionPart(reader),
+        FSharpPartKind.ClassExtension => new ClassExtensionPart(reader),
+        FSharpPartKind.StructExtension => new StructExtensionPart(reader),
+        FSharpPartKind.Delegate => new DelegatePart(reader),
+        FSharpPartKind.ObjectExpression => new ObjectExpressionTypePart(reader),
+        FSharpPartKind.AbbreviationOrSingleCaseUnion => new TypeAbbreviationOrDeclarationPart(reader),
+        FSharpPartKind.StructAbbreviationOrSingleCaseUnion => new StructTypeAbbreviationOrDeclarationPart(reader),
+        FSharpPartKind.HiddenType => new HiddenTypePart(reader),
+        _ => throw new SerializationError("Unknown tag:" + tag)
+      };
 
     public bool NeedCacheUpdate(ITreeNode elementContainingChanges, PsiChangedElementType type) => true;
     public bool IsCaseSensitive(IPsiModule module) => true;
