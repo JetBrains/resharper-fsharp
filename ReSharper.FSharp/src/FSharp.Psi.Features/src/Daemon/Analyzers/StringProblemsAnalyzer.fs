@@ -63,6 +63,9 @@ type RegularStringLexer(buffer) =
 
     static let maxUnicodeCodePoint = uint32 0x10FFFF
 
+    static let mutable isHexDigit = Func<_, _>(CharEx.IsHexDigitFast)
+    static let mutable isDigit = Func<_, _>(Char.IsDigit)
+
     override x.StartOffset = 1
     override x.EndOffset = 1
 
@@ -79,12 +82,20 @@ type RegularStringLexer(buffer) =
         match x.Buffer.[x.Position] with
         | 'u' -> x.ProcessHexEscapeSequence(4)
         | 'U' -> x.ProcessLongHexEscapeSequence()
+        | 'x' -> x.ProcessHexEscapeSequence(2)
+        | c when Char.IsDigit(c) -> x.ProcessNumericCharSequence() 
         | '"' | '\'' | '\\' | 'b' | 'n' | 'r' | 't' | 'a' | 'f' | 'v' -> StringTokenTypes.ESCAPE_CHARACTER
         | _ -> StringTokenTypes.CHARACTER
 
-    member x.ProcessHexEscapeSequence(length) =
-        let str = x.ProcessEscapeSequence(length, length, 1, (fun c -> c.IsHexDigitFast()))
+    member x.ProcessEscapeSequence(length, shift, matcher) =
+        let str = x.ProcessEscapeSequence(length, length, shift, matcher)
         if str.Length = length then StringTokenTypes.ESCAPE_CHARACTER else StringTokenTypes.CHARACTER
+
+    member x.ProcessHexEscapeSequence(length) =
+        x.ProcessEscapeSequence(length, 1, isHexDigit)
+
+    member x.ProcessNumericCharSequence() =
+        x.ProcessEscapeSequence(3, 0, isDigit)
 
     member x.ProcessLongHexEscapeSequence() =
         let hex = x.ProcessEscapeSequence(8, max = 8, shift = 1, matcher = (fun c -> c.IsHexDigitFast()))
@@ -95,30 +106,7 @@ type RegularStringLexer(buffer) =
         | true when codePoint <= maxUnicodeCodePoint -> StringTokenTypes.ESCAPE_CHARACTER
         | _ -> StringTokenTypes.CHARACTER
 
-    override x.ParseEscapeCharacter(value: string) =
-        match value.Length with
-        | 1 -> value.[0].ToString()
-        | 2 when value.[0] = '\\' ->
-            match value.[1] with
-            | '\\' -> "\\"
-            | '\'' -> "\'"
-            | '"' -> "\""
-            | 'b' -> "\b"
-            | 'n' -> "\n"
-            | 'r' -> "\r"
-            | 't' -> "\t"
-            | 'a' -> "\a"
-            | 'f' -> "\f"
-            | 'v' -> "\v"
-            | _ -> ArgumentException("Invalid Character") |> raise
-
-        | n when n > 2 && value.[0] = '\\' ->
-            match value.[1] with
-            | 'u' -> StringLexerBase.ParseHexEscapeSequence(value, min = 4, max = 4)
-            | 'U' -> StringLexerBase.ParseHexEscapeSequence(value, min = 8, max = 8)
-            | _ -> ArgumentException("Invalid Character") |> raise
-
-        | _ -> ArgumentException("Invalid Character") |> raise
+    override x.ParseEscapeCharacter _ = raise (NotImplementedException())
 
 
 type VerbatimStringLexer(buffer) =
@@ -136,14 +124,7 @@ type VerbatimStringLexer(buffer) =
 
             else StringTokenTypes.CHARACTER
 
-        override x.ParseEscapeCharacter(value: string) =
-            if value.Length = 1 then value.[0].ToString() else
-
-            if value.Length = 2 then
-                Assertion.Assert(value <> @"""", "Invalid character presentation")
-                "\""
-
-            else ArgumentException("Invalid character presentation") |> raise
+        override x.ParseEscapeCharacter _ = raise (NotImplementedException())
 
 
 type TripleQuoteStringLexer(buffer) =
@@ -165,17 +146,4 @@ type ByteArrayStringLexer(buffer) =
         | '\\' -> StringTokenTypes.ESCAPE_CHARACTER
         | _ -> StringTokenTypes.CHARACTER
 
-    override x.ParseEscapeCharacter(value: string) =
-        match value.Length with
-        | 1 -> value.[0].ToString()
-        | 2 when value.[0] = '\\' ->
-            match value.[1] with
-            | '\\' -> "\\"
-            | '\'' -> "\'"
-            | '"' -> "\""
-            | 'b' -> "\b"
-            | 'n' -> "\n"
-            | 'r' -> "\r"
-            | 't' -> "\t"
-            | _ -> ArgumentException("Invalid Character") |> raise
-        | _ -> ArgumentException("Invalid Character") |> raise
+    override x.ParseEscapeCharacter _ = raise (NotImplementedException())
