@@ -72,17 +72,18 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         call("GetNamespaces", int, array(RdProvidedNamespace))
         call("GetInvokerExpression", GetInvokerExpressionParameters, string)
         call("GetProvidedType", structdef("GetProvidedTypeArgs") {
-            field("ProviderId", int)
-            field("ProvidedTypeId", int)
+            field("Id", int)
         }, RdProvidedType)
         call("Dispose", int, void)
     }
 
     private val ApplyStaticArgumentsParameters = structdef {
-        field("TypeProviderId", int)
-        field("TypeWithoutArguments", string)
+        field("Id", int)
         field("TypePathWithArguments", array(string))
-        field("staticArguments", array(string))
+        field("StaticArguments", array(structdef("StaticArg") {
+            field("TypeName", string)
+            field("Value", string)
+        }))
     }
 
     private val GetStaticArgumentsParameters = structdef {
@@ -190,7 +191,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         }, RdProvidedPropertyInfo)
         call("GenericParameterPosition", int, int)
         call("GetStaticParameters", int, array(RdProvidedParameterInfo))
-        //call("ApplyStaticArguments", ApplyStaticArgumentsParameters, this)
+        call("ApplyStaticArguments", ApplyStaticArgumentsParameters, int)
         call("GetMethods", int, array(RdProvidedMethodInfo))
         call("DeclaringType", int, int.nullable)
     }
@@ -223,6 +224,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         RdProvidedType = classdef extends RdProvidedMemberInfo {
             field("FullName", string.nullable)
             field("Namespace", string.nullable)
+            field("IsVoid", bool)
             field("IsGenericParameter", bool)
             field("IsValueType", bool)
             field("IsByRef", bool)
@@ -245,8 +247,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
             field("CanWrite", bool)
         }
 
-        RdProvidedParameterInfo = classdef {
-            field("Name", string)
+        RdProvidedParameterInfo = classdef extends RdProvidedMemberInfo {
             field("IsIn", bool)
             field("IsOut", bool)
             field("IsOptional", bool)
@@ -271,4 +272,6 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         call("InstantiateTypeProvidersOfAssembly", InstantiateTypeProvidersOfAssemblyParameters, array(RdTypeProvider))
     }
 }
+
+//не забыть про IsVoid
 

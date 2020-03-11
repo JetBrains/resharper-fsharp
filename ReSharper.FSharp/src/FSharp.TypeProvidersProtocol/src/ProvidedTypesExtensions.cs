@@ -15,7 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol
       providedTypes.Select(t => t.WithCache()).ToArray();
 
     public static ProvidedParameterInfo WithCache(this ProvidedParameterInfo parameterInfo) =>
-      new ProvidedParameterInfoWithCache(parameterInfo);
+      null;
 
     public static ProvidedParameterInfo[] WithCache(this ProvidedParameterInfo[] parameterInfos) =>
       parameterInfos.Select(t => t.WithCache()).ToArray();

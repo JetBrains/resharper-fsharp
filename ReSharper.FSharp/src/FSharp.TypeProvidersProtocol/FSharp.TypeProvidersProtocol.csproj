@@ -4,6 +4,7 @@
         <TargetFramework>net461</TargetFramework>
         <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol</RootNamespace>
         <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol</AssemblyName>
+        <LangVersion>8</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>

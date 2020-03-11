@@ -45,8 +45,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
     public void Dispose() => RdTypeProviderProcessModel.Dispose.Sync(EntityId);
 
-    public event EventHandler Invalidate;
-
     private void InitCaches()
     {
       // ReSharper disable once CoVariantArrayConversion
@@ -57,6 +55,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       
       myCache = new TypeProviderCache(myRdTypeProvider, myProcessModel);
     }
+    
+    public event EventHandler Invalidate;
     
     private TypeProviderCache myCache;
     private Lazy<IProvidedNamespace[]> myProvidedNamespaces;

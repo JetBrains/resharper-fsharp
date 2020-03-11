@@ -14,12 +14,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache
       myProvidedType = providedType;
 
       myBaseType = new Lazy<ProvidedType>(() => myProvidedType.BaseType);
-      myElementType = new Lazy<ProvidedType>(() => myProvidedType.GetElementType().WithCache());
       myDeclaringType = new Lazy<ProvidedType>(() => myProvidedType.DeclaringType.WithCache());
       myInterfaces = new Lazy<ProvidedType[]>(() => myProvidedType.GetInterfaces().WithCache());
-      myEnumUnderlyingType = new Lazy<ProvidedType>(() => myProvidedType.GetEnumUnderlyingType().WithCache());
       myGenericArguments = new Lazy<ProvidedType[]>(() => myProvidedType.GetGenericArguments().WithCache());
-      myGenericTypeDefinition = new Lazy<ProvidedType>(() => myProvidedType.GetGenericTypeDefinition().WithCache());
       myMethods = new Lazy<ProvidedMethodInfo[]>(() => myProvidedType.GetMethods());
       myAllNestedTypes = new Lazy<ProvidedType[]>(() => myProvidedType.GetAllNestedTypes().WithCache());
       myProperties = new Lazy<ProvidedPropertyInfo[]>(() => myProvidedType.GetProperties());
@@ -61,9 +58,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache
 
     public override ProvidedType[] GetAllNestedTypes() => myAllNestedTypes.Value;
 
-    public override ProvidedType GetGenericTypeDefinition() => myGenericTypeDefinition.Value;
-
-
     public override ProvidedPropertyInfo[] GetProperties() => myProperties.Value;
 
     public override ProvidedPropertyInfo GetProperty(string nm)
@@ -75,11 +69,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache
     public override int GetArrayRank() =>
       myArrayRank ?? (myArrayRank = myProvidedType.GetArrayRank()).Value;
 
-    public override ProvidedType GetElementType() => myElementType.Value;
-
     public override ProvidedType[] GetGenericArguments() => myGenericArguments.Value;
-
-    public override ProvidedType GetEnumUnderlyingType() => myEnumUnderlyingType.Value;
 
     public override ProvidedParameterInfo[] GetStaticParameters(ITypeProvider provider) =>
       myStaticParameters?.Value ?? (myStaticParameters = new Lazy<ProvidedParameterInfo[]>(
@@ -93,15 +83,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache
 
     private int? myArrayRank;
     private readonly Lazy<ProvidedType> myBaseType;
-    private readonly Lazy<ProvidedType> myElementType;
     private readonly Lazy<ProvidedType[]> myInterfaces;
     private readonly Lazy<ProvidedType> myDeclaringType;
     private readonly Lazy<ProvidedMethodInfo[]> myMethods;
     private readonly Lazy<ProvidedType[]> myAllNestedTypes;
-    private readonly Lazy<ProvidedType> myEnumUnderlyingType;
     private readonly Lazy<ProvidedType[]> myGenericArguments;
     private Lazy<ProvidedParameterInfo[]> myStaticParameters;
     private readonly Lazy<ProvidedPropertyInfo[]> myProperties;
-    private readonly Lazy<ProvidedType> myGenericTypeDefinition;
   }
 }

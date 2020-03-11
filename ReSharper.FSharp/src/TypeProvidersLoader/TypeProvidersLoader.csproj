@@ -4,6 +4,7 @@
         <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader</RootNamespace>
         <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader</AssemblyName>
         <OutputType>Exe</OutputType>
+        <LangVersion>8</LangVersion>
     </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="..\FSharp.Common\FSharp.Common.fsproj" />

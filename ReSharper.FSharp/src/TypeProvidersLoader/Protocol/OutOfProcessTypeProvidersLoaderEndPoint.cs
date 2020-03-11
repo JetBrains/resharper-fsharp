@@ -5,6 +5,7 @@ using JetBrains.Core;
 using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.Platform.RdFramework.ExternalProcess;
+using JetBrains.Rd.Impl;
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Host.Features.Util;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts;
@@ -17,11 +18,11 @@ using Microsoft.FSharp.Core.CompilerServices;
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
 {
   public class
-    OutOfProcessTypeProvidersLoaderEndPoint : ProtocolEndPoint<RdFSharpTypeProvidersLoaderModel, TypeProviderExternal>
+    OutOfProcessTypeProvidersLoaderEndPoint : ProtocolEndPoint<RdFSharpTypeProvidersLoaderModel, RdSimpleDispatcher>
   {
     private readonly ITypeProvidersLoader myLoader;
-    private readonly IOutOfProcessProtocolHost<ITypeProvider, RdTypeProvider> myTypeProvidersHost;
-    private TypeProviderExternal myDispatcher;
+    private readonly IOutOfProcessRdModelsCreator<ITypeProvider, RdTypeProvider> myTypeProvidersHost;
+    private RdSimpleDispatcher myDispatcher;
 
     protected override string ProtocolName { get; } = "Out-of-Process Type Provider";
 
@@ -32,9 +33,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       myLoader = loader;
     }
 
-    protected override TypeProviderExternal InitDispatcher(Lifetime lifetime, ILogger logger)
+    protected override RdSimpleDispatcher InitDispatcher(Lifetime lifetime, ILogger logger)
     {
-      myDispatcher = new TypeProviderExternal(lifetime);
+      myDispatcher = new RdSimpleDispatcher(lifetime, logger);
       return myDispatcher;
     }
 
@@ -67,11 +68,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       return RdTask<RdTypeProvider[]>.Successful(instantiateResults);
     }
 
-    protected override void Run(Lifetime lifetime, TypeProviderExternal dispatcher)
+    protected override void Run(Lifetime lifetime, RdSimpleDispatcher dispatcher)
     {
-      while (true)
-      {
-      }
+      dispatcher.Run();
     }
 
     //on shutdown requested

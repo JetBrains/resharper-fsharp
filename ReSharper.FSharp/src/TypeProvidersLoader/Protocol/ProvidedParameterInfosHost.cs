@@ -2,6 +2,7 @@
 using JetBrains.Lifetimes;
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelCreators;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
 using Microsoft.FSharp.Core.CompilerServices;
@@ -10,11 +11,11 @@ using static FSharp.Compiler.ExtensionTyping;
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
 {
   public class
-    ProvidedParametersHost : OutOfProcessProtocolHostBase<ProvidedParameterInfo, RdProvidedParameterInfo>
+    ProvidedParametersHost : RdModelsCreatorBase<ProvidedParameterInfo, RdProvidedParameterInfo>
   {
-    private readonly IOutOfProcessProtocolHost<ProvidedType, RdProvidedType> myProvidedTypesHost;
+    private readonly IProvidedRdModelsCreator<ProvidedType, RdProvidedType> myProvidedTypesHost;
 
-    public ProvidedParametersHost(IOutOfProcessProtocolHost<ProvidedType, RdProvidedType> providedTypesHost) :
+    public ProvidedParametersHost(IProvidedRdModelsCreator<ProvidedType, RdProvidedType> providedTypesHost) :
       base(new ProvidedParameterInfoEqualityComparer())
     {
       myProvidedTypesHost = providedTypesHost;
@@ -41,7 +42,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       ProvidedParameterInfo providedNativeModel,
       ITypeProvider providedModelOwner)
     {
-      var parameterType = myProvidedTypesHost.GetRdModel(providedNativeModel.ParameterType, providedModelOwner);
+      var parameterType = myProvidedTypesHost.CreateRdModel(providedNativeModel.ParameterType, providedModelOwner);
       return RdTask<RdProvidedType>.Successful(parameterType);
     }
   }

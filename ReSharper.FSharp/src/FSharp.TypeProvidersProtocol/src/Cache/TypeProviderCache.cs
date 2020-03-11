@@ -33,9 +33,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache
 
       providedType = ProxyProvidedType
         .Create(
-          TypeProviderProcessModel.GetProvidedType.Sync(new GetProvidedTypeArgs(myProvider.TypeProviderId, key.Value)),
-          myProcessModel, context, this)
-        .WithCache();
+          TypeProviderProcessModel.GetProvidedType.Sync(new GetProvidedTypeArgs(key.Value)),
+          myProcessModel, context, this);
       myProvidedTypes.Add(key.Value, providedType);
 
       return providedType;

@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Globalization;
+using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
@@ -122,6 +124,33 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
         .Sync(EntityId)
         .Select(t => ProxyProvidedParameterInfoWithCache.Create(t, myProcessModel, Context, myCache))
         .ToArray();
+
+    public override ProvidedType ApplyStaticArguments(ITypeProvider provider, string[] fullTypePathAfterArguments,
+      object[] staticArgs)
+    {
+      var staticArgDescriptions = staticArgs.Select(t => t switch
+      {
+        sbyte x => new StaticArg("sbyte", x.ToString()),
+        short x => new StaticArg("short", x.ToString()),
+        int x => new StaticArg("int", x.ToString()),
+        long x => new StaticArg("long", x.ToString()),
+        byte x => new StaticArg("byte", x.ToString()),
+        ushort x => new StaticArg("ushort", x.ToString()),
+        uint x => new StaticArg("uint", x.ToString()),
+        ulong x => new StaticArg("ulong", x.ToString()),
+        decimal x => new StaticArg("decimal", x.ToString(CultureInfo.InvariantCulture)),
+        float x => new StaticArg("float", x.ToString(CultureInfo.InvariantCulture)),
+        double x => new StaticArg("double", x.ToString(CultureInfo.InvariantCulture)),
+        char x => new StaticArg("char", x.ToString()),
+        bool x => new StaticArg("bool", x.ToString()),
+        string x => new StaticArg("string", x),
+        _ => throw new ArgumentException($"Unexpected static arg with type {t.GetType().FullName}")
+      }).ToArray();
+
+      return myCache.GetOrCreateWithContext(
+        RdProvidedTypeProcessModel.ApplyStaticArguments.Sync(
+          new ApplyStaticArgumentsParameters(EntityId, fullTypePathAfterArguments, staticArgDescriptions)), Context);
+    }
 
     public override ProvidedType[] GetInterfaces() =>
       // ReSharper disable once CoVariantArrayConversion
