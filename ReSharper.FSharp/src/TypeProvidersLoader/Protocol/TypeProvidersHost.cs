@@ -3,32 +3,36 @@ using JetBrains.Lifetimes;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
 using Microsoft.FSharp.Core.CompilerServices;
 using JetBrains.Rd.Tasks;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
 {
-  public class TypeProvidersHost : OutOfProcessProtocolHostBase<ITypeProvider, RdTypeProviderProcessModel>
+  public class TypeProvidersHost : OutOfProcessProtocolHostBase<ITypeProvider, RdTypeProvider>
   {
+    private readonly RdTypeProviderProcessModel myProcessModel;
     private readonly IOutOfProcessProtocolHost<IProvidedNamespace, RdProvidedNamespace> myProvidedNamespacesHost;
-    private readonly RdTypeProviderProcessModel myRdTypeProviderProcessModel;
 
-    public TypeProvidersHost()
+    public TypeProvidersHost(ITypeProvider typeProvider, RdTypeProviderProcessModel processModel) : base(
+      new TypeProviderEqualityComparer())
     {
-      myProvidedNamespacesHost = new ProvidedNamespacesHost();
+      myProcessModel = processModel;
+      myProvidedNamespacesHost = new ProvidedNamespacesHost(typeProvider);
       myRdTypeProviderProcessModel = new RdTypeProviderProcessModel();
       myRdTypeProviderProcessModel.GetNamespaces.Set(GetTypeProviderNamespaces);
     }
 
-    protected override RdTypeProviderProcessModel CreateRdModel(
-      ITypeProvider providedNativeModel,
-      ITypeProvider providedModelOwner) => myRdTypeProviderProcessModel;
+    protected override RdTypeProvider CreateRdModel(ITypeProvider providedNativeModel, int entityId)
+      => new RdTypeProvider(entityId);
 
     private RdTask<RdProvidedNamespace[]> GetTypeProviderNamespaces(Lifetime lifetime, int providerId)
     {
-      var typeProvider = ProvidedModelsCache[providerId];
+      var typeProvider = GetEntity(providerId);
+
       var namespaces = typeProvider
         .GetNamespaces()
-        .Select(t => myProvidedNamespacesHost.GetRdModel(t, typeProvider)).ToArray();
+        .Select(t => myProvidedNamespacesHost.GetRdModel(t))
+        .ToArray();
       return RdTask<RdProvidedNamespace[]>.Successful(namespaces);
     }
   }

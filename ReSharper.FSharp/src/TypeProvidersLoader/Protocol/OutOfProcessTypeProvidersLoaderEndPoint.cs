@@ -7,6 +7,7 @@ using JetBrains.Lifetimes;
 using JetBrains.Platform.RdFramework.ExternalProcess;
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Host.Features.Util;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
 using JetBrains.Util;

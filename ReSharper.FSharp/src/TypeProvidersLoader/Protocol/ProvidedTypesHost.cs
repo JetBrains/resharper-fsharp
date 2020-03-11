@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using JetBrains.Lifetimes;
 using JetBrains.Rd.Tasks;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
 using Microsoft.FSharp.Core.CompilerServices;
@@ -10,6 +11,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
 {
   public class ProvidedTypesHost : OutOfProcessProtocolHostBase<ProvidedType, RdProvidedType>
   {
+    private readonly ITypeProvider myTypeProvider;
+
     private readonly IOutOfProcessProtocolHost<ProvidedParameterInfo, RdProvidedParameterInfo>
       myProvidedParameterInfosHost;
 
@@ -21,20 +24,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
 
     private readonly RdProvidedTypeProcessModel myRdProvidedTypeProcessModel;
 
-    public ProvidedTypesHost() : base(new ProvidedTypeEqualityComparer())
+    public ProvidedTypesHost(ITypeProvider typeProvider) : base(new ProvidedTypeEqualityComparer())
     {
+      myTypeProvider = typeProvider;
       myProvidedParameterInfosHost = new ProvidedParametersHost(this);
       myProvidedMethodInfosHost = new ProvidedMethodInfosHost(this, myProvidedParameterInfosHost);
       myProvidedPropertiesHost =
         new ProvidedPropertyInfoHost(myProvidedParameterInfosHost, this, myProvidedMethodInfosHost);
-      
+
       myRdProvidedTypeProcessModel = new RdProvidedTypeProcessModel();
       myRdProvidedTypeProcessModel.BaseType.Set((lifetime, _) =>
-        GetBaseType(lifetime, providedNativeModel, providedModelOwner));
+        GetBaseType(lifetime, providedNativeModel));
       myRdProvidedTypeProcessModel.DeclaringType.Set((lifetime, _) =>
-        GetDeclaringType(lifetime, providedNativeModel, providedModelOwner));
+        GetDeclaringType(lifetime, providedNativeModel));
       myRdProvidedTypeProcessModel.GetInterfaces.Set((lifetime, _) =>
-        GetInterfaces(lifetime, providedNativeModel, providedModelOwner));
+        GetInterfaces(lifetime, providedNativeModel));
       myRdProvidedTypeProcessModel.GetNestedType.Set((lifetime, typeName) =>
         GetNestedType(lifetime, providedNativeModel, providedModelOwner, typeName));
       myRdProvidedTypeProcessModel.GetNestedTypes.Set(
@@ -59,67 +63,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       myRdProvidedTypeProcessModel.GetStaticParameters.Set((lifetime, _) =>
         GetStaticParameters(lifetime, providedNativeModel, providedModelOwner));
       myRdProvidedTypeProcessModel.GetMethods.Set((lifetime, _) =>
-        GetMethods(lifetime, providedNativeModel, providedModelOwner));
+        GetMethods(lifetime, providedNativeModel));
     }
 
-    protected override RdProvidedType CreateRdModel(
-      ProvidedType providedNativeModel,
-      ITypeProvider providedModelOwner)
-    {
-      var providedNativeModelProtocolModel = new RdProvidedType(
-        providedNativeModel.FullName,
-        providedNativeModel.Namespace,
-        providedNativeModel.IsGenericParameter,
-        providedNativeModel.IsValueType,
-        providedNativeModel.IsByRef,
-        providedNativeModel.IsPointer,
-        providedNativeModel.IsArray,
-        providedNativeModel.IsEnum,
-        providedNativeModel.IsInterface,
-        providedNativeModel.IsClass,
-        providedNativeModel.IsSealed,
-        providedNativeModel.IsAbstract,
-        providedNativeModel.IsPublic,
-        providedNativeModel.IsNestedPublic,
-        providedNativeModel.IsSuppressRelocate,
-        providedNativeModel.IsErased,
-        providedNativeModel.IsGenericType,
-        providedNativeModel.Name);
-
-      providedNativeModelProtocolModel.BaseType.Set((lifetime, _) =>
-        GetBaseType(lifetime, providedNativeModel, providedModelOwner));
-      providedNativeModelProtocolModel.DeclaringType.Set((lifetime, _) =>
-        GetDeclaringType(lifetime, providedNativeModel, providedModelOwner));
-      providedNativeModelProtocolModel.GetInterfaces.Set((lifetime, _) =>
-        GetInterfaces(lifetime, providedNativeModel, providedModelOwner));
-      providedNativeModelProtocolModel.GetNestedType.Set((lifetime, typeName) =>
-        GetNestedType(lifetime, providedNativeModel, providedModelOwner, typeName));
-      providedNativeModelProtocolModel.GetNestedTypes.Set(
-        (lifetime, _) => GetNestedTypes(lifetime, providedNativeModel, providedModelOwner));
-      providedNativeModelProtocolModel.GetAllNestedTypes.Set((lifetime, _) =>
-        GetAllNestedTypes(lifetime, providedNativeModel, providedModelOwner));
-      providedNativeModelProtocolModel.GetGenericTypeDefinition.Set((lifetime, _) =>
-        GetGenericTypeDefinition(lifetime, providedNativeModel, providedModelOwner));
-      providedNativeModelProtocolModel.GetElementType.Set(
-        (lifetime, _) => GetElementType(lifetime, providedNativeModel, providedModelOwner));
-      providedNativeModelProtocolModel.GetGenericArguments.Set((lifetime, _) =>
-        GetGenericArguments(lifetime, providedNativeModel, providedModelOwner));
-      providedNativeModelProtocolModel.GetArrayRank.Set((lifetime, _) => GetArrayRank(lifetime, providedNativeModel));
-      providedNativeModelProtocolModel.GetEnumUnderlyingType.Set(
-        (lifetime, _) => GetEnumUnderlyingType(lifetime, providedNativeModel, providedModelOwner));
-      providedNativeModelProtocolModel.GetProperties.Set((lifetime, _) =>
-        GetProperties(lifetime, providedNativeModel, providedModelOwner));
-      providedNativeModelProtocolModel.GetProperty.Set((lifetime, propName) =>
-        GetProperty(lifetime, providedNativeModel, providedModelOwner, propName));
-      providedNativeModelProtocolModel.GenericParameterPosition.Set((lifetime, _) =>
-        GetGenericParameterPosition(lifetime, providedNativeModel));
-      providedNativeModelProtocolModel.GetStaticParameters.Set((lifetime, _) =>
-        GetStaticParameters(lifetime, providedNativeModel, providedModelOwner));
-      providedNativeModelProtocolModel.GetMethods.Set((lifetime, _) =>
-        GetMethods(lifetime, providedNativeModel, providedModelOwner));
-
-      return providedNativeModelProtocolModel;
-    }
+    protected override RdProvidedType CreateRdModel(ProvidedType providedNativeModel, int entityId, int typeProviderId)
+      => new RdProvidedType(providedNativeModel.FullName, providedNativeModel.Namespace,
+        providedNativeModel.IsGenericParameter, providedNativeModel.IsValueType, providedNativeModel.IsByRef,
+        providedNativeModel.IsPointer, providedNativeModel.IsEnum, providedNativeModel.IsArray,
+        providedNativeModel.IsInterface, providedNativeModel.IsClass, providedNativeModel.IsSealed,
+        providedNativeModel.IsAbstract, providedNativeModel.IsPublic, providedNativeModel.IsNestedPublic,
+        providedNativeModel.IsSuppressRelocate, providedNativeModel.IsErased, providedNativeModel.IsGenericType,
+        providedNativeModel.Name, entityId, typeProviderId);
 
     private RdTask<RdProvidedType> GetDeclaringType(
       in Lifetime lifetime,
@@ -259,24 +213,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       return RdTask<RdProvidedType[]>.Successful(nestedTypes);
     }
 
-    private RdTask<RdProvidedType> GetNestedType(
-      in Lifetime lifetime,
-      ProvidedType providedNativeModel,
-      ITypeProvider providedModelOwner,
-      string typeName)
+    private RdTask<RdProvidedType> GetNestedType(in Lifetime lifetime, int entityId, string typeName)
     {
-      var nestedType = GetRdModel(providedNativeModel.GetNestedType(typeName), providedModelOwner);
+      var providedType = GetEntity(entityId);
+
+      var nestedType = GetRdModel(providedType.GetNestedType(typeName));
       return RdTask<RdProvidedType>.Successful(nestedType);
     }
 
-    private RdTask<RdProvidedType[]> GetInterfaces(
-      in Lifetime lifetime,
-      ProvidedType providedNativeModel,
-      ITypeProvider providedModelOwner)
+    private RdTask<RdProvidedType[]> GetInterfaces(in Lifetime lifetime, int entityId)
     {
-      var interfaces = providedNativeModel
+      var providedType = GetEntity(entityId);
+
+      var interfaces = providedType
         .GetInterfaces()
-        .Select(t => GetRdModel(t, providedModelOwner)).ToArray();
+        .Select(GetRdModel)
+        .ToArray();
       return RdTask<RdProvidedType[]>.Successful(interfaces);
     }
   }

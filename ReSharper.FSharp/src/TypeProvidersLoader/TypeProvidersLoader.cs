@@ -20,15 +20,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader
       var typeProvidersTypes = TypeProviderInstantiateHelpers.GetTypeProviderImplementationTypes(
         parameters.RunTimeAssemblyFileName,
         parameters.DesignTimeAssemblyNameString);
-      
-      var ids = new List<ITypeProvider>(typeProvidersTypes.Length);
+
+      var typeProviders = new List<ITypeProvider>(typeProvidersTypes.Length);
 
       foreach (var typeProvidersType in typeProvidersTypes)
       {
         try
         {
           var result = CreateTypeProvider(typeProvidersType, parameters);
-          ids.Add(result);
+          typeProviders.Add(result);
         }
         catch (Exception e)
         {
@@ -37,7 +37,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader
         }
       }
 
-      return ids.ToArray();
+      return typeProviders.ToArray();
     }
 
     private ITypeProvider CreateTypeProvider(

@@ -136,7 +136,7 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
                      isInteractive: bool, 
                      systemRuntimeContainsType: string -> bool, //не забыть
                      systemRuntimeAssemblyVersion: System.Version,
-                     compilerToolsPath: string list,
+                     compilerToolsPath: string list, //не забыть
                      m: range) =
             
             if ourModel = null then 
@@ -182,7 +182,7 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
                                                                                                                                   compilerToolsPath |> Array.ofList,
                                                                                                                                   rdSystemRuntimeContainsType))
                             for tp in res
-                                -> new TypeProviderWithCache(new ProxyTypeProvider(tp, ourModel)) :> ITypeProvider
+                                -> new ProxyTypeProviderWithCache(tp, ourModel) :> ITypeProvider
                             |   None, _ -> () ]
                     
                     typeProvidersCache.Add(designTimeAssemblyNameString, newTypeProviders)
@@ -197,12 +197,13 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
             taintedProviders
             
         member this.GetProvidedTypes(pn: Tainted<IProvidedNamespace>, m: range) =
-            let types = pn.PApplyArray((fun r -> r.As<IProxyProvidedNamespace>().GetRdTypes()), "GetTypes", m)
-            let providedTypes = [| for t in types -> t.PApply((fun ty -> (ProxyProvidedType.CreateNoContext(ty, ourModel)).WithCache()), m) |]
+            let providedTypes =
+                pn.PApplyArray((fun r -> r.As<IProxyProvidedNamespace>().GetProvidedTypes().WithCache()), "GetTypes", m)
             providedTypes
             
         member this.ResolveTypeName(pn: Tainted<IProvidedNamespace>, typeName: string, m: range) =
-            pn.PApply((fun providedNamespace -> ProxyProvidedType.CreateNoContext(providedNamespace.As<IProxyProvidedNamespace>().ResolveRdTypeName typeName, ourModel).WithCache()), range=m) 
+            pn.PApply((fun providedNamespace ->
+                (providedNamespace.As<IProxyProvidedNamespace>().ResolveProvidedTypeName typeName).WithCache()), range=m) 
 
             
     interface IDisposable with

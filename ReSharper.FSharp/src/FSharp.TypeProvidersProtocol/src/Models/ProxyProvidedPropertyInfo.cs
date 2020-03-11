@@ -44,11 +44,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override bool CanWrite => myPropertyInfo.CanWrite;
 
     public override ProvidedType DeclaringType =>
-      myCache.GetOrCreateWithContextProvidedType(RdProvidedPropertyInfoProcessModel.DeclaringType.Sync(EntityId),
+      myCache.GetOrCreateWithContext(RdProvidedPropertyInfoProcessModel.DeclaringType.Sync(EntityId),
         myContext);
 
     public override ProvidedType PropertyType =>
-      myCache.GetOrCreateWithContextProvidedType(RdProvidedPropertyInfoProcessModel.PropertyType.Sync(EntityId),
+      myCache.GetOrCreateWithContext(RdProvidedPropertyInfoProcessModel.PropertyType.Sync(EntityId),
         myContext);
 
     public override ProvidedMethodInfo GetGetMethod() =>
@@ -63,7 +63,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       // ReSharper disable once CoVariantArrayConversion
       RdProvidedPropertyInfoProcessModel.GetIndexParameters
         .Sync(EntityId)
-        .Select(t => ProxyProvidedParameterInfo.Create(t, myProcessModel, myContext, myCache))
+        .Select(t => ProxyProvidedParameterInfoWithCache.Create(t, myProcessModel, myContext, myCache))
         .ToArray();
   }
 }

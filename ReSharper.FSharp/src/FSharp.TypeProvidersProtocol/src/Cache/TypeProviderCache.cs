@@ -9,7 +9,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache
   public interface ITypeProviderCache
   {
     [ContractAnnotation("key:null => null")]
-    ProvidedType GetOrCreateWithContextProvidedType(int? key, ProvidedTypeContext context);
+    ProvidedType GetOrCreateWithContext(int? key, ProvidedTypeContext context);
   }
 
   public class TypeProviderCache : ITypeProviderCache
@@ -26,14 +26,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache
       myProvidedTypes = new Dictionary<int, ProvidedType>();
     }
 
-    public ProvidedType GetOrCreateWithContextProvidedType(int? key, ProvidedTypeContext context)
+    public ProvidedType GetOrCreateWithContext(int? key, ProvidedTypeContext context)
     {
       if (!key.HasValue) return null;
       if (myProvidedTypes.TryGetValue(key.Value, out var providedType)) return providedType;
 
       providedType = ProxyProvidedType
         .Create(
-          TypeProviderProcessModel.GetProvidedType.Sync(new GetProvidedTypeArgs(myProvider.EntityId, key.Value)),
+          TypeProviderProcessModel.GetProvidedType.Sync(new GetProvidedTypeArgs(myProvider.TypeProviderId, key.Value)),
           myProcessModel, context, this)
         .WithCache();
       myProvidedTypes.Add(key.Value, providedType);

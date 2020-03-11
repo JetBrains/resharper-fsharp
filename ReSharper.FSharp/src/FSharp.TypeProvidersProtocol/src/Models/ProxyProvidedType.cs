@@ -62,31 +62,31 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       RdProvidedTypeProcessModel.GenericParameterPosition.Sync(myRdProvidedType.EntityId);
 
     public override ProvidedType BaseType =>
-      myCache.GetOrCreateWithContextProvidedType(RdProvidedTypeProcessModel.BaseType.Sync(EntityId), Context);
+      myCache.GetOrCreateWithContext(RdProvidedTypeProcessModel.BaseType.Sync(EntityId), Context);
 
     public override ProvidedType DeclaringType =>
-      myCache.GetOrCreateWithContextProvidedType(RdProvidedTypeProcessModel.DeclaringType.Sync(EntityId), Context);
+      myCache.GetOrCreateWithContext(RdProvidedTypeProcessModel.DeclaringType.Sync(EntityId), Context);
 
     public override ProvidedType GetNestedType(string nm) =>
-      myCache.GetOrCreateWithContextProvidedType(
+      myCache.GetOrCreateWithContext(
         RdProvidedTypeProcessModel.GetNestedType.Sync(new GetNestedTypeArgs(EntityId, nm)), Context);
 
     public override ProvidedType[] GetNestedTypes() =>
       // ReSharper disable once CoVariantArrayConversion
       RdProvidedTypeProcessModel.GetNestedTypes
         .Sync(EntityId)
-        .Select(t => myCache.GetOrCreateWithContextProvidedType(t, Context))
+        .Select(t => myCache.GetOrCreateWithContext(t, Context))
         .ToArray();
 
     public override ProvidedType[] GetAllNestedTypes() =>
       // ReSharper disable once CoVariantArrayConversion
       RdProvidedTypeProcessModel.GetAllNestedTypes
         .Sync(EntityId)
-        .Select(t => myCache.GetOrCreateWithContextProvidedType(t, Context))
+        .Select(t => myCache.GetOrCreateWithContext(t, Context))
         .ToArray();
 
     public override ProvidedType GetGenericTypeDefinition() =>
-      myCache.GetOrCreateWithContextProvidedType(RdProvidedTypeProcessModel.GetGenericTypeDefinition.Sync(EntityId),
+      myCache.GetOrCreateWithContext(RdProvidedTypeProcessModel.GetGenericTypeDefinition.Sync(EntityId),
         Context);
 
     public override ProvidedPropertyInfo[] GetProperties() =>
@@ -103,31 +103,31 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override int GetArrayRank() => RdProvidedTypeProcessModel.GetArrayRank.Sync(EntityId);
 
     public override ProvidedType GetElementType() =>
-      myCache.GetOrCreateWithContextProvidedType(RdProvidedTypeProcessModel.GetElementType.Sync(EntityId), Context);
+      myCache.GetOrCreateWithContext(RdProvidedTypeProcessModel.GetElementType.Sync(EntityId), Context);
 
     public override ProvidedType[] GetGenericArguments() =>
       // ReSharper disable once CoVariantArrayConversion
       RdProvidedTypeProcessModel.GetGenericArguments
         .Sync(EntityId)
-        .Select(t => myCache.GetOrCreateWithContextProvidedType(t, Context))
+        .Select(t => myCache.GetOrCreateWithContext(t, Context))
         .ToArray();
 
     public override ProvidedType GetEnumUnderlyingType() =>
-      myCache.GetOrCreateWithContextProvidedType(RdProvidedTypeProcessModel.GetEnumUnderlyingType.Sync(EntityId),
+      myCache.GetOrCreateWithContext(RdProvidedTypeProcessModel.GetEnumUnderlyingType.Sync(EntityId),
         Context);
 
     public override ProvidedParameterInfo[] GetStaticParameters(ITypeProvider provider) =>
       // ReSharper disable once CoVariantArrayConversion
       RdProvidedTypeProcessModel.GetStaticParameters
         .Sync(EntityId)
-        .Select(t => ProxyProvidedParameterInfo.Create(t, myProcessModel, Context, myCache))
+        .Select(t => ProxyProvidedParameterInfoWithCache.Create(t, myProcessModel, Context, myCache))
         .ToArray();
 
     public override ProvidedType[] GetInterfaces() =>
       // ReSharper disable once CoVariantArrayConversion
       RdProvidedTypeProcessModel.GetInterfaces
         .Sync(EntityId)
-        .Select(t => myCache.GetOrCreateWithContextProvidedType(t, Context))
+        .Select(t => myCache.GetOrCreateWithContext(t, Context))
         .ToArray();
 
     public override ProvidedMethodInfo[] GetMethods() =>

@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using JetBrains.Rd.Tasks;
 using JetBrains.Lifetimes;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
 using Microsoft.FSharp.Core.CompilerServices;
@@ -10,60 +11,57 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
 {
   public class ProvidedNamespacesHost : OutOfProcessProtocolHostBase<IProvidedNamespace, RdProvidedNamespace>
   {
+    private readonly RdProvidedNamespaceProcessModel myProcessModel;
     private readonly IOutOfProcessProtocolHost<ProvidedType, RdProvidedType> myProvidedTypesHost;
 
-    public ProvidedNamespacesHost() : base(new ProvidedNamespaceEqualityComparer())
+    private readonly RdProvidedNamespaceProcessModel myRdProvidedNamespaceProcessModel;
+
+    public ProvidedNamespacesHost(ITypeProvider typeProvider, RdProvidedNamespaceProcessModel processModel) : base(
+      new ProvidedNamespaceEqualityComparer())
     {
-      myProvidedTypesHost = new ProvidedTypesHost();
+      myProcessModel = processModel;
+      myProvidedTypesHost = new ProvidedTypesHost(typeProvider);
+
+      myRdProvidedNamespaceProcessModel = new RdProvidedNamespaceProcessModel();
+      myRdProvidedNamespaceProcessModel.GetNestedNamespaces.Set(GetNestedNamespaces);
+      myRdProvidedNamespaceProcessModel.GetTypes.Set(GetTypes);
+      myRdProvidedNamespaceProcessModel.ResolveTypeName.Set(ResolveTypeName);
     }
 
-    protected override RdProvidedNamespace CreateRdModel(
-      IProvidedNamespace providedNativeModel,
-      ITypeProvider providedModelOwner)
+    protected override RdProvidedNamespace CreateRdModel(IProvidedNamespace providedNativeModel, int entityId) =>
+      new RdProvidedNamespace(providedNativeModel.NamespaceName, entityId);
+
+    private RdTask<int> ResolveTypeName(Lifetime lifetime, ResolveTypeNameArgs args)
     {
-      var pnProtocolModel = new RdProvidedNamespace(providedNativeModel.NamespaceName);
+      var providedNamespace = GetEntity(args.Id);
 
-      pnProtocolModel.GetNestedNamespaces.Set((lifetime, _) =>
-        GetNestedNamespaces(lifetime, providedNativeModel, providedModelOwner));
-      pnProtocolModel.GetTypes.Set((lifetime, _) => GetTypes(lifetime, providedNativeModel, providedModelOwner));
-      pnProtocolModel.ResolveTypeName.Set((lifetime, typeName) =>
-        ResolveTypeName(lifetime, providedNativeModel, providedModelOwner, typeName));
-
-      return pnProtocolModel;
+      var providedType = ProvidedType.CreateNoContext(providedNamespace.ResolveTypeName(args.TypeFullName));
+      // ReSharper disable once PossibleNullReferenceException
+      var rdProvidedTypeId = myProvidedTypesHost.GetRdModel(providedType).EntityId;
+      return RdTask<int>.Successful(rdProvidedTypeId);
     }
 
-    private RdTask<RdProvidedType> ResolveTypeName(
-      Lifetime lifetime,
-      IProvidedNamespace providedNamespace,
-      ITypeProvider providedModelOwner,
-      string typeName)
+    private RdTask<int[]> GetTypes(Lifetime lifetime, int entityId)
     {
-      var providedType = ProvidedType.CreateNoContext(providedNamespace.ResolveTypeName(typeName));
-      var rdProvidedType = myProvidedTypesHost.GetRdModel(providedType, providedModelOwner);
-      return RdTask<RdProvidedType>.Successful(rdProvidedType);
-    }
+      var providedNamespace = GetEntity(entityId);
 
-    private RdTask<RdProvidedType[]> GetTypes(
-      Lifetime lifetime,
-      IProvidedNamespace providedNamespace,
-      ITypeProvider providedModelOwner)
-    {
-      var types = providedNamespace.GetTypes()
+      var typeIds = providedNamespace
+        .GetTypes()
         .Select(ProvidedType.CreateNoContext)
-        .Select(t => myProvidedTypesHost.GetRdModel(t, providedModelOwner))
+        // ReSharper disable once PossibleNullReferenceException
+        .Select(t => myProvidedTypesHost.GetRdModel(t).EntityId)
         .ToArray();
-
-      return RdTask<RdProvidedType[]>.Successful(types);
+      return RdTask<int[]>.Successful(typeIds);
     }
 
-    private RdTask<RdProvidedNamespace[]> GetNestedNamespaces(
-      Lifetime lifetime,
-      IProvidedNamespace providedNamespace,
-      ITypeProvider providedModelOwner)
+    private RdTask<RdProvidedNamespace[]> GetNestedNamespaces(Lifetime lifetime, int entityId)
     {
+      var providedNamespace = GetEntity(entityId);
+
       var namespaces = providedNamespace
         .GetNestedNamespaces()
-        .Select(t => GetRdModel(t, providedModelOwner)).ToArray();
+        .Select(GetRdModel)
+        .ToArray();
       return RdTask<RdProvidedNamespace[]>.Successful(namespaces);
     }
   }

@@ -7,13 +7,13 @@ using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 {
-  public class ProxyProvidedParameterInfo : ProvidedParameterInfo
+  public class ProxyProvidedParameterInfoWithCache : ProvidedParameterInfo
   {
     private readonly RdProvidedParameterInfo myParameterInfo;
     private readonly ProvidedTypeContext myContext;
     private readonly ITypeProviderCache myCache;
 
-    public ProxyProvidedParameterInfo(RdProvidedParameterInfo parameterInfo, ProvidedTypeContext context,
+    public ProxyProvidedParameterInfoWithCache(RdProvidedParameterInfo parameterInfo, ProvidedTypeContext context,
       ITypeProviderCache cache) : base(
       typeof(string).GetMethods().First().ReturnParameter, context)
     {
@@ -23,16 +23,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     }
 
     [ContractAnnotation("parameter:null => null")]
-    public static ProxyProvidedParameterInfo CreateNoContext(RdProvidedParameterInfo parameter,
+    public static ProxyProvidedParameterInfoWithCache CreateNoContext(RdProvidedParameterInfo parameter,
       RdFSharpTypeProvidersLoaderModel processModel, ITypeProviderCache cache) =>
       parameter == null
         ? null
-        : new ProxyProvidedParameterInfo(parameter, ProvidedTypeContext.Empty, cache);
+        : new ProxyProvidedParameterInfoWithCache(parameter, ProvidedTypeContext.Empty, cache);
 
     [ContractAnnotation("parameter:null => null")]
-    public static ProxyProvidedParameterInfo Create(RdProvidedParameterInfo parameter,
+    public static ProxyProvidedParameterInfoWithCache Create(RdProvidedParameterInfo parameter,
       RdFSharpTypeProvidersLoaderModel processModel, ProvidedTypeContext context, ITypeProviderCache cache) =>
-      parameter == null ? null : new ProxyProvidedParameterInfo(parameter, context, cache);
+      parameter == null ? null : new ProxyProvidedParameterInfoWithCache(parameter, context, cache);
 
     public override string Name => myParameterInfo.Name;
     public override bool IsIn => myParameterInfo.IsIn;
@@ -41,6 +41,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override bool HasDefaultValue => myParameterInfo.HasDefaultValue;
 
     public override ProvidedType ParameterType =>
-      myCache.GetOrCreateWithContextProvidedType(myParameterInfo.ParameterType.Sync(Unit.Instance), myContext);
+      myCache.GetOrCreateWithContext(myParameterInfo.ParameterType.Sync(Unit.Instance), myContext);
   }
 }

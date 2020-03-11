@@ -41,14 +41,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public ProvidedType[] GetProvidedTypes() =>
       RdProvidedNamespaceProcessModel.GetTypes
         .Sync(EntityId)
-        .Select(t => myCache.GetOrCreateWithContextProvidedType(t, ProvidedTypeContext.Empty))
+        .Select(t => myCache.GetOrCreateWithContext(t, ProvidedTypeContext.Empty))
         .ToArray();
 
     public Type ResolveTypeName(string typeName) =>
       throw new Exception("ResolveTypeName should be unreachable");
 
     public ProvidedType ResolveProvidedTypeName(string typeName) =>
-      myCache.GetOrCreateWithContextProvidedType(
+      myCache.GetOrCreateWithContext(
         RdProvidedNamespaceProcessModel.ResolveTypeName.Sync(new ResolveTypeNameArgs(EntityId, typeName)),
         ProvidedTypeContext.Empty);
   }

@@ -27,8 +27,8 @@ object RdFSharpTypeProvidersLoaderModel : Root(
     }
 
     private val RdProvidedMemberInfo = baseclass {
-        field("EntityId", int)
         field("Name", string)
+        field("EntityId", int)
     }
 
     private val RdProvidedMethodBase = baseclass extends RdProvidedMemberInfo {
@@ -216,7 +216,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
     }
 
     private val RdTypeProvider = structdef {
-        field("EntityId", int)
+        field("TypeProviderId", int)
     }
 
     init {

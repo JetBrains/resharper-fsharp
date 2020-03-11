@@ -56,24 +56,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override bool IsHideBySig => myMethodInfo.IsHideBySig;
 
     public override ProvidedType DeclaringType =>
-      myCache.GetOrCreateWithContextProvidedType(RdProvidedMethodInfoProcessModel.DeclaringType.Sync(EntityId),
+      myCache.GetOrCreateWithContext(RdProvidedMethodInfoProcessModel.DeclaringType.Sync(EntityId),
         myContext);
 
     public override ProvidedType ReturnType =>
-      myCache.GetOrCreateWithContextProvidedType(RdProvidedMethodInfoProcessModel.ReturnType.Sync(EntityId), myContext);
+      myCache.GetOrCreateWithContext(RdProvidedMethodInfoProcessModel.ReturnType.Sync(EntityId), myContext);
 
     public override ProvidedParameterInfo[] GetParameters() =>
       // ReSharper disable once CoVariantArrayConversion
       RdProvidedMethodInfoProcessModel.GetParameters
         .Sync(EntityId)
-        .Select(t => ProxyProvidedParameterInfo.Create(t, myProcessModel, myContext, myCache))
+        .Select(t => ProxyProvidedParameterInfoWithCache.Create(t, myProcessModel, myContext, myCache))
         .ToArray();
 
     public override ProvidedType[] GetGenericArguments() =>
       // ReSharper disable once CoVariantArrayConversion
       RdProvidedMethodInfoProcessModel.GetGenericArguments
         .Sync(EntityId)
-        .Select(t => myCache.GetOrCreateWithContextProvidedType(t, myContext))
+        .Select(t => myCache.GetOrCreateWithContext(t, myContext))
         .ToArray();
   }
 }

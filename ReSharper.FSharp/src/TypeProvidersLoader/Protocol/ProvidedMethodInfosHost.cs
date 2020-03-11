@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using JetBrains.Lifetimes;
 using JetBrains.Rd.Tasks;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
 using Microsoft.FSharp.Core.CompilerServices;
@@ -40,7 +41,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
         providedNativeModel.IsAbstract,
         providedNativeModel.IsHideBySig,
         providedNativeModel.IsConstructor,
-        providedNativeModel.Name);
+        providedNativeModel.Name,
+        "");
 
       methodInfoModel.ReturnType.Set((lifetime, _) =>
         GetReturnType(lifetime, providedNativeModel, providedModelOwner));

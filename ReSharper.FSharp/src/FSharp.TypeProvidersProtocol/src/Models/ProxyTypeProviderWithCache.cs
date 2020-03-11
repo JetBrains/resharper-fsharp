@@ -1,35 +1,33 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
 using Microsoft.FSharp.Core.CompilerServices;
 using Microsoft.FSharp.Quotations;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 {
-  public class ProxyTypeProvider : ITypeProvider
+  public class ProxyTypeProviderWithCache : ITypeProvider
   {
     private readonly RdTypeProvider myRdTypeProvider;
     private readonly RdFSharpTypeProvidersLoaderModel myProcessModel;
     private RdTypeProviderProcessModel RdTypeProviderProcessModel => myProcessModel.RdTypeProviderProcessModel;
-    private int EntityId => myRdTypeProvider.EntityId;
+    private int EntityId => myRdTypeProvider.TypeProviderId;
 
-    public ProxyTypeProvider(
+    public ProxyTypeProviderWithCache(
       RdTypeProvider rdTypeProvider,
       RdFSharpTypeProvidersLoaderModel processModel)
     {
       myRdTypeProvider = rdTypeProvider;
       myProcessModel = processModel;
-      
+
+      InitCaches();
+
       //myTypeProvider.Invalidate += TypeProviderOnInvalidate;
     }
 
-    public IProvidedNamespace[] GetNamespaces() =>
-      // ReSharper disable once CoVariantArrayConversion
-      RdTypeProviderProcessModel.GetNamespaces
-        .Sync(EntityId)
-        .Select(t => new ProxyProvidedNamespace(t, myProcessModel))
-        .ToArray();
+    public IProvidedNamespace[] GetNamespaces() => myProvidedNamespaces.Value;
 
     public ParameterInfo[] GetStaticParameters(Type typeWithoutArguments) =>
       throw new Exception("GetStaticParameters should be unreachable");
@@ -48,5 +46,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public void Dispose() => RdTypeProviderProcessModel.Dispose.Sync(EntityId);
 
     public event EventHandler Invalidate;
+
+    private void InitCaches()
+    {
+      // ReSharper disable once CoVariantArrayConversion
+      myProvidedNamespaces = new Lazy<IProvidedNamespace[]>(() => RdTypeProviderProcessModel.GetNamespaces
+        .Sync(EntityId)
+        .Select(t => new ProxyProvidedNamespace(t, myProcessModel, myCache))
+        .ToArray());
+      
+      myCache = new TypeProviderCache(myRdTypeProvider, myProcessModel);
+    }
+    
+    private TypeProviderCache myCache;
+    private Lazy<IProvidedNamespace[]> myProvidedNamespaces;
   }
 }

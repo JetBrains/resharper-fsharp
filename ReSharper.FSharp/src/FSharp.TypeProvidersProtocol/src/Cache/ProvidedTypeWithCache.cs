@@ -89,7 +89,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache
 
     public override ProvidedMethodInfo[] GetMethods() => myMethods.Value;
 
-    public override ProvidedType ApplyContext(ProvidedTypeContext ctxt) => myProvidedType.ApplyContext(ctxt);
+    public override ProvidedType ApplyContext(ProvidedTypeContext context) => myProvidedType.ApplyContext(context);
 
     private int? myArrayRank;
     private readonly Lazy<ProvidedType> myBaseType;
