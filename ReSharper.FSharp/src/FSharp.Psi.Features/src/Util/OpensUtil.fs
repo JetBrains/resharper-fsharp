@@ -57,10 +57,12 @@ let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBo
 
     let insertBeforeModuleMember (moduleMember: IModuleMember) =
         let indent = moduleMember.Indent
+        let nonSpaceNodeBeforeMember = skipMatchingNodesBefore isWhitespace moduleMember
+
         addNodesBefore moduleMember [
-            // todo: add only if needed
+            // todo: add setting for adding space before first module member
             // Add space before new opens group.
-            if not (moduleMember :? IOpenStatement) then
+            if not (moduleMember :? IOpenStatement) && (isNotNull (getTokenType nonSpaceNodeBeforeMember)) then
                 NewLine(lineEnding)
 
             if indent > 0 then
