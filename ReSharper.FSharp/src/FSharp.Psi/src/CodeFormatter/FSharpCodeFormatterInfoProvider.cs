@@ -22,9 +22,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         ("LocalBinding", ElementType.LOCAL_BINDING, LocalBinding.EXPR),
       };
 
+      var synExprIndentingRulesParameters = new[]
+      {
+        ("ForExpr", ElementType.FOR_EXPR, ForExpr.DO_EXPR),
+        ("ForEachExpr", ElementType.FOR_EACH_EXPR, ForEachExpr.DO_EXPR),
+        ("WhileExpr", ElementType.WHILE_EXPR, WhileExpr.DO_EXPR),
+        ("DoExpr", ElementType.DO_EXPR, DoExpr.EXPR),
+        ("AssertExpr", ElementType.ASSERT_EXPR, AssertExpr.EXPR),
+        ("LazyExpr", ElementType.LAZY_EXPR, LazyExpr.EXPR),
+        ("ComputationExpr", ElementType.COMPUTATION_EXPR, ComputationExpr.EXPR),
+        ("SetExpr", ElementType.SET_EXPR, SetExpr.RIGHT_EXPR),
+      };
+
       lock (this)
       {
         bindingAndModuleDeclIndentingRulesParameters
+          .Union(synExprIndentingRulesParameters)
           .ToList()
           .ForEach(DescribeSimpleIndentingRule);
       }
