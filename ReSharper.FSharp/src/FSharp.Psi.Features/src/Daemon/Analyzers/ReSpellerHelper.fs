@@ -14,3 +14,8 @@ type ReSpellerPsiHelper() =
         | :? ISynPat as synPat -> not synPat.IsDeclaration
         | :? IFSharpDeclaration as fsDeclaration -> fsDeclaration.NameIdentifier :? IActivePatternId
         | _ -> true
+
+    override x.GetDeclarationOnIdentifier(node) =
+        match node with
+        | :? IFSharpIdentifier as fsIdentifier -> NamedPatNavigator.GetByIdentifier(fsIdentifier) :> _
+        | _ -> null
