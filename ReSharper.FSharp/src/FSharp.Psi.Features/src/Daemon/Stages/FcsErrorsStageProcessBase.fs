@@ -99,7 +99,7 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | UndefinedName ->
             if (endsWith undefinedIndexerMessageSuffix error.Message &&
-                    let indexer = fsFile.GetNode(range) in isNotNull indexer) then
+                    let indexer = fsFile.GetNode<IItemIndexerExpr>(range) in isNotNull indexer) then
                 UndefinedIndexerError(fsFile.GetNode(range)) :> _ else
 
             let identifier = fsFile.GetNode(range)

@@ -1,0 +1,6 @@
+﻿module Module
+
+let item = "".|Item|(0)
+
+---------------------------------------------------------
+(0): ReSharper Error Highlighting: The type 'String' does not define the field, constructor or member 'Item'.
