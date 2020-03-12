@@ -30,7 +30,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelC
       return model;
     }
 
-    private RdProvidedType CreateRdModelInternal(ProvidedType providedNativeModel, int entityId) =>
+    private static RdProvidedType CreateRdModelInternal(ProvidedType providedNativeModel, int entityId) =>
       new RdProvidedType(providedNativeModel.FullName,
         providedNativeModel.Namespace, providedNativeModel.IsVoid,
         providedNativeModel.IsGenericParameter, providedNativeModel.IsValueType, providedNativeModel.IsByRef,

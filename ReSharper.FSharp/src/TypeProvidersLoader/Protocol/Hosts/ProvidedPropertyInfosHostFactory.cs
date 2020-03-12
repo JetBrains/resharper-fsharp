@@ -1,18 +1,16 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using JetBrains.Lifetimes;
 using JetBrains.Rd.Tasks;
-using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelCreators;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
 using Microsoft.FSharp.Core.CompilerServices;
 using static FSharp.Compiler.ExtensionTyping;
 
-namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
+namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
 {
   public class
-    ProvidedPropertyInfoHost : RdModelsCreatorBase<ProvidedPropertyInfo, RdProvidedPropertyInfo>
+    ProvidedPropertyInfoHost : IOutOfProcessHostFactory<RdProvidedPropertyInfoProcessModel>
   {
     private readonly IProvidedRdModelsCreator<ProvidedParameterInfo, RdProvidedParameterInfo>
       myProvidedParameterInfosHost;
@@ -22,6 +20,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
 
     private readonly IProvidedRdModelsCreator<ProvidedType, RdProvidedType> myProvidedTypesHost;
 
+    public RdProvidedPropertyInfoProcessModel CreateProcessModel()
+    {
+      var processModel = new RdProvidedPropertyInfoProcessModel();
+
+      processModel.PropertyType.Set(GetPropertyType);
+      processModel.DeclaringType.Set(GetDeclaringType);
+      processModel.GetGetMethod.Set(GetGetMethod);
+      processModel.GetSetMethod.Set(GetSetMethod);
+      processModel.GetIndexParameters.Set((lifetime, _) =>
+        GetIndexParameters(lifetime, providedNativeModel, providedModelOwner));
+
+      return ppModel;
+    }
+    
     public ProvidedPropertyInfoHost(
       IProvidedRdModelsCreator<ProvidedParameterInfo, RdProvidedParameterInfo>
         providedParameterInfosHost,
@@ -32,25 +44,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       myProvidedTypesHost = providedTypesHost;
       myProvidedMethodInfosHost = providedMethodInfosHost;
       myProvidedParameterInfosHost = providedParameterInfosHost;
-    }
-
-    protected override RdProvidedPropertyInfo CreateRdModel(
-      ProvidedPropertyInfo providedNativeModel,
-      ITypeProvider providedModelOwner)
-    {
-      var ppModel = new RdProvidedPropertyInfo(
-        providedNativeModel.CanRead,
-        providedNativeModel.CanWrite,
-        providedNativeModel.Name);
-
-      ppModel.PropertyType.Set((lifetime, _) => GetPropertyType(lifetime, providedNativeModel, providedModelOwner));
-      ppModel.DeclaringType.Set((lifetime, _) => GetDeclaringType(lifetime, providedNativeModel, providedModelOwner));
-      ppModel.GetGetMethod.Set((lifetime, _) => GetGetMethod(lifetime, providedNativeModel, providedModelOwner));
-      ppModel.GetSetMethod.Set((lifetime, _) => GetSetMethod(lifetime, providedNativeModel, providedModelOwner));
-      ppModel.GetIndexParameters.Set((lifetime, _) =>
-        GetIndexParameters(lifetime, providedNativeModel, providedModelOwner));
-
-      return ppModel;
     }
 
     private RdTask<RdProvidedType> GetDeclaringType(
