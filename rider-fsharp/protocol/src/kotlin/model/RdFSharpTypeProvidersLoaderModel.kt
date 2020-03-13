@@ -151,7 +151,6 @@ object RdFSharpTypeProvidersLoaderModel : Root(
 
     private val InstantiateTypeProvidersOfAssemblyParameters = structdef {
         field("runTimeAssemblyFileName", string)
-        field("RdILScopeRefOfRuntimeAssembly", RdILScopeRef)
         field("designTimeAssemblyNameString", string)
         field("RdResolutionEnvironment", RdResolutionEnvironment)
         field("isInvalidationSupported", bool)
@@ -194,6 +193,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         call("ApplyStaticArguments", ApplyStaticArgumentsParameters, int)
         call("GetMethods", int, array(RdProvidedMethodInfo))
         call("DeclaringType", int, int.nullable)
+        call("Assembly", int, RdProvidedAssembly)
     }
 
     private val RdProvidedMethodInfoProcessModel = aggregatedef("RdProvidedMethodInfoProcessModel") {
@@ -222,6 +222,15 @@ object RdFSharpTypeProvidersLoaderModel : Root(
 
     private val RdTypeProvider = structdef {
         field("TypeProviderId", int)
+    }
+
+    private val RdProvidedAssembly = classdef extends RdProvidedMemberInfo {
+        field("FullName", string)
+    }
+
+    private val RdProvidedAssemblyProcessModel = aggregatedef("RdProvidedAssemblyProcessModel") {
+        call("GetAssemblyPath", int, string)
+        call("GetManifestModuleContents", int, array(byte))
     }
 
     init {
@@ -271,6 +280,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         field("RdProvidedPropertyInfoProcessModel", RdProvidedPropertyInfoProcessModel)
         field("RdProvidedMethodInfoProcessModel", RdProvidedMethodInfoProcessModel)
         field("RdProvidedParameterInfoProcessModel", RdProvidedParameterInfoProcessModel)
+        field("RdProvidedAssemblyProcessModel", RdProvidedAssemblyProcessModel)
 
         call("InstantiateTypeProvidersOfAssembly", InstantiateTypeProvidersOfAssemblyParameters, array(RdTypeProvider))
     }

@@ -2,13 +2,13 @@
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Cache
 {
-  public class ProvidedCacheBase<T> : IReadProvidedCache<T>, IWriteProvidedCache<T>
+  public class ProvidedCacheBase<T> : IProvidedCache<T>
   {
     private readonly IDictionary<int, T> myProvidedModelsCache; // just base version
 
     //private ObjectIDGenerator myObjectIdGenerator;
 
-    protected ProvidedCacheBase()
+    public ProvidedCacheBase()
     {
       myProvidedModelsCache = new Dictionary<int, T>();
     }

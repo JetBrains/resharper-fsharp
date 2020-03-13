@@ -9,4 +9,8 @@
   {
     void Add(int id, T value);
   }
+
+  public interface IProvidedCache<T> : IReadProvidedCache<T>, IWriteProvidedCache<T>
+  {
+  }
 }

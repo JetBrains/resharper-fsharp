@@ -31,43 +31,7 @@ type ILVersionInfo with
                   this.Minor |> int,
                   this.Build |> int,
                   this.Revision |> int)
-        
-type PublicKey with
-    [<Extension>]
-    member this.toRdPublicKey() =
-        RdPublicKey(this.IsKey,
-                    this.IsKeyToken,
-                    this.Key,
-                    this.KeyToken)
 
-type ILModuleRef with
-    [<Extension>]
-    member this.toRdILModuleRef() =
-        RdILModuleRef(this.Name,
-                      this.HasMetadata,
-                      Option.toObj this.Hash)
-
-type ILAssemblyRef with
-    [<Extension>]
-    member this.toRdILAssemblyRef() =
-        RdILAssemblyRef(this.Name,
-                        this.QualifiedName,
-                        Option.toObj this.Hash,
-                        (match this.PublicKey with | Some x -> x.toRdPublicKey() | _ -> null),
-                        this.Retargetable,
-                        (match this.Version with | Some x -> x.toRdVersion() | _ -> null),
-                        Option.toObj this.Locale)
-
-type ILScopeRef with
-    [<Extension>]
-    member this.toRdILScopeRef() =
-        (*RdILScopeRef(this.IsModuleRef,
-                     this.IsAssemblyRef,
-                     (if this.IsModuleRef then this.ModuleRef.toRdILModuleRef() else null),
-                     (if this.IsAssemblyRef then this.AssemblyRef.toRdILAssemblyRef() else null),
-                     this.QualifiedName) *)
-        null
-        
 type ResolutionEnvironment with
     [<Extension>]
     member this.toRdResolutionEnvironment() =

@@ -1,20 +1,10 @@
-﻿using System;
-using System.IO;
-using System.Linq;
-using JetBrains.Core;
-using JetBrains.Diagnostics;
+﻿using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.Platform.RdFramework.ExternalProcess;
 using JetBrains.Rd.Impl;
-using JetBrains.Rd.Tasks;
-using JetBrains.ReSharper.Host.Features.Util;
-using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Cache;
-using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts;
-using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
 using JetBrains.Util;
 using JetBrains.Util.Logging;
-using Microsoft.FSharp.Core.CompilerServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
 {

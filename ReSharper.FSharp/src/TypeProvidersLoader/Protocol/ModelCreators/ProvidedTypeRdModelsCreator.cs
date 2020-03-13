@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Cache;
@@ -9,12 +10,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelC
 {
   public class ProvidedTypeRdModelsCreator : IProvidedRdModelsCreator<ProvidedType, RdProvidedType>
   {
-    private readonly IWriteProvidedCache<Tuple<ProvidedType, RdProvidedType, int>> myCache;
+    private readonly IProvidedCache<Tuple<ProvidedType, RdProvidedType, int>> myCache;
+    private readonly IDictionary<ProvidedType, int> myIdsCache;
     private int myCurrentId;
 
-    public ProvidedTypeRdModelsCreator(IWriteProvidedCache<Tuple<ProvidedType, RdProvidedType, int>> cache)
+    public ProvidedTypeRdModelsCreator(IProvidedCache<Tuple<ProvidedType, RdProvidedType, int>> cache,
+      IEqualityComparer<ProvidedType> equalityComparer)
     {
       myCache = cache;
+      myIdsCache = new Dictionary<ProvidedType, int>(equalityComparer);
     }
 
     [ContractAnnotation("providedModel:null => null")]
@@ -22,10 +26,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelC
     {
       if (providedModel == null) return null;
 
-      var id = CreateEntityKey(providedModel);
+      if (myIdsCache.TryGetValue(providedModel, out var id))
+      {
+        var (_, rdModel, _) = myCache.Get(id);
+        return rdModel;
+      }
+
+      id = CreateEntityKey(providedModel);
       var model = CreateRdModelInternal(providedModel, id);
 
       myCache.Add(id, new Tuple<ProvidedType, RdProvidedType, int>(providedModel, model, typeProviderId));
+      myIdsCache.Add(providedModel, id);
 
       return model;
     }

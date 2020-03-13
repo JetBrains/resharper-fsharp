@@ -73,13 +73,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache
 
     public override ProvidedParameterInfo[] GetStaticParameters(ITypeProvider provider) =>
       myStaticParameters?.Value ?? (myStaticParameters = new Lazy<ProvidedParameterInfo[]>(
-        () => myProvidedType.GetStaticParameters(provider).WithCache())).Value;
+        () => myProvidedType.GetStaticParameters(provider))).Value;
 
     public override ProvidedType[] GetInterfaces() => myInterfaces.Value;
 
     public override ProvidedMethodInfo[] GetMethods() => myMethods.Value;
 
     public override ProvidedType ApplyContext(ProvidedTypeContext context) => myProvidedType.ApplyContext(context);
+
+    public override ProvidedType ApplyStaticArguments(ITypeProvider provider, string[] fullTypePathAfterArguments,
+      object[] staticArgs) => myProvidedType.ApplyStaticArguments(provider, fullTypePathAfterArguments, staticArgs);
 
     private int? myArrayRank;
     private readonly Lazy<ProvidedType> myBaseType;

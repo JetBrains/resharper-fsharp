@@ -11,15 +11,13 @@
         <ProjectReference Include="..\FSharp.ProjectModelBase\FSharp.ProjectModelBase.csproj" />
         <ProjectReference Include="..\FSharp.TypeProvidersProtocol\FSharp.TypeProvidersProtocol.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
-    </ItemGroup>
-
+    
     <ItemGroup>
       <None Remove="JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.exe.config" />
       <Content Include="JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.exe.config">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
     </ItemGroup>
+
+    <Import Project="$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props" Condition="Exists('$(DotNetSdkPath)\Build\SubplatformReference.Psi.Features_src.Props')" />
 </Project>

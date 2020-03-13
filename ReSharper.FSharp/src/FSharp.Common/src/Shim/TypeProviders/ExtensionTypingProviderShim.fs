@@ -173,7 +173,6 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
                             | Some _, _ ->
                             let res = ourModel.InstantiateTypeProvidersOfAssembly.Sync(InstantiateTypeProvidersOfAssemblyParameters(
                                                                                                                                   runTimeAssemblyFileName,
-                                                                                                                                  ilScopeRefOfRuntimeAssembly.toRdILScopeRef(),
                                                                                                                                   designTimeAssemblyNameString, 
                                                                                                                                   resolutionEnvironment.toRdResolutionEnvironment(), 
                                                                                                                                   isInvalidationSupported, 
