@@ -2,8 +2,8 @@
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
 {
-  public interface IOutOfProcessHostFactory<out T> where T : RdBindableBase
+  public interface IOutOfProcessHostFactory<in T> where T : RdBindableBase
   {
-    T CreateProcessModel();
+    void Initialize(T model);
   }
 }

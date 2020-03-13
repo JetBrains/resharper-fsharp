@@ -8,6 +8,7 @@ using JetBrains.Platform.RdFramework.ExternalProcess;
 using JetBrains.Rd.Impl;
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Host.Features.Util;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
@@ -20,17 +21,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
   public class
     OutOfProcessTypeProvidersLoaderEndPoint : ProtocolEndPoint<RdFSharpTypeProvidersLoaderModel, RdSimpleDispatcher>
   {
-    private readonly ITypeProvidersLoader myLoader;
-    private readonly IOutOfProcessRdModelsCreator<ITypeProvider, RdTypeProvider> myTypeProvidersHost;
+    private readonly IUnitOfWork myUnitOfWork;
     private RdSimpleDispatcher myDispatcher;
 
     protected override string ProtocolName { get; } = "Out-of-Process Type Provider";
 
-    public OutOfProcessTypeProvidersLoaderEndPoint(string parentProcessPidEnvVariable,
-      ITypeProvidersLoader loader) :
+    public OutOfProcessTypeProvidersLoaderEndPoint(string parentProcessPidEnvVariable, IUnitOfWork unitOfWork) :
       base(parentProcessPidEnvVariable)
     {
-      myLoader = loader;
+      myUnitOfWork = unitOfWork;
     }
 
     protected override RdSimpleDispatcher InitDispatcher(Lifetime lifetime, ILogger logger)
@@ -55,17 +54,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
     protected override RdFSharpTypeProvidersLoaderModel InitModel(Lifetime lifetime, Rd.Impl.Protocol protocol)
     {
       var model = new RdFSharpTypeProvidersLoaderModel(lifetime, protocol);
-      model.InstantiateTypeProvidersOfAssembly.Set(InstantiateTypeProvidersOfAssembly);
-      return model;
-    }
+      myUnitOfWork.TypeProvidersLoaderHostFactory.Initialize(model);
+      myUnitOfWork.TypeProvidersHostFactory.Initialize(model.RdTypeProviderProcessModel);
+      myUnitOfWork.ProvidedNamespacesHostFactory.Initialize(model.RdProvidedNamespaceProcessModel);
+      myUnitOfWork.ProvidedTypesHostFactory.Initialize(model.RdProvidedTypeProcessModel);
+      myUnitOfWork.ProvidedPropertyInfosHostFactory.Initialize(model.RdProvidedPropertyInfoProcessModel);
+      myUnitOfWork.ProvidedMethodInfosHostFactory.Initialize(model.RdProvidedMethodInfoProcessModel);
+      myUnitOfWork.ProvidedParameterInfosHostFactory.Initialize(model.RdProvidedParameterInfoProcessModel);
 
-    private RdTask<RdTypeProvider[]> InstantiateTypeProvidersOfAssembly(Lifetime lifetime,
-      InstantiateTypeProvidersOfAssemblyParameters @params)
-    {
-      var instantiateResults = myLoader.InstantiateTypeProvidersOfAssembly(@params)
-        .Select(t => myTypeProvidersHost.GetRdModel(t, t))
-        .ToArray();
-      return RdTask<RdTypeProvider[]>.Successful(instantiateResults);
+      return model;
     }
 
     protected override void Run(Lifetime lifetime, RdSimpleDispatcher dispatcher)

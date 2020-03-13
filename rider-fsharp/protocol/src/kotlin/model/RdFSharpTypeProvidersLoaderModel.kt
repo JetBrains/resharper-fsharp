@@ -216,6 +216,10 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         call("GetIndexParameters", int, array(RdProvidedParameterInfo))
     }
 
+    private val RdProvidedParameterInfoProcessModel = aggregatedef("RdProvidedParameterInfoProcessModel") {
+        call("ParameterType", int, int)
+    }
+
     private val RdTypeProvider = structdef {
         field("TypeProviderId", int)
     }
@@ -253,8 +257,6 @@ object RdFSharpTypeProvidersLoaderModel : Root(
             field("IsOptional", bool)
             //field("RawDefaultValue : obj
             field("HasDefaultValue", bool)
-
-            call("ParameterType", void, int)
         }
 
         RdProvidedMethodInfo = classdef extends RdProvidedMethodBase {
@@ -268,6 +270,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         field("RdProvidedTypeProcessModel", RdProvidedTypeProcessModel)
         field("RdProvidedPropertyInfoProcessModel", RdProvidedPropertyInfoProcessModel)
         field("RdProvidedMethodInfoProcessModel", RdProvidedMethodInfoProcessModel)
+        field("RdProvidedParameterInfoProcessModel", RdProvidedParameterInfoProcessModel)
 
         call("InstantiateTypeProvidersOfAssembly", InstantiateTypeProvidersOfAssemblyParameters, array(RdTypeProvider))
     }

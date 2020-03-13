@@ -1,16 +1,16 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using JetBrains.Lifetimes;
 using JetBrains.Rd.Tasks;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelCreators;
-using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
-using Microsoft.FSharp.Core.CompilerServices;
 using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
 {
   public class
-    ProvidedPropertyInfoHost : IOutOfProcessHostFactory<RdProvidedPropertyInfoProcessModel>
+    ProvidedPropertyInfoHostFactory : IOutOfProcessHostFactory<RdProvidedPropertyInfoProcessModel>
   {
     private readonly IProvidedRdModelsCreator<ProvidedParameterInfo, RdProvidedParameterInfo>
       myProvidedParameterInfosHost;
@@ -18,79 +18,66 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
     private readonly IProvidedRdModelsCreator<ProvidedMethodInfo, RdProvidedMethodInfo>
       myProvidedMethodInfosHost;
 
+    private readonly IReadProvidedCache<Tuple<ProvidedPropertyInfo, int>> myProvidedPropertiesCache;
+
     private readonly IProvidedRdModelsCreator<ProvidedType, RdProvidedType> myProvidedTypesHost;
 
-    public RdProvidedPropertyInfoProcessModel CreateProcessModel()
+    public void Initialize(RdProvidedPropertyInfoProcessModel processModel)
     {
-      var processModel = new RdProvidedPropertyInfoProcessModel();
-
       processModel.PropertyType.Set(GetPropertyType);
       processModel.DeclaringType.Set(GetDeclaringType);
       processModel.GetGetMethod.Set(GetGetMethod);
       processModel.GetSetMethod.Set(GetSetMethod);
-      processModel.GetIndexParameters.Set((lifetime, _) =>
-        GetIndexParameters(lifetime, providedNativeModel, providedModelOwner));
-
-      return ppModel;
+      processModel.GetIndexParameters.Set(GetIndexParameters);
     }
-    
-    public ProvidedPropertyInfoHost(
-      IProvidedRdModelsCreator<ProvidedParameterInfo, RdProvidedParameterInfo>
-        providedParameterInfosHost,
+
+    public ProvidedPropertyInfoHostFactory(
+      IProvidedRdModelsCreator<ProvidedParameterInfo, RdProvidedParameterInfo> providedParameterInfosHost,
       IProvidedRdModelsCreator<ProvidedType, RdProvidedType> providedTypesHost,
-      IProvidedRdModelsCreator<ProvidedMethodInfo, RdProvidedMethodInfo> providedMethodInfosHost) : base(
-      new ProvidedPropertyInfoEqualityComparer())
+      IProvidedRdModelsCreator<ProvidedMethodInfo, RdProvidedMethodInfo> providedMethodInfosHost,
+      IReadProvidedCache<Tuple<ProvidedPropertyInfo, int>> providedPropertiesCache)
     {
       myProvidedTypesHost = providedTypesHost;
       myProvidedMethodInfosHost = providedMethodInfosHost;
+      myProvidedPropertiesCache = providedPropertiesCache;
       myProvidedParameterInfosHost = providedParameterInfosHost;
     }
 
-    private RdTask<RdProvidedType> GetDeclaringType(
-      in Lifetime lifetime, 
-      ProvidedPropertyInfo providedNativeModel, 
-      ITypeProvider providedModelOwner)
+    private RdTask<int?> GetDeclaringType(Lifetime lifetime, int entityId)
     {
-      var declaringType = myProvidedTypesHost.CreateRdModel(providedNativeModel.DeclaringType, providedModelOwner);
-      return RdTask<RdProvidedType>.Successful(declaringType);
+      var (property, typeProviderId) = myProvidedPropertiesCache.Get(entityId);
+      var declaringType = myProvidedTypesHost.CreateRdModel(property.DeclaringType, typeProviderId)?.EntityId;
+      return RdTask<int?>.Successful(declaringType);
     }
 
-    private RdTask<RdProvidedType> GetPropertyType(
-    in Lifetime lifetime, 
-    ProvidedPropertyInfo providedNativeModel, 
-    ITypeProvider providedModelOwner)
+    private RdTask<int> GetPropertyType(Lifetime lifetime, int entityId)
     {
-      var propertyType = myProvidedTypesHost.CreateRdModel(providedNativeModel.PropertyType, providedModelOwner);
-      return RdTask<RdProvidedType>.Successful(propertyType);
+      var (property, typeProviderId) = myProvidedPropertiesCache.Get(entityId);
+      var propertyType = myProvidedTypesHost.CreateRdModel(property.PropertyType, typeProviderId).EntityId;
+      return RdTask<int>.Successful(propertyType);
     }
 
-    private RdTask<RdProvidedParameterInfo[]> GetIndexParameters(
-      in Lifetime lifetime,
-      ProvidedPropertyInfo providedNativeModel,
-      ITypeProvider providedModelOwner)
+    private RdTask<RdProvidedParameterInfo[]> GetIndexParameters(Lifetime lifetime, int entityId)
     {
-      var indexParameters = providedNativeModel
+      var (property, typeProviderId) = myProvidedPropertiesCache.Get(entityId);
+      var indexParameters = property
         .GetIndexParameters()
-        .Select(t => myProvidedParameterInfosHost.CreateRdModel(t, providedModelOwner))
+        .Select(t => myProvidedParameterInfosHost.CreateRdModel(t, typeProviderId))
         .ToArray();
       return RdTask<RdProvidedParameterInfo[]>.Successful(indexParameters);
     }
 
-    private RdTask<RdProvidedMethodInfo> GetSetMethod(
-      in Lifetime lifetime,
-      ProvidedPropertyInfo providedNativeModel,
-      ITypeProvider providedModelOwner)
+    private RdTask<RdProvidedMethodInfo> GetSetMethod(Lifetime lifetime, int entityId)
     {
-      var setMethod = myProvidedMethodInfosHost.CreateRdModel(providedNativeModel.GetSetMethod(), providedModelOwner);
+      var (property, typeProviderId) = myProvidedPropertiesCache.Get(entityId);
+      var setMethod = myProvidedMethodInfosHost.CreateRdModel(property.GetSetMethod(), typeProviderId);
       return RdTask<RdProvidedMethodInfo>.Successful(setMethod);
     }
 
-    private RdTask<RdProvidedMethodInfo> GetGetMethod(
-      in Lifetime lifetime,
-      ProvidedPropertyInfo providedNativeModel,
-      ITypeProvider providedModelOwner)
+    private RdTask<RdProvidedMethodInfo> GetGetMethod(Lifetime lifetime, int entityId)
     {
-      var getMethod = myProvidedMethodInfosHost.CreateRdModel(providedNativeModel.GetGetMethod(), providedModelOwner);
+      var (property, typeProviderId) = myProvidedPropertiesCache.Get(entityId);
+      var getMethod = myProvidedMethodInfosHost.CreateRdModel(property.GetGetMethod(), typeProviderId);
       return RdTask<RdProvidedMethodInfo>.Successful(getMethod);
     }
   }

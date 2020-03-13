@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader
@@ -9,9 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader
   {
     public static void Main(string[] args)
     {
-      var endPoint = new OutOfProcessTypeProvidersLoaderEndPoint(
-        ProtocolConstants.TypeProvidersLoaderPid,
-        new TypeProvidersLoader());
+      var endPoint = new OutOfProcessTypeProvidersLoaderEndPoint(ProtocolConstants.TypeProvidersLoaderPid, new UnitOfWork());
 
       var portValue = args[0];
       var logPath = string.Empty;

@@ -42,9 +42,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       myTypeProvidersCache = typeProvidersCache;
     }
 
-    public RdProvidedTypeProcessModel CreateProcessModel()
+    public void Initialize(RdProvidedTypeProcessModel processModel)
     {
-      var processModel = new RdProvidedTypeProcessModel();
       processModel.BaseType.Set(GetBaseType);
       processModel.DeclaringType.Set(GetDeclaringType);
       processModel.GetInterfaces.Set(GetInterfaces);
@@ -62,8 +61,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       processModel.GetStaticParameters.Set(GetStaticParameters);
       processModel.GetMethods.Set(GetMethods);
       processModel.ApplyStaticArguments.Set(ApplyStaticArguments);
-
-      return processModel;
     }
 
     private RdTask<int> ApplyStaticArguments(Lifetime lifetime, ApplyStaticArgumentsParameters args)

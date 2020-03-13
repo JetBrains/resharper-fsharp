@@ -25,13 +25,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       myProvidedTypesCreator = providedTypesCreator;
     }
 
-    public RdProvidedNamespaceProcessModel CreateProcessModel()
+    public void Initialize(RdProvidedNamespaceProcessModel processModel)
     {
-      var processModel = new RdProvidedNamespaceProcessModel();
       processModel.GetNestedNamespaces.Set(GetNestedNamespaces);
       processModel.GetTypes.Set(GetTypes);
       processModel.ResolveTypeName.Set(ResolveTypeName);
-      return processModel;
     }
 
     private RdTask<int> ResolveTypeName(Lifetime lifetime, ResolveTypeNameArgs args)
