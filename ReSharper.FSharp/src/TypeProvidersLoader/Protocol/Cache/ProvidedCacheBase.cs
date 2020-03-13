@@ -16,5 +16,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Cache
     public void Add(int id, T value) => myProvidedModelsCache.Add(id, value);
 
     public T Get(int key) => myProvidedModelsCache[key];
+    public bool Contains(int key) => myProvidedModelsCache.ContainsKey(key);
   }
 }

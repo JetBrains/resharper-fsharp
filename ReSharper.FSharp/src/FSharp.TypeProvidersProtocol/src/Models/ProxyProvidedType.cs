@@ -168,5 +168,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
     public override ProvidedType ApplyContext(ProvidedTypeContext context) =>
       new ProxyProvidedType(myRdProvidedType, myProcessModel, context, myCache);
+
+    public override ProvidedAssembly Assembly =>
+      ProxyProvidedAssembly.CreateWithContext(RdProvidedTypeProcessModel.Assembly.Sync(EntityId), myProcessModel,
+        Context);
   }
 }

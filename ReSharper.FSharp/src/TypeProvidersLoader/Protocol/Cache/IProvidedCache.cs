@@ -3,6 +3,7 @@
   public interface IReadProvidedCache<out T>
   {
     T Get(int key);
+    bool Contains(int key);
   }
 
   public interface IWriteProvidedCache<in T>

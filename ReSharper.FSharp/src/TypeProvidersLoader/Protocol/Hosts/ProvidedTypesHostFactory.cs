@@ -22,6 +22,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       myProvidedPropertiesCreator;
 
     private readonly IProvidedRdModelsCreator<ProvidedType, RdProvidedType> myProvidedTypesCreator;
+    private readonly IProvidedRdModelsCreator<ProvidedAssembly, RdProvidedAssembly> myProvidedAssembliesCreator;
 
     private readonly IReadProvidedCache<Tuple<ProvidedType, RdProvidedType, int>> myProvidedTypesCache;
     private readonly IReadProvidedCache<ITypeProvider> myTypeProvidersCache;
@@ -31,6 +32,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       IProvidedRdModelsCreator<ProvidedMethodInfo, RdProvidedMethodInfo> providedMethodInfosCreator,
       IProvidedRdModelsCreator<ProvidedPropertyInfo, RdProvidedPropertyInfo> providedPropertiesCreator,
       IProvidedRdModelsCreator<ProvidedType, RdProvidedType> providedTypesCreator,
+      IProvidedRdModelsCreator<ProvidedAssembly, RdProvidedAssembly> providedAssembliesCreator,
       IReadProvidedCache<Tuple<ProvidedType, RdProvidedType, int>> providedTypesCache,
       IReadProvidedCache<ITypeProvider> typeProvidersCache)
     {
@@ -38,6 +40,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       myProvidedMethodInfosCreator = providedMethodInfosCreator;
       myProvidedPropertiesCreator = providedPropertiesCreator;
       myProvidedTypesCreator = providedTypesCreator;
+      myProvidedAssembliesCreator = providedAssembliesCreator;
       myProvidedTypesCache = providedTypesCache;
       myTypeProvidersCache = typeProvidersCache;
     }
@@ -61,6 +64,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       processModel.GetStaticParameters.Set(GetStaticParameters);
       processModel.GetMethods.Set(GetMethods);
       processModel.ApplyStaticArguments.Set(ApplyStaticArguments);
+      processModel.Assembly.Set(GetAssembly);
+    }
+
+    private RdTask<RdProvidedAssembly> GetAssembly(Lifetime lifetime, int entityId)
+    {
+      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
+      var assembly = myProvidedAssembliesCreator.CreateRdModel(providedType.Assembly, typeProviderId);
+      return RdTask<RdProvidedAssembly>.Successful(assembly);
     }
 
     private RdTask<int> ApplyStaticArguments(Lifetime lifetime, ApplyStaticArgumentsParameters args)

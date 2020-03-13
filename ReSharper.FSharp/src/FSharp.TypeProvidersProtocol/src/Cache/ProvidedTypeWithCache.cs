@@ -20,6 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache
       myMethods = new Lazy<ProvidedMethodInfo[]>(() => myProvidedType.GetMethods());
       myAllNestedTypes = new Lazy<ProvidedType[]>(() => myProvidedType.GetAllNestedTypes().WithCache());
       myProperties = new Lazy<ProvidedPropertyInfo[]>(() => myProvidedType.GetProperties());
+      myProvidedAssembly = new Lazy<ProvidedAssembly>(() => myProvidedType.Assembly);
     }
 
     public override string Name => myProvidedType.Name;
@@ -84,6 +85,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache
     public override ProvidedType ApplyStaticArguments(ITypeProvider provider, string[] fullTypePathAfterArguments,
       object[] staticArgs) => myProvidedType.ApplyStaticArguments(provider, fullTypePathAfterArguments, staticArgs);
 
+    public override ProvidedAssembly Assembly => myProvidedAssembly.Value;
+
     private int? myArrayRank;
     private readonly Lazy<ProvidedType> myBaseType;
     private readonly Lazy<ProvidedType[]> myInterfaces;
@@ -93,5 +96,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache
     private readonly Lazy<ProvidedType[]> myGenericArguments;
     private Lazy<ProvidedParameterInfo[]> myStaticParameters;
     private readonly Lazy<ProvidedPropertyInfo[]> myProperties;
+    private readonly Lazy<ProvidedAssembly> myProvidedAssembly;
   }
 }

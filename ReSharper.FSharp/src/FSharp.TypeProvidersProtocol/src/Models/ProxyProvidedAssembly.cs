@@ -16,7 +16,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
     private int EntityId => myAssembly.EntityId;
 
-    public ProxyProvidedAssembly(RdProvidedAssembly assembly, RdFSharpTypeProvidersLoaderModel processModel,
+    private ProxyProvidedAssembly(RdProvidedAssembly assembly, RdFSharpTypeProvidersLoaderModel processModel,
       ProvidedTypeContext context) : base(
       Assembly.GetAssembly(typeof(string)), context)
     {
@@ -24,11 +24,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       myProcessModel = processModel;
     }
 
+    public static ProxyProvidedAssembly CreateWithContext(RdProvidedAssembly assembly,
+      RdFSharpTypeProvidersLoaderModel processModel,
+      ProvidedTypeContext context) => new ProxyProvidedAssembly(assembly, processModel, context);
+
     public override string FullName => myAssembly.FullName;
 
     public override AssemblyName GetName()
     {
-      var assemblyPath = RdProvidedAssemblyProcessModel.GetAssemblyPath.Sync(EntityId);
+      var assemblyPath = myAssembly.AssemblyPath;
       return AssemblyName.GetAssemblyName(assemblyPath);
     }
 
