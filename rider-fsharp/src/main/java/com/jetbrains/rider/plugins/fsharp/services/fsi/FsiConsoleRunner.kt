@@ -1,6 +1,5 @@
 package com.jetbrains.rider.plugins.fsharp.services.fsi
 
-import com.intellij.execution.ExecutionManager
 import com.intellij.execution.Executor
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.console.LanguageConsoleBuilder
@@ -21,9 +20,10 @@ import com.intellij.notification.Notifications
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.colors.EditorColors
+import com.intellij.openapi.editor.event.EditorFactoryEvent
+import com.intellij.openapi.editor.event.EditorFactoryListener
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.extensions.Extensions
-import com.intellij.openapi.fileTypes.PlainTextLanguage
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Key
@@ -36,14 +36,18 @@ import com.intellij.util.ui.UIUtil
 import com.intellij.xdebugger.XDebuggerManager
 import com.intellij.xdebugger.attach.LocalAttachHost
 import com.intellij.xdebugger.attach.XAttachDebuggerProvider
+import com.jetbrains.rd.util.lifetime.Lifetime
+import com.jetbrains.rdclient.editors.sandboxes.SandboxManager
+import com.jetbrains.rdclient.lang.toRdLanguageOrThrow
+import com.jetbrains.rdclient.util.idea.fromOffset
 import com.jetbrains.rdclient.util.idea.pumpMessages
 import com.jetbrains.rider.debugger.DotNetDebugProcess
-import com.jetbrains.rider.model.RdFsiRuntime
-import com.jetbrains.rider.model.RdFsiSessionInfo
+import com.jetbrains.rider.editors.RiderTextControlHost
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptLanguage
+import com.jetbrains.rider.model.*
 import com.jetbrains.rider.plugins.fsharp.FSharpIcons
 import com.jetbrains.rider.runtime.RiderDotNetActiveRuntimeHost
 import com.jetbrains.rider.runtime.mono.MonoRuntime
-import com.jetbrains.rider.util.idea.application
 import com.jetbrains.rider.util.idea.getComponent
 import org.jetbrains.concurrency.AsyncPromise
 import org.jetbrains.concurrency.Promise
@@ -53,6 +57,7 @@ import java.time.Duration
 import javax.swing.BorderFactory
 import javax.swing.event.HyperlinkEvent
 import kotlin.properties.Delegates
+import com.jetbrains.rd.platform.util.application
 
 class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debug: Boolean)
     : AbstractConsoleRunnerWithHistory<LanguageConsoleView>(fsiHost.project, fsiTitle, null) {
@@ -237,17 +242,61 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
     }
 
     override fun createConsoleView(): LanguageConsoleView {
-        val consoleView = LanguageConsoleBuilder().gutterContentProvider(inputSeparatorGutterContentProvider).build(project, PlainTextLanguage.INSTANCE)
+        var createdConsoleView : LanguageConsoleView? = null
 
-        val consoleEditorBorder = BorderFactory.createMatteBorder(
-                2, 0, 0, 0, consoleView.consoleEditor.colorsScheme.getColor(EditorColors.INDENT_GUIDE_COLOR))
-        consoleView.consoleEditor.component.border = consoleEditorBorder
+        withGenericFSharpSandBoxing(genericFSharpSandboxInfoWithCustomParams("", false, emptyList()), project) {
+            val consoleView = LanguageConsoleBuilder().gutterContentProvider(inputSeparatorGutterContentProvider).build(project, FSharpScriptLanguage)
 
-        val historyKeyListener = HistoryKeyListener(fsiHost.project, consoleView.consoleEditor, commandHistory)
-        consoleView.consoleEditor.contentComponent.addKeyListener(historyKeyListener)
-        commandHistory.listeners.add(historyKeyListener)
+            val consoleEditorBorder = BorderFactory.createMatteBorder(
+                    2, 0, 0, 0, consoleView.consoleEditor.colorsScheme.getColor(EditorColors.INDENT_GUIDE_COLOR))
+            consoleView.consoleEditor.component.border = consoleEditorBorder
 
-        return consoleView
+            val historyKeyListener = HistoryKeyListener(fsiHost.project, consoleView.consoleEditor, commandHistory)
+            consoleView.consoleEditor.contentComponent.addKeyListener(historyKeyListener)
+            commandHistory.listeners.add(historyKeyListener)
+
+            createdConsoleView = consoleView
+        }
+
+        return createdConsoleView ?: error("Cannot create fsi")
+    }
+
+    private fun withGenericFSharpSandBoxing(sandboxInfo: SandboxInfo, project: Project, block: () -> Unit) {
+        application.assertIsDispatchThread()
+
+        val textControlHost = RiderTextControlHost.getInstance(project)
+
+        var localInfo : SandboxInfo? = sandboxInfo
+        Lifetime.using { lt ->
+            textControlHost.addPrioritizedEditorFactoryListener(lt, object: EditorFactoryListener {
+                override fun editorReleased(event: EditorFactoryEvent) {
+                }
+
+                override fun editorCreated(event: EditorFactoryEvent) {
+                    if(localInfo != null)
+                        SandboxManager.getInstance().markAsSandbox(event.editor, sandboxInfo)
+                }
+            })
+
+            block()
+            localInfo = null
+        }
+    }
+
+    private fun genericFSharpSandboxInfoWithCustomParams(additionalText: String = "", isNonUserCode: Boolean = false, disableTypingAssists : List<Char>): SandboxInfo {
+        return SandboxInfo(
+                null,
+                additionalText,
+                RdTextRange.fromOffset(additionalText.length),
+                isNonUserCode,
+                ExtraInfo(emptyList(), emptyList()),
+                emptyList(),
+                true,
+                emptyList(),
+                FSharpScriptLanguage.toRdLanguageOrThrow(),
+                true,
+                disableTypingAssists
+        )
     }
 
     override fun createProcessHandler(process: Process): OSProcessHandler {
