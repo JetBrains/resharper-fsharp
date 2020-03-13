@@ -20,8 +20,6 @@ import com.intellij.notification.Notifications
 import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.colors.EditorColors
-import com.intellij.openapi.editor.event.EditorFactoryEvent
-import com.intellij.openapi.editor.event.EditorFactoryListener
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.extensions.Extensions
 import com.intellij.openapi.options.ShowSettingsUtil
@@ -36,13 +34,8 @@ import com.intellij.util.ui.UIUtil
 import com.intellij.xdebugger.XDebuggerManager
 import com.intellij.xdebugger.attach.LocalAttachHost
 import com.intellij.xdebugger.attach.XAttachDebuggerProvider
-import com.jetbrains.rd.util.lifetime.Lifetime
-import com.jetbrains.rdclient.editors.sandboxes.SandboxManager
-import com.jetbrains.rdclient.lang.toRdLanguageOrThrow
-import com.jetbrains.rdclient.util.idea.fromOffset
 import com.jetbrains.rdclient.util.idea.pumpMessages
 import com.jetbrains.rider.debugger.DotNetDebugProcess
-import com.jetbrains.rider.editors.RiderTextControlHost
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptLanguage
 import com.jetbrains.rider.model.*
 import com.jetbrains.rider.plugins.fsharp.FSharpIcons
@@ -244,7 +237,7 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
     override fun createConsoleView(): LanguageConsoleView {
         var createdConsoleView : LanguageConsoleView? = null
 
-        withGenericFSharpSandBoxing(genericFSharpSandboxInfoWithCustomParams("", false, emptyList()), project) {
+        withGenericSandBoxing(genericFSharpSandboxInfoWithCustomParams("", false, emptyList()), project) {
             val consoleView = LanguageConsoleBuilder().gutterContentProvider(inputSeparatorGutterContentProvider).build(project, FSharpScriptLanguage)
 
             val consoleEditorBorder = BorderFactory.createMatteBorder(
@@ -261,53 +254,13 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
         return createdConsoleView ?: error("Cannot create fsi")
     }
 
-    private fun withGenericFSharpSandBoxing(sandboxInfo: SandboxInfo, project: Project, block: () -> Unit) {
-        application.assertIsDispatchThread()
-
-        val textControlHost = RiderTextControlHost.getInstance(project)
-
-        var localInfo : SandboxInfo? = sandboxInfo
-        Lifetime.using { lt ->
-            textControlHost.addPrioritizedEditorFactoryListener(lt, object: EditorFactoryListener {
-                override fun editorReleased(event: EditorFactoryEvent) {
-                }
-
-                override fun editorCreated(event: EditorFactoryEvent) {
-                    if(localInfo != null)
-                        SandboxManager.getInstance().markAsSandbox(event.editor, sandboxInfo)
-                }
-            })
-
-            block()
-            localInfo = null
-        }
-    }
-
-    private fun genericFSharpSandboxInfoWithCustomParams(additionalText: String = "", isNonUserCode: Boolean = false, disableTypingAssists : List<Char>): SandboxInfo {
-        return SandboxInfo(
-                null,
-                additionalText,
-                RdTextRange.fromOffset(additionalText.length),
-                isNonUserCode,
-                ExtraInfo(emptyList(), emptyList()),
-                emptyList(),
-                true,
-                emptyList(),
-                FSharpScriptLanguage.toRdLanguageOrThrow(),
-                true,
-                disableTypingAssists
-        )
-    }
-
     override fun createProcessHandler(process: Process): OSProcessHandler {
-        return object : OSProcessHandler(process, cmdLine.commandLineString, Charsets.UTF_8) {
-            override fun isSilentlyDestroyOnClose(): Boolean = true
+        val fsiProcessHandler = FsiProcessHandler(process, cmdLine.commandLineString, Charsets.UTF_8)
 
-            override fun notifyTextAvailable(text: String, outputType: Key<*>) {
-                if (text != "SERVER-PROMPT>\n")
-                    super.notifyTextAvailable(text, outputType)
-            }
-        }
+        val sandboxInfoUpdater = FsiSandboxInfoUpdater(fsiHost.project, consoleView.consoleEditor, commandHistory)
+        fsiProcessHandler.addSandboxInfoUpdater(sandboxInfoUpdater)
+
+        return fsiProcessHandler
     }
 
     private class ResetFsiAction(private val host: FsiHost) : AnAction("Reset F# Interactive", null, AllIcons.Actions.Restart) {
