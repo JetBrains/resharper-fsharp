@@ -387,7 +387,8 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
         x.Done(attr.Range, mark, ElementType.ATTRIBUTE)
 
     member x.ProcessEnumCase(EnumCase(_, _, _, _, range)) =
-        x.MarkAndDone(range, ElementType.ENUM_MEMBER_DECLARATION)
+        let mark = x.MarkTokenOrRange(FSharpTokenType.BAR, range)
+        x.Done(range, mark, ElementType.ENUM_MEMBER_DECLARATION)
 
     member x.ProcessField(Field(attrs, _, id, synType, _, _, _, range)) elementType =
         let mark =

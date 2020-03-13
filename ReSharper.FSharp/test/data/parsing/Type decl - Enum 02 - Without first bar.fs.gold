@@ -1,0 +1,24 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    ITypeDeclarationGroup
+      FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
+      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+      IEnumDeclaration
+        FSharpIdentifierToken(type:IDENTIFIER, text:A)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        IEnumMemberDeclaration
+          FSharpIdentifierToken(type:IDENTIFIER, text:B)
+          FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+          FSharpToken(type:INT32, text:0)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        IEnumMemberDeclaration
+          FSharpTokenType+BarTokenElement(type:BAR, text:|)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpIdentifierToken(type:IDENTIFIER, text:C)
+          FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+          FSharpToken(type:INT32, text:1)
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

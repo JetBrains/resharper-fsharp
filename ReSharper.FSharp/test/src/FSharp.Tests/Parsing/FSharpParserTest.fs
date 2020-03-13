@@ -39,6 +39,9 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Type decl - Attributes 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Attributes 02``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Type decl - Enum 01 - With first bar``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Enum 02 - Without first bar``() = x.DoNamedTest()
 
     [<Test>] member x.``Let 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Let 02 - Typed``() = x.DoNamedTest()
