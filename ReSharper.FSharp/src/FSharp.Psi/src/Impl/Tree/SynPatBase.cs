@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
@@ -32,6 +33,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override IFSharpIdentifierLikeNode NameIdentifier => ReferenceName?.Identifier;
     public bool IsDeclaration => true;
     public IEnumerable<IDeclaration> Declarations => new[] {this};
+
+    public override TreeTextRange GetNameIdentifierRange() =>
+      NameIdentifier.GetMemberNameIdentifierRange();
 
     public bool IsMutable => Binding?.IsMutable ?? false;
 

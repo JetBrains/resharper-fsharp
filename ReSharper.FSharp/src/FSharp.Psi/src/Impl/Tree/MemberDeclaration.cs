@@ -58,5 +58,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       ObjExprNavigator.GetByMemberDeclaration(this) != null;
 
     public override bool IsStatic => StaticKeyword != null;
+
+    public override TreeTextRange GetNameIdentifierRange() =>
+      NameIdentifier.GetMemberNameIdentifierRange();
   }
 }

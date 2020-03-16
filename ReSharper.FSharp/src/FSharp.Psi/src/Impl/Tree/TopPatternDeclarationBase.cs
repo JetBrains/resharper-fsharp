@@ -19,6 +19,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public override IFSharpIdentifierLikeNode NameIdentifier => ReferenceName?.Identifier;
 
+    public override TreeTextRange GetNameIdentifierRange() =>
+      NameIdentifier.GetMemberNameIdentifierRange();
+
     public TreeNodeCollection<IAttribute> Attributes =>
       this.GetBinding()?.AllAttributes ??
       TreeNodeCollection<IAttribute>.Empty;
