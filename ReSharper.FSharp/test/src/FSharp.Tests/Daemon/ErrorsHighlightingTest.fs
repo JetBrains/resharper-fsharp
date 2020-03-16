@@ -36,6 +36,7 @@ type ErrorsHighlightingTest() =
 
     [<Test>] member x.``Undefined indexer 01``() = x.DoNamedTest()
     [<Test>] member x.``Undefined indexer 02 - Undefined id``() = x.DoNamedTest()
+    [<Test>] member x.``Undefined indexer 03 - Item Id``() = x.DoNamedTest()
 
     [<Test>] member x.``Extension analyzer``() = x.DoNamedTest()
     
