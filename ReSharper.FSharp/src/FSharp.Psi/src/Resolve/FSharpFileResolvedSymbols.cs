@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using FSharp.Compiler;
 using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.Application.Threading;
@@ -140,7 +141,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
             // Skip active pattern cases bindings as these have incorrect ranges.
             // Active pattern cases uses inside bindings are currently marked as bindings so check the range.
             // https://github.com/Microsoft/visualfsharp/issues/4423
-            if (activePatternCase.DeclarationLocation.Equals(range))
+            if (Range.equals(activePatternCase.DeclarationLocation, range))
             {
               var activePatternId = fsFile.GetContainingNodeAt<ActivePatternId>(new TreeOffset(endOffset - 1));
               if (activePatternId == null)
