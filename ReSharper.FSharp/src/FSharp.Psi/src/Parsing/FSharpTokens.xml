@@ -115,7 +115,6 @@
         <Token name="COLON_QMARK_GREATER" representation=":?>" />
         <Token name="COLON_QMARK" representation=":?" />
         <Token name="COLON_EQUALS" representation=":=" />
-        <Token name="LPAREN_STAR_RPAREN" representation="(*)" />
         <Token name="PERCENT" representation="%" />
         <Token name="PERCENT_PERCENT" representation="%%" />
         <Token name="SEMICOLON" representation=";" />
@@ -123,12 +122,10 @@
         <Token name="LARROW" representation="&lt;-" />
         <Token name="EQUALS" representation="=" />
         <Token name="DOLLAR" representation="$" />
-        <Token name="MINUS" representation="-" />
         <Token name="QMARK" representation="?" />
         <Token name="QMARK_QMARK" representation="??" />
         <Token name="QUOTE" representation="'" />
 
-        <Token name="PLUS" representation="+" />
 
         <Token name="KEYWORD_STRING_SOURCE_DIRECTORY" representation="__SOURCE_DIRECTORY__" />
         <Token name="KEYWORD_STRING_SOURCE_FILE" representation="__SOURCE_FILE__" />
@@ -151,9 +148,12 @@
     </Tokens>
 
     <Tokens NodeType="FSharpTokenNodeType">
+        <!-- todo: Add fixed identifier tokens -->
         <Token name="IDENTIFIER" />
         <Token name="SYMBOLIC_OP" />
-        <!-- todo: Add fixed identifier tokens -->
+        <Token name="MINUS" />
+        <Token name="PLUS" />
+        <Token name="LPAREN_STAR_RPAREN" />
         <Token name="AMP_AMP" />
         <Token name="BAD_SYMBOLIC_OP" />
         <Token name="SHEBANG" />

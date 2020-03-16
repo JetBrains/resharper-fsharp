@@ -16,6 +16,7 @@ type IdentifierHighlightingTest() =
     [<Test>] member x.``Operators 01 - ==``() = x.DoNamedTest()
     [<Test>] member x.``Operators 02 - Custom``() = x.DoNamedTest()
     [<Test>] member x.``Operators 03 - Unary``() = x.DoNamedTest()
+    [<Test>] member x.``Operators 04 - op_Multiply decl``() = x.DoNamedTest()
 
     [<Test>] member x.``Active pattern decl``() = x.DoNamedTest()
 

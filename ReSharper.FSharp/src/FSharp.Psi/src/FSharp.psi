@@ -1320,6 +1320,9 @@ private letOrUseBang{ROLE, Getter}:
 private identOrOpName{ROLE, Getter}:
   IDENTIFIER<@ROLE, @Getter> |
   SYMBOLIC_OP<@ROLE, @Getter> |
+  MINUS<@ROLE, @Getter> |
+  PLUS<@ROLE, @Getter> |
+  LPAREN_STAR_RPAREN<@ROLE, @Getter> |
   activePatternId<@ROLE, @Getter>;
 
 activePatternId:

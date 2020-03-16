@@ -135,6 +135,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
             if (mfvLogicalName == "Invoke" && (mfv.DeclaringEntity?.Value?.IsDelegate ?? false))
               continue;
+
+            var len = endOffset - startOffset;
+            if (mfvLogicalName == "op_Multiply" && len == 3)
+            {
+              // The `*` pattern includes parens and is parsed as special token
+              // let (*) (_, _) = ()
+              startOffset++;
+              endOffset--;
+            }
           }
           else if (activePatternCase != null)
           {

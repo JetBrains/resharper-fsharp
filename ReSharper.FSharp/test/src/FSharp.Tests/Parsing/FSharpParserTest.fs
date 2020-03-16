@@ -265,6 +265,14 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Type member - Member 01 - Wild self id``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type member - Member - Method 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Member - Method 02 - Static``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type member - Member - Operator 01 - Add``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Member - Operator 02 - Multiply``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Member - Operator 03 - Subtract``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Member - Operator 04 - Divide``() = x.DoNamedTest()
+
     [<Test>] member x.``Module member - Open 01``() = x.DoNamedTest()
     [<Test>] member x.``Module member - Open 02 - Qualifier``() = x.DoNamedTest()
 

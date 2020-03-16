@@ -103,6 +103,11 @@ type CSharpResolveTest() =
 
     [<Test>] member x.``Nested module 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Operators - Math 01 - Addition``() = x.DoNamedTest()
+    [<Test>] member x.``Operators - Math 02 - Subtraction``() = x.DoNamedTest()
+    [<Test>] member x.``Operators - Math 03 - Multiplication``() = x.DoNamedTest()
+    [<Test>] member x.``Operators - Math 04 - Division``() = x.DoNamedTest()
+
     [<Test>] member x.``Operators 01 - Module``() = x.DoNamedTest()
     [<Test>] member x.``Operators 02 - Type``() = x.DoNamedTest()
     [<Test>] member x.``Operators 03 - Greater, Less``() = x.DoNamedTest()

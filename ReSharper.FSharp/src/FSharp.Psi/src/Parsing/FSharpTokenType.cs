@@ -226,7 +226,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         SYMBOLIC_OP,
         AMP_AMP,
         GREATER,
-        LESS);
+        PLUS,
+        MINUS,
+        LESS,
+        LPAREN_STAR_RPAREN);
 
       Strings = new NodeTypeSet(
         CHARACTER_LITERAL,

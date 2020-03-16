@@ -1,4 +1,4 @@
-Language: PsiLanguageType:F#
+﻿Language: PsiLanguageType:F#
 IFSharpImplFile
   IAnonModuleDeclaration
     IDo
@@ -8,7 +8,7 @@ IFSharpImplFile
             FSharpToken(type:INT32, text:1)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           IReferenceExpr
-            FSharpTokenType+PlusTokenElement(type:PLUS, text:+)
+            FSharpIdentifierToken(type:PLUS, text:+)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           ILiteralExpr
             FSharpToken(type:INT32, text:1)

@@ -1,0 +1,16 @@
+﻿module |Module|(0)
+
+type |T|(1) =
+    static member (|*|(2)) (|_|(3), |_|(4)) = ()
+
+let (|*|(5)) (|_|(6), |_|(7)) = 0
+
+---------------------------------------------------------
+(0): ReSharper F# Module Identifier: 
+(1): ReSharper F# Class Identifier: 
+(2): ReSharper F# Method Identifier: 
+(3): ReSharper F# Value Identifier: 
+(4): ReSharper F# Value Identifier: 
+(5): ReSharper F# Operator Identifier: 
+(6): ReSharper F# Value Identifier: 
+(7): ReSharper F# Value Identifier: 

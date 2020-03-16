@@ -154,9 +154,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       if (name == SharedImplUtil.MISSING_DECLARATION_NAME)
         return name;
 
-      if (identifier is IFSharpIdentifierLikeNode fsIdentifier &&
-          fsIdentifier.IdentifierToken?.GetTokenType() == FSharpTokenType.SYMBOLIC_OP)
-        return PrettyNaming.CompileOpName.Invoke(name);
+      if (identifier is FSharpIdentifierToken token &&
+          token.GetTokenType() is var tokenType && tokenType != FSharpTokenType.IDENTIFIER)
+        return tokenType == FSharpTokenType.LPAREN_STAR_RPAREN
+          ? "op_Multiply"
+          : PrettyNaming.CompileOpName.Invoke(name);
 
       return name;
     }
