@@ -544,6 +544,9 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
             x.ProcessTypeArgs(typeArgs, ltRange, gtRange, ElementType.PREFIX_APP_TYPE_ARGUMENT_LIST)
             x.Done(mark, ElementType.TYPE_REFERENCE_NAME)
 
+        | SynType.Var(_, range) ->
+            x.MarkAndDone(range, ElementType.TYPE_REFERENCE_NAME)
+
         | _ -> failwithf "unexpected type: %O" synType
 
     member x.ProcessType(TypeRange range as synType) =

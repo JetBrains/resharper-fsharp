@@ -190,6 +190,7 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Expr - New 01 - Lid``() = x.DoNamedTest()
     [<Test>] member x.``Expr - New 02 - Generics``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - New 03 - Type parameter``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - ObjExpr 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - ObjExpr 02 - Interface``() = x.DoNamedTest()
