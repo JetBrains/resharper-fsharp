@@ -66,6 +66,10 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
         x.AdvanceToOffset(offset)
         x.Mark()
     
+    member x.Mark() =
+        /// The base member is protected and cannot be used in closures.
+        base.Mark()
+
     member x.Done(range, mark, elementType) =
         x.AdvanceToEnd(range)
         x.Done(mark, elementType)
@@ -140,27 +144,40 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
         x.AdvanceToEnd(lastIdRangeAndMark.Range)
 
     member x.ProcessNamedTypeReference(lid: Ident list) =
-        x.ProcessNamedTypeReference(lid, [], None, None, false)
-    
-    member x.ProcessNamedTypeReference(lid: Ident list, typeArgs: SynType list, ltOption, gtOption, isPostfixApp) =
-        // todo: revise checking empty lid/args?
-        if not isPostfixApp && lid.IsEmpty || isPostfixApp && typeArgs.IsEmpty then () else
+        match lid with
+        | [] -> ()
+        | [IdentRange idRange] -> x.MarkAndDone(idRange, ElementType.TYPE_REFERENCE_NAME)
+        | IdentRange idRange :: _ ->
 
+        let mark = x.Mark(idRange)
+        x.MarkTypeReferenceQualifierNames(lid)
+        x.Done(mark, ElementType.TYPE_REFERENCE_NAME)
+
+    /// Marks simple type reference name qualifiers and advance past the last id.
+    /// Does not mark resulting type reference name.
+    member x.MarkTypeReferenceQualifierNames(lid: Ident list) =
         let marks = Stack()
 
-        let head = if isPostfixApp then typeArgs.Head.Range else lid.Head.idRange
-        x.AdvanceToStart(head)
+        let rec markNamesLid (marks: Stack<_>) lid =
+            match lid with
+            | [] | [_] -> ()
+            | _ :: rest ->
+                marks.Push(x.Mark())
+                markNamesLid marks rest
 
-        for _ in lid do
-            marks.Push(x.Mark())
-            if isPostfixApp && marks.Count = 1 then
-                x.ProcessTypeArgs(typeArgs, ltOption, gtOption, ElementType.POSTFIX_APP_TYPE_ARGUMENT_LIST)
+        let rec doneNamesLid (marks: Stack<_>) lid =
+            match lid with
+            | [] -> ()
+            | [IdentRange range] ->
+                Assertion.Assert(marks.Count = 0, "marks.Count = 0")
+                x.AdvanceToEnd(range)
 
-        for IdentRange id in lid do
-            if not isPostfixApp && marks.Count = 1 then
-                // todo: include measure types const range
-                x.ProcessTypeArgs(typeArgs, ltOption, gtOption, ElementType.PREFIX_APP_TYPE_ARGUMENT_LIST)
-            x.Done(id, marks.Pop(), ElementType.TYPE_REFERENCE_NAME)
+            | IdentRange range :: rest ->
+                x.Done(range, marks.Pop(), ElementType.TYPE_REFERENCE_NAME)
+                doneNamesLid marks rest
+
+        markNamesLid marks lid
+        doneNamesLid marks lid
 
     member x.GetTreeNode() =
         x.GetTree() :> ITreeNode
@@ -497,13 +514,35 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
             x.Done(exprStart, ElementType.REFERENCE_EXPR)
         | _ -> failwithf "Expecting typeApp, got: %A" synExpr
 
-    member x.ProcessTypeAsTypeReference(synType) =
+    member x.ProcessTypeAsTypeReferenceName(synType) =
         match synType with
         | SynType.LongIdent(lid) ->
             x.ProcessNamedTypeReference(lid.Lid)
 
-        | SynType.App(SynType.LongIdent(lid), ltRange, typeArgs, _, gtRange, isPostfix, _) ->
-            x.ProcessNamedTypeReference(lid.Lid, typeArgs, ltRange, gtRange, isPostfix)
+        | SynType.App(typeName, ltRange, typeArgs, _, gtRange, isPostfix, range) ->
+            let lid =
+                match typeName with
+                | SynType.LongIdent(lid) -> lid.Lid
+                | SynType.MeasurePower(SynType.LongIdent(lid), _, _) -> lid.Lid
+                | SynType.MeasureDivide(SynType.LongIdent(lid), _, _) -> lid.Lid
+                | _ -> failwithf "unexpected type: %O" typeName
+
+            let mark = x.Mark(range)
+            if isPostfix then
+                x.ProcessTypeArgs(typeArgs, ltRange, gtRange, ElementType.POSTFIX_APP_TYPE_ARGUMENT_LIST)
+                x.MarkTypeReferenceQualifierNames(lid)
+            else
+                x.MarkTypeReferenceQualifierNames(lid)
+                x.ProcessTypeArgs(typeArgs, ltRange, gtRange, ElementType.PREFIX_APP_TYPE_ARGUMENT_LIST)
+
+            x.Done(mark, ElementType.TYPE_REFERENCE_NAME)
+
+        | SynType.LongIdentApp(typeName, lid, ltRange, typeArgs, _, gtRange, range) ->
+            let mark = x.Mark(range)
+            x.ProcessTypeAsTypeReferenceName(typeName)
+            x.MarkTypeReferenceQualifierNames(lid.Lid)
+            x.ProcessTypeArgs(typeArgs, ltRange, gtRange, ElementType.PREFIX_APP_TYPE_ARGUMENT_LIST)
+            x.Done(mark, ElementType.TYPE_REFERENCE_NAME)
 
         | _ -> failwithf "unexpected type: %O" synType
 
@@ -514,23 +553,14 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
             x.ProcessNamedTypeReference(lid.Lid)
             x.Done(range, mark, ElementType.NAMED_TYPE)
 
-        | SynType.App(typeName, ltRange, typeArgs, _, gtRange, isPostfix, _) ->
+        | SynType.App(_, _, _, _, _, _, _) ->
             let mark = x.Mark(range)
-            let lid =
-                match typeName with
-                | SynType.LongIdent(lid) -> lid.Lid
-                | SynType.MeasurePower(SynType.LongIdent(lid), _, _) -> lid.Lid
-                | SynType.MeasureDivide(SynType.LongIdent(lid), _, _) -> lid.Lid
-                | _ -> failwithf "unexpected type: %O" typeName
-
-            // todo: fix isPostfix
-            x.ProcessNamedTypeReference(lid, typeArgs, ltRange, gtRange, isPostfix)
+            x.ProcessTypeAsTypeReferenceName(synType)
             x.Done(range, mark, ElementType.NAMED_TYPE)
 
         | SynType.LongIdentApp(_, _, ltRange, typeArgs, _, gtRange, _) ->
-            // todo: mark types
             let mark = x.Mark(range)
-            x.ProcessTypeArgs(typeArgs, ltRange, gtRange, ElementType.PREFIX_APP_TYPE_ARGUMENT_LIST)
+            x.ProcessTypeAsTypeReferenceName(synType)
             x.Done(range, mark, ElementType.NAMED_TYPE)
 
         | SynType.Tuple (_, types, _) ->

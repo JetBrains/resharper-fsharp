@@ -124,12 +124,12 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
 
         | SynMemberSig.Inherit(synType, range) ->
             let mark = x.Mark(range)
-            x.ProcessTypeAsTypeReference(synType)
+            x.ProcessTypeAsTypeReferenceName(synType)
             x.Done(mark, ElementType.INTERFACE_INHERIT)
 
         | SynMemberSig.Interface(synType, range) ->
             let mark = x.Mark(range)
-            x.ProcessTypeAsTypeReference(synType)
+            x.ProcessTypeAsTypeReferenceName(synType)
             x.Done(mark, ElementType.INTERFACE_IMPLEMENTATION)
 
         | _ -> ()

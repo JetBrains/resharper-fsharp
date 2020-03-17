@@ -11,8 +11,8 @@ IFSharpImplFile
           FSharpTokenType+ColonTokenElement(type:COLON, text::)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           INamedType
-            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
             ITypeReferenceName
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
               IPostfixAppTypeArgumentList
                 INamedType
                   ITypeReferenceName

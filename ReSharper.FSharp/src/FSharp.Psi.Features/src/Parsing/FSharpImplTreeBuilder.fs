@@ -205,12 +205,12 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                 ElementType.IMPLICIT_CONSTRUCTOR_DECLARATION
 
             | SynMemberDefn.ImplicitInherit(baseType, args, _, _) ->
-                x.ProcessTypeAsTypeReference(baseType)
+                x.ProcessTypeAsTypeReferenceName(baseType)
                 x.MarkChameleonExpression(args)
                 ElementType.TYPE_INHERIT
 
             | SynMemberDefn.Interface(interfaceType, interfaceMembersOpt , _) ->
-                x.ProcessTypeAsTypeReference(interfaceType)
+                x.ProcessTypeAsTypeReferenceName(interfaceType)
                 match interfaceMembersOpt with
                 | Some members ->
                     for m in members do
@@ -220,7 +220,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                 ElementType.INTERFACE_IMPLEMENTATION
 
             | SynMemberDefn.Inherit(baseType, _, _) ->
-                try x.ProcessTypeAsTypeReference(baseType)
+                try x.ProcessTypeAsTypeReferenceName(baseType)
                 with _ -> () // Getting type range throws an exception if base type lid is empty.
                 ElementType.INTERFACE_INHERIT
 
@@ -663,12 +663,12 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
 
         | SynExpr.New(_, synType, expr, _) ->
             x.PushRange(range, ElementType.NEW_EXPR)
-            x.ProcessTypeAsTypeReference(synType)
+            x.ProcessTypeAsTypeReferenceName(synType)
             x.ProcessExpression(expr)
 
         | SynExpr.ObjExpr(synType, args, bindings, interfaceImpls, _, _) ->
             x.PushRange(range, ElementType.OBJ_EXPR)
-            x.ProcessTypeAsTypeReference(synType)
+            x.ProcessTypeAsTypeReferenceName(synType)
             x.PushStepList(interfaceImpls, interfaceImplementationListProcessor)
             x.PushStepList(bindings, objectExpressionMemberListProcessor)
 
@@ -1105,7 +1105,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
     
     member x.ProcessInterfaceImplementation(InterfaceImpl(interfaceType, bindings, range)) =
         x.PushRange(range, ElementType.INTERFACE_IMPLEMENTATION)
-        x.ProcessTypeAsTypeReference(interfaceType)
+        x.ProcessTypeAsTypeReferenceName(interfaceType)
         x.PushStepList(bindings, objectExpressionMemberListProcessor)
 
     member x.ProcessSynIndexerArg(arg) =
