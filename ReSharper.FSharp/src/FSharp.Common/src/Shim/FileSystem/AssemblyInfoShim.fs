@@ -13,6 +13,8 @@ type AssemblyInfoShim
     inherit DelegatingFileSystemShim(lifetime)
 
     let isSupported (path: FileSystemPath) =
+        if not path.IsAbsolute then false else
+
         let extension = path.ExtensionNoDot
         extension = "dll" || extension = "exe"
 
