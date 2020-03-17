@@ -1187,7 +1187,12 @@ memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } 
   get { methodName="Attributes" path=<memberDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
-  STATIC<STATIC, StaticKeyword>?
+  (
+    STATIC<STATIC, StaticKeyword>
+    MEMBER<MEMBER_KEYWORD, MemberKeyword>
+  |
+    memberKeyword{MEMBER_KEYWORD, MemberKeyword}
+  )
   MEMBER<MEMBER, MemberKeyword>
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   memberSelfId<SELF_ID, SelfId>?
@@ -1205,6 +1210,11 @@ memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } 
       accessorDeclaration
     )?
   );
+
+private memberKeyword{ROLE, Getter}:
+  MEMBER<@ROLE, @Getter> |
+  OVERRIDE<@ROLE, @Getter> |
+  DEFAULT<@ROLE, @Getter>;
 
 abstractSlot options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<abstractSlot:TYPE_PARAMETERS_LIST/typeParameterOfMethodList:TYPE_PARAMETER> };

@@ -2,6 +2,7 @@
 using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
@@ -58,6 +59,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       ObjExprNavigator.GetByMemberDeclaration(this) != null;
 
     public override bool IsStatic => StaticKeyword != null;
+
+    public override bool IsOverride =>
+      MemberKeyword?.GetTokenType() is var tokenType &&
+      tokenType == FSharpTokenType.OVERRIDE || tokenType == FSharpTokenType.DEFAULT;
 
     public override TreeTextRange GetNameIdentifierRange() =>
       NameIdentifier.GetMemberNameIdentifierRange();

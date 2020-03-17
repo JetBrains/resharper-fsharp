@@ -19,3 +19,10 @@ type ReSpellerPsiHelper() =
         match node with
         | :? IFSharpIdentifier as fsIdentifier -> NamedPatNavigator.GetByIdentifier(fsIdentifier) :> _
         | _ -> null
+
+    override x.ShouldSkipInheritedMember(node, _) =
+        let memberDeclaration = node.As<IMemberDeclaration>()
+        if isNull memberDeclaration then false else
+
+        memberDeclaration.IsOverride ||
+        isNull (InterfaceImplementationNavigator.GetByTypeMember(memberDeclaration))

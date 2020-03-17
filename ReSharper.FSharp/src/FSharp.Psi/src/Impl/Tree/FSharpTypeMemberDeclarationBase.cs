@@ -94,7 +94,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public bool IsAbstract => false;
     public bool IsSealed => false;
     public bool IsVirtual => false;
-    public bool IsOverride => false;
+    public virtual bool IsOverride => false;
     public virtual bool IsStatic => false;
     public bool IsReadonly => false;
     public bool IsExtern => false;
