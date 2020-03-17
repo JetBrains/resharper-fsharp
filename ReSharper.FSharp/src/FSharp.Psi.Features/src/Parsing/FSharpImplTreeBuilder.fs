@@ -628,8 +628,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             x.MarkAndDone(range, elementType)
 
         | SynExpr.Typed(expr, synType, _) ->
-            Assertion.Assert(rangeContainsRange range synType.Range,
-                             "rangeContainsRange range synType.Range; {0}; {1}", range, synType.Range)
+            let typeRange = synType.Range
+            Assertion.Assert(rangeContainsRange range typeRange,
+                             "rangeContainsRange range synType.Range; {0}; {1}", range, typeRange)
 
             x.PushRange(range, ElementType.TYPED_EXPR)
             x.PushType(synType)
@@ -752,7 +753,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             x.ProcessExpression(first)
 
         | SynExpr.App(_, isInfix, funcExpr, argExpr, _) ->
-            Assertion.Assert(not isInfix, sprintf "Expecting prefix app, got: %A" expr)
+            Assertion.Assert(not isInfix, "Expecting prefix app, got: {0}", expr)
 
             x.PushRange(range, ElementType.PREFIX_APP_EXPR)
             x.PushExpression(argExpr)
