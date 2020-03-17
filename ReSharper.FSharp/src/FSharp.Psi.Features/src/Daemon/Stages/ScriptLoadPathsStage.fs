@@ -1,6 +1,7 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages
 
 open System.Collections.Generic
+open JetBrains.ReSharper.Daemon.Stages
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
@@ -10,7 +11,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
-[<DaemonStage(StagesBefore = [| typeof<DeadCodeHighlightStage> |], StagesAfter = [| typeof<HighlightIdentifiersStage> |])>]
+[<DaemonStage(StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |], StagesAfter = [| typeof<HighlightIdentifiersStage> |])>]
 type ScriptLoadPathsStage() =
     inherit FSharpDaemonStageBase()
 

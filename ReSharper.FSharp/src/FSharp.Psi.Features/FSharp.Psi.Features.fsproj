@@ -35,7 +35,6 @@
     <Compile Include="src\Daemon\Stages\FSharpIdentifierTooltipProvider.fs" />
     <Compile Include="src\Daemon\Stages\FcsErrorsStageProcessBase.fs" />
     <Compile Include="src\Daemon\Stages\FSharpDaemonBehaviour.fs" />
-    <Compile Include="src\Daemon\Stages\DeadCodeHighlightStage.fs" />
     <Compile Include="src\Daemon\Stages\ScriptLoadPathsStage.fs" />
     <Compile Include="src\Daemon\Stages\SyntaxErrorsStage.fs" />
     <Compile Include="src\Daemon\Stages\TypeCheckErrorsStage.fs" />
@@ -55,6 +54,7 @@
     <Compile Include="src\Daemon\Analyzers\RedundantNew.fs" />
     <Compile Include="src\Daemon\Analyzers\LetDisposableAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\RedundantParenAnalyzer.fs" />
+    <Compile Include="src\Daemon\Analyzers\InactivePreprocessorBranchAnalyzer.fs" />
     <Compile Include="src\Comment\FSharpBlockCommentActionProvider.fs" />
     <Compile Include="src\Comment\FSharpLineCommentActionProvider.fs" />
     <Compile Include="src\Debugger\FSharpBreakpointVariantsProvider.fs" />
