@@ -25,4 +25,4 @@ type ReSpellerPsiHelper() =
         if isNull memberDeclaration then false else
 
         memberDeclaration.IsOverride ||
-        isNull (InterfaceImplementationNavigator.GetByTypeMember(memberDeclaration))
+        isNotNull (InterfaceImplementationNavigator.GetByTypeMember(memberDeclaration))
