@@ -74,8 +74,12 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
     let createHighlightingFromParentNode highlightingCtor range: IHighlighting =
         match nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) with
         | null -> null
-        | node -> highlightingCtor (node.GetContainingNode()) :> _
-    
+        | node ->
+
+        match node.GetContainingNode() with
+        | null -> null
+        | parent -> highlightingCtor parent :> _
+
     let createHighlightingFromNodeWithMessage highlightingCtor range (error: FSharpErrorInfo): IHighlighting =
         let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
         if isNotNull expr then highlightingCtor (expr, error.Message) :> _ else
