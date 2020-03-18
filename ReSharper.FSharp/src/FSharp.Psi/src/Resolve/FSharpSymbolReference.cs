@@ -26,8 +26,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         : null;
 
     public virtual TreeOffset SymbolOffset =>
-      myOwner.IdentifierToken is var token && token != null
-        ? token.GetTreeStartOffset()
+      myOwner.FSharpIdentifier is var fsIdentifier && fsIdentifier != null
+        ? fsIdentifier.NameRange.StartOffset
         : TreeOffset.InvalidOffset;
 
     public virtual FSharpSymbol GetFSharpSymbol() =>
@@ -47,7 +47,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     }
 
     public override string GetName() =>
-      myOwner.IdentifierToken.GetSourceName();
+      myOwner.FSharpIdentifier?.IdentifierToken.GetSourceName() ??
+      SharedImplUtil.MISSING_DECLARATION_NAME;
 
     public override bool HasMultipleNames =>
       AttributeNavigator.GetByReferenceName(myOwner as ITypeReferenceName) != null;
@@ -61,7 +62,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     }
 
     public override TreeTextRange GetTreeTextRange() =>
-      myOwner.IdentifierToken?.GetTreeTextRange() ??
+      myOwner.FSharpIdentifier?.IdentifierToken?.GetTreeTextRange() ??
       TreeTextRange.InvalidRange;
 
     public override IAccessContext GetAccessContext() =>

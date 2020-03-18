@@ -1,26 +1,26 @@
 using System.Collections.Generic;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
-using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class TypeReferenceName
   {
-    public override ITokenNode IdentifierToken => Identifier as ITokenNode;
-    public string ShortName => Identifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
+    public override IFSharpIdentifier FSharpIdentifier => Identifier;
+    public string ShortName => FSharpIdentifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
     public string QualifiedName => this.GetQualifiedName();
     public IList<string> Names => this.GetNames();
   }
 
   internal partial class ExpressionReferenceName
   {
-    public override ITokenNode IdentifierToken => Identifier as ITokenNode;
+    public override IFSharpIdentifier FSharpIdentifier => Identifier;
 
     protected override FSharpSymbolReference CreateReference() =>
       new FSharpSymbolReference(this);
 
-    public string ShortName => Identifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
+    public string ShortName => FSharpIdentifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
     public string QualifiedName => this.GetQualifiedName();
     public IList<string> Names => this.GetNames();
   }

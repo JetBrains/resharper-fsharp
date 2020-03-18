@@ -6,7 +6,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
-  public class FSharpInterface : Interface, IFSharpTypeElement
+  public class FSharpInterface : Interface, IFSharpTypeElement, IFSharpTypeParametersOwner
   {
     public FSharpInterface(IInterfacePart part) : base(part)
     {
@@ -23,5 +23,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
           result.AddRange(fsPart.GetSuperTypeElements());
       return result.ToArray();
     }
+
+    public IList<ITypeParameter> AllTypeParameters =>
+      this.GetAllTypeParametersReversed();
   }
 }

@@ -545,7 +545,9 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
             x.Done(mark, ElementType.TYPE_REFERENCE_NAME)
 
         | SynType.Var(_, range) ->
-            x.MarkAndDone(range, ElementType.TYPE_REFERENCE_NAME)
+            let mark = x.Mark(range)
+            x.MarkAndDone(range, ElementType.TYPE_PARAMETER_ID)
+            x.Done(mark, ElementType.TYPE_REFERENCE_NAME)
 
         | _ -> failwithf "unexpected type: %O" synType
 
@@ -608,7 +610,9 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
             x.Done(range, mark, ElementType.ARRAY_TYPE)
 
         | SynType.Var _ ->
-            x.MarkAndDone(range, ElementType.VAR_TYPE)
+            let mark = x.Mark(range)
+            x.ProcessTypeAsTypeReferenceName(synType)
+            x.Done(range, mark, ElementType.NAMED_TYPE)
 
         // todo: mark expressions
         | SynType.StaticConstantExpr _

@@ -13,8 +13,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     public override FSharpSymbol GetFSharpSymbol()
     {
       var symbol = base.GetFSharpSymbol();
-      if (symbol is FSharpEntity entity)
-        return entity;
+      if (symbol is FSharpEntity || symbol is FSharpGenericParameter)
+        return symbol;
 
       if (base.GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv && mfv.IsConstructor)
         return mfv.DeclaringEntity?.Value;

@@ -1,4 +1,5 @@
-﻿using JetBrains.ReSharper.Psi.Tree;
+﻿using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
@@ -6,5 +7,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
   public interface IFSharpIdentifierLikeNode : IIdentifier
   {
     ITokenNode IdentifierToken { get; }
+    TreeTextRange NameRange { get; }
   }
 }

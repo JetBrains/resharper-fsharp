@@ -7,8 +7,9 @@ IFSharpImplFile
           FSharpTokenType+NewTokenElement(type:NEW, text:new)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           ITypeReferenceName
-            FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
-            FSharpIdentifierToken(type:IDENTIFIER, text:T)
+            ITypeParameterId
+              FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
+              FSharpIdentifierToken(type:IDENTIFIER, text:T)
           IUnitExpr
             FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
             FSharpTokenType+RparenTokenElement(type:RPAREN, text:))

@@ -8,7 +8,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
   {
     FSharpSymbolReference Reference { get; }
 
-    [CanBeNull] ITokenNode IdentifierToken { get; }
+    [CanBeNull] IFSharpIdentifier FSharpIdentifier { get; }
 
     [NotNull]
     IFSharpReferenceOwner SetName([NotNull] string name);

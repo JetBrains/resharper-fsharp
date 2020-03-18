@@ -1,4 +1,5 @@
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -13,6 +14,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override ReferenceCollection GetFirstClassReferences() =>
       new ReferenceCollection(Reference);
 
-    public override ITokenNode IdentifierToken => TypeName?.IdentifierToken;
+    public override IFSharpIdentifier FSharpIdentifier => TypeName?.Identifier;
   }
 }

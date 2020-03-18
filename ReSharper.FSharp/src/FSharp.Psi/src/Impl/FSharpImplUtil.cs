@@ -167,6 +167,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static string GetSourceName([CanBeNull] this IIdentifier identifier) =>
       identifier?.Name ?? SharedImplUtil.MISSING_DECLARATION_NAME;
 
+    [NotNull] 
     public static string GetSourceName([CanBeNull] this ITreeNode treeNode) =>
       GetSourceName(treeNode as IIdentifier);
 
@@ -175,10 +176,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       if (identifier == null)
         return TreeTextRange.InvalidRange;
 
-      if (identifier is IActivePatternId activePatternId)
-        return activePatternId.GetCasesRange();
-
-      var nameRange = identifier.GetTreeTextRange();
+      var nameRange = identifier.NameRange;
       var identifierToken = identifier.IdentifierToken;
       if (identifierToken == null)
         return nameRange;
@@ -673,7 +671,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static IFSharpReferenceOwner SetName([NotNull] this IFSharpReferenceOwner referenceOwner, 
       [NotNull] string name)
     {
-      if (referenceOwner.IdentifierToken is var id && id != null)
+      if (referenceOwner.FSharpIdentifier?.IdentifierToken is var id && id != null)
         LowLevelModificationUtil.ReplaceChildRange(id, id, new FSharpIdentifierToken(name));
 
       return referenceOwner;
@@ -758,5 +756,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       var firstQualifier = referenceName.GetFirstQualifier();
       return firstQualifier ?? referenceName;
     }
+    
+    public static IList<ITypeParameter> GetAllTypeParametersReversed(this ITypeElement typeElement) =>
+      typeElement.GetAllTypeParameters().ResultingList().Reverse();
   }
 }

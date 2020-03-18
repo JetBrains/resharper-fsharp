@@ -50,7 +50,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public bool IsTypeExtensionAllowed =>
       ModuleDeclarationNavigator.GetByMember(TypeDeclarationGroupNavigator.GetByTypeDeclaration(this)) != null;
 
-    public ITokenNode IdentifierToken => Identifier as ITokenNode;
+    public IFSharpIdentifier FSharpIdentifier => Identifier;
 
     IFSharpReferenceOwner IFSharpReferenceOwner.SetName(string name) =>
       FSharpImplUtil.SetName(this, name);

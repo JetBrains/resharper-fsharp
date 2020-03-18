@@ -1344,11 +1344,16 @@ activePatternId:
   )+
   RPAREN<RPAREN, RParen>;
 
+typeParameterId:
+  QUOTE
+  IDENTIFIER<IDENTIFIER, Identifier>;
+
 interface fSharpIdentifier:
   identifier |
   symbolicOp |
   ampAmp |
-  activePatternId;
+  activePatternId |
+  typeParameterId;
 
 abstract identifier options { interfaceName="IFSharpIdentifier"; }:
   IDENTIFIER;
@@ -1480,7 +1485,6 @@ interface synType:
   anonRecordType |
   arrayType |
   funType |
-  varType |
   anonType |
   otherType;
 
@@ -1514,10 +1518,6 @@ funType:
   synType
   RARROW
   synType;
-
-varType options { stubBase="TypeReferenceOwnerBase"; }:
-  QUOTE
-  IDENTIFIER<IDENTIFIER, Identifier>;
 
 anonType:
   UNDERSCORE;

@@ -15,7 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class RecordExpr
   {
     public FSharpSymbolReference Reference { get; private set; }
-    public ITokenNode IdentifierToken => null;
+    public IFSharpIdentifier FSharpIdentifier => null;
 
     public IFSharpReferenceOwner SetName(string name) => this;
 

@@ -12,6 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class ActivePatternId
   {
     public ITokenNode IdentifierToken => null;
+    public TreeTextRange NameRange => GetCasesRange();
 
     public string Name
     {

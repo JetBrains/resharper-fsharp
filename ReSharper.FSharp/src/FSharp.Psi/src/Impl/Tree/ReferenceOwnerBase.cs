@@ -31,7 +31,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       }
     }
 
-    public abstract ITokenNode IdentifierToken { get; }
+    public abstract IFSharpIdentifier FSharpIdentifier { get; }
 
     protected abstract FSharpSymbolReference CreateReference();
 

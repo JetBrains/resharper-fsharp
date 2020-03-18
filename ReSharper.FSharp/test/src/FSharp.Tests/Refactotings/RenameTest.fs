@@ -109,6 +109,7 @@ type FSharpRenameTest() =
     [<Test>] member x.``Interface 02 - Internal type impl``() = x.DoNamedTest()
 
     [<Test>] member x.``Type parameters - Type 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type parameters - Type reference 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Active patterns - Local - Partial 01 - Decl``() = x.DoNamedTest()
     [<Test>] member x.``Active patterns - Local - Partial 02 - Pattern``() = x.DoNamedTest()

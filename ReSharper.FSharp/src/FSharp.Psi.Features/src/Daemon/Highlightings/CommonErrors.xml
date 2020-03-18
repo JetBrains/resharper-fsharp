@@ -206,7 +206,7 @@
       <Argument>fcsMessage</Argument>
     </Message>
     <!--todo: identifier null check-->
-    <Range>reference.GetElement().IdentifierToken.GetHighlightingRange()</Range>
+    <Range>reference.GetElement().FSharpIdentifier.GetHighlightingRange()</Range>
     <Behavour attributeID="UNRESOLVED_ERROR" overlapResolvePolicy="NONE"/>
     <QuickFix>ToRecursiveFunctionFix</QuickFix>
     <QuickFix arguments="h.Reference">ImportTypeFix</QuickFix>

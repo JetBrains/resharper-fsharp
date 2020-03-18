@@ -80,7 +80,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       }
     }
 
-    public ITokenNode IdentifierToken => Identifier as ITokenNode;
+    public IFSharpIdentifier FSharpIdentifier => Identifier;
 
     public IFSharpReferenceOwner SetName(string name) =>
       FSharpImplUtil.SetName(this, name);

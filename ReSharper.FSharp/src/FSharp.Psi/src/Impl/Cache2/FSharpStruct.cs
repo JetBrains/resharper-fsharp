@@ -7,7 +7,7 @@ using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 {
-  public class FSharpStruct : Struct, IFSharpTypeElement
+  public class FSharpStruct : Struct, IFSharpTypeElement, IFSharpTypeParametersOwner
   {
     public FSharpStruct([NotNull] IStructPart part) : base(part)
     {
@@ -24,5 +24,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
           result.AddRange(fsPart.GetSuperTypeElements());
       return result.ToArray();
     }
+    
+    public IList<ITypeParameter> AllTypeParameters =>
+      this.GetAllTypeParametersReversed();
   }
 }
