@@ -4,6 +4,7 @@ using JetBrains.Lifetimes;
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelCreators;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
 using Microsoft.FSharp.Core.CompilerServices;
 using static FSharp.Compiler.ExtensionTyping;
@@ -22,6 +23,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       myProvidedPropertiesCreator;
 
     private readonly IProvidedRdModelsCreator<ProvidedType, RdProvidedType> myProvidedTypesCreator;
+    private readonly IProvidedRdModelsCreator<ProvidedFieldInfo, RdProvidedFieldInfo> myProvidedFieldInfosCreator;
     private readonly IProvidedRdModelsCreator<ProvidedAssembly, RdProvidedAssembly> myProvidedAssembliesCreator;
 
     private readonly IReadProvidedCache<Tuple<ProvidedType, RdProvidedType, int>> myProvidedTypesCache;
@@ -32,6 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       IProvidedRdModelsCreator<ProvidedMethodInfo, RdProvidedMethodInfo> providedMethodInfosCreator,
       IProvidedRdModelsCreator<ProvidedPropertyInfo, RdProvidedPropertyInfo> providedPropertiesCreator,
       IProvidedRdModelsCreator<ProvidedType, RdProvidedType> providedTypesCreator,
+      IProvidedRdModelsCreator<ProvidedFieldInfo, RdProvidedFieldInfo> providedFieldInfosCreator,
       IProvidedRdModelsCreator<ProvidedAssembly, RdProvidedAssembly> providedAssembliesCreator,
       IReadProvidedCache<Tuple<ProvidedType, RdProvidedType, int>> providedTypesCache,
       IReadProvidedCache<ITypeProvider> typeProvidersCache)
@@ -40,6 +43,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       myProvidedMethodInfosCreator = providedMethodInfosCreator;
       myProvidedPropertiesCreator = providedPropertiesCreator;
       myProvidedTypesCreator = providedTypesCreator;
+      myProvidedFieldInfosCreator = providedFieldInfosCreator;
       myProvidedAssembliesCreator = providedAssembliesCreator;
       myProvidedTypesCache = providedTypesCache;
       myTypeProvidersCache = typeProvidersCache;
@@ -65,6 +69,50 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       processModel.GetMethods.Set(GetMethods);
       processModel.ApplyStaticArguments.Set(ApplyStaticArguments);
       processModel.Assembly.Set(GetAssembly);
+      processModel.MakeArrayType.Set(MakeArrayType);
+      processModel.MakePointerType.Set(MakePointerType);
+      processModel.MakeByRefType.Set(MakeByRefType);
+      processModel.GetFields.Set(GetFields);
+      processModel.GetField.Set(GetField);
+    }
+
+    private RdTask<RdProvidedFieldInfo> GetField(Lifetime lifetime, GetFieldArgs args)
+    {
+      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(args.Id);
+      var field = myProvidedFieldInfosCreator.CreateRdModel(providedType.GetField(args.FieldName), typeProviderId);
+      return RdTask<RdProvidedFieldInfo>.Successful(field);
+    }
+
+    private RdTask<RdProvidedFieldInfo[]> GetFields(Lifetime lifetime, int entityId)
+    {
+      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
+      var fields = providedType
+        .GetFields()
+        .Select(t => myProvidedFieldInfosCreator.CreateRdModel(t, typeProviderId))
+        .ToArray();
+      return RdTask<RdProvidedFieldInfo[]>.Successful(fields);
+    }
+
+    private RdTask<int> MakeByRefType(Lifetime lifetime, int entityId)
+    {
+      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
+      var byRefTypeId = myProvidedTypesCreator.CreateRdModel(providedType.MakeByRefType(), typeProviderId).EntityId;
+      return RdTask<int>.Successful(byRefTypeId);
+    }
+
+    private RdTask<int> MakePointerType(Lifetime lifetime, int entityId)
+    {
+      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
+      var pointerTypeId = myProvidedTypesCreator.CreateRdModel(providedType.MakePointerType(), typeProviderId).EntityId;
+      return RdTask<int>.Successful(pointerTypeId);
+    }
+
+    private RdTask<int> MakeArrayType(Lifetime lifetime, MakeArrayTypeArgs args)
+    {
+      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(args.Id);
+      var arrayTypeId = myProvidedTypesCreator.CreateRdModel(
+        args.Rank == 1 ? providedType.MakeArrayType() : providedType.MakeArrayType(args.Rank), typeProviderId).EntityId;
+      return RdTask<int>.Successful(arrayTypeId);
     }
 
     private RdTask<RdProvidedAssembly> GetAssembly(Lifetime lifetime, int entityId)
@@ -79,24 +127,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(args.Id);
       var typeProvider = myTypeProvidersCache.Get(typeProviderId);
 
-      var staticArgDescriptions = args.StaticArguments.Select(t => t.TypeName switch
-      {
-        "sbyte" => sbyte.Parse(t.Value),
-        "short" => short.Parse(t.Value),
-        "int" => int.Parse(t.Value),
-        "long" => long.Parse(t.Value),
-        "byte" => byte.Parse(t.Value),
-        "ushort" => ushort.Parse(t.Value),
-        "uint" => uint.Parse(t.Value),
-        "ulong" => ulong.Parse(t.Value),
-        "decimal" => decimal.Parse(t.Value),
-        "float" => float.Parse(t.Value),
-        "double" => double.Parse(t.Value),
-        "char" => char.Parse(t.Value),
-        "bool" => bool.Parse(t.Value),
-        "string" => (object) t.Value,
-        _ => throw new ArgumentException($"Unexpected static arg with type {t.TypeName}")
-      }).ToArray();
+      var staticArgDescriptions = args.StaticArguments.Select(t => t.Unbox()).ToArray();
 
       var type = myProvidedTypesCreator
         .CreateRdModel(

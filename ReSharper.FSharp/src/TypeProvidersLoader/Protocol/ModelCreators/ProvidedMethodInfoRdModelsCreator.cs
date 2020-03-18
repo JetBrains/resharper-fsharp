@@ -12,13 +12,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelC
     }
 
     protected override RdProvidedMethodInfo
-      CreateRdModelInternal(ProvidedMethodInfo providedNativeModel, int entityId) => new RdProvidedMethodInfo(
-      providedNativeModel.MetadataToken,
-      providedNativeModel.IsGenericMethod,
-      providedNativeModel.IsStatic, providedNativeModel.IsFamily, providedNativeModel.IsFamilyAndAssembly,
-      providedNativeModel.IsFamilyOrAssembly, providedNativeModel.IsVirtual, providedNativeModel.IsFinal,
-      providedNativeModel.IsPublic,
-      providedNativeModel.IsAbstract, providedNativeModel.IsHideBySig, providedNativeModel.IsConstructor,
-      providedNativeModel.Name, entityId);
+      CreateRdModelInternal(ProvidedMethodInfo providedModel, int entityId) => new RdProvidedMethodInfo(
+      providedModel.MetadataToken,
+      providedModel.IsGenericMethod,
+      providedModel.IsStatic, providedModel.IsFamily, providedModel.IsFamilyAndAssembly,
+      providedModel.IsFamilyOrAssembly, providedModel.IsVirtual, providedModel.IsFinal,
+      providedModel.IsPublic,
+      providedModel.IsAbstract, providedModel.IsHideBySig, providedModel.IsConstructor,
+      providedModel.Name, entityId);
   }
 }

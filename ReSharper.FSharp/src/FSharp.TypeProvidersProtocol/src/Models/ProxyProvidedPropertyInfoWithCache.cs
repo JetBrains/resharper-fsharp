@@ -6,7 +6,7 @@ using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 {
-  public class ProxyProvidedPropertyInfo : ProvidedPropertyInfo
+  public class ProxyProvidedPropertyInfoWithCache : ProvidedPropertyInfo
   {
     private readonly RdProvidedPropertyInfo myPropertyInfo;
     private readonly RdFSharpTypeProvidersLoaderModel myProcessModel;
@@ -17,7 +17,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     private RdProvidedPropertyInfoProcessModel RdProvidedPropertyInfoProcessModel =>
       myProcessModel.RdProvidedPropertyInfoProcessModel;
 
-    private ProxyProvidedPropertyInfo(RdProvidedPropertyInfo propertyInfo,
+    private ProxyProvidedPropertyInfoWithCache(RdProvidedPropertyInfo propertyInfo,
       RdFSharpTypeProvidersLoaderModel processModel, ProvidedTypeContext context, ITypeProviderCache cache) : base(
       typeof(string).GetProperties().First(), context)
     {
@@ -28,16 +28,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     }
 
     [ContractAnnotation("propertyInfo:null => null")]
-    public static ProxyProvidedPropertyInfo CreateNoContext(RdProvidedPropertyInfo propertyInfo,
-      RdFSharpTypeProvidersLoaderModel processModel, ITypeProviderCache cache) =>
-      propertyInfo == null
-        ? null
-        : new ProxyProvidedPropertyInfo(propertyInfo, processModel, ProvidedTypeContext.Empty, cache);
-
-    [ContractAnnotation("propertyInfo:null => null")]
-    public static ProxyProvidedPropertyInfo Create(RdProvidedPropertyInfo propertyInfo,
+    public static ProxyProvidedPropertyInfoWithCache Create(RdProvidedPropertyInfo propertyInfo,
       RdFSharpTypeProvidersLoaderModel processModel, ProvidedTypeContext context, ITypeProviderCache cache) =>
-      propertyInfo == null ? null : new ProxyProvidedPropertyInfo(propertyInfo, processModel, context, cache);
+      propertyInfo == null ? null : new ProxyProvidedPropertyInfoWithCache(propertyInfo, processModel, context, cache);
 
     public override string Name => myPropertyInfo.Name;
     public override bool CanRead => myPropertyInfo.CanRead;
@@ -52,11 +45,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
         myContext);
 
     public override ProvidedMethodInfo GetGetMethod() =>
-      ProxyProvidedMethodInfo.Create(RdProvidedPropertyInfoProcessModel.GetGetMethod.Sync(EntityId), myProcessModel,
+      ProxyProvidedMethodInfoWithCache.Create(RdProvidedPropertyInfoProcessModel.GetGetMethod.Sync(EntityId), myProcessModel,
         myContext, myCache);
 
     public override ProvidedMethodInfo GetSetMethod() =>
-      ProxyProvidedMethodInfo.Create(RdProvidedPropertyInfoProcessModel.GetSetMethod.Sync(EntityId), myProcessModel,
+      ProxyProvidedMethodInfoWithCache.Create(RdProvidedPropertyInfoProcessModel.GetSetMethod.Sync(EntityId), myProcessModel,
         myContext, myCache);
 
     public override ProvidedParameterInfo[] GetIndexParameters() =>

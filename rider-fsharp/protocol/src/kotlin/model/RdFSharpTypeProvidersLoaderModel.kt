@@ -77,13 +77,15 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         call("Dispose", int, void)
     }
 
+    private val RdStaticArg = structdef {
+        field("TypeName", string)
+        field("Value", string)
+    }
+
     private val ApplyStaticArgumentsParameters = structdef {
         field("Id", int)
         field("TypePathWithArguments", array(string))
-        field("StaticArguments", array(structdef("StaticArg") {
-            field("TypeName", string)
-            field("Value", string)
-        }))
+        field("StaticArguments", array(RdStaticArg))
     }
 
     private val GetStaticArgumentsParameters = structdef {
@@ -194,6 +196,17 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         call("GetMethods", int, array(RdProvidedMethodInfo))
         call("DeclaringType", int, int.nullable)
         call("Assembly", int, RdProvidedAssembly)
+        call("MakePointerType", int, int)
+        call("MakeByRefType", int, int)
+        call("MakeArrayType", structdef("MakeArrayTypeArgs") {
+            field("Id", int)
+            field("Rank", int)
+        }, int)
+        call("GetFields", int, array(RdProvidedFieldInfo))
+        call("GetField", structdef("GetFieldArgs") {
+            field("Id", int)
+            field("FieldName", string)
+        }, RdProvidedFieldInfo)
     }
 
     private val RdProvidedMethodInfoProcessModel = aggregatedef("RdProvidedMethodInfoProcessModel") {
@@ -211,8 +224,8 @@ object RdFSharpTypeProvidersLoaderModel : Root(
     private val RdProvidedPropertyInfoProcessModel = aggregatedef("RdProvidedPropertyInfoProcessModel") {
         call("DeclaringType", int, int.nullable)
         call("PropertyType", int, int)
-        call("GetGetMethod", int, RdProvidedMethodInfo)
-        call("GetSetMethod", int, RdProvidedMethodInfo)
+        call("GetGetMethod", int, RdProvidedMethodInfo.nullable)
+        call("GetSetMethod", int, RdProvidedMethodInfo.nullable)
         call("GetIndexParameters", int, array(RdProvidedParameterInfo))
     }
 
@@ -232,6 +245,25 @@ object RdFSharpTypeProvidersLoaderModel : Root(
 
     private val RdProvidedAssemblyProcessModel = aggregatedef("RdProvidedAssemblyProcessModel") {
         call("GetManifestModuleContents", int, array(byte))
+    }
+
+    private val RdProvidedFieldInfoProcessModel = aggregatedef("RdProvidedFieldInfoProcessModel") {
+        call("FieldType", int, int)
+        call("DeclaringType", int, int)
+        call("GetRawConstantValue", int, RdStaticArg)
+    }
+
+    private val RdProvidedFieldInfo = classdef extends RdProvidedMemberInfo {
+        field("IsInitOnly", bool)
+        field("IsStatic", bool)
+        field("IsSpecialName", bool)
+        field("IsLiteral", bool)
+        field("GetRawConstantValue", RdStaticArg)
+        field("IsPublic", bool)
+        field("IsFamily", bool)
+        field("IsFamilyAndAssembly", bool)
+        field("IsFamilyOrAssembly", bool)
+        field("IsPrivate", bool)
     }
 
     init {
@@ -282,6 +314,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         field("RdProvidedMethodInfoProcessModel", RdProvidedMethodInfoProcessModel)
         field("RdProvidedParameterInfoProcessModel", RdProvidedParameterInfoProcessModel)
         field("RdProvidedAssemblyProcessModel", RdProvidedAssemblyProcessModel)
+        field("RdProvidedFieldInfoProcessModel", RdProvidedFieldInfoProcessModel)
 
         call("InstantiateTypeProvidersOfAssembly", InstantiateTypeProvidersOfAssemblyParameters, array(RdTypeProvider))
     }

@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using JetBrains.Annotations;
-using JetBrains.Core;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
 using static FSharp.Compiler.ExtensionTyping;
@@ -30,13 +29,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     }
 
     [ContractAnnotation("parameter:null => null")]
-    public static ProxyProvidedParameterInfoWithCache CreateNoContext(RdProvidedParameterInfo parameter,
-      RdFSharpTypeProvidersLoaderModel processModel, ITypeProviderCache cache) =>
-      parameter == null
-        ? null
-        : new ProxyProvidedParameterInfoWithCache(parameter, ProvidedTypeContext.Empty, processModel, cache);
-
-    [ContractAnnotation("parameter:null => null")]
     public static ProxyProvidedParameterInfoWithCache Create(RdProvidedParameterInfo parameter,
       RdFSharpTypeProvidersLoaderModel processModel, ProvidedTypeContext context, ITypeProviderCache cache) =>
       parameter == null ? null : new ProxyProvidedParameterInfoWithCache(parameter, context, processModel, cache);
@@ -48,6 +40,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override bool HasDefaultValue => myParameterInfo.HasDefaultValue;
 
     public override ProvidedType ParameterType =>
-      myCache.GetOrCreateWithContext(RdProvidedParameterInfoProcessModel.ParameterType.Sync(EntityId), myContext);
+      myCache.GetOrCreateWithContext(
+        myParameterTypeId ??= RdProvidedParameterInfoProcessModel.ParameterType.Sync(EntityId), myContext);
+
+    private int? myParameterTypeId;
   }
 }

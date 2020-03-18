@@ -12,7 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelC
     }
 
     protected override RdProvidedNamespace
-      CreateRdModelInternal(IProvidedNamespace providedNativeModel, int entityId) =>
-      new RdProvidedNamespace(providedNativeModel.NamespaceName, entityId);
+      CreateRdModelInternal(IProvidedNamespace providedModel, int entityId) =>
+      new RdProvidedNamespace(providedModel.NamespaceName, entityId);
   }
 }

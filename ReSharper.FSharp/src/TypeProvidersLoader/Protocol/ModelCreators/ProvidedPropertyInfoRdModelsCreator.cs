@@ -13,8 +13,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelC
     {
     }
 
-    protected override RdProvidedPropertyInfo CreateRdModelInternal(ProvidedPropertyInfo providedNativeModel,
-      int entityId) => new RdProvidedPropertyInfo(providedNativeModel.CanRead,
-      providedNativeModel.CanWrite, providedNativeModel.Name, entityId);
+    protected override RdProvidedPropertyInfo CreateRdModelInternal(ProvidedPropertyInfo providedModel,
+      int entityId) => new RdProvidedPropertyInfo(providedModel.CanRead,
+      providedModel.CanWrite, providedModel.Name, entityId);
   }
 }

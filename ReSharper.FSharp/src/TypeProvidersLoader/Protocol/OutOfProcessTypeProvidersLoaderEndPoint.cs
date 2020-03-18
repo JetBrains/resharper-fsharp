@@ -52,6 +52,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       myUnitOfWork.ProvidedMethodInfosHostFactory.Initialize(model.RdProvidedMethodInfoProcessModel);
       myUnitOfWork.ProvidedParameterInfosHostFactory.Initialize(model.RdProvidedParameterInfoProcessModel);
       myUnitOfWork.ProvidedAssemblyHostFactory.Initialize(model.RdProvidedAssemblyProcessModel);
+      myUnitOfWork.ProvidedFieldInfosHostFactory.Initialize(model.RdProvidedFieldInfoProcessModel);
 
       return model;
     }
@@ -61,6 +62,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       dispatcher.Run();
     }
 
-    //on shutdown requested
+    //TODO: on shutdown requested
   }
 }

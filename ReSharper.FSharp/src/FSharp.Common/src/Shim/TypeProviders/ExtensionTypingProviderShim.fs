@@ -197,12 +197,12 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
             
         member this.GetProvidedTypes(pn: Tainted<IProvidedNamespace>, m: range) =
             let providedTypes =
-                pn.PApplyArray((fun r -> r.As<IProxyProvidedNamespace>().GetProvidedTypes().WithCache()), "GetTypes", m)
+                pn.PApplyArray((fun r -> r.As<IProxyProvidedNamespace>().GetProvidedTypes()), "GetTypes", m)
             providedTypes
             
         member this.ResolveTypeName(pn: Tainted<IProvidedNamespace>, typeName: string, m: range) =
             pn.PApply((fun providedNamespace ->
-                (providedNamespace.As<IProxyProvidedNamespace>().ResolveProvidedTypeName typeName).WithCache()), range=m) 
+                (providedNamespace.As<IProxyProvidedNamespace>().ResolveProvidedTypeName typeName)), range=m) 
 
             
     interface IDisposable with

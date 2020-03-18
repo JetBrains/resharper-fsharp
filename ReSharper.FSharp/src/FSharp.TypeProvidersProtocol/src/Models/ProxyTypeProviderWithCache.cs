@@ -24,7 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
       InitCaches();
 
-      //myTypeProvider.Invalidate += TypeProviderOnInvalidate;
+      //myTypeProvider.Invalidate += TypeProviderOnInvalidate; where InitCaches();
     }
 
     public IProvidedNamespace[] GetNamespaces() => myProvidedNamespaces.Value;
@@ -50,7 +50,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       // ReSharper disable once CoVariantArrayConversion
       myProvidedNamespaces = new Lazy<IProvidedNamespace[]>(() => RdTypeProviderProcessModel.GetNamespaces
         .Sync(EntityId)
-        .Select(t => new ProxyProvidedNamespace(t, myProcessModel, myCache))
+        .Select(t => new ProxyProvidedNamespaceWithCache(t, myProcessModel, myCache))
         .ToArray());
       
       myCache = new TypeProviderCache(myRdTypeProvider, myProcessModel);

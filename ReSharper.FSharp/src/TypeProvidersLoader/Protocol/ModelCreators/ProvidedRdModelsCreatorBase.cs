@@ -34,6 +34,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelC
       return myCurrentId;
     }
 
-    protected abstract TU CreateRdModelInternal(T providedNativeModel, int entityId);
+    protected abstract TU CreateRdModelInternal(T providedModel, int entityId);
   }
 }

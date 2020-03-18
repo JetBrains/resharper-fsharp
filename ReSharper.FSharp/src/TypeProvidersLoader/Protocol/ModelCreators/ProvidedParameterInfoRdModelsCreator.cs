@@ -13,9 +13,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelC
     {
     }
 
-    protected override RdProvidedParameterInfo CreateRdModelInternal(ProvidedParameterInfo providedNativeModel,
-      int entityId) => new RdProvidedParameterInfo(providedNativeModel.IsIn,
-      providedNativeModel.IsOut, providedNativeModel.IsOptional,
-      providedNativeModel.HasDefaultValue, providedNativeModel.Name, entityId);
+    protected override RdProvidedParameterInfo CreateRdModelInternal(ProvidedParameterInfo providedModel,
+      int entityId) => new RdProvidedParameterInfo(providedModel.IsIn,
+      providedModel.IsOut, providedModel.IsOptional,
+      providedModel.HasDefaultValue, providedModel.Name, entityId);
   }
 }
