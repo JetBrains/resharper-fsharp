@@ -21,14 +21,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
 
     public void Initialize(RdFSharpTypeProvidersLoaderModel model)
     {
-      model.InstantiateTypeProvidersOfAssembly.Set(InstantiateTypeProvidersOfAssembly);
+      model.InstantiateTypeProvidersOfAssembly.Set((lifetime, args) =>
+        InstantiateTypeProvidersOfAssembly(lifetime, args, model.RdTypeProviderProcessModel));
     }
 
     private RdTask<RdTypeProvider[]> InstantiateTypeProvidersOfAssembly(Lifetime lifetime,
-      InstantiateTypeProvidersOfAssemblyParameters @params)
+      InstantiateTypeProvidersOfAssemblyParameters @params, RdTypeProviderProcessModel processModel)
     {
       var instantiateResults = myTypeProvidersLoader.InstantiateTypeProvidersOfAssembly(@params)
-        .Select(t => myTypeProvidersCreator.CreateRdModel(t, -1))
+        .Select(t =>
+        {
+          var typeProviderRdModel = myTypeProvidersCreator.CreateRdModel(t, -1);
+          t.Invalidate += (obj, args) => processModel.Invalidate.Fire(typeProviderRdModel.TypeProviderId); //TODO: optimize allocation
+          return typeProviderRdModel;
+        })
         .ToArray();
       return RdTask<RdTypeProvider[]>.Successful(instantiateResults);
     }

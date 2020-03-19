@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using JetBrains.Lifetimes;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
 using Microsoft.FSharp.Core.CompilerServices;
@@ -22,9 +23,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       myRdTypeProvider = rdTypeProvider;
       myProcessModel = processModel;
 
+      myCache = new TypeProviderCache(myRdTypeProvider, myProcessModel);
       InitCaches();
 
-      //myTypeProvider.Invalidate += TypeProviderOnInvalidate; where InitCaches();
+      var lifeTime = new Lifetime(); //temp
+      RdTypeProviderProcessModel.Invalidate.Advise(lifeTime, OnInvalidate);
+    }
+
+    private void OnInvalidate(int typeProviderId)
+    {
+      if (typeProviderId != EntityId) return;
+      
+      InitCaches();
+      Invalidate?.Invoke(this, EventArgs.Empty);
     }
 
     public IProvidedNamespace[] GetNamespaces() => myProvidedNamespaces.Value;
@@ -53,12 +64,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
         .Select(t => new ProxyProvidedNamespaceWithCache(t, myProcessModel, myCache))
         .ToArray());
       
-      myCache = new TypeProviderCache(myRdTypeProvider, myProcessModel);
+      myCache.Invalidate();
     }
     
     public event EventHandler Invalidate;
     
-    private TypeProviderCache myCache;
+    private readonly TypeProviderCache myCache;
     private Lazy<IProvidedNamespace[]> myProvidedNamespaces;
   }
 }

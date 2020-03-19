@@ -68,7 +68,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
     }
 
     private val RdTypeProviderProcessModel = aggregatedef("RdTypeProviderProcessModel") {
-        //sink("invalidate", void).async
+        signal("Invalidate", int).async
         call("GetNamespaces", int, array(RdProvidedNamespace))
         call("GetInvokerExpression", GetInvokerExpressionParameters, string)
         call("GetProvidedType", structdef("GetProvidedTypeArgs") {
@@ -323,7 +323,6 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         field("RdProvidedAssemblyProcessModel", RdProvidedAssemblyProcessModel)
         field("RdProvidedFieldInfoProcessModel", RdProvidedFieldInfoProcessModel)
         field("RdProvidedEventInfoProcessModel", RdProvidedEventInfoProcessModel)
-
         call("InstantiateTypeProvidersOfAssembly", InstantiateTypeProvidersOfAssemblyParameters, array(RdTypeProvider))
     }
 }

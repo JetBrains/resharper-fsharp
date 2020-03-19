@@ -10,6 +10,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache
   {
     [ContractAnnotation("key:null => null")]
     ProvidedType GetOrCreateWithContext(int? key, ProvidedTypeContext context);
+
+    void Invalidate();
   }
 
   public class TypeProviderCache : ITypeProviderCache
@@ -37,6 +39,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache
       myProvidedTypes.Add(key.Value, providedType);
 
       return providedType;
+    }
+
+    public void Invalidate()
+    {
+      myProvidedTypes.Clear(); //TODO: cascade invalidating?
     }
   }
 }
