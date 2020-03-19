@@ -126,7 +126,10 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
             x.Done(id, marks.Pop(), ElementType.EXPRESSION_REFERENCE_NAME)
 
     member x.ProcessReferenceNameSkipLast(lid: Ident list) =
-        if lid.IsEmpty then () else
+        match lid with
+        | [] -> ()
+        | [IdentRange idRange] -> x.AdvanceToEnd(idRange)
+        | _ ->
 
         let marks = Stack()
 
@@ -254,7 +257,7 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
         x.ProcessUnionCaseType(unionCaseType, ElementType.EXCEPTION_FIELD_DECLARATION) |> ignore
         mark
 
-    member x.StartType attrs typeParams (lid: LongIdent) range =
+    member x.StartType attrs typeParams constraints (lid: LongIdent) range =
         let mark = x.MarkAttributesOrIdOrRange(attrs, List.tryHead lid, range)
         if not lid.IsEmpty then
             let id = lid.Head
@@ -266,18 +269,20 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
                 | [] -> idOffset
 
             let paramsInBraces = idOffset < typeParamsOffset
-            x.ProcessTypeParametersOfType typeParams range paramsInBraces
+            x.ProcessTypeParametersOfType typeParams constraints range paramsInBraces
 
             // Needs to advance past id range due to implicit ctor range in class includes id.
             x.AdvanceToEnd(id.idRange)
         mark
 
-    member x.ProcessTypeParametersOfType typeParams range paramsInBraces =
+    member x.ProcessTypeParametersOfType typeParams constraints range paramsInBraces =
         match typeParams with
         | TyparDecl(_, (Typar(IdentRange idRange, _, _))) :: _ ->
             let mark = x.MarkTokenOrRange(FSharpTokenType.LESS, idRange)
             for p in typeParams do
                 x.ProcessTypeParameter(p, ElementType.TYPE_PARAMETER_OF_TYPE_DECLARATION)
+            for typeConstraint in constraints do
+                x.ProcessTypeConstraint(typeConstraint)
             if paramsInBraces then
                 let endOffset = x.GetEndOffset(range)
                 x.AdvanceToTokenOrOffset(FSharpTokenType.GREATER, endOffset, range)
@@ -544,10 +549,8 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
             x.ProcessTypeArgs(typeArgs, ltRange, gtRange, ElementType.PREFIX_APP_TYPE_ARGUMENT_LIST)
             x.Done(mark, ElementType.TYPE_REFERENCE_NAME)
 
-        | SynType.Var(_, range) ->
-            let mark = x.Mark(range)
-            x.MarkAndDone(range, ElementType.TYPE_PARAMETER_ID)
-            x.Done(mark, ElementType.TYPE_REFERENCE_NAME)
+        | SynType.Var(typeParameter, _) ->
+            x.ProcessTypeParameter(typeParameter)
 
         | _ -> failwithf "unexpected type: %O" synType
 
@@ -597,7 +600,13 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
             x.ProcessType(synType2)
             x.Done(range, mark, ElementType.FUN_TYPE)
 
-        | SynType.WithGlobalConstraints(synType, _, _)
+        | SynType.WithGlobalConstraints(synType, constraints, _) ->
+            let mark = x.Mark(range)
+            x.ProcessType(synType)
+            for typeConstraint in constraints do
+                x.ProcessTypeConstraint(typeConstraint)
+            x.Done(range, mark, ElementType.OTHER_TYPE)
+
         | SynType.HashConstraint(synType, _)
         | SynType.MeasurePower(synType, _, _) ->
             let mark = x.Mark(range)
@@ -621,6 +630,40 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
 
         | SynType.Anon _ ->
             x.MarkAndDone(range, ElementType.ANON_TYPE)
+
+    member x.ProcessTypeConstraint(typeConstraint: SynTypeConstraint) =
+        match typeConstraint with
+        | WhereTyparIsValueType(typeParameter, _)
+        | WhereTyparIsReferenceType(typeParameter, _)
+        | WhereTyparIsUnmanaged(typeParameter, _)
+        | WhereTyparSupportsNull(typeParameter, _)
+        | WhereTyparIsComparable(typeParameter, _)
+        | WhereTyparIsEquatable(typeParameter, _) ->
+            x.ProcessTypeParameter(typeParameter)
+
+        | WhereTyparDefaultsToType(typeParameter, synType, _)
+        | WhereTyparSubtypeOfType(typeParameter, synType, _) ->
+            x.ProcessTypeParameter(typeParameter)
+            x.ProcessType(synType)
+
+        | WhereTyparSupportsMember(typeParameterTypes, memberSig, _) ->
+            for synType in typeParameterTypes do
+                x.ProcessType(synType)
+            match memberSig with
+            | SynMemberSig.Member(ValSpfn(synType = synType), _, _) ->
+                x.ProcessType(synType)
+            | _ -> ()
+
+        | WhereTyparIsEnum(typeParameter, synTypes, _)
+        | WhereTyparIsDelegate(typeParameter, synTypes, _) ->
+            x.ProcessTypeParameter(typeParameter)
+            for synType in synTypes do
+                x.ProcessType(synType)
+
+    member x.ProcessTypeParameter(Typar(IdentRange range, _, _)) =
+        let mark = x.Mark(range)
+        x.MarkAndDone(range, ElementType.TYPE_PARAMETER_ID)
+        x.Done(range, mark, ElementType.TYPE_REFERENCE_NAME)
 
     member x.FixExpresion(expr: SynExpr) =
         // A fake SynExpr.Typed node is added for binding with return type specification like in the following

@@ -1,0 +1,4 @@
+﻿module Module
+
+type R<'zzz when 'zzz :> string> =
+    { Field: 'zzz }

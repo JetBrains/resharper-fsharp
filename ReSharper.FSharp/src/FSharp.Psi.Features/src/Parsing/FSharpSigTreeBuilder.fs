@@ -77,8 +77,8 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
 
         | _ -> ()
 
-    member x.ProcessTypeSignature(TypeDefnSig(ComponentInfo(attrs, typeParams, _, lid, _, _, _, _), typeSig, memberSigs, range)) =
-        let mark = x.StartType attrs typeParams lid range
+    member x.ProcessTypeSignature(TypeDefnSig(ComponentInfo(attrs, typeParams, constraints, lid, _, _, _, _), typeSig, memberSigs, range)) =
+        let mark = x.StartType attrs typeParams constraints lid range
         let elementType =
             match typeSig with
             | SynTypeDefnSigRepr.Simple(simpleRepr, _) ->

@@ -32,6 +32,11 @@ type FSharpParserTest() =
     [<Test>] member x.``Type decl - Delegate 02``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Delegate 03 - Ctor``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type parameters - Constraints 01 - Struct``() = x.DoNamedTest()
+    [<Test>] member x.``Type parameters - Constraints 02 - Member``() = x.DoNamedTest()
+    [<Test>] member x.``Type parameters - Constraints 03 - Or``() = x.DoNamedTest()
+    [<Test>] member x.``Type parameters - Constraints 04 - Or and member``() = x.DoNamedTest()
+
     [<Test>] member x.``Type decl - Attributes 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Attributes 02``() = x.DoNamedTest()
 
@@ -254,6 +259,13 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Types - Measure 01``() = x.DoNamedTest()
     [<Test>] member x.``Types - Measure 02 - Negate``() = x.DoNamedTest()
+
+    [<Test>] member x.``Types - Constraints - Null 01``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Constraints - Type 01``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Constraints - Reference 01``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Constraints - Struct 01``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Constraints - Comparison 01``() = x.DoNamedTest()
+    [<Test>] member x.``Types - Constraints - Equality 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Type member - Ctor - Primary 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Ctor - Primary 02 - Modifier``() = x.DoNamedTest()
