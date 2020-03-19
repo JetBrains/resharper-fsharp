@@ -33,7 +33,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     }
 
     [ContractAnnotation("fieldInfo:null => null")]
-    public static ProxyProvidedFieldInfoWithCache CreateWithContext(RdProvidedFieldInfo fieldInfo,
+    public static ProxyProvidedFieldInfoWithCache Create(RdProvidedFieldInfo fieldInfo,
       RdFSharpTypeProvidersLoaderModel processModel, ProvidedTypeContext context, ITypeProviderCache cache) =>
       fieldInfo == null ? null : new ProxyProvidedFieldInfoWithCache(fieldInfo, processModel, context, cache);
 

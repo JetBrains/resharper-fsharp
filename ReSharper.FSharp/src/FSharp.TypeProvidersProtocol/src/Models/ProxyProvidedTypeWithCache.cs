@@ -67,7 +67,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
         // ReSharper disable once CoVariantArrayConversion
         RdProvidedTypeProcessModel.GetFields
           .Sync(EntityId)
-          .Select(t => ProxyProvidedFieldInfoWithCache.CreateWithContext(t, myProcessModel, Context, myCache))
+          .Select(t => ProxyProvidedFieldInfoWithCache.Create(t, myProcessModel, Context, myCache))
+          .ToArray());
+      myEvents = new Lazy<ProvidedEventInfo[]>(() =>
+        // ReSharper disable once CoVariantArrayConversion
+        RdProvidedTypeProcessModel.GetEvents
+          .Sync(EntityId)
+          .Select(t => ProxyProvidedEventInfoWithCache.Create(t, myProcessModel, Context, myCache))
           .ToArray());
     }
 
@@ -179,9 +185,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
         myMakeByRefTypeId ??= RdProvidedTypeProcessModel.MakeByRefType.Sync(EntityId),
         Context);
 
+    public override ProvidedEventInfo[] GetEvents() => myEvents.Value;
+
+    public override ProvidedEventInfo GetEvent(string nm) => myEvents.Value.FirstOrDefault(t => t.Name == nm);
+
     public override ProvidedFieldInfo[] GetFields() => myFields.Value;
 
-    public override ProvidedFieldInfo GetField(string nm) => myFields.Value.FirstOrDefault(t => t.Name == nm); //TODO: optimize
+    public override ProvidedFieldInfo GetField(string nm) =>
+      myFields.Value.FirstOrDefault(t => t.Name == nm); //TODO: optimize
 
     public override ProvidedType ApplyContext(ProvidedTypeContext context)
     {
@@ -220,5 +231,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     private readonly Lazy<ProvidedAssembly> myProvidedAssembly;
     private readonly Lazy<ProvidedParameterInfo[]> myStaticParameters;
     private readonly Lazy<ProvidedFieldInfo[]> myFields;
+    private readonly Lazy<ProvidedEventInfo[]> myEvents;
   }
 }

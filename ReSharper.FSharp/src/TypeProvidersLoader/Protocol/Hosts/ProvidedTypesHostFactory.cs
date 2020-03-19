@@ -24,6 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
 
     private readonly IProvidedRdModelsCreator<ProvidedType, RdProvidedType> myProvidedTypesCreator;
     private readonly IProvidedRdModelsCreator<ProvidedFieldInfo, RdProvidedFieldInfo> myProvidedFieldInfosCreator;
+    private readonly IProvidedRdModelsCreator<ProvidedEventInfo, RdProvidedEventInfo> myProvidedEventInfosCreator;
     private readonly IProvidedRdModelsCreator<ProvidedAssembly, RdProvidedAssembly> myProvidedAssembliesCreator;
 
     private readonly IReadProvidedCache<Tuple<ProvidedType, RdProvidedType, int>> myProvidedTypesCache;
@@ -35,6 +36,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       IProvidedRdModelsCreator<ProvidedPropertyInfo, RdProvidedPropertyInfo> providedPropertiesCreator,
       IProvidedRdModelsCreator<ProvidedType, RdProvidedType> providedTypesCreator,
       IProvidedRdModelsCreator<ProvidedFieldInfo, RdProvidedFieldInfo> providedFieldInfosCreator,
+      IProvidedRdModelsCreator<ProvidedEventInfo, RdProvidedEventInfo> providedEventInfosCreator,
       IProvidedRdModelsCreator<ProvidedAssembly, RdProvidedAssembly> providedAssembliesCreator,
       IReadProvidedCache<Tuple<ProvidedType, RdProvidedType, int>> providedTypesCache,
       IReadProvidedCache<ITypeProvider> typeProvidersCache)
@@ -44,6 +46,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       myProvidedPropertiesCreator = providedPropertiesCreator;
       myProvidedTypesCreator = providedTypesCreator;
       myProvidedFieldInfosCreator = providedFieldInfosCreator;
+      myProvidedEventInfosCreator = providedEventInfosCreator;
       myProvidedAssembliesCreator = providedAssembliesCreator;
       myProvidedTypesCache = providedTypesCache;
       myTypeProvidersCache = typeProvidersCache;
@@ -74,6 +77,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       processModel.MakeByRefType.Set(MakeByRefType);
       processModel.GetFields.Set(GetFields);
       processModel.GetField.Set(GetField);
+      processModel.GetEvents.Set(GetEvents);
+    }
+
+    private RdTask<RdProvidedEventInfo[]> GetEvents(Lifetime lifetime, int entityId)
+    {
+      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
+      var events = providedType
+        .GetEvents()
+        .Select(t => myProvidedEventInfosCreator.CreateRdModel(t, typeProviderId))
+        .ToArray();
+      return RdTask<RdProvidedEventInfo[]>.Successful(events);
     }
 
     private RdTask<RdProvidedFieldInfo> GetField(Lifetime lifetime, GetFieldArgs args)

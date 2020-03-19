@@ -205,8 +205,9 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         call("GetFields", int, array(RdProvidedFieldInfo))
         call("GetField", structdef("GetFieldArgs") {
             field("Id", int)
-            field("FieldName", string)
+            field("FieldName", string) //TODO: remove
         }, RdProvidedFieldInfo)
+        call("GetEvents", int, array(RdProvidedEventInfo))
     }
 
     private val RdProvidedMethodInfoProcessModel = aggregatedef("RdProvidedMethodInfoProcessModel") {
@@ -214,11 +215,6 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         call("ReturnType", int, int)
         call("GetParameters", int, array(RdProvidedParameterInfo))
         call("GetGenericArguments", int, array(int))
-    }
-
-    private val InstantiationResult = structdef {
-        field("IsSuccsses", bool)
-        field("EntityId", int)
     }
 
     private val RdProvidedPropertyInfoProcessModel = aggregatedef("RdProvidedPropertyInfoProcessModel") {
@@ -264,6 +260,17 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         field("IsFamilyAndAssembly", bool)
         field("IsFamilyOrAssembly", bool)
         field("IsPrivate", bool)
+    }
+
+    private val RdProvidedEventInfoProcessModel = aggregatedef("RdProvidedEventInfoProcessModel") {
+        call("GetAddMethod", int, RdProvidedMethodInfo)
+        call("GetRemoveMethod", int, RdProvidedMethodInfo)
+        call("DeclaringType", int, int.nullable)
+        call("EventHandlerType", int, int)
+    }
+
+    private val RdProvidedEventInfo = classdef extends RdProvidedMemberInfo {
+
     }
 
     init {
@@ -315,6 +322,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         field("RdProvidedParameterInfoProcessModel", RdProvidedParameterInfoProcessModel)
         field("RdProvidedAssemblyProcessModel", RdProvidedAssemblyProcessModel)
         field("RdProvidedFieldInfoProcessModel", RdProvidedFieldInfoProcessModel)
+        field("RdProvidedEventInfoProcessModel", RdProvidedEventInfoProcessModel)
 
         call("InstantiateTypeProvidersOfAssembly", InstantiateTypeProvidersOfAssemblyParameters, array(RdTypeProvider))
     }
