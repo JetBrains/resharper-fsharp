@@ -2,10 +2,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open JetBrains.ReSharper.FeaturesTestFramework.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Tests
+open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
 [<FSharpTest>]
+[<TestSettingsKey(typeof<FSharpFormatSettingsKey>)>]
 type FSharpCodeFormatterTest() =
     inherit CodeFormatterWithExplicitSettingsTestBase<FSharpLanguage>()
 
@@ -58,3 +61,6 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Set expr indent 01 - Correct indent``() = x.DoNamedTest()
     [<Test>] member x.``Set expr indent 02 - No indent``() = x.DoNamedTest()
     [<Test>] member x.``Set expr indent 03 - Big indent``() = x.DoNamedTest()
+    
+    [<Test>] member x.``TryWith expr indent 01``() = x.DoNamedTest()
+    [<Test>] member x.``TryFinally expr indent 01 - Correct indent``() = x.DoNamedTest()

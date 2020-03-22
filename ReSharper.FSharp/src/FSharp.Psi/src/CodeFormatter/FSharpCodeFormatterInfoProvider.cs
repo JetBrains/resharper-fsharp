@@ -32,6 +32,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         ("LazyExpr", ElementType.LAZY_EXPR, LazyExpr.EXPR),
         ("ComputationExpr", ElementType.COMPUTATION_EXPR, ComputationExpr.EXPR),
         ("SetExpr", ElementType.SET_EXPR, SetExpr.RIGHT_EXPR),
+        ("TryFinally_Try", ElementType.TRY_FINALLY_EXPR, TryFinallyExpr.TRY_EXPR),
+        ("TryFinally_Finally", ElementType.TRY_FINALLY_EXPR, TryFinallyExpr.FINALLY_EXPR),
+        ("TryWith_Try", ElementType.TRY_WITH_EXPR, TryWithExpr.TRY_EXPR),
       };
 
       lock (this)
@@ -40,6 +43,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
           .Union(synExprIndentingRulesParameters)
           .ToList()
           .ForEach(DescribeSimpleIndentingRule);
+
+        Describe<IndentingRule>()
+          .Name("TryWith_WithIndent")
+          .Where(
+            Parent().HasType(ElementType.TRY_WITH_EXPR),
+            Node().HasRole(TryWithExpr.CLAUSE))
+          .Switch(
+            settings => settings.IndentOnTryWith,
+            When(true).Return(IndentType.External),
+            When(false).Return(IndentType.None))
+          .Build();
       }
     }
 
