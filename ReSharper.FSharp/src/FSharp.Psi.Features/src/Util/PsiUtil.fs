@@ -42,6 +42,7 @@ type IFSharpFile with
         | Some parseResults -> parseResults.ParseTree
         | _ -> None
 
+type IFile with
     member x.GetNode<'T when 'T :> ITreeNode and 'T : null>(document, range) =
         let offset = getStartOffset document range
         x.GetNode<'T>(DocumentOffset(document, offset))
