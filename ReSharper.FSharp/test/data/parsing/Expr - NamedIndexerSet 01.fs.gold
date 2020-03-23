@@ -10,7 +10,7 @@ IFSharpImplFile
                 FSharpIdentifierToken(type:IDENTIFIER, text:s)
               FSharpTokenType+DotTokenElement(type:DOT, text:.)
               FSharpIdentifierToken(type:IDENTIFIER, text:Chars)
-            IIndexerArg
+            IIndexerArgExpr
               IParenExpr
                 FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
                 ILiteralExpr

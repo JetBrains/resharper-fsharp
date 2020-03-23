@@ -442,15 +442,22 @@ namedIndexerExpr options { stubBase="FSharpExpressionBase"; } extras {
 
 indexerArgList:
   LBRACK
-  LIST synExpr<INDEXER_ARG, IndexerArgs> SEP COMMA<FSHARP_COMMA, Commas>
+  LIST indexerArg<INDEXER_ARG, IndexerArgs> SEP COMMA<FSHARP_COMMA, Commas>
   RBRACK;
 
-indexerArg:
+interface indexerArg:
+  indexerArgExpr |
+  indexerArgRange;
+
+indexerArgExpr  extras {
+  get { methodName="Expressions" path=<indexerArgExpr:EXPR> };
+}:
+  synExpr<EXPR, Expression>;
+
+indexerArgRange:
   synExpr<EXPR, Expressions>
-  (
-    DOT_DOT
-    synExpr<EXPR, Expressions>
-  )?;
+  DOT_DOT
+  synExpr<EXPR, Expressions>;
 
 interface castExpr:
   upcastExpr |

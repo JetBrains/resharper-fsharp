@@ -834,7 +834,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             x.PushExpression(expr2)
             x.PushRange(unionRanges lid.Range expr1.Range, ElementType.NAMED_INDEXER_EXPR)
             x.ProcessLongIdentifierExpression(lid.Lid, lid.Range)
-            x.PushRange(expr1.Range, ElementType.INDEXER_ARG)
+            x.PushRange(expr1.Range, ElementType.INDEXER_ARG_EXPR)
             x.ProcessExpression(expr1)
 
         | SynExpr.DotNamedIndexedPropertySet(expr1, lid, expr2, expr3, _) ->
@@ -1116,16 +1116,16 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
     member x.ProcessSynIndexerArg(arg) =
         match arg with
         | SynIndexerArg.One(expr, _, range) ->
-            x.PushRange(range, ElementType.INDEXER_ARG)
+            x.PushRange(range, ElementType.INDEXER_ARG_EXPR)
             x.PushExpression(getGeneratedAppArg expr)
 
         | SynIndexerArg.Two(expr1, _, expr2, _, range1, range2) ->
-            x.PushRange(unionRanges range1 range2, ElementType.INDEXER_ARG)
+            x.PushRange(unionRanges range1 range2, ElementType.INDEXER_ARG_RANGE)
             x.PushExpression(getGeneratedAppArg expr2)
             x.PushExpression(getGeneratedAppArg expr1)
 
     member x.PushNamedIndexerArgExpression(expr) =
-        let wrappedArgExpr = { Expression = expr; ElementType = ElementType.INDEXER_ARG }
+        let wrappedArgExpr = { Expression = expr; ElementType = ElementType.INDEXER_ARG_EXPR }
         x.PushStep(wrappedArgExpr, wrapExpressionProcessor)
 
     member x.ProcessAnonRecordField(IdentRange idRange, (ExprRange range as expr)) =
