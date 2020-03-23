@@ -60,29 +60,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
             When(false).Return(IndentType.None))
           .Build();
 
-        Describe<IndentingRule>()
-          .Name("If_ElseExprIndent")
-          .Where(
-            Parent().HasType(ElementType.IF_THEN_ELSE_EXPR),
-            Node()
-              .HasRole(IfThenElseExpr.ELSE_CLAUSE)
-              .Satisfies((node, context) =>
-                node.GetPreviousMeaningfulSibling().IsFirstOnLine(context.CodeFormatter) &&
-                !(node is IElifExpr)))
-          .Return(IndentType.External)
-          .Build();
-
-        Describe<IndentingRule>()
-          .Name("Elif_ElseExprIndent")
-          .Where(
-            Parent().HasType(ElementType.ELIF_EXPR),
-            Node()
-              .HasRole(ElifExpr.ELSE_CLAUSE)
-              .Satisfies((node, context) =>
-                node.GetPreviousMeaningfulSibling().IsFirstOnLine(context.CodeFormatter)
-                && !(node is IElifExpr)))
-          .Return(IndentType.External)
-          .Build();
+        DescribeElseExprIndentingRule("If", ElementType.IF_THEN_ELSE_EXPR, IfThenElseExpr.ELSE_CLAUSE);
+        DescribeElseExprIndentingRule("Elif", ElementType.ELIF_EXPR, ElifExpr.ELSE_CLAUSE);
       }
     }
 
@@ -95,6 +74,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         .Where(
           Parent().HasType(parameters.parentType),
           Node().HasRole(parameters.childRole))
+        .Return(IndentType.External)
+        .Build();
+    }
+
+    private void DescribeElseExprIndentingRule(string namePrefix, NodeType parentIfType, short elseExprRole)
+    {
+      Describe<IndentingRule>()
+        .Name(namePrefix + "_ElseExprIndent")
+        .Where(
+          Parent().HasType(parentIfType),
+          Node()
+            .HasRole(elseExprRole)
+            .Satisfies((node, context) =>
+              node.GetPreviousMeaningfulSibling().IsFirstOnLine(context.CodeFormatter)
+              && !(node is IElifExpr)))
         .Return(IndentType.External)
         .Build();
     }
