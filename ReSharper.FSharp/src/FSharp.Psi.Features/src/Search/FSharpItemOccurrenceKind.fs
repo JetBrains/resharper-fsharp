@@ -60,6 +60,9 @@ type FSharpItemOccurenceKindProvider() =
                 if isNotNull (OpenStatementNavigator.GetByReferenceName(typeReferenceName)) then
                     [| FSharpOccurrenceKinds.import |] :> _ else
 
+                if isNotNull (NewExprNavigator.GetByTypeName(typeReferenceName)) then
+                    [| OccurrenceKind.NewInstanceCreation |] :> _ else
+
                 let namedType = NamedTypeNavigator.GetByReferenceName(typeReferenceName)
                 if isNull namedType then EmptyList.Instance :> _ else
 

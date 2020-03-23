@@ -1,0 +1,10 @@
+﻿New instance creation
+---
+TO: [O] new System.|String|(' ', 1) RANGE: (28,34) @ New instance 03 - New.fs
+
+
+Other
+---
+TO: [O] new |System|.String(' ', 1) RANGE: (21,27) @ New instance 03 - New.fs
+
+
