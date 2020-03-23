@@ -33,35 +33,35 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``For expr indent 01 - Correct indent``() = x.DoNamedTest()
     [<Test>] member x.``For expr indent 02 - No indent``() = x.DoNamedTest()
     [<Test>] member x.``For expr indent 03 - Big indent``() = x.DoNamedTest()
-    
+
     [<Test>] member x.``ForEach expr indent 01 - Correct indent``() = x.DoNamedTest()
     [<Test>] member x.``ForEach expr indent 02 - No indent``() = x.DoNamedTest()
     [<Test>] member x.``ForEach expr indent 03 - Big indent``() = x.DoNamedTest()
-    
+
     [<Test>] member x.``While expr indent 01 - Correct indent``() = x.DoNamedTest()
     [<Test>] member x.``While expr indent 02 - No indent``() = x.DoNamedTest()
     [<Test>] member x.``While expr indent 03 - Big indent``() = x.DoNamedTest()
-    
+
     [<Test>] member x.``Do expr indent 01 - Correct indent``() = x.DoNamedTest()
     [<Test>] member x.``Do expr indent 02 - No indent``() = x.DoNamedTest()
     [<Test>] member x.``Do expr indent 03 - Big indent``() = x.DoNamedTest()
-    
+
     [<Test>] member x.``Assert expr indent 01 - Correct indent``() = x.DoNamedTest()
     [<Test>] member x.``Assert expr indent 02 - No indent``() = x.DoNamedTest()
     [<Test>] member x.``Assert expr indent 03 - Big indent``() = x.DoNamedTest()
-    
+
     [<Test>] member x.``Lazy expr indent 01 - Correct indent``() = x.DoNamedTest()
     [<Test>] member x.``Lazy expr indent 02 - No indent``() = x.DoNamedTest()
     [<Test>] member x.``Lazy expr indent 03 - Big indent``() = x.DoNamedTest()
-    
+
     [<Test>] member x.``Comp expr indent 01 - Correct indent``() = x.DoNamedTest()
     [<Test>] member x.``Comp expr indent 02 - No indent``() = x.DoNamedTest()
     [<Test>] member x.``Comp expr indent 03 - Big indent``() = x.DoNamedTest()
-    
+
     [<Test>] member x.``Set expr indent 01 - Correct indent``() = x.DoNamedTest()
     [<Test>] member x.``Set expr indent 02 - No indent``() = x.DoNamedTest()
     [<Test>] member x.``Set expr indent 03 - Big indent``() = x.DoNamedTest()
-    
+
     [<Test>] member x.``TryWith expr indent 01``() = x.DoNamedTest()
     [<Test>] member x.``TryFinally expr indent 01 - Correct indent``() = x.DoNamedTest()
 
