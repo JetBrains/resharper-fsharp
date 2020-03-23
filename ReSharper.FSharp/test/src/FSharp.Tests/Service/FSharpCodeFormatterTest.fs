@@ -64,3 +64,6 @@ type FSharpCodeFormatterTest() =
     
     [<Test>] member x.``TryWith expr indent 01``() = x.DoNamedTest()
     [<Test>] member x.``TryFinally expr indent 01 - Correct indent``() = x.DoNamedTest()
+
+    [<Test>] member x.``IfThenElse expr indent 01``() = x.DoNamedTest()
+    [<Test>] member x.``IfThenElse expr indent 02``() = x.DoNamedTest()

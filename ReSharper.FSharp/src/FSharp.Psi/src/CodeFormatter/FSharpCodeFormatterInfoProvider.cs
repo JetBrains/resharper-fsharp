@@ -6,6 +6,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Impl.CodeStyle;
+using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 {
@@ -35,6 +36,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         ("TryFinally_Try", ElementType.TRY_FINALLY_EXPR, TryFinallyExpr.TRY_EXPR),
         ("TryFinally_Finally", ElementType.TRY_FINALLY_EXPR, TryFinallyExpr.FINALLY_EXPR),
         ("TryWith_Try", ElementType.TRY_WITH_EXPR, TryWithExpr.TRY_EXPR),
+        ("ThenExpr", ElementType.IF_THEN_ELSE_EXPR, IfThenElseExpr.THEN_EXPR),
       };
 
       lock (this)
@@ -53,6 +55,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
             settings => settings.IndentOnTryWith,
             When(true).Return(IndentType.External),
             When(false).Return(IndentType.None))
+          .Build();
+
+        Describe<IndentingRule>()
+          .Name("ElseExprIndent")
+          .Where(
+            Parent().HasType(ElementType.IF_THEN_ELSE_EXPR),
+            Node()
+              .HasRole(IfThenElseExpr.ELSE_CLAUSE)
+              .Satisfies((node, context) => node.GetPreviousMeaningfulSibling().IsFirstOnLine(context.CodeFormatter)))
+          .Return(IndentType.External)
           .Build();
       }
     }
