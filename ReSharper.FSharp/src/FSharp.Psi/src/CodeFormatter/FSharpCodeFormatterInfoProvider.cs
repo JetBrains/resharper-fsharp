@@ -3,6 +3,8 @@ using JetBrains.Application.Settings;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Psi;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Impl.CodeStyle;
@@ -36,7 +38,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         ("TryFinally_Try", ElementType.TRY_FINALLY_EXPR, TryFinallyExpr.TRY_EXPR),
         ("TryFinally_Finally", ElementType.TRY_FINALLY_EXPR, TryFinallyExpr.FINALLY_EXPR),
         ("TryWith_Try", ElementType.TRY_WITH_EXPR, TryWithExpr.TRY_EXPR),
-        ("ThenExpr", ElementType.IF_THEN_ELSE_EXPR, IfThenElseExpr.THEN_EXPR),
+        ("If_ThenExpr", ElementType.IF_THEN_ELSE_EXPR, IfThenElseExpr.THEN_EXPR),
+        ("Elif_ThenExpr", ElementType.ELIF_EXPR, ElifExpr.THEN_EXPR),
       };
 
       lock (this)
@@ -58,12 +61,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
           .Build();
 
         Describe<IndentingRule>()
-          .Name("ElseExprIndent")
+          .Name("If_ElseExprIndent")
           .Where(
             Parent().HasType(ElementType.IF_THEN_ELSE_EXPR),
             Node()
               .HasRole(IfThenElseExpr.ELSE_CLAUSE)
-              .Satisfies((node, context) => node.GetPreviousMeaningfulSibling().IsFirstOnLine(context.CodeFormatter)))
+              .Satisfies((node, context) =>
+                node.GetPreviousMeaningfulSibling().IsFirstOnLine(context.CodeFormatter) &&
+                !(node is IElifExpr)))
+          .Return(IndentType.External)
+          .Build();
+
+        Describe<IndentingRule>()
+          .Name("Elif_ElseExprIndent")
+          .Where(
+            Parent().HasType(ElementType.ELIF_EXPR),
+            Node()
+              .HasRole(ElifExpr.ELSE_CLAUSE)
+              .Satisfies((node, context) =>
+                node.GetPreviousMeaningfulSibling().IsFirstOnLine(context.CodeFormatter)
+                && !(node is IElifExpr)))
           .Return(IndentType.External)
           .Build();
       }
