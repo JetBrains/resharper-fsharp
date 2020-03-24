@@ -40,6 +40,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         ("If_ThenExpr", ElementType.IF_THEN_ELSE_EXPR, IfThenElseExpr.THEN_EXPR),
         ("Elif_ThenExpr", ElementType.ELIF_EXPR, ElifExpr.THEN_EXPR),
         ("MatchClauseExpr", ElementType.MATCH_CLAUSE, MatchClause.EXPR),
+        ("LambdaExprBody", ElementType.LAMBDA_EXPR, LambdaExpr.EXPR),
       };
 
       lock (this)
