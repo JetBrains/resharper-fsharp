@@ -41,7 +41,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         ("Elif_ThenExpr", ElementType.ELIF_EXPR, ElifExpr.THEN_EXPR),
         ("MatchClauseExpr", ElementType.MATCH_CLAUSE, MatchClause.EXPR),
         ("LambdaExprBody", ElementType.LAMBDA_EXPR, LambdaExpr.EXPR),
-        ("PrefixAppExpr", ElementType.PREFIX_APP_EXPR, PrefixAppExpr.ARG_EXPR),
       };
 
       lock (this)
@@ -60,6 +59,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
             settings => settings.IndentOnTryWith,
             When(true).Return(IndentType.External),
             When(false).Return(IndentType.None))
+          .Build();
+
+        Describe<IndentingRule>()
+          .Name("PrefixAppExprIndent")
+          .Where(
+            Parent().HasType(ElementType.PREFIX_APP_EXPR),
+            Node()
+              .HasRole(PrefixAppExpr.ARG_EXPR)
+              .Satisfies((node, context) =>
+                !(node is IComputationLikeExpr) ||
+                !node.ContainsLineBreak(context.CodeFormatter)))
+          .Return(IndentType.External)
           .Build();
 
         DescribeElseExprIndentingRule("If", ElementType.IF_THEN_ELSE_EXPR, IfThenElseExpr.ELSE_CLAUSE);
