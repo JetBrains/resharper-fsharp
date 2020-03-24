@@ -73,3 +73,6 @@ type FSharpCodeFormatterTest() =
 
     [<Test>] member x.``Lambda expr indent 01 - Without offset``() = x.DoNamedTest()
     [<Test>] member x.``Lambda expr indent 02 - With offset``() = x.DoNamedTest()
+
+    [<Test>] member x.``PrefixApp expr indent 01``() = x.DoNamedTest()
+    [<Test>] member x.``PrefixApp expr indent 02``() = x.DoNamedTest()
