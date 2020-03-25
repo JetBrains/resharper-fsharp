@@ -149,7 +149,7 @@ type FSharpProjectOptionsBuilder
             options.AddRange(unusedValuesWarns)
             options.AddRange(getReferences psiModule)
 
-            match properties.ActiveConfigurations.GetOrCreateConfiguration(targetFrameworkId) with
+            match properties.ActiveConfigurations.TryGetConfiguration(targetFrameworkId) with
             | :? IManagedProjectConfiguration as cfg ->
                 let definedConstants = splitAndTrim defaultDelimiters cfg.DefineConstants
                 options.AddRange(definedConstants |> Seq.map (fun c -> "--define:" + c))
