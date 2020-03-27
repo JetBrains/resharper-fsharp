@@ -327,5 +327,3 @@ object RdFSharpTypeProvidersLoaderModel : Root(
     }
 }
 
-//не забыть про IsVoid
-
