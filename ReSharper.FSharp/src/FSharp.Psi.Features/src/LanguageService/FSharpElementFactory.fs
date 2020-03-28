@@ -210,3 +210,17 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             addParensIfNeeded rightArg |> ignore
 
             expr
+
+        member x.CreateSetExpr(left: ISynExpr, right: ISynExpr) =
+            let source = "() <- ()"
+            let expr = getExpression source
+            let setExpr = expr.As<ISetExpr>()
+
+            let leftArg = ModificationUtil.ReplaceChild(setExpr.LeftExpression, left.IgnoreInnerParens())
+            addParensIfNeeded leftArg |> ignore
+
+            let rightArg = ModificationUtil.ReplaceChild(setExpr.RightExpression, right.IgnoreInnerParens())
+            addParensIfNeeded rightArg |> ignore
+
+            expr
+  
