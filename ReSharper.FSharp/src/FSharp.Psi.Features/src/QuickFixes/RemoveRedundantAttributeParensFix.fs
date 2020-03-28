@@ -11,12 +11,10 @@ type RemoveRedundantAttributeParensFix(warning: RedundantAttributeParensWarning)
     let attribute = warning.Attribute
 
     override x.Text = "Remove redundant parentheses"
-    override x.IsAvailable _ = isValid attribute
+    override x.IsAvailable _ = isValid attribute && isNotNull attribute.ArgExpression
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(attribute.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
-        let attributeArg = attribute.ArgExpression
-        if isNotNull attributeArg then
-            deleteChild attributeArg
+        deleteChild attribute.ArgExpression
