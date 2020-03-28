@@ -146,10 +146,6 @@ let isInlineSpace (node: ITreeNode) =
 let isWhitespace (node: ITreeNode) =
     let tokenType = getTokenType node
     isNotNull tokenType && tokenType.IsWhitespace
-    
-let isEquals (node: ITreeNode) =
-    let tokenType = getTokenType node
-    isNotNull tokenType && tokenType == FSharpTokenType.EQUALS
 
 let isFiltered (node: ITreeNode) =
     let tokenType = getTokenType node
