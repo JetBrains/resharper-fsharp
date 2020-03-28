@@ -1,9 +1,11 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.CommonErrors
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Psi.Tree
 
 type ReplaceWithAssignmentExpressionFix(warning: UnitTypeExpectedWarning) =
     inherit FSharpQuickFixBase()
@@ -13,9 +15,8 @@ type ReplaceWithAssignmentExpressionFix(warning: UnitTypeExpectedWarning) =
         if not (isValid expr) || expr = null then false else
         match expr.LeftArgument with
         | :? IReferenceExpr
-        | :? IIndexerExpr -> true
+        | :? IIndexerExpr -> isEquals expr.Operator.FirstChild
         | _ -> false
-        //isPredefinedFunctionRef "=" (info.Result.DeclaredElement :?> ISynExpr)
         
     override x.Text = "Replace with assignment expression"
     
