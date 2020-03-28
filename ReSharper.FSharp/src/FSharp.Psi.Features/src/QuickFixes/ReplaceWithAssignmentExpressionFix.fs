@@ -10,7 +10,7 @@ type ReplaceWithAssignmentExpressionFix(warning: UnitTypeExpectedWarning) =
    
     let expr = warning.Expr.As<IBinaryAppExpr>()
     override x.IsAvailable _ =        
-        if not (expr.IsValid()) || expr = null then false else
+        if not (isValid expr) || expr = null then false else
         match expr.LeftArgument with
         | :? IReferenceExpr
         | :? IIndexerExpr -> true
