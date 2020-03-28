@@ -55,6 +55,7 @@
     <Compile Include="src\Daemon\Analyzers\LetDisposableAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\RedundantParenAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\InactivePreprocessorBranchAnalyzer.fs" />
+    <Compile Include="src\Daemon\Analyzers\RedundantAttributeParensAnalyzer.fs" />
     <Compile Include="src\Comment\FSharpBlockCommentActionProvider.fs" />
     <Compile Include="src\Comment\FSharpLineCommentActionProvider.fs" />
     <Compile Include="src\Debugger\FSharpBreakpointVariantsProvider.fs" />
@@ -129,6 +130,7 @@
     <Compile Include="src\QuickFixes\RemoveUnexpectedArgumentsFix.fs" />
     <Compile Include="src\QuickFixes\ToMutableFix.fs" />
     <Compile Include="src\QuickFixes\AddUnderscorePrefixFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveRedundantAttributeParensFix.fs" />
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />
     <Compile Include="src\PostfixTemplates\NotTemplate.fs" />
     <Compile Include="src\PostfixTemplates\LetPostfixTemplate.fs" />

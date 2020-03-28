@@ -282,6 +282,9 @@ module PsiModificationUtil =
     let deleteChildRange first last =
         ModificationUtil.DeleteChildRange(first, last)
 
+    let deleteChild child =
+        ModificationUtil.DeleteChild(child)
+
     let addNodesAfter anchor (nodes: ITreeNode seq) =
         nodes |> Seq.fold (fun anchor treeNode ->
             ModificationUtil.AddChildAfter(anchor, treeNode)) anchor
