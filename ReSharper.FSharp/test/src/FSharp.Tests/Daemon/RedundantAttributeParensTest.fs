@@ -15,3 +15,5 @@ type RedundantAttributeParensTest() =
     [<Test>] member x.``Type 01 - No arguments``() = x.DoNamedTest()
     [<Test>] member x.``Type 02 - Has arguments``() = x.DoNamedTest()
     [<Test>] member x.``Type 03 - No parens``() = x.DoNamedTest()
+    [<Test>] member x.``Type 04 - Multiple attributes``() = x.DoNamedTest()
+    [<Test>] member x.``Type 05 - Target attribute``() = x.DoNamedTest()
