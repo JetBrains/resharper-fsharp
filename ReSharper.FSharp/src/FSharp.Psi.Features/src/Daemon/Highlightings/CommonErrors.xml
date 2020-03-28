@@ -281,4 +281,11 @@
     <QuickFix>ToMutableFix</QuickFix>
   </Error>
 
+  <Warning staticGroup="FSharpErrors" name="RedundantAttributeParens">
+    <Parameter type="IAttribute" name="attribute"/>
+    <Range>attribute.ArgExpression.GetHighlightingRange()</Range>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message value="Parentheses are redundant if attribute has no arguments"/>
+  </Warning>
+
 </Errors>
