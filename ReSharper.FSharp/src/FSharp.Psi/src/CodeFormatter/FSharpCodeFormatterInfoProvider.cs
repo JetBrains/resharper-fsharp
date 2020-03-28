@@ -34,9 +34,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         ("LazyExpr", ElementType.LAZY_EXPR, LazyExpr.EXPR),
         ("ComputationExpr", ElementType.COMPUTATION_EXPR, ComputationExpr.EXPR),
         ("SetExpr", ElementType.SET_EXPR, SetExpr.RIGHT_EXPR),
-        ("TryFinally_Try", ElementType.TRY_FINALLY_EXPR, TryFinallyExpr.TRY_EXPR),
-        ("TryFinally_Finally", ElementType.TRY_FINALLY_EXPR, TryFinallyExpr.FINALLY_EXPR),
-        ("TryWith_Try", ElementType.TRY_WITH_EXPR, TryWithExpr.TRY_EXPR),
+        ("TryFinally_TryExpr", ElementType.TRY_FINALLY_EXPR, TryFinallyExpr.TRY_EXPR),
+        ("TryFinally_FinallyExpr", ElementType.TRY_FINALLY_EXPR, TryFinallyExpr.FINALLY_EXPR),
+        ("TryWith_TryExpr", ElementType.TRY_WITH_EXPR, TryWithExpr.TRY_EXPR),
         ("IfThenExpr", ElementType.IF_THEN_ELSE_EXPR, IfThenElseExpr.THEN_EXPR),
         ("ElifThenExpr", ElementType.ELIF_EXPR, ElifExpr.THEN_EXPR),
         ("MatchClauseExpr", ElementType.MATCH_CLAUSE, MatchClause.EXPR),
@@ -51,7 +51,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
           .ForEach(DescribeSimpleIndentingRule);
 
         Describe<IndentingRule>()
-          .Name("TryWith_WithIndent")
+          .Name("TryWith_WithClauseIndent")
           .Where(
             Parent().HasType(ElementType.TRY_WITH_EXPR),
             Node().HasRole(TryWithExpr.CLAUSE))
