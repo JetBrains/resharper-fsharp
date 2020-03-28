@@ -286,6 +286,7 @@
     <Range>attribute.ArgExpression.GetHighlightingRange()</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Message value="Parentheses are redundant if attribute has no arguments"/>
+    <QuickFix>RemoveRedundantAttributeParensFix</QuickFix>
   </Warning>
 
 </Errors>
