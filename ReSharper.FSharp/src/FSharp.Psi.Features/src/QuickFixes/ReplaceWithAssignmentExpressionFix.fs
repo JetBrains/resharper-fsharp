@@ -21,6 +21,6 @@ type ReplaceWithAssignmentExpressionFix(warning: UnitTypeExpectedWarning) =
     
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
-        let factory = warning.Expr.CreateElementFactory()
+        let factory = expr.CreateElementFactory()
         let setExpr = factory.CreateSetExpr(expr.LeftArgument, expr.RightArgument)
         replace expr setExpr
