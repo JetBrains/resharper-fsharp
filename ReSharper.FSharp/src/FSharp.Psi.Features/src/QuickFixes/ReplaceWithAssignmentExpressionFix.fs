@@ -8,7 +8,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Plugins.FSharp.Util
 
-
 type ReplaceWithAssignmentExpressionFix(warning: UnitTypeExpectedWarning) =
     inherit FSharpQuickFixBase()
    
