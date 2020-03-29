@@ -711,7 +711,7 @@ referenceExpr options { stubBase="FSharpExpressionBase"; } extras {
     DOT
   )?
   fSharpIdentifier<IDENTIFIER, Identifier>
-  prefixAppTypeArgumentList<TYPE_ARG_LIST, TypeArgumentsList>?;
+  prefixAppTypeArgumentList<TYPE_ARG_LIST, TypeArgumentList>?;
 
 matchClause:
   BAR<BAR, Bar>?

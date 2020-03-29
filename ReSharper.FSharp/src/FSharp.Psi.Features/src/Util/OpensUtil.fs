@@ -12,6 +12,24 @@ open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 
+let toQualifiedList (declaredElement: IClrDeclaredElement) =
+    let rec loop acc (declaredElement: IClrDeclaredElement) =
+        match declaredElement with
+        | :? INamespace as ns ->
+            if ns.IsRootNamespace then acc else
+            loop (declaredElement :: acc) (ns.GetContainingNamespace())
+
+        | :? ITypeElement as typeElement ->
+            let acc = declaredElement :: acc
+
+            match typeElement.GetContainingType() with
+            | null -> loop acc (typeElement.GetContainingNamespace())
+            | containingType -> loop acc containingType
+
+        | _ -> failwithf "Expecting namespace to type element"
+
+    loop [] declaredElement
+
 let rec getModuleToOpen (typeElement: ITypeElement): IClrDeclaredElement =
     match typeElement.GetContainingType() with
     | null ->
