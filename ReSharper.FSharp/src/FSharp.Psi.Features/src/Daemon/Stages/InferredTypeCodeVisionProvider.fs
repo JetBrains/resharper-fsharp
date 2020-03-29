@@ -77,7 +77,7 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
         stringBuilder.Append(s) |> ignore
 
     let formatMfv (symbolUse: FSharpSymbolUse) (mfv: FSharpMemberOrFunctionOrValue) =
-        let displayContext = symbolUse.DisplayContext
+        let displayContext = symbolUse.DisplayContext.WithShortTypeNames(true)
         let returnTypeStr = mfv.ReturnParameter.Type.Format(displayContext)
 
         if mfv.IsPropertyGetterMethod then returnTypeStr else
