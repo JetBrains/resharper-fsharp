@@ -98,11 +98,13 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
                 if not isFirstParam then append builder " * "
 
                 let fsType = param.Type
-                let isFunctionType = fsType.IsFunctionType
+                let addParens =
+                    fsType.IsFunctionType ||
+                    fsType.IsTupleType && group.Count > 1
 
-                if isFunctionType then append builder "("
+                if addParens then append builder "("
                 append builder (fsType.Format(displayContext))
-                if isFunctionType then append builder ")"
+                if addParens then append builder ")"
 
                 isFirstParam <- false
 
