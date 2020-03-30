@@ -1,7 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
 open System
-open System.Drawing
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Daemon.Stages
@@ -11,7 +10,6 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.Rider.Model
 open JetBrains.TextControl.DocumentMarkup
 open JetBrains.UI.RichText
 open FSharp.Compiler.SourceCodeServices
@@ -83,7 +81,7 @@ type TypeHighlightingVisitor(fsFile: IFSharpFile, checkResults: FSharpCheckFileR
             let getTooltip = checkResults.GetStructuredToolTipText(int coords.Line + 1, int coords.Column, lineText, tokenNames, FSharpTokenTag.Identifier)
             let (FSharpToolTipText layouts) = getTooltip.RunAsTask()
 
-            // The |> operator shouldn't have any overloads, and it should have two type parameters
+            // The |> operator should have one overload and two type parameters
             match layouts with
             | [ FSharpStructuredToolTipElement.Group [ { TypeMapping = [ _; returnTypeParam ] } ] ] ->
                 // TODO: do something way less hacky here
