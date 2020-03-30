@@ -90,9 +90,7 @@ type TypeHighlightingVisitor(fsFile: IFSharpFile, checkResults: FSharpCheckFileR
                 // Trim off the: "'U is " prefix
                 let text = ": " + (showL returnTypeParam).Substring(6)
 
-                let richText = RichText(text, TextStyle(System.Drawing.FontStyle.Underline, Color.Magenta))
-
-                TypeHintHighlighting(richText, binding.RightArgument.GetNavigationRange().EndOffsetRange())
+                TypeHintHighlighting(RichText text, binding.RightArgument.GetNavigationRange().EndOffsetRange())
                 |> consumer.AddHighlighting
             | _ -> ()
 
