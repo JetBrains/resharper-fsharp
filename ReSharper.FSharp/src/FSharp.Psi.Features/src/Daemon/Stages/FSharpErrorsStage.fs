@@ -40,7 +40,7 @@ and FSharpErrorStageProcess
 
         let fibers = daemonProcess.CreateFibers()
         for node in globalProcessor.MemberDeclarations do
-            fibers.EnqueueJob(fun _ -> node.ProcessThisAndDescendants(Processor(x, consumer)))
+            fibers.EnqueueJob((fun _ -> node.ProcessThisAndDescendants(Processor(x, consumer))), x.ResolveContext)
         fibers.Dispose()
 
         committer.Invoke(DaemonStageResult(consumer.Highlightings))

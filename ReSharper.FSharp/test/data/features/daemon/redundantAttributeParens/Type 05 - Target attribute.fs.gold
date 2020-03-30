@@ -1,0 +1,6 @@
+﻿[<type: Foo|()|(0)>]
+type A =
+    class end
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Parentheses are redundant if attribute has no arguments

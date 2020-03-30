@@ -93,7 +93,7 @@ type FSharpTestProjectOptionsProvider
                 | project ->
 
                 let targetFrameworkId = sourceFile.PsiModule.TargetFrameworkId
-                match project.ProjectProperties.ActiveConfigurations.GetOrCreateConfiguration(targetFrameworkId) with
+                match project.ProjectProperties.ActiveConfigurations.TryGetConfiguration(targetFrameworkId) with
                 | :? IManagedProjectConfiguration as cfg ->
                     cfg.OutputType = ProjectOutputType.CONSOLE_EXE
                 | _ -> false

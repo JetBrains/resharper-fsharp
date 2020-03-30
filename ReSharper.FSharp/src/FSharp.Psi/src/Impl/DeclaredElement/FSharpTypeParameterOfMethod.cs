@@ -42,6 +42,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public IList<ITypeElement> GetSuperTypeElements() => GetSuperTypes().ToTypeElements();
 
     public IEnumerable<ITypeMember> GetMembers() => EmptyList<ITypeMember>.InstanceList;
+    public MemberPresenceFlag GetMemberPresenceFlag() => MemberPresenceFlag.NONE;
 
     public INamespace GetContainingNamespace() =>
       Method.GetContainingType()?.GetContainingNamespace() ??

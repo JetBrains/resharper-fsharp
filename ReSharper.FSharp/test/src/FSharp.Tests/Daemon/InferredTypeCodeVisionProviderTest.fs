@@ -16,3 +16,4 @@ type InferredTypeCodeVisionProviderTest() =
     [<Test>] member x.``Unopened namespace``() = x.DoNamedTest()
 
     [<Test>] member x.``Object expression 01``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple param``() = x.DoNamedTest()

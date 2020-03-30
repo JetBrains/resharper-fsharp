@@ -42,6 +42,7 @@ type IFSharpFile with
         | Some parseResults -> parseResults.ParseTree
         | _ -> None
 
+type IFile with
     member x.GetNode<'T when 'T :> ITreeNode and 'T : null>(document, range) =
         let offset = getStartOffset document range
         x.GetNode<'T>(DocumentOffset(document, offset))
@@ -280,6 +281,9 @@ module PsiModificationUtil =
 
     let deleteChildRange first last =
         ModificationUtil.DeleteChildRange(first, last)
+
+    let deleteChild child =
+        ModificationUtil.DeleteChild(child)
 
     let addNodesAfter anchor (nodes: ITreeNode seq) =
         nodes |> Seq.fold (fun anchor treeNode ->

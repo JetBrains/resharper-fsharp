@@ -33,6 +33,8 @@
     <Compile Include="Daemon\SyntaxHighlightingTest.fs" />
     <Compile Include="Daemon\RedundantParensTest.fs" />
     <Compile Include="Daemon\StringEscapingTest.fs" />
+    <Compile Include="Daemon\RedundantAttributeParensTest.fs" />
+    <Compile Include="Debugger\ExpressionEvaluationInfoTest.fs" />
     <Compile Include="QuickFixes\ErrorAttributes.fs" />
     <Compile Include="QuickFixes\ReplaceUseWithLetTest.fs" />
     <Compile Include="QuickFixes\RemoveUnusedSelfIdVariableFix.fs" />
@@ -58,6 +60,7 @@
     <Compile Include="QuickFixes\ImportTypeTest.fs" />
     <Compile Include="QuickFixes\ToMutableTest.fs" />
     <Compile Include="QuickFixes\AddUnderscorePrefixFixTest.fs" />
+    <Compile Include="QuickFixes\RemoveRedundantAttributeParensTest.fs" />
     <Compile Include="Intentions\IntentionsTestBase.fs" />
     <Compile Include="Intentions\ToRecursiveLetBindings.fs" />
     <Compile Include="Intentions\ToMultilineRecordTest.fs" />
