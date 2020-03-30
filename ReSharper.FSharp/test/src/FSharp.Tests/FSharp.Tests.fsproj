@@ -34,6 +34,7 @@
     <Compile Include="Daemon\RedundantParensTest.fs" />
     <Compile Include="Daemon\StringEscapingTest.fs" />
     <Compile Include="Daemon\RedundantAttributeParensTest.fs" />
+    <Compile Include="Daemon\RedindantAttributeSuffixAnalyzerTest.fs" />
     <Compile Include="Debugger\ExpressionEvaluationInfoTest.fs" />
     <Compile Include="QuickFixes\ErrorAttributes.fs" />
     <Compile Include="QuickFixes\ReplaceUseWithLetTest.fs" />
