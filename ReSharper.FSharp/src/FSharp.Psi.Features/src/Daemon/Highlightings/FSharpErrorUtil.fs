@@ -47,3 +47,10 @@ let rec getUnusedExpr (expr: ISynExpr) =
         if isNotNull lastExpr then getUnusedExpr lastExpr else expr
 
     | _ -> expr
+
+let getAttributeSuffixRange (attribute: IAttribute) =
+    let attributeName = attribute.ReferenceName.Identifier.Name
+    if not (attributeName.EndsWith("Attribute")) then DocumentRange.InvalidRange else
+
+    let shortAttributeName = attributeName.TrimFromEnd("Attribute")
+    attribute.ReferenceName.GetHighlightingRange().TrimLeft(shortAttributeName.Length)

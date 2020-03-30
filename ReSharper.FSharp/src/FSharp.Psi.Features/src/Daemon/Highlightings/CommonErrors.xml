@@ -289,4 +289,11 @@
     <QuickFix>RemoveRedundantAttributeParensFix</QuickFix>
   </Warning>
 
+  <Warning staticGroup="FSharpErrors" name="RedundantAttributeSuffix">
+    <Parameter type="IAttribute" name="attribute"/>
+    <Range>getAttributeSuffixRange attribute</Range>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message value="Attribute suffix is redundant"/>
+  </Warning>
+
 </Errors>
