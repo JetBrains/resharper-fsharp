@@ -5,8 +5,8 @@
 ### Inspections / analyzers
 
 * Attributes 
-    * **Add** Redundant Attribute suffix analyzer and quick fix (by [@reacheight](https://github.com/reacheight) ([#109](https://github.com/JetBrains/fsharp-support/pull/109))
-    * **Add** Redundant attribute parens analyzer and quick fix (by [@reacheight](https://github.com/reacheight) ([#104](https://github.com/JetBrains/fsharp-support/pull/104))
+    * **Add** Redundant Attribute suffix analyzer and quick fix (by [@reacheight](https://github.com/reacheight) ([#109](https://github.com/JetBrains/fsharp-support/pull/109)))
+    * **Add** Redundant attribute parens analyzer and quick fix (by [@reacheight](https://github.com/reacheight) ([#104](https://github.com/JetBrains/fsharp-support/pull/104)))
 
 * Run analyzers in parallel
 * Optimize spell-checker analyzer
@@ -20,9 +20,9 @@
   * Escape module names when importing types
   * **Fix** various cases of incorrect `open` placement
 * **FS0003**: Not a function / unexpected argument
-  * **Add** Remore unexpected arguments (by [@DedSec256](https://github.com/DedSec256) ([#89](https://github.com/JetBrains/fsharp-support/pull/89))
+  * **Add** Remore unexpected arguments (by [@DedSec256](https://github.com/DedSec256) ([#89](https://github.com/JetBrains/fsharp-support/pull/89)))
 * **FS0026**: `match` rule is never matched
-  * Remove never matching rules (by [@reacheight](https://github.com/reacheight) ([#74](https://github.com/JetBrains/fsharp-support/pull/74))
+  * Remove never matching rules (by [@reacheight](https://github.com/reacheight) ([#74](https://github.com/JetBrains/fsharp-support/pull/74)))
 * **FS0005**: Field not mutable
   * **Add** Make field mutable
 * **FS0027**: Value not mutable
@@ -79,6 +79,7 @@
 
 * Add `Type` file template
 * Select whole `()` expression in Extend Selection
+* **Fix** Plugin could not be built on case-sensitive file systems (by [@ mcon](https://github.com/mcon) ([#108](https://github.com/JetBrains/fsharp-support/pull/108)))
 
 ## 2019.3
 
