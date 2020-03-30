@@ -50,6 +50,6 @@ let rec getUnusedExpr (expr: ISynExpr) =
 
 let getAttributeSuffixRange (attribute: IAttribute) =
     let referenceName = attribute.ReferenceName
-    if isNull referenceName || not (referenceName.ShortName.EndsWith("Attribute")) then DocumentRange.InvalidRange else
+    if isNull referenceName || not (referenceName.ShortName |> endsWith "Attribute") then DocumentRange.InvalidRange else
 
     referenceName.GetDocumentEndOffset().ExtendLeft("Attribute".Length)

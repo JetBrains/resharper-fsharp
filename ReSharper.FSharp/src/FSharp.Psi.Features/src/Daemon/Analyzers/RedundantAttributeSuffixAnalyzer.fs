@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 
 [<ElementProblemAnalyzer(typeof<IAttribute>,
@@ -14,7 +15,7 @@ type RedundantAttributeSuffixAnalyzer() =
         if isNull attribute.ReferenceName then () else
 
         let attributeName = attribute.ReferenceName.ShortName
-        if attributeName = "Attribute" || not (attributeName.EndsWith("Attribute")) then () else
+        if attributeName = "Attribute" || not (attributeName |> endsWith "Attribute") then () else
 
         let attributeTypeElement = attribute.ReferenceName.Reference.Resolve().DeclaredElement.As<ITypeElement>()
         if isNull attributeTypeElement then () else
