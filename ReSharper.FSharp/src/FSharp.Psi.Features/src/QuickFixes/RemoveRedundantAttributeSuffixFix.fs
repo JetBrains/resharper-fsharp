@@ -12,7 +12,7 @@ type RemoveRedundantAttributeSuffixFix(warning: RedundantAttributeSuffixWarning)
     let attribute = warning.Attribute
 
     override x.Text = "Remove redundant attribute suffix"
-    override x.IsAvailable _ = isValid attribute
+    override x.IsAvailable _ = isValid attribute && isNotNull attribute.ReferenceName
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(attribute.IsPhysical())

@@ -16,4 +16,4 @@ type RedundantAttributeAnalyzerTest() =
     [<Test>] member x.``Single attribute 02 - Needed suffix``() = x.DoNamedTest()
     [<Test>] member x.``Single attribute 03 - With constructor``() = x.DoNamedTest()
     [<Test>] member x.``Single attribute 04 - With target``() = x.DoNamedTest()
-    [<Test>] member x.``Multiple attributes 01``() = x.DoNamedTest()
+    [<Test>] member x.``Single attribute 05 - Name is just Attribute``() = x.DoNamedTest()
