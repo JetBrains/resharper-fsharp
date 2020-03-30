@@ -1,5 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
+open FSharp.Compiler.Layout
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application
 open JetBrains.Application.UI.Components
@@ -11,8 +12,13 @@ open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Host.Features.Services
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
+open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Files
+open JetBrains.ReSharper.Psi.Modules
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Rider.Model
 
@@ -70,6 +76,9 @@ type PipeChainCodeVisionStage(provider: PipeChainCodeVisionProvider) =
 and PipeChainCodeVisionProviderProcess(fsFile, settings, daemonProcess, provider: ICodeInsightsProvider) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
+    let tokenNames = ["|>"]
+    let [<Literal>] opName = "PipeChainCodeVisionProviderProcess"
+
     override x.Execute(committer) =
         let consumer = FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settings)
         fsFile.ProcessThisAndDescendants(Processor(x, consumer))
@@ -77,18 +86,40 @@ and PipeChainCodeVisionProviderProcess(fsFile, settings, daemonProcess, provider
 
     override x.VisitBinaryAppExpr(binding, consumer) =
         if binding.Operator.QualifiedName <> "|>" then () else
-        let formatSymbolUse (symbolUse : FSharpSymbolUse) =
-            match symbolUse.Symbol with
-            | :? FSharpMemberOrFunctionOrValue as mfv ->
-                let displayContext = symbolUse.DisplayContext.WithShortTypeNames(true)
-                let text = ": " + mfv.ReturnParameter.Type.Format(displayContext)
+
+        let sourceFile = daemonProcess.SourceFile
+        let opExpr = binding.Operator
+
+        match sourceFile.GetPsiFile<FSharpLanguage>(opExpr.GetNavigationRange()).As<IFSharpFile>() with
+        | null -> ()
+        | fsFile ->
+
+        match opExpr.Identifier.As<FSharpIdentifierToken>() with
+        | null -> ()
+        | token ->
+
+        match fsFile.GetParseAndCheckResults(true, opName) with
+        | None -> ()
+        | Some results ->
+
+        let checkResults = results.CheckResults
+        let coords = sourceFile.Document.GetCoordsByOffset(token.GetTreeEndOffset().Offset)
+        let lineText = sourceFile.Document.GetLineText(coords.Line)
+
+        use cookie = CompilationContextCookie.GetOrCreate(fsFile.GetPsiModule().GetContextFromModule())
+
+        // todo: provide tooltip for #r strings in fsx, should pass String tag
+        let getTooltip = checkResults.GetStructuredToolTipText(int coords.Line + 1, int coords.Column, lineText, tokenNames, FSharpTokenTag.Identifier)
+        let (FSharpToolTipText layouts) = getTooltip.RunAsTask()
+
+        match layouts with
+        | [ FSharpStructuredToolTipElement.Group [ overload ] ] ->
+            match overload.TypeMapping with
+            | [ _; result ] ->
+                // TODO: do something way less hacky here
+                // Trim off the: "'U is " prefix
+                let text = ": " + (showL result).Substring(6)
                 FSharpPipeChainHighlighting(binding.RightArgument.GetNavigationRange(), text, provider)
                 |> consumer.AddHighlighting
             | _ -> ()
-
-        match binding.RightArgument with
-        | :? IPrefixAppExpr as pae ->
-            formatSymbolUse <| pae.InvokedFunctionReference.GetSymbolUse()
-        | :? IReferenceExpr as refExpr ->
-            formatSymbolUse <| refExpr.Reference.GetSymbolUse()
         | _ -> ()
