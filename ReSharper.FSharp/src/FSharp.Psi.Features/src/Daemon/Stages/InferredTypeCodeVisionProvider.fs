@@ -40,7 +40,7 @@ type InferredTypeCodeVisionProvider() =
     interface ICodeInsightsProvider with
         member x.ProviderId = id
         member x.DisplayName = id
-        member x.DefaultAnchor = CodeLensAnchorKind.Right
+        member x.DefaultAnchor = CodeLensAnchorKind.Default
         member x.RelativeOrderings = [| CodeLensRelativeOrderingFirst() :> CodeLensRelativeOrdering |] :> _
 
         member x.IsAvailableIn _ = true
@@ -123,24 +123,6 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
         fsFile.ProcessThisAndDescendants(Processor(x, consumer))
         committer.Invoke(DaemonStageResult(consumer.Highlightings))
 
-    override x.VisitBinaryAppExpr(binding, consumer) =
-        if binding.Operator.QualifiedName <> "|>" then () else
-        let formatSymbolUse (symbolUse : FSharpSymbolUse) =
-            match symbolUse.Symbol with
-            | :? FSharpMemberOrFunctionOrValue as mfv ->
-                let displayContext = symbolUse.DisplayContext.WithShortTypeNames(true)
-                let text = ": " + mfv.ReturnParameter.Type.Format(displayContext)
-                FSharpInferredTypeHighlighting(binding.RightArgument.GetNavigationRange(), text, provider)
-                |> consumer.AddHighlighting
-            | _ -> ()
-        
-        match binding.RightArgument with
-        | :? IPrefixAppExpr as pae ->
-            formatSymbolUse <| pae.InvokedFunctionReference.GetSymbolUse()
-        | :? IReferenceExpr as refExpr ->
-            formatSymbolUse <| refExpr.Reference.GetSymbolUse()
-        | _ -> ()
-    
     override x.VisitTopBinding(binding, consumer) =
         let headPattern = binding.HeadPattern
         if not headPattern.IsDeclaration then () else
