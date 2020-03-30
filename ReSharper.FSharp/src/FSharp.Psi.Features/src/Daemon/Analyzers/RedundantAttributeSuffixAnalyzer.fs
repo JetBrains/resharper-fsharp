@@ -11,7 +11,7 @@ type RedundantAttributeSuffixAnalyzer() =
     inherit ElementProblemAnalyzer<IAttribute>()
 
     override x.Run(attribute, _, consumer) =
-        let attributeName = attribute.ReferenceName.Identifier.Name
+        let attributeName = attribute.ReferenceName.ShortName
         if not (attributeName.EndsWith("Attribute")) then () else
 
         let attributeTypeElement = attribute.ReferenceName.Reference.Resolve().DeclaredElement.As<ITypeElement>()

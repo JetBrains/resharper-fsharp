@@ -49,7 +49,7 @@ let rec getUnusedExpr (expr: ISynExpr) =
     | _ -> expr
 
 let getAttributeSuffixRange (attribute: IAttribute) =
-    let attributeName = attribute.ReferenceName.Identifier.Name
+    let attributeName = attribute.ReferenceName.ShortName
     if not (attributeName.EndsWith("Attribute")) then DocumentRange.InvalidRange else
 
     let shortAttributeName = attributeName.TrimFromEnd("Attribute")
