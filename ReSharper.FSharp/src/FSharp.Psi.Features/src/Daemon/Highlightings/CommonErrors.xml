@@ -294,6 +294,7 @@
     <Range>getAttributeSuffixRange attribute</Range>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Message value="Attribute suffix is redundant"/>
+    <QuickFix>RemoveRedundantAttributeSuffixFix</QuickFix>
   </Warning>
 
 </Errors>

@@ -132,6 +132,7 @@
     <Compile Include="src\QuickFixes\ToMutableFix.fs" />
     <Compile Include="src\QuickFixes\AddUnderscorePrefixFix.fs" />
     <Compile Include="src\QuickFixes\RemoveRedundantAttributeParensFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveRedundantAttributeSuffixFix.fs" />
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />
     <Compile Include="src\PostfixTemplates\NotTemplate.fs" />
     <Compile Include="src\PostfixTemplates\LetPostfixTemplate.fs" />
