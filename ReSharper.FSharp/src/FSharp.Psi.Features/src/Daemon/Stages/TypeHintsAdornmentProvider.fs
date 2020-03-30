@@ -57,8 +57,6 @@ and [<SolutionComponent>] TypeHintsAdornmentProvider() =
 type TypeHighlightingVisitor(fsFile: IFSharpFile, checkResults: FSharpCheckFileResults) =
     inherit TreeNodeVisitor<IHighlightingConsumer>()
 
-    let tokenNames = ["|>"]
-
     override x.VisitNode(node, context) =
         for child in node.Children() do
             match child with
@@ -81,7 +79,10 @@ type TypeHighlightingVisitor(fsFile: IFSharpFile, checkResults: FSharpCheckFileR
                 // Trim off the: "'U is " prefix
                 let text = ": " + (showL returnTypeParam).Substring(6)
 
-                TypeHintHighlighting(RichText text, binaryAppExpr.RightArgument.GetNavigationRange().EndOffsetRange())
+                // Use EndOffsetRange to ensure the adornment appears at the end of multi-line expressions
+                let range = binaryAppExpr.RightArgument.GetNavigationRange().EndOffsetRange()
+
+                TypeHintHighlighting(RichText text, range)
                 |> consumer.AddHighlighting
             | _ -> ()
 
