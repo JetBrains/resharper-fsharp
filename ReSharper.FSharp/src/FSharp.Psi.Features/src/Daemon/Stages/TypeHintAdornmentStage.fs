@@ -18,7 +18,7 @@ open FSharp.Compiler.SourceCodeServices
 open FSharp.Compiler.Layout
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
-[<DaemonIntraTextAdornmentProvider(typeof<TypeHintsAdornmentProvider>)>]
+[<DaemonIntraTextAdornmentProvider(typeof<TypeHintAdornmentProvider>)>]
 [<StaticSeverityHighlighting(Severity.INFO,
      HighlightingGroupIds.IntraTextAdornmentsGroup,
      AttributeId = AnalysisHighlightingAttributeIds.PARAMETER_NAME_HINT,
@@ -36,7 +36,7 @@ type TypeHintHighlighting(text: RichText, range: DocumentRange) =
 
     member x.Text = text
 
-and [<SolutionComponent>] TypeHintsAdornmentProvider() =
+and [<SolutionComponent>] TypeHintAdornmentProvider() =
     interface IHighlighterIntraTextAdornmentProvider with
         member x.CreateDataModel(highlighter) =
             match highlighter.UserData with
@@ -88,10 +88,10 @@ type TypeHighlightingVisitor(fsFile: IFSharpFile, checkResults: FSharpCheckFileR
 
         x.VisitNode(binaryAppExpr, consumer)
 
-type TypeHintsHighlightingProcess(fsFile, settings, daemonProcess) =
+type TypeHintHighlightingProcess(fsFile, settings, daemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
-    let [<Literal>] opName = "TypeHintsHighlightingProcess"
+    let [<Literal>] opName = "TypeHintHighlightingProcess"
 
     override x.Execute(committer) =
         match fsFile.GetParseAndCheckResults(true, opName) with
@@ -103,7 +103,7 @@ type TypeHintsHighlightingProcess(fsFile, settings, daemonProcess) =
         committer.Invoke(DaemonStageResult(consumer.Highlightings))
 
 [<DaemonStage(StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |])>]
-type TypeHintsStage() =
+type TypeHintAdornmentStage() =
     inherit FSharpDaemonStageBase()
 
     override x.IsSupported(sourceFile, processKind) =
@@ -112,4 +112,4 @@ type TypeHintsStage() =
         && not (sourceFile.LanguageType.Is<FSharpSignatureProjectFileType>())
 
     override x.CreateStageProcess(fsFile, settings, daemonProcess) =
-        TypeHintsHighlightingProcess(fsFile, settings, daemonProcess) :> _
+        TypeHintHighlightingProcess(fsFile, settings, daemonProcess) :> _

@@ -29,7 +29,7 @@
     <Compile Include="Daemon\ErrorsHighlightingTest.fs" />
     <Compile Include="Daemon\FormatSpecifiersHighlightingTest.fs" />
     <Compile Include="Daemon\InferredTypeCodeVisionProviderTest.fs" />
-    <Compile Include="Daemon\PipeChainCodeVisionProviderTest.fs" />
+    <Compile Include="Daemon\TypeHintAdornmentStageTest.fs" />
     <Compile Include="Daemon\InheritanceGutterMarksTest.fs" />
     <Compile Include="Daemon\SyntaxHighlightingTest.fs" />
     <Compile Include="Daemon\RedundantParensTest.fs" />
