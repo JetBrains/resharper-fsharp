@@ -24,7 +24,6 @@ import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.extensions.Extensions
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.UserDataHolderBase
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.wm.ToolWindowManager
@@ -255,7 +254,7 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
     }
 
     override fun createProcessHandler(process: Process): OSProcessHandler {
-        val fsiProcessHandler = FsiProcessHandler(process, cmdLine.commandLineString, Charsets.UTF_8)
+        val fsiProcessHandler = FsiProcessHandler(process, cmdLine.commandLineString)
 
         val sandboxInfoUpdater = FsiSandboxInfoUpdater(fsiHost.project, consoleView.consoleEditor, commandHistory)
         fsiProcessHandler.addSandboxInfoUpdater(sandboxInfoUpdater)

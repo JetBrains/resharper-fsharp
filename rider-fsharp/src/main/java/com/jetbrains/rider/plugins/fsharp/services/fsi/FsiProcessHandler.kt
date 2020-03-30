@@ -5,8 +5,7 @@ import com.intellij.openapi.util.Key
 import java.nio.charset.Charset
 
 class FsiProcessHandler (
-        process: Process, commandLine: String?, charset: Charset?)
-    : OSProcessHandler(process, commandLine, charset) {
+        process: Process, commandLine: String?) : OSProcessHandler(process, commandLine, Charsets.UTF_8) {
 
     private val sandboxInfoUpdaters = mutableListOf<FsiSandboxInfoUpdater>()
 
