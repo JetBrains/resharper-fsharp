@@ -1,0 +1,7 @@
+﻿open System
+
+type FooAttribute() = inherit Attribute()
+
+[<type: Foo{caret}()>]
+type A =
+    class end
