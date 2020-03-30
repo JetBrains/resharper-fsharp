@@ -15,7 +15,7 @@ type RedundantAttributeSuffixAnalyzer() =
         if isNull attribute.ReferenceName then () else
 
         let attributeName = attribute.ReferenceName.ShortName
-        if attributeName = "Attribute" || not (attributeName |> endsWith "Attribute") then () else
+        if not (attributeName |> endsWith "Attribute" && attributeName.Length > "Attribute".Length) then () else
 
         let attributeTypeElement = attribute.ReferenceName.Reference.Resolve().DeclaredElement.As<ITypeElement>()
         if isNull attributeTypeElement then () else
