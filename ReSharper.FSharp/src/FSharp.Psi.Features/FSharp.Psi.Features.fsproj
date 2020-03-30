@@ -43,7 +43,7 @@
     <Compile Include="src\Daemon\Stages\FSharpInheritedMembersHighlighterStage.fs" />
     <Compile Include="src\Daemon\Stages\FSharpVcsCodeVisionRangesProviderStage.fs" />
     <Compile Include="src\Daemon\Stages\FSharpErrorsStage.fs" />
-    <Compile Include="src\Daemon\Stages\PipeChainCodeVisionProvider.fs" />
+    <Compile Include="src\Daemon\Stages\TypeHintsAdornmentProvider.fs" />
     <Compile Include="src\Daemon\Stages\InferredTypeCodeVisionProvider.fs" />
     <Compile Include="src\Daemon\Stages\FSharpSyntaxHighlightingStage.fs" />
     <Compile Include="src\Daemon\UsageChecking\FSharpUsageCheckingService.fs" />
