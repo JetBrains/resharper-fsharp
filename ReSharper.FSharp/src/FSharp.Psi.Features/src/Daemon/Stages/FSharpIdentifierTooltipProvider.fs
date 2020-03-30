@@ -11,7 +11,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
@@ -27,6 +26,19 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
     inherit IdentifierTooltipProvider<FSharpLanguage>(lifetime, solution, presenter)
 
     let [<Literal>] opName = "FSharpIdentifierTooltipProvider"
+
+    static member GetFSharpToolTipText(checkResults: FSharpCheckFileResults, token: FSharpIdentifierToken) =
+        // todo: fix getting qualifiers
+        let tokenNames = [token.Name]
+
+        let sourceFile = token.GetSourceFile()
+        let coords = sourceFile.Document.GetCoordsByOffset(token.GetTreeEndOffset().Offset)
+        let lineText = sourceFile.Document.GetLineText(coords.Line)
+        use cookie = CompilationContextCookie.GetOrCreate(sourceFile.GetPsiModule().GetContextFromModule())
+
+        // todo: provide tooltip for #r strings in fsx, should pass String tag
+        let getTooltip = checkResults.GetStructuredToolTipText(int coords.Line + 1, int coords.Column, lineText, tokenNames, FSharpTokenTag.Identifier)
+        getTooltip.RunAsTask()
 
     override x.GetTooltip(highlighter) =
         if not highlighter.IsValid then String.Empty else
@@ -53,18 +65,8 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
         | None -> String.Empty
         | Some results ->
 
-        let checkResults = results.CheckResults
-        let coords = document.GetCoordsByOffset(token.GetTreeEndOffset().Offset)
-        // todo: fix getting qualifiers
-        let names = [token.Name]
-        let lineText = sourceFile.Document.GetLineText(coords.Line)
-
-        use cookie = CompilationContextCookie.GetOrCreate(fsFile.GetPsiModule().GetContextFromModule())
-
-        // todo: provide tooltip for #r strings in fsx, should pass String tag
-        let getTooltip = checkResults.GetStructuredToolTipText(int coords.Line + 1, int coords.Column, lineText, names, FSharpTokenTag.Identifier)
         let result = ResizeArray()
-        let (FSharpToolTipText layouts) = getTooltip.RunAsTask()
+        let (FSharpToolTipText layouts) = FSharpIdentifierTooltipProvider.GetFSharpToolTipText(results.CheckResults, token)
         
         layouts |> List.iter (function
             | FSharpStructuredToolTipElement.None

@@ -6,6 +6,8 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Daemon.Stages
 open JetBrains.ReSharper.Feature.Services.Daemon.Attributes
 open JetBrains.ReSharper.Plugins.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages.Tooltips
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
@@ -15,8 +17,6 @@ open JetBrains.UI.RichText
 open FSharp.Compiler.SourceCodeServices
 open FSharp.Compiler.Layout
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
-open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.Modules
 
 [<DaemonIntraTextAdornmentProvider(typeof<TypeHintsAdornmentProvider>)>]
 [<StaticSeverityHighlighting(Severity.INFO,
@@ -32,7 +32,7 @@ type TypeHintHighlighting(text: RichText, range: DocumentRange) =
         member x.CalculateRange() = range
 
     interface IHighlightingWithTestOutput with
-        member x.TestOutput = text.ToString()
+        member x.TestOutput = text.Text
 
     member x.Text = text
 
@@ -65,21 +65,14 @@ type TypeHighlightingVisitor(fsFile: IFSharpFile, checkResults: FSharpCheckFileR
             | :? IFSharpTreeNode as treeNode -> treeNode.Accept(x, context)
             | _ -> ()
 
-    override x.VisitBinaryAppExpr(binding, consumer) =
-        let opExpr = binding.Operator
-        if opExpr.QualifiedName <> "|>" then () else
+    override x.VisitBinaryAppExpr(binaryAppExpr, consumer) =
+        if not (FSharpExpressionUtil.isPredefinedInfixOpApp "|>" binaryAppExpr) then () else
 
+        let opExpr = binaryAppExpr.Operator
         match opExpr.Identifier.As<FSharpIdentifierToken>() with
         | null -> ()
         | token ->
-
-            let sourceFile = opExpr.GetSourceFile()
-            let coords = sourceFile.Document.GetCoordsByOffset(opExpr.GetTreeEndOffset().Offset)
-            let lineText = sourceFile.Document.GetLineText(coords.Line)
-            use cookie = CompilationContextCookie.GetOrCreate(fsFile.GetPsiModule().GetContextFromModule())
-
-            let getTooltip = checkResults.GetStructuredToolTipText(int coords.Line + 1, int coords.Column, lineText, tokenNames, FSharpTokenTag.Identifier)
-            let (FSharpToolTipText layouts) = getTooltip.RunAsTask()
+            let (FSharpToolTipText layouts) = FSharpIdentifierTooltipProvider.GetFSharpToolTipText(checkResults, token)
 
             // The |> operator should have one overload and two type parameters
             match layouts with
@@ -88,11 +81,11 @@ type TypeHighlightingVisitor(fsFile: IFSharpFile, checkResults: FSharpCheckFileR
                 // Trim off the: "'U is " prefix
                 let text = ": " + (showL returnTypeParam).Substring(6)
 
-                TypeHintHighlighting(RichText text, binding.RightArgument.GetNavigationRange().EndOffsetRange())
+                TypeHintHighlighting(RichText text, binaryAppExpr.RightArgument.GetNavigationRange().EndOffsetRange())
                 |> consumer.AddHighlighting
             | _ -> ()
 
-        x.VisitNode(binding, consumer)
+        x.VisitNode(binaryAppExpr, consumer)
 
 type TypeHintsHighlightingProcess(fsFile, settings, daemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
