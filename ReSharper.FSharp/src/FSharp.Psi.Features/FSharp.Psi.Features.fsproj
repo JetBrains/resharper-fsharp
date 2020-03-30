@@ -22,7 +22,7 @@
     <Compile Include="src\CodeStructure\FSharpCodeStructure.fs" />
     <Compile Include="src\Daemon\Highlightings\FSharpErrorUtil.fs" />
     <Compile Include="src\Daemon\Highlightings\ErrorHighlightings.fs" />
-    <Compile Include="Src\Daemon\Highlightings\CommonErrors.Generated.fs">
+    <Compile Include="src\Daemon\Highlightings\CommonErrors.Generated.fs">
       <DependentUpon>CommonErrors.xml</DependentUpon>
     </Compile>
     <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
