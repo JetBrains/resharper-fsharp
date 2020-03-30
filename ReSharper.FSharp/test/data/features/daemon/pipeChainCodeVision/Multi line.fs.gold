@@ -1,0 +1,8 @@
+﻿[ 1; 2; 3; 4; 5; 6 ]
+|> |List.groupBy (fun i -> i / 2)|(0)
+|> |List.map (fun (group, xs) -> xs.Length)|(1)
+|> |List.toSeq|(2)
+---------------------------------------------------------
+(0): CodeInsights: : ('Key * 'T list) list
+(1): CodeInsights: : 'U list
+(2): CodeInsights: : seq<'T>
