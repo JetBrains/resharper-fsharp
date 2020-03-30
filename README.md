@@ -4,8 +4,8 @@
 [![Join the chat at https://gitter.im/JetBrains/fsharp-support](https://badges.gitter.im/JetBrains/fsharp-support.svg)](https://gitter.im/JetBrains/fsharp-support?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 F# support in Rider is implemented as a plugin made of two major components: 
-* ReSharper.Host plugin (referred to as the *backend*) that adds F# support to ReSharper and is implemented in ReSharper.FSharp solution. ReSharper.Host is a modification of ReSharper used as a language service that the IntelliJ Platform interacts with. The backend is written in C# and F#.
-* IntelliJ Platform plugin for Rider (referred to as the *frontend*) that defines F# as a new IntelliJ Platform language but delegates most of the work to the backend. This part also adds F# Interactive support. The frontend is written in Kotlin.
+* ReSharper.Host plugin (referred to as the *backend*) that adds F# support to ReSharper and is implemented in ReSharper.FSharp solution. ReSharper.Host is a modification of ReSharper used as a language service that the IntelliJ Platform interacts with. The backend is written in F# and C#.
+* IntelliJ Platform plugin for Rider (referred to as the *frontend*) that defines F# as a new IntelliJ Platform language but delegates most of the work to the backend. This part also adds F# Interactive support. The frontend is written in Kotlin and Java.
 
 F# support in Rider makes use of open source software, most notably [FSharp.Compiler.Service](https://github.com/dotnet/fsharp) and [Fantomas](https://github.com/fsprojects/fantomas).
 
@@ -13,7 +13,7 @@ F# support in Rider makes use of open source software, most notably [FSharp.Comp
 
 ### Requirements
 
-* [.NET Core SDK 3.0.100](https://www.microsoft.com/net/download/windows)
+* [.NET Core SDK 3.1.100](https://www.microsoft.com/net/download/windows) or newer
 
 ### Optional
 
@@ -76,21 +76,18 @@ We suggest that you read docs on the two SDKs that this plugin uses:
 
 ## Development notes
 
-`master` is currently the main development branch, and builds from this branch are bundled with nightly Rider 2018.2 builds available via [JetBrains Toolbox App](https://www.jetbrains.com/toolbox/app/) when 2018.2 nightlies become public. 2018.1.x updates are built using `wave12` branch. When preparing a release or EAP build, changes are cherry-picked to the corresponding release branch like `wave10-rider-release`.
+The main development branch is changed on each release (i.e. `net201` correspond to 2020.1 development cycle), and builds from this branch are bundled with nightly Rider builds available via [JetBrains Toolbox App](https://www.jetbrains.com/toolbox/app/).
 
 By default, the project depends on nightly SDK builds, but a specific SDK version can be referenced in [rider-fsharp/build.gradle](rider-fsharp/build.gradle.kts) if necessary.
 
-To update to the latest frontend SDK, run the `intellij/prepare` Gradle task in IntelliJ IDEA which will download both Rider SDK and ReSharper SDK. To restore ReSharper SDK in projects run *Tools | NuGet | NuGet Force Restore* in Rider. The force restore is currently needed for floating package versions like `2017.3-SNAPSHOT*` ([RIDER-11395](https://youtrack.jetbrains.com/issue/RIDER-11395)).
+Gradle downloads a newer SDK from time to time. To force an update, run the `prepare --refresh-dependencies` Gradle task.
 
-To debug the backend, attach to the ReSharper.Host process launched via the `runIde` Gradle task. To debug the frontend, start the `runIde` task in Debug mode.
+To debug the backend, attach debugger to the ReSharper.Host process launched via the `runIde` Gradle task. To debug the frontend, start the `runIde` task in Debug mode.
 
 Rider's JVM-based frontend and .NET-based backend communicate using RdProtocol with APIs available on both sides. For backend-frontend communication in plugins, RdProtocol should be used as well. Protocol model is defined in [this file](https://github.com/JetBrains/fsharp-support/blob/master/rider-fsharp/protocol/src/kotlin/model/RdFSharpModel.kt).
 
-## Known issues
-
-As soon as you build the backend for the first time, Rider will show false red code warnings across the backend's F# projects. This is due to a bug in Rider waiting to be fixed ([RIDER-11392](https://youtrack.jetbrains.com/issue/RIDER-11392)). As a workaround, you can unload all projects in `ReSharper.FSharp.sln`, and then reload them.
+Running backend tests is not yet possible on macOS and Linux.
 
 ## Roadmap
 
 * Set up a public Continuous Integration server for test runs.
-* Enable development on macOS and Linux.
