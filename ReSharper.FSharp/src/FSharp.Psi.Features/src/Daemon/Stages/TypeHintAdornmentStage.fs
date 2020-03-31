@@ -96,7 +96,10 @@ type TypeHintHighlightingProcess(fsFile, settings: IContextBoundSettingsStore, d
     let [<Literal>] opName = "TypeHintHighlightingProcess"
 
     override x.Execute(committer) =
-        if not (settings.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowPipeReturnTypes)) then () else
+        if not (settings.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowPipeReturnTypes)) then
+            // Clear all highlightings from this stage
+            committer.Invoke(DaemonStageResult [])
+        else
 
         match fsFile.GetParseAndCheckResults(true, opName) with
         | None -> ()
