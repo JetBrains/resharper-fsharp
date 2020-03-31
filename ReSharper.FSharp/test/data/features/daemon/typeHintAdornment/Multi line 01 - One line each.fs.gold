@@ -2,6 +2,7 @@
 |> List.groupBy (fun i -> i / 2)||(0)
 |> List.map (fun (group, xs) -> xs.Length)||(1)
 |> List.toSeq||(2)
+
 ---------------------------------------------------------
 (0): ReSharper Parameter Name Hint: : (int * int list) list
 (1): ReSharper Parameter Name Hint: : int list

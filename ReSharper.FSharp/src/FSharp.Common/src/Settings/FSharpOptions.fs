@@ -57,6 +57,27 @@ type FSharpScriptOptionsProvider(lifetime: Lifetime, settings: IContextBoundSett
     member val CustomDefines = settings.GetValueProperty(lifetime, fun s -> s.CustomDefines)
 
 
+
+module FSharpTypeHintOptions =
+    let [<Literal>] pipeReturnTypes = "Show return type hints in |> chains"
+
+
+[<SettingsKey(typeof<FSharpOptions>, "FSharpTypeHintOptions")>]
+type FSharpTypeHintOptions =
+    { [<SettingsEntry(true, FSharpTypeHintOptions.pipeReturnTypes); DefaultValue>]
+      mutable ShowPipeReturnTypes: bool }
+
+
+[<SolutionInstanceComponent>]
+type FSharpTypeHintOptionsProvider(lifetime: Lifetime, settings: IContextBoundSettingsStoreLive) =
+    new (lifetime: Lifetime, solution: ISolution, settingsStore: ISettingsStore) =
+        let settings = settingsStore.BindToContextLive(lifetime, ContextRange.Smart(solution.ToDataContext()))
+        FSharpTypeHintOptionsProvider(lifetime, settings)
+
+    member val ShowPipeReturnTypes = settings.GetValueProperty(lifetime, fun s -> s.ShowPipeReturnTypes)
+
+
+
 [<OptionsPage("FSharpOptionsPage", "F#", typeof<ProjectModelThemedIcons.Fsharp>)>]
 type FSharpOptionsPage
         (lifetime: Lifetime, optionsPageContext, settings) as this =
@@ -69,6 +90,9 @@ type FSharpOptionsPage
 
         this.AddHeader("Script editing")
         this.AddComboEnum((fun key -> key.LanguageVersion), FSharpScriptOptions.languageVersion, FSharpLanguageVersion.toString)
+
+        this.AddHeader("Type hints")
+        this.AddBoolOption((fun key -> key.ShowPipeReturnTypes), RichText(FSharpTypeHintOptions.pipeReturnTypes), null)
         
         this.AddHeader("FSharp.Compiler.Service options")
         this.AddBoolOption((fun key -> key.BackgroundTypeCheck), RichText(backgroundTypeCheck), null)

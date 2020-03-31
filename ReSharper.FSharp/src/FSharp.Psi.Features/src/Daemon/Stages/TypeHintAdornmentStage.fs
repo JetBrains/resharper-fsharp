@@ -1,6 +1,7 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
 open System
+open JetBrains.Application.Settings
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Daemon.Stages
@@ -8,6 +9,8 @@ open JetBrains.ReSharper.Feature.Services.Daemon.Attributes
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages.Tooltips
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
@@ -16,7 +19,6 @@ open JetBrains.TextControl.DocumentMarkup
 open JetBrains.UI.RichText
 open FSharp.Compiler.SourceCodeServices
 open FSharp.Compiler.Layout
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
 [<DaemonIntraTextAdornmentProvider(typeof<TypeHintAdornmentProvider>)>]
 [<StaticSeverityHighlighting(Severity.INFO,
@@ -88,12 +90,14 @@ type TypeHighlightingVisitor(fsFile: IFSharpFile, checkResults: FSharpCheckFileR
 
         x.VisitNode(binaryAppExpr, consumer)
 
-type TypeHintHighlightingProcess(fsFile, settings, daemonProcess) =
+type TypeHintHighlightingProcess(fsFile, settings: IContextBoundSettingsStore, daemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
     let [<Literal>] opName = "TypeHintHighlightingProcess"
 
     override x.Execute(committer) =
+        if not (settings.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowPipeReturnTypes)) then () else
+
         match fsFile.GetParseAndCheckResults(true, opName) with
         | None -> ()
         | Some results ->

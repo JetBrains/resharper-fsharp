@@ -2,11 +2,13 @@
 
 open JetBrains.ReSharper.FeaturesTestFramework.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
+open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
 [<HighlightOnly(typeof<TypeHintHighlighting>)>]
 [<TestPackages("FSharp.Core")>]
+[<TestSetting(typeof<FSharpTypeHintOptions>, "ShowPipeReturnTypes", "true")>]
 type TypeHintAdornmentStageTest() =
     inherit FSharpHighlightingTestBase()
 
@@ -23,3 +25,6 @@ type TypeHintAdornmentStageTest() =
 
     [<Test>] member x.``Skipped 01 - Other binary op``() = x.DoNamedTest()
     [<Test>] member x.``Skipped 02 - Shadowed pipe op``() = x.DoNamedTest()
+
+    [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowPipeReturnTypes", "false")>]
+    [<Test>] member x.``Skipped 03 - Setting disabled``() = x.DoNamedTest()
