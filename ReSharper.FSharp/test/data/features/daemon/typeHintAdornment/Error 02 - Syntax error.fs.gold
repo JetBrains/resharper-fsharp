@@ -1,7 +1,7 @@
-﻿[ 1; 2; 3; 4; 5; 6 ]
-|> List.groupBy (fun i -> i / )||(0)
-|> List.toSeq||(1)
+﻿[ 1; 2; 3; 4; 5; 6 ]||(0)
+|> List.groupBy (fun i -> i / )||(1)
+|> List.toSeq
 
 ---------------------------------------------------------
-(0): ReSharper Parameter Name Hint: : (obj * int list) list
-(1): ReSharper Parameter Name Hint: : seq<obj * int list>
+(0): ReSharper Parameter Name Hint: : int list
+(1): ReSharper Parameter Name Hint: : (obj * int list) list

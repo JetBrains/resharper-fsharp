@@ -11,6 +11,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages.Tooltips
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Settings
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
@@ -56,8 +57,61 @@ and [<SolutionComponent>] TypeHintAdornmentProvider() =
                 }
             | _ -> null
 
-type TypeHighlightingVisitor(fsFile: IFSharpFile, checkResults: FSharpCheckFileResults) =
+[<RequireQualifiedAccess>]
+[<Struct>]
+type SameLinePipeHints =
+    | Show
+    | Hide
+
+type TypeHighlightingVisitor(fsFile: IFSharpFile, checkResults: FSharpCheckFileResults, sameLinePipeHints: SameLinePipeHints) =
     inherit TreeNodeVisitor<IHighlightingConsumer>()
+
+    let document = fsFile.GetSourceFile().Document
+
+    let showSameLineHints =
+        match sameLinePipeHints with
+        | SameLinePipeHints.Show -> true
+        | SameLinePipeHints.Hide -> false
+
+    /// Formats a type parameter layout.
+    /// Removes the "'T1 is " prefix from the layout string.
+    let formatTypeParamLayout (layout : Layout) =
+        let typeParamStr = showL layout
+        let prefixToRemove = "'T1 is "
+        if typeParamStr.StartsWith prefixToRemove then
+            typeParamStr.Substring prefixToRemove.Length
+        else
+            null
+
+    let visitBinaryAppExpr binaryAppExpr (consumer: IHighlightingConsumer) =
+        if not (FSharpExpressionUtil.isPredefinedInfixOpApp "|>" binaryAppExpr) then () else
+
+        let opExpr = binaryAppExpr.Operator
+        let exprToAdorn = binaryAppExpr.LeftArgument
+
+        let argCoords = document.GetCoordsByOffset(exprToAdorn.GetTreeEndOffset().Offset)
+        let opCoords = document.GetCoordsByOffset(opExpr.GetTreeStartOffset().Offset)
+
+        if not showSameLineHints && argCoords.Line = opCoords.Line then () else
+
+        match opExpr.Identifier.As<FSharpIdentifierToken>() with
+        | null -> ()
+        | token ->
+
+        let (FSharpToolTipText layouts) = FSharpIdentifierTooltipProvider.GetFSharpToolTipText(checkResults, token)
+
+        // The |> operator should have one overload and two type parameters
+        match layouts with
+        | [ FSharpStructuredToolTipElement.Group [ { TypeMapping = [ argumentType; _ ] } ] ] ->
+            let returnTypeStr = formatTypeParamLayout argumentType
+            if returnTypeStr = null then () else
+
+            // Use EndOffsetRange to ensure the adornment appears at the end of multi-line expressions
+            let range = exprToAdorn.GetNavigationRange().EndOffsetRange()
+
+            TypeHintHighlighting(RichText(": " + returnTypeStr), range)
+            |> consumer.AddHighlighting
+        | _ -> ()
 
     override x.VisitNode(node, context) =
         for child in node.Children() do
@@ -66,28 +120,7 @@ type TypeHighlightingVisitor(fsFile: IFSharpFile, checkResults: FSharpCheckFileR
             | _ -> ()
 
     override x.VisitBinaryAppExpr(binaryAppExpr, consumer) =
-        if not (FSharpExpressionUtil.isPredefinedInfixOpApp "|>" binaryAppExpr) then () else
-
-        let opExpr = binaryAppExpr.Operator
-        match opExpr.Identifier.As<FSharpIdentifierToken>() with
-        | null -> ()
-        | token ->
-            let (FSharpToolTipText layouts) = FSharpIdentifierTooltipProvider.GetFSharpToolTipText(checkResults, token)
-
-            // The |> operator should have one overload and two type parameters
-            match layouts with
-            | [ FSharpStructuredToolTipElement.Group [ { TypeMapping = [ _; returnTypeParam ] } ] ] ->
-                // TODO: do something way less hacky here
-                // Trim off the: "'U is " prefix
-                let text = ": " + (showL returnTypeParam).Substring(6)
-
-                // Use EndOffsetRange to ensure the adornment appears at the end of multi-line expressions
-                let range = binaryAppExpr.RightArgument.GetNavigationRange().EndOffsetRange()
-
-                TypeHintHighlighting(RichText text, range)
-                |> consumer.AddHighlighting
-            | _ -> ()
-
+        visitBinaryAppExpr binaryAppExpr consumer
         x.VisitNode(binaryAppExpr, consumer)
 
 type TypeHintHighlightingProcess(fsFile, settings: IContextBoundSettingsStore, daemonProcess) =
@@ -96,6 +129,12 @@ type TypeHintHighlightingProcess(fsFile, settings: IContextBoundSettingsStore, d
     let [<Literal>] opName = "TypeHintHighlightingProcess"
 
     override x.Execute(committer) =
+        let sameLinePipeHints =
+            if settings.GetValue(fun (key: FSharpTypeHintOptions) -> key.HideSameLine) then
+                SameLinePipeHints.Hide
+            else
+                SameLinePipeHints.Show
+
         if not (settings.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowPipeReturnTypes)) then
             // Clear all highlightings from this stage
             committer.Invoke(DaemonStageResult [])
@@ -106,7 +145,7 @@ type TypeHintHighlightingProcess(fsFile, settings: IContextBoundSettingsStore, d
         | Some results ->
 
         let consumer = FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settings)
-        fsFile.Accept(TypeHighlightingVisitor(fsFile, results.CheckResults), consumer)
+        fsFile.Accept(TypeHighlightingVisitor(fsFile, results.CheckResults, sameLinePipeHints), consumer)
         committer.Invoke(DaemonStageResult(consumer.Highlightings))
 
 [<DaemonStage(StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |])>]

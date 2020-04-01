@@ -61,11 +61,16 @@ type FSharpScriptOptionsProvider(lifetime: Lifetime, settings: IContextBoundSett
 module FSharpTypeHintOptions =
     let [<Literal>] pipeReturnTypes = "Show return type hints in |> chains"
 
+    let [<Literal>] hideSameLinePipe = "Hide when |> is on same line as argument"
+
 
 [<SettingsKey(typeof<FSharpOptions>, "FSharpTypeHintOptions")>]
 type FSharpTypeHintOptions =
     { [<SettingsEntry(true, FSharpTypeHintOptions.pipeReturnTypes); DefaultValue>]
-      mutable ShowPipeReturnTypes: bool }
+      mutable ShowPipeReturnTypes: bool
+
+      [<SettingsEntry(true, FSharpTypeHintOptions.hideSameLinePipe); DefaultValue>]
+      mutable HideSameLine: bool }
 
 
 [<SolutionInstanceComponent>]
@@ -75,6 +80,7 @@ type FSharpTypeHintOptionsProvider(lifetime: Lifetime, settings: IContextBoundSe
         FSharpTypeHintOptionsProvider(lifetime, settings)
 
     member val ShowPipeReturnTypes = settings.GetValueProperty(lifetime, fun s -> s.ShowPipeReturnTypes)
+    member val HideSameLine = settings.GetValueProperty(lifetime, fun s -> s.HideSameLine)
 
 
 
@@ -83,17 +89,19 @@ type FSharpOptionsPage
         (lifetime: Lifetime, optionsPageContext, settings) as this =
     inherit FSharpOptionsPageBase(lifetime, optionsPageContext, settings)
 
-    do ignoreAll {
+    do
         this.AddHeader("Imports")
-        this.AddBoolOption((fun key -> key.EnableOutOfScopeCompletion), RichText(outOfScopeCompletion), null)
-        this.AddBoolOption((fun key -> key.TopLevelOpenCompletion), RichText(topLevelOpenCompletion), null)
+        this.AddBoolOption((fun key -> key.EnableOutOfScopeCompletion), RichText(outOfScopeCompletion), null) |> ignore
+        this.AddBoolOption((fun key -> key.TopLevelOpenCompletion), RichText(topLevelOpenCompletion), null) |> ignore
 
         this.AddHeader("Script editing")
-        this.AddComboEnum((fun key -> key.LanguageVersion), FSharpScriptOptions.languageVersion, FSharpLanguageVersion.toString)
+        this.AddComboEnum((fun key -> key.LanguageVersion), FSharpScriptOptions.languageVersion, FSharpLanguageVersion.toString) |> ignore
 
         this.AddHeader("Type hints")
-        this.AddBoolOption((fun key -> key.ShowPipeReturnTypes), RichText(FSharpTypeHintOptions.pipeReturnTypes), null)
+        this.AddBoolOption((fun key -> key.ShowPipeReturnTypes), RichText(FSharpTypeHintOptions.pipeReturnTypes), null) |> ignore
+        do
+            use _x = this.Indent()
+            this.AddBoolOption((fun key -> key.HideSameLine), RichText(FSharpTypeHintOptions.hideSameLinePipe), null) |> ignore
         
         this.AddHeader("FSharp.Compiler.Service options")
-        this.AddBoolOption((fun key -> key.BackgroundTypeCheck), RichText(backgroundTypeCheck), null)
-    }
+        this.AddBoolOption((fun key -> key.BackgroundTypeCheck), RichText(backgroundTypeCheck), null) |> ignore
