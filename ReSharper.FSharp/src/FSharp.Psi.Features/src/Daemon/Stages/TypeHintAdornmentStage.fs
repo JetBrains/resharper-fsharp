@@ -1,7 +1,9 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
 open System
+open System.Diagnostics
 open JetBrains.Application.Settings
+open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Daemon.Stages
@@ -11,7 +13,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages.Tooltips
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Settings
-open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
@@ -20,6 +21,7 @@ open JetBrains.TextControl.DocumentMarkup
 open JetBrains.UI.RichText
 open FSharp.Compiler.SourceCodeServices
 open FSharp.Compiler.Layout
+open JetBrains.Util.Logging
 
 [<DaemonIntraTextAdornmentProvider(typeof<TypeHintAdornmentProvider>)>]
 [<StaticSeverityHighlighting(Severity.INFO,
@@ -64,7 +66,7 @@ type SameLinePipeHints =
     | Hide
 
 type TypeHighlightingVisitor(fsFile: IFSharpFile, checkResults: FSharpCheckFileResults, sameLinePipeHints: SameLinePipeHints) =
-    inherit TreeNodeVisitor<IHighlightingConsumer>()
+    inherit TreeNodeVisitor<ResizeArray<FSharpIdentifierToken * ITreeNode>>()
 
     let document = fsFile.GetSourceFile().Document
 
@@ -73,17 +75,7 @@ type TypeHighlightingVisitor(fsFile: IFSharpFile, checkResults: FSharpCheckFileR
         | SameLinePipeHints.Show -> true
         | SameLinePipeHints.Hide -> false
 
-    /// Formats a type parameter layout.
-    /// Removes the "'T1 is " prefix from the layout string.
-    let formatTypeParamLayout (layout : Layout) =
-        let typeParamStr = showL layout
-        let prefixToRemove = "'T1 is "
-        if typeParamStr.StartsWith prefixToRemove then
-            typeParamStr.Substring prefixToRemove.Length
-        else
-            null
-
-    let visitBinaryAppExpr binaryAppExpr (consumer: IHighlightingConsumer) =
+    let visitBinaryAppExpr binaryAppExpr (consumer: ResizeArray<FSharpIdentifierToken * ITreeNode>) =
         if not (FSharpExpressionUtil.isPredefinedInfixOpApp "|>" binaryAppExpr) then () else
 
         let opExpr = binaryAppExpr.Operator
@@ -96,22 +88,7 @@ type TypeHighlightingVisitor(fsFile: IFSharpFile, checkResults: FSharpCheckFileR
 
         match opExpr.Identifier.As<FSharpIdentifierToken>() with
         | null -> ()
-        | token ->
-
-        let (FSharpToolTipText layouts) = FSharpIdentifierTooltipProvider.GetFSharpToolTipText(checkResults, token)
-
-        // The |> operator should have one overload and two type parameters
-        match layouts with
-        | [ FSharpStructuredToolTipElement.Group [ { TypeMapping = [ argumentType; _ ] } ] ] ->
-            let returnTypeStr = formatTypeParamLayout argumentType
-            if returnTypeStr = null then () else
-
-            // Use EndOffsetRange to ensure the adornment appears at the end of multi-line expressions
-            let range = exprToAdorn.GetNavigationRange().EndOffsetRange()
-
-            TypeHintHighlighting(RichText(": " + returnTypeStr), range)
-            |> consumer.AddHighlighting
-        | _ -> ()
+        | token -> consumer.Add (token, exprToAdorn :> _)
 
     override x.VisitNode(node, context) =
         for child in node.Children() do
@@ -128,29 +105,85 @@ type TypeHintHighlightingProcess(fsFile, settings: IContextBoundSettingsStore, d
 
     let [<Literal>] opName = "TypeHintHighlightingProcess"
 
-    override x.Execute(committer) =
+    /// Formats a type parameter layout.
+    /// Removes the "'T1 is " prefix from the layout string.
+    let formatTypeParamLayout (layout : Layout) =
+        let typeParamStr = showL layout
+        let prefixToRemove = "'T1 is "
+        if typeParamStr.StartsWith prefixToRemove then
+            typeParamStr.Substring prefixToRemove.Length
+        else
+            null
+
+    let adornExprs logKey checkResults (exprs : (FSharpIdentifierToken * ITreeNode)[]) =
+        use _swc = logger.StopwatchCookie(sprintf "Adorning %s expressions" logKey, sprintf "exprCount=%d sourceFile=%s" exprs.Length daemonProcess.SourceFile.Name)
+        let highlightingConsumer = FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settings)
+
+        for token, exprToAdorn in exprs do
+            if daemonProcess.InterruptFlag then raise <| OperationCanceledException()
+
+            let (FSharpToolTipText layouts) = FSharpIdentifierTooltipProvider.GetFSharpToolTipText(checkResults, token)
+
+            // The |> operator should have one overload and two type parameters
+            match layouts with
+            | [ FSharpStructuredToolTipElement.Group [ { TypeMapping = [ argumentType; _ ] } ] ] ->
+                let returnTypeStr = formatTypeParamLayout argumentType
+                if returnTypeStr = null then () else
+
+                // Use EndOffsetRange to ensure the adornment appears at the end of multi-line expressions
+                let range = exprToAdorn.GetNavigationRange().EndOffsetRange()
+
+                TypeHintHighlighting(RichText(": " + returnTypeStr), range)
+                |> highlightingConsumer.AddHighlighting
+            | _ -> ()
+
+        highlightingConsumer.Highlightings
+
+    override x.ExecuteStage(committer) =
         let sameLinePipeHints =
             if settings.GetValue(fun (key: FSharpTypeHintOptions) -> key.HideSameLine) then
                 SameLinePipeHints.Hide
             else
                 SameLinePipeHints.Show
 
-        if not (settings.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowPipeReturnTypes)) then
-            // Clear all highlightings from this stage
-            committer.Invoke(DaemonStageResult [])
-        else
-
         match fsFile.GetParseAndCheckResults(true, opName) with
         | None -> ()
         | Some results ->
 
-        let consumer = FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settings)
+        let consumer = ResizeArray<_>()
         fsFile.Accept(TypeHighlightingVisitor(fsFile, results.CheckResults, sameLinePipeHints), consumer)
-        committer.Invoke(DaemonStageResult(consumer.Highlightings))
+        let allHighlightings = Array.ofSeq consumer
+
+        // Visible range may be larger than document range by 1 char
+        // Intersect them to ensure commit doesn't throw
+        let documentRange = daemonProcess.Document.GetDocumentRange()
+        let visibleRange = daemonProcess.VisibleRange.Intersect &documentRange
+
+        let remainingHighlightings =
+            if visibleRange.IsValid() then
+                // Partition the expressions to adorn by whether they're visible in the viewport or not
+                let visible, notVisible =
+                    allHighlightings
+                    |> Array.partition (fun (token, exprToAdorn) ->
+                        exprToAdorn.GetNavigationRange().IntersectsOrContacts &visibleRange
+                    )
+
+                // Adorn visible expressions first
+                let visibleHighlightings = adornExprs "visible" results.CheckResults visible
+                committer.Invoke(DaemonStageResult(visibleHighlightings, visibleRange))
+
+                // Finally adorn expressions that aren't visible in the viewport
+                adornExprs "not visible" results.CheckResults notVisible
+            else
+                adornExprs "all" results.CheckResults allHighlightings
+
+        committer.Invoke(DaemonStageResult remainingHighlightings)
 
 [<DaemonStage(StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |])>]
 type TypeHintAdornmentStage() =
     inherit FSharpDaemonStageBase()
+type TypeHintAdornmentStage(logger: ILogger) =
+    inherit FSharpDaemonStageBase(logger)
 
     override x.IsSupported(sourceFile, processKind) =
         processKind = DaemonProcessKind.VISIBLE_DOCUMENT
@@ -158,4 +191,5 @@ type TypeHintAdornmentStage() =
         && not (sourceFile.LanguageType.Is<FSharpSignatureProjectFileType>())
 
     override x.CreateStageProcess(fsFile, settings, daemonProcess) =
-        TypeHintHighlightingProcess(fsFile, settings, daemonProcess) :> _
+        if not (settings.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowPipeReturnTypes)) then null else
+        TypeHintHighlightingProcess(logger, fsFile, settings, daemonProcess) :> _
