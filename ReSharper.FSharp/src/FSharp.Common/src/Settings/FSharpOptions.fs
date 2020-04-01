@@ -1,12 +1,16 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Settings
 
+open System
 open System.Reflection
+open JetBrains.Application
 open JetBrains.Application.Settings
 open JetBrains.Application.UI.Options
+open JetBrains.Application.UI.Options.OptionsDialog.SimpleOptions
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.DataContext
 open JetBrains.ProjectModel.Resources
+open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.UI.RichText
 
@@ -73,17 +77,6 @@ type FSharpTypeHintOptions =
       mutable HideSameLine: bool }
 
 
-[<SolutionInstanceComponent>]
-type FSharpTypeHintOptionsProvider(lifetime: Lifetime, settings: IContextBoundSettingsStoreLive) =
-    new (lifetime: Lifetime, solution: ISolution, settingsStore: ISettingsStore) =
-        let settings = settingsStore.BindToContextLive(lifetime, ContextRange.Smart(solution.ToDataContext()))
-        FSharpTypeHintOptionsProvider(lifetime, settings)
-
-    member val ShowPipeReturnTypes = settings.GetValueProperty(lifetime, fun s -> s.ShowPipeReturnTypes)
-    member val HideSameLine = settings.GetValueProperty(lifetime, fun s -> s.HideSameLine)
-
-
-
 [<OptionsPage("FSharpOptionsPage", "F#", typeof<ProjectModelThemedIcons.Fsharp>)>]
 type FSharpOptionsPage
         (lifetime: Lifetime, optionsPageContext, settings) as this =
@@ -98,10 +91,30 @@ type FSharpOptionsPage
         this.AddComboEnum((fun key -> key.LanguageVersion), FSharpScriptOptions.languageVersion, FSharpLanguageVersion.toString) |> ignore
 
         this.AddHeader("Type hints")
-        this.AddBoolOption((fun key -> key.ShowPipeReturnTypes), RichText(FSharpTypeHintOptions.pipeReturnTypes), null) |> ignore
+        let showPipeReturnTypes = this.AddBoolOption((fun key -> key.ShowPipeReturnTypes), RichText(FSharpTypeHintOptions.pipeReturnTypes), null)
         do
             use _x = this.Indent()
-            this.AddBoolOption((fun key -> key.HideSameLine), RichText(FSharpTypeHintOptions.hideSameLinePipe), null) |> ignore
+            [
+                this.AddBoolOption((fun key -> key.HideSameLine), RichText(FSharpTypeHintOptions.hideSameLinePipe), null)
+            ]
+            |> Seq.iter (fun checkbox ->
+                this.AddBinding(checkbox, BindingStyle.IsEnabledProperty, (fun key -> key.ShowPipeReturnTypes), id)
+            )
         
         this.AddHeader("FSharp.Compiler.Service options")
         this.AddBoolOption((fun key -> key.BackgroundTypeCheck), RichText(backgroundTypeCheck), null) |> ignore
+
+
+[<ShellComponent>]
+type FSharpTypeHintOptionsStore(lifetime: Lifetime, settingsStore: ISettingsStore, highlightingSettingsManager: HighlightingSettingsManager) =
+    do
+        let settingsKey = settingsStore.Schema.GetKey<FSharpTypeHintOptions>()
+
+        settingsStore.Changed.Advise(lifetime, fun args ->
+            let typeHintOptionChanged =
+                args.ChangedEntries
+                |> Seq.exists (fun changedEntry -> changedEntry.Parent = settingsKey)
+
+            if typeHintOptionChanged then
+                highlightingSettingsManager.SettingsChanged.Fire(Nullable<_>(false))
+        )
