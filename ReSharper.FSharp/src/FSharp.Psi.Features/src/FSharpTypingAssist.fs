@@ -2,7 +2,7 @@ module rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.TypingAssist
 
 open System
 open System.Collections.Generic
-open FSharp.Compiler.Ast
+open FSharp.Compiler.SyntaxTree
 open FSharp.Compiler.PrettyNaming
 open FSharp.Compiler.SourceCodeServices.AstTraversal
 open JetBrains.Application.CommandProcessing

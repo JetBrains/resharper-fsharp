@@ -1,7 +1,7 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
 open System.Collections.Generic
-open FSharp.Compiler.Ast
+open FSharp.Compiler.SyntaxTree
 open FSharp.Compiler.PrettyNaming
 open FSharp.Compiler.Range
 open JetBrains.Diagnostics
@@ -302,7 +302,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
 
             | SynPat.Named _ ->
                 // In some cases patterns for static members inside records are represented this way.
-                x.ProcessMemberDeclaration(None, SynConstructorArgs.Pats [], returnInfo, expr, range)
+                x.ProcessMemberDeclaration(None, SynArgPats.Pats [], returnInfo, expr, range)
                 ElementType.MEMBER_DECLARATION
 
             | _ -> ElementType.OTHER_TYPE_MEMBER
@@ -495,7 +495,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         for pat in pats do
             x.ProcessPat(pat, isLocal, false)
 
-    member x.ProcessPatternParams(args: SynConstructorArgs, isLocal, markMember) =
+    member x.ProcessPatternParams(args: SynArgPats, isLocal, markMember) =
         match args with
         | Pats pats ->
             for pat in pats do
@@ -508,7 +508,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                 x.ProcessParam(pat, isLocal, markMember)
                 x.Done(range, mark, ElementType.FIELD_PAT)
 
-    member x.ProcessMemberParams(args: SynConstructorArgs, isLocal, markMember) =
+    member x.ProcessMemberParams(args: SynArgPats, isLocal, markMember) =
         match args with
         | Pats pats ->
             for pat in pats do
@@ -1299,7 +1299,7 @@ type BindingListProcessor() =
 
 
 type AndLocalBindingListProcessor() =
-    inherit StepListProcessorBase<SequencePointInfoForBinding * bool * bool * SynPat * SynExpr * range>()
+    inherit StepListProcessorBase<DebugPointForBinding * bool * bool * SynPat * SynExpr * range>()
 
     override x.Process(binding, builder) =
         builder.ProcessAndLocalBinding(binding)
