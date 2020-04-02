@@ -49,7 +49,7 @@ type PipeOperatorVisitor(fsFile: IFSharpFile, checkResults: FSharpCheckFileResul
 
         match opExpr.Identifier.As<FSharpIdentifierToken>() with
         | null -> ()
-        | token -> consumer.Add (token, exprToAdorn :> _)
+        | token -> consumer.Add(token, exprToAdorn :> _)
 
     override x.VisitNode(node, context) =
         for child in node.Children() do
@@ -71,8 +71,8 @@ type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBou
     let formatTypeParamLayout (layout : Layout) =
         let typeParamStr = showL layout
         let prefixToRemove = "'T1 is "
-        if typeParamStr.StartsWith prefixToRemove then
-            typeParamStr.Substring prefixToRemove.Length
+        if typeParamStr.StartsWith(prefixToRemove) then
+            typeParamStr.Substring(prefixToRemove.Length)
         else
             null
 
@@ -117,7 +117,7 @@ type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBou
         // Visible range may be larger than document range by 1 char
         // Intersect them to ensure commit doesn't throw
         let documentRange = daemonProcess.Document.GetDocumentRange()
-        let visibleRange = daemonProcess.VisibleRange.Intersect &documentRange
+        let visibleRange = daemonProcess.VisibleRange.Intersect(&documentRange)
 
         let remainingHighlightings =
             if visibleRange.IsValid() then
@@ -125,7 +125,7 @@ type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBou
                 let visible, notVisible =
                     allHighlightings
                     |> Array.partition (fun (token, exprToAdorn) ->
-                        exprToAdorn.GetNavigationRange().IntersectsOrContacts &visibleRange
+                        exprToAdorn.GetNavigationRange().IntersectsOrContacts(&visibleRange)
                     )
 
                 // Adorn visible expressions first

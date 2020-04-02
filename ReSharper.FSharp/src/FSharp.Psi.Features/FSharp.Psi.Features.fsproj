@@ -7,7 +7,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="src\CodeStyle\FSharpCodeStylePage.fs" />
-    <Compile Include="src\Daemon\Highlightings\TypeHintHighlighting.fs" />
     <Compile Include="src\Util\IFSharpElementFactory.fs" />
     <Compile Include="src\Util\StringLiteralsUtil.fs" />
     <Compile Include="src\Util\PsiUtil.fs" />
@@ -21,6 +20,7 @@
     <Compile Include="src\CodeCompletion\FSharpLookupItem.fs" />
     <Compile Include="src\CodeCompletion\FSharpCompletionProviders.fs" />
     <Compile Include="src\CodeStructure\FSharpCodeStructure.fs" />
+    <Compile Include="src\Daemon\Highlightings\TypeHintHighlighting.fs" />
     <Compile Include="src\Daemon\Highlightings\FSharpErrorUtil.fs" />
     <Compile Include="src\Daemon\Highlightings\ErrorHighlightings.fs" />
     <Compile Include="Src\Daemon\Highlightings\CommonErrors.Generated.fs">
