@@ -1,7 +1,7 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 
 open JetBrains.ReSharper.FeaturesTestFramework.Daemon
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
@@ -10,10 +10,10 @@ open NUnit.Framework
 [<TestPackages("FSharp.Core")>]
 [<TestSettingsKey(typeof<FSharpTypeHintOptions>)>]
 [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowPipeReturnTypes", "true")>]
-type TypeHintAdornmentStageTest() =
+type PipeChainTypeHintStageTest() =
     inherit FSharpHighlightingTestBase()
 
-    override x.RelativeTestDataPath = "features/daemon/typeHintAdornment"
+    override x.RelativeTestDataPath = "features/daemon/pipeChainTypeHints"
 
     [<TestSettings("{HideSameLine:All}")>]
     [<Test>] member x.``Single line 01 - Simple``() = x.DoNamedTest()
