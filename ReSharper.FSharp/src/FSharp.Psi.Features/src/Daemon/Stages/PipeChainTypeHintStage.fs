@@ -5,9 +5,9 @@ open JetBrains.Application.Settings
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Daemon.Stages
-open JetBrains.ReSharper.Feature.Services.Daemon.Attributes
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages.Tooltips
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -17,47 +17,9 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.TextControl.DocumentMarkup
-open JetBrains.UI.RichText
 open FSharp.Compiler.SourceCodeServices
 open FSharp.Compiler.Layout
 open JetBrains.Util.Logging
-
-[<DaemonIntraTextAdornmentProvider(typeof<TypeHintAdornmentProvider>)>]
-[<StaticSeverityHighlighting(Severity.INFO,
-     HighlightingGroupIds.IntraTextAdornmentsGroup,
-     AttributeId = AnalysisHighlightingAttributeIds.PARAMETER_NAME_HINT,
-     OverlapResolve = OverlapResolveKind.NONE,
-     ShowToolTipInStatusBar = false)>]
-type TypeHintHighlighting(text: RichText, range: DocumentRange) =
-    interface IHighlighting with
-        member x.ToolTip = null
-        member x.ErrorStripeToolTip = null
-        member x.IsValid() = not text.IsEmpty && not range.IsEmpty
-        member x.CalculateRange() = range
-
-    interface IHighlightingWithTestOutput with
-        member x.TestOutput = text.Text
-
-    member x.Text = text
-
-and [<SolutionComponent>] TypeHintAdornmentProvider() =
-    interface IHighlighterIntraTextAdornmentProvider with
-        member x.CreateDataModel(highlighter) =
-            match highlighter.UserData with
-            | :? TypeHintHighlighting as thh ->
-                { new IIntraTextAdornmentDataModel with
-                    override x.Text = thh.Text
-                    override x.HasContextMenu = false
-                    override x.ContextMenuTitle = null
-                    override x.ContextMenuItems = null
-                    override x.IsNavigable = false
-                    override x.ExecuteNavigation _ = ()
-                    override x.SelectionRange = Nullable<_>()
-                    override x.IconId = null
-                    override x.IsPreceding = false
-                }
-            | _ -> null
 
 [<RequireQualifiedAccess>]
 [<Struct>]
@@ -65,7 +27,7 @@ type SameLinePipeHints =
     | Show
     | Hide
 
-type TypeHighlightingVisitor(fsFile: IFSharpFile, checkResults: FSharpCheckFileResults, sameLinePipeHints: SameLinePipeHints) =
+type PipeOperatorVisitor(fsFile: IFSharpFile, checkResults: FSharpCheckFileResults, sameLinePipeHints: SameLinePipeHints) =
     inherit TreeNodeVisitor<ResizeArray<FSharpIdentifierToken * ITreeNode>>()
 
     let document = fsFile.GetSourceFile().Document
@@ -100,10 +62,10 @@ type TypeHighlightingVisitor(fsFile: IFSharpFile, checkResults: FSharpCheckFileR
         visitBinaryAppExpr binaryAppExpr consumer
         x.VisitNode(binaryAppExpr, consumer)
 
-type PipeReturnTypeHintHighlightingProcess(logger: ILogger, fsFile, settings: IContextBoundSettingsStore, daemonProcess: IDaemonProcess) =
+type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBoundSettingsStore, daemonProcess: IDaemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
-    let [<Literal>] opName = "PipeReturnTypeHintHighlightingProcess"
+    let [<Literal>] opName = "PipeChainHighlightingProcess"
 
     /// Formats a type parameter layout.
     /// Removes the "'T1 is " prefix from the layout string.
@@ -133,8 +95,7 @@ type PipeReturnTypeHintHighlightingProcess(logger: ILogger, fsFile, settings: IC
                 // Use EndOffsetRange to ensure the adornment appears at the end of multi-line expressions
                 let range = exprToAdorn.GetNavigationRange().EndOffsetRange()
 
-                TypeHintHighlighting(RichText(": " + returnTypeStr), range)
-                |> highlightingConsumer.AddHighlighting
+                highlightingConsumer.AddHighlighting(TypeHintHighlighting(returnTypeStr, range))
             | _ -> ()
 
         highlightingConsumer.Highlightings
@@ -151,7 +112,7 @@ type PipeReturnTypeHintHighlightingProcess(logger: ILogger, fsFile, settings: IC
         | Some results ->
 
         let consumer = ResizeArray<_>()
-        fsFile.Accept(TypeHighlightingVisitor(fsFile, results.CheckResults, sameLinePipeHints), consumer)
+        fsFile.Accept(PipeOperatorVisitor(fsFile, results.CheckResults, sameLinePipeHints), consumer)
         let allHighlightings = Array.ofSeq consumer
 
         // Visible range may be larger than document range by 1 char
@@ -216,7 +177,7 @@ type InferredTypeHintHighlightingProcess(logger: ILogger, fsFile, settings: ICon
         | _ -> ()
 
 [<DaemonStage(StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |])>]
-type TypeHintAdornmentStage(logger: ILogger) =
+type PipeChainTypeHintStage(logger: ILogger) =
     inherit FSharpDaemonStageBase()
 
     override x.IsSupported(sourceFile, processKind) =
@@ -225,10 +186,5 @@ type TypeHintAdornmentStage(logger: ILogger) =
         && not (sourceFile.LanguageType.Is<FSharpSignatureProjectFileType>())
 
     override x.CreateStageProcess(fsFile, settings, daemonProcess) =
-        [|
-            if settings.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowLocalIdentTypes) then
-                InferredTypeHintHighlightingProcess(logger, fsFile, settings, daemonProcess) :> IDaemonStageProcess
-
-            if settings.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowPipeReturnTypes) then
-                PipeReturnTypeHintHighlightingProcess(logger, fsFile, settings, daemonProcess) :> IDaemonStageProcess
-        |] :> _
+        if not (settings.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowPipeReturnTypes)) then null else
+        PipeChainHighlightingProcess(logger, fsFile, settings, daemonProcess) :> _

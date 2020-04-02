@@ -7,6 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="src\CodeStyle\FSharpCodeStylePage.fs" />
+    <Compile Include="src\Daemon\Highlightings\TypeHintHighlighting.fs" />
     <Compile Include="src\Util\IFSharpElementFactory.fs" />
     <Compile Include="src\Util\StringLiteralsUtil.fs" />
     <Compile Include="src\Util\PsiUtil.fs" />
@@ -43,7 +44,7 @@
     <Compile Include="src\Daemon\Stages\FSharpInheritedMembersHighlighterStage.fs" />
     <Compile Include="src\Daemon\Stages\FSharpVcsCodeVisionRangesProviderStage.fs" />
     <Compile Include="src\Daemon\Stages\FSharpErrorsStage.fs" />
-    <Compile Include="src\Daemon\Stages\TypeHintAdornmentStage.fs" />
+    <Compile Include="src\Daemon\Stages\PipeChainTypeHintStage.fs" />
     <Compile Include="src\Daemon\Stages\InferredTypeCodeVisionProvider.fs" />
     <Compile Include="src\Daemon\Stages\FSharpSyntaxHighlightingStage.fs" />
     <Compile Include="src\Daemon\UsageChecking\FSharpUsageCheckingService.fs" />
