@@ -40,7 +40,7 @@ type InferredTypeHintHighlightingProcess(logger: ILogger, fsFile, settings: ICon
         match symbolUse.Symbol with
         | :? FSharpMemberOrFunctionOrValue as mfv ->
             let typeNameStr =
-                symbolUse.DisplayContext.WithShortTypeNames true
+                symbolUse.DisplayContext.WithShortTypeNames(true)
                 |> mfv.FullType.Format
 
             let range = localRefPat.GetNavigationRange().EndOffsetRange()
