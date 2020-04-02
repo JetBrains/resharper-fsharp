@@ -3,7 +3,7 @@
 let x = { MyOption = Some 15. }
 match x with
 | { MyOption = None } -> ()
-| { MyOption = Some x||(0) } as myRecord -> ()
+| { MyOption = Some x||(0) } -> ()
 
 ---------------------------------------------------------
 (0): ReSharper Parameter Name Hint: : float

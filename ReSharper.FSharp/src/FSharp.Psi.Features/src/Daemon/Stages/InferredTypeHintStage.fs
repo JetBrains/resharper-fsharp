@@ -54,9 +54,9 @@ type InferredTypeHintStage(logger: ILogger) =
     inherit FSharpDaemonStageBase()
 
     override x.IsSupported(sourceFile, processKind) =
-        processKind = DaemonProcessKind.VISIBLE_DOCUMENT
-        && base.IsSupported(sourceFile, processKind)
-        && not (sourceFile.LanguageType.Is<FSharpSignatureProjectFileType>())
+        processKind = DaemonProcessKind.VISIBLE_DOCUMENT &&
+        base.IsSupported(sourceFile, processKind) &&
+        not (sourceFile.LanguageType.Is<FSharpSignatureProjectFileType>())
 
     override x.CreateStageProcess(fsFile, settings, daemonProcess) =
         if not (settings.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowInferredTypes)) then null else
