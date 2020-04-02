@@ -1,9 +1,7 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
 open System
-open System.Diagnostics
 open JetBrains.Application.Settings
-open JetBrains.Diagnostics
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Daemon.Stages
@@ -11,8 +9,10 @@ open JetBrains.ReSharper.Feature.Services.Daemon.Attributes
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages.Tooltips
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Settings
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
@@ -100,10 +100,10 @@ type TypeHighlightingVisitor(fsFile: IFSharpFile, checkResults: FSharpCheckFileR
         visitBinaryAppExpr binaryAppExpr consumer
         x.VisitNode(binaryAppExpr, consumer)
 
-type TypeHintHighlightingProcess(logger: ILogger, fsFile, settings: IContextBoundSettingsStore, daemonProcess: IDaemonProcess) =
+type PipeReturnTypeHintHighlightingProcess(logger: ILogger, fsFile, settings: IContextBoundSettingsStore, daemonProcess: IDaemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
-    let [<Literal>] opName = "TypeHintHighlightingProcess"
+    let [<Literal>] opName = "PipeReturnTypeHintHighlightingProcess"
 
     /// Formats a type parameter layout.
     /// Removes the "'T1 is " prefix from the layout string.
@@ -179,6 +179,42 @@ type TypeHintHighlightingProcess(logger: ILogger, fsFile, settings: IContextBoun
 
         committer.Invoke(DaemonStageResult remainingHighlightings)
 
+type InferredTypeHintHighlightingProcess(logger: ILogger, fsFile, settings: IContextBoundSettingsStore, daemonProcess: IDaemonProcess) =
+    inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
+
+    override x.Execute(committer) =
+        let consumer = new FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settings)
+        fsFile.ProcessThisAndDescendants(Processor(x, consumer))
+        committer.Invoke(DaemonStageResult(consumer.Highlightings))
+
+    override x.VisitLocalReferencePat(localRefPat, consumer) =
+        match localRefPat.IgnoreParentParens().Parent with
+        | :? ITypedPat -> ()
+        | :? ILocalBinding as localBinding when localBinding.ReturnTypeInfo <> null -> ()
+        | _ ->
+
+        match localRefPat.Identifier.As<FSharpIdentifierToken>() with
+        | null -> ()
+        | token ->
+
+        match box (localRefPat.GetFSharpSymbolUse()) with
+        | null -> ()
+        | symbolUse ->
+
+        let symbolUse = symbolUse :?> FSharpSymbolUse
+        match symbolUse.Symbol with
+        | :? FSharpMemberOrFunctionOrValue as mfv ->
+            let typeNameStr =
+                symbolUse.DisplayContext.WithShortTypeNames true
+                |> mfv.FullType.Format
+
+            let text = RichText(": " + typeNameStr)
+            let range = localRefPat.GetNavigationRange().EndOffsetRange()
+
+            // todo: TypeNameHintHighlighting can be used when RIDER-39605 is resolved
+            consumer.AddHighlighting(TypeHintHighlighting(text, range))
+        | _ -> ()
+
 [<DaemonStage(StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |])>]
 type TypeHintAdornmentStage(logger: ILogger) =
     inherit FSharpDaemonStageBase()
@@ -189,5 +225,10 @@ type TypeHintAdornmentStage(logger: ILogger) =
         && not (sourceFile.LanguageType.Is<FSharpSignatureProjectFileType>())
 
     override x.CreateStageProcess(fsFile, settings, daemonProcess) =
-        if not (settings.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowPipeReturnTypes)) then null else
-        TypeHintHighlightingProcess(logger, fsFile, settings, daemonProcess) :> _
+        [|
+            if settings.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowLocalIdentTypes) then
+                InferredTypeHintHighlightingProcess(logger, fsFile, settings, daemonProcess) :> IDaemonStageProcess
+
+            if settings.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowPipeReturnTypes) then
+                PipeReturnTypeHintHighlightingProcess(logger, fsFile, settings, daemonProcess) :> IDaemonStageProcess
+        |] :> _
