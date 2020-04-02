@@ -1,0 +1,5 @@
+﻿let subtract x||(0) (y : int) =
+    x - y
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : int

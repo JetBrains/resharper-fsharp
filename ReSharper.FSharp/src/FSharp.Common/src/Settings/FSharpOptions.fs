@@ -61,11 +61,12 @@ type FSharpScriptOptionsProvider(lifetime: Lifetime, settings: IContextBoundSett
     member val CustomDefines = settings.GetValueProperty(lifetime, fun s -> s.CustomDefines)
 
 
-
 module FSharpTypeHintOptions =
     let [<Literal>] pipeReturnTypes = "Show return type hints in |> chains"
 
     let [<Literal>] hideSameLinePipe = "Hide when |> is on same line as argument"
+
+    let [<Literal>] inferredTypes = "Show inferred types on identifiers"
 
 
 [<SettingsKey(typeof<FSharpOptions>, "FSharpTypeHintOptions")>]
@@ -74,7 +75,10 @@ type FSharpTypeHintOptions =
       mutable ShowPipeReturnTypes: bool
 
       [<SettingsEntry(true, FSharpTypeHintOptions.hideSameLinePipe); DefaultValue>]
-      mutable HideSameLine: bool }
+      mutable HideSameLine: bool
+
+      [<SettingsEntry(true, FSharpTypeHintOptions.inferredTypes); DefaultValue>]
+      mutable ShowInferredTypes: bool }
 
 
 [<OptionsPage("FSharpOptionsPage", "F#", typeof<ProjectModelThemedIcons.Fsharp>)>]
@@ -100,6 +104,8 @@ type FSharpOptionsPage
             |> Seq.iter (fun checkbox ->
                 this.AddBinding(checkbox, BindingStyle.IsEnabledProperty, (fun key -> key.ShowPipeReturnTypes), id)
             )
+
+        this.AddBoolOption((fun key -> key.ShowInferredTypes), RichText(FSharpTypeHintOptions.inferredTypes), null) |> ignore
         
         this.AddHeader("FSharp.Compiler.Service options")
         this.AddBoolOption((fun key -> key.BackgroundTypeCheck), RichText(backgroundTypeCheck), null) |> ignore

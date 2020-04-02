@@ -30,6 +30,7 @@
     <Compile Include="Daemon\FormatSpecifiersHighlightingTest.fs" />
     <Compile Include="Daemon\InferredTypeCodeVisionProviderTest.fs" />
     <Compile Include="Daemon\PipeChainTypeHintStageTest.fs" />
+    <Compile Include="Daemon\InferredTypeHintStageTest.fs" />
     <Compile Include="Daemon\InheritanceGutterMarksTest.fs" />
     <Compile Include="Daemon\SyntaxHighlightingTest.fs" />
     <Compile Include="Daemon\RedundantParensTest.fs" />

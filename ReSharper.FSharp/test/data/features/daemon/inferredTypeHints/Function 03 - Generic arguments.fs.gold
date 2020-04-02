@@ -1,0 +1,6 @@
+﻿let add x||(0) y||(1) =
+    15 + y
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : 'a
+(1): ReSharper Parameter Name Hint: : int

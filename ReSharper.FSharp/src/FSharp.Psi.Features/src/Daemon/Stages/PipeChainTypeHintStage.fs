@@ -9,10 +9,8 @@ open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages.Tooltips
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Settings
-open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
@@ -139,42 +137,6 @@ type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBou
                 adornExprs "all" results.CheckResults allHighlightings
 
         committer.Invoke(DaemonStageResult remainingHighlightings)
-
-type InferredTypeHintHighlightingProcess(logger: ILogger, fsFile, settings: IContextBoundSettingsStore, daemonProcess: IDaemonProcess) =
-    inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
-
-    override x.Execute(committer) =
-        let consumer = new FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settings)
-        fsFile.ProcessThisAndDescendants(Processor(x, consumer))
-        committer.Invoke(DaemonStageResult(consumer.Highlightings))
-
-    override x.VisitLocalReferencePat(localRefPat, consumer) =
-        match localRefPat.IgnoreParentParens().Parent with
-        | :? ITypedPat -> ()
-        | :? ILocalBinding as localBinding when localBinding.ReturnTypeInfo <> null -> ()
-        | _ ->
-
-        match localRefPat.Identifier.As<FSharpIdentifierToken>() with
-        | null -> ()
-        | token ->
-
-        match box (localRefPat.GetFSharpSymbolUse()) with
-        | null -> ()
-        | symbolUse ->
-
-        let symbolUse = symbolUse :?> FSharpSymbolUse
-        match symbolUse.Symbol with
-        | :? FSharpMemberOrFunctionOrValue as mfv ->
-            let typeNameStr =
-                symbolUse.DisplayContext.WithShortTypeNames true
-                |> mfv.FullType.Format
-
-            let text = RichText(": " + typeNameStr)
-            let range = localRefPat.GetNavigationRange().EndOffsetRange()
-
-            // todo: TypeNameHintHighlighting can be used when RIDER-39605 is resolved
-            consumer.AddHighlighting(TypeHintHighlighting(text, range))
-        | _ -> ()
 
 [<DaemonStage(StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |])>]
 type PipeChainTypeHintStage(logger: ILogger) =
