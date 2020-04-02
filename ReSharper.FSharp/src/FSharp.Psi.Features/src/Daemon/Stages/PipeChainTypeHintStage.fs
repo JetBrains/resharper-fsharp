@@ -1,6 +1,7 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
 open System
+open System.Collections.Generic
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
 open JetBrains.ProjectModel
@@ -26,7 +27,7 @@ type SameLinePipeHints =
     | Hide
 
 type PipeOperatorVisitor(fsFile: IFSharpFile, checkResults: FSharpCheckFileResults, sameLinePipeHints: SameLinePipeHints) =
-    inherit TreeNodeVisitor<ResizeArray<FSharpIdentifierToken * ITreeNode>>()
+    inherit TreeNodeVisitor<List<FSharpIdentifierToken * ITreeNode>>()
 
     let document = fsFile.GetSourceFile().Document
 
@@ -35,7 +36,7 @@ type PipeOperatorVisitor(fsFile: IFSharpFile, checkResults: FSharpCheckFileResul
         | SameLinePipeHints.Show -> true
         | SameLinePipeHints.Hide -> false
 
-    let visitBinaryAppExpr binaryAppExpr (consumer: ResizeArray<FSharpIdentifierToken * ITreeNode>) =
+    let visitBinaryAppExpr binaryAppExpr (consumer: List<FSharpIdentifierToken * ITreeNode>) =
         if not (FSharpExpressionUtil.isPredefinedInfixOpApp "|>" binaryAppExpr) then () else
 
         let opExpr = binaryAppExpr.Operator
@@ -109,7 +110,7 @@ type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBou
         | None -> ()
         | Some results ->
 
-        let consumer = ResizeArray<_>()
+        let consumer = List()
         fsFile.Accept(PipeOperatorVisitor(fsFile, results.CheckResults, sameLinePipeHints), consumer)
         let allHighlightings = Array.ofSeq consumer
 
@@ -143,9 +144,9 @@ type PipeChainTypeHintStage(logger: ILogger) =
     inherit FSharpDaemonStageBase()
 
     override x.IsSupported(sourceFile, processKind) =
-        processKind = DaemonProcessKind.VISIBLE_DOCUMENT
-        && base.IsSupported(sourceFile, processKind)
-        && not (sourceFile.LanguageType.Is<FSharpSignatureProjectFileType>())
+        processKind = DaemonProcessKind.VISIBLE_DOCUMENT &&
+        base.IsSupported(sourceFile, processKind) &&
+        not (sourceFile.LanguageType.Is<FSharpSignatureProjectFileType>())
 
     override x.CreateStageProcess(fsFile, settings, daemonProcess) =
         if not (settings.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowPipeReturnTypes)) then null else
