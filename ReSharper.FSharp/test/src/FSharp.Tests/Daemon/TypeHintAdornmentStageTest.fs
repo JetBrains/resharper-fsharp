@@ -8,26 +8,24 @@ open NUnit.Framework
 
 [<HighlightOnly(typeof<TypeHintHighlighting>)>]
 [<TestPackages("FSharp.Core")>]
+[<TestSettingsKey(typeof<FSharpTypeHintOptions>)>]
 [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowPipeReturnTypes", "true")>]
 type TypeHintAdornmentStageTest() =
     inherit FSharpHighlightingTestBase()
 
     override x.RelativeTestDataPath = "features/daemon/typeHintAdornment"
 
-    [<TestSetting(typeof<FSharpTypeHintOptions>, "HideSameLine", "false")>]
-    [<Test>] member x.``Single line 01 - Simple - Enabled``() = x.DoNamedTest()
-    [<Test>] member x.``Single line 01 - Simple - Disabled``() = x.DoNamedTest()
+    [<TestSettings("{HideSameLine:All}")>]
+    [<Test>] member x.``Single line 01 - Simple``() = x.DoNamedTest()
 
-    [<TestSetting(typeof<FSharpTypeHintOptions>, "HideSameLine", "false")>]
-    [<Test>] member x.``Single line 02 - Multiple - Enabled``() = x.DoNamedTest()
-    [<Test>] member x.``Single line 02 - Multiple - Disabled``() = x.DoNamedTest()
+    [<TestSettings("{HideSameLine:All}")>]
+    [<Test>] member x.``Single line 02 - Multiple``() = x.DoNamedTest()
 
     [<Test>] member x.``Multi line 01 - One line each``() = x.DoNamedTest()
     [<Test>] member x.``Multi line 02 - Multi line application``() = x.DoNamedTest()
 
-    [<TestSetting(typeof<FSharpTypeHintOptions>, "HideSameLine", "false")>]
-    [<Test>] member x.``Multi line 03 - Same line enabled``() = x.DoNamedTest()
-    [<Test>] member x.``Multi line 03 - Same line disabled``() = x.DoNamedTest()
+    [<TestSettings("{HideSameLine:All}")>]
+    [<Test>] member x.``Multi line 03 - Same line``() = x.DoNamedTest()
 
     [<Test>] member x.``Error 01 - Invalid reference``() = x.DoNamedTest()
     [<Test>] member x.``Error 02 - Syntax error``() = x.DoNamedTest()

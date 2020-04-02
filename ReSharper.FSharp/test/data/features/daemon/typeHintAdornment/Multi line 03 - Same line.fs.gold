@@ -1,4 +1,26 @@
-﻿[ 1; 2; 3; 4; 5; 6 ]||(0)
+﻿HideSameLine = True
+[ 1; 2; 3; 4; 5; 6 ]||(0)
+|> List.map (fun xs ->
+    xs + 5
+)||(1)
+|> List.groupBy (fun x -> x / 2)||(2)
+|> List.toSeq |> Seq.distinct||(3)
+|> Set.ofSeq |>
+Set.toSeq||(4)
+|> Set.ofSeq||(5)
+|> ignore
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : int list
+(1): ReSharper Parameter Name Hint: : int list
+(2): ReSharper Parameter Name Hint: : (int * int list) list
+(3): ReSharper Parameter Name Hint: : seq<int * int list>
+(4): ReSharper Parameter Name Hint: : seq<int * int list>
+(5): ReSharper Parameter Name Hint: : Set<int * int list>
+
+================
+HideSameLine = False
+[ 1; 2; 3; 4; 5; 6 ]||(0)
 |> List.map (fun xs ->
     xs + 5
 )||(1)
