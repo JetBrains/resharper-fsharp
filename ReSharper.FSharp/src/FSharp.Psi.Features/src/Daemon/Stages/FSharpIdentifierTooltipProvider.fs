@@ -1,6 +1,7 @@
 module JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages.Tooltips
 
 open System
+open System.Collections.Generic
 open FSharp.Compiler.Layout
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.DocumentModel
@@ -65,7 +66,7 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
         | None -> String.Empty
         | Some results ->
 
-        let result = ResizeArray()
+        let result = List()
         let (FSharpToolTipText layouts) = FSharpIdentifierTooltipProvider.GetFSharpToolTipText(results.CheckResults, token)
         
         layouts |> List.iter (function
