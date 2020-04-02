@@ -100,7 +100,7 @@ type TypeHighlightingVisitor(fsFile: IFSharpFile, checkResults: FSharpCheckFileR
         visitBinaryAppExpr binaryAppExpr consumer
         x.VisitNode(binaryAppExpr, consumer)
 
-type TypeHintHighlightingProcess(fsFile, settings: IContextBoundSettingsStore, daemonProcess) =
+type TypeHintHighlightingProcess(logger: ILogger, fsFile, settings: IContextBoundSettingsStore, daemonProcess: IDaemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
     let [<Literal>] opName = "TypeHintHighlightingProcess"
@@ -139,7 +139,7 @@ type TypeHintHighlightingProcess(fsFile, settings: IContextBoundSettingsStore, d
 
         highlightingConsumer.Highlightings
 
-    override x.ExecuteStage(committer) =
+    override x.Execute(committer) =
         let sameLinePipeHints =
             if settings.GetValue(fun (key: FSharpTypeHintOptions) -> key.HideSameLine) then
                 SameLinePipeHints.Hide
@@ -180,10 +180,8 @@ type TypeHintHighlightingProcess(fsFile, settings: IContextBoundSettingsStore, d
         committer.Invoke(DaemonStageResult remainingHighlightings)
 
 [<DaemonStage(StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |])>]
-type TypeHintAdornmentStage() =
-    inherit FSharpDaemonStageBase()
 type TypeHintAdornmentStage(logger: ILogger) =
-    inherit FSharpDaemonStageBase(logger)
+    inherit FSharpDaemonStageBase()
 
     override x.IsSupported(sourceFile, processKind) =
         processKind = DaemonProcessKind.VISIBLE_DOCUMENT
