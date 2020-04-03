@@ -37,7 +37,6 @@ type ReplaceWithAssignmentExpressionFix(warning: UnitTypeExpectedWarning) =
                 if memberOrFunctionOrValue.FullType.IsFunctionType then false else
                 match declaredElement.GetDeclarations().[0] with
                 | :? IReferencePat as pat -> isNotNull pat.Binding
-                | :? IAsPat -> true
                 | _ -> false
 
             | _ -> false
