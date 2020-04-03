@@ -7,12 +7,14 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
 type RemoveRedundantAttributeSuffixFix(warning: RedundantAttributeSuffixWarning) =
-    inherit FSharpQuickFixBase()
+    inherit FSharpScopedQuickFixBase()
 
     let attribute = warning.Attribute
 
     override x.Text = "Remove redundant attribute suffix"
     override x.IsAvailable _ = isValid attribute && isNotNull attribute.ReferenceName
+
+    override x.TryGetContextTreeNode() = attribute :> _
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(attribute.IsPhysical())
