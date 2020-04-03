@@ -23,18 +23,19 @@ type ReplaceWithAssignmentExpressionFix(warning: UnitTypeExpectedWarning) =
         match expr.LeftArgument with
         | :? IReferenceExpr as ref ->
             let declaredElement = ref.Reference.Resolve().DeclaredElement
-            if declaredElement :? ICompiledElement then false else
 
             match ref.Reference.GetFSharpSymbol() with
             | :? FSharpField as field ->
                 field.IsMutable ||
+                not (declaredElement :? ICompiledElement) &&
                 match field.DeclaringEntity with
                 | Some (entity) -> entity.IsFSharpRecord
                 | None -> false
 
             | :? FSharpMemberOrFunctionOrValue as memberOrFunctionOrValue ->
-                if memberOrFunctionOrValue.IsMember then memberOrFunctionOrValue.IsMutable else
-                if memberOrFunctionOrValue.FullType.IsFunctionType then false else
+                if memberOrFunctionOrValue.IsMember then
+                    memberOrFunctionOrValue.IsMutable || memberOrFunctionOrValue.HasSetterMethod
+                elif memberOrFunctionOrValue.FullType.IsFunctionType then false else
                 match declaredElement.GetDeclarations().[0] with
                 | :? IReferencePat as pat -> isNotNull pat.Binding
                 | _ -> false

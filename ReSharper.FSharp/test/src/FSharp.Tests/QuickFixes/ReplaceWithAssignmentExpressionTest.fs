@@ -11,5 +11,8 @@ type ReplaceWithAssignmentExpressionTestTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/replaceWithAssignmentExpression"
 
-    [<Test>] member x.``ReferenceExpr - Variable``() = x.DoNamedTest()
+    [<Test>] member x.``ReferenceExpr 1 - Variable``() = x.DoNamedTest()
+    [<Test>] member x.``ReferenceExpr 2 - Record field``() = x.DoNamedTest()
+    [<Test>] member x.``ReferenceExpr 3 - Mutable field``() = x.DoNamedTest()
+    [<Test>] member x.``ReferenceExpr 4 - Mutable member``() = x.DoNamedTest()
     [<Test>] member x.``IndexerExpr``() = x.DoNamedTest()
