@@ -14,11 +14,12 @@ type ReplaceWithAssignmentExpressionFix(warning: UnitTypeExpectedWarning) =
     inherit FSharpQuickFixBase()
    
     let expr = warning.Expr.As<IBinaryAppExpr>()
+
     override x.IsAvailable _ =
         if not (isValid expr) ||
             // Now we can’t find out if the operator is '=', so we define it bypassing the grammar rules
             // TODO: rewrite after https://youtrack.jetbrains.com/issue/RIDER-41848 fix
-            not (getTokenType expr.Operator.FirstChild == FSharpTokenType.EQUALS) then false else
+            getTokenType expr.Operator.FirstChild != FSharpTokenType.EQUALS then false else
 
         match expr.LeftArgument with
         | :? IReferenceExpr as ref ->
@@ -35,10 +36,10 @@ type ReplaceWithAssignmentExpressionFix(warning: UnitTypeExpectedWarning) =
             | :? FSharpMemberOrFunctionOrValue as memberOrFunctionOrValue ->
                 if memberOrFunctionOrValue.IsMember then
                     memberOrFunctionOrValue.IsMutable || memberOrFunctionOrValue.HasSetterMethod
-                elif memberOrFunctionOrValue.FullType.IsFunctionType then false else
-                match declaredElement.GetDeclarations().[0] with
-                | :? IReferencePat as pat -> isNotNull pat.Binding
-                | _ -> false
+                else
+                    match declaredElement.GetDeclarations().[0] with
+                    | :? IReferencePat as pat -> isNotNull pat.Binding
+                    | _ -> false
 
             | _ -> false
 
