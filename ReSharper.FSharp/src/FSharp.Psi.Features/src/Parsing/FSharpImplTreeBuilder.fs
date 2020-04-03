@@ -1,6 +1,7 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
 open System.Collections.Generic
+open FSharp.Compiler
 open FSharp.Compiler.SyntaxTree
 open FSharp.Compiler.PrettyNaming
 open FSharp.Compiler.Range
@@ -372,7 +373,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             match pat with
             | SynPat.Named(pat, id, _, _, _) ->
                 match pat with
-                | SynPat.Wild _ ->
+                | SynPat.Wild(range) when Range.equals id.idRange range ->
                     let mark = x.Mark(id.idRange)
                     if IsActivePatternName id.idText then x.ProcessActivePatternId(id, isLocal)
                     x.Done(id.idRange, mark, ElementType.EXPRESSION_REFERENCE_NAME)
