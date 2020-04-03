@@ -37,8 +37,8 @@ type ReplaceWithAssignmentExpressionFix(warning: UnitTypeExpectedWarning) =
                 if memberOrFunctionOrValue.IsMember then
                     memberOrFunctionOrValue.IsMutable || memberOrFunctionOrValue.HasSetterMethod
                 else
-                    match declaredElement.GetDeclarations().[0] with
-                    | :? IReferencePat as pat -> isNotNull pat.Binding
+                    match declaredElement.GetDeclarations() |> Seq.tryHead with
+                    | Some decl when (decl :? IReferencePat) -> isNotNull (decl :?> IReferencePat).Binding
                     | _ -> false
 
             | _ -> false
