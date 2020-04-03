@@ -24,7 +24,7 @@ type ReplaceWithAssignmentExpressionFix(warning: UnitTypeExpectedWarning) =
         | :? IReferenceExpr as ref ->
             let declaredElement = ref.Reference.Resolve().DeclaredElement
             if declaredElement :? ICompiledElement then false else
-            
+
             match ref.Reference.GetFSharpSymbol() with
             | :? FSharpField as field ->
                 field.IsMutable ||
@@ -43,7 +43,7 @@ type ReplaceWithAssignmentExpressionFix(warning: UnitTypeExpectedWarning) =
 
         | :? IIndexerExpr -> true
         | _ -> false
-        
+
     override x.Text = "Replace with '<-' assignment"
     
     override x.ExecutePsiTransaction _ =
