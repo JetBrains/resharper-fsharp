@@ -72,6 +72,8 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``MatchClause expr indent 01``() = x.DoNamedTest()
     [<Test>] member x.``MatchClause expr indent 02 - TryWith``() = x.DoNamedTest()
     [<Test>] member x.``MatchClause expr indent 03 - TryWith - Clause on the same line``() = x.DoNamedTest()
+    [<Test>] member x.``MatchClause expr indent 04 - Unindented last clause``() = x.DoNamedTest()
+    [<Test>] member x.``MatchClause expr indent 05 - Wrong indent in last clause``() = x.DoNamedTest()
 
     [<Test>] member x.``Lambda expr indent 01 - Without offset``() = x.DoNamedTest()
     [<Test>] member x.``Lambda expr indent 02 - With offset``() = x.DoNamedTest()

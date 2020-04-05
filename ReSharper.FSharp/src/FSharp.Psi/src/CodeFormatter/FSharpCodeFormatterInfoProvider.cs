@@ -39,7 +39,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         ("TryWith_TryExpr", ElementType.TRY_WITH_EXPR, TryWithExpr.TRY_EXPR),
         ("IfThenExpr", ElementType.IF_THEN_ELSE_EXPR, IfThenElseExpr.THEN_EXPR),
         ("ElifThenExpr", ElementType.ELIF_EXPR, ElifExpr.THEN_EXPR),
-        ("MatchClauseExpr", ElementType.MATCH_CLAUSE, MatchClause.EXPR),
         ("LambdaExprBody", ElementType.LAMBDA_EXPR, LambdaExpr.EXPR),
       };
 
@@ -85,6 +84,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
               .Satisfies(IndentElseExpr))
           .Return(IndentType.External)
           .Build();
+
+        Describe<IndentingRule>()
+          .Name("MatchClauseExprIndent")
+          .Where(
+            Node().HasRole(MatchClause.EXPR),
+            Parent()
+              .HasType(ElementType.MATCH_CLAUSE)
+              .Satisfies((node, context) =>
+              {
+                if (!(node is IMatchClause matchClause))
+                  return false;
+
+                var expr = matchClause.Expression;
+                return !IsLastNodeOfItsType(node, context) ||
+                       !AreAligned(matchClause, expr, context.CodeFormatter);
+              }))
+          .Return(IndentType.External)
+          .Build();
       }
     }
 
@@ -103,5 +120,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
     private static bool IndentElseExpr(ITreeNode elseExpr, CodeFormattingContext context) =>
       elseExpr.GetPreviousMeaningfulSibling().IsFirstOnLine(context.CodeFormatter) && !(elseExpr is IElifExpr);
+
+    private static bool AreAligned(ITreeNode first, ITreeNode second, IWhitespaceChecker whitespaceChecker) =>
+      first.CalcLineIndent(whitespaceChecker) == second.CalcLineIndent(whitespaceChecker);
   }
 }
