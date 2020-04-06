@@ -499,6 +499,7 @@ type FSharpTypingAssist
     do
         let isActionHandlerAvailable = Predicate<_>(this.IsActionHandlerAvailable2)
         let isTypingHandlerAvailable = Predicate<_>(this.IsTypingHandlerAvailable2)
+        let isSmartParensHandlerAvailable = Predicate<_>(this.IsTypingSmartParenthesisHandlerAvailable2)
 
         manager.AddActionHandler(lifetime, TextControlActions.ActionIds.Enter, this, Func<_,_>(handleEnter), isActionHandlerAvailable)
         manager.AddActionHandler(lifetime, TextControlActions.ActionIds.Backspace, this, Func<_,_>(this.HandleBackspacePressed), isActionHandlerAvailable)
@@ -507,18 +508,18 @@ type FSharpTypingAssist
         manager.AddTypingHandler(lifetime, ' ', this, Func<_,_>(handleSpace), isTypingHandlerAvailable)
 
         manager.AddTypingHandler(lifetime, '\'', this, Func<_,_>(this.HandleSingleQuoteTyped), isTypingHandlerAvailable)
-        manager.AddTypingHandler(lifetime, '"', this, Func<_,_>(this.HandleQuoteTyped), isTypingHandlerAvailable)
-        manager.AddTypingHandler(lifetime, '`', this, Func<_,_>(this.HandleBacktickTyped), isTypingHandlerAvailable)
+        manager.AddTypingHandler(lifetime, '"', this, Func<_,_>(this.HandleQuoteTyped), isSmartParensHandlerAvailable)
+        manager.AddTypingHandler(lifetime, '`', this, Func<_,_>(this.HandleBacktickTyped), isSmartParensHandlerAvailable)
 
-        manager.AddTypingHandler(lifetime, '(', this, Func<_,_>(this.HandleLeftBracket), isTypingHandlerAvailable)
-        manager.AddTypingHandler(lifetime, '[', this, Func<_,_>(this.HandleLeftBracket), isTypingHandlerAvailable)
-        manager.AddTypingHandler(lifetime, '{', this, Func<_,_>(this.HandleLeftBracket), isTypingHandlerAvailable)
-        manager.AddTypingHandler(lifetime, ')', this, Func<_,_>(this.HandleRightBracket), isTypingHandlerAvailable)
-        manager.AddTypingHandler(lifetime, ']', this, Func<_,_>(this.HandleRightBracket), isTypingHandlerAvailable)
-        manager.AddTypingHandler(lifetime, '}', this, Func<_,_>(this.HandleRightBracket), isTypingHandlerAvailable)
-        manager.AddTypingHandler(lifetime, '>', this, Func<_,_>(this.HandleRightBracket), isTypingHandlerAvailable)
+        manager.AddTypingHandler(lifetime, '(', this, Func<_,_>(this.HandleLeftBracket), isSmartParensHandlerAvailable)
+        manager.AddTypingHandler(lifetime, '[', this, Func<_,_>(this.HandleLeftBracket), isSmartParensHandlerAvailable)
+        manager.AddTypingHandler(lifetime, '{', this, Func<_,_>(this.HandleLeftBracket), isSmartParensHandlerAvailable)
+        manager.AddTypingHandler(lifetime, ')', this, Func<_,_>(this.HandleRightBracket), isSmartParensHandlerAvailable)
+        manager.AddTypingHandler(lifetime, ']', this, Func<_,_>(this.HandleRightBracket), isSmartParensHandlerAvailable)
+        manager.AddTypingHandler(lifetime, '}', this, Func<_,_>(this.HandleRightBracket), isSmartParensHandlerAvailable)
+        manager.AddTypingHandler(lifetime, '>', this, Func<_,_>(this.HandleRightBracket), isSmartParensHandlerAvailable)
 
-        manager.AddTypingHandler(lifetime, '<', this, Func<_,_>(this.HandleRightAngleBracketTyped), isTypingHandlerAvailable)
+        manager.AddTypingHandler(lifetime, '<', this, Func<_,_>(this.HandleRightAngleBracketTyped), isSmartParensHandlerAvailable)
         manager.AddTypingHandler(lifetime, '@', this, Func<_,_>(this.HandleAtTyped), isTypingHandlerAvailable)
         manager.AddTypingHandler(lifetime, '|', this, Func<_,_>(this.HandleBarTyped), isTypingHandlerAvailable)
 
@@ -1404,6 +1405,7 @@ type FSharpTypingAssist
 
     member x.IsActionHandlerAvailable2(context) = base.IsActionHandlerAvailable(context)
     member x.IsTypingHandlerAvailable2(context) = base.IsTypingHandlerAvailable(context)
+    member x.IsTypingSmartParenthesisHandlerAvailable2(context) = base.IsTypingSmartParenthesisHandlerAvailable(context)
 
     member x.GetFSharpTree(textControl: ITextControl) =
         match x.CommitPsiOnlyAndProceedWithDirtyCaches(textControl, id).AsFSharpFile() with
