@@ -79,6 +79,8 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
             let range = TreeRange(parent)
             {| ReplaceRange = range; InRange = range; AddNewLine = true |}
 
+    static member val TaggedByQuickFixKey = Key("")
+
     override x.Process(data) =
         let expr = data.SourceExpression.As<ISynExpr>()
         let parentExpr = data.Usages.FindLCA().As<ISynExpr>()
@@ -86,6 +88,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let names = getNames expr
         let name = if names.Count > 0 then names.[0] else "x"
 
+        expr.UserData.RemoveKey(FSharpIntroduceVariable.TaggedByQuickFixKey)
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
@@ -129,7 +132,9 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
         IntroduceVariableResult(hotspotsRegistry, expr.Bindings.[0].HeadPattern.As<ITreeNode>().CreateTreeElementPointer())
 
-    static member IntroduceVar(expr: ISynExpr, textControl: ITextControl) =
+    static member IntroduceVar(expr: ISynExpr, textControl: ITextControl, ?isFromQuickFix) =
+        let isFromQuickFix = defaultArg isFromQuickFix false
+
         let name = "IntroduceVarFix"
         let document = textControl.Document
         let solution = expr.GetSolution()
@@ -145,6 +150,9 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
         let actionManager = Shell.Instance.GetComponent<IActionManager>()
         let dataContext = actionManager.DataContexts.CreateWithDataRules(lifetime.Lifetime, rules)
+
+        if isFromQuickFix then
+            expr.UserData.PutKey(FSharpIntroduceVariable.TaggedByQuickFixKey)
 
         let workflow = IntroduceVariableWorkflow(solution, null)
         RefactoringActionUtil.ExecuteRefactoring(dataContext, workflow)
@@ -162,11 +170,20 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 type FSharpIntroduceVarHelper() =
     inherit IntroduceVariableHelper()
 
+    let isTaggedNodeByQuickFix (expr: ITreeNode) =
+        expr.UserData.HasKey(FSharpIntroduceVariable.TaggedByQuickFixKey)
+
     override x.IsLanguageSupported = true
 
     override x.CheckAvailability(node) =
+        if node.UserData.HasKey(FSharpIntroduceVariable.TaggedByQuickFixKey) then true else
+
         if not (node.FSharpExperimentalFeaturesEnabled()) then false else
 
         node.IsSingleLine // todo: change to something meaningful. :)
 
-    override x.CheckOccurrence(expr, occurrence) = true
+    override x.CheckOccurrence(expr, occurrence) =
+        if isTaggedNodeByQuickFix occurrence then true else
+
+        if isTaggedNodeByQuickFix expr then false else
+        expr.FSharpExperimentalFeaturesEnabled()

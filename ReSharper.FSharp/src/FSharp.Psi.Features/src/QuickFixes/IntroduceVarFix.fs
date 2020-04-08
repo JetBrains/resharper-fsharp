@@ -25,4 +25,4 @@ type IntroduceVarFix(expr: ISynExpr) =
 
         use cookie = FSharpRegistryUtil.AllowExperimentalFeaturesCookie.Create()
         textControl.Selection.SetRange(expr.GetDocumentRange().TextRange)
-        FSharpIntroduceVariable.IntroduceVar(expr, textControl)
+        FSharpIntroduceVariable.IntroduceVar(expr, textControl, true)
