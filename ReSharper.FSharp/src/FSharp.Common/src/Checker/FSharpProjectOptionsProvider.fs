@@ -10,8 +10,7 @@ open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Assemblies.Impl
 open JetBrains.ProjectModel.Build
 open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.Modules
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
@@ -19,7 +18,9 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Files
+open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Threading
 open JetBrains.Util
 
