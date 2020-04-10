@@ -107,9 +107,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
 
     private val RdPublicKey = structdef {
         field("IsKey", bool)
-        field("IsKeyToken", bool)
-        field("Key", array(byte))
-        field("KeyToken", array(byte))
+        field("Data", array(byte))
     }
 
     private val RdVersion = structdef {
@@ -121,7 +119,6 @@ object RdFSharpTypeProvidersLoaderModel : Root(
 
     private val RdILAssemblyRef = structdef {
         field("Name", string)
-        field("QualifiedName", string)
         field("Hash", array(byte).nullable)
         field("RdPublicKey", RdPublicKey.nullable)
         field("Retargetable", bool)
@@ -136,11 +133,10 @@ object RdFSharpTypeProvidersLoaderModel : Root(
     }
 
     private val RdILScopeRef = structdef {
-        field("IsModuleRef", bool)
-        field("IsAssemblyRef", bool)
+        field("IsLocal", bool)
+        field("IsPrimaryAssembly", bool)
         field("ModuleRef", RdILModuleRef.nullable)
         field("AssemblyRef", RdILAssemblyRef.nullable)
-        field("QualifiedName", string)
     }
 
     private val RdSystemRuntimeContainsType = structdef {
@@ -153,11 +149,12 @@ object RdFSharpTypeProvidersLoaderModel : Root(
 
     private val InstantiateTypeProvidersOfAssemblyParameters = structdef {
         field("runTimeAssemblyFileName", string)
+        field("IlScopeRefOfRuntimeAssembly", RdILScopeRef)
         field("designTimeAssemblyNameString", string)
         field("RdResolutionEnvironment", RdResolutionEnvironment)
         field("isInvalidationSupported", bool)
         field("isInteractive", bool)
-        field("systemRuntimeAssemblyRdVersion", RdVersion)
+        field("systemRuntimeAssemblyVersion", string)
         field("compilerToolsPath", array(string))
         field("systemRuntimeContainsType", RdSystemRuntimeContainsType)
     }

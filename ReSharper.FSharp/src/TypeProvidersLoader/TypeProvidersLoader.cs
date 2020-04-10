@@ -1,84 +1,33 @@
 ﻿using System;
-using System.Collections.Generic;
-using JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders;
+using System.Linq;
+using FSharp.Compiler;
+using JetBrains.ReSharper.Plugins.FSharp.Util;
 using Microsoft.FSharp.Core;
 using Microsoft.FSharp.Core.CompilerServices;
-using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
-using Type = System.Type;
+using Microsoft.FSharp.Collections;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader
 {
   public class TypeProvidersLoader : ITypeProvidersLoader
   {
-    private readonly Type[] myTpConstructorInfoType = {typeof(TypeProviderConfig)};
-
-    public ITypeProvider[] InstantiateTypeProvidersOfAssembly(
-      InstantiateTypeProvidersOfAssemblyParameters parameters)
+    public ITypeProvider[] InstantiateTypeProvidersOfAssembly(InstantiateTypeProvidersOfAssemblyParameters parameters)
     {
-      //сейчас этот код вызывает FileSystemShim, пока что с дефолтной реализацией 
-      var typeProvidersTypes = TypeProviderInstantiateHelpers.GetTypeProviderImplementationTypes(
-        parameters.RunTimeAssemblyFileName,
-        parameters.DesignTimeAssemblyNameString);
+      var ilScopeRefOfRuntimeAssembly = parameters.IlScopeRefOfRuntimeAssembly.ToILScopeRef();
+      var resolutionEnvironment = parameters.RdResolutionEnvironment.ToResolutionEnvironment();
+      var systemRuntimeContainsType = FSharpFunc<string, bool>.FromConverter(x => true);
+      var systemRuntimeAssemblyVersion = Version.Parse(parameters.SystemRuntimeAssemblyVersion);
+      var compilerToolsPath = ListModule.OfSeq(parameters.CompilerToolsPath);
 
-      var typeProviders = new List<ITypeProvider>(typeProvidersTypes.Length);
+      var typeProviders = ExtensionTyping.Shim.ExtensionTypingProvider.InstantiateTypeProvidersOfAssembly(
+        parameters.DesignTimeAssemblyNameString, ilScopeRefOfRuntimeAssembly, parameters.DesignTimeAssemblyNameString,
+        resolutionEnvironment, parameters.IsInvalidationSupported, parameters.IsInteractive, systemRuntimeContainsType,
+        systemRuntimeAssemblyVersion, compilerToolsPath, Range.range.Zero);
 
-      foreach (var typeProvidersType in typeProvidersTypes)
-      {
-        try
-        {
-          var result = CreateTypeProvider(typeProvidersType, parameters);
-          typeProviders.Add(result);
-        }
-        catch (Exception e)
-        {
-          Console.WriteLine(e);
-          throw;
-        }
-      }
-
-      return typeProviders.ToArray();
-    }
-
-    private ITypeProvider CreateTypeProvider(
-      Type typeProviderImplementationType,
-      InstantiateTypeProvidersOfAssemblyParameters parameters)
-    {
-      //allocation 
-      if (typeProviderImplementationType.GetConstructor(myTpConstructorInfoType) != null)
-      {
-        var func = FSharpFunc<string, bool>
-          .FromConverter(_ => parameters.SystemRuntimeContainsType.SystemRuntimeContainsTypeRef != null);
-        var tpConfig = new TypeProviderConfig(func) //(systemRuntimeContainsType)
-        {
-          ResolutionFolder = parameters.RdResolutionEnvironment.ResolutionFolder,
-          RuntimeAssembly = parameters.RunTimeAssemblyFileName,
-          ReferencedAssemblies = parameters.RdResolutionEnvironment.ReferencedAssemblies,
-          TemporaryFolder = parameters.RdResolutionEnvironment.TemporaryFolder,
-          IsInvalidationSupported = parameters.IsInvalidationSupported,
-          IsHostedExecution = parameters.IsInteractive,
-          SystemRuntimeAssemblyVersion = parameters.SystemRuntimeAssemblyRdVersion.ToSystemVersion(),
-        };
-        try
-        {
-          //Hack.getFakeTcImportsTest(func); 
-          var typeProvider = Activator.CreateInstance(typeProviderImplementationType, tpConfig) as ITypeProvider;
-          return typeProvider;
-        }
-        catch
-        {
-        }
-      }
-
-      else if (typeProviderImplementationType.GetConstructor(Array.Empty<Type>()) != null)
-      {
-        var typeProvider = Activator.CreateInstance(typeProviderImplementationType) as ITypeProvider;
-        return typeProvider;
-      }
-
-      throw new Exception();
-      //throw new TypeProviderError(FCSTypeProviderErrors.etProviderDoesNotHaveValidConstructor,
-      //  typeProviderImplementationType.FullName, parameters.Range.ToFSharpRange());
+      return typeProviders
+        .Select(t =>
+          t.PUntaint(FSharpFunc<ITypeProvider, ITypeProvider>.FromConverter(x => x), Range.range.Zero))
+        .ToArray();
     }
   }
 }
