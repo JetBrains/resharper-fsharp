@@ -57,7 +57,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       myCache.GetOrCreateWithContext(
         RdProvidedNamespaceProcessModel.ResolveTypeName.Sync(new ResolveTypeNameArgs(EntityId, typeName)),
         ProvidedTypeContext.Empty);*/
-      myProvidedTypes.Value.FirstOrDefault(t => t.FullName == typeName);
+      myProvidedTypes.Value.FirstOrDefault(t => t.Name == typeName);
 
     private readonly Lazy<IProvidedNamespace[]> myNestedNamespaces;
     private readonly Lazy<ProvidedType[]> myProvidedTypes;

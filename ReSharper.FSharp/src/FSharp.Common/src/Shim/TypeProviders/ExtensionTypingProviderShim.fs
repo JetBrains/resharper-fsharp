@@ -3,7 +3,6 @@
 open System
 open System.Collections.Generic
 open FSharp.Compiler
-open System.IO
 open System.Threading
 open FSharp.Compiler.AbstractIL.IL
 open FSharp.Compiler.ExtensionTyping
@@ -17,7 +16,6 @@ open JetBrains.Rider.FSharp.TypeProvidersProtocol.Server
 open JetBrains.ReSharper.Plugins.FSharp.Util.TypeProvidersProtocolConverter
 open JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders.Hack
 open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol
-open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache
 open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
 [<SolutionComponent>]

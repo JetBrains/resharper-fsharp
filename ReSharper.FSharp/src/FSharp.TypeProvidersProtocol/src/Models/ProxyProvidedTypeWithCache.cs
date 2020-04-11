@@ -130,7 +130,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
         Context);
 
     public override ProvidedType GetNestedType(string nm) =>
-      myAllNestedTypes.Value.FirstOrDefault(t => t.FullName == nm);
+      myAllNestedTypes.Value.FirstOrDefault(t => t.Name == nm);
 
     public override ProvidedType[] GetNestedTypes() => myAllNestedTypes.Value.Where(t => t.IsPublic).ToArray();
 
