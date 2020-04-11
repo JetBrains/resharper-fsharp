@@ -49,8 +49,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
 
     private RdTask<byte[]> GetManifestModuleContents(Lifetime lifetime, int entityId)
     {
-      var (providedAssembly, _) = myAssembliesCache.Get(entityId);
-      var typeProvider = myTypeProvidersCache.Get(entityId);
+      var (providedAssembly, typeProviderId) = myAssembliesCache.Get(entityId);
+      var typeProvider = myTypeProvidersCache.Get(typeProviderId);
       return RdTask<byte[]>.Successful(typeProvider.GetGeneratedAssemblyContents(providedAssembly.Handle));
     }
   }

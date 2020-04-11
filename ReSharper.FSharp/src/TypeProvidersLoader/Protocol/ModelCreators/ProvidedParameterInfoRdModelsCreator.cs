@@ -1,5 +1,6 @@
 ﻿using System;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Cache;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
 using static FSharp.Compiler.ExtensionTyping;
 
@@ -16,6 +17,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelC
     protected override RdProvidedParameterInfo CreateRdModelInternal(ProvidedParameterInfo providedModel,
       int entityId) => new RdProvidedParameterInfo(providedModel.IsIn,
       providedModel.IsOut, providedModel.IsOptional,
-      providedModel.HasDefaultValue, providedModel.Name, entityId);
+      providedModel.RawDefaultValue.BoxToClientStaticArg(), providedModel.HasDefaultValue,
+      providedModel.Name, entityId);
   }
 }

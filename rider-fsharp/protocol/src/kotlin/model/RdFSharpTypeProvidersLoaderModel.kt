@@ -308,7 +308,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
             field("IsIn", bool)
             field("IsOut", bool)
             field("IsOptional", bool)
-            //field("RawDefaultValue : obj
+            field("RawDefaultValue", RdStaticArg.nullable)
             field("HasDefaultValue", bool)
         }
 

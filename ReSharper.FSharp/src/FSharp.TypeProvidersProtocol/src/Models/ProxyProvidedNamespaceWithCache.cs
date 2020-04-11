@@ -53,10 +53,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       throw new Exception("ResolveTypeName should be unreachable");
 
     public ProvidedType ResolveProvidedTypeName(string typeName) =>
-      /*
-      myCache.GetOrCreateWithContext(
-        RdProvidedNamespaceProcessModel.ResolveTypeName.Sync(new ResolveTypeNameArgs(EntityId, typeName)),
-        ProvidedTypeContext.Empty);*/
       myProvidedTypes.Value.FirstOrDefault(t => t.Name == typeName);
 
     private readonly Lazy<IProvidedNamespace[]> myNestedNamespaces;

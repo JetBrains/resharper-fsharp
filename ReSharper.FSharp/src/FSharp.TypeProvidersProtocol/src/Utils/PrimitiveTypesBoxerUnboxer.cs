@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using JetBrains.Annotations;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
 using ClientRdStaticArg = JetBrains.Rider.FSharp.TypeProvidersProtocol.Client.RdStaticArg;
 
@@ -10,8 +11,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils
 {
   public static class PrimitiveTypesBoxerUnboxer
   {
-    public static RdStaticArg BoxToServerStaticArg(this object value) =>
-      value switch
+    [ContractAnnotation("null => null")]
+    public static RdStaticArg BoxToServerStaticArg(this object value)
+    {
+      if (value == null) return null;
+      return value switch
       {
         sbyte x => new RdStaticArg("sbyte", x.ToString()),
         short x => new RdStaticArg("short", x.ToString()),
@@ -29,9 +33,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils
         string x => new RdStaticArg("string", x),
         _ => throw new ArgumentException($"Unexpected static arg with type {value.GetType().FullName}")
       };
+    }
 
-    public static ClientRdStaticArg BoxToClientStaticArg(this object value) =>
-      value switch
+    [ContractAnnotation("null => null")]
+    public static ClientRdStaticArg BoxToClientStaticArg(this object value)
+    {
+      if (value == null) return null;
+      return value switch
       {
         sbyte x => new ClientRdStaticArg("sbyte", x.ToString()),
         short x => new ClientRdStaticArg("short", x.ToString()),
@@ -49,9 +57,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils
         string x => new ClientRdStaticArg("string", x),
         _ => throw new ArgumentException($"Unexpected static arg with type {value.GetType().FullName}")
       };
+    }
 
-    public static object Unbox(this RdStaticArg arg) =>
-      arg.TypeName switch
+    [ContractAnnotation("null => null")]
+    public static object Unbox(this RdStaticArg arg)
+    {
+      if (arg == null) return null;
+      return arg.TypeName switch
       {
         "sbyte" => sbyte.Parse(arg.Value),
         "short" => short.Parse(arg.Value),
@@ -69,9 +81,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils
         "string" => (object) arg.Value,
         _ => throw new ArgumentException($"Unexpected static arg with type {arg.TypeName}")
       };
+    }
 
-    public static object Unbox(this ClientRdStaticArg arg) =>
-      arg.TypeName switch
+    [ContractAnnotation("null => null")]
+    public static object Unbox(this ClientRdStaticArg arg)
+    {
+      if (arg == null) return null;
+      return arg.TypeName switch
       {
         "sbyte" => sbyte.Parse(arg.Value),
         "short" => short.Parse(arg.Value),
@@ -89,5 +105,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils
         "string" => (object) arg.Value,
         _ => throw new ArgumentException($"Unexpected static arg with type {arg.TypeName}")
       };
+    }
   }
 }
