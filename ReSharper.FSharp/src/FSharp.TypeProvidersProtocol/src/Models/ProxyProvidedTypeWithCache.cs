@@ -1,12 +1,9 @@
 ﻿using System;
-using System.Globalization;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils;
-using JetBrains.ReSharper.Psi.Impl.CodeStyle;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
-using JetBrains.Util;
 using Microsoft.FSharp.Core.CompilerServices;
 using static FSharp.Compiler.ExtensionTyping;
 
@@ -75,6 +72,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
           .Sync(EntityId)
           .Select(t => ProxyProvidedEventInfoWithCache.Create(t, myProcessModel, Context, myCache))
           .ToArray());
+      myConstructors = new Lazy<ProvidedConstructorInfo[]>(() =>
+        // ReSharper disable once CoVariantArrayConversion
+        RdProvidedTypeProcessModel.GetConstructors
+          .Sync(EntityId)
+          .Select(t => ProxyProvidedConstructorInfoWithCache.Create(t, myProcessModel, Context, myCache))
+          .ToArray());
     }
 
     [ContractAnnotation("type:null => null")]
@@ -104,6 +107,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override bool IsErased => myRdProvidedType.IsErased;
     public override bool IsGenericType => myRdProvidedType.IsGenericType;
     public override bool IsVoid => myRdProvidedType.IsVoid;
+    public override bool IsMeasure => myRdProvidedType.IsMeasure;
 
     public override int GenericParameterPosition =>
       myGenericParameterPosition ??=
@@ -194,6 +198,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override ProvidedFieldInfo GetField(string nm) =>
       myFields.Value.FirstOrDefault(t => t.Name == nm); //TODO: optimize
 
+    public override ProvidedConstructorInfo[] GetConstructors() => myConstructors.Value;
+
     public override ProvidedType ApplyContext(ProvidedTypeContext context)
     {
       var (lookupIlTypeRef, lookupTyconRef) = Context.GetDictionaries();
@@ -232,5 +238,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     private readonly Lazy<ProvidedParameterInfo[]> myStaticParameters;
     private readonly Lazy<ProvidedFieldInfo[]> myFields;
     private readonly Lazy<ProvidedEventInfo[]> myEvents;
+    private readonly Lazy<ProvidedConstructorInfo[]> myConstructors;
   }
 }

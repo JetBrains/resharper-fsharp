@@ -43,6 +43,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
 
     protected override RdFSharpTypeProvidersLoaderModel InitModel(Lifetime lifetime, Rd.Impl.Protocol protocol)
     {
+      //TODO: incapsulate this boilerplate code
       var model = new RdFSharpTypeProvidersLoaderModel(lifetime, protocol);
       myUnitOfWork.TypeProvidersLoaderHostFactory.Initialize(model);
       myUnitOfWork.TypeProvidersHostFactory.Initialize(model.RdTypeProviderProcessModel);
@@ -54,6 +55,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       myUnitOfWork.ProvidedAssemblyHostFactory.Initialize(model.RdProvidedAssemblyProcessModel);
       myUnitOfWork.ProvidedFieldInfosHostFactory.Initialize(model.RdProvidedFieldInfoProcessModel);
       myUnitOfWork.ProvidedEventInfosHostFactory.Initialize(model.RdProvidedEventInfoProcessModel);
+      myUnitOfWork.ProvidedConstructorInfosHostFactory.Initialize(model.RdProvidedConstructorInfoProcessModel);
 
       return model;
     }

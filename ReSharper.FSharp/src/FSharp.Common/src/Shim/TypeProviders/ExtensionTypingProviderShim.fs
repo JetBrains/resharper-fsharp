@@ -100,7 +100,6 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
         member this.ResolveTypeName(pn: Tainted<IProvidedNamespace>, typeName: string, m: range) =
             pn.PApply((fun providedNamespace ->
                 (providedNamespace.As<IProxyProvidedNamespace>().ResolveProvidedTypeName typeName)), range=m) 
-
             
     interface IDisposable with
         member this.Dispose() = () //terminate connection

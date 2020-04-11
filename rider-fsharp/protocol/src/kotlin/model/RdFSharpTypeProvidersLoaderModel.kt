@@ -22,7 +22,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
 
     private val RdProvidedMethodBaseProcessModel = baseclass extends RdProvidedMemberProcessModel {
         call("GetParameters", int, array(RdProvidedParameterInfo))
-        call("GetGenericArguments", int, array(RdProvidedType))
+        call("GetGenericArguments", int, array(int))
         //call("GetStaticParametersForMethod", RdTypeProvider, array(RdProvidedParameterInfo))
     }
 
@@ -170,10 +170,6 @@ object RdFSharpTypeProvidersLoaderModel : Root(
 
     private val RdProvidedTypeProcessModel = aggregatedef("RdProvidedTypeProcessModel") {
         call("BaseType", int, int.nullable)
-        call("GetNestedType", structdef("GetNestedTypeArgs") {
-            field("Id", int)
-            field("TypeName", string)
-        }, int)
         call("GetNestedTypes", int, array(int))
         call("GetAllNestedTypes", int, array(int))
         call("GetInterfaces", int, array(int))
@@ -183,10 +179,6 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         call("GetArrayRank", int, int)
         call("GetEnumUnderlyingType", int, int.nullable)
         call("GetProperties", int, array(RdProvidedPropertyInfo))
-        call("GetProperty", structdef("GetPropertyArgs") {
-            field("Id", int)
-            field("PropertyName", string)
-        }, RdProvidedPropertyInfo)
         call("GenericParameterPosition", int, int)
         call("GetStaticParameters", int, array(RdProvidedParameterInfo))
         call("ApplyStaticArguments", ApplyStaticArgumentsParameters, int)
@@ -200,11 +192,8 @@ object RdFSharpTypeProvidersLoaderModel : Root(
             field("Rank", int)
         }, int)
         call("GetFields", int, array(RdProvidedFieldInfo))
-        call("GetField", structdef("GetFieldArgs") {
-            field("Id", int)
-            field("FieldName", string) //TODO: remove
-        }, RdProvidedFieldInfo)
         call("GetEvents", int, array(RdProvidedEventInfo))
+        call("GetConstructors", int, array(RdProvidedConstructorInfo))
     }
 
     private val RdProvidedMethodInfoProcessModel = aggregatedef("RdProvidedMethodInfoProcessModel") {
@@ -212,6 +201,13 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         call("ReturnType", int, int)
         call("GetParameters", int, array(RdProvidedParameterInfo))
         call("GetGenericArguments", int, array(int))
+    }
+
+    private val RdProvidedConstructorInfoProcessModel = aggregatedef("RdProvidedConstructorInfoProcessModel") {
+        call("DeclaringType", int, int.nullable)
+        call("GetParameters", int, array(RdProvidedParameterInfo))
+        call("GetGenericArguments", int, array(int))
+        call("GetStaticParametersForMethod", int, array(RdProvidedParameterInfo))
     }
 
     private val RdProvidedPropertyInfoProcessModel = aggregatedef("RdProvidedPropertyInfoProcessModel") {
@@ -270,6 +266,9 @@ object RdFSharpTypeProvidersLoaderModel : Root(
 
     }
 
+    private val RdProvidedConstructorInfo = classdef extends RdProvidedMethodBase {
+    }
+
     init {
         RdProvidedType = classdef extends RdProvidedMemberInfo {
             field("FullName", string.nullable)
@@ -290,6 +289,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
             field("IsSuppressRelocate", bool)
             field("IsErased", bool)
             field("IsGenericType", bool)
+            field("IsMeasure", bool)
         }
 
         RdProvidedPropertyInfo = classdef extends RdProvidedMemberInfo {
@@ -316,6 +316,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         field("RdProvidedTypeProcessModel", RdProvidedTypeProcessModel)
         field("RdProvidedPropertyInfoProcessModel", RdProvidedPropertyInfoProcessModel)
         field("RdProvidedMethodInfoProcessModel", RdProvidedMethodInfoProcessModel)
+        field("RdProvidedConstructorInfoProcessModel", RdProvidedConstructorInfoProcessModel)
         field("RdProvidedParameterInfoProcessModel", RdProvidedParameterInfoProcessModel)
         field("RdProvidedAssemblyProcessModel", RdProvidedAssemblyProcessModel)
         field("RdProvidedFieldInfoProcessModel", RdProvidedFieldInfoProcessModel)

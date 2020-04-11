@@ -26,6 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
     private readonly IProvidedRdModelsCreator<ProvidedFieldInfo, RdProvidedFieldInfo> myProvidedFieldInfosCreator;
     private readonly IProvidedRdModelsCreator<ProvidedEventInfo, RdProvidedEventInfo> myProvidedEventInfosCreator;
     private readonly IProvidedRdModelsCreator<ProvidedAssembly, RdProvidedAssembly> myProvidedAssembliesCreator;
+    private readonly IProvidedRdModelsCreator<ProvidedConstructorInfo, RdProvidedConstructorInfo> myProvidedConstructorInfosCreator;
 
     private readonly IReadProvidedCache<Tuple<ProvidedType, RdProvidedType, int>> myProvidedTypesCache;
     private readonly IReadProvidedCache<ITypeProvider> myTypeProvidersCache;
@@ -38,6 +39,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       IProvidedRdModelsCreator<ProvidedFieldInfo, RdProvidedFieldInfo> providedFieldInfosCreator,
       IProvidedRdModelsCreator<ProvidedEventInfo, RdProvidedEventInfo> providedEventInfosCreator,
       IProvidedRdModelsCreator<ProvidedAssembly, RdProvidedAssembly> providedAssembliesCreator,
+      IProvidedRdModelsCreator<ProvidedConstructorInfo, RdProvidedConstructorInfo> providedConstructorInfosCreator,
       IReadProvidedCache<Tuple<ProvidedType, RdProvidedType, int>> providedTypesCache,
       IReadProvidedCache<ITypeProvider> typeProvidersCache)
     {
@@ -48,6 +50,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       myProvidedFieldInfosCreator = providedFieldInfosCreator;
       myProvidedEventInfosCreator = providedEventInfosCreator;
       myProvidedAssembliesCreator = providedAssembliesCreator;
+      myProvidedConstructorInfosCreator = providedConstructorInfosCreator;
       myProvidedTypesCache = providedTypesCache;
       myTypeProvidersCache = typeProvidersCache;
     }
@@ -57,7 +60,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       processModel.BaseType.Set(GetBaseType);
       processModel.DeclaringType.Set(GetDeclaringType);
       processModel.GetInterfaces.Set(GetInterfaces);
-      processModel.GetNestedType.Set(GetNestedType);
       processModel.GetNestedTypes.Set(GetNestedTypes);
       processModel.GetAllNestedTypes.Set(GetAllNestedTypes);
       processModel.GetGenericTypeDefinition.Set(GetGenericTypeDefinition);
@@ -66,7 +68,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       processModel.GetArrayRank.Set(GetArrayRank);
       processModel.GetEnumUnderlyingType.Set(GetEnumUnderlyingType);
       processModel.GetProperties.Set(GetProperties);
-      processModel.GetProperty.Set(GetProperty);
       processModel.GenericParameterPosition.Set(GetGenericParameterPosition);
       processModel.GetStaticParameters.Set(GetStaticParameters);
       processModel.GetMethods.Set(GetMethods);
@@ -76,8 +77,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       processModel.MakePointerType.Set(MakePointerType);
       processModel.MakeByRefType.Set(MakeByRefType);
       processModel.GetFields.Set(GetFields);
-      processModel.GetField.Set(GetField);
       processModel.GetEvents.Set(GetEvents);
+      processModel.GetConstructors.Set(GetConstructors);
+    }
+
+    private RdTask<RdProvidedConstructorInfo[]> GetConstructors(Lifetime lifetime, int entityId)
+    {
+      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
+      var events = providedType
+        .GetConstructors()
+        .Select(t => myProvidedConstructorInfosCreator.CreateRdModel(t, typeProviderId))
+        .ToArray();
+      return RdTask<RdProvidedConstructorInfo[]>.Successful(events);
     }
 
     private RdTask<RdProvidedEventInfo[]> GetEvents(Lifetime lifetime, int entityId)
@@ -88,13 +99,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
         .Select(t => myProvidedEventInfosCreator.CreateRdModel(t, typeProviderId))
         .ToArray();
       return RdTask<RdProvidedEventInfo[]>.Successful(events);
-    }
-
-    private RdTask<RdProvidedFieldInfo> GetField(Lifetime lifetime, GetFieldArgs args)
-    {
-      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(args.Id);
-      var field = myProvidedFieldInfosCreator.CreateRdModel(providedType.GetField(args.FieldName), typeProviderId);
-      return RdTask<RdProvidedFieldInfo>.Successful(field);
     }
 
     private RdTask<RdProvidedFieldInfo[]> GetFields(Lifetime lifetime, int entityId)
@@ -191,14 +195,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       return RdTask<int>.Successful(genericParameterPosition);
     }
 
-    private RdTask<RdProvidedPropertyInfo> GetProperty(Lifetime lifetime, GetPropertyArgs args)
-    {
-      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(args.Id);
-      var property =
-        myProvidedPropertiesCreator.CreateRdModel(providedType.GetProperty(args.PropertyName), typeProviderId);
-      return RdTask<RdProvidedPropertyInfo>.Successful(property);
-    }
-
     private RdTask<RdProvidedPropertyInfo[]> GetProperties(Lifetime lifetime, int entityId)
     {
       var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
@@ -267,14 +263,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
         .Select(t => myProvidedTypesCreator.CreateRdModel(t, typeProviderId).EntityId)
         .ToArray();
       return RdTask<int[]>.Successful(nestedTypes);
-    }
-
-    private RdTask<int> GetNestedType(Lifetime lifetime, GetNestedTypeArgs args)
-    {
-      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(args.Id);
-      var nestedType = myProvidedTypesCreator.CreateRdModel(providedType.GetNestedType(args.TypeName), typeProviderId)
-        .EntityId;
-      return RdTask<int>.Successful(nestedType);
     }
 
     private RdTask<int[]> GetInterfaces(Lifetime lifetime, int entityId)

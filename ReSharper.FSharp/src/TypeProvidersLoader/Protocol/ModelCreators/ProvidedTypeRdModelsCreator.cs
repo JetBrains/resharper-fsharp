@@ -41,15 +41,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelC
       return model;
     }
 
-    private static RdProvidedType CreateRdModelInternal(ProvidedType providedNativeModel, int entityId) =>
-      new RdProvidedType(providedNativeModel.FullName,
-        providedNativeModel.Namespace, providedNativeModel.IsVoid,
-        providedNativeModel.IsGenericParameter, providedNativeModel.IsValueType, providedNativeModel.IsByRef,
-        providedNativeModel.IsPointer, providedNativeModel.IsEnum, providedNativeModel.IsArray,
-        providedNativeModel.IsInterface, providedNativeModel.IsClass, providedNativeModel.IsSealed,
-        providedNativeModel.IsAbstract, providedNativeModel.IsPublic, providedNativeModel.IsNestedPublic,
-        providedNativeModel.IsSuppressRelocate, providedNativeModel.IsErased, providedNativeModel.IsGenericType,
-        providedNativeModel.Name, entityId);
+    private static RdProvidedType CreateRdModelInternal(ProvidedType providedModel, int entityId) =>
+      new RdProvidedType(providedModel.FullName,
+        providedModel.Namespace, providedModel.IsVoid,
+        providedModel.IsGenericParameter, providedModel.IsValueType, providedModel.IsByRef,
+        providedModel.IsPointer, providedModel.IsEnum, providedModel.IsArray,
+        providedModel.IsInterface, providedModel.IsClass, providedModel.IsSealed,
+        providedModel.IsAbstract, providedModel.IsPublic, providedModel.IsNestedPublic,
+        providedModel.IsSuppressRelocate, providedModel.IsErased, providedModel.IsGenericType,
+        providedModel.IsMeasure, providedModel.Name, entityId);
 
     protected int CreateEntityKey(ProvidedType providedModel)
     {

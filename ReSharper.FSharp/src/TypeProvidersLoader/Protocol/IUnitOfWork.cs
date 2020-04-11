@@ -21,6 +21,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
     IOutOfProcessHostFactory<RdProvidedAssemblyProcessModel> ProvidedAssemblyHostFactory { get; }
     IOutOfProcessHostFactory<RdProvidedFieldInfoProcessModel> ProvidedFieldInfosHostFactory { get; }
     IOutOfProcessHostFactory<RdProvidedEventInfoProcessModel> ProvidedEventInfosHostFactory { get; }
+    IOutOfProcessHostFactory<RdProvidedConstructorInfoProcessModel> ProvidedConstructorInfosHostFactory { get; }
   }
 
   public class UnitOfWork : IUnitOfWork
@@ -35,6 +36,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
     public IOutOfProcessHostFactory<RdProvidedAssemblyProcessModel> ProvidedAssemblyHostFactory { get; }
     public IOutOfProcessHostFactory<RdProvidedFieldInfoProcessModel> ProvidedFieldInfosHostFactory { get; }
     public IOutOfProcessHostFactory<RdProvidedEventInfoProcessModel> ProvidedEventInfosHostFactory { get; }
+    public IOutOfProcessHostFactory<RdProvidedConstructorInfoProcessModel> ProvidedConstructorInfosHostFactory { get; }
 
     public UnitOfWork()
     {
@@ -68,6 +70,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       var providedEventInfosCache = new ProvidedCacheBase<Tuple<ProvidedEventInfo, int>>();
       var providedEventInfoRdModelsCreator = new ProvidedEventInfoRdModelsCreator(providedEventInfosCache);
 
+      var providedConstructorInfosCache = new ProvidedCacheBase<Tuple<ProvidedConstructorInfo, int>>();
+      var providedConstructorInfoRdModelsCreator =
+        new ProvidedConstructorInfoRdModelsCreator(providedConstructorInfosCache);
+
       TypeProvidersLoaderHostFactory =
         new TypeProvidersLoaderHostFactory(typeProvidersLoader, typeProviderRdModelsCreator);
       TypeProvidersHostFactory =
@@ -78,7 +84,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       ProvidedTypesHostFactory = new ProvidedTypesHostFactory(providedParameterInfoRdModelsCreator,
         providedMethodInfoRdModelsCreator, providedPropertyInfoRdModelsCreator, providedTypeRdModelsCreator,
         providedFieldInfoRdModelsCreator, providedEventInfoRdModelsCreator, providedAssemblyRdModelsCreator,
-        providedTypesCache, typeProvidersCache);
+        providedConstructorInfoRdModelsCreator, providedTypesCache, typeProvidersCache);
       ProvidedPropertyInfosHostFactory =
         new ProvidedPropertyInfoHostFactory(providedParameterInfoRdModelsCreator, providedTypeRdModelsCreator,
           providedMethodInfoRdModelsCreator, providedPropertyInfosCache);
@@ -91,6 +97,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
         new ProvidedFieldInfoHostFactory(providedFieldInfosCache, providedTypeRdModelsCreator);
       ProvidedEventInfosHostFactory = new ProvidedEventInfoHostFactory(providedTypeRdModelsCreator,
         providedMethodInfoRdModelsCreator, providedEventInfosCache);
+
+      ProvidedConstructorInfosHostFactory = new ProvidedConstructorInfosHostFactory(providedTypeRdModelsCreator,
+        providedParameterInfoRdModelsCreator, providedConstructorInfosCache, typeProvidersCache);
     }
   }
 }
