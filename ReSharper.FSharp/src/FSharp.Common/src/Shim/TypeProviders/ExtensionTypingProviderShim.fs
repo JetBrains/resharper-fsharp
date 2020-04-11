@@ -4,6 +4,7 @@ open System
 open System.Collections.Generic
 open FSharp.Compiler
 open System.IO
+open System.Threading
 open FSharp.Compiler.AbstractIL.IL
 open FSharp.Compiler.ExtensionTyping
 open FSharp.Compiler.Range
@@ -54,6 +55,7 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
             if ourModel = null then 
                 let typeProvidersLoader = typeProvidersLoadersFactory.Create(lifetime)
                 typeProvidersLoader.RunAsync(Action<_, _>(onInitialized), Action(onFailed))
+                Thread.Sleep(5000)
            
             let typeProviders = 
                 if typeProvidersCache.ContainsKey(designTimeAssemblyNameString) then

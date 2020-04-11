@@ -61,7 +61,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       var providedMethodInfosCache = new ProvidedCacheBase<Tuple<ProvidedMethodInfo, int>>();
       var providedMethodInfoRdModelsCreator = new ProvidedMethodInfoRdModelsCreator(providedMethodInfosCache);
 
-      var providedAssembliesCache = new ProvidedCacheBase<ProvidedAssembly>();
+      var providedAssembliesCache = new ProvidedCacheBase<Tuple<ProvidedAssembly, int>>();
       var providedAssemblyRdModelsCreator = new ProvidedAssemblyRdModelCreator(providedAssembliesCache);
 
       var providedFieldInfosCache = new ProvidedCacheBase<Tuple<ProvidedFieldInfo, int>>();

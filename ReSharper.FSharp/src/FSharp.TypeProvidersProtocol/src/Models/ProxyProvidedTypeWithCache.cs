@@ -19,7 +19,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
     internal ProxyProvidedTypeWithCache(RdProvidedType rdProvidedType, RdFSharpTypeProvidersLoaderModel processModel,
       ProvidedTypeContext context, ITypeProviderCache cache) : base(
-      typeof(string), context)
+      typeof(ProxyProvidedTypeWithCache), context)
     {
       myRdProvidedType = rdProvidedType;
       myProcessModel = processModel;
@@ -30,48 +30,57 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
           .Sync(EntityId)
           .Select(t => myCache.GetOrCreateWithContext(t, Context))
           .ToArray());
+
       myGenericArguments = new Lazy<ProvidedType[]>(() =>
         RdProvidedTypeProcessModel.GetGenericArguments
           .Sync(EntityId)
           .Select(t => myCache.GetOrCreateWithContext(t, Context))
           .ToArray());
+
       myMethods = new Lazy<ProvidedMethodInfo[]>(() =>
         // ReSharper disable once CoVariantArrayConversion
         RdProvidedTypeProcessModel.GetMethods
           .Sync(EntityId)
           .Select(t => ProxyProvidedMethodInfoWithCache.Create(t, myProcessModel, Context, myCache))
           .ToArray());
+
       myAllNestedTypes = new Lazy<ProvidedType[]>(() =>
         RdProvidedTypeProcessModel.GetNestedTypes
           .Sync(EntityId)
           .Select(t => myCache.GetOrCreateWithContext(t, Context))
           .ToArray());
+
       myProperties = new Lazy<ProvidedPropertyInfo[]>(() =>
         // ReSharper disable once CoVariantArrayConversion
         RdProvidedTypeProcessModel.GetProperties
           .Sync(EntityId)
           .Select(t => ProxyProvidedPropertyInfoWithCache.Create(t, myProcessModel, Context, myCache))
           .ToArray());
+
       myProvidedAssembly = new Lazy<ProvidedAssembly>(() => ProxyProvidedAssembly.CreateWithContext(
         RdProvidedTypeProcessModel.Assembly.Sync(EntityId), myProcessModel, Context));
+
       myStaticParameters = new Lazy<ProvidedParameterInfo[]>(() =>
         // ReSharper disable once CoVariantArrayConversion
         RdProvidedTypeProcessModel.GetStaticParameters
           .Sync(EntityId)
           .Select(t => ProxyProvidedParameterInfoWithCache.Create(t, myProcessModel, Context, myCache))
           .ToArray());
+
       myFields = new Lazy<ProvidedFieldInfo[]>(() =>
         // ReSharper disable once CoVariantArrayConversion
         RdProvidedTypeProcessModel.GetFields
           .Sync(EntityId)
           .Select(t => ProxyProvidedFieldInfoWithCache.Create(t, myProcessModel, Context, myCache))
           .ToArray());
+
       myEvents = new Lazy<ProvidedEventInfo[]>(() =>
         // ReSharper disable once CoVariantArrayConversion
         RdProvidedTypeProcessModel.GetEvents
           .Sync(EntityId)
           .Select(t => ProxyProvidedEventInfoWithCache.Create(t, myProcessModel, Context, myCache))
           .ToArray());
+
       myConstructors = new Lazy<ProvidedConstructorInfo[]>(() =>
         // ReSharper disable once CoVariantArrayConversion
         RdProvidedTypeProcessModel.GetConstructors

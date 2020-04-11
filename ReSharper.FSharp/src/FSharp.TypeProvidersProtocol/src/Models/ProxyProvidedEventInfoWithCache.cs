@@ -20,7 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       myProcessModel.RdProvidedEventInfoProcessModel;
 
     public ProxyProvidedEventInfoWithCache(RdProvidedEventInfo eventInfo, RdFSharpTypeProvidersLoaderModel processModel,
-      ProvidedTypeContext context, ITypeProviderCache cache) : base(typeof(Timer).GetEvents().First(), context)
+      ProvidedTypeContext context, ITypeProviderCache cache) : base(typeof(ProxyTypeProviderWithCache).GetEvents().First(), context)
     {
       myEventInfo = eventInfo;
       myProcessModel = processModel;

@@ -1,5 +1,5 @@
-﻿using System.Reflection;
-using FSharp.Compiler;
+﻿using System;
+using System.Reflection;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
 using Microsoft.FSharp.Core.CompilerServices;
 using static FSharp.Compiler.ExtensionTyping;
@@ -18,10 +18,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
     private ProxyProvidedAssembly(RdProvidedAssembly assembly, RdFSharpTypeProvidersLoaderModel processModel,
       ProvidedTypeContext context) : base(
-      Assembly.GetAssembly(typeof(string)), context)
+      Assembly.GetAssembly(typeof(ProxyProvidedAssembly)), context)
     {
       myAssembly = assembly;
       myProcessModel = processModel;
+
+      myAssemblyName = new Lazy<AssemblyName>(() => ConvertFrom(RdProvidedAssemblyProcessModel.GetName.Sync(EntityId)));
     }
 
     public static ProxyProvidedAssembly CreateWithContext(RdProvidedAssembly assembly,
@@ -30,13 +32,27 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
     public override string FullName => myAssembly.FullName;
 
-    public override AssemblyName GetName()
-    {
-      var assemblyPath = myAssembly.AssemblyPath;
-      return AssemblyName.GetAssemblyName(assemblyPath);
-    }
+    public override AssemblyName GetName() => myAssemblyName.Value;
 
     public override byte[] GetManifestModuleContents(ITypeProvider provider) =>
       RdProvidedAssemblyProcessModel.GetManifestModuleContents.Sync(EntityId);
+
+    private static AssemblyName ConvertFrom(RdAssemblyName rdAssemblyName)
+    {
+      var assemblyName = new AssemblyName(rdAssemblyName.Name)
+      {
+        Version = Version.Parse(rdAssemblyName.Version),
+        Flags = (AssemblyNameFlags) rdAssemblyName.Flags
+      };
+
+      var rdPublicKey = rdAssemblyName.PublicKey;
+      if (rdPublicKey == null) return assemblyName;
+
+      if (rdPublicKey.IsKey) assemblyName.SetPublicKey(rdPublicKey.Data);
+      else assemblyName.SetPublicKeyToken(rdPublicKey.Data);
+      return assemblyName;
+    }
+
+    private readonly Lazy<AssemblyName> myAssemblyName;
   }
 }

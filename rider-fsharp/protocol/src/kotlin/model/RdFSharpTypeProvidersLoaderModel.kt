@@ -226,14 +226,21 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         field("TypeProviderId", int)
     }
 
+    private val RdAssemblyName = structdef {
+        field("Name", string)
+        field("PublicKey", RdPublicKey.nullable)
+        field("Version", string)
+        field("Flags", int)
+    }
+
     private val RdProvidedAssembly = structdef {
         field("FullName", string)
-        field("AssemblyPath", string)
         field("EntityId", int)
     }
 
     private val RdProvidedAssemblyProcessModel = aggregatedef("RdProvidedAssemblyProcessModel") {
         call("GetManifestModuleContents", int, array(byte))
+        call("GetName", int, RdAssemblyName)
     }
 
     private val RdProvidedFieldInfoProcessModel = aggregatedef("RdProvidedFieldInfoProcessModel") {

@@ -20,7 +20,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader
       var compilerToolsPath = ListModule.OfSeq(parameters.CompilerToolsPath);
 
       var typeProviders = ExtensionTyping.Shim.ExtensionTypingProvider.InstantiateTypeProvidersOfAssembly(
-        parameters.DesignTimeAssemblyNameString, ilScopeRefOfRuntimeAssembly, parameters.DesignTimeAssemblyNameString,
+        parameters.RunTimeAssemblyFileName, ilScopeRefOfRuntimeAssembly, parameters.DesignTimeAssemblyNameString,
         resolutionEnvironment, parameters.IsInvalidationSupported, parameters.IsInteractive, systemRuntimeContainsType,
         systemRuntimeAssemblyVersion, compilerToolsPath, Range.range.Zero);
 
