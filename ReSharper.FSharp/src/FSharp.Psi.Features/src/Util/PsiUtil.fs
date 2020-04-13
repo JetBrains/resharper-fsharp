@@ -247,7 +247,7 @@ let rec skipSemicolonsAndWhiteSpacesAfter node =
     else
         node
 
-let isFollowedByEmptyLine (node: ITreeNode) =
+let isFollowedByEmptyLineOrComment (node: ITreeNode) =
     let newLine =
         node
         |> skipMatchingNodesAfter isInlineSpaceOrComment
@@ -257,6 +257,13 @@ let isFollowedByEmptyLine (node: ITreeNode) =
 
     let afterWhitespace = newLine |> skipMatchingNodesAfter isInlineSpace
     afterWhitespace != newLine && afterWhitespace :? NewLine
+
+let isAfterEmptyLine (node: ITreeNode) =
+    let prevNonWhitespace = skipMatchingNodesBefore isInlineSpace node
+    let prevPrevNonWhiteSpace = skipMatchingNodesBefore isInlineSpace prevNonWhitespace
+
+    prevNonWhitespace != prevPrevNonWhiteSpace &&
+    prevNonWhitespace :? NewLine && (isNull prevPrevNonWhiteSpace || prevPrevNonWhiteSpace :? NewLine)
 
 
 [<AutoOpen>]

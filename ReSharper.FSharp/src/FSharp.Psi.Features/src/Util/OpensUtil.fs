@@ -75,12 +75,11 @@ let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBo
 
     let insertBeforeModuleMember (moduleMember: IModuleMember) =
         let indent = moduleMember.Indent
-        let nonSpaceNodeBeforeMember = skipMatchingNodesBefore isWhitespace moduleMember
 
         addNodesBefore moduleMember [
             // todo: add setting for adding space before first module member
             // Add space before new opens group.
-            if not (moduleMember :? IOpenStatement) && (isNotNull (getTokenType nonSpaceNodeBeforeMember)) then
+            if not (moduleMember :? IOpenStatement) && (not (isAfterEmptyLine moduleMember)) then
                 NewLine(lineEnding)
 
             if indent > 0 then
@@ -89,7 +88,7 @@ let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBo
             NewLine(lineEnding)
 
             // Add space after new opens group.
-            if not (moduleMember :? IOpenStatement) && not (isFollowedByEmptyLine moduleMember) then
+            if not (moduleMember :? IOpenStatement) && not (isFollowedByEmptyLineOrComment moduleMember) then
                 NewLine(lineEnding)
         ] |> ignore
 
@@ -101,7 +100,7 @@ let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBo
             if indent > 0 then
                 Whitespace(indent)
             elementFactory.CreateOpenStatement(ns)
-            if not (anchor :? IOpenStatement) && not (isFollowedByEmptyLine anchor) then
+            if not (anchor :? IOpenStatement) && not (isFollowedByEmptyLineOrComment anchor) then
                 NewLine(lineEnding)
         ] |> ignore
 

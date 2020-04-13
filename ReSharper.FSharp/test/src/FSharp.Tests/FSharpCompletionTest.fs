@@ -40,5 +40,6 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Import - Anon module 01 - First line``() = x.DoNamedTest()
     [<Test>] member x.``Import - Anon module 02 - Before open``() = x.DoNamedTest()
     [<Test>] member x.``Import - Anon module 03 - After open``() = x.DoNamedTest()
+    [<Test>] member x.``Import - Anon module 04 - After comment``() = x.DoNamedTest()
 
     [<Test>] member x.``Import - Sibling namespace``() = x.DoNamedTest()
