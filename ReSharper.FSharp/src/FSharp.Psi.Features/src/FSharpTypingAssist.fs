@@ -1405,7 +1405,19 @@ type FSharpTypingAssist
 
     member x.IsActionHandlerAvailable2(context) = base.IsActionHandlerAvailable(context)
     member x.IsTypingHandlerAvailable2(context) = base.IsTypingHandlerAvailable(context)
-    member x.IsTypingSmartParenthesisHandlerAvailable2(context) = base.IsTypingSmartParenthesisHandlerAvailable(context)
+
+    member x.IsTypingSmartParenthesisHandlerAvailable2(context) =
+        let textControl = context.TextControl
+        let offset = textControl.Caret.Offset()
+
+        let mutable lexer = Unchecked.defaultof<_>
+        if not (x.GetCachingLexer(textControl, &lexer) && lexer.FindTokenAt(offset - 1)) then false else
+
+        // Don't add pair quotes/brackets after opening char quote:
+        // `'"{caret}"` or `'({caret})`
+        if lexer.TokenType = FSharpTokenType.QUOTE && lexer.GetTokenLength() = 1 then false else
+
+        base.IsTypingSmartParenthesisHandlerAvailable(context)
 
     member x.GetFSharpTree(textControl: ITextControl) =
         match x.CommitPsiOnlyAndProceedWithDirtyCaches(textControl, id).AsFSharpFile() with

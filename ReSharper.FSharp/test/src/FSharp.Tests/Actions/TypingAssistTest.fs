@@ -194,6 +194,8 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Quotes - Pair quotes 10 - Insert single in multiline``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Pair quotes 11 - At eof``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Pair quotes 12 - At eof, unfinished triple quote``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Pair quotes 13 - After quote``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Pair quotes 14 - After char``() = x.DoNamedTest()
 
     [<Test>] member x.``Quotes - Skip end 01 - Char``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Skip end 02 - String``() = x.DoNamedTest()
@@ -214,6 +216,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Brackets - Left 03 - Add right before other and space``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Left 04 - No add angle``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Left 05 - Add right before attr list end``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Left 06 - No add after single quote``() = x.DoNamedTest()
 
     [<Test>] member x.``Brackets - Skip right 01``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Skip right 02 - After code``() = x.DoNamedTest()
