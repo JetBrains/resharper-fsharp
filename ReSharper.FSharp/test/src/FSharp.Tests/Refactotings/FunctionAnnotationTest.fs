@@ -14,6 +14,12 @@ type FunctionAnnotationTest() =
     
     [<Test>] member x.``Let - No existing annotations``() = x.DoNamedTest()
     
+    // Test a few other constructs that aren't functions, check we don't do anything on those, also invocations of functions
+    // Nested functions
+    // Method declaration on a type
+    // Method declaration on a type implementing an interface
+    // Incomplete type information
+    
     override x.CreateRefactoringWorkflow(textControl, context) =
         let workflow =
             RefactoringsManager.Instance.GetWorkflowProviders<AnnotateFunctionWorkflowProvider>()

@@ -9,6 +9,9 @@ open JetBrains.ReSharper.Psi.Pointers
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ProjectModel.DataContext
+open JetBrains.ReSharper.Feature.Services.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open FSharp.Compiler.SourceCodeServices
 
 [<RefactoringWorkflowProvider>]
 type AnnotateFunctionWorkflowProvider() =
@@ -57,50 +60,50 @@ and AnnotateFunctionRefactoring(workflow, solution, driver) =
     override this.Execute progressIndicator =
         if workflow.GetMethodPointer = null then false else
         let method = workflow.GetMethodPointer.FindDeclaredElement() // TODO: is is an IFSharpIdentifier?
-        let parameters = method.Parameters |> Seq.rev
-        // TODO: To get the method return type, parameter names and return types in F# syntax use .GetMethods in FSharpIdentifierTooltipProvider.fs
-        let methodDecl =
-            match method with
-            | :? IFSharpDeclaredElement as decl -> decl
-            | unexpected -> failwithf "unexpected type %A" unexpected
-            
-        // TODO: inspect this, work out what type and how to use it properly
+        let declaration = MultyPsiDeclarations(method).AllDeclarations |> Seq.exactlyOne
+        let fsharpDeclaration = declaration.As<IFSharpDeclaration>()
+        let methodSymbol = fsharpDeclaration.GetFSharpSymbol()
+        let fSharpFunction =
+            match methodSymbol with
+            | :? FSharpMemberOrFunctionOrValue as x -> x
+                // fSharpFunction.CurriedParameterGroups for parameters then .Type.TypeDefinition for type of the param
+                // fSharpFunction.ReturnParameter.Type.TypeDefinition for type of return
+            | _ -> failwith "Expected function here"
+        let parameters = fSharpFunction.CurriedParameterGroups
         let methodNode = method.GetDeclarations() |> Seq.exactlyOne
-//        let rec getLastNode (node : ITreeNode) =
-//            let nextNode = node.NextSibling
-//            if nextNode = null then node else getLastNode nextNode
-//        let lastArgNode = getLastNode methodNode
         printfn
-            "Method name: %s return: %s" methodDecl.SourceName (method.ReturnType.GetPresentableName(FSharpLanguage.Instance))
+            "Method name: %s return: %s" fSharpFunction.DisplayName fSharpFunction.ReturnParameter.Type.TypeDefinition.DisplayName
             
         use _writeLock = WriteLockCookie.Create(methodNode.IsPhysical())
         // Delete all argument parameters on the method
         JetBrains.ReSharper.Psi.ExtensionsAPI.Tree.ModificationUtil.DeleteChildRange(methodNode.FirstChild.NextSibling, methodNode.LastChild)
         
         // Recreate all type parameters on the method
+        let mutable anchor = methodNode :> ITreeNode
         parameters
         |> Seq.iter (fun prm ->
-            printfn "Parameter Name: %s, Type: %s" prm.ShortName (prm.Type.ToString())
+            let parameter = prm |> Seq.exactlyOne
+            let name = (parameter.Name |> Option.get)
+            let typeName = (parameter.Type.TypeDefinition.DisplayName)
+            printfn "Parameter Name: %s, Type: %s" name typeName
             let annotatedTypeElements = [
                 Parsing.FSharpTokenType.LPAREN.Create("(")
-                Parsing.FSharpTokenType.IDENTIFIER.Create(prm.ShortName)
+                Parsing.FSharpTokenType.IDENTIFIER.Create(name)
                 Parsing.FSharpTokenType.COLON.Create(":")
-                Parsing.FSharpTokenType.IDENTIFIER.Create(prm.Type.ToString())
+                Parsing.FSharpTokenType.IDENTIFIER.Create(typeName)
                 Parsing.FSharpTokenType.RPAREN.Create(")")
             ]
-            let mutable anchor = methodNode :> ITreeNode
+            
             for elem in annotatedTypeElements do
                 anchor <- JetBrains.ReSharper.Psi.ExtensionsAPI.Tree.ModificationUtil.AddChildAfter(anchor, elem)
             )
-        // TODO: Add test that fails as first stage
-        // TODO: Handle return type annotations
-        // Call Children on methodNode ignore sibling nodes that are NodeType of "WHITE_SPACE", but care about types
-        // which are NodeType LOCAL_REFERENCE_PAT, also has IsDeclaration as true
         
-        // TODO: Work out how to replace text or symbols
-        // Use FSHarpUtil.AddTokenBefore(, ) or maybe ModificationUtil.AddChildBefore, pass it the ITreeNode for each Parameter
-        // Currently assuming it's possible to get an ITreeNode from each param
-        
+        let returnTypeElements = [
+                Parsing.FSharpTokenType.COLON.Create(":")
+                Parsing.FSharpTokenType.IDENTIFIER.Create(fSharpFunction.ReturnParameter.Type.TypeDefinition.DisplayName)
+            ]
+        for elem in returnTypeElements do
+            anchor <- JetBrains.ReSharper.Psi.ExtensionsAPI.Tree.ModificationUtil.AddChildAfter(anchor, elem)
         // TODO: maybe use these when tidying up
 //        let elementFactory = fsFile.CreateElementFactory()
 //            elementFactory.CreateParenExpr
