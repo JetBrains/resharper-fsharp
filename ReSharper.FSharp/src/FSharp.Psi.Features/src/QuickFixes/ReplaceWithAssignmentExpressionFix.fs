@@ -2,13 +2,12 @@
 
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.CommonErrors
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpExpressionUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
-open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Resources.Shell
 
 type ReplaceWithAssignmentExpressionFix(warning: UnitTypeExpectedWarning) =
     inherit FSharpQuickFixBase()
@@ -16,10 +15,7 @@ type ReplaceWithAssignmentExpressionFix(warning: UnitTypeExpectedWarning) =
     let expr = warning.Expr.As<IBinaryAppExpr>()
 
     override x.IsAvailable _ =
-        if not (isValid expr) ||
-            // Now we can’t find out if the operator is '=', so we define it bypassing the grammar rules
-            // TODO: rewrite after https://youtrack.jetbrains.com/issue/RIDER-41848 fix
-            getTokenType expr.Operator.FirstChild != FSharpTokenType.EQUALS then false else
+        if not (isValid expr && isPredefinedFunctionRef "=" expr.Operator) then false else
 
         match expr.LeftArgument with
         | :? IReferenceExpr as ref ->

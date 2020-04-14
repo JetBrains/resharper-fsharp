@@ -15,6 +15,9 @@ type NegateIfConditionTest() =
     [<Test>] member x.``If 01``() = x.DoNamedTest()
     [<Test>] member x.``If 02 - Separate lines``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - = 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - = 02 - Not``() = x.DoNamedTest()
+
 [<FSharpTest; TestPackages("FSharp.Core")>]
 type NegateWhileConditionTest() =
     inherit FSharpContextActionExecuteTestBase<NegateWhileConditionAction>()
