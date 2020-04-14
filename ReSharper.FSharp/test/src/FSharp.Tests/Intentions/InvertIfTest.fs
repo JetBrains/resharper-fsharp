@@ -1,11 +1,10 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
-open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<Explicit; TestPackages("FSharp.Core")>]
+[<TestPackages("FSharp.Core")>]
 type InvertIfTest() =
     inherit FSharpContextActionExecuteTestBase<InvertIfAction>()
 
@@ -36,6 +35,7 @@ type InvertIfTest() =
     [<Test>] member x.``Else - If 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Single line expressions 01``() = x.DoNamedTest()
+    [<Test>] member x.``Single line expressions 02 - App``() = x.DoNamedTest()
 
     [<Test>] member x.``Deindent - Single line expressions 01``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``Deindent - Single line expressions 02 - Comment``() = x.DoNamedTest()

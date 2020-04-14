@@ -113,7 +113,7 @@ let rec needsParens (expr: ISynExpr) =
     | :? IAppExpr when
             // todo: for each
             isNotNull (BinaryAppExprNavigator.GetByArgument(context)) ||
-            isNotNull (ConditionOwnerExprNavigator.GetByConditionExpr(context)) ->
+            isNotNull (ConditionOwnerExprNavigator.GetByExpr(context)) ->
         false
 
     | :? IIfThenElseExpr when
