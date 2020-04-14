@@ -77,6 +77,7 @@
     <Compile Include="Actions\TypingAssistTest.fs" />
     <Compile Include="Actions\FSharpExtendSelectionTest.fs" />
     <Compile Include="Refactotings\RenameTest.fs" />
+    <Compile Include="Refactotings\FunctionAnnotationTest.fs" />
     <Compile Include="FSharpTodoTest.fs" />
     <Compile Include="FSharpOccurenceKindTest.fs" />
     <Compile Include="NavigationTests.fs" />

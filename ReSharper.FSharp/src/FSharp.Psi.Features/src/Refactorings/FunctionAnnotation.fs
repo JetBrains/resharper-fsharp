@@ -8,15 +8,13 @@ open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.Pointers
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.ReSharper.Psi.ExtensionsAPI
-open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ProjectModel.DataContext
 
-//[<Language(typeof<FSharpLanguage>)>]
 [<RefactoringWorkflowProvider>]
 type AnnotateFunctionWorkflowProvider() =
     interface IRefactoringWorkflowProvider with
         member this.CreateWorkflow context =
-            let solution = context.GetData(JetBrains.ProjectModel.DataContext.ProjectModelDataConstants.SOLUTION)
+            let solution = context.GetData(ProjectModelDataConstants.SOLUTION)
             AnnotateFunctionWorkflow(solution, "Annotate function") :> IRefactoringWorkflow |> Seq.singleton
 
 and AnnotateFunctionWorkflow(solution, actionId) =
