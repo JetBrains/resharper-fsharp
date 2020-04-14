@@ -102,8 +102,13 @@ let rec needsParens (expr: ISynExpr) =
     | :? IBinaryAppExpr as binaryAppExpr when
             // todo: app expr (and check prefix too)
             let outerApp = AppExprNavigator.GetByArgument(context)
-            precedence outerApp < precedence binaryAppExpr ->
+            isNotNull outerApp && precedence outerApp < precedence binaryAppExpr ->
         false
+
+    | :? IBinaryAppExpr as binaryAppExpr when
+            let outerApp = AppExprNavigator.GetByRightArgument(context)
+            isNotNull outerApp && precedence outerApp <= precedence binaryAppExpr ->
+        true
 
     | :? IAppExpr when
             // todo: for each
