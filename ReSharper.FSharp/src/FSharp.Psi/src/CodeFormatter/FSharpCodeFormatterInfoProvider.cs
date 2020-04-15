@@ -42,10 +42,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         ("LambdaExprBody", ElementType.LAMBDA_EXPR, LambdaExpr.EXPR),
       };
 
+      var typeDeclarationIndentingRulesParameters = new[]
+      {
+        ("EnumDeclaration", ElementType.ENUM_DECLARATION, EnumDeclaration.ENUM_MEMBER),
+        ("UnionDeclarationCases", ElementType.UNION_DECLARATION, UnionDeclaration.UNION_REPR),
+        ("TypeAbbreviation", ElementType.TYPE_ABBREVIATION_DECLARATION, TypeAbbreviationDeclaration.TYPE_OR_UNION_CASE),
+        ("ModuleAbbreviation", ElementType.MODULE_ABBREVIATION, ModuleAbbreviation.TYPE_REFERENCE),
+      };
+
       lock (this)
       {
         bindingAndModuleDeclIndentingRulesParameters
           .Union(synExprIndentingRulesParameters)
+          .Union(typeDeclarationIndentingRulesParameters)
           .ToList()
           .ForEach(DescribeSimpleIndentingRule);
 
