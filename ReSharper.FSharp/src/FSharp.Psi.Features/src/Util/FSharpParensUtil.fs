@@ -44,15 +44,19 @@ let precedence (expr: ISynExpr): int =
         match name with
         | "|" | "||" -> 1
         | "&" | "&&" -> 2
-        | Prefix "!=" | Prefix "<" | Prefix ">" | Prefix "|" | Prefix "&" | "$" | "=" -> 3
-        | Prefix "^" -> 4
-        | Prefix "::" -> 5
-        | Prefix "+" | Prefix "-" -> 6
-        | Prefix "*" | Prefix "/" | Prefix "%" -> 7
-        | Prefix "**" -> 8
+        | Prefix "!=" | Prefix "<" | Prefix ">" | Prefix "|" | Prefix "&" | "$" | "=" -> 4
+        | Prefix "^" -> 5
+        | Prefix "::" -> 6
+        | Prefix "+" | Prefix "-" -> 8
+        | Prefix "*" | Prefix "/" | Prefix "%" -> 9
+        | Prefix "**" -> 10
         | _ -> 0
 
-    | :? IPrefixAppExpr -> 9
+    | :? ICastExpr -> 3
+    | :? ITypeTestExpr -> 7
+    | :? IPrefixAppExpr | :? IDoLikeExpr -> 11
+    | :? IParenExpr -> 12
+
     | _ -> 0
 
 
@@ -100,24 +104,24 @@ let rec needsParens (expr: ISynExpr) =
     | :? IAddressOfExpr -> false
 
     | :? IBinaryAppExpr as binaryAppExpr when
-            // todo: app expr (and check prefix too)
-            let outerApp = AppExprNavigator.GetByArgument(context)
-            isNotNull outerApp && precedence outerApp < precedence binaryAppExpr ->
-        false
+            isNotNull (AppExprNavigator.GetByArgument(context)) ->
+        let outerApp = AppExprNavigator.GetByArgument(context)
+        precedence outerApp > precedence binaryAppExpr ||
 
-    | :? IBinaryAppExpr as binaryAppExpr when
-            let outerApp = AppExprNavigator.GetByRightArgument(context)
-            isNotNull outerApp && precedence outerApp <= precedence binaryAppExpr ->
-        true
-
+        let outerApp = AppExprNavigator.GetByRightArgument(context)
+        isNotNull outerApp && precedence outerApp = precedence binaryAppExpr
+        
     | :? IAppExpr when
             // todo: for each
-            isNotNull (BinaryAppExprNavigator.GetByArgument(context)) ||
-            isNotNull (ConditionOwnerExprNavigator.GetByExpr(context)) ->
+            isNotNull (BinaryAppExprNavigator.GetByArgument(context)) ->
         false
 
     | :? IIfThenElseExpr when
             isNotNull (IfThenElseExprNavigator.GetByElseExpr(context)) ->
+        false
+
+    | :? IAppExpr | :? ITypedLikeExpr | :? IDoLikeExpr when
+            isNotNull (ConditionOwnerExprNavigator.GetByExpr(context)) ->
         false
 
     | _ ->
@@ -133,7 +137,7 @@ let rec needsParens (expr: ISynExpr) =
     let rightArgument = binaryApp.RightArgument
     if isNotNull rightArgument && context.Indent = rightArgument.Indent then false else
 
-    true
+    precedence binaryApp.LeftArgument < precedence binaryApp
 
 
 let addParens (expr: ISynExpr) =

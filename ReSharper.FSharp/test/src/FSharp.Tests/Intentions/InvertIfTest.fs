@@ -36,6 +36,9 @@ type InvertIfTest() =
 
     [<Test>] member x.``Single line expressions 01``() = x.DoNamedTest()
     [<Test>] member x.``Single line expressions 02 - App``() = x.DoNamedTest()
+    [<Test>] member x.``Single line expressions 03 - Typed``() = x.DoNamedTest()
+    [<Test>] member x.``Single line expressions 04 - Typed``() = x.DoNamedTest()
+    [<Test>] member x.``Single line expressions 05 - Lazy``() = x.DoNamedTest()
 
     [<Test>] member x.``Deindent - Single line expressions 01``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``Deindent - Single line expressions 02 - Comment``() = x.DoNamedTest()
