@@ -32,7 +32,7 @@ type IFSharpElementFactory =
     abstract CreateRecordExprBinding: fieldName: string * addSemicolon: bool -> IRecordExprBinding
 
     abstract CreateMatchExpr: ISynExpr -> IMatchExpr
-    abstract CreateMatchClause: ISynPat -> IMatchClause
+    abstract CreateMatchClause: unit -> IMatchClause
 
     abstract CreateForEachExpr: ISynExpr -> IForEachExpr
 

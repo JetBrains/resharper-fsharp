@@ -2,7 +2,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
 open System
 open System.Collections.Generic
-open JetBrains.Application.Settings
 open JetBrains.ReSharper.Daemon.Stages.Dispatcher
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
@@ -16,12 +15,10 @@ type FSharpErrorsStage(elementProblemAnalyzerRegistrar) =
     inherit FSharpDaemonStageBase()
 
     override x.CreateStageProcess(fsFile, settings, daemonProcess) =
-        FSharpErrorStageProcess(fsFile, daemonProcess, settings, elementProblemAnalyzerRegistrar) :> IDaemonStageProcess
+        FSharpErrorStageProcess(fsFile, daemonProcess, settings, elementProblemAnalyzerRegistrar) :> _
 
 
-and FSharpErrorStageProcess
-        (fsFile: IFSharpFile, daemonProcess: IDaemonProcess, settings: IContextBoundSettingsStore,
-         analyzerRegistrar: ElementProblemAnalyzerRegistrar) =
+and FSharpErrorStageProcess(fsFile, daemonProcess, settings, analyzerRegistrar: ElementProblemAnalyzerRegistrar) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
     static let analyzerRunKind = ElementProblemAnalyzerRunKind.FullDaemon

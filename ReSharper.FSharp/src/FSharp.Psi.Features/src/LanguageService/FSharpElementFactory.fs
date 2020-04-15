@@ -169,13 +169,11 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
             matchExpr
 
-        member x.CreateMatchClause(pat) =
-            let source = "match () with | _ -> ()"
+        member x.CreateMatchClause() =
+            let source = "match () with | _ -> failwith \"todo\""
 
             let matchExpr = getExpression source :?> IMatchExpr
-            let clause = matchExpr.Clauses.[0]
-            clause.SetPattern(pat) |> ignore
-            clause
+            matchExpr.Clauses.[0]
 
         member x.CreateParenExpr() =
             getExpression "(())" :?> _

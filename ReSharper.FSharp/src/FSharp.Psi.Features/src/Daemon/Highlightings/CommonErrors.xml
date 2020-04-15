@@ -38,6 +38,28 @@
     <QuickFix>ReplaceUseWithLetFix</QuickFix>
   </Error>
 
+  <Warning staticGroup="FSharpErrors" name="MatchIncomplete">
+    <Parameter type="IMatchExpr" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.Expression.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>AddMatchAllClauseFix</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="EnumMatchIncomplete">
+    <Parameter type="IMatchExpr" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.Expression.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>AddMatchAllClauseFix</QuickFix>
+  </Warning>
+  
   <Warning staticGroup="FSharpErrors" name="RuleNeverMatched">
     <Parameter type="IMatchClause" name="matchClause"/>
     <Message value="This rule will never be matched"/>
