@@ -1,0 +1,3 @@
+﻿module Module
+
+let [<CompiledName "I"; Literal (* comment *) >] i{caret} = 1

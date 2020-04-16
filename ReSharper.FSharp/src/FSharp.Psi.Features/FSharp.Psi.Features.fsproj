@@ -100,6 +100,7 @@
     <Compile Include="src\Intentions\IfToElifAction.fs" />
     <Compile Include="src\Intentions\NegateConditionActions.fs" />
     <Compile Include="src\Intentions\ToMutableAction.fs" />
+    <Compile Include="src\Intentions\ToLiteralAction.fs" />
     <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
       <Mode>QUICKFIX</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>

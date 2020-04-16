@@ -5,8 +5,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   public abstract class FSharpExpressionBase : FSharpCompositeElement, IExpression
   {
-    public ConstantValue ConstantValue => ConstantValue.BAD_VALUE;
-    public bool IsConstantValue() => false;
+    public virtual ConstantValue ConstantValue => ConstantValue.BAD_VALUE;
+    public virtual bool IsConstantValue() => false;
 
     public ExpressionAccessType GetAccessType() => ExpressionAccessType.None;
 

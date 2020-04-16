@@ -38,6 +38,10 @@ type IFSharpElementFactory =
 
     abstract AsReferenceExpr: typeReference: ITypeReferenceName -> IReferenceExpr
 
+    abstract CreateEmptyAttributeList: unit -> IAttributeList
+    abstract CreateAttribute: attrName: string -> IAttribute
+
+
 [<AllowNullLiteral>]
 type IFSharpLanguageService =
     abstract CreateParser: IDocument -> IFSharpParser

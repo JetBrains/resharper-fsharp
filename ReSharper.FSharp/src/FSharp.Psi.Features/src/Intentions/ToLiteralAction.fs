@@ -1,0 +1,103 @@
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
+
+open JetBrains.ReSharper.Feature.Services.ContextActions
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Psi.ExtensionsAPI
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Resources.Shell
+
+module ToLiteralAction =
+    let [<Literal>] Description = "Make value literal (const) by adding Literal attribute"
+
+[<ContextAction(Name = "ToLiteral", Group = "F#", Description = ToLiteralAction.Description)>]
+type ToLiteralAction(dataProvider: FSharpContextActionDataProvider) =
+    inherit FSharpContextActionBase(dataProvider)
+
+    let getAttributeList (binding: IBinding): IAttributeList =
+        let attributeLists = binding.AttributeLists
+        if not attributeLists.IsEmpty then attributeLists.First() else
+
+        addNodesBefore binding.FirstChild [
+            binding.CreateElementFactory().CreateEmptyAttributeList()
+            Whitespace()
+        ] |> ignore
+
+        binding.AttributeLists.[0]
+
+    let rec isSimplePattern (pat: ISynPat): bool =
+        match pat with
+        | :? IReferencePat as refPat ->
+            let referenceName = refPat.ReferenceName
+            isNotNull referenceName && isNull referenceName.Qualifier
+
+        | :? IAsPat as asPat -> isSimplePattern asPat.Pattern
+        | :? IParenPat as parenPat -> isSimplePattern parenPat.Pattern
+
+        | _ -> false
+
+    let hasLiteralAttribute (attrs: TreeNodeEnumerable<IAttribute>):bool =
+        attrs |> Seq.exists (fun attr ->
+            let referenceName = attr.ReferenceName
+            isNotNull referenceName && referenceName.ShortName = "Literal")
+
+    let rec isLiteralBinding (binding: IBinding): bool =
+        if hasLiteralAttribute binding.AttributesEnumerable then true else
+
+        let letBindings = LetModuleDeclNavigator.GetByBinding(binding)
+        if isNull letBindings || letBindings.Bindings.[0] != binding then false else
+
+        hasLiteralAttribute letBindings.AttributesEnumerable
+
+    override x.Text = "To literal"
+
+    override x.IsAvailable _ =
+        // todo: allow on keyword
+        // todo: check isMutable, isInline
+
+        let binding = dataProvider.GetSelectedElement<ITopBinding>()
+        let selectedRange = dataProvider.SelectedTreeRange
+        if not (isValid binding && binding.GetNameRange().Contains(&selectedRange)) then false else
+
+        if not (isSimplePattern binding.HeadPattern) then false else
+        if isLiteralBinding binding then false else
+
+        binding.Expression.IsConstantValue()
+
+    override x.ExecutePsiTransaction(_, _) =
+        let binding = dataProvider.GetSelectedElement<IBinding>()
+        use writeCookie = WriteLockCookie.Create(binding.IsPhysical())
+        use disableFormatter = new DisableCodeFormatter()
+
+        let attributeList = getAttributeList binding
+        let attribute = binding.CreateElementFactory().CreateAttribute("Literal")
+
+        let attributes = attributeList.Attributes
+        if attributes.IsEmpty then
+            ModificationUtil.AddChildAfter(attributeList.LBrack, attribute) |> ignore
+        else
+            let lastAttribute = attributes.Last()
+            let anchor, seenSemi =
+                let node = skipMatchingNodesAfter isInlineSpaceOrComment lastAttribute
+                if getTokenType node == FSharpTokenType.SEMICOLON then
+                    node, true
+                else
+                    lastAttribute :> _, false
+
+            addNodesAfter anchor [
+                if not seenSemi then
+                    FSharpTokenType.SEMICOLON.CreateLeafElement()
+                Whitespace()
+                attribute
+
+                let nextSiblingType = getTokenType anchor.NextSibling
+                if isNotNull nextSiblingType &&
+                        not (nextSiblingType.IsWhitespace || nextSiblingType == FSharpTokenType.GREATER_RBRACK) then
+                    Whitespace()
+            ] |> ignore
+
+        null

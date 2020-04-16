@@ -72,6 +72,11 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         ModificationUtil.ReplaceChild(parenExpr.InnerExpression, expr.Copy()) |> ignore
         parenExpr
     
+    let createAttributeList attrName: IAttributeList =
+            let source = sprintf "[<%s>] ()" attrName
+            let doDecl = getDoDecl source
+            doDecl.AttributeLists.[0]
+
     interface IFSharpElementFactory with
         member x.CreateOpenStatement(ns) =
             // todo: mangle ns
@@ -230,3 +235,12 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
             expr
   
+
+        member x.CreateEmptyAttributeList() =
+            let attributeList = createAttributeList "Foo"
+            ModificationUtil.DeleteChild(attributeList.Attributes.[0])
+            attributeList
+
+        member x.CreateAttribute(attrName) =
+            let attributeList = createAttributeList attrName
+            attributeList.Attributes.[0]

@@ -488,11 +488,31 @@ unitExpr options { stubBase="FSharpExpressionBase"; }:
   LPAREN<LPAREN, LParen>
   RPAREN<RPAREN, RParen>;
 
-// todo: add numeric literals
 literalExpr options { stubBase="FSharpExpressionBase"; }:
   TRUE<LITERAL, Literal> |
   FALSE<LITERAL, Literal> |
-  NULL<LITERAL, Literal>;
+  NULL<LITERAL, Literal> |
+  SBYTE<LITERAL, Literal> |
+  BYTE<LITERAL, Literal> |
+  INT16<LITERAL, Literal> |
+  UINT16<LITERAL, Literal> |
+  INT32<LITERAL, Literal> |
+  UINT32<LITERAL, Literal> |
+  INT64<LITERAL, Literal> |
+  UINT64<LITERAL, Literal> |
+  IEEE32<LITERAL, Literal> |
+  IEEE64<LITERAL, Literal> |
+  DECIMAL<LITERAL, Literal> |
+  BIGNUM<LITERAL, Literal> |
+  NATIVEINT<LITERAL, Literal> |
+  UNATIVEINT<LITERAL, Literal> |
+  CHARACTER_LITERAL<LITERAL, Literal> |
+  STRING<LITERAL, Literal> |
+  VERBATIM_STRING<LITERAL, Literal> |
+  TRIPLE_QUOTED_STRING<LITERAL, Literal> |
+  BYTEARRAY<LITERAL, Literal> |
+  VERBATIM_BYTEARRAY<LITERAL, Literal> |
+  BYTECHAR<LITERAL, Literal>;
 
 typedExpr options { stubBase="FSharpExpressionBase"; }:
   synExpr<EXPR, Expression>
@@ -1408,9 +1428,9 @@ private accessModifier{ROLE,Getter}:
 // Attributes
 
 attributeList:
-  LBRACK<LBRACK, LBrack>
+  LBRACK_LESS<LBRACK, LBrack>
   LIST attribute<ATTRIBUTE, Attributes> SEP SEMICOLON<FSHARP_SEMI, Separators>
-  RBRACK<RBRACK, RBrack>;
+  GREATER_RBRACK<RBRACK, RBrack>;
 
 attribute options { stubBase="TypeReferenceOwnerBase"; } extras {
   get { methodName="Expression" path=<attribute:CHAMELEON_EXPR/chameleonExpression:EXPR> };
