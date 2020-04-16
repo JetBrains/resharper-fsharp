@@ -1,4 +1,4 @@
-﻿module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings.FunctionAnnotation
+module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings.FunctionAnnotation
 
 open JetBrains.Application.DataContext
 open JetBrains.ReSharper.Feature.Services.Refactorings
@@ -12,6 +12,7 @@ open JetBrains.ProjectModel.DataContext
 open JetBrains.ReSharper.Feature.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open FSharp.Compiler.SourceCodeServices
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
 [<RefactoringWorkflowProvider>]
 type AnnotateFunctionWorkflowProvider() =
@@ -35,11 +36,11 @@ and AnnotateFunctionWorkflow(solution, actionId) =
     /// Should "enable undo" be shown in the UI
     override this.get_MightModifyManyDocuments () = true
     member private this.GetMethod (context : IDataContext) =
+        // TODO: Currently this returns Some even for a function invocation, where it should return None
         context.GetData(PsiDataConstants.DECLARED_ELEMENTS)
             |> Option.ofObj
             |> Option.bind(Seq.tryFind(function | :? IMethod -> true | _ -> false))
             |> Option.bind(function | :? IMethod as method -> Some method | _ -> None)
-        // TODO MC: TO get types, do method.Parameters() to get params, use .FSharpSymbol.FullName on it for name and .Type for type properties!
     override this.Initialize (context : IDataContext) =
         match this.GetMethod(context) with
         | Some method ->
@@ -48,7 +49,6 @@ and AnnotateFunctionWorkflow(solution, actionId) =
         | None ->
             false
     override this.IsAvailable (context : IDataContext) =
-        // TODO: Must also be the let binding defining the method
         this.GetMethod context |> Option.isSome
     
     override this.get_Title () = "Annotate function types"
@@ -59,26 +59,30 @@ and AnnotateFunctionRefactoring(workflow, solution, driver) =
     
     override this.Execute progressIndicator =
         if workflow.GetMethodPointer = null then false else
-        let method = workflow.GetMethodPointer.FindDeclaredElement() // TODO: is is an IFSharpIdentifier?
+        let method = workflow.GetMethodPointer.FindDeclaredElement() 
         let declaration = MultyPsiDeclarations(method).AllDeclarations |> Seq.exactlyOne
         let fsharpDeclaration = declaration.As<IFSharpDeclaration>()
         let methodSymbol = fsharpDeclaration.GetFSharpSymbol()
         let fSharpFunction =
             match methodSymbol with
             | :? FSharpMemberOrFunctionOrValue as x -> x
-                // fSharpFunction.CurriedParameterGroups for parameters then .Type.TypeDefinition for type of the param
-                // fSharpFunction.ReturnParameter.Type.TypeDefinition for type of return
             | _ -> failwith "Expected function here"
         let parameters = fSharpFunction.CurriedParameterGroups
         let methodNode = method.GetDeclarations() |> Seq.exactlyOne
         printfn
             "Method name: %s return: %s" fSharpFunction.DisplayName fSharpFunction.ReturnParameter.Type.TypeDefinition.DisplayName
             
+        // TODO: In order to manipulate the code, and annotate it, I probably want to make use of the FSharpElementFactory
+        // but not sure how to get the existing method declaration in terms of an ISynExpr which looks like the best way to use the factory.
+        let langService = methodNode.Language.LanguageService().As<IFSharpLanguageService>()
+        let psi = fsharpDeclaration.GetPsiModule()
+        let elementFactory = langService.CreateElementFactory psi
+        
+        // Delete everything after `let funcName`
         use _writeLock = WriteLockCookie.Create(methodNode.IsPhysical())
-        // Delete all argument parameters on the method
         JetBrains.ReSharper.Psi.ExtensionsAPI.Tree.ModificationUtil.DeleteChildRange(methodNode.FirstChild.NextSibling, methodNode.LastChild)
         
-        // Recreate all type parameters on the method
+        // Insert function parameters with annotations, including return type annotation
         let mutable anchor = methodNode :> ITreeNode
         parameters
         |> Seq.iter (fun prm ->
@@ -93,6 +97,7 @@ and AnnotateFunctionRefactoring(workflow, solution, driver) =
                 Parsing.FSharpTokenType.IDENTIFIER.Create(typeName)
                 Parsing.FSharpTokenType.RPAREN.Create(")")
             ]
+            // TODO: Need to insert arguments on new lines with correct indentation, not all on same line
             
             for elem in annotatedTypeElements do
                 anchor <- JetBrains.ReSharper.Psi.ExtensionsAPI.Tree.ModificationUtil.AddChildAfter(anchor, elem)
@@ -104,9 +109,6 @@ and AnnotateFunctionRefactoring(workflow, solution, driver) =
             ]
         for elem in returnTypeElements do
             anchor <- JetBrains.ReSharper.Psi.ExtensionsAPI.Tree.ModificationUtil.AddChildAfter(anchor, elem)
-        // TODO: maybe use these when tidying up
-//        let elementFactory = fsFile.CreateElementFactory()
-//            elementFactory.CreateParenExpr
         
         true
     
