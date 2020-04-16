@@ -13,6 +13,7 @@ type FunctionAnnotationTest() =
     override x.RelativeTestDataPath = "features/refactorings/functionAnnotation"
     
     [<Test>] member x.``Let - No existing annotations``() = x.DoNamedTest()
+    [<Test>] member x.``Member - mixed existing annotations``() = x.DoNamedTest()
     
     // Test a few other constructs that aren't functions, check we don't do anything on those, also invocations of functions
     // Nested functions
