@@ -5,4 +5,4 @@ type Enum =
 
 match Enum.A{caret} with
 | Enum.A -> ()
-| _ -> failwith "todo"
+| _ -> ArgumentOutOfRangeException() |> raise

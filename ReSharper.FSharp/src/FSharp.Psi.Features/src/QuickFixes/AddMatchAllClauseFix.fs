@@ -8,14 +8,20 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
-type AddMatchAllClauseFix(expr: IMatchExpr) =
+[<RequireQualifiedAccess>]
+type GeneratedClauseExpr =
+    | Todo
+    | ArgumentOutOfRange
+
+
+type AddMatchAllClauseFix(expr: IMatchExpr, generatedExpr: GeneratedClauseExpr) =
     inherit FSharpQuickFixBase()
 
     new (warning: MatchIncompleteWarning) =
-        AddMatchAllClauseFix(warning.Expr)
+        AddMatchAllClauseFix(warning.Expr, GeneratedClauseExpr.Todo)
 
     new (warning: EnumMatchIncompleteWarning) =
-        AddMatchAllClauseFix(warning.Expr)
+        AddMatchAllClauseFix(warning.Expr, GeneratedClauseExpr.ArgumentOutOfRange)
 
     override x.Text = "Add '_' pattern"
 
@@ -24,6 +30,7 @@ type AddMatchAllClauseFix(expr: IMatchExpr) =
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
+        let factory = expr.CreateElementFactory()
         use disableFormatter = new DisableCodeFormatter()
 
         let clauses = expr.Clauses
@@ -32,12 +39,16 @@ type AddMatchAllClauseFix(expr: IMatchExpr) =
         let addToNewLine = not isSingleLineMatch // todo: cover more cases
         let indent = if addToNewLine then clauses.Last().Indent else expr.Indent
 
-        addNodesAfter expr.LastChild [
-            if addToNewLine then
-                NewLine(expr.GetLineEnding())
-                if indent > 0 then
-                    Whitespace(indent)
-            else
-                Whitespace()
-            expr.CreateElementFactory().CreateMatchClause()
-        ] |> ignore
+        let clause = 
+            addNodesAfter expr.LastChild [
+                if addToNewLine then
+                    NewLine(expr.GetLineEnding())
+                    if indent > 0 then
+                        Whitespace(indent)
+                else
+                    Whitespace()
+                factory.CreateMatchClause()
+            ] :?> IMatchClause
+
+        if generatedExpr = GeneratedClauseExpr.ArgumentOutOfRange then
+            clause.SetExpression(factory.CreateExpr("ArgumentOutOfRangeException() |> raise")) |> ignore
