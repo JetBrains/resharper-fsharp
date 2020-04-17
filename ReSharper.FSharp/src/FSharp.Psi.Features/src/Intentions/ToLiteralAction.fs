@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
 open JetBrains.ReSharper.Feature.Services.ContextActions
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -75,29 +76,6 @@ type ToLiteralAction(dataProvider: FSharpContextActionDataProvider) =
 
         let attributeList = getAttributeList binding
         let attribute = binding.CreateElementFactory().CreateAttribute("Literal")
-
-        let attributes = attributeList.Attributes
-        if attributes.IsEmpty then
-            ModificationUtil.AddChildAfter(attributeList.LBrack, attribute) |> ignore
-        else
-            let lastAttribute = attributes.Last()
-            let anchor, seenSemi =
-                let node = skipMatchingNodesAfter isInlineSpaceOrComment lastAttribute
-                if getTokenType node == FSharpTokenType.SEMICOLON then
-                    node, true
-                else
-                    lastAttribute :> _, false
-
-            addNodesAfter anchor [
-                if not seenSemi then
-                    FSharpTokenType.SEMICOLON.CreateLeafElement()
-                Whitespace()
-                attribute
-
-                let nextSiblingType = getTokenType anchor.NextSibling
-                if isNotNull nextSiblingType &&
-                        not (nextSiblingType.IsWhitespace || nextSiblingType == FSharpTokenType.GREATER_RBRACK) then
-                    Whitespace()
-            ] |> ignore
+        FSharpAttributesUtil.addAttribute attributeList attribute
 
         null

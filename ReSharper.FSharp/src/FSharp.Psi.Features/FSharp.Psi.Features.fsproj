@@ -13,6 +13,7 @@
     <Compile Include="src\Util\OpensUtil.fs" />
     <Compile Include="src\Util\FSharpParensUtil.fs" />
     <Compile Include="src\Util\FSharpExpressionUtil.fs" />
+    <Compile Include="src\Util\FSharpAttributesUtil.fs" />
     <Compile Include="src\CodeCompletion\CompletionUtil.fs" />
     <Compile Include="src\CodeCompletion\FSharpCodeCompletionContext.fs" />
     <Compile Include="src\CodeCompletion\FSharpPathCompletionProvider.fs" />

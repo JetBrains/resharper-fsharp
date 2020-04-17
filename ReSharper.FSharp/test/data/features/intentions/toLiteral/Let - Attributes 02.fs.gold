@@ -1,3 +1,0 @@
-﻿module Module
-
-let [<CompiledName "I"; Literal>] i{caret} = 1
