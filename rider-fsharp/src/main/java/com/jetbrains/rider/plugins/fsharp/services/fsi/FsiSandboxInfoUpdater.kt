@@ -12,39 +12,71 @@ import com.jetbrains.rdclient.editors.FrontendTextControlHost
 import com.jetbrains.rdclient.editors.sandboxes.SandboxManager
 import com.jetbrains.rd.platform.util.application
 import com.jetbrains.rd.util.lifetime.Lifetime
+import com.jetbrains.rd.util.lifetime.LifetimeDefinition
 import com.jetbrains.rdclient.lang.toRdLanguageOrThrow
 import com.jetbrains.rdclient.util.idea.fromOffset
 import com.jetbrains.rider.editors.RiderTextControlHost
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptLanguage
-import com.jetbrains.rider.model.ExtraInfo
-import com.jetbrains.rider.model.RdTextRange
-import com.jetbrains.rider.model.SandboxInfo
+import com.jetbrains.rider.model.*
+import com.jetbrains.rider.projectView.solution
+import org.jetbrains.concurrency.AsyncPromise
 
 class FsiSandboxInfoUpdater(
         private val project: Project, private val consoleEditor: EditorEx, private val history: CommandHistory) {
 
-    val fsiProcessOutputListener = FsiProcessOutputListener()
-    private var verifiedCommandNumber = 0
+    private val rdFsiTools = project.solution.rdFSharpModel.fSharpInteractiveHost.fsiTools;
 
+    private val lockObject = Object()
+
+    private var processLifetimeDefinition : LifetimeDefinition? = null
+    private var processLifetime : Lifetime? = null
+
+    val fsiProcessOutputListener = FsiSandboxInfoUpdaterProcessOutputListener(this)
+
+    private var verifiedCommandNumber = 0
+    private val preparedCommands = mutableListOf<String>()
+    private var lastPreparedCommandIndex: Int? = null
     private val correctCommandNumbers = mutableListOf<Int>()
 
     private fun updateSandboxInfo() {
         application.invokeLater {
             val sandboxManager = SandboxManager.getInstance()
-
             if (sandboxManager.getSandboxInfo(consoleEditor) == null) return@invokeLater
 
-            val additionalTextToInsert = StringBuilder()
-            for (i in correctCommandNumbers)
-                additionalTextToInsert.appendln(history.entries[i - 1].visibleText)
+            var startUnpreparedCommandIndex = 0
+            val endUnpreparedCommandIndex = correctCommandNumbers.size
+            if (lastPreparedCommandIndex != null) {
+                startUnpreparedCommandIndex = lastPreparedCommandIndex!! + 1
+            }
 
-            val sandboxInfo = genericFSharpSandboxInfoWithCustomParams(
-                    additionalTextToInsert.toString().replace("\r\n", "\n"),
-                    false,
-                    emptyList()
-            )
-            sandboxManager.markAsSandbox(consoleEditor, sandboxInfo)
-            FrontendTextControlHost.getInstance(project).rebindEditor(consoleEditor)
+            val unpreparedCommands = mutableListOf<String>()
+            for (i in correctCommandNumbers.subList(startUnpreparedCommandIndex, endUnpreparedCommandIndex)) {
+                unpreparedCommands.add(history.entries[i - 1].visibleText)
+            }
+
+            synchronized(lockObject)
+            {
+                if (processLifetime == null) return@invokeLater
+
+                val result = AsyncPromise<List<String>>()
+                rdFsiTools.prepareCommands.start(RdFsiPrepareCommandsArgs(startUnpreparedCommandIndex, unpreparedCommands)).result.advise(processLifetime!!) {
+                    result.setResult(it.unwrap())
+                }
+
+                result.onSuccess {preparedAdditionalCommands ->
+                    preparedCommands.addAll(preparedAdditionalCommands)
+                    lastPreparedCommandIndex = preparedCommands.size - 1
+
+                    val sandboxInfo = genericFSharpSandboxInfoWithCustomParams(
+                            preparedCommands.joinToString(separator= "").replace("\r\n", "\n"),
+                            false,
+                            emptyList()
+                    )
+
+                    sandboxManager.markAsSandbox(consoleEditor, sandboxInfo)
+                    FrontendTextControlHost.getInstance(project).rebindEditor(consoleEditor)
+                }
+            }
         }
     }
 
@@ -61,12 +93,21 @@ class FsiSandboxInfoUpdater(
         fsiProcessOutputListener.lastOutputType = ProcessOutputTypes.STDERR
     }
 
-    class FsiProcessOutputListener : ProcessAdapter() {
+    class FsiSandboxInfoUpdaterProcessOutputListener(private val fsiSandboxInfoUpdater: FsiSandboxInfoUpdater) : ProcessAdapter() {
         var lastOutputType : Key<*> = ProcessOutputTypes.SYSTEM
 
         override fun onTextAvailable(event: ProcessEvent, outputType: Key<*>) {
             if (outputType == ProcessOutputTypes.STDOUT && lastOutputType != ProcessOutputTypes.SYSTEM)
                 lastOutputType = ProcessOutputTypes.STDOUT
+        }
+
+        override fun startNotified(event: ProcessEvent) {
+            fsiSandboxInfoUpdater.processLifetimeDefinition = LifetimeDefinition()
+            fsiSandboxInfoUpdater.processLifetime = fsiSandboxInfoUpdater.processLifetimeDefinition!!.lifetime
+        }
+
+        override fun processTerminated(event: ProcessEvent) {
+            fsiSandboxInfoUpdater.processLifetimeDefinition!!.terminate()
         }
     }
 }

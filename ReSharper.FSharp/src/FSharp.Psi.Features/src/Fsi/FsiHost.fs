@@ -75,6 +75,8 @@ type FsiHost
         let rdFsiHost = solution.RdFSharpModel().FSharpInteractiveHost
         rdFsiHost.RequestNewFsiSessionInfo.Set(getNewFsiSessionInfo)
         rdFsiHost.GetProjectReferences.Set(getProjectReferences)
+          
+        rdFsiHost.FsiTools.PrepareCommands.Set(FsiTools.prepareCommands)
 
         fsiOptions.MoveCaretOnSendLine.FlowInto(lifetime, rdFsiHost.MoveCaretOnSendLine)
         fsiOptions.ExecuteRecent.FlowInto(lifetime, rdFsiHost.CopyRecentToEditor)
