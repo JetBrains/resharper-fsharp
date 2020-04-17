@@ -6,7 +6,6 @@ open FSharp.Compiler.SyntaxTree
 open FSharp.Compiler.Range
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
-open JetBrains.Lifetimes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -17,18 +16,20 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.TreeBuilder
 
 [<AbstractClass>]
-type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetime, projectedOffset) =
+type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset, offsetShift, lineShift) =
     inherit TreeBuilderBase(lifetime, lexer)
+
+    let lineShift = lineShift - 1
 
     let lineOffsets =
         let lineCount = document.GetLineCount()
-        Array.init (int lineCount) (fun line -> document.GetLineStartOffset(docLine line))
+        Array.init (int lineCount) (fun line -> document.GetLineStartOffset(docLine line) + offsetShift)
 
     let getLineOffset line =
-        lineOffsets.[line - 1]
+        lineOffsets.[line + lineShift]
 
     new (sourceFile, lexer, lifetime) =
-        FSharpTreeBuilderBase(sourceFile, lexer, lifetime, 0)
+        FSharpTreeBuilderBase(sourceFile, lexer, lifetime, 0, 0, 0)
 
     abstract member CreateFSharpFile: unit -> IFSharpFile
 
@@ -677,14 +678,18 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
 
     member x.MarkChameleonExpression(expr: SynExpr) =
         let (ExprRange range as expr) = x.FixExpresion(expr)
-        let mark = x.Mark(range)
+
+        let startOffset = x.GetStartOffset(range)
+        let mark = x.Mark(startOffset)
 
         // Replace all tokens with single chameleon token.
         let tokenMark = x.Mark(range)
         x.AdvanceToEnd(range)
         x.Builder.AlterToken(tokenMark, FSharpTokenType.CHAMELEON)
 
-        x.Done(range, mark, ChameleonExpressionNodeType.Instance, expr)
+        let lineStart = lineOffsets.[range.StartLine - 1]
+        let data = expr, startOffset, lineStart
+        x.Done(range, mark, ChameleonExpressionNodeType.Instance, data)
 
     member x.ProcessHashDirective(ParsedHashDirective(id, _, range)) =
         let mark = x.Mark(range)

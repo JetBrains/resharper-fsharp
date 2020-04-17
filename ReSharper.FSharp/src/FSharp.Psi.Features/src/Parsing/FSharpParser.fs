@@ -1,18 +1,20 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
-open FSharp.Compiler.SyntaxTree
 open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.SyntaxTree
 open JetBrains.Annotations
 open JetBrains.DocumentModel
 open JetBrains.Lifetimes
-open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Parsing
+open JetBrains.ReSharper.Psi.Tree
 
 type FSharpParser(lexer: ILexer, document: IDocument, path: FileSystemPath, sourceFile: IPsiSourceFile,
                   checkerService: FSharpCheckerService, symbolsCache: IFSharpResolvedSymbolsCache) =
@@ -70,10 +72,30 @@ type FSharpParser(lexer: ILexer, document: IDocument, path: FileSystemPath, sour
 
         member this.ParseExpression(chameleonExpr: IChameleonExpression, document) =
             let document = if isNotNull document then document else chameleonExpr.GetSourceFile().Document
+
             let projectedOffset = chameleonExpr.GetTreeStartOffset().Offset
+            let offsetShift = projectedOffset - chameleonExpr.OriginalStartOffset
+
+            let startLine =
+                if offsetShift = 0 then docLine 0 else
+                chameleonExpr.GetDocumentStartOffset().ToDocumentCoords().Line
+
+            let lineShift =
+                if offsetShift = 0 then 0 else
+
+                let originalStartLine = chameleonExpr.SynExpr.Range.StartLine - 1
+                int startLine - originalStartLine
+
+            let offsetShift =
+                if offsetShift = 0 then 0 else
+
+                let lineStartShift = document.GetLineStartOffset(startLine) - chameleonExpr.OriginalLineStart
+                offsetShift - lineStartShift
 
             Lifetime.Using(fun lifetime ->
                 // todo: cover error cases where fsImplFile or multiple expressions may be returned
-                let treeBuilder = FSharpImplTreeBuilder(lexer, document, [], lifetime, projectedOffset)
+                let treeBuilder =
+                    FSharpImplTreeBuilder(lexer, document, [], lifetime, projectedOffset, offsetShift, lineShift)
+
                 treeBuilder.ProcessTopLevelExpression(chameleonExpr.SynExpr)
                 treeBuilder.GetTreeNode()) :?> ISynExpr

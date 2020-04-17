@@ -22,8 +22,8 @@ and IBuilderStepProcessor =
     abstract Process: step: obj * builder: FSharpImplTreeBuilder -> unit
 
 
-type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
-    inherit FSharpTreeBuilderBase(lexer, document, lifetime, projectedOffset)
+type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, offsetShift, lineShift) =
+    inherit FSharpTreeBuilderBase(lexer, document, lifetime, projectedOffset, offsetShift, lineShift)
 
     let nextSteps = Stack<BuilderStep>()
 
@@ -33,7 +33,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
     let mutable unfinishedDeclaration: (int * range * CompositeNodeType) option = None
 
     new (lexer, document, decls, lifetime) =
-        FSharpImplTreeBuilder(lexer, document, decls, lifetime, 0) 
+        FSharpImplTreeBuilder(lexer, document, decls, lifetime, 0, 0, 0)
 
     override x.CreateFSharpFile() =
         let mark = x.Mark()

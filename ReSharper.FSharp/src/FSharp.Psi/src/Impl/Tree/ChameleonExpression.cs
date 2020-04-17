@@ -16,12 +16,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class ChameleonExpression : IChameleonNode
   {
     [CanBeNull] public SynExpr SynExpr { get; }
+    public int OriginalStartOffset { get; }
+    public int OriginalLineStart { get; }
 
     [NotNull] private readonly object mySyncObject = new object();
     private bool myOpened;
 
-    public ChameleonExpression([CanBeNull] SynExpr expr) =>
+    public ChameleonExpression([CanBeNull] SynExpr expr, int startOffset, int lineStart)
+    {
       SynExpr = expr;
+      OriginalStartOffset = startOffset;
+      OriginalLineStart = lineStart;
+    }
 
     public IChameleonNode ReSync(CachingLexer cachingLexer, TreeTextRange changedRange, int insertedTextLen) =>
       null; // No reparse for now.
