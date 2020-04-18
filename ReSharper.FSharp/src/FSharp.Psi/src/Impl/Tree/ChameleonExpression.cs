@@ -15,7 +15,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class ChameleonExpression : IChameleonNode
   {
-    [CanBeNull] public SynExpr SynExpr { get; }
+    [CanBeNull] public SynExpr SynExpr { get; private set; }
+
     public int OriginalStartOffset { get; }
     public int OriginalLineStart { get; }
 
@@ -89,6 +90,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       AppendNewChild((TreeElement) node);
 
       myOpened = true;
+      SynExpr = null;
     }
 
     public override int GetTextLength()
