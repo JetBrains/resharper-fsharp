@@ -16,20 +16,20 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.TreeBuilder
 
 [<AbstractClass>]
-type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset, offsetShift, lineShift) =
+type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset, lineShift) =
     inherit TreeBuilderBase(lifetime, lexer)
 
     let lineShift = lineShift - 1
 
     let lineOffsets =
         let lineCount = document.GetLineCount()
-        Array.init (int lineCount) (fun line -> document.GetLineStartOffset(docLine line) + offsetShift)
+        Array.init (int lineCount) (fun line -> document.GetLineStartOffset(docLine line))
 
     let getLineOffset line =
         lineOffsets.[line + lineShift]
 
     new (sourceFile, lexer, lifetime) =
-        FSharpTreeBuilderBase(sourceFile, lexer, lifetime, 0, 0, 0)
+        FSharpTreeBuilderBase(sourceFile, lexer, lifetime, 0, 0)
 
     abstract member CreateFSharpFile: unit -> IFSharpFile
 

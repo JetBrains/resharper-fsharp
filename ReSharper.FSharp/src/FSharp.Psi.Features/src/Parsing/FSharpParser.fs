@@ -73,29 +73,24 @@ type FSharpParser(lexer: ILexer, document: IDocument, path: FileSystemPath, sour
         member this.ParseExpression(chameleonExpr: IChameleonExpression, document) =
             let document = if isNotNull document then document else chameleonExpr.GetSourceFile().Document
 
-            let projectedOffset = chameleonExpr.GetTreeStartOffset().Offset
-            let offsetShift = projectedOffset - chameleonExpr.OriginalStartOffset
+            let projectedOffset, lineShift =
+                let projectedOffset = chameleonExpr.GetTreeStartOffset().Offset
+                let offsetShift = projectedOffset - chameleonExpr.OriginalStartOffset
 
-            let startLine =
-                if offsetShift = 0 then docLine 0 else
-                chameleonExpr.GetDocumentStartOffset().ToDocumentCoords().Line
+                if offsetShift = 0 then
+                    projectedOffset, 0
+                else
+                    let startLine = chameleonExpr.GetDocumentStartOffset().ToDocumentCoords().Line
+                    let lineShift = int startLine - chameleonExpr.SynExpr.Range.StartLine + 1
 
-            let lineShift =
-                if offsetShift = 0 then 0 else
-
-                let originalStartLine = chameleonExpr.SynExpr.Range.StartLine - 1
-                int startLine - originalStartLine
-
-            let offsetShift =
-                if offsetShift = 0 then 0 else
-
-                let lineStartShift = document.GetLineStartOffset(startLine) - chameleonExpr.OriginalLineStart
-                offsetShift - lineStartShift
+                    let lineStartShift = document.GetLineStartOffset(startLine) - chameleonExpr.OriginalLineStart
+                    let projectedOffset = projectedOffset + lineStartShift - offsetShift
+                    projectedOffset, lineShift
 
             Lifetime.Using(fun lifetime ->
                 // todo: cover error cases where fsImplFile or multiple expressions may be returned
                 let treeBuilder =
-                    FSharpImplTreeBuilder(lexer, document, [], lifetime, projectedOffset, offsetShift, lineShift)
+                    FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lineShift)
 
                 treeBuilder.ProcessTopLevelExpression(chameleonExpr.SynExpr)
                 treeBuilder.GetTreeNode()) :?> ISynExpr
