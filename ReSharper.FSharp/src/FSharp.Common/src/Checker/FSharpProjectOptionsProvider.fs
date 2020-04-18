@@ -144,6 +144,7 @@ type FSharpProjectOptionsProvider
     let getParsingOptionsForSingleFile ([<NotNull>] sourceFile: IPsiSourceFile) isScript =
         { FSharpParsingOptions.Default with
             SourceFiles = [| sourceFile.GetLocation().FullPath |]
+            ConditionalCompilationDefines = ImplicitDefines.scriptDefines
             IsExe = isScript }
 
     member x.ModuleInvalidated = moduleInvalidated
@@ -223,6 +224,7 @@ type FSharpProjectOptionsProvider
             |> Option.defaultValue false
 
         member x.GetParsingOptions(sourceFile) =
+            if isNull sourceFile then sandboxParsingOptions else
             if isScriptLike sourceFile then getParsingOptionsForSingleFile sourceFile true else
 
             getOrCreateFSharpProject sourceFile
