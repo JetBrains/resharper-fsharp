@@ -320,4 +320,15 @@
     <QuickFix>RemoveRedundantAttributeSuffixFix</QuickFix>
   </Warning>
 
+  <Error staticGroup="FSharpErrors" name="NoImplementationGiven">
+    <Parameter type="IFSharpTypeDeclaration" name="typeDecl"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>typeDecl.GetNameDocumentRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ToAbstractFix</QuickFix>
+  </Error>
+
 </Errors>

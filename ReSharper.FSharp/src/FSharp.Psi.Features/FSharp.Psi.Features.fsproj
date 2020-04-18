@@ -137,6 +137,7 @@
     <Compile Include="src\QuickFixes\RemoveRedundantAttributeSuffixFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceWithAssignmentExpressionFix.fs" />
     <Compile Include="src\QuickFixes\AddMatchAllClauseFix.fs" />
+    <Compile Include="src\QuickFixes\ToAbstractFix.fs" />
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />
     <Compile Include="src\PostfixTemplates\NotTemplate.fs" />
     <Compile Include="src\PostfixTemplates\LetPostfixTemplate.fs" />

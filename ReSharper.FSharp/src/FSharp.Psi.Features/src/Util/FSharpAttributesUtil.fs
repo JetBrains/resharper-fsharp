@@ -17,6 +17,7 @@ let addAttribute (attributeList: IAttributeList) (attribute: IAttribute) =
                 Whitespace()
         ] |> ignore
 
+
 let addAttributeAfter (anchor: IAttribute) (attribute: IAttribute) =
     let anchor, seenSemi =
         let node = skipMatchingNodesAfter isInlineSpaceOrComment anchor
@@ -34,5 +35,16 @@ let addAttributeAfter (anchor: IAttribute) (attribute: IAttribute) =
         let nextSiblingType = getTokenType anchor.NextSibling
         if isNotNull nextSiblingType &&
                 not (nextSiblingType.IsWhitespace || nextSiblingType == FSharpTokenType.GREATER_RBRACK) then
+            Whitespace()
+    ] |> ignore
+
+
+let addAttributesList (decl: IFSharpTreeNode) addNewLine =
+    addNodesBefore decl.FirstChild [
+        decl.CreateElementFactory().CreateEmptyAttributeList()
+        if addNewLine then
+            NewLine(decl.GetLineEnding())
+            Whitespace(decl.Indent)
+        else
             Whitespace()
     ] |> ignore

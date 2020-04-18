@@ -1,0 +1,5 @@
+﻿namespace global
+
+[<AbstractClass>]
+type {caret}A() =
+    abstract P: int

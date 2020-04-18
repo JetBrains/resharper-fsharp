@@ -31,6 +31,7 @@ module FSharpErrors =
     let [<Literal>] EnumMatchIncomplete = 104
     let [<Literal>] ModuleOrNamespaceRequired = 222
     let [<Literal>] UnrecognizedOption = 243
+    let [<Literal>] NoImplementationGiven = 365
     let [<Literal>] UseBindingsIllegalInImplicitClassConstructors = 523
     let [<Literal>] LetAndForNonRecBindings = 576
     let [<Literal>] FieldRequiresAssignment = 764
@@ -159,6 +160,14 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | UseBindingsIllegalInModules ->
             createHighlightingFromNode UseBindingsIllegalInModulesWarning range
+
+        | NoImplementationGiven ->
+            let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
+            match expr.Parent with
+            | :? IFSharpTypeDeclaration as typeDecl when typeDecl.Identifier == expr ->
+                NoImplementationGivenError(typeDecl, error.Message) :> _
+
+            | _ -> createGenericHighlighting error range
 
         | UseBindingsIllegalInImplicitClassConstructors ->
             createHighlightingFromNode UseKeywordIllegalInPrimaryCtorError range

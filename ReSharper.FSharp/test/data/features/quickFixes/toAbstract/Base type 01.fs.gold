@@ -1,0 +1,8 @@
+﻿namespace global
+
+[<AbstractClass>]
+type A() =
+    abstract P: int
+
+and [<AbstractClass>] {caret}B() =
+    inherit A()

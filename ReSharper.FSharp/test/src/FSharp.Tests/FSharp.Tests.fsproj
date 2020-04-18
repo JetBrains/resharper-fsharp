@@ -66,6 +66,7 @@
     <Compile Include="QuickFixes\RemoveRedundantAttributeSuffixTest.fs" />
     <Compile Include="QuickFixes\ReplaceWithAssignmentExpressionTest.fs" />
     <Compile Include="QuickFixes\AddMatchAllClauseFixTest.fs" />
+    <Compile Include="QuickFixes\ToAbstractFixTest.fs" />
     <Compile Include="Intentions\IntentionsTestBase.fs" />
     <Compile Include="Intentions\ToRecursiveLetBindings.fs" />
     <Compile Include="Intentions\ToMultilineRecordTest.fs" />
