@@ -14,6 +14,7 @@
     <Compile Include="src\Util\FSharpParensUtil.fs" />
     <Compile Include="src\Util\FSharpExpressionUtil.fs" />
     <Compile Include="src\Util\FSharpAttributesUtil.fs" />
+    <Compile Include="src\Util\FSharpVisualElementFactory.fs" />
     <Compile Include="src\CodeCompletion\CompletionUtil.fs" />
     <Compile Include="src\CodeCompletion\FSharpCodeCompletionContext.fs" />
     <Compile Include="src\CodeCompletion\FSharpPathCompletionProvider.fs" />
@@ -58,6 +59,7 @@
     <Compile Include="src\Daemon\Analyzers\InactivePreprocessorBranchAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\RedundantAttributeParensAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\RedundantAttributeSuffixAnalyzer.fs" />
+    <Compile Include="src\Daemon\Analyzers\ColorReferenceAnalyzer.fs" />
     <Compile Include="src\Comment\FSharpBlockCommentActionProvider.fs" />
     <Compile Include="src\Comment\FSharpLineCommentActionProvider.fs" />
     <Compile Include="src\Debugger\FSharpBreakpointVariantsProvider.fs" />
