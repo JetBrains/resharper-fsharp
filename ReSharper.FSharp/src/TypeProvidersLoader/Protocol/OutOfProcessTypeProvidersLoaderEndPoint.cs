@@ -56,6 +56,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       myUnitOfWork.ProvidedFieldInfosHostFactory.Initialize(model.RdProvidedFieldInfoProcessModel);
       myUnitOfWork.ProvidedEventInfosHostFactory.Initialize(model.RdProvidedEventInfoProcessModel);
       myUnitOfWork.ProvidedConstructorInfosHostFactory.Initialize(model.RdProvidedConstructorInfoProcessModel);
+      myUnitOfWork.ProvidedExprsHostFactory.Initialize(model.RdProvidedExprProcessModel);
+      myUnitOfWork.ProvidedVarsHostFactory.Initialize(model.RdProvidedVarProcessModel);
 
       return model;
     }

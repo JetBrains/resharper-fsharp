@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using JetBrains.Lifetimes;
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Cache;
@@ -14,21 +15,53 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
   {
     private readonly IReadProvidedCache<Tuple<ProvidedType, RdProvidedType, int>> myProvidedTypesCache;
     private readonly IReadProvidedCache<ITypeProvider> myTypeProvidersCache;
+    private readonly IReadProvidedCache<Tuple<ProvidedExpr, int>> myProvidedExprsCache;
+    private readonly IReadProvidedCache<Tuple<ProvidedMethodInfo, int>> myProvidedMethodsCache;
+    private readonly IReadProvidedCache<Tuple<ProvidedConstructorInfo, int>> myProvidedConstructorsCache;
     private readonly IProvidedRdModelsCreator<IProvidedNamespace, RdProvidedNamespace> myProvidedNamespacesCreator;
+    private readonly IProvidedRdModelsCreator<ProvidedExpr, RdProvidedExpr> myProvidedExprsCreator;
 
     public TypeProvidersHostFactory(IReadProvidedCache<Tuple<ProvidedType, RdProvidedType, int>> providedTypesCache,
       IReadProvidedCache<ITypeProvider> typeProvidersCache,
-      IProvidedRdModelsCreator<IProvidedNamespace, RdProvidedNamespace> providedNamespacesCreator)
+      IReadProvidedCache<Tuple<ProvidedExpr, int>> providedExprsCache,
+      IReadProvidedCache<Tuple<ProvidedMethodInfo, int>> providedMethodsCache,
+      IReadProvidedCache<Tuple<ProvidedConstructorInfo, int>> providedConstructorsCache,
+      IProvidedRdModelsCreator<IProvidedNamespace, RdProvidedNamespace> providedNamespacesCreator,
+      IProvidedRdModelsCreator<ProvidedExpr, RdProvidedExpr> providedExprsCreator)
     {
       myProvidedTypesCache = providedTypesCache;
       myTypeProvidersCache = typeProvidersCache;
+      myProvidedExprsCache = providedExprsCache;
+      myProvidedMethodsCache = providedMethodsCache;
+      myProvidedConstructorsCache = providedConstructorsCache;
       myProvidedNamespacesCreator = providedNamespacesCreator;
+      myProvidedExprsCreator = providedExprsCreator;
     }
 
     public void Initialize(RdTypeProviderProcessModel processModel)
     {
       processModel.GetNamespaces.Set(GetTypeProviderNamespaces);
       processModel.GetProvidedType.Set(GetProvidedType);
+      processModel.GetInvokerExpression.Set(GetInvokerExpression);
+    }
+
+    private RdTask<RdProvidedExpr> GetInvokerExpression(Lifetime lifetime, GetInvokerExpressionArgs args)
+    {
+      var typeProvider = myTypeProvidersCache.Get(args.TypeProviderId);
+
+      //TODO: Rewrite it better
+      var method = args.IsConstructor
+        ? (MethodBase)myProvidedConstructorsCache.Get(args.ProvidedMethodBaseId).Item1.Handle
+        : myProvidedMethodsCache.Get(args.ProvidedMethodBaseId).Item1.Handle;
+      
+      var vars = args.ProvidedVarParamExprIds
+        .Select(myProvidedExprsCache.Get)
+        .Select(t => t.Item1.Handle)
+        .ToArray();
+      
+      var expr = myProvidedExprsCreator.CreateRdModel(
+        new ProvidedExpr(typeProvider.GetInvokerExpression(method, vars), ProvidedTypeContext.Empty), args.TypeProviderId);
+      return RdTask<RdProvidedExpr>.Successful(expr);
     }
 
     private RdTask<RdProvidedType> GetProvidedType(Lifetime lifetime, GetProvidedTypeArgs args)

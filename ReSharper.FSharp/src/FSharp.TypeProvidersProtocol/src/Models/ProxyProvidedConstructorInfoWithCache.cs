@@ -8,13 +8,13 @@ using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 {
-  public class ProxyProvidedConstructorInfoWithCache : ProvidedConstructorInfo
+  public class ProxyProvidedConstructorInfoWithCache : ProvidedConstructorInfo, IRdProvidedEntity
   {
     private readonly RdProvidedConstructorInfo myConstructorInfo;
     private readonly RdFSharpTypeProvidersLoaderModel myProcessModel;
     private readonly ProvidedTypeContext myContext;
     private readonly ITypeProviderCache myCache;
-    private int EntityId => myConstructorInfo.EntityId;
+    public int EntityId => myConstructorInfo.EntityId;
 
     private RdProvidedConstructorInfoProcessModel RdProvidedConstructorInfoProcessModel =>
       myProcessModel.RdProvidedConstructorInfoProcessModel;

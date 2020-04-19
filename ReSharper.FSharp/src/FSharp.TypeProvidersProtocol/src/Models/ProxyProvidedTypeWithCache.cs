@@ -205,7 +205,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override ProvidedFieldInfo[] GetFields() => myFields.Value;
 
     public override ProvidedFieldInfo GetField(string nm) =>
-      myFields.Value.FirstOrDefault(t => t.Name == nm); //TODO: optimize
+      myFields.Value.FirstOrDefault(t => t.Name == nm);
 
     public override ProvidedConstructorInfo[] GetConstructors() => myConstructors.Value;
 
@@ -227,6 +227,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     }
 
     public override ProvidedAssembly Assembly => myProvidedAssembly.Value;
+
+    public override ProvidedVar Fresh(string nm) =>
+      ProxyProvidedVarWithCache.Create(RdProvidedTypeProcessModel.Fresh.Sync(EntityId), myProcessModel, Context,
+        myCache);
 
     private int? myArrayRank;
     private int? myMakeArrayTypeId;

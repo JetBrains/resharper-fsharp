@@ -84,11 +84,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
     private RdTask<RdProvidedConstructorInfo[]> GetConstructors(Lifetime lifetime, int entityId)
     {
       var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
-      var events = providedType
+      var constructors = providedType
         .GetConstructors()
         .Select(t => myProvidedConstructorInfosCreator.CreateRdModel(t, typeProviderId))
         .ToArray();
-      return RdTask<RdProvidedConstructorInfo[]>.Successful(events);
+      return RdTask<RdProvidedConstructorInfo[]>.Successful(constructors);
     }
 
     private RdTask<RdProvidedEventInfo[]> GetEvents(Lifetime lifetime, int entityId)

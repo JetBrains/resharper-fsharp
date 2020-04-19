@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
 using Microsoft.FSharp.Core.CompilerServices;
 using Microsoft.FSharp.Quotations;
+using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 {
-  public class ProxyTypeProviderWithCache : ITypeProvider
+  public class ProxyTypeProviderWithCache : ITypeProvider, IProxyTypeProvider
   {
     private readonly RdTypeProvider myRdTypeProvider;
     private readonly RdFSharpTypeProvidersLoaderModel myProcessModel;
@@ -33,7 +35,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     private void OnInvalidate(int typeProviderId)
     {
       if (typeProviderId != EntityId) return;
-      
+
       InitCaches();
       Invalidate?.Invoke(this, EventArgs.Empty);
     }
@@ -48,11 +50,27 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       throw new Exception("ApplyStaticArguments should be unreachable");
 
     public FSharpExpr GetInvokerExpression(MethodBase syntheticMethodBase, FSharpExpr[] parameters) =>
-      //typeProvider.GetInvokerExpression(syntheticMethodBase, parameters)
-      throw new Exception("WHOAH! IS THIS GetInvokerExpression CALL?");
+      throw new Exception("GetInvokerExpression should be unreachable");
 
     public byte[] GetGeneratedAssemblyContents(Assembly assembly) =>
       throw new Exception("GetGeneratedAssemblyContents should be unreachable");
+
+    public ProvidedExpr GetInvokerExpression(ProvidedMethodBase methodBase, ProvidedVar[] paramExprs)
+    {
+      var providedMethodBase = methodBase as IRdProvidedEntity;
+      var providedVarParamExprs = paramExprs.Select(x => x as IRdProvidedEntity).ToArray();
+
+      Assertion.Assert(providedMethodBase != null, "methodBase is ProxyProvided");
+      Assertion.Assert(providedVarParamExprs.All(x => x != null), "paramExprs is ProxyProvided");
+
+      var providedMethodBaseId = providedMethodBase.EntityId;
+      var providedVarParamExprIds = providedVarParamExprs.Select(x => x.EntityId).ToArray();
+
+      return ProxyProvidedExprWithCache.Create(RdTypeProviderProcessModel.GetInvokerExpression.Sync(
+          new GetInvokerExpressionArgs(EntityId, providedMethodBaseId, methodBase is ProvidedConstructorInfo,
+            providedVarParamExprIds)),
+        myProcessModel, ProvidedTypeContext.Empty, myCache);
+    }
 
     public void Dispose() => RdTypeProviderProcessModel.Dispose.Sync(EntityId);
 
@@ -63,12 +81,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
         .Sync(EntityId)
         .Select(t => new ProxyProvidedNamespaceWithCache(t, myProcessModel, myCache))
         .ToArray());
-      
+
       myCache.Invalidate();
     }
-    
+
     public event EventHandler Invalidate;
-    
+
     private readonly TypeProviderCache myCache;
     private Lazy<IProvidedNamespace[]> myProvidedNamespaces;
   }

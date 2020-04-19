@@ -8,13 +8,13 @@ using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 {
-  public class ProxyProvidedMethodInfoWithCache : ProvidedMethodInfo
+  public class ProxyProvidedMethodInfoWithCache : ProvidedMethodInfo, IRdProvidedEntity
   {
     private readonly RdProvidedMethodInfo myMethodInfo;
     private readonly RdFSharpTypeProvidersLoaderModel myProcessModel;
     private readonly ProvidedTypeContext myContext;
     private readonly ITypeProviderCache myCache;
-    private int EntityId => myMethodInfo.EntityId;
+    public int EntityId => myMethodInfo.EntityId;
 
     private RdProvidedMethodInfoProcessModel RdProvidedMethodInfoProcessModel =>
       myProcessModel.RdProvidedMethodInfoProcessModel;
@@ -22,7 +22,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     private ProxyProvidedMethodInfoWithCache(RdProvidedMethodInfo methodInfo,
       RdFSharpTypeProvidersLoaderModel processModel,
       ProvidedTypeContext context, ITypeProviderCache cache) : base(
-      typeof(string).GetMethods().First(),
+      typeof(ProxyProvidedMethodInfoWithCache).GetMethods().First(),
       ProvidedTypeContext.Empty)
     {
       myMethodInfo = methodInfo;
@@ -70,7 +70,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override ProvidedType ReturnType =>
       myCache.GetOrCreateWithContext(
         myReturnTypeId ??= RdProvidedMethodInfoProcessModel.ReturnType.Sync(EntityId), myContext);
-    
+
     public override ProvidedParameterInfo[] GetStaticParametersForMethod(ITypeProvider provider)
     {
       return base.GetStaticParametersForMethod(provider);

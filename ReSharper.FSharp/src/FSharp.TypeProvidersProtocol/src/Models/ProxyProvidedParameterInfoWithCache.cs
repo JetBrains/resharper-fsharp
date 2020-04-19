@@ -1,5 +1,4 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils;

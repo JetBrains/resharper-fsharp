@@ -12,6 +12,7 @@ open JetBrains.ProjectModel
 open Microsoft.FSharp.Core.CompilerServices
 open FSharp.Compiler.AbstractIL.Internal.Library
 open FSharp.Compiler.ErrorLogger
+open JetBrains.Diagnostics
 open JetBrains.Rider.FSharp.TypeProvidersProtocol.Server
 open JetBrains.ReSharper.Plugins.FSharp.Util.TypeProvidersProtocolConverter
 open JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders.Hack
@@ -92,6 +93,7 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
             let taintedProviders = Tainted<_>.CreateAll providerSpecs
             taintedProviders
             
+        //TODO: Asserts
         member this.GetProvidedTypes(pn: Tainted<IProvidedNamespace>, m: range) =
             let providedTypes =
                 pn.PApplyArray((fun r -> r.As<IProxyProvidedNamespace>().GetProvidedTypes()), "GetTypes", m)
@@ -99,7 +101,12 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
             
         member this.ResolveTypeName(pn: Tainted<IProvidedNamespace>, typeName: string, m: range) =
             pn.PApply((fun providedNamespace ->
-                (providedNamespace.As<IProxyProvidedNamespace>().ResolveProvidedTypeName typeName)), range=m) 
+                (providedNamespace.As<IProxyProvidedNamespace>().ResolveProvidedTypeName typeName)), range=m)
+            
+        member this.GetInvokerExpression(provider: ITypeProvider, methodBase: ProvidedMethodBase, paramExprs: ProvidedVar[]) =
+            let provider = provider.As<IProxyTypeProvider>()          
+            Assertion.Assert(provider <> null, "provider is IProxyTypeProvider")         
+            provider.GetInvokerExpression(methodBase, paramExprs)
             
     interface IDisposable with
         member this.Dispose() = () //terminate connection
