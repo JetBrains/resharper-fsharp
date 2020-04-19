@@ -297,6 +297,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
     }
 
     private val RdProvidedExprType = classdef {
+        field("HasValue", bool)
         field("ProvidedNewArrayExpr", classdef("ProvidedNewArrayExpr") {
             field("ProvidedType", int)
             field("ProvidedExprs", array(RdProvidedExpr))

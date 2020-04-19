@@ -112,7 +112,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
         providedMethodInfoRdModelsCreator, providedEventInfosCache);
       ProvidedConstructorInfosHostFactory = new ProvidedConstructorInfosHostFactory(providedTypeRdModelsCreator,
         providedParameterInfoRdModelsCreator, providedConstructorInfosCache, typeProvidersCache);
-      ProvidedExprsHostFactory = new ProvidedExprHostFactory(providedExprsCache, providedTypeRdModelsCreator);
+      ProvidedExprsHostFactory = new ProvidedExprHostFactory(providedExprsCache, providedTypeRdModelsCreator,
+        providedExprRdModelsCreator, providedVarRdModelsCreator, providedMethodInfoRdModelsCreator,
+        providedConstructorInfoRdModelsCreator);
       ProvidedVarsHostFactory = new ProvidedVarsHostFactory(providedVarsCache, providedTypeRdModelsCreator);
     }
   }

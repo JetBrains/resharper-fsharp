@@ -42,7 +42,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override FSharpOption<ProvidedExprType> GetExprType()
     {
       var data = RdProvidedExprProcessModel.GetExprType.Sync(EntityId);
-      ProvidedExprType providedExprType = null;
+
+      if (!data.HasValue) return FSharpOption<ProvidedExprType>.None;
 
       if (data.ProvidedNewArrayExpr != null)
       {
@@ -52,7 +53,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
           .Select(t => Create(t, myProcessModel, myContext, myCache))
           .ToArray();
         // ReSharper disable once CoVariantArrayConversion
-        providedExprType = ProvidedExprType.NewProvidedNewArrayExpr(providedType, providedExprs);
+        return ProvidedExprType.NewProvidedNewArrayExpr(providedType, providedExprs);
       }
 
       else if (data.ProvidedNewObjectExpr != null)
@@ -65,7 +66,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
           .Select(t => Create(t, myProcessModel, myContext, myCache))
           .ToArray();
         // ReSharper disable once CoVariantArrayConversion
-        providedExprType = ProvidedExprType.NewProvidedNewObjectExpr(providedConstructorInfo, providedExprs);
+        return ProvidedExprType.NewProvidedNewObjectExpr(providedConstructorInfo, providedExprs);
       }
 
       else if (data.ProvidedWhileLoopExpr != null)
@@ -73,7 +74,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
         var providedWhileLoopExpr = data.ProvidedWhileLoopExpr;
         var providedExpr1 = Create(providedWhileLoopExpr.ProvidedExpr1, myProcessModel, myContext, myCache);
         var providedExpr2 = Create(providedWhileLoopExpr.ProvidedExpr2, myProcessModel, myContext, myCache);
-        providedExprType = ProvidedExprType.NewProvidedWhileLoopExpr(providedExpr1, providedExpr2);
+        return ProvidedExprType.NewProvidedWhileLoopExpr(providedExpr1, providedExpr2);
       }
 
       else if (data.ProvidedNewDelegateExpr != null)
@@ -85,7 +86,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
           .ToArray();
         var providedExpr = Create(providedNewDelegateExpr.ProvidedExpr, myProcessModel, myContext, myCache);
         // ReSharper disable once CoVariantArrayConversion
-        providedExprType = ProvidedExprType.NewProvidedNewDelegateExpr(providedType, providedVars, providedExpr);
+        return ProvidedExprType.NewProvidedNewDelegateExpr(providedType, providedVars, providedExpr);
       }
 
       else if (data.ProvidedForIntegerRangeLoopExpr != null)
@@ -96,8 +97,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
         var providedExpr1 = Create(providedForIntegerRangeLoopExpr.ProvidedExpr1, myProcessModel, myContext, myCache);
         var providedExpr2 = Create(providedForIntegerRangeLoopExpr.ProvidedExpr2, myProcessModel, myContext, myCache);
         var providedExpr3 = Create(providedForIntegerRangeLoopExpr.ProvidedExpr3, myProcessModel, myContext, myCache);
-        providedExprType =
-          ProvidedExprType.NewProvidedForIntegerRangeLoopExpr(providedVar, providedExpr1, providedExpr2, providedExpr3);
+        return ProvidedExprType.NewProvidedForIntegerRangeLoopExpr(providedVar, providedExpr1, providedExpr2,
+          providedExpr3);
       }
 
       else if (data.ProvidedSequentialExpr != null)
@@ -105,7 +106,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
         var providedSequentialExpr = data.ProvidedSequentialExpr;
         var providedExpr1 = Create(providedSequentialExpr.ProvidedExpr1, myProcessModel, myContext, myCache);
         var providedExpr2 = Create(providedSequentialExpr.ProvidedExpr2, myProcessModel, myContext, myCache);
-        providedExprType = ProvidedExprType.NewProvidedSequentialExpr(providedExpr1, providedExpr2);
+        return ProvidedExprType.NewProvidedSequentialExpr(providedExpr1, providedExpr2);
       }
 
       else if (data.ProvidedTryWithExpr != null)
@@ -118,8 +119,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
         var providedVar2 =
           ProxyProvidedVarWithCache.Create(providedTryWithExpr.ProvidedVar2, myProcessModel, myContext, myCache);
         var providedExpr3 = Create(providedTryWithExpr.ProvidedExpr3, myProcessModel, myContext, myCache);
-        providedExprType = ProvidedExprType.NewProvidedTryWithExpr(providedExpr1, providedVar1, providedExpr2,
-          providedVar2, providedExpr3);
+        return ProvidedExprType.NewProvidedTryWithExpr(providedExpr1, providedVar1, providedExpr2, providedVar2,
+          providedExpr3);
       }
 
       else if (data.ProvidedTryFinallyExpr != null)
@@ -127,7 +128,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
         var providedTryFinallyExpr = data.ProvidedTryFinallyExpr;
         var providedExpr1 = Create(providedTryFinallyExpr.ProvidedExpr1, myProcessModel, myContext, myCache);
         var providedExpr2 = Create(providedTryFinallyExpr.ProvidedExpr2, myProcessModel, myContext, myCache);
-        providedExprType = ProvidedExprType.NewProvidedTryFinallyExpr(providedExpr1, providedExpr2);
+        return ProvidedExprType.NewProvidedTryFinallyExpr(providedExpr1, providedExpr2);
       }
 
       else if (data.ProvidedLambdaExpr != null)
@@ -136,7 +137,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
         var providedVar =
           ProxyProvidedVarWithCache.Create(providedLambdaExpr.ProvidedVar, myProcessModel, myContext, myCache);
         var providedExpr = Create(providedLambdaExpr.ProvidedExpr, myProcessModel, myContext, myCache);
-        providedExprType = ProvidedExprType.NewProvidedLambdaExpr(providedVar, providedExpr);
+        return ProvidedExprType.NewProvidedLambdaExpr(providedVar, providedExpr);
       }
 
       else if (data.ProvidedCallExpr != null)
@@ -151,7 +152,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
           .Select(t => Create(t, myProcessModel, myContext, myCache))
           .ToArray();
         // ReSharper disable once CoVariantArrayConversion
-        providedExprType = ProvidedExprType.NewProvidedCallExpr(providedExpr, providedMethodInfo, providedExprs);
+        return ProvidedExprType.NewProvidedCallExpr(providedExpr, providedMethodInfo, providedExprs);
       }
 
       else if (data.ProvidedConstantExpr != null)
@@ -159,14 +160,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
         var providedConstantExpr = data.ProvidedConstantExpr;
         var providedType = myCache.GetOrCreateWithContext(providedConstantExpr.ProvidedType, myContext);
         var obj = providedConstantExpr.Obj.Unbox();
-        providedExprType = ProvidedExprType.NewProvidedConstantExpr(obj, providedType);
+        return ProvidedExprType.NewProvidedConstantExpr(obj, providedType);
       }
 
       else if (data.ProvidedDefaultExpr != null)
       {
         var providedDefaultExpr = data.ProvidedDefaultExpr;
         var providedType = myCache.GetOrCreateWithContext(providedDefaultExpr.ProvidedType, myContext);
-        providedExprType = ProvidedExprType.NewProvidedDefaultExpr(providedType);
+        return ProvidedExprType.NewProvidedDefaultExpr(providedType);
       }
 
       else if (data.ProvidedNewTupleExpr != null)
@@ -176,7 +177,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
           .Select(t => Create(t, myProcessModel, myContext, myCache))
           .ToArray();
         // ReSharper disable once CoVariantArrayConversion
-        providedExprType = ProvidedExprType.NewProvidedNewTupleExpr(providedExprs);
+        return ProvidedExprType.NewProvidedNewTupleExpr(providedExprs);
       }
 
       else if (data.ProvidedTupleGetExpr != null)
@@ -184,7 +185,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
         var providedTupleGetExpr = data.ProvidedTupleGetExpr;
         var providedExpr = Create(providedTupleGetExpr.ProvidedExpr, myProcessModel, myContext, myCache);
         var intValue = providedTupleGetExpr.Int;
-        providedExprType = ProvidedExprType.NewProvidedTupleGetExpr(providedExpr, intValue);
+        return ProvidedExprType.NewProvidedTupleGetExpr(providedExpr, intValue);
       }
 
       else if (data.ProvidedTypeAsExpr != null)
@@ -192,7 +193,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
         var providedTypeAsExpr = data.ProvidedTypeAsExpr;
         var providedExpr = Create(providedTypeAsExpr.ProvidedExpr, myProcessModel, myContext, myCache);
         var providedType = myCache.GetOrCreateWithContext(providedTypeAsExpr.ProvidedType, myContext);
-        providedExprType = ProvidedExprType.NewProvidedTypeAsExpr(providedExpr, providedType);
+        return ProvidedExprType.NewProvidedTypeAsExpr(providedExpr, providedType);
       }
 
       else if (data.ProvidedTypeTestExpr != null)
@@ -200,7 +201,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
         var providedTypeTestExpr = data.ProvidedTypeTestExpr;
         var providedExpr = Create(providedTypeTestExpr.ProvidedExpr, myProcessModel, myContext, myCache);
         var providedType = myCache.GetOrCreateWithContext(providedTypeTestExpr.ProvidedType, myContext);
-        providedExprType = ProvidedExprType.NewProvidedTypeTestExpr(providedExpr, providedType);
+        return ProvidedExprType.NewProvidedTypeTestExpr(providedExpr, providedType);
       }
 
       else if (data.ProvidedLetExpr != null)
@@ -210,7 +211,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
           ProxyProvidedVarWithCache.Create(providedLetExpr.ProvidedVar, myProcessModel, myContext, myCache);
         var providedExpr1 = Create(providedLetExpr.ProvidedExpr1, myProcessModel, myContext, myCache);
         var providedExpr2 = Create(providedLetExpr.ProvidedExpr2, myProcessModel, myContext, myCache);
-        providedExprType = ProvidedExprType.NewProvidedLetExpr(providedVar, providedExpr1, providedExpr2);
+        return ProvidedExprType.NewProvidedLetExpr(providedVar, providedExpr1, providedExpr2);
       }
 
       else if (data.ProvidedVarSetExpr != null)
@@ -219,7 +220,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
         var providedVar =
           ProxyProvidedVarWithCache.Create(providedVarSetExpr.ProvidedVar, myProcessModel, myContext, myCache);
         var providedExpr = Create(providedVarSetExpr.ProvidedExpr, myProcessModel, myContext, myCache);
-        providedExprType = ProvidedExprType.NewProvidedVarSetExpr(providedVar, providedExpr);
+        return ProvidedExprType.NewProvidedVarSetExpr(providedVar, providedExpr);
       }
 
       else if (data.ProvidedIfThenElseExpr != null)
@@ -228,7 +229,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
         var providedExpr1 = Create(providedIfThenElseExpr.ProvidedExpr1, myProcessModel, myContext, myCache);
         var providedExpr2 = Create(providedIfThenElseExpr.ProvidedExpr2, myProcessModel, myContext, myCache);
         var providedExpr3 = Create(providedIfThenElseExpr.ProvidedExpr3, myProcessModel, myContext, myCache);
-        providedExprType = ProvidedExprType.NewProvidedIfThenElseExpr(providedExpr1, providedExpr2, providedExpr3);
+        return ProvidedExprType.NewProvidedIfThenElseExpr(providedExpr1, providedExpr2, providedExpr3);
       }
 
       else if (data.ProvidedVarExpr != null)
@@ -236,12 +237,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
         var providedVarExpr = data.ProvidedVarExpr;
         var providedVar =
           ProxyProvidedVarWithCache.Create(providedVarExpr.ProvidedVar, myProcessModel, myContext, myCache);
-        providedExprType = ProvidedExprType.NewProvidedVarExpr(providedVar);
+        return ProvidedExprType.NewProvidedVarExpr(providedVar);
       }
 
-      return providedExprType == null
-        ? FSharpOption<ProvidedExprType>.None
-        : FSharpOption<ProvidedExprType>.Some(providedExprType);
+      throw new InvalidOperationException("ProvidedExprType has flag HasValue, but data is null");
     }
 
     private int? myTypeId;
