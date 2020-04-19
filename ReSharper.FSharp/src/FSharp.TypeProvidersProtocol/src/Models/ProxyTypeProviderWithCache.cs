@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Remoting.Contexts;
 using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache;
@@ -11,7 +12,7 @@ using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 {
-  public class ProxyTypeProviderWithCache : ITypeProvider, IProxyTypeProvider
+  public class ProxyTypeProviderWithCache : IProxyTypeProvider
   {
     private readonly RdTypeProvider myRdTypeProvider;
     private readonly RdFSharpTypeProvidersLoaderModel myProcessModel;
@@ -55,13 +56,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public byte[] GetGeneratedAssemblyContents(Assembly assembly) =>
       throw new Exception("GetGeneratedAssemblyContents should be unreachable");
 
+    //TODO: Move to ProvidedMethodBase
     public ProvidedExpr GetInvokerExpression(ProvidedMethodBase methodBase, ProvidedVar[] paramExprs)
     {
       var providedMethodBase = methodBase as IRdProvidedEntity;
       var providedVarParamExprs = paramExprs.Select(x => x as IRdProvidedEntity).ToArray();
 
-      Assertion.Assert(providedMethodBase != null, "methodBase is ProxyProvided");
-      Assertion.Assert(providedVarParamExprs.All(x => x != null), "paramExprs is ProxyProvided");
+      Assertion.Assert(providedMethodBase != null, "methodBase is not ProxyProvided");
+      Assertion.Assert(providedVarParamExprs.All(x => x != null), "paramExprs is not ProxyProvided");
 
       var providedMethodBaseId = providedMethodBase.EntityId;
       var providedVarParamExprIds = providedVarParamExprs.Select(x => x.EntityId).ToArray();
@@ -69,7 +71,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       return ProxyProvidedExprWithCache.Create(RdTypeProviderProcessModel.GetInvokerExpression.Sync(
           new GetInvokerExpressionArgs(EntityId, providedMethodBaseId, methodBase is ProvidedConstructorInfo,
             providedVarParamExprIds)),
-        myProcessModel, ProvidedTypeContext.Empty, myCache);
+        myProcessModel, ProvidedTypeContext.Empty, myCache); //TODO: non empty context
     }
 
     public void Dispose() => RdTypeProviderProcessModel.Dispose.Sync(EntityId);

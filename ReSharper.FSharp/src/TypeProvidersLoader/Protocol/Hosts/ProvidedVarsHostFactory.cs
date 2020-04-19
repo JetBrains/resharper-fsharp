@@ -22,7 +22,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
 
     public void Initialize(RdProvidedVarProcessModel model)
     {
-      model.GetType.Set(GetType);
+      model.Type.Set(GetType);
     }
 
     private RdTask<int> GetType(Lifetime lifetime, int entityId)

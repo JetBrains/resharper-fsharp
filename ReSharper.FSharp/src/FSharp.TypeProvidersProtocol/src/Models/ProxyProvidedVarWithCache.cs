@@ -34,7 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override bool IsMutable => myVar.IsMutable;
 
     public override ProvidedType Type =>
-      myCache.GetOrCreateWithContext(myTypeId ??= RdProvidedVarProcessModel.GetType.Sync(EntityId), myContext);
+      myCache.GetOrCreateWithContext(myTypeId ??= RdProvidedVarProcessModel.Type.Sync(EntityId), myContext);
 
     private int? myTypeId;
   }

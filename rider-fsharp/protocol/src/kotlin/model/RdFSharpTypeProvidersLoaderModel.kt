@@ -288,11 +288,104 @@ object RdFSharpTypeProvidersLoaderModel : Root(
     }
 
     private val RdProvidedExprProcessModel = aggregatedef("RdProvidedExprProcessModel") {
-        call("GetType", int, int)
+        call("Type", int, int)
+        call("GetExprType", int, RdProvidedExprType)
     }
 
     private val RdProvidedVarProcessModel = aggregatedef("RdProvidedVarProcessModel") {
-        call("GetType", int, int)
+        call("Type", int, int)
+    }
+
+    private val RdProvidedExprType = classdef {
+        field("ProvidedNewArrayExpr", classdef("ProvidedNewArrayExpr") {
+            field("ProvidedType", int)
+            field("ProvidedExprs", array(RdProvidedExpr))
+        }.nullable)
+        //field("ProvidedAddressOfExpr", classdef {
+        //    field("ProvidedExpr", RdProvidedExpr)
+        //})
+        field("ProvidedNewObjectExpr", classdef("ProvidedNewObjectExpr") {
+            field("ProvidedConstructorInfo", RdProvidedConstructorInfo)
+            field("ProvidedExprs", array(RdProvidedExpr))
+        }.nullable)
+        field("ProvidedWhileLoopExpr", classdef("ProvidedWhileLoopExpr") {
+            field("ProvidedExpr1", RdProvidedExpr)
+            field("ProvidedExpr2", RdProvidedExpr)
+        }.nullable)
+        field("ProvidedNewDelegateExpr", classdef("ProvidedNewDelegateExpr") {
+            field("ProvidedType", int)
+            field("ProvidedVars", array(RdProvidedVar))
+            field("ProvidedExpr", RdProvidedExpr)
+        }.nullable)
+        field("ProvidedForIntegerRangeLoopExpr", classdef("ProvidedForIntegerRangeLoopExpr") {
+            field("ProvidedVar", RdProvidedVar)
+            field("ProvidedExpr1", RdProvidedExpr)
+            field("ProvidedExpr2", RdProvidedExpr)
+            field("ProvidedExpr3", RdProvidedExpr)
+        }.nullable)
+        field("ProvidedSequentialExpr", classdef("ProvidedSequentialExpr") {
+            field("ProvidedExpr1", RdProvidedExpr)
+            field("ProvidedExpr2", RdProvidedExpr)
+        }.nullable)
+        field("ProvidedTryWithExpr", classdef("ProvidedTryWithExpr") {
+            field("ProvidedExpr1", RdProvidedExpr)
+            field("ProvidedVar1", RdProvidedVar)
+            field("ProvidedExpr2", RdProvidedExpr)
+            field("ProvidedVar2", RdProvidedVar)
+            field("ProvidedExpr3", RdProvidedExpr)
+        }.nullable)
+        field("ProvidedTryFinallyExpr", classdef("ProvidedTryFinallyExpr") {
+            field("ProvidedExpr1", RdProvidedExpr)
+            field("ProvidedExpr2", RdProvidedExpr)
+        }.nullable)
+        field("ProvidedLambdaExpr", classdef("ProvidedLambdaExpr") {
+            field("ProvidedVar", RdProvidedVar)
+            field("ProvidedExpr", RdProvidedExpr)
+        }.nullable)
+        field("ProvidedCallExpr", classdef("ProvidedCallExpr") {
+            field("ProvidedExpr", RdProvidedExpr.nullable)
+            field("ProvidedMethodInfo", RdProvidedMethodInfo)
+            field("ProvidedExprs", array(RdProvidedExpr))
+        }.nullable)
+        field("ProvidedConstantExpr", classdef("ProvidedConstantExpr") {
+            field("Obj", RdStaticArg)
+            field("ProvidedType", int)
+        }.nullable)
+        field("ProvidedDefaultExpr", classdef("ProvidedDefaultExpr") {
+            field("ProvidedType", int)
+        }.nullable)
+        field("ProvidedNewTupleExpr", classdef("ProvidedNewTupleExpr") {
+            field("ProvidedExprs", array(RdProvidedExpr))
+        }.nullable)
+        field("ProvidedTupleGetExpr", classdef("ProvidedTupleGetExpr") {
+            field("ProvidedExpr", RdProvidedExpr)
+            field("Int", int)
+        }.nullable)
+        field("ProvidedTypeAsExpr", classdef("ProvidedTypeAsExpr") {
+            field("ProvidedExpr", RdProvidedExpr)
+            field("ProvidedType", int)
+        }.nullable)
+        field("ProvidedTypeTestExpr", classdef("ProvidedTypeTestExpr") {
+            field("ProvidedExpr", RdProvidedExpr)
+            field("ProvidedType", int)
+        }.nullable)
+        field("ProvidedLetExpr", classdef("ProvidedLetExpr") {
+            field("ProvidedVar", RdProvidedVar)
+            field("ProvidedExpr1", RdProvidedExpr)
+            field("ProvidedExpr2", RdProvidedExpr)
+        }.nullable)
+        field("ProvidedVarSetExpr", classdef("ProvidedVarSetExpr") {
+            field("ProvidedVar", RdProvidedVar)
+            field("ProvidedExpr", RdProvidedExpr)
+        }.nullable)
+        field("ProvidedIfThenElseExpr", classdef("ProvidedIfThenElseExpr") {
+            field("ProvidedExpr1", RdProvidedExpr)
+            field("ProvidedExpr2", RdProvidedExpr)
+            field("ProvidedExpr3", RdProvidedExpr)
+        }.nullable)
+        field("ProvidedVarExpr", classdef("ProvidedVarExpr") {
+            field("ProvidedVar", RdProvidedVar)
+        }.nullable)
     }
 
     init {
