@@ -89,7 +89,6 @@
     <Compile Include="src\Refactorings\Rename.fs" />
     <Compile Include="src\Refactorings\IntroduceVariable.fs" />
     <Compile Include="src\Refactorings\FSharpRefactoringLanguageService.fs" />
-    <Compile Include="src\Refactorings\FunctionAnnotation.fs" />
     <Compile Include="src\Intentions\DataProviders.fs" />
     <Compile Include="src\Intentions\FSharpContextActionBase.fs" />
     <Compile Include="src\Intentions\ToRecursiveLetBindingsAction.fs" />
@@ -101,6 +100,7 @@
     <Compile Include="src\Intentions\IfToElifAction.fs" />
     <Compile Include="src\Intentions\NegateConditionActions.fs" />
     <Compile Include="src\Intentions\ToMutableAction.fs" />
+    <Compile Include="src\Intentions\FunctionAnnotationAction.fs" />
     <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
       <Mode>QUICKFIX</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>

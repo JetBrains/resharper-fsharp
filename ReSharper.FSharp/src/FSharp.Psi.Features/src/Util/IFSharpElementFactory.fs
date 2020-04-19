@@ -32,6 +32,9 @@ type IFSharpElementFactory =
 
     abstract CreateMatchExpr: ISynExpr -> IMatchExpr
     abstract CreateForEachExpr: ISynExpr -> IForEachExpr
+    
+    abstract CreateTypedPatInParens: typeSignature: string * parameterName: string -> IParenPat
+    abstract CreateReturnTypeInfo: typeSignature: string -> IReturnTypeInfo
 
     abstract AsReferenceExpr: typeReference: ITypeReferenceName -> IReferenceExpr
 

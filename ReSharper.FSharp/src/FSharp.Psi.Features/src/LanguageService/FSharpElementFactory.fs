@@ -210,3 +210,18 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             addParensIfNeeded rightArg |> ignore
 
             expr
+            
+        member x.CreateTypedPatInParens(typeSignature: string, parameterName: string) : IParenPat =
+            let expr = createLetBinding (sprintf "(%s : %s)" parameterName typeSignature)
+            let binding = expr.Bindings |> Seq.exactlyOne
+            binding.Children()
+            |> Seq.choose (function | :? IParenPat as pat -> Some pat | _ -> None)
+            |> Seq.head
+            
+        member x.CreateReturnTypeInfo(typeSignature: string) : IReturnTypeInfo =
+            let expr = createLetBinding (sprintf "_ : %s" typeSignature)
+            let binding = expr.Bindings |> Seq.exactlyOne
+            binding.Children()
+            |> Seq.choose (function | :? IReturnTypeInfo as pat -> Some pat | _ -> None)
+            |> Seq.head
+            

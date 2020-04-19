@@ -1,7 +1,0 @@
-module Module
-
-open System
-
-type NumberStringProducer() =
-    member this.PrintWithFormat (first : int)(second : int32) =
-        sprintf "First: %d Second: %d" first second
