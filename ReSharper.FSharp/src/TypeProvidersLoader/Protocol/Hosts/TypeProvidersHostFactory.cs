@@ -7,6 +7,7 @@ using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelCreators;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
 using Microsoft.FSharp.Core.CompilerServices;
+using Microsoft.FSharp.Quotations;
 using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
@@ -15,7 +16,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
   {
     private readonly IReadProvidedCache<Tuple<ProvidedType, RdProvidedType, int>> myProvidedTypesCache;
     private readonly IReadProvidedCache<ITypeProvider> myTypeProvidersCache;
-    private readonly IReadProvidedCache<Tuple<ProvidedExpr, int>> myProvidedExprsCache;
+    private readonly IReadProvidedCache<Tuple<ProvidedVar, int>> myProvidedVarsCache;
     private readonly IReadProvidedCache<Tuple<ProvidedMethodInfo, int>> myProvidedMethodsCache;
     private readonly IReadProvidedCache<Tuple<ProvidedConstructorInfo, int>> myProvidedConstructorsCache;
     private readonly IProvidedRdModelsCreator<IProvidedNamespace, RdProvidedNamespace> myProvidedNamespacesCreator;
@@ -23,7 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
 
     public TypeProvidersHostFactory(IReadProvidedCache<Tuple<ProvidedType, RdProvidedType, int>> providedTypesCache,
       IReadProvidedCache<ITypeProvider> typeProvidersCache,
-      IReadProvidedCache<Tuple<ProvidedExpr, int>> providedExprsCache,
+      IReadProvidedCache<Tuple<ProvidedVar, int>> providedVarsCache,
       IReadProvidedCache<Tuple<ProvidedMethodInfo, int>> providedMethodsCache,
       IReadProvidedCache<Tuple<ProvidedConstructorInfo, int>> providedConstructorsCache,
       IProvidedRdModelsCreator<IProvidedNamespace, RdProvidedNamespace> providedNamespacesCreator,
@@ -31,7 +32,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
     {
       myProvidedTypesCache = providedTypesCache;
       myTypeProvidersCache = typeProvidersCache;
-      myProvidedExprsCache = providedExprsCache;
+      myProvidedVarsCache = providedVarsCache;
       myProvidedMethodsCache = providedMethodsCache;
       myProvidedConstructorsCache = providedConstructorsCache;
       myProvidedNamespacesCreator = providedNamespacesCreator;
@@ -55,8 +56,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
         : myProvidedMethodsCache.Get(args.ProvidedMethodBaseId).Item1.Handle;
       
       var vars = args.ProvidedVarParamExprIds
-        .Select(myProvidedExprsCache.Get)
-        .Select(t => t.Item1.Handle)
+        .Select(myProvidedVarsCache.Get)
+        .Select(t => FSharpExpr.Var(t.Item1.Handle))
         .ToArray();
       
       var expr = myProvidedExprsCreator.CreateRdModel(

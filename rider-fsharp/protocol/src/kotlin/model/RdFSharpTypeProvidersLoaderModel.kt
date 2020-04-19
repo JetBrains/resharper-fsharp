@@ -196,7 +196,10 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         call("GetFields", int, array(RdProvidedFieldInfo))
         call("GetEvents", int, array(RdProvidedEventInfo))
         call("GetConstructors", int, array(RdProvidedConstructorInfo))
-        call("Fresh", int, RdProvidedVar)
+        call("Fresh", structdef("FreshArgs") {
+            field("EntityId", int)
+            field("Name", string)
+        }, RdProvidedVar)
     }
 
     private val RdProvidedMethodInfoProcessModel = aggregatedef("RdProvidedMethodInfoProcessModel") {

@@ -229,7 +229,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override ProvidedAssembly Assembly => myProvidedAssembly.Value;
 
     public override ProvidedVar Fresh(string nm) =>
-      ProxyProvidedVarWithCache.Create(RdProvidedTypeProcessModel.Fresh.Sync(EntityId), myProcessModel, Context,
+      ProxyProvidedVarWithCache.Create(RdProvidedTypeProcessModel.Fresh.Sync(new FreshArgs(EntityId, nm)), myProcessModel, Context,
         myCache);
 
     private int? myArrayRank;

@@ -26,6 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
     private readonly IProvidedRdModelsCreator<ProvidedFieldInfo, RdProvidedFieldInfo> myProvidedFieldInfosCreator;
     private readonly IProvidedRdModelsCreator<ProvidedEventInfo, RdProvidedEventInfo> myProvidedEventInfosCreator;
     private readonly IProvidedRdModelsCreator<ProvidedAssembly, RdProvidedAssembly> myProvidedAssembliesCreator;
+    private readonly IProvidedRdModelsCreator<ProvidedVar, RdProvidedVar> myProvidedVarsCreator;
     private readonly IProvidedRdModelsCreator<ProvidedConstructorInfo, RdProvidedConstructorInfo> myProvidedConstructorInfosCreator;
 
     private readonly IReadProvidedCache<Tuple<ProvidedType, RdProvidedType, int>> myProvidedTypesCache;
@@ -39,6 +40,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       IProvidedRdModelsCreator<ProvidedFieldInfo, RdProvidedFieldInfo> providedFieldInfosCreator,
       IProvidedRdModelsCreator<ProvidedEventInfo, RdProvidedEventInfo> providedEventInfosCreator,
       IProvidedRdModelsCreator<ProvidedAssembly, RdProvidedAssembly> providedAssembliesCreator,
+      IProvidedRdModelsCreator<ProvidedVar, RdProvidedVar> providedVarsCreator,
       IProvidedRdModelsCreator<ProvidedConstructorInfo, RdProvidedConstructorInfo> providedConstructorInfosCreator,
       IReadProvidedCache<Tuple<ProvidedType, RdProvidedType, int>> providedTypesCache,
       IReadProvidedCache<ITypeProvider> typeProvidersCache)
@@ -50,6 +52,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       myProvidedFieldInfosCreator = providedFieldInfosCreator;
       myProvidedEventInfosCreator = providedEventInfosCreator;
       myProvidedAssembliesCreator = providedAssembliesCreator;
+      myProvidedVarsCreator = providedVarsCreator;
       myProvidedConstructorInfosCreator = providedConstructorInfosCreator;
       myProvidedTypesCache = providedTypesCache;
       myTypeProvidersCache = typeProvidersCache;
@@ -79,6 +82,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       processModel.GetFields.Set(GetFields);
       processModel.GetEvents.Set(GetEvents);
       processModel.GetConstructors.Set(GetConstructors);
+      processModel.Fresh.Set(Fresh);
+    }
+
+    //TODO: Remove
+    private RdTask<RdProvidedVar> Fresh(Lifetime lifetime, FreshArgs args)
+    {
+      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(args.EntityId);
+      var providedVar = myProvidedVarsCreator.CreateRdModel(providedType.Fresh(args.Name), typeProviderId);
+      return RdTask<RdProvidedVar>.Successful(providedVar);
     }
 
     private RdTask<RdProvidedConstructorInfo[]> GetConstructors(Lifetime lifetime, int entityId)

@@ -88,7 +88,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       TypeProvidersLoaderHostFactory =
         new TypeProvidersLoaderHostFactory(typeProvidersLoader, typeProviderRdModelsCreator);
       TypeProvidersHostFactory =
-        new TypeProvidersHostFactory(providedTypesCache, typeProvidersCache, providedExprsCache,
+        new TypeProvidersHostFactory(providedTypesCache, typeProvidersCache, providedVarsCache,
           providedMethodInfosCache, providedConstructorInfosCache,
           providedNamespaceRdModelsCreator, providedExprRdModelsCreator);
       ProvidedNamespacesHostFactory =
@@ -97,7 +97,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
       ProvidedTypesHostFactory = new ProvidedTypesHostFactory(providedParameterInfoRdModelsCreator,
         providedMethodInfoRdModelsCreator, providedPropertyInfoRdModelsCreator, providedTypeRdModelsCreator,
         providedFieldInfoRdModelsCreator, providedEventInfoRdModelsCreator, providedAssemblyRdModelsCreator,
-        providedConstructorInfoRdModelsCreator, providedTypesCache, typeProvidersCache);
+        providedVarRdModelsCreator, providedConstructorInfoRdModelsCreator, providedTypesCache, typeProvidersCache);
       ProvidedPropertyInfosHostFactory =
         new ProvidedPropertyInfoHostFactory(providedParameterInfoRdModelsCreator, providedTypeRdModelsCreator,
           providedMethodInfoRdModelsCreator, providedPropertyInfosCache);
