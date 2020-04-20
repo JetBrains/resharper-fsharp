@@ -896,13 +896,17 @@ typeExtensionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; 
 enumDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<enumDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
   get { methodName="Attributes" path=<enumDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+  get {methodName="EnumMembers" path=<enumDeclaration:ENUM_REPR/enumRepresentation:ENUM_MEMBER> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
-  enumMemberDeclaration<ENUM_MEMBER, EnumMembers>*
+  enumRepresentation<ENUM_REPR, EnumRepresentation>*
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
+
+enumRepresentation:
+  enumMemberDeclaration<ENUM_MEMBER, EnumMembers>*;
 
 enumMemberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
   get { methodName="Attributes" path=<enumMemberDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };

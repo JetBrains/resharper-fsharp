@@ -49,7 +49,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
       var typeDeclarationIndentingRulesParameters = new[]
       {
-        ("EnumDeclaration", ElementType.ENUM_DECLARATION, EnumDeclaration.ENUM_MEMBER),
+        ("EnumDeclaration", ElementType.ENUM_DECLARATION, EnumDeclaration.ENUM_REPR),
         ("UnionDeclarationCases", ElementType.UNION_DECLARATION, UnionDeclaration.UNION_REPR),
         ("TypeAbbreviation", ElementType.TYPE_ABBREVIATION_DECLARATION, TypeAbbreviationDeclaration.TYPE_OR_UNION_CASE),
         ("ModuleAbbreviation", ElementType.MODULE_ABBREVIATION, ModuleAbbreviation.TYPE_REFERENCE),
