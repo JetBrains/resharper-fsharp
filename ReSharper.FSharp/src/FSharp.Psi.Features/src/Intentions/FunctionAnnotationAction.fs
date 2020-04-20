@@ -49,6 +49,7 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
             match methodSymbol with
             | :? FSharpMemberOrFunctionOrValue as x -> x
             | _ -> failwith "Expected function here"
+        // TODO MC: Match up compiler parameters with document parameters by ordering as name isn't included for nested functions...
         let compilerParameters =
             fSharpFunction.CurriedParameterGroups
             |> Seq.map(Seq.exactlyOne)
@@ -81,18 +82,8 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
             let typedPat = factory.CreateTypedPatInParens(typeName, name)
             PsiModificationUtil.replaceWithCopy ref.ParameterNodeInSignature typedPat
             
-        let finalChild = namedPat.LastChild
-        let getPreviousNonWhitespaceSibling (node : ITreeNode) : ITreeNode =
-            let mutable currentNode = node
-            while currentNode |> isNotNull && currentNode.IsWhitespaceToken() do
-                currentNode <- currentNode.PrevSibling
-            currentNode
-        let isEndOfFunctionAnnotated (node : ITreeNode) : bool =
-            let previousNonWhitespaceSibling = getPreviousNonWhitespaceSibling node
-            previousNonWhitespaceSibling.As<IReturnTypeInfo>() |> isNotNull
-            
-        if finalChild |> isEndOfFunctionAnnotated |> not then
-            let afterWhitespace = ModificationUtil.AddChildAfter(finalChild, FSharpTokenType.WHITESPACE.Create(" "))
+        if binding.ReturnTypeInfo |> isNull then
+            let afterWhitespace = ModificationUtil.AddChildAfter(namedPat.LastChild, FSharpTokenType.WHITESPACE.Create(" "))
             let namedType = factory.CreateReturnTypeInfo fSharpFunction.ReturnParameter.Type.TypeDefinition.CompiledName
             ModificationUtil.AddChildAfter(afterWhitespace, namedType) |> ignore
 
