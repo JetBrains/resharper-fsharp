@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open System
 open JetBrains.ReSharper.Feature.Services.VisualElements
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Colors
@@ -27,7 +28,29 @@ type FSharpVisualElementFactory() =
 
         let colorElement = ColorElement(color.Value, name)
         let range = Nullable(referenceExpr.Identifier.GetDocumentRange())
-        FSharpColorReference(colorElement, referenceExpr, range) :> _
+        FSharpColorReference.Create(colorElement, referenceExpr, range)
+
+    let getFromAppExpr (referenceExpr: IReferenceExpr) (qualifier: IReferenceExpr) : IColorReference =
+        let reference = referenceExpr.Reference
+        let name = reference.GetName()
+        if not (name = "FromArgb" || name = "FromName") then null else
+
+        let appExpr = PrefixAppExprNavigator.GetByFunctionExpression(referenceExpr)
+        let argExpression = appExpr.ArgumentExpression.IgnoreInnerParens().As<ITupleExpr>()
+        if isNull argExpression then null else
+
+        let args = 
+            argExpression.Expressions
+            |> Seq.cast
+            |> Seq.toArray
+
+        let factory =
+            Func<ITypeElement, IColorElement, IColorReference>(fun qualifierType color ->
+                let range = Nullable(argExpression.GetDocumentRange())
+                FSharpColorReference.Create(color, argExpression, range))
+
+        PredefinedColorTypes.ColorReferenceFromInvocation(
+            StringComparer.Ordinal, qualifier.Reference, reference, args, factory)
 
     interface IVisualElementFactory with
         member x.GetColorReference(node) =
@@ -37,10 +60,13 @@ type FSharpVisualElementFactory() =
             let qualifier = referenceExpr.Qualifier.As<IReferenceExpr>()
             if isNull qualifier then null else
 
-            getFromProperty referenceExpr qualifier
+            let color = getFromProperty referenceExpr qualifier
+            if isNotNull color then color else
+
+            getFromAppExpr referenceExpr qualifier
 
 
-and FSharpColorReference(colorElement: IColorElement, owner: ITreeNode, range) =
+and FSharpColorReference private (colorElement, owner, range) =
     interface IColorReference with
         member x.Owner = owner
         member x.ColorConstantRange = range
@@ -49,3 +75,6 @@ and FSharpColorReference(colorElement: IColorElement, owner: ITreeNode, range) =
         member x.Bind _ = ()
         member x.GetColorTable() = Seq.empty
         member x.BindOptions = ColorBindOptions(BindsToValue = false, BindsToName = false)
+
+    static member Create(colorElement: IColorElement, owner: ITreeNode, range) =
+        FSharpColorReference(colorElement, owner, range) :> IColorReference 

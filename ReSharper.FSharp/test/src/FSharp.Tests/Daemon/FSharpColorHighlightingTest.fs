@@ -14,4 +14,5 @@ type FSharpColorHighlightingTest() =
     override x.HighlightingPredicate(highlighting, _, _) =
         highlighting :? ColorHighlighting
 
+    [<Test>] member x.``Methods 01``() = x.DoNamedTest()
     [<Test>] member x.``Properties 01``() = x.DoNamedTest()

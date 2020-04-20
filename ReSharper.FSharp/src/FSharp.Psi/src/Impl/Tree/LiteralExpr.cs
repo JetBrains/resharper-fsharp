@@ -1,4 +1,5 @@
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -29,6 +30,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       var tokenType = Literal?.GetTokenType();
       return LiteralTokenTypes[tokenType];
+    }
+
+    public override ConstantValue ConstantValue
+    {
+      get
+      {
+        var literal = Literal;
+        if (literal == null)
+          return ConstantValue.BAD_VALUE;
+
+        var tokenType = literal.GetTokenType();
+        if (tokenType == FSharpTokenType.INT32)
+        {
+          // todo: hex, octal, binary
+          if (int.TryParse(literal.GetText(), out var result))
+            return new ConstantValue(result, GetPsiModule().GetPredefinedType().Int);
+        }
+
+        return ConstantValue.BAD_VALUE;
+      }
     }
   }
 }
