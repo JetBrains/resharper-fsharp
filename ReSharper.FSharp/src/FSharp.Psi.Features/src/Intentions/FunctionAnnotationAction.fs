@@ -17,6 +17,11 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
+type private ParameterToModify = {
+    ParameterNameNode : ILocalReferencePat
+    ParameterNodeInSignature : ISynPat
+}
+
 [<ContextAction(Name = "AnnotateFunction", Group = "F#", Description = "Annotate function with parameter types and return type")>]
 type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     inherit ContextActionBase()
@@ -52,16 +57,29 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         let factory = namedPat.CreateElementFactory()
         let childrenToModify =
             namedPat.Children()
-            |> Seq.choose(function | :? ILocalReferencePat as ref -> Some ref | _ -> None)
+            |> Seq.choose(
+                function
+                    | :? ILocalReferencePat as ref ->
+                        Some {ParameterNameNode = ref; ParameterNodeInSignature = ref}
+                    | :? IParenPat as ref ->
+                        let parameterNameNode =
+                            ref.Children()
+                            |> Seq.choose(function | :? ILocalReferencePat as pat -> Some pat | _ -> None)
+                            |> Seq.tryExactlyOne
+                        parameterNameNode
+                        |> Option.map(fun namedNode ->
+                            {ParameterNameNode = namedNode;
+                              ParameterNodeInSignature = ref})
+                    | _ -> None)
             |> Seq.toList
         for ref in childrenToModify do
-            let name = ref.CompiledName
+            let name = ref.ParameterNameNode.CompiledName
             let typeName =
                 compilerParameters
                 |> List.find(fun x -> (x.Name |> Option.get) = name)
                 |> fun x -> x.Type.TypeDefinition.CompiledName
             let typedPat = factory.CreateTypedPatInParens(typeName, name)
-            PsiModificationUtil.replaceWithCopy ref typedPat
+            PsiModificationUtil.replaceWithCopy ref.ParameterNodeInSignature typedPat
             
         let finalChild = namedPat.LastChild
         let getPreviousNonWhitespaceSibling (node : ITreeNode) : ITreeNode =
