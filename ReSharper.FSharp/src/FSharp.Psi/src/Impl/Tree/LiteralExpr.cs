@@ -1,3 +1,4 @@
+using System;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
@@ -43,13 +44,49 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         var tokenType = literal.GetTokenType();
         if (tokenType == FSharpTokenType.INT32)
         {
-          // todo: hex, octal, binary
-          if (int.TryParse(literal.GetText(), out var result))
+          var text = literal.GetText();
+          var literalBase = GetIntegerDigitsStartOffsetAndBase(text);
+          var startOffset = literalBase == IntBase.Decimal ? 0 : 2;
+          var literalText = text.Substring(startOffset).Replace("_", string.Empty);
+
+          try
+          {
+            var result = Convert.ToInt32(literalText, (int) literalBase);
             return new ConstantValue(result, GetPsiModule().GetPredefinedType().Int);
+          }
+          catch (Exception)
+          {
+            return ConstantValue.BAD_VALUE;
+          }
         }
 
         return ConstantValue.BAD_VALUE;
       }
+    }
+
+    private static IntBase GetIntegerDigitsStartOffsetAndBase(string literalText)
+    {
+      if (literalText.Length <= 2 || literalText[0] != '0')
+        return IntBase.Decimal;
+
+      return literalText[1] switch
+      {
+        'X' => IntBase.Hexadecimal,
+        'x' => IntBase.Hexadecimal,
+        'B' => IntBase.Binary,
+        'b' => IntBase.Binary,
+        'O' => IntBase.Octal,
+        'o' => IntBase.Octal,
+        _ => IntBase.Decimal
+      };
+    }
+
+    private enum IntBase
+    {
+      Binary = 2,
+      Octal = 8,
+      Decimal = 10,
+      Hexadecimal = 16
     }
   }
 }
