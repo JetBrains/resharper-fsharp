@@ -36,7 +36,15 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         if parameter.Type.IsGenericParameter then
             "\'" + parameter.Type.GenericParameter.DisplayName
         else
-            parameter.Type.TypeDefinition.DisplayName
+            let genericParams =
+                match parameter.Type.GenericArguments |> Seq.toList with
+                | [] -> ""
+                | genericArgs ->
+                    (genericArgs
+                     |> Seq.map(fun x -> x.TypeDefinition.DisplayName)
+                     |> String.concat " ")
+                    + " "
+            genericParams + parameter.Type.TypeDefinition.DisplayName 
     
     override x.Text = "Annotate function with parameter types and return type"
     
@@ -107,7 +115,7 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
             
         if binding.ReturnTypeInfo |> isNull then
             let afterWhitespace = ModificationUtil.AddChildAfter(namedPat.LastChild, FSharpTokenType.WHITESPACE.Create(" "))
-            let namedType = factory.CreateReturnTypeInfo fSharpFunction.ReturnParameter.Type.TypeDefinition.CompiledName
+            let namedType = fSharpFunction.ReturnParameter |> parameterTypeDisplayName |> factory.CreateReturnTypeInfo
             ModificationUtil.AddChildAfter(afterWhitespace, namedType) |> ignore
 
         null
