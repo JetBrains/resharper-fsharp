@@ -101,7 +101,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
                 // Don't escape function declarations
                 not (binding.HeadPattern :? IParametersOwnerPat) ->
-            getExprToInsertBefore (LetLikeExprNavigator.GetByBinding(binding))
+            LetLikeExprNavigator.GetByBinding(binding) :> _
 
         | :? ISynExpr as parentExpr -> getExprToInsertBefore parentExpr
         | _ -> expr

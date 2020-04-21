@@ -18,3 +18,4 @@ type IntroduceVarTest() =
 
     [<Test>] member x.``Let 01``() = x.DoNamedTest()
     [<Test>] member x.``Let 02 - Function``() = x.DoNamedTest()
+    [<Test>] member x.``Let 03 - Inside other``() = x.DoNamedTest()
