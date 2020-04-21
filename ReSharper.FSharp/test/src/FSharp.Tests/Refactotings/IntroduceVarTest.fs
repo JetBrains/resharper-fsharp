@@ -4,7 +4,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Refactorings.Test.Common
 open NUnit.Framework
 
-[<FSharpTest; Explicit>]
+[<FSharpTest>]
 type IntroduceVarTest() =
     inherit IntroduceVariableTestBase()
 
@@ -15,3 +15,6 @@ type IntroduceVarTest() =
         base.DoTest(lifetime, project)
 
     [<Test>] member x.``Simple 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Let 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let 02 - Function``() = x.DoNamedTest()

@@ -88,14 +88,23 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
     let rec getExprToInsertBefore (expr: ISynExpr): ISynExpr =
         let expr = expr.IgnoreParentParens()
 
-        let parent = expr.Parent.As<ISynExpr>()
+        let parent = expr.Parent
         if isNull parent then expr else
 
         match parent with
         | :? IConditionOwnerExpr as conditionOwnerExpr when conditionOwnerExpr.ConditionExpr != expr -> expr 
         | :? IForLikeExpr as forLikeExpr when forLikeExpr.DoExpression == expr -> expr
         | :? ISequentialExpr | :? ILambdaExpr | :? ITryLikeExpr -> expr
-        | _ -> getExprToInsertBefore parent
+
+        | :? IBinding as binding when
+                binding.Expression == expr && isNotNull (LetLikeExprNavigator.GetByBinding(binding)) &&
+
+                // Don't escape function declarations
+                not (binding.HeadPattern :? IParametersOwnerPat) ->
+            getExprToInsertBefore (LetLikeExprNavigator.GetByBinding(binding))
+
+        | :? ISynExpr as parentExpr -> getExprToInsertBefore parentExpr
+        | _ -> expr
 
     static member val TaggedByQuickFixKey = Key("")
 
@@ -175,17 +184,17 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let workflow = FSharpIntroduceVariableWorkflow(solution, null, removeSourceExpr)
         RefactoringActionUtil.ExecuteRefactoring(dataContext, workflow)
 
-    static member CanIntroduceVar(expr: ISynExpr) =
+    static member CanIntroduceVar(expr: ISynExpr, allowInSeqExprOnly) =
         if not (isValid expr) then false else
 
-        let isValidContext (expr: ISynExpr) =
+        let isInSeqExpr (expr: ISynExpr) =
             let sequentialExpr = SequentialExprNavigator.GetByExpression(expr)
             if isNull sequentialExpr then false else
 
             let nextMeaningfulSibling = expr.GetNextMeaningfulSibling()
             nextMeaningfulSibling :? ISynExpr && nextMeaningfulSibling.Indent = expr.Indent
 
-        if not (isValidContext expr) then false else
+        if allowInSeqExprOnly && not (isInSeqExpr expr) then false else
 
         let rec isValidExpr (expr: ISynExpr) =
             match expr with
@@ -210,11 +219,13 @@ type FSharpIntroduceVarHelper() =
     override x.IsLanguageSupported = true
 
     override x.CheckAvailability(node) =
-        if node.UserData.HasKey(FSharpIntroduceVariable.TaggedByQuickFixKey) then true else
+        let expr = node.As<ISynExpr>()
+        if isNull expr then false else
 
-        if not (node.FSharpExperimentalFeaturesEnabled()) then false else
+        if expr.UserData.HasKey(FSharpIntroduceVariable.TaggedByQuickFixKey) then true else
 
-        node.IsSingleLine // todo: change to something meaningful. :)
+        if not (expr.FSharpExperimentalFeaturesEnabled()) then false else
+        FSharpIntroduceVariable.CanIntroduceVar(expr, false)
 
     override x.CheckOccurrence(expr, occurrence) =
         if isTaggedNodeByQuickFix occurrence then true else
