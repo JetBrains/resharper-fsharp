@@ -1,5 +1,5 @@
-﻿Suggested names: foo
+﻿Suggested names: i
 do
-  let foo = 1
-  let x = 1 + foo
+  let i = 1
+  let x = 1 + i
   ()
