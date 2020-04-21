@@ -219,17 +219,17 @@ type FSharpProjectOptionsProvider
         member x.HasPairFile(file) =
             if isScriptLike file then false else
 
-            getOrCreateFSharpProject file
-            |> Option.map (fun fsProject -> fsProject.ImplFilesWithSigs.Contains(file.GetLocation()))
-            |> Option.defaultValue false
+            match getOrCreateFSharpProject file with
+            | Some fsProject -> fsProject.ImplFilesWithSigs.Contains(file.GetLocation())
+            | _ -> false
 
         member x.GetParsingOptions(sourceFile) =
             if isNull sourceFile then sandboxParsingOptions else
             if isScriptLike sourceFile then getParsingOptionsForSingleFile sourceFile true else
 
-            getOrCreateFSharpProject sourceFile
-            |> Option.map (fun fsProject -> fsProject.ParsingOptions)
-            |> Option.defaultWith (fun _ -> getParsingOptionsForSingleFile sourceFile false)
+            match getOrCreateFSharpProject sourceFile with
+            | Some fsProject -> fsProject.ParsingOptions
+            | _ -> getParsingOptionsForSingleFile sourceFile false
 
         member x.GetFileIndex(sourceFile) =
             if isScriptLike sourceFile then 0 else
