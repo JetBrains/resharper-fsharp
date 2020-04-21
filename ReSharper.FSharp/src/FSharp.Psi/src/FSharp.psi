@@ -358,8 +358,7 @@ interface synExpr:
   arrayOrListExpr |
   recordExpr |
   objExpr |
-  forExpr |
-  forEachExpr |
+  forLikeExpr |
   arrayOrListOfSeqExpr |
   computationLikeExpr |
   lambdaExpr |
@@ -390,6 +389,10 @@ interface doLikeExpr:
   lazyExpr |
   fixedExpr |
   inferredCastExpr;
+
+interface forLikeExpr:
+  forExpr |
+  forEachExpr;
 
 interface appLikeExpr:
   prefixAppExpr |
@@ -648,7 +651,7 @@ matchLambdaExpr options { stubBase="FSharpExpressionBase"; }:
 matchExpr options { stubBase="FSharpExpressionBase"; }:
   MATCH
   synExpr<EXPR, Expression>
-  WITH
+  WITH<WITH, WithKeyword>
   matchClause<MATCH_CLAUSE, Clauses>*;
 
 doExpr options { stubBase="FSharpExpressionBase"; }:

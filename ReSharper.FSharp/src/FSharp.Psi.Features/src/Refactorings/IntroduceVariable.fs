@@ -9,6 +9,7 @@ open JetBrains.ProjectModel.DataContext
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots
 open JetBrains.ReSharper.Feature.Services.Refactorings
 open JetBrains.ReSharper.Feature.Services.Refactorings.Specific
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
@@ -28,6 +29,11 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.TextControl
 open JetBrains.TextControl.DataContext
 open JetBrains.Util
+
+type FSharpIntroduceVariableWorkflow(solution, actionId, removeSourceExpr) =
+    inherit IntroduceVariableWorkflow(solution, actionId)
+
+    member x.RemoveSourceExpr = removeSourceExpr
 
 type FSharpIntroduceVariable(workflow, solution, driver) =
     inherit IntroduceVariableBase(workflow, solution, driver)
@@ -52,7 +58,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let suggestionOptions = SuggestionOptions(null, DefaultName = "foo")
         namesCollection.Prepare(namingRule, ScopeKind.Common, suggestionOptions).AllNames()
 
-    let getRaplaceRanges (expr: ISynExpr) (parent: ISynExpr) =
+    let getReplaceRanges (expr: ISynExpr) (parent: ISynExpr) =
         let sequentialExpr = SequentialExprNavigator.GetByExpression(expr)
         if expr == parent && isNotNull sequentialExpr then
             Assertion.Assert(expr == parent, "expr == parent")
@@ -79,11 +85,24 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
             let range = TreeRange(parent)
             {| ReplaceRange = range; InRange = range; AddNewLine = true |}
 
+    let rec getExprToInsertBefore (expr: ISynExpr): ISynExpr =
+        let expr = expr.IgnoreParentParens()
+
+        let parent = expr.Parent.As<ISynExpr>()
+        if isNull parent then expr else
+
+        match parent with
+        | :? IConditionOwnerExpr as conditionOwnerExpr when conditionOwnerExpr.ConditionExpr != expr -> expr 
+        | :? IForLikeExpr as forLikeExpr when forLikeExpr.DoExpression == expr -> expr
+        | :? ISequentialExpr | :? ILambdaExpr | :? ITryLikeExpr -> expr
+        | _ -> getExprToInsertBefore parent
+
     static member val TaggedByQuickFixKey = Key("")
 
     override x.Process(data) =
         let expr = data.SourceExpression.As<ISynExpr>()
         let parentExpr = data.Usages.FindLCA().As<ISynExpr>()
+        let parentExpr = getExprToInsertBefore parentExpr
 
         let names = getNames expr
         let name = if names.Count > 0 then names.[0] else "x"
@@ -106,7 +125,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                 let ref = elementFactory.CreateReferenceExpr(name)
                 Some (ModificationUtil.ReplaceChild(usage, ref).As<ITreeNode>().CreateTreeElementPointer()))
 
-        let ranges = getRaplaceRanges expr parentExpr
+        let ranges = getReplaceRanges expr parentExpr
         let replaced = ModificationUtil.ReplaceChildRange(ranges.ReplaceRange, TreeRange(letOrUseExpr))
         let letOrUseExpr = replaced.First :?> ILetBindings
 
@@ -132,17 +151,16 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
         IntroduceVariableResult(hotspotsRegistry, expr.Bindings.[0].HeadPattern.As<ITreeNode>().CreateTreeElementPointer())
 
-    static member IntroduceVar(expr: ISynExpr, textControl: ITextControl, ?isFromQuickFix) =
-        let isFromQuickFix = defaultArg isFromQuickFix false
+    static member IntroduceVar(expr: ISynExpr, textControl: ITextControl, ?removeSourceExpr) =
+        let removeSourceExpr = defaultArg removeSourceExpr false
 
-        let name = "IntroduceVarFix"
-        let document = textControl.Document
+        let name = "FSharpIntroduceVar"
         let solution = expr.GetSolution()
 
         let rules =
             DataRules
                 .AddRule(name, ProjectModelDataConstants.SOLUTION, solution)
-                .AddRule(name, DocumentModelDataConstants.DOCUMENT, document)
+                .AddRule(name, DocumentModelDataConstants.DOCUMENT, textControl.Document)
                 .AddRule(name, TextControlDataConstants.TEXT_CONTROL, textControl)
                 .AddRule(name, PsiDataConstants.SELECTED_EXPRESSION, expr)
 
@@ -151,20 +169,36 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let actionManager = Shell.Instance.GetComponent<IActionManager>()
         let dataContext = actionManager.DataContexts.CreateWithDataRules(lifetime.Lifetime, rules)
 
-        if isFromQuickFix then
+        if removeSourceExpr then
             expr.UserData.PutKey(FSharpIntroduceVariable.TaggedByQuickFixKey)
 
-        let workflow = IntroduceVariableWorkflow(solution, null)
+        let workflow = FSharpIntroduceVariableWorkflow(solution, null, removeSourceExpr)
         RefactoringActionUtil.ExecuteRefactoring(dataContext, workflow)
 
     static member CanIntroduceVar(expr: ISynExpr) =
         if not (isValid expr) then false else
 
-        let sequentialExpr = SequentialExprNavigator.GetByExpression(expr)
-        if isNull sequentialExpr then false else
+        let isValidContext (expr: ISynExpr) =
+            let sequentialExpr = SequentialExprNavigator.GetByExpression(expr)
+            if isNull sequentialExpr then false else
 
-        let nextMeaningfulSibling = expr.GetNextMeaningfulSibling()
-        nextMeaningfulSibling :? ISynExpr && nextMeaningfulSibling.Indent = expr.Indent
+            let nextMeaningfulSibling = expr.GetNextMeaningfulSibling()
+            nextMeaningfulSibling :? ISynExpr && nextMeaningfulSibling.Indent = expr.Indent
+
+        if not (isValidContext expr) then false else
+
+        let rec isValidExpr (expr: ISynExpr) =
+            match expr with
+            | :? IReferenceExpr as refExpr ->
+                let declaredElement = refExpr.Reference.Resolve().DeclaredElement
+                not (declaredElement :? ITypeElement || declaredElement :? INamespace)
+
+            | :? IParenExpr as parenExpr ->
+                isValidExpr parenExpr.InnerExpression
+
+            | _ -> true
+
+        isValidExpr expr
 
 
 type FSharpIntroduceVarHelper() =
