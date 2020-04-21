@@ -194,8 +194,6 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
             let nextMeaningfulSibling = expr.GetNextMeaningfulSibling()
             nextMeaningfulSibling :? ISynExpr && nextMeaningfulSibling.Indent = expr.Indent
 
-        if allowInSeqExprOnly && not (isInSeqExpr expr) then false else
-
         let rec isValidExpr (expr: ISynExpr) =
             match expr with
             | :? IReferenceExpr as refExpr ->
@@ -207,6 +205,14 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
             | _ -> true
 
+        let isAllowedContext (expr: ISynExpr) =
+            let topLevelExpr = skipIntermediateParentsOfSameType<ISynExpr>(expr)
+            if isNotNull (AttributeNavigator.GetByExpression(topLevelExpr)) then false else
+
+            true
+
+        if allowInSeqExprOnly && not (isInSeqExpr expr) then false else
+        if not (isAllowedContext expr) then false else
         isValidExpr expr
 
 
