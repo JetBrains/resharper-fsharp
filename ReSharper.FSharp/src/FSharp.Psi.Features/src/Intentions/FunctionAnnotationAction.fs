@@ -20,6 +20,12 @@ open JetBrains.ReSharper.Resources.Shell
 type private ParameterToModify = {
     ParameterNameNode : ILocalReferencePat
     ParameterNodeInSignature : ISynPat
+    FSharpParameters : FSharpParameter list
+}
+
+type private ParameterNodeWithType = {
+    Node : ITreeNode
+    FSharpParameters : FSharpParameter list
 }
 
 [<ContextAction(Name = "AnnotateFunction", Group = "F#", Description = "Annotate function with parameter types and return type")>]
@@ -49,19 +55,27 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
             match methodSymbol with
             | :? FSharpMemberOrFunctionOrValue as x -> x
             | _ -> failwith "Expected function here"
-        // TODO MC: Match up compiler parameters with document parameters by ordering as name isn't included for nested functions...
-        let compilerParameters =
-            fSharpFunction.CurriedParameterGroups
-            |> Seq.map(Seq.exactlyOne)
-            |> Seq.toList
-            
-        let factory = namedPat.CreateElementFactory()
-        let childrenToModify =
+        let treeParameters =
             namedPat.Children()
             |> Seq.choose(
                 function
+                 | :? ILocalReferencePat as ref -> ref :> ITreeNode |> Some
+                 | :? IParenPat as ref -> ref :> ITreeNode |> Some
+                 | _ -> None)
+            |> Seq.toList
+        let unifiedParameters =
+            fSharpFunction.CurriedParameterGroups
+            |> Seq.toList
+            |> List.zip treeParameters
+            |> List.map(fun (node, parameters) -> {Node = node; FSharpParameters = parameters |> Seq.toList})
+            
+        let factory = namedPat.CreateElementFactory()
+        let childrenToModify =
+            unifiedParameters
+            |> Seq.choose(fun {Node = node; FSharpParameters = curriedParams} ->
+                match node with
                     | :? ILocalReferencePat as ref ->
-                        Some {ParameterNameNode = ref; ParameterNodeInSignature = ref}
+                        Some {ParameterNameNode = ref; ParameterNodeInSignature = ref; FSharpParameters = curriedParams}
                     | :? IParenPat as ref ->
                         let parameterNameNode =
                             ref.Children()
@@ -70,15 +84,17 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
                         parameterNameNode
                         |> Option.map(fun namedNode ->
                             {ParameterNameNode = namedNode;
-                              ParameterNodeInSignature = ref})
+                              ParameterNodeInSignature = ref;
+                              FSharpParameters = curriedParams})
                     | _ -> None)
             |> Seq.toList
         for ref in childrenToModify do
-            let name = ref.ParameterNameNode.CompiledName
+            let name = ref.ParameterNameNode.SourceName
             let typeName =
-                compilerParameters
-                |> List.find(fun x -> (x.Name |> Option.get) = name)
-                |> fun x -> x.Type.TypeDefinition.CompiledName
+                match ref.FSharpParameters with
+                | [] -> failwith "Unexpectedly received no type parameters"
+                | [single] -> single.Type.TypeDefinition.DisplayName
+                | multiple -> multiple |> List.map (fun x -> x.Type.TypeDefinition.DisplayName) |> String.concat "*"
             let typedPat = factory.CreateTypedPatInParens(typeName, name)
             PsiModificationUtil.replaceWithCopy ref.ParameterNodeInSignature typedPat
             
