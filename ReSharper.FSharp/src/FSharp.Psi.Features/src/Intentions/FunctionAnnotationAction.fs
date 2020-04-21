@@ -32,9 +32,13 @@ type private ParameterNodeWithType = {
 type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     inherit ContextActionBase()
 
-    override x.Text = "Annotate function with parameter types and return type"
-
+    let parameterTypeDisplayName (parameter : FSharpParameter) : string =
+        if parameter.Type.IsGenericParameter then
+            "\'" + parameter.Type.GenericParameter.DisplayName
+        else
+            parameter.Type.TypeDefinition.DisplayName
     
+    override x.Text = "Annotate function with parameter types and return type"
     
     override x.IsAvailable _ =
         let letExpr = dataProvider.GetSelectedElement<ILetBindings>()
@@ -63,6 +67,9 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
                  | :? IParenPat as ref -> ref :> ITreeNode |> Some
                  | _ -> None)
             |> Seq.toList
+            
+        // In the case that let statements are nested, the FSC doesn't return the display name of the parameters,
+        // and so zipping the paremeters from the FSC and tree is the only way to reconcile the type information.
         let unifiedParameters =
             fSharpFunction.CurriedParameterGroups
             |> Seq.toList
@@ -93,8 +100,8 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
             let typeName =
                 match ref.FSharpParameters with
                 | [] -> failwith "Unexpectedly received no type parameters"
-                | [single] -> single.Type.TypeDefinition.DisplayName
-                | multiple -> multiple |> List.map (fun x -> x.Type.TypeDefinition.DisplayName) |> String.concat "*"
+                | [single] -> parameterTypeDisplayName single
+                | multiple -> multiple |> List.map (parameterTypeDisplayName) |> String.concat "*"
             let typedPat = factory.CreateTypedPatInParens(typeName, name)
             PsiModificationUtil.replaceWithCopy ref.ParameterNodeInSignature typedPat
             
