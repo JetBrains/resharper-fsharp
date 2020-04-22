@@ -676,6 +676,11 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         | SynExpr.Typed(inner, synType, range) when not (rangeContainsRange range synType.Range) -> inner
         | _ -> expr
 
+    member x.RemoveDoExpr(expr: SynExpr) =
+        match expr with
+        | SynExpr.Do(expr, _) -> expr
+        | _ -> expr
+
     member x.MarkChameleonExpression(expr: SynExpr) =
         let (ExprRange range as expr) = x.FixExpresion(expr)
 

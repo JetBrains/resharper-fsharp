@@ -100,6 +100,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                     x.AdvanceToTokenOrRangeStart(FSharpTokenType.DO, range)
                     x.Mark()
 
+            let expr = x.RemoveDoExpr(expr)
             x.MarkChameleonExpression(expr)
             x.Done(range, mark, ElementType.DO)
 
@@ -222,6 +223,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
 
             | SynMemberDefn.LetBindings([Binding(kind = SynBindingKind.DoBinding; expr = expr)], _, _, range) ->
                 x.AdvanceToTokenOrRangeStart(FSharpTokenType.DO, range)
+                let expr = x.RemoveDoExpr(expr)
                 x.MarkChameleonExpression(expr)
                 ElementType.DO
 

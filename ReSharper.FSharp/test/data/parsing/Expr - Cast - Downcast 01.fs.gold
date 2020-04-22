@@ -6,15 +6,14 @@ IFSharpImplFile
       NewLine(type:NEW_LINE, text:\n) spaces:"\n"
       Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
       IChameleonExpression
-        IDoExpr
-          IDowncastExpr
-            IUnitExpr
-              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+ColonQmarkGreaterTokenElement(type:COLON_QMARK_GREATER, text::?>)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IAnonType
-              FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+        IDowncastExpr
+          IUnitExpr
+            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+ColonQmarkGreaterTokenElement(type:COLON_QMARK_GREATER, text::?>)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IAnonType
+            FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 
