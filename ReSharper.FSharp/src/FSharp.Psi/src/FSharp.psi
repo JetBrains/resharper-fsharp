@@ -419,7 +419,7 @@ interface conditionOwnerExpr:
   ifExpr |
   whileExpr;
 
-setExpr options { stubBase="FSharpExpressionBase"; }:
+setExpr options { stubBase="UnitExpressionBase"; }:
   synExpr<LEFT_EXPR, LeftExpression>
   LARROW<LARROW, LArrow>
   synExpr<RIGHT_EXPR, RightExpression>;
@@ -487,7 +487,7 @@ interface constExpr:
   unitExpr |
   literalExpr;
 
-unitExpr options { stubBase="FSharpExpressionBase"; }:
+unitExpr options { stubBase="UnitExpressionBase"; }:
   LPAREN<LPAREN, LParen>
   RPAREN<RPAREN, RParen>;
 
@@ -571,7 +571,7 @@ newExpr options { stubBase="FSharpExpressionBase"; }:
   typeReferenceName<TYPE_REFERENCE, TypeName>
   synExpr<EXPR, ArgumentExpression>;
 
-forExpr options { stubBase="FSharpExpressionBase"; }:
+forExpr options { stubBase="UnitExpressionBase"; }:
   FOR
   localDeclaration<IDENTIFIER, Identifier>
   EQUALS
@@ -581,7 +581,7 @@ forExpr options { stubBase="FSharpExpressionBase"; }:
   DO
   synExpr<DO_EXPR, DoExpression>;
 
-forEachExpr options { stubBase="FSharpExpressionBase"; }:
+forEachExpr options { stubBase="UnitExpressionBase"; }:
   FOR
   synPat<PAT, Pattern>
   IN
@@ -602,7 +602,7 @@ arrayOrListOfSeqExpr options { stubBase="FSharpExpressionBase"; }:
     synExpr<EXPR, Expression>
     BAR_RBRACK);
 
-whileExpr options { stubBase="FSharpExpressionBase"; }:
+whileExpr options { stubBase="UnitExpressionBase"; }:
   WHILE<WHILE_KEYWORD, WhileKeyword>
   synExpr<WHILE_EXPR, ConditionExpr>
   DO
@@ -654,7 +654,7 @@ matchExpr options { stubBase="FSharpExpressionBase"; }:
   WITH<WITH, WithKeyword>
   matchClause<MATCH_CLAUSE, Clauses>*;
 
-doExpr options { stubBase="FSharpExpressionBase"; }:
+doExpr options { stubBase="UnitExpressionBase"; }:
   DO<KEYWORD, Keyword>
   synExpr<EXPR, Expression>;
 
