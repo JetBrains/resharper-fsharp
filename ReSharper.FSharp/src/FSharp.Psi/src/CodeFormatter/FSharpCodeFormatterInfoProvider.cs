@@ -60,7 +60,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         ("MatchClauses", ElementType.MATCH_EXPR),
         ("UnionCases", ElementType.UNION_REPRESENTATION),
         ("EnumCases", ElementType.ENUM_REPRESENTATION),
-        ("SequentialExpr", ElementType.SEQUENTIAL_EXPR)
+        ("SequentialExpr", ElementType.SEQUENTIAL_EXPR),
+        ("BinaryExpr", ElementType.BINARY_APP_EXPR),
       };
 
       lock (this)
