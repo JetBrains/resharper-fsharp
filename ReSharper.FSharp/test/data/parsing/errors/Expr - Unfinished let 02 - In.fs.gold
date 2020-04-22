@@ -6,10 +6,10 @@ IFSharpImplFile
     FSharpIdentifierToken(type:IDENTIFIER, text:Module)
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-    FSharpTokenType+DoTokenElement(type:DO, text:do)
-    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-    Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
     IDo
+      FSharpTokenType+DoTokenElement(type:DO, text:do)
+      NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+      Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
       IChameleonExpression
         IDoExpr
           ILetOrUseExpr

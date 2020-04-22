@@ -1,9 +1,9 @@
 ﻿Language: PsiLanguageType:F#
 IFSharpImplFile
   IAnonModuleDeclaration
-    FSharpTokenType+DoTokenElement(type:DO, text:do)
-    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
     IDo
+      FSharpTokenType+DoTokenElement(type:DO, text:do)
+      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
       IChameleonExpression
         IDoExpr
           IUnitExpr

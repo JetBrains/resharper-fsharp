@@ -96,7 +96,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                 | Some(mark, _, _) ->
                     unfinishedDeclaration <- None
                     mark
-                | _ -> x.Mark(range)
+                | _ ->
+                    x.AdvanceToTokenOrRangeStart(FSharpTokenType.DO, range)
+                    x.Mark()
 
             x.MarkChameleonExpression(expr)
             x.Done(range, mark, ElementType.DO)
