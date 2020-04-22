@@ -220,6 +220,11 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
             | SynMemberDefn.Member(binding, range) ->
                 x.ProcessMemberBinding(mark, binding, range)
 
+            | SynMemberDefn.LetBindings([Binding(kind = SynBindingKind.DoBinding; expr = expr)], _, _, range) ->
+                x.AdvanceToTokenOrRangeStart(FSharpTokenType.DO, range)
+                x.MarkChameleonExpression(expr)
+                ElementType.DO
+
             | SynMemberDefn.LetBindings(bindings, _, _, range) ->
                 for binding in bindings do
                     x.ProcessTopLevelBinding(binding, range)
