@@ -56,7 +56,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
     let createLetBinding bindingName =
         let source = sprintf "do (let %s = ())" bindingName
         let newExpr = getExpression source
-        newExpr.As<IDoExpr>().Expression.As<IParenExpr>().InnerExpression.As<ILetOrUseExpr>()
+        newExpr.As<IParenExpr>().InnerExpression.As<ILetOrUseExpr>()
 
     let setBindingExpression (expr: ISynExpr) (letBindings: #ILetBindings) =
         let newExpr = letBindings.Bindings.[0].SetExpression(expr.Copy())
@@ -191,8 +191,8 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
         member x.CreateReferenceExpr(name) =
             let source = sprintf "do %s" name
-            let newExpr = getExpression source
-            newExpr.As<IDoExpr>().Expression.As<IReferenceExpr>() :> _
+            let newExpr = getExpression source :?> IReferenceExpr
+            newExpr :> _
 
         member x.CreateForEachExpr(expr) =
             let sourceFile = expr.GetSourceFile()

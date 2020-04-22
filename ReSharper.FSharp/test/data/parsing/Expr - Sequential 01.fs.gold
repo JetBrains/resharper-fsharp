@@ -6,15 +6,14 @@ IFSharpImplFile
       NewLine(type:NEW_LINE, text:\n) spaces:"\n"
       Whitespace(type:WHITE_SPACE, text:  ) spaces:"  "
       IChameleonExpression
-        IDoExpr
-          ISequentialExpr
-            IUnitExpr
-              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
-            NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-            Whitespace(type:WHITE_SPACE, text:  ) spaces:"  "
-            IUnitExpr
-              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+        ISequentialExpr
+          IUnitExpr
+            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+          NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+          Whitespace(type:WHITE_SPACE, text:  ) spaces:"  "
+          IUnitExpr
+            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 
