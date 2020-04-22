@@ -118,12 +118,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
           .Build();
 
         Describe<IndentingRule>()
-          .Name("DoDecl")
+          .Name("DoDeclIndent")
           .Where(
-            Parent().HasType(ElementType.DO),
-            Node()
-              .HasRole(Do.CHAMELEON_EXPR)
-              .Satisfies((node, context) => node.GetPreviousMeaningfulSibling()?.GetTokenType() == FSharpTokenType.DO))
+            Parent()
+              .HasType(ElementType.DO)
+              .Satisfies((node, context) => ((IDo) node).DoKeyword != null),
+            Node().HasRole(Do.CHAMELEON_EXPR))
           .Return(IndentType.External)
           .Build();
       }
