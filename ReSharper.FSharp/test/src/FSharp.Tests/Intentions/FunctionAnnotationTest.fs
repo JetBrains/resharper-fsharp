@@ -20,7 +20,10 @@ type FunctionAnnotationActionTest() =
     [<Test>] member x.``Let - existing incorrect parameters annotation``() = x.DoNamedTest()
     [<Test>] member x.``Let - unable to determine all parameter or return types``() = x.DoNamedTest()
     [<Test>] member x.``Let - Instance of generic type``() = x.DoNamedTest()
-    // TODO: Need test case covering out arguments
+    [<Test>] member x.``Let - unit to unit``() = x.DoNamedTest()
+    
+    // TODO: Need case covering out args
+    // TODO: Need case covering functions pased to functions
 
 [<FSharpTest; TestPackages("FSharp.Core")>]
 type FunctionAnnotationAvailabilityTest() =
@@ -38,3 +41,5 @@ type FunctionAnnotationAvailabilityTest() =
     [<Test>] member x.``Expression - Keyword 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Not available``() = x.DoNamedTest()
+    
+    // TODO MC: Double check that this returns false for class members
