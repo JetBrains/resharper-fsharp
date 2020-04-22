@@ -3,6 +3,7 @@ using JetBrains.Application.Settings;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Psi;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
@@ -113,6 +114,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
                 return !IsLastNodeOfItsType(node, context) ||
                        !AreAligned(matchClause, expr, context.CodeFormatter);
               }))
+          .Return(IndentType.External)
+          .Build();
+
+        Describe<IndentingRule>()
+          .Name("DoDecl")
+          .Where(
+            Parent().HasType(ElementType.DO),
+            Node()
+              .HasRole(Do.CHAMELEON_EXPR)
+              .Satisfies((node, context) => node.GetPreviousMeaningfulSibling()?.GetTokenType() == FSharpTokenType.DO))
           .Return(IndentType.External)
           .Build();
       }
