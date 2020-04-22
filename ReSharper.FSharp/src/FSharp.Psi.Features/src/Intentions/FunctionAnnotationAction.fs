@@ -32,19 +32,16 @@ type private ParameterNodeWithType = {
 type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     inherit ContextActionBase()
 
-    let parameterTypeDisplayName (parameter : FSharpParameter) : string =
-        if parameter.Type.IsGenericParameter then
-            "\'" + parameter.Type.GenericParameter.DisplayName
-        else
-            let genericParams =
-                match parameter.Type.GenericArguments |> Seq.toList with
-                | [] -> ""
-                | genericArgs ->
-                    (genericArgs
-                     |> Seq.map(fun x -> x.TypeDefinition.DisplayName)
-                     |> String.concat " ")
-                    + " "
-            genericParams + parameter.Type.TypeDefinition.DisplayName 
+    let rec getTypeDisplayName (fsType : FSharpType) : string =
+        let typeDef = if fsType.HasTypeDefinition then fsType.TypeDefinition.DisplayName else ""
+        let genericParam = if fsType.IsGenericParameter then "'" + fsType.GenericParameter.DisplayName else ""
+        let genericArgs = if fsType.HasTypeDefinition then fsType.GenericArguments |> Seq.map getTypeDisplayName |> Seq.toList else List.empty
+        let tupleArgs = if fsType.IsTupleType then fsType.GenericArguments |> Seq.map getTypeDisplayName |> String.concat "*" else ""
+        
+        [genericParam; typeDef; tupleArgs]
+        |> List.append genericArgs
+        |> List.filter (fun x -> String.length x <> 0)
+        |> String.concat " "
     
     override x.Text = "Annotate function with parameter types and return type"
     
@@ -108,14 +105,14 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
             let typeName =
                 match ref.FSharpParameters with
                 | [] -> failwith "Unexpectedly received no type parameters"
-                | [single] -> parameterTypeDisplayName single
-                | multiple -> multiple |> List.map (parameterTypeDisplayName) |> String.concat "*"
+                | [single] -> getTypeDisplayName single.Type
+                | multiple -> multiple |> List.map (fun x -> getTypeDisplayName x.Type) |> String.concat "*"
             let typedPat = factory.CreateTypedPatInParens(typeName, name)
             PsiModificationUtil.replaceWithCopy ref.ParameterNodeInSignature typedPat
             
         if binding.ReturnTypeInfo |> isNull then
             let afterWhitespace = ModificationUtil.AddChildAfter(namedPat.LastChild, FSharpTokenType.WHITESPACE.Create(" "))
-            let namedType = fSharpFunction.ReturnParameter |> parameterTypeDisplayName |> factory.CreateReturnTypeInfo
+            let namedType = fSharpFunction.ReturnParameter.Type |> getTypeDisplayName |> factory.CreateReturnTypeInfo
             ModificationUtil.AddChildAfter(afterWhitespace, namedType) |> ignore
 
         null
