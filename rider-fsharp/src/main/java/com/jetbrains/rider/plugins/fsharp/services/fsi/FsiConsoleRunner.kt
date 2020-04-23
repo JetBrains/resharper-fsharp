@@ -25,6 +25,7 @@ import com.intellij.openapi.extensions.Extensions
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.UserDataHolderBase
+import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.project.isDirectoryBased
@@ -159,8 +160,10 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
             ToolWindowManager.getInstance(project).getToolWindow(executor.id)?.show(null)
 
             val stream = processHandler.processInput ?: error("Broken Fsi stream")
-            stream.write(fsiText.toByteArray(Charsets.UTF_8))
-            stream.flush()
+            if(!StringUtil.isEmptyOrSpaces(visibleText)) {
+                stream.write(fsiText.toByteArray(Charsets.UTF_8))
+                stream.flush()
+            }
         }
     }
 
