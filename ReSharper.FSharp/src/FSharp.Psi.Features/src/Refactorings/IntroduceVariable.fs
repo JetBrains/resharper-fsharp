@@ -106,12 +106,23 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         | :? ISynExpr as parentExpr -> getExprToInsertBefore parentExpr
         | _ -> expr
 
+    let createBinding (context: ISynExpr) (contextDecl: ILetModuleDecl) name expr: ILet =
+        let elementFactory = context.CreateElementFactory()
+        if isNotNull contextDecl then
+            elementFactory.CreateLetModuleDecl(name, expr) :> _
+        else
+            elementFactory.CreateLetBindingExpr(name, expr) :> _
+
     static member val TaggedByQuickFixKey = Key("")
 
     override x.Process(data) =
         let expr = data.SourceExpression.As<ISynExpr>()
-        let parentExpr = data.Usages.FindLCA().As<ISynExpr>()
-        let parentExpr = getExprToInsertBefore parentExpr
+        let commonParentExpr = data.Usages.FindLCA().As<ISynExpr>()
+
+        // contextDecl is not null when expression is bound to a module/type let binding
+        let contextExpr = getExprToInsertBefore commonParentExpr
+        let contextDecl = LetModuleDeclNavigator.GetByBinding(BindingNavigator.GetByExpression(contextExpr))
+        let contextIndent = if isNotNull contextDecl then contextDecl.Indent else contextExpr.Indent
 
         let names = getNames expr
         let name = if names.Count > 0 then names.[0] else "x"
@@ -121,44 +132,55 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         use disableFormatter = new DisableCodeFormatter()
 
         let lineEnding = expr.GetLineEnding()
-        let parentExprIndent = parentExpr.Indent
-
         let elementFactory = expr.CreateElementFactory()
-        let letOrUseExpr = elementFactory.CreateLetBindingExpr(name, expr)
+
+        let letOrUseExpr = createBinding contextExpr contextDecl name expr
 
         let replacedUsages =
             data.Usages
             |> Array.ofSeq
             |> Array.choose (fun usage ->
-                if not (isValid usage) || obj.ReferenceEquals(usage, parentExpr) then None else
+                if not (isValid usage) || obj.ReferenceEquals(usage, contextExpr) then None else
                 let ref = elementFactory.CreateReferenceExpr(name)
                 Some (ModificationUtil.ReplaceChild(usage, ref).As<ITreeNode>().CreateTreeElementPointer()))
 
-        let ranges = getReplaceRanges expr parentExpr
+        let ranges = getReplaceRanges expr contextExpr
         let replaced = ModificationUtil.ReplaceChildRange(ranges.ReplaceRange, TreeRange(letOrUseExpr))
-        let letOrUseExpr = replaced.First :?> ILetBindings
+        let letBindings = replaced.First :?> ILetBindings
 
-        let binding = letOrUseExpr.Bindings.[0]
-        let replaced = ModificationUtil.ReplaceChildRange(TreeRange(binding.NextSibling, letOrUseExpr.LastChild), ranges.InRange)
-        if ranges.AddNewLine then
-            let anchor = ModificationUtil.AddChildBefore(replaced.First, NewLine(lineEnding))
-            ModificationUtil.AddChildAfter(anchor, Whitespace(parentExprIndent)) |> ignore
+        match replaced.First with
+        | :? ILetOrUseExpr ->
+            let binding = letBindings.Bindings.[0]
+            let replaceRange = TreeRange(binding.NextSibling, letBindings.LastChild)
+            let replaced = ModificationUtil.ReplaceChildRange(replaceRange, ranges.InRange)
+
+            if ranges.AddNewLine then
+                let anchor = ModificationUtil.AddChildBefore(replaced.First, NewLine(lineEnding))
+                ModificationUtil.AddChildAfter(anchor, Whitespace(contextIndent)) |> ignore
+
+        | :? ILetModuleDecl ->
+            addNodesBefore contextDecl [
+                letBindings
+                NewLine(lineEnding)
+                Whitespace(contextIndent)
+            ] |> ignore
+
+        | _ -> ()
 
         let nodes =
             let replacedNodes =
                 replacedUsages
                 |> Array.choose (fun pointer -> pointer.GetTreeNode() |> Option.ofObj)
 
-            [| letOrUseExpr.As<ILet>().Bindings.[0].HeadPattern :> ITreeNode |]
+            [| letBindings.As<ILet>().Bindings.[0].HeadPattern :> ITreeNode |]
             |> Array.append replacedNodes 
 
         let nameExpression = NameSuggestionsExpression(names)
         let hotspotsRegistry = HotspotsRegistry(solution.GetPsiServices())
         hotspotsRegistry.Register(nodes, nameExpression)
 
-        let expr = letOrUseExpr :?> ILetLikeExpr
-
-        IntroduceVariableResult(hotspotsRegistry, expr.Bindings.[0].HeadPattern.As<ITreeNode>().CreateTreeElementPointer())
+        let namePat = letBindings.Bindings.[0].HeadPattern
+        IntroduceVariableResult(hotspotsRegistry, namePat.As<ITreeNode>().CreateTreeElementPointer())
 
     static member IntroduceVar(expr: ISynExpr, textControl: ITextControl, ?removeSourceExpr) =
         let removeSourceExpr = defaultArg removeSourceExpr false

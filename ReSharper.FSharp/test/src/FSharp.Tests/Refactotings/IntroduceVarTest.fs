@@ -19,3 +19,8 @@ type IntroduceVarTest() =
     [<Test>] member x.``Let 01``() = x.DoNamedTest()
     [<Test>] member x.``Let 02 - Function``() = x.DoNamedTest()
     [<Test>] member x.``Let 03 - Inside other``() = x.DoNamedTest()
+
+    [<Test>] member x.``LetDecl 01``() = x.DoNamedTest()
+    [<Test>] member x.``LetDecl 02 - Indent``() = x.DoNamedTest()
+
+    [<Test>] member x.``Not allowed - Attribute 01``() = x.DoNamedTest()
