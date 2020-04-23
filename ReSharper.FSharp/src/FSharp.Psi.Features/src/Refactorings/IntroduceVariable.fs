@@ -106,66 +106,80 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         | :? ISynExpr as parentExpr -> getExprToInsertBefore parentExpr
         | _ -> expr
 
-    let createBinding (context: ISynExpr) (contextDecl: ILetModuleDecl) name expr: ILet =
+    let getContextDeclaration (contextExpr: ISynExpr): IModuleMember =
+        let letDecl = LetModuleDeclNavigator.GetByBinding(BindingNavigator.GetByExpression(contextExpr))
+        if isNotNull letDecl then letDecl :> _ else
+
+        let doDecl = DoNavigator.GetByExpression(contextExpr)
+        if isNotNull doDecl && doDecl.IsImplicit then doDecl :> _ else null
+
+    let createBinding (context: ISynExpr) (contextDecl: IModuleMember) name expr: ILet =
         let elementFactory = context.CreateElementFactory()
         if isNotNull contextDecl then
             elementFactory.CreateLetModuleDecl(name, expr) :> _
         else
             elementFactory.CreateLetBindingExpr(name, expr) :> _
 
-    static member val TaggedByQuickFixKey = Key("")
+    static member val ExpressionToRemove = Key("FSharpIntroduceVariable.ExpressionToRemove")
 
     override x.Process(data) =
-        let expr = data.SourceExpression.As<ISynExpr>()
+        let initialExpr = data.SourceExpression.As<ISynExpr>()
         let commonParentExpr = data.Usages.FindLCA().As<ISynExpr>()
 
         // contextDecl is not null when expression is bound to a module/type let binding
         let contextExpr = getExprToInsertBefore commonParentExpr
-        let contextDecl = LetModuleDeclNavigator.GetByBinding(BindingNavigator.GetByExpression(contextExpr))
+        let contextDecl = getContextDeclaration contextExpr
         let contextIndent = if isNotNull contextDecl then contextDecl.Indent else contextExpr.Indent
 
-        let names = getNames expr
+        let names = getNames initialExpr
         let name = if names.Count > 0 then names.[0] else "x"
 
-        expr.UserData.RemoveKey(FSharpIntroduceVariable.TaggedByQuickFixKey)
-        use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
+        let removeSourceExpr = initialExpr.UserData.HasKey(FSharpIntroduceVariable.ExpressionToRemove)
+        initialExpr.UserData.RemoveKey(FSharpIntroduceVariable.ExpressionToRemove)
+
+        use writeCookie = WriteLockCookie.Create(initialExpr.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
-        let lineEnding = expr.GetLineEnding()
-        let elementFactory = expr.CreateElementFactory()
+        let lineEnding = initialExpr.GetLineEnding()
+        let elementFactory = initialExpr.CreateElementFactory()
 
-        let letOrUseExpr = createBinding contextExpr contextDecl name expr
+        let letOrUseExpr = createBinding contextExpr contextDecl name initialExpr
 
         let replacedUsages =
             data.Usages
             |> Array.ofSeq
             |> Array.choose (fun usage ->
-                if not (isValid usage) || obj.ReferenceEquals(usage, contextExpr) then None else
+                if not (isValid usage) then None else
+                if removeSourceExpr && obj.ReferenceEquals(usage, contextExpr) then None else
+
                 let ref = elementFactory.CreateReferenceExpr(name)
                 Some (ModificationUtil.ReplaceChild(usage, ref).As<ITreeNode>().CreateTreeElementPointer()))
 
-        let ranges = getReplaceRanges expr contextExpr
-        let replaced = ModificationUtil.ReplaceChildRange(ranges.ReplaceRange, TreeRange(letOrUseExpr))
-        let letBindings = replaced.First :?> ILetBindings
+        let letBindings: ILet = 
+            match letOrUseExpr with
+            | :? ILetOrUseExpr ->
+                let ranges = getReplaceRanges initialExpr contextExpr
+                let replaced = ModificationUtil.ReplaceChildRange(ranges.ReplaceRange, TreeRange(letOrUseExpr))
+                let letBindings = replaced.First :?> ILet
 
-        match replaced.First with
-        | :? ILetOrUseExpr ->
-            let binding = letBindings.Bindings.[0]
-            let replaceRange = TreeRange(binding.NextSibling, letBindings.LastChild)
-            let replaced = ModificationUtil.ReplaceChildRange(replaceRange, ranges.InRange)
+                let binding = letBindings.Bindings.[0]
+                let replaceRange = TreeRange(binding.NextSibling, letBindings.LastChild)
+                let replaced = ModificationUtil.ReplaceChildRange(replaceRange, ranges.InRange)
 
-            if ranges.AddNewLine then
-                let anchor = ModificationUtil.AddChildBefore(replaced.First, NewLine(lineEnding))
-                ModificationUtil.AddChildAfter(anchor, Whitespace(contextIndent)) |> ignore
-
-        | :? ILetModuleDecl ->
-            addNodesBefore contextDecl [
+                if ranges.AddNewLine then
+                    let anchor = ModificationUtil.AddChildBefore(replaced.First, NewLine(lineEnding))
+                    ModificationUtil.AddChildAfter(anchor, Whitespace(contextIndent)) |> ignore
                 letBindings
-                NewLine(lineEnding)
-                Whitespace(contextIndent)
-            ] |> ignore
 
-        | _ -> ()
+            | :? ILetModuleDecl ->
+                addNodesBefore contextDecl [
+                    letOrUseExpr
+                    NewLine(lineEnding)
+                    Whitespace(contextIndent)
+                ] |> ignore
+                letOrUseExpr
+
+            | _ -> failwithf "Unexpected let node type"
 
         let nodes =
             let replacedNodes =
@@ -201,7 +215,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let dataContext = actionManager.DataContexts.CreateWithDataRules(lifetime.Lifetime, rules)
 
         if removeSourceExpr then
-            expr.UserData.PutKey(FSharpIntroduceVariable.TaggedByQuickFixKey)
+            expr.UserData.PutKey(FSharpIntroduceVariable.ExpressionToRemove)
 
         let workflow = FSharpIntroduceVariableWorkflow(solution, null, removeSourceExpr)
         RefactoringActionUtil.ExecuteRefactoring(dataContext, workflow)
@@ -241,8 +255,8 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 type FSharpIntroduceVarHelper() =
     inherit IntroduceVariableHelper()
 
-    let isTaggedNodeByQuickFix (expr: ITreeNode) =
-        expr.UserData.HasKey(FSharpIntroduceVariable.TaggedByQuickFixKey)
+    let isExpressionToRemove (expr: ITreeNode) =
+        expr.UserData.HasKey(FSharpIntroduceVariable.ExpressionToRemove)
 
     override x.IsLanguageSupported = true
 
@@ -250,13 +264,13 @@ type FSharpIntroduceVarHelper() =
         let expr = node.As<ISynExpr>()
         if isNull expr then false else
 
-        if expr.UserData.HasKey(FSharpIntroduceVariable.TaggedByQuickFixKey) then true else
+        if expr.UserData.HasKey(FSharpIntroduceVariable.ExpressionToRemove) then true else
 
         if not (expr.FSharpExperimentalFeaturesEnabled()) then false else
         FSharpIntroduceVariable.CanIntroduceVar(expr, false)
 
     override x.CheckOccurrence(expr, occurrence) =
-        if isTaggedNodeByQuickFix occurrence then true else
+        if isExpressionToRemove occurrence then true else
 
-        if isTaggedNodeByQuickFix expr then false else
+        if isExpressionToRemove expr then false else
         expr.FSharpExperimentalFeaturesEnabled()

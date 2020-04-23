@@ -122,7 +122,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
           .Where(
             Parent()
               .HasType(ElementType.DO)
-              .Satisfies((node, context) => ((IDo) node).DoKeyword != null),
+              .Satisfies((node, context) => !((IDo) node).IsImplicit),
             Node().HasRole(Do.CHAMELEON_EXPR))
           .Return(IndentType.External)
           .Build();

@@ -23,4 +23,6 @@ type IntroduceVarTest() =
     [<Test>] member x.``LetDecl 01``() = x.DoNamedTest()
     [<Test>] member x.``LetDecl 02 - Indent``() = x.DoNamedTest()
 
+    [<Test>] member x.``Do decl 01 - Implicit``() = x.DoNamedTest()
+
     [<Test>] member x.``Not allowed - Attribute 01``() = x.DoNamedTest()
