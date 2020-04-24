@@ -120,6 +120,41 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         else
             elementFactory.CreateLetBindingExpr(name, expr) :> _
 
+    let getMoveToNewLineInfo (contextExpr: ISynExpr) =
+        if not contextExpr.IsSingleLine then None else
+
+        let parent = contextExpr.Parent
+        let prevToken =
+            match parent with
+            | :? IBinding as binding when isNotNull binding.Parent -> binding.EqualsToken
+            | :? IMatchClause as matchClause -> matchClause.RArrow
+            | :? ILambdaExpr as lambdaExpr -> lambdaExpr.RArrow
+            | :? ITryLikeExpr as tryExpr -> tryExpr.TryKeyword
+            | _ -> null
+
+        if isNull prevToken then None else
+
+        let prevSignificant = skipMatchingNodesBefore isInlineSpaceOrComment contextExpr
+        if not (obj.ReferenceEquals(prevSignificant, prevToken)) then None else
+
+        let indent =
+            match parent with
+            | :? IBinding -> parent.Parent.Indent
+            | _ -> parent.Indent
+
+        Some(indent + contextExpr.GetIndentSize())
+
+    let moveToNewLine (contextExpr: ISynExpr) (indent: int) =
+        let prevSibling = contextExpr.PrevSibling
+        if isInlineSpace prevSibling then
+            let first = getFirstMatchingNodeBefore isInlineSpace prevSibling
+            ModificationUtil.DeleteChildRange(first, prevSibling)
+
+        addNodesBefore contextExpr [
+            NewLine(contextExpr.GetLineEnding())
+            Whitespace(indent)
+        ] |> ignore
+
     static member val ExpressionToRemove = Key("FSharpIntroduceVariable.ExpressionToRemove")
 
     override x.Process(data) =
@@ -129,7 +164,14 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         // contextDecl is not null when expression is bound to a module/type let binding
         let contextExpr = getExprToInsertBefore commonParentExpr
         let contextDecl = getContextDeclaration contextExpr
-        let contextIndent = if isNotNull contextDecl then contextDecl.Indent else contextExpr.Indent
+        let moveToNewLineInfo = if isNotNull contextDecl then None else getMoveToNewLineInfo contextExpr
+
+        let contextIndent =
+            if isNotNull contextDecl then contextDecl.Indent else
+
+            match moveToNewLineInfo with
+            | Some indent -> indent
+            | _ -> contextExpr.Indent
 
         let names = getNames initialExpr
         let name = if names.Count > 0 then names.[0] else "x"
@@ -154,6 +196,10 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
                 let ref = elementFactory.CreateReferenceExpr(name)
                 Some (ModificationUtil.ReplaceChild(usage, ref).As<ITreeNode>().CreateTreeElementPointer()))
+
+        match moveToNewLineInfo with
+        | Some indent -> moveToNewLine contextExpr indent
+        | _ -> ()
 
         let letBindings: ILet = 
             match letOrUseExpr with

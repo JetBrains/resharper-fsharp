@@ -1,6 +1,6 @@
 ﻿Suggested names: i
 do
-  let foo x =
+  match () with
+  | _ ->
     let i = 1
     1 + i
-  ()

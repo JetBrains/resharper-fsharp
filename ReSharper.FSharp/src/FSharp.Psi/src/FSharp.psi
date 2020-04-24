@@ -632,7 +632,7 @@ computationExpr options { stubBase="FSharpExpressionBase"; }:
 lambdaExpr options { stubBase="FSharpExpressionBase"; }:
   FUN
   synPat<PAT, Patterns>*
-  RARROW
+  RARROW<RARROW, RArrow>
   synExpr<EXPR, Expression>;
 
 interface matchClauseListOwner:
@@ -685,13 +685,13 @@ interface tryLikeExpr:
   tryFinallyExpr;
 
 tryWithExpr options { stubBase="FSharpExpressionBase"; }:
-  TRY
+  TRY<TRY_KEYWORD, TryKeyword>
   synExpr<TRY_EXPR, TryExpression>
   WITH
   matchClause<CLAUSE, Clauses>*;
 
 tryFinallyExpr options { stubBase="FSharpExpressionBase"; }:
-  TRY
+  TRY<TRY_KEYWORD, TryKeyword>
   synExpr<TRY_EXPR, TryExpression>
   FINALLY
   synExpr<FINALLY_EXPR, FinallyExpression>;
