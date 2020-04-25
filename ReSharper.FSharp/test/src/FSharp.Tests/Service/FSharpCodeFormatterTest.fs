@@ -92,3 +92,9 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Union declaration indent 01 - Correct indent``() = x.DoNamedTest()
     [<Test>] member x.``Type abbreviation declaration indent 01 - Correct indent``() = x.DoNamedTest()
     [<Test>] member x.``Module abbreviation declaration indent 01 - Correct indent``() = x.DoNamedTest()
+
+    [<Test>] member x.``Match clauses alignment 01``() = x.DoNamedTest()
+    [<Test>] member x.``Union cases alignment 01``() = x.DoNamedTest()
+    [<Test>] member x.``Enum cases alignment 01``() = x.DoNamedTest()
+    [<Test>] member x.``Sequential expr alignment 01``() = x.DoNamedTest()
+    [<Test>] member x.``Binary expr alignment 01``() = x.DoNamedTest()
