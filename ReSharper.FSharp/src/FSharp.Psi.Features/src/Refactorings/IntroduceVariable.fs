@@ -239,8 +239,8 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let hotspotsRegistry = HotspotsRegistry(solution.GetPsiServices())
         hotspotsRegistry.Register(nodes, nameExpression)
 
-        let namePat = letBindings.Bindings.[0].HeadPattern
-        IntroduceVariableResult(hotspotsRegistry, namePat.As<ITreeNode>().CreateTreeElementPointer())
+        let expr = letBindings.Bindings.[0].Expression
+        IntroduceVariableResult(hotspotsRegistry, expr.As<ITreeNode>().CreateTreeElementPointer())
 
     static member IntroduceVar(expr: ISynExpr, textControl: ITextControl, ?removeSourceExpr) =
         let removeSourceExpr = defaultArg removeSourceExpr false
