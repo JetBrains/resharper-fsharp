@@ -42,4 +42,5 @@ type FunctionAnnotationAvailabilityTest() =
 
     [<Test>] member x.``Not available``() = x.DoNamedTest()
     
-    // TODO MC: Double check that this returns false for class members
+    [<Test>] member x.``Class - member - 01``() = x.DoNamedTest()
+    
