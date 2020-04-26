@@ -45,6 +45,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         ("IfThenExpr", ElementType.IF_THEN_ELSE_EXPR, IfThenElseExpr.THEN_EXPR),
         ("ElifThenExpr", ElementType.ELIF_EXPR, ElifExpr.THEN_EXPR),
         ("LambdaExprBody", ElementType.LAMBDA_EXPR, LambdaExpr.EXPR),
+        ("MatchExpr_Expr", ElementType.MATCH_EXPR, MatchExpr.EXPR),
+        ("MatchExpr_With", ElementType.MATCH_EXPR, MatchExpr.WITH),
       };
 
       var typeDeclarationIndentingRulesParameters = new[]

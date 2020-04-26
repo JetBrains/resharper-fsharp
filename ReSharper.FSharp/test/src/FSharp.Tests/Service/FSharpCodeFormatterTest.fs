@@ -74,6 +74,9 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``IfThenElse expr indent 02``() = x.DoNamedTest()
     [<Test>] member x.``IfThenElse expr indent 03 - Elif``() = x.DoNamedTest()
 
+    [<Test>] member x.``Match expr indent 01 - Expr at new line``() = x.DoNamedTest()
+    [<Test>] member x.``Match expr indent 02 - With at new line``() = x.DoNamedTest()
+
     [<Test>] member x.``MatchClause expr indent 01``() = x.DoNamedTest()
     [<Test>] member x.``MatchClause expr indent 02 - TryWith``() = x.DoNamedTest()
     [<Test>] member x.``MatchClause expr indent 03 - TryWith - Clause on the same line``() = x.DoNamedTest()
