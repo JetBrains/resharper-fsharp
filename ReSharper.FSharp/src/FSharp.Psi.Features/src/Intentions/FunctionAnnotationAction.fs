@@ -94,6 +94,7 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
             |> List.zip treeParameters
             |> List.map(fun (node, parameters) -> {Node = node; FSharpParameters = parameters |> Seq.toList})
             
+        // Annotate function parameters
         let factory = namedPat.CreateElementFactory()
         let childrenToModify =
             unifiedParameters
@@ -123,6 +124,7 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
             let typedPat = factory.CreateTypedPatInParens(typeName, name)
             PsiModificationUtil.replaceWithCopy ref.ParameterNodeInSignature typedPat
             
+        // Annotate function return type
         if binding.ReturnTypeInfo |> isNull then
             let afterWhitespace = ModificationUtil.AddChildAfter(namedPat.LastChild, FSharpTokenType.WHITESPACE.Create(" "))
             let namedType = fSharpFunction.ReturnParameter.Type |> getTypeDisplayName |> factory.CreateReturnTypeInfo
