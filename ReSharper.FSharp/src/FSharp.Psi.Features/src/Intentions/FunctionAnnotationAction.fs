@@ -46,10 +46,23 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     override x.Text = "Annotate function with parameter types and return type"
     
     override x.IsAvailable _ =
-        let letExpr = dataProvider.GetSelectedElement<ILetBindings>()
-        if isNull letExpr then false else
-        true
-        // TODO MC: replicate logic to check composition here is correct before saying is available
+        let letBindings = dataProvider.GetSelectedElement<ILetBindings>()
+        if isNull letBindings || letBindings.IsRecursive then false else
+
+        let letToken = letBindings.LetOrUseToken
+        if isNull letToken then false else
+
+        let bindings = letBindings.Bindings
+        if bindings.Count <> 1 then false else
+
+        match bindings.[0].HeadPattern.As<INamedPat>() with
+        | null -> false
+        | namedPat ->
+
+        match namedPat.Identifier with
+        | null -> false
+        | _identifier -> true
+        
     override x.ExecutePsiTransaction(_, _) =
         let letExpr = dataProvider.GetSelectedElement<ILetBindings>()
         use _writeCookie = WriteLockCookie.Create(letExpr.IsPhysical())
