@@ -1,0 +1,6 @@
+﻿Suggested names: foo
+do
+  let foo = 
+    id
+      1
+  ignore (foo)

@@ -58,15 +58,6 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         let newExpr = getExpression source
         newExpr.As<IParenExpr>().InnerExpression.As<ILetOrUseExpr>()
 
-    let setBindingExpression (expr: ISynExpr) (letBindings: #ILetBindings) =
-        let newExpr = letBindings.Bindings.[0].SetExpression(expr.Copy())
-        if not expr.IsSingleLine then
-            let indentSize = expr.GetIndentSize()
-            ModificationUtil.AddChildBefore(newExpr, NewLine(expr.GetLineEnding())) |> ignore
-            ModificationUtil.AddChildBefore(newExpr, Whitespace(expr.Indent + indentSize)) |> ignore
-            shiftExpr indentSize newExpr
-        letBindings
-
     let createParenExpr (expr: ISynExpr) =
         let parenExpr = getExpression "(())" :?> IParenExpr
         ModificationUtil.ReplaceChild(parenExpr.InnerExpression, expr.Copy()) |> ignore
@@ -141,14 +132,9 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         member x.CreateLetBindingExpr(bindingName) =
             createLetBinding bindingName
 
-        member x.CreateLetBindingExpr(bindingName, expr) =
-            let letOrUseExpr = createLetBinding bindingName
-            setBindingExpression expr letOrUseExpr
-
-        member x.CreateLetModuleDecl(bindingName, expr) =
+        member x.CreateLetModuleDecl(bindingName) =
             let source = sprintf "let %s = ()" bindingName
-            let letModuleDecl = getModuleMember source  :?> ILetModuleDecl
-            setBindingExpression expr letModuleDecl
+            getModuleMember source :?> ILetModuleDecl
 
         member x.CreateConstExpr(text) =
             getExpression text :?> _

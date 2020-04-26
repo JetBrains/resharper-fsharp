@@ -7,6 +7,7 @@ open JetBrains.ReSharper.Feature.Services.PostfixTemplates
 open JetBrains.ReSharper.Feature.Services.PostfixTemplates.Contexts
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
@@ -49,7 +50,8 @@ and LetPostfixTemplateBehavior(info) =
 
             if (FSharpIntroduceVariable.CanIntroduceVar(refExpr, true)) then refExpr :> ITreeNode else
 
-            let letOrUseExpr = elementFactory.CreateLetBindingExpr("_", refExpr)
+            let letOrUseExpr = elementFactory.CreateLetBindingExpr("_")
+            setBindingExpression refExpr refExpr.Indent letOrUseExpr
             let replaced = ModificationUtil.ReplaceChild(refExpr, letOrUseExpr)
             replaced.UserData.PutKey(LetPostfixTemplateBehavior.PreventIntroduceVarKey)
             replaced :> _)

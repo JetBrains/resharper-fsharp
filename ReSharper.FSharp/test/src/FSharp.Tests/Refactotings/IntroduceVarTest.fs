@@ -30,4 +30,10 @@ type IntroduceVarTest() =
     [<Test>] member x.``Do decl - Implicit 01``() = x.DoNamedTest()
     [<Test>] member x.``Do decl - Implicit 02 - App``() = x.DoNamedTest()
 
+    [<Test>] member x.``Shift - Decl 01``() = x.DoNamedTest()
+    [<Test>] member x.``Shift - Decl 02``() = x.DoNamedTest()
+
+    [<Test>] member x.``Shift - Expr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Shift - Expr 02``() = x.DoNamedTest()
+
     [<Test>] member x.``Not allowed - Attribute 01``() = x.DoNamedTest()
