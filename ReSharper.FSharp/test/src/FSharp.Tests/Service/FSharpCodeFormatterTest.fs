@@ -96,5 +96,6 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Match clauses alignment 01``() = x.DoNamedTest()
     [<Test>] member x.``Union cases alignment 01``() = x.DoNamedTest()
     [<Test>] member x.``Enum cases alignment 01``() = x.DoNamedTest()
-    [<Test>] member x.``Sequential expr alignment 01``() = x.DoNamedTest()
+    [<Test>] member x.``Sequential expr alignment 01 - No separators``() = x.DoNamedTest()
+    [<Test>] member x.``Sequential expr alignment 02 - Separators``() = x.DoNamedTest()
     [<Test>] member x.``Binary expr alignment 01``() = x.DoNamedTest()
