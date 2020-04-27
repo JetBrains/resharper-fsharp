@@ -951,11 +951,14 @@ recordFieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase
 
 unionRepresentation:
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
+  unionCaseList<UNION_CASE_LIST, UnionCaseList>;
+
+unionCaseList:
   unionCaseDeclaration<UNION_CASE, UnionCases>*;
 
 unionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<unionDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
-  get { methodName="UnionCases" path=<unionDeclaration:UNION_REPR/unionRepresentation:UNION_CASE> };
+  get { methodName="UnionCases" path=<unionDeclaration:UNION_REPR/unionRepresentation:UNION_CASE_LIST/unionCaseList:UNION_CASE> };
   get { methodName="Attributes" path=<unionDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*

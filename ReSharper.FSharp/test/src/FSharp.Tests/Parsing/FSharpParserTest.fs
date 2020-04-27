@@ -11,6 +11,7 @@ type FSharpParserTest() =
 
     override x.RelativeTestDataPath = "parsing"
 
+    [<Test>] member x.m() = x.DoNamedTest()
     [<Test>] member x.``Module - Anon 01``() = x.DoNamedTest()
     [<Test>] member x.``Module - Anon 02``() = x.DoNamedTest()
     [<Test>] member x.``Module - Top level 01``() = x.DoNamedTest()
@@ -42,6 +43,11 @@ type FSharpParserTest() =
     
     [<Test>] member x.``Type decl - Enum 01 - With first bar``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Enum 02 - Without first bar``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type decl - Union 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Union 02 - Modifier``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Union 03 - No first bar``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Union 04 - No first bar with modifier``() = x.DoNamedTest()
 
     [<Test>] member x.``Let 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Let 02 - Typed``() = x.DoNamedTest()

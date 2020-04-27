@@ -3,7 +3,6 @@ using JetBrains.Application.Settings;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Psi;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
@@ -60,7 +59,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
       var alignmentRulesParameters = new[]
       {
         ("MatchClauses", ElementType.MATCH_EXPR),
-        ("UnionCases", ElementType.UNION_REPRESENTATION),
+        ("UnionCases", ElementType.UNION_CASE_LIST),
         ("EnumCases", ElementType.ENUM_REPRESENTATION),
         ("SequentialExpr", ElementType.SEQUENTIAL_EXPR),
         ("BinaryExpr", ElementType.BINARY_APP_EXPR),
@@ -139,6 +138,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
               .HasType(ElementType.DO)
               .Satisfies((node, context) => !((IDo) node).IsImplicit),
             Node().HasRole(Do.CHAMELEON_EXPR))
+          .Return(IndentType.External)
+          .Build();
+
+        Describe<IndentingRule>()
+          .Name("UnionRepresentationCasesIndent")
+          .Where(
+            Parent()
+              .HasType(ElementType.UNION_REPRESENTATION)
+              .Satisfies((node, context) =>
+              {
+                var modifier = ((IUnionRepresentation) node).AccessModifier;
+                return modifier != null && modifier.HasNewLineAfter(context.CodeFormatter);
+              }),
+            Node().HasRole(UnionRepresentation.UNION_CASE_LIST))
           .Return(IndentType.External)
           .Build();
       }
