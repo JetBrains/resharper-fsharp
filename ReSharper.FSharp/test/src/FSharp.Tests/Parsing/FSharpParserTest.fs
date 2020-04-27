@@ -11,7 +11,6 @@ type FSharpParserTest() =
 
     override x.RelativeTestDataPath = "parsing"
 
-    [<Test>] member x.m() = x.DoNamedTest()
     [<Test>] member x.``Module - Anon 01``() = x.DoNamedTest()
     [<Test>] member x.``Module - Anon 02``() = x.DoNamedTest()
     [<Test>] member x.``Module - Top level 01``() = x.DoNamedTest()
