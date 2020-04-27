@@ -320,9 +320,9 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
             x.Done(range, casesListMark, ElementType.ENUM_REPRESENTATION)
             ElementType.ENUM_DECLARATION
 
-        | SynTypeDefnSimpleRepr.Union(modifier, cases, range) ->
+        | SynTypeDefnSimpleRepr.Union(_, cases, range) ->
             let representationMark = x.Mark(range)
-            if modifier.IsSome && not cases.IsEmpty then
+            if not cases.IsEmpty then
                 let firstCaseRange = cases.Head.Range
                 x.AdvanceToTokenOrRangeStart(FSharpTokenType.BAR, firstCaseRange)
  
