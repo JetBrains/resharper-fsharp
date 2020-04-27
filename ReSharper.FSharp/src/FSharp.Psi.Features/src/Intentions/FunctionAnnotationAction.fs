@@ -2,16 +2,9 @@
 
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.ReSharper.Feature.Services.ContextActions
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
-open JetBrains.ReSharper.Plugins.FSharp.Util
-open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
@@ -57,27 +50,25 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         isNotNull namedPat.Identifier
         
     override x.ExecutePsiTransaction(_, _) =
-        let letExpr = dataProvider.GetSelectedElement<ILetBindings>()
-        use _writeCookie = WriteLockCookie.Create(letExpr.IsPhysical())
+        let binding = dataProvider.GetSelectedElement<IBinding>()
+        use _writeCookie = WriteLockCookie.Create(binding.IsPhysical())
         use _disableFormatter = new DisableCodeFormatter()
-        let binding = letExpr.Bindings |> Seq.exactlyOne
         match binding.HeadPattern.As<INamedPat>() with
         | null -> null
         | namedPat ->
             
-        let methodSymbol = namedPat.GetFSharpSymbol()
+        match box (namedPat.GetFSharpSymbol()) with
+        | null -> null
+        | methodSymbol ->
         let fSharpFunction =
             match methodSymbol with
             | :? FSharpMemberOrFunctionOrValue as x -> x
             | _ -> failwith "Expected function here"
-        let treeParameters =
-            namedPat.Children()
-            |> Seq.choose(
-                function
-                 | :? ILocalReferencePat as ref -> ref :> ITreeNode |> Some
-                 | :? IParenPat as ref -> ref :> ITreeNode |> Some
-                 | _ -> None)
-            |> Seq.toList
+            
+        match namedPat.As<IParametersOwnerPat>() with
+        | null -> null
+        | parameterOwner ->
+        let treeParameters = parameterOwner.Parameters |> Seq.toList
             
         // In the case that let statements are nested, the FSC doesn't return the display name of the parameters,
         // and so zipping the paremeters from the FSC and tree is the only way to reconcile the type information.
@@ -93,19 +84,19 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
             unifiedParameters
             |> Seq.choose(fun {Node = node; FSharpParameters = curriedParams} ->
                 match node with
-                    | :? ILocalReferencePat as ref ->
-                        Some {ParameterNameNode = ref; ParameterNodeInSignature = ref; FSharpParameters = curriedParams}
-                    | :? IParenPat as ref ->
-                        let parameterNameNode =
-                            ref.Children()
-                            |> Seq.choose(function | :? ILocalReferencePat as pat -> Some pat | _ -> None)
-                            |> Seq.tryExactlyOne
-                        parameterNameNode
-                        |> Option.map(fun namedNode ->
-                            {ParameterNameNode = namedNode;
-                              ParameterNodeInSignature = ref;
-                              FSharpParameters = curriedParams})
-                    | _ -> None)
+                | :? ILocalReferencePat as ref ->
+                    Some {ParameterNameNode = ref; ParameterNodeInSignature = ref; FSharpParameters = curriedParams}
+                | :? IParenPat as ref ->
+                    let parameterNameNode =
+                        ref.Children()
+                        |> Seq.choose(function | :? ILocalReferencePat as pat -> Some pat | _ -> None)
+                        |> Seq.tryExactlyOne
+                    parameterNameNode
+                    |> Option.map(fun namedNode ->
+                        {ParameterNameNode = namedNode;
+                          ParameterNodeInSignature = ref;
+                          FSharpParameters = curriedParams})
+                | _ -> None)
             |> Seq.toList
         for ref in childrenToModify do
             let name = ref.ParameterNameNode.SourceName
