@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
+﻿namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Tests
@@ -21,6 +21,8 @@ type FunctionAnnotationActionTest() =
     [<Test>] member x.``Let - unable to determine all parameter or return types``() = x.DoNamedTest()
     [<Test>] member x.``Let - Instance of generic type``() = x.DoNamedTest()
     [<Test>] member x.``Let - unit to unit``() = x.DoNamedTest()
+    [<Test>] member x.``Let - recursive function``() = x.DoNamedTest()
+    [<Test>] member x.``Let - tupled generic arg``() = x.DoNamedTest()
     
     // TODO: Need case covering out args
     // TODO: Need case covering functions pased to functions
