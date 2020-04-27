@@ -2,10 +2,10 @@ module Module
 
 open System
 
-let printerFun{caret} (a : string) (b : int*'a) : string = 
-    sprintf "%s %d" a (b |> fst)
+let printerFun{caret} (a : string) (b : int*('a*string)) : string = 
+    sprintf "%s %d %s" a (b |> fst) (b |> snd |> snd)
 
 [<EntryPoint>]
 let main argv =
-    printerFun "string" (1, 2) |> stdout.WriteLine
+    printerFun "string" (1, (2, "anotherString")) |> stdout.WriteLine
     0 

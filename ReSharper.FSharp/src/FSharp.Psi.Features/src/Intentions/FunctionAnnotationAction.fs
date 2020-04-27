@@ -33,35 +33,28 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     inherit ContextActionBase()
 
     let rec getTypeDisplayName (fsType : FSharpType) : string =
+        let hasGenericArgs = fsType.HasTypeDefinition && fsType.GenericArguments |> Seq.isEmpty |> not
         let typeDef = if fsType.HasTypeDefinition then fsType.TypeDefinition.DisplayName else ""
         let genericParam = if fsType.IsGenericParameter then "'" + fsType.GenericParameter.DisplayName else ""
-        let genericArgs = if fsType.HasTypeDefinition then fsType.GenericArguments |> Seq.map getTypeDisplayName |> Seq.toList else List.empty
+        let genericArgs = if hasGenericArgs then fsType.GenericArguments |> Seq.map getTypeDisplayName |> Seq.toList else List.empty
         let tupleArgs = if fsType.IsTupleType then fsType.GenericArguments |> Seq.map getTypeDisplayName |> String.concat "*" else ""
         
         [genericParam; typeDef; tupleArgs]
         |> List.append genericArgs
         |> List.filter (fun x -> String.length x <> 0)
         |> String.concat " "
+        |> fun typeString -> if hasGenericArgs || fsType.IsTupleType then sprintf "(%s)" typeString else typeString
     
     override x.Text = "Annotate function with parameter types and return type"
     
     override x.IsAvailable _ =
-        let letBindings = dataProvider.GetSelectedElement<ILetBindings>()
-        if isNull letBindings || letBindings.IsRecursive then false else
+        let binding = dataProvider.GetSelectedElement<IBinding>()
+        if isNull binding then false else
 
-        let letToken = letBindings.LetOrUseToken
-        if isNull letToken then false else
-
-        let bindings = letBindings.Bindings
-        if bindings.Count <> 1 then false else
-
-        match bindings.[0].HeadPattern.As<INamedPat>() with
+        match binding.HeadPattern.As<INamedPat>() with
         | null -> false
         | namedPat ->
-
-        match namedPat.Identifier with
-        | null -> false
-        | _identifier -> true
+        isNotNull namedPat.Identifier
         
     override x.ExecutePsiTransaction(_, _) =
         let letExpr = dataProvider.GetSelectedElement<ILetBindings>()
