@@ -1,4 +1,4 @@
-﻿namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
+namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Tests
@@ -33,9 +33,6 @@ type FunctionAnnotationAvailabilityTest() =
 
     [<Test>] member x.``Module - Name 01``() = x.DoNamedTest()
     [<Test>] member x.``Module - Name 02 - Attributes``() = x.DoNamedTest()
-
-    [<Test>] member x.``Module - Keyword 01``() = x.DoNamedTest()
-    [<Test>] member x.``Module - Keyword 02 - Attributes``() = x.DoNamedTest()
 
     [<Test>] member x.``Expression - Name 01``() = x.DoNamedTest()
     [<Test>] member x.``Expression - Keyword 01``() = x.DoNamedTest()
