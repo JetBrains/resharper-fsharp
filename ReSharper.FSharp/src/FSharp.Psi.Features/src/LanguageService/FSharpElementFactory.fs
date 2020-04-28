@@ -211,8 +211,8 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
             expr
             
-        member x.CreateTypedPatInParens(typeSignature: string, parameterName: string) : ISynPat =
-            let expr = createLetBinding (sprintf "(%s : %s)" parameterName typeSignature)
+        member x.CreateTypedPatInParens(typeSignature: string) : ISynPat =
+            let expr = createLetBinding (sprintf "(%s)" typeSignature)
             let binding = expr.Bindings |> Seq.exactlyOne
             binding.HeadPattern  
             

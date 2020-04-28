@@ -1,6 +1,8 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
 open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.Layout
+open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -9,35 +11,42 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.ReSharper.Plugins.FSharp
 
 type private ParameterToModify = {
     ParameterNameNode : ILocalReferencePat
     ParameterNodeInSignature : ISynPat
-    FSharpParameters : FSharpParameter list
-}
-
-type private ParameterNodeWithType = {
-    Node : ITreeNode
-    FSharpParameters : FSharpParameter list
 }
 
 [<ContextAction(Name = "AnnotateFunction", Group = "F#", Description = "Annotate function with parameter types and return type")>]
 type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     inherit ContextActionBase()
 
-    let rec getTypeDisplayName (fsType : FSharpType) : string =
-        let hasGenericArgs = fsType.HasTypeDefinition && fsType.GenericArguments |> Seq.isEmpty |> not
-        let typeDef = if fsType.HasTypeDefinition then fsType.TypeDefinition.DisplayName else ""
-        let genericParam = if fsType.IsGenericParameter then "'" + fsType.GenericParameter.DisplayName else ""
-        let genericArgs = if hasGenericArgs then fsType.GenericArguments |> Seq.map getTypeDisplayName |> Seq.toList else List.empty
-        let tupleArgs = if fsType.IsTupleType then fsType.GenericArguments |> Seq.map getTypeDisplayName |> String.concat "*" else ""
-        
-        [genericParam; typeDef; tupleArgs]
-        |> List.append genericArgs
-        |> List.filter (fun x -> String.length x <> 0)
-        |> String.concat " "
-        |> fun typeString -> if hasGenericArgs || fsType.IsTupleType then sprintf "(%s)" typeString else typeString
+    let [<Literal>] opName = "FunctionAnnotationAction"
     
+    let getParameterTooltip (document: IDocument) (checkResults : FSharpCheckFileResults) pattern : string Option =
+        let offset = pattern.ParameterNameNode.GetTreeEndOffset().Offset
+        let coords = document.GetCoordsByOffset(offset)
+        let text = document.GetLineText(coords.Line)
+        let getTooltip =
+            checkResults.GetStructuredToolTipText(int coords.Line + 1, int coords.Column, text, [pattern.ParameterNameNode.SourceName], FSharpTokenTag.Identifier)
+        let (FSharpToolTipText layouts) = getTooltip.RunAsTask()
+        
+        let layout = layouts |> List.exactlyOne
+        match layout with
+        | FSharpStructuredToolTipElement.None
+        | FSharpStructuredToolTipElement.CompositionError _ -> failwith "Expected Group tooltip element"
+        | FSharpStructuredToolTipElement.Group(overloads) ->
+        let overload = overloads |> Seq.exactlyOne
+        
+        // Tooltips in this case are prepended with "val " which we don't want in the source code - in the case that
+        // a type can't be determined, it doesn't start with val, so don't try to annotate type
+        let tooltipString = showL overload.MainDescription
+        
+        if tooltipString.IndexOf("val ", 0) = 0 then
+            (showL overload.MainDescription |> Seq.skip 4 |> Seq.map string) |> String.concat "" |> Some
+        else
+            None
     override x.Text = "Annotate function with parameter types and return type"
     
     override x.IsAvailable _ =
@@ -70,22 +79,14 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         | parameterOwner ->
         let treeParameters = parameterOwner.Parameters |> Seq.toList
             
-        // In the case that let statements are nested, the FSC doesn't return the display name of the parameters,
-        // and so zipping the paremeters from the FSC and tree is the only way to reconcile the type information.
-        let unifiedParameters =
-            fSharpFunction.CurriedParameterGroups
-            |> Seq.toList
-            |> List.zip treeParameters
-            |> List.map(fun (node, parameters) -> {Node = node; FSharpParameters = parameters |> Seq.toList})
-            
         // Annotate function parameters
         let factory = namedPat.CreateElementFactory()
         let childrenToModify =
-            unifiedParameters
-            |> Seq.choose(fun {Node = node; FSharpParameters = curriedParams} ->
-                match node with
+            treeParameters
+            |> Seq.choose(
+                function
                 | :? ILocalReferencePat as ref ->
-                    Some {ParameterNameNode = ref; ParameterNodeInSignature = ref; FSharpParameters = curriedParams}
+                    Some {ParameterNameNode = ref; ParameterNodeInSignature = ref}
                 | :? IParenPat as ref ->
                     let parameterNameNode =
                         ref.Children()
@@ -94,24 +95,42 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
                     parameterNameNode
                     |> Option.map(fun namedNode ->
                         {ParameterNameNode = namedNode;
-                          ParameterNodeInSignature = ref;
-                          FSharpParameters = curriedParams})
+                          ParameterNodeInSignature = ref})
                 | _ -> None)
             |> Seq.toList
-        for ref in childrenToModify do
-            let name = ref.ParameterNameNode.SourceName
-            let typeName =
-                match ref.FSharpParameters with
-                | [] -> failwith "Unexpectedly received no type parameters"
-                | [single] -> getTypeDisplayName single.Type
-                | multiple -> multiple |> List.map (fun x -> getTypeDisplayName x.Type) |> String.concat "*"
-            let typedPat = factory.CreateTypedPatInParens(typeName, name)
-            PsiModificationUtil.replaceWithCopy ref.ParameterNodeInSignature typedPat
+            
+        // Parse FSharp file, in order to get tooltips
+        let parsedFile =
+            namedPat.FSharpFile.GetParseAndCheckResults(true, opName)
+            |> Option.defaultWith(fun () -> failwith "Unable to parse FSharp file")
+        let checkResults = parsedFile.CheckResults
+        let document = namedPat.FSharpFile.GetSourceFile().Document
+            
+        // Replace parameters with their tooltip values - each parameter is associated with a list of FSharpType instances
+        // and so `symbolUse.DisplayContext.WithShortTypeNames`, as used with return type can't be used.
+        childrenToModify
+        |> List.map(fun ref ->
+            getParameterTooltip document checkResults ref
+            |> Option.map (fun signature ->
+                let typedPat = factory.CreateTypedPatInParens(signature)
+                fun () -> PsiModificationUtil.replaceWithCopy ref.ParameterNodeInSignature typedPat)
+            |> Option.defaultValue(fun () -> ()))
+        |> List.iter(fun x -> x()) // Only modify the document once the tooltips have been determined
             
         // Annotate function return type
         if binding.ReturnTypeInfo |> isNull then
+            // Given the return type of a function is a single FSharpType, we don't have to use the tooltip to get its
+            // pretty-printed string type
+            match box(namedPat.GetFSharpSymbolUse()) with
+            | null -> failwith "FSharpSymbolUse expected to be non-null"
+            | symbolUseObj ->
+            let symbolUse = symbolUseObj :?> FSharpSymbolUse
+            let returnTypeString =
+                symbolUse.DisplayContext.WithShortTypeNames(true)
+                |> fSharpFunction.ReturnParameter.Type.Format
+            
             let afterWhitespace = ModificationUtil.AddChildAfter(namedPat.LastChild, FSharpTokenType.WHITESPACE.Create(" "))
-            let namedType = fSharpFunction.ReturnParameter.Type |> getTypeDisplayName |> factory.CreateReturnTypeInfo
+            let namedType = returnTypeString |> factory.CreateReturnTypeInfo
             ModificationUtil.AddChildAfter(afterWhitespace, namedType) |> ignore
 
         null
