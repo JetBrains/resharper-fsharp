@@ -17,12 +17,11 @@ let tryGetNamedArg (expr: ISynExpr) =
 
     refExpr.Reference.Resolve().DeclaredElement.As<IParameter>()
 
-let getMatchingParameter (initialExpr: ISynExpr) =
-    let expr = initialExpr.IgnoreInnerParens()
-    let tupleExpr = TupleExprNavigator.GetByExpression(expr)
-    let tupleExprContext = tupleExpr.IgnoreParentParens()
+let getMatchingParameter (expr: ISynExpr) =
+    let tupleExpr = TupleExprNavigator.GetByExpression(expr.IgnoreParentParens())
+    let exprContext = if isNull tupleExpr then expr else tupleExpr :> _
 
-    let appExpr = PrefixAppExprNavigator.GetByArgumentExpression(if isNull tupleExpr then expr else tupleExprContext)
+    let appExpr = PrefixAppExprNavigator.GetByArgumentExpression(exprContext.IgnoreParentParens())
     if isNull appExpr then null else
 
     let refExpr = appExpr.FunctionExpression.As<IReferenceExpr>()
@@ -30,15 +29,17 @@ let getMatchingParameter (initialExpr: ISynExpr) =
 
     use compilationContextCookie = CompilationContextCookie.OverrideOrCreate(expr.GetResolveContext())
 
-    let parameter = tryGetNamedArg initialExpr
+    let parameter = tryGetNamedArg expr
     if isNotNull parameter then parameter else
 
-    let method = refExpr.Reference.Resolve().DeclaredElement.As<IMethod>()
-    let parameters = method.Parameters
-    if parameters.Count = 1 then parameters.[0] else
+    match refExpr.Reference.Resolve().DeclaredElement with
+    | :? IParametersOwner as paramOwner ->
+        let parameters = paramOwner.Parameters
+        if parameters.Count = 1 then parameters.[0] else
 
-    let index = tupleExpr.Expressions.IndexOf(expr)
-    if index < parameters.Count then parameters.[index] else null
+        let index = tupleExpr.Expressions.IndexOf(expr)
+        if index < parameters.Count then parameters.[index] else null
+    | _ -> null
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpMethodInvocationUtil() =

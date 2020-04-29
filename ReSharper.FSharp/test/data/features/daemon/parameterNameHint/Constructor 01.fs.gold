@@ -1,0 +1,12 @@
+﻿open System.IO
+
+DirectoryInfo ||(0)"" |> ignore
+DirectoryInfo(||(1)"") |> ignore
+DirectoryInfo (||(2)"") |> ignore
+(DirectoryInfo ||(3)"") |> ignore
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: path, 
+(1): ReSharper Parameter Name Hint: path, 
+(2): ReSharper Parameter Name Hint: path, 
+(3): ReSharper Parameter Name Hint: path, 
