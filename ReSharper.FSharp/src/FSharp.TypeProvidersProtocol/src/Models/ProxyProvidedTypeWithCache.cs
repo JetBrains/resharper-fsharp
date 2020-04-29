@@ -10,12 +10,12 @@ using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 {
-  public class ProxyProvidedTypeWithCache : ProvidedType
+  public class ProxyProvidedTypeWithCache : ProvidedType, IRdProvidedEntity
   {
     private readonly RdProvidedType myRdProvidedType;
     private readonly RdFSharpTypeProvidersLoaderModel myProcessModel;
     private readonly ITypeProviderCache myCache;
-    private int EntityId => myRdProvidedType.EntityId;
+    public int EntityId => myRdProvidedType.EntityId;
     private RdProvidedTypeProcessModel RdProvidedTypeProcessModel => myProcessModel.RdProvidedTypeProcessModel;
 
     internal ProxyProvidedTypeWithCache(RdProvidedType rdProvidedType, RdFSharpTypeProvidersLoaderModel processModel,
@@ -89,6 +89,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
           .Select(t => ProxyProvidedConstructorInfoWithCache.Create(t, myProcessModel, Context, myCache))
           .ToArray());
 
+      myDeclaringTypeId = new Lazy<int?>(() => RdProvidedTypeProcessModel.DeclaringType.Sync(EntityId));
+
       myTypeAsVarsCache = new Dictionary<string, ProvidedVar>();
     }
 
@@ -129,8 +131,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       myCache.GetOrCreateWithContext(myBaseTypeId ??= RdProvidedTypeProcessModel.BaseType.Sync(EntityId), Context);
 
     public override ProvidedType DeclaringType =>
-      myCache.GetOrCreateWithContext(myDeclaringTypeId ??= RdProvidedTypeProcessModel.DeclaringType.Sync(EntityId),
-        Context);
+      myCache.GetOrCreateWithContext(myDeclaringTypeId.Value, Context);
 
     public override ProvidedType GetNestedType(string nm) =>
       myAllNestedTypes.Value.FirstOrDefault(t => t.Name == nm);
@@ -235,11 +236,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     private int? myMakePointerTypeId;
     private int? myMakeByRefTypeId;
     private int? myBaseTypeId;
-    private int? myDeclaringTypeId;
     private int? myGenericParameterPosition;
     private int? myGenericTypeDefinitionId;
     private int? myElementTypeId;
     private int? myEnumUnderlyingTypeId;
+    private readonly Lazy<int?> myDeclaringTypeId;
     private readonly Lazy<ProvidedType[]> myInterfaces;
     private readonly Lazy<ProvidedMethodInfo[]> myMethods;
     private readonly Lazy<ProvidedType[]> myAllNestedTypes;
