@@ -39,6 +39,9 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Type decl - Attributes 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Attributes 02``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Type decl - Enum 01 - With first bar``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Enum 02 - Without first bar``() = x.DoNamedTest()
 
     [<Test>] member x.``Let 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Let 02 - Typed``() = x.DoNamedTest()
@@ -216,6 +219,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Attribute 04 - Qualifiers``() = x.DoNamedTest()
     [<Test>] member x.``Attribute 05 - Qualifiers and arg``() = x.DoNamedTest()
     [<Test>] member x.``Attribute 06 - Unit arg``() = x.DoNamedTest()
+    [<Test>] member x.``Attribute 07 - Semi``() = x.DoNamedTest()
 
     [<Test>] member x.``Attributes - Let bindings 01``() = x.DoNamedTest()
     [<Test>] member x.``Attributes - Let bindings 02``() = x.DoNamedTest()
@@ -278,6 +282,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Type member - Inherit - Type 03 - Arguments``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Inherit - Type 04 - Type parameters 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type member - Do 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Let bindings 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Type member - Member 01 - Wild self id``() = x.DoNamedTest()
@@ -295,6 +300,8 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Pattern - Record 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Record 02 - Qualified name``() = x.DoNamedTest()
+
+    [<Test>] member x.``Pattern - As - Wild 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Record field 01 - Attribute``() = x.DoNamedTest()
 

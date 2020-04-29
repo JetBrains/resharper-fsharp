@@ -1,0 +1,11 @@
+﻿namespace Ns1
+
+module ``Foo Bar`` =
+    type T() = class end
+
+namespace Ns2
+
+open Ns1.``Foo Bar``
+
+module M =
+    let t = T{caret}()

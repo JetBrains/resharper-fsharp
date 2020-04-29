@@ -1,0 +1,6 @@
+﻿Suggested names: i
+do
+  match () with
+  | _ ->
+    let i = 1
+    1 + i

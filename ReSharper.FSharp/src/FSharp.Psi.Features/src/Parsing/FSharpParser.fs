@@ -1,18 +1,20 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
-open FSharp.Compiler.Ast
 open FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.SyntaxTree
 open JetBrains.Annotations
 open JetBrains.DocumentModel
 open JetBrains.Lifetimes
-open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Parsing
+open JetBrains.ReSharper.Psi.Tree
 
 type FSharpParser(lexer: ILexer, document: IDocument, path: FileSystemPath, sourceFile: IPsiSourceFile,
                   checkerService: FSharpCheckerService, symbolsCache: IFSharpResolvedSymbolsCache) =
@@ -34,8 +36,8 @@ type FSharpParser(lexer: ILexer, document: IDocument, path: FileSystemPath, sour
         use lifetimeDefinition = Lifetime.Define()
         let lifetime = lifetimeDefinition.Lifetime
 
-        let defines = checkerService.GetDefines(sourceFile)
-        let parsingOptions = checkerService.GetParsingOptions(sourceFile)
+        let parsingOptions = checkerService.OptionsProvider.GetParsingOptions(sourceFile)
+        let defines = parsingOptions.ConditionalCompilationDefines
 
         let lexer = FSharpPreprocessedLexerFactory(defines).CreateLexer(lexer).ToCachingLexer()
         let parseResults = checkerService.ParseFile(path, document, parsingOptions)
@@ -70,10 +72,25 @@ type FSharpParser(lexer: ILexer, document: IDocument, path: FileSystemPath, sour
 
         member this.ParseExpression(chameleonExpr: IChameleonExpression, document) =
             let document = if isNotNull document then document else chameleonExpr.GetSourceFile().Document
-            let projectedOffset = chameleonExpr.GetTreeStartOffset().Offset
+
+            let projectedOffset, lineShift =
+                let projectedOffset = chameleonExpr.GetTreeStartOffset().Offset
+                let offsetShift = projectedOffset - chameleonExpr.OriginalStartOffset
+
+                if offsetShift = 0 then
+                    projectedOffset, 0
+                else
+                    let startLine = chameleonExpr.GetDocumentStartOffset().ToDocumentCoords().Line
+                    let lineShift = int startLine - chameleonExpr.SynExpr.Range.StartLine + 1
+
+                    let lineStartShift = document.GetLineStartOffset(startLine) - chameleonExpr.OriginalLineStart
+                    let projectedOffset = projectedOffset + lineStartShift - offsetShift
+                    projectedOffset, lineShift
 
             Lifetime.Using(fun lifetime ->
                 // todo: cover error cases where fsImplFile or multiple expressions may be returned
-                let treeBuilder = FSharpImplTreeBuilder(lexer, document, [], lifetime, projectedOffset)
+                let treeBuilder =
+                    FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lineShift)
+
                 treeBuilder.ProcessTopLevelExpression(chameleonExpr.SynExpr)
                 treeBuilder.GetTreeNode()) :?> ISynExpr

@@ -4,6 +4,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
   public partial interface IChameleonExpression
   {
-    Ast.SynExpr SynExpr { get; }
+    SyntaxTree.SynExpr SynExpr { get; }
+    int OriginalStartOffset { get; }
+    int OriginalLineStart { get; }
   }
 }

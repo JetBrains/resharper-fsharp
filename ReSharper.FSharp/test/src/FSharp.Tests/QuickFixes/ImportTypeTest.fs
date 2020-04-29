@@ -17,4 +17,14 @@ type ImportTypeTest() =
     [<Test>] member x.``Type 01``() = x.DoNamedTest()
     [<Test>] member x.``Type extension 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Generic List 01``() = x.DoNamedTest()
+    [<Test>] member x.``Generic List 02``() = x.DoNamedTest()
+    [<Test>] member x.``Generic List 03``() = x.DoNamedTest()
+    [<Test>] member x.``Generic List 04``() = x.DoNamedTest()
+
+    [<Test>] member x.``Attribute 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type arguments - Count 01``() = x.DoNamedTest()
+    [<Test>] member x.``Module name - Escaped 01``() = x.DoNamedTest()
+
     [<Test; NotAvailable>] member x.``Not available 01 - Open``() = x.DoNamedTest()

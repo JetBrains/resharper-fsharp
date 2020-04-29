@@ -524,16 +524,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static void AddTokenAfter([NotNull] this ITreeNode anchor, [NotNull] TokenNodeType tokenType)
     {
       using var _ = WriteLockCookie.Create(anchor.NotNull().IsPhysical());
-      anchor =
-        anchor.NextSibling is Whitespace space
-          ? ModificationUtil.ReplaceChild(space, new Whitespace())
-          : ModificationUtil.AddChildAfter(anchor, new Whitespace());
-
-      var addSpaceAfter = anchor.NextSibling?.GetTokenType() != FSharpTokenType.NEW_LINE;
-
-      anchor = ModificationUtil.AddChildAfter(anchor, tokenType.CreateLeafElement());
-      if (addSpaceAfter)
-        ModificationUtil.AddChildAfter(anchor, new Whitespace());
+      ModificationUtil.AddChildAfter(anchor, tokenType.CreateLeafElement());
     }
 
     public static void AddTokenBefore([NotNull] ITreeNode anchor, [NotNull] TokenNodeType tokenType)

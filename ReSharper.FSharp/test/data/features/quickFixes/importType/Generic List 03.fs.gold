@@ -1,0 +1,6 @@
+﻿// ${RUN:4}
+module Module
+
+open System.Collections
+
+let l = IList{caret}()

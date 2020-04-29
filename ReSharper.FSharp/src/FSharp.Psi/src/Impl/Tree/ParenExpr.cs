@@ -7,5 +7,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override IType Type() =>
       InnerExpression?.Type() ??
       TypeFactory.CreateUnknownType(GetPsiModule());
+
+    public override bool IsConstantValue() =>
+      InnerExpression?.IsConstantValue() ?? false;
   }
 }

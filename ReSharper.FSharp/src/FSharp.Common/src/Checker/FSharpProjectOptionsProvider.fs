@@ -10,8 +10,7 @@ open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Assemblies.Impl
 open JetBrains.ProjectModel.Build
 open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.Modules
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
@@ -19,7 +18,9 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Files
+open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Threading
 open JetBrains.Util
 
@@ -143,6 +144,7 @@ type FSharpProjectOptionsProvider
     let getParsingOptionsForSingleFile ([<NotNull>] sourceFile: IPsiSourceFile) isScript =
         { FSharpParsingOptions.Default with
             SourceFiles = [| sourceFile.GetLocation().FullPath |]
+            ConditionalCompilationDefines = ImplicitDefines.scriptDefines
             IsExe = isScript }
 
     member x.ModuleInvalidated = moduleInvalidated
@@ -217,16 +219,17 @@ type FSharpProjectOptionsProvider
         member x.HasPairFile(file) =
             if isScriptLike file then false else
 
-            getOrCreateFSharpProject file
-            |> Option.map (fun fsProject -> fsProject.ImplFilesWithSigs.Contains(file.GetLocation()))
-            |> Option.defaultValue false
+            match getOrCreateFSharpProject file with
+            | Some fsProject -> fsProject.ImplFilesWithSigs.Contains(file.GetLocation())
+            | _ -> false
 
         member x.GetParsingOptions(sourceFile) =
+            if isNull sourceFile then sandboxParsingOptions else
             if isScriptLike sourceFile then getParsingOptionsForSingleFile sourceFile true else
 
-            getOrCreateFSharpProject sourceFile
-            |> Option.map (fun fsProject -> fsProject.ParsingOptions)
-            |> Option.defaultWith (fun _ -> getParsingOptionsForSingleFile sourceFile false)
+            match getOrCreateFSharpProject sourceFile with
+            | Some fsProject -> fsProject.ParsingOptions
+            | _ -> getParsingOptionsForSingleFile sourceFile false
 
         member x.GetFileIndex(sourceFile) =
             if isScriptLike sourceFile then 0 else

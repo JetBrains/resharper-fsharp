@@ -1,7 +1,8 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
 open System.Collections.Generic
-open FSharp.Compiler.Ast
+open FSharp.Compiler
+open FSharp.Compiler.SyntaxTree
 open FSharp.Compiler.PrettyNaming
 open FSharp.Compiler.Range
 open JetBrains.Diagnostics
@@ -11,20 +12,8 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 
-[<Struct>]
-type BuilderStep =
-    { Item: obj
-      Processor: IBuilderStepProcessor }
-
-
-and IBuilderStepProcessor =
-    abstract Process: step: obj * builder: FSharpImplTreeBuilder -> unit
-
-
-type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
-    inherit FSharpTreeBuilderBase(lexer, document, lifetime, projectedOffset)
-
-    let nextSteps = Stack<BuilderStep>()
+type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, lineShift) =
+    inherit FSharpTreeBuilderBase(lexer, document, lifetime, projectedOffset, lineShift)
 
     /// FCS splits some declarations into separate fake ones:
     ///   * property declaration when both getter and setter bodies are present
@@ -32,7 +21,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
     let mutable unfinishedDeclaration: (int * range * CompositeNodeType) option = None
 
     new (lexer, document, decls, lifetime) =
-        FSharpImplTreeBuilder(lexer, document, decls, lifetime, 0) 
+        FSharpImplTreeBuilder(lexer, document, decls, lifetime, 0, 0)
 
     override x.CreateFSharpFile() =
         let mark = x.Mark()
@@ -107,8 +96,11 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                 | Some(mark, _, _) ->
                     unfinishedDeclaration <- None
                     mark
-                | _ -> x.Mark(range)
+                | _ ->
+                    x.AdvanceToTokenOrRangeStart(FSharpTokenType.DO, range)
+                    x.Mark()
 
+            let expr = x.RemoveDoExpr(expr)
             x.MarkChameleonExpression(expr)
             x.Done(range, mark, ElementType.DO)
 
@@ -229,6 +221,12 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             | SynMemberDefn.Member(binding, range) ->
                 x.ProcessMemberBinding(mark, binding, range)
 
+            | SynMemberDefn.LetBindings([Binding(kind = SynBindingKind.DoBinding; expr = expr)], _, _, range) ->
+                x.AdvanceToTokenOrRangeStart(FSharpTokenType.DO, range)
+                let expr = x.RemoveDoExpr(expr)
+                x.MarkChameleonExpression(expr)
+                ElementType.DO
+
             | SynMemberDefn.LetBindings(bindings, _, _, range) ->
                 for binding in bindings do
                     x.ProcessTopLevelBinding(binding, range)
@@ -302,7 +300,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
 
             | SynPat.Named _ ->
                 // In some cases patterns for static members inside records are represented this way.
-                x.ProcessMemberDeclaration(None, SynConstructorArgs.Pats [], returnInfo, expr, range)
+                x.ProcessMemberDeclaration(None, SynArgPats.Pats [], returnInfo, expr, range)
                 ElementType.MEMBER_DECLARATION
 
             | _ -> ElementType.OTHER_TYPE_MEMBER
@@ -372,7 +370,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             match pat with
             | SynPat.Named(pat, id, _, _, _) ->
                 match pat with
-                | SynPat.Wild _ ->
+                | SynPat.Wild(range) when Range.equals id.idRange range ->
                     let mark = x.Mark(id.idRange)
                     if IsActivePatternName id.idText then x.ProcessActivePatternId(id, isLocal)
                     x.Done(id.idRange, mark, ElementType.EXPRESSION_REFERENCE_NAME)
@@ -495,7 +493,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         for pat in pats do
             x.ProcessPat(pat, isLocal, false)
 
-    member x.ProcessPatternParams(args: SynConstructorArgs, isLocal, markMember) =
+    member x.ProcessPatternParams(args: SynArgPats, isLocal, markMember) =
         match args with
         | Pats pats ->
             for pat in pats do
@@ -508,7 +506,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                 x.ProcessParam(pat, isLocal, markMember)
                 x.Done(range, mark, ElementType.FIELD_PAT)
 
-    member x.ProcessMemberParams(args: SynConstructorArgs, isLocal, markMember) =
+    member x.ProcessMemberParams(args: SynArgPats, isLocal, markMember) =
         match args with
         | Pats pats ->
             for pat in pats do
@@ -557,6 +555,22 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         x.MarkChameleonExpression(expr)
 
         x.Done(binding.RangeOfBindingAndRhs, mark, ElementType.TOP_BINDING)
+
+
+[<Struct>]
+type BuilderStep =
+    { Item: obj
+      Processor: IBuilderStepProcessor }
+
+
+and IBuilderStepProcessor =
+    abstract Process: step: obj * builder: FSharpExpressionTreeBuilder -> unit
+
+
+type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lineShift) =
+    inherit FSharpImplTreeBuilder(lexer, document, [], lifetime, projectedOffset, lineShift)
+
+    let nextSteps = Stack<BuilderStep>()
 
     member x.ProcessLocalBinding(Binding(_, kind, _, _, attrs, _, _, headPat, returnInfo, expr, _, _) as binding) =
         let expr = x.FixExpresion(expr)
@@ -1190,10 +1204,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
     member x.ProcessIndexerArg(arg: SynIndexerArg) =
         x.ProcessExpressionList(arg.Exprs)
 
-
 [<AbstractClass>]
 type StepProcessorBase<'TStep>() =
-    abstract Process: step: 'TStep * builder: FSharpImplTreeBuilder -> unit
+    abstract Process: step: 'TStep * builder: FSharpExpressionTreeBuilder -> unit
 
     interface IBuilderStepProcessor with
         member x.Process(step, builder) =
@@ -1201,7 +1214,7 @@ type StepProcessorBase<'TStep>() =
 
 [<AbstractClass>]
 type StepListProcessorBase<'TStep>() =
-    abstract Process: 'TStep * FSharpImplTreeBuilder -> unit
+    abstract Process: 'TStep * FSharpExpressionTreeBuilder -> unit
 
     interface IBuilderStepProcessor with
         member x.Process(step, builder) =
@@ -1299,7 +1312,7 @@ type BindingListProcessor() =
 
 
 type AndLocalBindingListProcessor() =
-    inherit StepListProcessorBase<SequencePointInfoForBinding * bool * bool * SynPat * SynExpr * range>()
+    inherit StepListProcessorBase<DebugPointForBinding * bool * bool * SynPat * SynExpr * range>()
 
     override x.Process(binding, builder) =
         builder.ProcessAndLocalBinding(binding)

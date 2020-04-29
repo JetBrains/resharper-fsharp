@@ -448,11 +448,29 @@ type FSharpScriptPsiModule
         member x.IsValid() = x.IsValid
 
 
+type IFSharpFileService =
+    /// True when file is script or an IntelliJ scratch file.
+    abstract member IsScriptLike: IPsiSourceFile -> bool
+
+    /// True when file is an IntelliJ scratch file.
+    abstract member IsScratchFile: FileSystemPath -> bool
+
+
 /// Holder for psi module resolve context.
 type FSharpScriptModule(path: FileSystemPath, solution: ISolution) =
     inherit UserDataHolder()
 
-    let path = path.MakeRelativeTo(solution.SolutionDirectory)
+    static let scratchesPath = RelativePath.TryParse("Scratches")
+
+    let path: IPath =
+        if Shell.Instance.GetComponent<IFSharpFileService>().IsScratchFile(path) then
+            scratchesPath / path.Name :> _
+        else
+            let driveName = path.GetDriveName()
+            let solutionDriveName = solution.SolutionDirectory.GetDriveName()
+
+            if driveName <> solutionDriveName then path :> _ else
+            path.MakeRelativeTo(solution.SolutionDirectory) :> _
 
     interface IModule with
         member x.Presentation = path.Name

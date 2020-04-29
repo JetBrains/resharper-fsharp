@@ -138,7 +138,7 @@ let inline (|IgnoreInnerParenExpr|) (expr: ISynExpr) =
 
 let isInlineSpaceOrComment (node: ITreeNode) =
     let tokenType = getTokenType node
-    tokenType == FSharpTokenType.WHITESPACE || isNotNull tokenType && tokenType.IsComment
+    tokenType == FSharpTokenType.WHITESPACE || isNotNull tokenType && tokenType.IsComment // todo: multiline comments?
 
 let isInlineSpace (node: ITreeNode) =
     getTokenType node == FSharpTokenType.WHITESPACE
@@ -175,8 +175,8 @@ let skipMatchingNodesAfter predicate (node: ITreeNode): ITreeNode =
     skip nextSibling
 
 let skipMatchingNodesBefore predicate (node: ITreeNode) =
-    let prebSibling = node.PrevSibling
-    if isNull prebSibling then node else
+    let prevSibling = node.PrevSibling
+    if isNull prevSibling then node else
 
     let rec skip (node: ITreeNode) =
         if predicate node then
@@ -184,7 +184,7 @@ let skipMatchingNodesBefore predicate (node: ITreeNode) =
         else
             node
     
-    skip prebSibling
+    skip prevSibling
 
 
 let rec getLastMatchingNodeAfter predicate (node: ITreeNode) =
@@ -247,7 +247,7 @@ let rec skipSemicolonsAndWhiteSpacesAfter node =
     else
         node
 
-let isFollowedByEmptyLine (node: ITreeNode) =
+let isFollowedByEmptyLineOrComment (node: ITreeNode) =
     let newLine =
         node
         |> skipMatchingNodesAfter isInlineSpaceOrComment
@@ -257,6 +257,13 @@ let isFollowedByEmptyLine (node: ITreeNode) =
 
     let afterWhitespace = newLine |> skipMatchingNodesAfter isInlineSpace
     afterWhitespace != newLine && afterWhitespace :? NewLine
+
+let isAfterEmptyLine (node: ITreeNode) =
+    let prevNonWhitespace = skipMatchingNodesBefore isInlineSpace node
+    let prevPrevNonWhiteSpace = skipMatchingNodesBefore isInlineSpace prevNonWhitespace
+
+    prevNonWhitespace != prevPrevNonWhiteSpace &&
+    prevNonWhitespace :? NewLine && (isNull prevPrevNonWhiteSpace || prevPrevNonWhiteSpace :? NewLine)
 
 
 [<AutoOpen>]
@@ -351,21 +358,29 @@ let shouldEraseSemicolon (node: ITreeNode) =
 
 
 let shiftExpr shift (expr: ISynExpr) =
+    if shift = 0 then () else
+
     for child in List.ofSeq (expr.Tokens()) do
         if not (child :? NewLine) then () else
 
         let nextSibling = child.NextSibling
-        if nextSibling :? NewLine then () else
         if not (expr.Contains(nextSibling)) then () else
 
-        if nextSibling :? Whitespace then
+        match nextSibling with
+        | :? NewLine -> ()
+        | :? Whitespace ->
             // Skip empty lines
             if nextSibling.NextSibling.IsWhitespaceToken() then () else
 
             let length = nextSibling.GetTextLength() + shift
-            ModificationUtil.ReplaceChild(nextSibling, Whitespace(length)) |> ignore
-        else
-            ModificationUtil.AddChildAfter(child, Whitespace(shift)) |> ignore
+            if length > 0 then
+                ModificationUtil.ReplaceChild(nextSibling, Whitespace(length)) |> ignore
+            else
+                ModificationUtil.DeleteChild(nextSibling)
+        | _ ->
+            if shift > 0 then
+                ModificationUtil.AddChildAfter(child, Whitespace(shift)) |> ignore
+
 
 let rec tryFindRootPrefixAppWhereExpressionIsFunc (expr: ISynExpr) =
     let prefixApp = PrefixAppExprNavigator.GetByFunctionExpression(expr.IgnoreParentParens())

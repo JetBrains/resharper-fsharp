@@ -18,22 +18,27 @@ type IFSharpElementFactory =
     abstract CreateAppExpr: funcName: string * arg: ISynExpr -> IPrefixAppExpr
     abstract CreateAppExpr: funExpr: ISynExpr * argExpr: ISynExpr * addSpace: bool -> IPrefixAppExpr
     abstract CreateBinaryAppExpr: string * left: ISynExpr * right: ISynExpr -> ISynExpr
+    abstract CreateSetExpr: left: ISynExpr * right: ISynExpr -> ISynExpr
 
     abstract CreateExpr: string -> ISynExpr
     abstract CreateReferenceExpr: string -> ISynExpr
     
     abstract CreateLetBindingExpr: bindingName: string -> ILetOrUseExpr
-    abstract CreateLetBindingExpr: bindingName: string * expr: ISynExpr -> ILetOrUseExpr
-
-    abstract CreateLetModuleDecl: bindingName: string * expr: ISynExpr -> ILetModuleDecl
+    abstract CreateLetModuleDecl: bindingName: string -> ILetModuleDecl
 
     abstract CreateIgnoreApp: ISynExpr * newLine: bool -> IBinaryAppExpr
     abstract CreateRecordExprBinding: fieldName: string * addSemicolon: bool -> IRecordExprBinding
 
     abstract CreateMatchExpr: ISynExpr -> IMatchExpr
+    abstract CreateMatchClause: unit -> IMatchClause
+
     abstract CreateForEachExpr: ISynExpr -> IForEachExpr
 
     abstract AsReferenceExpr: typeReference: ITypeReferenceName -> IReferenceExpr
+
+    abstract CreateEmptyAttributeList: unit -> IAttributeList
+    abstract CreateAttribute: attrName: string -> IAttribute
+
 
 [<AllowNullLiteral>]
 type IFSharpLanguageService =

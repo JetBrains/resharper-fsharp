@@ -3,11 +3,13 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpExpressionUtil
 
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 
 let isPredefinedFunctionRef name (expr: ISynExpr) =
@@ -29,7 +31,7 @@ let inline isPredefinedInfixOpApp name (binaryAppExpr: IBinaryAppExpr) =
     if isNull binaryAppExpr then false else
     isPredefinedFunctionRef name binaryAppExpr.Operator
 
-let inline isPredefinedFuctionApp name (expr: ISynExpr) (arg: outref<ISynExpr>) =
+let inline isPredefinedFunctionApp name (expr: ISynExpr) (arg: outref<ISynExpr>) =
     match expr with
     | :? IPrefixAppExpr as prefixApp when
             isPredefinedFunctionRef name prefixApp.FunctionExpression ->
@@ -58,29 +60,35 @@ let rec createLogicallyNegatedExpression (expr: ISynExpr): ISynExpr =
     let factory = expr.CreateElementFactory()
 
     let mutable arg = Unchecked.defaultof<_>
-    if isPredefinedFuctionApp "not" expr &arg && isNotNull arg then
+    if isPredefinedFunctionApp "not" expr &arg && isNotNull arg then
         arg.IgnoreInnerParens().Copy() else
 
     let binaryApp = expr.As<IBinaryAppExpr>()
-    if isPredefinedInfixOpApp "||" binaryApp then
-        let arg1 = createLogicallyNegatedExpression binaryApp.LeftArgument
-        let arg2 = createLogicallyNegatedExpression binaryApp.RightArgument
 
-        let newBinaryApp = factory.CreateBinaryAppExpr("&&", arg1, arg2) :?> IBinaryAppExpr
+    let replaceBinaryApp nameTo negateArgs: ISynExpr =
+        let arg1 = binaryApp.LeftArgument
+        let arg2 = binaryApp.RightArgument
+
+        let arg1 = if negateArgs then createLogicallyNegatedExpression arg1 else arg1
+        let arg2 = if negateArgs then createLogicallyNegatedExpression arg2 else arg2
+
+        let newBinaryApp = factory.CreateBinaryAppExpr(nameTo, arg1, arg2) :?> IBinaryAppExpr
         if binaryApp.LeftArgument.EndLine <> binaryApp.RightArgument.StartLine then
             moveToNewLine lineEnding binaryApp.LeftArgument.Indent newBinaryApp.RightArgument
 
-        newBinaryApp :> _ else
+        newBinaryApp :> _
+
+    if isPredefinedInfixOpApp "||" binaryApp then
+        replaceBinaryApp "&&" true else
 
     if isPredefinedInfixOpApp "&&" binaryApp then
-        let arg1 = createLogicallyNegatedExpression binaryApp.LeftArgument
-        let arg2 = createLogicallyNegatedExpression binaryApp.RightArgument
+        replaceBinaryApp "||" true else
 
-        let newBinaryApp = factory.CreateBinaryAppExpr("||", arg1, arg2) :?> IBinaryAppExpr
-        if binaryApp.LeftArgument.EndLine <> binaryApp.RightArgument.StartLine then
-            moveToNewLine lineEnding binaryApp.LeftArgument.Indent newBinaryApp.RightArgument
+    if isPredefinedInfixOpApp "<>" binaryApp then
+        replaceBinaryApp "=" false else
 
-        newBinaryApp :> _ else
+    if isPredefinedInfixOpApp "=" binaryApp then
+        replaceBinaryApp "<>" false else
 
     let literalExpr = expr.As<ILiteralExpr>()
     let literalTokenType = if isNotNull literalExpr then getTokenType literalExpr.Literal else null
@@ -92,3 +100,11 @@ let rec createLogicallyNegatedExpression (expr: ISynExpr): ISynExpr =
         factory.CreateExpr("false") else
 
     factory.CreateAppExpr("not", expr) :> _
+
+let setBindingExpression (expr: ISynExpr) contextIndent (letBindings: #ILet) =
+    let newExpr = letBindings.Bindings.[0].SetExpression(expr.Copy())
+    if not expr.IsSingleLine then
+        let indentSize = expr.GetIndentSize()
+        ModificationUtil.AddChildBefore(newExpr, NewLine(expr.GetLineEnding())) |> ignore
+        ModificationUtil.AddChildBefore(newExpr, Whitespace(contextIndent + indentSize)) |> ignore
+        shiftExpr indentSize newExpr
