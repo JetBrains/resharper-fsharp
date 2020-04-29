@@ -1,0 +1,8 @@
+module Module
+
+type Record = {Field: int}
+
+let f() =
+    let record = {Field = 1}
+    record.Field = 5{caret}
+    ()

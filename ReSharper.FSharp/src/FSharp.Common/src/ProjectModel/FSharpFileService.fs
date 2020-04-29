@@ -7,13 +7,6 @@ open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 open JetBrains.ReSharper.Psi
 
-type IFSharpFileService =
-    /// True when file is script or an IntelliJ scratch file.
-    abstract member IsScriptLike: IPsiSourceFile -> bool
-
-    /// True when file is an IntelliJ scratch file.
-    abstract member IsScratchFile: IPsiSourceFile -> bool
-
 [<ShellComponent>]
 type FSharpFileService(settingsLocation: RiderAnyProductSettingsLocation) =
     let scratchesDir =
@@ -22,8 +15,8 @@ type FSharpFileService(settingsLocation: RiderAnyProductSettingsLocation) =
             .Parent / "scratches"
 
     interface IFSharpFileService with
-        member x.IsScratchFile(file) =
-            file.GetLocation().Parent.Equals(scratchesDir)
+        member x.IsScratchFile(path: FileSystemPath) =
+            path.Parent.Equals(scratchesDir)
 
         member x.IsScriptLike(file) =
             file.LanguageType.Equals(FSharpScriptProjectFileType.Instance) ||

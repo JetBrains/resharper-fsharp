@@ -5,7 +5,7 @@ open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Resources
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
-open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpMsBuildUtils
@@ -22,7 +22,10 @@ type FSharpProjectFileLanguageService
     override x.GetMixedLexerFactory(_, _, [<Optional; DefaultParameterValue(null: IPsiSourceFile)>] sourceFile) =
         match sourceFile with
         | null -> FSharpLanguage.Instance.LanguageService().GetPrimaryLexerFactory()
-        | _ -> FSharpPreprocessedLexerFactory(fsCheckerService.GetDefines(sourceFile)) :> _
+        | _ ->
+
+        let defines = fsCheckerService.OptionsProvider.GetParsingOptions(sourceFile).ConditionalCompilationDefines
+        FSharpPreprocessedLexerFactory(defines) :> _
 
     override x.GetPsiProperties(projectFile, sourceFile, isCompileService) =
         let providesCodeModel =

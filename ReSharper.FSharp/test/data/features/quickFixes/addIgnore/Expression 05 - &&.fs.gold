@@ -1,0 +1,5 @@
+﻿module Module
+
+let x =
+    (true && true) |> ignore{caret}
+    ()

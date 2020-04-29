@@ -6,7 +6,6 @@ open JetBrains.ReSharper.Feature.Services.Refactorings.WorkflowOccurrences
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.UI.RichText
@@ -68,6 +67,6 @@ type ToRecursiveFunctionFix(warning: UndefinedNameError) =
         base.Execute(solution, textControl)
     
     override x.ExecutePsiTransaction _ =
+        use cookie = FSharpRegistryUtil.AllowFormatterCookie.Create()
         use writeCookie = WriteLockCookie.Create(referenceExpr.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
         chosenLetBindings.SetIsRecursive(true)

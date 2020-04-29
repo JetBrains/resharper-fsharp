@@ -67,7 +67,7 @@ type FSharpReformatCode() =
             let stamp = document.LastModificationStamp
             let modificationSide = TextModificationSide.NotSpecified
             let newLineText = sourceFile.DetectLineEnding().GetPresentation()
-            let parsingOptions = checkerService.GetParsingOptions(sourceFile)
+            let parsingOptions = checkerService.OptionsProvider.GetParsingOptions(sourceFile)
             let checker = checkerService.Checker
 
             let change = 
@@ -85,7 +85,8 @@ type FSharpReformatCode() =
                         Some(DocumentChange(document, offset, oldLength, formatted, stamp, modificationSide))
                     with _ -> None
                 else
-                    let defines = checkerService.GetDefines(sourceFile)
+                    let parsingOptions = checkerService.OptionsProvider.GetParsingOptions(sourceFile)
+                    let defines = parsingOptions.ConditionalCompilationDefines
                     let formatTask =
                             if List.isEmpty defines
                             then CodeFormatter.FormatASTAsync(parseTree, filePath, defines,  Some source, formatConfig)

@@ -2,11 +2,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 
 open System
 open System.Collections.Generic
-open FSharp.Compiler.Ast
+open FSharp.Compiler.SyntaxTree
 open FSharp.Compiler.Range
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
-open JetBrains.Lifetimes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -17,18 +16,20 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.TreeBuilder
 
 [<AbstractClass>]
-type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetime, projectedOffset) =
+type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset, lineShift) =
     inherit TreeBuilderBase(lifetime, lexer)
+
+    let lineShift = lineShift - 1
 
     let lineOffsets =
         let lineCount = document.GetLineCount()
         Array.init (int lineCount) (fun line -> document.GetLineStartOffset(docLine line))
 
     let getLineOffset line =
-        lineOffsets.[line - 1]
+        lineOffsets.[line + lineShift]
 
     new (sourceFile, lexer, lifetime) =
-        FSharpTreeBuilderBase(sourceFile, lexer, lifetime, 0)
+        FSharpTreeBuilderBase(sourceFile, lexer, lifetime, 0, 0)
 
     abstract member CreateFSharpFile: unit -> IFSharpFile
 
@@ -387,7 +388,8 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
         x.Done(attr.Range, mark, ElementType.ATTRIBUTE)
 
     member x.ProcessEnumCase(EnumCase(_, _, _, _, range)) =
-        x.MarkAndDone(range, ElementType.ENUM_MEMBER_DECLARATION)
+        let mark = x.MarkTokenOrRange(FSharpTokenType.BAR, range)
+        x.Done(range, mark, ElementType.ENUM_MEMBER_DECLARATION)
 
     member x.ProcessField(Field(attrs, _, id, synType, _, _, _, range)) elementType =
         let mark =
@@ -674,16 +676,25 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
         | SynExpr.Typed(inner, synType, range) when not (rangeContainsRange range synType.Range) -> inner
         | _ -> expr
 
+    member x.RemoveDoExpr(expr: SynExpr) =
+        match expr with
+        | SynExpr.Do(expr, _) -> expr
+        | _ -> expr
+
     member x.MarkChameleonExpression(expr: SynExpr) =
         let (ExprRange range as expr) = x.FixExpresion(expr)
-        let mark = x.Mark(range)
+
+        let startOffset = x.GetStartOffset(range)
+        let mark = x.Mark(startOffset)
 
         // Replace all tokens with single chameleon token.
         let tokenMark = x.Mark(range)
         x.AdvanceToEnd(range)
         x.Builder.AlterToken(tokenMark, FSharpTokenType.CHAMELEON)
 
-        x.Done(range, mark, ChameleonExpressionNodeType.Instance, expr)
+        let lineStart = lineOffsets.[range.StartLine - 1]
+        let data = expr, startOffset, lineStart
+        x.Done(range, mark, ChameleonExpressionNodeType.Instance, data)
 
     member x.ProcessHashDirective(ParsedHashDirective(id, _, range)) =
         let mark = x.Mark(range)

@@ -20,6 +20,7 @@
     <Compile Include="Service\FSharpNamingTest.fs" />
     <Compile Include="Service\FSharpMetadataReaderTest.fs" />
     <Compile Include="Service\FSharpCodeFormatterTest.fs" />
+    <Compile Include="Service\FSharpAssemblyAutoOpenTest.fs" />
     <Compile Include="Cache\CSharpResolveTest.fs" />
     <Compile Include="Cache\SymbolCacheTest.fs" />
     <Compile Include="Parsing\FSharpLexerTest.fs" />
@@ -36,6 +37,8 @@
     <Compile Include="Daemon\RedundantParensTest.fs" />
     <Compile Include="Daemon\StringEscapingTest.fs" />
     <Compile Include="Daemon\RedundantAttributeParensTest.fs" />
+    <Compile Include="Daemon\RedundantAttributeSuffixAnalyzerTest.fs" />
+    <Compile Include="Daemon\FSharpColorHighlightingTest.fs" />
     <Compile Include="Debugger\ExpressionEvaluationInfoTest.fs" />
     <Compile Include="QuickFixes\ErrorAttributes.fs" />
     <Compile Include="QuickFixes\ReplaceUseWithLetTest.fs" />
@@ -63,6 +66,10 @@
     <Compile Include="QuickFixes\ToMutableTest.fs" />
     <Compile Include="QuickFixes\AddUnderscorePrefixFixTest.fs" />
     <Compile Include="QuickFixes\RemoveRedundantAttributeParensTest.fs" />
+    <Compile Include="QuickFixes\RemoveRedundantAttributeSuffixTest.fs" />
+    <Compile Include="QuickFixes\ReplaceWithAssignmentExpressionTest.fs" />
+    <Compile Include="QuickFixes\AddMatchAllClauseFixTest.fs" />
+    <Compile Include="QuickFixes\ToAbstractFixTest.fs" />
     <Compile Include="Intentions\IntentionsTestBase.fs" />
     <Compile Include="Intentions\ToRecursiveLetBindings.fs" />
     <Compile Include="Intentions\ToMultilineRecordTest.fs" />
@@ -73,10 +80,12 @@
     <Compile Include="Intentions\IfToElifTest.fs" />
     <Compile Include="Intentions\NegateConditionTest.fs" />
     <Compile Include="Intentions\ToMutableTest.fs" />
+    <Compile Include="Intentions\ToLiteralTest.fs" />
     <Compile Include="Actions\CommentActionTests.fs" />
     <Compile Include="Actions\TypingAssistTest.fs" />
     <Compile Include="Actions\FSharpExtendSelectionTest.fs" />
     <Compile Include="Refactotings\RenameTest.fs" />
+    <Compile Include="Refactotings\IntroduceVarTest.fs" />
     <Compile Include="FSharpTodoTest.fs" />
     <Compile Include="FSharpOccurenceKindTest.fs" />
     <Compile Include="NavigationTests.fs" />

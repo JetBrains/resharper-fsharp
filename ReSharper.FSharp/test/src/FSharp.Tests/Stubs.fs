@@ -4,6 +4,7 @@ open JetBrains.Application
 open JetBrains.Application.Components
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi
 
 [<SolutionComponent>]

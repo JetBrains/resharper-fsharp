@@ -7,6 +7,8 @@ open JetBrains.Metadata.Reader.API
 open JetBrains.Metadata.Utils
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Caches
+open JetBrains.ReSharper.Psi.Impl.Reflection2
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
@@ -87,3 +89,38 @@ let getFSharpMetadataResources (psiModule: IPsiModule) =
     // todo: external metadata in FSharp.Core
 
     resources.AsReadOnly()
+
+
+let getNestedTypes (declaredElement: IClrDeclaredElement) (symbolScope: ISymbolScope): ITypeElement seq =
+    match declaredElement with
+    | :? INamespace as ns -> ns.GetNestedTypeElements(symbolScope) :> _
+    | :? ITypeElement as typeElement -> typeElement.NestedTypes :> _
+    | _ -> Seq.empty
+
+let rec importAutoOpenModule (declaredElement: IClrDeclaredElement) (symbolScope: ISymbolScope)(result: ICollection<IClrDeclaredElement>) =
+      result.Add(declaredElement)
+      for typeElement in getNestedTypes declaredElement symbolScope do
+          for attribute in getAutoOpenAttributes typeElement do
+              if attribute.PositionParameterCount = 0 then
+                  importAutoOpenModule typeElement symbolScope result
+
+let getAutoOpenModules (psiAssemblyFileLoader: IPsiAssemblyFileLoader) (assembly: IPsiAssembly) =
+    let result = List()
+
+    psiAssemblyFileLoader.GetOrLoadAssembly(assembly, true, fun psiAssembly assemblyFile metadataAssembly ->
+        let attributesSet = assemblyFile.CreateAssemblyAttributes()
+        let attributes = getAutoOpenAttributes attributesSet
+
+        if attributes.IsEmpty() then () else
+
+        let psiServices = psiAssembly.PsiModule.GetPsiServices()
+        let symbolScope = psiServices.Symbols.GetSymbolScope(psiAssembly.PsiModule, false, true)
+
+        for attribute in attributes do
+            let moduleString = attribute.PositionParameter(0).ConstantValue.Value.As<string>()
+            if moduleString.IsNullOrEmpty() then () else
+
+            for declaredElement in symbolScope.GetElementsByQualifiedName(moduleString) do
+                importAutoOpenModule declaredElement symbolScope result) |> ignore
+
+    result

@@ -143,7 +143,7 @@ module rec CommonUtil =
 
 [<AutoOpen>]
 module rec FcsUtil =
-    open FSharp.Compiler.Ast
+    open FSharp.Compiler.SyntaxTree
 
     let inline (|ExprRange|) (expr: SynExpr) = expr.Range
     let inline (|PatRange|) (pat: SynPat) = pat.Range

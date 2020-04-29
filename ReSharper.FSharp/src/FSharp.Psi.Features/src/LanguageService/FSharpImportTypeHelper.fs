@@ -11,18 +11,21 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Finder
+open JetBrains.ReSharper.Psi.Naming
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpImportTypeHelper() =
+    let [<Literal>] opName = "FSharpImportTypeHelper.FindTypeCandidates"
+
     let isApplicable (context: IFSharpReferenceOwner) =
         let referenceName = context.As<ITypeReferenceName>()
         if isNotNull (OpenStatementNavigator.GetByReferenceName(referenceName)) then false else
 
         true
-    
+
     interface IImportTypeHelper with
         member x.FindTypeCandidates(reference, importTypeCacheFactory) =
             let reference = reference.As<FSharpSymbolReference>()
@@ -43,26 +46,51 @@ type FSharpImportTypeHelper() =
             let names = reference.GetAllNames().ResultingList()
             let factory = importTypeCacheFactory.Invoke(context)
 
-            names
-            |> Seq.collect factory.Invoke
-            |> Seq.filter (fun clrDeclaredElement ->
-                let typeElement = clrDeclaredElement.As<ITypeElement>()
-                if isNull typeElement then false else
-
-                // todo: enable when singleton property cases are supported
-                if typeElement.IsUnionCase() then false else
-
-                // Module accessibility is calculated by the factory for us,
-                // we only need to check the order inside the project. 
-                if typeElement.Module != psiModule then true else
-
+            let canReferenceInsideProject typeElement =
                 let searchGuru = psiModule.GetSolution().GetComponent<FSharpSearchGuru>() :> ISearchGuru
                 let elementId = searchGuru.GetElementId(typeElement)
-                if not (searchGuru.CanContainReferences(sourceFile, elementId)) then false else
+                searchGuru.CanContainReferences(sourceFile, elementId)
 
-                let moduleToOpen = getModuleToOpen typeElement
-                not (containingModules.Contains(moduleToOpen)))
-            |> Seq.cast
+            let mutable candidates: ITypeElement seq =
+                names
+                |> Seq.collect factory.Invoke
+                |> Seq.filter (fun clrDeclaredElement ->
+                    let typeElement = clrDeclaredElement.As<ITypeElement>()
+                    if isNull typeElement then false else
+
+                    // todo: enable when singleton property cases are supported
+                    if typeElement.IsUnionCase() then false else
+
+                    if typeElement.Module == psiModule &&
+                            not (canReferenceInsideProject typeElement) then false else
+
+                    let moduleToOpen = getModuleToOpen typeElement
+                    if containingModules.Contains(moduleToOpen) then false else
+
+                    let names = toQualifiedList typeElement |> List.map (fun el -> el.GetSourceName())
+                    let symbolUse = context.FSharpFile.CheckerService.ResolveNameAtLocation(context, names, opName)
+                    Option.isSome symbolUse)
+                |> Seq.cast
+
+
+            let referenceName = context.As<ITypeArgumentOwner>()
+            if isNotNull referenceName then
+                let typeArgumentList = referenceName.TypeArgumentList
+                if isNull typeArgumentList || typeArgumentList.Types.Count = 0 then () else
+
+                let typesCount = typeArgumentList.Types.Count
+                candidates <- candidates |> Seq.filter (fun c -> c.TypeParameters.Count = typesCount)
+
+
+            let typeReferenceName = context.As<ITypeReferenceName>()
+            if isNotNull (AttributeNavigator.GetByReferenceName(typeReferenceName)) then
+                let attributeTypeElement = context.GetPredefinedType().Attribute.GetTypeElement()
+                candidates <- candidates |> Seq.filter (fun c -> c.IsDescendantOf(attributeTypeElement))
+
+            if isNotNull (InheritMemberNavigator.GetByTypeName(typeReferenceName)) then
+                candidates <- candidates |> Seq.filter (fun c -> c :? IInterface || c :? IClass || c :? IStruct)
+
+            candidates
 
         member x.ReferenceTargetCanBeType _ = true
         member x.ReferenceTargetIsUnlikelyBeType _ = false
@@ -79,9 +107,14 @@ type FSharpQuickFixUtilComponent() =
 
             let moduleToOpen = getModuleToOpen typeElement
 
+            let namingService = NamingManager.GetNamingLanguageService(fsFile.Language)
+
             let nameToOpen =
-                let style = DeclaredElementPresenter.QUALIFIED_NAME_PRESENTER
-                DeclaredElementPresenter.Format(context.Language, style, moduleToOpen).Text
+                toQualifiedList moduleToOpen
+                |> List.map (fun el ->
+                    let sourceName = el.GetSourceName()
+                    namingService.MangleNameIfNecessary(sourceName))
+                |> String.concat "."
 
             if nameToOpen.IsNullOrEmpty() then reference :> _ else
 

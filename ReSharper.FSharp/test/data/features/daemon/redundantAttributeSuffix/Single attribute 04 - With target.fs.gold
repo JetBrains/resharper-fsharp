@@ -1,0 +1,10 @@
+﻿open System
+
+type FooAttribute() = inherit Attribute()
+
+[<type:Foo|Attribute|(0)>]
+type A =
+    class end
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Attribute suffix is redundant

@@ -1,0 +1,7 @@
+﻿module Module
+
+do
+    let {selstart}i{selend} = 1
+    ()
+    1
+    ()

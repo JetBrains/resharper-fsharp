@@ -59,14 +59,16 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
                 context.XmlDocService <- basicContext.Solution.GetComponent<FSharpXmlDocService>()
                 context.DisplayContext <- completionInfo.DisplayContext
 
-                for item in completionInfo.Items do
-                    let (lookupItem: TextLookupItemBase) =
-                        if item.Glyph = FSharpGlyph.Error
-                        then FSharpErrorLookupItem(item) :> _
-                        else FSharpLookupItem(item, context) :> _
-
+                if completionInfo.IsError then
+                    let item = Seq.head completionInfo.Items
+                    let lookupItem = FSharpErrorLookupItem(item)
                     lookupItem.InitializeRanges(context.Ranges, basicContext)
                     collector.Add(lookupItem)
+                else
+                    for item in completionInfo.Items do
+                        let lookupItem = FSharpLookupItem(item, context)
+                        lookupItem.InitializeRanges(context.Ranges, basicContext)
+                        collector.Add(lookupItem)
                 true
             with
             | OperationCanceled -> reraise()

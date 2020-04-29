@@ -84,6 +84,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public IFSharpReferenceOwner SetName(string name) =>
       FSharpImplUtil.SetName(this, name);
+
+    ITypeArgumentList ITypeArgumentOwner.TypeArgumentList => TypeArgumentList;
   }
 
   public class ReferenceExpressionTypeReference : FSharpSymbolReference

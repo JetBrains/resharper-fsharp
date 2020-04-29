@@ -7,18 +7,27 @@ open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<FSharpTest>]
-type FSharpMetadataReaderTest() =
+[<FSharpTest; AbstractClass>]
+type FSharpReferencedAssemblyTestBase() =
     inherit BaseTestWithSingleProject()
 
-    override x.RelativeTestDataPath = "common/metadataReader"
-    
+    abstract DoTest: assemblyModule: IPsiModule -> unit
+
     member x.DoTest(moduleName: string) =
         x.WithSingleProject([], fun lifetime solution (project: IProject) ->
             let modules = project.GetSolution().PsiModules().GetModules()
             match modules |> Seq.tryFind (fun m -> m.Name = moduleName) with
             | None -> failwith "Could not get module"
-            | Some psiModule -> FSharpMetadataReader.ReadMetadata(psiModule) )
+            | Some psiModule -> x.DoTest(psiModule) )
+
+
+type FSharpMetadataReaderTest() =
+    inherit FSharpReferencedAssemblyTestBase()
+
+    override x.RelativeTestDataPath = "common/metadataReader"
+
+    override x.DoTest(assemblyModule: IPsiModule) =
+        FSharpMetadataReader.ReadMetadata(assemblyModule)
 
     [<Test; TestPackages("FSharp.Core")>]
     member x.FSharpCore() = x.DoTest("FSharp.Core")

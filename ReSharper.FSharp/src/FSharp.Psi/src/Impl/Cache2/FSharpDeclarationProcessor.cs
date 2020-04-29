@@ -40,7 +40,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
         return;
 
       var fileKind = GetFSharpFileKind(fsFile);
-      var hasPairFile = myCheckerService.HasPairFile(sourceFile);
+      var hasPairFile = myCheckerService.OptionsProvider.HasPairFile(sourceFile);
 
       Builder.CreateProjectFilePart(new FSharpProjectFilePart(sourceFile, fileKind, hasPairFile));
 

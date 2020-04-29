@@ -1,0 +1,6 @@
+﻿Suggested names: i
+do
+  let a = 1
+  let i = 1
+  let b = 1 + i
+  ()

@@ -1,20 +1,19 @@
 ﻿Language: PsiLanguageType:F#
 IFSharpImplFile
   IAnonModuleDeclaration
-    FSharpTokenType+DoTokenElement(type:DO, text:do)
-    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-    Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
     IDo
+      FSharpTokenType+DoTokenElement(type:DO, text:do)
+      NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+      Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
       IChameleonExpression
-        IDoExpr
-          IUpcastExpr
-            IUnitExpr
-              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+ColonGreaterTokenElement(type:COLON_GREATER, text::>)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IAnonType
-              FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+        IUpcastExpr
+          IUnitExpr
+            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+ColonGreaterTokenElement(type:COLON_GREATER, text::>)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IAnonType
+            FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 
