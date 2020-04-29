@@ -15,21 +15,14 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.UI.RichText
 
 [<SettingsKey(typeof<Missing>, "F# settings")>]
-type FSharpSettings() =
-    class
-    end
+type FSharpSettings() = class end
 
 
 [<AutoOpen>]
 module FSharpOptions =
-    [<Literal>]
-    let backgroundTypeCheck = "Enable background type checking"
-
-    [<Literal>]
-    let outOfScopeCompletion = "Enable out of scope items completion"
-
-    [<Literal>]
-    let topLevelOpenCompletion = "Add 'open' declarations to top level module or namespace"
+    let [<Literal>] backgroundTypeCheck = "Enable background type checking"
+    let [<Literal>] outOfScopeCompletion = "Enable out of scope items completion"
+    let [<Literal>] topLevelOpenCompletion = "Add 'open' declarations to top level module or namespace"
 
 
 [<SettingsKey(typeof<FSharpSettings>, "FSharpOptions")>]
@@ -45,11 +38,8 @@ type FSharpOptions =
 
 
 module FSharpScriptOptions =
-    [<Literal>]
-    let languageVersion = "Language version"
-
-    [<Literal>]
-    let customDefines = "Custom defines"
+    let [<Literal>] languageVersion = "Language version"
+    let [<Literal>] customDefines = "Custom defines"
 
 
 [<SettingsKey(typeof<FSharpOptions>, "FSharpScriptOptions")>]
@@ -63,24 +53,20 @@ type FSharpScriptOptions =
 
 [<SolutionInstanceComponent>]
 type FSharpScriptOptionsProvider(lifetime: Lifetime, settings: IContextBoundSettingsStoreLive) =
-
-    new(lifetime: Lifetime, solution: ISolution, settingsStore: ISettingsStore) =
+    new (lifetime: Lifetime, solution: ISolution, settingsStore: ISettingsStore) =
         let settings = settingsStore.BindToContextLive(lifetime, ContextRange.Smart(solution.ToDataContext()))
         FSharpScriptOptionsProvider(lifetime, settings)
 
-    member val LanguageVersion = settings.GetValueProperty(lifetime, (fun s -> s.LanguageVersion))
-    member val CustomDefines = settings.GetValueProperty(lifetime, (fun s -> s.CustomDefines))
+    member val LanguageVersion = settings.GetValueProperty(lifetime, fun s -> s.LanguageVersion)
+    member val CustomDefines = settings.GetValueProperty(lifetime, fun s -> s.CustomDefines)
 
 
 module FSharpTypeHintOptions =
-    [<Literal>]
-    let pipeReturnTypes = "Show return type hints in |> chains"
+    let [<Literal>] pipeReturnTypes = "Show return type hints in |> chains"
 
-    [<Literal>]
-    let hideSameLinePipe = "Hide when |> is on same line as argument"
+    let [<Literal>] hideSameLinePipe = "Hide when |> is on same line as argument"
 
-    [<Literal>]
-    let inferredTypes = "Show inferred types on identifiers"
+    let [<Literal>] inferredTypes = "Show inferred types on identifiers"
 
 
 [<SettingsKey(typeof<FSharpOptions>, "FSharpTypeHintOptions")>]
@@ -96,7 +82,8 @@ type FSharpTypeHintOptions =
 
 
 [<OptionsPage("FSharpOptionsPage", "F#", typeof<ProjectModelThemedIcons.Fsharp>)>]
-type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings) as this =
+type FSharpOptionsPage
+        (lifetime: Lifetime, optionsPageContext, settings) as this =
     inherit FSharpOptionsPageBase(lifetime, optionsPageContext, settings)
 
     do
@@ -105,22 +92,20 @@ type FSharpOptionsPage(lifetime: Lifetime, optionsPageContext, settings) as this
         this.AddBoolOption((fun key -> key.TopLevelOpenCompletion), RichText(topLevelOpenCompletion), null) |> ignore
 
         this.AddHeader("Script editing")
-        this.AddComboEnum
-            ((fun key -> key.LanguageVersion), FSharpScriptOptions.languageVersion, FSharpLanguageVersion.toString)
-        |> ignore
+        this.AddComboEnum((fun key -> key.LanguageVersion), FSharpScriptOptions.languageVersion, FSharpLanguageVersion.toString) |> ignore
 
         this.AddHeader("Type hints")
-        let showPipeReturnTypes =
-            this.AddBoolOption
-                ((fun key -> key.ShowPipeReturnTypes), RichText(FSharpTypeHintOptions.pipeReturnTypes), null)
-        do use _x = this.Indent()
-           [ this.AddBoolOption((fun key -> key.HideSameLine), RichText(FSharpTypeHintOptions.hideSameLinePipe), null) ]
-           |> Seq.iter
-               (fun checkbox ->
-                   this.AddBinding(checkbox, BindingStyle.IsEnabledProperty, (fun key -> key.ShowPipeReturnTypes), id))
+        let showPipeReturnTypes = this.AddBoolOption((fun key -> key.ShowPipeReturnTypes), RichText(FSharpTypeHintOptions.pipeReturnTypes), null)
+        do
+            use _x = this.Indent()
+            [
+                this.AddBoolOption((fun key -> key.HideSameLine), RichText(FSharpTypeHintOptions.hideSameLinePipe), null)
+            ]
+            |> Seq.iter (fun checkbox ->
+                this.AddBinding(checkbox, BindingStyle.IsEnabledProperty, (fun key -> key.ShowPipeReturnTypes), id)
+            )
 
-        this.AddBoolOption((fun key -> key.ShowInferredTypes), RichText(FSharpTypeHintOptions.inferredTypes), null)
-        |> ignore
+        this.AddBoolOption((fun key -> key.ShowInferredTypes), RichText(FSharpTypeHintOptions.inferredTypes), null) |> ignore
 
         this.AddHeader("FSharp.Compiler.Service options")
         this.AddBoolOption((fun key -> key.BackgroundTypeCheck), RichText(backgroundTypeCheck), null) |> ignore
@@ -131,10 +116,11 @@ type FSharpTypeHintOptionsStore(lifetime: Lifetime, settingsStore: ISettingsStor
     do
         let settingsKey = settingsStore.Schema.GetKey<FSharpTypeHintOptions>()
 
-        settingsStore.Changed.Advise
-            (lifetime,
-             (fun args ->
-                 let typeHintOptionChanged =
-                     args.ChangedEntries |> Seq.exists (fun changedEntry -> changedEntry.Parent = settingsKey)
+        settingsStore.Changed.Advise(lifetime, fun args ->
+            let typeHintOptionChanged =
+                args.ChangedEntries
+                |> Seq.exists (fun changedEntry -> changedEntry.Parent = settingsKey)
 
-                 if typeHintOptionChanged then highlightingSettingsManager.SettingsChanged.Fire(Nullable<_>(false))))
+            if typeHintOptionChanged then
+                highlightingSettingsManager.SettingsChanged.Fire(Nullable<_>(false))
+        )
