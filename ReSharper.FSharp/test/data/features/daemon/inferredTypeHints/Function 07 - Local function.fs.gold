@@ -1,0 +1,11 @@
+﻿let hello () =
+    let localFunc x||(0) y||(1) = x + y
+    let l||(2) = fun x||(3) y||(4) -> x + y
+    ()
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : int
+(1): ReSharper Parameter Name Hint: : int
+(2): ReSharper Parameter Name Hint: : int -> int -> int
+(3): ReSharper Parameter Name Hint: : int
+(4): ReSharper Parameter Name Hint: : int

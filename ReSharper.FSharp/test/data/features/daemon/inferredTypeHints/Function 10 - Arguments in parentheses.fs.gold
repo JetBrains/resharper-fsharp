@@ -1,0 +1,5 @@
+﻿let addFive (hi||(0)) =
+    hi + 5
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : int

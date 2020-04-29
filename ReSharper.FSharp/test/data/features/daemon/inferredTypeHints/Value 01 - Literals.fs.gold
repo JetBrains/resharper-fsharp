@@ -1,0 +1,8 @@
+﻿let run () =
+    let x||(0) = 15
+    let y||(1) = failwith ""
+    y + ""
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : int
+(1): ReSharper Parameter Name Hint: : string

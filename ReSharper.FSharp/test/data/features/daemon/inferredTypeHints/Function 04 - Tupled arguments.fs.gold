@@ -1,6 +1,10 @@
 ﻿let add (x||(0), y||(1)) =
     x + y
 
+let l = fun (x||(2), y||(3)) -> x + y
+
 ---------------------------------------------------------
 (0): ReSharper Parameter Name Hint: : int
 (1): ReSharper Parameter Name Hint: : int
+(2): ReSharper Parameter Name Hint: : int
+(3): ReSharper Parameter Name Hint: : int

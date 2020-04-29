@@ -1,9 +1,11 @@
 ﻿type 'a MyRecord = { MyOption : 'a option }
 
-let x = { MyOption = Some 15. }
-match x with
-| { MyOption = None } -> ()
-| { MyOption = Some x||(0) } -> ()
+let run () =
+    let x||(0) = { MyOption = Some 15. }
+    match x with
+    | { MyOption = None } -> ()
+    | { MyOption = Some x||(1) } -> ()
 
 ---------------------------------------------------------
-(0): ReSharper Parameter Name Hint: : float
+(0): ReSharper Parameter Name Hint: : float MyRecord
+(1): ReSharper Parameter Name Hint: : float

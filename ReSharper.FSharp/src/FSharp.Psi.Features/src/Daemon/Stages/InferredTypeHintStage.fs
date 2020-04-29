@@ -14,23 +14,20 @@ open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open FSharp.Compiler.SourceCodeServices
 
-type InferredTypeHintHighlightingProcess(logger: ILogger, fsFile, settings: IContextBoundSettingsStore, daemonProcess: IDaemonProcess) =
+type InferredTypeHintHighlightingProcess(fsFile, settings: IContextBoundSettingsStore, daemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
     override x.Execute(committer) =
-        let consumer = new FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settings)
+        let consumer = FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settings)
         fsFile.ProcessThisAndDescendants(Processor(x, consumer))
         committer.Invoke(DaemonStageResult(consumer.Highlightings))
 
     override x.VisitLocalReferencePat(localRefPat, consumer) =
-        match localRefPat.IgnoreParentParens().Parent with
-        | :? ITypedPat -> ()
-        | :? ILocalBinding as localBinding when localBinding.ReturnTypeInfo <> null -> ()
-        | _ ->
+        let pat = localRefPat.IgnoreParentParens()
+        if isNotNull (TypedPatNavigator.GetByPattern(pat)) then () else
 
-        match localRefPat.Identifier.As<FSharpIdentifierToken>() with
-        | null -> ()
-        | token ->
+        let binding = BindingNavigator.GetByHeadPattern(pat)
+        if isNotNull binding && isNotNull binding.ReturnTypeInfo then () else
 
         match box (localRefPat.GetFSharpSymbolUse()) with
         | null -> ()
@@ -50,7 +47,7 @@ type InferredTypeHintHighlightingProcess(logger: ILogger, fsFile, settings: ICon
         | _ -> ()
 
 [<DaemonStage(StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |])>]
-type InferredTypeHintStage(logger: ILogger) =
+type InferredTypeHintStage() =
     inherit FSharpDaemonStageBase()
 
     override x.IsSupported(sourceFile, processKind) =
@@ -60,4 +57,4 @@ type InferredTypeHintStage(logger: ILogger) =
 
     override x.CreateStageProcess(fsFile, settings, daemonProcess) =
         if not (settings.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowInferredTypes)) then null else
-        InferredTypeHintHighlightingProcess(logger, fsFile, settings, daemonProcess) :> _
+        InferredTypeHintHighlightingProcess(fsFile, settings, daemonProcess) :> _
