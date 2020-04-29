@@ -1,3 +1,0 @@
-constructors
-errors
-    Directory.Delete((recursive=false), path="")
