@@ -1,8 +1,0 @@
-﻿open System.Drawing
-
-let green = 234
-Color.FromArgb(||(0)123, green, ||(1)100) |> ignore
-
----------------------------------------------------------
-(0): ReSharper Parameter Name Hint: red, 
-(1): ReSharper Parameter Name Hint: blue, 

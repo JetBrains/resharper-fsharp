@@ -1,9 +1,0 @@
-﻿open System.IO
-
-DirectoryInfo(path="") |> ignore
-DirectoryInfo(||(0)"").Delete(recursive=true)
-DirectoryInfo(||(1)"").Delete (recursive=true)
-
----------------------------------------------------------
-(0): ReSharper Parameter Name Hint: path, 
-(1): ReSharper Parameter Name Hint: path, 
