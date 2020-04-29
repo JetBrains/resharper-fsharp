@@ -5,7 +5,6 @@ open JetBrains.ReSharper.Daemon.Stages
 open JetBrains.ReSharper.Feature.Services.ParameterNameHints
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
@@ -30,11 +29,10 @@ type ParameterNameHintHighlightingProcess(fsFile, settings, daemonProcess) =
             | expr -> [| expr |]
 
         for argExpr in args do
+            let arg = argExpr :?> IArgument
+
             match argExpr.IgnoreInnerParens() with
             | :? ILiteralExpr ->
-                let arg = argExpr.As<IArgument>()
-                // todo: is there ever a case where a literal expression isn't an IArgument? if not, can this be encoded in the type system?
-
                 let param = arg.MatchingParameter
                 if isNull param then () else
 
