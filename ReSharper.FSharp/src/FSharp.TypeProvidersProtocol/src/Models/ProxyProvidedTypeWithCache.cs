@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache;
@@ -87,6 +88,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
           .Sync(EntityId)
           .Select(t => ProxyProvidedConstructorInfoWithCache.Create(t, myProcessModel, Context, myCache))
           .ToArray());
+
+      myTypeAsVarsCache = new Dictionary<string, ProvidedVar>();
     }
 
     [ContractAnnotation("type:null => null")]
@@ -210,27 +213,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override ProvidedConstructorInfo[] GetConstructors() => myConstructors.Value;
 
     public override ProvidedType ApplyContext(ProvidedTypeContext context)
-    {
-      var (lookupIlTypeRef, lookupTyconRef) = Context.GetDictionaries();
-      var (newLookupIlTypeRef, newLookupTyconRef) = context.GetDictionaries();
-
-      lookupIlTypeRef.Clear();
-      lookupTyconRef.Clear();
-
-      foreach (var ilTypeRef in newLookupIlTypeRef)
-        lookupIlTypeRef.Add(ilTypeRef.Key, ilTypeRef.Value);
-
-      foreach (var tyconRef in newLookupTyconRef)
-        lookupTyconRef.Add(tyconRef.Key, tyconRef.Value);
-
-      return this;
-    }
+      => Create(myRdProvidedType, myProcessModel, context, myCache);
 
     public override ProvidedAssembly Assembly => myProvidedAssembly.Value;
 
-    public override ProvidedVar Fresh(string nm) =>
-      ProxyProvidedVarWithCache.Create(RdProvidedTypeProcessModel.Fresh.Sync(new FreshArgs(EntityId, nm)), myProcessModel, Context,
-        myCache);
+    public override ProvidedVar Fresh(string nm)
+    {
+      if (!myTypeAsVarsCache.TryGetValue(nm, out var providedVar))
+      {
+        providedVar = ProxyProvidedVarWithCache.Create(
+          RdProvidedTypeProcessModel.Fresh.Sync(new FreshArgs(EntityId, nm)), myProcessModel, Context, myCache);
+
+        myTypeAsVarsCache.Add(nm, providedVar);
+      }
+
+      return providedVar;
+    }
 
     private int? myArrayRank;
     private int? myMakeArrayTypeId;
@@ -252,5 +250,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     private readonly Lazy<ProvidedFieldInfo[]> myFields;
     private readonly Lazy<ProvidedEventInfo[]> myEvents;
     private readonly Lazy<ProvidedConstructorInfo[]> myConstructors;
+    private readonly Dictionary<string, ProvidedVar> myTypeAsVarsCache;
   }
 }
