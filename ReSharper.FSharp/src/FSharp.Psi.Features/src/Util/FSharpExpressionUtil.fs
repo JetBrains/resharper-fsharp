@@ -3,11 +3,13 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpExpressionUtil
 
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 
 let isPredefinedFunctionRef name (expr: ISynExpr) =
@@ -98,3 +100,11 @@ let rec createLogicallyNegatedExpression (expr: ISynExpr): ISynExpr =
         factory.CreateExpr("false") else
 
     factory.CreateAppExpr("not", expr) :> _
+
+let setBindingExpression (expr: ISynExpr) contextIndent (letBindings: #ILet) =
+    let newExpr = letBindings.Bindings.[0].SetExpression(expr.Copy())
+    if not expr.IsSingleLine then
+        let indentSize = expr.GetIndentSize()
+        ModificationUtil.AddChildBefore(newExpr, NewLine(expr.GetLineEnding())) |> ignore
+        ModificationUtil.AddChildBefore(newExpr, Whitespace(contextIndent + indentSize)) |> ignore
+        shiftExpr indentSize newExpr

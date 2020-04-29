@@ -2,13 +2,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
 
 open JetBrains.Application.DataContext
 open JetBrains.Application.UI.Actions.ActionManager
-open JetBrains.Diagnostics
 open JetBrains.DocumentModel.DataContext
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel.DataContext
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots
 open JetBrains.ReSharper.Feature.Services.Refactorings
 open JetBrains.ReSharper.Feature.Services.Refactorings.Specific
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -29,11 +29,6 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.TextControl
 open JetBrains.TextControl.DataContext
 open JetBrains.Util
-
-type FSharpIntroduceVariableWorkflow(solution, actionId, removeSourceExpr) =
-    inherit IntroduceVariableWorkflow(solution, actionId)
-
-    member x.RemoveSourceExpr = removeSourceExpr
 
 type FSharpIntroduceVariable(workflow, solution, driver) =
     inherit IntroduceVariableBase(workflow, solution, driver)
@@ -61,7 +56,6 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
     let getReplaceRanges (expr: ISynExpr) (parent: ISynExpr) =
         let sequentialExpr = SequentialExprNavigator.GetByExpression(expr)
         if expr == parent && isNotNull sequentialExpr then
-            Assertion.Assert(expr == parent, "expr == parent")
             let inRange = TreeRange(expr.NextSibling, sequentialExpr.LastChild)
 
             let seqExprs = sequentialExpr.Expressions
@@ -113,12 +107,12 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let doDecl = DoNavigator.GetByExpression(contextExpr)
         if isNotNull doDecl && doDecl.IsImplicit then doDecl :> _ else null
 
-    let createBinding (context: ISynExpr) (contextDecl: IModuleMember) name expr: ILet =
+    let createBinding (context: ISynExpr) (contextDecl: IModuleMember) name: ILet =
         let elementFactory = context.CreateElementFactory()
         if isNotNull contextDecl then
-            elementFactory.CreateLetModuleDecl(name, expr) :> _
+            elementFactory.CreateLetModuleDecl(name) :> _
         else
-            elementFactory.CreateLetBindingExpr(name, expr) :> _
+            elementFactory.CreateLetBindingExpr(name) :> _
 
     let getMoveToNewLineInfo (contextExpr: ISynExpr) =
         if not contextExpr.IsSingleLine then None else
@@ -158,7 +152,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
     static member val ExpressionToRemove = Key("FSharpIntroduceVariable.ExpressionToRemove")
 
     override x.Process(data) =
-        let initialExpr = data.SourceExpression.As<ISynExpr>()
+        let sourceExpr = data.SourceExpression.As<ISynExpr>()
         let commonParentExpr = data.Usages.FindLCA().As<ISynExpr>()
 
         // contextDecl is not null when expression is bound to a module/type let binding
@@ -173,39 +167,42 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
             | Some indent -> indent
             | _ -> contextExpr.Indent
 
-        let names = getNames initialExpr
+        let names = getNames sourceExpr
         let name = if names.Count > 0 then names.[0] else "x"
 
-        let removeSourceExpr = initialExpr.UserData.HasKey(FSharpIntroduceVariable.ExpressionToRemove)
-        initialExpr.UserData.RemoveKey(FSharpIntroduceVariable.ExpressionToRemove)
+        let removeSourceExpr = sourceExpr.UserData.HasKey(FSharpIntroduceVariable.ExpressionToRemove)
+        sourceExpr.UserData.RemoveKey(FSharpIntroduceVariable.ExpressionToRemove)
 
-        use writeCookie = WriteLockCookie.Create(initialExpr.IsPhysical())
+        use writeCookie = WriteLockCookie.Create(sourceExpr.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
-        let lineEnding = initialExpr.GetLineEnding()
-        let elementFactory = initialExpr.CreateElementFactory()
+        let lineEnding = sourceExpr.GetLineEnding()
+        let elementFactory = sourceExpr.CreateElementFactory()
 
-        let letOrUseExpr = createBinding contextExpr contextDecl name initialExpr
+        let indentShift = contextExpr.Indent - sourceExpr.Indent
+        shiftExpr indentShift sourceExpr
+
+        let letBindings = createBinding contextExpr contextDecl name
+        setBindingExpression sourceExpr contextIndent letBindings
 
         let replacedUsages =
-            data.Usages
-            |> Array.ofSeq
-            |> Array.choose (fun usage ->
+            data.Usages |> Seq.choose (fun usage ->
                 if not (isValid usage) then None else
                 if removeSourceExpr && obj.ReferenceEquals(usage, contextExpr) then None else
 
                 let ref = elementFactory.CreateReferenceExpr(name)
                 Some (ModificationUtil.ReplaceChild(usage, ref).As<ITreeNode>().CreateTreeElementPointer()))
+            |> Seq.toArray
 
         match moveToNewLineInfo with
         | Some indent -> moveToNewLine contextExpr indent
         | _ -> ()
 
         let letBindings: ILet = 
-            match letOrUseExpr with
+            match letBindings with
             | :? ILetOrUseExpr ->
-                let ranges = getReplaceRanges initialExpr contextExpr
-                let replaced = ModificationUtil.ReplaceChildRange(ranges.ReplaceRange, TreeRange(letOrUseExpr))
+                let ranges = getReplaceRanges sourceExpr contextExpr
+                let replaced = ModificationUtil.ReplaceChildRange(ranges.ReplaceRange, TreeRange(letBindings))
                 let letBindings = replaced.First :?> ILet
 
                 let binding = letBindings.Bindings.[0]
@@ -219,11 +216,11 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
             | :? ILetModuleDecl ->
                 addNodesBefore contextDecl [
-                    letOrUseExpr
+                    letBindings
                     NewLine(lineEnding)
                     Whitespace(contextIndent)
                 ] |> ignore
-                letOrUseExpr
+                letBindings
 
             | _ -> failwithf "Unexpected let node type"
 
@@ -263,7 +260,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         if removeSourceExpr then
             expr.UserData.PutKey(FSharpIntroduceVariable.ExpressionToRemove)
 
-        let workflow = FSharpIntroduceVariableWorkflow(solution, null, removeSourceExpr)
+        let workflow = IntroduceVariableWorkflow(solution, null)
         RefactoringActionUtil.ExecuteRefactoring(dataContext, workflow)
 
     static member CanIntroduceVar(expr: ISynExpr, allowInSeqExprOnly) =
