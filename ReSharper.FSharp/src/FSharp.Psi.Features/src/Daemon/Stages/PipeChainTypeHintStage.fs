@@ -11,6 +11,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages.Tooltips
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Feature.Services.Daemon
@@ -26,30 +27,27 @@ type SameLinePipeHints =
     | Show
     | Hide
 
-type PipeOperatorVisitor(fsFile: IFSharpFile, checkResults: FSharpCheckFileResults, sameLinePipeHints: SameLinePipeHints) =
+type PipeOperatorVisitor(sameLinePipeHints: SameLinePipeHints) =
     inherit TreeNodeVisitor<List<FSharpIdentifierToken * ITreeNode>>()
-
-    let document = fsFile.GetSourceFile().Document
 
     let showSameLineHints =
         match sameLinePipeHints with
         | SameLinePipeHints.Show -> true
         | SameLinePipeHints.Hide -> false
 
-    let visitBinaryAppExpr binaryAppExpr (consumer: List<FSharpIdentifierToken * ITreeNode>) =
+    let visitBinaryAppExpr binaryAppExpr (context: List<FSharpIdentifierToken * ITreeNode>) =
         if not (FSharpExpressionUtil.isPredefinedInfixOpApp "|>" binaryAppExpr) then () else
 
+        match binaryAppExpr.LeftArgument with
+        | null -> ()
+        | exprToAdorn ->
+
         let opExpr = binaryAppExpr.Operator
-        let exprToAdorn = binaryAppExpr.LeftArgument
-
-        let argCoords = document.GetCoordsByOffset(exprToAdorn.GetTreeEndOffset().Offset)
-        let opCoords = document.GetCoordsByOffset(opExpr.GetTreeStartOffset().Offset)
-
-        if not showSameLineHints && argCoords.Line = opCoords.Line then () else
+        if not showSameLineHints && exprToAdorn.EndLine = opExpr.StartLine then () else
 
         match opExpr.Identifier.As<FSharpIdentifierToken>() with
         | null -> ()
-        | token -> consumer.Add(token, exprToAdorn :> _)
+        | token -> context.Add(token, exprToAdorn :> _)
 
     override x.VisitNode(node, context) =
         for child in node.Children() do
@@ -57,9 +55,9 @@ type PipeOperatorVisitor(fsFile: IFSharpFile, checkResults: FSharpCheckFileResul
             | :? IFSharpTreeNode as treeNode -> treeNode.Accept(x, context)
             | _ -> ()
 
-    override x.VisitBinaryAppExpr(binaryAppExpr, consumer) =
-        visitBinaryAppExpr binaryAppExpr consumer
-        x.VisitNode(binaryAppExpr, consumer)
+    override x.VisitBinaryAppExpr(binaryAppExpr, context) =
+        visitBinaryAppExpr binaryAppExpr context
+        x.VisitNode(binaryAppExpr, context)
 
 type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBoundSettingsStore, daemonProcess: IDaemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
@@ -111,7 +109,7 @@ type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBou
         | Some results ->
 
         let consumer = List()
-        fsFile.Accept(PipeOperatorVisitor(fsFile, results.CheckResults, sameLinePipeHints), consumer)
+        fsFile.Accept(PipeOperatorVisitor(sameLinePipeHints), consumer)
         let allHighlightings = Array.ofSeq consumer
 
         // Visible range may be larger than document range by 1 char
@@ -124,7 +122,7 @@ type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBou
                 // Partition the expressions to adorn by whether they're visible in the viewport or not
                 let visible, notVisible =
                     allHighlightings
-                    |> Array.partition (fun (token, exprToAdorn) ->
+                    |> Array.partition (fun (_, exprToAdorn) ->
                         exprToAdorn.GetNavigationRange().IntersectsOrContacts(&visibleRange)
                     )
 
