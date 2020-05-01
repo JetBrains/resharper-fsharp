@@ -10,12 +10,12 @@ IFSharpImplFile
         IReturnTypeInfo
           FSharpTokenType+ColonTokenElement(type:COLON, text::)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          INamedType
+          INamedTypeUsage
             ITypeReferenceName
               FSharpIdentifierToken(type:IDENTIFIER, text:list)
               IPrefixAppTypeArgumentList
                 FSharpTokenType+LessTokenElement(type:LESS, text:<)
-                INamedType
+                INamedTypeUsage
                   ITypeReferenceName
                     FSharpIdentifierToken(type:IDENTIFIER, text:int)
                 FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)

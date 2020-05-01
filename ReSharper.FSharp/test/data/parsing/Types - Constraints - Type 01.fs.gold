@@ -10,8 +10,8 @@ IFSharpImplFile
         IReturnTypeInfo
           FSharpTokenType+ColonTokenElement(type:COLON, text::)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IOtherType
-            INamedType
+          IUnsupportedTypeUsage
+            INamedTypeUsage
               ITypeReferenceName
                 ITypeParameterId
                   FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
@@ -26,7 +26,7 @@ IFSharpImplFile
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+ColonGreaterTokenElement(type:COLON_GREATER, text::>)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            INamedType
+            INamedTypeUsage
               ITypeReferenceName
                 FSharpIdentifierToken(type:IDENTIFIER, text:obj)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "

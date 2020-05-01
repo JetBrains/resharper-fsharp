@@ -10,8 +10,8 @@ IFSharpImplFile
         IReturnTypeInfo
           FSharpTokenType+ColonTokenElement(type:COLON, text::)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IOtherType
-            INamedType
+          IUnsupportedTypeUsage
+            INamedTypeUsage
               ITypeReferenceName
                 ITypeParameterId
                   FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')

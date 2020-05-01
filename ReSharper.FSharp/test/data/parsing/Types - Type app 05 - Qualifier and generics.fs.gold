@@ -16,7 +16,7 @@ IFSharpImplFile
               FSharpIdentifierToken(type:IDENTIFIER, text:A)
               IPrefixAppTypeArgumentList
                 FSharpTokenType+LessTokenElement(type:LESS, text:<)
-                IAnonType
+                IAnonTypeUsage
                   FSharpIdentifierToken(type:IDENTIFIER, text:_)
                 FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
             FSharpTokenType+DotTokenElement(type:DOT, text:.)

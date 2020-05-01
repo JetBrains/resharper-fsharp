@@ -19,14 +19,14 @@ IFSharpImplFile
             FSharpIdentifierToken(type:IDENTIFIER, text:List)
             IPrefixAppTypeArgumentList
               FSharpTokenType+LessTokenElement(type:LESS, text:<)
-              ITupleType
-                INamedType
+              ITupleTypeUsage
+                INamedTypeUsage
                   ITypeReferenceName
                     FSharpIdentifierToken(type:IDENTIFIER, text:int)
                 Whitespace(type:WHITE_SPACE, text: ) spaces:" "
                 FSharpTokenType+StarTokenElement(type:STAR, text:*)
                 Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                INamedType
+                INamedTypeUsage
                   ITypeReferenceName
                     FSharpIdentifierToken(type:IDENTIFIER, text:int)
               FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
