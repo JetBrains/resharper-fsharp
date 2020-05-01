@@ -6,7 +6,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.TextControl
 
-type IntroduceVarFix(expr: ISynExpr) =
+type IntroduceVarFix(expr: IFSharpExpression) =
     inherit FSharpQuickFixBase()
 
     new (warning: UnitTypeExpectedWarning) =

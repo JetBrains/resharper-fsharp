@@ -90,7 +90,7 @@
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="UnitTypeExpected">
-    <Parameter type="ISynExpr" name="expr"/>
+    <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
       <Argument>fcsMessage</Argument>
@@ -104,7 +104,7 @@
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="FunctionValueUnexpected">
-    <Parameter type="ISynExpr" name="expr"/>
+    <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
       <Argument>fcsMessage</Argument>
@@ -117,7 +117,7 @@
   </Warning>
   
   <Error staticGroup="FSharpErrors" name="UnitTypeExpected">
-    <Parameter type="ISynExpr" name="expr"/>
+    <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
       <Argument>fcsMessage</Argument>
@@ -277,7 +277,7 @@
   </Error>
 
   <Error staticGroup="FSharpErrors" name="NotAFunction">
-    <Parameter type="ISynExpr" name="expr"/>
+    <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="IPrefixAppExpr" name="prefixApp"/>
     <Message value="{0}">
       <Argument>if prefixApp.FunctionExpression == expr then "Unexpected argument" else "Unexpected arguments"</Argument>

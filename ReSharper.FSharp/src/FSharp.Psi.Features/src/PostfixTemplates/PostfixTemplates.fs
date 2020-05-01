@@ -64,7 +64,7 @@ type FSharpPostfixTemplatesProvider(templatesManager, sessionExecutor, usageStat
                 isNotNull identifier &&
  
                 let parent = identifier.Parent
-                (parent :? ISynExpr || parent :? IReferenceName) ->
+                (parent :? IFSharpExpression || parent :? IReferenceName) ->
             FSharpPostfixTemplateContext(identifier, executionContext)
 
         | _ -> null
@@ -74,7 +74,7 @@ type FSharpPostfixTemplatesProvider(templatesManager, sessionExecutor, usageStat
 type FSharpPostfixTemplateBehaviorBase(info) =
     inherit PostfixTemplateBehavior(info)
 
-    let rec getContainingArgExpr (expr: ISynExpr) =
+    let rec getContainingArgExpr (expr: IFSharpExpression) =
         match PrefixAppExprNavigator.GetByArgumentExpression(expr) with
         | null -> expr
         | appExpr -> getContainingArgExpr appExpr
@@ -95,7 +95,7 @@ type FSharpPostfixTemplateBehaviorBase(info) =
         null
 
     
-    let getParentExpression (token: IFSharpTreeNode): ISynExpr =
+    let getParentExpression (token: IFSharpTreeNode): IFSharpExpression =
         match token with
         | TokenType FSharpTokenType.RESERVED_LITERAL_FORMATS _ ->
             match token.Parent.As<IConstExpr>() with

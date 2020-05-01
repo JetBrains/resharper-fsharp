@@ -12,7 +12,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 
-let isPredefinedFunctionRef name (expr: ISynExpr) =
+let isPredefinedFunctionRef name (expr: IFSharpExpression) =
     let refExpr = expr.IgnoreInnerParens().As<IReferenceExpr>()
     if isNull refExpr then false else
 
@@ -31,7 +31,7 @@ let inline isPredefinedInfixOpApp name (binaryAppExpr: IBinaryAppExpr) =
     if isNull binaryAppExpr then false else
     isPredefinedFunctionRef name binaryAppExpr.Operator
 
-let inline isPredefinedFunctionApp name (expr: ISynExpr) (arg: outref<ISynExpr>) =
+let inline isPredefinedFunctionApp name (expr: IFSharpExpression) (arg: outref<IFSharpExpression>) =
     match expr with
     | :? IPrefixAppExpr as prefixApp when
             isPredefinedFunctionRef name prefixApp.FunctionExpression ->
@@ -52,7 +52,7 @@ let inline isPredefinedFunctionApp name (expr: ISynExpr) (arg: outref<ISynExpr>)
 
     | _ -> false
 
-let rec createLogicallyNegatedExpression (expr: ISynExpr): ISynExpr =
+let rec createLogicallyNegatedExpression (expr: IFSharpExpression): IFSharpExpression =
     if isNull expr then null else
 
     let expr = expr.IgnoreInnerParens()
@@ -65,7 +65,7 @@ let rec createLogicallyNegatedExpression (expr: ISynExpr): ISynExpr =
 
     let binaryApp = expr.As<IBinaryAppExpr>()
 
-    let replaceBinaryApp nameTo negateArgs: ISynExpr =
+    let replaceBinaryApp nameTo negateArgs: IFSharpExpression =
         let arg1 = binaryApp.LeftArgument
         let arg2 = binaryApp.RightArgument
 
@@ -101,7 +101,7 @@ let rec createLogicallyNegatedExpression (expr: ISynExpr): ISynExpr =
 
     factory.CreateAppExpr("not", expr) :> _
 
-let setBindingExpression (expr: ISynExpr) contextIndent (letBindings: #ILet) =
+let setBindingExpression (expr: IFSharpExpression) contextIndent (letBindings: #ILet) =
     let newExpr = letBindings.Bindings.[0].SetExpression(expr.Copy())
     if not expr.IsSingleLine then
         let indentSize = expr.GetIndentSize()

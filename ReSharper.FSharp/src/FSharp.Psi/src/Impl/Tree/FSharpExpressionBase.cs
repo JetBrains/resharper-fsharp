@@ -7,7 +7,7 @@ using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  public abstract class FSharpExpressionBase : FSharpCompositeElement, ISynExpr, IArgument
+  public abstract class FSharpExpressionBase : FSharpCompositeElement, IFSharpExpression, IArgument
   {
     public virtual ConstantValue ConstantValue => ConstantValue.BAD_VALUE;
     public virtual bool IsConstantValue() => false;
