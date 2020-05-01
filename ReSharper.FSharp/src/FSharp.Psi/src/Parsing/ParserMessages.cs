@@ -65,7 +65,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_TRY_LIKE_EXPR = "";
     public const string IDS_SET_EXPR = "";
     public const string IDS_CAST_EXPR = "";
-    public const string IDS_SYN_TYPE = "";
+    public const string IDS_TYPE_USAGE = "";
     public const string IDS_LET_OR_USE = "";
     public const string IDS_LET_OR_USE_BANG = "";
     public const string IDS_REFERENCE_NAME = "";

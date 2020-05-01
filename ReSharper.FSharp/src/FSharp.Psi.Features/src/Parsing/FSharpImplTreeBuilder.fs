@@ -524,7 +524,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
     member x.MarkOtherType(TypeRange range as typ) =
         let mark = x.Mark(range)
         x.ProcessType(typ)
-        x.Done(range, mark, ElementType.OTHER_TYPE)
+        x.Done(range, mark, ElementType.UNSUPPORTED_TYPE_USAGE)
 
     member x.SkipOuterAttrs(attrs: SynAttributeList list, outerRange: range) =
         match attrs with

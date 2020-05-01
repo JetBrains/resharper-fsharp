@@ -195,7 +195,7 @@ returnTypeInfo extras {
 }:
   COLON
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
-  synType<TYPE, ReturnType>;
+  typeUsage<TYPE, ReturnType>;
 
 interface synPat:
   namedPat |
@@ -274,7 +274,7 @@ interface arrayOrListPat:
 typedPat options { stubBase="SynPatternBase"; }:
   synPat<PATTERN, Pattern>
   COLON
-  synType<TYPE, Type>;
+  typeUsage<TYPE, Type>;
 
 attribPat options { stubBase="SynPatternBase"; } extras {
   get { methodName="Attributes" path=<attribPat:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
@@ -326,7 +326,7 @@ optionalValPat options { stubBase="SynPatternBase"; }:
 
 isInstPat options { stubBase="SynPatternBase"; }:
   COLON_QMARK
-  synType<SYN_TYPE, Type>;
+  typeUsage<SYN_TYPE, Type>;
 
 consPat options { stubBase="SynPatternBase"; }:
   synPat<PATTERN1, Pattern1>
@@ -520,7 +520,7 @@ literalExpr options { stubBase="FSharpExpressionBase"; }:
 typedExpr options { stubBase="FSharpExpressionBase"; }:
   fSharpExpression<EXPR, Expression>
   COLON
-  synType<TYPE, Type>;
+  typeUsage<TYPE, Type>;
 
 tupleExpr options { stubBase="FSharpExpressionBase"; }:
   (
@@ -750,17 +750,17 @@ whenExpr:
 typeTestExpr options { stubBase="FSharpExpressionBase"; }:
   fSharpExpression<EXPR, Expression>
   COLON_QMARK
-  synType<TYPE, TypeUsage>;
+  typeUsage<TYPE, TypeUsage>;
 
 upcastExpr options { stubBase="FSharpExpressionBase"; }:
   fSharpExpression<EXPR, Expression>
   COLON_GREATER<OP, OperatorToken>
-  synType<TYPE, TypeUsage>;
+  typeUsage<TYPE, TypeUsage>;
   
 downcastExpr options { stubBase="FSharpExpressionBase"; }:
   fSharpExpression<EXPR, Expression>
   COLON_QMARK_GREATER<OP, OperatorToken>
-  synType<TYPE, TypeUsage>;
+  typeUsage<TYPE, TypeUsage>;
 
 interface inferredCastExpr:
   inferredUpcastExpr |
@@ -939,7 +939,7 @@ recordFieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase
   MUTABLE<MUTABLE, MutableKeyword>?
   IDENTIFIER<IDENTIFIER, Identifier>
   COLON
-  synType<TYPE, Type>;
+  typeUsage<TYPE, Type>;
 
 
 
@@ -992,11 +992,11 @@ interface caseFieldDeclaration:
 
 unionCaseFieldDeclaration options { stubBase="UnionCaseFieldDeclarationBase"; }:
   IDENTIFIER<IDENTIFIER, Identifier>?
-  synType<TYPE, Type>;
+  typeUsage<TYPE, Type>;
 
 exceptionFieldDeclaration options { stubBase="UnionCaseFieldDeclarationBase"; }:
   IDENTIFIER<IDENTIFIER, Identifier>?
-  synType<TYPE, Type>;
+  typeUsage<TYPE, Type>;
 
 
 // Other members
@@ -1026,7 +1026,7 @@ typeAbbreviationDeclaration options { stubBase="FSharpTypeElementDeclarationBase
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
 
 abbreviatedTypeOrUnionCaseDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
-  synType<TYPE, AbbreviatedType>;
+  typeUsage<TYPE, AbbreviatedType>;
 
 moduleAbbreviation options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<moduleAbbreviation:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
@@ -1139,7 +1139,7 @@ delegateDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } ext
 delegateRepresentation:
   DELEGATE
   OF
-  synType<TYPE, Type>;
+  typeUsage<TYPE, Type>;
 
 interface fSharpTypeMemberDeclaration:
   constructorDeclaration |
@@ -1469,16 +1469,16 @@ interface typeArgumentList:
 
 postfixAppTypeArgumentList:
   (
-    synType<TYPE, Types>
+    typeUsage<TYPE, Types>
   |
     LPAREN
-    LIST synType<TYPE, Types> SEP COMMA<FSHARP_COMMA, Commas>
+    LIST typeUsage<TYPE, Types> SEP COMMA<FSHARP_COMMA, Commas>
     RPAREN
  );
 
 prefixAppTypeArgumentList:
   LESS<LESS,LAngle>
-  LIST synType<TYPE, Types> SEP COMMA<FSHARP_COMMA, Commas>
+  LIST typeUsage<TYPE, Types> SEP COMMA<FSHARP_COMMA, Commas>
   GREATER<GREATER,RAngle>;
 
 
@@ -1509,27 +1509,27 @@ typeReferenceName options { stubBase="TypeReferenceOwnerBase"; }:
   );
 
 
-interface synType:
-  namedType |
-  tupleType |
-  anonRecordType |
-  arrayType |
-  funType |
-  anonType |
-  otherType;
+interface typeUsage:
+  namedTypeUsage |
+  tupleTypeUsage |
+  anonRecordTypeUsage |
+  arrayTypeUsage |
+  functionTypeUsage |
+  anonTypeUsage |
+  unsupportedTypeUsage;
 
 
-namedType:
+namedTypeUsage:
   typeReferenceName<TYPE_REFERENCE, ReferenceName>;
 
-tupleType:
-  synType<ITEM, Items>
+tupleTypeUsage:
+  typeUsage<ITEM, Items>
   (
     STAR
-    synType<ITEM, Items>
+    typeUsage<ITEM, Items>
   )*;
 
-anonRecordType:
+anonRecordTypeUsage:
   LBRACE_BAR
   anonRecordField<FIELD, Fields>*
   BAR_RBRACE;
@@ -1537,20 +1537,20 @@ anonRecordType:
 anonRecordField:
   expressionReferenceName<REFERENCE_NAME, ReferenceName>
   COLON
-  synType<TYPE, Type>;
+  typeUsage<TYPE, Type>;
 
-arrayType:
-  synType<TYPE, Type>
+arrayTypeUsage:
+  typeUsage<TYPE, Type>
   LBRACK
   RBRACK;
 
-funType:
-  synType
+functionTypeUsage:
+  typeUsage
   RARROW
-  synType;
+  typeUsage;
 
-anonType:
+anonTypeUsage:
   UNDERSCORE;
 
-otherType:
+unsupportedTypeUsage:
   fakeSeparator;
