@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
@@ -25,6 +26,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       myProcessModel = processModel;
       myContext = context;
       myCache = cache;
+
+      myGetMethod = new Lazy<ProvidedMethodInfo>(() =>
+        ProxyProvidedMethodInfoWithCache.Create(RdProvidedPropertyInfoProcessModel.GetGetMethod.Sync(EntityId),
+          myProcessModel, myContext, myCache));
+
+      mySetMethod = new Lazy<ProvidedMethodInfo>(() =>
+        ProxyProvidedMethodInfoWithCache.Create(RdProvidedPropertyInfoProcessModel.GetSetMethod.Sync(EntityId),
+          myProcessModel, myContext, myCache));
+
+      myIndexParameters = new Lazy<ProvidedParameterInfo[]>(() => // ReSharper disable once CoVariantArrayConversion
+        RdProvidedPropertyInfoProcessModel.GetIndexParameters
+          .Sync(EntityId)
+          .Select(t => ProxyProvidedParameterInfoWithCache.Create(t, myProcessModel, myContext, myCache))
+          .ToArray());
     }
 
     [ContractAnnotation("propertyInfo:null => null")]
@@ -37,26 +52,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override bool CanWrite => myPropertyInfo.CanWrite;
 
     public override ProvidedType DeclaringType =>
-      myCache.GetOrCreateWithContext(RdProvidedPropertyInfoProcessModel.DeclaringType.Sync(EntityId),
+      myCache.GetOrCreateWithContext(
+        myDeclaringTypeId ??= RdProvidedPropertyInfoProcessModel.DeclaringType.Sync(EntityId),
         myContext);
 
     public override ProvidedType PropertyType =>
-      myCache.GetOrCreateWithContext(RdProvidedPropertyInfoProcessModel.PropertyType.Sync(EntityId),
+      myCache.GetOrCreateWithContext(
+        myPropertyTypeId ??= RdProvidedPropertyInfoProcessModel.PropertyType.Sync(EntityId),
         myContext);
 
-    public override ProvidedMethodInfo GetGetMethod() =>
-      ProxyProvidedMethodInfoWithCache.Create(RdProvidedPropertyInfoProcessModel.GetGetMethod.Sync(EntityId), myProcessModel,
-        myContext, myCache);
+    public override ProvidedMethodInfo GetGetMethod() => myGetMethod.Value;
 
-    public override ProvidedMethodInfo GetSetMethod() =>
-      ProxyProvidedMethodInfoWithCache.Create(RdProvidedPropertyInfoProcessModel.GetSetMethod.Sync(EntityId), myProcessModel,
-        myContext, myCache);
+    public override ProvidedMethodInfo GetSetMethod() => mySetMethod.Value;
 
-    public override ProvidedParameterInfo[] GetIndexParameters() =>
-      // ReSharper disable once CoVariantArrayConversion
-      RdProvidedPropertyInfoProcessModel.GetIndexParameters
-        .Sync(EntityId)
-        .Select(t => ProxyProvidedParameterInfoWithCache.Create(t, myProcessModel, myContext, myCache))
-        .ToArray();
+    public override ProvidedParameterInfo[] GetIndexParameters() => myIndexParameters.Value;
+
+    private int? myDeclaringTypeId;
+    private int? myPropertyTypeId;
+    private readonly Lazy<ProvidedMethodInfo> myGetMethod;
+    private readonly Lazy<ProvidedMethodInfo> mySetMethod;
+    private readonly Lazy<ProvidedParameterInfo[]> myIndexParameters;
   }
 }

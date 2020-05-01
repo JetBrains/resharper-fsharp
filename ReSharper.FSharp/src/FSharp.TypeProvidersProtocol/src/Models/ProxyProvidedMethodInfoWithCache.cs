@@ -2,6 +2,7 @@
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
 using Microsoft.FSharp.Core.CompilerServices;
 using static FSharp.Compiler.ExtensionTyping;
@@ -32,6 +33,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
       myParameters = new Lazy<ProvidedParameterInfo[]>(() => // ReSharper disable once CoVariantArrayConversion
         RdProvidedMethodInfoProcessModel.GetParameters
+          .Sync(EntityId)
+          .Select(t => ProxyProvidedParameterInfoWithCache.Create(t, myProcessModel, myContext, myCache))
+          .ToArray());
+
+      myStaticParameters = new Lazy<ProvidedParameterInfo[]>(() => // ReSharper disable once CoVariantArrayConversion
+        RdProvidedMethodInfoProcessModel.GetStaticParametersForMethod
           .Sync(EntityId)
           .Select(t => ProxyProvidedParameterInfoWithCache.Create(t, myProcessModel, myContext, myCache))
           .ToArray());
@@ -71,10 +78,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       myCache.GetOrCreateWithContext(
         myReturnTypeId ??= RdProvidedMethodInfoProcessModel.ReturnType.Sync(EntityId), myContext);
 
-    public override ProvidedParameterInfo[] GetStaticParametersForMethod(ITypeProvider provider)
-    {
-      return base.GetStaticParametersForMethod(provider);
-    }
+    public override ProvidedParameterInfo[] GetStaticParametersForMethod(ITypeProvider provider) =>
+      myStaticParameters.Value;
+
+    public override ProvidedMethodBase ApplyStaticArgumentsForMethod(ITypeProvider provider,
+      string fullNameAfterArguments,
+      object[] staticArgs) =>
+      Create(
+        RdProvidedMethodInfoProcessModel.ApplyStaticArgumentsForMethod.Sync(
+          new ApplyStaticArgumentsForMethodArgs(EntityId, fullNameAfterArguments,
+            staticArgs.Select(t => t.BoxToServerStaticArg()).ToArray())), myProcessModel, myContext, myCache);
 
     public override ProvidedParameterInfo[] GetParameters() => myParameters.Value;
     public override ProvidedType[] GetGenericArguments() => myGenericArguments.Value;
@@ -82,6 +95,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     private int? myDeclaringTypeId;
     private int? myReturnTypeId;
     private readonly Lazy<ProvidedParameterInfo[]> myParameters;
+    private readonly Lazy<ProvidedParameterInfo[]> myStaticParameters;
     private readonly Lazy<ProvidedType[]> myGenericArguments;
   }
 }

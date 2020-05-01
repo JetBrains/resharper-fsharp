@@ -12,6 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     private readonly ProvidedTypeContext myContext;
     private readonly RdFSharpTypeProvidersLoaderModel myProcessModel;
     private readonly ITypeProviderCache myCache;
+    
     public int EntityId => myVar.EntityId;
     private RdProvidedVarProcessModel RdProvidedVarProcessModel => myProcessModel.RdProvidedVarProcessModel;
 
@@ -35,6 +36,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
     public override ProvidedType Type =>
       myCache.GetOrCreateWithContext(myTypeId ??= RdProvidedVarProcessModel.Type.Sync(EntityId), myContext);
+
+    //TODO: reduce allocations count
+    public override bool Equals(object obj) => obj switch
+    {
+      ProvidedVar y => Type.FullName + Name == y.Type.FullName + y.Name,
+      _ => false
+    };
+
+    public override int GetHashCode() => (Type.FullName + Name).GetHashCode();
 
     private int? myTypeId;
   }

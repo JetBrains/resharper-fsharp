@@ -38,7 +38,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override bool IsIn => myParameterInfo.IsIn;
     public override bool IsOptional => myParameterInfo.IsOptional;
     public override bool IsOut => myParameterInfo.IsOut;
-    public override object RawDefaultValue => myParameterInfo.RawDefaultValue.Unbox(); //TODO: cache
+    public override object RawDefaultValue => myParameterInfo.RawDefaultValue.Unbox(); //TODO: cache?
     public override bool HasDefaultValue => myParameterInfo.HasDefaultValue;
 
     public override ProvidedType ParameterType =>

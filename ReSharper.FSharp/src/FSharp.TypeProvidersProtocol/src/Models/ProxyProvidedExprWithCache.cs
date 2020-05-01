@@ -26,6 +26,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       myProcessModel = processModel;
       myContext = context;
       myCache = cache;
+
+      myExprType = new Lazy<FSharpOption<ProvidedExprType>>(GetExprTypeInternal);
     }
 
     [ContractAnnotation("expr:null => null")]
@@ -38,8 +40,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override ProvidedType Type =>
       myCache.GetOrCreateWithContext(myTypeId ??= RdProvidedExprProcessModel.Type.Sync(EntityId), myContext);
 
+    public override FSharpOption<ProvidedExprType> GetExprType() => myExprType.Value;
 
-    public override FSharpOption<ProvidedExprType> GetExprType()
+    private FSharpOption<ProvidedExprType> GetExprTypeInternal()
     {
       var data = RdProvidedExprProcessModel.GetExprType.Sync(EntityId);
 
@@ -244,5 +247,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     }
 
     private int? myTypeId;
+    private readonly Lazy<FSharpOption<ProvidedExprType>> myExprType;
   }
 }

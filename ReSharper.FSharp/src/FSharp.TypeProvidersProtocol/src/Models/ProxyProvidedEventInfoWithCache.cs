@@ -20,7 +20,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       myProcessModel.RdProvidedEventInfoProcessModel;
 
     public ProxyProvidedEventInfoWithCache(RdProvidedEventInfo eventInfo, RdFSharpTypeProvidersLoaderModel processModel,
-      ProvidedTypeContext context, ITypeProviderCache cache) : base(typeof(ProxyTypeProviderWithCache).GetEvents().First(), context)
+      ProvidedTypeContext context, ITypeProviderCache cache) : base(
+      typeof(ProxyTypeProviderWithCache).GetEvents().First(), context)
     {
       myEventInfo = eventInfo;
       myProcessModel = processModel;
@@ -30,6 +31,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       myAddMethod = new Lazy<ProvidedMethodInfo>(() =>
         ProxyProvidedMethodInfoWithCache.Create(RdProvidedEventInfoProcessModel.GetAddMethod.Sync(EntityId),
           myProcessModel, context, cache));
+
       myRemoveMethod = new Lazy<ProvidedMethodInfo>(() =>
         ProxyProvidedMethodInfoWithCache.Create(RdProvidedEventInfoProcessModel.GetRemoveMethod.Sync(EntityId),
           myProcessModel, context, cache));

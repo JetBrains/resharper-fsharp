@@ -78,8 +78,8 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         }, RdProvidedType)
         call("GetInvokerExpression", structdef("GetInvokerExpressionArgs") {
             field("TypeProviderId", int)
-            field("ProvidedMethodBaseId", int)
             field("IsConstructor", bool)
+            field("ProvidedMethodBaseId", int)
             field("ProvidedVarParamExprIds", array(int)) //with constructor
         }, RdProvidedExpr)
         call("Dispose", int, void)
@@ -193,6 +193,10 @@ object RdFSharpTypeProvidersLoaderModel : Root(
             field("Id", int)
             field("Rank", int)
         }, int)
+        call("MakeGenericType", structdef("MakeGenericTypeArgs") {
+            field("EntityId", int)
+            field("ArgIds", array(int))
+        }, int)
         call("GetFields", int, array(RdProvidedFieldInfo))
         call("GetEvents", int, array(RdProvidedEventInfo))
         call("GetConstructors", int, array(RdProvidedConstructorInfo))
@@ -202,11 +206,19 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         }, RdProvidedVar)
     }
 
+    private val ApplyStaticArgumentsForMethodArgs = structdef("ApplyStaticArgumentsForMethodArgs") {
+        field("EntityId", int)
+        field("FullNameAfterArguments", string)
+        field("StaticArgs", array(RdStaticArg))
+    }
+
     private val RdProvidedMethodInfoProcessModel = aggregatedef("RdProvidedMethodInfoProcessModel") {
         call("DeclaringType", int, int.nullable)
         call("ReturnType", int, int)
         call("GetParameters", int, array(RdProvidedParameterInfo))
         call("GetGenericArguments", int, array(int))
+        call("GetStaticParametersForMethod", int, array(RdProvidedParameterInfo))
+        call("ApplyStaticArgumentsForMethod", ApplyStaticArgumentsForMethodArgs, RdProvidedMethodInfo)
     }
 
     private val RdProvidedConstructorInfoProcessModel = aggregatedef("RdProvidedConstructorInfoProcessModel") {
@@ -214,6 +226,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         call("GetParameters", int, array(RdProvidedParameterInfo))
         call("GetGenericArguments", int, array(int))
         call("GetStaticParametersForMethod", int, array(RdProvidedParameterInfo))
+        call("ApplyStaticArgumentsForMethod", ApplyStaticArgumentsForMethodArgs, RdProvidedConstructorInfo)
     }
 
     private val RdProvidedPropertyInfoProcessModel = aggregatedef("RdProvidedPropertyInfoProcessModel") {

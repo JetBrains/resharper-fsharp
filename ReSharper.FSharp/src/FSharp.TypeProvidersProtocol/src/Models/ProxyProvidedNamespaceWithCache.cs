@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache;
-using JetBrains.ReSharper.Psi.Impl.CodeStyle;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
-using JetBrains.Util;
 using Microsoft.FSharp.Core.CompilerServices;
 using static FSharp.Compiler.ExtensionTyping;
 
@@ -33,7 +30,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
         .Select(t => new ProxyProvidedNamespaceWithCache(t, myProcessModel, cache))
         .ToArray());
 
-      //TODO: подумать о том, что дешевле -- постоянные аллокации ToArray или простоянно хранить массив типов
       myProvidedTypes = new Lazy<ProvidedType[]>(() => RdProvidedNamespaceProcessModel.GetTypes
         .Sync(EntityId)
         .Select(t => cache.GetOrCreateWithContext(t, ProvidedTypeContext.Empty))
@@ -47,10 +43,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public Type[] GetTypes() =>
       throw new Exception("GetTypes should be unreachable");
 
-    public ProvidedType[] GetProvidedTypes() => myProvidedTypes.Value;
-
     public Type ResolveTypeName(string typeName) =>
       throw new Exception("ResolveTypeName should be unreachable");
+
+    public ProvidedType[] GetProvidedTypes() => myProvidedTypes.Value;
 
     public ProvidedType ResolveProvidedTypeName(string typeName) =>
       myProvidedTypes.Value.FirstOrDefault(t => t.Name == typeName);

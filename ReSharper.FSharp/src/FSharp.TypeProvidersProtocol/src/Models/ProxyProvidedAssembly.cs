@@ -24,6 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       myProcessModel = processModel;
 
       myAssemblyName = new Lazy<AssemblyName>(() => ConvertFrom(RdProvidedAssemblyProcessModel.GetName.Sync(EntityId)));
+      manifestModuleContent = new Lazy<byte[]>(() => RdProvidedAssemblyProcessModel.GetManifestModuleContents.Sync(EntityId));
     }
 
     public static ProxyProvidedAssembly CreateWithContext(RdProvidedAssembly assembly,
@@ -34,8 +35,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
     public override AssemblyName GetName() => myAssemblyName.Value;
 
-    public override byte[] GetManifestModuleContents(ITypeProvider provider) =>
-      RdProvidedAssemblyProcessModel.GetManifestModuleContents.Sync(EntityId);
+    public override byte[] GetManifestModuleContents(ITypeProvider provider) => manifestModuleContent.Value;
 
     private static AssemblyName ConvertFrom(RdAssemblyName rdAssemblyName)
     {
@@ -54,5 +54,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     }
 
     private readonly Lazy<AssemblyName> myAssemblyName;
+    private readonly Lazy<byte[]> manifestModuleContent;
   }
 }

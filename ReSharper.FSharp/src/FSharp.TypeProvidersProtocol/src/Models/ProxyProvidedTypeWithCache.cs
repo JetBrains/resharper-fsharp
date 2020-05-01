@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
@@ -92,6 +93,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       myDeclaringTypeId = new Lazy<int?>(() => RdProvidedTypeProcessModel.DeclaringType.Sync(EntityId));
 
       myTypeAsVarsCache = new Dictionary<string, ProvidedVar>();
+      myGeneratedTypesCache = new Dictionary<string, ProvidedType>();
     }
 
     [ContractAnnotation("type:null => null")]
@@ -136,7 +138,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override ProvidedType GetNestedType(string nm) =>
       myAllNestedTypes.Value.FirstOrDefault(t => t.Name == nm);
 
-    public override ProvidedType[] GetNestedTypes() => myAllNestedTypes.Value.Where(t => t.IsPublic).ToArray();
+    //TODO: hide non public
+    public override ProvidedType[] GetNestedTypes() => myAllNestedTypes.Value;
 
     public override ProvidedType[] GetAllNestedTypes() => myAllNestedTypes.Value;
 
@@ -164,14 +167,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
     public override ProvidedParameterInfo[] GetStaticParameters(ITypeProvider provider) => myStaticParameters.Value;
 
+    //TODO: use cache with lifetime invalidation
     public override ProvidedType ApplyStaticArguments(ITypeProvider provider, string[] fullTypePathAfterArguments,
       object[] staticArgs)
     {
-      var staticArgDescriptions = staticArgs.Select(t => t.BoxToServerStaticArg()).ToArray();
+      var key = string.Concat(fullTypePathAfterArguments);
+      if (!myGeneratedTypesCache.TryGetValue(key, out var type))
+      {
+        var staticArgDescriptions = staticArgs.Select(t => t.BoxToServerStaticArg()).ToArray();
 
-      return myCache.GetOrCreateWithContext(
-        RdProvidedTypeProcessModel.ApplyStaticArguments.Sync(
-          new ApplyStaticArgumentsParameters(EntityId, fullTypePathAfterArguments, staticArgDescriptions)), Context);
+        type = myCache.GetOrCreateWithContext(
+          RdProvidedTypeProcessModel.ApplyStaticArguments.Sync(
+            new ApplyStaticArgumentsParameters(EntityId, fullTypePathAfterArguments, staticArgDescriptions)), Context);
+        myGeneratedTypesCache.Add(key, type);
+      }
+
+      return type;
     }
 
     public override ProvidedType[] GetInterfaces() => myInterfaces.Value;
@@ -188,9 +199,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
         RdProvidedTypeProcessModel.MakeArrayType.Sync(new MakeArrayTypeArgs(EntityId, rank)),
         Context);
 
-    //TODO: Implement
-    public override ProvidedType MakeGenericType(ProvidedType[] args) =>
-      throw new NotImplementedException("ProvidedType.MakeGenericType is not implemented");
+    public override ProvidedType MakeGenericType(ProvidedType[] args)
+    {
+      var proxyProvidedTypes = args.Select(t => t as IRdProvidedEntity);
+      Assertion.Assert(args.All(t => t != null), "ProvidedType must be ProxyProvidedType");
+      // ReSharper disable once PossibleNullReferenceException
+      var argIds = proxyProvidedTypes.Select(t => t.EntityId).ToArray();
+      return myCache.GetOrCreateWithContext(
+        RdProvidedTypeProcessModel.MakeGenericType.Sync(new MakeGenericTypeArgs(EntityId, argIds)),
+        Context);
+    }
 
     public override ProvidedType MakePointerType() =>
       myCache.GetOrCreateWithContext(
@@ -252,5 +270,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     private readonly Lazy<ProvidedEventInfo[]> myEvents;
     private readonly Lazy<ProvidedConstructorInfo[]> myConstructors;
     private readonly Dictionary<string, ProvidedVar> myTypeAsVarsCache;
+    private readonly Dictionary<string, ProvidedType> myGeneratedTypesCache;
   }
 }

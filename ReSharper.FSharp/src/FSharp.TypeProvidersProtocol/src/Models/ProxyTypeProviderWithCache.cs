@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Remoting.Contexts;
 using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache;
@@ -56,6 +55,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public byte[] GetGeneratedAssemblyContents(Assembly assembly) =>
       throw new Exception("GetGeneratedAssemblyContents should be unreachable");
 
+    public ParameterInfo[] GetStaticParametersForMethod(MethodBase methodWithoutArguments) =>
+      throw new Exception("GetStaticParametersForMethod should be unreachable");
+
+    public MethodBase ApplyStaticArgumentsForMethod(MethodBase methodWithoutArguments, string methodNameWithArguments,
+      object[] staticArguments) =>
+      throw new Exception("ApplyStaticArgumentsForMethod should be unreachable");
+
     //TODO: Move to ProvidedMethodBase
     public ProvidedExpr GetInvokerExpression(ProvidedMethodBase methodBase, ProvidedVar[] paramExprs)
     {
@@ -69,7 +75,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       var providedVarParamExprIds = providedVarParamExprs.Select(x => x.EntityId).ToArray();
 
       return ProxyProvidedExprWithCache.Create(RdTypeProviderProcessModel.GetInvokerExpression.Sync(
-          new GetInvokerExpressionArgs(EntityId, providedMethodBaseId, methodBase is ProvidedConstructorInfo,
+          new GetInvokerExpressionArgs(EntityId, methodBase is ProvidedConstructorInfo, providedMethodBaseId,
             providedVarParamExprIds)),
         myProcessModel, ProvidedTypeContext.Empty, myCache); //TODO: non empty context
     }

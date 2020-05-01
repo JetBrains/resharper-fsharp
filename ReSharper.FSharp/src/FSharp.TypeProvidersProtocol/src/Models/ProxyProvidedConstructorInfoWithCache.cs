@@ -2,6 +2,7 @@
 using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
 using Microsoft.FSharp.Core.CompilerServices;
 using static FSharp.Compiler.ExtensionTyping;
@@ -54,7 +55,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public static ProxyProvidedConstructorInfoWithCache Create(
       RdProvidedConstructorInfo constructorInfo,
       RdFSharpTypeProvidersLoaderModel processModel, ProvidedTypeContext context, ITypeProviderCache cache) =>
-      constructorInfo == null ? null : new ProxyProvidedConstructorInfoWithCache(constructorInfo, processModel, context, cache);
+      constructorInfo == null
+        ? null
+        : new ProxyProvidedConstructorInfoWithCache(constructorInfo, processModel, context, cache);
 
     public override string Name => myConstructorInfo.Name;
     public override bool IsAbstract => myConstructorInfo.IsAbstract;
@@ -71,6 +74,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
     public override ProvidedParameterInfo[] GetStaticParametersForMethod(ITypeProvider provider) =>
       myStaticParameters.Value;
+
+    public override ProvidedMethodBase ApplyStaticArgumentsForMethod(ITypeProvider provider,
+      string fullNameAfterArguments,
+      object[] staticArgs) =>
+      Create(
+        RdProvidedConstructorInfoProcessModel.ApplyStaticArgumentsForMethod.Sync(
+          new ApplyStaticArgumentsForMethodArgs(EntityId, fullNameAfterArguments,
+            staticArgs.Select(t => t.BoxToServerStaticArg()).ToArray())), myProcessModel, myContext, myCache);
 
     public override ProvidedType DeclaringType =>
       myCache.GetOrCreateWithContext(

@@ -27,7 +27,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
     private readonly IProvidedRdModelsCreator<ProvidedEventInfo, RdProvidedEventInfo> myProvidedEventInfosCreator;
     private readonly IProvidedRdModelsCreator<ProvidedAssembly, RdProvidedAssembly> myProvidedAssembliesCreator;
     private readonly IProvidedRdModelsCreator<ProvidedVar, RdProvidedVar> myProvidedVarsCreator;
-    private readonly IProvidedRdModelsCreator<ProvidedConstructorInfo, RdProvidedConstructorInfo> myProvidedConstructorInfosCreator;
+
+    private readonly IProvidedRdModelsCreator<ProvidedConstructorInfo, RdProvidedConstructorInfo>
+      myProvidedConstructorInfosCreator;
 
     private readonly IReadProvidedCache<Tuple<ProvidedType, RdProvidedType, int>> myProvidedTypesCache;
     private readonly IReadProvidedCache<ITypeProvider> myTypeProvidersCache;
@@ -83,9 +85,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       processModel.GetEvents.Set(GetEvents);
       processModel.GetConstructors.Set(GetConstructors);
       processModel.Fresh.Set(Fresh);
+      processModel.MakeGenericType.Set(MakeGenericType);
     }
 
-    //TODO: Remove
+    private RdTask<int> MakeGenericType(Lifetime lifetime, MakeGenericTypeArgs args)
+    {
+      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(args.EntityId);
+      var providedArgs = args.ArgIds.Select(id => myProvidedTypesCache.Get(id).Item1).ToArray();
+      var genericType = myProvidedTypesCreator.CreateRdModel(providedType.MakeGenericType(providedArgs), typeProviderId)
+        .EntityId;
+      return RdTask<int>.Successful(genericType);
+    }
+
     private RdTask<RdProvidedVar> Fresh(Lifetime lifetime, FreshArgs args)
     {
       var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(args.EntityId);

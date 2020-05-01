@@ -102,7 +102,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
         new ProvidedPropertyInfoHostFactory(providedParameterInfoRdModelsCreator, providedTypeRdModelsCreator,
           providedMethodInfoRdModelsCreator, providedPropertyInfosCache);
       ProvidedMethodInfosHostFactory = new ProvidedMethodInfosHostFactory(providedTypeRdModelsCreator,
-        providedParameterInfoRdModelsCreator, providedMethodInfosCache);
+        providedParameterInfoRdModelsCreator, providedMethodInfoRdModelsCreator, typeProvidersCache,
+        providedMethodInfosCache);
       ProvidedParameterInfosHostFactory =
         new ProvidedParameterInfosHostFactory(providedTypeRdModelsCreator, providedParameterInfosCache);
       ProvidedAssemblyHostFactory = new ProvidedAssemblyHostFactory(providedAssembliesCache, typeProvidersCache);
