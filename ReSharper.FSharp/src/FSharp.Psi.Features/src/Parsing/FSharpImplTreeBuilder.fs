@@ -930,9 +930,11 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             x.MarkAndDone(range, ElementType.LIBRARY_ONLY_EXPR)
 
         | SynExpr.ArbitraryAfterError _
-        | SynExpr.FromParseError _
         | SynExpr.DiscardAfterMissingQualificationAfterDot _ ->
             x.MarkAndDone(range, ElementType.FROM_ERROR_EXPR)
+
+        | SynExpr.FromParseError(expr, _) ->
+            x.PushRangeAndProcessExpression(expr, range, ElementType.FROM_ERROR_EXPR)
 
         | SynExpr.Fixed(expr, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.FIXED_EXPR)

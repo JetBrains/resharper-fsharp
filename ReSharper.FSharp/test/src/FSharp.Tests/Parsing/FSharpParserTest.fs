@@ -351,3 +351,6 @@ type FSharpErrorsParserTest() =
     [<Test>] member x.``Expr - CompExpr - Range 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - CompExpr - Range 02 - Step``() = x.DoNamedTest()
     [<Test>] member x.``Expr - CompExpr - Range 03``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - If 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - If 02``() = x.DoNamedTest()
