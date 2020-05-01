@@ -24,3 +24,5 @@ type GenerateMissingRecordFieldsTest() =
 
     [<Test>] member x.``Multiline 01``() = x.DoNamedTest()
     [<Test>] member x.``Multiline 02``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Empty function``() = x.DoNamedTest()

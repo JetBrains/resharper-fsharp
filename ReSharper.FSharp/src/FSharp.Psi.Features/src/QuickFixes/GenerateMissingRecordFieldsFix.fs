@@ -8,6 +8,7 @@ open JetBrains.ReSharper.Feature.Services.LiveTemplates.LiveTemplates
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Templates
 open JetBrains.ReSharper.Feature.Services.QuickFixes
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -31,6 +32,15 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
             | null -> failwith "Could not get expr"
             | expr -> ModificationUtil.AddChildAfter(expr, FSharpTokenType.SEMICOLON.CreateLeafElement()) |> ignore
 
+    let getReturnType (recordExpr : IRecordExpr) =
+        match recordExpr.SelfAndPathToRoot() |> Seq.tryPick(fun x -> x.As<ITopBinding>() |> Option.ofObj) with
+        | None -> failwith "Could not get top binding reference"
+        | Some topBinding ->
+        match topBinding.DeclaredElement.As<IFSharpMember>() with
+        | null -> failwith "Expected IFSharpMember"
+        | fsharpMember ->
+        fsharpMember.Mfv.ReturnParameter.Type
+    
     new (error: FieldRequiresAssignmentError) =
         GenerateMissingRecordFieldsFix(error.Expr)
 
@@ -46,15 +56,26 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
         match recordExpr.Reference with
         | null -> failwith "Could not get reference"
         | reference ->
-
-        let declaredElement = reference.Resolve().DeclaredElement
-        isNotNull declaredElement
+        
+        let declaredElement = match reference.Resolve() with | null -> null | symbolRef -> symbolRef.DeclaredElement
+        isNotNull declaredElement || (getReturnType recordExpr).HasTypeDefinition
 
     override x.ExecutePsiTransaction(solution, _) =
-        let typeElement = recordExpr.Reference.Resolve().DeclaredElement :?> ITypeElement
-        Assertion.Assert(typeElement.IsRecord(), "Expecting record type")
+        let typeElement =
+            match recordExpr.Reference.Resolve() with
+            | null -> null
+            | symbolRef -> symbolRef.DeclaredElement :?> ITypeElement
+        
+        let fieldNames =     
+            if isNull typeElement then
+                // If the ITypeElement isn't resolvable (as is the case with functions), then get the field names from the FCS.
+                let returnType = getReturnType recordExpr
+                Assertion.Assert(returnType.TypeDefinition.IsFSharpRecord, "Expecting record type")
+                returnType.TypeDefinition.FSharpFields |> Seq.map(fun x -> x.Name)
+            else
+                Assertion.Assert(typeElement.IsRecord(), "Expecting record type")
+                typeElement.GetRecordFieldNames() :> seq<string>
 
-        let fieldNames = typeElement.GetRecordFieldNames()
         let existingBindings = recordExpr.ExprBindings
 
         let fieldsToAdd = HashSet(fieldNames)
@@ -91,7 +112,7 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
         let isSingleLine = recordExpr.IsSingleLine
 
         let generateSingleLine =
-            existingBindings.Count > 1 && fieldNames.Count <= 4 && isSingleLine
+            existingBindings.Count > 1 && fieldNames |> Seq.length <= 4 && isSingleLine
 
         if isSingleLine && not generateSingleLine && existingBindings.Count > 0 then
             ToMultilineRecord.Execute(recordExpr)
