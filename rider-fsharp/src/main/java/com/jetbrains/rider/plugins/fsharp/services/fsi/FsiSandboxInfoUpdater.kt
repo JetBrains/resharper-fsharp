@@ -35,7 +35,6 @@ class FsiSandboxInfoUpdater(
 
     private var verifiedCommandNumber = 0
     private val preparedCommands = mutableListOf<String>()
-    private var lastPreparedCommandIndex: Int? = null
     private val correctCommandNumbers = mutableListOf<Int>()
 
     private fun updateSandboxInfo() {
@@ -43,11 +42,8 @@ class FsiSandboxInfoUpdater(
             val sandboxManager = SandboxManager.getInstance()
             if (sandboxManager.getSandboxInfo(consoleEditor) == null) return@invokeLater
 
-            var startUnpreparedCommandIndex = 0
+            val startUnpreparedCommandIndex = preparedCommands.size
             val endUnpreparedCommandIndex = correctCommandNumbers.size
-            if (lastPreparedCommandIndex != null) {
-                startUnpreparedCommandIndex = lastPreparedCommandIndex!! + 1
-            }
 
             val unpreparedCommands = mutableListOf<String>()
             for (i in correctCommandNumbers.subList(startUnpreparedCommandIndex, endUnpreparedCommandIndex)) {
@@ -65,7 +61,6 @@ class FsiSandboxInfoUpdater(
 
                 result.onSuccess {preparedAdditionalCommands ->
                     preparedCommands.addAll(preparedAdditionalCommands)
-                    lastPreparedCommandIndex = preparedCommands.size - 1
 
                     val sandboxInfo = genericFSharpSandboxInfoWithCustomParams(
                             preparedCommands.joinToString(separator= "").replace("\r\n", "\n"),
