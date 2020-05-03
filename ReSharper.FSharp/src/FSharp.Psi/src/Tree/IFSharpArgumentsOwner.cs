@@ -5,6 +5,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 {
   public interface IFSharpArgumentsOwner : IArgumentsOwner, IFSharpReferenceOwner
   {
-    IList<ISynExpr> AppliedExpressions { get; }
+    IList<IFSharpExpression> AppliedExpressions { get; }
   }
 }

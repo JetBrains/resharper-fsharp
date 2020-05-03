@@ -33,6 +33,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       }
     }
 
-    public IList<ISynExpr> AppliedExpressions => new List<ISynExpr> {ArgExpression.Expression};
+    public IList<IFSharpExpression> AppliedExpressions => new List<IFSharpExpression> {ArgExpression.Expression};
   }
 }

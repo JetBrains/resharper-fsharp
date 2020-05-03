@@ -61,11 +61,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       }
     }
 
-    public IList<ISynExpr> AppliedExpressions
+    public IList<IFSharpExpression> AppliedExpressions
     {
       get
       {
-        var args = new List<ISynExpr>();
+        var args = new List<IFSharpExpression>();
         var funExpr = (IPrefixAppExpr) this;
         while (funExpr.FunctionExpression.IgnoreInnerParens() is IPrefixAppExpr appExpr)
         {

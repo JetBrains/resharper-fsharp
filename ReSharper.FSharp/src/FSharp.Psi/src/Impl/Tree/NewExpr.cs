@@ -46,6 +46,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override ReferenceCollection GetFirstClassReferences() =>
       new ReferenceCollection(Reference);
 
-    public IList<ISynExpr> AppliedExpressions => new List<ISynExpr> {ArgumentExpression};
+    public IList<IFSharpExpression> AppliedExpressions => new List<IFSharpExpression> {ArgumentExpression};
   }
 }
