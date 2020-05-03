@@ -9,7 +9,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 
-let deindentsBody (expr: ISynExpr) =
+let deindentsBody (expr: IFSharpExpression) =
     match expr with
     | :? IMatchClauseListOwner as matchExpr ->
         if expr.IsSingleLine then false else
@@ -31,7 +31,7 @@ let deindentsBody (expr: ISynExpr) =
 let (|Prefix|_|) (other: string) (str: string) =
     if str.StartsWith(other, StringComparison.Ordinal) then someUnit else None
 
-let precedence (expr: ISynExpr): int =
+let precedence (expr: IFSharpExpression): int =
     match expr with
     | :? IBinaryAppExpr as binaryApp ->
         let refExpr = binaryApp.Operator
@@ -71,7 +71,7 @@ let isHighPrecedenceApp (appExpr: IPrefixAppExpr) =
     let argStartOffset = argExpr.GetTreeStartOffset()
     funEndOffset = argStartOffset
 
-let private canBeTopLevelArgInHighPrecedenceApp (expr: ISynExpr) =
+let private canBeTopLevelArgInHighPrecedenceApp (expr: IFSharpExpression) =
     expr :? IArrayOrListExpr || expr :? IArrayOrListOfSeqExpr ||
     expr :? IObjExpr || expr :? IRecordExpr
 
@@ -83,7 +83,7 @@ let rec private isHighPrecedenceAppRequired (appExpr: IPrefixAppExpr) =
 
     false
 
-let rec needsParens (expr: ISynExpr) =
+let rec needsParens (expr: IFSharpExpression) =
     if isNull expr then false else
 
     let context = expr.IgnoreParentParens()
@@ -140,7 +140,7 @@ let rec needsParens (expr: ISynExpr) =
     precedence binaryApp.LeftArgument < precedence binaryApp
 
 
-let addParens (expr: ISynExpr) =
+let addParens (expr: IFSharpExpression) =
     let exprCopy = expr.Copy()
     let factory = expr.CreateElementFactory()
 
@@ -152,6 +152,6 @@ let addParens (expr: ISynExpr) =
     expr
 
 
-let addParensIfNeeded (expr: ISynExpr) =
+let addParensIfNeeded (expr: IFSharpExpression) =
     if not (needsParens expr) then expr else
     addParens expr

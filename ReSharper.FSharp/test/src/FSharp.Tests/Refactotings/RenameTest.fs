@@ -174,3 +174,5 @@ type FSharpRenameTest() =
 
     [<Test>] member x.``Anon record 01``() = x.DoNamedTest()
     [<Test>] member x.``Anon record 02 - Invalid name``() = x.DoNamedTest()
+
+    [<Test>] member x.``Error - If 01``() = x.DoNamedTest()

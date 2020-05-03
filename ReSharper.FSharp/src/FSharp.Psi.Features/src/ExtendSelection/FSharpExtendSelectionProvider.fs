@@ -53,7 +53,7 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
 
             null
 
-        | :? ISynExpr as expr ->
+        | :? IFSharpExpression as expr ->
             let attribute = AttributeNavigator.GetByExpression(expr)
             if isNotNull attribute && isNotNull attribute.ReferenceName && isNotNull attribute.ArgExpression then
                 FSharpTreeRangeSelection(fsFile, attribute.ReferenceName, attribute.ArgExpression) :> _ else

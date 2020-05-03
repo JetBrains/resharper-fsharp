@@ -7,7 +7,7 @@ IFSharpImplFile
           FSharpIdentifierToken(type:IDENTIFIER, text:foo)
           IPrefixAppTypeArgumentList
             FSharpTokenType+LessTokenElement(type:LESS, text:<)
-            INamedType
+            INamedTypeUsage
               ITypeReferenceName
                 FSharpIdentifierToken(type:IDENTIFIER, text:int)
             FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)

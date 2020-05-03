@@ -17,18 +17,18 @@ IFSharpImplFile
                 FSharpIdentifierToken(type:IDENTIFIER, text:A)
                 IPrefixAppTypeArgumentList
                   FSharpTokenType+LessTokenElement(type:LESS, text:<)
-                  IAnonType
+                  IAnonTypeUsage
                     FSharpIdentifierToken(type:IDENTIFIER, text:_)
                   FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
               FSharpTokenType+DotTokenElement(type:DOT, text:.)
               FSharpIdentifierToken(type:IDENTIFIER, text:B)
               IPrefixAppTypeArgumentList
                 FSharpTokenType+LessTokenElement(type:LESS, text:<)
-                IAnonType
+                IAnonTypeUsage
                   FSharpIdentifierToken(type:IDENTIFIER, text:_)
                 FSharpTokenType+CommaTokenElement(type:COMMA, text:,)
                 Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                IAnonType
+                IAnonTypeUsage
                   FSharpIdentifierToken(type:IDENTIFIER, text:_)
                 FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
             FSharpTokenType+DotTokenElement(type:DOT, text:.)

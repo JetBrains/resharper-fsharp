@@ -7,6 +7,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
   public interface IFSharpParser : IParser
   {
     IFSharpFile ParseFSharpFile();
-    ISynExpr ParseExpression(IChameleonExpression chameleonExpression, IDocument document = null);
+    IFSharpExpression ParseExpression(IChameleonExpression chameleonExpression, IDocument document = null);
   }
 }

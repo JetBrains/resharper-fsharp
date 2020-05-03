@@ -8,7 +8,7 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 
-let tryGetNamedArg (expr: ISynExpr) =
+let tryGetNamedArg (expr: IFSharpExpression) =
     let binaryAppExpr = expr.As<IBinaryAppExpr>()
     if isNull binaryAppExpr then null else
 
@@ -20,7 +20,7 @@ let tryGetNamedArg (expr: ISynExpr) =
     refExpr.Reference.Resolve().DeclaredElement.As<IParameter>()
 
 
-let getMatchingParameter (expr: ISynExpr) =
+let getMatchingParameter (expr: IFSharpExpression) =
     let argsOwner =
         let tupleExpr = TupleExprNavigator.GetByExpression(expr.IgnoreParentParens())
         let exprContext = if isNull tupleExpr then expr else tupleExpr :> _

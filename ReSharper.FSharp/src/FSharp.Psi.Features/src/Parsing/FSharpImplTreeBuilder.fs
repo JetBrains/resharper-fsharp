@@ -524,7 +524,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
     member x.MarkOtherType(TypeRange range as typ) =
         let mark = x.Mark(range)
         x.ProcessType(typ)
-        x.Done(range, mark, ElementType.OTHER_TYPE)
+        x.Done(range, mark, ElementType.UNSUPPORTED_TYPE_USAGE)
 
     member x.SkipOuterAttrs(attrs: SynAttributeList list, outerRange: range) =
         match attrs with
@@ -930,9 +930,11 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             x.MarkAndDone(range, ElementType.LIBRARY_ONLY_EXPR)
 
         | SynExpr.ArbitraryAfterError _
-        | SynExpr.FromParseError _
         | SynExpr.DiscardAfterMissingQualificationAfterDot _ ->
             x.MarkAndDone(range, ElementType.FROM_ERROR_EXPR)
+
+        | SynExpr.FromParseError(expr, _) ->
+            x.PushRangeAndProcessExpression(expr, range, ElementType.FROM_ERROR_EXPR)
 
         | SynExpr.Fixed(expr, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.FIXED_EXPR)

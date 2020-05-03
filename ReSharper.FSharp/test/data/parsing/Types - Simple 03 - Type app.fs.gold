@@ -10,7 +10,7 @@ IFSharpImplFile
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         IAbbreviatedTypeOrUnionCaseDeclaration
-          INamedType
+          INamedTypeUsage
             ITypeReferenceName
               ITypeReferenceName
                 ITypeReferenceName
@@ -24,7 +24,7 @@ IFSharpImplFile
               FSharpIdentifierToken(type:IDENTIFIER, text:List)
               IPrefixAppTypeArgumentList
                 FSharpTokenType+LessTokenElement(type:LESS, text:<)
-                INamedType
+                INamedTypeUsage
                   ITypeReferenceName
                     FSharpIdentifierToken(type:IDENTIFIER, text:int)
                 FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)

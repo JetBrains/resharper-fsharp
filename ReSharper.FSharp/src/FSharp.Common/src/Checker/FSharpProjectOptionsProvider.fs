@@ -252,7 +252,13 @@ type FSharpScriptProjectOptionsProvider
         (lifetime, logger: ILogger, checkerService: FSharpCheckerService, scriptOptions: FSharpScriptOptionsProvider) =
 
     let getScriptOptionsLock = obj()
-    let defaultFlags = [| "--warnon:1182" |]
+
+    let defaultFlags =
+        [| "--warnon:1182"
+
+           if PlatformUtil.IsRunningOnCore then
+               "--targetprofile:netcore"
+               "--simpleresolution" |]
 
     let getOtherFlags languageVersion =
         if languageVersion = FSharpLanguageVersion.Default then defaultFlags else
@@ -275,7 +281,10 @@ type FSharpScriptProjectOptionsProvider
         let source = SourceText.ofString source
         lock getScriptOptionsLock (fun _ ->
             let getScriptOptionsAsync =
-                checkerService.Checker.GetProjectOptionsFromScript(path, source, otherFlags = otherFlags.Value.Value)
+                checkerService.Checker.GetProjectOptionsFromScript(
+                    path, source,
+                    otherFlags = otherFlags.Value.Value,
+                    assumeDotNetFramework = not PlatformUtil.IsRunningOnCore)
             try
                 let options, errors = getScriptOptionsAsync.RunAsTask()
                 if not errors.IsEmpty then

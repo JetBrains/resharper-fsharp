@@ -33,7 +33,7 @@ open JetBrains.Util
 type FSharpIntroduceVariable(workflow, solution, driver) =
     inherit IntroduceVariableBase(workflow, solution, driver)
 
-    let getNames (expr: ISynExpr) =
+    let getNames (expr: IFSharpExpression) =
         let language = expr.Language
         let sourceFile = expr.GetSourceFile()
 
@@ -53,7 +53,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let suggestionOptions = SuggestionOptions(null, DefaultName = "foo")
         namesCollection.Prepare(namingRule, ScopeKind.Common, suggestionOptions).AllNames()
 
-    let getReplaceRanges (expr: ISynExpr) (parent: ISynExpr) =
+    let getReplaceRanges (expr: IFSharpExpression) (parent: IFSharpExpression) =
         let sequentialExpr = SequentialExprNavigator.GetByExpression(expr)
         if expr == parent && isNotNull sequentialExpr then
             let inRange = TreeRange(expr.NextSibling, sequentialExpr.LastChild)
@@ -79,7 +79,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
             let range = TreeRange(parent)
             {| ReplaceRange = range; InRange = range; AddNewLine = true |}
 
-    let rec getExprToInsertBefore (expr: ISynExpr): ISynExpr =
+    let rec getExprToInsertBefore (expr: IFSharpExpression): IFSharpExpression =
         let expr = expr.IgnoreParentParens()
 
         let parent = expr.Parent
@@ -97,24 +97,24 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                 not (binding.HeadPattern :? IParametersOwnerPat) ->
             LetLikeExprNavigator.GetByBinding(binding) :> _
 
-        | :? ISynExpr as parentExpr -> getExprToInsertBefore parentExpr
+        | :? IFSharpExpression as parentExpr -> getExprToInsertBefore parentExpr
         | _ -> expr
 
-    let getContextDeclaration (contextExpr: ISynExpr): IModuleMember =
+    let getContextDeclaration (contextExpr: IFSharpExpression): IModuleMember =
         let letDecl = LetModuleDeclNavigator.GetByBinding(BindingNavigator.GetByExpression(contextExpr))
         if isNotNull letDecl then letDecl :> _ else
 
         let doDecl = DoNavigator.GetByExpression(contextExpr)
         if isNotNull doDecl && doDecl.IsImplicit then doDecl :> _ else null
 
-    let createBinding (context: ISynExpr) (contextDecl: IModuleMember) name: ILet =
+    let createBinding (context: IFSharpExpression) (contextDecl: IModuleMember) name: ILet =
         let elementFactory = context.CreateElementFactory()
         if isNotNull contextDecl then
             elementFactory.CreateLetModuleDecl(name) :> _
         else
             elementFactory.CreateLetBindingExpr(name) :> _
 
-    let getMoveToNewLineInfo (contextExpr: ISynExpr) =
+    let getMoveToNewLineInfo (contextExpr: IFSharpExpression) =
         if not contextExpr.IsSingleLine then None else
 
         let parent = contextExpr.Parent
@@ -138,7 +138,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
         Some(indent + contextExpr.GetIndentSize())
 
-    let moveToNewLine (contextExpr: ISynExpr) (indent: int) =
+    let moveToNewLine (contextExpr: IFSharpExpression) (indent: int) =
         let prevSibling = contextExpr.PrevSibling
         if isInlineSpace prevSibling then
             let first = getFirstMatchingNodeBefore isInlineSpace prevSibling
@@ -152,8 +152,8 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
     static member val ExpressionToRemove = Key("FSharpIntroduceVariable.ExpressionToRemove")
 
     override x.Process(data) =
-        let sourceExpr = data.SourceExpression.As<ISynExpr>()
-        let commonParentExpr = data.Usages.FindLCA().As<ISynExpr>()
+        let sourceExpr = data.SourceExpression.As<IFSharpExpression>()
+        let commonParentExpr = data.Usages.FindLCA().As<IFSharpExpression>()
 
         // contextDecl is not null when expression is bound to a module/type let binding
         let contextExpr = getExprToInsertBefore commonParentExpr
@@ -239,7 +239,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let expr = letBindings.Bindings.[0].Expression
         IntroduceVariableResult(hotspotsRegistry, expr.As<ITreeNode>().CreateTreeElementPointer())
 
-    static member IntroduceVar(expr: ISynExpr, textControl: ITextControl, ?removeSourceExpr) =
+    static member IntroduceVar(expr: IFSharpExpression, textControl: ITextControl, ?removeSourceExpr) =
         let removeSourceExpr = defaultArg removeSourceExpr false
 
         let name = "FSharpIntroduceVar"
@@ -263,17 +263,17 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let workflow = IntroduceVariableWorkflow(solution, null)
         RefactoringActionUtil.ExecuteRefactoring(dataContext, workflow)
 
-    static member CanIntroduceVar(expr: ISynExpr, allowInSeqExprOnly) =
+    static member CanIntroduceVar(expr: IFSharpExpression, allowInSeqExprOnly) =
         if not (isValid expr) then false else
 
-        let isInSeqExpr (expr: ISynExpr) =
+        let isInSeqExpr (expr: IFSharpExpression) =
             let sequentialExpr = SequentialExprNavigator.GetByExpression(expr)
             if isNull sequentialExpr then false else
 
             let nextMeaningfulSibling = expr.GetNextMeaningfulSibling()
-            nextMeaningfulSibling :? ISynExpr && nextMeaningfulSibling.Indent = expr.Indent
+            nextMeaningfulSibling :? IFSharpExpression && nextMeaningfulSibling.Indent = expr.Indent
 
-        let rec isValidExpr (expr: ISynExpr) =
+        let rec isValidExpr (expr: IFSharpExpression) =
             match expr with
             | :? IReferenceExpr as refExpr ->
                 let declaredElement = refExpr.Reference.Resolve().DeclaredElement
@@ -284,8 +284,8 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
             | _ -> true
 
-        let isAllowedContext (expr: ISynExpr) =
-            let topLevelExpr = skipIntermediateParentsOfSameType<ISynExpr>(expr)
+        let isAllowedContext (expr: IFSharpExpression) =
+            let topLevelExpr = skipIntermediateParentsOfSameType<IFSharpExpression>(expr)
             if isNotNull (AttributeNavigator.GetByExpression(topLevelExpr)) then false else
 
             true
@@ -304,7 +304,7 @@ type FSharpIntroduceVarHelper() =
     override x.IsLanguageSupported = true
 
     override x.CheckAvailability(node) =
-        let expr = node.As<ISynExpr>()
+        let expr = node.As<IFSharpExpression>()
         if isNull expr then false else
 
         if expr.UserData.HasKey(FSharpIntroduceVariable.ExpressionToRemove) then true else

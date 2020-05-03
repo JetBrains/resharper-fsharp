@@ -11,7 +11,7 @@ open JetBrains.ReSharper.Psi.Tree
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpExpressionEvaluationInfoProvider() =
-    static let rec getTextToEvaluate (expr: ISynExpr) =
+    static let rec getTextToEvaluate (expr: IFSharpExpression) =
         match expr with
         | :? IReferenceExpr as refExpr ->
             let declaredElement = refExpr.Reference.Resolve().DeclaredElement
@@ -43,12 +43,12 @@ type FSharpExpressionEvaluationInfoProvider() =
 
         | _ -> null
 
-    static member GetTextToEvaluate(expr: ISynExpr) =
+    static member GetTextToEvaluate(expr: IFSharpExpression) =
         getTextToEvaluate expr
 
     interface IExpressionEvaluationInfoProvider with
         member x.FindExpression(file, range, _) =
-            let expr = file.GetNode<ISynExpr>(range)
+            let expr = file.GetNode<IFSharpExpression>(range)
             let exprName = getTextToEvaluate expr
             if isNotNull exprName then
                 EvaluationExpressionInfo(expr, exprName, expr.GetText())

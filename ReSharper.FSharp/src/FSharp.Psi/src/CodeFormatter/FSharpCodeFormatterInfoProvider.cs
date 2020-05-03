@@ -29,7 +29,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         ("NamedModuleDeclName", ElementType.NAMED_MODULE_DECLARATION, NamedModuleDeclaration.IDENTIFIER),
       };
 
-      var synExprIndentingRulesParameters = new[]
+      var fsExprIndentingRulesParameters = new[]
       {
         ("ForExpr", ElementType.FOR_EXPR, ForExpr.DO_EXPR),
         ("ForEachExpr", ElementType.FOR_EACH_EXPR, ForEachExpr.DO_EXPR),
@@ -58,7 +58,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
       lock (this)
       {
         bindingAndModuleDeclIndentingRulesParameters
-          .Union(synExprIndentingRulesParameters)
+          .Union(fsExprIndentingRulesParameters)
           .Union(typeDeclarationIndentingRulesParameters)
           .ToList()
           .ForEach(DescribeSimpleIndentingRule);
