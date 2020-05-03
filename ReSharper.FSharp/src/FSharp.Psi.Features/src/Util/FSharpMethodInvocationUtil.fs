@@ -8,16 +8,20 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 
-let tryGetNamedArg (expr: IFSharpExpression) =
-    let binaryAppExpr = expr.As<IBinaryAppExpr>()
-    if isNull binaryAppExpr then null else
 
+let resolveNamedArg (binaryAppExpr: IBinaryAppExpr) =
     if binaryAppExpr.Operator.Reference.GetName() <> "=" then null else
 
     let refExpr = binaryAppExpr.LeftArgument.As<IReferenceExpr>()
     if isNull refExpr then null else
 
     refExpr.Reference.Resolve().DeclaredElement.As<IParameter>()
+
+
+let tryGetNamedArg (expr: IFSharpExpression) =
+    let binaryAppExpr = expr.As<IBinaryAppExpr>()
+    if isNull binaryAppExpr then null else
+    resolveNamedArg binaryAppExpr
 
 
 let getMatchingParameter (expr: IFSharpExpression) =
@@ -28,8 +32,9 @@ let getMatchingParameter (expr: IFSharpExpression) =
 
     if isNull argsOwner then null else
 
-    let parameter = tryGetNamedArg expr
-    if isNotNull parameter then parameter else
+    let binaryAppExpr = expr.As<IBinaryAppExpr>()
+    // todo: recover from named args failures
+    if isNotNull binaryAppExpr then resolveNamedArg binaryAppExpr else
 
     let symbolReference = argsOwner.Reference
     if isNull symbolReference then null else

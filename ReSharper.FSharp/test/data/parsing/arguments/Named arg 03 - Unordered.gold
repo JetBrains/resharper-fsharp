@@ -1,0 +1,9 @@
+﻿type Foo () =
+    static member F (|first|(param #2): int, |second|(param #0), |third|(param #1)) = first + second + third
+
+Foo.F (|second=15|(arg #0), |third=25|(arg #1), |first=1|(arg #2))
+
+---------------------------------------------------------
+(arg #0) => second
+(arg #1) => third
+(arg #2) => first

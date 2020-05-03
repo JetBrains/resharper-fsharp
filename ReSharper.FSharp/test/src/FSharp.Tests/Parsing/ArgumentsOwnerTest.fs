@@ -135,6 +135,12 @@ type ArgumentsOwnerTest() =
     [<Test>] member x.``Extension FSharp 03 - Curried args``() = x.DoNamedTest()
     [<Test>] member x.``Extension FSharp 04 - Tupled args``() = x.DoNamedTest()
 
+    [<Test>] member x.``Generic 01 - Module``() = x.DoNamedTest()
+    [<Test>] member x.``Generic 02 - Static method``() = x.DoNamedTest()
+
+    [<Test>] member x.``Misc 01 - No args``() = x.DoNamedTest()
+    [<Test; ExpectErrors>] member x.``Misc 02 - Too many args``() = x.DoNamedTest()
+
     [<Test>] member x.``Multiple 01 - Curried``() = x.DoNamedTest()
     [<Test>] member x.``Multiple 02 - Tupled``() = x.DoNamedTest()
     [<Test>] member x.``Multiple 03 - Curried fun in paren``() = x.DoNamedTest()
@@ -144,7 +150,13 @@ type ArgumentsOwnerTest() =
     [<Test>] member x.``Multiple 07 - Curried - partial``() = x.DoNamedTest()
     [<Test; ExpectErrors>] member x.``Multiple 08 - Curried - too many``() = x.DoNamedTest()
 
-    [<Test>] member x.``No args 01``() = x.DoNamedTest()
+    [<Test>] member x.``Named arg 01 - BCL``() = x.DoNamedTest()
+    [<Test; ExpectErrors>] member x.``Named arg 02 - Partial``() = x.DoNamedTest()
+    [<Test>] member x.``Named arg 03 - Unordered``() = x.DoNamedTest()
+    [<Test; ExpectErrors>] member x.``Named arg 04 - Invalid name``() = x.DoNamedTest()
+    [<Test>] member x.``Named arg 05 - Boolean``() = x.DoNamedTest()
+
+    [<Test>] member x.``Non IArgument 01 - Obj expression``() = x.DoNamedTest()
 
     [<Test>] member x.``Single 01 - Paren``() = x.DoNamedTest()
     [<Test>] member x.``Single 02 - Space paren``() = x.DoNamedTest()

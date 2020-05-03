@@ -1,4 +1,0 @@
-- Generic parameters?
-- Non-IArgument arguments (e.g. object creation expressions)
-- Named arguments
-- Giving too many arguments to a `unit -> unit` function
