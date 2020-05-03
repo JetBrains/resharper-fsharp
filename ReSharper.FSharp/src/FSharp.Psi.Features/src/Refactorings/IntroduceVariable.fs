@@ -274,6 +274,8 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
             nextMeaningfulSibling :? IFSharpExpression && nextMeaningfulSibling.Indent = expr.Indent
 
         let rec isValidExpr (expr: IFSharpExpression) =
+            if isNotNull (FSharpMethodInvocationUtil.tryGetNamedArg expr) then false else
+
             match expr with
             | :? IReferenceExpr as refExpr ->
                 let declaredElement = refExpr.Reference.Resolve().DeclaredElement

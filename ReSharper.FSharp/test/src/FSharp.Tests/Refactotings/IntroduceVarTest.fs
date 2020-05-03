@@ -37,3 +37,4 @@ type IntroduceVarTest() =
     [<Test>] member x.``Shift - Expr 02``() = x.DoNamedTest()
 
     [<Test>] member x.``Not allowed - Attribute 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not allowed - Named arg 01``() = x.DoNamedTest()
