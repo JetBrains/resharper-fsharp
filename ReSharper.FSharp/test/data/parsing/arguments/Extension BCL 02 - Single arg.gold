@@ -1,0 +1,9 @@
+﻿module Mod
+
+open System.Linq
+
+let x = Seq.empty
+x.Single (|fun x -> true|(arg #0))
+
+---------------------------------------------------------
+(arg #0) => predicate

@@ -1,31 +1,53 @@
 using System.Collections.Generic;
+using System.Linq;
 using FSharp.Compiler.SourceCodeServices;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class PrefixAppExpr
   {
-    public FSharpSymbolReference InvokedFunctionReference
+    public FSharpSymbolReference Reference => InvokedReferenceExpression?.Reference;
+
+    public IReferenceExpr InvokedReferenceExpression
     {
       get
       {
-        var argsCount = 0;
+        // todo: can we init this once then cache it?
         var funExpr = (IPrefixAppExpr) this;
         while (funExpr.FunctionExpression.IgnoreInnerParens() is IPrefixAppExpr appExpr)
         {
           funExpr = appExpr;
-          argsCount++;
         }
 
         if (!(funExpr.FunctionExpression.IgnoreInnerParens() is IReferenceExpr referenceExpr))
+        {
           return null;
+        }
 
-        argsCount++;
+        return referenceExpr;
+      }
+    }
+
+    public IFSharpIdentifier FSharpIdentifier => InvokedReferenceExpression?.Identifier;
+
+    public IFSharpReferenceOwner SetName(string name) => this;
+
+    public override ReferenceCollection GetFirstClassReferences() =>
+      new ReferenceCollection(Reference);
+
+    public FSharpSymbolReference InvokedFunctionReference
+    {
+      get
+      {
+        var referenceExpr = InvokedReferenceExpression;
+        if (referenceExpr == null)
+          return null;
 
         var reference = referenceExpr.Reference;
         var fsSymbol = reference.GetFSharpSymbol();
@@ -35,15 +57,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
           return null;
 
         var paramGroups = mfv.CurriedParameterGroups;
-        return paramGroups.Count >= argsCount ? reference : null;
+        return paramGroups.Count >= AppliedExpressions.Count ? reference : null;
       }
     }
 
-    public IList<IExpression> Arguments
+    public IList<ISynExpr> AppliedExpressions
     {
       get
       {
-        var args = new List<IExpression>();
+        var args = new List<ISynExpr>();
         var funExpr = (IPrefixAppExpr) this;
         while (funExpr.FunctionExpression.IgnoreInnerParens() is IPrefixAppExpr appExpr)
         {
@@ -54,6 +76,47 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         args.Add(funExpr.ArgumentExpression);
         args.Reverse();
         return args;
+      }
+    }
+
+    // todo: this should be a Lazy/cache its result
+    public IList<IArgument> Arguments
+    {
+      get
+      {
+        if (!(InvokedFunctionReference?.GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv))
+          return EmptyList<IArgument>.Instance;
+
+        var paramGroups = mfv.CurriedParameterGroups;
+        var isVoidReturn = paramGroups.Count == 1 && paramGroups[0].Count == 1 && paramGroups[0][0].Type.IsUnit;
+
+        if (isVoidReturn)
+          return EmptyArray<IArgument>.Instance;
+
+        return paramGroups
+          .Zip(AppliedExpressions, (paramGroup, argExpr) => (paramGroup, argExpr.IgnoreInnerParens()))
+          .SelectMany(pair =>
+          {
+            var (paramGroup, argExpr) = pair;
+
+            switch (paramGroup.Count)
+            {
+              case 0:
+                // e.g. F# extension methods with 0 parameters
+                return EmptyList<IArgument>.Instance;
+              case 1:
+                return new[] {argExpr as IArgument};
+              default:
+                if (!(argExpr is ITupleExpr tupleExpr))
+                  return new[] {argExpr as IArgument};
+
+                return tupleExpr.Expressions.Count <= paramGroup.Count
+                  ? tupleExpr.Expressions.Select(expr => expr as IArgument)
+                  : EmptyList<IArgument>.Instance;
+            }
+          })
+          .Where(argExpr => argExpr != null)
+          .ToList();
       }
     }
 

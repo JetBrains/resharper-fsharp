@@ -25,6 +25,7 @@
     <Compile Include="Cache\SymbolCacheTest.fs" />
     <Compile Include="Parsing\FSharpLexerTest.fs" />
     <Compile Include="Parsing\FSharpParserTest.fs" />
+    <Compile Include="Parsing\ArgumentsOwnerTest.fs" />
     <Compile Include="Daemon\FSharpHighlightingTestBase.fs" />
     <Compile Include="Daemon\IdentifierHighlightingTest.fs" />
     <Compile Include="Daemon\ErrorsHighlightingTest.fs" />
