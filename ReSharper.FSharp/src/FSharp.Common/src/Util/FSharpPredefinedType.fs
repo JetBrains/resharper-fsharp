@@ -66,7 +66,7 @@ let languagePrimitivesModuleTypeName = clrTypeName "Microsoft.FSharp.Core.Langua
 let intrinsicOperatorsTypeName = clrTypeName "Microsoft.FSharp.Core.LanguagePrimitives+IntrinsicOperators"
 
 let predefinedFunctionTypes =
-    [| operatorsModuleTypeName, [| "not"; "|>"; "<|"; "<>"; "=" |]
+    [| operatorsModuleTypeName, [| "not"; "|>"; "<|"; "<>"; "="; "typeof" |]
        intrinsicOperatorsTypeName, [| "||"; "&&" |] |]
     |> Array.collect (fun (typeName, names) -> [| for name in names -> name, typeName |])
     |> dict

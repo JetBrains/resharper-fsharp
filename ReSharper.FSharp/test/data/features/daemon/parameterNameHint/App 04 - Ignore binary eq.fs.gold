@@ -4,4 +4,4 @@ let recursive = false
 Directory.Delete(||(0)"", (recursive=false))
 
 ---------------------------------------------------------
-(0): ReSharper Parameter Name Hint: path, 
+(0): ReSharper Parameter Name Hint: path, System.IO.Directory.Delete

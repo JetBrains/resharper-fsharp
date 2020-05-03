@@ -5,7 +5,7 @@ Color.FromArgb(||(3)123, blue = 234, green = 150) |> ignore
 Color.FromArgb(green = 150, blue = 234, red = 123) |> ignore
 
 ---------------------------------------------------------
-(0): ReSharper Parameter Name Hint: red, 
-(1): ReSharper Parameter Name Hint: green, 
-(2): ReSharper Parameter Name Hint: blue, 
-(3): ReSharper Parameter Name Hint: red, 
+(0): ReSharper Parameter Name Hint: red, System.Drawing.Color.FromArgb
+(1): ReSharper Parameter Name Hint: green, System.Drawing.Color.FromArgb
+(2): ReSharper Parameter Name Hint: blue, System.Drawing.Color.FromArgb
+(3): ReSharper Parameter Name Hint: red, System.Drawing.Color.FromArgb
