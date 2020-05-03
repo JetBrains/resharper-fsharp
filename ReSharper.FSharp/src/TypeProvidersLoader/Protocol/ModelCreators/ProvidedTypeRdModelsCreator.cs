@@ -41,15 +41,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelC
       return model;
     }
 
-    private static RdProvidedType CreateRdModelInternal(ProvidedType providedModel, int entityId) =>
-      new RdProvidedType(providedModel.FullName,
+    private static RdProvidedType CreateRdModelInternal(ProvidedType providedModel, int entityId)
+    {
+      // We cannot request these properties from GenericParameter due to their implementation in .NET
+      var isValueType = !providedModel.IsGenericParameter && providedModel.IsValueType;
+      var isClass = !providedModel.IsGenericParameter && providedModel.IsClass;
+      
+      return new RdProvidedType(providedModel.FullName,
         providedModel.Namespace, providedModel.IsVoid,
-        providedModel.IsGenericParameter, providedModel.IsValueType, providedModel.IsByRef,
+        providedModel.IsGenericParameter, isValueType, providedModel.IsByRef,
         providedModel.IsPointer, providedModel.IsEnum, providedModel.IsArray,
-        providedModel.IsInterface, providedModel.IsClass, providedModel.IsSealed,
+        providedModel.IsInterface, isClass, providedModel.IsSealed,
         providedModel.IsAbstract, providedModel.IsPublic, providedModel.IsNestedPublic,
         providedModel.IsSuppressRelocate, providedModel.IsErased, providedModel.IsGenericType,
         providedModel.IsMeasure, providedModel.Name, entityId);
+    }
 
     protected int CreateEntityKey(ProvidedType providedModel)
     {

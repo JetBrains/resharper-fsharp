@@ -23,7 +23,7 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
                                   typeProvidersLoadersFactory: TypeProvidersLoaderExternalProcessFactory) as this =
     let defaultExtensionTypingProvider = ExtensionTypingProvider
     let mutable ourModel = null
-    
+
     do ExtensionTypingProvider <- this :> IExtensionTypingProvider
        lifetime.OnTermination(fun () ->
            (this :> IDisposable).Dispose()
@@ -47,7 +47,7 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
                      isInteractive: bool, 
                      systemRuntimeContainsType: string -> bool, //TODO: не забыть
                      systemRuntimeAssemblyVersion: System.Version,
-                     compilerToolsPath: string list, //TODO: не забыть
+                     compilerToolsPath: string list,
                      m: range) =
             
             if ourModel = null then 

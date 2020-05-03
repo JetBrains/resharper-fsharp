@@ -214,7 +214,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
     private RdTask<int> GetGenericParameterPosition(Lifetime lifetime, int entityId)
     {
       var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
-      var genericParameterPosition = providedType.GetArrayRank();
+      var genericParameterPosition = providedType.GenericParameterPosition;
       return RdTask<int>.Successful(genericParameterPosition);
     }
 

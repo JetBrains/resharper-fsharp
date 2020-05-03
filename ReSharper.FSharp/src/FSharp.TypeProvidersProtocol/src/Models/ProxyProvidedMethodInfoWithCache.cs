@@ -24,7 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       RdFSharpTypeProvidersLoaderModel processModel,
       ProvidedTypeContext context, ITypeProviderCache cache) : base(
       typeof(ProxyProvidedMethodInfoWithCache).GetMethods().First(),
-      ProvidedTypeContext.Empty)
+      context)
     {
       myMethodInfo = methodInfo;
       myProcessModel = processModel;
