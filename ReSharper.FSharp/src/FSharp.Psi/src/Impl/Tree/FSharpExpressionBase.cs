@@ -9,8 +9,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   public abstract class FSharpExpressionBase : FSharpCompositeElement, IFSharpExpression, IArgument
   {
-    private readonly CachedPsiValue<DeclaredElementInstance<IParameter>> myMatchingParameter = new FileCachedPsiValue<DeclaredElementInstance<IParameter>>();
-
     public virtual ConstantValue ConstantValue => ConstantValue.BAD_VALUE;
     public virtual bool IsConstantValue() => false;
 
@@ -27,10 +25,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         .TryGetService<IFSharpMethodInvocationUtil>(FSharpLanguage.Instance);
 
     DeclaredElementInstance<IParameter> IArgumentInfo.MatchingParameter =>
-      myMatchingParameter.GetValue(this, () =>
-        InvocationUtil?.GetMatchingParameter(this) is var parameter && parameter != null
-          ? new DeclaredElementInstance<IParameter>(parameter)
-          : null);
+      InvocationUtil?.GetMatchingParameter(this) is var parameter && parameter != null
+        ? new DeclaredElementInstance<IParameter>(parameter)
+        : null;
 
     IExpression IArgument.Expression =>
       InvocationUtil?.GetNamedArg(this) is var parameter && parameter != null
