@@ -313,16 +313,24 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
             x.Done(range, mark, ElementType.RECORD_REPRESENTATION)
             ElementType.RECORD_DECLARATION
 
-        | SynTypeDefnSimpleRepr.Enum(enumCases, _) ->
+        | SynTypeDefnSimpleRepr.Enum(enumCases, range) ->
+            let casesListMark = x.Mark(range)
             for case in enumCases do
                 x.ProcessEnumCase case
+            x.Done(range, casesListMark, ElementType.ENUM_REPRESENTATION)
             ElementType.ENUM_DECLARATION
 
         | SynTypeDefnSimpleRepr.Union(_, cases, range) ->
-            let casesListMark = x.Mark(range)
+            let representationMark = x.Mark(range)
+            if not cases.IsEmpty then
+                let firstCaseRange = cases.Head.Range
+                x.AdvanceToTokenOrRangeStart(FSharpTokenType.BAR, firstCaseRange)
+ 
+            let caseListMark = x.Mark()
             for case in cases do
                 x.ProcessUnionCase(case)
-            x.Done(range, casesListMark, ElementType.UNION_REPRESENTATION)
+            x.Done(range, caseListMark, ElementType.UNION_CASE_LIST)
+            x.Done(representationMark, ElementType.UNION_REPRESENTATION)
             ElementType.UNION_DECLARATION
 
         | SynTypeDefnSimpleRepr.TypeAbbrev(_, (TypeRange range as synType), _) ->

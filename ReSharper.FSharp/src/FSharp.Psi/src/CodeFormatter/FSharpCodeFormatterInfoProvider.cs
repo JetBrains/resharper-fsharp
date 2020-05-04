@@ -3,7 +3,6 @@ using JetBrains.Application.Settings;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Psi;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
@@ -45,14 +44,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         ("IfThenExpr", ElementType.IF_THEN_ELSE_EXPR, IfThenElseExpr.THEN_EXPR),
         ("ElifThenExpr", ElementType.ELIF_EXPR, ElifExpr.THEN_EXPR),
         ("LambdaExprBody", ElementType.LAMBDA_EXPR, LambdaExpr.EXPR),
+        ("MatchExpr_Expr", ElementType.MATCH_EXPR, MatchExpr.EXPR),
+        ("MatchExpr_With", ElementType.MATCH_EXPR, MatchExpr.WITH),
       };
 
       var typeDeclarationIndentingRulesParameters = new[]
       {
-        ("EnumDeclaration", ElementType.ENUM_DECLARATION, EnumDeclaration.ENUM_MEMBER),
+        ("EnumDeclaration", ElementType.ENUM_DECLARATION, EnumDeclaration.ENUM_REPR),
         ("UnionDeclarationCases", ElementType.UNION_DECLARATION, UnionDeclaration.UNION_REPR),
         ("TypeAbbreviation", ElementType.TYPE_ABBREVIATION_DECLARATION, TypeAbbreviationDeclaration.TYPE_OR_UNION_CASE),
         ("ModuleAbbreviation", ElementType.MODULE_ABBREVIATION, ModuleAbbreviation.TYPE_REFERENCE),
+      };
+
+      var alignmentRulesParameters = new[]
+      {
+        ("MatchClauses", ElementType.MATCH_EXPR),
+        ("UnionCases", ElementType.UNION_CASE_LIST),
+        ("UnionRepresentation", ElementType.UNION_REPRESENTATION),
+        ("EnumCases", ElementType.ENUM_REPRESENTATION),
+        ("SequentialExpr", ElementType.SEQUENTIAL_EXPR),
+        ("BinaryExpr", ElementType.BINARY_APP_EXPR),
       };
 
       lock (this)
@@ -62,6 +73,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
           .Union(typeDeclarationIndentingRulesParameters)
           .ToList()
           .ForEach(DescribeSimpleIndentingRule);
+
+        alignmentRulesParameters
+          .ToList()
+          .ForEach(DescribeSimpleAlignmentRule);
 
         Describe<IndentingRule>()
           .Name("TryWith_WithClauseIndent")
@@ -126,6 +141,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
             Node().HasRole(Do.CHAMELEON_EXPR))
           .Return(IndentType.External)
           .Build();
+
+        Describe<IndentingRule>()
+          .Name("UnionRepresentationCasesIndent")
+          .Where(
+            Parent()
+              .HasType(ElementType.UNION_REPRESENTATION)
+              .Satisfies((node, context) =>
+              {
+                var modifier = ((IUnionRepresentation) node).AccessModifier;
+                return modifier != null && modifier.HasNewLineAfter(context.CodeFormatter);
+              }),
+            Node().HasRole(UnionRepresentation.UNION_CASE_LIST))
+          .Return(IndentType.External)
+          .Build();
       }
     }
 
@@ -139,6 +168,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
           Parent().HasType(parameters.parentType),
           Node().HasRole(parameters.childRole))
         .Return(IndentType.External)
+        .Build();
+    }
+
+    private void DescribeSimpleAlignmentRule((string name, CompositeNodeType nodeType) parameters)
+    {
+      Describe<IndentingRule>()
+        .Name(parameters.name + "Alignment")
+        .Where(Node().HasType(parameters.nodeType))
+        .Return(IndentType.AlignThrough)
         .Build();
     }
 
