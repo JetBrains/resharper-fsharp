@@ -2,6 +2,7 @@
 using System.Linq;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
@@ -9,6 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class NewExpr
   {
+    private readonly CachedPsiValue<IList<IArgument>> myParameterArguments = new FileCachedPsiValue<IList<IArgument>>();
     public FSharpSymbolReference Reference { get; private set; }
 
     protected override void PreInit()
@@ -17,35 +19,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       Reference = new CtorReference(this);
     }
 
-    public IList<IArgument> Arguments
-    {
-      get
-      {
-        // todo: this is same as Attribute.Arguments
-        switch (ArgumentExpression.IgnoreInnerParens())
-        {
-          case IUnitExpr _:
-            return EmptyList<IArgument>.Instance;
-          case ITupleExpr tupleExpr:
-            return tupleExpr.Expressions.Select(arg => arg as IArgument).ToList();
-          case IArgument argExpr:
-            return new List<IArgument> { argExpr };
-          default:
-            return EmptyList<IArgument>.Instance;
-        }
-      }
-    }
-
     public IFSharpIdentifier FSharpIdentifier => TypeName?.Identifier;
 
-    public IFSharpReferenceOwner SetName(string name)
-    {
-      throw new System.NotImplementedException();
-    }
+    public IFSharpReferenceOwner SetName(string name) => this;
 
     public override ReferenceCollection GetFirstClassReferences() =>
       new ReferenceCollection(Reference);
 
-    public IList<IFSharpExpression> AppliedExpressions => new List<IFSharpExpression> {ArgumentExpression};
+    public IList<IArgument> ParameterArguments => myParameterArguments.GetValue(this,
+      () => FSharpArgumentsOwnerUtil.CalculateParameterArguments(this, new[] {ArgumentExpression}));
+
+    public IList<IArgument> Arguments => ParameterArguments.WhereNotNull().ToList();
   }
 }

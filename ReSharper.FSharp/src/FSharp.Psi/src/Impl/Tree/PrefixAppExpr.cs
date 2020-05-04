@@ -12,6 +12,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class PrefixAppExpr
   {
+    private readonly CachedPsiValue<IList<IArgument>> myParameterArguments = new FileCachedPsiValue<IList<IArgument>>();
+
     public FSharpSymbolReference Reference => InvokedReferenceExpression?.Reference;
 
     public IReferenceExpr InvokedReferenceExpression
@@ -79,46 +81,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       }
     }
 
-    // todo: this should be a Lazy/cache its result
-    public IList<IArgument> Arguments
-    {
-      get
-      {
-        if (!(InvokedFunctionReference?.GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv))
-          return EmptyList<IArgument>.Instance;
+    public IList<IArgument> Arguments => ParameterArguments.Where(arg => arg != null).ToList();
 
-        var paramGroups = mfv.CurriedParameterGroups;
-        var isVoidReturn = paramGroups.Count == 1 && paramGroups[0].Count == 1 && paramGroups[0][0].Type.IsUnit;
-
-        if (isVoidReturn)
-          return EmptyArray<IArgument>.Instance;
-
-        return paramGroups
-          .Zip(AppliedExpressions, (paramGroup, argExpr) => (paramGroup, argExpr.IgnoreInnerParens()))
-          .SelectMany(pair =>
-          {
-            var (paramGroup, argExpr) = pair;
-
-            switch (paramGroup.Count)
-            {
-              case 0:
-                // e.g. F# extension methods with 0 parameters
-                return EmptyList<IArgument>.Instance;
-              case 1:
-                return new[] {argExpr as IArgument};
-              default:
-                if (!(argExpr is ITupleExpr tupleExpr))
-                  return new[] {argExpr as IArgument};
-
-                return tupleExpr.Expressions.Count <= paramGroup.Count
-                  ? tupleExpr.Expressions.Select(expr => expr as IArgument)
-                  : EmptyList<IArgument>.Instance;
-            }
-          })
-          .Where(argExpr => argExpr != null)
-          .ToList();
-      }
-    }
+    public IList<IArgument> ParameterArguments => myParameterArguments.GetValue(this,
+      () => FSharpArgumentsOwnerUtil.CalculateParameterArguments(this, AppliedExpressions));
 
     public override IType Type()
     {

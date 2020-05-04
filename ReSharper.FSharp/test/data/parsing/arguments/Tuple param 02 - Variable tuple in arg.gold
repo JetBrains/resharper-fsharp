@@ -1,8 +1,7 @@
-﻿module M = let f (x, y) |z|(param #1) = x + y + z
+﻿module M = let f (x, y) |z|(param #0) = x + y + z
 
 let x = 1, 2
-M.f |x|(arg #0) |3|(arg #1)
+M.f x |3|(arg #0)
 
 ---------------------------------------------------------
-(arg #0) => <no matching param>
-(arg #1) => z
+(arg #0) => z

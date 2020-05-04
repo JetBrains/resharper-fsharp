@@ -40,29 +40,7 @@ let getMatchingParameter (expr: IFSharpExpression) =
 
     match box (symbolReference.GetFSharpSymbol()) with
     | :? FSharpMemberOrFunctionOrValue as mfv ->
-
-        // todo: this should be cached, and kept on the FSharpArgumentsOwner
-        // todo: this is basically doing the same as PrefixAppExpr.Arguments, can they be merged?
-        let args =
-            argsOwner.AppliedExpressions
-            |> Seq.map (fun expr -> expr.IgnoreInnerParens())
-            |> Seq.zip mfv.CurriedParameterGroups
-            |> Seq.collect (fun (paramGroup, argExpr) ->
-                match paramGroup.Count with
-                | 0 -> Seq.empty
-                | 1 -> Seq.singleton (argExpr :?> IArgument)
-                | count ->
-                    match argExpr with
-                    | :? ITupleExpr as tupleExpr ->
-                        Seq.init paramGroup.Count (fun i ->
-                            if i < tupleExpr.Expressions.Count then
-                                tupleExpr.Expressions.[i] :?> IArgument
-                            else
-                                null
-                        )
-                    | _ ->
-                        Seq.init count (fun _ -> null)
-            )
+        let args = argsOwner.ParameterArguments
 
         match args |> Seq.tryFindIndex (fun argExpr -> expr.Equals(argExpr)) with
         | None -> null
