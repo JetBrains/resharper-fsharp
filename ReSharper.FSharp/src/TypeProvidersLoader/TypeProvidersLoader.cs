@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using FSharp.Compiler;
+using JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using Microsoft.FSharp.Core;
 using Microsoft.FSharp.Core.CompilerServices;
@@ -15,7 +16,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader
     {
       var ilScopeRefOfRuntimeAssembly = parameters.IlScopeRefOfRuntimeAssembly.ToILScopeRef();
       var resolutionEnvironment = parameters.RdResolutionEnvironment.ToResolutionEnvironment();
-      var systemRuntimeContainsType = FSharpFunc<string, bool>.FromConverter(x => true);
+      var systemRuntimeContainsType = Hack.injectFakeTcImports(parameters.FakeTcImports);
       var systemRuntimeAssemblyVersion = Version.Parse(parameters.SystemRuntimeAssemblyVersion);
       var compilerToolsPath = ListModule.OfSeq(parameters.CompilerToolsPath);
 
@@ -23,7 +24,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader
         parameters.RunTimeAssemblyFileName, ilScopeRefOfRuntimeAssembly, parameters.DesignTimeAssemblyNameString,
         resolutionEnvironment, parameters.IsInvalidationSupported, parameters.IsInteractive, systemRuntimeContainsType,
         systemRuntimeAssemblyVersion, compilerToolsPath, Range.range.Zero);
-
+      
       return typeProviders
         .Select(t =>
           t.PUntaint(FSharpFunc<ITypeProvider, ITypeProvider>.FromConverter(x => x), Range.range.Zero))

@@ -158,7 +158,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         field("isInteractive", bool)
         field("systemRuntimeAssemblyVersion", string)
         field("compilerToolsPath", array(string))
-        field("systemRuntimeContainsType", RdSystemRuntimeContainsType)
+        field("fakeTcImports", RdFakeTcImports)
     }
 
     private val RdFakeDllInfo = structdef {

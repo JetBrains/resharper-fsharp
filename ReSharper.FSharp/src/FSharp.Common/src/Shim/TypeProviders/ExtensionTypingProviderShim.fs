@@ -62,7 +62,6 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
                 let fakeTcImports = getFakeTcImports(systemRuntimeContainsType)
             
             //TODO: need to secure lifetime 
-                let rdSystemRuntimeContainsType = RdSystemRuntimeContainsType(SystemRuntimeContainsTypeRef(Value(fakeTcImports)))
                 //rdSystemRuntimeContainsType.SystemRuntimeContainsTypeRef.Value.ConSystemRuntimeContainsType.Set(fun a b -> RdTask.Successful(systemRuntimeContainsType b))
             
                 try
@@ -76,7 +75,7 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
                                                                             isInteractive, 
                                                                             systemRuntimeAssemblyVersion.ToString(),
                                                                             compilerToolsPath |> Array.ofList,
-                                                                            rdSystemRuntimeContainsType))
+                                                                            fakeTcImports))
                     let typeProviderProxies =
                         [for tp in rdTypeProviders -> new ProxyTypeProviderWithCache(tp, ourModel) :> ITypeProvider]
                     
