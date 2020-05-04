@@ -28,7 +28,7 @@ type ArgumentsOwnerTest() =
 
     let treeNodeSelection = FSharpTreeNodeSelectionProvider.Instance
 
-    override x.RelativeTestDataPath = "parsing/arguments"
+    override x.RelativeTestDataPath = "features/service/arguments"
 
     override x.DoTest(lifetime, project) =
         let textControl = x.OpenTextControl(lifetime)
