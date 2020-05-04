@@ -9,18 +9,21 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 
 
-let resolveNamedArg (binaryAppExpr: IBinaryAppExpr) =
-    if binaryAppExpr.Operator.Reference.GetName() <> "=" then null else
+let tryGetNamedRef (expr: IFSharpExpression) =
+    let binaryAppExpr = expr.As<IBinaryAppExpr>()
+    if isNull binaryAppExpr then None else
+
+    if binaryAppExpr.Operator.Reference.GetName() <> "=" then None else
 
     match binaryAppExpr.LeftArgument with
-    | :? IReferenceExpr as refExpr -> refExpr.Reference.Resolve().DeclaredElement.As<IParameter>()
-    | _ -> null
+    | :? IReferenceExpr as refExpr -> Some refExpr
+    | _ -> None
 
 
 let tryGetNamedArg (expr: IFSharpExpression) =
-    match expr with
-    | :? IBinaryAppExpr as binaryAppExpr -> resolveNamedArg binaryAppExpr
-    | _ -> null
+    match tryGetNamedRef expr with
+    | None -> null
+    | Some refExpr -> refExpr.Reference.Resolve().DeclaredElement.As<IParameter>()
 
 
 let getMatchingParameter (expr: IFSharpExpression) =
@@ -31,31 +34,50 @@ let getMatchingParameter (expr: IFSharpExpression) =
 
     if isNull argsOwner then null else
 
-    let binaryAppExpr = expr.As<IBinaryAppExpr>()
-    // todo: recover from named args failures
-    if isNotNull binaryAppExpr then resolveNamedArg binaryAppExpr else
+    let namedRefOpt = tryGetNamedRef expr
+    let namedParam =
+        match namedRefOpt with
+        | None -> null
+        | Some namedRef -> namedRef.Reference.Resolve().DeclaredElement.As<IParameter>()
+    if isNotNull namedParam then namedParam else
 
     let symbolReference = argsOwner.Reference
     if isNull symbolReference then null else
 
-    match box (symbolReference.GetFSharpSymbol()) with
-    | :? FSharpMemberOrFunctionOrValue as mfv ->
+    let mfv =
+        symbolReference.TryGetFSharpSymbol()
+        |> Option.bind (function
+            | :? FSharpMemberOrFunctionOrValue as mfv -> Some mfv
+            | _ -> None)
+
+    match mfv with
+    | None -> null
+    | Some mfv ->
+
+    let paramOwner = symbolReference.Resolve().DeclaredElement.As<IParametersOwner>()
+    if isNull paramOwner then null else
+
+    let param =
+        match namedRefOpt with
+        | Some namedRef ->
+            // If this is a named argument, but FCS couldn't match it, try matching ourselves by name
+            paramOwner.Parameters
+            |> Seq.tryFind (fun param -> param.ShortName = namedRef.Reference.GetName())
+        | None ->
+
         let args = argsOwner.ParameterArguments
 
         match args |> Seq.tryFindIndex (fun argExpr -> expr.Equals(argExpr)) with
-        | None -> null
+        | None -> None
         | Some paramIndex ->
-
-        let paramOwner = symbolReference.Resolve().DeclaredElement.As<IParametersOwner>()
-        if isNull paramOwner then null else
 
         let invokingExtensionMethod = mfv.IsExtensionMember && Some mfv.ApparentEnclosingEntity <> mfv.DeclaringEntity
         let offset = if invokingExtensionMethod then 1 else 0
-        let param = paramOwner.Parameters.[paramIndex + offset]
+        Some paramOwner.Parameters.[paramIndex + offset]
 
-        // Skip unnamed parameters
-        if param.ShortName = SharedImplUtil.MISSING_DECLARATION_NAME then null else param
-
+    // Skip unnamed parameters
+    match param with
+    | Some param when param.ShortName <> SharedImplUtil.MISSING_DECLARATION_NAME -> param
     | _ -> null
 
 [<Language(typeof<FSharpLanguage>)>]

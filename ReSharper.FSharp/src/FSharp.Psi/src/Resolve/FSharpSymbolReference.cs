@@ -12,6 +12,7 @@ using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 using JetBrains.Util.DataStructures;
+using Microsoft.FSharp.Core;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
@@ -33,6 +34,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     public virtual FSharpSymbol GetFSharpSymbol() =>
       GetSymbolUse()?.Symbol;
+
+    public FSharpOption<FSharpSymbol> TryGetFSharpSymbol() =>
+      OptionModule.OfObj(GetFSharpSymbol());
 
     public override ResolveResultWithInfo ResolveWithoutCache()
     {

@@ -6,7 +6,7 @@ open System.Runtime.CompilerServices
 [<Extension>]
 type FileExt =
     [<Extension>]
-    static member CreateDirectory (fileInfo: FileInfo, safe: bool, x: string) =
+    static member CreateDirectory (fileInfo: FileInfo, safe: bool, s: string) =
             Directory.CreateDirectory fileInfo.Directory.FullName
 
 let x = FileInfo "abc.txt"
