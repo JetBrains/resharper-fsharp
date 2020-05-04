@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Globalization;
-using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
 using ClientRdStaticArg = JetBrains.Rider.FSharp.TypeProvidersProtocol.Client.RdStaticArg;
@@ -31,6 +30,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils
         char x => new RdStaticArg("char", x.ToString()),
         bool x => new RdStaticArg("bool", x.ToString()),
         string x => new RdStaticArg("string", x),
+        _ when value.GetType() is var type && type.IsEnum => ((int)value).BoxToServerStaticArg(),
         _ => throw new ArgumentException($"Unexpected static arg with type {value.GetType().FullName}")
       };
     }
@@ -55,6 +55,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils
         char x => new ClientRdStaticArg("char", x.ToString()),
         bool x => new ClientRdStaticArg("bool", x.ToString()),
         string x => new ClientRdStaticArg("string", x),
+        _ when value.GetType() is var type && type.IsEnum => ((int)value).BoxToClientStaticArg(),
         _ => throw new ArgumentException($"Unexpected static arg with type {value.GetType().FullName}")
       };
     }
@@ -78,7 +79,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils
         "double" => double.Parse(arg.Value),
         "char" => char.Parse(arg.Value),
         "bool" => bool.Parse(arg.Value),
-        "string" => (object) arg.Value,
+        "string" => arg.Value,
         _ => throw new ArgumentException($"Unexpected static arg with type {arg.TypeName}")
       };
     }
