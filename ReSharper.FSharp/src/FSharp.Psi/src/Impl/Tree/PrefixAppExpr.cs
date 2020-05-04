@@ -20,7 +20,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       get
       {
-        // todo: can we init this once then cache it?
         var funExpr = (IPrefixAppExpr) this;
         while (funExpr.FunctionExpression.IgnoreInnerParens() is IPrefixAppExpr appExpr)
         {
