@@ -31,7 +31,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
     }
 
     private val RdProvidedMemberInfo = baseclass extends RdProvidedEntity {
-        field("Name", string)
+        field("Name", string.nullable)
     }
 
     private val RdProvidedMethodBase = baseclass extends RdProvidedMemberInfo {
