@@ -1,12 +1,12 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open System
+open System.IO
 open FSharp.Compiler.SourceCodeServices
+open JetBrains.Diagnostics
 open JetBrains.ProjectModel
-open JetBrains.ReSharper.Feature.Services.ExpressionSelection
 open JetBrains.ReSharper.FeaturesTestFramework.Utils
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -26,15 +26,15 @@ type ExpectErrorsAttribute () =
 type ArgumentsOwnerTest() =
     inherit BaseTestWithTextControl()
 
+    let treeNodeSelection = FSharpTreeNodeSelectionProvider.Instance
+
     override x.RelativeTestDataPath = "parsing/arguments"
 
     override x.DoTest(lifetime, project) =
         let textControl = x.OpenTextControl(lifetime)
-
-        let expectErrors = x.TestMethod.GetCustomAttributes(typeof<ExpectErrorsAttribute>, true).Length > 0
-
         let fsFile = textControl.GetFSharpFile(x.Solution)
 
+        let expectErrors = x.TestMethod.GetCustomAttributes(typeof<ExpectErrorsAttribute>, true).Length > 0
         if not expectErrors then
             match fsFile.GetParseAndCheckResults(true, "ArgumentsOwnerTest") with
             | None -> failwithf "GetParseAndCheckResults failed"
@@ -44,16 +44,24 @@ type ArgumentsOwnerTest() =
                 results.CheckResults.Errors
                 |> Array.filter (fun err -> err.Severity = FSharpErrorSeverity.Error)
 
-            match errors with
-            | [||] -> ()
-            | errors ->
-                errors
-                |> Array.map (fun err -> sprintf "(%d,%d)-(%d,%d): %s %d: %s" err.Range.StartLine err.Range.StartColumn err.Range.EndLine err.Range.EndColumn err.Subcategory err.ErrorNumber err.Message)
-                |> String.concat "\n"
-                |> failwithf "Errors occurred while type checking:\n\n%s"
+            if errors.Length = 0 then () else
 
-        let expr = FSharpTreeNodeSelectionProvider.Instance.GetExpressionInRange<IArgumentsOwner>(fsFile, textControl.Selection.OneDocumentRangeWithCaret(), true, null)
-        if isNull expr then failwithf "Failed to find IArgumentsOwner at selection"
+            errors
+            |> Array.map (fun err ->
+                sprintf
+                    "(%d,%d)-(%d,%d): %s %d: %s"
+                    err.Range.StartLine err.Range.StartColumn
+                    err.Range.EndLine err.Range.EndColumn
+                    err.Subcategory err.ErrorNumber
+                    err.Message)
+            |> String.concat "\n"
+            |> failwithf "Errors occurred while type checking:\n\n%s"
+
+        let selection = textControl.Selection.OneDocumentRangeWithCaret()
+        let expr =
+            treeNodeSelection
+                .GetExpressionInRange<IArgumentsOwner>(fsFile, selection, true, null)
+                .NotNull("Failed to find IArgumentsOwner at selection")
 
         x.ExecuteWithGold(fun writer ->
             let args = Array.ofSeq expr.Arguments
@@ -62,26 +70,21 @@ type ArgumentsOwnerTest() =
                 args
                 |> Array.indexed
                 |> Array.collect (fun (i, expr) ->
-                    let argRange = sprintf "|(arg #%d)" i, expr.GetDocumentRange().TextRange
-
                     let matchingParam = expr.MatchingParameter
 
                     let declRange =
                         if isNull matchingParam then None else
-
                         match matchingParam.Element with
-                        | :? FSharpMethodParameter as param ->
-                            // todo: assert document name
+                        | :? FSharpMethodParameter as param
+                                when Path.GetFileName(param.FSharpSymbol.DeclarationLocation.FileName) = fsFile.GetSourceFile().Name ->
                             Some (FSharpRangeUtil.getTextRange textControl.Document param.FSharpSymbol.DeclarationLocation)
-                        | :? FSharpExtensionMemberParameter as extParam ->
-                            failwith "todo: support extension params"
                         | _ ->
                             None
 
+                    let argRange = sprintf "|(arg #%d)" i, expr.GetDocumentRange().TextRange
                     match declRange with
                     | None -> [| argRange |]
-                    | Some declRange -> [| argRange; sprintf "|(param #%d)" i, declRange |]
-                )
+                    | Some declRange -> [| argRange; sprintf "|(param #%d)" i, declRange |])
                 |> Array.unzip
 
             let endText rangeIdx = endTexts.[rangeIdx]

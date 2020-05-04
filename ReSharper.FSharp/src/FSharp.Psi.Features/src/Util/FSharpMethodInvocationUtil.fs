@@ -12,16 +12,15 @@ open JetBrains.ReSharper.Psi.Tree
 let resolveNamedArg (binaryAppExpr: IBinaryAppExpr) =
     if binaryAppExpr.Operator.Reference.GetName() <> "=" then null else
 
-    let refExpr = binaryAppExpr.LeftArgument.As<IReferenceExpr>()
-    if isNull refExpr then null else
-
-    refExpr.Reference.Resolve().DeclaredElement.As<IParameter>()
+    match binaryAppExpr.LeftArgument with
+    | :? IReferenceExpr as refExpr -> refExpr.Reference.Resolve().DeclaredElement.As<IParameter>()
+    | _ -> null
 
 
 let tryGetNamedArg (expr: IFSharpExpression) =
-    let binaryAppExpr = expr.As<IBinaryAppExpr>()
-    if isNull binaryAppExpr then null else
-    resolveNamedArg binaryAppExpr
+    match expr with
+    | :? IBinaryAppExpr as binaryAppExpr -> resolveNamedArg binaryAppExpr
+    | _ -> null
 
 
 let getMatchingParameter (expr: IFSharpExpression) =
