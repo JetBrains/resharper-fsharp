@@ -171,3 +171,6 @@ type ArgumentsOwnerTest() =
 
     [<Test; ExpectErrors>] member x.``Tuple param 04 - Mismatch - too few``() = x.DoNamedTest()
     [<Test; ExpectErrors>] member x.``Tuple param 05 - Mismatch - too many``() = x.DoNamedTest()
+
+    [<Test>] member x.``Unit 01 - Named``() = x.DoNamedTest()
+    [<Test>] member x.``Unit 02 - Unnamed``() = x.DoNamedTest()
