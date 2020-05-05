@@ -27,7 +27,6 @@ open JetBrains.Util.Dotnet.TargetFrameworkIds
 open Moq
 open NUnit.Framework
 
-[<assembly: Parallelizable(ParallelScope.All)>]
 [<assembly: Apartment(ApartmentState.STA)>]
 do()
 
