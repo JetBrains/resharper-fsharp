@@ -75,6 +75,7 @@
     <Compile Include="src\Search\RecordCtorSearch.fs" />
     <Compile Include="src\ExtendSelection\FSharpExtendSelectionProvider.fs" />
     <Compile Include="src\Formatter\FSharpReformatCode.fs" />
+    <Compile Include="src\Fsi\FsiTools.fs" />
     <Compile Include="src\Fsi\FsiOptions.fs" />
     <Compile Include="src\Fsi\FsiDetector.fs" />
     <Compile Include="src\Fsi\FsiHost.fs" />
@@ -148,6 +149,7 @@
     <Compile Include="src\LanguageService\FSharpBreadcrumbsHelper.fs" />
     <Compile Include="src\LanguageService\FSharpImportTypeHelper.fs" />
     <Compile Include="src\LanguageService\FSharpQuickDefinitionService.fs" />
+    <Compile Include="src\LanguageService\SandboxDocumentLanguageSupportFSharpScript.fs" />
     <Compile Include="src\FSharpTypingAssist.fs" />
     <Compile Include="src\ZoneMarker.fs" />
   </ItemGroup>
