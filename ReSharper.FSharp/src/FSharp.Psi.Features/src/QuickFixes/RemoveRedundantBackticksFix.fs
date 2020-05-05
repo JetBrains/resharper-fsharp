@@ -28,5 +28,6 @@ type RemoveRedundantBackticksFix(warning: RedundantBackticksWarning) =
     interface IHighlightingsCleanupItem with
         member x.IsAvailable _ = true
         member x.IsReanalysisRequired = false
+        member x.ReanalysisDependencyRoot = null
         member x.IsValid() = isValid identifier
         member x.Execute() = x.ExecutePsiTransaction() |> ignore

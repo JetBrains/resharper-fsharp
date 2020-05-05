@@ -45,7 +45,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 
         var highlightingId =
           symbolUse.IsFromComputationExpression
-            ? FSharpHighlightingAttributeIds.Keyword
+            ? FSharpHighlightingAttributeIdsModule.Keyword
             : symbol.GetHighlightingAttributeId();
 
         if (symbolUse.IsFromDefinition && symbol is FSharpMemberOrFunctionOrValue mfv)

@@ -19,12 +19,12 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Rider.Model
 open JetBrains.Util
 
+module FSharpInferredTypeHighlighting =
+    let [<Literal>] Id = "CodeInsights"
 
 [<StaticSeverityHighlighting(
-    Severity.INFO,
-    HighlightingGroupIds.CodeInsightsGroup, 
-    AttributeId = HighlightingGroupIds.CodeInsightsGroup,
-    OverlapResolve = OverlapResolveKind.NONE)>]
+    Severity.INFO, typeof<HighlightingGroupIds.CodeInsights>, 
+    AttributeId = FSharpInferredTypeHighlighting.Id, OverlapResolve = OverlapResolveKind.NONE)>]
 type FSharpInferredTypeHighlighting(range, text, provider: ICodeInsightsProvider) =
     inherit CodeInsightsHighlighting(range, text, "", "Copy inferred type", provider, null, null)
 

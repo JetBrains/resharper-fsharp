@@ -68,78 +68,69 @@ type FSharpSettingsNamesProvider() =
 
 // todo: replace explicit styles with fallback ids when highlighting registration refactoring is finished.
 
-[<assembly:
-      RegisterHighlighterGroup(
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          PresentableName = "F#",
-          Priority = HighlighterGroupPriority.KEY_LANGUAGE_SETTINGS,
-          RiderNamesProviderType = typeof<FSharpSettingsNamesProvider>);
+[<RegisterHighlighterGroup(
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      PresentableName = "F#",
+      Priority = HighlighterGroupPriority.KEY_LANGUAGE_SETTINGS,
+      RiderNamesProviderType = typeof<FSharpSettingsNamesProvider>);
 
-  assembly:
-      RegisterHighlighter(
-          FSharpHighlightingAttributeIds.Keyword,
-          FallbackAttributeId = DefaultLanguageAttributeIds.KEYWORD,
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          RiderPresentableName = "Syntax//Keyword",
-          Layer = HighlighterLayer.SYNTAX,
-          EffectType = EffectType.TEXT, ForegroundColor = "#0000E0", DarkForegroundColor = "#569CD6");
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.Keyword,
+      FallbackAttributeId = DefaultLanguageAttributeIds.KEYWORD,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Syntax//Keyword",
+      Layer = HighlighterLayer.SYNTAX,
+      EffectType = EffectType.TEXT, ForegroundColor = "#0000E0", DarkForegroundColor = "#569CD6");
 
-  assembly:
-      RegisterHighlighter(
-          FSharpHighlightingAttributeIds.String,
-          FallbackAttributeId = DefaultLanguageAttributeIds.STRING,
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          RiderPresentableName = "Syntax//String",
-          Layer = HighlighterLayer.SYNTAX,
-          EffectType = EffectType.TEXT, ForegroundColor = "#A31515", DarkForegroundColor = "#D69D85");
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.String,
+      FallbackAttributeId = DefaultLanguageAttributeIds.STRING,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Syntax//String",
+      Layer = HighlighterLayer.SYNTAX,
+      EffectType = EffectType.TEXT, ForegroundColor = "#A31515", DarkForegroundColor = "#D69D85");
 
-  assembly:
-      RegisterHighlighter(
-          FSharpHighlightingAttributeIds.Number,
-          FallbackAttributeId = DefaultLanguageAttributeIds.NUMBER,
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          RiderPresentableName = "Syntax//Number",
-          Layer = HighlighterLayer.SYNTAX,
-          EffectType = EffectType.TEXT, ForegroundColor = "#000000", DarkForegroundColor = "#B5CEA8");
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.Number,
+      FallbackAttributeId = DefaultLanguageAttributeIds.NUMBER,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Syntax//Number",
+      Layer = HighlighterLayer.SYNTAX,
+      EffectType = EffectType.TEXT, ForegroundColor = "#000000", DarkForegroundColor = "#B5CEA8");
 
-  assembly:
-      RegisterHighlighter(
-          FSharpHighlightingAttributeIds.LineComment,
-          FallbackAttributeId = DefaultLanguageAttributeIds.LINE_COMMENT,
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          RiderPresentableName = "Comments//Line comment",
-          Layer = HighlighterLayer.ADDITIONAL_SYNTAX,
-          EffectType = EffectType.TEXT, ForegroundColor = "#007F00", DarkForegroundColor = "#57A64A");
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.LineComment,
+      FallbackAttributeId = DefaultLanguageAttributeIds.LINE_COMMENT,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Comments//Line comment",
+      Layer = HighlighterLayer.ADDITIONAL_SYNTAX,
+      EffectType = EffectType.TEXT, ForegroundColor = "#007F00", DarkForegroundColor = "#57A64A");
 
-  assembly:
-      RegisterHighlighter(
-          FSharpHighlightingAttributeIds.BlockComment,
-          FallbackAttributeId = DefaultLanguageAttributeIds.BLOCK_COMMENT,
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          RiderPresentableName = "Comments//Block comment",
-          Layer = HighlighterLayer.ADDITIONAL_SYNTAX,
-          EffectType = EffectType.TEXT, ForegroundColor = "#007F00", DarkForegroundColor = "#57A64A");
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.BlockComment,
+      FallbackAttributeId = DefaultLanguageAttributeIds.BLOCK_COMMENT,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Comments//Block comment",
+      Layer = HighlighterLayer.ADDITIONAL_SYNTAX,
+      EffectType = EffectType.TEXT, ForegroundColor = "#007F00", DarkForegroundColor = "#57A64A");
 
-  assembly:
-      RegisterHighlighter(
-          FSharpHighlightingAttributeIds.EscapeCharacter1,
-          FallbackAttributeId = DefaultLanguageAttributeIds.STRING_ESCAPE_CHARACTER_1,
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          Layer = FSharpHighlightingAttributeIds.LayerSyntaxPlusOne,
-          VSPriority = FSharpHighlightingAttributeIds.VsPriorityPlusOne,
-          EffectType = EffectType.TEXT, ForegroundColor = "#FF007F", DarkForegroundColor = "#E07A00");
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.EscapeCharacter1,
+      FallbackAttributeId = DefaultLanguageAttributeIds.STRING_ESCAPE_CHARACTER_1,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      Layer = FSharpHighlightingAttributeIds.LayerSyntaxPlusOne,
+      VSPriority = FSharpHighlightingAttributeIds.VsPriorityPlusOne,
+      EffectType = EffectType.TEXT, ForegroundColor = "#FF007F", DarkForegroundColor = "#E07A00");
 
-  assembly:
-      RegisterHighlighter(
-          FSharpHighlightingAttributeIds.EscapeCharacter2,
-          FallbackAttributeId = DefaultLanguageAttributeIds.STRING_ESCAPE_CHARACTER_2,
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          Layer = FSharpHighlightingAttributeIds.LayerSyntaxPlusOne,
-          VSPriority = FSharpHighlightingAttributeIds.VsPriorityPlusOne,
-          EffectType = EffectType.TEXT, ForegroundColor = "#FF66B2", DarkForegroundColor = "#FF8D1C");
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.EscapeCharacter2,
+      FallbackAttributeId = DefaultLanguageAttributeIds.STRING_ESCAPE_CHARACTER_2,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      Layer = FSharpHighlightingAttributeIds.LayerSyntaxPlusOne,
+      VSPriority = FSharpHighlightingAttributeIds.VsPriorityPlusOne,
+      EffectType = EffectType.TEXT, ForegroundColor = "#FF66B2", DarkForegroundColor = "#FF8D1C");
 
-  assembly:
-    RegisterHighlighter(
+  RegisterHighlighter(
       FSharpHighlightingAttributeIds.PreprocessorKeyword,
       FallbackAttributeId = DefaultLanguageAttributeIds.PREPROCESSOR_KEYWORD,
       GroupId = FSharpHighlightingAttributeIds.GroupId,
@@ -147,229 +138,206 @@ type FSharpSettingsNamesProvider() =
       Layer = HighlighterLayer.SYNTAX,
       EffectType = EffectType.TEXT, ForegroundColor = "#0000E0", DarkForegroundColor = "#569CD6");
 
-  assembly:
-      RegisterHighlighter(
-          FSharpHighlightingAttributeIds.PreprocessorInactiveBranch,
-          FallbackAttributeId = DefaultLanguageAttributeIds.PREPROCESSOR_INACTIVE_BRANCH,
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          RiderPresentableName = "Preprocessor//Inactive branch",
-          Layer = HighlighterLayer.DEADCODE,
-          VSPriority = VSPriority.DEADCODE,
-          EffectType = EffectType.TEXT, ForegroundColor = "DarkGray");
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.PreprocessorInactiveBranch,
+      FallbackAttributeId = DefaultLanguageAttributeIds.PREPROCESSOR_INACTIVE_BRANCH,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Preprocessor//Inactive branch",
+      Layer = HighlighterLayer.DEADCODE,
+      VSPriority = VSPriority.DEADCODE,
+      EffectType = EffectType.TEXT, ForegroundColor = "DarkGray");
 
-  assembly:
-      RegisterHighlighter(
-          FSharpHighlightingAttributeIds.Namespace,
-          FallbackAttributeId = DefaultLanguageAttributeIds.NAMESPACE,
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          RiderPresentableName = "Modules and namespaces//Namespace",
-          Layer = HighlighterLayer.SYNTAX,
-          VSPriority = VSPriority.IDENTIFIERS,
-          EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.Namespace,
+      FallbackAttributeId = DefaultLanguageAttributeIds.NAMESPACE,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Modules and namespaces//Namespace",
+      Layer = HighlighterLayer.SYNTAX,
+      VSPriority = VSPriority.IDENTIFIERS,
+      EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
 
-  assembly:
-      RegisterHighlighter(
-          FSharpHighlightingAttributeIds.Module,
-          FallbackAttributeId = FSharpHighlightingAttributeIds.StaticClass,
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          RiderPresentableName = "Modules and namespaces//Module",
-          Layer = HighlighterLayer.SYNTAX,
-          VSPriority = VSPriority.IDENTIFIERS,
-          EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.Module,
+      FallbackAttributeId = FSharpHighlightingAttributeIds.StaticClass,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Modules and namespaces//Module",
+      Layer = HighlighterLayer.SYNTAX,
+      VSPriority = VSPriority.IDENTIFIERS,
+      EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
 
-  assembly:
-      RegisterHighlighter(
-          FSharpHighlightingAttributeIds.Class,
-          FallbackAttributeId = DefaultLanguageAttributeIds.CLASS,
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          RiderPresentableName = "Types//Class",
-          Layer = HighlighterLayer.SYNTAX,
-          VSPriority = VSPriority.IDENTIFIERS,
-          EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.Class,
+      FallbackAttributeId = DefaultLanguageAttributeIds.CLASS,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Types//Class",
+      Layer = HighlighterLayer.SYNTAX,
+      VSPriority = VSPriority.IDENTIFIERS,
+      EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
 
-  assembly:
-      RegisterHighlighter(
-          FSharpHighlightingAttributeIds.StaticClass,
-          FallbackAttributeId = FSharpHighlightingAttributeIds.Class,
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          RiderPresentableName = "Types//Static class",
-          Layer = HighlighterLayer.SYNTAX,
-          VSPriority = VSPriority.IDENTIFIERS,
-          EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.StaticClass,
+      FallbackAttributeId = FSharpHighlightingAttributeIds.Class,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Types//Static class",
+      Layer = HighlighterLayer.SYNTAX,
+      VSPriority = VSPriority.IDENTIFIERS,
+      EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
 
-  assembly:
-      RegisterHighlighter(
-          FSharpHighlightingAttributeIds.Interface,
-          FallbackAttributeId = DefaultLanguageAttributeIds.INTERFACE,
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          RiderPresentableName = "Types//Interface",
-          Layer = HighlighterLayer.SYNTAX,
-          VSPriority = VSPriority.IDENTIFIERS,
-          EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.Interface,
+      FallbackAttributeId = DefaultLanguageAttributeIds.INTERFACE,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Types//Interface",
+      Layer = HighlighterLayer.SYNTAX,
+      VSPriority = VSPriority.IDENTIFIERS,
+      EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
 
-  assembly:
-      RegisterHighlighter(
-          FSharpHighlightingAttributeIds.Delegate,
-          FallbackAttributeId = DefaultLanguageAttributeIds.DELEGATE,
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          RiderPresentableName = "Types//Delegate",
-          Layer = HighlighterLayer.SYNTAX,
-          VSPriority = VSPriority.IDENTIFIERS,
-          EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.Delegate,
+      FallbackAttributeId = DefaultLanguageAttributeIds.DELEGATE,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Types//Delegate",
+      Layer = HighlighterLayer.SYNTAX,
+      VSPriority = VSPriority.IDENTIFIERS,
+      EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
 
-  assembly:
-      RegisterHighlighter(
-          FSharpHighlightingAttributeIds.Struct,
-          FallbackAttributeId = DefaultLanguageAttributeIds.STRUCT,
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          RiderPresentableName = "Types//Struct",
-          Layer = HighlighterLayer.SYNTAX,
-          VSPriority = VSPriority.IDENTIFIERS,
-          EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.Struct,
+      FallbackAttributeId = DefaultLanguageAttributeIds.STRUCT,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Types//Struct",
+      Layer = HighlighterLayer.SYNTAX,
+      VSPriority = VSPriority.IDENTIFIERS,
+      EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
 
-  assembly:
-      RegisterHighlighter(
-          FSharpHighlightingAttributeIds.Enum,
-          FallbackAttributeId = DefaultLanguageAttributeIds.ENUM,
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          RiderPresentableName = "Types//Enum",
-          Layer = HighlighterLayer.SYNTAX,
-          VSPriority = VSPriority.IDENTIFIERS,
-          EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.Enum,
+      FallbackAttributeId = DefaultLanguageAttributeIds.ENUM,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Types//Enum",
+      Layer = HighlighterLayer.SYNTAX,
+      VSPriority = VSPriority.IDENTIFIERS,
+      EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
 
-  assembly:
-      RegisterHighlighter(
-          FSharpHighlightingAttributeIds.TypeParameter,
-          FallbackAttributeId = DefaultLanguageAttributeIds.TYPE_PARAMETER,
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          RiderPresentableName = "Types//Type parameter",
-          Layer = HighlighterLayer.SYNTAX,
-          VSPriority = VSPriority.IDENTIFIERS,
-          EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.TypeParameter,
+      FallbackAttributeId = DefaultLanguageAttributeIds.TYPE_PARAMETER,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Types//Type parameter",
+      Layer = HighlighterLayer.SYNTAX,
+      VSPriority = VSPriority.IDENTIFIERS,
+      EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
 
-  assembly:
-      RegisterHighlighter(
-          FSharpHighlightingAttributeIds.Union,
-          FallbackAttributeId = FSharpHighlightingAttributeIds.Enum,
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          RiderPresentableName = "Types//Union",
-          Layer = HighlighterLayer.SYNTAX,
-          VSPriority = VSPriority.IDENTIFIERS,
-          EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.Union,
+      FallbackAttributeId = FSharpHighlightingAttributeIds.Enum,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Types//Union",
+      Layer = HighlighterLayer.SYNTAX,
+      VSPriority = VSPriority.IDENTIFIERS,
+      EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
 
-  assembly:
-      RegisterHighlighter(
-          FSharpHighlightingAttributeIds.UnionCase,
-          FallbackAttributeId = FSharpHighlightingAttributeIds.Class,
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          RiderPresentableName = "Types//Union Case",
-          Layer = HighlighterLayer.SYNTAX,
-          VSPriority = VSPriority.IDENTIFIERS,
-          EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.UnionCase,
+      FallbackAttributeId = FSharpHighlightingAttributeIds.Class,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Types//Union Case",
+      Layer = HighlighterLayer.SYNTAX,
+      VSPriority = VSPriority.IDENTIFIERS,
+      EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
 
-  assembly:
-      RegisterHighlighter(
-          FSharpHighlightingAttributeIds.Record,
-          FallbackAttributeId = FSharpHighlightingAttributeIds.Class,
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          RiderPresentableName = "Types//Record",
-          Layer = HighlighterLayer.SYNTAX,
-          VSPriority = VSPriority.IDENTIFIERS,
-          EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.Record,
+      FallbackAttributeId = FSharpHighlightingAttributeIds.Class,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Types//Record",
+      Layer = HighlighterLayer.SYNTAX,
+      VSPriority = VSPriority.IDENTIFIERS,
+      EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
 
-  assembly:
-      RegisterHighlighter(
-          FSharpHighlightingAttributeIds.Literal,
-          FallbackAttributeId = DefaultLanguageAttributeIds.CONSTANT,
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          RiderPresentableName = "Values//Literal",
-          Layer = HighlighterLayer.SYNTAX,
-          VSPriority = VSPriority.IDENTIFIERS,
-          EffectType = EffectType.TEXT, ForegroundColor = "Purple", DarkForegroundColor = "Violet",
-          FontStyle = FontStyle.Bold);
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.Literal,
+      FallbackAttributeId = DefaultLanguageAttributeIds.CONSTANT,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Values//Literal",
+      Layer = HighlighterLayer.SYNTAX,
+      VSPriority = VSPriority.IDENTIFIERS,
+      EffectType = EffectType.TEXT, ForegroundColor = "Purple", DarkForegroundColor = "Violet",
+      FontStyle = FontStyle.Bold);
 
-  assembly:
-      RegisterHighlighter(
-          FSharpHighlightingAttributeIds.Event,
-          FallbackAttributeId = DefaultLanguageAttributeIds.EVENT,
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          RiderPresentableName = "Members//Event",
-          Layer = HighlighterLayer.SYNTAX,
-          VSPriority = VSPriority.IDENTIFIERS,
-          EffectType = EffectType.TEXT, ForegroundColor = "Magenta", DarkForegroundColor = "Plum");
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.Event,
+      FallbackAttributeId = DefaultLanguageAttributeIds.EVENT,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Members//Event",
+      Layer = HighlighterLayer.SYNTAX,
+      VSPriority = VSPriority.IDENTIFIERS,
+      EffectType = EffectType.TEXT, ForegroundColor = "Magenta", DarkForegroundColor = "Plum");
 
-  assembly:
-      RegisterHighlighter(
-          FSharpHighlightingAttributeIds.Field,
-          FallbackAttributeId = DefaultLanguageAttributeIds.FIELD,
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          RiderPresentableName = "Members//Field",
-          Layer = HighlighterLayer.SYNTAX,
-          VSPriority = VSPriority.IDENTIFIERS,
-          EffectType = EffectType.TEXT, ForegroundColor = "Purple", DarkForegroundColor = "Violet");
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.Field,
+      FallbackAttributeId = DefaultLanguageAttributeIds.FIELD,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Members//Field",
+      Layer = HighlighterLayer.SYNTAX,
+      VSPriority = VSPriority.IDENTIFIERS,
+      EffectType = EffectType.TEXT, ForegroundColor = "Purple", DarkForegroundColor = "Violet");
 
-  assembly:
-      RegisterHighlighter(
-          FSharpHighlightingAttributeIds.Property,
-          FallbackAttributeId = DefaultLanguageAttributeIds.PROPERTY,
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          RiderPresentableName = "Members//Property",
-          Layer = HighlighterLayer.SYNTAX,
-          VSPriority = VSPriority.IDENTIFIERS,
-          EffectType = EffectType.TEXT, ForegroundColor = "Purple", DarkForegroundColor = "Violet");
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.Property,
+      FallbackAttributeId = DefaultLanguageAttributeIds.PROPERTY,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Members//Property",
+      Layer = HighlighterLayer.SYNTAX,
+      VSPriority = VSPriority.IDENTIFIERS,
+      EffectType = EffectType.TEXT, ForegroundColor = "Purple", DarkForegroundColor = "Violet");
 
-  assembly:
-      RegisterHighlighter(
-          FSharpHighlightingAttributeIds.Value,
-          FallbackAttributeId = DefaultLanguageAttributeIds.LOCAL_VARIABLE,
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          RiderPresentableName = "Values//Value",
-          Layer = HighlighterLayer.SYNTAX,
-          VSPriority = VSPriority.IDENTIFIERS,
-          EffectType = EffectType.TEXT);
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.Value,
+      FallbackAttributeId = DefaultLanguageAttributeIds.LOCAL_VARIABLE,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Values//Value",
+      Layer = HighlighterLayer.SYNTAX,
+      VSPriority = VSPriority.IDENTIFIERS,
+      EffectType = EffectType.TEXT);
 
-  assembly:
-      RegisterHighlighter(
-          FSharpHighlightingAttributeIds.MutableValue,
-          FallbackAttributeId = DefaultLanguageAttributeIds.MUTABLE_LOCAL_VARIABLE,
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          RiderPresentableName = "Values//Mutable value",
-          Layer = FSharpHighlightingAttributeIds.LayerSyntaxPlusOne,
-          VSPriority = FSharpHighlightingAttributeIds.VsPriorityPlusOne,
-          EffectType = EffectType.TEXT,
-          FontStyle = FontStyle.Bold);
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.MutableValue,
+      FallbackAttributeId = DefaultLanguageAttributeIds.MUTABLE_LOCAL_VARIABLE,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Values//Mutable value",
+      Layer = FSharpHighlightingAttributeIds.LayerSyntaxPlusOne,
+      VSPriority = FSharpHighlightingAttributeIds.VsPriorityPlusOne,
+      EffectType = EffectType.TEXT,
+      FontStyle = FontStyle.Bold);
 
-  assembly:
-      RegisterHighlighter(
-          FSharpHighlightingAttributeIds.Method,
-          FallbackAttributeId = DefaultLanguageAttributeIds.METHOD,
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          RiderPresentableName = "Members//Method",
-          Layer = HighlighterLayer.SYNTAX,
-          VSPriority = VSPriority.IDENTIFIERS,
-          EffectType = EffectType.TEXT, ForegroundColor = "DarkCyan:Maroon", DarkForegroundColor = "Cyan");
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.Method,
+      FallbackAttributeId = DefaultLanguageAttributeIds.METHOD,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Members//Method",
+      Layer = HighlighterLayer.SYNTAX,
+      VSPriority = VSPriority.IDENTIFIERS,
+      EffectType = EffectType.TEXT, ForegroundColor = "DarkCyan:Maroon", DarkForegroundColor = "Cyan");
 
-  assembly:
-      RegisterHighlighter(
-          FSharpHighlightingAttributeIds.Operator,
-          FallbackAttributeId = DefaultLanguageAttributeIds.OVERLOADED_OPERATOR,
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          RiderPresentableName = "Values//Operator",
-          Layer = HighlighterLayer.SYNTAX,
-          VSPriority = VSPriority.IDENTIFIERS,
-          EffectType = EffectType.TEXT, ForegroundColor = "DarkCyan:Blue", DarkForegroundColor = "Cyan");
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.Operator,
+      FallbackAttributeId = DefaultLanguageAttributeIds.OVERLOADED_OPERATOR,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Values//Operator",
+      Layer = HighlighterLayer.SYNTAX,
+      VSPriority = VSPriority.IDENTIFIERS,
+      EffectType = EffectType.TEXT, ForegroundColor = "DarkCyan:Blue", DarkForegroundColor = "Cyan");
 
-    assembly:
-      RegisterHighlighter(
-          FSharpHighlightingAttributeIds.ActivePatternCase,
-          FallbackAttributeId = FSharpHighlightingAttributeIds.Method,
-          GroupId = FSharpHighlightingAttributeIds.GroupId,
-          RiderPresentableName = "Values//Active pattern case",
-          Layer = HighlighterLayer.SYNTAX,
-          VSPriority = VSPriority.IDENTIFIERS,
-          EffectType = EffectType.TEXT, ForegroundColor = "DarkCyan:Blue", DarkForegroundColor = "Cyan")>]
-do
-    ()
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.ActivePatternCase,
+      FallbackAttributeId = FSharpHighlightingAttributeIds.Method,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Values//Active pattern case",
+      Layer = HighlighterLayer.SYNTAX,
+      VSPriority = VSPriority.IDENTIFIERS,
+      EffectType = EffectType.TEXT, ForegroundColor = "DarkCyan:Blue", DarkForegroundColor = "Cyan")>]
+type FSharpHighlightingAttributeIds() = class end
 
 module MissingAssemblyReferenceWorkaround =
     type T(p: FontStyle) =

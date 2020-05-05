@@ -1,5 +1,6 @@
 using System.Linq;
 using JetBrains.Application.Settings;
+using JetBrains.Application.Settings.Calculated.Interface;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Psi;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
@@ -15,7 +16,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
   public class FSharpFormatterInfoProvider :
     FormatterInfoProviderWithFluentApi<CodeFormattingContext, FSharpFormatSettingsKey>
   {
-    public FSharpFormatterInfoProvider(ISettingsSchema settingsSchema) : base(settingsSchema)
+    public FSharpFormatterInfoProvider(ISettingsSchema settingsSchema,
+      ICalculatedSettingsSchema calculatedSettingsSchema) : base(settingsSchema, calculatedSettingsSchema)
     {
       var bindingAndModuleDeclIndentingRulesParameters = new[]
       {
