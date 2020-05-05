@@ -1,11 +1,23 @@
-﻿Pattern
+﻿Field declaration
 ---
-TO: [O] let { |Foo| = { Bar.Baz = 1 } } = () RANGE: (6,9) @ Pattern - Record 02 - Nested.fs
-TO: [O] let { Foo = { Bar.|Baz| = 1 } } = () RANGE: (18,21) @ Pattern - Record 02 - Nested.fs
+TO: [O] type Bar = { Baz : |int| } RANGE: (19,22) @ Pattern - Record 02 - Nested.fs
+TO: [O] type Record = { Foo : |Bar| } RANGE: (48,51) @ Pattern - Record 02 - Nested.fs
+
+
+Pattern, Read access
+---
+TO: [R] let { |Foo| = { Bar.Baz = 1 } } = failwith "" RANGE: (61,64) @ Pattern - Record 02 - Nested.fs
+TO: [R] let { Foo = { Bar.|Baz| = 1 } } = failwith "" RANGE: (73,76) @ Pattern - Record 02 - Nested.fs
 
 
 Other
 ---
-TO: [O] let { Foo = { |Bar|.Baz = 1 } } = () RANGE: (14,17) @ Pattern - Record 02 - Nested.fs
+TO: [O] let { Foo = { |Bar|.Baz = 1 } } = failwith "" RANGE: (69,72) @ Pattern - Record 02 - Nested.fs
+TO: [O] let { Foo = { Bar.Baz = 1 } } = |failwith| "" RANGE: (87,95) @ Pattern - Record 02 - Nested.fs
+
+
+New instance creation
+---
+TO: [O] let { Foo = { Bar.Baz = 1 } } = |failwith| "" RANGE: (87,95) @ Pattern - Record 02 - Nested.fs
 
 

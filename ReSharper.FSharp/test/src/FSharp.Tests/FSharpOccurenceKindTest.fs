@@ -20,10 +20,10 @@ type FSharpOccurenceKindTest() =
     [<Test>] member x.``Unions 02 - Single empty case``() = x.DoNamedTest()
 
     [<Test>] member x.``Exception - Singleton 01``() = x.DoNamedTest()
-    [<Test>] member x.``Exception - Singleton 02 - Type specification``() = x.DoNamedTest()
+    [<Test; ExpectErrors 1>] member x.``Exception - Singleton 02 - Type specification``() = x.DoNamedTest()
     [<Test>] member x.``Exception - Singleton 03 - Members``() = x.DoNamedTest()
     [<Test>] member x.``Exception - Fields 01``() = x.DoNamedTest()
-    [<Test>] member x.``Exception - Fields 02 - Type specification``() = x.DoNamedTest()
+    [<Test; ExpectErrors 1>] member x.``Exception - Fields 02 - Type specification``() = x.DoNamedTest()
     [<Test>] member x.``Exception - Fields 03 - Members``() = x.DoNamedTest()
 
     [<Test>] member x.``Base Type 01``() = x.DoNamedTest()
@@ -35,19 +35,19 @@ type FSharpOccurenceKindTest() =
     [<Test>] member x.``Base Type - Object expressions 02 - Interface``() = x.DoNamedTest()
     [<Test>] member x.``Base Type - Object expressions 03 - Secondary interfaces``() = x.DoNamedTest()
 
-    [<Test>] member x.``Type Argument 01``() = x.DoNamedTest()
-    [<Test>] member x.``Type Argument 02 - Pattern``() = x.DoNamedTest()
-    [<Test>] member x.``Type Argument 03 - Tuple``() = x.DoNamedTest()
+    [<Test; ExpectErrors 39>] member x.``Type Argument 01``() = x.DoNamedTest()
+    [<Test; ExpectErrors 39>] member x.``Type Argument 02 - Pattern``() = x.DoNamedTest()
+    [<Test; ExpectErrors 39>] member x.``Type Argument 03 - Tuple``() = x.DoNamedTest()
     [<Test>] member x.``Type Argument 04 - Array``() = x.DoNamedTest()
-    [<Test>] member x.``Type Argument 05 - Return type``() = x.DoNamedTest()
-    [<Test>] member x.``Type Argument 06 - ML``() = x.DoNamedTest()
+    [<Test; ExpectErrors 1>] member x.``Type Argument 05 - Return type``() = x.DoNamedTest()
+    [<Test; ExpectErrors 1>] member x.``Type Argument 06 - ML``() = x.DoNamedTest()
     [<Test>] member x.``Type Argument 07 - Tuple abbreviation``() = x.DoNamedTest()
 
     [<Test>] member x.``Type Cast 01 - Upcast``() = x.DoNamedTest()
     [<Test>] member x.``Type Cast 02 - Downcast``() = x.DoNamedTest()
 
-    [<Test>] member x.``Type Test 01 - Expr``() = x.DoNamedTest()
-    [<Test>] member x.``Type Test 02 - Pattern``() = x.DoNamedTest()
+    [<Test; ExpectErrors 16>] member x.``Type Test 01 - Expr``() = x.DoNamedTest()
+    [<Test; ExpectErrors 16>] member x.``Type Test 02 - Pattern``() = x.DoNamedTest()
 
     [<Test>] member x.``Type abbreviation 01``() = x.DoNamedTest()
 

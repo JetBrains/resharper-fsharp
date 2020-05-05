@@ -22,9 +22,9 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Top binding indent 02 - Correct indent``() = x.DoNamedTest()
     [<Test>] member x.``Top binding indent 03 - Big indent``() = x.DoNamedTest()
 
-    [<Test>] member x.``Local binding indent 01 - No indent``() = x.DoNamedTest()
-    [<Test>] member x.``Local binding indent 02 - Correct indent``() = x.DoNamedTest()
-    [<Test>] member x.``Local binding indent 03 - Big indent``() = x.DoNamedTest()
+    [<Test; ExpectErrors 588>] member x.``Local binding indent 01 - No indent``() = x.DoNamedTest()
+    [<Test; ExpectErrors 588>] member x.``Local binding indent 02 - Correct indent``() = x.DoNamedTest()
+    [<Test; ExpectErrors 588>] member x.``Local binding indent 03 - Big indent``() = x.DoNamedTest()
 
     [<Test>] member x.``Let module decl binding indent 01 - Correct indent``() = x.DoNamedTest()
     [<Test>] member x.``Let expr binding indent 01 - Correct indent``() = x.DoNamedTest()

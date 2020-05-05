@@ -11,4 +11,4 @@ type ToUpcastTest() =
 
     override x.RelativeTestDataPath = "features/quickFixes/toUpcast"
 
-    [<Test>] member x.``Simple 01``() = x.DoNamedTest()
+    [<Test; ExpectErrors 3198>] member x.``Simple 01``() = x.DoNamedTest()

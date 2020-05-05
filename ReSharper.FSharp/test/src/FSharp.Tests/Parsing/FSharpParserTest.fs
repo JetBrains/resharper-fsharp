@@ -208,6 +208,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - ObjExpr 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - ObjExpr 02 - Interface``() = x.DoNamedTest()
 
+    // todo: (4,0)-(4,1): parse 10: Unexpected symbol '}' in expression
     [<Test>] member x.``Expr - ImplicitZero 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - LetOrUseBang 01``() = x.DoNamedTest()
@@ -303,7 +304,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Module member - Open 01``() = x.DoNamedTest()
     [<Test>] member x.``Module member - Open 02 - Qualifier``() = x.DoNamedTest()
 
-    [<Test>] member x.``Pattern - Record 01``() = x.DoNamedTest()
+    [<Test; ExpectErrors 39>] member x.``Pattern - Record 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Record 02 - Qualified name``() = x.DoNamedTest()
 
     [<Test>] member x.``Pattern - As - Wild 01``() = x.DoNamedTest()
@@ -341,6 +342,7 @@ type FSharpSignatureParserTest() =
 
 
 [<FSharpTest>]
+[<ExpectErrors>]
 type FSharpErrorsParserTest() =
     inherit ParserTestBase<FSharpLanguage>()
 

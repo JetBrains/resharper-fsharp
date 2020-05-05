@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 
 open JetBrains.ReSharper.Daemon.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
 open NUnit.Framework
 
 type FormatSpecifiersHighlightingTest() =
@@ -16,7 +17,7 @@ type FormatSpecifiersHighlightingTest() =
     [<Test>] member x.``Escaped strings``() = x.DoNamedTest()
     [<Test>] member x.``Triple quoted strings``() = x.DoNamedTest()
     [<Test>] member x.``Multi line strings``() = x.DoNamedTest()
-    [<Test>] member x.``Malformed formatters``() = x.DoNamedTest()
+    [<Test; ExpectErrors 741>] member x.``Malformed formatters``() = x.DoNamedTest()
     [<Test>] member x.``kprintf bprintf fprintf``() = x.DoNamedTest()
     [<Test>] member x.``Plane strings``() = x.DoNamedTest()
     [<Test>] member x.``Extensions``() = x.DoNamedTest()

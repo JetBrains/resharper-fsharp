@@ -58,7 +58,8 @@ type FSharpCheckerService
     member val OptionsProvider = Unchecked.defaultof<IFSharpProjectOptionsProvider> with get, set
     member x.Checker = checker.Value
 
-    member x.ParseFile(path: FileSystemPath, document: IDocument, parsingOptions: FSharpParsingOptions) =
+    abstract ParseFile : path: FileSystemPath * document: IDocument * parsingOptions: FSharpParsingOptions -> FSharpParseFileResults option
+    default x.ParseFile(path: FileSystemPath, document: IDocument, parsingOptions: FSharpParsingOptions) =
         let source = SourceText.ofString (document.GetText())
         try
             let parseResults = x.Checker.ParseFile(path.FullPath, source, parsingOptions).RunAsTask() 
@@ -74,8 +75,10 @@ type FSharpCheckerService
         let parsingOptions = x.OptionsProvider.GetParsingOptions(sourceFile)
         x.ParseFile(sourceFile.GetLocation(), sourceFile.Document, parsingOptions)
 
-    member x.ParseAndCheckFile([<NotNull>] file: IPsiSourceFile, opName,
-                               [<Optional; DefaultParameterValue(false)>] allowStaleResults) =
+    abstract ParseAndCheckFile : [<NotNull>] file: IPsiSourceFile * opName: string * [<Optional; DefaultParameterValue(false)>] allowStaleResults: bool -> FSharpParseAndCheckResults option
+
+    default x.ParseAndCheckFile([<NotNull>] file: IPsiSourceFile, opName,
+                                [<Optional; DefaultParameterValue(false)>] allowStaleResults) =
         match x.OptionsProvider.GetProjectOptions(file) with
         | None -> None
         | Some options ->

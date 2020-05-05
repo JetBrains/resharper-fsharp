@@ -3,6 +3,7 @@
 open JetBrains.ReSharper.FeaturesTestFramework.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Settings
+open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
@@ -27,8 +28,8 @@ type PipeChainTypeHintStageTest() =
     [<TestSettings("{HideSameLine:All}")>]
     [<Test>] member x.``Multi line 03 - Same line``() = x.DoNamedTest()
 
-    [<Test>] member x.``Error 01 - Invalid reference``() = x.DoNamedTest()
-    [<Test>] member x.``Error 02 - Syntax error``() = x.DoNamedTest()
+    [<Test; ExpectErrors 39>] member x.``Error 01 - Invalid reference``() = x.DoNamedTest()
+    [<Test; ExpectErrors 10>] member x.``Error 02 - Syntax error``() = x.DoNamedTest()
 
     [<Test>] member x.``Skipped 01 - Other binary op``() = x.DoNamedTest()
     [<Test>] member x.``Skipped 02 - Shadowed pipe op``() = x.DoNamedTest()

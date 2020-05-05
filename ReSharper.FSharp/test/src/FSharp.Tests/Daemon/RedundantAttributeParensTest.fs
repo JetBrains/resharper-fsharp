@@ -1,9 +1,11 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
+open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 open NUnit.Framework
 
+[<ExpectErrors 39>]
 type RedundantAttributeParensTest() =
     inherit FSharpHighlightingTestBase()
 

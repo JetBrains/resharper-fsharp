@@ -4,9 +4,9 @@ let |x|(0) = 1
 let |f|(1) x = x
 let |g|(2) = fun x -> x + 1
 let |h|(3) f g x y = f x + g y
-let |f|(4) (x, y) z (a, b, c) = x + y + a + string b + c
-let |f|(5) (x, y) = x + y
-let |f|(6) (x, y) z = x + y + z
+let |i|(4) (x, y) z (a, b, c) = x + y + a + string b + c
+let |j|(5) (x, y) = x + y
+let |k|(6) (x, y) z = x + y + z
 
 ---------------------------------------------------------
 (0): CodeInsights: int

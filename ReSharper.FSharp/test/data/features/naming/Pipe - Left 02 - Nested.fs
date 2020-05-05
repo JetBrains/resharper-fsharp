@@ -1,5 +1,5 @@
 ﻿module Module
 
-let getName _ = ()
+let getName _ _ = ()
 let foo _ = ()
 let x{caret} = getName <| foo <| 1

@@ -36,12 +36,12 @@ type AddIgnoreTest() =
     [<Test>] member x.``New line - Match 02``() = x.DoNamedTest()
     [<Test>] member x.``New line - Match 03 - Single line``() = x.DoNamedTest()
 
-    [<Test>] member x.``Inner expression - If 01``() = x.DoNamedTest()
+    [<Test; ExpectErrors 1>] member x.``Inner expression - If 01``() = x.DoNamedTest()
     [<Test>] member x.``Inner expression - Match 01``() = x.DoNamedTest()
-    [<Test>] member x.``Inner expression - Try 01 - With``() = x.DoNamedTest()
+    [<Test; ExpectErrors 1>] member x.``Inner expression - Try 01 - With``() = x.DoNamedTest()
     [<Test>] member x.``Inner expression - Try 02 - Finally``() = x.DoNamedTest()
 
-    [<Test>] member x.``Missing else branch 01``() = x.DoNamedTest()
+    [<Test; ExpectErrors 1>] member x.``Missing else branch 01``() = x.DoNamedTest()
 
     override x.DoTestOnTextControlAndExecuteWithGold(project, textControl, projectFile) =
         let occurrenceName = QuickFixTestBase.GetSetting(textControl, OccurrenceName)
