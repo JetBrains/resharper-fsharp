@@ -16,6 +16,7 @@ type IntroduceVarTest() =
 
     [<Test>] member x.``Simple 01``() = x.DoNamedTest()
     [<Test>] member x.``Simple 02``() = x.DoNamedTest()
+    [<Test>] member x.``Simple 03``() = x.DoNamedTest()
 
     [<Test>] member x.``Let 01``() = x.DoNamedTest()
     [<Test>] member x.``Let 02 - Function``() = x.DoNamedTest()
@@ -23,6 +24,8 @@ type IntroduceVarTest() =
 
     [<Test>] member x.``Match 01``() = x.DoNamedTest()
     [<Test>] member x.``Match 02 - Multiline``() = x.DoNamedTest()
+
+    [<Test>] member x.``LetExpr 01``() = x.DoNamedTest()
 
     [<Test>] member x.``LetDecl 01``() = x.DoNamedTest()
     [<Test>] member x.``LetDecl 02 - Indent``() = x.DoNamedTest()
