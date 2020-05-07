@@ -4,6 +4,7 @@ using JetBrains.Lifetimes;
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelCreators;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
 using Microsoft.FSharp.Core.CompilerServices;
 using static FSharp.Compiler.ExtensionTyping;
@@ -17,17 +18,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
     private readonly IProvidedRdModelsCreator<ProvidedParameterInfo, RdProvidedParameterInfo>
       myProvidedParameterInfoRdModelsCreator;
 
+    private readonly IProvidedRdModelsCreator<ProvidedConstructorInfo, RdProvidedConstructorInfo>
+      myProvidedConstructorInfoRdModelsCreator;
+
     private readonly IReadProvidedCache<Tuple<ProvidedConstructorInfo, int>> myProvidedConstructorInfosCache;
     private readonly IReadProvidedCache<ITypeProvider> myTypeProvidersCache;
 
     public ProvidedConstructorInfosHostFactory(
       IProvidedRdModelsCreator<ProvidedType, RdProvidedType> providedTypeRdModelsCreator,
       IProvidedRdModelsCreator<ProvidedParameterInfo, RdProvidedParameterInfo> providedParameterInfoRdModelsCreator,
+      IProvidedRdModelsCreator<ProvidedConstructorInfo, RdProvidedConstructorInfo>
+        providedConstructorInfoRdModelsCreator,
       IReadProvidedCache<Tuple<ProvidedConstructorInfo, int>> providedConstructorInfosCache,
       IReadProvidedCache<ITypeProvider> typeProvidersCache)
     {
       myProvidedTypeRdModelsCreator = providedTypeRdModelsCreator;
       myProvidedParameterInfoRdModelsCreator = providedParameterInfoRdModelsCreator;
+      myProvidedConstructorInfoRdModelsCreator = providedConstructorInfoRdModelsCreator;
       myProvidedConstructorInfosCache = providedConstructorInfosCache;
       myTypeProvidersCache = typeProvidersCache;
     }
@@ -38,6 +45,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       processModel.GetParameters.Set(GetParameters);
       processModel.GetGenericArguments.Set(GetGenericArguments);
       processModel.GetStaticParametersForMethod.Set(GetStaticParametersForMethod);
+      processModel.ApplyStaticArgumentsForMethod.Set(ApplyStaticArgumentsForMethod);
+    }
+
+    private RdTask<RdProvidedConstructorInfo> ApplyStaticArgumentsForMethod(Lifetime lifetime,
+      ApplyStaticArgumentsForMethodArgs args)
+    {
+      var (providedConstructor, typeProviderId) = myProvidedConstructorInfosCache.Get(args.EntityId);
+      var typeProvider = myTypeProvidersCache.Get(typeProviderId);
+      var constructorInfo = myProvidedConstructorInfoRdModelsCreator.CreateRdModel(
+        providedConstructor.ApplyStaticArgumentsForMethod(typeProvider, args.FullNameAfterArguments,
+          args.StaticArgs.Select(t => t.Unbox()).ToArray()) as ProvidedConstructorInfo, typeProviderId);
+      return RdTask<RdProvidedConstructorInfo>.Successful(constructorInfo);
     }
 
     private RdTask<RdProvidedParameterInfo[]> GetStaticParametersForMethod(Lifetime lifetime, int entityId)
