@@ -18,7 +18,7 @@ type IntroduceVarFix(expr: IFSharpExpression) =
     override x.Text = "Introduce 'let' binding"
 
     override x.IsAvailable _ =
-        FSharpIntroduceVariable.CanIntroduceVar(expr, true)
+        FSharpIntroduceVariable.CanIntroduceVar(expr)
 
     override x.Execute(solution, textControl) =
         base.Execute(solution, textControl)
