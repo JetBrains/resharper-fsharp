@@ -1,0 +1,4 @@
+﻿Suggested names: i
+do
+  let i = 1
+  ignore i

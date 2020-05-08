@@ -23,13 +23,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public override string[] ExtendsListShortNames =>
       FSharpGeneratedMembers.SimpleTypeExtendsListShortNames;
 
-    public override MemberPresenceFlag GetMemberPresenceFlag()
-    {
-      return base.GetMemberPresenceFlag() |
-             MemberPresenceFlag.INSTANCE_CTOR |
-             MemberPresenceFlag.EXPLICIT_OP | MemberPresenceFlag.IMPLICIT_OP |
-             MemberPresenceFlag.MAY_EQUALS_OVERRIDE | MemberPresenceFlag.MAY_TOSTRING_OVERRIDE;
-    }
+    public override MemberPresenceFlag GetMemberPresenceFlag() =>
+      base.GetMemberPresenceFlag() |
+      MemberPresenceFlag.INSTANCE_CTOR |
+      MemberPresenceFlag.EXPLICIT_OP | MemberPresenceFlag.IMPLICIT_OP |
+      MemberPresenceFlag.MAY_EQUALS_OVERRIDE | MemberPresenceFlag.MAY_TOSTRING_OVERRIDE;
 
     public override IDeclaredType GetBaseClassType() =>
       GetPsiModule().GetPredefinedType().Object;

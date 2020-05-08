@@ -17,7 +17,6 @@ open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.ExtensionsAPI.Resolve
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
@@ -74,21 +73,6 @@ type FSharpCheckerService
     member x.ParseFile([<NotNull>] sourceFile: IPsiSourceFile) =
         let parsingOptions = x.OptionsProvider.GetParsingOptions(sourceFile)
         x.ParseFile(sourceFile.GetLocation(), sourceFile.Document, parsingOptions)
-
-    member x.GetParsingOptions([<NotNull>] sourceFile: IPsiSourceFile) =
-        if isNull sourceFile then { FSharpParsingOptions.Default with SourceFiles = [| "Sandbox.fs" |] } else 
-        x.OptionsProvider.GetParsingOptions(sourceFile)
-
-    member x.HasPairFile([<NotNull>] file: IPsiSourceFile) =
-        x.OptionsProvider.HasPairFile(file)
-
-    member x.GetDefines([<CanBeNull>] sourceFile: IPsiSourceFile) =
-        if isNull sourceFile then [] else
-
-        let isScript = sourceFile.LanguageType.Is<FSharpScriptProjectFileType>()
-        let implicitDefines = getImplicitDefines isScript
-        let projectDefines = x.OptionsProvider.GetParsingOptions(sourceFile).ConditionalCompilationDefines
-        implicitDefines @ projectDefines
 
     member x.ParseAndCheckFile([<NotNull>] file: IPsiSourceFile, opName,
                                [<Optional; DefaultParameterValue(false)>] allowStaleResults) =
@@ -151,21 +135,6 @@ type FSharpCheckerService
         let names = List.ofSeq names
         let coords = context.GetNavigationRange().StartOffset.ToDocumentCoords()
         x.ResolveNameAtLocation(sourceFile, names, coords, opName)
-
-    /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.
-    member x.ResolveNameAtLocation(reference: TreeReferenceBase<_>, opName) =
-        let context = reference.GetElement()
-        let names = reference.GetAllNames().ResultingList()
-        x.ResolveNameAtLocation(context, names, opName)
-
-
-[<AutoOpen>]
-module ImplicitDefines =
-    let sourceDefines = [ "EDITING"; "COMPILED" ]
-    let scriptDefines = [ "EDITING"; "INTERACTIVE" ]
-
-    let getImplicitDefines isScript =
-        if isScript then scriptDefines else sourceDefines
 
 
 type FSharpProject =

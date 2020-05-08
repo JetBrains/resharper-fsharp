@@ -38,6 +38,28 @@
     <QuickFix>ReplaceUseWithLetFix</QuickFix>
   </Error>
 
+  <Warning staticGroup="FSharpErrors" name="MatchIncomplete">
+    <Parameter type="IMatchExpr" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.Expression.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>AddMatchAllClauseFix</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="EnumMatchIncomplete">
+    <Parameter type="IMatchExpr" name="expr"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>expr.Expression.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>AddMatchAllClauseFix</QuickFix>
+  </Warning>
+  
   <Warning staticGroup="FSharpErrors" name="RuleNeverMatched">
     <Parameter type="IMatchClause" name="matchClause"/>
     <Message value="This rule will never be matched"/>
@@ -68,7 +90,7 @@
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="UnitTypeExpected">
-    <Parameter type="ISynExpr" name="expr"/>
+    <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
       <Argument>fcsMessage</Argument>
@@ -82,7 +104,7 @@
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="FunctionValueUnexpected">
-    <Parameter type="ISynExpr" name="expr"/>
+    <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
       <Argument>fcsMessage</Argument>
@@ -95,7 +117,7 @@
   </Warning>
   
   <Error staticGroup="FSharpErrors" name="UnitTypeExpected">
-    <Parameter type="ISynExpr" name="expr"/>
+    <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
       <Argument>fcsMessage</Argument>
@@ -255,7 +277,7 @@
   </Error>
 
   <Error staticGroup="FSharpErrors" name="NotAFunction">
-    <Parameter type="ISynExpr" name="expr"/>
+    <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="IPrefixAppExpr" name="prefixApp"/>
     <Message value="{0}">
       <Argument>if prefixApp.FunctionExpression == expr then "Unexpected argument" else "Unexpected arguments"</Argument>
@@ -297,5 +319,16 @@
     <Message value="Attribute suffix is redundant"/>
     <QuickFix>RemoveRedundantAttributeSuffixFix</QuickFix>
   </Warning>
+
+  <Error staticGroup="FSharpErrors" name="NoImplementationGiven">
+    <Parameter type="IFSharpTypeDeclaration" name="typeDecl"/>
+    <Parameter type="string" name="fcsMessage"/>
+    <Message value="{0}">
+      <Argument>fcsMessage</Argument>
+    </Message>
+    <Range>typeDecl.GetNameDocumentRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ToAbstractFix</QuickFix>
+  </Error>
 
 </Errors>

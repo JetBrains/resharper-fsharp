@@ -56,22 +56,18 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
     let createLetBinding bindingName =
         let source = sprintf "do (let %s = ())" bindingName
         let newExpr = getExpression source
-        newExpr.As<IDoExpr>().Expression.As<IParenExpr>().InnerExpression.As<ILetOrUseExpr>()
+        newExpr.As<IParenExpr>().InnerExpression.As<ILetOrUseExpr>()
 
-    let setBindingExpression (expr: ISynExpr) (letBindings: #ILetBindings) =
-        let newExpr = letBindings.Bindings.[0].SetExpression(expr.Copy())
-        if not expr.IsSingleLine then
-            let indentSize = expr.GetIndentSize()
-            ModificationUtil.AddChildBefore(newExpr, NewLine(expr.GetLineEnding())) |> ignore
-            ModificationUtil.AddChildBefore(newExpr, Whitespace(expr.Indent + indentSize)) |> ignore
-            shiftExpr indentSize newExpr
-        letBindings
-
-    let createParenExpr (expr: ISynExpr) =
+    let createParenExpr (expr: IFSharpExpression) =
         let parenExpr = getExpression "(())" :?> IParenExpr
         ModificationUtil.ReplaceChild(parenExpr.InnerExpression, expr.Copy()) |> ignore
         parenExpr
     
+    let createAttributeList attrName: IAttributeList =
+            let source = sprintf "[<%s>] ()" attrName
+            let doDecl = getDoDecl source
+            doDecl.AttributeLists.[0]
+
     interface IFSharpElementFactory with
         member x.CreateOpenStatement(ns) =
             // todo: mangle ns
@@ -136,14 +132,9 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         member x.CreateLetBindingExpr(bindingName) =
             createLetBinding bindingName
 
-        member x.CreateLetBindingExpr(bindingName, expr) =
-            let letOrUseExpr = createLetBinding bindingName
-            setBindingExpression expr letOrUseExpr
-
-        member x.CreateLetModuleDecl(bindingName, expr) =
+        member x.CreateLetModuleDecl(bindingName) =
             let source = sprintf "let %s = ()" bindingName
-            let letModuleDecl = getModuleMember source  :?> ILetModuleDecl
-            setBindingExpression expr letModuleDecl
+            getModuleMember source :?> ILetModuleDecl
 
         member x.CreateConstExpr(text) =
             getExpression text :?> _
@@ -169,6 +160,12 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
             matchExpr
 
+        member x.CreateMatchClause() =
+            let source = "match () with | _ -> failwith \"todo\""
+
+            let matchExpr = getExpression source :?> IMatchExpr
+            matchExpr.Clauses.[0]
+
         member x.CreateParenExpr() =
             getExpression "(())" :?> _
 
@@ -180,8 +177,8 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
         member x.CreateReferenceExpr(name) =
             let source = sprintf "do %s" name
-            let newExpr = getExpression source
-            newExpr.As<IDoExpr>().Expression.As<IReferenceExpr>() :> _
+            let newExpr = getExpression source :?> IReferenceExpr
+            newExpr :> _
 
         member x.CreateForEachExpr(expr) =
             let sourceFile = expr.GetSourceFile()
@@ -198,7 +195,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         member x.CreateExpr(text) =
             getExpression text
 
-        member x.CreateBinaryAppExpr(text, arg1: ISynExpr, arg2: ISynExpr) =
+        member x.CreateBinaryAppExpr(text, arg1: IFSharpExpression, arg2: IFSharpExpression) =
             let source = "() " + text + " ()"
             let expr = getExpression source
             let appExpr = expr :?> IBinaryAppExpr
@@ -219,8 +216,8 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         member x.CreateReturnTypeInfo(typeSignature: string) : IReturnTypeInfo =
             let expr = createLetBinding (sprintf "_ : %s" typeSignature)
             expr.Bindings.[0].ReturnTypeInfo
-            
-        member x.CreateSetExpr(left: ISynExpr, right: ISynExpr) =
+
+        member x.CreateSetExpr(left: IFSharpExpression, right: IFSharpExpression) =
             let source = "() <- ()"
             let expr = getExpression source
             let setExpr = expr :?> ISetExpr
@@ -233,3 +230,11 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
             expr
   
+        member x.CreateEmptyAttributeList() =
+            let attributeList = createAttributeList "Foo"
+            ModificationUtil.DeleteChild(attributeList.Attributes.[0])
+            attributeList
+
+        member x.CreateAttribute(attrName) =
+            let attributeList = createAttributeList attrName
+            attributeList.Attributes.[0]

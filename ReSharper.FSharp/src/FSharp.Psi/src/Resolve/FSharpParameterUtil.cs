@@ -22,7 +22,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         if (!(infixAppExpr?.Operator is var funExpr) || funExpr?.GetText() != "=")
           return null;
 
-        var innerExpr = (ISynExpr) TupleExprNavigator.GetByExpression(infixAppExpr) ?? infixAppExpr;
+        var innerExpr = (IFSharpExpression) TupleExprNavigator.GetByExpression(infixAppExpr) ?? infixAppExpr;
         var parenExpr = ParenExprNavigator.GetByInnerExpression(innerExpr);
 
         if (!(PrefixAppExprNavigator.GetByArgumentExpression(parenExpr)?.FunctionExpression is IReferenceExpr expr))

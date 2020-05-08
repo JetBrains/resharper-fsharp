@@ -144,6 +144,7 @@ type FSharpProjectOptionsProvider
     let getParsingOptionsForSingleFile ([<NotNull>] sourceFile: IPsiSourceFile) isScript =
         { FSharpParsingOptions.Default with
             SourceFiles = [| sourceFile.GetLocation().FullPath |]
+            ConditionalCompilationDefines = ImplicitDefines.scriptDefines
             IsExe = isScript }
 
     member x.ModuleInvalidated = moduleInvalidated
@@ -218,16 +219,17 @@ type FSharpProjectOptionsProvider
         member x.HasPairFile(file) =
             if isScriptLike file then false else
 
-            getOrCreateFSharpProject file
-            |> Option.map (fun fsProject -> fsProject.ImplFilesWithSigs.Contains(file.GetLocation()))
-            |> Option.defaultValue false
+            match getOrCreateFSharpProject file with
+            | Some fsProject -> fsProject.ImplFilesWithSigs.Contains(file.GetLocation())
+            | _ -> false
 
         member x.GetParsingOptions(sourceFile) =
+            if isNull sourceFile then sandboxParsingOptions else
             if isScriptLike sourceFile then getParsingOptionsForSingleFile sourceFile true else
 
-            getOrCreateFSharpProject sourceFile
-            |> Option.map (fun fsProject -> fsProject.ParsingOptions)
-            |> Option.defaultWith (fun _ -> getParsingOptionsForSingleFile sourceFile false)
+            match getOrCreateFSharpProject sourceFile with
+            | Some fsProject -> fsProject.ParsingOptions
+            | _ -> getParsingOptionsForSingleFile sourceFile false
 
         member x.GetFileIndex(sourceFile) =
             if isScriptLike sourceFile then 0 else
@@ -250,7 +252,13 @@ type FSharpScriptProjectOptionsProvider
         (lifetime, logger: ILogger, checkerService: FSharpCheckerService, scriptOptions: FSharpScriptOptionsProvider) =
 
     let getScriptOptionsLock = obj()
-    let defaultFlags = [| "--warnon:1182" |]
+
+    let defaultFlags =
+        [| "--warnon:1182"
+
+           if PlatformUtil.IsRunningOnCore then
+               "--targetprofile:netcore"
+               "--simpleresolution" |]
 
     let getOtherFlags languageVersion =
         if languageVersion = FSharpLanguageVersion.Default then defaultFlags else
@@ -273,7 +281,10 @@ type FSharpScriptProjectOptionsProvider
         let source = SourceText.ofString source
         lock getScriptOptionsLock (fun _ ->
             let getScriptOptionsAsync =
-                checkerService.Checker.GetProjectOptionsFromScript(path, source, otherFlags = otherFlags.Value.Value)
+                checkerService.Checker.GetProjectOptionsFromScript(
+                    path, source,
+                    otherFlags = otherFlags.Value.Value,
+                    assumeDotNetFramework = not PlatformUtil.IsRunningOnCore)
             try
                 let options, errors = getScriptOptionsAsync.RunAsTask()
                 if not errors.IsEmpty then

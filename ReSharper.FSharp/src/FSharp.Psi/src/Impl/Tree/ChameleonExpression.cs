@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text;
+using FSharp.Compiler;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
@@ -9,19 +10,25 @@ using JetBrains.ReSharper.Psi.Impl;
 using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Text;
-using static FSharp.Compiler.SyntaxTree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
   internal partial class ChameleonExpression : IChameleonNode
   {
-    [CanBeNull] public SynExpr SynExpr { get; }
+    [CanBeNull] public SyntaxTree.SynExpr SynExpr { get; private set; }
+
+    public int OriginalStartOffset { get; }
+    public int OriginalLineStart { get; }
 
     [NotNull] private readonly object mySyncObject = new object();
     private bool myOpened;
 
-    public ChameleonExpression([CanBeNull] SynExpr expr) =>
+    public ChameleonExpression([CanBeNull] SyntaxTree.SynExpr expr, int startOffset, int lineStart)
+    {
       SynExpr = expr;
+      OriginalStartOffset = startOffset;
+      OriginalLineStart = lineStart;
+    }
 
     public IChameleonNode ReSync(CachingLexer cachingLexer, TreeTextRange changedRange, int insertedTextLen) =>
       null; // No reparse for now.
@@ -31,9 +38,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       get
       {
         lock (mySyncObject)
-        {
           return myOpened;
-        }
       }
     }
 
@@ -83,38 +88,31 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       AppendNewChild((TreeElement) node);
 
       myOpened = true;
+      SynExpr = null;
     }
 
     public override int GetTextLength()
     {
       lock (mySyncObject)
-      {
         return base.GetTextLength();
-      }
     }
 
     public override StringBuilder GetText(StringBuilder to)
     {
       lock (mySyncObject)
-      {
         return base.GetText(to);
-      }
     }
 
     public override IBuffer GetTextAsBuffer()
     {
       lock (mySyncObject)
-      {
         return base.GetTextAsBuffer();
-      }
     }
 
     protected override TreeElement DeepClone(TreeNodeCopyContext context)
     {
       lock (mySyncObject)
-      {
         return base.DeepClone(context);
-      }
     }
 
 
@@ -137,9 +135,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override ITreeNode FindNodeAt(TreeTextRange treeRange)
     {
       if (treeRange.IntersectsOrContacts(TreeTextRange.FromLength(GetTextLength())))
-      {
         return base.FindNodeAt(treeRange);
-      }
 
       return null;
     }
@@ -148,9 +144,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       bool includeContainingNodes)
     {
       if (relativeRange.ContainedIn(TreeTextRange.FromLength(GetTextLength())))
-      {
         base.FindNodesAtInternal(relativeRange, result, includeContainingNodes);
-      }
     }
   }
 }

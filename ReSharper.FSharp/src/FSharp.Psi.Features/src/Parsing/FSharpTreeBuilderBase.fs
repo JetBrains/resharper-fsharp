@@ -6,7 +6,6 @@ open FSharp.Compiler.SyntaxTree
 open FSharp.Compiler.Range
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
-open JetBrains.Lifetimes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -17,18 +16,20 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.TreeBuilder
 
 [<AbstractClass>]
-type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetime, projectedOffset) =
+type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset, lineShift) =
     inherit TreeBuilderBase(lifetime, lexer)
+
+    let lineShift = lineShift - 1
 
     let lineOffsets =
         let lineCount = document.GetLineCount()
         Array.init (int lineCount) (fun line -> document.GetLineStartOffset(docLine line))
 
     let getLineOffset line =
-        lineOffsets.[line - 1]
+        lineOffsets.[line + lineShift]
 
     new (sourceFile, lexer, lifetime) =
-        FSharpTreeBuilderBase(sourceFile, lexer, lifetime, 0)
+        FSharpTreeBuilderBase(sourceFile, lexer, lifetime, 0, 0)
 
     abstract member CreateFSharpFile: unit -> IFSharpFile
 
@@ -312,16 +313,24 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
             x.Done(range, mark, ElementType.RECORD_REPRESENTATION)
             ElementType.RECORD_DECLARATION
 
-        | SynTypeDefnSimpleRepr.Enum(enumCases, _) ->
+        | SynTypeDefnSimpleRepr.Enum(enumCases, range) ->
+            let casesListMark = x.Mark(range)
             for case in enumCases do
                 x.ProcessEnumCase case
+            x.Done(range, casesListMark, ElementType.ENUM_REPRESENTATION)
             ElementType.ENUM_DECLARATION
 
         | SynTypeDefnSimpleRepr.Union(_, cases, range) ->
-            let casesListMark = x.Mark(range)
+            let representationMark = x.Mark(range)
+            if not cases.IsEmpty then
+                let firstCaseRange = cases.Head.Range
+                x.AdvanceToTokenOrRangeStart(FSharpTokenType.BAR, firstCaseRange)
+ 
+            let caseListMark = x.Mark()
             for case in cases do
                 x.ProcessUnionCase(case)
-            x.Done(range, casesListMark, ElementType.UNION_REPRESENTATION)
+            x.Done(range, caseListMark, ElementType.UNION_CASE_LIST)
+            x.Done(representationMark, ElementType.UNION_REPRESENTATION)
             ElementType.UNION_DECLARATION
 
         | SynTypeDefnSimpleRepr.TypeAbbrev(_, (TypeRange range as synType), _) ->
@@ -560,23 +569,23 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
         | SynType.LongIdent(lid) ->
             let mark = x.Mark(range)
             x.ProcessNamedTypeReference(lid.Lid)
-            x.Done(range, mark, ElementType.NAMED_TYPE)
+            x.Done(range, mark, ElementType.NAMED_TYPE_USAGE)
 
         | SynType.App(_, _, _, _, _, _, _) ->
             let mark = x.Mark(range)
             x.ProcessTypeAsTypeReferenceName(synType)
-            x.Done(range, mark, ElementType.NAMED_TYPE)
+            x.Done(range, mark, ElementType.NAMED_TYPE_USAGE)
 
         | SynType.LongIdentApp(_, _, ltRange, typeArgs, _, gtRange, _) ->
             let mark = x.Mark(range)
             x.ProcessTypeAsTypeReferenceName(synType)
-            x.Done(range, mark, ElementType.NAMED_TYPE)
+            x.Done(range, mark, ElementType.NAMED_TYPE_USAGE)
 
         | SynType.Tuple (_, types, _) ->
             let mark = x.Mark(range)
             for _, synType in types do
                 x.ProcessType(synType)
-            x.Done(range, mark, ElementType.TUPLE_TYPE)
+            x.Done(range, mark, ElementType.TUPLE_TYPE_USAGE)
 
         // todo: struct keyword?
         | SynType.AnonRecd(_, fields, _) ->
@@ -586,51 +595,51 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
                 x.MarkAndDone(range, ElementType.EXPRESSION_REFERENCE_NAME)
                 x.ProcessType(synType)
                 x.Done(range, mark, ElementType.ANON_RECORD_FIELD)
-            x.Done(range, mark, ElementType.ANON_RECORD_TYPE)
+            x.Done(range, mark, ElementType.ANON_RECORD_TYPE_USAGE)
 
         | SynType.StaticConstantNamed(synType1, synType2, _)
         | SynType.MeasureDivide(synType1, synType2, _) ->
             let mark = x.Mark(range)
             x.ProcessType(synType1)
             x.ProcessType(synType2)
-            x.Done(range, mark, ElementType.OTHER_TYPE)
+            x.Done(range, mark, ElementType.UNSUPPORTED_TYPE_USAGE)
 
         | SynType.Fun(synType1, synType2, _) ->
             let mark = x.Mark(range)
             x.ProcessType(synType1)
             x.ProcessType(synType2)
-            x.Done(range, mark, ElementType.FUN_TYPE)
+            x.Done(range, mark, ElementType.FUNCTION_TYPE_USAGE)
 
         | SynType.WithGlobalConstraints(synType, constraints, _) ->
             let mark = x.Mark(range)
             x.ProcessType(synType)
             for typeConstraint in constraints do
                 x.ProcessTypeConstraint(typeConstraint)
-            x.Done(range, mark, ElementType.OTHER_TYPE)
+            x.Done(range, mark, ElementType.UNSUPPORTED_TYPE_USAGE)
 
         | SynType.HashConstraint(synType, _)
         | SynType.MeasurePower(synType, _, _) ->
             let mark = x.Mark(range)
             x.ProcessType(synType)
-            x.Done(range, mark, ElementType.OTHER_TYPE)
+            x.Done(range, mark, ElementType.UNSUPPORTED_TYPE_USAGE)
 
         | SynType.Array(_, synType, _) ->
             let mark = x.Mark(range)
             x.ProcessType(synType)
-            x.Done(range, mark, ElementType.ARRAY_TYPE)
+            x.Done(range, mark, ElementType.ARRAY_TYPE_USAGE)
 
         | SynType.Var _ ->
             let mark = x.Mark(range)
             x.ProcessTypeAsTypeReferenceName(synType)
-            x.Done(range, mark, ElementType.NAMED_TYPE)
+            x.Done(range, mark, ElementType.NAMED_TYPE_USAGE)
 
         // todo: mark expressions
         | SynType.StaticConstantExpr _
         | SynType.StaticConstant _ ->
-            x.MarkAndDone(range, ElementType.OTHER_TYPE)
+            x.MarkAndDone(range, ElementType.UNSUPPORTED_TYPE_USAGE)
 
         | SynType.Anon _ ->
-            x.MarkAndDone(range, ElementType.ANON_TYPE)
+            x.MarkAndDone(range, ElementType.ANON_TYPE_USAGE)
 
     member x.ProcessTypeConstraint(typeConstraint: SynTypeConstraint) =
         match typeConstraint with
@@ -675,16 +684,25 @@ type FSharpTreeBuilderBase(lexer: ILexer, document: IDocument, lifetime: Lifetim
         | SynExpr.Typed(inner, synType, range) when not (rangeContainsRange range synType.Range) -> inner
         | _ -> expr
 
+    member x.RemoveDoExpr(expr: SynExpr) =
+        match expr with
+        | SynExpr.Do(expr, _) -> expr
+        | _ -> expr
+
     member x.MarkChameleonExpression(expr: SynExpr) =
         let (ExprRange range as expr) = x.FixExpresion(expr)
-        let mark = x.Mark(range)
+
+        let startOffset = x.GetStartOffset(range)
+        let mark = x.Mark(startOffset)
 
         // Replace all tokens with single chameleon token.
         let tokenMark = x.Mark(range)
         x.AdvanceToEnd(range)
         x.Builder.AlterToken(tokenMark, FSharpTokenType.CHAMELEON)
 
-        x.Done(range, mark, ChameleonExpressionNodeType.Instance, expr)
+        let lineStart = lineOffsets.[range.StartLine - 1]
+        let data = expr, startOffset, lineStart
+        x.Done(range, mark, ChameleonExpressionNodeType.Instance, data)
 
     member x.ProcessHashDirective(ParsedHashDirective(id, _, range)) =
         let mark = x.Mark(range)
