@@ -54,10 +54,12 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let suggestionOptions = SuggestionOptions(null, DefaultName = "foo")
         namesCollection.Prepare(namingRule, ScopeKind.Common, suggestionOptions).AllNames()
 
-    let getReplaceRanges (sourceExpr: IFSharpExpression) (contextExpr: IFSharpExpression) =
+    let getReplaceRanges (sourceExpr: IFSharpExpression) (contextExpr: IFSharpExpression) removeSourceExpr =
         let sequentialExpr = SequentialExprNavigator.GetByExpression(contextExpr)
         if sourceExpr == contextExpr && isNotNull sequentialExpr then
-            let inRange = TreeRange(sourceExpr.NextSibling, sequentialExpr.LastChild)
+            let inRange =
+                let startNode: ITreeNode = if removeSourceExpr then sourceExpr.NextSibling else sourceExpr :> _
+                TreeRange(startNode, sequentialExpr.LastChild)
 
             let seqExprs = sequentialExpr.Expressions
             let index = seqExprs.IndexOf(sourceExpr)
@@ -70,12 +72,12 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                 LowLevelModificationUtil.AddChild(newSeqExpr, Array.ofSeq inRange)
                 {| ReplaceRange = TreeRange(sourceExpr, newSeqExpr)
                    InRange = TreeRange(newSeqExpr)
-                   AddNewLine = false |}
+                   AddNewLine = not removeSourceExpr |}
             else
                 // The last expression can be moved as is.
                 {| ReplaceRange = TreeRange(sourceExpr, sequentialExpr.LastChild)
                    InRange = inRange
-                   AddNewLine = false |}
+                   AddNewLine = not removeSourceExpr |}
         else
             let range = TreeRange(contextExpr)
             {| ReplaceRange = range; InRange = range; AddNewLine = true |}
@@ -160,9 +162,11 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let contextExpr = getExprToInsertBefore commonParentExpr
         let contextDecl = getContextDeclaration contextExpr
 
-        let contextIsSourceExpr =
-            sourceExpr == contextExpr && isNull contextDecl &&
-            isNull (SequentialExprNavigator.GetByExpression(sourceExpr))
+        let contextIsSourceExpr = sourceExpr == contextExpr && isNull contextDecl
+
+        let isInSeqExpr =
+            let seqExpr = SequentialExprNavigator.GetByExpression(sourceExpr)
+            isNotNull seqExpr && sourceExpr != seqExpr.Expressions.Last()
 
         let moveToNewLineInfo = if isNotNull contextDecl then None else getMoveToNewLineInfo contextExpr
 
@@ -191,14 +195,22 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let letBindings = createBinding contextExpr contextDecl name
         setBindingExpression sourceExpr contextIndent letBindings
 
-        let replacedUsages =
-            data.Usages |> Seq.choose (fun usage ->
-                if not (isValid usage) then None else
-                if obj.ReferenceEquals(usage, sourceExpr) && (removeSourceExpr || contextIsSourceExpr) then None else
+        let replacedUsages, sourceExpr =
+            data.Usages |> Seq.fold (fun ((replacedUsages, sourceExpr) as acc) usage ->
+                if not (isValid usage) then acc else
+
+                if obj.ReferenceEquals(usage, sourceExpr) &&
+                        (removeSourceExpr || contextIsSourceExpr && not isInSeqExpr) then acc else
 
                 let refExpr = elementFactory.CreateReferenceExpr(name)
-                Some(ModificationUtil.ReplaceChild(usage, refExpr).As<ITreeNode>().CreateTreeElementPointer()))
-            |> List
+                let replacedUsage = ModificationUtil.ReplaceChild(usage, refExpr)
+
+                let sourceExpr = if contextIsSourceExpr && isInSeqExpr then replacedUsage else sourceExpr
+                let replacedUsagePointer = replacedUsage.As<ITreeNode>().CreateTreeElementPointer()
+                replacedUsagePointer :: replacedUsages, sourceExpr) ([], sourceExpr)
+
+        let contextExpr = if contextIsSourceExpr then sourceExpr else contextExpr
+        let replacedUsages = List(Seq.rev replacedUsages)
 
         match moveToNewLineInfo with
         | Some indent -> moveToNewLine contextExpr indent
@@ -206,7 +218,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
         let letBindings: ILet = 
             match letBindings with
-            | :? ILetOrUseExpr when contextIsSourceExpr ->
+            | :? ILetOrUseExpr when contextIsSourceExpr && not isInSeqExpr ->
                 let letBindings = ModificationUtil.ReplaceChild(sourceExpr, letBindings)
 
                 addNodesAfter letBindings.LastChild [
@@ -225,7 +237,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                 letBindings
 
             | :? ILetOrUseExpr ->
-                let ranges = getReplaceRanges sourceExpr contextExpr
+                let ranges = getReplaceRanges sourceExpr contextExpr removeSourceExpr
                 let replaced = ModificationUtil.ReplaceChildRange(ranges.ReplaceRange, TreeRange(letBindings))
                 let letBindings = replaced.First :?> ILet
 

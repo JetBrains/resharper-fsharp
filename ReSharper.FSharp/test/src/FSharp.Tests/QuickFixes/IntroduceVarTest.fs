@@ -22,6 +22,8 @@ type IntroduceVarTest() =
     [<Test>] member x.``Local - Seq - Multiline 01``() = x.DoNamedTest()
     [<Test>] member x.``Local - Seq - Multiple occurrences 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Local - Seq - Last 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Do 01``() = x.DoNamedTest()
     [<Test>] member x.``For 01``() = x.DoNamedTest()
     [<Test>] member x.``If 01``() = x.DoNamedTest()
