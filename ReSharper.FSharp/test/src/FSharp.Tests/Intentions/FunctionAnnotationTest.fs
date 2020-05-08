@@ -24,9 +24,6 @@ type FunctionAnnotationActionTest() =
     [<Test>] member x.``Let - recursive function``() = x.DoNamedTest()
     [<Test>] member x.``Let - tupled generic arg``() = x.DoNamedTest()
     
-    // TODO: Need case covering out args
-    // TODO: Need case covering functions pased to functions
-
 [<FSharpTest; TestPackages("FSharp.Core")>]
 type FunctionAnnotationAvailabilityTest() =
     inherit FSharpContextActionAvailabilityTestBase<FunctionAnnotationAction>()
