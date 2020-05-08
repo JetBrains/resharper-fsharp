@@ -1,6 +1,5 @@
 package com.jetbrains.rider.plugins.fsharp.services.fsi
 
-import com.intellij.execution.ExecutionManager
 import com.intellij.execution.Executor
 import com.intellij.execution.configurations.GeneralCommandLine
 import com.intellij.execution.console.LanguageConsoleBuilder
@@ -23,11 +22,10 @@ import com.intellij.openapi.diagnostic.Logger
 import com.intellij.openapi.editor.colors.EditorColors
 import com.intellij.openapi.editor.ex.util.EditorUtil
 import com.intellij.openapi.extensions.Extensions
-import com.intellij.openapi.fileTypes.PlainTextLanguage
 import com.intellij.openapi.options.ShowSettingsUtil
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.Key
 import com.intellij.openapi.util.UserDataHolderBase
+import com.intellij.openapi.util.text.StringUtil
 import com.intellij.openapi.vfs.VfsUtil
 import com.intellij.openapi.wm.ToolWindowManager
 import com.intellij.project.isDirectoryBased
@@ -38,12 +36,11 @@ import com.intellij.xdebugger.attach.LocalAttachHost
 import com.intellij.xdebugger.attach.XAttachDebuggerProvider
 import com.jetbrains.rdclient.util.idea.pumpMessages
 import com.jetbrains.rider.debugger.DotNetDebugProcess
-import com.jetbrains.rider.model.RdFsiRuntime
-import com.jetbrains.rider.model.RdFsiSessionInfo
+import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptLanguage
+import com.jetbrains.rider.model.*
 import com.jetbrains.rider.plugins.fsharp.FSharpIcons
 import com.jetbrains.rider.runtime.RiderDotNetActiveRuntimeHost
 import com.jetbrains.rider.runtime.mono.MonoRuntime
-import com.jetbrains.rider.util.idea.application
 import com.jetbrains.rider.util.idea.getComponent
 import org.jetbrains.concurrency.AsyncPromise
 import org.jetbrains.concurrency.Promise
@@ -53,6 +50,7 @@ import java.time.Duration
 import javax.swing.BorderFactory
 import javax.swing.event.HyperlinkEvent
 import kotlin.properties.Delegates
+import com.jetbrains.rd.platform.util.application
 
 class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debug: Boolean)
     : AbstractConsoleRunnerWithHistory<LanguageConsoleView>(fsiHost.project, fsiTitle, null) {
@@ -162,8 +160,10 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
             ToolWindowManager.getInstance(project).getToolWindow(executor.id)?.show(null)
 
             val stream = processHandler.processInput ?: error("Broken Fsi stream")
-            stream.write(fsiText.toByteArray(Charsets.UTF_8))
-            stream.flush()
+            if(!StringUtil.isEmptyOrSpaces(visibleText)) {
+                stream.write(fsiText.toByteArray(Charsets.UTF_8))
+                stream.flush()
+            }
         }
     }
 
@@ -237,28 +237,32 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
     }
 
     override fun createConsoleView(): LanguageConsoleView {
-        val consoleView = LanguageConsoleBuilder().gutterContentProvider(inputSeparatorGutterContentProvider).build(project, PlainTextLanguage.INSTANCE)
+        var createdConsoleView : LanguageConsoleView? = null
 
-        val consoleEditorBorder = BorderFactory.createMatteBorder(
-                2, 0, 0, 0, consoleView.consoleEditor.colorsScheme.getColor(EditorColors.INDENT_GUIDE_COLOR))
-        consoleView.consoleEditor.component.border = consoleEditorBorder
+        withGenericSandBoxing(genericFSharpSandboxInfoWithCustomParams("", false, emptyList()), project) {
+            val consoleView = LanguageConsoleBuilder().gutterContentProvider(inputSeparatorGutterContentProvider).build(project, FSharpScriptLanguage)
 
-        val historyKeyListener = HistoryKeyListener(fsiHost.project, consoleView.consoleEditor, commandHistory)
-        consoleView.consoleEditor.contentComponent.addKeyListener(historyKeyListener)
-        commandHistory.listeners.add(historyKeyListener)
+            val consoleEditorBorder = BorderFactory.createMatteBorder(
+                    2, 0, 0, 0, consoleView.consoleEditor.colorsScheme.getColor(EditorColors.INDENT_GUIDE_COLOR))
+            consoleView.consoleEditor.component.border = consoleEditorBorder
 
-        return consoleView
+            val historyKeyListener = HistoryKeyListener(fsiHost.project, consoleView.consoleEditor, commandHistory)
+            consoleView.consoleEditor.contentComponent.addKeyListener(historyKeyListener)
+            commandHistory.listeners.add(historyKeyListener)
+
+            createdConsoleView = consoleView
+        }
+
+        return createdConsoleView ?: error("Cannot create fsi")
     }
 
     override fun createProcessHandler(process: Process): OSProcessHandler {
-        return object : OSProcessHandler(process, cmdLine.commandLineString, Charsets.UTF_8) {
-            override fun isSilentlyDestroyOnClose(): Boolean = true
+        val fsiProcessHandler = FsiProcessHandler(process, cmdLine.commandLineString)
 
-            override fun notifyTextAvailable(text: String, outputType: Key<*>) {
-                if (text != "SERVER-PROMPT>\n")
-                    super.notifyTextAvailable(text, outputType)
-            }
-        }
+        val sandboxInfoUpdater = FsiSandboxInfoUpdater(fsiHost.project, consoleView.consoleEditor, commandHistory)
+        fsiProcessHandler.addSandboxInfoUpdater(sandboxInfoUpdater)
+
+        return fsiProcessHandler
     }
 
     private class ResetFsiAction(private val host: FsiHost) : AnAction("Reset F# Interactive", null, AllIcons.Actions.Restart) {

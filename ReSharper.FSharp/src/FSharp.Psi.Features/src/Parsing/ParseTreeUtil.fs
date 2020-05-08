@@ -2,7 +2,7 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Parsing.ParseTreeUtil
 
 open FSharp.Compiler
-open FSharp.Compiler.Ast
+open FSharp.Compiler.SyntaxTree
 open FSharp.Compiler.Range
 
 type SynBinding with

@@ -1,0 +1,12 @@
+﻿IndentOnTryWith = True
+try
+  ()
+with
+  | _ -> ()
+
+================
+IndentOnTryWith = False
+try
+  ()
+with
+| _ -> ()

@@ -1,6 +1,5 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
-open JetBrains.ReSharper.Feature.Services.Intentions.Scoped.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
@@ -8,7 +7,7 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 type RemoveRedundantNewFix(warning: RedundantNewWarning) =
-    inherit ScopedQuickFixBase()
+    inherit FSharpScopedQuickFixBase()
 
     let newExpr = warning.NewExpr
 
@@ -17,7 +16,7 @@ type RemoveRedundantNewFix(warning: RedundantNewWarning) =
 
     override x.TryGetContextTreeNode() = newExpr :> _
 
-    override x.ExecutePsiTransaction(_, _) =
+    override x.ExecutePsiTransaction(_) =
         use writeCookie = WriteLockCookie.Create(newExpr.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
 
@@ -26,5 +25,3 @@ type RemoveRedundantNewFix(warning: RedundantNewWarning) =
 
         let appExpr = factory.CreateAppExpr(refExpr, newExpr.ArgumentExpression, false)
         ModificationUtil.ReplaceChild(newExpr, appExpr) |> ignore
-        
-        null

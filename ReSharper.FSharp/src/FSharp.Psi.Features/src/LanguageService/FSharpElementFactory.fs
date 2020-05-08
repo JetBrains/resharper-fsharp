@@ -201,7 +201,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         member x.CreateBinaryAppExpr(text, arg1: ISynExpr, arg2: ISynExpr) =
             let source = "() " + text + " ()"
             let expr = getExpression source
-            let appExpr = expr.As<IBinaryAppExpr>()
+            let appExpr = expr :?> IBinaryAppExpr
 
             let leftArg = ModificationUtil.ReplaceChild(appExpr.LeftArgument, arg1.IgnoreInnerParens())
             addParensIfNeeded leftArg |> ignore
@@ -220,3 +220,16 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let expr = createLetBinding (sprintf "_ : %s" typeSignature)
             expr.Bindings.[0].ReturnTypeInfo
             
+        member x.CreateSetExpr(left: ISynExpr, right: ISynExpr) =
+            let source = "() <- ()"
+            let expr = getExpression source
+            let setExpr = expr :?> ISetExpr
+
+            let leftArg = ModificationUtil.ReplaceChild(setExpr.LeftExpression, left.IgnoreInnerParens())
+            addParensIfNeeded leftArg |> ignore
+
+            let rightArg = ModificationUtil.ReplaceChild(setExpr.RightExpression, right.IgnoreInnerParens())
+            addParensIfNeeded rightArg |> ignore
+
+            expr
+  

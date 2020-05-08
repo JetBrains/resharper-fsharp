@@ -1,6 +1,5 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
-open JetBrains.ReSharper.Feature.Services.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -8,7 +7,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.TextControl
 
 type IntroduceVarFix(expr: ISynExpr) =
-    inherit QuickFixBase()
+    inherit FSharpQuickFixBase()
 
     new (warning: UnitTypeExpectedWarning) =
         IntroduceVarFix(warning.Expr)
@@ -26,7 +25,4 @@ type IntroduceVarFix(expr: ISynExpr) =
 
         use cookie = FSharpRegistryUtil.AllowExperimentalFeaturesCookie.Create()
         textControl.Selection.SetRange(expr.GetDocumentRange().TextRange)
-        FSharpIntroduceVariable.IntroduceVar(expr, textControl)
-
-    override x.ExecutePsiTransaction(_, _) =
-        null
+        FSharpIntroduceVariable.IntroduceVar(expr, textControl, true)

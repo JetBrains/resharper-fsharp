@@ -22,6 +22,12 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
             field("fixArgsForAttach", bool)
         })
         call("getProjectReferences", int, immutableList(string))
+        field("fsiTools", aggregatedef("RdFSharpInteractiveTools") {
+            call("prepareCommands", structdef("RdFsiPrepareCommandsArgs") {
+                field("firstCommandIndex", int)
+                field("commands", immutableList(string))
+            }, immutableList(string))
+        })
         property("moveCaretOnSendLine", bool).readonly
         property("moveCaretOnSendSelection", bool).readonly
         property("copyRecentToEditor", bool).readonly

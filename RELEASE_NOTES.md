@@ -1,5 +1,86 @@
 # Release notes
 
+## 2020.1
+
+### Inspections / analyzers
+
+* Attributes 
+    * **Add** Redundant Attribute suffix analyzer and quick fix (by [@reacheight](https://github.com/reacheight) ([#109](https://github.com/JetBrains/fsharp-support/pull/109)))
+    * **Add** Redundant attribute parens analyzer and quick fix (by [@reacheight](https://github.com/reacheight) ([#104](https://github.com/JetBrains/fsharp-support/pull/104)))
+
+* Run analyzers in parallel
+* Optimize spell-checker analyzer
+* **Fix** Spell-checker didn't work on some declarations
+* Improve reported ranges for unused sequential and `let` expressions
+
+### Quick fixes
+
+* **FS0039**: Undefined name
+  * Better types filtering in Import Type quick fix
+  * Escape module names when importing types
+  * **Fix** various cases of incorrect `open` placement
+* **FS0003**: Not a function / unexpected argument
+  * **Add** Remore unexpected arguments (by [@DedSec256](https://github.com/DedSec256) ([#89](https://github.com/JetBrains/fsharp-support/pull/89)))
+* **FS0026**: `match` rule is never matched
+  * Remove never matching rules (by [@reacheight](https://github.com/reacheight) ([#74](https://github.com/JetBrains/fsharp-support/pull/74)))
+* **FS0005**: Field not mutable
+  * **Add** Make field mutable
+* **FS0027**: Value not mutable
+  * **Add** Make value mutable
+* **FS1182**: Unused let binding
+  * **Add** Rename with `_` prefix
+* **FS0038**: Var bound twice
+  * **Add** Replace with `_`
+
+* Add parens to expression when applying quick fixes where needed
+
+### Intentions / Context actions
+
+* **Add** Elif to If, If to Elif actions
+* **Add** Negate `If` expression condition
+
+### Code vision
+
+* **Add** Copy Inferred Type action
+* **Add** Don't show parent namespaces for types
+* **Fix** Nested tuple params could be shown wrong
+
+### C# interop
+
+* **Fix** Symbols from C# projects could not be seen after first build
+* **Fix** Support for single case unions that are parsed as type abbreviations
+* **Fix** Invalid accessibility for some types containing non-public members
+* **Fix** Attributes containing `Attribute` wasn't seen properly from C# (e.g. `AttributeUsage`)
+
+### F# Interactive
+
+* **Add** Send project references to F# Interactive action
+* **Fix** Send to F# Interactive is now available during initial file indexing
+
+### Debugger
+
+* **Add** More expressions are supported in evaluation on mouse hover:
+  * self-reference qualifiers in methods and types (`this.Property`)
+  * indexer expressions (`"foo".[1]`)
+
+### Find usages and Rename
+
+* **Fix** Types would not be found inside generic constraints, constructor attributes, and measures
+* **Fix** New Instance Creation wasn't reported for `new` expressions
+* Better naming style suggestions for literals
+
+### Highlighting
+
+**Add** Highlight more escape sequences in strings
+**Add** Settings for F# preprocessor keywords 
+**Fix** Highlighting for `const` keyword
+
+### Misc
+
+* Add `Type` file template
+* Select whole `()` expression in Extend Selection
+* **Fix** Plugin could not be built on case-sensitive file systems (by [@ mcon](https://github.com/mcon) ([#108](https://github.com/JetBrains/fsharp-support/pull/108)))
+
 ## 2019.3
 
 ### Tools update and internals

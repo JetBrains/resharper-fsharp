@@ -18,6 +18,7 @@ type IFSharpElementFactory =
     abstract CreateAppExpr: funcName: string * arg: ISynExpr -> IPrefixAppExpr
     abstract CreateAppExpr: funExpr: ISynExpr * argExpr: ISynExpr * addSpace: bool -> IPrefixAppExpr
     abstract CreateBinaryAppExpr: string * left: ISynExpr * right: ISynExpr -> ISynExpr
+    abstract CreateSetExpr: left: ISynExpr * right: ISynExpr -> ISynExpr
 
     abstract CreateExpr: string -> ISynExpr
     abstract CreateReferenceExpr: string -> ISynExpr

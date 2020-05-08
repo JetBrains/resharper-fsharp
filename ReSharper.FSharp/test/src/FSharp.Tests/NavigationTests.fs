@@ -28,7 +28,7 @@ type FSharpGoToUsagesTest() =
 
     [<Test>] member x.``Record Ctor 01 - Source``() = x.DoNamedTest()
 
-    [<TestReferences("FSharpRecord.dll")>]
+    [<TestReferences("../../../assemblies/FSharpRecord.dll")>]
     [<Test>] member x.``Record Ctor 02 - Compiled``() = x.DoNamedTest()
 
     [<Test>] member x.``Anon record 01 - Ctor``() = x.DoNamedTest()

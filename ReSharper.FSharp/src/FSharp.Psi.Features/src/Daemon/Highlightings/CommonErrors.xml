@@ -78,6 +78,7 @@
     <QuickFix>AddIgnoreFix</QuickFix>
     <QuickFix>IntroduceVarFix</QuickFix>
     <QuickFix>RemoveSubsequentFix</QuickFix>
+    <QuickFix>ReplaceWithAssignmentExpressionFix</QuickFix>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="FunctionValueUnexpected">

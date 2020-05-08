@@ -38,7 +38,7 @@ type FSharpErrorLookupItem(item: FSharpDeclarationListItem) =
     inherit TextLookupItemBase()
 
     override x.Image = null
-    override x.Text = item.NameInCode
+    override x.Text = item.Name
     override x.Accept(_, _, _, _, _, _) = ()
 
     interface IDescriptionProvidingLookupItem with
@@ -88,7 +88,8 @@ type FSharpLookupItem(item: FSharpDeclarationListItem, context: FSharpCodeComple
         try getIconId item.FSharpSymbol
         with _ -> null
 
-    override x.Text = item.NameInCode
+    override x.Text =
+        PrettyNaming.QuoteIdentifierIfNeeded item.Name
 
     override x.DisplayTypeName =
         try
@@ -102,19 +103,23 @@ type FSharpLookupItem(item: FSharpDeclarationListItem, context: FSharpCodeComple
     override x.OnAfterComplete(textControl, nameRange, decorationRange, tailType, suffix, caretPositionRangeMarker) =
         base.OnAfterComplete(textControl, &nameRange, &decorationRange, tailType, &suffix, &caretPositionRangeMarker)
 
-        match item.NamespaceToOpen with
-        | None -> ()
-        | Some namespaceToOpen ->
+        let ns = item.NamespaceToOpen
+        if ns.IsEmpty() then () else
+
+        let ns = ns |> Array.map (fun ns -> Keywords.QuoteIdentifierIfNeeded ns) |> String.concat "."
 
         let solution = context.BasicContext.Solution
         solution.GetPsiServices().Files.CommitAllDocuments()    
-        addOpen namespaceToOpen
+        addOpen ns
 
     override x.GetDisplayName() =
         let name = LookupUtil.FormatLookupString(item.Name, x.TextColor)
-        match item.NamespaceToOpen with
-        | None -> ()
-        | Some ns -> LookupUtil.AddInformationText(name, "(in " + ns + ")", itemInfoTextStyle)
+
+        let ns = item.NamespaceToOpen
+        if not (ns.IsEmpty()) then
+            let ns = String.concat "." ns
+            LookupUtil.AddInformationText(name, "(in " + ns + ")", itemInfoTextStyle)
+
         name
 
     interface IParameterInfoCandidatesProvider with

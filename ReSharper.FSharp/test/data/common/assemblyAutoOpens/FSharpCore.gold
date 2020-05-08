@@ -1,0 +1,17 @@
+﻿Microsoft.FSharp
+Microsoft.FSharp.Core.LanguagePrimitives+IntrinsicOperators
+Microsoft.FSharp.Core
+Microsoft.FSharp.Core.ExtraTopLevelOperators
+Microsoft.FSharp.Core.NumericLiterals
+Microsoft.FSharp.Core.DetailedExceptions
+Microsoft.FSharp.Core.Operators
+Microsoft.FSharp.Core.Operators+ArrayExtensions
+Microsoft.FSharp.Collections
+Microsoft.FSharp.Control
+Microsoft.FSharp.Control.WebExtensions
+Microsoft.FSharp.Control.CommonExtensions
+Microsoft.FSharp.Control.AsyncBuilderImpl
+Microsoft.FSharp.Control.ExceptionDispatchInfoHelpers
+Microsoft.FSharp.Control.LazyExtensions
+Microsoft.FSharp.Linq.QueryRunExtensions.LowPriority
+Microsoft.FSharp.Linq.QueryRunExtensions.HighPriority

@@ -197,8 +197,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         if (field.IsAnonRecordField)
           return new FSharpAnonRecordFieldProperty(referenceExpression.Reference);
 
+        if (field.IsUnionCaseField && field.DeclaringUnionCase?.Value is var fieldUnionCase)
+        {
+          var unionCaseTypeElement = GetDeclaredElement(fieldUnionCase, psiModule, referenceExpression) as ITypeElement;
+          return unionCaseTypeElement?.EnumerateMembers(field.Name, true).FirstOrDefault();
+        }
+
         if (!field.IsUnresolved && field.DeclaringEntity?.Value is FSharpEntity fieldEntity)
-          return GetTypeElement(fieldEntity, psiModule)?.EnumerateMembers(field.Name, true).FirstOrDefault();}
+          return GetTypeElement(fieldEntity, psiModule)?.EnumerateMembers(field.Name, true).FirstOrDefault();
+      }
 
       if (symbol is FSharpActivePatternCase patternCase)
         return GetActivePatternCaseElement(psiModule, referenceExpression, patternCase);

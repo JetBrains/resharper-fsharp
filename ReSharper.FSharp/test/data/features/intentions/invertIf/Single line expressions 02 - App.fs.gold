@@ -1,0 +1,4 @@
+﻿if{caret} false then
+    ignore "b"
+else
+    ignore "a"
