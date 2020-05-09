@@ -10,7 +10,7 @@ open JetBrains.UI.RichText
 
 [<DaemonIntraTextAdornmentProvider(typeof<TypeHintAdornmentProvider>)>]
 [<StaticSeverityHighlighting(Severity.INFO,
-     HighlightingGroupIds.IntraTextAdornmentsGroup,
+     typeof<HighlightingGroupIds.IntraTextAdornments>,
      AttributeId = AnalysisHighlightingAttributeIds.PARAMETER_NAME_HINT,
      OverlapResolve = OverlapResolveKind.NONE,
      ShowToolTipInStatusBar = false)>]
@@ -43,5 +43,6 @@ and [<SolutionComponent>] TypeHintAdornmentProvider() =
                     override x.SelectionRange = Nullable<_>()
                     override x.IconId = null
                     override x.IsPreceding = false
+                    override x.Order = 0
                 }
             | _ -> null
