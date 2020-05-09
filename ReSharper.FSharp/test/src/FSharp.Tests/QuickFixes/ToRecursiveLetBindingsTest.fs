@@ -13,3 +13,4 @@ type ToRecursiveLetBindingsTest() =
 
     [<Test>] member x.``Module 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Module 02 - Attributes``() = x.DoNamedTest()
+    [<Test>] member x.``Module 03 - Alignment``() = x.DoNamedTest()

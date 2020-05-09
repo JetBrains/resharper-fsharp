@@ -74,6 +74,9 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``IfThenElse expr indent 02``() = x.DoNamedTest()
     [<Test>] member x.``IfThenElse expr indent 03 - Elif``() = x.DoNamedTest()
 
+    [<Test>] member x.``Match expr indent 01 - Expr at new line``() = x.DoNamedTest()
+    [<Test>] member x.``Match expr indent 02 - With at new line``() = x.DoNamedTest()
+
     [<Test>] member x.``MatchClause expr indent 01``() = x.DoNamedTest()
     [<Test>] member x.``MatchClause expr indent 02 - TryWith``() = x.DoNamedTest()
     [<Test>] member x.``MatchClause expr indent 03 - TryWith - Clause on the same line``() = x.DoNamedTest()
@@ -90,5 +93,15 @@ type FSharpCodeFormatterTest() =
 
     [<Test>] member x.``Enum declaration indent 01 - Correct indent``() = x.DoNamedTest()
     [<Test>] member x.``Union declaration indent 01 - Correct indent``() = x.DoNamedTest()
+    [<Test>] member x.``Union declaration indent 02 - Modifier``() = x.DoNamedTest()
     [<Test>] member x.``Type abbreviation declaration indent 01 - Correct indent``() = x.DoNamedTest()
     [<Test>] member x.``Module abbreviation declaration indent 01 - Correct indent``() = x.DoNamedTest()
+
+    [<Test>] member x.``Match clauses alignment 01``() = x.DoNamedTest()
+    [<Test>] member x.``Union cases alignment 01``() = x.DoNamedTest()
+    [<Test>] member x.``Union cases alignment 02 - Modifier``() = x.DoNamedTest()
+    [<Test>] member x.``Union cases alignment 03 - Modifier and new line``() = x.DoNamedTest()
+    [<Test>] member x.``Enum cases alignment 01``() = x.DoNamedTest()
+    [<Test>] member x.``Sequential expr alignment 01 - No separators``() = x.DoNamedTest()
+    [<Test>] member x.``Sequential expr alignment 02 - Separators``() = x.DoNamedTest()
+    [<Test>] member x.``Binary expr alignment 01``() = x.DoNamedTest()

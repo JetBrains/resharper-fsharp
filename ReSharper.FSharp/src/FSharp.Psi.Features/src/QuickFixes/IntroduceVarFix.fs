@@ -15,10 +15,13 @@ type IntroduceVarFix(expr: IFSharpExpression) =
     new (warning: FunctionValueUnexpectedWarning) =
         IntroduceVarFix(warning.Expr)
 
+    new (error: UnitTypeExpectedError) =
+        IntroduceVarFix(error.Expr)
+
     override x.Text = "Introduce 'let' binding"
 
     override x.IsAvailable _ =
-        FSharpIntroduceVariable.CanIntroduceVar(expr, true)
+        FSharpIntroduceVariable.CanIntroduceVar(expr)
 
     override x.Execute(solution, textControl) =
         base.Execute(solution, textControl)

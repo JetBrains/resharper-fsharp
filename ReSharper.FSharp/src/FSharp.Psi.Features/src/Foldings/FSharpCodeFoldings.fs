@@ -1,4 +1,4 @@
-namespace rec JetBrains.ReSharper.Plugins.FSharp.Services.Foldings
+namespace JetBrains.ReSharper.Plugins.FSharp.Services.Foldings
 
 open FSharp.Compiler.SourceCodeServices
 open FSharp.Compiler.SourceCodeServices.Structure
@@ -12,14 +12,15 @@ open JetBrains.ReSharper.Psi
 open JetBrains.TextControl.DocumentMarkup
 open JetBrains.Util
 
-[<Language(typeof<FSharpLanguage>)>]
-type FSharpCodeFoldingProcessFactory(logger: ILogger) =
-    interface ICodeFoldingProcessorFactory with
-        member x.CreateProcessor() =
-            FSharpCodeFoldingProcess(logger) :> _
+module FSharpCodeFoldingAttributes =
+    let [<Literal>] HashDirective = "ReSharper F# Hash Directives Block Folding"
 
 
-and FSharpCodeFoldingProcess(logger: ILogger) =
+[<RegisterHighlighter(FSharpCodeFoldingAttributes.HashDirective, EffectType = EffectType.FOLDING)>]
+type FSharpCodeFoldingAttributes() = class end
+
+
+type FSharpCodeFoldingProcess(logger: ILogger) =
     inherit TreeNodeVisitor<FoldingHighlightingConsumer>()
     let mutable processingFinished = false
 
@@ -80,9 +81,8 @@ and FSharpCodeFoldingProcess(logger: ILogger) =
             | _ -> ()
 
 
-module FSharpCodeFoldingAttributes =
-    let [<Literal>] HashDirective = "ReSharper F# Hash Directives Block Folding"
-
-
-[<assembly: RegisterHighlighter(FSharpCodeFoldingAttributes.HashDirective, EffectType = EffectType.FOLDING)>]
-do ()
+[<Language(typeof<FSharpLanguage>)>]
+type FSharpCodeFoldingProcessFactory(logger: ILogger) =
+    interface ICodeFoldingProcessorFactory with
+        member x.CreateProcessor() =
+            FSharpCodeFoldingProcess(logger) :> _

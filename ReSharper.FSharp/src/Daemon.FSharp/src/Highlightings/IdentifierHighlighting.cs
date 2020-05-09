@@ -9,7 +9,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Highlightings
   }
 
   [DaemonTooltipProvider(typeof(IFSharpIdentifierTooltipProvider))]
-  [StaticSeverityHighlighting(Severity.INFO, HighlightingGroupIds.IdentifierHighlightingsGroup,
+  [StaticSeverityHighlighting(Severity.INFO, typeof(HighlightingGroupIds.IdentifierHighlightings),
     OverlapResolve = OverlapResolveKind.NONE, ShowToolTipInStatusBar = false)]
   public class FSharpIdentifierHighlighting : ICustomAttributeIdHighlighting
   {
