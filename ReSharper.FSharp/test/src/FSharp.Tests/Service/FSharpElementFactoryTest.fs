@@ -22,7 +22,7 @@ type FSharpElementFactoryTest() =
 
     member x.DoTest(action: IFSharpElementFactory -> unit) =
         testAction <- action
-        x.DoTestSolution()
+        x.DoTestSolution Array.empty<string>
 
     override x.DoTest(_, project: IProject) =
         let psiModule = project.GetPsiModules().Single()
