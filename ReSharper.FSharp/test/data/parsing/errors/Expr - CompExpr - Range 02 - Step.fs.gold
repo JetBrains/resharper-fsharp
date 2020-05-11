@@ -7,10 +7,10 @@ IFSharpImplFile
           IReferenceExpr
             FSharpIdentifierToken(type:IDENTIFIER, text:seq)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IRangeSequenceExpr
+          IComputationExpr
             FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IRangeSequence
+            IRangeSequenceExpr
               ILiteralExpr
                 FSharpToken(type:INT32, text:1)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "

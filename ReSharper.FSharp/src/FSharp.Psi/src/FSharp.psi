@@ -359,8 +359,8 @@ interface fSharpExpression:
   recordExpr |
   objExpr |
   forLikeExpr |
-  arrayOrListOfSeqExpr |
-  computationLikeExpr |
+  rangeSequenceExpr |
+  computationExpr |
   lambdaExpr |
   matchLikeExpr |
   doLikeExpr |
@@ -540,16 +540,9 @@ anonRecdExpr options { stubBase="FSharpExpressionBase"; }:
   BAR_RBRACE;
 
 arrayOrListExpr options { stubBase="FSharpExpressionBase"; }:
-  (
-    LBRACK
-    fSharpExpression<EXPR, Expressions>*
-    RBRACK
-  ) |
-  (
-    LBRACK_BAR
-    fSharpExpression<EXPR, Expressions>*
-    BAR_RBRACK
-  );
+  (LBRACK | LBRACK_BAR)
+  fSharpExpression<EXPR, Expression>
+  (RBRACK | BAR_RBRACK);
 
 recordExpr options { stubBase="FSharpExpressionBase"; }:
   LBRACE<LBRACE, LeftBrace>
@@ -585,22 +578,13 @@ forEachExpr options { stubBase="UnitExpressionBase"; }:
   FOR
   synPat<PAT, Pattern>
   IN
-  forEachInClause{IN_CLAUSE, InClause}
-  DO
+  fSharpExpression<IN_EXPR, InExpression>
+  forEachBodySeparator{BODY_SEPARATOR, BodySeparator}
   fSharpExpression<DO_EXPR, DoExpression>;
 
-private forEachInClause{ROLE, Getter}:
-  fSharpExpression<@ROLE, @Getter> |
-  rangeSequence<@ROLE, @Getter>;
-
-arrayOrListOfSeqExpr options { stubBase="FSharpExpressionBase"; }:
-  (LBRACK
-   fSharpExpression<EXPR, Expression>
-   RBRACK) |
-
-   (LBRACK_BAR
-    fSharpExpression<EXPR, Expression>
-    BAR_RBRACK);
+private forEachBodySeparator{ROLE, Getter}:
+  DO<@ROLE, @Getter> |
+  RARROW<@ROLE, @Getter>;
 
 whileExpr options { stubBase="UnitExpressionBase"; }:
   WHILE<WHILE_KEYWORD, WhileKeyword>
@@ -619,10 +603,6 @@ objExpr options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   memberDeclaration<MEMBER_DECL, MemberDeclarations>*
   interfaceImplementation<INTERFACE_IMPL, InterfaceImplementations>*
   RBRACE;
-
-interface computationLikeExpr:
-  computationExpr |
-  rangeSequenceExpr;
 
 computationExpr options { stubBase="FSharpExpressionBase"; }:
   LBRACE
@@ -807,13 +787,13 @@ libraryOnlyExpr options { stubBase="FSharpExpressionBase"; }:
   fakeSeparator;
 
 fromErrorExpr options { stubBase="FSharpExpressionBase"; }:
-  fakeSeparator;
+  fSharpExpression<EXPR, Expression>;
 
 fixedExpr options { stubBase="FSharpExpressionBase"; }:
   FIXED<KEYWORD, Keyword>
   fSharpExpression<EXPR, Expression>;
 
-rangeSequence:
+rangeSequenceExpr options { stubBase="FSharpExpressionBase"; }:
   fSharpExpression<FROM_EXPR, FromExpr>
   (
     DOT_DOT
@@ -821,11 +801,6 @@ rangeSequence:
   )?
   DOT_DOT
   fSharpExpression<TO_EXPR, ToExpr>;
-
-rangeSequenceExpr options { stubBase="FSharpExpressionBase"; }:
-  LBRACE
-  rangeSequence<RANGE, RangeSequence>
-  RBRACE;
 
 chameleonExpression:
   fSharpExpression<EXPR, Expression>;

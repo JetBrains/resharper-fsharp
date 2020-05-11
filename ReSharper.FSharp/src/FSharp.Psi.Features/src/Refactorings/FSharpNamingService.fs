@@ -255,9 +255,8 @@ type FSharpNamingService(language: FSharpLanguage) =
             | expr -> addNamesForExpr expr
 
         | :? IForEachExpr as forEachExpr when forEachExpr.Pattern == pat ->
-            match forEachExpr.InClause.As<IFSharpExpression>() with
-            | null -> ()
-            | expr ->
+            let expr = forEachExpr.InExpression
+            if expr :? IRangeSequenceExpr then () else
 
             let naming = pat.GetPsiServices().Naming
             let collection =

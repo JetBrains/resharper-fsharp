@@ -186,7 +186,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
             let forExpr = getExpression "for _ in () do ()" :?> IForEachExpr
 
-            let expr = ModificationUtil.ReplaceChild(forExpr.InClause, expr.Copy())
+            let expr = ModificationUtil.ReplaceChild(forExpr.InExpression, expr.Copy())
             let whitespace = ModificationUtil.ReplaceChild(forExpr.DoExpression.PrevSibling, Whitespace(indent))
             ModificationUtil.AddChildBefore(whitespace, NewLine(expr.GetLineEnding())) |> ignore
 
