@@ -772,7 +772,12 @@ implicitZeroExpr options { stubBase="FSharpExpressionBase"; }:
   fakeSeparator;
 
 yieldOrReturnExpr options { stubBase="FSharpExpressionBase"; }:
-  (YIELD | YIELD_BANG | RETURN | RETURN_BANG)
+  (
+    YIELD<YIELD_KEYWORD, YieldKeyword> |
+    YIELD_BANG<YIELD_KEYWORD, YieldKeyword> |
+    RETURN<YIELD_KEYWORD, YieldKeyword> |
+    RETURN_BANG<YIELD_KEYWORD, YieldKeyword>
+  )
   fSharpExpression<EXPR, Expression>;
 
 letOrUseBangExpr options { stubBase="FSharpExpressionBase"; } extras {
