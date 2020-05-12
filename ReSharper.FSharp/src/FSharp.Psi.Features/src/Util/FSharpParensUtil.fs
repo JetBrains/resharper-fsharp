@@ -72,8 +72,7 @@ let isHighPrecedenceApp (appExpr: IPrefixAppExpr) =
     funEndOffset = argStartOffset
 
 let private canBeTopLevelArgInHighPrecedenceApp (expr: IFSharpExpression) =
-    expr :? IArrayOrListExpr || expr :? IArrayOrListOfSeqExpr ||
-    expr :? IObjExpr || expr :? IRecordExpr
+    expr :? IArrayOrListExpr || expr :? IObjExpr || expr :? IRecordExpr
 
 let rec private isHighPrecedenceAppRequired (appExpr: IPrefixAppExpr) =
     let argExpr = appExpr.ArgumentExpression.IgnoreInnerParens()
@@ -99,9 +98,8 @@ let rec needsParens (expr: IFSharpExpression) =
     | :? IParenExpr | :? IQuoteExpr
     | :? IConstExpr | :? INullExpr
     | :? IRecordExpr | :? IAnonRecdExpr
-    | :? IArrayOrListExpr | :? IArrayOrListOfSeqExpr
-    | :? IObjExpr | :? IComputationLikeExpr
-    | :? IAddressOfExpr -> false
+    | :? IArrayOrListExpr | :? IComputationExpr
+    | :? IObjExpr | :? IAddressOfExpr -> false
 
     | :? IBinaryAppExpr as binaryAppExpr when
             isNotNull (AppExprNavigator.GetByArgument(context)) ->

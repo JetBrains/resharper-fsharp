@@ -10,6 +10,29 @@ import com.jetbrains.rider.util.idea.application
 
 class FSharpMoveProviderExtension(project: Project) : MoveProviderExtension(project) {
 
+    private fun ProjectModelNode.prevSibling() = getSibling { index -> index - 1 }
+    private fun ProjectModelNode.nextSibling() = getSibling { index -> index + 1 }
+
+    private fun ProjectModelNode.getSibling(indexFunc: (Int) -> Int): ProjectModelNode? {
+        val parent = parent ?: return null
+        val siblings = parent.getSortedChildren()
+        val index = siblings.indexOf(this)
+        val newIndex = indexFunc(index)
+        if (newIndex < 0 || newIndex > siblings.count() - 1)
+            return null
+        return siblings[newIndex]
+    }
+
+    private fun ProjectModelNode.getSortedChildren(performExpand: Boolean = true): List<ProjectModelNode> {
+        val comparator = Comparator<ProjectModelNode> { p0, p1 ->
+            if (p0 == null && p1 == null) return@Comparator 0
+            if (p0 == null) return@Comparator 1
+            if (p1 == null) return@Comparator -1
+            compareNodes(p0, p1)
+        }
+        return getChildren(performExpand = performExpand).sortedWith(comparator)
+    }
+
     companion object {
         const val CompileBeforeType: String = "CompileBefore"
         const val CompileAfterType: String = "CompileAfter"

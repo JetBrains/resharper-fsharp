@@ -107,7 +107,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
             Node()
               .HasRole(PrefixAppExpr.ARG_EXPR)
               .Satisfies((node, context) =>
-                !(node is IComputationLikeExpr) ||
+                !(node is IComputationExpr) ||
                 !node.ContainsLineBreak(context.CodeFormatter)))
           .Return(IndentType.External)
           .Build();
