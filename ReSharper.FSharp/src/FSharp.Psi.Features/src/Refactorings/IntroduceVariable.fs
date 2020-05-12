@@ -118,12 +118,21 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
             elementFactory.CreateLetBindingExpr(name) :> _
 
     let getMoveToNewLineInfo (contextExpr: IFSharpExpression) =
-        if not contextExpr.IsSingleLine then None else
-
-        let parent = contextExpr.Parent
-        let prevToken =
+        let requiresMultilineExpr (parent: ITreeNode) =
             match parent with
+            | :? IMemberDeclaration | :? IAutoProperty -> false
+            | _ -> true
+
+        let contextExprParent = contextExpr.Parent
+        let contextParent = contextExpr.IgnoreParentChameleonExpr()
+
+        if not contextExpr.IsSingleLine && requiresMultilineExpr contextParent then None else
+
+        let prevToken =
+            match contextParent with
             | :? IBinding as binding when isNotNull binding.Parent -> binding.EqualsToken
+            | :? IMemberDeclaration as memberDeclaration -> memberDeclaration.EqualsToken
+            | :? IAutoProperty as autoProperty -> autoProperty.EqualsToken
             | :? IMatchClause as matchClause -> matchClause.RArrow
             | :? ILambdaExpr as lambdaExpr -> lambdaExpr.RArrow
             | :? ITryLikeExpr as tryExpr -> tryExpr.TryKeyword
@@ -131,13 +140,16 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
         if isNull prevToken then None else
 
+        let contextExpr: IFSharpTreeNode =
+            if contextExprParent :? IChameleonExpression then contextExprParent :?> _ else contextExpr :> _
+
         let prevSignificant = skipMatchingNodesBefore isInlineSpaceOrComment contextExpr
         if not (obj.ReferenceEquals(prevSignificant, prevToken)) then None else
 
         let indent =
-            match parent with
-            | :? IBinding -> parent.Parent.Indent
-            | _ -> parent.Indent
+            match contextParent with
+            | :? IBinding -> contextParent.Parent.Indent
+            | _ -> contextParent.Indent
 
         Some(indent + contextExpr.GetIndentSize())
 
