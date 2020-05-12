@@ -30,7 +30,7 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
            ExtensionTypingProvider <- defaultExtensionTypingProvider) |> ignore
        ()
        
-    let onInitialized lifetime model =
+    let onInitialized l model =
         ourModel <- model
         ()
         
@@ -50,9 +50,9 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
                      compilerToolsPath: string list,
                      m: range) =
             
-            if ourModel = null then 
+            if ourModel == null then 
                 let typeProvidersLoader = typeProvidersLoadersFactory.Create(lifetime)
-                typeProvidersLoader.RunAsync(Action<_, _>(onInitialized), Action(onFailed))
+                typeProvidersLoader.RunAsync(Action<Lifetime, _>(onInitialized), Action(onFailed))
            
             let typeProviders = 
                 if typeProvidersCache.ContainsKey(designTimeAssemblyNameString) then
