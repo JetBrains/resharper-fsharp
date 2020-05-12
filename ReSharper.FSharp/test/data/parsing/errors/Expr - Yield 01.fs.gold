@@ -1,0 +1,12 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IDo
+      IChameleonExpression
+        IYieldOrReturnExpr
+          FSharpTokenType+YieldTokenElement(type:YIELD, text:yield)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          ILiteralExpr
+            FSharpToken(type:INT32, text:1)
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

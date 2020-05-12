@@ -15,7 +15,7 @@ IFSharpImplFile
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+WhenTokenElement(type:WHEN, text:when)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          INamedType
+          INamedTypeUsage
             ITypeReferenceName
               ITypeParameterId
                 FSharpIdentifierToken(type:SYMBOLIC_OP, text:^)
@@ -28,7 +28,7 @@ IFSharpImplFile
           FSharpIdentifierToken(type:IDENTIFIER, text:P)
           FSharpTokenType+ColonTokenElement(type:COLON, text::)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          INamedType
+          INamedTypeUsage
             ITypeReferenceName
               FSharpIdentifierToken(type:IDENTIFIER, text:int)
           FSharpTokenType+RparenTokenElement(type:RPAREN, text:))

@@ -313,16 +313,24 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
             x.Done(range, mark, ElementType.RECORD_REPRESENTATION)
             ElementType.RECORD_DECLARATION
 
-        | SynTypeDefnSimpleRepr.Enum(enumCases, _) ->
+        | SynTypeDefnSimpleRepr.Enum(enumCases, range) ->
+            let casesListMark = x.Mark(range)
             for case in enumCases do
                 x.ProcessEnumCase case
+            x.Done(range, casesListMark, ElementType.ENUM_REPRESENTATION)
             ElementType.ENUM_DECLARATION
 
         | SynTypeDefnSimpleRepr.Union(_, cases, range) ->
-            let casesListMark = x.Mark(range)
+            let representationMark = x.Mark(range)
+            if not cases.IsEmpty then
+                let firstCaseRange = cases.Head.Range
+                x.AdvanceToTokenOrRangeStart(FSharpTokenType.BAR, firstCaseRange)
+ 
+            let caseListMark = x.Mark()
             for case in cases do
                 x.ProcessUnionCase(case)
-            x.Done(range, casesListMark, ElementType.UNION_REPRESENTATION)
+            x.Done(range, caseListMark, ElementType.UNION_CASE_LIST)
+            x.Done(representationMark, ElementType.UNION_REPRESENTATION)
             ElementType.UNION_DECLARATION
 
         | SynTypeDefnSimpleRepr.TypeAbbrev(_, (TypeRange range as synType), _) ->
@@ -561,23 +569,23 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         | SynType.LongIdent(lid) ->
             let mark = x.Mark(range)
             x.ProcessNamedTypeReference(lid.Lid)
-            x.Done(range, mark, ElementType.NAMED_TYPE)
+            x.Done(range, mark, ElementType.NAMED_TYPE_USAGE)
 
         | SynType.App(_, _, _, _, _, _, _) ->
             let mark = x.Mark(range)
             x.ProcessTypeAsTypeReferenceName(synType)
-            x.Done(range, mark, ElementType.NAMED_TYPE)
+            x.Done(range, mark, ElementType.NAMED_TYPE_USAGE)
 
         | SynType.LongIdentApp(_, _, ltRange, typeArgs, _, gtRange, _) ->
             let mark = x.Mark(range)
             x.ProcessTypeAsTypeReferenceName(synType)
-            x.Done(range, mark, ElementType.NAMED_TYPE)
+            x.Done(range, mark, ElementType.NAMED_TYPE_USAGE)
 
         | SynType.Tuple (_, types, _) ->
             let mark = x.Mark(range)
             for _, synType in types do
                 x.ProcessType(synType)
-            x.Done(range, mark, ElementType.TUPLE_TYPE)
+            x.Done(range, mark, ElementType.TUPLE_TYPE_USAGE)
 
         // todo: struct keyword?
         | SynType.AnonRecd(_, fields, _) ->
@@ -587,51 +595,51 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
                 x.MarkAndDone(range, ElementType.EXPRESSION_REFERENCE_NAME)
                 x.ProcessType(synType)
                 x.Done(range, mark, ElementType.ANON_RECORD_FIELD)
-            x.Done(range, mark, ElementType.ANON_RECORD_TYPE)
+            x.Done(range, mark, ElementType.ANON_RECORD_TYPE_USAGE)
 
         | SynType.StaticConstantNamed(synType1, synType2, _)
         | SynType.MeasureDivide(synType1, synType2, _) ->
             let mark = x.Mark(range)
             x.ProcessType(synType1)
             x.ProcessType(synType2)
-            x.Done(range, mark, ElementType.OTHER_TYPE)
+            x.Done(range, mark, ElementType.UNSUPPORTED_TYPE_USAGE)
 
         | SynType.Fun(synType1, synType2, _) ->
             let mark = x.Mark(range)
             x.ProcessType(synType1)
             x.ProcessType(synType2)
-            x.Done(range, mark, ElementType.FUN_TYPE)
+            x.Done(range, mark, ElementType.FUNCTION_TYPE_USAGE)
 
         | SynType.WithGlobalConstraints(synType, constraints, _) ->
             let mark = x.Mark(range)
             x.ProcessType(synType)
             for typeConstraint in constraints do
                 x.ProcessTypeConstraint(typeConstraint)
-            x.Done(range, mark, ElementType.OTHER_TYPE)
+            x.Done(range, mark, ElementType.UNSUPPORTED_TYPE_USAGE)
 
         | SynType.HashConstraint(synType, _)
         | SynType.MeasurePower(synType, _, _) ->
             let mark = x.Mark(range)
             x.ProcessType(synType)
-            x.Done(range, mark, ElementType.OTHER_TYPE)
+            x.Done(range, mark, ElementType.UNSUPPORTED_TYPE_USAGE)
 
         | SynType.Array(_, synType, _) ->
             let mark = x.Mark(range)
             x.ProcessType(synType)
-            x.Done(range, mark, ElementType.ARRAY_TYPE)
+            x.Done(range, mark, ElementType.ARRAY_TYPE_USAGE)
 
         | SynType.Var _ ->
             let mark = x.Mark(range)
             x.ProcessTypeAsTypeReferenceName(synType)
-            x.Done(range, mark, ElementType.NAMED_TYPE)
+            x.Done(range, mark, ElementType.NAMED_TYPE_USAGE)
 
         // todo: mark expressions
         | SynType.StaticConstantExpr _
         | SynType.StaticConstant _ ->
-            x.MarkAndDone(range, ElementType.OTHER_TYPE)
+            x.MarkAndDone(range, ElementType.UNSUPPORTED_TYPE_USAGE)
 
         | SynType.Anon _ ->
-            x.MarkAndDone(range, ElementType.ANON_TYPE)
+            x.MarkAndDone(range, ElementType.ANON_TYPE_USAGE)
 
     member x.ProcessTypeConstraint(typeConstraint: SynTypeConstraint) =
         match typeConstraint with

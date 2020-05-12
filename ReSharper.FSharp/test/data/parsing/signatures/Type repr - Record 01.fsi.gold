@@ -22,7 +22,7 @@ IFSharpSigFile
             FSharpIdentifierToken(type:IDENTIFIER, text:Field)
             FSharpTokenType+ColonTokenElement(type:COLON, text::)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            INamedType
+            INamedTypeUsage
               ITypeReferenceName
                 FSharpIdentifierToken(type:IDENTIFIER, text:int)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "

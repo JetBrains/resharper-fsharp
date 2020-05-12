@@ -10,7 +10,7 @@ IFSharpImplFile
         IReturnTypeInfo
           FSharpTokenType+ColonTokenElement(type:COLON, text::)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IAnonRecordType
+          IAnonRecordTypeUsage
             FSharpTokenType+LbraceBarTokenElement(type:LBRACE_BAR, text:{|)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             IAnonRecordField
@@ -18,7 +18,7 @@ IFSharpImplFile
                 FSharpIdentifierToken(type:IDENTIFIER, text:A)
               FSharpTokenType+ColonTokenElement(type:COLON, text::)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              INamedType
+              INamedTypeUsage
                 ITypeReferenceName
                   FSharpIdentifierToken(type:IDENTIFIER, text:int)
             FSharpTokenType+SemicolonTokenElement(type:SEMICOLON, text:;)
@@ -28,7 +28,7 @@ IFSharpImplFile
                 FSharpIdentifierToken(type:IDENTIFIER, text:B)
               FSharpTokenType+ColonTokenElement(type:COLON, text::)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              INamedType
+              INamedTypeUsage
                 ITypeReferenceName
                   FSharpIdentifierToken(type:IDENTIFIER, text:int)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "

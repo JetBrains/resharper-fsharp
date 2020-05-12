@@ -58,7 +58,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         let newExpr = getExpression source
         newExpr.As<IParenExpr>().InnerExpression.As<ILetOrUseExpr>()
 
-    let createParenExpr (expr: ISynExpr) =
+    let createParenExpr (expr: IFSharpExpression) =
         let parenExpr = getExpression "(())" :?> IParenExpr
         ModificationUtil.ReplaceChild(parenExpr.InnerExpression, expr.Copy()) |> ignore
         parenExpr
@@ -186,7 +186,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
             let forExpr = getExpression "for _ in () do ()" :?> IForEachExpr
 
-            let expr = ModificationUtil.ReplaceChild(forExpr.InClause, expr.Copy())
+            let expr = ModificationUtil.ReplaceChild(forExpr.InExpression, expr.Copy())
             let whitespace = ModificationUtil.ReplaceChild(forExpr.DoExpression.PrevSibling, Whitespace(indent))
             ModificationUtil.AddChildBefore(whitespace, NewLine(expr.GetLineEnding())) |> ignore
 
@@ -195,7 +195,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         member x.CreateExpr(text) =
             getExpression text
 
-        member x.CreateBinaryAppExpr(text, arg1: ISynExpr, arg2: ISynExpr) =
+        member x.CreateBinaryAppExpr(text, arg1: IFSharpExpression, arg2: IFSharpExpression) =
             let source = "() " + text + " ()"
             let expr = getExpression source
             let appExpr = expr :?> IBinaryAppExpr
@@ -208,7 +208,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
             expr
 
-        member x.CreateSetExpr(left: ISynExpr, right: ISynExpr) =
+        member x.CreateSetExpr(left: IFSharpExpression, right: IFSharpExpression) =
             let source = "() <- ()"
             let expr = getExpression source
             let setExpr = expr :?> ISetExpr

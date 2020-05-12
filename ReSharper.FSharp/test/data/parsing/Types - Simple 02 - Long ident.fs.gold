@@ -10,7 +10,7 @@ IFSharpImplFile
         IReturnTypeInfo
           FSharpTokenType+ColonTokenElement(type:COLON, text::)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          INamedType
+          INamedTypeUsage
             ITypeReferenceName
               ITypeReferenceName
                 FSharpIdentifierToken(type:IDENTIFIER, text:System)

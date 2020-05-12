@@ -48,7 +48,7 @@ and LetPostfixTemplateBehavior(info) =
             use disableFormatter = new DisableCodeFormatter()
             let refExpr = x.GetExpression(context)
 
-            if (FSharpIntroduceVariable.CanIntroduceVar(refExpr, true)) then refExpr :> ITreeNode else
+            if (FSharpIntroduceVariable.CanIntroduceVar(refExpr)) then refExpr :> ITreeNode else
 
             let letOrUseExpr = elementFactory.CreateLetBindingExpr("_")
             setBindingExpression refExpr refExpr.Indent letOrUseExpr

@@ -7,11 +7,10 @@ IFSharpImplFile
           IPrefixAppExpr
             IReferenceExpr
               FSharpIdentifierToken(type:IDENTIFIER, text:f)
-            IArrayOrListOfSeqExpr
+            IArrayOrListExpr
               FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
-              IComputationExpr
-                IReferenceExpr
-                  FSharpIdentifierToken(type:IDENTIFIER, text:x)
+              IReferenceExpr
+                FSharpIdentifierToken(type:IDENTIFIER, text:x)
               FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])
           FSharpTokenType+DotTokenElement(type:DOT, text:.)
           FSharpIdentifierToken(type:IDENTIFIER, text:P)

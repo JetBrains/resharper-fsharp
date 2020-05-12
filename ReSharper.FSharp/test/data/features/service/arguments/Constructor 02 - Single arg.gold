@@ -1,0 +1,7 @@
+﻿type MyType (|foo|(param #0): string) =
+    class end
+
+MyType(|"test"|(arg #0))
+
+---------------------------------------------------------
+(arg #0) => foo

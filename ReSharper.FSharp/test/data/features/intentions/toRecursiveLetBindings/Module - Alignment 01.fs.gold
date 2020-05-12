@@ -1,0 +1,4 @@
+﻿module Module
+
+let rec foo{caret} x = ()
+                ()

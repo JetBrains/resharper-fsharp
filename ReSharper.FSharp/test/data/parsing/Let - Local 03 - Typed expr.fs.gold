@@ -20,7 +20,7 @@ IFSharpImplFile
                   FSharpToken(type:INT32, text:123)
                 FSharpTokenType+ColonTokenElement(type:COLON, text::)
                 Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                INamedType
+                INamedTypeUsage
                   ITypeReferenceName
                     FSharpIdentifierToken(type:IDENTIFIER, text:int)
             NewLine(type:NEW_LINE, text:\n) spaces:"\n"

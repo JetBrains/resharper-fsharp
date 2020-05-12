@@ -21,6 +21,7 @@
     <Compile Include="Service\FSharpMetadataReaderTest.fs" />
     <Compile Include="Service\FSharpCodeFormatterTest.fs" />
     <Compile Include="Service\FSharpAssemblyAutoOpenTest.fs" />
+    <Compile Include="Service\ArgumentsOwnerTest.fs" />
     <Compile Include="Cache\CSharpResolveTest.fs" />
     <Compile Include="Cache\SymbolCacheTest.fs" />
     <Compile Include="Parsing\FSharpLexerTest.fs" />
@@ -30,6 +31,7 @@
     <Compile Include="Daemon\ErrorsHighlightingTest.fs" />
     <Compile Include="Daemon\FormatSpecifiersHighlightingTest.fs" />
     <Compile Include="Daemon\InferredTypeCodeVisionProviderTest.fs" />
+    <Compile Include="Daemon\PipeChainTypeHintStageTest.fs" />
     <Compile Include="Daemon\InheritanceGutterMarksTest.fs" />
     <Compile Include="Daemon\SyntaxHighlightingTest.fs" />
     <Compile Include="Daemon\RedundantParensTest.fs" />

@@ -23,6 +23,7 @@
     <Compile Include="src\CodeCompletion\FSharpLookupItem.fs" />
     <Compile Include="src\CodeCompletion\FSharpCompletionProviders.fs" />
     <Compile Include="src\CodeStructure\FSharpCodeStructure.fs" />
+    <Compile Include="src\Daemon\Highlightings\TypeHintHighlighting.fs" />
     <Compile Include="src\Daemon\Highlightings\FSharpErrorUtil.fs" />
     <Compile Include="src\Daemon\Highlightings\ErrorHighlightings.fs" />
     <Compile Include="src\Daemon\Highlightings\CommonErrors.Generated.fs">
@@ -46,6 +47,7 @@
     <Compile Include="src\Daemon\Stages\FSharpInheritedMembersHighlighterStage.fs" />
     <Compile Include="src\Daemon\Stages\FSharpVcsCodeVisionRangesProviderStage.fs" />
     <Compile Include="src\Daemon\Stages\FSharpErrorsStage.fs" />
+    <Compile Include="src\Daemon\Stages\PipeChainTypeHintStage.fs" />
     <Compile Include="src\Daemon\Stages\InferredTypeCodeVisionProvider.fs" />
     <Compile Include="src\Daemon\Stages\FSharpSyntaxHighlightingStage.fs" />
     <Compile Include="src\Daemon\Stages\ParameterNameHintStage.fs" />
@@ -80,6 +82,7 @@
     <Compile Include="src\Search\RecordCtorSearch.fs" />
     <Compile Include="src\ExtendSelection\FSharpExtendSelectionProvider.fs" />
     <Compile Include="src\Formatter\FSharpReformatCode.fs" />
+    <Compile Include="src\Fsi\FsiTools.fs" />
     <Compile Include="src\Fsi\FsiOptions.fs" />
     <Compile Include="src\Fsi\FsiDetector.fs" />
     <Compile Include="src\Fsi\FsiHost.fs" />
@@ -156,6 +159,7 @@
     <Compile Include="src\LanguageService\FSharpBreadcrumbsHelper.fs" />
     <Compile Include="src\LanguageService\FSharpImportTypeHelper.fs" />
     <Compile Include="src\LanguageService\FSharpQuickDefinitionService.fs" />
+    <Compile Include="src\LanguageService\SandboxDocumentLanguageSupportFSharpScript.fs" />
     <Compile Include="src\FSharpTypingAssist.fs" />
     <Compile Include="src\ZoneMarker.fs" />
   </ItemGroup>

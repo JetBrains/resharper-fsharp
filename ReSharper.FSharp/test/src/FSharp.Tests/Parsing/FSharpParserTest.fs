@@ -43,6 +43,11 @@ type FSharpParserTest() =
     [<Test>] member x.``Type decl - Enum 01 - With first bar``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Enum 02 - Without first bar``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type decl - Union 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Union 02 - Modifier``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Union 03 - No first bar``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Union 04 - No first bar with modifier``() = x.DoNamedTest()
+
     [<Test>] member x.``Let 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Let 02 - Typed``() = x.DoNamedTest()
     [<Test>] member x.``Let 03 - Typed, var type``() = x.DoNamedTest()
@@ -195,6 +200,15 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Sequential 04 - Let``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Sequential 05 - Let``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Sequential 06 - Let``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - List - Empty 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - List - Comprehension 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - List - Range sequence 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - List - Seq 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - List - Seq 02 - Implicit semi``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - List - Seq 03 - Implicit yield``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - List - Seq 04 - Yield``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - List - Seq 05 - ForEach``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - New 01 - Lid``() = x.DoNamedTest()
     [<Test>] member x.``Expr - New 02 - Generics``() = x.DoNamedTest()
@@ -351,3 +365,10 @@ type FSharpErrorsParserTest() =
     [<Test>] member x.``Expr - CompExpr - Range 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - CompExpr - Range 02 - Step``() = x.DoNamedTest()
     [<Test>] member x.``Expr - CompExpr - Range 03``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - Yield 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - For 01 - Rarrow``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - List - Comprehension 01 - ForExpr``() = x.DoNamedTest()
+
+    [<Test>] member x.``Expr - If 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - If 02``() = x.DoNamedTest()

@@ -14,7 +14,7 @@ IFSharpImplFile
                 FSharpIdentifierToken(type:IDENTIFIER, text:x)
               FSharpTokenType+ColonTokenElement(type:COLON, text::)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              INamedType
+              INamedTypeUsage
                 ITypeReferenceName
                   FSharpIdentifierToken(type:IDENTIFIER, text:int)
             FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
@@ -26,14 +26,14 @@ IFSharpImplFile
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+OfTokenElement(type:OF, text:of)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IFunType
-            INamedType
+          IFunctionTypeUsage
+            INamedTypeUsage
               ITypeReferenceName
                 FSharpIdentifierToken(type:IDENTIFIER, text:int)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            INamedType
+            INamedTypeUsage
               ITypeReferenceName
                 FSharpIdentifierToken(type:IDENTIFIER, text:int)
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"

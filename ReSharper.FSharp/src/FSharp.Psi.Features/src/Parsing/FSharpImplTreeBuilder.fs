@@ -524,7 +524,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
     member x.MarkOtherType(TypeRange range as typ) =
         let mark = x.Mark(range)
         x.ProcessType(typ)
-        x.Done(range, mark, ElementType.OTHER_TYPE)
+        x.Done(range, mark, ElementType.UNSUPPORTED_TYPE_USAGE)
 
     member x.SkipOuterAttrs(attrs: SynAttributeList list, outerRange: range) =
         match attrs with
@@ -664,7 +664,10 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             x.ProcessExpressionList(exprs)
 
         | SynExpr.ArrayOrList(_, exprs, _) ->
-            x.ProcessListExpr(exprs, range, ElementType.ARRAY_OR_LIST_EXPR)
+            // SynExpr.ArrayOrList is currently only used for error recovery and empty lists in the parser.
+            // Non-empty SynExpr.ArrayOrList is created in the type checker only.
+            Assertion.Assert(List.isEmpty exprs, "Non-empty SynExpr.ArrayOrList: {0}", expr)
+            x.MarkAndDone(range, ElementType.ARRAY_OR_LIST_EXPR)
 
         | SynExpr.AnonRecd(_, copyInfo, fields, _) ->
             x.PushRange(range, ElementType.ANON_RECD_EXPR)
@@ -714,7 +717,8 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             x.ProcessExpression(enumExpr)
 
         | SynExpr.ArrayOrListOfSeqExpr(_, expr, _) ->
-            x.PushRangeAndProcessExpression(expr, range, ElementType.ARRAY_OR_LIST_OF_SEQ_EXPR)
+            let expr = match expr with | SynExpr.CompExpr(expr = expr) -> expr | _ -> expr
+            x.PushRangeAndProcessExpression(expr, range, ElementType.ARRAY_OR_LIST_EXPR)
 
         | SynExpr.CompExpr(_, _, expr, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.COMPUTATION_EXPR)
@@ -904,7 +908,15 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
 
         | SynExpr.ImplicitZero _ -> ()
 
-        | SynExpr.YieldOrReturn(_, expr, _)
+        | SynExpr.YieldOrReturn(_, expr, _) ->
+            x.AdvanceToStart(range)
+            if x.TokenType == FSharpTokenType.RARROW then
+                // Remove fake yield expressions in list comprehensions
+                // by replacing `-> a` with `a` in `[ for a in 1 .. 2 -> a ]`.
+                x.ProcessExpression(expr)
+            else
+                x.PushRangeAndProcessExpression(expr, range, ElementType.YIELD_OR_RETURN_EXPR)
+
         | SynExpr.YieldOrReturnFrom(_, expr, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.YIELD_OR_RETURN_EXPR)
 
@@ -930,9 +942,11 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             x.MarkAndDone(range, ElementType.LIBRARY_ONLY_EXPR)
 
         | SynExpr.ArbitraryAfterError _
-        | SynExpr.FromParseError _
         | SynExpr.DiscardAfterMissingQualificationAfterDot _ ->
             x.MarkAndDone(range, ElementType.FROM_ERROR_EXPR)
+
+        | SynExpr.FromParseError(expr, _) ->
+            x.PushRangeAndProcessExpression(expr, range, ElementType.FROM_ERROR_EXPR)
 
         | SynExpr.Fixed(expr, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.FIXED_EXPR)
@@ -970,10 +984,10 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
 
         // Range sequence expr also contains braces in the fake app expr, mark it as a separate expr node.
         if appRange <> rangeSeqRange then
-            x.PushRange(appRange, ElementType.RANGE_SEQUENCE_EXPR)
+            x.PushRange(appRange, ElementType.COMPUTATION_EXPR)
 
         let seqMark = x.Mark(fromRange)
-        x.PushRangeForMark(toRange, seqMark, ElementType.RANGE_SEQUENCE)
+        x.PushRangeForMark(toRange, seqMark, ElementType.RANGE_SEQUENCE_EXPR)
         x.PushExpression(toExpr)
 
         match stepExpr with

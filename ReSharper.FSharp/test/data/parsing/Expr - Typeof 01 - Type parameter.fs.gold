@@ -8,7 +8,7 @@ IFSharpImplFile
             FSharpIdentifierToken(type:IDENTIFIER, text:typeof)
             IPrefixAppTypeArgumentList
               FSharpTokenType+LessTokenElement(type:LESS, text:<)
-              INamedType
+              INamedTypeUsage
                 ITypeReferenceName
                   ITypeParameterId
                     FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')

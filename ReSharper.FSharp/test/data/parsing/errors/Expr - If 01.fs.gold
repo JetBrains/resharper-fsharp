@@ -1,0 +1,12 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    FSharpTokenType+IfTokenElement(type:IF, text:if)
+    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+    IDo
+      IChameleonExpression
+        IFromErrorExpr
+          IReferenceExpr
+            FSharpIdentifierToken(type:IDENTIFIER, text:x)
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

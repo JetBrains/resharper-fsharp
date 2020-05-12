@@ -5,7 +5,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 {
   public interface IFSharpMethodInvocationUtil
   {
-    IParameter GetMatchingParameter(ISynExpr synExpr);
-    IParameter GetNamedArg(ISynExpr synExpr);
+    IParameter GetMatchingParameter(IFSharpExpression fsExpr);
+    IParameter GetNamedArg(IFSharpExpression fsExpr);
   }
 }
