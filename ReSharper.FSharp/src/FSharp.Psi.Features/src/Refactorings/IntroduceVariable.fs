@@ -94,11 +94,11 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         | :? ISequentialExpr | :? ILambdaExpr | :? ITryLikeExpr -> expr
 
         | :? IBinding as binding when
-                binding.Expression == expr && isNotNull (LetLikeExprNavigator.GetByBinding(binding)) &&
+                binding.Expression == expr && isNotNull (LetOrUseExprNavigator.GetByBinding(binding)) &&
 
                 // Don't escape function declarations
                 not (binding.HeadPattern :? IParametersOwnerPat) ->
-            LetLikeExprNavigator.GetByBinding(binding) :> _
+            LetOrUseExprNavigator.GetByBinding(binding) :> _
 
         | :? IFSharpExpression as parentExpr -> getExprToInsertBefore parentExpr
         | _ -> expr
@@ -110,7 +110,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let doDecl = DoNavigator.GetByExpression(contextExpr)
         if isNotNull doDecl && doDecl.IsImplicit then doDecl :> _ else null
 
-    let createBinding (context: IFSharpExpression) (contextDecl: IModuleMember) name: ILet =
+    let createBinding (context: IFSharpExpression) (contextDecl: IModuleMember) name: ILetBindings =
         let elementFactory = context.CreateElementFactory()
         if isNotNull contextDecl then
             elementFactory.CreateLetModuleDecl(name) :> _
@@ -228,7 +228,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         | Some indent -> moveToNewLine contextExpr indent
         | _ -> ()
 
-        let letBindings: ILet = 
+        let letBindings: ILetBindings = 
             match letBindings with
             | :? ILetOrUseExpr when contextIsSourceExpr && not isInSeqExpr ->
                 let letBindings = ModificationUtil.ReplaceChild(sourceExpr, letBindings)
@@ -251,7 +251,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
             | :? ILetOrUseExpr ->
                 let ranges = getReplaceRanges sourceExpr contextExpr removeSourceExpr
                 let replaced = ModificationUtil.ReplaceChildRange(ranges.ReplaceRange, TreeRange(letBindings))
-                let letBindings = replaced.First :?> ILet
+                let letBindings = replaced.First :?> ILetBindings
 
                 let binding = letBindings.Bindings.[0]
                 let replaceRange = TreeRange(binding.NextSibling, letBindings.LastChild)
@@ -278,7 +278,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                 |> Seq.choose (fun pointer -> pointer.GetTreeNode() |> Option.ofObj)
                 |> Seq.toArray
 
-            [| letBindings.As<ILet>().Bindings.[0].HeadPattern :> ITreeNode |]
+            [| letBindings.As<ILetBindings>().Bindings.[0].HeadPattern :> ITreeNode |]
             |> Array.append replacedNodes 
 
         let nameExpression = NameSuggestionsExpression(names)

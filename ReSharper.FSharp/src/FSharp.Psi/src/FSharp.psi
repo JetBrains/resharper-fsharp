@@ -149,19 +149,9 @@ letModuleDecl options { stubBase="DummyDeclaration"; } extras {
   REC<REC, RecKeyword>?
   LIST binding<BINDING, Bindings> SEP AND<FSHARP_AND, Separators>;
 
-
-interface let:
-  letBindings |
-  letOrUseBangExpr;
-
 interface letBindings:
   letModuleDecl |
   letOrUseExpr;
-
-interface letLikeExpr:
-  letOrUseExpr |
-  letOrUseBangExpr;
-
 
 interface binding:
   topBinding |
@@ -366,7 +356,7 @@ interface fSharpExpression:
   doLikeExpr |
   appLikeExpr |
   binaryAppExpr |
-  letLikeExpr |
+  letOrUseExpr |
   tryLikeExpr |
   sequentialExpr |
   conditionOwnerExpr |
@@ -779,14 +769,6 @@ yieldOrReturnExpr options { stubBase="FSharpExpressionBase"; }:
     RETURN_BANG<YIELD_KEYWORD, YieldKeyword>
   )
   fSharpExpression<EXPR, Expression>;
-
-letOrUseBangExpr options { stubBase="FSharpExpressionBase"; } extras {
-  get { methodName="Bindings" path=<letOrUseBangExpr:BINDING> };
-}:
-  letOrUseBang{LET, LetOrUseToken}
-  LIST binding<BINDING, Bindings> SEP AND_BANG<FSHARP_AND, Separators>
-  IN<IN, InKeyword>?
-  fSharpExpression<IN_EXPR, InExpression>;
 
 libraryOnlyExpr options { stubBase="FSharpExpressionBase"; }:
   fakeSeparator;
@@ -1338,9 +1320,7 @@ do options { stubBase="DummyDeclaration"; } extras {
 
 private letOrUse{ROLE, Getter}:
   LET<@ROLE, @Getter> |
-  USE<@ROLE, @Getter>;
-
-private letOrUseBang{ROLE, Getter}:
+  USE<@ROLE, @Getter> |
   LET_BANG<@ROLE, @Getter> |
   USE_BANG<@ROLE, @Getter>;
 
