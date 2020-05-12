@@ -317,7 +317,7 @@ recordPat options { stubBase="SynPatternBase"; }:
 
 fieldPat options { stubBase="SynPatternBase"; }:
   expressionReferenceName<REFERENCE_NAME, ReferenceName>
-  EQUALS
+  EQUALS<FSHARP_EQUALS, EqualsToken>
   synPat<PAT, Pattern>;
 
 optionalValPat options { stubBase="SynPatternBase"; }:
@@ -555,7 +555,7 @@ recordExpr options { stubBase="FSharpExpressionBase"; }:
 
 recordExprBinding:
   expressionReferenceName<REFERENCE_NAME, ReferenceName>
-  EQUALS
+  EQUALS<FSHARP_EQUALS, EqualsToken>
   fSharpExpression<EXPR, Expression>
   SEMICOLON<FSHARP_SEMI, Semicolon>?;
 
@@ -567,7 +567,7 @@ newExpr options { stubBase="FSharpExpressionBase"; }:
 forExpr options { stubBase="UnitExpressionBase"; }:
   FOR
   localDeclaration<IDENTIFIER, Identifier>
-  EQUALS
+  EQUALS<FSHARP_EQUALS, EqualsToken>
   fSharpExpression<IDENT_EXPR, IdentExpression>
   TO
   fSharpExpression<TO_EXPR, ToExpression>
@@ -1008,7 +1008,7 @@ typeAbbreviationDeclaration options { stubBase="FSharpTypeElementDeclarationBase
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
-  EQUALS
+  EQUALS<FSHARP_EQUALS, EqualsToken>
   abbreviatedTypeOrUnionCaseDeclaration<TYPE_OR_UNION_CASE, AbbreviatedTypeOrUnionCase>
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
 
@@ -1023,7 +1023,7 @@ moduleAbbreviation options { stubBase="FSharpTypeElementDeclarationBase"; } extr
   MODULE<MODULE, ModuleOrNamespaceKeyword>
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   fSharpIdentifier<IDENTIFIER, Identifier>
-  EQUALS
+  EQUALS<FSHARP_EQUALS, EqualsToken>
   typeReferenceName<TYPE_REFERENCE, TypeName>
   // todo: remove rules below
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
@@ -1118,7 +1118,7 @@ delegateDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } ext
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
-  EQUALS
+  EQUALS<FSHARP_EQUALS, EqualsToken>
   delegateRepresentation<DELEGATE_REPR, DelegateRepresentation>
   // todo: remove members
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
@@ -1202,6 +1202,7 @@ memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } 
   get { methodName="TypeParameters" path=<memberDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfMethodList:TYPE_PARAMETER> };
   get { methodName="Parameters" path=<memberDeclaration:PARAM_GROUP/memberParamDeclarationGroup:PARAMETER> };
   get { methodName="Attributes" path=<memberDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+  get { methodName="Expression" path=<memberDeclaration:CHAMELEON_EXPR/chameleonExpression:EXPR> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   (
@@ -1210,15 +1211,14 @@ memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } 
   |
     memberKeyword{MEMBER_KEYWORD, MemberKeyword}
   )
-  MEMBER<MEMBER, MemberKeyword>
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   memberSelfId<SELF_ID, SelfId>?
   identOrOpName{IDENTIFIER, Identifier}
   typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   (
     memberParamDeclarationGroup<PARAM_GROUP, ParameterGroups>*
-    EQUALS
-    chameleonExpression
+    EQUALS<FSHARP_EQUALS, EqualsToken>
+    chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>
   |
     WITH
     accessorDeclaration
@@ -1254,7 +1254,7 @@ autoProperty options { stubBase="FSharpProperTypeMemberDeclarationBase"; }  extr
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   IDENTIFIER<IDENTIFIER, Identifier>
-  EQUALS
+  EQUALS<FSHARP_EQUALS, EqualsToken>
   chameleonExpression<CHAMELEON_EXPR, InitExpression>
   accessorsNamesClause<ACESSORS_CLAUSE, AccessorsClause>?;
 
@@ -1264,14 +1264,14 @@ accessorsNamesClause:
     IDENTIFIER<ACESSOR, AccessorsNames>
   |
     IDENTIFIER<ACESSOR, AccessorsNames>
-    COMMA
+    COMMA<FSHARP_COMMA, Comma>
     IDENTIFIER<ACESSOR, AccessorsNames>
   );
 
 accessorDeclaration:
   IDENTIFIER<IDENTIFIER, Identifier>
   memberParamDeclaration<PARAMETER, Parameters>*
-  EQUALS
+  EQUALS<FSHARP_EQUALS, EqualsToken>
   chameleonExpression<CHAMELEON_EXPR, BodyExpression>;
 
 
