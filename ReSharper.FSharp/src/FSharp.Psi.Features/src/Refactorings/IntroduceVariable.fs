@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
 open System.Collections.Generic
 open JetBrains.Application.DataContext
 open JetBrains.Application.UI.Actions.ActionManager
+open JetBrains.Diagnostics
 open JetBrains.DocumentModel.DataContext
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel.DataContext
@@ -57,9 +58,8 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
     let getReplaceRanges (sourceExpr: IFSharpExpression) (contextExpr: IFSharpExpression) removeSourceExpr =
         let sequentialExpr = SequentialExprNavigator.GetByExpression(contextExpr)
         if sourceExpr == contextExpr && isNotNull sequentialExpr then
-            let inRange =
-                let startNode: ITreeNode = if removeSourceExpr then sourceExpr.NextSibling else sourceExpr :> _
-                TreeRange(startNode, sequentialExpr.LastChild)
+            let inRangeStart = if removeSourceExpr then sourceExpr.NextSibling else sourceExpr :> _
+            let inRange = TreeRange(inRangeStart, sequentialExpr.LastChild)
 
             let seqExprs = sequentialExpr.Expressions
             let index = seqExprs.IndexOf(sourceExpr)
@@ -70,7 +70,11 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                 let newSeqExpr = ModificationUtil.ReplaceChildRange(inRange, TreeRange(newSeqExpr)).First
 
                 LowLevelModificationUtil.AddChild(newSeqExpr, Array.ofSeq inRange)
-                {| ReplaceRange = TreeRange(sourceExpr, newSeqExpr)
+
+                let replaceRange =
+                    if removeSourceExpr then TreeRange(sourceExpr, newSeqExpr) else TreeRange(newSeqExpr)
+
+                {| ReplaceRange = replaceRange
                    InRange = TreeRange(newSeqExpr)
                    AddNewLine = not removeSourceExpr |}
             else
@@ -102,6 +106,17 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
         | :? IFSharpExpression as parentExpr -> getExprToInsertBefore parentExpr
         | _ -> expr
+
+    let getCommonParentExpr (data: IntroduceVariableData) (sourceExpr: IFSharpExpression): IFSharpExpression =
+        let commonParent = data.Usages.FindLCA().As<IFSharpExpression>().NotNull("commonParentExpr is null")
+
+        let seqExpr = commonParent.As<ISequentialExpr>()
+        if isNull seqExpr then commonParent else
+
+        if sourceExpr.Parent == commonParent then sourceExpr else
+
+        let contextExpr = sourceExpr.PathToRoot() |> Seq.find (fun n -> n.Parent == commonParent)
+        contextExpr :?> _
 
     let getContextDeclaration (contextExpr: IFSharpExpression): IModuleMember =
         let letDecl = LetModuleDeclNavigator.GetByBinding(BindingNavigator.GetByExpression(contextExpr))
@@ -144,7 +159,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
             if contextExprParent :? IChameleonExpression then contextExprParent :?> _ else contextExpr :> _
 
         let prevSignificant = skipMatchingNodesBefore isInlineSpaceOrComment contextExpr
-        if not (obj.ReferenceEquals(prevSignificant, prevToken)) then None else
+        if prevSignificant != prevToken then None else
 
         let indent =
             match contextParent with
@@ -167,8 +182,8 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
     static member val ExpressionToRemoveKey = Key("FSharpIntroduceVariable.ExpressionToRemove")
 
     override x.Process(data) =
-        let sourceExpr = data.SourceExpression.As<IFSharpExpression>()
-        let commonParentExpr = data.Usages.FindLCA().As<IFSharpExpression>()
+        let sourceExpr = data.Usages |> Seq.minBy (fun u -> u.GetTreeStartOffset().Offset) :?> IFSharpExpression
+        let commonParentExpr = getCommonParentExpr data sourceExpr
 
         // contextDecl is not null when expression is bound to a module/type let binding
         let contextExpr = getExprToInsertBefore commonParentExpr
@@ -211,13 +226,15 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
             data.Usages |> Seq.fold (fun ((replacedUsages, sourceExpr) as acc) usage ->
                 if not (isValid usage) then acc else
 
-                if obj.ReferenceEquals(usage, sourceExpr) &&
-                        (removeSourceExpr || contextIsSourceExpr && not isInSeqExpr) then acc else
+                let usageIsSourceExpr = usage == sourceExpr
+                if usageIsSourceExpr && (removeSourceExpr || contextIsSourceExpr && not isInSeqExpr) then acc else
 
                 let refExpr = elementFactory.CreateReferenceExpr(name)
                 let replacedUsage = ModificationUtil.ReplaceChild(usage, refExpr)
 
-                let sourceExpr = if contextIsSourceExpr && isInSeqExpr then replacedUsage else sourceExpr
+                let sourceExpr =
+                    if usageIsSourceExpr && contextIsSourceExpr && isInSeqExpr then replacedUsage else sourceExpr
+
                 let replacedUsagePointer = replacedUsage.As<ITreeNode>().CreateTreeElementPointer()
                 replacedUsagePointer :: replacedUsages, sourceExpr) ([], sourceExpr)
 

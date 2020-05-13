@@ -30,6 +30,7 @@ type IntroduceVarTest() =
     [<Test>] member x.``Seq 01``() = x.DoNamedTest()
     [<Test>] member x.``Seq 02``() = x.DoNamedTest()
     [<Test>] member x.``Seq 03 - Last``() = x.DoNamedTest()
+    [<Test>] member x.``Seq 04``() = x.DoNamedTest()
 
     [<Test>] member x.``LetDecl 01``() = x.DoNamedTest()
     [<Test>] member x.``LetDecl 02 - Indent``() = x.DoNamedTest()

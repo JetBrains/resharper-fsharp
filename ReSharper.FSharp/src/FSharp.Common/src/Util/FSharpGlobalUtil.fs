@@ -9,7 +9,7 @@ module FSharpGlobalUtil =
             | _ -> null
 
     /// Reference equality.
-    let inline (==) a b = LanguagePrimitives.PhysicalEquality a b
+    let inline (==) a b = obj.ReferenceEquals(a, b)
 
     /// Reference inequality.
     let inline (!=) a b = not (a == b)

@@ -18,7 +18,7 @@ type FSharpExpressionEvaluationInfoProvider() =
             if declaredElement :? ISelfId then "this" else
 
             let shortName = refExpr.ShortName
-            if shortName == SharedImplUtil.MISSING_DECLARATION_NAME then null else
+            if shortName = SharedImplUtil.MISSING_DECLARATION_NAME then null else
 
             let qualifier = getTextToEvaluate refExpr.Qualifier
             if isNull qualifier then shortName else qualifier + "." + shortName
