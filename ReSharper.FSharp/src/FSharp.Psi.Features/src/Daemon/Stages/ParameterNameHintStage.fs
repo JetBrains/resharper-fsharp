@@ -41,11 +41,8 @@ type ParameterNameHintsHighlightingStrategy() =
 
     override x.IsShouldBeIgnored(argument: IArgument) =
         match argument with
-        | :? IBinaryAppExpr as binaryAppExpr ->
-            // todo: do we need to resolve the left arg as an IParameter to be sure?
-            binaryAppExpr.Operator.Reference.GetName() = "="
-        | _ ->
-            false
+        | :? IFSharpExpression as expr -> isNotNull (FSharpMethodInvocationUtil.tryGetNamedArg expr)
+        | _ -> false
 
     override x.IsShouldBeIgnored(expression: IExpression) = false
     override x.IsLast(parameter) = parameter.IsParameterArray || parameter.IsVarArg
@@ -90,7 +87,7 @@ type ParameterNameHintsHighlightingStrategy() =
     override x.IsDefaultExpression(expression) = false
 
     override x.GetExpression(expression, getThroughInvocation, getThroughCast) =
-        let expr = expression.As<ISynExpr>()
+        let expr = expression.As<IFSharpExpression>()
         if isNull expr then null else
 
         match expr.IgnoreInnerParens() with
