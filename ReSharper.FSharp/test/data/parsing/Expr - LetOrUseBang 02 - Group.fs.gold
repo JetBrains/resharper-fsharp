@@ -1,4 +1,4 @@
-﻿Language: PsiLanguageType:F#
+Language: PsiLanguageType:F#
 IFSharpImplFile
   IAnonModuleDeclaration
     IDo
@@ -10,7 +10,7 @@ IFSharpImplFile
           IComputationExpr
             FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
             NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-            Whitespace(type:WHITE_SPACE, text:     ) spaces:"     "
+            Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
             ILetOrUseExpr
               FSharpTokenType+LetBangTokenElement(type:LET_BANG, text:let!)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
@@ -25,7 +25,7 @@ IFSharpImplFile
                   FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
                   FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
               NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-              Whitespace(type:WHITE_SPACE, text:     ) spaces:"     "
+              Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
               FSharpTokenType+AndBangTokenElement(type:AND_BANG, text:and!)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               ILocalBinding
@@ -39,12 +39,11 @@ IFSharpImplFile
                   FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
                   FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
               NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-              Whitespace(type:WHITE_SPACE, text:     ) spaces:"     "
+              Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
               IUnitExpr
                 FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
                 FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
             NewLine(type:NEW_LINE, text:\n) spaces:"\n"
             FSharpTokenType+RbraceTokenElement(type:RBRACE, text:})
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
 

@@ -220,6 +220,7 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - ImplicitZero 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - LetOrUseBang 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - LetOrUseBang 02 - Group``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Typeof 01 - Type parameter``() = x.DoNamedTest()
 

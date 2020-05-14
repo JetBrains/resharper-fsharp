@@ -2,4 +2,3 @@
 
 if true then
     let {selstart}i{selend} = 123
-    ()

@@ -101,7 +101,7 @@ let rec createLogicallyNegatedExpression (expr: IFSharpExpression): IFSharpExpre
 
     factory.CreateAppExpr("not", expr) :> _
 
-let setBindingExpression (expr: IFSharpExpression) contextIndent (letBindings: #ILet) =
+let setBindingExpression (expr: IFSharpExpression) contextIndent (letBindings: #ILetBindings) =
     let newExpr = letBindings.Bindings.[0].SetExpression(expr.Copy())
     if not expr.IsSingleLine then
         let indentSize = expr.GetIndentSize()

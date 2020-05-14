@@ -37,6 +37,8 @@ module FSharpErrors =
     let [<Literal>] FieldRequiresAssignment = 764
     let [<Literal>] ExpectedExpressionAfterLet = 588
     let [<Literal>] SuccessiveArgsShouldBeSpacedOrTupled = 597
+    let [<Literal>] ConstructRequiresListArrayOrSequence = 747
+    let [<Literal>] ConstructRequiresComputationExpression = 748
     let [<Literal>] EmptyRecordInvalid = 789
     let [<Literal>] UseBindingsIllegalInModules = 524
     let [<Literal>] LocalClassBindingsCannotBeInline = 894
@@ -189,6 +191,12 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | SuccessiveArgsShouldBeSpacedOrTupled ->
             createHighlightingFromNode SuccessiveArgsShouldBeSpacedOrTupledError range
+
+        | ConstructRequiresListArrayOrSequence ->
+            createHighlightingFromNode YieldRequiresSeqExpressionError range
+
+        | ConstructRequiresComputationExpression ->
+            createHighlightingFromNode ReturnRequiresComputationExpressionError range
 
         | EmptyRecordInvalid ->
             createHighlightingFromNodeWithMessage EmptyRecordInvalidError range error

@@ -260,7 +260,7 @@
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="ConvertToUseBinding">
-    <Parameter type="ILetLikeExpr" name="letExpr"/>
+    <Parameter type="ILetOrUseExpr" name="letExpr"/>
     <Range>letExpr.LetOrUseToken.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <Message value="Convert to 'use' binding"/>
@@ -268,7 +268,7 @@
   </Warning>
   
   <Error staticGroup="FSharpErrors" name="ExpectedExpressionAfterLet">
-    <Parameter type="ILetLikeExpr" name="letExpr"/>
+    <Parameter type="ILetOrUseExpr" name="letExpr"/>
     <Range>letExpr.LetOrUseToken.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <Message value="'{0}' is missing expression">
@@ -332,4 +332,20 @@
     <QuickFix>ToAbstractFix</QuickFix>
   </Error>
 
+  <Error staticGroup="FSharpErrors" name="ReturnRequiresComputationExpression">
+    <Parameter type="IYieldOrReturnExpr" name="yieldExpr"/>
+    <Message value="`return` may only be used within computation expressions"/>
+    <Range>yieldExpr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>RemoveYieldFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="YieldRequiresSeqExpression">
+    <Parameter type="IYieldOrReturnExpr" name="yieldExpr"/>
+    <Message value="`yield` may only be used within list, array, and sequence expressions"/>
+    <Range>yieldExpr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>RemoveYieldFix</QuickFix>
+  </Error>
+  
 </Errors>

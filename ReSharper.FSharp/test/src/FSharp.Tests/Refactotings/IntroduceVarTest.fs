@@ -30,12 +30,16 @@ type IntroduceVarTest() =
     [<Test>] member x.``Seq 01``() = x.DoNamedTest()
     [<Test>] member x.``Seq 02``() = x.DoNamedTest()
     [<Test>] member x.``Seq 03 - Last``() = x.DoNamedTest()
+    [<Test>] member x.``Seq 04``() = x.DoNamedTest()
 
     [<Test>] member x.``LetDecl 01``() = x.DoNamedTest()
     [<Test>] member x.``LetDecl 02 - Indent``() = x.DoNamedTest()
 
     [<Test>] member x.``Do decl - Implicit 01``() = x.DoNamedTest()
     [<Test>] member x.``Do decl - Implicit 02 - App``() = x.DoNamedTest()
+
+    [<Test>] member x.``Member - Decl 01``() = x.DoNamedTest()
+    [<Test>] member x.``Member - Auto property 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Shift - Decl 01``() = x.DoNamedTest()
     [<Test>] member x.``Shift - Decl 02``() = x.DoNamedTest()
