@@ -2,4 +2,4 @@
 type T() =
     member val P = 
       let i = 1
-      i
+      ()

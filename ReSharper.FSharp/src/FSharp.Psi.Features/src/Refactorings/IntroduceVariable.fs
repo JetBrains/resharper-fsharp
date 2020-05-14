@@ -182,10 +182,12 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
     static member val ExpressionToRemoveKey = Key("FSharpIntroduceVariable.ExpressionToRemove")
 
     override x.Process(data) =
+        // Replace the actual source expression with the outer-most expression among usages,
+        // since it's needed for calculating a common node to replace. 
         let sourceExpr = data.Usages |> Seq.minBy (fun u -> u.GetTreeStartOffset().Offset) :?> IFSharpExpression
         let commonParentExpr = getCommonParentExpr data sourceExpr
 
-        // contextDecl is not null when expression is bound to a module/type let binding
+        // `contextDecl` is not null when expression is bound to a module/type let binding
         let contextExpr = getExprToInsertBefore commonParentExpr
         let contextDecl = getContextDeclaration contextExpr
 
@@ -207,7 +209,17 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let names = getNames sourceExpr
         let name = if names.Count > 0 then names.[0] else "x"
 
-        let removeSourceExpr = sourceExpr.UserData.HasKey(FSharpIntroduceVariable.ExpressionToRemoveKey)
+        let removeSourceExpr =
+            if data.SourceExpression.UserData.HasKey(FSharpIntroduceVariable.ExpressionToRemoveKey) then true else
+            if not contextIsSourceExpr then false else
+            if data.Usages.Count = 1 then true else
+
+            let seqExpr = SequentialExprNavigator.GetByExpression(sourceExpr)
+            if isNull seqExpr then false else
+
+            let arrayOrListExpr = ArrayOrListExprNavigator.GetByExpression(seqExpr)
+            isNull arrayOrListExpr || data.Usages.Count = 1
+
         sourceExpr.UserData.RemoveKey(FSharpIntroduceVariable.ExpressionToRemoveKey)
 
         use writeCookie = WriteLockCookie.Create(sourceExpr.IsPhysical())

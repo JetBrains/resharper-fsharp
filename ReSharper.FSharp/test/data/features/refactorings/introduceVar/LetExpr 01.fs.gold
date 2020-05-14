@@ -3,4 +3,4 @@ do
   let foo = 
     let x = 1 + 1
     ()
-  foo
+  ()
