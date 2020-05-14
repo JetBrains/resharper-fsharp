@@ -123,5 +123,6 @@ let getFunExprAndPosition (expr: IFSharpExpression) =
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpMethodInvocationUtil() =
     interface IFSharpMethodInvocationUtil with
+        member x.GetArgumentsOwner(expr) = getArgsOwner expr
         member x.GetMatchingParameter(expr) = getMatchingParameter expr
         member x.GetNamedArg(expr) = tryGetNamedArg expr
