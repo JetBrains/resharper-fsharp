@@ -35,6 +35,11 @@ open JetBrains.Util
 type FSharpIntroduceVariable(workflow, solution, driver) =
     inherit IntroduceVariableBase(workflow, solution, driver)
 
+    /// Applies to case where source expression is the node to replace and is the last expression in a block,
+    /// i.e. it doesn't have any expression to put as InExpression in the new `let` binding expression.
+    /// Producing incomplete expression adds error but is easier to edit code immediately afterwards.
+    let alwaysGenerateCompleteBindingExpr = false
+
     let getNames (expr: IFSharpExpression) =
         let language = expr.Language
         let sourceFile = expr.GetSourceFile()
@@ -262,18 +267,19 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
             | :? ILetOrUseExpr when contextIsSourceExpr && not isInSeqExpr ->
                 let letBindings = ModificationUtil.ReplaceChild(sourceExpr, letBindings)
 
-                addNodesAfter letBindings.LastChild [
-                    NewLine(lineEnding)
-                    Whitespace(contextIndent)
+                if alwaysGenerateCompleteBindingExpr then
+                    addNodesAfter letBindings.LastChild [
+                        NewLine(lineEnding)
+                        Whitespace(contextIndent)
 
-                    if removeSourceExpr then
-                        elementFactory.CreateExpr("()")
-                    else
-                        let refExpr = elementFactory.CreateReferenceExpr(name).As<ITreeNode>()
-                        let nodePointer = refExpr.CreateTreeElementPointer()
-                        replacedUsages.Add(nodePointer)
-                        refExpr
-                ] |> ignore
+                        if removeSourceExpr then
+                            elementFactory.CreateExpr("()")
+                        else
+                            let refExpr = elementFactory.CreateReferenceExpr(name).As<ITreeNode>()
+                            let nodePointer = refExpr.CreateTreeElementPointer()
+                            replacedUsages.Add(nodePointer)
+                            refExpr
+                    ] |> ignore
 
                 letBindings
 
@@ -354,6 +360,8 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
             | :? IParenExpr as parenExpr ->
                 isValidExpr parenExpr.InnerExpression
+
+            | :? IRangeSequenceExpr | :? IComputationExpr | :? IYieldOrReturnExpr -> false
 
             | _ -> true
 
