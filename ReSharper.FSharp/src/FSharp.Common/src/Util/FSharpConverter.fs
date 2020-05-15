@@ -35,44 +35,6 @@ type PublicKey with
         match this with
         | PublicKey key -> RdPublicKey(true, key)
         | PublicKeyToken token -> RdPublicKey(false, token) 
-        
-type JetBrains.Rider.FSharp.TypeProvidersProtocol.Client.RdILModuleRef with
-    [<Extension>]
-    member this.toILModuleRef() =
-        ILModuleRef.Create(this.Name, this.HasMetadata, Option.ofObj(this.Hash))
-        
-type JetBrains.Rider.FSharp.TypeProvidersProtocol.Client.RdILAssemblyRef with
-    [<Extension>]
-    member this.toILAssemblyRef() =
-        ILAssemblyRef.Create(this.Name,
-                             Option.ofObj(this.Hash),
-                             (match this.RdPublicKey with | null -> None | x -> Some (x.toPublicKey())),
-                             this.Retargetable,
-                             (match this.RdVersion with | null -> None | x -> Some (x.toVersion())),
-                             Option.ofObj(this.Locale))
-        
-type ILModuleRef with
-    [<Extension>]
-    member this.toRdILModuleRef() =
-        RdILModuleRef(this.Name, this.HasMetadata, Option.toObj(this.Hash))
-        
-type ILAssemblyRef with
-    [<Extension>]
-    member this.toRdILAssemblyRef() =
-        RdILAssemblyRef(this.Name, Option.toObj(this.Hash),
-                        (match this.PublicKey with | Some key -> key.toRdPublicKey() | _ -> null), 
-                        this.Retargetable,
-                        (match this.Version with | Some version -> version.toRdVersion() | _ -> null),
-                        Option.toObj(this.Locale))
-    
-type ILScopeRef with
-    [<Extension>]
-    member this.toRdILScopeRef() =
-        match this with
-        | ILScopeRef.Local -> RdILScopeRef(true, false, null, null)
-        | ILScopeRef.Module iLModuleRef -> RdILScopeRef(true, false, iLModuleRef.toRdILModuleRef(), null)
-        | ILScopeRef.Assembly iLAssemblyRef -> RdILScopeRef(false, false, null, iLAssemblyRef.toRdILAssemblyRef())
-        | ILScopeRef.PrimaryAssembly -> RdILScopeRef(false, true, null, null)
 
 type ResolutionEnvironment with
     [<Extension>]
@@ -90,16 +52,7 @@ type JetBrains.Rider.FSharp.TypeProvidersProtocol.Client.RdResolutionEnvironment
            outputFile = Option.ofObj(this.OutputFile);
            showResolutionMessages = this.ShowResolutionMessages;
            referencedAssemblies = this.ReferencedAssemblies;
-           temporaryFolder = this.TemporaryFolder }
-         
-type JetBrains.Rider.FSharp.TypeProvidersProtocol.Client.RdILScopeRef with
-    [<Extension; CompiledName("ToILScopeRef")>]
-    member this.toILScopeRef() =
-        if this.IsLocal then ILScopeRef.Local else
-        if this.IsPrimaryAssembly then ILScopeRef.PrimaryAssembly else
-        if isNotNull this.ModuleRef then ILScopeRef.Module (this.ModuleRef.toILModuleRef()) else
-        ILScopeRef.Assembly (this.AssemblyRef.toILAssemblyRef())
-                        
+           temporaryFolder = this.TemporaryFolder }                        
       
 let bindAll = BindingFlags.DeclaredOnly ||| BindingFlags.Public ||| BindingFlags.NonPublic ||| BindingFlags.Static ||| BindingFlags.Instance
 

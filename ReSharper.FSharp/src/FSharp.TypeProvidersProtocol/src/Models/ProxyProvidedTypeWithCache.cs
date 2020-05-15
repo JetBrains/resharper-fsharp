@@ -236,12 +236,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
     public override ProvidedAssembly Assembly => myProvidedAssembly.Value;
 
-    public override ProvidedVar Fresh(string nm)
+    public override ProvidedVar AsProvidedVar(string nm)
     {
       if (!myTypeAsVarsCache.TryGetValue(nm, out var providedVar))
       {
         providedVar = ProxyProvidedVarWithCache.Create(
-          RdProvidedTypeProcessModel.Fresh.Sync(new FreshArgs(EntityId, nm)), myProcessModel, Context, myCache);
+          RdProvidedTypeProcessModel.AsProvidedVar.Sync(new AsProvidedVarArgs(EntityId, nm)), myProcessModel, Context,
+          myCache);
 
         myTypeAsVarsCache.Add(nm, providedVar);
       }

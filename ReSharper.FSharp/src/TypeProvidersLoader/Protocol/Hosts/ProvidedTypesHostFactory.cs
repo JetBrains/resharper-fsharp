@@ -84,7 +84,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       processModel.GetFields.Set(GetFields);
       processModel.GetEvents.Set(GetEvents);
       processModel.GetConstructors.Set(GetConstructors);
-      processModel.Fresh.Set(Fresh);
+      processModel.AsProvidedVar.Set(AsProvidedVar);
       processModel.MakeGenericType.Set(MakeGenericType);
     }
 
@@ -97,10 +97,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       return RdTask<int>.Successful(genericType);
     }
 
-    private RdTask<RdProvidedVar> Fresh(Lifetime lifetime, FreshArgs args)
+    private RdTask<RdProvidedVar> AsProvidedVar(Lifetime lifetime, AsProvidedVarArgs args)
     {
       var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(args.EntityId);
-      var providedVar = myProvidedVarsCreator.CreateRdModel(providedType.Fresh(args.Name), typeProviderId);
+      var providedVar = myProvidedVarsCreator.CreateRdModel(providedType.AsProvidedVar(args.Name), typeProviderId);
       return RdTask<RdProvidedVar>.Successful(providedVar);
     }
 

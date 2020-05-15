@@ -119,28 +119,6 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         field("Revision", int)
     }
 
-    private val RdILAssemblyRef = structdef {
-        field("Name", string)
-        field("Hash", array(byte).nullable)
-        field("RdPublicKey", RdPublicKey.nullable)
-        field("Retargetable", bool)
-        field("RdVersion", RdVersion.nullable)
-        field("Locale", string.nullable)
-    }
-
-    private val RdILModuleRef = structdef {
-        field("Name", string)
-        field("HasMetadata", bool)
-        field("Hash", array(byte).nullable)
-    }
-
-    private val RdILScopeRef = structdef {
-        field("IsLocal", bool)
-        field("IsPrimaryAssembly", bool)
-        field("ModuleRef", RdILModuleRef.nullable)
-        field("AssemblyRef", RdILAssemblyRef.nullable)
-    }
-
     private val RdSystemRuntimeContainsType = structdef {
         field("systemRuntimeContainsTypeRef", structdef {
             field("value", structdef {
@@ -151,7 +129,6 @@ object RdFSharpTypeProvidersLoaderModel : Root(
 
     private val InstantiateTypeProvidersOfAssemblyParameters = structdef {
         field("runTimeAssemblyFileName", string)
-        field("IlScopeRefOfRuntimeAssembly", RdILScopeRef)
         field("designTimeAssemblyNameString", string)
         field("RdResolutionEnvironment", RdResolutionEnvironment)
         field("isInvalidationSupported", bool)
@@ -200,7 +177,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         call("GetFields", int, array(RdProvidedFieldInfo))
         call("GetEvents", int, array(RdProvidedEventInfo))
         call("GetConstructors", int, array(RdProvidedConstructorInfo))
-        call("Fresh", structdef("FreshArgs") {
+        call("AsProvidedVar", structdef("AsProvidedVarArgs") {
             field("EntityId", int)
             field("Name", string)
         }, RdProvidedVar)
@@ -243,6 +220,8 @@ object RdFSharpTypeProvidersLoaderModel : Root(
 
     private val RdTypeProvider = structdef {
         field("TypeProviderId", int)
+        field("FullName", string)
+        field("Name", string)
     }
 
     private val RdAssemblyName = structdef {

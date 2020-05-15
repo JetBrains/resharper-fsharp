@@ -3,15 +3,14 @@
 open System
 open System.Collections.Generic
 open FSharp.Compiler
-open FSharp.Compiler.AbstractIL.IL
 open FSharp.Compiler.ExtensionTyping
 open FSharp.Compiler.Range
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
+open JetBrains.Rd.Tasks
 open Microsoft.FSharp.Core.CompilerServices
 open FSharp.Compiler.AbstractIL.Internal.Library
 open FSharp.Compiler.ErrorLogger
-open JetBrains.Diagnostics
 open JetBrains.Rider.FSharp.TypeProvidersProtocol.Server
 open JetBrains.ReSharper.Plugins.FSharp.Util.TypeProvidersProtocolConverter
 open JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders.Hack
@@ -39,8 +38,7 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
     
     interface IExtensionTypingProvider with
         member this.InstantiateTypeProvidersOfAssembly
-                    (runTimeAssemblyFileName: string, 
-                     ilScopeRefOfRuntimeAssembly: ILScopeRef, 
+                    (runTimeAssemblyFileName: string,
                      designTimeAssemblyNameString: string, 
                      resolutionEnvironment: ResolutionEnvironment, 
                      isInvalidationSupported: bool, 
@@ -68,14 +66,13 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
                     let rdTypeProviders =
                         ourModel.InstantiateTypeProvidersOfAssembly.Sync(InstantiateTypeProvidersOfAssemblyParameters(
                                                                             runTimeAssemblyFileName,
-                                                                            ilScopeRefOfRuntimeAssembly.toRdILScopeRef(),
                                                                             designTimeAssemblyNameString, 
                                                                             resolutionEnvironment.toRdResolutionEnvironment(), 
                                                                             isInvalidationSupported, 
                                                                             isInteractive, 
                                                                             systemRuntimeAssemblyVersion.ToString(),
                                                                             compilerToolsPath |> Array.ofList,
-                                                                            fakeTcImports))
+                                                                            fakeTcImports), RpcTimeouts.Maximal)
                     let typeProviderProxies =
                         [for tp in rdTypeProviders -> new ProxyTypeProviderWithCache(tp, ourModel) :> ITypeProvider]
                     
@@ -84,26 +81,29 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
                     
                 with :? TypeProviderError as tpe ->
                     tpe.Iter(fun e -> errorR(NumberedError((e.Number, e.ContextualErrorMessage), m)) )                        
-                    [] //local try catch
+                    []
                     
-            let providerSpecs = typeProviders |> List.map (fun t -> (t, ilScopeRefOfRuntimeAssembly))
-            let taintedProviders = Tainted<_>.CreateAll providerSpecs
-            taintedProviders
+            typeProviders
             
-        //TODO: Asserts
-        member this.GetProvidedTypes(pn: Tainted<IProvidedNamespace>, m: range) =
-            let providedTypes =
-                pn.PApplyArray((fun r -> r.As<IProxyProvidedNamespace>().GetProvidedTypes()), "GetTypes", m)
-            providedTypes
+        member this.GetProvidedTypes(pn: IProvidedNamespace) =
+            match pn with
+            | :? IProxyProvidedNamespace as pn -> pn.GetProvidedTypes()
+            | _ -> defaultExtensionTypingProvider.GetProvidedTypes(pn)
             
-        member this.ResolveTypeName(pn: Tainted<IProvidedNamespace>, typeName: string, m: range) =
-            pn.PApply((fun providedNamespace ->
-                (providedNamespace.As<IProxyProvidedNamespace>().ResolveProvidedTypeName typeName)), range=m)
+        member this.ResolveTypeName(pn: IProvidedNamespace, typeName: string) =
+            match pn with
+            | :? IProxyProvidedNamespace as pn -> pn.ResolveProvidedTypeName typeName
+            | _ -> defaultExtensionTypingProvider.ResolveTypeName(pn, typeName)
             
         member this.GetInvokerExpression(provider: ITypeProvider, methodBase: ProvidedMethodBase, paramExprs: ProvidedVar[]) =
-            let provider = provider.As<IProxyTypeProvider>()          
-            Assertion.Assert(provider <> null, "provider is IProxyTypeProvider")         
-            provider.GetInvokerExpression(methodBase, paramExprs)
+            match provider with
+            | :? IProxyTypeProvider as tp -> tp.GetInvokerExpression(methodBase, paramExprs)
+            | _ -> defaultExtensionTypingProvider.GetInvokerExpression(provider, methodBase, paramExprs)
+            
+        member this.DisplayNameOfTypeProvider(provider: ITypeProvider, fullName: bool) =
+            match provider with
+            | :? IProxyTypeProvider as tp -> tp.GetDisplayName(fullName)
+            | _ -> defaultExtensionTypingProvider.DisplayNameOfTypeProvider(provider, fullName)
             
     interface IDisposable with
         member this.Dispose() = () //terminate connection

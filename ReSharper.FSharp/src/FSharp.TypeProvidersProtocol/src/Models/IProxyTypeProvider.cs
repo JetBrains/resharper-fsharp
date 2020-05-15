@@ -6,5 +6,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
   public interface IProxyTypeProvider : ITypeProvider, ITypeProvider2
   {
     ProvidedExpr GetInvokerExpression(ProvidedMethodBase methodBase, ProvidedVar[] paramExprs);
+    string GetDisplayName(bool fullName);
   }
 }

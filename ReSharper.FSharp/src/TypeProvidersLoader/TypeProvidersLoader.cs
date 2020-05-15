@@ -14,21 +14,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader
   {
     public ITypeProvider[] InstantiateTypeProvidersOfAssembly(InstantiateTypeProvidersOfAssemblyParameters parameters)
     {
-      var ilScopeRefOfRuntimeAssembly = parameters.IlScopeRefOfRuntimeAssembly.ToILScopeRef();
       var resolutionEnvironment = parameters.RdResolutionEnvironment.ToResolutionEnvironment();
       var systemRuntimeContainsType = Hack.injectFakeTcImports(parameters.FakeTcImports);
       var systemRuntimeAssemblyVersion = Version.Parse(parameters.SystemRuntimeAssemblyVersion);
       var compilerToolsPath = ListModule.OfSeq(parameters.CompilerToolsPath);
 
       var typeProviders = ExtensionTyping.Shim.ExtensionTypingProvider.InstantiateTypeProvidersOfAssembly(
-        parameters.RunTimeAssemblyFileName, ilScopeRefOfRuntimeAssembly, parameters.DesignTimeAssemblyNameString,
+        parameters.RunTimeAssemblyFileName, parameters.DesignTimeAssemblyNameString,
         resolutionEnvironment, parameters.IsInvalidationSupported, parameters.IsInteractive, systemRuntimeContainsType,
         systemRuntimeAssemblyVersion, compilerToolsPath, Range.range.Zero);
-      
-      return typeProviders
-        .Select(t =>
-          t.PUntaint(FSharpFunc<ITypeProvider, ITypeProvider>.FromConverter(x => x), Range.range.Zero))
-        .ToArray();
+
+      return typeProviders.ToArray();
     }
   }
 }
