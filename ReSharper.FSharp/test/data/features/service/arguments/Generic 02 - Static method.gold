@@ -1,0 +1,7 @@
+﻿type C () =
+    static member Log<'a> (|x|(param #0) : 'a) = sprintf "%O" x
+
+C.Log |"hello"|(arg #0)
+
+---------------------------------------------------------
+(arg #0) => x
