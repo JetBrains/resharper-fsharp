@@ -1,0 +1,3 @@
+﻿Suggested names: boolean
+do
+  match () with | _ -> let boolean = true in (boolean)

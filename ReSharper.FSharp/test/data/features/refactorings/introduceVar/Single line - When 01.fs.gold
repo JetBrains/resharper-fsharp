@@ -1,0 +1,4 @@
+﻿Suggested names: boolean
+do
+  match () with
+  | _ when let boolean = true in boolean -> ()  

@@ -47,5 +47,11 @@ type IntroduceVarTest() =
     [<Test>] member x.``Shift - Expr 01``() = x.DoNamedTest()
     [<Test>] member x.``Shift - Expr 02``() = x.DoNamedTest()
 
+    [<Test>] member x.``Single line - If 01``() = x.DoNamedTest()
+    [<Test>] member x.``Single line - Lambda 01``() = x.DoNamedTest()
+    [<Test>] member x.``Single line - Match 01``() = x.DoNamedTest()
+    [<Test>] member x.``Single line - Match 02 - Parens``() = x.DoNamedTest()
+    [<Test>] member x.``Single line - When 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Not allowed - Attribute 01``() = x.DoNamedTest()
     [<Test>] member x.``Not allowed - Named arg 01``() = x.DoNamedTest()

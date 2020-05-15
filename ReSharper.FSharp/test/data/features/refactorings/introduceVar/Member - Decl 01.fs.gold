@@ -2,4 +2,3 @@
 type T() =
     static member P = 
       let i = 1
-      ()

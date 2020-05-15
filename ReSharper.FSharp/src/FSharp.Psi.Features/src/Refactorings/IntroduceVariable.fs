@@ -13,6 +13,7 @@ open JetBrains.ReSharper.Feature.Services.Refactorings.Specific
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
@@ -137,6 +138,24 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         else
             elementFactory.CreateLetBindingExpr(name) :> _
 
+    let isSingleLineContext (context: ITreeNode): bool =
+        let contextParent = context.Parent
+        if not contextParent.IsSingleLine then false else 
+
+        match contextParent with
+        | :? IMatchClause as matchClause ->
+            let matchClauseOwner = MatchClauseListOwnerNavigator.GetByClause(matchClause)
+            if matchClauseOwner.IsSingleLine then true else
+
+            let clauses = matchClauseOwner.Clauses
+            let index = clauses.IndexOf(matchClause)
+            if index = clauses.Count - 1 then false else
+
+            clauses.[index + 1].StartLine = matchClause.StartLine
+
+        | :? IIfThenElseExpr | :? ILambdaExpr | :? ITryLikeExpr | :? IWhenExprClause -> true
+        | _ -> false
+    
     let getMoveToNewLineInfo (contextExpr: IFSharpExpression) =
         let requiresMultilineExpr (parent: ITreeNode) =
             match parent with
@@ -154,6 +173,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
             | :? IMemberDeclaration as memberDeclaration -> memberDeclaration.EqualsToken
             | :? IAutoProperty as autoProperty -> autoProperty.EqualsToken
             | :? IMatchClause as matchClause -> matchClause.RArrow
+            | :? IWhenExprClause as whenExpr -> whenExpr.WhenKeyword
             | :? ILambdaExpr as lambdaExpr -> lambdaExpr.RArrow
             | :? ITryLikeExpr as tryExpr -> tryExpr.TryKeyword
             | _ -> null
@@ -197,12 +217,16 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let contextDecl = getContextDeclaration contextExpr
 
         let contextIsSourceExpr = sourceExpr == contextExpr && isNull contextDecl
+        let isInSingleLineContext = isNull contextDecl && isSingleLineContext contextExpr
 
         let isInSeqExpr =
             let seqExpr = SequentialExprNavigator.GetByExpression(sourceExpr)
             isNotNull seqExpr && sourceExpr != seqExpr.Expressions.Last()
 
-        let moveToNewLineInfo = if isNotNull contextDecl then None else getMoveToNewLineInfo contextExpr
+        let replaceSourceExprNode = contextIsSourceExpr && not isInSeqExpr
+
+        let moveToNewLineInfo =
+            if isNotNull contextDecl || isInSingleLineContext then None else getMoveToNewLineInfo contextExpr
 
         let contextIndent =
             if isNotNull contextDecl then contextDecl.Indent else
@@ -264,8 +288,14 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
         let letBindings: ILetBindings = 
             match letBindings with
-            | :? ILetOrUseExpr when contextIsSourceExpr && not isInSeqExpr ->
+            | :? ILetOrUseExpr when replaceSourceExprNode ->
                 let letBindings = ModificationUtil.ReplaceChild(sourceExpr, letBindings)
+
+                let createRefExpr () =
+                    let refExpr = elementFactory.CreateReferenceExpr(name).As<ITreeNode>()
+                    let nodePointer = refExpr.CreateTreeElementPointer()
+                    replacedUsages.Add(nodePointer)
+                    refExpr
 
                 if alwaysGenerateCompleteBindingExpr then
                     addNodesAfter letBindings.LastChild [
@@ -275,10 +305,15 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                         if removeSourceExpr then
                             elementFactory.CreateExpr("()")
                         else
-                            let refExpr = elementFactory.CreateReferenceExpr(name).As<ITreeNode>()
-                            let nodePointer = refExpr.CreateTreeElementPointer()
-                            replacedUsages.Add(nodePointer)
-                            refExpr
+                            createRefExpr ()
+                    ] |> ignore
+
+                if isInSingleLineContext then
+                    addNodesAfter letBindings.LastChild [
+                        Whitespace()
+                        FSharpTokenType.IN.CreateLeafElement()
+                        Whitespace()
+                        createRefExpr ()
                     ] |> ignore
 
                 letBindings
@@ -292,7 +327,13 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                 let replaceRange = TreeRange(binding.NextSibling, letBindings.LastChild)
                 let replaced = ModificationUtil.ReplaceChildRange(replaceRange, ranges.InRange)
 
-                if ranges.AddNewLine then
+                if isInSingleLineContext then
+                    addNodesBefore replaced.First [
+                        Whitespace()
+                        FSharpTokenType.IN.CreateLeafElement()
+                        Whitespace()
+                    ] |> ignore
+                elif ranges.AddNewLine then
                     let anchor = ModificationUtil.AddChildBefore(replaced.First, NewLine(lineEnding))
                     ModificationUtil.AddChildAfter(anchor, Whitespace(contextIndent)) |> ignore
                 letBindings
@@ -320,8 +361,13 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let hotspotsRegistry = HotspotsRegistry(solution.GetPsiServices())
         hotspotsRegistry.Register(nodes, nameExpression)
 
-        let expr = letBindings.Bindings.[0].Expression
-        IntroduceVariableResult(hotspotsRegistry, expr.As<ITreeNode>().CreateTreeElementPointer())
+        let caretTarget =
+            if isInSingleLineContext && replaceSourceExprNode then
+                letBindings.LastChild
+            else
+                letBindings.Bindings.[0].Expression :> _
+
+        IntroduceVariableResult(hotspotsRegistry, caretTarget.CreateTreeElementPointer())
 
     static member IntroduceVar(expr: IFSharpExpression, textControl: ITextControl, ?removeSourceExpr) =
         let removeSourceExpr = defaultArg removeSourceExpr false

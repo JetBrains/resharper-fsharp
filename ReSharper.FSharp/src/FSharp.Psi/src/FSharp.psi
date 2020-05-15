@@ -606,7 +606,8 @@ lambdaExpr options { stubBase="FSharpExpressionBase"; }:
   fSharpExpression<EXPR, Expression>;
 
 interface matchClauseListOwner:
-  matchLikeExpr |
+  matchExpr |
+  matchLambdaExpr |
   tryWithExpr;
 
 interface matchLikeExpr:
@@ -658,7 +659,7 @@ tryWithExpr options { stubBase="FSharpExpressionBase"; }:
   TRY<TRY_KEYWORD, TryKeyword>
   fSharpExpression<TRY_EXPR, TryExpression>
   WITH
-  matchClause<CLAUSE, Clauses>*;
+  matchClause<MATCH_CLAUSE, Clauses>*;
 
 tryFinallyExpr options { stubBase="FSharpExpressionBase"; }:
   TRY<TRY_KEYWORD, TryKeyword>
@@ -709,11 +710,11 @@ referenceExpr options { stubBase="FSharpExpressionBase"; } extras {
 matchClause:
   BAR<BAR, Bar>?
   synPat<PAT, Pattern>
-  whenExpr<WHEN_EXPR, WhenExpression>?
+  whenExprClause<WHEN_EXPR, WhenExpression>?
   RARROW<RARROW, RArrow>
   fSharpExpression<EXPR, Expression>;
   
-whenExpr:
+whenExprClause:
   WHEN<WHEN, WhenKeyword>
   fSharpExpression<EXPR, Expression>;
 

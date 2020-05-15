@@ -1211,7 +1211,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             
         let range = whenExpr.Range
         let mark = x.MarkTokenOrRange(FSharpTokenType.WHEN, range)
-        x.PushRangeForMark(range, mark, ElementType.WHEN_EXPR)
+        x.PushRangeForMark(range, mark, ElementType.WHEN_EXPR_CLAUSE)
         
         x.ProcessExpression(whenExpr)
 

@@ -69,7 +69,7 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
 
             null
             
-        | :? IWhenExpr as whenExpr ->
+        | :? IWhenExprClause as whenExpr ->
             let matchClause = MatchClauseNavigator.GetByWhenExpression(whenExpr)
             if isNotNull matchClause && isNotNull matchClause.Pattern then
                 FSharpTreeRangeSelection(fsFile, matchClause.Pattern, whenExpr) :> _ else
