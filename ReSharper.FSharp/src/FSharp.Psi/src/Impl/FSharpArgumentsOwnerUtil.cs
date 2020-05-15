@@ -40,8 +40,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
           return Enumerable.Range(0, paramGroup.Count)
             .Select(i => i < tupleExprs.Count ? tupleExprs[i] as IArgument : null);
-        })
-        .ToList();
+        }).ToList();
     }
   }
 }
