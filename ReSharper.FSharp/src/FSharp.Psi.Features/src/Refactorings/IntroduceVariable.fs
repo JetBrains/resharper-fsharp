@@ -61,14 +61,14 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let suggestionOptions = SuggestionOptions(null, DefaultName = "foo")
         namesCollection.Prepare(namingRule, ScopeKind.Common, suggestionOptions).AllNames()
 
-    let getReplaceRanges (sourceExpr: IFSharpExpression) (contextExpr: IFSharpExpression) removeSourceExpr =
+    let getReplaceRanges (contextExpr: IFSharpExpression) removeSourceExpr =
         let sequentialExpr = SequentialExprNavigator.GetByExpression(contextExpr)
-        if sourceExpr == contextExpr && isNotNull sequentialExpr then
-            let inRangeStart = if removeSourceExpr then sourceExpr.NextSibling else sourceExpr :> _
+        if isNotNull sequentialExpr then
+            let inRangeStart = if removeSourceExpr then contextExpr.NextSibling else contextExpr :> _
             let inRange = TreeRange(inRangeStart, sequentialExpr.LastChild)
 
             let seqExprs = sequentialExpr.Expressions
-            let index = seqExprs.IndexOf(sourceExpr)
+            let index = seqExprs.IndexOf(contextExpr)
 
             if seqExprs.Count - index > 2 then
                 // Replace rest expressions with a sequential expr node.
@@ -78,14 +78,14 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                 LowLevelModificationUtil.AddChild(newSeqExpr, Array.ofSeq inRange)
 
                 let replaceRange =
-                    if removeSourceExpr then TreeRange(sourceExpr, newSeqExpr) else TreeRange(newSeqExpr)
+                    if removeSourceExpr then TreeRange(contextExpr, newSeqExpr) else TreeRange(newSeqExpr)
 
                 {| ReplaceRange = replaceRange
                    InRange = TreeRange(newSeqExpr)
                    AddNewLine = not removeSourceExpr |}
             else
                 // The last expression can be moved as is.
-                {| ReplaceRange = TreeRange(sourceExpr, sequentialExpr.LastChild)
+                {| ReplaceRange = TreeRange(contextExpr, sequentialExpr.LastChild)
                    InRange = inRange
                    AddNewLine = not removeSourceExpr |}
         else
@@ -320,9 +320,8 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                 letBindings
 
             | :? ILetOrUseExpr ->
-                let ranges = getReplaceRanges sourceExpr contextExpr removeSourceExpr
-                let replaced = ModificationUtil.ReplaceChildRange(ranges.ReplaceRange, TreeRange(letBindings))
-                let letBindings = replaced.First :?> ILetBindings
+                let ranges = getReplaceRanges contextExpr removeSourceExpr
+                let letBindings = ModificationUtil.AddChildBefore(ranges.ReplaceRange.First, letBindings)
 
                 let binding = letBindings.Bindings.[0]
                 let replaceRange = TreeRange(binding.NextSibling, letBindings.LastChild)
@@ -337,6 +336,8 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                 elif ranges.AddNewLine then
                     let anchor = ModificationUtil.AddChildBefore(replaced.First, NewLine(lineEnding))
                     ModificationUtil.AddChildAfter(anchor, Whitespace(contextIndent)) |> ignore
+
+                ModificationUtil.DeleteChildRange(letBindings.NextSibling, letBindings.Parent.LastChild)
                 letBindings
 
             | :? ILetModuleDecl ->
