@@ -21,6 +21,7 @@ type IntroduceVarTest() =
     [<Test>] member x.``Let 01``() = x.DoNamedTest()
     [<Test>] member x.``Let 02 - Function``() = x.DoNamedTest()
     [<Test>] member x.``Let 03 - Inside other``() = x.DoNamedTest()
+    [<Test>] member x.``Let 04 - After other``() = x.DoNamedTest()
 
     [<Test>] member x.``Match 01``() = x.DoNamedTest()
     [<Test>] member x.``Match 02 - Multiline``() = x.DoNamedTest()
