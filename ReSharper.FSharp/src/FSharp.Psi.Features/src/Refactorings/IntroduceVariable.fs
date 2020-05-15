@@ -399,7 +399,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         if not (isValid expr) then false else
 
         let rec isValidExpr (expr: IFSharpExpression) =
-            if isNotNull (FSharpMethodInvocationUtil.tryGetNamedArg expr) then false else
+            if FSharpMethodInvocationUtil.isNamedArgReference expr then false else
 
             match expr with
             | :? IReferenceExpr as refExpr ->

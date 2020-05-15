@@ -55,4 +55,9 @@ type IntroduceVarTest() =
     [<Test>] member x.``Single line - When 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Not allowed - Attribute 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not allowed - CompExpr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not allowed - CompExpr 02 - Yield``() = x.DoNamedTest()
+    [<Test>] member x.``Not allowed - RangeSequenceExpr 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Not allowed - Named arg 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not allowed - Named arg 02 - Unit``() = x.DoNamedTest()
