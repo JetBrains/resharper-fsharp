@@ -344,9 +344,8 @@ interface fSharpExpression:
   constExpr |
   typedLikeExpr |
   tupleExpr |
-  anonRecdExpr |
+  recordLikeExpr |
   arrayOrListExpr |
-  recordExpr |
   objExpr |
   forLikeExpr |
   rangeSequenceExpr |
@@ -519,7 +518,11 @@ tupleExpr options { stubBase="FSharpExpressionBase"; }:
   )?
   LIST fSharpExpression<EXPR, Expressions> SEP COMMA<FSHARP_COMMA, Commas>;
 
-anonRecdExpr options { stubBase="FSharpExpressionBase"; }:
+interface recordLikeExpr:
+  anonRecordExpr |
+  recordExpr;
+
+anonRecordExpr options { stubBase="FSharpExpressionBase"; }:
   STRUCT<STRUCT, STRUCT_KEYWORD>?
   LBRACE_BAR
   (

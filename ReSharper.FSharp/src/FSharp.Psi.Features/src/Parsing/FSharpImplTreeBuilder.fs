@@ -670,7 +670,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             x.MarkAndDone(range, ElementType.ARRAY_OR_LIST_EXPR)
 
         | SynExpr.AnonRecd(_, copyInfo, fields, _) ->
-            x.PushRange(range, ElementType.ANON_RECD_EXPR)
+            x.PushRange(range, ElementType.ANON_RECORD_EXPR)
             x.PushStepList(fields, anonRecordFieldListProcessor)
             match copyInfo with
             | Some(expr, _) -> x.ProcessExpression(expr)

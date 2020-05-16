@@ -110,7 +110,14 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                 not (binding.HeadPattern :? IParametersOwnerPat) ->
             LetOrUseExprNavigator.GetByBinding(binding) :> _
 
-        | :? ILetOrUseExpr -> expr
+        | :? IRecordExprBinding as fieldBinding ->
+            let recordExpr = RecordLikeExprNavigator.GetByExprBinding(fieldBinding)
+            getExprToInsertBefore recordExpr
+
+        | :? ILetOrUseExpr as letExpr ->
+            Assertion.Assert(letExpr.InExpression == expr, "letExpr.InExpression == expr")
+            expr
+
         | :? IFSharpExpression as parentExpr -> getExprToInsertBefore parentExpr
         | _ -> expr
 
