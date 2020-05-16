@@ -41,7 +41,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     {
       var assemblyName = new AssemblyName(rdAssemblyName.Name)
       {
-        Version = Version.Parse(rdAssemblyName.Version),
+        Version = rdAssemblyName.Version == null ? null : Version.Parse(rdAssemblyName.Version),
         Flags = (AssemblyNameFlags) rdAssemblyName.Flags
       };
 

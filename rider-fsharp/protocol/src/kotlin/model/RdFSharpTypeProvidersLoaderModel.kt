@@ -227,7 +227,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
     private val RdAssemblyName = structdef {
         field("Name", string)
         field("PublicKey", RdPublicKey.nullable)
-        field("Version", string)
+        field("Version", string.nullable)
         field("Flags", int)
     }
 

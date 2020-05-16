@@ -43,7 +43,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       }
 
       var rdAssemblyName =
-        new RdAssemblyName(assemblyName.Name, rdPublicKey, assemblyName.Version.ToString(), (int) assemblyName.Flags);
+        new RdAssemblyName(assemblyName.Name, rdPublicKey, assemblyName.Version?.ToString(), (int) assemblyName.Flags);
       return RdTask<RdAssemblyName>.Successful(rdAssemblyName);
     }
 
