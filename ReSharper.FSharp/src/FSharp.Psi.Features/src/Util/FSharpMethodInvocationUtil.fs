@@ -20,7 +20,8 @@ let isNamedArgReference (expr: IFSharpExpression) =
     if isNull refExpr then false else
 
     match refExpr.Reference.GetFSharpSymbol() with
-    | :? FSharpParameter | :? FSharpUnionCase -> true
+    | :? FSharpParameter -> true
+    | :? FSharpField as fsField -> fsField.IsUnionCaseField 
     | _ -> false
 
 

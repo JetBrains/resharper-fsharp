@@ -42,6 +42,8 @@ type IntroduceVarTest() =
     [<Test>] member x.``Member - Decl 01``() = x.DoNamedTest()
     [<Test>] member x.``Member - Auto property 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - Binary app 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Shift - Decl 01``() = x.DoNamedTest()
     [<Test>] member x.``Shift - Decl 02``() = x.DoNamedTest()
 
@@ -61,3 +63,4 @@ type IntroduceVarTest() =
 
     [<Test>] member x.``Not allowed - Named arg 01``() = x.DoNamedTest()
     [<Test>] member x.``Not allowed - Named arg 02 - Unit``() = x.DoNamedTest()
+    [<Test>] member x.``Not allowed - Named arg 03 - Union case field``() = x.DoNamedTest()
