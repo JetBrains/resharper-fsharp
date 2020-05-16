@@ -46,15 +46,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelC
       // We cannot request these properties from GenericParameter due to their implementation in .NET
       var isValueType = !providedModel.IsGenericParameter && providedModel.IsValueType;
       var isClass = !providedModel.IsGenericParameter && providedModel.IsClass;
-      
-      return new RdProvidedType(providedModel.FullName,
-        providedModel.Namespace, providedModel.IsVoid,
-        providedModel.IsGenericParameter, isValueType, providedModel.IsByRef,
-        providedModel.IsPointer, providedModel.IsEnum, providedModel.IsArray,
-        providedModel.IsInterface, isClass, providedModel.IsSealed,
-        providedModel.IsAbstract, providedModel.IsPublic, providedModel.IsNestedPublic,
-        providedModel.IsSuppressRelocate, providedModel.IsErased, providedModel.IsGenericType,
-        providedModel.IsMeasure, providedModel.Name, entityId);
+
+      var flags = RdProvidedTypeFlags.None;
+      if (isClass) flags |= RdProvidedTypeFlags.IsClass;
+      if (isValueType) flags |= RdProvidedTypeFlags.IsValueType;
+      if (providedModel.IsVoid) flags |= RdProvidedTypeFlags.IsVoid;
+      if (providedModel.IsEnum) flags |= RdProvidedTypeFlags.IsEnum;
+      if (providedModel.IsByRef) flags |= RdProvidedTypeFlags.IsByRef;
+      if (providedModel.IsSealed) flags |= RdProvidedTypeFlags.IsSealed;
+      if (providedModel.IsPublic) flags |= RdProvidedTypeFlags.IsPublic;
+      if (providedModel.IsErased) flags |= RdProvidedTypeFlags.IsErased;
+      if (providedModel.IsMeasure) flags |= RdProvidedTypeFlags.IsMeasure;
+      if (providedModel.IsPointer) flags |= RdProvidedTypeFlags.IsPointer;
+      if (providedModel.IsAbstract) flags |= RdProvidedTypeFlags.IsAbstract;
+      if (providedModel.IsInterface) flags |= RdProvidedTypeFlags.IsInterface;
+      if (providedModel.IsGenericType) flags |= RdProvidedTypeFlags.IsGenericType;
+      if (providedModel.IsNestedPublic) flags |= RdProvidedTypeFlags.IsNestedPublic;
+      if (providedModel.IsSuppressRelocate) flags |= RdProvidedTypeFlags.IsSuppressRelocate;
+      if (providedModel.IsGenericParameter) flags |= RdProvidedTypeFlags.IsGenericParameter;
+
+      return new RdProvidedType(providedModel.FullName, providedModel.Namespace, flags, providedModel.Name, entityId);
     }
 
     protected int CreateEntityKey(ProvidedType providedModel)

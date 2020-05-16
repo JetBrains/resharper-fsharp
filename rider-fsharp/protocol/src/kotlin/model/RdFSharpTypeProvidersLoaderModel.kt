@@ -380,27 +380,32 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         }.nullable)
     }
 
+    private val RdProvidedTypeFlags = flags {
+        +"None"
+        +"IsVoid"
+        +"IsGenericParameter"
+        +"IsValueType"
+        +"IsByRef"
+        +"IsPointer"
+        +"IsEnum"
+        +"IsArray"
+        +"IsInterface"
+        +"IsClass"
+        +"IsSealed"
+        +"IsAbstract"
+        +"IsPublic"
+        +"IsNestedPublic"
+        +"IsSuppressRelocate"
+        +"IsErased"
+        +"IsGenericType"
+        +"IsMeasure"
+    }
+
     init {
         RdProvidedType = classdef extends RdProvidedMemberInfo {
             field("FullName", string.nullable)
             field("Namespace", string.nullable)
-            field("IsVoid", bool)
-            field("IsGenericParameter", bool)
-            field("IsValueType", bool)
-            field("IsByRef", bool)
-            field("IsPointer", bool)
-            field("IsEnum", bool)
-            field("IsArray", bool)
-            field("IsInterface", bool)
-            field("IsClass", bool)
-            field("IsSealed", bool)
-            field("IsAbstract", bool)
-            field("IsPublic", bool)
-            field("IsNestedPublic", bool)
-            field("IsSuppressRelocate", bool)
-            field("IsErased", bool)
-            field("IsGenericType", bool)
-            field("IsMeasure", bool)
+            field("Flags", RdProvidedTypeFlags)
         }
 
         RdProvidedPropertyInfo = classdef extends RdProvidedMemberInfo {

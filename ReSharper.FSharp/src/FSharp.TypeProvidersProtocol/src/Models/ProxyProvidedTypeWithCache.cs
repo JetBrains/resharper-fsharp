@@ -109,23 +109,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override string Name => myRdProvidedType.Name;
     public override string FullName => myRdProvidedType.FullName;
     public override string Namespace => myRdProvidedType.Namespace;
-    public override bool IsGenericParameter => myRdProvidedType.IsGenericParameter;
-    public override bool IsValueType => myRdProvidedType.IsValueType;
-    public override bool IsByRef => myRdProvidedType.IsByRef;
-    public override bool IsPointer => myRdProvidedType.IsPointer;
-    public override bool IsPublic => myRdProvidedType.IsPublic;
-    public override bool IsNestedPublic => myRdProvidedType.IsNestedPublic;
-    public override bool IsArray => myRdProvidedType.IsArray;
-    public override bool IsEnum => myRdProvidedType.IsEnum;
-    public override bool IsClass => myRdProvidedType.IsClass;
-    public override bool IsSealed => myRdProvidedType.IsSealed;
-    public override bool IsAbstract => myRdProvidedType.IsAbstract;
-    public override bool IsInterface => myRdProvidedType.IsInterface;
-    public override bool IsSuppressRelocate => myRdProvidedType.IsSuppressRelocate;
-    public override bool IsErased => myRdProvidedType.IsErased;
-    public override bool IsGenericType => myRdProvidedType.IsGenericType;
-    public override bool IsVoid => myRdProvidedType.IsVoid;
-    public override bool IsMeasure => myRdProvidedType.IsMeasure;
+
+    public override bool IsGenericParameter => HasFlag(RdProvidedTypeFlags.IsGenericParameter);
+    public override bool IsValueType => HasFlag(RdProvidedTypeFlags.IsValueType);
+    public override bool IsByRef => HasFlag(RdProvidedTypeFlags.IsByRef);
+    public override bool IsPointer => HasFlag(RdProvidedTypeFlags.IsPointer);
+    public override bool IsPublic => HasFlag(RdProvidedTypeFlags.IsPublic);
+    public override bool IsNestedPublic => HasFlag(RdProvidedTypeFlags.IsNestedPublic);
+    public override bool IsArray => HasFlag(RdProvidedTypeFlags.IsArray);
+    public override bool IsEnum => HasFlag(RdProvidedTypeFlags.IsEnum);
+    public override bool IsClass => HasFlag(RdProvidedTypeFlags.IsClass);
+    public override bool IsSealed => HasFlag(RdProvidedTypeFlags.IsSealed);
+    public override bool IsAbstract => HasFlag(RdProvidedTypeFlags.IsAbstract);
+    public override bool IsInterface => HasFlag(RdProvidedTypeFlags.IsInterface);
+    public override bool IsSuppressRelocate => HasFlag(RdProvidedTypeFlags.IsSuppressRelocate);
+    public override bool IsErased => HasFlag(RdProvidedTypeFlags.IsErased);
+    public override bool IsGenericType => HasFlag(RdProvidedTypeFlags.IsGenericType);
+    public override bool IsVoid => HasFlag(RdProvidedTypeFlags.IsVoid);
+    public override bool IsMeasure => HasFlag(RdProvidedTypeFlags.IsMeasure);
 
     public override int GenericParameterPosition =>
       myGenericParameterPosition ??=
@@ -269,6 +270,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     }
 
     public override ProvidedTypeContext Context => myContext;
+
+    private bool HasFlag(RdProvidedTypeFlags flag) => (myRdProvidedType.Flags & flag) == flag;
 
     private int? myArrayRank;
     private int? myMakeArrayTypeId;
