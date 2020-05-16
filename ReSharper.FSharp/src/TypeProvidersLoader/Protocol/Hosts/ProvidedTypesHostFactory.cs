@@ -88,214 +88,179 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       processModel.MakeGenericType.Set(MakeGenericType);
     }
 
-    private RdTask<int> MakeGenericType(Lifetime lifetime, MakeGenericTypeArgs args)
+    private int MakeGenericType(MakeGenericTypeArgs args)
     {
       var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(args.EntityId);
       var providedArgs = args.ArgIds.Select(id => myProvidedTypesCache.Get(id).Item1).ToArray();
-      var genericType = myProvidedTypesCreator.CreateRdModel(providedType.MakeGenericType(providedArgs), typeProviderId)
-        .EntityId;
-      return RdTask<int>.Successful(genericType);
+      return myProvidedTypesCreator.CreateRdModel(providedType.MakeGenericType(providedArgs), typeProviderId).EntityId;
     }
 
-    private RdTask<RdProvidedVar> AsProvidedVar(Lifetime lifetime, AsProvidedVarArgs args)
+    private RdProvidedVar AsProvidedVar(AsProvidedVarArgs args)
     {
       var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(args.EntityId);
-      var providedVar = myProvidedVarsCreator.CreateRdModel(providedType.AsProvidedVar(args.Name), typeProviderId);
-      return RdTask<RdProvidedVar>.Successful(providedVar);
+      return myProvidedVarsCreator.CreateRdModel(providedType.AsProvidedVar(args.Name), typeProviderId);
     }
 
-    private RdTask<RdProvidedConstructorInfo[]> GetConstructors(Lifetime lifetime, int entityId)
+    private RdProvidedConstructorInfo[] GetConstructors(int entityId)
     {
       var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
-      var constructors = providedType
+      return providedType
         .GetConstructors()
-        .Select(t => myProvidedConstructorInfosCreator.CreateRdModel(t, typeProviderId))
-        .ToArray();
-      return RdTask<RdProvidedConstructorInfo[]>.Successful(constructors);
+        .CreateRdModels(myProvidedConstructorInfosCreator, typeProviderId);
     }
 
-    private RdTask<RdProvidedEventInfo[]> GetEvents(Lifetime lifetime, int entityId)
+    private RdProvidedEventInfo[] GetEvents(int entityId)
     {
       var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
-      var events = providedType
+      return providedType
         .GetEvents()
-        .Select(t => myProvidedEventInfosCreator.CreateRdModel(t, typeProviderId))
-        .ToArray();
-      return RdTask<RdProvidedEventInfo[]>.Successful(events);
+        .CreateRdModels(myProvidedEventInfosCreator, typeProviderId);
     }
 
-    private RdTask<RdProvidedFieldInfo[]> GetFields(Lifetime lifetime, int entityId)
+    private RdProvidedFieldInfo[] GetFields(int entityId)
     {
       var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
-      var fields = providedType
+      return providedType
         .GetFields()
-        .Select(t => myProvidedFieldInfosCreator.CreateRdModel(t, typeProviderId))
-        .ToArray();
-      return RdTask<RdProvidedFieldInfo[]>.Successful(fields);
+        .CreateRdModels(myProvidedFieldInfosCreator, typeProviderId);
     }
 
-    private RdTask<int> MakeByRefType(Lifetime lifetime, int entityId)
+    private int MakeByRefType(int entityId)
     {
       var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
-      var byRefTypeId = myProvidedTypesCreator.CreateRdModel(providedType.MakeByRefType(), typeProviderId).EntityId;
-      return RdTask<int>.Successful(byRefTypeId);
+      return myProvidedTypesCreator.CreateRdModel(providedType.MakeByRefType(), typeProviderId).EntityId;
     }
 
-    private RdTask<int> MakePointerType(Lifetime lifetime, int entityId)
+    private int MakePointerType(int entityId)
     {
       var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
-      var pointerTypeId = myProvidedTypesCreator.CreateRdModel(providedType.MakePointerType(), typeProviderId).EntityId;
-      return RdTask<int>.Successful(pointerTypeId);
+      return myProvidedTypesCreator.CreateRdModel(providedType.MakePointerType(), typeProviderId).EntityId;
     }
 
-    private RdTask<int> MakeArrayType(Lifetime lifetime, MakeArrayTypeArgs args)
+    private int MakeArrayType(MakeArrayTypeArgs args)
     {
       var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(args.Id);
-      var arrayTypeId = myProvidedTypesCreator.CreateRdModel(
-        args.Rank == 1 ? providedType.MakeArrayType() : providedType.MakeArrayType(args.Rank), typeProviderId).EntityId;
-      return RdTask<int>.Successful(arrayTypeId);
+      return myProvidedTypesCreator
+        .CreateRdModel(args.Rank == 1 ? providedType.MakeArrayType() : providedType.MakeArrayType(args.Rank),
+          typeProviderId).EntityId;
     }
 
-    private RdTask<RdProvidedAssembly> GetAssembly(Lifetime lifetime, int entityId)
+    private RdProvidedAssembly GetAssembly(int entityId)
     {
       var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
-      var assembly = myProvidedAssembliesCreator.CreateRdModel(providedType.Assembly, typeProviderId);
-      return RdTask<RdProvidedAssembly>.Successful(assembly);
+      return myProvidedAssembliesCreator.CreateRdModel(providedType.Assembly, typeProviderId);
     }
 
-    private RdTask<int> ApplyStaticArguments(Lifetime lifetime, ApplyStaticArgumentsParameters args)
+    private int ApplyStaticArguments(ApplyStaticArgumentsParameters args)
     {
       var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(args.Id);
       var typeProvider = myTypeProvidersCache.Get(typeProviderId);
 
       var staticArgDescriptions = args.StaticArguments.Select(t => t.Unbox()).ToArray();
 
-      var type = myProvidedTypesCreator
+      return myProvidedTypesCreator
         .CreateRdModel(
           providedType.ApplyStaticArguments(typeProvider, args.TypePathWithArguments, staticArgDescriptions),
           typeProviderId).EntityId;
-      return RdTask<int>.Successful(type);
     }
 
-    private RdTask<int?> GetDeclaringType(Lifetime lifetime, int entityId)
+    private int? GetDeclaringType(int entityId)
     {
       var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
-      var declaringTypeId = myProvidedTypesCreator.CreateRdModel(providedType.DeclaringType, typeProviderId)?.EntityId;
-      return RdTask<int?>.Successful(declaringTypeId);
+      return myProvidedTypesCreator.CreateRdModel(providedType.DeclaringType, typeProviderId)?.EntityId;
     }
 
-    private RdTask<int?> GetBaseType(Lifetime lifetime, int entityId)
+    private int? GetBaseType(int entityId)
     {
       var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
-      var baseType = myProvidedTypesCreator.CreateRdModel(providedType.BaseType, typeProviderId)?.EntityId;
-      return RdTask<int?>.Successful(baseType);
+      return myProvidedTypesCreator.CreateRdModel(providedType.BaseType, typeProviderId)?.EntityId;
     }
 
-    private RdTask<RdProvidedMethodInfo[]> GetMethods(Lifetime lifetime, int entityId)
+    private RdProvidedMethodInfo[] GetMethods(int entityId)
     {
       var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
-      var interfaces = providedType
+      return providedType
         .GetMethods()
-        .Select(t => myProvidedMethodInfosCreator.CreateRdModel(t, typeProviderId)).ToArray();
-      return RdTask<RdProvidedMethodInfo[]>.Successful(interfaces);
+        .CreateRdModels(myProvidedMethodInfosCreator, typeProviderId);
     }
 
-    private RdTask<RdProvidedParameterInfo[]> GetStaticParameters(Lifetime lifetime, int entityId)
+    private RdProvidedParameterInfo[] GetStaticParameters(int entityId)
     {
       var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
       var typeProvider = myTypeProvidersCache.Get(typeProviderId);
-      var staticParameters = providedType
+      return providedType
         .GetStaticParameters(typeProvider)
-        .Select(t => myProvidedParameterInfosCreator.CreateRdModel(t, typeProviderId))
-        .ToArray();
-      return RdTask<RdProvidedParameterInfo[]>.Successful(staticParameters);
+        .CreateRdModels(myProvidedParameterInfosCreator, typeProviderId);
     }
 
-    private RdTask<int> GetGenericParameterPosition(Lifetime lifetime, int entityId)
-    {
-      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
-      var genericParameterPosition = providedType.GenericParameterPosition;
-      return RdTask<int>.Successful(genericParameterPosition);
-    }
-
-    private RdTask<RdProvidedPropertyInfo[]> GetProperties(Lifetime lifetime, int entityId)
-    {
-      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
-      var properties = providedType
-        .GetProperties()
-        .Select(t => myProvidedPropertiesCreator.CreateRdModel(t, typeProviderId))
-        .ToArray();
-      return RdTask<RdProvidedPropertyInfo[]>.Successful(properties);
-    }
-
-    private RdTask<int?> GetEnumUnderlyingType(Lifetime lifetime, int entityId)
-    {
-      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
-      var enumUnderlyingTypeId =
-        myProvidedTypesCreator.CreateRdModel(providedType.GetEnumUnderlyingType(), typeProviderId)?.EntityId;
-      return RdTask<int?>.Successful(enumUnderlyingTypeId);
-    }
-
-    private RdTask<int> GetArrayRank(Lifetime lifetime, int entityId)
+    private int GetGenericParameterPosition(int entityId)
     {
       var (providedType, _, _) = myProvidedTypesCache.Get(entityId);
-      var arrayRank = providedType.GetArrayRank();
-      return RdTask<int>.Successful(arrayRank);
+      return providedType.GenericParameterPosition;
     }
 
-    private RdTask<int[]> GetGenericArguments(Lifetime lifetime, int entityId)
+    private RdProvidedPropertyInfo[] GetProperties(int entityId)
     {
       var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
-      var genericArguments = providedType
+      return providedType
+        .GetProperties()
+        .CreateRdModels(myProvidedPropertiesCreator, typeProviderId);
+    }
+
+    private int? GetEnumUnderlyingType(int entityId)
+    {
+      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
+      return myProvidedTypesCreator.CreateRdModel(providedType.GetEnumUnderlyingType(), typeProviderId)?.EntityId;
+    }
+
+    private int GetArrayRank(int entityId)
+    {
+      var (providedType, _, _) = myProvidedTypesCache.Get(entityId);
+      return providedType.GetArrayRank();
+    }
+
+    private int[] GetGenericArguments(int entityId)
+    {
+      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
+      return providedType
         .GetGenericArguments()
-        .Select(t => myProvidedTypesCreator.CreateRdModel(t, typeProviderId).EntityId)
-        .ToArray();
-      return RdTask<int[]>.Successful(genericArguments);
+        .CreateRdModelsAndReturnIds(myProvidedTypesCreator, typeProviderId);
     }
 
-    private RdTask<int> GetElementType(Lifetime lifetime, int entityId)
+    private int GetElementType(int entityId)
     {
       var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
-      var elementType = myProvidedTypesCreator.CreateRdModel(providedType.GetElementType(), typeProviderId).EntityId;
-      return RdTask<int>.Successful(elementType);
+      return myProvidedTypesCreator.CreateRdModel(providedType.GetElementType(), typeProviderId).EntityId;
     }
 
-    private RdTask<int> GetGenericTypeDefinition(Lifetime lifetime, int entityId)
+    private int GetGenericTypeDefinition(int entityId)
     {
       var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
-      var genericTypeDefinition = myProvidedTypesCreator
-        .CreateRdModel(providedType.GetGenericTypeDefinition(), typeProviderId).EntityId;
-      return RdTask<int>.Successful(genericTypeDefinition);
+      return myProvidedTypesCreator.CreateRdModel(providedType.GetGenericTypeDefinition(), typeProviderId).EntityId;
     }
 
-    private RdTask<int[]> GetAllNestedTypes(Lifetime lifetime, int entityId)
+    private int[] GetAllNestedTypes(int entityId)
     {
       var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
-      var nestedTypes = providedType
+      return providedType
         .GetAllNestedTypes()
-        .Select(t => myProvidedTypesCreator.CreateRdModel(t, typeProviderId).EntityId)
-        .ToArray();
-      return RdTask<int[]>.Successful(nestedTypes);
+        .CreateRdModelsAndReturnIds(myProvidedTypesCreator, typeProviderId);
     }
 
-    private RdTask<int[]> GetNestedTypes(Lifetime lifetime, int entityId)
+    private int[] GetNestedTypes(int entityId)
     {
       var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
-      var nestedTypes = providedType
+      return providedType
         .GetNestedTypes()
-        .Select(t => myProvidedTypesCreator.CreateRdModel(t, typeProviderId).EntityId)
-        .ToArray();
-      return RdTask<int[]>.Successful(nestedTypes);
+        .CreateRdModelsAndReturnIds(myProvidedTypesCreator, typeProviderId);
     }
 
-    private RdTask<int[]> GetInterfaces(Lifetime lifetime, int entityId)
+    private int[] GetInterfaces(int entityId)
     {
       var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
-      var interfaces = providedType
+      return providedType
         .GetInterfaces()
-        .Select(t => myProvidedTypesCreator.CreateRdModel(t, typeProviderId).EntityId)
-        .ToArray();
-      return RdTask<int[]>.Successful(interfaces);
+        .CreateRdModelsAndReturnIds(myProvidedTypesCreator, typeProviderId);
     }
   }
 }

@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Linq;
-using JetBrains.Lifetimes;
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelCreators;
@@ -43,42 +41,36 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       myProvidedParameterInfosHost = providedParameterInfosHost;
     }
 
-    private RdTask<int?> GetDeclaringType(Lifetime lifetime, int entityId)
+    private int? GetDeclaringType(int entityId)
     {
       var (property, typeProviderId) = myProvidedPropertiesCache.Get(entityId);
-      var declaringType = myProvidedTypesHost.CreateRdModel(property.DeclaringType, typeProviderId)?.EntityId;
-      return RdTask<int?>.Successful(declaringType);
+      return myProvidedTypesHost.CreateRdModel(property.DeclaringType, typeProviderId)?.EntityId;
     }
 
-    private RdTask<int> GetPropertyType(Lifetime lifetime, int entityId)
+    private int GetPropertyType(int entityId)
     {
       var (property, typeProviderId) = myProvidedPropertiesCache.Get(entityId);
-      var propertyType = myProvidedTypesHost.CreateRdModel(property.PropertyType, typeProviderId).EntityId;
-      return RdTask<int>.Successful(propertyType);
+      return myProvidedTypesHost.CreateRdModel(property.PropertyType, typeProviderId).EntityId;
     }
 
-    private RdTask<RdProvidedParameterInfo[]> GetIndexParameters(Lifetime lifetime, int entityId)
+    private RdProvidedParameterInfo[] GetIndexParameters(int entityId)
     {
       var (property, typeProviderId) = myProvidedPropertiesCache.Get(entityId);
-      var indexParameters = property
+      return property
         .GetIndexParameters()
-        .Select(t => myProvidedParameterInfosHost.CreateRdModel(t, typeProviderId))
-        .ToArray();
-      return RdTask<RdProvidedParameterInfo[]>.Successful(indexParameters);
+        .CreateRdModels(myProvidedParameterInfosHost, typeProviderId);
     }
 
-    private RdTask<RdProvidedMethodInfo> GetSetMethod(Lifetime lifetime, int entityId)
+    private RdProvidedMethodInfo GetSetMethod(int entityId)
     {
       var (property, typeProviderId) = myProvidedPropertiesCache.Get(entityId);
-      var setMethod = myProvidedMethodInfosHost.CreateRdModel(property.GetSetMethod(), typeProviderId);
-      return RdTask<RdProvidedMethodInfo>.Successful(setMethod);
+      return myProvidedMethodInfosHost.CreateRdModel(property.GetSetMethod(), typeProviderId);
     }
 
-    private RdTask<RdProvidedMethodInfo> GetGetMethod(Lifetime lifetime, int entityId)
+    private RdProvidedMethodInfo GetGetMethod(int entityId)
     {
       var (property, typeProviderId) = myProvidedPropertiesCache.Get(entityId);
-      var getMethod = myProvidedMethodInfosHost.CreateRdModel(property.GetGetMethod(), typeProviderId);
-      return RdTask<RdProvidedMethodInfo>.Successful(getMethod);
+      return myProvidedMethodInfosHost.CreateRdModel(property.GetGetMethod(), typeProviderId);
     }
   }
 }

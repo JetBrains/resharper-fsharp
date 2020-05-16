@@ -25,7 +25,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelC
 
       var id = CreateEntityKey(providedModel);
       var typeProviderType = providedModel.GetType();
-      var model = new RdTypeProvider(id, typeProviderType?.FullName ?? typeProviderType.Name, typeProviderType.Name);
+      var model = new RdTypeProvider(typeProviderType?.FullName ?? typeProviderType.Name, typeProviderType.Name, id);
 
       myCache.Add(id, providedModel);
       return model;

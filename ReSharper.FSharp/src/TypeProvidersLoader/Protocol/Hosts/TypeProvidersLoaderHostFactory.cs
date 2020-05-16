@@ -32,7 +32,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
         .Select(t =>
         {
           var typeProviderRdModel = myTypeProvidersCreator.CreateRdModel(t, -1);
-          t.Invalidate += (obj, args) => processModel.Invalidate.Fire(typeProviderRdModel.TypeProviderId); //TODO: optimize allocation
+          t.Invalidate +=
+            (obj, args) => processModel.Invalidate.Fire(typeProviderRdModel.EntityId); //TODO: optimize allocation
           return typeProviderRdModel;
         })
         .ToArray();

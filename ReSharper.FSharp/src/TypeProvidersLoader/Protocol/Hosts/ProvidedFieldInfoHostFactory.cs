@@ -1,5 +1,4 @@
 ﻿using System;
-using JetBrains.Lifetimes;
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelCreators;
@@ -26,18 +25,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       model.DeclaringType.Set(GetDeclaringType);
     }
 
-    private RdTask<int> GetDeclaringType(Lifetime lifetime, int entityId)
+    private int GetDeclaringType(int entityId)
     {
       var (providedType, typeProviderId) = myProvidedFieldInfosCache.Get(entityId);
-      var fieldTypeId = myProvidedRdModelsCreator.CreateRdModel(providedType.DeclaringType, typeProviderId).EntityId;
-      return RdTask<int>.Successful(fieldTypeId);
+      return myProvidedRdModelsCreator.CreateRdModel(providedType.DeclaringType, typeProviderId).EntityId;
     }
 
-    private RdTask<int> GetFieldType(Lifetime lifetimes, int entityId)
+    private int GetFieldType(int entityId)
     {
       var (providedType, typeProviderId) = myProvidedFieldInfosCache.Get(entityId);
-      var fieldTypeId = myProvidedRdModelsCreator.CreateRdModel(providedType.FieldType, typeProviderId).EntityId;
-      return RdTask<int>.Successful(fieldTypeId);
+      return myProvidedRdModelsCreator.CreateRdModel(providedType.FieldType, typeProviderId).EntityId;
     }
   }
 }

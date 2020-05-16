@@ -1,5 +1,4 @@
 ﻿using System;
-using JetBrains.Lifetimes;
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelCreators;
@@ -35,36 +34,28 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       model.GetRemoveMethod.Set(GetRemoveMethod);
     }
 
-    private RdTask<RdProvidedMethodInfo> GetRemoveMethod(Lifetime lifetime, int entityId)
+    private RdProvidedMethodInfo GetRemoveMethod(int entityId)
     {
       var (providedEvent, typeProviderId) = myProvidedEventInfosCache.Get(entityId);
-      var removeMethod =
-        myProvidedMethodInfoRdModelsCreator.CreateRdModel(providedEvent.GetRemoveMethod(), typeProviderId);
-      return RdTask<RdProvidedMethodInfo>.Successful(removeMethod);
+      return myProvidedMethodInfoRdModelsCreator.CreateRdModel(providedEvent.GetRemoveMethod(), typeProviderId);
     }
 
-    private RdTask<RdProvidedMethodInfo> GetAddMethod(Lifetime lifetime, int entityId)
+    private RdProvidedMethodInfo GetAddMethod(int entityId)
     {
       var (providedEvent, typeProviderId) = myProvidedEventInfosCache.Get(entityId);
-      var addMethod =
-        myProvidedMethodInfoRdModelsCreator.CreateRdModel(providedEvent.GetAddMethod(), typeProviderId);
-      return RdTask<RdProvidedMethodInfo>.Successful(addMethod);
+      return myProvidedMethodInfoRdModelsCreator.CreateRdModel(providedEvent.GetAddMethod(), typeProviderId);
     }
 
-    private RdTask<int> GetEventHandlerType(Lifetime lifetime, int entityId)
+    private int GetEventHandlerType(int entityId)
     {
       var (providedEvent, typeProviderId) = myProvidedEventInfosCache.Get(entityId);
-      var eventHandlerTypeId = myProvidedTypeRdModelsCreator
-        .CreateRdModel(providedEvent.EventHandlerType, typeProviderId).EntityId;
-      return RdTask<int>.Successful(eventHandlerTypeId);
+      return myProvidedTypeRdModelsCreator.CreateRdModel(providedEvent.EventHandlerType, typeProviderId).EntityId;
     }
 
-    private RdTask<int?> GetDeclaringType(Lifetime lifetime, int entityId)
+    private int? GetDeclaringType(int entityId)
     {
       var (providedEvent, typeProviderId) = myProvidedEventInfosCache.Get(entityId);
-      var declaringTypeId = myProvidedTypeRdModelsCreator.CreateRdModel(providedEvent.DeclaringType, typeProviderId)
-        ?.EntityId;
-      return RdTask<int?>.Successful(declaringTypeId);
+      return myProvidedTypeRdModelsCreator.CreateRdModel(providedEvent.DeclaringType, typeProviderId)?.EntityId;
     }
   }
 }

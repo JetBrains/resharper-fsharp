@@ -36,7 +36,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
         .ToArray());
     }
 
-    public string NamespaceName => myProvidedNamespace.NamespaceName;
+    public string NamespaceName => myProvidedNamespace.Name;
 
     public IProvidedNamespace[] GetNestedNamespaces() => myNestedNamespaces.Value;
 

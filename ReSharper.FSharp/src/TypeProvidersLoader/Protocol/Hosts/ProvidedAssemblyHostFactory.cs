@@ -27,7 +27,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       model.GetName.Set(GetName);
     }
 
-    private RdTask<RdAssemblyName> GetName(Lifetime lifetime, int entityId)
+    private RdAssemblyName GetName(int entityId)
     {
       var (providedAssembly, _) = myAssembliesCache.Get(entityId);
       var assemblyName = providedAssembly.Handle.GetName();
@@ -42,16 +42,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
         rdPublicKey = publicKeyToken != null ? new RdPublicKey(true, publicKeyToken) : null;
       }
 
-      var rdAssemblyName =
-        new RdAssemblyName(assemblyName.Name, rdPublicKey, assemblyName.Version?.ToString(), (int) assemblyName.Flags);
-      return RdTask<RdAssemblyName>.Successful(rdAssemblyName);
+      return new RdAssemblyName(assemblyName.Name, rdPublicKey, assemblyName.Version?.ToString(), (int) assemblyName.Flags);
     }
 
-    private RdTask<byte[]> GetManifestModuleContents(Lifetime lifetime, int entityId)
+    private byte[] GetManifestModuleContents(int entityId)
     {
       var (providedAssembly, typeProviderId) = myAssembliesCache.Get(entityId);
       var typeProvider = myTypeProvidersCache.Get(typeProviderId);
-      return RdTask<byte[]>.Successful(typeProvider.GetGeneratedAssemblyContents(providedAssembly.Handle));
+      return typeProvider.GetGeneratedAssemblyContents(providedAssembly.Handle); //TODO: encapsulate handle at provided assembly
     }
   }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using JetBrains.Lifetimes;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Cache;
@@ -32,38 +31,28 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       processModel.ResolveTypeName.Set(ResolveTypeName);
     }
 
-    private RdTask<int> ResolveTypeName(Lifetime lifetime, ResolveTypeNameArgs args)
+    private int ResolveTypeName(ResolveTypeNameArgs args)
     {
       var (providedNamespace, providerId) = myProvidedNamespacesCache.Get(args.Id);
-
       var providedType = ProvidedType.CreateNoContext(providedNamespace.ResolveTypeName(args.TypeFullName));
-      // ReSharper disable once PossibleNullReferenceException
-      var rdProvidedTypeId = myProvidedTypesCreator.CreateRdModel(providedType, providerId).EntityId;
-      return RdTask<int>.Successful(rdProvidedTypeId);
+      return myProvidedTypesCreator.CreateRdModel(providedType, providerId).EntityId;
     }
 
-    private RdTask<int[]> GetTypes(Lifetime lifetime, int entityId)
+    private int[] GetTypes(int entityId)
     {
       var (providedNamespace, providerId) = myProvidedNamespacesCache.Get(entityId);
-
-      var typeIds = providedNamespace
+      return providedNamespace
         .GetTypes()
-        .Select(ProvidedType.CreateNoContext)
-        // ReSharper disable once PossibleNullReferenceException
-        .Select(t => myProvidedTypesCreator.CreateRdModel(t, providerId).EntityId)
-        .ToArray();
-      return RdTask<int[]>.Successful(typeIds);
+        .Select(ProvidedType.CreateNoContext) //TODO: make CreateArray public
+        .CreateRdModelsAndReturnIds(myProvidedTypesCreator, providerId);
     }
 
-    private RdTask<RdProvidedNamespace[]> GetNestedNamespaces(Lifetime lifetime, int entityId)
+    private RdProvidedNamespace[] GetNestedNamespaces(int entityId)
     {
       var (providedNamespace, providerId) = myProvidedNamespacesCache.Get(entityId);
-
-      var namespaces = providedNamespace
+      return providedNamespace
         .GetNestedNamespaces()
-        .Select(t => myProvidedNamespacesCreator.CreateRdModel(t, providerId))
-        .ToArray();
-      return RdTask<RdProvidedNamespace[]>.Successful(namespaces);
+        .CreateRdModels(myProvidedNamespacesCreator, providerId);
     }
   }
 }

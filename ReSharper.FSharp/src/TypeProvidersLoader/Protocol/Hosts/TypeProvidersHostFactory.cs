@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using JetBrains.Lifetimes;
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelCreators;
@@ -46,40 +45,37 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       processModel.GetInvokerExpression.Set(GetInvokerExpression);
     }
 
-    private RdTask<RdProvidedExpr> GetInvokerExpression(Lifetime lifetime, GetInvokerExpressionArgs args)
+    private RdProvidedExpr GetInvokerExpression(GetInvokerExpressionArgs args)
     {
       var typeProvider = myTypeProvidersCache.Get(args.TypeProviderId);
 
-      //TODO: Rewrite it better
+      //TODO: Rewrite it better?
       var method = args.IsConstructor
-        ? (MethodBase)myProvidedConstructorsCache.Get(args.ProvidedMethodBaseId).Item1.Handle
+        ? (MethodBase) myProvidedConstructorsCache.Get(args.ProvidedMethodBaseId).Item1.Handle
         : myProvidedMethodsCache.Get(args.ProvidedMethodBaseId).Item1.Handle;
-      
+
       var vars = args.ProvidedVarParamExprIds
         .Select(myProvidedVarsCache.Get)
         .Select(t => FSharpExpr.Var(t.Item1.Handle))
         .ToArray();
-      
-      var expr = myProvidedExprsCreator.CreateRdModel(
-        new ProvidedExpr(typeProvider.GetInvokerExpression(method, vars), ProvidedTypeContext.Empty), args.TypeProviderId);
-      return RdTask<RdProvidedExpr>.Successful(expr);
+
+      return myProvidedExprsCreator.CreateRdModel(
+        new ProvidedExpr(typeProvider.GetInvokerExpression(method, vars), ProvidedTypeContext.Empty),
+        args.TypeProviderId);
     }
 
-    private RdTask<RdProvidedType> GetProvidedType(Lifetime lifetime, GetProvidedTypeArgs args)
+    private RdProvidedType GetProvidedType(GetProvidedTypeArgs args)
     {
       var (_, type, _) = myProvidedTypesCache.Get(args.Id);
-      return RdTask<RdProvidedType>.Successful(type);
+      return type;
     }
 
-    private RdTask<RdProvidedNamespace[]> GetTypeProviderNamespaces(Lifetime lifetime, int providerId)
+    private RdProvidedNamespace[] GetTypeProviderNamespaces(int providerId)
     {
       var typeProvider = myTypeProvidersCache.Get(providerId);
-
-      var namespaces = typeProvider
+      return typeProvider
         .GetNamespaces()
-        .Select(t => myProvidedNamespacesCreator.CreateRdModel(t, providerId))
-        .ToArray();
-      return RdTask<RdProvidedNamespace[]>.Successful(namespaces);
+        .CreateRdModels(myProvidedNamespacesCreator, providerId);
     }
   }
 }

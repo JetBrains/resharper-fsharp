@@ -16,7 +16,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     private readonly RdTypeProvider myRdTypeProvider;
     private readonly RdFSharpTypeProvidersLoaderModel myProcessModel;
     private RdTypeProviderProcessModel RdTypeProviderProcessModel => myProcessModel.RdTypeProviderProcessModel;
-    private int EntityId => myRdTypeProvider.TypeProviderId;
+    private int EntityId => myRdTypeProvider.EntityId;
 
     public ProxyTypeProviderWithCache(
       RdTypeProvider rdTypeProvider,

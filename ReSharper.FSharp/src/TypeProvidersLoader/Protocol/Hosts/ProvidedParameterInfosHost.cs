@@ -1,5 +1,4 @@
 ﻿using System;
-using JetBrains.Lifetimes;
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelCreators;
@@ -25,11 +24,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       processModel.ParameterType.Set(GetParameterType);
     }
 
-    private RdTask<int> GetParameterType(Lifetime lifetime, int entityId)
+    private int GetParameterType(int entityId)
     {
       var (providedParameter, typeProviderId) = myProvidedParameterInfosCache.Get(entityId);
-      var parameterType = myProvidedTypesHost.CreateRdModel(providedParameter.ParameterType, typeProviderId).EntityId;
-      return RdTask<int>.Successful(parameterType);
+      return myProvidedTypesHost.CreateRdModel(providedParameter.ParameterType, typeProviderId).EntityId;
     }
   }
 }

@@ -1,5 +1,4 @@
 ﻿using JetBrains.Annotations;
-using Microsoft.FSharp.Core.CompilerServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelCreators
 {

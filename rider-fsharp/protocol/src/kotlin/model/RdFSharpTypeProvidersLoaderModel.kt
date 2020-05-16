@@ -65,9 +65,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         }, int)
     }
 
-    private val RdProvidedNamespace = classdef {
-        field("NamespaceName", string)
-        field("EntityId", int)
+    private val RdProvidedNamespace = classdef extends RdProvidedMemberInfo {
     }
 
     private val RdTypeProviderProcessModel = aggregatedef("RdTypeProviderProcessModel") {
@@ -218,13 +216,11 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         call("ParameterType", int, int)
     }
 
-    private val RdTypeProvider = structdef {
-        field("TypeProviderId", int)
+    private val RdTypeProvider = classdef extends RdProvidedMemberInfo {
         field("FullName", string)
-        field("Name", string)
     }
 
-    private val RdAssemblyName = structdef {
+    private val RdAssemblyName = RdProvidedMemberInfo {
         field("Name", string)
         field("PublicKey", RdPublicKey.nullable)
         field("Version", string.nullable)

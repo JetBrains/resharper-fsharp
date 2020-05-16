@@ -49,61 +49,50 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       processModel.ApplyStaticArgumentsForMethod.Set(ApplyStaticArgumentsForMethod);
     }
 
-    private RdTask<RdProvidedMethodInfo> ApplyStaticArgumentsForMethod(Lifetime lifetime,
-      ApplyStaticArgumentsForMethodArgs args)
+    private RdProvidedMethodInfo ApplyStaticArgumentsForMethod(ApplyStaticArgumentsForMethodArgs args)
     {
       var (providedMethod, typeProviderId) = myProvidedMethodInfosCache.Get(args.EntityId);
       var typeProvider = myTypeProvidersCache.Get(typeProviderId);
-      var methodInfo = myProvidedMethodInfoRdModelsCreator.CreateRdModel(
+      return myProvidedMethodInfoRdModelsCreator.CreateRdModel(
         providedMethod.ApplyStaticArgumentsForMethod(typeProvider, args.FullNameAfterArguments,
           args.StaticArgs.Select(t => t.Unbox()).ToArray()) as ProvidedMethodInfo, typeProviderId);
-      return RdTask<RdProvidedMethodInfo>.Successful(methodInfo);
     }
 
-    private RdTask<RdProvidedParameterInfo[]> GetStaticParametersForMethod(Lifetime lifetime, int entityId)
+    private RdProvidedParameterInfo[] GetStaticParametersForMethod(int entityId)
     {
       var (providedMethod, typeProviderId) = myProvidedMethodInfosCache.Get(entityId);
       var typeProvider = myTypeProvidersCache.Get(typeProviderId);
-      var parameters = providedMethod.GetStaticParametersForMethod(typeProvider)
-        .Select(t => myProvidedParameterInfoRdModelsCreator.CreateRdModel(t, typeProviderId))
-        .ToArray();
-      return RdTask<RdProvidedParameterInfo[]>.Successful(parameters);
+      return providedMethod
+        .GetStaticParametersForMethod(typeProvider)
+        .CreateRdModels(myProvidedParameterInfoRdModelsCreator, typeProviderId);
     }
 
-    private RdTask<int?> GetDeclaringType(Lifetime lifetime, int entityId)
+    private int? GetDeclaringType(int entityId)
     {
       var (providedMethod, typeProviderId) = myProvidedMethodInfosCache.Get(entityId);
-      var declaringType = myProvidedTypeRdModelsCreator.CreateRdModel(providedMethod.DeclaringType, typeProviderId)
-        ?.EntityId;
-      return RdTask<int?>.Successful(declaringType);
+      return myProvidedTypeRdModelsCreator.CreateRdModel(providedMethod.DeclaringType, typeProviderId)?.EntityId;
     }
 
-    private RdTask<int> GetReturnType(Lifetime lifetime, int entityId)
+    private int GetReturnType(int entityId)
     {
       var (providedMethod, typeProviderId) = myProvidedMethodInfosCache.Get(entityId);
-      var returnType = myProvidedTypeRdModelsCreator.CreateRdModel(providedMethod.ReturnType, typeProviderId)
-        .EntityId;
-      return RdTask<int>.Successful(returnType);
+      return myProvidedTypeRdModelsCreator.CreateRdModel(providedMethod.ReturnType, typeProviderId).EntityId;
     }
 
-    private RdTask<int[]> GetGenericArguments(Lifetime lifetime, int entityId)
+    private int[] GetGenericArguments(int entityId)
     {
       var (providedMethod, typeProviderId) = myProvidedMethodInfosCache.Get(entityId);
-      var genericArgs = providedMethod
+      return providedMethod
         .GetGenericArguments()
-        .Select(t => myProvidedTypeRdModelsCreator.CreateRdModel(t, typeProviderId).EntityId)
-        .ToArray();
-      return RdTask<int[]>.Successful(genericArgs);
+        .CreateRdModelsAndReturnIds(myProvidedTypeRdModelsCreator, typeProviderId);
     }
 
-    private RdTask<RdProvidedParameterInfo[]> GetParameters(Lifetime lifetime, int entityId)
+    private RdProvidedParameterInfo[] GetParameters(int entityId)
     {
       var (providedMethod, typeProviderId) = myProvidedMethodInfosCache.Get(entityId);
-      var parameters = providedMethod
+      return providedMethod
         .GetParameters()
-        .Select(t => myProvidedParameterInfoRdModelsCreator.CreateRdModel(t, typeProviderId))
-        .ToArray();
-      return RdTask<RdProvidedParameterInfo[]>.Successful(parameters);
+        .CreateRdModels(myProvidedParameterInfoRdModelsCreator, typeProviderId);
     }
   }
 }

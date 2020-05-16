@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using JetBrains.Lifetimes;
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelCreators;
@@ -43,15 +42,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
       model.GetExprType.Set(GetExprType);
     }
 
-    private RdTask<RdProvidedExprType> GetExprType(Lifetime lifetime, int entityId)
+    private RdProvidedExprType GetExprType(int entityId)
     {
       var (providedExpr, typeProviderId) = myProvidedExprsCache.Get(entityId);
       var exprType = providedExpr.GetExprType();
 
       if (FSharpOption<ProvidedExprType>.get_IsNone(exprType))
       {
-        return RdTask<RdProvidedExprType>.Successful(new RdProvidedExprType(false, null, null, null, null, null, null,
-          null, null, null, null, null, null, null, null, null, null, null, null, null, null));
+        return new RdProvidedExprType(false, null, null, null, null, null, null, null, null, null, null, null, null,
+          null, null, null, null, null, null, null, null);
       }
 
       var exprTypeValue = exprType.Value;
@@ -274,18 +273,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
         providedVarExpr = new ProvidedVarExpr(providedVar);
       }
 
-      return RdTask<RdProvidedExprType>.Successful(new RdProvidedExprType(true, providedNewArrayExpr,
+      return new RdProvidedExprType(true, providedNewArrayExpr,
         providedNewObjectExpr, providedWhileLoopExpr, providedNewDelegateExpr, providedForIntegerRangeLoopExpr,
         providedSequentialExpr, providedTryWithExpr, providedTryFinallyExpr, providedLambdaExpr, providedCallExpr,
         providedConstantExpr, providedDefaultExpr, providedNewTupleExpr, providedTupleGetExpr, providedTypeAsExpr,
-        providedTypeTestExpr, providedLetExpr, providedVarSetExpr, providedIfThenElseExpr, providedVarExpr));
+        providedTypeTestExpr, providedLetExpr, providedVarSetExpr, providedIfThenElseExpr, providedVarExpr);
     }
 
-    private RdTask<int> GetType(Lifetime lifetime, int entityId)
+    private int GetType(int entityId)
     {
       var (providedExpr, typeProviderId) = myProvidedExprsCache.Get(entityId);
-      var typeId = myProvidedTypeRdModelsCreator.CreateRdModel(providedExpr.Type, typeProviderId).EntityId;
-      return RdTask<int>.Successful(typeId);
+      return myProvidedTypeRdModelsCreator.CreateRdModel(providedExpr.Type, typeProviderId).EntityId;
     }
   }
 }
