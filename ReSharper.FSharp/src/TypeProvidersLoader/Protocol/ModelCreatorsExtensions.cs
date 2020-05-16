@@ -11,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
     public static TU[] CreateRdModels<T, TU>([NotNull] this IEnumerable<T> models,
       IProvidedRdModelsCreator<T, TU> rdModelsCreator, int typeProviderId) where TU : class
     {
-      var modelsArray = models.ToArray();
+      var modelsArray = models is T[] array ? array : models.ToArray();
       var rdModels = new TU[modelsArray.Length];
 
       var i = 0;
@@ -27,7 +27,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
     public static int[] CreateRdModelsAndReturnIds<T, TU>([NotNull] this IEnumerable<T> models,
       IProvidedRdModelsCreator<T, TU> rdModelsCreator, int typeProviderId) where TU : RdProvidedEntity
     {
-      var modelsArray = models.ToArray();
+      var modelsArray = models is T[] array ? array : models.ToArray();
       var rdModels = new int[modelsArray.Length];
 
       var i = 0;
