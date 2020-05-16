@@ -61,7 +61,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public MethodBase ApplyStaticArgumentsForMethod(MethodBase methodWithoutArguments, string methodNameWithArguments,
       object[] staticArguments) =>
       throw new Exception("ApplyStaticArgumentsForMethod should be unreachable");
-    
+
     public ProvidedExpr GetInvokerExpression(ProvidedMethodBase methodBase, ProvidedVar[] paramExprs)
     {
       var providedMethodBase = methodBase as IRdProvidedEntity;
@@ -76,14 +76,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       return ProxyProvidedExprWithCache.Create(RdTypeProviderProcessModel.GetInvokerExpression.Sync(
           new GetInvokerExpressionArgs(EntityId, methodBase is ProvidedConstructorInfo, providedMethodBaseId,
             providedVarParamExprIds)),
-        myProcessModel, ProvidedTypeContext.Empty, myCache); //TODO: non empty context
+        myProcessModel, methodBase.Context, myCache);
     }
 
-    public string GetDisplayName(bool fullName)
-    {
-      if (fullName) return myRdTypeProvider.FullName;
-      return myRdTypeProvider.Name;
-    }
+    public string GetDisplayName(bool fullName) => fullName ? myRdTypeProvider.FullName : myRdTypeProvider.Name;
 
     public void Dispose() => RdTypeProviderProcessModel.Dispose.Sync(EntityId);
 

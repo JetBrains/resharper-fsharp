@@ -16,6 +16,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     private readonly RdProvidedType myRdProvidedType;
     private readonly RdFSharpTypeProvidersLoaderModel myProcessModel;
     private readonly ITypeProviderCache myCache;
+    private ProvidedTypeContext myContext;
     public int EntityId => myRdProvidedType.EntityId;
     private RdProvidedTypeProcessModel RdProvidedTypeProcessModel => myProcessModel.RdProvidedTypeProcessModel;
 
@@ -25,6 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     {
       myRdProvidedType = rdProvidedType;
       myProcessModel = processModel;
+      myContext = context;
       myCache = cache;
 
       myInterfaces = new Lazy<ProvidedType[]>(() =>
@@ -232,7 +234,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override ProvidedConstructorInfo[] GetConstructors() => myConstructors.Value;
 
     public override ProvidedType ApplyContext(ProvidedTypeContext context)
-      => Create(myRdProvidedType, myProcessModel, context, myCache);
+    {
+      var (lookupIlTypeRef, lookupTyconRef) = myContext.GetDictionaries();
+      var (newLookupIlTypeRef, newLookupTyconRef) = context.GetDictionaries();
+
+      foreach (var ilTypeRef in lookupIlTypeRef.Where(ilTypeRef => !newLookupIlTypeRef.ContainsKey(ilTypeRef.Key)))
+      {
+        newLookupIlTypeRef.Add(ilTypeRef.Key, ilTypeRef.Value);
+      }
+
+      foreach (var tyconRef in lookupTyconRef.Where(tyconRef => !newLookupTyconRef.ContainsKey(tyconRef.Key)))
+      {
+        newLookupTyconRef.Add(tyconRef.Key, tyconRef.Value);
+      }
+
+      myContext = context;
+      return this;
+    }
 
     public override ProvidedAssembly Assembly => myProvidedAssembly.Value;
 
@@ -249,6 +267,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
       return providedVar;
     }
+
+    public override ProvidedTypeContext Context => myContext;
 
     private int? myArrayRank;
     private int? myMakeArrayTypeId;

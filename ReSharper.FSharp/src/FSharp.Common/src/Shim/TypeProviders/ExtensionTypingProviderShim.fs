@@ -43,7 +43,7 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
                      resolutionEnvironment: ResolutionEnvironment, 
                      isInvalidationSupported: bool, 
                      isInteractive: bool, 
-                     systemRuntimeContainsType: string -> bool, //TODO: не забыть
+                     systemRuntimeContainsType: string -> bool, //TODO: now it always returns true
                      systemRuntimeAssemblyVersion: System.Version,
                      compilerToolsPath: string list,
                      m: range) =
@@ -55,13 +55,8 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
             let typeProviders = 
                 if typeProvidersCache.ContainsKey(designTimeAssemblyNameString) then
                     typeProvidersCache.[designTimeAssemblyNameString]
-                else 
-            
+                else         
                 let fakeTcImports = getFakeTcImports(systemRuntimeContainsType)
-            
-            //TODO: need to secure lifetime 
-                //rdSystemRuntimeContainsType.SystemRuntimeContainsTypeRef.Value.ConSystemRuntimeContainsType.Set(fun a b -> RdTask.Successful(systemRuntimeContainsType b))
-            
                 try
                     let rdTypeProviders =
                         ourModel.InstantiateTypeProvidersOfAssembly.Sync(InstantiateTypeProvidersOfAssemblyParameters(
