@@ -4,6 +4,7 @@ using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
+using JetBrains.Util.Concurrency;
 using Microsoft.FSharp.Core;
 using Microsoft.FSharp.Quotations;
 using static FSharp.Compiler.ExtensionTyping;
@@ -27,7 +28,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       myContext = context;
       myCache = cache;
 
-      myExprType = new Lazy<FSharpOption<ProvidedExprType>>(GetExprTypeInternal);
+      myExprType = new InterruptibleLazy<FSharpOption<ProvidedExprType>>(GetExprTypeInternal);
     }
 
     [ContractAnnotation("expr:null => null")]
@@ -247,6 +248,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     }
 
     private int? myTypeId;
-    private readonly Lazy<FSharpOption<ProvidedExprType>> myExprType;
+    private readonly InterruptibleLazy<FSharpOption<ProvidedExprType>> myExprType;
   }
 }

@@ -5,6 +5,7 @@ using JetBrains.Diagnostics;
 using JetBrains.Lifetimes;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
+using JetBrains.Util.Concurrency;
 using Microsoft.FSharp.Core.CompilerServices;
 using Microsoft.FSharp.Quotations;
 using static FSharp.Compiler.ExtensionTyping;
@@ -86,7 +87,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     private void InitCaches()
     {
       // ReSharper disable once CoVariantArrayConversion
-      myProvidedNamespaces = new Lazy<IProvidedNamespace[]>(() => RdTypeProviderProcessModel.GetNamespaces
+      myProvidedNamespaces = new InterruptibleLazy<IProvidedNamespace[]>(() => RdTypeProviderProcessModel.GetNamespaces
         .Sync(EntityId)
         .Select(t => new ProxyProvidedNamespaceWithCache(t, myProcessModel, myCache))
         .ToArray());
@@ -97,6 +98,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public event EventHandler Invalidate;
 
     private readonly TypeProviderCache myCache;
-    private Lazy<IProvidedNamespace[]> myProvidedNamespaces;
+    private InterruptibleLazy<IProvidedNamespace[]> myProvidedNamespaces;
   }
 }

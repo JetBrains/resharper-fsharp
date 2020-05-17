@@ -1,9 +1,9 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
+using JetBrains.Util.Concurrency;
 using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
@@ -28,7 +28,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       myCache = cache;
       myContext = context;
 
-      myRawConstantValue = new Lazy<object>(() =>
+      myRawConstantValue = new InterruptibleLazy<object>(() =>
         RdProvidedFieldInfoProcessModel.GetRawConstantValue.Sync(EntityId).Unbox());
     }
 
@@ -60,6 +60,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
     private int? myDeclaringTypeId;
     private int? myFieldTypeId;
-    private readonly Lazy<object> myRawConstantValue;
+    private readonly InterruptibleLazy<object> myRawConstantValue;
   }
 }

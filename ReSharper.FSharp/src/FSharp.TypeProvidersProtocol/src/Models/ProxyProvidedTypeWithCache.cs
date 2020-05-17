@@ -6,6 +6,7 @@ using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
+using JetBrains.Util.Concurrency;
 using Microsoft.FSharp.Core.CompilerServices;
 using static FSharp.Compiler.ExtensionTyping;
 
@@ -29,70 +30,70 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       myContext = context;
       myCache = cache;
 
-      myInterfaces = new Lazy<ProvidedType[]>(() =>
+      myInterfaces = new InterruptibleLazy<ProvidedType[]>(() =>
         RdProvidedTypeProcessModel.GetInterfaces
           .Sync(EntityId)
           .Select(t => myCache.GetOrCreateWithContext(t, Context))
           .ToArray());
 
-      myGenericArguments = new Lazy<ProvidedType[]>(() =>
+      myGenericArguments = new InterruptibleLazy<ProvidedType[]>(() =>
         RdProvidedTypeProcessModel.GetGenericArguments
           .Sync(EntityId)
           .Select(t => myCache.GetOrCreateWithContext(t, Context))
           .ToArray());
 
-      myMethods = new Lazy<ProvidedMethodInfo[]>(() =>
+      myMethods = new InterruptibleLazy<ProvidedMethodInfo[]>(() =>
         // ReSharper disable once CoVariantArrayConversion
         RdProvidedTypeProcessModel.GetMethods
           .Sync(EntityId)
           .Select(t => ProxyProvidedMethodInfoWithCache.Create(t, myProcessModel, Context, myCache))
           .ToArray());
 
-      myAllNestedTypes = new Lazy<ProvidedType[]>(() =>
+      myAllNestedTypes = new InterruptibleLazy<ProvidedType[]>(() =>
         RdProvidedTypeProcessModel.GetNestedTypes
           .Sync(EntityId)
           .Select(t => myCache.GetOrCreateWithContext(t, Context))
           .ToArray());
 
-      myProperties = new Lazy<ProvidedPropertyInfo[]>(() =>
+      myProperties = new InterruptibleLazy<ProvidedPropertyInfo[]>(() =>
         // ReSharper disable once CoVariantArrayConversion
         RdProvidedTypeProcessModel.GetProperties
           .Sync(EntityId)
           .Select(t => ProxyProvidedPropertyInfoWithCache.Create(t, myProcessModel, Context, myCache))
           .ToArray());
 
-      myProvidedAssembly = new Lazy<ProvidedAssembly>(() => ProxyProvidedAssembly.CreateWithContext(
+      myProvidedAssembly = new InterruptibleLazy<ProvidedAssembly>(() => ProxyProvidedAssembly.CreateWithContext(
         RdProvidedTypeProcessModel.Assembly.Sync(EntityId), myProcessModel, Context));
 
-      myStaticParameters = new Lazy<ProvidedParameterInfo[]>(() =>
+      myStaticParameters = new InterruptibleLazy<ProvidedParameterInfo[]>(() =>
         // ReSharper disable once CoVariantArrayConversion
         RdProvidedTypeProcessModel.GetStaticParameters
           .Sync(EntityId)
           .Select(t => ProxyProvidedParameterInfoWithCache.Create(t, myProcessModel, Context, myCache))
           .ToArray());
 
-      myFields = new Lazy<ProvidedFieldInfo[]>(() =>
+      myFields = new InterruptibleLazy<ProvidedFieldInfo[]>(() =>
         // ReSharper disable once CoVariantArrayConversion
         RdProvidedTypeProcessModel.GetFields
           .Sync(EntityId)
           .Select(t => ProxyProvidedFieldInfoWithCache.Create(t, myProcessModel, Context, myCache))
           .ToArray());
 
-      myEvents = new Lazy<ProvidedEventInfo[]>(() =>
+      myEvents = new InterruptibleLazy<ProvidedEventInfo[]>(() =>
         // ReSharper disable once CoVariantArrayConversion
         RdProvidedTypeProcessModel.GetEvents
           .Sync(EntityId)
           .Select(t => ProxyProvidedEventInfoWithCache.Create(t, myProcessModel, Context, myCache))
           .ToArray());
 
-      myConstructors = new Lazy<ProvidedConstructorInfo[]>(() =>
+      myConstructors = new InterruptibleLazy<ProvidedConstructorInfo[]>(() =>
         // ReSharper disable once CoVariantArrayConversion
         RdProvidedTypeProcessModel.GetConstructors
           .Sync(EntityId)
           .Select(t => ProxyProvidedConstructorInfoWithCache.Create(t, myProcessModel, Context, myCache))
           .ToArray());
 
-      myDeclaringTypeId = new Lazy<int?>(() => RdProvidedTypeProcessModel.DeclaringType.Sync(EntityId));
+      myDeclaringTypeId = new InterruptibleLazy<int?>(() => RdProvidedTypeProcessModel.DeclaringType.Sync(EntityId));
 
       myTypeAsVarsCache = new Dictionary<string, ProvidedVar>();
       myGeneratedTypesCache = new Dictionary<string, ProvidedType>();
@@ -282,17 +283,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     private int? myGenericTypeDefinitionId;
     private int? myElementTypeId;
     private int? myEnumUnderlyingTypeId;
-    private readonly Lazy<int?> myDeclaringTypeId;
-    private readonly Lazy<ProvidedType[]> myInterfaces;
-    private readonly Lazy<ProvidedMethodInfo[]> myMethods;
-    private readonly Lazy<ProvidedType[]> myAllNestedTypes;
-    private readonly Lazy<ProvidedType[]> myGenericArguments;
-    private readonly Lazy<ProvidedPropertyInfo[]> myProperties;
-    private readonly Lazy<ProvidedAssembly> myProvidedAssembly;
-    private readonly Lazy<ProvidedParameterInfo[]> myStaticParameters;
-    private readonly Lazy<ProvidedFieldInfo[]> myFields;
-    private readonly Lazy<ProvidedEventInfo[]> myEvents;
-    private readonly Lazy<ProvidedConstructorInfo[]> myConstructors;
+    private readonly InterruptibleLazy<int?> myDeclaringTypeId;
+    private readonly InterruptibleLazy<ProvidedType[]> myInterfaces;
+    private readonly InterruptibleLazy<ProvidedMethodInfo[]> myMethods;
+    private readonly InterruptibleLazy<ProvidedType[]> myAllNestedTypes;
+    private readonly InterruptibleLazy<ProvidedType[]> myGenericArguments;
+    private readonly InterruptibleLazy<ProvidedPropertyInfo[]> myProperties;
+    private readonly InterruptibleLazy<ProvidedAssembly> myProvidedAssembly;
+    private readonly InterruptibleLazy<ProvidedParameterInfo[]> myStaticParameters;
+    private readonly InterruptibleLazy<ProvidedFieldInfo[]> myFields;
+    private readonly InterruptibleLazy<ProvidedEventInfo[]> myEvents;
+    private readonly InterruptibleLazy<ProvidedConstructorInfo[]> myConstructors;
     private readonly Dictionary<string, ProvidedVar> myTypeAsVarsCache;
     private readonly Dictionary<string, ProvidedType> myGeneratedTypesCache;
   }

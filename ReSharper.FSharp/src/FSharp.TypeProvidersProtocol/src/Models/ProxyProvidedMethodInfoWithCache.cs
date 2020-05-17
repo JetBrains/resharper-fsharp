@@ -1,9 +1,9 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
+using JetBrains.Util.Concurrency;
 using Microsoft.FSharp.Core.CompilerServices;
 using static FSharp.Compiler.ExtensionTyping;
 
@@ -31,19 +31,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       myContext = context;
       myCache = cache;
 
-      myParameters = new Lazy<ProvidedParameterInfo[]>(() => // ReSharper disable once CoVariantArrayConversion
+      myParameters = new InterruptibleLazy<ProvidedParameterInfo[]>(() => // ReSharper disable once CoVariantArrayConversion
         RdProvidedMethodInfoProcessModel.GetParameters
           .Sync(EntityId)
           .Select(t => ProxyProvidedParameterInfoWithCache.Create(t, myProcessModel, myContext, myCache))
           .ToArray());
 
-      myStaticParameters = new Lazy<ProvidedParameterInfo[]>(() => // ReSharper disable once CoVariantArrayConversion
+      myStaticParameters = new InterruptibleLazy<ProvidedParameterInfo[]>(() => // ReSharper disable once CoVariantArrayConversion
         RdProvidedMethodInfoProcessModel.GetStaticParametersForMethod
           .Sync(EntityId)
           .Select(t => ProxyProvidedParameterInfoWithCache.Create(t, myProcessModel, myContext, myCache))
           .ToArray());
 
-      myGenericArguments = new Lazy<ProvidedType[]>(() =>
+      myGenericArguments = new InterruptibleLazy<ProvidedType[]>(() =>
         RdProvidedMethodInfoProcessModel.GetGenericArguments
           .Sync(EntityId)
           .Select(t => myCache.GetOrCreateWithContext(t, myContext))
@@ -96,8 +96,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
     private int? myDeclaringTypeId;
     private int? myReturnTypeId;
-    private readonly Lazy<ProvidedParameterInfo[]> myParameters;
-    private readonly Lazy<ProvidedParameterInfo[]> myStaticParameters;
-    private readonly Lazy<ProvidedType[]> myGenericArguments;
+    private readonly InterruptibleLazy<ProvidedParameterInfo[]> myParameters;
+    private readonly InterruptibleLazy<ProvidedParameterInfo[]> myStaticParameters;
+    private readonly InterruptibleLazy<ProvidedType[]> myGenericArguments;
   }
 }

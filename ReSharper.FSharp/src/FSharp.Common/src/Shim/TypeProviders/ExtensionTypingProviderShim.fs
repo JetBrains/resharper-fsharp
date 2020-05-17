@@ -27,14 +27,12 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
        lifetime.OnTermination(fun () ->
            (this :> IDisposable).Dispose()
            ExtensionTypingProvider <- defaultExtensionTypingProvider) |> ignore
-       ()
        
     let onInitialized l model =
         ourModel <- model
-        ()
         
     let onFailed() = ()
-    let typeProvidersCache: IDictionary<string, ITypeProvider list> = Dictionary<string, ITypeProvider list>() :> _
+    let typeProvidersCache: IDictionary<_, _> = Dictionary<_, _>() :> _
     
     interface IExtensionTypingProvider with
         member this.InstantiateTypeProvidersOfAssembly

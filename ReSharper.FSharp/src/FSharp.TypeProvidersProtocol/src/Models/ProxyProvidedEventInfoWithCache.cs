@@ -1,9 +1,8 @@
-﻿using System;
-using System.Linq;
-using System.Threading;
+﻿using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
+using JetBrains.Util.Concurrency;
 using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
@@ -28,11 +27,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       myContext = context;
       myCache = cache;
 
-      myAddMethod = new Lazy<ProvidedMethodInfo>(() =>
+      myAddMethod = new InterruptibleLazy<ProvidedMethodInfo>(() =>
         ProxyProvidedMethodInfoWithCache.Create(RdProvidedEventInfoProcessModel.GetAddMethod.Sync(EntityId),
           myProcessModel, context, cache));
 
-      myRemoveMethod = new Lazy<ProvidedMethodInfo>(() =>
+      myRemoveMethod = new InterruptibleLazy<ProvidedMethodInfo>(() =>
         ProxyProvidedMethodInfoWithCache.Create(RdProvidedEventInfoProcessModel.GetRemoveMethod.Sync(EntityId),
           myProcessModel, context, cache));
     }
@@ -56,7 +55,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
     private int? myDeclaringTypeId;
     private int? myEventHandlerTypeId;
-    private readonly Lazy<ProvidedMethodInfo> myAddMethod;
-    private readonly Lazy<ProvidedMethodInfo> myRemoveMethod;
+    private readonly InterruptibleLazy<ProvidedMethodInfo> myAddMethod;
+    private readonly InterruptibleLazy<ProvidedMethodInfo> myRemoveMethod;
   }
 }

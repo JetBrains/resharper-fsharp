@@ -1,8 +1,8 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
+using JetBrains.Util.Concurrency;
 using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
@@ -27,15 +27,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       myContext = context;
       myCache = cache;
 
-      myGetMethod = new Lazy<ProvidedMethodInfo>(() =>
+      myGetMethod = new InterruptibleLazy<ProvidedMethodInfo>(() =>
         ProxyProvidedMethodInfoWithCache.Create(RdProvidedPropertyInfoProcessModel.GetGetMethod.Sync(EntityId),
           myProcessModel, myContext, myCache));
 
-      mySetMethod = new Lazy<ProvidedMethodInfo>(() =>
+      mySetMethod = new InterruptibleLazy<ProvidedMethodInfo>(() =>
         ProxyProvidedMethodInfoWithCache.Create(RdProvidedPropertyInfoProcessModel.GetSetMethod.Sync(EntityId),
           myProcessModel, myContext, myCache));
 
-      myIndexParameters = new Lazy<ProvidedParameterInfo[]>(() => // ReSharper disable once CoVariantArrayConversion
+      myIndexParameters = new InterruptibleLazy<ProvidedParameterInfo[]>(() => // ReSharper disable once CoVariantArrayConversion
         RdProvidedPropertyInfoProcessModel.GetIndexParameters
           .Sync(EntityId)
           .Select(t => ProxyProvidedParameterInfoWithCache.Create(t, myProcessModel, myContext, myCache))
@@ -69,8 +69,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
     private int? myDeclaringTypeId;
     private int? myPropertyTypeId;
-    private readonly Lazy<ProvidedMethodInfo> myGetMethod;
-    private readonly Lazy<ProvidedMethodInfo> mySetMethod;
-    private readonly Lazy<ProvidedParameterInfo[]> myIndexParameters;
+    private readonly InterruptibleLazy<ProvidedMethodInfo> myGetMethod;
+    private readonly InterruptibleLazy<ProvidedMethodInfo> mySetMethod;
+    private readonly InterruptibleLazy<ProvidedParameterInfo[]> myIndexParameters;
   }
 }

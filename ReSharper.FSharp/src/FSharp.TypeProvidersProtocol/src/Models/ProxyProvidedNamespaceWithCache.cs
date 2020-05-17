@@ -2,6 +2,7 @@
 using System.Linq;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
+using JetBrains.Util.Concurrency;
 using Microsoft.FSharp.Core.CompilerServices;
 using static FSharp.Compiler.ExtensionTyping;
 
@@ -25,12 +26,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       myProcessModel = processModel;
 
       // ReSharper disable once CoVariantArrayConversion
-      myNestedNamespaces = new Lazy<IProvidedNamespace[]>(() => RdProvidedNamespaceProcessModel.GetNestedNamespaces
+      myNestedNamespaces = new InterruptibleLazy<IProvidedNamespace[]>(() => RdProvidedNamespaceProcessModel.GetNestedNamespaces
         .Sync(EntityId)
         .Select(t => new ProxyProvidedNamespaceWithCache(t, myProcessModel, cache))
         .ToArray());
 
-      myProvidedTypes = new Lazy<ProvidedType[]>(() => RdProvidedNamespaceProcessModel.GetTypes
+      myProvidedTypes = new InterruptibleLazy<ProvidedType[]>(() => RdProvidedNamespaceProcessModel.GetTypes
         .Sync(EntityId)
         .Select(t => cache.GetOrCreateWithContext(t, ProvidedTypeContext.Empty))
         .ToArray());
@@ -51,7 +52,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public ProvidedType ResolveProvidedTypeName(string typeName) =>
       myProvidedTypes.Value.FirstOrDefault(t => t.Name == typeName);
 
-    private readonly Lazy<IProvidedNamespace[]> myNestedNamespaces;
-    private readonly Lazy<ProvidedType[]> myProvidedTypes;
+    private readonly InterruptibleLazy<IProvidedNamespace[]> myNestedNamespaces;
+    private readonly InterruptibleLazy<ProvidedType[]> myProvidedTypes;
   }
 }

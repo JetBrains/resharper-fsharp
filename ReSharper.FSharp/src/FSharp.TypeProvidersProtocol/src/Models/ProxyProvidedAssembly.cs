@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Server;
+using JetBrains.Util.Concurrency;
 using Microsoft.FSharp.Core.CompilerServices;
 using static FSharp.Compiler.ExtensionTyping;
 
@@ -23,8 +24,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       myAssembly = assembly;
       myProcessModel = processModel;
 
-      myAssemblyName = new Lazy<AssemblyName>(() => ConvertFrom(RdProvidedAssemblyProcessModel.GetName.Sync(EntityId)));
-      manifestModuleContent = new Lazy<byte[]>(() => RdProvidedAssemblyProcessModel.GetManifestModuleContents.Sync(EntityId));
+      myAssemblyName = new InterruptibleLazy<AssemblyName>(() => ConvertFrom(RdProvidedAssemblyProcessModel.GetName.Sync(EntityId)));
+      manifestModuleContent = new InterruptibleLazy<byte[]>(() => RdProvidedAssemblyProcessModel.GetManifestModuleContents.Sync(EntityId));
     }
 
     public static ProxyProvidedAssembly CreateWithContext(RdProvidedAssembly assembly,
@@ -53,7 +54,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       return assemblyName;
     }
 
-    private readonly Lazy<AssemblyName> myAssemblyName;
-    private readonly Lazy<byte[]> manifestModuleContent;
+    private readonly InterruptibleLazy<AssemblyName> myAssemblyName;
+    private readonly InterruptibleLazy<byte[]> manifestModuleContent;
   }
 }
