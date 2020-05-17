@@ -74,7 +74,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
     }
 
     private val RdStaticArg = structdef {
-        field("TypeName", string)
+        field("TypeName", RdTypeName)
         field("Value", string)
     }
 
@@ -404,6 +404,23 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         +"IsAbstract"
         +"IsHideBySig"
         +"IsConstructor"
+    }
+
+    private val RdTypeName = enum {
+        +"sbyte"
+        +"short"
+        +"int"
+        +"long"
+        +"byte"
+        +"ushort"
+        +"uint"
+        +"ulong"
+        +"decimal"
+        +"float"
+        +"double"
+        +"char"
+        +"bool"
+        +"string"
     }
 
     init {
