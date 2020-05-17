@@ -60,17 +60,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
         : new ProxyProvidedConstructorInfoWithCache(constructorInfo, processModel, context, cache);
 
     public override string Name => myConstructorInfo.Name;
-    public override bool IsAbstract => myConstructorInfo.IsAbstract;
-    public override bool IsConstructor => myConstructorInfo.IsConstructor;
-    public override bool IsFamily => myConstructorInfo.IsFamily;
-    public override bool IsFinal => myConstructorInfo.IsFinal;
-    public override bool IsPublic => myConstructorInfo.IsPublic;
-    public override bool IsStatic => myConstructorInfo.IsStatic;
-    public override bool IsVirtual => myConstructorInfo.IsVirtual;
-    public override bool IsGenericMethod => myConstructorInfo.IsGenericMethod;
-    public override bool IsFamilyAndAssembly => myConstructorInfo.IsFamilyAndAssembly;
-    public override bool IsFamilyOrAssembly => myConstructorInfo.IsFamilyOrAssembly;
-    public override bool IsHideBySig => myConstructorInfo.IsHideBySig;
+    public override bool IsAbstract => HasFlag(RdProvidedMethodFlags.IsAbstract);
+    public override bool IsConstructor => HasFlag(RdProvidedMethodFlags.IsConstructor);
+    public override bool IsFamily => HasFlag(RdProvidedMethodFlags.IsFamily);
+    public override bool IsFinal => HasFlag(RdProvidedMethodFlags.IsFinal);
+    public override bool IsPublic => HasFlag(RdProvidedMethodFlags.IsPublic);
+    public override bool IsStatic => HasFlag(RdProvidedMethodFlags.IsStatic);
+    public override bool IsVirtual => HasFlag(RdProvidedMethodFlags.IsVirtual);
+    public override bool IsGenericMethod => HasFlag(RdProvidedMethodFlags.IsGenericMethod);
+    public override bool IsFamilyAndAssembly => HasFlag(RdProvidedMethodFlags.IsFamilyAndAssembly);
+    public override bool IsFamilyOrAssembly => HasFlag(RdProvidedMethodFlags.IsFamilyOrAssembly);
+    public override bool IsHideBySig => HasFlag(RdProvidedMethodFlags.IsHideBySig);
 
     public override ProvidedParameterInfo[] GetStaticParametersForMethod(ITypeProvider provider) =>
       myStaticParameters.Value;
@@ -89,6 +89,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
     public override ProvidedParameterInfo[] GetParameters() => myParameters.Value;
     public override ProvidedType[] GetGenericArguments() => myGenericArguments.Value;
+
+    private bool HasFlag(RdProvidedMethodFlags flag) => (myConstructorInfo.Flags & flag) == flag;
 
     private int? myDeclaringTypeId;
     private readonly Lazy<ProvidedParameterInfo[]> myParameters;

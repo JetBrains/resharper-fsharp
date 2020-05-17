@@ -57,18 +57,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       methodInfo == null ? null : new ProxyProvidedMethodInfoWithCache(methodInfo, processModel, context, cache);
 
     public override string Name => myMethodInfo.Name;
-    public override bool IsAbstract => myMethodInfo.IsAbstract;
-    public override bool IsConstructor => myMethodInfo.IsConstructor;
-    public override bool IsFamily => myMethodInfo.IsFamily;
-    public override bool IsFinal => myMethodInfo.IsFinal;
-    public override bool IsPublic => myMethodInfo.IsPublic;
-    public override bool IsStatic => myMethodInfo.IsStatic;
-    public override bool IsVirtual => myMethodInfo.IsVirtual;
+    public override bool IsAbstract => HasFlag(RdProvidedMethodFlags.IsAbstract);
+    public override bool IsConstructor => HasFlag(RdProvidedMethodFlags.IsConstructor);
+    public override bool IsFamily => HasFlag(RdProvidedMethodFlags.IsFamily);
+    public override bool IsFinal => HasFlag(RdProvidedMethodFlags.IsFinal);
+    public override bool IsPublic => HasFlag(RdProvidedMethodFlags.IsPublic);
+    public override bool IsStatic => HasFlag(RdProvidedMethodFlags.IsStatic);
+    public override bool IsVirtual => HasFlag(RdProvidedMethodFlags.IsVirtual);
+    public override bool IsGenericMethod => HasFlag(RdProvidedMethodFlags.IsGenericMethod);
+    public override bool IsFamilyAndAssembly => HasFlag(RdProvidedMethodFlags.IsFamilyAndAssembly);
+    public override bool IsFamilyOrAssembly => HasFlag(RdProvidedMethodFlags.IsFamilyOrAssembly);
+    public override bool IsHideBySig => HasFlag(RdProvidedMethodFlags.IsHideBySig);
     public override int MetadataToken => myMethodInfo.MetadataToken;
-    public override bool IsGenericMethod => myMethodInfo.IsGenericMethod;
-    public override bool IsFamilyAndAssembly => myMethodInfo.IsFamilyAndAssembly;
-    public override bool IsFamilyOrAssembly => myMethodInfo.IsFamilyOrAssembly;
-    public override bool IsHideBySig => myMethodInfo.IsHideBySig;
 
     public override ProvidedType DeclaringType =>
       myCache.GetOrCreateWithContext(
@@ -91,6 +91,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
     public override ProvidedParameterInfo[] GetParameters() => myParameters.Value;
     public override ProvidedType[] GetGenericArguments() => myGenericArguments.Value;
+
+    private bool HasFlag(RdProvidedMethodFlags flag) => (myMethodInfo.Flags & flag) == flag;
 
     private int? myDeclaringTypeId;
     private int? myReturnTypeId;

@@ -35,17 +35,7 @@ object RdFSharpTypeProvidersLoaderModel : Root(
     }
 
     private val RdProvidedMethodBase = baseclass extends RdProvidedMemberInfo {
-        field("IsGenericMethod", bool)
-        field("IsStatic", bool)
-        field("IsFamily", bool)
-        field("IsFamilyAndAssembly", bool)
-        field("IsFamilyOrAssembly", bool)
-        field("IsVirtual", bool)
-        field("IsFinal", bool)
-        field("IsPublic", bool)
-        field("IsAbstract", bool)
-        field("IsHideBySig", bool)
-        field("IsConstructor", bool)
+        field("Flags", RdProvidedMethodFlags)
     }
 
     private val RdResolutionEnvironment = structdef {
@@ -399,6 +389,21 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         +"IsErased"
         +"IsGenericType"
         +"IsMeasure"
+    }
+
+    private val RdProvidedMethodFlags = flags {
+        +"None"
+        +"IsGenericMethod"
+        +"IsStatic"
+        +"IsFamily"
+        +"IsFamilyAndAssembly"
+        +"IsFamilyOrAssembly"
+        +"IsVirtual"
+        +"IsFinal"
+        +"IsPublic"
+        +"IsAbstract"
+        +"IsHideBySig"
+        +"IsConstructor"
     }
 
     init {
