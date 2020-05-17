@@ -7,11 +7,11 @@ DirectoryInfo(||(4)"").Delete(||(5)true)
 DirectoryInfo(||(6)"").Delete (||(7)true)
 
 ---------------------------------------------------------
-(0): ReSharper Parameter Name Hint: path, 
-(1): ReSharper Parameter Name Hint: path, 
-(2): ReSharper Parameter Name Hint: path, 
-(3): ReSharper Parameter Name Hint: recursive, 
-(4): ReSharper Parameter Name Hint: path, 
-(5): ReSharper Parameter Name Hint: recursive, 
-(6): ReSharper Parameter Name Hint: path, 
-(7): ReSharper Parameter Name Hint: recursive, 
+(0): ReSharper Parameter Name Hint: path, System.IO.DirectoryInfo.DirectoryInfo
+(1): ReSharper Parameter Name Hint: path, System.IO.DirectoryInfo.DirectoryInfo
+(2): ReSharper Parameter Name Hint: path, System.IO.DirectoryInfo.DirectoryInfo
+(3): ReSharper Parameter Name Hint: recursive, System.IO.DirectoryInfo.Delete
+(4): ReSharper Parameter Name Hint: path, System.IO.DirectoryInfo.DirectoryInfo
+(5): ReSharper Parameter Name Hint: recursive, System.IO.DirectoryInfo.Delete
+(6): ReSharper Parameter Name Hint: path, System.IO.DirectoryInfo.DirectoryInfo
+(7): ReSharper Parameter Name Hint: recursive, System.IO.DirectoryInfo.Delete
