@@ -11,7 +11,7 @@ IFSharpImplFile
             FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
             NewLine(type:NEW_LINE, text:\n) spaces:"\n"
             Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
-            ILetOrUseBangExpr
+            ILetOrUseExpr
               FSharpTokenType+LetBangTokenElement(type:LET_BANG, text:let!)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               ILocalBinding

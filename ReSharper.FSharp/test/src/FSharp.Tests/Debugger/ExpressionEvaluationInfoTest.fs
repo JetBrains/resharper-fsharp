@@ -16,7 +16,7 @@ type ExpressionEvaluationInfoTest() =
 
     override x.DoTest(lifetime, project) =
         let textControl = x.OpenTextControl(lifetime)
-        let expr = TextControlToPsi.GetElementFromCaretPosition<ISynExpr>(x.Solution, textControl)
+        let expr = TextControlToPsi.GetElementFromCaretPosition<IFSharpExpression>(x.Solution, textControl)
         let textToEvaluate = FSharpExpressionEvaluationInfoProvider.GetTextToEvaluate(expr)
         x.ExecuteWithGold(fun writer ->
             writer.WriteLine(textToEvaluate)) |> ignore

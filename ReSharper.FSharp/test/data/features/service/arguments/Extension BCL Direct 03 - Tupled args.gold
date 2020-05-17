@@ -1,0 +1,11 @@
+﻿module Mod
+
+open System.Linq
+
+let x = Seq.empty<string * int>
+Enumerable.ToDictionary(|x|(arg #0), |(fun (x, y) -> x)|(arg #1), |(fun (x, y) -> y)|(arg #2))
+
+---------------------------------------------------------
+(arg #0) => source
+(arg #1) => keySelector
+(arg #2) => elementSelector

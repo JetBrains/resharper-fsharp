@@ -93,4 +93,4 @@ type FSharpParser(lexer: ILexer, document: IDocument, path: FileSystemPath, sour
                     FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lineShift)
 
                 treeBuilder.ProcessTopLevelExpression(chameleonExpr.SynExpr)
-                treeBuilder.GetTreeNode()) :?> ISynExpr
+                treeBuilder.GetTreeNode()) :?> IFSharpExpression

@@ -90,7 +90,7 @@
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="UnitTypeExpected">
-    <Parameter type="ISynExpr" name="expr"/>
+    <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
       <Argument>fcsMessage</Argument>
@@ -104,7 +104,7 @@
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="FunctionValueUnexpected">
-    <Parameter type="ISynExpr" name="expr"/>
+    <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
       <Argument>fcsMessage</Argument>
@@ -117,7 +117,7 @@
   </Warning>
   
   <Error staticGroup="FSharpErrors" name="UnitTypeExpected">
-    <Parameter type="ISynExpr" name="expr"/>
+    <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="string" name="fcsMessage"/>
     <Message value="{0}">
       <Argument>fcsMessage</Argument>
@@ -125,6 +125,7 @@
     <Range>expr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>AddIgnoreFix</QuickFix>
+    <QuickFix>IntroduceVarFix</QuickFix>
   </Error>
 
   <Warning staticGroup="FSharpErrors" name="TypeTestUnnecessary">
@@ -259,7 +260,7 @@
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="ConvertToUseBinding">
-    <Parameter type="ILetLikeExpr" name="letExpr"/>
+    <Parameter type="ILetOrUseExpr" name="letExpr"/>
     <Range>letExpr.LetOrUseToken.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <Message value="Convert to 'use' binding"/>
@@ -267,7 +268,7 @@
   </Warning>
   
   <Error staticGroup="FSharpErrors" name="ExpectedExpressionAfterLet">
-    <Parameter type="ILetLikeExpr" name="letExpr"/>
+    <Parameter type="ILetOrUseExpr" name="letExpr"/>
     <Range>letExpr.LetOrUseToken.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <Message value="'{0}' is missing expression">
@@ -277,7 +278,7 @@
   </Error>
 
   <Error staticGroup="FSharpErrors" name="NotAFunction">
-    <Parameter type="ISynExpr" name="expr"/>
+    <Parameter type="IFSharpExpression" name="expr"/>
     <Parameter type="IPrefixAppExpr" name="prefixApp"/>
     <Message value="{0}">
       <Argument>if prefixApp.FunctionExpression == expr then "Unexpected argument" else "Unexpected arguments"</Argument>
@@ -331,4 +332,20 @@
     <QuickFix>ToAbstractFix</QuickFix>
   </Error>
 
+  <Error staticGroup="FSharpErrors" name="ReturnRequiresComputationExpression">
+    <Parameter type="IYieldOrReturnExpr" name="yieldExpr"/>
+    <Message value="`return` may only be used within computation expressions"/>
+    <Range>yieldExpr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>RemoveYieldFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="YieldRequiresSeqExpression">
+    <Parameter type="IYieldOrReturnExpr" name="yieldExpr"/>
+    <Message value="`yield` may only be used within list, array, and sequence expressions"/>
+    <Range>yieldExpr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>RemoveYieldFix</QuickFix>
+  </Error>
+  
 </Errors>

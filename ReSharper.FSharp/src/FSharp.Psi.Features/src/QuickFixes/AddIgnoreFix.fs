@@ -12,12 +12,12 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.UI.RichText
 
-type AddIgnoreFix(expr: ISynExpr) =
+type AddIgnoreFix(expr: IFSharpExpression) =
     inherit FSharpQuickFixBase()
 
     let mutable expr = expr
 
-    let shouldAddNewLine (expr: ISynExpr) =
+    let shouldAddNewLine (expr: IFSharpExpression) =
         if expr.IsSingleLine then false else
         if deindentsBody expr then false else
 
@@ -26,7 +26,7 @@ type AddIgnoreFix(expr: ISynExpr) =
         | :? IDoExpr | :? IAssertExpr | :? ILazyExpr -> true
         | _ -> false
 
-    let suggestInnerExpression (expr: ISynExpr) =
+    let suggestInnerExpression (expr: IFSharpExpression) =
         match expr with
         | :? IIfThenElseExpr as ifExpr ->
             Some(ifExpr.ThenExpr, "Then branch")
@@ -61,7 +61,7 @@ type AddIgnoreFix(expr: ISynExpr) =
                 [| innerExpression, text
                    expr, "Whole expression" |]
                 |> Array.map (fun (expr, text) ->
-                    let getRange (expr: ISynExpr) = [| expr.GetNavigationRange() |]
+                    let getRange (expr: IFSharpExpression) = [| expr.GetNavigationRange() |]
                     WorkflowPopupMenuOccurrence(RichText(text), RichText.Empty, expr, getRange))
 
             let occurrence =

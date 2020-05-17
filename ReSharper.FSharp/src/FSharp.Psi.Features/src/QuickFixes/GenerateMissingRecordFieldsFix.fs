@@ -72,7 +72,7 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
             match existingBindings.LastOrDefault() with
             | null ->
                 let lBrace = recordExpr.LeftBrace
-                let rBrace = recordExpr.RightBrace :> ITreeNode
+                let rBrace = recordExpr.RightBrace
 
                 if lBrace.NextSibling == rBrace then
                     // Empty braces: {}

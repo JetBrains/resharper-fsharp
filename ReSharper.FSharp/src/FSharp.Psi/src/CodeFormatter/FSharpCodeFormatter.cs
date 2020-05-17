@@ -73,7 +73,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
       if (!firstElement.FSharpFormatterEnabled())
         return new TreeRange(firstElement, lastElement);
 
-      var formatterSettings = GetFormattingSettings(task.FirstElement, parameters);
+      var formatterSettings = GetFormattingSettings(task.FirstElement, parameters, myFormatterInfoProvider);
 
       DoDeclarativeFormat(formatterSettings, myFormatterInfoProvider, null, new[] {task},
         parameters, null, null, null, false);

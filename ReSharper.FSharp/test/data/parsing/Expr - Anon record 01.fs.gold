@@ -3,7 +3,7 @@ IFSharpImplFile
   IAnonModuleDeclaration
     IDo
       IChameleonExpression
-        IAnonRecdExpr
+        IAnonRecordExpr
           FSharpTokenType+LbraceBarTokenElement(type:LBRACE_BAR, text:{|)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           IRecordExprBinding

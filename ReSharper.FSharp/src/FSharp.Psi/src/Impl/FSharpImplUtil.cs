@@ -50,7 +50,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       attr.GetShortName() == shortName;
 
     [CanBeNull]
-    private static FSharpString GetStringConst([CanBeNull] ISynExpr expr)
+    private static FSharpString GetStringConst([CanBeNull] IFSharpExpression expr)
     {
       switch (expr)
       {
@@ -85,7 +85,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return true;
     }
 
-    private static bool IsModuleSuffixExpr([CanBeNull] ISynExpr expr)
+    private static bool IsModuleSuffixExpr([CanBeNull] IFSharpExpression expr)
     {
       switch (expr)
       {
@@ -620,22 +620,27 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       };
     }
 
-    public static ISynExpr IgnoreParentParens([NotNull] this ISynExpr synExpr)
+    public static IFSharpExpression IgnoreParentParens([NotNull] this IFSharpExpression fsExpr)
     {
-      while (synExpr.Parent is IParenExpr parenExpr)
-        synExpr = parenExpr;
-      return synExpr;
+      while (fsExpr.Parent is IParenExpr parenExpr)
+        fsExpr = parenExpr;
+      return fsExpr;
     }
-    
+
+    public static ITreeNode IgnoreParentChameleonExpr([NotNull] this ITreeNode treeNode) =>
+      treeNode.Parent is IChameleonExpression parenExpr
+        ? parenExpr.Parent
+        : treeNode.Parent;
+
     [CanBeNull]
-    public static ISynExpr IgnoreInnerParens([CanBeNull] this ISynExpr synExpr)
+    public static IFSharpExpression IgnoreInnerParens([CanBeNull] this IFSharpExpression fsExpr)
     {
-      if (synExpr == null)
+      if (fsExpr == null)
         return null;
 
-      while (synExpr is IParenExpr parenExpr && parenExpr.InnerExpression != null)
-        synExpr = parenExpr.InnerExpression;
-      return synExpr;
+      while (fsExpr is IParenExpr parenExpr && parenExpr.InnerExpression != null)
+        fsExpr = parenExpr.InnerExpression;
+      return fsExpr;
     }
     
     public static ISynPat IgnoreParentParens([CanBeNull] this ISynPat synPat)

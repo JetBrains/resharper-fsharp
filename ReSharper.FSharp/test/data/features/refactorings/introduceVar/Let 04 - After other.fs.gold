@@ -1,0 +1,4 @@
+﻿Suggested names: unit
+do
+  let a = 1
+  let unit = ignore 1

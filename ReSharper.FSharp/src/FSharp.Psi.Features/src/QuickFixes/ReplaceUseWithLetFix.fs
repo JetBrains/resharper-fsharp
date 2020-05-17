@@ -8,7 +8,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
-type ReplaceUseWithLetFix(letNode: ILet) =
+type ReplaceUseWithLetFix(letNode: ILetBindings) =
     inherit FSharpQuickFixBase()
 
     new (warning: UseBindingsIllegalInModulesWarning) =

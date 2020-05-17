@@ -10,17 +10,17 @@ IFSharpImplFile
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         IAbbreviatedTypeOrUnionCaseDeclaration
-          INamedType
+          INamedTypeUsage
             ITypeReferenceName
               FSharpIdentifierToken(type:IDENTIFIER, text:float)
               IPrefixAppTypeArgumentList
                 FSharpTokenType+LessTokenElement(type:LESS, text:<)
-                ITupleType
-                  INamedType
+                ITupleTypeUsage
+                  INamedTypeUsage
                     ITypeReferenceName
                       FSharpIdentifierToken(type:IDENTIFIER, text:g)
                   FSharpIdentifierToken(type:SYMBOLIC_OP, text:/)
-                  INamedType
+                  INamedTypeUsage
                     ITypeReferenceName
                       FSharpIdentifierToken(type:IDENTIFIER, text:kg)
                 FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)

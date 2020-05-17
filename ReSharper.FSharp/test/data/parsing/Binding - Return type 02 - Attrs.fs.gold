@@ -18,7 +18,7 @@ IFSharpImplFile
                 FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
             FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          INamedType
+          INamedTypeUsage
             ITypeReferenceName
               FSharpIdentifierToken(type:IDENTIFIER, text:int)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "

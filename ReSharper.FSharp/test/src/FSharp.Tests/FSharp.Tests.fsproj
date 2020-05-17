@@ -21,6 +21,7 @@
     <Compile Include="Service\FSharpMetadataReaderTest.fs" />
     <Compile Include="Service\FSharpCodeFormatterTest.fs" />
     <Compile Include="Service\FSharpAssemblyAutoOpenTest.fs" />
+    <Compile Include="Service\ArgumentsOwnerTest.fs" />
     <Compile Include="Cache\CSharpResolveTest.fs" />
     <Compile Include="Cache\SymbolCacheTest.fs" />
     <Compile Include="Parsing\FSharpLexerTest.fs" />
@@ -70,6 +71,7 @@
     <Compile Include="QuickFixes\ReplaceWithAssignmentExpressionTest.fs" />
     <Compile Include="QuickFixes\AddMatchAllClauseFixTest.fs" />
     <Compile Include="QuickFixes\ToAbstractFixTest.fs" />
+    <Compile Include="QuickFixes\RemoveYieldTest.fs" />
     <Compile Include="Intentions\IntentionsTestBase.fs" />
     <Compile Include="Intentions\ToRecursiveLetBindings.fs" />
     <Compile Include="Intentions\ToMultilineRecordTest.fs" />

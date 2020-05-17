@@ -33,7 +33,7 @@ module Traverse =
 
         tryMakePatPath [] pat
 
-    let rec tryTraverseExprPath (path: TraverseStep list) (IgnoreInnerParenExpr expr: ISynExpr) =
+    let rec tryTraverseExprPath (path: TraverseStep list) (IgnoreInnerParenExpr expr: IFSharpExpression) =
         match path with
         | [] -> expr
         | step :: rest ->
@@ -255,9 +255,8 @@ type FSharpNamingService(language: FSharpLanguage) =
             | expr -> addNamesForExpr expr
 
         | :? IForEachExpr as forEachExpr when forEachExpr.Pattern == pat ->
-            match forEachExpr.InClause.As<ISynExpr>() with
-            | null -> ()
-            | expr ->
+            let expr = forEachExpr.InExpression
+            if expr :? IRangeSequenceExpr then () else
 
             let naming = pat.GetPsiServices().Naming
             let collection =

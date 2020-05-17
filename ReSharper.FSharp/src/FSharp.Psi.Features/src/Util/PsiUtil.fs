@@ -133,7 +133,7 @@ let (|Whitespace|_|) (treeNode: ITreeNode) =
 
 let inline (|IgnoreParenPat|) (pat: ISynPat) = pat.IgnoreParentParens()
 
-let inline (|IgnoreInnerParenExpr|) (expr: ISynExpr) =
+let inline (|IgnoreInnerParenExpr|) (expr: IFSharpExpression) =
     expr.IgnoreInnerParens()
 
 let isInlineSpaceOrComment (node: ITreeNode) =
@@ -338,7 +338,7 @@ let inline isValid (node: ^T) =
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpExpressionSelectionProvider() =
-    inherit ExpressionSelectionProviderBase<ISynExpr>()
+    inherit ExpressionSelectionProviderBase<IFSharpExpression>()
 
     override x.IsTokenSkipped(token) =
         // todo: also ;; ?
@@ -357,7 +357,7 @@ let shouldEraseSemicolon (node: ITreeNode) =
     not (settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SemicolonAtEndOfLine))
 
 
-let shiftExpr shift (expr: ISynExpr) =
+let shiftExpr shift (expr: IFSharpExpression) =
     if shift = 0 then () else
 
     for child in List.ofSeq (expr.Tokens()) do
@@ -382,13 +382,13 @@ let shiftExpr shift (expr: ISynExpr) =
                 ModificationUtil.AddChildAfter(child, Whitespace(shift)) |> ignore
 
 
-let rec tryFindRootPrefixAppWhereExpressionIsFunc (expr: ISynExpr) =
+let rec tryFindRootPrefixAppWhereExpressionIsFunc (expr: IFSharpExpression) =
     let prefixApp = PrefixAppExprNavigator.GetByFunctionExpression(expr.IgnoreParentParens())
     if isNotNull prefixApp && isNotNull prefixApp.ArgumentExpression then
         tryFindRootPrefixAppWhereExpressionIsFunc(prefixApp)
     else expr
 
-let rec getAllExpressionArgs (expr: ISynExpr) =
+let rec getAllExpressionArgs (expr: IFSharpExpression) =
     let mutable currentExpr = expr
     seq {
         while isNotNull currentExpr do        

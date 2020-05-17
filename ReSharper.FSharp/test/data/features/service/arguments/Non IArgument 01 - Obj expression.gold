@@ -1,0 +1,7 @@
+﻿open System
+
+let dispose (disp: IDisposable) = disp.Dispose()
+
+dispose { new IDisposable with override __.Dispose () = () }
+
+---------------------------------------------------------

@@ -14,9 +14,9 @@ Occurrence's navigation result. Opened file: Object.cs
 ------------------
 
     [__DynamicallyInvokable]
-    public virtual string |CARET|ToString()
-    {
-      return this.GetType().ToString();
+    public virtual string |CARET|ToString() => this.GetType().ToString();
+
+    [TargetedPatchingOptOut("Performance critical to inline across NGen image boundaries")]
 ------------------
 
 Occurrence's dump:
