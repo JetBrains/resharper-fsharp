@@ -12,11 +12,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelC
     {
     }
 
-    protected override RdProvidedFieldInfo CreateRdModelInternal(ProvidedFieldInfo providedModel, int entityId) =>
-      new RdProvidedFieldInfo(providedModel.IsInitOnly, providedModel.IsStatic, providedModel.IsSpecialName,
-        providedModel.IsLiteral, providedModel.GetRawConstantValue().BoxToClientStaticArg(), providedModel.IsPublic,
-        providedModel.IsFamily,
-        providedModel.IsFamilyAndAssembly, providedModel.IsFamilyOrAssembly, providedModel.IsPrivate,
+    protected override RdProvidedFieldInfo CreateRdModelInternal(ProvidedFieldInfo providedModel, int entityId)
+    {
+      var flags = RdProvidedFieldFlags.None;
+      if (providedModel.IsInitOnly) flags |= RdProvidedFieldFlags.IsInitOnly;
+      if (providedModel.IsStatic) flags |= RdProvidedFieldFlags.IsStatic;
+      if (providedModel.IsSpecialName) flags |= RdProvidedFieldFlags.IsSpecialName;
+      if (providedModel.IsLiteral) flags |= RdProvidedFieldFlags.IsLiteral;
+      if (providedModel.IsPublic) flags |= RdProvidedFieldFlags.IsPublic;
+      if (providedModel.IsFamily) flags |= RdProvidedFieldFlags.IsFamily;
+      if (providedModel.IsFamilyAndAssembly) flags |= RdProvidedFieldFlags.IsFamilyAndAssembly;
+      if (providedModel.IsFamilyOrAssembly) flags |= RdProvidedFieldFlags.IsFamilyOrAssembly;
+      if (providedModel.IsPrivate) flags |= RdProvidedFieldFlags.IsPrivate;
+
+      return new RdProvidedFieldInfo(providedModel.GetRawConstantValue().BoxToClientStaticArg(), flags,
         providedModel.Name, entityId);
+    }
   }
 }

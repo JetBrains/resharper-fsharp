@@ -234,16 +234,8 @@ object RdFSharpTypeProvidersLoaderModel : Root(
     }
 
     private val RdProvidedFieldInfo = classdef extends RdProvidedMemberInfo {
-        field("IsInitOnly", bool)
-        field("IsStatic", bool)
-        field("IsSpecialName", bool)
-        field("IsLiteral", bool)
         field("GetRawConstantValue", RdStaticArg)
-        field("IsPublic", bool)
-        field("IsFamily", bool)
-        field("IsFamilyAndAssembly", bool)
-        field("IsFamilyOrAssembly", bool)
-        field("IsPrivate", bool)
+        field("Flags", RdProvidedFieldFlags)
     }
 
     private val RdProvidedEventInfoProcessModel = aggregatedef("RdProvidedEventInfoProcessModel") {
@@ -389,6 +381,19 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         +"IsErased"
         +"IsGenericType"
         +"IsMeasure"
+    }
+
+    private val RdProvidedFieldFlags = flags {
+        +"None"
+        +"IsInitOnly"
+        +"IsStatic"
+        +"IsSpecialName"
+        +"IsLiteral"
+        +"IsPublic"
+        +"IsFamily"
+        +"IsFamilyAndAssembly"
+        +"IsFamilyOrAssembly"
+        +"IsPrivate"
     }
 
     private val RdProvidedMethodFlags = flags {

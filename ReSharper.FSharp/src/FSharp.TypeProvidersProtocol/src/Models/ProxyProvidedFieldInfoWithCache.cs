@@ -38,15 +38,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       fieldInfo == null ? null : new ProxyProvidedFieldInfoWithCache(fieldInfo, processModel, context, cache);
 
     public override string Name => myFieldInfo.Name;
-    public override bool IsFamily => myFieldInfo.IsFamily;
-    public override bool IsLiteral => myFieldInfo.IsLiteral;
-    public override bool IsPrivate => myFieldInfo.IsPrivate;
-    public override bool IsPublic => myFieldInfo.IsPublic;
-    public override bool IsStatic => myFieldInfo.IsStatic;
-    public override bool IsInitOnly => myFieldInfo.IsInitOnly;
-    public override bool IsSpecialName => myFieldInfo.IsSpecialName;
-    public override bool IsFamilyAndAssembly => myFieldInfo.IsFamilyAndAssembly;
-    public override bool IsFamilyOrAssembly => myFieldInfo.IsFamilyOrAssembly;
+    public override bool IsFamily => HasFlag(RdProvidedFieldFlags.IsFamily);
+    public override bool IsLiteral => HasFlag(RdProvidedFieldFlags.IsLiteral);
+    public override bool IsPrivate => HasFlag(RdProvidedFieldFlags.IsPrivate);
+    public override bool IsPublic => HasFlag(RdProvidedFieldFlags.IsPublic);
+    public override bool IsStatic => HasFlag(RdProvidedFieldFlags.IsStatic);
+    public override bool IsInitOnly => HasFlag(RdProvidedFieldFlags.IsInitOnly);
+    public override bool IsSpecialName => HasFlag(RdProvidedFieldFlags.IsSpecialName);
+    public override bool IsFamilyAndAssembly => HasFlag(RdProvidedFieldFlags.IsFamilyAndAssembly);
+    public override bool IsFamilyOrAssembly => HasFlag(RdProvidedFieldFlags.IsFamilyOrAssembly);
 
     public override ProvidedType DeclaringType => myCache.GetOrCreateWithContext(
       myDeclaringTypeId ??= RdProvidedFieldInfoProcessModel.DeclaringType.Sync(EntityId), myContext);
@@ -55,6 +55,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       myFieldTypeId ??= RdProvidedFieldInfoProcessModel.FieldType.Sync(EntityId), myContext);
 
     public override object GetRawConstantValue() => myRawConstantValue.Value;
+
+    private bool HasFlag(RdProvidedFieldFlags flag) => (myFieldInfo.Flags & flag) == flag;
 
     private int? myDeclaringTypeId;
     private int? myFieldTypeId;
