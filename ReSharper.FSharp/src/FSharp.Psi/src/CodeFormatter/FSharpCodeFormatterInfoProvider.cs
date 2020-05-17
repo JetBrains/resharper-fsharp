@@ -93,7 +93,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
           .Name("TryWith_WithClauseIndent")
           .Where(
             Parent().HasType(ElementType.TRY_WITH_EXPR),
-            Node().HasRole(TryWithExpr.CLAUSE))
+            Node().HasRole(TryWithExpr.MATCH_CLAUSE))
           .Switch(
             settings => settings.IndentOnTryWith,
             When(true).Return(IndentType.External),

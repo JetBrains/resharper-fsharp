@@ -12,7 +12,7 @@ open JetBrains.ReSharper.Psi.Util
 //[<ElementProblemAnalyzer(typeof<ILetLikeExpr>,
 //                         HighlightingTypes = [| typeof<RedundantNewWarning> |])>]
 type LetDisposableAnalyzer() =
-    inherit ElementProblemAnalyzer<ILetLikeExpr>()
+    inherit ElementProblemAnalyzer<ILetOrUseExpr>()
 
     override x.Run(letExpr, _, consumer) =
         if letExpr.IsUse then () else

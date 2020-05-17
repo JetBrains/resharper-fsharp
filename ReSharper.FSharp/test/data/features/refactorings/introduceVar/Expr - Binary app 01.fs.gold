@@ -1,0 +1,9 @@
+﻿Suggested names: foo
+module Module
+
+type U =
+    | A
+    static member M(b: bool) = ()
+
+let foo = U.A = U.A
+U.M(foo)

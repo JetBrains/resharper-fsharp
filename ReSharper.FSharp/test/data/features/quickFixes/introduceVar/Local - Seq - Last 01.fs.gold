@@ -3,4 +3,3 @@
 do
     ()
     let {selstart}i{selend} = 123
-    ()

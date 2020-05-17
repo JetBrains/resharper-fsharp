@@ -670,7 +670,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             x.MarkAndDone(range, ElementType.ARRAY_OR_LIST_EXPR)
 
         | SynExpr.AnonRecd(_, copyInfo, fields, _) ->
-            x.PushRange(range, ElementType.ANON_RECD_EXPR)
+            x.PushRange(range, ElementType.ANON_RECORD_EXPR)
             x.PushStepList(fields, anonRecordFieldListProcessor)
             match copyInfo with
             | Some(expr, _) -> x.ProcessExpression(expr)
@@ -921,7 +921,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             x.PushRangeAndProcessExpression(expr, range, ElementType.YIELD_OR_RETURN_EXPR)
 
         | SynExpr.LetOrUseBang(_, _, _, pat, expr, ands, inExpr, range) ->
-            x.PushRange(range, ElementType.LET_OR_USE_BANG_EXPR)
+            x.PushRange(range, ElementType.LET_OR_USE_EXPR)
             x.PushExpression(inExpr)
             x.PushStepList(ands, andLocalBindingListProcessor)
             x.PushRangeForMark(expr.Range, x.Mark(pat.Range), ElementType.LOCAL_BINDING)
@@ -1211,7 +1211,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             
         let range = whenExpr.Range
         let mark = x.MarkTokenOrRange(FSharpTokenType.WHEN, range)
-        x.PushRangeForMark(range, mark, ElementType.WHEN_EXPR)
+        x.PushRangeForMark(range, mark, ElementType.WHEN_EXPR_CLAUSE)
         
         x.ProcessExpression(whenExpr)
 

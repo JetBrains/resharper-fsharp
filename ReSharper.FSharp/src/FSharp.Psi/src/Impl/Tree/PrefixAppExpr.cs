@@ -39,9 +39,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public IFSharpReferenceOwner SetName(string name) => this;
 
-    public override ReferenceCollection GetFirstClassReferences() =>
-      new ReferenceCollection(Reference);
-
     public FSharpSymbolReference InvokedFunctionReference
     {
       get

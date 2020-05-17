@@ -1,8 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open System
-open System.IO
-open FSharp.Compiler.SourceCodeServices
 open JetBrains.Diagnostics
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.FeaturesTestFramework.Utils
@@ -10,18 +8,14 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
 open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.TestFramework
 open JetBrains.TextControl
 open NUnit.Framework
 
-[<AttributeUsage(AttributeTargets.Method, AllowMultiple=false)>]
-type ExpectErrorsAttribute () =
-    inherit Attribute()
-
 [<FSharpTest>]
-[<TestPackages("FSharp.Core")>]
-[<TestReferences("System.Drawing", "System", "System.Core")>]
+[<TestPackages("FSharp.Core"); TestReferences("System.Drawing", "System", "System.Core")>]
 [<TestProjectOutputType(ProjectOutputType.CONSOLE_EXE)>]
 type ArgumentsOwnerTest() =
     inherit BaseTestWithTextControl()
@@ -30,32 +24,12 @@ type ArgumentsOwnerTest() =
 
     override x.RelativeTestDataPath = "features/service/arguments"
 
-    override x.DoTest(lifetime, project) =
+    override x.DoTest(lifetime, _) =
         let textControl = x.OpenTextControl(lifetime)
         let fsFile = textControl.GetFSharpFile(x.Solution)
 
-        let expectErrors = x.TestMethod.GetCustomAttributes(typeof<ExpectErrorsAttribute>, true).Length > 0
-        if not expectErrors then
-            match fsFile.GetParseAndCheckResults(true, "ArgumentsOwnerTest") with
-            | None -> failwithf "GetParseAndCheckResults failed"
-            | Some results ->
-
-            let errors =
-                results.CheckResults.Errors
-                |> Array.filter (fun err -> err.Severity = FSharpErrorSeverity.Error)
-
-            if errors.Length = 0 then () else
-
-            errors
-            |> Array.map (fun err ->
-                sprintf
-                    "(%d,%d)-(%d,%d): %s %d: %s"
-                    err.Range.StartLine err.Range.StartColumn
-                    err.Range.EndLine err.Range.EndColumn
-                    err.Subcategory err.ErrorNumber
-                    err.Message)
-            |> String.concat "\n"
-            |> failwithf "Errors occurred while type checking:\n\n%s"
+        let document = textControl.Document
+        let filePath = fsFile.GetSourceFile().GetLocation()
 
         let selection = textControl.Selection.OneDocumentRangeWithCaret()
         let expr =
@@ -74,10 +48,11 @@ type ArgumentsOwnerTest() =
 
                     let declRange =
                         if isNull matchingParam then None else
+
                         match matchingParam.Element with
-                        | :? FSharpMethodParameter as param
-                                when Path.GetFileName(param.FSharpSymbol.DeclarationLocation.FileName) = fsFile.GetSourceFile().Name ->
-                            Some (FSharpRangeUtil.getTextRange textControl.Document param.FSharpSymbol.DeclarationLocation)
+                        | :? FSharpMethodParameter as param when
+                                 FileSystemPath.TryParse(param.FSharpSymbol.DeclarationLocation.FileName) = filePath ->
+                            Some (FSharpRangeUtil.getTextRange document param.FSharpSymbol.DeclarationLocation)
                         | _ ->
                             None
 
@@ -89,7 +64,7 @@ type ArgumentsOwnerTest() =
 
             let endText rangeIdx = endTexts.[rangeIdx]
 
-            DocumentRangeUtil.DumpRanges(textControl.Document, ranges, (fun _ -> "|"), Func<_,_> endText).ToString()
+            DocumentRangeUtil.DumpRanges(textControl.Document, ranges, (fun _ -> "|"), Func<_,_>(endText)).ToString()
             |> writer.WriteLine
 
             writer.WriteLine("---------------------------------------------------------")
@@ -142,21 +117,21 @@ type ArgumentsOwnerTest() =
     [<Test>] member x.``Generic 02 - Static method``() = x.DoNamedTest()
 
     [<Test>] member x.``Misc 01 - No args``() = x.DoNamedTest()
-    [<Test; ExpectErrors>] member x.``Misc 02 - Too many args``() = x.DoNamedTest()
+    [<Test>] member x.``Misc 02 - Too many args``() = x.DoNamedTest()
 
     [<Test>] member x.``Multiple 01 - Curried``() = x.DoNamedTest()
     [<Test>] member x.``Multiple 02 - Tupled``() = x.DoNamedTest()
     [<Test>] member x.``Multiple 03 - Curried fun in paren``() = x.DoNamedTest()
     [<Test>] member x.``Multiple 04 - Curried arg in paren``() = x.DoNamedTest()
-    [<Test; ExpectErrors>] member x.``Multiple 05 - Tupled - too few``() = x.DoNamedTest()
-    [<Test; ExpectErrors>] member x.``Multiple 06 - Tupled - too many``() = x.DoNamedTest()
+    [<Test>] member x.``Multiple 05 - Tupled - too few``() = x.DoNamedTest()
+    [<Test>] member x.``Multiple 06 - Tupled - too many``() = x.DoNamedTest()
     [<Test>] member x.``Multiple 07 - Curried - partial``() = x.DoNamedTest()
-    [<Test; ExpectErrors>] member x.``Multiple 08 - Curried - too many``() = x.DoNamedTest()
+    [<Test>] member x.``Multiple 08 - Curried - too many``() = x.DoNamedTest()
 
     [<Test>] member x.``Named arg 01 - BCL``() = x.DoNamedTest()
-    [<Test; ExpectErrors>] member x.``Named arg 02 - Partial``() = x.DoNamedTest()
+    [<Test>] member x.``Named arg 02 - Partial``() = x.DoNamedTest()
     [<Test>] member x.``Named arg 03 - Unordered``() = x.DoNamedTest()
-    [<Test; ExpectErrors>] member x.``Named arg 04 - Invalid name``() = x.DoNamedTest()
+    [<Test>] member x.``Named arg 04 - Invalid name``() = x.DoNamedTest()
     [<Test>] member x.``Named arg 05 - Boolean``() = x.DoNamedTest()
 
     [<Test>] member x.``Non IArgument 01 - Obj expression``() = x.DoNamedTest()
@@ -169,8 +144,8 @@ type ArgumentsOwnerTest() =
     [<Test>] member x.``Tuple param 02 - Variable tuple in arg``() = x.DoNamedTest()
     [<Test>] member x.``Tuple param 03 - Param not deconstructed``() = x.DoNamedTest()
 
-    [<Test; ExpectErrors>] member x.``Tuple param 04 - Mismatch - too few``() = x.DoNamedTest()
-    [<Test; ExpectErrors>] member x.``Tuple param 05 - Mismatch - too many``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple param 04 - Mismatch - too few``() = x.DoNamedTest()
+    [<Test>] member x.``Tuple param 05 - Mismatch - too many``() = x.DoNamedTest()
 
     [<Test>] member x.``Unit 01 - Named``() = x.DoNamedTest()
     [<Test>] member x.``Unit 02 - Unnamed``() = x.DoNamedTest()
