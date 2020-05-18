@@ -34,9 +34,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
   public static class FSharpImplUtil
   {
     public const string CompiledNameAttrName = "Microsoft.FSharp.Core.CompiledNameAttribute";
-    public const string ModuleSuffix = "CompilationRepresentationFlags.ModuleSuffix";
+    public const string ModuleSuffixFlag = "CompilationRepresentationFlags.ModuleSuffix";
     public const string CompiledName = "CompiledName";
     public const string AttributeSuffix = "Attribute";
+    public const string ModuleSuffix = "Module";
     public const string Interface = "Interface";
     public const string AbstractClass = "AbstractClass";
     public const string Class = "Class";
@@ -92,7 +93,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         case ParenExpr parenExpr:
           return IsModuleSuffixExpr(parenExpr.InnerExpression);
         case IReferenceExpr referenceExpr:
-          return referenceExpr.QualifiedName == ModuleSuffix;
+          return referenceExpr.QualifiedName == ModuleSuffixFlag;
       }
 
       return false;
