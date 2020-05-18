@@ -151,7 +151,7 @@ type OpenedModulesProvider(fsFile: IFSharpFile) =
     let map = HashSet()
 
     let psiModule = fsFile.GetPsiModule()
-    let symbolScope = getSymbolScope psiModule
+    let symbolScope = getModuleOnlySymbolScope psiModule
 
 //    let getQualifiedName (element: IClrDeclaredElement) =
 //        match toQualifiedList element with

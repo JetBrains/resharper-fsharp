@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -48,10 +48,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       if (element is IAttributesOwner attrOwner)
       {
-        if (GetAttributeValue(attrOwner, SourceNameAttrTypeName) is string sourceName)
+        if (GetAttributeFirstArgValue(attrOwner, SourceNameAttrTypeName) is string sourceName)
           names.Add(sourceName);
 
-        if (GetAttributeValue(attrOwner, CompilationMappingAttrTypeName) is var flagValue && flagValue != null)
+        if (GetAttributeFirstArgValue(attrOwner, CompilationMappingAttrTypeName) is var flagValue && flagValue != null)
         {
           if ((SourceConstructFlags) flagValue == SourceConstructFlags.UnionCase && element is IMethod &&
               name.StartsWith("New", StringComparison.Ordinal))
@@ -75,7 +75,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     }
 
     [CanBeNull]
-    private static object GetAttributeValue([NotNull] IAttributesSet attrs, [NotNull] IClrTypeName attrName)
+    public static object GetAttributeFirstArgValue([NotNull] this IAttributesSet attrs, [NotNull] IClrTypeName attrName)
     {
       var instance = attrs.GetAttributeInstances(attrName, false).FirstOrDefault();
       var parameter = instance?.PositionParameters().FirstOrDefault();

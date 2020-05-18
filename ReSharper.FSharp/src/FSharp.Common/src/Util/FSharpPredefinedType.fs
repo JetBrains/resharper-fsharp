@@ -13,6 +13,9 @@ let sourceNameAttrTypeName = clrTypeName "Microsoft.FSharp.Core.CompilationSourc
 [<CompiledName("CompilationMappingAttrTypeName")>]
 let compilationMappingAttrTypeName = clrTypeName "Microsoft.FSharp.Core.CompilationMappingAttribute"
 
+[<CompiledName("CompilationRepresentationAttrTypeName")>]
+let compilationRepresentationAttrTypeName = clrTypeName "Microsoft.FSharp.Core.CompilationRepresentationAttribute"
+
 [<CompiledName("AutoOpenAttrTypeName")>]
 let autoOpenAttrTypeName = clrTypeName "Microsoft.FSharp.Core.AutoOpenAttribute"
 

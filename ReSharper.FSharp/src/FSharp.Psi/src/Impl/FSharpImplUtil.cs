@@ -15,9 +15,11 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
+using JetBrains.ReSharper.Psi.Caches;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
+using JetBrains.ReSharper.Psi.Impl.Reflection2;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Naming;
 using JetBrains.ReSharper.Psi.Parsing;
@@ -379,11 +381,52 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return typeElement.ShortName;
     }
 
+    public static bool HasModuleSuffix([NotNull] this string shortName) =>
+      shortName.EndsWith(ModuleSuffix, StringComparison.Ordinal);
+
+    public static ITypeElement TryGetAssociatedType([NotNull] this CompiledTypeElement moduleTypeElement, string sourceName)
+    {
+      Assertion.Assert(moduleTypeElement.IsCompiledModule(), "moduleTypeElement.IsCompiledModule()");
+
+      bool IsAssociatedType(ITypeElement t) =>
+        !t.Equals(moduleTypeElement) && t.TypeParameters.Count == 0 && t.GetSourceName() == sourceName;
+
+      var containingType = moduleTypeElement.GetContainingType();
+      if (containingType != null)
+        return containingType.NestedTypes.FirstOrDefault(IsAssociatedType);
+
+      var ns = moduleTypeElement.GetContainingNamespace();
+      var symbolScope = moduleTypeElement.Module.GetModuleOnlySymbolScope();
+      return ns.GetNestedTypeElements(symbolScope).FirstOrDefault(IsAssociatedType);
+    }
+
+    public static string GetSourceName([NotNull] this CompiledTypeElement typeElement)
+    {
+      if (typeElement.GetAttributeFirstArgValue(FSharpPredefinedType.SourceNameAttrTypeName) is string sourceName &&
+          sourceName != SharedImplUtil.MISSING_DECLARATION_NAME)
+        return sourceName;
+
+      var shortName = typeElement.ShortName;
+      if (shortName.HasModuleSuffix() && typeElement.IsCompiledModule())
+      {
+        var shortNameWithoutSuffix = shortName.SubstringBeforeLast(ModuleSuffix);
+        var flags = typeElement.GetAttributeFirstArgValue(FSharpPredefinedType.CompilationRepresentationAttrTypeName);
+        if (flags != null && (CompilationRepresentationFlags) flags == CompilationRepresentationFlags.ModuleSuffix)
+          return shortNameWithoutSuffix;
+
+        if (typeElement.TryGetAssociatedType(shortNameWithoutSuffix) != null)
+          return shortNameWithoutSuffix;
+      }
+
+      return shortName;
+    }
+
     public static string GetSourceName([NotNull] this IDeclaredElement declaredElement) =>
       declaredElement switch
       {
+        INamespace ns => ns.IsRootNamespace ? "global" : ns.ShortName,
         IFSharpDeclaredElement fsElement => fsElement.SourceName,
-        INamespace ns when ns.IsRootNamespace => "global",
+        CompiledTypeElement compiledTypeElement => GetSourceName(compiledTypeElement),
         _ => declaredElement.ShortName
       };
 

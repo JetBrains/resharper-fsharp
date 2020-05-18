@@ -202,9 +202,16 @@ module rec FSharpMsBuildUtils =
 
 [<Extension; AutoOpen>]
 module PsiUtil =
+    let private getModuleSymbolScope withReferences (psiModule: IPsiModule) =
+        psiModule.GetPsiServices().Symbols.GetSymbolScope(psiModule, withReferences, true)
+
     [<Extension; CompiledName("GetSymbolScope")>]
     let getSymbolScope (psiModule: IPsiModule) =
-        psiModule.GetPsiServices().Symbols.GetSymbolScope(psiModule, true, true)
+        getModuleSymbolScope true psiModule
+
+    [<Extension; CompiledName("GetModuleOnlySymbolScope")>]
+    let getModuleOnlySymbolScope (psiModule: IPsiModule) =
+        getModuleSymbolScope false psiModule
 
     [<Extension; CompiledName("GetTokenTypeSafe")>]
     let getTokenType ([<CanBeNull>] node: ITreeNode) =

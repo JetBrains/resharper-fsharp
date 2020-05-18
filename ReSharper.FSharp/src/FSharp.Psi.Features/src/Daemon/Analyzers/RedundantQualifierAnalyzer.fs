@@ -3,11 +3,14 @@
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
+open JetBrains.ReSharper.Psi.Impl.Reflection2
 
 let [<Literal>] OpName = "RedundantQualifierAnalyzer"
 
@@ -34,17 +37,29 @@ let isRedundant (data: ElementProblemAnalyzerData) (referenceOwner: IFSharpRefer
         | :? IConstructor as ctor -> ctor.GetContainingType() :> IDeclaredElement
         | declaredElement -> declaredElement
 
+    if isNull declaredElement then false else
+
     // Don't make namespace usages unqualified, e.g. don't remove `System` leaving `Collections.Generic.List`.
     if declaredElement :? INamespace && qualifierName <> FSharpTokenType.GLOBAL.TokenRepresentation then false else
 
     // todo: try to check next qualified names in case we got into multiple-result resolve, i.e. for module?
-    let checkerService = reference.GetElement().CheckerService
-    match checkerService.ResolveNameAtLocation(referenceOwner, [reference.GetName()], OpName) with
+    let shortName = reference.GetName()
+    match referenceOwner.CheckerService.ResolveNameAtLocation(referenceOwner, [shortName], OpName) with
     | None -> false
     | Some symbolUse ->
 
     let unqualifiedElement = symbolUse.Symbol.GetDeclaredElement(referenceOwner.GetPsiModule(), referenceOwner)
-    declaredElement = unqualifiedElement
+    if declaredElement.Equals(unqualifiedElement) then true else
+
+    // Workaround for case where unqualified resolve may return module with implicit suffix instead of type.
+    let compiledTypeElement = unqualifiedElement.As<CompiledTypeElement>()
+    if isNull compiledTypeElement then false else
+
+    if not (unqualifiedElement.ShortName.HasModuleSuffix() && not (shortName.HasModuleSuffix())) then false else
+    if not (isCompiledModule compiledTypeElement) then false else
+
+    let typeElement = FSharpImplUtil.TryGetAssociatedType(compiledTypeElement, shortName)
+    declaredElement.Equals(typeElement)
 
 
 [<ElementProblemAnalyzer([| typeof<IReferenceExpr>; typeof<IReferenceName>; typeof<ITypeExtensionDeclaration> |],
