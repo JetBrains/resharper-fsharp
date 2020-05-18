@@ -379,9 +379,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     public static string GetSourceName([NotNull] this IDeclaredElement declaredElement) =>
-      declaredElement is IFSharpDeclaredElement fsElement
-        ? fsElement.SourceName
-        : declaredElement.ShortName;
+      declaredElement switch
+      {
+        IFSharpDeclaredElement fsElement => fsElement.SourceName,
+        INamespace ns when ns.IsRootNamespace => "global",
+        _ => declaredElement.ShortName
+      };
 
     public static AccessRights GetFSharpRepresentationAccessRights([CanBeNull] this ITypeElement type)
     {

@@ -63,6 +63,7 @@
     <Compile Include="src\Daemon\Analyzers\RedundantAttributeParensAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\RedundantAttributeSuffixAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\ColorReferenceAnalyzer.fs" />
+    <Compile Include="src\Daemon\Analyzers\RedundantQualifierAnalyzer.fs" />
     <Compile Include="src\Comment\FSharpBlockCommentActionProvider.fs" />
     <Compile Include="src\Comment\FSharpLineCommentActionProvider.fs" />
     <Compile Include="src\Debugger\FSharpBreakpointVariantsProvider.fs" />
@@ -145,6 +146,7 @@
     <Compile Include="src\QuickFixes\AddMatchAllClauseFix.fs" />
     <Compile Include="src\QuickFixes\ToAbstractFix.fs" />
     <Compile Include="src\QuickFixes\RemoveYieldFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveRedundantQualifierFix.fs" />
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />
     <Compile Include="src\PostfixTemplates\NotTemplate.fs" />
     <Compile Include="src\PostfixTemplates\LetPostfixTemplate.fs" />

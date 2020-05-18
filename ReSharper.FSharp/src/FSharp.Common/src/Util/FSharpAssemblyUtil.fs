@@ -1,4 +1,4 @@
-[<AutoOpen; Extension>]
+[<Extension>]
 module JetBrains.ReSharper.Plugins.FSharp.Util.FSharpAssemblyUtil
 
 open System.Collections.Generic
@@ -97,12 +97,12 @@ let getNestedTypes (declaredElement: IClrDeclaredElement) (symbolScope: ISymbolS
     | :? ITypeElement as typeElement -> typeElement.NestedTypes :> _
     | _ -> Seq.empty
 
-let rec importAutoOpenModule (declaredElement: IClrDeclaredElement) (symbolScope: ISymbolScope)(result: ICollection<IClrDeclaredElement>) =
-      result.Add(declaredElement)
-      for typeElement in getNestedTypes declaredElement symbolScope do
-          for attribute in getAutoOpenAttributes typeElement do
-              if attribute.PositionParameterCount = 0 then
-                  importAutoOpenModule typeElement symbolScope result
+let rec getNestedAutoImportedModules (declaredElement: IClrDeclaredElement) (symbolScope: ISymbolScope) = seq {
+    for typeElement in getNestedTypes declaredElement symbolScope do
+        for attribute in getAutoOpenAttributes typeElement do
+            if attribute.PositionParameterCount = 0 then
+                yield typeElement
+                yield! getNestedAutoImportedModules typeElement symbolScope }
 
 let getAutoOpenModules (psiAssemblyFileLoader: IPsiAssemblyFileLoader) (assembly: IPsiAssembly) =
     let result = List()
@@ -121,6 +121,7 @@ let getAutoOpenModules (psiAssemblyFileLoader: IPsiAssemblyFileLoader) (assembly
             if moduleString.IsNullOrEmpty() then () else
 
             for declaredElement in symbolScope.GetElementsByQualifiedName(moduleString) do
-                importAutoOpenModule declaredElement symbolScope result) |> ignore
+                result.Add(declaredElement)
+                result.AddRange(getNestedAutoImportedModules declaredElement symbolScope)) |> ignore
 
     result

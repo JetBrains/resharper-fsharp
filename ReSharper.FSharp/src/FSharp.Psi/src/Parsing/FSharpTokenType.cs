@@ -17,9 +17,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         TokenRepresentation = name;
       }
 
+      public FSharpTokenNodeType(string name, int index, string representation) : base(name, index)
+      {
+        FSharpNodeTypeIndexer.Instance.Add(this, index);
+        TokenRepresentation = representation;
+      }
+
       public override LeafElementBase Create(string text)
       {
-        if (Identifiers[this])
+        if (CreateIdentifierTokenTypes[this])
           return new FSharpIdentifierToken(this, text);
 
         if (IsComment)
@@ -126,6 +132,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public static readonly NodeTypeSet Identifiers;
     public static readonly NodeTypeSet Strings;
     public static readonly NodeTypeSet Literals;
+    public static readonly NodeTypeSet CreateIdentifierTokenTypes;
 
     static FSharpTokenType()
     {
@@ -253,6 +260,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         BIGNUM,
         NATIVEINT,
         UNATIVEINT);
+      
+      CreateIdentifierTokenTypes = new NodeTypeSet(
+        IDENTIFIER,
+        SYMBOLIC_OP,
+        AMP_AMP,
+        GREATER,
+        PLUS,
+        MINUS,
+        LESS,
+        LPAREN_STAR_RPAREN,
+        GLOBAL);
     }
   }
 }

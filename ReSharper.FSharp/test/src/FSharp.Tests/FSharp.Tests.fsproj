@@ -39,6 +39,7 @@
     <Compile Include="Daemon\RedundantAttributeParensTest.fs" />
     <Compile Include="Daemon\RedundantAttributeSuffixAnalyzerTest.fs" />
     <Compile Include="Daemon\FSharpColorHighlightingTest.fs" />
+    <Compile Include="Daemon\RedundantQualifiersTest.fs" />
     <Compile Include="Debugger\ExpressionEvaluationInfoTest.fs" />
     <Compile Include="QuickFixes\ErrorAttributes.fs" />
     <Compile Include="QuickFixes\ReplaceUseWithLetTest.fs" />
@@ -71,6 +72,7 @@
     <Compile Include="QuickFixes\AddMatchAllClauseFixTest.fs" />
     <Compile Include="QuickFixes\ToAbstractFixTest.fs" />
     <Compile Include="QuickFixes\RemoveYieldTest.fs" />
+    <Compile Include="QuickFixes\RemoveRedundantQualifierTest.fs" />
     <Compile Include="Intentions\IntentionsTestBase.fs" />
     <Compile Include="Intentions\ToRecursiveLetBindings.fs" />
     <Compile Include="Intentions\ToMultilineRecordTest.fs" />
