@@ -26,6 +26,13 @@ type GenerateMissingRecordFieldsTest() =
     [<Test>] member x.``Multiline 02``() = x.DoNamedTest()
     
     [<Test>] member x.``Empty function``() = x.DoNamedTest()
+    
+[<FSharpTest>]
+type GenerateMissingRecordFieldsAvailabilityTest() =
+    inherit QuickFixAvailabilityTestBase()
+
+    override x.RelativeTestDataPath = "features/quickFixes/generateMissingRecordFields"
+
     // The quickfix should apply if the empty record is the final statement of a function binding, as that's what the
     // annotated return type pertains to.
     [<Test>] member x.``Empty function statement no-op``() = x.DoNamedTest()

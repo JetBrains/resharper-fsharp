@@ -10,6 +10,26 @@ open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 
+/// If given an expression is a return expression, the owning IBinding is returned, otherwise null.
+let getReturnExpressionOwner (expr: ISynExpr) : IBinding =
+    let rec getParentFunction (treeNode : ITreeNode) =
+        let parent = treeNode.Parent
+        if isNotNull parent then
+            let binding = parent.As<IBinding>() 
+            if binding |> isNotNull then
+                binding
+            else
+                getParentFunction parent
+        else
+            null
+    let sequentialExpr = SequentialExprNavigator.GetByExpression(expr)
+    
+    // Necessary, but not sufficient, requirement for the expression to be a return expression of a function
+    if isNotNull sequentialExpr && sequentialExpr.Expressions.Last() == expr then
+        getParentFunction expr
+    else
+        null
+
 let isPredefinedFunctionRef name (expr: ISynExpr) =
     let refExpr = expr.IgnoreInnerParens().As<IReferenceExpr>()
     if isNull refExpr then false else
