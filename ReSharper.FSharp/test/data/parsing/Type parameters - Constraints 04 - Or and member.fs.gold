@@ -21,7 +21,7 @@ IFSharpImplFile
           FSharpTokenType+WhenTokenElement(type:WHEN, text:when)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-          INamedType
+          INamedTypeUsage
             ITypeReferenceName
               ITypeParameterId
                 FSharpIdentifierToken(type:SYMBOLIC_OP, text:^)
@@ -29,7 +29,7 @@ IFSharpImplFile
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+OrTokenElement(type:OR, text:or)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          INamedType
+          INamedTypeUsage
             ITypeReferenceName
               ITypeParameterId
                 FSharpIdentifierToken(type:SYMBOLIC_OP, text:^)
@@ -47,9 +47,9 @@ IFSharpImplFile
           FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           FSharpTokenType+ColonTokenElement(type:COLON, text::)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IFunType
-            ITupleType
-              INamedType
+          IFunctionTypeUsage
+            ITupleTypeUsage
+              INamedTypeUsage
                 ITypeReferenceName
                   ITypeParameterId
                     FSharpIdentifierToken(type:SYMBOLIC_OP, text:^)
@@ -57,7 +57,7 @@ IFSharpImplFile
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               FSharpTokenType+StarTokenElement(type:STAR, text:*)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              INamedType
+              INamedTypeUsage
                 ITypeReferenceName
                   ITypeParameterId
                     FSharpIdentifierToken(type:SYMBOLIC_OP, text:^)
@@ -65,7 +65,7 @@ IFSharpImplFile
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            INamedType
+            INamedTypeUsage
               ITypeReferenceName
                 ITypeParameterId
                   FSharpIdentifierToken(type:SYMBOLIC_OP, text:^)

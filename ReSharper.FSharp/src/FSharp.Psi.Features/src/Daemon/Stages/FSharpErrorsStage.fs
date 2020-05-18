@@ -2,26 +2,29 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
 open System
 open System.Collections.Generic
-open JetBrains.Application.Settings
 open JetBrains.ReSharper.Daemon.Stages.Dispatcher
+open JetBrains.ReSharper.Daemon.VisualElements
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.Util
+
+module FSharpErrorsStage =
+    let visualElementFactoryKey = Key<VisualElementHighlighter>("ColorUsageHighlightingEnabled")
+
 
 [<DaemonStage(StagesBefore = [| typeof<HighlightIdentifiersStage> |])>]
 type FSharpErrorsStage(elementProblemAnalyzerRegistrar) =
     inherit FSharpDaemonStageBase()
 
     override x.CreateStageProcess(fsFile, settings, daemonProcess) =
-        FSharpErrorStageProcess(fsFile, daemonProcess, settings, elementProblemAnalyzerRegistrar) :> IDaemonStageProcess
+        FSharpErrorStageProcess(fsFile, daemonProcess, settings, elementProblemAnalyzerRegistrar) :> _
 
 
-and FSharpErrorStageProcess
-        (fsFile: IFSharpFile, daemonProcess: IDaemonProcess, settings: IContextBoundSettingsStore,
-         analyzerRegistrar: ElementProblemAnalyzerRegistrar) =
+and FSharpErrorStageProcess(fsFile, daemonProcess, settings, analyzerRegistrar: ElementProblemAnalyzerRegistrar) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
     static let analyzerRunKind = ElementProblemAnalyzerRunKind.FullDaemon
@@ -29,6 +32,10 @@ and FSharpErrorStageProcess
     let interruptCheck = daemonProcess.GetCheckForInterrupt()
     let elementProblemAnalyzerData = ElementProblemAnalyzerData(fsFile, settings, analyzerRunKind, interruptCheck)
     let analyzerDispatcher = analyzerRegistrar.CreateDispatcher(elementProblemAnalyzerData)
+
+    do
+        let visualElementHighlighter = VisualElementHighlighter(fsFile.Language, settings)
+        elementProblemAnalyzerData.PutData(FSharpErrorsStage.visualElementFactoryKey, visualElementHighlighter)
 
     override x.VisitNode(element: ITreeNode, consumer: IHighlightingConsumer) =
         analyzerDispatcher.Run(element, consumer)

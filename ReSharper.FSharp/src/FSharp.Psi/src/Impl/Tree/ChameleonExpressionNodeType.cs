@@ -19,7 +19,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override CompositeElement Create() =>
       throw new InvalidOperationException("Should not be created without data.");
 
-    public override CompositeElement Create(object data) =>
-      new ChameleonExpression(data as SyntaxTree.SynExpr);
+    public override CompositeElement Create(object data)
+    {
+      var (expr, startOffset, lineStart) = (Tuple<SyntaxTree.SynExpr, int, int>) data;
+      var chameleonExpression = new ChameleonExpression(expr, startOffset, lineStart);
+      return chameleonExpression;
+    }
   }
 }

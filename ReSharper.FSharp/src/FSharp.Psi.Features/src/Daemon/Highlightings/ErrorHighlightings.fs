@@ -5,6 +5,10 @@ open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Feature.Services.Daemon.Attributes
 
+[<RegisterStaticHighlightingsGroup("F# Errors", true)>]
+type FSharpErrors() =
+    class end
+
 [<AbstractClass>]
 type FSharpErrorHighlightingBase(message, range: DocumentRange) = 
     interface IHighlighting with
@@ -14,42 +18,42 @@ type FSharpErrorHighlightingBase(message, range: DocumentRange) =
         member x.CalculateRange() = range
 
 
-[<StaticSeverityHighlighting(Severity.ERROR, HighlightingGroupIds.IdentifierHighlightingsGroup,
+[<StaticSeverityHighlighting(Severity.ERROR, typeof<HighlightingGroupIds.IdentifierHighlightings>,
                              AttributeId = AnalysisHighlightingAttributeIds.ERROR,
                              OverlapResolve = OverlapResolveKind.NONE)>]
 type ErrorHighlighting(message, range) =
     inherit FSharpErrorHighlightingBase(message, range)
 
 
-[<StaticSeverityHighlighting(Severity.WARNING, HighlightingGroupIds.IdentifierHighlightingsGroup,
+[<StaticSeverityHighlighting(Severity.WARNING, typeof<HighlightingGroupIds.IdentifierHighlightings>,
                              AttributeId = AnalysisHighlightingAttributeIds.WARNING,
                              OverlapResolve = OverlapResolveKind.NONE)>]
 type WarningHighlighting(message, range) =
     inherit FSharpErrorHighlightingBase(message, range)
 
 
-[<StaticSeverityHighlighting(Severity.ERROR, HighlightingGroupIds.IdentifierHighlightingsGroup,
+[<StaticSeverityHighlighting(Severity.ERROR, typeof<HighlightingGroupIds.IdentifierHighlightings>,
                              AttributeId = AnalysisHighlightingAttributeIds.UNRESOLVED_ERROR,
                              OverlapResolve = OverlapResolveKind.NONE)>]
 type UnresolvedHighlighting(message, range) =
     inherit FSharpErrorHighlightingBase(message, range)
 
 
-[<StaticSeverityHighlighting(Severity.WARNING, HighlightingGroupIds.IdentifierHighlightingsGroup, 
+[<StaticSeverityHighlighting(Severity.WARNING, typeof<HighlightingGroupIds.IdentifierHighlightings>, 
                              AttributeId = AnalysisHighlightingAttributeIds.DEADCODE,
                              OverlapResolve = OverlapResolveKind.NONE)>]
 type UnusedHighlighting(message, range) = 
     inherit FSharpErrorHighlightingBase(message, range)
 
 
-[<StaticSeverityHighlighting(Severity.ERROR, HighlightingGroupIds.IdentifierHighlightingsGroup,
+[<StaticSeverityHighlighting(Severity.ERROR, typeof<HighlightingGroupIds.IdentifierHighlightings>,
                              AttributeId = AnalysisHighlightingAttributeIds.ERROR,
                              OverlapResolve = OverlapResolveKind.NONE)>]
 type UseKeywordIllegalInPrimaryCtor(message, range) =
     inherit FSharpErrorHighlightingBase(message, range)
 
 
-[<StaticSeverityHighlighting(Severity.INFO, HighlightingGroupIds.IdentifierHighlightingsGroup,
+[<StaticSeverityHighlighting(Severity.INFO, typeof<HighlightingGroupIds.IdentifierHighlightings>,
                              AttributeId = AnalysisHighlightingAttributeIds.DEADCODE,
                              OverlapResolve = OverlapResolveKind.NONE)>]
 type DeadCodeHighlighting(range) =

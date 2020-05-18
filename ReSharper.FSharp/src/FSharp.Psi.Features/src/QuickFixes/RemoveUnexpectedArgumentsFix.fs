@@ -18,7 +18,6 @@ type RemoveUnexpectedArgumentsFix(warning: NotAFunctionError) =
     inherit FSharpQuickFixBase()
 
     let expr = warning.Expr
-    let exprNode = expr :> ITreeNode
     let prefixApp = warning.PrefixApp
     
     override x.Text =
@@ -33,5 +32,5 @@ type RemoveUnexpectedArgumentsFix(warning: NotAFunctionError) =
         let commentNodeCandidate = skipMatchingNodesBefore isWhitespace firstUnexpectedArg
         let updatedRoot = ModificationUtil.ReplaceChild(prefixApp, expr.Copy())
         
-        if commentNodeCandidate != exprNode then
+        if commentNodeCandidate != expr then
             addNodesAfter updatedRoot (TreeRange(expr.NextSibling, commentNodeCandidate)) |> ignore

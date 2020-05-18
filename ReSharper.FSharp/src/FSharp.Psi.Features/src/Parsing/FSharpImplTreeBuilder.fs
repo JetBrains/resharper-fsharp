@@ -12,20 +12,8 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 
-[<Struct>]
-type BuilderStep =
-    { Item: obj
-      Processor: IBuilderStepProcessor }
-
-
-and IBuilderStepProcessor =
-    abstract Process: step: obj * builder: FSharpImplTreeBuilder -> unit
-
-
-type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
-    inherit FSharpTreeBuilderBase(lexer, document, lifetime, projectedOffset)
-
-    let nextSteps = Stack<BuilderStep>()
+type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, lineShift) =
+    inherit FSharpTreeBuilderBase(lexer, document, lifetime, projectedOffset, lineShift)
 
     /// FCS splits some declarations into separate fake ones:
     ///   * property declaration when both getter and setter bodies are present
@@ -33,7 +21,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
     let mutable unfinishedDeclaration: (int * range * CompositeNodeType) option = None
 
     new (lexer, document, decls, lifetime) =
-        FSharpImplTreeBuilder(lexer, document, decls, lifetime, 0) 
+        FSharpImplTreeBuilder(lexer, document, decls, lifetime, 0, 0)
 
     override x.CreateFSharpFile() =
         let mark = x.Mark()
@@ -108,8 +96,11 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
                 | Some(mark, _, _) ->
                     unfinishedDeclaration <- None
                     mark
-                | _ -> x.Mark(range)
+                | _ ->
+                    x.AdvanceToTokenOrRangeStart(FSharpTokenType.DO, range)
+                    x.Mark()
 
+            let expr = x.RemoveDoExpr(expr)
             x.MarkChameleonExpression(expr)
             x.Done(range, mark, ElementType.DO)
 
@@ -229,6 +220,12 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
 
             | SynMemberDefn.Member(binding, range) ->
                 x.ProcessMemberBinding(mark, binding, range)
+
+            | SynMemberDefn.LetBindings([Binding(kind = SynBindingKind.DoBinding; expr = expr)], _, _, range) ->
+                x.AdvanceToTokenOrRangeStart(FSharpTokenType.DO, range)
+                let expr = x.RemoveDoExpr(expr)
+                x.MarkChameleonExpression(expr)
+                ElementType.DO
 
             | SynMemberDefn.LetBindings(bindings, _, _, range) ->
                 for binding in bindings do
@@ -527,7 +524,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
     member x.MarkOtherType(TypeRange range as typ) =
         let mark = x.Mark(range)
         x.ProcessType(typ)
-        x.Done(range, mark, ElementType.OTHER_TYPE)
+        x.Done(range, mark, ElementType.UNSUPPORTED_TYPE_USAGE)
 
     member x.SkipOuterAttrs(attrs: SynAttributeList list, outerRange: range) =
         match attrs with
@@ -558,6 +555,22 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
         x.MarkChameleonExpression(expr)
 
         x.Done(binding.RangeOfBindingAndRhs, mark, ElementType.TOP_BINDING)
+
+
+[<Struct>]
+type BuilderStep =
+    { Item: obj
+      Processor: IBuilderStepProcessor }
+
+
+and IBuilderStepProcessor =
+    abstract Process: step: obj * builder: FSharpExpressionTreeBuilder -> unit
+
+
+type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lineShift) =
+    inherit FSharpImplTreeBuilder(lexer, document, [], lifetime, projectedOffset, lineShift)
+
+    let nextSteps = Stack<BuilderStep>()
 
     member x.ProcessLocalBinding(Binding(_, kind, _, _, attrs, _, _, headPat, returnInfo, expr, _, _) as binding) =
         let expr = x.FixExpresion(expr)
@@ -651,10 +664,13 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             x.ProcessExpressionList(exprs)
 
         | SynExpr.ArrayOrList(_, exprs, _) ->
-            x.ProcessListExpr(exprs, range, ElementType.ARRAY_OR_LIST_EXPR)
+            // SynExpr.ArrayOrList is currently only used for error recovery and empty lists in the parser.
+            // Non-empty SynExpr.ArrayOrList is created in the type checker only.
+            Assertion.Assert(List.isEmpty exprs, "Non-empty SynExpr.ArrayOrList: {0}", expr)
+            x.MarkAndDone(range, ElementType.ARRAY_OR_LIST_EXPR)
 
         | SynExpr.AnonRecd(_, copyInfo, fields, _) ->
-            x.PushRange(range, ElementType.ANON_RECD_EXPR)
+            x.PushRange(range, ElementType.ANON_RECORD_EXPR)
             x.PushStepList(fields, anonRecordFieldListProcessor)
             match copyInfo with
             | Some(expr, _) -> x.ProcessExpression(expr)
@@ -701,7 +717,8 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             x.ProcessExpression(enumExpr)
 
         | SynExpr.ArrayOrListOfSeqExpr(_, expr, _) ->
-            x.PushRangeAndProcessExpression(expr, range, ElementType.ARRAY_OR_LIST_OF_SEQ_EXPR)
+            let expr = match expr with | SynExpr.CompExpr(expr = expr) -> expr | _ -> expr
+            x.PushRangeAndProcessExpression(expr, range, ElementType.ARRAY_OR_LIST_EXPR)
 
         | SynExpr.CompExpr(_, _, expr, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.COMPUTATION_EXPR)
@@ -891,12 +908,20 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
 
         | SynExpr.ImplicitZero _ -> ()
 
-        | SynExpr.YieldOrReturn(_, expr, _)
+        | SynExpr.YieldOrReturn(_, expr, _) ->
+            x.AdvanceToStart(range)
+            if x.TokenType == FSharpTokenType.RARROW then
+                // Remove fake yield expressions in list comprehensions
+                // by replacing `-> a` with `a` in `[ for a in 1 .. 2 -> a ]`.
+                x.ProcessExpression(expr)
+            else
+                x.PushRangeAndProcessExpression(expr, range, ElementType.YIELD_OR_RETURN_EXPR)
+
         | SynExpr.YieldOrReturnFrom(_, expr, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.YIELD_OR_RETURN_EXPR)
 
         | SynExpr.LetOrUseBang(_, _, _, pat, expr, ands, inExpr, range) ->
-            x.PushRange(range, ElementType.LET_OR_USE_BANG_EXPR)
+            x.PushRange(range, ElementType.LET_OR_USE_EXPR)
             x.PushExpression(inExpr)
             x.PushStepList(ands, andLocalBindingListProcessor)
             x.PushRangeForMark(expr.Range, x.Mark(pat.Range), ElementType.LOCAL_BINDING)
@@ -917,9 +942,11 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             x.MarkAndDone(range, ElementType.LIBRARY_ONLY_EXPR)
 
         | SynExpr.ArbitraryAfterError _
-        | SynExpr.FromParseError _
         | SynExpr.DiscardAfterMissingQualificationAfterDot _ ->
             x.MarkAndDone(range, ElementType.FROM_ERROR_EXPR)
+
+        | SynExpr.FromParseError(expr, _) ->
+            x.PushRangeAndProcessExpression(expr, range, ElementType.FROM_ERROR_EXPR)
 
         | SynExpr.Fixed(expr, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.FIXED_EXPR)
@@ -957,10 +984,10 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
 
         // Range sequence expr also contains braces in the fake app expr, mark it as a separate expr node.
         if appRange <> rangeSeqRange then
-            x.PushRange(appRange, ElementType.RANGE_SEQUENCE_EXPR)
+            x.PushRange(appRange, ElementType.COMPUTATION_EXPR)
 
         let seqMark = x.Mark(fromRange)
-        x.PushRangeForMark(toRange, seqMark, ElementType.RANGE_SEQUENCE)
+        x.PushRangeForMark(toRange, seqMark, ElementType.RANGE_SEQUENCE_EXPR)
         x.PushExpression(toExpr)
 
         match stepExpr with
@@ -1184,17 +1211,16 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset) =
             
         let range = whenExpr.Range
         let mark = x.MarkTokenOrRange(FSharpTokenType.WHEN, range)
-        x.PushRangeForMark(range, mark, ElementType.WHEN_EXPR)
+        x.PushRangeForMark(range, mark, ElementType.WHEN_EXPR_CLAUSE)
         
         x.ProcessExpression(whenExpr)
 
     member x.ProcessIndexerArg(arg: SynIndexerArg) =
         x.ProcessExpressionList(arg.Exprs)
 
-
 [<AbstractClass>]
 type StepProcessorBase<'TStep>() =
-    abstract Process: step: 'TStep * builder: FSharpImplTreeBuilder -> unit
+    abstract Process: step: 'TStep * builder: FSharpExpressionTreeBuilder -> unit
 
     interface IBuilderStepProcessor with
         member x.Process(step, builder) =
@@ -1202,7 +1228,7 @@ type StepProcessorBase<'TStep>() =
 
 [<AbstractClass>]
 type StepListProcessorBase<'TStep>() =
-    abstract Process: 'TStep * FSharpImplTreeBuilder -> unit
+    abstract Process: 'TStep * FSharpExpressionTreeBuilder -> unit
 
     interface IBuilderStepProcessor with
         member x.Process(step, builder) =

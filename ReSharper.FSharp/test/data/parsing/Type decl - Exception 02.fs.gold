@@ -9,7 +9,7 @@ IFSharpImplFile
       FSharpTokenType+OfTokenElement(type:OF, text:of)
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "
       IExceptionFieldDeclaration
-        INamedType
+        INamedTypeUsage
           ITypeReferenceName
             FSharpIdentifierToken(type:IDENTIFIER, text:int)
 

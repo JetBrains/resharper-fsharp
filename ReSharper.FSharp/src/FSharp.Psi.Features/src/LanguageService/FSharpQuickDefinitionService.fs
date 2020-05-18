@@ -16,6 +16,6 @@ type FSharpQuickDefinitionService() =
         | :? ISynPat as pat ->
             let pat = skipIntermediatePatParents pat
             let binding = BindingNavigator.GetByHeadPattern(pat)
-            TreeRange(LetNavigator.GetByBinding(binding)) :> _
+            TreeRange(LetBindingsNavigator.GetByBinding(binding)) :> _
 
         | _ -> base.GetPresentableTreeRange(node)

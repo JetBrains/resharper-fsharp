@@ -1,0 +1,8 @@
+﻿module Mod
+
+open System.Linq
+
+let x = Seq.empty
+x.Single()
+
+---------------------------------------------------------

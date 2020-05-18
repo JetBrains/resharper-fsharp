@@ -1,0 +1,5 @@
+﻿Suggested names: foo
+do
+  let foo = 
+    let x = 1 + 1
+    ()

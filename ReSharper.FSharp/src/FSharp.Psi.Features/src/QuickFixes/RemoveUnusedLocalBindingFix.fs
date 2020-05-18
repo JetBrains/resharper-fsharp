@@ -22,9 +22,9 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
     // todo: we can also check that every top declaration pat is unused instead
 
     let binding = BindingNavigator.GetByHeadPattern(pat)
-    let letOrUse = LetNavigator.GetByBinding(binding)
+    let letOrUse = LetBindingsNavigator.GetByBinding(binding)
 
-    let getCopyRange (expr: ILetLikeExpr) =
+    let getCopyRange (expr: ILetOrUseExpr) =
         let inExpr = expr.InExpression
 
         let inKeyword = expr.InKeyword
@@ -71,7 +71,7 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
 
                 ModificationUtil.DeleteChildRange(TreeRange(first, last))
 
-            | :? ILetLikeExpr as letExpr ->
+            | :? ILetOrUseExpr as letExpr ->
                 let rangeToCopy = getCopyRange letExpr
                 ModificationUtil.ReplaceChildRange(TreeRange(letExpr), rangeToCopy) |> ignore
 

@@ -1,5 +1,8 @@
 using System.Linq;
 using JetBrains.Application.Settings;
+using JetBrains.Application.Settings.Calculated.Interface;
+using JetBrains.Application.Threading;
+using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Psi;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
@@ -15,16 +18,28 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
   public class FSharpFormatterInfoProvider :
     FormatterInfoProviderWithFluentApi<CodeFormattingContext, FSharpFormatSettingsKey>
   {
-    public FSharpFormatterInfoProvider(ISettingsSchema settingsSchema) : base(settingsSchema)
+    public FSharpFormatterInfoProvider(ISettingsSchema settingsSchema,
+      ICalculatedSettingsSchema calculatedSettingsSchema, IThreading threading, Lifetime lifetime)
+      : base(settingsSchema, calculatedSettingsSchema, threading, lifetime)
     {
+    }
+
+    protected override void Initialize()
+    {
+      base.Initialize();
+
       var bindingAndModuleDeclIndentingRulesParameters = new[]
       {
         ("NestedModuleDeclaration", ElementType.NESTED_MODULE_DECLARATION, NestedModuleDeclaration.MODULE_MEMBER),
         ("TopBinding", ElementType.TOP_BINDING, TopBinding.CHAMELEON_EXPR),
         ("LocalBinding", ElementType.LOCAL_BINDING, LocalBinding.EXPR),
+        ("LetModuleDeclBinding", ElementType.LET_MODULE_DECL, LetModuleDecl.BINDING),
+        ("LetExprBinding", ElementType.LET_OR_USE_EXPR, LetOrUseExpr.BINDING),
+        ("NestedModuleDeclName", ElementType.NESTED_MODULE_DECLARATION, NestedModuleDeclaration.IDENTIFIER),
+        ("NamedModuleDeclName", ElementType.NAMED_MODULE_DECLARATION, NamedModuleDeclaration.IDENTIFIER),
       };
 
-      var synExprIndentingRulesParameters = new[]
+      var fsExprIndentingRulesParameters = new[]
       {
         ("ForExpr", ElementType.FOR_EXPR, ForExpr.DO_EXPR),
         ("ForEachExpr", ElementType.FOR_EACH_EXPR, ForEachExpr.DO_EXPR),
@@ -40,29 +55,45 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         ("IfThenExpr", ElementType.IF_THEN_ELSE_EXPR, IfThenElseExpr.THEN_EXPR),
         ("ElifThenExpr", ElementType.ELIF_EXPR, ElifExpr.THEN_EXPR),
         ("LambdaExprBody", ElementType.LAMBDA_EXPR, LambdaExpr.EXPR),
+        ("MatchExpr_Expr", ElementType.MATCH_EXPR, MatchExpr.EXPR),
+        ("MatchExpr_With", ElementType.MATCH_EXPR, MatchExpr.WITH),
       };
 
       var typeDeclarationIndentingRulesParameters = new[]
       {
-        ("EnumDeclaration", ElementType.ENUM_DECLARATION, EnumDeclaration.ENUM_MEMBER),
+        ("EnumDeclaration", ElementType.ENUM_DECLARATION, EnumDeclaration.ENUM_REPR),
         ("UnionDeclarationCases", ElementType.UNION_DECLARATION, UnionDeclaration.UNION_REPR),
         ("TypeAbbreviation", ElementType.TYPE_ABBREVIATION_DECLARATION, TypeAbbreviationDeclaration.TYPE_OR_UNION_CASE),
         ("ModuleAbbreviation", ElementType.MODULE_ABBREVIATION, ModuleAbbreviation.TYPE_REFERENCE),
       };
 
+      var alignmentRulesParameters = new[]
+      {
+        ("MatchClauses", ElementType.MATCH_EXPR),
+        ("UnionCases", ElementType.UNION_CASE_LIST),
+        ("UnionRepresentation", ElementType.UNION_REPRESENTATION),
+        ("EnumCases", ElementType.ENUM_REPRESENTATION),
+        ("SequentialExpr", ElementType.SEQUENTIAL_EXPR),
+        ("BinaryExpr", ElementType.BINARY_APP_EXPR),
+      };
+
       lock (this)
       {
         bindingAndModuleDeclIndentingRulesParameters
-          .Union(synExprIndentingRulesParameters)
+          .Union(fsExprIndentingRulesParameters)
           .Union(typeDeclarationIndentingRulesParameters)
           .ToList()
           .ForEach(DescribeSimpleIndentingRule);
+
+        alignmentRulesParameters
+          .ToList()
+          .ForEach(DescribeSimpleAlignmentRule);
 
         Describe<IndentingRule>()
           .Name("TryWith_WithClauseIndent")
           .Where(
             Parent().HasType(ElementType.TRY_WITH_EXPR),
-            Node().HasRole(TryWithExpr.CLAUSE))
+            Node().HasRole(TryWithExpr.MATCH_CLAUSE))
           .Switch(
             settings => settings.IndentOnTryWith,
             When(true).Return(IndentType.External),
@@ -76,7 +107,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
             Node()
               .HasRole(PrefixAppExpr.ARG_EXPR)
               .Satisfies((node, context) =>
-                !(node is IComputationLikeExpr) ||
+                !(node is IComputationExpr) ||
                 !node.ContainsLineBreak(context.CodeFormatter)))
           .Return(IndentType.External)
           .Build();
@@ -111,6 +142,30 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
               }))
           .Return(IndentType.External)
           .Build();
+
+        Describe<IndentingRule>()
+          .Name("DoDeclIndent")
+          .Where(
+            Parent()
+              .HasType(ElementType.DO)
+              .Satisfies((node, context) => !((IDo) node).IsImplicit),
+            Node().HasRole(Do.CHAMELEON_EXPR))
+          .Return(IndentType.External)
+          .Build();
+
+        Describe<IndentingRule>()
+          .Name("UnionRepresentationCasesIndent")
+          .Where(
+            Parent()
+              .HasType(ElementType.UNION_REPRESENTATION)
+              .Satisfies((node, context) =>
+              {
+                var modifier = ((IUnionRepresentation) node).AccessModifier;
+                return modifier != null && modifier.HasNewLineAfter(context.CodeFormatter);
+              }),
+            Node().HasRole(UnionRepresentation.UNION_CASE_LIST))
+          .Return(IndentType.External)
+          .Build();
       }
     }
 
@@ -124,6 +179,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
           Parent().HasType(parameters.parentType),
           Node().HasRole(parameters.childRole))
         .Return(IndentType.External)
+        .Build();
+    }
+
+    private void DescribeSimpleAlignmentRule((string name, CompositeNodeType nodeType) parameters)
+    {
+      Describe<IndentingRule>()
+        .Name(parameters.name + "Alignment")
+        .Where(Node().HasType(parameters.nodeType))
+        .Return(IndentType.AlignThrough)
         .Build();
     }
 

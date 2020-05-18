@@ -13,6 +13,7 @@ open JetBrains.ProjectModel.MSBuild
 open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
+open JetBrains.ReSharper.Plugins.FSharp.Checker.ProjectOptions
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.TestFramework
@@ -85,6 +86,8 @@ type FSharpTestProjectOptionsProvider
             getProjectOptions sourceFile
 
         member x.GetParsingOptions(sourceFile) =
+            if isNull sourceFile then sandboxParsingOptions else
+
             let isScript = sourceFile.LanguageType.Is<FSharpScriptProjectFileType>()
 
             let isExe =

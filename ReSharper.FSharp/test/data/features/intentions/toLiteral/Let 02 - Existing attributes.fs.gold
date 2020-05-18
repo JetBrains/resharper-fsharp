@@ -1,0 +1,3 @@
+﻿module Module
+
+let [<Literal; CompiledName "I">] i{caret} = 1

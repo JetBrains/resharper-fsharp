@@ -60,6 +60,20 @@ type FSharpTargetsProjectLoadModificator() =
         member x.Modify(targets) =
             targets.AddRange(fsTargets)
 
+[<AutoOpen>]
+module ProjectOptions =
+    let sandboxParsingOptions =
+        { FSharpParsingOptions.Default with SourceFiles = [| "Sandbox.fs" |] }
+
+    [<RequireQualifiedAccess>]
+    module ImplicitDefines =
+        let sourceDefines = [ "EDITING"; "COMPILED" ]
+        let scriptDefines = [ "EDITING"; "INTERACTIVE" ]
+
+        let getImplicitDefines isScript =
+            if isScript then scriptDefines else sourceDefines
+
+
 
 type IFSharpProjectOptionsBuilder =
     abstract BuildSingleFSharpProject: IProject * IPsiModule -> FSharpProject
@@ -223,7 +237,12 @@ type FSharpProjectOptionsBuilder
             let parsingOptions, errors =
                 checkerService.Checker.GetParsingOptionsFromCommandLineArgs(List.ofArray options.OtherOptions)
 
-            let parsingOptions = { parsingOptions with SourceFiles = options.SourceFiles }
+            let defines = ImplicitDefines.sourceDefines @ parsingOptions.ConditionalCompilationDefines
+
+            let parsingOptions = { parsingOptions with
+                                        SourceFiles = options.SourceFiles
+                                        ConditionalCompilationDefines = defines }
+
             if not errors.IsEmpty then
                 logger.Warn("Getting parsing options: {0}", concatErrors errors)
 

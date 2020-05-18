@@ -13,6 +13,9 @@
     <Compile Include="src\Util\OpensUtil.fs" />
     <Compile Include="src\Util\FSharpParensUtil.fs" />
     <Compile Include="src\Util\FSharpExpressionUtil.fs" />
+    <Compile Include="src\Util\FSharpAttributesUtil.fs" />
+    <Compile Include="src\Util\FSharpMethodInvocationUtil.fs" />
+    <Compile Include="src\Util\FSharpVisualElementFactory.fs" />
     <Compile Include="src\CodeCompletion\CompletionUtil.fs" />
     <Compile Include="src\CodeCompletion\FSharpCodeCompletionContext.fs" />
     <Compile Include="src\CodeCompletion\FSharpPathCompletionProvider.fs" />
@@ -20,6 +23,7 @@
     <Compile Include="src\CodeCompletion\FSharpLookupItem.fs" />
     <Compile Include="src\CodeCompletion\FSharpCompletionProviders.fs" />
     <Compile Include="src\CodeStructure\FSharpCodeStructure.fs" />
+    <Compile Include="src\Daemon\Highlightings\TypeHintHighlighting.fs" />
     <Compile Include="src\Daemon\Highlightings\FSharpErrorUtil.fs" />
     <Compile Include="src\Daemon\Highlightings\ErrorHighlightings.fs" />
     <Compile Include="src\Daemon\Highlightings\CommonErrors.Generated.fs">
@@ -43,6 +47,7 @@
     <Compile Include="src\Daemon\Stages\FSharpInheritedMembersHighlighterStage.fs" />
     <Compile Include="src\Daemon\Stages\FSharpVcsCodeVisionRangesProviderStage.fs" />
     <Compile Include="src\Daemon\Stages\FSharpErrorsStage.fs" />
+    <Compile Include="src\Daemon\Stages\PipeChainTypeHintStage.fs" />
     <Compile Include="src\Daemon\Stages\InferredTypeCodeVisionProvider.fs" />
     <Compile Include="src\Daemon\Stages\FSharpSyntaxHighlightingStage.fs" />
     <Compile Include="src\Daemon\UsageChecking\FSharpUsageCheckingService.fs" />
@@ -57,6 +62,7 @@
     <Compile Include="src\Daemon\Analyzers\InactivePreprocessorBranchAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\RedundantAttributeParensAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\RedundantAttributeSuffixAnalyzer.fs" />
+    <Compile Include="src\Daemon\Analyzers\ColorReferenceAnalyzer.fs" />
     <Compile Include="src\Comment\FSharpBlockCommentActionProvider.fs" />
     <Compile Include="src\Comment\FSharpLineCommentActionProvider.fs" />
     <Compile Include="src\Debugger\FSharpBreakpointVariantsProvider.fs" />
@@ -75,6 +81,7 @@
     <Compile Include="src\Search\RecordCtorSearch.fs" />
     <Compile Include="src\ExtendSelection\FSharpExtendSelectionProvider.fs" />
     <Compile Include="src\Formatter\FSharpReformatCode.fs" />
+    <Compile Include="src\Fsi\FsiTools.fs" />
     <Compile Include="src\Fsi\FsiOptions.fs" />
     <Compile Include="src\Fsi\FsiDetector.fs" />
     <Compile Include="src\Fsi\FsiHost.fs" />
@@ -100,6 +107,7 @@
     <Compile Include="src\Intentions\IfToElifAction.fs" />
     <Compile Include="src\Intentions\NegateConditionActions.fs" />
     <Compile Include="src\Intentions\ToMutableAction.fs" />
+    <Compile Include="src\Intentions\ToLiteralAction.fs" />
     <ErrorsGen Include="src\Daemon\Highlightings\CommonErrors.xml">
       <Mode>QUICKFIX</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>
@@ -134,6 +142,9 @@
     <Compile Include="src\QuickFixes\RemoveRedundantAttributeParensFix.fs" />
     <Compile Include="src\QuickFixes\RemoveRedundantAttributeSuffixFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceWithAssignmentExpressionFix.fs" />
+    <Compile Include="src\QuickFixes\AddMatchAllClauseFix.fs" />
+    <Compile Include="src\QuickFixes\ToAbstractFix.fs" />
+    <Compile Include="src\QuickFixes\RemoveYieldFix.fs" />
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />
     <Compile Include="src\PostfixTemplates\NotTemplate.fs" />
     <Compile Include="src\PostfixTemplates\LetPostfixTemplate.fs" />
@@ -148,6 +159,7 @@
     <Compile Include="src\LanguageService\FSharpBreadcrumbsHelper.fs" />
     <Compile Include="src\LanguageService\FSharpImportTypeHelper.fs" />
     <Compile Include="src\LanguageService\FSharpQuickDefinitionService.fs" />
+    <Compile Include="src\LanguageService\SandboxDocumentLanguageSupportFSharpScript.fs" />
     <Compile Include="src\FSharpTypingAssist.fs" />
     <Compile Include="src\ZoneMarker.fs" />
   </ItemGroup>

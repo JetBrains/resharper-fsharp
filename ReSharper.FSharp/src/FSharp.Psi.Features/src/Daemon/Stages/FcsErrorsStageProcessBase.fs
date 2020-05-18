@@ -21,19 +21,24 @@ module FSharpErrors =
     let [<Literal>] NotAFunction = 3
     let [<Literal>] FieldNotMutable = 5
     let [<Literal>] UnitTypeExpected = 20
+    let [<Literal>] MatchIncomplete = 25
     let [<Literal>] RuleNeverMatched = 26
     let [<Literal>] ValNotMutable = 27
     let [<Literal>] VarBoundTwice = 38
     let [<Literal>] UndefinedName = 39
     let [<Literal>] UpcastUnnecessary = 66
     let [<Literal>] TypeTestUnnecessary = 67
+    let [<Literal>] EnumMatchIncomplete = 104
     let [<Literal>] ModuleOrNamespaceRequired = 222
     let [<Literal>] UnrecognizedOption = 243
+    let [<Literal>] NoImplementationGiven = 365
     let [<Literal>] UseBindingsIllegalInImplicitClassConstructors = 523
     let [<Literal>] LetAndForNonRecBindings = 576
     let [<Literal>] FieldRequiresAssignment = 764
     let [<Literal>] ExpectedExpressionAfterLet = 588
     let [<Literal>] SuccessiveArgsShouldBeSpacedOrTupled = 597
+    let [<Literal>] ConstructRequiresListArrayOrSequence = 747
+    let [<Literal>] ConstructRequiresComputationExpression = 748
     let [<Literal>] EmptyRecordInvalid = 789
     let [<Literal>] UseBindingsIllegalInModules = 524
     let [<Literal>] LocalClassBindingsCannotBeInline = 894
@@ -85,6 +90,15 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         if isNotNull expr then highlightingCtor (expr, error.Message) :> _ else
         null
 
+    let createHighlightingFromParentNodeWithMessage highlightingCtor range (error: FSharpErrorInfo): IHighlighting =
+        match nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null) with
+        | null -> null
+        | node ->
+
+        match node.GetContainingNode() with
+        | null -> null
+        | parent -> highlightingCtor (parent, error.Message) :> _
+
     let createHighlighting (error: FSharpErrorInfo) (range: DocumentRange): IHighlighting =
         match error.ErrorNumber with
         | TypeEquation when error.Message.StartsWith(ifExprMissingElseBranch, StringComparison.Ordinal) ->
@@ -126,6 +140,12 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
         | RuleNeverMatched ->
             createHighlightingFromParentNode RuleNeverMatchedWarning range
 
+        | MatchIncomplete ->
+            createHighlightingFromParentNodeWithMessage MatchIncompleteWarning range error
+
+        | EnumMatchIncomplete ->
+            createHighlightingFromParentNodeWithMessage EnumMatchIncompleteWarning range error
+
         | ValNotMutable ->
             let setExpr = fsFile.GetNode<ISetExpr>(range)
             if isNull setExpr then createGenericHighlighting error range else
@@ -142,6 +162,14 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | UseBindingsIllegalInModules ->
             createHighlightingFromNode UseBindingsIllegalInModulesWarning range
+
+        | NoImplementationGiven ->
+            let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
+            match expr.Parent with
+            | :? IFSharpTypeDeclaration as typeDecl when typeDecl.Identifier == expr ->
+                NoImplementationGivenError(typeDecl, error.Message) :> _
+
+            | _ -> createGenericHighlighting error range
 
         | UseBindingsIllegalInImplicitClassConstructors ->
             createHighlightingFromNode UseKeywordIllegalInPrimaryCtorError range
@@ -163,6 +191,12 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | SuccessiveArgsShouldBeSpacedOrTupled ->
             createHighlightingFromNode SuccessiveArgsShouldBeSpacedOrTupledError range
+
+        | ConstructRequiresListArrayOrSequence ->
+            createHighlightingFromNode YieldRequiresSeqExpressionError range
+
+        | ConstructRequiresComputationExpression ->
+            createHighlightingFromNode ReturnRequiresComputationExpressionError range
 
         | EmptyRecordInvalid ->
             createHighlightingFromNodeWithMessage EmptyRecordInvalidError range error

@@ -10,26 +10,26 @@ IFSharpImplFile
         IReturnTypeInfo
           FSharpTokenType+ColonTokenElement(type:COLON, text::)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          ITupleType
-            INamedType
+          ITupleTypeUsage
+            INamedTypeUsage
               ITypeReferenceName
                 FSharpIdentifierToken(type:IDENTIFIER, text:int)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+StarTokenElement(type:STAR, text:*)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            INamedType
+            INamedTypeUsage
               ITypeReferenceName
                 FSharpIdentifierToken(type:IDENTIFIER, text:int)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+StarTokenElement(type:STAR, text:*)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            INamedType
+            INamedTypeUsage
               ITypeReferenceName
                 FSharpIdentifierToken(type:IDENTIFIER, text:int)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+StarTokenElement(type:STAR, text:*)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            INamedType
+            INamedTypeUsage
               ITypeReferenceName
                 FSharpIdentifierToken(type:IDENTIFIER, text:int)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "

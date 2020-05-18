@@ -18,7 +18,7 @@ IFSharpImplFile
                 FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
             FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IAnonType
+          IAnonTypeUsage
             FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)

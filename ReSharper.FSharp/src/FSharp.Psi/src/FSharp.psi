@@ -149,19 +149,9 @@ letModuleDecl options { stubBase="DummyDeclaration"; } extras {
   REC<REC, RecKeyword>?
   LIST binding<BINDING, Bindings> SEP AND<FSHARP_AND, Separators>;
 
-
-interface let:
-  letBindings |
-  letOrUseBangExpr;
-
 interface letBindings:
   letModuleDecl |
   letOrUseExpr;
-
-interface letLikeExpr:
-  letOrUseExpr |
-  letOrUseBangExpr;
-
 
 interface binding:
   topBinding |
@@ -188,14 +178,14 @@ localBinding extras {
   synPat<HEAD_PATTERN, HeadPattern>
   returnTypeInfo<RETURN_INFO, ReturnTypeInfo>?
   EQUALS<EQUALS, EqualsToken>
-  synExpr<EXPR, Expression>;
+  fSharpExpression<EXPR, Expression>;
 
 returnTypeInfo extras {
   get { methodName="Attributes" path=<returnTypeInfo:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
   COLON
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
-  synType<TYPE, ReturnType>;
+  typeUsage<TYPE, ReturnType>;
 
 interface synPat:
   namedPat |
@@ -274,7 +264,7 @@ interface arrayOrListPat:
 typedPat options { stubBase="SynPatternBase"; }:
   synPat<PATTERN, Pattern>
   COLON
-  synType<TYPE, Type>;
+  typeUsage<TYPE, Type>;
 
 attribPat options { stubBase="SynPatternBase"; } extras {
   get { methodName="Attributes" path=<attribPat:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
@@ -317,7 +307,7 @@ recordPat options { stubBase="SynPatternBase"; }:
 
 fieldPat options { stubBase="SynPatternBase"; }:
   expressionReferenceName<REFERENCE_NAME, ReferenceName>
-  EQUALS
+  EQUALS<FSHARP_EQUALS, EqualsToken>
   synPat<PAT, Pattern>;
 
 optionalValPat options { stubBase="SynPatternBase"; }:
@@ -326,7 +316,7 @@ optionalValPat options { stubBase="SynPatternBase"; }:
 
 isInstPat options { stubBase="SynPatternBase"; }:
   COLON_QMARK
-  synType<SYN_TYPE, Type>;
+  typeUsage<SYN_TYPE, Type>;
 
 consPat options { stubBase="SynPatternBase"; }:
   synPat<PATTERN1, Pattern1>
@@ -348,26 +338,24 @@ otherPat options { stubBase="SynPatternBase"; }:
   fakeSeparator;
 
 
-interface synExpr:
+interface fSharpExpression:
   parenExpr |
   quoteExpr |
   constExpr |
   typedLikeExpr |
   tupleExpr |
-  anonRecdExpr |
+  recordLikeExpr |
   arrayOrListExpr |
-  recordExpr |
   objExpr |
-  forExpr |
-  forEachExpr |
-  arrayOrListOfSeqExpr |
-  computationLikeExpr |
+  forLikeExpr |
+  rangeSequenceExpr |
+  computationExpr |
   lambdaExpr |
   matchLikeExpr |
   doLikeExpr |
   appLikeExpr |
   binaryAppExpr |
-  letLikeExpr |
+  letOrUseExpr |
   tryLikeExpr |
   sequentialExpr |
   conditionOwnerExpr |
@@ -390,6 +378,10 @@ interface doLikeExpr:
   lazyExpr |
   fixedExpr |
   inferredCastExpr;
+
+interface forLikeExpr:
+  forExpr |
+  forEachExpr;
 
 interface appLikeExpr:
   prefixAppExpr |
@@ -416,10 +408,10 @@ interface conditionOwnerExpr:
   ifExpr |
   whileExpr;
 
-setExpr options { stubBase="FSharpExpressionBase"; }:
-  synExpr<LEFT_EXPR, LeftExpression>
+setExpr options { stubBase="UnitExpressionBase"; }:
+  fSharpExpression<LEFT_EXPR, LeftExpression>
   LARROW<LARROW, LArrow>
-  synExpr<RIGHT_EXPR, RightExpression>;
+  fSharpExpression<RIGHT_EXPR, RightExpression>;
 
 interface indexerExpr:
   itemIndexerExpr |
@@ -428,7 +420,7 @@ interface indexerExpr:
 itemIndexerExpr options { stubBase="FSharpExpressionBase"; } extras {
   get { methodName="Args" path=<itemIndexerExpr:ARG_LIST/indexerArgList:INDEXER_ARG> };
 }:
-  synExpr<QUALIFIER_EXPR, Qualifier>
+  fSharpExpression<QUALIFIER_EXPR, Qualifier>
   DOT
   indexerArgList<ARG_LIST, IndexerArgList>;
 
@@ -437,7 +429,7 @@ namedIndexerExpr options { stubBase="FSharpExpressionBase"; } extras {
   get { methodName="Args" path=<namedIndexerExpr:INDEXER_ARG> };
 }:
   // todo: maybe: refExpr?
-  synExpr<QUALIFIER_EXPR, Qualifier>
+  fSharpExpression<QUALIFIER_EXPR, Qualifier>
   indexerArg<INDEXER_ARG, IndexerArg>;
 
 indexerArgList:
@@ -452,12 +444,12 @@ interface indexerArg:
 indexerArgExpr  extras {
   get { methodName="Expressions" path=<indexerArgExpr:EXPR> };
 }:
-  synExpr<EXPR, Expression>;
+  fSharpExpression<EXPR, Expression>;
 
 indexerArgRange:
-  synExpr<EXPR, Expressions>
+  fSharpExpression<EXPR, Expressions>
   DOT_DOT
-  synExpr<EXPR, Expressions>;
+  fSharpExpression<EXPR, Expressions>;
 
 interface castExpr:
   upcastExpr |
@@ -465,18 +457,18 @@ interface castExpr:
 
 parenExpr options { stubBase="FSharpExpressionBase"; }:
   LPAREN<LPAREN, LeftParen>
-  synExpr<EXPR, InnerExpression>?
+  fSharpExpression<EXPR, InnerExpression>?
   RPAREN<RPAREN, RightParen>;
 
 quoteExpr options { stubBase="FSharpExpressionBase"; }:
   (
     LQUOTE_TYPED
-    synExpr<EXPR, QuotedExpression>?
+    fSharpExpression<EXPR, QuotedExpression>?
     RQUOTE_TYPED?
   ) |
   (
     LQUOTE_UNTYPED
-    synExpr<EXPR, QuotedExpression>?
+    fSharpExpression<EXPR, QuotedExpression>?
     RQUOTE_UNTYPED?
   );
 
@@ -484,54 +476,71 @@ interface constExpr:
   unitExpr |
   literalExpr;
 
-unitExpr options { stubBase="FSharpExpressionBase"; }:
+unitExpr options { stubBase="UnitExpressionBase"; }:
   LPAREN<LPAREN, LParen>
   RPAREN<RPAREN, RParen>;
 
-// todo: add numeric literals
 literalExpr options { stubBase="FSharpExpressionBase"; }:
   TRUE<LITERAL, Literal> |
   FALSE<LITERAL, Literal> |
-  NULL<LITERAL, Literal>;
+  NULL<LITERAL, Literal> |
+  SBYTE<LITERAL, Literal> |
+  BYTE<LITERAL, Literal> |
+  INT16<LITERAL, Literal> |
+  UINT16<LITERAL, Literal> |
+  INT32<LITERAL, Literal> |
+  UINT32<LITERAL, Literal> |
+  INT64<LITERAL, Literal> |
+  UINT64<LITERAL, Literal> |
+  IEEE32<LITERAL, Literal> |
+  IEEE64<LITERAL, Literal> |
+  DECIMAL<LITERAL, Literal> |
+  BIGNUM<LITERAL, Literal> |
+  NATIVEINT<LITERAL, Literal> |
+  UNATIVEINT<LITERAL, Literal> |
+  CHARACTER_LITERAL<LITERAL, Literal> |
+  STRING<LITERAL, Literal> |
+  VERBATIM_STRING<LITERAL, Literal> |
+  TRIPLE_QUOTED_STRING<LITERAL, Literal> |
+  BYTEARRAY<LITERAL, Literal> |
+  VERBATIM_BYTEARRAY<LITERAL, Literal> |
+  BYTECHAR<LITERAL, Literal>;
 
 typedExpr options { stubBase="FSharpExpressionBase"; }:
-  synExpr<EXPR, Expression>
+  fSharpExpression<EXPR, Expression>
   COLON
-  synType<TYPE, Type>;
+  typeUsage<TYPE, Type>;
 
 tupleExpr options { stubBase="FSharpExpressionBase"; }:
   (
     LPAREN
     STRUCT<STRUCT, StructKeyword>
   )?
-  LIST synExpr<EXPR, Expressions> SEP COMMA<FSHARP_COMMA, Commas>;
+  LIST fSharpExpression<EXPR, Expressions> SEP COMMA<FSHARP_COMMA, Commas>;
 
-anonRecdExpr options { stubBase="FSharpExpressionBase"; }:
+interface recordLikeExpr:
+  anonRecordExpr |
+  recordExpr;
+
+anonRecordExpr options { stubBase="FSharpExpressionBase"; }:
   STRUCT<STRUCT, STRUCT_KEYWORD>?
   LBRACE_BAR
   (
-    synExpr<COPY_INFO, CopyInfoExpression>
+    fSharpExpression<COPY_INFO, CopyInfoExpression>
     WITH
   )?
   recordExprBinding<BINDING, ExprBindings>*
   BAR_RBRACE;
 
 arrayOrListExpr options { stubBase="FSharpExpressionBase"; }:
-  (
-    LBRACK
-    synExpr<EXPR, Expressions>*
-    RBRACK
-  ) |
-  (
-    LBRACK_BAR
-    synExpr<EXPR, Expressions>*
-    BAR_RBRACK
-  );
+  (LBRACK | LBRACK_BAR)
+  fSharpExpression<EXPR, Expression>
+  (RBRACK | BAR_RBRACK);
 
 recordExpr options { stubBase="FSharpExpressionBase"; }:
   LBRACE<LBRACE, LeftBrace>
   (
-    synExpr<COPY_INFO, CopyInfoExpression>
+    fSharpExpression<COPY_INFO, CopyInfoExpression>
     WITH
   )?
   recordExprBinding<BINDING, ExprBindings>*
@@ -539,51 +548,42 @@ recordExpr options { stubBase="FSharpExpressionBase"; }:
 
 recordExprBinding:
   expressionReferenceName<REFERENCE_NAME, ReferenceName>
-  EQUALS
-  synExpr<EXPR, Expression>
+  EQUALS<FSHARP_EQUALS, EqualsToken>
+  fSharpExpression<EXPR, Expression>
   SEMICOLON<FSHARP_SEMI, Semicolon>?;
 
 newExpr options { stubBase="FSharpExpressionBase"; }:
   NEW<NEW, NewKeyword>
   typeReferenceName<TYPE_REFERENCE, TypeName>
-  synExpr<EXPR, ArgumentExpression>;
+  fSharpExpression<EXPR, ArgumentExpression>;
 
-forExpr options { stubBase="FSharpExpressionBase"; }:
+forExpr options { stubBase="UnitExpressionBase"; }:
   FOR
   localDeclaration<IDENTIFIER, Identifier>
-  EQUALS
-  synExpr<IDENT_EXPR, IdentExpression>
+  EQUALS<FSHARP_EQUALS, EqualsToken>
+  fSharpExpression<IDENT_EXPR, IdentExpression>
   TO
-  synExpr<TO_EXPR, ToExpression>
+  fSharpExpression<TO_EXPR, ToExpression>
   DO
-  synExpr<DO_EXPR, DoExpression>;
+  fSharpExpression<DO_EXPR, DoExpression>;
 
-forEachExpr options { stubBase="FSharpExpressionBase"; }:
+forEachExpr options { stubBase="UnitExpressionBase"; }:
   FOR
   synPat<PAT, Pattern>
   IN
-  forEachInClause{IN_CLAUSE, InClause}
-  DO
-  synExpr<DO_EXPR, DoExpression>;
+  fSharpExpression<IN_EXPR, InExpression>
+  forEachBodySeparator{BODY_SEPARATOR, BodySeparator}
+  fSharpExpression<DO_EXPR, DoExpression>;
 
-private forEachInClause{ROLE, Getter}:
-  synExpr<@ROLE, @Getter> |
-  rangeSequence<@ROLE, @Getter>;
+private forEachBodySeparator{ROLE, Getter}:
+  DO<@ROLE, @Getter> |
+  RARROW<@ROLE, @Getter>;
 
-arrayOrListOfSeqExpr options { stubBase="FSharpExpressionBase"; }:
-  (LBRACK
-   synExpr<EXPR, Expression>
-   RBRACK) |
-
-   (LBRACK_BAR
-    synExpr<EXPR, Expression>
-    BAR_RBRACK);
-
-whileExpr options { stubBase="FSharpExpressionBase"; }:
+whileExpr options { stubBase="UnitExpressionBase"; }:
   WHILE<WHILE_KEYWORD, WhileKeyword>
-  synExpr<WHILE_EXPR, ConditionExpr>
+  fSharpExpression<WHILE_EXPR, ConditionExpr>
   DO
-  synExpr<DO_EXPR, DoExpression>;
+  fSharpExpression<DO_EXPR, DoExpression>;
 
 objExpr options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="InterfaceMembers" path=<objExpr:INTERFACE_IMPL/interfaceImplementation:MEMBER_DECL> };
@@ -591,29 +591,26 @@ objExpr options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   LBRACE
   NEW
   typeReferenceName<TYPE_REFERENCE, TypeName>
-  synExpr<ARG_EXPR, ArgExpression>
+  fSharpExpression<ARG_EXPR, ArgExpression>
   WITH
   memberDeclaration<MEMBER_DECL, MemberDeclarations>*
   interfaceImplementation<INTERFACE_IMPL, InterfaceImplementations>*
   RBRACE;
 
-interface computationLikeExpr:
-  computationExpr |
-  rangeSequenceExpr;
-
 computationExpr options { stubBase="FSharpExpressionBase"; }:
   LBRACE
-  synExpr<EXPR, Expression>
+  fSharpExpression<EXPR, Expression>
   RBRACE;
 
 lambdaExpr options { stubBase="FSharpExpressionBase"; }:
   FUN
   synPat<PAT, Patterns>*
-  RARROW
-  synExpr<EXPR, Expression>;
+  RARROW<RARROW, RArrow>
+  fSharpExpression<EXPR, Expression>;
 
 interface matchClauseListOwner:
-  matchLikeExpr |
+  matchExpr |
+  matchLambdaExpr |
   tryWithExpr;
 
 interface matchLikeExpr:
@@ -627,77 +624,77 @@ matchLambdaExpr options { stubBase="FSharpExpressionBase"; }:
 // todo: separate nodes for bang exprs?
 matchExpr options { stubBase="FSharpExpressionBase"; }:
   MATCH
-  synExpr<EXPR, Expression>
-  WITH
+  fSharpExpression<EXPR, Expression>
+  WITH<WITH, WithKeyword>
   matchClause<MATCH_CLAUSE, Clauses>*;
 
-doExpr options { stubBase="FSharpExpressionBase"; }:
+doExpr options { stubBase="UnitExpressionBase"; }:
   DO<KEYWORD, Keyword>
-  synExpr<EXPR, Expression>;
+  fSharpExpression<EXPR, Expression>;
 
 assertExpr options { stubBase="FSharpExpressionBase"; }:
   ASSERT<KEYWORD, Keyword>
-  synExpr<EXPR, Expression>;
+  fSharpExpression<EXPR, Expression>;
 
 prefixAppExpr options { stubBase="FSharpExpressionBase"; }:
-  synExpr<FUNC_EXPR, FunctionExpression>
-  synExpr<ARG_EXPR, ArgumentExpression>;
+  fSharpExpression<FUNC_EXPR, FunctionExpression>
+  fSharpExpression<ARG_EXPR, ArgumentExpression>;
 
 binaryAppExpr options { stubBase="FSharpExpressionBase"; } extras {
   get { methodName="FunctionExpression" path=<binaryAppExpr:OP_REF_EXPR> };
 }:
-  synExpr<LEFT_ARG_EXPR, LeftArgument>
+  fSharpExpression<LEFT_ARG_EXPR, LeftArgument>
   referenceExpr<OP_REF_EXPR, Operator>
-  synExpr<RIGHT_ARG_EXPR, RightArgument>;
+  fSharpExpression<RIGHT_ARG_EXPR, RightArgument>;
 
 letOrUseExpr options { stubBase="FSharpExpressionBase"; }:
   letOrUse{LET, LetOrUseToken}
   REC<REC, RecKeyword>?
   LIST binding<BINDING, Bindings> SEP AND<FSHARP_AND, Separators>  
   IN<IN, InKeyword>?
-  synExpr<IN_EXPR, InExpression>;
+  fSharpExpression<IN_EXPR, InExpression>;
 
 interface tryLikeExpr:
   tryWithExpr |
   tryFinallyExpr;
 
 tryWithExpr options { stubBase="FSharpExpressionBase"; }:
-  TRY
-  synExpr<TRY_EXPR, TryExpression>
+  TRY<TRY_KEYWORD, TryKeyword>
+  fSharpExpression<TRY_EXPR, TryExpression>
   WITH
-  matchClause<CLAUSE, Clauses>*;
+  matchClause<MATCH_CLAUSE, Clauses>*;
 
 tryFinallyExpr options { stubBase="FSharpExpressionBase"; }:
-  TRY
-  synExpr<TRY_EXPR, TryExpression>
+  TRY<TRY_KEYWORD, TryKeyword>
+  fSharpExpression<TRY_EXPR, TryExpression>
   FINALLY
-  synExpr<FINALLY_EXPR, FinallyExpression>;
+  fSharpExpression<FINALLY_EXPR, FinallyExpression>;
 
 lazyExpr options { stubBase="FSharpExpressionBase"; }:
   LAZY<KEYWORD, Keyword>
-  synExpr<EXPR, Expression>;
+  fSharpExpression<EXPR, Expression>;
 
 sequentialExpr options { stubBase="FSharpExpressionBase"; }:
-  LIST synExpr<EXPR, Expressions> SEP SEMICOLON<FSHARP_SEMI, Separators>;
+  LIST fSharpExpression<EXPR, Expressions> SEP SEMICOLON<FSHARP_SEMI, Separators>;
 
 ifThenElseExpr options { stubBase="FSharpExpressionBase"; }:
   IF<IF, IfKeyword>
-  synExpr<IF_EXPR, ConditionExpr>
+  fSharpExpression<IF_EXPR, ConditionExpr>
   THEN<THEN, ThenKeyword>
-  synExpr<THEN_EXPR, ThenExpr>
+  fSharpExpression<THEN_EXPR, ThenExpr>
   elseClause{ELSE_CLAUSE, ElseExpr}?;
 
 elifExpr options { stubBase="FSharpExpressionBase"; }:
   ELIF<ELIF, ElifKeyword>
-  synExpr<IF_EXPR, ConditionExpr>
+  fSharpExpression<IF_EXPR, ConditionExpr>
   THEN<THEN, ThenKeyword>
-  synExpr<THEN_EXPR, ThenExpr>
+  fSharpExpression<THEN_EXPR, ThenExpr>
   elseClause{ELSE_CLAUSE, ElseExpr}?;
 
 private elseClause{ROLE, Getter}:
   (
     ELSE<ELSE, ElseKeyword>
-    synExpr<@ROLE, @Getter>)
+    fSharpExpression<@ROLE, @Getter>)
   |
   (
     elifExpr<@ROLE, @Getter>
@@ -707,7 +704,7 @@ referenceExpr options { stubBase="FSharpExpressionBase"; } extras {
   get { methodName="TypeArguments" path=<referenceExpr:TYPE_ARG_LIST/prefixAppTypeArgumentList:TYPE> };
 }:
   (
-    synExpr<QUALIFIER_EXPR, Qualifier>
+    fSharpExpression<QUALIFIER_EXPR, Qualifier>
     DOT
   )?
   fSharpIdentifier<IDENTIFIER, Identifier>
@@ -716,28 +713,28 @@ referenceExpr options { stubBase="FSharpExpressionBase"; } extras {
 matchClause:
   BAR<BAR, Bar>?
   synPat<PAT, Pattern>
-  whenExpr<WHEN_EXPR, WhenExpression>?
+  whenExprClause<WHEN_EXPR, WhenExpression>?
   RARROW<RARROW, RArrow>
-  synExpr<EXPR, Expression>;
+  fSharpExpression<EXPR, Expression>;
   
-whenExpr:
+whenExprClause:
   WHEN<WHEN, WhenKeyword>
-  synExpr<EXPR, Expression>;
+  fSharpExpression<EXPR, Expression>;
 
 typeTestExpr options { stubBase="FSharpExpressionBase"; }:
-  synExpr<EXPR, Expression>
+  fSharpExpression<EXPR, Expression>
   COLON_QMARK
-  synType<TYPE, TypeUsage>;
+  typeUsage<TYPE, TypeUsage>;
 
 upcastExpr options { stubBase="FSharpExpressionBase"; }:
-  synExpr<EXPR, Expression>
+  fSharpExpression<EXPR, Expression>
   COLON_GREATER<OP, OperatorToken>
-  synType<TYPE, TypeUsage>;
+  typeUsage<TYPE, TypeUsage>;
   
 downcastExpr options { stubBase="FSharpExpressionBase"; }:
-  synExpr<EXPR, Expression>
+  fSharpExpression<EXPR, Expression>
   COLON_QMARK_GREATER<OP, OperatorToken>
-  synType<TYPE, TypeUsage>;
+  typeUsage<TYPE, TypeUsage>;
 
 interface inferredCastExpr:
   inferredUpcastExpr |
@@ -745,11 +742,11 @@ interface inferredCastExpr:
 
 inferredUpcastExpr options { stubBase="FSharpExpressionBase"; }:
   UPCAST<KEYWORD, Keyword>
-  synExpr<EXPR, Expression>;
+  fSharpExpression<EXPR, Expression>;
 
 inferredDowncastExpr options { stubBase="FSharpExpressionBase"; }:
   DOWNCAST<KEYWORD, Keyword>
-  synExpr<EXPR, Expression>;
+  fSharpExpression<EXPR, Expression>;
 
 // todo: maybe replace with SynExpr.Const in FCS?
 nullExpr options { stubBase="FSharpExpressionBase"; }:
@@ -757,7 +754,7 @@ nullExpr options { stubBase="FSharpExpressionBase"; }:
 
 addressOfExpr options { stubBase="FSharpExpressionBase"; }:
   (AMP | AMP_AMP)
-  synExpr<EXPR, Expression>;
+  fSharpExpression<EXPR, Expression>;
 
 traitCallExpr options { stubBase="FSharpExpressionBase"; }:
   fakeSeparator;
@@ -769,43 +766,35 @@ implicitZeroExpr options { stubBase="FSharpExpressionBase"; }:
   fakeSeparator;
 
 yieldOrReturnExpr options { stubBase="FSharpExpressionBase"; }:
-  (YIELD | YIELD_BANG | RETURN | RETURN_BANG)
-  synExpr<EXPR, Expression>;
-
-letOrUseBangExpr options { stubBase="FSharpExpressionBase"; } extras {
-  get { methodName="Bindings" path=<letOrUseBangExpr:BINDING> };
-}:
-  letOrUseBang{LET, LetOrUseToken}
-  LIST binding<BINDING, Bindings> SEP AND_BANG<FSHARP_AND, Separators>
-  IN<IN, InKeyword>?
-  synExpr<IN_EXPR, InExpression>;
+  (
+    YIELD<YIELD_KEYWORD, YieldKeyword> |
+    YIELD_BANG<YIELD_KEYWORD, YieldKeyword> |
+    RETURN<YIELD_KEYWORD, YieldKeyword> |
+    RETURN_BANG<YIELD_KEYWORD, YieldKeyword>
+  )
+  fSharpExpression<EXPR, Expression>;
 
 libraryOnlyExpr options { stubBase="FSharpExpressionBase"; }:
   fakeSeparator;
 
 fromErrorExpr options { stubBase="FSharpExpressionBase"; }:
-  fakeSeparator;
+  fSharpExpression<EXPR, Expression>;
 
 fixedExpr options { stubBase="FSharpExpressionBase"; }:
   FIXED<KEYWORD, Keyword>
-  synExpr<EXPR, Expression>;
-
-rangeSequence:
-  synExpr<FROM_EXPR, FromExpr>
-  (
-    DOT_DOT
-    synExpr<STEP_EXPR, StepExpr>
-  )?
-  DOT_DOT
-  synExpr<TO_EXPR, ToExpr>;
+  fSharpExpression<EXPR, Expression>;
 
 rangeSequenceExpr options { stubBase="FSharpExpressionBase"; }:
-  LBRACE
-  rangeSequence<RANGE, RangeSequence>
-  RBRACE;
+  fSharpExpression<FROM_EXPR, FromExpr>
+  (
+    DOT_DOT
+    fSharpExpression<STEP_EXPR, StepExpr>
+  )?
+  DOT_DOT
+  fSharpExpression<TO_EXPR, ToExpr>;
 
 chameleonExpression:
-  synExpr<EXPR, Expression>;
+  fSharpExpression<EXPR, Expression>;
 
 
 typeDeclarationGroup extras {
@@ -873,13 +862,17 @@ typeExtensionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; 
 enumDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<enumDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
   get { methodName="Attributes" path=<enumDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+  get {methodName="EnumMembers" path=<enumDeclaration:ENUM_REPR/enumRepresentation:ENUM_MEMBER> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
-  enumMemberDeclaration<ENUM_MEMBER, EnumMembers>*
+  enumRepresentation<ENUM_REPR, EnumRepresentation>*
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
+
+enumRepresentation:
+  enumMemberDeclaration<ENUM_MEMBER, EnumMembers>*;
 
 enumMemberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
   get { methodName="Attributes" path=<enumMemberDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
@@ -916,7 +909,7 @@ recordFieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase
   MUTABLE<MUTABLE, MutableKeyword>?
   IDENTIFIER<IDENTIFIER, Identifier>
   COLON
-  synType<TYPE, Type>;
+  typeUsage<TYPE, Type>;
 
 
 
@@ -924,11 +917,14 @@ recordFieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase
 
 unionRepresentation:
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
+  unionCaseList<UNION_CASE_LIST, UnionCaseList>;
+
+unionCaseList:
   unionCaseDeclaration<UNION_CASE, UnionCases>*;
 
 unionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<unionDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
-  get { methodName="UnionCases" path=<unionDeclaration:UNION_REPR/unionRepresentation:UNION_CASE> };
+  get { methodName="UnionCases" path=<unionDeclaration:UNION_REPR/unionRepresentation:UNION_CASE_LIST/unionCaseList:UNION_CASE> };
   get { methodName="Attributes" path=<unionDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
@@ -969,11 +965,11 @@ interface caseFieldDeclaration:
 
 unionCaseFieldDeclaration options { stubBase="UnionCaseFieldDeclarationBase"; }:
   IDENTIFIER<IDENTIFIER, Identifier>?
-  synType<TYPE, Type>;
+  typeUsage<TYPE, Type>;
 
 exceptionFieldDeclaration options { stubBase="UnionCaseFieldDeclarationBase"; }:
   IDENTIFIER<IDENTIFIER, Identifier>?
-  synType<TYPE, Type>;
+  typeUsage<TYPE, Type>;
 
 
 // Other members
@@ -998,12 +994,12 @@ typeAbbreviationDeclaration options { stubBase="FSharpTypeElementDeclarationBase
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
-  EQUALS
+  EQUALS<FSHARP_EQUALS, EqualsToken>
   abbreviatedTypeOrUnionCaseDeclaration<TYPE_OR_UNION_CASE, AbbreviatedTypeOrUnionCase>
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
 
 abbreviatedTypeOrUnionCaseDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
-  synType<TYPE, AbbreviatedType>;
+  typeUsage<TYPE, AbbreviatedType>;
 
 moduleAbbreviation options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<moduleAbbreviation:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
@@ -1013,7 +1009,7 @@ moduleAbbreviation options { stubBase="FSharpTypeElementDeclarationBase"; } extr
   MODULE<MODULE, ModuleOrNamespaceKeyword>
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   fSharpIdentifier<IDENTIFIER, Identifier>
-  EQUALS
+  EQUALS<FSHARP_EQUALS, EqualsToken>
   typeReferenceName<TYPE_REFERENCE, TypeName>
   // todo: remove rules below
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
@@ -1108,7 +1104,7 @@ delegateDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } ext
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
-  EQUALS
+  EQUALS<FSHARP_EQUALS, EqualsToken>
   delegateRepresentation<DELEGATE_REPR, DelegateRepresentation>
   // todo: remove members
   fSharpTypeMemberDeclaration<TYPE_MEMBER, TypeMembers>*;
@@ -1116,7 +1112,7 @@ delegateDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } ext
 delegateRepresentation:
   DELEGATE
   OF
-  synType<TYPE, Type>;
+  typeUsage<TYPE, Type>;
 
 interface fSharpTypeMemberDeclaration:
   constructorDeclaration |
@@ -1192,6 +1188,7 @@ memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } 
   get { methodName="TypeParameters" path=<memberDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfMethodList:TYPE_PARAMETER> };
   get { methodName="Parameters" path=<memberDeclaration:PARAM_GROUP/memberParamDeclarationGroup:PARAMETER> };
   get { methodName="Attributes" path=<memberDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+  get { methodName="Expression" path=<memberDeclaration:CHAMELEON_EXPR/chameleonExpression:EXPR> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   (
@@ -1200,15 +1197,14 @@ memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } 
   |
     memberKeyword{MEMBER_KEYWORD, MemberKeyword}
   )
-  MEMBER<MEMBER, MemberKeyword>
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   memberSelfId<SELF_ID, SelfId>?
   identOrOpName{IDENTIFIER, Identifier}
   typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   (
     memberParamDeclarationGroup<PARAM_GROUP, ParameterGroups>*
-    EQUALS
-    chameleonExpression
+    EQUALS<FSHARP_EQUALS, EqualsToken>
+    chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>
   |
     WITH
     accessorDeclaration
@@ -1244,7 +1240,7 @@ autoProperty options { stubBase="FSharpProperTypeMemberDeclarationBase"; }  extr
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   IDENTIFIER<IDENTIFIER, Identifier>
-  EQUALS
+  EQUALS<FSHARP_EQUALS, EqualsToken>
   chameleonExpression<CHAMELEON_EXPR, InitExpression>
   accessorsNamesClause<ACESSORS_CLAUSE, AccessorsClause>?;
 
@@ -1254,14 +1250,14 @@ accessorsNamesClause:
     IDENTIFIER<ACESSOR, AccessorsNames>
   |
     IDENTIFIER<ACESSOR, AccessorsNames>
-    COMMA
+    COMMA<FSHARP_COMMA, Comma>
     IDENTIFIER<ACESSOR, AccessorsNames>
   );
 
 accessorDeclaration:
   IDENTIFIER<IDENTIFIER, Identifier>
   memberParamDeclaration<PARAMETER, Parameters>*
-  EQUALS
+  EQUALS<FSHARP_EQUALS, EqualsToken>
   chameleonExpression<CHAMELEON_EXPR, BodyExpression>;
 
 
@@ -1328,9 +1324,7 @@ do options { stubBase="DummyDeclaration"; } extras {
 
 private letOrUse{ROLE, Getter}:
   LET<@ROLE, @Getter> |
-  USE<@ROLE, @Getter>;
-
-private letOrUseBang{ROLE, Getter}:
+  USE<@ROLE, @Getter> |
   LET_BANG<@ROLE, @Getter> |
   USE_BANG<@ROLE, @Getter>;
 
@@ -1408,9 +1402,9 @@ private accessModifier{ROLE,Getter}:
 // Attributes
 
 attributeList:
-  LBRACK<LBRACK, LBrack>
+  LBRACK_LESS<LBRACK, LBrack>
   LIST attribute<ATTRIBUTE, Attributes> SEP SEMICOLON<FSHARP_SEMI, Separators>
-  RBRACK<RBRACK, RBrack>;
+  GREATER_RBRACK<RBRACK, RBrack>;
 
 attribute options { stubBase="TypeReferenceOwnerBase"; } extras {
   get { methodName="Expression" path=<attribute:CHAMELEON_EXPR/chameleonExpression:EXPR> };
@@ -1446,16 +1440,16 @@ interface typeArgumentList:
 
 postfixAppTypeArgumentList:
   (
-    synType<TYPE, Types>
+    typeUsage<TYPE, Types>
   |
     LPAREN
-    LIST synType<TYPE, Types> SEP COMMA<FSHARP_COMMA, Commas>
+    LIST typeUsage<TYPE, Types> SEP COMMA<FSHARP_COMMA, Commas>
     RPAREN
  );
 
 prefixAppTypeArgumentList:
   LESS<LESS,LAngle>
-  LIST synType<TYPE, Types> SEP COMMA<FSHARP_COMMA, Commas>
+  LIST typeUsage<TYPE, Types> SEP COMMA<FSHARP_COMMA, Commas>
   GREATER<GREATER,RAngle>;
 
 
@@ -1486,27 +1480,27 @@ typeReferenceName options { stubBase="TypeReferenceOwnerBase"; }:
   );
 
 
-interface synType:
-  namedType |
-  tupleType |
-  anonRecordType |
-  arrayType |
-  funType |
-  anonType |
-  otherType;
+interface typeUsage:
+  namedTypeUsage |
+  tupleTypeUsage |
+  anonRecordTypeUsage |
+  arrayTypeUsage |
+  functionTypeUsage |
+  anonTypeUsage |
+  unsupportedTypeUsage;
 
 
-namedType:
+namedTypeUsage:
   typeReferenceName<TYPE_REFERENCE, ReferenceName>;
 
-tupleType:
-  synType<ITEM, Items>
+tupleTypeUsage:
+  typeUsage<ITEM, Items>
   (
     STAR
-    synType<ITEM, Items>
+    typeUsage<ITEM, Items>
   )*;
 
-anonRecordType:
+anonRecordTypeUsage:
   LBRACE_BAR
   anonRecordField<FIELD, Fields>*
   BAR_RBRACE;
@@ -1514,20 +1508,20 @@ anonRecordType:
 anonRecordField:
   expressionReferenceName<REFERENCE_NAME, ReferenceName>
   COLON
-  synType<TYPE, Type>;
+  typeUsage<TYPE, Type>;
 
-arrayType:
-  synType<TYPE, Type>
+arrayTypeUsage:
+  typeUsage<TYPE, Type>
   LBRACK
   RBRACK;
 
-funType:
-  synType
+functionTypeUsage:
+  typeUsage
   RARROW
-  synType;
+  typeUsage;
 
-anonType:
+anonTypeUsage:
   UNDERSCORE;
 
-otherType:
+unsupportedTypeUsage:
   fakeSeparator;

@@ -3,7 +3,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Feature.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 
 [<ContextAction(Name = "ToRecursiveLetBindings", Group = "F#", Description = "To recursive")>]
 type ToRecursiveLetBindingsAction(dataProvider: FSharpContextActionDataProvider) =
@@ -35,7 +34,7 @@ type ToRecursiveLetBindingsAction(dataProvider: FSharpContextActionDataProvider)
         ranges.Contains(dataProvider.SelectedTreeRange)
 
     override x.ExecutePsiTransaction(_, _) =
-        use disableFormatter = new DisableCodeFormatter()
+        use cookie = FSharpRegistryUtil.AllowFormatterCookie.Create()
         let letBindings = dataProvider.GetSelectedElement<ILetBindings>()
         letBindings.SetIsRecursive(true)
 

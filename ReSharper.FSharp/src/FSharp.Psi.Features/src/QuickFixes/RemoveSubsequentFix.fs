@@ -8,7 +8,7 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
 
-type RemoveSubsequentFix(expr: ISynExpr) =
+type RemoveSubsequentFix(expr: IFSharpExpression) =
     inherit FSharpQuickFixBase()
 
     new (warning: UnitTypeExpectedWarning) =

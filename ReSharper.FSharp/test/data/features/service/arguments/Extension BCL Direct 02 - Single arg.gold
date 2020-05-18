@@ -1,0 +1,10 @@
+﻿module Mod
+
+open System.Linq
+
+let x = Seq.empty
+Enumerable.Single (|x|(arg #0), |fun x -> true|(arg #1))
+
+---------------------------------------------------------
+(arg #0) => source
+(arg #1) => predicate

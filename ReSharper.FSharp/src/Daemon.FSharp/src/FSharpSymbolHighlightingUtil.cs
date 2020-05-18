@@ -13,65 +13,65 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
     public static string GetEntityHighlightingAttributeId([NotNull] this FSharpEntity entity)
     {
       if (entity.IsNamespace)
-        return FSharpHighlightingAttributeIds.Namespace;
+        return FSharpHighlightingAttributeIdsModule.Namespace;
 
       if (entity.IsEnum)
-        return FSharpHighlightingAttributeIds.Enum;
+        return FSharpHighlightingAttributeIdsModule.Enum;
 
       if (entity.IsValueType)
-        return FSharpHighlightingAttributeIds.Struct;
+        return FSharpHighlightingAttributeIdsModule.Struct;
 
       if (entity.IsDelegate)
-        return FSharpHighlightingAttributeIds.Delegate;
+        return FSharpHighlightingAttributeIdsModule.Delegate;
 
       if (entity.IsFSharpModule)
-        return FSharpHighlightingAttributeIds.Module;
+        return FSharpHighlightingAttributeIdsModule.Module;
 
       if (entity.IsFSharpUnion)
-        return FSharpHighlightingAttributeIds.Union;
+        return FSharpHighlightingAttributeIdsModule.Union;
 
       if (entity.IsFSharpRecord)
-        return FSharpHighlightingAttributeIds.Record;
+        return FSharpHighlightingAttributeIdsModule.Record;
 
       return entity.IsInterface
-        ? FSharpHighlightingAttributeIds.Interface
-        : FSharpHighlightingAttributeIds.Class;
+        ? FSharpHighlightingAttributeIdsModule.Interface
+        : FSharpHighlightingAttributeIdsModule.Class;
     }
 
     [NotNull]
     public static string GetMfvHighlightingAttributeId([NotNull] this FSharpMemberOrFunctionOrValue mfv)
     {
       if (mfv.IsEvent || mfv.IsEventAddMethod || mfv.IsEventRemoveMethod || mfv.EventForFSharpProperty != null)
-        return FSharpHighlightingAttributeIds.Event;
+        return FSharpHighlightingAttributeIdsModule.Event;
 
       if (mfv.IsImplicitConstructor || mfv.IsConstructor)
         return mfv.DeclaringEntity?.Value is FSharpEntity declEntity && declEntity.IsValueType
-          ? FSharpHighlightingAttributeIds.Struct
-          : FSharpHighlightingAttributeIds.Class;
+          ? FSharpHighlightingAttributeIdsModule.Struct
+          : FSharpHighlightingAttributeIdsModule.Class;
 
       var entity = mfv.DeclaringEntity;
       if (mfv.IsModuleValueOrMember && (entity != null && !entity.Value.IsFSharpModule || mfv.IsExtensionMember))
         return mfv.IsProperty || mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod
-          ? FSharpHighlightingAttributeIds.Property
-          : FSharpHighlightingAttributeIds.Method;
+          ? FSharpHighlightingAttributeIdsModule.Property
+          : FSharpHighlightingAttributeIdsModule.Method;
 
       if (mfv.LiteralValue != null)
-        return FSharpHighlightingAttributeIds.Literal;
+        return FSharpHighlightingAttributeIdsModule.Literal;
 
       if (mfv.IsActivePattern)
-        return FSharpHighlightingAttributeIds.ActivePatternCase;
+        return FSharpHighlightingAttributeIdsModule.ActivePatternCase;
 
       if (mfv.IsMutable || mfv.IsRefCell())
-        return FSharpHighlightingAttributeIds.MutableValue;
+        return FSharpHighlightingAttributeIdsModule.MutableValue;
 
       if (IsMangledOpName(mfv.LogicalName))
-        return FSharpHighlightingAttributeIds.Operator;
+        return FSharpHighlightingAttributeIdsModule.Operator;
 
       var fsType = mfv.FullType;
       if (fsType.HasTypeDefinition && fsType.TypeDefinition is var mfvTypeEntity && mfvTypeEntity.IsByRef)
-        return FSharpHighlightingAttributeIds.MutableValue;
+        return FSharpHighlightingAttributeIdsModule.MutableValue;
 
-      return FSharpHighlightingAttributeIds.Value;
+      return FSharpHighlightingAttributeIdsModule.Value;
     }
 
     [NotNull]
@@ -87,21 +87,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
 
         case FSharpField field:
           return field.IsLiteral
-            ? FSharpHighlightingAttributeIds.Literal
-            : FSharpHighlightingAttributeIds.Field;
+            ? FSharpHighlightingAttributeIdsModule.Literal
+            : FSharpHighlightingAttributeIdsModule.Field;
 
         case FSharpUnionCase _:
-          return FSharpHighlightingAttributeIds.UnionCase;
+          return FSharpHighlightingAttributeIdsModule.UnionCase;
 
         case FSharpGenericParameter _:
-          return FSharpHighlightingAttributeIds.TypeParameter;
+          return FSharpHighlightingAttributeIdsModule.TypeParameter;
 
         case FSharpActivePatternCase _:
-          return FSharpHighlightingAttributeIds.ActivePatternCase;
+          return FSharpHighlightingAttributeIdsModule.ActivePatternCase;
       }
 
       // some highlighting is needed for tooltip provider
-      return FSharpHighlightingAttributeIds.Value;
+      return FSharpHighlightingAttributeIdsModule.Value;
     }
   }
 }

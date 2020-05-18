@@ -20,6 +20,7 @@ open JetBrains.ReSharper.Psi.Impl
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Psi.Util
 open JetBrains.Util
 
 [<Language(typeof<FSharpLanguage>)>]
@@ -123,6 +124,8 @@ type FSharpLanguageService
         | generatedElement -> generatedElement.CreatePointer() :?> _
 
     override x.AnalyzePossibleInfiniteInheritance = false
+
+    override x.GetTypeConversionRule(_, _) = ClrPredefinedTypeConversionRule.INSTANCE
 
     interface IFSharpLanguageService with
         member x.CreateParser(document: IDocument) =

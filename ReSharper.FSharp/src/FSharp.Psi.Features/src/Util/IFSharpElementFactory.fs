@@ -10,31 +10,35 @@ type IFSharpElementFactory =
     abstract CreateWildPat: unit -> IWildPat
 
     abstract CreateParenExpr: unit -> IParenExpr
-    abstract CreateParenExpr: ISynExpr -> IParenExpr
+    abstract CreateParenExpr: IFSharpExpression -> IParenExpr
 
     abstract CreateConstExpr: text: string -> IConstExpr
 
     abstract CreateAppExpr: addSpace: bool -> IPrefixAppExpr
-    abstract CreateAppExpr: funcName: string * arg: ISynExpr -> IPrefixAppExpr
-    abstract CreateAppExpr: funExpr: ISynExpr * argExpr: ISynExpr * addSpace: bool -> IPrefixAppExpr
-    abstract CreateBinaryAppExpr: string * left: ISynExpr * right: ISynExpr -> ISynExpr
-    abstract CreateSetExpr: left: ISynExpr * right: ISynExpr -> ISynExpr
+    abstract CreateAppExpr: funcName: string * arg: IFSharpExpression -> IPrefixAppExpr
+    abstract CreateAppExpr: funExpr: IFSharpExpression * argExpr: IFSharpExpression * addSpace: bool -> IPrefixAppExpr
+    abstract CreateBinaryAppExpr: string * left: IFSharpExpression * right: IFSharpExpression -> IFSharpExpression
+    abstract CreateSetExpr: left: IFSharpExpression * right: IFSharpExpression -> IFSharpExpression
 
-    abstract CreateExpr: string -> ISynExpr
-    abstract CreateReferenceExpr: string -> ISynExpr
+    abstract CreateExpr: string -> IFSharpExpression
+    abstract CreateReferenceExpr: string -> IFSharpExpression
     
     abstract CreateLetBindingExpr: bindingName: string -> ILetOrUseExpr
-    abstract CreateLetBindingExpr: bindingName: string * expr: ISynExpr -> ILetOrUseExpr
+    abstract CreateLetModuleDecl: bindingName: string -> ILetModuleDecl
 
-    abstract CreateLetModuleDecl: bindingName: string * expr: ISynExpr -> ILetModuleDecl
-
-    abstract CreateIgnoreApp: ISynExpr * newLine: bool -> IBinaryAppExpr
+    abstract CreateIgnoreApp: IFSharpExpression * newLine: bool -> IBinaryAppExpr
     abstract CreateRecordExprBinding: fieldName: string * addSemicolon: bool -> IRecordExprBinding
 
-    abstract CreateMatchExpr: ISynExpr -> IMatchExpr
-    abstract CreateForEachExpr: ISynExpr -> IForEachExpr
+    abstract CreateMatchExpr: IFSharpExpression -> IMatchExpr
+    abstract CreateMatchClause: unit -> IMatchClause
+
+    abstract CreateForEachExpr: IFSharpExpression -> IForEachExpr
 
     abstract AsReferenceExpr: typeReference: ITypeReferenceName -> IReferenceExpr
+
+    abstract CreateEmptyAttributeList: unit -> IAttributeList
+    abstract CreateAttribute: attrName: string -> IAttribute
+
 
 [<AllowNullLiteral>]
 type IFSharpLanguageService =

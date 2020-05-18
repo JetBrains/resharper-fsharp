@@ -1,2 +1,2 @@
-for x in 1 ..2 do
+for x in 1 .. 2 do
     ()
