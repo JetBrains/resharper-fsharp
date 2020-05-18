@@ -175,7 +175,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override ProvidedType ApplyStaticArguments(ITypeProvider provider, string[] fullTypePathAfterArguments,
       object[] staticArgs)
     {
-      var key = string.Concat(fullTypePathAfterArguments);
+      var key = string.Concat(staticArgs);
       if (!myGeneratedTypesCache.TryGetValue(key, out var type))
       {
         var staticArgDescriptions = staticArgs.Select(t => t.BoxToServerStaticArg()).ToArray();
