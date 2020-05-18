@@ -2,6 +2,7 @@
 using JetBrains.Annotations;
 using JetBrains.Application.Processes;
 using JetBrains.Application.Threading;
+using JetBrains.Core;
 using JetBrains.Lifetimes;
 using JetBrains.Platform.RdFramework.ExternalProcess;
 using JetBrains.Rd;
@@ -20,7 +21,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol
       [NotNull] IShellLocks shellLocks,
       [NotNull] IProcessStartInfoPatcher processInfoPatcher,
       [NotNull] JetProcessRuntimeRequest request)
-      : base(lifetime, processFileName, parentProcessPidEnvironmentVariable, ProtocolConstants.LogFolder, logger, shellLocks,
+      : base(lifetime, processFileName, parentProcessPidEnvironmentVariable, ProtocolConstants.LogFolder, logger,
+        shellLocks,
         processInfoPatcher, request)
     {
     }
@@ -28,6 +30,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol
     protected override void OnShutdownRequested(Lifetime remainingLifetime,
       RdFSharpTypeProvidersLoaderModel protocolModel)
     {
+      protocolModel?.Kill.Sync(Unit.Instance);
     }
 
     protected override void CreateModel(Lifetime processLifetime, IProtocol protocol,

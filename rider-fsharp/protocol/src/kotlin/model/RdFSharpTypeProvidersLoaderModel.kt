@@ -465,5 +465,6 @@ object RdFSharpTypeProvidersLoaderModel : Root(
         field("RdProvidedExprProcessModel", RdProvidedExprProcessModel)
         field("RdProvidedVarProcessModel", RdProvidedVarProcessModel)
         call("InstantiateTypeProvidersOfAssembly", InstantiateTypeProvidersOfAssemblyParameters, array(RdTypeProvider))
+        call("Kill", void, void)
     }
 }

@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
+using JetBrains.Core;
 using JetBrains.Lifetimes;
 using JetBrains.Rd.Tasks;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelCreators;
@@ -23,6 +25,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
     {
       model.InstantiateTypeProvidersOfAssembly.Set((lifetime, args) =>
         InstantiateTypeProvidersOfAssembly(lifetime, args, model.RdTypeProviderProcessModel));
+
+      model.Kill.Set(Die);
+    }
+
+    private static Unit Die(Unit _)
+    {
+      Environment.Exit(0);
+      return Unit.Instance;
     }
 
     private RdTask<RdTypeProvider[]> InstantiateTypeProvidersOfAssembly(Lifetime lifetime,
