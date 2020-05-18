@@ -8,6 +8,7 @@ open FSharp.Compiler.Range
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.Rd.Tasks
+open JetBrains.ReSharper.Feature.Services
 open Microsoft.FSharp.Core.CompilerServices
 open FSharp.Compiler.AbstractIL.Internal.Library
 open FSharp.Compiler.ErrorLogger
@@ -19,17 +20,15 @@ open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
 [<SolutionComponent>]
 type ExtensionTypingProviderShim (lifetime: Lifetime,
+                                  onSolutionCloseNotifier: OnSolutionCloseNotifier,
                                   typeProvidersLoadersFactory: TypeProvidersLoaderExternalProcessFactory) as this =
     let defaultExtensionTypingProvider = ExtensionTypingProvider
     let mutable ourModel = null
-
+    let outProcessLifetime = Lifetime.Define(lifetime)
     do ExtensionTypingProvider <- this :> IExtensionTypingProvider
-       lifetime.OnTermination(fun () ->
-           (this :> IDisposable).Dispose()
-           ExtensionTypingProvider <- defaultExtensionTypingProvider) |> ignore
-       
-    let onInitialized l model =
+    let onInitialized _ model =
         ourModel <- model
+        onSolutionCloseNotifier.SolutionIsAboutToClose.Advise(outProcessLifetime.Lifetime, fun _ -> outProcessLifetime.Terminate())
         
     let onFailed() = ()
     let typeProvidersCache: IDictionary<_, _> = Dictionary<_, _>() :> _
@@ -46,8 +45,8 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
                      compilerToolsPath: string list,
                      m: range) =
             
-            if ourModel == null then 
-                let typeProvidersLoader = typeProvidersLoadersFactory.Create(lifetime)
+            if ourModel == null then
+                let typeProvidersLoader = typeProvidersLoadersFactory.Create(outProcessLifetime.Lifetime)
                 typeProvidersLoader.RunAsync(Action<Lifetime, _>(onInitialized), Action(onFailed))
            
             let typeProviders = 
