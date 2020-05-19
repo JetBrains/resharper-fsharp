@@ -37,7 +37,7 @@ type FSharpNamingTest() =
     [<Test>] member x.``Type 01``() = x.DoNamedTest()
 
     [<Test>] member x.``AppExpr 01``() = x.DoNamedTest()
-    [<Test>] member x.``AppExpr 02 - More args``() = x.DoNamedTest()
+    [<Test; ExpectErrors 3>] member x.``AppExpr 02 - More args``() = x.DoNamedTest()
     [<Test>] member x.``AppExpr 03 - Partial``() = x.DoNamedTest()
 
     [<Test>] member x.``Pipe - Right 01``() = x.DoNamedTest()

@@ -22,7 +22,7 @@ type ExpressionEvaluationInfoTest() =
             writer.WriteLine(textToEvaluate)) |> ignore
 
     [<Test>] member x.``Id 01``() = x.DoNamedTest()
-    [<Test>] member x.``Id 02 - Qualifier``() = x.DoNamedTest()
+    [<Test; ExpectErrors 39>] member x.``Id 02 - Qualifier``() = x.DoNamedTest()
 
     [<Test>] member x.``SelfId 01 - Member``() = x.DoNamedTest()
     [<Test>] member x.``SelfId 02 - Type``() = x.DoNamedTest()

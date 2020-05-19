@@ -6,7 +6,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<FSharpTest>]
+[<FSharpTest; ExpectErrors>]
 type FSharpCompletionTest() =
     inherit CodeCompletionTestBase()
 

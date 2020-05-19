@@ -6,6 +6,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
 open NUnit.Framework
 
 [<FSharpTest>]
+[<ExpectErrors 588>]
 type ReplaceLetWithExpressionTest() =
     inherit QuickFixTestBase<ReplaceLetWithExpressionFix>()
 
@@ -21,6 +22,7 @@ type ReplaceLetWithExpressionTest() =
     
 
 [<FSharpTest>]
+[<ExpectErrors 588>]
 type ReplaceLetWithExpressionAvailabilityTest() =
     inherit QuickFixAvailabilityTestBase()
 

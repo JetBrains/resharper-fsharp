@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 
 open JetBrains.ReSharper.Feature.Services.Daemon
+open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
 open NUnit.Framework
 
 type InheritanceGutterMarks() =
@@ -13,5 +14,5 @@ type InheritanceGutterMarks() =
 
     [<Test>] member x.``Inherited gutter mark``() = x.DoNamedTest()
 
-    [<Test>] member x.``Module 01``() = x.DoNamedTest()
-    [<Test>] member x.``Struct 01``() = x.DoNamedTest()
+    [<Test; ExpectErrors 39>] member x.``Module 01``() = x.DoNamedTest()
+    [<Test; ExpectErrors 945>] member x.``Struct 01``() = x.DoNamedTest()

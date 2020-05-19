@@ -7,6 +7,7 @@ open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
 [<FSharpTest; TestPackages("FSharp.Core")>]
+[<ExpectErrors 39>]
 type ImportTypeTest() =
     inherit QuickFixTestBase<ImportTypeFix>()
 

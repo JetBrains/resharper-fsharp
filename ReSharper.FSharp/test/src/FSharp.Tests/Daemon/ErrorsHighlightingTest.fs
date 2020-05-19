@@ -1,9 +1,11 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 
 open JetBrains.ReSharper.Plugins.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
+[<ExpectErrors>]
 type ErrorsHighlightingTest() =
     inherit FSharpHighlightingTestBase()
 

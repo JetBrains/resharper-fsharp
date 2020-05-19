@@ -7,6 +7,7 @@ open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
 [<FSharpTest; TestPackages("FSharp.Core")>]
+[<ExpectErrors(365, 54)>]
 type ToAbstractFixTest() =
     inherit QuickFixTestBase<ToAbstractFix>()
 

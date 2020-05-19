@@ -6,6 +6,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
 open NUnit.Framework
 
 [<FSharpTest>]
+[<ExpectErrors 39>]
 type ToRecursiveFunctionTest() =
     inherit QuickFixTestBase<ToRecursiveFunctionFix>()
 

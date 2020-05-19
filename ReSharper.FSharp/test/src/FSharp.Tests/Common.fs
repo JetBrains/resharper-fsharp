@@ -2,18 +2,23 @@
 module JetBrains.ReSharper.Plugins.FSharp.Tests.Common
 
 open System
+open System.Collections.Concurrent
+open System.Reflection
+open System.Runtime.InteropServices
 open System.Threading
 open FSharp.Compiler.SourceCodeServices
+open JetBrains.Annotations
+open JetBrains.Application
 open JetBrains.Application.Components
 open JetBrains.Application.platforms
 open JetBrains.DataFlow
+open JetBrains.DocumentModel
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.MSBuild
 open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
-open JetBrains.ReSharper.Plugins.FSharp.Checker.ProjectOptions
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.TestFramework
@@ -51,6 +56,90 @@ type FSharpSignatureTestAttribute() =
 
 type FSharpScriptTestAttribute() =
     inherit FSharpTestAttribute(FSharpScriptProjectFileType.FsxExtension)
+
+
+[<AttributeUsage(AttributeTargets.Method ||| AttributeTargets.Class, AllowMultiple=false)>]
+type ExpectErrors ([<ParamArray>] errorCodes: int[]) =
+    inherit Attribute()
+
+    new () = ExpectErrors [||]
+
+    member __.ErrorCodes = errorCodes
+
+
+[<ShellComponent>]
+type FSharpTestCheckerService(lifetime, logger, onSolutionCloseNotifier, settingsStore, settingsSchema) =
+    inherit FSharpCheckerService(lifetime, logger, onSolutionCloseNotifier, settingsStore, settingsSchema)
+
+    let baseExpectedCodes =
+        set [
+            222 // FS0222: Files in libraries or multiple-file applications must begin with a namespace or module
+        ]
+
+    let expectedErrorCodeCache = ConcurrentDictionary<string, int[] option>()
+
+    let getExpectedErrorCodes () =
+        expectedErrorCodeCache.GetOrAdd(TestContext.CurrentContext.Test.FullName, fun _ ->
+            let assembly = Assembly.GetExecutingAssembly()
+            let typ = assembly.GetType(TestContext.CurrentContext.Test.ClassName, true)
+            let testMethod = typ.GetMethod(TestContext.CurrentContext.Test.MethodName)
+
+            testMethod.GetCustomAttributes<ExpectErrors>()
+            |> Seq.tryExactlyOne
+            |> Option.orElseWith (fun () -> typ.GetCustomAttributes<ExpectErrors>() |> Seq.tryExactlyOne)
+            |> Option.map (fun attr -> attr.ErrorCodes))
+
+    let validateErrors (errors: FSharpErrorInfo[]) =
+        match getExpectedErrorCodes() with
+        | Some [||] ->
+            // All errors are expected
+            ()
+        | extraExpectedCodes ->
+
+        let expectedErrorCodes =
+            baseExpectedCodes
+            |> Set.union (Set.ofArray (defaultArg extraExpectedCodes [||]))
+
+        let unexpectedErrors =
+            errors
+            |> Array.filter (fun err ->
+                err.Severity = FSharpErrorSeverity.Error &&
+                not (expectedErrorCodes |> Set.contains err.ErrorNumber))
+
+        if unexpectedErrors.Length = 0 then () else
+
+        unexpectedErrors
+        |> Array.map (fun err ->
+            sprintf
+                "(%d,%d)-(%d,%d): %s %d: %s"
+                err.Range.StartLine err.Range.StartColumn
+                err.Range.EndLine err.Range.EndColumn
+                err.Subcategory err.ErrorNumber
+                err.Message)
+        |> String.concat "\n"
+        |> sprintf "Unexpected compile errors:\n%s\n"
+        |> Assert.Fail
+
+    interface IHideImplementation<FSharpCheckerService>
+
+    override x.ParseFile(path: FileSystemPath, document: IDocument, parsingOptions: FSharpParsingOptions) =
+        let results = base.ParseFile(path, document, parsingOptions)
+
+        match results with
+        | None -> failwithf "ParseFile failed unexpectedly"
+        | Some results -> validateErrors results.Errors
+
+        results
+
+    override x.ParseAndCheckFile([<NotNull>] file: IPsiSourceFile, opName,
+                                 [<Optional; DefaultParameterValue(false)>] allowStaleResults) =
+        let results = base.ParseAndCheckFile(file, opName, allowStaleResults)
+
+        match results with
+        | None -> failwithf "ParseAndCheckFile failed unexpectedly"
+        | Some results -> validateErrors results.CheckResults.Errors
+
+        results
 
 
 [<SolutionComponent>]
