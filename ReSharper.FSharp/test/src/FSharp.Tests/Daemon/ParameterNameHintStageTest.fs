@@ -9,7 +9,7 @@ open NUnit.Framework
 type ParameterNameHintStageTest() =
     inherit FSharpHighlightingTestBase()
 
-    override x.RelativeTestDataPath = "features/daemon/parameterNameHint"
+    override x.RelativeTestDataPath = "features/daemon/parameterNameHints"
 
     override x.HighlightingPredicate(highlighting, _, _) =
         highlighting :? ParameterNameHintHighlighting
