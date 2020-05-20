@@ -18,8 +18,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       GetContainingTypeDeclaration()?.GetNameRange() ?? TreeTextRange.InvalidRange;
 
     protected override IDeclaredElement CreateDeclaredElement() =>
-      GetFSharpSymbol() is FSharpMemberOrFunctionOrValue ctor
-        ? new FSharpImplicitConstructor(this, ctor)
+      GetFSharpSymbol() is FSharpMemberOrFunctionOrValue
+        ? new FSharpImplicitConstructor(this)
         : null;
 
     public override IFSharpIdentifierLikeNode NameIdentifier => null;

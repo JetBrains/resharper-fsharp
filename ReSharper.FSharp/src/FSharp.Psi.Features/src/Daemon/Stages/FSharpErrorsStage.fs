@@ -8,12 +8,15 @@ open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
+[<AutoOpen>]
 module FSharpErrorsStage =
     let visualElementFactoryKey = Key<VisualElementHighlighter>("ColorUsageHighlightingEnabled")
+    let openedModulesProvider = Key<OpenedModulesProvider>("OpenedModulesProvider")
 
 
 [<DaemonStage(StagesBefore = [| typeof<HighlightIdentifiersStage> |])>]
@@ -27,15 +30,14 @@ type FSharpErrorsStage(elementProblemAnalyzerRegistrar) =
 and FSharpErrorStageProcess(fsFile, daemonProcess, settings, analyzerRegistrar: ElementProblemAnalyzerRegistrar) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
-    static let analyzerRunKind = ElementProblemAnalyzerRunKind.FullDaemon
-
+    let analyzerRunKind = ElementProblemAnalyzerRunKind.FullDaemon
     let interruptCheck = daemonProcess.GetCheckForInterrupt()
-    let elementProblemAnalyzerData = ElementProblemAnalyzerData(fsFile, settings, analyzerRunKind, interruptCheck)
-    let analyzerDispatcher = analyzerRegistrar.CreateDispatcher(elementProblemAnalyzerData)
+    let analyzerData = ElementProblemAnalyzerData(fsFile, settings, analyzerRunKind, interruptCheck)
+    let analyzerDispatcher = analyzerRegistrar.CreateDispatcher(analyzerData)
 
     do
-        let visualElementHighlighter = VisualElementHighlighter(fsFile.Language, settings)
-        elementProblemAnalyzerData.PutData(FSharpErrorsStage.visualElementFactoryKey, visualElementHighlighter)
+        analyzerData.PutData(visualElementFactoryKey, VisualElementHighlighter(fsFile.Language, settings))
+        analyzerData.PutData(openedModulesProvider, OpenedModulesProvider(fsFile))
 
     override x.VisitNode(element: ITreeNode, consumer: IHighlightingConsumer) =
         analyzerDispatcher.Run(element, consumer)

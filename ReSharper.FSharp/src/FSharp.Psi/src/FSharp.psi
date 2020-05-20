@@ -98,7 +98,7 @@ namedNamespaceDeclaration options { stubBase="FSharpDeclarationBase"; }:
   REC<REC, RecKeyword>?
   (
     referenceName<REFERENCE_NAME, QualifierReferenceName>
-    DOT
+    DOT<FSHARP_DELIMITER, Delimiter>
   )?
   fSharpIdentifier<IDENTIFIER, Identifier>
   moduleMember<MODULE_MEMBER, Members>*;
@@ -118,7 +118,7 @@ namedModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } 
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   (
     referenceName<REFERENCE_NAME, QualifierReferenceName>
-    DOT
+    DOT<FSHARP_DELIMITER, Delimiter>
   )?
   fSharpIdentifier<IDENTIFIER, Identifier>
   moduleMember<MODULE_MEMBER, Members>*;
@@ -421,7 +421,7 @@ itemIndexerExpr options { stubBase="FSharpExpressionBase"; } extras {
   get { methodName="Args" path=<itemIndexerExpr:ARG_LIST/indexerArgList:INDEXER_ARG> };
 }:
   fSharpExpression<QUALIFIER_EXPR, Qualifier>
-  DOT
+  DOT<FSHARP_DELIMITER, Delimiter>
   indexerArgList<ARG_LIST, IndexerArgList>;
 
 namedIndexerExpr options { stubBase="FSharpExpressionBase"; } extras {
@@ -705,7 +705,7 @@ referenceExpr options { stubBase="FSharpExpressionBase"; } extras {
 }:
   (
     fSharpExpression<QUALIFIER_EXPR, Qualifier>
-    DOT
+    DOT<FSHARP_DELIMITER, Delimiter>
   )?
   fSharpIdentifier<IDENTIFIER, Identifier>
   prefixAppTypeArgumentList<TYPE_ARG_LIST, TypeArgumentList>?;
@@ -851,7 +851,7 @@ typeExtensionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; 
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   (
     referenceName<REFERENCE_NAME, QualifierReferenceName>
-    DOT
+    DOT<FSHARP_DELIMITER, Delimiter>
   )?
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
@@ -1354,7 +1354,8 @@ interface fSharpIdentifier:
   symbolicOp |
   ampAmp |
   activePatternId |
-  typeParameterId;
+  typeParameterId |
+  global;
 
 abstract identifier options { interfaceName="IFSharpIdentifier"; }:
   IDENTIFIER;
@@ -1364,6 +1365,9 @@ abstract symbolicOp options { interfaceName="IFSharpIdentifier"; }:
 
 abstract ampAmp options { interfaceName="IFSharpIdentifier"; }:
   ampAmp;
+
+abstract global options { interfaceName="IFSharpIdentifier"; }:
+  GLOBAL;
 
 // Type parameters
 
@@ -1456,7 +1460,7 @@ prefixAppTypeArgumentList:
 expressionReferenceName options { stubBase="ReferenceOwnerBase"; }:
   (
     expressionReferenceName<QUALIFIER, Qualifier>
-    DOT<DELIMITER, Dot>
+    DOT<FSHARP_DELIMITER, Delimiter>
   )?
   fSharpIdentifier<IDENTIFIER, Identifier>
   prefixAppTypeArgumentList<TYPE_ARG, TypeArgumentList>;
@@ -1467,13 +1471,13 @@ typeReferenceName options { stubBase="TypeReferenceOwnerBase"; }:
     postfixAppTypeArgumentList<TYPE_ARG, TypeArgumentList>
     (
       typeReferenceName<QUALIFIER, Qualifier>
-      DOT<DELIMITER, Dot>
+      DOT<FSHARP_DELIMITER, Delimiter>
     )?
     fSharpIdentifier<IDENTIFIER, Identifier>
   |
     (
       typeReferenceName<QUALIFIER, Qualifier>
-      DOT<DELIMITER, Dot>
+      DOT<FSHARP_DELIMITER, Delimiter>
     )?
     fSharpIdentifier<IDENTIFIER, Identifier>
     prefixAppTypeArgumentList<TYPE_ARG, TypeArgumentList>

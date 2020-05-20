@@ -13,8 +13,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
   internal abstract class FSharpFunctionBase<TDeclaration> : FSharpMemberBase<TDeclaration>, IFunction
     where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
-    protected FSharpFunctionBase([NotNull] ITypeMemberDeclaration declaration,
-      [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration)
+    protected FSharpFunctionBase([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {
     }
 

@@ -20,8 +20,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override TreeTextRange GetNameIdentifierRange() => this.GetTreeTextRange();
 
     protected override IDeclaredElement CreateDeclaredElement() =>
-      GetFSharpSymbol() is FSharpMemberOrFunctionOrValue ctor
-        ? new FSharpConstructor(this, ctor)
+      GetFSharpSymbol() is FSharpMemberOrFunctionOrValue
+        ? new FSharpConstructor(this)
         : null;
   }
 }

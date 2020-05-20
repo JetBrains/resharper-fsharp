@@ -2,6 +2,7 @@
 using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
+using JetBrains.Metadata.Reader.Impl;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
@@ -10,6 +11,7 @@ using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2.ExtensionMethods;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
+using JetBrains.Util.dataStructures;
 using JetBrains.Util.DataStructures;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
@@ -114,16 +116,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
       if (AttributeClassNames.IsEmpty())
         return EmptyList<IAttributeInstance>.Instance;
 
-      if (!((GetDeclaration() as IFSharpTypeDeclaration)?.GetFSharpSymbol() is FSharpEntity entity))
+      if (!(GetDeclaration()?.GetFSharpSymbol() is FSharpEntity entity))
         return EmptyList<IAttributeInstance>.Instance;
 
       var psiModule = GetPsiModule();
       var entityAttrs = entity.Attributes;
-      var attrs = new IAttributeInstance[entityAttrs.Count];
-      for (var i = 0; i < attrs.Length; i++)
-        attrs[i] = new FSharpAttributeInstance(entityAttrs[i], psiModule);
+      
+      if (entityAttrs.Count == 0)
+        return EmptyList<IAttributeInstance>.Instance;
 
-      return attrs;
+      var result = new FrugalLocalList<IAttributeInstance>();
+      foreach (var fcsAttribute in entityAttrs)
+        if (new ClrTypeName(fcsAttribute.AttributeType.QualifiedBaseName).Equals(clrName))
+          result.Add(new FSharpAttributeInstance(fcsAttribute, psiModule));
+
+      return result.ResultingList();
     }
 
     public override bool HasAttributeInstance(IClrTypeName clrTypeName)

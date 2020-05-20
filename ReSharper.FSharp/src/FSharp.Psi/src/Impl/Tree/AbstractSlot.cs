@@ -32,7 +32,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
           logicalName.StartsWith("remove_", StringComparison.Ordinal))
       {
         if (mfv.Attributes.HasAttributeInstance(FSharpPredefinedType.CLIEventAttribute))
-          return new AbstractFSharpCliEvent(this, mfv);
+          return new AbstractFSharpCliEvent(this);
       }
       
       if (mfv.IsProperty)
@@ -42,7 +42,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (property != null)
         return new FSharpProperty<AbstractSlot>(this, property.Value);
 
-      return new FSharpMethod<AbstractSlot>(this, mfv);
+      return new FSharpMethod<AbstractSlot>(this);
     }
   }
 }
