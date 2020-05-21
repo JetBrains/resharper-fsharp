@@ -21,6 +21,11 @@ open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
+module FSharpCheckerService =
+    let getSourceText (document: IDocument) =
+        SourceText.ofString(document.GetText())
+
+
 [<ShellComponent; AllowNullLiteral>]
 type FSharpCheckerService
         (lifetime, logger: ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier, settingsStore: ISettingsStore,
@@ -58,10 +63,18 @@ type FSharpCheckerService
     member val OptionsProvider = Unchecked.defaultof<IFSharpProjectOptionsProvider> with get, set
     member x.Checker = checker.Value
 
-    member x.ParseFile(path: FileSystemPath, document: IDocument, parsingOptions: FSharpParsingOptions) =
-        let source = SourceText.ofString (document.GetText())
+    member x.ParseFile(path, document, parsingOptions, [<Optional; DefaultParameterValue(false)>] noCache: bool) =
         try
-            let parseResults = x.Checker.ParseFile(path.FullPath, source, parsingOptions).RunAsTask() 
+            let source = FSharpCheckerService.getSourceText document
+            let fullPath = getFullPath path
+
+            let parseAsync =
+                if noCache then
+                    x.Checker.ParseFileNoCache(fullPath, source, parsingOptions)
+                else
+                    x.Checker.ParseFile(fullPath, source, parsingOptions)
+
+            let parseResults = parseAsync.RunAsTask()
             Some parseResults
         with
         | OperationCanceled -> reraise()
@@ -81,7 +94,7 @@ type FSharpCheckerService
         | Some options ->
 
         let path = file.GetLocation().FullPath
-        let source = SourceText.ofString (file.Document.GetText())
+        let source = FSharpCheckerService.getSourceText file.Document
         logger.Trace("ParseAndCheckFile: start {0}, {1}", path, opName)
 
         // todo: don't cancel the computation when file didn't change

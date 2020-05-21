@@ -28,7 +28,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         let document = createDocument source
         let parser = languageService.CreateParser(document)
 
-        let fsFile = parser.ParseFSharpFile(StandaloneDocument = document)
+        let fsFile = parser.ParseFSharpFile(noCache = true, StandaloneDocument = document)
         SandBox.CreateSandBoxFor(fsFile, psiModule)
         fsFile
 

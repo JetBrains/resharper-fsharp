@@ -62,6 +62,9 @@ module rec CommonUtil =
     let isSigFile (path: FileSystemPath) =
         isSigFileExtension path.ExtensionNoDot
 
+    let getFullPath (path: FileSystemPath) =
+        path.FullPath
+
     type Line = Int32<DocLine>
     type Column = Int32<DocColumn>
 
