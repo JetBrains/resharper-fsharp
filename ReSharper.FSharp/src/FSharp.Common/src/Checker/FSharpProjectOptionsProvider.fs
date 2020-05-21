@@ -9,6 +9,7 @@ open JetBrains.DataFlow
 open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Assemblies.Impl
 open JetBrains.ProjectModel.Build
+open JetBrains.ProjectModel.Tasks
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 open JetBrains.ReSharper.Plugins.FSharp
@@ -29,7 +30,8 @@ type FSharpProjectOptionsProvider
         (lifetime, solution: ISolution, changeManager: ChangeManager, checkerService: FSharpCheckerService,
          optionsBuilder: IFSharpProjectOptionsBuilder, scriptOptionsProvider: IFSharpScriptProjectOptionsProvider,
          fsFileService: IFSharpFileService, moduleReferenceResolveStore: ModuleReferencesResolveStore, logger: ILogger,
-         psiModules: IPsiModules, resolveContextManager: PsiModuleResolveContextManager) as this =
+         psiModules: IPsiModules, resolveContextManager: PsiModuleResolveContextManager,
+         scheduler: ISolutionLoadTasksScheduler) as this =
     inherit RecursiveProjectModelChangeDeltaVisitor()
 
     let [<Literal>] invalidatingProjectChangeType =
@@ -46,7 +48,10 @@ type FSharpProjectOptionsProvider
 
     let locker = JetFastSemiReenterableRWLock()
     do
-        changeManager.Changed2.Advise(lifetime, this.ProcessChange)
+        // Start listening for the changes after project model is updated.
+        scheduler.EnqueueTask(SolutionLoadTask("FSharpProjectOptionsProvider", SolutionLoadTaskKinds.StartPsi, fun _ ->
+            changeManager.Changed2.Advise(lifetime, this.ProcessChange)))
+
         checkerService.OptionsProvider <- this
         lifetime.OnTermination(fun _ -> checkerService.OptionsProvider <- Unchecked.defaultof<_>) |> ignore
 
