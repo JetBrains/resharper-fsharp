@@ -37,3 +37,5 @@ type RedundantQualifiersTest() =
 
     [<TestReferences("../../../assemblies/ImplicitModule.dll")>]
     [<Test>] member x.``Compiled names - ModuleSuffix 02 - Implicit``() = x.DoNamedTest()
+
+    [<Test>] member x.``Opens 01``() = x.DoNamedTest()

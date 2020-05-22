@@ -145,7 +145,9 @@ let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBo
     insertAfterAnchor anchor indent
 
 let isInOpen (referenceName: IReferenceName) =
-    skipIntermediateParentsOfSameType referenceName :? IOpenStatement
+    match skipIntermediateParentsOfSameType referenceName with
+    | null -> false
+    | node -> node.Parent :? IOpenStatement
 
 type OpenedModulesProvider(fsFile: IFSharpFile) =
     let map = HashSet()
