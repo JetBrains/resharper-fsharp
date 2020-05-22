@@ -6,6 +6,7 @@ open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
 [<TestReferences("System.Drawing")>]
+[<TestSettingsKey(typeof<ParameterNameHintsOptions>)>]
 type ParameterNameHintStageTest() =
     inherit FSharpHighlightingTestBase()
 
@@ -20,4 +21,10 @@ type ParameterNameHintStageTest() =
     [<Test>] member x.``App 04 - Ignore binary eq``() = x.DoNamedTest()
     [<Test>] member x.``App 05 - After constructor``() = x.DoNamedTest()
     [<Test>] member x.``App 06 - Ignored``() = x.DoNamedTest()
-    [<Test>] member x.``Constructor 01``() = x.DoNamedTest()
+    [<Test>] member x.``Constructor 01`` () = x.DoNamedTest()
+
+    [<Test; TestSettings("{HideForMethodsWithSameNamedNumberedParameters:All}")>]
+    member x.``Toggleable 01 - Parameters only differ by numbered suffix`` () = x.DoNamedTest()
+
+    [<Test; TestSettings("{ShowForNonLiteralsInCaseOfMultipleParametersWithSameName:All}")>]
+    member x.``Toggleable 02 - Non literals with multiple parameters of same type`` () = x.DoNamedTest()

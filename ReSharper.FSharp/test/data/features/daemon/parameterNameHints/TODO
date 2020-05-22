@@ -22,18 +22,7 @@ Constants/enum members [ShowForConstantsAndEnumMembers]
 ?? Lambda expressions/anonymous methods [ShowForLambdaExpressions]
 ?? Array/anonymous object creation expressions [ShowForUnclearCreationExpression]
 ?? Method invocations (is this Foo.Invoke?) [ShowForMethodInvocations]
-Same types [ShowForNonLiteralsInCaseOfMultipleParametersWithSameName]
-    let foo (i: int, a: string, b: string, c: string, j: int, k: bool) = ()    
-    let test () =
-        let i = 15
-        let b = true
-        let x, y, z = "", "", ""
-        foo(i, x, y, z, 12, b)
 
 Builder methods [HideForBuilderLikeMethods]
-Hide if method parameters only differ by numbered suffix [HideForMethodsWithSameNamedNumberedParameters]
 Hide if intention of first parameter is clear from method name [HideIfIntentionOfFirstParameterIsClearFromMethodName]
-    let foo2 (x1, x2, x3) = x1 + x2 + x3
-    foo2 (1, 2, 3)
-
 Hide if intention of argument is clear from usage [HideIfIntentionOfArgumentIsClearFromUsage]

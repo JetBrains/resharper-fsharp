@@ -1,0 +1,19 @@
+﻿HideForMethodsWithSameNamedNumberedParameters = True
+module Mod
+
+let func (x1, x2, x3) = x1 + x2 + x3
+func (1, 2, 3)
+
+---------------------------------------------------------
+
+================
+HideForMethodsWithSameNamedNumberedParameters = False
+module Mod
+
+let func (x1, x2, x3) = x1 + x2 + x3
+func (||(0)1, ||(1)2, ||(2)3)
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: x1, Mod.func
+(1): ReSharper Parameter Name Hint: x2, Mod.func
+(2): ReSharper Parameter Name Hint: x3, Mod.func
