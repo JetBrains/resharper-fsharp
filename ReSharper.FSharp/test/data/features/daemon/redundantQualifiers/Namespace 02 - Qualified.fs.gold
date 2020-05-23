@@ -1,0 +1,9 @@
+﻿module Module
+
+open System.Collections.Generic
+
+let l: |System.Collections.Generic.|(0)List<System.String> = |System.Collections.Generic.|(1)List()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Qualifier is redundant
+(1): ReSharper Dead Code: Qualifier is redundant

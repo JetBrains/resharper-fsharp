@@ -1,0 +1,9 @@
+﻿module Module
+
+open System
+
+let s: |System.|(0)String = |System.|(1)String('a', 123)
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Qualifier is redundant
+(1): ReSharper Dead Code: Qualifier is redundant

@@ -60,7 +60,7 @@ type FsiHost
 
     let assemblyFilter (assembly: IPsiAssembly) =
         let assemblyName = assembly.AssemblyName
-        not (isFSharpCore assemblyName || assemblyName.PossiblyContainsPredefinedTypes())
+        not (FSharpAssemblyUtil.isFSharpCore assemblyName || assemblyName.PossiblyContainsPredefinedTypes())
 
     let getProjectReferences projectId =
         use cookie = ReadLockCookie.Create()

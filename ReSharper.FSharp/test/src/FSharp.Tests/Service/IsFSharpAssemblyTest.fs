@@ -1,7 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open JetBrains.ProjectModel
-open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpAssemblyUtil
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.TestFramework

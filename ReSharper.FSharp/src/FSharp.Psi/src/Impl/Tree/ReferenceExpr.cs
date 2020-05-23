@@ -94,12 +94,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
     }
 
-    public override FSharpSymbol GetFSharpSymbol()
-    {
-      if (base.GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv && mfv.IsConstructor)
-        return mfv.DeclaringEntity?.Value;
-
-      return null;
-    }
+    public override FSharpSymbol GetFSharpSymbol() =>
+      base.GetFSharpSymbol() switch
+      {
+        FSharpMemberOrFunctionOrValue mfv when mfv.IsConstructor => mfv.DeclaringEntity?.Value,
+        // FSharpUnionCase unionCase => unionCase.ReturnType.TypeDefinition,
+        _ => null
+      };
   }
 }

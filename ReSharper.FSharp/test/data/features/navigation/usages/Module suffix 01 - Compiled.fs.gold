@@ -1,0 +1,38 @@
+﻿-------------- offset 21 line 3 col 5 --------------------
++++ JetBrains.ReSharper.Features.Navigation.Features.GoToUsages.GotoUsagesProvider navigation provider results +++
+Occurrences provided for OccurrenceUtil:
+Occurrence's dump:
+TO: [O] |List|.append |> ignore RANGE: (17,21) @ Module suffix 01 - Compiled.fs
+Menu Item presentation: 
+Text: Module      |List|.append |> ignore| (3)
+Shortcut text: in <Root Namespace>
+Style: Enabled
+Mnemonic: 
+Tooltip: List.append |> ignore
+
+Occurrence's navigation result. Opened file: Module suffix 01 - Compiled.fs
+------------------
+module Module
+
+List|CARET|.append |> ignore
+List.append |> ignore
+
+------------------
+
+Occurrence's dump:
+TO: [O] |List|.append |> ignore RANGE: (40,44) @ Module suffix 01 - Compiled.fs
+Menu Item presentation: 
+Text: Module      |List|.append |> ignore| (4)
+Shortcut text: in <Root Namespace>
+Style: Enabled
+Mnemonic: 
+Tooltip: List.append |> ignore
+
+Occurrence's navigation result. Opened file: Module suffix 01 - Compiled.fs
+------------------
+
+List.append |> ignore
+|CARET|List.append |> ignore
+
+------------------
+

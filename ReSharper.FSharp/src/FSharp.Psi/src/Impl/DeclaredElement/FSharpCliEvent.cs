@@ -12,8 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
   internal class FSharpCliEvent<TDeclaration> : FSharpMemberBase<TDeclaration>, IEvent
     where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
-    public FSharpCliEvent([NotNull] ITypeMemberDeclaration declaration, FSharpMemberOrFunctionOrValue mfv)
-      : base(declaration)
+    public FSharpCliEvent([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {
     }
 
@@ -37,8 +36,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
   internal class AbstractFSharpCliEvent : FSharpCliEvent<AbstractSlot>
   {
-    public AbstractFSharpCliEvent([NotNull] ITypeMemberDeclaration declaration, FSharpMemberOrFunctionOrValue mfv)
-      : base(declaration, mfv)
+    public AbstractFSharpCliEvent([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {
     }
 

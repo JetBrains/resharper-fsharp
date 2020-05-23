@@ -116,5 +116,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         ITypeExtensionDeclaration typeExtension => typeExtension.QualifierReferenceName != null,
         _ => false
       };
+
+    public FSharpSymbolReference QualifierReference =>
+      GetElement() switch
+      {
+        IReferenceExpr referenceExpr => referenceExpr.Qualifier is IReferenceExpr refExpr ? refExpr.Reference : null,
+        IReferenceName referenceName => referenceName.Qualifier?.Reference,
+        ITypeExtensionDeclaration typeExtension => typeExtension.QualifierReferenceName?.Reference,
+        _ => null
+      };
   }
 }

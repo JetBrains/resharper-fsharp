@@ -347,5 +347,13 @@
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>RemoveYieldFix</QuickFix>
   </Error>
-  
+
+  <Warning staticGroup="FSharpErrors" name="RedundantQualifier">
+    <Parameter type="ITreeNode" name="treeNode"/>
+    <Range>getQualifierRange treeNode</Range>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message value="Qualifier is redundant"/>
+    <QuickFix>RemoveRedundantQualifierFix</QuickFix>
+  </Warning>
+
 </Errors>

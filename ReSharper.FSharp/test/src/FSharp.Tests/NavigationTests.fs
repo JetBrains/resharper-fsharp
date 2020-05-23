@@ -35,6 +35,8 @@ type FSharpGoToUsagesTest() =
     [<Test>] member x.``Anon record 02 - Type``() = x.DoNamedTest()
     [<Test>] member x.``Anon record 03 - Getter``() = x.DoNamedTest()
 
+    [<Test>] member x.``Module suffix 01 - Compiled``() = x.DoNamedTest()
+
 
 type FSharpGoToInheritorsTest() =
     inherit FSharpContextSearchTestBase("inheritors")

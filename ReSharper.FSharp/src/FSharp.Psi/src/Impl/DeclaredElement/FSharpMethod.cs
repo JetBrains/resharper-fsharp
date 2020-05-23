@@ -1,5 +1,4 @@
-﻿using FSharp.Compiler.SourceCodeServices;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
@@ -10,16 +9,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
   internal class FSharpMethod<TDeclaration> : FSharpMethodBase<TDeclaration>
     where TDeclaration : FSharpDeclarationBase, IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
-    public FSharpMethod([NotNull] ITypeMemberDeclaration declaration, [NotNull] FSharpMemberOrFunctionOrValue mfv)
-      : base(declaration, mfv)
+    public FSharpMethod([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {
     }
   }
 
-  internal class FSharpTypePrivateMethod : FSharpMethodBase<TopPatternDeclarationBase>
+  internal class FSharpTypePrivateMethod : FSharpMethodBase<TopPatternDeclarationBase>, ITypePrivateMember
   {
-    public FSharpTypePrivateMethod([NotNull] ITypeMemberDeclaration declaration,
-      [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)
+    public FSharpTypePrivateMethod([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {
     }
 

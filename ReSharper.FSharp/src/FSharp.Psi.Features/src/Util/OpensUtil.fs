@@ -1,14 +1,17 @@
 [<AutoOpen>]
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Util.OpensUtil
 
+open System.Collections.Generic
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpAssemblyUtil
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 
@@ -140,3 +143,47 @@ let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBo
         | _ -> failwithf "Unexpected module: %O" moduleDecl
 
     insertAfterAnchor anchor indent
+
+let isInOpen (referenceName: IReferenceName) =
+    match skipIntermediateParentsOfSameType referenceName with
+    | null -> false
+    | node -> node.Parent :? IOpenStatement
+
+type OpenedModulesProvider(fsFile: IFSharpFile) =
+    let map = HashSet()
+
+    let psiModule = fsFile.GetPsiModule()
+    let symbolScope = getModuleOnlySymbolScope psiModule
+
+//    let getQualifiedName (element: IClrDeclaredElement) =
+//        match toQualifiedList element with
+//        | [] -> "global"
+//        | names -> names |> List.map (fun el -> el.GetSourceName()) |> String.concat "."
+
+    let import (element: IClrDeclaredElement) =
+        map.Add(element.GetSourceName()) |> ignore
+        for autoImportedModule in getNestedAutoImportedModules element symbolScope do
+            map.Add(autoImportedModule.GetSourceName()) |> ignore
+
+    do
+        import symbolScope.GlobalNamespace
+
+        for moduleDecl in fsFile.ModuleDeclarationsEnumerable do
+            let topLevelModuleDecl = moduleDecl.As<ITopLevelModuleLikeDeclaration>()
+            if isNotNull topLevelModuleDecl then
+                match topLevelModuleDecl.DeclaredElement with
+                | :? INamespace as ns -> import ns
+                | :? ITypeElement as ty -> import (ty.GetContainingNamespace())
+                | _ -> ()
+
+        match fsFile.GetParseAndCheckResults(true, "OpenedModulesProvider") with
+        | None -> ()
+        | Some results ->
+
+        for fcsOpenDecl in results.CheckResults.OpenDeclarations do
+            for fcsEntity in fcsOpenDecl.Modules do
+                let declaredElement = fcsEntity.GetDeclaredElement(psiModule).As<IClrDeclaredElement>()
+                if isNotNull declaredElement then
+                    import declaredElement
+
+    member x.GetOpenedModuleNames = map
