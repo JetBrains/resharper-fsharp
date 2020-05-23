@@ -52,7 +52,7 @@ type FSharpSearchGuru(fsProjectOptionsProvider: IFSharpProjectOptionsProvider) =
 
             let fsElementId = elementId :?> FSharpSearchGuruElementId
 
-            let typePrivateMember = fsElementId.As<ITypePrivateMember>()
+            let typePrivateMember = fsElementId.DeclaredElement.As<ITypePrivateMember>()
             if isNotNull typePrivateMember then
                 typePrivateMember.GetSourceFiles().Contains(sourceFile) else
 
