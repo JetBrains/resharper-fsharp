@@ -8,9 +8,10 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Finder
 open JetBrains.ReSharper.Psi.Modules
 
-type ElementDeclarationFileIndex =
-    { FileIndex: int
-      Module: IPsiModule }
+type FSharpSearchGuruElementId =
+    { DeclaredElement: IDeclaredElement
+      PsiModule: IPsiModule
+      FileIndex: int }
 
 
 [<SearchGuru(SearchGuruPerformanceEnum.FastFilterOutByLanguage)>]
@@ -21,37 +22,41 @@ type FSharpSearchGuru(fsProjectOptionsProvider: IFSharpProjectOptionsProvider) =
         | fsElement -> fsElement.GetContainingType()
     
     interface ISearchGuru with
-        member x.IsAvailable(_) = true
+        member x.IsAvailable _ = true
         member x.BuzzWordFilter(_, words) = words
 
         member x.GetElementId(element) =
-            match element.As<IFSharpDeclaredElement>() with
-            | null -> null
-            | fsElement ->
+            let fsDeclaredElement = element.As<IFSharpDeclaredElement>()
+            if isNull fsDeclaredElement then null else
 
-            match getTypeElement fsElement with
-            | null -> null
-            | typeElement ->
+            let typeElement = getTypeElement fsDeclaredElement
+            if isNull typeElement then null else
 
-            let sourceFiles = typeElement.GetSourceFiles().ReadOnlyList()
-            if sourceFiles.Count = 0 then null else
+            let sourceFiles = typeElement.GetSourceFiles()
+            if sourceFiles.IsEmpty then null else
 
             let declarationFileIndex =
-                sourceFiles
-                |> Seq.map (fun sourceFile -> fsProjectOptionsProvider.GetFileIndex(sourceFile))
+                sourceFiles.ReadOnlyList()
+                |> Seq.map fsProjectOptionsProvider.GetFileIndex
                 |> Seq.min
 
             if declarationFileIndex = -1 then null else
 
-            { Module = typeElement.Module
+            { DeclaredElement = element
+              PsiModule = fsDeclaredElement.Module
               FileIndex = declarationFileIndex } :> _
 
 
         member x.CanContainReferences(sourceFile, elementId) =
-            let fileIndex = elementId :?> ElementDeclarationFileIndex
-
             if not (sourceFile.LanguageType.Is<FSharpProjectFileType>()) then true else
-            if sourceFile.PsiModule != fileIndex.Module then true else
+
+            let fsElementId = elementId :?> FSharpSearchGuruElementId
+
+            let typePrivateMember = fsElementId.As<ITypePrivateMember>()
+            if isNotNull typePrivateMember then
+                typePrivateMember.GetSourceFiles().Contains(sourceFile) else
+
+            if sourceFile.PsiModule != fsElementId.PsiModule then true else
 
             let sourceFileIndex = fsProjectOptionsProvider.GetFileIndex(sourceFile)
-            sourceFileIndex >= fileIndex.FileIndex
+            sourceFileIndex >= fsElementId.FileIndex

@@ -32,7 +32,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override bool IsFSharpMember => false;
   }
 
-  internal class FSharpTypePrivateField : FSharpFieldBase<TopPatternDeclarationBase>, IMutableModifierOwner
+  internal class FSharpTypePrivateField : FSharpFieldBase<TopPatternDeclarationBase>, IMutableModifierOwner, ITypePrivateMember
   {
     public FSharpTypePrivateField([NotNull] TopPatternDeclarationBase declaration) : base(declaration)
     {

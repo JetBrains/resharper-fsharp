@@ -14,7 +14,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     }
   }
 
-  internal class FSharpTypePrivateMethod : FSharpMethodBase<TopPatternDeclarationBase>
+  internal class FSharpTypePrivateMethod : FSharpMethodBase<TopPatternDeclarationBase>, ITypePrivateMember
   {
     public FSharpTypePrivateMethod([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {
