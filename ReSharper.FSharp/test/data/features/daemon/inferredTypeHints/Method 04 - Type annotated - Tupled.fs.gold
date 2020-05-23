@@ -1,8 +1,9 @@
 ﻿ShowTypeNameHintsForImplicitlyTypedVariables = True
-let subtract x||(0) (y : int) =
-    x - y
+type C () =
+    member __.Subtract (x: int, y||(0)) =
+        x - y
 
-let l = fun x||(1) (y: int) -> x - y
+    member __.LambdaProp = fun (x: int, y||(1)) -> x - y
 
 ---------------------------------------------------------
 (0): ReSharper Parameter Name Hint: : int
@@ -10,10 +11,11 @@ let l = fun x||(1) (y: int) -> x - y
 
 ================
 ShowTypeNameHintsForImplicitlyTypedVariables = False
-let subtract x (y : int) =
-    x - y
+type C () =
+    member __.Subtract (x: int, y) =
+        x - y
 
-let l = fun x||(0) (y: int) -> x - y
+    member __.LambdaProp = fun (x: int, y||(0)) -> x - y
 
 ---------------------------------------------------------
 (0): ReSharper Parameter Name Hint: : int

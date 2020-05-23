@@ -1,8 +1,9 @@
 ﻿ShowTypeNameHintsForLambdaExpressionParameters = True
-let add x||(0) y||(1) =
-    x + y
+type C () =
+    member __.Add x||(0) y||(1) =
+        x + y
 
-let x = fun x||(2) y||(3) -> x + y
+    member __.LambdaProp = fun x||(2) y||(3) -> x + y
 
 ---------------------------------------------------------
 (0): ReSharper Parameter Name Hint: : int
@@ -12,10 +13,11 @@ let x = fun x||(2) y||(3) -> x + y
 
 ================
 ShowTypeNameHintsForLambdaExpressionParameters = False
-let add x||(0) y||(1) =
-    x + y
+type C () =
+    member __.Add x||(0) y||(1) =
+        x + y
 
-let x = fun x y -> x + y
+    member __.LambdaProp = fun x y -> x + y
 
 ---------------------------------------------------------
 (0): ReSharper Parameter Name Hint: : int

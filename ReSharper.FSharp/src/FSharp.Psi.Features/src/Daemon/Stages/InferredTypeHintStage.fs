@@ -52,6 +52,34 @@ type LocalReferencePatternVisitor(fsFile: IFSharpFile, highlightingContext: Type
         not (String.IsNullOrEmpty(variableName)) &&
         NamesHelper.IsLike(variableNameParts, NamesHelper.GetParts(nameParser, namingPolicyProvider, typeName))
 
+    let isTypeOfPatternEvident (pattern: ISynPat) =
+
+        // v-- not evident
+        // x::y::z
+        //    ^--^-- evident
+        let tuplePat = TuplePatNavigator.GetByPattern pattern
+        if isNotNull tuplePat then
+            let consPat = ConsPatNavigator.GetByPattern1 tuplePat
+            if isNull consPat then false else
+
+            // Are we nested inside another ConsPat?
+            let parentTuplePat = TuplePatNavigator.GetByPattern consPat
+            if isNull parentTuplePat then tuplePat.Patterns.IndexOf pattern <> 0 else
+            isNotNull (ConsPatNavigator.GetByPattern1 parentTuplePat)
+
+        else
+
+        //  v-- not evident
+        // [x; y; z]
+        //     ^--^-- evident
+        let listOrListPat = ArrayOrListPatNavigator.GetByPattern pattern
+        if isNotNull listOrListPat then
+            listOrListPat.Patterns.IndexOf pattern <> 0
+
+        else
+
+        false
+
     override x.VisitNode(node, context) =
         for child in node.Children() do
             match child with
@@ -64,6 +92,8 @@ type LocalReferencePatternVisitor(fsFile: IFSharpFile, highlightingContext: Type
 
         let binding = BindingNavigator.GetByHeadPattern(pat)
         if isNotNull binding && isNotNull binding.ReturnTypeInfo then () else
+
+        if isTypeOfPatternEvident pat then () else
 
         match box (localRefPat.GetFSharpSymbolUse()) with
         | null -> ()

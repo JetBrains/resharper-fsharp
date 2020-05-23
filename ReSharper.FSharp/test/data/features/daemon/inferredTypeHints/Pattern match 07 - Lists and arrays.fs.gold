@@ -1,0 +1,29 @@
+﻿ShowTypeNameHintsForPatternMatchingExpressions = True
+let x =
+    match [1;2] with
+    | x||(0) -> ()
+    | [x||(1)] -> ()
+    | [x||(2); y] -> ()
+    | x||(3)::y -> ()
+    | x||(4)::y::z -> ()
+    | _ -> ()
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : int list
+(1): ReSharper Parameter Name Hint: : int
+(2): ReSharper Parameter Name Hint: : int
+(3): ReSharper Parameter Name Hint: : int
+(4): ReSharper Parameter Name Hint: : int
+
+================
+ShowTypeNameHintsForPatternMatchingExpressions = False
+let x =
+    match [1;2] with
+    | x -> ()
+    | [x] -> ()
+    | [x; y] -> ()
+    | x::y -> ()
+    | x::y::z -> ()
+    | _ -> ()
+
+---------------------------------------------------------

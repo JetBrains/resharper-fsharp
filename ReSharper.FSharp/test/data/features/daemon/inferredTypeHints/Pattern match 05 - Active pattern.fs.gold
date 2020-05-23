@@ -1,14 +1,29 @@
-﻿let (|Parse|_|) pattern||(0) input||(1) =
+﻿ShowTypeNameHintsForPatternMatchingExpressions = True
+let (|Parse|_|) pattern||(0) input||(1) =
     if input = pattern then Some [1; 2; 3]
     else None
 
 let parse =
     function
-    | Parse "ints" (x||(2)::xs||(3)) -> x + List.sum xs
+    | Parse "ints" (x||(2)::xs) -> x + List.sum xs
     | _ -> 0
 
 ---------------------------------------------------------
 (0): ReSharper Parameter Name Hint: : 'a
 (1): ReSharper Parameter Name Hint: : 'a
 (2): ReSharper Parameter Name Hint: : int
-(3): ReSharper Parameter Name Hint: : int list
+
+================
+ShowTypeNameHintsForPatternMatchingExpressions = False
+let (|Parse|_|) pattern||(0) input||(1) =
+    if input = pattern then Some [1; 2; 3]
+    else None
+
+let parse =
+    function
+    | Parse "ints" (x::xs) -> x + List.sum xs
+    | _ -> 0
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : 'a
+(1): ReSharper Parameter Name Hint: : 'a

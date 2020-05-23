@@ -1,0 +1,13 @@
+﻿let outer z||(0) =
+    let x||(1) = [y; y+2]
+    let y||(2) = [|z; z+1|]
+    let u||(3) = z + 1
+    let ts||(4) = 1, "hi", u
+    ()
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : int
+(1): ReSharper Parameter Name Hint: : int list
+(2): ReSharper Parameter Name Hint: : int []
+(3): ReSharper Parameter Name Hint: : int
+(4): ReSharper Parameter Name Hint: : int * string * int

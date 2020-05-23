@@ -1,7 +1,17 @@
-﻿let sayHello =
+﻿ShowTypeNameHintsForPatternMatchingExpressions = True
+let sayHello =
     function
     | None -> "Hi there"
     | Some n||(0) -> "Hi, " + n
 
 ---------------------------------------------------------
 (0): ReSharper Parameter Name Hint: : string
+
+================
+ShowTypeNameHintsForPatternMatchingExpressions = False
+let sayHello =
+    function
+    | None -> "Hi there"
+    | Some n -> "Hi, " + n
+
+---------------------------------------------------------

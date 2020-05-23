@@ -117,4 +117,9 @@ let rec isTypeEvident (expr: IFSharpExpression) =
     | :? ILiteralExpr -> true
     | :? ITupleExpr as tupleExpr ->
         tupleExpr.Expressions |> Seq.forall isTypeEvident
+    | :? IArrayOrListExpr as arrayOrListExpr ->
+        match arrayOrListExpr.Expression with
+        | :? ISequentialExpr as seqExpr ->
+            isTypeEvident (seqExpr.Expressions.FirstOrDefault())
+        | _ -> false
     | _ -> false

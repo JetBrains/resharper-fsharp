@@ -2,6 +2,9 @@
 let run () =
     let x = 15
     let y||(0) = failwith ""
+    let z = [1;2;3]
+    let u = [|1;2;3|]
+    let ts = 1, "hi", 10.
     y + ""
 
 ---------------------------------------------------------
@@ -12,8 +15,14 @@ HideTypeNameHintsForImplicitlyTypedVariablesWhenTypeIsEvident = False
 let run () =
     let x||(0) = 15
     let y||(1) = failwith ""
+    let z||(2) = [1;2;3]
+    let u||(3) = [|1;2;3|]
+    let ts||(4) = 1, "hi", 10.
     y + ""
 
 ---------------------------------------------------------
 (0): ReSharper Parameter Name Hint: : int
 (1): ReSharper Parameter Name Hint: : string
+(2): ReSharper Parameter Name Hint: : int list
+(3): ReSharper Parameter Name Hint: : int []
+(4): ReSharper Parameter Name Hint: : int * string * float
