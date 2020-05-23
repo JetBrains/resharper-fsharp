@@ -1,5 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 
+open JetBrains.ReSharper.Feature.Services.TypeNameHints
 open JetBrains.ReSharper.FeaturesTestFramework.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Settings
@@ -8,9 +9,8 @@ open NUnit.Framework
 
 [<HighlightOnly(typeof<TypeHintHighlighting>)>]
 [<TestPackages("FSharp.Core")>]
-[<TestSettingsKey(typeof<FSharpTypeHintOptions>)>]
+[<TestSettingsKey(typeof<TypeNameHintsOptions>)>]
 [<TestSetting(typeof<FSharpTypeHintOptions>, "ShowPipeReturnTypes", "false")>]
-[<TestSetting(typeof<FSharpTypeHintOptions>, "ShowInferredTypes", "true")>]
 type InferredTypeHintStageTest() =
     inherit FSharpHighlightingTestBase()
 
@@ -32,6 +32,11 @@ type InferredTypeHintStageTest() =
     [<Test>] member x.``Pattern match 03 - Wildcard``() = x.DoNamedTest()
     [<Test>] member x.``Pattern match 04 - Function``() = x.DoNamedTest()
     [<Test>] member x.``Pattern match 05 - Active pattern``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern match 06 - Type match``() = x.DoNamedTest()
 
-    [<Test>] member x.``Value 01 - Literals``() = x.DoNamedTest()
+    [<Test; TestSettings("{HideTypeNameHintsForImplicitlyTypedVariablesWhenTypeIsEvident:All}")>]
+    member x.``Value 01 - Literals``() = x.DoNamedTest()
+
     [<Test>] member x.``Value 02 - Pattern match``() = x.DoNamedTest()
+
+    [<Test>] member x.``Nested 01``() = x.DoNamedTest()

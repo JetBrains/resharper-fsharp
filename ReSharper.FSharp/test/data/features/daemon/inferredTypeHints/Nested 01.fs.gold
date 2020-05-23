@@ -1,0 +1,15 @@
+﻿let outerLet =
+    let myFunc (o: obj) =
+        match o with
+        | :? int as i ->
+            let x||(0) =
+                let myLambda = fun x||(1) (y: int) -> x + y
+                let myValue = 123
+                myLambda myValue i
+        | _ -> 0
+        
+    myFunc 10
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : int
+(1): ReSharper Parameter Name Hint: : int

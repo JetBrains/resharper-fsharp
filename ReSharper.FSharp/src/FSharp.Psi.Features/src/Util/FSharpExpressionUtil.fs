@@ -108,3 +108,13 @@ let setBindingExpression (expr: IFSharpExpression) contextIndent (letBindings: #
         ModificationUtil.AddChildBefore(newExpr, NewLine(expr.GetLineEnding())) |> ignore
         ModificationUtil.AddChildBefore(newExpr, Whitespace(contextIndent + indentSize)) |> ignore
         shiftExpr indentSize newExpr
+
+let rec isTypeEvident (expr: IFSharpExpression) =
+    match expr.IgnoreInnerParens() with
+    | :? IObjExpr
+    | :? ICastExpr
+    | :? ILambdaExpr
+    | :? ILiteralExpr -> true
+    | :? ITupleExpr as tupleExpr ->
+        tupleExpr.Expressions |> Seq.forall isTypeEvident
+    | _ -> false

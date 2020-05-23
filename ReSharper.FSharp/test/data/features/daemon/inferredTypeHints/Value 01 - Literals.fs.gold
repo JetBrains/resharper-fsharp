@@ -1,4 +1,15 @@
-﻿let run () =
+﻿HideTypeNameHintsForImplicitlyTypedVariablesWhenTypeIsEvident = True
+let run () =
+    let x = 15
+    let y||(0) = failwith ""
+    y + ""
+
+---------------------------------------------------------
+(0): ReSharper Parameter Name Hint: : string
+
+================
+HideTypeNameHintsForImplicitlyTypedVariablesWhenTypeIsEvident = False
+let run () =
     let x||(0) = 15
     let y||(1) = failwith ""
     y + ""

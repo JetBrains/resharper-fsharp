@@ -66,8 +66,6 @@ module FSharpTypeHintOptions =
 
     let [<Literal>] hideSameLinePipe = "Hide when |> is on same line as argument"
 
-    let [<Literal>] inferredTypes = "Show inferred types on identifiers"
-
 
 [<SettingsKey(typeof<FSharpOptions>, "FSharpTypeHintOptions")>]
 type FSharpTypeHintOptions =
@@ -75,10 +73,7 @@ type FSharpTypeHintOptions =
       mutable ShowPipeReturnTypes: bool
 
       [<SettingsEntry(true, FSharpTypeHintOptions.hideSameLinePipe); DefaultValue>]
-      mutable HideSameLine: bool
-
-      [<SettingsEntry(true, FSharpTypeHintOptions.inferredTypes); DefaultValue>]
-      mutable ShowInferredTypes: bool }
+      mutable HideSameLine: bool }
 
 
 [<OptionsPage("FSharpOptionsPage", "F#", typeof<ProjectModelThemedIcons.Fsharp>)>]
@@ -95,7 +90,7 @@ type FSharpOptionsPage
         this.AddComboEnum((fun key -> key.LanguageVersion), FSharpScriptOptions.languageVersion, FSharpLanguageVersion.toString) |> ignore
 
         this.AddHeader("Type hints")
-        let showPipeReturnTypes = this.AddBoolOption((fun key -> key.ShowPipeReturnTypes), RichText(FSharpTypeHintOptions.pipeReturnTypes), null)
+        this.AddBoolOption((fun key -> key.ShowPipeReturnTypes), RichText(FSharpTypeHintOptions.pipeReturnTypes), null) |> ignore
         do
             use _x = this.Indent()
             [
@@ -104,8 +99,6 @@ type FSharpOptionsPage
             |> Seq.iter (fun checkbox ->
                 this.AddBinding(checkbox, BindingStyle.IsEnabledProperty, (fun key -> key.ShowPipeReturnTypes), id)
             )
-
-        this.AddBoolOption((fun key -> key.ShowInferredTypes), RichText(FSharpTypeHintOptions.inferredTypes), null) |> ignore
 
         this.AddHeader("FSharp.Compiler.Service options")
         this.AddBoolOption((fun key -> key.BackgroundTypeCheck), RichText(backgroundTypeCheck), null) |> ignore
