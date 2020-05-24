@@ -28,7 +28,7 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
 
     let [<Literal>] opName = "FSharpIdentifierTooltipProvider"
 
-    static member GetFSharpToolTipText(checkResults: FSharpCheckFileResults, token: FSharpIdentifierToken) =
+    static member GetFSharpToolTipText(userOpName: string, checkResults: FSharpCheckFileResults, token: FSharpIdentifierToken) =
         // todo: fix getting qualifiers
         let tokenNames = [token.Name]
 
@@ -38,7 +38,7 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
         use cookie = CompilationContextCookie.GetOrCreate(sourceFile.GetPsiModule().GetContextFromModule())
 
         // todo: provide tooltip for #r strings in fsx, should pass String tag
-        let getTooltip = checkResults.GetStructuredToolTipText(int coords.Line + 1, int coords.Column, lineText, tokenNames, FSharpTokenTag.Identifier)
+        let getTooltip = checkResults.GetStructuredToolTipText(int coords.Line + 1, int coords.Column, lineText, tokenNames, FSharpTokenTag.Identifier, userOpName)
         getTooltip.RunAsTask()
 
     override x.GetTooltip(highlighter) =
@@ -67,7 +67,7 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
         | Some results ->
 
         let result = List()
-        let (FSharpToolTipText layouts) = FSharpIdentifierTooltipProvider.GetFSharpToolTipText(results.CheckResults, token)
+        let (FSharpToolTipText layouts) = FSharpIdentifierTooltipProvider.GetFSharpToolTipText(opName, results.CheckResults, token)
         
         layouts |> List.iter (function
             | FSharpStructuredToolTipElement.None
