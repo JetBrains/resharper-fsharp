@@ -2,7 +2,10 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.FcsReactorMonitor
 
 open System
 open System.Diagnostics
+open System.IO
 open System.Text.RegularExpressions
+open JetBrains.Application.Environment
+open JetBrains.Application.Environment.Helpers
 open JetBrains.Application.Threading
 open JetBrains.DataFlow
 open JetBrains.Lifetimes
@@ -10,39 +13,46 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Host.Features.BackgroundTasks
 
 [<SolutionComponent>]
-type FcsReactorMonitor(lifetime: Lifetime, locks: IShellLocks, backgroundTaskHost: RiderBackgroundTaskHost, threading: IThreading) as this =
+type FcsReactorMonitor
+        (
+            lifetime: Lifetime,
+            locks: IShellLocks,
+            backgroundTaskHost: RiderBackgroundTaskHost,
+            threading: IThreading,
+            configurations: RunsProducts.ProductConfigurations
+        ) as this =
     inherit TraceListener("FcsReactorMonitor")
 
-    /// How long before the FCS becoming busy that the background task should be shown
-    let showDelay = TimeSpan.FromSeconds 1.0
+    /// How long after the reactor becoming busy that the background task should be shown
+    let showDelay =
+        if configurations.IsInternalMode() then 1.0 else 5.0
+        |> TimeSpan.FromSeconds
 
-    /// How long after the FCS becoming free that the background task should be hidden
+    /// How long after the reactor becoming free that the background task should be hidden
     let hideDelay = TimeSpan.FromSeconds 0.5
 
     let isReactorBusy = new Property<bool>("isReactorBusy")
-    let operationCounter = new Property<int64>("operationCounter")
-    let queueLength = new Property<int>("queueLength")
+    let operationCount = new Property<int64>("operationCount")
 
-    let taskHeader = new Property<string>("header")
-    let taskDescription = new Property<string>("description")
-    let taskVisible = new Property<bool>("taskVisible")
+    let taskHeader = new Property<string>("taskHeader")
+    let taskDescription = new Property<string>("taskDescription")
+    let showBackgroundTask = new Property<bool>("showBackgroundTask")
 
-    let opStartRegex = Regex(@"--> (.+), remaining (\d+)$", RegexOptions.Compiled)
-    let enqueueRegex = Regex(@"enqueue .+, length (\d+)$", RegexOptions.Compiled)
+    let opStartRegex = Regex(@"--> (.+) \((.+)\), remaining \d+$", RegexOptions.Compiled)
 
     let createNewTask (activeLifetime: Lifetime) =
         locks.Dispatcher.AssertAccess()
 
         let task =
             RiderBackgroundTaskBuilder.Create()
-                .WithTitle("F# Compiler Service")
+                .WithTitle("F# Compiler Service is busy...")
                 .WithHeader(taskHeader)
                 .WithDescription(taskDescription)
                 .AsIndeterminate()
                 .AsNonCancelable()
                 .Build()
 
-        // Show the background task after we've been busy for some time
+        // Only show the background task after we've been busy for some time
         threading.QueueAt(
             activeLifetime,
             "FcsReactorMonitor.AddNewTask",
@@ -50,59 +60,39 @@ type FcsReactorMonitor(lifetime: Lifetime, locks: IShellLocks, backgroundTaskHos
             fun () -> backgroundTaskHost.AddNewTask(activeLifetime, task)
         )
 
-    let onOperationEnqueue (remaining: int) =
+    let onOperationStart (opDescription: string) (opArg: string) =
         locks.Dispatcher.AssertAccess()
 
-        // Trace is sent _before_ operation is enqueued, so it's always one behind
-        queueLength.SetValue (remaining + 1) |> ignore
-
-    let onOperationStart (opDescription: string) (remaining: int) =
-        locks.Dispatcher.AssertAccess()
-
-        operationCounter.SetValue (operationCounter.Value + 1L) |> ignore
+        operationCount.SetValue(operationCount.Value + 1L) |> ignore
         taskHeader.SetValue opDescription |> ignore
-        queueLength.SetValue remaining |> ignore
+
+        let opArg = if Path.IsPathRooted opArg then Path.GetFileName opArg else opArg
+        taskDescription.SetValue(sprintf "%s (operation #%d)" opArg operationCount.Value) |> ignore
+
         isReactorBusy.SetValue true |> ignore
 
     let onOperationEnd () =
         locks.Dispatcher.AssertAccess()
+
         isReactorBusy.SetValue false |> ignore
 
-    let updateTaskDescription () =
-        let queueLength = queueLength.Value
-
-        if queueLength <= 0 then ""
-        else sprintf " + %d queued" queueLength
-        |> sprintf "#%d%s" operationCounter.Value
-        |> taskDescription.SetValue
-        |> ignore
-
     let onTrace (message: string) =
-        // todo: this is horrible. add a proper IReactorListener interface in FCS instead
+        // todo: add and use a proper reactor event interface in FCS instead of matching trace messages
 
         if message.Contains "<--" then
             locks.Dispatcher.BeginInvoke(lifetime, "FcsReactorMonitor.OnOperationEnd", onOperationEnd)
         else
 
-        let enqueueMatch = enqueueRegex.Match(message)
-        if enqueueMatch.Success then
-            locks.Dispatcher.BeginInvoke(lifetime, "FcsReactorMonitor.OnOperationEnqueue", fun () -> onOperationEnqueue (Int32.Parse (enqueueMatch.Groups.[1].Value)))
-
-        else
         let opStartMatch = opStartRegex.Match(message)
         if opStartMatch.Success then
-            locks.Dispatcher.BeginInvoke(lifetime, "FcsReactorMonitor.OnOperationStart", fun () -> onOperationStart (opStartMatch.Groups.[1].Value) (Int32.Parse (opStartMatch.Groups.[2].Value)))
+            locks.Dispatcher.BeginInvoke(lifetime, "FcsReactorMonitor.OnOperationStart", fun () ->
+                onOperationStart (opStartMatch.Groups.[1].Value) (opStartMatch.Groups.[2].Value))
 
     do
-        // todo: are we running in internal mode?
+        showBackgroundTask.WhenTrue(lifetime, Action<_> createNewTask)
 
-        taskVisible.WhenTrue(lifetime, Action<_> createNewTask)
-
-        isReactorBusy.WhenTrue(lifetime, fun _ -> taskVisible.SetValue true |> ignore)
-        isReactorBusy.WhenFalse(lifetime, fun lt -> threading.QueueAt(lt, "FcsReactorMonitor.HideTask", hideDelay, fun () -> taskVisible.SetValue false |> ignore))
-
-        operationCounter.Change.Advise(lifetime, updateTaskDescription)
-        queueLength.Change.Advise(lifetime, updateTaskDescription)
+        isReactorBusy.WhenTrue(lifetime, fun _ -> showBackgroundTask.SetValue true |> ignore)
+        isReactorBusy.WhenFalse(lifetime, fun lt -> threading.QueueAt(lt, "FcsReactorMonitor.HideTask", hideDelay, fun () -> showBackgroundTask.SetValue false |> ignore))
 
         // Start listening for trace events
         Trace.Listeners.Add(this) |> ignore
