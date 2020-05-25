@@ -80,6 +80,7 @@
     <Compile Include="Intentions\NegateConditionTest.fs" />
     <Compile Include="Intentions\ToMutableTest.fs" />
     <Compile Include="Intentions\ToLiteralTest.fs" />
+    <Compile Include="Intentions\GenerateMissingInterfaceImplementationTest.fs" />
     <Compile Include="Actions\CommentActionTests.fs" />
     <Compile Include="Actions\TypingAssistTest.fs" />
     <Compile Include="Actions\FSharpExtendSelectionTest.fs" />
