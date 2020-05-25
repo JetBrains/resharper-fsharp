@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
+﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
 open System
 open JetBrains.Application.Settings
@@ -111,10 +111,13 @@ type LocalReferencePatternVisitor(fsFile: IFSharpFile, highlightingContext: Type
             consumer.AddHighlighting(TypeHintHighlighting(typeNameStr, range))
         | _ -> ()
 
-type InferredTypeHintHighlightingProcess(fsFile, settings: IContextBoundSettingsStore, highlightingContext: TypeNameHintHighlightingContext, namingManager: NamingManager, nameParser: NameParser, daemonProcess) =
+type InferredTypeHintHighlightingProcess
+        (fsFile, settings: IContextBoundSettingsStore, highlightingContext: TypeNameHintHighlightingContext,
+         namingManager: NamingManager, nameParser: NameParser, daemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
     let namingPolicyProvider = namingManager.Policy.GetPolicyProvider(fsFile.Language, fsFile.GetSourceFile())
+    let hideHintsForEvidentTypes = highlightingContext.HideTypeNameHintsForImplicitlyTypedVariablesWhenTypeIsEvident
 
     let visitor = LocalReferencePatternVisitor(fsFile, highlightingContext, namingPolicyProvider, nameParser)
 
@@ -122,7 +125,7 @@ type InferredTypeHintHighlightingProcess(fsFile, settings: IContextBoundSettings
         if not highlightingContext.ShowTypeNameHintsForImplicitlyTypedVariables then () else
 
         for binding in letBindings.Bindings do
-            if highlightingContext.HideTypeNameHintsForImplicitlyTypedVariablesWhenTypeIsEvident && isTypeEvident binding.Expression then () else
+            if hideHintsForEvidentTypes && isTypeEvident binding.Expression then () else
             binding.HeadPattern.Accept(visitor, consumer)
 
     override x.Execute(committer) =
@@ -161,11 +164,12 @@ type InferredTypeHintStage(namingManager: NamingManager, nameParser: NameParser)
         not (sourceFile.LanguageType.Is<FSharpSignatureProjectFileType>())
 
     override x.CreateStageProcess(fsFile, settings, daemonProcess) =
-        let highlightingContext = TypeNameHintHighlightingContext(settings)
+        let context = TypeNameHintHighlightingContext(settings)
+
         let isEnabled =
-            highlightingContext.ShowTypeNameHintsForImplicitlyTypedVariables ||
-            highlightingContext.ShowTypeNameHintsForLambdaExpressionParameters ||
-            highlightingContext.ShowTypeNameHintsForVarDeclarationsInPatternMatchingExpressions
-        
+            context.ShowTypeNameHintsForImplicitlyTypedVariables ||
+            context.ShowTypeNameHintsForLambdaExpressionParameters ||
+            context.ShowTypeNameHintsForVarDeclarationsInPatternMatchingExpressions
+
         if not isEnabled then null else
-        InferredTypeHintHighlightingProcess(fsFile, settings, highlightingContext, namingManager, nameParser, daemonProcess) :> _
+        InferredTypeHintHighlightingProcess(fsFile, settings, context, namingManager, nameParser, daemonProcess) :> _
