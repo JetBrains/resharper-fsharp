@@ -25,7 +25,7 @@ type FcsReactorMonitor
 
     /// How long after the reactor becoming busy that the background task should be shown
     let showDelay =
-        if configurations.IsInternalMode() then 1.0 else 5.0
+        if configurations.IsInternalMode() then 3.0 else 5.0
         |> TimeSpan.FromSeconds
 
     /// How long after the reactor becoming free that the background task should be hidden
@@ -92,7 +92,10 @@ type FcsReactorMonitor
         showBackgroundTask.WhenTrue(lifetime, Action<_> createNewTask)
 
         isReactorBusy.WhenTrue(lifetime, fun _ -> showBackgroundTask.SetValue true |> ignore)
-        isReactorBusy.WhenFalse(lifetime, fun lt -> threading.QueueAt(lt, "FcsReactorMonitor.HideTask", hideDelay, fun () -> showBackgroundTask.SetValue false |> ignore))
+
+        isReactorBusy.WhenFalse(lifetime, fun lt ->
+            threading.QueueAt(lt, "FcsReactorMonitor.HideTask", hideDelay, fun () ->
+                showBackgroundTask.SetValue false |> ignore))
 
         // Start listening for trace events
         Trace.Listeners.Add(this) |> ignore
