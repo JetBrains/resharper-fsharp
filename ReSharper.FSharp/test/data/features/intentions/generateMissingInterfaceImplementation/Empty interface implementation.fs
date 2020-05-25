@@ -3,4 +3,4 @@ type IPrintable =
    abstract member Print2 : unit -> unit
 
 type SomeClass1(x: int, y: float) =
-   interface IPrintable{caret} with
+   interface IPrintable{caret}

@@ -4,4 +4,5 @@ type IPrintable =
 
 type SomeClass1(x: int, y: float) =
    member this.SomethingElse{off}() = printfn "Not an interface implementation"
-   interface IPrintable{on} with{on}
+
+   interface IPrintable{on} 
