@@ -15,7 +15,6 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.Caches;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
@@ -45,6 +44,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public const string Class = "Class";
     public const string Sealed = "Sealed";
     public const string Struct = "Struct";
+    public const string AutoOpen = "AutoOpen";
 
     [NotNull] public static string GetShortName([NotNull] this IAttribute attr) =>
       attr.ReferenceName?.ShortName.GetAttributeShortName() ?? SharedImplUtil.MISSING_DECLARATION_NAME;
@@ -623,6 +623,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 
       return null;
     }
+
+    public static bool HasAttribute([NotNull] this TypeElement typeElement, string attrShortName)
+    {
+      foreach (var part in typeElement.EnumerateParts())
+        if (part.AttributeClassNames.Contains(attrShortName))
+          return true;
+      return false;
+    }
+
+    public static bool HasAutoOpenAttribute([NotNull] this ITypeElement typeElement) =>
+      typeElement switch
+      {
+        FSharpModule fsModule => HasAttribute(fsModule, AutoOpen),
+        IFSharpTypeElement _ => false,
+        _ => typeElement.HasAttributeInstance(FSharpPredefinedType.AutoOpenAttrTypeName, false)
+      };
 
     public static bool IsRecord([NotNull] this ITypeElement typeElement) =>
       typeElement switch

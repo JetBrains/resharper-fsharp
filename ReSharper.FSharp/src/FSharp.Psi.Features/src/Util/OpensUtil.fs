@@ -11,7 +11,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
-open JetBrains.ReSharper.Plugins.FSharp.Util.FSharpAssemblyUtil
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 

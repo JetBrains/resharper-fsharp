@@ -10,6 +10,7 @@
     <Compile Include="src\Util\IFSharpElementFactory.fs" />
     <Compile Include="src\Util\StringLiteralsUtil.fs" />
     <Compile Include="src\Util\PsiUtil.fs" />
+    <Compile Include="src\Util\FSharpAutoOpenUtil.fs" />
     <Compile Include="src\Util\OpensUtil.fs" />
     <Compile Include="src\Util\FSharpParensUtil.fs" />
     <Compile Include="src\Util\FSharpExpressionUtil.fs" />
