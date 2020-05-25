@@ -12,7 +12,7 @@ open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Host.Features.BackgroundTasks
 
-[<SolutionComponent>]
+//[<SolutionComponent>]
 type FcsReactorMonitor
         (
             lifetime: Lifetime,
