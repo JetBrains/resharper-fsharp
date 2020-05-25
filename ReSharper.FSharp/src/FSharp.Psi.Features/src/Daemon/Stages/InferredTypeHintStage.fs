@@ -1,9 +1,8 @@
-﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
 open System
 open JetBrains.Application.Settings
 open JetBrains.ProjectModel
-open JetBrains.ReSharper.Daemon.Stages
 open JetBrains.ReSharper.Feature.Services.InlayHints
 open JetBrains.ReSharper.Feature.Services.TypeNameHints
 open JetBrains.ReSharper.Plugins.FSharp
@@ -152,7 +151,7 @@ type InferredTypeHintHighlightingProcess(fsFile, settings: IContextBoundSettings
         for pattern in lambdaExpr.Patterns do
             pattern.Accept(visitor, consumer)
 
-[<DaemonStage(StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |])>]
+[<DaemonStage(StagesBefore = [| typeof<FSharpErrorsStage> |])>]
 type InferredTypeHintStage(namingManager: NamingManager, nameParser: NameParser) =
     inherit FSharpDaemonStageBase()
 

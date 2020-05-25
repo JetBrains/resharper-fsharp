@@ -58,7 +58,7 @@ type InferredTypeCodeVisionProvider() =
         member x.OnExtraActionClick(_, _, _) = ()
 
 
-[<DaemonStage>]
+[<DaemonStage(StagesBefore = [| typeof<FSharpErrorsStage> |])>]
 type InferredTypeCodeVisionStage(provider: InferredTypeCodeVisionProvider) =
     inherit FSharpDaemonStageBase()
 

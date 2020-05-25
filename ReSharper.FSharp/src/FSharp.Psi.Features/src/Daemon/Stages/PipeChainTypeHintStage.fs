@@ -137,7 +137,7 @@ type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBou
 
         committer.Invoke(DaemonStageResult remainingHighlightings)
 
-[<DaemonStage(StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |])>]
+[<DaemonStage(StagesBefore = [| typeof<FSharpErrorsStage> |])>]
 type PipeChainTypeHintStage(logger: ILogger) =
     inherit FSharpDaemonStageBase()
 
