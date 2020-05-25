@@ -1,4 +1,4 @@
-module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.FcsReactorMonitor
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 
 open System
 open System.Diagnostics
@@ -12,7 +12,7 @@ open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Host.Features.BackgroundTasks
 
-//[<SolutionComponent>]
+[<SolutionComponent>]
 type FcsReactorMonitor
         (
             lifetime: Lifetime,
@@ -80,13 +80,12 @@ type FcsReactorMonitor
         // todo: add and use a proper reactor event interface in FCS instead of matching trace messages
 
         if message.Contains "<--" then
-            locks.Dispatcher.BeginInvoke(lifetime, "FcsReactorMonitor.OnOperationEnd", onOperationEnd)
+            locks.ExecuteOrQueue(lifetime, "FcsReactorMonitor.OnOperationEnd", onOperationEnd)
         else
-
-        let opStartMatch = opStartRegex.Match(message)
-        if opStartMatch.Success then
-            locks.Dispatcher.BeginInvoke(lifetime, "FcsReactorMonitor.OnOperationStart", fun () ->
-                onOperationStart (opStartMatch.Groups.[1].Value) (opStartMatch.Groups.[2].Value))
+            let opStartMatch = opStartRegex.Match(message)
+            if opStartMatch.Success then
+                locks.ExecuteOrQueue(lifetime, "FcsReactorMonitor.OnOperationStart", fun () ->
+                    onOperationStart (opStartMatch.Groups.[1].Value) (opStartMatch.Groups.[2].Value))
 
     do
         showBackgroundTask.WhenTrue(lifetime, Action<_> createNewTask)
@@ -101,5 +100,5 @@ type FcsReactorMonitor
         Trace.Listeners.Add(this) |> ignore
         lifetime.OnTermination(fun () -> Trace.Listeners.Remove(this)) |> ignore
 
-    override x.Write(message: string) = ()
+    override x.Write(_: string) = ()
     override x.WriteLine(message: string) = if message.StartsWith "Reactor:" then onTrace message
