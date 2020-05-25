@@ -163,6 +163,7 @@
     <Compile Include="src\LanguageService\FSharpQuickDefinitionService.fs" />
     <Compile Include="src\LanguageService\SandboxDocumentLanguageSupportFSharpScript.fs" />
     <Compile Include="src\FSharpTypingAssist.fs" />
+    <Compile Include="src\FcsReactorMonitor.fs" />
     <Compile Include="src\ZoneMarker.fs" />
   </ItemGroup>
 
