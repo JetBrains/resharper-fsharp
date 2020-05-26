@@ -1,5 +1,4 @@
-[<AutoOpen>]
-module JetBrains.ReSharper.Plugins.FSharp.Tests.Common
+namespace JetBrains.ReSharper.Plugins.FSharp.Tests
 
 open System
 open System.Threading
@@ -13,7 +12,6 @@ open JetBrains.ProjectModel.MSBuild
 open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
-open JetBrains.ReSharper.Plugins.FSharp.Checker.ProjectOptions
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.TestFramework
@@ -63,25 +61,25 @@ type TestFcsProjectBuilder(checkerService: FSharpCheckerService, logger: ILogger
 
 
 [<SolutionComponent>]
-type FSharpTestProjectOptionsProvider
-        (lifetime: Lifetime, checkerService: FSharpCheckerService, projectOptionsBuilder: FcsProjectBuilder,
-         scriptOptionsProvider: IScriptFcsProjectProvider) as this =
+type TestFcsProjectProvider
+        (lifetime: Lifetime, checkerService: FSharpCheckerService, fcsProjectBuilder: FcsProjectBuilder,
+         scriptFcsProjectProvider: IScriptFcsProjectProvider) as this =
     do
-        checkerService.OptionsProvider <- this
-        lifetime.OnTermination(fun _ -> checkerService.OptionsProvider <- Unchecked.defaultof<_>) |> ignore
+        checkerService.FcsProjectProvider <- this
+        lifetime.OnTermination(fun _ -> checkerService.FcsProjectProvider <- Unchecked.defaultof<_>) |> ignore
 
     let getProjectOptions (sourceFile: IPsiSourceFile) =
-        let fcsProject = projectOptionsBuilder.BuildFcsProject(sourceFile.PsiModule, sourceFile.GetProject())
+        let fcsProject = fcsProjectBuilder.BuildFcsProject(sourceFile.PsiModule, sourceFile.GetProject())
         Some { fcsProject.ProjectOptions with SourceFiles = [| sourceFile.GetLocation().FullPath |] }
 
     interface IHideImplementation<FcsProjectProvider>
     
-    interface IFSharpProjectOptionsProvider with
+    interface IFcsProjectProvider with
         member x.HasPairFile _ = false
 
         member x.GetProjectOptions(sourceFile) =
             if sourceFile.LanguageType.Is<FSharpScriptProjectFileType>() then
-                scriptOptionsProvider.GetScriptOptions(sourceFile) else
+                scriptFcsProjectProvider.GetScriptOptions(sourceFile) else
 
             getProjectOptions sourceFile
 

@@ -104,8 +104,8 @@ type FcsProjectProvider
         scheduler.EnqueueTask(SolutionLoadTask("FSharpProjectOptionsProvider", SolutionLoadTaskKinds.StartPsi, fun _ ->
             changeManager.Changed2.Advise(lifetime, this.ProcessChange)))
 
-        checkerService.OptionsProvider <- this
-        lifetime.OnTermination(fun _ -> checkerService.OptionsProvider <- Unchecked.defaultof<_>) |> ignore
+        checkerService.FcsProjectProvider <- this
+        lifetime.OnTermination(fun _ -> checkerService.FcsProjectProvider <- Unchecked.defaultof<_>) |> ignore
 
     let tryGetFcsProject (psiModule: IPsiModule): FcsProject option =
         use lock = locker.UsingReadLock()
@@ -204,7 +204,7 @@ type FcsProjectProvider
                 let psiModule = fileChange.Item.PsiModule
                 dirtyModules.Add(psiModule) |> ignore
 
-    interface IFSharpProjectOptionsProvider with
+    interface IFcsProjectProvider with
         member x.GetProjectOptions(sourceFile) =
             locks.AssertReadAccessAllowed()
             processDirtyFcsProjects ()
@@ -258,11 +258,11 @@ type FcsProjectProvider
 [<SolutionComponent>]
 type OutputAssemblyChangeInvalidator
         (lifetime: Lifetime, outputAssemblies: OutputAssemblies, daemon: IDaemon, psiFiles: IPsiFiles,
-         provider: IFSharpProjectOptionsProvider) =
+         fcsProjectProvider: IFcsProjectProvider) =
     do
         outputAssemblies.ProjectOutputAssembliesChanged.Advise(lifetime, fun (project: IProject) ->
-            if not provider.HasFcsProjects || project.IsFSharp then () else
+            if not fcsProjectProvider.HasFcsProjects || project.IsFSharp then () else
 
-            if provider.InvalidateReferencesToProject(project) then
+            if fcsProjectProvider.InvalidateReferencesToProject(project) then
                 psiFiles.IncrementModificationTimestamp(null) // Drop cached values.
                 daemon.Invalidate()) // Request files re-highlighting.

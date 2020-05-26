@@ -10,6 +10,7 @@ open JetBrains.Application
 open JetBrains.Application.Settings
 open JetBrains.DataFlow
 open JetBrains.DocumentModel
+open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services
 open JetBrains.ReSharper.Plugins.FSharp
@@ -27,8 +28,8 @@ module FSharpCheckerService =
 
 [<ShellComponent; AllowNullLiteral>]
 type FSharpCheckerService
-        (lifetime, logger: ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier, settingsStore: ISettingsStore,
-         settingsSchema: SettingsSchema) =
+        (lifetime: Lifetime, logger: ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier,
+         settingsStore: ISettingsStore, settingsSchema: SettingsSchema) =
 
     let checker =
         Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "20")
@@ -59,7 +60,8 @@ type FSharpCheckerService
             if checker.IsValueCreated then
                 checker.Value.InvalidateAll())
 
-    member val OptionsProvider = Unchecked.defaultof<IFSharpProjectOptionsProvider> with get, set
+    member val FcsProjectProvider = Unchecked.defaultof<IFcsProjectProvider> with get, set
+
     member x.Checker = checker.Value
 
     member x.ParseFile(path, document, parsingOptions, [<Optional; DefaultParameterValue(false)>] noCache: bool) =
@@ -83,12 +85,12 @@ type FSharpCheckerService
             None
 
     member x.ParseFile([<NotNull>] sourceFile: IPsiSourceFile) =
-        let parsingOptions = x.OptionsProvider.GetParsingOptions(sourceFile)
+        let parsingOptions = x.FcsProjectProvider.GetParsingOptions(sourceFile)
         x.ParseFile(sourceFile.GetLocation(), sourceFile.Document, parsingOptions)
 
     member x.ParseAndCheckFile([<NotNull>] file: IPsiSourceFile, opName,
                                [<Optional; DefaultParameterValue(false)>] allowStaleResults) =
-        match x.OptionsProvider.GetProjectOptions(file) with
+        match x.FcsProjectProvider.GetProjectOptions(file) with
         | None -> None
         | Some options ->
 
@@ -107,7 +109,7 @@ type FSharpCheckerService
             None
 
     member x.TryGetStaleCheckResults([<NotNull>] file: IPsiSourceFile, opName) =
-        match x.OptionsProvider.GetProjectOptions(file) with
+        match x.FcsProjectProvider.GetProjectOptions(file) with
         | None -> None
         | Some options ->
 
@@ -154,7 +156,7 @@ type FSharpParseAndCheckResults =
       CheckResults: FSharpCheckFileResults }
 
 
-type IFSharpProjectOptionsProvider =
+type IFcsProjectProvider =
     abstract GetProjectOptions: IPsiSourceFile -> FSharpProjectOptions option
     abstract GetParsingOptions: IPsiSourceFile -> FSharpParsingOptions
     abstract GetFileIndex: IPsiSourceFile -> int

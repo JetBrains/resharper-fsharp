@@ -52,7 +52,7 @@ type ScriptLoadPathsStageProcess(fsFile, daemonProcess) =
         fsFile.Accept(visitor)
         if allDirectives.IsEmpty() then () else
 
-        match fsFile.CheckerService.OptionsProvider.GetProjectOptions(daemonProcess.SourceFile) with
+        match fsFile.CheckerService.FcsProjectProvider.GetProjectOptions(daemonProcess.SourceFile) with
         | Some options when not options.OriginalLoadReferences.IsEmpty ->
             let document = daemonProcess.Document
             let linesCount = document.GetLineCount() |> int

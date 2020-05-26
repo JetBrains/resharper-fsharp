@@ -15,7 +15,7 @@ type FSharpSearchGuruElementId =
 
 
 [<SearchGuru(SearchGuruPerformanceEnum.FastFilterOutByLanguage)>]
-type FSharpSearchGuru(fsProjectOptionsProvider: IFSharpProjectOptionsProvider) =
+type FSharpSearchGuru(fsProjectOptionsProvider: IFcsProjectProvider) =
     let getTypeElement (fsElement: IFSharpDeclaredElement) =
         match fsElement with
         | :? ITypeElement as typeElement -> typeElement
