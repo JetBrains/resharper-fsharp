@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Application.Settings;
 using JetBrains.Application.Settings.Calculated.Interface;
@@ -18,6 +20,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
   public class FSharpFormatterInfoProvider :
     FormatterInfoProviderWithFluentApi<CodeFormattingContext, FSharpFormatSettingsKey>
   {
+    private static readonly IReadOnlyCollection<string> PipeOperatorsRepresentations =
+      new HashSet<string>(new[] {"|>", "||>", "|||>", "<|", "<||", "<|||"}, StringComparer.Ordinal);
+
     public FSharpFormatterInfoProvider(ISettingsSchema settingsSchema,
       ICalculatedSettingsSchema calculatedSettingsSchema, IThreading threading, Lifetime lifetime)
       : base(settingsSchema, calculatedSettingsSchema, threading, lifetime)
@@ -166,6 +171,27 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
             Node().HasRole(UnionRepresentation.UNION_CASE_LIST))
           .Return(IndentType.External)
           .Build();
+
+        Describe<IndentingRule>()
+          .Name("OutdentBinaryOperators")
+          .Where(
+            GrandParent().HasType(ElementType.BINARY_APP_EXPR),
+            Parent().HasRole(BinaryAppExpr.OP_REF_EXPR),
+            Node().Satisfies((node, context) => !IsPipeOperator(node)))
+          .Switch(settings => settings.OutdentBinaryOperators,
+            When(true).Return(IndentType.Outdent | IndentType.External))
+          .Build();
+
+        Describe<IndentingRule>()
+          .Name("OutdentPipeOperators")
+          .Where(
+            GrandParent().HasType(ElementType.BINARY_APP_EXPR),
+            Parent().HasRole(BinaryAppExpr.OP_REF_EXPR),
+            Node().Satisfies((node, context) => IsPipeOperator(node)))
+          .Switch(settings => settings.OutdentBinaryOperators,
+            When(true).Switch(settings => settings.NeverOutdentPipeOperators,
+              When(false).Return(IndentType.Outdent | IndentType.External)))
+          .Build();
       }
     }
 
@@ -196,5 +222,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
     private static bool AreAligned(ITreeNode first, ITreeNode second, IWhitespaceChecker whitespaceChecker) =>
       first.CalcLineIndent(whitespaceChecker) == second.CalcLineIndent(whitespaceChecker);
+
+    private static bool IsPipeOperator(ITreeNode node)
+    {
+      var opText = node.GetText();
+      return PipeOperatorsRepresentations.Contains(opText);
+    }
   }
 }

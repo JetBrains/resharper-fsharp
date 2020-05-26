@@ -38,5 +38,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
     [SettingsEntry(true, "Don't indent comments started at first column")]
     public bool StickComment;
+
+    [SettingsEntry(true, "Outdent binary operators")]
+    public bool OutdentBinaryOperators;
+
+    [SettingsEntry(true, "Never outdent pipe operators")]
+    public bool NeverOutdentPipeOperators;
   }
 }
