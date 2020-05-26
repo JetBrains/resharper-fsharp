@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils;
@@ -31,11 +32,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       myContext = context;
       myCache = cache;
 
-      myParameters = new InterruptibleLazy<ProvidedParameterInfo[]>(() => // ReSharper disable once CoVariantArrayConversion
-        RdProvidedConstructorInfoProcessModel.GetParameters
-          .Sync(EntityId)
-          .Select(t => ProxyProvidedParameterInfoWithCache.Create(t, myProcessModel, myContext, myCache))
-          .ToArray());
+      myParameters = new InterruptibleLazy<ProvidedParameterInfo[]>(
+        () => // ReSharper disable once CoVariantArrayConversion
+          RdProvidedConstructorInfoProcessModel.GetParameters
+            .Sync(EntityId)
+            .Select(t => ProxyProvidedParameterInfoWithCache.Create(t, myProcessModel, myContext, myCache))
+            .ToArray());
 
       myGenericArguments = new InterruptibleLazy<ProvidedType[]>(() =>
         RdProvidedConstructorInfoProcessModel.GetGenericArguments
@@ -49,6 +51,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
           .Sync(EntityId)
           .Select(t => ProxyProvidedParameterInfoWithCache.Create(t, myProcessModel, myContext, myCache))
           .ToArray());
+
+      myGeneratedConstructorsCache = new Dictionary<string, ProxyProvidedConstructorInfoWithCache>();
     }
 
     [ContractAnnotation("constructorInfo:null => null")]
@@ -77,11 +81,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
     public override ProvidedMethodBase ApplyStaticArgumentsForMethod(ITypeProvider provider,
       string fullNameAfterArguments,
-      object[] staticArgs) =>
-      Create(
-        RdProvidedConstructorInfoProcessModel.ApplyStaticArgumentsForMethod.Sync(
-          new ApplyStaticArgumentsForMethodArgs(EntityId, fullNameAfterArguments,
-            staticArgs.Select(t => t.BoxToServerStaticArg()).ToArray())), myProcessModel, myContext, myCache);
+      object[] staticArgs)
+    {
+      var key = string.Concat(staticArgs);
+      if (!myGeneratedConstructorsCache.TryGetValue(key, out var method))
+      {
+        var staticArgDescriptions = staticArgs.Select(t => t.BoxToServerStaticArg()).ToArray();
+
+        method = Create(
+          RdProvidedConstructorInfoProcessModel.ApplyStaticArgumentsForMethod.Sync(
+            new ApplyStaticArgumentsForMethodArgs(EntityId, fullNameAfterArguments, staticArgDescriptions)),
+          myProcessModel, myContext, myCache);
+
+        myGeneratedConstructorsCache.Add(key, method);
+      }
+
+      return method;
+    }
 
     public override ProvidedType DeclaringType =>
       myCache.GetOrCreateWithContext(
@@ -96,5 +112,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     private readonly InterruptibleLazy<ProvidedParameterInfo[]> myParameters;
     private readonly InterruptibleLazy<ProvidedType[]> myGenericArguments;
     private readonly InterruptibleLazy<ProvidedParameterInfo[]> myStaticParameters;
+    private readonly Dictionary<string, ProxyProvidedConstructorInfoWithCache> myGeneratedConstructorsCache;
   }
 }
