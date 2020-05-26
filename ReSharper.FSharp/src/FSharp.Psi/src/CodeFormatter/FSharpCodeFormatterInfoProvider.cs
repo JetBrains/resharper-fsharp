@@ -6,6 +6,7 @@ using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Psi;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
@@ -165,6 +166,27 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
               }),
             Node().HasRole(UnionRepresentation.UNION_CASE_LIST))
           .Return(IndentType.External)
+          .Build();
+
+        Describe<IndentingRule>()
+          .Name("OutdentBinaryOperators")
+          .Where(
+            GrandParent().HasType(ElementType.BINARY_APP_EXPR),
+            Parent().HasRole(BinaryAppExpr.OP_REF_EXPR),
+            Node().Not().In(FSharpTokenType.PIPE_FORWARD_OP, FSharpTokenType.PIPE_BACKWARD_OP))
+          .Switch(settings => settings.OutdentBinaryOperators,
+            When(true).Return(IndentType.Outdent | IndentType.External, 0))
+          .Build();
+
+        Describe<IndentingRule>()
+          .Name("OutdentPipeOperators")
+          .Where(
+            GrandParent().HasType(ElementType.BINARY_APP_EXPR),
+            Parent().HasRole(BinaryAppExpr.OP_REF_EXPR),
+          Node().In(FSharpTokenType.PIPE_FORWARD_OP, FSharpTokenType.PIPE_BACKWARD_OP))
+          .Switch(settings => settings.OutdentBinaryOperators, When(true)
+            .Switch(settings => settings.NeverOutdentPipeOperators, 
+              When(false).Return(IndentType.Outdent | IndentType.External, 0)))
           .Build();
       }
     }

@@ -1,0 +1,4 @@
+{
+OutdentBinaryOperators: all,
+NeverOutdentPipeOperators: all
+}
