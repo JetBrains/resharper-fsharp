@@ -155,6 +155,8 @@
         <Token name="LPAREN_STAR_RPAREN" />
         <Token name="AMP_AMP" />
         <Token name="GLOBAL" representation="global" />
+        <Token name="PIPE_FORWARD_OP" />
+        <Token name="PIPE_BACKWARD_OP" />
         <Token name="BAD_SYMBOLIC_OP" />
         <Token name="SHEBANG" />
         <Token name="HASH" />

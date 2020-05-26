@@ -1355,7 +1355,9 @@ interface fSharpIdentifier:
   ampAmp |
   activePatternId |
   typeParameterId |
-  global;
+  global |
+  pipeForwardOp |
+  pipeBackwardOp;
 
 abstract identifier options { interfaceName="IFSharpIdentifier"; }:
   IDENTIFIER;
@@ -1368,6 +1370,12 @@ abstract ampAmp options { interfaceName="IFSharpIdentifier"; }:
 
 abstract global options { interfaceName="IFSharpIdentifier"; }:
   GLOBAL;
+
+abstract pipeForwardOp options { interfaceName="IFSharpIdentifier"; }:
+  PIPE_FORWARD_OP;
+
+abstract pipeBackwardOp options { interfaceName="IFSharpIdentifier"; }:
+  PIPE_BACKWARD_OP;
 
 // Type parameters
 

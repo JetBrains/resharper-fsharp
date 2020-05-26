@@ -198,7 +198,9 @@ type FSharpTypingAssist
         [| FSharpTokenType.BAR_BAR
            FSharpTokenType.AMP_AMP
            FSharpTokenType.PLUS
-           FSharpTokenType.MINUS |]
+           FSharpTokenType.MINUS
+           FSharpTokenType.PIPE_FORWARD_OP
+           FSharpTokenType.PIPE_BACKWARD_OP |]
         |> HashSet
 
     let isInfixOp (lexer: ILexer) =

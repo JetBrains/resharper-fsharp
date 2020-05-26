@@ -16,7 +16,7 @@ IFSharpImplFile
               FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           IReferenceExpr
-            FSharpIdentifierToken(type:SYMBOLIC_OP, text:|>)
+            FSharpIdentifierToken(type:PIPE_FORWARD_OP, text:|>)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           IReferenceExpr
             FSharpIdentifierToken(type:IDENTIFIER, text:ignore)

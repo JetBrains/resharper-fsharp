@@ -175,6 +175,9 @@ BAD_SYMBOLIC_OP=(([\?])|("?<-")|(({BAD_OP_CHAR})+)|{QUOTE_OP_LEFT}|{QUOTE_OP_RIG
 
 LESS_OP=(("</")|{LESS})
 
+PIPE_FORWARD_OP=((("|")|("||")|("|||")){GREATER})
+PIPE_BACKWARD_OP=({LESS}(("|")|("||")|("|||")))
+
 SEPARATOR="_"
 HEXDIGIT=({DIGIT}|[A-F]|[a-f])
 OCTALDIGIT=[0-7]
@@ -296,6 +299,8 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <SYMBOLIC_OPERATOR> {UNDERSCORE}          { riseFromParenLevel(0); return makeToken(UNDERSCORE); }
 <SYMBOLIC_OPERATOR> {MINUS}               { riseFromParenLevel(0); return makeToken(MINUS); }
 <SYMBOLIC_OPERATOR> {COMMA}               { riseFromParenLevel(0); return makeToken(COMMA); }
+<SYMBOLIC_OPERATOR> {PIPE_FORWARD_OP}     { riseFromParenLevel(0); return makeToken(PIPE_FORWARD_OP); }
+<SYMBOLIC_OPERATOR> {PIPE_BACKWARD_OP}    { riseFromParenLevel(0); return makeToken(PIPE_BACKWARD_OP); }
 <SYMBOLIC_OPERATOR> {SYMBOLIC_OP}         { riseFromParenLevel(0); return makeToken(SYMBOLIC_OP); }
 <SYMBOLIC_OPERATOR> {BAD_SYMBOLIC_OP}     { riseFromParenLevel(0); return makeToken(BAD_SYMBOLIC_OP); }
 
@@ -374,6 +379,8 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <LINE, ADJACENT_TYAPP> {PERCENT_PERCENT}     { return makeToken(PERCENT_PERCENT); }
 <LINE, ADJACENT_TYAPP> {AMP}                 { return makeToken(AMP); }
 <LINE, ADJACENT_TYAPP> {AMP_AMP}             { return makeToken(AMP_AMP); }
+<LINE, ADJACENT_TYAPP> {PIPE_FORWARD_OP}     { return makeToken(PIPE_FORWARD_OP); }
+<LINE, ADJACENT_TYAPP> {PIPE_BACKWARD_OP}    { return makeToken(PIPE_BACKWARD_OP); }
 
 <INIT_ADJACENT_TYAPP> {LET_BANG}            { yybegin(LINE); return makeToken(LET_BANG); }
 <INIT_ADJACENT_TYAPP> {USE_BANG}            { yybegin(LINE); return makeToken(USE_BANG); }
@@ -402,6 +409,8 @@ PP_CONDITIONAL_SYMBOL={IDENT}
 <INIT_ADJACENT_TYAPP> {PERCENT_PERCENT}     { yybegin(LINE); return makeToken(PERCENT_PERCENT); }
 <INIT_ADJACENT_TYAPP> {AMP}                 { yybegin(LINE); return makeToken(AMP); }
 <INIT_ADJACENT_TYAPP> {AMP_AMP}             { yybegin(LINE); return makeToken(AMP_AMP); }
+<INIT_ADJACENT_TYAPP> {PIPE_FORWARD_OP}     { yybegin(LINE); return makeToken(PIPE_FORWARD_OP); }
+<INIT_ADJACENT_TYAPP> {PIPE_BACKWARD_OP}    { yybegin(LINE); return makeToken(PIPE_BACKWARD_OP); }
 
 <LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {LBRACE_BAR}    { return makeToken(LBRACE_BAR); }
 <LINE, ADJACENT_TYAPP, INIT_ADJACENT_TYAPP> {BAR_RBRACE}    { return makeToken(BAR_RBRACE); }

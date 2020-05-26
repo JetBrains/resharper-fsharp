@@ -78,6 +78,8 @@ public interface FSharpTokenType {
     IElementType MINUS = createToken("MINUS");
     IElementType PLUS = createToken("PLUS");
     IElementType SYMBOLIC_OP = createToken("SYMBOLIC_OP");
+    IElementType PIPE_FORWARD_OP = createToken("PIPE_FORWARD_OP");
+    IElementType PIPE_BACKWARD_OP = createToken("PIPE_BACKWARD_OP");
     IElementType BAD_SYMBOLIC_OP = createToken("BAD_SYMBOLIC_OP");
     IElementType TRIPLE_QUOTED_STRING = createToken("TRIPLE_QUOTED_STRING");
     IElementType UINT16 = createToken("UINT16");

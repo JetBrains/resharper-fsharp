@@ -236,7 +236,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         PLUS,
         MINUS,
         LESS,
-        LPAREN_STAR_RPAREN);
+        LPAREN_STAR_RPAREN,
+        PIPE_FORWARD_OP,
+        PIPE_BACKWARD_OP);
 
       Strings = new NodeTypeSet(
         CHARACTER_LITERAL,
@@ -270,7 +272,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         MINUS,
         LESS,
         LPAREN_STAR_RPAREN,
-        GLOBAL);
+        GLOBAL,
+        PIPE_FORWARD_OP,
+        PIPE_BACKWARD_OP);
     }
   }
 }

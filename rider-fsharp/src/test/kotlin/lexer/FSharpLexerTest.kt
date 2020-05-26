@@ -74,7 +74,7 @@ class FSharpLexerTest : LexerTestCase() {
 
     @Test
     fun testSymbolicOperator() {
-        doTest("&&& ||| ?<- @-><-= ?-> >-> >>= >>- |> .>>. .>> >>",
+        doTest("&&& ||| ?<- @-><-= ?-> >-> >>= >>- .>>. .>> >>",
                 """
                 |SYMBOLIC_OP ('&&&')
                 |WHITESPACE (' ')
@@ -92,13 +92,30 @@ class FSharpLexerTest : LexerTestCase() {
                 |WHITESPACE (' ')
                 |SYMBOLIC_OP ('>>-')
                 |WHITESPACE (' ')
-                |SYMBOLIC_OP ('|>')
-                |WHITESPACE (' ')
                 |SYMBOLIC_OP ('.>>.')
                 |WHITESPACE (' ')
                 |SYMBOLIC_OP ('.>>')
                 |WHITESPACE (' ')
                 |SYMBOLIC_OP ('>>')
+                """.trimMargin()
+        )
+    }
+
+    @Test
+    fun testPipeOperators() {
+        doTest("|> ||> |||> <| <|| <|||",
+                """
+                |PIPE_FORWARD_OP ('|>')
+                |WHITESPACE (' ')
+                |PIPE_FORWARD_OP ('||>')
+                |WHITESPACE (' ')
+                |PIPE_FORWARD_OP ('|||>')
+                |WHITESPACE (' ')
+                |PIPE_BACKWARD_OP ('<|')
+                |WHITESPACE (' ')
+                |PIPE_BACKWARD_OP ('<||')
+                |WHITESPACE (' ')
+                |PIPE_BACKWARD_OP ('<|||')
                 """.trimMargin()
         )
     }
