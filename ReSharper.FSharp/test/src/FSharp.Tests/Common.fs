@@ -54,27 +54,27 @@ type FSharpScriptTestAttribute() =
 
 
 [<SolutionComponent>]
-type FSharpTestProjectOptionsBuilder(checkerService, logger) =
-    inherit FSharpProjectOptionsBuilder(checkerService, logger, Mock<_>().Object)
+type TestFcsProjectBuilder(checkerService: FSharpCheckerService, logger: ILogger) =
+    inherit FcsProjectBuilder(checkerService, Mock<_>().Object, logger)
 
     override x.GetProjectItemsPaths(_, _) = [||]
 
-    interface IHideImplementation<IFSharpProjectOptionsBuilder>
+    interface IHideImplementation<FcsProjectBuilder>
 
 
 [<SolutionComponent>]
 type FSharpTestProjectOptionsProvider
-        (lifetime: Lifetime, checkerService: FSharpCheckerService, projectOptionsBuilder: IFSharpProjectOptionsBuilder,
-         scriptOptionsProvider: IFSharpScriptProjectOptionsProvider) as this =
+        (lifetime: Lifetime, checkerService: FSharpCheckerService, projectOptionsBuilder: FcsProjectBuilder,
+         scriptOptionsProvider: IScriptFcsProjectProvider) as this =
     do
         checkerService.OptionsProvider <- this
         lifetime.OnTermination(fun _ -> checkerService.OptionsProvider <- Unchecked.defaultof<_>) |> ignore
 
     let getProjectOptions (sourceFile: IPsiSourceFile) =
-        let fsProject = projectOptionsBuilder.BuildSingleFSharpProject(sourceFile.GetProject(), sourceFile.PsiModule)
-        Some { fsProject.ProjectOptions with SourceFiles = [| sourceFile.GetLocation().FullPath |] }
+        let fcsProject = projectOptionsBuilder.BuildFcsProject(sourceFile.PsiModule, sourceFile.GetProject())
+        Some { fcsProject.ProjectOptions with SourceFiles = [| sourceFile.GetLocation().FullPath |] }
 
-    interface IHideImplementation<FSharpProjectOptionsProvider>
+    interface IHideImplementation<FcsProjectProvider>
     
     interface IFSharpProjectOptionsProvider with
         member x.HasPairFile _ = false
@@ -109,5 +109,5 @@ type FSharpTestProjectOptionsProvider
         member x.GetFileIndex _ = 0
         member x.ModuleInvalidated = new Signal<_>("Todo") :> _
 
-        member x.Invalidate _ = false
-        member x.HasFSharpProjects = false
+        member x.InvalidateReferencesToProject _ = false
+        member x.HasFcsProjects = false

@@ -54,6 +54,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       if (myPsiModules.IsEmpty())
         return;
 
+      // todo: reuse FcsProjectProvider references
       using (CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule()))
       {
         var resolveContext = CompilationContextCookie.GetContext();

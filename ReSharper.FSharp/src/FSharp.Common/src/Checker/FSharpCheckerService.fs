@@ -1,7 +1,6 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Checker
 
 open System
-open System.Collections.Generic
 open System.Runtime.InteropServices
 open FSharp.Compiler.SourceCodeServices
 open FSharp.Compiler.Text
@@ -124,9 +123,9 @@ type FSharpCheckerService
             logger.Trace("TryGetStaleCheckResults: fail {0}, {1}", path, opName)
             None
 
-    member x.InvalidateFSharpProject(fsProject: FSharpProject) =
+    member x.InvalidateFcsProject(fcsProjectOptions: FSharpProjectOptions) =
         if checker.IsValueCreated then
-            checker.Value.InvalidateConfiguration(fsProject.ProjectOptions, false)
+            checker.Value.InvalidateConfiguration(fcsProjectOptions, false)
 
     /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.
     member x.ResolveNameAtLocation(sourceFile: IPsiSourceFile, names, coords, opName) =
@@ -150,16 +149,6 @@ type FSharpCheckerService
         x.ResolveNameAtLocation(sourceFile, names, coords, opName)
 
 
-type FSharpProject =
-    { ProjectOptions: FSharpProjectOptions
-      ParsingOptions: FSharpParsingOptions
-      FileIndices: IDictionary<FileSystemPath, int>
-      ImplFilesWithSigs: ISet<FileSystemPath> }
-
-    member x.ContainsFile(file: IPsiSourceFile) =
-        x.FileIndices.ContainsKey(file.GetLocation())
-
-
 type FSharpParseAndCheckResults = 
     { ParseResults: FSharpParseFileResults
       CheckResults: FSharpCheckFileResults }
@@ -169,12 +158,19 @@ type IFSharpProjectOptionsProvider =
     abstract GetProjectOptions: IPsiSourceFile -> FSharpProjectOptions option
     abstract GetParsingOptions: IPsiSourceFile -> FSharpParsingOptions
     abstract GetFileIndex: IPsiSourceFile -> int
+
+    // Indicates if implementation file has an associated signature file.
     abstract HasPairFile: IPsiSourceFile -> bool
-    abstract Invalidate: IProject -> bool
+
+    /// Returns True when the project has been invalidated.
+    abstract InvalidateReferencesToProject: IProject -> bool
+
     abstract ModuleInvalidated: ISignal<IPsiModule>
-    abstract HasFSharpProjects: bool
+
+    /// True when any F# projects are currently known to project options provider after requesting info from FCS.
+    abstract HasFcsProjects: bool
 
 
-type IFSharpScriptProjectOptionsProvider =
+type IScriptFcsProjectProvider =
     abstract GetScriptOptions: IPsiSourceFile -> FSharpProjectOptions option
     abstract GetScriptOptions: FileSystemPath * string -> FSharpProjectOptions option
