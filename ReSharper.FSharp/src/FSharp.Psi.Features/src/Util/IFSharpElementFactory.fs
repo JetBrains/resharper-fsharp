@@ -25,6 +25,8 @@ type IFSharpElementFactory =
     
     abstract CreateLetBindingExpr: bindingName: string -> ILetOrUseExpr
     abstract CreateLetModuleDecl: bindingName: string -> ILetModuleDecl
+    
+    abstract CreateMemberBindingExpr: bindingName: string * argNames: string list -> IMemberDeclaration
 
     abstract CreateIgnoreApp: IFSharpExpression * newLine: bool -> IBinaryAppExpr
     abstract CreateRecordExprBinding: fieldName: string * addSemicolon: bool -> IRecordExprBinding

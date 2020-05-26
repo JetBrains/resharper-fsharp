@@ -22,7 +22,7 @@ type FSharpElementFactoryTest() =
 
     member x.DoTest(action: IFSharpElementFactory -> unit) =
         testAction <- action
-        x.DoTestSolution()
+        x.DoTestSolution Array.empty<string>
 
     override x.DoTest(_, project: IProject) =
         let psiModule = project.GetPsiModules().Single()
@@ -45,3 +45,9 @@ type FSharpElementFactoryTest() =
             Assert.AreEqual(1, wildPat.Children().Count())
             Assert.AreEqual(FSharpTokenType.UNDERSCORE, wildPat.FirstChild.GetTokenType())
             Assert.AreEqual("_", wildPat.GetText()))
+        
+    [<Test>]
+    member x.``Member binding 01``() =
+        x.DoTest(fun elementFactory ->
+            use readCookie = ReadLockCookie.Create()
+            elementFactory.CreateMemberBindingExpr("memberName", ["param1"; "param2"]) |> ignore)

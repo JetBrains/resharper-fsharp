@@ -57,6 +57,16 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         let source = sprintf "do (let %s = ())" bindingName
         let newExpr = getExpression source
         newExpr.As<IParenExpr>().InnerExpression.As<ILetOrUseExpr>()
+        
+    let createMemberBinding bindingName parameterNames =
+        let paramSource = match parameterNames with | [] -> "()" | names -> names |> String.concat " "
+        let source = sprintf "type DummyType() = \n member this.%s %s = failwith \"todo\"" bindingName paramSource
+        let moduleMember = getModuleMember source
+        let typeDecl = moduleMember.As<ITypeDeclarationGroup>().TypeDeclarations |> Seq.exactlyOne
+        let objectTypeDecl = typeDecl.As<IObjectTypeDeclaration>()
+        (objectTypeDecl.TypeMembers
+         |> Seq.where (function | :? IMemberDeclaration -> true | _ -> false)
+         |> Seq.exactlyOne).As<IMemberDeclaration>()
 
     let createParenExpr (expr: IFSharpExpression) =
         let parenExpr = getExpression "(())" :?> IParenExpr
@@ -135,6 +145,9 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         member x.CreateLetModuleDecl(bindingName) =
             let source = sprintf "let %s = ()" bindingName
             getModuleMember source :?> ILetModuleDecl
+            
+        member x.CreateMemberBindingExpr(bindingName, argNames) : IMemberDeclaration =
+            createMemberBinding bindingName argNames
 
         member x.CreateConstExpr(text) =
             getExpression text :?> _
