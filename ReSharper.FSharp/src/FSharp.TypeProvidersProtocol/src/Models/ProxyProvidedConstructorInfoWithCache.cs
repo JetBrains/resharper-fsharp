@@ -10,7 +10,7 @@ using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 {
-  public class ProxyProvidedConstructorInfoWithCache : ProvidedConstructorInfo, IRdProvidedEntity
+  public class ProxyProvidedConstructorInfoWithCache : ProvidedConstructorInfo, IProxyProvidedNamedEntity
   {
     private readonly RdProvidedConstructorInfo myConstructorInfo;
     private readonly RdFSharpTypeProvidersLoaderModel myProcessModel;
@@ -105,6 +105,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
     public override ProvidedParameterInfo[] GetParameters() => myParameters.Value;
     public override ProvidedType[] GetGenericArguments() => myGenericArguments.Value;
+    public string FullName => DeclaringType.FullName + Name;
 
     private bool HasFlag(RdProvidedMethodFlags flag) => (myConstructorInfo.Flags & flag) == flag;
 

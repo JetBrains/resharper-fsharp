@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using JetBrains.Diagnostics;
@@ -65,19 +66,27 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
     public ProvidedExpr GetInvokerExpression(ProvidedMethodBase methodBase, ProvidedVar[] paramExprs)
     {
-      var providedMethodBase = methodBase as IRdProvidedEntity;
-      var providedVarParamExprs = paramExprs.Select(x => x as IRdProvidedEntity).ToArray();
+      var providedMethodBase = methodBase as IProxyProvidedNamedEntity;
+      var providedVarParamExprs = paramExprs.Select(x => x as IProxyProvidedNamedEntity).ToArray();
 
       Assertion.Assert(providedMethodBase != null, "methodBase is not ProxyProvided");
       Assertion.Assert(providedVarParamExprs.All(x => x != null), "paramExprs is not ProxyProvided");
 
-      var providedMethodBaseId = providedMethodBase.EntityId;
-      var providedVarParamExprIds = providedVarParamExprs.Select(x => x.EntityId).ToArray();
+      var key = string.Concat(providedMethodBase.FullName, providedVarParamExprs.Select(t => t.FullName));
+      if (!myInvokerExpressionsCache.TryGetValue(key, out var expr))
+      {
+        var providedMethodBaseId = providedMethodBase.EntityId;
+        var providedVarParamExprIds = providedVarParamExprs.Select(x => x.EntityId).ToArray();
 
-      return ProxyProvidedExprWithCache.Create(RdTypeProviderProcessModel.GetInvokerExpression.Sync(
-          new GetInvokerExpressionArgs(EntityId, methodBase is ProvidedConstructorInfo, providedMethodBaseId,
-            providedVarParamExprIds)),
-        myProcessModel, methodBase.Context, myCache);
+        expr = ProxyProvidedExprWithCache.Create(RdTypeProviderProcessModel.GetInvokerExpression.Sync(
+            new GetInvokerExpressionArgs(EntityId, methodBase is ProvidedConstructorInfo, providedMethodBaseId,
+              providedVarParamExprIds)),
+          myProcessModel, methodBase.Context, myCache);
+
+        myInvokerExpressionsCache.Add(key, expr);
+      }
+
+      return expr;
     }
 
     public string GetDisplayName(bool fullName) => fullName ? myRdTypeProvider.FullName : myRdTypeProvider.Name;
@@ -92,6 +101,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
         .Select(t => new ProxyProvidedNamespaceWithCache(t, myProcessModel, myCache))
         .ToArray());
 
+      myInvokerExpressionsCache = new Dictionary<string, ProxyProvidedExprWithCache>();
       myCache.Invalidate();
     }
 
@@ -99,5 +109,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
     private readonly TypeProviderCache myCache;
     private InterruptibleLazy<IProvidedNamespace[]> myProvidedNamespaces;
+    private Dictionary<string, ProxyProvidedExprWithCache> myInvokerExpressionsCache;
   }
 }

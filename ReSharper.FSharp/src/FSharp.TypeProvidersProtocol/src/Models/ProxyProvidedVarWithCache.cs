@@ -6,13 +6,13 @@ using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 {
-  public class ProxyProvidedVarWithCache : ProvidedVar, IRdProvidedEntity
+  public class ProxyProvidedVarWithCache : ProvidedVar, IProxyProvidedNamedEntity
   {
     private readonly RdProvidedVar myVar;
     private readonly ProvidedTypeContext myContext;
     private readonly RdFSharpTypeProvidersLoaderModel myProcessModel;
     private readonly ITypeProviderCache myCache;
-    
+
     public int EntityId => myVar.EntityId;
     private RdProvidedVarProcessModel RdProvidedVarProcessModel => myProcessModel.RdProvidedVarProcessModel;
 
@@ -37,14 +37,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override ProvidedType Type =>
       myCache.GetOrCreateWithContext(myTypeId ??= RdProvidedVarProcessModel.Type.Sync(EntityId), myContext);
 
+    public string FullName => Type.FullName + Name;
+
     //TODO: reduce allocations count
     public override bool Equals(object obj) => obj switch
     {
-      ProvidedVar y => Type.FullName + Name == y.Type.FullName + y.Name,
+      ProvidedVar y => FullName == y.Type.FullName + y.Name,
       _ => false
     };
 
-    public override int GetHashCode() => (Type.FullName + Name).GetHashCode();
+    public override int GetHashCode() => FullName.GetHashCode();
 
     private int? myTypeId;
   }
