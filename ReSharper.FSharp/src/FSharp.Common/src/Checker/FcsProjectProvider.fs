@@ -118,24 +118,27 @@ type FcsProjectProvider
 
         let fcsProject = fcsProjectBuilder.BuildFcsProject(psiModule, project)
 
-        let referencedProjectsPsiModules =
+        let referencedProjectPsiModules =
             getReferencedModules psiModule
             |> Seq.filter (fun psiModule ->
-                psiModule.IsValid() && isFSharpProjectModule psiModule && psiModule.ContainingProjectModule != project)
-            |> Array.ofSeq
+                psiModule.IsValid() && isProjectModule psiModule && psiModule.ContainingProjectModule != project)
+            |> List
 
-        let referencedProjectsOptions =
-            referencedProjectsPsiModules |> Array.map (fun referencedPsiModule ->
+        let referencedFcsProjects =
+            referencedProjectPsiModules
+            |> Seq.filter isFSharpProjectModule
+            |> Seq.map (fun referencedPsiModule ->
                 let referencedProject = referencedPsiModule.ContainingProjectModule :?> _
                 let referencedFcsProject = createFcsProject referencedProject referencedPsiModule
                 referencedFcsProject.OutputPath.FullPath, referencedFcsProject.ProjectOptions)
+            |> Seq.toArray
 
-        let fcsProjectOptions = { fcsProject.ProjectOptions with ReferencedProjects = referencedProjectsOptions }
+        let fcsProjectOptions = { fcsProject.ProjectOptions with ReferencedProjects = referencedFcsProjects }
         let fcsProject = { fcsProject with ProjectOptions = fcsProjectOptions }
 
         fcsProjects.[psiModule] <- fcsProject
 
-        for referencedPsiModule in referencedProjectsPsiModules do
+        for referencedPsiModule in referencedProjectPsiModules do
             let referencedModule = referencedModules.GetOrCreateValue(referencedPsiModule, ReferencedModule.Create)
             referencedModule.ReferencingModules.Add(psiModule) |> ignore
 
@@ -247,9 +250,12 @@ type FcsProjectProvider
         member x.ModuleInvalidated = x.FcsProjectInvalidated :> _
 
         member x.InvalidateReferencesToProject(project: IProject) =
-            project.GetPsiModules() |> Seq.iter (dirtyModules.Add >> ignore)
-            // todo: workaround needless daemon invalidation; keep another change type?
-            true
+            (false, project.GetPsiModules()) ||> Seq.fold (fun invalidated psiModule ->
+                tryGetValue psiModule referencedModules
+                |> Option.map (fun referencedModule ->
+                    (invalidated, referencedModule.ReferencingModules)
+                    ||> Seq.fold (fun invalidated psiModule -> dirtyModules.Add(psiModule) || invalidated))
+                |> Option.defaultValue invalidated)
 
         member x.HasFcsProjects = not (fcsProjects.IsEmpty())
 

@@ -14,7 +14,7 @@ open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Rider.Model
 
 [<SolutionComponent>]
-type FcsHost
+type TestFcsHost
         (lifetime: Lifetime, solution: ISolution, checkerService: FSharpCheckerService, sourceCache: FSharpSourceCache,
          itemsContainer: FSharpItemsContainer, fcsProjectProvider: FcsProjectProvider) =
 
