@@ -287,9 +287,6 @@ type FSharpParserTest() =
     [<Test>] member x.``Type member - Inherit - Type 03 - Arguments``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Inherit - Type 04 - Type parameters 01``() = x.DoNamedTest()
     
-    [<Test>] member x.``Type member - Implement interface - Type 01 - Simple``() = x.DoNamedTest()
-    [<Test>] member x.``Type member - Implement interface - Type 02 - Partial implementation``() = x.DoNamedTest()
-
     [<Test>] member x.``Type member - Do 01``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Let bindings 01``() = x.DoNamedTest()
 
