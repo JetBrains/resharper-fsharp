@@ -58,9 +58,16 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         let newExpr = getExpression source
         newExpr.As<IParenExpr>().InnerExpression.As<ILetOrUseExpr>()
         
-    let createMemberBinding bindingName parameterNames =
-        let paramSource = match parameterNames with | [] -> "()" | names -> names |> String.concat " "
-        let source = sprintf "type DummyType() = \n member this.%s %s = failwith \"todo\"" bindingName paramSource
+    let createMemberBinding bindingName typeParameters (argNames : string option list) =
+        let argsSource =
+            argNames
+            |> List.map(Option.defaultValue "()")
+            |> String.concat " "
+        let typeArgsSource =
+            match typeParameters with
+            | [] -> ""
+            | parameters -> sprintf "<%s>" (parameters |> String.concat ",")
+        let source = sprintf "type DummyType() = \n member this.%s%s %s = failwith \"todo\"" bindingName typeArgsSource argsSource
         let moduleMember = getModuleMember source
         let typeDecl = moduleMember.As<ITypeDeclarationGroup>().TypeDeclarations |> Seq.exactlyOne
         let objectTypeDecl = typeDecl.As<IObjectTypeDeclaration>()
@@ -146,8 +153,8 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let source = sprintf "let %s = ()" bindingName
             getModuleMember source :?> ILetModuleDecl
             
-        member x.CreateMemberBindingExpr(bindingName, argNames) : IMemberDeclaration =
-            createMemberBinding bindingName argNames
+        member x.CreateMemberBindingExpr(bindingName, typeParameters, argNames) : IMemberDeclaration =
+            createMemberBinding bindingName typeParameters argNames
 
         member x.CreateConstExpr(text) =
             getExpression text :?> _
