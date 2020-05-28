@@ -2,26 +2,17 @@
 using System.Linq;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
 using JetBrains.Rd.Tasks;
-using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Cache;
-using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelCreators;
-using Microsoft.FSharp.Core.CompilerServices;
 using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
 {
   public class ProvidedNamespacesHostFactory : IOutOfProcessHostFactory<RdProvidedNamespaceProcessModel>
   {
-    private readonly IReadProvidedCache<Tuple<IProvidedNamespace, int>> myProvidedNamespacesCache;
-    private readonly IProvidedRdModelsCreator<IProvidedNamespace, RdProvidedNamespace> myProvidedNamespacesCreator;
-    private readonly IProvidedRdModelsCreator<ProvidedType, RdProvidedType> myProvidedTypesCreator;
+    private readonly UnitOfWork myUnitOfWork;
 
-    public ProvidedNamespacesHostFactory(IReadProvidedCache<Tuple<IProvidedNamespace, int>> providedNamespacesCache,
-      IProvidedRdModelsCreator<IProvidedNamespace, RdProvidedNamespace> providedNamespacesCreator,
-      IProvidedRdModelsCreator<ProvidedType, RdProvidedType> providedTypesCreator)
+    public ProvidedNamespacesHostFactory(UnitOfWork unitOfWork)
     {
-      myProvidedNamespacesCache = providedNamespacesCache;
-      myProvidedNamespacesCreator = providedNamespacesCreator;
-      myProvidedTypesCreator = providedTypesCreator;
+      myUnitOfWork = unitOfWork;
     }
 
     public void Initialize(RdProvidedNamespaceProcessModel processModel)
@@ -33,26 +24,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
 
     private int ResolveTypeName(ResolveTypeNameArgs args)
     {
-      var (providedNamespace, providerId) = myProvidedNamespacesCache.Get(args.Id);
+      var (providedNamespace, providerId) = myUnitOfWork.ProvidedNamespacesCache.Get(args.Id);
       var providedType = ProvidedType.CreateNoContext(providedNamespace.ResolveTypeName(args.TypeFullName));
-      return myProvidedTypesCreator.CreateRdModel(providedType, providerId).EntityId;
+      return myUnitOfWork.ProvidedTypeRdModelsCreator.CreateRdModel(providedType, providerId).EntityId;
     }
 
     private int[] GetTypes(int entityId)
     {
-      var (providedNamespace, providerId) = myProvidedNamespacesCache.Get(entityId);
+      var (providedNamespace, providerId) = myUnitOfWork.ProvidedNamespacesCache.Get(entityId);
       return providedNamespace
         .GetTypes()
-        .Select(ProvidedType.CreateNoContext) //TODO: make CreateArray public
-        .CreateRdModelsAndReturnIds(myProvidedTypesCreator, providerId);
+        .Select(ProvidedType.CreateNoContext)
+        .CreateRdModelsAndReturnIds(myUnitOfWork.ProvidedTypeRdModelsCreator, providerId);
     }
 
     private RdProvidedNamespace[] GetNestedNamespaces(int entityId)
     {
-      var (providedNamespace, providerId) = myProvidedNamespacesCache.Get(entityId);
+      var (providedNamespace, providerId) = myUnitOfWork.ProvidedNamespacesCache.Get(entityId);
       return providedNamespace
         .GetNestedNamespaces()
-        .CreateRdModels(myProvidedNamespacesCreator, providerId);
+        .CreateRdModels(myUnitOfWork.ProvidedNamespaceRdModelsCreator, providerId);
     }
   }
 }

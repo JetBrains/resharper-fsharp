@@ -1,24 +1,16 @@
 ﻿using System;
-using FSharp.Compiler;
-using JetBrains.Lifetimes;
 using JetBrains.Rd.Tasks;
-using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Cache;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
-using Microsoft.FSharp.Core.CompilerServices;
-using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
 {
   public class ProvidedAssemblyHostFactory : IOutOfProcessHostFactory<RdProvidedAssemblyProcessModel>
   {
-    private readonly IReadProvidedCache<Tuple<ProvidedAssembly, int>> myAssembliesCache;
-    private readonly IReadProvidedCache<ITypeProvider> myTypeProvidersCache;
+    private readonly UnitOfWork myUnitOfWork;
 
-    public ProvidedAssemblyHostFactory(IReadProvidedCache<Tuple<ProvidedAssembly, int>> assembliesCache,
-      IReadProvidedCache<ITypeProvider> typeProvidersCache)
+    public ProvidedAssemblyHostFactory(UnitOfWork unitOfWork)
     {
-      myAssembliesCache = assembliesCache;
-      myTypeProvidersCache = typeProvidersCache;
+      myUnitOfWork = unitOfWork;
     }
 
     public void Initialize(RdProvidedAssemblyProcessModel model)
@@ -29,7 +21,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
 
     private RdAssemblyName GetName(int entityId)
     {
-      var (providedAssembly, _) = myAssembliesCache.Get(entityId);
+      var (providedAssembly, _) = myUnitOfWork.ProvidedAssembliesCache.Get(entityId);
       var assemblyName = providedAssembly.Handle.GetName();
 
       var publicKey = assemblyName.GetPublicKey();
@@ -42,14 +34,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
         rdPublicKey = publicKeyToken != null ? new RdPublicKey(true, publicKeyToken) : null;
       }
 
-      return new RdAssemblyName(assemblyName.Name, rdPublicKey, assemblyName.Version?.ToString(), (int) assemblyName.Flags);
+      return new RdAssemblyName(assemblyName.Name, rdPublicKey, assemblyName.Version?.ToString(),
+        (int) assemblyName.Flags);
     }
 
     private byte[] GetManifestModuleContents(int entityId)
     {
-      var (providedAssembly, typeProviderId) = myAssembliesCache.Get(entityId);
-      var typeProvider = myTypeProvidersCache.Get(typeProviderId);
-      return typeProvider.GetGeneratedAssemblyContents(providedAssembly.Handle); //TODO: encapsulate handle at provided assembly
+      var (providedAssembly, typeProviderId) = myUnitOfWork.ProvidedAssembliesCache.Get(entityId);
+      var typeProvider = myUnitOfWork.TypeProvidersCache.Get(typeProviderId);
+      //TODO: encapsulate handle at provided assembly
+      return typeProvider.GetGeneratedAssemblyContents(providedAssembly.Handle);
     }
   }
 }

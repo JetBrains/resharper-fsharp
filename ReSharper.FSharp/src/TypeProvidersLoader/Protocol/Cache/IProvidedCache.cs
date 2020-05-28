@@ -9,6 +9,7 @@
   public interface IWriteProvidedCache<in T>
   {
     void Add(int id, T value);
+    void RemoveAll(int typeProviderId);
   }
 
   public interface IProvidedCache<T> : IReadProvidedCache<T>, IWriteProvidedCache<T>

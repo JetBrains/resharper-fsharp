@@ -1,21 +1,43 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.FSharp.Core.CompilerServices;
+using NuGet;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Cache
 {
-  public class ProvidedCacheBase<T> : IProvidedCache<T>
+  public abstract class ProvidedCacheBase<T> : IProvidedCache<T>
   {
-    private readonly IDictionary<int, T> myProvidedModelsCache; // just base version
+    protected readonly IDictionary<int, T> ProvidedModelsCache;
 
-    //private ObjectIDGenerator myObjectIdGenerator;
-
-    public ProvidedCacheBase()
+    protected ProvidedCacheBase()
     {
-      myProvidedModelsCache = new Dictionary<int, T>();
+      ProvidedModelsCache = new Dictionary<int, T>();
     }
 
-    public void Add(int id, T value) => myProvidedModelsCache.Add(id, value);
+    public void Add(int id, T value) => ProvidedModelsCache.Add(id, value);
 
-    public T Get(int key) => myProvidedModelsCache[key];
-    public bool Contains(int key) => myProvidedModelsCache.ContainsKey(key);
+    //Used only for type providers invalidating 
+    public abstract void RemoveAll(int typeProviderId);
+
+    public T Get(int key) => ProvidedModelsCache[key];
+    public bool Contains(int key) => ProvidedModelsCache.ContainsKey(key);
+  }
+
+  public class SimpleProvidedCache<T> : ProvidedCacheBase<Tuple<T, int>>
+  {
+    public override void RemoveAll(int typeProviderId) =>
+      ProvidedModelsCache.RemoveAll(t => t.Value.Item2 == typeProviderId);
+  }
+
+  public class TypeProviderCache : ProvidedCacheBase<ITypeProvider>
+  {
+    public override void RemoveAll(int typeProviderId) =>
+      ProvidedModelsCache.RemoveAll(t => t.Key == typeProviderId);
+  }
+
+  public class ProvidedEntitiesWithRdModelsCache<T, TU> : ProvidedCacheBase<Tuple<T, TU, int>>
+  {
+    public override void RemoveAll(int typeProviderId) =>
+      ProvidedModelsCache.RemoveAll(t => t.Value.Item3 == typeProviderId);
   }
 }

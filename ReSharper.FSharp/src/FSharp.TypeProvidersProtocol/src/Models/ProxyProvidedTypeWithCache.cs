@@ -203,10 +203,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
         RdProvidedTypeProcessModel.MakeArrayType.Sync(new MakeArrayTypeArgs(EntityId, rank)),
         Context);
 
+    //TODO: Add cache
     public override ProvidedType MakeGenericType(ProvidedType[] args)
     {
       var proxyProvidedTypes = args.Select(t => t as IRdProvidedEntity);
       Assertion.Assert(args.All(t => t != null), "ProvidedType must be ProxyProvidedType");
+
       // ReSharper disable once PossibleNullReferenceException
       var argIds = proxyProvidedTypes.Select(t => t.EntityId).ToArray();
       return myCache.GetOrCreateWithContext(
@@ -240,14 +242,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       var (lookupIlTypeRef, lookupTyconRef) = myContext.GetDictionaries();
       var (newLookupIlTypeRef, newLookupTyconRef) = context.GetDictionaries();
 
-      foreach (var ilTypeRef in lookupIlTypeRef.Where(ilTypeRef => !newLookupIlTypeRef.ContainsKey(ilTypeRef.Key)))
+      foreach (var ilTypeRef in lookupIlTypeRef)
       {
-        newLookupIlTypeRef.Add(ilTypeRef.Key, ilTypeRef.Value);
+        if (!newLookupIlTypeRef.ContainsKey(ilTypeRef.Key)) newLookupIlTypeRef.Add(ilTypeRef.Key, ilTypeRef.Value);
       }
 
-      foreach (var tyconRef in lookupTyconRef.Where(tyconRef => !newLookupTyconRef.ContainsKey(tyconRef.Key)))
+      foreach (var tyconRef in lookupTyconRef)
       {
-        newLookupTyconRef.Add(tyconRef.Key, tyconRef.Value);
+        if (!newLookupTyconRef.ContainsKey(tyconRef.Key)) newLookupTyconRef.Add(tyconRef.Key, tyconRef.Value);
       }
 
       myContext = context;

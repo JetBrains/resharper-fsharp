@@ -1,63 +1,18 @@
 ﻿using System;
 using System.Linq;
-using JetBrains.Lifetimes;
 using JetBrains.Rd.Tasks;
-using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Cache;
-using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelCreators;
 using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
-using Microsoft.FSharp.Core.CompilerServices;
-using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
 {
   public class ProvidedTypesHostFactory : IOutOfProcessHostFactory<RdProvidedTypeProcessModel>
   {
-    private readonly IProvidedRdModelsCreator<ProvidedParameterInfo, RdProvidedParameterInfo>
-      myProvidedParameterInfosCreator;
+    private readonly UnitOfWork myUnitOfWork;
 
-    private readonly IProvidedRdModelsCreator<ProvidedMethodInfo, RdProvidedMethodInfo>
-      myProvidedMethodInfosCreator;
-
-    private readonly IProvidedRdModelsCreator<ProvidedPropertyInfo, RdProvidedPropertyInfo>
-      myProvidedPropertiesCreator;
-
-    private readonly IProvidedRdModelsCreator<ProvidedType, RdProvidedType> myProvidedTypesCreator;
-    private readonly IProvidedRdModelsCreator<ProvidedFieldInfo, RdProvidedFieldInfo> myProvidedFieldInfosCreator;
-    private readonly IProvidedRdModelsCreator<ProvidedEventInfo, RdProvidedEventInfo> myProvidedEventInfosCreator;
-    private readonly IProvidedRdModelsCreator<ProvidedAssembly, RdProvidedAssembly> myProvidedAssembliesCreator;
-    private readonly IProvidedRdModelsCreator<ProvidedVar, RdProvidedVar> myProvidedVarsCreator;
-
-    private readonly IProvidedRdModelsCreator<ProvidedConstructorInfo, RdProvidedConstructorInfo>
-      myProvidedConstructorInfosCreator;
-
-    private readonly IReadProvidedCache<Tuple<ProvidedType, RdProvidedType, int>> myProvidedTypesCache;
-    private readonly IReadProvidedCache<ITypeProvider> myTypeProvidersCache;
-
-    public ProvidedTypesHostFactory(
-      IProvidedRdModelsCreator<ProvidedParameterInfo, RdProvidedParameterInfo> providedParameterInfosCreator,
-      IProvidedRdModelsCreator<ProvidedMethodInfo, RdProvidedMethodInfo> providedMethodInfosCreator,
-      IProvidedRdModelsCreator<ProvidedPropertyInfo, RdProvidedPropertyInfo> providedPropertiesCreator,
-      IProvidedRdModelsCreator<ProvidedType, RdProvidedType> providedTypesCreator,
-      IProvidedRdModelsCreator<ProvidedFieldInfo, RdProvidedFieldInfo> providedFieldInfosCreator,
-      IProvidedRdModelsCreator<ProvidedEventInfo, RdProvidedEventInfo> providedEventInfosCreator,
-      IProvidedRdModelsCreator<ProvidedAssembly, RdProvidedAssembly> providedAssembliesCreator,
-      IProvidedRdModelsCreator<ProvidedVar, RdProvidedVar> providedVarsCreator,
-      IProvidedRdModelsCreator<ProvidedConstructorInfo, RdProvidedConstructorInfo> providedConstructorInfosCreator,
-      IReadProvidedCache<Tuple<ProvidedType, RdProvidedType, int>> providedTypesCache,
-      IReadProvidedCache<ITypeProvider> typeProvidersCache)
+    public ProvidedTypesHostFactory(UnitOfWork unitOfWork)
     {
-      myProvidedParameterInfosCreator = providedParameterInfosCreator;
-      myProvidedMethodInfosCreator = providedMethodInfosCreator;
-      myProvidedPropertiesCreator = providedPropertiesCreator;
-      myProvidedTypesCreator = providedTypesCreator;
-      myProvidedFieldInfosCreator = providedFieldInfosCreator;
-      myProvidedEventInfosCreator = providedEventInfosCreator;
-      myProvidedAssembliesCreator = providedAssembliesCreator;
-      myProvidedVarsCreator = providedVarsCreator;
-      myProvidedConstructorInfosCreator = providedConstructorInfosCreator;
-      myProvidedTypesCache = providedTypesCache;
-      myTypeProvidersCache = typeProvidersCache;
+      myUnitOfWork = unitOfWork;
     }
 
     public void Initialize(RdProvidedTypeProcessModel processModel)
@@ -90,75 +45,79 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
 
     private int MakeGenericType(MakeGenericTypeArgs args)
     {
-      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(args.EntityId);
-      var providedArgs = args.ArgIds.Select(id => myProvidedTypesCache.Get(id).Item1).ToArray();
-      return myProvidedTypesCreator.CreateRdModel(providedType.MakeGenericType(providedArgs), typeProviderId).EntityId;
+      var (providedType, _, typeProviderId) = myUnitOfWork.ProvidedTypesCache.Get(args.EntityId);
+      var providedArgs = args.ArgIds.Select(id => myUnitOfWork.ProvidedTypesCache.Get(id).Item1).ToArray();
+      return myUnitOfWork.ProvidedTypeRdModelsCreator
+        .CreateRdModel(providedType.MakeGenericType(providedArgs), typeProviderId).EntityId;
     }
 
     private RdProvidedVar AsProvidedVar(AsProvidedVarArgs args)
     {
-      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(args.EntityId);
-      return myProvidedVarsCreator.CreateRdModel(providedType.AsProvidedVar(args.Name), typeProviderId);
+      var (providedType, _, typeProviderId) = myUnitOfWork.ProvidedTypesCache.Get(args.EntityId);
+      return myUnitOfWork.ProvidedVarRdModelsCreator.CreateRdModel(providedType.AsProvidedVar(args.Name),
+        typeProviderId);
     }
 
     private RdProvidedConstructorInfo[] GetConstructors(int entityId)
     {
-      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
+      var (providedType, _, typeProviderId) = myUnitOfWork.ProvidedTypesCache.Get(entityId);
       return providedType
         .GetConstructors()
-        .CreateRdModels(myProvidedConstructorInfosCreator, typeProviderId);
+        .CreateRdModels(myUnitOfWork.ProvidedConstructorInfoRdModelsCreator, typeProviderId);
     }
 
     private RdProvidedEventInfo[] GetEvents(int entityId)
     {
-      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
+      var (providedType, _, typeProviderId) = myUnitOfWork.ProvidedTypesCache.Get(entityId);
       return providedType
         .GetEvents()
-        .CreateRdModels(myProvidedEventInfosCreator, typeProviderId);
+        .CreateRdModels(myUnitOfWork.ProvidedEventInfoRdModelsCreator, typeProviderId);
     }
 
     private RdProvidedFieldInfo[] GetFields(int entityId)
     {
-      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
+      var (providedType, _, typeProviderId) = myUnitOfWork.ProvidedTypesCache.Get(entityId);
       return providedType
         .GetFields()
-        .CreateRdModels(myProvidedFieldInfosCreator, typeProviderId);
+        .CreateRdModels(myUnitOfWork.ProvidedFieldInfoRdModelsCreator, typeProviderId);
     }
 
     private int MakeByRefType(int entityId)
     {
-      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
-      return myProvidedTypesCreator.CreateRdModel(providedType.MakeByRefType(), typeProviderId).EntityId;
+      var (providedType, _, typeProviderId) = myUnitOfWork.ProvidedTypesCache.Get(entityId);
+      return myUnitOfWork.ProvidedTypeRdModelsCreator.CreateRdModel(providedType.MakeByRefType(), typeProviderId)
+        .EntityId;
     }
 
     private int MakePointerType(int entityId)
     {
-      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
-      return myProvidedTypesCreator.CreateRdModel(providedType.MakePointerType(), typeProviderId).EntityId;
+      var (providedType, _, typeProviderId) = myUnitOfWork.ProvidedTypesCache.Get(entityId);
+      return myUnitOfWork.ProvidedTypeRdModelsCreator.CreateRdModel(providedType.MakePointerType(), typeProviderId)
+        .EntityId;
     }
 
     private int MakeArrayType(MakeArrayTypeArgs args)
     {
-      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(args.Id);
-      return myProvidedTypesCreator
+      var (providedType, _, typeProviderId) = myUnitOfWork.ProvidedTypesCache.Get(args.Id);
+      return myUnitOfWork.ProvidedTypeRdModelsCreator
         .CreateRdModel(args.Rank == 1 ? providedType.MakeArrayType() : providedType.MakeArrayType(args.Rank),
           typeProviderId).EntityId;
     }
 
     private RdProvidedAssembly GetAssembly(int entityId)
     {
-      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
-      return myProvidedAssembliesCreator.CreateRdModel(providedType.Assembly, typeProviderId);
+      var (providedType, _, typeProviderId) = myUnitOfWork.ProvidedTypesCache.Get(entityId);
+      return myUnitOfWork.ProvidedAssemblyRdModelsCreator.CreateRdModel(providedType.Assembly, typeProviderId);
     }
 
     private int ApplyStaticArguments(ApplyStaticArgumentsParameters args)
     {
-      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(args.Id);
-      var typeProvider = myTypeProvidersCache.Get(typeProviderId);
+      var (providedType, _, typeProviderId) = myUnitOfWork.ProvidedTypesCache.Get(args.Id);
+      var typeProvider = myUnitOfWork.TypeProvidersCache.Get(typeProviderId);
 
       var staticArgDescriptions = args.StaticArguments.Select(t => t.Unbox()).ToArray();
 
-      return myProvidedTypesCreator
+      return myUnitOfWork.ProvidedTypeRdModelsCreator
         .CreateRdModel(
           providedType.ApplyStaticArguments(typeProvider, args.TypePathWithArguments, staticArgDescriptions),
           typeProviderId).EntityId;
@@ -166,101 +125,105 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
 
     private int? GetDeclaringType(int entityId)
     {
-      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
-      return myProvidedTypesCreator.CreateRdModel(providedType.DeclaringType, typeProviderId)?.EntityId;
+      var (providedType, _, typeProviderId) = myUnitOfWork.ProvidedTypesCache.Get(entityId);
+      return myUnitOfWork.ProvidedTypeRdModelsCreator.CreateRdModel(providedType.DeclaringType, typeProviderId)
+        ?.EntityId;
     }
 
     private int? GetBaseType(int entityId)
     {
-      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
-      return myProvidedTypesCreator.CreateRdModel(providedType.BaseType, typeProviderId)?.EntityId;
+      var (providedType, _, typeProviderId) = myUnitOfWork.ProvidedTypesCache.Get(entityId);
+      return myUnitOfWork.ProvidedTypeRdModelsCreator.CreateRdModel(providedType.BaseType, typeProviderId)?.EntityId;
     }
 
     private RdProvidedMethodInfo[] GetMethods(int entityId)
     {
-      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
+      var (providedType, _, typeProviderId) = myUnitOfWork.ProvidedTypesCache.Get(entityId);
       return providedType
         .GetMethods()
-        .CreateRdModels(myProvidedMethodInfosCreator, typeProviderId);
+        .CreateRdModels(myUnitOfWork.ProvidedMethodInfoRdModelsCreator, typeProviderId);
     }
 
     private RdProvidedParameterInfo[] GetStaticParameters(int entityId)
     {
-      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
-      var typeProvider = myTypeProvidersCache.Get(typeProviderId);
+      var (providedType, _, typeProviderId) = myUnitOfWork.ProvidedTypesCache.Get(entityId);
+      var typeProvider = myUnitOfWork.TypeProvidersCache.Get(typeProviderId);
       return providedType
         .GetStaticParameters(typeProvider)
-        .CreateRdModels(myProvidedParameterInfosCreator, typeProviderId);
+        .CreateRdModels(myUnitOfWork.ProvidedParameterInfoRdModelsCreator, typeProviderId);
     }
 
     private int GetGenericParameterPosition(int entityId)
     {
-      var (providedType, _, _) = myProvidedTypesCache.Get(entityId);
+      var (providedType, _, _) = myUnitOfWork.ProvidedTypesCache.Get(entityId);
       return providedType.GenericParameterPosition;
     }
 
     private RdProvidedPropertyInfo[] GetProperties(int entityId)
     {
-      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
+      var (providedType, _, typeProviderId) = myUnitOfWork.ProvidedTypesCache.Get(entityId);
       return providedType
         .GetProperties()
-        .CreateRdModels(myProvidedPropertiesCreator, typeProviderId);
+        .CreateRdModels(myUnitOfWork.ProvidedPropertyInfoRdModelsCreator, typeProviderId);
     }
 
     private int? GetEnumUnderlyingType(int entityId)
     {
-      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
-      return myProvidedTypesCreator.CreateRdModel(providedType.GetEnumUnderlyingType(), typeProviderId)?.EntityId;
+      var (providedType, _, typeProviderId) = myUnitOfWork.ProvidedTypesCache.Get(entityId);
+      return myUnitOfWork.ProvidedTypeRdModelsCreator
+        .CreateRdModel(providedType.GetEnumUnderlyingType(), typeProviderId)?.EntityId;
     }
 
     private int GetArrayRank(int entityId)
     {
-      var (providedType, _, _) = myProvidedTypesCache.Get(entityId);
+      var (providedType, _, _) = myUnitOfWork.ProvidedTypesCache.Get(entityId);
       return providedType.GetArrayRank();
     }
 
     private int[] GetGenericArguments(int entityId)
     {
-      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
+      var (providedType, _, typeProviderId) = myUnitOfWork.ProvidedTypesCache.Get(entityId);
       return providedType
         .GetGenericArguments()
-        .CreateRdModelsAndReturnIds(myProvidedTypesCreator, typeProviderId);
+        .CreateRdModelsAndReturnIds(myUnitOfWork.ProvidedTypeRdModelsCreator, typeProviderId);
     }
 
     private int GetElementType(int entityId)
     {
-      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
-      return myProvidedTypesCreator.CreateRdModel(providedType.GetElementType(), typeProviderId).EntityId;
+      var (providedType, _, typeProviderId) = myUnitOfWork.ProvidedTypesCache.Get(entityId);
+      return myUnitOfWork.ProvidedTypeRdModelsCreator.CreateRdModel(providedType.GetElementType(), typeProviderId)
+        .EntityId;
     }
 
     private int GetGenericTypeDefinition(int entityId)
     {
-      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
-      return myProvidedTypesCreator.CreateRdModel(providedType.GetGenericTypeDefinition(), typeProviderId).EntityId;
+      var (providedType, _, typeProviderId) = myUnitOfWork.ProvidedTypesCache.Get(entityId);
+      return myUnitOfWork.ProvidedTypeRdModelsCreator
+        .CreateRdModel(providedType.GetGenericTypeDefinition(), typeProviderId).EntityId;
     }
 
     private int[] GetAllNestedTypes(int entityId)
     {
-      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
+      var (providedType, _, typeProviderId) = myUnitOfWork.ProvidedTypesCache.Get(entityId);
       return providedType
         .GetAllNestedTypes()
-        .CreateRdModelsAndReturnIds(myProvidedTypesCreator, typeProviderId);
+        .CreateRdModelsAndReturnIds(myUnitOfWork.ProvidedTypeRdModelsCreator, typeProviderId);
     }
 
     private int[] GetNestedTypes(int entityId)
     {
-      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
+      var (providedType, _, typeProviderId) = myUnitOfWork.ProvidedTypesCache.Get(entityId);
       return providedType
         .GetNestedTypes()
-        .CreateRdModelsAndReturnIds(myProvidedTypesCreator, typeProviderId);
+        .CreateRdModelsAndReturnIds(myUnitOfWork.ProvidedTypeRdModelsCreator, typeProviderId);
     }
 
     private int[] GetInterfaces(int entityId)
     {
-      var (providedType, _, typeProviderId) = myProvidedTypesCache.Get(entityId);
+      var (providedType, _, typeProviderId) = myUnitOfWork.ProvidedTypesCache.Get(entityId);
       return providedType
         .GetInterfaces()
-        .CreateRdModelsAndReturnIds(myProvidedTypesCreator, typeProviderId);
+        .CreateRdModelsAndReturnIds(myUnitOfWork.ProvidedTypeRdModelsCreator, typeProviderId);
     }
   }
 }

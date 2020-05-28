@@ -1,22 +1,16 @@
 ﻿using System;
 using JetBrains.Rd.Tasks;
-using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Cache;
-using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelCreators;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
-using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
 {
   public class ProvidedVarsHostFactory : IOutOfProcessHostFactory<RdProvidedVarProcessModel>
   {
-    private readonly IReadProvidedCache<Tuple<ProvidedVar, int>> myProvidedVarsCache;
-    private readonly IProvidedRdModelsCreator<ProvidedType, RdProvidedType> myProvidedTypeRdModelsCreator;
+    private readonly UnitOfWork myUnitOfWork;
 
-    public ProvidedVarsHostFactory(IReadProvidedCache<Tuple<ProvidedVar, int>> providedVarsCache,
-      IProvidedRdModelsCreator<ProvidedType, RdProvidedType> providedTypeRdModelsCreator)
+    public ProvidedVarsHostFactory(UnitOfWork unitOfWork)
     {
-      myProvidedVarsCache = providedVarsCache;
-      myProvidedTypeRdModelsCreator = providedTypeRdModelsCreator;
+      myUnitOfWork = unitOfWork;
     }
 
     public void Initialize(RdProvidedVarProcessModel model)
@@ -26,8 +20,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
 
     private int GetType(int entityId)
     {
-      var (providedExpr, typeProviderId) = myProvidedVarsCache.Get(entityId);
-      return myProvidedTypeRdModelsCreator.CreateRdModel(providedExpr.Type, typeProviderId).EntityId;
+      var (providedExpr, typeProviderId) = myUnitOfWork.ProvidedVarsCache.Get(entityId);
+      return myUnitOfWork.ProvidedTypeRdModelsCreator.CreateRdModel(providedExpr.Type, typeProviderId).EntityId;
     }
   }
 }

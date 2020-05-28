@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using FSharp.Compiler;
+﻿using System.Collections.Generic;
+using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils
 {
-  public class ProvidedTypeEqualityComparer : IEqualityComparer<ExtensionTyping.ProvidedType>
+  public class ProvidedTypeEqualityComparer : IEqualityComparer<ProvidedType>
   {
-    public bool Equals(ExtensionTyping.ProvidedType x, ExtensionTyping.ProvidedType y)
-    {
-      return string.Equals(x.FullName, y.FullName, StringComparison.Ordinal);
-    }
+    private (string, string) Key(ProvidedType x) => (x?.Assembly.FullName, x?.FullName);
 
-    public int GetHashCode(ExtensionTyping.ProvidedType obj)
+    public bool Equals(ProvidedType x, ProvidedType y) => Key(x).Equals(Key(y));
+
+    public int GetHashCode(ProvidedType obj)
     {
       return obj.FullName.GetHashCode();
     }

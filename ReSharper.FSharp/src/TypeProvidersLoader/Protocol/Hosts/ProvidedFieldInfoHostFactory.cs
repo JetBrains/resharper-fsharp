@@ -1,22 +1,16 @@
 ﻿using System;
 using JetBrains.Rd.Tasks;
-using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Cache;
-using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.ModelCreators;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
-using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
 {
   public class ProvidedFieldInfoHostFactory : IOutOfProcessHostFactory<RdProvidedFieldInfoProcessModel>
   {
-    private readonly IReadProvidedCache<Tuple<ProvidedFieldInfo, int>> myProvidedFieldInfosCache;
-    private readonly IProvidedRdModelsCreator<ProvidedType, RdProvidedType> myProvidedRdModelsCreator;
+    private readonly UnitOfWork myUnitOfWork;
 
-    public ProvidedFieldInfoHostFactory(IReadProvidedCache<Tuple<ProvidedFieldInfo, int>> providedFieldInfosCache,
-      IProvidedRdModelsCreator<ProvidedType, RdProvidedType> providedRdModelsCreator)
+    public ProvidedFieldInfoHostFactory(UnitOfWork unitOfWork)
     {
-      myProvidedFieldInfosCache = providedFieldInfosCache;
-      myProvidedRdModelsCreator = providedRdModelsCreator;
+      myUnitOfWork = unitOfWork;
     }
 
     public void Initialize(RdProvidedFieldInfoProcessModel model)
@@ -27,14 +21,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts
 
     private int GetDeclaringType(int entityId)
     {
-      var (providedType, typeProviderId) = myProvidedFieldInfosCache.Get(entityId);
-      return myProvidedRdModelsCreator.CreateRdModel(providedType.DeclaringType, typeProviderId).EntityId;
+      var (providedType, typeProviderId) = myUnitOfWork.ProvidedFieldInfosCache.Get(entityId);
+      return myUnitOfWork.ProvidedTypeRdModelsCreator.CreateRdModel(providedType.DeclaringType, typeProviderId)
+        .EntityId;
     }
 
     private int GetFieldType(int entityId)
     {
-      var (providedType, typeProviderId) = myProvidedFieldInfosCache.Get(entityId);
-      return myProvidedRdModelsCreator.CreateRdModel(providedType.FieldType, typeProviderId).EntityId;
+      var (providedType, typeProviderId) = myUnitOfWork.ProvidedFieldInfosCache.Get(entityId);
+      return myUnitOfWork.ProvidedTypeRdModelsCreator.CreateRdModel(providedType.FieldType, typeProviderId).EntityId;
     }
   }
 }

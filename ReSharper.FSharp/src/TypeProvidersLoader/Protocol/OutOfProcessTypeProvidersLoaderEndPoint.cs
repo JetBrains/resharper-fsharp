@@ -2,6 +2,7 @@
 using JetBrains.Lifetimes;
 using JetBrains.Platform.RdFramework.ExternalProcess;
 using JetBrains.Rd.Impl;
+using JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol.Hosts;
 using JetBrains.Rider.FSharp.TypeProvidersProtocol.Client;
 using JetBrains.Util;
 using JetBrains.Util.Logging;
@@ -11,15 +12,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
   public class
     OutOfProcessTypeProvidersLoaderEndPoint : ProtocolEndPoint<RdFSharpTypeProvidersLoaderModel, RdSimpleDispatcher>
   {
-    private readonly IUnitOfWork myUnitOfWork;
     private RdSimpleDispatcher myDispatcher;
 
     protected override string ProtocolName { get; } = "Out-of-Process Type Provider";
 
-    public OutOfProcessTypeProvidersLoaderEndPoint(string parentProcessPidEnvVariable, IUnitOfWork unitOfWork) :
+    public OutOfProcessTypeProvidersLoaderEndPoint(string parentProcessPidEnvVariable) :
       base(parentProcessPidEnvVariable)
     {
-      myUnitOfWork = unitOfWork;
     }
 
     protected override RdSimpleDispatcher InitDispatcher(Lifetime lifetime, ILogger logger)
@@ -43,21 +42,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersLoader.Protocol
 
     protected override RdFSharpTypeProvidersLoaderModel InitModel(Lifetime lifetime, Rd.Impl.Protocol protocol)
     {
-      //TODO: incapsulate this boilerplate code
       var model = new RdFSharpTypeProvidersLoaderModel(lifetime, protocol);
-      myUnitOfWork.TypeProvidersLoaderHostFactory.Initialize(model);
-      myUnitOfWork.TypeProvidersHostFactory.Initialize(model.RdTypeProviderProcessModel);
-      myUnitOfWork.ProvidedNamespacesHostFactory.Initialize(model.RdProvidedNamespaceProcessModel);
-      myUnitOfWork.ProvidedTypesHostFactory.Initialize(model.RdProvidedTypeProcessModel);
-      myUnitOfWork.ProvidedPropertyInfosHostFactory.Initialize(model.RdProvidedPropertyInfoProcessModel);
-      myUnitOfWork.ProvidedMethodInfosHostFactory.Initialize(model.RdProvidedMethodInfoProcessModel);
-      myUnitOfWork.ProvidedParameterInfosHostFactory.Initialize(model.RdProvidedParameterInfoProcessModel);
-      myUnitOfWork.ProvidedAssemblyHostFactory.Initialize(model.RdProvidedAssemblyProcessModel);
-      myUnitOfWork.ProvidedFieldInfosHostFactory.Initialize(model.RdProvidedFieldInfoProcessModel);
-      myUnitOfWork.ProvidedEventInfosHostFactory.Initialize(model.RdProvidedEventInfoProcessModel);
-      myUnitOfWork.ProvidedConstructorInfosHostFactory.Initialize(model.RdProvidedConstructorInfoProcessModel);
-      myUnitOfWork.ProvidedExprsHostFactory.Initialize(model.RdProvidedExprProcessModel);
-      myUnitOfWork.ProvidedVarsHostFactory.Initialize(model.RdProvidedVarProcessModel);
+      var unitOfWork = new UnitOfWork();
+      new TypeProvidersLoaderHostFactory(unitOfWork).Initialize(model);
+      new TypeProvidersHostFactory(unitOfWork).Initialize(model.RdTypeProviderProcessModel);
+      new ProvidedNamespacesHostFactory(unitOfWork).Initialize(model.RdProvidedNamespaceProcessModel);
+      new ProvidedTypesHostFactory(unitOfWork).Initialize(model.RdProvidedTypeProcessModel);
+      new ProvidedPropertyInfoHostFactory(unitOfWork).Initialize(model.RdProvidedPropertyInfoProcessModel);
+      new ProvidedMethodInfosHostFactory(unitOfWork).Initialize(model.RdProvidedMethodInfoProcessModel);
+      new ProvidedParameterInfosHostFactory(unitOfWork).Initialize(model.RdProvidedParameterInfoProcessModel);
+      new ProvidedAssemblyHostFactory(unitOfWork).Initialize(model.RdProvidedAssemblyProcessModel);
+      new ProvidedFieldInfoHostFactory(unitOfWork).Initialize(model.RdProvidedFieldInfoProcessModel);
+      new ProvidedEventInfoHostFactory(unitOfWork).Initialize(model.RdProvidedEventInfoProcessModel);
+      new ProvidedConstructorInfosHostFactory(unitOfWork).Initialize(model.RdProvidedConstructorInfoProcessModel);
+      new ProvidedExprHostFactory(unitOfWork).Initialize(model.RdProvidedExprProcessModel);
+      new ProvidedVarsHostFactory(unitOfWork).Initialize(model.RdProvidedVarProcessModel);
 
       return model;
     }
