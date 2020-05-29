@@ -1,4 +1,4 @@
-﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
 open FSharp.Compiler.SourceCodeServices
 open FSharp.Compiler.Layout
@@ -53,7 +53,7 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         let binding = dataProvider.GetSelectedElement<IBinding>()
         if isNull binding then false else
 
-        match binding.HeadPattern.As<INamedPat>() with
+        match binding.HeadPattern.As<IParametersOwnerPat>() with
         | null -> false
         | namedPat ->
         isNotNull namedPat.Identifier
