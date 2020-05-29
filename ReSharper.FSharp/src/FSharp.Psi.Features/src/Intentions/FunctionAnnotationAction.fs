@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
+﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
 open FSharp.Compiler.SourceCodeServices
 open FSharp.Compiler.Layout
@@ -65,8 +65,8 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         match binding.HeadPattern.As<INamedPat>() with
         | null -> null
         | namedPat ->
-            
-        match box (namedPat.GetFSharpSymbol()) with
+        let fsharpSymbolUse = namedPat.GetFSharpSymbolUse() 
+        match box(fsharpSymbolUse.Symbol) with
         | null -> null
         | methodSymbol ->
         let fSharpFunction =
@@ -113,15 +113,17 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
             getParameterTooltip document checkResults ref
             |> Option.map (fun signature ->
                 let typedPat = factory.CreateTypedPatInParens(signature)
+                // Determining which elements can go where must be done before executing these operations, as otherwise
+                // the syntax tree is mutated underneath you.
                 fun () -> PsiModificationUtil.replaceWithCopy ref.ParameterNodeInSignature typedPat)
             |> Option.defaultValue(fun () -> ()))
-        |> List.iter(fun x -> x()) // Only modify the document once the tooltips have been determined
+        |> List.iter(fun x -> x())
             
         // Annotate function return type
         if binding.ReturnTypeInfo |> isNull then
             // Given the return type of a function is a single FSharpType, we don't have to use the tooltip to get its
             // pretty-printed string type
-            match box(namedPat.GetFSharpSymbolUse()) with
+            match box(fsharpSymbolUse) with
             | null -> failwith "FSharpSymbolUse expected to be non-null"
             | symbolUseObj ->
             let symbolUse = symbolUseObj :?> FSharpSymbolUse
