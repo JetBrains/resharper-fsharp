@@ -14,7 +14,7 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Plugins.FSharp
 
 type private ParameterToModify = {
-    ParameterNameNode : ILocalReferencePat
+    ParameterNameNode : IReferencePat
     ParameterNodeInSignature : ISynPat
 }
 
@@ -88,10 +88,7 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
                 | :? ILocalReferencePat as ref ->
                     Some {ParameterNameNode = ref; ParameterNodeInSignature = ref}
                 | :? IParenPat as ref ->
-                    let parameterNameNode =
-                        ref.Children()
-                        |> Seq.choose(function | :? ILocalReferencePat as pat -> Some pat | _ -> None)
-                        |> Seq.tryExactlyOne
+                    let parameterNameNode = ref.Pattern.As<IReferencePat>() |> Option.ofObj
                     parameterNameNode
                     |> Option.map(fun namedNode ->
                         {ParameterNameNode = namedNode;
