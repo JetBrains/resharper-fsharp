@@ -208,15 +208,38 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
             expr
             
-        member x.CreateTypedPatInParens(typeSignature: string) : ISynPat =
-            let expr = createLetBinding (sprintf "(%s)" typeSignature)
+        // TODO: Work out whether these factory methods are the simplest they can be
+        member x.CreateParenPat() =
+            let expr = createLetBinding "(())"
             let binding = expr.Bindings |> Seq.exactlyOne
-            binding.HeadPattern  
+            binding.HeadPattern.As<IParenPat>()
             
-        member x.CreateReturnTypeInfo(typeSignature: string) : IReturnTypeInfo =
-            let expr = createLetBinding (sprintf "_ : %s" typeSignature)
-            expr.Bindings.[0].ReturnTypeInfo
+        member x.CreateTypedPat (pattern: string, typeUsage: ITypeUsage, spaceBeforeColon: bool) : ITypedPat =
+            let preColonSpace = if spaceBeforeColon then " " else ""
+            let expr = createLetBinding (sprintf "(%s%s: ())" pattern preColonSpace)
+            let binding = expr.Bindings |> Seq.exactlyOne
+            let typedPat = binding.HeadPattern.As<IParenPat>().Pattern.As<ITypedPat>()
+            ModificationUtil.ReplaceChild(typedPat.Type, typeUsage) |> ignore
+            typedPat
+            
+        member x.CreateReturnTypeInfo(typeUsage: ITypeUsage) : IReturnTypeInfo =
+            let expr = createLetBinding "_ : ()"
+            let returnTypeInfo = expr.Bindings.[0].ReturnTypeInfo
+            ModificationUtil.ReplaceChild(returnTypeInfo.ReturnType, typeUsage) |> ignore
+            returnTypeInfo
 
+        member x.CreateTypeUsage(typeUsage: string) : ITypeUsage =
+            let expr = createLetBinding (sprintf "_ : %s" typeUsage)
+            expr.Bindings.[0].ReturnTypeInfo.ReturnType
+            
+        member x.CreateTypeUsage(typeUsages: ITypeUsage list) : ITypeUsage =
+            let copiedUsages = typeUsages |> List.map(fun x -> x.Copy())
+            let mutable currentNode = copiedUsages |> List.head
+            for usage in copiedUsages |> List.skip 1 do
+                currentNode <- ModificationUtil.AddChild(currentNode, usage)
+                
+            currentNode
+        
         member x.CreateSetExpr(left: IFSharpExpression, right: IFSharpExpression) =
             let source = "() <- ()"
             let expr = getExpression source

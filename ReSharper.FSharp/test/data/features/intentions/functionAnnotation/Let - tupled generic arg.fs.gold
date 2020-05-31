@@ -1,4 +1,4 @@
-let printer{caret} (a : string * seq<string>) : string =
+let printer{caret} (a: string * seq<string>) : string =
     let dotted = a |> snd |> String.concat "."
     (a |> fst) + dotted
 

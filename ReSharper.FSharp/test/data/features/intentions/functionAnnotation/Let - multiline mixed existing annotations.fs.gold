@@ -2,7 +2,7 @@ module Module
 
 open System
 
-let printerFun{caret} (a : string) (b : int * ('a * string)) : string = 
+let printerFun{caret} (a: string) (b: int * ('a * string)) : string = 
     sprintf "%s %d %s" a (b |> fst) (b |> snd |> snd)
 
 [<EntryPoint>]

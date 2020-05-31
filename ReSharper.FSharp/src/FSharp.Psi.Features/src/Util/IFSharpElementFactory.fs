@@ -29,8 +29,13 @@ type IFSharpElementFactory =
     abstract CreateIgnoreApp: IFSharpExpression * newLine: bool -> IBinaryAppExpr
     abstract CreateRecordExprBinding: fieldName: string * addSemicolon: bool -> IRecordExprBinding
 
-    abstract CreateTypedPatInParens: typeSignature: string -> ISynPat
-    abstract CreateReturnTypeInfo: typeSignature: string -> IReturnTypeInfo
+    abstract CreateParenPat: unit -> IParenPat
+    abstract CreateTypedPat: pattern: string * typeUsage: ITypeUsage * spaceBeforeColon: bool -> ITypedPat
+    
+    abstract CreateTypeUsage: typeUsage: string -> ITypeUsage
+    abstract CreateTypeUsage: typeUsages: ITypeUsage list -> ITypeUsage
+    
+    abstract CreateReturnTypeInfo: typeSignature: ITypeUsage -> IReturnTypeInfo
     
     abstract CreateMatchExpr: IFSharpExpression -> IMatchExpr
     abstract CreateMatchClause: unit -> IMatchClause
