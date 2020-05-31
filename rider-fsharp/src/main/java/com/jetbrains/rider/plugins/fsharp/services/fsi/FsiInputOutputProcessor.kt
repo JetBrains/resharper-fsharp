@@ -26,7 +26,17 @@ class FsiInputOutputProcessor(private val fsiRunner: FsiConsoleRunner) {
         return Pair(startOffset, endOffset)
     }
 
-    private fun fsiIconWithTooltipOnOutputText() : IconWithTooltip? = if (nextOutputTextIsFirst) FsiIcons.RESULT else null
+    private fun fsiIconWithTooltipOnOutputText(outputType: ConsoleViewContentType) : IconWithTooltip? {
+        if (nextOutputTextIsFirst)
+        {
+            when (outputType) {
+                ConsoleViewContentType.NORMAL_OUTPUT -> return FsiIcons.RESULT
+                ConsoleViewContentType.ERROR_OUTPUT -> return FsiIcons.ERROR
+            }
+        }
+
+        return null
+    }
 
     fun printInputText(text: String, outputType: ConsoleViewContentType) {
         printText(text + "\n", FsiIcons.COMMAND_MARKER, fSharpSyntaxHighlighter, outputType)
@@ -40,7 +50,7 @@ class FsiInputOutputProcessor(private val fsiRunner: FsiConsoleRunner) {
             printOutputInitialText(text, outputType)
         }
         else {
-            val fsiResultIconWithTooltip = fsiIconWithTooltipOnOutputText()
+            val fsiResultIconWithTooltip = fsiIconWithTooltipOnOutputText(outputType)
 
             when (outputType) {
                 ConsoleViewContentType.NORMAL_OUTPUT ->
