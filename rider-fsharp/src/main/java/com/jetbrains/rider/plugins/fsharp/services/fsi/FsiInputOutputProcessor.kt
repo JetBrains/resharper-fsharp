@@ -11,7 +11,7 @@ import com.intellij.openapi.editor.markup.HighlighterTargetArea
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.highlighting.FSharpSyntaxHighlighter
 
 class FsiInputOutputProcessor(private val fsiRunner: FsiConsoleRunner) {
-    private var isInitialState = true
+    private var isInitialText = true
     private var nextOutputTextIsFirst = true
 
     private val fSharpSyntaxHighlighter = FSharpSyntaxHighlighter()
@@ -32,12 +32,11 @@ class FsiInputOutputProcessor(private val fsiRunner: FsiConsoleRunner) {
         printText(text + "\n", FsiIcons.COMMAND_MARKER, fSharpSyntaxHighlighter, outputType)
         EditorUtil.scrollToTheEnd(fsiRunner.consoleView.historyViewer)
 
-        isInitialState = false
         nextOutputTextIsFirst = true
     }
 
     fun printOutputText(text: String, outputType: ConsoleViewContentType) {
-        if (isInitialState) {
+        if (isInitialText) {
             printOutputInitialText(text, outputType)
         }
         else {
@@ -76,5 +75,9 @@ class FsiInputOutputProcessor(private val fsiRunner: FsiConsoleRunner) {
 
     private fun printOutputInitialText(text: String, outputType: ConsoleViewContentType)  = WriteCommandAction.runWriteCommandAction(fsiRunner.project){
         fsiRunner.consoleView.print(text, outputType)
+    }
+    
+    fun onServerPrompt() {
+        isInitialText = false
     }
 }

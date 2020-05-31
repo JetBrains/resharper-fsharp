@@ -34,6 +34,8 @@ class FsiProcessHandler (
         }
         else {
             sandboxInfoUpdaters.forEach { it.onOutputEnd() }
+
+            fsiInputOutputProcessor.onServerPrompt()
         }
     }
 
