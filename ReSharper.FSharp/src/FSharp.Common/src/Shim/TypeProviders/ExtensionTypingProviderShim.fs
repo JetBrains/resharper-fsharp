@@ -8,7 +8,6 @@ open FSharp.Compiler.Range
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.Rd.Tasks
-open JetBrains.ReSharper.Feature.Services
 open Microsoft.FSharp.Core.CompilerServices
 open FSharp.Compiler.AbstractIL.Internal.Library
 open FSharp.Compiler.ErrorLogger
@@ -17,17 +16,21 @@ open JetBrains.ReSharper.Plugins.FSharp.Util.TypeProvidersProtocolConverter
 open JetBrains.ReSharper.Plugins.FSharp.Shim.TypeProviders.Hack
 open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol
 open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
+open JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Cache
 
 [<SolutionComponent>]
 type ExtensionTypingProviderShim (lifetime: Lifetime,
                                   typeProvidersLoadersFactory: TypeProvidersLoaderExternalProcessFactory) as this =
     let defaultExtensionTypingProvider = ExtensionTypingProvider
     let mutable ourModel = null
+    let mutable providedTypesCache = null
     let outProcessLifetime = Lifetime.Define(lifetime)
     do ExtensionTypingProvider <- this :> IExtensionTypingProvider
     
     let onInitialized _ model =
         ourModel <- model
+        providedTypesCache <- ProvidedTypesCache(ourModel)
+        
         
     let onFailed() = ()
     let typeProvidersCache: IDictionary<_, _> = Dictionary<_, _>() :> _
@@ -65,7 +68,7 @@ type ExtensionTypingProviderShim (lifetime: Lifetime,
                                                                             compilerToolsPath |> Array.ofList,
                                                                             fakeTcImports), RpcTimeouts.Maximal)
                     let typeProviderProxies =
-                        [for tp in rdTypeProviders -> new ProxyTypeProviderWithCache(tp, ourModel) :> ITypeProvider]
+                        [for tp in rdTypeProviders -> new ProxyTypeProviderWithCache(tp, providedTypesCache, ourModel) :> ITypeProvider]
                     
                     typeProvidersCache.Add(designTimeAssemblyNameString, typeProviderProxies)
                     typeProviderProxies

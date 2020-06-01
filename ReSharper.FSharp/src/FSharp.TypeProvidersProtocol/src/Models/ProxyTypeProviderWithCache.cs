@@ -13,21 +13,22 @@ using static FSharp.Compiler.ExtensionTyping;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 {
-  public class ProxyTypeProviderWithCache : IProxyTypeProvider
+  public class ProxyTypeProviderWithCache : IProxyTypeProvider, IRdProvidedEntity
   {
     private readonly RdTypeProvider myRdTypeProvider;
     private readonly RdFSharpTypeProvidersLoaderModel myProcessModel;
     private RdTypeProviderProcessModel RdTypeProviderProcessModel => myProcessModel.RdTypeProviderProcessModel;
-    private int EntityId => myRdTypeProvider.EntityId;
+    public int EntityId => myRdTypeProvider.EntityId;
 
     public ProxyTypeProviderWithCache(
       RdTypeProvider rdTypeProvider,
+      IProvidedTypesCache cache,
       RdFSharpTypeProvidersLoaderModel processModel)
     {
       myRdTypeProvider = rdTypeProvider;
       myProcessModel = processModel;
 
-      myCache = new TypeProviderCache(myRdTypeProvider, myProcessModel);
+      myCache = cache;
       InitCaches();
 
       var lifeTime = new Lifetime(); //temp
@@ -80,7 +81,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
 
         expr = ProxyProvidedExprWithCache.Create(RdTypeProviderProcessModel.GetInvokerExpression.Sync(
             new GetInvokerExpressionArgs(EntityId, methodBase is ProvidedConstructorInfo, providedMethodBaseId,
-              providedVarParamExprIds)),
+              providedVarParamExprIds)), EntityId,
           myProcessModel, methodBase.Context, myCache);
 
         myInvokerExpressionsCache.Add(key, expr);
@@ -98,16 +99,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       // ReSharper disable once CoVariantArrayConversion
       myProvidedNamespaces = new InterruptibleLazy<IProvidedNamespace[]>(() => RdTypeProviderProcessModel.GetNamespaces
         .Sync(EntityId)
-        .Select(t => new ProxyProvidedNamespaceWithCache(t, myProcessModel, myCache))
+        .Select(t => new ProxyProvidedNamespaceWithCache(t, EntityId, myProcessModel, myCache))
         .ToArray());
 
       myInvokerExpressionsCache = new Dictionary<string, ProxyProvidedExprWithCache>();
-      myCache.Invalidate();
+      myCache.Invalidate(EntityId);
     }
 
     public event EventHandler Invalidate;
 
-    private readonly TypeProviderCache myCache;
+    private readonly IProvidedTypesCache myCache;
     private InterruptibleLazy<IProvidedNamespace[]> myProvidedNamespaces;
     private Dictionary<string, ProxyProvidedExprWithCache> myInvokerExpressionsCache;
   }

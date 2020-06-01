@@ -11,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Utils
 
     public int GetHashCode(ProvidedType obj)
     {
-      return obj.FullName.GetHashCode();
+      return Key(obj).GetHashCode();
     }
   }
 }

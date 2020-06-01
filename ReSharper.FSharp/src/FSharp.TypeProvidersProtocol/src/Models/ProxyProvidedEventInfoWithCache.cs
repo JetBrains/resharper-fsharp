@@ -10,44 +10,50 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
   public class ProxyProvidedEventInfoWithCache : ProvidedEventInfo
   {
     private readonly RdProvidedEventInfo myEventInfo;
+    private readonly int myTypeProviderId;
     private readonly RdFSharpTypeProvidersLoaderModel myProcessModel;
     private readonly ProvidedTypeContext myContext;
-    private readonly ITypeProviderCache myCache;
+    private readonly IProvidedTypesCache myCache;
     private int EntityId => myEventInfo.EntityId;
 
     private RdProvidedEventInfoProcessModel RdProvidedEventInfoProcessModel =>
       myProcessModel.RdProvidedEventInfoProcessModel;
 
-    public ProxyProvidedEventInfoWithCache(RdProvidedEventInfo eventInfo, RdFSharpTypeProvidersLoaderModel processModel,
-      ProvidedTypeContext context, ITypeProviderCache cache) : base(
+    private ProxyProvidedEventInfoWithCache(RdProvidedEventInfo eventInfo, int typeProviderId,
+      RdFSharpTypeProvidersLoaderModel processModel,
+      ProvidedTypeContext context, IProvidedTypesCache cache) : base(
       typeof(ProxyTypeProviderWithCache).GetEvents().First(), context)
     {
       myEventInfo = eventInfo;
+      myTypeProviderId = typeProviderId;
       myProcessModel = processModel;
       myContext = context;
       myCache = cache;
 
       myAddMethod = new InterruptibleLazy<ProvidedMethodInfo>(() =>
-        ProxyProvidedMethodInfoWithCache.Create(RdProvidedEventInfoProcessModel.GetAddMethod.Sync(EntityId),
+        ProxyProvidedMethodInfoWithCache.Create(RdProvidedEventInfoProcessModel.GetAddMethod.Sync(EntityId), myTypeProviderId,
           myProcessModel, context, cache));
 
       myRemoveMethod = new InterruptibleLazy<ProvidedMethodInfo>(() =>
-        ProxyProvidedMethodInfoWithCache.Create(RdProvidedEventInfoProcessModel.GetRemoveMethod.Sync(EntityId),
+        ProxyProvidedMethodInfoWithCache.Create(RdProvidedEventInfoProcessModel.GetRemoveMethod.Sync(EntityId), myTypeProviderId,
           myProcessModel, context, cache));
     }
 
     [ContractAnnotation("eventInfo:null => null")]
-    public static ProxyProvidedEventInfoWithCache Create(RdProvidedEventInfo eventInfo,
-      RdFSharpTypeProvidersLoaderModel processModel, ProvidedTypeContext context, ITypeProviderCache cache) =>
-      eventInfo == null ? null : new ProxyProvidedEventInfoWithCache(eventInfo, processModel, context, cache);
+    public static ProxyProvidedEventInfoWithCache Create(RdProvidedEventInfo eventInfo, int typeProviderId,
+      RdFSharpTypeProvidersLoaderModel processModel, ProvidedTypeContext context, IProvidedTypesCache cache) =>
+      eventInfo == null
+        ? null
+        : new ProxyProvidedEventInfoWithCache(eventInfo, typeProviderId, processModel, context, cache);
 
     public override string Name => myEventInfo.Name;
 
     public override ProvidedType DeclaringType => myCache.GetOrCreateWithContext(
-      myDeclaringTypeId ??= RdProvidedEventInfoProcessModel.DeclaringType.Sync(EntityId), myContext);
+      myDeclaringTypeId ??= RdProvidedEventInfoProcessModel.DeclaringType.Sync(EntityId), myTypeProviderId, myContext);
 
     public override ProvidedType EventHandlerType => myCache.GetOrCreateWithContext(
-      myEventHandlerTypeId ??= RdProvidedEventInfoProcessModel.EventHandlerType.Sync(EntityId), myContext);
+      myEventHandlerTypeId ??= RdProvidedEventInfoProcessModel.EventHandlerType.Sync(EntityId), myTypeProviderId,
+      myContext);
 
     public override ProvidedMethodInfo GetAddMethod() => myAddMethod.Value;
 

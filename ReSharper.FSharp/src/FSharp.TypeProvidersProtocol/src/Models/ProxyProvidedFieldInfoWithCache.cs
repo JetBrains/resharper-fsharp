@@ -11,8 +11,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
   public class ProxyProvidedFieldInfoWithCache : ProvidedFieldInfo
   {
     private readonly RdProvidedFieldInfo myFieldInfo;
+    private readonly int myTypeProviderId;
     private readonly RdFSharpTypeProvidersLoaderModel myProcessModel;
-    private readonly ITypeProviderCache myCache;
+    private readonly IProvidedTypesCache myCache;
     private readonly ProvidedTypeContext myContext;
 
     private int EntityId => myFieldInfo.EntityId;
@@ -20,10 +21,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     private RdProvidedFieldInfoProcessModel RdProvidedFieldInfoProcessModel =>
       myProcessModel.RdProvidedFieldInfoProcessModel;
 
-    public ProxyProvidedFieldInfoWithCache(RdProvidedFieldInfo fieldInfo, RdFSharpTypeProvidersLoaderModel processModel,
-      ProvidedTypeContext context, ITypeProviderCache cache) : base(typeof(string).GetFields().First(), context)
+    private ProxyProvidedFieldInfoWithCache(RdProvidedFieldInfo fieldInfo, int typeProviderId,
+      RdFSharpTypeProvidersLoaderModel processModel,
+      ProvidedTypeContext context, IProvidedTypesCache cache) : base(typeof(string).GetFields().First(), context)
     {
       myFieldInfo = fieldInfo;
+      myTypeProviderId = typeProviderId;
       myProcessModel = processModel;
       myCache = cache;
       myContext = context;
@@ -33,9 +36,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     }
 
     [ContractAnnotation("fieldInfo:null => null")]
-    public static ProxyProvidedFieldInfoWithCache Create(RdProvidedFieldInfo fieldInfo,
-      RdFSharpTypeProvidersLoaderModel processModel, ProvidedTypeContext context, ITypeProviderCache cache) =>
-      fieldInfo == null ? null : new ProxyProvidedFieldInfoWithCache(fieldInfo, processModel, context, cache);
+    public static ProxyProvidedFieldInfoWithCache Create(RdProvidedFieldInfo fieldInfo, int typeProviderId,
+      RdFSharpTypeProvidersLoaderModel processModel, ProvidedTypeContext context, IProvidedTypesCache cache) =>
+      fieldInfo == null ? null : new ProxyProvidedFieldInfoWithCache(fieldInfo, typeProviderId, processModel, context, cache);
 
     public override string Name => myFieldInfo.Name;
     public override bool IsFamily => HasFlag(RdProvidedFieldFlags.IsFamily);
@@ -49,10 +52,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override bool IsFamilyOrAssembly => HasFlag(RdProvidedFieldFlags.IsFamilyOrAssembly);
 
     public override ProvidedType DeclaringType => myCache.GetOrCreateWithContext(
-      myDeclaringTypeId ??= RdProvidedFieldInfoProcessModel.DeclaringType.Sync(EntityId), myContext);
+      myDeclaringTypeId ??= RdProvidedFieldInfoProcessModel.DeclaringType.Sync(EntityId), myTypeProviderId, myContext);
 
     public override ProvidedType FieldType => myCache.GetOrCreateWithContext(
-      myFieldTypeId ??= RdProvidedFieldInfoProcessModel.FieldType.Sync(EntityId), myContext);
+      myFieldTypeId ??= RdProvidedFieldInfoProcessModel.FieldType.Sync(EntityId), myTypeProviderId, myContext);
 
     public override object GetRawConstantValue() => myRawConstantValue.Value;
 

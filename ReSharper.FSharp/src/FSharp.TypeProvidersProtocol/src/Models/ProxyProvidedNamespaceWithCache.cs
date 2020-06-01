@@ -19,21 +19,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     private int EntityId => myProvidedNamespace.EntityId;
 
     public ProxyProvidedNamespaceWithCache(RdProvidedNamespace providedNamespace,
+      int typeProviderId,
       RdFSharpTypeProvidersLoaderModel processModel,
-      ITypeProviderCache cache)
+      IProvidedTypesCache cache)
     {
       myProvidedNamespace = providedNamespace;
       myProcessModel = processModel;
 
       // ReSharper disable once CoVariantArrayConversion
-      myNestedNamespaces = new InterruptibleLazy<IProvidedNamespace[]>(() => RdProvidedNamespaceProcessModel.GetNestedNamespaces
+      myNestedNamespaces = new InterruptibleLazy<IProvidedNamespace[]>(() => RdProvidedNamespaceProcessModel
+        .GetNestedNamespaces
         .Sync(EntityId)
-        .Select(t => new ProxyProvidedNamespaceWithCache(t, myProcessModel, cache))
+        .Select(t => new ProxyProvidedNamespaceWithCache(t, typeProviderId, myProcessModel, cache))
         .ToArray());
 
       myProvidedTypes = new InterruptibleLazy<ProvidedType[]>(() => RdProvidedNamespaceProcessModel.GetTypes
         .Sync(EntityId)
-        .Select(t => cache.GetOrCreateWithContext(t, ProvidedTypeContext.Empty))
+        .Select(t => cache.GetOrCreateWithContext(t, typeProviderId, ProvidedTypeContext.Empty))
         .ToArray());
     }
 
