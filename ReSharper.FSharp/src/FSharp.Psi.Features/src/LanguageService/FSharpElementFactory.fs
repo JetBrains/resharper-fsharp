@@ -14,6 +14,7 @@ open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Naming
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 
 type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IPsiModule) =
     let [<Literal>] moniker = "F# element factory"
@@ -67,6 +68,10 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let source = sprintf "[<%s>] ()" attrName
             let doDecl = getDoDecl source
             doDecl.AttributeLists.[0]
+            
+    let createTypeUsage usage: ITypeUsage =
+        let expr = createLetBinding (sprintf "(a: %s)" usage)
+        expr.Bindings.[0].HeadPattern.As<IParenPat>().Pattern.As<ITypedPat>().Type
 
     interface IFSharpElementFactory with
         member x.CreateOpenStatement(ns) =
@@ -229,16 +234,30 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             returnTypeInfo
 
         member x.CreateTypeUsage(typeUsage: string) : ITypeUsage =
-            let expr = createLetBinding (sprintf "_ : %s" typeUsage)
-            expr.Bindings.[0].ReturnTypeInfo.ReturnType
+            createTypeUsage typeUsage
             
         member x.CreateTypeUsage(typeUsages: ITypeUsage list) : ITypeUsage =
-            let copiedUsages = typeUsages |> List.map(fun x -> x.Copy())
-            let mutable currentNode = copiedUsages |> List.head
-            for usage in copiedUsages |> List.skip 1 do
-                currentNode <- ModificationUtil.AddChild(currentNode, usage)
+            let fakeUsages = "()" |> List.replicate typeUsages.Length |> String.concat " * "
+            let parentFakeUsage = createTypeUsage fakeUsages
+            
+            let copiedTypeUsages = typeUsages |> List.map(fun x -> x.Copy())
+            // If there are multiple type usages, they are combined in a TupleTypeUsage
+            let fakeUsageNodes =
+                match parentFakeUsage with
+                | :? ITupleTypeUsage as tupleUsage -> tupleUsage.Items |> Seq.toList
+                | typeUsage -> [typeUsage]
+            
                 
-            currentNode
+            for typeUsage, fakeUsage in List.zip copiedTypeUsages fakeUsageNodes do
+                let typeUsageInPlace = ModificationUtil.ReplaceChild(fakeUsage, typeUsage)
+                // In the context of a tuple within the parent tuple, brackets are required to disambiguate that case
+                // from the case of a single flat tuple.
+                if typeUsageInPlace.As<ITupleTypeUsage>() |> isNotNull then
+                    ModificationUtil.AddChildBefore(typeUsageInPlace, FSharpTokenType.LPAREN.Create("(")) |> ignore
+                    ModificationUtil.AddChildAfter(typeUsageInPlace, FSharpTokenType.RPAREN.Create(")")) |> ignore
+                
+            // In the case of multiple usages, we want to return the generated parent TupleTypeUsage
+            match copiedTypeUsages with | [singleUsage] -> singleUsage | _ -> parentFakeUsage
         
         member x.CreateSetExpr(left: IFSharpExpression, right: IFSharpExpression) =
             let source = "() <- ()"

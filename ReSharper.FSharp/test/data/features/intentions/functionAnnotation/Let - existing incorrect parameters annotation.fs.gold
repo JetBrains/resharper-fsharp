@@ -2,7 +2,7 @@ module Module
 
 open System
 
-let printerFun{caret} (a : int) (b : string) : string = sprintf "%s %d" a b
+let printerFun{caret} (a : int) (b : string): string = sprintf "%s %d" a b
 
 [<EntryPoint>]
 let main argv =

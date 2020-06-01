@@ -2,7 +2,7 @@ module Module
 
 open System
 
-let printerFun{caret} (a: seq<string>) : string = 
+let printerFun{caret} (a: seq<string>): string = 
     String.concat ", " a
 
 [<EntryPoint>]

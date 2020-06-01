@@ -1,2 +1,2 @@
-let rec foo x =
+let rec foo (x : string * (int * string)) =
     ()

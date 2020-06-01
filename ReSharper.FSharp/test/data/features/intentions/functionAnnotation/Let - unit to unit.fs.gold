@@ -2,7 +2,7 @@ module Module
 
 open System
 
-let printerFun{caret}() : unit = "foo bar" |> stdout.WriteLine
+let printerFun{caret}(): unit = "foo bar" |> stdout.WriteLine
 
 [<EntryPoint>]
 let main argv =

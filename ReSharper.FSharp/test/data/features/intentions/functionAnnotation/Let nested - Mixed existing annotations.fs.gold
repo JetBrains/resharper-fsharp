@@ -4,6 +4,6 @@ open System
 
 [<EntryPoint>]
 let main argv =
-    let printerFun{caret} (a : string) (b : int64) : string = sprintf "%s %d" a b
+    let printerFun{caret} (a: string) (b: int64): string = sprintf "%s %d" a b
     printerFun "string" (int64 1) |> stdout.WriteLine
     0 

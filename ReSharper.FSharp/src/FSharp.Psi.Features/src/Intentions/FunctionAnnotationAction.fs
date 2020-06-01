@@ -51,17 +51,14 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         match namedPat.As<IParametersOwnerPat>() with
         | null -> null
         | parameterOwner ->
-        let treeParametersWithTypes =
+        let typedTreeParameters =
             parameterOwner.Parameters
             |> Seq.zip fSharpFunction.CurriedParameterGroups
             |> Seq.toList
             
         // Annotate function parameters
         let factory = namedPat.CreateElementFactory()
-            
-        // Replace parameters with their tooltip values - each parameter is associated with a list of FSharpType instances
-        // and so `symbolUse.DisplayContext.WithShortTypeNames`, as used with return type can't be used.
-        for fSharpTypes, parameter in treeParametersWithTypes do
+        for fSharpTypes, parameter in typedTreeParameters do
             let paramName =
                 match parameter with
                 | :? ILocalReferencePat as ref -> Some ref.SourceName
@@ -72,25 +69,17 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
                 | _ -> None
             match paramName with
             | Some name ->
-                let typeSignatures =
+                // If the parameter is not curried, there will be multiple types pertaining to it
+                let subTypeUsages =
                     fSharpTypes
                     |> Seq.map(fun fSharpType ->
-                        // If tuples aren't parenthesized then the type signature is incorrect
-                        {|
-                          typeString = fsharpSymbolUse.DisplayContext.WithShortTypeNames(true) |> fSharpType.Type.Format
-                          needsParens = fSharpType.Type.IsTupleType
-                        |})
+                        fsharpSymbolUse.DisplayContext.WithShortTypeNames(true)
+                        |> fSharpType.Type.Format
+                        |> factory.CreateTypeUsage)
                     |> Seq.toList
-                let subTypeUsages =
-                    typeSignatures
-                    |> List.map(fun x ->
-                        // TODO: Need to add parens to ITypeUsage
-                        let str = if x.needsParens then sprintf "(%s)" x.typeString else x.typeString
-                        factory.CreateTypeUsage(str))
+                    
                 let typeUsage = factory.CreateTypeUsage(subTypeUsages)
-                let typedPat =
-                    factory.CreateTypedPat(name, typeUsage, spaceBeforeColon)
-                
+                let typedPat = factory.CreateTypedPat(name, typeUsage, spaceBeforeColon)
                 let parenPat = factory.CreateParenPat()
                 parenPat.SetPattern(typedPat) |> ignore
                 
@@ -99,17 +88,15 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
             
         // Annotate function return type
         if binding.ReturnTypeInfo |> isNull then
-            // Given the return type of a function is a single FSharpType, we don't have to use the tooltip to get its
-            // pretty-printed string type
-            match box(fsharpSymbolUse) with
-            | null -> failwith "FSharpSymbolUse expected to be non-null"
-            | symbolUseObj ->
-            let symbolUse = symbolUseObj :?> FSharpSymbolUse
             let returnTypeString =
-                symbolUse.DisplayContext.WithShortTypeNames(true)
+                fsharpSymbolUse.DisplayContext.WithShortTypeNames(true)
                 |> fSharpFunction.ReturnParameter.Type.Format
             
-            let afterWhitespace = ModificationUtil.AddChildAfter(namedPat.LastChild, Whitespace(" "))
+            let afterWhitespace =
+                if spaceBeforeColon then
+                    ModificationUtil.AddChildAfter(namedPat.LastChild, Whitespace(" ")) :> ITreeNode
+                else
+                    namedPat.LastChild
             let namedType =
                 returnTypeString
                 |> factory.CreateTypeUsage
