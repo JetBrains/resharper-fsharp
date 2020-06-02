@@ -1,6 +1,7 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
+﻿namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
+open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 open JetBrains.ReSharper.TestFramework
@@ -13,6 +14,9 @@ type FunctionAnnotationActionTest() =
     override x.ExtraPath = "functionAnnotation"
     
     [<Test>] member x.``Let - No existing annotations``() = x.DoNamedTest()
+    
+    [<TestSetting(typeof<FSharpFormatSettingsKey>, "SpaceBeforeColon", "true")>]
+    [<Test>] member x.``Let - No existing annotations with space before colon``() = x.DoNamedTest()
     [<Test>] member x.``Let nested - Mixed existing annotations``() = x.DoNamedTest()
     [<Test>] member x.``Let - multiline mixed existing annotations``() = x.DoNamedTest()
     [<Test>] member x.``Let - existing return type annotation``() = x.DoNamedTest()
