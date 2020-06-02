@@ -1,9 +1,8 @@
-﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
@@ -32,11 +31,10 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         for fSharpTypes, parameter in typedTreeParameters do
             let paramName =
                 match parameter with
-                | :? ILocalReferencePat as ref -> Some ref.SourceName
+                | :? IReferencePat as ref -> ref |> Some
                 | :? IParenPat as ref ->
                     ref.Pattern.As<IReferencePat>()
                     |> Option.ofObj
-                    |> Option.map(fun x -> x.SourceName)
                 | _ -> None
             match paramName with
             | Some name ->

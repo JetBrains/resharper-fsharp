@@ -30,7 +30,7 @@ type IFSharpElementFactory =
     abstract CreateRecordExprBinding: fieldName: string * addSemicolon: bool -> IRecordExprBinding
 
     abstract CreateParenPat: unit -> IParenPat
-    abstract CreateTypedPat: pattern: string * typeUsage: ITypeUsage * spaceBeforeColon: bool -> ITypedPat
+    abstract CreateTypedPat: reference: IReferencePat * typeUsage: ITypeUsage * spaceBeforeColon: bool -> ITypedPat
     
     abstract CreateTypeUsage: typeUsage: string -> ITypeUsage
     abstract CreateTypeUsage: typeUsages: ITypeUsage list -> ITypeUsage

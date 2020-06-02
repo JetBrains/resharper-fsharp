@@ -213,17 +213,20 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
             expr
             
-        // TODO: Work out whether these factory methods are the simplest they can be
         member x.CreateParenPat() =
             let expr = createLetBinding "(())"
             let binding = expr.Bindings |> Seq.exactlyOne
             binding.HeadPattern.As<IParenPat>()
             
-        member x.CreateTypedPat (pattern: string, typeUsage: ITypeUsage, spaceBeforeColon: bool) : ITypedPat =
+        member x.CreateTypedPat (reference: IReferencePat, typeUsage: ITypeUsage, spaceBeforeColon: bool) : ITypedPat =
+            let copiedReference = reference.Copy()
             let preColonSpace = if spaceBeforeColon then " " else ""
-            let expr = createLetBinding (sprintf "(%s%s: ())" pattern preColonSpace)
+            
+            let expr = createLetBinding (sprintf "(()%s: ())" preColonSpace)
             let binding = expr.Bindings |> Seq.exactlyOne
             let typedPat = binding.HeadPattern.As<IParenPat>().Pattern.As<ITypedPat>()
+            
+            ModificationUtil.ReplaceChild(typedPat.Pattern, copiedReference) |> ignore
             ModificationUtil.ReplaceChild(typedPat.Type, typeUsage) |> ignore
             typedPat
             
