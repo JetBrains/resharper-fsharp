@@ -44,7 +44,7 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
                 let subTypeUsages =
                     fSharpTypes
                     |> Seq.map(fun fSharpType ->
-                        fsharpSymbolUse.DisplayContext.WithShortTypeNames(true)
+                        fsharpSymbolUse.DisplayContext.WithShortTypeNames(false)
                         |> fSharpType.Type.Format
                         |> factory.CreateTypeUsage)
                     |> Seq.toList
@@ -64,7 +64,7 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         (fsharpSymbolUse : FSharpSymbolUse)
         (spaceBeforeColon : bool) =
         let returnTypeString =
-            fsharpSymbolUse.DisplayContext.WithShortTypeNames(true)
+            fsharpSymbolUse.DisplayContext.WithShortTypeNames(false)
             |> fSharpFunction.ReturnParameter.Type.Format
         
         let afterWhitespace =
