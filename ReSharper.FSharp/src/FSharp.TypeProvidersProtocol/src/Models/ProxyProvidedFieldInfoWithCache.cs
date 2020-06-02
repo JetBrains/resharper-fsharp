@@ -30,15 +30,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
       myProcessModel = processModel;
       myCache = cache;
       myContext = context;
-
-      myRawConstantValue = new InterruptibleLazy<object>(() =>
-        RdProvidedFieldInfoProcessModel.GetRawConstantValue.Sync(EntityId).Unbox());
     }
 
     [ContractAnnotation("fieldInfo:null => null")]
     public static ProxyProvidedFieldInfoWithCache Create(RdProvidedFieldInfo fieldInfo, int typeProviderId,
       RdFSharpTypeProvidersLoaderModel processModel, ProvidedTypeContext context, IProvidedTypesCache cache) =>
-      fieldInfo == null ? null : new ProxyProvidedFieldInfoWithCache(fieldInfo, typeProviderId, processModel, context, cache);
+      fieldInfo == null
+        ? null
+        : new ProxyProvidedFieldInfoWithCache(fieldInfo, typeProviderId, processModel, context, cache);
 
     public override string Name => myFieldInfo.Name;
     public override bool IsFamily => HasFlag(RdProvidedFieldFlags.IsFamily);
@@ -57,12 +56,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.TypeProvidersProtocol.Models
     public override ProvidedType FieldType => myCache.GetOrCreateWithContext(
       myFieldTypeId ??= RdProvidedFieldInfoProcessModel.FieldType.Sync(EntityId), myTypeProviderId, myContext);
 
-    public override object GetRawConstantValue() => myRawConstantValue.Value;
+    public override object GetRawConstantValue() => myFieldInfo.RawConstantValue.Unbox();
 
     private bool HasFlag(RdProvidedFieldFlags flag) => (myFieldInfo.Flags & flag) == flag;
 
     private int? myDeclaringTypeId;
     private int? myFieldTypeId;
-    private readonly InterruptibleLazy<object> myRawConstantValue;
   }
 }

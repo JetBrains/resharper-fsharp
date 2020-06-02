@@ -230,11 +230,10 @@ object RdFSharpTypeProvidersLoaderModel : Root(
     private val RdProvidedFieldInfoProcessModel = aggregatedef("RdProvidedFieldInfoProcessModel") {
         call("FieldType", int, int)
         call("DeclaringType", int, int)
-        call("GetRawConstantValue", int, RdStaticArg)
     }
 
     private val RdProvidedFieldInfo = classdef extends RdProvidedMemberInfo {
-        field("GetRawConstantValue", RdStaticArg)
+        field("RawConstantValue", RdStaticArg)
         field("Flags", RdProvidedFieldFlags)
     }
 

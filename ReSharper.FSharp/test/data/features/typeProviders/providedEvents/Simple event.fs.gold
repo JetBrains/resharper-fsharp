@@ -1,0 +1,31 @@
+|module ||Test|(1)|(2)
+
+open |SimpleErasingProviderNamespace|(3)
+
+let ||||event|(5)|(6)|(7) = |SimpleErasedType|(8)().|SimpleEvent|(4)|(9)
+|event|(10).|AddHandler|(11)(|Handler|(12)<|string|(13)>(fun |s|(14) |o|(15) -> ()))
+|event|(16).|RemoveHandler|(17)(|Handler|(18)<|string|(19)>(fun |s|(20) |o|(21) -> ()))|(0)
+
+---------------------------------------------------------
+(0): RiderVcsRangesHighlighter: 
+(1): RiderVcsRangesHighlighter: 
+(2): ReSharper F# Module Identifier: 
+(3): ReSharper F# Namespace Identifier: 
+(4): RiderVcsRangesHighlighter: 
+(5): RiderVcsRangesHighlighter: 
+(6): ReSharper F# Value Identifier: 
+(7): CodeInsights: IEvent<Handler<string>,string>
+(8): ReSharper F# Class Identifier: 
+(9): ReSharper F# Event Identifier: 
+(10): ReSharper F# Value Identifier: 
+(11): ReSharper F# Method Identifier: 
+(12): ReSharper F# Delegate Identifier: 
+(13): ReSharper F# Class Identifier: 
+(14): ReSharper F# Value Identifier: 
+(15): ReSharper F# Value Identifier: 
+(16): ReSharper F# Value Identifier: 
+(17): ReSharper F# Method Identifier: 
+(18): ReSharper F# Delegate Identifier: 
+(19): ReSharper F# Class Identifier: 
+(20): ReSharper F# Value Identifier: 
+(21): ReSharper F# Value Identifier: 

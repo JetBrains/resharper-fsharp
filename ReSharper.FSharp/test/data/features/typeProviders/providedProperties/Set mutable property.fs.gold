@@ -1,0 +1,13 @@
+|module ||Test|(1)|(2)
+
+open |SimpleErasingProviderNamespace|(3)
+
+|SimpleErasedType|(4)().|StringPropertyWithSetter|(5) <- ""|(0)
+
+---------------------------------------------------------
+(0): RiderVcsRangesHighlighter: 
+(1): RiderVcsRangesHighlighter: 
+(2): ReSharper F# Module Identifier: 
+(3): ReSharper F# Namespace Identifier: 
+(4): ReSharper F# Class Identifier: 
+(5): ReSharper F# Property Identifier: 

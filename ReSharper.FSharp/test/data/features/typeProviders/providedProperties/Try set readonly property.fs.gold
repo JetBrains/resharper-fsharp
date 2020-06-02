@@ -1,0 +1,14 @@
+|module ||Test|(1)|(2)
+
+open |SimpleErasingProviderNamespace|(3)
+
+||SimpleErasedType|(5)().|ReadonlyStringProperty|(4)|(6) <- ""|(0)
+
+---------------------------------------------------------
+(0): RiderVcsRangesHighlighter: 
+(1): RiderVcsRangesHighlighter: 
+(2): ReSharper F# Module Identifier: 
+(3): ReSharper F# Namespace Identifier: 
+(4): ReSharper Underlined Error Highlighting: Property 'ReadonlyStringProperty' cannot be set
+(5): ReSharper F# Class Identifier: 
+(6): ReSharper F# Property Identifier: 

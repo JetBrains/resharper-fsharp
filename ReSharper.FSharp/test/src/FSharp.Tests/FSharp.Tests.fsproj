@@ -93,6 +93,10 @@
     <Compile Include="FSharpOccurenceKindTest.fs" />
     <Compile Include="NavigationTests.fs" />
     <Compile Include="FSharpCompletionTest.fs" />
+    <Compile Include="TypeProviders\TypeProvidersHighlightingTestBase.fs" />
+    <Compile Include="TypeProviders\ProvidedPropertiesResolveTest.fs" />
+    <Compile Include="TypeProviders\ProvidedFieldsResolveTest.fs" />
+    <Compile Include="TypeProviders\ProvidedEventResolveTest.fs" />
   </ItemGroup>
 
   <ItemGroup>
