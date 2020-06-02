@@ -389,7 +389,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       Assertion.Assert(moduleTypeElement.IsCompiledModule(), "moduleTypeElement.IsCompiledModule()");
 
       bool IsAssociatedType(ITypeElement t) =>
-        !t.Equals(moduleTypeElement) && t.TypeParameters.Count == 0 && t.GetSourceName() == sourceName;
+        !t.Equals(moduleTypeElement) && t.TypeParameters.Count == 0 && 
+        !t.IsCompiledModule() && t.GetSourceName() == sourceName;
 
       var containingType = moduleTypeElement.GetContainingType();
       if (containingType != null)
