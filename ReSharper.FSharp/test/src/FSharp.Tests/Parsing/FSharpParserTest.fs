@@ -318,6 +318,9 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Pattern - As - Wild 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Pattern - Named args 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Named args 02 - Multiple``() = x.DoNamedTest()
+
     [<Test>] member x.``Record field 01 - Attribute``() = x.DoNamedTest()
 
 
