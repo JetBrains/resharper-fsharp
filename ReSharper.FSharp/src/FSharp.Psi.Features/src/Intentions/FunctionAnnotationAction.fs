@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
+﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.ReSharper.Feature.Services.ContextActions
@@ -36,8 +36,8 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
                     ref.Pattern.As<IReferencePat>()
                     |> Option.ofObj
                 | _ -> None
-            match paramName with
-            | Some name ->
+            paramName
+            |> Option.iter(fun name ->
                 // If the parameter is not curried, there will be multiple types pertaining to it
                 let subTypeUsages =
                     fSharpTypes
@@ -52,8 +52,7 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
                 let parenPat = factory.CreateParenPat()
                 parenPat.SetPattern(typedPat) |> ignore
                 
-                PsiModificationUtil.replaceWithCopy parameter parenPat
-            | None -> ()
+                PsiModificationUtil.replaceWithCopy parameter parenPat)
             
     let annotateBindingReturnType
         (namedPat : INamedPat)
