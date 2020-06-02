@@ -1,4 +1,4 @@
-﻿namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
+namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Tests
@@ -23,6 +23,7 @@ type FunctionAnnotationActionTest() =
     [<Test>] member x.``Let - unit to unit``() = x.DoNamedTest()
     [<Test>] member x.``Let - recursive function``() = x.DoNamedTest()
     [<Test>] member x.``Let - tupled generic arg``() = x.DoNamedTest()
+    [<Test>] member x.``Let - value binding no existing annotation``() = x.DoNamedTest()
     
 [<FSharpTest; TestPackages("FSharp.Core")>]
 type FunctionAnnotationAvailabilityTest() =

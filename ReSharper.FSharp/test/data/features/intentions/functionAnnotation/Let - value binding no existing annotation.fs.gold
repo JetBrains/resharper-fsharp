@@ -1,0 +1,5 @@
+﻿module Module
+
+open System
+
+let valueBinding: string * int{caret} = ("foo", 1)
