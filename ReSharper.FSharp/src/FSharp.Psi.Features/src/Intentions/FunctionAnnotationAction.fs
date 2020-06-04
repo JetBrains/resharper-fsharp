@@ -31,7 +31,7 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
         for fSharpTypes, parameter in typedTreeParameters do
             let paramName =
                 match parameter with
-                | :? IReferencePat as ref -> ref |> Some
+                | :? IReferencePat as ref -> Some ref
                 | :? IParenPat as ref ->
                     ref.Pattern.As<IReferencePat>()
                     |> Option.ofObj
@@ -74,6 +74,26 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
             |> factory.CreateTypeUsage
             |> factory.CreateReturnTypeInfo
         ModificationUtil.AddChildAfter(afterWhitespace, namedType) |> ignore
+        
+    let isAlreadyAnnotated (binding : IBinding) : bool =
+        let areParametersAnnotated =
+            let namedPat = binding.HeadPattern.As<INamedPat>()
+            if isNull namedPat then failwith "Expected INamedPat" else
+            // If there are no parameters owned by a binding, then there's nothing to annotate
+            let parametersOwner = namedPat.As<IParametersOwnerPat>()
+            if isNull parametersOwner then true else
+            let areAnyAnnotated =
+                parametersOwner.Parameters
+                |> Seq.tryFind(fun parameter ->
+                    let parenPat = parameter.As<IParenPat>()
+                    if isNull parenPat then true else
+                    isNull (parenPat.Pattern.As<ITypedPat>())
+                    )
+                |> Option.isNone
+            areAnyAnnotated
+        let isReturnTypeAnnotated = isNotNull binding.ReturnTypeInfo
+        
+        areParametersAnnotated && isReturnTypeAnnotated
 
     let [<Literal>] opName = "FunctionAnnotationAction"
     override x.Text = "Annotate function with parameter types and return type"
@@ -84,7 +104,11 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
 
         match binding.HeadPattern with
         | :? IAsPat -> false
-        | :? INamedPat as namedPat -> isNotNull namedPat.Identifier
+        | :? INamedPat as namedPat ->
+            if isNotNull namedPat.Identifier then
+                binding |> isAlreadyAnnotated |> not
+            else
+                false
         | _ -> false
         
     override x.ExecutePsiTransaction(_, _) =

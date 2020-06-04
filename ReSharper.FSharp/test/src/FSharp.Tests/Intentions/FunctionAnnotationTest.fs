@@ -20,7 +20,6 @@ type FunctionAnnotationActionTest() =
     [<Test>] member x.``Let nested - Mixed existing annotations``() = x.DoNamedTest()
     [<Test>] member x.``Let - multiline mixed existing annotations``() = x.DoNamedTest()
     [<Test>] member x.``Let - existing return type annotation``() = x.DoNamedTest()
-    [<Test>] member x.``Let - existing incorrect return type annotation``() = x.DoNamedTest()
     [<Test>] member x.``Let - existing incorrect parameters annotation``() = x.DoNamedTest()
     [<Test>] member x.``Let - unable to determine all parameter or return types``() = x.DoNamedTest()
     [<Test>] member x.``Let - Instance of generic type``() = x.DoNamedTest()
@@ -38,8 +37,8 @@ type FunctionAnnotationAvailabilityTest() =
     [<Test>] member x.``Module - Name 01``() = x.DoNamedTest()
     [<Test>] member x.``Module - Name 02 - Attributes``() = x.DoNamedTest()
 
-    [<Test>] member x.``Expression - Name 01``() = x.DoNamedTest()
-    [<Test>] member x.``Expression - Keyword 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expression - Simple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expression - Partial Annotations 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Not available``() = x.DoNamedTest()
     
