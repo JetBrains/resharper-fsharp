@@ -2,6 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open System.Linq
 open JetBrains.ProjectModel
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -45,3 +46,28 @@ type FSharpElementFactoryTest() =
             Assert.AreEqual(1, wildPat.Children().Count())
             Assert.AreEqual(FSharpTokenType.UNDERSCORE, wildPat.FirstChild.GetTokenType())
             Assert.AreEqual("_", wildPat.GetText()))
+        
+    [<Test>]
+    member x.``CreateReturnTypeInfo from type strings``() =
+        x.DoTest(fun elementFactory ->
+            use readCookie = ReadLockCookie.Create()
+            let returnTypeInfo =
+                "string"
+                |> elementFactory.CreateTypeUsage
+                |> elementFactory.CreateReturnTypeInfo
+            let returnInfoTypeName =
+                returnTypeInfo.ReturnType.As<INamedTypeUsage>().ReferenceName.Names |> Seq.exactlyOne
+            Assert.AreEqual("string", returnInfoTypeName))
+        
+    [<Test>]
+    member x.``CreateTypeUsage with composite TypeUsage from type strings``() =
+        x.DoTest(fun elementFactory ->
+            use readCookie = ReadLockCookie.Create()
+            let compositeTypeUsage =
+                ["string"; "int"]
+                |> List.map elementFactory.CreateTypeUsage
+                |> elementFactory.CreateTypeUsage
+            let tupleType = compositeTypeUsage.As<ITupleTypeUsage>()
+            Assert.NotNull(tupleType)
+            Assert.AreEqual(["string"; "int"], tupleType.Items |> Seq.map(fun x -> x.As<INamedTypeUsage>().ReferenceName.Names |> Seq.exactlyOne)))
+        
