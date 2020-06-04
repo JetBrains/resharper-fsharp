@@ -2,9 +2,8 @@ package projectModel
 
 import com.intellij.testFramework.ProjectViewTestUtil
 import com.jetbrains.rdclient.testFramework.waitForDaemon
+import com.jetbrains.rdclient.testFramework.waitForNextDaemon
 import com.jetbrains.rider.daemon.util.hasErrors
-import com.jetbrains.rider.model.rdFSharpModel
-import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.base.BaseTestWithSolution
 import com.jetbrains.rider.test.enums.CoreVersion
@@ -33,13 +32,13 @@ class FcsProjectProviderTest : BaseTestWithSolution() {
             assert(markupAdapter.hasErrors)
         }
 
-        addReference2(project, arrayOf("ProjectReferencesFSharp", "ReferenceFrom"), "<ReferenceTo>")
+        addReference(project, arrayOf("ProjectReferencesFSharp", "ReferenceFrom"), "<ReferenceTo>")
         withOpenedEditor(project, "ReferenceFrom/Library.fs") {
             waitForDaemon()
             assert(!markupAdapter.hasErrors)
         }
 
-        deleteElement2(project, arrayOf("ProjectReferencesFSharp", "ReferenceFrom", "Dependencies", ".NETStandard 2.0", "Projects", "ReferenceTo/1.0.0"))
+        deleteElement(project, arrayOf("ProjectReferencesFSharp", "ReferenceFrom", "Dependencies", ".NETStandard 2.0", "Projects", "ReferenceTo/1.0.0"))
         withOpenedEditor(project, "ReferenceFrom/Library.fs") {
             waitForDaemon()
             assert(markupAdapter.hasErrors)
@@ -49,15 +48,13 @@ class FcsProjectProviderTest : BaseTestWithSolution() {
     @Test
     @TestEnvironment(solution = "ProjectReferencesCSharp")
     fun projectReferencesCSharp() {
-        val fcsHost = project.solution.rdFSharpModel.fcsHost
-
         assertAllProjectsWereLoaded(project)
         withOpenedEditor(project, "FSharpProject/Library.fs") {
             waitForDaemon()
             assert(markupAdapter.hasErrors)
         }
 
-        addReference2(project, arrayOf("ProjectReferencesCSharp", "FSharpProject"), "<CSharpProject>")
+        addReference(project, arrayOf("ProjectReferencesCSharp", "FSharpProject"), "<CSharpProject>")
         withOpenedEditor(project, "FSharpProject/Library.fs") {
             waitForDaemon()
             assert(markupAdapter.hasErrors)
@@ -65,18 +62,17 @@ class FcsProjectProviderTest : BaseTestWithSolution() {
 
         buildSolutionWithReSharperBuild()
         withOpenedEditor(project, "FSharpProject/Library.fs") {
-            waitForDaemon()
-            wait(Duration.ofSeconds(15))
+            waitForNextDaemon(Duration.ofSeconds(5))
             assert(!markupAdapter.hasErrors)
         }
 
-        deleteElement2(project, arrayOf("ProjectReferencesFSharp", "FSharpProject", "Dependencies", ".NETStandard 2.0", "Projects", "CSharpProject/1.0.0"))
+        deleteElement(project, arrayOf("ProjectReferencesFSharp", "FSharpProject", "Dependencies", ".NETStandard 2.0", "Projects", "CSharpProject/1.0.0"))
         withOpenedEditor(project, "FSharpProject/Library.fs") {
             waitForDaemon()
             assert(markupAdapter.hasErrors)
         }
 
-        addReference2(project, arrayOf("ProjectReferencesCSharp", "FSharpProject"), "<CSharpProject>")
+        addReference(project, arrayOf("ProjectReferencesCSharp", "FSharpProject"), "<CSharpProject>")
         withOpenedEditor(project, "FSharpProject/Library.fs") {
             waitForDaemon()
             assert(!markupAdapter.hasErrors)
