@@ -95,9 +95,10 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
     override x.GetSecondaryElements(element: IDeclaredElement, newName) =
         match element with
         | :? ILocalReferencePat as localNamedPat ->
-            let mutable pat = localNamedPat :> ISynPat
-            while (pat.Parent :? ISynPat) && not (pat.Parent :? IParametersOwnerPat && (pat.Parent :?> ISynPat).IsDeclaration) do
-                pat <- pat.Parent :?> ISynPat
+            let mutable pat = localNamedPat :> IFSharpPattern
+            while pat.Parent :? IFSharpPattern &&
+                    not (pat.Parent :? IParametersOwnerPat && (pat.Parent :?> IFSharpPattern).IsDeclaration) do
+                pat <- pat.Parent :?> IFSharpPattern
 
             pat.Declarations
             |> Seq.cast<IDeclaredElement>

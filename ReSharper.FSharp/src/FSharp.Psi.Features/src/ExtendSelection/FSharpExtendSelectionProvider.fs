@@ -46,10 +46,10 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
 
             null
 
-        | :? ISynPat as synPat ->
-            let matchClause = MatchClauseNavigator.GetByPattern(synPat)
+        | :? IFSharpPattern as fsPattern ->
+            let matchClause = MatchClauseNavigator.GetByPattern(fsPattern)
             if isNotNull matchClause && isNotNull matchClause.WhenExpression then
-                FSharpTreeRangeSelection(fsFile, synPat, matchClause.WhenExpression) :> _ else
+                FSharpTreeRangeSelection(fsFile, fsPattern, matchClause.WhenExpression) :> _ else
 
             null
 

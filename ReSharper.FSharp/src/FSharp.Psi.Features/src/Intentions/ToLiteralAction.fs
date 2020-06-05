@@ -22,8 +22,8 @@ type ToLiteralAction(dataProvider: FSharpContextActionDataProvider) =
         FSharpAttributesUtil.addAttributesList binding false
         binding.AttributeLists.[0]
 
-    let rec isSimplePattern (pat: ISynPat): bool =
-        match pat with
+    let rec isSimplePattern (fsPattern: IFSharpPattern): bool =
+        match fsPattern with
         | :? IReferencePat as refPat ->
             let referenceName = refPat.ReferenceName
             isNotNull referenceName && isNull referenceName.Qualifier

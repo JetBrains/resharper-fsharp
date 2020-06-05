@@ -136,7 +136,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
           if (declaration is IFSharpLocalDeclaration localDeclaration)
             return localDeclaration;
 
-          return declaration is ISynPat
+          return declaration is IFSharpPattern
             ? declaration.DeclaredElement
             : null;
         }

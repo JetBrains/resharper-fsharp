@@ -281,8 +281,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
           return typeDeclaration.AllAttributes;
         case IMemberDeclaration memberDeclaration:
           return memberDeclaration.Attributes;
-        case ISynPat pat:
-          return pat.Attributes;
+        case IFSharpPattern fsPattern:
+          return fsPattern.Attributes;
         case IDeclaredModuleDeclaration moduleDeclaration:
           return moduleDeclaration.Attributes;
         default: return TreeNodeCollection<IAttribute>.Empty;
@@ -707,24 +707,24 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return fsExpr;
     }
     
-    public static ISynPat IgnoreParentParens([CanBeNull] this ISynPat synPat)
+    public static IFSharpPattern IgnoreParentParens([CanBeNull] this IFSharpPattern fsPattern)
     {
-      if (synPat == null)
+      if (fsPattern == null)
         return null;
 
-      while (synPat.Parent is IParenPat parenPat)
-        synPat = parenPat;
-      return synPat;
+      while (fsPattern.Parent is IParenPat parenPat)
+        fsPattern = parenPat;
+      return fsPattern;
     }
 
-    public static ISynPat IgnoreInnerParens([CanBeNull] this ISynPat synPat)
+    public static IFSharpPattern IgnoreInnerParens([CanBeNull] this IFSharpPattern fsPattern)
     {
-      if (synPat == null)
+      if (fsPattern == null)
         return null;
 
-      while (synPat is IParenPat parenPat && parenPat.Pattern != null)
-        synPat = parenPat.Pattern;
-      return synPat;
+      while (fsPattern is IParenPat parenPat && parenPat.Pattern != null)
+        fsPattern = parenPat.Pattern;
+      return fsPattern;
     }
     
     [NotNull]
