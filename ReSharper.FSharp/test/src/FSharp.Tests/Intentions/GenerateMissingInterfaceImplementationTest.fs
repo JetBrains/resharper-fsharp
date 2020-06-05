@@ -9,8 +9,8 @@ type GenerateMissingInterfaceImplementationTest() =
 
     override x.ExtraPath = "generateMissingInterfaceImplementation"
 
-    [<Test>] member x.``Empty interface implementation``() = x.DoNamedTest()
-    // TODO: Test a case with generics
+    [<Test>] member x.``Empty interface implementation - concrete``() = x.DoNamedTest()
+    [<Test>] member x.``Empty interface implementation - generics``() = x.DoNamedTest()
     
 type GenerateMissingInterfaceImplementationAvailabilityTest() =
     inherit FSharpContextActionAvailabilityTestBase<GenerateMissingInterfaceImplementation>()
@@ -20,4 +20,4 @@ type GenerateMissingInterfaceImplementationAvailabilityTest() =
     [<Test>] member x.``Partial interface implementation``() = x.DoNamedTest()
     [<Test>] member x.``Complete interface implementation``() = x.DoNamedTest()
     [<Test>] member x.``Members on class``() = x.DoNamedTest()
-    // TODO: `interface SomeClassNotAnInterface with` shouldn't be available
+    [<Test>] member x.``Interface implementation with class name``() = x.DoNamedTest()
