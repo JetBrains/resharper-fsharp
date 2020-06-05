@@ -1,4 +1,4 @@
-﻿namespace JetBrains.ReSharper.Plugins.FSharp.Checker
+namespace JetBrains.ReSharper.Plugins.FSharp.Checker
 
 open System.Collections.Generic
 open FSharp.Compiler.SourceCodeServices
@@ -264,11 +264,15 @@ type FcsProjectProvider
 [<SolutionComponent>]
 type OutputAssemblyChangeInvalidator
         (lifetime: Lifetime, outputAssemblies: OutputAssemblies, daemon: IDaemon, psiFiles: IPsiFiles,
-         fcsProjectProvider: IFcsProjectProvider) =
+         fcsProjectProvider: IFcsProjectProvider, scheduler: ISolutionLoadTasksScheduler) =
     do
-        outputAssemblies.ProjectOutputAssembliesChanged.Advise(lifetime, fun (project: IProject) ->
-            if not fcsProjectProvider.HasFcsProjects || project.IsFSharp then () else
+        scheduler.EnqueueTask(SolutionLoadTask("FSharpProjectOptionsProvider", SolutionLoadTaskKinds.StartPsi, fun _ ->
+            // todo: track file system changes instead? This currently may be triggered on a project model change too.
+            outputAssemblies.ProjectOutputAssembliesChanged.Advise(lifetime, fun (project: IProject) ->
+                if not fcsProjectProvider.HasFcsProjects || project.IsFSharp then () else
 
-            if fcsProjectProvider.InvalidateReferencesToProject(project) then
-                psiFiles.IncrementModificationTimestamp(null) // Drop cached values.
-                daemon.Invalidate()) // Request files re-highlighting.
+                if fcsProjectProvider.InvalidateReferencesToProject(project) then
+                    psiFiles.IncrementModificationTimestamp(null) // Drop cached values.
+                    daemon.Invalidate() // Request files re-highlighting.
+            )
+        ))
