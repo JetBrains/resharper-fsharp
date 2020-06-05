@@ -28,8 +28,8 @@ module FSharpCheckerService =
 
 [<ShellComponent; AllowNullLiteral>]
 type FSharpCheckerService
-        (lifetime: Lifetime, logger: ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier,
-         settingsStore: ISettingsStore, settingsSchema: SettingsSchema) =
+        (lifetime, logger: ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier, settingsStore: ISettingsStore,
+         reactorMonitor: IFcsReactorMonitor, settingsSchema: SettingsSchema) =
 
     let checker =
         Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "20")
@@ -97,6 +97,8 @@ type FSharpCheckerService
         let path = file.GetLocation().FullPath
         let source = FSharpCheckerService.getSourceText file.Document
         logger.Trace("ParseAndCheckFile: start {0}, {1}", path, opName)
+
+        let opName = reactorMonitor.RegisterOperation opName
 
         // todo: don't cancel the computation when file didn't change
         match x.Checker.ParseAndCheckDocument(path, source, options, allowStaleResults, opName).RunAsTask() with
