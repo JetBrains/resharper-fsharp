@@ -26,7 +26,8 @@ type IFSharpElementFactory =
     abstract CreateLetBindingExpr: bindingName: string -> ILetOrUseExpr
     abstract CreateLetModuleDecl: bindingName: string -> ILetModuleDecl
     
-    abstract CreateMemberBindingExpr: bindingName: string * typeParameters: string list * argNames: string option list -> IMemberDeclaration
+    abstract CreateMemberParamDeclarations: curriedParameterNames: string list list * isSpaceAfterComma: bool -> IMemberParamDeclaration list
+    abstract CreateMemberBindingExpr: bindingName: string * typeParameters: string list * args: IMemberParamDeclaration list -> IMemberDeclaration
     abstract CreateInterfaceImplementation: typeReferenceName: ITypeReferenceName * memberDeclarations: IMemberDeclaration list * indent: int -> IInterfaceImplementation
 
     abstract CreateIgnoreApp: IFSharpExpression * newLine: bool -> IBinaryAppExpr

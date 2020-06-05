@@ -58,16 +58,12 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         let newExpr = getExpression source
         newExpr.As<IParenExpr>().InnerExpression.As<ILetOrUseExpr>()
         
-    let createMemberBinding bindingName typeParameters (argNames : string option list) =
-        let argsSource =
-            argNames
-            |> List.map(Option.defaultValue "()") // Cover the unit case
-            |> String.concat " "
+    let createMemberBinding bindingName typeParameters argsSource =
         let typeArgsSource =
             match typeParameters with
             | [] -> ""
             | parameters -> sprintf "<%s>" (parameters |> List.map(sprintf "'%s") |> String.concat ",")
-        let source = sprintf "type DummyType() = \n member this.%s%s %s = failwith \"todo\"" bindingName typeArgsSource argsSource
+        let source = sprintf "type DummyType() = \n member this.%s%s %s= failwith \"todo\"" bindingName typeArgsSource argsSource
         let moduleMember = getModuleMember source
         let typeDecl = moduleMember.As<ITypeDeclarationGroup>().TypeDeclarations |> Seq.exactlyOne
         let objectTypeDecl = typeDecl.As<IObjectTypeDeclaration>()
@@ -153,8 +149,27 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let source = sprintf "let %s = ()" bindingName
             getModuleMember source :?> ILetModuleDecl
             
-        member x.CreateMemberBindingExpr(bindingName, typeParameters, argNames) : IMemberDeclaration =
-            createMemberBinding bindingName typeParameters argNames
+        member x.CreateMemberParamDeclarations(curriedParameterNames, isSpaceAfterComma) : IMemberParamDeclaration list =
+            let spaceAfterComma = if isSpaceAfterComma then " " else ""
+            let argsSource =
+                curriedParameterNames
+                |> List.fold (fun state parameters ->
+                    let paramGroupString =
+                        match parameters with
+                        | [] -> "()" // No arguments case
+                        | [singleParam] -> singleParam
+                        | multipleParams -> multipleParams |> String.concat ("," + spaceAfterComma) |> sprintf "(%s)"
+                    state  + " " + paramGroupString
+                    ) ""
+            let memberBinding = createMemberBinding "fakeBindingName" List.empty argsSource
+            memberBinding.Parameters |> Seq.toList
+            
+        member x.CreateMemberBindingExpr(bindingName, typeParameters, args) : IMemberDeclaration =
+            let fakeArgNames = "dummy " |> String.replicate (args.Length)
+            let memberBinding = createMemberBinding bindingName (Seq.toList typeParameters) fakeArgNames
+            for realArg, fakeArg in Seq.zip args memberBinding.Parameters do
+                ModificationUtil.ReplaceChild(fakeArg, realArg) |> ignore
+            memberBinding
             
         member x.CreateInterfaceImplementation(typeReferenceName, memberDeclarations, baseIndent) : IInterfaceImplementation =
             let memberIndent = baseIndent + typeReferenceName.FSharpFile.GetIndentSize()

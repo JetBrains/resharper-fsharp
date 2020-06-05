@@ -5,8 +5,11 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open  FSharp.Compiler.SourceCodeServices
+open FSharp.Compiler.SourceCodeServices
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
+open JetBrains.ReSharper.Psi.Tree
+open JetBrains.Application.Settings
 
 [<ContextAction(Name = "GenerateInterfaceImplementation", Group = "F#", Description = "Generates skeleton interface implementation")>]
 type GenerateMissingInterfaceImplementation(dataProvider: FSharpContextActionDataProvider) =
@@ -34,7 +37,7 @@ type GenerateMissingInterfaceImplementation(dataProvider: FSharpContextActionDat
             | _ -> None
             |> Option.defaultWith(fun _ -> failwith "ExpectedFSharpEntity")
         
-        let isNotImplemented = declaration.TypeMembersEnumerable |> Seq.map(fun x -> x.SourceName) |> Seq.isEmpty
+        let isNotImplemented = declaration.TypeMembersEnumerable |> Seq.map (fun x -> x.SourceName) |> Seq.isEmpty
         entity.IsInterface && isNotImplemented
 
     override x.ExecutePsiTransaction(_, _) =
@@ -42,6 +45,8 @@ type GenerateMissingInterfaceImplementation(dataProvider: FSharpContextActionDat
         let factory = initialInterfaceImpl.CreateElementFactory()
         use _writeCookie = WriteLockCookie.Create(initialInterfaceImpl.IsPhysical())
         use _disableFormatter = new DisableCodeFormatter()
+        let settingsStore = initialInterfaceImpl.FSharpFile.GetSettingsStore()
+        let spaceAfterComma = settingsStore.GetValue(fun (key : FSharpFormatSettingsKey) -> key.SpaceAfterComma)
         
         let symbol = initialInterfaceImpl.TypeName.Reference.GetFSharpSymbol()
         
@@ -51,18 +56,18 @@ type GenerateMissingInterfaceImplementation(dataProvider: FSharpContextActionDat
             | _ -> None
             |> Option.defaultWith(fun _ -> failwith "ExpectedFSharpEntity")
             
-        // TODO: Handle generation of arguments for tupled arguments to member functions - should this indeed come from FCS as a tuple, or be a list of types?
         let memberDeclarations =
             entity.MembersFunctionsAndValues
             |> Seq.map(fun x ->
                 let argNames =
                     x.CurriedParameterGroups
-                    |> Seq.map(Seq.toList >> function | [] -> None | [singleParam] -> Some singleParam | _ -> failwith "Unexpected number of params")
-                    |> Seq.map (Option.map (fun param -> param.Name |> Option.defaultWith(fun _ -> getUnnamedVariableName())))
+                    |> Seq.map (Seq.map (fun x -> x.Name |> Option.defaultWith(fun _ -> getUnnamedVariableName())) >> Seq.toList)
                     |> Seq.toList
                 let typeParams = x.GenericParameters |> Seq.map (fun param -> param.Name) |> Seq.toList
                 let memberName = x.DisplayName
-                factory.CreateMemberBindingExpr(memberName, typeParams, argNames)
+                
+                let paramDeclarationGroups = factory.CreateMemberParamDeclarations(argNames, spaceAfterComma)
+                factory.CreateMemberBindingExpr(memberName, typeParams, paramDeclarationGroups)
                 )
             |> Seq.toList
             
