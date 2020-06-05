@@ -1220,7 +1220,6 @@ memberConstructorDeclaration options { stubBase="FSharpProperTypeMemberDeclarati
 
 memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<memberDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfMethodList:TYPE_PARAMETER> };
-  get { methodName="Parameters" path=<memberDeclaration:PARAM_GROUP/memberParamDeclarationGroup:PARAMETER> };
   get { methodName="Attributes" path=<memberDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
@@ -1236,7 +1235,7 @@ memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } 
   identOrOpName{IDENTIFIER, Identifier}
   typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   (
-    memberParamDeclarationGroup<PARAM_GROUP, ParameterGroups>*
+    memberParamDeclaration<PARAMETERS, Parameters>+
     EQUALS
     chameleonExpression
   |

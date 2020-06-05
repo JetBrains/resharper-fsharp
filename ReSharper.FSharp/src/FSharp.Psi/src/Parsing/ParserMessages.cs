@@ -2,19 +2,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 {
   public class ParserMessages
   {
-    public const string IDS_F_SHARP_DECLARATION = "";
-    public const string IDS_MODULE_LIKE_DECLARATION = "";
-    public const string IDS_NAMED_MODULE_LIKE_DECLARATION = "";
+    public const string IDS_MEMBER_PARAM_DECLARATION = "";
     public const string IDS_TOP_LEVEL_MODULE_LIKE_DECLARATION = "";
     public const string IDS_QUALIFIABLE_DECLARATION = "";
     public const string IDS_QUALIFIABLE_MODULE_LIKE_DECLARATION = "";
     public const string IDS_DECLARED_MODULE_LIKE_DECLARATION = "";
     public const string IDS_ACCESS_MODIFIER = "";
-    public const string IDS_MODULE_DECLARATION = "";
     public const string IDS_DECLARED_MODULE_DECLARATION = "";
     public const string IDS_MODULE_MEMBER = "";
-    public const string IDS_MODULE_MEMBER_DECLARATION = "";
-    public const string IDS_MODULE_MEMBER_STATEMENT = "";
     public const string IDS_F_SHARP_TYPE_DECLARATION = "";
     public const string IDS_UNION_CASE_DECLARATION = "";
     public const string IDS_CASE_FIELD_DECLARATION = "";
@@ -25,7 +20,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_MEMBER_PARAM_DECLARATION_GROUP = "";
     public const string IDS_MEMBER_KEYWORD = "";
     public const string IDS_SELF_ID = "";
-    public const string IDS_MODIFIER = "";
     public const string IDS_NOT_COMPILED_TYPE_DECLARATION = "";
     public const string IDS_SIMPLE_TYPE_DECLARATION = "";
     public const string IDS_HASH_DIRECTIVE = "";
@@ -54,7 +48,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_ARRAY_OR_LIST_EXPR = "";
     public const string IDS_QUALIFIED_EXPR = "";
     public const string IDS_INDEXER_EXPR = "";
-    public const string IDS_INDEXER_ARG_LIST = "";
     public const string IDS_INDEXER_ARG = "";
     public const string IDS_APP_EXPR = "";
     public const string IDS_QUOTE_EXPR = "";
@@ -63,16 +56,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_MATCH_CLAUSE_LIST_OWNER = "";
     public const string IDS_MATCH_LIKE_EXPR = "";
     public const string IDS_TRY_LIKE_EXPR = "";
-    public const string IDS_SET_EXPR = "";
     public const string IDS_CAST_EXPR = "";
     public const string IDS_TYPE_USAGE = "";
     public const string IDS_LET_OR_USE = "";
     public const string IDS_LET_OR_USE_BANG = "";
     public const string IDS_REFERENCE_NAME = "";
-    public const string IDS_EXPRESSION_REFERENCE_NAME = "";
     public const string IDS_TYPE_REFERENCE_NAME = "";
     public const string IDS_TYPE_ARGUMENT_LIST = "";
-    public const string IDS_PREFIX_APP_TYPE_ARGUMENT_LIST = "";
     public const string IDS_POSTFIX_APP_TYPE_ARGUMENT_LIST = "";
     public const string IDS_FOR_EACH_IN_CLAUSE = "";
     public const string IDS_CONDITION_OWNER_EXPR = "";
