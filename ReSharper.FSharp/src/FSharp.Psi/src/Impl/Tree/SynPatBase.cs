@@ -31,7 +31,28 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class LocalReferencePat
   {
     public override IFSharpIdentifierLikeNode NameIdentifier => ReferenceName?.Identifier;
-    public bool IsDeclaration => true;
+
+    public bool IsDeclaration
+    {
+      get
+      {
+        // todo: check other parents: e.g. parameters?
+        if (Parent is IBinding)
+          return true;
+
+        var referenceName = ReferenceName;
+        if (referenceName == null)
+          return false;
+
+        if (referenceName.Qualifier != null)
+          return false;
+
+        // todo: check starts with lower case
+        var idOffset = GetNameIdentifierRange().StartOffset.Offset;
+        return FSharpFile.GetSymbolUse(idOffset) == null;
+      }
+    }
+
     public IEnumerable<IDeclaration> Declarations => new[] {this};
 
     public override TreeTextRange GetNameIdentifierRange() =>

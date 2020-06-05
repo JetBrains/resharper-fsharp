@@ -1,5 +1,5 @@
 [<AutoOpen>]
-module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Parsing.ParseTreeUtil
+module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Parsing.FcsSyntaxTreeUtil
 
 open FSharp.Compiler
 open FSharp.Compiler.SyntaxTree
@@ -101,3 +101,9 @@ let getGeneratedAppArg (expr: SynExpr) =
     match expr with
     | SynExpr.App(_, false, func, arg, _) when func.Range.IsSynthetic -> arg
     | _ -> expr
+
+type SynArgPats with
+    member x.IsEmpty =
+        match x with
+        | Pats pats -> pats.IsEmpty
+        | NamePatPairs(idsAndPats, _) -> idsAndPats.IsEmpty

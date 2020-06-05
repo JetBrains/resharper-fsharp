@@ -86,11 +86,14 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
         newDeclaredElement.PresentationLanguage.Is<FSharpLanguage>()
 
     override x.IsLocalRename(element: IDeclaredElement) =
-        match element with
-        | :? IParametersOwnerPat as longIdentPat -> longIdentPat.IsDeclaration
-        | _ -> element :? IFSharpLocalDeclaration
+        if not (element :? IFSharpLocalDeclaration) then false else
 
-    override x.CheckLocalRenameSameDocument(element: IDeclaredElement) = x.IsLocalRename(element)
+        match element with
+        | :? INamedPat as namedPat -> namedPat.IsDeclaration
+        | _ -> true
+
+    override x.CheckLocalRenameSameDocument(element: IDeclaredElement) =
+        x.IsLocalRename(element)
 
     override x.GetSecondaryElements(element: IDeclaredElement, newName) =
         match element with
@@ -182,7 +185,7 @@ type FSharpAtomicRenamesFactory() =
     override x.CheckRenameAvailability(element: IDeclaredElement) =
         match element with
         | :? FSharpGeneratedMemberBase -> RenameAvailabilityCheckResult.CanNotBeRenamed
-        | :? IParametersOwnerPat as pat when not pat.IsDeclaration -> RenameAvailabilityCheckResult.CanNotBeRenamed
+        | :? INamedPat as pat when not pat.IsDeclaration -> RenameAvailabilityCheckResult.CanNotBeRenamed
 
         | :? IFSharpDeclaredElement as fsElement when fsElement.SourceName = SharedImplUtil.MISSING_DECLARATION_NAME ->
             RenameAvailabilityCheckResult.CanNotBeRenamed

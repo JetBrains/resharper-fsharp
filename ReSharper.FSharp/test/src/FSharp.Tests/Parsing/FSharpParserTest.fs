@@ -39,7 +39,11 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Type decl - Attributes 01``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Attributes 02``() = x.DoNamedTest()
-    
+
+    [<Test>] member x.``Type decl - Let binding - Function 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Let binding - Value 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Let binding - Value 02 - Upper``() = x.DoNamedTest()
+
     [<Test>] member x.``Type decl - Enum 01 - With first bar``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Enum 02 - Without first bar``() = x.DoNamedTest()
 
@@ -320,6 +324,13 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Pattern - Named args 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Named args 02 - Multiple``() = x.DoNamedTest()
+
+    [<Test>] member x.``Pattern - Reference 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Reference 02 - Upper``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Reference 03 - Qualified``() = x.DoNamedTest()
+
+    [<Test>] member x.``Pattern - Parameters owner 01``() = x.DoNamedTest()
+    [<Test>] member x.``Pattern - Parameters owner 02 - Qualified``() = x.DoNamedTest()
 
     [<Test>] member x.``Record field 01 - Attribute``() = x.DoNamedTest()
 

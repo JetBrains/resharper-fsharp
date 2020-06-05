@@ -413,8 +413,11 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                 | lid ->
                     x.ProcessReferenceName(lid)
 
-                x.ProcessPatternParams(args, isLocal || isTopLevelPat, false)
-                if isLocal then ElementType.LOCAL_PARAMETERS_OWNER_PAT else ElementType.TOP_PARAMETERS_OWNER_PAT
+                if args.IsEmpty then
+                    if isLocal then ElementType.LOCAL_REFERENCE_PAT else ElementType.TOP_REFERENCE_PAT
+                else
+                    x.ProcessPatternParams(args, isLocal || isTopLevelPat, false)
+                    if isLocal then ElementType.LOCAL_PARAMETERS_OWNER_PAT else ElementType.TOP_PARAMETERS_OWNER_PAT
 
             | SynPat.Typed(pat, synType, _) ->
                 x.ProcessPat(pat, isLocal, false)
