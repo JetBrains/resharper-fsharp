@@ -46,9 +46,3 @@ type FSharpElementFactoryTest() =
             Assert.AreEqual(FSharpTokenType.UNDERSCORE, wildPat.FirstChild.GetTokenType())
             Assert.AreEqual("_", wildPat.GetText()))
         
-    [<Test>]
-    member x.``Member binding 01``() =
-        x.DoTest(fun elementFactory ->
-            use readCookie = ReadLockCookie.Create()
-            elementFactory.CreateMemberBindingExpr("memberName", [], [None; Some "param2"]) |> ignore)
-        // TODO: Assert correct values are equal, and add tests which cover remaining code paths
