@@ -61,12 +61,12 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
     let createMemberBinding bindingName typeParameters (argNames : string option list) =
         let argsSource =
             argNames
-            |> List.map(Option.defaultValue "()")
+            |> List.map(Option.defaultValue "()") // Cover the unit case
             |> String.concat " "
         let typeArgsSource =
             match typeParameters with
             | [] -> ""
-            | parameters -> sprintf "<%s>" (parameters |> String.concat ",")
+            | parameters -> sprintf "<%s>" (parameters |> List.map(sprintf "'%s") |> String.concat ",")
         let source = sprintf "type DummyType() = \n member this.%s%s %s = failwith \"todo\"" bindingName typeArgsSource argsSource
         let moduleMember = getModuleMember source
         let typeDecl = moduleMember.As<ITypeDeclarationGroup>().TypeDeclarations |> Seq.exactlyOne
@@ -155,6 +155,24 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             
         member x.CreateMemberBindingExpr(bindingName, typeParameters, argNames) : IMemberDeclaration =
             createMemberBinding bindingName typeParameters argNames
+            
+        member x.CreateInterfaceImplementation(typeReferenceName, memberDeclarations, baseIndent) : IInterfaceImplementation =
+            let memberIndent = baseIndent + typeReferenceName.FSharpFile.GetIndentSize()
+            let dummyMembers = "  member this.DummyMember() = ()" |> String.replicate (memberDeclarations.Length)
+            let source = sprintf "type DummyType() =\n  interface DummyInterface with %s" dummyMembers
+            
+            let moduleMember = getModuleMember source
+            let typeDecl = moduleMember.As<ITypeDeclarationGroup>().TypeDeclarations |> Seq.exactlyOne
+            let objectTypeDecl = typeDecl.As<IObjectTypeDeclaration>()
+            let interfaceImplementation = objectTypeDecl.TypeMembers.OfType<IInterfaceImplementation>() |> Seq.exactlyOne
+            
+            ModificationUtil.ReplaceChild(interfaceImplementation.TypeName, typeReferenceName) |> ignore
+            for dummyMember, realMember in Seq.zip interfaceImplementation.TypeMembers memberDeclarations do 
+                let inPlaceMember = ModificationUtil.ReplaceChild(dummyMember, realMember)
+                let whitespace = ModificationUtil.ReplaceChild(inPlaceMember.PrevSibling, Whitespace(memberIndent))
+                ModificationUtil.AddChildBefore(whitespace, NewLine(typeReferenceName.GetLineEnding())) |> ignore
+            
+            interfaceImplementation
 
         member x.CreateConstExpr(text) =
             getExpression text :?> _
