@@ -1,8 +1,11 @@
+using System.Collections.Generic;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
+using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
@@ -54,5 +57,27 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     IFSharpReferenceOwner IFSharpReferenceOwner.SetName(string name) =>
       FSharpImplUtil.SetName(this, name);
+
+    public bool IsQualified => QualifierReferenceName != null;
+    public FSharpSymbolReference QualifierReference => QualifierReferenceName?.Reference;
+
+    public IList<string> Names
+    {
+      get
+      {
+        var qualifierReferenceName = QualifierReferenceName;
+        if (qualifierReferenceName == null)
+          return new[] {SourceName};
+
+        var names = qualifierReferenceName.Names.AsList();
+        names.Add(SourceName);
+        return names;
+      }
+    }
+
+    public void SetQualifier(IClrDeclaredElement declaredElement)
+    {
+      // todo
+    }
   }
 }

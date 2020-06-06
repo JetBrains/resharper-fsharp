@@ -27,4 +27,9 @@ type ImportTypeTest() =
     [<Test>] member x.``Type arguments - Count 01``() = x.DoNamedTest()
     [<Test>] member x.``Module name - Escaped 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Qualifiers - Expr - Imported 01``() = x.DoNamedTest()
+    [<Test>] member x.``Qualifiers - Expr - Imported 02 - Nested``() = x.DoNamedTest()
+    [<Test>] member x.``Qualifiers - Expr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Qualifiers - Expr 02 - Nested``() = x.DoNamedTest()
+
     [<Test; NotAvailable>] member x.``Not available 01 - Open``() = x.DoNamedTest()

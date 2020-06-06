@@ -10,7 +10,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     AutoOpen = 2,
   }
 
-  public interface IModule : IFSharpTypeElement
+  public interface IFSharpModule : IFSharpTypeElement
   {
     bool IsAnonymous { get; }
     bool IsAutoOpen { get; }

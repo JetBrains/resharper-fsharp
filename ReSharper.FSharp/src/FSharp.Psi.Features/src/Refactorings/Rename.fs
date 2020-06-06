@@ -113,7 +113,7 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
         | :? IGeneratedConstructorParameterOwner as parameterOwner ->
             [| parameterOwner.GetParameter() :> IDeclaredElement |] :> _
 
-        | :? IModule -> EmptyArray.Instance :> _
+        | :? IFSharpModule -> EmptyArray.Instance :> _
 
         | :? IFSharpTypeElement as fsTypeElement ->
             match fsTypeElement.GetModuleToUpdateName(newName) with
@@ -190,7 +190,7 @@ type FSharpAtomicRenamesFactory() =
         | :? IFSharpDeclaredElement as fsElement when fsElement.SourceName = SharedImplUtil.MISSING_DECLARATION_NAME ->
             RenameAvailabilityCheckResult.CanNotBeRenamed
 
-        | :? IModule as fsModule when fsModule.IsAnonymous ->
+        | :? IFSharpModule as fsModule when fsModule.IsAnonymous ->
             RenameAvailabilityCheckResult.CanNotBeRenamed // todo: needs a special implementation
 
         | _ ->

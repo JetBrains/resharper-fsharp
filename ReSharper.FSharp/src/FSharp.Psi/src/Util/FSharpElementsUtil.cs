@@ -58,7 +58,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
           // Happens when there are an exception and a module with the same name.
           // It's now allowed, but we want keep resolve working where possible.
           if (typeElement is IFSharpDeclaredElement)
-            return isModule == typeElement is IModule;
+            return isModule == typeElement is IFSharpModule;
 
           return true;
         });

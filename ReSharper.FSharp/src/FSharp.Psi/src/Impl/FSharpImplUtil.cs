@@ -667,7 +667,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     public static bool IsModule(this ITypeElement typeElement) =>
-      typeElement is IModule ||
+      typeElement is IFSharpModule ||
       typeElement is ICompiledElement compiledElement && compiledElement.IsCompiledModule();
 
     public static ModuleMembersAccessKind GetAccessType([NotNull] this ITypeElement typeElement)
@@ -675,7 +675,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       Assertion.Assert(typeElement.IsModule(), "typeElement.IsModule()");
       return typeElement switch
       {
-        IModule module => module.AccessKind,
+        IFSharpModule module => module.AccessKind,
         ICompiledElement _ =>
           typeElement.HasRequireQualifiedAccessAttribute()
             ? ModuleMembersAccessKind.RequiresQualifiedAccess
@@ -683,6 +683,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         _ => throw new InvalidOperationException()
       };
     }
+
+    public static bool RequiresQualifiedAccess([NotNull] this ITypeElement typeElement) => 
+      typeElement.GetAccessType() == ModuleMembersAccessKind.RequiresQualifiedAccess;
 
     public static IFSharpExpression IgnoreParentParens([NotNull] this IFSharpExpression fsExpr)
     {
@@ -779,6 +782,23 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return result;
     }
 
+    public static IList<string> GetNames([CanBeNull] this IReferenceExpr referenceExpr)
+    {
+      var result = new List<string>();
+      while (referenceExpr != null)
+      {
+        var shortName = referenceExpr.ShortName;
+        if (shortName.IsEmpty() || shortName == SharedImplUtil.MISSING_DECLARATION_NAME)
+          break;
+
+        result.Insert(0, shortName);
+        referenceExpr = referenceExpr.Qualifier as IReferenceExpr;
+      }
+
+      return result;
+    }
+
+    
     public static ModuleMembersAccessKind GetAccessType([NotNull] this IDeclaredModuleDeclaration moduleDeclaration)
     {
       var autoOpen = false;

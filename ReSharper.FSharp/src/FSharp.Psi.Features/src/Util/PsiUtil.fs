@@ -1,5 +1,5 @@
 [<AutoOpen>]
-module JetBrains.ReSharper.Plugins.FSharp.Psi.Util.PsiUtil
+module JetBrains.ReSharper.Plugins.FSharp.Psi.PsiUtil
 
 open FSharp.Compiler.Range
 open JetBrains.Application.Settings
@@ -60,15 +60,6 @@ type IFile with
         x.GetNode<'T>(documentRange.StartOffset)
 
 type IFSharpTreeNode with
-    member x.FSharpLanguageService =
-        x.Language.LanguageService().As<IFSharpLanguageService>()
-
-    member x.CreateElementFactory() =
-        x.FSharpLanguageService.CreateElementFactory(x.GetPsiModule())
-
-    member x.CheckerService =
-        x.FSharpFile.CheckerService
-    
     member x.GetLineEnding() =
         let fsFile = x.FSharpFile
         fsFile.DetectLineEnding(fsFile.GetPsiServices()).GetPresentation()
