@@ -7,4 +7,5 @@ module Module1 =
 namespace N2
 
 module Nested =
-    type T{caret} with
+    match null with
+    | :? T{caret} -> ()

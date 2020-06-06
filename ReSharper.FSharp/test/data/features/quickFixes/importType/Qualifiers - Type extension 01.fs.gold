@@ -1,4 +1,4 @@
-namespace Ns1
+﻿namespace Ns1
 
 [<RequireQualifiedAccess>]
 module Module1 =
@@ -6,5 +6,7 @@ module Module1 =
 
 namespace N2
 
+open Ns1
+
 module Nested =
-    type T{caret} with
+    type Module1.T{caret} with

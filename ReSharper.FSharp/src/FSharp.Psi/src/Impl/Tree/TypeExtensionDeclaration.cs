@@ -75,9 +75,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       }
     }
 
-    public void SetQualifier(IClrDeclaredElement declaredElement)
-    {
-      // todo
-    }
+    public void SetQualifier(IClrDeclaredElement declaredElement) => 
+      this.SetQualifier(this.CreateElementFactory().CreateTypeReferenceName, declaredElement);
   }
 }

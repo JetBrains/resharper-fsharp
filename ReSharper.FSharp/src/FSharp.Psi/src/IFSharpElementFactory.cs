@@ -8,18 +8,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     IWildPat CreateWildPat();
 
     IParenExpr CreateParenExpr();
-    IParenExpr CreateParenExpr(IFSharpExpression fsExpr);
-
     IConstExpr CreateConstExpr(string text);
 
-    IPrefixAppExpr CreateAppExpr(bool addSpace);
     IPrefixAppExpr CreateAppExpr(string funcName, IFSharpExpression arg);
     IPrefixAppExpr CreateAppExpr(IFSharpExpression funExpr, IFSharpExpression argExpr, bool addSpace);
     IFSharpExpression CreateBinaryAppExpr(string opName, IFSharpExpression left, IFSharpExpression right);
     IFSharpExpression CreateSetExpr(IFSharpExpression left, IFSharpExpression right);
 
     IFSharpExpression CreateExpr(string expr);
-    IFSharpExpression CreateReferenceExpr(string expr);
+    IReferenceExpr CreateReferenceExpr(string expr);
 
     ILetOrUseExpr CreateLetBindingExpr(string bindingName);
     ILetModuleDecl CreateLetModuleDecl(string bindingName);
@@ -33,7 +30,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     IForEachExpr CreateForEachExpr(IFSharpExpression expr);
 
     IReferenceExpr AsReferenceExpr(ITypeReferenceName typeReference);
-    
+
+    IExpressionReferenceName CreateExpressionReferenceName(string referenceName);
+    ITypeReferenceName CreateTypeReferenceName(string referenceName);
+
     IAttributeList CreateEmptyAttributeList();
     IAttribute CreateAttribute(string attrName);
   }

@@ -7,7 +7,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.CodeStyle
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Modules
@@ -58,11 +57,6 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         let newExpr = getExpression source
         newExpr.As<IParenExpr>().InnerExpression.As<ILetOrUseExpr>()
 
-    let createParenExpr (expr: IFSharpExpression) =
-        let parenExpr = getExpression "(())" :?> IParenExpr
-        ModificationUtil.ReplaceChild(parenExpr.InnerExpression, expr.Copy()) |> ignore
-        parenExpr
-    
     let createAttributeList attrName: IAttributeList =
             let source = sprintf "[<%s>] ()" attrName
             let doDecl = getDoDecl source
@@ -120,9 +114,6 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             addParensIfNeeded newArg |> ignore
             newExpr
 
-        member x.CreateAppExpr(addSpace) =
-            createAppExpr addSpace
-
         member x.CreateAppExpr(funExpr, argExpr, addSpace) =
             let appExpr = createAppExpr addSpace
             appExpr.SetFunctionExpression(funExpr.Copy()) |> ignore
@@ -168,9 +159,6 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
         member x.CreateParenExpr() =
             getExpression "(())" :?> _
-
-        member x.CreateParenExpr(expr) =
-            createParenExpr expr
 
         member x.AsReferenceExpr(typeReference: ITypeReferenceName) =
             getExpression (typeReference.GetText()) :?> _
@@ -221,6 +209,16 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
             expr
   
+        member x.CreateExpressionReferenceName(name) =
+            let source = sprintf "let %s = ()" name
+            let letModuleDecl = getModuleMember source :?> ILetModuleDecl
+            letModuleDecl.Bindings.[0].HeadPattern.As<IReferencePat>().ReferenceName
+
+        member x.CreateTypeReferenceName(name) =
+            let source = sprintf "type T = %s" name
+            let typeDeclarationGroup = getModuleMember source :?> ITypeDeclarationGroup
+            let typeAbbreviation = typeDeclarationGroup.TypeDeclarations.[0].As<ITypeAbbreviationDeclaration>()
+            typeAbbreviation.AbbreviatedType.As<INamedTypeUsage>().ReferenceName
 
         member x.CreateEmptyAttributeList() =
             let attributeList = createAttributeList "Foo"

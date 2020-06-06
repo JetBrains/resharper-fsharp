@@ -2,12 +2,10 @@ using System.Collections.Generic;
 using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
-using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
@@ -98,14 +96,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       // todo: implement for existing qualifiers
       Assertion.Assert(Qualifier == null, "Qualifier == null");
-
-      // todo: type args
-      var name = FSharpReferenceBindingUtil.SuggestShortReferenceName(declaredElement, Language);
-      var delimiter = ModificationUtil.AddChildAfter(this, null, FSharpTokenType.DOT.CreateLeafElement());
-      var referenceExpr = (IReferenceExpr) this.CreateElementFactory().CreateReferenceExpr(name);
-      var qualifier = ModificationUtil.AddChildBefore(delimiter, referenceExpr);
-
-      FSharpReferenceBindingUtil.SetRequiredQualifiers(qualifier.Reference, declaredElement);
+      this.SetQualifier(this.CreateElementFactory().CreateReferenceExpr, declaredElement);
     }
 
     public IList<string> Names => this.GetNames();

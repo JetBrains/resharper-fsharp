@@ -278,7 +278,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                 let usageIsSourceExpr = usage == sourceExpr
                 if usageIsSourceExpr && (removeSourceExpr || contextIsSourceExpr && not isInSeqExpr) then acc else
 
-                let refExpr = elementFactory.CreateReferenceExpr(name)
+                let refExpr = elementFactory.CreateReferenceExpr(name) :> IFSharpExpression
                 let replacedUsage = ModificationUtil.ReplaceChild(usage, refExpr)
 
                 let sourceExpr =

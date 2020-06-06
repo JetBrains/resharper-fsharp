@@ -741,17 +741,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     }
 
     [NotNull]
-    public static string GetQualifiedName([NotNull] this IReferenceName referenceName)
-    {
-      var qualifier = referenceName.Qualifier;
-      var shortName = referenceName.ShortName;
-
-      return qualifier == null
-        ? shortName
-        : qualifier.QualifiedName + "." + shortName;
-    }
-
-    [NotNull]
     public static string GetQualifiedName([CanBeNull] IReferenceName qualifier,
       [CanBeNull] IFSharpIdentifier identifier)
     {
@@ -764,22 +753,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
       return identifier != null
         ? qualifier.QualifiedName + "." + identifier.Name
         : qualifier.QualifiedName;
-    }
-
-    public static IList<string> GetNames([CanBeNull] this IReferenceName referenceName)
-    {
-      var result = new List<string>();
-      while (referenceName != null)
-      {
-        var shortName = referenceName.ShortName;
-        if (shortName.IsEmpty() || shortName == SharedImplUtil.MISSING_DECLARATION_NAME)
-          break;
-
-        result.Insert(0, shortName);
-        referenceName = referenceName.Qualifier;
-      }
-
-      return result;
     }
 
     public static IList<string> GetNames([CanBeNull] this IReferenceExpr referenceExpr)
@@ -818,25 +791,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
         : ModuleMembersAccessKind.Normal;
     }
 
-    [CanBeNull]
-    public static IReferenceName GetFirstQualifier([NotNull] this IReferenceName referenceName)
-    {
-      var qualifier = referenceName.Qualifier;
-      while (qualifier != null)
-      {
-        referenceName = qualifier;
-        qualifier = referenceName.Qualifier;
-      }
-
-      return referenceName;
-    }
-
-    public static IReferenceName GetFirstName([NotNull] this IReferenceName referenceName)
-    {
-      var firstQualifier = referenceName.GetFirstQualifier();
-      return firstQualifier ?? referenceName;
-    }
-    
     public static IList<ITypeParameter> GetAllTypeParametersReversed(this ITypeElement typeElement) =>
       typeElement.GetAllTypeParameters().ResultingList().Reverse();
   }
