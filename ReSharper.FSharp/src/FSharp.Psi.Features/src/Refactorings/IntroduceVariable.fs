@@ -133,7 +133,10 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         contextExpr :?> _
 
     let getContextDeclaration (contextExpr: IFSharpExpression): IModuleMember =
-        let letDecl = LetModuleDeclNavigator.GetByBinding(BindingNavigator.GetByExpression(contextExpr))
+        let binding = BindingNavigator.GetByExpression(contextExpr)
+        if isNull binding || binding.HeadPattern :? IParametersOwnerPat then null else
+
+        let letDecl = LetModuleDeclNavigator.GetByBinding(binding)
         if isNotNull letDecl then letDecl :> _ else
 
         let doDecl = DoNavigator.GetByExpression(contextExpr)
