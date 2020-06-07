@@ -23,12 +23,12 @@ open JetBrains.Util
 let [<Literal>] RiderTooltipSeparator = "_RIDER_HORIZONTAL_LINE_TOOLTIP_SEPARATOR_"
 
 [<SolutionComponent>]
-type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocService: FSharpXmlDocService) =
+type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocService: FSharpXmlDocService, reactorMonitor) =
     inherit IdentifierTooltipProvider<FSharpLanguage>(lifetime, solution, presenter)
 
     let [<Literal>] opName = "FSharpIdentifierTooltipProvider"
 
-    static member GetFSharpToolTipText(userOpName: string, checkResults: FSharpCheckFileResults, token: FSharpIdentifierToken) =
+    static member GetFSharpToolTipText(reactorMonitor: IFcsReactorMonitor, userOpName: string, checkResults: FSharpCheckFileResults, token: FSharpIdentifierToken) =
         // todo: fix getting qualifiers
         let tokenNames = [token.Name]
 
@@ -37,8 +37,10 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
         let lineText = sourceFile.Document.GetLineText(coords.Line)
         use cookie = CompilationContextCookie.GetOrCreate(sourceFile.GetPsiModule().GetContextFromModule())
 
+        use op = reactorMonitor.MonitorOperation userOpName
+
         // todo: provide tooltip for #r strings in fsx, should pass String tag
-        let getTooltip = checkResults.GetStructuredToolTipText(int coords.Line + 1, int coords.Column, lineText, tokenNames, FSharpTokenTag.Identifier, userOpName)
+        let getTooltip = checkResults.GetStructuredToolTipText(int coords.Line + 1, int coords.Column, lineText, tokenNames, FSharpTokenTag.Identifier, op.OperationName)
         getTooltip.RunAsTask()
 
     override x.GetTooltip(highlighter) =
@@ -67,7 +69,7 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
         | Some results ->
 
         let result = List()
-        let (FSharpToolTipText layouts) = FSharpIdentifierTooltipProvider.GetFSharpToolTipText(opName, results.CheckResults, token)
+        let (FSharpToolTipText layouts) = FSharpIdentifierTooltipProvider.GetFSharpToolTipText(reactorMonitor, opName, results.CheckResults, token)
         
         layouts |> List.iter (function
             | FSharpStructuredToolTipElement.None
