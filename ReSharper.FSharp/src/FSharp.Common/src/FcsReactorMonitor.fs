@@ -56,8 +56,7 @@ type FcsReactorMonitor
     let hideDelay = TimeSpan.FromSeconds 0.5
 
     /// How long an operation must be running for before a stack trace of the enqueuing thread is dumped
-    /// TODO: change to 10.0 before merging!
-    let dumpStackDelay = TimeSpan.FromSeconds 1.0
+    let dumpStackDelay = TimeSpan.FromSeconds 10.0
 
     let mutable slowOperationTimer = null
     let isReactorBusy = new Property<bool>("isReactorBusy")
