@@ -33,12 +33,6 @@ module MonitoredReactorOperation =
 type IFcsReactorMonitor =
     abstract MonitorOperation : opName: string -> IMonitoredReactorOperation
 
-type private TrackedOperation =
-    {
-        StackTrace : StackTrace
-        OpName : string
-    }
-
 [<SolutionComponent>]
 type FcsReactorMonitor
         (lifetime: Lifetime, backgroundTaskHost: RiderBackgroundTaskHost, threading: IThreading,
