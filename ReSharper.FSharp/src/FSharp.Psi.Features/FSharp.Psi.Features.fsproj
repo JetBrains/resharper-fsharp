@@ -153,6 +153,10 @@
     <Compile Include="src\Intentions\SetNameAction.fs" />
     <Compile Include="src\Intentions\LetToUseAction.fs" />
     <Compile Include="src\Intentions\RenameFileToMatchTypeNameAction.fs" />
+    <Compile Include="src\Injected\FSharpLiteralInjectionTarget.fs" />
+    <Compile Include="src\Injected\FSharpInjectionProvider.fs" />
+    <Compile Include="src\Injected\FSharpRegexNodeProvider.fs" />
+    <Compile Include="src\Injected\RegExpPsiProvider.fs" />
     <ErrorsGen Include="src\Daemon\Highlightings\Errors.xml">
       <Mode>QUICKFIX</Mode>
       <Namespace>JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes</Namespace>

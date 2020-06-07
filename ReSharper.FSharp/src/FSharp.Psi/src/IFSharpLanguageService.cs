@@ -1,13 +1,12 @@
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
-using JetBrains.ReSharper.Psi;
-using JetBrains.ReSharper.Psi.Tree;
+using JetBrains.DocumentModel;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
+using JetBrains.ReSharper.Psi.Modules;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi
 {
   public interface IFSharpLanguageService
   {
-    IFSharpArgumentsOwner GetArgumentsOwner(IFSharpExpression fsExpr);
-    IParameter GetMatchingParameter(IFSharpExpression fsExpr);
-    IParameter GetNamedArg(IFSharpExpression fsExpr);
+    IFSharpParser CreateParser(IDocument document);
+    IFSharpElementFactory CreateElementFactory(IPsiModule psiModule);
   }
 }
