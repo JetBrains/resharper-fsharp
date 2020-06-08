@@ -1120,7 +1120,6 @@ interface fSharpTypeMemberDeclaration:
   interfaceImplementation |
   abstractSlot |
   memberDeclaration |
-  typeLetBindings |
   valField |
   autoProperty |
   letModuleDecl |
@@ -1156,12 +1155,11 @@ interfaceImplementation:
 
 
 otherTypeMember: fakeSeparator;
-typeLetBindings: fakeSeparator;
 
-implicitConstructorDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
-  get { methodName="Parameters" path=<implicitConstructorDeclaration:PARAM_GROUP/memberParamDeclarationGroup:PARAMETER> };
-}:
-  memberParamDeclarationGroup<PARAM_GROUP, ParameterGroup>
+implicitConstructorDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
+  accessModifier{ACCESS_MODIFIER, AccessModifier}?
+  memberParamsDeclaration<PARAMETERS, Parameters>
   ctorSelfId<SELF_ID, SelfIdentifier>?;
 
 interface selfId:
@@ -1175,10 +1173,16 @@ ctorSelfId options { stubBase="LocalDeclarationBase"; }:
 memberSelfId options { stubBase="LocalDeclarationBase"; }:
   IDENTIFIER<IDENTIFIER, Identifier>;  
 
-memberConstructorDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; }:
+memberConstructorDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
+  get { methodName="Expression" path=<memberConstructorDeclaration:CHAMELEON_EXPR/chameleonExpression:EXPR> };
+}:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
+  accessModifier{ACCESS_MODIFIER, AccessModifier}?
   NEW<NEW, NewKeyword>
-  localDeclaration<PARAMETER, Parameters>* fakeSeparator
-  ctorSelfId<SELF_ID, SelfIdentifier>?;
+  memberParamsDeclaration<PARAMETERS, Parameters>
+  ctorSelfId<SELF_ID, SelfIdentifier>?
+  EQUALS<FSHARP_EQUALS, EqualsToken>
+  chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>;
 
 
 
@@ -1186,7 +1190,6 @@ memberConstructorDeclaration options { stubBase="FSharpProperTypeMemberDeclarati
 
 memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<memberDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfMethodList:TYPE_PARAMETER> };
-  get { methodName="Parameters" path=<memberDeclaration:PARAM_GROUP/memberParamDeclarationGroup:PARAMETER> };
   get { methodName="Attributes" path=<memberDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
   get { methodName="Expression" path=<memberDeclaration:CHAMELEON_EXPR/chameleonExpression:EXPR> };
 }:
@@ -1202,7 +1205,7 @@ memberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } 
   identOrOpName{IDENTIFIER, Identifier}
   typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
   (
-    memberParamDeclarationGroup<PARAM_GROUP, ParameterGroups>*
+    memberParamsDeclaration<PARAMETERS, Parameters>
     EQUALS<FSHARP_EQUALS, EqualsToken>
     chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>
   |
@@ -1226,7 +1229,7 @@ abstractSlot options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extra
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   IDENTIFIER<IDENTIFIER, Identifier>
   typeParameterOfMethodList<TYPE_PARAMETERS_LIST, TypeParameterList>?
-  memberParamDeclaration<PARAMETER, Parameters>*;
+  memberParamsDeclaration<PARAMETERS, Parameters>;
 
 valField options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
   get { methodName="Attributes" path=<valField:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
@@ -1256,24 +1259,11 @@ accessorsNamesClause:
 
 accessorDeclaration:
   IDENTIFIER<IDENTIFIER, Identifier>
-  memberParamDeclaration<PARAMETER, Parameters>*
+  memberParamsDeclaration<PARAMETERS, Parameters>
   EQUALS<FSHARP_EQUALS, EqualsToken>
   chameleonExpression<CHAMELEON_EXPR, BodyExpression>;
 
-
-memberParamDeclarationGroup:
-  (
-    memberParamDeclarationList
-  |
-    LPAREN
-    memberParamDeclarationList
-    RPAREN
-  );
-  
-private memberParamDeclarationList:
-  LIST memberParamDeclaration<PARAMETER, Parameters> SEP COMMA<FSHARP_COMMA, Commas>;
-
-memberParamDeclaration:
+memberParamsDeclaration:
   fSharpPattern<PATTERN, Pattern>;
 
 

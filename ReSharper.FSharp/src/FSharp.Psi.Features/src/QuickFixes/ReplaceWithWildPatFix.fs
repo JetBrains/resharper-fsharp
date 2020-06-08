@@ -28,7 +28,7 @@ type ReplaceWithWildPatFix(pat: INamedPat) =
         let node = skipIntermediatePatParents pat |> getParent
         node :? IBinding ||
         node :? IMatchClause ||
-        node :? IMemberParamDeclaration && node.Parent :? IMemberDeclaration // todo: check this check
+        node :? IMemberParamsDeclaration && (node.Parent :? IMemberDeclaration || node.Parent :? IMemberConstructorDeclaration)
 
     override x.ExecutePsiTransaction _ =
         use writeLock = WriteLockCookie.Create(pat.IsPhysical())

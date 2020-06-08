@@ -1,0 +1,4 @@
+﻿module Module
+
+type T(zzz: int) =
+    let b = zzz

@@ -14,9 +14,10 @@ IFSharpImplFile
       IClassDeclaration
         FSharpIdentifierToken(type:IDENTIFIER, text:T)
         IImplicitConstructorDeclaration
-          IMemberParamDeclarationGroup
-            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+          IMemberParamsDeclaration
+            IParenPat
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         NewLine(type:NEW_LINE, text:\n) spaces:"\n"

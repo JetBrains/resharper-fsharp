@@ -50,7 +50,7 @@ IFSharpImplFile
                 FSharpIdentifierToken(type:IDENTIFIER, text:x)
               FSharpTokenType+DotTokenElement(type:DOT, text:.)
               FSharpIdentifierToken(type:IDENTIFIER, text:Dispose)
-              IMemberParamDeclaration
+              IMemberParamsDeclaration
                 IParenPat
                   IConstPat
                     FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
