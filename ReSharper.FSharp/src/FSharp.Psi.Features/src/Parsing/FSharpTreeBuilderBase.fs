@@ -562,6 +562,10 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         | SynType.Var(typeParameter, _) ->
             x.ProcessTypeParameter(typeParameter)
 
+        | SynType.Anon _ ->
+            // Produced on error
+            ()
+
         | _ -> failwithf "unexpected type: %O" synType
 
     member x.ProcessType(TypeRange range as synType) =

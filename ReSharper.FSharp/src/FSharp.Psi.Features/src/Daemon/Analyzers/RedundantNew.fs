@@ -14,6 +14,8 @@ type RedundantNewAnalyzer() =
 
     override x.Run(newExpr, _, consumer) =
         let typeName = newExpr.TypeName
+        if isNull typeName then () else
+
         let resolveResult = typeName.Reference.Resolve()
         match resolveResult.DeclaredElement.As<ITypeElement>() with
         | null -> ()
