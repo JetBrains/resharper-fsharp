@@ -23,12 +23,17 @@ type ReplaceWithWildPatFix(pat: INamedPat) =
     override x.IsAvailable _ =
         isValid pat &&
 
-        if pat.IgnoreParentParens().Parent :? IAttribPat then false else
+        let pat = pat.IgnoreParentParens()
+        if isNotNull (AttribPatNavigator.GetByPattern(pat)) then false else
+
+        let typedPat = TypedPatNavigator.GetByPattern(pat).IgnoreParentParens()
+        if isNotNull (AttribPatNavigator.GetByPattern(typedPat)) then false else
 
         let node = skipIntermediatePatParents pat |> getParent
         node :? IBinding ||
         node :? IMatchClause ||
-        node :? IMemberParamsDeclaration && (node.Parent :? IMemberDeclaration || node.Parent :? IMemberConstructorDeclaration)
+        node :? IMemberParamsDeclaration &&
+                (node.Parent :? IMemberDeclaration || node.Parent :? IMemberConstructorDeclaration)
 
     override x.ExecutePsiTransaction _ =
         use writeLock = WriteLockCookie.Create(pat.IsPhysical())
