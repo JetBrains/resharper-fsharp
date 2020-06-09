@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 
+open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Highlightings
 
@@ -29,3 +30,17 @@ type IdentifierHighlightingTest() =
     [<Test>] member x.``Byrefs 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Union case 01``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Extension members 01``() = x.DoNamedTest()
+    
+    [<TestReferences("System", "System.Core")>]
+    [<Test>] member x.``Extension members 02``() = x.DoNamedTest()    
+    
+    [<TestReferences("System")>]
+    [<Test>] member x.``Functions 01``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Functions 02``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Computation expressions``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Units of measure``() = x.DoNamedTest()

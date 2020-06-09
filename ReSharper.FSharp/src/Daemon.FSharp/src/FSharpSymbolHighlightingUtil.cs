@@ -33,6 +33,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
       if (entity.IsFSharpRecord)
         return FSharpHighlightingAttributeIdsModule.Record;
 
+      if (entity.IsMeasure)
+        return FSharpHighlightingAttributeIdsModule.UnitOfMeasure;
+      
       return entity.IsInterface
         ? FSharpHighlightingAttributeIdsModule.Interface
         : FSharpHighlightingAttributeIdsModule.Class;
@@ -51,9 +54,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
 
       var entity = mfv.DeclaringEntity;
       if (mfv.IsModuleValueOrMember && (entity != null && !entity.Value.IsFSharpModule || mfv.IsExtensionMember))
-        return mfv.IsProperty || mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod
-          ? FSharpHighlightingAttributeIdsModule.Property
-          : FSharpHighlightingAttributeIdsModule.Method;
+        if (mfv.IsProperty || mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod)
+          return mfv.IsExtensionMember
+            ? FSharpHighlightingAttributeIdsModule.ExtensionProperty
+            : FSharpHighlightingAttributeIdsModule.Property;
+        else
+          return mfv.IsExtensionMember
+            ? FSharpHighlightingAttributeIdsModule.ExtensionMethod
+            : FSharpHighlightingAttributeIdsModule.Method;
 
       if (mfv.LiteralValue != null)
         return FSharpHighlightingAttributeIdsModule.Literal;
@@ -61,11 +69,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
       if (mfv.IsActivePattern)
         return FSharpHighlightingAttributeIdsModule.ActivePatternCase;
 
-      if (mfv.IsMutable || mfv.IsRefCell())
-        return FSharpHighlightingAttributeIdsModule.MutableValue;
-
       if (IsMangledOpName(mfv.LogicalName))
         return FSharpHighlightingAttributeIdsModule.Operator;
+
+      if (mfv.FullType.IsFunctionType || mfv.IsTypeFunction)
+        return mfv.IsMutable
+          ? FSharpHighlightingAttributeIdsModule.MutableFunction
+          : FSharpHighlightingAttributeIdsModule.Function;
+
+      if (mfv.IsMutable || mfv.IsRefCell())
+        return FSharpHighlightingAttributeIdsModule.MutableValue;
 
       var fsType = mfv.FullType;
       if (fsType.HasTypeDefinition && fsType.TypeDefinition is var mfvTypeEntity && mfvTypeEntity.IsByRef)
