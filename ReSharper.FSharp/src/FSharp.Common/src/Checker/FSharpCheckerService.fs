@@ -60,6 +60,7 @@ type FSharpCheckerService
             if checker.IsValueCreated then
                 checker.Value.InvalidateAll())
 
+    member val FcsReactorMonitor = Unchecked.defaultof<IFcsReactorMonitor> with get, set
     member val FcsProjectProvider = Unchecked.defaultof<IFcsProjectProvider> with get, set
 
     member x.Checker = checker.Value
@@ -98,8 +99,7 @@ type FSharpCheckerService
         let source = FSharpCheckerService.getSourceText file.Document
         logger.Trace("ParseAndCheckFile: start {0}, {1}", path, opName)
 
-        let reactorMonitor = file.GetSolution().GetComponent<IFcsReactorMonitor>()
-        use op = reactorMonitor.MonitorOperation opName
+        use op = x.FcsReactorMonitor.MonitorOperation opName
 
         // todo: don't cancel the computation when file didn't change
         match x.Checker.ParseAndCheckDocument(path, source, options, allowStaleResults, op.OperationName).RunAsTask() with
@@ -179,3 +179,12 @@ type IFcsProjectProvider =
 type IScriptFcsProjectProvider =
     abstract GetScriptOptions: IPsiSourceFile -> FSharpProjectOptions option
     abstract GetScriptOptions: FileSystemPath * string -> FSharpProjectOptions option
+
+
+type IMonitoredReactorOperation =
+    inherit IDisposable
+    abstract OperationName : string
+
+
+type IFcsReactorMonitor =
+    abstract MonitorOperation : opName: string -> IMonitoredReactorOperation

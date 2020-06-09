@@ -6,20 +6,15 @@ open System.Diagnostics
 open System.IO
 open System.Text.RegularExpressions
 open System.Threading
-open JetBrains.Application.Environment
-open JetBrains.Application.Environment.Helpers
 open JetBrains.Application.Threading
 open JetBrains.DataFlow
 open JetBrains.Diagnostics
 open JetBrains.Lifetimes
 open JetBrains.Platform.RdFramework.Util
 open JetBrains.ProjectModel
+open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Host.Features.BackgroundTasks
 open JetBrains.Util
-
-type IMonitoredReactorOperation =
-    inherit IDisposable
-    abstract OperationName : string
 
 [<RequireQualifiedAccess>]
 module MonitoredReactorOperation =
@@ -30,13 +25,10 @@ module MonitoredReactorOperation =
         }
 
 
-type IFcsReactorMonitor =
-    abstract MonitorOperation : opName: string -> IMonitoredReactorOperation
-
 [<SolutionComponent>]
 type FcsReactorMonitor
         (lifetime: Lifetime, backgroundTaskHost: RiderBackgroundTaskHost, threading: IThreading,
-         configurations: RunsProducts.ProductConfigurations, logger: ILogger, solution: ISolution) as this =
+         checkerService: FSharpCheckerService, logger: ILogger, solution: ISolution) as this =
 
     inherit TraceListener("FcsReactorMonitor")
 
@@ -145,8 +137,11 @@ type FcsReactorMonitor
                 showBackgroundTask.SetValue false |> ignore))
 
         // Start listening for trace events
+        checkerService.FcsReactorMonitor <- this
         Trace.Listeners.Add(this) |> ignore
-        lifetime.OnTermination(fun () -> Trace.Listeners.Remove(this)) |> ignore
+        lifetime.OnTermination(fun () ->
+            checkerService.FcsReactorMonitor <- Unchecked.defaultof<_>
+            Trace.Listeners.Remove(this)) |> ignore
 
     override x.Write(_: string) = ()
     override x.WriteLine(message: string) = if message.StartsWith "Reactor:" then onTrace message

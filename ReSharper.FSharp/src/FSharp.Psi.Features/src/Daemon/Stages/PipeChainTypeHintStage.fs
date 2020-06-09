@@ -59,7 +59,7 @@ type PipeOperatorVisitor(sameLinePipeHints: SameLinePipeHints) =
         visitBinaryAppExpr binaryAppExpr context
         x.VisitNode(binaryAppExpr, context)
 
-type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBoundSettingsStore, reactorMonitor, daemonProcess: IDaemonProcess) =
+type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBoundSettingsStore, daemonProcess: IDaemonProcess) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
     let [<Literal>] opName = "PipeChainHighlightingProcess"
@@ -81,7 +81,7 @@ type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBou
         for token, exprToAdorn in exprs do
             if daemonProcess.InterruptFlag then raise <| OperationCanceledException()
 
-            let (FSharpToolTipText layouts) = FSharpIdentifierTooltipProvider.GetFSharpToolTipText(reactorMonitor, opName, checkResults, token)
+            let (FSharpToolTipText layouts) = FSharpIdentifierTooltipProvider.GetFSharpToolTipText(opName, checkResults, token)
 
             // The |> operator should have one overload and two type parameters
             match layouts with
@@ -138,7 +138,7 @@ type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBou
         committer.Invoke(DaemonStageResult remainingHighlightings)
 
 [<DaemonStage(StagesBefore = [| typeof<GlobalFileStructureCollectorStage> |])>]
-type PipeChainTypeHintStage(logger: ILogger, reactorMonitor: IFcsReactorMonitor) =
+type PipeChainTypeHintStage(logger: ILogger) =
     inherit FSharpDaemonStageBase()
 
     override x.IsSupported(sourceFile, processKind) =
@@ -148,4 +148,4 @@ type PipeChainTypeHintStage(logger: ILogger, reactorMonitor: IFcsReactorMonitor)
 
     override x.CreateStageProcess(fsFile, settings, daemonProcess) =
         if not (settings.GetValue(fun (key: FSharpTypeHintOptions) -> key.ShowPipeReturnTypes)) then null else
-        PipeChainHighlightingProcess(logger, fsFile, settings, reactorMonitor, daemonProcess) :> _
+        PipeChainHighlightingProcess(logger, fsFile, settings, daemonProcess) :> _
