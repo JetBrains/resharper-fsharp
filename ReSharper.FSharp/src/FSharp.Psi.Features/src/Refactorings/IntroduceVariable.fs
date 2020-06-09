@@ -120,16 +120,19 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
             expr
 
         | :? IBinaryAppExpr as binaryAppExpr when
-                binaryAppExpr.RightArgument == expr &&
+                binaryAppExpr.RightArgument == expr && isNotNull binaryAppExpr.LeftArgument ->
+            let leftArgument = binaryAppExpr.LeftArgument
 
-                let leftArgument = binaryAppExpr.LeftArgument
-                isNotNull leftArgument &&
-                leftArgument.Indent = expr.Indent &&
-
+            if leftArgument.Indent = expr.Indent && leftArgument.EndLine + docLine 1 < expr.StartLine then
                 // Don't move up from "blocks" after empty non-code line separators.
                 // todo: allow choosing scope?
-                leftArgument.EndLine + docLine 1 < expr.StartLine ->
-            expr
+                expr
+            else
+                // Try going up from the left part instead.
+                match leftArgument.IgnoreInnerParens() with
+                | :? IBinaryAppExpr as binaryAppExpr when isNotNull binaryAppExpr.RightArgument ->
+                    getExprToInsertBefore binaryAppExpr.RightArgument
+                | _ -> getExprToInsertBefore leftArgument
 
         | :? IFSharpExpression as parentExpr -> getExprToInsertBefore parentExpr
         | _ -> expr
