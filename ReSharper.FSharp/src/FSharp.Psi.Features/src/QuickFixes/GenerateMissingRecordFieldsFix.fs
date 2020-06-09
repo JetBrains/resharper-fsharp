@@ -46,13 +46,14 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
         match recordExpr.Reference with
         | null -> failwith "Could not get reference"
         | reference ->
-        
+
         let declaredElement = reference.Resolve().DeclaredElement
         isNotNull declaredElement
 
     override x.ExecutePsiTransaction(solution, _) =
         let typeElement = recordExpr.Reference.Resolve().DeclaredElement :?> ITypeElement
         Assertion.Assert(typeElement.IsRecord(), "Expecting record type")
+
         let fieldNames = typeElement.GetRecordFieldNames()
         let existingBindings = recordExpr.ExprBindings
 
