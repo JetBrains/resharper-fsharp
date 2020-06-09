@@ -16,6 +16,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.ExtensionsAPI
@@ -116,6 +117,18 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
         | :? ILetOrUseExpr as letExpr ->
             Assertion.Assert(letExpr.InExpression == expr, "letExpr.InExpression == expr")
+            expr
+
+        | :? IBinaryAppExpr as binaryAppExpr when
+                binaryAppExpr.RightArgument == expr &&
+
+                let leftArgument = binaryAppExpr.LeftArgument
+                isNotNull leftArgument &&
+                leftArgument.Indent = expr.Indent &&
+
+                // Don't move up from "blocks" after empty non-code line separators.
+                // todo: allow choosing scope?
+                leftArgument.EndLine + docLine 1 < expr.StartLine ->
             expr
 
         | :? IFSharpExpression as parentExpr -> getExprToInsertBefore parentExpr
@@ -279,7 +292,10 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                 if not (isValid usage) then acc else
 
                 let usageIsSourceExpr = usage == sourceExpr
-                if usageIsSourceExpr && (removeSourceExpr || contextIsSourceExpr && not isInSeqExpr) then acc else
+                
+                if usageIsSourceExpr && (removeSourceExpr || replaceSourceExprNode) then
+                    // Ignore this usage, it's going to be removed via replacing tree ranges later.
+                    acc else
 
                 let refExpr = elementFactory.CreateReferenceExpr(name) :> IFSharpExpression
                 let replacedUsage = ModificationUtil.ReplaceChild(usage, refExpr)
