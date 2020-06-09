@@ -3,8 +3,8 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpParensUtil
 
 open System
 open FSharp.Compiler
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree

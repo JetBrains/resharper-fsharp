@@ -29,7 +29,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_NOT_COMPILED_TYPE_DECLARATION = "";
     public const string IDS_SIMPLE_TYPE_DECLARATION = "";
     public const string IDS_HASH_DIRECTIVE = "";
-    public const string IDS_SYN_PAT = "";
+    public const string IDS_F_SHARP_PATTERN = "";
     public const string IDS_CONST_PAT = "";
     public const string IDS_F_SHARP_IDENTIFIER = "";
     public const string IDS_REFERENCE_PAT = "";

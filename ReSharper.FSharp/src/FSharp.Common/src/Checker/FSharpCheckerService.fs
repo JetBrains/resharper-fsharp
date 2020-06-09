@@ -1,7 +1,6 @@
 namespace rec JetBrains.ReSharper.Plugins.FSharp.Checker
 
 open System
-open System.Collections.Generic
 open System.Runtime.InteropServices
 open FSharp.Compiler.SourceCodeServices
 open FSharp.Compiler.Text
@@ -11,6 +10,7 @@ open JetBrains.Application
 open JetBrains.Application.Settings
 open JetBrains.DataFlow
 open JetBrains.DocumentModel
+open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services
 open JetBrains.ReSharper.Plugins.FSharp
@@ -21,10 +21,15 @@ open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
+module FSharpCheckerService =
+    let getSourceText (document: IDocument) =
+        SourceText.ofString(document.GetText())
+
+
 [<ShellComponent; AllowNullLiteral>]
 type FSharpCheckerService
-        (lifetime, logger: ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier, settingsStore: ISettingsStore,
-         settingsSchema: SettingsSchema) =
+        (lifetime: Lifetime, logger: ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier,
+         settingsStore: ISettingsStore, settingsSchema: SettingsSchema) =
 
     let checker =
         Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "20")
@@ -55,13 +60,22 @@ type FSharpCheckerService
             if checker.IsValueCreated then
                 checker.Value.InvalidateAll())
 
-    member val OptionsProvider = Unchecked.defaultof<IFSharpProjectOptionsProvider> with get, set
+    member val FcsProjectProvider = Unchecked.defaultof<IFcsProjectProvider> with get, set
+
     member x.Checker = checker.Value
 
-    member x.ParseFile(path: FileSystemPath, document: IDocument, parsingOptions: FSharpParsingOptions) =
-        let source = SourceText.ofString (document.GetText())
+    member x.ParseFile(path, document, parsingOptions, [<Optional; DefaultParameterValue(false)>] noCache: bool) =
         try
-            let parseResults = x.Checker.ParseFile(path.FullPath, source, parsingOptions).RunAsTask() 
+            let source = FSharpCheckerService.getSourceText document
+            let fullPath = getFullPath path
+
+            let parseAsync =
+                if noCache then
+                    x.Checker.ParseFileNoCache(fullPath, source, parsingOptions)
+                else
+                    x.Checker.ParseFile(fullPath, source, parsingOptions)
+
+            let parseResults = parseAsync.RunAsTask()
             Some parseResults
         with
         | OperationCanceled -> reraise()
@@ -71,17 +85,17 @@ type FSharpCheckerService
             None
 
     member x.ParseFile([<NotNull>] sourceFile: IPsiSourceFile) =
-        let parsingOptions = x.OptionsProvider.GetParsingOptions(sourceFile)
+        let parsingOptions = x.FcsProjectProvider.GetParsingOptions(sourceFile)
         x.ParseFile(sourceFile.GetLocation(), sourceFile.Document, parsingOptions)
 
     member x.ParseAndCheckFile([<NotNull>] file: IPsiSourceFile, opName,
                                [<Optional; DefaultParameterValue(false)>] allowStaleResults) =
-        match x.OptionsProvider.GetProjectOptions(file) with
+        match x.FcsProjectProvider.GetProjectOptions(file) with
         | None -> None
         | Some options ->
 
         let path = file.GetLocation().FullPath
-        let source = SourceText.ofString (file.Document.GetText())
+        let source = FSharpCheckerService.getSourceText file.Document
         logger.Trace("ParseAndCheckFile: start {0}, {1}", path, opName)
 
         // todo: don't cancel the computation when file didn't change
@@ -95,7 +109,7 @@ type FSharpCheckerService
             None
 
     member x.TryGetStaleCheckResults([<NotNull>] file: IPsiSourceFile, opName) =
-        match x.OptionsProvider.GetProjectOptions(file) with
+        match x.FcsProjectProvider.GetProjectOptions(file) with
         | None -> None
         | Some options ->
 
@@ -111,9 +125,9 @@ type FSharpCheckerService
             logger.Trace("TryGetStaleCheckResults: fail {0}, {1}", path, opName)
             None
 
-    member x.InvalidateFSharpProject(fsProject: FSharpProject) =
+    member x.InvalidateFcsProject(fcsProjectOptions: FSharpProjectOptions) =
         if checker.IsValueCreated then
-            checker.Value.InvalidateConfiguration(fsProject.ProjectOptions, false)
+            checker.Value.InvalidateConfiguration(fcsProjectOptions, false)
 
     /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.
     member x.ResolveNameAtLocation(sourceFile: IPsiSourceFile, names, coords, opName) =
@@ -137,31 +151,28 @@ type FSharpCheckerService
         x.ResolveNameAtLocation(sourceFile, names, coords, opName)
 
 
-type FSharpProject =
-    { ProjectOptions: FSharpProjectOptions
-      ParsingOptions: FSharpParsingOptions
-      FileIndices: IDictionary<FileSystemPath, int>
-      ImplFilesWithSigs: ISet<FileSystemPath> }
-
-    member x.ContainsFile(file: IPsiSourceFile) =
-        x.FileIndices.ContainsKey(file.GetLocation())
-
-
 type FSharpParseAndCheckResults = 
     { ParseResults: FSharpParseFileResults
       CheckResults: FSharpCheckFileResults }
 
 
-type IFSharpProjectOptionsProvider =
+type IFcsProjectProvider =
     abstract GetProjectOptions: IPsiSourceFile -> FSharpProjectOptions option
     abstract GetParsingOptions: IPsiSourceFile -> FSharpParsingOptions
     abstract GetFileIndex: IPsiSourceFile -> int
+
+    // Indicates if implementation file has an associated signature file.
     abstract HasPairFile: IPsiSourceFile -> bool
-    abstract Invalidate: IProject -> bool
+
+    /// Returns True when the project has been invalidated.
+    abstract InvalidateReferencesToProject: IProject -> bool
+
     abstract ModuleInvalidated: ISignal<IPsiModule>
-    abstract HasFSharpProjects: bool
+
+    /// True when any F# projects are currently known to project options provider after requesting info from FCS.
+    abstract HasFcsProjects: bool
 
 
-type IFSharpScriptProjectOptionsProvider =
+type IScriptFcsProjectProvider =
     abstract GetScriptOptions: IPsiSourceFile -> FSharpProjectOptions option
     abstract GetScriptOptions: FileSystemPath * string -> FSharpProjectOptions option

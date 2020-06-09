@@ -1,7 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Actions
 
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
-open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
+open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 

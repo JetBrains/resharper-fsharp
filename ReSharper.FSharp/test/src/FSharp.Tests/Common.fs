@@ -1,5 +1,4 @@
-[<AutoOpen>]
-module JetBrains.ReSharper.Plugins.FSharp.Tests.Common
+namespace JetBrains.ReSharper.Plugins.FSharp.Tests
 
 open System
 open System.Threading
@@ -13,7 +12,6 @@ open JetBrains.ProjectModel.MSBuild
 open JetBrains.ProjectModel.Properties.Managed
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Checker
-open JetBrains.ReSharper.Plugins.FSharp.Checker.ProjectOptions
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.TestFramework
@@ -54,34 +52,34 @@ type FSharpScriptTestAttribute() =
 
 
 [<SolutionComponent>]
-type FSharpTestProjectOptionsBuilder(checkerService, logger) =
-    inherit FSharpProjectOptionsBuilder(checkerService, logger, Mock<_>().Object)
+type TestFcsProjectBuilder(checkerService: FSharpCheckerService, logger: ILogger) =
+    inherit FcsProjectBuilder(checkerService, Mock<_>().Object, logger)
 
     override x.GetProjectItemsPaths(_, _) = [||]
 
-    interface IHideImplementation<IFSharpProjectOptionsBuilder>
+    interface IHideImplementation<FcsProjectBuilder>
 
 
 [<SolutionComponent>]
-type FSharpTestProjectOptionsProvider
-        (lifetime: Lifetime, checkerService: FSharpCheckerService, projectOptionsBuilder: IFSharpProjectOptionsBuilder,
-         scriptOptionsProvider: IFSharpScriptProjectOptionsProvider) as this =
+type TestFcsProjectProvider
+        (lifetime: Lifetime, checkerService: FSharpCheckerService, fcsProjectBuilder: FcsProjectBuilder,
+         scriptFcsProjectProvider: IScriptFcsProjectProvider) as this =
     do
-        checkerService.OptionsProvider <- this
-        lifetime.OnTermination(fun _ -> checkerService.OptionsProvider <- Unchecked.defaultof<_>) |> ignore
+        checkerService.FcsProjectProvider <- this
+        lifetime.OnTermination(fun _ -> checkerService.FcsProjectProvider <- Unchecked.defaultof<_>) |> ignore
 
     let getProjectOptions (sourceFile: IPsiSourceFile) =
-        let fsProject = projectOptionsBuilder.BuildSingleFSharpProject(sourceFile.GetProject(), sourceFile.PsiModule)
-        Some { fsProject.ProjectOptions with SourceFiles = [| sourceFile.GetLocation().FullPath |] }
+        let fcsProject = fcsProjectBuilder.BuildFcsProject(sourceFile.PsiModule, sourceFile.GetProject())
+        Some { fcsProject.ProjectOptions with SourceFiles = [| sourceFile.GetLocation().FullPath |] }
 
-    interface IHideImplementation<FSharpProjectOptionsProvider>
+    interface IHideImplementation<FcsProjectProvider>
     
-    interface IFSharpProjectOptionsProvider with
+    interface IFcsProjectProvider with
         member x.HasPairFile _ = false
 
         member x.GetProjectOptions(sourceFile) =
             if sourceFile.LanguageType.Is<FSharpScriptProjectFileType>() then
-                scriptOptionsProvider.GetScriptOptions(sourceFile) else
+                scriptFcsProjectProvider.GetScriptOptions(sourceFile) else
 
             getProjectOptions sourceFile
 
@@ -109,5 +107,5 @@ type FSharpTestProjectOptionsProvider
         member x.GetFileIndex _ = 0
         member x.ModuleInvalidated = new Signal<_>("Todo") :> _
 
-        member x.Invalidate _ = false
-        member x.HasFSharpProjects = false
+        member x.InvalidateReferencesToProject _ = false
+        member x.HasFcsProjects = false

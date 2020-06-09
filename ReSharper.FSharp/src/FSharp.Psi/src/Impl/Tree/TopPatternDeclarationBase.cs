@@ -59,7 +59,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (typeDeclaration is IFSharpTypeDeclaration)
       {
         if ((!mfv.CurriedParameterGroups.IsEmpty() || !mfv.GenericParameters.IsEmpty()) && !mfv.IsMutable)
-          return new FSharpTypePrivateMethod(this, mfv);
+          return new FSharpTypePrivateMethod(this);
 
         if (mfv.LiteralValue != null)
           return new FSharpLiteral(this);
@@ -74,8 +74,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         return new ModuleValue(this, mfv);
 
       return !mfv.IsInstanceMember && mfv.CompiledName.StartsWith("op_", StringComparison.Ordinal)
-        ? (IDeclaredElement) new FSharpSignOperator<TopPatternDeclarationBase>(this, mfv)
-        : new ModuleFunction(this, mfv);
+        ? (IDeclaredElement) new FSharpSignOperator<TopPatternDeclarationBase>(this)
+        : new ModuleFunction(this);
     }
   }
 

@@ -35,6 +35,8 @@ type FSharpGoToUsagesTest() =
     [<Test>] member x.``Anon record 02 - Type``() = x.DoNamedTest()
     [<Test>] member x.``Anon record 03 - Getter``() = x.DoNamedTest()
 
+    [<Test>] member x.``Module suffix 01 - Compiled``() = x.DoNamedTest()
+
 
 type FSharpGoToInheritorsTest() =
     inherit FSharpContextSearchTestBase("inheritors")
@@ -88,6 +90,7 @@ type FSharpGoToDeclarationTest() =
         |> Seq.filter (fun p -> p :? IGotoDeclarationProvider)
 
     [<Test>] member x.``Own member vs interface``() = x.DoNamedTest()
+    [<Test>] member x.``Ctor 01 - Modifier``() = x.DoNamedTest()
 
     [<TestReferences("Library1.dll", "Library2.dll")>]
     [<Test>] member x.``Same type from different assemblies``() = x.DoNamedTest()

@@ -11,7 +11,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
@@ -32,15 +31,15 @@ type FSharpParser(lexer: ILexer, document: IDocument, path: FileSystemPath, sour
             override x.CreateFSharpFile() =
                 x.FinishFile(x.Mark(), ElementType.F_SHARP_IMPL_FILE) }
 
-    let parseFile () =
+    let parseFile (noCache: bool) =
         use lifetimeDefinition = Lifetime.Define()
         let lifetime = lifetimeDefinition.Lifetime
 
-        let parsingOptions = checkerService.OptionsProvider.GetParsingOptions(sourceFile)
+        let parsingOptions = checkerService.FcsProjectProvider.GetParsingOptions(sourceFile)
         let defines = parsingOptions.ConditionalCompilationDefines
 
         let lexer = FSharpPreprocessedLexerFactory(defines).CreateLexer(lexer).ToCachingLexer()
-        let parseResults = checkerService.ParseFile(path, document, parsingOptions)
+        let parseResults = checkerService.ParseFile(path, document, parsingOptions, noCache)
 
         let language =
             match sourceFile with
@@ -67,8 +66,8 @@ type FSharpParser(lexer: ILexer, document: IDocument, path: FileSystemPath, sour
     static member val SandBoxPath = FileSystemPath.Parse("Sandbox.fs")
 
     interface IFSharpParser with
-        member this.ParseFSharpFile() = parseFile ()
-        member this.ParseFile() = parseFile () :> _
+        member this.ParseFSharpFile(noCache) = parseFile noCache
+        member this.ParseFile() = parseFile false :> _
 
         member this.ParseExpression(chameleonExpr: IChameleonExpression, document) =
             let document = if isNotNull document then document else chameleonExpr.GetSourceFile().Document

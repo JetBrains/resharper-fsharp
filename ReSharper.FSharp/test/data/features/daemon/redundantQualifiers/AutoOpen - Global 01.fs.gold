@@ -1,0 +1,13 @@
+﻿namespace global
+[<AutoOpen>]
+module Nested1 =
+    type T() = class end
+
+namespace Ns
+module Nested2 =
+    let t: |Nested1.|(0)T = |Nested1.|(1)T()
+
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Qualifier is redundant
+(1): ReSharper Dead Code: Qualifier is redundant

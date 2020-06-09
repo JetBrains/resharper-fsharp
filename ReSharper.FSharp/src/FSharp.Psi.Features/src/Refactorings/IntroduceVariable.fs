@@ -10,12 +10,12 @@ open JetBrains.ProjectModel.DataContext
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots
 open JetBrains.ReSharper.Feature.Services.Refactorings
 open JetBrains.ReSharper.Feature.Services.Refactorings.Specific
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.ExtensionsAPI
@@ -133,7 +133,10 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         contextExpr :?> _
 
     let getContextDeclaration (contextExpr: IFSharpExpression): IModuleMember =
-        let letDecl = LetModuleDeclNavigator.GetByBinding(BindingNavigator.GetByExpression(contextExpr))
+        let binding = BindingNavigator.GetByExpression(contextExpr)
+        if isNull binding || binding.HeadPattern :? IParametersOwnerPat then null else
+
+        let letDecl = LetModuleDeclNavigator.GetByBinding(binding)
         if isNotNull letDecl then letDecl :> _ else
 
         let doDecl = DoNavigator.GetByExpression(contextExpr)
@@ -278,7 +281,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                 let usageIsSourceExpr = usage == sourceExpr
                 if usageIsSourceExpr && (removeSourceExpr || contextIsSourceExpr && not isInSeqExpr) then acc else
 
-                let refExpr = elementFactory.CreateReferenceExpr(name)
+                let refExpr = elementFactory.CreateReferenceExpr(name) :> IFSharpExpression
                 let replacedUsage = ModificationUtil.ReplaceChild(usage, refExpr)
 
                 let sourceExpr =

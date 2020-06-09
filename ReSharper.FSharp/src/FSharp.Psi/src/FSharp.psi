@@ -98,7 +98,7 @@ namedNamespaceDeclaration options { stubBase="FSharpDeclarationBase"; }:
   REC<REC, RecKeyword>?
   (
     referenceName<REFERENCE_NAME, QualifierReferenceName>
-    DOT
+    DOT<FSHARP_DELIMITER, Delimiter>
   )?
   fSharpIdentifier<IDENTIFIER, Identifier>
   moduleMember<MODULE_MEMBER, Members>*;
@@ -118,7 +118,7 @@ namedModuleDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } 
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   (
     referenceName<REFERENCE_NAME, QualifierReferenceName>
-    DOT
+    DOT<FSHARP_DELIMITER, Delimiter>
   )?
   fSharpIdentifier<IDENTIFIER, Identifier>
   moduleMember<MODULE_MEMBER, Members>*;
@@ -164,7 +164,7 @@ topBinding extras {
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   INLINE<INLINE, InlineKeyword>?
   MUTABLE<MUTABLE, MutableKeyword>?
-  synPat<HEAD_PATTERN, HeadPattern>
+  fSharpPattern<HEAD_PATTERN, HeadPattern>
   returnTypeInfo<RETURN_INFO, ReturnTypeInfo>?
   EQUALS<EQUALS, EqualsToken>
   chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>;
@@ -175,7 +175,7 @@ localBinding extras {
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   INLINE<INLINE, InlineKeyword>?
   MUTABLE<MUTABLE, MutableKeyword>?
-  synPat<HEAD_PATTERN, HeadPattern>
+  fSharpPattern<HEAD_PATTERN, HeadPattern>
   returnTypeInfo<RETURN_INFO, ReturnTypeInfo>?
   EQUALS<EQUALS, EqualsToken>
   fSharpExpression<EXPR, Expression>;
@@ -187,7 +187,7 @@ returnTypeInfo extras {
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   typeUsage<TYPE, ReturnType>;
 
-interface synPat:
+interface fSharpPattern:
   namedPat |
   typedPat |
   attribPat |
@@ -238,21 +238,21 @@ localParametersOwnerPat options { stubBase="LocalPatternDeclarationBase"; } extr
   get { methodName="Identifier" path=<localParametersOwnerPat:REFERENCE_NAME/expressionReferenceName:IDENTIFIER> };
 }:
   expressionReferenceName<REFERENCE_NAME, ReferenceName>
-  synPat<PARAMETER, Parameters>*;
+  fSharpPattern<PARAMETER, Parameters>*;
 
 topParametersOwnerPat options { stubBase="TopPatternDeclarationBase"; } extras {
   get { methodName="Identifier" path=<topParametersOwnerPat:REFERENCE_NAME/expressionReferenceName:IDENTIFIER> };
 }:
   expressionReferenceName<REFERENCE_NAME, ReferenceName>
-  synPat<PARAMETER, Parameters>*;
+  fSharpPattern<PARAMETER, Parameters>*;
 
 localAsPat options { stubBase="LocalPatternDeclarationBase"; }:
-  synPat<PATTERN, Pattern>
+  fSharpPattern<PATTERN, Pattern>
   AS
   fSharpIdentifier<IDENTIFIER, Identifier>;
 
 topAsPat options { stubBase="TopPatternDeclarationBase"; }:
-  synPat<PATTERN, Pattern>
+  fSharpPattern<PATTERN, Pattern>
   AS
   fSharpIdentifier<IDENTIFIER, Identifier>;
 
@@ -262,7 +262,7 @@ interface arrayOrListPat:
   listPat;
 
 typedPat options { stubBase="SynPatternBase"; }:
-  synPat<PATTERN, Pattern>
+  fSharpPattern<PATTERN, Pattern>
   COLON
   typeUsage<TYPE, Type>;
 
@@ -270,34 +270,34 @@ attribPat options { stubBase="SynPatternBase"; } extras {
   get { methodName="Attributes" path=<attribPat:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
-  synPat<PATTERN, Pattern>;
+  fSharpPattern<PATTERN, Pattern>;
 
 orPat options { stubBase="SynPatternBase"; }:
-  synPat<PATTERN1, Pattern1>
+  fSharpPattern<PATTERN1, Pattern1>
   BAR
-  synPat<PATTERN2, Pattern2>;
+  fSharpPattern<PATTERN2, Pattern2>;
 
 andsPat options { stubBase="SynPatternBase"; }:
-  synPat<PATTERN1, Pattern1>
+  fSharpPattern<PATTERN1, Pattern1>
   AMP
-  synPat<PATTERN2, Pattern2>;
+  fSharpPattern<PATTERN2, Pattern2>;
 
 arrayPat options { stubBase="SynPatternBase"; }:
   LBRACK_BAR
-  synPat<ATTRIBUTE, Patterns>*
+  fSharpPattern<ATTRIBUTE, Patterns>*
   LBRACK_BAR;
 
 listPat options { stubBase="SynPatternBase"; }:
   LBRACK
-  synPat<ATTRIBUTE, Patterns>*
+  fSharpPattern<ATTRIBUTE, Patterns>*
   RBRACK;
 
 tuplePat options { stubBase="SynPatternBase"; }:
-  LIST synPat<ATTRIBUTE, Patterns> SEP COMMA<FSHARP_COMMA, Commas>;
+  LIST fSharpPattern<ATTRIBUTE, Patterns> SEP COMMA<FSHARP_COMMA, Commas>;
 
 parenPat options { stubBase="SynPatternBase"; }:
   LPAREN
-  synPat<PATTERN, Pattern>
+  fSharpPattern<PATTERN, Pattern>
   RPAREN;
 
 recordPat options { stubBase="SynPatternBase"; }:
@@ -308,20 +308,20 @@ recordPat options { stubBase="SynPatternBase"; }:
 fieldPat options { stubBase="SynPatternBase"; }:
   expressionReferenceName<REFERENCE_NAME, ReferenceName>
   EQUALS<FSHARP_EQUALS, EqualsToken>
-  synPat<PAT, Pattern>;
+  fSharpPattern<PAT, Pattern>;
 
 optionalValPat options { stubBase="SynPatternBase"; }:
   QMARK
-  synPat<PATTERN, Pattern>;
+  fSharpPattern<PATTERN, Pattern>;
 
 isInstPat options { stubBase="SynPatternBase"; }:
   COLON_QMARK
   typeUsage<SYN_TYPE, Type>;
 
 consPat options { stubBase="SynPatternBase"; }:
-  synPat<PATTERN1, Pattern1>
+  fSharpPattern<PATTERN1, Pattern1>
   COLON_COLON
-  synPat<PATTERN2, Pattern2>;
+  fSharpPattern<PATTERN2, Pattern2>;
 
 wildPat options { stubBase="SynPatternBase"; }:
   UNDERSCORE;
@@ -421,7 +421,7 @@ itemIndexerExpr options { stubBase="FSharpExpressionBase"; } extras {
   get { methodName="Args" path=<itemIndexerExpr:ARG_LIST/indexerArgList:INDEXER_ARG> };
 }:
   fSharpExpression<QUALIFIER_EXPR, Qualifier>
-  DOT
+  DOT<FSHARP_DELIMITER, Delimiter>
   indexerArgList<ARG_LIST, IndexerArgList>;
 
 namedIndexerExpr options { stubBase="FSharpExpressionBase"; } extras {
@@ -569,7 +569,7 @@ forExpr options { stubBase="UnitExpressionBase"; }:
 
 forEachExpr options { stubBase="UnitExpressionBase"; }:
   FOR
-  synPat<PAT, Pattern>
+  fSharpPattern<PAT, Pattern>
   IN
   fSharpExpression<IN_EXPR, InExpression>
   forEachBodySeparator{BODY_SEPARATOR, BodySeparator}
@@ -604,7 +604,7 @@ computationExpr options { stubBase="FSharpExpressionBase"; }:
 
 lambdaExpr options { stubBase="FSharpExpressionBase"; }:
   FUN
-  synPat<PAT, Patterns>*
+  fSharpPattern<PAT, Patterns>*
   RARROW<RARROW, RArrow>
   fSharpExpression<EXPR, Expression>;
 
@@ -705,14 +705,14 @@ referenceExpr options { stubBase="FSharpExpressionBase"; } extras {
 }:
   (
     fSharpExpression<QUALIFIER_EXPR, Qualifier>
-    DOT
+    DOT<FSHARP_DELIMITER, Delimiter>
   )?
   fSharpIdentifier<IDENTIFIER, Identifier>
   prefixAppTypeArgumentList<TYPE_ARG_LIST, TypeArgumentList>?;
 
 matchClause:
   BAR<BAR, Bar>?
-  synPat<PAT, Pattern>
+  fSharpPattern<PAT, Pattern>
   whenExprClause<WHEN_EXPR, WhenExpression>?
   RARROW<RARROW, RArrow>
   fSharpExpression<EXPR, Expression>;
@@ -851,7 +851,7 @@ typeExtensionDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; 
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
   (
     referenceName<REFERENCE_NAME, QualifierReferenceName>
-    DOT
+    DOT<FSHARP_DELIMITER, Delimiter>
   )?
   fSharpIdentifier<IDENTIFIER, Identifier>
   typeParameterOfTypeList<TYPE_PARAMETERS_LIST, TypeParameterList>?
@@ -1274,7 +1274,7 @@ private memberParamDeclarationList:
   LIST memberParamDeclaration<PARAMETER, Parameters> SEP COMMA<FSHARP_COMMA, Commas>;
 
 memberParamDeclaration:
-  synPat<PATTERN, Pattern>;
+  fSharpPattern<PATTERN, Pattern>;
 
 
 // module statements
@@ -1354,7 +1354,8 @@ interface fSharpIdentifier:
   symbolicOp |
   ampAmp |
   activePatternId |
-  typeParameterId;
+  typeParameterId |
+  global;
 
 abstract identifier options { interfaceName="IFSharpIdentifier"; }:
   IDENTIFIER;
@@ -1364,6 +1365,9 @@ abstract symbolicOp options { interfaceName="IFSharpIdentifier"; }:
 
 abstract ampAmp options { interfaceName="IFSharpIdentifier"; }:
   ampAmp;
+
+abstract global options { interfaceName="IFSharpIdentifier"; }:
+  GLOBAL;
 
 // Type parameters
 
@@ -1456,7 +1460,7 @@ prefixAppTypeArgumentList:
 expressionReferenceName options { stubBase="ReferenceOwnerBase"; }:
   (
     expressionReferenceName<QUALIFIER, Qualifier>
-    DOT<DELIMITER, Dot>
+    DOT<FSHARP_DELIMITER, Delimiter>
   )?
   fSharpIdentifier<IDENTIFIER, Identifier>
   prefixAppTypeArgumentList<TYPE_ARG, TypeArgumentList>;
@@ -1467,13 +1471,13 @@ typeReferenceName options { stubBase="TypeReferenceOwnerBase"; }:
     postfixAppTypeArgumentList<TYPE_ARG, TypeArgumentList>
     (
       typeReferenceName<QUALIFIER, Qualifier>
-      DOT<DELIMITER, Dot>
+      DOT<FSHARP_DELIMITER, Delimiter>
     )?
     fSharpIdentifier<IDENTIFIER, Identifier>
   |
     (
       typeReferenceName<QUALIFIER, Qualifier>
-      DOT<DELIMITER, Dot>
+      DOT<FSHARP_DELIMITER, Delimiter>
     )?
     fSharpIdentifier<IDENTIFIER, Identifier>
     prefixAppTypeArgumentList<TYPE_ARG, TypeArgumentList>

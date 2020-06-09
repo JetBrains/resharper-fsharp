@@ -4,7 +4,7 @@ open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application.Components
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Checker
-open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
+open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework

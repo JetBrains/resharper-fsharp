@@ -1,0 +1,8 @@
+﻿module Module
+
+open Option
+
+|Option.|(0)bind |> ignore
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Qualifier is redundant

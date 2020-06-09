@@ -3,7 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 open JetBrains.ReSharper.Feature.Services.Refactorings.Specific.Rename
 open JetBrains.ReSharper.Feature.Services.Util
 open JetBrains.ReSharper.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
+open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Naming.Extentions
 open JetBrains.ReSharper.Psi.Naming.Impl

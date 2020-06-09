@@ -1,0 +1,4 @@
+﻿Suggested names: i
+let f x =
+    let i = 1
+    2

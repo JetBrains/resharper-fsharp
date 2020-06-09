@@ -93,7 +93,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         return this;
 
       using (WriteLockCookie.Create(myOwner.IsPhysical()))
-        return myOwner.SetName(FSharpBindingUtil.SuggestShortReferenceName(this, element)).Reference;
+        return myOwner.SetName(FSharpReferenceBindingUtil.SuggestShortReferenceName(this, element)).Reference;
     }
 
     private static bool CanBindTo(IDeclaredElement element) =>
@@ -109,12 +109,28 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       throw new NotImplementedException();
 
     public bool IsQualified =>
-      GetElement() switch
-      {
-        IReferenceExpr referenceExpr => referenceExpr.Qualifier != null,
-        IReferenceName referenceName => referenceName.Qualifier != null,
-        ITypeExtensionDeclaration typeExtension => typeExtension.QualifierReferenceName != null,
-        _ => false
-      };
+      GetElement() is IFSharpQualifiableReferenceOwner referenceOwner && referenceOwner.IsQualified;
+
+    public FSharpSymbolReference QualifierReference =>
+      GetElement() is IFSharpQualifiableReferenceOwner referenceOwner ? referenceOwner.QualifierReference : null;
+
+    public void SetQualifier([NotNull] IClrDeclaredElement declaredElement)
+    {
+      if (GetElement() is IFSharpQualifiableReferenceOwner referenceOwner)
+        referenceOwner.SetQualifier(declaredElement);
+    }
+
+    /// Does not reuse existing file resolve results, does complete lookup by name.
+    public FSharpOption<FSharpSymbolUse> ResolveWithFcs([NotNull] string opName, bool qualified = true)
+    {
+      var referenceOwner = GetElement();
+      var checkerService = referenceOwner.GetFcsCheckerService();
+
+      var names = qualified && referenceOwner is IFSharpQualifiableReferenceOwner qualifiableReferenceOwner
+        ? qualifiableReferenceOwner.Names
+        : new[] {GetName()};
+
+      return checkerService.ResolveNameAtLocation(referenceOwner, names, opName);
+    }
   }
 }

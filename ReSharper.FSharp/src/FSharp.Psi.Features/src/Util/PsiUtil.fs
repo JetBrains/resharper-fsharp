@@ -1,5 +1,5 @@
 [<AutoOpen>]
-module JetBrains.ReSharper.Plugins.FSharp.Psi.Util.PsiUtil
+module JetBrains.ReSharper.Plugins.FSharp.Psi.PsiUtil
 
 open FSharp.Compiler.Range
 open JetBrains.Application.Settings
@@ -60,15 +60,6 @@ type IFile with
         x.GetNode<'T>(documentRange.StartOffset)
 
 type IFSharpTreeNode with
-    member x.FSharpLanguageService =
-        x.Language.LanguageService().As<IFSharpLanguageService>()
-
-    member x.CreateElementFactory() =
-        x.FSharpLanguageService.CreateElementFactory(x.GetPsiModule())
-
-    member x.CheckerService =
-        x.FSharpFile.CheckerService
-    
     member x.GetLineEnding() =
         let fsFile = x.FSharpFile
         fsFile.DetectLineEnding(fsFile.GetPsiServices()).GetPresentation()
@@ -131,7 +122,8 @@ let (|TokenType|_|) tokenType (treeNode: ITreeNode) =
 let (|Whitespace|_|) (treeNode: ITreeNode) =
     if getTokenType treeNode == FSharpTokenType.WHITESPACE then Some treeNode else None
 
-let inline (|IgnoreParenPat|) (pat: ISynPat) = pat.IgnoreParentParens()
+let inline (|IgnoreParenPat|) (fsPattern: IFSharpPattern) =
+    fsPattern.IgnoreParentParens()
 
 let inline (|IgnoreInnerParenExpr|) (expr: IFSharpExpression) =
     expr.IgnoreInnerParens()
@@ -328,8 +320,8 @@ let rec skipIntermediateParentsOfSameType<'T when 'T :> ITreeNode> (node: 'T) =
     | :? 'T as pat -> skipIntermediateParentsOfSameType pat
     | _ -> node
 
-let rec skipIntermediatePatParents (pat: ISynPat) =
-    skipIntermediateParentsOfSameType<ISynPat> pat
+let rec skipIntermediatePatParents (fsPattern: IFSharpPattern) =
+    skipIntermediateParentsOfSameType<IFSharpPattern> fsPattern
 
 
 let inline isValid (node: ^T) =

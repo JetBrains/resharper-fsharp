@@ -86,18 +86,22 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
         newDeclaredElement.PresentationLanguage.Is<FSharpLanguage>()
 
     override x.IsLocalRename(element: IDeclaredElement) =
-        match element with
-        | :? IParametersOwnerPat as longIdentPat -> longIdentPat.IsDeclaration
-        | _ -> element :? IFSharpLocalDeclaration
+        if not (element :? IFSharpLocalDeclaration) then false else
 
-    override x.CheckLocalRenameSameDocument(element: IDeclaredElement) = x.IsLocalRename(element)
+        match element with
+        | :? INamedPat as namedPat -> namedPat.IsDeclaration
+        | _ -> true
+
+    override x.CheckLocalRenameSameDocument(element: IDeclaredElement) =
+        x.IsLocalRename(element)
 
     override x.GetSecondaryElements(element: IDeclaredElement, newName) =
         match element with
         | :? ILocalReferencePat as localNamedPat ->
-            let mutable pat = localNamedPat :> ISynPat
-            while (pat.Parent :? ISynPat) && not (pat.Parent :? IParametersOwnerPat && (pat.Parent :?> ISynPat).IsDeclaration) do
-                pat <- pat.Parent :?> ISynPat
+            let mutable pat = localNamedPat :> IFSharpPattern
+            while pat.Parent :? IFSharpPattern &&
+                    not (pat.Parent :? IParametersOwnerPat && (pat.Parent :?> IFSharpPattern).IsDeclaration) do
+                pat <- pat.Parent :?> IFSharpPattern
 
             pat.Declarations
             |> Seq.cast<IDeclaredElement>
@@ -109,7 +113,7 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
         | :? IGeneratedConstructorParameterOwner as parameterOwner ->
             [| parameterOwner.GetParameter() :> IDeclaredElement |] :> _
 
-        | :? IModule -> EmptyArray.Instance :> _
+        | :? IFSharpModule -> EmptyArray.Instance :> _
 
         | :? IFSharpTypeElement as fsTypeElement ->
             match fsTypeElement.GetModuleToUpdateName(newName) with
@@ -181,12 +185,12 @@ type FSharpAtomicRenamesFactory() =
     override x.CheckRenameAvailability(element: IDeclaredElement) =
         match element with
         | :? FSharpGeneratedMemberBase -> RenameAvailabilityCheckResult.CanNotBeRenamed
-        | :? IParametersOwnerPat as pat when not pat.IsDeclaration -> RenameAvailabilityCheckResult.CanNotBeRenamed
+        | :? INamedPat as pat when not pat.IsDeclaration -> RenameAvailabilityCheckResult.CanNotBeRenamed
 
         | :? IFSharpDeclaredElement as fsElement when fsElement.SourceName = SharedImplUtil.MISSING_DECLARATION_NAME ->
             RenameAvailabilityCheckResult.CanNotBeRenamed
 
-        | :? IModule as fsModule when fsModule.IsAnonymous ->
+        | :? IFSharpModule as fsModule when fsModule.IsAnonymous ->
             RenameAvailabilityCheckResult.CanNotBeRenamed // todo: needs a special implementation
 
         | _ ->

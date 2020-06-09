@@ -12,21 +12,21 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.Shim.FileSystem
 
 [<SolutionComponent>]
-type FcsHost
-        (lifetime: Lifetime, solution: ISolution, checkerService: FSharpCheckerService,
-         sourceCache: FSharpSourceCache, itemsContainer: FSharpItemsContainer) =
+type TestFcsHost
+        (lifetime: Lifetime, solution: ISolution, checkerService: FSharpCheckerService, sourceCache: FSharpSourceCache,
+         itemsContainer: FSharpItemsContainer) =
 
-    let dumpSingleProjectMapping (rdVoid: Unit) =
+    let dumpSingleProjectMapping (_: Unit) =
         let projectMapping =
             itemsContainer.ProjectMappings.Values.SingleOrDefault().NotNull("Expected single project mapping.")
         projectMapping.DumpToString()
 
     do
-        let fcsHost = solution.RdFSharpModel().FSharpCompilerServiceHost
+        let fcsHost = solution.RdFSharpModel().FcsHost
 
         // We want to get events published by background checker.
         checkerService.Checker.ImplicitlyStartBackgroundWork <- true
-        
+
         let subscription = checkerService.Checker.ProjectChecked.Subscribe(fun (projectFilePath, _) ->
             fcsHost.ProjectChecked(projectFilePath))
         lifetime.OnTermination(fun _ -> subscription.Dispose()) |> ignore

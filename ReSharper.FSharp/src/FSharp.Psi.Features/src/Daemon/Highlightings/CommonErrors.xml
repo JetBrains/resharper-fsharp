@@ -2,8 +2,8 @@
 
   <Usings>
     JetBrains.ReSharper.Intentions.QuickFixes;
+    JetBrains.ReSharper.Plugins.FSharp.Psi;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings;
-    JetBrains.ReSharper.Plugins.FSharp.Psi.Util.PsiUtil;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
@@ -347,5 +347,13 @@
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>RemoveYieldFix</QuickFix>
   </Error>
-  
+
+  <Warning staticGroup="FSharpErrors" name="RedundantQualifier">
+    <Parameter type="ITreeNode" name="treeNode"/>
+    <Range>getQualifierRange treeNode</Range>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message value="Qualifier is redundant"/>
+    <QuickFix>RemoveRedundantQualifierFix</QuickFix>
+  </Warning>
+
 </Errors>
