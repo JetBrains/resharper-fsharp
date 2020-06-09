@@ -37,8 +37,10 @@ type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocServic
         let lineText = sourceFile.Document.GetLineText(coords.Line)
         use cookie = CompilationContextCookie.GetOrCreate(sourceFile.GetPsiModule().GetContextFromModule())
 
+        use op = token.GetFcsCheckerService().FcsReactorMonitor.MonitorOperation userOpName
+
         // todo: provide tooltip for #r strings in fsx, should pass String tag
-        let getTooltip = checkResults.GetStructuredToolTipText(int coords.Line + 1, int coords.Column, lineText, tokenNames, FSharpTokenTag.Identifier, userOpName)
+        let getTooltip = checkResults.GetStructuredToolTipText(int coords.Line + 1, int coords.Column, lineText, tokenNames, FSharpTokenTag.Identifier, op.OperationName)
         getTooltip.RunAsTask()
 
     override x.GetTooltip(highlighter) =

@@ -53,5 +53,6 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
         field("fcsHost", RdFcsHost)
         property("enableExperimentalFeatures", bool)
         property("enableFormatter", bool)
+        property("fcsBusyDelayMs", int)
     }
 }

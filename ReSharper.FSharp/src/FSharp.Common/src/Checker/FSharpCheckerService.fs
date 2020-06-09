@@ -60,6 +60,7 @@ type FSharpCheckerService
             if checker.IsValueCreated then
                 checker.Value.InvalidateAll())
 
+    member val FcsReactorMonitor = Unchecked.defaultof<IFcsReactorMonitor> with get, set
     member val FcsProjectProvider = Unchecked.defaultof<IFcsProjectProvider> with get, set
 
     member x.Checker = checker.Value
@@ -98,8 +99,10 @@ type FSharpCheckerService
         let source = FSharpCheckerService.getSourceText file.Document
         logger.Trace("ParseAndCheckFile: start {0}, {1}", path, opName)
 
+        use op = x.FcsReactorMonitor.MonitorOperation opName
+
         // todo: don't cancel the computation when file didn't change
-        match x.Checker.ParseAndCheckDocument(path, source, options, allowStaleResults, opName).RunAsTask() with
+        match x.Checker.ParseAndCheckDocument(path, source, options, allowStaleResults, op.OperationName).RunAsTask() with
         | Some (parseResults, checkResults) when parseResults.ParseTree.IsSome ->
             logger.Trace("ParseAndCheckFile: finish {0}, {1}", path, opName)
             Some { ParseResults = parseResults; CheckResults = checkResults }
@@ -137,7 +140,9 @@ type FSharpCheckerService
             let checkResults = results.CheckResults
             let fcsPos = getPosFromCoords coords
             let lineText = sourceFile.Document.GetLineText(coords.Line)
-            checkResults.GetSymbolUseAtLocation(fcsPos.Line, fcsPos.Column, lineText, names, opName).RunAsTask())
+
+            use op = x.FcsReactorMonitor.MonitorOperation opName
+            checkResults.GetSymbolUseAtLocation(fcsPos.Line, fcsPos.Column, lineText, names, op.OperationName).RunAsTask())
 
     /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.
     member x.ResolveNameAtLocation(sourceFile: IPsiSourceFile, name, coords, opName) =
@@ -176,3 +181,12 @@ type IFcsProjectProvider =
 type IScriptFcsProjectProvider =
     abstract GetScriptOptions: IPsiSourceFile -> FSharpProjectOptions option
     abstract GetScriptOptions: FileSystemPath * string -> FSharpProjectOptions option
+
+
+type IMonitoredReactorOperation =
+    inherit IDisposable
+    abstract OperationName : string
+
+
+type IFcsReactorMonitor =
+    abstract MonitorOperation : opName: string -> IMonitoredReactorOperation
