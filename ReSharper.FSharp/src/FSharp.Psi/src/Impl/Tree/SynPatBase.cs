@@ -47,7 +47,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         if (referenceName.Qualifier != null)
           return false;
 
-        // todo: check starts with lower case
+        var name = referenceName.ShortName;
+        if (!name.IsEmpty() && name[0].IsLowerFast())
+          return true;
+
         var idOffset = GetNameIdentifierRange().StartOffset.Offset;
         return FSharpFile.GetSymbolUse(idOffset) == null;
       }
