@@ -33,6 +33,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
       if (entity.IsFSharpRecord)
         return FSharpHighlightingAttributeIdsModule.Record;
 
+      if (entity.IsMeasure)
+        return FSharpHighlightingAttributeIdsModule.Measure;
+      
       return entity.IsInterface
         ? FSharpHighlightingAttributeIdsModule.Interface
         : FSharpHighlightingAttributeIdsModule.Class;
@@ -51,9 +54,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
 
       var entity = mfv.DeclaringEntity;
       if (mfv.IsModuleValueOrMember && (entity != null && !entity.Value.IsFSharpModule || mfv.IsExtensionMember))
-        return mfv.IsProperty || mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod
-          ? FSharpHighlightingAttributeIdsModule.Property
-          : FSharpHighlightingAttributeIdsModule.Method;
+        if (mfv.IsProperty || mfv.IsPropertyGetterMethod || mfv.IsPropertySetterMethod)
+          return mfv.IsExtensionMember
+            ? FSharpHighlightingAttributeIdsModule.ExtensionProperty
+            : FSharpHighlightingAttributeIdsModule.Property;
+        else
+          return mfv.IsExtensionMember
+            ? FSharpHighlightingAttributeIdsModule.ExtensionMethod
+            : FSharpHighlightingAttributeIdsModule.Method;
 
       if (mfv.LiteralValue != null)
         return FSharpHighlightingAttributeIdsModule.Literal;
@@ -61,11 +69,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
       if (mfv.IsActivePattern)
         return FSharpHighlightingAttributeIdsModule.ActivePatternCase;
 
-      if (mfv.IsMutable || mfv.IsRefCell())
-        return FSharpHighlightingAttributeIdsModule.MutableValue;
-
       if (IsMangledOpName(mfv.LogicalName))
         return FSharpHighlightingAttributeIdsModule.Operator;
+
+      if (mfv.IsValCompiledAsMethod)
+        return FSharpHighlightingAttributeIdsModule.Method;
+      
+      if (mfv.FullType.IsFunctionType)
+        return mfv.IsMutable
+          ? FSharpHighlightingAttributeIdsModule.MutableValueFunction
+          : FSharpHighlightingAttributeIdsModule.ValueFunction;
+
+      if (mfv.IsMutable || mfv.IsRefCell())
+        return FSharpHighlightingAttributeIdsModule.MutableValue;
 
       var fsType = mfv.FullType;
       if (fsType.HasTypeDefinition && fsType.TypeDefinition is var mfvTypeEntity && mfvTypeEntity.IsByRef)
@@ -82,6 +98,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
         case FSharpEntity entity when !entity.IsUnresolved:
           return GetEntityHighlightingAttributeId(entity);
 
+        case FSharpParameter parameter: // FSharpParameter is a static member in a generic constraint, not a method parameter
+          if (parameter.FullName.Equals("new"))
+            return FSharpHighlightingAttributeIdsModule.Keyword;
+          return parameter.Type.GenericArguments.Count == 2 && parameter.Type.GenericArguments[0].IsUnit
+            ? FSharpHighlightingAttributeIdsModule.Property
+            : FSharpHighlightingAttributeIdsModule.Method;
+        
         case FSharpMemberOrFunctionOrValue mfv when !mfv.IsUnresolved:
           return GetMfvHighlightingAttributeId(mfv.AccessorProperty?.Value ?? mfv);
 
