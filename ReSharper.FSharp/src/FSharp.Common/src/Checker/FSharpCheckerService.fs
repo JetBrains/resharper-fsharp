@@ -140,7 +140,9 @@ type FSharpCheckerService
             let checkResults = results.CheckResults
             let fcsPos = getPosFromCoords coords
             let lineText = sourceFile.Document.GetLineText(coords.Line)
-            checkResults.GetSymbolUseAtLocation(fcsPos.Line, fcsPos.Column, lineText, names, opName).RunAsTask())
+
+            use op = x.FcsReactorMonitor.MonitorOperation opName
+            checkResults.GetSymbolUseAtLocation(fcsPos.Line, fcsPos.Column, lineText, names, op.OperationName).RunAsTask())
 
     /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.
     member x.ResolveNameAtLocation(sourceFile: IPsiSourceFile, name, coords, opName) =
