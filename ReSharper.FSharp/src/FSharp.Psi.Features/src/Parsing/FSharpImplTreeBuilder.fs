@@ -1146,7 +1146,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
 
     member x.ProcessSynIndexerArg(arg) =
         match arg with
-        | SynIndexerArg.One(expr, _, range) ->
+        | SynIndexerArg.One(ExprRange range as expr, _, _) ->
             x.PushRange(range, ElementType.INDEXER_ARG_EXPR)
             x.PushExpression(getGeneratedAppArg expr)
 

@@ -664,6 +664,11 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         | SynType.Anon _ ->
             x.MarkAndDone(range, ElementType.ANON_TYPE_USAGE)
 
+        | SynType.Paren(innerType, range) ->
+            let mark = x.Mark(range)
+            x.ProcessType(innerType)
+            x.Done(range, mark, ElementType.PAREN_TYPE_USAGE)
+
     member x.ProcessTypeConstraint(typeConstraint: SynTypeConstraint) =
         match typeConstraint with
         | WhereTyparIsValueType(typeParameter, _)
