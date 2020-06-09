@@ -30,7 +30,7 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
             match binding.Expression with
             | null -> failwith "Could not get expr"
             | expr -> ModificationUtil.AddChildAfter(expr, FSharpTokenType.SEMICOLON.CreateLeafElement()) |> ignore
-    
+
     new (error: FieldRequiresAssignmentError) =
         GenerateMissingRecordFieldsFix(error.Expr)
 
@@ -47,17 +47,13 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
         | null -> failwith "Could not get reference"
         | reference ->
         
-        let declaredElement = match reference.Resolve() with | null -> null | symbolRef -> symbolRef.DeclaredElement
-        isNotNull declaredElement 
+        let declaredElement = reference.Resolve().DeclaredElement
+        isNotNull declaredElement
 
     override x.ExecutePsiTransaction(solution, _) =
-        let typeElement =
-            match recordExpr.Reference.Resolve() with
-            | null -> null
-            | symbolRef -> symbolRef.DeclaredElement :?> ITypeElement
-        
+        let typeElement = recordExpr.Reference.Resolve().DeclaredElement :?> ITypeElement
+        Assertion.Assert(typeElement.IsRecord(), "Expecting record type")
         let fieldNames = typeElement.GetRecordFieldNames()
-
         let existingBindings = recordExpr.ExprBindings
 
         let fieldsToAdd = HashSet(fieldNames)
