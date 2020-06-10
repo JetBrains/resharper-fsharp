@@ -105,9 +105,11 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             createHighlightingFromNodeWithMessage UnitTypeExpectedError range error
 
         | NotAFunction ->
-            let notAFunctionNode = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
-            let prefixAppExpr = (tryFindRootPrefixAppWhereExpressionIsFunc notAFunctionNode).As<IPrefixAppExpr>()
-            NotAFunctionError(notAFunctionNode.IgnoreParentParens(), prefixAppExpr) :> _
+            let notAFunctionHighlightingCtor = fun notAFunctionNode ->  
+                let prefixAppExpr = (tryFindRootPrefixAppWhereExpressionIsFunc notAFunctionNode).As<IPrefixAppExpr>()
+                NotAFunctionError(notAFunctionNode.IgnoreParentParens(), prefixAppExpr)
+
+            createHighlightingFromNode notAFunctionHighlightingCtor range
 
         | FieldNotMutable ->
             createHighlightingFromNode FieldOrValueNotMutableError range
