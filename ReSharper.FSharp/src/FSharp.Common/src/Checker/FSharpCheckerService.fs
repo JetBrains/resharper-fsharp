@@ -29,8 +29,7 @@ module FSharpCheckerService =
 [<ShellComponent; AllowNullLiteral>]
 type FSharpCheckerService
         (lifetime: Lifetime, logger: ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier,
-         settingsStore: ISettingsStore, settingsSchema: SettingsSchema,
-         reactorMonitor: IFcsReactorMonitor, reactorListener: IReactorListener) =
+         settingsStore: ISettingsStore, settingsSchema: SettingsSchema, reactorMonitor: IFcsReactorMonitor) =
 
     let checker =
         Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "20")
@@ -49,7 +48,7 @@ type FSharpCheckerService
                 FSharpChecker.Create(projectCacheSize = 200,
                                      keepAllBackgroundResolutions = false,
                                      keepAllBackgroundSymbolUses = false,
-                                     reactorListener = reactorListener,
+                                     reactorListener = reactorMonitor,
                                      ImplicitlyStartBackgroundWork = enableBgCheck.Value)
 
             enableBgCheck.Change.Advise_NoAcknowledgement(lifetime, fun (ArgValue enabled) ->
@@ -101,7 +100,7 @@ type FSharpCheckerService
         let source = FSharpCheckerService.getSourceText file.Document
         logger.Trace("ParseAndCheckFile: start {0}, {1}", path, opName)
 
-        use op = reactorMonitor.MonitorOperation opName
+        use op = x.FcsReactorMonitor.MonitorOperation opName
 
         // todo: don't cancel the computation when file didn't change
         match x.Checker.ParseAndCheckDocument(path, source, options, allowStaleResults, op.OperationName).RunAsTask() with
@@ -143,7 +142,7 @@ type FSharpCheckerService
             let fcsPos = getPosFromCoords coords
             let lineText = sourceFile.Document.GetLineText(coords.Line)
 
-            use op = reactorMonitor.MonitorOperation opName
+            use op = x.FcsReactorMonitor.MonitorOperation opName
             checkResults.GetSymbolUseAtLocation(fcsPos.Line, fcsPos.Column, lineText, names, op.OperationName).RunAsTask())
 
     /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.

@@ -32,6 +32,8 @@ module MonitoredReactorOperation =
 
 
 type IFcsReactorMonitor =
+    inherit IReactorListener
+
     /// How long after the reactor becoming busy that the background task should be shown
     abstract FcsBusyDelay : IProperty<TimeSpan>
 
