@@ -53,6 +53,8 @@ type IntroduceVarTest() =
     [<Test>] member x.``Expr - Binary app - Same indent 04``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Binary app - Same indent 05``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - If 01 - Let``() = x.DoNamedTest()
+
     [<Test>] member x.``Record field binding - Anon 01``() = x.DoNamedTest()
     [<Test>] member x.``Record field binding - Anon 02 - In app``() = x.DoNamedTest()
     [<Test>] member x.``Record field binding 01``() = x.DoNamedTest()

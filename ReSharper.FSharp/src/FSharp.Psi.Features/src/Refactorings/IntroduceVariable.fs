@@ -366,7 +366,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                     let anchor = ModificationUtil.AddChildBefore(replaced.First, NewLine(lineEnding))
                     ModificationUtil.AddChildAfter(anchor, Whitespace(contextIndent)) |> ignore
 
-                ModificationUtil.DeleteChildRange(letBindings.NextSibling, letBindings.Parent.LastChild)
+                ModificationUtil.DeleteChildRange(ranges.ReplaceRange)
                 letBindings
 
             | :? ILetModuleDecl ->
