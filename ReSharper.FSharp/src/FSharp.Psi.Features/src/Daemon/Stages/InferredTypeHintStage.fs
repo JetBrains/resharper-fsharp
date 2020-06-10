@@ -11,6 +11,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Naming
 open JetBrains.ReSharper.Psi.Naming.Impl
 open JetBrains.ReSharper.Psi.Tree
@@ -51,7 +52,7 @@ type LocalReferencePatternVisitor(fsFile: IFSharpFile, highlightingContext: Type
         not (String.IsNullOrEmpty(variableName)) &&
         NamesHelper.IsLike(variableNameParts, NamesHelper.GetParts(nameParser, namingPolicyProvider, typeName))
 
-    let isTypeOfPatternEvident (pattern: ISynPat) =
+    let isTypeOfPatternEvident (pattern: IFSharpPattern) =
 
         // v-- not evident
         // x::y::z
@@ -73,7 +74,9 @@ type LocalReferencePatternVisitor(fsFile: IFSharpFile, highlightingContext: Type
         //     ^--^-- evident
         let listOrListPat = ArrayOrListPatNavigator.GetByPattern pattern
         if isNotNull listOrListPat then
-            listOrListPat.Patterns.IndexOf pattern <> 0
+            match Seq.tryHead listOrListPat.PatternsEnumerable with
+            | None -> false
+            | Some head -> head <> pattern
 
         else
 
@@ -92,6 +95,9 @@ type LocalReferencePatternVisitor(fsFile: IFSharpFile, highlightingContext: Type
         let binding = BindingNavigator.GetByHeadPattern(pat)
         if isNotNull binding && isNotNull binding.ReturnTypeInfo then () else
 
+        let variableName = localRefPat.ReferenceName.ShortName
+        if variableName = SharedImplUtil.MISSING_DECLARATION_NAME then () else
+
         if isTypeOfPatternEvident pat then () else
 
         match box (localRefPat.GetFSharpSymbolUse()) with
@@ -100,7 +106,7 @@ type LocalReferencePatternVisitor(fsFile: IFSharpFile, highlightingContext: Type
 
         let symbolUse = symbolUse :?> FSharpSymbolUse
         match symbolUse.Symbol with
-        | :? FSharpMemberOrFunctionOrValue as mfv when not (isEvidentFromVariableName mfv.FullType localRefPat.ReferenceName.Identifier.Name) ->
+        | :? FSharpMemberOrFunctionOrValue as mfv when not (isEvidentFromVariableName mfv.FullType variableName) ->
             let typeNameStr =
                 symbolUse.DisplayContext.WithShortTypeNames(true)
                 |> mfv.FullType.Format
@@ -126,7 +132,10 @@ type InferredTypeHintHighlightingProcess
 
         for binding in letBindings.Bindings do
             if hideHintsForEvidentTypes && isTypeEvident binding.Expression then () else
-            binding.HeadPattern.Accept(visitor, consumer)
+
+            match binding.HeadPattern with
+            | null -> ()
+            | headPat -> headPat.Accept(visitor, consumer)
 
     override x.Execute(committer) =
         let consumer = FilteringHighlightingConsumer(daemonProcess.SourceFile, fsFile, settings)
@@ -139,20 +148,24 @@ type InferredTypeHintHighlightingProcess
     override x.VisitLetOrUseExpr(letOrUseExpr, consumer) =
         visitLetBindings letOrUseExpr consumer
 
-    override x.VisitMemberParamDeclaration(paramDecl, consumer) =
-        // todo: do we need another setting for this?
+    override x.VisitMemberParamsDeclaration(paramDecl, consumer) =
         if highlightingContext.ShowTypeNameHintsForImplicitlyTypedVariables then
-            paramDecl.Pattern.Accept(visitor, consumer)
+            match paramDecl.Pattern with
+            | null -> ()
+            | pattern -> pattern.Accept(visitor, consumer)
 
     override x.VisitMatchClause(matchClause, consumer) =
         if highlightingContext.ShowTypeNameHintsForVarDeclarationsInPatternMatchingExpressions then
-            matchClause.Pattern.Accept(visitor, consumer)
+            match matchClause.Pattern with
+            | null -> ()
+            | pattern -> pattern.Accept(visitor, consumer)
 
     override x.VisitLambdaExpr(lambdaExpr, consumer) =
         if not highlightingContext.ShowTypeNameHintsForLambdaExpressionParameters then () else
 
         for pattern in lambdaExpr.Patterns do
-            pattern.Accept(visitor, consumer)
+            if isNotNull pattern then
+                pattern.Accept(visitor, consumer)
 
 [<DaemonStage(StagesBefore = [| typeof<FSharpErrorsStage> |])>]
 type InferredTypeHintStage(namingManager: NamingManager, nameParser: NameParser) =
