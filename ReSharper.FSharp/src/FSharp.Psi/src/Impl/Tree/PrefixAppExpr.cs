@@ -86,12 +86,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       var reference = InvokedFunctionReference;
       if (reference == null)
-        return TypeFactory.CreateUnknownType(GetPsiModule());
+        return base.Type();
 
       var mfv = (FSharpMemberOrFunctionOrValue) reference.GetFSharpSymbol();
       return !mfv.IsConstructor && mfv.CurriedParameterGroups.Count == Arguments.Count
         ? mfv.ReturnParameter.Type.MapType(reference.GetElement())
-        : TypeFactory.CreateUnknownType(GetPsiModule());
+        : base.Type();
     }
   }
 }

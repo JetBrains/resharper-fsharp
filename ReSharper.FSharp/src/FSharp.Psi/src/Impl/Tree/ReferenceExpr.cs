@@ -64,7 +64,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         : ShortName;
 
     public override IType Type() =>
-      Reference.Resolve().DeclaredElement?.Type() ?? TypeFactory.CreateUnknownType(this);
+      Reference.Resolve().DeclaredElement?.Type() ?? base.Type();
 
     public FSharpSymbolReference Reference
     {

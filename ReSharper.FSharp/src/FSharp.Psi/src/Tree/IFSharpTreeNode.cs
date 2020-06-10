@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using JetBrains.ReSharper.Plugins.FSharp.Checker;
 using JetBrains.ReSharper.Psi.Tree;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -10,5 +11,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     TReturn Accept<TContext, TReturn>(TreeNodeVisitor<TContext, TReturn> visitor, TContext context);
 
     [NotNull] IFSharpFile FSharpFile { get; }
+    [NotNull] FSharpCheckerService CheckerService { get; }
   }
 }

@@ -69,10 +69,14 @@ let getEndOffset ([<NotNull>] document) (range: range) =
     getPosOffset document range.End
 
 [<Extension; CompiledName("ToDocumentRange")>]
-let ofDocumentRange (documentRange: DocumentRange) =
+let ofFileDocumentRange (documentRange: DocumentRange) (path: FileSystemPath) =
     let startPos = getPosFromDocumentOffset documentRange.StartOffset
     let endPos = getPosFromDocumentOffset documentRange.EndOffset
-    mkRange "" startPos endPos
+    mkRange path.FullPath startPos endPos
+
+[<Extension; CompiledName("ToDocumentRange")>]
+let ofDocumentRange (documentRange: DocumentRange) =
+    ofFileDocumentRange documentRange FileSystemPath.Empty
 
 [<Extension; CompiledName("GetTextRange")>]
 let getTextRange (document: IDocument) (range: range) =

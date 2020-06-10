@@ -124,7 +124,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     public FSharpOption<FSharpSymbolUse> ResolveWithFcs([NotNull] string opName, bool qualified = true)
     {
       var referenceOwner = GetElement();
-      var checkerService = referenceOwner.GetFcsCheckerService();
+      var checkerService = referenceOwner.CheckerService;
 
       var names = qualified && referenceOwner is IFSharpQualifiableReferenceOwner qualifiableReferenceOwner
         ? qualifiableReferenceOwner.Names
