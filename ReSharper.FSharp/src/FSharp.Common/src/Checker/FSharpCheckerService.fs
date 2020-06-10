@@ -29,8 +29,8 @@ module FSharpCheckerService =
 [<ShellComponent; AllowNullLiteral>]
 type FSharpCheckerService
         (lifetime: Lifetime, logger: ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier,
-         settingsStore: ISettingsStore, settingsSchema: SettingsSchema, reactorMonitor: IFcsReactorMonitor,
-         [<Optional; DefaultParameterValue(null: IReactorListener)>] reactorListener: IReactorListener) =
+         settingsStore: ISettingsStore, settingsSchema: SettingsSchema,
+         reactorMonitor: IFcsReactorMonitor, reactorListener: IReactorListener) =
 
     let checker =
         Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "20")
@@ -49,7 +49,7 @@ type FSharpCheckerService
                 FSharpChecker.Create(projectCacheSize = 200,
                                      keepAllBackgroundResolutions = false,
                                      keepAllBackgroundSymbolUses = false,
-                                     ?reactorListener = Option.ofObj reactorListener,
+                                     reactorListener = reactorListener,
                                      ImplicitlyStartBackgroundWork = enableBgCheck.Value)
 
             enableBgCheck.Change.Advise_NoAcknowledgement(lifetime, fun (ArgValue enabled) ->

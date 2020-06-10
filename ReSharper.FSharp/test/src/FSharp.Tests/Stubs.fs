@@ -1,13 +1,12 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests
 
 open System
+open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application
 open JetBrains.Application.Components
 open JetBrains.DataFlow
-open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp
-open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi
@@ -33,3 +32,14 @@ type TestFcsReactorMonitor() =
     interface IFcsReactorMonitor with
         member x.FcsBusyDelay = fcsShowDelay :> _
         member x.MonitorOperation opName = MonitoredReactorOperation.empty opName
+
+    interface IReactorListener with
+        override __.OnReactorPauseBeforeBackgroundWork _ = ()
+        override __.OnReactorOperationStart _ _ _ _ = ()
+        override __.OnReactorOperationEnd _ _ _ _ = ()
+        override __.OnReactorBackgroundStart _ _ _ = ()
+        override __.OnReactorBackgroundCancelled _ _ _ = ()
+        override __.OnReactorBackgroundEnd _ _ _ _ = ()
+        override __.OnSetBackgroundOp _ = ()
+        override __.OnCancelBackgroundOp () = ()
+        override __.OnEnqueueOp _ _ _ _ = ()

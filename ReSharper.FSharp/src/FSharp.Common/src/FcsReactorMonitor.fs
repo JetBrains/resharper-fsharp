@@ -156,7 +156,7 @@ type FcsReactorMonitor
 
     interface IReactorListener with
         override __.OnReactorPauseBeforeBackgroundWork pauseMillis =
-            logger.Verbose("Pausing before background work for {0:0.}ms", pauseMillis)
+            logger.Trace("Pausing before background work for {0:0.}ms", pauseMillis)
         override __.OnReactorOperationStart userOpName opName opArg approxQueueLength =
             logger.Verbose("--> {0}.{1} ({2}), queue length {3}", userOpName, opName, opArg, approxQueueLength)
             onOperationStart (userOpName + "." + opName) opArg
@@ -168,20 +168,20 @@ type FcsReactorMonitor
             onOperationEnd ()
         override __.OnReactorBackgroundStart bgUserOpName bgOpName bgOpArg =
             // todo: do we want to show background steps too?
-            logger.Verbose("--> Background step {0}.{1} ({2})", bgUserOpName, bgOpName, bgOpArg)
+            logger.Trace("--> Background step {0}.{1} ({2})", bgUserOpName, bgOpName, bgOpArg)
         override __.OnReactorBackgroundCancelled bgUserOpName bgOpName _bgOpArg =
-            logger.Verbose("<-- Background step {0}.{1}, was cancelled", bgUserOpName, bgOpName)
+            logger.Trace("<-- Background step {0}.{1}, was cancelled", bgUserOpName, bgOpName)
         override __.OnReactorBackgroundEnd _bgUserOpName _bgOpName _bgOpArg elapsed =
             let level =
                 if elapsed > showDelay.Value then LoggingLevel.WARN
-                else LoggingLevel.VERBOSE
+                else LoggingLevel.TRACE
             logger.LogMessage(level, "<-- Background step took {0:0.}ms", elapsed.TotalMilliseconds)
         override __.OnSetBackgroundOp approxQueueLength =
-            logger.Verbose("Enqueue start background, queue length {0}", approxQueueLength)
+            logger.Trace("Enqueue start background, queue length {0}", approxQueueLength)
         override __.OnCancelBackgroundOp () =
-            logger.Verbose("Trying to cancel any active background work...")
+            logger.Trace("Trying to cancel any active background work...")
         override __.OnEnqueueOp userOpName opName opArg approxQueueLength =
-            logger.Verbose("Enqueue: {0}.{1} ({2}), queue length {3}", userOpName, opName, opArg, approxQueueLength)
+            logger.Trace("Enqueue: {0}.{1} ({2}), queue length {3}", userOpName, opName, opArg, approxQueueLength)
 
 
 [<SolutionComponent>]
