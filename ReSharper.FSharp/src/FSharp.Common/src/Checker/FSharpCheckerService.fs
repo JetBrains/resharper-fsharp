@@ -29,7 +29,7 @@ module FSharpCheckerService =
 [<ShellComponent; AllowNullLiteral>]
 type FSharpCheckerService
         (lifetime: Lifetime, logger: ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier,
-         settingsStore: ISettingsStore, settingsSchema: SettingsSchema) =
+         settingsStore: ISettingsStore, settingsSchema: SettingsSchema, reactorMonitor: IFcsReactorMonitor) =
 
     let checker =
         Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "20")
@@ -48,6 +48,7 @@ type FSharpCheckerService
                 FSharpChecker.Create(projectCacheSize = 200,
                                      keepAllBackgroundResolutions = false,
                                      keepAllBackgroundSymbolUses = false,
+                                     reactorListener = reactorMonitor,
                                      ImplicitlyStartBackgroundWork = enableBgCheck.Value)
 
             enableBgCheck.Change.Advise_NoAcknowledgement(lifetime, fun (ArgValue enabled) ->
@@ -60,7 +61,7 @@ type FSharpCheckerService
             if checker.IsValueCreated then
                 checker.Value.InvalidateAll())
 
-    member val FcsReactorMonitor = Unchecked.defaultof<IFcsReactorMonitor> with get, set
+    member val FcsReactorMonitor = reactorMonitor
     member val FcsProjectProvider = Unchecked.defaultof<IFcsProjectProvider> with get, set
 
     member x.Checker = checker.Value
@@ -181,12 +182,3 @@ type IFcsProjectProvider =
 type IScriptFcsProjectProvider =
     abstract GetScriptOptions: IPsiSourceFile -> FSharpProjectOptions option
     abstract GetScriptOptions: FileSystemPath * string -> FSharpProjectOptions option
-
-
-type IMonitoredReactorOperation =
-    inherit IDisposable
-    abstract OperationName : string
-
-
-type IFcsReactorMonitor =
-    abstract MonitorOperation : opName: string -> IMonitoredReactorOperation
