@@ -16,24 +16,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public ExpressionAccessType GetAccessType() => ExpressionAccessType.None;
 
-    public virtual IType Type()
-    {
-      var fsFile = FSharpFile;
-      using var opName = fsFile.CheckerService.FcsReactorMonitor.MonitorOperation("FSharpExpressionBase.Type");
-      var checkResults = fsFile.GetParseAndCheckResults(true, opName.OperationName)?.Value?.CheckResults;
-      if (checkResults == null)
-        return TypeFactory.CreateUnknownType(GetPsiModule());
-
-      var sourceFile = GetSourceFile();
-      if (sourceFile == null)
-        return TypeFactory.CreateUnknownType(GetPsiModule());
-
-      var range = this.GetDocumentRange().ToDocumentRange(sourceFile.GetLocation());
-      var fcsType = checkResults.GetTypeOfExpression(range)?.Value;
-      return fcsType != null
-        ? fcsType.MapType(this)
-        : TypeFactory.CreateUnknownType(GetPsiModule());
-    }
+    public virtual IType Type() => this.GetFcsExpressionType();
 
     public IExpressionType GetExpressionType() => Type();
     public IType GetImplicitlyConvertedTo() => Type();
@@ -57,5 +40,27 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     bool IArgumentInfo.IsExtensionInvocationQualifier => false;
     IPsiModule IArgumentInfo.PsiModule => GetPsiModule();
     DocumentRange IArgumentInfo.GetDocumentRange() => GetNavigationRange();
+  }
+
+  public static class FSharpExpressionUtil
+  {
+    public static IType GetFcsExpressionType(this IFSharpExpression fsExpr)
+    {
+      var fsFile = fsExpr.FSharpFile;
+      using var opName = fsFile.CheckerService.FcsReactorMonitor.MonitorOperation("FSharpExpressionBase.Type");
+      var checkResults = fsFile.GetParseAndCheckResults(true, opName.OperationName)?.Value?.CheckResults;
+      if (checkResults == null)
+        return TypeFactory.CreateUnknownType(fsExpr.GetPsiModule());
+
+      var sourceFile = fsExpr.GetSourceFile();
+      if (sourceFile == null)
+        return TypeFactory.CreateUnknownType(fsExpr.GetPsiModule());
+
+      var range = fsExpr.GetDocumentRange().ToDocumentRange(sourceFile.GetLocation());
+      var fcsType = checkResults.GetTypeOfExpression(range)?.Value;
+      return fcsType != null
+        ? fcsType.MapType(fsExpr)
+        : TypeFactory.CreateUnknownType(fsExpr.GetPsiModule());
+    }
   }
 }

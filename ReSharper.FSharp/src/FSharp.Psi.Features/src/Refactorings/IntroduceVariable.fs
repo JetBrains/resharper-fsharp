@@ -42,6 +42,19 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
     /// Producing incomplete expression adds error but is easier to edit code immediately afterwards.
     let alwaysGenerateCompleteBindingExpr = false
 
+    static let needsSpaceAfterIdentNodeTypes =
+        NodeTypeSet(
+           ElementType.RECORD_EXPR,
+           ElementType.ANON_RECORD_EXPR,
+           ElementType.ARRAY_OR_LIST_EXPR,
+           ElementType.PAREN_EXPR,
+           ElementType.LAMBDA_EXPR,
+           ElementType.MATCH_LAMBDA_EXPR,
+           ElementType.COMPUTATION_EXPR,
+           ElementType.QUOTE_EXPR,
+           ElementType.OBJ_EXPR,
+           ElementType.ADDRESS_OF_EXPR)
+
     let getNames (expr: IFSharpExpression) =
         let language = expr.Language
         let sourceFile = expr.GetSourceFile()
@@ -262,6 +275,8 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
             | Some indent -> indent
             | _ -> contextExpr.Indent
 
+        let addSpaceAfterIdents = needsSpaceAfterIdentNodeTypes.[sourceExpr.NodeType]
+
         let names = getNames sourceExpr
         let name = if names.Count > 0 then names.[0] else "x"
 
@@ -291,7 +306,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         setBindingExpression sourceExpr contextIndent letBindings
 
         let replacedUsages, sourceExpr =
-            data.Usages |> Seq.fold (fun ((replacedUsages, sourceExpr) as acc) usage ->
+            data.Usages |> Seq.fold (fun ((replacedUsages, sourceExpr: IFSharpExpression) as acc) usage ->
                 if not (isValid usage) then acc else
 
                 let usageIsSourceExpr = usage == sourceExpr
@@ -302,6 +317,9 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
                 let refExpr = elementFactory.CreateReferenceExpr(name) :> IFSharpExpression
                 let replacedUsage = ModificationUtil.ReplaceChild(usage, refExpr)
+
+                if addSpaceAfterIdents && replacedUsage.GetPreviousToken().IsIdentifier() then
+                    ModificationUtil.AddChildBefore(replacedUsage, Whitespace()) |> ignore
 
                 let sourceExpr =
                     if usageIsSourceExpr && contextIsSourceExpr && isInSeqExpr then replacedUsage else sourceExpr

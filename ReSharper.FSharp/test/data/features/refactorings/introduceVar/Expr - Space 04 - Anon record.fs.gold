@@ -1,0 +1,6 @@
+﻿Suggested names: foo
+module Module
+
+do
+    let foo = {| F = 1 |}
+    id foo

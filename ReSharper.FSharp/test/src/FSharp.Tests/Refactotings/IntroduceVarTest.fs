@@ -55,6 +55,14 @@ type IntroduceVarTest() =
 
     [<Test>] member x.``Expr - If 01 - Let``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - Space - Not needed``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Space 01 - Parens``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Space 02 - List``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Space 03 - Record``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Space 04 - Anon record``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Space 05 - Array``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Space 06 - Object expr``() = x.DoNamedTest()
+
     [<Test>] member x.``Record field binding - Anon 01``() = x.DoNamedTest()
     [<Test>] member x.``Record field binding - Anon 02 - In app``() = x.DoNamedTest()
     [<Test>] member x.``Record field binding 01``() = x.DoNamedTest()

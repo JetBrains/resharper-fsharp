@@ -18,8 +18,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public ConstantValue ConstantValue => ConstantValue.BAD_VALUE;
     public ExpressionAccessType GetAccessType() => ExpressionAccessType.None;
 
-    // todo: use type from reference name
-    public IType Type() => TypeFactory.CreateUnknownType(GetPsiModule());
+    public IType Type() => this.GetFcsExpressionType();
     public IExpressionType GetExpressionType() => Type();
     public IType GetImplicitlyConvertedTo() => Type();
   }
