@@ -33,5 +33,3 @@ type TestFcsReactorMonitor() =
     interface IFcsReactorMonitor with
         member x.FcsBusyDelay = fcsShowDelay :> _
         member x.MonitorOperation opName = MonitoredReactorOperation.empty opName
-        member x.OnOperationStart _ _ = ()
-        member x.OnOperationEnd() = ()

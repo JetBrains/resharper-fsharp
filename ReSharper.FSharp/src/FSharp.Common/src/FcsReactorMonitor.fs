@@ -37,9 +37,6 @@ type IFcsReactorMonitor =
 
     abstract MonitorOperation : opName: string -> IMonitoredReactorOperation
 
-    abstract OnOperationStart : opName: string -> opArg: string -> unit
-    abstract OnOperationEnd : unit -> unit
-
 [<ShellComponent>]
 type FcsReactorMonitor
         (lifetime: Lifetime, backgroundTaskHost: RiderBackgroundTaskHost, threading: IThreading,
@@ -157,24 +154,18 @@ type FcsReactorMonitor
                 override __.OperationName = sprintf "{%d}%s" operationId opName
             }
 
-        override __.OnOperationStart opName opArg = onOperationStart opName opArg
-        override __.OnOperationEnd() = onOperationEnd()
-
-
-[<ShellComponent>]
-type FcsReactorListener(logger: ILogger, reactorMonitor: IFcsReactorMonitor) =
     interface IReactorListener with
         override __.OnReactorPauseBeforeBackgroundWork pauseMillis =
             logger.Verbose("Pausing before background work for {0:0.}ms", pauseMillis)
         override __.OnReactorOperationStart userOpName opName opArg approxQueueLength =
             logger.Verbose("--> {0}.{1} ({2}), queue length {3}", userOpName, opName, opArg, approxQueueLength)
-            reactorMonitor.OnOperationStart (userOpName + "." + opName) opArg
+            onOperationStart (userOpName + "." + opName) opArg
         override __.OnReactorOperationEnd userOpName opName _opArg elapsed =
             let level =
-                if elapsed > reactorMonitor.FcsBusyDelay.Value then LoggingLevel.WARN
+                if elapsed > showDelay.Value then LoggingLevel.WARN
                 else LoggingLevel.VERBOSE
             logger.LogMessage(level, "<-- {0}.{1}, took {2:0.}ms", userOpName, opName, elapsed.TotalMilliseconds)
-            reactorMonitor.OnOperationEnd ()
+            onOperationEnd ()
         override __.OnReactorBackgroundStart bgUserOpName bgOpName bgOpArg =
             // todo: do we want to show background steps too?
             logger.Verbose("--> Background step {0}.{1} ({2})", bgUserOpName, bgOpName, bgOpArg)
@@ -182,7 +173,7 @@ type FcsReactorListener(logger: ILogger, reactorMonitor: IFcsReactorMonitor) =
             logger.Verbose("<-- Background step {0}.{1}, was cancelled", bgUserOpName, bgOpName)
         override __.OnReactorBackgroundEnd _bgUserOpName _bgOpName _bgOpArg elapsed =
             let level =
-                if elapsed > reactorMonitor.FcsBusyDelay.Value then LoggingLevel.WARN
+                if elapsed > showDelay.Value then LoggingLevel.WARN
                 else LoggingLevel.VERBOSE
             logger.LogMessage(level, "<-- Background step took {0:0.}ms", elapsed.TotalMilliseconds)
         override __.OnSetBackgroundOp approxQueueLength =
