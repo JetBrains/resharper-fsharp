@@ -29,7 +29,8 @@ module FSharpCheckerService =
 [<ShellComponent; AllowNullLiteral>]
 type FSharpCheckerService
         (lifetime: Lifetime, logger: ILogger, onSolutionCloseNotifier: OnSolutionCloseNotifier,
-         settingsStore: ISettingsStore, settingsSchema: SettingsSchema) =
+         settingsStore: ISettingsStore, settingsSchema: SettingsSchema,
+         reactorMonitor: IFcsReactorMonitor, reactorListener: IReactorListener) =
 
     let checker =
         Environment.SetEnvironmentVariable("FCS_CheckFileInProjectCacheSize", "20")
@@ -48,6 +49,7 @@ type FSharpCheckerService
                 FSharpChecker.Create(projectCacheSize = 200,
                                      keepAllBackgroundResolutions = false,
                                      keepAllBackgroundSymbolUses = false,
+                                     reactorListener = reactorListener,
                                      ImplicitlyStartBackgroundWork = enableBgCheck.Value)
 
             enableBgCheck.Change.Advise_NoAcknowledgement(lifetime, fun (ArgValue enabled) ->
@@ -60,7 +62,7 @@ type FSharpCheckerService
             if checker.IsValueCreated then
                 checker.Value.InvalidateAll())
 
-    member val FcsReactorMonitor = Unchecked.defaultof<IFcsReactorMonitor> with get, set
+    member val FcsReactorMonitor = reactorMonitor
     member val FcsProjectProvider = Unchecked.defaultof<IFcsProjectProvider> with get, set
 
     member x.Checker = checker.Value
@@ -99,7 +101,7 @@ type FSharpCheckerService
         let source = FSharpCheckerService.getSourceText file.Document
         logger.Trace("ParseAndCheckFile: start {0}, {1}", path, opName)
 
-        use op = x.FcsReactorMonitor.MonitorOperation opName
+        use op = reactorMonitor.MonitorOperation opName
 
         // todo: don't cancel the computation when file didn't change
         match x.Checker.ParseAndCheckDocument(path, source, options, allowStaleResults, op.OperationName).RunAsTask() with
@@ -141,7 +143,7 @@ type FSharpCheckerService
             let fcsPos = getPosFromCoords coords
             let lineText = sourceFile.Document.GetLineText(coords.Line)
 
-            use op = x.FcsReactorMonitor.MonitorOperation opName
+            use op = reactorMonitor.MonitorOperation opName
             checkResults.GetSymbolUseAtLocation(fcsPos.Line, fcsPos.Column, lineText, names, op.OperationName).RunAsTask())
 
     /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.
@@ -181,12 +183,3 @@ type IFcsProjectProvider =
 type IScriptFcsProjectProvider =
     abstract GetScriptOptions: IPsiSourceFile -> FSharpProjectOptions option
     abstract GetScriptOptions: FileSystemPath * string -> FSharpProjectOptions option
-
-
-type IMonitoredReactorOperation =
-    inherit IDisposable
-    abstract OperationName : string
-
-
-type IFcsReactorMonitor =
-    abstract MonitorOperation : opName: string -> IMonitoredReactorOperation

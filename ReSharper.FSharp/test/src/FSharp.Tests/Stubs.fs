@@ -1,7 +1,9 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests
 
+open System
 open JetBrains.Application
 open JetBrains.Application.Components
+open JetBrains.DataFlow
 open JetBrains.Lifetimes
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp
@@ -22,13 +24,14 @@ type FSharpFileServiceStub() =
         member x.IsScratchFile(_) = false
         member x.IsScriptLike(_) = false
 
-[<SolutionComponent>]
-type TestFcsReactorMonitor(lifetime: Lifetime, checkerService: FSharpCheckerService) as this =
-    do
-        checkerService.FcsReactorMonitor <- this
-        lifetime.OnTermination(fun () ->
-            checkerService.FcsReactorMonitor <- Unchecked.defaultof<_>) |> ignore
+[<ShellComponent>]
+type TestFcsReactorMonitor() =
+    let fcsShowDelay = new Property<TimeSpan>("fcsShowDelay")
 
     interface IHideImplementation<FcsReactorMonitor>
+
     interface IFcsReactorMonitor with
+        member x.FcsBusyDelay = fcsShowDelay :> _
         member x.MonitorOperation opName = MonitoredReactorOperation.empty opName
+        member x.OnOperationStart _ _ = ()
+        member x.OnOperationEnd() = ()

@@ -14,6 +14,7 @@
     <Compile Include="src\Util\FSharpRangeUtil.fs" />
     <Compile Include="src\Util\FSharpCompilerAttributesUtil.fs" />
     <Compile Include="src\Util\FSharpAssemblyUtil.fs" />
+    <Compile Include="src\FcsReactorMonitor.fs" />
     <Compile Include="src\ProjectModel\FSharpLanguageVersion.fs" />
     <Compile Include="src\ProjectModel\FSharpProjectLanguage.fs" />
     <Compile Include="src\ProjectModel\ProjectProperties.fs" />
@@ -42,7 +43,6 @@
     <Compile Include="src\Checker\ScriptFcsProjectProvider.fs" />
     <Compile Include="src\Checker\FcsProjectBuilder.fs" />
     <Compile Include="src\Checker\FcsProjectProvider.fs" />
-    <Compile Include="src\FcsReactorMonitor.fs" />
     <Compile Include="src\PaketRestoreTargetsAnalyzer.fs" />
   </ItemGroup>
 

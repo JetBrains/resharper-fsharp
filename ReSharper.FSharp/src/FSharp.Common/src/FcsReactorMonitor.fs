@@ -4,17 +4,23 @@ open System
 open System.Collections.Concurrent
 open System.Diagnostics
 open System.IO
-open System.Text.RegularExpressions
 open System.Threading
+open FSharp.Compiler.SourceCodeServices
+open JetBrains.Application
+open JetBrains.Application.Environment
+open JetBrains.Application.Environment.Helpers
 open JetBrains.Application.Threading
 open JetBrains.DataFlow
 open JetBrains.Diagnostics
 open JetBrains.Lifetimes
 open JetBrains.Platform.RdFramework.Util
 open JetBrains.ProjectModel
-open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Host.Features.BackgroundTasks
 open JetBrains.Util
+
+type IMonitoredReactorOperation =
+    inherit IDisposable
+    abstract OperationName : string
 
 [<RequireQualifiedAccess>]
 module MonitoredReactorOperation =
@@ -25,12 +31,21 @@ module MonitoredReactorOperation =
         }
 
 
-[<SolutionComponent>]
+type IFcsReactorMonitor =
+    /// How long after the reactor becoming busy that the background task should be shown
+    abstract FcsBusyDelay : IProperty<TimeSpan>
+
+    abstract MonitorOperation : opName: string -> IMonitoredReactorOperation
+
+    abstract OnOperationStart : opName: string -> opArg: string -> unit
+    abstract OnOperationEnd : unit -> unit
+
+[<ShellComponent>]
 type FcsReactorMonitor
         (lifetime: Lifetime, backgroundTaskHost: RiderBackgroundTaskHost, threading: IThreading,
-         checkerService: FSharpCheckerService, logger: ILogger, solution: ISolution) as this =
+         logger: ILogger, configurations: RunsProducts.ProductConfigurations) =
 
-    inherit TraceListener("FcsReactorMonitor")
+    let isInternalMode = configurations.IsInternalMode()
 
     /// How long after the reactor becoming busy that the background task should be shown
     let showDelay = new Property<TimeSpan>("showDelay")
@@ -51,12 +66,10 @@ type FcsReactorMonitor
     let taskDescription = new Property<string>("taskDescription")
     let showBackgroundTask = new Property<bool>("showBackgroundTask")
 
-    let opStartRegex = Regex(@"--> (.+) \((.+)\), remaining \d+$", RegexOptions.Compiled)
-
     let createNewTask (activeLifetime: Lifetime) =
         let task =
             RiderBackgroundTaskBuilder.Create()
-                .WithTitle("F# Compiler Service is busy...")
+                .WithTitle("F# Compiler Service is busy")
                 .WithHeader(taskHeader)
                 .WithDescription(taskDescription)
                 .AsIndeterminate()
@@ -95,7 +108,10 @@ type FcsReactorMonitor
 
             Some operationId, opName
 
-        taskHeader.SetValue opName |> ignore
+        if isInternalMode then sprintf "Processing F# / %s" opName
+        else "Processing F#"
+        |> taskHeader.SetValue
+        |> ignore
 
         let opArg = if Path.IsPathRooted opArg then Path.GetFileName opArg else opArg
         match operationId with
@@ -114,20 +130,7 @@ type FcsReactorMonitor
 
         isReactorBusy.SetValue false |> ignore
 
-    let onTrace (message: string) =
-        // todo: add and use a proper reactor event interface in FCS instead of matching trace messages
-
-        if message.Contains "<--" then
-            onOperationEnd ()
-        else
-            let opStartMatch = opStartRegex.Match(message)
-            if opStartMatch.Success then
-                onOperationStart (opStartMatch.Groups.[1].Value) (opStartMatch.Groups.[2].Value)
-
     do
-        solution.RdFSharpModel().FcsBusyDelayMs.FlowInto(lifetime, showDelay,
-            fun ms -> TimeSpan.FromMilliseconds(float ms))
-
         showBackgroundTask.WhenTrue(lifetime, Action<_> createNewTask)
 
         isReactorBusy.WhenTrue(lifetime, fun lt -> showBackgroundTask.SetValue true |> ignore)
@@ -136,17 +139,9 @@ type FcsReactorMonitor
             threading.QueueAt(lt, "FcsReactorMonitor.HideTask", hideDelay, fun () ->
                 showBackgroundTask.SetValue false |> ignore))
 
-        // Start listening for trace events
-        checkerService.FcsReactorMonitor <- this
-        Trace.Listeners.Add(this) |> ignore
-        lifetime.OnTermination(fun () ->
-            checkerService.FcsReactorMonitor <- Unchecked.defaultof<_>
-            Trace.Listeners.Remove(this)) |> ignore
-
-    override x.Write(_: string) = ()
-    override x.WriteLine(message: string) = if message.StartsWith "Reactor:" then onTrace message
-
     interface IFcsReactorMonitor with
+        override __.FcsBusyDelay = showDelay :> _
+
         override __.MonitorOperation opName =
             // Only monitor operations when trace logging is enabled
             if not (logger.IsEnabled LoggingLevel.TRACE) then
@@ -161,3 +156,48 @@ type FcsReactorMonitor
                 override __.Dispose () = match operations.TryRemove operationId with _ -> ()
                 override __.OperationName = sprintf "{%d}%s" operationId opName
             }
+
+        override __.OnOperationStart opName opArg = onOperationStart opName opArg
+        override __.OnOperationEnd() = onOperationEnd()
+
+
+[<ShellComponent>]
+type FcsReactorListener(logger: ILogger, reactorMonitor: IFcsReactorMonitor) =
+    interface IReactorListener with
+        override __.OnReactorPauseBeforeBackgroundWork pauseMillis =
+            logger.Verbose("Pausing before background work for {0:0.}ms", pauseMillis)
+        override __.OnReactorOperationStart userOpName opName opArg approxQueueLength =
+            logger.Verbose("--> {0}.{1} ({2}), queue length {3}", userOpName, opName, opArg, approxQueueLength)
+            reactorMonitor.OnOperationStart (userOpName + "." + opName) opArg
+        override __.OnReactorOperationEnd userOpName opName _opArg elapsed =
+            let level =
+                if elapsed > reactorMonitor.FcsBusyDelay.Value then LoggingLevel.WARN
+                else LoggingLevel.VERBOSE
+            logger.LogMessage(level, "<-- {0}.{1}, took {2:0.}ms", userOpName, opName, elapsed.TotalMilliseconds)
+            reactorMonitor.OnOperationEnd ()
+        override __.OnReactorBackgroundStart bgUserOpName bgOpName bgOpArg =
+            // todo: do we want to show background steps too?
+            logger.Verbose("--> Background step {0}.{1} ({2})", bgUserOpName, bgOpName, bgOpArg)
+        override __.OnReactorBackgroundCancelled bgUserOpName bgOpName _bgOpArg =
+            logger.Verbose("<-- Background step {0}.{1}, was cancelled", bgUserOpName, bgOpName)
+        override __.OnReactorBackgroundEnd _bgUserOpName _bgOpName _bgOpArg elapsed =
+            let level =
+                if elapsed > reactorMonitor.FcsBusyDelay.Value then LoggingLevel.WARN
+                else LoggingLevel.VERBOSE
+            logger.LogMessage(level, "<-- Background step took {0:0.}ms", elapsed.TotalMilliseconds)
+        override __.OnSetBackgroundOp approxQueueLength =
+            logger.Verbose("Enqueue start background, queue length {0}", approxQueueLength)
+        override __.OnCancelBackgroundOp () =
+            logger.Verbose("Trying to cancel any active background work...")
+        override __.OnEnqueueOp userOpName opName opArg approxQueueLength =
+            logger.Verbose("Enqueue: {0}.{1} ({2}), queue length {3}", userOpName, opName, opArg, approxQueueLength)
+
+
+[<SolutionComponent>]
+type ReactorMonitorSolutionLink(lifetime: Lifetime, solution: ISolution, reactorMonitor: IFcsReactorMonitor) =
+    do
+        match solution.RdFSharpModel() with
+        | null -> ()
+        | model ->
+            model.FcsBusyDelayMs.FlowInto(lifetime, reactorMonitor.FcsBusyDelay,
+                fun ms -> TimeSpan.FromMilliseconds(float ms))
