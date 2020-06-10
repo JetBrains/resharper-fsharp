@@ -413,8 +413,11 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                 | lid ->
                     x.ProcessReferenceName(lid)
 
-                x.ProcessPatternParams(args, isLocal || isTopLevelPat, false)
-                if isLocal then ElementType.LOCAL_PARAMETERS_OWNER_PAT else ElementType.TOP_PARAMETERS_OWNER_PAT
+                if args.IsEmpty then
+                    if isLocal then ElementType.LOCAL_REFERENCE_PAT else ElementType.TOP_REFERENCE_PAT
+                else
+                    x.ProcessPatternParams(args, isLocal || isTopLevelPat, false)
+                    if isLocal then ElementType.LOCAL_PARAMETERS_OWNER_PAT else ElementType.TOP_PARAMETERS_OWNER_PAT
 
             | SynPat.Typed(pat, synType, _) ->
                 x.ProcessPat(pat, isLocal, false)
@@ -519,7 +522,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
 
         let mark = x.Mark(range)
         x.ProcessPat(pat, isLocal, false)
-        x.Done(range, mark, ElementType.MEMBER_PARAM_DECLARATION)
+        x.Done(range, mark, ElementType.MEMBER_PARAMS_DECLARATION)
 
     member x.MarkOtherType(TypeRange range as typ) =
         let mark = x.Mark(range)
@@ -1143,7 +1146,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
 
     member x.ProcessSynIndexerArg(arg) =
         match arg with
-        | SynIndexerArg.One(expr, _, range) ->
+        | SynIndexerArg.One(ExprRange range as expr, _, _) ->
             x.PushRange(range, ElementType.INDEXER_ARG_EXPR)
             x.PushExpression(getGeneratedAppArg expr)
 

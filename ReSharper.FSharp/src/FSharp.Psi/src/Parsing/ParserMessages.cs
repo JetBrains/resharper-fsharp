@@ -22,14 +22,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_OBJECT_MODEL_TYPE_DECLARATION = "";
     public const string IDS_INHERIT_MEMBER = "";
     public const string IDS_CONSTRUCTOR_DECLARATION = "";
-    public const string IDS_MEMBER_PARAM_DECLARATION_GROUP = "";
+    public const string IDS_MEMBER_PARAMS_DECLARATION = "";
     public const string IDS_MEMBER_KEYWORD = "";
     public const string IDS_SELF_ID = "";
     public const string IDS_MODIFIER = "";
     public const string IDS_NOT_COMPILED_TYPE_DECLARATION = "";
     public const string IDS_SIMPLE_TYPE_DECLARATION = "";
     public const string IDS_HASH_DIRECTIVE = "";
-    public const string IDS_SYN_PAT = "";
+    public const string IDS_F_SHARP_PATTERN = "";
     public const string IDS_CONST_PAT = "";
     public const string IDS_F_SHARP_IDENTIFIER = "";
     public const string IDS_REFERENCE_PAT = "";

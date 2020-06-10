@@ -2,7 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open JetBrains.ReSharper.FeaturesTestFramework.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
-open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
+open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
 [<FSharpTest>]
@@ -32,3 +32,5 @@ type ReplaceWithWildPatAvailabilityTest() =
 
     [<Test>] member x.``Not available - Let - Attribute 01``() = x.DoNamedTest()
     [<Test>] member x.``Not available - Let - Attribute 02 - Parens``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - Let - Attribute 03 - Typed``() = x.DoNamedTest()
+    [<Test>] member x.``Not available - Let - Attribute 04 - Typed``() = x.DoNamedTest()

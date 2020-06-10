@@ -7,10 +7,10 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Editor
 open JetBrains.ReSharper.Feature.Services.SelectEmbracingConstruct
 open JetBrains.ReSharper.Plugins.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Parsing
@@ -46,10 +46,10 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
 
             null
 
-        | :? ISynPat as synPat ->
-            let matchClause = MatchClauseNavigator.GetByPattern(synPat)
+        | :? IFSharpPattern as fsPattern ->
+            let matchClause = MatchClauseNavigator.GetByPattern(fsPattern)
             if isNotNull matchClause && isNotNull matchClause.WhenExpression then
-                FSharpTreeRangeSelection(fsFile, synPat, matchClause.WhenExpression) :> _ else
+                FSharpTreeRangeSelection(fsFile, fsPattern, matchClause.WhenExpression) :> _ else
 
             null
 

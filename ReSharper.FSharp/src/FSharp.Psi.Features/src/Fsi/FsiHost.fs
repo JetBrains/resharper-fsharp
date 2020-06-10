@@ -69,7 +69,13 @@ type FsiHost
         let targetFrameworkId = project.GetCurrentTargetFrameworkId()
         let psiModule = psiModules.GetPrimaryPsiModule(project, targetFrameworkId)
 
-        getReferencePaths assemblyFilter psiModule
+        getReferencedModules psiModule
+        |> Seq.filter (fun psiModule ->
+            match psiModule with
+            | :? IAssemblyPsiModule as assemblyModule -> assemblyFilter assemblyModule.Assembly
+            | _ -> true)
+        |> Seq.map getModuleFullPath
+        |> List
 
     do
         let rdFsiHost = solution.RdFSharpModel().FSharpInteractiveHost

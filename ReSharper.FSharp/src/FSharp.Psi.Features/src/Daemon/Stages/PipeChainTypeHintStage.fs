@@ -8,10 +8,10 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages.Tooltips
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Feature.Services.Daemon
@@ -81,7 +81,7 @@ type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBou
         for token, exprToAdorn in exprs do
             if daemonProcess.InterruptFlag then raise <| OperationCanceledException()
 
-            let (FSharpToolTipText layouts) = FSharpIdentifierTooltipProvider.GetFSharpToolTipText(checkResults, token)
+            let (FSharpToolTipText layouts) = FSharpIdentifierTooltipProvider.GetFSharpToolTipText(opName, checkResults, token)
 
             // The |> operator should have one overload and two type parameters
             match layouts with

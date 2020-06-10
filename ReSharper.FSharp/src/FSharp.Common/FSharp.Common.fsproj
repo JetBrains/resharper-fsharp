@@ -39,8 +39,10 @@
     <Compile Include="src\ProjectModel\FSharpFileService.fs" />
     <Compile Include="src\ProjectModel\FSharpProjectPresenter.fs" />
     <Compile Include="src\ProjectModel\ProjectLoadDiagnostics.fs" />
-    <Compile Include="src\Checker\FSharpProjectOptionsBuilder.fs" />
-    <Compile Include="src\Checker\FSharpProjectOptionsProvider.fs" />
+    <Compile Include="src\Checker\ScriptFcsProjectProvider.fs" />
+    <Compile Include="src\Checker\FcsProjectBuilder.fs" />
+    <Compile Include="src\Checker\FcsProjectProvider.fs" />
+    <Compile Include="src\FcsReactorMonitor.fs" />
     <Compile Include="src\PaketRestoreTargetsAnalyzer.fs" />
   </ItemGroup>
 

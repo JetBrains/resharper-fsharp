@@ -50,8 +50,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.ParameterInfo
       var paramInfoLocations = paramInfoLocationsOption.Value;
       var names = paramInfoLocations.LongId;
       var lidEnd = paramInfoLocations.LongIdEndLocation;
+
+      using var op = fsFile.CheckerService.FcsReactorMonitor.MonitorOperation(OpName);
       var getMethodsAsync =
-        checkResults.GetMethods(lidEnd.Line, lidEnd.Column, string.Empty, OptionModule.OfObj(names), FSharpOption<string>.None);
+        checkResults.GetMethods(lidEnd.Line, lidEnd.Column, string.Empty, OptionModule.OfObj(names), FSharpOption<string>.Some(op.OperationName));
 
       // do not show when no overloads are found or got an operator info
       // github.com/Microsoft/visualfsharp/blob/Visual-Studio-2017/vsintegration/src/FSharp.LanguageService/Intellisense.fs#L274

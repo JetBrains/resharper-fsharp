@@ -13,7 +13,7 @@ type FSharpRenameTest() =
 
     override x.RelativeTestDataPath = "features/refactorings/rename"
 
-    override x.ProvideOccurrencesData(occurrences, context, control) =
+    override x.ProvideOccurrencesData(occurrences, _, _) =
         // When multiple overloads are available, we want to rename initial element.
         // Current occurrences are:
         // "Rename initial element"
@@ -24,8 +24,8 @@ type FSharpRenameTest() =
         let testName = x.TestMethodName
         let csExtension = CSharpProjectFileType.CS_EXTENSION
         let fsExtension = FSharpProjectFileType.FsExtension
-        x.DoTestFiles(testName + csExtension, testName + fsExtension)
-    
+        x.DoTestSolution([| testName + csExtension; testName + fsExtension |])
+
     [<Test>] member x.``Inline - Declaration``() = x.DoNamedTest()
     [<Test>] member x.``Inline - Use``() = x.DoNamedTest()
     [<Test>] member x.``Inline - Member self id``() = x.DoNamedTest()
@@ -72,6 +72,10 @@ type FSharpRenameTest() =
     [<Test>] member x.``Params - Type private function``() = x.DoNamedTest()
     [<Test>] member x.``Params - Attributes``() = x.DoNamedTest()
     [<Test>] member x.``Params - Optional param 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Ctor params 01``() = x.DoNamedTest()
+    [<Test>] member x.``Ctor params 02``() = x.DoNamedTest()
+    [<Test>] member x.``Ctor params 03``() = x.DoNamedTest()
 
     [<Test>] member x.``Type private binding - function``() = x.DoNamedTest()
     [<Test>] member x.``Type private binding - value``() = x.DoNamedTest()
@@ -170,7 +174,10 @@ type FSharpRenameTest() =
 
     [<Test>] member x.``Union Case Field - Creation param 01``() = x.DoNamedTest()
     [<Test>] member x.``Union Case Field - Creation param 02 - Tuple``() = x.DoNamedTest()
+
     [<Test>] member x.``Union Case Field - Pattern param 01``() = x.DoNamedTest()
+    [<Test>] member x.``Union Case Field - Pattern param 02``() = x.DoNamedTest()
+    [<Test>] member x.``Union Case Field - Pattern param 03 - Pat``() = x.DoNamedTest()
 
     [<Test>] member x.``Anon record 01``() = x.DoNamedTest()
     [<Test>] member x.``Anon record 02 - Invalid name``() = x.DoNamedTest()

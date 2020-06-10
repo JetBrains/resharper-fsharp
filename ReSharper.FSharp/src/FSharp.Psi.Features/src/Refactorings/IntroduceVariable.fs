@@ -10,12 +10,13 @@ open JetBrains.ProjectModel.DataContext
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots
 open JetBrains.ReSharper.Feature.Services.Refactorings
 open JetBrains.ReSharper.Feature.Services.Refactorings.Specific
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.ExtensionsAPI
@@ -118,6 +119,21 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
             Assertion.Assert(letExpr.InExpression == expr, "letExpr.InExpression == expr")
             expr
 
+        | :? IBinaryAppExpr as binaryAppExpr when
+                binaryAppExpr.RightArgument == expr && isNotNull binaryAppExpr.LeftArgument ->
+            let leftArgument = binaryAppExpr.LeftArgument
+
+            if leftArgument.Indent = expr.Indent && leftArgument.EndLine + docLine 1 < expr.StartLine then
+                // Don't move up from "blocks" after empty non-code line separators.
+                // todo: allow choosing scope?
+                expr
+            else
+                // Try going up from the left part instead.
+                match leftArgument.IgnoreInnerParens() with
+                | :? IBinaryAppExpr as binaryAppExpr when isNotNull binaryAppExpr.RightArgument ->
+                    getExprToInsertBefore binaryAppExpr.RightArgument
+                | _ -> getExprToInsertBefore leftArgument
+
         | :? IFSharpExpression as parentExpr -> getExprToInsertBefore parentExpr
         | _ -> expr
 
@@ -133,7 +149,10 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         contextExpr :?> _
 
     let getContextDeclaration (contextExpr: IFSharpExpression): IModuleMember =
-        let letDecl = LetModuleDeclNavigator.GetByBinding(BindingNavigator.GetByExpression(contextExpr))
+        let binding = BindingNavigator.GetByExpression(contextExpr)
+        if isNull binding || binding.HeadPattern :? IParametersOwnerPat then null else
+
+        let letDecl = LetModuleDeclNavigator.GetByBinding(binding)
         if isNotNull letDecl then letDecl :> _ else
 
         let doDecl = DoNavigator.GetByExpression(contextExpr)
@@ -276,9 +295,12 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                 if not (isValid usage) then acc else
 
                 let usageIsSourceExpr = usage == sourceExpr
-                if usageIsSourceExpr && (removeSourceExpr || contextIsSourceExpr && not isInSeqExpr) then acc else
+                
+                if usageIsSourceExpr && (removeSourceExpr || replaceSourceExprNode) then
+                    // Ignore this usage, it's going to be removed via replacing tree ranges later.
+                    acc else
 
-                let refExpr = elementFactory.CreateReferenceExpr(name)
+                let refExpr = elementFactory.CreateReferenceExpr(name) :> IFSharpExpression
                 let replacedUsage = ModificationUtil.ReplaceChild(usage, refExpr)
 
                 let sourceExpr =

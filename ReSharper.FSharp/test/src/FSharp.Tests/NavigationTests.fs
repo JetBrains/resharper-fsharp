@@ -90,6 +90,7 @@ type FSharpGoToDeclarationTest() =
         |> Seq.filter (fun p -> p :? IGotoDeclarationProvider)
 
     [<Test>] member x.``Own member vs interface``() = x.DoNamedTest()
+    [<Test>] member x.``Ctor 01 - Modifier``() = x.DoNamedTest()
 
     [<TestReferences("Library1.dll", "Library2.dll")>]
     [<Test>] member x.``Same type from different assemblies``() = x.DoNamedTest()

@@ -1,5 +1,4 @@
 import com.intellij.openapi.vfs.LocalFileSystem
-import com.jetbrains.rider.model.RdFSharpCompilerServiceHost
 import com.jetbrains.rider.model.rdFSharpModel
 import com.jetbrains.rider.projectView.solution
 import com.jetbrains.rider.test.asserts.shouldNotBeNull
@@ -7,6 +6,7 @@ import com.jetbrains.rider.test.base.BaseTestWithSolution
 import com.jetbrains.rider.test.scriptingApi.changeFileContent
 import com.jetbrains.rider.util.idea.lifetime
 import com.jetbrains.rdclient.util.idea.waitAndPump
+import com.jetbrains.rider.model.RdFcsHost
 import com.jetbrains.rider.test.annotations.TestEnvironment
 import com.jetbrains.rider.test.enums.CoreVersion
 import org.testng.annotations.Test
@@ -18,8 +18,8 @@ import java.time.Duration
 class FileSystemShimTest : BaseTestWithSolution() {
     override fun getSolutionDirectoryName() = "CoreConsoleApp"
 
-    private val fcsHost: RdFSharpCompilerServiceHost
-        get() = project.solution.rdFSharpModel.fSharpCompilerServiceHost
+    private val fcsHost: RdFcsHost
+        get() = project.solution.rdFSharpModel.fcsHost
 
     @Test
     fun externalFileChange() {

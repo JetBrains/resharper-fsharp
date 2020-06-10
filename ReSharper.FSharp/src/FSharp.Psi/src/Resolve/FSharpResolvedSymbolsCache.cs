@@ -21,19 +21,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
   {
     public IPsiModules PsiModules { get; }
     public FSharpCheckerService CheckerService { get; }
-    public IFSharpProjectOptionsProvider ProjectOptionsProvider { get; }
+    public IFcsProjectProvider FcsProjectProvider { get; }
 
     private readonly object myLock = new object();
     private readonly ISet<IPsiSourceFile> myDirtyFiles = new HashSet<IPsiSourceFile>();
 
     public FSharpResolvedSymbolsCache(Lifetime lifetime, FSharpCheckerService checkerService, IPsiModules psiModules,
-      IFSharpProjectOptionsProvider projectOptionsProvider)
+      IFcsProjectProvider fcsProjectProvider)
     {
       PsiModules = psiModules;
       CheckerService = checkerService;
-      ProjectOptionsProvider = projectOptionsProvider;
+      FcsProjectProvider = fcsProjectProvider;
 
-      projectOptionsProvider.ModuleInvalidated.Advise(lifetime, Invalidate);
+      fcsProjectProvider.ModuleInvalidated.Advise(lifetime, Invalidate);
     }
 
     private static bool IsApplicable(IPsiSourceFile sourceFile) =>
@@ -54,6 +54,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       if (myPsiModules.IsEmpty())
         return;
 
+      // todo: reuse FcsProjectProvider references
       using (CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule()))
       {
         var resolveContext = CompilationContextCookie.GetContext();
@@ -183,11 +184,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         if (myPsiModules.TryGetValue(psiModule, out var symbols))
           return symbols;
 
-        var parsingOptions = ProjectOptionsProvider.GetParsingOptions(sourceFile);
+        var parsingOptions = FcsProjectProvider.GetParsingOptions(sourceFile);
         var filesCount = parsingOptions.SourceFiles.Length;
 
         var moduleResolvedSymbols =
-          new FSharpModuleResolvedSymbols(psiModule, filesCount, CheckerService, ProjectOptionsProvider);
+          new FSharpModuleResolvedSymbols(psiModule, filesCount, CheckerService, FcsProjectProvider);
         myPsiModules[psiModule] = moduleResolvedSymbols;
         return moduleResolvedSymbols;
       }

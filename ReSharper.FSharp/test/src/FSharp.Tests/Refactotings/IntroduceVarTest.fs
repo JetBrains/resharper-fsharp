@@ -25,6 +25,8 @@ type IntroduceVarTest() =
 
     [<Test>] member x.``Match 01``() = x.DoNamedTest()
     [<Test>] member x.``Match 02 - Multiline``() = x.DoNamedTest()
+    [<Test>] member x.``Match 03 - Multiline``() = x.DoNamedTest()
+    [<Test>] member x.``Match 04 - Multiline``() = x.DoNamedTest()
 
     [<Test>] member x.``LetExpr 01``() = x.DoNamedTest()
 
@@ -33,6 +35,8 @@ type IntroduceVarTest() =
     [<Test>] member x.``Seq 03 - Last``() = x.DoNamedTest()
     [<Test>] member x.``Seq 04``() = x.DoNamedTest()
 
+    [<Test>] member x.``LetDecl - Function 01``() = x.DoNamedTest()
+    [<Test>] member x.``LetDecl - Function 02``() = x.DoNamedTest()
     [<Test>] member x.``LetDecl 01``() = x.DoNamedTest()
     [<Test>] member x.``LetDecl 02 - Indent``() = x.DoNamedTest()
 
@@ -43,6 +47,11 @@ type IntroduceVarTest() =
     [<Test>] member x.``Member - Auto property 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Binary app 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Binary app - Same indent 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Binary app - Same indent 02``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Binary app - Same indent 03``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Binary app - Same indent 04``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Binary app - Same indent 05``() = x.DoNamedTest()
 
     [<Test>] member x.``Record field binding - Anon 01``() = x.DoNamedTest()
     [<Test>] member x.``Record field binding - Anon 02 - In app``() = x.DoNamedTest()

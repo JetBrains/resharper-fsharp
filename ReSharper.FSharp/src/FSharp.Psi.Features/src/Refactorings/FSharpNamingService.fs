@@ -23,13 +23,13 @@ module Traverse =
         | TupleItem of item: int
 
     let makeTuplePatPath pat =
-        let rec tryMakePatPath path (IgnoreParenPat pat: ISynPat) =
-            match pat.Parent with
+        let rec tryMakePatPath path (IgnoreParenPat fsPattern: IFSharpPattern) =
+            match fsPattern.Parent with
             | :? ITuplePat as tuplePat ->
-                let item = tuplePat.Patterns.IndexOf(pat)
+                let item = tuplePat.Patterns.IndexOf(fsPattern)
                 Assertion.Assert(item <> -1, "item <> -1")
                 tryMakePatPath (TupleItem(item) :: path) tuplePat
-            | _ -> pat, path
+            | _ -> fsPattern, path
 
         tryMakePatPath [] pat
 
@@ -227,8 +227,8 @@ type FSharpNamingService(language: FSharpLanguage) =
 
         | _ -> EmptyList.Instance :> _
 
-    member x.AddExtraNames(namesCollection: INamesCollection, declaredElementPat: ISynPat) =
-        let pat, path = makeTuplePatPath declaredElementPat
+    member x.AddExtraNames(namesCollection: INamesCollection, fsPattern: IFSharpPattern) =
+        let pat, path = makeTuplePatPath fsPattern
 
         let entryOptions =
             EntryOptions(subrootPolicy = SubrootPolicy.Decompose, emphasis = Emphasis.Good,
@@ -271,7 +271,7 @@ type FSharpNamingService(language: FSharpLanguage) =
 
         | _ -> ()
 
-        match declaredElementPat with
+        match fsPattern with
         | :? INamedPat as namedPat ->
             let parametersOwner = ParametersOwnerPatNavigator.GetByParameter(namedPat.IgnoreParentParens())
             if isNull parametersOwner || parametersOwner.Parameters.Count <> 1 then () else
@@ -302,7 +302,7 @@ type FSharpNamingService(language: FSharpLanguage) =
         if isNotNull field && field.IsConstant then base.GetNamedElementKind(element) else
 
         let declarations = element.GetDeclarations()
-        if declarations |> Seq.exists (fun decl -> decl :? ISynPat) then
+        if declarations |> Seq.exists (fun decl -> decl :? IFSharpPattern) then
             NamedElementKinds.Locals
         else
             base.GetNamedElementKind(element)

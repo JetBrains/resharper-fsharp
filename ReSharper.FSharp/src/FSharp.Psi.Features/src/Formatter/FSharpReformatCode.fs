@@ -10,7 +10,6 @@ open JetBrains.ReSharper.Feature.Services.CSharp.CodeCleanup
 open JetBrains.ReSharper.Feature.Services.CodeCleanup
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
@@ -28,7 +27,7 @@ type FSharpReformatCode() =
         member x.SetDefaultSetting(_, _) = ()
         member x.IsAvailable(sourceFile) = sourceFile.PrimaryPsiLanguage :? FSharpLanguage
 
-        member x.Process(sourceFile, rangeMarker, profile, _) =
+        member x.Process(sourceFile, rangeMarker, profile, _, _) =
             if not (profile.GetSetting(ReformatCode.REFORMAT_CODE_DESCRIPTOR)) then () else
 
             let fsFile = sourceFile.FSharpFile
@@ -67,7 +66,7 @@ type FSharpReformatCode() =
             let stamp = document.LastModificationStamp
             let modificationSide = TextModificationSide.NotSpecified
             let newLineText = sourceFile.DetectLineEnding().GetPresentation()
-            let parsingOptions = checkerService.OptionsProvider.GetParsingOptions(sourceFile)
+            let parsingOptions = checkerService.FcsProjectProvider.GetParsingOptions(sourceFile)
             let checker = checkerService.Checker
 
             let change = 
@@ -85,7 +84,7 @@ type FSharpReformatCode() =
                         Some(DocumentChange(document, offset, oldLength, formatted, stamp, modificationSide))
                     with _ -> None
                 else
-                    let parsingOptions = checkerService.OptionsProvider.GetParsingOptions(sourceFile)
+                    let parsingOptions = checkerService.FcsProjectProvider.GetParsingOptions(sourceFile)
                     let defines = parsingOptions.ConditionalCompilationDefines
                     let formatTask =
                             if List.isEmpty defines

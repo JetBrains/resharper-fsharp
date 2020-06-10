@@ -5,6 +5,7 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Intentions.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Search
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -98,15 +99,20 @@ type FSharpImportTypeHelper() =
 
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpQuickFixUtilComponent() =
+    let [<Literal>] FcsOpName = "FSharpQuickFixUtilComponent.BindTo"
+
     interface IQuickFixUtilComponent with
         member x.BindTo(reference, typeElement, _, _) =
             let reference = reference :?> FSharpSymbolReference
-            let context = reference.GetElement()
-            let fsFile = context.FSharpFile
-            let settings = fsFile.GetSettingsStore()
+
+            let referenceOwner = reference.GetElement()
+            use writeCookie = WriteLockCookie.Create(referenceOwner.IsPhysical())
+
+            FSharpReferenceBindingUtil.SetRequiredQualifiers(reference, typeElement)
+            if FSharpResolveUtil.resolvesToQualified typeElement reference FcsOpName then reference :> _ else
 
             let moduleToOpen = getModuleToOpen typeElement
-
+            let fsFile = referenceOwner.FSharpFile
             let namingService = NamingManager.GetNamingLanguageService(fsFile.Language)
 
             let nameToOpen =
@@ -118,8 +124,8 @@ type FSharpQuickFixUtilComponent() =
 
             if nameToOpen.IsNullOrEmpty() then reference :> _ else
 
-            use writeCookie = WriteLockCookie.Create(context.IsPhysical())
-            addOpen (context.GetDocumentStartOffset()) fsFile settings nameToOpen
+            let settings = fsFile.GetSettingsStore()
+            addOpen (referenceOwner.GetDocumentStartOffset()) fsFile settings nameToOpen
             reference :> _
 
         member x.AddImportsForExtensionMethod(reference, _) = reference

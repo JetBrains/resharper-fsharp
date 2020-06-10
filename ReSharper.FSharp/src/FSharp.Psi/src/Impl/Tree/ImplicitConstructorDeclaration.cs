@@ -1,5 +1,4 @@
-﻿using FSharp.Compiler.SourceCodeServices;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
+﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
@@ -18,9 +17,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       GetContainingTypeDeclaration()?.GetNameRange() ?? TreeTextRange.InvalidRange;
 
     protected override IDeclaredElement CreateDeclaredElement() =>
-      GetFSharpSymbol() is FSharpMemberOrFunctionOrValue
-        ? new FSharpImplicitConstructor(this)
-        : null;
+      new FSharpImplicitConstructor(this);
 
     public override IFSharpIdentifierLikeNode NameIdentifier => null;
     public override TreeTextRange GetNameIdentifierRange() => GetNameRange();

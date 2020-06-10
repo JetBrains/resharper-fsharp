@@ -3,6 +3,7 @@
     <TargetFramework>net461</TargetFramework>
     <RootNamespace>JetBrains.ReSharper.Plugins.FSharp.Services.Cs</RootNamespace>
     <AssemblyName>JetBrains.ReSharper.Plugins.FSharp.Services.Cs</AssemblyName>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>

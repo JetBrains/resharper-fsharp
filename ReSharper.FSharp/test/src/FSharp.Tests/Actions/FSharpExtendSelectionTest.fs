@@ -1,7 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open JetBrains.ReSharper.Feature.Services.Tests.FeatureServices.SelectEmbracingConstruct
-open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
+open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
 [<FSharpTest>]

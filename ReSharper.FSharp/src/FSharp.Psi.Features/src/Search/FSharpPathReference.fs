@@ -48,7 +48,7 @@ type FSharpPathReference(owner, sourceFile) =
         let fsFile = owner.GetContainingFile() :?> IFSharpFile
         let document = sourceFile.Document
         let tokenStartOffset = owner.Parent.GetTreeStartOffset()
-        fsFile.CheckerService.OptionsProvider.GetProjectOptions(sourceFile)
+        fsFile.CheckerService.FcsProjectProvider.GetProjectOptions(sourceFile)
         |> Option.bind (fun options ->
             options.OriginalLoadReferences
             |> List.tryFind (fun (range, _, _) -> getTreeStartOffset document range = tokenStartOffset)

@@ -2,8 +2,8 @@
 
   <Usings>
     JetBrains.ReSharper.Intentions.QuickFixes;
+    JetBrains.ReSharper.Plugins.FSharp.Psi;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings;
-    JetBrains.ReSharper.Plugins.FSharp.Psi.Util.PsiUtil;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;

@@ -52,10 +52,10 @@ type FSharpScriptOptions =
 
 
 [<SolutionInstanceComponent>]
-type FSharpScriptOptionsProvider(lifetime: Lifetime, settings: IContextBoundSettingsStoreLive) =
+type FSharpScriptSettingsProvider(lifetime: Lifetime, settings: IContextBoundSettingsStoreLive) =
     new (lifetime: Lifetime, solution: ISolution, settingsStore: ISettingsStore) =
         let settings = settingsStore.BindToContextLive(lifetime, ContextRange.Smart(solution.ToDataContext()))
-        FSharpScriptOptionsProvider(lifetime, settings)
+        FSharpScriptSettingsProvider(lifetime, settings)
 
     member val LanguageVersion = settings.GetValueProperty(lifetime, fun s -> s.LanguageVersion)
     member val CustomDefines = settings.GetValueProperty(lifetime, fun s -> s.CustomDefines)
