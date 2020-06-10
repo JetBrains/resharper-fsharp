@@ -1,9 +1,9 @@
-﻿Suggested names: foo
+﻿Suggested names: boolean
 module Module
 
 type U =
     | A
     static member M(b: bool) = ()
 
-let foo = U.A = U.A
-U.M(foo)
+let boolean = U.A = U.A
+U.M(boolean)
