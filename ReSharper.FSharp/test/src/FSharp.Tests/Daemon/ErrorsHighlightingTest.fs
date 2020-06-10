@@ -48,3 +48,5 @@ type ErrorsHighlightingTest() =
     [<Test>] member x.``Unused expr 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Value not mutable 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Upcast unnecessary 01``() = x.DoNamedTest()

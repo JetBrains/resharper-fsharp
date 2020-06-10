@@ -15,9 +15,10 @@ let getTreeNodesDocumentRange (startNode: ITreeNode) (endNode: ITreeNode) =
     DocumentRange(&startOffset, &endOffset)
 
 let getUpcastRange (upcastExpr: IUpcastExpr) =
-    if not (isValid upcastExpr && isValid upcastExpr.OperatorToken) then DocumentRange.InvalidRange else
-
-    getTreeNodesDocumentRange upcastExpr upcastExpr.OperatorToken
+    if isValid upcastExpr && isValid upcastExpr.OperatorToken && isValid upcastExpr.TypeUsage then
+        getTreeNodesDocumentRange upcastExpr.OperatorToken upcastExpr.TypeUsage
+    else
+        DocumentRange.InvalidRange
 
 let getIndexerArgListRange (indexerExpr: IItemIndexerExpr) =
     match indexerExpr.IndexerArgList with
