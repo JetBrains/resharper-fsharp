@@ -275,7 +275,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
             | Some indent -> indent
             | _ -> contextExpr.Indent
 
-        let addSpaceAfterIdents = needsSpaceAfterIdentNodeTypes.[sourceExpr.NodeType]
+        let addSpaceNearIdents = needsSpaceAfterIdentNodeTypes.[sourceExpr.NodeType]
 
         let names = getNames sourceExpr
         let name = if names.Count > 0 then names.[0] else "x"
@@ -318,8 +318,12 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                 let refExpr = elementFactory.CreateReferenceExpr(name) :> IFSharpExpression
                 let replacedUsage = ModificationUtil.ReplaceChild(usage, refExpr)
 
-                if addSpaceAfterIdents && replacedUsage.GetPreviousToken().IsIdentifier() then
-                    ModificationUtil.AddChildBefore(replacedUsage, Whitespace()) |> ignore
+                if addSpaceNearIdents then
+                    if replacedUsage.GetPreviousToken().IsIdentifier() then
+                        ModificationUtil.AddChildBefore(replacedUsage, Whitespace()) |> ignore
+
+                    if replacedUsage.GetNextToken().IsIdentifier() then
+                        ModificationUtil.AddChildAfter(replacedUsage, Whitespace()) |> ignore
 
                 let sourceExpr =
                     if usageIsSourceExpr && contextIsSourceExpr && isInSeqExpr then replacedUsage else sourceExpr
