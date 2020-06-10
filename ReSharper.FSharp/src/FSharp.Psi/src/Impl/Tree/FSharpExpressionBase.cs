@@ -1,6 +1,8 @@
 using JetBrains.DocumentModel;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
+using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
@@ -14,7 +16,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public ExpressionAccessType GetAccessType() => ExpressionAccessType.None;
 
-    public virtual IType Type() => TypeFactory.CreateUnknownType(GetPsiModule());
+    public virtual IType Type()
+    {
+      var fsFile = FSharpFile;
+      using var opName = fsFile.CheckerService.FcsReactorMonitor.MonitorOperation("FSharpExpressionBase.Type");
+      var checkResults = fsFile.GetParseAndCheckResults(true, opName.OperationName)?.Value?.CheckResults;
+      if (checkResults == null)
+        return TypeFactory.CreateUnknownType(GetPsiModule());
+
+      var sourceFile = GetSourceFile();
+      if (sourceFile == null)
+        return TypeFactory.CreateUnknownType(GetPsiModule());
+
+      var range = this.GetDocumentRange().ToDocumentRange(sourceFile.GetLocation());
+      var fcsType = checkResults.GetTypeOfExpression(range)?.Value;
+      return fcsType != null
+        ? fcsType.MapType(this)
+        : TypeFactory.CreateUnknownType(GetPsiModule());
+    }
+
     public IExpressionType GetExpressionType() => Type();
     public IType GetImplicitlyConvertedTo() => Type();
 

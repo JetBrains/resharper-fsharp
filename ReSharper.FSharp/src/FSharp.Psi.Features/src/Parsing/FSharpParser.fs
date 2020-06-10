@@ -50,7 +50,7 @@ type FSharpParser(lexer: ILexer, document: IDocument, path: FileSystemPath, sour
             tryCreateTreeBuilder lexer lifetime parseResults
             |> Option.defaultWith (fun _ -> createFakeBuilder lexer lifetime)
 
-        treeBuilder.CreateFSharpFile(CheckerService = checkerService,
+        treeBuilder.CreateFSharpFile(FcsCheckerService = checkerService,
                                      ParseResults = parseResults,
                                      ResolvedSymbolsCache = symbolsCache,
                                      LanguageType = language)
