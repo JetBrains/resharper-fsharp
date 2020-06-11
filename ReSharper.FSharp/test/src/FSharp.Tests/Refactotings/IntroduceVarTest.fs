@@ -87,6 +87,7 @@ type IntroduceVarTest() =
 
     [<Test>] member x.``Single line - If 01``() = x.DoNamedTest()
     [<Test>] member x.``Single line - Lambda 01``() = x.DoNamedTest()
+    [<Test>] member x.``Single line - Lambda 02 - Nested``() = x.DoNamedTest()
     [<Test>] member x.``Single line - Match 01``() = x.DoNamedTest()
     [<Test>] member x.``Single line - Match 02 - Parens``() = x.DoNamedTest()
     [<Test>] member x.``Single line - When 01``() = x.DoNamedTest()

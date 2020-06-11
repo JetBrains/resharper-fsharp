@@ -108,6 +108,3 @@ let setBindingExpression (expr: IFSharpExpression) contextIndent (letBindings: #
         ModificationUtil.AddChildBefore(newExpr, NewLine(expr.GetLineEnding())) |> ignore
         ModificationUtil.AddChildBefore(newExpr, Whitespace(contextIndent + indentSize)) |> ignore
         shiftExpr indentSize newExpr
-
-        if expr :? ILambdaExpr then
-            addParens newExpr |> ignore 

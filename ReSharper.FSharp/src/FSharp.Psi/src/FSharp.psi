@@ -457,7 +457,7 @@ interface castExpr:
 
 parenExpr options { stubBase="FSharpExpressionBase"; }:
   LPAREN<LPAREN, LeftParen>
-  fSharpExpression<EXPR, InnerExpression>?
+  fSharpExpression<EXPR, InnerExpression>
   RPAREN<RPAREN, RightParen>;
 
 quoteExpr options { stubBase="FSharpExpressionBase"; }:
