@@ -14,16 +14,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     }
 
     public bool IsMutable =>
-      GetDeclaration() is ITopReferencePat referencePat && referencePat.IsMutable;
+      GetDeclaration() is IMutableModifierOwner mutableModifierOwner && mutableModifierOwner.IsMutable;
 
     public void SetIsMutable(bool value)
     {
       foreach (var declaration in GetDeclarations())
-        if (declaration is ITopReferencePat referencePat)
-          referencePat.SetIsMutable(true);
+        if (declaration is IMutableModifierOwner mutableModifierOwner)
+          mutableModifierOwner.SetIsMutable(true);
     }
 
     public bool CanBeMutable =>
-      GetDeclaration() is ITopReferencePat referencePat && referencePat.CanBeMutable;
+      GetDeclaration() is IMutableModifierOwner mutableModifierOwner && mutableModifierOwner.CanBeMutable;
   }
 }
