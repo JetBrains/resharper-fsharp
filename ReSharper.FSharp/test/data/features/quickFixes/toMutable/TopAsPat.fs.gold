@@ -1,0 +1,6 @@
+﻿module Module
+
+let mutable a as c = 1
+
+let main() =
+    c{caret} <- 3

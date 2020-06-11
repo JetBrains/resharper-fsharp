@@ -110,6 +110,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public TreeNodeCollection<IAttribute> Attributes =>
       this.GetBinding()?.AllAttributes ??
       TreeNodeCollection<IAttribute>.Empty;
+
+    public bool IsMutable => Binding?.IsMutable ?? false;
+
+    public void SetIsMutable(bool value)
+    {
+      var binding = Binding;
+      Assertion.Assert(binding != null, "GetBinding() != null");
+      binding.SetIsMutable(true);
+    }
+
+    public bool CanBeMutable => Binding != null;
+
+    private IBinding Binding => this.GetBinding();
   }
 
   internal partial class LocalAsPat
@@ -117,6 +130,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override IFSharpIdentifierLikeNode NameIdentifier => Identifier;
     public bool IsDeclaration => true;
     public IEnumerable<IDeclaration> Declarations => Pattern?.Declarations.Prepend(this) ?? new[] {this};
+    
+    public bool IsMutable => Binding?.IsMutable ?? false;
+
+    public void SetIsMutable(bool value)
+    {
+      var binding = Binding;
+      Assertion.Assert(binding is LocalBinding, "GetBinding() is LocalBinding");
+      binding.SetIsMutable(true);
+    }
+
+    public bool CanBeMutable => Binding is LocalBinding;
+
+    private IBinding Binding => this.GetBinding();
   }
 
   internal partial class OrPat
