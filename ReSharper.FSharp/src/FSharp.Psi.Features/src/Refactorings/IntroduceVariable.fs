@@ -401,13 +401,23 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
             | _ -> failwithf "Unexpected let node type"
 
+        let binding = letBindings.As<ILetBindings>().Bindings.[0]
+
+        match binding.Expression.IgnoreInnerParens() with
+        | :? ILambdaExpr as lambdaExpr when not lambdaExpr.IsSingleLine ->
+            // Use better indent for extracted lambda
+            let bodyExpr = lambdaExpr.Expression
+            let shift = lambdaExpr.Indent - bodyExpr.Indent + contextExpr.GetIndentSize()
+            shiftWithWhitespaceBefore shift bodyExpr
+        | _ -> ()
+
         let nodes =
             let replacedNodes =
                 replacedUsages
                 |> Seq.choose (fun pointer -> pointer.GetTreeNode() |> Option.ofObj)
                 |> Seq.toArray
 
-            [| letBindings.As<ILetBindings>().Bindings.[0].HeadPattern :> ITreeNode |]
+            [| binding.HeadPattern :> ITreeNode |]
             |> Array.append replacedNodes 
 
         let nameExpression = NameSuggestionsExpression(names)
@@ -484,7 +494,7 @@ type FSharpIntroduceVarHelper() =
 
     override x.CheckAvailability(node) =
         let expr = node.As<IFSharpExpression>()
-        if isNull expr then false else
+        if isNull expr || expr :? IFromErrorExpr then false else
 
         if expr.UserData.HasKey(FSharpIntroduceVariable.ExpressionToRemoveKey) then true else
 

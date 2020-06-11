@@ -348,6 +348,12 @@ let shouldEraseSemicolon (node: ITreeNode) =
     let settingsStore = node.GetSettingsStore()
     not (settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SemicolonAtEndOfLine))
 
+let shiftWhitespaceBefore shift (whitespace: Whitespace) =
+    let length = whitespace.GetTextLength() + shift
+    if length > 0 then
+        ModificationUtil.ReplaceChild(whitespace, Whitespace(length)) |> ignore
+    else
+        ModificationUtil.DeleteChild(whitespace)
 
 let shiftExpr shift (expr: IFSharpExpression) =
     if shift = 0 then () else
@@ -360,18 +366,24 @@ let shiftExpr shift (expr: IFSharpExpression) =
 
         match nextSibling with
         | :? NewLine -> ()
-        | :? Whitespace ->
+        | :? Whitespace as whitespace ->
             // Skip empty lines
-            if nextSibling.NextSibling.IsWhitespaceToken() then () else
-
-            let length = nextSibling.GetTextLength() + shift
-            if length > 0 then
-                ModificationUtil.ReplaceChild(nextSibling, Whitespace(length)) |> ignore
-            else
-                ModificationUtil.DeleteChild(nextSibling)
+            if not (whitespace.NextSibling.IsWhitespaceToken()) then
+                shiftWhitespaceBefore shift whitespace
         | _ ->
             if shift > 0 then
                 ModificationUtil.AddChildAfter(child, Whitespace(shift)) |> ignore
+
+let shiftWithWhitespaceBefore shift (expr: IFSharpExpression) =
+    match expr.PrevSibling with
+    | :? Whitespace as whitespace ->
+        if not (whitespace.NextSibling.IsWhitespaceToken()) then
+            shiftWhitespaceBefore shift whitespace
+    | _ ->
+        if shift > 0 then
+            ModificationUtil.AddChildBefore(expr, Whitespace(shift)) |> ignore
+
+    shiftExpr shift expr
 
 
 let rec tryFindRootPrefixAppWhereExpressionIsFunc (expr: IFSharpExpression) =

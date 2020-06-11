@@ -53,6 +53,10 @@ type IntroduceVarTest() =
     [<Test>] member x.``Expr - Binary app - Same indent 04``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Binary app - Same indent 05``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - Lambda 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 02``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Match 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Expr - If 01 - Let``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Space - Not needed``() = x.DoNamedTest()
