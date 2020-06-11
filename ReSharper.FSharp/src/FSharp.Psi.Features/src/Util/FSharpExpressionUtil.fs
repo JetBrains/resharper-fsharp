@@ -120,6 +120,6 @@ let rec isTypeEvident (expr: IFSharpExpression) =
     | :? IArrayOrListExpr as arrayOrListExpr ->
         match arrayOrListExpr.Expression with
         | :? ISequentialExpr as seqExpr ->
-            isTypeEvident (seqExpr.Expressions.FirstOrDefault())
+            isTypeEvident (seqExpr.ExpressionsEnumerable.FirstOrDefault())
         | _ -> false
     | _ -> false

@@ -1,6 +1,7 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
 open System
+open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application.Settings
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.InlayHints
@@ -19,9 +20,10 @@ open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open FSharp.Compiler.SourceCodeServices
+open JetBrains.Util
 
-type LocalReferencePatternVisitor(fsFile: IFSharpFile, highlightingContext: TypeNameHintHighlightingContext, namingPolicyProvider, nameParser) =
+type LocalReferencePatternVisitor
+        (fsFile: IFSharpFile, highlightingContext: TypeNameHintHighlightingContext, namingPolicyProvider, nameParser) =
     inherit TreeNodeVisitor<IHighlightingConsumer>()
 
     let isTypeEvidentFromVariableNamePrefix (typ: IType) (variableNameParts: string[]) =
@@ -36,7 +38,7 @@ type LocalReferencePatternVisitor(fsFile: IFSharpFile, highlightingContext: Type
     let isEvidentFromVariableName (fsType: FSharpType) variableName =
         if not highlightingContext.HideTypeNameHintsWhenTypeNameIsEvidentFromVariableName then false else
 
-        let typ = fsType.MapType(Array.empty, fsFile.GetPsiModule())
+        let typ = fsType.MapType(EmptyList.InstanceList, fsFile.GetPsiModule())
         if not (typ.IsValid()) then false else
 
         let variableNameParts = NamesHelper.GetParts(nameParser, namingPolicyProvider, variableName)
@@ -95,7 +97,7 @@ type LocalReferencePatternVisitor(fsFile: IFSharpFile, highlightingContext: Type
         let binding = BindingNavigator.GetByHeadPattern(pat)
         if isNotNull binding && isNotNull binding.ReturnTypeInfo then () else
 
-        let variableName = localRefPat.ReferenceName.ShortName
+        let variableName = localRefPat.SourceName
         if variableName = SharedImplUtil.MISSING_DECLARATION_NAME then () else
 
         if isTypeOfPatternEvident pat then () else
