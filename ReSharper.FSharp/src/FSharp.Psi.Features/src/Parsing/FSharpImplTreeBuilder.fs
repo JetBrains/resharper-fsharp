@@ -1076,8 +1076,8 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
                 x.ProcessOneLambdaParam(pats, lambdaBody, outerBodyExpr, processNext)
             else
                 match outerBodyExpr with
-                | SynExpr.Match(_, _, [ Clause(pat, whenExpr, innerExpr, clauseRange, _) ], matchRange) when
-                        matchRange.Start = clauseRange.Start ->
+                | SynExpr.Match(_, _, [ Clause(pat, whenExpr, innerExpr, _, _) as clause ], matchRange) when
+                        matchRange.Start = clause.Range.Start ->
 
                     Assertion.Assert(whenExpr.IsNone, "whenExpr.IsNone")
                     x.ProcessPat(pat, true, false)
