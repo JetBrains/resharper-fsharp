@@ -100,6 +100,9 @@ type IntroduceVarTest() =
     [<Test>] member x.``Not allowed - CompExpr 02 - Yield``() = x.DoNamedTest()
     [<Test>] member x.``Not allowed - RangeSequenceExpr 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Not allowed - Op 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not allowed - Op 02 - Prefix app``() = x.DoNamedTest()
+
     [<Test>] member x.``Not allowed - Named arg 01``() = x.DoNamedTest()
     [<Test>] member x.``Not allowed - Named arg 02 - Unit``() = x.DoNamedTest()
     [<Test>] member x.``Not allowed - Named arg 03 - Union case field``() = x.DoNamedTest()

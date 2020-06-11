@@ -177,6 +177,8 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - App - Precedence 05 - High - Multiple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - App - Precedence 06 - High - Multiple``() = x.DoNamedTest()
 
+    [<Test>] member x.``Expr - App - Prefix op - Binary 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - App - Prefix op - Binary 02 - Spaces``() = x.DoNamedTest()
     [<Test>] member x.``Expr - App - Prefix op 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - App - List 01``() = x.DoNamedTest()

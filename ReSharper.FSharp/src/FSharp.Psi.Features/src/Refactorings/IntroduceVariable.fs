@@ -1,6 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
 
 open System.Collections.Generic
+open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application.DataContext
 open JetBrains.Application.UI.Actions.ActionManager
 open JetBrains.Diagnostics
@@ -464,6 +465,11 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
             match expr with
             | :? IReferenceExpr as refExpr ->
+                let shortName = refExpr.ShortName
+                if shortName = SharedImplUtil.MISSING_DECLARATION_NAME then false else
+
+                if PrettyNaming.IsOperatorName shortName then false else
+
                 let declaredElement = refExpr.Reference.Resolve().DeclaredElement
                 not (declaredElement :? ITypeElement || declaredElement :? INamespace)
 
