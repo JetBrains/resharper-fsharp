@@ -61,10 +61,10 @@ type FSharpCheckerService
             if checker.IsValueCreated then
                 checker.Value.InvalidateAll())
 
-    member val FcsReactorMonitor = reactorMonitor
     member val FcsProjectProvider = Unchecked.defaultof<IFcsProjectProvider> with get, set
 
     member x.Checker = checker.Value
+    member x.FcsReactorMonitor = reactorMonitor
 
     member x.ParseFile(path, document, parsingOptions, [<Optional; DefaultParameterValue(false)>] noCache: bool) =
         try
@@ -100,7 +100,7 @@ type FSharpCheckerService
         let source = FSharpCheckerService.getSourceText file.Document
         logger.Trace("ParseAndCheckFile: start {0}, {1}", path, opName)
 
-        use op = x.FcsReactorMonitor.MonitorOperation opName
+        use op = reactorMonitor.MonitorOperation opName
 
         // todo: don't cancel the computation when file didn't change
         match x.Checker.ParseAndCheckDocument(path, source, options, allowStaleResults, op.OperationName).RunAsTask() with
@@ -142,7 +142,7 @@ type FSharpCheckerService
             let fcsPos = getPosFromCoords coords
             let lineText = sourceFile.Document.GetLineText(coords.Line)
 
-            use op = x.FcsReactorMonitor.MonitorOperation opName
+            use op = reactorMonitor.MonitorOperation opName
             checkResults.GetSymbolUseAtLocation(fcsPos.Line, fcsPos.Column, lineText, names, op.OperationName).RunAsTask())
 
     /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.

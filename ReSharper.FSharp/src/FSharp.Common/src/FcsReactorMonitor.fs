@@ -194,3 +194,22 @@ type ReactorMonitorSolutionLink(lifetime: Lifetime, solution: ISolution, reactor
         | model ->
             model.FcsBusyDelayMs.FlowInto(lifetime, reactorMonitor.FcsBusyDelay,
                 fun ms -> TimeSpan.FromMilliseconds(float ms))
+
+
+type FcsReactorMonitorStub() =
+    let fcsShowDelay = new Property<TimeSpan>("fcsShowDelay")
+
+    interface IFcsReactorMonitor with
+        member x.FcsBusyDelay = fcsShowDelay :> _
+        member x.MonitorOperation opName = MonitoredReactorOperation.empty opName
+
+    interface IReactorListener with
+        override __.OnReactorPauseBeforeBackgroundWork _ = ()
+        override __.OnReactorOperationStart _ _ _ _ = ()
+        override __.OnReactorOperationEnd _ _ _ _ = ()
+        override __.OnReactorBackgroundStart _ _ _ = ()
+        override __.OnReactorBackgroundCancelled _ _ _ = ()
+        override __.OnReactorBackgroundEnd _ _ _ _ = ()
+        override __.OnSetBackgroundOp _ = ()
+        override __.OnCancelBackgroundOp () = ()
+        override __.OnEnqueueOp _ _ _ _ = ()
