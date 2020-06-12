@@ -7,15 +7,16 @@ open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Naming.Extentions
 open JetBrains.ReSharper.Psi.Naming.Impl
 open JetBrains.ReSharper.Psi.Naming.Interfaces
 open JetBrains.ReSharper.Psi.Naming.Settings
 open JetBrains.Util
+open JetBrains.Util.dataStructures
 
 [<AutoOpen>]
 module Traverse =
@@ -306,3 +307,125 @@ type FSharpNamingService(language: FSharpLanguage) =
             NamedElementKinds.Locals
         else
             base.GetNamedElementKind(element)
+
+module FSharpNamingService =
+    let getUsedNames (contextExpr: IFSharpExpression) (usages: List<ITreeNode>): ISet<string> =
+        let usages = HashSet(usages)
+        let usedNames = HashSet()
+
+        let scopes = Stack()
+        let scopedNames = HashSet()
+
+        let shouldAddToScope name =
+            not (usedNames.Contains(name) || scopedNames.Contains(name))
+
+        let addScopeForPatterns (patterns: IFSharpPattern seq) (inExpr: IFSharpExpression) =
+            if isNull inExpr || Seq.isEmpty patterns then () else 
+
+            let newNames = FrugalLocalList()
+            for fsPattern in patterns do
+                for decl in fsPattern.Declarations do
+                    if isNull decl.DeclaredElement then () else
+
+                    let name = decl.DeclaredName
+                    if name = SharedImplUtil.MISSING_DECLARATION_NAME then () else
+
+                    if shouldAddToScope name then
+                        newNames.Add(name)
+
+            if not newNames.IsEmpty then
+                scopes.Push({| Expr = inExpr; Names = newNames.ResultingList() |}) |> ignore
+
+        let processor =
+            { new IRecursiveElementProcessor with
+                member x.ProcessingIsFinished = false
+
+                member x.InteriorShouldBeProcessed(treeNode) =
+                    not (usages.Contains(treeNode))
+
+                member x.ProcessBeforeInterior(treeNode) =
+                    match treeNode with
+                    | :? IReferenceExpr as refExpr ->
+                        if usages.Contains(refExpr) then
+                            usedNames.AddRange(scopedNames)
+                            scopedNames.Clear() else
+
+                        if isNotNull refExpr.Qualifier then () else
+
+                        let name = refExpr.ShortName
+                        if name = SharedImplUtil.MISSING_DECLARATION_NAME ||
+                                scopedNames.Contains(name) || usedNames.Contains(name) then () else
+
+                        if refExpr.Reference.HasFcsSymbol then
+                            usedNames.Add(name) |> ignore
+
+                    | :? ILetOrUseExpr as letExpr ->
+                        let patterns = letExpr.BindingsEnumerable |> Seq.map (fun b -> b.HeadPattern)
+                        addScopeForPatterns patterns letExpr.InExpression
+
+                    | :? IBinding as binding ->
+                        let headPattern = binding.HeadPattern
+                        if isNull headPattern then () else
+
+                        let bindingExpression = binding.Expression
+                        if isNull bindingExpression then () else
+
+                        let letExpr = LetOrUseExprNavigator.GetByBinding(binding)
+                        if isNull letExpr then () else
+
+                        let patterns =
+                            match headPattern with
+                            | :? IParametersOwnerPat as p ->
+                                let parameters = p.ParametersEnumerable
+                                if letExpr.IsRecursive then
+                                    Seq.append (Seq.singleton headPattern) parameters
+                                else
+                                    parameters :> _
+
+                            | fsPattern -> Seq.singleton fsPattern
+
+                        addScopeForPatterns patterns bindingExpression
+
+                    | :? ILambdaExpr as lambdaExpr ->
+                        addScopeForPatterns lambdaExpr.PatternsEnumerable lambdaExpr.Expression
+
+                    | :? IMatchClause as matchClause ->
+                        addScopeForPatterns (Seq.singleton matchClause.Pattern) matchClause.Expression
+
+                    | :? IForEachExpr as forEachExpr ->
+                        addScopeForPatterns (Seq.singleton forEachExpr.Pattern) forEachExpr.InExpression
+
+                    | :? IForExpr as forExpr ->
+                        if isNull forExpr.DoExpression then () else
+
+                        let name = forExpr.Identifier.GetSourceName()
+                        if name = SharedImplUtil.MISSING_DECLARATION_NAME then () else
+
+                        if shouldAddToScope name then
+                            scopes.Push({| Expr = forExpr.DoExpression; Names = List(Seq.singleton name) |}) |> ignore
+
+                    | :? IFSharpExpression as fsExpr when not (scopes.IsEmpty()) ->
+                        let scope = scopes.Peek()
+                        if scope.Expr == fsExpr then
+                            scopedNames.AddRange(scope.Names)
+
+                    | _ -> ()
+
+                member x.ProcessAfterInterior(treeNode) =
+                    let fsExpr = treeNode.As<IFSharpExpression>()
+                    if scopes.IsEmpty() then () else
+
+                    let scope = scopes.Peek()
+                    if scope.Expr == fsExpr then
+                        scopedNames.RemoveRange(scope.Names)
+                        scopes.Pop() |> ignore
+            }
+
+        match SequentialExprNavigator.GetByExpression(contextExpr) with
+        | null -> contextExpr.ProcessThisAndDescendants(processor)
+        | seqExpr ->
+            seqExpr.ExpressionsEnumerable
+            |> Seq.skipWhile (fun expr -> expr != contextExpr)
+            |> Seq.iter (fun expr -> expr.ProcessThisAndDescendants(processor))
+
+        usedNames :> _

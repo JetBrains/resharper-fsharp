@@ -1,5 +1,6 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
 
+open System
 open System.Collections.Generic
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application.DataContext
@@ -56,7 +57,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
            ElementType.OBJ_EXPR,
            ElementType.ADDRESS_OF_EXPR)
 
-    let getNames (expr: IFSharpExpression) =
+    let getNames (usedNames: ISet<string>) (expr: IFSharpExpression) =
         let language = expr.Language
         let sourceFile = expr.GetSourceFile()
 
@@ -64,7 +65,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let namesCollection =
             namingManager.Suggestion.CreateEmptyCollection(PluralityKinds.Unknown, language, true, sourceFile)
 
-        let entryOptions = EntryOptions(subrootPolicy = SubrootPolicy.Decompose, prefixPolicy = PredefinedPrefixPolicy.Remove)
+        let entryOptions = EntryOptions(PluralityKinds.Unknown, SubrootPolicy.Decompose, PredefinedPrefixPolicy.Remove)
         namesCollection.Add(expr, entryOptions)
 
         let settingsStore = expr.GetSettingsStoreWithEditorConfig()
@@ -73,7 +74,9 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let namingRule =
             namingManager.Policy.GetDefaultRule(sourceFile, language, settingsStore, elementKind, descriptor)
 
-        let suggestionOptions = SuggestionOptions(null, DefaultName = "foo")
+        let usedNamesFilter = Func<_,_>(usedNames.Contains >> not)
+        let suggestionOptions = SuggestionOptions(null, DefaultName = "foo", UsedNamesFilter = usedNamesFilter)
+
         namesCollection.Prepare(namingRule, ScopeKind.Common, suggestionOptions).AllNames()
 
     let getReplaceRanges (contextExpr: IFSharpExpression) removeSourceExpr =
@@ -278,7 +281,8 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
         let addSpaceNearIdents = needsSpaceAfterIdentNodeTypes.[sourceExpr.NodeType]
 
-        let names = getNames sourceExpr
+        let usedNames = FSharpNamingService.getUsedNames contextExpr data.Usages
+        let names = getNames usedNames sourceExpr
         let name = if names.Count > 0 then names.[0] else "x"
 
         let removeSourceExpr =

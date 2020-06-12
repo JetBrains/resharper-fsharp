@@ -96,6 +96,12 @@ type IntroduceVarTest() =
     [<Test>] member x.``Types 02 - Method return``() = x.DoNamedTest()
     [<Test>] member x.``Types 03 - Type check``() = x.DoNamedTest()
 
+    [<Test>] member x.``Used names - For 01``() = x.DoNamedTest()
+    [<Test>] member x.``Used names - Let 01``() = x.DoNamedTest()
+    [<Test>] member x.``Used names - Seq 01``() = x.DoNamedTest()
+    [<Test>] member x.``Used names - Seq 02 - Before``() = x.DoNamedTest()
+    [<Test>] member x.``Used names 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Not allowed - Attribute 01``() = x.DoNamedTest()
     [<Test>] member x.``Not allowed - CompExpr 01``() = x.DoNamedTest()
     [<Test>] member x.``Not allowed - CompExpr 02 - Yield``() = x.DoNamedTest()

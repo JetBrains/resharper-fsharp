@@ -38,6 +38,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     public FSharpOption<FSharpSymbol> TryGetFSharpSymbol() =>
       OptionModule.OfObj(GetFSharpSymbol());
 
+    public bool HasFcsSymbol => GetSymbolUse() != null;
+
     public override ResolveResultWithInfo ResolveWithoutCache()
     {
       if (!myOwner.IsValid())
