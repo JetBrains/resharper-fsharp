@@ -34,7 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
         return FSharpHighlightingAttributeIdsModule.Record;
 
       if (entity.IsMeasure)
-        return FSharpHighlightingAttributeIdsModule.Measure;
+        return FSharpHighlightingAttributeIdsModule.UnitOfMeasure;
       
       return entity.IsInterface
         ? FSharpHighlightingAttributeIdsModule.Interface
@@ -72,13 +72,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
       if (IsMangledOpName(mfv.LogicalName))
         return FSharpHighlightingAttributeIdsModule.Operator;
 
-      if (mfv.IsValCompiledAsMethod)
-        return FSharpHighlightingAttributeIdsModule.Method;
-      
       if (mfv.FullType.IsFunctionType)
         return mfv.IsMutable
-          ? FSharpHighlightingAttributeIdsModule.MutableValueFunction
-          : FSharpHighlightingAttributeIdsModule.ValueFunction;
+          ? FSharpHighlightingAttributeIdsModule.MutableFunction
+          : FSharpHighlightingAttributeIdsModule.Function;
 
       if (mfv.IsMutable || mfv.IsRefCell())
         return FSharpHighlightingAttributeIdsModule.MutableValue;
@@ -98,13 +95,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
         case FSharpEntity entity when !entity.IsUnresolved:
           return GetEntityHighlightingAttributeId(entity);
 
-        case FSharpParameter parameter: // FSharpParameter is a static member in a generic constraint, not a method parameter
-          if (parameter.FullName.Equals("new"))
-            return FSharpHighlightingAttributeIdsModule.Keyword;
-          return parameter.Type.GenericArguments.Count == 2 && parameter.Type.GenericArguments[0].IsUnit
-            ? FSharpHighlightingAttributeIdsModule.Property
-            : FSharpHighlightingAttributeIdsModule.Method;
-        
         case FSharpMemberOrFunctionOrValue mfv when !mfv.IsUnresolved:
           return GetMfvHighlightingAttributeId(mfv.AccessorProperty?.Value ?? mfv);
 

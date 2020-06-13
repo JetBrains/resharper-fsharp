@@ -5,7 +5,7 @@ let |hello|(1) (|name|(2): |byref|(3)<|string|(4)>) (|other|(5): |inref|(6)<|int
 
 ---------------------------------------------------------
 (0): ReSharper F# Module Identifier: 
-(1): ReSharper F# Value Identifier: 
+(1): ReSharper F# Function Identifier: 
 (2): ReSharper F# Mutable Value Identifier: 
 (3): ReSharper F# Class Identifier: 
 (4): ReSharper F# Class Identifier: 

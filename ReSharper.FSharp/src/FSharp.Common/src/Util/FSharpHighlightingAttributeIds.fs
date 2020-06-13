@@ -47,8 +47,8 @@ module FSharpHighlightingAttributeIds =
 
     let [<Literal>] Value = "ReSharper F# Value Identifier"
     let [<Literal>] MutableValue = "ReSharper F# Mutable Value Identifier"    
-    let [<Literal>] ValueFunction = "ReSharper F# Value Function Identifier" // todo: tests
-    let [<Literal>] MutableValueFunction = "ReSharper F# Mutable Value Function Identifier" // todo: tests
+    let [<Literal>] Function = "ReSharper F# Function Identifier" // todo: tests
+    let [<Literal>] MutableFunction = "ReSharper F# Mutable Function Identifier" // todo: tests
     
     let [<Literal>] Parameter = "ReSharper F# Parameter Identifier" // todo: add setting
     let [<Literal>] Literal = "ReSharper F# Literal Identifier"
@@ -65,7 +65,7 @@ module FSharpHighlightingAttributeIds =
     let [<Literal>] ExtensionProperty = "ReSharper F# Extension Property Identifier" // todo: tests
     
     let [<Literal>] ComputationExpression = "ReSharper F# Computation Expression Identifier" // todo: tests
-    let [<Literal>] Measure = "ReSharper F# Measure Identifier" // todo: tests
+    let [<Literal>] UnitOfMeasure = "ReSharper F# Unit Of Measure Identifier" // todo: tests
 
 type FSharpSettingsNamesProvider() =
     inherit PrefixBasedSettingsNamesProvider("ReSharper F#", "FSHARP")
@@ -102,22 +102,6 @@ type FSharpSettingsNamesProvider() =
       RiderPresentableName = "Syntax//Number",
       Layer = HighlighterLayer.SYNTAX,
       EffectType = EffectType.TEXT, ForegroundColor = "#000000", DarkForegroundColor = "#B5CEA8");
-
-  RegisterHighlighter(
-      FSharpHighlightingAttributeIds.Measure,
-      FallbackAttributeId = FSharpHighlightingAttributeIds.TypeParameter,
-      GroupId = FSharpHighlightingAttributeIds.GroupId,
-      RiderPresentableName = "Syntax//Measure",
-      Layer = HighlighterLayer.SYNTAX,      
-      EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
-  
-  RegisterHighlighter(
-      FSharpHighlightingAttributeIds.ComputationExpression,
-      FallbackAttributeId = FSharpHighlightingAttributeIds.Keyword,
-      GroupId = FSharpHighlightingAttributeIds.GroupId,
-      RiderPresentableName = "Syntax//Computation expression",
-      Layer = HighlighterLayer.SYNTAX,      
-      EffectType = EffectType.TEXT, ForegroundColor = "#0000E0", DarkForegroundColor = "#569CD6");
   
   RegisterHighlighter(
       FSharpHighlightingAttributeIds.LineComment,
@@ -250,6 +234,14 @@ type FSharpSettingsNamesProvider() =
       EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
 
   RegisterHighlighter(
+      FSharpHighlightingAttributeIds.UnitOfMeasure,
+      FallbackAttributeId = FSharpHighlightingAttributeIds.TypeParameter,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Types//Unit of measure",
+      Layer = HighlighterLayer.SYNTAX,
+      EffectType = EffectType.TEXT, ForegroundColor = "DarkBlue", DarkForegroundColor = "LightBlue");
+  
+  RegisterHighlighter(
       FSharpHighlightingAttributeIds.Union,
       FallbackAttributeId = FSharpHighlightingAttributeIds.Enum,
       GroupId = FSharpHighlightingAttributeIds.GroupId,
@@ -333,23 +325,31 @@ type FSharpSettingsNamesProvider() =
       FontStyle = FontStyle.Bold);
   
   RegisterHighlighter(
-      FSharpHighlightingAttributeIds.ValueFunction,
+      FSharpHighlightingAttributeIds.Function,
       FallbackAttributeId = FSharpHighlightingAttributeIds.Method,
       GroupId = FSharpHighlightingAttributeIds.GroupId,
-      RiderPresentableName = "Values//Value function",
+      RiderPresentableName = "Values//Function",
       Layer = HighlighterLayer.SYNTAX,
       VSPriority = VSPriority.IDENTIFIERS,
       EffectType = EffectType.TEXT, ForegroundColor = "DarkCyan:Maroon", DarkForegroundColor = "Cyan");
   
   RegisterHighlighter(
-      FSharpHighlightingAttributeIds.MutableValueFunction,
+      FSharpHighlightingAttributeIds.MutableFunction,
       FallbackAttributeId = FSharpHighlightingAttributeIds.MutableValue,
       GroupId = FSharpHighlightingAttributeIds.GroupId,
-      RiderPresentableName = "Values//Mutable value function",
+      RiderPresentableName = "Values//Mutable function",
       Layer = HighlighterLayer.SYNTAX,
       VSPriority = VSPriority.IDENTIFIERS,
       EffectType = EffectType.TEXT, ForegroundColor = "DarkCyan:Maroon", DarkForegroundColor = "Cyan");
 
+  RegisterHighlighter(
+      FSharpHighlightingAttributeIds.ComputationExpression,
+      FallbackAttributeId = FSharpHighlightingAttributeIds.Keyword,
+      GroupId = FSharpHighlightingAttributeIds.GroupId,
+      RiderPresentableName = "Values//Computation expression",
+      Layer = HighlighterLayer.SYNTAX,
+      EffectType = EffectType.TEXT, ForegroundColor = "#0000E0", DarkForegroundColor = "#569CD6");
+  
   RegisterHighlighter(
       FSharpHighlightingAttributeIds.Method,
       FallbackAttributeId = DefaultLanguageAttributeIds.METHOD,
