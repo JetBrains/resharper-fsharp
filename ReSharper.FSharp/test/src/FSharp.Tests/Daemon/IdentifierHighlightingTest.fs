@@ -29,3 +29,11 @@ type IdentifierHighlightingTest() =
     [<Test>] member x.``Byrefs 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Union case 01``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Extension members 01``() = x.DoNamedTest()
+    [<Test>] member x.``Extension members 02``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Functions``() = x.DoNamedTest()
+    [<Test>] member x.``Computation expressions``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Units of measure``() = x.DoNamedTest()

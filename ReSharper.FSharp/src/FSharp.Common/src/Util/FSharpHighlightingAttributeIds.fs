@@ -46,9 +46,9 @@ module FSharpHighlightingAttributeIds =
     let [<Literal>] InterfaceExtension = "ReSharper F# Struct Extension Identifier" // todo: add setting
 
     let [<Literal>] Value = "ReSharper F# Value Identifier"
-    let [<Literal>] MutableValue = "ReSharper F# Mutable Value Identifier"    
-    let [<Literal>] Function = "ReSharper F# Function Identifier" // todo: tests
-    let [<Literal>] MutableFunction = "ReSharper F# Mutable Function Identifier" // todo: tests
+    let [<Literal>] MutableValue = "ReSharper F# Mutable Value Identifier"
+    let [<Literal>] Function = "ReSharper F# Function Identifier"
+    let [<Literal>] MutableFunction = "ReSharper F# Mutable Function Identifier"
     
     let [<Literal>] Parameter = "ReSharper F# Parameter Identifier" // todo: add setting
     let [<Literal>] Literal = "ReSharper F# Literal Identifier"
@@ -61,11 +61,11 @@ module FSharpHighlightingAttributeIds =
     let [<Literal>] Event = "ReSharper F# Event Identifier"
 
     let [<Literal>] Method = "ReSharper F# Method Identifier"
-    let [<Literal>] ExtensionMethod = "ReSharper F# Extension Method Identifier" // todo: tests
-    let [<Literal>] ExtensionProperty = "ReSharper F# Extension Property Identifier" // todo: tests
+    let [<Literal>] ExtensionMethod = "ReSharper F# Extension Method Identifier"
+    let [<Literal>] ExtensionProperty = "ReSharper F# Extension Property Identifier"
     
-    let [<Literal>] ComputationExpression = "ReSharper F# Computation Expression Identifier" // todo: tests
-    let [<Literal>] UnitOfMeasure = "ReSharper F# Unit Of Measure Identifier" // todo: tests
+    let [<Literal>] ComputationExpression = "ReSharper F# Computation Expression Identifier"
+    let [<Literal>] UnitOfMeasure = "ReSharper F# Unit Of Measure Identifier"
 
 type FSharpSettingsNamesProvider() =
     inherit PrefixBasedSettingsNamesProvider("ReSharper F#", "FSHARP")

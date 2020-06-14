@@ -1,0 +1,48 @@
+﻿[<|Measure|(0)>] type |m|(1)
+[<|Measure|(2)>] type |s|(3)
+
+type |vector3D|(4)<[<|Measure|(5)>] |'u|(6)> = { |x|(7) : |float|(8)<|'u|(9)>; |y|(10) : |float|(11)<|'u|(12)>; |z|(13) : |float|(14)<|'u|(15)> }
+let |xvec|(16) : |vector3D|(17)<|m|(18)> = { |x|(19) = 0.0<|m|(20)>; |y|(21) = 0.0<|m|(22)>; |z|(23) = 0.0<|m|(24)> }
+
+type |vector3D2|(25)<|'u|(26)> = { |x|(27) : |'u|(28); |y|(29) : |'u|(30); |z|(31) : |'u|(32) }
+let |xvec2|(33) : |vector3D2|(34)<|int|(35)> = { |x|(36) = 0; |y|(37) = 0; |z|(38) = 0 }
+---------------------------------------------------------
+(0): ReSharper F# Class Identifier: 
+(1): ReSharper F# Unit Of Measure Identifier: 
+(2): ReSharper F# Class Identifier: 
+(3): ReSharper F# Unit Of Measure Identifier: 
+(4): ReSharper F# Record Identifier: 
+(5): ReSharper F# Class Identifier: 
+(6): ReSharper F# Type Parameter Identifier: 
+(7): ReSharper F# Field Identifier: 
+(8): ReSharper F# Class Identifier: 
+(9): ReSharper F# Type Parameter Identifier: 
+(10): ReSharper F# Field Identifier: 
+(11): ReSharper F# Class Identifier: 
+(12): ReSharper F# Type Parameter Identifier: 
+(13): ReSharper F# Field Identifier: 
+(14): ReSharper F# Class Identifier: 
+(15): ReSharper F# Type Parameter Identifier: 
+(16): ReSharper F# Value Identifier: 
+(17): ReSharper F# Record Identifier: 
+(18): ReSharper F# Unit Of Measure Identifier: 
+(19): ReSharper F# Field Identifier: 
+(20): ReSharper F# Unit Of Measure Identifier: 
+(21): ReSharper F# Field Identifier: 
+(22): ReSharper F# Unit Of Measure Identifier: 
+(23): ReSharper F# Field Identifier: 
+(24): ReSharper F# Unit Of Measure Identifier: 
+(25): ReSharper F# Record Identifier: 
+(26): ReSharper F# Type Parameter Identifier: 
+(27): ReSharper F# Field Identifier: 
+(28): ReSharper F# Type Parameter Identifier: 
+(29): ReSharper F# Field Identifier: 
+(30): ReSharper F# Type Parameter Identifier: 
+(31): ReSharper F# Field Identifier: 
+(32): ReSharper F# Type Parameter Identifier: 
+(33): ReSharper F# Value Identifier: 
+(34): ReSharper F# Record Identifier: 
+(35): ReSharper F# Class Identifier: 
+(36): ReSharper F# Field Identifier: 
+(37): ReSharper F# Field Identifier: 
+(38): ReSharper F# Field Identifier: 

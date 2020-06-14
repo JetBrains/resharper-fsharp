@@ -1,0 +1,29 @@
+﻿open |System|(0)
+open |System|(1).|Threading|(2).|Tasks|(3)
+
+let |asyncCex|(4) = |async|(5) { let! |a|(6) = |Task|(7).|Run|(8)(fun |x|(9) -> 10) ||>|(10) |Async|(11).|AwaitTask|(12)
+                       |a|(13) ||>|(14) |ignore|(15) } ||>|(16) |Async|(17).|RunSynchronously|(18)
+
+let |seqCex|(19) = |seq|(20) { 0; 1; 2; 3; 4; 5 }
+---------------------------------------------------------
+(0): ReSharper F# Namespace Identifier: 
+(1): ReSharper F# Namespace Identifier: 
+(2): ReSharper F# Namespace Identifier: 
+(3): ReSharper F# Namespace Identifier: 
+(4): ReSharper F# Value Identifier: 
+(5): ReSharper F# Computation Expression Identifier: 
+(6): ReSharper F# Value Identifier: 
+(7): ReSharper F# Class Identifier: 
+(8): ReSharper F# Method Identifier: 
+(9): ReSharper F# Value Identifier: 
+(10): ReSharper F# Operator Identifier: 
+(11): ReSharper F# Class Identifier: 
+(12): ReSharper F# Method Identifier: 
+(13): ReSharper F# Value Identifier: 
+(14): ReSharper F# Operator Identifier: 
+(15): ReSharper F# Function Identifier: 
+(16): ReSharper F# Operator Identifier: 
+(17): ReSharper F# Class Identifier: 
+(18): ReSharper F# Method Identifier: 
+(19): ReSharper F# Value Identifier: 
+(20): ReSharper F# Computation Expression Identifier: 

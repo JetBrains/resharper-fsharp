@@ -1,0 +1,16 @@
+﻿open |System|(0)
+
+type |String|(1) with    
+    static member |StaticMethod|(2)() = "Lul"
+    static member |StaticProperty|(3) = "Two"
+    member |x|(4).|Method|(5)() = "Two"
+    member |x|(6).|Property|(7) = "OneOne"
+---------------------------------------------------------
+(0): ReSharper F# Namespace Identifier: 
+(1): ReSharper F# Class Identifier: 
+(2): ReSharper F# Extension Method Identifier: 
+(3): ReSharper F# Extension Property Identifier: 
+(4): ReSharper F# Value Identifier: 
+(5): ReSharper F# Extension Method Identifier: 
+(6): ReSharper F# Value Identifier: 
+(7): ReSharper F# Extension Property Identifier: 
