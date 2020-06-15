@@ -1,0 +1,115 @@
+﻿open |System|(0)
+
+let inline |CallInstanceProp|(1)<|'T|(2) when |'T|(3) : (member |Two|(4) : |'T|(5))> (|x|(6) : |'T|(7)) =
+    (|^T|(8) : (member |Two|(9) : |'T|(10)) (|x|(11)))
+let inline |CallInstanceMethod|(12)<|'T|(13) when |'T|(14) : (member |Two|(15) : |unit|(16) -> |'T|(17))> (|x|(18) : |'T|(19)) =
+    (|^T|(20) : (member |Two|(21) : |unit|(22) -> |'T|(23)) (|x|(24)))
+let inline |CallStaticProp|(25)<|'T|(26) when |'T|(27) : (static member |Two|(28) : |'T|(29))> =
+    (|^T|(30) : (static member |Two|(31) : |'T|(32)) ())
+let inline |CallStaticMethod|(33)<|'T|(34) when |'T|(35) : (static member |Two|(36) : |unit|(37) -> |'T|(38))> =
+    (|^T|(39) : (static member |Two|(40) : |unit|(41) -> |'T|(42)) ())
+    
+let inline |arraysAndStaticMethod|(43)<|'T|(44) when |'T|(45) : (static member |Two|(46) : |unit|(47) -> |'T|(48))> =
+    let |arr|(49) = |Array|(50).|zeroCreate|(51)<|Type|(52)> 10
+    for |i|(53) = 0 to |arr|(54).|Length|(55) do
+        |arr|(56).[|i|(57)] <- |typeof|(58)<|'T|(59)>
+    let |element|(60) = (|^T|(61) : (static member |Two|(62) : |unit|(63) -> |'T|(64)) ())
+    let |arr2|(65) = Enumerable.Repeat(element, 10) ||>|(66) |Seq|(67).|toArray|(68)
+    |arr|(69) ||>|(70) |Array|(71).|zip|(72) |arr2|(73)
+    
+let inline |arraysAndStaticProp|(74)<|'T|(75) when |'T|(76) : (static member |Two|(77) : |'T|(78))> =
+    (|^T|(79) : (static member |Two|(80) : |'T|(81)) ()) ||>|(82) |Seq|(83).|replicate|(84) 10
+    ||>|(85) |Seq|(86).|toArray|(87)
+    ||>|(88) |Array|(89).|zip|(90) ((Enumerable.Repeat(typedefof<'T>, 10)).ToArray())
+---------------------------------------------------------
+(0): ReSharper F# Namespace Identifier: 
+(1): ReSharper F# Function Identifier: 
+(2): ReSharper F# Type Parameter Identifier: 
+(3): ReSharper F# Type Parameter Identifier: 
+(4): ReSharper F# Value Identifier: 
+(5): ReSharper F# Type Parameter Identifier: 
+(6): ReSharper F# Value Identifier: 
+(7): ReSharper F# Type Parameter Identifier: 
+(8): ReSharper F# Type Parameter Identifier: 
+(9): ReSharper F# Value Identifier: 
+(10): ReSharper F# Type Parameter Identifier: 
+(11): ReSharper F# Value Identifier: 
+(12): ReSharper F# Function Identifier: 
+(13): ReSharper F# Type Parameter Identifier: 
+(14): ReSharper F# Type Parameter Identifier: 
+(15): ReSharper F# Value Identifier: 
+(16): ReSharper F# Class Identifier: 
+(17): ReSharper F# Type Parameter Identifier: 
+(18): ReSharper F# Value Identifier: 
+(19): ReSharper F# Type Parameter Identifier: 
+(20): ReSharper F# Type Parameter Identifier: 
+(21): ReSharper F# Value Identifier: 
+(22): ReSharper F# Class Identifier: 
+(23): ReSharper F# Type Parameter Identifier: 
+(24): ReSharper F# Value Identifier: 
+(25): ReSharper F# Function Identifier: 
+(26): ReSharper F# Type Parameter Identifier: 
+(27): ReSharper F# Type Parameter Identifier: 
+(28): ReSharper F# Value Identifier: 
+(29): ReSharper F# Type Parameter Identifier: 
+(30): ReSharper F# Type Parameter Identifier: 
+(31): ReSharper F# Value Identifier: 
+(32): ReSharper F# Type Parameter Identifier: 
+(33): ReSharper F# Function Identifier: 
+(34): ReSharper F# Type Parameter Identifier: 
+(35): ReSharper F# Type Parameter Identifier: 
+(36): ReSharper F# Value Identifier: 
+(37): ReSharper F# Class Identifier: 
+(38): ReSharper F# Type Parameter Identifier: 
+(39): ReSharper F# Type Parameter Identifier: 
+(40): ReSharper F# Value Identifier: 
+(41): ReSharper F# Class Identifier: 
+(42): ReSharper F# Type Parameter Identifier: 
+(43): ReSharper F# Function Identifier: 
+(44): ReSharper F# Type Parameter Identifier: 
+(45): ReSharper F# Type Parameter Identifier: 
+(46): ReSharper F# Value Identifier: 
+(47): ReSharper F# Class Identifier: 
+(48): ReSharper F# Type Parameter Identifier: 
+(49): ReSharper F# Value Identifier: 
+(50): ReSharper F# Module Identifier: 
+(51): ReSharper F# Function Identifier: 
+(52): ReSharper F# Class Identifier: 
+(53): ReSharper F# Value Identifier: 
+(54): ReSharper F# Value Identifier: 
+(55): ReSharper F# Property Identifier: 
+(56): ReSharper F# Value Identifier: 
+(57): ReSharper F# Value Identifier: 
+(58): ReSharper F# Function Identifier: 
+(59): ReSharper F# Type Parameter Identifier: 
+(60): ReSharper F# Value Identifier: 
+(61): ReSharper F# Type Parameter Identifier: 
+(62): ReSharper F# Value Identifier: 
+(63): ReSharper F# Class Identifier: 
+(64): ReSharper F# Type Parameter Identifier: 
+(65): ReSharper F# Value Identifier: 
+(66): ReSharper F# Operator Identifier: 
+(67): ReSharper F# Module Identifier: 
+(68): ReSharper F# Function Identifier: 
+(69): ReSharper F# Value Identifier: 
+(70): ReSharper F# Operator Identifier: 
+(71): ReSharper F# Module Identifier: 
+(72): ReSharper F# Function Identifier: 
+(73): ReSharper F# Value Identifier: 
+(74): ReSharper F# Function Identifier: 
+(75): ReSharper F# Type Parameter Identifier: 
+(76): ReSharper F# Type Parameter Identifier: 
+(77): ReSharper F# Value Identifier: 
+(78): ReSharper F# Type Parameter Identifier: 
+(79): ReSharper F# Type Parameter Identifier: 
+(80): ReSharper F# Value Identifier: 
+(81): ReSharper F# Type Parameter Identifier: 
+(82): ReSharper F# Operator Identifier: 
+(83): ReSharper F# Module Identifier: 
+(84): ReSharper F# Function Identifier: 
+(85): ReSharper F# Operator Identifier: 
+(86): ReSharper F# Module Identifier: 
+(87): ReSharper F# Function Identifier: 
+(88): ReSharper F# Operator Identifier: 
+(89): ReSharper F# Module Identifier: 
+(90): ReSharper F# Function Identifier: 
