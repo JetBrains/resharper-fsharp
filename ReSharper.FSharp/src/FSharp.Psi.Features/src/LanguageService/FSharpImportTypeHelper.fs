@@ -12,6 +12,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Finder
+open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Naming
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
@@ -67,6 +68,10 @@ type FSharpImportTypeHelper() =
 
                     let moduleToOpen = getModuleToOpen typeElement
                     if containingModules.Contains(moduleToOpen) then false else
+
+                    if typeElement.Module != psiModule &&
+                            not (psiModule.References(typeElement.Module)) then
+                        true else
 
                     let names = toQualifiedList typeElement |> List.map (fun el -> el.GetSourceName())
                     let symbolUse = context.FSharpFile.CheckerService.ResolveNameAtLocation(context, names, opName)

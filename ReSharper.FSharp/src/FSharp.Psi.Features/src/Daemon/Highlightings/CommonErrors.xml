@@ -234,6 +234,7 @@
     <Behavour attributeID="UNRESOLVED_ERROR" overlapResolvePolicy="NONE"/>
     <QuickFix>ToRecursiveFunctionFix</QuickFix>
     <QuickFix arguments="h.Reference">ImportTypeFix</QuickFix>
+    <QuickFix arguments="h.Reference">ReferenceModuleAndTypeFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="UndefinedIndexer">
