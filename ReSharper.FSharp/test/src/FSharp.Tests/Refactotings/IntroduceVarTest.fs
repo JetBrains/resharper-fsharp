@@ -101,6 +101,10 @@ type IntroduceVarTest() =
     [<Test>] member x.``Used names - Seq 01``() = x.DoNamedTest()
     [<Test>] member x.``Used names - Seq 02 - Before``() = x.DoNamedTest()
     [<Test>] member x.``Used names 01``() = x.DoNamedTest()
+    [<Test>] member x.``Used names - Member - Module 01``() = x.DoNamedTest()
+    [<Test>] member x.``Used names - Member - Module 02 - Nested pat``() = x.DoNamedTest()
+    [<Test>] member x.``Used names - Member - Type 01``() = x.DoNamedTest()
+    [<Test>] member x.``Used names - Member - Type 02 - Member``() = x.DoNamedTest()
 
     [<Test>] member x.``Not allowed - Attribute 01``() = x.DoNamedTest()
     [<Test>] member x.``Not allowed - CompExpr 01``() = x.DoNamedTest()

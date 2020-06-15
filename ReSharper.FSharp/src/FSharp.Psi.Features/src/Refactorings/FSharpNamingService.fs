@@ -309,9 +309,17 @@ type FSharpNamingService(language: FSharpLanguage) =
             base.GetNamedElementKind(element)
 
 module FSharpNamingService =
-    let getUsedNames (contextExpr: IFSharpExpression) (usages: List<ITreeNode>): ISet<string> =
+    let getUsedNames
+            (contextExpr: IFSharpExpression) (usages: List<ITreeNode>) (containingTypeElement: ITypeElement)
+            : ISet<string> =
+
         let usages = HashSet(usages)
         let usedNames = HashSet()
+
+        // Not null when suggesting names for declaration in a module/class.
+        // Don't suggest already used names. 
+        if isNotNull containingTypeElement then
+            usedNames.AddRange(containingTypeElement.MemberNames)
 
         let scopes = Stack()
         let scopedNames = HashSet()

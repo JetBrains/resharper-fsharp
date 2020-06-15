@@ -167,7 +167,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
     let getContextDeclaration (contextExpr: IFSharpExpression): IModuleMember =
         let binding = BindingNavigator.GetByExpression(contextExpr)
-        if isNull binding || binding.HeadPattern :? IParametersOwnerPat then null else
+        if isNotNull binding && binding.HeadPattern :? IParametersOwnerPat then null else
 
         let letDecl = LetModuleDeclNavigator.GetByBinding(binding)
         if isNotNull letDecl then letDecl :> _ else
@@ -260,6 +260,14 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let contextExpr = getExprToInsertBefore commonParentExpr
         let contextDecl = getContextDeclaration contextExpr
 
+        let containingTypeElement =
+            if isNull contextDecl then null else
+
+            let typeDeclaration = contextDecl.GetContainingTypeDeclaration()
+            if isNull typeDeclaration then null else
+
+            typeDeclaration.DeclaredElement
+
         let contextIsSourceExpr = sourceExpr == contextExpr && isNull contextDecl
         let isInSingleLineContext = isNull contextDecl && isSingleLineContext contextExpr
 
@@ -281,7 +289,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
         let addSpaceNearIdents = needsSpaceAfterIdentNodeTypes.[sourceExpr.NodeType]
 
-        let usedNames = FSharpNamingService.getUsedNames contextExpr data.Usages
+        let usedNames = FSharpNamingService.getUsedNames contextExpr data.Usages containingTypeElement
         let names = getNames usedNames sourceExpr
         let name = if names.Count > 0 then names.[0] else "x"
 
