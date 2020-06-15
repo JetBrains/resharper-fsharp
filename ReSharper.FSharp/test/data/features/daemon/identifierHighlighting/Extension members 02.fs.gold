@@ -1,10 +1,12 @@
 ﻿open |System|(0)
 open |System|(1).Linq
 
-type |Int32|(2) with
-    static member |MoreThanZero|(3) |x|(4) = |x|(5) |>|(6) 0
+type |Char|(2) with
+    static member |IsZero|(3) |x|(4) = |x|(5) |=|(6) |char|(7) 0
 
-let |showLinq|(7) = (|Array|(8).|zeroCreate|(9)<|int|(10)> 0).Where(Int32.MoreThanZero).Select(fun x -> x + 1).Distinct().ToArray()
+let |linq|(8) (|x|(9) : |string|(10)) =
+    |x|(11).Select(Char.IsZero).ToArray()
+
 ---------------------------------------------------------
 (0): ReSharper F# Namespace Identifier: 
 (1): ReSharper F# Namespace Identifier: 
@@ -13,7 +15,8 @@ let |showLinq|(7) = (|Array|(8).|zeroCreate|(9)<|int|(10)> 0).Where(Int32.MoreTh
 (4): ReSharper F# Value Identifier: 
 (5): ReSharper F# Value Identifier: 
 (6): ReSharper F# Operator Identifier: 
-(7): ReSharper F# Value Identifier: 
-(8): ReSharper F# Module Identifier: 
-(9): ReSharper F# Function Identifier: 
+(7): ReSharper F# Function Identifier: 
+(8): ReSharper F# Function Identifier: 
+(9): ReSharper F# Value Identifier: 
 (10): ReSharper F# Class Identifier: 
+(11): ReSharper F# Value Identifier: 

@@ -1,9 +1,3 @@
-open System
-
-let func f g x =
-    let mutable a = String.Equals(x, "lol")
+let func f g (x : string) =
     let mutable mf = f
-    let b = mf a
-	a <- b
-    mf <- not
-    g (mf a) b x
+    g (mf x) (Object.Equals(x, null))

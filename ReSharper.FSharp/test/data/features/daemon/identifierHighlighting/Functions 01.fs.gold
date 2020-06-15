@@ -1,24 +1,14 @@
-﻿open |System|(0)
-
-let |func|(1) |f|(2) |g|(3) |x|(4) =
-    let mutable |a|(5) = |String|(6).|Equals|(7)(|x|(8), "lol")
-    let mutable |mf|(9) = |f|(10)
-    let |b|(11) = |mf|(12) |a|(13)
-	a <- b
-    mf <- not
-    g (mf a) b x
+﻿let |func|(0) |f|(1) |g|(2) (|x|(3) : |string|(4)) =
+    let mutable |mf|(5) = |f|(6)
+    |g|(7) (|mf|(8) |x|(9)) (Object.Equals(x, null))
 ---------------------------------------------------------
-(0): ReSharper F# Namespace Identifier: 
+(0): ReSharper F# Function Identifier: 
 (1): ReSharper F# Function Identifier: 
 (2): ReSharper F# Function Identifier: 
 (3): ReSharper F# Value Identifier: 
-(4): ReSharper F# Value Identifier: 
-(5): ReSharper F# Mutable Value Identifier: 
-(6): ReSharper F# Class Identifier: 
-(7): ReSharper F# Method Identifier: 
-(8): ReSharper F# Value Identifier: 
-(9): ReSharper F# Mutable Function Identifier: 
-(10): ReSharper F# Function Identifier: 
-(11): ReSharper F# Value Identifier: 
-(12): ReSharper F# Mutable Function Identifier: 
-(13): ReSharper F# Mutable Value Identifier: 
+(4): ReSharper F# Class Identifier: 
+(5): ReSharper F# Mutable Function Identifier: 
+(6): ReSharper F# Function Identifier: 
+(7): ReSharper F# Function Identifier: 
+(8): ReSharper F# Mutable Function Identifier: 
+(9): ReSharper F# Value Identifier: 

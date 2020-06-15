@@ -1,10 +1,11 @@
 ﻿open |System|(0)
 
 type |String|(1) with    
-    static member |StaticMethod|(2)() = "Lul"
-    static member |StaticProperty|(3) = "Two"
-    member |x|(4).|Method|(5)() = "Two"
-    member |x|(6).|Property|(7) = "OneOne"
+    static member |StaticMethod|(2)() = "M"
+    static member |StaticProperty|(3) = "P"
+    member |x|(4).|Method|(5)() = "m"
+    member |x|(6).|Property|(7) = "p"
+
 ---------------------------------------------------------
 (0): ReSharper F# Namespace Identifier: 
 (1): ReSharper F# Class Identifier: 

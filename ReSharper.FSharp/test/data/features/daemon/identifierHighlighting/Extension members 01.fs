@@ -1,7 +1,7 @@
 open System
 
 type String with    
-    static member StaticMethod() = "Lul"
-    static member StaticProperty = "Two"
-    member x.Method() = "Two"
-    member x.Property = "OneOne"
+    static member StaticMethod() = "M"
+    static member StaticProperty = "P"
+    member x.Method() = "m"
+    member x.Property = "p"
