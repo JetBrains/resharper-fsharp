@@ -326,7 +326,7 @@ type FSharpSettingsNamesProvider() =
   
   RegisterHighlighter(
       FSharpHighlightingAttributeIds.Function,
-      FallbackAttributeId = FSharpHighlightingAttributeIds.Method,
+      FallbackAttributeId = FSharpHighlightingAttributeIds.Value,
       GroupId = FSharpHighlightingAttributeIds.GroupId,
       RiderPresentableName = "Values//Function",
       Layer = HighlighterLayer.SYNTAX,

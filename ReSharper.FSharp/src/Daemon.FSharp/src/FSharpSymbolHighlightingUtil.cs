@@ -72,7 +72,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
       if (IsMangledOpName(mfv.LogicalName))
         return FSharpHighlightingAttributeIdsModule.Operator;
 
-      if (mfv.FullType.IsFunctionType)
+      if (mfv.FullType.IsFunctionType || mfv.IsTypeFunction)
         return mfv.IsMutable
           ? FSharpHighlightingAttributeIdsModule.MutableFunction
           : FSharpHighlightingAttributeIdsModule.Function;
