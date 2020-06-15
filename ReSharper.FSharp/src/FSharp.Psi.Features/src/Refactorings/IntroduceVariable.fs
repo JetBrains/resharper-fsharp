@@ -269,6 +269,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
             typeDeclaration.DeclaredElement
 
         let contextIsSourceExpr = sourceExpr == contextExpr && isNull contextDecl
+        let contextIsImplicitDo = sourceExpr == contextExpr && contextDecl :? IDo
         let isInSingleLineContext = isNull contextDecl && isSingleLineContext contextExpr
 
         let isInSeqExpr =
@@ -295,6 +296,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
         let removeSourceExpr =
             if data.SourceExpression.UserData.HasKey(FSharpIntroduceVariable.ExpressionToRemoveKey) then true else
+            if contextIsImplicitDo then true else
             if not contextIsSourceExpr then false else
             if data.Usages.Count = 1 then true else
 
@@ -405,12 +407,15 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                 letBindings
 
             | :? ILetModuleDecl ->
-                addNodesBefore contextDecl [
+                if removeSourceExpr then
+                    ModificationUtil.ReplaceChild(contextDecl, letBindings)
+                else
+                    let letBindings = ModificationUtil.AddChildBefore(contextDecl, letBindings)
+                    addNodesAfter letBindings [
+                        NewLine(lineEnding)
+                        Whitespace(contextIndent)
+                    ] |> ignore
                     letBindings
-                    NewLine(lineEnding)
-                    Whitespace(contextIndent)
-                ] |> ignore
-                letBindings
 
             | _ -> failwithf "Unexpected let node type"
 

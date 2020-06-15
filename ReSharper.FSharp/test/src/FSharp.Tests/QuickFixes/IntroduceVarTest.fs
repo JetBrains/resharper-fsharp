@@ -27,3 +27,5 @@ type IntroduceVarTest() =
     [<Test>] member x.``Do 01``() = x.DoNamedTest()
     [<Test>] member x.``For 01``() = x.DoNamedTest()
     [<Test>] member x.``If 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Module - Do 01 - Implicit``() = x.DoNamedTest()

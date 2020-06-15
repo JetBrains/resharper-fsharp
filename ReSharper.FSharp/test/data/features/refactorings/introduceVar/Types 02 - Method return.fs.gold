@@ -2,4 +2,3 @@
 open System.Text
 
 let stringBuilder = StringBuilder().Append([||])
-stringBuilder
