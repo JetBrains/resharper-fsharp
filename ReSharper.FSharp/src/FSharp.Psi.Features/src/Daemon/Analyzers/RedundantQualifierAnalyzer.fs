@@ -24,7 +24,19 @@ let isRedundant (data: ElementProblemAnalyzerData) (referenceOwner: IFSharpRefer
     if qualifierName = SharedImplUtil.MISSING_DECLARATION_NAME then false else
 
     let opens = data.GetData(FSharpErrorsStage.openedModulesProvider).GetOpenedModuleNames
-    if not (opens.Contains(qualifierName)) then false else
+    let scopes = opens.GetValuesSafe(qualifierName)
+
+    let inAnyScope =
+        if scopes.Count = 0 then false else
+
+        let offset = referenceOwner.GetTreeStartOffset()
+        if scopes.Count = 1 then
+            OpenScope.includesOffset offset scopes.[0]
+        else
+            scopes |> Seq.exists (OpenScope.includesOffset offset)
+
+    if not inAnyScope then false else
+
 //    if not (opens.GetValuesSafe(shortName) |> Seq.exists (endsWith qualifierExpr.QualifiedName)) then () else
 
     let referenceName = referenceOwner.As<IReferenceName>()

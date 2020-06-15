@@ -1,7 +1,6 @@
 [<AutoOpen>]
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Util.OpensUtil
 
-open System.Collections.Generic
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -13,6 +12,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.Util
 
 let toQualifiedList (declaredElement: IClrDeclaredElement) =
     let rec loop acc (declaredElement: IClrDeclaredElement) =
@@ -148,9 +148,24 @@ let isInOpen (referenceName: IReferenceName) =
     | null -> false
     | node -> node.Parent :? IOpenStatement
 
-type OpenedModulesProvider(fsFile: IFSharpFile) =
-    let map = HashSet()
 
+[<RequireQualifiedAccess>]
+type OpenScope =
+    | Global
+    | Range of range: TreeTextRange
+
+[<RequireQualifiedAccess>]
+module OpenScope =
+    let includesOffset (offset: TreeOffset) (scope: OpenScope) =
+        match scope with
+        | OpenScope.Range range -> range.Contains(offset)
+        | _ -> true
+
+
+type OpenedModulesProvider(fsFile: IFSharpFile) =
+    let map = OneToListMap<string, OpenScope>()
+
+    let document = fsFile.GetSourceFile().Document
     let psiModule = fsFile.GetPsiModule()
     let symbolScope = getModuleOnlySymbolScope psiModule
 
@@ -159,20 +174,22 @@ type OpenedModulesProvider(fsFile: IFSharpFile) =
 //        | [] -> "global"
 //        | names -> names |> List.map (fun el -> el.GetSourceName()) |> String.concat "."
 
-    let import (element: IClrDeclaredElement) =
-        map.Add(element.GetSourceName()) |> ignore
+    let import scope (element: IClrDeclaredElement) =
+        map.Add(element.GetSourceName(), scope) |> ignore
         for autoImportedModule in getNestedAutoImportedModules element symbolScope do
-            map.Add(autoImportedModule.GetSourceName()) |> ignore
+            map.Add(autoImportedModule.GetSourceName(), scope) |> ignore
 
     do
-        import symbolScope.GlobalNamespace
+        import OpenScope.Global symbolScope.GlobalNamespace
 
         for moduleDecl in fsFile.ModuleDeclarationsEnumerable do
             let topLevelModuleDecl = moduleDecl.As<ITopLevelModuleLikeDeclaration>()
             if isNotNull topLevelModuleDecl then
+                // todo: use inner range only
+                let scope = OpenScope.Range(topLevelModuleDecl.GetTreeTextRange())
                 match topLevelModuleDecl.DeclaredElement with
-                | :? INamespace as ns -> import ns
-                | :? ITypeElement as ty -> import (ty.GetContainingNamespace())
+                | :? INamespace as ns -> import scope ns
+                | :? ITypeElement as ty -> import scope (ty.GetContainingNamespace())
                 | _ -> ()
 
         match fsFile.GetParseAndCheckResults(true, "OpenedModulesProvider") with
@@ -180,9 +197,10 @@ type OpenedModulesProvider(fsFile: IFSharpFile) =
         | Some results ->
 
         for fcsOpenDecl in results.CheckResults.OpenDeclarations do
+            let scope = OpenScope.Range(getTreeTextRange document fcsOpenDecl.AppliedScope)
             for fcsEntity in fcsOpenDecl.Modules do
                 let declaredElement = fcsEntity.GetDeclaredElement(psiModule).As<IClrDeclaredElement>()
                 if isNotNull declaredElement then
-                    import declaredElement
+                    import scope declaredElement
 
     member x.GetOpenedModuleNames = map
