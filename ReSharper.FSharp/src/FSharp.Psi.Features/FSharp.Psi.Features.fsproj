@@ -70,6 +70,7 @@
     <Compile Include="src\Debugger\FSharpBreakpointVariantsProvider.fs" />
     <Compile Include="src\Debugger\FSharpDebuggerLocalSymbolProvider.fs" />
     <Compile Include="src\Debugger\FSharpExpressionEvaluationInfoProvider.fs" />
+    <Compile Include="src\ExternalSources\FSharpDeclaredElementBinder.fs" />
     <Compile Include="src\FileTemplates\FileTemplates.fs" />
     <EmbeddedResource Include="src\FileTemplates\FileTemplates.xml">
       <LogicalName>JetBrains.ReSharper.Plugins.FSharp.Templates.FileTemplates.xml</LogicalName>
