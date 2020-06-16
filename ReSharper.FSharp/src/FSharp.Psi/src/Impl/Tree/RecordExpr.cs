@@ -69,16 +69,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         return field.DeclaringEntity?.Value;
 
       // todo: cover other contexts
-      var binding = BindingNavigator.GetByExpression(RecordExpr.IgnoreParentParens());
+      var sequentialExpr = SequentialExprNavigator.GetByExpression(RecordExpr.IgnoreParentParens());
+      if (sequentialExpr != null && sequentialExpr.Expressions.Last() != RecordExpr)
+        return null;
+      var exprToGetBy = sequentialExpr ?? RecordExpr.IgnoreParentParens();
+      
+      var binding = BindingNavigator.GetByExpression(exprToGetBy);
       if (binding == null || !(binding.HeadPattern is INamedPat namedPat))
         return null;
 
       var mfv = namedPat.GetFSharpSymbol() as FSharpMemberOrFunctionOrValue;
-      var fsType = mfv?.FullType;
-      if (fsType == null || !fsType.HasTypeDefinition)
+      var returnParameterType = mfv?.ReturnParameter.Type;
+      if (returnParameterType == null || !returnParameterType.HasTypeDefinition)
         return null;
 
-      var entity = fsType.TypeDefinition;
+      var entity = returnParameterType.TypeDefinition;
       return entity.IsFSharpRecord ? entity : null;
     }
 
