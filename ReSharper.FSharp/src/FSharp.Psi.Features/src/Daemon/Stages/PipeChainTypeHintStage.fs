@@ -92,7 +92,7 @@ type PipeChainHighlightingProcess(logger: ILogger, fsFile, settings: IContextBou
                 // Use EndOffsetRange to ensure the adornment appears at the end of multi-line expressions
                 let range = exprToAdorn.GetNavigationRange().EndOffsetRange()
 
-                highlightingConsumer.AddHighlighting(TypeHintHighlighting(returnTypeStr, range))
+                highlightingConsumer.AddHighlighting(PipeTypeHintHighlighting(returnTypeStr, range))
             | _ -> ()
 
         highlightingConsumer.Highlightings
