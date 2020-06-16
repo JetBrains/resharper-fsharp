@@ -27,14 +27,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public override ReferenceCollection GetFirstClassReferences() =>
       new ReferenceCollection(Reference);
-
-    public override IType Type()
-    {
-      var resolveResult = Reference.Resolve().Result;
-      return resolveResult.DeclaredElement is ITypeElement typeElement
-        ? TypeFactory.CreateType(typeElement)
-        : TypeFactory.CreateUnknownType(GetPsiModule());
-    }
   }
 
   public class RecordCtorReference : FSharpSymbolReference
@@ -73,7 +65,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (sequentialExpr != null && sequentialExpr.Expressions.Last() != RecordExpr)
         return null;
       var exprToGetBy = sequentialExpr ?? RecordExpr.IgnoreParentParens();
-      
+
       var binding = BindingNavigator.GetByExpression(exprToGetBy);
       if (binding == null || !(binding.HeadPattern is INamedPat namedPat))
         return null;

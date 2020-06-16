@@ -8,7 +8,6 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.ReSharper.Psi.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
@@ -62,9 +61,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       Qualifier is IReferenceExpr qualifier && qualifier.QualifiedName is var qualifierName && qualifierName != null
         ? qualifierName + "." + ShortName
         : ShortName;
-
-    public override IType Type() =>
-      Reference.Resolve().DeclaredElement?.Type() ?? base.Type();
 
     public FSharpSymbolReference Reference
     {

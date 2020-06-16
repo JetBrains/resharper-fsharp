@@ -3,9 +3,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 open JetBrains.ReSharper.FeaturesTestFramework.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Tests
+open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<FSharpTest>]
+[<FSharpTest; TestPackages("FSharp.Core")>]
 type IntroduceVarTest() =
     inherit QuickFixTestBase<IntroduceVarFix>()
 
@@ -29,3 +30,4 @@ type IntroduceVarTest() =
     [<Test>] member x.``If 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Module - Do 01 - Implicit``() = x.DoNamedTest()
+    [<Test>] member x.``Module - Do 02 - Function``() = x.DoNamedTest()
