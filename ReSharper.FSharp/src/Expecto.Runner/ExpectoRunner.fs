@@ -4,9 +4,9 @@ open System
 open System.Collections.Generic
 open System.IO
 open System.Reflection
-open global.Expecto
-open global.Expecto.Impl
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.UnitTesting.Expecto.Tasks
+open Expecto
+open Expecto.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.UnitTesting.ExpectoTasks
 open JetBrains.ReSharper.TaskRunnerFramework
 
 [<AllowNullLiteral>]
@@ -211,6 +211,5 @@ type ExpectoTaskRunner(server) =
     static member val RunnerInfo =
         let location = typeof<RemoteTask>.Assembly.Location
         let dir = Path.GetDirectoryName(location)
-        
-        RemoteTaskRunnerInfo(expectoId, typeof<ExpectoTaskRunner>, [| dir |])
 
+        RemoteTaskRunnerInfo(ExpectoId, typeof<ExpectoTaskRunner>, [| dir |])

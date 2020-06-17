@@ -1,16 +1,15 @@
-﻿[<AutoOpen>]
-module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.UnitTesting.Expecto.Tasks
+﻿module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.UnitTesting.ExpectoTasks
 
 open System
 open System.Xml
 open JetBrains.ReSharper.TaskRunnerFramework
 
-let [<Literal>] expectoId = "Expecto"
-let [<Literal>] assemblyPathId = "PathId"
-let [<Literal>] testId = "TestId"
-let [<Literal>] testNameId = "TestNameId"
-let [<Literal>] testUniqueId = "TestUniqueId"
-let [<Literal>] testParentUniqueId = "TestParentUniqueId"
+let [<Literal>] ExpectoId = "Expecto"
+let [<Literal>] AssemblyPathId = "PathId"
+let [<Literal>] TestId = "TestId"
+let [<Literal>] TestNameId = "TestNameId"
+let [<Literal>] TestUniqueId = "TestUniqueId"
+let [<Literal>] TestParentUniqueId = "TestParentUniqueId"
 
 [<AllowNullLiteral; Serializable>]
 type ExpectoAssemblyTask =
@@ -19,16 +18,16 @@ type ExpectoAssemblyTask =
     val Path: string
 
     new (path: string) =
-        { inherit RemoteTask(expectoId)
+        { inherit RemoteTask(ExpectoId)
           Path = path }
 
     new (xmlElement: XmlElement) =
         { inherit RemoteTask(xmlElement)
-          Path = RemoteTask.GetXmlAttribute(xmlElement, assemblyPathId) }
+          Path = RemoteTask.GetXmlAttribute(xmlElement, AssemblyPathId) }
 
     override x.SaveXml(xmlElement) =
         base.SaveXml(xmlElement)
-        RemoteTask.SetXmlAttribute(xmlElement, assemblyPathId, x.Path)
+        RemoteTask.SetXmlAttribute(xmlElement, AssemblyPathId, x.Path)
 
     override x.IsMeaningfulTask = false
 
@@ -52,16 +51,16 @@ type ExpectoTestsTask =
     val TestId: string
 
     new (elementId: string) =
-        { inherit RemoteTask(expectoId)
+        { inherit RemoteTask(ExpectoId)
           TestId = elementId }
 
     new (xmlElement: XmlElement) =
         { inherit RemoteTask(xmlElement)
-          TestId = RemoteTask.GetXmlAttribute(xmlElement, testId) }
+          TestId = RemoteTask.GetXmlAttribute(xmlElement, TestId) }
 
     override x.SaveXml(xmlElement) =
         base.SaveXml(xmlElement)
-        RemoteTask.SetXmlAttribute(xmlElement, testId, x.TestId)
+        RemoteTask.SetXmlAttribute(xmlElement, TestId, x.TestId)
 
     override x.IsMeaningfulTask = true
 
@@ -87,22 +86,22 @@ type ExpectoTestTaskBase =
     val ParentUniqueId: int
 
     new (name: string, id: int, parentId: int) =
-        { inherit RemoteTask(expectoId)
+        { inherit RemoteTask(ExpectoId)
           Name = name
           UniqueId = id
           ParentUniqueId = parentId }
 
     new (xmlElement: XmlElement) =
         { inherit RemoteTask(xmlElement)
-          Name = RemoteTask.GetXmlAttribute(xmlElement, testNameId)
-          UniqueId = RemoteTask.GetXmlAttribute(xmlElement, testUniqueId) |> int
-          ParentUniqueId = RemoteTask.GetXmlAttribute(xmlElement, testParentUniqueId) |> int }
+          Name = RemoteTask.GetXmlAttribute(xmlElement, TestNameId)
+          UniqueId = RemoteTask.GetXmlAttribute(xmlElement, TestUniqueId) |> int
+          ParentUniqueId = RemoteTask.GetXmlAttribute(xmlElement, TestParentUniqueId) |> int }
 
     override x.SaveXml(xmlElement) =
         base.SaveXml(xmlElement)
-        RemoteTask.SetXmlAttribute(xmlElement, testNameId, x.Name)
-        RemoteTask.SetXmlAttribute(xmlElement, testUniqueId, x.UniqueId.ToString())
-        RemoteTask.SetXmlAttribute(xmlElement, testParentUniqueId, x.ParentUniqueId.ToString())
+        RemoteTask.SetXmlAttribute(xmlElement, TestNameId, x.Name)
+        RemoteTask.SetXmlAttribute(xmlElement, TestUniqueId, x.UniqueId.ToString())
+        RemoteTask.SetXmlAttribute(xmlElement, TestParentUniqueId, x.ParentUniqueId.ToString())
 
     override x.IsMeaningfulTask = true
 

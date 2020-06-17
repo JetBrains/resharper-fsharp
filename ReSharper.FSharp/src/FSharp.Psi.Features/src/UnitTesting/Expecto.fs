@@ -8,8 +8,8 @@ open JetBrains.Application.UI.BindableLinq.Collections
 open JetBrains.Metadata.Reader.API
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.ClrLanguages
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.UnitTesting.Expecto.Tasks
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.UnitTesting.ExpectoTasks
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
@@ -96,7 +96,7 @@ let runnerInfo =
 
     let typeName = "JetBrains.ReSharper.Plugins.FSharp.Psi.Features.UnitTesting.ExpectoRunner+ExpectoTaskRunner"
     
-    RemoteTaskRunnerInfo(expectoId, path, typeName, [| dir |])
+    RemoteTaskRunnerInfo(ExpectoId, path, typeName, [| dir |])
 
 [<UnitTestProvider>]
 type ExpectoProvider() =
@@ -106,8 +106,8 @@ type ExpectoProvider() =
     let taskIds = Dictionary<int, string>()
 
     interface IUnitTestProvider with
-        member x.ID = expectoId
-        member x.Name = expectoId
+        member x.ID = ExpectoId
+        member x.Name = ExpectoId
 
         member x.IsElementOfKind(element: IUnitTestElement, elementKind: UnitTestElementKind) =
             match elementKind with
@@ -217,8 +217,7 @@ and [<AbstractClass; AllowNullLiteral>]
             let declaredElement = x.DeclaredElement
             if isNull declaredElement then null else
 
-            declaredElement.GetSourceFiles()
-            |> Seq.map (fun sourceFile -> sourceFile.ToProjectFile())
+            declaredElement.GetSourceFiles().Select(fun sourceFile -> sourceFile.ToProjectFile())
 
         member x.GetNamespace() =
             let declaredElement = x.DeclaredElement
