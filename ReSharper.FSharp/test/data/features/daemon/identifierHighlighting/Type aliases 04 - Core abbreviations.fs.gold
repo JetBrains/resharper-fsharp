@@ -6,6 +6,12 @@ let |testList|(5) (|ls|(6) : |int|(7) |list|(8)) =
 
 let |testSeq|(10) (|sq|(11) : |int|(12) |seq|(13)) =
     |sq|(14)
+	
+let |testRszArr|(15) (|rsz|(16) : |int|(17) |ResizeArray|(18)) =
+    |rsz|(19)
+    
+let |testOpt|(20) (|io|(21) : |int|(22) |option|(23)) =
+    |io|(24)
 ---------------------------------------------------------
 (0): ReSharper F# Function Identifier: 
 (1): ReSharper F# Value Identifier: 
@@ -22,3 +28,13 @@ let |testSeq|(10) (|sq|(11) : |int|(12) |seq|(13)) =
 (12): ReSharper F# Struct Identifier: 
 (13): ReSharper F# Interface Identifier: 
 (14): ReSharper F# Value Identifier: 
+(15): ReSharper F# Function Identifier: 
+(16): ReSharper F# Value Identifier: 
+(17): ReSharper F# Struct Identifier: 
+(18): ReSharper F# Class Identifier: 
+(19): ReSharper F# Value Identifier: 
+(20): ReSharper F# Function Identifier: 
+(21): ReSharper F# Value Identifier: 
+(22): ReSharper F# Struct Identifier: 
+(23): ReSharper F# Union Identifier: 
+(24): ReSharper F# Value Identifier: 
