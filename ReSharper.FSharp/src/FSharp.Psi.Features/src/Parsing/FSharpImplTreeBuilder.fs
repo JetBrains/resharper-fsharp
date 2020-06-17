@@ -679,11 +679,18 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             | Some(expr, _) -> x.ProcessExpression(expr)
             | _ -> ()
 
-        | SynExpr.Record(_, copyInfo, fields, _) ->
+        | SynExpr.Record(baseInfo, copyInfo, fields, _) ->
             x.PushRange(range, ElementType.RECORD_EXPR)
             x.PushStepList(fields, recordFieldListProcessor)
-            match copyInfo with
-            | Some(expr, _) -> x.ProcessExpression(expr)
+
+            match baseInfo, copyInfo with
+            | Some(typeName, expr, _, _, _), _ ->
+                x.ProcessTypeAsTypeReferenceName(typeName)
+                x.ProcessExpression(expr)
+
+            | _, Some(expr, _) ->
+                x.ProcessExpression(expr)
+
             | _ -> ()
 
         | SynExpr.New(_, synType, expr, _) ->

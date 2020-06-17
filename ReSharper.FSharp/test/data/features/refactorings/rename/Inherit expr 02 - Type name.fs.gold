@@ -1,0 +1,13 @@
+﻿module Module
+
+type zzz(i: int) =
+    class end
+
+type B() =
+    inherit zzz
+
+    val F: int
+
+    new (i: int) =
+        { inherit zzz(i)
+          F = i }
