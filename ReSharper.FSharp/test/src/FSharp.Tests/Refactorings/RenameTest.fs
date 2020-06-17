@@ -13,7 +13,7 @@ type FSharpRenameTest() =
 
     override x.RelativeTestDataPath = "features/refactorings/rename"
 
-    override x.ProvideOccurrencesData(occurrences, _, _) =
+    override x.ProvideOccurrencesData(occurrences, _, _, _) =
         // When multiple overloads are available, we want to rename initial element.
         // Current occurrences are:
         // "Rename initial element"
@@ -183,3 +183,7 @@ type FSharpRenameTest() =
     [<Test>] member x.``Anon record 02 - Invalid name``() = x.DoNamedTest()
 
     [<Test>] member x.``Error - If 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Inherit expr 01 - Arg``() = x.DoNamedTest()
+    [<Test>] member x.``Inherit expr 02 - Type name``() = x.DoNamedTest()
+    [<Test>] member x.``Inherit expr 03 - Field``() = x.DoNamedTest()

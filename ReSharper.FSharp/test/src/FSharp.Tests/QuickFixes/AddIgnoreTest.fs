@@ -47,7 +47,7 @@ type AddIgnoreTest() =
         let occurrenceName = QuickFixTestBase.GetSetting(textControl, OccurrenceName)
         if isNotNull occurrenceName then
             let workflowPopupMenu = x.Solution.GetComponent<TestWorkflowPopupMenu>()
-            workflowPopupMenu.SetTestData(x.TestLifetime, fun _ occurrences _ _ ->
+            workflowPopupMenu.SetTestData(x.TestLifetime, fun _ occurrences _ _ _ ->
                 occurrences
                 |> Array.tryFind (fun occurrence -> occurrence.Name.Text = occurrenceName)
                 |> Option.defaultWith (fun _ -> failwithf "Could not find %s occurrence" occurrenceName))
