@@ -2,6 +2,8 @@
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
+using JetBrains.Rider.Model.DebuggerWorker;
+using Microsoft.FSharp.Collections;
 using static FSharp.Compiler.PrettyNaming;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
@@ -18,9 +20,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
       if (entity.IsEnum)
         return FSharpHighlightingAttributeIdsModule.Enum;
 
-      if (entity.IsValueType)
-        return FSharpHighlightingAttributeIdsModule.Struct;
-
       if (entity.IsDelegate)
         return FSharpHighlightingAttributeIdsModule.Delegate;
 
@@ -35,10 +34,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
 
       if (entity.IsMeasure)
         return FSharpHighlightingAttributeIdsModule.UnitOfMeasure;
+
+      if (entity.IsInterface)
+        return FSharpHighlightingAttributeIdsModule.Interface;
+
+      if (entity.IsValueType || entity.HasMeasureParameter())
+        return FSharpHighlightingAttributeIdsModule.Struct;
       
-      return entity.IsInterface
-        ? FSharpHighlightingAttributeIdsModule.Interface
-        : FSharpHighlightingAttributeIdsModule.Class;
+      return FSharpHighlightingAttributeIdsModule.Class;
     }
 
     [NotNull]
@@ -86,14 +89,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
 
       return FSharpHighlightingAttributeIdsModule.Value;
     }
-
+    
     [NotNull]
     public static string GetHighlightingAttributeId([NotNull] this FSharpSymbol symbol)
     {
       switch (symbol)
       {
         case FSharpEntity entity when !entity.IsUnresolved:
-          return GetEntityHighlightingAttributeId(entity);
+          return GetEntityHighlightingAttributeId(entity.GetBaseTypeEntity());
 
         case FSharpMemberOrFunctionOrValue mfv when !mfv.IsUnresolved:
           return GetMfvHighlightingAttributeId(mfv.AccessorProperty?.Value ?? mfv);
