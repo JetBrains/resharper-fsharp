@@ -96,7 +96,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
       switch (symbol)
       {
         case FSharpEntity entity when !entity.IsUnresolved:
-          return GetEntityHighlightingAttributeId(entity.GetBaseTypeEntity());
+          return GetEntityHighlightingAttributeId(entity.GetAbbreviatedType());
 
         case FSharpMemberOrFunctionOrValue mfv when !mfv.IsUnresolved:
           return GetMfvHighlightingAttributeId(mfv.AccessorProperty?.Value ?? mfv);
