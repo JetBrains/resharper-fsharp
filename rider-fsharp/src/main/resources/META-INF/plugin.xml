@@ -27,6 +27,7 @@
     <lang.documentationProvider language="F#" implementationClass="com.jetbrains.rdclient.quickDoc.FrontendDocumentationProvider"/>
     <rider.debuggerSupportPolicy language="F#" implementationClass="com.jetbrains.rider.debugger.RiderDebuggerSupportPolicy" />
     <lineIndentProvider implementation="com.jetbrains.rider.plugins.fsharp.actions.FSharpDummyLineIndentProvider"/>
+    <scratch.creationHelper language="F#" implementationClass="com.jetbrains.rider.plugins.fsharp.actions.FSharpScratchCreationHelper" />
 
     <fileType name="F# Script" language="F# Script" extensions="fsx;fsscript" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptFileType" />
     <lang.ast.factory language="F# Script" implementationClass="com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptAstFactory" />
