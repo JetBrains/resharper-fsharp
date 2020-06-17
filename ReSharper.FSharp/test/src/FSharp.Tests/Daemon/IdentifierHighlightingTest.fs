@@ -44,3 +44,11 @@ type IdentifierHighlightingTest() =
     [<Test>] member x.``Computation expressions``() = x.DoNamedTest()
     
     [<Test>] member x.``Units of measure``() = x.DoNamedTest()
+    
+    [<TestReferences("System")>]
+    [<Test>] member x.``Type aliases 01 - Simple types with System dependence``() = x.DoNamedTest()
+    [<Test>] member x.``Type aliases 02 - Simple types without System dependence``() = x.DoNamedTest()
+    [<Test>] member x.``Type aliases 03 - Units of Measure``() = x.DoNamedTest()
+    [<Test>] member x.``Type aliases 04 - Core abbreviations``() = x.DoNamedTest()
+    
+    
