@@ -187,3 +187,6 @@ type FSharpRenameTest() =
     [<Test>] member x.``Inherit expr 01 - Arg``() = x.DoNamedTest()
     [<Test>] member x.``Inherit expr 02 - Type name``() = x.DoNamedTest()
     [<Test>] member x.``Inherit expr 03 - Field``() = x.DoNamedTest()
+
+    [<Test>] member x.``Wild - Let - Top 01``() = x.DoNamedTest()
+    [<Test>] member x.``Wild - Match 01``() = x.DoNamedTest()

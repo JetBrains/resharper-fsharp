@@ -13,6 +13,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     TreeNodeCollection<IAttribute> Attributes { get; }
 
     [NotNull]
-    IType Type();
+    IType GetPatternType();
   }
 }

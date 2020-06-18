@@ -1,3 +1,0 @@
-﻿open System.Text
-
-let stringBuilder{caret} = StringBuilder()

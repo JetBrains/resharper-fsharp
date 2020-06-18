@@ -5,6 +5,7 @@ open System.Linq
 open FSharp.Compiler.PrettyNaming
 open JetBrains.Application
 open JetBrains.Diagnostics
+open JetBrains.DocumentModel
 open JetBrains.IDE.UI.Extensions.Validation
 open JetBrains.ReSharper.Feature.Services.Refactorings.Specific.Rename
 open JetBrains.ReSharper.Plugins.FSharp.Psi
@@ -164,8 +165,14 @@ type FSharpRenameHelper(namingService: FSharpNamingService) =
 
         for declaration in declaredElement.GetDeclarations() do
             match declaration with
-            | :? INamedPat as pat -> namingService.AddExtraNames(namesCollection, pat)
+            | :? IFSharpPattern as pat -> namingService.AddExtraNames(namesCollection, pat)
             | _ -> ()
+
+    override x.GetNameDocumentRangeForRename(declaration: IDeclaration, initialName): DocumentRange =
+        match declaration with
+        | :? IWildPat as wil -> wil.GetDocumentRange()
+        | _ -> base.GetNameDocumentRangeForRename(declaration, initialName)
+
 
 type FSharpNameValidationRule(property, element: IDeclaredElement, namingService: FSharpNamingService) as this =
     inherit SimpleValidationRuleOnProperty<string>(property, element.GetSolution().Locks)
@@ -186,6 +193,7 @@ type FSharpAtomicRenamesFactory() =
         match element with
         | :? FSharpGeneratedMemberBase -> RenameAvailabilityCheckResult.CanNotBeRenamed
         | :? INamedPat as pat when not pat.IsDeclaration -> RenameAvailabilityCheckResult.CanNotBeRenamed
+        | :? IWildPat -> RenameAvailabilityCheckResult.CanBeRenamed
 
         | :? IFSharpDeclaredElement as fsElement when fsElement.SourceName = SharedImplUtil.MISSING_DECLARATION_NAME ->
             RenameAvailabilityCheckResult.CanNotBeRenamed

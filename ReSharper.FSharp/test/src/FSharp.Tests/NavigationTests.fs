@@ -37,6 +37,8 @@ type FSharpGoToUsagesTest() =
 
     [<Test>] member x.``Module suffix 01 - Compiled``() = x.DoNamedTest()
 
+    [<Test>] member x.``Wild pat 01``() = x.DoNamedTest()
+
 
 type FSharpGoToInheritorsTest() =
     inherit FSharpContextSearchTestBase("inheritors")
@@ -107,3 +109,5 @@ type FSharpGoToTypeTest() =
 
     [<Test; Explicit("Support external type parameters")>]
     member x.``Anon record field 02 - Substitution``() = x.DoNamedTest()
+
+    [<Test>] member x.``Wild pat 01``() = x.DoNamedTest()

@@ -17,7 +17,7 @@ open JetBrains.Util
 module SetNameAction =
     let [<Literal>] Description = "Set name"
 
-[<ContextAction(Name = "SetName", Group = "F#", Description = ToLiteralAction.Description)>]
+//[<ContextAction(Name = "SetName", Group = "F#", Description = ToLiteralAction.Description)>]
 type SetNameAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
 
@@ -39,7 +39,7 @@ type SetNameAction(dataProvider: FSharpContextActionDataProvider) =
 
         let names =
             createEmptyNamesCollection wildPat
-            |> addNamesForType (wildPat.Type())
+            |> addNamesForType (wildPat.GetPatternType())
             |> prepareNamesCollection EmptySet.Instance wildPat
 
         let name = if names.Count > 0 then names.[0] else "x"

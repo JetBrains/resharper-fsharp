@@ -323,8 +323,8 @@ consPat options { stubBase="SynPatternBase"; }:
   COLON_COLON
   fSharpPattern<PATTERN2, Pattern2>;
 
-wildPat options { stubBase="SynPatternBase"; }:
-  UNDERSCORE;
+wildPat options { stubBase="LocalPatternDeclarationBase"; }:
+  UNDERSCORE<UNDERSCORE, Underscore>;
 
 constPat options { stubBase="SynPatternBase"; }:
   (

@@ -45,6 +45,12 @@ type FSharpNamingTest() =
     [<Test>] member x.``Pipe - Left 01``() = x.DoNamedTest()
     [<Test>] member x.``Pipe - Left 02 - Nested``() = x.DoNamedTest()
 
+    [<Test>] member x.``Wild - Let - Top 01``() = x.DoNamedTest()
+    [<Test>] member x.``Wild - Let - Top 02 - StringBuilder``() = x.DoNamedTest()
+    [<Test>] member x.``Wild - Let - Top 03 - Method``() = x.DoNamedTest()
+
+    [<Test>] member x.``Wild - Match 01``() = x.DoNamedTest()
+
     override x.DoTest(lifetime, _) =
         let textControl = x.OpenTextControl(lifetime)
         let sourceFile = textControl.Document.GetPsiSourceFile(x.Solution)
