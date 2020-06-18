@@ -1,5 +1,5 @@
 type SimpleRecord = { Value : int }
-type SimpleDU = Value of int | Value2 of int * int
+type SimpleDU = Value of int
 
 type DUDummy = SimpleDU
 type RecordDummy = SimpleRecord

@@ -3,8 +3,9 @@
 type |IntMeasure|(2) = |int|(3)<|m|(4)>
 
 type |MeasureClass|(5)<[<|Measure|(6)>] |'a|(7)>() = class end
-let |mclsctor|(8) = |MeasureClass|(9)<|m|(10)>
-let |mcls|(11) = |MeasureClass|(12)<|m|(13)>()
+
+let _: |MeasureClass|(8)<|m|(9)> = |MeasureClass|(10)<|m|(11)>()
+
 ---------------------------------------------------------
 (0): ReSharper F# Class Identifier: 
 (1): ReSharper F# Unit Of Measure Identifier: 
@@ -14,9 +15,7 @@ let |mcls|(11) = |MeasureClass|(12)<|m|(13)>()
 (5): ReSharper F# Class Identifier: 
 (6): ReSharper F# Class Identifier: 
 (7): ReSharper F# Type Parameter Identifier: 
-(8): ReSharper F# Function Identifier: 
-(9): ReSharper F# Class Identifier: 
-(10): ReSharper F# Unit Of Measure Identifier: 
-(11): ReSharper F# Value Identifier: 
-(12): ReSharper F# Class Identifier: 
-(13): ReSharper F# Unit Of Measure Identifier: 
+(8): ReSharper F# Class Identifier: 
+(9): ReSharper F# Unit Of Measure Identifier: 
+(10): ReSharper F# Class Identifier: 
+(11): ReSharper F# Unit Of Measure Identifier: 

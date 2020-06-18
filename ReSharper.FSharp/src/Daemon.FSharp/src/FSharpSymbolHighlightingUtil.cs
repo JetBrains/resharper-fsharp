@@ -90,7 +90,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
 
       return FSharpHighlightingAttributeIdsModule.Value;
     }
-    
+
     [NotNull]
     public static string GetHighlightingAttributeId([NotNull] this FSharpSymbol symbol)
     {

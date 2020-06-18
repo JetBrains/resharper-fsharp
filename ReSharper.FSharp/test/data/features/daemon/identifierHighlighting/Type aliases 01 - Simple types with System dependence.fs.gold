@@ -1,13 +1,14 @@
 ﻿open |System|(0)
 
 type |SimpleRecord|(1) = { |Value|(2) : |int|(3) }
-type |SimpleDU|(4) = |Value|(5) of |int|(6) | |Value2|(7) of |int|(8) * |int|(9)
+type |SimpleDU|(4) = |Value|(5) of |int|(6)
 
-type |DUDummy|(10) = |SimpleDU|(11)
-type |RecordDummy|(12) = |SimpleRecord|(13)
-type |StructDummy|(14) = |Int32|(15)
-type |InterfaceDummy|(16) = |IDisposable|(17)
-type |ObjectDummy|(18) = |Object|(19)
+type |DUDummy|(7) = |SimpleDU|(8)
+type |RecordDummy|(9) = |SimpleRecord|(10)
+type |StructDummy|(11) = |Int32|(12)
+type |InterfaceDummy|(13) = |IDisposable|(14)
+type |ObjectDummy|(15) = |Object|(16)
+
 ---------------------------------------------------------
 (0): ReSharper F# Namespace Identifier: 
 (1): ReSharper F# Record Identifier: 
@@ -16,16 +17,13 @@ type |ObjectDummy|(18) = |Object|(19)
 (4): ReSharper F# Union Identifier: 
 (5): ReSharper F# Union Case Identifier: 
 (6): ReSharper F# Struct Identifier: 
-(7): ReSharper F# Union Case Identifier: 
-(8): ReSharper F# Struct Identifier: 
-(9): ReSharper F# Struct Identifier: 
-(10): ReSharper F# Union Identifier: 
-(11): ReSharper F# Union Identifier: 
-(12): ReSharper F# Record Identifier: 
-(13): ReSharper F# Record Identifier: 
-(14): ReSharper F# Struct Identifier: 
-(15): ReSharper F# Struct Identifier: 
-(16): ReSharper F# Interface Identifier: 
-(17): ReSharper F# Interface Identifier: 
-(18): ReSharper F# Class Identifier: 
-(19): ReSharper F# Class Identifier: 
+(7): ReSharper F# Union Identifier: 
+(8): ReSharper F# Union Identifier: 
+(9): ReSharper F# Record Identifier: 
+(10): ReSharper F# Record Identifier: 
+(11): ReSharper F# Struct Identifier: 
+(12): ReSharper F# Struct Identifier: 
+(13): ReSharper F# Interface Identifier: 
+(14): ReSharper F# Interface Identifier: 
+(15): ReSharper F# Class Identifier: 
+(16): ReSharper F# Class Identifier: 

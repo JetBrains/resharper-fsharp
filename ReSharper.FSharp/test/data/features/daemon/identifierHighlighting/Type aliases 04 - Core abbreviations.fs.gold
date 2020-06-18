@@ -1,35 +1,22 @@
-﻿let |testArr|(0) (|ar|(1) : |int|(2) |array|(3)) = |ar|(4)
+﻿type |T1|(0) = |int|(1) |array|(2)
+type |T2|(3) = |int|(4) |list|(5)
+type |T3|(6) = |int|(7) |seq|(8)
+type |T4|(9) = |int|(10) |ResizeArray|(11)
+type |T5|(12) = |int|(13) |option|(14)
 
-let |testList|(5) (|ls|(6) : |int|(7) |list|(8)) = |ls|(9)
-
-let |testSeq|(10) (|sq|(11) : |int|(12) |seq|(13)) = |sq|(14)
-	
-let |testRszArr|(15) (|rsz|(16) : |int|(17) |ResizeArray|(18)) = |rsz|(19)
-    
-let |testOpt|(20) (|io|(21) : |int|(22) |option|(23)) = |io|(24)
 ---------------------------------------------------------
-(0): ReSharper F# Function Identifier: 
-(1): ReSharper F# Value Identifier: 
-(2): ReSharper F# Struct Identifier: 
-(3): ReSharper F# Class Identifier: 
-(4): ReSharper F# Value Identifier: 
-(5): ReSharper F# Function Identifier: 
-(6): ReSharper F# Value Identifier: 
+(0): ReSharper F# Class Identifier: 
+(1): ReSharper F# Struct Identifier: 
+(2): ReSharper F# Class Identifier: 
+(3): ReSharper F# Union Identifier: 
+(4): ReSharper F# Struct Identifier: 
+(5): ReSharper F# Union Identifier: 
+(6): ReSharper F# Interface Identifier: 
 (7): ReSharper F# Struct Identifier: 
-(8): ReSharper F# Union Identifier: 
-(9): ReSharper F# Value Identifier: 
-(10): ReSharper F# Function Identifier: 
-(11): ReSharper F# Value Identifier: 
-(12): ReSharper F# Struct Identifier: 
-(13): ReSharper F# Interface Identifier: 
-(14): ReSharper F# Value Identifier: 
-(15): ReSharper F# Function Identifier: 
-(16): ReSharper F# Value Identifier: 
-(17): ReSharper F# Struct Identifier: 
-(18): ReSharper F# Class Identifier: 
-(19): ReSharper F# Value Identifier: 
-(20): ReSharper F# Function Identifier: 
-(21): ReSharper F# Value Identifier: 
-(22): ReSharper F# Struct Identifier: 
-(23): ReSharper F# Union Identifier: 
-(24): ReSharper F# Value Identifier: 
+(8): ReSharper F# Interface Identifier: 
+(9): ReSharper F# Class Identifier: 
+(10): ReSharper F# Struct Identifier: 
+(11): ReSharper F# Class Identifier: 
+(12): ReSharper F# Union Identifier: 
+(13): ReSharper F# Struct Identifier: 
+(14): ReSharper F# Union Identifier: 
