@@ -77,6 +77,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         ? (IDeclaredElement) new FSharpSignOperator<TopPatternDeclarationBase>(this)
         : new ModuleFunction(this);
     }
+    
+    public virtual IType Type() => TypeFactory.CreateUnknownType(GetPsiModule());
   }
 
   internal abstract class SynPatternBase : FSharpCompositeElement
@@ -87,6 +89,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       EmptyList<IDeclaration>.Instance;
     
     public TreeNodeCollection<IAttribute> Attributes => TreeNodeCollection<IAttribute>.Empty;
+
+    public virtual IType Type() => TypeFactory.CreateUnknownType(GetPsiModule());
   }
 
   public static class NamedPatEx

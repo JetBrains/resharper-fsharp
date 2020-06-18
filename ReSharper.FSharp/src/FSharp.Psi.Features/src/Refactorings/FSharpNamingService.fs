@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
 open System
 open System.Collections.Generic
 open FSharp.Compiler.SourceCodeServices
+open JetBrains.Annotations
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -10,6 +11,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
+open JetBrains.ReSharper.Psi.Naming.Elements
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Naming.Extentions
 open JetBrains.ReSharper.Psi.Naming.Impl
@@ -18,7 +20,6 @@ open JetBrains.ReSharper.Psi.Naming.Settings
 open JetBrains.Util
 open JetBrains.Util.dataStructures
 
-[<AutoOpen>]
 module Traverse =
     type TraverseStep =
         | TupleItem of item: int
@@ -229,14 +230,14 @@ type FSharpNamingService(language: FSharpLanguage) =
         | _ -> EmptyList.Instance :> _
 
     member x.AddExtraNames(namesCollection: INamesCollection, fsPattern: IFSharpPattern) =
-        let pat, path = makeTuplePatPath fsPattern
+        let pat, path = Traverse.makeTuplePatPath fsPattern
 
         let entryOptions =
             EntryOptions(subrootPolicy = SubrootPolicy.Decompose, emphasis = Emphasis.Good,
                          prefixPolicy = PredefinedPrefixPolicy.Remove)
 
         let addNamesForExpr expr =
-            match tryTraverseExprPath path expr with
+            match Traverse.tryTraverseExprPath path expr with
             | null -> ()
             | expr -> namesCollection.Add(expr, entryOptions)
 
@@ -310,7 +311,7 @@ type FSharpNamingService(language: FSharpLanguage) =
 
 module FSharpNamingService =
     let getUsedNames
-            (contextExpr: IFSharpExpression) (usages: List<ITreeNode>) (containingTypeElement: ITypeElement)
+            ([<NotNull>] contextExpr: IFSharpExpression) (usages: List<ITreeNode>) (containingTypeElement: ITypeElement)
             : ISet<string> =
 
         let usages = HashSet(usages)
@@ -437,3 +438,35 @@ module FSharpNamingService =
             |> Seq.iter (fun expr -> expr.ProcessThisAndDescendants(processor))
 
         usedNames :> _
+
+    let createEmptyNamesCollection (fsTreeNode: IFSharpTreeNode) =
+        let sourceFile = fsTreeNode.GetSourceFile()
+        let namingManager = sourceFile.GetSolution().GetPsiServices().Naming
+        namingManager.Suggestion.CreateEmptyCollection(PluralityKinds.Unknown, fsTreeNode.Language, true, sourceFile)
+
+    let getEntryOptions () =
+        EntryOptions(PluralityKinds.Unknown, SubrootPolicy.Decompose, PredefinedPrefixPolicy.Remove)
+
+    let addNamesForType (t: IType) (namesCollection: INamesCollection) =
+        namesCollection.Add(t, getEntryOptions ())
+        namesCollection
+
+    let addNamesForExpression (expr: IFSharpExpression) (namesCollection: INamesCollection) =
+        namesCollection.Add(expr, getEntryOptions ())
+        namesCollection
+
+    let prepareNamesCollection
+            (usedNames: ISet<string>) (fsTreeNode: IFSharpTreeNode) (namesCollection: INamesCollection) =
+
+        let sourceFile = fsTreeNode.GetSourceFile()
+        let namingManager = namesCollection.Solution.GetPsiServices().Naming
+
+        let settingsStore = fsTreeNode.GetSettingsStoreWithEditorConfig()
+        let elementKind = NamedElementKinds.Locals
+        let descriptor = ElementKindOfElementType.LOCAL_VARIABLE
+        let namingRule =
+            namingManager.Policy.GetDefaultRule(sourceFile, fsTreeNode.Language, settingsStore, elementKind, descriptor)
+
+        let usedNamesFilter = Func<_,_>(usedNames.Contains >> not)
+        let suggestionOptions = SuggestionOptions(null, DefaultName = "foo", UsedNamesFilter = usedNamesFilter)
+        namesCollection.Prepare(namingRule, ScopeKind.Common, suggestionOptions).AllNames()

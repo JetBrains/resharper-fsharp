@@ -6,6 +6,8 @@ using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.Metadata.Reader.Impl;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
@@ -219,5 +221,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       return ParameterKind.VALUE;
     }
+
+    [NotNull]
+    public static IType TryGetFcsType([NotNull] IFSharpTreeNode fsTreeNode)
+    {
+      var fsFile = fsTreeNode.FSharpFile;
+      using var opName = fsFile.CheckerService.FcsReactorMonitor.MonitorOperation("FSharpExpressionBase.Type");
+      var checkResults = fsFile.GetParseAndCheckResults(true, opName.OperationName)?.Value?.CheckResults;
+      if (checkResults == null)
+        return TypeFactory.CreateUnknownType(fsTreeNode.GetPsiModule());
+
+      var sourceFile = fsTreeNode.GetSourceFile();
+      if (sourceFile == null)
+        return TypeFactory.CreateUnknownType(fsTreeNode.GetPsiModule());
+
+      var range = fsTreeNode.GetDocumentRange().ToDocumentRange(sourceFile.GetLocation());
+      var fcsType = checkResults.GetTypeOfExpression(range)?.Value;
+      return fcsType != null
+        ? fcsType.MapType(fsTreeNode)
+        : TypeFactory.CreateUnknownType(fsTreeNode.GetPsiModule());
+    }
+
   }
 }

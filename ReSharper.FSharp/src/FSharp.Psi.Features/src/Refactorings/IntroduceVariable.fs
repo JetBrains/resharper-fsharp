@@ -1,6 +1,5 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
 
-open System
 open System.Collections.Generic
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application.DataContext
@@ -13,6 +12,7 @@ open JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots
 open JetBrains.ReSharper.Feature.Services.Refactorings
 open JetBrains.ReSharper.Feature.Services.Refactorings.Specific
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings.FSharpNamingService
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -23,10 +23,6 @@ open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.DataContext
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
-open JetBrains.ReSharper.Psi.Naming.Elements
-open JetBrains.ReSharper.Psi.Naming.Extentions
-open JetBrains.ReSharper.Psi.Naming.Impl
-open JetBrains.ReSharper.Psi.Naming.Settings
 open JetBrains.ReSharper.Psi.Pointers
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
@@ -58,26 +54,9 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
            ElementType.ADDRESS_OF_EXPR)
 
     let getNames (usedNames: ISet<string>) (expr: IFSharpExpression) =
-        let language = expr.Language
-        let sourceFile = expr.GetSourceFile()
-
-        let namingManager = solution.GetPsiServices().Naming
-        let namesCollection =
-            namingManager.Suggestion.CreateEmptyCollection(PluralityKinds.Unknown, language, true, sourceFile)
-
-        let entryOptions = EntryOptions(PluralityKinds.Unknown, SubrootPolicy.Decompose, PredefinedPrefixPolicy.Remove)
-        namesCollection.Add(expr, entryOptions)
-
-        let settingsStore = expr.GetSettingsStoreWithEditorConfig()
-        let elementKind = NamedElementKinds.Locals
-        let descriptor = ElementKindOfElementType.LOCAL_VARIABLE
-        let namingRule =
-            namingManager.Policy.GetDefaultRule(sourceFile, language, settingsStore, elementKind, descriptor)
-
-        let usedNamesFilter = Func<_,_>(usedNames.Contains >> not)
-        let suggestionOptions = SuggestionOptions(null, DefaultName = "foo", UsedNamesFilter = usedNamesFilter)
-
-        namesCollection.Prepare(namingRule, ScopeKind.Common, suggestionOptions).AllNames()
+        createEmptyNamesCollection expr
+        |> addNamesForExpression expr
+        |> prepareNamesCollection usedNames expr
 
     let getReplaceRanges (contextExpr: IFSharpExpression) removeSourceExpr =
         let sequentialExpr = SequentialExprNavigator.GetByExpression(contextExpr)

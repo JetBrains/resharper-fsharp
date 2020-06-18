@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -44,23 +45,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
   public static class FSharpExpressionUtil
   {
-    public static IType GetFcsExpressionType(this IFSharpExpression fsExpr)
-    {
-      var fsFile = fsExpr.FSharpFile;
-      using var opName = fsFile.CheckerService.FcsReactorMonitor.MonitorOperation("FSharpExpressionBase.Type");
-      var checkResults = fsFile.GetParseAndCheckResults(true, opName.OperationName)?.Value?.CheckResults;
-      if (checkResults == null)
-        return TypeFactory.CreateUnknownType(fsExpr.GetPsiModule());
-
-      var sourceFile = fsExpr.GetSourceFile();
-      if (sourceFile == null)
-        return TypeFactory.CreateUnknownType(fsExpr.GetPsiModule());
-
-      var range = fsExpr.GetDocumentRange().ToDocumentRange(sourceFile.GetLocation());
-      var fcsType = checkResults.GetTypeOfExpression(range)?.Value;
-      return fcsType != null
-        ? fcsType.MapType(fsExpr)
-        : TypeFactory.CreateUnknownType(fsExpr.GetPsiModule());
-    }
+    [CanBeNull]
+    public static IType GetFcsExpressionType([NotNull] this IFSharpExpression fsExpr) => 
+      FSharpTypesUtil.TryGetFcsType(fsExpr);
   }
 }
