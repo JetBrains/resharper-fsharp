@@ -2,8 +2,6 @@
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
-using JetBrains.Rider.Model.DebuggerWorker;
-using Microsoft.FSharp.Collections;
 using static FSharp.Compiler.PrettyNaming;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs

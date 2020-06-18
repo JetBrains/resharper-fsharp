@@ -1,92 +1,55 @@
 ﻿[<|Measure|(0)>] type |m|(1)
-[<|Measure|(2)>] type |s|(3)
 
-type |MeasureBasicType|(4) = |int|(5)<|m|(6)/|s|(7)>
+type |MeasureRecord|(2)<[<|Measure|(3)>] |'u|(4)> = { |x|(5) : |float|(6)<|'u|(7)> }
+let |mrec|(8) : |MeasureRecord|(9)<|m|(10)> = { |x|(11) = 0.0<|m|(12)>; }
 
-type |MeasureRecord|(8)<[<|Measure|(9)>] |'u|(10)> = { |x|(11) : |float|(12)<|'u|(13)>; |y|(14) : |float|(15)<|'u|(16)>; |z|(17) : |float|(18)<|'u|(19)> }
-let |mrec|(20) : |MeasureRecord|(21)<|m|(22)> = { |x|(23) = 0.0<|m|(24)>; |y|(25) = 0.0<|m|(26)>; |z|(27) = 0.0<|m|(28)> }
+type |MeasureDiscriminatedUnion|(13)<[<|Measure|(14)>] |'a|(15)> = | |IntMeasureMember|(16) of |decimal|(17)<|'a|(18)>
+let |mdu|(19) = |MeasureDiscriminatedUnion|(20)<|m|(21)>.|IntMeasureMember|(22) 10m<|m|(23)>
 
-type |MeasureDiscriminatedUnion|(29)<[<|Measure|(30)>] |'a|(31)> =
-    | |IntMeasureMember|(32) of |int|(33)<|'a|(34)>
-    | |FloatMeasureMember|(35) of |float|(36)<|'a|(37)>
-let |mdu|(38) = |MeasureDiscriminatedUnion|(39)<|s|(40)>.|IntMeasureMember|(41) 10<|s|(42)>
+type |MeasureClass|(24)<[<|Measure|(25)>] |'a|(26)>() = class end    
+let |mcls|(27) = |MeasureClass|(28)<|m|(29)>()
 
-type |MeasureClass|(43)<[<|Measure|(44)>] |'a|(45)>(|value|(46) : |int|(47)<|'a|(48)>) =
-    member |x|(49).|Value|(50) = |value|(51)
-let |mcls|(52) = |MeasureClass|(53)<|s|(54)> 10<|s|(55)>
-
-[<|Struct|(56)>]
-type |MeasureStruct|(57)<[<|Measure|(58)>] |'a|(59)>(|value|(60) : |int|(61)<|'a|(62)>) =
-    member |x|(63).|Value|(64) = |value|(65)    
-let |mstr|(66) = |MeasureStruct|(67)<|s|(68)> 10<|s|(69)>
+[<|Struct|(30)>]
+type |MeasureStruct|(31)<[<|Measure|(32)>] |'a|(33)>(|__|(34) : |int|(35)<|'a|(36)>) = struct end
+let |mstr|(37) = |MeasureStruct|(38)<|m|(39)>()
 ---------------------------------------------------------
 (0): ReSharper F# Class Identifier: 
 (1): ReSharper F# Unit Of Measure Identifier: 
-(2): ReSharper F# Class Identifier: 
-(3): ReSharper F# Unit Of Measure Identifier: 
-(4): ReSharper F# Struct Identifier: 
-(5): ReSharper F# Struct Identifier: 
-(6): ReSharper F# Unit Of Measure Identifier: 
-(7): ReSharper F# Unit Of Measure Identifier: 
-(8): ReSharper F# Record Identifier: 
-(9): ReSharper F# Class Identifier: 
-(10): ReSharper F# Type Parameter Identifier: 
+(2): ReSharper F# Record Identifier: 
+(3): ReSharper F# Class Identifier: 
+(4): ReSharper F# Type Parameter Identifier: 
+(5): ReSharper F# Field Identifier: 
+(6): ReSharper F# Struct Identifier: 
+(7): ReSharper F# Type Parameter Identifier: 
+(8): ReSharper F# Value Identifier: 
+(9): ReSharper F# Record Identifier: 
+(10): ReSharper F# Unit Of Measure Identifier: 
 (11): ReSharper F# Field Identifier: 
-(12): ReSharper F# Struct Identifier: 
-(13): ReSharper F# Type Parameter Identifier: 
-(14): ReSharper F# Field Identifier: 
-(15): ReSharper F# Struct Identifier: 
-(16): ReSharper F# Type Parameter Identifier: 
-(17): ReSharper F# Field Identifier: 
-(18): ReSharper F# Struct Identifier: 
-(19): ReSharper F# Type Parameter Identifier: 
-(20): ReSharper F# Value Identifier: 
-(21): ReSharper F# Record Identifier: 
-(22): ReSharper F# Unit Of Measure Identifier: 
-(23): ReSharper F# Field Identifier: 
-(24): ReSharper F# Unit Of Measure Identifier: 
-(25): ReSharper F# Field Identifier: 
-(26): ReSharper F# Unit Of Measure Identifier: 
-(27): ReSharper F# Field Identifier: 
-(28): ReSharper F# Unit Of Measure Identifier: 
-(29): ReSharper F# Union Identifier: 
+(12): ReSharper F# Unit Of Measure Identifier: 
+(13): ReSharper F# Union Identifier: 
+(14): ReSharper F# Class Identifier: 
+(15): ReSharper F# Type Parameter Identifier: 
+(16): ReSharper F# Union Case Identifier: 
+(17): ReSharper F# Struct Identifier: 
+(18): ReSharper F# Type Parameter Identifier: 
+(19): ReSharper F# Value Identifier: 
+(20): ReSharper F# Union Identifier: 
+(21): ReSharper F# Unit Of Measure Identifier: 
+(22): ReSharper F# Union Case Identifier: 
+(23): ReSharper F# Unit Of Measure Identifier: 
+(24): ReSharper F# Class Identifier: 
+(25): ReSharper F# Class Identifier: 
+(26): ReSharper F# Type Parameter Identifier: 
+(27): ReSharper F# Value Identifier: 
+(28): ReSharper F# Class Identifier: 
+(29): ReSharper F# Unit Of Measure Identifier: 
 (30): ReSharper F# Class Identifier: 
-(31): ReSharper F# Type Parameter Identifier: 
-(32): ReSharper F# Union Case Identifier: 
-(33): ReSharper F# Struct Identifier: 
-(34): ReSharper F# Type Parameter Identifier: 
-(35): ReSharper F# Union Case Identifier: 
-(36): ReSharper F# Struct Identifier: 
-(37): ReSharper F# Type Parameter Identifier: 
-(38): ReSharper F# Value Identifier: 
-(39): ReSharper F# Union Identifier: 
-(40): ReSharper F# Unit Of Measure Identifier: 
-(41): ReSharper F# Union Case Identifier: 
-(42): ReSharper F# Unit Of Measure Identifier: 
-(43): ReSharper F# Class Identifier: 
-(44): ReSharper F# Class Identifier: 
-(45): ReSharper F# Type Parameter Identifier: 
-(46): ReSharper F# Value Identifier: 
-(47): ReSharper F# Struct Identifier: 
-(48): ReSharper F# Type Parameter Identifier: 
-(49): ReSharper F# Value Identifier: 
-(50): ReSharper F# Property Identifier: 
-(51): ReSharper F# Value Identifier: 
-(52): ReSharper F# Value Identifier: 
-(53): ReSharper F# Class Identifier: 
-(54): ReSharper F# Unit Of Measure Identifier: 
-(55): ReSharper F# Unit Of Measure Identifier: 
-(56): ReSharper F# Class Identifier: 
-(57): ReSharper F# Struct Identifier: 
-(58): ReSharper F# Class Identifier: 
-(59): ReSharper F# Type Parameter Identifier: 
-(60): ReSharper F# Value Identifier: 
-(61): ReSharper F# Struct Identifier: 
-(62): ReSharper F# Type Parameter Identifier: 
-(63): ReSharper F# Mutable Value Identifier: 
-(64): ReSharper F# Property Identifier: 
-(65): ReSharper F# Value Identifier: 
-(66): ReSharper F# Value Identifier: 
-(67): ReSharper F# Struct Identifier: 
-(68): ReSharper F# Unit Of Measure Identifier: 
-(69): ReSharper F# Unit Of Measure Identifier: 
+(31): ReSharper F# Struct Identifier: 
+(32): ReSharper F# Class Identifier: 
+(33): ReSharper F# Type Parameter Identifier: 
+(34): ReSharper F# Value Identifier: 
+(35): ReSharper F# Struct Identifier: 
+(36): ReSharper F# Type Parameter Identifier: 
+(37): ReSharper F# Value Identifier: 
+(38): ReSharper F# Struct Identifier: 
+(39): ReSharper F# Unit Of Measure Identifier: 
