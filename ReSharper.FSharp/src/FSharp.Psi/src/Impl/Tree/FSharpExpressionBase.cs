@@ -1,9 +1,7 @@
-using JetBrains.Annotations;
 using JetBrains.DocumentModel;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
-using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
@@ -17,7 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public ExpressionAccessType GetAccessType() => ExpressionAccessType.None;
 
-    public virtual IType Type() => this.GetFcsExpressionType();
+    public virtual IType Type() => this.TryGetFcsType();
 
     public IExpressionType GetExpressionType() => Type();
     public IType GetImplicitlyConvertedTo() => Type();
@@ -41,12 +39,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     bool IArgumentInfo.IsExtensionInvocationQualifier => false;
     IPsiModule IArgumentInfo.PsiModule => GetPsiModule();
     DocumentRange IArgumentInfo.GetDocumentRange() => GetNavigationRange();
-  }
-
-  public static class FSharpExpressionUtil
-  {
-    [CanBeNull]
-    public static IType GetFcsExpressionType([NotNull] this IFSharpExpression fsExpr) => 
-      FSharpTypesUtil.TryGetFcsType(fsExpr);
   }
 }

@@ -223,11 +223,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     }
 
     [NotNull]
-    public static IType TryGetFcsType([NotNull] IFSharpTreeNode fsTreeNode)
+    public static IType TryGetFcsType([NotNull] this IFSharpTreeNode fsTreeNode)
     {
-      var fsFile = fsTreeNode.FSharpFile;
-      using var opName = fsFile.CheckerService.FcsReactorMonitor.MonitorOperation("FSharpExpressionBase.Type");
-      var checkResults = fsFile.GetParseAndCheckResults(true, opName.OperationName)?.Value?.CheckResults;
+      var checkResults = fsTreeNode.FSharpFile.GetParseAndCheckResults(true, "TryGetFcsType")?.Value?.CheckResults;
       if (checkResults == null)
         return TypeFactory.CreateUnknownType(fsTreeNode.GetPsiModule());
 
