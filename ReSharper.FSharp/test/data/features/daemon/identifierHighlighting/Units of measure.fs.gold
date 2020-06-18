@@ -10,7 +10,7 @@ let |xvec|(8): |vector3D|(9)<|m|(10)> = { |x|(11) = 0.0<|m|(12)> }
 (3): ReSharper F# Class Identifier: 
 (4): ReSharper F# Type Parameter Identifier: 
 (5): ReSharper F# Field Identifier: 
-(6): ReSharper F# Class Identifier: 
+(6): ReSharper F# Struct Identifier: 
 (7): ReSharper F# Type Parameter Identifier: 
 (8): ReSharper F# Value Identifier: 
 (9): ReSharper F# Record Identifier: 

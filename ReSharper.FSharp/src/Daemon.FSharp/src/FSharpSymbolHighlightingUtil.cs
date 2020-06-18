@@ -18,9 +18,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
       if (entity.IsEnum)
         return FSharpHighlightingAttributeIdsModule.Enum;
 
-      if (entity.IsValueType)
-        return FSharpHighlightingAttributeIdsModule.Struct;
-
       if (entity.IsDelegate)
         return FSharpHighlightingAttributeIdsModule.Delegate;
 
@@ -35,10 +32,17 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
 
       if (entity.IsMeasure)
         return FSharpHighlightingAttributeIdsModule.UnitOfMeasure;
+
+      if (entity.IsInterface)
+        return FSharpHighlightingAttributeIdsModule.Interface;
+
+      if (entity.IsClass)
+        return FSharpHighlightingAttributeIdsModule.Class;
       
-      return entity.IsInterface
-        ? FSharpHighlightingAttributeIdsModule.Interface
-        : FSharpHighlightingAttributeIdsModule.Class;
+      if (entity.IsValueType || entity.HasMeasureParameter())
+        return FSharpHighlightingAttributeIdsModule.Struct;
+      
+      return FSharpHighlightingAttributeIdsModule.Class;
     }
 
     [NotNull]
@@ -93,7 +97,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
       switch (symbol)
       {
         case FSharpEntity entity when !entity.IsUnresolved:
-          return GetEntityHighlightingAttributeId(entity);
+          return GetEntityHighlightingAttributeId(entity.GetAbbreviatedType());
 
         case FSharpMemberOrFunctionOrValue mfv when !mfv.IsUnresolved:
           return GetMfvHighlightingAttributeId(mfv.AccessorProperty?.Value ?? mfv);

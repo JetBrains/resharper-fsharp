@@ -8,5 +8,5 @@ type |U|(1) =
 (0): ReSharper F# Module Identifier: 
 (1): ReSharper F# Union Identifier: 
 (2): ReSharper F# Union Case Identifier: 
-(3): ReSharper F# Class Identifier: 
+(3): ReSharper F# Struct Identifier: 
 (4): ReSharper F# Union Case Identifier: 
