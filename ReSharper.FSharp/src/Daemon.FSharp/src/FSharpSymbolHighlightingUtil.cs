@@ -36,6 +36,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
       if (entity.IsInterface)
         return FSharpHighlightingAttributeIdsModule.Interface;
 
+      if (entity.IsClass)
+        return FSharpHighlightingAttributeIdsModule.Class;
+      
       if (entity.IsValueType || entity.HasMeasureParameter())
         return FSharpHighlightingAttributeIdsModule.Struct;
       
