@@ -54,3 +54,25 @@ let isAtIfExprKeyword (dataProvider: IContextActionDataProvider) (ifExpr: IIfThe
 
 let isAtTreeNode (dataProvider: IContextActionDataProvider) (node: ITreeNode) =
     isNotNull node && DisjointedTreeTextRange.From(node).Contains(dataProvider.SelectedTreeRange)
+
+let isAtLetExprKeywordOrNamedPat (dataProvider: IContextActionDataProvider) (letBindings: ILetBindings) =
+    if isNull letBindings then false else
+
+    let letToken = letBindings.LetOrUseToken
+    if isNull letToken then false else
+
+    let ranges = DisjointedTreeTextRange.From(letToken)
+
+    let bindings = letBindings.BindingsEnumerable
+    if bindings.IsEmpty() then false else
+
+    match bindings.FirstOrDefault().HeadPattern.As<INamedPat>() with
+    | null -> false
+    | parametersOwnerPat ->
+
+    match parametersOwnerPat.Identifier with
+    | null -> false
+    | identifier ->
+
+    ranges.Then(identifier) |> ignore
+    ranges.Contains(dataProvider.SelectedTreeRange)
