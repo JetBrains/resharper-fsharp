@@ -4,11 +4,14 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 open NUnit.Framework
 
-[<Explicit>]
 type RedundantParensTest() =
     inherit FSharpHighlightingTestBase()
 
     override x.RelativeTestDataPath = "features/daemon/redundantParens"
+
+    override x.DoTest(lifetime, project) =
+        use cookie = FSharpRegistryUtil.AllowExperimentalFeaturesCookie.Create()
+        base.DoTest(lifetime, project)
 
     override x.HighlightingPredicate(highlighting, _, _) =
         highlighting :? RedundantParenExprWarning
