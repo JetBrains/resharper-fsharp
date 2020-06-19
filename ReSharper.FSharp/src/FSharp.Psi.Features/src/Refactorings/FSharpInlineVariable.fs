@@ -6,9 +6,11 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Resolve
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Refactorings.Inline
 open JetBrains.ReSharper.Refactorings.InlineVar
 open JetBrains.ReSharper.Refactorings.InlineVar.RDAnalysis
@@ -37,25 +39,49 @@ type FSharpInlineHelper(driver) =
 type FSharpInlineVariable(workflow, solution, driver) =
     inherit InlineVarBase(workflow, solution, driver)
 
+    let mutable exprIndent = 0
+
     override x.InlineHelper = FSharpInlineHelper(driver) :> _
 
     override x.ProcessReferenceWithContext(reference, _, info) =
-        let treeNode = reference.GetTreeNode()
-        use cookie = WriteLockCookie.Create(treeNode.IsPhysical())
+        let referenceOwner = reference.GetTreeNode()
+        use cookie = WriteLockCookie.Create(referenceOwner.IsPhysical())
+        use disableFormatter = new DisableCodeFormatter()
+
         let expr = info.InlinedMethodInfo.Expression :?> IFSharpExpression
-        let newExpr = ModificationUtil.ReplaceChild(treeNode, expr.Copy())
+        let exprCopy = expr.Copy()
+
+        let indentShift = referenceOwner.Indent - exprIndent
+        shiftExpr indentShift exprCopy
+        
+        let newExpr = ModificationUtil.ReplaceChild(referenceOwner, exprCopy)
         addParensIfNeeded newExpr |> ignore
  
     override x.Ignore _ = false
+
     override x.RemoveVariableDeclaration(decl) =
         let refPat = decl.As<ILocalReferencePat>()
         let binding = BindingNavigator.GetByHeadPattern(refPat.IgnoreParentParens())
         let letExpr = LetOrUseExprNavigator.GetByBinding(binding)
 
-        use cookie = WriteLockCookie.Create(letExpr.IsPhysical())
-        replaceWithCopy letExpr letExpr.InExpression
+        let inKeyword = letExpr.InKeyword
+        let lastNode: ITreeNode = if isNotNull inKeyword then inKeyword :> _ else binding :> _
 
-    override x.RemoveAssignment _ = ()
+        let first =
+            skipMatchingNodesAfter isInlineSpaceOrComment lastNode
+            |> getThisOrNextNewLine
+            |> skipMatchingNodesAfter isInlineSpace
+
+        let last = letExpr.LastChild
+
+        use cookie = WriteLockCookie.Create(letExpr.IsPhysical())
+        use disableFormatter = new DisableCodeFormatter()
+
+        ModificationUtil.AddChildRangeBefore(letExpr, TreeRange(first, last)) |> ignore
+        ModificationUtil.DeleteChild(letExpr)
+
+    override x.RemoveAssignment(expr) =
+        exprIndent <- expr.Indent
 
 
 type FSharpInlineVarAnalyser(workflow) =
@@ -68,7 +94,7 @@ type FSharpInlineVarAnalyser(workflow) =
 
     override x.References = inlineReferences
     override x.Expression = inlineExpr
-    override x.AssignmentExpression = null
+    override x.AssignmentExpression = inlineExpr
 
     override x.Run(declaredElement, _, references) =
         let refPat = declaredElement.As<ILocalReferencePat>()
@@ -78,7 +104,7 @@ type FSharpInlineVarAnalyser(workflow) =
         if isNull binding || isNull binding.Expression then Pair(false, "") else
 
         let letExpr = LetOrUseExprNavigator.GetByBinding(binding)
-        if isNull letExpr || letExpr.Bindings.Count <> 1 then Pair(false, "") else
+        if isNull letExpr || letExpr.Bindings.Count <> 1 || isNull letExpr.InExpression then Pair(false, "") else
 
         let hasWriteReferences (references: IList<IReference>) =
             references |> Seq.exists (fun reference ->
