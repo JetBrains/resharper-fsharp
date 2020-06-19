@@ -2,8 +2,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
+open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
+[<TestPackages("FSharp.Core")>]
 type RedundantParensTest() =
     inherit FSharpHighlightingTestBase()
 
@@ -39,3 +41,11 @@ type RedundantParensTest() =
 
     [<Test>] member x.``Arg - Low precedence 01``() = x.DoNamedTest()
     [<Test>] member x.``Arg - Low precedence 02 - Member``() = x.DoNamedTest()
+
+    [<Test>] member x.``Let - Local - App - Binary 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Local - App - Binary 02 - Nested``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Local - Literal 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Let - Top - App - Binary 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Top - App - Binary 02 - Nested``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Top - Literal 01``() = x.DoNamedTest()

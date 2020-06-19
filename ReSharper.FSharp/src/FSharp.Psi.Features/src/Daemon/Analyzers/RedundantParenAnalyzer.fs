@@ -26,5 +26,5 @@ type RedundantParenAnalyzer() =
 
         let innerExpression = parenExpr.InnerExpression
 
-        if innerExpression :? IParenExpr || not (needsParens innerExpression) then
+        if innerExpression :? IParenExpr || not (needsParens null innerExpression) then
             addHighlighting consumer parenExpr

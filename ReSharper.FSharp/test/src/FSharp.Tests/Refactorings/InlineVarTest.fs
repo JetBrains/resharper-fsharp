@@ -16,6 +16,12 @@ type InlineVarTest() =
 
     [<Test>] member x.``Simple 01``() = x.DoNamedTest()
     [<Test>] member x.``Simple 02``() = x.DoNamedTest()
-    [<Test>] member x.``Simple 03 - App``() = x.DoNamedTest()
+
+    [<Test>] member x.``App 01``() = x.DoNamedTest()
+    [<Test>] member x.``App 02 - Parens``() = x.DoNamedTest()
+
+    [<Test>] member x.``Comment 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Inline 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Not available - Set 01``() = x.DoNamedTest()
