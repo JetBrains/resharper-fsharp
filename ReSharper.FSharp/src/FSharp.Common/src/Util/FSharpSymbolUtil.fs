@@ -146,8 +146,8 @@ let patternName (pattern: FSharpActivePatternGroup) =
     let wildCase = if pattern.IsTotal then "|" else "_|"
     "|" + joinedNames + wildCase
     
-[<Extension; CompiledName("GetAbbreviatedType")>]
-let getAbbreviatedType (entity: FSharpEntity) =
+[<Extension; CompiledName("GetAbbreviatedEntity")>]
+let getAbbreviatedEntity (entity: FSharpEntity) =
     let mutable baseTypeEntity = entity
     while baseTypeEntity.IsFSharpAbbreviation && baseTypeEntity.AbbreviatedType.HasTypeDefinition do
         baseTypeEntity <- baseTypeEntity.AbbreviatedType.TypeDefinition

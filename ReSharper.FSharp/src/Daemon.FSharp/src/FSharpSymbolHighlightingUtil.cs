@@ -41,6 +41,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
       
       if (entity.IsValueType || entity.HasMeasureParameter())
         return FSharpHighlightingAttributeIdsModule.Struct;
+
+      if (entity.IsFSharpAbbreviation && entity.AbbreviatedType.IsFunctionType)
+        return FSharpHighlightingAttributeIdsModule.Delegate;
       
       return FSharpHighlightingAttributeIdsModule.Class;
     }
@@ -76,15 +79,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
       if (IsMangledOpName(mfv.LogicalName))
         return FSharpHighlightingAttributeIdsModule.Operator;
 
-      if (mfv.FullType.IsFunctionType || mfv.IsTypeFunction)
+      var fsType = mfv.FullType;
+      if (fsType.IsFunctionType || mfv.IsTypeFunction || fsType.IsAbbreviation && fsType.AbbreviatedType.IsFunctionType)
         return mfv.IsMutable
           ? FSharpHighlightingAttributeIdsModule.MutableFunction
           : FSharpHighlightingAttributeIdsModule.Function;
-
+      
       if (mfv.IsMutable || mfv.IsRefCell())
         return FSharpHighlightingAttributeIdsModule.MutableValue;
 
-      var fsType = mfv.FullType;
       if (fsType.HasTypeDefinition && fsType.TypeDefinition is var mfvTypeEntity && mfvTypeEntity.IsByRef)
         return FSharpHighlightingAttributeIdsModule.MutableValue;
 
@@ -97,7 +100,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
       switch (symbol)
       {
         case FSharpEntity entity when !entity.IsUnresolved:
-          return GetEntityHighlightingAttributeId(entity.GetAbbreviatedType());
+          return GetEntityHighlightingAttributeId(entity.GetAbbreviatedEntity());
 
         case FSharpMemberOrFunctionOrValue mfv when !mfv.IsUnresolved:
           return GetMfvHighlightingAttributeId(mfv.AccessorProperty?.Value ?? mfv);
