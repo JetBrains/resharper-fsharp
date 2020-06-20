@@ -84,7 +84,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
         return mfv.IsMutable
           ? FSharpHighlightingAttributeIdsModule.MutableFunction
           : FSharpHighlightingAttributeIdsModule.Function;
-      
+
       if (mfv.IsMutable || mfv.IsRefCell())
         return FSharpHighlightingAttributeIdsModule.MutableValue;
 
