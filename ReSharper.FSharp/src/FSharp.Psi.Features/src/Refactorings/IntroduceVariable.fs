@@ -103,6 +103,9 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         | :? IBinding as binding when
                 binding.Expression == expr && isNotNull (LetOrUseExprNavigator.GetByBinding(binding)) &&
 
+                // Don't escape bindings with expressions on separate lines
+                binding.EqualsToken.StartLine = expr.StartLine &&
+
                 // Don't escape function declarations
                 not (binding.HeadPattern :? IParametersOwnerPat) ->
             LetOrUseExprNavigator.GetByBinding(binding) :> _
