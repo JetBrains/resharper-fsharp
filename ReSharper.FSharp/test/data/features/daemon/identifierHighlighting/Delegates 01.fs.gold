@@ -1,0 +1,28 @@
+﻿open |System|(0)
+
+type |T1|(1) = delegate of |unit|(2) -> |unit|(3)
+type |T2|(4) = delegate of |int|(5) -> |int|(6)
+type |T3|(7) = |Func|(8)<|int|(9), unt>
+type |T4|(10) = |Action|(11)<|int|(12)>
+type |T5|(13) = |int|(14) -> |int|(15)
+type |T6|(16) = |T5|(17)
+
+---------------------------------------------------------
+(0): ReSharper F# Namespace Identifier: 
+(1): ReSharper F# Delegate Identifier: 
+(2): ReSharper F# Class Identifier: 
+(3): ReSharper F# Class Identifier: 
+(4): ReSharper F# Delegate Identifier: 
+(5): ReSharper F# Struct Identifier: 
+(6): ReSharper F# Struct Identifier: 
+(7): ReSharper F# Class Identifier: 
+(8): ReSharper F# Delegate Identifier: 
+(9): ReSharper F# Struct Identifier: 
+(10): ReSharper F# Delegate Identifier: 
+(11): ReSharper F# Delegate Identifier: 
+(12): ReSharper F# Struct Identifier: 
+(13): ReSharper F# Delegate Identifier: 
+(14): ReSharper F# Struct Identifier: 
+(15): ReSharper F# Struct Identifier: 
+(16): ReSharper F# Delegate Identifier: 
+(17): ReSharper F# Delegate Identifier: 

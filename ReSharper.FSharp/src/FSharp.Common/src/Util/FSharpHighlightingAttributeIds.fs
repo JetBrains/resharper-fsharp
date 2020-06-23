@@ -391,7 +391,7 @@ type FSharpSettingsNamesProvider() =
       FSharpHighlightingAttributeIds.ExtensionProperty,
       FallbackAttributeId = FSharpHighlightingAttributeIds.Property,
       GroupId = FSharpHighlightingAttributeIds.GroupId,
-      RiderPresentableName = "Members//Extensions property",
+      RiderPresentableName = "Members//Extension property",
       Layer = HighlighterLayer.SYNTAX,
       VSPriority = VSPriority.IDENTIFIERS,
       EffectType = EffectType.TEXT, ForegroundColor = "Purple", DarkForegroundColor = "Violet")>]
