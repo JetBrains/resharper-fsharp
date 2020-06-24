@@ -2,23 +2,28 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeStructure
 
 open System
 open System.Collections.Generic
+open JetBrains.Application
+open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeStructure
 open JetBrains.ReSharper.Plugins.FSharp
-open JetBrains.ReSharper.Plugins.FSharp.Util
-open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.Tree
-open JetBrains.ReSharper.Psi.Resources
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Util
+open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Resources
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.UI.Icons
-open JetBrains.Util
 open JetBrains.UI.RichText
+open JetBrains.Util
 
+[<ProjectFileType(typeof<FSharpProjectFileType>)>]
 [<Language(typeof<FSharpLanguage>)>]
 type FSharpCodeStructureProvider() =
     let typeExtensionIconId = compose PsiSymbolsThemedIcons.Class.Id FSharpIcons.ExtensionOverlay.Id
 
     let rec processNode (node: ITreeNode) (parent: CodeStructureElement) =
+        InterruptableActivityCookie.CheckAndThrow()
+
         match node with
         | :? IFSharpFile as fsFile ->
             for decl in fsFile.ModuleDeclarations do
@@ -77,11 +82,10 @@ type FSharpCodeStructureProvider() =
         for memberDecl in typeDecl.TypeMembers do
             processNode memberDecl structureElement
 
-    interface IPsiFileCodeStructureProvider with
-        member x.Build(file, _) =
-            match file.As<IFSharpFile>() with
-            | null -> null
-            | fsFile ->
+    interface IProjectFileCodeStructureProvider with
+        member x.Build(sourceFile, _) =
+            let fsFile = sourceFile.FSharpFile
+            if isNull fsFile then null else
 
             let root = CodeStructureRootElement(fsFile)
             processNode fsFile root

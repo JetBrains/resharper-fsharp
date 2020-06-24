@@ -30,7 +30,7 @@ type IFile with
 type IPsiSourceFile with
     member x.FSharpFile =
         if isNull x then null else
-        x.GetDominantPsiFile<FSharpLanguage>().AsFSharpFile()
+        x.GetPrimaryPsiFile().AsFSharpFile()
 
 type ITextControl with
     member x.GetFSharpFile(solution) =
