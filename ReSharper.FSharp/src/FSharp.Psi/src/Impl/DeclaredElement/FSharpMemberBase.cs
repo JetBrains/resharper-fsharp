@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
@@ -10,7 +9,6 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
-using JetBrains.Util.Logging;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
@@ -104,13 +102,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
         if (implementations.IsNullOrEmpty())
           return EmptyList<IExplicitImplementation>.Instance;
 
-        var impl = implementations.FirstOrDefault();
-        if (impl == null)
-          return EmptyList<IExplicitImplementation>.Instance;
+        var result = new LocalList<IExplicitImplementation>();
+        foreach (var impl in implementations)
+          if (GetType(impl.DeclaringType) is IDeclaredType type)
+            result.Add(new ExplicitImplementation(this, type, ShortName, true));
 
-        return GetType(impl.DeclaringType) is IDeclaredType type
-          ? new IExplicitImplementation[] {new ExplicitImplementation(this, type, ShortName, true)}
-          : EmptyList<IExplicitImplementation>.InstanceList;
+        return result.ResultingList();
       }
     }
 

@@ -55,6 +55,9 @@ type FSharpGoToInheritorsTest() =
     [<Test>] member x.``Interface 02 - Member``() = x.DoNamedTest()
     [<Test>] member x.``Interface 03 - Internal type impl``() = x.DoNamedTest()
     [<Test>] member x.``Interface 04 - Overloads``() = x.DoNamedTest()
+    [<Test>] member x.``Interface 05 - Inherit``() = x.DoNamedTest()
+    [<Test>] member x.``Interface 06 - Implement multiple``() = x.DoNamedTest()
+    [<Test>] member x.``Interface 07 - Implement multiple``() = x.DoNamedTest()
 
     [<Test>] member x.``Object expr - Interface 01``() = x.DoNamedTest()
     [<Test>] member x.``Object expr - Interface 02 - Dispose``() = x.DoNamedTest()
@@ -74,6 +77,10 @@ type FSharpGoToBaseTest() =
     [<Test>] member x.``Union case 01``() = x.DoNamedTest()
     [<Test>] member x.``Exception 01``() = x.DoNamedTest()
     [<Test>] member x.``Enum 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Interface 01``() = x.DoNamedTest()
+    [<Test>] member x.``Interface 02 - Inherit``() = x.DoNamedTest()
+    [<Test>] member x.``Interface 03 - Implement multiple``() = x.DoNamedTest()
 
     [<Test>] member x.``Object expr - Interface 01``() = x.DoNamedTest()
     [<Test>] member x.``Object expr - Interface 02 - Dispose``() = x.DoNamedTest()
