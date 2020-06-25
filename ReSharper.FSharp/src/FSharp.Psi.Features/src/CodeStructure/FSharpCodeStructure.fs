@@ -2,7 +2,10 @@ namespace rec JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeStructure
 
 open System
 open System.Collections.Generic
+open System.IO
 open JetBrains.Application
+open JetBrains.Application.UI.Controls.JetPopupMenu
+open JetBrains.Application.UI.Controls.TreeView
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeStructure
 open JetBrains.ReSharper.Plugins.FSharp
@@ -32,7 +35,7 @@ type FSharpCodeStructureProvider() =
         | :? IModuleLikeDeclaration as moduleLikeDeclaration ->
             let parent =
                 if not (moduleLikeDeclaration :? IModuleDeclaration) then parent else
-                CodeStructureDeclarationElement(parent, moduleLikeDeclaration) :> CodeStructureElement
+                FSharpDeclarationCodeStructureElement(parent, moduleLikeDeclaration) :> CodeStructureElement
 
             for memberDeclaration in moduleLikeDeclaration.Members do
                 processNode memberDeclaration parent
@@ -42,7 +45,7 @@ type FSharpCodeStructureProvider() =
             processTypeDeclaration unionDecl cases parent
 
         | :? IUnionCaseDeclaration as caseDecl ->
-            CodeStructureDeclarationElement(parent, caseDecl) |> ignore
+            FSharpDeclarationCodeStructureElement(parent, caseDecl) |> ignore
 
         | :? IRecordDeclaration as recordDecl ->
             let fields = Seq.cast recordDecl.Fields 
@@ -57,7 +60,7 @@ type FSharpCodeStructureProvider() =
             processTypeDeclaration decl TreeNodeCollection.Empty parent
 
         | :? ITypeMemberDeclaration as typeMember ->
-            CodeStructureDeclarationElement(parent, typeMember) |> ignore
+            FSharpDeclarationCodeStructureElement(parent, typeMember) |> ignore
 
         | :? IInterfaceImplementation as interfaceImpl ->
             let parent = NamedIdentifierOwner(interfaceImpl, parent, PsiSymbolsThemedIcons.Interface.Id)
@@ -66,7 +69,7 @@ type FSharpCodeStructureProvider() =
 
         | :? ILetModuleDecl as letDecl ->
             for binding in Seq.cast<ITopBinding> letDecl.Bindings do
-                CodeStructureDeclarationElement(parent, binding) |> ignore
+                FSharpDeclarationCodeStructureElement(parent, binding) |> ignore
 
         | :? ITypeDeclarationGroup as declarationGroup ->
             for typeDeclaration in declarationGroup.TypeDeclarations do
@@ -75,7 +78,7 @@ type FSharpCodeStructureProvider() =
         | _ -> ()
 
     and processTypeDeclaration (typeDecl: IFSharpTypeDeclaration) (members: IDeclaration seq) parent =
-        let structureElement = CodeStructureDeclarationElement(parent, typeDecl)
+        let structureElement = FSharpDeclarationCodeStructureElement(parent, typeDecl)
         for memberDecl in members do
             processNode memberDecl structureElement
 
@@ -90,6 +93,46 @@ type FSharpCodeStructureProvider() =
             let root = CodeStructureRootElement(fsFile)
             processNode fsFile root
             root
+
+
+type FSharpDeclarationCodeStructureElement(parentElement, declaration: IDeclaration) =
+    inherit CodeStructureElement(parentElement)
+
+    do
+        if not (isValid declaration) then
+            raise (ArgumentException("declaration should be valid", "declaration"))
+
+    let language = declaration.Language
+    let declarationPointer = declaration.GetPsiServices().Pointers.CreateTreeElementPointer(declaration)
+    let textRange = declaration.GetDocumentRange().TextRange
+    let aspects = CodeStructureDeclarationAspects(declaration)
+
+    let getDeclaration () = declarationPointer.GetTreeNode()
+
+    override x.Language = language
+
+    override x.TreeNode = getDeclaration () :> _
+    override x.GetTextRange() = textRange
+
+    override x.GetFileStructureAspect() = aspects :> _
+    override x.GetGotoMemberAspect() = aspects :> _
+    override x.GetMemberNavigationAspect() = aspects :> _
+
+    override x.DumpSelf(builder: TextWriter ) =
+      let description = MenuItemDescriptor(x)
+      let aspect = aspects
+      aspect.Present(description, PresentationState())
+      builder.Write(description.Text.Text)
+
+    interface ICodeStructureDeclarationElement with
+        member x.Declaration = getDeclaration ()
+
+        member x.DeclaredElement =
+            let declaration = getDeclaration ()
+            if not (isValid declaration) then null else
+
+            let declaredElement = declaration.DeclaredElement
+            if isValid declaredElement then declaredElement else null
 
 
 type NameIdentifierOwnerNodeAspect(treeNode: INameIdentifierOwner, iconId: IconId) =
