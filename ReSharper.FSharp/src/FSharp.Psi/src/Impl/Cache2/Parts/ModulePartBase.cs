@@ -26,16 +26,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2.Parts
     public override TypeElement CreateTypeElement() =>
       new FSharpModule(this);
 
-    public IEnumerable<ITypeMember> GetTypeMembers()
-    {
-      var declaration = GetDeclaration();
-      if (declaration == null)
-        return EmptyList<ITypeMember>.Instance;
-
-      return declaration.MemberDeclarations.Select(d => d.DeclaredElement)
-        .Where(el => el is IFSharpTypeMember fsMember && (!fsMember.IsFSharpMember || fsMember.IsExtensionMember) ||
-                     el != null);
-    }
+    public IEnumerable<ITypeMember> GetTypeMembers() =>
+      GetDeclaration() is { } declaration
+        ? declaration.MemberDeclarations.Select(d => d.DeclaredElement).WhereNotNull()
+        : EmptyList<ITypeMember>.Instance;
 
     public IEnumerable<IDeclaredType> GetSuperTypes() => new[] {GetBaseClassType()};
     public IDeclaredType GetBaseClassType() => GetPsiModule().GetPredefinedType().Object;
