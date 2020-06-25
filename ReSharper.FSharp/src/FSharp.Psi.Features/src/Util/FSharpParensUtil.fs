@@ -28,6 +28,11 @@ let deindentsBody (expr: IFSharpExpression) =
 
     | _ -> false
 
+let contextExprRequiresParens (expr: IFSharpExpression) =
+    isNotNull (TypeInheritNavigator.GetByCtorArgExpression(expr)) ||
+    isNotNull (ObjExprNavigator.GetByArgExpression(expr)) ||
+    isNotNull (NewExprNavigator.GetByArgumentExpression(expr))
+
 let isTopLevelContextExpr (expr: IFSharpExpression) =
     if expr.Parent :? IChameleonExpression then true else
 
@@ -109,6 +114,7 @@ let rec needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
 
     let context = if isNotNull context then context else expr.IgnoreParentParens()
 
+    if contextExprRequiresParens context then true else
     if isTopLevelContextExpr context then false else
 
     let appExpr = PrefixAppExprNavigator.GetByExpression(context)

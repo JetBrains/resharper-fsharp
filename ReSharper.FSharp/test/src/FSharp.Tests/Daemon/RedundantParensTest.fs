@@ -49,3 +49,8 @@ type RedundantParensTest() =
     [<Test>] member x.``Let - Top - App - Binary 01``() = x.DoNamedTest()
     [<Test>] member x.``Let - Top - App - Binary 02 - Nested``() = x.DoNamedTest()
     [<Test>] member x.``Let - Top - Literal 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Required - Inherit 01``() = x.DoNamedTest()
+    [<Test>] member x.``Required - Inherit 02 - Nested``() = x.DoNamedTest()
+    [<Test>] member x.``Required - New expr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Required - Obj expr 01``() = x.DoNamedTest()
