@@ -20,6 +20,7 @@ type ReplaceWithWildPatTest() =
 
     [<Test>] member x.``Match clause pat 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern 01``() = x.DoNamedTest()
+    [<Test>] member x.``Lambda 01``() = x.DoNamedTest()
 
 [<FSharpTest>]
 type ReplaceWithWildPatAvailabilityTest() =

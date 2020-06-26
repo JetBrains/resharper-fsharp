@@ -1,0 +1,4 @@
+﻿module Module
+
+[ 1, 2 ]
+|> List.iter (fun (_{caret}, _) -> ())

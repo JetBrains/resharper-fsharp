@@ -32,6 +32,7 @@ type ReplaceWithWildPatFix(pat: INamedPat) =
         let node = skipIntermediatePatParents pat |> getParent
         node :? IBinding ||
         node :? IMatchClause ||
+        node :? ILambdaExpr ||
         node :? IMemberParamsDeclaration &&
                 (node.Parent :? IMemberDeclaration || node.Parent :? IMemberConstructorDeclaration)
 
