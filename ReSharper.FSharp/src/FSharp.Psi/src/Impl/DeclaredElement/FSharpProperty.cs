@@ -1,4 +1,5 @@
-﻿using FSharp.Compiler.SourceCodeServices;
+﻿using System.Linq;
+using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -13,5 +14,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)
     {
     }
+
+    public override bool IsStatic => GetContainingType() is IFSharpModule || base.IsStatic;
   }
 }

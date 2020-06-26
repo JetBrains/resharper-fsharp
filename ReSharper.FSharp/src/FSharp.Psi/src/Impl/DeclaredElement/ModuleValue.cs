@@ -25,5 +25,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public bool CanBeMutable =>
       GetDeclaration() is IMutableModifierOwner mutableModifierOwner && mutableModifierOwner.CanBeMutable;
+
+    public override bool IsStatic => true;
   }
 }
