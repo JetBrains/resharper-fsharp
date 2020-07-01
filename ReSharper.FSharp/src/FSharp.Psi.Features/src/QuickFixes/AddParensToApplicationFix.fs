@@ -5,7 +5,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
@@ -36,7 +35,7 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
         let rec collectAppliedExprsRec (prefixAppExpr : IPrefixAppExpr) (appliedExprsAcc: _ list) =
             let functionExpression = prefixAppExpr.FunctionExpression.IgnoreInnerParens()
             match prefixAppExpr.ArgumentExpression with
-            | :? IReferenceExpr as refExpr->
+            | :? IReferenceExpr as refExpr ->
                 match refExpr.Reference.GetFSharpSymbol() with
                 | :? FSharpMemberOrFunctionOrValue as memberOrFunctionOrValue ->
                     let parametersCount = memberOrFunctionOrValue.CurriedParameterGroups.Count
@@ -62,7 +61,7 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
 
     override x.Text =
         match prefixAppToApply with
-        | Some prefixApp -> sprintf "Add parens to '%s' application" "foo"
+        | Some prefixApp -> sprintf "Add parens to '%s' application" (prefixApp.Reference.GetName())
         | None -> ""
 
     override x.IsAvailable _ =
