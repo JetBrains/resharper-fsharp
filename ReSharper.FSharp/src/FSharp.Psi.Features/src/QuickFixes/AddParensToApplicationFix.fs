@@ -53,7 +53,7 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
                 | _ -> (None, [])
                 
         collectAppliedExprsRec prefixAppExpr []
-            
+
     do
         let (x, y) = collectAppliedExprs errorPrefixApp
         prefixAppToApply <- x
