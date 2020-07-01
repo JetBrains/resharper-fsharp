@@ -5,6 +5,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
@@ -15,7 +16,7 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
 
     let errorPrefixApp = error.PrefixApp
     let mutable prefixAppToApply = None
-    let mutable exprsToApply = []
+    let mutable argExprsToApply = []
     
     let getParentPrefixApp (expr: IFSharpExpression) nestingLevel =
         let rec getParentPrefixAppRec (expr: IFSharpExpression) i =
@@ -27,11 +28,11 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
     let rec createPrefixAppExprTree (factory: IFSharpElementFactory) (expr: IFSharpExpression) args =
         match args with
         | head :: tail ->
-            let newAppExpr = factory.CreateAppExpr(expr,  head, true)
+            let newAppExpr = factory.CreateAppExpr(expr, head, true)
             createPrefixAppExprTree factory newAppExpr tail
         | [] -> expr
         
-    let collectAppliedExprs (prefixAppExpr : IPrefixAppExpr) =
+    let tryFindPrefixAppWithoutParens prefixAppExpr =
         let rec collectAppliedExprsRec (prefixAppExpr : IPrefixAppExpr) (appliedExprsAcc: _ list) =
             let functionExpression = prefixAppExpr.FunctionExpression.IgnoreInnerParens()
             match prefixAppExpr.ArgumentExpression with
@@ -41,7 +42,7 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
                     let parametersCount = memberOrFunctionOrValue.CurriedParameterGroups.Count
                     if memberOrFunctionOrValue.FullType.IsFunctionType &&
                        parametersCount <= appliedExprsAcc.Length then
-                        (Some (prefixAppExpr.ArgumentExpression), appliedExprsAcc |> List.take parametersCount)
+                        (Some (refExpr), appliedExprsAcc |> List.take parametersCount)
                     else (None, [])
                 | _ ->
                     match functionExpression with
@@ -51,13 +52,13 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
                 match functionExpression with
                 | :? IPrefixAppExpr as appExpr -> collectAppliedExprsRec appExpr (prefixAppExpr.ArgumentExpression :: appliedExprsAcc)
                 | _ -> (None, [])
-                
+
         collectAppliedExprsRec prefixAppExpr []
 
     do
-        let (x, y) = collectAppliedExprs errorPrefixApp
+        let (x, y) = tryFindPrefixAppWithoutParens errorPrefixApp
         prefixAppToApply <- x
-        exprsToApply <- y
+        argExprsToApply <- y
 
     override x.Text =
         match prefixAppToApply with
@@ -72,11 +73,11 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(errorPrefixApp.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
-        
+
         let factory = errorPrefixApp.CreateElementFactory()
         let prefixAppToApply = match prefixAppToApply with | Some x -> x | None -> null
-        let newPrefixAppTree = createPrefixAppExprTree factory prefixAppToApply exprsToApply
+        let newPrefixAppTree = createPrefixAppExprTree factory prefixAppToApply argExprsToApply
         let updatedPrefixAppTree = ModificationUtil.ReplaceChild(prefixAppToApply, newPrefixAppTree)
         let updatedPrefixAppTreeWithParens = addParens updatedPrefixAppTree
         let parentPrefixApp = PrefixAppExprNavigator.GetByArgumentExpression(updatedPrefixAppTreeWithParens.IgnoreParentParens())
-        ModificationUtil.ReplaceChild(getParentPrefixApp parentPrefixApp exprsToApply.Length, parentPrefixApp) |> ignore
+        ModificationUtil.ReplaceChild(getParentPrefixApp parentPrefixApp argExprsToApply.Length, parentPrefixApp) |> ignore

@@ -239,6 +239,5 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         ? fcsType.MapType(fsTreeNode)
         : TypeFactory.CreateUnknownType(fsTreeNode.GetPsiModule());
     }
-
   }
 }
