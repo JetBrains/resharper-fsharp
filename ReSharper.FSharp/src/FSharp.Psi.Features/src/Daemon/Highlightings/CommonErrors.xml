@@ -288,6 +288,7 @@
     <SecondaryRanges>getAllExpressionArgs expr |> Seq.tail |> getExpressionsRanges</SecondaryRanges>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>RemoveUnexpectedArgumentsFix</QuickFix>
+    <QuickFix>AddParensToApplicationFix</QuickFix>
   </Error>
 
   <Warning staticGroup="FSharpErrors" name="RedundantParenExpr" isSuppressedInTests="true">

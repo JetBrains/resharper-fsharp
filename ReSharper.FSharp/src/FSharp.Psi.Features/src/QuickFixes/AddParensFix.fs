@@ -16,5 +16,5 @@ type AddParensFix(error: SuccessiveArgsShouldBeSpacedOrTupledError) =
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
-        use diableFormatter = new DisableCodeFormatter()
+        use disableFormatter = new DisableCodeFormatter()
         addParens expr |> ignore
