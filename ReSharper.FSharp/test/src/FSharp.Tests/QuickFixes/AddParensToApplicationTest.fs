@@ -24,3 +24,4 @@ type AddParensToApplicationAvailabilityTest() =
 
     [<Test>] member x.``Not enough arguments - not available``() = x.DoNamedTest()
     [<Test>] member x.``Without applications - not available``() = x.DoNamedTest()
+    [<Test>] member x.``Display prefix app name``() = x.DoNamedTest()

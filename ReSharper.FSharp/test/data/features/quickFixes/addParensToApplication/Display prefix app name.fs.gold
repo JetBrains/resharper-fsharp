@@ -1,0 +1,15 @@
+﻿module Module
+
+let add (a: int) (b: int) = a + b
+let multiply (a: int) (b: int) = a * b
+multiply 1 add |2|(0) |3|(1)
+
+------------------------------------------------
+0: Unexpected arguments
+QUICKFIXES:
+Remove unexpected arguments
+Add parens to 'add' application
+1: Unexpected arguments
+QUICKFIXES:
+Remove unexpected arguments
+Add parens to 'add' application
