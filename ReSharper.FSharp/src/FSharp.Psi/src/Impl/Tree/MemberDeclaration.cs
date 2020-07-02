@@ -21,9 +21,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         ? FSharpFile.GetSymbolUse(identifierRange.StartOffset.Offset)
         : base.GetSymbolDeclaration(identifierRange);
 
-    protected override IDeclaredElement CreateDeclaredElement()
+    protected override IDeclaredElement CreateDeclaredElement() =>
+      GetFSharpSymbol() is { } fcsSymbol
+        ? CreateDeclaredElement(fcsSymbol)
+        : null;
+
+    protected override IDeclaredElement CreateDeclaredElement(FSharpSymbol fcsSymbol)
     {
-      if (!(GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv)) return null;
+      if (!(fcsSymbol is FSharpMemberOrFunctionOrValue mfv)) return null;
 
       if (mfv.IsProperty)
         return new FSharpProperty<MemberDeclaration>(this, mfv);

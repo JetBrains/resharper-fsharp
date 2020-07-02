@@ -47,13 +47,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     IFunction IFunctionDeclaration.DeclaredElement => base.DeclaredElement as IFunction;
 
-    protected override IDeclaredElement CreateDeclaredElement()
+    protected override IDeclaredElement CreateDeclaredElement() =>
+      GetFSharpSymbol() is { } fcsSymbol
+        ? CreateDeclaredElement(fcsSymbol)
+        : null;
+
+    protected override IDeclaredElement CreateDeclaredElement(FSharpSymbol fcsSymbol)
     {
-      var typeDeclaration = GetContainingNode<ITypeDeclaration>();
-      if (typeDeclaration == null)
+      if (!(fcsSymbol is FSharpMemberOrFunctionOrValue mfv))
         return null;
 
-      if (!(GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv))
+      var typeDeclaration = GetContainingNode<ITypeDeclaration>();
+      if (typeDeclaration == null)
         return null;
 
       if (typeDeclaration is IFSharpTypeDeclaration)
@@ -64,7 +69,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         if (mfv.LiteralValue != null)
           return new FSharpLiteral(this);
 
-        return new FSharpTypePrivateField(this); 
+        return new FSharpTypePrivateField(this);
       }
 
       if (mfv.LiteralValue != null)
@@ -77,7 +82,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         ? (IDeclaredElement) new FSharpSignOperator<TopPatternDeclarationBase>(this)
         : new ModuleFunction(this);
     }
-    
+
     public virtual IType GetPatternType() => TypeFactory.CreateUnknownType(GetPsiModule());
   }
 
