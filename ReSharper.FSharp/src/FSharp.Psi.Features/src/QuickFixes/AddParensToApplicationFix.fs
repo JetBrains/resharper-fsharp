@@ -5,6 +5,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
@@ -16,52 +17,56 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
     let errorPrefixApp = error.PrefixApp
     let mutable prefixAppToApply = None
     let mutable argExprsToApply = []
-    
+
     let getParentPrefixApp (expr: IFSharpExpression) nestingLevel =
         let rec getParentPrefixAppRec (expr: IFSharpExpression) i =
             let parentPrefixApp = PrefixAppExprNavigator.GetByFunctionExpression(expr)
             if i + 1 <= nestingLevel then getParentPrefixAppRec parentPrefixApp (i + 1) else parentPrefixApp
 
         getParentPrefixAppRec expr 1
-        
+
     let rec createPrefixAppExprTree (factory: IFSharpElementFactory) (expr: IFSharpExpression) args =
         match args with
         | head :: tail ->
             let newAppExpr = factory.CreateAppExpr(expr, head, true)
             createPrefixAppExprTree factory newAppExpr tail
         | [] -> expr
-        
+
+    let countArgs fsharpType =
+        let rec countArgsRec (fsharpType: FSharpType) count =
+            let functionCandidate = fsharpType.GenericArguments.[1]
+            if functionCandidate.IsFunctionType then countArgsRec functionCandidate count + 1 else count
+
+        countArgsRec fsharpType 1
+
     let tryFindPrefixAppWithoutParens prefixAppExpr =
         let rec collectAppliedExprsRec (prefixAppExpr : IPrefixAppExpr) (appliedExprsAcc: _ list) =
-            let functionExpression = prefixAppExpr.FunctionExpression.IgnoreInnerParens()
-            match prefixAppExpr.ArgumentExpression with
-            | :? IReferenceExpr as refExpr ->
-                match refExpr.Reference.GetFSharpSymbol() with
-                | :? FSharpMemberOrFunctionOrValue as memberOrFunctionOrValue ->
-                    let parametersCount = memberOrFunctionOrValue.CurriedParameterGroups.Count
-                    if memberOrFunctionOrValue.FullType.IsFunctionType &&
-                       parametersCount <= appliedExprsAcc.Length then
-                        (Some (refExpr), appliedExprsAcc |> List.take parametersCount)
-                    else (None, [])
-                | _ ->
-                    match functionExpression with
-                    | :? IPrefixAppExpr as appExpr -> collectAppliedExprsRec appExpr (prefixAppExpr.ArgumentExpression :: appliedExprsAcc)
-                    | _ -> (None, [])
-            | _ ->
-                match functionExpression with
-                | :? IPrefixAppExpr as appExpr -> collectAppliedExprsRec appExpr (prefixAppExpr.ArgumentExpression :: appliedExprsAcc)
-                | _ -> (None, [])
+            let argExprFcsType = prefixAppExpr.ArgumentExpression.IgnoreInnerParens().TryGetFSharpType()
+            if argExprFcsType != null && argExprFcsType.IsFunctionType then
+                let expectedArgsCount = countArgs argExprFcsType
+                if expectedArgsCount <= appliedExprsAcc.Length then
+                    (Some (prefixAppExpr.ArgumentExpression), appliedExprsAcc |> List.take expectedArgsCount)
+                else (None, [])         
+            else match prefixAppExpr.FunctionExpression.IgnoreInnerParens() with
+                 | :? IPrefixAppExpr as appExpr -> collectAppliedExprsRec appExpr (prefixAppExpr.ArgumentExpression :: appliedExprsAcc)
+                 | _ -> (None, [])
 
         collectAppliedExprsRec prefixAppExpr []
 
-    do
-        let (x, y) = tryFindPrefixAppWithoutParens errorPrefixApp
-        prefixAppToApply <- x
-        argExprsToApply <- y
+    do let (x, y) = tryFindPrefixAppWithoutParens errorPrefixApp
+       prefixAppToApply <- x
+       argExprsToApply <- y
 
     override x.Text =
         match prefixAppToApply with
-        | Some prefixApp -> sprintf "Add parens to '%s' application" (prefixApp.Reference.GetName())
+        | Some prefixApp ->
+            let reference =
+                match prefixApp.IgnoreInnerParens() with
+                | :? IPrefixAppExpr as appExpr -> appExpr.Reference
+                | :? IReferenceExpr as refExpr -> refExpr.Reference
+                | _ -> null
+            if isNotNull reference then sprintf "Add parens to '%s' application" (reference.GetName())
+            else "Add parens to lambda application"
         | None -> ""
 
     override x.IsAvailable _ =
