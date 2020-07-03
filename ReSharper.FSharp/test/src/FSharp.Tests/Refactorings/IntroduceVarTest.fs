@@ -10,10 +10,6 @@ type IntroduceVarTest() =
 
     override x.RelativeTestDataPath = "features/refactorings/introduceVar"
 
-    override x.DoTest(lifetime, project) =
-        use cookie = FSharpRegistryUtil.AllowExperimentalFeaturesCookie.Create()
-        base.DoTest(lifetime, project)
-
     [<Test>] member x.``Simple 01``() = x.DoNamedTest()
     [<Test>] member x.``Simple 02``() = x.DoNamedTest()
     [<Test>] member x.``Simple 03``() = x.DoNamedTest()
