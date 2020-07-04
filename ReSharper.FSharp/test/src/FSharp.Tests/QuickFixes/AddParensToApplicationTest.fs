@@ -13,6 +13,10 @@ type AddParensToApplicationTest() =
 
     [<Test>] member x.``Single application``() = x.DoNamedTest()
     [<Test>] member x.``Multiply applications``() = x.DoNamedTest()
+    [<Test>] member x.``Lambda expression 1``() = x.DoNamedTest()
+    [<Test>] member x.``Lambda expression 2``() = x.DoNamedTest()
+    [<Test>] member x.``Curried function``() = x.DoNamedTest()
+    [<Test>] member x.``Curried function with parens``() = x.DoNamedTest()
     [<Test>] member x.``Application inside application``() = x.DoNamedTest()
     [<Test>] member x.``First arg is application``() = x.DoNamedTest()
 
@@ -25,3 +29,5 @@ type AddParensToApplicationAvailabilityTest() =
     [<Test>] member x.``Not enough arguments - not available``() = x.DoNamedTest()
     [<Test>] member x.``Without applications - not available``() = x.DoNamedTest()
     [<Test>] member x.``Display prefix app name``() = x.DoNamedTest()
+    [<Test>] member x.``Display curried app name``() = x.DoNamedTest()
+    [<Test>] member x.``Display lambda name``() = x.DoNamedTest()
