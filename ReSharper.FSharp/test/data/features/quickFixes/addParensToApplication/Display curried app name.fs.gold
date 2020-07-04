@@ -8,5 +8,5 @@ multiply 1 add2 |3|(0)
 ------------------------------------------------
 0: Unexpected argument
 QUICKFIXES:
-Remove unexpected argument
 Add parens to 'add2' application
+Remove unexpected argument

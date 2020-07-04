@@ -7,9 +7,9 @@ multiply 1 add |2|(0) |3|(1)
 ------------------------------------------------
 0: Unexpected arguments
 QUICKFIXES:
-Remove unexpected arguments
 Add parens to 'add' application
+Remove unexpected arguments
 1: Unexpected arguments
 QUICKFIXES:
-Remove unexpected arguments
 Add parens to 'add' application
+Remove unexpected arguments
