@@ -41,7 +41,9 @@ type FSharpCodeStylePageSchema(lifetime, smartContext, itemViewModelFactory, con
            x.GetItem(fun key -> key.SpaceAroundDelimiter)
            x.GetItem(fun key -> key.ReorderOpenDeclarations)
            x.GetItem(fun key -> key.PreserveEndOfLine)
-           x.GetItem(fun key -> key.StickComment) |] :> _
+           x.GetItem(fun key -> key.StickComment)
+           x.GetItem(fun key -> key.OutdentBinaryOperators)
+           x.GetItem(fun key -> key.NeverOutdentPipeOperators) |] :> _
 
 
 [<OptionsPage("FSharpCodeStylePage", "Formatting Style", typeof<PsiFeaturesUnsortedOptionsThemedIcons.Indent>)>]
