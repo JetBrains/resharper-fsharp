@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Application.Settings;
 using JetBrains.Application.Settings.Calculated.Interface;
@@ -9,6 +7,7 @@ using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Psi;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Impl.CodeStyle;
@@ -20,9 +19,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
   public class FSharpFormatterInfoProvider :
     FormatterInfoProviderWithFluentApi<CodeFormattingContext, FSharpFormatSettingsKey>
   {
-    private static readonly IReadOnlyCollection<string> PipeOperatorsRepresentations =
-      new HashSet<string>(new[] {"|>", "||>", "|||>", "<|", "<||", "<|||"}, StringComparer.Ordinal);
-
     public FSharpFormatterInfoProvider(ISettingsSchema settingsSchema,
       ICalculatedSettingsSchema calculatedSettingsSchema, IThreading threading, Lifetime lifetime)
       : base(settingsSchema, calculatedSettingsSchema, threading, lifetime)
@@ -226,7 +222,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
     private static bool IsPipeOperator(ITreeNode node)
     {
       var opText = node.GetText();
-      return PipeOperatorsRepresentations.Contains(opText);
+      return FSharpPredefinedType.PipeOperatorNames.Contains(opText);
     }
   }
 }
