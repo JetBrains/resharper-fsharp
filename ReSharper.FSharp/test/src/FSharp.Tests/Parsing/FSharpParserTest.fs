@@ -55,6 +55,11 @@ type FSharpParserTest() =
     [<Test>] member x.``Type decl - Union 04 - No first bar with modifier``() = x.DoNamedTest()
     [<Test>] member x.``Type decl - Union 05 - Case attributes``() = x.DoNamedTest()
 
+    [<Test>] member x.``Type decl - Record 01 - Single line``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Record 02 - Multiline``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Record 03 - Multiline, semicolons``() = x.DoNamedTest()
+    [<Test>] member x.``Type decl - Record 04 - Attribute``() = x.DoNamedTest()
+
     [<Test>] member x.``Let 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Let 02 - Typed``() = x.DoNamedTest()
     [<Test>] member x.``Let 03 - Typed, var type``() = x.DoNamedTest()
@@ -350,8 +355,6 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Pattern - Parameters owner 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern - Parameters owner 02 - Qualified``() = x.DoNamedTest()
-
-    [<Test>] member x.``Record field 01 - Attribute``() = x.DoNamedTest()
 
 
 [<FSharpSignatureTest>]

@@ -887,7 +887,7 @@ enumMemberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"
 recordDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<recordDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
   get { methodName="Attributes" path=<recordDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
-  get { methodName="Fields" path=<recordDeclaration:RECORD_REPR/recordRepresentation:RECORD_FIELD> };
+  get { methodName="Fields" path=<recordDeclaration:RECORD_REPR/recordRepresentation:RECORD_FIELD_LIST/recordFieldList:RECORD_FIELD> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
@@ -899,8 +899,11 @@ recordDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extra
 recordRepresentation:
   LBRACE
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
-  recordFieldDeclaration<RECORD_FIELD, Fields>*
+  recordFieldList<RECORD_FIELD_LIST, RecordFieldList>
   RBRACE;
+
+recordFieldList:
+  recordFieldDeclaration<RECORD_FIELD, Fields>*;
 
 recordFieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
   get { methodName="Attributes" path=<recordFieldDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };

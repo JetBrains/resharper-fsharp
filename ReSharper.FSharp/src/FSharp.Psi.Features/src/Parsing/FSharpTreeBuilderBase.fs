@@ -315,8 +315,17 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
         match repr with
         | SynTypeDefnSimpleRepr.Record(_, fields, range) ->
             let mark = x.Mark(range)
-            for field in fields do
-                x.ProcessField field ElementType.RECORD_FIELD_DECLARATION
+
+            if not fields.IsEmpty then
+                let (Field(_, _, _, _, _, _, _, firstFieldRange)) = fields.Head
+                let (Field(_, _, _, _, _, _, _, lastFieldRange)) = List.last fields
+
+                x.AdvanceToStart(firstFieldRange)
+                let fieldListMark = x.Mark()
+                for field in fields do
+                    x.ProcessField field ElementType.RECORD_FIELD_DECLARATION
+                x.Done(lastFieldRange, fieldListMark, ElementType.RECORD_FIELD_LIST)
+
             x.Done(range, mark, ElementType.RECORD_REPRESENTATION)
             ElementType.RECORD_DECLARATION
 
