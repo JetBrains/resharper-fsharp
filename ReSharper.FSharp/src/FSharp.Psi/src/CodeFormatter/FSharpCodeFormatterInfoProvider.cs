@@ -66,6 +66,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         ("UnionDeclarationCases", ElementType.UNION_DECLARATION, UnionDeclaration.UNION_REPR),
         ("TypeAbbreviation", ElementType.TYPE_ABBREVIATION_DECLARATION, TypeAbbreviationDeclaration.TYPE_OR_UNION_CASE),
         ("ModuleAbbreviation", ElementType.MODULE_ABBREVIATION, ModuleAbbreviation.TYPE_REFERENCE),
+        ("RecordDeclaration", ElementType.RECORD_DECLARATION, RecordDeclaration.RECORD_REPR),
       };
 
       var alignmentRulesParameters = new[]
@@ -76,6 +77,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         ("EnumCases", ElementType.ENUM_REPRESENTATION),
         ("SequentialExpr", ElementType.SEQUENTIAL_EXPR),
         ("BinaryExpr", ElementType.BINARY_APP_EXPR),
+        ("RecordDeclaration", ElementType.RECORD_FIELD_LIST),
       };
 
       lock (this)
