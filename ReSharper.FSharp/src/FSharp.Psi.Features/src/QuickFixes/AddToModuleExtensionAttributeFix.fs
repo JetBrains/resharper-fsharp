@@ -12,9 +12,7 @@ open FSharpAttributesUtil
 type AddToModuleExtensionAttributeFix(warning: ExtensionMemberInNonExtensionTypeWarning) =
     inherit FSharpQuickFixBase()
 
-    let mutable declaration = null
-
-    do declaration <- LetModuleDeclNavigator.GetByAttribute(warning.Attr).GetContainingTypeDeclaration()
+    let declaration = LetModuleDeclNavigator.GetByAttribute(warning.Attr).GetContainingTypeDeclaration()
     override x.Text =
         match declaration with
         | :? IDeclaredModuleDeclaration as m ->
