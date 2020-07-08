@@ -182,7 +182,7 @@
     <Range>attr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <Message value="Extension member in non-extension type looks suspicious"/>
-    <QuickFix>AddToModuleExtensionAttributeFix</QuickFix>
+    <QuickFix>AddExtensionAttributeFix</QuickFix>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="ExtensionTypeWithNoExtensionMembers">

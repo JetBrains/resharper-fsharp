@@ -9,10 +9,11 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open FSharpAttributesUtil
 
-type AddToModuleExtensionAttributeFix(warning: ExtensionMemberInNonExtensionTypeWarning) =
+type AddExtensionAttributeFix(warning: ExtensionMemberInNonExtensionTypeWarning) =
     inherit FSharpQuickFixBase()
 
     let declaration = LetModuleDeclNavigator.GetByAttribute(warning.Attr).GetContainingTypeDeclaration()
+
     override x.Text =
         match declaration with
         | :? IDeclaredModuleDeclaration as m ->
