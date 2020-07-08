@@ -12,13 +12,19 @@ open FSharpAttributesUtil
 type AddToModuleExtensionAttributeFix(warning: ExtensionMemberInNonExtensionTypeWarning) =
     inherit FSharpQuickFixBase()
 
-    let mutable moduleName = null
+    let mutable declaration = null
 
-    do moduleName <- LetModuleDeclNavigator.GetByAttribute(warning.Attr).GetContainingTypeDeclaration()
-    override x.Text = sprintf "Add 'Extension' attribute to '%s' module" moduleName.DeclaredName
+    do declaration <- LetModuleDeclNavigator.GetByAttribute(warning.Attr).GetContainingTypeDeclaration()
+    override x.Text =
+        match declaration with
+        | :? IDeclaredModuleDeclaration as m ->
+            sprintf "Add 'Extension' attribute to '%s' module" m.DeclaredName
+        | :? IObjectTypeDeclaration as o ->
+            sprintf "Add 'Extension' attribute to '%s' type" o.DeclaredName
+        | _ -> ""
 
     override x.IsAvailable _ =
-        match moduleName with
+        match declaration with
         | :? INamedModuleDeclaration -> false
         | _ -> isValid warning.Attr
 
@@ -27,7 +33,7 @@ type AddToModuleExtensionAttributeFix(warning: ExtensionMemberInNonExtensionType
         use disableFormatter = new DisableCodeFormatter()
 
         let attribute = warning.Attr.CreateElementFactory().CreateAttribute("Extension")
-        match moduleName with
+        match declaration with
         | :? IDeclaredModuleDeclaration as m ->
             if m.AttributeLists.IsEmpty then addAttributesList m true
             addAttribute m.AttributeLists.[0] attribute
