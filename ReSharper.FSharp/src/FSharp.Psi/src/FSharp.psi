@@ -522,14 +522,16 @@ interface recordLikeExpr:
   anonRecordExpr |
   recordExpr;
 
-anonRecordExpr options { stubBase="FSharpExpressionBase"; }:
+anonRecordExpr options { stubBase="FSharpExpressionBase"; } extras {
+  get { methodName="ExprBindings" path=<anonRecordExpr:BINDING_LIST/recordExprBindingList:BINDING> };
+}:
   STRUCT<STRUCT, STRUCT_KEYWORD>?
   LBRACE_BAR
   (
     fSharpExpression<COPY_INFO, CopyInfoExpression>
     WITH
   )?
-  recordExprBinding<BINDING, ExprBindings>*
+  recordExprBindingList<BINDING_LIST, ExprBindingList>
   BAR_RBRACE;
 
 arrayOrListExpr options { stubBase="FSharpExpressionBase"; }:
@@ -537,14 +539,19 @@ arrayOrListExpr options { stubBase="FSharpExpressionBase"; }:
   fSharpExpression<EXPR, Expression>
   (RBRACK | BAR_RBRACK);
 
-recordExpr options { stubBase="FSharpExpressionBase"; }:
+recordExpr options { stubBase="FSharpExpressionBase"; } extras {
+  get { methodName="ExprBindings" path=<recordExpr:BINDING_LIST/recordExprBindingList:BINDING> };
+}:
   LBRACE<LBRACE, LeftBrace>
   (
     fSharpExpression<COPY_INFO, CopyInfoExpression>
     WITH
   )?
-  recordExprBinding<BINDING, ExprBindings>*
+  recordExprBindingList<BINDING_LIST, ExprBindingList>
   RBRACE<RBRACE, RightBrace>;
+
+recordExprBindingList:
+  recordExprBinding<BINDING, ExprBindings>*;
 
 recordExprBinding:
   expressionReferenceName<REFERENCE_NAME, ReferenceName>

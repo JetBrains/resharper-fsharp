@@ -89,7 +89,9 @@ type FSharpParserTest() =
 
     [<Test>] member x.``Expr - Typed 01 - Simple``() = x.DoNamedTest()
 
-    [<Test>] member x.``Expr - Anon record 01``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Anon record 01 - Single line``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Anon record 02 - Multiline``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Anon record 03 - With copy info``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Record - Inherit 01``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record 01 - Single Line``() = x.DoNamedTest()
@@ -98,6 +100,8 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Record 04 - Empty``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record 05 - Single Line with end semicolon``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Record 06 - With qualifier``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record 07 - With copy info``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Record 08 - Spaces before semicolon``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - While 01 - Simple``() = x.DoNamedTest()
 

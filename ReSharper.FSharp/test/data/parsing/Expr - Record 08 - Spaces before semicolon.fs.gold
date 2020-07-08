@@ -5,7 +5,6 @@ IFSharpImplFile
       IChameleonExpression
         IRecordExpr
           FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           IRecordExprBindingList
             IRecordExprBinding
               IExpressionReferenceName
@@ -15,8 +14,9 @@ IFSharpImplFile
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               ILiteralExpr
                 FSharpToken(type:INT32, text:1)
-            NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-            Whitespace(type:WHITE_SPACE, text:  ) spaces:"  "
+              Whitespace(type:WHITE_SPACE, text:  ) spaces:"  "
+              FSharpTokenType+SemicolonTokenElement(type:SEMICOLON, text:;)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             IRecordExprBinding
               IExpressionReferenceName
                 FSharpIdentifierToken(type:IDENTIFIER, text:B)
