@@ -24,7 +24,7 @@ type AddExtensionAttributeFix(warning: ExtensionMemberInNonExtensionTypeWarning)
 
     override x.IsAvailable _ =
         match declaration with
-        | :? INamedModuleDeclaration -> false
+        | :? ITopLevelModuleLikeDeclaration -> false
         | _ -> isValid warning.Attr
 
     override x.ExecutePsiTransaction _ =
