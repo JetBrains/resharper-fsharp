@@ -3,8 +3,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Feature.Services.Intentions.Scoped
 open JetBrains.ReSharper.Feature.Services.Intentions.Scoped.Actions
 open JetBrains.ReSharper.Feature.Services.QuickFixes
-open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
@@ -29,14 +29,5 @@ type RemoveUnusedOpensFix(warning: UnusedOpenWarning) =
                 | null -> ()
                 | warning ->
 
-                let openStatement = warning.OpenStatement
-
-                let first = getFirstMatchingNodeBefore isInlineSpaceOrComment openStatement
-                let last =
-                    openStatement
-                    |> skipSemicolonsAndWhiteSpacesAfter
-                    |> getThisOrNextNewLine
-
-                deleteChildRange first last
-
+                OpensUtil.removeUnusedOpen warning.OpenStatement
             null
