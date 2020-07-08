@@ -109,3 +109,7 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Record declaration alignment 01``() = x.DoNamedTest()
     [<Test>] member x.``Record declaration alignment 02 - Semicolons``() = x.DoNamedTest()
     [<Test>] member x.``Record declaration alignment 03 - Mutable``() = x.DoNamedTest()
+    [<Test>] member x.``Record expr alignment 01``() = x.DoNamedTest()
+    [<Test>] member x.``Record expr alignment 02 - Copy``() = x.DoNamedTest()
+    [<Test>] member x.``Anon record expr alignment 01``() = x.DoNamedTest()
+    [<Test>] member x.``Anon record expr alignment 02 - Copy``() = x.DoNamedTest()

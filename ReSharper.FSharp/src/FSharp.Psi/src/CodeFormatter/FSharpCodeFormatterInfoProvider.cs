@@ -78,6 +78,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         ("SequentialExpr", ElementType.SEQUENTIAL_EXPR),
         ("BinaryExpr", ElementType.BINARY_APP_EXPR),
         ("RecordDeclaration", ElementType.RECORD_FIELD_LIST),
+        ("RecordExprBindings", ElementType.RECORD_EXPR_BINDING_LIST),
       };
 
       lock (this)
