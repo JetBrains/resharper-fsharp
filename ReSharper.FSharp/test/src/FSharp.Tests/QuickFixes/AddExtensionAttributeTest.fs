@@ -14,6 +14,7 @@ type AddExtensionAttributeTest() =
     [<Test>] member x.``Module``() = x.DoNamedTest()
     [<Test>] member x.``Type``() = x.DoNamedTest()
     [<Test>] member x.``Attribute namespace - move``() = x.DoNamedTest()
+    [<Test>] member x.``On type member``() = x.DoNamedTest()
 
 
 [<FSharpTest>]
