@@ -4,6 +4,7 @@ open System.Runtime.CompilerServices
 
 [<Extension>]
 module Module =
+    open System.Runtime.CompilerServices
 
     [<{caret}Extension>]
     let a() = 5
