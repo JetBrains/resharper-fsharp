@@ -6,6 +6,7 @@ using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Psi;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
@@ -190,6 +191,37 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
           .Switch(settings => settings.OutdentBinaryOperators,
             When(true).Switch(settings => settings.NeverOutdentPipeOperators,
               When(false).Return(IndentType.Outdent | IndentType.External)))
+          .Build();
+
+        Describe<FormattingRule>()
+          .Name("SpaceBetweenRecordBindings")
+          .Where(
+            Left()
+              .HasType(ElementType.RECORD_EXPR_BINDING)
+              .Satisfies((node, context) => ((IRecordExprBinding) node).Semicolon != null),
+            Right().HasType(ElementType.RECORD_EXPR_BINDING))
+          .Return(IntervalFormatType.Space)
+          .Build();
+
+        Describe<FormattingRule>()
+          .Group(LineBreaksRuleGroup)
+          .Name("LineBreaksBetweenRecordBindings")
+          .Where(
+            Left()
+              .HasType(ElementType.RECORD_EXPR_BINDING)
+              .Satisfies((node, context) => ((IRecordExprBinding) node).Semicolon == null),
+            Right().HasType(ElementType.RECORD_EXPR_BINDING))
+          .Return(IntervalFormatType.NewLine)
+          .Build();
+
+        Describe<FormattingRule>()
+          .Name("SpacesAroundRecordExprBraces")
+          .Where(
+            Left().In(FSharpTokenType.LBRACE, FSharpTokenType.RBRACE),
+            Right().HasType(ElementType.RECORD_EXPR_BINDING_LIST))
+          .Return(IntervalFormatType.OnlySpace)
+          .Build()
+          .AndViceVersa()
           .Build();
       }
     }
