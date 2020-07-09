@@ -59,7 +59,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         }
       }
 
-      return names.SelectMany(n => new[] {n, $"``{n}``"});
+      return names;
     }
 
     private static void GetPossibleSourceNames(ITypeElement type, ISet<string> names)
