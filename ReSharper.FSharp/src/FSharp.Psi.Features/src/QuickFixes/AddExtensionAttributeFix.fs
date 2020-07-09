@@ -17,7 +17,7 @@ type AddExtensionAttributeFix(warning: ExtensionMemberInNonExtensionTypeWarning)
     let [<Literal>] attributeName = "Extension"
     let declaration = LetModuleDeclNavigator.GetByAttribute(warning.Attr).GetContainingTypeDeclaration()
 
-    override x.Text = sprintf "Add 'Extension' attribute to '%s' module" declaration.SourceName
+    override x.Text = sprintf "Add 'Extension' attribute to '%s'" declaration.SourceName
 
     override x.IsAvailable _ =
         match declaration with
