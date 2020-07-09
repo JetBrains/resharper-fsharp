@@ -21,6 +21,7 @@ open JetBrains.Util.Text
 [<CodeCleanupModule>]
 type FSharpReformatCode() =
     interface ICodeCleanupModule with
+        member x.Name = "Reformat F#"
         member x.LanguageType = FSharpLanguage.Instance :> _
         member x.Descriptors = EmptyList.Instance :> _
         member x.IsAvailableOnSelection = true
