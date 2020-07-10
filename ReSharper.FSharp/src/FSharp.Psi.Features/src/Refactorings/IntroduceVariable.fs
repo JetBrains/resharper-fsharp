@@ -502,13 +502,8 @@ type FSharpIntroduceVarHelper() =
         let expr = node.As<IFSharpExpression>()
         if isNull expr || expr :? IFromErrorExpr then false else
 
-        if expr.UserData.HasKey(FSharpIntroduceVariable.ExpressionToRemoveKey) then true else
-
-        if not (expr.FSharpExperimentalFeaturesEnabled()) then false else
+        expr.UserData.HasKey(FSharpIntroduceVariable.ExpressionToRemoveKey) ||
         FSharpIntroduceVariable.CanIntroduceVar(expr)
 
     override x.CheckOccurrence(expr, occurrence) =
-        if isExpressionToRemove occurrence then true else
-
-        if isExpressionToRemove expr then false else
-        expr.FSharpExperimentalFeaturesEnabled()
+        isExpressionToRemove occurrence || not (isExpressionToRemove expr)

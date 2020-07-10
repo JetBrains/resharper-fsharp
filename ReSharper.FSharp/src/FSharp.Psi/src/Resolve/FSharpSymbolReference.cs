@@ -61,8 +61,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
       // Current grammar rules can't get some operator identifiers, like '=', we're trying to workaround it below.
       // todo: rewrite after https://youtrack.jetbrains.com/issue/RIDER-41848 is fixed, also change SymbolOffset
-
-      var text = myOwner.GetText();
+      var text = myOwner.GetText().RemoveBackticks();
       return text.IsEmpty() ? SharedImplUtil.MISSING_DECLARATION_NAME : text;
     }
 

@@ -16,7 +16,6 @@ type FSharpRefactoringLanguageService() =
         FSharpIntroduceVarHelper() :> _
 
     override x.CreateIntroduceVariable(workflow, solution, driver) =
-        if not (solution.FSharpExperimentalFeaturesEnabled()) then null else
         FSharpIntroduceVariable(workflow, solution, driver) :> _
 
     override x.CreateInlineVar(workflow, solution, driver) =

@@ -34,7 +34,7 @@ let contextExprRequiresParens (expr: IFSharpExpression) =
     isNotNull (NewExprNavigator.GetByArgumentExpression(expr))
 
 let isTopLevelContextExpr (expr: IFSharpExpression) =
-    if expr.Parent :? IChameleonExpression then true else
+    if expr.Parent :? IChameleonExpression && isNull (AttributeNavigator.GetByExpression(expr)) then true else
 
     if isNotNull (ParenExprNavigator.GetByInnerExpression(expr)) then
         true else
@@ -121,6 +121,11 @@ let rec needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
     if isHighPrecedenceApp appExpr && isHighPrecedenceAppRequired appExpr then true else
 
     match expr with
+    | :? IReferenceExpr as refExpr when
+            isNotNull refExpr.TypeArgumentList &&
+            isNotNull (AttributeNavigator.GetByExpression(refExpr.IgnoreParentParens())) ->
+        true
+
     | :? IQualifiedExpr as qualifiedExpr ->
         needsParens context qualifiedExpr.Qualifier
 

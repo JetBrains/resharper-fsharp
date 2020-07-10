@@ -39,6 +39,9 @@ type FSharpGoToUsagesTest() =
 
     [<Test>] member x.``Wild pat 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Operator 01 - Pipe``() = x.DoNamedTest()
+    [<Test; Explicit("Not implemented")>] member x.``Operator 02 - =``() = x.DoNamedTest()
+
 
 type FSharpGoToInheritorsTest() =
     inherit FSharpContextSearchTestBase("inheritors")

@@ -1,0 +1,38 @@
+﻿-------------- offset 21 line 4 col 1 --------------------
++++ JetBrains.ReSharper.Features.Navigation.Features.GoToUsages.GotoUsagesProvider navigation provider results +++
+Occurrences provided for OccurrenceUtil:
+Occurrence's dump:
+TO: [O] ||>| ignore RANGE: (21,23) @ Operator 01 - Pipe.fs
+Menu Item presentation: 
+Text: Module      ||>| ignore| (4)
+Shortcut text: in <Root Namespace>
+Style: Enabled
+Mnemonic: 
+Tooltip: |> ignore
+
+Occurrence's navigation result. Opened file: Operator 01 - Pipe.fs
+------------------
+
+()
+|CARET||> ignore
+|> ignore
+
+------------------
+
+Occurrence's dump:
+TO: [O] ||>| ignore RANGE: (32,34) @ Operator 01 - Pipe.fs
+Menu Item presentation: 
+Text: Module      ||>| ignore| (5)
+Shortcut text: in <Root Namespace>
+Style: Enabled
+Mnemonic: 
+Tooltip: |> ignore
+
+Occurrence's navigation result. Opened file: Operator 01 - Pipe.fs
+------------------
+()
+|> ignore
+|CARET||> ignore
+
+------------------
+

@@ -105,3 +105,4 @@ type FSharpCodeFormatterTest() =
     [<Test>] member x.``Sequential expr alignment 01 - No separators``() = x.DoNamedTest()
     [<Test>] member x.``Sequential expr alignment 02 - Separators``() = x.DoNamedTest()
     [<Test>] member x.``Binary expr alignment 01``() = x.DoNamedTest()
+    [<Test>] member x.``Binary expr alignment 02 - Pipe operator``() = x.DoNamedTest()
