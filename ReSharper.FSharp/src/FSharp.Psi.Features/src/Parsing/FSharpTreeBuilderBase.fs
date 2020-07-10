@@ -320,8 +320,7 @@ type FSharpTreeBuilderBase(lexer, document: IDocument, lifetime, projectedOffset
                 let (Field(_, _, _, _, _, _, _, firstFieldRange)) = fields.Head
                 let (Field(_, _, _, _, _, _, _, lastFieldRange)) = List.last fields
 
-                x.AdvanceToStart(firstFieldRange)
-                let fieldListMark = x.Mark()
+                let fieldListMark = x.Mark(firstFieldRange)
                 for field in fields do
                     x.ProcessField field ElementType.RECORD_FIELD_DECLARATION
                 x.Done(lastFieldRange, fieldListMark, ElementType.RECORD_FIELD_LIST)
