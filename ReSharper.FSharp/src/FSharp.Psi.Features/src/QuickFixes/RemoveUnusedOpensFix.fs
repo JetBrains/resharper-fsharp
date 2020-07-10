@@ -27,5 +27,5 @@ type RemoveUnusedOpensFix(warning: UnusedOpenWarning) =
             for highlightingInfo in highlightingInfos do
                 match highlightingInfo.Highlighting.As<UnusedOpenWarning>() with
                 | null -> ()
-                | warning -> OpensUtil.removeUnusedOpen warning.OpenStatement
+                | warning -> OpensUtil.removeOpen warning.OpenStatement
             null

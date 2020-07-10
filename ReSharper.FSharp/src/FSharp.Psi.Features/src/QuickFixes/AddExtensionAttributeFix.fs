@@ -16,19 +16,18 @@ type AddExtensionAttributeFix(warning: ExtensionMemberInNonExtensionTypeWarning)
     let [<Literal>] extensionNamespaceName = "System.Runtime.CompilerServices"
     let [<Literal>] attributeName = "Extension"
     let declaration =
-        let attributeHolder: ITreeNode =
+        let attributeOwner: IFSharpTypeMemberDeclaration =
             match LetModuleDeclNavigator.GetByAttribute(warning.Attr) with
-            | null ->  MemberDeclarationNavigator.GetByAttribute(warning.Attr) :> _
+            | null -> MemberDeclarationNavigator.GetByAttribute(warning.Attr) :> _
             | letModuleDec -> letModuleDec :> _
-        attributeHolder.GetContainingTypeDeclaration().As<IFSharpTypeElementDeclaration>()
+        if isNotNull attributeOwner then attributeOwner.GetContainingTypeDeclaration() else null
 
     override x.Text = sprintf "Add 'Extension' attribute to '%s'" declaration.SourceName
 
     override x.IsAvailable _ =
         match declaration with
         | :? ITopLevelModuleLikeDeclaration -> false
-        | null -> false
-        | _ -> isValid warning.Attr
+        | _ -> isValid declaration
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(warning.Attr.IsPhysical())

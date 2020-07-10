@@ -66,7 +66,7 @@ let tryGetOpen (moduleDecl: IModuleLikeDeclaration) namespaceName =
     |> Seq.cast<IOpenStatement>
     |> Seq.tryFind (fun x -> x.ReferenceName.QualifiedName = namespaceName)
 
-let removeUnusedOpen (openStatement: IOpenStatement) =
+let removeOpen (openStatement: IOpenStatement) =
     let first = getFirstMatchingNodeBefore isInlineSpaceOrComment openStatement
     let last =
         openStatement
