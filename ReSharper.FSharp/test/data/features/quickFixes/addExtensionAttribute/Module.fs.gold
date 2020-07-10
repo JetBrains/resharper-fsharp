@@ -1,0 +1,9 @@
+namespace Test
+
+open System.Runtime.CompilerServices
+
+[<Extension>]
+module Module =
+
+    [<{caret}Extension>]
+    let a() = 5

@@ -60,6 +60,21 @@ let tryGetFirstOpensGroup (moduleDecl: IModuleLikeDeclaration) =
 
     if opens.IsEmpty then None else Some opens
 
+let tryGetOpen (moduleDecl: IModuleLikeDeclaration) namespaceName =
+    moduleDecl.MembersEnumerable
+    |> Seq.filter (fun m -> m :? IOpenStatement)
+    |> Seq.cast<IOpenStatement>
+    |> Seq.tryFind (fun x -> x.ReferenceName.QualifiedName = namespaceName)
+
+let removeOpen (openStatement: IOpenStatement) =
+    let first = getFirstMatchingNodeBefore isInlineSpaceOrComment openStatement
+    let last =
+        openStatement
+        |> skipSemicolonsAndWhiteSpacesAfter
+        |> getThisOrNextNewLine
+
+    deleteChildRange first last
+
 let isSystemNs ns =
     ns = "System" || startsWith "System." ns
 
