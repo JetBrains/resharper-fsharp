@@ -17,7 +17,7 @@ IFSharpImplFile
         IRecordRepresentation
           FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IRecordFieldList
+          IRecordFieldDeclarationList
             IRecordFieldDeclaration
               FSharpIdentifierToken(type:IDENTIFIER, text:A)
               FSharpTokenType+ColonTokenElement(type:COLON, text::)

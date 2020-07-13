@@ -22,7 +22,7 @@ open JetBrains.ReSharper.Resources.Shell
 type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
     inherit FSharpQuickFixBase()
 
-    let addSemicolon (binding: IRecordExprBinding) =
+    let addSemicolon (binding: IRecordFieldBinding) =
         if isNull binding.Semicolon then
             match binding.Expression with
             | null -> failwith "Could not get expr"
@@ -52,7 +52,7 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
         Assertion.Assert(typeElement.IsRecord(), "Expecting record type")
 
         let fieldNames = typeElement.GetRecordFieldNames()
-        let existingBindings = recordExpr.ExprBindings
+        let existingBindings = recordExpr.FieldBindings
 
         let fieldsToAdd = HashSet(fieldNames)
         for binding in existingBindings do
@@ -75,22 +75,22 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
         if generateSingleLine && not existingBindings.IsEmpty then
             addSemicolon (existingBindings.Last())
 
-        let generatedBindings = List<IRecordExprBinding>()
+        let generatedBindings = List<IRecordFieldBinding>()
 
         let anchorBindingList =
             match existingBindings.LastOrDefault() with
             | null ->
                 let firstField = fieldsToAdd.First()
                 fieldsToAdd.Remove(firstField) |> ignore
-                let binding = elementFactory.CreateRecordExprBinding(firstField, generateSingleLine)
-                let bindingList = RecordExprBindingListNavigator.GetByExprBinding(binding)
+                let binding = elementFactory.CreateRecordFieldBinding(firstField, generateSingleLine)
+                let bindingList = RecordFieldBindingListNavigator.GetByFieldBinding(binding)
                 let actualList = ModificationUtil.AddChildAfter(recordExpr.LeftBrace, bindingList)
-                generatedBindings.Add(actualList.ExprBindings.First())
+                generatedBindings.Add(actualList.FieldBindings.First())
                 actualList
-            | binding -> RecordExprBindingListNavigator.GetByExprBinding(binding)
+            | binding -> RecordFieldBindingListNavigator.GetByFieldBinding(binding)
 
         for name in fieldsToAdd do
-            let binding = elementFactory.CreateRecordExprBinding(name, generateSingleLine)
+            let binding = elementFactory.CreateRecordFieldBinding(name, generateSingleLine)
             generatedBindings.Add(ModificationUtil.AddChild(anchorBindingList, binding))
 
         if generateSingleLine then
@@ -98,10 +98,10 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
             ModificationUtil.DeleteChild(lastBinding.Semicolon)
 
             for binding in existingBindings do
-                if binding.NextSibling :? IRecordExprBinding then
+                if binding.NextSibling :? IRecordFieldBinding then
                     ModificationUtil.AddChildAfter(binding, Whitespace()) |> ignore
 
-        if recordExpr.LeftBrace.NextSibling :? IRecordExprBindingList then
+        if recordExpr.LeftBrace.NextSibling :? IRecordFieldBindingList then
             ModificationUtil.AddChildAfter(recordExpr.LeftBrace, Whitespace()) |> ignore
 
         Action<_>(fun textControl ->

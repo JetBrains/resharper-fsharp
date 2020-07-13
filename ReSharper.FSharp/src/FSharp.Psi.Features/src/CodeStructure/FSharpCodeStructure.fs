@@ -48,7 +48,7 @@ type FSharpCodeStructureProvider() =
             FSharpDeclarationCodeStructureElement(parent, caseDecl) |> ignore
 
         | :? IRecordDeclaration as recordDecl ->
-            let fields = Seq.cast recordDecl.Fields 
+            let fields = Seq.cast recordDecl.FieldDeclarations 
             processTypeDeclaration recordDecl fields parent
 
         | :? ITypeExtensionDeclaration as extensionDecl when not extensionDecl.IsTypePartDeclaration ->

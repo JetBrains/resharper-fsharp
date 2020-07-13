@@ -6,8 +6,8 @@ IFSharpImplFile
         IRecordExpr
           FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IRecordExprBindingList
-            IRecordExprBinding
+          IRecordFieldBindingList
+            IRecordFieldBinding
               IExpressionReferenceName
                 IExpressionReferenceName
                   IExpressionReferenceName

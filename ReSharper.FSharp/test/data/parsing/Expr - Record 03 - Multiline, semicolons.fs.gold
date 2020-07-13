@@ -6,8 +6,8 @@ IFSharpImplFile
         IRecordExpr
           FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IRecordExprBindingList
-            IRecordExprBinding
+          IRecordFieldBindingList
+            IRecordFieldBinding
               IExpressionReferenceName
                 FSharpIdentifierToken(type:IDENTIFIER, text:A)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
@@ -18,7 +18,7 @@ IFSharpImplFile
               FSharpTokenType+SemicolonTokenElement(type:SEMICOLON, text:;)
             NewLine(type:NEW_LINE, text:\n) spaces:"\n"
             Whitespace(type:WHITE_SPACE, text:  ) spaces:"  "
-            IRecordExprBinding
+            IRecordFieldBinding
               IExpressionReferenceName
                 FSharpIdentifierToken(type:IDENTIFIER, text:B)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "

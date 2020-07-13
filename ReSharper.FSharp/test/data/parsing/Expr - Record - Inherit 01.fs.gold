@@ -17,8 +17,8 @@ IFSharpImplFile
             FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           NewLine(type:NEW_LINE, text:\n) spaces:"\n"
           Whitespace(type:WHITE_SPACE, text:  ) spaces:"  "
-          IRecordExprBindingList
-            IRecordExprBinding
+          IRecordFieldBindingList
+            IRecordFieldBinding
               IExpressionReferenceName
                 FSharpIdentifierToken(type:IDENTIFIER, text:Path)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "

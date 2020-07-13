@@ -78,8 +78,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         ("EnumCases", ElementType.ENUM_REPRESENTATION),
         ("SequentialExpr", ElementType.SEQUENTIAL_EXPR),
         ("BinaryExpr", ElementType.BINARY_APP_EXPR),
-        ("RecordDeclaration", ElementType.RECORD_FIELD_LIST),
-        ("RecordExprBindings", ElementType.RECORD_EXPR_BINDING_LIST),
+        ("RecordDeclaration", ElementType.RECORD_FIELD_DECLARATION_LIST),
+        ("RecordExprBindings", ElementType.RECORD_FIELD_BINDING_LIST),
       };
 
       lock (this)
@@ -197,9 +197,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
           .Name("SpaceBetweenRecordBindings")
           .Where(
             Left()
-              .HasType(ElementType.RECORD_EXPR_BINDING)
-              .Satisfies((node, context) => ((IRecordExprBinding) node).Semicolon != null),
-            Right().HasType(ElementType.RECORD_EXPR_BINDING))
+              .HasType(ElementType.RECORD_FIELD_BINDING)
+              .Satisfies((node, context) => ((IRecordFieldBinding) node).Semicolon != null),
+            Right().HasType(ElementType.RECORD_FIELD_BINDING))
           .Return(IntervalFormatType.Space)
           .Build();
 
@@ -208,9 +208,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
           .Name("LineBreaksBetweenRecordBindings")
           .Where(
             Left()
-              .HasType(ElementType.RECORD_EXPR_BINDING)
-              .Satisfies((node, context) => ((IRecordExprBinding) node).Semicolon == null),
-            Right().HasType(ElementType.RECORD_EXPR_BINDING))
+              .HasType(ElementType.RECORD_FIELD_BINDING)
+              .Satisfies((node, context) => ((IRecordFieldBinding) node).Semicolon == null),
+            Right().HasType(ElementType.RECORD_FIELD_BINDING))
           .Return(IntervalFormatType.NewLine)
           .Build();
 
@@ -218,7 +218,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
           .Name("SpacesAroundRecordExprBraces")
           .Where(
             Left().In(FSharpTokenType.LBRACE, FSharpTokenType.RBRACE),
-            Right().HasType(ElementType.RECORD_EXPR_BINDING_LIST))
+            Right().HasType(ElementType.RECORD_FIELD_BINDING_LIST))
           .Return(IntervalFormatType.OnlySpace)
           .Build()
           .AndViceVersa()

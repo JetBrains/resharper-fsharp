@@ -22,7 +22,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     ILetModuleDecl CreateLetModuleDecl(string bindingName);
 
     IBinaryAppExpr CreateIgnoreApp(IFSharpExpression expr, bool newLine);
-    IRecordExprBinding CreateRecordExprBinding(string fieldName, bool addSemicolon);
+    IRecordFieldBinding CreateRecordFieldBinding(string fieldName, bool addSemicolon);
 
     IMatchExpr CreateMatchExpr(IFSharpExpression expr);
     IMatchClause CreateMatchClause();

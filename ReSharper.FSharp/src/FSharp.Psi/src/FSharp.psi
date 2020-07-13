@@ -523,7 +523,7 @@ interface recordLikeExpr:
   recordExpr;
 
 anonRecordExpr options { stubBase="FSharpExpressionBase"; } extras {
-  get { methodName="ExprBindings" path=<anonRecordExpr:BINDING_LIST/recordExprBindingList:BINDING> };
+  get { methodName="FieldBindings" path=<anonRecordExpr:BINDING_LIST/recordFieldBindingList:BINDING> };
 }:
   STRUCT<STRUCT, STRUCT_KEYWORD>?
   LBRACE_BAR
@@ -531,7 +531,7 @@ anonRecordExpr options { stubBase="FSharpExpressionBase"; } extras {
     fSharpExpression<COPY_INFO, CopyInfoExpression>
     WITH
   )?
-  recordExprBindingList<BINDING_LIST, ExprBindingList>
+  recordFieldBindingList<BINDING_LIST, FieldBindingList>
   BAR_RBRACE;
 
 arrayOrListExpr options { stubBase="FSharpExpressionBase"; }:
@@ -540,20 +540,20 @@ arrayOrListExpr options { stubBase="FSharpExpressionBase"; }:
   (RBRACK | BAR_RBRACK);
 
 recordExpr options { stubBase="FSharpExpressionBase"; } extras {
-  get { methodName="ExprBindings" path=<recordExpr:BINDING_LIST/recordExprBindingList:BINDING> };
+  get { methodName="FieldBindings" path=<recordExpr:BINDING_LIST/recordFieldBindingList:BINDING> };
 }:
   LBRACE<LBRACE, LeftBrace>
   (
     fSharpExpression<COPY_INFO, CopyInfoExpression>
     WITH
   )?
-  recordExprBindingList<BINDING_LIST, ExprBindingList>
+  recordFieldBindingList<BINDING_LIST, FieldBindingList>
   RBRACE<RBRACE, RightBrace>;
 
-recordExprBindingList:
-  recordExprBinding<BINDING, ExprBindings>*;
+recordFieldBindingList:
+  recordFieldBinding<BINDING, FieldBindings>*;
 
-recordExprBinding:
+recordFieldBinding:
   expressionReferenceName<REFERENCE_NAME, ReferenceName>
   EQUALS<FSHARP_EQUALS, EqualsToken>
   fSharpExpression<EXPR, Expression>
@@ -894,7 +894,7 @@ enumMemberDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"
 recordDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extras {
   get { methodName="TypeParameters" path=<recordDeclaration:TYPE_PARAMETERS_LIST/typeParameterOfTypeList:TYPE_PARAMETER> };
   get { methodName="Attributes" path=<recordDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
-  get { methodName="Fields" path=<recordDeclaration:RECORD_REPR/recordRepresentation:RECORD_FIELD_LIST/recordFieldList:RECORD_FIELD> };
+  get { methodName="FieldDeclarations" path=<recordDeclaration:RECORD_REPR/recordRepresentation:FIELD_DECLARATION_LIST/recordFieldDeclarationList:FIELD_DECLARATION> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
@@ -906,11 +906,11 @@ recordDeclaration options { stubBase="FSharpTypeElementDeclarationBase"; } extra
 recordRepresentation:
   LBRACE
   accessModifier{ACCESS_MODIFIER, AccessModifier}?
-  recordFieldList<RECORD_FIELD_LIST, RecordFieldList>
+  recordFieldDeclarationList<FIELD_DECLARATION_LIST, FieldDeclarationList>
   RBRACE;
 
-recordFieldList:
-  recordFieldDeclaration<RECORD_FIELD, Fields>*;
+recordFieldDeclarationList:
+  recordFieldDeclaration<FIELD_DECLARATION, FieldDeclarations>*;
 
 recordFieldDeclaration options { stubBase="FSharpProperTypeMemberDeclarationBase"; } extras {
   get { methodName="Attributes" path=<recordFieldDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };

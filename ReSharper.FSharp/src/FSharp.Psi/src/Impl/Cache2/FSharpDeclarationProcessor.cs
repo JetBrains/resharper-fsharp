@@ -187,7 +187,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
       Builder.StartPart(recordPart);
       ProcessTypeMembers(decl.MemberDeclarations);
-      ProcessTypeMembers(decl.Fields);
+      ProcessTypeMembers(decl.FieldDeclarations);
       Builder.EndPart();
     }
 

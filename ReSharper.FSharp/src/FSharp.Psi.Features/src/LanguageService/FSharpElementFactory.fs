@@ -96,7 +96,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
             binaryAppExpr
 
-        member x.CreateRecordExprBinding(field, addSemicolon) =
+        member x.CreateRecordFieldBinding(field, addSemicolon) =
             let field = namingService.MangleNameIfNecessary(field)
             let semicolon = if addSemicolon then ";" else ""
 
@@ -105,7 +105,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
             match newExpr.As<IRecordExpr>() with
             | null -> failwith "Could not get record expr"
-            | recordExpr -> recordExpr.ExprBindings.First()
+            | recordExpr -> recordExpr.FieldBindings.First()
 
         member x.CreateAppExpr(funcName, argExpr) =
             let source = sprintf "%s ()" funcName

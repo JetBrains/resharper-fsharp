@@ -13,7 +13,7 @@ IFSharpImplFile
         IRecordRepresentation
           FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IRecordFieldList
+          IRecordFieldDeclarationList
             IRecordFieldDeclaration
               IAttributeList
                 FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)

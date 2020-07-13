@@ -40,13 +40,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override bool HasMultipleNames => true;
 
     public override HybridCollection<string> GetAllNames() =>
-      new HybridCollection<string>(RecordExpr.ExprBindings.Select(b => b.ReferenceName?.ShortName).WhereNotNull());
+      new HybridCollection<string>(RecordExpr.FieldBindings.Select(b => b.ReferenceName?.ShortName).WhereNotNull());
 
     public override TreeOffset SymbolOffset
     {
       get
       {
-        foreach (var binding in RecordExpr.ExprBindings)
+        foreach (var binding in RecordExpr.FieldBindings)
           if (binding.ReferenceName?.Identifier is ITokenNode token)
             return token.GetTreeStartOffset();
 

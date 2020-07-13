@@ -111,8 +111,8 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                 not (binding.HeadPattern :? IParametersOwnerPat) ->
             LetOrUseExprNavigator.GetByBinding(binding) :> _
 
-        | :? IRecordExprBinding as fieldBinding ->
-            let recordExpr = RecordLikeExprNavigator.GetByExprBinding(fieldBinding)
+        | :? IRecordFieldBinding as fieldBinding ->
+            let recordExpr = RecordLikeExprNavigator.GetByFieldBinding(fieldBinding)
             getExprToInsertBefore recordExpr
 
         | :? ILetOrUseExpr as letExpr ->

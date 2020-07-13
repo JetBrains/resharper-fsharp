@@ -17,7 +17,7 @@ type ToMultilineRecord(dataProvider: FSharpContextActionDataProvider) =
     override x.IsAvailable _ =
         let recordExpr = dataProvider.GetSelectedElement<IRecordExpr>()
         if isNull recordExpr then false else
-        if isNotNull recordExpr.CopyInfoExpression || recordExpr.ExprBindings.Count < 2 then false else
+        if isNotNull recordExpr.CopyInfoExpression || recordExpr.FieldBindings.Count < 2 then false else
         if not recordExpr.IsSingleLine then false else
 
         let lBrace = recordExpr.LeftBrace
@@ -37,7 +37,7 @@ type ToMultilineRecord(dataProvider: FSharpContextActionDataProvider) =
         use writeCookie = WriteLockCookie.Create(recordExpr.IsPhysical())
         use enableFormatterCookie = FSharpRegistryUtil.AllowFormatterCookie.Create()
 
-        let bindings = recordExpr.ExprBindings
+        let bindings = recordExpr.FieldBindings
         let firstBinding = bindings.[0]
 
         for binding in bindings do

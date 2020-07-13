@@ -675,7 +675,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
         | SynExpr.AnonRecd(_, copyInfo, fields, _) ->
             x.PushRange(range, ElementType.ANON_RECORD_EXPR)
             if not fields.IsEmpty then
-                x.PushStep(fields, anonRecordBindingListProcessor)
+                x.PushStep(fields, anonRecordBindingListRepresentationProcessor)
 
             match copyInfo with
             | Some(expr, _) -> x.ProcessExpression(expr)
@@ -684,7 +684,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
         | SynExpr.Record(baseInfo, copyInfo, fields, _) ->
             x.PushRange(range, ElementType.RECORD_EXPR)
             if not fields.IsEmpty then
-                x.PushStep(fields, recordBindingListProcessor)
+                x.PushStep(fields, recordBindingListRepresentationProcessor)
 
             match baseInfo, copyInfo with
             | Some(typeName, expr, _, _, _), _ ->
@@ -1169,37 +1169,37 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
         let wrappedArgExpr = { Expression = expr; ElementType = ElementType.INDEXER_ARG_EXPR }
         x.PushStep(wrappedArgExpr, wrapExpressionProcessor)
 
-    member x.ProcessRecordBindingList(fields: (RecordFieldName * (SynExpr option) * BlockSeparator option) list) =
+    member x.ProcessRecordFieldBindingList(fields: (RecordFieldName * (SynExpr option) * BlockSeparator option) list) =
         let fieldsRange =
             match fields.Head, List.last fields with
             | ((lid, _), _, _), (_, Some(fieldValue), _) -> unionRanges lid.Range fieldValue.Range
             | ((lid, _), _, _), _ -> lid.Range
         
-        x.PushRange(fieldsRange, ElementType.RECORD_EXPR_BINDING_LIST)
-        x.PushStepList(fields, recordFieldListProcessor)
+        x.PushRange(fieldsRange, ElementType.RECORD_FIELD_BINDING_LIST)
+        x.PushStepList(fields, recordFieldBindingListProcessor)
 
-    member x.ProcessAnonRecordBindingList(fields: (Ident * SynExpr) list) =
+    member x.ProcessAnonRecordFieldBindingList(fields: (Ident * SynExpr) list) =
         let fieldsRange =
             match fields.Head, List.last fields with
             | (id, _), (_, value) -> unionRanges id.idRange value.Range
         
-        x.PushRange(fieldsRange, ElementType.RECORD_EXPR_BINDING_LIST)
-        x.PushStepList(fields, anonRecordFieldListProcessor)
+        x.PushRange(fieldsRange, ElementType.RECORD_FIELD_BINDING_LIST)
+        x.PushStepList(fields, anonRecordFieldBindingListProcessor)
 
-    member x.ProcessAnonRecordField(IdentRange idRange, (ExprRange range as expr)) =
+    member x.ProcessAnonRecordFieldBinding(IdentRange idRange, (ExprRange range as expr)) =
         // Start node at id range, end at expr range.
         let mark = x.Mark(idRange)
-        x.PushRangeForMark(range, mark, ElementType.RECORD_EXPR_BINDING)
+        x.PushRangeForMark(range, mark, ElementType.RECORD_FIELD_BINDING)
         x.MarkAndDone(idRange, ElementType.EXPRESSION_REFERENCE_NAME)
         x.ProcessExpression(expr)
 
-    member x.ProcessRecordField(field: (RecordFieldName * (SynExpr option) * BlockSeparator option)) =
+    member x.ProcessRecordFieldBinding(field: (RecordFieldName * (SynExpr option) * BlockSeparator option)) =
         let (lid, _), expr, blockSep = field
         let lid = lid.Lid
         match lid, expr with
         | IdentRange headRange :: _, Some(ExprRange exprRange as expr) ->
             let mark = x.Mark(headRange)
-            x.PushRangeForMark(exprRange, mark, ElementType.RECORD_EXPR_BINDING)
+            x.PushRangeForMark(exprRange, mark, ElementType.RECORD_FIELD_BINDING)
             x.PushRecordBlockSep(blockSep)
             x.ProcessReferenceName(lid)
             x.ProcessExpression(expr)
@@ -1335,18 +1335,18 @@ type TypeArgsInReferenceExprProcessor() =
         builder.ProcessTypeArgsInReferenceExpr(synExpr)
 
 
-type RecordBindingListProcessor() =
+type RecordBindingListRepresentationProcessor() =
     inherit StepProcessorBase<(RecordFieldName * (SynExpr option) * BlockSeparator option) list>()
     
     override x.Process(fields, builder) =
-        builder.ProcessRecordBindingList(fields)
+        builder.ProcessRecordFieldBindingList(fields)
 
 
-type AnonRecordBindingListProcessor() =
+type AnonRecordBindingListRepresentationProcessor() =
     inherit StepProcessorBase<(Ident * SynExpr) list>()
     
     override x.Process(fields, builder) =
-        builder.ProcessAnonRecordBindingList(fields)
+        builder.ProcessAnonRecordFieldBindingList(fields)
 
 
 type ExpressionListProcessor() =
@@ -1370,18 +1370,18 @@ type AndLocalBindingListProcessor() =
         builder.ProcessAndLocalBinding(binding)
 
 
-type RecordFieldListProcessor() =
+type RecordFieldBindingListProcessor() =
     inherit StepListProcessorBase<RecordFieldName * (SynExpr option) * BlockSeparator option>()
 
     override x.Process(field, builder) =
-        builder.ProcessRecordField(field)
+        builder.ProcessRecordFieldBinding(field)
 
 
-type AnonRecordFieldListProcessor() =
+type AnonRecordFieldBindingListProcessor() =
     inherit StepListProcessorBase<Ident * SynExpr>()
 
     override x.Process(field, builder) =
-        builder.ProcessAnonRecordField(field)
+        builder.ProcessAnonRecordFieldBinding(field)
 
 
 type MatchClauseListProcessor() =
@@ -1440,14 +1440,14 @@ module BuilderStepProcessors =
     let synTypeProcessor = SynTypeProcessor()
     let typeArgsInReferenceExprProcessor = TypeArgsInReferenceExprProcessor()
     let indexerArgsProcessor = IndexerArgsProcessor()
-    let recordBindingListProcessor = RecordBindingListProcessor() 
-    let anonRecordBindingListProcessor = AnonRecordBindingListProcessor() 
+    let recordBindingListRepresentationProcessor = RecordBindingListRepresentationProcessor() 
+    let anonRecordBindingListRepresentationProcessor = AnonRecordBindingListRepresentationProcessor() 
 
     let expressionListProcessor = ExpressionListProcessor()
     let bindingListProcessor = BindingListProcessor()
     let andLocalBindingListProcessor = AndLocalBindingListProcessor()
-    let recordFieldListProcessor = RecordFieldListProcessor()
-    let anonRecordFieldListProcessor = AnonRecordFieldListProcessor()
+    let recordFieldBindingListProcessor = RecordFieldBindingListProcessor()
+    let anonRecordFieldBindingListProcessor = AnonRecordFieldBindingListProcessor()
     let matchClauseListProcessor = MatchClauseListProcessor()
     let objectExpressionMemberListProcessor = ObjectExpressionMemberListProcessor()
     let interfaceImplementationListProcessor = InterfaceImplementationListProcessor()
