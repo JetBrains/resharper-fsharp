@@ -11,7 +11,7 @@ open JetBrains.Rider.Model
 module FSharpRegistryUtil =
     [<AbstractClass>]
     type EnabledCookieBase<'T when 'T :> EnabledCookieBase<'T> and 'T : (new : unit -> 'T)>() =
-        static let enabled = [false] |> Stack
+        static let enabled = Stack [false]
 
         static member Create() =
             enabled.Push(true)
