@@ -217,8 +217,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         Describe<FormattingRule>()
           .Name("SpacesAroundRecordExprBraces")
           .Where(
+            Parent().HasType(ElementType.RECORD_EXPR),
             Left().In(FSharpTokenType.LBRACE, FSharpTokenType.RBRACE),
-            Right().HasType(ElementType.RECORD_FIELD_BINDING_LIST))
+            Right()
+              .In(ElementType.RECORD_FIELD_BINDING_LIST, FSharpTokenType.BLOCK_COMMENT)
+              .Or()
+              .HasRole(RecordExpr.COPY_INFO))
           .Return(IntervalFormatType.OnlySpace)
           .Build()
           .AndViceVersa()
