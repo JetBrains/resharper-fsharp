@@ -6,6 +6,7 @@ using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Psi;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
@@ -66,6 +67,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         ("UnionDeclarationCases", ElementType.UNION_DECLARATION, UnionDeclaration.UNION_REPR),
         ("TypeAbbreviation", ElementType.TYPE_ABBREVIATION_DECLARATION, TypeAbbreviationDeclaration.TYPE_OR_UNION_CASE),
         ("ModuleAbbreviation", ElementType.MODULE_ABBREVIATION, ModuleAbbreviation.TYPE_REFERENCE),
+        ("RecordDeclaration", ElementType.RECORD_DECLARATION, RecordDeclaration.RECORD_REPR),
       };
 
       var alignmentRulesParameters = new[]
@@ -76,6 +78,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         ("EnumCases", ElementType.ENUM_REPRESENTATION),
         ("SequentialExpr", ElementType.SEQUENTIAL_EXPR),
         ("BinaryExpr", ElementType.BINARY_APP_EXPR),
+        ("RecordDeclaration", ElementType.RECORD_FIELD_DECLARATION_LIST),
+        ("RecordExprBindings", ElementType.RECORD_FIELD_BINDING_LIST),
       };
 
       lock (this)
@@ -187,6 +191,41 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
           .Switch(settings => settings.OutdentBinaryOperators,
             When(true).Switch(settings => settings.NeverOutdentPipeOperators,
               When(false).Return(IndentType.Outdent | IndentType.External)))
+          .Build();
+
+        Describe<FormattingRule>()
+          .Name("SpaceBetweenRecordBindings")
+          .Where(
+            Left()
+              .HasType(ElementType.RECORD_FIELD_BINDING)
+              .Satisfies((node, context) => ((IRecordFieldBinding) node).Semicolon != null),
+            Right().HasType(ElementType.RECORD_FIELD_BINDING))
+          .Return(IntervalFormatType.Space)
+          .Build();
+
+        Describe<FormattingRule>()
+          .Group(LineBreaksRuleGroup)
+          .Name("LineBreaksBetweenRecordBindings")
+          .Where(
+            Left()
+              .HasType(ElementType.RECORD_FIELD_BINDING)
+              .Satisfies((node, context) => ((IRecordFieldBinding) node).Semicolon == null),
+            Right().HasType(ElementType.RECORD_FIELD_BINDING))
+          .Return(IntervalFormatType.NewLine)
+          .Build();
+
+        Describe<FormattingRule>()
+          .Name("SpacesAroundRecordExprBraces")
+          .Where(
+            Parent().HasType(ElementType.RECORD_EXPR),
+            Left().In(FSharpTokenType.LBRACE, FSharpTokenType.RBRACE),
+            Right()
+              .In(ElementType.RECORD_FIELD_BINDING_LIST, FSharpTokenType.BLOCK_COMMENT)
+              .Or()
+              .HasRole(RecordExpr.COPY_INFO))
+          .Return(IntervalFormatType.OnlySpace)
+          .Build()
+          .AndViceVersa()
           .Build();
       }
     }

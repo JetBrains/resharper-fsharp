@@ -2,6 +2,6 @@
 
 type R = { A: int; B: int; C: int }
 
-let r = {A = 1
-         B = {selstart}failwith "todo"{selend}
-         C = failwith "todo" }
+let r = { A = 1
+          B = {selstart}failwith "todo"{selend}
+          C = failwith "todo" }

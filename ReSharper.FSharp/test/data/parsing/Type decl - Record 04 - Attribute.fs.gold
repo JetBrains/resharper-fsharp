@@ -1,11 +1,6 @@
 ﻿Language: PsiLanguageType:F#
-IFSharpSigFile
-  INamedModuleDeclaration
-    FSharpTokenType+ModuleTokenElement(type:MODULE, text:module)
-    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-    FSharpIdentifierToken(type:IDENTIFIER, text:Module)
-    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+IFSharpImplFile
+  IAnonModuleDeclaration
     ITypeDeclarationGroup
       FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "
@@ -20,6 +15,20 @@ IFSharpSigFile
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           IRecordFieldDeclarationList
             IRecordFieldDeclaration
+              IAttributeList
+                FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
+                IAttribute
+                  ITypeReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:CompiledName)
+                  IChameleonExpression
+                    IParenExpr
+                      FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                      IReferenceExpr
+                        FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
+                      FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+                FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
+              NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+              Whitespace(type:WHITE_SPACE, text:      ) spaces:"      "
               FSharpIdentifierToken(type:IDENTIFIER, text:Field)
               FSharpTokenType+ColonTokenElement(type:COLON, text::)
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
@@ -28,5 +37,5 @@ IFSharpSigFile
                   FSharpIdentifierToken(type:IDENTIFIER, text:int)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+RbraceTokenElement(type:RBRACE, text:})
-      NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 
