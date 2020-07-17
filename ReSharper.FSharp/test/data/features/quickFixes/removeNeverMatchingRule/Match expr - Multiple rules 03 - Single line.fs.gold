@@ -1,5 +1,5 @@
 ﻿module Module
 
 do
-    match () with | _ -> () {caret}| _ -> ()
+    match () with | a -> () {caret}| c -> ()
     ()

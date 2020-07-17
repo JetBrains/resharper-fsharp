@@ -2,7 +2,7 @@ module Module
 
 do
     match () with
-    | _ -> ()
-    |{caret} deleted -> () // comment
-    | _ -> ()
+    | a -> ()
+    |{caret} b -> () // comment
+    | c -> ()
     ()

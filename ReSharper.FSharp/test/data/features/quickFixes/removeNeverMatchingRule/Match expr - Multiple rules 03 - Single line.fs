@@ -1,5 +1,5 @@
 module Module
 
 do
-    match () with | _ -> () |{caret} deleted -> () | _ -> ()
+    match () with | a -> () |{caret} b -> () | c -> ()
     ()
