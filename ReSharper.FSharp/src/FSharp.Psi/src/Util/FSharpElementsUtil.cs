@@ -16,7 +16,9 @@ using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2;
+using JetBrains.ReSharper.Psi.Impl.Resolve;
 using JetBrains.ReSharper.Psi.Modules;
+using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Psi.Util;
 using JetBrains.Util;
@@ -209,6 +211,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       [NotNull] IFSharpTypeElement fsTypeElement)
     {
       var name = mfv.IsConstructor ? fsTypeElement.ShortName : mfv.GetMfvCompiledName();
+
+      var symbolTableCache = fsTypeElement.GetPsiServices().Caches.GetPsiCache<SymbolTableCache>();
+      var symbolTable = symbolTableCache.TryGetCachedSymbolTable(fsTypeElement, SymbolTableMode.FULL);
+      if (symbolTable != null)
+      {
+        var members = symbolTable.GetSymbolInfos(name).Select(info =>
+          info.GetDeclaredElement() is ITypeMember member && member.ShortName == name ? member : null);
+        return ChooseTypeMember(mfv, members.AsList());
+      }
+
       var declarations = new List<FSharpProperTypeMemberDeclarationBase>();
 
       var typeElement = (TypeElement) fsTypeElement;
@@ -245,6 +257,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         ? typeElement.Constructors.AsList<ITypeMember>()
         : typeElement.EnumerateMembers(compiledName, true).AsList();
 
+      return ChooseTypeMember(mfv, members);
+    }
+
+    [CanBeNull]
+    private static IDeclaredElement ChooseTypeMember(FSharpMemberOrFunctionOrValue mfv,
+      List<ITypeMember> members)
+    {
       switch (members.Count)
       {
         case 0:
