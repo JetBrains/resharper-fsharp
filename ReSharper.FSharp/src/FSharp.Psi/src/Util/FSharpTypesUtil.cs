@@ -222,23 +222,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       return ParameterKind.VALUE;
     }
 
+    [CanBeNull]
+    public static FSharpType TryGetFSharpType([NotNull] this IFSharpTreeNode fsTreeNode)
+    {
+      var checkResults = fsTreeNode.FSharpFile.GetParseAndCheckResults(true, "TryGetFcsType")?.Value?.CheckResults;
+      if (checkResults == null) return null;
+
+      var sourceFile = fsTreeNode.GetSourceFile();
+      if (sourceFile == null) return null;
+
+      var range = fsTreeNode.GetDocumentRange().ToDocumentRange(sourceFile.GetLocation());
+      return checkResults.GetTypeOfExpression(range)?.Value;
+    }
+
     [NotNull]
     public static IType TryGetFcsType([NotNull] this IFSharpTreeNode fsTreeNode)
     {
-      var checkResults = fsTreeNode.FSharpFile.GetParseAndCheckResults(true, "TryGetFcsType")?.Value?.CheckResults;
-      if (checkResults == null)
-        return TypeFactory.CreateUnknownType(fsTreeNode.GetPsiModule());
-
-      var sourceFile = fsTreeNode.GetSourceFile();
-      if (sourceFile == null)
-        return TypeFactory.CreateUnknownType(fsTreeNode.GetPsiModule());
-
-      var range = fsTreeNode.GetDocumentRange().ToDocumentRange(sourceFile.GetLocation());
-      var fcsType = checkResults.GetTypeOfExpression(range)?.Value;
-      return fcsType != null
-        ? fcsType.MapType(fsTreeNode)
+      var fsharpType = TryGetFSharpType(fsTreeNode);
+      return fsharpType != null
+        ? fsharpType.MapType(fsTreeNode)
         : TypeFactory.CreateUnknownType(fsTreeNode.GetPsiModule());
     }
-
   }
 }
