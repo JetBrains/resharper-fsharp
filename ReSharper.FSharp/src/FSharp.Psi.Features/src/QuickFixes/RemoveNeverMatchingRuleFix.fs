@@ -31,7 +31,7 @@ type RemoveNeverMatchingRuleFix(warning: RuleNeverMatchedWarning) =
         removeMatchClause clause
 
     interface IHighlightingsSetScopedAction with
-        member x.ScopedText = x.Text
+        member x.ScopedText = "Remove never matching rules"
         member x.FileCollectorInfo = FileCollectorInfo.Default
 
         member x.ExecuteAction(highlightingInfos, _, _) =
