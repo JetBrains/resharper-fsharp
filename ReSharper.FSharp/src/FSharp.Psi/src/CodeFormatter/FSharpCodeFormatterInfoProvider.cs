@@ -149,6 +149,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
           .Build();
 
         Describe<IndentingRule>()
+          .Name("MatchClauseWhenExprIndent")
+          .Where(
+            Parent().HasType(ElementType.MATCH_CLAUSE),
+            Node().HasRole(MatchClause.WHEN_EXPR))
+          .Return(IndentType.External, 2)
+          .Build();
+
+        Describe<IndentingRule>()
           .Name("DoDeclIndent")
           .Where(
             Parent()
