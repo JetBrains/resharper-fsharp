@@ -59,7 +59,8 @@ type ToLiteralAction(dataProvider: FSharpContextActionDataProvider) =
         if not (isSimplePattern binding.HeadPattern) then false else
         if isLiteralBinding binding then false else
 
-        binding.Expression.IsConstantValue()
+        let expr = binding.Expression
+        isNotNull expr && expr.IsConstantValue()
 
     override x.ExecutePsiTransaction(_, _) =
         let binding = dataProvider.GetSelectedElement<IBinding>()
