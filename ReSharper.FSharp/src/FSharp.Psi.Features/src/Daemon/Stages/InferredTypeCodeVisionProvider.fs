@@ -13,6 +13,7 @@ open JetBrains.ReSharper.Host.Features.Services
 open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
@@ -124,7 +125,7 @@ and InferredTypeCodeVisionProviderProcess(fsFile, settings, daemonProcess, provi
         committer.Invoke(DaemonStageResult(consumer.Highlightings))
 
     override x.VisitTopBinding(binding, consumer) =
-        let headPattern = binding.HeadPattern
+        let headPattern = binding.HeadPattern.IgnoreInnerParens()
         if not headPattern.IsDeclaration then () else
 
         match headPattern with
