@@ -204,7 +204,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
       return typeElement is IFSharpTypeElement fsTypeElement
         ? GetFSharpSourceTypeMember(mfv, fsTypeElement)
-        : GetNonFSharpTypeMember(mfv, typeElement);
+        : GetTypeMember(mfv, typeElement);
     }
 
     private static IDeclaredElement GetFSharpSourceTypeMember([NotNull] FSharpMemberOrFunctionOrValue mfv,
@@ -221,13 +221,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         return ChooseTypeMember(mfv, members.AsList());
       }
 
-      var declarations = new List<FSharpProperTypeMemberDeclarationBase>();
+      var fcsRange = mfv.DeclarationLocation;
+      var path = FileSystemPath.TryParse(fcsRange.FileName);
+      if (path.IsEmpty)
+        return GetTypeMember(mfv, fsTypeElement);
 
+      var declarations = new List<FSharpProperTypeMemberDeclarationBase>();
       var typeElement = (TypeElement) fsTypeElement;
       foreach (var typePart in typeElement.EnumerateParts())
       {
         var typeDeclaration = typePart.GetDeclaration() as FSharpTypeElementDeclarationBase;
-        if (typeDeclaration == null) continue;
+        var sourceFile = typeDeclaration?.GetSourceFile();
+        if (sourceFile == null || sourceFile.GetLocation() != path)
+          continue;
 
         foreach (var declaration in typeDeclaration.MemberDeclarations)
         {
@@ -237,19 +243,18 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       }
 
       if (declarations.Count == 0)
-        return null;
+        return GetTypeMember(mfv, typeElement);
 
       var singleDeclaration = declarations.SingleOrDefault(decl =>
       {
-        var document = decl.GetSourceFile().NotNull().Document;
-        var range = document.GetTreeTextRange(mfv.DeclarationLocation);
+        var range = decl.GetSourceFile().NotNull().Document.GetTreeTextRange(fcsRange);
         return range.Contains(decl.GetNameIdentifierRange());
       });
 
       return singleDeclaration?.GetOrCreateDeclaredElement(mfv);
     }
 
-    private static IDeclaredElement GetNonFSharpTypeMember([NotNull] FSharpMemberOrFunctionOrValue mfv,
+    private static IDeclaredElement GetTypeMember([NotNull] FSharpMemberOrFunctionOrValue mfv,
       [NotNull] ITypeElement typeElement)
     {
       var compiledName = mfv.GetMfvCompiledName();

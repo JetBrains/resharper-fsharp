@@ -104,6 +104,9 @@ type FSharpGoToDeclarationTest() =
     [<Test>] member x.``Own member vs interface``() = x.DoNamedTest()
     [<Test>] member x.``Ctor 01 - Modifier``() = x.DoNamedTest()
 
+    [<Test>] member x.``Signature 01``() = x.DoTestSolution("Signature 01.fsi", "Signature 01.fs")
+    [<Test>] member x.``Signature 02 - Same range``() = x.DoTestSolution("Signature 02 - Same range.fsi", "Signature 02 - Same range.fs")
+
     [<TestReferences("Library1.dll", "Library2.dll")>]
     [<Test>] member x.``Same type from different assemblies``() = x.DoNamedTest()
 
