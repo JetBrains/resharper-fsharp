@@ -35,6 +35,8 @@ module FSharpTestAttribute =
         TargetFrameworkId.Create(FrameworkIdentifier.NetFramework, Version(4, 5, 1), ProfileIdentifier.Default)
 
 type FSharpTestAttribute(extension) =
+    inherit Attribute()
+
     new () =
         FSharpTestAttribute(FSharpProjectFileType.FsExtension)
 
