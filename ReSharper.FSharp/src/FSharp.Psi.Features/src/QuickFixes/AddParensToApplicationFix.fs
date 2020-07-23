@@ -1,5 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
+open System.Text.RegularExpressions
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.ReSharper.Feature.Services.Navigation.CustomHighlighting
 open JetBrains.ReSharper.Feature.Services.Refactorings.WorkflowOccurrences
@@ -20,27 +21,32 @@ open System
 type AddParensToApplicationFix(error: NotAFunctionError) =
     inherit FSharpQuickFixBase()
 
-    let [<Literal>] multilineSuffix = " ..."
-    let [<Literal>] quickFixText = "Add parens to application"
-    let displayNameMaxLength = 70
+    let popupItemMaxLength = 80
     let errorPrefixApp = error.PrefixApp
-    let mutable prefixAppWithArgsToApply = (null, [])
-    
-    let normalizeDisplayText (text: string) =
-        if text.Length <= displayNameMaxLength then text else text.Substring(0, displayNameMaxLength) + multilineSuffix
+    let mutable appToApply = null
+    let mutable argsToApply = []
 
-    let getParentPrefixApp (expr: IFSharpExpression) nestingLevel =
-        let rec getParentPrefixAppRec (expr: IFSharpExpression) i =
+    let toDisplay (text: string) =
+        if text.Length <= popupItemMaxLength then text else
+        let text = Regex("\n\s*", RegexOptions.Compiled).Replace(text, " ↩ ")
+        let diff = text.Length - popupItemMaxLength
+        let center = text.Length / 2
+        let textBefore = text.Substring(0, center - diff / 2)
+        let textAfter = text.Substring(center + diff / 2)
+        String.Concat(textBefore, " ... ", textAfter)
+
+    let getParentPrefixApp expr nestingLevel =
+        let rec getParentPrefixAppRec expr i =
             let parentPrefixApp = PrefixAppExprNavigator.GetByFunctionExpression(expr)
-            if i + 1 <= nestingLevel then getParentPrefixAppRec parentPrefixApp (i + 1) else parentPrefixApp
+            if i + 1 <= nestingLevel
+            then getParentPrefixAppRec parentPrefixApp (i + 1)
+            else parentPrefixApp
 
         getParentPrefixAppRec expr 1
 
-    let rec createPrefixAppExprTree (factory: IFSharpElementFactory) (expr: IFSharpExpression) args =
+    let rec createAppExprTree (factory: IFSharpElementFactory) (expr: IFSharpExpression) args =
         match args with
-        | head :: tail ->
-            let newAppExpr = factory.CreateAppExpr(expr, head, true)
-            createPrefixAppExprTree factory newAppExpr tail
+        | head :: tail -> createAppExprTree factory (factory.CreateAppExpr(expr, head, true)) tail
         | [] -> expr
 
     let countArgs fsharpType =
@@ -50,74 +56,90 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
 
         countArgsRec fsharpType 1
 
-    let tryFindPrefixAppsWithoutParens prefixAppExpr =
-        let rec collectAppliedExprsRec (prefixAppExpr : IPrefixAppExpr) (prefixAppDataAcc: (_ * int * _ list) list) (appliedExprsAcc: _ list) =
-            let argExprFcsType = prefixAppExpr.ArgumentExpression.IgnoreInnerParens().TryGetFSharpType()
-            let expectedArgsCount = if argExprFcsType != null && argExprFcsType.IsFunctionType then Some(countArgs argExprFcsType) else None
-            let isPrefixAppWithoutParens = match expectedArgsCount with Some x -> x <= appliedExprsAcc.Length | _ -> false
+    let findAppsWithoutParens prefixAppExpr =
+        let rec collectAppliedExprsRec
+                (prefixAppExpr: IPrefixAppExpr)
+                (prefixAppDataAcc: _ list)
+                (appliedExprsAcc: _ list) =
+
+            let argExprFcsType = prefixAppExpr.ArgumentExpression.TryGetFSharpType()
+
+            let maxArgsCount =
+                if argExprFcsType != null && argExprFcsType.IsFunctionType
+                then Some(countArgs argExprFcsType) else None
+
+            let isPrefixAppWithoutParens =
+                match maxArgsCount with
+                | Some _ -> appliedExprsAcc.Length > 0
+                | _ -> false
+
             let prefixAppDataAcc =
-                if isPrefixAppWithoutParens then (prefixAppExpr.ArgumentExpression, expectedArgsCount.Value, appliedExprsAcc) :: prefixAppDataAcc
+                if isPrefixAppWithoutParens then
+                    {| App = prefixAppExpr.ArgumentExpression
+                       MaxArgsCount = maxArgsCount.Value
+                       ArgCandidates = appliedExprsAcc |} :: prefixAppDataAcc
                 else prefixAppDataAcc
+
             match prefixAppExpr.FunctionExpression.IgnoreInnerParens() with
-            | :? IPrefixAppExpr as appExpr -> collectAppliedExprsRec appExpr prefixAppDataAcc (prefixAppExpr.ArgumentExpression :: appliedExprsAcc)   
+            | :? IPrefixAppExpr as appExpr ->
+                collectAppliedExprsRec appExpr prefixAppDataAcc (prefixAppExpr.ArgumentExpression :: appliedExprsAcc)
             | _ -> prefixAppDataAcc
 
         collectAppliedExprsRec prefixAppExpr [] []
 
-    let prefixAppsData = tryFindPrefixAppsWithoutParens errorPrefixApp
+    let appCandidates = findAppsWithoutParens errorPrefixApp
 
-    override x.Text = quickFixText
+    override x.Text = "Add parens to application"
 
     override x.IsAvailable _ =
-        match prefixAppsData with
+        match appCandidates with
         | [] -> false
-        | list -> list |> List.forall (fun (prefixApp, _, _) -> isValid prefixApp)
+        | list -> list |> List.forall (fun appData -> isValid appData.App)
 
     override x.Execute(solution, textControl) =
         let popupMenu = solution.GetComponent<WorkflowPopupMenu>()
 
-        let getPrefixAppRange (data: IFSharpExpression * int * IFSharpExpression list) =
-            let (prefixApp, _, _) = data
-            [| prefixApp.GetNavigationRange() |]
-
-        let prefixAppPopups =
-            prefixAppsData
+        let appOccurrences =
+            appCandidates
             |> Seq.rev
-            |> Seq.map (fun (prefixApp, _, _ as x) ->
-                WorkflowPopupMenuOccurrence(RichText(normalizeDisplayText (prefixApp.GetText())), RichText.Empty, x, getPrefixAppRange))
+            |> Seq.map (fun x -> WorkflowPopupMenuOccurrence(
+                                     RichText(toDisplay (x.App.GetText())),
+                                     RichText.Empty, x,
+                                     (fun appData -> [| appData.App.GetNavigationRange() |])))
             |> Array.ofSeq
 
-        let selectedPrefixAppData = popupMenu.ShowPopup(textControl.Lifetime, prefixAppPopups, CustomHighlightingKind.Other, textControl, null)
-        if isNull selectedPrefixAppData then () else
-            
-        let (prefixApp, argsCount, argExprs) = Seq.head (selectedPrefixAppData.Entities)
+        let appOccurrence =
+            popupMenu.ShowPopup(textControl.Lifetime, appOccurrences, CustomHighlightingKind.Other, textControl, null)
 
-        let getPrefixAppWithArgsText (args: IFSharpExpression list) =
-            normalizeDisplayText (String.Join(" ", prefixApp.GetText(), String.Join(" ", args |> List.map(fun x -> x.GetText()))))
-        let getPrefixAppWithArgsRange args = [|getTreeNodesDocumentRange prefixApp (args |> List.last)|]
+        if isNull appOccurrence then () else       
+        let appData = Seq.head (appOccurrence.Entities)
 
-        let argExprsPopups =
-            [1 .. argsCount]
-            |> Seq.map (fun i -> argExprs |> List.take i)
+        let argOccurrences =
+            [ 1 .. Math.Min(appData.MaxArgsCount, appData.ArgCandidates.Length) ]
+            |> Seq.map (fun i -> appData.ArgCandidates |> List.take i)
             |> Seq.rev
-            |> Seq.map (fun args -> WorkflowPopupMenuOccurrence(RichText(getPrefixAppWithArgsText args), RichText.Empty, args, getPrefixAppWithArgsRange))
+            |> Seq.map (fun args -> WorkflowPopupMenuOccurrence(
+                                        RichText(toDisplay(String.Join(" ", appData.App.GetText(), String.Join(" ", args |> List.map (fun x -> x.GetText()))))),
+                                        RichText.Empty, args,
+                                        (fun args -> [| getTreeNodesDocumentRange appData.App (args |> List.last) |])))
             |> Array.ofSeq
 
-        let argExprsToApply = popupMenu.ShowPopup(textControl.Lifetime, argExprsPopups, CustomHighlightingKind.Other, textControl, null)      
-        if isNull argExprsToApply then () else
+        let argsOccurrence =
+            popupMenu.ShowPopup(textControl.Lifetime, argOccurrences, CustomHighlightingKind.Other, textControl, null)
 
-        prefixAppWithArgsToApply <- (prefixApp, Seq.head (argExprsToApply.Entities))
-        base.Execute(solution, textControl)  
+        if isNull argsOccurrence then () else
+        appToApply <- appData.App
+        argsToApply <- Seq.head (argsOccurrence.Entities)
+        base.Execute(solution, textControl)
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(errorPrefixApp.IsPhysical())
         let factory = errorPrefixApp.CreateElementFactory()
         use disableFormatter = new DisableCodeFormatter()
 
-        let (prefixAppToApply, argExprsToApply) = prefixAppWithArgsToApply
-        let newPrefixAppTree = createPrefixAppExprTree factory prefixAppToApply argExprsToApply
-        let updatedPrefixAppTree = ModificationUtil.ReplaceChild(prefixAppToApply, newPrefixAppTree)
-        let updatedPrefixAppTreeWithParens = addParens updatedPrefixAppTree
+        let newAppExpr = createAppExprTree factory appToApply argsToApply
+        let newAppExpr = ModificationUtil.ReplaceChild(appToApply, newAppExpr)
+        let newAppExpr = addParens newAppExpr
 
-        let parentPrefixApp = PrefixAppExprNavigator.GetByArgumentExpression(updatedPrefixAppTreeWithParens.IgnoreParentParens())
-        ModificationUtil.ReplaceChild(getParentPrefixApp parentPrefixApp argExprsToApply.Length, parentPrefixApp) |> ignore
+        let parentApp = PrefixAppExprNavigator.GetByArgumentExpression(newAppExpr.IgnoreParentParens())
+        ModificationUtil.ReplaceChild(getParentPrefixApp parentApp argsToApply.Length, parentApp) |> ignore
