@@ -45,6 +45,7 @@ type RedundantParensTest() =
     [<Test>] member x.``App - Attribute 01``() = x.DoNamedTest()
     [<Test>] member x.``App - Attribute 02 - Type function``() = x.DoNamedTest()
     [<Test>] member x.``App - Attribute 03 - Reference``() = x.DoNamedTest()
+    [<Test>] member x.``App - Attribute 04 - Targets``() = x.DoNamedTest()
 
     [<Test>] member x.``Let - Local - App - Binary 01``() = x.DoNamedTest()
     [<Test>] member x.``Let - Local - App - Binary 02 - Nested``() = x.DoNamedTest()

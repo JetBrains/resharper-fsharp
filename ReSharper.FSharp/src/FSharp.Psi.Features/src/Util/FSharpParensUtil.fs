@@ -122,8 +122,8 @@ let rec needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
 
     match expr with
     | :? IReferenceExpr as refExpr when
-            isNotNull refExpr.TypeArgumentList &&
-            isNotNull (AttributeNavigator.GetByExpression(refExpr.IgnoreParentParens())) ->
+            let attr = AttributeNavigator.GetByExpression(refExpr.IgnoreParentParens())
+            isNotNull attr && (isNotNull refExpr.TypeArgumentList || isNotNull attr.Target) ->
         true
 
     | :? IQualifiedExpr as qualifiedExpr ->
