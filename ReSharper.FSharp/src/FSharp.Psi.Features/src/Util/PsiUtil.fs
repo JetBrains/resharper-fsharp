@@ -257,6 +257,8 @@ let isAfterEmptyLine (node: ITreeNode) =
     prevNonWhitespace != prevPrevNonWhiteSpace &&
     prevNonWhitespace :? NewLine && (isNull prevPrevNonWhiteSpace || prevPrevNonWhiteSpace :? NewLine)
 
+let isFirstChildOrAfterEmptyLine (node: ITreeNode) =
+    isNull node.PrevSibling || isAfterEmptyLine node
 
 [<AutoOpen>]
 module PsiModificationUtil =
