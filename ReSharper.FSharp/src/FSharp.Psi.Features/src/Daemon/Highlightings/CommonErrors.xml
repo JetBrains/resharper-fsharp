@@ -295,6 +295,7 @@
     <Parameter type="IParenExpr" name="parenExpr"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Message value="Redundant parentheses"/>
+    <QuickFix>RemoveRedundantParenExprFix</QuickFix>
   </Warning>
 
   <Error staticGroup="FSharpErrors" name="FieldOrValueNotMutable">

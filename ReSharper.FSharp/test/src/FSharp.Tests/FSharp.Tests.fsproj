@@ -74,6 +74,7 @@
     <Compile Include="QuickFixes\RemoveYieldTest.fs" />
     <Compile Include="QuickFixes\RemoveRedundantQualifierTest.fs" />
     <Compile Include="QuickFixes\AddExtensionAttributeTest.fs" />
+    <Compile Include="QuickFixes\RemoveRedundantParenExprTest.fs" />
     <Compile Include="Intentions\IntentionsTestBase.fs" />
     <Compile Include="Intentions\ToRecursiveLetBindings.fs" />
     <Compile Include="Intentions\ToMultilineRecordTest.fs" />
