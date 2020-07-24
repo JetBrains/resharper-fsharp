@@ -1,0 +1,9 @@
+﻿module Module
+
+do
+    match () with
+    | a -> (){caret}
+
+    try () with
+    | a -> ()
+    ()
