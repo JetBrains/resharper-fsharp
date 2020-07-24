@@ -46,7 +46,7 @@ type FSharpReformatCode() =
 
             
             let solution = fsFile.GetSolution()
-            let settings = sourceFile.GetSettingsStore()
+            let settings = sourceFile.GetSettingsStoreWithEditorConfig()
             let languageService = fsFile.Language.LanguageServiceNotNull()
             let formatter = languageService.CodeFormatter
 
@@ -54,38 +54,33 @@ type FSharpReformatCode() =
                 formatter.GetFormatterSettings(solution, sourceFile, settings, false) :?> FSharpFormatSettingsKey
 
             let formatConfig =
-                match CodeFormatter.TryReadConfiguration(filePath) with
-                | Some config ->
-                    // Setting found in an .editorconfig file for filePath
-                    config
-                | None ->
-                    { FormatConfig.Default with
-                          IndentSize = settings.INDENT_SIZE
-                          MaxLineLength = settings.WRAP_LIMIT
-                          SpaceBeforeParameter = settings.SpaceBeforeParameter
-                          SpaceBeforeLowercaseInvocation = settings.SpaceBeforeLowercaseInvocation
-                          SpaceBeforeUppercaseInvocation = settings.SpaceBeforeUppercaseInvocation
-                          SpaceBeforeClassConstructor = settings.SpaceBeforeClassConstructor
-                          SpaceBeforeMember = settings.SpaceBeforeMember
-                          SpaceBeforeColon = settings.SpaceBeforeColon
-                          SpaceAfterComma = settings.SpaceAfterComma
-                          SpaceBeforeSemicolon = settings.SpaceBeforeSemicolon
-                          SpaceAfterSemicolon = settings.SpaceAfterSemicolon
-                          IndentOnTryWith = settings.IndentOnTryWith
-                          SpaceAroundDelimiter = settings.SpaceAroundDelimiter
-                          MaxIfThenElseShortWidth = settings.MaxIfThenElseShortWidth
-                          MaxInfixOperatorExpression = settings.MaxInfixOperatorExpression
-                          MaxRecordWidth = settings.MaxRecordWidth
-                          MaxArrayOrListWidth = settings.MaxArrayOrListWidth
-                          MaxValueBindingWidth = settings.MaxValueBindingWidth
-                          MaxFunctionBindingWidth = settings.MaxFunctionBindingWidth
-                          MultilineBlockBracketsOnSameColumn = settings.MultilineBlockBracketsOnSameColumn
-                          NewlineBetweenTypeDefinitionAndMembers = settings.NewlineBetweenTypeDefinitionAndMembers
-                          KeepIfThenInSameLine = settings.KeepIfThenInSameLine
-                          MaxElmishWidth = settings.MaxElmishWidth
-                          SingleArgumentWebMode = settings.SingleArgumentWebMode
-                          AlignFunctionSignatureToIndentation = settings.AlignFunctionSignatureToIndentation
-                          AlternativeLongMemberDefinitions = settings.AlternativeLongMemberDefinitions }
+                { FormatConfig.Default with
+                      IndentSize = settings.INDENT_SIZE
+                      MaxLineLength = settings.WRAP_LIMIT
+                      SpaceBeforeParameter = settings.SpaceBeforeParameter
+                      SpaceBeforeLowercaseInvocation = settings.SpaceBeforeLowercaseInvocation
+                      SpaceBeforeUppercaseInvocation = settings.SpaceBeforeUppercaseInvocation
+                      SpaceBeforeClassConstructor = settings.SpaceBeforeClassConstructor
+                      SpaceBeforeMember = settings.SpaceBeforeMember
+                      SpaceBeforeColon = settings.SpaceBeforeColon
+                      SpaceAfterComma = settings.SpaceAfterComma
+                      SpaceBeforeSemicolon = settings.SpaceBeforeSemicolon
+                      SpaceAfterSemicolon = settings.SpaceAfterSemicolon
+                      IndentOnTryWith = settings.IndentOnTryWith
+                      SpaceAroundDelimiter = settings.SpaceAroundDelimiter
+                      MaxIfThenElseShortWidth = settings.MaxIfThenElseShortWidth
+                      MaxInfixOperatorExpression = settings.MaxInfixOperatorExpression
+                      MaxRecordWidth = settings.MaxRecordWidth
+                      MaxArrayOrListWidth = settings.MaxArrayOrListWidth
+                      MaxValueBindingWidth = settings.MaxValueBindingWidth
+                      MaxFunctionBindingWidth = settings.MaxFunctionBindingWidth
+                      MultilineBlockBracketsOnSameColumn = settings.MultilineBlockBracketsOnSameColumn
+                      NewlineBetweenTypeDefinitionAndMembers = settings.NewlineBetweenTypeDefinitionAndMembers
+                      KeepIfThenInSameLine = settings.KeepIfThenInSameLine
+                      MaxElmishWidth = settings.MaxElmishWidth
+                      SingleArgumentWebMode = settings.SingleArgumentWebMode
+                      AlignFunctionSignatureToIndentation = settings.AlignFunctionSignatureToIndentation
+                      AlternativeLongMemberDefinitions = settings.AlternativeLongMemberDefinitions }
 
             let stamp = document.LastModificationStamp
             let modificationSide = TextModificationSide.NotSpecified
