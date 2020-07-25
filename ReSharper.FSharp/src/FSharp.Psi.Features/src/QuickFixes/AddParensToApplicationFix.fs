@@ -109,7 +109,7 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
             |> Array.ofSeq
 
         let appOccurrence =
-            popupMenu.ShowPopup(textControl.Lifetime, appOccurrences, CustomHighlightingKind.Other, textControl, null)
+            popupMenu.ShowPopup(textControl.Lifetime, appOccurrences, CustomHighlightingKind.Other, textControl, null, "AppPopup")
 
         if isNull appOccurrence then () else       
         let appData = Seq.head (appOccurrence.Entities)
@@ -125,7 +125,7 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
             |> Array.ofSeq
 
         let argsOccurrence =
-            popupMenu.ShowPopup(textControl.Lifetime, argOccurrences, CustomHighlightingKind.Other, textControl, null)
+            popupMenu.ShowPopup(textControl.Lifetime, argOccurrences, CustomHighlightingKind.Other, textControl, null, "ArgsPopup")
 
         if isNull argsOccurrence then () else
         appToApply <- appData.App
