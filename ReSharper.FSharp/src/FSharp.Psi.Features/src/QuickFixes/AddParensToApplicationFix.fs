@@ -62,19 +62,19 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
                 (prefixAppDataAcc: _ list)
                 (appliedExprsAcc: _ list) =
 
-            let argExprFcsType = prefixAppExpr.ArgumentExpression.TryGetFSharpType()
+            let appExprFcsType = prefixAppExpr.ArgumentExpression.TryGetFSharpType()
 
             let maxArgsCount =
-                if argExprFcsType != null && argExprFcsType.IsFunctionType
-                then Some(countArgs argExprFcsType) else None
+                if appExprFcsType != null && appExprFcsType.IsFunctionType
+                then Some(countArgs appExprFcsType) else None
 
-            let isPrefixAppWithoutParens =
+            let canApplyRefactoringToApp =
                 match maxArgsCount with
                 | Some _ -> appliedExprsAcc.Length > 0
                 | _ -> false
 
-            let prefixAppDataAcc =
-                if isPrefixAppWithoutParens then
+            let appDataAcc =
+                if canApplyRefactoringToApp then
                     {| App = prefixAppExpr.ArgumentExpression
                        MaxArgsCount = maxArgsCount.Value
                        ArgCandidates = appliedExprsAcc |} :: prefixAppDataAcc
@@ -82,8 +82,8 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
 
             match prefixAppExpr.FunctionExpression.IgnoreInnerParens() with
             | :? IPrefixAppExpr as appExpr ->
-                collectAppliedExprsRec appExpr prefixAppDataAcc (prefixAppExpr.ArgumentExpression :: appliedExprsAcc)
-            | _ -> prefixAppDataAcc
+                collectAppliedExprsRec appExpr appDataAcc (prefixAppExpr.ArgumentExpression :: appliedExprsAcc)
+            | _ -> appDataAcc
 
         collectAppliedExprsRec prefixAppExpr [] []
 
