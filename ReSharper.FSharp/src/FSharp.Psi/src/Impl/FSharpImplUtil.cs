@@ -691,6 +691,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static IFSharpExpression IgnoreParentParens([CanBeNull] this IFSharpExpression fsExpr)
     {
       if (fsExpr == null) return null;
+
       while (fsExpr.Parent is IParenExpr parenExpr)
         fsExpr = parenExpr;
       return fsExpr;

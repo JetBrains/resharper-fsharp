@@ -388,14 +388,11 @@ let shiftWithWhitespaceBefore shift (expr: IFSharpExpression) =
 
 
 [<CanBeNull>]
-let tryFindRootPrefixAppWhereExpressionIsFunc ([<CanBeNull>] expr) =
-    let rec tryFindRootPrefixAppWhereExpressionIsFuncRec (expr: IFSharpExpression) =
-        let prefixApp = PrefixAppExprNavigator.GetByFunctionExpression(expr.IgnoreParentParens())
-        if isNotNull prefixApp && isNotNull prefixApp.ArgumentExpression then
-            tryFindRootPrefixAppWhereExpressionIsFuncRec(prefixApp)
-        else expr
-
-    if isNull expr then null else tryFindRootPrefixAppWhereExpressionIsFuncRec expr    
+let rec tryFindRootPrefixAppWhereExpressionIsFunc ([<CanBeNull>] expr: IFSharpExpression) =
+    let prefixApp = PrefixAppExprNavigator.GetByFunctionExpression(expr.IgnoreParentParens())
+    if isNotNull prefixApp && isNotNull prefixApp.ArgumentExpression then
+        tryFindRootPrefixAppWhereExpressionIsFunc(prefixApp)
+    else expr
 
 let rec getAllExpressionArgs (expr: IFSharpExpression) =
     let mutable currentExpr = expr
