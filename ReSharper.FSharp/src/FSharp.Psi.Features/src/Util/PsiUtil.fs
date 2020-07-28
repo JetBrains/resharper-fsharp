@@ -2,6 +2,7 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.PsiUtil
 
 open FSharp.Compiler.Range
+open JetBrains.Annotations
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.ExpressionSelection
@@ -386,11 +387,15 @@ let shiftWithWhitespaceBefore shift (expr: IFSharpExpression) =
     shiftExpr shift expr
 
 
-let rec tryFindRootPrefixAppWhereExpressionIsFunc (expr: IFSharpExpression) =
-    let prefixApp = PrefixAppExprNavigator.GetByFunctionExpression(expr.IgnoreParentParens())
-    if isNotNull prefixApp && isNotNull prefixApp.ArgumentExpression then
-        tryFindRootPrefixAppWhereExpressionIsFunc(prefixApp)
-    else expr
+[<CanBeNull>]
+let tryFindRootPrefixAppWhereExpressionIsFunc ([<CanBeNull>] expr) =
+    let rec tryFindRootPrefixAppWhereExpressionIsFuncRec (expr: IFSharpExpression) =
+        let prefixApp = PrefixAppExprNavigator.GetByFunctionExpression(expr.IgnoreParentParens())
+        if isNotNull prefixApp && isNotNull prefixApp.ArgumentExpression then
+            tryFindRootPrefixAppWhereExpressionIsFuncRec(prefixApp)
+        else expr
+
+    if isNull expr then null else tryFindRootPrefixAppWhereExpressionIsFuncRec expr    
 
 let rec getAllExpressionArgs (expr: IFSharpExpression) =
     let mutable currentExpr = expr
