@@ -687,8 +687,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
     public static bool RequiresQualifiedAccess([NotNull] this ITypeElement typeElement) => 
       typeElement.GetAccessType() == ModuleMembersAccessKind.RequiresQualifiedAccess;
 
-    public static IFSharpExpression IgnoreParentParens([NotNull] this IFSharpExpression fsExpr)
+    [CanBeNull]
+    public static IFSharpExpression IgnoreParentParens([CanBeNull] this IFSharpExpression fsExpr)
     {
+      if (fsExpr == null) return null;
+
       while (fsExpr.Parent is IParenExpr parenExpr)
         fsExpr = parenExpr;
       return fsExpr;
