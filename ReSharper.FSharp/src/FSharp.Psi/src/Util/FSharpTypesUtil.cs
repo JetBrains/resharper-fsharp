@@ -223,7 +223,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     }
 
     [CanBeNull]
-    public static FSharpType TryGetFSharpType([NotNull] this IFSharpTreeNode fsTreeNode)
+    public static FSharpType TryGetFcsType([NotNull] this IFSharpTreeNode fsTreeNode)
     {
       var checkResults = fsTreeNode.FSharpFile.GetParseAndCheckResults(true, "TryGetFcsType")?.Value?.CheckResults;
       if (checkResults == null) return null;
@@ -236,9 +236,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     }
 
     [NotNull]
-    public static IType TryGetFcsType([NotNull] this IFSharpTreeNode fsTreeNode)
+    public static IType GetExpressionTypeFromFcs([NotNull] this IFSharpTreeNode fsTreeNode)
     {
-      var fsharpType = TryGetFSharpType(fsTreeNode);
+      var fsharpType = TryGetFcsType(fsTreeNode);
       return fsharpType != null
         ? fsharpType.MapType(fsTreeNode)
         : TypeFactory.CreateUnknownType(fsTreeNode.GetPsiModule());

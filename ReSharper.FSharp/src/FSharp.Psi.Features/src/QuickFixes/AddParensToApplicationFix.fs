@@ -1,5 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
+open System
 open System.Text.RegularExpressions
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.ReSharper.Feature.Services.Navigation.CustomHighlighting
@@ -16,18 +17,23 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ProjectModel
 open JetBrains.UI.RichText
 open JetBrains.Util
-open System
+
+module AddParensToApplicationFix =
+    let [<Literal>] AppPopupName = "AppPopup"
+    let [<Literal>] ArgsPopupName = "ArgsPopup"
 
 type AddParensToApplicationFix(error: NotAFunctionError) =
     inherit FSharpQuickFixBase()
 
-    let popupItemMaxLength = 80
+    let [<Literal>] popupItemMaxLength = 80
+
     let errorPrefixApp = error.PrefixApp
     let mutable appToApply = null
     let mutable argsToApply = []
 
     let toDisplay (text: string) =
         if text.Length <= popupItemMaxLength then text else
+
         let text = Regex("\n\s*", RegexOptions.Compiled).Replace(text, " ↩ ")
         let diff = text.Length - popupItemMaxLength
         let center = text.Length / 2
@@ -44,9 +50,9 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
 
         getParentPrefixAppRec expr 1
 
-    let rec createAppExprTree (factory: IFSharpElementFactory) (expr: IFSharpExpression) args =
+    let rec createAppExpr (factory: IFSharpElementFactory) (expr: IFSharpExpression) args =
         match args with
-        | head :: tail -> createAppExprTree factory (factory.CreateAppExpr(expr, head, true)) tail
+        | head :: tail -> createAppExpr factory (factory.CreateAppExpr(expr, head, true)) tail
         | [] -> expr
 
     let countArgs fsharpType =
@@ -62,11 +68,11 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
                 (prefixAppDataAcc: _ list)
                 (appliedExprsAcc: _ list) =
 
-            let appExprFcsType = prefixAppExpr.ArgumentExpression.TryGetFSharpType()
+            let appExprFcsType = prefixAppExpr.ArgumentExpression.TryGetFcsType()
 
             let maxArgsCount =
-                if appExprFcsType != null && appExprFcsType.IsFunctionType
-                then Some(countArgs appExprFcsType) else None
+                if isNull appExprFcsType || not appExprFcsType.IsFunctionType then None else
+                Some(countArgs appExprFcsType)
 
             let canApplyRefactoringToApp =
                 match maxArgsCount with
@@ -89,7 +95,17 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
 
     let appCandidates = findAppsWithoutParens errorPrefixApp
 
-    override x.Text = "Add parens to application"
+    override x.Text =
+        match appCandidates with
+        | [appData] ->
+            match appData.App with
+            | :? IReferenceExpr as refExpr when refExpr.ShortName <> SharedImplUtil.MISSING_DECLARATION_NAME -> 
+                sprintf "Add parens to '%s' application" refExpr.ShortName
+
+            | :? ILambdaExpr -> "Add parens to lambda application"
+            | _ -> "Add parens to application"
+
+        | _ -> "Add parens to application"
 
     override x.IsAvailable _ =
         match appCandidates with
@@ -98,36 +114,40 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
 
     override x.Execute(solution, textControl) =
         let popupMenu = solution.GetComponent<WorkflowPopupMenu>()
+        let lifetime = textControl.Lifetime
+
+        let showPopup occurrences id =
+            popupMenu.ShowPopup(lifetime, occurrences, CustomHighlightingKind.Other, textControl, null, id)
 
         let appOccurrences =
             appCandidates
             |> Seq.rev
-            |> Seq.map (fun x -> WorkflowPopupMenuOccurrence(
-                                     RichText(toDisplay (x.App.GetText())),
-                                     RichText.Empty, x,
-                                     (fun appData -> [| appData.App.GetNavigationRange() |])))
+            |> Seq.map (fun x ->
+                WorkflowPopupMenuOccurrence(
+                    RichText(toDisplay (x.App.GetText())), RichText.Empty, x,
+                    (fun appData -> [| appData.App.GetNavigationRange() |])))
             |> Array.ofSeq
 
-        let appOccurrence =
-            popupMenu.ShowPopup(textControl.Lifetime, appOccurrences, CustomHighlightingKind.Other, textControl, null, "AppPopup")
+        let appOccurrence = showPopup appOccurrences AddParensToApplicationFix.AppPopupName
 
         if isNull appOccurrence then () else       
+
         let appData = Seq.head (appOccurrence.Entities)
 
         let argOccurrences =
             [ 1 .. Math.Min(appData.MaxArgsCount, appData.ArgCandidates.Length) ]
-            |> Seq.map (fun i -> appData.ArgCandidates |> List.take i)
             |> Seq.rev
-            |> Seq.map (fun args -> WorkflowPopupMenuOccurrence(
-                                        RichText(toDisplay(String.Join(" ", appData.App.GetText(), String.Join(" ", args |> List.map (fun x -> x.GetText()))))),
-                                        RichText.Empty, args,
-                                        (fun args -> [| getTreeNodesDocumentRange appData.App (args |> List.last) |])))
+            |> Seq.map (fun i ->
+                let args = appData.ArgCandidates |> List.take i
+                let argsTexts = args |> List.map (fun x -> x.GetText()) |> String.concat " "
+                WorkflowPopupMenuOccurrence(
+                    RichText(toDisplay(String.Join(" ", appData.App.GetText(), argsTexts))), RichText.Empty, args,
+                    (fun args -> [| getTreeNodesDocumentRange appData.App (args |> List.last) |])))
             |> Array.ofSeq
 
-        let argsOccurrence =
-            popupMenu.ShowPopup(textControl.Lifetime, argOccurrences, CustomHighlightingKind.Other, textControl, null, "ArgsPopup")
-
+        let argsOccurrence = showPopup argOccurrences AddParensToApplicationFix.ArgsPopupName
         if isNull argsOccurrence then () else
+
         appToApply <- appData.App
         argsToApply <- Seq.head (argsOccurrence.Entities)
         base.Execute(solution, textControl)
@@ -137,9 +157,10 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
         let factory = errorPrefixApp.CreateElementFactory()
         use disableFormatter = new DisableCodeFormatter()
 
-        let newAppExpr = createAppExprTree factory appToApply argsToApply
+        let newAppExpr = createAppExpr factory appToApply argsToApply
         let newAppExpr = ModificationUtil.ReplaceChild(appToApply, newAppExpr)
-        let newAppExpr = addParens newAppExpr
 
-        let parentApp = PrefixAppExprNavigator.GetByArgumentExpression(newAppExpr.IgnoreParentParens())
+        let parenExpr = ParenExprNavigator.GetByInnerExpression(addParens newAppExpr)
+        let parentApp = PrefixAppExprNavigator.GetByArgumentExpression(parenExpr)
+
         ModificationUtil.ReplaceChild(getParentPrefixApp parentApp argsToApply.Length, parentApp) |> ignore

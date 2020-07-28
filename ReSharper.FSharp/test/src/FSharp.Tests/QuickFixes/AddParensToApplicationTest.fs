@@ -4,6 +4,7 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.FeaturesTestFramework.Intentions
 open JetBrains.ReSharper.FeaturesTestFramework.Refactorings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes.AddParensToApplicationFix
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
@@ -13,8 +14,7 @@ type AddParensToApplicationTest() =
 
     let [<Literal>] AppOccurrenceName = "APP_OCCURRENCE"
     let [<Literal>] ArgsOccurrenceName = "ARGS_OCCURRENCE"
-    let [<Literal>] AppPopupName = "AppPopup"
-    let [<Literal>] ArgsPopupName = "ArgsPopup"
+
     override x.RelativeTestDataPath = "features/quickFixes/addParensToApplication"
 
     [<Test>] member x.``Single application``() = x.DoNamedTest()
@@ -36,9 +36,11 @@ type AddParensToApplicationTest() =
         let workflowPopupMenu = x.Solution.GetComponent<TestWorkflowPopupMenu>()
         workflowPopupMenu.SetTestData(x.TestLifetime, fun _ occurrences _ _ id ->
             let occurrenceName =
-                if id = AppPopupName && isNotNull appOccurrenceName then appOccurrenceName else
-                if id = ArgsPopupName && isNotNull argsOccurrenceName then argsOccurrenceName
-                else (Array.head occurrences).Name.Text
+                match id with
+                | AppPopupName when isNotNull appOccurrenceName -> appOccurrenceName
+                | ArgsPopupName when isNotNull argsOccurrenceName -> argsOccurrenceName
+                | _ -> occurrences.[0].Name.Text
+
             occurrences
             |> Array.tryFind (fun occurrence -> occurrence.Name.Text = occurrenceName)
             |> Option.defaultWith (fun _ -> failwithf "Could not find %s occurrence" occurrenceName))           
