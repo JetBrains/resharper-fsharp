@@ -215,6 +215,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
     private void Formatting()
     {
       Describe<FormattingRule>()
+        .Group(SpaceRuleGroup)
+        .Name("SpaceAfterImplicitConstructorDecl")
+        .Where(Left().HasType(ElementType.IMPLICIT_CONSTRUCTOR_DECLARATION))
+        .Return(IntervalFormatType.Space)
+        .Build();
+      
+      Describe<FormattingRule>()
+        .Group(SpaceRuleGroup)
+        .Name("SpacesInMemberConstructorDecl")
+        .Where(Parent().HasType(ElementType.MEMBER_CONSTRUCTOR_DECLARATION))
+        .Return(IntervalFormatType.Space)
+        .Build();
+
+      Describe<FormattingRule>()
         .Name("SpaceBetweenRecordBindings")
         .Where(
           Left()
