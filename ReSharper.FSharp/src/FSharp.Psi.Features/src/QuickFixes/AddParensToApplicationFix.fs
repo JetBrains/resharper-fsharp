@@ -114,10 +114,9 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
 
     override x.Execute(solution, textControl) =
         let popupMenu = solution.GetComponent<WorkflowPopupMenu>()
-        let lifetime = textControl.Lifetime
 
         let showPopup occurrences id =
-            popupMenu.ShowPopup(lifetime, occurrences, CustomHighlightingKind.Other, textControl, null, id)
+            popupMenu.ShowPopup(textControl.Lifetime, occurrences, CustomHighlightingKind.Other, textControl, null, id)
 
         let appOccurrences =
             appCandidates
