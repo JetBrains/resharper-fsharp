@@ -288,6 +288,7 @@
     <Range>PrefixAppExprNavigator.GetByFunctionExpression(expr).ArgumentExpression.GetHighlightingRange()</Range>
     <SecondaryRanges>getAllExpressionArgs expr |> Seq.tail |> getExpressionsRanges</SecondaryRanges>
     <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>AddParensToApplicationFix</QuickFix>
     <QuickFix>RemoveUnexpectedArgumentsFix</QuickFix>
   </Error>
 

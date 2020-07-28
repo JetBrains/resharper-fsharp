@@ -15,7 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public ExpressionAccessType GetAccessType() => ExpressionAccessType.None;
 
-    public virtual IType Type() => this.TryGetFcsType();
+    public virtual IType Type() => this.GetExpressionTypeFromFcs();
 
     public IExpressionType GetExpressionType() => Type();
     public IType GetImplicitlyConvertedTo() => Type();

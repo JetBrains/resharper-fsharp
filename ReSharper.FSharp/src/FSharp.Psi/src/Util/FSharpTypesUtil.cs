@@ -222,23 +222,26 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       return ParameterKind.VALUE;
     }
 
-    [NotNull]
-    public static IType TryGetFcsType([NotNull] this IFSharpTreeNode fsTreeNode)
+    [CanBeNull]
+    public static FSharpType TryGetFcsType([NotNull] this IFSharpTreeNode fsTreeNode)
     {
       var checkResults = fsTreeNode.FSharpFile.GetParseAndCheckResults(true, "TryGetFcsType")?.Value?.CheckResults;
-      if (checkResults == null)
-        return TypeFactory.CreateUnknownType(fsTreeNode.GetPsiModule());
+      if (checkResults == null) return null;
 
       var sourceFile = fsTreeNode.GetSourceFile();
-      if (sourceFile == null)
-        return TypeFactory.CreateUnknownType(fsTreeNode.GetPsiModule());
+      if (sourceFile == null) return null;
 
       var range = fsTreeNode.GetDocumentRange().ToDocumentRange(sourceFile.GetLocation());
-      var fcsType = checkResults.GetTypeOfExpression(range)?.Value;
-      return fcsType != null
-        ? fcsType.MapType(fsTreeNode)
-        : TypeFactory.CreateUnknownType(fsTreeNode.GetPsiModule());
+      return checkResults.GetTypeOfExpression(range)?.Value;
     }
 
+    [NotNull]
+    public static IType GetExpressionTypeFromFcs([NotNull] this IFSharpTreeNode fsTreeNode)
+    {
+      var fsharpType = TryGetFcsType(fsTreeNode);
+      return fsharpType != null
+        ? fsharpType.MapType(fsTreeNode)
+        : TypeFactory.CreateUnknownType(fsTreeNode.GetPsiModule());
+    }
   }
 }

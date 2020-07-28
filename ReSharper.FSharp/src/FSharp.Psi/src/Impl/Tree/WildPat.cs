@@ -14,7 +14,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public bool IsDeclaration => true;
     public IEnumerable<IDeclaration> Declarations => new[] {this};
 
-    public override IType GetPatternType() => this.TryGetFcsType();
+    public override IType GetPatternType() => this.GetExpressionTypeFromFcs();
     public override IType Type => GetPatternType();
 
     public override TreeTextRange GetNameRange() => this.GetTreeTextRange();
