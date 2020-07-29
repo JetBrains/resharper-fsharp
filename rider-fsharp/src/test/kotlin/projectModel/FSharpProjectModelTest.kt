@@ -12,7 +12,7 @@ import com.jetbrains.rider.test.scriptingApi.pasteItem
 import com.jetbrains.rider.test.scriptingApi.renameItem
 import org.testng.annotations.Test
 
-@Test
+@Test(enabled = false)
 class FSharpProjectModelTest : ProjectModelBaseTest() {
     override fun getSolutionDirectoryName() = "EmptySolution"
     override val restoreNuGetPackages: Boolean
@@ -45,7 +45,7 @@ class FSharpProjectModelTest : ProjectModelBaseTest() {
         treeOutput.append(fcsHost.dumpSingleProjectMapping.sync(Unit))
     }
 
-    @Test
+    @Test(enabled = false)
     @TestEnvironment(solution = "FSharpProjectTree", toolset = ToolsetVersion.TOOLSET_16_CORE)
     fun testFSharpProjectStructure() {
         doTestDumpProjectsView {
