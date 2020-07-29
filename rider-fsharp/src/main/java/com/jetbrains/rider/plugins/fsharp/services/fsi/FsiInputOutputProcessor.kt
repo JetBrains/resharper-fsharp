@@ -26,9 +26,8 @@ class FsiInputOutputProcessor(private val fsiRunner: FsiConsoleRunner) {
         return Pair(startOffset, endOffset)
     }
 
-    private fun fsiIconWithTooltipOnOutputText(outputType: ConsoleViewContentType) : IconWithTooltip? {
-        if (nextOutputTextIsFirst)
-        {
+    private fun fsiIconWithTooltipOnOutputText(outputType: ConsoleViewContentType): IconWithTooltip? {
+        if (nextOutputTextIsFirst) {
             when (outputType) {
                 ConsoleViewContentType.NORMAL_OUTPUT -> return FsiIcons.RESULT
                 ConsoleViewContentType.ERROR_OUTPUT -> return FsiIcons.ERROR
@@ -48,8 +47,7 @@ class FsiInputOutputProcessor(private val fsiRunner: FsiConsoleRunner) {
     fun printOutputText(text: String, outputType: ConsoleViewContentType) {
         if (isInitialText) {
             printOutputInitialText(text, outputType)
-        }
-        else {
+        } else {
             val fsiResultIconWithTooltip = fsiIconWithTooltipOnOutputText(outputType)
 
             when (outputType) {
@@ -63,30 +61,31 @@ class FsiInputOutputProcessor(private val fsiRunner: FsiConsoleRunner) {
         }
     }
 
-    private fun printText(text: String, iconWithTooltip: IconWithTooltip?, highlighter: FSharpSyntaxHighlighter?, outputType: ConsoleViewContentType)
-                = WriteCommandAction.runWriteCommandAction(fsiRunner.project) {
-        val (startOffset, endOffset) = textOffsets(text)
+    private fun printText(text: String, iconWithTooltip: IconWithTooltip?, highlighter: FSharpSyntaxHighlighter?,
+                          outputType: ConsoleViewContentType) =
+            WriteCommandAction.runWriteCommandAction(fsiRunner.project) {
+                val (startOffset, endOffset) = textOffsets(text)
 
-        if (highlighter == null) {
-            fsiRunner.consoleView.print(text, outputType)
-        }
-        else {
-            ConsoleViewUtil.printWithHighlighting(fsiRunner.consoleView, text, highlighter)
-        }
+                if (highlighter == null) {
+                    fsiRunner.consoleView.print(text, outputType)
+                } else {
+                    ConsoleViewUtil.printWithHighlighting(fsiRunner.consoleView, text, highlighter)
+                }
 
-        (fsiRunner.consoleView as LanguageConsoleImpl).flushDeferredText()
+                (fsiRunner.consoleView as LanguageConsoleImpl).flushDeferredText()
 
-        if (iconWithTooltip == null) return@runWriteCommandAction
+                if (iconWithTooltip == null) return@runWriteCommandAction
 
-        fsiRunner.consoleView.historyViewer.markupModel.addRangeHighlighter(
-                startOffset, endOffset, HighlighterLayer.LAST, null, HighlighterTargetArea.LINES_IN_RANGE
-        ).apply { gutterIconRenderer = FsiConsoleIndicatorRenderer(iconWithTooltip) }
-    }
+                fsiRunner.consoleView.historyViewer.markupModel.addRangeHighlighter(
+                        startOffset, endOffset, HighlighterLayer.LAST, null, HighlighterTargetArea.LINES_IN_RANGE
+                ).apply { gutterIconRenderer = FsiConsoleIndicatorRenderer(iconWithTooltip) }
+            }
 
-    private fun printOutputInitialText(text: String, outputType: ConsoleViewContentType)  = WriteCommandAction.runWriteCommandAction(fsiRunner.project){
-        fsiRunner.consoleView.print(text, outputType)
-    }
-    
+    private fun printOutputInitialText(text: String, outputType: ConsoleViewContentType) =
+            WriteCommandAction.runWriteCommandAction(fsiRunner.project) {
+                fsiRunner.consoleView.print(text, outputType)
+            }
+
     fun onServerPrompt() {
         isInitialText = false
     }
