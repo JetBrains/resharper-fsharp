@@ -14,6 +14,7 @@ import com.jetbrains.rd.platform.util.application
 import com.jetbrains.rd.util.lifetime.Lifetime
 import com.jetbrains.rd.util.lifetime.LifetimeDefinition
 import com.jetbrains.rdclient.lang.toRdLanguageOrThrow
+import com.jetbrains.rdclient.util.idea.LifetimedProjectComponent
 import com.jetbrains.rdclient.util.idea.fromOffset
 import com.jetbrains.rider.editors.RiderTextControlHost
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptLanguage
@@ -21,10 +22,10 @@ import com.jetbrains.rider.model.*
 import com.jetbrains.rider.projectView.solution
 import org.jetbrains.concurrency.AsyncPromise
 
-class FsiSandboxInfoUpdater(
-        private val project: Project, private val consoleEditor: EditorEx, private val history: CommandHistory) {
+class FsiSandboxInfoUpdater(project: Project, private val consoleEditor: EditorEx, private val history: CommandHistory)
+    : LifetimedProjectComponent(project) {
 
-    private val rdFsiTools = project.solution.rdFSharpModel.fSharpInteractiveHost.fsiTools;
+    private val rdFsiTools = project.solution.rdFSharpModel.fSharpInteractiveHost.fsiTools
 
     private val lockObject = Object()
 
@@ -55,7 +56,7 @@ class FsiSandboxInfoUpdater(
                 if (processLifetime == null) return@invokeLater
 
                 val result = AsyncPromise<List<String>>()
-                rdFsiTools.prepareCommands.start(RdFsiPrepareCommandsArgs(startUnpreparedCommandIndex, unpreparedCommands)).result.advise(processLifetime!!) {
+                rdFsiTools.prepareCommands.start(componentLifetime, RdFsiPrepareCommandsArgs(startUnpreparedCommandIndex, unpreparedCommands)).result.advise(processLifetime!!) {
                     result.setResult(it.unwrap())
                 }
 
@@ -63,7 +64,7 @@ class FsiSandboxInfoUpdater(
                     preparedCommands.addAll(preparedAdditionalCommands)
 
                     val sandboxText = preparedCommands.joinToString("\n").replace("\r\n", "\n") + "\ndo ()\n\n"
-                    val sandboxInfo = createFSharpSandbox (sandboxText, false, emptyList())
+                    val sandboxInfo = createFSharpSandbox(sandboxText, false, emptyList())
 
                     sandboxManager.markAsSandbox(consoleEditor, sandboxInfo)
                     FrontendTextControlHost.getInstance(project).rebindEditor(consoleEditor)
