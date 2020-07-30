@@ -10,6 +10,7 @@ using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Checker;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Caches;
+using JetBrains.ReSharper.Psi.Files.SandboxFiles;
 using JetBrains.ReSharper.Psi.Modules;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
@@ -173,7 +174,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     private IFSharpModuleResolvedSymbols GetModuleResolvedSymbols(IPsiSourceFile sourceFile)
     {
       var psiModule = sourceFile.PsiModule;
-      if (psiModule.IsMiscFilesProjectModule())
+      if (psiModule.IsMiscFilesProjectModule() && !(psiModule is SandboxPsiModule))
         return FSharpMiscModuleResolvedSymbols.Instance;
 
       lock (myLock)

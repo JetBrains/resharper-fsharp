@@ -3,6 +3,7 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Util.OpensUtil
 
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
+open JetBrains.ReSharper.Host.Features.Documents
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -11,6 +12,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Files.SandboxFiles
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
@@ -136,6 +138,15 @@ let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBo
     let moduleDecl = findModuleToInsert fsFile offset settings
     match tryGetFirstOpensGroup moduleDecl with
     | Some opens -> addOpenToOpensGroup opens
+    | _ ->
+
+    match moduleDecl with
+    | :? IAnonModuleDeclaration when (fsFile.GetPsiModule() :? SandboxPsiModule) ->
+        moduleDecl.MembersEnumerable
+        |> Seq.skipWhile (fun m -> not (m :? IDo))
+        |> Seq.tail
+        |> Seq.tryHead
+        |> Option.iter insertBeforeModuleMember
     | _ ->
 
     match Seq.tryHead moduleDecl.MembersEnumerable with

@@ -18,6 +18,7 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Files
+open JetBrains.ReSharper.Psi.Files.SandboxFiles
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.Threading
 open JetBrains.Util
@@ -178,7 +179,7 @@ type FcsProjectProvider
             | Some fcsProject when fcsProject.IsKnownFile(sourceFile) -> Some fcsProject.ProjectOptions
             | _ -> None
 
-        elif psiModule :? FSharpScriptPsiModule then
+        elif psiModule :? FSharpScriptPsiModule || psiModule :? SandboxPsiModule then
             scriptFcsProjectProvider.GetScriptOptions(sourceFile)
 
         else

@@ -162,7 +162,7 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
             ToolWindowManager.getInstance(project).getToolWindow(executor.id)?.show(null)
 
             val stream = processHandler.processInput ?: error("Broken Fsi stream")
-            if(!StringUtil.isEmptyOrSpaces(visibleText)) {
+            if (!StringUtil.isEmptyOrSpaces(visibleText)) {
                 stream.write(fsiText.toByteArray(Charsets.UTF_8))
                 stream.flush()
             }
@@ -214,6 +214,8 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
         return object : ProcessBackedConsoleExecuteActionHandler(processHandler, false) {
             override fun runExecuteAction(consoleView: LanguageConsoleView) {
                 val visibleText = consoleView.consoleEditor.document.text
+                if (visibleText.isBlank()) return
+
                 val fsiText = "\n$visibleText\n# 1 \"stdin\"\n;;\n"
                 sendText(visibleText, fsiText, false)
                 consoleView.setInputText("")
@@ -244,7 +246,7 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
         setupGutters()
     }
 
-    private fun setupGutters(){
+    private fun setupGutters() {
         val historyEditor = consoleView.historyViewer
         historyEditor.settings.isLineMarkerAreaShown = true
         historyEditor.settings.isFoldingOutlineShown = true
@@ -254,9 +256,9 @@ class FsiConsoleRunner(sessionInfo: RdFsiSessionInfo, val fsiHost: FsiHost, debu
     }
 
     override fun createConsoleView(): LanguageConsoleView {
-        var createdConsoleView : LanguageConsoleView? = null
+        var createdConsoleView: LanguageConsoleView? = null
 
-        withGenericSandBoxing(genericFSharpSandboxInfoWithCustomParams("", false, emptyList()), project) {
+        withGenericSandBoxing(createFSharpSandbox("do ()\n\n", false, emptyList()), project) {
             val consoleView = LanguageConsoleBuilder().gutterContentProvider(inputSeparatorGutterContentProvider).build(project, FSharpScriptLanguage)
 
             val consoleEditorBorder = BorderFactory.createMatteBorder(
