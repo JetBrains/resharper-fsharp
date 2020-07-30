@@ -216,7 +216,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       var symbolTable = symbolTableCache.TryGetCachedSymbolTable(fsTypeElement, SymbolTableMode.FULL);
       if (symbolTable != null)
       {
-        var members = symbolTable.GetSymbolInfos(name).Select(info =>
+        var members = symbolTable.GetSymbolInfos(name).SelectNotNull(info =>
           info.GetDeclaredElement() is ITypeMember member && member.ShortName == name ? member : null);
         return ChooseTypeMember(mfv, members.AsList());
       }
@@ -267,7 +267,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 
     [CanBeNull]
     private static IDeclaredElement ChooseTypeMember(FSharpMemberOrFunctionOrValue mfv,
-      List<ITypeMember> members)
+      [NotNull] IReadOnlyList<ITypeMember> members)
     {
       switch (members.Count)
       {
