@@ -145,6 +145,7 @@ type TestFcsProjectProvider
             | true, index -> index
             | _ -> -1
 
+        member x.InvalidateDirty() = ()
         member x.ModuleInvalidated = new Signal<_>("Todo") :> _
 
         member x.InvalidateReferencesToProject _ = false

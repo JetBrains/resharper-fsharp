@@ -177,6 +177,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       if (psiModule.IsMiscFilesProjectModule() && !(psiModule is SandboxPsiModule))
         return FSharpMiscModuleResolvedSymbols.Instance;
 
+      FcsProjectProvider.InvalidateDirty();
+
       lock (myLock)
       {
         if (HasDirtyFiles)

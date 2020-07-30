@@ -11,6 +11,8 @@ open JetBrains.ProjectModel
 open JetBrains.ProjectModel.Build
 open JetBrains.ProjectModel.Tasks
 open JetBrains.ReSharper.Feature.Services.Daemon
+open JetBrains.ReSharper.Plugins.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectItems.ItemsContainer
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
@@ -82,12 +84,12 @@ type FcsProjectProvider
         fcsProjects.Remove(psiModule) |> ignore
         dirtyModules.Remove(psiModule) |> ignore
 
-//        if not (psiModule.IsValid()) then // todo: keep change type in dirtyModules?
-//            solution.GetComponent<FSharpItemsContainer>().RemoveProject(project)
+        if not (psiModule.IsValid()) then
+            let project = psiModule.ContainingProjectModule.As<IProject>()
+            if isNotNull project then
+                solution.GetComponent<FSharpItemsContainer>().RemoveProject(project)
 
         // todo: remove removed psiModules? (don't we remove them anyway?) (standalone projects only?)
-        // todo: invalidate resolved symbol cache
-        // todo: invalidate fcsProjects on request from resolved symbols cache
         logger.Trace("Done invalidating project: {0}", psiModule)
 
     let processDirtyFcsProjects () =
@@ -161,8 +163,11 @@ type FcsProjectProvider
     let getOrCreateFcsProjectForFile (sourceFile: IPsiSourceFile) =
         getOrCreateFcsProject sourceFile.PsiModule
 
+    let isMiscModule (psiModule: IPsiModule) =
+        psiModule.IsMiscFilesProjectModule()
+
     let isScriptLike file =
-        fsFileService.IsScriptLike(file) || file.PsiModule.IsMiscFilesProjectModule() || isNull (file.GetProject())        
+        fsFileService.IsScriptLike(file) || isMiscModule file.PsiModule || isNull (file.GetProject())        
 
     let getParsingOptionsForSingleFile ([<NotNull>] sourceFile: IPsiSourceFile) isScript =
         { FSharpParsingOptions.Default with
@@ -174,7 +179,7 @@ type FcsProjectProvider
         let psiModule = sourceFile.PsiModule
 
         // Scripts belong to separate psi modules even when are in projects, project/misc module check is enough.
-        if isProjectModule psiModule && not (psiModule.IsMiscFilesProjectModule()) then
+        if isProjectModule psiModule && not (isMiscModule psiModule) then
             match getOrCreateFcsProject psiModule with
             | Some fcsProject when fcsProject.IsKnownFile(sourceFile) -> Some fcsProject.ProjectOptions
             | _ -> None
@@ -200,12 +205,24 @@ type FcsProjectProvider
         for moduleChange in change.ModuleChanges do
             // todo: ignore `PsiModuleChange.ChangeType.Invalidated`?
             if moduleChange.Type <> PsiModuleChange.ChangeType.Added then
-                dirtyModules.Add(moduleChange.Item) |> ignore
+                let psiModule = moduleChange.Item
+                if isMiscModule psiModule then () else
+
+                logger.Trace("Module change: type: {0}, module: {1}", moduleChange.Type, psiModule)
+                dirtyModules.Add(psiModule) |> ignore
 
         for fileChange in change.FileChanges do
             let changeType = fileChange.Type
-            if changeType = PsiModuleChange.ChangeType.Added || changeType = PsiModuleChange.ChangeType.Removed then
-                let psiModule = fileChange.Item.PsiModule
+            if changeType <> PsiModuleChange.ChangeType.Invalidated then
+                let sourceFile = fileChange.Item
+                let projectFileType = sourceFile.LanguageType
+                if not (projectFileType.Is<FSharpProjectFileType>()) then () else
+
+                // todo: make it possible to distinguish fsi sandbox files from sandbox in diffs 
+                let psiModule = sourceFile.PsiModule
+                if isMiscModule psiModule && not (projectFileType.Is<FSharpScriptProjectFileType>()) then () else
+
+                logger.Trace("File change: type {0}, name: {1}, module: {2}", changeType, sourceFile.Name, psiModule)
                 dirtyModules.Add(psiModule) |> ignore
 
     interface IFcsProjectProvider with
@@ -260,6 +277,8 @@ type FcsProjectProvider
 
         member x.HasFcsProjects = not (fcsProjects.IsEmpty())
 
+        member x.InvalidateDirty() =
+            processDirtyFcsProjects ()
 
 /// Invalidates psi caches when a non-F# project is built and FCS cached resolve results become stale
 [<SolutionComponent>]

@@ -173,6 +173,7 @@ type IFcsProjectProvider =
     /// Returns True when the project has been invalidated.
     abstract InvalidateReferencesToProject: IProject -> bool
 
+    abstract InvalidateDirty: unit -> unit
     abstract ModuleInvalidated: ISignal<IPsiModule>
 
     /// True when any F# projects are currently known to project options provider after requesting info from FCS.
