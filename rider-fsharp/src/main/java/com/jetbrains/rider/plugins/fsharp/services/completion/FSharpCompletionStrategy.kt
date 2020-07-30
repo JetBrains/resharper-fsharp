@@ -8,8 +8,6 @@ import com.jetbrains.rdclient.completion.ICompletionSessionStrategy
 
 class FSharpCompletionStrategy : ICompletionSessionStrategy {
     override fun shouldForbidCompletion(editor: Editor, type: CompletionType) = editor.selectionModel.hasSelection()
-
     override fun shouldRescheduleCompletion(prefix: String, psiFile: PsiFile, char: Char?, offset: Int) =
-            prefix.isEmpty() ||
-                    CompletionSessionHeuristics.getInstance(psiFile.project).shouldRescheduleDefaultStrategy(char)
+            prefix.isEmpty()
 }
