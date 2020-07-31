@@ -9,7 +9,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
-open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
+open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
 open JetBrains.ReSharper.Resources.Shell
 open NUnit.Framework
@@ -64,8 +64,8 @@ type FSharpElementFactoryTest() =
         x.DoTest(fun elementFactory ->
             use readCookie = ReadLockCookie.Create()
             let compositeTypeUsage =
-                ["string"; "int"]
-                |> List.map elementFactory.CreateTypeUsage
+                [|"string"; "int"|]
+                |> Array.map elementFactory.CreateTypeUsage
                 |> elementFactory.CreateTypeUsage
             let tupleType = compositeTypeUsage.As<ITupleTypeUsage>()
             Assert.NotNull(tupleType)

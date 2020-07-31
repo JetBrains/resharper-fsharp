@@ -6,7 +6,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 {
   public interface IFSharpParser : IParser
   {
-    IFSharpFile ParseFSharpFile();
+    IFSharpFile ParseFSharpFile(bool noCache);
     IFSharpExpression ParseExpression(IChameleonExpression chameleonExpression, IDocument document = null);
   }
 }

@@ -2,9 +2,9 @@
 
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.ReSharper.Feature.Services.ContextActions
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
@@ -47,7 +47,7 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
                         |> factory.CreateTypeUsage)
                     |> Seq.toList
                     
-                let typeUsage = factory.CreateTypeUsage(subTypeUsages)
+                let typeUsage = factory.CreateTypeUsage(Array.ofList subTypeUsages)
                 let typedPat = factory.CreateTypedPat(name, typeUsage, spaceBeforeColon)
                 let parenPat = factory.CreateParenPat()
                 parenPat.SetPattern(typedPat) |> ignore

@@ -7,7 +7,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.CodeStyle
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Modules
@@ -29,7 +28,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         let document = createDocument source
         let parser = languageService.CreateParser(document)
 
-        let fsFile = parser.ParseFSharpFile(StandaloneDocument = document)
+        let fsFile = parser.ParseFSharpFile(noCache = true, StandaloneDocument = document)
         SandBox.CreateSandBoxFor(fsFile, psiModule)
         fsFile
 
@@ -59,11 +58,6 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         let newExpr = getExpression source
         newExpr.As<IParenExpr>().InnerExpression.As<ILetOrUseExpr>()
 
-    let createParenExpr (expr: IFSharpExpression) =
-        let parenExpr = getExpression "(())" :?> IParenExpr
-        ModificationUtil.ReplaceChild(parenExpr.InnerExpression, expr.Copy()) |> ignore
-        parenExpr
-    
     let createAttributeList attrName: IAttributeList =
             let source = sprintf "[<%s>] ()" attrName
             let doDecl = getDoDecl source
@@ -107,7 +101,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
             binaryAppExpr
 
-        member x.CreateRecordExprBinding(field, addSemicolon) =
+        member x.CreateRecordFieldBinding(field, addSemicolon) =
             let field = namingService.MangleNameIfNecessary(field)
             let semicolon = if addSemicolon then ";" else ""
 
@@ -116,7 +110,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
             match newExpr.As<IRecordExpr>() with
             | null -> failwith "Could not get record expr"
-            | recordExpr -> recordExpr.ExprBindings.First()
+            | recordExpr -> recordExpr.FieldBindings.First()
 
         member x.CreateAppExpr(funcName, argExpr) =
             let source = sprintf "%s ()" funcName
@@ -124,9 +118,6 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let newArg = newExpr.SetArgumentExpression(argExpr.Copy())
             addParensIfNeeded newArg |> ignore
             newExpr
-
-        member x.CreateAppExpr(addSpace) =
-            createAppExpr addSpace
 
         member x.CreateAppExpr(funExpr, argExpr, addSpace) =
             let appExpr = createAppExpr addSpace
@@ -174,9 +165,6 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         member x.CreateParenExpr() =
             getExpression "(())" :?> _
 
-        member x.CreateParenExpr(expr) =
-            createParenExpr expr
-
         member x.AsReferenceExpr(typeReference: ITypeReferenceName) =
             getExpression (typeReference.GetText()) :?> _
 
@@ -191,7 +179,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
             let forExpr = getExpression "for _ in () do ()" :?> IForEachExpr
 
-            let expr = ModificationUtil.ReplaceChild(forExpr.InClause, expr.Copy())
+            let expr = ModificationUtil.ReplaceChild(forExpr.InExpression, expr.Copy())
             let whitespace = ModificationUtil.ReplaceChild(forExpr.DoExpression.PrevSibling, Whitespace(indent))
             ModificationUtil.AddChildBefore(whitespace, NewLine(expr.GetLineEnding())) |> ignore
 
@@ -239,11 +227,11 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
         member x.CreateTypeUsage(typeUsage: string) : ITypeUsage =
             createTypeUsage typeUsage
             
-        member x.CreateTypeUsage(typeUsages: ITypeUsage list) : ITypeUsage =
+        member x.CreateTypeUsage(typeUsages: ITypeUsage[]) : ITypeUsage =
             let fakeUsages = "()" |> List.replicate typeUsages.Length |> String.concat " * "
             let parentFakeUsage = createTypeUsage fakeUsages
-            
-            let copiedTypeUsages = typeUsages |> List.map(fun x -> x.Copy())
+
+            let copiedTypeUsages = typeUsages |> Array.toList |> List.map(fun x -> x.Copy())
             // If there are multiple type usages, they are combined in a TupleTypeUsage
             let fakeUsageNodes =
                 match parentFakeUsage with
@@ -275,6 +263,17 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
             expr
   
+        member x.CreateExpressionReferenceName(name) =
+            let source = sprintf "let %s = ()" name
+            let letModuleDecl = getModuleMember source :?> ILetModuleDecl
+            letModuleDecl.Bindings.[0].HeadPattern.As<IReferencePat>().ReferenceName
+
+        member x.CreateTypeReferenceName(name) =
+            let source = sprintf "type T = %s" name
+            let typeDeclarationGroup = getModuleMember source :?> ITypeDeclarationGroup
+            let typeAbbreviation = typeDeclarationGroup.TypeDeclarations.[0].As<ITypeAbbreviationDeclaration>()
+            typeAbbreviation.AbbreviatedType.As<INamedTypeUsage>().ReferenceName
+
         member x.CreateEmptyAttributeList() =
             let attributeList = createAttributeList "Foo"
             ModificationUtil.DeleteChild(attributeList.Attributes.[0])

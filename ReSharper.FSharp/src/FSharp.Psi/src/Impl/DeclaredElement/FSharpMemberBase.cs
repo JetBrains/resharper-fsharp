@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
 using JetBrains.Metadata.Reader.API;
@@ -10,7 +9,6 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
-using JetBrains.Util.Logging;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
@@ -24,8 +22,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
     public FSharpMemberOrFunctionOrValue Mfv => Symbol as FSharpMemberOrFunctionOrValue;
 
-    public override bool IsExtensionMember => Mfv?.IsExtensionMember ?? false;
-    public override bool IsFSharpMember => Mfv?.IsMember ?? false;
+    public override bool IsExtensionMember =>
+      GetContainingType() is IFSharpModule && GetDeclaration() is IMemberDeclaration;
 
     protected override ITypeElement GetTypeElement(IDeclaration declaration)
     {
@@ -60,16 +58,16 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       if (IsExplicitImplementation)
         return AccessRights.PRIVATE;
 
-      var mfv = Mfv;
-      if (mfv == null)
-        return AccessRights.NONE;
-
       // Workaround to hide extension methods from resolve in C#.
       // todo: calc compiled names for extension members (it'll hide needed ones properly)
       // todo: implement F# declared element presenter to hide compiled names in features/ui
-      if (mfv.IsExtensionMember && GetDeclaration() is IMemberDeclaration memberDeclaration)
-        if (!memberDeclaration.Attributes.GetCompiledName(out _))
+      if (IsExtensionMember && GetDeclaration() is IMemberDeclaration memberDeclaration)
+        if (!(this is IMethod && memberDeclaration.Attributes.GetCompiledName(out _)))
           return AccessRights.INTERNAL;
+
+      var mfv = Mfv;
+      if (mfv == null)
+        return AccessRights.NONE;
 
       var accessibility = mfv.Accessibility;
       if (accessibility.IsInternal)
@@ -84,8 +82,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public bool CanBeImplicitImplementation => false;
 
     public bool IsExplicitImplementation =>
-      GetDeclaration() is IMemberDeclaration member && member.IsExplicitImplementation ||
-      (SymbolUse?.IsFromDispatchSlotImplementation ?? false) && (Mfv?.DeclaringEntity?.Value.IsInterface ?? false);
+      GetDeclaration() is IMemberDeclaration member && member.IsExplicitImplementation;
 
     public IList<IExplicitImplementation> ExplicitImplementations
     {
@@ -96,27 +93,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
           return EmptyList<IExplicitImplementation>.Instance;
 
         if (GetDeclaration() is IMemberDeclaration member && ObjExprNavigator.GetByMember(member) != null)
-        {
-          return mfv.DeclaringEntity?.Value is FSharpEntity entity && entity.GetTypeElement(Module) is ITypeElement typeElement
+          return mfv.DeclaringEntity?.Value is { } entity && entity.GetTypeElement(Module) is { } typeElement
             ? new IExplicitImplementation[]
               {new ExplicitImplementation(this, TypeFactory.CreateType(typeElement), ShortName, true)}
             : EmptyList<IExplicitImplementation>.InstanceList;
-        }
 
         var implementations = mfv.ImplementedAbstractSignatures;
-        if (implementations == null || implementations.IsEmpty())
+        if (implementations.IsNullOrEmpty())
           return EmptyList<IExplicitImplementation>.Instance;
 
-        if (implementations.Count > 1)
-          Logger.GetLogger<FSharpMemberBase<TDeclaration>>().Warn("Multiple explicit implementations for {0}", this);
+        var result = new LocalList<IExplicitImplementation>();
+        foreach (var impl in implementations)
+          if (GetType(impl.DeclaringType) is IDeclaredType type)
+            result.Add(new ExplicitImplementation(this, type, ShortName, true));
 
-        var impl = implementations.FirstOrDefault();
-        if (impl == null)
-          return EmptyList<IExplicitImplementation>.Instance;
-
-        return GetType(impl.DeclaringType) is IDeclaredType type
-          ? new IExplicitImplementation[] {new ExplicitImplementation(this, type, ShortName, true)}
-          : EmptyList<IExplicitImplementation>.InstanceList;
+        return result.ResultingList();
       }
     }
 

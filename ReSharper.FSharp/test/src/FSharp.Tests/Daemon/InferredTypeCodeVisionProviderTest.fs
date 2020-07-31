@@ -17,3 +17,5 @@ type InferredTypeCodeVisionProviderTest() =
 
     [<Test>] member x.``Object expression 01``() = x.DoNamedTest()
     [<Test>] member x.``Tuple param``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Top binding head pattern with parens``() = x.DoNamedTest()

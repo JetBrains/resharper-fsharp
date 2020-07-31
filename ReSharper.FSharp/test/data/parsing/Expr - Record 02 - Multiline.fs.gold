@@ -6,24 +6,25 @@ IFSharpImplFile
         IRecordExpr
           FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IRecordExprBinding
-            IExpressionReferenceName
-              FSharpIdentifierToken(type:IDENTIFIER, text:A)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            ILiteralExpr
-              FSharpToken(type:INT32, text:1)
+          IRecordFieldBindingList
+            IRecordFieldBinding
+              IExpressionReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:A)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              ILiteralExpr
+                FSharpToken(type:INT32, text:1)
             NewLine(type:NEW_LINE, text:\n) spaces:"\n"
             Whitespace(type:WHITE_SPACE, text:  ) spaces:"  "
-          IRecordExprBinding
-            IExpressionReferenceName
-              FSharpIdentifierToken(type:IDENTIFIER, text:B)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            ILiteralExpr
-              FSharpToken(type:INT32, text:2)
+            IRecordFieldBinding
+              IExpressionReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:B)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              ILiteralExpr
+                FSharpToken(type:INT32, text:2)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+RbraceTokenElement(type:RBRACE, text:})
   NewLine(type:NEW_LINE, text:\n) spaces:"\n"

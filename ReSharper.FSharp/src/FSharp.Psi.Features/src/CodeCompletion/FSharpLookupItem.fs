@@ -7,6 +7,7 @@ open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Feature.Services.ParameterInfo
 open JetBrains.ReSharper.Host.Features.Completion
 open JetBrains.ReSharper.Plugins.FSharp
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion

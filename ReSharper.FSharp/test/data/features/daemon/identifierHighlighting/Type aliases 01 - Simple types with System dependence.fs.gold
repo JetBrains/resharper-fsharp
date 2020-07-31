@@ -1,0 +1,29 @@
+﻿open |System|(0)
+
+type |SimpleRecord|(1) = { |Value|(2) : |int|(3) }
+type |SimpleDU|(4) = |Value|(5) of |int|(6)
+
+type |DUDummy|(7) = |SimpleDU|(8)
+type |RecordDummy|(9) = |SimpleRecord|(10)
+type |StructDummy|(11) = |Int32|(12)
+type |InterfaceDummy|(13) = |IDisposable|(14)
+type |ObjectDummy|(15) = |Object|(16)
+
+---------------------------------------------------------
+(0): ReSharper F# Namespace Identifier: 
+(1): ReSharper F# Record Identifier: 
+(2): ReSharper F# Field Identifier: 
+(3): ReSharper F# Struct Identifier: 
+(4): ReSharper F# Union Identifier: 
+(5): ReSharper F# Union Case Identifier: 
+(6): ReSharper F# Struct Identifier: 
+(7): ReSharper F# Union Identifier: 
+(8): ReSharper F# Union Identifier: 
+(9): ReSharper F# Record Identifier: 
+(10): ReSharper F# Record Identifier: 
+(11): ReSharper F# Struct Identifier: 
+(12): ReSharper F# Struct Identifier: 
+(13): ReSharper F# Interface Identifier: 
+(14): ReSharper F# Interface Identifier: 
+(15): ReSharper F# Class Identifier: 
+(16): ReSharper F# Class Identifier: 

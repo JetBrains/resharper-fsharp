@@ -3,7 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Debugger
 open JetBrains.ReSharper.Feature.Services.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Services.Debugger
-open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
+open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 

@@ -1179,4 +1179,9 @@ class FSharpLexerTest : LexerTestCase() {
                 """.trimMargin()
         )
     }
+
+    @Test
+    fun testCharQuote() {
+        doTest("'''", "CHARACTER_LITERAL (''''')")
+    }
 }

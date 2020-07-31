@@ -1,9 +1,9 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util.PsiUtil
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
@@ -23,14 +23,20 @@ type ReplaceWithWildPatFix(pat: INamedPat) =
     override x.IsAvailable _ =
         isValid pat &&
 
-        if pat.IgnoreParentParens().Parent :? IAttribPat then false else
+        let pat = pat.IgnoreParentParens()
+        if isNotNull (AttribPatNavigator.GetByPattern(pat)) then false else
+
+        let typedPat = TypedPatNavigator.GetByPattern(pat).IgnoreParentParens()
+        if isNotNull (AttribPatNavigator.GetByPattern(typedPat)) then false else
 
         let node = skipIntermediatePatParents pat |> getParent
         node :? IBinding ||
         node :? IMatchClause ||
-        node :? IMemberParamDeclaration && node.Parent :? IMemberDeclaration // todo: check this check
+        node :? ILambdaExpr ||
+        node :? IMemberParamsDeclaration &&
+                (node.Parent :? IMemberDeclaration || node.Parent :? IMemberConstructorDeclaration)
 
     override x.ExecutePsiTransaction _ =
         use writeLock = WriteLockCookie.Create(pat.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
-        replace pat (pat.FSharpLanguageService.CreateElementFactory(pat.GetPsiModule()).CreateWildPat())
+        replace pat (pat.GetFSharpLanguageService().CreateElementFactory(pat.GetPsiModule()).CreateWildPat())

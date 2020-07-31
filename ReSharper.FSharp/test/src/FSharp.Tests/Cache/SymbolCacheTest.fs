@@ -55,7 +55,7 @@ type SymbolCacheTest() =
 
     [<Test>] member x.``Union 01 - Single case 01 - Fields``() = x.DoNamedTest()
     [<Test>] member x.``Union 02 - Single case 02 - No fields``() = x.DoNamedTest()
-    [<Test; Explicit("Not implemented")>] member x.``Union 03 - Single case 03 - No fields, no bar``() = x.DoNamedTest()
+    [<Test>] member x.``Union 03 - Single case 03 - No fields, no bar``() = x.DoNamedTest()
     [<Test>] member x.``Union 04 - Singletons``() = x.DoNamedTest()
     [<Test>] member x.``Union 05 - Nested types``() = x.DoNamedTest()
     [<Test>] member x.``Union 06 - Mixed cases``() = x.DoNamedTest()

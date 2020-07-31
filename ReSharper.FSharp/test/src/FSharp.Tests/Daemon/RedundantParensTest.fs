@@ -1,15 +1,19 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
-open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
 open JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
+open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
-[<Explicit>]
+[<TestPackages("FSharp.Core")>]
 type RedundantParensTest() =
     inherit FSharpHighlightingTestBase()
 
     override x.RelativeTestDataPath = "features/daemon/redundantParens"
+
+    override x.DoTest(lifetime, project) =
+        use cookie = FSharpRegistryUtil.AllowExperimentalFeaturesCookie.Create()
+        base.DoTest(lifetime, project)
 
     override x.HighlightingPredicate(highlighting, _, _) =
         highlighting :? RedundantParenExprWarning
@@ -37,3 +41,21 @@ type RedundantParensTest() =
 
     [<Test>] member x.``Arg - Low precedence 01``() = x.DoNamedTest()
     [<Test>] member x.``Arg - Low precedence 02 - Member``() = x.DoNamedTest()
+
+    [<Test>] member x.``App - Attribute 01``() = x.DoNamedTest()
+    [<Test>] member x.``App - Attribute 02 - Type function``() = x.DoNamedTest()
+    [<Test>] member x.``App - Attribute 03 - Reference``() = x.DoNamedTest()
+    [<Test>] member x.``App - Attribute 04 - Targets``() = x.DoNamedTest()
+
+    [<Test>] member x.``Let - Local - App - Binary 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Local - App - Binary 02 - Nested``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Local - Literal 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Let - Top - App - Binary 01``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Top - App - Binary 02 - Nested``() = x.DoNamedTest()
+    [<Test>] member x.``Let - Top - Literal 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Required - Inherit 01``() = x.DoNamedTest()
+    [<Test>] member x.``Required - Inherit 02 - Nested``() = x.DoNamedTest()
+    [<Test>] member x.``Required - New expr 01``() = x.DoNamedTest()
+    [<Test>] member x.``Required - Obj expr 01``() = x.DoNamedTest()

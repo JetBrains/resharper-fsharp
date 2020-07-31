@@ -13,8 +13,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
   internal abstract class FSharpFunctionBase<TDeclaration> : FSharpMemberBase<TDeclaration>, IFunction
     where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
-    protected FSharpFunctionBase([NotNull] ITypeMemberDeclaration declaration,
-      [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration)
+    protected FSharpFunctionBase([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {
     }
 
@@ -39,7 +38,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 
         var typeParameters = AllTypeParameters;
         var methodParams = new List<IParameter>(paramsCount);
-        if (isFsExtension)
+        if (isFsExtension && mfv.IsInstanceMember)
         {
           var typeElement = mfv.ApparentEnclosingEntity.GetTypeElement(Module);
 

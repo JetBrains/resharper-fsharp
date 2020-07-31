@@ -15,6 +15,9 @@ type IntroduceVarFix(expr: IFSharpExpression) =
     new (warning: FunctionValueUnexpectedWarning) =
         IntroduceVarFix(warning.Expr)
 
+    new (error: UnitTypeExpectedError) =
+        IntroduceVarFix(error.Expr)
+
     override x.Text = "Introduce 'let' binding"
 
     override x.IsAvailable _ =

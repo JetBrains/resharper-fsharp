@@ -1,0 +1,22 @@
+﻿OutdentBinaryOperators = True
+  NeverOutdentPipeOperators = True
+module Module
+
+let foo = 1
+          |> sprintf "%i"
+          |> String.length
+================
+  NeverOutdentPipeOperators = False
+module Module
+
+let foo = 1
+       |> sprintf "%i"
+       |> String.length
+================
+OutdentBinaryOperators = False
+  unaffected by NeverOutdentPipeOperators
+module Module
+
+let foo = 1
+          |> sprintf "%i"
+          |> String.length

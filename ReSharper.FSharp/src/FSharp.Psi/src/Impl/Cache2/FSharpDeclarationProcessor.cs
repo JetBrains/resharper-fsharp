@@ -40,7 +40,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
         return;
 
       var fileKind = GetFSharpFileKind(fsFile);
-      var hasPairFile = myCheckerService.OptionsProvider.HasPairFile(sourceFile);
+      var hasPairFile = myCheckerService.FcsProjectProvider.HasPairFile(sourceFile);
 
       Builder.CreateProjectFilePart(new FSharpProjectFilePart(sourceFile, fileKind, hasPairFile));
 
@@ -187,7 +187,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
 
       Builder.StartPart(recordPart);
       ProcessTypeMembers(decl.MemberDeclarations);
-      ProcessTypeMembers(decl.Fields);
+      ProcessTypeMembers(decl.FieldDeclarations);
       Builder.EndPart();
     }
 

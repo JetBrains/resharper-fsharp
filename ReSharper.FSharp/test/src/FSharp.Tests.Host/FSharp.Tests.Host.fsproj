@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Include="FcsHost.fs" />
+    <Compile Include="TestFcsHost.fs" />
   </ItemGroup>
 
   <ItemGroup>

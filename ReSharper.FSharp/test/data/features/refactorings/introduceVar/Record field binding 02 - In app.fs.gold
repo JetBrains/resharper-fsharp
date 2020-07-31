@@ -1,0 +1,7 @@
+﻿Suggested names: i
+module Module
+
+type R = { Field: int }
+
+let i = 1
+ignore { Field = i }

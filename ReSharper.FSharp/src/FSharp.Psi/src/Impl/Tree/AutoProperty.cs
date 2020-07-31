@@ -10,10 +10,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
     public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
 
-    protected override IDeclaredElement CreateDeclaredElement()
-    {
-      if (!(GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv)) return null;
+    protected override IDeclaredElement CreateDeclaredElement() =>
+      GetFSharpSymbol() is { } fcsSymbol
+        ? CreateDeclaredElement(fcsSymbol)
+        : null;
 
+    protected override IDeclaredElement CreateDeclaredElement(FSharpSymbol fcsSymbol)
+    {
+      if (!(fcsSymbol is FSharpMemberOrFunctionOrValue mfv)) return null;
       if (mfv.IsProperty)
         return new FSharpProperty<AutoProperty>(this, mfv);
 

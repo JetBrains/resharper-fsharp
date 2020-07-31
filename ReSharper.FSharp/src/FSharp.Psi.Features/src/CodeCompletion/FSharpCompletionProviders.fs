@@ -1,5 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
+open System
+open FSharp.Compiler
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application.Settings
 open JetBrains.Diagnostics
@@ -7,7 +9,6 @@ open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.CodeCompletion
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems
-open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure.LookupItems.Impl
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Settings
 open JetBrains.ReSharper.Feature.Services.Lookup
 open JetBrains.ReSharper.Plugins.FSharp
@@ -19,6 +20,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Files.SandboxFiles
 open JetBrains.Util
 
 type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolved) =
@@ -41,6 +43,15 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
             match fsFile.GetParseAndCheckResults(true, opName) with
             | None -> false
             | Some results ->
+
+            let skipFsiModules =
+                // Workaround for FSI_0123 modules generated in sandboxes 
+                fsFile.Language.Is<FSharpScriptLanguage>() &&
+                fsFile.GetPsiModule() :? SandboxPsiModule
+
+            let isFsiModuleToSkip (item: FSharpDeclarationListItem) =
+                not (Array.isEmpty item.NamespaceToOpen) &&
+                item.Name.StartsWith(PrettyNaming.FsiDynamicModulePrefix, StringComparison.Ordinal)
 
             let checkResults = results.CheckResults
             let parseResults = fsFile.ParseResults
@@ -66,6 +77,8 @@ type FSharpLookupItemsProviderBase(logger: ILogger, getAllSymbols, filterResolve
                     collector.Add(lookupItem)
                 else
                     for item in completionInfo.Items do
+                        if skipFsiModules && isFsiModuleToSkip item then () else
+
                         let lookupItem = FSharpLookupItem(item, context)
                         lookupItem.InitializeRanges(context.Ranges, basicContext)
                         collector.Add(lookupItem)
@@ -95,8 +108,8 @@ type FSharpLookupItemsProvider(logger: ILogger) =
         member x.AddLookupItems(context, collector, _) =
             base.AddLookupItems(context :?> FSharpCodeCompletionContext, collector)
 
-        member x.TransformItems(context, collector, data) = ()
-        member x.DecorateItems(context, collector, data) = ()
+        member x.TransformItems(_, _, _) = ()
+        member x.DecorateItems(_, _, _) = ()
 
         member x.GetLookupFocusBehaviour(_, _) = LookupFocusBehaviour.Soft
         member x.GetAutocompletionBehaviour(_, _) = AutocompletionBehaviour.NoRecommendation
@@ -129,8 +142,8 @@ type FSharpLibraryScopeLookupItemsProvider(logger: ILogger, assemblyContentProvi
         member x.AddLookupItems(context, collector, _) =
             base.AddLookupItems(context :?> FSharpCodeCompletionContext, collector)
 
-        member x.TransformItems(context, collector, data) = ()
-        member x.DecorateItems(context, collector, data) = ()
+        member x.TransformItems(_, _, _) = ()
+        member x.DecorateItems(_, _, _) = ()
 
         member x.GetLookupFocusBehaviour(_, _) = LookupFocusBehaviour.Soft
         member x.GetAutocompletionBehaviour(_, _) = AutocompletionBehaviour.NoRecommendation
@@ -145,7 +158,7 @@ type FSharpLibraryScopeLookupItemsProvider(logger: ILogger, assemblyContentProvi
 type FSharpAutocompletionStrategy() =
     interface IAutomaticCodeCompletionStrategy with
         member x.Language = FSharpLanguage.Instance :> _
-        member x.AcceptsFile(file, textControl) = file :? IFSharpFile
+        member x.AcceptsFile(file, _) = file :? IFSharpFile
 
         member x.AcceptTyping(char, _, _) = char.IsLetterFast() || char = '.'
         member x.ProcessSubsequentTyping(char, _) = char.IsIdentifierPart()

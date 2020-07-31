@@ -1,0 +1,31 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IDo
+      IChameleonExpression
+        IAnonRecordExpr
+          FSharpTokenType+LbraceBarTokenElement(type:LBRACE_BAR, text:{|)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IRecordFieldBindingList
+            IRecordFieldBinding
+              IExpressionReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:F)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              ILiteralExpr
+                FSharpToken(type:INT32, text:123)
+            FSharpTokenType+SemicolonTokenElement(type:SEMICOLON, text:;)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            IRecordFieldBinding
+              IExpressionReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:B)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              ILiteralExpr
+                FSharpToken(type:INT32, text:123)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+BarRbraceTokenElement(type:BAR_RBRACE, text:|})
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

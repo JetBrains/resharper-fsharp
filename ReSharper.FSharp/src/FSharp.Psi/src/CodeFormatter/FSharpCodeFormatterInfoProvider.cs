@@ -6,7 +6,9 @@ using JetBrains.Lifetimes;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Plugins.FSharp.Psi;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Impl.CodeStyle;
@@ -28,6 +30,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
     {
       base.Initialize();
 
+      Indenting();
+      Aligning();
+      Formatting();
+    }
+
+    public override ProjectFileType MainProjectFileType => FSharpProjectFileType.Instance;
+
+    private void Indenting()
+    {
       var bindingAndModuleDeclIndentingRulesParameters = new[]
       {
         ("NestedModuleDeclaration", ElementType.NESTED_MODULE_DECLARATION, NestedModuleDeclaration.MODULE_MEMBER),
@@ -65,8 +76,104 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         ("UnionDeclarationCases", ElementType.UNION_DECLARATION, UnionDeclaration.UNION_REPR),
         ("TypeAbbreviation", ElementType.TYPE_ABBREVIATION_DECLARATION, TypeAbbreviationDeclaration.TYPE_OR_UNION_CASE),
         ("ModuleAbbreviation", ElementType.MODULE_ABBREVIATION, ModuleAbbreviation.TYPE_REFERENCE),
+        ("RecordDeclaration", ElementType.RECORD_DECLARATION, RecordDeclaration.RECORD_REPR),
       };
 
+      bindingAndModuleDeclIndentingRulesParameters
+        .Union(fsExprIndentingRulesParameters)
+        .Union(typeDeclarationIndentingRulesParameters)
+        .ToList()
+        .ForEach(DescribeSimpleIndentingRule);
+
+      Describe<IndentingRule>()
+        .Name("TryWith_WithClauseIndent")
+        .Where(
+          Parent().HasType(ElementType.TRY_WITH_EXPR),
+          Node().HasRole(TryWithExpr.MATCH_CLAUSE))
+        .Switch(
+          settings => settings.IndentOnTryWith,
+          When(true).Return(IndentType.External),
+          When(false).Return(IndentType.None))
+        .Build();
+
+      Describe<IndentingRule>()
+        .Name("PrefixAppExprIndent")
+        .Where(
+          Parent().HasType(ElementType.PREFIX_APP_EXPR),
+          Node()
+            .HasRole(PrefixAppExpr.ARG_EXPR)
+            .Satisfies((node, context) =>
+              !(node is IComputationExpr) ||
+              !node.ContainsLineBreak(context.CodeFormatter)))
+        .Return(IndentType.External)
+        .Build();
+
+      Describe<IndentingRule>()
+        .Name("ElseExprIndent")
+        .Where(
+          Parent().In(ElementType.IF_THEN_ELSE_EXPR, ElementType.ELIF_EXPR),
+          Node()
+            .HasRole(IfThenElseExpr.ELSE_CLAUSE)
+            .Satisfies(IndentElseExpr)
+            .Or()
+            .HasRole(ElifExpr.ELSE_CLAUSE)
+            .Satisfies(IndentElseExpr))
+        .Return(IndentType.External)
+        .Build();
+
+      Describe<IndentingRule>()
+        .Name("MatchClauseExprIndent")
+        .Where(
+          Node().HasRole(MatchClause.EXPR),
+          Parent()
+            .HasType(ElementType.MATCH_CLAUSE)
+            .Satisfies((node, context) =>
+            {
+              if (!(node is IMatchClause matchClause))
+                return false;
+
+              var expr = matchClause.Expression;
+              return !IsLastNodeOfItsType(node, context) ||
+                     !AreAligned(matchClause, expr, context.CodeFormatter);
+            }))
+        .Return(IndentType.External)
+        .Build();
+
+      Describe<IndentingRule>()
+        .Name("MatchClauseWhenExprIndent")
+        .Where(
+          Parent().HasType(ElementType.MATCH_CLAUSE),
+          Node().HasRole(MatchClause.WHEN_EXPR))
+        .Return(IndentType.External, 2)
+        .Build();
+
+      Describe<IndentingRule>()
+        .Name("DoDeclIndent")
+        .Where(
+          Parent()
+            .HasType(ElementType.DO)
+            .Satisfies((node, context) => !((IDo) node).IsImplicit),
+          Node().HasRole(Do.CHAMELEON_EXPR))
+        .Return(IndentType.External)
+        .Build();
+
+      Describe<IndentingRule>()
+        .Name("UnionRepresentationCasesIndent")
+        .Where(
+          Parent()
+            .HasType(ElementType.UNION_REPRESENTATION)
+            .Satisfies((node, context) =>
+            {
+              var modifier = ((IUnionRepresentation) node).AccessModifier;
+              return modifier != null && modifier.HasNewLineAfter(context.CodeFormatter);
+            }),
+          Node().HasRole(UnionRepresentation.UNION_CASE_LIST))
+        .Return(IndentType.External)
+        .Build();
+    }
+
+    private void Aligning()
+    {
       var alignmentRulesParameters = new[]
       {
         ("MatchClauses", ElementType.MATCH_EXPR),
@@ -75,101 +182,87 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
         ("EnumCases", ElementType.ENUM_REPRESENTATION),
         ("SequentialExpr", ElementType.SEQUENTIAL_EXPR),
         ("BinaryExpr", ElementType.BINARY_APP_EXPR),
+        ("RecordDeclaration", ElementType.RECORD_FIELD_DECLARATION_LIST),
+        ("RecordExprBindings", ElementType.RECORD_FIELD_BINDING_LIST),
       };
 
-      lock (this)
-      {
-        bindingAndModuleDeclIndentingRulesParameters
-          .Union(fsExprIndentingRulesParameters)
-          .Union(typeDeclarationIndentingRulesParameters)
-          .ToList()
-          .ForEach(DescribeSimpleIndentingRule);
+      alignmentRulesParameters
+        .ToList()
+        .ForEach(DescribeSimpleAlignmentRule);
 
-        alignmentRulesParameters
-          .ToList()
-          .ForEach(DescribeSimpleAlignmentRule);
+      Describe<IndentingRule>()
+        .Name("OutdentBinaryOperators")
+        .Where(
+          GrandParent().HasType(ElementType.BINARY_APP_EXPR),
+          Parent().HasRole(BinaryAppExpr.OP_REF_EXPR),
+          Node().Satisfies((node, context) => !IsPipeOperator(node)))
+        .Switch(settings => settings.OutdentBinaryOperators,
+          When(true).Return(IndentType.Outdent | IndentType.External))
+        .Build();
 
-        Describe<IndentingRule>()
-          .Name("TryWith_WithClauseIndent")
-          .Where(
-            Parent().HasType(ElementType.TRY_WITH_EXPR),
-            Node().HasRole(TryWithExpr.CLAUSE))
-          .Switch(
-            settings => settings.IndentOnTryWith,
-            When(true).Return(IndentType.External),
-            When(false).Return(IndentType.None))
-          .Build();
-
-        Describe<IndentingRule>()
-          .Name("PrefixAppExprIndent")
-          .Where(
-            Parent().HasType(ElementType.PREFIX_APP_EXPR),
-            Node()
-              .HasRole(PrefixAppExpr.ARG_EXPR)
-              .Satisfies((node, context) =>
-                !(node is IComputationLikeExpr) ||
-                !node.ContainsLineBreak(context.CodeFormatter)))
-          .Return(IndentType.External)
-          .Build();
-
-        Describe<IndentingRule>()
-          .Name("ElseExprIndent")
-          .Where(
-            Parent().In(ElementType.IF_THEN_ELSE_EXPR, ElementType.ELIF_EXPR),
-            Node()
-              .HasRole(IfThenElseExpr.ELSE_CLAUSE)
-              .Satisfies(IndentElseExpr)
-              .Or()
-              .HasRole(ElifExpr.ELSE_CLAUSE)
-              .Satisfies(IndentElseExpr))
-          .Return(IndentType.External)
-          .Build();
-
-        Describe<IndentingRule>()
-          .Name("MatchClauseExprIndent")
-          .Where(
-            Node().HasRole(MatchClause.EXPR),
-            Parent()
-              .HasType(ElementType.MATCH_CLAUSE)
-              .Satisfies((node, context) =>
-              {
-                if (!(node is IMatchClause matchClause))
-                  return false;
-
-                var expr = matchClause.Expression;
-                return !IsLastNodeOfItsType(node, context) ||
-                       !AreAligned(matchClause, expr, context.CodeFormatter);
-              }))
-          .Return(IndentType.External)
-          .Build();
-
-        Describe<IndentingRule>()
-          .Name("DoDeclIndent")
-          .Where(
-            Parent()
-              .HasType(ElementType.DO)
-              .Satisfies((node, context) => !((IDo) node).IsImplicit),
-            Node().HasRole(Do.CHAMELEON_EXPR))
-          .Return(IndentType.External)
-          .Build();
-
-        Describe<IndentingRule>()
-          .Name("UnionRepresentationCasesIndent")
-          .Where(
-            Parent()
-              .HasType(ElementType.UNION_REPRESENTATION)
-              .Satisfies((node, context) =>
-              {
-                var modifier = ((IUnionRepresentation) node).AccessModifier;
-                return modifier != null && modifier.HasNewLineAfter(context.CodeFormatter);
-              }),
-            Node().HasRole(UnionRepresentation.UNION_CASE_LIST))
-          .Return(IndentType.External)
-          .Build();
-      }
+      Describe<IndentingRule>()
+        .Name("OutdentPipeOperators")
+        .Where(
+          GrandParent().HasType(ElementType.BINARY_APP_EXPR),
+          Parent().HasRole(BinaryAppExpr.OP_REF_EXPR),
+          Node().Satisfies((node, context) => IsPipeOperator(node)))
+        .Switch(settings => settings.OutdentBinaryOperators,
+          When(true).Switch(settings => settings.NeverOutdentPipeOperators,
+            When(false).Return(IndentType.Outdent | IndentType.External)))
+        .Build();
     }
 
-    public override ProjectFileType MainProjectFileType => FSharpProjectFileType.Instance;
+    private void Formatting()
+    {
+      Describe<FormattingRule>()
+        .Group(SpaceRuleGroup)
+        .Name("SpaceAfterImplicitConstructorDecl")
+        .Where(Left().HasType(ElementType.IMPLICIT_CONSTRUCTOR_DECLARATION))
+        .Return(IntervalFormatType.Space)
+        .Build();
+      
+      Describe<FormattingRule>()
+        .Group(SpaceRuleGroup)
+        .Name("SpacesInMemberConstructorDecl")
+        .Where(Parent().HasType(ElementType.MEMBER_CONSTRUCTOR_DECLARATION))
+        .Return(IntervalFormatType.Space)
+        .Build();
+
+      Describe<FormattingRule>()
+        .Name("SpaceBetweenRecordBindings")
+        .Where(
+          Left()
+            .HasType(ElementType.RECORD_FIELD_BINDING)
+            .Satisfies((node, context) => ((IRecordFieldBinding) node).Semicolon != null),
+          Right().HasType(ElementType.RECORD_FIELD_BINDING))
+        .Return(IntervalFormatType.Space)
+        .Build();
+
+      Describe<FormattingRule>()
+        .Group(LineBreaksRuleGroup)
+        .Name("LineBreaksBetweenRecordBindings")
+        .Where(
+          Left()
+            .HasType(ElementType.RECORD_FIELD_BINDING)
+            .Satisfies((node, context) => ((IRecordFieldBinding) node).Semicolon == null),
+          Right().HasType(ElementType.RECORD_FIELD_BINDING))
+        .Return(IntervalFormatType.NewLine)
+        .Build();
+
+      Describe<FormattingRule>()
+        .Name("SpacesAroundRecordExprBraces")
+        .Where(
+          Parent().HasType(ElementType.RECORD_EXPR),
+          Left().In(FSharpTokenType.LBRACE, FSharpTokenType.RBRACE),
+          Right()
+            .In(ElementType.RECORD_FIELD_BINDING_LIST, FSharpTokenType.BLOCK_COMMENT)
+            .Or()
+            .HasRole(RecordExpr.COPY_INFO))
+        .Return(IntervalFormatType.OnlySpace)
+        .Build()
+        .AndViceVersa()
+        .Build();
+    }
 
     private void DescribeSimpleIndentingRule((string name, CompositeNodeType parentType, short childRole) parameters)
     {
@@ -196,5 +289,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 
     private static bool AreAligned(ITreeNode first, ITreeNode second, IWhitespaceChecker whitespaceChecker) =>
       first.CalcLineIndent(whitespaceChecker) == second.CalcLineIndent(whitespaceChecker);
+
+    private static bool IsPipeOperator(ITreeNode node)
+    {
+      var opText = node.GetText();
+      return FSharpPredefinedType.PipeOperatorNames.Contains(opText);
+    }
   }
 }

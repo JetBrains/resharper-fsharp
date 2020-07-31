@@ -16,6 +16,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Fsi.Settings
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Rider.Model
 open JetBrains.Util
+open JetBrains.Util.DevEnv
 open NuGet.Versioning
 
 let [<Literal>] defaultFsiName        = "fsi.exe"
@@ -117,26 +118,19 @@ type IFsiDirectoryProvider =
 
 
 type VsFsiProvider() =
-    static let versions = [| "2019"; "2017" |]
-    static let editions = [| "BuildTools"; "Community"; "Professional"; "Enterprise" |]
-    static let fsharpRelativePath = RelativePath.Parse("Common7/IDE/CommonExtensions/Microsoft/FSharp")
-
     interface IFsiDirectoryProvider with
         member x.GetFsiTools(_) =
             if not PlatformUtil.IsRunningUnderWindows then [] :> _ else
 
-            let vsPath = PlatformUtils.GetProgramFiles86() / "Microsoft Visual Studio"
-            if not vsPath.ExistsDirectory then [] :> _ else
+            DevenvHostDiscovery.EnumInstalledVs()
+            |> Seq.choose (fun vs ->
+                let fsiDir = vs.InstallDir / "CommonExtensions" / "Microsoft" / "FSharp"
+                let fsiPath = fsiDir / defaultFsiName
 
-            seq {
-                for version in versions do
-                    for edition in editions do
-                        let fsiDir = vsPath / version / edition / fsharpRelativePath
-                        let fsiPath = fsiDir / defaultFsiName
-    
-                        if fsiPath.ExistsFile then
-                            let title = sprintf "Visual Studio %s %s" version edition
-                            yield FsiTool.Create(title, fsiDir) }
+                if fsiPath.ExistsFile then
+                    Some (FsiTool.Create(vs.DisplayNameLong, fsiDir))
+                else
+                    None)
 
 
 type LegacyVsFsiProvider() =

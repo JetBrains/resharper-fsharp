@@ -15,7 +15,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal abstract class FSharpFileBase : FileElementBase, IFSharpFileCheckInfoOwner
   {
     // ReSharper disable once NotNullMemberIsNotInitialized
-    public FSharpCheckerService CheckerService { get; set; }
+    public FSharpCheckerService FcsCheckerService { get; set; }
+    public FSharpCheckerService CheckerService => FcsCheckerService;
 
     // ReSharper disable once NotNullMemberIsNotInitialized
     public IFSharpResolvedSymbolsCache ResolvedSymbolsCache { get; set; }
@@ -25,7 +26,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     public FSharpOption<FSharpParseFileResults> ParseResults
     {
-      get => myParseResults.GetValue(this, fsFile => CheckerService.ParseFile(SourceFile));
+      get => myParseResults.GetValue(this, fsFile => FcsCheckerService.ParseFile(SourceFile));
       set => myParseResults.SetValue(this, value);
     }
 
@@ -34,7 +35,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override PsiLanguageType Language => ((IFSharpFileCheckInfoOwner) this).LanguageType;
 
     public FSharpOption<FSharpParseAndCheckResults> GetParseAndCheckResults(bool allowStaleResults, string opName) =>
-      CheckerService.ParseAndCheckFile(SourceFile, opName, allowStaleResults);
+      FcsCheckerService.ParseAndCheckFile(SourceFile, opName, allowStaleResults);
 
     public FSharpSymbol GetSymbol(int offset) =>
       ResolvedSymbolsCache.GetSymbol(SourceFile, offset);

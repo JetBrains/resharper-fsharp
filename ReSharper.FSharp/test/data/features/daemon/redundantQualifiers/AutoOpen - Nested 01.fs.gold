@@ -1,0 +1,11 @@
+﻿module TopLevel =
+    [<AutoOpen>]
+    module Nested =
+        type T() = class end
+
+open TopLevel
+let t: |Nested.|(0)T = |Nested.|(1)T()
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Qualifier is redundant
+(1): ReSharper Dead Code: Qualifier is redundant

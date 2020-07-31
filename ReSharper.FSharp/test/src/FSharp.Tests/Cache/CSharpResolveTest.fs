@@ -100,6 +100,7 @@ type CSharpResolveTest() =
 
     [<Test>] member x.``Module bindings - Compiled name 01``() = x.DoNamedTest()
     [<Test>] member x.``Module bindings - Compiled name 02 - Nested pat``() = x.DoNamedTest()
+    [<Test>] member x.``Module bindings - Compiled name 03 - Overloads``() = x.DoNamedTest()
 
     [<Test>] member x.``Nested module 01``() = x.DoNamedTest()
 
@@ -133,6 +134,8 @@ type CSharpResolveTest() =
     [<Test>] member x.``Type Extension 12 - Optional extension``() = x.DoNamedTest()
     [<Test>] member x.``Type Extension 13 - C# extension 01``() = x.DoNamedTest()
     [<Test>] member x.``Type Extension 14 - C# extension 02``() = x.DoNamedTest()
+    [<Test>] member x.``Type Extension 15 - Compiled name``() = x.DoNamedTest()
+    [<Test>] member x.``Type Extension 16 - Compiled name - Static``() = x.DoNamedTest()
 
     [<Test>] member x.``Generics - Methods 01``() = x.DoNamedTest()
 

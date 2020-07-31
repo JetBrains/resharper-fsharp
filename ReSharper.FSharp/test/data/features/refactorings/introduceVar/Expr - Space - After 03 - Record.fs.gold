@@ -1,0 +1,9 @@
+﻿Suggested names: r
+module Module
+
+let f a b = ()
+type R = { F: int }
+
+do
+    let r = { F = 1 }
+    f r id

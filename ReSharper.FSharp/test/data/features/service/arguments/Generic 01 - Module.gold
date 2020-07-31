@@ -1,0 +1,7 @@
+﻿module Mod =
+    let log<'a> (|x|(param #0) : 'a) = sprintf "%O" x
+
+Mod.log |"hello"|(arg #0)
+
+---------------------------------------------------------
+(arg #0) => x

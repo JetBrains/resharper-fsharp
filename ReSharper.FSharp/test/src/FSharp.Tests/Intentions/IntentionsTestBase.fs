@@ -2,7 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.FeaturesTestFramework.Intentions
-open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
+open JetBrains.ReSharper.Plugins.FSharp.Tests
 
 [<AbstractClass; FSharpTest>]
 type FSharpContextActionExecuteTestBase<'T when 'T :> IContextAction and 'T: not struct>() =

@@ -2,6 +2,6 @@
 
 do
     match () with
-    | _ -> ()
-    {caret}| _ -> ()
+    | a -> (){caret}
+    | c -> ()
     ()

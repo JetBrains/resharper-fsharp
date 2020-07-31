@@ -1,0 +1,8 @@
+﻿type MyType (|x|(param #0): string, |i|(param #1): int) =
+    class end
+
+new MyType(|""|(arg #0), |15|(arg #1))
+
+---------------------------------------------------------
+(arg #0) => x
+(arg #1) => i

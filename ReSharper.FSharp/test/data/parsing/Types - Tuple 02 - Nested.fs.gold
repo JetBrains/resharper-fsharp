@@ -17,18 +17,19 @@ IFSharpImplFile
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
             FSharpTokenType+StarTokenElement(type:STAR, text:*)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-            ITupleTypeUsage
-              INamedTypeUsage
-                ITypeReferenceName
-                  FSharpIdentifierToken(type:IDENTIFIER, text:int)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              FSharpTokenType+StarTokenElement(type:STAR, text:*)
-              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-              INamedTypeUsage
-                ITypeReferenceName
-                  FSharpIdentifierToken(type:IDENTIFIER, text:int)
-            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+            IParenTypeUsage
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              ITupleTypeUsage
+                INamedTypeUsage
+                  ITypeReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:int)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                FSharpTokenType+StarTokenElement(type:STAR, text:*)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                INamedTypeUsage
+                  ITypeReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:int)
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "

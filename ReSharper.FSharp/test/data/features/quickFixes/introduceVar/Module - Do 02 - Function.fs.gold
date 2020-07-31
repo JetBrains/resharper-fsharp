@@ -1,0 +1,5 @@
+﻿module Module
+
+let foo (x: string) = ()
+
+let {selstart}stringFunc{selend} = foo

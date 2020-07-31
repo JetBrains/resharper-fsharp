@@ -3,8 +3,8 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpParensUtil
 
 open System
 open FSharp.Compiler
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
@@ -27,6 +27,32 @@ let deindentsBody (expr: IFSharpExpression) =
         isNotNull elseExpr && elseExpr.Indent = expr.Indent
 
     | _ -> false
+
+let contextExprRequiresParens (expr: IFSharpExpression) =
+    isNotNull (TypeInheritNavigator.GetByCtorArgExpression(expr)) ||
+    isNotNull (ObjExprNavigator.GetByArgExpression(expr)) ||
+    isNotNull (NewExprNavigator.GetByArgumentExpression(expr))
+
+let isTopLevelContextExpr (expr: IFSharpExpression) =
+    if expr.Parent :? IChameleonExpression && isNull (AttributeNavigator.GetByExpression(expr)) then true else
+
+    if isNotNull (ParenExprNavigator.GetByInnerExpression(expr)) then
+        true else
+
+    if isNotNull (LetOrUseExprNavigator.GetByBinding(LocalBindingNavigator.GetByExpression(expr))) then
+        true else
+
+    if isNotNull (LetOrUseExprNavigator.GetByInExpression(expr)) then
+        true else
+
+    if isNotNull (MatchClauseNavigator.GetByExpression(expr)) ||
+            isNotNull (MatchClauseNavigator.GetByWhenExpression(WhenExprClauseNavigator.GetByExpression(expr))) then
+        true else
+
+    if isNotNull (WhileExprNavigator.GetByExpression(expr)) then
+        true else
+
+    false
 
 let (|Prefix|_|) (other: string) (str: string) =
     if str.StartsWith(other, StringComparison.Ordinal) then someUnit else None
@@ -72,8 +98,8 @@ let isHighPrecedenceApp (appExpr: IPrefixAppExpr) =
     funEndOffset = argStartOffset
 
 let private canBeTopLevelArgInHighPrecedenceApp (expr: IFSharpExpression) =
-    expr :? IArrayOrListExpr || expr :? IArrayOrListOfSeqExpr ||
-    expr :? IObjExpr || expr :? IRecordExpr
+    // todo: check `ignore{| Field = 1 + 1 |}.Field` vs `ignore[].Head` 
+    expr :? IArrayOrListExpr || expr :? IObjExpr || expr :? IRecordLikeExpr
 
 let rec private isHighPrecedenceAppRequired (appExpr: IPrefixAppExpr) =
     let argExpr = appExpr.ArgumentExpression.IgnoreInnerParens()
@@ -83,25 +109,30 @@ let rec private isHighPrecedenceAppRequired (appExpr: IPrefixAppExpr) =
 
     false
 
-let rec needsParens (expr: IFSharpExpression) =
+let rec needsParens (context: IFSharpExpression) (expr: IFSharpExpression) =
     if isNull expr then false else
 
-    let context = expr.IgnoreParentParens()
-    if context.Parent :? IChameleonExpression then false else
+    let context = if isNotNull context then context else expr.IgnoreParentParens()
+
+    if contextExprRequiresParens context then true else
+    if isTopLevelContextExpr context then false else
 
     let appExpr = PrefixAppExprNavigator.GetByExpression(context)
     if isHighPrecedenceApp appExpr && isHighPrecedenceAppRequired appExpr then true else
 
     match expr with
+    | :? IReferenceExpr as refExpr when
+            let attr = AttributeNavigator.GetByExpression(refExpr.IgnoreParentParens())
+            isNotNull attr && (isNotNull refExpr.TypeArgumentList || isNotNull attr.Target) ->
+        true
+
     | :? IQualifiedExpr as qualifiedExpr ->
-        needsParens qualifiedExpr.Qualifier
+        needsParens context qualifiedExpr.Qualifier
 
     | :? IParenExpr | :? IQuoteExpr
     | :? IConstExpr | :? INullExpr
-    | :? IRecordExpr | :? IAnonRecdExpr
-    | :? IArrayOrListExpr | :? IArrayOrListOfSeqExpr
-    | :? IObjExpr | :? IComputationLikeExpr
-    | :? IAddressOfExpr -> false
+    | :? IRecordLikeExpr | :? IArrayOrListExpr | :? IComputationExpr
+    | :? IObjExpr | :? IAddressOfExpr -> false
 
     | :? IBinaryAppExpr as binaryAppExpr when
             isNotNull (AppExprNavigator.GetByArgument(context)) ->
@@ -153,5 +184,5 @@ let addParens (expr: IFSharpExpression) =
 
 
 let addParensIfNeeded (expr: IFSharpExpression) =
-    if not (needsParens expr) then expr else
+    if not (needsParens expr expr) then expr else
     addParens expr

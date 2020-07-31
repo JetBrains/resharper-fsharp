@@ -11,25 +11,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     public IPsiModule PsiModule { get; }
     public FSharpCheckerService CheckerService { get; }
-    public IFSharpProjectOptionsProvider ProjectOptionsProvider { get; }
+    public IFcsProjectProvider FcsProjectProvider { get; }
 
     private readonly JetFastSemiReenterableRWLock myLock = new JetFastSemiReenterableRWLock();
 
     public FSharpModuleResolvedSymbols(IPsiModule psiModule, int filesCount, FSharpCheckerService checkerService,
-      IFSharpProjectOptionsProvider projectOptionsProvider)
+      IFcsProjectProvider fcsProjectProvider)
     {
       myFileResolvedSymbols = new FSharpFileResolvedSymbols[filesCount];
 
       PsiModule = psiModule;
       CheckerService = checkerService;
-      ProjectOptionsProvider = projectOptionsProvider;
+      FcsProjectProvider = fcsProjectProvider;
     }
 
     public void Invalidate(IPsiSourceFile sourceFile)
     {
       using (myLock.UsingWriteLock())
       {
-        var fileIndex = ProjectOptionsProvider.GetFileIndex(sourceFile);
+        var fileIndex = FcsProjectProvider.GetFileIndex(sourceFile);
         if (fileIndex == -1)
           return;
 
@@ -47,7 +47,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
     public IFSharpFileResolvedSymbols GetResolvedSymbols(IPsiSourceFile sourceFile)
     {
-      var fileIndex = ProjectOptionsProvider.GetFileIndex(sourceFile);
+      var fileIndex = FcsProjectProvider.GetFileIndex(sourceFile);
       var fileResolvedSymbols = TryGetResolvedSymbols(fileIndex);
       if (fileResolvedSymbols != null)
         return fileResolvedSymbols;

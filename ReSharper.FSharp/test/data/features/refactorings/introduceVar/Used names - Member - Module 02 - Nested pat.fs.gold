@@ -1,0 +1,4 @@
+﻿Suggested names: i1
+let i1 = 1
+id i1
+let (Some (i, _)) = Some(1, 2)

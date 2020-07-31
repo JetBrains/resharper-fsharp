@@ -13,9 +13,9 @@ type FSharpQuickDefinitionService() =
 
     override x.GetPresentableTreeRange(node) =
         match node with
-        | :? ISynPat as pat ->
-            let pat = skipIntermediatePatParents pat
-            let binding = BindingNavigator.GetByHeadPattern(pat)
-            TreeRange(LetNavigator.GetByBinding(binding)) :> _
+        | :? IFSharpPattern as fsPattern ->
+            let fsPattern = skipIntermediatePatParents fsPattern
+            let binding = BindingNavigator.GetByHeadPattern(fsPattern)
+            TreeRange(LetBindingsNavigator.GetByBinding(binding)) :> _
 
         | _ -> base.GetPresentableTreeRange(node)

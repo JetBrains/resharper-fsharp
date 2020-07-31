@@ -1,0 +1,6 @@
+﻿Suggested names: doubles
+module Module
+
+do
+    let doubles = [|1.0|]
+    id doubles

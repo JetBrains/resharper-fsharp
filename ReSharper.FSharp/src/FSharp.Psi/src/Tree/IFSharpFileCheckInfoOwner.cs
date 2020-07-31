@@ -15,7 +15,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
     [CanBeNull]
     FSharpOption<FSharpParseAndCheckResults> GetParseAndCheckResults(bool allowStaleResults, string opName);
 
-    [NotNull] FSharpCheckerService CheckerService { get; set; }
+    [NotNull] FSharpCheckerService FcsCheckerService { get; set; }
 
     [NotNull] IFSharpResolvedSymbolsCache ResolvedSymbolsCache { get; set; }
 

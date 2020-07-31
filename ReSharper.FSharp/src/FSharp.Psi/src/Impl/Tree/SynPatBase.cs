@@ -31,7 +31,31 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   internal partial class LocalReferencePat
   {
     public override IFSharpIdentifierLikeNode NameIdentifier => ReferenceName?.Identifier;
-    public bool IsDeclaration => true;
+
+    public bool IsDeclaration
+    {
+      get
+      {
+        // todo: check other parents: e.g. parameters?
+        if (Parent is IBinding)
+          return true;
+
+        var referenceName = ReferenceName;
+        if (referenceName == null)
+          return false;
+
+        if (referenceName.Qualifier != null)
+          return false;
+
+        var name = referenceName.ShortName;
+        if (!name.IsEmpty() && name[0].IsLowerFast())
+          return true;
+
+        var idOffset = GetNameIdentifierRange().StartOffset.Offset;
+        return FSharpFile.GetSymbolUse(idOffset) == null;
+      }
+    }
+
     public IEnumerable<IDeclaration> Declarations => new[] {this};
 
     public override TreeTextRange GetNameIdentifierRange() =>
@@ -86,6 +110,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public TreeNodeCollection<IAttribute> Attributes =>
       this.GetBinding()?.AllAttributes ??
       TreeNodeCollection<IAttribute>.Empty;
+
+    public bool IsMutable => Binding?.IsMutable ?? false;
+
+    public void SetIsMutable(bool value)
+    {
+      var binding = Binding;
+      Assertion.Assert(binding != null, "GetBinding() != null");
+      binding.SetIsMutable(true);
+    }
+
+    public bool CanBeMutable => Binding != null;
+
+    private IBinding Binding => this.GetBinding();
   }
 
   internal partial class LocalAsPat
@@ -93,6 +130,19 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override IFSharpIdentifierLikeNode NameIdentifier => Identifier;
     public bool IsDeclaration => true;
     public IEnumerable<IDeclaration> Declarations => Pattern?.Declarations.Prepend(this) ?? new[] {this};
+    
+    public bool IsMutable => Binding?.IsMutable ?? false;
+
+    public void SetIsMutable(bool value)
+    {
+      var binding = Binding;
+      Assertion.Assert(binding is LocalBinding, "GetBinding() is LocalBinding");
+      binding.SetIsMutable(true);
+    }
+
+    public bool CanBeMutable => Binding is LocalBinding;
+
+    private IBinding Binding => this.GetBinding();
   }
 
   internal partial class OrPat

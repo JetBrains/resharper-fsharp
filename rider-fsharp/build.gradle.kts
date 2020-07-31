@@ -15,8 +15,8 @@ buildscript {
         maven { setUrl("https://cache-redirector.jetbrains.com/repo.maven.apache.org/maven2")}
     }
     dependencies {
-        classpath("com.jetbrains.rd:rd-gen:0.201.57")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.50")
+        classpath("com.jetbrains.rd:rd-gen:0.202.100")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.61")
     }
 }
 
@@ -184,7 +184,7 @@ tasks {
         }
 
         files.forEach {
-            from(it, { into("${intellij.pluginName}/dotnet") })
+            from(it) { into("${intellij.pluginName}/dotnet") }
         }
 
         into("${intellij.pluginName}/projectTemplates") {

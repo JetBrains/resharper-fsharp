@@ -118,7 +118,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public virtual bool CanNavigateTo => IsVisibleFromFSharp;
 
     public virtual bool IsExtensionMember => false;
-    public abstract bool IsFSharpMember { get; }
 
     public virtual IList<ITypeParameter> AllTypeParameters =>
       GetContainingType().GetAllTypeParameters().ResultingList().Reverse();

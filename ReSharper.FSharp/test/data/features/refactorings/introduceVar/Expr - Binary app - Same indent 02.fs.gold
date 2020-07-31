@@ -1,0 +1,7 @@
+﻿Suggested names: i
+module Module
+
+do
+  let i = 1
+  1 +
+  1 + i

@@ -27,7 +27,7 @@ type FSharpDeclaredElementIconProvider() =
             canApplyExtensions <- true
 
             match declaredElement with
-            | :? IModule -> FSharpIcons.FSharpModule.Id
+            | :? IFSharpModule -> FSharpIcons.FSharpModule.Id
 
             | :? IUnionCase as unionCase ->
                 canApplyExtensions <- false

@@ -14,3 +14,6 @@ type AddMatchAllClauseFixTest() =
 
     [<Test>] member x.``Enum 01``() = x.DoNamedTest()
     [<Test>] member x.``Simple 01``() = x.DoNamedTest()
+    [<Test>] member x.``Simple 02 - Indent``() = x.DoNamedTest()
+    [<Test>] member x.``Simple 03 - Multiple clauses``() = x.DoNamedTest()
+    [<Test>] member x.``Simple 04 - Generate single line``() = x.DoNamedTest()

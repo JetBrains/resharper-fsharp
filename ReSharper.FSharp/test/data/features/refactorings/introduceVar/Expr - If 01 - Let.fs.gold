@@ -1,0 +1,9 @@
+﻿Suggested names: i
+module Module
+
+if true then
+    let a =
+        let i = 1
+    ()
+else
+    ()

@@ -24,11 +24,11 @@ type TestWithTwoProjectsBase() =
     override x.ProjectName = base.ProjectName + ".MainProject"
 
     member x.SecondProject = x.Solution.GetProjectByName(x.SecondProjectName)
-    member x.SecondProjectName = base.ProjectName + "SecondProject"
+    override x.SecondProjectName = base.ProjectName + "SecondProject"
 
     abstract DoTest: mainProject: IProject * secondProject: IProject -> unit
 
-    override x.DoTest(lifetime: Lifetime, project: IProject) =
+    override x.DoTest(_: Lifetime, project: IProject) =
         x.AddProjectReference(project)
         x.DoTest(project, x.SecondProject)
 
@@ -42,7 +42,7 @@ type TestWithTwoProjectsBase() =
         let targetFrameworkId = x.GetTargetFrameworkId()
         x.CreateProjectDescriptor(targetFrameworkId, name, [| filePath |], libs, guid)
 
-    override x.DoTestSolution([<ParamArray>] names: string[]) =
+    override x.DoTestSolution([<ParamArray>] _names: string[]) =
         let baseFilePath = x.TestDataPath / x.TestName
         let mainFile = baseFilePath.ChangeExtension(x.MainFileExtension)
         let secondFile = baseFilePath.ChangeExtension(x.SecondFileExtension)
