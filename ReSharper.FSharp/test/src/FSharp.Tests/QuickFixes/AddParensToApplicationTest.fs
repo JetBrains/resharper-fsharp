@@ -28,7 +28,6 @@ type AddParensToApplicationTest() =
     [<Test>] member x.``Application with not enough args``() = x.DoNamedTest()
     [<Test>] member x.``Long ident application``() = x.DoNamedTest()
 
-
     override x.DoTestOnTextControlAndExecuteWithGold(project, textControl, projectFile) =
         let appOccurrenceName = QuickFixTestBase.GetSetting(textControl, AppOccurrenceName)
         let argsOccurrenceName = QuickFixTestBase.GetSetting(textControl, ArgsOccurrenceName)
@@ -46,3 +45,13 @@ type AddParensToApplicationTest() =
             |> Option.defaultWith (fun _ -> failwithf "Could not find %s occurrence" occurrenceName))           
 
         base.DoTestOnTextControlAndExecuteWithGold(project, textControl, projectFile)
+
+[<FSharpTest>]
+type AddParensToApplicationAvailabilityTest() =
+    inherit QuickFixAvailabilityTestBase()
+
+    override x.RelativeTestDataPath = "features/quickFixes/addParensToApplication"
+
+    [<Test>] member x.``Single application - reference``() = x.DoNamedTest()
+    [<Test>] member x.``Single application - lambda``() = x.DoNamedTest()
+    [<Test>] member x.``Multiply applications text``() = x.DoNamedTest()

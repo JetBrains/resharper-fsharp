@@ -98,7 +98,7 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
     override x.Text =
         match appCandidates with
         | [appData] ->
-            match appData.App with
+            match appData.App.IgnoreInnerParens() with
             | :? IReferenceExpr as refExpr when refExpr.ShortName <> SharedImplUtil.MISSING_DECLARATION_NAME -> 
                 sprintf "Add parens to '%s' application" refExpr.ShortName
 
