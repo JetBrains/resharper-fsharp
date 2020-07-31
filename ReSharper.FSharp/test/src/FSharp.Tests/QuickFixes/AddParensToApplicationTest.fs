@@ -28,7 +28,6 @@ type AddParensToApplicationTest() =
     [<Test>] member x.``Application with not enough args``() = x.DoNamedTest()
     [<Test>] member x.``Long ident application``() = x.DoNamedTest()
 
-
     override x.DoTestOnTextControlAndExecuteWithGold(project, textControl, projectFile) =
         let appOccurrenceName = QuickFixTestBase.GetSetting(textControl, AppOccurrenceName)
         let argsOccurrenceName = QuickFixTestBase.GetSetting(textControl, ArgsOccurrenceName)
