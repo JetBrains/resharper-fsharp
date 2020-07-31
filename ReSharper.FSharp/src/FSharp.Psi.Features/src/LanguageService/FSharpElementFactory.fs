@@ -2,11 +2,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
+open JetBrains.Application.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Psi.CodeStyle
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Modules
@@ -200,26 +202,25 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             addParensIfNeeded rightArg |> ignore
 
             expr
-            
+
         member x.CreateParenPat() =
             let expr = createLetBinding "(())"
-            let binding = expr.Bindings |> Seq.exactlyOne
-            binding.HeadPattern.As<IParenPat>()
-            
-        member x.CreateTypedPat (reference: IReferencePat, typeUsage: ITypeUsage, spaceBeforeColon: bool) : ITypedPat =
-            let copiedReference = reference.Copy()
+            expr.Bindings.[0].HeadPattern.As<IParenPat>()
+
+        member x.CreateTypedPat(reference: IReferencePat, typeUsage: ITypeUsage) =
+            let settingsStore = typeUsage.GetSettingsStoreWithEditorConfig()
+            let spaceBeforeColon = settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceBeforeColon)
             let preColonSpace = if spaceBeforeColon then " " else ""
-            
-            let expr = createLetBinding (sprintf "(()%s: ())" preColonSpace)
-            let binding = expr.Bindings |> Seq.exactlyOne
-            let typedPat = binding.HeadPattern.As<IParenPat>().Pattern.As<ITypedPat>()
-            
-            ModificationUtil.ReplaceChild(typedPat.Pattern, copiedReference) |> ignore
+
+            let expr = createLetBinding (sprintf "(_%s: _)" preColonSpace)
+            let typedPat = expr.Bindings.[0].HeadPattern.As<IParenPat>().Pattern.As<ITypedPat>()
+
+            ModificationUtil.ReplaceChild(typedPat.Pattern, reference.Copy()) |> ignore
             ModificationUtil.ReplaceChild(typedPat.Type, typeUsage) |> ignore
             typedPat
-            
-        member x.CreateReturnTypeInfo(typeUsage: ITypeUsage) : IReturnTypeInfo =
-            let expr = createLetBinding "_ : ()"
+
+        member x.CreateReturnTypeInfo(typeUsage: ITypeUsage): IReturnTypeInfo =
+            let expr = createLetBinding "_: _"
             let returnTypeInfo = expr.Bindings.[0].ReturnTypeInfo
             ModificationUtil.ReplaceChild(returnTypeInfo.ReturnType, typeUsage) |> ignore
             returnTypeInfo

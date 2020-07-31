@@ -86,7 +86,7 @@
     <Compile Include="Intentions\IfToElifTest.fs" />
     <Compile Include="Intentions\NegateConditionTest.fs" />
     <Compile Include="Intentions\ToMutableTest.fs" />
-    <Compile Include="Intentions\FunctionAnnotationTest.fs" />
+    <Compile Include="Intentions\SpecifyTypesTest.fs" />
     <Compile Include="Intentions\ToLiteralTest.fs" />
     <Compile Include="Intentions\LetToUseTest.fs" />
     <Compile Include="Actions\CommentActionTests.fs" />

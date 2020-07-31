@@ -1,5 +1,0 @@
-module Module
-
-open System
-
-let printerFun{caret} (a: 'a) (b: 'b): ('a * 'b) list = List.singleton (a, b)

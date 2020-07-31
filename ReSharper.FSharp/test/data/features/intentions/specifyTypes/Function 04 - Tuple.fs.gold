@@ -1,0 +1,4 @@
+﻿module Module
+
+let f{caret} (a: string * seq<string>): string =
+    a ||> String.concat
