@@ -1,0 +1,14 @@
+﻿module Module
+
+let multiply (a: int) (b: int) = a * b
+multiply id 1 |id|(0) |2|(1) 
+
+------------------------------------------------
+0: Unexpected arguments
+QUICKFIXES:
+Add parens to application
+Remove unexpected arguments
+1: Unexpected arguments
+QUICKFIXES:
+Add parens to application
+Remove unexpected arguments

@@ -46,3 +46,13 @@ type AddParensToApplicationTest() =
             |> Option.defaultWith (fun _ -> failwithf "Could not find %s occurrence" occurrenceName))           
 
         base.DoTestOnTextControlAndExecuteWithGold(project, textControl, projectFile)
+
+[<FSharpTest>]
+type AddParensToApplicationAvailabilityTest() =
+    inherit QuickFixAvailabilityTestBase()
+
+    override x.RelativeTestDataPath = "features/quickFixes/addParensToApplication"
+
+    [<Test>] member x.``Single application - reference``() = x.DoNamedTest()
+    [<Test>] member x.``Single application - lambda``() = x.DoNamedTest()
+    [<Test>] member x.``Multiply applications text``() = x.DoNamedTest()
