@@ -60,13 +60,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (symbolUse?.Symbol is FSharpField field)
         return field.DeclaringEntity?.Value;
 
-      // todo: cover other contexts
-      var sequentialExpr = SequentialExprNavigator.GetByExpression(RecordExpr.IgnoreParentParens());
-      if (sequentialExpr != null && sequentialExpr.Expressions.Last() != RecordExpr)
-        return null;
-      var exprToGetBy = sequentialExpr ?? RecordExpr.IgnoreParentParens();
-
-      var binding = BindingNavigator.GetByExpression(exprToGetBy);
+      var functionExpr = GetFunctionExpression(RecordExpr);
+      var binding = BindingNavigator.GetByExpression(functionExpr);
       if (binding == null || !(binding.HeadPattern is INamedPat namedPat))
         return null;
 
@@ -77,6 +72,25 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
       var entity = returnParameterType.TypeDefinition;
       return entity.IsFSharpRecord ? entity : null;
+    }
+
+    private static IFSharpExpression GetFunctionExpression(IFSharpExpression expression)
+    {
+      IFSharpExpression currentExpression = IfExprNavigator.GetByThenExpr(expression);
+      currentExpression ??= IfExprNavigator.GetByElseExpr(expression);
+      var matchClause = MatchClauseNavigator.GetByExpression(expression);
+      currentExpression = matchClause == null ? currentExpression : MatchExprNavigator.GetByClause(matchClause);
+      currentExpression ??= MatchLambdaExprNavigator.GetByClause(matchClause);
+
+      var sequentialExpr = SequentialExprNavigator.GetByExpression(expression);
+      currentExpression ??= sequentialExpr;
+      if (sequentialExpr != null && sequentialExpr.Expressions.Last() != expression)
+        return null;
+
+      if (currentExpression == null)
+        return expression;
+
+      return GetFunctionExpression(currentExpression);
     }
 
     public override string GetName() =>
