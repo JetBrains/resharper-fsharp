@@ -30,8 +30,8 @@ type ReplaceWithWildPatFix(pat: INamedPat) =
         
     let isAvailable (pat: IReferencePat) =
         isValid pat &&
-        let parent = getPatOwner pat
-        match parent with
+        let owner = getPatOwner pat
+        match owner with
         | None -> false
         | Some node ->
             node :? IBinding ||

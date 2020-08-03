@@ -21,6 +21,9 @@ type ReplaceWithWildPatTest() =
     [<Test>] member x.``Match clause pat 01``() = x.DoNamedTest()
     [<Test>] member x.``Pattern 01``() = x.DoNamedTest()
     [<Test>] member x.``Lambda 01``() = x.DoNamedTest()
+    
+    [<Test>] member x.``Signature``() = x.DoNamedTest()
+    [<Test; ExecuteScopedQuickFixInFile>] member x.``Whole file``() = x.DoNamedTest()
 
 [<FSharpTest>]
 type ReplaceWithWildPatAvailabilityTest() =
