@@ -1,0 +1,3 @@
+﻿module Module
+
+let f{caret} (): int -> unit = fun (x: int) -> ()

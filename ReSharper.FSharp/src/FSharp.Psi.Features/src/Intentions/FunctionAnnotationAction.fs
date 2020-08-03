@@ -4,6 +4,7 @@ open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application.Settings
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -13,9 +14,42 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
+module SpecifyTypes =
+    let specifyBindingReturnType (binding: IBinding) (mfv: FSharpMemberOrFunctionOrValue) displayContext =
+        let typeString =
+            let fullType = mfv.FullType
+            if fullType.IsFunctionType then
+                let specifiedTypesCount =
+                    match binding.HeadPattern with
+                    | :? IParametersOwnerPat as pat -> pat.Parameters.Count
+                    | _ -> 0
+
+                let types = FcsTypesUtil.getFunctionTypeArgs fullType
+                if types.Length <= specifiedTypesCount then mfv.ReturnParameter.Type.Format(displayContext) else
+
+                let remainingTypes = types |> List.skip specifiedTypesCount
+                remainingTypes
+                |> List.map (fun fcsType ->
+                    let typeString = fcsType.Format(displayContext)
+                    if fcsType.IsFunctionType then sprintf "(%s)" typeString else typeString)
+                |> String.concat " -> "
+            else
+                mfv.ReturnParameter.Type.Format(displayContext)
+
+        let factory = binding.CreateElementFactory()
+        let typeUsage = factory.CreateTypeUsage(typeString)
+
+        let pat = binding.HeadPattern
+        let returnTypeInfo = ModificationUtil.AddChildAfter(pat, factory.CreateReturnTypeInfo(typeUsage))
+
+        let settingsStore = pat.GetSettingsStoreWithEditorConfig()
+        if settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceBeforeColon) then
+            ModificationUtil.AddChildBefore(returnTypeInfo, Whitespace()) |> ignore
+
+
 [<ContextAction(Name = "AnnotateFunction", Group = "F#",
                 Description = "Annotate function with parameter types and return type")>]
-type SpecifyTypesAction(dataProvider: FSharpContextActionDataProvider) =
+type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
     inherit FSharpContextActionBase(dataProvider)
 
     let specifyParameterTypes
@@ -48,16 +82,6 @@ type SpecifyTypesAction(dataProvider: FSharpContextActionDataProvider) =
             parenPat.SetPattern(typedPat) |> ignore
 
             replaceWithCopy parameter parenPat
-
-    let specifyReturnType
-            (namedPat: INamedPat) (factory: IFSharpElementFactory) (mfv: FSharpMemberOrFunctionOrValue) displayContext =
-
-        let typeUsage = factory.CreateTypeUsage(mfv.ReturnParameter.Type.Format(displayContext))
-        let returnTypeInfo = ModificationUtil.AddChildAfter(namedPat, factory.CreateReturnTypeInfo(typeUsage))
-
-        let settingsStore = namedPat.GetSettingsStoreWithEditorConfig()
-        if settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceBeforeColon) then
-            ModificationUtil.AddChildBefore(returnTypeInfo, Whitespace()) |> ignore
 
     let isAnnotated (binding: IBinding) =
         isNotNull binding.ReturnTypeInfo &&
@@ -97,4 +121,4 @@ type SpecifyTypesAction(dataProvider: FSharpContextActionDataProvider) =
             specifyParameterTypes parametersOwner factory mfv displayContext
 
         if isNull binding.ReturnTypeInfo then
-            specifyReturnType namedPat factory mfv displayContext
+            SpecifyTypes.specifyBindingReturnType binding mfv displayContext

@@ -8,7 +8,7 @@ open NUnit.Framework
 
 [<TestPackages("FSharp.Core")>]
 type SpecifyTypesActionTest() =
-    inherit FSharpContextActionExecuteTestBase<SpecifyTypesAction>()
+    inherit FSharpContextActionExecuteTestBase<FunctionAnnotationAction>()
 
     override x.ExtraPath = "specifyTypes"
 
@@ -25,6 +25,13 @@ type SpecifyTypesActionTest() =
 
     [<Test>] member x.``Function - Local 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Function - Return - Function 01``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Return - Function 02``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Return - Function 03 - Specified function param``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Return - Function 04 - Function params``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Return - Function 05 - Nested``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Return 01``() = x.DoNamedTest()
+
     [<TestSetting(typeof<FSharpFormatSettingsKey>, "SpaceBeforeColon", "true")>]
     [<Test>] member x.``Function - Formatting - Add space``() = x.DoNamedTest()
 
@@ -33,7 +40,7 @@ type SpecifyTypesActionTest() =
 
 [<TestPackages("FSharp.Core")>]
 type SpecifyTypesActionAvailabilityTest() =
-    inherit FSharpContextActionAvailabilityTestBase<SpecifyTypesAction>()
+    inherit FSharpContextActionAvailabilityTestBase<FunctionAnnotationAction>()
 
     override x.ExtraPath = "specifyTypes"
 

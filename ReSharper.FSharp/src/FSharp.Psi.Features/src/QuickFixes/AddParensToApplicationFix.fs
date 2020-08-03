@@ -55,32 +55,21 @@ type AddParensToApplicationFix(error: NotAFunctionError) =
         | head :: tail -> createAppExpr factory (factory.CreateAppExpr(expr, head, true)) tail
         | [] -> expr
 
-    let countArgs fsharpType =
-        let rec countArgsRec (fsharpType: FSharpType) count =
-            let functionCandidate = fsharpType.GenericArguments.[1]
-            if functionCandidate.IsFunctionType then countArgsRec functionCandidate count + 1 else count
-
-        countArgsRec fsharpType 1
-
     let findAppsWithoutParens prefixAppExpr =
-        let rec collectAppliedExprsRec
-                (prefixAppExpr: IPrefixAppExpr)
-                (prefixAppDataAcc: _ list)
-                (appliedExprsAcc: _ list) =
-
+        let rec collectAppliedExprsRec (prefixAppExpr: IPrefixAppExpr) prefixAppDataAcc appliedExprsAcc =
             let appExprFcsType = prefixAppExpr.ArgumentExpression.TryGetFcsType()
 
             let maxArgsCount =
                 if isNull appExprFcsType || not appExprFcsType.IsFunctionType then None else
-                Some(countArgs appExprFcsType)
 
-            let canApplyRefactoringToApp =
-                match maxArgsCount with
-                | Some _ -> appliedExprsAcc.Length > 0
-                | _ -> false
+                let args = FcsTypesUtil.getFunctionTypeArgs appExprFcsType
+                Some(args |> List.tail |> List.length)
+
+            let isApplicableApp =
+                Option.isSome maxArgsCount && not (List.isEmpty appliedExprsAcc)
 
             let appDataAcc =
-                if canApplyRefactoringToApp then
+                if isApplicableApp then
                     {| App = prefixAppExpr.ArgumentExpression
                        MaxArgsCount = maxArgsCount.Value
                        ArgCandidates = appliedExprsAcc |} :: prefixAppDataAcc
