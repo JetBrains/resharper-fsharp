@@ -1,5 +1,7 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using JetBrains.Diagnostics;
+using JetBrains.ReSharper.Plugins.FSharp.Checker;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
@@ -48,7 +50,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public virtual TResult Accept<TContext, TResult>(TreeNodeVisitor<TContext, TResult> visitor, TContext context) =>
       visitor.VisitNode(this, context);
 
-    public IFSharpFile FSharpFile =>
-      (this.GetContainingFile() as IFSharpFile).NotNull();
+    public IFSharpFile FSharpFile => (this.GetContainingFile() as IFSharpFile).NotNull();
+
+    public FSharpCheckerService CheckerService
+    {
+      get => FSharpFile.CheckerService;
+      set => throw new InvalidOperationException();
+    }
   }
 }

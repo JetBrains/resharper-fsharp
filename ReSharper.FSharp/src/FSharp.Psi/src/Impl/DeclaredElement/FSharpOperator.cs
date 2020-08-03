@@ -1,5 +1,4 @@
-﻿using FSharp.Compiler.SourceCodeServices;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
@@ -10,8 +9,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
   internal class FSharpConversionOperator<TDeclaration> : FSharpOperatorBase<TDeclaration>, IConversionOperator
     where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
-    internal FSharpConversionOperator([NotNull] ITypeMemberDeclaration declaration,
-      [NotNull] FSharpMemberOrFunctionOrValue mfv, bool isExplicitCast) : base(declaration, mfv) =>
+    internal FSharpConversionOperator([NotNull] ITypeMemberDeclaration declaration, bool isExplicitCast) :
+      base(declaration) =>
       IsExplicitCast = isExplicitCast;
 
     public override DeclaredElementType GetElementType() =>
@@ -24,8 +23,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
   internal class FSharpSignOperator<TDeclaration> : FSharpOperatorBase<TDeclaration>, ISignOperator
     where TDeclaration : FSharpDeclarationBase, IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
-    internal FSharpSignOperator([NotNull] ITypeMemberDeclaration declaration,
-      [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)
+    internal FSharpSignOperator([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {
     }
 
@@ -36,8 +34,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
   internal abstract class FSharpOperatorBase<TDeclaration> : FSharpTypeParametersOwnerBase<TDeclaration>, IOperator
     where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
-    internal FSharpOperatorBase([NotNull] ITypeMemberDeclaration declaration,
-      [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)
+    internal FSharpOperatorBase([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {
     }
 

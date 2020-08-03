@@ -28,6 +28,7 @@ type FSharpLexerTest() =
     [<Test>] member x.``Strings 05 - Escape characters 4 - Verbatim``() = x.DoNamedTest()
     [<Test>] member x.``Strings 06 - Keyword``() = x.DoNamedTest()
     [<Test>] member x.``Strings 07 - Backslash``() = x.DoNamedTest()
+    [<Test>] member x.``Strings 08 - Quotes``() = x.DoNamedTest()
 
     [<Test>] member x.``Multiline strings 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Multiline strings 02 - Triple quoted``() = x.DoNamedTest()

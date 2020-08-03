@@ -11,4 +11,4 @@ type FSharpBreadcrumbsHelper() =
     inherit BreadcrumbsHelperBase()
 
     override x.IsApplicable(declaration) =
-        declaration :? ITypeMemberDeclaration && not (declaration :? ISynPat)
+        declaration :? ITypeMemberDeclaration && not (declaration :? IFSharpPattern)

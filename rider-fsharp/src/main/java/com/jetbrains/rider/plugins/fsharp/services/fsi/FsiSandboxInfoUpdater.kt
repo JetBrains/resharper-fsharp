@@ -14,6 +14,7 @@ import com.jetbrains.rd.platform.util.application
 import com.jetbrains.rd.util.lifetime.Lifetime
 import com.jetbrains.rd.util.lifetime.LifetimeDefinition
 import com.jetbrains.rdclient.lang.toRdLanguageOrThrow
+import com.jetbrains.rdclient.util.idea.LifetimedProjectComponent
 import com.jetbrains.rdclient.util.idea.fromOffset
 import com.jetbrains.rider.editors.RiderTextControlHost
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpScriptLanguage
@@ -21,15 +22,15 @@ import com.jetbrains.rider.model.*
 import com.jetbrains.rider.projectView.solution
 import org.jetbrains.concurrency.AsyncPromise
 
-class FsiSandboxInfoUpdater(
-        private val project: Project, private val consoleEditor: EditorEx, private val history: CommandHistory) {
+class FsiSandboxInfoUpdater(project: Project, private val consoleEditor: EditorEx, private val history: CommandHistory)
+    : LifetimedProjectComponent(project) {
 
-    private val rdFsiTools = project.solution.rdFSharpModel.fSharpInteractiveHost.fsiTools;
+    private val rdFsiTools = project.solution.rdFSharpModel.fSharpInteractiveHost.fsiTools
 
     private val lockObject = Object()
 
-    private var processLifetimeDefinition : LifetimeDefinition? = null
-    private var processLifetime : Lifetime? = null
+    private var processLifetimeDefinition: LifetimeDefinition? = null
+    private var processLifetime: Lifetime? = null
 
     val fsiProcessOutputListener = FsiSandboxInfoUpdaterProcessOutputListener(this)
 
@@ -55,18 +56,15 @@ class FsiSandboxInfoUpdater(
                 if (processLifetime == null) return@invokeLater
 
                 val result = AsyncPromise<List<String>>()
-                rdFsiTools.prepareCommands.start(RdFsiPrepareCommandsArgs(startUnpreparedCommandIndex, unpreparedCommands)).result.advise(processLifetime!!) {
+                rdFsiTools.prepareCommands.start(componentLifetime, RdFsiPrepareCommandsArgs(startUnpreparedCommandIndex, unpreparedCommands)).result.advise(processLifetime!!) {
                     result.setResult(it.unwrap())
                 }
 
-                result.onSuccess {preparedAdditionalCommands ->
+                result.onSuccess { preparedAdditionalCommands ->
                     preparedCommands.addAll(preparedAdditionalCommands)
 
-                    val sandboxInfo = genericFSharpSandboxInfoWithCustomParams(
-                            preparedCommands.joinToString(separator= "").replace("\r\n", "\n"),
-                            false,
-                            emptyList()
-                    )
+                    val sandboxText = preparedCommands.joinToString("\n").replace("\r\n", "\n") + "\ndo ()\n\n"
+                    val sandboxInfo = createFSharpSandbox(sandboxText, false, emptyList())
 
                     sandboxManager.markAsSandbox(consoleEditor, sandboxInfo)
                     FrontendTextControlHost.getInstance(project).rebindEditor(consoleEditor)
@@ -89,7 +87,7 @@ class FsiSandboxInfoUpdater(
     }
 
     class FsiSandboxInfoUpdaterProcessOutputListener(private val fsiSandboxInfoUpdater: FsiSandboxInfoUpdater) : ProcessAdapter() {
-        var lastOutputType : Key<*> = ProcessOutputTypes.SYSTEM
+        var lastOutputType: Key<*> = ProcessOutputTypes.SYSTEM
 
         override fun onTextAvailable(event: ProcessEvent, outputType: Key<*>) {
             if (outputType == ProcessOutputTypes.STDOUT && lastOutputType != ProcessOutputTypes.SYSTEM)
@@ -112,14 +110,14 @@ fun withGenericSandBoxing(sandboxInfo: SandboxInfo, project: Project, block: () 
 
     val textControlHost = RiderTextControlHost.getInstance(project)
 
-    var localInfo : SandboxInfo? = sandboxInfo
+    var localInfo: SandboxInfo? = sandboxInfo
     Lifetime.using { lt ->
-        textControlHost.addPrioritizedEditorFactoryListener(lt, object: EditorFactoryListener {
+        textControlHost.addPrioritizedEditorFactoryListener(lt, object : EditorFactoryListener {
             override fun editorReleased(event: EditorFactoryEvent) {
             }
 
             override fun editorCreated(event: EditorFactoryEvent) {
-                if(localInfo != null)
+                if (localInfo != null)
                     SandboxManager.getInstance().markAsSandbox(event.editor, sandboxInfo)
             }
         })
@@ -129,7 +127,7 @@ fun withGenericSandBoxing(sandboxInfo: SandboxInfo, project: Project, block: () 
     }
 }
 
-fun genericFSharpSandboxInfoWithCustomParams(additionalText: String = "", isNonUserCode: Boolean = false, disableTypingAssists : List<Char>): SandboxInfo {
+fun createFSharpSandbox(additionalText: String = "", isNonUserCode: Boolean = false, disableTypingAssists: List<Char>): SandboxInfo {
     return SandboxInfo(
             null,
             additionalText,

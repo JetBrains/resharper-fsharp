@@ -1,4 +1,4 @@
-module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers.ColorReferenceAnalyzer
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
 
 open JetBrains.Application.Settings
 open JetBrains.ReSharper.Daemon.VisualElements
@@ -6,9 +6,8 @@ open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 
-[<ElementProblemAnalyzer(typeof<IReferenceExpr>,
-                         HighlightingTypes = [| typeof<ColorHighlighting> |])>]
-type RedundantAttributeSuffixAnalyzer() =
+[<ElementProblemAnalyzer(typeof<IReferenceExpr>, HighlightingTypes = [| typeof<ColorHighlighting> |])>]
+type ColorReferenceAnalyzer() =
     inherit ElementProblemAnalyzer<IReferenceExpr>()
 
     override x.Run(expr, analyzerData, consumer) =

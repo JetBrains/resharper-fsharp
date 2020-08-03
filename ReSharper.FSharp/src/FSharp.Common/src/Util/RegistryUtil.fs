@@ -1,6 +1,7 @@
 namespace global
 
 open System
+open System.Collections.Generic
 open JetBrains.Annotations
 open JetBrains.ProjectModel
 open JetBrains.ReSharper.Host.Features
@@ -10,17 +11,17 @@ open JetBrains.Rider.Model
 module FSharpRegistryUtil =
     [<AbstractClass>]
     type EnabledCookieBase<'T when 'T :> EnabledCookieBase<'T> and 'T : (new : unit -> 'T)>() =
-        static let mutable enabled = false
+        static let enabled = Stack [false]
 
         static member Create() =
-            enabled <- true
+            enabled.Push(true)
             new 'T()
 
-        static member Enabled = enabled
+        static member Enabled = enabled.Peek()
 
         interface IDisposable with
             member _.Dispose() =
-                enabled <- false
+                enabled.Pop() |> ignore
 
     type AllowExperimentalFeaturesCookie() = inherit EnabledCookieBase<AllowExperimentalFeaturesCookie>()
     type AllowFormatterCookie() = inherit EnabledCookieBase<AllowFormatterCookie>()

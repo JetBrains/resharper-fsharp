@@ -1,5 +1,7 @@
 build
 classes
-.idea
+.idea/*
+!.idea/*.png
+testData/**/.idea
 .gradle
 *.iml

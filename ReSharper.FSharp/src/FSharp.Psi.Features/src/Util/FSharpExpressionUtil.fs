@@ -2,11 +2,11 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpExpressionUtil
 
 open JetBrains.Diagnostics
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
@@ -101,7 +101,7 @@ let rec createLogicallyNegatedExpression (expr: IFSharpExpression): IFSharpExpre
 
     factory.CreateAppExpr("not", expr) :> _
 
-let setBindingExpression (expr: IFSharpExpression) contextIndent (letBindings: #ILet) =
+let setBindingExpression (expr: IFSharpExpression) contextIndent (letBindings: #ILetBindings) =
     let newExpr = letBindings.Bindings.[0].SetExpression(expr.Copy())
     if not expr.IsSingleLine then
         let indentSize = expr.GetIndentSize()

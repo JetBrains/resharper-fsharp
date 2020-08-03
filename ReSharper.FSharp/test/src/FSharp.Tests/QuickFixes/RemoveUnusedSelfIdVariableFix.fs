@@ -2,7 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
 open JetBrains.ReSharper.FeaturesTestFramework.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
-open JetBrains.ReSharper.Plugins.FSharp.Tests.Common
+open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
 [<FSharpTest>]
@@ -19,3 +19,4 @@ type RemoveUnusedSelfIdVariableTest() =
     [<Test>] member x.``Comments 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Member ctor 01``() = x.DoNamedTest()
+    [<Test>] member x.``Member ctor 02 - Add space``() = x.DoNamedTest()

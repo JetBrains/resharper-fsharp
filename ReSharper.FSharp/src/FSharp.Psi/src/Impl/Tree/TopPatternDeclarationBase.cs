@@ -47,24 +47,29 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     IFunction IFunctionDeclaration.DeclaredElement => base.DeclaredElement as IFunction;
 
-    protected override IDeclaredElement CreateDeclaredElement()
+    protected override IDeclaredElement CreateDeclaredElement() =>
+      GetFSharpSymbol() is { } fcsSymbol
+        ? CreateDeclaredElement(fcsSymbol)
+        : null;
+
+    protected override IDeclaredElement CreateDeclaredElement(FSharpSymbol fcsSymbol)
     {
-      var typeDeclaration = GetContainingNode<ITypeDeclaration>();
-      if (typeDeclaration == null)
+      if (!(fcsSymbol is FSharpMemberOrFunctionOrValue mfv))
         return null;
 
-      if (!(GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv))
+      var typeDeclaration = GetContainingNode<ITypeDeclaration>();
+      if (typeDeclaration == null)
         return null;
 
       if (typeDeclaration is IFSharpTypeDeclaration)
       {
         if ((!mfv.CurriedParameterGroups.IsEmpty() || !mfv.GenericParameters.IsEmpty()) && !mfv.IsMutable)
-          return new FSharpTypePrivateMethod(this, mfv);
+          return new FSharpTypePrivateMethod(this);
 
         if (mfv.LiteralValue != null)
           return new FSharpLiteral(this);
 
-        return new FSharpTypePrivateField(this); 
+        return new FSharpTypePrivateField(this);
       }
 
       if (mfv.LiteralValue != null)
@@ -74,9 +79,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         return new ModuleValue(this, mfv);
 
       return !mfv.IsInstanceMember && mfv.CompiledName.StartsWith("op_", StringComparison.Ordinal)
-        ? (IDeclaredElement) new FSharpSignOperator<TopPatternDeclarationBase>(this, mfv)
-        : new ModuleFunction(this, mfv);
+        ? (IDeclaredElement) new FSharpSignOperator<TopPatternDeclarationBase>(this)
+        : new ModuleFunction(this);
     }
+
+    public virtual IType GetPatternType() => TypeFactory.CreateUnknownType(GetPsiModule());
   }
 
   internal abstract class SynPatternBase : FSharpCompositeElement
@@ -87,6 +94,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       EmptyList<IDeclaration>.Instance;
     
     public TreeNodeCollection<IAttribute> Attributes => TreeNodeCollection<IAttribute>.Empty;
+
+    public virtual IType GetPatternType() => TypeFactory.CreateUnknownType(GetPsiModule());
   }
 
   public static class NamedPatEx

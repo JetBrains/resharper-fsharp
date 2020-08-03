@@ -1,0 +1,5 @@
+﻿module Module
+
+let add (a: int) (b: int) = a + b
+let multiply (a: int) (b: int) = a * b
+multiply add 1 2 ({caret}add 3 4)

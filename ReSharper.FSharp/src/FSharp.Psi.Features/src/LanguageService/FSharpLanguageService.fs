@@ -12,7 +12,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.LanguageService.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CSharp.Impl
@@ -110,7 +109,7 @@ type FSharpLanguageService
             x.GetDefaultAccessType(declaredElement)
 
         | :? IExpressionReferenceName as referenceName ->
-            if isNotNull (RecordExprBindingNavigator.GetByReferenceName(referenceName)) then
+            if isNotNull (RecordFieldBindingNavigator.GetByReferenceName(referenceName)) then
                 ReferenceAccessType.WRITE else
 
             x.GetDefaultAccessType(declaredElement)

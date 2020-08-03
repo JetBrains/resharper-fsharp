@@ -1,6 +1,7 @@
 [<AutoOpen; Extension>]
 module JetBrains.ReSharper.Plugins.FSharp.Util.FSharpPredefinedType
 
+open System.Collections.Generic
 open JetBrains.Metadata.Reader.API
 open JetBrains.Metadata.Reader.Impl
 open JetBrains.ReSharper.Psi
@@ -12,6 +13,9 @@ let sourceNameAttrTypeName = clrTypeName "Microsoft.FSharp.Core.CompilationSourc
 
 [<CompiledName("CompilationMappingAttrTypeName")>]
 let compilationMappingAttrTypeName = clrTypeName "Microsoft.FSharp.Core.CompilationMappingAttribute"
+
+[<CompiledName("CompilationRepresentationAttrTypeName")>]
+let compilationRepresentationAttrTypeName = clrTypeName "Microsoft.FSharp.Core.CompilationRepresentationAttribute"
 
 [<CompiledName("AutoOpenAttrTypeName")>]
 let autoOpenAttrTypeName = clrTypeName "Microsoft.FSharp.Core.AutoOpenAttribute"
@@ -71,6 +75,8 @@ let predefinedFunctionTypes =
     |> Array.collect (fun (typeName, names) -> [| for name in names -> name, typeName |])
     |> dict
 
+[<CompiledName("PipeOperatorNames")>]
+let pipeOperatorNames = [| "|>"; "||>"; "|||>"; "<|"; "<||"; "<|||" |] |> HashSet
 
 /// This map is used in Find Usages to get source name of element without having FSharpSymbol element.
 /// It should be removed when it's possible to get abbreviation definitions from assemblies.

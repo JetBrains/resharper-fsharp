@@ -1,0 +1,49 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  INamedModuleDeclaration
+    FSharpTokenType+ModuleTokenElement(type:MODULE, text:module)
+    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+    FSharpIdentifierToken(type:IDENTIFIER, text:Module)
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    ITypeDeclarationGroup
+      FSharpTokenType+TypeTokenElement(type:TYPE, text:type)
+      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+      IRecordDeclaration
+        FSharpIdentifierToken(type:IDENTIFIER, text:R)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        IRecordRepresentation
+          FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IRecordFieldDeclarationList
+            IRecordFieldDeclaration
+              FSharpIdentifierToken(type:IDENTIFIER, text:A)
+              FSharpTokenType+ColonTokenElement(type:COLON, text::)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              INamedTypeUsage
+                ITypeReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:int)
+            NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+            Whitespace(type:WHITE_SPACE, text:           ) spaces:"           "
+            IRecordFieldDeclaration
+              FSharpIdentifierToken(type:IDENTIFIER, text:B)
+              FSharpTokenType+ColonTokenElement(type:COLON, text::)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              INamedTypeUsage
+                ITypeReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:int)
+            NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+            Whitespace(type:WHITE_SPACE, text:           ) spaces:"           "
+            IRecordFieldDeclaration
+              FSharpIdentifierToken(type:IDENTIFIER, text:C)
+              FSharpTokenType+ColonTokenElement(type:COLON, text::)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              INamedTypeUsage
+                ITypeReferenceName
+                  FSharpIdentifierToken(type:IDENTIFIER, text:int)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+RbraceTokenElement(type:RBRACE, text:})
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

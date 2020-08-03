@@ -24,7 +24,7 @@ IFSharpImplFile
           FSharpIdentifierToken(type:SYMBOLIC_OP, text:/)
           FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IMemberParamDeclaration
+          IMemberParamsDeclaration
             IParenPat
               FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
               ITuplePat

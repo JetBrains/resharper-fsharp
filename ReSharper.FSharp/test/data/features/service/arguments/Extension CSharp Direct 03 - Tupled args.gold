@@ -1,0 +1,18 @@
+﻿module Mod
+
+open System.IO
+open System.Runtime.CompilerServices
+
+[<Extension>]
+type FileExt =
+    [<Extension>]
+    static member CreateDirectory (|fileInfo|(param #0): FileInfo, |safe|(param #1): bool, |x|(param #2): string) =
+            Directory.CreateDirectory fileInfo.Directory.FullName
+
+let x = FileInfo "abc.txt"
+FileExt.CreateDirectory (|x|(arg #0), |true|(arg #1), |"hi"|(arg #2))
+
+---------------------------------------------------------
+(arg #0) => fileInfo
+(arg #1) => safe
+(arg #2) => x

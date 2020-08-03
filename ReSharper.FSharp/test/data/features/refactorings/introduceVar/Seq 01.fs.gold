@@ -1,0 +1,4 @@
+﻿Suggested names: i
+while true do
+    let i = 123
+    ()

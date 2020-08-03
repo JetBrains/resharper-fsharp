@@ -2,9 +2,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
 
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.ReSharper.Feature.Services.Daemon
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi
 
 [<ElementProblemAnalyzer(typeof<INewExpr>,
@@ -14,6 +14,8 @@ type RedundantNewAnalyzer() =
 
     override x.Run(newExpr, _, consumer) =
         let typeName = newExpr.TypeName
+        if isNull typeName then () else
+
         let resolveResult = typeName.Reference.Resolve()
         match resolveResult.DeclaredElement.As<ITypeElement>() with
         | null -> ()

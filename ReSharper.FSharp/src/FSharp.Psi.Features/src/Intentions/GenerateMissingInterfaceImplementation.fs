@@ -1,7 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
 
 open JetBrains.ReSharper.Feature.Services.ContextActions
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -10,6 +9,7 @@ open JetBrains.ReSharper.Resources.Shell
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Application.Settings
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 
 [<ContextAction(Name = "GenerateInterfaceImplementation", Group = "F#", Description = "Generates skeleton interface implementation")>]
 type GenerateMissingInterfaceImplementation(dataProvider: FSharpContextActionDataProvider) =

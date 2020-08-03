@@ -1,0 +1,9 @@
+﻿module Mod
+
+open System.Linq
+
+let x = Seq.empty
+Enumerable.Single(|x|(arg #0))
+
+---------------------------------------------------------
+(arg #0) => source

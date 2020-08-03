@@ -1,0 +1,38 @@
+﻿-------------- offset 32 line 5 col 1 --------------------
++++ JetBrains.ReSharper.Features.Navigation.Features.GoToDeclaration.GotoDeclarationProvider navigation provider results +++
+Occurrences provided for OccurrenceUtil:
+Occurrence's dump:
+TO: [O] let |x| = 123 RANGE: (21,22) @ Signature 02 - Same range.fs
+Menu Item presentation: 
+Text: Signature 02 - Same range.fs| (3)
+Shortcut text: in <TestProject>
+Style: Enabled
+Mnemonic: 
+Tooltip: let x = 123
+
+Occurrence's navigation result. Opened file: Signature 02 - Same range.fs
+------------------
+module Module
+
+let |CARET|x = 123
+
+x
+------------------
+
+Occurrence's dump:
+TO: [O] val |x|: int RANGE: (21,22) @ Signature 02 - Same range.fsi
+Menu Item presentation: 
+Text: Signature 02 - Same range.fsi| (3)
+Shortcut text: in <TestProject>
+Style: Enabled
+Mnemonic: 
+Tooltip: val x: int
+
+Occurrence's navigation result. Opened file: Signature 02 - Same range.fsi
+------------------
+module Module
+
+val |CARET|x: int
+
+------------------
+

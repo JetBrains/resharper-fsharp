@@ -18,20 +18,21 @@ IFSharpSigFile
         IRecordRepresentation
           FSharpTokenType+LbraceTokenElement(type:LBRACE, text:{)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IRecordFieldDeclaration
-            IAttributeList
-              FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
-              IAttribute
+          IRecordFieldDeclarationList
+            IRecordFieldDeclaration
+              IAttributeList
+                FSharpTokenType+LbrackLessTokenElement(type:LBRACK_LESS, text:[<)
+                IAttribute
+                  ITypeReferenceName
+                    FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
+                FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              FSharpIdentifierToken(type:IDENTIFIER, text:Field)
+              FSharpTokenType+ColonTokenElement(type:COLON, text::)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              INamedTypeUsage
                 ITypeReferenceName
-                  FSharpIdentifierToken(type:IDENTIFIER, text:Foo)
-              FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            FSharpIdentifierToken(type:IDENTIFIER, text:Field)
-            FSharpTokenType+ColonTokenElement(type:COLON, text::)
-            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            INamedTypeUsage
-              ITypeReferenceName
-                FSharpIdentifierToken(type:IDENTIFIER, text:int)
+                  FSharpIdentifierToken(type:IDENTIFIER, text:int)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           FSharpTokenType+RbraceTokenElement(type:RBRACE, text:})
       NewLine(type:NEW_LINE, text:\n) spaces:"\n"

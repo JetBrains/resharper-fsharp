@@ -17,13 +17,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_OBJECT_MODEL_TYPE_DECLARATION = "";
     public const string IDS_INHERIT_MEMBER = "";
     public const string IDS_CONSTRUCTOR_DECLARATION = "";
-    public const string IDS_MEMBER_PARAM_DECLARATION_GROUP = "";
+    public const string IDS_MEMBER_PARAMS_DECLARATION = "";
     public const string IDS_MEMBER_KEYWORD = "";
     public const string IDS_SELF_ID = "";
     public const string IDS_NOT_COMPILED_TYPE_DECLARATION = "";
     public const string IDS_SIMPLE_TYPE_DECLARATION = "";
     public const string IDS_HASH_DIRECTIVE = "";
-    public const string IDS_SYN_PAT = "";
+    public const string IDS_F_SHARP_PATTERN = "";
     public const string IDS_CONST_PAT = "";
     public const string IDS_F_SHARP_IDENTIFIER = "";
     public const string IDS_REFERENCE_PAT = "";
@@ -45,7 +45,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_APP_LIKE_EXPR = "";
     public const string IDS_TYPED_LIKE_EXPR = "";
     public const string IDS_LITERAL_EXPR = "";
+    public const string IDS_ARRAY_OR_LIST_LIKE_EXPR = "";
     public const string IDS_ARRAY_OR_LIST_EXPR = "";
+    public const string IDS_ARRAY_OR_LIST_COMPREHENSION_EXPR_CLAUSE = "";
     public const string IDS_QUALIFIED_EXPR = "";
     public const string IDS_INDEXER_EXPR = "";
     public const string IDS_INDEXER_ARG = "";
@@ -65,9 +67,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
     public const string IDS_TYPE_ARGUMENT_LIST = "";
     public const string IDS_POSTFIX_APP_TYPE_ARGUMENT_LIST = "";
     public const string IDS_FOR_EACH_IN_CLAUSE = "";
+    public const string IDS_FOR_EACH_BODY_SEPARATOR = "";
     public const string IDS_CONDITION_OWNER_EXPR = "";
     public const string IDS_IF_EXPR = "";
     public const string IDS_ELSE_CLAUSE = "";
+    public const string IDS_RECORD_LIKE_EXPR = "";
 
     public static string GetString(string id) => id;
     public static string GetExpectedMessage(string s) => string.Empty;

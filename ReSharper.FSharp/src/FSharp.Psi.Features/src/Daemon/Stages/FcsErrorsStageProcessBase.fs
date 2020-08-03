@@ -6,10 +6,10 @@ open FSharp.Compiler.SourceCodeServices
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.Util
 
@@ -37,6 +37,8 @@ module FSharpErrors =
     let [<Literal>] FieldRequiresAssignment = 764
     let [<Literal>] ExpectedExpressionAfterLet = 588
     let [<Literal>] SuccessiveArgsShouldBeSpacedOrTupled = 597
+    let [<Literal>] ConstructRequiresListArrayOrSequence = 747
+    let [<Literal>] ConstructRequiresComputationExpression = 748
     let [<Literal>] EmptyRecordInvalid = 789
     let [<Literal>] UseBindingsIllegalInModules = 524
     let [<Literal>] LocalClassBindingsCannotBeInline = 894
@@ -104,8 +106,10 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | NotAFunction ->
             let notAFunctionNode = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
-            let prefixAppExpr = (tryFindRootPrefixAppWhereExpressionIsFunc notAFunctionNode).As<IPrefixAppExpr>()
-            NotAFunctionError(notAFunctionNode.IgnoreParentParens(), prefixAppExpr) :> _
+            match tryFindRootPrefixAppWhereExpressionIsFunc notAFunctionNode with
+            | :? IPrefixAppExpr as prefixAppExpr ->
+                NotAFunctionError(notAFunctionNode.IgnoreParentParens(), prefixAppExpr) :> _
+            | _ -> createGenericHighlighting error range
 
         | FieldNotMutable ->
             createHighlightingFromNode FieldOrValueNotMutableError range
@@ -189,6 +193,12 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
 
         | SuccessiveArgsShouldBeSpacedOrTupled ->
             createHighlightingFromNode SuccessiveArgsShouldBeSpacedOrTupledError range
+
+        | ConstructRequiresListArrayOrSequence ->
+            createHighlightingFromNode YieldRequiresSeqExpressionError range
+
+        | ConstructRequiresComputationExpression ->
+            createHighlightingFromNode ReturnRequiresComputationExpressionError range
 
         | EmptyRecordInvalid ->
             createHighlightingFromNodeWithMessage EmptyRecordInvalidError range error

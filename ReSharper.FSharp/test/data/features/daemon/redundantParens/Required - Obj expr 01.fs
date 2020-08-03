@@ -1,0 +1,5 @@
+module M
+
+type A(x: int) = class end
+
+{ new A(123) with override x.ToString() = "" }

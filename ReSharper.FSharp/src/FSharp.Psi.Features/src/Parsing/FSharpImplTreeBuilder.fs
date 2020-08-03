@@ -413,8 +413,11 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                 | lid ->
                     x.ProcessReferenceName(lid)
 
-                x.ProcessPatternParams(args, isLocal || isTopLevelPat, false)
-                if isLocal then ElementType.LOCAL_PARAMETERS_OWNER_PAT else ElementType.TOP_PARAMETERS_OWNER_PAT
+                if args.IsEmpty then
+                    if isLocal then ElementType.LOCAL_REFERENCE_PAT else ElementType.TOP_REFERENCE_PAT
+                else
+                    x.ProcessPatternParams(args, isLocal || isTopLevelPat, false)
+                    if isLocal then ElementType.LOCAL_PARAMETERS_OWNER_PAT else ElementType.TOP_PARAMETERS_OWNER_PAT
 
             | SynPat.Typed(pat, synType, _) ->
                 x.ProcessPat(pat, isLocal, false)
@@ -519,7 +522,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
 
         let mark = x.Mark(range)
         x.ProcessPat(pat, isLocal, false)
-        x.Done(range, mark, ElementType.MEMBER_PARAM_DECLARATION)
+        x.Done(range, mark, ElementType.MEMBER_PARAMS_DECLARATION)
 
     member x.MarkOtherType(TypeRange range as typ) =
         let mark = x.Mark(range)
@@ -664,20 +667,33 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             x.ProcessExpressionList(exprs)
 
         | SynExpr.ArrayOrList(_, exprs, _) ->
-            x.ProcessListExpr(exprs, range, ElementType.ARRAY_OR_LIST_EXPR)
+            // SynExpr.ArrayOrList is currently only used for error recovery and empty lists in the parser.
+            // Non-empty SynExpr.ArrayOrList is created in the type checker only.
+            Assertion.Assert(List.isEmpty exprs, "Non-empty SynExpr.ArrayOrList: {0}", expr)
+            x.MarkAndDone(range, ElementType.ARRAY_OR_LIST_EXPR)
 
         | SynExpr.AnonRecd(_, copyInfo, fields, _) ->
-            x.PushRange(range, ElementType.ANON_RECD_EXPR)
-            x.PushStepList(fields, anonRecordFieldListProcessor)
+            x.PushRange(range, ElementType.ANON_RECORD_EXPR)
+            if not fields.IsEmpty then
+                x.PushStep(fields, anonRecordBindingListRepresentationProcessor)
+
             match copyInfo with
             | Some(expr, _) -> x.ProcessExpression(expr)
             | _ -> ()
 
-        | SynExpr.Record(_, copyInfo, fields, _) ->
+        | SynExpr.Record(baseInfo, copyInfo, fields, _) ->
             x.PushRange(range, ElementType.RECORD_EXPR)
-            x.PushStepList(fields, recordFieldListProcessor)
-            match copyInfo with
-            | Some(expr, _) -> x.ProcessExpression(expr)
+            if not fields.IsEmpty then
+                x.PushStep(fields, recordBindingListRepresentationProcessor)
+
+            match baseInfo, copyInfo with
+            | Some(typeName, expr, _, _, _), _ ->
+                x.ProcessTypeAsTypeReferenceName(typeName)
+                x.ProcessExpression(expr)
+
+            | _, Some(expr, _) ->
+                x.ProcessExpression(expr)
+
             | _ -> ()
 
         | SynExpr.New(_, synType, expr, _) ->
@@ -714,7 +730,8 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             x.ProcessExpression(enumExpr)
 
         | SynExpr.ArrayOrListOfSeqExpr(_, expr, _) ->
-            x.PushRangeAndProcessExpression(expr, range, ElementType.ARRAY_OR_LIST_OF_SEQ_EXPR)
+            let expr = match expr with | SynExpr.CompExpr(expr = expr) -> expr | _ -> expr
+            x.PushRangeAndProcessExpression(expr, range, ElementType.ARRAY_OR_LIST_EXPR)
 
         | SynExpr.CompExpr(_, _, expr, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.COMPUTATION_EXPR)
@@ -904,12 +921,20 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
 
         | SynExpr.ImplicitZero _ -> ()
 
-        | SynExpr.YieldOrReturn(_, expr, _)
+        | SynExpr.YieldOrReturn(_, expr, _) ->
+            x.AdvanceToStart(range)
+            if x.TokenType == FSharpTokenType.RARROW then
+                // Remove fake yield expressions in list comprehensions
+                // by replacing `-> a` with `a` in `[ for a in 1 .. 2 -> a ]`.
+                x.ProcessExpression(expr)
+            else
+                x.PushRangeAndProcessExpression(expr, range, ElementType.YIELD_OR_RETURN_EXPR)
+
         | SynExpr.YieldOrReturnFrom(_, expr, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.YIELD_OR_RETURN_EXPR)
 
         | SynExpr.LetOrUseBang(_, _, _, pat, expr, ands, inExpr, range) ->
-            x.PushRange(range, ElementType.LET_OR_USE_BANG_EXPR)
+            x.PushRange(range, ElementType.LET_OR_USE_EXPR)
             x.PushExpression(inExpr)
             x.PushStepList(ands, andLocalBindingListProcessor)
             x.PushRangeForMark(expr.Range, x.Mark(pat.Range), ElementType.LOCAL_BINDING)
@@ -972,10 +997,10 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
 
         // Range sequence expr also contains braces in the fake app expr, mark it as a separate expr node.
         if appRange <> rangeSeqRange then
-            x.PushRange(appRange, ElementType.RANGE_SEQUENCE_EXPR)
+            x.PushRange(appRange, ElementType.COMPUTATION_EXPR)
 
         let seqMark = x.Mark(fromRange)
-        x.PushRangeForMark(toRange, seqMark, ElementType.RANGE_SEQUENCE)
+        x.PushRangeForMark(toRange, seqMark, ElementType.RANGE_SEQUENCE_EXPR)
         x.PushExpression(toExpr)
 
         match stepExpr with
@@ -1061,8 +1086,8 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
                 x.ProcessOneLambdaParam(pats, lambdaBody, outerBodyExpr, processNext)
             else
                 match outerBodyExpr with
-                | SynExpr.Match(_, _, [ Clause(pat, whenExpr, innerExpr, clauseRange, _) ], matchRange) when
-                        matchRange.Start = clauseRange.Start ->
+                | SynExpr.Match(_, _, [ Clause(pat, whenExpr, innerExpr, _, _) as clause ], matchRange) when
+                        matchRange.Start = clause.Range.Start ->
 
                     Assertion.Assert(whenExpr.IsNone, "whenExpr.IsNone")
                     x.ProcessPat(pat, true, false)
@@ -1131,7 +1156,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
 
     member x.ProcessSynIndexerArg(arg) =
         match arg with
-        | SynIndexerArg.One(expr, _, range) ->
+        | SynIndexerArg.One(ExprRange range as expr, _, _) ->
             x.PushRange(range, ElementType.INDEXER_ARG_EXPR)
             x.PushExpression(getGeneratedAppArg expr)
 
@@ -1144,34 +1169,45 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
         let wrappedArgExpr = { Expression = expr; ElementType = ElementType.INDEXER_ARG_EXPR }
         x.PushStep(wrappedArgExpr, wrapExpressionProcessor)
 
-    member x.ProcessAnonRecordField(IdentRange idRange, (ExprRange range as expr)) =
+    member x.ProcessRecordFieldBindingList(fields: (RecordFieldName * (SynExpr option) * BlockSeparator option) list) =
+        let fieldsRange =
+            match fields.Head, List.last fields with
+            | ((lid, _), _, _), (_, Some(fieldValue), _) -> unionRanges lid.Range fieldValue.Range
+            | ((lid, _), _, _), _ -> lid.Range
+        
+        x.PushRange(fieldsRange, ElementType.RECORD_FIELD_BINDING_LIST)
+        x.PushStepList(fields, recordFieldBindingListProcessor)
+
+    member x.ProcessAnonRecordFieldBindingList(fields: (Ident * SynExpr) list) =
+        let fieldsRange =
+            match fields.Head, List.last fields with
+            | (id, _), (_, value) -> unionRanges id.idRange value.Range
+        
+        x.PushRange(fieldsRange, ElementType.RECORD_FIELD_BINDING_LIST)
+        x.PushStepList(fields, anonRecordFieldBindingListProcessor)
+
+    member x.ProcessAnonRecordFieldBinding(IdentRange idRange, (ExprRange range as expr)) =
         // Start node at id range, end at expr range.
         let mark = x.Mark(idRange)
-        x.PushRangeForMark(range, mark, ElementType.RECORD_EXPR_BINDING)
+        x.PushRangeForMark(range, mark, ElementType.RECORD_FIELD_BINDING)
         x.MarkAndDone(idRange, ElementType.EXPRESSION_REFERENCE_NAME)
         x.ProcessExpression(expr)
 
-    member x.ProcessRecordField(field: (RecordFieldName * (SynExpr option) * BlockSeparator option)) =
+    member x.ProcessRecordFieldBinding(field: (RecordFieldName * (SynExpr option) * BlockSeparator option)) =
         let (lid, _), expr, blockSep = field
         let lid = lid.Lid
         match lid, expr with
-        | [], None -> ()
-        | [], Some(ExprRange range as expr) ->
-            x.PushRange(range, ElementType.RECORD_EXPR_BINDING)
-            x.PushRecordBlockSep(blockSep)
-            x.ProcessExpression(expr)
-
-        | IdentRange headRange :: _, expr ->
+        | IdentRange headRange :: _, Some(ExprRange exprRange as expr) ->
             let mark = x.Mark(headRange)
-            x.PushRangeForMark(headRange, mark, ElementType.RECORD_EXPR_BINDING)
+            x.PushRangeForMark(exprRange, mark, ElementType.RECORD_FIELD_BINDING)
             x.PushRecordBlockSep(blockSep)
             x.ProcessReferenceName(lid)
-            if expr.IsSome then
-                x.ProcessExpression(expr.Value)
+            x.ProcessExpression(expr)
+        | _ -> ()
 
     member x.PushRecordBlockSep(blockSep) =
         match blockSep with
-        | Some(range, _) -> x.PushStep(range, advanceToEndProcessor)
+        | Some(_, Some(pos)) -> x.PushStep(pos, advanceToPosProcessor)
         | _ -> ()
 
     member x.ProcessListExpr(exprs, range, elementType) =
@@ -1199,7 +1235,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             
         let range = whenExpr.Range
         let mark = x.MarkTokenOrRange(FSharpTokenType.WHEN, range)
-        x.PushRangeForMark(range, mark, ElementType.WHEN_EXPR)
+        x.PushRangeForMark(range, mark, ElementType.WHEN_EXPR_CLAUSE)
         
         x.ProcessExpression(whenExpr)
 
@@ -1272,11 +1308,11 @@ type RangeMarkAndType =
       Mark: int
       ElementType: NodeType }
 
-type AdvanceToEndProcessor() =
-    inherit StepProcessorBase<range>()
+type AdvanceToPosProcessor() =
+    inherit StepProcessorBase<pos>()
 
     override x.Process(item, builder) =
-        builder.AdvanceToEnd(item)
+        builder.AdvanceTo(item)
 
 type EndRangeProcessor() =
     inherit StepProcessorBase<RangeMarkAndType>()
@@ -1297,6 +1333,20 @@ type TypeArgsInReferenceExprProcessor() =
 
     override x.Process(synExpr, builder) =
         builder.ProcessTypeArgsInReferenceExpr(synExpr)
+
+
+type RecordBindingListRepresentationProcessor() =
+    inherit StepProcessorBase<(RecordFieldName * (SynExpr option) * BlockSeparator option) list>()
+    
+    override x.Process(fields, builder) =
+        builder.ProcessRecordFieldBindingList(fields)
+
+
+type AnonRecordBindingListRepresentationProcessor() =
+    inherit StepProcessorBase<(Ident * SynExpr) list>()
+    
+    override x.Process(fields, builder) =
+        builder.ProcessAnonRecordFieldBindingList(fields)
 
 
 type ExpressionListProcessor() =
@@ -1320,18 +1370,18 @@ type AndLocalBindingListProcessor() =
         builder.ProcessAndLocalBinding(binding)
 
 
-type RecordFieldListProcessor() =
+type RecordFieldBindingListProcessor() =
     inherit StepListProcessorBase<RecordFieldName * (SynExpr option) * BlockSeparator option>()
 
     override x.Process(field, builder) =
-        builder.ProcessRecordField(field)
+        builder.ProcessRecordFieldBinding(field)
 
 
-type AnonRecordFieldListProcessor() =
+type AnonRecordFieldBindingListProcessor() =
     inherit StepListProcessorBase<Ident * SynExpr>()
 
     override x.Process(field, builder) =
-        builder.ProcessAnonRecordField(field)
+        builder.ProcessAnonRecordFieldBinding(field)
 
 
 type MatchClauseListProcessor() =
@@ -1385,17 +1435,19 @@ module BuilderStepProcessors =
     let expressionProcessor = ExpressionProcessor()
     let sequentialExpressionProcessor = SequentialExpressionProcessor()
     let wrapExpressionProcessor = WrapExpressionProcessor()
-    let advanceToEndProcessor = AdvanceToEndProcessor()
+    let advanceToPosProcessor = AdvanceToPosProcessor()
     let endRangeProcessor = EndRangeProcessor()
     let synTypeProcessor = SynTypeProcessor()
     let typeArgsInReferenceExprProcessor = TypeArgsInReferenceExprProcessor()
     let indexerArgsProcessor = IndexerArgsProcessor()
+    let recordBindingListRepresentationProcessor = RecordBindingListRepresentationProcessor() 
+    let anonRecordBindingListRepresentationProcessor = AnonRecordBindingListRepresentationProcessor() 
 
     let expressionListProcessor = ExpressionListProcessor()
     let bindingListProcessor = BindingListProcessor()
     let andLocalBindingListProcessor = AndLocalBindingListProcessor()
-    let recordFieldListProcessor = RecordFieldListProcessor()
-    let anonRecordFieldListProcessor = AnonRecordFieldListProcessor()
+    let recordFieldBindingListProcessor = RecordFieldBindingListProcessor()
+    let anonRecordFieldBindingListProcessor = AnonRecordFieldBindingListProcessor()
     let matchClauseListProcessor = MatchClauseListProcessor()
     let objectExpressionMemberListProcessor = ObjectExpressionMemberListProcessor()
     let interfaceImplementationListProcessor = InterfaceImplementationListProcessor()

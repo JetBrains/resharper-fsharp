@@ -1,0 +1,23 @@
+﻿Language: PsiLanguageType:F#
+IFSharpImplFile
+  IAnonModuleDeclaration
+    IDo
+      FSharpTokenType+DoTokenElement(type:DO, text:do)
+      NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+      Whitespace(type:WHITE_SPACE, text:  ) spaces:"  "
+      IChameleonExpression
+        IArrayOrListExpr
+          FSharpTokenType+LbrackTokenElement(type:LBRACK, text:[)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          IRangeSequenceExpr
+            ILiteralExpr
+              FSharpToken(type:INT32, text:1)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            FSharpTokenType+DotDotTokenElement(type:DOT_DOT, text:..)
+            Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+            ILiteralExpr
+              FSharpToken(type:INT32, text:2)
+          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+          FSharpTokenType+RbrackTokenElement(type:RBRACK, text:])
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+

@@ -12,19 +12,20 @@ IFSharpImplFile
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
           INamedTypeUsage
             ITypeReferenceName
-              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
               IPostfixAppTypeArgumentList
-                ITupleTypeUsage
-                  INamedTypeUsage
-                    ITypeReferenceName
-                      FSharpIdentifierToken(type:IDENTIFIER, text:int)
-                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                  FSharpTokenType+StarTokenElement(type:STAR, text:*)
-                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-                  INamedTypeUsage
-                    ITypeReferenceName
-                      FSharpIdentifierToken(type:IDENTIFIER, text:int)
-              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+                IParenTypeUsage
+                  FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                  ITupleTypeUsage
+                    INamedTypeUsage
+                      ITypeReferenceName
+                        FSharpIdentifierToken(type:IDENTIFIER, text:int)
+                    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                    FSharpTokenType+StarTokenElement(type:STAR, text:*)
+                    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                    INamedTypeUsage
+                      ITypeReferenceName
+                        FSharpIdentifierToken(type:IDENTIFIER, text:int)
+                  FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
               Whitespace(type:WHITE_SPACE, text: ) spaces:" "
               FSharpIdentifierToken(type:IDENTIFIER, text:list)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "

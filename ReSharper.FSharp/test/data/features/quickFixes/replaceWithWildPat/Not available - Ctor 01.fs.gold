@@ -6,4 +6,5 @@ type T(|p|(0)) =
 
 ------------------------------------------------
 0: The value 'p' is unused
-NO QUICKFIXES
+QUICKFIXES:
+Rename to '_p'

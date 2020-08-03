@@ -1,0 +1,10 @@
+module Module
+
+open System.Runtime.CompilerServices
+
+[<|Extension|(0)>]
+let a() = 5
+
+------------------------------------------------
+0: Extension member in non-extension type looks suspicious
+NO QUICKFIXES

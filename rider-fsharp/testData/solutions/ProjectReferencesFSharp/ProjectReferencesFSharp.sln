@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ReferenceFrom", "ReferenceFrom\ReferenceFrom.fsproj", "{8F2A67B4-1AB9-465B-B575-6B4DC8BE55D0}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "ReferenceTo", "ReferenceTo\ReferenceTo.fsproj", "{2B6207FF-DF04-41F0-919C-2896EA2F771D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8F2A67B4-1AB9-465B-B575-6B4DC8BE55D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8F2A67B4-1AB9-465B-B575-6B4DC8BE55D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8F2A67B4-1AB9-465B-B575-6B4DC8BE55D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8F2A67B4-1AB9-465B-B575-6B4DC8BE55D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B6207FF-DF04-41F0-919C-2896EA2F771D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B6207FF-DF04-41F0-919C-2896EA2F771D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B6207FF-DF04-41F0-919C-2896EA2F771D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B6207FF-DF04-41F0-919C-2896EA2F771D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

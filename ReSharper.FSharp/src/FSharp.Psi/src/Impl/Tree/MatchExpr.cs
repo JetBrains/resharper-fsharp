@@ -6,6 +6,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     public override IType Type() =>
       ClausesEnumerable.FirstOrDefault()?.Expression?.Type() ??
-      TypeFactory.CreateUnknownType(GetPsiModule());
+      base.Type();
   }
 }

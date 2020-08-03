@@ -145,6 +145,17 @@ let patternName (pattern: FSharpActivePatternGroup) =
     let joinedNames = String.concat "|" pattern.Names
     let wildCase = if pattern.IsTotal then "|" else "_|"
     "|" + joinedNames + wildCase
+    
+[<Extension; CompiledName("GetAbbreviatedEntity")>]
+let getAbbreviatedEntity (entity: FSharpEntity) =
+    let mutable baseTypeEntity = entity
+    while baseTypeEntity.IsFSharpAbbreviation && baseTypeEntity.AbbreviatedType.HasTypeDefinition do
+        baseTypeEntity <- baseTypeEntity.AbbreviatedType.TypeDefinition
+    baseTypeEntity
+
+[<Extension; CompiledName("HasMeasureParameter")>]
+let hasMeasureParameter(entity: FSharpEntity) =
+    entity.GenericParameters.Count > 0 && entity.GenericParameters.[0].IsMeasure;
 
 type FSharpActivePatternGroup with
     member x.PatternName = patternName x

@@ -1,0 +1,7 @@
+﻿Suggested names: doubles
+module Module
+
+let f a b = ()
+do
+    let doubles = [|1.0|]
+    f doubles id

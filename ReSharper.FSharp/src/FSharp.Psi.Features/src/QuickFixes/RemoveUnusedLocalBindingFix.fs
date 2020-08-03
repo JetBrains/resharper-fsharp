@@ -3,10 +3,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open System
 open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.QuickFixes
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Util
@@ -22,9 +22,9 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
     // todo: we can also check that every top declaration pat is unused instead
 
     let binding = BindingNavigator.GetByHeadPattern(pat)
-    let letOrUse = LetNavigator.GetByBinding(binding)
+    let letOrUse = LetBindingsNavigator.GetByBinding(binding)
 
-    let getCopyRange (expr: ILetLikeExpr) =
+    let getCopyRange (expr: ILetOrUseExpr) =
         let inExpr = expr.InExpression
 
         let inKeyword = expr.InKeyword
@@ -71,7 +71,7 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
 
                 ModificationUtil.DeleteChildRange(TreeRange(first, last))
 
-            | :? ILetLikeExpr as letExpr ->
+            | :? ILetOrUseExpr as letExpr ->
                 let rangeToCopy = getCopyRange letExpr
                 ModificationUtil.ReplaceChildRange(TreeRange(letExpr), rangeToCopy) |> ignore
 

@@ -1,5 +1,4 @@
-﻿using FSharp.Compiler.SourceCodeServices;
-using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
+﻿using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
@@ -12,7 +11,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
 
     protected override IDeclaredElement CreateDeclaredElement() =>
-      GetFSharpSymbol() is FSharpField field ? new FSharpRecordField(this, field) : null;
+      new FSharpRecordField(this);
 
     public bool IsMutable => MutableKeyword != null;
 

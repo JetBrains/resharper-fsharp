@@ -18,7 +18,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       CLRDeclaredElementType.CONSTANT;
 
     public override bool IsStatic => true;
-    public override bool IsFSharpMember => false;
 
     public IType Type => GetType(Mfv?.FullType);
 

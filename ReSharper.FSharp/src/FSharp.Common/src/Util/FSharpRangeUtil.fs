@@ -40,6 +40,13 @@ let getTreeStartOffset ([<NotNull>] document) (range: range) =
 let getTreeEndOffset ([<NotNull>] document) (range: range) =
     getTreeOffsetByPos document range.End
 
+[<Extension; CompiledName("GetTreeTextRange")>]
+let getTreeTextRange (document: IDocument) (range: range) =
+    let startOffset = getTreeStartOffset document range
+    let endOffset = getTreeEndOffset document range
+    TreeTextRange(startOffset, endOffset)
+
+
 [<Extension; CompiledName("ToPos")>]
 let getPosFromCoords (coords: DocumentCoords) =
     let line = int coords.Line + 1
@@ -69,10 +76,14 @@ let getEndOffset ([<NotNull>] document) (range: range) =
     getPosOffset document range.End
 
 [<Extension; CompiledName("ToDocumentRange")>]
-let ofDocumentRange (documentRange: DocumentRange) =
+let ofFileDocumentRange (documentRange: DocumentRange) (path: FileSystemPath) =
     let startPos = getPosFromDocumentOffset documentRange.StartOffset
     let endPos = getPosFromDocumentOffset documentRange.EndOffset
-    mkRange "" startPos endPos
+    mkRange path.FullPath startPos endPos
+
+[<Extension; CompiledName("ToDocumentRange")>]
+let ofDocumentRange (documentRange: DocumentRange) =
+    ofFileDocumentRange documentRange FileSystemPath.Empty
 
 [<Extension; CompiledName("GetTextRange")>]
 let getTextRange (document: IDocument) (range: range) =

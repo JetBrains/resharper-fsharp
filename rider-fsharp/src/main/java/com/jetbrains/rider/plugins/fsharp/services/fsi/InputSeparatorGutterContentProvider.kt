@@ -17,4 +17,6 @@ class InputSeparatorGutterContentProvider(isLineRelationshipComputable: Boolean)
     fun addLineSeparator(line: Int) {
         separatorLines.add(line)
     }
+
+    override fun beforeEvaluate(editor: Editor) = Unit
 }

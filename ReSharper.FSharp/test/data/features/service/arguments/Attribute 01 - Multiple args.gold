@@ -1,0 +1,8 @@
+﻿open System.ComponentModel
+
+[<DefaultValue(|typeof<string>|(arg #0), |"hi"|(arg #1))>]
+let x = ""
+
+---------------------------------------------------------
+(arg #0) => type
+(arg #1) => value

@@ -26,9 +26,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
   {
     private readonly bool myIsMutable;
 
-    internal FSharpRecordField([NotNull] IRecordFieldDeclaration declaration, [NotNull] FSharpField field) :
-      base(declaration) =>
-      myIsMutable = field.IsMutable;
+    internal FSharpRecordField([NotNull] IRecordFieldDeclaration declaration) : base(declaration) =>
+      myIsMutable = declaration.IsMutable;
 
     public bool IsMutable =>
       myIsMutable || GetContainingType().IsCliMutableRecord();

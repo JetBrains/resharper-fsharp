@@ -1,12 +1,13 @@
+using System.Collections.Generic;
 using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Annotations;
+using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
-using JetBrains.ReSharper.Psi.Util;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
@@ -61,9 +62,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         ? qualifierName + "." + ShortName
         : ShortName;
 
-    public override IType Type() =>
-      Reference.Resolve().DeclaredElement?.Type() ?? TypeFactory.CreateUnknownType(this);
-
     public FSharpSymbolReference Reference
     {
       get
@@ -72,10 +70,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
           return SymbolReference;
 
         lock (this)
-        {
-          if (SymbolReference == null)
-            SymbolReference = new FSharpSymbolReference(this);
-        }
+          SymbolReference ??= new FSharpSymbolReference(this);
+
         return SymbolReference;
       }
     }
@@ -86,6 +82,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       FSharpImplUtil.SetName(this, name);
 
     ITypeArgumentList ITypeArgumentOwner.TypeArgumentList => TypeArgumentList;
+
+    public bool IsQualified => Qualifier != null;
+
+    public FSharpSymbolReference QualifierReference =>
+      Qualifier is IReferenceExpr refExpr ? refExpr.Reference : null;
+
+    public void SetQualifier(IClrDeclaredElement declaredElement)
+    {
+      // todo: implement for existing qualifiers
+      Assertion.Assert(Qualifier == null, "Qualifier == null");
+      this.SetQualifier(this.CreateElementFactory().CreateReferenceExpr, declaredElement);
+    }
+
+    public IList<string> Names => this.GetNames();
   }
 
   public class ReferenceExpressionTypeReference : FSharpSymbolReference
@@ -94,12 +104,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
     }
 
-    public override FSharpSymbol GetFSharpSymbol()
-    {
-      if (base.GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv && mfv.IsConstructor)
-        return mfv.DeclaringEntity?.Value;
-
-      return null;
-    }
+    public override FSharpSymbol GetFSharpSymbol() =>
+      base.GetFSharpSymbol() switch
+      {
+        FSharpMemberOrFunctionOrValue mfv when mfv.IsConstructor => mfv.DeclaringEntity?.Value,
+        // FSharpUnionCase unionCase => unionCase.ReturnType.TypeDefinition,
+        _ => null
+      };
   }
 }

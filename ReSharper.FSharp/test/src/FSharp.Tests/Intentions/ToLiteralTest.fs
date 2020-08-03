@@ -13,7 +13,7 @@ type ToLiteralTest() =
     [<Test>] member x.``Let 02 - Existing attributes``() = x.DoNamedTest()
     [<Test>] member x.``Let 03 - Existing attributes``() = x.DoNamedTest()
 
-type ToLiteralTestAvailabilityTest() =
+type ToLiteralAvailabilityTest() =
     inherit FSharpContextActionAvailabilityTestBase<ToLiteralAction>()
 
     override x.ExtraPath = "toLiteral"

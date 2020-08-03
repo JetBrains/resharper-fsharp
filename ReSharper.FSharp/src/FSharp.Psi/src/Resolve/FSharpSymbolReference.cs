@@ -12,6 +12,7 @@ using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.ReSharper.Resources.Shell;
 using JetBrains.Util;
 using JetBrains.Util.DataStructures;
+using Microsoft.FSharp.Core;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 {
@@ -34,6 +35,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
     public virtual FSharpSymbol GetFSharpSymbol() =>
       GetSymbolUse()?.Symbol;
 
+    public FSharpOption<FSharpSymbol> TryGetFSharpSymbol() =>
+      OptionModule.OfObj(GetFSharpSymbol());
+
+    public bool HasFcsSymbol => GetSymbolUse() != null;
+
     public override ResolveResultWithInfo ResolveWithoutCache()
     {
       if (!myOwner.IsValid())
@@ -55,8 +61,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
 
       // Current grammar rules can't get some operator identifiers, like '=', we're trying to workaround it below.
       // todo: rewrite after https://youtrack.jetbrains.com/issue/RIDER-41848 is fixed, also change SymbolOffset
-
-      var text = myOwner.GetText();
+      var text = myOwner.GetText().RemoveBackticks();
       return text.IsEmpty() ? SharedImplUtil.MISSING_DECLARATION_NAME : text;
     }
 
@@ -89,7 +94,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         return this;
 
       using (WriteLockCookie.Create(myOwner.IsPhysical()))
-        return myOwner.SetName(FSharpBindingUtil.SuggestShortReferenceName(this, element)).Reference;
+        return myOwner.SetName(FSharpReferenceBindingUtil.SuggestShortReferenceName(this, element)).Reference;
     }
 
     private static bool CanBindTo(IDeclaredElement element) =>
@@ -105,12 +110,28 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
       throw new NotImplementedException();
 
     public bool IsQualified =>
-      GetElement() switch
-      {
-        IReferenceExpr referenceExpr => referenceExpr.Qualifier != null,
-        IReferenceName referenceName => referenceName.Qualifier != null,
-        ITypeExtensionDeclaration typeExtension => typeExtension.QualifierReferenceName != null,
-        _ => false
-      };
+      GetElement() is IFSharpQualifiableReferenceOwner referenceOwner && referenceOwner.IsQualified;
+
+    public FSharpSymbolReference QualifierReference =>
+      GetElement() is IFSharpQualifiableReferenceOwner referenceOwner ? referenceOwner.QualifierReference : null;
+
+    public void SetQualifier([NotNull] IClrDeclaredElement declaredElement)
+    {
+      if (GetElement() is IFSharpQualifiableReferenceOwner referenceOwner)
+        referenceOwner.SetQualifier(declaredElement);
+    }
+
+    /// Does not reuse existing file resolve results, does complete lookup by name.
+    public FSharpOption<FSharpSymbolUse> ResolveWithFcs([NotNull] string opName, bool qualified = true)
+    {
+      var referenceOwner = GetElement();
+      var checkerService = referenceOwner.CheckerService;
+
+      var names = qualified && referenceOwner is IFSharpQualifiableReferenceOwner qualifiableReferenceOwner
+        ? qualifiableReferenceOwner.Names
+        : new[] {GetName()};
+
+      return checkerService.ResolveNameAtLocation(referenceOwner, names, opName);
+    }
   }
 }

@@ -1,0 +1,12 @@
+﻿module Module
+
+type FooAttribute() =
+    inherit System.Attribute()
+
+let foo ([<Foo>] ((|x|(0): int))) =
+    ()
+
+------------------------------------------------
+0: The value 'x' is unused
+QUICKFIXES:
+Rename to '_x'

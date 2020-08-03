@@ -31,7 +31,6 @@
         <Token name="FOR" representation="for" />
         <Token name="FUN" representation="fun" />
         <Token name="FUNCTION" representation="function" />
-        <Token name="GLOBAL" representation="global" />
         <Token name="IF" representation="if" />
         <Token name="IN" representation="in" />
         <Token name="INHERIT" representation="inherit" />
@@ -155,6 +154,7 @@
         <Token name="PLUS" />
         <Token name="LPAREN_STAR_RPAREN" />
         <Token name="AMP_AMP" />
+        <Token name="GLOBAL" representation="global" />
         <Token name="BAD_SYMBOLIC_OP" />
         <Token name="SHEBANG" />
         <Token name="HASH" />

@@ -1,0 +1,4 @@
+﻿Suggested names: stringBuilder, builder, append
+open System.Text
+
+let stringBuilder = StringBuilder().Append([||])

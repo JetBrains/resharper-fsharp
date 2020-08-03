@@ -1,9 +1,9 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpAttributesUtil
 
+open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 
@@ -48,3 +48,14 @@ let addAttributesList (decl: IFSharpTreeNode) addNewLine =
         else
             Whitespace()
     ] |> ignore
+
+let getTypeDeclarationAttributeList typeDecl =
+    let typeDeclarationGroup = TypeDeclarationGroupNavigator.GetByTypeDeclaration(typeDecl)
+    if typeDeclarationGroup.TypeDeclarations.[0] == typeDecl then
+        let attributeLists = typeDeclarationGroup.AttributeLists
+        if not attributeLists.IsEmpty then attributeLists.[0] else
+        addAttributesList typeDeclarationGroup true; typeDeclarationGroup.AttributeLists.[0]
+    else
+        let attributeLists = typeDecl.AttributeLists
+        if not attributeLists.IsEmpty then attributeLists.[0] else
+        addAttributesList typeDecl false; typeDecl.AttributeLists.[0]

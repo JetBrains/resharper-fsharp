@@ -1,0 +1,16 @@
+﻿module Mod
+
+open System.IO
+
+[<AutoOpen>]
+module FileExt =
+    type FileInfo with
+        member this.CreateDirectory (|safe|(param #0): bool) (|x|(param #1): string) =
+            Directory.CreateDirectory this.Directory.FullName
+
+let x = FileInfo "abc.txt"
+x.CreateDirectory |true|(arg #0) |"hi"|(arg #1)
+
+---------------------------------------------------------
+(arg #0) => safe
+(arg #1) => x

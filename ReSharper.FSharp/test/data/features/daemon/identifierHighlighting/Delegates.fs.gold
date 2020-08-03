@@ -9,5 +9,5 @@ type |T2|(4) = delegate of |int|(5) -> |int|(6)
 (2): ReSharper F# Class Identifier: 
 (3): ReSharper F# Class Identifier: 
 (4): ReSharper F# Delegate Identifier: 
-(5): ReSharper F# Class Identifier: 
-(6): ReSharper F# Class Identifier: 
+(5): ReSharper F# Struct Identifier: 
+(6): ReSharper F# Struct Identifier: 

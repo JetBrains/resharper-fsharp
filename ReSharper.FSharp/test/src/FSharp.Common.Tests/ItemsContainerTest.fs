@@ -61,7 +61,7 @@ let createContainer items writer =
         RdProjectDescription(projectDirectory.FullPath, projectMark.Location.FullPath, null, List(), List(), List())
     let msBuildProject = MsBuildProject(projectMark, Dictionary(), [rdProject].ToList(id), rdProjectDescription)
     let projectProperties = FSharpProjectPropertiesFactory.CreateProjectProperties(List())
-    let projectDescriptor = ProjectDescriptor.CreateByProjectName(Guid(), projectProperties, null, projectMark.Name)
+    let projectDescriptor = ProjectDescriptor.CreateByProjectName(Guid.NewGuid(), projectProperties, null, projectMark.Name)
 
     (container :> IFSharpItemsContainer).OnProjectLoaded(projectMark, msBuildProject, projectDescriptor)
     container

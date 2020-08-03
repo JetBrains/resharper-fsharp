@@ -1,0 +1,9 @@
+﻿Suggested names: disposable
+module Module
+
+open System
+
+let f a b = ()
+do
+    let disposable = {new IDisposable with member x.Dispose() = ()}
+    f disposable id

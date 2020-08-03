@@ -1,0 +1,7 @@
+﻿module Module
+
+let s: |global.|(0)System.String = |global.|(1)System.String('a', 123)
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Qualifier is redundant
+(1): ReSharper Dead Code: Qualifier is redundant

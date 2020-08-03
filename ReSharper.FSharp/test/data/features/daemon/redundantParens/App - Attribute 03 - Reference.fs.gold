@@ -1,0 +1,10 @@
+﻿module M
+
+let [<Literal>] S = "X"
+
+[<CompiledName|(|(0)S|)|(1)>]
+let x = 123
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant parentheses
+(1):<secondary> ReSharper Dead Code: Redundant parentheses

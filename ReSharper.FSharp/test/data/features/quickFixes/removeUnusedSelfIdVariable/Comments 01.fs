@@ -1,5 +1,5 @@
 module Module
 
-type T() (* 123 *) as  (* 123 *) this{caret}    (* 123 *) =
+type T() (* 1 *) as  (* 2 *) this{caret}    (* 3 *) =
     class
     end

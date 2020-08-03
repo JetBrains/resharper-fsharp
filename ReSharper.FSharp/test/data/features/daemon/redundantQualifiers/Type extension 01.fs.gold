@@ -1,0 +1,9 @@
+﻿module Module
+
+open System
+
+type |System.|(0)String with
+    member x.P = 123
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Qualifier is redundant

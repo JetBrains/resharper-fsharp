@@ -48,8 +48,15 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
       var psiView = psiDocumentRangeView.View<FSharpLanguage>();
       var document = psiDocumentRangeView.DocumentRangeFromMainDocument.Document;
       var token = psiView.GetSelectedTreeNode<FSharpIdentifierToken>();
+
       if (token == null)
+      {
+        var wildPat = psiView.GetSelectedTreeNode<IWildPat>();
+        if (wildPat != null)
+          consumer.ConsumeHighlighting(HighlightingId, wildPat.GetDocumentRange());
+
         return;
+      }
 
       // todo: type parameters: t<$caret$type> or t<'$caret$ttype>
 

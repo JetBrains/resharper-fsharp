@@ -1,0 +1,22 @@
+﻿type |T1|(0) = |int|(1) |array|(2)
+type |T2|(3) = |int|(4) |list|(5)
+type |T3|(6) = |int|(7) |seq|(8)
+type |T4|(9) = |int|(10) |ResizeArray|(11)
+type |T5|(12) = |int|(13) |option|(14)
+
+---------------------------------------------------------
+(0): ReSharper F# Class Identifier: 
+(1): ReSharper F# Struct Identifier: 
+(2): ReSharper F# Class Identifier: 
+(3): ReSharper F# Union Identifier: 
+(4): ReSharper F# Struct Identifier: 
+(5): ReSharper F# Union Identifier: 
+(6): ReSharper F# Interface Identifier: 
+(7): ReSharper F# Struct Identifier: 
+(8): ReSharper F# Interface Identifier: 
+(9): ReSharper F# Class Identifier: 
+(10): ReSharper F# Struct Identifier: 
+(11): ReSharper F# Class Identifier: 
+(12): ReSharper F# Union Identifier: 
+(13): ReSharper F# Struct Identifier: 
+(14): ReSharper F# Union Identifier: 

@@ -10,11 +10,12 @@ IFSharpImplFile
         IReturnTypeInfo
           FSharpTokenType+ColonTokenElement(type:COLON, text::)
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-          INamedTypeUsage
-            ITypeReferenceName
-              FSharpIdentifierToken(type:IDENTIFIER, text:int)
-          FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+          IParenTypeUsage
+            FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+            INamedTypeUsage
+              ITypeReferenceName
+                FSharpIdentifierToken(type:IDENTIFIER, text:int)
+            FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "
         FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
         Whitespace(type:WHITE_SPACE, text: ) spaces:" "

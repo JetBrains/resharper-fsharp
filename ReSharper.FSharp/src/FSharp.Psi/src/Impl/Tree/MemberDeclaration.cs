@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using FSharp.Compiler.SourceCodeServices;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
@@ -21,9 +21,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         ? FSharpFile.GetSymbolUse(identifierRange.StartOffset.Offset)
         : base.GetSymbolDeclaration(identifierRange);
 
-    protected override IDeclaredElement CreateDeclaredElement()
+    protected override IDeclaredElement CreateDeclaredElement() =>
+      GetFSharpSymbol() is { } fcsSymbol
+        ? CreateDeclaredElement(fcsSymbol)
+        : null;
+
+    protected override IDeclaredElement CreateDeclaredElement(FSharpSymbol fcsSymbol)
     {
-      if (!(GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv)) return null;
+      if (!(fcsSymbol is FSharpMemberOrFunctionOrValue mfv)) return null;
 
       if (mfv.IsProperty)
         return new FSharpProperty<MemberDeclaration>(this, mfv);
@@ -33,7 +38,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       {
         var cliEvent = property.EventForFSharpProperty?.Value;
         return cliEvent != null
-          ? (ITypeMember) new FSharpCliEvent<MemberDeclaration>(this, cliEvent)
+          ? (ITypeMember) new FSharpCliEvent<MemberDeclaration>(this)
           : new FSharpProperty<MemberDeclaration>(this, property);
       }
 
@@ -43,20 +48,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         switch (compiledName)
         {
           case StandardOperatorNames.Explicit:
-            return new FSharpConversionOperator<MemberDeclaration>(this, mfv, true);
+            return new FSharpConversionOperator<MemberDeclaration>(this, true);
           case StandardOperatorNames.Implicit:
-            return new FSharpConversionOperator<MemberDeclaration>(this, mfv, false);
+            return new FSharpConversionOperator<MemberDeclaration>(this, false);
         }
 
-        return new FSharpSignOperator<MemberDeclaration>(this, mfv);
+        return new FSharpSignOperator<MemberDeclaration>(this);
       }
 
-      return new FSharpMethod<MemberDeclaration>(this, mfv);
+      return new FSharpMethod<MemberDeclaration>(this);
     }
 
     public bool IsExplicitImplementation =>
       InterfaceImplementationNavigator.GetByTypeMember(this) != null ||
-      ObjExprNavigator.GetByMemberDeclaration(this) != null;
+      ObjExprNavigator.GetByMemberDeclaration(this) is { } objExpr && objExpr.ArgExpression == null ||
+      ObjExprNavigator.GetByInterfaceMember(this) != null;
 
     public override bool IsStatic => StaticKeyword != null;
 

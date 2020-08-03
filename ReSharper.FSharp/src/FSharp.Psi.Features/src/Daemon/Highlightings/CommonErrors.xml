@@ -2,8 +2,8 @@
 
   <Usings>
     JetBrains.ReSharper.Intentions.QuickFixes;
+    JetBrains.ReSharper.Plugins.FSharp.Psi;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings;
-    JetBrains.ReSharper.Plugins.FSharp.Psi.Util.PsiUtil;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
     JetBrains.ReSharper.Plugins.FSharp.Psi.Impl;
@@ -125,6 +125,7 @@
     <Range>expr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>AddIgnoreFix</QuickFix>
+    <QuickFix>IntroduceVarFix</QuickFix>
   </Error>
 
   <Warning staticGroup="FSharpErrors" name="TypeTestUnnecessary">
@@ -181,6 +182,7 @@
     <Range>attr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <Message value="Extension member in non-extension type looks suspicious"/>
+    <QuickFix>AddExtensionAttributeFix</QuickFix>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="ExtensionTypeWithNoExtensionMembers">
@@ -233,6 +235,7 @@
     <Behavour attributeID="UNRESOLVED_ERROR" overlapResolvePolicy="NONE"/>
     <QuickFix>ToRecursiveFunctionFix</QuickFix>
     <QuickFix arguments="h.Reference">ImportTypeFix</QuickFix>
+    <QuickFix arguments="h.Reference">ReferenceModuleAndTypeFix</QuickFix>
   </Error>
 
   <Error staticGroup="FSharpErrors" name="UndefinedIndexer">
@@ -259,7 +262,7 @@
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="ConvertToUseBinding">
-    <Parameter type="ILetLikeExpr" name="letExpr"/>
+    <Parameter type="ILetOrUseExpr" name="letExpr"/>
     <Range>letExpr.LetOrUseToken.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <Message value="Convert to 'use' binding"/>
@@ -267,7 +270,7 @@
   </Warning>
   
   <Error staticGroup="FSharpErrors" name="ExpectedExpressionAfterLet">
-    <Parameter type="ILetLikeExpr" name="letExpr"/>
+    <Parameter type="ILetOrUseExpr" name="letExpr"/>
     <Range>letExpr.LetOrUseToken.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <Message value="'{0}' is missing expression">
@@ -285,6 +288,7 @@
     <Range>PrefixAppExprNavigator.GetByFunctionExpression(expr).ArgumentExpression.GetHighlightingRange()</Range>
     <SecondaryRanges>getAllExpressionArgs expr |> Seq.tail |> getExpressionsRanges</SecondaryRanges>
     <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>AddParensToApplicationFix</QuickFix>
     <QuickFix>RemoveUnexpectedArgumentsFix</QuickFix>
   </Error>
 
@@ -292,6 +296,7 @@
     <Parameter type="IParenExpr" name="parenExpr"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Message value="Redundant parentheses"/>
+    <QuickFix>RemoveRedundantParenExprFix</QuickFix>
   </Warning>
 
   <Error staticGroup="FSharpErrors" name="FieldOrValueNotMutable">
@@ -330,5 +335,29 @@
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>ToAbstractFix</QuickFix>
   </Error>
+
+  <Error staticGroup="FSharpErrors" name="ReturnRequiresComputationExpression">
+    <Parameter type="IYieldOrReturnExpr" name="yieldExpr"/>
+    <Message value="`return` may only be used within computation expressions"/>
+    <Range>yieldExpr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>RemoveYieldFix</QuickFix>
+  </Error>
+
+  <Error staticGroup="FSharpErrors" name="YieldRequiresSeqExpression">
+    <Parameter type="IYieldOrReturnExpr" name="yieldExpr"/>
+    <Message value="`yield` may only be used within list, array, and sequence expressions"/>
+    <Range>yieldExpr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>RemoveYieldFix</QuickFix>
+  </Error>
+
+  <Warning staticGroup="FSharpErrors" name="RedundantQualifier">
+    <Parameter type="ITreeNode" name="treeNode"/>
+    <Range>getQualifierRange treeNode</Range>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message value="Qualifier is redundant"/>
+    <QuickFix>RemoveRedundantQualifierFix</QuickFix>
+  </Warning>
 
 </Errors>

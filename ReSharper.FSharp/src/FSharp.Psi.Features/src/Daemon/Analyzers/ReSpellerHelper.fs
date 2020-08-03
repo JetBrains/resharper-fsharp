@@ -11,7 +11,7 @@ type ReSpellerPsiHelper() =
 
     override x.ShouldSkipDeclaration(declaration) =
         match declaration with
-        | :? ISynPat as synPat -> not synPat.IsDeclaration
+        | :? IFSharpPattern as fsPattern -> not fsPattern.IsDeclaration
         | :? IFSharpDeclaration as fsDeclaration -> fsDeclaration.NameIdentifier :? IActivePatternId
         | _ -> true
 

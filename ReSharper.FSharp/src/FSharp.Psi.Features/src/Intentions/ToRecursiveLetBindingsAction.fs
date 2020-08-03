@@ -13,25 +13,10 @@ type ToRecursiveLetBindingsAction(dataProvider: FSharpContextActionDataProvider)
     override x.IsAvailable _ =
         let letBindings = dataProvider.GetSelectedElement<ILetBindings>()
         if isNull letBindings || letBindings.IsRecursive then false else
-
-        let letToken = letBindings.LetOrUseToken
-        if isNull letToken then false else
-
-        let ranges = DisjointedTreeTextRange.From(letToken)
+        if not (isAtLetExprKeywordOrNamedPat dataProvider letBindings) then false else
 
         let bindings = letBindings.Bindings
-        if bindings.Count <> 1 then false else
-
-        match bindings.[0].HeadPattern.As<INamedPat>() with
-        | null -> false
-        | namedPat ->
-
-        match namedPat.Identifier with
-        | null -> false
-        | identifier ->
-
-        ranges.Then(identifier) |> ignore
-        ranges.Contains(dataProvider.SelectedTreeRange)
+        bindings.Count = 1 && bindings.[0].HeadPattern :? IParametersOwnerPat
 
     override x.ExecutePsiTransaction(_, _) =
         use cookie = FSharpRegistryUtil.AllowFormatterCookie.Create()

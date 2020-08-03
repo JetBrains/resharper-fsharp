@@ -72,5 +72,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
   {
     public TreeNodeCollection<IAttribute> Attributes =>
       TreeNodeCollection<IAttribute>.Empty;
+    
+    public virtual IType GetPatternType() => TypeFactory.CreateUnknownType(GetPsiModule());
   }
 }

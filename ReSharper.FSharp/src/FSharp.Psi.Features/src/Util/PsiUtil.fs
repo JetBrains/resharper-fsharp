@@ -1,7 +1,8 @@
 [<AutoOpen>]
-module JetBrains.ReSharper.Plugins.FSharp.Psi.Util.PsiUtil
+module JetBrains.ReSharper.Plugins.FSharp.Psi.PsiUtil
 
 open FSharp.Compiler.Range
+open JetBrains.Annotations
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.ExpressionSelection
@@ -30,7 +31,7 @@ type IFile with
 type IPsiSourceFile with
     member x.FSharpFile =
         if isNull x then null else
-        x.GetDominantPsiFile<FSharpLanguage>().AsFSharpFile()
+        x.GetPrimaryPsiFile().AsFSharpFile()
 
 type ITextControl with
     member x.GetFSharpFile(solution) =
@@ -60,15 +61,6 @@ type IFile with
         x.GetNode<'T>(documentRange.StartOffset)
 
 type IFSharpTreeNode with
-    member x.FSharpLanguageService =
-        x.Language.LanguageService().As<IFSharpLanguageService>()
-
-    member x.CreateElementFactory() =
-        x.FSharpLanguageService.CreateElementFactory(x.GetPsiModule())
-
-    member x.CheckerService =
-        x.FSharpFile.CheckerService
-    
     member x.GetLineEnding() =
         let fsFile = x.FSharpFile
         fsFile.DetectLineEnding(fsFile.GetPsiServices()).GetPresentation()
@@ -131,7 +123,8 @@ let (|TokenType|_|) tokenType (treeNode: ITreeNode) =
 let (|Whitespace|_|) (treeNode: ITreeNode) =
     if getTokenType treeNode == FSharpTokenType.WHITESPACE then Some treeNode else None
 
-let inline (|IgnoreParenPat|) (pat: ISynPat) = pat.IgnoreParentParens()
+let inline (|IgnoreParenPat|) (fsPattern: IFSharpPattern) =
+    fsPattern.IgnoreParentParens()
 
 let inline (|IgnoreInnerParenExpr|) (expr: IFSharpExpression) =
     expr.IgnoreInnerParens()
@@ -265,6 +258,8 @@ let isAfterEmptyLine (node: ITreeNode) =
     prevNonWhitespace != prevPrevNonWhiteSpace &&
     prevNonWhitespace :? NewLine && (isNull prevPrevNonWhiteSpace || prevPrevNonWhiteSpace :? NewLine)
 
+let isFirstChildOrAfterEmptyLine (node: ITreeNode) =
+    isNull node.PrevSibling || isAfterEmptyLine node
 
 [<AutoOpen>]
 module PsiModificationUtil =
@@ -328,8 +323,8 @@ let rec skipIntermediateParentsOfSameType<'T when 'T :> ITreeNode> (node: 'T) =
     | :? 'T as pat -> skipIntermediateParentsOfSameType pat
     | _ -> node
 
-let rec skipIntermediatePatParents (pat: ISynPat) =
-    skipIntermediateParentsOfSameType<ISynPat> pat
+let rec skipIntermediatePatParents (fsPattern: IFSharpPattern) =
+    skipIntermediateParentsOfSameType<IFSharpPattern> fsPattern
 
 
 let inline isValid (node: ^T) =
@@ -356,6 +351,12 @@ let shouldEraseSemicolon (node: ITreeNode) =
     let settingsStore = node.GetSettingsStore()
     not (settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SemicolonAtEndOfLine))
 
+let shiftWhitespaceBefore shift (whitespace: Whitespace) =
+    let length = whitespace.GetTextLength() + shift
+    if length > 0 then
+        ModificationUtil.ReplaceChild(whitespace, Whitespace(length)) |> ignore
+    else
+        ModificationUtil.DeleteChild(whitespace)
 
 let shiftExpr shift (expr: IFSharpExpression) =
     if shift = 0 then () else
@@ -368,21 +369,28 @@ let shiftExpr shift (expr: IFSharpExpression) =
 
         match nextSibling with
         | :? NewLine -> ()
-        | :? Whitespace ->
+        | :? Whitespace as whitespace ->
             // Skip empty lines
-            if nextSibling.NextSibling.IsWhitespaceToken() then () else
-
-            let length = nextSibling.GetTextLength() + shift
-            if length > 0 then
-                ModificationUtil.ReplaceChild(nextSibling, Whitespace(length)) |> ignore
-            else
-                ModificationUtil.DeleteChild(nextSibling)
+            if not (whitespace.NextSibling.IsWhitespaceToken()) then
+                shiftWhitespaceBefore shift whitespace
         | _ ->
             if shift > 0 then
                 ModificationUtil.AddChildAfter(child, Whitespace(shift)) |> ignore
 
+let shiftWithWhitespaceBefore shift (expr: IFSharpExpression) =
+    match expr.PrevSibling with
+    | :? Whitespace as whitespace ->
+        if not (whitespace.NextSibling.IsWhitespaceToken()) then
+            shiftWhitespaceBefore shift whitespace
+    | _ ->
+        if shift > 0 then
+            ModificationUtil.AddChildBefore(expr, Whitespace(shift)) |> ignore
 
-let rec tryFindRootPrefixAppWhereExpressionIsFunc (expr: IFSharpExpression) =
+    shiftExpr shift expr
+
+
+[<CanBeNull>]
+let rec tryFindRootPrefixAppWhereExpressionIsFunc ([<CanBeNull>] expr: IFSharpExpression) =
     let prefixApp = PrefixAppExprNavigator.GetByFunctionExpression(expr.IgnoreParentParens())
     if isNotNull prefixApp && isNotNull prefixApp.ArgumentExpression then
         tryFindRootPrefixAppWhereExpressionIsFunc(prefixApp)

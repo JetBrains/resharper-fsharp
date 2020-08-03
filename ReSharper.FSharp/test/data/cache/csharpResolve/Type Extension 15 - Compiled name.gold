@@ -1,0 +1,17 @@
+﻿public class Class1
+{
+    public Class1()
+    {
+        int m1 = Module.M1("");
+        int m2 = Module.M2("", 1);
+        int p = Module.|Prop|(0);
+    }
+}
+
+---------------------------------------------------------
+(0): ReSharper Underlined Error Highlighting: Cannot access internal property 'Prop' here
+M:Module.M1(System.String)
+M:Module.M1(System.String)
+M:Module.M2(System.String,System.Int32)
+M:Module.M2(System.String,System.Int32)
+P:Module.Prop

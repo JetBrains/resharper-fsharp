@@ -14,7 +14,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     bool CanNavigateTo { get; }
 
     bool IsExtensionMember { get; }
-    bool IsFSharpMember { get; }
   }
 
   public interface IFSharpMember : IFSharpTypeMember

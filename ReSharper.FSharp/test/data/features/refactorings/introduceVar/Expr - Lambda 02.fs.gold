@@ -1,0 +1,10 @@
+﻿Suggested names: foo
+module Module
+
+do
+    let foo = 
+      fun _ ->
+          1
+          1
+    [] |> List.map(foo
+    )
