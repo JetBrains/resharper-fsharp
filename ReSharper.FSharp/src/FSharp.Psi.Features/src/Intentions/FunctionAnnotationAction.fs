@@ -4,6 +4,7 @@ open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application.Settings
 open JetBrains.ReSharper.Feature.Services.ContextActions
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
@@ -63,9 +64,7 @@ type SpecifyTypesAction(dataProvider: FSharpContextActionDataProvider) =
 
         match binding.HeadPattern with
         | :? IParametersOwnerPat as parametersOwner ->
-            parametersOwner.ParametersEnumerable |> Seq.forall (function
-                | :? IParenPat as parenPat -> parenPat.Pattern :? ITypedPat
-                | _ -> false)
+            parametersOwner.ParametersEnumerable |> Seq.forall (fun pat -> pat.IgnoreInnerParens() :? ITypedPat)
         | _ -> true
 
     override x.Text = "Annotate function with parameter types and return type"

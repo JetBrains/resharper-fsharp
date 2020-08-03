@@ -40,6 +40,7 @@ type SpecifyTypesActionAvailabilityTest() =
     [<Test>] member x.``Module - Name 01``() = x.DoNamedTest()
     [<Test>] member x.``Module - Name 02 - Attributes``() = x.DoNamedTest()
 
-    [<Test>] member x.``Not available``() = x.DoNamedTest()
+    [<Test>] member x.``Not available 01``() = x.DoNamedTest()
+    [<Test>] member x.``Not available 02 - Annotated``() = x.DoNamedTest()
 
     [<Test>] member x.``Class - member - 01``() = x.DoNamedTest()
