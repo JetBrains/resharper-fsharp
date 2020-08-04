@@ -42,6 +42,8 @@ type SpecifyTypesActionTest() =
     [<Test>] member x.``Function - Formatting - Add space``() = x.DoNamedTest()
 
     [<Test>] member x.``Value 01``() = x.DoNamedTest()
+    [<Test>] member x.``Value 02 - Function``() = x.DoNamedTest()
+    [<Test>] member x.``Value 03 - Function, tuple``() = x.DoNamedTest()
 
 
 [<TestPackages("FSharp.Core")>]
