@@ -1,8 +1,0 @@
-﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=6ef1611e_002Dcb0e_002D4dba_002Da853_002Da0c68c8d61f2/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="GenerateMissingRecordFieldsTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
-  &lt;TestAncestor&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::AF85AA16-C863-42F2-AE7E-44C3E36F8883::.NETFramework,Version=v4.6.1::JetBrains.ReSharper.Plugins.FSharp.Tests.Features.GenerateMissingRecordFieldsTest&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::AF85AA16-C863-42F2-AE7E-44C3E36F8883::.NETFramework,Version=v4.6.1::JetBrains.ReSharper.Plugins.FSharp.Tests.Features.GenerateMissingRecordFieldsAvailabilityTest&lt;/TestId&gt;&#xD;
-    &lt;TestId&gt;NUnit3x::AF85AA16-C863-42F2-AE7E-44C3E36F8883::.NETFramework,Version=v4.6.1::JetBrains.ReSharper.Plugins.FSharp.Tests.Features.FSharpParserTest.Attribute 01&lt;/TestId&gt;&#xD;
-  &lt;/TestAncestor&gt;&#xD;
-&lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
