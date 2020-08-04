@@ -46,7 +46,7 @@ type FSharpElementFactoryTest() =
             Assert.AreEqual(1, wildPat.Children().Count())
             Assert.AreEqual(FSharpTokenType.UNDERSCORE, wildPat.FirstChild.GetTokenType())
             Assert.AreEqual("_", wildPat.GetText()))
-        
+
     [<Test>]
     member x.``CreateReturnTypeInfo from type strings``() =
         x.DoTest(fun elementFactory ->
@@ -58,16 +58,3 @@ type FSharpElementFactoryTest() =
             let returnInfoTypeName =
                 returnTypeInfo.ReturnType.As<INamedTypeUsage>().ReferenceName.Names |> Seq.exactlyOne
             Assert.AreEqual("string", returnInfoTypeName))
-        
-    [<Test>]
-    member x.``CreateTypeUsage with composite TypeUsage from type strings``() =
-        x.DoTest(fun elementFactory ->
-            use readCookie = ReadLockCookie.Create()
-            let compositeTypeUsage =
-                [|"string"; "int"|]
-                |> Array.map elementFactory.CreateTypeUsage
-                |> elementFactory.CreateTypeUsage
-            let tupleType = compositeTypeUsage.As<ITupleTypeUsage>()
-            Assert.NotNull(tupleType)
-            Assert.AreEqual(["string"; "int"], tupleType.Items |> Seq.map(fun x -> x.As<INamedTypeUsage>().ReferenceName.Names |> Seq.exactlyOne)))
-        

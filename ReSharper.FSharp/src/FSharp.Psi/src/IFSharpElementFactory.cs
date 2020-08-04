@@ -25,10 +25,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     IRecordFieldBinding CreateRecordFieldBinding(string fieldName, bool addSemicolon);
 
     IParenPat CreateParenPat();
-    ITypedPat CreateTypedPat(IReferencePat reference, ITypeUsage typeUsage);
+    ITypedPat CreateTypedPat(IFSharpPattern pattern, ITypeUsage typeUsage);
 
     ITypeUsage CreateTypeUsage(string typeUsage);
-    ITypeUsage CreateTypeUsage(ITypeUsage[] typeUsages);
 
     IReturnTypeInfo CreateReturnTypeInfo(ITypeUsage typeSignature);
 

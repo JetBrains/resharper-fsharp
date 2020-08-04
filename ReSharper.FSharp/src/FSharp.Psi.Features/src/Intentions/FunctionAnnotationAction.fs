@@ -56,30 +56,26 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
             (parameterOwner: IParametersOwnerPat) (factory: IFSharpElementFactory)
             (mfv: FSharpMemberOrFunctionOrValue) displayContext =
 
-        let typedTreeParameters =
-            parameterOwner.Parameters
-            |> Seq.zip mfv.CurriedParameterGroups
-            |> Seq.toList
-
-        // Annotate function parameters
-        for fcsParamsGroup, parameter in typedTreeParameters do
-            let paramName =
-                match parameter with
-                | :? IReferencePat as ref -> ref
-                | :? IParenPat as ref -> ref.Pattern.As<IReferencePat>()
-                | _ -> null
-
-            if isNull paramName then () else
-
-            // If the parameter is not curried, there will be multiple types pertaining to it
-            let subTypeUsages =
-                fcsParamsGroup
-                |> Seq.map (fun fcsType -> factory.CreateTypeUsage(fcsType.Type.Format(displayContext)))
-                |> Seq.toArray
-
-            let typedPat = factory.CreateTypedPat(paramName, factory.CreateTypeUsage(subTypeUsages))
+        let addParens pattern =
             let parenPat = factory.CreateParenPat()
-            parenPat.SetPattern(typedPat) |> ignore
+            parenPat.SetPattern(pattern) |> ignore
+            parenPat :> IFSharpPattern
+
+        let types = FcsTypesUtil.getFunctionTypeArgs mfv.FullType
+        let parameters = parameterOwner.Parameters
+
+        for fcsType, parameter in (types, parameters) ||> Seq.zip do
+            match parameter.IgnoreInnerParens() with
+            | :? IConstPat | :? ITypedPat -> ()
+            | pattern ->
+
+            let pattern =
+                match pattern with
+                | :? ITuplePat -> addParens pattern
+                | _ -> pattern
+
+            let typedPat = factory.CreateTypedPat(pattern, factory.CreateTypeUsage(fcsType.Format(displayContext)))
+            let parenPat = addParens typedPat
 
             replaceWithCopy parameter parenPat
 

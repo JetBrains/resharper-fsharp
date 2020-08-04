@@ -25,6 +25,12 @@ type SpecifyTypesActionTest() =
 
     [<Test>] member x.``Function - Local 01``() = x.DoNamedTest()
 
+    [<Test>] member x.``Function - Parameters - Pattern 01 - Tuple``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Parameters - Pattern 02 - Wild``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Parameters - Pattern 03 - List``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Parameters - Pattern 04 - As``() = x.DoNamedTest()
+    [<Test>] member x.``Function - Parameters - Pattern 05 - Param owner``() = x.DoNamedTest()
+
     [<Test>] member x.``Function - Return - Function 01``() = x.DoNamedTest()
     [<Test>] member x.``Function - Return - Function 02``() = x.DoNamedTest()
     [<Test>] member x.``Function - Return - Function 03 - Specified function param``() = x.DoNamedTest()
