@@ -10,7 +10,8 @@ IFSharpImplFile
           ILambdaExpr
             FSharpTokenType+FunTokenElement(type:FUN, text:fun)
             Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-            IWildPat
-              FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
+            ILambdaParametersList
+              IWildPat
+                FSharpTokenType+UnderscoreTokenElement(type:UNDERSCORE, text:_)
             IFromErrorExpr
 

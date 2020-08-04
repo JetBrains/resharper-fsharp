@@ -750,7 +750,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             let skippedLambdas = skipGeneratedLambdas bodyExpr
             let parametersMark = x.Mark(args.Range)
             x.ProcessLambdaParameters(expr, skippedLambdas, true)
-            x.Done(parametersMark, ElementType.LAMBDA_PARAMETERS)
+            x.Done(parametersMark, ElementType.LAMBDA_PARAMETERS_LIST)
             x.ProcessExpression(skipGeneratedMatch skippedLambdas)
 
         | SynExpr.MatchLambda(_, _, clauses, _, _) ->
