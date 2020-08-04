@@ -65,7 +65,12 @@ type ReplaceWithWildPatFix(pat: INamedPat) =
             | Some node ->
                 let scopeText =
                     match node.Parent with
-                    | :? IMatchClause -> sprintf "'%s' pattern" ((node :?> ILocalParametersOwnerPat).DeclaredName)
+                    | :? IMatchClause ->
+                        let patternText = 
+                            match node with
+                            | :? ILocalParametersOwnerPat as owner -> owner.DeclaredName
+                            | _ -> "match"
+                        sprintf "'%s' pattern" patternText
                     | :? ILambdaParametersList
                     | :? IMemberParamsDeclaration -> "parameter list"
                     | :? IBinding -> "'binding' pattern"
