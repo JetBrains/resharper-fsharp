@@ -26,19 +26,21 @@ type ReplaceWithWildPatFix(pat: INamedPat) =
         let typedPat = TypedPatNavigator.GetByPattern(pat).IgnoreParentParens()
         if isNotNull (AttribPatNavigator.GetByPattern(typedPat)) then None else
 
-        Some(skipIntermediatePatParents pat |> getParent)
-        
+        Some(skipIntermediatePatParents pat)
+
     let isAvailable (pat: IReferencePat) =
         isValid pat &&
-        let owner = getPatOwner pat
-        match owner with
+        let patOwner = getPatOwner pat
+        match patOwner with
         | None -> false
         | Some node ->
-            node :? IBinding ||
-            node :? IMatchClause ||
-            node :? ILambdaExpr ||
-            node :? IMemberParamsDeclaration &&
-            (node.Parent :? IMemberDeclaration || node.Parent :? IMemberConstructorDeclaration)
+            match node.Parent with
+            | :? IBinding
+            | :? IMatchClause
+            | :? ILambdaParametersList
+            | :? IMemberParamsDeclaration as parent when
+                (parent.Parent :? IMemberDeclaration || parent.Parent :? IMemberConstructorDeclaration) -> true
+            | _ -> false
 
     let patOwner = getPatOwner pat
 
@@ -61,9 +63,17 @@ type ReplaceWithWildPatFix(pat: INamedPat) =
         member x.ScopedText = fixText
         member x.FileCollectorInfo =
             match patOwner with
-            | None -> FileCollectorInfo.Default
-            | Some node -> 
-                FileCollectorInfo.WithThisAndContainingLocalScopes(LocalScope(node, "signature", "signature"))
+            | Some node ->
+                let scopeText =
+                    match node.Parent with
+                    | :? IMatchClause -> sprintf "'%s' pattern" ((node :?> ILocalParametersOwnerPat).DeclaredName)
+                    | :? ILambdaParametersList -> "parameter list"
+                    | :? IMemberParamsDeclaration -> "parameter list"
+                    | :? IBinding -> "'binding' pattern"
+                    | _ -> invalidArg "patOwner.Parent" "unexpected type"
+                let scopeNode = if node.Parent :? ILambdaParametersList then node.Parent else node :>_
+                FileCollectorInfo.WithThisAndContainingLocalScopes(LocalScope(scopeNode, scopeText, scopeText))
+            | _ -> FileCollectorInfo.Default
 
         member x.ExecuteAction(highlightingInfos, _, _) =
             use writeLock = WriteLockCookie.Create(true)
