@@ -2,17 +2,20 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.LanguageService
 
 open JetBrains.Diagnostics
 open JetBrains.DocumentModel
+open JetBrains.Application.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Psi.CodeStyle
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Naming
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 
 type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IPsiModule) =
     let [<Literal>] moniker = "F# element factory"
@@ -61,6 +64,10 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let source = sprintf "[<%s>] ()" attrName
             let doDecl = getDoDecl source
             doDecl.AttributeLists.[0]
+            
+    let createTypeUsage usage: ITypeUsage =
+        let expr = createLetBinding (sprintf "(a: %s)" usage)
+        expr.Bindings.[0].HeadPattern.As<IParenPat>().Pattern.As<ITypedPat>().Type
 
     interface IFSharpElementFactory with
         member x.CreateOpenStatement(ns) =
@@ -196,6 +203,31 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
             expr
 
+        member x.CreateParenPat() =
+            let expr = createLetBinding "(())"
+            expr.Bindings.[0].HeadPattern.As<IParenPat>()
+
+        member x.CreateTypedPat(pattern, typeUsage: ITypeUsage) =
+            let settingsStore = typeUsage.GetSettingsStoreWithEditorConfig()
+            let spaceBeforeColon = settingsStore.GetValue(fun (key: FSharpFormatSettingsKey) -> key.SpaceBeforeColon)
+            let preColonSpace = if spaceBeforeColon then " " else ""
+
+            let expr = createLetBinding (sprintf "(_%s: _)" preColonSpace)
+            let typedPat = expr.Bindings.[0].HeadPattern.As<IParenPat>().Pattern.As<ITypedPat>()
+
+            ModificationUtil.ReplaceChild(typedPat.Pattern, pattern.Copy()) |> ignore
+            ModificationUtil.ReplaceChild(typedPat.Type, typeUsage) |> ignore
+            typedPat
+
+        member x.CreateReturnTypeInfo(typeUsage: ITypeUsage): IReturnTypeInfo =
+            let expr = createLetBinding "_: _"
+            let returnTypeInfo = expr.Bindings.[0].ReturnTypeInfo
+            ModificationUtil.ReplaceChild(returnTypeInfo.ReturnType, typeUsage) |> ignore
+            returnTypeInfo
+
+        member x.CreateTypeUsage(typeUsage: string) : ITypeUsage =
+            createTypeUsage typeUsage
+    
         member x.CreateSetExpr(left: IFSharpExpression, right: IFSharpExpression) =
             let source = "() <- ()"
             let expr = getExpression source
