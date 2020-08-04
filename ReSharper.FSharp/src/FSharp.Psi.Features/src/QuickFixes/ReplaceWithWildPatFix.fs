@@ -35,9 +35,9 @@ type ReplaceWithWildPatFix(pat: INamedPat) =
         | None -> false
         | Some node ->
             match node.Parent with
-            | :? IBinding
-            | :? IMatchClause
-            | :? ILambdaParametersList
+            | :? IBinding -> true
+            | :? IMatchClause -> true
+            | :? ILambdaParametersList -> true
             | :? IMemberParamsDeclaration as parent when
                 (parent.Parent :? IMemberDeclaration || parent.Parent :? IMemberConstructorDeclaration) -> true
             | _ -> false
