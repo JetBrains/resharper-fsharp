@@ -396,7 +396,7 @@ module FSharpNamingService =
                         addScopeForPatterns patterns bindingExpression
 
                     | :? ILambdaExpr as lambdaExpr ->
-                        addScopeForPatterns lambdaExpr.PatternsEnumerable lambdaExpr.Expression
+                        addScopeForPatterns lambdaExpr.Parameters.PatternsEnumerable lambdaExpr.Expression
 
                     | :? IMatchClause as matchClause ->
                         addScopeForPatterns (Seq.singleton matchClause.Pattern) matchClause.Expression

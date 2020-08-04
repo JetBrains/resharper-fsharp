@@ -736,7 +736,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
         | SynExpr.CompExpr(_, _, expr, _) ->
             x.PushRangeAndProcessExpression(expr, range, ElementType.COMPUTATION_EXPR)
 
-        | SynExpr.Lambda(_, inLambdaSeq, _, bodyExpr, _) ->
+        | SynExpr.Lambda(_, inLambdaSeq, args, bodyExpr, _) ->
             // Lambdas get "desugared" by converting to fake nested lambdas and match expressions.
             // Simple patterns like ids are preserved in lambdas and more complex ones are replaced
             // with generated placeholder patterns and go to generated match expressions inside lambda bodies.
@@ -748,7 +748,9 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             x.PushRange(range, ElementType.LAMBDA_EXPR)
 
             let skippedLambdas = skipGeneratedLambdas bodyExpr
+            let parametersMark = x.Mark(args.Range)
             x.ProcessLambdaParameters(expr, skippedLambdas, true)
+            x.Done(parametersMark, ElementType.LAMBDA_PARAMETERS)
             x.ProcessExpression(skipGeneratedMatch skippedLambdas)
 
         | SynExpr.MatchLambda(_, _, clauses, _, _) ->

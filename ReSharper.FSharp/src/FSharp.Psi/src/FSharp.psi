@@ -611,9 +611,12 @@ computationExpr options { stubBase="FSharpExpressionBase"; }:
 
 lambdaExpr options { stubBase="FSharpExpressionBase"; }:
   FUN
-  fSharpPattern<PAT, Patterns>*
+  lambdaParameters<LAMBDA_PARAMETERS, Parameters>
   RARROW<RARROW, RArrow>
   fSharpExpression<EXPR, Expression>;
+  
+lambdaParameters:
+  fSharpPattern<PAT, Patterns>*;
 
 interface matchClauseListOwner:
   matchExpr |
