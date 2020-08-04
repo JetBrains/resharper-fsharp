@@ -87,7 +87,7 @@ type FunctionAnnotationAction(dataProvider: FSharpContextActionDataProvider) =
             parametersOwner.ParametersEnumerable |> Seq.forall (fun pat -> pat.IgnoreInnerParens() :? ITypedPat)
         | _ -> true
 
-    override x.Text = "Annotate function with parameter types and return type"
+    override x.Text = "Add type annotations"
 
     override x.IsAvailable _ =
         let binding = dataProvider.GetSelectedElement<IBinding>()
