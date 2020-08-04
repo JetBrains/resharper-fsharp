@@ -13,7 +13,6 @@ open JetBrains.ReSharper.Resources.Shell
 type ReplaceWithWildPatFix(pat: INamedPat) =
     inherit FSharpQuickFixBase()
 
-    let [<Literal>] fixText = "Replace with '_'"
     let pat = pat.As<IReferencePat>()
 
     let replaceWithWildPat (pat: IReferencePat) =
@@ -35,8 +34,8 @@ type ReplaceWithWildPatFix(pat: INamedPat) =
         | None -> false
         | Some node ->
             match node.Parent with
-            | :? IBinding -> true
-            | :? IMatchClause -> true
+            | :? IBinding
+            | :? IMatchClause
             | :? ILambdaParametersList -> true
             | :? IMemberParamsDeclaration as parent when
                 (parent.Parent :? IMemberDeclaration || parent.Parent :? IMemberConstructorDeclaration) -> true
@@ -50,7 +49,7 @@ type ReplaceWithWildPatFix(pat: INamedPat) =
     new (error: VarBoundTwiceError) =
         ReplaceWithWildPatFix(error.Pat)
 
-    override x.Text = fixText
+    override x.Text = "Replace with '_'"
 
     override x.IsAvailable _ = isAvailable pat
 
@@ -60,14 +59,14 @@ type ReplaceWithWildPatFix(pat: INamedPat) =
         replaceWithWildPat pat
 
     interface IHighlightingsSetScopedAction with
-        member x.ScopedText = fixText
+        member x.ScopedText = "Replace unused values with '_'"
         member x.FileCollectorInfo =
             match patOwner with
             | Some node ->
                 let scopeText =
                     match node.Parent with
                     | :? IMatchClause -> sprintf "'%s' pattern" ((node :?> ILocalParametersOwnerPat).DeclaredName)
-                    | :? ILambdaParametersList -> "parameter list"
+                    | :? ILambdaParametersList
                     | :? IMemberParamsDeclaration -> "parameter list"
                     | :? IBinding -> "'binding' pattern"
                     | _ -> invalidArg "patOwner.Parent" "unexpected type"
