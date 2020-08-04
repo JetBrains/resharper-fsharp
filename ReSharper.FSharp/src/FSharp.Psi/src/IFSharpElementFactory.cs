@@ -24,6 +24,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     IBinaryAppExpr CreateIgnoreApp(IFSharpExpression expr, bool newLine);
     IRecordFieldBinding CreateRecordFieldBinding(string fieldName, bool addSemicolon);
 
+    IParenPat CreateParenPat();
+    ITypedPat CreateTypedPat(IFSharpPattern pattern, ITypeUsage typeUsage);
+
+    ITypeUsage CreateTypeUsage(string typeUsage);
+
+    IReturnTypeInfo CreateReturnTypeInfo(ITypeUsage typeSignature);
+
     IMatchExpr CreateMatchExpr(IFSharpExpression expr);
     IMatchClause CreateMatchClause();
 

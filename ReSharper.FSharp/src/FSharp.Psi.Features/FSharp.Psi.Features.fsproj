@@ -17,6 +17,7 @@
     <Compile Include="src\Util\FSharpMethodInvocationUtil.fs" />
     <Compile Include="src\Util\FSharpVisualElementFactory.fs" />
     <Compile Include="src\Util\FSharpResolveUtil.fs" />
+    <Compile Include="src\Util\FcsTypesUtil.fs" />
     <Compile Include="src\CodeCompletion\CompletionUtil.fs" />
     <Compile Include="src\CodeCompletion\FSharpCodeCompletionContext.fs" />
     <Compile Include="src\CodeCompletion\FSharpPathCompletionProvider.fs" />
@@ -111,6 +112,7 @@
     <Compile Include="src\Intentions\IfToElifAction.fs" />
     <Compile Include="src\Intentions\NegateConditionActions.fs" />
     <Compile Include="src\Intentions\ToMutableAction.fs" />
+    <Compile Include="src\Intentions\FunctionAnnotationAction.fs" />
     <Compile Include="src\Intentions\ToLiteralAction.fs" />
     <Compile Include="src\Intentions\SetNameAction.fs" />
     <Compile Include="src\Intentions\LetToUseAction.fs" />
