@@ -2,4 +2,4 @@
 module Module
 
 match (1, 2, 3) with
-|  ({caret}x, y, z) when z > 5 -> ()
+| ({caret}x, y, z) when z > 5 -> ()
