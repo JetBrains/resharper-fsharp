@@ -184,9 +184,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Daemon.FSharp\Daemon.FSharp.csproj" />
     <ProjectReference Include="..\FSharp.Psi\FSharp.Psi.csproj" />
-    <ProjectReference Include="..\Services.FSharp\Services.FSharp.csproj" />
   </ItemGroup>
 
   <ItemGroup>

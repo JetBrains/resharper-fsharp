@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using JetBrains.ReSharper.Feature.Services.ParameterInfo;
 using JetBrains.Util;
 
-namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.ParameterInfo
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.ParameterInfo
 {
   public class FSharpParameterInfoContext : IParameterInfoContext
   {

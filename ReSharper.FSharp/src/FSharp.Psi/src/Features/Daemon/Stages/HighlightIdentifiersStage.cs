@@ -8,14 +8,13 @@ using JetBrains.DocumentModel;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Daemon.UsageChecking;
 using JetBrains.ReSharper.Feature.Services.Daemon;
-using JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Highlightings;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi;
 using JetBrains.Util;
 
-namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 {
   [DaemonStage(StagesAfter = new[] {typeof(CollectUsagesStage)})]
   public class HighlightIdentifiersStage : FSharpDaemonStageBase

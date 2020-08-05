@@ -7,7 +7,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi.Tree;
 using Microsoft.FSharp.Core;
 
-namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 {
   [AllowNullLiteral]
   public abstract class FSharpDaemonStageProcessBase : TreeNodeVisitor<IHighlightingConsumer>, IDaemonStageProcess

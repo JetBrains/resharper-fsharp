@@ -3,11 +3,10 @@ using JetBrains.Annotations;
 using JetBrains.Lifetimes;
 using JetBrains.ReSharper.Daemon.CaretDependentFeatures;
 using JetBrains.ReSharper.Feature.Services.Contexts;
-using JetBrains.ReSharper.Plugins.FSharp.Psi;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Psi.DataContext;
 
-namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.ContextHighlighters
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.ContextHighlighters
 {
   [ContainsContextConsumer]
   public class

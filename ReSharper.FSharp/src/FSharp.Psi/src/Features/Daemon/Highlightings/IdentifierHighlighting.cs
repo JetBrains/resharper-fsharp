@@ -2,7 +2,7 @@
 using JetBrains.ReSharper.Daemon;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 
-namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Highlightings
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 {
   public interface IFSharpIdentifierTooltipProvider
   {
