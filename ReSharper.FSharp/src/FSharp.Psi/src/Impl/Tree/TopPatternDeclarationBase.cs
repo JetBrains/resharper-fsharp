@@ -86,7 +86,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public virtual IType GetPatternType() => TypeFactory.CreateUnknownType(GetPsiModule());
   }
 
-  internal abstract class SynPatternBase : FSharpCompositeElement
+  internal abstract class FSharpPatternBase : FSharpCompositeElement
   {
     public virtual bool IsDeclaration => false;
 

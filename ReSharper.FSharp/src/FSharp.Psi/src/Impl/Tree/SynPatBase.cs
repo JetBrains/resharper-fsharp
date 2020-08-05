@@ -222,7 +222,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       Pattern.Declarations;
   }
 
-  internal partial class ConsPat
+  internal partial class ListConsPat
   {
     public override IEnumerable<IDeclaration> Declarations
     {

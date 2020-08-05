@@ -199,7 +199,7 @@ interface fSharpPattern:
   recordPat |
   optionalValPat |
   isInstPat |
-  consPat |
+  listPat |
   wildPat |
   constPat |
   fieldPat |
@@ -261,64 +261,64 @@ interface arrayOrListPat:
   arrayPat |
   listPat;
 
-typedPat options { stubBase="SynPatternBase"; }:
+typedPat options { stubBase="FSharpPatternBase"; }:
   fSharpPattern<PATTERN, Pattern>
   COLON
   typeUsage<TYPE, Type>;
 
-attribPat options { stubBase="SynPatternBase"; } extras {
+attribPat options { stubBase="FSharpPatternBase"; } extras {
   get { methodName="Attributes" path=<attribPat:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
   fSharpPattern<PATTERN, Pattern>;
 
-orPat options { stubBase="SynPatternBase"; }:
+orPat options { stubBase="FSharpPatternBase"; }:
   fSharpPattern<PATTERN1, Pattern1>
   BAR
   fSharpPattern<PATTERN2, Pattern2>;
 
-andsPat options { stubBase="SynPatternBase"; }:
+andsPat options { stubBase="FSharpPatternBase"; }:
   fSharpPattern<PATTERN1, Pattern1>
   AMP
   fSharpPattern<PATTERN2, Pattern2>;
 
-arrayPat options { stubBase="SynPatternBase"; }:
+arrayPat options { stubBase="FSharpPatternBase"; }:
   LBRACK_BAR
   fSharpPattern<ATTRIBUTE, Patterns>*
   LBRACK_BAR;
 
-listPat options { stubBase="SynPatternBase"; }:
+listPat options { stubBase="FSharpPatternBase"; }:
   LBRACK
   fSharpPattern<ATTRIBUTE, Patterns>*
   RBRACK;
 
-tuplePat options { stubBase="SynPatternBase"; }:
+tuplePat options { stubBase="FSharpPatternBase"; }:
   LIST fSharpPattern<ATTRIBUTE, Patterns> SEP COMMA<FSHARP_COMMA, Commas>;
 
-parenPat options { stubBase="SynPatternBase"; }:
+parenPat options { stubBase="FSharpPatternBase"; }:
   LPAREN
   fSharpPattern<PATTERN, Pattern>
   RPAREN;
 
-recordPat options { stubBase="SynPatternBase"; }:
+recordPat options { stubBase="FSharpPatternBase"; }:
   LBRACE
   fieldPat<FIELD_PAT, FieldPatterns>*
   RBRACE;
 
-fieldPat options { stubBase="SynPatternBase"; }:
+fieldPat options { stubBase="FSharpPatternBase"; }:
   expressionReferenceName<REFERENCE_NAME, ReferenceName>
   EQUALS<FSHARP_EQUALS, EqualsToken>
   fSharpPattern<PAT, Pattern>;
 
-optionalValPat options { stubBase="SynPatternBase"; }:
+optionalValPat options { stubBase="FSharpPatternBase"; }:
   QMARK
   fSharpPattern<PATTERN, Pattern>;
 
-isInstPat options { stubBase="SynPatternBase"; }:
+isInstPat options { stubBase="FSharpPatternBase"; }:
   COLON_QMARK
   typeUsage<SYN_TYPE, Type>;
 
-consPat options { stubBase="SynPatternBase"; }:
+listConsPat options { stubBase="FSharpPatternBase"; }:
   fSharpPattern<PATTERN1, Pattern1>
   COLON_COLON
   fSharpPattern<PATTERN2, Pattern2>;
@@ -331,19 +331,19 @@ interface constPat:
   unitPat |
   literalPat;
 
-literalPat options { stubBase="SynPatternBase"; }:
+literalPat options { stubBase="FSharpPatternBase"; }:
   (
     TRUE |
     FALSE |
     STRING // todo: add more
   );
 
-unitPat options { stubBase="SynPatternBase"; }:
+unitPat options { stubBase="FSharpPatternBase"; }:
   LPAREN<LPAREN, LParen>
   RPAREN<RPAREN, RParen>;
 
 
-otherPat options { stubBase="SynPatternBase"; }:
+otherPat options { stubBase="FSharpPatternBase"; }:
   fakeSeparator;
 
 

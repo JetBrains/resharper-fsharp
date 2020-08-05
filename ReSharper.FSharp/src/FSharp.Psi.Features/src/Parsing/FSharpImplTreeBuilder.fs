@@ -391,7 +391,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                         for _, pat in pats do
                             x.ProcessPat(pat, isLocal, false)
 
-                    ElementType.CONS_PAT
+                    ElementType.LIST_CONS_PAT
 
                 | _ ->
 
