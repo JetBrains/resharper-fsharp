@@ -6,7 +6,7 @@ let f |x|(0) y = y
 0: The value 'x' is unused
 QUICKFIXES:
 Replace with '_'
---Replace unused values with '_' in 'binding' pattern
+--Replace unused values with '_' in 'binding' patterns
 --Replace unused values with '_' in file
 --Replace unused values with '_' in project
 --Replace unused values with '_' in solution

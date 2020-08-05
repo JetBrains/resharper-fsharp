@@ -24,6 +24,8 @@ type ReplaceWithWildPatTest() =
     
     [<Test>] member x.``Parameters list - lambda``() = x.DoNamedTest()
     [<Test>] member x.``Parameters list - method``() = x.DoNamedTest()
+    [<Test>] member x.``Parameters list - parameter with attribute``() = x.DoNamedTest()
+    [<Test>] member x.``Parameters list - typed parameter with attribute``() = x.DoNamedTest()
     [<Test>] member x.``Match clause pattern - parameters owner pat``() = x.DoNamedTest()
     [<Test>] member x.``Match clause pattern - simple pat``() = x.DoNamedTest()
     [<Test>] member x.``Binding pattern``() = x.DoNamedTest()

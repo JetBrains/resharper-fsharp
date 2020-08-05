@@ -33,13 +33,14 @@ type ReplaceWithWildPatFix(pat: INamedPat) =
         match patOwner with
         | None -> false
         | Some node ->
-            match node.Parent with
-            | :? IBinding
-            | :? IMatchClause
-            | :? ILambdaParametersList -> true
-            | :? IMemberParamsDeclaration as parent when
-                (parent.Parent :? IMemberDeclaration || parent.Parent :? IMemberConstructorDeclaration) -> true
-            | _ -> false
+
+        match node.Parent with
+        | :? IBinding
+        | :? IMatchClause
+        | :? ILambdaParametersList -> true
+        | :? IMemberParamsDeclaration as parent when
+            (parent.Parent :? IMemberDeclaration || parent.Parent :? IMemberConstructorDeclaration) -> true
+        | _ -> false
 
     let patOwner = getPatOwner pat
 
@@ -73,7 +74,7 @@ type ReplaceWithWildPatFix(pat: INamedPat) =
                         sprintf "'%s' pattern" patternText
                     | :? ILambdaParametersList
                     | :? IMemberParamsDeclaration -> "parameter list"
-                    | :? IBinding -> "'binding' pattern"
+                    | :? IBinding -> "'binding' patterns"
                     | _ -> invalidArg "patOwner.Parent" "unexpected type"
                 let scopeNode = if node.Parent :? ILambdaParametersList then node.Parent else node :>_
                 FileCollectorInfo.WithThisAndContainingLocalScopes(LocalScope(scopeNode, scopeText, scopeText))
