@@ -6,7 +6,6 @@ using JetBrains.Application.Settings;
 using JetBrains.DocumentModel;
 using JetBrains.ProjectModel;
 using JetBrains.ReSharper.Feature.Services.ParameterInfo;
-using JetBrains.ReSharper.Plugins.FSharp.Psi;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
@@ -15,7 +14,7 @@ using JetBrains.Util;
 using Microsoft.FSharp.Control;
 using Microsoft.FSharp.Core;
 
-namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.ParameterInfo
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.ParameterInfo
 {
   [ParameterInfoContextFactory(typeof(FSharpLanguage))]
   public class FSharpParameterInfoContextFactory : IParameterInfoContextFactory

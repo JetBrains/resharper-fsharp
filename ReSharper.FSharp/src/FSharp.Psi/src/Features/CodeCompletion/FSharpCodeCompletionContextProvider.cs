@@ -12,7 +12,7 @@ using JetBrains.ReSharper.Psi.Parsing;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
 
-namespace JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 {
   [IntellisensePart]
   public class FSharpCodeCompletionContextProvider : CodeCompletionContextProviderBase

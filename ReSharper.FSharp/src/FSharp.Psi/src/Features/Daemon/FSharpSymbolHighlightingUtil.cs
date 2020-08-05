@@ -4,7 +4,7 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings;
 using JetBrains.ReSharper.Plugins.FSharp.Util;
 using static FSharp.Compiler.PrettyNaming;
 
-namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon
 {
   // todo: provide F# specific highlightings and use semantic classification from FCS
   public static class FSharpSymbolHighlightingUtil

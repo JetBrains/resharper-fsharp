@@ -2,7 +2,7 @@
 using JetBrains.Annotations;
 using JetBrains.ReSharper.Feature.Services.Daemon;
 
-namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon
 {
   public static class DaemonUtil
   {

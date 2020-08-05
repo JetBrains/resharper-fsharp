@@ -2,7 +2,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 
 open JetBrains.ReSharper.Feature.Services.CodeCompletion.Infrastructure
 open JetBrains.ReSharper.Feature.Services.Lookup
-open JetBrains.ReSharper.Plugins.FSharp.Services.Cs.CodeCompletion
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.CodeCompletion
 open JetBrains.Util
 
 type FSharpItemsProviderBase() =

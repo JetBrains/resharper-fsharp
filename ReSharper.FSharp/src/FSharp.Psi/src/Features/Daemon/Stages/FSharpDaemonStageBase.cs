@@ -8,7 +8,7 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Files;
 using JetBrains.Util;
 
-namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 {
   public abstract class FSharpDaemonStageBase : IDaemonStage
   {

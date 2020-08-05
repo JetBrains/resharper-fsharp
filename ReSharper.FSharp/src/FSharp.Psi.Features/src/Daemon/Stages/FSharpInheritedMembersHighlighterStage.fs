@@ -4,8 +4,8 @@ open System
 open System.Collections.Generic
 open JetBrains.ReSharper.Daemon.Specific.InheritedGutterMark
 open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
