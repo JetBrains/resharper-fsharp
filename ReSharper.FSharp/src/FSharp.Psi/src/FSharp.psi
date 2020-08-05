@@ -326,13 +326,22 @@ consPat options { stubBase="SynPatternBase"; }:
 wildPat options { stubBase="LocalPatternDeclarationBase"; }:
   UNDERSCORE<UNDERSCORE, Underscore>;
 
-constPat options { stubBase="SynPatternBase"; }:
+
+interface constPat:
+  unitPat |
+  literalPat;
+
+literalPat options { stubBase="SynPatternBase"; }:
   (
     TRUE |
     FALSE |
     STRING // todo: add more
   );
-  
+
+unitPat options { stubBase="SynPatternBase"; }:
+  LPAREN<LPAREN, LParen>
+  RPAREN<RPAREN, RParen>;
+
 
 otherPat options { stubBase="SynPatternBase"; }:
   fakeSeparator;

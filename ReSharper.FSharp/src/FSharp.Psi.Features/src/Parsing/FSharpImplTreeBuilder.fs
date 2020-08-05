@@ -442,6 +442,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                 x.ProcessListLikePat(pats, isLocal)
                 ElementType.LIST_PAT
 
+            | SynPat.Paren(SynPat.Const(SynConst.Unit, _), _) ->
+                ElementType.UNIT_PAT
+
             | SynPat.Paren(pat, _) ->
                 x.ProcessPat(pat, isLocal, false)
                 ElementType.PAREN_PAT
@@ -479,7 +482,7 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                 ElementType.ATTRIB_PAT
 
             | SynPat.Const _ ->
-                ElementType.CONST_PAT
+                ElementType.LITERAL_PAT
 
             | SynPat.OptionalVal(id, _) ->
                 let mark = x.Mark(id.idRange)
@@ -1045,10 +1048,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
         | SynSimplePats.SimplePats(pats, range) ->
             match pats with
             | [] ->
-                let parenMark = x.Mark(range)
-                let constMark = x.Mark(range)
-                x.Done(range, constMark, ElementType.CONST_PAT)
-                x.Done(parenMark, ElementType.PAREN_PAT)
+                x.MarkAndDone(range, ElementType.UNIT_PAT)
                 x.ProcessLambdaParameters(lambdaBody, outerBodyExpr, false)
 
             | [pat] ->
