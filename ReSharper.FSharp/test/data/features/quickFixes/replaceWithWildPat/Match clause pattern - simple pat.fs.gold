@@ -1,0 +1,5 @@
+﻿//${RUN:1}
+module Module
+
+match (1, 2, 3) with
+| (_{caret}, _, z) when z > 5 -> ()
