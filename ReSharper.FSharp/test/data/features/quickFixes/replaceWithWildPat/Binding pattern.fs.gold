@@ -1,0 +1,4 @@
+﻿//${RUN:1}
+module Module
+
+let f _{caret} _ z = z

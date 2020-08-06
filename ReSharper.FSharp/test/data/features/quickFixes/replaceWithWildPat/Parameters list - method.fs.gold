@@ -1,0 +1,5 @@
+﻿//${RUN:1}
+module Module
+
+type A() =
+    member _.Method(x, _{caret}, _) = x

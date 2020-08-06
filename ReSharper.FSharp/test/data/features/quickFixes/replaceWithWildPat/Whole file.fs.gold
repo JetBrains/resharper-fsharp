@@ -1,0 +1,12 @@
+﻿module Module
+
+type Pattern = Pattern of a: int * b : int * c: int
+
+let _ =
+    match Pattern(5, 3, 4) with
+    | Pattern(_, b, _) when b > 5 -> ()
+    | _ -> ()
+
+    match Pattern(5, 3, 4) with
+    | Pattern(_{caret}, _, f) when f > 5 -> ()
+    | _ -> ()
