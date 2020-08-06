@@ -76,7 +76,7 @@ type ReplaceWithWildPatFix(pat: INamedPat) =
                     sprintf "'%s' pattern" patternText
                 | :? ILambdaParametersList
                 | :? IMemberParamsDeclaration -> "parameter list"
-                | :? IBinding -> "'binding' patterns"
+                | :? IBinding -> "binding patterns"
                 | _ -> invalidArg "patOwner.Parent" "unexpected type"
 
             let scopeNode = if pat.Parent :? ILambdaParametersList then pat.Parent else pat :>_
