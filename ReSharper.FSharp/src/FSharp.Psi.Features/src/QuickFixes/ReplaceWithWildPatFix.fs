@@ -15,7 +15,7 @@ type ReplaceWithWildPatFix(pat: INamedPat) =
 
     let pat = pat.As<IReferencePat>()
 
-    let replaceWithWildPat (pat: IReferencePat) =
+    let replaceWithWildPat (pat: IFSharpPattern) =
         replace pat (pat.GetFSharpLanguageService().CreateElementFactory(pat.GetPsiModule()).CreateWildPat())
 
     let getPatOwner (pat: INamedPat) =
@@ -29,8 +29,8 @@ type ReplaceWithWildPatFix(pat: INamedPat) =
 
     let isAvailable (pat: IReferencePat) =
         isValid pat &&
-        let patOwner = getPatOwner pat
-        match patOwner with
+
+        match getPatOwner pat with
         | None -> false
         | Some node ->
 
@@ -63,35 +63,35 @@ type ReplaceWithWildPatFix(pat: INamedPat) =
         member x.ScopedText = "Replace unused values with '_'"
         member x.FileCollectorInfo =
             match patOwner with
-            | Some node ->
-                let scopeText =
-                    match node.Parent with
-                    | :? IMatchClause ->
-                        let patternText = 
-                            match node with
-                            | :? ILocalParametersOwnerPat as owner -> owner.DeclaredName
-                            | _ -> "match clause"
-                        sprintf "'%s' pattern" patternText
-                    | :? ILambdaParametersList
-                    | :? IMemberParamsDeclaration -> "parameter list"
-                    | :? IBinding -> "'binding' patterns"
-                    | _ -> invalidArg "patOwner.Parent" "unexpected type"
-                let scopeNode = if node.Parent :? ILambdaParametersList then node.Parent else node :>_
-                FileCollectorInfo.WithThisAndContainingLocalScopes(LocalScope(scopeNode, scopeText, scopeText))
-            | _ -> FileCollectorInfo.Default
+            | None -> FileCollectorInfo.Default
+            | Some pat ->
+
+            let scopeText =
+                match pat.Parent with
+                | :? IMatchClause ->
+                    let patternText = 
+                        match pat with
+                        | :? ILocalParametersOwnerPat as owner -> owner.SourceName
+                        | _ -> "match clause"
+                    sprintf "'%s' pattern" patternText
+                | :? ILambdaParametersList
+                | :? IMemberParamsDeclaration -> "parameter list"
+                | :? IBinding -> "'binding' patterns"
+                | _ -> invalidArg "patOwner.Parent" "unexpected type"
+
+            let scopeNode = if pat.Parent :? ILambdaParametersList then pat.Parent else pat :>_
+            FileCollectorInfo.WithThisAndContainingLocalScopes(LocalScope(scopeNode, scopeText, scopeText))
 
         member x.ExecuteAction(highlightingInfos, _, _) =
             use writeLock = WriteLockCookie.Create(true)
             use disableFormatter = new DisableCodeFormatter()
 
             for highlightingInfo in highlightingInfos do
-                match highlightingInfo.Highlighting.As<UnusedValueWarning>() with
-                | null -> ()
-                | warning ->
-                    let pat = warning.Pat.As<IReferencePat>()
-                    let isAvailable =
-                        match pat with
-                        | null -> false
-                        | pat -> isAvailable pat
-                    if isAvailable then replaceWithWildPat pat
+                let warning = highlightingInfo.Highlighting.As<UnusedValueWarning>()
+                if isNull warning then () else
+
+                let pat = warning.Pat.As<IReferencePat>()
+                if isNotNull pat && isAvailable pat then
+                    replaceWithWildPat pat
+
             null
