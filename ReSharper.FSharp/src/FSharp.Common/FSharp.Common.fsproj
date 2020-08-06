@@ -30,6 +30,7 @@
     <Compile Include="src\Util\FSharpXmlDocService.fs" />
     <Compile Include="src\Util\CacheUtil.fs" />
     <Compile Include="src\Util\FSharpHighlightingAttributeIds.fs" />
+    <Compile Include="src\Util\FcsExpressionUtil.fs" />
     <Compile Include="src\Settings\FSharpOptionsPageBase.fs" />
     <Compile Include="src\Settings\FSharpOptions.fs" />
     <Compile Include="src\Checker\FSharpAssemblyContentProvider.fs" />
