@@ -19,6 +19,8 @@ type ReplaceWithWildPatFix(pat: INamedPat) =
         replace pat (pat.GetFSharpLanguageService().CreateElementFactory(pat.GetPsiModule()).CreateWildPat())
 
     let getPatOwner (pat: INamedPat) =
+        if isNull pat then None else
+
         let pat = pat.IgnoreParentParens()
         if isNotNull (AttribPatNavigator.GetByPattern(pat)) then None else
 
