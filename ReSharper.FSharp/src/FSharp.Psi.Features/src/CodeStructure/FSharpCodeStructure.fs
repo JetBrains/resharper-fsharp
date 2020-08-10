@@ -67,8 +67,8 @@ type FSharpCodeStructureProvider() =
             for memberDecl in interfaceImpl.TypeMembers do
                 processNode memberDecl parent
 
-        | :? ILetModuleDecl as letDecl ->
-            for binding in Seq.cast<ITopBinding> letDecl.Bindings do
+        | :? ILetBindingsDeclaration as letBindings ->
+            for binding in Seq.cast<ITopBinding> letBindings.Bindings do
                 FSharpDeclarationCodeStructureElement(parent, binding) |> ignore
 
         | :? ITypeDeclarationGroup as declarationGroup ->

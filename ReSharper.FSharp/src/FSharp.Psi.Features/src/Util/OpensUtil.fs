@@ -143,7 +143,7 @@ let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBo
     match moduleDecl with
     | :? IAnonModuleDeclaration when (fsFile.GetPsiModule() :? SandboxPsiModule) ->
         moduleDecl.MembersEnumerable
-        |> Seq.skipWhile (fun m -> not (m :? IDo))
+        |> Seq.skipWhile (fun m -> not (m :? IDoStatement))
         |> Seq.tail
         |> Seq.tryHead
         |> Option.iter insertBeforeModuleMember

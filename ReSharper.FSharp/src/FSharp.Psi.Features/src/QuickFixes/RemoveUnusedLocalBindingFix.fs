@@ -59,14 +59,14 @@ type RemoveUnusedLocalBindingFix(warning: UnusedValueWarning) =
         let bindings = letOrUse.Bindings
         if bindings.Count = 1 then
             match letOrUse with
-            | :? ILetModuleDecl as letModuleDecl ->
+            | :? ILetBindingsDeclaration as letBindings ->
                 let first =
-                    letModuleDecl
+                    letBindings
                     |> skipMatchingNodesBefore isInlineSpaceOrComment
                     |> getThisOrPrevNewLIne
 
                 let last =
-                    letModuleDecl
+                    letBindings
                     |> getLastMatchingNodeAfter isInlineSpaceOrComment
 
                 ModificationUtil.DeleteChildRange(TreeRange(first, last))

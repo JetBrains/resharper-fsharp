@@ -94,7 +94,7 @@ and private GlobalProcessor(daemonProcessor, consumer) =
     inherit Processor(daemonProcessor, consumer)
 
     let shouldProcess (node: ITreeNode) =
-        not (node :? IBinding || node :? IMemberDeclaration || node :? IDo)
+        not (node :? IBinding || node :? IMemberDeclaration || node :? IDoStatement)
 
     member val MemberDeclarations: JetHashSet<ITreeNode> = JetHashSet()
 

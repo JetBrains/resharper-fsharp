@@ -21,7 +21,7 @@ IFSharpImplFile
                   FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
             FSharpTokenType+GreaterRbrackTokenElement(type:GREATER_RBRACK, text:>])
           Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          IMemberParamsDeclaration
+          IParametersPatternDeclaration
             IParenPat
               FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
               FSharpTokenType+RparenTokenElement(type:RPAREN, text:))

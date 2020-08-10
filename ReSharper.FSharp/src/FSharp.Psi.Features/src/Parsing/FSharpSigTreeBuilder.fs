@@ -47,7 +47,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
 
         | SynModuleSigDecl.ModuleAbbrev(IdentRange range, lid, _) ->
             x.ProcessNamedTypeReference(lid)
-            x.MarkAndDone(range, ElementType.MODULE_ABBREVIATION)
+            x.MarkAndDone(range, ElementType.MODULE_ABBREVIATION_DECLARATION)
 
         | SynModuleSigDecl.Val(ValSpfn(attrs, id, SynValTyparDecls(typeParams, _, _), synType, _, _, _, _, _, _, _), range) ->
             let letMark = x.MarkAttributesOrIdOrRange(attrs, Some id, range)
@@ -65,7 +65,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
             x.ProcessType(synType)
 
             x.Done(range, bindingMark, ElementType.TOP_BINDING)
-            x.Done(letMark, ElementType.LET_MODULE_DECL)
+            x.Done(letMark, ElementType.LET_BINDINGS_DECLARATION)
 
         | SynModuleSigDecl.Open(lid, range) ->
             let mark = x.MarkTokenOrRange(FSharpTokenType.OPEN, range)
@@ -109,7 +109,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
             x.ProcessType(synType)
             let elementType =
                 if flags.IsDispatchSlot then
-                    ElementType.ABSTRACT_SLOT
+                    ElementType.ABSTRACT_MEMBER_DECLARATION
                 else
                     match flags.MemberKind with
                     | MemberKind.Constructor -> ElementType.MEMBER_CONSTRUCTOR_DECLARATION
@@ -120,7 +120,7 @@ type internal FSharpSigTreeBuilder(sourceFile, lexer, sigs, lifetime) =
             if id.IsSome then
                 let mark = x.MarkAttributesOrIdOrRange(attrs, id, range)
                 x.ProcessType(synType)
-                x.Done(mark,ElementType.VAL_FIELD)
+                x.Done(mark,ElementType.VAL_FIELD_DECLARATION)
 
         | SynMemberSig.Inherit(synType, range) ->
             let mark = x.Mark(range)

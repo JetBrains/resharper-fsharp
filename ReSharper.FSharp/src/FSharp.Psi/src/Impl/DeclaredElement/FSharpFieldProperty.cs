@@ -35,8 +35,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public void SetIsMutable(bool value)
     {
       foreach (var declaration in GetDeclarations())
-        if (declaration is IRecordFieldDeclaration fieldDeclaration)
-          fieldDeclaration.SetIsMutable(value);
+        if (declaration is IRecordFieldDeclaration valFieldDeclaration)
+          valFieldDeclaration.SetIsMutable(value);
     }
 
     public bool CanBeMutable => true;

@@ -19,7 +19,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     IReferenceExpr CreateReferenceExpr(string expr);
 
     ILetOrUseExpr CreateLetBindingExpr(string bindingName);
-    ILetModuleDecl CreateLetModuleDecl(string bindingName);
+    ILetBindingsDeclaration CreateLetModuleDecl(string bindingName);
 
     IBinaryAppExpr CreateIgnoreApp(IFSharpExpression expr, bool newLine);
     IRecordFieldBinding CreateRecordFieldBinding(string fieldName, bool addSemicolon);

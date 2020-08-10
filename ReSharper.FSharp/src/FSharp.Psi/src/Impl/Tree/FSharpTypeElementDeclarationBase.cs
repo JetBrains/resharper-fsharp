@@ -69,7 +69,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
                 result.Add(typeDeclaration);
             }
 
-          if (child is ILetModuleDecl let)
+          if (child is ILetBindingsDeclaration let)
             foreach (var binding in let.Bindings)
             {
               var headPattern = binding.HeadPattern;

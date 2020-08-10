@@ -8,7 +8,7 @@ using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class AbstractSlot
+  internal partial class AbstractMemberDeclaration
   {
     protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
     public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
@@ -42,13 +42,13 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       }
 
       if (mfv.IsProperty)
-        return new FSharpProperty<AbstractSlot>(this, mfv);
+        return new FSharpProperty<AbstractMemberDeclaration>(this, mfv);
 
       var property = mfv.AccessorProperty;
       if (property != null)
-        return new FSharpProperty<AbstractSlot>(this, property.Value);
+        return new FSharpProperty<AbstractMemberDeclaration>(this, property.Value);
 
-      return new FSharpMethod<AbstractSlot>(this);
+      return new FSharpMethod<AbstractMemberDeclaration>(this);
     }
   }
 }

@@ -9,6 +9,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public const short FSHARP_SEMI = 3;
     public const short FSHARP_EQUALS = 4;
     public const short FSHARP_DELIMITER = 5;
+    public const short FSHARP_COLON = 6;
 
     public const short LAST = 100;
   }

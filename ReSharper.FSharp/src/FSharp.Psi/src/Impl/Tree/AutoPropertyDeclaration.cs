@@ -5,7 +5,7 @@ using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class AutoProperty
+  internal partial class AutoPropertyDeclaration
   {
     protected override string DeclaredElementName => NameIdentifier.GetCompiledName(Attributes);
     public override IFSharpIdentifierLikeNode NameIdentifier => (IFSharpIdentifierLikeNode) Identifier;
@@ -19,11 +19,11 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       if (!(fcsSymbol is FSharpMemberOrFunctionOrValue mfv)) return null;
       if (mfv.IsProperty)
-        return new FSharpProperty<AutoProperty>(this, mfv);
+        return new FSharpProperty<AutoPropertyDeclaration>(this, mfv);
 
       var property = mfv.AccessorProperty;
       return property != null
-        ? new FSharpProperty<AutoProperty>(this, property.Value)
+        ? new FSharpProperty<AutoPropertyDeclaration>(this, property.Value)
         : null;
     }
   }

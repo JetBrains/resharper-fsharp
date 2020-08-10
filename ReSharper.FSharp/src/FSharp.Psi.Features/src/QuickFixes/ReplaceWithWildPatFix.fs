@@ -40,7 +40,7 @@ type ReplaceWithWildPatFix(pat: INamedPat) =
         | :? IBinding
         | :? IMatchClause
         | :? ILambdaParametersList -> true
-        | :? IMemberParamsDeclaration as parent when
+        | :? IParametersPatternDeclaration as parent when
             (parent.Parent :? IMemberDeclaration || parent.Parent :? IMemberConstructorDeclaration) -> true
         | _ -> false
 
@@ -77,7 +77,7 @@ type ReplaceWithWildPatFix(pat: INamedPat) =
                         | _ -> "match clause"
                     sprintf "'%s' pattern" patternText
                 | :? ILambdaParametersList
-                | :? IMemberParamsDeclaration -> "parameter list"
+                | :? IParametersPatternDeclaration -> "parameter list"
                 | :? IBinding -> "binding patterns"
                 | _ -> invalidArg "patOwner.Parent" "unexpected type"
 

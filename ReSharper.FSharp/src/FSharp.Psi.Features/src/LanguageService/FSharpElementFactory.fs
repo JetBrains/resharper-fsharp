@@ -15,7 +15,6 @@ open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Naming
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 
 type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IPsiModule) =
     let [<Literal>] moniker = "F# element factory"
@@ -44,7 +43,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
     let getDoDecl source =
         let moduleMember = getModuleMember source
-        moduleMember.As<IDo>().NotNull()
+        moduleMember.As<IDoStatement>().NotNull()
 
     let getExpression source =
         let doDecl = getDoDecl source
@@ -81,8 +80,8 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
             let source = "let _ = ()"
             let moduleDeclaration = getModuleDeclaration source
 
-            let letModuleDecl = moduleDeclaration.Members.First().As<ILetModuleDecl>()
-            let binding = letModuleDecl.Bindings.First()
+            let letBindings = moduleDeclaration.Members.First().As<ILetBindingsDeclaration>()
+            let binding = letBindings.Bindings.First()
             binding.HeadPattern :?> _
 
         member x.CreateIgnoreApp(expr, newLine) =
@@ -132,7 +131,7 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
 
         member x.CreateLetModuleDecl(bindingName) =
             let source = sprintf "let %s = ()" bindingName
-            getModuleMember source :?> ILetModuleDecl
+            getModuleMember source :?> ILetBindingsDeclaration
 
         member x.CreateConstExpr(text) =
             getExpression text :?> _
@@ -243,8 +242,8 @@ type FSharpElementFactory(languageService: IFSharpLanguageService, psiModule: IP
   
         member x.CreateExpressionReferenceName(name) =
             let source = sprintf "let %s = ()" name
-            let letModuleDecl = getModuleMember source :?> ILetModuleDecl
-            letModuleDecl.Bindings.[0].HeadPattern.As<IReferencePat>().ReferenceName
+            let letBindings = getModuleMember source :?> ILetBindingsDeclaration
+            letBindings.Bindings.[0].HeadPattern.As<IReferencePat>().ReferenceName
 
         member x.CreateTypeReferenceName(name) =
             let source = sprintf "type T = %s" name

@@ -7,13 +7,13 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 type RemoveInlineFix(error: LocalClassBindingsCannotBeInlineError) =
     inherit FSharpQuickFixBase()
 
-    let letModuleDecl = error.LetModuleDecl
+    let letBindings = error.LetBindings
 
     override x.Text = "Remove 'inline'"
     override x.IsAvailable _ =
-        isValid letModuleDecl &&
-        isNotNull letModuleDecl.InlineKeyword
+        isValid letBindings &&
+        isNotNull letBindings.InlineKeyword
 
     override x.ExecutePsiTransaction _ =
         use disableFormatter = new DisableCodeFormatter()
-        letModuleDecl.SetIsInline(false)
+        letBindings.SetIsInline(false)

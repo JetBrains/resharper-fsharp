@@ -152,11 +152,11 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
         let binding = BindingNavigator.GetByExpression(contextExpr)
         if isNotNull binding && binding.HeadPattern :? IParametersOwnerPat then null else
 
-        let letDecl = LetModuleDeclNavigator.GetByBinding(binding)
-        if isNotNull letDecl then letDecl :> _ else
+        let letBindings = LetBindingsDeclarationNavigator.GetByBinding(binding)
+        if isNotNull letBindings then letBindings :> _ else
 
-        let doDecl = DoNavigator.GetByExpression(contextExpr)
-        if isNotNull doDecl && doDecl.IsImplicit then doDecl :> _ else null
+        let doStmt = DoStatementNavigator.GetByExpression(contextExpr)
+        if isNotNull doStmt && doStmt.IsImplicit then doStmt :> _ else null
 
     let createBinding (context: IFSharpExpression) (contextDecl: IModuleMember) name: ILetBindings =
         let elementFactory = context.CreateElementFactory()
@@ -186,7 +186,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
     let getMoveToNewLineInfo (contextExpr: IFSharpExpression) =
         let requiresMultilineExpr (parent: ITreeNode) =
             match parent with
-            | :? IMemberDeclaration | :? IAutoProperty -> false
+            | :? IMemberDeclaration | :? IAutoPropertyDeclaration -> false
             | _ -> true
 
         let contextExprParent = contextExpr.Parent
@@ -198,7 +198,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
             match contextParent with
             | :? IBinding as binding when isNotNull binding.Parent -> binding.EqualsToken
             | :? IMemberDeclaration as memberDeclaration -> memberDeclaration.EqualsToken
-            | :? IAutoProperty as autoProperty -> autoProperty.EqualsToken
+            | :? IAutoPropertyDeclaration as autoProperty -> autoProperty.EqualsToken
             | :? IMatchClause as matchClause -> matchClause.RArrow
             | :? IWhenExprClause as whenExpr -> whenExpr.WhenKeyword
             | :? ILambdaExpr as lambdaExpr -> lambdaExpr.RArrow
@@ -252,7 +252,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
             typeDeclaration.DeclaredElement
 
         let contextIsSourceExpr = sourceExpr == contextExpr && isNull contextDecl
-        let contextIsImplicitDo = sourceExpr == contextExpr && contextDecl :? IDo
+        let contextIsImplicitDo = sourceExpr == contextExpr && contextDecl :? IDoStatement
         let isInSingleLineContext = isNull contextDecl && isSingleLineContext contextExpr
 
         let isInSeqExpr =
@@ -389,7 +389,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
                 ModificationUtil.DeleteChildRange(ranges.ReplaceRange)
                 letBindings
 
-            | :? ILetModuleDecl ->
+            | :? ILetBindingsDeclaration ->
                 if removeSourceExpr then
                     ModificationUtil.ReplaceChild(contextDecl, letBindings)
                 else

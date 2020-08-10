@@ -23,17 +23,17 @@
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="UseBindingsIllegalInModules">
-    <Parameter type="ILetModuleDecl" name="letModuleDecl"/>
+    <Parameter type="ILetBindingsDeclaration" name="letBindings"/>
     <Message value="'use' bindings are treated as 'let' bindings in modules"/>
-    <Range>letModuleDecl.LetOrUseToken.GetHighlightingRange()</Range>
+    <Range>letBindings.LetOrUseToken.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>ReplaceUseWithLetFix</QuickFix>
   </Warning>
 
   <Error staticGroup="FSharpErrors" name="UseKeywordIllegalInPrimaryCtor">
-    <Parameter type="ILetModuleDecl" name="letModuleDecl"/>
+    <Parameter type="ILetBindingsDeclaration" name="letBindings"/>
     <Message value="'use' bindings are not permitted in primary constructors"/>
-    <Range>letModuleDecl.LetOrUseToken.GetHighlightingRange()</Range>
+    <Range>letBindings.LetOrUseToken.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>ReplaceUseWithLetFix</QuickFix>
   </Error>
@@ -170,8 +170,8 @@
   </Error>
 
   <Error staticGroup="FSharpErrors" name="LocalClassBindingsCannotBeInline">
-    <Parameter type="ILetModuleDecl" name="letModuleDecl"/>
-    <Range>letModuleDecl.InlineKeyword.GetHighlightingRange()</Range>
+    <Parameter type="ILetBindingsDeclaration" name="letBindings"/>
+    <Range>letBindings.InlineKeyword.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <Message value="Class local bindings cannot be inline"/>
     <QuickFix>RemoveInlineFix</QuickFix>

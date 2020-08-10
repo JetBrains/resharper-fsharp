@@ -153,9 +153,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
         typeDeclaration.Accept(this);
     }
 
-    public override void VisitLetModuleDecl(ILetModuleDecl letModuleDecl)
+    public override void VisitLetBindingsDeclaration(ILetBindingsDeclaration letBindings)
     {
-      foreach (var binding in letModuleDecl.Bindings)
+      foreach (var binding in letBindings.Bindings)
       {
         var headPattern = binding.HeadPattern;
         if (headPattern != null)
@@ -235,7 +235,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
         Builder.AddDeclaredMemberName(declaredName);
     }
 
-    public override void VisitModuleAbbreviation(IModuleAbbreviation decl) =>
+    public override void VisitModuleAbbreviationDeclaration(IModuleAbbreviationDeclaration decl) =>
       ProcessHiddenTypeDeclaration(decl);
 
     public override void VisitAbstractTypeDeclaration(IAbstractTypeDeclaration decl) =>

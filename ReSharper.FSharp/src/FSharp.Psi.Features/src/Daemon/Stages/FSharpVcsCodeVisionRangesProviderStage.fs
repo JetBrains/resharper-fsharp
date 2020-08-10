@@ -25,9 +25,9 @@ and FSharpVcsCodeVisionRangesProviderProcess(file, daemonProcess) =
         | :? ITypeMemberDeclaration ->
             declaration :? ITopBinding ||
             declaration :? IMemberDeclaration ||
-            declaration :? IAbstractSlot ||
-            declaration :? IAutoProperty ||
+            declaration :? IAbstractMemberDeclaration ||
+            declaration :? IAutoPropertyDeclaration ||
             declaration :? IMemberConstructorDeclaration ||
-            declaration :? IValField
+            declaration :? IValFieldDeclaration
 
         | _ -> false

@@ -5,7 +5,7 @@ using JetBrains.ReSharper.Resources.Shell;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class LetModuleDecl
+  internal partial class LetBindingsDeclaration
   {
     public bool IsRecursive => RecKeyword != null;
     public bool IsUse => LetOrUseToken?.GetTokenType() == FSharpTokenType.USE;

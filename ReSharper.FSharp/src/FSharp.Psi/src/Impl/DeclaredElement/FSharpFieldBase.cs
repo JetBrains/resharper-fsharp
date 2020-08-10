@@ -55,9 +55,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
       GetDeclaration() is ITopReferencePat referencePat && referencePat.CanBeMutable;
   }
 
-  internal class FSharpValField : FSharpFieldBase<ValField>
+  internal class FSharpValField : FSharpFieldBase<ValFieldDeclaration>
   {
-    public FSharpValField([NotNull] ValField declaration) : base(declaration)
+    public FSharpValField([NotNull] ValFieldDeclaration declaration) : base(declaration)
     {
     }
 

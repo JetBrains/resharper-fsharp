@@ -22,7 +22,7 @@ IFSharpImplFile
             FSharpIdentifierToken(type:IDENTIFIER, text:x)
           FSharpTokenType+DotTokenElement(type:DOT, text:.)
           FSharpIdentifierToken(type:IDENTIFIER, text:M)
-          IMemberParamsDeclaration
+          IParametersPatternDeclaration
             IParenPat
               FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
               IWildPat

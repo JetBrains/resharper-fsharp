@@ -12,10 +12,10 @@ type ReplaceUseWithLetFix(letNode: ILetBindings) =
     inherit FSharpQuickFixBase()
 
     new (warning: UseBindingsIllegalInModulesWarning) =
-        ReplaceUseWithLetFix(warning.LetModuleDecl)
+        ReplaceUseWithLetFix(warning.LetBindings)
 
     new (error: UseKeywordIllegalInPrimaryCtorError) =
-        ReplaceUseWithLetFix(error.LetModuleDecl)
+        ReplaceUseWithLetFix(error.LetBindings)
 
     override x.Text = "Replace with 'let'"
     override x.IsAvailable _ = isValid letNode
