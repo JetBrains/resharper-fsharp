@@ -307,11 +307,13 @@ module PsiModificationUtil =
             Whitespace(indent)
         ] |> ignore
 
-    let private toModuleNamespaceDeclaration
-            tokenType
-            (nodeType: CompositeNodeType)
-            (moduleDeclaration: IDeclaredModuleLikeDeclaration) =
-        if moduleDeclaration == null then () else
+[<AutoOpen>]
+module ModuleLikeModificationUtil =
+    
+    let private toModuleNamespaceDeclaration tokenType (nodeType: CompositeNodeType)
+        (moduleDeclaration: IDeclaredModuleLikeDeclaration) =
+
+        if isNull moduleDeclaration then () else
 
         replaceWithToken moduleDeclaration.ModuleOrNamespaceKeyword tokenType
         let newModuleDeclaration = ModificationUtil.ReplaceChild(moduleDeclaration, nodeType.Create())

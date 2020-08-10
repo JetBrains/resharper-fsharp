@@ -360,16 +360,12 @@
     <QuickFix>RemoveRedundantQualifierFix</QuickFix>
   </Warning>
 
-  <Error staticGroup="FSharpErrors" name="NamespaceContainsValue">
+  <Error staticGroup="FSharpErrors" name="NamespaceCannotContainValues">
     <Parameter type="IFSharpIdentifier" name="identifier"/>
-    <Parameter type="string" name="message"/>
-    <Parameter type="DocumentRange" name="range"/>
-    <Range>range</Range>
-    <Message value="{0}">
-      <Argument>message</Argument>
-    </Message>
+    <Message value="Namespaces cannot contain values or functions."/>
+    <Range>identifier.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
-    <QuickFix>ConvertNamespaceToModuleFix</QuickFix>
+    <QuickFix>NamespaceToModuleFix</QuickFix>
   </Error>
 
 </Errors>

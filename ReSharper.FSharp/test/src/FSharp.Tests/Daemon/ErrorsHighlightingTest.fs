@@ -51,4 +51,4 @@ type ErrorsHighlightingTest() =
 
     [<Test>] member x.``Upcast unnecessary 01``() = x.DoNamedTest()
     
-    [<Test>] member x.``Namespaces cannot contain values or functions``() = x.DoNamedTest()
+    [<Test>] member x.``Value in namespace``() = x.DoNamedTest()

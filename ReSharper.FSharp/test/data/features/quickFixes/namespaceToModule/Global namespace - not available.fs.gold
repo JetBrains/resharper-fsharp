@@ -1,0 +1,7 @@
+namespace global
+
+let |a|(0) = ()
+
+------------------------------------------------
+0: Namespaces cannot contain values or functions.
+NO QUICKFIXES

@@ -29,7 +29,7 @@ module FSharpErrors =
     let [<Literal>] UpcastUnnecessary = 66
     let [<Literal>] TypeTestUnnecessary = 67
     let [<Literal>] EnumMatchIncomplete = 104
-    let [<Literal>] NamespaceContainsValue = 201
+    let [<Literal>] NamespaceCannotContainValues = 201
     let [<Literal>] ModuleOrNamespaceRequired = 222
     let [<Literal>] UnrecognizedOption = 243
     let [<Literal>] NoImplementationGiven = 365
@@ -51,7 +51,6 @@ module FSharpErrors =
     let [<Literal>] undefinedIndexerMessageSuffix = " does not define the field, constructor or member 'Item'."
     let [<Literal>] ifExprMissingElseBranch = "This 'if' expression is missing an 'else' branch."
     let [<Literal>] expressionIsAFunctionMessage = "This expression is a function value, i.e. is missing arguments. Its type is string -> unit."
-    let [<Literal>] namespaceContainsValueMessage = "Namespaces cannot contain values or functions."
 
 [<AbstractClass>]
 type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
@@ -210,9 +209,8 @@ type FcsErrorsStageProcessBase(fsFile, daemonProcess) =
             let expr = getUnusedExpr expr
             FunctionValueUnexpectedWarning(expr, error.Message) :> _
 
-        | NamespaceContainsValue ->
-            let expr = nodeSelectionProvider.GetExpressionInRange(fsFile, range, false, null)
-            NamespaceContainsValueError(expr, namespaceContainsValueMessage, range) :> _
+        | NamespaceCannotContainValues ->
+            createHighlightingFromNode NamespaceCannotContainValuesError range
 
         | _ -> createGenericHighlighting error range
 
