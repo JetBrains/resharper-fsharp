@@ -6,9 +6,9 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
   public static class FSharpTreeNodeExtensions
   {
     [CanBeNull, Pure]
-    public static INamedNamespaceDeclaration GetContainingNamespaceDeclaration([NotNull] this IFSharpTreeNode treeNode)
+    public static INamedNamespaceDeclaration GetContainingNamespaceDeclaration(this IFSharpTreeNode treeNode)
     {
-      return treeNode.GetContainingNode<INamedNamespaceDeclaration>();
+      return treeNode?.GetContainingNode<INamedNamespaceDeclaration>();
     }
 
     [CanBeNull, Pure]
