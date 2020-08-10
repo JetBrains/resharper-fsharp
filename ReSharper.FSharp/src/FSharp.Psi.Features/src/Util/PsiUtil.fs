@@ -15,14 +15,12 @@ open JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.CodeStyle
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Files
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.TextControl
 open JetBrains.Util.Text
-open JetBrains.Util
 
 type IFile with
     member x.AsFSharpFile() =
@@ -306,24 +304,6 @@ module PsiModificationUtil =
             NewLine(lineEnding)
             Whitespace(indent)
         ] |> ignore
-
-[<AutoOpen>]
-module ModuleLikeModificationUtil =
-    
-    let private toModuleNamespaceDeclaration tokenType (nodeType: CompositeNodeType)
-        (moduleDeclaration: IDeclaredModuleLikeDeclaration) =
-
-        if isNull moduleDeclaration then () else
-
-        replaceWithToken moduleDeclaration.ModuleOrNamespaceKeyword tokenType
-        let newModuleDeclaration = ModificationUtil.ReplaceChild(moduleDeclaration, nodeType.Create())
-        LowLevelModificationUtil.AddChild(newModuleDeclaration, moduleDeclaration.Children().AsArray())
-
-    let convertModuleToNamespace: IDeclaredModuleLikeDeclaration -> unit =
-        toModuleNamespaceDeclaration FSharpTokenType.NAMESPACE ElementType.NAMED_NAMESPACE_DECLARATION
-
-    let convertNamespaceToModule: IDeclaredModuleLikeDeclaration -> unit =
-        toModuleNamespaceDeclaration FSharpTokenType.MODULE ElementType.NAMED_MODULE_DECLARATION
 
 let getPrevNodeOfType nodeType (node: ITreeNode) =
     let mutable prev = node.PrevSibling

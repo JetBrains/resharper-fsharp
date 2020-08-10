@@ -10,14 +10,8 @@ type NamespaceToModuleTest() =
     inherit QuickFixTestBase<NamespaceToModuleFix>()
 
     override x.RelativeTestDataPath = "features/quickFixes/namespaceToModule"
+    
+    override x.OnQuickFixNotAvailable(_, _) = Assert.Fail(ErrorText.NotAvailable);
 
     [<Test>] member x.``Simple``() = x.DoNamedTest()
-
-
-[<FSharpTest>]
-type NamespaceToModuleAvailabilityTest() =
-    inherit QuickFixAvailabilityTestBase()
-
-    override x.RelativeTestDataPath = "features/quickFixes/namespaceToModule"
-
-    [<Test>] member x.``Global namespace - not available``() = x.DoNamedTest()
+    [<Test; NotAvailable>] member x.``Global namespace``() = x.DoNamedTest()
