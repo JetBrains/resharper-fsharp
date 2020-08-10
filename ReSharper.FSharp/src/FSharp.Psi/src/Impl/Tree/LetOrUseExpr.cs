@@ -1,5 +1,6 @@
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
+using JetBrains.ReSharper.Psi;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
@@ -18,5 +19,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
       LetOrUseToken.NotNull().AddTokenAfter(FSharpTokenType.REC);
     }
+
+    public override IType Type() => InExpression.Type();
   }
 }
