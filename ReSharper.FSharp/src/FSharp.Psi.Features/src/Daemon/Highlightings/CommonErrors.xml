@@ -360,4 +360,16 @@
     <QuickFix>RemoveRedundantQualifierFix</QuickFix>
   </Warning>
 
+  <Error staticGroup="FSharpErrors" name="NamespaceContainsValue">
+    <Parameter type="IFSharpIdentifier" name="identifier"/>
+    <Parameter type="string" name="message"/>
+    <Parameter type="DocumentRange" name="range"/>
+    <Range>range</Range>
+    <Message value="{0}">
+      <Argument>message</Argument>
+    </Message>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <QuickFix>ConvertNamespaceToModuleFix</QuickFix>
+  </Error>
+
 </Errors>
