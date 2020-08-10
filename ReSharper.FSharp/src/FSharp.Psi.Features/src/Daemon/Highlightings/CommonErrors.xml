@@ -87,6 +87,7 @@
     <QuickFix>AddUnderscorePrefixFix</QuickFix>
     <QuickFix>RemoveUnusedLocalBindingFix</QuickFix>
     <QuickFix>RemoveUnusedNamedAsPatFix</QuickFix>
+    <QuickFix>IgnoreUnusedBindingExpressionFix</QuickFix>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="UnitTypeExpected">
