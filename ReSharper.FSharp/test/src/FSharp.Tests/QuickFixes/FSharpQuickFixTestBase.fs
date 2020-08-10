@@ -10,4 +10,4 @@ open NUnit.Framework;
 type FSharpQuickFixTestBase<'a when 'a :> IQuickFix>() =
     inherit QuickFixTestBase<'a>()
 
-    override x.OnQuickFixNotAvailable(_, _) = Assert.Fail(ErrorText.NotAvailable);
+    override x.OnQuickFixNotAvailable(_, _) = Assert.Fail(ErrorText.NotAvailable)

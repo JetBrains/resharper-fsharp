@@ -362,7 +362,7 @@
 
   <Error staticGroup="FSharpErrors" name="NamespaceCannotContainValues">
     <Parameter type="IFSharpIdentifier" name="identifier"/>
-    <Message value="Namespaces cannot contain values or functions."/>
+    <Message value="Namespaces cannot contain values or functions"/>
     <Range>identifier.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>NamespaceToModuleFix</QuickFix>
