@@ -1,0 +1,8 @@
+﻿module Module
+
+let a =
+  t{caret}ry () with
+  | b -> ()
+  | c -> ()
+
+  ()

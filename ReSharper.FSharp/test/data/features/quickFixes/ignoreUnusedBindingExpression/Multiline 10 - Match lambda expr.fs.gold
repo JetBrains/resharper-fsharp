@@ -1,0 +1,9 @@
+﻿module Module
+
+let a =
+  {caret}function
+  | b -> 1
+  | c -> 2
+  |> ignore
+
+  ()

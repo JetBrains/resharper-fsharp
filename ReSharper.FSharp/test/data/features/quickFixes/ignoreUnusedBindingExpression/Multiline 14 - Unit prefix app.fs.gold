@@ -1,0 +1,7 @@
+﻿module Module
+
+let a =
+  let {caret}f x = ()
+  f 0
+
+  ()

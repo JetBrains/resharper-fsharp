@@ -1,0 +1,7 @@
+﻿module Module
+
+let a =
+  1{caret}
+  1 |> ignore
+
+  ()

@@ -1,0 +1,9 @@
+﻿module Module
+
+let a =
+  t{caret}ry
+    ()
+  finally
+    ()
+
+  ()
