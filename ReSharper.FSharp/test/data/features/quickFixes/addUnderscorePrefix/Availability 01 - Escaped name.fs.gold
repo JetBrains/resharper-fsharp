@@ -15,6 +15,7 @@ Replace with '_'
 --Replace unused values with '_' in solution
 Rename to '_foo'
 Remove unused value
+Inline and ignore expression
 1: The value 'foo bar' is unused
 QUICKFIXES:
 Replace with '_'
@@ -23,3 +24,4 @@ Replace with '_'
 --Replace unused values with '_' in project
 --Replace unused values with '_' in solution
 Remove unused value
+Inline and ignore expression
