@@ -1,13 +1,12 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
-open JetBrains.ReSharper.FeaturesTestFramework.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
 [<FSharpTest>]
 type IgnoreUnusedBindingExpressionTest() =
-    inherit QuickFixTestBase<IgnoreUnusedBindingExpressionFix>()
+    inherit FSharpQuickFixTestBase<IgnoreUnusedBindingExpressionFix>()
     
     override x.RelativeTestDataPath = "features/quickFixes/ignoreUnusedBindingExpression"
     
@@ -21,6 +20,7 @@ type IgnoreUnusedBindingExpressionTest() =
     [<Test; Explicit>] member x.``Single line 08 - Ignore``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``Single line 09 - Do expr``() = x.DoNamedTest()
     [<Test>] member x.``Single line 10 - Assert expr``() = x.DoNamedTest()
+    [<Test; NotAvailable>] member x.``Single line 11 - Function``() = x.DoNamedTest()
 
     [<Test>] member x.``Multiline 01 - Seq expr``() = x.DoNamedTest()
     [<Test>] member x.``Multiline 02 - Nested let``() = x.DoNamedTest()
@@ -36,11 +36,3 @@ type IgnoreUnusedBindingExpressionTest() =
     [<Test>] member x.``Multiline 12 - Try with expr``() = x.DoNamedTest()
     [<Test>] member x.``Multiline 13 - Try finally expr``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``Multiline 14 - Unit prefix app``() = x.DoNamedTest()
-
-[<FSharpTest>]
-type IgnoreUnusedBindingExpressionAvailabilityTest() =
-    inherit QuickFixAvailabilityTestBase()
-
-    override x.RelativeTestDataPath = "features/quickFixes/ignoreUnusedBindingExpression"
-
-    [<Test>] member x.``Function``() = x.DoNamedTest()
