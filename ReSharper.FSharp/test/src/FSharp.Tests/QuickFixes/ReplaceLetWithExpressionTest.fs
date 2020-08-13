@@ -7,7 +7,7 @@ open NUnit.Framework
 
 [<FSharpTest>]
 type ReplaceLetWithExpressionTest() =
-    inherit QuickFixTestBase<ReplaceLetWithExpressionFix>()
+    inherit FSharpQuickFixTestBase<ReplaceLetWithExpressionFix>()
 
     override x.RelativeTestDataPath = "features/quickFixes/replaceLetWithExpression"
 
@@ -18,7 +18,7 @@ type ReplaceLetWithExpressionTest() =
     [<Test>] member x.``In 01``() = x.DoNamedTest()
     [<Test>] member x.``In 02 - Inline``() = x.DoNamedTest()
     [<Test>] member x.``In 03 - Before other``() = x.DoNamedTest()
-    
+
 
 [<FSharpTest>]
 type ReplaceLetWithExpressionAvailabilityTest() =

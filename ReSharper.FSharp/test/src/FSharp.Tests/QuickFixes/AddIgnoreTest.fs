@@ -9,7 +9,7 @@ open NUnit.Framework
 
 [<FSharpTest>]
 type AddIgnoreTest() =
-    inherit QuickFixTestBase<AddIgnoreFix>()
+    inherit FSharpQuickFixTestBase<AddIgnoreFix>()
 
     let [<Literal>] OccurrenceName = "OCCURRENCE"
 

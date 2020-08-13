@@ -8,7 +8,7 @@ open NUnit.Framework
 
 [<FSharpTest; TestPackages("FSharp.Core")>]
 type AddUnderscorePrefixFixTest() =
-    inherit QuickFixTestBase<AddUnderscorePrefixFix>()
+    inherit FSharpQuickFixTestBase<AddUnderscorePrefixFix>()
 
     override x.RelativeTestDataPath = "features/quickFixes/addUnderscorePrefix"
 

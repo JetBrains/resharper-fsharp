@@ -7,7 +7,7 @@ open NUnit.Framework
 
 [<FSharpTest>]
 type RemoveNeverMatchingRuleTest() =
-    inherit QuickFixTestBase<RemoveNeverMatchingRuleFix>()
+    inherit FSharpQuickFixTestBase<RemoveNeverMatchingRuleFix>()
 
     override x.RelativeTestDataPath = "features/quickFixes/removeNeverMatchingRule"
 

@@ -7,7 +7,7 @@ open NUnit.Framework
 
 [<FSharpTest>]
 type RemoveUnusedLocalBindingTest() =
-    inherit QuickFixTestBase<RemoveUnusedLocalBindingFix>()
+    inherit FSharpQuickFixTestBase<RemoveUnusedLocalBindingFix>()
 
     override x.RelativeTestDataPath = "features/quickFixes/removeUnusedLocalBinding"
 
@@ -47,15 +47,15 @@ type RemoveUnusedLocalBindingTest() =
     [<Test>] member x.``Type - Single 02``() = x.DoNamedTest()
     [<Test>] member x.``Type - Recursive 01``() = x.DoNamedTest()
 
+    [<Test; NotAvailable>] member x.``Not available 01``() = x.DoNamedTest()
+    [<Test; NotAvailable>] member x.``Not available 02 - Param``() = x.DoNamedTest()
+
 
 [<FSharpTest>]
 type RemoveUnusedLocalBindingAvailabilityTest() =
     inherit QuickFixAvailabilityTestBase()
 
     override x.RelativeTestDataPath = "features/quickFixes/removeUnusedLocalBinding"
-
-    [<Test>] member x.``Not available 01``() = x.DoNamedTest()
-    [<Test>] member x.``Not available 02 - Param``() = x.DoNamedTest()
 
     [<Test>] member x.``Text - Function 01``() = x.DoNamedTest()
     [<Test>] member x.``Text - Value 01``() = x.DoNamedTest()

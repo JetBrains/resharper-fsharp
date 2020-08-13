@@ -10,7 +10,7 @@ open NUnit.Framework
 
 [<FSharpTest>]
 type AddParensToApplicationTest() =
-    inherit QuickFixTestBase<AddParensToApplicationFix>()
+    inherit FSharpQuickFixTestBase<AddParensToApplicationFix>()
 
     let [<Literal>] AppOccurrenceName = "APP_OCCURRENCE"
     let [<Literal>] ArgsOccurrenceName = "ARGS_OCCURRENCE"
@@ -45,6 +45,7 @@ type AddParensToApplicationTest() =
             |> Option.defaultWith (fun _ -> failwithf "Could not find %s occurrence" occurrenceName))           
 
         base.DoTestOnTextControlAndExecuteWithGold(project, textControl, projectFile)
+
 
 [<FSharpTest>]
 type AddParensToApplicationAvailabilityTest() =

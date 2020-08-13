@@ -8,7 +8,7 @@ open NUnit.Framework
 
 [<FSharpTest; TestPackages("FSharp.Core")>]
 type RemoveRedundantQualifierTest() =
-    inherit QuickFixTestBase<RemoveRedundantQualifierFix>()
+    inherit FSharpQuickFixTestBase<RemoveRedundantQualifierFix>()
 
     override x.RelativeTestDataPath = "features/quickFixes/removeRedundantQualifier"
 
