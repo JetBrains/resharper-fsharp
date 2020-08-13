@@ -301,8 +301,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
     }
 
     private static bool IndentElseExpr(ITreeNode elseExpr, CodeFormattingContext context) =>
-      (elseExpr.GetPreviousMeaningfulSibling().IsFirstOnLine(context.CodeFormatter)
-    || !AreAligned(elseExpr, elseExpr.Parent?.FirstChild, context.CodeFormatter)) && !(elseExpr is IElifExpr);
+      (elseExpr.GetPreviousMeaningfulSibling().IsFirstOnLine(context.CodeFormatter) ||
+       !AreAligned(elseExpr, elseExpr.Parent?.FirstChild, context.CodeFormatter)) && !(elseExpr is IElifExpr);
 
     private static bool AreAligned(ITreeNode first, ITreeNode second, IWhitespaceChecker whitespaceChecker) =>
       first.CalcLineIndent(whitespaceChecker) == second.CalcLineIndent(whitespaceChecker);
