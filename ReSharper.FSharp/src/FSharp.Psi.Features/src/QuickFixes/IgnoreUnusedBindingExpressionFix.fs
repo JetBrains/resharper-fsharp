@@ -20,8 +20,8 @@ type IgnoreUnusedBindingExpressionFix(warning: UnusedValueWarning) =
     override x.Text = "Ignore expression"
 
     override x.IsAvailable _ =
-        isValid pat && isValid letOrUseExpr && letOrUseExpr.Bindings.Count = 1 && isValid binding.Expression &&
-        not (binding.Expression :? IDoExpr)
+        isValid pat && not (pat :? IParametersOwnerPat) && isValid letOrUseExpr && letOrUseExpr.Bindings.Count = 1 &&
+        isValid binding.Expression && not (binding.Expression :? IDoExpr)
 
     override x.ExecutePsiTransaction _ =
         use writeLock = WriteLockCookie.Create(pat.IsPhysical())
