@@ -36,3 +36,11 @@ type IgnoreUnusedBindingExpressionTest() =
     [<Test>] member x.``Multiline 12 - Try with expr``() = x.DoNamedTest()
     [<Test>] member x.``Multiline 13 - Try finally expr``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``Multiline 14 - Unit prefix app``() = x.DoNamedTest()
+
+[<FSharpTest>]
+type IgnoreUnusedBindingExpressionAvailabilityTest() =
+    inherit QuickFixAvailabilityTestBase()
+
+    override x.RelativeTestDataPath = "features/quickFixes/ignoreUnusedBindingExpression"
+
+    [<Test>] member x.``Function``() = x.DoNamedTest()
