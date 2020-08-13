@@ -77,5 +77,5 @@ type AddIgnoreFix(expr: IFSharpExpression) =
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
-        
+
         ignoreExpression expr (shouldAddNewLine expr)

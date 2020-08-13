@@ -16,7 +16,7 @@ type IgnoreUnusedBindingExpressionFix(warning: UnusedValueWarning) =
     let pat = warning.Pat.IgnoreParentParens()
     let binding = BindingNavigator.GetByHeadPattern(pat)
     let letOrUseExpr = LetOrUseExprNavigator.GetByBinding(binding)
-    
+
     override x.Text = "Ignore expression"
 
     override x.IsAvailable _ =
@@ -26,13 +26,13 @@ type IgnoreUnusedBindingExpressionFix(warning: UnusedValueWarning) =
     override x.ExecutePsiTransaction _ =
         use writeLock = WriteLockCookie.Create(pat.IsPhysical())
         use formatter = FSharpRegistryUtil.AllowFormatterCookie.Create()
-        
+
         if not (binding.Expression.Type().IsVoid()) then
             ignoreInnermostExpression binding.Expression false
-        
+
         let inExpr = letOrUseExpr.InExpression
         let newLine = NewLine(letOrUseExpr.GetLineEnding())
-        
+
         let bindingExpr = ModificationUtil.ReplaceChild(letOrUseExpr, binding.Expression)
         addNodesAfter bindingExpr [
             newLine
