@@ -17,7 +17,7 @@ type IgnoreUnusedBindingExpressionFix(warning: UnusedValueWarning) =
     let binding = BindingNavigator.GetByHeadPattern(pat)
     let letOrUseExpr = LetOrUseExprNavigator.GetByBinding(binding)
     
-    override x.Text = "Inline and ignore expression"
+    override x.Text = "Ignore expression"
 
     override x.IsAvailable _ =
         isValid pat && isValid letOrUseExpr && letOrUseExpr.Bindings.Count = 1 && isValid binding.Expression &&
