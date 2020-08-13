@@ -108,3 +108,19 @@ let setBindingExpression (expr: IFSharpExpression) contextIndent (letBindings: #
         ModificationUtil.AddChildBefore(newExpr, NewLine(expr.GetLineEnding())) |> ignore
         ModificationUtil.AddChildBefore(newExpr, Whitespace(contextIndent + indentSize)) |> ignore
         shiftExpr indentSize newExpr
+
+let ignoreExpression (expr: IFSharpExpression) shouldAddNewLine =
+    let ignoreApp = expr.CreateElementFactory().CreateIgnoreApp(expr, shouldAddNewLine)
+
+    let replaced = ModificationUtil.ReplaceChild(expr, ignoreApp).As<IBinaryAppExpr>()
+    addParensIfNeeded replaced.LeftArgument |> ignore
+
+let ignoreInnermostExpression (expr: IFSharpExpression) =
+    let rec getInnermostExpression (expr: IFSharpExpression) =
+        match expr with
+        | :? ISequentialExpr as seqExpr -> getInnermostExpression (seqExpr.Expressions.Last())
+        | :? ILetOrUseExpr as letOrUseExpr -> getInnermostExpression letOrUseExpr.InExpression
+        | :? IParenExpr as parenExpr -> getInnermostExpression parenExpr.InnerExpression
+        | _ -> expr
+
+    ignoreExpression (getInnermostExpression expr) false

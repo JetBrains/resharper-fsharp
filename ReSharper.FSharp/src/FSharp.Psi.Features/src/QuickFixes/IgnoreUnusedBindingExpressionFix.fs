@@ -17,19 +17,6 @@ type IgnoreUnusedBindingExpressionFix(warning: UnusedValueWarning) =
     let binding = BindingNavigator.GetByHeadPattern(pat)
     let letOrUseExpr = LetOrUseExprNavigator.GetByBinding(binding)
     
-    let ignoreInnermostExpression (expr: IFSharpExpression) =
-        let rec getInnermostExpression (expr: IFSharpExpression) =
-            match expr with
-            | :? ISequentialExpr as seqExpr -> getInnermostExpression (seqExpr.Expressions.Last())
-            | :? ILetOrUseExpr as letOrUseExpr -> getInnermostExpression letOrUseExpr.InExpression
-            | :? IParenExpr as parenExpr -> getInnermostExpression parenExpr.InnerExpression
-            | _ -> expr
-        
-        let exprToIgnore = getInnermostExpression expr
-        let ignoredExpr = exprToIgnore.CreateElementFactory().CreateIgnoreApp(exprToIgnore, false)
-        let replaced = ModificationUtil.ReplaceChild(exprToIgnore, ignoredExpr)
-        addParensIfNeeded replaced.LeftArgument |> ignore
-    
     override x.Text = "Inline and ignore expression"
 
     override x.IsAvailable _ =
