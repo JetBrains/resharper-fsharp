@@ -115,12 +115,15 @@ let ignoreExpression (expr: IFSharpExpression) shouldAddNewLine =
     let replaced = ModificationUtil.ReplaceChild(expr, ignoreApp).As<IBinaryAppExpr>()
     addParensIfNeeded replaced.LeftArgument |> ignore
 
-let ignoreInnermostExpression (expr: IFSharpExpression) =
+let ignoreInnermostExpression (expr: IFSharpExpression) shouldAddNewLine =
     let rec getInnermostExpression (expr: IFSharpExpression) =
         match expr with
-        | :? ISequentialExpr as seqExpr -> getInnermostExpression (seqExpr.Expressions.Last())
-        | :? ILetOrUseExpr as letOrUseExpr -> getInnermostExpression letOrUseExpr.InExpression
-        | :? IParenExpr as parenExpr -> getInnermostExpression parenExpr.InnerExpression
+        | :? ISequentialExpr as seqExpr when not (seqExpr.ExpressionsEnumerable.IsEmpty()) ->
+            getInnermostExpression (seqExpr.ExpressionsEnumerable.LastOrDefault())
+        | :? ILetOrUseExpr as letOrUseExpr when isNotNull letOrUseExpr.InExpression ->
+            getInnermostExpression letOrUseExpr.InExpression
+        | :? IParenExpr as parenExpr when isNotNull parenExpr.InnerExpression ->
+            getInnermostExpression parenExpr.InnerExpression
         | _ -> expr
 
-    ignoreExpression (getInnermostExpression expr) false
+    ignoreExpression (getInnermostExpression expr) shouldAddNewLine

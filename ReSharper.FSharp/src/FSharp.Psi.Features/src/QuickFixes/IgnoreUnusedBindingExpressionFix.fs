@@ -28,7 +28,7 @@ type IgnoreUnusedBindingExpressionFix(warning: UnusedValueWarning) =
         use formatter = FSharpRegistryUtil.AllowFormatterCookie.Create()
         
         if not (binding.Expression.Type().IsVoid()) then
-            ignoreInnermostExpression binding.Expression
+            ignoreInnermostExpression binding.Expression false
         
         let inExpr = letOrUseExpr.InExpression
         let newLine = NewLine(letOrUseExpr.GetLineEnding())
