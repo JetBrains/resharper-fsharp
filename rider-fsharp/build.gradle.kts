@@ -137,7 +137,7 @@ fun File.writeTextIfChanged(content: String) {
 }
 
 configure<RdgenParams> {
-    val csOutput = File(repoRoot, "Resharper.FSharp/src/FSharp.ProjectModelBase/src/Protocol")
+    val csOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.ProjectModelBase/src/Protocol")
     val ktOutput = File(repoRoot, "rider-fsharp/src/main/java/com/jetbrains/rider/plugins/fsharp/protocol")
 
     verbose = true
