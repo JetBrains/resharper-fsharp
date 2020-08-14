@@ -7,7 +7,6 @@ do
 0: The value 'foo' is unused
 QUICKFIXES:
 Remove unused function
-Inline and ignore expression
 1: The value 'x' is unused
 QUICKFIXES:
 Replace with '_'

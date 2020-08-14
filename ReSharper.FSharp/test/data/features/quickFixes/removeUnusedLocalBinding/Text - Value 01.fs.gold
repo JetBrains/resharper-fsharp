@@ -13,4 +13,4 @@ Replace with '_'
 --Replace unused values with '_' in solution
 Rename to '_x'
 Remove unused value
-Inline and ignore expression
+Ignore expression
