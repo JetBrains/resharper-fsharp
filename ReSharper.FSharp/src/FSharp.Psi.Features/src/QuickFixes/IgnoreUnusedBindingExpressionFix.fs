@@ -8,6 +8,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 
 type IgnoreUnusedBindingExpressionFix(warning: UnusedValueWarning) =
@@ -16,6 +17,19 @@ type IgnoreUnusedBindingExpressionFix(warning: UnusedValueWarning) =
     let pat = warning.Pat.IgnoreParentParens()
     let binding = BindingNavigator.GetByHeadPattern(pat)
     let letOrUseExpr = LetOrUseExprNavigator.GetByBinding(binding)
+
+    let rec getCorrectAnchor (expr: ITreeNode): ITreeNode =
+        match expr with
+        | :? ISequentialExpr as seqExpr when not (seqExpr.ExpressionsEnumerable.IsEmpty()) ->
+            let last = seqExpr.ExpressionsEnumerable.LastOrDefault()
+            if last :? ILetOrUseExpr then getCorrectAnchor last else last :> _
+
+        | :? ILetOrUseExpr as letExpr when isNotNull letExpr.InExpression -> getCorrectAnchor letExpr.InExpression
+        | _ ->
+
+        let exprCopy = expr.Copy()
+        let seqExpr = ModificationUtil.ReplaceChild(expr, ElementType.SEQUENTIAL_EXPR.Create())
+        ModificationUtil.AddChild(seqExpr, exprCopy)
 
     override x.Text = "Ignore expression"
 
@@ -34,7 +48,7 @@ type IgnoreUnusedBindingExpressionFix(warning: UnusedValueWarning) =
         let newLine = NewLine(letOrUseExpr.GetLineEnding())
 
         let bindingExpr = ModificationUtil.ReplaceChild(letOrUseExpr, binding.Expression)
-        addNodesAfter bindingExpr [
+        addNodesAfter (getCorrectAnchor bindingExpr) [
             newLine
             newLine
             inExpr
