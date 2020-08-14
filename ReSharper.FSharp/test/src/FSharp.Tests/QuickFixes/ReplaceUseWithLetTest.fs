@@ -1,13 +1,12 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
-open JetBrains.ReSharper.FeaturesTestFramework.Intentions
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
 [<FSharpTest>]
 type ReplaceUseWithLet() =
-    inherit QuickFixTestBase<ReplaceUseWithLetFix>()
+    inherit FSharpQuickFixTestBase<ReplaceUseWithLetFix>()
 
     override x.RelativeTestDataPath = "features/quickFixes/replaceUseWithLet"
     
