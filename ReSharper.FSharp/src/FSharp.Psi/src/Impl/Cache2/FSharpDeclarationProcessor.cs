@@ -153,15 +153,21 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Cache2
         typeDeclaration.Accept(this);
     }
 
+    private void ProcessBinding(IBinding binding)
+    {
+      var headPattern = binding.HeadPattern;
+      if (headPattern != null)
+        ProcessTypeMembers(headPattern.Declarations);
+    }
+
     public override void VisitLetBindingsDeclaration(ILetBindingsDeclaration letBindings)
     {
-      foreach (var binding in letBindings.Bindings)
-      {
-        var headPattern = binding.HeadPattern;
-        if (headPattern != null)
-          ProcessTypeMembers(headPattern.Declarations);
-      }
+      foreach (var binding in letBindings.Bindings) 
+        ProcessBinding(binding);
     }
+
+    public override void VisitBindingSignature(IBindingSignature binding) => 
+      ProcessBinding(binding);
 
     public override void VisitExceptionDeclaration(IExceptionDeclaration decl)
     {

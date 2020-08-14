@@ -25,7 +25,7 @@
   <Warning staticGroup="FSharpErrors" name="UseBindingsIllegalInModules">
     <Parameter type="ILetBindingsDeclaration" name="letBindings"/>
     <Message value="'use' bindings are treated as 'let' bindings in modules"/>
-    <Range>letBindings.LetOrUseToken.GetHighlightingRange()</Range>
+    <Range>letBindings.BindingKeyword.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>ReplaceUseWithLetFix</QuickFix>
   </Warning>
@@ -33,7 +33,7 @@
   <Error staticGroup="FSharpErrors" name="UseKeywordIllegalInPrimaryCtor">
     <Parameter type="ILetBindingsDeclaration" name="letBindings"/>
     <Message value="'use' bindings are not permitted in primary constructors"/>
-    <Range>letBindings.LetOrUseToken.GetHighlightingRange()</Range>
+    <Range>letBindings.BindingKeyword.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>ReplaceUseWithLetFix</QuickFix>
   </Error>
@@ -163,7 +163,7 @@
 
   <Error staticGroup="FSharpErrors" name="LetAndForNonRecBindings">
     <Parameter type="ILetBindings" name="letBindings"/>
-    <Range>(letBindings.Separators |> Seq.tryHead |> Option.defaultWith (fun _ -> letBindings.LetOrUseToken)).GetHighlightingRange()</Range>
+    <Range>(letBindings.Separators |> Seq.tryHead |> Option.defaultWith (fun _ -> letBindings.BindingKeyword)).GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <Message value="The declaration form 'let ... and ...' is only allowed for recursive bindings. Consider using a sequence of 'let' bindings"/>
     <QuickFix>ToRecursiveLetBindingsFix</QuickFix>
@@ -263,7 +263,7 @@
 
   <Warning staticGroup="FSharpErrors" name="ConvertToUseBinding">
     <Parameter type="ILetOrUseExpr" name="letExpr"/>
-    <Range>letExpr.LetOrUseToken.GetHighlightingRange()</Range>
+    <Range>letExpr.BindingKeyword.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <Message value="Convert to 'use' binding"/>
     <QuickFix>ConvertToUseFix</QuickFix>
@@ -271,10 +271,10 @@
   
   <Error staticGroup="FSharpErrors" name="ExpectedExpressionAfterLet">
     <Parameter type="ILetOrUseExpr" name="letExpr"/>
-    <Range>letExpr.LetOrUseToken.GetHighlightingRange()</Range>
+    <Range>letExpr.BindingKeyword.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <Message value="'{0}' is missing expression">
-      <Argument>getLetTokenText letExpr.LetOrUseToken</Argument>
+      <Argument>getLetTokenText letExpr.BindingKeyword</Argument>
     </Message>
     <QuickFix>ReplaceLetWithExpressionFix</QuickFix>
   </Error>

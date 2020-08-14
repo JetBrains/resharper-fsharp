@@ -138,22 +138,42 @@ interface moduleMember:
   moduleAbbreviationDeclaration |
   openStatement |
   doStatement |
-  hashDirective;
+  hashDirective |
+  bindingSignature;
 
 letBindingsDeclaration options { stubBase="DummyDeclaration"; } extras {
   get { methodName="Attributes" path=<letBindingsDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
-  letOrUse{LET, LetOrUseToken}
+  letOrUse{LET, BindingKeyword}
   INLINE<INLINE, InlineKeyword>?
   REC<REC, RecKeyword>?
   LIST binding<BINDING, Bindings> SEP AND<FSHARP_AND, Separators>;
+
+bindingSignature extras {
+  get { methodName="Attributes" path=<bindingSignature:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
+  get { methodName="Expression" path=<bindingSignature:CHAMELEON_EXPR/chameleonExpression:EXPR> };
+}:
+  attributeList<ATTRIBUTE_LIST, AttributeLists>*
+  VAL<VAL, BindingKeyword>
+  INLINE<INLINE, InlineKeyword>?
+  MUTABLE<MUTABLE, MutableKeyword>?
+  referencePat<HEAD_PATTERN, HeadPattern>
+  returnTypeInfo<RETURN_INFO, ReturnTypeInfo>
+  (
+    EQUALS<EQUALS, EqualsToken>
+    chameleonExpression<CHAMELEON_EXPR, ChameleonExpression>
+  )?;
 
 interface letBindings:
   letBindingsDeclaration |
   letOrUseExpr;
 
 interface binding:
+  bindingImplementation
+  bindingSignature;
+
+interface bindingImplementation:
   topBinding |
   localBinding;
 
@@ -669,7 +689,7 @@ binaryAppExpr options { stubBase="FSharpExpressionBase"; } extras {
   fSharpExpression<RIGHT_ARG_EXPR, RightArgument>;
 
 letOrUseExpr options { stubBase="FSharpExpressionBase"; }:
-  letOrUse{LET, LetOrUseToken}
+  letOrUse{LET, BindingKeyword}
   REC<REC, RecKeyword>?
   LIST binding<BINDING, Bindings> SEP AND<FSHARP_AND, Separators>  
   IN<IN, InKeyword>?

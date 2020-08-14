@@ -11,22 +11,17 @@ IFSharpSigFile
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "
       ITopReferencePat
         IExpressionReferenceName
-          FSharpIdentifierToken(type:IDENTIFIER, text:f)
+          FSharpIdentifierToken(type:IDENTIFIER, text:c)
+      FSharpTokenType+LessTokenElement(type:LESS, text:<)
+      FSharpTokenType+QuoteTokenElement(type:QUOTE, text:')
+      FSharpIdentifierToken(type:IDENTIFIER, text:T)
+      FSharpTokenType+GreaterTokenElement(type:GREATER, text:>)
+      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
       FSharpTokenType+ColonTokenElement(type:COLON, text::)
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "
       IReturnTypeInfo
-        IFunctionTypeUsage
-          FSharpIdentifierToken(type:IDENTIFIER, text:x)
-          FSharpTokenType+ColonTokenElement(type:COLON, text::)
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          INamedTypeUsage
-            ITypeReferenceName
-              FSharpIdentifierToken(type:IDENTIFIER, text:int)
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
-          Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-          INamedTypeUsage
-            ITypeReferenceName
-              FSharpIdentifierToken(type:IDENTIFIER, text:unit)
+        INamedTypeUsage
+          ITypeReferenceName
+            FSharpIdentifierToken(type:IDENTIFIER, text:int)
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
 

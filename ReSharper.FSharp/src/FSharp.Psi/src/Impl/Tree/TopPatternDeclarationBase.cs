@@ -22,41 +22,45 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
       if (TryCreateDeclaredElementFast(typeDeclaration) is var declaredElement && declaredElement != null)
         return declaredElement;
-      
+
       return GetFSharpSymbol() is { } fcsSymbol
         ? CreateDeclaredElement(fcsSymbol)
         : null;
     }
 
-    protected override IDeclaredElement CreateDeclaredElement(FSharpSymbol fcsSymbol)
+    protected override IDeclaredElement CreateDeclaredElement(FSharpSymbol fcsSymbol) =>
+      CreateBindingDeclaredElement(fcsSymbol, this);
+
+    public static IDeclaredElement CreateBindingDeclaredElement([NotNull] FSharpSymbol fcsSymbol,
+      [NotNull] TopPatternDeclarationBase declaration)
     {
       if (!(fcsSymbol is FSharpMemberOrFunctionOrValue mfv))
         return null;
 
-      var typeDeclaration = GetContainingNode<ITypeDeclaration>();
+      var typeDeclaration = declaration.GetContainingNode<ITypeDeclaration>();
       if (typeDeclaration == null)
         return null;
 
       if (typeDeclaration is IFSharpTypeDeclaration)
       {
         if ((!mfv.CurriedParameterGroups.IsEmpty() || !mfv.GenericParameters.IsEmpty()) && !mfv.IsMutable)
-          return new FSharpTypePrivateMethod(this);
+          return new FSharpTypePrivateMethod(declaration);
 
         if (mfv.LiteralValue != null)
-          return new FSharpLiteral(this);
+          return new FSharpLiteral(declaration);
 
-        return new FSharpTypePrivateField(this);
+        return new FSharpTypePrivateField(declaration);
       }
 
       if (mfv.LiteralValue != null)
-        return new FSharpLiteral(this);
+        return new FSharpLiteral(declaration);
 
       if (!mfv.IsValCompiledAsMethod())
-        return new ModuleValue(this);
+        return new ModuleValue(declaration);
 
       return !mfv.IsInstanceMember && mfv.CompiledName.StartsWith("op_", StringComparison.Ordinal)
-        ? (IDeclaredElement) new FSharpSignOperator<TopPatternDeclarationBase>(this)
-        : new ModuleFunction(this);
+        ? (IDeclaredElement) new FSharpSignOperator<TopPatternDeclarationBase>(declaration)
+        : new ModuleFunction(declaration);
     }
 
     [CanBeNull]
@@ -105,7 +109,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         : null;
     }
 
-    [NotNull] private IDeclaredElement CreateValue(ITypeDeclaration typeDeclaration) =>
+    [NotNull]
+    private IDeclaredElement CreateValue(ITypeDeclaration typeDeclaration) =>
       typeDeclaration is IFSharpTypeDeclaration
         ? (IDeclaredElement) new FSharpTypePrivateField(this)
         : new ModuleValue(this);

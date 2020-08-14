@@ -382,6 +382,9 @@ type FSharpSignatureParserTest() =
     override x.RelativeTestDataPath = "parsing/signatures"
 
     [<Test>] member x.``Val - Value 01``() = x.DoNamedTest()
+    [<Test>] member x.``Val - Value 02 - Return attrs``() = x.DoNamedTest()
+    [<Test>] member x.``Val - Value 03 - Type func``() = x.DoNamedTest()
+    [<Test>] member x.``Val - Value 04 - Literal``() = x.DoNamedTest()
 
     [<Test>] member x.``Val - Function 01``() = x.DoNamedTest()
     [<Test>] member x.``Val - Function 02 - Named param``() = x.DoNamedTest()

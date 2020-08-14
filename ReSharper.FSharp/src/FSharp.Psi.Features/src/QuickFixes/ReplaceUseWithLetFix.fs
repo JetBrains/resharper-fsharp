@@ -21,7 +21,7 @@ type ReplaceUseWithLetFix(letNode: ILetBindings) =
     override x.IsAvailable _ = isValid letNode
 
     override x.ExecutePsiTransaction _ =
-        let useKeyword = letNode.LetOrUseToken
+        let useKeyword = letNode.BindingKeyword
         Assertion.Assert(useKeyword.GetTokenType() == FSharpTokenType.USE,
                          sprintf "Expecting use, got: %O" (useKeyword.GetTokenType()))
 
