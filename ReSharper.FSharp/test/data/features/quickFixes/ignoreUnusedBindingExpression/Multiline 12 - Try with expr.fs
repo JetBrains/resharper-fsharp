@@ -2,8 +2,8 @@
 
 let a =
   let {caret}a =
-    try () with
-    | b -> ()
-    | c -> ()
+    try 1 with
+    | b -> 1
+    | c -> 1
 
   ()

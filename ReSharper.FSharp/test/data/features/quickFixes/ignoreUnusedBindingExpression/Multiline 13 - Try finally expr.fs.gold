@@ -1,9 +1,8 @@
 ﻿module Module
 
 let a =
-  t{caret}ry
-    ()
-  finally
-    ()
+  t{caret}ry 1
+  finally ()
+  |> ignore
 
   ()

@@ -1,15 +1,27 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features
 
+open JetBrains.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Tests
+open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open NUnit.Framework
 
 [<FSharpTest>]
 type IgnoreUnusedBindingExpressionTest() =
     inherit FSharpQuickFixTestBase<IgnoreUnusedBindingExpressionFix>()
-    
+
     override x.RelativeTestDataPath = "features/quickFixes/ignoreUnusedBindingExpression"
-    
+
+    override x.DoTest(lifetime, project) =
+        base.DoTest(lifetime, project)
+
+        for projectFile in project.GetAllProjectFiles() do
+            let file = projectFile.GetPrimaryPsiFile()
+            x.ExecuteWithSpecifiedGold(
+                x.GetTestDataFilePath2(x.TestName + ".dump.gold"),
+                fun writer -> DebugUtil.DumpPsi(writer, file)) |> ignore
+
     [<Test>] member x.``Single line 01 - No parens``() = x.DoNamedTest()
     [<Test>] member x.``Single line 02 - Parens``() = x.DoNamedTest()
     [<Test>] member x.``Single line 03 - If expr``() = x.DoNamedTest()
@@ -36,3 +48,4 @@ type IgnoreUnusedBindingExpressionTest() =
     [<Test>] member x.``Multiline 12 - Try with expr``() = x.DoNamedTest()
     [<Test>] member x.``Multiline 13 - Try finally expr``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``Multiline 14 - Unit prefix app``() = x.DoNamedTest()
+    [<Test;>] member x.``Multiline 15 - Seq expr with let expr``() = x.DoNamedTest()

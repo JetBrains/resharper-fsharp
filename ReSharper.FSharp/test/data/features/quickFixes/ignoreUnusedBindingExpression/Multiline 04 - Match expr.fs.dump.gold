@@ -1,0 +1,69 @@
+﻿IFSharpImplFile
+  INamedModuleDeclaration
+    FSharpTokenType+ModuleTokenElement(type:MODULE, text:module)
+    Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+    FSharpIdentifierToken(type:IDENTIFIER, text:Module)
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+    ILetModuleDecl
+      FSharpTokenType+LetTokenElement(type:LET, text:let)
+      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+      ITopBinding
+        ITopReferencePat
+          IExpressionReferenceName
+            FSharpIdentifierToken(type:IDENTIFIER, text:a)
+        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+        FSharpTokenType+EqualsTokenElement(type:EQUALS, text:=)
+        NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+        Whitespace(type:WHITE_SPACE, text:  ) spaces:"  "
+        IChameleonExpression
+          ISequentialExpr
+            IBinaryAppExpr
+              IMatchExpr
+                FSharpTokenType+MatchTokenElement(type:MATCH, text:match)
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                IUnitExpr
+                  FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+                  FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+                Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                FSharpTokenType+WithTokenElement(type:WITH, text:with)
+                NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+                Whitespace(type:WHITE_SPACE, text:  ) spaces:"  "
+                IMatchClause
+                  FSharpTokenType+BarTokenElement(type:BAR, text:|)
+                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                  ILocalReferencePat
+                    IExpressionReferenceName
+                      FSharpIdentifierToken(type:IDENTIFIER, text:a)
+                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                  FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
+                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                  ILiteralExpr
+                    FSharpToken(type:INT32, text:1)
+                NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+                Whitespace(type:WHITE_SPACE, text:  ) spaces:"  "
+                IMatchClause
+                  FSharpTokenType+BarTokenElement(type:BAR, text:|)
+                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                  ILocalReferencePat
+                    IExpressionReferenceName
+                      FSharpIdentifierToken(type:IDENTIFIER, text:b)
+                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                  FSharpTokenType+RarrowTokenElement(type:RARROW, text:->)
+                  Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+                  ILiteralExpr
+                    FSharpToken(type:INT32, text:2)
+              NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+              Whitespace(type:WHITE_SPACE, text:  ) spaces:"  "
+              IReferenceExpr
+                FSharpIdentifierToken(type:SYMBOLIC_OP, text:|>)
+              Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+              IReferenceExpr
+                FSharpIdentifierToken(type:IDENTIFIER, text:ignore)
+            NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+            NewLine(type:NEW_LINE, text:\n) spaces:"\n"
+            Whitespace(type:WHITE_SPACE, text:  ) spaces:"  "
+            IUnitExpr
+              FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
+              FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
+  NewLine(type:NEW_LINE, text:\n) spaces:"\n"

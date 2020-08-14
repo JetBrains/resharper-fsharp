@@ -2,9 +2,7 @@
 
 let a =
   let {caret}a =
-    try
-      ()
-    finally
-      ()
+    try 1
+    finally ()
 
   ()
