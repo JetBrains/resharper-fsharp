@@ -20,3 +20,4 @@ type RemoveRedundantParenExprTest() =
     [<Test>] member x.``App 01``() = x.DoNamedTest()
     [<Test>] member x.``App 02 - Spaces``() = x.DoNamedTest()
     [<Test>] member x.``App 03 - Add spaces``() = x.DoNamedTest()
+    [<Test>] member x.``App 04 - Parens in parens``() = x.DoNamedTest()
