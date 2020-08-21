@@ -53,7 +53,7 @@ type FSharpBreakpointVariantsProvider() =
                         let breakpointText = document.GetText(TextRange(startOffset, Math.Min(lineEnd, endOffset)))
                         if endOffset > lineEnd then breakpointText + multilineSuffix else breakpointText
 
-                    variants.[range] <- TextRangeBreakpoint(startOffset, endOffset, text)
+                    variants.[range] <- TextRangeBreakpoint(TextRange(startOffset, endOffset), text)
                 | _ -> ()
 
             variants.Values.AsList()

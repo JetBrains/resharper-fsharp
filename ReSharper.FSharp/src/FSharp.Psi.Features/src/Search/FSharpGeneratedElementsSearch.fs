@@ -18,7 +18,7 @@ type FSharpGeneratedElementsSearch() =
         | null -> false
         | elements -> elements |> Seq.forall (fun el -> el :? IFSharpGeneratedFromOtherElement)
 
-    override x.GetElementCandidates(context: IDataContext, kind) =
+    override x.GetElementCandidates(context: IDataContext, kind, updateOnly) =
         match context.GetData(PsiDataConstants.DECLARED_ELEMENTS) with
         | null -> EmptyList.Instance :> _
         | elements ->
