@@ -1,0 +1,6 @@
+﻿module Module
+
+let a =
+  l{caret}azy 1 |> ignore
+
+  ()

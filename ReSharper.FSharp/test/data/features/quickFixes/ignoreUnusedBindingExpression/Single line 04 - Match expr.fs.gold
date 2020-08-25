@@ -1,0 +1,6 @@
+﻿module Module
+
+let a =
+  ({caret}match () with | a -> 1 | b -> 2) |> ignore
+
+  ()

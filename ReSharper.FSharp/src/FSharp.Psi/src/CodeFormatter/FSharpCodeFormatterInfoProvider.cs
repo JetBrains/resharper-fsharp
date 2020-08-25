@@ -215,6 +215,22 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
     private void Formatting()
     {
       Describe<FormattingRule>()
+        .Name("LineBreakBeforeIgnorePipe")
+        .Group(LineBreaksRuleGroup)
+        .Where(
+          Parent()
+            .HasType(ElementType.BINARY_APP_EXPR)
+            .Satisfies((node, context) => ((IBinaryAppExpr) node).RightArgument.GetText() == "ignore"),
+          Left()
+            .HasRole(BinaryAppExpr.LEFT_ARG_EXPR)
+            .Satisfies((node, context) => node.ContainsLineBreak(context.CodeFormatter))
+            .In(ElementType.MATCH_EXPR, ElementType.IF_THEN_ELSE_EXPR, ElementType.TRY_WITH_EXPR,
+              ElementType.TRY_FINALLY_EXPR, ElementType.LAMBDA_EXPR, ElementType.ASSERT_EXPR,
+              ElementType.LAZY_EXPR, ElementType.MATCH_LAMBDA_EXPR))
+        .Return(IntervalFormatType.NewLine)
+        .Build();
+        
+      Describe<FormattingRule>()
         .Group(SpaceRuleGroup)
         .Name("SpaceAfterImplicitConstructorDecl")
         .Where(Left().HasType(ElementType.IMPLICIT_CONSTRUCTOR_DECLARATION))
@@ -285,7 +301,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Services.Formatter
     }
 
     private static bool IndentElseExpr(ITreeNode elseExpr, CodeFormattingContext context) =>
-      elseExpr.GetPreviousMeaningfulSibling().IsFirstOnLine(context.CodeFormatter) && !(elseExpr is IElifExpr);
+      (elseExpr.GetPreviousMeaningfulSibling().IsFirstOnLine(context.CodeFormatter) ||
+       !AreAligned(elseExpr, elseExpr.Parent?.FirstChild, context.CodeFormatter)) && !(elseExpr is IElifExpr);
 
     private static bool AreAligned(ITreeNode first, ITreeNode second, IWhitespaceChecker whitespaceChecker) =>
       first.CalcLineIndent(whitespaceChecker) == second.CalcLineIndent(whitespaceChecker);

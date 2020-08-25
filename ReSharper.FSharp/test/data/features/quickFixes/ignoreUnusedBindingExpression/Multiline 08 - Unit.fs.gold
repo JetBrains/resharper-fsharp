@@ -1,0 +1,9 @@
+﻿module Module
+
+let a =
+  let {caret}a = 1
+  let b = 2
+
+  ()
+
+  ()

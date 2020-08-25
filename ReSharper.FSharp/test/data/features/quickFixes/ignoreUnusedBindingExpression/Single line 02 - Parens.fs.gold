@@ -1,0 +1,6 @@
+﻿module Module
+
+let a =
+  (t{caret}rue && true) |> ignore
+
+  ()

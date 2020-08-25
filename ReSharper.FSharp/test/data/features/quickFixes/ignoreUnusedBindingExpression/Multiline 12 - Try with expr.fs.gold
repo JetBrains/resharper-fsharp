@@ -1,0 +1,9 @@
+﻿module Module
+
+let a =
+  t{caret}ry 1 with
+  | b -> 1
+  | c -> 1
+  |> ignore
+
+  ()

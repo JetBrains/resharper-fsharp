@@ -78,6 +78,7 @@
     <Compile Include="QuickFixes\RemoveRedundantParenExprTest.fs" />
     <Compile Include="QuickFixes\AddParensToApplicationTest.fs" />
     <Compile Include="QuickFixes\NamespaceToModuleTest.fs" />
+    <Compile Include="QuickFixes\IgnoreUnusedBindingExpressionTest.fs" />
     <Compile Include="Intentions\IntentionsTestBase.fs" />
     <Compile Include="Intentions\ToRecursiveLetBindings.fs" />
     <Compile Include="Intentions\ToMultilineRecordTest.fs" />

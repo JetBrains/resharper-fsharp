@@ -673,7 +673,7 @@ doExpr options { stubBase="UnitExpressionBase"; }:
   DO<KEYWORD, Keyword>
   fSharpExpression<EXPR, Expression>;
 
-assertExpr options { stubBase="FSharpExpressionBase"; }:
+assertExpr options { stubBase="UnitExpressionBase"; }:
   ASSERT<KEYWORD, Keyword>
   fSharpExpression<EXPR, Expression>;
 

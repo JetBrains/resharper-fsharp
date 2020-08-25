@@ -1,0 +1,8 @@
+﻿module Module
+
+let a =
+  {caret}fun x ->
+    x + 1
+  |> ignore
+
+  ()
