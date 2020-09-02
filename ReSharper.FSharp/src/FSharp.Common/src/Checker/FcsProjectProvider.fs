@@ -48,7 +48,7 @@ type FcsProjectProvider
         (lifetime: Lifetime, solution: ISolution, changeManager: ChangeManager, checkerService: FSharpCheckerService,
          fcsProjectBuilder: FcsProjectBuilder, scriptFcsProjectProvider: IScriptFcsProjectProvider,
          scheduler: ISolutionLoadTasksScheduler, fsFileService: IFSharpFileService, psiModules: IPsiModules,
-         locks: IShellLocks, logger: ILogger) as this =
+         locks: IShellLocks, logger: ILogger, fileExtensions: IProjectFileExtensions) as this =
     inherit RecursiveProjectModelChangeDeltaVisitor()
 
     let locker = JetFastSemiReenterableRWLock()
@@ -215,7 +215,7 @@ type FcsProjectProvider
             let changeType = fileChange.Type
             if changeType <> PsiModuleChange.ChangeType.Invalidated then
                 let sourceFile = fileChange.Item
-                let projectFileType = sourceFile.LanguageType
+                let projectFileType = fileExtensions.GetFileType(sourceFile.GetLocation().ExtensionWithDot)
                 if not (projectFileType.Is<FSharpProjectFileType>()) then () else
 
                 // todo: make it possible to distinguish fsi sandbox files from sandbox in diffs 
