@@ -9,13 +9,16 @@ open FSharp.Compiler.SourceCodeServices
 open JetBrains.Application
 open JetBrains.Application.Environment
 open JetBrains.Application.Environment.Helpers
+open JetBrains.Application.Settings
 open JetBrains.Application.Threading
 open JetBrains.DataFlow
 open JetBrains.Diagnostics
 open JetBrains.Lifetimes
 open JetBrains.Platform.RdFramework.Util
 open JetBrains.ProjectModel
+open JetBrains.ProjectModel.DataContext
 open JetBrains.ReSharper.Host.Features.BackgroundTasks
+open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.Util
 
 type IMonitoredReactorOperation =
@@ -42,7 +45,8 @@ type IFcsReactorMonitor =
 [<ShellComponent>]
 type FcsReactorMonitor
         (lifetime: Lifetime, backgroundTaskHost: RiderBackgroundTaskHost, threading: IThreading,
-         logger: ILogger, configurations: RunsProducts.ProductConfigurations) =
+         logger: ILogger, configurations: RunsProducts.ProductConfigurations, settingsStore: ISettingsStore,
+         solutionsManager: SolutionsManager) =
 
     let isInternalMode = configurations.IsInternalMode()
 
@@ -132,7 +136,16 @@ type FcsReactorMonitor
     do
         showBackgroundTask.WhenTrue(lifetime, Action<_> createNewTask)
 
-        isReactorBusy.WhenTrue(lifetime, fun lt -> showBackgroundTask.SetValue true |> ignore)
+        isReactorBusy.WhenTrue(lifetime, fun lt ->
+            let solution = solutionsManager.Solution
+            if isNull solution then () else
+
+            let isEnabled =
+                settingsStore.BindToContextTransient(ContextRange.Smart(solution.ToDataContext()))
+                    .GetValue((fun (s: FSharpOptions) -> s.EnableReactorMonitor), null)
+
+            if not isEnabled then () else
+            showBackgroundTask.SetValue true |> ignore)
 
         isReactorBusy.WhenFalse(lifetime, fun lt ->
             threading.QueueAt(lt, "FcsReactorMonitor.HideTask", hideDelay, fun () ->
