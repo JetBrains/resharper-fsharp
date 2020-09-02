@@ -20,10 +20,11 @@ type FSharpSettings() = class end
 
 [<AutoOpen>]
 module FSharpOptions =
-    let [<Literal>] backgroundTypeCheck = "Enable background type checking"
+    let [<Literal>] backgroundTypeCheck = "Enable background type checking (not recommended)"
     let [<Literal>] outOfScopeCompletion = "Enable out of scope items completion"
     let [<Literal>] topLevelOpenCompletion = "Add 'open' declarations to top level module or namespace"
-    let [<Literal>] enableInteractiveEditor   = "Enable analysis of F# Interactive editor"
+    let [<Literal>] enableInteractiveEditor = "Enable analysis of F# Interactive editor"
+    let [<Literal>] enableFcsReactorMonitor = "Enable FCS monitor"
 
 
 [<SettingsKey(typeof<FSharpSettings>, "FSharpOptions")>]
@@ -38,7 +39,10 @@ type FSharpOptions =
       mutable TopLevelOpenCompletion: bool
       
       [<SettingsEntry(false, enableInteractiveEditor); DefaultValue>]
-      mutable EnableInteractiveEditor: bool }
+      mutable EnableInteractiveEditor: bool
+
+      [<SettingsEntry(false, enableFcsReactorMonitor); DefaultValue>]
+      mutable EnableReactorMonitor: bool }
 
 
 module FSharpScriptOptions =
@@ -107,6 +111,7 @@ type FSharpOptionsPage
             )
         
         this.AddHeader("FSharp.Compiler.Service options")
+        this.AddBoolOption((fun key -> key.EnableReactorMonitor), RichText(enableFcsReactorMonitor), null) |> ignore
         this.AddBoolOption((fun key -> key.BackgroundTypeCheck), RichText(backgroundTypeCheck), null) |> ignore
 
 

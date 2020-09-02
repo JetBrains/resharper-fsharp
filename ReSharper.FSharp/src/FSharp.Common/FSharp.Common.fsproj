@@ -14,7 +14,6 @@
     <Compile Include="src\Util\FSharpRangeUtil.fs" />
     <Compile Include="src\Util\FSharpCompilerAttributesUtil.fs" />
     <Compile Include="src\Util\FSharpAssemblyUtil.fs" />
-    <Compile Include="src\FcsReactorMonitor.fs" />
     <Compile Include="src\ProjectModel\FSharpLanguageVersion.fs" />
     <Compile Include="src\ProjectModel\FSharpProjectLanguage.fs" />
     <Compile Include="src\ProjectModel\ProjectProperties.fs" />
@@ -33,6 +32,7 @@
     <Compile Include="src\Util\FcsExpressionUtil.fs" />
     <Compile Include="src\Settings\FSharpOptionsPageBase.fs" />
     <Compile Include="src\Settings\FSharpOptions.fs" />
+    <Compile Include="src\FcsReactorMonitor.fs" />
     <Compile Include="src\Checker\FSharpAssemblyContentProvider.fs" />
     <Compile Include="src\Checker\FSharpCheckerExtensions.fs" />
     <Compile Include="src\Checker\FSharpCoreFix.fs" />
