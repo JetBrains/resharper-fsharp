@@ -16,7 +16,7 @@ buildscript {
     }
     dependencies {
         // https://www.myget.org/feed/rd-snapshots/package/maven/com.jetbrains.rd/rd-gen
-        classpath("com.jetbrains.rd:rd-gen:0.203.144")
+        classpath("com.jetbrains.rd:rd-gen:0.203.148")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.0")
     }
 }
