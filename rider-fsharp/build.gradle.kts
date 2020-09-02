@@ -1,4 +1,4 @@
-import com.jetbrains.rd.generator.gradle.RdgenParams
+import com.jetbrains.rd.generator.gradle.RdGenExtension
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.jetbrains.grammarkit.tasks.GenerateLexer
 import org.jetbrains.intellij.IntelliJPlugin
@@ -15,8 +15,9 @@ buildscript {
         maven { setUrl("https://cache-redirector.jetbrains.com/repo.maven.apache.org/maven2")}
     }
     dependencies {
-        classpath("com.jetbrains.rd:rd-gen:0.202.100")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.61")
+        // https://www.myget.org/feed/rd-snapshots/package/maven/com.jetbrains.rd/rd-gen
+        classpath("com.jetbrains.rd:rd-gen:0.203.148")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.4.0")
     }
 }
 
@@ -136,7 +137,7 @@ fun File.writeTextIfChanged(content: String) {
     }
 }
 
-configure<RdgenParams> {
+configure<RdGenExtension> {
     val csOutput = File(repoRoot, "ReSharper.FSharp/src/FSharp.ProjectModelBase/src/Protocol")
     val ktOutput = File(repoRoot, "rider-fsharp/src/main/java/com/jetbrains/rider/plugins/fsharp/protocol")
 
