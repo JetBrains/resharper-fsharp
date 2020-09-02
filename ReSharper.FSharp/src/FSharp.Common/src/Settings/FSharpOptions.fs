@@ -23,6 +23,7 @@ module FSharpOptions =
     let [<Literal>] backgroundTypeCheck = "Enable background type checking"
     let [<Literal>] outOfScopeCompletion = "Enable out of scope items completion"
     let [<Literal>] topLevelOpenCompletion = "Add 'open' declarations to top level module or namespace"
+    let [<Literal>] enableInteractiveEditor   = "Enable analysis of F# Interactive editor"
 
 
 [<SettingsKey(typeof<FSharpSettings>, "FSharpOptions")>]
@@ -34,7 +35,10 @@ type FSharpOptions =
       mutable EnableOutOfScopeCompletion: bool
 
       [<SettingsEntry(true, topLevelOpenCompletion); DefaultValue>]
-      mutable TopLevelOpenCompletion: bool }
+      mutable TopLevelOpenCompletion: bool
+      
+      [<SettingsEntry(false, enableInteractiveEditor); DefaultValue>]
+      mutable EnableInteractiveEditor: bool }
 
 
 module FSharpScriptOptions =
@@ -89,6 +93,7 @@ type FSharpOptionsPage
 
         this.AddHeader("Script editing")
         this.AddComboEnum((fun key -> key.LanguageVersion), FSharpScriptOptions.languageVersion, FSharpLanguageVersion.toString) |> ignore
+        this.AddBoolOption((fun key -> key.EnableInteractiveEditor), RichText(enableInteractiveEditor)) |> ignore
 
         this.AddHeader("Type hints")
         let showPipeReturnTypes = this.AddBoolOption((fun key -> key.ShowPipeReturnTypes), RichText(FSharpTypeHintOptions.pipeReturnTypes), null)

@@ -3,6 +3,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Checker
 open System.Collections.Generic
 open FSharp.Compiler.SourceCodeServices
 open JetBrains.Annotations
+open JetBrains.Application.Settings
 open JetBrains.Application.Threading
 open JetBrains.Application.changes
 open JetBrains.DataFlow
@@ -17,6 +18,7 @@ open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.Scripts
 open JetBrains.ReSharper.Plugins.FSharp.Checker
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel
 open JetBrains.ReSharper.Plugins.FSharp.ProjectModel.ProjectProperties
+open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Files
@@ -184,12 +186,18 @@ type FcsProjectProvider
             | Some fcsProject when fcsProject.IsKnownFile(sourceFile) -> Some fcsProject.ProjectOptions
             | _ -> None
 
-        elif psiModule :? FSharpScriptPsiModule || psiModule :? SandboxPsiModule then
+        elif psiModule :? FSharpScriptPsiModule then
+            scriptFcsProjectProvider.GetScriptOptions(sourceFile)
+
+        elif psiModule :? SandboxPsiModule then
+            let settings = sourceFile.GetSettingsStore()
+            if not (settings.GetValue(fun (s: FSharpOptions) -> s.EnableInteractiveEditor)) then None else
+
             scriptFcsProjectProvider.GetScriptOptions(sourceFile)
 
         else
             None
-    
+
     member x.FcsProjectInvalidated = fcsProjectInvalidated
 
     member private x.ProcessChange(obj: ChangeEventArgs) =
