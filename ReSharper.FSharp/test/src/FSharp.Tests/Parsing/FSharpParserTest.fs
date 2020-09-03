@@ -329,7 +329,11 @@ type FSharpParserTest() =
     [<Test>] member x.``Type member - Inherit - Type 04 - Type parameters 01``() = x.DoNamedTest()
 
     [<Test>] member x.``Type member - Do 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Type member - Let bindings - Static 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Let bindings - Static 02 - Rec``() = x.DoNamedTest()
     [<Test>] member x.``Type member - Let bindings 01``() = x.DoNamedTest()
+    [<Test>] member x.``Type member - Let bindings 02 - Rec``() = x.DoNamedTest()
 
     [<Test>] member x.``Type member - Member 01 - Wild self id``() = x.DoNamedTest()
 

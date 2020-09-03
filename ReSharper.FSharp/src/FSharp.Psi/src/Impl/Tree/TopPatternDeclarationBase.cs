@@ -116,5 +116,10 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         : new ModuleValue(this);
 
     public virtual IType GetPatternType() => TypeFactory.CreateUnknownType(GetPsiModule());
+
+    [CanBeNull] public abstract IBinding Binding { get; }
+
+    public bool CanBeMutable => Binding != null;
+    public override bool IsStatic => LetBindingsDeclarationNavigator.GetByBinding(Binding)?.StaticKeyword != null;
   }
 }

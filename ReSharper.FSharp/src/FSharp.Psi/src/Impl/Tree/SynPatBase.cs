@@ -23,9 +23,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       binding.SetIsMutable(true);
     }
 
-    public bool CanBeMutable => Binding != null;
-
-    public IBinding Binding => this.GetBinding();
+    public override IBinding Binding => this.GetBinding();
   }
 
   internal partial class LocalReferencePat
@@ -120,9 +118,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       binding.SetIsMutable(true);
     }
 
-    public bool CanBeMutable => Binding != null;
-
-    private IBinding Binding => this.GetBinding();
+    public override IBinding Binding => this.GetBinding();
   }
 
   internal partial class LocalAsPat
@@ -172,6 +168,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       IsDeclaration
         ? new[] {this}
         : Parameters.SelectMany(param => param.Declarations);
+
+    public override IBinding Binding => this.GetBinding();
   }
 
   internal partial class ArrayPat

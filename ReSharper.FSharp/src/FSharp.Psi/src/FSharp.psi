@@ -145,6 +145,7 @@ letBindingsDeclaration options { stubBase="DummyDeclaration"; } extras {
   get { methodName="Attributes" path=<letBindingsDeclaration:ATTRIBUTE_LIST/attributeList:ATTRIBUTE> };
 }:
   attributeList<ATTRIBUTE_LIST, AttributeLists>*
+  STATIC<STATIC, StaticKeyword>?
   letOrUse{LET, BindingKeyword}
   INLINE<INLINE, InlineKeyword>?
   REC<REC, RecKeyword>?
