@@ -16,7 +16,7 @@ open JetBrains.Util
 module FSharpErrorsStage =
     let visualElementFactoryKey = Key<VisualElementHighlighter>("ColorUsageHighlightingEnabled")
     let openedModulesProvider = Key<OpenedModulesProvider>("OpenedModulesProvider")
-    let experimentalFeaturesEnabledKey = Key<obj>("ExperimentalFeaturesEnabled")
+    let redundantParenAnalysisEnabledKey = Key<obj>("RedundantParenAnalysisEnabled")
 
 
 [<DaemonStage(StagesBefore = [| typeof<HighlightIdentifiersStage> |])>]
@@ -40,10 +40,10 @@ and FSharpErrorStageProcess(fsFile, daemonProcess, settings, analyzerRegistrar: 
         analyzerData.PutData(openedModulesProvider, OpenedModulesProvider(fsFile))
 
         let solution = fsFile.GetSolution()
-        let experimentalFeaturesEnabled =
-            if solution.FSharpExperimentalFeaturesEnabled() then BooleanBoxes.True else BooleanBoxes.False
+        let redundantParensAnalysisEnabled =
+            if solution.FSharpRedundantParenAnalysisEnabled() then BooleanBoxes.True else BooleanBoxes.False
 
-        analyzerData.PutData(experimentalFeaturesEnabledKey, experimentalFeaturesEnabled)
+        analyzerData.PutData(redundantParenAnalysisEnabledKey, redundantParensAnalysisEnabled)
 
     override x.VisitNode(element: ITreeNode, consumer: IHighlightingConsumer) =
         analyzerDispatcher.Run(element, consumer)

@@ -38,7 +38,7 @@ type FSharpPostfixTemplateContextFactory() =
             if isNull treeNode then null else
 
             let solution = executionContext.Solution
-            if not (solution.FSharpExperimentalFeaturesEnabled()) then null else
+            if not (solution.FSharpPostfixTemplatesEnabled()) then null else
 
             FSharpPostfixTemplateContext(treeNode, executionContext) :> _
 
@@ -52,7 +52,7 @@ type FSharpPostfixTemplatesProvider(templatesManager, sessionExecutor, usageStat
         let context = fsCompletionContext.BasicContext
         let solution = context.Solution
 
-        if not (solution.FSharpExperimentalFeaturesEnabled()) then null else
+        if not (solution.FSharpPostfixTemplatesEnabled()) then null else
 
         let settings = context.ContextBoundSettingsStore
         let executionContext = PostfixTemplateExecutionContext(solution, context.TextControl, settings, "__")
