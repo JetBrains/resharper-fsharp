@@ -68,8 +68,8 @@ module FSharpExperimentalFeaturesOptions =
     let [<Literal>] enableFormatter = "Enable F# code formatter"
 
 
-[<SettingsKey(typeof<FSharpOptions>, "FSharpExperimentalFeaturesOptions")>]
-type FSharpExperimentalFeaturesOptions =
+[<SettingsKey(typeof<FSharpOptions>, "F# experimental features")>]
+type ExperimentalFeatures =
     { [<SettingsEntry(false, FSharpExperimentalFeaturesOptions.enableInlineVarRefactoring)>]
       mutable EnableInlineVarRefactoring: bool
 
