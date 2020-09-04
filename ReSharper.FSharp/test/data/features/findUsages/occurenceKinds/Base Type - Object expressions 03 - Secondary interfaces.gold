@@ -1,17 +1,17 @@
 ﻿Other
 ---
-TO: [O] abstract M: |int| RANGE: (46,49) @ Base Type - Object expressions 03 - Secondary interfaces.fs
-TO: [O] interface |System|.IDisposable with RANGE: (150,156) @ Base Type - Object expressions 03 - Secondary interfaces.fs
+UsageOther TO: [O] abstract M: |int| RANGE: (46,49) @ Base Type - Object expressions 03 - Secondary interfaces.fs
+UsageOther TO: [O] interface |System|.IDisposable with RANGE: (150,156) @ Base Type - Object expressions 03 - Secondary interfaces.fs
 
 
 Pattern
 ---
-TO: [O] let |t| = { RANGE: (80,81) @ Base Type - Object expressions 03 - Secondary interfaces.fs
+UsageOther TO: [O] let |t| = { RANGE: (80,81) @ Base Type - Object expressions 03 - Secondary interfaces.fs
 
 
 Base type
 ---
-TO: [O] new |Ta|() with RANGE: (95,97) @ Base Type - Object expressions 03 - Secondary interfaces.fs
-TO: [O] interface System.|IDisposable| with RANGE: (157,168) @ Base Type - Object expressions 03 - Secondary interfaces.fs
+UsageExtendedType TO: [O] new |Ta|() with RANGE: (95,97) @ Base Type - Object expressions 03 - Secondary interfaces.fs
+UsageExtendedType TO: [O] interface System.|IDisposable| with RANGE: (157,168) @ Base Type - Object expressions 03 - Secondary interfaces.fs
 
 

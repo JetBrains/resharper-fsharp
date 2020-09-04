@@ -1,5 +1,5 @@
 ﻿Pattern
 ---
-TO: [O] let { |Foo| = 1 } = () RANGE: (6,9) @ Pattern - Record 01.fs
+UsageOther TO: [O] let { |Foo| = 1 } = () RANGE: (6,9) @ Pattern - Record 01.fs
 
 

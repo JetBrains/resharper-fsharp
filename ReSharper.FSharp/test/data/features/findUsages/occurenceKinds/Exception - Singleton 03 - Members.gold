@@ -1,10 +1,10 @@
 ﻿Read access
 ---
-TO: [R] Exn.|Foo| RANGE: (68,71) @ Exception - Singleton 03 - Members.fs
+UsageRead TO: [R] Exn.|Foo| RANGE: (68,71) @ Exception - Singleton 03 - Members.fs
 
 
 Other
 ---
-TO: [O] |Exn|.Foo RANGE: (64,67) @ Exception - Singleton 03 - Members.fs
+UsageOther TO: [O] |Exn|.Foo RANGE: (64,67) @ Exception - Singleton 03 - Members.fs
 
 

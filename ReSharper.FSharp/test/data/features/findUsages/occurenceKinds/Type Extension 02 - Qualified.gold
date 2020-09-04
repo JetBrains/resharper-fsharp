@@ -1,10 +1,10 @@
 ﻿Type extension
 ---
-TO: [O] type System.|String| with RANGE: (29,35) @ Type Extension 02 - Qualified.fs
+UsageOther TO: [O] type System.|String| with RANGE: (29,35) @ Type Extension 02 - Qualified.fs
 
 
 Other
 ---
-TO: [O] type |System|.String with RANGE: (22,28) @ Type Extension 02 - Qualified.fs
+Fsharp TO: [O] type |System|.String with RANGE: (22,28) @ Type Extension 02 - Qualified.fs
 
 
