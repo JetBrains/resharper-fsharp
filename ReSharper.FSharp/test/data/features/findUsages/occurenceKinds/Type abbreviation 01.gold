@@ -1,5 +1,5 @@
 ﻿Type abbreviation
 ---
-TO: [O] type T = |int| RANGE: (26,29) @ Type abbreviation 01.fs
+UsageOther TO: [O] type T = |int| RANGE: (26,29) @ Type abbreviation 01.fs
 
 

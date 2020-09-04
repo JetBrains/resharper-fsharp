@@ -1,34 +1,34 @@
 ﻿Field declaration
 ---
-TO: [O] type R = { mutable F: |int| } RANGE: (39,42) @ Write - Record 03 - Copy and update.fs
+UsageFieldTypeDeclaration TO: [O] type R = { mutable F: |int| } RANGE: (39,42) @ Write - Record 03 - Copy and update.fs
 
 
 Pattern
 ---
-TO: [O] let |r1| = { F = 1 } RANGE: (50,52) @ Write - Record 03 - Copy and update.fs
-TO: [O] let |r2| = { r1 with F = r1.F + 1 } RANGE: (70,72) @ Write - Record 03 - Copy and update.fs
+UsageOther TO: [O] let |r1| = { F = 1 } RANGE: (50,52) @ Write - Record 03 - Copy and update.fs
+UsageOther TO: [O] let |r2| = { r1 with F = r1.F + 1 } RANGE: (70,72) @ Write - Record 03 - Copy and update.fs
 
 
 New instance creation
 ---
-TO: [O] let r1 = |{ F = 1 }| RANGE: (55,64) @ Write - Record 03 - Copy and update.fs
+UsageInstanceCreation TO: [O] let r1 = |{ F = 1 }| RANGE: (55,64) @ Write - Record 03 - Copy and update.fs
 
 
 Write access
 ---
-TO: [W] let r1 = { |F| = 1 } RANGE: (57,58) @ Write - Record 03 - Copy and update.fs
-TO: [W] let r2 = { r1 with |F| = r1.F + 1 } RANGE: (85,86) @ Write - Record 03 - Copy and update.fs
+UsageWrite TO: [W] let r1 = { |F| = 1 } RANGE: (57,58) @ Write - Record 03 - Copy and update.fs
+UsageWrite TO: [W] let r2 = { r1 with |F| = r1.F + 1 } RANGE: (85,86) @ Write - Record 03 - Copy and update.fs
 
 
 Copy and update
 ---
-TO: [O] let r2 = |{ r1 with F = r1.F + 1 }| RANGE: (75,99) @ Write - Record 03 - Copy and update.fs
+UsageOther TO: [O] let r2 = |{ r1 with F = r1.F + 1 }| RANGE: (75,99) @ Write - Record 03 - Copy and update.fs
 
 
 Read access
 ---
-TO: [R] let r2 = { |r1| with F = r1.F + 1 } RANGE: (77,79) @ Write - Record 03 - Copy and update.fs
-TO: [R] let r2 = { r1 with F = r1.|F| + 1 } RANGE: (92,93) @ Write - Record 03 - Copy and update.fs
-TO: [R] let r2 = { r1 with F = |r1|.F + 1 } RANGE: (89,91) @ Write - Record 03 - Copy and update.fs
+UsageRead TO: [R] let r2 = { |r1| with F = r1.F + 1 } RANGE: (77,79) @ Write - Record 03 - Copy and update.fs
+UsageRead TO: [R] let r2 = { r1 with F = r1.|F| + 1 } RANGE: (92,93) @ Write - Record 03 - Copy and update.fs
+UsageRead TO: [R] let r2 = { r1 with F = |r1|.F + 1 } RANGE: (89,91) @ Write - Record 03 - Copy and update.fs
 
 

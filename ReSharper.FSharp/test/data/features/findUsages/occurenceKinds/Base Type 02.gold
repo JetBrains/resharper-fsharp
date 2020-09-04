@@ -1,10 +1,10 @@
 ﻿Base type
 ---
-TO: [O] inherit System.|IDisposable| RANGE: (46,57) @ Base Type 02.fs
+UsageExtendedType TO: [O] inherit System.|IDisposable| RANGE: (46,57) @ Base Type 02.fs
 
 
 Other
 ---
-TO: [O] inherit |System|.IDisposable RANGE: (39,45) @ Base Type 02.fs
+UsageOther TO: [O] inherit |System|.IDisposable RANGE: (39,45) @ Base Type 02.fs
 
 

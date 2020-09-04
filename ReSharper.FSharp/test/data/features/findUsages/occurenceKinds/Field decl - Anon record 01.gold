@@ -1,10 +1,10 @@
 ﻿Field declaration, Read access
 ---
-TO: [R] type R = {| |F|: int |} RANGE: (29,30) @ Field decl - Anon record 01.fs
+UsageRead TO: [R] type R = {| |F|: int |} RANGE: (29,30) @ Field decl - Anon record 01.fs
 
 
 Field declaration
 ---
-TO: [O] type R = {| F: |int| |} RANGE: (32,35) @ Field decl - Anon record 01.fs
+UsageFieldTypeDeclaration TO: [O] type R = {| F: |int| |} RANGE: (32,35) @ Field decl - Anon record 01.fs
 
 
