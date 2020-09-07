@@ -34,12 +34,14 @@
     <Compile Include="Daemon\PipeChainTypeHintStageTest.fs" />
     <Compile Include="Daemon\InheritanceGutterMarksTest.fs" />
     <Compile Include="Daemon\SyntaxHighlightingTest.fs" />
-    <Compile Include="Daemon\RedundantParensTest.fs" />
+    <Compile Include="Daemon\RedundantParenExprTest.fs" />
+    <Compile Include="Daemon\RedundantParenPatTest.fs" />
     <Compile Include="Daemon\StringEscapingTest.fs" />
     <Compile Include="Daemon\RedundantAttributeParensTest.fs" />
     <Compile Include="Daemon\RedundantAttributeSuffixAnalyzerTest.fs" />
     <Compile Include="Daemon\FSharpColorHighlightingTest.fs" />
     <Compile Include="Daemon\RedundantQualifiersTest.fs" />
+    <Compile Include="Daemon\RedundantUnionCaseFieldPatsTest.fs" />
     <Compile Include="Debugger\ExpressionEvaluationInfoTest.fs" />
     <Compile Include="QuickFixes\ErrorAttributes.fs" />
     <Compile Include="QuickFixes\FSharpQuickFixTestBase.fs" />

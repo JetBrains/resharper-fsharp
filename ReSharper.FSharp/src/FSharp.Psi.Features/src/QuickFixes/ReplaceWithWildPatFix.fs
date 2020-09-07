@@ -6,19 +6,26 @@ open JetBrains.ReSharper.Feature.Services.Intentions.Scoped.Scopes
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Resources.Shell
 
-type ReplaceWithWildPatFix(pat: INamedPat) =
+type ReplaceWithWildPatFix(pat: IFSharpPattern) =
     inherit FSharpQuickFixBase()
 
-    let pat = pat.As<IReferencePat>()
-
     let replaceWithWildPat (pat: IFSharpPattern) =
+        if isIdentifierOrKeyword (pat.GetPreviousToken()) then
+            ModificationUtil.AddChildBefore(pat, Whitespace()) |> ignore
+
+        if isIdentifierOrKeyword (pat.GetNextToken()) then
+            ModificationUtil.AddChildAfter(pat, Whitespace()) |> ignore
+
         replace pat (pat.GetFSharpLanguageService().CreateElementFactory(pat.GetPsiModule()).CreateWildPat())
 
-    let getPatOwner (pat: INamedPat) =
+    let getPatOwner (pat: IFSharpPattern) =
         if isNull pat then None else
 
         let pat = pat.IgnoreParentParens()
@@ -29,8 +36,8 @@ type ReplaceWithWildPatFix(pat: INamedPat) =
 
         Some(skipIntermediatePatParents pat)
 
-    let isAvailable (pat: IReferencePat) =
-        isValid pat &&
+    let isAvailable (pat: IFSharpPattern) =
+        isValid pat && not (pat :? IParametersOwnerPat) &&
 
         match getPatOwner pat with
         | None -> false
@@ -51,6 +58,12 @@ type ReplaceWithWildPatFix(pat: INamedPat) =
 
     new (error: VarBoundTwiceError) =
         ReplaceWithWildPatFix(error.Pat)
+
+    new (warning: RedundantUnionCaseFieldPatternsWarning) =
+        ReplaceWithWildPatFix(warning.ParenPat)
+
+    new (warning: RedundantParenPatWarning) =
+        ReplaceWithWildPatFix(warning.ParenPat)
 
     override x.Text = "Replace with '_'"
 
@@ -90,10 +103,7 @@ type ReplaceWithWildPatFix(pat: INamedPat) =
 
             for highlightingInfo in highlightingInfos do
                 let warning = highlightingInfo.Highlighting.As<UnusedValueWarning>()
-                if isNull warning then () else
-
-                let pat = warning.Pat.As<IReferencePat>()
-                if isNotNull pat && isAvailable pat then
-                    replaceWithWildPat pat
+                if isNotNull warning && isAvailable warning.Pat then
+                    replaceWithWildPat warning.Pat
 
             null

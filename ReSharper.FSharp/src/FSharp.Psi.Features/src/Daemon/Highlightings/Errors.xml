@@ -74,6 +74,13 @@
     <QuickFix>RemoveRedundantParenExprFix</QuickFix>
   </Warning>
 
+  <Warning staticGroup="FSharpErrors" name="RedundantParenPat" isSuppressedInTests="true">
+    <Parameter type="IParenPat" name="parenPat"/>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message value="Redundant parentheses"/>
+    <QuickFix>ReplaceWithWildPatFix</QuickFix>
+  </Warning>
+
   <Warning staticGroup="FSharpErrors" name="RedundantAttributeParens">
     <Parameter type="IAttribute" name="attribute"/>
     <Range>attribute.ArgExpression.GetHighlightingRange()</Range>
@@ -96,6 +103,14 @@
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Message value="Qualifier is redundant"/>
     <QuickFix>RemoveRedundantQualifierFix</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="RedundantUnionCaseFieldPatterns">
+    <Parameter type="IParenPat" name="parenPat"/>
+    <Range>parenPat.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <Message value="Redundant union case fields matching"/>
+    <QuickFix>ReplaceWithWildPatFix</QuickFix>
   </Warning>
 
 </Errors>

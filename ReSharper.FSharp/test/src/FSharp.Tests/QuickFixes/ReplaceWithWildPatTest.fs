@@ -31,6 +31,9 @@ type ReplaceWithWildPatTest() =
     [<Test>] member x.``Binding pattern``() = x.DoNamedTest()
     [<Test; ExecuteScopedQuickFixInFile>] member x.``Whole file``() = x.DoNamedTest()
 
+    [<Test>] member x.``No space 01 - Before``() = x.DoNamedTest()
+    [<Test>] member x.``No space 02 - After``() = x.DoNamedTest()
+
     [<Test; NotAvailable>] member x.``Not available - Ctor 01``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Not available - Let - Attribute 01``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Not available - Let - Attribute 02 - Parens``() = x.DoNamedTest()

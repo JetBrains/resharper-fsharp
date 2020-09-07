@@ -9,7 +9,7 @@ open JetBrains.Util
 
 [<ElementProblemAnalyzer(typeof<IParenExpr>,
                          HighlightingTypes = [| typeof<RedundantParenExprWarning> |])>]
-type RedundantParenAnalyzer() =
+type RedundantParenExprAnalyzer() =
     inherit ElementProblemAnalyzer<IParenExpr>()
 
     let addHighlighting (consumer: IHighlightingConsumer) (parenExpr: IParenExpr) =
