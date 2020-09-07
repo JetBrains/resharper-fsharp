@@ -1,7 +1,7 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
 
 open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.CommonErrors
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree

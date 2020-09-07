@@ -14,14 +14,6 @@
     <Group name="F# Errors" key="FSharpErrors"/>
   </StaticSeverityGroups>
 
-  <Warning staticGroup="FSharpErrors" name="UnusedOpen">
-    <Parameter type="IOpenStatement" name="openStatement"/>
-    <Message value="Open directive is not required by the code and can be safely removed"/>
-    <Range>openStatement.GetHighlightingRange()</Range>
-    <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
-    <QuickFix>RemoveUnusedOpensFix</QuickFix>
-  </Warning>
-
   <Warning staticGroup="FSharpErrors" name="UseBindingsIllegalInModules">
     <Parameter type="ILetBindingsDeclaration" name="letBindings"/>
     <Message value="'use' bindings are treated as 'let' bindings in modules"/>
@@ -177,35 +169,6 @@
     <QuickFix>RemoveInlineFix</QuickFix>
   </Error>
   
-  <Warning staticGroup="FSharpErrors" name="ExtensionMemberInNonExtensionType">
-    <Parameter type="IAttribute" name="attr"/>
-    <Range>attr.GetHighlightingRange()</Range>
-    <Behavour overlapResolvePolicy="NONE"/>
-    <Message value="Extension member in non-extension type looks suspicious"/>
-    <QuickFix>AddExtensionAttributeFix</QuickFix>
-  </Warning>
-
-  <Warning staticGroup="FSharpErrors" name="ExtensionTypeWithNoExtensionMembers">
-    <Parameter type="IAttribute" name="attr"/>
-    <Range>attr.GetHighlightingRange()</Range>
-    <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
-    <Message value="Extension type doesn't have any extension members"/>
-  </Warning>
-
-  <Warning staticGroup="FSharpErrors" name="ExtensionMemberShouldBeStatic">
-    <Parameter type="IAttribute" name="attr"/>
-    <Range>attr.GetHighlightingRange()</Range>
-    <Behavour overlapResolvePolicy="NONE"/>
-    <Message value="Extension member should be static"/>
-  </Warning>
-
-  <Warning staticGroup="FSharpErrors" name="RedundantBackticks">
-    <Parameter type="FSharpIdentifierToken" name="identifier"/>
-    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
-    <Message value="Redundant identifier quotation"/>
-    <QuickFix>RemoveRedundantBackticksFix</QuickFix>
-  </Warning>
-
   <Warning staticGroup="FSharpErrors" name="UpcastUnnecessary">
     <Parameter type="IUpcastExpr" name="upcastExpr"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
@@ -253,22 +216,6 @@
     <QuickFix>AddParensFix</QuickFix>
   </Error>
 
-  <Warning staticGroup="FSharpErrors" name="RedundantNew">
-    <Parameter type="INewExpr" name="newExpr"/>
-    <Range>newExpr.NewKeyword.GetHighlightingRange()</Range>
-    <Behavour attributeID="DEADCODE" overlapResolvePolicy="NONE"/>
-    <Message value="'new' keyword is redundant"/>
-    <QuickFix>RemoveRedundantNewFix</QuickFix>
-  </Warning>
-
-  <Warning staticGroup="FSharpErrors" name="ConvertToUseBinding">
-    <Parameter type="ILetOrUseExpr" name="letExpr"/>
-    <Range>letExpr.BindingKeyword.GetHighlightingRange()</Range>
-    <Behavour overlapResolvePolicy="NONE"/>
-    <Message value="Convert to 'use' binding"/>
-    <QuickFix>ConvertToUseFix</QuickFix>
-  </Warning>
-  
   <Error staticGroup="FSharpErrors" name="ExpectedExpressionAfterLet">
     <Parameter type="ILetOrUseExpr" name="letExpr"/>
     <Range>letExpr.BindingKeyword.GetHighlightingRange()</Range>
@@ -292,13 +239,6 @@
     <QuickFix>RemoveUnexpectedArgumentsFix</QuickFix>
   </Error>
 
-  <Warning staticGroup="FSharpErrors" name="RedundantParenExpr" isSuppressedInTests="true">
-    <Parameter type="IParenExpr" name="parenExpr"/>
-    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
-    <Message value="Redundant parentheses"/>
-    <QuickFix>RemoveRedundantParenExprFix</QuickFix>
-  </Warning>
-
   <Error staticGroup="FSharpErrors" name="FieldOrValueNotMutable">
     <Parameter type="IReferenceExpr" name="refExpr"/>
     <Message value="{0} is not mutable">
@@ -308,22 +248,6 @@
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>ToMutableFix</QuickFix>
   </Error>
-
-  <Warning staticGroup="FSharpErrors" name="RedundantAttributeParens">
-    <Parameter type="IAttribute" name="attribute"/>
-    <Range>attribute.ArgExpression.GetHighlightingRange()</Range>
-    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
-    <Message value="Parentheses are redundant if attribute has no arguments"/>
-    <QuickFix>RemoveRedundantAttributeParensFix</QuickFix>
-  </Warning>
-
-  <Warning staticGroup="FSharpErrors" name="RedundantAttributeSuffix">
-    <Parameter type="IAttribute" name="attribute"/>
-    <Range>getAttributeSuffixRange attribute</Range>
-    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
-    <Message value="Attribute suffix is redundant"/>
-    <QuickFix>RemoveRedundantAttributeSuffixFix</QuickFix>
-  </Warning>
 
   <Error staticGroup="FSharpErrors" name="NoImplementationGiven">
     <Parameter type="IFSharpTypeDeclaration" name="typeDecl"/>
@@ -351,14 +275,6 @@
     <Behavour overlapResolvePolicy="NONE"/>
     <QuickFix>RemoveYieldFix</QuickFix>
   </Error>
-
-  <Warning staticGroup="FSharpErrors" name="RedundantQualifier">
-    <Parameter type="ITreeNode" name="treeNode"/>
-    <Range>getQualifierRange treeNode</Range>
-    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
-    <Message value="Qualifier is redundant"/>
-    <QuickFix>RemoveRedundantQualifierFix</QuickFix>
-  </Warning>
 
   <Error staticGroup="FSharpErrors" name="NamespaceCannotContainValues">
     <Parameter type="IFSharpIdentifier" name="identifier"/>
