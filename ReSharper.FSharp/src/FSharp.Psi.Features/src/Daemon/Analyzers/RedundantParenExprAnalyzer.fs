@@ -22,7 +22,7 @@ type RedundantParenExprAnalyzer() =
         consumer.AddHighlighting(highlighting, rightParen.GetHighlightingRange(), isSecondaryHighlighting = true)
 
     override x.Run(parenExpr, data, consumer) =
-        if data.GetData(experimentalFeaturesEnabledKey) != BooleanBoxes.True then () else
+        if data.GetData(redundantParenAnalysisEnabledKey) != BooleanBoxes.True then () else
 
         let innerExpression = parenExpr.InnerExpression
 
