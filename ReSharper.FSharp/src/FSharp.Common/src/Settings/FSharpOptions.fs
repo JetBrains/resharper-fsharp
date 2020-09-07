@@ -25,7 +25,6 @@ module FSharpOptions =
     let [<Literal>] backgroundTypeCheck = "Enable background type checking (not recommended)"
     let [<Literal>] outOfScopeCompletion = "Enable out of scope items completion"
     let [<Literal>] topLevelOpenCompletion = "Add 'open' declarations to top level module or namespace"
-    let [<Literal>] enableInteractiveEditor = "Enable analysis of F# Interactive editor"
     let [<Literal>] enableFcsReactorMonitor = "Enable FCS monitor"
 
 
@@ -40,9 +39,6 @@ type FSharpOptions =
       [<SettingsEntry(true, topLevelOpenCompletion); DefaultValue>]
       mutable TopLevelOpenCompletion: bool
       
-      [<SettingsEntry(false, enableInteractiveEditor); DefaultValue>]
-      mutable EnableInteractiveEditor: bool
-
       [<SettingsEntry(false, enableFcsReactorMonitor); DefaultValue>]
       mutable EnableReactorMonitor: bool }
 
@@ -61,26 +57,30 @@ type FSharpScriptOptions =
       mutable CustomDefines: string }
 
 
-module FSharpExperimentalFeaturesOptions =
-    let [<Literal>] enableInlineVarRefactoring = "Enable inline var refactoring"
-    let [<Literal>] enablePostfixTemplates = "Enable postfix templates"
-    let [<Literal>] enableRedundantParenAnalysis = "Enable redundant paren analysis"
-    let [<Literal>] enableFormatter = "Enable F# code formatter"
+module FSharpExperimentalFeatures =
+    let [<Literal>] inlineVarRefactoring = "Enable inline var refactoring"
+    let [<Literal>] postfixTemplates = "Enable postfix templates"
+    let [<Literal>] redundantParenAnalysis = "Enable redundant paren analysis"
+    let [<Literal>] formatter = "Enable F# code formatter"
+    let [<Literal>] fsiInteractiveEditor = "Enable analysis of F# Interactive editor"
 
 
 [<SettingsKey(typeof<FSharpOptions>, "F# experimental features")>]
-type ExperimentalFeatures =
-    { [<SettingsEntry(false, FSharpExperimentalFeaturesOptions.enableInlineVarRefactoring)>]
-      mutable EnableInlineVarRefactoring: bool
+type FSharpExperimentalFeatures =
+    { [<SettingsEntry(false, FSharpExperimentalFeatures.inlineVarRefactoring)>]
+      mutable InlineVarRefactoring: bool
 
-      [<SettingsEntry(false, FSharpExperimentalFeaturesOptions.enablePostfixTemplates)>]
-      mutable EnablePostfixTemplates: bool
+      [<SettingsEntry(false, FSharpExperimentalFeatures.postfixTemplates)>]
+      mutable PostfixTemplates: bool
 
-      [<SettingsEntry(false, FSharpExperimentalFeaturesOptions.enableRedundantParenAnalysis)>]
-      mutable EnableRedundantParenAnalysis: bool
+      [<SettingsEntry(false, FSharpExperimentalFeatures.redundantParenAnalysis)>]
+      mutable RedundantParensAnalysis: bool
 
-      [<SettingsEntry(false, FSharpExperimentalFeaturesOptions.enableFormatter)>]
-      mutable EnableFormatter: bool }
+      [<SettingsEntry(false, FSharpExperimentalFeatures.formatter)>]
+      mutable Formatter: bool
+      
+      [<SettingsEntry(false, FSharpExperimentalFeatures.fsiInteractiveEditor); DefaultValue>]
+      mutable FsiInteractiveEditor: bool }
 
 
 [<SolutionInstanceComponent>]
@@ -99,10 +99,10 @@ type FSharpExperimentalFeaturesProvider(lifetime: Lifetime, settings: IContextBo
         let settings = settingsStore.BindToContextLive(lifetime, ContextRange.Smart(solution.ToDataContext()))
         FSharpExperimentalFeaturesProvider(lifetime, settings)
 
-    member val EnableInlineVarRefactoring = settings.GetValueProperty(lifetime, fun s -> s.EnableInlineVarRefactoring)
-    member val EnablePostfixTemplates = settings.GetValueProperty(lifetime, fun s -> s.EnablePostfixTemplates)
-    member val EnableRedundantParenAnalysis = settings.GetValueProperty(lifetime, fun s -> s.EnableRedundantParenAnalysis)
-    member val EnableFormatter = settings.GetValueProperty(lifetime, fun s -> s.EnableFormatter)
+    member val EnableInlineVarRefactoring = settings.GetValueProperty(lifetime, fun s -> s.InlineVarRefactoring)
+    member val EnablePostfixTemplates = settings.GetValueProperty(lifetime, fun s -> s.PostfixTemplates)
+    member val RedundantParensAnalysis = settings.GetValueProperty(lifetime, fun s -> s.RedundantParensAnalysis)
+    member val Formatter = settings.GetValueProperty(lifetime, fun s -> s.Formatter)
 
 
 module FSharpTypeHintOptions =
@@ -132,7 +132,7 @@ type FSharpOptionsPage
 
         this.AddHeader("Script editing")
         this.AddComboEnum((fun key -> key.LanguageVersion), FSharpScriptOptions.languageVersion, FSharpLanguageVersion.toString) |> ignore
-        this.AddBoolOption((fun key -> key.EnableInteractiveEditor), RichText(enableInteractiveEditor)) |> ignore
+        this.AddBoolOption((fun key -> key.FsiInteractiveEditor), RichText(FSharpExperimentalFeatures.fsiInteractiveEditor)) |> ignore
 
         this.AddHeader("Type hints")
         let showPipeReturnTypes = this.AddBoolOption((fun key -> key.ShowPipeReturnTypes), RichText(FSharpTypeHintOptions.pipeReturnTypes), null)
@@ -151,10 +151,10 @@ type FSharpOptionsPage
 
         if configurations.IsInternalMode() then
             this.AddHeader("Experimental features options")
-            this.AddBoolOption((fun key -> key.EnableInlineVarRefactoring), RichText(FSharpExperimentalFeaturesOptions.enableInlineVarRefactoring), null) |> ignore
-            this.AddBoolOption((fun key -> key.EnablePostfixTemplates), RichText(FSharpExperimentalFeaturesOptions.enablePostfixTemplates), null) |> ignore
-            this.AddBoolOption((fun key -> key.EnableRedundantParenAnalysis), RichText(FSharpExperimentalFeaturesOptions.enableRedundantParenAnalysis), null) |> ignore
-            this.AddBoolOption((fun key -> key.EnableFormatter), RichText(FSharpExperimentalFeaturesOptions.enableFormatter), null) |> ignore
+            this.AddBoolOption((fun key -> key.InlineVarRefactoring), RichText(FSharpExperimentalFeatures.inlineVarRefactoring), null) |> ignore
+            this.AddBoolOption((fun key -> key.PostfixTemplates), RichText(FSharpExperimentalFeatures.postfixTemplates), null) |> ignore
+            this.AddBoolOption((fun key -> key.RedundantParensAnalysis), RichText(FSharpExperimentalFeatures.redundantParenAnalysis), null) |> ignore
+            this.AddBoolOption((fun key -> key.Formatter), RichText(FSharpExperimentalFeatures.formatter), null) |> ignore
 
 
 [<ShellComponent>]

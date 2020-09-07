@@ -54,14 +54,14 @@ type FSharpExperimentalFeaturesEx =
         if FSharpRegistryUtil.EnableRedundantParenAnalysisCookie.Enabled then true else
 
         let settingsProvider = solution.GetComponent<FSharpExperimentalFeaturesProvider>()
-        settingsProvider.EnableRedundantParenAnalysis.Value
+        settingsProvider.RedundantParensAnalysis.Value
 
     [<Extension>]
     static member FSharpFormatterEnabled(solution: ISolution) =
         if FSharpRegistryUtil.AllowFormatterCookie.Enabled then true else
 
         let settingsProvider = solution.GetComponent<FSharpExperimentalFeaturesProvider>()
-        settingsProvider.EnableFormatter.Value
+        settingsProvider.Formatter.Value
 
     [<Extension>]
     static member FSharpFormatterEnabled(node: ITreeNode) =
