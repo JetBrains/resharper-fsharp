@@ -1,4 +1,4 @@
 ﻿module Module
 
 match [] with
-| [ {caret}_ ] -> ()
+| {caret}[_] -> ()

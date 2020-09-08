@@ -311,7 +311,7 @@ arrayPat options { stubBase="FSharpPatternBase"; }:
 listPat options { stubBase="FSharpPatternBase"; }:
   LBRACK<LBRACE, LeftBracket>
   fSharpPattern<ATTRIBUTE, Patterns>*
-  LBRACK<RBRACE, RightBracket>;
+  RBRACK<RBRACE, RightBracket>;
 
 tuplePat options { stubBase="FSharpPatternBase"; }:
   LIST fSharpPattern<ATTRIBUTE, Patterns> SEP COMMA<FSHARP_COMMA, Commas>;
