@@ -113,4 +113,12 @@
     <QuickFix>ReplaceWithWildPatFix</QuickFix>
   </Warning>
 
+  <Warning staticGroup="FSharpErrors" name="ConsWithEmptyListPat">
+    <Parameter type="IListConsPat" name="listConsPat"/>
+    <Range>listConsPat.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <Message value="Pattern can be simplified"/>
+    <QuickFix>SimplifyListConsPatFix</QuickFix>
+  </Warning>
+  
 </Errors>

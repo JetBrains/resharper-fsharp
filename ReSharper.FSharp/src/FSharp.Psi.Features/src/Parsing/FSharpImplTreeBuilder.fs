@@ -381,15 +381,10 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                     if isLocal then ElementType.LOCAL_AS_PAT else ElementType.TOP_AS_PAT
 
             | SynPat.LongIdent(lid, _, typars, args, _, _) ->
-                match lid.Lid with
-                | [id] when id.idText = "op_ColonColon" ->
-                    match args with
-                    | Pats pats ->
-                        for pat in pats do
-                            x.ProcessPat(pat, isLocal, false)
-                    | NamePatPairs(pats, _) ->
-                        for _, pat in pats do
-                            x.ProcessPat(pat, isLocal, false)
+                match lid.Lid, args with
+                | [id], Pats([SynPat.Tuple(_, pats, _)]) when id.idText = "op_ColonColon" ->
+                    for pat in pats do
+                        x.ProcessPat(pat, isLocal, false)
 
                     ElementType.LIST_CONS_PAT
 

@@ -1,0 +1,9 @@
+﻿module Module
+
+match [] with
+| |_ :: []|(0) -> ()
+| _ :: |_ :: []|(1) -> ()
+
+---------------------------------------------------------
+(0): ReSharper Warning: Pattern can be simplified
+(1): ReSharper Warning: Pattern can be simplified

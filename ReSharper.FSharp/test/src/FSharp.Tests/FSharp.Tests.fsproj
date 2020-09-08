@@ -42,6 +42,7 @@
     <Compile Include="Daemon\FSharpColorHighlightingTest.fs" />
     <Compile Include="Daemon\RedundantQualifiersTest.fs" />
     <Compile Include="Daemon\RedundantUnionCaseFieldPatsTest.fs" />
+    <Compile Include="Daemon\ListConsPatAnalyzerTest.fs" />
     <Compile Include="Debugger\ExpressionEvaluationInfoTest.fs" />
     <Compile Include="QuickFixes\ErrorAttributes.fs" />
     <Compile Include="QuickFixes\FSharpQuickFixTestBase.fs" />
@@ -80,6 +81,7 @@
     <Compile Include="QuickFixes\RemoveRedundantParenExprTest.fs" />
     <Compile Include="QuickFixes\AddParensToApplicationTest.fs" />
     <Compile Include="QuickFixes\NamespaceToModuleTest.fs" />
+    <Compile Include="QuickFixes\SimplifyListConsPatTest.fs" />
     <Compile Include="Intentions\IntentionsTestBase.fs" />
     <Compile Include="Intentions\ToRecursiveLetBindings.fs" />
     <Compile Include="Intentions\ToMultilineRecordTest.fs" />

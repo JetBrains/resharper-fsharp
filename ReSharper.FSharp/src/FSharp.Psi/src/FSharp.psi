@@ -309,9 +309,9 @@ arrayPat options { stubBase="FSharpPatternBase"; }:
   LBRACK_BAR;
 
 listPat options { stubBase="FSharpPatternBase"; }:
-  LBRACK
+  LBRACK<LBRACE, LeftBracket>
   fSharpPattern<ATTRIBUTE, Patterns>*
-  RBRACK;
+  LBRACK<RBRACE, RightBracket>;
 
 tuplePat options { stubBase="FSharpPatternBase"; }:
   LIST fSharpPattern<ATTRIBUTE, Patterns> SEP COMMA<FSHARP_COMMA, Commas>;
@@ -340,9 +340,9 @@ isInstPat options { stubBase="FSharpPatternBase"; }:
   typeUsage<SYN_TYPE, Type>;
 
 listConsPat options { stubBase="FSharpPatternBase"; }:
-  fSharpPattern<PATTERN1, Pattern1>
+  fSharpPattern<PATTERN1, HeadPattern>
   COLON_COLON
-  fSharpPattern<PATTERN2, Pattern2>;
+  fSharpPattern<PATTERN2, TailPattern>;
 
 wildPat options { stubBase="LocalPatternDeclarationBase"; }:
   UNDERSCORE<UNDERSCORE, Underscore>;

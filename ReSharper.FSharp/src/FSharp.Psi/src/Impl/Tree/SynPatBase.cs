@@ -226,8 +226,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     {
       get
       {
-        var pattern1Decls = Pattern1?.Declarations ?? EmptyList<IDeclaration>.Instance;
-        var pattern2Decls = Pattern2?.Declarations ?? EmptyList<IDeclaration>.Instance;
+        var pattern1Decls = HeadPattern?.Declarations ?? EmptyList<IDeclaration>.Instance;
+        var pattern2Decls = TailPattern?.Declarations ?? EmptyList<IDeclaration>.Instance;
         return pattern2Decls.Prepend(pattern1Decls);
       }
     }
