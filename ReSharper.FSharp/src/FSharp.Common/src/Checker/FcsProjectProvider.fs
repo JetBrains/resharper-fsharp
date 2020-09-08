@@ -191,7 +191,7 @@ type FcsProjectProvider
 
         elif psiModule :? SandboxPsiModule then
             let settings = sourceFile.GetSettingsStore()
-            if not (settings.GetValue(fun (s: FSharpOptions) -> s.EnableInteractiveEditor)) then None else
+            if not (settings.GetValue(fun (s: FSharpExperimentalFeatures) -> s.FsiInteractiveEditor)) then None else
 
             scriptFcsProjectProvider.GetScriptOptions(sourceFile)
 
