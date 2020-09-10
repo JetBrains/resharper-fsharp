@@ -79,6 +79,7 @@
     <Compile Include="src\Daemon\Analyzers\RedundantQualifierAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\RedundantUnionCaseFieldPatsAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\ListConsPatAnalyzer.fs" />
+    <Compile Include="src\Daemon\Analyzers\AppExpressionAnalyzer.fs" />
     <Compile Include="src\Comment\FSharpBlockCommentActionProvider.fs" />
     <Compile Include="src\Comment\FSharpLineCommentActionProvider.fs" />
     <Compile Include="src\Debugger\FSharpBreakpointVariantsProvider.fs" />
@@ -175,9 +176,11 @@
     <Compile Include="src\QuickFixes\RemoveRedundantQualifierFix.fs" />
     <Compile Include="src\QuickFixes\AddParensToApplicationFix.fs" />
     <Compile Include="src\QuickFixes\AddExtensionAttributeFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceWithInnerExpressionFixBase.fs" />
     <Compile Include="src\QuickFixes\RemoveRedundantParenExprFix.fs" />
     <Compile Include="src\QuickFixes\NamespaceToModuleFix.fs" />
     <Compile Include="src\QuickFixes\SimplifyListConsPatFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceAppExprWithArgFix.fs" />
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />
     <Compile Include="src\PostfixTemplates\NotTemplate.fs" />
     <Compile Include="src\PostfixTemplates\LetPostfixTemplate.fs" />

@@ -1,0 +1,8 @@
+﻿|id|(0) 1
+1 ||> id|(1)
+|id <||(2) 1
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant application
+(1): ReSharper Dead Code: Redundant application
+(2): ReSharper Dead Code: Redundant application
