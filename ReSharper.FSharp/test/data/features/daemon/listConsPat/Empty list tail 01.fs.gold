@@ -1,6 +1,4 @@
-﻿module Module
-
-match [] with
+﻿match [] with
 | |_ :: []|(0) -> ()
 | _ :: |_ :: []|(1) -> ()
 

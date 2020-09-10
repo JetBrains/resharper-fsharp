@@ -1,5 +1,3 @@
-﻿module Module
-
-match None with
+﻿match None with
 | Some _{caret} -> ()
 | _ -> ()

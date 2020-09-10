@@ -1,5 +1,3 @@
-module Module
-
 type Pattern = Pattern of a: int * b : int * c: int
 
 let _ =

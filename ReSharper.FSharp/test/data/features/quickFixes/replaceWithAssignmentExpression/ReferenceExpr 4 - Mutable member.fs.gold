@@ -1,6 +1,4 @@
-﻿module Module
-
-type MyType() =
+﻿type MyType() =
     member val Member = 1 with get, set
 
 let f() =

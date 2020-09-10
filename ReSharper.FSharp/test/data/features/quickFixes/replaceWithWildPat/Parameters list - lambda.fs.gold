@@ -1,6 +1,4 @@
 ﻿//${RUN:1}
-module Module
-
 (fun x _{caret} _ ->
     let a = 5
     x)

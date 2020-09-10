@@ -1,5 +1,3 @@
-module Module
-
 do
     let hello (name: string) =
         let anotherNestedFunction x =

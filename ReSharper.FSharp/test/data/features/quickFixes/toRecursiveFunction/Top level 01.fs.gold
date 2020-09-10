@@ -1,6 +1,4 @@
-﻿module Module
-
-let rec hello (name: string) =
+﻿let rec hello (name: string) =
     let anotherNestedFunction x =
         {caret}hello x
 

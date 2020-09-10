@@ -1,6 +1,4 @@
-﻿module Module
-
-do
+﻿do
     {caret}1
 
 let x = 1

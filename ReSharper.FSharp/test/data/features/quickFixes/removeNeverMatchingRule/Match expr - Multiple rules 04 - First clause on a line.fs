@@ -1,5 +1,3 @@
-module Module
-
 do
     match 0 with
     | a -> ()

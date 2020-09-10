@@ -1,6 +1,4 @@
 //${RUN:1}
-module Module
-
 type FooAttribute() =
     inherit System.Attribute()
 
