@@ -131,7 +131,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
         ? qualifiableReferenceOwner.Names
         : new[] {GetName()};
 
-      return checkerService.ResolveNameAtLocation(referenceOwner, names, opName);
+      return checkerService.ResolveNameAtLocation(referenceOwner.FSharpIdentifier, names, opName);
     }
   }
 }

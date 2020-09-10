@@ -15,6 +15,7 @@ type RemoveRedundantNewTest() =
     [<Test>] member x.``Simple 02 - Type args``() = x.DoNamedTest()
 
     [<Test; NoHighlightingFound>] member x.``Function 01 - String, not available``() = x.DoNamedTest()
+    [<Test; NoHighlightingFound>] member x.``Function 03 - String, not available, anon module``() = x.DoNamedTest()
 
 
 [<FSharpTest>]
