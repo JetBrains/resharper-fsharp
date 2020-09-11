@@ -6,6 +6,8 @@ fun x y -> f y
 fun x y -> f 1 y
 fun x y -> f 1 x y
 
+fun x () -> f ()
+
 fun x (a, b) -> f (a, b)
 fun x (a, b) -> f 1 (a, b)
 fun x (a, b) -> f 1 x (a, b)

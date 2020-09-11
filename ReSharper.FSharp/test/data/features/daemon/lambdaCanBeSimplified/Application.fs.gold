@@ -1,12 +1,18 @@
 ﻿let f a b = ()
 
-|fun x -> id x|(0)
-|fun x -> (fun x -> 5) x|(1)
-|fun (a, b) c -> f (a, b) c|(2)
-|fun (a, b) (c, d, e) -> f (a, b) (c, d, e)|(3)
+|fun x () -> f x ()|(0)
+|fun () () -> f () ()|(1)
+
+|fun x -> id x|(2)
+|fun x -> (fun x -> 5) x|(3)
+
+|fun (a, b) c -> f (a, b) c|(4)
+|fun (a, b) (c, d, e) -> f (a, b) (c, d, e)|(5)
 
 ---------------------------------------------------------
 (0): ReSharper Dead Code: Lambda can be simplified
 (1): ReSharper Dead Code: Lambda can be simplified
 (2): ReSharper Dead Code: Lambda can be simplified
 (3): ReSharper Dead Code: Lambda can be simplified
+(4): ReSharper Dead Code: Lambda can be simplified
+(5): ReSharper Dead Code: Lambda can be simplified

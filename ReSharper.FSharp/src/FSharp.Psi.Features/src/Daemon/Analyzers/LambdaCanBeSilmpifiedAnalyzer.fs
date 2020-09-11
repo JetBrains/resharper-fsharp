@@ -14,6 +14,7 @@ type LambdaCanBeSimplifiedAnalyzer() =
         match pat.IgnoreInnerParens(), arg.IgnoreInnerParens() with
         | :? ITuplePat as pat, (:? ITupleExpr as tuple) -> compareArgsSeq pat.PatternsEnumerable tuple.ExpressionsEnumerable
         | :? ILocalReferencePat as pat, (:? IReferenceExpr as reference) -> pat.SourceName = reference.ShortName
+        | :? IUnitPat, (:? IUnitExpr) -> true
         | _ -> false
 
     and compareArgsSeq (pats: IFSharpPattern seq) (args: IFSharpExpression seq) =
@@ -42,7 +43,7 @@ type LambdaCanBeSimplifiedAnalyzer() =
         let (needWarning, redundantArgsCount) = 
             match lambda.Expression.IgnoreInnerParens() with
             | :? IPrefixAppExpr as app ->  compareArgs (Seq.rev pats) app
-            | x when (x :? IReferenceExpr || x :? ITupleExpr) -> compareArg (pats.Last()) x, 1
+            | x when (x :? IReferenceExpr || x :? ITupleExpr || x :? IUnitExpr) -> compareArg (pats.Last()) x, 1
             | _ -> false, 0
 
         if needWarning then
