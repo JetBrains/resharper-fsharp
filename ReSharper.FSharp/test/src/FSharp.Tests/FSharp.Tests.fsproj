@@ -44,6 +44,7 @@
     <Compile Include="Daemon\RedundantUnionCaseFieldPatsTest.fs" />
     <Compile Include="Daemon\ListConsPatAnalyzerTest.fs" />
     <Compile Include="Daemon\AppExprAnalyzerTest.fs" />
+    <Compile Include="Daemon\LambdaCanBeSimplifiedTest.fs" />
     <Compile Include="Debugger\ExpressionEvaluationInfoTest.fs" />
     <Compile Include="QuickFixes\ErrorAttributes.fs" />
     <Compile Include="QuickFixes\FSharpQuickFixTestBase.fs" />

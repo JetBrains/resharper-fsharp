@@ -1,0 +1,8 @@
+﻿|fun x -> x|(0)
+|fun (x, y) -> (x, y)|(1)
+|fun (a, b) (c, d, e) -> (c, d, e)|(2)
+
+---------------------------------------------------------
+(0): ReSharper Dead Code: Lambda can be simplified
+(1): ReSharper Dead Code: Lambda can be simplified
+(2): ReSharper Dead Code: Lambda can be simplified

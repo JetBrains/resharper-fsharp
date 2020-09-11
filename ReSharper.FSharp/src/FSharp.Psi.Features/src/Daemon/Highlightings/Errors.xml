@@ -131,4 +131,11 @@
     <QuickFix>ReplaceAppExprWithArgFix</QuickFix>
   </Warning>
 
+  <Warning staticGroup="FSharpErrors" name="LambdaCanBeSimplified">
+    <Parameter type="ILambdaExpr" name="lambdaExpr"/>
+    <Parameter type="int" name="redundantArgsCount"/>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message value="Lambda can be simplified"/>
+  </Warning>
+
 </Errors>
