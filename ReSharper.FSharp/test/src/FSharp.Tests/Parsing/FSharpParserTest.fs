@@ -140,6 +140,9 @@ type FSharpParserTest() =
     [<Test>] member x.``Expr - Lambda 22 - Attribute``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Lambda 23 - Attribute, Typed``() = x.DoNamedTest()
     [<Test; Explicit>] member x.``Expr - Lambda 24 - Unit in nested parens``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 25 - Multiple matches``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 26 - Multiple matches``() = x.DoNamedTest()
+    [<Test>] member x.``Expr - Lambda 27 - Multiple matches, nested``() = x.DoNamedTest()
 
     [<Test>] member x.``Expr - Match 01 - Simple``() = x.DoNamedTest()
     [<Test>] member x.``Expr - Match 02 - Simple pat``() = x.DoNamedTest()

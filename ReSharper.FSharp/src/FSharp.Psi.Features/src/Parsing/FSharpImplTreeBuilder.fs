@@ -1031,12 +1031,13 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
 
         x.ProcessExpression(expr)
     
-    member x.ProcessLambdaParameters(expr, outerBodyExpr, topLevel) =
+    member x.ProcessLambdaParameters(expr, outerBodyExpr, topLevel): SynExpr =
         match expr with
         | SynExpr.Lambda(_, inLambdaSeq, pats, bodyExpr, _) when inLambdaSeq <> topLevel ->
             x.ProcessLambdaParameters(pats, bodyExpr, outerBodyExpr)
 
-        | _ -> ()
+        | _ ->
+            outerBodyExpr
 
     member x.ProcessLambdaParameters(pats: SynSimplePats, lambdaBody: SynExpr, outerBodyExpr) =
         match pats with
@@ -1049,7 +1050,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             | [pat] ->
                 if posLt range.Start pat.Range.Start then
                     let mark = x.Mark(range)
-                    x.ProcessOneLambdaParam(pats, lambdaBody, outerBodyExpr, false)
+                    let outerBodyExpr = x.ProcessOneLambdaParam(pats, lambdaBody, outerBodyExpr, false)
                     x.Done(range, mark, ElementType.PAREN_PAT)
                     x.ProcessLambdaParameters(lambdaBody, outerBodyExpr, false)
                 else
@@ -1058,7 +1059,7 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
             | pats ->
                 let parenMark = x.Mark(range)
                 let tupleMark = x.Mark(range)
-                x.ProcessOneLambdaParam(pats, lambdaBody, outerBodyExpr, false)
+                let outerBodyExpr = x.ProcessOneLambdaParam(pats, lambdaBody, outerBodyExpr, false)
                 x.Done(tupleMark, ElementType.TUPLE_PAT)
                 x.Done(parenMark, ElementType.PAREN_PAT)
                 x.ProcessLambdaParameters(lambdaBody, outerBodyExpr, false)
@@ -1071,6 +1072,8 @@ type FSharpExpressionTreeBuilder(lexer, document, lifetime, projectedOffset, lin
         | [] ->
             if processNext then
                 x.ProcessLambdaParameters(lambdaBody, outerBodyExpr, false)
+            else
+                outerBodyExpr
 
         | pat :: pats ->
 
