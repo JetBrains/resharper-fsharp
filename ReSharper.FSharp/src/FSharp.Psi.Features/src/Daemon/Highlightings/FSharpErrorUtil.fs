@@ -4,6 +4,7 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.FSha
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
@@ -90,6 +91,6 @@ let getFunctionExpr (appExpr: IAppExpr) =
     | _ -> null
 
 let getReferenceExprName (expr: IFSharpExpression) =
-    match expr with
+    match expr.IgnoreInnerParens() with
     | :? IReferenceExpr as refExpr -> refExpr.ShortName
     | _ -> SharedImplUtil.MISSING_DECLARATION_NAME

@@ -68,7 +68,8 @@ let getPossibleFunctionAppReferenceExpr (expr: IFSharpExpression) =
     | _ -> null
 
 let getPossibleFunctionAppName (expr: IFSharpExpression) =
-    match getPossibleFunctionAppReferenceExpr expr with
+    let expr = getPossibleFunctionAppReferenceExpr expr
+    match expr.IgnoreInnerParens() with
     | :? IReferenceExpr as refExpr -> refExpr.ShortName
     | _ -> SharedImplUtil.MISSING_DECLARATION_NAME
 
