@@ -26,12 +26,13 @@ type LambdaCanBeSimplifiedAnalyzer() =
 
     and compareArgs (pats: IFSharpPattern seq) (app: IPrefixAppExpr) =
         let rec compareArgsRec (pats: IFSharpPattern seq) (app: IPrefixAppExpr) i =
-            if isNull app || isNull app.ArgumentExpression || pats.IsEmpty() then (true, i) else
+            let hasMatches = not (i = 0)
+            if isNull app || isNull app.ArgumentExpression || pats.IsEmpty() then (hasMatches, i) else
 
             let equal = compareArg (Seq.head pats) app.ArgumentExpression
             let app = if isNull app then null else app.FunctionExpression.As<IPrefixAppExpr>()
 
-            if equal then compareArgsRec (Seq.tail pats) app (i + 1) else (not (i = 0) , i)
+            if equal then compareArgsRec (Seq.tail pats) app (i + 1) else (hasMatches, i)
 
         compareArgsRec (pats: IFSharpPattern seq) (app: IPrefixAppExpr) 0
 
