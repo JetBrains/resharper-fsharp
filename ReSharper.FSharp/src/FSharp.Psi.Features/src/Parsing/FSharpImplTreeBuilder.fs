@@ -476,6 +476,9 @@ type FSharpImplTreeBuilder(lexer, document, decls, lifetime, projectedOffset, li
                 x.ProcessPat(pat, isLocal, false)
                 ElementType.ATTRIB_PAT
 
+            | SynPat.Const(SynConst.Unit, _) ->
+                ElementType.UNIT_PAT
+
             | SynPat.Const _ ->
                 ElementType.LITERAL_PAT
 

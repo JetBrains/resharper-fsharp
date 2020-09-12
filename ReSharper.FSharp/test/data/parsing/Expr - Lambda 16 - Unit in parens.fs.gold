@@ -9,7 +9,7 @@ IFSharpImplFile
           ILambdaParametersList
             IParenPat
               FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-              ILiteralPat
+              IUnitPat
                 FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
                 FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
               FSharpTokenType+RparenTokenElement(type:RPAREN, text:))
