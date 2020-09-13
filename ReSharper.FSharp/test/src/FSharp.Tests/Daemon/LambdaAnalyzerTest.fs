@@ -6,10 +6,10 @@ open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
 
 [<TestPackages("FSharp.Core")>]
-type LambdaCanBeSimplifiedTest() =
+type LambdaAnalyzerTest() =
     inherit FSharpHighlightingTestBase()
 
-    override x.RelativeTestDataPath = "features/daemon/lambdaCanBeSimplified"
+    override x.RelativeTestDataPath = "features/daemon/lambdaAnalyzer"
 
     override x.HighlightingPredicate(highlighting, _, _) =
         highlighting :? LambdaCanBeSimplifiedWarning

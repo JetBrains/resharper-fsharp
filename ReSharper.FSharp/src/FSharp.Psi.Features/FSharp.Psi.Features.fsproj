@@ -80,7 +80,7 @@
     <Compile Include="src\Daemon\Analyzers\RedundantUnionCaseFieldPatsAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\ListConsPatAnalyzer.fs" />
     <Compile Include="src\Daemon\Analyzers\AppExpressionAnalyzer.fs" />
-    <Compile Include="src\Daemon\Analyzers\LambdaCanBeSilmpifiedAnalyzer.fs" />
+    <Compile Include="src\Daemon\Analyzers\LambdaAnalyzer.fs" />
     <Compile Include="src\Comment\FSharpBlockCommentActionProvider.fs" />
     <Compile Include="src\Comment\FSharpLineCommentActionProvider.fs" />
     <Compile Include="src\Debugger\FSharpBreakpointVariantsProvider.fs" />

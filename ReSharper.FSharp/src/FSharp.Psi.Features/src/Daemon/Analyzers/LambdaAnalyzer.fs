@@ -7,13 +7,15 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.Errors
 
 [<ElementProblemAnalyzer(typeof<ILambdaExpr>, HighlightingTypes = [|typeof<LambdaCanBeSimplifiedWarning>|])>]
-type LambdaCanBeSimplifiedAnalyzer() =
+type LambdaAnalyzer() =
     inherit ElementProblemAnalyzer<ILambdaExpr>()
 
     let rec compareArg (pat: IFSharpPattern) (arg: IFSharpExpression) =
         match pat.IgnoreInnerParens(), arg.IgnoreInnerParens() with
-        | :? ITuplePat as pat, (:? ITupleExpr as tuple) -> compareArgsSeq pat.PatternsEnumerable tuple.ExpressionsEnumerable
-        | :? ILocalReferencePat as pat, (:? IReferenceExpr as reference) -> pat.SourceName = reference.ShortName
+        | :? ITuplePat as pat, (:? ITupleExpr as expr) ->
+            compareArgsSeq pat.PatternsEnumerable expr.ExpressionsEnumerable
+        | :? ILocalReferencePat as pat, (:? IReferenceExpr as reference) ->
+            pat.SourceName = reference.ShortName
         | :? IUnitPat, (:? IUnitExpr) -> true
         | _ -> false
 
@@ -25,27 +27,26 @@ type LambdaCanBeSimplifiedAnalyzer() =
         if equal then compareArgsSeq (Seq.tail pats) (Seq.tail args) else false
 
     and compareArgs (pats: IFSharpPattern seq) (app: IPrefixAppExpr) =
-        let rec compareArgsRec (pats: IFSharpPattern seq) (app: IPrefixAppExpr) i =
-            let hasMatches = not (i = 0)
-            if isNull app || isNull app.ArgumentExpression || pats.IsEmpty() then (hasMatches, i) else
+        let rec compareArgsRec (pats: IFSharpPattern seq) (app: IPrefixAppExpr) hasMatches =
+            if isNull app || isNull app.ArgumentExpression || pats.IsEmpty() then (hasMatches, app) else
 
             let equal = compareArg (Seq.head pats) app.ArgumentExpression
             let app = if isNull app then null else app.FunctionExpression.As<IPrefixAppExpr>()
 
-            if equal then compareArgsRec (Seq.tail pats) app (i + 1) else (hasMatches, i)
+            if equal then compareArgsRec (Seq.tail pats) app true else (hasMatches, app)
 
-        compareArgsRec (pats: IFSharpPattern seq) (app: IPrefixAppExpr) 0
+        compareArgsRec (pats: IFSharpPattern seq) (app: IPrefixAppExpr) false
 
     override x.Run(lambda, _, consumer) =
         if isNull lambda.Expression then () else
 
         let pats = lambda.Patterns
  
-        let (needWarning, redundantArgsCount) = 
+        let (canBeSimplified, appForReplace) = 
             match lambda.Expression.IgnoreInnerParens() with
             | :? IPrefixAppExpr as app ->  compareArgs (Seq.rev pats) app
-            | x when (x :? IReferenceExpr || x :? ITupleExpr || x :? IUnitExpr) -> compareArg (pats.Last()) x, 1
-            | _ -> false, 0
+            | x when (x :? IReferenceExpr || x :? ITupleExpr || x :? IUnitExpr) -> compareArg (pats.Last()) x, null
+            | _ -> false, null
 
-        if needWarning then
-            consumer.AddHighlighting(LambdaCanBeSimplifiedWarning(lambda, redundantArgsCount), lambda.GetHighlightingRange())
+        if canBeSimplified then
+            consumer.AddHighlighting(LambdaCanBeSimplifiedWarning(lambda, appForReplace), lambda.GetHighlightingRange())

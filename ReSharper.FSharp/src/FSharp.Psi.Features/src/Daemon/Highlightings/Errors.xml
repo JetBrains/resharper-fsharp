@@ -133,8 +133,8 @@
 
   <Warning staticGroup="FSharpErrors" name="LambdaCanBeSimplified">
     <Parameter type="ILambdaExpr" name="lambdaExpr"/>
-    <Parameter type="int" name="redundantArgsCount"/>
-    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Parameter type="IPrefixAppExpr" name="appForReplace"/>
+    <Behavour overlapResolvePolicy="NONE"/>
     <Message value="Lambda can be simplified"/>
   </Warning>
 
