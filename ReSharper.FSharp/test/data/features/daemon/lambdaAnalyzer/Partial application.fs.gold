@@ -15,13 +15,13 @@
 |fun (a, b) (c, d) -> f 1 (a, b) (c, d)|(9)
 
 ---------------------------------------------------------
-(0): ReSharper Dead Code: Lambda can be replaced
-(1): ReSharper Warning: Lambda can be simplified
-(2): ReSharper Dead Code: Lambda can be replaced
-(3): ReSharper Dead Code: Lambda can be replaced
-(4): ReSharper Warning: Lambda can be simplified
-(5): ReSharper Dead Code: Lambda can be replaced
-(6): ReSharper Dead Code: Lambda can be replaced
-(7): ReSharper Dead Code: Lambda can be replaced
-(8): ReSharper Warning: Lambda can be simplified
-(9): ReSharper Warning: Lambda can be simplified
+(0): ReSharper Dead Code: Lambda can be replaced with 'f'
+(1): ReSharper Dead Code: Lambda can be simplified
+(2): ReSharper Warning: Lambda can be simplified
+(3): ReSharper Warning: Lambda can be simplified
+(4): ReSharper Dead Code: Lambda can be simplified
+(5): ReSharper Warning: Lambda can be simplified
+(6): ReSharper Warning: Lambda can be simplified
+(7): ReSharper Warning: Lambda can be simplified
+(8): ReSharper Dead Code: Lambda can be simplified
+(9): ReSharper Dead Code: Lambda can be simplified

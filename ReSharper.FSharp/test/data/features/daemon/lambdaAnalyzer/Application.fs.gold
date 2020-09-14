@@ -10,9 +10,9 @@
 |fun (a, b) (c, d, e) -> f (a, b) (c, d, e)|(5)
 
 ---------------------------------------------------------
-(0): ReSharper Dead Code: Lambda can be replaced
-(1): ReSharper Dead Code: Lambda can be replaced
-(2): ReSharper Dead Code: Lambda can be replaced
-(3): ReSharper Dead Code: Lambda can be replaced
-(4): ReSharper Dead Code: Lambda can be replaced
-(5): ReSharper Dead Code: Lambda can be replaced
+(0): ReSharper Dead Code: Lambda can be replaced with 'f'
+(1): ReSharper Dead Code: Lambda can be replaced with 'f'
+(2): ReSharper Dead Code: Lambda can be replaced with 'id'
+(3): ReSharper Dead Code: Lambda can be simplified
+(4): ReSharper Dead Code: Lambda can be replaced with 'f'
+(5): ReSharper Dead Code: Lambda can be replaced with 'f'

@@ -94,3 +94,9 @@ let getReferenceExprName (expr: IFSharpExpression) =
     match expr.IgnoreInnerParens() with
     | :? IReferenceExpr as refExpr -> refExpr.ShortName
     | _ -> SharedImplUtil.MISSING_DECLARATION_NAME
+
+let getLambdaCanBeReplacedWarningText (replaceCandidate: IFSharpExpression) =
+    match replaceCandidate with
+    | :? IReferenceExpr as x -> sprintf "Lambda can be replaced with '%s'" x.ShortName
+    | null -> "Lambda can be replaced with 'id'"
+    | _ -> "Lambda can be simplified"

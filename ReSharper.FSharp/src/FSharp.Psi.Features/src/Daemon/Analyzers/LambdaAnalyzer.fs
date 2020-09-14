@@ -1,6 +1,7 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
 
 open JetBrains.Util
+open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
@@ -28,48 +29,41 @@ type LambdaAnalyzer() =
         let equal = compareArg (Seq.head pats) (Seq.head args)
         if equal then compareArgsSeq (Seq.tail pats) (Seq.tail args) else false
 
-    and compareArgs (lambda: ILambdaExpr) =
-        let expr = lambda.Expression.IgnoreInnerParens()
-        let pats = lambda.Patterns
-
+    and compareArgs (pats: TreeNodeCollection<IFSharpPattern>) (expr: IFSharpExpression) =
         let rec compareArgsRec (expr: IFSharpExpression) i =
             let hasMatches = not (i = 0)
             match expr with
             | :? IPrefixAppExpr as app when isNotNull app.ArgumentExpression && not (i = pats.Count) ->
                 let equal = compareArg pats.[pats.Count - 1 - i] app.ArgumentExpression
-                let app = if isNull app then null else app.FunctionExpression
+                let app = app.FunctionExpression.IgnoreInnerParens()
 
-                if equal then compareArgsRec app (i + 1) else (hasMatches, app)
-            | _ -> hasMatches, expr
+                if equal then compareArgsRec app (i + 1) else (hasMatches, false, app)
+            | _ -> hasMatches, i = pats.Count, expr
 
         compareArgsRec expr 0
+        
+    let isApplicable (expr: IFSharpExpression) =
+        match expr with
+        | :? IPrefixAppExpr
+        | :? IReferenceExpr
+        | :? ITupleExpr
+        | :? IUnitExpr -> true
+        | _ -> false
 
-    let addLambdaCanBeSimplifiedWarning (consumer: IHighlightingConsumer) (lambda: ILambdaExpr) (exprForReplace: IFSharpExpression) =
-        consumer.AddHighlighting(LambdaCanBeSimplifiedWarning(lambda, exprForReplace), lambda.GetHighlightingRange())
-
-    let addLambdaCanBeReplacedWarning (consumer: IHighlightingConsumer) (lambda: ILambdaExpr) (replaceCandidate: IFSharpExpression) =
-        consumer.AddHighlighting(LambdaCanBeReplacedWarning(lambda, replaceCandidate), lambda.GetHighlightingRange())
-    
     override x.Run(lambda, _, consumer) =
-        if isNull lambda.Expression then () else
- 
-        match lambda.Expression.IgnoreInnerParens() with
-        | :? IPrefixAppExpr ->
-            let (hasArgsMatches, exprForReplace) = compareArgs lambda
+        let expr = lambda.Expression.IgnoreInnerParens()
+        if not (isApplicable expr) then () else
 
-            if hasArgsMatches then
-                match exprForReplace with
-                | x when (isNotNull x && x.IgnoreInnerParens() :? IPrefixAppExpr) ->
-                    addLambdaCanBeSimplifiedWarning consumer lambda x
-                | x ->
-                    addLambdaCanBeReplacedWarning consumer lambda x
+        let pats = lambda.Patterns
+        
+        match compareArgs pats expr with
+        | (true, true, replaceCandidate) ->
+            consumer.AddHighlighting(LambdaCanBeReplacedWarning(lambda, replaceCandidate))
+        | (true, false, replaceCandidate) ->
+            consumer.AddHighlighting(LambdaCanBeSimplifiedWarning(lambda, replaceCandidate))
+        | _ ->
 
-        | x when (x :? IReferenceExpr || x :? ITupleExpr || x :? IUnitExpr) ->
-            let hasMatch = compareArg (lambda.PatternsEnumerable.LastOrDefault()) x
-
-            if hasMatch then 
-                if lambda.PatternsEnumerable.CountIs 1 then
-                    addLambdaCanBeReplacedWarning consumer lambda null
-                else
-                    addLambdaCanBeSimplifiedWarning consumer lambda null
+        match (compareArg (pats.Last()) expr, pats.Count = 1) with
+        | (true, true) -> consumer.AddHighlighting(LambdaCanBeReplacedWarning(lambda, null))
+        | (true, false) -> consumer.AddHighlighting(LambdaCanBeSimplifiedWarning(lambda, null))
         | _ -> ()
