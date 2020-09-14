@@ -12,7 +12,10 @@ type LambdaAnalyzerTest() =
     override x.RelativeTestDataPath = "features/daemon/lambdaAnalyzer"
 
     override x.HighlightingPredicate(highlighting, _, _) =
-        highlighting :? LambdaCanBeSimplifiedWarning
+        match highlighting with
+        | :? LambdaCanBeSimplifiedWarning
+        | :? LambdaCanBeReplacedWarning -> true
+        | _ -> false
 
     [<Test>] member x.``Application``() = x.DoNamedTest()
     [<Test>] member x.``Partial application``() = x.DoNamedTest()

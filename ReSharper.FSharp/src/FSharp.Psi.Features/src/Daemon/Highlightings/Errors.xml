@@ -138,4 +138,11 @@
     <Message value="Lambda can be simplified"/>
   </Warning>
 
+  <Warning staticGroup="FSharpErrors" name="LambdaCanBeReplaced">
+    <Parameter type="ILambdaExpr" name="lambdaExpr"/>
+    <Parameter type="IFSharpExpression" name="replaceCandidate"/>
+    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Message value="Lambda can be replaced"/>
+  </Warning>
+
 </Errors>

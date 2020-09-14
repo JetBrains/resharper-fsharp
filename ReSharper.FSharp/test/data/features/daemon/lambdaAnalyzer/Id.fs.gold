@@ -4,7 +4,7 @@
 |fun (a, b) (c, d, e) -> (c, d, e)|(3)
 
 ---------------------------------------------------------
-(0): ReSharper Warning: Lambda can be simplified
-(1): ReSharper Warning: Lambda can be simplified
-(2): ReSharper Warning: Lambda can be simplified
+(0): ReSharper Dead Code: Lambda can be replaced
+(1): ReSharper Dead Code: Lambda can be replaced
+(2): ReSharper Dead Code: Lambda can be replaced
 (3): ReSharper Warning: Lambda can be simplified
