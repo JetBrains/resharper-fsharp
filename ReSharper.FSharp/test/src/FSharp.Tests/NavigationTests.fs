@@ -1,9 +1,11 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Navigation
 
+open JetBrains.ProjectModel
 open JetBrains.ReSharper.Feature.Services.Navigation.ContextNavigation
 open JetBrains.ReSharper.Features.Navigation.Features.FindDeclarations
 open JetBrains.ReSharper.Features.Navigation.Features.GoToDeclaration
 open JetBrains.ReSharper.IntentionsTests.Navigation
+open JetBrains.ReSharper.Plugins.FSharp
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open JetBrains.ReSharper.TestFramework
 open NUnit.Framework
@@ -18,6 +20,12 @@ type FSharpContextSearchTestBase(extraPath) =
 
 type FSharpGoToUsagesTest() =
     inherit FSharpContextSearchTestBase("usages")
+
+    member x.DoNamedTestFiles() =
+        let testName = x.TestMethodName
+        let csExtension = CSharpProjectFileType.CS_EXTENSION
+        let fsExtension = FSharpProjectFileType.FsExtension
+        x.DoTestSolution([| testName + csExtension; testName + fsExtension |])
 
     override x.CreateContextAction(solution, textControl) =
         base.CreateContextAction(solution, textControl)
@@ -42,6 +50,8 @@ type FSharpGoToUsagesTest() =
     [<Test>] member x.``Operator 01 - Pipe``() = x.DoNamedTest()
     [<Test; Explicit("Not implemented")>] member x.``Operator 02 - =``() = x.DoNamedTest()
 
+    [<Test>] member x.``Union case 01 - Fields``() = x.DoNamedTestFiles()
+    [<Test>] member x.``Union case 02 - Singleton``() = x.DoNamedTestFiles()
 
 type FSharpGoToInheritorsTest() =
     inherit FSharpContextSearchTestBase("inheritors")

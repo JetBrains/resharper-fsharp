@@ -6,7 +6,7 @@ using JetBrains.ReSharper.Psi.Pointers;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 {
-  public class IsUnionCaseProperty : FSharpGeneratedPropertyBase, IFSharpGeneratedFromOtherElement
+  public class IsUnionCaseProperty : FSharpGeneratedPropertyBase, IFSharpGeneratedFromUnionCase
   {
     [NotNull] internal IUnionCase UnionCase { get; }
 

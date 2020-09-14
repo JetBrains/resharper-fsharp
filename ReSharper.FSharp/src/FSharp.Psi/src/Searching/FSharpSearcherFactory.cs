@@ -93,7 +93,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Searching
         case IUnionCase unionCase:
           return GetUnionCaseRelatedElements(unionCase);
         case IGeneratedConstructorParameterOwner parameterOwner:
-          return new[] {new RelatedDeclaredElement(parameterOwner.GetParameter())};
+          return new[] {new RelatedDeclaredElement(parameterOwner.GetGeneratedParameter())};
         default:
           return EmptyList<RelatedDeclaredElement>.Instance;
       }

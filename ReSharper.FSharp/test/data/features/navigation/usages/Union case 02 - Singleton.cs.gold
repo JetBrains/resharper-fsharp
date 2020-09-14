@@ -1,0 +1,56 @@
+﻿-------------- offset 61 line 5 col 14 --------------------
++++ JetBrains.ReSharper.Features.Navigation.Features.GoToUsages.GotoUsagesProvider navigation provider results +++
+Occurrences provided for OccurrenceUtil:
+Occurrence's dump:
+TO: [R] U u = U.|B|; RANGE: (60,61) @ Union case 02 - Singleton.cs
+Menu Item presentation: 
+Text: Class1.Class1      |U u = U.|B|;| (5)
+Shortcut text: in <Root Namespace>
+Style: Enabled
+Mnemonic: 
+Tooltip: U u = U.B;
+
+Occurrence's navigation result. Opened file: Union case 02 - Singleton.cs
+------------------
+  public Class1()
+  {
+    U u = U.B|CARET|;
+    var isB = u.IsB;
+  }
+------------------
+
+Occurrence's dump:
+TO: [R] var isB = u.|IsB|; RANGE: (80,83) @ Union case 02 - Singleton.cs
+Menu Item presentation: 
+Text: Class1.Class1      |var isB = u.|IsB|;| (6)
+Shortcut text: in <Root Namespace>
+Style: Enabled
+Mnemonic: 
+Tooltip: var isB = u.IsB;
+
+Occurrence's navigation result. Opened file: Union case 02 - Singleton.cs
+------------------
+  {
+    U u = U.B;
+    var isB = u.|CARET|IsB;
+  }
+}
+------------------
+
+Occurrence's dump:
+TO: [R] let b = |B| RANGE: (86,87) @ Union case 02 - Singleton.fs
+Menu Item presentation: 
+Text: Module.b      |let b = |B| (8)
+Shortcut text: in <Root Namespace>
+Style: Enabled
+Mnemonic: 
+Tooltip: let b = B
+
+Occurrence's navigation result. Opened file: Union case 02 - Singleton.fs
+------------------
+
+module Module =
+    let b = |CARET|B
+
+------------------
+

@@ -63,7 +63,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public override AccessRights GetAccessRights() =>
       GetContainingType().GetRepresentationAccessRights();
 
-    public IParameter GetParameter() =>
+    public IParameter GetGeneratedParameter() =>
       new FSharpGeneratedParameter(GetContainingType().GetGeneratedConstructor(), this);
   }
 

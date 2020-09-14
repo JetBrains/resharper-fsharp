@@ -31,4 +31,8 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi
     [NotNull] IClrDeclaredElement OriginElement { get; }
     IDeclaredElementPointer<IFSharpGeneratedFromOtherElement> CreatePointer();
   }
+
+  public interface IFSharpGeneratedFromUnionCase : IFSharpGeneratedFromOtherElement
+  {
+  }
 }
