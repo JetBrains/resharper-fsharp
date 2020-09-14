@@ -45,8 +45,7 @@ type IFcsReactorMonitor =
 [<ShellComponent>]
 type FcsReactorMonitor
         (lifetime: Lifetime, backgroundTaskHost: RiderBackgroundTaskHost, threading: IThreading,
-         logger: ILogger, configurations: RunsProducts.ProductConfigurations, settingsStore: ISettingsStore,
-         solutionsManager: SolutionsManager) =
+         logger: ILogger, configurations: RunsProducts.ProductConfigurations) as this =
 
     let isInternalMode = configurations.IsInternalMode()
 
@@ -70,21 +69,21 @@ type FcsReactorMonitor
     let showBackgroundTask = new Property<bool>("showBackgroundTask")
 
     let createNewTask (activeLifetime: Lifetime) =
-        let task =
-            RiderBackgroundTaskBuilder.Create()
-                .WithTitle("F# Compiler Service is busy")
-                .WithHeader(taskHeader)
-                .WithDescription(taskDescription)
-                .AsIndeterminate()
-                .AsNonCancelable()
-                .Build()
-
         // Only show the background task after we've been busy for some time
-        threading.QueueAt(
-            activeLifetime,
-            "FcsReactorMonitor.AddNewTask",
-            showDelay.Value,
-            fun () -> backgroundTaskHost.AddNewTask(activeLifetime, task))
+        threading.QueueAt(activeLifetime, "FcsReactorMonitor.AddNewTask", showDelay.Value, fun () ->
+            let settingsProvider = this.SettingsProvider
+            if isNotNull settingsProvider && not settingsProvider.EnableReactorMonitor then () else
+
+            let task =
+                RiderBackgroundTaskBuilder.Create()
+                    .WithTitle("F# Compiler Service is busy")
+                    .WithHeader(taskHeader)
+                    .WithDescription(taskDescription)
+                    .AsIndeterminate()
+                    .AsNonCancelable()
+                    .Build()
+
+            backgroundTaskHost.AddNewTask(activeLifetime, task))
 
     /// Called when a FCS operation starts.
     /// Always called from the current FCS reactor thread.
@@ -136,20 +135,13 @@ type FcsReactorMonitor
     do
         showBackgroundTask.WhenTrue(lifetime, Action<_> createNewTask)
 
-        isReactorBusy.WhenTrue(lifetime, fun lt ->
-            let solution = solutionsManager.Solution
-            if isNull solution then () else
-
-            let isEnabled =
-                settingsStore.BindToContextTransient(ContextRange.Smart(solution.ToDataContext()))
-                    .GetValue((fun (s: FSharpOptions) -> s.EnableReactorMonitor), null)
-
-            if not isEnabled then () else
-            showBackgroundTask.SetValue true |> ignore)
+        isReactorBusy.WhenTrue(lifetime, fun lt -> showBackgroundTask.SetValue true |> ignore)
 
         isReactorBusy.WhenFalse(lifetime, fun lt ->
             threading.QueueAt(lt, "FcsReactorMonitor.HideTask", hideDelay, fun () ->
                 showBackgroundTask.SetValue false |> ignore))
+
+    member val SettingsProvider: FcsReactorMonitorSettingsProvider = null with get, set
 
     interface IFcsReactorMonitor with
         override __.FcsBusyDelay = showDelay :> _
@@ -197,6 +189,23 @@ type FcsReactorMonitor
             logger.Trace("Trying to cancel any active background work...")
         override __.OnEnqueueOp userOpName opName opArg approxQueueLength =
             logger.Trace("Enqueue: {0}.{1} ({2}), queue length {3}", userOpName, opName, opArg, approxQueueLength)
+
+and 
+    [<SolutionComponent; AllowNullLiteral>]
+    FcsReactorMonitorSettingsProvider
+        (lifetime: Lifetime, solution: ISolution, monitor: IFcsReactorMonitor, settingsStore: ISettingsStore) as this =
+
+    let settings = settingsStore.BindToContextLive(lifetime, ContextRange.Smart(solution.ToDataContext()))
+    let isEnabledProperty = settings.GetValueProperty(lifetime, fun (key: FSharpOptions) -> key.EnableReactorMonitor)
+
+    do
+        match monitor with
+        | :? FcsReactorMonitor as fcsReactorMonitor ->
+            fcsReactorMonitor.SettingsProvider <- this
+            lifetime.OnTermination(fun _ -> fcsReactorMonitor.SettingsProvider <- null) |> ignore
+        | _ -> ()
+
+    member x.EnableReactorMonitor = isEnabledProperty.Value
 
 
 [<SolutionComponent>]
