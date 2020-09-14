@@ -30,10 +30,11 @@ open JetBrains.Util
 [<SolutionComponent>]
 type FSharpTypingAssist
         (lifetime, solution, settingsStore, cachingLexerService, commandProcessor, psiServices,
-         externalIntellisenseHost, skippingTypingAssist, lastTypingAssistAction, manager: ITypingAssistManager) as this =
+         externalIntellisenseHost, skippingTypingAssist, lastTypingAssistAction, structuralRemoveManager,
+         manager: ITypingAssistManager) as this =
     inherit TypingAssistLanguageBase<FSharpLanguage>
         (solution, settingsStore, cachingLexerService, commandProcessor, psiServices, externalIntellisenseHost,
-         skippingTypingAssist, lastTypingAssistAction)
+         skippingTypingAssist, lastTypingAssistAction, structuralRemoveManager)
 
     static let indentFromToken =
         [| FSharpTokenType.LBRACK_LESS

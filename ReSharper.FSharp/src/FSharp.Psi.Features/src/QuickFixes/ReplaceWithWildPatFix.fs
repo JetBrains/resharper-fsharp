@@ -95,7 +95,7 @@ type ReplaceWithWildPatFix(pat: IFSharpPattern) =
                 | _ -> invalidArg "patOwner.Parent" "unexpected type"
 
             let scopeNode = if pat.Parent :? ILambdaParametersList then pat.Parent else pat :>_
-            FileCollectorInfo.WithThisAndContainingLocalScopes(LocalScope(scopeNode, scopeText, scopeText))
+            FileCollectorInfo.WithLocalAndAdditionalScopes(scopeNode, LocalScope(scopeNode, scopeText, scopeText))
 
         member x.ExecuteAction(highlightingInfos, _, _) =
             use writeLock = WriteLockCookie.Create(true)

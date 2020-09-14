@@ -104,7 +104,7 @@ type FSharpDeclarationCodeStructureElement(parentElement, declaration: IDeclarat
 
     let language = declaration.Language
     let declarationPointer = declaration.GetPsiServices().Pointers.CreateTreeElementPointer(declaration)
-    let textRange = declaration.GetDocumentRange().TextRange
+    let textRange = declaration.GetDocumentRange()
     let aspects = CodeStructureDeclarationAspects(declaration)
 
     let getDeclaration () = declarationPointer.GetTreeNode()
@@ -193,8 +193,8 @@ type NamedIdentifierOwner(treeNode: INameIdentifierOwner, parent, iconId) =
 
     let textRange =
         match treeNode.NameIdentifier with
-        | null -> treeNode.GetNavigationRange().TextRange
-        | ident -> ident.GetDocumentRange().TextRange
+        | null -> treeNode.GetNavigationRange()
+        | ident -> ident.GetDocumentRange()
 
     override x.TreeNode = treeNodePointer.GetTreeNode() :> _
     override x.Language = FSharpLanguage.Instance :> _
