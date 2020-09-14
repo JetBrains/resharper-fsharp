@@ -133,7 +133,7 @@
 
   <Warning staticGroup="FSharpErrors" name="LambdaCanBeSimplified">
     <Parameter type="ILambdaExpr" name="lambdaExpr"/>
-    <Parameter type="IPrefixAppExpr" name="appForReplace"/>
+    <Parameter type="IFSharpExpression" name="exprForReplace"/>
     <Behavour overlapResolvePolicy="NONE"/>
     <Message value="Lambda can be simplified"/>
   </Warning>

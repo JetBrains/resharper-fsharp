@@ -28,24 +28,25 @@ type LambdaAnalyzer() =
         if equal then compareArgsSeq (Seq.tail pats) (Seq.tail args) else false
 
     and compareArgs (lambda: ILambdaExpr) =
-        let app = lambda.Expression.IgnoreInnerParens() :?> IPrefixAppExpr
+        let expr = lambda.Expression.IgnoreInnerParens()
         let pats = lambda.Patterns
 
-        let rec compareArgsRec (app: IPrefixAppExpr) i =
+        let rec compareArgsRec (expr: IFSharpExpression) i =
             let hasMatches = not (i = 0)
-            if isNull app || isNull app.ArgumentExpression || i = pats.Count then (hasMatches, app) else
+            match expr with
+            | :? IPrefixAppExpr as app when isNotNull app.ArgumentExpression && not (i = pats.Count) ->
+                let equal = compareArg pats.[pats.Count - 1 - i] app.ArgumentExpression
+                let app = if isNull app then null else app.FunctionExpression
 
-            let equal = compareArg pats.[pats.Count - 1 - i] app.ArgumentExpression
-            let app = if isNull app then null else app.FunctionExpression.As<IPrefixAppExpr>()
+                if equal then compareArgsRec app (i + 1) else (hasMatches, app)
+            | _ -> hasMatches, expr
 
-            if equal then compareArgsRec app (i + 1) else (hasMatches, app)
-
-        compareArgsRec (app: IPrefixAppExpr) 0
+        compareArgsRec expr 0
 
     override x.Run(lambda, _, consumer) =
         if isNull lambda.Expression then () else
  
-        let (canBeSimplified, appForReplace) = 
+        let (canBeSimplified, exprForReplace) = 
             match lambda.Expression.IgnoreInnerParens() with
             | :? IPrefixAppExpr ->  compareArgs lambda
             | x when (x :? IReferenceExpr || x :? ITupleExpr || x :? IUnitExpr) ->
@@ -53,4 +54,4 @@ type LambdaAnalyzer() =
             | _ -> false, null
 
         if canBeSimplified then
-            consumer.AddHighlighting(LambdaCanBeSimplifiedWarning(lambda, appForReplace), lambda.GetHighlightingRange())
+            consumer.AddHighlighting(LambdaCanBeSimplifiedWarning(lambda, exprForReplace), lambda.GetHighlightingRange())
