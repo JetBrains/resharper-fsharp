@@ -5,6 +5,7 @@ open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.Errors
+open JetBrains.ReSharper.Psi.Tree
 
 [<ElementProblemAnalyzer(typeof<ILambdaExpr>, HighlightingTypes = [|typeof<LambdaCanBeSimplifiedWarning>|])>]
 type LambdaAnalyzer() =
@@ -26,26 +27,29 @@ type LambdaAnalyzer() =
         let equal = compareArg (Seq.head pats) (Seq.head args)
         if equal then compareArgsSeq (Seq.tail pats) (Seq.tail args) else false
 
-    and compareArgs (pats: IFSharpPattern seq) (app: IPrefixAppExpr) =
-        let rec compareArgsRec (pats: IFSharpPattern seq) (app: IPrefixAppExpr) hasMatches =
-            if isNull app || isNull app.ArgumentExpression || pats.IsEmpty() then (hasMatches, app) else
+    and compareArgs (lambda: ILambdaExpr) =
+        let app = lambda.Expression.IgnoreInnerParens() :?> IPrefixAppExpr
+        let pats = lambda.Patterns
 
-            let equal = compareArg (Seq.head pats) app.ArgumentExpression
+        let rec compareArgsRec (app: IPrefixAppExpr) i =
+            let hasMatches = not (i = 0)
+            if isNull app || isNull app.ArgumentExpression || i = pats.Count then (hasMatches, app) else
+
+            let equal = compareArg pats.[pats.Count - 1 - i] app.ArgumentExpression
             let app = if isNull app then null else app.FunctionExpression.As<IPrefixAppExpr>()
 
-            if equal then compareArgsRec (Seq.tail pats) app true else (hasMatches, app)
+            if equal then compareArgsRec app (i + 1) else (hasMatches, app)
 
-        compareArgsRec (pats: IFSharpPattern seq) (app: IPrefixAppExpr) false
+        compareArgsRec (app: IPrefixAppExpr) 0
 
     override x.Run(lambda, _, consumer) =
         if isNull lambda.Expression then () else
-
-        let pats = lambda.Patterns
  
         let (canBeSimplified, appForReplace) = 
             match lambda.Expression.IgnoreInnerParens() with
-            | :? IPrefixAppExpr as app ->  compareArgs (Seq.rev pats) app
-            | x when (x :? IReferenceExpr || x :? ITupleExpr || x :? IUnitExpr) -> compareArg (pats.Last()) x, null
+            | :? IPrefixAppExpr ->  compareArgs lambda
+            | x when (x :? IReferenceExpr || x :? ITupleExpr || x :? IUnitExpr) ->
+                compareArg (lambda.PatternsEnumerable.LastOrDefault()) x, null
             | _ -> false, null
 
         if canBeSimplified then
