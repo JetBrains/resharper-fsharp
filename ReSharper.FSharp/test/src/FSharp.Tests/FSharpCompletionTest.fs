@@ -37,6 +37,15 @@ type FSharpCompletionTest() =
     [<Test>] member x.``Open 07 - After System``() = x.DoNamedTest()
     [<Test>] member x.``Open 08 - Before other System``() = x.DoNamedTest()
 
+    [<TestSetting(typeof<FSharpOptions>, "TopLevelOpenCompletion", "false")>]
+    [<Test>] member x.``Open - Indent - Nested - After 01``() = x.DoNamedTest()
+
+    [<TestSetting(typeof<FSharpOptions>, "TopLevelOpenCompletion", "false")>]
+    [<Test>] member x.``Open - Indent - Nested - Before 01``() = x.DoNamedTest()
+
+    [<Test>] member x.``Open - Indent - Top - After 01``() = x.DoNamedTest()
+    [<Test>] member x.``Open - Indent - Top - Before 01``() = x.DoNamedTest()
+
     [<Test>] member x.``Import - Anon module 01 - First line``() = x.DoNamedTest()
     [<Test>] member x.``Import - Anon module 02 - Before open``() = x.DoNamedTest()
     [<Test>] member x.``Import - Anon module 03 - After open``() = x.DoNamedTest()

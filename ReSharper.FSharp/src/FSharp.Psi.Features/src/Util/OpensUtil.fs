@@ -101,10 +101,10 @@ let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBo
             if not (moduleMember :? IOpenStatement) && not (isFirstChildOrAfterEmptyLine moduleMember) then
                 NewLine(lineEnding)
 
-            if indent > 0 then
-                Whitespace(indent)
             elementFactory.CreateOpenStatement(ns)
             NewLine(lineEnding)
+            if indent > 0 then
+                Whitespace(indent)
 
             // Add space after new opens group.
             if not (moduleMember :? IOpenStatement) && not (isFollowedByEmptyLineOrComment moduleMember) then
