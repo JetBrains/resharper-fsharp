@@ -79,7 +79,7 @@
     <Parameter type="IParenPat" name="parenPat"/>
     <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
     <Message value="Redundant parentheses"/>
-    <QuickFix>ReplaceWithWildPatFix</QuickFix>
+    <QuickFix>ReplaceWithWildPatScopedFix</QuickFix>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="RedundantAttributeParens">
@@ -111,7 +111,7 @@
     <Range>parenPat.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <Message value="Redundant union case fields matching"/>
-    <QuickFix>ReplaceWithWildPatFix</QuickFix>
+    <QuickFix>ReplaceWithWildPatScopedFix</QuickFix>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="ConsWithEmptyListPat">
