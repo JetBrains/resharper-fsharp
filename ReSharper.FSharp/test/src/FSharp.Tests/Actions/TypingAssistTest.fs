@@ -196,6 +196,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Quotes - Pair quotes 12 - At eof, unfinished triple quote``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Pair quotes 13 - After quote``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Pair quotes 14 - After char``() = x.DoNamedTest()
+    [<Test>] member x.``Quotes - Pair quotes 15 - File start``() = x.DoNamedTest()
 
     [<Test>] member x.``Quotes - Skip end 01 - Char``() = x.DoNamedTest()
     [<Test>] member x.``Quotes - Skip end 02 - String``() = x.DoNamedTest()
@@ -241,6 +242,7 @@ type FSharpTypingAssistTest() =
     [<Test>] member x.``Brackets - Attributes 02 - Type left angle before spaces``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Attributes 03 - Type right angle``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Attributes 04 - Type right angle, left bracket``() = x.DoNamedTest()
+    [<Test>] member x.``Brackets - Attributes 05 - File start``() = x.DoNamedTest()
       
     [<Test>] member x.``Brackets - Arrays 01 - Type left bar``() = x.DoNamedTest()
     [<Test>] member x.``Brackets - Arrays 02 - Type left bar before space``() = x.DoNamedTest()

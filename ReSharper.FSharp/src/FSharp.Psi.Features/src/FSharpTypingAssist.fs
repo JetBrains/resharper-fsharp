@@ -1412,7 +1412,8 @@ type FSharpTypingAssist
         let offset = textControl.Caret.Offset()
 
         let mutable lexer = Unchecked.defaultof<_>
-        if not (x.GetCachingLexer(textControl, &lexer) && lexer.FindTokenAt(offset - 1)) then false else
+        if not (x.GetCachingLexer(textControl, &lexer)) then false else
+        if offset > 0 && not (lexer.FindTokenAt(offset - 1)) then false else
 
         // Don't add pair quotes/brackets after opening char quote:
         // `'"{caret}"` or `'({caret})`
