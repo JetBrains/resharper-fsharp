@@ -1,0 +1,10 @@
+﻿|fun x -> x|(0)
+|fun () -> ()|(1)
+|fun (x, y) -> (x, y)|(2)
+|fun (a, b) (c, d, e) -> (c, d, e)|(3)
+
+---------------------------------------------------------
+(0): ReSharper Warning: Lambda can be replaced with 'id'
+(1): ReSharper Warning: Lambda can be replaced with 'id'
+(2): ReSharper Warning: Lambda can be replaced with 'id'
+(3): ReSharper Warning: Lambda can be simplified

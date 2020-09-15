@@ -131,4 +131,22 @@
     <QuickFix>ReplaceAppExprWithArgFix</QuickFix>
   </Warning>
 
+  <Warning staticGroup="FSharpErrors" name="LambdaCanBeSimplified">
+    <Parameter type="ILambdaExpr" name="lambdaExpr"/>
+    <Parameter type="IFSharpExpression" name="replaceCandidate"/>
+    <Range>lambdaExpr.GetHighlightingRange()</Range>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <Message value="Lambda can be simplified"/>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="LambdaCanBeReplaced">
+    <Parameter type="ILambdaExpr" name="lambdaExpr"/>
+    <Parameter type="IFSharpExpression" name="replaceCandidate"/>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <Range>lambdaExpr.GetHighlightingRange()</Range>
+    <Message value="{0}">
+      <Argument>getLambdaCanBeReplacedWarningText replaceCandidate</Argument>
+    </Message>
+  </Warning>
+
 </Errors>

@@ -1,0 +1,27 @@
+﻿let f x y z = ()
+
+|fun x -> f x|(0)
+|fun x -> f 1 x|(1)
+|fun x y -> f y|(2)
+|fun x y -> f 1 y|(3)
+|fun x y -> f 1 x y|(4)
+
+|fun x () -> f ()|(5)
+
+|fun x (a, b) -> f (a, b)|(6)
+|fun x (a, b) -> f 1 (a, b)|(7)
+|fun x (a, b) -> f 1 x (a, b)|(8)
+
+|fun (a, b) (c, d) -> f 1 (a, b) (c, d)|(9)
+
+---------------------------------------------------------
+(0): ReSharper Warning: Lambda can be replaced with 'f'
+(1): ReSharper Warning: Lambda can be simplified
+(2): ReSharper Warning: Lambda can be simplified
+(3): ReSharper Warning: Lambda can be simplified
+(4): ReSharper Warning: Lambda can be simplified
+(5): ReSharper Warning: Lambda can be simplified
+(6): ReSharper Warning: Lambda can be simplified
+(7): ReSharper Warning: Lambda can be simplified
+(8): ReSharper Warning: Lambda can be simplified
+(9): ReSharper Warning: Lambda can be simplified
