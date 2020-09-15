@@ -142,7 +142,7 @@
   <Warning staticGroup="FSharpErrors" name="LambdaCanBeReplaced">
     <Parameter type="ILambdaExpr" name="lambdaExpr"/>
     <Parameter type="IFSharpExpression" name="replaceCandidate"/>
-    <Behavour attributeID="DEADCODE" overlapResolvePolicy="DEADCODE"/>
+    <Behavour overlapResolvePolicy="NONE"/>
     <Range>lambdaExpr.GetHighlightingRange()</Range>
     <Message value="{0}">
       <Argument>getLambdaCanBeReplacedWarningText replaceCandidate</Argument>

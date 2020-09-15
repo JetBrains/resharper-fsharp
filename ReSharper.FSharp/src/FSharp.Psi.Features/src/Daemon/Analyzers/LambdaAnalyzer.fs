@@ -1,11 +1,11 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
 
-open JetBrains.Util
 open JetBrains.ReSharper.Psi.Tree
-open JetBrains.ReSharper.Feature.Services.Daemon
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.Errors
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Feature.Services.Daemon
+open JetBrains.Util
 
 [<ElementProblemAnalyzer(typeof<ILambdaExpr>,
                          HighlightingTypes = [|typeof<LambdaCanBeSimplifiedWarning>;
@@ -26,14 +26,14 @@ type LambdaAnalyzer() =
         if args.IsEmpty() then pats.IsEmpty() else
         if pats.IsEmpty() then false else
 
-        let equal = compareArg (Seq.head pats) (Seq.head args)
-        if equal then compareArgsSeq (Seq.tail pats) (Seq.tail args) else false
+        compareArg (Seq.head pats) (Seq.head args) && compareArgsSeq (Seq.tail pats) (Seq.tail args)
 
     and compareArgs (pats: TreeNodeCollection<IFSharpPattern>) (expr: IFSharpExpression) =
         let rec compareArgsRec (expr: IFSharpExpression) i =
-            let hasMatches = not (i = 0)
+            let hasMatches = i > 0
+
             match expr with
-            | :? IPrefixAppExpr as app when isNotNull app.ArgumentExpression && not (i = pats.Count) ->
+            | :? IPrefixAppExpr as app when isNotNull app.ArgumentExpression && i <> pats.Count ->
                 let equal = compareArg pats.[pats.Count - 1 - i] app.ArgumentExpression
                 let app = app.FunctionExpression.IgnoreInnerParens()
 
@@ -41,7 +41,7 @@ type LambdaAnalyzer() =
             | _ -> hasMatches, i = pats.Count, expr
 
         compareArgsRec expr 0
-        
+
     let isApplicable (expr: IFSharpExpression) =
         match expr with
         | :? IPrefixAppExpr
@@ -55,15 +55,15 @@ type LambdaAnalyzer() =
         if not (isApplicable expr) then () else
 
         let pats = lambda.Patterns
-        
+
         match compareArgs pats expr with
-        | (true, true, replaceCandidate) ->
+        | true, true, replaceCandidate ->
             consumer.AddHighlighting(LambdaCanBeReplacedWarning(lambda, replaceCandidate))
-        | (true, false, replaceCandidate) ->
+        | true, false, replaceCandidate ->
             consumer.AddHighlighting(LambdaCanBeSimplifiedWarning(lambda, replaceCandidate))
         | _ ->
 
-        match (compareArg (pats.Last()) expr, pats.Count = 1) with
-        | (true, true) -> consumer.AddHighlighting(LambdaCanBeReplacedWarning(lambda, null))
-        | (true, false) -> consumer.AddHighlighting(LambdaCanBeSimplifiedWarning(lambda, null))
+        match compareArg (pats.LastOrDefault()) expr, pats.Count = 1 with
+        | true, true -> consumer.AddHighlighting(LambdaCanBeReplacedWarning(lambda, null))
+        | true, false -> consumer.AddHighlighting(LambdaCanBeSimplifiedWarning(lambda, null))
         | _ -> ()
