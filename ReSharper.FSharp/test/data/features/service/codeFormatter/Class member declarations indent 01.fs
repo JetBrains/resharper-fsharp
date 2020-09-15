@@ -7,6 +7,8 @@ type A(a) =
 
   let a = ()
 
+  do ()
+
   new () = A(3)
 
   member x.B() = ()
