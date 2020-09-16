@@ -14,6 +14,7 @@ type ReplaceLambdaTest() =
     [<Test>] member x.``Partial application``() = x.DoNamedTest()
     [<Test>] member x.``Inner lambda``() = x.DoNamedTest()
     [<Test>] member x.``Need parens``() = x.DoNamedTest()
+    [<Test>] member x.``Multiline``() = x.DoNamedTest()
     [<Test; NotAvailable>] member x.``Non application - not available``() = x.DoNamedTest()
 
 
