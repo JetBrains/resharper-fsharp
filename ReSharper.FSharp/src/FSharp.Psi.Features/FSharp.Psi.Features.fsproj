@@ -183,6 +183,7 @@
     <Compile Include="src\QuickFixes\SimplifyListConsPatFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceAppExprWithArgFix.fs" />
     <Compile Include="src\QuickFixes\SimplifyLambdaFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceLambdaFix.fs" />
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />
     <Compile Include="src\PostfixTemplates\NotTemplate.fs" />
     <Compile Include="src\PostfixTemplates\LetPostfixTemplate.fs" />
