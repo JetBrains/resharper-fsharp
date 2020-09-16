@@ -1,5 +1,5 @@
 module Test
 
-let f x y = ()
+let f _ _ = ()
 
-let _ = fun x y ->{caret} f 1 y
+let _ = fun _ y ->{caret} f 1 y

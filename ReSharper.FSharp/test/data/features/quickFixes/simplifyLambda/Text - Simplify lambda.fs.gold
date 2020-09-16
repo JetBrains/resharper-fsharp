@@ -1,34 +1,10 @@
 ﻿module Test
 
-let f |x|(0) |y|(1) = ()
+let f _ _ = ()
 
-let _ = |fun |x|(3) y -> f 1 y|(2)
+let _ = |fun _ y -> f 1 y|(0)
 
 ------------------------------------------------
-0: The value 'x' is unused
-QUICKFIXES:
-Replace with '_'
---Replace unused values with '_' in binding patterns
---Replace unused values with '_' in file
---Replace unused values with '_' in project
---Replace unused values with '_' in solution
-Rename to '_x'
-1: The value 'y' is unused
-QUICKFIXES:
-Replace with '_'
---Replace unused values with '_' in binding patterns
---Replace unused values with '_' in file
---Replace unused values with '_' in project
---Replace unused values with '_' in solution
-Rename to '_y'
-2: Lambda can be simplified
+0: Lambda can be simplified
 QUICKFIXES:
 Simplify lambda
-3: The value 'x' is unused
-QUICKFIXES:
-Replace with '_'
---Replace unused values with '_' in parameter list
---Replace unused values with '_' in file
---Replace unused values with '_' in project
---Replace unused values with '_' in solution
-Rename to '_x'
