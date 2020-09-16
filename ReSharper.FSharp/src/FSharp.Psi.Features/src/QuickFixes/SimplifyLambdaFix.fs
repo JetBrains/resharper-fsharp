@@ -28,10 +28,10 @@ type SimplifyLambdaFix(warning: LambdaCanBeSimplifiedWarning) =
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(lambda.IsPhysical())
         use disableFormatter = new DisableCodeFormatter()
-        let patterns = lambda.Patterns
 
         replaceWithCopy lambda.Expression (replaceCandidate.IgnoreInnerParens())
 
+        let patterns = lambda.Patterns
         let redundantArgsCount = countRedundantArgs replaceCandidate
         let firstNodeToDelete = patterns.[patterns.Count - redundantArgsCount - 1].NextSibling
         let lastNodeToDelete = patterns.Last()
