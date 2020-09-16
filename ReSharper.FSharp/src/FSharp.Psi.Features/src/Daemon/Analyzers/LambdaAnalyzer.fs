@@ -35,9 +35,9 @@ type LambdaAnalyzer() =
             match expr with
             | :? IPrefixAppExpr as app when isNotNull app.ArgumentExpression && i <> pats.Count ->
                 let equal = compareArg pats.[pats.Count - 1 - i] app.ArgumentExpression
-                let app = app.FunctionExpression.IgnoreInnerParens()
+                let app = app.FunctionExpression
 
-                if equal then compareArgsRec app (i + 1) else (hasMatches, false, app)
+                if equal then compareArgsRec app (i + 1) else (hasMatches, false, expr)
             | _ -> hasMatches, i = pats.Count, expr
 
         compareArgsRec expr 0
