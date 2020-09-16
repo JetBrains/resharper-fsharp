@@ -1,5 +1,4 @@
 ﻿let f x y = ()
 
-fun x 
-    y ->{caret} f [1,
+fun x ->{caret} f [1,
             2]

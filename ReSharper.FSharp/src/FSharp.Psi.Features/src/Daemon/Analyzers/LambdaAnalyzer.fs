@@ -32,14 +32,13 @@ type LambdaAnalyzer() =
         let rec compareArgsRec (expr: IFSharpExpression) i =
             let hasMatches = i > 0
 
-            match expr with
-            | :? IParenExpr as expr -> compareArgsRec (expr.IgnoreInnerParens()) i
+            match expr.IgnoreInnerParens() with
             | :? IPrefixAppExpr as app when isNotNull app.ArgumentExpression && i <> pats.Count ->
                 let equal = compareArg pats.[pats.Count - 1 - i] app.ArgumentExpression
-                let app = app.FunctionExpression
+                let funExpr = app.FunctionExpression
 
-                if equal then compareArgsRec app (i + 1) else (hasMatches, false, expr)
-            | _ -> hasMatches, i = pats.Count, expr
+                if equal then compareArgsRec funExpr (i + 1) else (hasMatches, false, app :> IFSharpExpression)
+            | x -> hasMatches, i = pats.Count, x
 
         compareArgsRec expr 0
 

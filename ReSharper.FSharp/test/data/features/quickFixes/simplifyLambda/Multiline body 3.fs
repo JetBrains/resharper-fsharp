@@ -3,4 +3,4 @@ let f x y = ()
 fun x 
     y
     dzet ->{caret} f [1,
-               2] y dzet
+               2] dzet
