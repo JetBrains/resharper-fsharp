@@ -735,7 +735,7 @@ type ProjectMapping(projectDirectory, projectUniqueName, targetFrameworkIds: ISe
             match parsePaths item.Item with
             | Some (physicalPath, logicalPath) ->
                 if not (projectDirectory.IsPrefixOf(logicalPath)) then
-                    logger.Warn("Invalid logical path {0} for project dir: {1}", projectDirectory, logicalPath) else
+                    logger.Warn("Invalid logical path {0} for project dir: {1}", logicalPath, projectDirectory) else
 
                 if logicalPath.Directory <> folders.Peek().Path then
                     let commonParent = FileSystemPath.GetDeepestCommonParent(logicalPath.Parent, folders.Peek().Path)
