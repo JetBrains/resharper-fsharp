@@ -98,11 +98,11 @@ type FcsProjectProvider
         use lock = locker.UsingWriteLock()
         if dirtyModules.IsEmpty() then () else
 
-        logger.Verbose("Start invalidating dirty projects")
+        logger.Trace("Start invalidating dirty modules")
         let modulesToInvalidate = List(dirtyModules)
         for psiModule in modulesToInvalidate do
             invalidateFcsProject psiModule
-        logger.Verbose("Done invalidating dirty projects")
+        logger.Trace("Done invalidating dirty modules")
 
     do
         // Start listening for the changes after project model is updated.
