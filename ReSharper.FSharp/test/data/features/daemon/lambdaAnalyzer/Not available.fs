@@ -11,3 +11,7 @@ fun x y -> f y x
 fun (a, b) -> f b
 fun (a, b, c) -> (c, b, a)
 fun (a, b) (c, d, e) -> f (a, b, c, d, e)
+
+fun x -> f x x
+fun (a, b) -> f a (a, b)
+fun x -> (fun y -> x) x

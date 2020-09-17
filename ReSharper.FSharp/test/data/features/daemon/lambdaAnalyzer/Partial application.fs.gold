@@ -14,6 +14,9 @@
 
 |fun (a, b) (c, d) -> f 1 (a, b) (c, d)|(9)
 
+fun x -> f x x
+|fun (a, b) x -> f a (a, b) x|(10)
+
 ---------------------------------------------------------
 (0): ReSharper Warning: Lambda can be replaced with 'f'
 (1): ReSharper Warning: Lambda can be simplified
@@ -25,3 +28,4 @@
 (7): ReSharper Warning: Lambda can be simplified
 (8): ReSharper Warning: Lambda can be simplified
 (9): ReSharper Warning: Lambda can be simplified
+(10): ReSharper Warning: Lambda can be simplified

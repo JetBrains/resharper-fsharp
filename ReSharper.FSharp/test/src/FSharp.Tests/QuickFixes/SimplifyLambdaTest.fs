@@ -13,6 +13,7 @@ type SimplifyLambdaTest() =
     [<Test>] member x.``Reference``() = x.DoNamedTest()
     [<Test>] member x.``Partial application 1``() = x.DoNamedTest()
     [<Test>] member x.``Partial application 2``() = x.DoNamedTest()
+    [<Test>] member x.``Partial application 3``() = x.DoNamedTest()
     [<Test>] member x.``In parens``() = x.DoNamedTest()
     [<Test>] member x.``Multiline pats``() = x.DoNamedTest()
     [<Test>] member x.``Multiline body 1``() = x.DoNamedTest()

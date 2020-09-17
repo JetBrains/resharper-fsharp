@@ -26,6 +26,7 @@
     <Compile Include="src\CodeCompletion\FSharpLookupItem.fs" />
     <Compile Include="src\CodeCompletion\FSharpCompletionProviders.fs" />
     <Compile Include="src\CodeStructure\FSharpCodeStructure.fs" />
+    <Compile Include="src\FSharpNamingService.fs" />
     <Compile Include="src\Daemon\Highlightings\TypeHintHighlighting.fs" />
     <Compile Include="src\Daemon\Highlightings\FSharpErrorUtil.fs" />
     <Compile Include="src\Daemon\Highlightings\ErrorHighlightings.fs" />
@@ -111,7 +112,6 @@
     <Compile Include="src\Parsing\FSharpImplTreeBuilder.fs" />
     <Compile Include="src\Parsing\FSharpSigTreeBuilder.fs" />
     <Compile Include="src\Parsing\FSharpParser.fs" />
-    <Compile Include="src\Refactorings\FSharpNamingService.fs" />
     <Compile Include="src\Refactorings\Rename.fs" />
     <Compile Include="src\Refactorings\IntroduceVariable.fs" />
     <Compile Include="src\Refactorings\FSharpInlineVariable.fs" />
@@ -183,7 +183,7 @@
     <Compile Include="src\QuickFixes\SimplifyListConsPatFix.fs" />
     <Compile Include="src\QuickFixes\ReplaceAppExprWithArgFix.fs" />
     <Compile Include="src\QuickFixes\SimplifyLambdaFix.fs" />
-    <Compile Include="src\QuickFixes\ReplaceLambdaFix.fs" />
+    <Compile Include="src\QuickFixes\ReplaceLambdaWithInnerExpressionFix.fs" />
     <Compile Include="src\PostfixTemplates\PostfixTemplates.fs" />
     <Compile Include="src\PostfixTemplates\NotTemplate.fs" />
     <Compile Include="src\PostfixTemplates\LetPostfixTemplate.fs" />

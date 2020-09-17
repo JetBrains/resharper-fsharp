@@ -148,7 +148,7 @@
     <Message value="{0}">
       <Argument>getLambdaCanBeReplacedWarningText replaceCandidate</Argument>
     </Message>
-    <QuickFix>ReplaceLambdaFix</QuickFix>
+    <QuickFix>ReplaceLambdaWithInnerExpressionFix</QuickFix>
   </Warning>
 
 </Errors>

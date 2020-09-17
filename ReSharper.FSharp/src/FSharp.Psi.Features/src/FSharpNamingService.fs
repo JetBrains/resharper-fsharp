@@ -353,6 +353,11 @@ module FSharpNamingService =
                     not (usages.Contains(treeNode))
 
                 member x.ProcessBeforeInterior(treeNode) =
+                    if not (scopes.IsEmpty()) then
+                        let scope = scopes.Peek()
+                        let fsExpr = treeNode.As<IFSharpExpression>()
+                        if scope.Expr == fsExpr then scopedNames.AddRange(scope.Names)
+
                     match treeNode with
                     | :? IReferenceExpr as refExpr ->
                         if usages.Contains(refExpr) then
@@ -412,12 +417,6 @@ module FSharpNamingService =
 
                         if shouldAddToScope name then
                             scopes.Push({| Expr = forExpr.DoExpression; Names = List(Seq.singleton name) |}) |> ignore
-
-                    | :? IFSharpExpression as fsExpr when not (scopes.IsEmpty()) ->
-                        let scope = scopes.Peek()
-                        if scope.Expr == fsExpr then
-                            scopedNames.AddRange(scope.Names)
-
                     | _ -> ()
 
                 member x.ProcessAfterInterior(treeNode) =

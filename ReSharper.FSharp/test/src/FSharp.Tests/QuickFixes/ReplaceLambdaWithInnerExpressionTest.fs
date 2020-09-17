@@ -5,8 +5,8 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Tests
 open NUnit.Framework
 
-type ReplaceLambdaTest() =
-    inherit FSharpQuickFixTestBase<ReplaceLambdaFix>()
+type ReplaceLambdaWithInnerExpressionTest() =
+    inherit FSharpQuickFixTestBase<ReplaceLambdaWithInnerExpressionFix>()
 
     override x.RelativeTestDataPath = "features/quickFixes/replaceLambda"
 
@@ -19,7 +19,7 @@ type ReplaceLambdaTest() =
 
 
 [<FSharpTest>]
-type ReplaceLambdaAvailabilityTest() =
+type ReplaceLambdaWithInnerExpressionAvailabilityTest() =
     inherit QuickFixAvailabilityTestBase()
 
     override x.RelativeTestDataPath = "features/quickFixes/replaceLambda"
