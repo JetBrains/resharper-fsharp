@@ -33,7 +33,7 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
         property("copyRecentToEditor", bool).readonly
     }
 
-    private val RdFcsHost = aggregatedef("RdFcsHost") {
+    private val RdFSharpTestHost = aggregatedef("RdFSharpTestHost") {
         sink("fileChecked", string).async
         sink("projectChecked", string).async
         sink("fcsProjectInvalidated", structdef("RdFcsProject") {
@@ -46,11 +46,12 @@ object RdFSharpModel : Ext(SolutionModel.Solution) {
             field("timestamp", dateTime)
         }.nullable)
         call("dumpSingleProjectMapping", void, string)
+        call("dumpSingleProjectLocalReferences", void, immutableList(string))
     }
 
     init {
         field("fSharpInteractiveHost", RdFSharpInteractiveHost)
-        field("fcsHost", RdFcsHost)
+        field("fsharpTestHost", RdFSharpTestHost)
         property("fcsBusyDelayMs", int)
     }
 }
