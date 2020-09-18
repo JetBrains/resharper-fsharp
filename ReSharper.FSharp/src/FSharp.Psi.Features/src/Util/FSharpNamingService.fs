@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
+module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.NamingUtils
 
 open System
 open System.Collections.Generic
@@ -311,7 +311,7 @@ type FSharpNamingService(language: FSharpLanguage) =
 
 module FSharpNamingService =
     let getUsedNames
-            ([<NotNull>] contextExpr: IFSharpExpression) (usages: List<ITreeNode>) (containingTypeElement: ITypeElement)
+            ([<NotNull>] contextExpr: IFSharpExpression) (usages: IList<ITreeNode>) (containingTypeElement: ITypeElement)
             : ISet<string> =
 
         let usages = HashSet(usages)

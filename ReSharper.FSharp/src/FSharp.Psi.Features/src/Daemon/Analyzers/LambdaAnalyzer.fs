@@ -1,9 +1,9 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
 
 open System.Collections.Generic
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.Errors
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.NamingUtils
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Tree
@@ -14,28 +14,16 @@ open JetBrains.Util
                                                typeof<LambdaCanBeReplacedWarning>|])>]
 type LambdaAnalyzer() =
     inherit ElementProblemAnalyzer<ILambdaExpr>()
-
-    let rec containsAnyNode (set: ISet<string>) (nodes: ITreeNode seq) =
-        if nodes.IsEmpty() then false else
-
-        let contains = 
-            match Seq.head nodes with
-            | :? ILocalReferencePat as pat -> set.Contains(pat.SourceName)
-            | _ -> false
-
-        if contains then true else containsAnyNode set (Seq.tail nodes)
     
-    let rec collectPatsPatterns (pats: IFSharpPattern seq) (acc: IList<_>) =
-        if pats.IsEmpty() then () else 
+    let rec containsPats (set: ISet<_>) (pats: IFSharpPattern seq) =
+        if pats.IsEmpty() then false else
+        if not (containsPat set (Seq.head pats)) then containsPats set (Seq.tail pats) else true
 
-        collectPatPatterns (Seq.head pats) acc
-        collectPatsPatterns (Seq.tail pats) acc
-    
-    and collectPatPatterns (pat: IFSharpPattern) (acc: IList<_>) =
+    and containsPat (set: ISet<_>) (pat: IFSharpPattern)  =
         match pat.IgnoreInnerParens() with
-        | :? ITuplePat as pat -> collectPatsPatterns pat.PatternsEnumerable acc
-        | :? ILocalReferencePat as pat -> acc.Add(pat :> ITreeNode)
-        | _ -> ()
+        | :? ITuplePat as pat -> containsPats set pat.PatternsEnumerable
+        | :? ILocalReferencePat as pat -> set.Contains(pat.SourceName)
+        | _ -> false
 
     let rec compareArg (pat: IFSharpPattern) (arg: IFSharpExpression) =
         match pat.IgnoreInnerParens(), arg.IgnoreInnerParens() with
@@ -52,7 +40,7 @@ type LambdaAnalyzer() =
 
         compareArg (Seq.head pats) (Seq.head args) && compareArgsSeq (Seq.tail pats) (Seq.tail args)
     
-    and compareArgs (pats: TreeNodeCollection<IFSharpPattern>) (expr: IFSharpExpression) =
+    and compareArgs (pats: TreeNodeCollection<_>) (expr: IFSharpExpression) =
         let rec compareArgsRec (expr: IFSharpExpression) i =
             let hasMatches = i > 0
             match expr.IgnoreInnerParens() with
@@ -61,14 +49,12 @@ type LambdaAnalyzer() =
                 let equal = compareArg pat app.ArgumentExpression
                 let funExpr = app.FunctionExpression
 
-                let continueCompare =
+                let isPatRedundant =
                     equal &&
-                    let pats = List()
-                    collectPatPatterns pat (List())     
-                    let usedNames = FSharpNamingService.getUsedNames funExpr pats null
-                    not (containsAnyNode usedNames pats)
+                    let usedNames = FSharpNamingService.getUsedNames funExpr EmptyList.Instance null
+                    not (containsPat usedNames pat)
 
-                if continueCompare then compareArgsRec funExpr (i + 1) else (hasMatches, false, app :> IFSharpExpression)
+                if isPatRedundant then compareArgsRec funExpr (i + 1) else (hasMatches, false, app :> IFSharpExpression)
             | x -> hasMatches, i = pats.Count, x
 
         compareArgsRec expr 0

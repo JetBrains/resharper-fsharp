@@ -19,6 +19,7 @@
     <Compile Include="src\Util\FSharpResolveUtil.fs" />
     <Compile Include="src\Util\FcsTypesUtil.fs" />
     <Compile Include="src\Util\FSharpModulesUtil.fs" />
+    <Compile Include="src\Util\FSharpNamingService.fs" />
     <Compile Include="src\CodeCompletion\CompletionUtil.fs" />
     <Compile Include="src\CodeCompletion\FSharpCodeCompletionContext.fs" />
     <Compile Include="src\CodeCompletion\FSharpPathCompletionProvider.fs" />
@@ -26,7 +27,6 @@
     <Compile Include="src\CodeCompletion\FSharpLookupItem.fs" />
     <Compile Include="src\CodeCompletion\FSharpCompletionProviders.fs" />
     <Compile Include="src\CodeStructure\FSharpCodeStructure.fs" />
-    <Compile Include="src\FSharpNamingService.fs" />
     <Compile Include="src\Daemon\Highlightings\TypeHintHighlighting.fs" />
     <Compile Include="src\Daemon\Highlightings\FSharpErrorUtil.fs" />
     <Compile Include="src\Daemon\Highlightings\ErrorHighlightings.fs" />

@@ -8,7 +8,6 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
-open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
 
 type SimplifyLambdaFix(warning: LambdaCanBeSimplifiedWarning) =
@@ -36,6 +35,7 @@ type SimplifyLambdaFix(warning: LambdaCanBeSimplifiedWarning) =
 
         let patterns = lambda.Patterns
         let arrow = lambda.RArrow
+        let nodeAfterPats = lambda.Parameters.NextSibling
         let redundantArgsCount = countRedundantArgs replaceCandidate
         let firstNodeToDelete = patterns.[patterns.Count - redundantArgsCount - 1].NextSibling
         let lastNodeToDelete = patterns.Last()
@@ -43,7 +43,7 @@ type SimplifyLambdaFix(warning: LambdaCanBeSimplifiedWarning) =
 
         deleteChildRange firstNodeToDelete lastNodeToDelete
 
-        if isWhitespace arrow.PrevSibling then replace arrow.PrevSibling (Whitespace(1))
+        if nodeAfterPats != arrow then replaceRangeWithNode nodeAfterPats arrow.PrevSibling (Whitespace(1))
         else ModificationUtil.AddChildBefore(arrow, Whitespace(1)) |> ignore
 
         shiftExpr -indentDiff expr
