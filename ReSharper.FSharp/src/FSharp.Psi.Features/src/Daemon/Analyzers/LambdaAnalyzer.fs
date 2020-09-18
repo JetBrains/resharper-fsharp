@@ -14,15 +14,11 @@ open JetBrains.Util
                                                typeof<LambdaCanBeReplacedWarning>|])>]
 type LambdaAnalyzer() =
     inherit ElementProblemAnalyzer<ILambdaExpr>()
-    
-    let rec containsPats (set: ISet<_>) (pats: IFSharpPattern seq) =
-        if pats.IsEmpty() then false else
-        if not (containsPat set (Seq.head pats)) then containsPats set (Seq.tail pats) else true
 
-    and containsPat (set: ISet<_>) (pat: IFSharpPattern)  =
+    let rec patIsUsed (usedNames: ISet<_>) (pat: IFSharpPattern)  =
         match pat.IgnoreInnerParens() with
-        | :? ITuplePat as pat -> containsPats set pat.PatternsEnumerable
-        | :? ILocalReferencePat as pat -> set.Contains(pat.SourceName)
+        | :? ITuplePat as tuplePat -> Seq.exists (patIsUsed usedNames) tuplePat.PatternsEnumerable
+        | :? ILocalReferencePat as refPat -> usedNames.Contains(refPat.SourceName)
         | _ -> false
 
     let rec compareArg (pat: IFSharpPattern) (arg: IFSharpExpression) =
@@ -39,7 +35,7 @@ type LambdaAnalyzer() =
         if pats.IsEmpty() then false else
 
         compareArg (Seq.head pats) (Seq.head args) && compareArgsSeq (Seq.tail pats) (Seq.tail args)
-    
+
     and compareArgs (pats: TreeNodeCollection<_>) (expr: IFSharpExpression) =
         let rec compareArgsRec (expr: IFSharpExpression) i =
             let hasMatches = i > 0
@@ -52,7 +48,7 @@ type LambdaAnalyzer() =
                 let isPatRedundant =
                     equal &&
                     let usedNames = FSharpNamingService.getUsedNames funExpr EmptyList.Instance null false
-                    not (containsPat usedNames pat)
+                    not (patIsUsed usedNames pat)
 
                 if isPatRedundant then compareArgsRec funExpr (i + 1) else (hasMatches, false, app :> IFSharpExpression)
             | x -> hasMatches, i = pats.Count, x

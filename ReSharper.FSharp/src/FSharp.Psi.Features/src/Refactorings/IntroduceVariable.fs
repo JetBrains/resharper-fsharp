@@ -273,7 +273,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
         let addSpaceNearIdents = needsSpaceAfterIdentNodeTypes.[sourceExpr.NodeType]
 
-        let usedNames = FSharpNamingService.getUsedNames contextExpr data.Usages containingTypeElement true
+        let usedNames = getUsedNames contextExpr data.Usages containingTypeElement true
         let names = getNames usedNames sourceExpr
         let name = if names.Count > 0 then names.[0] else "x"
 

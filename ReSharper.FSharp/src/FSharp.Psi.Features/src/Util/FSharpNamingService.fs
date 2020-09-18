@@ -311,8 +311,8 @@ type FSharpNamingService(language: FSharpLanguage) =
 
 module FSharpNamingService =
     let getUsedNames
-            ([<NotNull>] contextExpr: IFSharpExpression) (usages: IList<ITreeNode>) (containingTypeElement: ITypeElement)
-            (checkFcsSymbol) : ISet<string> =
+            (contextExpr: IFSharpExpression) (usages: IList<ITreeNode>) (containingTypeElement: ITypeElement)
+            checkFcsSymbols: ISet<string> =
 
         let usages = HashSet(usages)
         let usedNames = HashSet()
@@ -370,7 +370,7 @@ module FSharpNamingService =
                         if name = SharedImplUtil.MISSING_DECLARATION_NAME ||
                                 scopedNames.Contains(name) || usedNames.Contains(name) then () else
 
-                        if not checkFcsSymbol || refExpr.Reference.HasFcsSymbol then
+                        if not checkFcsSymbols || refExpr.Reference.HasFcsSymbol then
                             usedNames.Add(name) |> ignore
 
                     | :? ILetOrUseExpr as letExpr ->
