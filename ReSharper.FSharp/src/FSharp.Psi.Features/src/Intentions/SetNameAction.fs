@@ -4,7 +4,7 @@ open System
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.LiveTemplates
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.NamingUtils.FSharpNamingService
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpNamingService
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI

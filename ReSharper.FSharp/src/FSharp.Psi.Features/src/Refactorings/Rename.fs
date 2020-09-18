@@ -9,7 +9,7 @@ open JetBrains.DocumentModel
 open JetBrains.IDE.UI.Extensions.Validation
 open JetBrains.ReSharper.Feature.Services.Refactorings.Specific.Rename
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.NamingUtils
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement.CompilerGenerated
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree

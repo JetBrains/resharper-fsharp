@@ -1,4 +1,4 @@
-module JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.NamingUtils
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 
 open System
 open System.Collections.Generic
@@ -312,7 +312,7 @@ type FSharpNamingService(language: FSharpLanguage) =
 module FSharpNamingService =
     let getUsedNames
             ([<NotNull>] contextExpr: IFSharpExpression) (usages: IList<ITreeNode>) (containingTypeElement: ITypeElement)
-            : ISet<string> =
+            (checkFcsSymbol) : ISet<string> =
 
         let usages = HashSet(usages)
         let usedNames = HashSet()
@@ -370,7 +370,7 @@ module FSharpNamingService =
                         if name = SharedImplUtil.MISSING_DECLARATION_NAME ||
                                 scopedNames.Contains(name) || usedNames.Contains(name) then () else
 
-                        if refExpr.Reference.HasFcsSymbol then
+                        if not checkFcsSymbol || refExpr.Reference.HasFcsSymbol then
                             usedNames.Add(name) |> ignore
 
                     | :? ILetOrUseExpr as letExpr ->

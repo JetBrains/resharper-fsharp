@@ -3,7 +3,7 @@
 open System.Collections.Generic
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.Errors
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.NamingUtils
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Tree
@@ -51,7 +51,7 @@ type LambdaAnalyzer() =
 
                 let isPatRedundant =
                     equal &&
-                    let usedNames = FSharpNamingService.getUsedNames funExpr EmptyList.Instance null
+                    let usedNames = FSharpNamingService.getUsedNames funExpr EmptyList.Instance null false
                     not (containsPat usedNames pat)
 
                 if isPatRedundant then compareArgsRec funExpr (i + 1) else (hasMatches, false, app :> IFSharpExpression)

@@ -14,5 +14,4 @@ fun x (a, b) -> f 1 x (a, b)
 
 fun (a, b) (c, d) -> f 1 (a, b) (c, d)
 
-fun x -> f x x
 fun (a, b) x -> f a (a, b) x
