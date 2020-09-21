@@ -311,7 +311,7 @@ type FSharpNamingService(language: FSharpLanguage) =
 
 module FSharpNamingService =
     let getUsedNames
-            (contextExpr: IFSharpExpression) (usages: IList<ITreeNode>) (containingTypeElement: ITypeElement)
+            ([<NotNull>] contextExpr: IFSharpExpression) (usages: IList<ITreeNode>) (containingTypeElement: ITypeElement)
             checkFcsSymbols: ISet<string> =
 
         let usages = HashSet(usages)
