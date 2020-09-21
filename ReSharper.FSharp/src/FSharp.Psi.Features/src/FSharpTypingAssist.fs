@@ -116,7 +116,8 @@ type FSharpTypingAssist
     static let bracketsAllowingDeindent =
         [| FSharpTokenType.LBRACE
            FSharpTokenType.LBRACK
-           FSharpTokenType.LBRACK_BAR |]
+           FSharpTokenType.LBRACK_BAR
+           FSharpTokenType.LPAREN |]
         |> HashSet
 
     static let leftBrackets =
@@ -788,7 +789,12 @@ type FSharpTypingAssist
         let indentString = baseIndentString + String(' ',  getIndentSize textControl)
 
         if lastElementEndOffset = leftBracketEndOffset then
-            let newText = indentString + baseIndentString
+            let newText =
+                if tokenType == FSharpTokenType.LPAREN then
+                    indentString
+                else
+                    indentString + baseIndentString
+
             document.ReplaceText(TextRange(lastElementEndOffset, rightBracketStartOffset), newText)
         else
             let firstElementStartOffset =
@@ -797,7 +803,9 @@ type FSharpTypingAssist
                     lexer.Advance()
                 lexer.TokenStart
 
-            document.ReplaceText(TextRange(lastElementEndOffset, rightBracketStartOffset), baseIndentString)
+            if tokenType != FSharpTokenType.LPAREN then
+                document.ReplaceText(TextRange(lastElementEndOffset, rightBracketStartOffset), baseIndentString)
+
             document.ReplaceText(TextRange(leftBracketEndOffset, firstElementStartOffset), indentString)
 
         textControl.Caret.MoveTo(leftBracketEndOffset + indentString.Length, CaretVisualPlacement.DontScrollIfVisible)
