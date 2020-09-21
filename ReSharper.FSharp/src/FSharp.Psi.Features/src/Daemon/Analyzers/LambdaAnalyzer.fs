@@ -10,7 +10,7 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
 [<ElementProblemAnalyzer(typeof<ILambdaExpr>,
-                         HighlightingTypes = [|typeof<LambdaCanBeSimplifiedWarning>;
+                         HighlightingTypes = [|typeof<LambdaCanBeSimplifiedWarning>
                                                typeof<LambdaCanBeReplacedWarning>
                                                typeof<ExpressionCanBeReplacedWithIdWarning>|])>]
 type LambdaAnalyzer() =
