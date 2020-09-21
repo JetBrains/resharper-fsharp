@@ -149,6 +149,7 @@
       <Argument>getLambdaCanBeReplacedWarningText replaceCandidate</Argument>
     </Message>
     <QuickFix>ReplaceLambdaWithInnerExpressionFix</QuickFix>
+    <QuickFix>ReplaceExpressionWithIdFix</QuickFix>
   </Warning>
 
 </Errors>
