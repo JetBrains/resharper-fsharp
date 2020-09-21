@@ -9,4 +9,4 @@
 (1): ReSharper Warning: Lambda can be replaced with 'id'
 (2): ReSharper Warning: Lambda can be replaced with 'id'
 (3): ReSharper Warning: Lambda can be replaced with 'id'
-(4): ReSharper Warning: Lambda can be simplified
+(4): ReSharper Warning: Lambda body can be replaced with 'id'

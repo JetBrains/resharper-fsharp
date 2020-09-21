@@ -10,6 +10,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.Util
 
 let getTreeNodesDocumentRange (startNode: ITreeNode) (endNode: ITreeNode) =
     let startOffset = startNode.GetDocumentStartOffset()
@@ -98,5 +99,11 @@ let getReferenceExprName (expr: IFSharpExpression) =
 let getLambdaCanBeReplacedWarningText (replaceCandidate: IFSharpExpression) =
     match replaceCandidate with
     | :? IReferenceExpr as x -> sprintf "Lambda can be replaced with '%s'" x.ShortName
-    | null -> "Lambda can be replaced with 'id'"
     | _ -> "Lambda can be simplified"
+
+let getExpressionCanBeReplacedWithIdWarningText (expr: IFSharpExpression) =
+    match expr with
+    | :? ILambdaExpr as lambda ->
+        if lambda.PatternsEnumerable.CountIs(1) then "Lambda can be replaced with 'id'"
+        else "Lambda body can be replaced with 'id'"
+    | _ -> "Expression can be replaced with 'id'"

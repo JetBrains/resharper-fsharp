@@ -11,7 +11,8 @@ open JetBrains.Util
 
 [<ElementProblemAnalyzer(typeof<ILambdaExpr>,
                          HighlightingTypes = [|typeof<LambdaCanBeSimplifiedWarning>;
-                                               typeof<LambdaCanBeReplacedWarning>|])>]
+                                               typeof<LambdaCanBeReplacedWarning>
+                                               typeof<ExpressionCanBeReplacedWithIdWarning>|])>]
 type LambdaAnalyzer() =
     inherit ElementProblemAnalyzer<ILambdaExpr>()
 
@@ -77,7 +78,5 @@ type LambdaAnalyzer() =
             consumer.AddHighlighting(LambdaCanBeSimplifiedWarning(lambda, replaceCandidate))
         | _ ->
 
-        match compareArg (pats.LastOrDefault()) expr, pats.Count = 1 with
-        | true, true -> consumer.AddHighlighting(LambdaCanBeReplacedWarning(lambda, null))
-        | true, false -> consumer.AddHighlighting(LambdaCanBeSimplifiedWarning(lambda, null))
-        | _ -> ()
+        if compareArg (pats.LastOrDefault()) expr then
+            consumer.AddHighlighting(ExpressionCanBeReplacedWithIdWarning(lambda))
