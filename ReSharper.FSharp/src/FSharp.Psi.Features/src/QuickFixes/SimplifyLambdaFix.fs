@@ -3,6 +3,7 @@
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpLambdaUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
@@ -34,16 +35,10 @@ type SimplifyLambdaFix(warning: LambdaCanBeSimplifiedWarning) =
         let expr = ModificationUtil.ReplaceChild(lambda.Expression, replaceCandidate)
 
         let patterns = lambda.Patterns
-        let arrow = lambda.RArrow
-        let nodeAfterPats = lambda.Parameters.NextSibling
         let redundantArgsCount = countRedundantArgs replaceCandidate
         let firstNodeToDelete = patterns.[patterns.Count - redundantArgsCount - 1].NextSibling
-        let lastNodeToDelete = patterns.Last()
-        let indentDiff = arrow.Indent - firstNodeToDelete.Indent - 1
+        let indentDiff = lambda.RArrow.Indent - firstNodeToDelete.Indent - 1
 
-        deleteChildRange firstNodeToDelete lastNodeToDelete
-
-        if nodeAfterPats != arrow then replaceRangeWithNode nodeAfterPats arrow.PrevSibling (Whitespace(1))
-        else ModificationUtil.AddChildBefore(arrow, Whitespace(1)) |> ignore
+        deleteLastArgs lambda patterns redundantArgsCount
 
         shiftExpr -indentDiff expr

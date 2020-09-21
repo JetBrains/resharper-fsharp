@@ -3,10 +3,9 @@
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.QuickFixes
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpLambdaUtil
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.ExtensionsAPI
-open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
@@ -44,9 +43,7 @@ type ReplaceExpressionWithIdFix(expr: IFSharpExpression) =
 
         match expr with
         | :? ILambdaExpr as lambda ->
-            let arrow = lambda.RArrow
             let pats = lambda.Patterns
-            let nodeAfterPats = lambda.Parameters.NextSibling
             let replaceBody = pats.Count = 1
 
             if replaceBody then
@@ -54,9 +51,6 @@ type ReplaceExpressionWithIdFix(expr: IFSharpExpression) =
                 let nodeToReplace = if isNotNull paren then paren :> IFSharpExpression else expr
                 replace nodeToReplace (factory.CreateReferenceExpr("id"))
             else
-                if nodeAfterPats != arrow then replaceRangeWithNode nodeAfterPats arrow.PrevSibling (Whitespace(1))
-                else ModificationUtil.AddChildBefore(arrow, Whitespace(1)) |> ignore
-
-                deleteChildRange (pats.[pats.Count - 2]).NextSibling (pats.Last())
+                deleteLastArgs lambda pats 1
                 replace lambda.Expression (factory.CreateReferenceExpr("id"))
         | _ -> ()
