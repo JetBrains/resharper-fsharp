@@ -314,6 +314,7 @@ listPat options { stubBase="FSharpPatternBase"; }:
   RBRACK<RBRACE, RightBracket>;
 
 tuplePat options { stubBase="FSharpPatternBase"; }:
+  STRUCT<STRUCT, StructKeyword>?
   LIST fSharpPattern<ATTRIBUTE, Patterns> SEP COMMA<FSHARP_COMMA, Commas>;
 
 parenPat options { stubBase="FSharpPatternBase"; }:

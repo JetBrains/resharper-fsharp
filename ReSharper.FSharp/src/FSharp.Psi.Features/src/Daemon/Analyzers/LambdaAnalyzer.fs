@@ -24,6 +24,7 @@ type LambdaAnalyzer() =
     let rec compareArg (pat: IFSharpPattern) (arg: IFSharpExpression) =
         match pat.IgnoreInnerParens(), arg.IgnoreInnerParens() with
         | :? ITuplePat as pat, (:? ITupleExpr as expr) ->
+            (isNull pat.StructKeyword = isNull expr.StructKeyword) && 
             compareArgsSeq pat.PatternsEnumerable expr.ExpressionsEnumerable
         | :? ILocalReferencePat as pat, (:? IReferenceExpr as reference) ->
             pat.SourceName = reference.ShortName

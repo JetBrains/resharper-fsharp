@@ -15,3 +15,6 @@ fun (a, b) (c, d, e) -> f (a, b, c, d, e)
 fun x -> f x x
 fun (a, b) -> f a (a, b)
 fun x -> (fun y -> x) x
+
+fun struct(a, b) -> (a, b)
+fun (a, b) -> struct(a, b)
