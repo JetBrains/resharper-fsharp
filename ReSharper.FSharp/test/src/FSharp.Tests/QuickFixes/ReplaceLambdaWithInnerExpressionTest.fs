@@ -24,5 +24,6 @@ type ReplaceLambdaWithInnerExpressionAvailabilityTest() =
     override x.RelativeTestDataPath = "features/quickFixes/replaceLambda"
 
     [<Test>] member x.``Text - Replace lambda with reference``() = x.DoNamedTest()
+    [<Test>] member x.``Text - Replace lambda with qualified reference``() = x.DoNamedTest()
     [<Test>] member x.``Text - Replace lambda with partial application``() = x.DoNamedTest()
     [<Test>] member x.``Text - Simplify lambda``() = x.DoNamedTest()

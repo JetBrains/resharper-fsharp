@@ -11,6 +11,6 @@ type ReplaceLambdaWithInnerExpressionFix(warning: LambdaCanBeReplacedWarning) =
 
     override x.Text =
         match replaceCandidate with
-        | :? IReferenceExpr as ref -> sprintf "Replace lambda with '%s'" ref.ShortName
+        | :? IReferenceExpr as ref -> sprintf "Replace lambda with '%s'" ref.QualifiedName
         | :? IPrefixAppExpr -> "Replace lambda with partial application"
         | _ -> "Simplify lambda"

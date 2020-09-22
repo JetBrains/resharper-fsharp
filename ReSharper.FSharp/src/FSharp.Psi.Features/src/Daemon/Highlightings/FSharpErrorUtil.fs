@@ -98,7 +98,7 @@ let getReferenceExprName (expr: IFSharpExpression) =
 
 let getLambdaCanBeReplacedWarningText (replaceCandidate: IFSharpExpression) =
     match replaceCandidate with
-    | :? IReferenceExpr as x -> sprintf "Lambda can be replaced with '%s'" x.ShortName
+    | :? IReferenceExpr as x -> sprintf "Lambda can be replaced with '%s'" x.QualifiedName
     | _ -> "Lambda can be simplified"
 
 let getExpressionCanBeReplacedWithIdWarningText (expr: IFSharpExpression) =

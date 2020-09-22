@@ -5,6 +5,7 @@ fun x -> f 1 x
 fun x y -> f y
 fun x y -> f 1 y
 fun x y -> f 1 x y
+fun x -> Math.Abs x
 
 fun x () -> f ()
 
