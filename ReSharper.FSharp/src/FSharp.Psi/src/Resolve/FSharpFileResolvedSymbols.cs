@@ -227,8 +227,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Resolve
               !(lexer.FindTokenAt(nameRange.EndOffset - 1) && (lexer.TokenType?.IsIdentifier ?? false)))
             continue;
 
-          if (!resolvedSymbols.Declarations.ContainsKey(startOffset))
+          // IsFromPattern helps in cases where fake value is created at range,
+          // e.g. `fun Literal -> ()` has both pattern and binding symbols at pattern range. 
+          if (symbolUse.IsFromPattern || !resolvedSymbols.Declarations.ContainsKey(startOffset))
             resolvedSymbols.Uses[startOffset] = new FSharpResolvedSymbolUse(symbolUse, nameRange);
+          if (symbolUse.IsFromPattern)
+            resolvedSymbols.Declarations.Remove(startOffset);
         }
 
         interruptChecker.CheckForInterrupt();

@@ -1,0 +1,3 @@
+﻿let [<Literal>] zzz = 123
+
+fun zzz -> zzz
