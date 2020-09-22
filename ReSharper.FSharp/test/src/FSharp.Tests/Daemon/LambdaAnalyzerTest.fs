@@ -14,7 +14,8 @@ type LambdaAnalyzerTest() =
     override x.HighlightingPredicate(highlighting, _, _) =
         match highlighting with
         | :? LambdaCanBeSimplifiedWarning
-        | :? LambdaCanBeReplacedWarning -> true
+        | :? LambdaCanBeReplacedWarning
+        | :? ExpressionCanBeReplacedWithIdWarning -> true
         | _ -> false
 
     [<Test>] member x.``Application``() = x.DoNamedTest()

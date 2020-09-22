@@ -84,6 +84,9 @@
     <Compile Include="QuickFixes\AddParensToApplicationTest.fs" />
     <Compile Include="QuickFixes\NamespaceToModuleTest.fs" />
     <Compile Include="QuickFixes\SimplifyListConsPatTest.fs" />
+    <Compile Include="QuickFixes\SimplifyLambdaTest.fs" />
+    <Compile Include="QuickFixes\ReplaceLambdaWithInnerExpressionTest.fs" />
+    <Compile Include="QuickFixes\ReplaceExpressionWithIdTest.fs" />
     <Compile Include="Intentions\IntentionsTestBase.fs" />
     <Compile Include="Intentions\ToRecursiveLetBindings.fs" />
     <Compile Include="Intentions\ToMultilineRecordTest.fs" />

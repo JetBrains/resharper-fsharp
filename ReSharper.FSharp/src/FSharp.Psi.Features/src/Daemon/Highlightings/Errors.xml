@@ -137,6 +137,7 @@
     <Range>lambdaExpr.GetHighlightingRange()</Range>
     <Behavour overlapResolvePolicy="NONE"/>
     <Message value="Lambda can be simplified"/>
+    <QuickFix>SimplifyLambdaFix</QuickFix>
   </Warning>
 
   <Warning staticGroup="FSharpErrors" name="LambdaCanBeReplaced">
@@ -147,6 +148,17 @@
     <Message value="{0}">
       <Argument>getLambdaCanBeReplacedWarningText replaceCandidate</Argument>
     </Message>
+    <QuickFix>ReplaceLambdaWithInnerExpressionFix</QuickFix>
+  </Warning>
+
+  <Warning staticGroup="FSharpErrors" name="ExpressionCanBeReplacedWithId">
+    <Parameter type="IFSharpExpression" name="expr"/>
+    <Behavour overlapResolvePolicy="NONE"/>
+    <Range>expr.GetHighlightingRange()</Range>
+    <Message value="{0}">
+      <Argument>getExpressionCanBeReplacedWithIdWarningText expr</Argument>
+    </Message>
+    <QuickFix>ReplaceExpressionWithIdFix</QuickFix>
   </Warning>
 
 </Errors>

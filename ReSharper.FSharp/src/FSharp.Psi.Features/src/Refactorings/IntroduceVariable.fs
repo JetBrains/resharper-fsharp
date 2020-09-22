@@ -12,8 +12,8 @@ open JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots
 open JetBrains.ReSharper.Feature.Services.Refactorings
 open JetBrains.ReSharper.Feature.Services.Refactorings.Specific
 open JetBrains.ReSharper.Plugins.FSharp.Psi
-open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings.FSharpNamingService
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util.FSharpNamingService
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
@@ -273,7 +273,7 @@ type FSharpIntroduceVariable(workflow, solution, driver) =
 
         let addSpaceNearIdents = needsSpaceAfterIdentNodeTypes.[sourceExpr.NodeType]
 
-        let usedNames = FSharpNamingService.getUsedNames contextExpr data.Usages containingTypeElement
+        let usedNames = getUsedNames contextExpr data.Usages containingTypeElement true
         let names = getNames usedNames sourceExpr
         let name = if names.Count > 0 then names.[0] else "x"
 

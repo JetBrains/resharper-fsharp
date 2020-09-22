@@ -1,4 +1,4 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Refactorings
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 
 open System
 open System.Collections.Generic
@@ -311,8 +311,8 @@ type FSharpNamingService(language: FSharpLanguage) =
 
 module FSharpNamingService =
     let getUsedNames
-            ([<NotNull>] contextExpr: IFSharpExpression) (usages: List<ITreeNode>) (containingTypeElement: ITypeElement)
-            : ISet<string> =
+            ([<NotNull>] contextExpr: IFSharpExpression) (usages: IList<ITreeNode>) (containingTypeElement: ITypeElement)
+            checkFcsSymbols: ISet<string> =
 
         let usages = HashSet(usages)
         let usedNames = HashSet()
@@ -353,6 +353,11 @@ module FSharpNamingService =
                     not (usages.Contains(treeNode))
 
                 member x.ProcessBeforeInterior(treeNode) =
+                    if not (scopes.IsEmpty()) then
+                        let scope = scopes.Peek()
+                        let fsExpr = treeNode.As<IFSharpExpression>()
+                        if scope.Expr == fsExpr then scopedNames.AddRange(scope.Names)
+
                     match treeNode with
                     | :? IReferenceExpr as refExpr ->
                         if usages.Contains(refExpr) then
@@ -365,7 +370,7 @@ module FSharpNamingService =
                         if name = SharedImplUtil.MISSING_DECLARATION_NAME ||
                                 scopedNames.Contains(name) || usedNames.Contains(name) then () else
 
-                        if refExpr.Reference.HasFcsSymbol then
+                        if not checkFcsSymbols || refExpr.Reference.HasFcsSymbol then
                             usedNames.Add(name) |> ignore
 
                     | :? ILetOrUseExpr as letExpr ->
@@ -412,12 +417,6 @@ module FSharpNamingService =
 
                         if shouldAddToScope name then
                             scopes.Push({| Expr = forExpr.DoExpression; Names = List(Seq.singleton name) |}) |> ignore
-
-                    | :? IFSharpExpression as fsExpr when not (scopes.IsEmpty()) ->
-                        let scope = scopes.Peek()
-                        if scope.Expr == fsExpr then
-                            scopedNames.AddRange(scope.Names)
-
                     | _ -> ()
 
                 member x.ProcessAfterInterior(treeNode) =

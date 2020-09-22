@@ -1,0 +1,11 @@
+﻿module Test
+
+module A = 
+ let f _ = ()
+
+let _ = |fun x -> A.f x|(0)
+
+------------------------------------------------
+0: Lambda can be replaced with 'A.f'
+QUICKFIXES:
+Replace lambda with 'A.f'
