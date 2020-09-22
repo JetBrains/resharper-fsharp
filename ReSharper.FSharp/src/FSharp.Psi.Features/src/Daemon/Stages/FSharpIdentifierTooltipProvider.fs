@@ -24,8 +24,8 @@ let [<Literal>] RiderTooltipSeparator = "_RIDER_HORIZONTAL_LINE_TOOLTIP_SEPARATO
 
 [<SolutionComponent>]
 type FSharpIdentifierTooltipProvider
-        (lifetime, solution, presenter, xmlDocService: FSharpXmlDocService, textStylesService, textStyles) =
-    inherit IdentifierTooltipProvider<FSharpLanguage>(lifetime, solution, presenter, textStylesService, textStyles)
+        (lifetime, solution, presenter, xmlDocService: FSharpXmlDocService, textStylesService) =
+    inherit IdentifierTooltipProvider<FSharpLanguage>(lifetime, solution, presenter, textStylesService)
 
     let [<Literal>] opName = "FSharpIdentifierTooltipProvider"
 
