@@ -18,3 +18,11 @@ fun x -> (fun y -> x) x
 
 fun struct(a, b) -> (a, b)
 fun (a, b) -> struct(a, b)
+
+module A =
+    let [<Literal>] b = 5
+
+fun None -> None
+fun A.b -> b
+fun b -> A.b
+fun A.b -> A.b

@@ -1,5 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
 
+open System
 open System.Collections.Generic
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.Errors
@@ -27,8 +28,10 @@ type LambdaAnalyzer() =
         | :? ITuplePat as pat, (:? ITupleExpr as expr) ->
             (isNull pat.StructKeyword = isNull expr.StructKeyword) && 
             compareArgsSeq pat.PatternsEnumerable expr.ExpressionsEnumerable
-        | :? ILocalReferencePat as pat, (:? IReferenceExpr as reference) ->
-            pat.SourceName = reference.ShortName
+        | :? ILocalReferencePat as pat, (:? IReferenceExpr as expr) ->
+            not pat.ReferenceName.IsQualified && Char.IsLower(pat.SourceName.[0]) &&
+            not expr.IsQualified && Char.IsLower(expr.ShortName.[0]) &&
+            pat.SourceName = expr.ShortName
         | :? IUnitPat, (:? IUnitExpr) -> true
         | _ -> false
 
