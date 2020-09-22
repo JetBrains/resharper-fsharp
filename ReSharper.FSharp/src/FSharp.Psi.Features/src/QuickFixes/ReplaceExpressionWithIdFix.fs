@@ -12,7 +12,7 @@ open JetBrains.Util
 type ReplaceExpressionWithIdFix(expr: IFSharpExpression) =
     inherit FSharpQuickFixBase()
 
-    let hasIdCollision =
+    let idIsShadowed =
         match expr with
         | :? ILambdaExpr as lambda ->
             match lambda.CheckerService.ResolveNameAtLocation(lambda.RArrow, ["id"], "ReplaceExpressionWithIdFix") with
@@ -26,15 +26,16 @@ type ReplaceExpressionWithIdFix(expr: IFSharpExpression) =
             if lambda.PatternsEnumerable.CountIs(1) then "Replace lambda with 'id'" else "Replace lambda body with 'id'"
         | _ -> "Replace with 'id'"
 
-    new(warning: ExpressionCanBeReplacedWithIdWarning) = ReplaceExpressionWithIdFix(warning.Expr)
-    
+    new (warning: ExpressionCanBeReplacedWithIdWarning) =
+        ReplaceExpressionWithIdFix(warning.Expr)
+
     override x.IsAvailable _ =
         let isApplicable =
             match expr with
             | :? ILambdaExpr as lambda -> isValid lambda
             | _ -> false
-         
-        isApplicable && not hasIdCollision
+
+        isApplicable && not idIsShadowed
 
     override x.ExecutePsiTransaction _ =
         use writeCookie = WriteLockCookie.Create(expr.IsPhysical())
@@ -51,6 +52,6 @@ type ReplaceExpressionWithIdFix(expr: IFSharpExpression) =
                 let nodeToReplace = if isNotNull paren then paren :> IFSharpExpression else expr
                 replace nodeToReplace (factory.CreateReferenceExpr("id"))
             else
-                deleteLastArgs lambda pats 1
+                deletePatternsFromEnd lambda 1
                 replace lambda.Expression (factory.CreateReferenceExpr("id"))
         | _ -> ()
