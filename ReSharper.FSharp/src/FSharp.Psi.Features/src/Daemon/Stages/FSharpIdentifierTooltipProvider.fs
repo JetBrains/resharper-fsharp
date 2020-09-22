@@ -23,8 +23,9 @@ open JetBrains.Util
 let [<Literal>] RiderTooltipSeparator = "_RIDER_HORIZONTAL_LINE_TOOLTIP_SEPARATOR_"
 
 [<SolutionComponent>]
-type FSharpIdentifierTooltipProvider(lifetime, solution, presenter, xmlDocService: FSharpXmlDocService) =
-    inherit IdentifierTooltipProvider<FSharpLanguage>(lifetime, solution, presenter)
+type FSharpIdentifierTooltipProvider
+        (lifetime, solution, presenter, xmlDocService: FSharpXmlDocService, textStylesService, textStyles) =
+    inherit IdentifierTooltipProvider<FSharpLanguage>(lifetime, solution, presenter, textStylesService, textStyles)
 
     let [<Literal>] opName = "FSharpIdentifierTooltipProvider"
 
