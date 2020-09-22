@@ -11,9 +11,9 @@ open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
 [<ElementProblemAnalyzer(typeof<ILambdaExpr>,
-                         HighlightingTypes = [|typeof<LambdaCanBeSimplifiedWarning>
-                                               typeof<LambdaCanBeReplacedWarning>
-                                               typeof<ExpressionCanBeReplacedWithIdWarning>|])>]
+                         HighlightingTypes = [| typeof<LambdaCanBeSimplifiedWarning>
+                                                typeof<LambdaCanBeReplacedWarning>
+                                                typeof<ExpressionCanBeReplacedWithIdWarning> |])>]
 type LambdaAnalyzer() =
     inherit ElementProblemAnalyzer<ILambdaExpr>()
 
@@ -26,12 +26,18 @@ type LambdaAnalyzer() =
     let rec compareArg (pat: IFSharpPattern) (arg: IFSharpExpression) =
         match pat.IgnoreInnerParens(), arg.IgnoreInnerParens() with
         | :? ITuplePat as pat, (:? ITupleExpr as expr) ->
-            (isNull pat.StructKeyword = isNull expr.StructKeyword) && 
+            isNull pat.StructKeyword = isNull expr.StructKeyword && 
             compareArgsSeq pat.PatternsEnumerable expr.ExpressionsEnumerable
+
         | :? ILocalReferencePat as pat, (:? IReferenceExpr as expr) ->
-            not pat.ReferenceName.IsQualified && Char.IsLower(pat.SourceName.[0]) &&
-            not expr.IsQualified && Char.IsLower(expr.ShortName.[0]) &&
-            pat.SourceName = expr.ShortName
+            let patReferenceName = pat.ReferenceName
+            if patReferenceName.IsQualified || expr.IsQualified then false else
+
+            let patName = patReferenceName.ShortName
+            if patName.IsEmpty() || not (Char.IsLower(patName.[0])) then false else
+
+            patName = expr.ShortName
+
         | :? IUnitPat, (:? IUnitExpr) -> true
         | _ -> false
 
