@@ -8,6 +8,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
 
 [<ElementProblemAnalyzer(typeof<ILambdaExpr>,
@@ -26,6 +27,9 @@ type LambdaAnalyzer() =
     let rec compareArg (pat: IFSharpPattern) (arg: IFSharpExpression) =
         match pat.IgnoreInnerParens(), arg.IgnoreInnerParens() with
         | :? ITuplePat as pat, (:? ITupleExpr as expr) ->
+            // todo: remove with FCS update, fix tuple pattern ranges
+            Shell.Instance.IsTestShell &&
+
             isNull pat.StructKeyword = isNull expr.StructKeyword && 
             compareArgsSeq pat.PatternsEnumerable expr.ExpressionsEnumerable
 

@@ -10,7 +10,7 @@ let deletePatternsFromEnd (lambda: ILambdaExpr) count =
     let pats = lambda.Patterns
     Assertion.Assert(count > 0 && count < pats.Count, "count > 0 && count < pats.Count")
 
-    let firstNodeToDelete = pats.[pats.Count - count - 1].NextSibling
+    let firstNodeToDelete = getFirstMatchingNodeBefore isWhitespace pats.[pats.Count - count]
     let lastNodeToDelete = pats.Last()
     deleteChildRange firstNodeToDelete lastNodeToDelete
 
