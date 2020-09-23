@@ -308,18 +308,22 @@ type FSharpNamingService(language: FSharpLanguage) =
             base.GetNamedElementKind(element)
 
 module FSharpNamingService =
-    let getUsedNames
+    let getUsedNamesUsages
             (contextExpr: IFSharpExpression) (usages: IList<ITreeNode>) (containingTypeElement: ITypeElement)
-            checkFcsSymbols: ISet<string> =
+            checkFcsSymbols =
 
         let usages = HashSet(usages)
-        let usedNames = HashSet()
+        let usedNames = OneToListMap<string, ITreeNode>()
+
+        let addUsedNames names =
+            for name in names do
+                usedNames.Add(name, null)
 
         // Type element is not null when checking names for declaration in a module/class.
         // Consider all member names used.
         // todo: type private let binding allow shadowing 
         if isNotNull containingTypeElement then
-            usedNames.AddRange(containingTypeElement.MemberNames)
+            addUsedNames containingTypeElement.MemberNames
 
         let scopes = Stack()
         let scopedNames = Dictionary<string, int>()
@@ -361,17 +365,17 @@ module FSharpNamingService =
                         if usages.Contains(refExpr) then
                             // Scoped names can't be used when their scope contains usage expressions
                             // in Introduce Var since the introduced name would get shadowed.
-                            usedNames.AddRange(scopedNames.Keys)
+                            addUsedNames scopedNames.Keys
                             scopedNames.Clear() else
 
                         if isNotNull refExpr.Qualifier then () else
 
                         let name = refExpr.ShortName
                         if name = SharedImplUtil.MISSING_DECLARATION_NAME ||
-                                scopedNames.ContainsKey(name) || usedNames.Contains(name) then () else
+                                scopedNames.ContainsKey(name) || usedNames.ContainsKey(name) then () else
 
                         if not checkFcsSymbols || refExpr.Reference.HasFcsSymbol then
-                            usedNames.Add(name) |> ignore
+                            usedNames.Add(name, refExpr)
 
                     | :? ILetOrUseExpr as letExpr ->
                         let patterns = letExpr.BindingsEnumerable |> Seq.map (fun b -> b.HeadPattern)
@@ -439,7 +443,11 @@ module FSharpNamingService =
             |> Seq.skipWhile ((!=) contextExpr)
             |> Seq.iter (fun expr -> expr.ProcessThisAndDescendants(processor))
 
-        usedNames :> _
+        usedNames
+
+    let getUsedNames contextExpr usages containingTypeElement checkFcsSymbols: ISet<string> =
+        let usedNames = getUsedNamesUsages contextExpr usages containingTypeElement checkFcsSymbols
+        HashSet(usedNames.Keys) :> _
 
     let createEmptyNamesCollection (fsTreeNode: IFSharpTreeNode) =
         let sourceFile = fsTreeNode.GetSourceFile()

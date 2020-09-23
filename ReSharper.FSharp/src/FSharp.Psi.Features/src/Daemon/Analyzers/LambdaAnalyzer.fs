@@ -1,7 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
 
 open System
-open System.Collections.Generic
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.Errors
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
@@ -18,10 +17,12 @@ open JetBrains.Util
 type LambdaAnalyzer() =
     inherit ElementProblemAnalyzer<ILambdaExpr>()
 
-    let rec patIsUsed (usedNames: ISet<_>) (pat: IFSharpPattern)  =
+    let rec patIsUsed (nameUsages: OneToListMap<string, ITreeNode>) (excludedUseExpr: ITreeNode) (pat: IFSharpPattern) =
         match pat.IgnoreInnerParens() with
-        | :? ITuplePat as tuplePat -> Seq.exists (patIsUsed usedNames) tuplePat.PatternsEnumerable
-        | :? ILocalReferencePat as refPat -> usedNames.Contains(refPat.SourceName)
+        | :? ITuplePat as tuplePat -> Seq.exists (patIsUsed nameUsages excludedUseExpr) tuplePat.PatternsEnumerable
+        | :? ILocalReferencePat as refPat ->
+            nameUsages.GetValuesSafe(refPat.SourceName)
+            |> Seq.exists (fun u -> isNotNull u && not (excludedUseExpr.Contains(u))) 
         | _ -> false
 
     let rec compareArg (pat: IFSharpPattern) (arg: IFSharpExpression) =
@@ -52,23 +53,29 @@ type LambdaAnalyzer() =
         compareArg (Seq.head pats) (Seq.head args) && compareArgsSeq (Seq.tail pats) (Seq.tail args)
 
     and compareArgs (pats: TreeNodeCollection<_>) (expr: IFSharpExpression) =
-        let rec compareArgsRec (expr: IFSharpExpression) i =
+        let rec compareArgsRec (expr: IFSharpExpression) i nameUsages =
             let hasMatches = i > 0
             match expr.IgnoreInnerParens() with
             | :? IPrefixAppExpr as app when isNotNull app.ArgumentExpression && i <> pats.Count ->
                 let pat = pats.[pats.Count - 1 - i]
-                let equal = compareArg pat app.ArgumentExpression
-                let funExpr = app.FunctionExpression
+                let argExpr = app.ArgumentExpression
 
-                let isPatRedundant =
-                    equal &&
-                    let usedNames = FSharpNamingService.getUsedNames funExpr EmptyList.Instance null false
-                    not (patIsUsed usedNames pat)
+                if not (compareArg pat argExpr) then
+                    hasMatches, false, app :> IFSharpExpression
+                else
+                    let funExpr = app.FunctionExpression
+                    let usedNames =
+                        if isNotNull nameUsages then nameUsages else
+                        FSharpNamingService.getUsedNamesUsages funExpr EmptyList.Instance null false
 
-                if isPatRedundant then compareArgsRec funExpr (i + 1) else (hasMatches, false, app :> IFSharpExpression)
+                    if not (patIsUsed usedNames argExpr pat) then
+                        compareArgsRec funExpr (i + 1) usedNames
+                    else
+                        hasMatches, false, app :> _
+
             | x -> hasMatches, i = pats.Count, x
 
-        compareArgsRec expr 0
+        compareArgsRec expr 0 null
 
     let isApplicable (expr: IFSharpExpression) =
         match expr with
