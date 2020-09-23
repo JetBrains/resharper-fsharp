@@ -22,3 +22,5 @@ type LambdaAnalyzerTest() =
     [<Test>] member x.``Partial application``() = x.DoNamedTest()
     [<Test>] member x.``Id``() = x.DoNamedTest()
     [<Test>] member x.``Not available``() = x.DoNamedTest()
+
+    [<Test>] member x.``Used names - Nested scope``() = x.DoNamedTest()
