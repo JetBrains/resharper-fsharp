@@ -1,11 +1,13 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
 
+open FSharp.Compiler
 open System
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.Errors
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
@@ -72,6 +74,11 @@ type LambdaAnalyzer() =
                         compareArgsRec funExpr (i + 1) usedNames
                     else
                         hasMatches, false, app :> _
+
+            | :? IReferenceExpr as r when
+                    let name = r.ShortName
+                    name = SharedImplUtil.MISSING_DECLARATION_NAME || PrettyNaming.IsOperatorName name ->
+                false, false, null
 
             | x -> hasMatches, i = pats.Count, x
 
