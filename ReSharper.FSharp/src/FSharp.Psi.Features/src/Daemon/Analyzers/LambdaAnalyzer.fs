@@ -1,5 +1,6 @@
 ﻿namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Analyzers
 
+open FSharp.Compiler
 open System
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.Errors
@@ -74,7 +75,9 @@ type LambdaAnalyzer() =
                     else
                         hasMatches, false, app :> _
 
-            | :? IReferenceExpr as r when r.ShortName = SharedImplUtil.MISSING_DECLARATION_NAME -> false, false, null
+            | :? IReferenceExpr as r when
+                r.ShortName = SharedImplUtil.MISSING_DECLARATION_NAME || PrettyNaming.IsOperatorName r.ShortName ->
+                false, false, null
             | x -> hasMatches, i = pats.Count, x
 
         compareArgsRec expr 0 null
