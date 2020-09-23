@@ -6,6 +6,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings.Errors
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Util
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Resources.Shell
 open JetBrains.Util
@@ -73,6 +74,7 @@ type LambdaAnalyzer() =
                     else
                         hasMatches, false, app :> _
 
+            | :? IReferenceExpr as r when r.ShortName = SharedImplUtil.MISSING_DECLARATION_NAME -> false, false, null
             | x -> hasMatches, i = pats.Count, x
 
         compareArgsRec expr 0 null

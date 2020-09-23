@@ -1,5 +1,6 @@
 ﻿let f x y = ()
 
+fun x -> -x
 fun x -> x + 1
 fun x -> f x 1
 
