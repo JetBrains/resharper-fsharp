@@ -1,5 +1,3 @@
-﻿module Module
-
-match 1 with
+﻿match 1 with
 | 1{caret} -> ()
 | _ -> ()

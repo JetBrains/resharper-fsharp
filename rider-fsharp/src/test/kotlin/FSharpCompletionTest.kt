@@ -21,7 +21,7 @@ class FSharpCompletionTest : CompletionTestBase() {
     override fun getSolutionDirectoryName() = "CoreConsoleApp"
     override val restoreNuGetPackages = true
 
-    private val rdFcsHost get() = project.solution.rdFSharpModel.fcsHost
+    private val rdFcsHost get() = project.solution.rdFSharpModel.fsharpTestHost
     private var isFcsReady = false
 
     @Test(enabled = false)

@@ -8,7 +8,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public bool IsRecursive => RecKeyword != null;
 
     public bool IsUse => 
-      LetOrUseToken?.GetTokenType() is var tokenType && 
+      BindingKeyword?.GetTokenType() is var tokenType && 
       (tokenType == FSharpTokenType.USE || tokenType == FSharpTokenType.USE_BANG);
 
     public void SetIsRecursive(bool value)
@@ -16,7 +16,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (!value)
         throw new System.NotImplementedException();
 
-      LetOrUseToken.NotNull().AddTokenAfter(FSharpTokenType.REC);
+      BindingKeyword.NotNull().AddTokenAfter(FSharpTokenType.REC);
     }
   }
 }

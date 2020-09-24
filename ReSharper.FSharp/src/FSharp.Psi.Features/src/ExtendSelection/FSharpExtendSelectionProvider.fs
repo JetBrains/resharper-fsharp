@@ -84,7 +84,7 @@ type FSharpExtendSelectionProvider(settingsStore: ISettingsStore) =
             null
 
         | :? IAttributeList as attrList ->
-            let letBindings = LetModuleDeclNavigator.GetByAttributeList(attrList)
+            let letBindings = LetBindingsDeclarationNavigator.GetByAttributeList(attrList)
             if isNotNull letBindings then
                 FSharpExtendSelectionProvider.CreateLetBindingSelection(fsFile, letBindings) else
 

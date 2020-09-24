@@ -1,14 +1,14 @@
 ﻿Module or namespace import
 ---
-TO: [O] open |System| RANGE: (22,28) @ Import 01.fs
-TO: [O] open System.Collections.|Generic| RANGE: (54,61) @ Import 01.fs
-TO: [O] open FSharp.|Core| RANGE: (75,79) @ Import 01.fs
+UsageOther TO: [O] open |System| RANGE: (22,28) @ Import 01.fs
+UsageOther TO: [O] open System.Collections.|Generic| RANGE: (54,61) @ Import 01.fs
+UsageOther TO: [O] open FSharp.|Core| RANGE: (75,79) @ Import 01.fs
 
 
 Other
 ---
-TO: [O] open System.|Collections|.Generic RANGE: (42,53) @ Import 01.fs
-TO: [O] open |System|.Collections.Generic RANGE: (35,41) @ Import 01.fs
-TO: [O] open |FSharp|.Core RANGE: (68,74) @ Import 01.fs
+UsageOther TO: [O] open System.|Collections|.Generic RANGE: (42,53) @ Import 01.fs
+UsageOther TO: [O] open |System|.Collections.Generic RANGE: (35,41) @ Import 01.fs
+UsageOther TO: [O] open |FSharp|.Core RANGE: (68,74) @ Import 01.fs
 
 

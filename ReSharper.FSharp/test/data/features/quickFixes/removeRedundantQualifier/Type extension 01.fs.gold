@@ -1,6 +1,4 @@
-﻿module Module
-
-open System
+﻿open System
 
 type {caret}String with
     member x.P = 123

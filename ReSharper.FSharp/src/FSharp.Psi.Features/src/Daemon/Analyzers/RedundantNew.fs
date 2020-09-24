@@ -25,7 +25,7 @@ type RedundantNewAnalyzer() =
         if typeElement.IsDescendantOf(predefinedType.IDisposable.GetTypeElement()) then () else
         if isNull newExpr.NewKeyword then () else
 
-        match newExpr.CheckerService.ResolveNameAtLocation(newExpr, typeName.Names, "RedundantNewAnalyzer") with
+        match newExpr.CheckerService.ResolveNameAtLocation(typeName, typeName.Names, "RedundantNewAnalyzer") with
         | None -> ()
         | Some symbolUse ->
 

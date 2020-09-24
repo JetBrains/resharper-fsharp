@@ -13,7 +13,7 @@ IFSharpImplFile
         FSharpIdentifierToken(type:IDENTIFIER, text:T)
         IImplicitConstructorDeclaration
           FSharpTokenType+LparenTokenElement(type:LPAREN, text:()
-          IMemberParamsDeclaration
+          IParametersPatternDeclaration
             IParenPat
               ITuplePat
                 ITypedPat

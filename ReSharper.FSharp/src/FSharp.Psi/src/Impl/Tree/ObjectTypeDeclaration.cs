@@ -16,7 +16,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
           return typeKind;
 
         foreach (var member in TypeMembersEnumerable)
-          if (!(member is IInterfaceInherit) && !(member is IAbstractSlot))
+          if (!(member is IInterfaceInherit) && !(member is IAbstractMemberDeclaration))
             return PartKind.Class;
 
         return PartKind.Interface;

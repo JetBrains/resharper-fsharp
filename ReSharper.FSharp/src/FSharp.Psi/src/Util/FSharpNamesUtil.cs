@@ -40,7 +40,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
       if (element is IFSharpDeclaredElement fsDeclaredElement)
         names.Add(fsDeclaredElement.SourceName);
 
-      if (element is IConstructor ctor && ctor.GetContainingType() is ITypeElement typeElement)
+      if (element is IConstructor ctor && ctor.GetContainingType() is { } typeElement)
         GetPossibleSourceNames(typeElement, names);
 
       if (element is ITypeElement type)
@@ -59,7 +59,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
         }
       }
 
-      return names.SelectMany(n => new[] {n, $"``{n}``"});
+      return names;
     }
 
     private static void GetPossibleSourceNames(ITypeElement type, ISet<string> names)

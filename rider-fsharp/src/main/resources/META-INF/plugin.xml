@@ -5,7 +5,6 @@
   <description>F# language support plugin for JetBrains Rider.</description>
 
   <version>0.9999</version>
-  <idea-version since-build="171.3655" />
 
   <depends>com.intellij.modules.rider</depends>
   <extensions defaultExtensionNs="com.intellij">
@@ -83,8 +82,6 @@
       <descriptionDirectoryName>SendToFsi</descriptionDirectoryName>
     </intentionAction>
 
-    <registryKey key="rider.fsharp.experimental" description="Enable experimental F# features" defaultValue="false" restartRequired="false"/>
-    <registryKey key="rider.fsharp.formatter" description="Enable F# code formatter" defaultValue="false" restartRequired="false"/>
     <registryKey key="rider.fsharp.fcsBusyDelay.ms" description="Number of milliseconds that the FCS reactor must be busy for before showing a background task" defaultValue="5000" restartRequired="false"/>
 
     <rdclient.traceScenarioHolder implementation="com.jetbrains.rider.plugins.fsharp.logs.FSharpLogTraceScenarios"/>

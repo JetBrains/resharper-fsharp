@@ -7,7 +7,6 @@ open JetBrains.Diagnostics
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.LiveTemplates
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Hotspots
 open JetBrains.ReSharper.Feature.Services.LiveTemplates.Templates
-open JetBrains.ReSharper.Feature.Services.QuickFixes
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Intentions
@@ -16,16 +15,14 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
-open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
-open JetBrains.ReSharper.Psi.Util
 open JetBrains.ReSharper.Resources.Shell
 
 type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
-    inherit QuickFixBase()
+    inherit FSharpQuickFixBase()
 
-    let addSemicolon (binding: IRecordExprBinding) =
+    let addSemicolon (binding: IRecordFieldBinding) =
         if isNull binding.Semicolon then
             match binding.Expression with
             | null -> failwith "Could not get expr"
@@ -55,38 +52,17 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
         Assertion.Assert(typeElement.IsRecord(), "Expecting record type")
 
         let fieldNames = typeElement.GetRecordFieldNames()
-        let existingBindings = recordExpr.ExprBindings
+        let existingBindings = recordExpr.FieldBindings
 
         let fieldsToAdd = HashSet(fieldNames)
         for binding in existingBindings do
             fieldsToAdd.Remove(binding.ReferenceName.ShortName) |> ignore
 
         let fsFile = recordExpr.FSharpFile
-        let lineEnding = fsFile.GetLineEnding()
         let elementFactory = fsFile.CreateElementFactory()
 
         use writeCookie = WriteLockCookie.Create(recordExpr.IsPhysical())
-        use disableFormatter = new DisableCodeFormatter()
-
-        let mutable anchor: ITreeNode =
-            match existingBindings.LastOrDefault() with
-            | null ->
-                let lBrace = recordExpr.LeftBrace
-                let rBrace = recordExpr.RightBrace
-
-                if lBrace.NextSibling == rBrace then
-                    // Empty braces: {}
-                    ModificationUtil.AddChildAfter(lBrace, Whitespace()) :> _
-                else
-                    match lBrace.NextSibling with
-                    | Whitespace node when node.GetTextLength() = 1 -> node
-                    | nextSibling ->
-
-                    // Some space inside braces: {   }
-                    let existingSpace = TreeRange(nextSibling, rBrace.PrevSibling)
-                    ModificationUtil.ReplaceChildRange(existingSpace, TreeRange(Whitespace())).First
-
-            | binding -> binding :> _
+        use enableFormatter = FSharpRegistryUtil.AllowFormatterCookie.Create()
 
         let isSingleLine = recordExpr.IsSingleLine
 
@@ -99,39 +75,34 @@ type GenerateMissingRecordFieldsFix(recordExpr: IRecordExpr) =
         if generateSingleLine && not existingBindings.IsEmpty then
             addSemicolon (existingBindings.Last())
 
-        let generatedBindings = List<IRecordExprBinding>()
+        let generatedBindings = List<IRecordFieldBinding>()
 
-        let indent =
-            match anchor with
-            | :? IRecordExprBinding -> anchor.Indent
-            | _ -> anchor.Indent + 1
+        let anchorBindingList =
+            match existingBindings.LastOrDefault() with
+            | null ->
+                let firstField = fieldsToAdd.First()
+                fieldsToAdd.Remove(firstField) |> ignore
+                let binding = elementFactory.CreateRecordFieldBinding(firstField, generateSingleLine)
+                let bindingList = RecordFieldBindingListNavigator.GetByFieldBinding(binding)
+                let actualList = ModificationUtil.AddChildAfter(recordExpr.LeftBrace, bindingList)
+                generatedBindings.Add(actualList.FieldBindings.First())
+                actualList
+            | binding -> RecordFieldBindingListNavigator.GetByFieldBinding(binding)
 
         for name in fieldsToAdd do
-            if anchor :? IRecordExprBinding then
-                if generateSingleLine then
-                    anchor <- ModificationUtil.AddChildAfter(anchor, Whitespace())
-                else
-                    anchor <- ModificationUtil.AddChildAfter(anchor, NewLine(lineEnding))
-                    anchor <- ModificationUtil.AddChildAfter(anchor, Whitespace(indent))
-
-            let binding = elementFactory.CreateRecordExprBinding(name, generateSingleLine)
-            anchor <- ModificationUtil.AddChildAfter(anchor, binding)
-            generatedBindings.Add(anchor :?> _)
-
-        let lastBinding = generatedBindings.Last()
+            let binding = elementFactory.CreateRecordFieldBinding(name, generateSingleLine)
+            generatedBindings.Add(ModificationUtil.AddChild(anchorBindingList, binding))
 
         if generateSingleLine then
+            let lastBinding = generatedBindings.Last()
             ModificationUtil.DeleteChild(lastBinding.Semicolon)
 
             for binding in existingBindings do
-                if binding.NextSibling :? IRecordExprBinding then
+                if binding.NextSibling :? IRecordFieldBinding then
                     ModificationUtil.AddChildAfter(binding, Whitespace()) |> ignore
 
-            if recordExpr.LeftBrace.NextSibling :? IRecordExprBinding then
-                ModificationUtil.AddChildAfter(recordExpr.LeftBrace, Whitespace()) |> ignore
-
-        if lastBinding.NextSibling.GetTokenType() == FSharpTokenType.RBRACE then
-            ModificationUtil.AddChildAfter(lastBinding, Whitespace()) |> ignore
+        if recordExpr.LeftBrace.NextSibling :? IRecordFieldBindingList then
+            ModificationUtil.AddChildAfter(recordExpr.LeftBrace, Whitespace()) |> ignore
 
         Action<_>(fun textControl ->
             let templatesManager = LiveTemplatesManager.Instance

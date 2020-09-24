@@ -1,8 +1,8 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Tests.Features.Daemon
 
 open JetBrains.ReSharper.TestFramework
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Highlightings
 open NUnit.Framework
-open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Highlightings
 
 type IdentifierHighlightingTest() =
     inherit FSharpHighlightingTestBase()

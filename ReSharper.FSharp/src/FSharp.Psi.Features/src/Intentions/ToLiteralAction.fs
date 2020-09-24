@@ -41,7 +41,7 @@ type ToLiteralAction(dataProvider: FSharpContextActionDataProvider) =
     let rec isLiteralBinding (binding: IBinding): bool =
         if hasLiteralAttribute binding.AttributesEnumerable then true else
 
-        let letBindings = LetModuleDeclNavigator.GetByBinding(binding)
+        let letBindings = LetBindingsDeclarationNavigator.GetByBinding(binding)
         if isNull letBindings || letBindings.Bindings.[0] != binding then false else
 
         hasLiteralAttribute letBindings.AttributesEnumerable
@@ -59,7 +59,8 @@ type ToLiteralAction(dataProvider: FSharpContextActionDataProvider) =
         if not (isSimplePattern binding.HeadPattern) then false else
         if isLiteralBinding binding then false else
 
-        binding.Expression.IsConstantValue()
+        let expr = binding.Expression
+        isNotNull expr && expr.IsConstantValue()
 
     override x.ExecutePsiTransaction(_, _) =
         let binding = dataProvider.GetSelectedElement<IBinding>()

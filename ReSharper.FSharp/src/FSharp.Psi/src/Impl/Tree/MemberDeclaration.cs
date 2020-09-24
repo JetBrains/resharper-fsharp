@@ -23,7 +23,28 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     protected override IDeclaredElement CreateDeclaredElement()
     {
-      if (!(GetFSharpSymbol() is FSharpMemberOrFunctionOrValue mfv)) return null;
+      if (ParametersPatternsEnumerable.Any())
+      {
+        var compiledName = CompiledName;
+        if (compiledName.StartsWith("op_", StringComparison.Ordinal) && IsStatic)
+          return compiledName switch
+          {
+            StandardOperatorNames.Explicit => new FSharpConversionOperator<MemberDeclaration>(this, true),
+            StandardOperatorNames.Implicit => new FSharpConversionOperator<MemberDeclaration>(this, false),
+            _ => new FSharpSignOperator<MemberDeclaration>(this)
+          };
+
+        return new FSharpMethod<MemberDeclaration>(this);
+      }
+
+      return GetFSharpSymbol() is { } fcsSymbol
+        ? CreateDeclaredElement(fcsSymbol)
+        : null;
+    }
+
+    protected override IDeclaredElement CreateDeclaredElement(FSharpSymbol fcsSymbol)
+    {
+      if (!(fcsSymbol is FSharpMemberOrFunctionOrValue mfv)) return null;
 
       if (mfv.IsProperty)
         return new FSharpProperty<MemberDeclaration>(this, mfv);
@@ -35,20 +56,6 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         return cliEvent != null
           ? (ITypeMember) new FSharpCliEvent<MemberDeclaration>(this)
           : new FSharpProperty<MemberDeclaration>(this, property);
-      }
-
-      var compiledName = mfv.CompiledName;
-      if (!mfv.IsInstanceMember && compiledName.StartsWith("op_", StringComparison.Ordinal))
-      {
-        switch (compiledName)
-        {
-          case StandardOperatorNames.Explicit:
-            return new FSharpConversionOperator<MemberDeclaration>(this, true);
-          case StandardOperatorNames.Implicit:
-            return new FSharpConversionOperator<MemberDeclaration>(this, false);
-        }
-
-        return new FSharpSignOperator<MemberDeclaration>(this);
       }
 
       return new FSharpMethod<MemberDeclaration>(this);

@@ -1,7 +1,8 @@
 package com.jetbrains.rider.plugins.fsharp.services.fsi
 
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.project.Project
+import com.jetbrains.rd.platform.util.getComponent
+import com.jetbrains.rd.platform.util.lifetime
 import com.jetbrains.rd.util.lifetime.Lifetime
 import com.jetbrains.rider.model.rdFSharpModel
 import com.jetbrains.rider.projectView.actions.ProjectViewActionBase
@@ -12,12 +13,12 @@ import com.jetbrains.rider.projectView.solution
 class SendProjectReferencesToFsiAction : ProjectViewActionBase("Send project references", "Send project references") {
     override fun actionPerformedInternal(item: ProjectModelNode, project: Project) {
         val fSharpInteractiveHost = project.solution.rdFSharpModel.fSharpInteractiveHost
-        fSharpInteractiveHost.getProjectReferences.start(item.id).result.advise(Lifetime.Eternal) { result ->
+        fSharpInteractiveHost.getProjectReferences.start(project.lifetime, item.id).result.advise(Lifetime.Eternal) { result ->
             val text =
                     result.unwrap().joinToString("\n") { "#r @\"$it\"" } +
                             "\n" +
                             "# 1 \"stdin\"\n;;\n"
-            ServiceManager.getService(project, FsiHost::class.java).sendToFsi(text, text, false)
+            project.getComponent<FsiHost>().sendToFsi(text, text, false)
         }
     }
 

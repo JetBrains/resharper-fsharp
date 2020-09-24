@@ -3,13 +3,13 @@ package com.jetbrains.rider.plugins.fsharp.services.fsi
 import com.intellij.codeInsight.intention.BaseElementAtCaretIntentionAction
 import com.intellij.codeInsight.intention.HighPriorityAction
 import com.intellij.openapi.actionSystem.*
-import com.intellij.openapi.components.ServiceManager
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.DumbAware
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Iconable
 import com.intellij.openapi.util.SystemInfo
 import com.intellij.psi.PsiElement
+import com.jetbrains.rd.platform.util.getComponent
 import com.jetbrains.rider.ideaInterop.fileTypes.fsharp.FSharpLanguageBase
 import icons.ReSharperIcons
 import javax.swing.Icon
@@ -28,7 +28,7 @@ object Fsi {
 class StartFsiAction : AnAction() {
     override fun actionPerformed(e: AnActionEvent) {
         val project = CommonDataKeys.PROJECT.getData(e.dataContext) ?: return
-        ServiceManager.getService(project, FsiHost::class.java).resetFsiConsole(false)
+        project.getComponent<FsiHost>().resetFsiConsole(false)
     }
 }
 
@@ -92,7 +92,7 @@ abstract class BaseSendToFsiIntentionAction(private val debug: Boolean, private 
             isAvailable && file.language is FSharpLanguageBase && editor?.caretModel?.caretCount == 1
 
     override fun invoke(project: Project, editor: Editor, element: PsiElement) {
-        ServiceManager.getService(project, FsiHost::class.java).sendToFsi(editor, element.containingFile, debug)
+        project.getComponent<FsiHost>().sendToFsi(editor, element.containingFile, debug)
     }
 
     override fun getIcon(flags: Int): Icon = ReSharperIcons.Bulb.GhostBulb

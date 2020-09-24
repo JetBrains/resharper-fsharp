@@ -3,6 +3,7 @@ module JetBrains.ReSharper.Plugins.FSharp.Psi.Util.OpensUtil
 
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
+open JetBrains.ReSharper.Host.Features.Documents
 open JetBrains.ReSharper.Plugins.FSharp.Psi
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
@@ -11,6 +12,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.ReSharper.Plugins.FSharp.Settings
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.Files.SandboxFiles
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.Util
 
@@ -60,6 +62,21 @@ let tryGetFirstOpensGroup (moduleDecl: IModuleLikeDeclaration) =
 
     if opens.IsEmpty then None else Some opens
 
+let tryGetOpen (moduleDecl: IModuleLikeDeclaration) namespaceName =
+    moduleDecl.MembersEnumerable
+    |> Seq.filter (fun m -> m :? IOpenStatement)
+    |> Seq.cast<IOpenStatement>
+    |> Seq.tryFind (fun x -> x.ReferenceName.QualifiedName = namespaceName)
+
+let removeOpen (openStatement: IOpenStatement) =
+    let first = getFirstMatchingNodeBefore isInlineSpaceOrComment openStatement
+    let last =
+        openStatement
+        |> skipSemicolonsAndWhiteSpacesAfter
+        |> getThisOrNextNewLine
+
+    deleteChildRange first last
+
 let isSystemNs ns =
     ns = "System" || startsWith "System." ns
 
@@ -81,13 +98,13 @@ let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBo
         addNodesBefore moduleMember [
             // todo: add setting for adding space before first module member
             // Add space before new opens group.
-            if not (moduleMember :? IOpenStatement) && (not (isAfterEmptyLine moduleMember)) then
+            if not (moduleMember :? IOpenStatement) && not (isFirstChildOrAfterEmptyLine moduleMember) then
                 NewLine(lineEnding)
 
-            if indent > 0 then
-                Whitespace(indent)
             elementFactory.CreateOpenStatement(ns)
             NewLine(lineEnding)
+            if indent > 0 then
+                Whitespace(indent)
 
             // Add space after new opens group.
             if not (moduleMember :? IOpenStatement) && not (isFollowedByEmptyLineOrComment moduleMember) then
@@ -121,6 +138,15 @@ let addOpen (offset: DocumentOffset) (fsFile: IFSharpFile) (settings: IContextBo
     let moduleDecl = findModuleToInsert fsFile offset settings
     match tryGetFirstOpensGroup moduleDecl with
     | Some opens -> addOpenToOpensGroup opens
+    | _ ->
+
+    match moduleDecl with
+    | :? IAnonModuleDeclaration when (fsFile.GetPsiModule() :? SandboxPsiModule) ->
+        moduleDecl.MembersEnumerable
+        |> Seq.skipWhile (fun m -> not (m :? IDoStatement))
+        |> Seq.tail
+        |> Seq.tryHead
+        |> Option.iter insertBeforeModuleMember
     | _ ->
 
     match Seq.tryHead moduleDecl.MembersEnumerable with

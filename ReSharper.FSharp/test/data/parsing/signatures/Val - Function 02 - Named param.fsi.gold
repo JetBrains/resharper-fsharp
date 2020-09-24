@@ -6,15 +6,15 @@ IFSharpSigFile
     FSharpIdentifierToken(type:IDENTIFIER, text:Module)
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-    ILetModuleDecl
-      ITopBinding
-        FSharpTokenType+ValTokenElement(type:VAL, text:val)
-        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
-        ITopReferencePat
-          IExpressionReferenceName
-            FSharpIdentifierToken(type:IDENTIFIER, text:f)
-        FSharpTokenType+ColonTokenElement(type:COLON, text::)
-        Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+    IBindingSignature
+      FSharpTokenType+ValTokenElement(type:VAL, text:val)
+      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+      ITopReferencePat
+        IExpressionReferenceName
+          FSharpIdentifierToken(type:IDENTIFIER, text:f)
+      FSharpTokenType+ColonTokenElement(type:COLON, text::)
+      Whitespace(type:WHITE_SPACE, text: ) spaces:" "
+      IReturnTypeInfo
         IFunctionTypeUsage
           FSharpIdentifierToken(type:IDENTIFIER, text:x)
           FSharpTokenType+ColonTokenElement(type:COLON, text::)

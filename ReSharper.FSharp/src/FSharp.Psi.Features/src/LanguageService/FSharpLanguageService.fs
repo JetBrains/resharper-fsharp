@@ -109,7 +109,7 @@ type FSharpLanguageService
             x.GetDefaultAccessType(declaredElement)
 
         | :? IExpressionReferenceName as referenceName ->
-            if isNotNull (RecordExprBindingNavigator.GetByReferenceName(referenceName)) then
+            if isNotNull (RecordFieldBindingNavigator.GetByReferenceName(referenceName)) then
                 ReferenceAccessType.WRITE else
 
             x.GetDefaultAccessType(declaredElement)

@@ -1,0 +1,4 @@
+﻿module Module =
+    let [<Literal>] zzz = 123
+
+fun Module.zzz -> Bar

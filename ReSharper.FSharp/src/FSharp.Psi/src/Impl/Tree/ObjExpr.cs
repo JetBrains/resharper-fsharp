@@ -19,7 +19,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
     public ConstantValue ConstantValue => ConstantValue.BAD_VALUE;
     public ExpressionAccessType GetAccessType() => ExpressionAccessType.None;
 
-    public IType Type() => this.TryGetFcsType();
+    public IType Type() => this.GetExpressionTypeFromFcs();
     public IExpressionType GetExpressionType() => Type();
     public IType GetImplicitlyConvertedTo() => Type();
   }

@@ -1,5 +1,3 @@
-module Module
-
 let name = ""
 
 do

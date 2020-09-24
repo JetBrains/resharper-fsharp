@@ -6,6 +6,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Psi
 open JetBrains.ReSharper.Psi.Caches
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Caches2
+open JetBrains.ReSharper.Psi.Modules
 open JetBrains.ReSharper.Psi.Tree
 open JetBrains.ReSharper.Psi.Util
 
@@ -57,6 +58,7 @@ type FSharpDeclaredElementBinder() =
         bindModuleMembers typeElement (typeDecl.As<IModuleDeclaration>())
 
     override x.BindDeclarations(file, psiModule, _) =
+        use cookie = CompilationContextCookie.GetOrCreate(psiModule.GetContextFromModule())
         let symbolCache = psiModule.GetPsiServices().Symbols
         let symbolScope = symbolCache.GetSymbolScope(psiModule, false, true)
         

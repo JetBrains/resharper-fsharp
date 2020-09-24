@@ -8,8 +8,8 @@
   </PropertyGroup>
   
   <PropertyGroup>
-    <FantomasVersion>2020.1.4</FantomasVersion>
-    <FSharpCompilerServiceVersion>2020.2.4</FSharpCompilerServiceVersion>
+    <FantomasVersion>2020.2.2</FantomasVersion>
+    <FSharpCompilerServiceVersion>2020.2.6</FSharpCompilerServiceVersion>
     <FSharpCoreVersion>4.7.0</FSharpCoreVersion>
     <ValueTupleVersion>4.5.0</ValueTupleVersion>
   </PropertyGroup>

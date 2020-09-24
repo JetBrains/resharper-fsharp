@@ -1,0 +1,4 @@
+﻿module Module
+
+let v: string * (int -> unit){caret} =
+    "", fun (a: int) -> ()

@@ -6,7 +6,7 @@ IFSharpImplFile
     FSharpIdentifierToken(type:IDENTIFIER, text:Module)
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-    IDo
+    IDoStatement
       FSharpTokenType+DoTokenElement(type:DO, text:do)
       NewLine(type:NEW_LINE, text:\n) spaces:"\n"
       Whitespace(type:WHITE_SPACE, text:    ) spaces:"    "
@@ -28,7 +28,7 @@ IFSharpImplFile
     FSharpTokenType+InTokenElement(type:IN, text:in)
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-    ILetModuleDecl
+    ILetBindingsDeclaration
       FSharpTokenType+LetTokenElement(type:LET, text:let)
       Whitespace(type:WHITE_SPACE, text: ) spaces:" "
       ITopBinding

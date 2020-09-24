@@ -1,0 +1,3 @@
+module N
+
+let a{caret} = ()

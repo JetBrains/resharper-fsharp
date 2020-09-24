@@ -6,7 +6,7 @@ IFSharpImplFile
     FSharpIdentifierToken(type:IDENTIFIER, text:Module)
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
     NewLine(type:NEW_LINE, text:\n) spaces:"\n"
-    IDo
+    IDoStatement
       IChameleonExpression
         IUnitExpr
           FSharpTokenType+LparenTokenElement(type:LPAREN, text:()

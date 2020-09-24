@@ -12,16 +12,16 @@ type ReplaceUseWithLetFix(letNode: ILetBindings) =
     inherit FSharpQuickFixBase()
 
     new (warning: UseBindingsIllegalInModulesWarning) =
-        ReplaceUseWithLetFix(warning.LetModuleDecl)
+        ReplaceUseWithLetFix(warning.LetBindings)
 
     new (error: UseKeywordIllegalInPrimaryCtorError) =
-        ReplaceUseWithLetFix(error.LetModuleDecl)
+        ReplaceUseWithLetFix(error.LetBindings)
 
     override x.Text = "Replace with 'let'"
     override x.IsAvailable _ = isValid letNode
 
     override x.ExecutePsiTransaction _ =
-        let useKeyword = letNode.LetOrUseToken
+        let useKeyword = letNode.BindingKeyword
         Assertion.Assert(useKeyword.GetTokenType() == FSharpTokenType.USE,
                          sprintf "Expecting use, got: %O" (useKeyword.GetTokenType()))
 

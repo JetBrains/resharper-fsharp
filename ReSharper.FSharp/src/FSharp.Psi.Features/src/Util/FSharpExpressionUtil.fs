@@ -9,6 +9,7 @@ open JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Util
 open JetBrains.ReSharper.Psi
+open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Tree
 
@@ -27,12 +28,12 @@ let isPredefinedFunctionRef name (expr: IFSharpExpression) =
     let containingType = declaredElement.GetContainingType()
     isNotNull containingType && containingType.GetClrName() = predefinedFunctionTypes.[name]
 
-let inline isPredefinedInfixOpApp name (binaryAppExpr: IBinaryAppExpr) =
+let isPredefinedInfixOpApp name (binaryAppExpr: IBinaryAppExpr) =
     if isNull binaryAppExpr then false else
     isPredefinedFunctionRef name binaryAppExpr.Operator
 
-let inline isPredefinedFunctionApp name (expr: IFSharpExpression) (arg: outref<IFSharpExpression>) =
-    match expr with
+let isPredefinedFunctionApp name (expr: #IFSharpExpression) (arg: outref<IFSharpExpression>) =
+    match expr :> IFSharpExpression with
     | :? IPrefixAppExpr as prefixApp when
             isPredefinedFunctionRef name prefixApp.FunctionExpression ->
         arg <- prefixApp.ArgumentExpression
@@ -51,6 +52,27 @@ let inline isPredefinedFunctionApp name (expr: IFSharpExpression) (arg: outref<I
         true
 
     | _ -> false
+
+
+let getPossibleFunctionAppReferenceExpr (expr: IFSharpExpression) =
+    match expr with
+    | :? IPrefixAppExpr as prefixApp -> prefixApp.FunctionExpression
+    | :? IBinaryAppExpr as binaryApp ->
+        let refExpr = binaryApp.FunctionExpression.As<IReferenceExpr>()
+        if isNull refExpr then null else
+
+        match refExpr.ShortName with
+        | "|>" -> binaryApp.RightArgument
+        | "<|" -> binaryApp.LeftArgument
+        | _ -> null
+    | _ -> null
+
+let getPossibleFunctionAppName (expr: IFSharpExpression) =
+    let expr = getPossibleFunctionAppReferenceExpr expr
+    match expr.IgnoreInnerParens() with
+    | :? IReferenceExpr as refExpr -> refExpr.ShortName
+    | _ -> SharedImplUtil.MISSING_DECLARATION_NAME
+
 
 let rec createLogicallyNegatedExpression (expr: IFSharpExpression): IFSharpExpression =
     if isNull expr then null else

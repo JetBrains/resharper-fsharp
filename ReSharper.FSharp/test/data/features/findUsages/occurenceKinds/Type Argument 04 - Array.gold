@@ -1,10 +1,10 @@
 ﻿Pattern
 ---
-TO: [O] let |l|: string[] = [||] RANGE: (21,22) @ Type Argument 04 - Array.fs
+UsageOther TO: [O] let |l|: string[] = [||] RANGE: (21,22) @ Type Argument 04 - Array.fs
 
 
 Type argument
 ---
-TO: [O] let l: |string|[] = [||] RANGE: (24,30) @ Type Argument 04 - Array.fs
+UsageTypeArgument TO: [O] let l: |string|[] = [||] RANGE: (24,30) @ Type Argument 04 - Array.fs
 
 

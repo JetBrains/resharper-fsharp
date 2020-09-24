@@ -1,6 +1,4 @@
-﻿module Module
-
-async {
+﻿async {
     let! _{caret} = Async.Sleep(0)
     return ()
 } |> ignore

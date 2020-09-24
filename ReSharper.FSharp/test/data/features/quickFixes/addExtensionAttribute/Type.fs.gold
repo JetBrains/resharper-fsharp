@@ -1,0 +1,9 @@
+namespace Test
+
+open System.Runtime.CompilerServices
+
+[<Extension>]
+type TestType() =
+
+    [<{caret}Extension>]
+    let a() = 5

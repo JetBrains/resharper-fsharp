@@ -1,6 +1,4 @@
-﻿module Module
-
-type T() =
+﻿type T() =
     let rec g{caret} x = ()
 
     do g ()

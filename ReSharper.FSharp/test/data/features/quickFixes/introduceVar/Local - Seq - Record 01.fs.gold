@@ -1,6 +1,4 @@
-﻿module Module
-
-type Roar =
+﻿type Roar =
     { Field: int }
 
 do

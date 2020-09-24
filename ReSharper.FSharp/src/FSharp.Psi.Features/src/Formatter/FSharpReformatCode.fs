@@ -21,6 +21,7 @@ open JetBrains.Util.Text
 [<CodeCleanupModule>]
 type FSharpReformatCode() =
     interface ICodeCleanupModule with
+        member x.Name = "Reformat F#"
         member x.LanguageType = FSharpLanguage.Instance :> _
         member x.Descriptors = EmptyList.Instance :> _
         member x.IsAvailableOnSelection = true
@@ -45,23 +46,41 @@ type FSharpReformatCode() =
 
             
             let solution = fsFile.GetSolution()
-            let settings = sourceFile.GetSettingsStore()
+            let settings = sourceFile.GetSettingsStoreWithEditorConfig()
             let languageService = fsFile.Language.LanguageServiceNotNull()
             let formatter = languageService.CodeFormatter
 
             let settings =
                 formatter.GetFormatterSettings(solution, sourceFile, settings, false) :?> FSharpFormatSettingsKey
 
-            let formatConfig = { FormatConfig.Default with
-                                     PageWidth = settings.WRAP_LIMIT
-                                     IndentSpaceNum = settings.INDENT_SIZE
-                                     ReorderOpenDeclaration = settings.ReorderOpenDeclarations
-                                     SpaceBeforeColon = settings.SpaceBeforeColon
-                                     SpaceAfterComma = settings.SpaceAfterComma
-                                     SpaceAfterSemicolon = settings.SpaceAfterSemicolon
-                                     IndentOnTryWith = settings.IndentOnTryWith
-                                     SpaceAroundDelimiter = settings.SpaceAroundDelimiter
-                                     KeepNewlineAfter = settings.PreserveEndOfLine }
+            let formatConfig =
+                { FormatConfig.Default with
+                      IndentSize = settings.INDENT_SIZE
+                      MaxLineLength = settings.WRAP_LIMIT
+                      SpaceBeforeParameter = settings.SpaceBeforeParameter
+                      SpaceBeforeLowercaseInvocation = settings.SpaceBeforeLowercaseInvocation
+                      SpaceBeforeUppercaseInvocation = settings.SpaceBeforeUppercaseInvocation
+                      SpaceBeforeClassConstructor = settings.SpaceBeforeClassConstructor
+                      SpaceBeforeMember = settings.SpaceBeforeMember
+                      SpaceBeforeColon = settings.SpaceBeforeColon
+                      SpaceAfterComma = settings.SpaceAfterComma
+                      SpaceBeforeSemicolon = settings.SpaceBeforeSemicolon
+                      SpaceAfterSemicolon = settings.SpaceAfterSemicolon
+                      IndentOnTryWith = settings.IndentOnTryWith
+                      SpaceAroundDelimiter = settings.SpaceAroundDelimiter
+                      MaxIfThenElseShortWidth = settings.MaxIfThenElseShortWidth
+                      MaxInfixOperatorExpression = settings.MaxInfixOperatorExpression
+                      MaxRecordWidth = settings.MaxRecordWidth
+                      MaxArrayOrListWidth = settings.MaxArrayOrListWidth
+                      MaxValueBindingWidth = settings.MaxValueBindingWidth
+                      MaxFunctionBindingWidth = settings.MaxFunctionBindingWidth
+                      MultilineBlockBracketsOnSameColumn = settings.MultilineBlockBracketsOnSameColumn
+                      NewlineBetweenTypeDefinitionAndMembers = settings.NewlineBetweenTypeDefinitionAndMembers
+                      KeepIfThenInSameLine = settings.KeepIfThenInSameLine
+                      MaxElmishWidth = settings.MaxElmishWidth
+                      SingleArgumentWebMode = settings.SingleArgumentWebMode
+                      AlignFunctionSignatureToIndentation = settings.AlignFunctionSignatureToIndentation
+                      AlternativeLongMemberDefinitions = settings.AlternativeLongMemberDefinitions }
 
             let stamp = document.LastModificationStamp
             let modificationSide = TextModificationSide.NotSpecified

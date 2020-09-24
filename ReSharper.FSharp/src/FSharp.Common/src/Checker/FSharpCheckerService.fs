@@ -151,10 +151,9 @@ type FSharpCheckerService
 
     /// Use with care: returns wrong symbol inside its non-recursive declaration, see dotnet/fsharp#7694.
     member x.ResolveNameAtLocation(context: ITreeNode, names, opName) =
-        let sourceFile = context.GetSourceFile()
-        let names = List.ofSeq names
-        let coords = context.GetNavigationRange().StartOffset.ToDocumentCoords()
-        x.ResolveNameAtLocation(sourceFile, names, coords, opName)
+        let offset = context.GetNavigationRange().EndOffset - 1
+        let coords = offset.ToDocumentCoords()
+        x.ResolveNameAtLocation(context.GetSourceFile(), List.ofSeq names, coords, opName)
 
 
 type FSharpParseAndCheckResults = 
@@ -173,6 +172,7 @@ type IFcsProjectProvider =
     /// Returns True when the project has been invalidated.
     abstract InvalidateReferencesToProject: IProject -> bool
 
+    abstract InvalidateDirty: unit -> unit
     abstract ModuleInvalidated: ISignal<IPsiModule>
 
     /// True when any F# projects are currently known to project options provider after requesting info from FCS.

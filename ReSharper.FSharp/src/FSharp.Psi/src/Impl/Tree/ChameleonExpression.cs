@@ -1,9 +1,13 @@
+using System;
 using System.Collections.Generic;
 using System.Text;
 using FSharp.Compiler;
 using JetBrains.Annotations;
 using JetBrains.Diagnostics;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
+using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
+using JetBrains.ReSharper.Plugins.FSharp.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.Tree;
 using JetBrains.ReSharper.Psi.Impl;
@@ -13,9 +17,9 @@ using JetBrains.Text;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 {
-  internal partial class ChameleonExpression : IChameleonNode
+  internal partial class ChameleonExpression
   {
-    [CanBeNull] public SyntaxTree.SynExpr SynExpr { get; private set; }
+    public SyntaxTree.SynExpr SynExpr { get; private set; }
 
     public int OriginalStartOffset { get; }
     public int OriginalLineStart { get; }
@@ -146,5 +150,27 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (relativeRange.ContainedIn(TreeTextRange.FromLength(GetTextLength())))
         base.FindNodesAtInternal(relativeRange, result, includeContainingNodes);
     }
+
+    public bool Check(Func<IFSharpExpression, bool> fsExprPredicate,
+      Func<SyntaxTree.SynExpr, bool> synExprPredicate)
+    {
+      var synExpr = SynExpr;
+      if (synExpr != null) return synExprPredicate(synExpr);
+
+      var fsExpr = Expression;
+      if (fsExpr != null)
+        return fsExprPredicate(fsExpr);
+
+      return false;
+    }
+  }
+
+  public static class ChameleonExpressionUtil
+  {
+    public static bool IsSimpleValueExpression([NotNull] this IChameleonExpression expr) =>
+      expr.NotNull().Check(FSharpExpressionUtil.IsSimpleValueExpressionFunc, FcsExpressionUtil.IsSimpleValueExpressionFunc);
+
+    public static bool IsLiteralExpression([NotNull] this IChameleonExpression expr) =>
+      expr.NotNull().Check(FSharpExpressionUtil.IsLiteralExpressionFunc, FcsExpressionUtil.IsLiteralExpressionFunc);
   }
 }

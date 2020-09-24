@@ -2,6 +2,7 @@
 module JetBrains.ReSharper.Plugins.FSharp.Psi.PsiUtil
 
 open FSharp.Compiler.Range
+open JetBrains.Annotations
 open JetBrains.Application.Settings
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Feature.Services.ExpressionSelection
@@ -18,6 +19,7 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI.Tree
 open JetBrains.ReSharper.Psi.Files
 open JetBrains.ReSharper.Psi.Parsing
 open JetBrains.ReSharper.Psi.Tree
+open JetBrains.ReSharper.Psi.Util
 open JetBrains.TextControl
 open JetBrains.Util.Text
 
@@ -145,7 +147,11 @@ let isFiltered (node: ITreeNode) =
 
 let isSemicolon (node: ITreeNode) =
     getTokenType node == FSharpTokenType.SEMICOLON
-    
+
+let isIdentifierOrKeyword (node: ITreeNode) =
+    let tokenType = getTokenType node
+    isNotNull tokenType && (tokenType.IsIdentifier || tokenType.IsKeyword)
+
 let isFirstChild (node: ITreeNode) =
     let parent = getParent node
     isNotNull parent && parent.FirstChild == node
@@ -257,6 +263,8 @@ let isAfterEmptyLine (node: ITreeNode) =
     prevNonWhitespace != prevPrevNonWhiteSpace &&
     prevNonWhitespace :? NewLine && (isNull prevPrevNonWhiteSpace || prevPrevNonWhiteSpace :? NewLine)
 
+let isFirstChildOrAfterEmptyLine (node: ITreeNode) =
+    isNull node.PrevSibling || isAfterEmptyLine node
 
 [<AutoOpen>]
 module PsiModificationUtil =
@@ -283,6 +291,9 @@ module PsiModificationUtil =
 
     let deleteChild child =
         ModificationUtil.DeleteChild(child)
+        
+    let replaceRangeWithNode first last replaceNode =
+        ModificationUtil.ReplaceChildRange(TreeRange(first, last), TreeRange(replaceNode)) |> ignore
 
     let addNodesAfter anchor (nodes: ITreeNode seq) =
         nodes |> Seq.fold (fun anchor treeNode ->
@@ -386,7 +397,8 @@ let shiftWithWhitespaceBefore shift (expr: IFSharpExpression) =
     shiftExpr shift expr
 
 
-let rec tryFindRootPrefixAppWhereExpressionIsFunc (expr: IFSharpExpression) =
+[<CanBeNull>]
+let rec tryFindRootPrefixAppWhereExpressionIsFunc ([<CanBeNull>] expr: IFSharpExpression) =
     let prefixApp = PrefixAppExprNavigator.GetByFunctionExpression(expr.IgnoreParentParens())
     if isNotNull prefixApp && isNotNull prefixApp.ArgumentExpression then
         tryFindRootPrefixAppWhereExpressionIsFunc(prefixApp)

@@ -1,0 +1,19 @@
+﻿|id|(0) 1
+|Operators.id|(1) 1
+
+let id x = |id|(2) x
+
+id 1
+|Operators.id|(3) 1
+
+module Operators =
+    let id x = x
+
+Operators.id 1
+|FSharp.Core.Operators.id|(4) 1
+---------------------------------------------------------
+(0): ReSharper Dead Code: Redundant application
+(1): ReSharper Dead Code: Redundant application
+(2): ReSharper Dead Code: Redundant application
+(3): ReSharper Dead Code: Redundant application
+(4): ReSharper Dead Code: Redundant application

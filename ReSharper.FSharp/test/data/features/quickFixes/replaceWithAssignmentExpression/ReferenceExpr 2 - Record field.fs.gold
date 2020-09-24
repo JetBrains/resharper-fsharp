@@ -1,6 +1,4 @@
-﻿module Module
-
-type Record = {Field: int}
+﻿type Record = {Field: int}
 
 let f() =
     let record = {Field = 1}

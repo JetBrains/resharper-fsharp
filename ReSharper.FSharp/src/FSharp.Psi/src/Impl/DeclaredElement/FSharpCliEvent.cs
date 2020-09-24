@@ -34,14 +34,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     public bool IsFieldLikeEvent => false;
   }
 
-  internal class AbstractFSharpCliEvent : FSharpCliEvent<AbstractSlot>
+  internal class AbstractFSharpCliEvent : FSharpCliEvent<AbstractMemberDeclaration>
   {
     public AbstractFSharpCliEvent([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {
     }
 
     protected override FSharpType MfvType =>
-      Mfv?.CurriedParameterGroups.FirstOrDefault()?.FirstOrDefault() is FSharpParameter parameter
+      Mfv?.CurriedParameterGroups.FirstOrDefault()?.FirstOrDefault() is { } parameter
         ? parameter.Type
         : null;
 

@@ -13,3 +13,6 @@ type FSharpDaemonBehaviour() =
            sourceFile.IsLanguageSupported<FSharpLanguage>()
         then ErrorStripeRequest.STRIPE_AND_ERRORS
         else ErrorStripeRequest.NONE
+
+    override x.RunInSolutionAnalysis = false
+    override x.RunInFindCodeIssues = true

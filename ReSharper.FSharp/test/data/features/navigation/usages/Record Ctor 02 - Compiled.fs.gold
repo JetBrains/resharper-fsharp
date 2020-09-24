@@ -2,6 +2,24 @@
 +++ JetBrains.ReSharper.Features.Navigation.Features.GoToUsages.GotoUsagesProvider navigation provider results +++
 Occurrences provided for OccurrenceUtil:
 Occurrence's dump:
+TO: [O] let r1: |Record| = { Field = 1 } RANGE: (25,31) @ Record Ctor 02 - Compiled.fs
+Menu Item presentation: 
+Text: Module.r1      |let r1: |Record| = { Field = 1 }| (3)
+Shortcut text: in <Root Namespace>
+Style: Enabled
+Mnemonic: 
+Tooltip: let r1: Record = { Field = 1 }
+
+Occurrence's navigation result. Opened file: Record Ctor 02 - Compiled.fs
+------------------
+module Module
+
+let r1: Record|CARET| = { Field = 1 }
+let r2 = { r1 with Field = 2 }
+
+------------------
+
+Occurrence's dump:
 TO: [O] let r1: Record = |{ Field = 1 }| RANGE: (34,47) @ Record Ctor 02 - Compiled.fs
 Menu Item presentation: 
 Text: Module.r1      |let r1: Record = |{ Field = 1 }| (3)
@@ -15,24 +33,6 @@ Occurrence's navigation result. Opened file: Record Ctor 02 - Compiled.fs
 module Module
 
 let r1: Record = |CARET|{ Field = 1 }
-let r2 = { r1 with Field = 2 }
-
-------------------
-
-Occurrence's dump:
-TO: [O] let r1: |Record| = { Field = 1 } RANGE: (25,31) @ Record Ctor 02 - Compiled.fs
-Menu Item presentation: 
-Text: Module.r1      |let r1: |Record| = { Field = 1 }| (3)
-Shortcut text: in <Root Namespace>
-Style: Enabled
-Mnemonic: 
-Tooltip: let r1: Record = { Field = 1 }
-
-Occurrence's navigation result. Opened file: Record Ctor 02 - Compiled.fs
-------------------
-module Module
-
-let r1: |CARET|Record = { Field = 1 }
 let r2 = { r1 with Field = 2 }
 
 ------------------
